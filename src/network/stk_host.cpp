@@ -506,9 +506,12 @@ void STKHost::handleLANRequests()
     }   // if message is server-requested
     else if (std::string(buffer, len) == "connection-request")
     {
-        Protocol *c = new ConnectToPeer(0);
+        Protocol *c = new ConnectToPeer(sender);
         c->requestStart();
     }
+    else
+        Log::info("STKHost", "Received unknown command '%s'",
+                  std::string(buffer, len).c_str());
 
 }   // handleLANRequests
 

@@ -23,8 +23,6 @@
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
-#include <string>
-
 /** One instance of this is started for every peer who tries to
  *  connect to this server.
  */
@@ -38,6 +36,9 @@ protected:
     /** Pointer to the protocol which is monitored for state changes. */
     Protocol *m_current_protocol;
 
+    /** True if this is a LAN connection. */
+    bool m_is_lan;
+
     enum STATE
     {
         NONE,
@@ -46,11 +47,11 @@ protected:
         CONNECTED,
         DONE,
         EXITING
-    };
-    STATE m_state;
+    }  m_state;
 
 public:
-    ConnectToPeer(uint32_t peer_id);
+             ConnectToPeer(uint32_t peer_id);
+             ConnectToPeer(const TransportAddress &address);
     virtual ~ConnectToPeer();
 
     virtual bool notifyEventAsynchronous(Event* event);

@@ -24,6 +24,7 @@
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/servers_manager.hpp"
+#include "network/stk_host.hpp"
 
 using namespace Online;
 
@@ -34,6 +35,7 @@ RequestConnection::RequestConnection(uint32_t server_id)
                  : Protocol(PROTOCOL_SILENT)
 {
     m_server_id = server_id;
+    m_request   = NULL;
 }   // RequestConnection
 
 // ----------------------------------------------------------------------------
@@ -75,19 +77,18 @@ void RequestConnection::asynchronousUpdate()
         {
             if(NetworkConfig::get()->isLAN())
             {
-                Network *broadcast = new Network(1, 1, 0, 0);
-
-                NetworkString s(std::string("connection-request"));
                 const Server *server = 
                     ServersManager::get()->getServerByID(m_server_id);
-                broadcast->sendRawPacket(s.getBytes(), s.size(),
-                                         server->getAddress());
-                m_state = EXITING;
+                NetworkString s(std::string("connection-request"));
+                STKHost::get()->sendRawPacket(s.getBytes(), s.size(),
+                                             server->getAddress());
+                m_state = DONE;
             }
             else
             {
                 m_request = new ServerJoinRequest();
-                PlayerManager::setUserDetails(m_request, "request-connection", Online::API::SERVER_PATH);
+                PlayerManager::setUserDetails(m_request, "request-connection",
+                                               Online::API::SERVER_PATH);
 
                 m_request->addParameter("server_id", m_server_id);
                 m_request->queue();

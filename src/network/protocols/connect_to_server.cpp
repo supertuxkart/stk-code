@@ -84,7 +84,7 @@ void ConnectToServer::setup()
     m_current_protocol = NULL;
     // In case of LAN we already have the server's and our ip address,
     // so we can immediately start requesting a connection.
-    m_state = NetworkConfig::get()->isLAN() ? GETTING_SERVER_ADDRESS : NONE;
+    m_state = NetworkConfig::get()->isLAN() ? GOT_SERVER_ADDRESS : NONE;
 }   // setup
 
 // ----------------------------------------------------------------------------
@@ -135,14 +135,14 @@ void ConnectToServer::asynchronousUpdate()
                 // Find its address
                 m_current_protocol = new GetPeerAddress(m_host_id, this);
                 m_current_protocol->requestStart();
-                m_state = GETTING_SERVER_ADDRESS;
+                m_state = GOT_SERVER_ADDRESS;
                 // Pause this protocol till GetPeerAddress finishes.
                 // The callback then will unpause this protocol/
                 ProtocolManager::getInstance()->pauseProtocol(this);
             }
         }
         break;
-        case GETTING_SERVER_ADDRESS:
+        case GOT_SERVER_ADDRESS:
         {
             assert(!m_quick_join);
             delete m_current_protocol;
@@ -163,9 +163,11 @@ void ConnectToServer::asynchronousUpdate()
         }
         case REQUESTING_CONNECTION:
             // In case of a LAN server, m_crrent_protocol is NULL
-            if (NetworkConfig::get()->isLAN() ||
+            if (!m_current_protocol ||
                 m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
             {
+                delete m_current_protocol;
+                m_current_protocol = NULL;
                 // Server knows we want to connect
                 Log::info("ConnectToServer", "Connection request made");
                 if (m_server_address.getIP() == 0 ||
@@ -253,7 +255,7 @@ void ConnectToServer::callback(Protocol *protocol)
             // STKHost, so we only need to unpause this protocol
             ProtocolManager::getInstance()->unpauseProtocol(this);
             break;
-        case GETTING_SERVER_ADDRESS:
+        case GOT_SERVER_ADDRESS:
             // Get the server address from the protocol.
             m_server_address.copy(((GetPeerAddress*)protocol)->getAddress());
             ProtocolManager::getInstance()->unpauseProtocol(this);
@@ -355,11 +357,13 @@ void ConnectToServer::handleSameLAN()
     STKHost* host = STKHost::get();
     host->stopListening(); // stop the listening
 
+#ifdef XX
     TransportAddress broadcast_address;
     broadcast_address.setIP(-1); // 255.255.255.255
     broadcast_address.setPort(7321);
     char data2[] = "aloha_stk\0";
     host->sendRawPacket((uint8_t*)(data2), 10, broadcast_address);
+#endif
 
     Log::info("ConnectToServer", "Waiting broadcast message.");
 

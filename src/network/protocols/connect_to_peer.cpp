@@ -31,12 +31,30 @@
 #include "utils/log.hpp"
 
 // ----------------------------------------------------------------------------
-
+/** Constructor for a WAN request. In this case we need to get the peer's
+ *  ip address first. 
+ *  \param peer_id ID of the peer in the stk client table.
+ */
 ConnectToPeer::ConnectToPeer(uint32_t peer_id)  : Protocol(PROTOCOL_CONNECTION)
 {
-    m_peer_id = peer_id;
-    m_state = NONE;
-}   // ConnectToPeer
+    m_peer_address.clear();
+    m_peer_id          = peer_id;
+    m_state            = NONE;
+    m_current_protocol = NULL;
+    m_is_lan           = false;
+}   // ConnectToPeer(peer_id)
+
+// ----------------------------------------------------------------------------
+ConnectToPeer::ConnectToPeer(const TransportAddress &address)
+             : Protocol(PROTOCOL_CONNECTION)
+{
+    m_peer_address.copy(address);
+    // We don't need to find the peer address, so we can start
+    // with the state when we found the peer address.
+    m_state            = RECEIVED_PEER_ADDRESS;
+    m_current_protocol = NULL;
+    m_is_lan           = true;
+}   // ConnectToPeers(TransportAddress)
 
 // ----------------------------------------------------------------------------
 
@@ -44,13 +62,10 @@ ConnectToPeer::~ConnectToPeer()
 {
 }   // ~ConnectToPeer
 
-    // ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void ConnectToPeer::setup()
 {
-    m_peer_address.clear();
-    m_current_protocol = NULL;
-    m_state            = NONE;
 }   // setup
     // ----------------------------------------------------------------------------
 
@@ -103,7 +118,8 @@ void ConnectToPeer::asynchronousUpdate()
             // the Ping protocol to keep the port available. We can't rely on
             // STKHost::isLAN(), since we might get a LAN connection even if
             // the server itself accepts connections from anywhere.
-            if (m_peer_address.getIP() != NetworkConfig::get()
+            if (!m_is_lan &&
+                m_peer_address.getIP() != NetworkConfig::get()
                                           ->getMyAddress().getIP())
             {
                 m_current_protocol = new PingProtocol(m_peer_address,
@@ -117,8 +133,14 @@ void ConnectToPeer::asynchronousUpdate()
             // Just send a broadcast packet with the string aloha_stk inside,
             // the client will know our ip address and will connect
             TransportAddress broadcast_address;
-            broadcast_address.setIP(-1); // 255.255.255.255
-            broadcast_address.setPort(m_peer_address.getPort()); // 0b10101100000101101101111111111111; // for test
+            if(NetworkConfig::get()->isWAN())
+            {
+                broadcast_address.setIP(-1); // 255.255.255.255
+                broadcast_address.setPort(m_peer_address.getPort());
+            }
+            else
+                broadcast_address.copy(m_peer_address);
+
             char data[] = "aloha_stk\0";
             STKHost::get()->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
             Log::info("ConnectToPeer", "Broadcast aloha sent.");
