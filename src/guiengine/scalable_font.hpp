@@ -22,15 +22,6 @@
 #include "guiengine/ft_environment.hpp"
 #include "utils/leak_check.hpp"
 
-#include "IrrCompileConfig.h"
-#include "IGUIFontBitmap.h"
-#include "irrString.h"
-#include "irrMap.h"
-#include "IXMLReader.h"
-#include "IReadFile.h"
-#include "irrArray.h"
-
-
 #include <map>
 #include <string>
 #include <set>

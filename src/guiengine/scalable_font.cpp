@@ -23,11 +23,6 @@
 #include "io/file_manager.hpp"
 #include "utils/translation.hpp"
 
-#include <IAttributes.h>
-#include <IGUIEnvironment.h>
-#include <IGUISpriteBank.h>
-#include <IVideoDriver.h>
-
 #include <clocale>
 #include <cmath>
 #include <cwctype>
@@ -310,7 +305,7 @@ bool ScalableFont::loadTTF()
 
     m_glyph_max_height = curr_maxheight;
 
-    for(wchar_t c='0'; c<='9'; c++)
+    for(wchar_t c = '0'; c <= '9'; c++)
     {
         SFontArea a = getAreaFromCharacter(c, NULL);
         m_max_digit_area.width     = a.width;
@@ -815,7 +810,7 @@ void ScalableFont::doDraw(const core::stringw& text,
 
     if (m_type == T_NORMAL || T_BOLD) //lazy load char, have to do this again
     {                                 //because some text isn't drawn with getDimension
-        for (u32 i = 0; i<text_size; i++)
+        for (u32 i = 0; i < text_size; i++)
         {
             wchar_t c = text[i];
             if (c == L'\r' ||  c == L'\n' || c == L' ' || c < 32) continue;
@@ -842,7 +837,7 @@ void ScalableFont::doDraw(const core::stringw& text,
         }
     }
 
-    for (u32 i = 0; i<text_size; i++)
+    for (u32 i = 0; i < text_size; i++)
     {
         wchar_t c = text[i];
 
