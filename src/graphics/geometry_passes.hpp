@@ -44,7 +44,8 @@ public:
                            unsigned render_target);
     void renderShadows(const ShadowMatrices& shadow_matrices,
                        const FrameBuffer& shadow_framebuffer);
-    void renderReflectiveShadowMap(const ShadowMatrices& shadow_matrices,
+    void renderReflectiveShadowMap(const DrawCalls& draw_calls,
+                                   const ShadowMatrices& shadow_matrices,
                                    const FrameBuffer& reflective_shadow_map_framebuffer);
 
 

@@ -60,29 +60,9 @@
                       prefilled_tex[1], prefilled_tex[2], prefilled_tex[3]);
     }
 
-
-
-
-template<typename T>
-void CommandBuffer::fillMaterial(int material_id,
-                                 MeshMap *mesh_map,
-                                 T *instance_buffer)
-{
-    m_offset[material_id] = m_command_buffer_offset;
-    FillInstances<T>(mesh_map[material_id],
-                     m_meshes[material_id],
-                     instance_buffer,
-                     m_draw_indirect_cmd,
-                     m_instance_buffer_offset,
-                     m_command_buffer_offset,
-                     m_poly_count);
-            
-    m_size[material_id] = m_command_buffer_offset - m_instance_buffer_offset;        
-}
-
-
-CommandBuffer::CommandBuffer():
-m_offset(NULL), m_size(NULL), m_poly_count(0)
+template<int N>
+CommandBuffer<N>::CommandBuffer():
+m_poly_count(0)
 {
     glGenBuffers(1, &m_draw_indirect_cmd_id);
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_draw_indirect_cmd_id);
@@ -104,20 +84,15 @@ m_offset(NULL), m_size(NULL), m_poly_count(0)
     }    
 }
 
-CommandBuffer::~CommandBuffer()
+template<int N>
+CommandBuffer<N>::~CommandBuffer()
 {
-    delete[] m_meshes;
     glDeleteBuffers(1, &m_draw_indirect_cmd_id);
-    delete[] m_offset;
-    delete[] m_size;
 }
 
 
 SolidCommandBuffer::SolidCommandBuffer(): CommandBuffer()
 {
-    m_meshes = new std::vector<GLMesh *>[static_cast<int>(Material::SHADERTYPE_COUNT)];
-    m_offset = new size_t[static_cast<int>(Material::SHADERTYPE_COUNT)];
-    m_size = new size_t[static_cast<int>(Material::SHADERTYPE_COUNT)];
 }
    
 void SolidCommandBuffer::fill(MeshMap *mesh_map)
@@ -218,9 +193,6 @@ void SolidCommandBuffer::fill(MeshMap *mesh_map)
 
 ShadowCommandBuffer::ShadowCommandBuffer(): CommandBuffer()
 {
-    m_meshes = new std::vector<GLMesh *>[4 * static_cast<int>(Material::SHADERTYPE_COUNT)];
-    m_offset = new size_t[4 * static_cast<int>(Material::SHADERTYPE_COUNT)];
-    m_size = new size_t[4 * static_cast<int>(Material::SHADERTYPE_COUNT)];
 }
 
 void ShadowCommandBuffer::fill(MeshMap *mesh_map)
@@ -228,6 +200,13 @@ void ShadowCommandBuffer::fill(MeshMap *mesh_map)
     m_instance_buffer_offset = 0;
     m_command_buffer_offset = 0;
     m_poly_count = 0;
+    
+    //clear meshes
+    for(int i=0;i<4*Material::SHADERTYPE_COUNT;i++)
+    {
+        m_meshes[i].clear();
+    }
+    
     InstanceDataSingleTex *shadow_instance_buffer;
     
     if (CVS->supportsAsyncInstanceUpload())
@@ -281,9 +260,6 @@ void ShadowCommandBuffer::fill(MeshMap *mesh_map)
 
 ReflectiveShadowMapCommandBuffer::ReflectiveShadowMapCommandBuffer(): CommandBuffer()
 {
-    m_meshes = new std::vector<GLMesh *>[static_cast<int>(Material::SHADERTYPE_COUNT)];
-    m_offset = new size_t[static_cast<int>(Material::SHADERTYPE_COUNT)];
-    m_size = new size_t[static_cast<int>(Material::SHADERTYPE_COUNT)];
 }
 
 
@@ -292,11 +268,18 @@ void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
     m_instance_buffer_offset = 0;
     m_command_buffer_offset = 0;
     m_poly_count = 0;
+    
+    //clear meshes
+    for(int i=0;i<Material::SHADERTYPE_COUNT;i++)
+    {
+        m_meshes[i].clear();
+    }
+    
     InstanceDataSingleTex *rsm_instance_buffer;
     
     if (CVS->supportsAsyncInstanceUpload())
     {
-        rsm_instance_buffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeShadow);
+        rsm_instance_buffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeRSM);
     }
     else
     {
@@ -319,7 +302,7 @@ void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
         Material::SHADERTYPE_ALPHA_TEST,
         Material::SHADERTYPE_SOLID_UNLIT,
         Material::SHADERTYPE_DETAIL_MAP,
-        Material::SHADERTYPE_NORMAL_MAP,
+        Material::SHADERTYPE_NORMAL_MAP
     };
     int material_id;
     
@@ -340,17 +323,17 @@ void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
 } //ReflectiveShadowMapCommandBuffer::fill
 
 GlowCommandBuffer::GlowCommandBuffer()
-{
-    m_meshes = new std::vector<GLMesh *>[1];
-    m_offset = new size_t[1];
-    m_size = new size_t[1];    
+{   
 }
 
 void GlowCommandBuffer::fill(MeshMap *mesh_map)
 {
     m_instance_buffer_offset = 0;
     m_command_buffer_offset = 0;
-    m_poly_count = 0;    
+    m_poly_count = 0;
+    
+    m_meshes[0].clear();
+    
     GlowInstanceData *glow_instance_buffer;
 
     if (CVS->supportsAsyncInstanceUpload())

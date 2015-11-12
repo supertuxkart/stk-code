@@ -543,7 +543,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
             m_solid_cmd_buffer.fill(m_solid_pass_mesh);
         }
 #pragma omp section
-        {
+        {            
             size_t offset = 0, current_cmd = 0;
 
             if (!CVS->supportsAsyncInstanceUpload())
@@ -578,6 +578,8 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
         }
 #pragma omp section
         {
+            //m_shadow_cmd_buffer.fill(m_shadow_pass_mesh);
+
             irr_driver->setPhase(SHADOW_PASS);
 
             size_t offset = 0, current_cmd = 0;
@@ -615,7 +617,9 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
 #pragma omp section
         if (!shadow_matrices.isRSMMapAvail())
         {
-            size_t offset = 0, current_cmd = 0;
+            m_reflective_shadow_map_cmd_buffer.fill(m_reflective_shadow_map_mesh);
+
+            /*size_t offset = 0, current_cmd = 0;
             if (!CVS->supportsAsyncInstanceUpload())
             {
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeRSM));
@@ -649,7 +653,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
             {
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-            }
+            }*/
         }
     }
     PROFILER_POP_CPU_MARKER();
@@ -700,26 +704,34 @@ void DrawCalls::multidrawIndirectSolidCmd(Material::ShaderType shader_type) cons
 
 void DrawCalls::drawIndirectSolidFirstPass() const
 {
-    m_solid_cmd_buffer.drawIndirect<DefaultMaterial>();
-    m_solid_cmd_buffer.drawIndirect<AlphaRef>();
-    m_solid_cmd_buffer.drawIndirect<UnlitMat>();
-    m_solid_cmd_buffer.drawIndirect<SphereMap>();
-    m_solid_cmd_buffer.drawIndirect<GrassMat>(windDir);
-    m_solid_cmd_buffer.drawIndirect<DetailMat>();
-    m_solid_cmd_buffer.drawIndirect<NormalMat>();  
+    m_solid_cmd_buffer.drawIndirectFirstPass<DefaultMaterial>();
+    m_solid_cmd_buffer.drawIndirectFirstPass<AlphaRef>();
+    m_solid_cmd_buffer.drawIndirectFirstPass<UnlitMat>();
+    m_solid_cmd_buffer.drawIndirectFirstPass<SphereMap>();
+    m_solid_cmd_buffer.drawIndirectFirstPass<GrassMat>(windDir);
+    m_solid_cmd_buffer.drawIndirectFirstPass<DetailMat>();
+    m_solid_cmd_buffer.drawIndirectFirstPass<NormalMat>();  
 }
 
 
 void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled_tex) const
 {
 
-    m_solid_cmd_buffer.drawIndirect2ndPass<DefaultMaterial>(prefilled_tex);
-    m_solid_cmd_buffer.drawIndirect2ndPass<AlphaRef>(prefilled_tex);
-    m_solid_cmd_buffer.drawIndirect2ndPass<UnlitMat>(prefilled_tex);
-    m_solid_cmd_buffer.drawIndirect2ndPass<SphereMap>(prefilled_tex);
-    m_solid_cmd_buffer.drawIndirect2ndPass<GrassMat>(prefilled_tex, windDir, irr_driver->getSunDirection());
-    m_solid_cmd_buffer.drawIndirect2ndPass<DetailMat>(prefilled_tex);
-    m_solid_cmd_buffer.drawIndirect2ndPass<NormalMat>(prefilled_tex);
+    m_solid_cmd_buffer.drawIndirectSecondPass<DefaultMaterial>(prefilled_tex);
+    m_solid_cmd_buffer.drawIndirectSecondPass<AlphaRef>(prefilled_tex);
+    m_solid_cmd_buffer.drawIndirectSecondPass<UnlitMat>(prefilled_tex);
+    m_solid_cmd_buffer.drawIndirectSecondPass<SphereMap>(prefilled_tex);
+    m_solid_cmd_buffer.drawIndirectSecondPass<GrassMat>(prefilled_tex, windDir, irr_driver->getSunDirection());
+    m_solid_cmd_buffer.drawIndirectSecondPass<DetailMat>(prefilled_tex);
+    m_solid_cmd_buffer.drawIndirectSecondPass<NormalMat>(prefilled_tex);
 }
 
+void DrawCalls::drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const
+{
+    m_reflective_shadow_map_cmd_buffer.drawIndirectReflectiveShadowMap<DefaultMaterial>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirectReflectiveShadowMap<AlphaRef>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirectReflectiveShadowMap<UnlitMat>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirectReflectiveShadowMap<NormalMat>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirectReflectiveShadowMap<DetailMat>(rsm_matrix);   
+}
 

@@ -191,7 +191,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                 if (!m_shadow_matrices.isRSMMapAvail())
                 {
                     PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
-                    m_geometry_passes.renderReflectiveShadowMap(m_shadow_matrices, 
+                    m_geometry_passes.renderReflectiveShadowMap(m_draw_calls,
+                                                                m_shadow_matrices, 
                                                                 irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer()); //TODO: move somewhere else as RSM are computed only once per track
                     m_shadow_matrices.setRSMMapAvail(true);
                     PROFILER_POP_CPU_MARKER();

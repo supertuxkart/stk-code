@@ -852,7 +852,8 @@ void multidrawRSM(Args...args)
 }   // multidrawRSM
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderReflectiveShadowMap(const ShadowMatrices& shadow_matrices,
+void GeometryPasses::renderReflectiveShadowMap(const DrawCalls& draw_calls,
+                                               const ShadowMatrices& shadow_matrices,
                                                const FrameBuffer& reflective_shadow_map_framebuffer)
 {
     ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_RSM));
@@ -868,8 +869,7 @@ void GeometryPasses::renderReflectiveShadowMap(const ShadowMatrices& shadow_matr
     drawRSM<SplattingMat, 1>(rsm_matrix);
 
     if (CVS->supportsIndirectInstancingRendering())
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER,
-                     RSMPassCmd::getInstance()->drawindirectcmd);
+        draw_calls.bindReflectiveShadowMapsCmd();
 
     if (CVS->isAZDOEnabled())
     {
@@ -881,10 +881,6 @@ void GeometryPasses::renderReflectiveShadowMap(const ShadowMatrices& shadow_matr
     }
     else if (CVS->supportsIndirectInstancingRendering())
     {
-        renderRSMShadow<DefaultMaterial>(rsm_matrix);
-        renderRSMShadow<AlphaRef>(rsm_matrix);
-        renderRSMShadow<UnlitMat>(rsm_matrix);
-        renderRSMShadow<NormalMat>(rsm_matrix);
-        renderRSMShadow<DetailMat>(rsm_matrix);
+        draw_calls.drawIndirectReflectiveShadowMaps(rsm_matrix);
     }
 }   // renderRSM

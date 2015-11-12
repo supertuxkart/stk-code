@@ -98,6 +98,10 @@ public:
     void renderParticlesList()     const;
 
     inline void bindSolidCmd() const { m_solid_cmd_buffer.bind(); }
+    inline void bindReflectiveShadowMapsCmd() const { m_reflective_shadow_map_cmd_buffer.bind(); }
+
+    
+    
     inline bool isSolidCmdEmpty(Material::ShaderType shader_type) const
     { return m_solid_cmd_buffer.isEmpty(shader_type); }
     void drawIndirectSolidCmd(Material::ShaderType shader_type, int i) const;
@@ -106,6 +110,9 @@ public:
     void drawIndirectSolidFirstPass() const;
     //void multidrawIndirectSolidCmd() const; //TODO
     void drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled_tex) const;
+    void drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const;
+
+    
 };
 
 #endif //HEADER_DRAW_CALLS_HPP
