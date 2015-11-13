@@ -98,8 +98,8 @@ namespace Scripting
             {
                 gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
                 STKTextBillboard* tb = new STKTextBillboard(wtext.c_str(), font,
-                    video::SColor(255, 255, 225, 0),
-                    video::SColor(255, 255, 89, 0),
+                    GUIEngine::getSkin()->getColor("bottom::font"),
+                    GUIEngine::getSkin()->getColor("top::font"),
                     irr_driver->getSceneManager()->getRootSceneNode(),
                     irr_driver->getSceneManager(), -1, xyz,
                     core::vector3df(1.5f, 1.5f, 1.5f));
@@ -117,8 +117,8 @@ namespace Scripting
                     textsize.Height / 35.0f),
                     xyz,
                     -1, // id
-                    video::SColor(255, 255, 225, 0),
-                    video::SColor(255, 255, 89, 0));
+                    GUIEngine::getSkin()->getColor("bottom::font"),
+                    GUIEngine::getSkin()->getColor("top::font"));
                 World::getWorld()->getTrack()->addNode(sn);
             }
         }
