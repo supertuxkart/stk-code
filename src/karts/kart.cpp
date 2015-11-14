@@ -2753,8 +2753,8 @@ void Kart::setOnScreenText(const wchar_t *text)
         gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont()
                                                        : GUIEngine::getTitleFont();
         new STKTextBillboard(text, font,
-            GUIEngine::getSkin()->getColor("bottom::font"),
-            GUIEngine::getSkin()->getColor("top::font"),
+            GUIEngine::getSkin()->getColor("font::bottom"),
+            GUIEngine::getSkin()->getColor("font::top"),
             getNode(), irr_driver->getSceneManager(), -1,
             core::vector3df(0.0f, 1.5f, 0.0f),
             core::vector3df(1.0f, 1.0f, 1.0f));
@@ -2770,8 +2770,8 @@ void Kart::setOnScreenText(const wchar_t *text)
             textsize.Height/55.0f),
             core::vector3df(0.0f, 1.5f, 0.0f),
             -1, // id
-            GUIEngine::getSkin()->getColor("bottom::font"),
-            GUIEngine::getSkin()->getColor("top::font"));
+            GUIEngine::getSkin()->getColor("font::bottom"),
+            GUIEngine::getSkin()->getColor("font::top"));
     }
 
     // No need to store the reference to the billboard scene node:

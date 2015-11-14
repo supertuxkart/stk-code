@@ -256,8 +256,8 @@ when the border that intersect at this corner are enabled.
 <element type="rating" state="neutral" image="peach/rating_star.png" />
 
 <!-- Font color -->
-<color type="top" state="font" a="255" r="255" g="128" b="0" />
-<color type="bottom" state="font" a="255" r="255" g="220" b="15" />
-<color type="normal" state="font" a="255" r="210" g="100" b="50" />
+<color type="font" state="top" a="255" r="255" g="128" b="0" />
+<color type="font" state="bottom" a="255" r="255" g="220" b="15" />
+<color type="font" state="normal" a="255" r="210" g="100" b="50" />
 
 </skin>

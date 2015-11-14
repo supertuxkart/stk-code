@@ -354,9 +354,9 @@ void PlayerController::update(float dt)
                 if (m)
                 {
                     m->addMessage(_("Penalty time!!"), m_kart, 2.0f,
-                                  GUIEngine::getSkin()->getColor("top::font"));
+                                  GUIEngine::getSkin()->getColor("font::top"));
                     m->addMessage(_("Don't accelerate before go"), m_kart, 2.0f,
-                                  GUIEngine::getSkin()->getColor("normal::font"));
+                                  GUIEngine::getSkin()->getColor("font::normal"));
                 }
                 m_bzzt_sound->play();
 
