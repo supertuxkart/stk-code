@@ -20,6 +20,7 @@
 
 #include "graphics/2dutils.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/skin.hpp"
 #include "io/file_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -992,10 +993,11 @@ void ScalableFont::doDraw(const core::stringw& text,
 
         if (fallback[n] || m_type == T_BOLD)
         {
-            // TODO: don't hardcode colors?
-            video::SColor orange(color.getAlpha(), 255, 100, 0);
-            video::SColor yellow(color.getAlpha(), 255, 220, 15);
-            video::SColor title_colors[] = {orange, yellow, orange, yellow};
+            video::SColor title_colors[] = {GUIEngine::getSkin()->getColor("font::top"   ),
+                                            GUIEngine::getSkin()->getColor("font::bottom"),
+                                            GUIEngine::getSkin()->getColor("font::top"   ),
+                                            GUIEngine::getSkin()->getColor("font::bottom")
+                                           };
 
             if (charCollector != NULL)
             {
