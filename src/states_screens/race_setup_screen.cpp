@@ -233,7 +233,7 @@ void RaceSetupScreen::init()
     }
 
 #ifdef ENABLE_SOCCER_MODE
-    if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_mode)
+if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_mode)
     {
         irr::core::stringw name5 = irr::core::stringw(
             RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
@@ -244,7 +244,6 @@ void RaceSetupScreen::init()
 
 #define ENABLE_EASTER_EGG_MODE
 #ifdef ENABLE_EASTER_EGG_MODE
-    if(race_manager->getNumLocalPlayers() == 1)
     {
         irr::core::stringw name1 = irr::core::stringw(
            RaceManager::getNameOf(RaceManager::MINOR_MODE_EASTER_EGG)) + L"\n";

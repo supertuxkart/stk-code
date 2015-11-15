@@ -169,7 +169,7 @@
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/controller/ai_base_controller.hpp"
+#include "karts/controller/ai_base_lap_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/demo_world.hpp"

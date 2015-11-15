@@ -22,18 +22,18 @@
 #include "karts/controller/controller.hpp"
 #include "states_screens/state_manager.hpp"
 
+
 class AIProperties;
 class LinearWorld;
+class ThreeStrikesBattle;
 class QuadGraph;
+class BattleGraph;
 class Track;
 class Vec3;
 
-/** A base class for all AI karts. This class basically provides some
- *  common low level functions.
- * \ingroup controller
- */
 class AIBaseController : public Controller
 {
+
 private:
     /** Stores the last N times when a collision happened. This is used
     *  to detect when the AI is stuck, i.e. N collisions happened in
@@ -42,24 +42,26 @@ private:
 
     /** A flag that is set during the physics processing to indicate that
     *  this kart is stuck and needs to be rescued. */
-    bool m_stuck_trigger_rescue;
+    bool m_stuck;
+
 
 protected:
-    /** Length of the kart, storing it here saves many function calls. */
+     /** Length of the kart, storing it here saves many function calls. */
     float m_kart_length;
 
     /** Cache width of kart. */
     float m_kart_width;
 
+    
     /** Keep a pointer to the track to reduce calls */
     Track       *m_track;
 
-    /** Keep a pointer to world. */
-    LinearWorld *m_world;
-
+    
+    
     /** A pointer to the AI properties for this kart. */
     const AIProperties *m_ai_properties;
 
+<<<<<<< HEAD
     /** The current node the kart is on. This can be different from the value
      *  in LinearWorld, since it takes the chosen path of the AI into account
      *  (e.g. the closest point in LinearWorld might be on a branch not
@@ -77,46 +79,35 @@ protected:
     /** For each graph node this list contains a list of the next X
      *  graph nodes. */
     std::vector<std::vector<int> > m_all_look_aheads;
+=======
+>>>>>>> origin/battleAI
 
+    static bool m_ai_debug;
+    
     virtual void update      (float delta) ;
-    virtual unsigned int getNextSector(unsigned int index);
-    virtual void  newLap             (int lap);
-    virtual void setControllerName(const std::string &name);
     virtual void setSteering   (float angle, float dt);
-    float    steerToAngle  (const unsigned int sector, const float angle);
-    float    steerToPoint  (const Vec3 &point);
+    void    setControllerName(const std::string &name);
+    float   steerToPoint(const Vec3 &point);
     float    normalizeAngle(float angle);
-    void     computePath();
     virtual bool doSkid(float steer_fraction);
-    // ------------------------------------------------------------------------
-    /** Nothing special to do when the race is finished. */
-    virtual void raceFinished() {};
+
+    
+
     // ------------------------------------------------------------------------
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
-    bool     isStuck() const { return m_stuck_trigger_rescue; }
+    bool     isStuck() const { return m_stuck; }
 
-    static bool m_ai_debug;
 public:
-             AIBaseController(AbstractKart *kart,
+    
+    AIBaseController(AbstractKart *kart,
                               StateManager::ActivePlayer *player=NULL);
     virtual ~AIBaseController() {};
     virtual void reset();
     static void enableDebug() {m_ai_debug = true; }
-    virtual void crashed(const AbstractKart *k) {};
-    virtual void crashed(const Material *m);
-    virtual void handleZipper(bool play_sound) {};
-    virtual void finishedRace(float time) {};
-    virtual void collectedItem(const Item &item, int add_info=-1,
-                               float previous_energy=0) {};
-    virtual void setPosition(int p) {};
-    virtual bool isNetworkController() const { return false; }
-    virtual bool isPlayerController() const { return false; }
-    virtual void action(PlayerAction action, int value) {};
-    virtual void  skidBonusTriggered() {};
     virtual bool  disableSlipstreamBonus() const;
-};   // AIBaseController
+    
+    virtual void    crashed(const Material *m);
 
+};
 #endif
-
-/* EOF */

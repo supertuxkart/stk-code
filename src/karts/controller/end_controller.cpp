@@ -52,13 +52,13 @@
 
 EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *player,
                              Controller *prev_controller)
-             : AIBaseController(kart, player)
+             : AIBaseLapController(kart, player)
 {
     m_previous_controller = prev_controller;
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
-        // Overwrite the random selected default path from AIBaseController
+        // Overwrite the random selected default path from AIBaseLapController
         // with a path that always picks the first branch (i.e. it follows
         // the main driveline).
         std::vector<unsigned int> next;
@@ -124,7 +124,7 @@ EndController::~EndController()
 //-----------------------------------------------------------------------------
 void EndController::reset()
 {
-    AIBaseController::reset();
+    AIBaseLapController::reset();
 
     m_crash_time       = 0.0f;
     m_time_since_stuck = 0.0f;
@@ -179,7 +179,7 @@ void EndController::update(float dt)
     m_controls->m_brake     = false;
     m_controls->m_accel     = 1.0f;
 
-    AIBaseController::update(dt);
+    AIBaseLapController::update(dt);
 
     // In case of battle mode: don't do anything
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||

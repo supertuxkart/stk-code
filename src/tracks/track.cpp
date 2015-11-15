@@ -54,6 +54,7 @@
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"
+#include "tracks/battle_graph.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track_manager.hpp"
@@ -274,6 +275,7 @@ void Track::reset()
 void Track::cleanup()
 {
     QuadGraph::destroy();
+    BattleGraph::destroy();
     ItemManager::destroy();
     VAOManager::kill();
 
@@ -706,8 +708,14 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
         }
     }
 }   // loadQuadGraph
-
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+/** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
+ *  they are connected to each other. Input file name is hardcoded for now
+ */
+void Track::loadBattleGraph()
+{
+    BattleGraph::create(m_root+"navmesh.xml");
+}// -----------------------------------------------------------------------------
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
     QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
@@ -1587,9 +1595,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the information about the size of the texture to render the mini
     // map to.
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+    
 
     ItemManager::create();
-
+	
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
     float forwards_distance  = 1.5f;
@@ -1811,12 +1820,28 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     delete root;
 
+	// ItemManager assumes the existence of a QuadGraph, that is why the 
+	// quad graph is loaded before ItemManager::create(). This is undesirable
+	// but requires signifcant code overhaul to fix. The new battle graph
+	// performs its own computatoins separate from ItemManager. But
+	// Battle Graph needs ItemManager to be created, and all items to be
+	// added to ItemManager. Loading battle graph here is therefore a workaround
+	// to the main problem.
+	if (m_is_arena && !m_is_soccer && !m_is_cutscene) loadBattleGraph();
+
+
     if (UserConfigParams::m_track_debug &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
         !m_is_cutscene)
     {
         QuadGraph::get()->createDebugMesh();
     }
+
+    if (UserConfigParams::m_track_debug &&
+        race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
+        !m_is_cutscene)
+        BattleGraph::get()->createDebugMesh();
+
 
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
@@ -1851,6 +1876,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     irr_driver->unsetTextureErrorMessage();
+
+	
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------

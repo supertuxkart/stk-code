@@ -44,6 +44,9 @@ private:
 
     float          m_penalty_time;
 
+    /** This variable is required for battle mode **/
+    int            m_current_node;
+
     /** The camera attached to the kart for this controller. The camera
      *  object is managed in the Camera class, so no need to free it. */
     Camera        *m_camera;
@@ -65,6 +68,8 @@ public:
     void           handleZipper      (bool play_sound);
     void           collectedItem     (const Item &item, int add_info=-1,
                                       float previous_energy=0);
+    unsigned int getCurrentNode() const { return m_current_node; }
+    void         setCurrentNode(int i)  { m_current_node = i;   } 
     virtual void   skidBonusTriggered();
     virtual void   setPosition       (int p);
     virtual bool   isPlayerController() const {return true;}

@@ -43,7 +43,7 @@
 #endif
 
 
-#include "karts/controller/ai_base_controller.hpp"
+#include "karts/controller/ai_base_lap_controller.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/graph_node.hpp"
 #include "utils/random_generator.hpp"
@@ -111,7 +111,7 @@ the AI does the following steps:
 
 \ingroup controller
 */
-class SkiddingAI : public AIBaseController
+class SkiddingAI : public AIBaseLapController
 {
 private:
 

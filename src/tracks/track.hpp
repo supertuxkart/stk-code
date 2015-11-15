@@ -43,6 +43,7 @@ class ModelDefinitionLoader;
 #include "items/item.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "tracks/quad_graph.hpp"
+#include "tracks/battle_graph.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/translation.hpp"
 #include "utils/vec3.hpp"
@@ -376,6 +377,7 @@ private:
 
     void loadTrackInfo();
     void loadQuadGraph(unsigned int mode_id, const bool reverse);
+    void loadBattleGraph();
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
     void createWater(const XMLNode &node);
