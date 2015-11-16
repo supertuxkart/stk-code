@@ -172,6 +172,10 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
     else if (name == m_server_list_widget->m_properties[GUIEngine::PROP_ID])
     {
         int selected_index = m_server_list_widget->getSelectionID();
+        // This can happen e.g. when the list is empty and the user
+        // clicks somewhere.
+        if(selected_index >= ServersManager::get()->getNumServers())
+            return;
         const Server *server = 
             ServersManager::get()->getServerBySort(selected_index);
         uint32_t server_id = server->getServerId();
