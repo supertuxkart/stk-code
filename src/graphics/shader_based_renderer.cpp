@@ -183,7 +183,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
             CVS->isShadowEnabled() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
-            m_geometry_passes.renderShadows(m_shadow_matrices,
+            m_geometry_passes.renderShadows(m_draw_calls,
+                                            m_shadow_matrices,
                                             irr_driver->getRTT()->getShadowFrameBuffer());
             PROFILER_POP_CPU_MARKER();
             if (CVS->isGlobalIlluminationEnabled())

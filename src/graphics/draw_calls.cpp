@@ -79,7 +79,7 @@ void DrawCalls::genDrawCalls(unsigned cascade,
     if (CVS->supportsIndirectInstancingRendering())
         ShadowPassCmd::getInstance()->Offset[cascade][Mat] = CommandBufferOffset; // Store command buffer offset
         
-    FillInstances<T>(m_shadow_pass_mesh[Mat][cascade],
+    FillInstances<T>(m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat],
                      InstancedList,
                      InstanceBuffer,
                      CommandBuffer,
@@ -275,7 +275,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                 for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
                     if (Mat != Material::SHADERTYPE_SPLATTING)
-                        m_shadow_pass_mesh[Mat][cascade][mesh->mb].emplace_back(mesh, Node);
+                        m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].emplace_back(mesh, Node);
                     else
                     {
                         core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
@@ -438,7 +438,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
         m_solid_pass_mesh[Mat].clear();
         m_reflective_shadow_map_mesh[Mat].clear();
         for (unsigned i = 0; i < 4; i++)
-            m_shadow_pass_mesh[Mat][i].clear();
+            m_shadow_pass_mesh[i * Material::SHADERTYPE_COUNT + Mat].clear();
     }
 
     m_glow_pass_mesh.clear();
@@ -578,82 +578,13 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
         }
 #pragma omp section
         {
-            //m_shadow_cmd_buffer.fill(m_shadow_pass_mesh);
-
             irr_driver->setPhase(SHADOW_PASS);
-
-            size_t offset = 0, current_cmd = 0;
-            if (!CVS->supportsAsyncInstanceUpload())
-            {
-                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeShadow));
-                ShadowInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-                glBindBuffer(GL_DRAW_INDIRECT_BUFFER, ShadowPassCmd::getInstance()->drawindirectcmd);
-                ShadowCmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-            }
-
-            for (unsigned i = 0; i < 4; i++)
-            {
-                // Mat default
-                genDrawCalls<Material::SHADERTYPE_SOLID>(i, ListInstancedMatDefault::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
-                // Mat AlphaRef
-                genDrawCalls<Material::SHADERTYPE_ALPHA_TEST>(i, ListInstancedMatAlphaRef::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
-                // Mat Unlit
-                genDrawCalls<Material::SHADERTYPE_SOLID_UNLIT>(i, ListInstancedMatUnlit::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
-                // Mat NormalMap
-                genDrawCalls<Material::SHADERTYPE_NORMAL_MAP>(i, ListInstancedMatNormalMap::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
-                // Mat Spheremap
-                genDrawCalls<Material::SHADERTYPE_SPHERE_MAP>(i, ListInstancedMatSphereMap::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
-                // Mat Detail
-                genDrawCalls<Material::SHADERTYPE_DETAIL_MAP>(i, ListInstancedMatDetails::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
-                // Mat Grass
-                genDrawCalls<Material::SHADERTYPE_VEGETATION>(i, ListInstancedMatGrass::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
-            }
-            if (!CVS->supportsAsyncInstanceUpload())
-            {
-                glUnmapBuffer(GL_ARRAY_BUFFER);
-                glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-            }
+            m_shadow_cmd_buffer.fill(m_shadow_pass_mesh);
         }
 #pragma omp section
         if (!shadow_matrices.isRSMMapAvail())
         {
             m_reflective_shadow_map_cmd_buffer.fill(m_reflective_shadow_map_mesh);
-
-            /*size_t offset = 0, current_cmd = 0;
-            if (!CVS->supportsAsyncInstanceUpload())
-            {
-                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeRSM));
-                RSMInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-                glBindBuffer(GL_DRAW_INDIRECT_BUFFER, RSMPassCmd::getInstance()->drawindirectcmd);
-                RSMCmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-            }
-
-            // Default Material
-            RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID] = current_cmd;
-            FillInstances(m_reflective_shadow_map_mesh[Material::SHADERTYPE_SOLID], ListInstancedMatDefault::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
-            RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID];
-            // Alpha Ref
-            RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_ALPHA_TEST] = current_cmd;
-            FillInstances(m_reflective_shadow_map_mesh[Material::SHADERTYPE_ALPHA_TEST], ListInstancedMatAlphaRef::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
-            RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_ALPHA_TEST] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_ALPHA_TEST];
-            // Unlit
-            RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_UNLIT] = current_cmd;
-            FillInstances(m_reflective_shadow_map_mesh[Material::SHADERTYPE_SOLID_UNLIT], ListInstancedMatUnlit::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
-            RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID_UNLIT] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_UNLIT];
-            // Detail
-            RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_DETAIL_MAP] = current_cmd;
-            FillInstances(m_reflective_shadow_map_mesh[Material::SHADERTYPE_DETAIL_MAP], ListInstancedMatDetails::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
-            RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_DETAIL_MAP] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_DETAIL_MAP];
-            // Normal Map
-            RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP] = current_cmd;
-            FillInstances(m_reflective_shadow_map_mesh[Material::SHADERTYPE_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
-            RSMPassCmd::getInstance()->Size[Material::SHADERTYPE_NORMAL_MAP] = current_cmd - RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_NORMAL_MAP];
-
-            if (!CVS->supportsAsyncInstanceUpload())
-            {
-                glUnmapBuffer(GL_ARRAY_BUFFER);
-                glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-            }*/
         }
     }
     PROFILER_POP_CPU_MARKER();
@@ -728,10 +659,20 @@ void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled
 
 void DrawCalls::drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const
 {
-    m_reflective_shadow_map_cmd_buffer.drawIndirectReflectiveShadowMap<DefaultMaterial>(rsm_matrix);
-    m_reflective_shadow_map_cmd_buffer.drawIndirectReflectiveShadowMap<AlphaRef>(rsm_matrix);
-    m_reflective_shadow_map_cmd_buffer.drawIndirectReflectiveShadowMap<UnlitMat>(rsm_matrix);
-    m_reflective_shadow_map_cmd_buffer.drawIndirectReflectiveShadowMap<NormalMat>(rsm_matrix);
-    m_reflective_shadow_map_cmd_buffer.drawIndirectReflectiveShadowMap<DetailMat>(rsm_matrix);   
+    m_reflective_shadow_map_cmd_buffer.drawIndirect<DefaultMaterial>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirect<AlphaRef>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirect<UnlitMat>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirect<NormalMat>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirect<DetailMat>(rsm_matrix);   
 }
 
+void DrawCalls::drawIndirectShadows(unsigned cascade) const
+{
+    m_shadow_cmd_buffer.drawIndirect<DefaultMaterial>(cascade);
+    m_shadow_cmd_buffer.drawIndirect<DetailMat>(cascade);
+    m_shadow_cmd_buffer.drawIndirect<AlphaRef>(cascade);
+    m_shadow_cmd_buffer.drawIndirect<UnlitMat>(cascade);
+    m_shadow_cmd_buffer.drawIndirect<GrassMat,irr::core::vector3df>(windDir, cascade);
+    m_shadow_cmd_buffer.drawIndirect<NormalMat>(cascade);
+    
+}

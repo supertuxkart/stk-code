@@ -53,7 +53,7 @@ private:
     irr::core::vector3df windDir; //TODO: same member in geometry_passes
     
     MeshMap m_solid_pass_mesh           [Material::SHADERTYPE_COUNT]    ;
-    MeshMap m_shadow_pass_mesh          [Material::SHADERTYPE_COUNT][4] ;
+    MeshMap m_shadow_pass_mesh          [4 * Material::SHADERTYPE_COUNT] ;
     MeshMap m_reflective_shadow_map_mesh[Material::SHADERTYPE_COUNT]    ;
     MeshMap m_glow_pass_mesh;
     std::vector <STKMeshCommon *> m_deferred_update;
@@ -98,6 +98,7 @@ public:
     void renderParticlesList()     const;
 
     inline void bindSolidCmd() const { m_solid_cmd_buffer.bind(); }
+    inline void bindShadowCmd() const { m_shadow_cmd_buffer.bind(); }
     inline void bindReflectiveShadowMapsCmd() const { m_reflective_shadow_map_cmd_buffer.bind(); }
 
     
@@ -110,8 +111,8 @@ public:
     void drawIndirectSolidFirstPass() const;
     //void multidrawIndirectSolidCmd() const; //TODO
     void drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled_tex) const;
+    void drawIndirectShadows(unsigned cascade) const;
     void drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const;
-
     
 };
 

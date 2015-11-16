@@ -17,6 +17,7 @@
 
 #include "graphics/command_buffer.hpp"
 #include "graphics/central_settings.hpp"
+#include "utils/cpp2011.hpp"
 
 
     template<>
@@ -60,6 +61,30 @@
                       prefilled_tex[1], prefilled_tex[2], prefilled_tex[3]);
     }
 
+
+template<int N>
+void CommandBuffer<N>::clearMeshes()
+{
+    m_instance_buffer_offset = 0;
+    m_command_buffer_offset = 0;
+    m_poly_count = 0;    
+    
+    for(int i=0;i<N;i++)
+    {
+        m_meshes[i].clear();
+    }   
+}
+
+template<int N>
+void CommandBuffer<N>::unmapBuffers()
+{
+    if (!CVS->supportsAsyncInstanceUpload())
+    {
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
+    }    
+}
+
 template<int N>
 CommandBuffer<N>::CommandBuffer():
 m_poly_count(0)
@@ -90,235 +115,102 @@ CommandBuffer<N>::~CommandBuffer()
     glDeleteBuffers(1, &m_draw_indirect_cmd_id);
 }
 
-
 SolidCommandBuffer::SolidCommandBuffer(): CommandBuffer()
 {
 }
-   
+
 void SolidCommandBuffer::fill(MeshMap *mesh_map)
 {
-    m_instance_buffer_offset = 0;
-    m_command_buffer_offset = 0;
-    m_poly_count = 0;    
+    clearMeshes();
     
-    //clear meshes
-    for(int i=0;i<Material::SHADERTYPE_COUNT;i++)
-    {
-        m_meshes[i].clear();
-    }
-    
-    
-    //Dual textures materials
-    InstanceDataDualTex *instance_buffer_dual_tex;
-
-    if (CVS->supportsAsyncInstanceUpload())
-    {
-        instance_buffer_dual_tex =
-            (InstanceDataDualTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeDualTex);
-    }
-    else
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeDualTex));
-        instance_buffer_dual_tex =
-            (InstanceDataDualTex*) glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                                                    10000 * sizeof(InstanceDataDualTex),
-                                                    GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_draw_indirect_cmd_id);
+    std::vector<int> dual_tex_material_list =
+        createVector<int>(Material::SHADERTYPE_SOLID,
+                          Material::SHADERTYPE_ALPHA_TEST,
+                          Material::SHADERTYPE_SOLID_UNLIT,
+                          Material::SHADERTYPE_SPHERE_MAP,
+                          Material::SHADERTYPE_VEGETATION);
+                          
+    fillInstanceData<InstanceDataDualTex>(mesh_map,
+                                          dual_tex_material_list,
+                                          InstanceTypeDualTex);
+                                           
+    std::vector<int> three_tex_material_list =
+        createVector<int>(Material::SHADERTYPE_DETAIL_MAP,
+                          Material::SHADERTYPE_NORMAL_MAP);
+                          
+    fillInstanceData<InstanceDataThreeTex>(mesh_map,
+                                           three_tex_material_list,
+                                           InstanceTypeThreeTex);
         
-        
-        m_draw_indirect_cmd =
-            (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0,
-                                                           10000 * sizeof(DrawElementsIndirectCommand),
-                                                           GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-    }
-
-    Material::ShaderType dual_tex_materials[5] =
-    {
-        Material::SHADERTYPE_SOLID,
-        Material::SHADERTYPE_ALPHA_TEST,
-        Material::SHADERTYPE_SOLID_UNLIT,
-        Material::SHADERTYPE_SPHERE_MAP,
-        Material::SHADERTYPE_VEGETATION
-    };
-
-    int material_id;
-    for(int i=0;i<5;i++)
-    {
-        material_id = static_cast<int>(dual_tex_materials[i]);
-        fillMaterial( material_id,
-                      mesh_map,
-                      instance_buffer_dual_tex);
-    }
-        
-
-    //Three textures materials
-    InstanceDataThreeTex *instance_buffer_three_tex;
-
-
-
-    if (CVS->supportsAsyncInstanceUpload())
-    {
-        instance_buffer_three_tex =
-            (InstanceDataThreeTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeThreeTex);
-    }
-    else
-    {
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeThreeTex));
-        instance_buffer_three_tex =
-            (InstanceDataThreeTex*) glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                                                     10000 * sizeof(InstanceDataSingleTex), //TODO: why single?
-                                                     GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-    }
     
-    Material::ShaderType three_tex_materials[2] =
-    {
-        Material::SHADERTYPE_DETAIL_MAP,
-        Material::SHADERTYPE_NORMAL_MAP
-    }; 
-    for(int i=0;i<2;i++)
-    {
-        material_id = static_cast<int>(three_tex_materials[i]);
-        fillMaterial( material_id,
-                      mesh_map,
-                      instance_buffer_three_tex);
-    } 
+    unmapBuffers();
     
-    if (!CVS->supportsAsyncInstanceUpload())
-    {
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-    }
 } //SolidCommandBuffer::fill
+
 
 ShadowCommandBuffer::ShadowCommandBuffer(): CommandBuffer()
 {
 }
 
+//void ShadowCommandBuffer::fill(std::array<MeshMap,Material::SHADERTYPE_COUNT> mesh_map)
 void ShadowCommandBuffer::fill(MeshMap *mesh_map)
 {
-    m_instance_buffer_offset = 0;
-    m_command_buffer_offset = 0;
-    m_poly_count = 0;
+    clearMeshes();
     
-    //clear meshes
-    for(int i=0;i<4*Material::SHADERTYPE_COUNT;i++)
+    std::vector<int> shadow_tex_material_list;
+    /*    createVector<Material::ShaderType>(Material::SHADERTYPE_SOLID,
+                                           Material::SHADERTYPE_ALPHA_TEST,
+                                           Material::SHADERTYPE_SOLID_UNLIT,
+                                           Material::SHADERTYPE_NORMAL_MAP,
+                                           Material::SHADERTYPE_SPHERE_MAP,
+                                           Material::SHADERTYPE_DETAIL_MAP,
+                                           Material::SHADERTYPE_VEGETATION);*/
+    for(int cascade=0; cascade<4; cascade++)
     {
-        m_meshes[i].clear();
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_SOLID);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_ALPHA_TEST);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_SOLID_UNLIT);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_NORMAL_MAP);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_SPHERE_MAP);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_DETAIL_MAP);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_VEGETATION);
     }
-    
-    InstanceDataSingleTex *shadow_instance_buffer;
-    
-    if (CVS->supportsAsyncInstanceUpload())
-    {
-        shadow_instance_buffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeShadow);
-    }
-    else
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeShadow));
-        shadow_instance_buffer =
-            (InstanceDataSingleTex*) glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                                                      10000 * sizeof(InstanceDataDualTex),
-                                                      GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_draw_indirect_cmd_id);
-        m_draw_indirect_cmd =
-            (DrawElementsIndirectCommand*) glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0,
-                                                            10000 * sizeof(DrawElementsIndirectCommand),
-                                                            GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-    }
+                                           
+    fillInstanceData<InstanceDataSingleTex>(mesh_map, shadow_tex_material_list, InstanceTypeShadow);
+    //fillInstanceData<InstanceDataSingleTex>(mesh_map.data(), shadow_tex_material_list, InstanceTypeShadow);
 
-    Material::ShaderType materials[7] =
-    {
-        Material::SHADERTYPE_SOLID,
-        Material::SHADERTYPE_ALPHA_TEST,
-        Material::SHADERTYPE_SOLID_UNLIT,
-        Material::SHADERTYPE_NORMAL_MAP,
-        Material::SHADERTYPE_SPHERE_MAP,
-        Material::SHADERTYPE_DETAIL_MAP,
-        Material::SHADERTYPE_VEGETATION
-    };
-    int material_id;
-    
-    for(int cascade=0;cascade<4;cascade++)
-    {
-        for(int i=0;i<7;i++)
-        {
-            material_id = cascade * 7 + static_cast<int>(materials[i]);
-            fillMaterial( material_id,
-                          mesh_map,
-                          shadow_instance_buffer);            
-        }
-    }
-    
-    if (!CVS->supportsAsyncInstanceUpload())
-    {
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-    }
+    unmapBuffers();
     
 } //ShadowCommandBuffer::fill
 
-ReflectiveShadowMapCommandBuffer::ReflectiveShadowMapCommandBuffer(): CommandBuffer()
+ReflectiveShadowMapCommandBuffer::ReflectiveShadowMapCommandBuffer()
 {
 }
 
 
 void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
 {
-    m_instance_buffer_offset = 0;
-    m_command_buffer_offset = 0;
-    m_poly_count = 0;
+    clearMeshes();
     
-    //clear meshes
-    for(int i=0;i<Material::SHADERTYPE_COUNT;i++)
-    {
-        m_meshes[i].clear();
-    }
-    
-    InstanceDataSingleTex *rsm_instance_buffer;
-    
-    if (CVS->supportsAsyncInstanceUpload())
-    {
-        rsm_instance_buffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeRSM);
-    }
-    else
-    {
-        glBindBuffer(GL_ARRAY_BUFFER,
-                     VAOManager::getInstance()->getInstanceBuffer(InstanceTypeRSM));
-        rsm_instance_buffer =
-            (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                                                     10000 * sizeof(InstanceDataDualTex),
-                                                     GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_draw_indirect_cmd_id);
-        m_draw_indirect_cmd =
-            (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0,
-                                                           10000 * sizeof(DrawElementsIndirectCommand),
-                                                           GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-    }
-    
-    Material::ShaderType materials[5] =
-    {
-        Material::SHADERTYPE_SOLID,
-        Material::SHADERTYPE_ALPHA_TEST,
-        Material::SHADERTYPE_SOLID_UNLIT,
-        Material::SHADERTYPE_DETAIL_MAP,
-        Material::SHADERTYPE_NORMAL_MAP
-    };
-    int material_id;
-    
-    for(int i=0;i<5;i++)
-    {
-        material_id = static_cast<int>(materials[i]);
-        fillMaterial( material_id,
-                      mesh_map,
-                      rsm_instance_buffer);
-    }
+    std::vector<int> rsm_material_list =
+        createVector<int>(Material::SHADERTYPE_SOLID,
+                          Material::SHADERTYPE_ALPHA_TEST,
+                          Material::SHADERTYPE_SOLID_UNLIT,
+                          Material::SHADERTYPE_DETAIL_MAP,
+                          Material::SHADERTYPE_NORMAL_MAP);
+                          
+    fillInstanceData<InstanceDataSingleTex>(mesh_map,
+                                            rsm_material_list,
+                                            InstanceTypeRSM);
 
-    if (!CVS->supportsAsyncInstanceUpload())
-    {
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-    }    
+    unmapBuffers();   
     
 } //ReflectiveShadowMapCommandBuffer::fill
 
@@ -328,11 +220,7 @@ GlowCommandBuffer::GlowCommandBuffer()
 
 void GlowCommandBuffer::fill(MeshMap *mesh_map)
 {
-    m_instance_buffer_offset = 0;
-    m_command_buffer_offset = 0;
-    m_poly_count = 0;
-    
-    m_meshes[0].clear();
+    clearMeshes();
     
     GlowInstanceData *glow_instance_buffer;
 
@@ -359,9 +247,5 @@ void GlowCommandBuffer::fill(MeshMap *mesh_map)
                   mesh_map,
                   glow_instance_buffer);   
     
-    if (!CVS->supportsAsyncInstanceUpload())
-    {
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-    }   
+    unmapBuffers();   
 } //GlowCommandBuffer::fill

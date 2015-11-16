@@ -42,7 +42,8 @@ public:
     void renderNormalsVisualisation(const DrawCalls& draw_calls);
     void renderTransparent(const DrawCalls& draw_calls, 
                            unsigned render_target);
-    void renderShadows(const ShadowMatrices& shadow_matrices,
+    void renderShadows(const DrawCalls& draw_calls,
+                       const ShadowMatrices& shadow_matrices,
                        const FrameBuffer& shadow_framebuffer);
     void renderReflectiveShadowMap(const DrawCalls& draw_calls,
                                    const ShadowMatrices& shadow_matrices,

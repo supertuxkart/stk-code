@@ -84,7 +84,7 @@ void FillInstances_impl(InstanceList instance_list,
     CurrentCommand.firstIndex = mesh->vaoOffset / 2;
     CurrentCommand.baseInstance = initial_offset;
     CurrentCommand.instanceCount = instance_buffer_offset - initial_offset;
-
+    
     poly_count += (instance_buffer_offset - initial_offset) * mesh->IndexCount / 3;
 }
 
@@ -126,13 +126,18 @@ class CommandBuffer
 protected:
     GLuint m_draw_indirect_cmd_id;
     DrawElementsIndirectCommand *m_draw_indirect_cmd;
-    std::vector<GLMesh *> m_meshes[N];
-    size_t m_offset[N];
-    size_t m_size[N];
+    
+    std::array<std::vector<GLMesh *>, N> m_meshes;
+    std::array<size_t,N> m_offset;
+    std::array<size_t,N> m_size;
     
     size_t m_poly_count;
     size_t m_instance_buffer_offset;
     size_t m_command_buffer_offset;
+
+
+    void clearMeshes();
+    void unmapBuffers();
 
     template<typename T>
     void fillMaterial(int material_id,
@@ -142,14 +147,59 @@ protected:
         m_offset[material_id] = m_command_buffer_offset;
         for(auto& instance_list : mesh_map[material_id])
         {
-            FillInstances_impl<T>(instance_list.second, instance_buffer, m_draw_indirect_cmd, m_instance_buffer_offset, m_command_buffer_offset, m_poly_count);
+            FillInstances_impl<T>(instance_list.second,
+                                  instance_buffer,
+                                  m_draw_indirect_cmd,
+                                  m_instance_buffer_offset,
+                                  m_command_buffer_offset,
+                                  m_poly_count);
             if (!CVS->isAZDOEnabled())
                 m_meshes[material_id].push_back(instance_list.second.front().first);
-            
         }
                 
-        m_size[material_id] = m_command_buffer_offset - m_instance_buffer_offset; 
+        m_size[material_id] = m_command_buffer_offset - m_offset[material_id];
     }
+    
+    
+    template<typename InstanceData>
+    void fillInstanceData(MeshMap *mesh_map,
+                          const std::vector<int> &material_list,
+                          InstanceType instance_type)
+    {
+        InstanceData *instance_buffer;
+        
+        if (CVS->supportsAsyncInstanceUpload())
+        {
+            instance_buffer = (InstanceData*)VAOManager::getInstance()->
+                              getInstanceBufferPtr(instance_type);
+        }
+        else
+        {
+            glBindBuffer(GL_ARRAY_BUFFER,
+                         VAOManager::getInstance()->getInstanceBuffer(instance_type));
+            instance_buffer = (InstanceData*)
+                              glMapBufferRange(GL_ARRAY_BUFFER, 0,
+                                               10000 * sizeof(InstanceDataDualTex),
+                                               GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+            glBindBuffer(GL_DRAW_INDIRECT_BUFFER,
+                         m_draw_indirect_cmd_id);
+            
+            
+            m_draw_indirect_cmd = (DrawElementsIndirectCommand*)
+                                  glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0,
+                                                   10000 * sizeof(DrawElementsIndirectCommand),
+                                                   GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+        }
+        
+        for(int material_id: material_list)
+        {
+            fillMaterial( material_id,
+                          mesh_map,
+                          instance_buffer);
+        }
+        
+    }
+    
     
 public:
     CommandBuffer();
@@ -164,82 +214,6 @@ public:
     {
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_draw_indirect_cmd_id);        
     }
- 
- 
-    template<typename T, typename...Uniforms>
-    void drawIndirectFirstPass(Uniforms...uniforms) const
-    {
-        T::InstancedFirstPassShader::getInstance()->use();
-        T::InstancedFirstPassShader::getInstance()->setUniforms(uniforms...);
-        
-        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
-                                                                    T::Instance));
-        for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
-        {
-            GLMesh *mesh = m_meshes[T::MaterialType][i];
-#ifdef DEBUG
-            if (mesh->VAOType != T::VertexType)
-            {
-                Log::error("CommandBuffer", "Wrong instanced vertex format (hint : %s)", 
-                    mesh->textures[0]->getName().getPath().c_str());
-                continue;
-            }
-#endif
-            TexExpander<typename T::InstancedFirstPassShader>::template expandTex(*mesh, T::FirstPassTextures);
-
-            glDrawElementsIndirect(GL_TRIANGLES,
-                                   GL_UNSIGNED_SHORT,
-                                   (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
-        }        
-        
-    } //drawIndirectFirstPass
-
-    
-    // ----------------------------------------------------------------------------
-    template<typename T, typename...Uniforms>
-    void drawIndirectSecondPass(const std::vector<GLuint> &prefilled_tex,
-                             Uniforms...uniforms                       ) const
-    {
-        T::InstancedSecondPassShader::getInstance()->use();
-        T::InstancedSecondPassShader::getInstance()->setUniforms(uniforms...);
-
-        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
-                                                                    T::Instance));
-        for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
-        {
-            GLMesh *mesh = m_meshes[T::MaterialType][i];
-            expandTexSecondPass<T>(*mesh, prefilled_tex);
-            glDrawElementsIndirect(GL_TRIANGLES,
-                                   GL_UNSIGNED_SHORT,
-                                   (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
-        }
-    } //drawIndirectSecondPass
-    
-
-
-    // ----------------------------------------------------------------------------
-    template<typename T, typename...Uniforms>
-    void drawIndirectReflectiveShadowMap(Uniforms ...uniforms) const
-    {
-        T::InstancedRSMShader::getInstance()->use();
-        T::InstancedRSMShader::getInstance()->setUniforms(uniforms...);
-        
-        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
-                                                                    InstanceTypeRSM));
-                                                                    
-        for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
-
-        {
-            GLMesh *mesh = m_meshes[T::MaterialType][i];
-
-            TexExpander<typename T::InstancedRSMShader>::template expandTex(*mesh, T::RSMTextures);
-            glDrawElementsIndirect(GL_TRIANGLES,
-                                   GL_UNSIGNED_SHORT,
-                                   (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
-        }
-    } //drawIndirectReflectiveShadowMap
-
-
 
  
      /** Draw the i-th mesh with the specified material
@@ -274,6 +248,56 @@ public:
     SolidCommandBuffer();
     void fill(MeshMap *mesh_map);
     
+    // ----------------------------------------------------------------------------
+    template<typename T, typename...Uniforms>
+    void drawIndirectFirstPass(Uniforms...uniforms) const
+    {
+        T::InstancedFirstPassShader::getInstance()->use();
+        T::InstancedFirstPassShader::getInstance()->setUniforms(uniforms...);
+        
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                    T::Instance));
+        for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
+        {
+            GLMesh *mesh = m_meshes[T::MaterialType][i];
+#ifdef DEBUG
+            if (mesh->VAOType != T::VertexType)
+            {
+                Log::error("CommandBuffer", "Wrong instanced vertex format (hint : %s)", 
+                    mesh->textures[0]->getName().getPath().c_str());
+                continue;
+            }
+#endif
+            TexExpander<typename T::InstancedFirstPassShader>::template
+                expandTex(*mesh, T::FirstPassTextures);
+
+            glDrawElementsIndirect(GL_TRIANGLES,
+                                   GL_UNSIGNED_SHORT,
+                                   (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
+        }        
+        
+    } //drawIndirectFirstPass
+
+    
+    // ----------------------------------------------------------------------------
+    template<typename T, typename...Uniforms>
+    void drawIndirectSecondPass(const std::vector<GLuint> &prefilled_tex,
+                             Uniforms...uniforms                       ) const
+    {
+        T::InstancedSecondPassShader::getInstance()->use();
+        T::InstancedSecondPassShader::getInstance()->setUniforms(uniforms...);
+
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                    T::Instance));
+        for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
+        {
+            GLMesh *mesh = m_meshes[T::MaterialType][i];
+            expandTexSecondPass<T>(*mesh, prefilled_tex);
+            glDrawElementsIndirect(GL_TRIANGLES,
+                                   GL_UNSIGNED_SHORT,
+                                   (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
+        }
+    } //drawIndirectSecondPass
 
 };
 
@@ -282,6 +306,31 @@ class ShadowCommandBuffer: public CommandBuffer<4*static_cast<int>(Material::SHA
 public:
     ShadowCommandBuffer();
     void fill(MeshMap *mesh_map);
+    
+    // ----------------------------------------------------------------------------
+    template<typename T, typename...Uniforms>
+    void drawIndirect(Uniforms ...uniforms, unsigned cascade) const
+    {
+        T::InstancedShadowPassShader::getInstance()->use();
+        T::InstancedShadowPassShader::getInstance()->setUniforms(uniforms..., cascade);
+        
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                    InstanceTypeShadow));
+                                                                    
+        int material_id = T::MaterialType + cascade * Material::SHADERTYPE_COUNT;
+
+        for (unsigned i = 0; i < m_meshes[material_id].size(); i++)
+        {
+            GLMesh *mesh = m_meshes[material_id][i];
+            
+            TexExpander<typename T::InstancedShadowPassShader>::template 
+                expandTex(*mesh, T::ShadowTextures);
+            glDrawElementsIndirect(GL_TRIANGLES,
+                                   GL_UNSIGNED_SHORT,
+                                   (const void*)((m_offset[material_id] + i)
+                                   * sizeof(DrawElementsIndirectCommand)));
+        }  // for i
+    }   // renderInstancedShadow
 };
 
 class ReflectiveShadowMapCommandBuffer: public CommandBuffer<static_cast<int>(Material::SHADERTYPE_COUNT)>
@@ -289,6 +338,28 @@ class ReflectiveShadowMapCommandBuffer: public CommandBuffer<static_cast<int>(Ma
 public:
     ReflectiveShadowMapCommandBuffer();
     void fill(MeshMap *mesh_map);
+    
+    // ----------------------------------------------------------------------------
+    template<typename T, typename...Uniforms>
+    void drawIndirect(Uniforms ...uniforms) const
+    {
+        T::InstancedRSMShader::getInstance()->use();
+        T::InstancedRSMShader::getInstance()->setUniforms(uniforms...);
+        
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                    InstanceTypeRSM));
+                                                                    
+        for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
+
+        {
+            GLMesh *mesh = m_meshes[T::MaterialType][i];
+
+            TexExpander<typename T::InstancedRSMShader>::template expandTex(*mesh, T::RSMTextures);
+            glDrawElementsIndirect(GL_TRIANGLES,
+                                   GL_UNSIGNED_SHORT,
+                                   (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
+        }
+    } //drawIndirectReflectiveShadowMap
 };
 
 class GlowCommandBuffer: public CommandBuffer<1>
