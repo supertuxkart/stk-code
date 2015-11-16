@@ -184,7 +184,8 @@ void ConnectToServer::asynchronousUpdate()
                 if (m_server_address.getIP() 
                       == NetworkConfig::get()->getMyAddress().getIP())
                 {
-                    // we're in the same lan (same public ip address) !!
+                    // We're in the same lan (same public ip address).
+                    // The state will change to CONNECTING
                     handleSameLAN();
                 }
                 else
@@ -200,8 +201,8 @@ void ConnectToServer::asynchronousUpdate()
                 static double timer = 0;
                 if (StkTime::getRealTime() > timer+5.0) // every 5 seconds
                 {
-                    timer = StkTime::getRealTime();
                     STKHost::get()->connect(m_server_address);
+                    timer = StkTime::getRealTime();
                     Log::info("ConnectToServer", "Trying to connect to %s",
                               m_server_address.toString().c_str());
                 }
@@ -210,20 +211,32 @@ void ConnectToServer::asynchronousUpdate()
         case CONNECTED:
         {
             Log::info("ConnectToServer", "Connected");
-            // Kill the ping protocol because we're connected
-            m_current_protocol->requestTerminate();
-
-            m_current_protocol = new HidePublicAddress();
-            m_current_protocol->requestStart();
-            // FIXME - is that necessary?  ClientNetworkManager::getInstance()->setConnected(true);
-            // FIXME We can test if the peer is connected, which is handled by ENet
+            if(m_current_protocol)
+            {
+                // Kill the ping protocol because we're connected
+                m_current_protocol->requestTerminate();
+            }
+            delete m_current_protocol;
+            m_current_protocol = NULL;
+            // LAN networking does not use the stk server tables.
+            if(NetworkConfig::get()->isWAN())
+            {
+                m_current_protocol = new HidePublicAddress();
+                m_current_protocol->requestStart();
+            }
             m_state = HIDING_ADDRESS;
             break;
         }
         case HIDING_ADDRESS:
             // Wait till we have hidden our address
-            if (m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
+            if (!m_current_protocol ||
+                m_current_protocol->getState() == PROTOCOL_STATE_TERMINATED)
             {
+                if(m_current_protocol)
+                {
+                    delete m_current_protocol;
+                    m_current_protocol = NULL;
+                }
                 Log::info("ConnectToServer", "Address hidden");
                 m_state = DONE;
                 // lobby room protocol if we're connected only
@@ -445,7 +458,12 @@ bool ConnectToServer::notifyEventAsynchronous(Event* event)
     {
         Log::info("ConnectToServer", "The Connect To Server protocol has "
             "received an event notifying that he's connected to the peer.");
+        //STKHost::get()->addPeer(event->getPeer());
         m_state = CONNECTED; // we received a message, we are connected
+        Server *server = ServersManager::get()->getJoinedServer();
+ //       STKHost::get()->connect(server->getAddress());
+
+        event->getPeer();
     }
     return true;
 }   // notifyEventAsynchronous
