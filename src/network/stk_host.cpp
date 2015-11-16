@@ -534,6 +534,28 @@ bool STKHost::peerExists(const TransportAddress& peer)
 }   // peerExists
 
 // ----------------------------------------------------------------------------
+/** Returns the STK peer belonging to the given enet_peer. If no STKPeer
+ *  exists, create a new STKPeer.
+ *  \param enet_peer The EnetPeer.
+ */
+STKPeer* STKHost::getPeer(ENetPeer *enet_peer)
+{
+    for(unsigned int i=0; i<m_peers.size(); i++)
+    {
+        if(m_peers[i]->isSamePeer(enet_peer))
+            return m_peers[i];
+    }
+    //FIXME Should we check #clients here? It might be easier to only
+    // handle this at connect time, not in all getPeer calls.
+    STKPeer *peer = new STKPeer(enet_peer);
+    Log::debug("getPeer", 
+               "Creating a new peer, address are STKPeer:%p, Peer:%p",
+               peer, enet_peer);
+
+    m_peers.push_back(peer);
+    return peer;
+}   // getPeer
+// ----------------------------------------------------------------------------
 /** \brief Tells if a peer is known and connected.
  *  \return True if the peer is known and connected, false elseway.
  */

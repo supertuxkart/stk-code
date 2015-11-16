@@ -60,27 +60,7 @@ Event::Event(ENetEvent* event)
     m_packet = NULL;
 
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-    m_peer = NULL;
-    for (unsigned int i = 0; i < peers.size(); i++)
-    {
-        if (peers[i]->m_enet_peer == event->peer)
-        {
-            m_peer = peers[i];
-            Log::verbose("Event", "The peer you sought has been found on %p",
-                         m_peer);
-            return;
-        }
-    }
-
-    if (m_peer == NULL) // peer does not exist, create him
-    {
-        STKPeer* new_peer = new STKPeer();
-        new_peer->m_enet_peer = event->peer;
-        m_peer = new_peer;
-        Log::debug("Event", 
-                   "Creating a new peer, address are STKPeer:%p, Peer:%p",
-                    new_peer, event->peer);
-    }
+    m_peer = STKHost::get()->getPeer(event->peer);
 }   // Event(ENetEvent)
 
 // ----------------------------------------------------------------------------
@@ -88,7 +68,8 @@ Event::Event(ENetEvent* event)
  */
 Event::~Event()
 {
-    delete m_peer;
+    // Do not delete m_peer, it's a pointer to the enet data structure
+    // which is persistent.
     m_peer = NULL;
     m_packet = NULL;
 }   // ~Event

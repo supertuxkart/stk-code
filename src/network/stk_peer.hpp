@@ -38,7 +38,6 @@ class TransportAddress;
  */
 class STKPeer : public NoCopy
 {
-    friend class Event;
 protected:
     /** Pointer to the corresponding ENet peer data structure. */
     ENetPeer* m_enet_peer;
@@ -52,7 +51,7 @@ protected:
     bool m_token_set;
 
 public:
-             STKPeer();
+             STKPeer(ENetPeer *enet_peer);
     virtual ~STKPeer();
 
     virtual void sendPacket(const NetworkString& data, bool reliable = true);
@@ -62,6 +61,7 @@ public:
     uint32_t getAddress() const;
     uint16_t getPort() const;
     bool isSamePeer(const STKPeer* peer) const;
+    bool isSamePeer(const ENetPeer* peer) const;
 
     // ------------------------------------------------------------------------
     /** Sets the token for this client. */

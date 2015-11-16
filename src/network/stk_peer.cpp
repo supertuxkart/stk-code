@@ -26,9 +26,9 @@
 
 /** Constructor for an empty peer.
  */
-STKPeer::STKPeer()
+STKPeer::STKPeer(ENetPeer *enet_peer)
 {
-    m_enet_peer           = NULL;
+    m_enet_peer           = enet_peer;
     m_player_profile      = NULL;
     m_client_server_token = 0;
     m_token_set           = false;
@@ -39,8 +39,7 @@ STKPeer::STKPeer()
  */
 STKPeer::~STKPeer()
 {
-    if (m_enet_peer)
-        m_enet_peer = NULL;
+    m_enet_peer = NULL;
     if (m_player_profile)
         delete m_player_profile;
     m_player_profile = NULL;
@@ -105,11 +104,20 @@ bool STKPeer::exists() const
 }
 
 //-----------------------------------------------------------------------------
-
+/** Returns if this STKPeer is the same as the given peer.
+ */
 bool STKPeer::isSamePeer(const STKPeer* peer) const
 {
     return peer->m_enet_peer==m_enet_peer;
-}
+}   // isSamePeer
+
+//-----------------------------------------------------------------------------
+/** Returns if this STKPeer is the same as the given peer.
+*/
+bool STKPeer::isSamePeer(const ENetPeer* peer) const
+{
+    return peer==m_enet_peer;
+}   // isSamePeer
 
 //-----------------------------------------------------------------------------
 

@@ -142,6 +142,7 @@ public:
     bool        peerExists(const TransportAddress& peer_address);
     void        removePeer(const STKPeer* peer);
     bool        isConnectedTo(const TransportAddress& peer_address);
+    STKPeer    *getPeer(ENetPeer *enet_peer);
     int         mustStopListening();
     uint16_t    getPort() const;
     void        setErrorMessage(const irr::core::stringw &message);
