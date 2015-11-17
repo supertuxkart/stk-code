@@ -526,10 +526,10 @@ void Camera::update(float dt)
 {
     if (race_manager->getNumLocalPlayers() < 2)
     {
-        Vec3 pos(m_camera->getPosition());
+        Vec3 heading(sin(m_kart->getHeading()), 0.0f, cos(m_kart->getHeading()));
         SFXManager::get()->positionListener(m_kart->getXYZ(),
-            m_kart->getXYZ() + Vec3(0, 0, 1),
-                                            Vec3(0, 1, 0));
+            heading,
+            Vec3(0, 1, 0));
     }
 
     if (m_kart == NULL) return; // cameras not attached to kart must be positioned manually
