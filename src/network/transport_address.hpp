@@ -53,7 +53,7 @@ public:
     /** Construct an transport address from an ENetAddress. */
     TransportAddress(const ENetAddress &a)
     {
-        m_ip   = a.host;
+        m_ip   = htonl(a.host);
         m_port = a.port;
     }   // TransportAddress(EnetAddress)
 
