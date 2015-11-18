@@ -236,8 +236,8 @@ void ConnectToServer::asynchronousUpdate()
                 {
                     delete m_current_protocol;
                     m_current_protocol = NULL;
+                    Log::info("ConnectToServer", "Address hidden");
                 }
-                Log::info("ConnectToServer", "Address hidden");
                 m_state = DONE;
                 // lobby room protocol if we're connected only
                 if(STKHost::get()->getPeers()[0]->isConnected())
@@ -458,12 +458,8 @@ bool ConnectToServer::notifyEventAsynchronous(Event* event)
     {
         Log::info("ConnectToServer", "The Connect To Server protocol has "
             "received an event notifying that he's connected to the peer.");
-        //STKHost::get()->addPeer(event->getPeer());
         m_state = CONNECTED; // we received a message, we are connected
         Server *server = ServersManager::get()->getJoinedServer();
- //       STKHost::get()->connect(server->getAddress());
-
-        event->getPeer();
     }
     return true;
 }   // notifyEventAsynchronous
