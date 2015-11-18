@@ -100,8 +100,8 @@
               detach parachute. E.g. at max-speed 30% of speed must be lost.
        max-speed is a factor that decides the impact of rate of speed
               (distance between bounds) -->
-  <parachute friction="2.0" time="4.0" time-other="8.0"
-             lbound-fraction="0.95" ubound-fraction="0.7" max-speed="23"/>
+  <parachute friction="1.5" time="3.0" time-other="4.5"
+             lbound-fraction="0.9" ubound-fraction="0.55" max-speed="18"/>
 
   <!-- time is the time till a bomb explodes. time-increase is the time added
        to timer when bomb is passed on. -->
