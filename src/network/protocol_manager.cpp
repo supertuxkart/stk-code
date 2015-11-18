@@ -381,8 +381,15 @@ bool ProtocolManager::sendEvent(EventProcessingInfo* event, bool synchronous)
                 result = m_protocols.getData()[i]
                          ->notifyEventAsynchronous(event->m_event);
             if (result)
+            {
                 event->m_protocols_ids.pop_back();
-            else
+                // Exit if all protocols ids have been handled. This is,
+                // important,otherwise the test m_protocols_ids[index]
+                // causes a crash
+                if(event->m_protocols_ids.size()<=(unsigned int)index)
+                    break;
+            }
+            else  // !result
                 index++;
         }
     }
