@@ -533,6 +533,7 @@ void cmdLineHelp()
     // "                            n=1: recorded positions\n"
     // "                            n=2: recorded key strokes\n"
     "       --server=name      Start a server (not a playing client).\n"
+    "       --lan-server=name  Start a LAN server (not a playing client).\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
@@ -774,13 +775,23 @@ int handleCmdLine()
     }
 
     // Networking command lines
-    if(CommandLine::has("--server", &s) )
+    NetworkConfig::get()->
+        setMaxPlayers(UserConfigParams::m_server_max_players);
+    if(CommandLine::has("--server", &s))
     {
-        NetworkConfig::get()->
-            setMaxPlayers(UserConfigParams::m_server_max_players);
         NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
+        NetworkConfig::get()->setIsServer(true);
+        NetworkConfig::get()->setIsWAN();
         STKHost::create();
-        Log::info("main", "Creating a server '%s'.", s.c_str());
+        Log::info("main", "Creating a WAN server '%s'.", s.c_str());
+    } 
+    if (CommandLine::has("--lan-server", &s))
+    {
+        NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
+        NetworkConfig::get()->setIsServer(true);
+        NetworkConfig::get()->setIsLAN();
+        STKHost::create();
+        Log::info("main", "Creating a LAN server '%s'.", s.c_str());
     }   
 
     if(CommandLine::has("--max-players", &n))
