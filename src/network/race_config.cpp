@@ -42,41 +42,54 @@ S getHighestInHistogram(std::map<S,int>* histogram)
         }
     }
     return best_item;
-}
+}   // getHighestInHistogram
 
 //-----------------------------------------------------------------------------
 //---------------------------------  TrackVote --------------------------------
 //-----------------------------------------------------------------------------
-
+/** Constructor for a track vote.
+ */
 TrackVote::TrackVote()
 {
     has_voted_laps = false;
     has_voted_track = false;
     has_voted_reversed = false;
-}
+}   // TrackVote
+
 //-----------------------------------------------------------------------------
-void TrackVote::voteTrack(std::string track)
+/** Sets that this vote is for the specified track.
+ */
+void TrackVote::voteTrack(const std::string &track)
 {
     track_info.track = track;
     has_voted_track = true;
-}
+}   // voteTrack
+
 //-----------------------------------------------------------------------------
+/** Sets if this vote is for normal or reversed driving.
+ *  \param reversed True if this vote is for reversed racing.
+ */
 void TrackVote::voteReversed(bool reversed)
 {
     track_info.reversed = reversed;
     has_voted_reversed = true;
-}
+}   // voteReversed
+
 //-----------------------------------------------------------------------------
+/** Votes for the number of laps.
+ *  \param laps Numger of laps.
+ */
 void TrackVote::voteLaps(uint8_t laps)
 {
     track_info.laps = laps;
     has_voted_laps = true;
-}
+}   // voteLaps
 
 //-----------------------------------------------------------------------------
 //---------------------------------  RaceVote ---------------------------------
 //-----------------------------------------------------------------------------
-
+/** Constructor for a race vote.
+ */
 RaceVote::RaceVote()
 {
     m_has_voted_major = false;
@@ -85,115 +98,130 @@ RaceVote::RaceVote()
     m_major_mode = 0;
     m_minor_mode = 0;
     m_races_count = 0;
-}
+}   // RaceVote
 
 //-----------------------------------------------------------------------------
-
+/** Sets the selected major race vote.
+ */
 void RaceVote::voteMajor(uint8_t major)
 {
     m_has_voted_major = true;
-    m_major_mode = major;
-}
+    m_major_mode      = major;
+}   // voteMajor
 
 //-----------------------------------------------------------------------------
-
+/** Sets the vote for race count.
+ */
 void RaceVote::voteRaceCount(uint8_t count)
 {
     m_has_voted_races_count = true;
     m_races_count = count;
-}
+}   // voteRaceCount
 
 //-----------------------------------------------------------------------------
-
+/** Sets vote for minor race mode.
+ */
 void RaceVote::voteMinor(uint8_t minor)
 {
     m_has_voted_minor = true;
     m_minor_mode = minor;
-}
+}   // voteMinor
 
 //-----------------------------------------------------------------------------
-
-void RaceVote::voteTrack(std::string track, uint8_t track_number)
+/** Sets a track vote.
+ *  \param track Name of the track.
+ */
+void RaceVote::voteTrack(const std::string &track, uint8_t track_number)
 {
     m_tracks_vote[track_number].voteTrack(track);
-}
+}   // voteTrack
 
 //-----------------------------------------------------------------------------
-
+/** Sets a vote for reveresed racing.
+ */
 void RaceVote::voteReversed(bool reversed, uint8_t track_number)
 {
     m_tracks_vote[track_number].voteReversed(reversed);
-}
+}   // voteReversed
 
 //-----------------------------------------------------------------------------
-
+/** Sets a vote for number of laps.
+ */
 void RaceVote::voteLaps(uint8_t laps, uint8_t track_number)
 {
     m_tracks_vote[track_number].voteLaps(laps);
-}
+}   // voteLaps
 
 //-----------------------------------------------------------------------------
 bool RaceVote::hasVotedMajor() const
 {
     return m_has_voted_major;
-}
+}   // hasVotedMajor
 //-----------------------------------------------------------------------------
 bool RaceVote::hasVotedRacesCount() const
 {
     return m_has_voted_races_count;
-}
+}   // hasVotedRacesCount
+
 //-----------------------------------------------------------------------------
 bool RaceVote::hasVotedMinor() const
 {
     return m_has_voted_minor;
-}
+}   // hasVotedMinor
+
 //-----------------------------------------------------------------------------
 bool RaceVote::hasVotedTrack(uint8_t track_number) const
 {
     return m_tracks_vote[track_number].has_voted_track;
-}
+}   // hasVotedTrack
+
 //-----------------------------------------------------------------------------
 bool RaceVote::hasVotedReversed(uint8_t track_number) const
 {
     return m_tracks_vote[track_number].has_voted_reversed;
-}
+}   // hasVotedReversed
+
 //-----------------------------------------------------------------------------
 bool RaceVote::hasVotedLaps(uint8_t track_number) const
 {
     return m_tracks_vote[track_number].has_voted_laps;
-}
+}   // hasVotedLaps
 
 //-----------------------------------------------------------------------------
-
 uint8_t RaceVote::getMajorVote() const
 {
     return m_major_mode;
-}
+}   // getMajorVote
+
 //-----------------------------------------------------------------------------
 uint8_t RaceVote::getRacesCountVote() const
 {
     return m_races_count;
-}
+}   // getRacesCountVote
+
 //-----------------------------------------------------------------------------
 uint8_t RaceVote::getMinorVote() const
 {
     return m_minor_mode;
-}
+}   // getMinorVote
+
 //-----------------------------------------------------------------------------
-std::string RaceVote::getTrackVote(uint8_t track_number) const
+const std::string &RaceVote::getTrackVote(uint8_t track_number) const
 {
     return m_tracks_vote[track_number].track_info.track;
-}
+}   // getTrackVote
+
 //-----------------------------------------------------------------------------
 bool RaceVote::getReversedVote(uint8_t track_number) const
 {
     return m_tracks_vote[track_number].track_info.reversed;
-}
+}   // getReversedVote
+
 //-----------------------------------------------------------------------------
 uint8_t RaceVote::getLapsVote(uint8_t track_number) const
 {
     return m_tracks_vote[track_number].track_info.laps;
-}
+}   // getLapsVote
 
 //-----------------------------------------------------------------------------
 //---------------------------------  RaceConfig -------------------------------
@@ -202,7 +230,7 @@ uint8_t RaceVote::getLapsVote(uint8_t track_number) const
 RaceConfig::RaceConfig()
 {
     m_max_players = NetworkConfig::get()->getMaxPlayers();
-}
+}   // RaceConfig
 
 //-----------------------------------------------------------------------------
 /** Sets the maximum number of players.
@@ -214,58 +242,61 @@ void RaceConfig::setMaxPlayerCount(uint8_t count)
 }   // setMaxPlayerCount
 
 //-----------------------------------------------------------------------------
-
 void RaceConfig::setPlayerMajorVote(uint8_t player_id, uint8_t major)
 {
     Log::info("RaceConfig", "Player %d voted for major %d", player_id, major);
     m_votes[player_id].voteMajor(major);
-}
+}   // setPlayerMajorVote
 
 //-----------------------------------------------------------------------------
-
 void RaceConfig::setPlayerRaceCountVote(uint8_t player_id, uint8_t count)
 {
-    Log::info("RaceConfig", "Player %d voted for %d races in GP", player_id, count);
+    Log::info("RaceConfig", "Player %d voted for %d races in GP",
+              player_id, count);
     m_votes[player_id].voteRaceCount(count);
-}
+}   // setPlayerRaceCountVote
 
 //-----------------------------------------------------------------------------
-
 void RaceConfig::setPlayerMinorVote(uint8_t player_id, uint8_t minor)
 {
     Log::info("RaceConfig", "Player %d voted for minor %d", player_id, minor);
     m_votes[player_id].voteMinor(minor);
-}
+}   // setPlayerMinorVote
 
 //-----------------------------------------------------------------------------
-
-void RaceConfig::setPlayerTrackVote(uint8_t player_id, std::string track, uint8_t track_nb)
+void RaceConfig::setPlayerTrackVote(uint8_t player_id, 
+                                    const std::string &track, uint8_t track_nb)
 {
-    Log::info("RaceConfig", "Player %d voted for track %s", player_id, track.c_str());
+    Log::info("RaceConfig", "Player %d voted for track %s",
+              player_id, track.c_str());
     m_votes[player_id].voteTrack(track, track_nb);
-}
+}   // setPlayerTrackVote
 
 //-----------------------------------------------------------------------------
-
-void RaceConfig::setPlayerReversedVote(uint8_t player_id, bool reversed, uint8_t track_nb)
+void RaceConfig::setPlayerReversedVote(uint8_t player_id, bool reversed,
+                                       uint8_t track_nb)
 {
     if (reversed)
-        Log::info("RaceConfig", "Player %d voted map %d to be reversed", player_id, track_nb);
+        Log::info("RaceConfig", "Player %d voted map %d to be reversed",
+                  player_id, track_nb);
     else
-        Log::info("RaceConfig", "Player %d voted map %d NOT to be reversed", player_id, track_nb);
+        Log::info("RaceConfig", "Player %d voted map %d NOT to be reversed",
+                  player_id, track_nb);
     m_votes[player_id].voteReversed(reversed, track_nb);
-}
+}   // setPlayerReversedVote
 
 //-----------------------------------------------------------------------------
-
-void RaceConfig::setPlayerLapsVote(uint8_t player_id, uint8_t lap_count, uint8_t track_nb)
+void RaceConfig::setPlayerLapsVote(uint8_t player_id, uint8_t lap_count,
+                                   uint8_t track_nb)
 {
-    Log::info("RaceConfig", "Player %d voted map %d to have %d laps", player_id, track_nb, lap_count);
+    Log::info("RaceConfig", "Player %d voted map %d to have %d laps",
+              player_id, track_nb, lap_count);
     m_votes[player_id].voteLaps(lap_count, track_nb);
-}
+}   // setPlayerLapsVote
 
 //-----------------------------------------------------------------------------
-
+/** Computes the selected race mode.
+ */
 void RaceConfig::computeRaceMode()
 {
     // calculate the race type and number of tracks (in GP mode).
@@ -310,9 +341,12 @@ void RaceConfig::computeRaceMode()
         }
     }
     // now we know :
-    m_major_mode = (!major_histogram.empty() ? getHighestInHistogram<int>(&major_histogram) : 1);
-    m_races_count = (!minor_histogram.empty() ? getHighestInHistogram<int>(&races_count_histogram) : 1);
-    m_minor_mode = (!minor_histogram.empty() ? getHighestInHistogram<int>(&minor_histogram) : 0);
+    m_major_mode  = major_histogram.empty() ? 1 
+                          : getHighestInHistogram<int>(&major_histogram);
+    m_races_count = minor_histogram.empty() ? 1 
+                          : getHighestInHistogram<int>(&races_count_histogram);
+    m_minor_mode  = minor_histogram.empty() ? 0 
+                          : getHighestInHistogram<int>(&minor_histogram);
 
     if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
         m_tracks.resize(m_races_count);
@@ -322,8 +356,11 @@ void RaceConfig::computeRaceMode()
         m_races_count = 1;
     }
 
-    Log::info("RaceConfig", "Major mode will be %d with %d races. Minor is %d", m_major_mode, m_races_count, m_minor_mode);
-}
+    Log::info("RaceConfig", "Major mode will be %d with %d races. Minor is %d",
+              m_major_mode, m_races_count, m_minor_mode);
+}   // computeRaceMode
+
+// ----------------------------------------------------------------------------
 void RaceConfig::computeNextTrack()
 {
     for (unsigned int j = 0; j < m_races_count; j++)
@@ -374,17 +411,19 @@ void RaceConfig::computeNextTrack()
         m_tracks[j].reversed = getHighestInHistogram<bool>(&reversed_histogram);
         m_tracks[j].laps = getHighestInHistogram<int>(&laps_histogram);
         if (m_tracks[j].reversed)
-            Log::info("RaceConfig", "Race %d will be on %s with %d laps and reversed", j, m_tracks[j].track.c_str(), m_tracks[j].laps);
+            Log::info("RaceConfig",
+                      "Race %d will be on %s with %d laps and reversed",
+                       j, m_tracks[j].track.c_str(), m_tracks[j].laps);
         else
-            Log::info("RaceConfig", "Race %d will be on %s with %d laps", j, m_tracks[j].track.c_str(), m_tracks[j].laps);
+            Log::info("RaceConfig", "Race %d will be on %s with %d laps", 
+                      j, m_tracks[j].track.c_str(), m_tracks[j].laps);
     }
-}
+}   // computeNextTrack
 
 //-----------------------------------------------------------------------------
-
 const TrackInfo* RaceConfig::getNextTrackInfo() const
 {
     return &m_tracks[0];
-}
+}   // getNextTrackInfo
 
 //-----------------------------------------------------------------------------
