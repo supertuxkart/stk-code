@@ -103,6 +103,7 @@ public:
     void multidrawShadows(unsigned cascade) const;
 
     void drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const;
+    void multidrawReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const;
     
 };
 

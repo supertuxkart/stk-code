@@ -61,12 +61,6 @@ public:
 };
 
 
-class RSMPassCmd : public CommandBufferOld<RSMPassCmd, 1, static_cast<int>(Material::SHADERTYPE_COUNT)>
-{
-public:
-    size_t Offset[Material::SHADERTYPE_COUNT], Size[Material::SHADERTYPE_COUNT];
-};
-
 class GlowPassCmd : public CommandBufferOld<GlowPassCmd, 1, 1>
 {
 public:

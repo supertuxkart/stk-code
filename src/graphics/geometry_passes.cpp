@@ -628,44 +628,6 @@ void drawRSM(const core::matrix4 & rsm_matrix)
 }   // drawRSM
 
 // ----------------------------------------------------------------------------
-template<typename T, typename...Args>
-void renderRSMShadow(Args ...args)
-{
-    T::InstancedRSMShader::getInstance()->use();
-    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, InstanceTypeRSM));
-    auto t = T::InstancedList::getInstance()->RSM;
-    for (unsigned i = 0; i < t.size(); i++)
-    {
-        std::vector<GLuint> Textures;
-        GLMesh *mesh = t[i];
-
-        TexExpander<typename T::InstancedRSMShader>::template expandTex(*mesh, T::RSMTextures);
-        T::InstancedRSMShader::getInstance()->setUniforms(args...);
-        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
-           (const void*)((RSMPassCmd::getInstance()->Offset[T::MaterialType] + i)
-           * sizeof(DrawElementsIndirectCommand)));
-    }
-}   // renderRSMShadow
-
-// ----------------------------------------------------------------------------
-template<typename T, typename... Args>
-void multidrawRSM(Args...args)
-{
-    T::InstancedRSMShader::getInstance()->use();
-    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
-                                                               InstanceTypeRSM));
-    if (RSMPassCmd::getInstance()->Size[T::MaterialType])
-    {
-        T::InstancedRSMShader::getInstance()->setUniforms(args...);
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
-            (const void*)(RSMPassCmd::getInstance()->Offset[T::MaterialType] 
-               * sizeof(DrawElementsIndirectCommand)),
-            (int)RSMPassCmd::getInstance()->Size[T::MaterialType],
-            sizeof(DrawElementsIndirectCommand));
-    }
-}   // multidrawRSM
-
-// ----------------------------------------------------------------------------
 void GeometryPasses::renderReflectiveShadowMap(const DrawCalls& draw_calls,
                                                const ShadowMatrices& shadow_matrices,
                                                const FrameBuffer& reflective_shadow_map_framebuffer)
@@ -687,11 +649,7 @@ void GeometryPasses::renderReflectiveShadowMap(const DrawCalls& draw_calls,
 
     if (CVS->isAZDOEnabled())
     {
-        multidrawRSM<DefaultMaterial>(rsm_matrix);
-        multidrawRSM<NormalMat>(rsm_matrix);
-        multidrawRSM<AlphaRef>(rsm_matrix);
-        multidrawRSM<UnlitMat>(rsm_matrix);
-        multidrawRSM<DetailMat>(rsm_matrix);
+        draw_calls.multidrawReflectiveShadowMaps(rsm_matrix);
     }
     else if (CVS->supportsIndirectInstancingRendering())
     {

@@ -476,21 +476,15 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
     if (!CVS->supportsIndirectInstancingRendering())
         return;
 
-    InstanceDataSingleTex *ShadowInstanceBuffer;
-    InstanceDataSingleTex *RSMInstanceBuffer;
     GlowInstanceData *GlowInstanceBuffer;
-    DrawElementsIndirectCommand *RSMCmdBuffer;
     DrawElementsIndirectCommand *GlowCmdBuffer;
 
     int enableOpenMP = 0;
     
     if (CVS->supportsAsyncInstanceUpload())
     {
-        ShadowInstanceBuffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeShadow);
-        RSMInstanceBuffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeRSM);
         GlowInstanceBuffer = (GlowInstanceData*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeGlow);
         GlowCmdBuffer = GlowPassCmd::getInstance()->Ptr;
-        RSMCmdBuffer = RSMPassCmd::getInstance()->Ptr;
         enableOpenMP = 1;
     }
 
@@ -696,3 +690,14 @@ void DrawCalls::drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix
     m_reflective_shadow_map_cmd_buffer.drawIndirect<NormalMat>(rsm_matrix);
     m_reflective_shadow_map_cmd_buffer.drawIndirect<DetailMat>(rsm_matrix);   
 }
+
+// ----------------------------------------------------------------------------
+void DrawCalls::multidrawReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const
+{
+    m_reflective_shadow_map_cmd_buffer.multidraw<DefaultMaterial>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.multidraw<NormalMat>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.multidraw<AlphaRef>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.multidraw<UnlitMat>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.multidraw<DetailMat>(rsm_matrix);
+}
+

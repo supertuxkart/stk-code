@@ -268,13 +268,13 @@ public:
     template<typename T, typename...Uniforms>
     void multidrawFirstPass(Uniforms...uniforms) const
     {
-        T::InstancedFirstPassShader::getInstance()->use();
-        T::InstancedFirstPassShader::getInstance()->setUniforms(uniforms...);
-
-        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
-                                                                    T::Instance));
         if (m_size[T::MaterialType])
         {
+            T::InstancedFirstPassShader::getInstance()->use();
+            T::InstancedFirstPassShader::getInstance()->setUniforms(uniforms...);
+
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                        T::Instance));
             glMultiDrawElementsIndirect(GL_TRIANGLES,
                                         GL_UNSIGNED_SHORT,
                                         (const void*)(m_offset[T::MaterialType] * sizeof(DrawElementsIndirectCommand)),
@@ -308,13 +308,13 @@ public:
     void multidraw2ndPass(const std::vector<uint64_t> &handles,
                           Uniforms... uniforms) const
     {
-        T::InstancedSecondPassShader::getInstance()->use();
-        T::InstancedSecondPassShader::getInstance()->setUniforms(uniforms...);
-        
-        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
-                                                                    T::Instance));
         if (m_size[T::MaterialType])
         {
+            T::InstancedSecondPassShader::getInstance()->use();
+            T::InstancedSecondPassShader::getInstance()->setUniforms(uniforms...);
+            
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                        T::Instance));
             expandHandlesSecondPass<T>(handles);
             glMultiDrawElementsIndirect(GL_TRIANGLES,
                                         GL_UNSIGNED_SHORT,
@@ -345,13 +345,15 @@ public:
     template<typename T>
     void multidrawNormals() const
     {
-        NormalVisualizer::getInstance()->use();
-        NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
 
-        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
-                                                                    T::Instance));
         if (m_size[T::MaterialType])
         {
+            NormalVisualizer::getInstance()->use();
+            NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
+
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                        T::Instance));
+            
             glMultiDrawElementsIndirect(GL_TRIANGLES,
                                         GL_UNSIGNED_SHORT,
                                         (const void*)(m_offset[T::MaterialType] * sizeof(DrawElementsIndirectCommand)),
@@ -396,15 +398,15 @@ public:
     template<typename T, typename...Uniforms>
     void multidrawShadow(Uniforms ...uniforms, unsigned cascade) const
     {
-        T::InstancedShadowPassShader::getInstance()->use();
-        T::InstancedShadowPassShader::getInstance()->setUniforms(uniforms..., cascade);
-        
-        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
-                                                                    InstanceTypeShadow));
         int material_id = T::MaterialType + cascade * Material::SHADERTYPE_COUNT;
                             
         if (m_size[material_id])
         {
+            T::InstancedShadowPassShader::getInstance()->use();
+            T::InstancedShadowPassShader::getInstance()->setUniforms(uniforms..., cascade);
+            
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                        InstanceTypeShadow));
             glMultiDrawElementsIndirect(GL_TRIANGLES,
                                         GL_UNSIGNED_SHORT,
                                         (const void*)(m_offset[material_id] * sizeof(DrawElementsIndirectCommand)),
@@ -442,7 +444,27 @@ public:
                                    GL_UNSIGNED_SHORT,
                                    (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
         }
-    } //drawIndirectReflectiveShadowMap
+    } //drawIndirect
+    
+    // ----------------------------------------------------------------------------
+    template<typename T, typename... Uniforms>
+    void multidraw(Uniforms...uniforms) const
+    {
+        if (m_size[T::MaterialType])
+        {
+            T::InstancedRSMShader::getInstance()->use();
+            T::InstancedRSMShader::getInstance()->setUniforms(uniforms...);
+        
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                        InstanceTypeRSM));
+            glMultiDrawElementsIndirect(GL_TRIANGLES,
+                                        GL_UNSIGNED_SHORT,
+                                        (const void*)(m_offset[T::MaterialType] * sizeof(DrawElementsIndirectCommand)),
+                                        (int) m_size[T::MaterialType],
+                                        sizeof(DrawElementsIndirectCommand));
+        }
+    }   // multidraw
+    
 };
 
 class GlowCommandBuffer: public CommandBuffer<1>
