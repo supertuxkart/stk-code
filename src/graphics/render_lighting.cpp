@@ -349,7 +349,7 @@ unsigned IrrDriver::updateLightsInfo(scene::ICameraSceneNode * const camnode,
             m_lights[i]->render();
             continue;
         }
-        core::vector3df &light_cam_vector = 
+        core::vector3df light_cam_vector = 
                                  (m_lights[i]->getAbsolutePosition() - campos);
 
         float length = light_cam_vector.getLength();
