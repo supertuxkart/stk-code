@@ -98,6 +98,7 @@ RaceVote::RaceVote()
     m_major_mode = 0;
     m_minor_mode = 0;
     m_races_count = 0;
+    m_tracks_vote.resize(1);
 }   // RaceVote
 
 //-----------------------------------------------------------------------------
@@ -229,7 +230,7 @@ uint8_t RaceVote::getLapsVote(uint8_t track_number) const
 
 RaceConfig::RaceConfig()
 {
-    m_max_players = NetworkConfig::get()->getMaxPlayers();
+    setMaxPlayerCount(NetworkConfig::get()->getMaxPlayers());
 }   // RaceConfig
 
 //-----------------------------------------------------------------------------
