@@ -80,7 +80,8 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         uint8_t message_type;
         message_type = data[0];
         event->removeFront(1);
-        Log::info("ServerLobbyRoomProtocol", "Message received with type %d.", message_type);
+        Log::info("ServerLobbyRoomProtocol", "Message received with type %d.",
+                  message_type);
         if (message_type == 0x01) // player requesting connection
             connectionRequested(event);
         else if (message_type == 0x02) // player requesting kart selection
@@ -238,7 +239,8 @@ void ServerLobbyRoomProtocol::startSelection()
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         NetworkString ns(6);
-        ns.ai8(0x05).ai8(4).ai32(peers[i]->getClientServerToken()); // start selection
+        // start selection
+        ns.ai8(0x05).ai8(4).ai32(peers[i]->getClientServerToken());
         sendMessage(peers[i], ns, true); // reliably
     }
     m_selection_enabled = true;
@@ -325,7 +327,8 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
         for (unsigned int i = 0; i < karts_results.size(); i++)
         {
             queue.ai8(1).ai8(karts_results[i]); // kart pos = i+1
-            Log::info("ServerLobbyRoomProtocol", "Kart %d finished #%d", karts_results[i], i+1);
+            Log::info("ServerLobbyRoomProtocol", "Kart %d finished #%d",
+                      karts_results[i], i + 1);
         }
         for (unsigned int i = 0; i < peers.size(); i++)
         {
@@ -338,34 +341,35 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
         m_in_race = false;
 
         // stop race protocols
-        Protocol* protocol = NULL;
-        protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
+        Protocol* protocol = ProtocolManager::getInstance()
+                           ->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
         if (protocol)
             protocol->requestTerminate();
         else
-            Log::error("ClientLobbyRoomProtocol", "No controller events protocol registered.");
+            Log::error("ClientLobbyRoomProtocol",
+                       "No controller events protocol registered.");
 
-        protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_KART_UPDATE);
+        protocol = ProtocolManager::getInstance()
+                 ->getProtocol(PROTOCOL_KART_UPDATE);
         if (protocol)
             protocol->requestTerminate();
         else
-            Log::error("ClientLobbyRoomProtocol", "No kart update protocol registered.");
+            Log::error("ClientLobbyRoomProtocol",
+                       "No kart update protocol registered.");
 
-        protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS);
+        protocol = ProtocolManager::getInstance()
+                 ->getProtocol(PROTOCOL_GAME_EVENTS);
         if (protocol)
             protocol->requestTerminate();
         else
-            Log::error("ClientLobbyRoomProtocol", "No game events protocol registered.");
+            Log::error("ClientLobbyRoomProtocol",
+                       "No game events protocol registered.");
 
         // notify the network world that it is stopped
         NetworkWorld::getInstance()->stop();
         // exit the race now
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
-    }
-    else
-    {
-        //Log::info("ServerLobbyRoomProtocol", "Phase is %d", World::getWorld()->getPhase());
     }
 }   // checkRaceFinished
 
@@ -406,13 +410,15 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     const NetworkString &data = event->data();
     if (data.size() != 5 || data[0] != 4)
     {
-        Log::warn("ServerLobbyRoomProtocol", "Receiving badly formated message. Size is %d and first byte %d", data.size(), data[0]);
+        Log::warn("ServerLobbyRoomProtocol",
+              "Receiving badly formated message. Size is %d and first byte %d",
+              data.size(), data[0]);
         return;
     }
     uint32_t player_id = 0;
     player_id = data.getUInt32(1);
     // can we add the player ?
-    if (m_setup->getPlayerCount() < NetworkConfig::get()->getMaxPlayers()) //accept
+    if (m_setup->getPlayerCount() < NetworkConfig::get()->getMaxPlayers())
     {
         // add the player to the game setup
         m_next_id = m_setup->getPlayerCount();
@@ -435,13 +441,18 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         // Size is overestimated, probably one player's data will not be sent
         NetworkString message_ack(13+players.size()*7);
         // connection success (129) -- size of token -- token
-        message_ack.ai8(0x81).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4).ai32(player_id);
+        message_ack.ai8(0x81).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4)
+                   .ai32(player_id);
         // add all players so that this user knows
         for (unsigned int i = 0; i < players.size(); i++)
         {
             // do not duplicate the player into the message
-            if (players[i]->race_id != m_next_id && players[i]->user_profile->getID() != player_id)
-                message_ack.ai8(1).ai8(players[i]->race_id).ai8(4).ai32(players[i]->user_profile->getID());
+            if (players[i]->race_id != m_next_id && 
+                players[i]->user_profile->getID() != player_id)
+            {
+                message_ack.ai8(1).ai8(players[i]->race_id).ai8(4)
+                           .ai32(players[i]->user_profile->getID());
+            }
         }
         sendMessage(peer, message_ack);
 
@@ -677,7 +688,8 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
     if (!isByteCorrect(event, 7, 1))
         return;
     uint8_t player_id = peer->getPlayerProfile()->race_id;
-    m_setup->getRaceConfig()->setPlayerReversedVote(player_id, data[6]!=0, data[8]);
+    m_setup->getRaceConfig()->setPlayerReversedVote(player_id,
+                                                    data[6]!=0, data[8]);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token
     NetworkString other(2+data.size());
