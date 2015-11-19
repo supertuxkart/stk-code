@@ -54,11 +54,13 @@ void ClientLobbyRoomProtocol::setup()
 
 //-----------------------------------------------------------------------------
 
-void ClientLobbyRoomProtocol::requestKartSelection(std::string kart_name)
+void ClientLobbyRoomProtocol::requestKartSelection(const std::string &kart_name)
 {
     NetworkString request(6+1+kart_name.size());
-    // 0x02 : kart selection request, size_token (4), token, size kart name, kart name
-    request.ai8(0x02).ai8(4).ai32(m_server->getClientServerToken()).add(kart_name);
+    // 0x02 : kart selection request, size_token (4), token, size kart name,
+    //        kart name
+    request.ai8(0x02).ai8(4).ai32(m_server->getClientServerToken())
+           .add(kart_name);
     sendMessage(request, true);
 }   // requestKartSelection
 
@@ -88,17 +90,21 @@ void ClientLobbyRoomProtocol::voteMinor(uint8_t minor)
 {
     NetworkString request(8);
     // 0xc0 : minor vote, size_token (4), token, size minor(1),minor
-    request.ai8(0xc2).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(minor);
+    request.ai8(0xc2).ai8(4).ai32(m_server->getClientServerToken())
+           .ai8(1).ai8(minor);
     sendMessage(request, true);
 }   // voteMinor
 
 //-----------------------------------------------------------------------------
 
-void ClientLobbyRoomProtocol::voteTrack(std::string track, uint8_t track_nb)
+void ClientLobbyRoomProtocol::voteTrack(const std::string &track,
+                                        uint8_t track_nb)
 {
     NetworkString request(8+1+track.size());
-    // 0xc0 : major vote, size_token (4), token, size track, track, size #track, #track
-    request.ai8(0xc3).ai8(4).ai32(m_server->getClientServerToken()).add(track).ai8(1).ai8(track_nb);
+    // 0xc0 : major vote, size_token (4), token, size track, track, size #track,
+    //        #track
+    request.ai8(0xc3).ai8(4).ai32(m_server->getClientServerToken()).add(track)
+           .ai8(1).ai8(track_nb);
     sendMessage(request, true);
 }   // voteTrack
 
@@ -107,8 +113,10 @@ void ClientLobbyRoomProtocol::voteTrack(std::string track, uint8_t track_nb)
 void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
 {
     NetworkString request(9);
-    // 0xc0 : major vote, size_token (4), token, size reversed(1),reversed, size #track, #track
-    request.ai8(0xc4).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(reversed).ai8(1).ai8(track_nb);
+    // 0xc0 : major vote, size_token (4), token, size reversed(1),reversed,
+    //        size #track, #track
+    request.ai8(0xc4).ai8(4).ai32(m_server->getClientServerToken()).ai8(1)
+           .ai8(reversed).ai8(1).ai8(track_nb);
     sendMessage(request, true);
 }   // voteReversed
 
@@ -117,8 +125,10 @@ void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
 void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
 {
     NetworkString request(10);
-    // 0xc0 : major vote, size_token (4), token, size laps(1),laps, size #track, #track
-    request.ai8(0xc5).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(laps).ai8(1).ai8(track_nb);
+    // 0xc0 : major vote, size_token (4), token, size laps(1),laps,
+    //        size #track, #track
+    request.ai8(0xc5).ai8(4).ai32(m_server->getClientServerToken()).ai8(1)
+           .ai8(laps).ai8(1).ai8(track_nb);
     sendMessage(request, true);
 }   // voteLaps
 
@@ -145,7 +155,8 @@ bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
             return false; // don't treat the event
 
         event->removeFront(1);
-        Log::info("ClientLobbyRoomProtocol", "Synchronous message of type %d", message_type);
+        Log::info("ClientLobbyRoomProtocol", "Synchronous message of type %d",
+                  message_type);
         if (message_type == 0x03) // kart selection update
             kartSelectionUpdate(event);
         else if (message_type == 0x06) // end of race
@@ -171,7 +182,8 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
             return false; // don't treat the event
 
         event->removeFront(1);
-        Log::info("ClientLobbyRoomProtocol", "Asynchronous message of type %d", message_type);
+        Log::info("ClientLobbyRoomProtocol", "Asynchronous message of type %d",
+                  message_type);
         if (message_type == 0x01) // new player connected
             newPlayer(event);
         else if (message_type == 0x02) // player disconnected
@@ -205,8 +217,9 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
     {
         return true;
     } // connection
-    else if (event->getType() == EVENT_TYPE_DISCONNECTED) // means we left essentially
+    else if (event->getType() == EVENT_TYPE_DISCONNECTED) 
     {
+        // means we left essentially
         STKHost::get()->removePeer(m_server);
         m_server = NULL;
         STKHost::get()->deleteAllPeers();
@@ -246,7 +259,8 @@ void ClientLobbyRoomProtocol::update()
         break;
     case KART_SELECTION:
     {
-        NetworkKartSelectionScreen* screen = NetworkKartSelectionScreen::getInstance();
+        NetworkKartSelectionScreen* screen =
+                                     NetworkKartSelectionScreen::getInstance();
         screen->push();
         m_state = SELECTING_KARTS;
     }
@@ -255,7 +269,8 @@ void ClientLobbyRoomProtocol::update()
         break;
     case PLAYING:
     {
-        if (NetworkWorld::getInstance<NetworkWorld>()->isRaceOver()) // race is now over, kill race protocols and return to connected state
+        // race is now over, kill race protocols and return to connected state
+        if (NetworkWorld::getInstance<NetworkWorld>()->isRaceOver())
         {
             Log::info("ClientLobbyRoomProtocol", "Game finished.");
             m_state = RACE_FINISHED;
