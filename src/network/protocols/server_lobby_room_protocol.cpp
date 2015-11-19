@@ -640,7 +640,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
     if (!checkDataSizeAndToken(event, 8))
         return;
     int N = data[5];
-    std::string track_name = data.getString(5, N);
+    std::string track_name = data.getString(6, N);
     if (!isByteCorrect(event, N+6, 1))
         return;
     uint8_t player_id = peer->getPlayerProfile()->race_id;
