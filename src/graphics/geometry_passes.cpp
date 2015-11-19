@@ -164,19 +164,6 @@ void renderMeshes1stPass(const DrawCalls& draw_calls)
     }
 }   // renderMeshes1stPass
 
-// ----------------------------------------------------------------------------
-template<typename T, typename...Args>
-void multidraw1stPass(const DrawCalls& draw_calls, Args...args)
-{
-    T::InstancedFirstPassShader::getInstance()->use();
-    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
-    if (!draw_calls.isSolidCmdEmpty(T::MaterialType))
-    {
-        T::InstancedFirstPassShader::getInstance()->setUniforms(args...);
-        draw_calls.multidrawIndirectSolidCmd(T::MaterialType);
-    }
-}   // multidraw1stPass
-
 
 GeometryPasses::GeometryPasses()
 {
@@ -209,14 +196,7 @@ void GeometryPasses::renderSolidFirstPass(const DrawCalls& draw_calls)
 
         if (CVS->isAZDOEnabled())
         {
-            multidraw1stPass<DefaultMaterial>(draw_calls);
-            multidraw1stPass<AlphaRef>(draw_calls);
-            multidraw1stPass<SphereMap>(draw_calls);
-            multidraw1stPass<UnlitMat>(draw_calls);
-            multidraw1stPass<GrassMat>(draw_calls, m_wind_dir);
-
-            multidraw1stPass<NormalMat>(draw_calls);
-            multidraw1stPass<DetailMat>(draw_calls);
+            draw_calls.multidrawSolidFirstPass();
         }
         else if (CVS->supportsIndirectInstancingRendering())
         {
@@ -265,30 +245,11 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
 }   // renderMeshes2ndPass
 
 // ----------------------------------------------------------------------------
-template<typename T, typename...Args>
-void multidraw2ndPass(const DrawCalls& draw_calls, const std::vector<uint64_t> &Handles, Args... args)
-{
-    T::InstancedSecondPassShader::getInstance()->use();
-    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
-                                                                T::Instance));
-    uint64_t nulltex[10] = {};
-    if (!draw_calls.isSolidCmdEmpty(T::MaterialType))
-    {
-        HandleExpander<typename T::InstancedSecondPassShader>::template
-            expand(nulltex, T::SecondPassTextures, Handles[0], Handles[1],
-                   Handles[2]);
-        T::InstancedSecondPassShader::getInstance()->setUniforms(args...);
-        draw_calls.multidrawIndirectSolidCmd(T::MaterialType);
-    }
-}   // multidraw2ndPass
-
-
-// ----------------------------------------------------------------------------
 void GeometryPasses::renderSolidSecondPass( const DrawCalls& draw_calls,
                                             unsigned render_target_diffuse,
                                             unsigned render_target_specular,
                                             unsigned render_target_half_red)
-            {
+{
     irr_driver->setPhase(SOLID_LIT_PASS);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
@@ -345,29 +306,13 @@ void GeometryPasses::renderSolidSecondPass( const DrawCalls& draw_calls,
 
         if (CVS->isAZDOEnabled())
         {
-            multidraw2ndPass<DefaultMaterial>(draw_calls, createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
-            multidraw2ndPass<AlphaRef>(draw_calls, createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
-            multidraw2ndPass<SphereMap>(draw_calls, createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
-            multidraw2ndPass<UnlitMat>(draw_calls, createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
-            multidraw2ndPass<NormalMat>(draw_calls, createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
-            multidraw2ndPass<DetailMat>(draw_calls, createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0, 0));
-
-            // template does not work with template due to extra depth texture
-            {
-                GrassMat::InstancedSecondPassShader::getInstance()->use();
-                glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(GrassMat::VertexType,
-                                                                           GrassMat::Instance));
-                uint64_t nulltex[10] = {};
-                if (!draw_calls.isSolidCmdEmpty(GrassMat::MaterialType))
-                {
-                    HandleExpander<GrassMat::InstancedSecondPassShader>
-                         ::expand(nulltex, GrassMat::SecondPassTextures, DiffuseHandle,
-                                  SpecularHandle, SSAOHandle, DepthHandle);
-                    GrassMat::InstancedSecondPassShader::getInstance()->setUniforms(m_wind_dir,
-                                                             irr_driver->getSunDirection());
-                    draw_calls.multidrawIndirectSolidCmd(GrassMat::MaterialType);
-                }
-            }
+            std::vector<uint64_t> handles = 
+                createVector<uint64_t>(DiffuseHandle,
+                                       SpecularHandle,
+                                       SSAOHandle,
+                                       DepthHandle);
+            
+            draw_calls.multidrawSolidSecondPass(handles);
         }
         else if (CVS->supportsIndirectInstancingRendering())
         {
@@ -381,52 +326,16 @@ void GeometryPasses::renderSolidSecondPass( const DrawCalls& draw_calls,
     }
 }   // renderSolidSecondPass
 
-// ----------------------------------------------------------------------------
-template<typename T>
-static void renderInstancedMeshNormals(const DrawCalls& draw_calls)
-{
-    std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
-    NormalVisualizer::getInstance()->use();
-    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
-    for (unsigned i = 0; i < meshes.size(); i++)
-    {
-        NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
-        draw_calls.drawIndirectSolidCmd(T::MaterialType, i);
-    }
-}   // renderInstancedMeshNormals
-
-// ----------------------------------------------------------------------------
-template<typename T>
-static void renderMultiMeshNormals(const DrawCalls& draw_calls)
-{
-    NormalVisualizer::getInstance()->use();
-    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
-    if (!draw_calls.isSolidCmdEmpty(T::MaterialType))
-    {
-        NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
-        draw_calls.multidrawIndirectSolidCmd(T::MaterialType);
-    }
-}   // renderMultiMeshNormals
 
 // ----------------------------------------------------------------------------
 void GeometryPasses::renderNormalsVisualisation(const DrawCalls& draw_calls)
 {
     if (CVS->isAZDOEnabled()) {
-        renderMultiMeshNormals<DefaultMaterial>(draw_calls);
-        renderMultiMeshNormals<AlphaRef>(draw_calls);
-        renderMultiMeshNormals<UnlitMat>(draw_calls);
-        renderMultiMeshNormals<SphereMap>(draw_calls);
-        renderMultiMeshNormals<DetailMat>(draw_calls);
-        renderMultiMeshNormals<NormalMat>(draw_calls);
+        draw_calls.multidrawNormals();
     }
     else if (CVS->supportsIndirectInstancingRendering())
     {
-        renderInstancedMeshNormals<DefaultMaterial>(draw_calls);
-        renderInstancedMeshNormals<AlphaRef>(draw_calls);
-        renderInstancedMeshNormals<UnlitMat>(draw_calls);
-        renderInstancedMeshNormals<SphereMap>(draw_calls);
-        renderInstancedMeshNormals<DetailMat>(draw_calls);
-        renderInstancedMeshNormals<NormalMat>(draw_calls);
+        draw_calls.drawIndirectNormals();
     }
 }   // renderNormalsVisualisation
 
@@ -620,48 +529,6 @@ void renderShadow(unsigned cascade)
 }   // renderShadow
 
 // ----------------------------------------------------------------------------
-template<typename T, typename...Args>
-void renderInstancedShadow(unsigned cascade, Args ...args)
-{
-    T::InstancedShadowPassShader::getInstance()->use();
-    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
-                                                          InstanceTypeShadow));
-    std::vector<GLMesh *> &t = T::InstancedList::getInstance()->Shadows[cascade];
-    for (unsigned i = 0; i < t.size(); i++)
-    {
-        GLMesh *mesh = t[i];
-
-        TexExpander<typename T::InstancedShadowPassShader>::template 
-                                       expandTex(*mesh, T::ShadowTextures);
-        T::InstancedShadowPassShader::getInstance()->setUniforms(args..., cascade);
-        size_t tmp = ShadowPassCmd::getInstance()->Offset[cascade][T::MaterialType] + i;
-        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
-                               (const void*)((tmp) 
-                               * sizeof(DrawElementsIndirectCommand)));
-    }   // for i
-
-}   // renderInstancedShadow
-
-// ----------------------------------------------------------------------------
-template<typename T, typename...Args>
-static void multidrawShadow(unsigned i, Args ...args)
-{
-    T::InstancedShadowPassShader::getInstance()->use();
-    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
-                                                           InstanceTypeShadow));
-    if (ShadowPassCmd::getInstance()->Size[i][T::MaterialType])
-    {
-        T::InstancedShadowPassShader::getInstance()->setUniforms(args..., i);
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
-            (const void*)(ShadowPassCmd::getInstance()->Offset[i][T::MaterialType] 
-            * sizeof(DrawElementsIndirectCommand)),
-            (int)ShadowPassCmd::getInstance()->Size[i][T::MaterialType], 
-            sizeof(DrawElementsIndirectCommand));
-    }
-}   // multidrawShadow
-
-
-// ----------------------------------------------------------------------------
 void GeometryPasses::renderShadows(const DrawCalls& draw_calls,
                                    const ShadowMatrices& shadow_matrices,
                                    const FrameBuffer& shadow_framebuffer)
@@ -689,39 +556,27 @@ void GeometryPasses::renderShadows(const DrawCalls& draw_calls,
     {
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SHADOWS_CASCADE0 + cascade));
 
-        /*renderShadow<DefaultMaterial, 1>(cascade);
+        //TODO: useless if indirect instancing rendering or AZDO
+        renderShadow<DefaultMaterial, 1>(cascade);
         renderShadow<SphereMap, 1>(cascade);
         renderShadow<DetailMat, 1>(cascade);
         renderShadow<SplattingMat, 1>(cascade);
         renderShadow<NormalMat, 1>(cascade);
         renderShadow<AlphaRef, 1>(cascade);
         renderShadow<UnlitMat, 1>(cascade);
-        renderShadow<GrassMat, 3, 1>(cascade);*/
+        renderShadow<GrassMat, 3, 1>(cascade);
 
         if (CVS->supportsIndirectInstancingRendering())
-            //glBindBuffer(GL_DRAW_INDIRECT_BUFFER, ShadowPassCmd::getInstance()->drawindirectcmd);
             draw_calls.bindShadowCmd();
 
 
         if (CVS->isAZDOEnabled())
         {
-            multidrawShadow<DefaultMaterial>(cascade);
-            multidrawShadow<DetailMat>(cascade);
-            multidrawShadow<NormalMat>(cascade);
-            multidrawShadow<AlphaRef>(cascade);
-            multidrawShadow<UnlitMat>(cascade);
-            multidrawShadow<GrassMat>(cascade, m_wind_dir);
+            draw_calls.multidrawShadows(cascade);
         }
         else if (CVS->supportsIndirectInstancingRendering())
         {
-            //if(cascade==0)
             draw_calls.drawIndirectShadows(cascade);
-            /*renderInstancedShadow<DefaultMaterial>(cascade);
-            renderInstancedShadow<DetailMat>(cascade);
-            renderInstancedShadow<AlphaRef>(cascade);
-            renderInstancedShadow<UnlitMat>(cascade);
-            renderInstancedShadow<GrassMat>(cascade, m_wind_dir);
-            renderInstancedShadow<NormalMat>(cascade);*/
         }
     }
 

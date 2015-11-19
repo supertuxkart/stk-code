@@ -60,15 +60,6 @@ private:
     
     
     void clearLists();
-    
-    template<Material::ShaderType Mat, typename T>
-    void genDrawCalls(  unsigned cascade,
-                        std::vector<GLMesh *> &InstancedList,
-                        T *InstanceBuffer,
-                        DrawElementsIndirectCommand *CommandBuffer,
-                        size_t &InstanceBufferOffset,
-                        size_t &CommandBufferOffset,
-                        size_t &PolyCount);
 
     void handleSTKCommon(scene::ISceneNode *Node,
                                 std::vector<scene::ISceneNode *> *ImmediateDraw,
@@ -101,17 +92,16 @@ public:
     inline void bindShadowCmd() const { m_shadow_cmd_buffer.bind(); }
     inline void bindReflectiveShadowMapsCmd() const { m_reflective_shadow_map_cmd_buffer.bind(); }
 
-    
-    
-    inline bool isSolidCmdEmpty(Material::ShaderType shader_type) const
-    { return m_solid_cmd_buffer.isEmpty(shader_type); }
-    void drawIndirectSolidCmd(Material::ShaderType shader_type, int i) const;
-    void multidrawIndirectSolidCmd(Material::ShaderType shader_type) const;
-    
     void drawIndirectSolidFirstPass() const;
-    //void multidrawIndirectSolidCmd() const; //TODO
+    void multidrawSolidFirstPass() const;
     void drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled_tex) const;
+    void multidrawSolidSecondPass(const std::vector<uint64_t> &handles) const;
+    void drawIndirectNormals() const;
+    void multidrawNormals() const;
+    
     void drawIndirectShadows(unsigned cascade) const;
+    void multidrawShadows(unsigned cascade) const;
+
     void drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const;
     
 };

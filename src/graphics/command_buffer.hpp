@@ -120,6 +120,20 @@ template<>
 void expandTexSecondPass<GrassMat>(const GLMesh &mesh,
                                    const std::vector<GLuint> &prefilled_tex);
 
+
+template<typename T>
+void expandHandlesSecondPass(const std::vector<uint64_t> &handles)
+{
+    uint64_t nulltex[10] = {};
+    HandleExpander<typename T::InstancedSecondPassShader>::template
+        expand(nulltex, T::SecondPassTextures,
+               handles[0], handles[1], handles[2]);
+}
+
+template<>
+void expandHandlesSecondPass<GrassMat>(const std::vector<uint64_t> &handles);
+
+
 template<int N>
 class CommandBuffer
 {
@@ -207,39 +221,11 @@ public:
 
     inline size_t getPolyCount() const {return m_poly_count;}
 
-    inline bool isEmpty(Material::ShaderType shader_type) const
-    { return m_size[static_cast<int>(shader_type)] == 0;}
-
     inline void bind() const
     {
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_draw_indirect_cmd_id);        
     }
-
- 
-     /** Draw the i-th mesh with the specified material
-     * (require at least OpenGL 4.0
-     * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
-     */ 
-    inline void drawIndirect(int material_id, int i) const
-    {
-        glDrawElementsIndirect(GL_TRIANGLES,
-                               GL_UNSIGNED_SHORT,
-                               (const void*)((m_offset[material_id] + i) * sizeof(DrawElementsIndirectCommand)));
-    }
- 
-    /** Draw the meshes with the specified material
-     * (require at least OpenGL 4.3 or AZDO extensions)
-     */ 
-    inline void multidrawIndirect(int material_id) const
-    {
-        glMultiDrawElementsIndirect(GL_TRIANGLES,
-                                    GL_UNSIGNED_SHORT,
-                                    (const void*)(m_offset[material_id] * sizeof(DrawElementsIndirectCommand)),
-                                    (int) m_size[material_id],
-                                    sizeof(DrawElementsIndirectCommand));
-    }
 };
-
 
 
 class SolidCommandBuffer: public CommandBuffer<static_cast<int>(Material::SHADERTYPE_COUNT)>
@@ -278,7 +264,25 @@ public:
         
     } //drawIndirectFirstPass
 
-    
+    // ----------------------------------------------------------------------------
+    template<typename T, typename...Uniforms>
+    void multidrawFirstPass(Uniforms...uniforms) const
+    {
+        T::InstancedFirstPassShader::getInstance()->use();
+        T::InstancedFirstPassShader::getInstance()->setUniforms(uniforms...);
+
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                    T::Instance));
+        if (m_size[T::MaterialType])
+        {
+            glMultiDrawElementsIndirect(GL_TRIANGLES,
+                                        GL_UNSIGNED_SHORT,
+                                        (const void*)(m_offset[T::MaterialType] * sizeof(DrawElementsIndirectCommand)),
+                                        (int) m_size[T::MaterialType],
+                                        sizeof(DrawElementsIndirectCommand));
+        }
+    }   // multidrawFirstPass
+
     // ----------------------------------------------------------------------------
     template<typename T, typename...Uniforms>
     void drawIndirectSecondPass(const std::vector<GLuint> &prefilled_tex,
@@ -299,6 +303,62 @@ public:
         }
     } //drawIndirectSecondPass
 
+    // ----------------------------------------------------------------------------
+    template<typename T, typename...Uniforms>
+    void multidraw2ndPass(const std::vector<uint64_t> &handles,
+                          Uniforms... uniforms) const
+    {
+        T::InstancedSecondPassShader::getInstance()->use();
+        T::InstancedSecondPassShader::getInstance()->setUniforms(uniforms...);
+        
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                    T::Instance));
+        if (m_size[T::MaterialType])
+        {
+            expandHandlesSecondPass<T>(handles);
+            glMultiDrawElementsIndirect(GL_TRIANGLES,
+                                        GL_UNSIGNED_SHORT,
+                                        (const void*)(m_offset[T::MaterialType] * sizeof(DrawElementsIndirectCommand)),
+                                        (int) m_size[T::MaterialType],
+                                        sizeof(DrawElementsIndirectCommand));
+        }
+    }   // multidraw2ndPass
+
+
+    // ----------------------------------------------------------------------------
+    template<typename T>
+    void drawIndirectNormals() const
+    {
+        NormalVisualizer::getInstance()->use();
+        NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
+        
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                    T::Instance));
+        for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
+        {
+            glDrawElementsIndirect(GL_TRIANGLES,
+                                   GL_UNSIGNED_SHORT,
+                                   (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));        }
+    }   // drawIndirectNormals
+
+    // ----------------------------------------------------------------------------
+    template<typename T>
+    void multidrawNormals() const
+    {
+        NormalVisualizer::getInstance()->use();
+        NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
+
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                    T::Instance));
+        if (m_size[T::MaterialType])
+        {
+            glMultiDrawElementsIndirect(GL_TRIANGLES,
+                                        GL_UNSIGNED_SHORT,
+                                        (const void*)(m_offset[T::MaterialType] * sizeof(DrawElementsIndirectCommand)),
+                                        (int) m_size[T::MaterialType],
+                                        sizeof(DrawElementsIndirectCommand));
+        }
+    }   // multidrawNormals
 };
 
 class ShadowCommandBuffer: public CommandBuffer<4*static_cast<int>(Material::SHADERTYPE_COUNT)>
@@ -330,7 +390,30 @@ public:
                                    (const void*)((m_offset[material_id] + i)
                                    * sizeof(DrawElementsIndirectCommand)));
         }  // for i
-    }   // renderInstancedShadow
+    }   // drawIndirect
+    
+    // ----------------------------------------------------------------------------
+    template<typename T, typename...Uniforms>
+    void multidrawShadow(Uniforms ...uniforms, unsigned cascade) const
+    {
+        T::InstancedShadowPassShader::getInstance()->use();
+        T::InstancedShadowPassShader::getInstance()->setUniforms(uniforms..., cascade);
+        
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
+                                                                    InstanceTypeShadow));
+        int material_id = T::MaterialType + cascade * Material::SHADERTYPE_COUNT;
+                            
+        if (m_size[material_id])
+        {
+            glMultiDrawElementsIndirect(GL_TRIANGLES,
+                                        GL_UNSIGNED_SHORT,
+                                        (const void*)(m_offset[material_id] * sizeof(DrawElementsIndirectCommand)),
+                                        (int) m_size[material_id],
+                                        sizeof(DrawElementsIndirectCommand));
+        }
+    }   // multidrawShadow
+    
+    
 };
 
 class ReflectiveShadowMapCommandBuffer: public CommandBuffer<static_cast<int>(Material::SHADERTYPE_COUNT)>

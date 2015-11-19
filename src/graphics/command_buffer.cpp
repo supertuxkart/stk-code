@@ -20,46 +20,55 @@
 #include "utils/cpp2011.hpp"
 
 
-    template<>
-    void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataSingleTex &instance)
-    {
-        fillOriginOrientationScale<InstanceDataSingleTex>(node, instance);
-        instance.Texture = mesh->TextureHandles[0];
-    }
+template<>
+void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataSingleTex &instance)
+{
+    fillOriginOrientationScale<InstanceDataSingleTex>(node, instance);
+    instance.Texture = mesh->TextureHandles[0];
+}
 
-    template<>
-    void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataDualTex &instance)
-    {
-        fillOriginOrientationScale<InstanceDataDualTex>(node, instance);
-        instance.Texture = mesh->TextureHandles[0];
-        instance.SecondTexture = mesh->TextureHandles[1];
-    }
+template<>
+void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataDualTex &instance)
+{
+    fillOriginOrientationScale<InstanceDataDualTex>(node, instance);
+    instance.Texture = mesh->TextureHandles[0];
+    instance.SecondTexture = mesh->TextureHandles[1];
+}
 
-    template<>
-    void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataThreeTex &instance)
-    {
-        fillOriginOrientationScale<InstanceDataThreeTex>(node, instance);
-        instance.Texture = mesh->TextureHandles[0];
-        instance.SecondTexture = mesh->TextureHandles[1];
-        instance.ThirdTexture = mesh->TextureHandles[2];
-    }
+template<>
+void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataThreeTex &instance)
+{
+    fillOriginOrientationScale<InstanceDataThreeTex>(node, instance);
+    instance.Texture = mesh->TextureHandles[0];
+    instance.SecondTexture = mesh->TextureHandles[1];
+    instance.ThirdTexture = mesh->TextureHandles[2];
+}
 
-    template<>
-    void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, scene::ISceneNode *node, GlowInstanceData &instance)
-    {
-        fillOriginOrientationScale<GlowInstanceData>(node, instance);
-        STKMeshSceneNode *nd = dynamic_cast<STKMeshSceneNode*>(node);
-        instance.Color = nd->getGlowColor().color;
-    }
-    
-    template<>
-    void expandTexSecondPass<GrassMat>(const GLMesh &mesh,
-                                       const std::vector<GLuint> &prefilled_tex)
-    {
-        TexExpander<typename GrassMat::InstancedSecondPassShader>::template
-            expandTex(mesh, GrassMat::SecondPassTextures, prefilled_tex[0],
-                      prefilled_tex[1], prefilled_tex[2], prefilled_tex[3]);
-    }
+template<>
+void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, scene::ISceneNode *node, GlowInstanceData &instance)
+{
+    fillOriginOrientationScale<GlowInstanceData>(node, instance);
+    STKMeshSceneNode *nd = dynamic_cast<STKMeshSceneNode*>(node);
+    instance.Color = nd->getGlowColor().color;
+}
+
+template<>
+void expandTexSecondPass<GrassMat>(const GLMesh &mesh,
+                                   const std::vector<GLuint> &prefilled_tex)
+{
+    TexExpander<typename GrassMat::InstancedSecondPassShader>::template
+        expandTex(mesh, GrassMat::SecondPassTextures, prefilled_tex[0],
+                  prefilled_tex[1], prefilled_tex[2], prefilled_tex[3]);
+}
+
+template<>
+void expandHandlesSecondPass<GrassMat>(const std::vector<uint64_t> &handles)
+{
+    uint64_t nulltex[10] = {};
+    HandleExpander<GrassMat::InstancedSecondPassShader>::template
+        expand(nulltex, GrassMat::SecondPassTextures,
+               handles[0], handles[1], handles[2], handles[3]);
+}
 
 
 template<int N>
@@ -152,19 +161,11 @@ ShadowCommandBuffer::ShadowCommandBuffer(): CommandBuffer()
 {
 }
 
-//void ShadowCommandBuffer::fill(std::array<MeshMap,Material::SHADERTYPE_COUNT> mesh_map)
 void ShadowCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
     
     std::vector<int> shadow_tex_material_list;
-    /*    createVector<Material::ShaderType>(Material::SHADERTYPE_SOLID,
-                                           Material::SHADERTYPE_ALPHA_TEST,
-                                           Material::SHADERTYPE_SOLID_UNLIT,
-                                           Material::SHADERTYPE_NORMAL_MAP,
-                                           Material::SHADERTYPE_SPHERE_MAP,
-                                           Material::SHADERTYPE_DETAIL_MAP,
-                                           Material::SHADERTYPE_VEGETATION);*/
     for(int cascade=0; cascade<4; cascade++)
     {
         shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
@@ -182,10 +183,9 @@ void ShadowCommandBuffer::fill(MeshMap *mesh_map)
         shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
                                            + Material::SHADERTYPE_VEGETATION);
     }
-                                           
+    
     fillInstanceData<InstanceDataSingleTex>(mesh_map, shadow_tex_material_list, InstanceTypeShadow);
-    //fillInstanceData<InstanceDataSingleTex>(mesh_map.data(), shadow_tex_material_list, InstanceTypeShadow);
-
+    
     unmapBuffers();
     
 } //ShadowCommandBuffer::fill
@@ -243,9 +243,7 @@ void GlowCommandBuffer::fill(MeshMap *mesh_map)
                                                            GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
     }
  
-     fillMaterial( 0,
-                  mesh_map,
-                  glow_instance_buffer);   
+     fillMaterial( 0, mesh_map, glow_instance_buffer);   
     
     unmapBuffers();   
 } //GlowCommandBuffer::fill

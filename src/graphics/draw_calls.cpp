@@ -66,31 +66,6 @@ void DrawCalls::clearLists()
     ListInstancedGlow::getInstance()->clear();    
 }
 
-//TODO: rename (shadow pass only)
-template<Material::ShaderType Mat, typename T>
-void DrawCalls::genDrawCalls(unsigned cascade,
-                            std::vector<GLMesh *> &InstancedList,
-                            T *InstanceBuffer,
-                             DrawElementsIndirectCommand *CommandBuffer,
-                             size_t &InstanceBufferOffset,
-                             size_t &CommandBufferOffset,
-                             size_t &PolyCount)
-{
-    if (CVS->supportsIndirectInstancingRendering())
-        ShadowPassCmd::getInstance()->Offset[cascade][Mat] = CommandBufferOffset; // Store command buffer offset
-        
-    FillInstances<T>(m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat],
-                     InstancedList,
-                     InstanceBuffer,
-                     CommandBuffer,
-                     InstanceBufferOffset,
-                     CommandBufferOffset,
-                     PolyCount);
-    
-    if (CVS->isAZDOEnabled())
-        ShadowPassCmd::getInstance()->Size[cascade][Mat] = CommandBufferOffset - ShadowPassCmd::getInstance()->Offset[cascade][Mat];
-}
-
 
 void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                             std::vector<scene::ISceneNode *> *ImmediateDraw,
@@ -504,7 +479,6 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
     InstanceDataSingleTex *ShadowInstanceBuffer;
     InstanceDataSingleTex *RSMInstanceBuffer;
     GlowInstanceData *GlowInstanceBuffer;
-    DrawElementsIndirectCommand *ShadowCmdBuffer;
     DrawElementsIndirectCommand *RSMCmdBuffer;
     DrawElementsIndirectCommand *GlowCmdBuffer;
 
@@ -515,7 +489,6 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
         ShadowInstanceBuffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeShadow);
         RSMInstanceBuffer = (InstanceDataSingleTex*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeRSM);
         GlowInstanceBuffer = (GlowInstanceData*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeGlow);
-        ShadowCmdBuffer = ShadowPassCmd::getInstance()->Ptr;
         GlowCmdBuffer = GlowPassCmd::getInstance()->Ptr;
         RSMCmdBuffer = RSMPassCmd::getInstance()->Ptr;
         enableOpenMP = 1;
@@ -615,24 +588,11 @@ void DrawCalls::renderParticlesList() const
         particles->render();
 }
 
-
- /** Draw the i-th mesh with the specified material for the solid pass
- * (require at least OpenGL 4.0
+// ----------------------------------------------------------------------------
+ /** Render the solid first pass (depth and normals)
+ * Require at least OpenGL 4.0
  * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
  */ 
-void DrawCalls::drawIndirectSolidCmd(Material::ShaderType shader_type, int i) const
-{
-    m_solid_cmd_buffer.drawIndirect(static_cast<int>(shader_type), i);
-}
-
-/** Draw the meshes with the specified material
- * (require at least OpenGL 4.3 or AZDO extensions)
- */ 
-void DrawCalls::multidrawIndirectSolidCmd(Material::ShaderType shader_type) const
-{
-    m_solid_cmd_buffer.multidrawIndirect(static_cast<int>(shader_type));
-}
-
 void DrawCalls::drawIndirectSolidFirstPass() const
 {
     m_solid_cmd_buffer.drawIndirectFirstPass<DefaultMaterial>();
@@ -644,10 +604,24 @@ void DrawCalls::drawIndirectSolidFirstPass() const
     m_solid_cmd_buffer.drawIndirectFirstPass<NormalMat>();  
 }
 
+// ----------------------------------------------------------------------------
+ /** Render the solid first pass (depth and normals)
+ * Require OpenGL AZDO extensions
+ */ 
+void DrawCalls::multidrawSolidFirstPass() const
+{
+    m_solid_cmd_buffer.multidrawFirstPass<DefaultMaterial>();
+    m_solid_cmd_buffer.multidrawFirstPass<AlphaRef>();
+    m_solid_cmd_buffer.multidrawFirstPass<SphereMap>();
+    m_solid_cmd_buffer.multidrawFirstPass<UnlitMat>();
+    m_solid_cmd_buffer.multidrawFirstPass<GrassMat>(windDir);
+    m_solid_cmd_buffer.multidrawFirstPass<NormalMat>();
+    m_solid_cmd_buffer.multidrawFirstPass<DetailMat>();  
+}
 
+// ----------------------------------------------------------------------------
 void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled_tex) const
 {
-
     m_solid_cmd_buffer.drawIndirectSecondPass<DefaultMaterial>(prefilled_tex);
     m_solid_cmd_buffer.drawIndirectSecondPass<AlphaRef>(prefilled_tex);
     m_solid_cmd_buffer.drawIndirectSecondPass<UnlitMat>(prefilled_tex);
@@ -657,15 +631,41 @@ void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled
     m_solid_cmd_buffer.drawIndirectSecondPass<NormalMat>(prefilled_tex);
 }
 
-void DrawCalls::drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const
+// ----------------------------------------------------------------------------
+void DrawCalls::multidrawSolidSecondPass(const std::vector<uint64_t> &handles) const
 {
-    m_reflective_shadow_map_cmd_buffer.drawIndirect<DefaultMaterial>(rsm_matrix);
-    m_reflective_shadow_map_cmd_buffer.drawIndirect<AlphaRef>(rsm_matrix);
-    m_reflective_shadow_map_cmd_buffer.drawIndirect<UnlitMat>(rsm_matrix);
-    m_reflective_shadow_map_cmd_buffer.drawIndirect<NormalMat>(rsm_matrix);
-    m_reflective_shadow_map_cmd_buffer.drawIndirect<DetailMat>(rsm_matrix);   
+    m_solid_cmd_buffer.multidraw2ndPass<DefaultMaterial>(handles);
+    m_solid_cmd_buffer.multidraw2ndPass<AlphaRef>(handles);
+    m_solid_cmd_buffer.multidraw2ndPass<SphereMap>(handles);
+    m_solid_cmd_buffer.multidraw2ndPass<UnlitMat>(handles);
+    m_solid_cmd_buffer.multidraw2ndPass<NormalMat>(handles);
+    m_solid_cmd_buffer.multidraw2ndPass<DetailMat>(handles);
+    m_solid_cmd_buffer.multidraw2ndPass<GrassMat>(handles, windDir, irr_driver->getSunDirection());
 }
 
+// ----------------------------------------------------------------------------
+void DrawCalls::drawIndirectNormals() const
+{
+    m_solid_cmd_buffer.drawIndirectNormals<DefaultMaterial>();
+    m_solid_cmd_buffer.drawIndirectNormals<AlphaRef>();
+    m_solid_cmd_buffer.drawIndirectNormals<UnlitMat>();
+    m_solid_cmd_buffer.drawIndirectNormals<SphereMap>();
+    m_solid_cmd_buffer.drawIndirectNormals<DetailMat>();
+    m_solid_cmd_buffer.drawIndirectNormals<NormalMat>();
+}
+
+// ----------------------------------------------------------------------------
+void DrawCalls::multidrawNormals() const
+{
+    m_solid_cmd_buffer.multidrawNormals<DefaultMaterial>();
+    m_solid_cmd_buffer.multidrawNormals<AlphaRef>();
+    m_solid_cmd_buffer.multidrawNormals<UnlitMat>();
+    m_solid_cmd_buffer.multidrawNormals<SphereMap>();
+    m_solid_cmd_buffer.multidrawNormals<DetailMat>();
+    m_solid_cmd_buffer.multidrawNormals<NormalMat>();
+}
+
+// ----------------------------------------------------------------------------
 void DrawCalls::drawIndirectShadows(unsigned cascade) const
 {
     m_shadow_cmd_buffer.drawIndirect<DefaultMaterial>(cascade);
@@ -675,4 +675,24 @@ void DrawCalls::drawIndirectShadows(unsigned cascade) const
     m_shadow_cmd_buffer.drawIndirect<GrassMat,irr::core::vector3df>(windDir, cascade);
     m_shadow_cmd_buffer.drawIndirect<NormalMat>(cascade);
     
+}
+
+void DrawCalls::multidrawShadows(unsigned cascade) const
+{
+    m_shadow_cmd_buffer.multidrawShadow<DefaultMaterial>(cascade);
+    m_shadow_cmd_buffer.multidrawShadow<DetailMat>(cascade);
+    m_shadow_cmd_buffer.multidrawShadow<NormalMat>(cascade);
+    m_shadow_cmd_buffer.multidrawShadow<AlphaRef>(cascade);
+    m_shadow_cmd_buffer.multidrawShadow<UnlitMat>(cascade);
+    m_shadow_cmd_buffer.multidrawShadow<GrassMat,irr::core::vector3df>(windDir, cascade);    
+}
+
+// ----------------------------------------------------------------------------
+void DrawCalls::drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const
+{
+    m_reflective_shadow_map_cmd_buffer.drawIndirect<DefaultMaterial>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirect<AlphaRef>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirect<UnlitMat>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirect<NormalMat>(rsm_matrix);
+    m_reflective_shadow_map_cmd_buffer.drawIndirect<DetailMat>(rsm_matrix);   
 }
