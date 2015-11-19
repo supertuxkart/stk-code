@@ -335,6 +335,8 @@ unsigned IrrDriver::updateLightsInfo(scene::ICameraSceneNode * const camnode,
 {
     const u32 lightcount = (u32)m_lights.size();
     const core::vector3df &campos = camnode->getAbsolutePosition();
+    const core::vector3df cam_heading = (camnode->getTarget() - campos).normalize();
+    //Vec3 heading(sin(m_kart->getHeading()), 0.0f, cos(m_kart->getHeading()));
 
     std::vector<LightNode *> BucketedLN[15];
     for (unsigned int i = 0; i < lightcount; i++)
@@ -347,12 +349,97 @@ unsigned IrrDriver::updateLightsInfo(scene::ICameraSceneNode * const camnode,
             m_lights[i]->render();
             continue;
         }
-        const core::vector3df &lightpos = 
+        core::vector3df &light_cam_vector = 
                                  (m_lights[i]->getAbsolutePosition() - campos);
-        unsigned idx = (unsigned)(lightpos.getLength() / 10);
+
+        float length = light_cam_vector.getLength();
+        light_cam_vector.normalize();
+
+        float dotProduct = light_cam_vector.dotProduct(cam_heading);
+
+        unsigned idx = (unsigned)(length / 12);
+
+        float target_radius_multiplier = 1.0f;
+
+        // Lights behind the camera or to the side should be moved to further buckets,
+        // lights straight ahead of the camera deserve a better chance of being in
+        // the first buckets
+        // Lights that are completely behind the kart should be fully culled, unless they are 
+        // very close (then they could still have visible effects nearby)
+        // TODO: all of these numbers are very, very arbitrary and approximate, find a cleaner way?
+        if (length > 150.0f)
+        {
+            if (dotProduct < 0.5f)
+                continue; // light is behind kart or to the side, ignore
+            else
+                target_radius_multiplier = 0.2f;
+        }
+        else if (length > 40.0f)
+        {
+            if (dotProduct < -0.2f)
+            {
+                continue; // light is behind kart or to the side, ignore
+            }
+            else if (dotProduct < 0.0f)
+            {
+                idx += 2;
+                target_radius_multiplier = 0.5f;
+            }
+            else if (dotProduct < 0.25f)
+            {
+                idx += 1; // light is a bit to the side, move back in render priorities
+                target_radius_multiplier = 0.5f;
+            }
+        }
+        else
+        {
+            if (dotProduct < 0.1f)
+            {
+                idx += 1; // light is a bit to the side or behind, move back in render priorities
+                target_radius_multiplier = 0.5f;
+            }
+        }
+        if (dotProduct > 0.8f && idx > 0)
+        {
+            if (idx > 0)
+                idx = 0;
+        }
+        else if (dotProduct > 0.6f)
+        {
+            if (idx > 0)
+                idx -= 1;
+        }
+
+        if (length < 50.0f && dotProduct > -0.2f)
+        {
+            if (idx > 0)
+                idx -= 1;
+        }
+
+        if (length > 200.0f && target_radius_multiplier > 0.2f)
+        {
+            target_radius_multiplier = 0.2f;
+        }
+        else if (length > 100.0f && target_radius_multiplier > 0.5f)
+        {
+            target_radius_multiplier = 0.5f;
+        }
+
         if (idx > 14)
             idx = 14;
         BucketedLN[idx].push_back(m_lights[i]);
+
+        float curr_multiplier = m_lights[i]->getRadiusMultiplier();
+        if (curr_multiplier < target_radius_multiplier)
+        {
+            m_lights[i]->setRadiusMultiplier(std::min(curr_multiplier + dt, target_radius_multiplier));
+        }
+        else if (curr_multiplier > target_radius_multiplier)
+        {
+            m_lights[i]->setRadiusMultiplier(std::max(curr_multiplier - dt, target_radius_multiplier));
+        }
+
+        //m_lights[i]->setRadiusMultiplier(target_radius_multiplier);
     }
 
     unsigned lightnum = 0;
@@ -362,14 +449,31 @@ unsigned IrrDriver::updateLightsInfo(scene::ICameraSceneNode * const camnode,
     {
         for (unsigned j = 0; j < BucketedLN[i].size(); j++)
         {
+            LightNode* light_node = BucketedLN[i].at(j);
+
+            /*
+            if (i == 0)
+                light_node->setColor(1.0f, 0.0f, 0.0f);
+            else if (i == 1)
+                light_node->setColor(1.0f, 0.0f, 1.0f);
+            else if (i == 2)
+                light_node->setColor(0.0f, 0.0f, 1.0f);
+            else if (i == 3)
+                light_node->setColor(0.0f, 1.0f, 1.0f);
+            else if (i == 4)
+                light_node->setColor(0.0f, 1.0f, 0.0f);
+            else
+                light_node->setColor(1.0f, 1.0f, 0.0f);
+            */
+
             if (++lightnum >= LightBaseClass::MAXLIGHT)
             {
-                LightNode* light_node = BucketedLN[i].at(j);
+                //LightNode* light_node = BucketedLN[i].at(j);
                 light_node->setEnergyMultiplier(0.0f);
             }
             else
             {
-                LightNode* light_node = BucketedLN[i].at(j);
+                //LightNode* light_node = BucketedLN[i].at(j);
 
                 float em = light_node->getEnergyMultiplier();
                 if (em < 1.0f)
@@ -395,8 +499,8 @@ unsigned IrrDriver::updateLightsInfo(scene::ICameraSceneNode * const camnode,
                 m_point_lights_info[lightnum].green = col.Y;
                 m_point_lights_info[lightnum].blue = col.Z;
 
-                // Light radius
-                m_point_lights_info[lightnum].radius = light_node->getRadius();
+                float radius = light_node->getRadius();
+                m_point_lights_info[lightnum].radius = radius;
             }
         }
         if (lightnum > LightBaseClass::MAXLIGHT)

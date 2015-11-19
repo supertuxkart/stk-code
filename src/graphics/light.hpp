@@ -55,7 +55,7 @@ public:
     virtual u32 getMaterialCount() const OVERRIDE { return 1; }
     virtual bool isPointLight() { return true; }
 
-    float getRadius() const { return m_radius; }
+    float getRadius() const { return m_radius * m_radius_multiplier; }
     float getEnergy() const { return m_energy; }
     float getEffectiveEnergy() const { return m_energy_multiplier * m_energy; }
     core::vector3df getColor() const { return core::vector3df(m_color[0], m_color[1], m_color[2]); }
@@ -63,6 +63,10 @@ public:
 
     float getEnergyMultiplier() const { return m_energy_multiplier; }
     void  setEnergyMultiplier(float newval) { m_energy_multiplier = newval; }
+
+    float getRadiusMultiplier() const { return m_radius_multiplier; }
+    void  setRadiusMultiplier(float newval) { m_radius_multiplier = newval; }
+
 
     // For the debug menu
     void setEnergy(float energy) { m_energy = energy; }
@@ -77,6 +81,8 @@ protected:
 
     /// The energy multiplier is in range [0, 1] and is used to fade in lights when they come in range
     float m_energy_multiplier;
+
+    float m_radius_multiplier;
 };
 
 #endif

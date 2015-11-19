@@ -40,6 +40,7 @@ LightNode::LightNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float
     m_energy = e;
     m_radius = d;
     m_energy_multiplier = 1.0f;
+    m_radius_multiplier = 1.0f;
     m_color[0] = r;
     m_color[1] = g;
     m_color[2] = b;
