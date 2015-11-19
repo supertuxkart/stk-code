@@ -151,20 +151,10 @@ void* NetworkConsole::mainLoop(void* data)
             }
             std::cout << "\n";
         }
-        // FIXME
-        // If STK shuts down, but should receive an input after the network 
-        // manager was deleted, the getInstance call will return NULL.
-        else if (NetworkConfig::get()->isclient() && 
-                 STKHost::get()->getPeerCount() > 0)
+        else
         {
-            NetworkString msg(1 + str.size());
-            msg.ai8(0);
-            msg += str;
-            STKHost::get()->getPeers()[0]->sendPacket(msg);
+            Log::info("Console", "Unknown command '%s'.", str.c_str());
         }
-
-
-
     }   // while !stop
 
     Protocol *p = new StopServer();
