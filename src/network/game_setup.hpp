@@ -66,7 +66,7 @@ class GameSetup
         /** \brief Get the players that are in the game
          *  \return A vector containing pointers on the players profiles.
          */
-        std::vector<NetworkPlayerProfile*> getPlayers() { return m_players; }
+        const std::vector<NetworkPlayerProfile*>& getPlayers() { return m_players; }
         int getPlayerCount() { return (int)m_players.size(); }
         /*! \brief Get a network player profile matching a universal id.
          *  \param id : Global id of the player (the one in the SQL database)

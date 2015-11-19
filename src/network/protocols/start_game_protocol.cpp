@@ -25,7 +25,7 @@ StartGameProtocol::StartGameProtocol(GameSetup* game_setup)
                  : Protocol(PROTOCOL_START_GAME)
 {
     m_game_setup = game_setup;
-    std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
+    const std::vector<NetworkPlayerProfile*> &players = m_game_setup->getPlayers();
     for (unsigned int i = 0; i < players.size(); i++)
     {
         m_player_states.insert(std::pair<NetworkPlayerProfile*, STATE>(players[i], LOADING));
