@@ -57,9 +57,8 @@ void ClientLobbyRoomProtocol::setup()
 void ClientLobbyRoomProtocol::requestKartSelection(const std::string &kart_name)
 {
     NetworkString request(6+1+kart_name.size());
-    // 0x02 : kart selection request, size_token (4), token, size kart name,
-    //        kart name
-    request.ai8(0x02).ai8(4).ai32(m_server->getClientServerToken())
+    // size_token (4), token, size kart name, kart name
+    request.ai8(LE_KART_SELECTION).ai8(4).ai32(m_server->getClientServerToken())
            .add(kart_name);
     sendMessage(request, true);
 }   // requestKartSelection
@@ -69,8 +68,9 @@ void ClientLobbyRoomProtocol::requestKartSelection(const std::string &kart_name)
 void ClientLobbyRoomProtocol::voteMajor(uint8_t major)
 {
     NetworkString request(8);
-    // 0xc0 : major vote, size_token (4), token, size major(1),major
-    request.ai8(0xc0).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(major);
+    // size_token (4), token, size major(1),major
+    request.ai8(LE_VOTE_MAJOR).ai8(4)
+           .ai32(m_server->getClientServerToken()).ai8(1).ai8(major);
     sendMessage(request, true);
 }   // voteMajor
 
@@ -79,8 +79,9 @@ void ClientLobbyRoomProtocol::voteMajor(uint8_t major)
 void ClientLobbyRoomProtocol::voteRaceCount(uint8_t count)
 {
     NetworkString request(8);
-    // 0xc0 : race count vote, size_token (4), token, size race count(1), count
-    request.ai8(0xc1).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(count);
+    // size_token (4), token, size race count(1), count
+    request.ai8(LE_VOTE_RACE_COUNT).ai8(4)
+           .ai32(m_server->getClientServerToken()).ai8(1).ai8(count);
     sendMessage(request, true);
 }   // voteRaceCount
 
@@ -89,8 +90,8 @@ void ClientLobbyRoomProtocol::voteRaceCount(uint8_t count)
 void ClientLobbyRoomProtocol::voteMinor(uint8_t minor)
 {
     NetworkString request(8);
-    // 0xc0 : minor vote, size_token (4), token, size minor(1),minor
-    request.ai8(0xc2).ai8(4).ai32(m_server->getClientServerToken())
+    // size_token (4), token, size minor(1),minor
+    request.ai8(LE_VOTE_MINOR).ai8(4).ai32(m_server->getClientServerToken())
            .ai8(1).ai8(minor);
     sendMessage(request, true);
 }   // voteMinor
@@ -101,10 +102,9 @@ void ClientLobbyRoomProtocol::voteTrack(const std::string &track,
                                         uint8_t track_nb)
 {
     NetworkString request(8+1+track.size());
-    // 0xc0 : major vote, size_token (4), token, size track, track, size #track,
-    //        #track
-    request.ai8(0xc3).ai8(4).ai32(m_server->getClientServerToken()).add(track)
-           .ai8(1).ai8(track_nb);
+    // size_token (4), token, size track, track, size #track, #track
+    request.ai8(LE_VOTE_TRACK).ai8(4).ai32(m_server->getClientServerToken())
+           .add(track).ai8(1).ai8(track_nb);
     sendMessage(request, true);
 }   // voteTrack
 
@@ -113,10 +113,9 @@ void ClientLobbyRoomProtocol::voteTrack(const std::string &track,
 void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
 {
     NetworkString request(9);
-    // 0xc0 : major vote, size_token (4), token, size reversed(1),reversed,
-    //        size #track, #track
-    request.ai8(0xc4).ai8(4).ai32(m_server->getClientServerToken()).ai8(1)
-           .ai8(reversed).ai8(1).ai8(track_nb);
+    // size_token (4), token, size reversed(1),reversed, size #track, #track
+    request.ai8(LE_VOTE_REVERSE).ai8(4).ai32(m_server->getClientServerToken())
+           .ai8(1).ai8(reversed).ai8(1).ai8(track_nb);
     sendMessage(request, true);
 }   // voteReversed
 
@@ -125,9 +124,8 @@ void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
 void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
 {
     NetworkString request(10);
-    // 0xc0 : major vote, size_token (4), token, size laps(1),laps,
-    //        size #track, #track
-    request.ai8(0xc5).ai8(4).ai32(m_server->getClientServerToken()).ai8(1)
+    // size_token (4), token, size laps(1),laps, size #track, #track
+    request.ai8(LE_VOTE_LAPS).ai8(4).ai32(m_server->getClientServerToken()).ai8(1)
            .ai8(laps).ai8(1).ai8(track_nb);
     sendMessage(request, true);
 }   // voteLaps
@@ -150,16 +148,16 @@ bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
         const NetworkString &data = event->data();
         assert(data.size()); // assert that data isn't empty
         uint8_t message_type = data[0];
-        if (message_type != 0x03 &&
-            message_type != 0x06)
+        if (message_type != LE_KART_SELECTION_UPDATE &&
+            message_type != LE_RACE_FINISHED            )
             return false; // don't treat the event
 
         event->removeFront(1);
         Log::info("ClientLobbyRoomProtocol", "Synchronous message of type %d",
                   message_type);
-        if (message_type == 0x03) // kart selection update
+        if (message_type == LE_KART_SELECTION_UPDATE) // kart selection update
             kartSelectionUpdate(event);
-        else if (message_type == 0x06) // end of race
+        else if (message_type == LE_RACE_FINISHED) // end of race
             raceFinished(event);
 
         return true;
@@ -184,31 +182,31 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         event->removeFront(1);
         Log::info("ClientLobbyRoomProtocol", "Asynchronous message of type %d",
                   message_type);
-        if (message_type == 0x01) // new player connected
+        if (message_type == LE_NEW_PLAYER_CONNECTED) // new player connected
             newPlayer(event);
-        else if (message_type == 0x02) // player disconnected
+        else if (message_type == LE_PLAYER_DISCONNECTED) // player disconnected
             disconnectedPlayer(event);
-        else if (message_type == 0x04) // start race
+        else if (message_type == LE_START_RACE) // start race
             startGame(event);
-        else if (message_type == 0x05) // start selection phase
+        else if (message_type == LE_START_SELECTION) // start selection phase
             startSelection(event);
-        else if (message_type == 0x80) // connection refused
+        else if (message_type == LE_CONNECTION_REFUSED) // connection refused
             connectionRefused(event);
-        else if (message_type == 0x81) // connection accepted
+        else if (message_type == LE_CONNECTION_ACCEPTED) // connection accepted
             connectionAccepted(event);
-        else if (message_type == 0x82) // kart selection refused
+        else if (message_type == LE_KART_SELECTION_REFUSED) // kart selection refused
             kartSelectionRefused(event);
-        else if (message_type == 0xc0) // vote for major mode
+        else if (message_type == LE_VOTE_MAJOR) // vote for major mode
             playerMajorVote(event);
-        else if (message_type == 0xc1) // vote for race count
+        else if (message_type == LE_VOTE_RACE_COUNT) // vote for race count
             playerRaceCountVote(event);
-        else if (message_type == 0xc2) // vote for minor mode
+        else if (message_type == LE_VOTE_MINOR) // vote for minor mode
             playerMinorVote(event);
-        else if (message_type == 0xc3) // vote for track
+        else if (message_type == LE_VOTE_TRACK) // vote for track
             playerTrackVote(event);
-        else if (message_type == 0xc4) // vote for reversed mode
+        else if (message_type == LE_VOTE_REVERSE) // vote for reversed mode
             playerReversedVote(event);
-        else if (message_type == 0xc5) // vote for laps
+        else if (message_type == LE_VOTE_LAPS) // vote for laps
             playerLapsVote(event);
 
         return true;
@@ -247,8 +245,9 @@ void ClientLobbyRoomProtocol::update()
     case LINKED:
     {
         NetworkString ns(6);
-        // 1 (connection request), 4 (size of id), global id
-        ns.ai8(1).ai8(4).ai32(PlayerManager::getCurrentOnlineId());
+        // 4 (size of id), global id
+        ns.ai8(LE_CONNECTION_REQUESTED).ai8(4)
+          .ai32(PlayerManager::getCurrentOnlineId());
         sendMessage(ns);
         m_state = REQUESTING_CONNECTION;
     }

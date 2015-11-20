@@ -82,21 +82,21 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         event->removeFront(1);
         Log::info("ServerLobbyRoomProtocol", "Message received with type %d.",
                   message_type);
-        if (message_type == 0x01) // player requesting connection
+        if (message_type == LE_CONNECTION_REQUESTED) // player requesting connection
             connectionRequested(event);
-        else if (message_type == 0x02) // player requesting kart selection
+        else if (message_type == LE_KART_SELECTION) // player requesting kart selection
             kartSelectionRequested(event);
-        else if (message_type == 0xc0) // vote for major mode
+        else if (message_type == LE_VOTE_MAJOR) // vote for major mode
             playerMajorVote(event);
-        else if (message_type == 0xc1) // vote for race count
+        else if (message_type == LE_VOTE_RACE_COUNT) // vote for race count
             playerRaceCountVote(event);
-        else if (message_type == 0xc2) // vote for minor mode
+        else if (message_type == LE_VOTE_MINOR) // vote for minor mode
             playerMinorVote(event);
-        else if (message_type == 0xc3) // vote for track
+        else if (message_type == LE_VOTE_TRACK) // vote for track
             playerTrackVote(event);
-        else if (message_type == 0xc4) // vote for reversed mode
+        else if (message_type == LE_VOTE_REVERSE) // vote for reversed mode
             playerReversedVote(event);
-        else if (message_type == 0xc5) // vote for laps
+        else if (message_type == LE_VOTE_LAPS) // vote for laps
             playerLapsVote(event);
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
     else if (event->getType() == EVENT_TYPE_CONNECTED)
@@ -223,7 +223,7 @@ void ServerLobbyRoomProtocol::startGame()
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         NetworkString ns(6);
-        ns.ai8(0x04).ai8(4).ai32(peers[i]->getClientServerToken()); // start game
+        ns.ai8(LE_START_RACE).ai8(4).ai32(peers[i]->getClientServerToken());
         sendMessage(peers[i], ns, true); // reliably
     }
     Protocol *p = new StartGameProtocol(m_setup);
@@ -240,7 +240,7 @@ void ServerLobbyRoomProtocol::startSelection()
     {
         NetworkString ns(6);
         // start selection
-        ns.ai8(0x05).ai8(4).ai32(peers[i]->getClientServerToken());
+        ns.ai8(LE_START_SELECTION).ai8(4).ai32(peers[i]->getClientServerToken());
         sendMessage(peers[i], ns, true); // reliably
     }
     m_selection_enabled = true;
@@ -381,7 +381,8 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
     if (peer->getPlayerProfile() != NULL) // others knew him
     {
         NetworkString msg(3);
-        msg.ai8(0x02).ai8(1).ai8(peer->getPlayerProfile()->race_id);
+        msg.ai8(LE_PLAYER_DISCONNECTED).ai8(1)
+           .ai8(peer->getPlayerProfile()->race_id);
         sendMessage(msg);
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
                   peer->getPlayerProfile()->race_id);
@@ -424,8 +425,9 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         m_next_id = m_setup->getPlayerCount();
         // notify everybody that there is a new player
         NetworkString message(8);
-        // new player (1) -- size of id -- id -- size of local id -- local id;
-        message.ai8(1).ai8(4).ai32(player_id).ai8(1).ai8(m_next_id);
+        // size of id -- id -- size of local id -- local id;
+        message.ai8(LE_NEW_PLAYER_CONNECTED).ai8(4).ai32(player_id)
+               .ai8(1).ai8(m_next_id);
         ProtocolManager::getInstance()->sendMessageExcept(this, peer, message);
 
         /// now answer to the peer that just connected
@@ -441,8 +443,8 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         // Size is overestimated, probably one player's data will not be sent
         NetworkString message_ack(13+players.size()*7);
         // connection success (129) -- size of token -- token
-        message_ack.ai8(0x81).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4)
-                   .ai32(player_id);
+        message_ack.ai8(LE_CONNECTION_ACCEPTED).ai8(1).ai8(m_next_id).ai8(4)
+                   .ai32(token).ai8(4).ai32(player_id);
         // add all players so that this user knows
         for (unsigned int i = 0; i < players.size(); i++)
         {
@@ -469,7 +471,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     else  // refuse the connection with code 0 (too much players)
     {
         NetworkString message(3);
-        message.ai8(0x80);            // 128 means connection refused
+        message.ai8(LE_CONNECTION_REFUSED);
         message.ai8(1);               // 1 bytes for the error code
         message.ai8(0);               // 0 = too much players
         // send only to the peer that made the request
@@ -509,7 +511,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     if (!m_selection_enabled)
     {
         NetworkString answer(3);
-        answer.ai8(0x82).ai8(1).ai8(2); // selection still not started
+        answer.ai8(LE_KART_SELECTION_REFUSED).ai8(1).ai8(2); // selection still not started
         sendMessage(peer, answer);
         return;
     }
@@ -517,7 +519,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     if (!m_setup->isKartAvailable(kart_name))
     {
         NetworkString answer(3);
-        answer.ai8(0x82).ai8(1).ai8(0); // kart is already taken
+        answer.ai8(LE_KART_SELECTION_REFUSED).ai8(1).ai8(0); // kart is already taken
         sendMessage(peer, answer);
         return;
     }
@@ -525,7 +527,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     if (!m_setup->isKartAllowed(kart_name))
     {
         NetworkString answer(3);
-        answer.ai8(0x82).ai8(1).ai8(1); // kart is not authorized
+        answer.ai8(LE_KART_SELECTION_REFUSED).ai8(1).ai8(1); // kart is not authorized
         sendMessage(peer, answer);
         return;
     }
@@ -567,9 +569,10 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
     NetworkString prefix(1);
-    prefix.ai8(0xc0); // prefix the token with the ype
+    prefix.ai8(LE_VOTE_MAJOR); // prefix the token with the type
     sendMessageToPeersChangingToken(prefix, other);
-}
+}   // playerMajorVote
+
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when a player votes for the number of races in a GP.
@@ -598,9 +601,10 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
     NetworkString prefix(1);
-    prefix.ai8(0xc1); // prefix the token with the type
+    prefix.ai8(LE_VOTE_RACE_COUNT); // prefix the token with the type
     sendMessageToPeersChangingToken(prefix, other);
-}
+}   // playerRaceCountVote
+
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when a player votes for a minor race mode.
@@ -629,9 +633,10 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
     NetworkString prefix(1);
-    prefix.ai8(0xc2); // prefix the token with the ype
+    prefix.ai8(LE_VOTE_MINOR); // prefix the token with the ype
     sendMessageToPeersChangingToken(prefix, other);
-}
+}   // playerMinorVote
+
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when a player votes for a track.
@@ -662,9 +667,10 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
     NetworkString prefix(1);
-    prefix.ai8(0xc3); // prefix the token with the ype
+    prefix.ai8(LE_VOTE_TRACK); // prefix the token with the ype
     sendMessageToPeersChangingToken(prefix, other);
-}
+}   // playerTrackVote
+
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when a player votes for the reverse mode of a race
@@ -696,9 +702,10 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
     NetworkString prefix(1);
-    prefix.ai8(0xc4); // prefix the token with the ype
+    prefix.ai8(LE_VOTE_REVERSE); // prefix the token with the ype
     sendMessageToPeersChangingToken(prefix, other);
-}
+}   // playerReversedVote
+
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when a player votes for a major race mode.
@@ -729,7 +736,8 @@ void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
     NetworkString prefix(1);
-    prefix.ai8(0xc5); // prefix the token with the ype
+    prefix.ai8(LE_VOTE_LAPS); // prefix the token with the ype
     sendMessageToPeersChangingToken(prefix, other);
-}
+}   // playerLapsVote
+
 //-----------------------------------------------------------------------------
