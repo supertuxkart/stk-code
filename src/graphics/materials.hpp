@@ -670,7 +670,6 @@ struct DefaultMaterial
     typedef InstancedObjectPass2Shader InstancedSecondPassShader;
     typedef InstancedShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatDefault InstancedList;
     typedef Shaders::ObjectPass1Shader FirstPassShader;
     typedef Shaders::ObjectPass2Shader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
@@ -693,7 +692,6 @@ struct AlphaRef
     typedef InstancedObjectRefPass2Shader InstancedSecondPassShader;
     typedef InstancedRefShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatAlphaRef InstancedList;
     typedef ObjectRefPass1Shader FirstPassShader;
     typedef ObjectRefPass2Shader SecondPassShader;
     typedef RefShadowShader ShadowPassShader;
@@ -715,7 +713,6 @@ struct SphereMap
     typedef InstancedSphereMapShader InstancedSecondPassShader;
     typedef InstancedShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatSphereMap InstancedList;
     typedef Shaders::ObjectPass1Shader FirstPassShader;
     typedef SphereMapShader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
@@ -738,7 +735,6 @@ struct UnlitMat
     typedef InstancedObjectUnlitShader InstancedSecondPassShader;
     typedef InstancedRefShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatUnlit InstancedList;
     typedef ObjectRefPass1Shader FirstPassShader;
     typedef ObjectUnlitShader SecondPassShader;
     typedef RefShadowShader ShadowPassShader;
@@ -761,7 +757,6 @@ struct GrassMat
     typedef InstancedGrassPass2Shader InstancedSecondPassShader;
     typedef InstancedGrassShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatGrass InstancedList;
     typedef GrassPass1Shader FirstPassShader;
     typedef GrassPass2Shader SecondPassShader;
     typedef GrassShadowShader ShadowPassShader;
@@ -784,7 +779,6 @@ struct NormalMat
     typedef InstancedObjectPass2Shader InstancedSecondPassShader;
     typedef InstancedShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatNormalMap InstancedList;
     typedef NormalMapShader FirstPassShader;
     typedef Shaders::ObjectPass2Shader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
@@ -807,7 +801,6 @@ struct DetailMat
     typedef InstancedDetailedObjectPass2Shader InstancedSecondPassShader;
     typedef InstancedShadowShader InstancedShadowPassShader;
     typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatDetails InstancedList;
     typedef Shaders::ObjectPass1Shader FirstPassShader;
     typedef DetailedObjectPass2Shader SecondPassShader;
     typedef ShadowShader ShadowPassShader;

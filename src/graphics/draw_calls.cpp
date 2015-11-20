@@ -63,7 +63,6 @@ void DrawCalls::clearLists()
     m_immediate_draw_list.clear();
     m_billboard_list.clear();
     m_particles_list.clear();
-    ListInstancedGlow::getInstance()->clear();    
 }
 
 
@@ -482,16 +481,6 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
     {
         enableOpenMP = 1;
     }
-
-    ListInstancedMatDefault::getInstance()->clear();
-    ListInstancedMatAlphaRef::getInstance()->clear();
-    ListInstancedMatGrass::getInstance()->clear();
-    ListInstancedMatNormalMap::getInstance()->clear();
-    ListInstancedMatSphereMap::getInstance()->clear();
-    ListInstancedMatDetails::getInstance()->clear();
-    ListInstancedMatUnlit::getInstance()->clear();
-
-
     
     size_t SolidPoly = 0, ShadowPoly = 0, MiscPoly = 0;
 

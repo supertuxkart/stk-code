@@ -87,15 +87,6 @@ public:
     virtual bool isImmediateDraw() const { return false; }
 };   // STKMeshCommon
 
-/*
-// ----------------------------------------------------------------------------
-//TODO: template function in order to avoid duplicate code (clear method)
-template<typename T>
-clearMeshList()
-{
-    
-}
-*/
 
 // ----------------------------------------------------------------------------
 template<typename T, typename... Args>
@@ -112,28 +103,10 @@ public:
     }
 };   // MeshList
 
-// ----------------------------------------------------------------------------
-template<typename T>
-class InstancedMeshList : public Singleton<T>
-{
-public:
-    std::vector<GLMesh *> SolidPass, Shadows[4], RSM;
-    void clear()
-    {
-        SolidPass.clear();
-        RSM.clear();
-        for (unsigned i = 0; i < 4; i++)
-            Shadows[i].clear();
-    }
-};   // InstancedMeshList
 
 // ----------------------------------------------------------------------------
 class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4,
                                       core::matrix4, core::matrix4>
-{};
-
-// ----------------------------------------------------------------------------
-class ListInstancedMatDefault : public InstancedMeshList<ListInstancedMatDefault>
 {};
 
 // ----------------------------------------------------------------------------
@@ -142,16 +115,8 @@ class ListMatAlphaRef : public MeshList<ListMatAlphaRef, GLMesh *, core::matrix4
 {};
 
 // ----------------------------------------------------------------------------
-class ListInstancedMatAlphaRef : public InstancedMeshList<ListInstancedMatAlphaRef>
-{};
-
-// ----------------------------------------------------------------------------
 class ListMatNormalMap : public MeshList<ListMatNormalMap, GLMesh *, core::matrix4,
                                          core::matrix4, core::matrix4>
-{};
-
-// ----------------------------------------------------------------------------
-class ListInstancedMatNormalMap : public InstancedMeshList<ListInstancedMatNormalMap>
 {};
 
 // ----------------------------------------------------------------------------
@@ -160,17 +125,9 @@ class ListMatGrass : public MeshList<ListMatGrass, GLMesh *, core::matrix4,
 {};
 
 // ----------------------------------------------------------------------------
-class ListInstancedMatGrass : public InstancedMeshList<ListInstancedMatGrass>
-{};
-
-// ----------------------------------------------------------------------------
 class ListMatSphereMap : public MeshList<ListMatSphereMap, GLMesh *,
                                          core::matrix4, core::matrix4,
                                          core::matrix4>
-{};
-
-// ----------------------------------------------------------------------------
-class ListInstancedMatSphereMap : public InstancedMeshList<ListInstancedMatSphereMap>
 {};
 
 // ----------------------------------------------------------------------------
@@ -184,16 +141,8 @@ class ListMatUnlit : public MeshList<ListMatUnlit, GLMesh *, core::matrix4,
 {};
 
 // ----------------------------------------------------------------------------
-class ListInstancedMatUnlit : public InstancedMeshList<ListInstancedMatUnlit>
-{};
-
-// ----------------------------------------------------------------------------
 class ListMatDetails : public MeshList<ListMatDetails, GLMesh *, core::matrix4,
                                        core::matrix4, core::matrix4>
-{};
-
-// ----------------------------------------------------------------------------
-class ListInstancedMatDetails : public InstancedMeshList<ListInstancedMatDetails>
 {};
 
 // ----------------------------------------------------------------------------
@@ -232,11 +181,6 @@ class ListAdditiveTransparentFog : public MiscList<ListAdditiveTransparentFog,
 // ----------------------------------------------------------------------------
 class ListDisplacement : public MiscList<ListDisplacement, GLMesh *,
                                          core::matrix4>
-{};
-
-// ----------------------------------------------------------------------------
-class ListInstancedGlow : public Singleton<ListInstancedGlow>
-                        , public std::vector<GLMesh *>
 {};
 
 // ----------------------------------------------------------------------------
