@@ -391,7 +391,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
     }
     else
         Log::info("ServerLobbyRoomProtocol", "The DC peer wasn't registered.");
-}
+}   // kartDisconnected
 
 //-----------------------------------------------------------------------------
 
@@ -478,7 +478,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         sendMessage(peer, message);
         Log::verbose("ServerLobbyRoomProtocol", "Player refused");
     }
-}
+}   // connectionRequested
 
 //-----------------------------------------------------------------------------
 
@@ -511,7 +511,8 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     if (!m_selection_enabled)
     {
         NetworkString answer(3);
-        answer.ai8(LE_KART_SELECTION_REFUSED).ai8(1).ai8(2); // selection still not started
+        // selection still not started
+        answer.ai8(LE_KART_SELECTION_REFUSED).ai8(1).ai8(2);
         sendMessage(peer, answer);
         return;
     }
@@ -519,7 +520,8 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     if (!m_setup->isKartAvailable(kart_name))
     {
         NetworkString answer(3);
-        answer.ai8(LE_KART_SELECTION_REFUSED).ai8(1).ai8(0); // kart is already taken
+        // kart is already taken
+        answer.ai8(LE_KART_SELECTION_REFUSED).ai8(1).ai8(0);
         sendMessage(peer, answer);
         return;
     }
@@ -527,7 +529,8 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     if (!m_setup->isKartAllowed(kart_name))
     {
         NetworkString answer(3);
-        answer.ai8(LE_KART_SELECTION_REFUSED).ai8(1).ai8(1); // kart is not authorized
+        // kart is not authorized
+        answer.ai8(LE_KART_SELECTION_REFUSED).ai8(1).ai8(1);
         sendMessage(peer, answer);
         return;
     }
@@ -539,7 +542,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     answer.add(kart_name);
     sendMessage(answer);
     m_setup->setPlayerKart(peer->getPlayerProfile()->race_id, kart_name);
-}
+}   // kartSelectionRequested
 
 //-----------------------------------------------------------------------------
 

@@ -31,7 +31,8 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
 
-ClientLobbyRoomProtocol::ClientLobbyRoomProtocol(const TransportAddress& server_address)
+ClientLobbyRoomProtocol::
+ClientLobbyRoomProtocol(const TransportAddress& server_address)
                        : LobbyRoomProtocol(NULL)
 {
     m_server_address.copy(server_address);
@@ -125,8 +126,8 @@ void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
 {
     NetworkString request(10);
     // size_token (4), token, size laps(1),laps, size #track, #track
-    request.ai8(LE_VOTE_LAPS).ai8(4).ai32(m_server->getClientServerToken()).ai8(1)
-           .ai8(laps).ai8(1).ai8(track_nb);
+    request.ai8(LE_VOTE_LAPS).ai8(4).ai32(m_server->getClientServerToken())
+           .ai8(1).ai8(laps).ai8(1).ai8(track_nb);
     sendMessage(request, true);
 }   // voteLaps
 
@@ -194,7 +195,7 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
             connectionRefused(event);
         else if (message_type == LE_CONNECTION_ACCEPTED) // connection accepted
             connectionAccepted(event);
-        else if (message_type == LE_KART_SELECTION_REFUSED) // kart selection refused
+        else if (message_type == LE_KART_SELECTION_REFUSED) // kart selection
             kartSelectionRefused(event);
         else if (message_type == LE_VOTE_MAJOR) // vote for major mode
             playerMajorVote(event);
@@ -304,7 +305,9 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
     const NetworkString &data = event->data();
     if (data.size() != 7 || data[0] != 4 || data[5] != 1) // 7 bytes remains now
     {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a new player wasn't formated as expected.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "A message notifying a new player wasn't formated "
+                   "as expected.");
         return;
     }
 
@@ -313,9 +316,12 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
 
     if (global_id == PlayerManager::getCurrentOnlineId())
     {
-        Log::error("ClientLobbyRoomProtocol", "The server notified me that i'm a new player in the room (not normal).");
+        Log::error("ClientLobbyRoomProtocol",
+                   "The server notified me that I'm a new player in the "
+                   "room (not normal).");
     }
-    else if (m_setup->getProfile(race_id) == NULL || m_setup->getProfile(global_id) == NULL)
+    else if (m_setup->getProfile(race_id) == NULL ||
+             m_setup->getProfile(global_id) == NULL)
     {
         Log::verbose("ClientLobbyRoomProtocol", "New player connected.");
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
@@ -326,7 +332,8 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
     }
     else
     {
-        Log::error("ClientLobbyRoomProtocol", "One of the player notified in the list is myself.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "One of the player notified in the list is myself.");
     }
 }   // newPlayer
 
@@ -347,7 +354,9 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
     const NetworkString &data = event->data();
     if (data.size() != 2 || data[0] != 1)
     {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a new player wasn't formated as expected.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "A message notifying a new player wasn't formated "
+                   "as expected.");
         return;
     }
     uint8_t id = data[1];
@@ -357,7 +366,8 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
     }
     else
     {
-        Log::error("ClientLobbyRoomProtocol", "The disconnected peer wasn't known.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "The disconnected peer wasn't known.");
     }
 }   // disconnectedPlayer
 
@@ -376,9 +386,12 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
 void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 {
     NetworkString &data = event->data();
-    if (data.size() < 12 || data[0] != 1 || data[2] != 4 || data[7] != 4) // 12 bytes remains now
+    // 12 bytes should remain now
+    if (data.size() < 12 || data[0] != 1 || data[2] != 4 || data[7] != 4)
     {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying an accepted connection wasn't formated as expected.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "A message notifying an accepted connection wasn't "
+                   "formated as expected.");
         return;
     }
     STKPeer* peer = event->getPeer();
@@ -386,7 +399,8 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     uint32_t global_id = data.gui32(8);
     if (global_id == PlayerManager::getCurrentOnlineId())
     {
-        Log::info("ClientLobbyRoomProtocol", "The server accepted the connection.");
+        Log::info("ClientLobbyRoomProtocol",
+                  "The server accepted the connection.");
 
         // self profile
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
@@ -402,17 +416,20 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         int remaining = data.size();
         if (remaining%7 != 0)
         {
-            Log::error("ClientLobbyRoomProtocol", "ConnectionAccepted : Error in the server list");
+            Log::error("ClientLobbyRoomProtocol",
+                       "ConnectionAccepted : Error in the server list");
         }
         remaining /= 7;
         for (int i = 0; i < remaining; i++)
         {
             if (data[0] != 1 || data[2] != 4)
-                Log::error("ClientLobbyRoomProtocol", "Bad format in players list.");
+                Log::error("ClientLobbyRoomProtocol",
+                           "Bad format in players list.");
 
             uint8_t race_id = data[1];
             uint32_t global_id = data.gui32(3);
-            Online::OnlineProfile* new_user = new Online::OnlineProfile(global_id, "");
+            Online::OnlineProfile* new_user =
+                new Online::OnlineProfile(global_id, "");
 
             NetworkPlayerProfile* profile2 = new NetworkPlayerProfile();
             profile2->race_id = race_id;
@@ -427,7 +444,8 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         m_state = CONNECTED;
     }
     else
-        Log::info("ClientLobbyRoomProtocol", "Failure during the connection acceptation process.");
+        Log::info("ClientLobbyRoomProtocol",
+                  "Failure during the connection acceptation process.");
 }   // connectionAccepted
 
 //-----------------------------------------------------------------------------
@@ -447,14 +465,17 @@ void ClientLobbyRoomProtocol::connectionRefused(Event* event)
     const NetworkString &data = event->data();
     if (data.size() != 2 || data[0] != 1) // 2 bytes remains now
     {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a refused connection wasn't formated as expected.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "A message notifying a refused connection wasn't formated "
+                   "as expected.");
         return;
     }
 
     switch (data[1]) // the second byte
     {
     case 0:
-        Log::info("ClientLobbyRoomProtocol", "Connection refused : too many players.");
+        Log::info("ClientLobbyRoomProtocol",
+                  "Connection refused : too many players.");
         break;
     case 1:
         Log::info("ClientLobbyRoomProtocol", "Connection refused : banned.");
@@ -482,17 +503,21 @@ void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
     const NetworkString &data = event->data();
     if (data.size() != 2 || data[0] != 1)
     {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a refused kart selection wasn't formated as expected.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "A message notifying a refused kart selection wasn't "
+                   "formated as expected.");
         return;
     }
 
     switch (data[1]) // the error code
     {
     case 0:
-        Log::info("ClientLobbyRoomProtocol", "Kart selection refused : already taken.");
+        Log::info("ClientLobbyRoomProtocol",
+                  "Kart selection refused : already taken.");
         break;
     case 1:
-        Log::info("ClientLobbyRoomProtocol", "Kart selection refused : not available.");
+        Log::info("ClientLobbyRoomProtocol",
+                  "Kart selection refused : not available.");
         break;
     default:
         Log::info("ClientLobbyRoomProtocol", "Kart selection refused.");
@@ -517,7 +542,9 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
     const NetworkString &data = event->data();
     if (data.size() < 3 || data[0] != 1)
     {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a kart selection update wasn't formated as expected.");
+        Log::error("ClientLobbyRoomProtocol", 
+                   "A message notifying a kart selection update wasn't "
+                   "formated as expected.");
         return;
     }
     uint8_t player_id = data[1];
@@ -525,15 +552,19 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
     std::string kart_name = data.getString(3, kart_name_length);
     if (kart_name.size() != kart_name_length)
     {
-        Log::error("ClientLobbyRoomProtocol", "Kart names sizes differ: told: %d, real: %d.", kart_name_length, kart_name.size());
+        Log::error("ClientLobbyRoomProtocol",
+                   "Kart names sizes differ: told: %d, real: %d.",
+                   kart_name_length, kart_name.size());
         return;
     }
     if (!m_setup->isKartAvailable(kart_name))
     {
-        Log::error("ClientLobbyRoomProtocol", "The updated kart is taken already.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "The updated kart is taken already.");
     }
     m_setup->setPlayerKart(player_id, kart_name);
-    NetworkKartSelectionScreen::getInstance()->playerSelected(player_id, kart_name);
+    NetworkKartSelectionScreen::getInstance()->playerSelected(player_id,
+                                                              kart_name);
 }   // kartSelectionUpdate
 
 //-----------------------------------------------------------------------------
@@ -561,7 +592,8 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
     if (token == STKHost::get()->getPeers()[0]->getClientServerToken())
     {
         m_state = PLAYING;
-        ProtocolManager::getInstance()->requestStart(new StartGameProtocol(m_setup));
+        ProtocolManager::getInstance()
+                       ->requestStart(new StartGameProtocol(m_setup));
         Log::error("ClientLobbyRoomProtocol", "Starting new game");
     }
     else
@@ -627,27 +659,33 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
         return;
     }
     data.removeFront(5);
-    Log::error("ClientLobbyRoomProtocol", "Server notified that the race is finished.");
+    Log::error("ClientLobbyRoomProtocol",
+               "Server notified that the race is finished.");
 
     // stop race protocols
-    Protocol* protocol = NULL;
-    protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
+    Protocol* protocol = ProtocolManager::getInstance()
+                       ->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
     if (protocol)
         ProtocolManager::getInstance()->requestTerminate(protocol);
     else
-        Log::error("ClientLobbyRoomProtocol", "No controller events protocol registered.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "No controller events protocol registered.");
 
-    protocol = ProtocolManager::getInstance() ->getProtocol(PROTOCOL_KART_UPDATE);
+    protocol = ProtocolManager::getInstance() 
+             ->getProtocol(PROTOCOL_KART_UPDATE);
     if (protocol)
         ProtocolManager::getInstance()->requestTerminate(protocol);
     else
-        Log::error("ClientLobbyRoomProtocol", "No kart update protocol registered.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "No kart update protocol registered.");
 
-    protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS);
+    protocol = ProtocolManager::getInstance()
+             ->getProtocol(PROTOCOL_GAME_EVENTS);
     if (protocol)
         ProtocolManager::getInstance()->requestTerminate(protocol);
     else
-        Log::error("ClientLobbyRoomProtocol", "No game events protocol registered.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "No game events protocol registered.");
 
     // finish the race
     WorldWithRank* ranked_world = (WorldWithRank*)(World::getWorld());
@@ -668,7 +706,8 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
         }
         uint8_t kart_id = data[1];
         ranked_world->setKartPosition(kart_id,position);
-        Log::info("ClientLobbyRoomProtocol", "Kart %d has finished #%d", kart_id, position);
+        Log::info("ClientLobbyRoomProtocol", "Kart %d has finished #%d",
+                  kart_id, position);
         data.removeFront(2);
         position++;
     }
@@ -753,7 +792,7 @@ void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6           7   8            N+8 N+9                 N+10
+ *  Byte 0   1            5   6           7   8            N+8 N+9              N+10
  *       ---------------------------------------------------------------------------
  *  Size | 1 |      4     | 1 |      1    | 1 |      N     | 1 |       1           |
  *  Data | 4 | priv token | 1 | player id | N | track name | 1 | track number (gp) |
