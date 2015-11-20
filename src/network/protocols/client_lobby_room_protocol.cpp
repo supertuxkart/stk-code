@@ -176,39 +176,29 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         const NetworkString &data = event->data();
         assert(data.size()); // assert that data isn't empty
         uint8_t message_type = data[0];
-        if (message_type == 0x03 ||
-            message_type == 0x06)
+        if (message_type == LE_KART_SELECTION_UPDATE ||
+            message_type == LE_RACE_FINISHED           )
             return false; // don't treat the event
 
         event->removeFront(1);
         Log::info("ClientLobbyRoomProtocol", "Asynchronous message of type %d",
                   message_type);
-        if (message_type == LE_NEW_PLAYER_CONNECTED) // new player connected
-            newPlayer(event);
-        else if (message_type == LE_PLAYER_DISCONNECTED) // player disconnected
-            disconnectedPlayer(event);
-        else if (message_type == LE_START_RACE) // start race
-            startGame(event);
-        else if (message_type == LE_START_SELECTION) // start selection phase
-            startSelection(event);
-        else if (message_type == LE_CONNECTION_REFUSED) // connection refused
-            connectionRefused(event);
-        else if (message_type == LE_CONNECTION_ACCEPTED) // connection accepted
-            connectionAccepted(event);
-        else if (message_type == LE_KART_SELECTION_REFUSED) // kart selection
-            kartSelectionRefused(event);
-        else if (message_type == LE_VOTE_MAJOR) // vote for major mode
-            playerMajorVote(event);
-        else if (message_type == LE_VOTE_RACE_COUNT) // vote for race count
-            playerRaceCountVote(event);
-        else if (message_type == LE_VOTE_MINOR) // vote for minor mode
-            playerMinorVote(event);
-        else if (message_type == LE_VOTE_TRACK) // vote for track
-            playerTrackVote(event);
-        else if (message_type == LE_VOTE_REVERSE) // vote for reversed mode
-            playerReversedVote(event);
-        else if (message_type == LE_VOTE_LAPS) // vote for laps
-            playerLapsVote(event);
+        switch(message_type)
+        {
+            case LE_NEW_PLAYER_CONNECTED: newPlayer(event);              break;
+            case LE_PLAYER_DISCONNECTED : disconnectedPlayer(event);     break;
+            case LE_START_RACE: startGame(event);                        break;
+            case LE_START_SELECTION: startSelection(event);              break;
+            case LE_CONNECTION_REFUSED: connectionRefused(event);        break;
+            case LE_CONNECTION_ACCEPTED: connectionAccepted(event);      break;
+            case LE_KART_SELECTION_REFUSED: kartSelectionRefused(event); break;
+            case LE_VOTE_MAJOR : playerMajorVote(event);                 break;
+            case LE_VOTE_RACE_COUNT: playerRaceCountVote(event);         break;
+            case LE_VOTE_MINOR: playerMinorVote(event);                  break;
+            case LE_VOTE_TRACK: playerTrackVote(event);                  break;
+            case LE_VOTE_REVERSE: playerReversedVote(event);             break;
+            case LE_VOTE_LAPS: playerLapsVote(event);                    break;
+        }   // switch
 
         return true;
     } // message

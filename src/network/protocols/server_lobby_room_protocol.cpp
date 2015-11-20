@@ -82,22 +82,18 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         event->removeFront(1);
         Log::info("ServerLobbyRoomProtocol", "Message received with type %d.",
                   message_type);
-        if (message_type == LE_CONNECTION_REQUESTED) // player requesting connection
-            connectionRequested(event);
-        else if (message_type == LE_KART_SELECTION) // player requesting kart selection
-            kartSelectionRequested(event);
-        else if (message_type == LE_VOTE_MAJOR) // vote for major mode
-            playerMajorVote(event);
-        else if (message_type == LE_VOTE_RACE_COUNT) // vote for race count
-            playerRaceCountVote(event);
-        else if (message_type == LE_VOTE_MINOR) // vote for minor mode
-            playerMinorVote(event);
-        else if (message_type == LE_VOTE_TRACK) // vote for track
-            playerTrackVote(event);
-        else if (message_type == LE_VOTE_REVERSE) // vote for reversed mode
-            playerReversedVote(event);
-        else if (message_type == LE_VOTE_LAPS) // vote for laps
-            playerLapsVote(event);
+        switch(message_type)
+        {
+        case LE_CONNECTION_REQUESTED: connectionRequested(event); break;
+        case LE_KART_SELECTION: kartSelectionRequested(event);    break;
+        case LE_VOTE_MAJOR: playerMajorVote(event);               break;
+        case LE_VOTE_RACE_COUNT: playerRaceCountVote(event);      break;
+        case LE_VOTE_MINOR: playerMinorVote(event);               break;
+        case LE_VOTE_TRACK: playerTrackVote(event);               break;
+        case LE_VOTE_REVERSE: playerReversedVote(event);          break;
+        case LE_VOTE_LAPS:  playerLapsVote(event);                break;
+        }   // switch
+           
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
     else if (event->getType() == EVENT_TYPE_CONNECTED)
     {
