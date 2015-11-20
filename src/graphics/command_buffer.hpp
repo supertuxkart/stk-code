@@ -225,7 +225,7 @@ public:
     {
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_draw_indirect_cmd_id);        
     }
-};
+}; //CommandBuffer
 
 
 class SolidCommandBuffer: public CommandBuffer<static_cast<int>(Material::SHADERTYPE_COUNT)>
@@ -361,7 +361,7 @@ public:
                                         sizeof(DrawElementsIndirectCommand));
         }
     }   // multidrawNormals
-};
+}; //SolidCommandBuffer
 
 class ShadowCommandBuffer: public CommandBuffer<4*static_cast<int>(Material::SHADERTYPE_COUNT)>
 {
@@ -416,7 +416,7 @@ public:
     }   // multidrawShadow
     
     
-};
+}; //ShadowCommandBuffer
 
 class ReflectiveShadowMapCommandBuffer: public CommandBuffer<static_cast<int>(Material::SHADERTYPE_COUNT)>
 {
@@ -435,7 +435,6 @@ public:
                                                                     InstanceTypeRSM));
                                                                     
         for (unsigned i = 0; i < m_meshes[T::MaterialType].size(); i++)
-
         {
             GLMesh *mesh = m_meshes[T::MaterialType][i];
 
@@ -465,13 +464,56 @@ public:
         }
     }   // multidraw
     
-};
+}; //ReflectiveShadowMapCommandBuffer
+
+
+// ============================================================================
+class InstancedColorizeShader : public Shader<InstancedColorizeShader>
+{
+public:
+    InstancedColorizeShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER,   "utils/getworldmatrix.vert",
+                            GL_VERTEX_SHADER,   "glow_object.vert",
+                            GL_FRAGMENT_SHADER, "glow_object.frag");
+        assignUniforms();
+    }   // InstancedColorizeShader
+};   // InstancedColorizeShader
 
 class GlowCommandBuffer: public CommandBuffer<1>
 {
 public:
     GlowCommandBuffer();
     void fill(MeshMap *mesh_map);
+    
+    void drawIndirect() const
+    {
+        InstancedColorizeShader::getInstance()->use();
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(irr::video::EVT_STANDARD,
+                                                                    InstanceTypeGlow));
+        for (unsigned i = 0; i < m_meshes[0].size(); i++)
+        {
+            glDrawElementsIndirect(GL_TRIANGLES,
+                                   GL_UNSIGNED_SHORT,
+                                   (const void*)((m_offset[0] + i) * sizeof(DrawElementsIndirectCommand)));
+        }
+        
+    } //drawIndirect
+    
+    void multidraw() const
+    {
+        InstancedColorizeShader::getInstance()->use();
+        glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(irr::video::EVT_STANDARD,
+                                                                    InstanceTypeGlow));
+        if (m_size[0])
+        {
+            glMultiDrawElementsIndirect(GL_TRIANGLES,
+                                        GL_UNSIGNED_SHORT,
+                                        (const void*)(m_offset[0] * sizeof(DrawElementsIndirectCommand)),
+                                        (int) m_size[0],
+                                        sizeof(DrawElementsIndirectCommand));
+        }                                                                        
+    } // multidraw
 };
 
 #endif //HEADER_COMMAND_BUFFER_HPP

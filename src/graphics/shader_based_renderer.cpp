@@ -347,7 +347,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GLOW));
         irr_driver->setPhase(GLOW_PASS);
-        irr_driver->renderGlow(glows);
+        m_geometry_passes.renderGlow(m_draw_calls, glows);
     } // end glow
     PROFILER_POP_CPU_MARKER();
 

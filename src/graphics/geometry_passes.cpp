@@ -27,6 +27,7 @@
 #include "modes/world.hpp"
 #include "utils/profiler.hpp"
 #include "utils/tuple.hpp"
+#include <SColor.h>
 #include <S3DVertex.h>
 
 
@@ -338,6 +339,77 @@ void GeometryPasses::renderNormalsVisualisation(const DrawCalls& draw_calls)
         draw_calls.drawIndirectNormals();
     }
 }   // renderNormalsVisualisation
+
+
+
+// ----------------------------------------------------------------------------
+
+void GeometryPasses::renderGlow(const DrawCalls& draw_calls, std::vector<GlowData>& glows)
+{
+    irr_driver->getSceneManager()->setCurrentRendertime(scene::ESNRP_SOLID);
+    irr_driver->getRTT()->getFBO(FBO_TMP1_WITH_DS).bind();
+    glClearStencil(0);
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+    const u32 glowcount = (int)glows.size();
+
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilFunc(GL_ALWAYS, 1, ~0);
+    glEnable(GL_STENCIL_TEST);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_BLEND);
+
+    if (CVS->isARBBaseInstanceUsable())
+        glBindVertexArray(VAOManager::getInstance()->getVAO(irr::video::EVT_STANDARD));
+    for (u32 i = 0; i < glowcount; i++)
+    {
+        const GlowData &dat = glows[i];
+        scene::ISceneNode * cur = dat.node;
+
+        STKMeshSceneNode *node = static_cast<STKMeshSceneNode *>(cur);
+        node->setGlowColors(irr::video::SColor(0, (unsigned) (dat.b * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.r * 255.f)));
+        if (!CVS->supportsIndirectInstancingRendering())
+            node->render();
+    }
+
+    if (CVS->supportsIndirectInstancingRendering())
+    {
+        draw_calls.bindGlowCmd();
+         if (CVS->isAZDOEnabled())
+        {
+            draw_calls.multidrawGlow();
+        }
+        else
+        {
+            draw_calls.drawIndirectGlow();
+        }
+    }
+
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    glDisable(GL_STENCIL_TEST);
+    glDisable(GL_BLEND);
+
+    // To half
+    FrameBuffer::Blit(irr_driver->getFBO(FBO_TMP1_WITH_DS), irr_driver->getFBO(FBO_HALF1), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+    // To quarter
+    FrameBuffer::Blit(irr_driver->getFBO(FBO_HALF1), irr_driver->getFBO(FBO_QUARTER1), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glStencilFunc(GL_EQUAL, 0, ~0);
+    glEnable(GL_STENCIL_TEST);
+    irr_driver->getRTT()->getFBO(FBO_COLORS).bind();
+    irr_driver->getPostProcessing()->renderGlow(irr_driver->getRTT()->getRenderTarget(RTT_QUARTER1));
+    glDisable(GL_STENCIL_TEST);
+}
+
+
 
 // ----------------------------------------------------------------------------
 template<typename Shader, enum video::E_VERTEX_TYPE VertexType, int...List, 

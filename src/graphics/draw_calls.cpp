@@ -476,15 +476,10 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
     if (!CVS->supportsIndirectInstancingRendering())
         return;
 
-    GlowInstanceData *GlowInstanceBuffer;
-    DrawElementsIndirectCommand *GlowCmdBuffer;
-
     int enableOpenMP = 0;
     
     if (CVS->supportsAsyncInstanceUpload())
     {
-        GlowInstanceBuffer = (GlowInstanceData*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeGlow);
-        GlowCmdBuffer = GlowPassCmd::getInstance()->Ptr;
         enableOpenMP = 1;
     }
 
@@ -498,7 +493,6 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
 
 
     
-    //TODO: split command upload in separate functions
     size_t SolidPoly = 0, ShadowPoly = 0, MiscPoly = 0;
 
     PROFILER_PUSH_CPU_MARKER("- Draw Command upload", 0xFF, 0x0, 0xFF);
@@ -511,37 +505,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
         }
 #pragma omp section
         {            
-            size_t offset = 0, current_cmd = 0;
-
-            if (!CVS->supportsAsyncInstanceUpload())
-            {
-                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeGlow));
-                GlowInstanceBuffer = (GlowInstanceData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-                glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
-                GlowCmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-            }
-
-            // Glow
-            if (CVS->supportsIndirectInstancingRendering())
-                GlowPassCmd::getInstance()->Offset = offset; // Store command buffer offset
-
-            auto It = m_glow_pass_mesh.begin(), E = m_glow_pass_mesh.end();//TODO
-            for (; It != E; ++It)
-            {
-                size_t Polycnt = 0;
-                FillInstances_impl<GlowInstanceData>(It->second, GlowInstanceBuffer, GlowCmdBuffer, offset, current_cmd, Polycnt);
-                if (!CVS->isAZDOEnabled())
-                    ListInstancedGlow::getInstance()->push_back(It->second.front().first);
-            }
-
-            if (CVS->isAZDOEnabled())
-                GlowPassCmd::getInstance()->Size = current_cmd - GlowPassCmd::getInstance()->Offset;
-
-            if (!CVS->supportsAsyncInstanceUpload())
-            {
-                glUnmapBuffer(GL_ARRAY_BUFFER);
-                glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-            }
+            m_glow_cmd_buffer.fill(&m_glow_pass_mesh);
         }
 #pragma omp section
         {
@@ -701,3 +665,14 @@ void DrawCalls::multidrawReflectiveShadowMaps(const core::matrix4 &rsm_matrix) c
     m_reflective_shadow_map_cmd_buffer.multidraw<DetailMat>(rsm_matrix);
 }
 
+// ----------------------------------------------------------------------------
+void DrawCalls::drawIndirectGlow() const
+{
+    m_glow_cmd_buffer.drawIndirect();
+}
+
+// ----------------------------------------------------------------------------
+void DrawCalls::multidrawGlow() const
+{
+    m_glow_cmd_buffer.multidraw();
+}

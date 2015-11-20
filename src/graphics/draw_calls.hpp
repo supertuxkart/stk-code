@@ -91,6 +91,7 @@ public:
     inline void bindSolidCmd() const { m_solid_cmd_buffer.bind(); }
     inline void bindShadowCmd() const { m_shadow_cmd_buffer.bind(); }
     inline void bindReflectiveShadowMapsCmd() const { m_reflective_shadow_map_cmd_buffer.bind(); }
+    inline void bindGlowCmd() const { m_glow_cmd_buffer.bind(); }
 
     void drawIndirectSolidFirstPass() const;
     void multidrawSolidFirstPass() const;
@@ -104,6 +105,9 @@ public:
 
     void drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const;
     void multidrawReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const;
+    
+    void drawIndirectGlow() const;
+    void multidrawGlow() const;
     
 };
 

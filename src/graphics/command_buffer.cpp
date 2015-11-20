@@ -221,29 +221,8 @@ GlowCommandBuffer::GlowCommandBuffer()
 void GlowCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
-    
-    GlowInstanceData *glow_instance_buffer;
-
-    if (CVS->supportsAsyncInstanceUpload())
-    {
-        glow_instance_buffer = (GlowInstanceData*)VAOManager::getInstance()->getInstanceBufferPtr(InstanceTypeGlow);
-    }
-    else
-    {
-        glBindBuffer(GL_ARRAY_BUFFER,
-                     VAOManager::getInstance()->getInstanceBuffer(InstanceTypeGlow));
-        glow_instance_buffer =
-            (GlowInstanceData*)glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                                                10000 * sizeof(InstanceDataDualTex),
-                                                GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_draw_indirect_cmd_id);
-        m_draw_indirect_cmd =
-            (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0,
-                                                           10000 * sizeof(DrawElementsIndirectCommand),
-                                                           GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-    }
- 
-     fillMaterial( 0, mesh_map, glow_instance_buffer);   
-    
-    unmapBuffers();   
+    fillInstanceData<GlowInstanceData>(mesh_map,
+                                          createVector<int>(0),
+                                          InstanceTypeGlow);
+    unmapBuffers();
 } //GlowCommandBuffer::fill

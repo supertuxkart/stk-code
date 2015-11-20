@@ -40,6 +40,9 @@ public:
                                 unsigned render_target_specular,
                                 unsigned render_target_half_red);
     void renderNormalsVisualisation(const DrawCalls& draw_calls);
+    
+    void renderGlow(const DrawCalls& draw_calls, std::vector<GlowData>& glows);
+    
     void renderTransparent(const DrawCalls& draw_calls, 
                            unsigned render_target);
     void renderShadows(const DrawCalls& draw_calls,
