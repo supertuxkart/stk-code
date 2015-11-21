@@ -20,6 +20,7 @@
 # This script creates code for the characteristics.
 # It takes an argument that specifies what the output of the script should be.
 # The output options can be seen by running this script without arguments.
+# A more convenient version to update the code is to run update_characteristics.py
 
 import sys
 
@@ -46,7 +47,8 @@ Startup: time(std::vector<float>/floatVector), boost(std::vector<float>/floatVec
 Rescue: duration, vertOffset, height
 Explosion: duration, radius, invulnerabilityTime
 Nitro: duration, engineForce, consumption, smallContainer, bigContainer, maxSpeedIncrease, fadeOutTime, max
-Slipstream: duration, length, width, collectTime, useTime, addPower, minSpeed, maxSpeedIncrease, fadeOutTime"""
+Slipstream: duration, length, width, collectTime, useTime, addPower, minSpeed, maxSpeedIncrease, fadeOutTime
+Skid: increase, decrease, max, timeTillMax, visual, visualTime, revertVisualTime, minSpeed, timeTillBonus(std::vector<float>/floatVector), bonusSpeed(std::vector<float>/floatVector), bonusTime(std::vector<float>/floatVector), bonusForce(std::vector<float>/floatVector), physicalJumpTime, graphicalJumpTime, postSkidRotateFactor, reduceTurnMin, reduceTurnMax"""
 
 """ A GroupMember is an attribute of a group.
     In the xml files, a value will be assigned to it.
