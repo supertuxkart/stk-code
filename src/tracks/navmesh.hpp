@@ -27,13 +27,11 @@
 
 #include "utils/vec3.hpp"
 
-
 namespace irr
 {
     namespace video { struct S3DVertex; }
 }
 using namespace irr;
-
 
 class btTransform;
 class XMLNode;
@@ -41,35 +39,34 @@ class XMLNode;
 /**
 * \ingroup tracks
 *
-*  \brief This class stores a set of navigatoin polygons. It uses a 
-*  'simplified singleton' design pattern: it has a static create function 
-*	to create exactly one instance, a destroy function, and a get function 
-*	(that does not have the side effect  of the 'normal singleton'  design 
-*	pattern to create an instance). Besides saving on the if statement in get(), 
-*	this is necessary since certain race modes might not have a navigaton 
-*	mesh at all (e.g. race mode). So get() returns NULL in this case, and 
-*	this is tested where necessary.
+*  \brief This class stores a set of navigatoin polygons. It uses a
+*  'simplified singleton' design pattern: it has a static create function
+*    to create exactly one instance, a destroy function, and a get function
+*    (that does not have the side effect  of the 'normal singleton'  design
+*    pattern to create an instance). Besides saving on the if statement in get(),
+*    this is necessary since certain race modes might not have a navigaton
+*    mesh at all (e.g. race mode). So get() returns NULL in this case, and
+*    this is tested where necessary.
  \ingroup tracks
 */
 class NavMesh
 {
 
 private:
+    static NavMesh                  *m_nav_mesh;
 
-	static NavMesh                  *m_nav_mesh;
+    /** The actual set of nav polys that constitute the nav mesh */
+    std::vector<NavPoly>            m_polys;
 
-	/** The actual set of nav polys that constitute the nav mesh */
-    std::vector<NavPoly>            m_polys;    
-	
-	/** The set of vertices that are part of this nav mesh*/
+    /** The set of vertices that are part of this nav mesh*/
     std::vector< Vec3 >             m_verts;
 
-	/** Number of vertices */
+    /** Number of vertices */
     unsigned int                    m_n_verts;
-	/** Number of polygons */
-	unsigned int                    m_n_polys;
-	/** Maximum vertices per polygon */
-	unsigned int                    m_nvp;
+    /** Number of polygons */
+    unsigned int                    m_n_polys;
+    /** Maximum vertices per polygon */
+    unsigned int                    m_nvp;
 
     void readVertex(const XMLNode *xml, Vec3* result) const;
     //void readFace(const XMLNode *xml, Vec3* result) const;
@@ -77,74 +74,71 @@ private:
     ~NavMesh();
 
 public:
-    
-	/** Creates a NavMesh instance. */
+    /** Creates a NavMesh instance. */
     static void create(const std::string &filename)
     {
         assert(m_nav_mesh==NULL);
 
-        // m_nav_mesh assigned in the constructor because it needs to defined 
+        // m_nav_mesh assigned in the constructor because it needs to defined
         // for NavPoly which is constructed  in NavMesh()
         new NavMesh(filename);
     }
 
-	/** Cleans up the nav mesh. It is possible that this function is called
-	*  even if no instance exists (e.g. in race). So it is not an
-	*  error if there is no instance. */
+    /** Cleans up the nav mesh. It is possible that this function is called
+    *  even if no instance exists (e.g. in race). So it is not an
+    *  error if there is no instance. */
     static void destroy()
-    { 
+    {
       if(m_nav_mesh)
       {
         delete m_nav_mesh;
         m_nav_mesh = NULL;
       }
     }
-   
-	/** Returns the one instance of this object. It is possible that there
-	*  is no instance created (e.g. in normal race, since it doesn't have
-	*  a nav mesh), so we don't assert that an instance exist, and we
-	*  also don't create one if it doesn't exists. */
+
+    /** Returns the one instance of this object. It is possible that there
+    *  is no instance created (e.g. in normal race, since it doesn't have
+    *  a nav mesh), so we don't assert that an instance exist, and we
+    *  also don't create one if it doesn't exists. */
     static NavMesh          *get() { return m_nav_mesh; }
 
-	/** Returns a const reference to a NavPoly */
-    const NavPoly&          getNavPoly(int n) const 
+    /** Returns a const reference to a NavPoly */
+    const NavPoly&          getNavPoly(int n) const
                                 { return m_polys[n]; }
 
-	/** Returns a const reference to a vertex(Vec3) */
-    const Vec3&             getVertex(int n) const  
+    /** Returns a const reference to a vertex(Vec3) */
+    const Vec3&             getVertex(int n) const
                                 { return m_verts[n]; }
 
-	/** Returns a const reference to a vector containing all vertices */
+    /** Returns a const reference to a vector containing all vertices */
     const std::vector<Vec3>& getAllVertices() const
                                 { return m_verts;   }
 
-	/** Returns the total number of polys */
-    unsigned int            getNumberOfPolys() const  
+    /** Returns the total number of polys */
+    unsigned int            getNumberOfPolys() const
                                 { return m_n_polys; }
 
-	/** Returns the total number of vertices */
-    unsigned int            getNumberOfVerts() const  
+    /** Returns the total number of vertices */
+    unsigned int            getNumberOfVerts() const
                                 { return m_n_verts; }
 
-	/** Returns maximum vertices per polygon */
-    unsigned int            getMaxVertsPerPoly() const 
+    /** Returns maximum vertices per polygon */
+    unsigned int            getMaxVertsPerPoly() const
                                 { return m_nvp; }
 
-	/** Returns the center of a polygon */
+    /** Returns the center of a polygon */
     const Vec3&             getCenterOfPoly(int n) const
                                 {return m_polys[n].getCenter();}
 
-	/** Returns a const referece to a vector containing the indices 
-	 *	of polygons adjacent to a given polygon */
+    /** Returns a const referece to a vector containing the indices
+     *    of polygons adjacent to a given polygon */
     const std::vector<int>& getAdjacentPolys(int n) const
                                 {return m_polys[n].getAdjacents();}
 
-	/** Returns a const reference to a vector containing the vertices
-	 *	of a given polygon. */
+    /** Returns a const reference to a vector containing the vertices
+     *    of a given polygon. */
     const std::vector<Vec3> getVertsOfPoly(int n)
                                 {return m_polys[n].getVertices();}
 
 };
-
-
 #endif

@@ -33,10 +33,7 @@ class Vec3;
  */
 class AIBaseLapController : public AIBaseController
 {
-
-
 protected:
-   
     /** The current node the kart is on. This can be different from the value
      *  in LinearWorld, since it takes the chosen path of the AI into account
      *  (e.g. the closest point in LinearWorld might be on a branch not
@@ -49,9 +46,9 @@ protected:
     /** Which of the successors of a node was selected by the AI. */
     std::vector<int> m_successor_index;
     /** For each node in the graph this list contains the chosen next node.
-     *  For normal lap track without branches we always have 
+     *  For normal lap track without branches we always have
      *  m_next_node_index[i] = (i+1) % size;
-     *  but if a branch is possible, the AI will select one option here. 
+     *  but if a branch is possible, the AI will select one option here.
      *  If the node is not used, m_next_node_index will be -1. */
     std::vector<int> m_next_node_index;
     /** For each graph node this list contains a list of the next X
@@ -62,35 +59,29 @@ protected:
     virtual unsigned int getNextSector(unsigned int index);
     virtual void  newLap             (int lap);
     //virtual void setControllerName(const std::string &name);
-    
+
     float    steerToAngle  (const unsigned int sector, const float angle);
-    
-    
+
     void     computePath();
-    
     // ------------------------------------------------------------------------
     /** Nothing special to do when the race is finished. */
     virtual void raceFinished() {};
-    
-    
+
 public:
              AIBaseLapController(AbstractKart *kart,
-                              StateManager::ActivePlayer *player=NULL);
+                                 StateManager::ActivePlayer *player=NULL);
     virtual ~AIBaseLapController() {};
     virtual void reset();
     virtual void crashed(const AbstractKart *k) {};
     virtual void handleZipper(bool play_sound) {};
     virtual void finishedRace(float time) {};
     virtual void collectedItem(const Item &item, int add_info=-1,
-		                       float previous_energy=0) {};
+                               float previous_energy=0) {};
     virtual void setPosition(int p) {};
     virtual bool isNetworkController() const { return false; }
-    virtual bool isPlayerController() const { return false; }
+    virtual bool isPlayerController() const { return false;  }
     virtual void action(PlayerAction action, int value) {};
     virtual void  skidBonusTriggered() {};
-    
 };   // AIBaseLapController
 
 #endif
-
-/* EOF */

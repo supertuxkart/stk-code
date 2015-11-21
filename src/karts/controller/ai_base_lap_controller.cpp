@@ -85,11 +85,11 @@ in all AIs, e.g.:
 */
 AIBaseLapController::AIBaseLapController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player)
-                : AIBaseController(kart, player)
+                   : AIBaseController(kart, player)
 {
-    
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
-       race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
+
+    if (race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         m_world     = dynamic_cast<LinearWorld*>(World::getWorld());
         m_track     = m_world->getTrack();
@@ -200,7 +200,7 @@ void AIBaseLapController::computePath()
  */
 void AIBaseLapController::update(float dt)
 {
-	AIBaseController::update(dt);
+    AIBaseController::update(dt);
     if(QuadGraph::get())
     {
         // Update the current node:
@@ -223,7 +223,6 @@ void AIBaseLapController::update(float dt)
             m_track_node = old_node;
     }
 }   // update
-
 
 //-----------------------------------------------------------------------------
 /** Returns the next sector of the given sector index. This is used
@@ -262,5 +261,3 @@ float AIBaseLapController::steerToAngle(const unsigned int sector,
 
     return steer_angle;
 }   // steerToAngle
-
-

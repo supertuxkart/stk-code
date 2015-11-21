@@ -69,7 +69,7 @@ public:
     void           collectedItem     (const Item &item, int add_info=-1,
                                       float previous_energy=0);
     unsigned int getCurrentNode() const { return m_current_node; }
-    void         setCurrentNode(int i)  { m_current_node = i;   } 
+    void         setCurrentNode(int i)  { m_current_node = i;   }
     virtual void   skidBonusTriggered();
     virtual void   setPosition       (int p);
     virtual bool   isPlayerController() const {return true;}

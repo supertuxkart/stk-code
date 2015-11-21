@@ -19,7 +19,6 @@
 #ifndef HEADER_NAV_POLY_HPP
 #define HEADER_NAV_POLY_HPP
 
-
 #include <vector>
 #include <string>
 #include <SColor.h>
@@ -31,7 +30,6 @@
 class NavPoly
 {
 private:
-
     /** Holds the index of vertices for a polygon **/
     std::vector<int> m_vertices;
 
@@ -42,31 +40,31 @@ private:
     std::vector<int> m_adjacents;
 
 public:
-    NavPoly(const  std::vector<int> &polygonVertIndices,  
+    NavPoly(const  std::vector<int> &polygonVertIndices,
             const std::vector<int> &adjacentPolygonIndices);
-    
-	// ------------------------------------------------------------------------
-	/** Returns the center point of a polygon. */
+
+    // ------------------------------------------------------------------------
+    /** Returns the center point of a polygon. */
     const Vec3&        getCenter() const   {return m_center;}
 
-	// ------------------------------------------------------------------------
-	/** Returns the adjacent polygons of a polygon. */
+    // ------------------------------------------------------------------------
+    /** Returns the adjacent polygons of a polygon. */
     const std::vector<int>&     getAdjacents() const {return m_adjacents;}
 
-	// ------------------------------------------------------------------------
-	/** Returns the vertices(Vec3) of this polygon. */
+    // ------------------------------------------------------------------------
+    /** Returns the vertices(Vec3) of this polygon. */
     const std::vector<Vec3>     getVertices();
 
-	// ------------------------------------------------------------------------
-	/** Returns the indices of the vertices of this polygon */
+    // ------------------------------------------------------------------------
+    /** Returns the indices of the vertices of this polygon */
     const std::vector<int>      getVerticesIndex() const {return m_vertices;}
 
-	// ------------------------------------------------------------------------
-	/** Returns true if a given point lies in this polygon. */
+    // ------------------------------------------------------------------------
+    /** Returns true if a given point lies in this polygon. */
     bool                        pointInPoly(const Vec3& p) const;
 
     const Vec3&                 operator[](int i) const ;
-   
+
 }; // class NavPoly
 
 #endif

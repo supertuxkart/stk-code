@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,7 +23,6 @@
 #include <S3DVertex.h>
 #include <triangle3d.h>
 
-
 #include "LinearMath/btTransform.h"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -31,17 +30,16 @@
 
 NavMesh *NavMesh::m_nav_mesh = NULL;
 
-
 /** Constructor, loads the mesh information from a given set of polygons
- *	from a navmesh.xml file.
- *	\param filename Name of the file containing all polygons
+ *    from a navmesh.xml file.
+ *    \param filename Name of the file containing all polygons
  */
 NavMesh::NavMesh(const std::string &filename)
 {
-    
+
     m_n_verts=0;
     m_n_polys=0;
-    
+
     XMLNode *xml = file_manager->createXMLTree(filename);
     if(!xml || xml->getName()!="navmesh")
     {
@@ -75,7 +73,7 @@ NavMesh::NavMesh(const std::string &filename)
             }
 
         }
-        
+
         if(xml_node->getName()=="faces")
         {
             for(unsigned int i=0; i<xml_node->getNumNodes(); i++)
@@ -99,11 +97,11 @@ NavMesh::NavMesh(const std::string &filename)
             }
 
         }
-        
+
         if(xml_node->getName()=="MaxVertsPerPoly")
         {
            xml_node->get("nvp", &m_nvp);
-        }   
+        }
 
         //delete xml_node;
     }
@@ -123,11 +121,10 @@ NavMesh::~NavMesh()
 /** Reads the vertex information from an XMLNode */
 void NavMesh::readVertex(const XMLNode *xml, Vec3* result) const
 {
-	float x, y, z;
-	xml->get("x", &x);
-	xml->get("y", &y);
-	xml->get("z", &z);
-	Vec3 temp(x, y, z);
-	*result = temp;
-}	 //	readVertex
-
+    float x, y, z;
+    xml->get("x", &x);
+    xml->get("y", &y);
+    xml->get("z", &z);
+    Vec3 temp(x, y, z);
+    *result = temp;
+}     //    readVertex
