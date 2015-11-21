@@ -198,6 +198,25 @@ public:
         SLIPSTREAM_MAX_SPEED_INCREASE,
         SLIPSTREAM_FADE_OUT_TIME,
 
+        // Skid
+        SKID_INCREASE,
+        SKID_DECREASE,
+        SKID_MAX,
+        SKID_TIME_TILL_MAX,
+        SKID_VISUAL,
+        SKID_VISUAL_TIME,
+        SKID_REVERT_VISUAL_TIME,
+        SKID_MIN_SPEED,
+        SKID_TIME_TILL_BONUS,
+        SKID_BONUS_SPEED,
+        SKID_BONUS_TIME,
+        SKID_BONUS_FORCE,
+        SKID_PHYSICAL_JUMP_TIME,
+        SKID_GRAPHICAL_JUMP_TIME,
+        SKID_POST_SKID_ROTATE_FACTOR,
+        SKID_REDUCE_TURN_MIN,
+        SKID_REDUCE_TURN_MAX,
+
         /* <characteristics-end enum> */
 
 
@@ -343,6 +362,24 @@ public:
     float getSlipstreamMinSpeed() const;
     float getSlipstreamMaxSpeedIncrease() const;
     float getSlipstreamFadeOutTime() const;
+
+    float getSkidIncrease() const;
+    float getSkidDecrease() const;
+    float getSkidMax() const;
+    float getSkidTimeTillMax() const;
+    float getSkidVisual() const;
+    float getSkidVisualTime() const;
+    float getSkidRevertVisualTime() const;
+    float getSkidMinSpeed() const;
+    std::vector<float> getSkidTimeTillBonus() const;
+    std::vector<float> getSkidBonusSpeed() const;
+    std::vector<float> getSkidBonusTime() const;
+    std::vector<float> getSkidBonusForce() const;
+    float getSkidPhysicalJumpTime() const;
+    float getSkidGraphicalJumpTime() const;
+    float getSkidPostSkidRotateFactor() const;
+    float getSkidReduceTurnMin() const;
+    float getSkidReduceTurnMax() const;
 
     /* <characteristics-end defs> */
 };

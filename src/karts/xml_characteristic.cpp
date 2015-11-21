@@ -557,6 +557,44 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[SLIPSTREAM_FADE_OUT_TIME]);
     }
 
+    if (const XMLNode *sub_node = node->getNode("skid"))
+    {
+        sub_node->get("increase",
+            &m_values[SKID_INCREASE]);
+        sub_node->get("decrease",
+            &m_values[SKID_DECREASE]);
+        sub_node->get("max",
+            &m_values[SKID_MAX]);
+        sub_node->get("time-till-max",
+            &m_values[SKID_TIME_TILL_MAX]);
+        sub_node->get("visual",
+            &m_values[SKID_VISUAL]);
+        sub_node->get("visual-time",
+            &m_values[SKID_VISUAL_TIME]);
+        sub_node->get("revert-visual-time",
+            &m_values[SKID_REVERT_VISUAL_TIME]);
+        sub_node->get("min-speed",
+            &m_values[SKID_MIN_SPEED]);
+        sub_node->get("time-till-bonus",
+            &m_values[SKID_TIME_TILL_BONUS]);
+        sub_node->get("bonus-speed",
+            &m_values[SKID_BONUS_SPEED]);
+        sub_node->get("bonus-time",
+            &m_values[SKID_BONUS_TIME]);
+        sub_node->get("bonus-force",
+            &m_values[SKID_BONUS_FORCE]);
+        sub_node->get("physical-jump-time",
+            &m_values[SKID_PHYSICAL_JUMP_TIME]);
+        sub_node->get("graphical-jump-time",
+            &m_values[SKID_GRAPHICAL_JUMP_TIME]);
+        sub_node->get("post-skid-rotate-factor",
+            &m_values[SKID_POST_SKID_ROTATE_FACTOR]);
+        sub_node->get("reduce-turn-min",
+            &m_values[SKID_REDUCE_TURN_MIN]);
+        sub_node->get("reduce-turn-max",
+            &m_values[SKID_REDUCE_TURN_MAX]);
+    }
+
 
     /* <characteristics-end getXml> */
 }   // load

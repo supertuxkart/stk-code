@@ -228,6 +228,40 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case SLIPSTREAM_FADE_OUT_TIME:
         return TYPE_FLOAT;
+    case SKID_INCREASE:
+        return TYPE_FLOAT;
+    case SKID_DECREASE:
+        return TYPE_FLOAT;
+    case SKID_MAX:
+        return TYPE_FLOAT;
+    case SKID_TIME_TILL_MAX:
+        return TYPE_FLOAT;
+    case SKID_VISUAL:
+        return TYPE_FLOAT;
+    case SKID_VISUAL_TIME:
+        return TYPE_FLOAT;
+    case SKID_REVERT_VISUAL_TIME:
+        return TYPE_FLOAT;
+    case SKID_MIN_SPEED:
+        return TYPE_FLOAT;
+    case SKID_TIME_TILL_BONUS:
+        return TYPE_FLOAT_VECTOR;
+    case SKID_BONUS_SPEED:
+        return TYPE_FLOAT_VECTOR;
+    case SKID_BONUS_TIME:
+        return TYPE_FLOAT_VECTOR;
+    case SKID_BONUS_FORCE:
+        return TYPE_FLOAT_VECTOR;
+    case SKID_PHYSICAL_JUMP_TIME:
+        return TYPE_FLOAT;
+    case SKID_GRAPHICAL_JUMP_TIME:
+        return TYPE_FLOAT;
+    case SKID_POST_SKID_ROTATE_FACTOR:
+        return TYPE_FLOAT;
+    case SKID_REDUCE_TURN_MIN:
+        return TYPE_FLOAT;
+    case SKID_REDUCE_TURN_MAX:
+        return TYPE_FLOAT;
 
     /* <characteristics-end getProp1> */
     }   // switch (type)
@@ -416,6 +450,40 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SLIPSTREAM_MAX_SPEED_INCREASE";
     case SLIPSTREAM_FADE_OUT_TIME:
         return "SLIPSTREAM_FADE_OUT_TIME";
+    case SKID_INCREASE:
+        return "SKID_INCREASE";
+    case SKID_DECREASE:
+        return "SKID_DECREASE";
+    case SKID_MAX:
+        return "SKID_MAX";
+    case SKID_TIME_TILL_MAX:
+        return "SKID_TIME_TILL_MAX";
+    case SKID_VISUAL:
+        return "SKID_VISUAL";
+    case SKID_VISUAL_TIME:
+        return "SKID_VISUAL_TIME";
+    case SKID_REVERT_VISUAL_TIME:
+        return "SKID_REVERT_VISUAL_TIME";
+    case SKID_MIN_SPEED:
+        return "SKID_MIN_SPEED";
+    case SKID_TIME_TILL_BONUS:
+        return "SKID_TIME_TILL_BONUS";
+    case SKID_BONUS_SPEED:
+        return "SKID_BONUS_SPEED";
+    case SKID_BONUS_TIME:
+        return "SKID_BONUS_TIME";
+    case SKID_BONUS_FORCE:
+        return "SKID_BONUS_FORCE";
+    case SKID_PHYSICAL_JUMP_TIME:
+        return "SKID_PHYSICAL_JUMP_TIME";
+    case SKID_GRAPHICAL_JUMP_TIME:
+        return "SKID_GRAPHICAL_JUMP_TIME";
+    case SKID_POST_SKID_ROTATE_FACTOR:
+        return "SKID_POST_SKID_ROTATE_FACTOR";
+    case SKID_REDUCE_TURN_MIN:
+        return "SKID_REDUCE_TURN_MIN";
+    case SKID_REDUCE_TURN_MAX:
+        return "SKID_REDUCE_TURN_MAX";
 
     /* <characteristics-end getProp2> */
     }   // switch (type)
@@ -1436,6 +1504,210 @@ float AbstractCharacteristic::getSlipstreamFadeOutTime() const
                     getName(SLIPSTREAM_FADE_OUT_TIME).c_str());
     return result;
 }  // getSlipstreamFadeOutTime
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidIncrease() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_INCREASE, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_INCREASE).c_str());
+    return result;
+}  // getSkidIncrease
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidDecrease() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_DECREASE, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_DECREASE).c_str());
+    return result;
+}  // getSkidDecrease
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidMax() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_MAX, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_MAX).c_str());
+    return result;
+}  // getSkidMax
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidTimeTillMax() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_TIME_TILL_MAX, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_TIME_TILL_MAX).c_str());
+    return result;
+}  // getSkidTimeTillMax
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidVisual() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_VISUAL, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_VISUAL).c_str());
+    return result;
+}  // getSkidVisual
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidVisualTime() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_VISUAL_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_VISUAL_TIME).c_str());
+    return result;
+}  // getSkidVisualTime
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidRevertVisualTime() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_REVERT_VISUAL_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_REVERT_VISUAL_TIME).c_str());
+    return result;
+}  // getSkidRevertVisualTime
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidMinSpeed() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_MIN_SPEED, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_MIN_SPEED).c_str());
+    return result;
+}  // getSkidMinSpeed
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidTimeTillBonus() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_TIME_TILL_BONUS, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_TIME_TILL_BONUS).c_str());
+    return result;
+}  // getSkidTimeTillBonus
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidBonusSpeed() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_BONUS_SPEED, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_BONUS_SPEED).c_str());
+    return result;
+}  // getSkidBonusSpeed
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidBonusTime() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_BONUS_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_BONUS_TIME).c_str());
+    return result;
+}  // getSkidBonusTime
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidBonusForce() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_BONUS_FORCE, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_BONUS_FORCE).c_str());
+    return result;
+}  // getSkidBonusForce
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidPhysicalJumpTime() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_PHYSICAL_JUMP_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_PHYSICAL_JUMP_TIME).c_str());
+    return result;
+}  // getSkidPhysicalJumpTime
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidGraphicalJumpTime() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_GRAPHICAL_JUMP_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_GRAPHICAL_JUMP_TIME).c_str());
+    return result;
+}  // getSkidGraphicalJumpTime
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidPostSkidRotateFactor() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_POST_SKID_ROTATE_FACTOR, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_POST_SKID_ROTATE_FACTOR).c_str());
+    return result;
+}  // getSkidPostSkidRotateFactor
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidReduceTurnMin() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_REDUCE_TURN_MIN, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_REDUCE_TURN_MIN).c_str());
+    return result;
+}  // getSkidReduceTurnMin
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidReduceTurnMax() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_REDUCE_TURN_MAX, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_REDUCE_TURN_MAX).c_str());
+    return result;
+}  // getSkidReduceTurnMax
 
 
 /* <characteristics-end getter> */
