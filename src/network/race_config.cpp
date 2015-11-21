@@ -17,6 +17,7 @@
 
 #include "network/race_config.hpp"
 
+#include "config/user_config.hpp"
 #include "network/network_config.hpp"
 #include "race/race_manager.hpp"
 #include "utils/log.hpp"
@@ -28,8 +29,11 @@
  *  \return The key of type S that has the highest second value.
  */
 template<typename S>
-S getHighestInHistogram(std::map<S,int>* histogram)
+S getHighestInHistogram(std::map<S,int>* histogram, S default)
 {
+    if(histogram->empty())
+        return default;
+
     S best_item = histogram->begin()->first;
     uint8_t highest_count = histogram->begin()->second;
     for (typename std::map<S, int>::iterator it = histogram->begin();
@@ -342,15 +346,16 @@ void RaceConfig::computeRaceMode()
         }
     }
     // now we know :
-    m_major_mode  = major_histogram.empty() ? 1 
-                          : getHighestInHistogram<int>(&major_histogram);
-    m_races_count = minor_histogram.empty() ? 1 
-                          : getHighestInHistogram<int>(&races_count_histogram);
-    m_minor_mode  = minor_histogram.empty() ? 0 
-                          : getHighestInHistogram<int>(&minor_histogram);
+    m_major_mode  = getHighestInHistogram(&major_histogram,
+                                          (int)RaceManager::MAJOR_MODE_SINGLE);
+    m_minor_mode  = getHighestInHistogram(&minor_histogram,
+                                     (int)RaceManager::MINOR_MODE_NORMAL_RACE);
 
     if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        m_races_count = getHighestInHistogram(&races_count_histogram, 1);
         m_tracks.resize(m_races_count);
+    }
     else
     {
         m_tracks.resize(1);
@@ -408,9 +413,11 @@ void RaceConfig::computeNextTrack()
             }
         }
         // now find the highest votes
-        m_tracks[j].track = getHighestInHistogram<std::string>(&tracks_histogram);
-        m_tracks[j].reversed = getHighestInHistogram<bool>(&reversed_histogram);
-        m_tracks[j].laps = getHighestInHistogram<int>(&laps_histogram);
+        m_tracks[j].track = getHighestInHistogram<std::string>(&tracks_histogram,
+                                                 UserConfigParams::m_last_track);
+        m_tracks[j].reversed = getHighestInHistogram(&reversed_histogram, false);
+        m_tracks[j].laps = getHighestInHistogram<int>(&laps_histogram,
+                                                   UserConfigParams::m_num_laps); 
         if (m_tracks[j].reversed)
             Log::info("RaceConfig",
                       "Race %d will be on %s with %d laps and reversed",
