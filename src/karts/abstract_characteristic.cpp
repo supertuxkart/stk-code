@@ -262,6 +262,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case SKID_REDUCE_TURN_MAX:
         return TYPE_FLOAT;
+    case SKID_ENABLED:
+        return TYPE_BOOL;
 
     /* <characteristics-end getProp1> */
     }   // switch (type)
@@ -484,6 +486,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SKID_REDUCE_TURN_MIN";
     case SKID_REDUCE_TURN_MAX:
         return "SKID_REDUCE_TURN_MAX";
+    case SKID_ENABLED:
+        return "SKID_ENABLED";
 
     /* <characteristics-end getProp2> */
     }   // switch (type)
@@ -1708,6 +1712,18 @@ float AbstractCharacteristic::getSkidReduceTurnMax() const
                     getName(SKID_REDUCE_TURN_MAX).c_str());
     return result;
 }  // getSkidReduceTurnMax
+
+// ----------------------------------------------------------------------------
+bool AbstractCharacteristic::getSkidEnabled() const
+{
+    bool result;
+    bool is_set = false;
+    process(SKID_ENABLED, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_ENABLED).c_str());
+    return result;
+}  // getSkidEnabled
 
 
 /* <characteristics-end getter> */

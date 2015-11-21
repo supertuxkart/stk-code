@@ -216,6 +216,7 @@ public:
         SKID_POST_SKID_ROTATE_FACTOR,
         SKID_REDUCE_TURN_MIN,
         SKID_REDUCE_TURN_MAX,
+        SKID_ENABLED,
 
         /* <characteristics-end enum> */
 
@@ -380,6 +381,7 @@ public:
     float getSkidPostSkidRotateFactor() const;
     float getSkidReduceTurnMin() const;
     float getSkidReduceTurnMax() const;
+    bool getSkidEnabled() const;
 
     /* <characteristics-end defs> */
 };

@@ -593,6 +593,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[SKID_REDUCE_TURN_MIN]);
         sub_node->get("reduce-turn-max",
             &m_values[SKID_REDUCE_TURN_MAX]);
+        sub_node->get("enabled",
+            &m_values[SKID_ENABLED]);
     }
 
 

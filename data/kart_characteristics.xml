@@ -163,7 +163,7 @@
               bonus-force="250 350"
               physical-jump-time="0" graphical-jump-time="0.4"
               post-skid-rotate-factor="1"
-              reduce-turn-min="0.2" reduce-turn-max="0.8" />
+              reduce-turn-min="0.2" reduce-turn-max="0.8" enabled="true" />
 
         <!-- Camera
             Distance between kart and camera.
