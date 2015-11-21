@@ -105,6 +105,7 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
             m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
+            NetworkConfig::get()->unsetNetworking();
             StateManager::get()->escapePressed();
         }
         else if (selection == m_create_widget->m_properties[PROP_ID])
