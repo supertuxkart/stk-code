@@ -1518,7 +1518,7 @@ int main(int argc, char *argv[] )
     StateManager::get()->resetActivePlayers();
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
 
-    if(NetworkConfig::get()->isNetworking())
+    if(NetworkConfig::get()->isNetworking() && STKHost::existHost())
         STKHost::get()->abort();
 
     cleanSuperTuxKart();
@@ -1628,7 +1628,7 @@ static void cleanSuperTuxKart()
     // FIXME: do we need to wait for threads there, can they be
     // moved further up?
     ServersManager::deallocate();
-    if(NetworkConfig::get()->isNetworking())
+    if(NetworkConfig::get()->isNetworking() && STKHost::existHost())
         STKHost::destroy();
 
     cleanUserConfig();

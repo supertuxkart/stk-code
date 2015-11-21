@@ -97,7 +97,11 @@ public:
     /** Set that this is a LAN networked game. */
     void setIsLAN() { m_network_type = NETWORK_LAN; }
     // ------------------------------------------------------------------------
+    /** Set that this is a WAN networked game. */
     void setIsWAN() { m_network_type = NETWORK_WAN; }
+    // ------------------------------------------------------------------------
+    /** Set that this is not a networked game. */
+    void unsetNetworking() { m_network_type = NETWORK_NONE; }
     // ------------------------------------------------------------------------
     /** Sets the maximum number of players for this server. */
     void setMaxPlayers(int n) { m_max_players = n; }
