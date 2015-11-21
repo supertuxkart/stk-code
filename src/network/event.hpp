@@ -24,9 +24,13 @@
 #ifndef EVENT_HPP
 #define EVENT_HPP
 
-#include "network/stk_peer.hpp"
 #include "network/network_string.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/types.hpp"
+
+#include "enet/enet.h"
+
+class STKPeer;
 
 /*!
  * \enum EVENT_TYPE
@@ -51,37 +55,44 @@ enum EVENT_TYPE
  */
 class Event
 {
-    public:
-        /*! \brief Constructor
-         *  \param event : The event that needs to be translated.
-         */
-        Event(ENetEvent* event);
-        /*! \brief Constructor
-         *  \param event : The event to copy.
-         */
-        Event(const Event& event);
-        /*! \brief Destructor
-         *  frees the memory of the ENetPacket.
-         */
+private:
+    LEAK_CHECK()
+    /** Copy of the data passed by the event. */
+    NetworkString m_data;
+
+    /** A pointer on the ENetPacket to be deleted. */
+    ENetPacket* m_packet;
+
+    /**  Type of the event. */
+    EVENT_TYPE m_type;
+
+    /** Pointer to the peer that triggered that event. */
+    STKPeer* m_peer;
+
+public:
+         Event(ENetEvent* event);
         ~Event();
+    void removeFront(int size);
 
-        /*! \brief Remove bytes at the beginning of data.
-         *  \param size : The number of bytes to remove.
-         */
-        void removeFront(int size);
+    // ------------------------------------------------------------------------
+    /** Returns the type of this event. */
+    EVENT_TYPE getType() const { return m_type; }
 
-        /*! \brief Get a copy of the data.
-         *  \return A copy of the message data. This is empty for events like
-         *  connection or disconnections.
-         */
-        NetworkString data() const { return m_data; }
+    // ------------------------------------------------------------------------
+    /** Returns the peer of this event. */
+    STKPeer* getPeer() const { return m_peer;  }
+    // ------------------------------------------------------------------------
+    /** \brief Get a const reference to the received data.
+     *  This is empty for events like connection or disconnections. 
+     */
+    const NetworkString& data() const { return m_data; }
+    // ------------------------------------------------------------------------
+    /** \brief Get a non-const reference to the received data.
+     *  A copy of the message data. This is empty for events like
+     *  connection or disconnections. */
+    NetworkString& data() { return m_data; }
+    // ------------------------------------------------------------------------
 
-        EVENT_TYPE type;    //!< Type of the event.
-        STKPeer** peer;     //!< Pointer to the peer that triggered that event.
-
-    private:
-        NetworkString m_data; //!< Copy of the data passed by the event.
-        ENetPacket* m_packet; //!< A pointer on the ENetPacket to be deleted.
-};
+};   // class Event
 
 #endif // EVENT_HPP

@@ -42,7 +42,7 @@ private:
 public:
     // ------------------------------------------------------------------------
     /** Initialise the data and the mutex with default constructors. */
-    Synchronised() : m_data(TYPE())
+    Synchronised() : m_data()
     {
         pthread_mutex_init(&m_mutex, NULL);
     }   // Synchronised()

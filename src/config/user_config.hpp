@@ -626,12 +626,12 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx",
                                      &m_graphics_quality, "Weather effects") );
     PARAM_PREFIX IntUserConfigParam        m_show_steering_animations
-            PARAM_DEFAULT(  IntUserConfigParam(ANIMS_ALL,
+            PARAM_DEFAULT(  IntUserConfigParam(ANIMS_PLAYERS_ONLY,
                             "steering_animations", &m_graphics_quality,
                 "Whether to display kart animations (0=disabled for all; "
                 "1=enabled for humans, disabled for AIs; 2=enabled for all") );
     PARAM_PREFIX IntUserConfigParam         m_anisotropic
-            PARAM_DEFAULT( IntUserConfigParam(8, "anisotropic",
+            PARAM_DEFAULT( IntUserConfigParam(4, "anisotropic",
                            &m_graphics_quality,
                            "Quality of anisotropic filtering (usual values include 2-4-8-16; 0 to disable)") );
     PARAM_PREFIX BoolUserConfigParam         m_trilinear
@@ -666,7 +666,7 @@ namespace UserConfigParams
                            "shadows_resoltion", &m_graphics_quality,
                            "Shadow resolution (0 = disabled") );
     PARAM_PREFIX BoolUserConfigParam          m_degraded_IBL
-        PARAM_DEFAULT(BoolUserConfigParam(false,
+        PARAM_DEFAULT(BoolUserConfigParam(true,
         "Degraded_IBL", &m_graphics_quality,
         "Disable specular IBL"));
 

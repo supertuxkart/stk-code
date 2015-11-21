@@ -1,3 +1,6 @@
+# Usage:
+# cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-mingw.cmake 
+
 # the name of the target operating system
 SET(CMAKE_SYSTEM_NAME Windows)
 

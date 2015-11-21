@@ -355,10 +355,18 @@ private:
     float m_distance;
     float m_energy;
 
+    float m_energy_animation_from;
+    float m_energy_animation_to;
+    float m_energy_animation_total_duration;
+    float m_energy_animation_remaining_duration;
+
 public:
     TrackObjectPresentationLight(const XMLNode& xml_node,
                                  scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationLight();
+    void setEnergy(float energy);
+    void setEnergy(float energy, float duration);
+    virtual void update(float dt) OVERRIDE;
 };   // TrackObjectPresentationLight
 
 // ============================================================================

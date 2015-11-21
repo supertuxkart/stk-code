@@ -45,14 +45,14 @@ void StopServer::asynchronousUpdate()
 {
     if (m_state == NONE)
     {
-        TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
+        const TransportAddress& addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
         PlayerManager::setUserDetails(m_request, "stop", Online::API::SERVER_PATH);
 
-        m_request->addParameter("address", addr.ip);
-        m_request->addParameter("port", addr.port);
+        m_request->addParameter("address", addr.getIP());
+        m_request->addParameter("port", addr.getPort());
 
-        Log::info("StopServer", "address %u, port %d", addr.ip, addr.port);
+        Log::info("StopServer", "address %s", addr.toString().c_str());
 
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;

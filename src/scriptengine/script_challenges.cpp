@@ -66,7 +66,6 @@ namespace Scripting
 
         int getChallengeRequiredPoints(std::string* challenge_name)
         {
-            ::Track* track = World::getWorld()->getTrack();
             const ChallengeData* challenge = unlock_manager->getChallengeData(*challenge_name);
             if (challenge == NULL)
             {
@@ -81,7 +80,6 @@ namespace Scripting
 
         bool isChallengeUnlocked(std::string* challenge_name)
         {
-            ::Track* track = World::getWorld()->getTrack();
             const ChallengeData* challenge = unlock_manager->getChallengeData(*challenge_name);
             if (challenge == NULL)
             {

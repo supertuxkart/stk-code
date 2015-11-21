@@ -257,4 +257,9 @@ when the border that intersect at this corner are enabled.
 <!-- Rating star image -->
 <element type="rating" state="neutral" image="ocean/rating_star.png" />
 
+<!-- Font color -->
+<color type="font" state="top" a="255" r="100" g="200" b="220" />
+<color type="font" state="bottom" a="255" r="80" g="80" b="220" />
+<color type="font" state="normal" a="255" r="40" g="40" b="180" />
+
 </skin>

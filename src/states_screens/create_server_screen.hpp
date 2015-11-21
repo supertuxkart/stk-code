@@ -35,6 +35,9 @@ class CreateServerScreen :      public GUIEngine::Screen,
 private:
     friend class GUIEngine::ScreenSingleton<CreateServerScreen>;
 
+    /** */
+    bool m_is_lan;
+
     CreateServerScreen();
 
     GUIEngine::TextBoxWidget * m_name_widget;
@@ -63,9 +66,6 @@ private:
 
     ServerCreationRequest *m_server_creation_request;
 
-    /** \brief Sets which widget has to be focused. Depends on the user state. */
-    void setInitialFocus();
-
     void serverCreationRequest();
 
 public:
@@ -80,19 +80,14 @@ public:
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void beforeAddingWidget() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
 
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
-
-    /** \brief Implements the callback when a dialog gets closed. */
-    virtual void onDialogClose() OVERRIDE;
-};
+    // ------------------------------------------------------------------------
+    /** Sets if a lan or wan server is to be created. */
+    void setIsLan(bool is_lan) { m_is_lan = is_lan; }
+};   // class CreateServerScreen
 
 #endif

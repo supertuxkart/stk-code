@@ -143,6 +143,15 @@ public:
     /** The field of view for 1, 2, 3, 4 player split screen. */
     float m_camera_fov[4];
 
+    /** File names of the default fonts in STK. */
+    std::string m_font_default;
+    std::string m_font_default_fallback;
+    std::string m_font_cjk;
+    std::string m_font_ar;
+    std::string m_font_bold;
+    std::string m_font_bold_fallback;
+    std::string m_font_digit;
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid

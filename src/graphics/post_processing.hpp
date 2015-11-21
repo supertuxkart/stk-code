@@ -105,6 +105,7 @@ public:
     void renderMotionBlur(unsigned cam, const FrameBuffer &in_fbo,
                           FrameBuffer &out_fbo);
     void renderGlow(unsigned tex);
+    void renderLightning(core::vector3df intensity);
 
     /** Render the post-processed scene */
     FrameBuffer *render(scene::ICameraSceneNode * const camnode, bool isRace);

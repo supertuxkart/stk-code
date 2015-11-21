@@ -819,6 +819,24 @@ public:
 };   // SunLightShader
 
 // ============================================================================
+class LightningShader : public TextureShader<LightningShader, 1, 
+                                             core::vector3df>
+{
+public:
+    LightningShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "lightning.frag");
+        assignUniforms("intensity");
+    }   // LightningShader
+    // ------------------------------------------------------------------------
+    void render(core::vector3df intensity)
+    {
+        drawFullScreenEffect(intensity);
+    }   // render
+};   // LightningShader
+
+// ============================================================================
 
 PostProcessing::PostProcessing(IVideoDriver* video_driver)
 {
@@ -1230,8 +1248,6 @@ void PostProcessing::renderHorizontalBlur(const FrameBuffer &in_fbo,
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
-    float inv_width  = 1.0f / in_fbo.getWidth();
-    float inv_height = 1.0f / in_fbo.getHeight();
 
     auxiliary.bind();
     Gaussian6HBlurShader::getInstance()->render(in_fbo, in_fbo.getWidth(),
@@ -1250,8 +1266,6 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
            in_fbo.getHeight() == auxiliary.getHeight());
     if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
-    float inv_width = 1.0f / in_fbo.getWidth();
-    float inv_height = 1.0f / in_fbo.getHeight();
     {
         if (!CVS->supportsComputeShadersFiltering())
         {
@@ -1407,6 +1421,18 @@ void PostProcessing::applyMLAA()
     // Done.
     glDisable(GL_STENCIL_TEST);
 }   // applyMLAA
+
+// ----------------------------------------------------------------------------
+void PostProcessing::renderLightning(core::vector3df intensity)
+{
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBlendEquation(GL_FUNC_ADD);
+       
+    LightningShader::getInstance()->render(intensity);
+    
+    glDisable(GL_BLEND);
+}
 
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */

@@ -58,7 +58,7 @@ SFXOpenAL::SFXOpenAL(SFXBuffer* buffer, bool positional, float volume,
     // will not be used anyway.
     if (SFXManager::get()->sfxAllowed())
     {
-        init();
+        SFXManager::get()->queue(SFXManager::SFX_CREATE_SOURCE, this);
     }
 }   // SFXOpenAL
 
@@ -157,6 +157,8 @@ void SFXOpenAL::setSpeed(float factor)
  */
 void SFXOpenAL::reallySetSpeed(float factor)
 {
+    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+
     if(m_status==SFX_NOT_INITIALISED)
     {
         init();
@@ -314,7 +316,8 @@ void SFXOpenAL::reallyPauseNow()
  */
 void SFXOpenAL::resume()
 {
-    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+    //if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+    if (!SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_RESUME, this);
 }   // resume
 
@@ -346,7 +349,7 @@ void SFXOpenAL::play()
 {
     if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
 
-    if(m_status==SFX_STOPPED)
+    if(m_status==SFX_STOPPED || m_status==SFX_NOT_INITIALISED)
         m_play_time = 0.0f;
 
     // Technically the sfx is only playing after the sfx thread starts it,
@@ -375,6 +378,13 @@ void SFXOpenAL::reallyPlayNow()
 
     alSourcePlay(m_sound_source);
     SFXManager::checkError("playing");
+    // Esp. with terrain sounds it can (very likely) happen that the status
+    // got overwritten: a sound is created and an init event is queued. Then
+    // a play event is queued, and the status is immediately changed to
+    // playing. But when now the init event is executed, the status is set
+    // to stopped again. So for this case we have to set the status to
+    // playing again.
+    m_status = SFX_PLAYING;
 }   // reallyPlayNow
 
 //-----------------------------------------------------------------------------
@@ -385,7 +395,7 @@ void SFXOpenAL::play(const Vec3 &position)
 {
     if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
 
-    if(m_status==SFX_STOPPED)
+    if(m_status==SFX_STOPPED || m_status==SFX_NOT_INITIALISED)
         m_play_time = 0.0f;
 
     // Technically the sfx is only playing after the sfx thread starts it,
@@ -465,7 +475,8 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
 /** Shortcut that plays at a specified position. */
 void SFXOpenAL::setSpeedPosition(float factor, const Vec3 &position)
 {
-    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+    //if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+    if (!SFXManager::get()->sfxAllowed()) return;
 
     SFXManager::get()->queue(SFXManager::SFX_SPEED_POSITION, this,
                              factor, position);
@@ -477,6 +488,7 @@ void SFXOpenAL::setSpeedPosition(float factor, const Vec3 &position)
  */
 void SFXOpenAL::reallySetSpeedPosition(float f, const Vec3 &position)
 {
+    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
     reallySetSpeed(f);
     reallySetPosition(position);
 }   // reallySetSpeedPosition

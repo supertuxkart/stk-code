@@ -409,4 +409,21 @@
          <heavy />
      </kart-type>
   </general-kart-defaults>
+
+  <!-- Here are the default fonts file names for STK.
+
+  Please DO NOT report bugs if there're crashes when using your custom font.
+  This usually happen because the character map of the font is not in unicode mode
+  (let's take Chinese for example, some fonts of it store the characters in BIG5 mode,
+  which leads to crash with STK), but the fonts are to blame, what's the point of not
+  using industry standard nowadays...
+  -->
+  <font default="Ubuntu-R.ttf"
+        default_fallback="FreeSans.ttf"
+        cjk="wqy-microhei.ttf"
+        ar="NotoNaskhArabicUI-Bold.ttf"
+        bold="Ubuntu-B.ttf"
+        bold_fallback="FreeSansBold.ttf"
+        digit="SigmarOne.otf" />
+
 </config>

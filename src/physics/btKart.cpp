@@ -539,12 +539,7 @@ void btKart::updateVehicle( btScalar step )
 
             btScalar proj = fwd.dot(wheel.m_raycastInfo.m_contactNormalWS);
             fwd -= wheel.m_raycastInfo.m_contactNormalWS * proj;
-
-            btScalar proj2 = fwd.dot(vel);
-
-
         } 
-
     }
 
     // If configured, add a force to keep karts on the track

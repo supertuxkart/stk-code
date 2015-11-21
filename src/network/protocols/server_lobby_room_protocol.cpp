@@ -21,6 +21,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
+#include "network/event.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/show_public_address.hpp"
@@ -53,8 +54,6 @@ void ServerLobbyRoomProtocol::setup()
     m_setup->getRaceConfig()->setPlayerCount(16); //FIXME : this has to be moved to when logging into the server
     m_next_id = 0;
     m_state = NONE;
-    m_public_address.ip = 0;
-    m_public_address.port = 0;
     m_selection_enabled = false;
     m_in_race = false;
     Log::info("ServerLobbyRoomProtocol", "Starting the protocol.");
@@ -65,9 +64,9 @@ void ServerLobbyRoomProtocol::setup()
 bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
 {
     assert(m_setup); // assert that the setup exists
-    if (event->type == EVENT_TYPE_MESSAGE)
+    if (event->getType() == EVENT_TYPE_MESSAGE)
     {
-        NetworkString data = event->data();
+        const NetworkString &data = event->data();
         assert(data.size()); // message not empty
         uint8_t message_type;
         message_type = data[0];
@@ -89,14 +88,14 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
             playerReversedVote(event);
         else if (message_type == 0xc5) // vote for laps
             playerLapsVote(event);
-    } // if (event->type == EVENT_TYPE_MESSAGE)
-    else if (event->type == EVENT_TYPE_CONNECTED)
+    } // if (event->getType() == EVENT_TYPE_MESSAGE)
+    else if (event->getType() == EVENT_TYPE_CONNECTED)
     {
-    } // if (event->type == EVENT_TYPE_CONNECTED)
-    else if (event->type == EVENT_TYPE_DISCONNECTED)
+    } // if (event->getType() == EVENT_TYPE_CONNECTED)
+    else if (event->getType() == EVENT_TYPE_DISCONNECTED)
     {
         kartDisconnected(event);
-    } // if (event->type == EVENT_TYPE_DISCONNECTED)
+    } // if (event->getType() == EVENT_TYPE_DISCONNECTED)
     return true;
 }
 
@@ -107,13 +106,12 @@ void ServerLobbyRoomProtocol::update()
     switch (m_state)
     {
     case NONE:
-        m_current_protocol_id = m_listener->requestStart(new GetPublicAddress(&m_public_address));
+        m_current_protocol_id = m_listener->requestStart(new GetPublicAddress());
         m_state = GETTING_PUBLIC_ADDRESS;
         break;
     case GETTING_PUBLIC_ADDRESS:
         if (m_listener->getProtocolState(m_current_protocol_id) == PROTOCOL_STATE_TERMINATED)
         {
-            NetworkManager::getInstance()->setPublicAddress(m_public_address);
             m_current_protocol_id = m_listener->requestStart(new StartServer());
             m_state = LAUNCHING_SERVER;
             Log::debug("ServerLobbyRoomProtocol", "Public address known.");
@@ -150,7 +148,7 @@ void ServerLobbyRoomProtocol::startGame()
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        NetworkString ns;
+        NetworkString ns(6);
         ns.ai8(0x04).ai8(4).ai32(peers[i]->getClientServerToken()); // start game
         m_listener->sendMessage(this, peers[i], ns, true); // reliably
     }
@@ -165,7 +163,7 @@ void ServerLobbyRoomProtocol::startSelection()
     std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        NetworkString ns;
+        NetworkString ns(6);
         ns.ai8(0x05).ai8(4).ai32(peers[i]->getClientServerToken()); // start selection
         m_listener->sendMessage(this, peers[i], ns, true); // reliably
     }
@@ -181,12 +179,12 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
     if (StkTime::getRealTime() > last_poll_time+10.0)
     {
         last_poll_time = StkTime::getRealTime();
-        TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
+        const TransportAddress &addr = NetworkManager::getInstance()->getPublicAddress();
         Online::XMLRequest* request = new Online::XMLRequest();
         PlayerManager::setUserDetails(request, "poll-connection-requests", Online::API::SERVER_PATH);
 
-        request->addParameter("address", addr.ip);
-        request->addParameter("port", addr.port);
+        request->addParameter("address", addr.getIP());
+        request->addParameter("port", addr.getPort());
 
         request->executeNow();
         assert(request->isDone());
@@ -256,7 +254,7 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
 
         std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
 
-        NetworkString queue;
+        NetworkString queue(karts_results.size()*2);
         for (unsigned int i = 0; i < karts_results.size(); i++)
         {
             queue.ai8(1).ai8(karts_results[i]); // kart pos = i+1
@@ -264,7 +262,7 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
         }
         for (unsigned int i = 0; i < peers.size(); i++)
         {
-            NetworkString ns;
+            NetworkString ns(6);
             ns.ai8(0x06).ai8(4).ai32(peers[i]->getClientServerToken());
             NetworkString total = ns + queue;
             m_listener->sendMessage(this, peers[i], total, true);
@@ -308,10 +306,10 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
 
 void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
 {
-    STKPeer* peer = *(event->peer);
+    STKPeer* peer = event->getPeer();
     if (peer->getPlayerProfile() != NULL) // others knew him
     {
-        NetworkString msg;
+        NetworkString msg(3);
         msg.ai8(0x02).ai8(1).ai8(peer->getPlayerProfile()->race_id);
         m_listener->sendMessage(this, msg);
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
@@ -337,8 +335,8 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
  */
 void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 {
-    STKPeer* peer = *(event->peer);
-    NetworkString data = event->data();
+    STKPeer* peer = event->getPeer();
+    const NetworkString &data = event->data();
     if (data.size() != 5 || data[0] != 4)
     {
         Log::warn("ServerLobbyRoomProtocol", "Receiving badly formated message. Size is %d and first byte %d", data.size(), data[0]);
@@ -353,7 +351,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         // add the player to the game setup
         m_next_id = m_setup->getPlayerCount();
         // notify everybody that there is a new player
-        NetworkString message;
+        NetworkString message(8);
         // new player (1) -- size of id -- id -- size of local id -- local id;
         message.ai8(1).ai8(4).ai32(player_id).ai8(1).ai8(m_next_id);
         m_listener->sendMessageExcept(this, peer, message);
@@ -366,12 +364,13 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
                                     ((token_generator.get(RAND_MAX)<<8)  & 0xff) +
                                     ((token_generator.get(RAND_MAX)      & 0xff)));
 
+        std::vector<NetworkPlayerProfile*> players = m_setup->getPlayers();
         // send a message to the one that asked to connect
-        NetworkString message_ack;
+        // Size is overestimated, probably one player's data will not be sent
+        NetworkString message_ack(13+players.size()*7);
         // connection success (129) -- size of token -- token
         message_ack.ai8(0x81).ai8(1).ai8(m_next_id).ai8(4).ai32(token).ai8(4).ai32(player_id);
         // add all players so that this user knows
-        std::vector<NetworkPlayerProfile*> players = m_setup->getPlayers();
         for (unsigned int i = 0; i < players.size(); i++)
         {
             // do not duplicate the player into the message
@@ -392,7 +391,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     } // accept player
     else  // refuse the connection with code 0 (too much players)
     {
-        NetworkString message;
+        NetworkString message(3);
         message.ai8(0x80);            // 128 means connection refused
         message.ai8(1);               // 1 bytes for the error code
         message.ai8(0);               // 0 = too much players
@@ -416,13 +415,13 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
  */
 void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
 {
-    NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    const NetworkString &data = event->data();
+    STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 6))
         return;
 
     uint8_t kart_name_size = data.gui8(5);
-    std::string kart_name = data.gs(6, kart_name_size);
+    std::string kart_name = data.getString(6, kart_name_size);
     if (kart_name.size() != kart_name_size)
     {
         Log::error("ServerLobbyRoomProtocol", "Kart names sizes differ: told:"
@@ -432,7 +431,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     // check if selection is possible
     if (!m_selection_enabled)
     {
-        NetworkString answer;
+        NetworkString answer(3);
         answer.ai8(0x82).ai8(1).ai8(2); // selection still not started
         m_listener->sendMessage(this, peer, answer);
         return;
@@ -440,7 +439,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     // check if somebody picked that kart
     if (!m_setup->isKartAvailable(kart_name))
     {
-        NetworkString answer;
+        NetworkString answer(3);
         answer.ai8(0x82).ai8(1).ai8(0); // kart is already taken
         m_listener->sendMessage(this, peer, answer);
         return;
@@ -448,17 +447,17 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     // check if this kart is authorized
     if (!m_setup->isKartAllowed(kart_name))
     {
-        NetworkString answer;
+        NetworkString answer(3);
         answer.ai8(0x82).ai8(1).ai8(1); // kart is not authorized
         m_listener->sendMessage(this, peer, answer);
         return;
     }
     // send a kart update to everyone
-    NetworkString answer;
+    NetworkString answer(3+1+kart_name.size());
     // kart update (3), 1, race id
     answer.ai8(0x03).ai8(1).ai8(peer->getPlayerProfile()->race_id);
     //  kart name size, kart name
-    answer.ai8(kart_name.size()).as(kart_name);
+    answer.add(kart_name);
     m_listener->sendMessage(this, answer);
     m_setup->setPlayerKart(peer->getPlayerProfile()->race_id, kart_name);
 }
@@ -477,8 +476,8 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
  */
 void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
 {
-    NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    NetworkString &data = event->data();
+    STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 7))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -486,11 +485,11 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
     uint8_t player_id = peer->getPlayerProfile()->race_id;
     m_setup->getRaceConfig()->setPlayerMajorVote(player_id, data[6]);
     // Send the vote to everybody (including the sender)
-    NetworkString other;
-    other.ai8(1).ai8(player_id); // add the player id
     data.removeFront(5); // remove the token
+    NetworkString other(2+data.size());
+    other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix;
+    NetworkString prefix(1);
     prefix.ai8(0xc0); // prefix the token with the ype
     sendMessageToPeersChangingToken(prefix, other);
 }
@@ -508,8 +507,8 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
  */
 void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
 {
-    NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    NetworkString &data = event->data();
+    STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 7))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -517,11 +516,11 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
     uint8_t player_id = peer->getPlayerProfile()->race_id;
     m_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, data[6]);
     // Send the vote to everybody (including the sender)
-    NetworkString other;
-    other.ai8(1).ai8(player_id); // add the player id
     data.removeFront(5); // remove the token
+    NetworkString other(2+data.size());
+    other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix;
+    NetworkString prefix(1);
     prefix.ai8(0xc1); // prefix the token with the type
     sendMessageToPeersChangingToken(prefix, other);
 }
@@ -539,8 +538,8 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
  */
 void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
 {
-    NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    NetworkString &data = event->data();
+    STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 7))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -548,11 +547,11 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
     uint8_t player_id = peer->getPlayerProfile()->race_id;
     m_setup->getRaceConfig()->setPlayerMinorVote(player_id, data[6]);
     // Send the vote to everybody (including the sender)
-    NetworkString other;
-    other.ai8(1).ai8(player_id); // add the player id
     data.removeFront(5); // remove the token
+    NetworkString other(2+data.size());
+    other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix;
+    NetworkString prefix(1);
     prefix.ai8(0xc2); // prefix the token with the ype
     sendMessageToPeersChangingToken(prefix, other);
 }
@@ -570,22 +569,22 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
  */
 void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
 {
-    NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    NetworkString &data = event->data();
+    STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 8))
         return;
     int N = data[5];
-    std::string track_name = data.gs(5, N);
+    std::string track_name = data.getString(5, N);
     if (!isByteCorrect(event, N+6, 1))
         return;
     uint8_t player_id = peer->getPlayerProfile()->race_id;
     m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name, data[N+7]);
     // Send the vote to everybody (including the sender)
-    NetworkString other;
-    other.ai8(1).ai8(player_id); // add the player id
     data.removeFront(5); // remove the token
+    NetworkString other(2+data.size());
+    other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix;
+    NetworkString prefix(1);
     prefix.ai8(0xc3); // prefix the token with the ype
     sendMessageToPeersChangingToken(prefix, other);
 }
@@ -603,8 +602,8 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
  */
 void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
 {
-    NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    NetworkString &data = event->data();
+    STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -614,11 +613,11 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
     uint8_t player_id = peer->getPlayerProfile()->race_id;
     m_setup->getRaceConfig()->setPlayerReversedVote(player_id, data[6]!=0, data[8]);
     // Send the vote to everybody (including the sender)
-    NetworkString other;
-    other.ai8(1).ai8(player_id); // add the player id
     data.removeFront(5); // remove the token
+    NetworkString other(2+data.size());
+    other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix;
+    NetworkString prefix(1);
     prefix.ai8(0xc4); // prefix the token with the ype
     sendMessageToPeersChangingToken(prefix, other);
 }
@@ -636,8 +635,8 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
  */
 void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
 {
-    NetworkString data = event->data();
-    STKPeer* peer = *(event->peer);
+    NetworkString &data = event->data();
+    STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -647,11 +646,11 @@ void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
     uint8_t player_id = peer->getPlayerProfile()->race_id;
     m_setup->getRaceConfig()->setPlayerLapsVote(player_id, data[6], data[8]);
     // Send the vote to everybody (including the sender)
-    NetworkString other;
-    other.ai8(1).ai8(player_id); // add the player id
     data.removeFront(5); // remove the token
+    NetworkString other(2+data.size());
+    other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix;
+    NetworkString prefix(1);
     prefix.ai8(0xc5); // prefix the token with the ype
     sendMessageToPeersChangingToken(prefix, other);
 }

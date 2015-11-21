@@ -19,6 +19,8 @@
 #include "dictionary.hpp"
 
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 namespace tinygettext {
 
@@ -209,6 +211,36 @@ Dictionary::add_translation(const std::string& msgctxt, const std::string& msgid
               msgctxt.c_str(), msgid.c_str());
     vec[0] = msgstr;
   }
+}
+
+std::set<wchar_t> Dictionary::get_all_used_chars()
+{
+    std::set<wchar_t> UsedChars;
+    for (Entries::const_iterator i = entries.begin(); i != entries.end(); ++i)
+    {
+        const std::vector<std::string>& msgstrs = i->second;
+        for (unsigned int k = 0; k < msgstrs.size(); k++)
+        {
+            irr::core::stringw ws = translations->fribidize((StringUtils::utf8_to_wide(msgstrs[k].c_str())).c_str());
+                for (unsigned int l = 0; l < ws.size(); ++l)
+                    UsedChars.insert(ws[l]);
+        }
+    }
+
+    for (CtxtEntries::const_iterator i = ctxt_entries.begin(); i != ctxt_entries.end(); ++i)
+    {
+        for (Entries::const_iterator j = i->second.begin(); j != i->second.end(); ++j)
+        {
+            const std::vector<std::string>& msgstrs = j->second;
+            for (unsigned int k = 0; k < msgstrs.size(); k++)
+            {
+                irr::core::stringw ws = translations->fribidize((StringUtils::utf8_to_wide(msgstrs[k].c_str())).c_str());
+                for (unsigned int l = 0; l < ws.size(); ++l)
+                    UsedChars.insert(ws[l]);
+            }
+        }
+    }
+    return UsedChars;
 }
 
 } // namespace tinygettext

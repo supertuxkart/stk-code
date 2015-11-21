@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-09-26 00:20+1000\n"
-"PO-Revision-Date: 2015-09-27 19:23+0000\n"
+"PO-Revision-Date: 2015-10-03 11:54+0000\n"
 "Last-Translator: Karl Ove Hufthammer <karl@huftis.org>\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/supertuxkart/supertuxkart/language/nn/)\n"
 "MIME-Version: 1.0\n"
@@ -1140,7 +1140,7 @@ msgstr "Bruksvilkår"
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 msgid "I agree to the above terms and am 13 years or older. "
-msgstr "I godtek vilkåra over, og er minst 13 år gammal. "
+msgstr "Eg godtek vilkåra over, og er minst 13 år gammal. "
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog

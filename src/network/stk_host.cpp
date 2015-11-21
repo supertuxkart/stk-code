@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "network/event.hpp"
 #include "network/network_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -54,89 +55,161 @@ const char* inet_ntop(int af, const void* src, char* dst, int cnt)
 }
 #endif
 
+Synchronised<FILE*> STKHost::m_log_file = NULL;
 
-FILE* STKHost::m_log_file = NULL;
-pthread_mutex_t STKHost::m_log_mutex;
-
-void STKHost::logPacket(const NetworkString &ns, bool incoming)
+// ============================================================================
+/** Constructor that just initialises this object (esp. opening the packet
+ *  log file), but it does not start a listener thread.
+ */
+STKHost::STKHost()
 {
-    if (m_log_file == NULL)
-        return;
-    pthread_mutex_lock(&m_log_mutex);
-    if (incoming)
-        fprintf(m_log_file, "[%d\t]  <--  ", (int)(StkTime::getRealTime()));
-    else
-        fprintf(m_log_file, "[%d\t]  -->  ", (int)(StkTime::getRealTime()));
-    for (int i = 0; i < ns.size(); i++)
+    m_host             = NULL;
+    m_listening_thread = NULL;
+    m_log_file.setAtomic(NULL);
+    pthread_mutex_init(&m_exit_mutex, NULL);
+    if (UserConfigParams::m_packets_log_filename.toString() != "")
     {
-        fprintf(m_log_file, "%d.", ns[i]);
+        std::string s = file_manager
+                 ->getUserConfigFile(UserConfigParams::m_packets_log_filename);
+        m_log_file.setAtomic(fopen(s.c_str(), "w+"));
     }
-    fprintf(m_log_file, "\n");
-    pthread_mutex_unlock(&m_log_mutex);
-}
+    if (!m_log_file.getData())
+        Log::warn("STKHost", "Network packets won't be logged: no file.");
+}   // STKHost
 
 // ----------------------------------------------------------------------------
+/** Destructor. Stops the listening thread, closes the packet log file and
+ *  destroys the enet host.
+ */
+STKHost::~STKHost()
+{
+    stopListening();
+    if (m_log_file.getData())
+    {
+        m_log_file.lock();
+        fclose(m_log_file.getData());
+        Log::warn("STKHost", "Packet logging file has been closed.");
+        m_log_file.getData() = NULL;
+        m_log_file.unlock();
+    }
+    if (m_host)
+    {
+        enet_host_destroy(m_host);
+    }
+}   // ~STKHost
 
-void* STKHost::receive_data(void* self)
+// ----------------------------------------------------------------------------
+/** \brief Log packets into a file
+ *  \param ns : The data in the packet
+ *  \param incoming : True if the packet comes from a peer.
+ *  False if it's sent to a peer.
+ */
+void STKHost::logPacket(const NetworkString &ns, bool incoming)
+{
+    if (m_log_file.getData() == NULL) // read only access, no need to lock
+        return;
+
+    const char *arrow = incoming ? "<--" : "-->";
+
+    m_log_file.lock();
+    fprintf(m_log_file.getData(), "[%d\t]  %s  ",
+            (int)(StkTime::getRealTime()), arrow);
+
+    for (int i = 0; i < ns.size(); i++)
+    {
+        fprintf(m_log_file.getData(), "%d.", ns[i]);
+    }
+    fprintf(m_log_file.getData(), "\n");
+    m_log_file.unlock();
+}   // logPacket
+
+// ----------------------------------------------------------------------------
+/** \brief Starts the listening of events from ENet.
+ *  Starts a thread for receiveData that updates it as often as possible.
+ */
+void STKHost::startListening()
+{
+    pthread_mutex_lock(&m_exit_mutex); // will let the update function start
+    m_listening_thread = new pthread_t;
+    pthread_create(m_listening_thread, NULL, &STKHost::mainLoop, this);
+}   // startListening
+
+// ----------------------------------------------------------------------------
+/** \brief Stops the listening of events from ENet.
+ *  Stops the thread that was receiving events.
+ */
+void STKHost::stopListening()
+{
+    if (m_listening_thread)
+    {
+        // This will stop the update function on its next update
+        pthread_mutex_unlock(&m_exit_mutex);
+        pthread_join(*m_listening_thread, NULL); // wait for the thread to end
+    }
+}   // stopListening
+
+// ---------------------------------------------------------------------------
+/** \brief Returns true when the thread should stop listening.
+ */
+int STKHost::mustStopListening()
+{
+    switch (pthread_mutex_trylock(&m_exit_mutex)) {
+    case 0: /* if we got the lock, unlock and return 1 (true) */
+        pthread_mutex_unlock(&m_exit_mutex);
+        return 1;
+    case EBUSY: /* return 0 (false) if the mutex was locked */
+        return 0;
+    }
+    return 1;
+}   // mustStopListening
+
+// ----------------------------------------------------------------------------
+/** \brief Thread function checking if data is received.
+ *  This function tries to get data from network low-level functions as
+ *  often as possible. When something is received, it generates an
+ *  event and passes it to the Network Manager.
+ *  \param self : used to pass the ENet host to the function.
+ */
+void* STKHost::mainLoop(void* self)
 {
     ENetEvent event;
     STKHost* myself = (STKHost*)(self);
     ENetHost* host = myself->m_host;
     while (!myself->mustStopListening())
     {
-        while (enet_host_service(host, &event, 20) != 0) {
-            Event* evt = new Event(&event);
-            if (evt->type == EVENT_TYPE_MESSAGE)
-                logPacket(evt->data(), true);
-            if (event.type != ENET_EVENT_TYPE_NONE)
-                NetworkManager::getInstance()->notifyEvent(evt);
-            delete evt;
-        }
-    }
-    myself->m_listening = false;
+        while (enet_host_service(host, &event, 20) != 0)
+        {
+            if (event.type == ENET_EVENT_TYPE_NONE)
+                continue;
+
+            // Create an STKEvent with the event data
+            Event* stk_event = new Event(&event);
+            if (stk_event->getType() == EVENT_TYPE_MESSAGE)
+                logPacket(stk_event->data(), true);
+
+            // The event is forwarded to the NetworkManger and from there
+            // there to the ProtocolManager. The ProtocolManager is
+            // responsible for freeing the memory.
+            NetworkManager::getInstance()->propagateEvent(stk_event);
+            
+        }   // while enet_host_service
+    }   // while !mustStopListening
+
     free(myself->m_listening_thread);
     myself->m_listening_thread = NULL;
     Log::info("STKHost", "Listening has been stopped");
     return NULL;
-}
+}   // mainLoop
 
 // ----------------------------------------------------------------------------
-
-STKHost::STKHost()
-{
-    m_host             = NULL;
-    m_listening_thread = NULL;
-    m_log_file         = NULL;
-    pthread_mutex_init(&m_exit_mutex, NULL);
-    pthread_mutex_init(&m_log_mutex, NULL);
-    if (UserConfigParams::m_packets_log_filename.toString() != "")
-    {
-        std::string s =
-            file_manager->getUserConfigFile(UserConfigParams::m_packets_log_filename);
-        m_log_file = fopen(s.c_str(), "w+");
-    }
-    if (!m_log_file)
-        Log::warn("STKHost", "Network packets won't be logged: no file.");
-}
-
-// ----------------------------------------------------------------------------
-
-STKHost::~STKHost()
-{
-    stopListening();
-    if (m_log_file)
-    {
-        fclose(m_log_file);
-        Log::warn("STKHost", "Packet logging file has been closed.");
-    }
-    if (m_host)
-    {
-        enet_host_destroy(m_host);
-    }
-}
-
-// ----------------------------------------------------------------------------
-
+/** \brief Setups this host as a server.
+ *  \param address : The IPv4 address of incoming connections.
+ *  \param port : The port on which the server listens.
+ *  \param peer_count : The maximum number of peers.
+ *  \param channel_limit : The maximum number of channels per peer.
+ *  \param max_incoming_bandwidth : The maximum incoming bandwidth.
+ *  \param max_outgoing_bandwidth : The maximum outgoing bandwidth.
+ */
 void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
                             int channel_limit, uint32_t max_incoming_bandwidth,
                             uint32_t max_outgoing_bandwidth)
@@ -153,231 +226,216 @@ void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
 #endif
 
     m_host = enet_host_create(addr, peer_count, channel_limit,
-                            max_incoming_bandwidth, max_outgoing_bandwidth);
-    if (m_host == NULL)
+                              max_incoming_bandwidth, max_outgoing_bandwidth);
+    if (!m_host)
     {
-        Log::error("STKHost", "An error occurred while trying to create an ENet"
+        Log::fatal("STKHost", "An error occurred while trying to create an ENet"
                           " server host.");
-        exit (EXIT_FAILURE);
     }
-}
+}   // setupServer
 
 // ----------------------------------------------------------------------------
+/** \brief Setups the host as a client.
+ *  In fact there is only one peer connected to this host.
+ *  \param peer_count : The maximum number of peers.
+ *  \param channel_limit : The maximum number of channels per peer.
+ *  \param max_incoming_bandwidth : The maximum incoming bandwidth.
+ *  \param max_outgoing_bandwidth : The maximum outgoing bandwidth.
+ */
 
 void STKHost::setupClient(int peer_count, int channel_limit,
-                            uint32_t max_incoming_bandwidth,
-                            uint32_t max_outgoing_bandwidth)
+                          uint32_t max_incoming_bandwidth,
+                          uint32_t max_outgoing_bandwidth)
 {
     m_host = enet_host_create(NULL, peer_count, channel_limit,
-                            max_incoming_bandwidth, max_outgoing_bandwidth);
-    if (m_host == NULL)
+                              max_incoming_bandwidth, max_outgoing_bandwidth);
+    if (!m_host)
     {
-        Log::error("STKHost", "An error occurred while trying to create an ENet"
-                          " client host.");
-        exit (EXIT_FAILURE);
+        Log::fatal ("STKHost", "An error occurred while trying to create an "
+                          "ENet client host.");
     }
-}
+}   // setupClient
 
 // ----------------------------------------------------------------------------
-
-void STKHost::startListening()
-{
-    pthread_mutex_lock(&m_exit_mutex); // will let the update function start
-    m_listening_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
-    pthread_create(m_listening_thread, NULL, &STKHost::receive_data, this);
-    m_listening = true;
-}
-
-// ----------------------------------------------------------------------------
-
-void STKHost::stopListening()
-{
-    if(m_listening_thread)
-    {
-        pthread_mutex_unlock(&m_exit_mutex); // will stop the update function on its next update
-        pthread_join(*m_listening_thread, NULL); // wait the thread to end
-    }
-}
-
-// ----------------------------------------------------------------------------
-
-void STKHost::sendRawPacket(uint8_t* data, int length, TransportAddress dst)
+/** \brief Sends a packet whithout ENet adding its headers.
+ *  This function is used in particular to achieve the STUN protocol.
+ *  \param data : Data to send.
+ *  \param length : Length of the sent data.
+ *  \param dst : Destination of the packet.
+ */
+void STKHost::sendRawPacket(uint8_t* data, int length,
+                            const TransportAddress& dst)
 {
     struct sockaddr_in to;
     int to_len = sizeof(to);
     memset(&to,0,to_len);
 
     to.sin_family = AF_INET;
-    to.sin_port = htons(dst.port);
-    to.sin_addr.s_addr = htonl(dst.ip);
+    to.sin_port = htons(dst.getPort());
+    to.sin_addr.s_addr = htonl(dst.getIP());
 
     sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
-    Log::verbose("STKHost", "Raw packet sent to %i.%i.%i.%i:%u", ((dst.ip>>24)&0xff)
-    , ((dst.ip>>16)&0xff), ((dst.ip>>8)&0xff), ((dst.ip>>0)&0xff), dst.port);
-    STKHost::logPacket(NetworkString(std::string((char*)(data), length)), false);
-}
+    Log::verbose("STKHost", "Raw packet sent to %s", dst.toString().c_str());
+    STKHost::logPacket(NetworkString(std::string((char*)(data), length)),
+                       false);
+}   // sendRawPacket
 
 // ----------------------------------------------------------------------------
-
-uint8_t* STKHost::receiveRawPacket()
-{
-    uint8_t* buffer; // max size needed normally (only used for stun)
-    buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
-    memset(buffer, 0, 2048);
-
-    int len = recv(m_host->socket,(char*)buffer,2048, 0);
-    int i = 0;
-    // wait to receive the message because enet sockets are non-blocking
-    while(len < 0)
-    {
-        i++;
-        len = recv(m_host->socket,(char*)buffer,2048, 0);
-        StkTime::sleep(1);
-    }
-    STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
-    return buffer;
-}
-
-// ----------------------------------------------------------------------------
-
+/** \brief Receives a packet directly from the network interface.
+ *  Receive a packet whithout ENet processing it and returns the
+ *  sender's ip address and port in the TransportAddress structure.
+ *  \param sender : Stores the transport address of the sender of the
+ *                  received packet.
+ *  \return A string containing the data of the received packet.
+ */
 uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
 {
-    uint8_t* buffer; // max size needed normally (only used for stun)
-    buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
-    memset(buffer, 0, 2048);
+    const int LEN = 2048;
+    // max size needed normally (only used for stun)
+    uint8_t* buffer = new uint8_t[LEN]; 
+    memset(buffer, 0, LEN);
 
     socklen_t from_len;
     struct sockaddr_in addr;
 
     from_len = sizeof(addr);
-    int len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
+    int len = recvfrom(m_host->socket, (char*)buffer, LEN, 0,
+                       (struct sockaddr*)(&addr), &from_len   );
 
     int i = 0;
      // wait to receive the message because enet sockets are non-blocking
     while(len == -1) // nothing received
     {
-        i++;
-        len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
         StkTime::sleep(1); // wait 1 millisecond between two checks
+        i++;
+        len = recvfrom(m_host->socket, (char*)buffer, LEN, 0,
+                       (struct sockaddr*)(&addr), &from_len   );
     }
     if (len == SOCKET_ERROR)
     {
-        Log::error("STKHost", "Problem with the socket. Please contact the dev team.");
+        Log::error("STKHost",
+                   "Problem with the socket. Please contact the dev team.");
     }
     // we received the data
-    sender->ip = ntohl((uint32_t)(addr.sin_addr.s_addr));
-    sender->port = ntohs(addr.sin_port);
+    sender->setIP( ntohl((uint32_t)(addr.sin_addr.s_addr)) );
+    sender->setPort( ntohs(addr.sin_port) );
 
     if (addr.sin_family == AF_INET)
     {
-        char s[20];
-        inet_ntop(AF_INET, &(addr.sin_addr), s, 20);
-        Log::info("STKHost", "IPv4 Address of the sender was %s", s);
+        Log::info("STKHost", "IPv4 Address of the sender was %s",
+                  sender->toString().c_str());
     }
     STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
     return buffer;
-}
+}   // receiveRawPacket(TransportAddress* sender)
 
 // ----------------------------------------------------------------------------
-
-uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
+/** \brief Receives a packet directly from the network interface and
+ *  filter its address.
+ *  Receive a packet whithout ENet processing it. Checks that the
+ *  sender of the packet is the one that corresponds to the sender
+ *  parameter. Does not check the port right now.
+ *  \param sender : Transport address of the original sender of the
+ *                  wanted packet.
+ *  \param max_tries : Number of times we try to read data from the
+ *                  socket. This is aproximately the time we wait in
+ *                  milliseconds. -1 means eternal tries.
+ *  \return A string containing the data of the received packet
+ *          matching the sender's ip address.
+ */
+uint8_t* STKHost::receiveRawPacket(const TransportAddress& sender,
+                                   int max_tries)
 {
-    uint8_t* buffer; // max size needed normally (only used for stun)
-    buffer = (uint8_t*)(malloc(sizeof(uint8_t)*2048));
-    memset(buffer, 0, 2048);
+    const int LEN = 2048;
+    uint8_t* buffer = new uint8_t[LEN];
+    memset(buffer, 0, LEN);
 
     socklen_t from_len;
     struct sockaddr_in addr;
 
     from_len = sizeof(addr);
-    int len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
+    int len = recvfrom(m_host->socket, (char*)buffer, LEN, 0,
+                       (struct sockaddr*)(&addr), &from_len    );
 
-    int i = 0;
+    int count = 0;
      // wait to receive the message because enet sockets are non-blocking
-    while(len < 0 || addr.sin_addr.s_addr == sender.ip)
+    while(len < 0 || addr.sin_addr.s_addr == sender.getIP())
     {
-        i++;
+        count++;
         if (len>=0)
         {
-            Log::info("STKHost", "Message received but the ip address didn't match the expected one.");
+            Log::info("STKHost", "Message received but the ip address didn't "
+                                 "match the expected one.");
         }
-        len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
+        len = recvfrom(m_host->socket, (char*)buffer, LEN, 0, 
+                       (struct sockaddr*)(&addr), &from_len);
         StkTime::sleep(1); // wait 1 millisecond between two checks
-        if (i >= max_tries && max_tries != -1)
+        if (count >= max_tries && max_tries != -1)
         {
-            Log::verbose("STKHost", "No answer from the server on %u.%u.%u.%u:%u", (m_host->address.host&0xff),
-                        (m_host->address.host>>8&0xff),
-                        (m_host->address.host>>16&0xff),
-                        (m_host->address.host>>24&0xff),
-                        (m_host->address.port));
+            TransportAddress a(m_host->address);
+            Log::verbose("STKHost", "No answer from the server on %s",
+                         a.toString().c_str());
             return NULL;
         }
     }
     if (addr.sin_family == AF_INET)
     {
-        char s[20];
-        inet_ntop(AF_INET, &(addr.sin_addr), s, 20);
-        Log::info("STKHost", "IPv4 Address of the sender was %s", s);
+        TransportAddress a(ntohl(addr.sin_addr.s_addr));
+        Log::info("STKHost", "IPv4 Address of the sender was %s",
+                  a.toString(false).c_str());
     }
     STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
     return buffer;
-}
+}   // receiveRawPacket(const TransportAddress& sender, int max_tries)
 
 // ----------------------------------------------------------------------------
-
+/** \brief Broadcasts a packet to all peers.
+ *  \param data : Data to send.
+ */
 void STKHost::broadcastPacket(const NetworkString& data, bool reliable)
 {
     ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
-               (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
+                                      reliable ? ENET_PACKET_FLAG_RELIABLE
+                                               : ENET_PACKET_FLAG_UNSEQUENCED);
     enet_host_broadcast(m_host, 0, packet);
     STKHost::logPacket(data, false);
-}
+}   // broadcastPacket
 
 // ----------------------------------------------------------------------------
-
-bool STKHost::peerExists(TransportAddress peer)
+/** \brief Tells if a peer is known.
+ *  \return True if the peer is known, false elseway.
+ */
+bool STKHost::peerExists(const TransportAddress& peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == ntohl(peer.ip) &&
-            m_host->peers[i].address.port == peer.port)
+        if (m_host->peers[i].address.host == ntohl(peer.getIP()) &&
+            m_host->peers[i].address.port == peer.getPort()        )
         {
             return true;
         }
     }
     return false;
-}
+}   // peerExists
 
 // ----------------------------------------------------------------------------
-
-bool STKHost::isConnectedTo(TransportAddress peer)
+/** \brief Tells if a peer is known and connected.
+ *  \return True if the peer is known and connected, false elseway.
+ */
+bool STKHost::isConnectedTo(const TransportAddress& peer)
 {
     for (unsigned int i = 0; i < m_host->peerCount; i++)
     {
-        if (m_host->peers[i].address.host == ntohl(peer.ip) &&
-            m_host->peers[i].address.port == peer.port &&
+        if (peer == m_host->peers[i].address &&
             m_host->peers[i].state == ENET_PEER_STATE_CONNECTED)
         {
             return true;
         }
     }
     return false;
-}
+}   // isConnectedTo
 
-// ---------------------------------------------------------------------------
-
-int STKHost::mustStopListening()
-{
-  switch(pthread_mutex_trylock(&m_exit_mutex)) {
-    case 0: /* if we got the lock, unlock and return 1 (true) */
-      pthread_mutex_unlock(&m_exit_mutex);
-      return 1;
-    case EBUSY: /* return 0 (false) if the mutex was locked */
-      return 0;
-  }
-  return 1;
-}
-
+// ----------------------------------------------------------------------------
 uint16_t STKHost::getPort() const
 {
     struct sockaddr_in sin;

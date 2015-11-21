@@ -51,14 +51,8 @@ public:
     static void init();
     static void getDate(int *day=NULL, int *month=NULL, int *year=NULL);
 
-        /** Converts the time in this object to a human readable string. */
-    static std::string toString(const TimeType &tt)
-    {
-        const struct tm *t = gmtime(&tt);
-        char s[16];
-        strftime(s, 16, "%x", t);
-        return s;
-    }   // toString
+    /** Converts the time in this object to a human readable string. */
+    static std::string toString(const TimeType &tt);
     // ------------------------------------------------------------------------
     /** Returns the number of seconds since 1.1.1970. This function is used
      *  to compare access times of files, e.g. news, addons data etc.

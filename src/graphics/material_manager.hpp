@@ -24,13 +24,15 @@
 
 namespace irr
 {
-    namespace video { class ITexture;    }
+    namespace video { class ITexture; }
     namespace scene { class IMeshBuffer; class ISceneNode; }
 }
 using namespace irr;
 
+#include <irrlicht.h>
 #include <string>
 #include <vector>
+#include <map>
 
 class Material;
 class XMLReader;
@@ -48,7 +50,8 @@ private:
 
     std::vector<Material*> m_materials;
 
-    Material* m_default_material;
+    std::map<video::E_MATERIAL_TYPE, Material*> m_default_materials;
+    Material* getDefaultMaterial(video::E_MATERIAL_TYPE material_type);
 
 public:
               MaterialManager();

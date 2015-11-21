@@ -21,29 +21,38 @@
 
 #include "network/protocol.hpp"
 
+#include <string>
+
+class STKHost;
+
 class GetPublicAddress : public Protocol
 {
     public:
-        GetPublicAddress(CallbackObject* callback_object);
-        virtual ~GetPublicAddress();
+        GetPublicAddress();
+        virtual ~GetPublicAddress() {}
 
         virtual bool notifyEvent(Event* event) { return true; }
         virtual bool notifyEventAsynchronous(Event* event) { return true; }
-        virtual void setup();
+        virtual void setup() { m_state = NOTHING_DONE; }
         virtual void update() {}
         virtual void asynchronousUpdate();
 
-    protected:
+    private:
+        void createStunRequest();
+        std::string parseStunResponse();
+
+        // Constants
+        static const uint32_t m_stun_magic_cookie;
+        static const int m_stun_server_port = 3478;
+
         enum STATE
         {
             NOTHING_DONE,
-            TEST_SENT,
-            ADDRESS_KNOWN,
+            STUN_REQUEST_SENT,
             EXITING
         };
         STATE m_state;
-        uint32_t m_stun_tansaction_id[3];
-        static const uint32_t m_stun_magic_cookie = 0x2112A442;
+        uint8_t m_stun_tansaction_id[12];
         uint32_t m_stun_server_ip;
         STKHost* m_transaction_host;
 };
