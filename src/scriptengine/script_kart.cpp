@@ -16,13 +16,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <assert.h>
-#include <angelscript.h>
+#include "script_kart.hpp"
+
+#include "karts/abstract_characteristic.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
-#include "script_kart.hpp"
 #include "scriptvec3.hpp"
 
+#include <assert.h>
+#include <angelscript.h>
 //debug
 #include <iostream>
 
@@ -121,8 +123,7 @@ namespace Scripting
         float getMaxSpeed(int idKart)
         {
             AbstractKart* kart = World::getWorld()->getKart(idKart);
-            return kart->getKartProperties()->getMaxSpeed() *
-                kart->getPlayerDifficulty()->getMaxSpeed();
+            return kart->getCharacteristic()->getEngineMaxSpeed();
         }
 
         /** @}*/
