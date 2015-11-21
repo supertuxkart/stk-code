@@ -175,12 +175,6 @@ void CachedCharacteristic::updateSource()
 }   // updateSource
 
 // ----------------------------------------------------------------------------
-const SkiddingProperties* CachedCharacteristic::getSkiddingProperties() const
-{
-    return m_origin->getSkiddingProperties();
-}   // getSkiddingProperties
-
-// ----------------------------------------------------------------------------
 /** Returns the stored value. */
 void CachedCharacteristic::process(CharacteristicType type, Value value,
                                    bool *is_set) const

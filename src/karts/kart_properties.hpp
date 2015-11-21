@@ -41,7 +41,6 @@ class AbstractCharacteristic;
 class AIProperties;
 class CombinedCharacteristic;
 class Material;
-class SkiddingProperties;
 class XMLNode;
 
 /**
@@ -59,11 +58,6 @@ class KartProperties
 private:
     /** Base directory for this kart. */
     std::string              m_root;
-
-    /** The skididing properties for this kart, as a separate object in order
-     *  to reduce dependencies (and therefore compile time) when changing
-     *  any skidding property. */
-    SkiddingProperties *m_skidding_properties;
 
     /** AI Properties for this kart, as a separate object in order to
      *  reduce dependencies (and therefore compile time) when changing
@@ -374,11 +368,6 @@ public:
     /** Returns the scale factor by which the shadow plane
      *  had to be set. */
     float getShadowZOffset          () const {return m_shadow_z_offset;       }
-
-    // ------------------------------------------------------------------------
-    /** Returns a pointer to the skidding properties. */
-    const SkiddingProperties *getSkiddingProperties() const
-                                              { return m_skidding_properties; }
 
     // ------------------------------------------------------------------------
     /** Returns a pointer to the AI properties. */

@@ -29,7 +29,6 @@ private:
 public:
     void addCharacteristic(const AbstractCharacteristic *characteristic);
 
-    virtual const SkiddingProperties* getSkiddingProperties() const;
     virtual void process(CharacteristicType type, Value value, bool *is_set) const;
 };
 

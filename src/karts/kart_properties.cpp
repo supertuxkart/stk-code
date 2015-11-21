@@ -30,7 +30,6 @@
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "karts/skidding_properties.hpp"
 #include "karts/xml_characteristic.hpp"
 #include "modes/world.hpp"
 #include "io/xml_node.hpp"
@@ -95,14 +94,12 @@ KartProperties::KartProperties(const std::string &filename)
     // The default constructor for stk_config uses filename=""
     if (filename != "")
     {
-        m_skidding_properties = NULL;
         for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
             m_ai_properties[i]= NULL;
         load(filename, "kart");
     }
     else
     {
-        m_skidding_properties = new SkiddingProperties();
         for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
             m_ai_properties[i]= new AIProperties((RaceManager::Difficulty)i);
     }
@@ -113,8 +110,6 @@ KartProperties::KartProperties(const std::string &filename)
 KartProperties::~KartProperties()
 {
     delete m_kart_model;
-    if(m_skidding_properties)
-        delete m_skidding_properties;
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         if(m_ai_properties[i])
             delete m_ai_properties[i];
@@ -133,10 +128,6 @@ void KartProperties::copyFrom(const KartProperties *source)
 
     // After the memcpy any pointers will be shared.
     // So all pointer variables need to be separately allocated and assigned.
-    m_skidding_properties = new SkiddingProperties();
-    assert(m_skidding_properties);
-    *m_skidding_properties = *source->m_skidding_properties;
-
     if (source->m_characteristic)
     {
         m_characteristic.reset(new XmlCharacteristic());
@@ -446,11 +437,6 @@ void KartProperties::getAllData(const XMLNode * root)
 #endif
     }   // if sounds-node exist
 
-    if(const XMLNode *skid_node = root->getNode("skid"))
-    {
-        m_skidding_properties->load(skid_node);
-    }
-
 
     if(const XMLNode *lean_node= root->getNode("lean"))
     {
@@ -490,7 +476,6 @@ void KartProperties::checkAllSet(const std::string &filename)
 
     m_speed_weighted_object_properties.checkAllSet();
 
-    m_skidding_properties->checkAllSet(filename);
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         m_ai_properties[i]->checkAllSet(filename);
 }   // checkAllSet

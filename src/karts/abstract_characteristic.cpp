@@ -28,12 +28,6 @@ AbstractCharacteristic::AbstractCharacteristic()
 }
 
 // ----------------------------------------------------------------------------
-const SkiddingProperties* AbstractCharacteristic::getSkiddingProperties() const
-{
-    return nullptr;
-}   // getSkiddingProperties
-
-// ----------------------------------------------------------------------------
 /** The process function should change the given value.
  *  The input and output argument is saved in value.
  *  is_set describes if the value is already set or if it's undefined.

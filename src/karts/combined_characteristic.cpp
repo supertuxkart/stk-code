@@ -25,18 +25,6 @@ void CombinedCharacteristic::addCharacteristic(
 }   // addCharacteristic
 
 // ----------------------------------------------------------------------------
-const SkiddingProperties* CombinedCharacteristic::getSkiddingProperties() const
-{
-    for (const AbstractCharacteristic *characteristic : m_childs)
-    {
-        const SkiddingProperties *skid = characteristic->getSkiddingProperties();
-        if (skid)
-            return skid;
-    }
-    return nullptr;
-}   // getSkiddingProperties
-
-// ----------------------------------------------------------------------------
 /** Combines all contained source characteristics. */
 void CombinedCharacteristic::process(CharacteristicType type, Value value,
                                      bool *is_set) const

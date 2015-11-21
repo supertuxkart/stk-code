@@ -22,7 +22,6 @@
 #include <string>
 #include <vector>
 
-class SkiddingProperties;
 class InterpolationArray;
 
 /**
@@ -224,17 +223,10 @@ public:
         // Count
         CHARACTERISTIC_COUNT
     };
-private:
-    /** The skididing properties for this kart, as a separate object in order
-     *  to reduce dependencies (and therefore compile time) when changing
-     *  any skidding property. */
-    //TODO SkiddingProperties *m_skidding;
 
 public:
     AbstractCharacteristic();
     virtual ~AbstractCharacteristic() {}
-
-    virtual const SkiddingProperties* getSkiddingProperties() const;
 
     /**
      * The process function is the core of this characteristics system.

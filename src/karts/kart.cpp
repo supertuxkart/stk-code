@@ -225,8 +225,7 @@ void Kart::init(RaceManager::KartType type)
     loadData(type, animations);
 
     m_kart_gfx = new KartGFX(this);
-    m_skidding = new Skidding(this,
-                              m_kart_properties->getSkiddingProperties());
+    m_skidding = new Skidding(this);
     // Create the stars effect
     m_stars_effect =
         new Stars(getNode(),
@@ -1369,7 +1368,7 @@ void Kart::update(float dt)
     static video::SColor green(255, 61, 87, 23);
 
     // draw skidmarks if relevant (we force pink skidmarks on when hitting a bubblegum)
-    if(m_kart_properties->getSkiddingProperties()->hasSkidmarks())
+    if(m_characteristic->getSkidEnabled())
     {
         m_skidmarks->update(dt,
                             m_bubblegum_time > 0,
@@ -2244,8 +2243,8 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             engine_power *= 5.0f;
 
         // Lose some traction when skidding, to balance the advantage
-        if(m_controls.m_skid &&
-           m_kart_properties->getSkiddingProperties()->getSkidVisualTime()==0)
+        if (m_controls.m_skid &&
+            m_characteristic->getSkidVisualTime() == 0)
             engine_power *= 0.5f;
 
         applyEngineForce(engine_power*m_controls.m_accel);
@@ -2446,7 +2445,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 
     m_slipstream = new SlipStream(this);
 
-    if(m_kart_properties->getSkiddingProperties()->hasSkidmarks())
+    if (m_characteristic->getSkidEnabled())
     {
         m_skidmarks = new SkidMarks(*this);
         m_skidmarks->adjustFog(

@@ -39,7 +39,6 @@
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
-#include "karts/skidding_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/profile_world.hpp"
 #include "race/race_manager.hpp"
@@ -2260,7 +2259,6 @@ bool SkiddingAI::doSkid(float steer_fraction)
     // the actual path is adjusted during the turn. So apply an
     // experimentally found factor in to get better estimates.
     duration *= 1.5f;
-    const Skidding *skidding = m_kart->getSkidding();
 
     // If the remaining estimated time for skidding is too short, stop
     // it. This code will mostly trigger the bonus at the end of a skid.
@@ -2289,8 +2287,8 @@ bool SkiddingAI::doSkid(float steer_fraction)
             return false;
         }
     // If there is a skidding bonus, try to get it.
-    else if(skidding->getNumberOfBonusTimes()>0 &&
-            skidding->getTimeTillBonus(0) < duration)
+    else if (m_kart->getCharacteristic()->getSkidBonusSpeed().size() > 0 &&
+             m_kart->getCharacteristic()->getSkidTimeTillBonus()[0] < duration)
     {
 #ifdef DEBUG
         if(!m_controls->m_skid && m_ai_debug)

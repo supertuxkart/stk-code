@@ -47,7 +47,6 @@ public:
     /** Fetches all cached values from the original source. */
     void updateSource();
 
-    virtual const SkiddingProperties* getSkiddingProperties() const;
     virtual void process(CharacteristicType type, Value value, bool *is_set) const;
 };
 

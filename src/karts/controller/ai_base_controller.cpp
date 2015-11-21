@@ -20,9 +20,9 @@
 #include "karts/controller/ai_base_controller.hpp"
 
 #include "config/user_config.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/skidding_properties.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "tracks/track.hpp"
@@ -501,8 +501,7 @@ bool AIBaseController::doSkid(float steer_fraction)
     // FIXME: Disable skidding for now if the new skidding
     // code is activated, since the AI can not handle this
     // properly.
-    if(m_kart->getKartProperties()->getSkiddingProperties()
-                                  ->getSkidVisualTime()>0)
+    if(m_kart->getCharacteristic()->getSkidVisualTime() > 0)
         return false;
 
     // Otherwise return if we need a sharp turn (which is
