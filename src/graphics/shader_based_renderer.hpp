@@ -53,7 +53,7 @@ private:
     void prepareDrawCalls(scene::ICameraSceneNode *camnode);
 
     void renderScene(irr::scene::ICameraSceneNode * const camnode,
-                     std::vector<GlowData>& glows,
+                     const std::vector<GlowData>& glows,
                      float dt, bool hasShadows, bool forceRTT);
                      
     void renderParticles();

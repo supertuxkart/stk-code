@@ -48,8 +48,7 @@ private:
     ShadowCommandBuffer                   m_shadow_cmd_buffer;
     ReflectiveShadowMapCommandBuffer      m_reflective_shadow_map_cmd_buffer;
     GlowCommandBuffer                     m_glow_cmd_buffer;
-    
-    
+        
     irr::core::vector3df windDir; //TODO: same member in geometry_passes
     
     MeshMap m_solid_pass_mesh           [Material::SHADERTYPE_COUNT]    ;
@@ -87,11 +86,6 @@ public:
     void renderImmediateDrawList() const;
     void renderBillboardList()      const;
     void renderParticlesList()     const;
-
-    inline void bindSolidCmd() const { m_solid_cmd_buffer.bind(); }
-    inline void bindShadowCmd() const { m_shadow_cmd_buffer.bind(); }
-    inline void bindReflectiveShadowMapsCmd() const { m_reflective_shadow_map_cmd_buffer.bind(); }
-    inline void bindGlowCmd() const { m_glow_cmd_buffer.bind(); }
 
     void drawIndirectSolidFirstPass() const;
     void multidrawSolidFirstPass() const;

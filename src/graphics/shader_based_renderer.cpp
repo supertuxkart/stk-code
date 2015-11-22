@@ -160,7 +160,7 @@ void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *con
 
 // ============================================================================
 void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
-                                      std::vector<GlowData>& glows,
+                                      const std::vector<GlowData>& glows,
                                       float dt,
                                       bool hasShadow,
                                       bool forceRTT)

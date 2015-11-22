@@ -542,6 +542,7 @@ void DrawCalls::renderParticlesList() const
  */ 
 void DrawCalls::drawIndirectSolidFirstPass() const
 {
+    m_solid_cmd_buffer.bind();
     m_solid_cmd_buffer.drawIndirectFirstPass<DefaultMaterial>();
     m_solid_cmd_buffer.drawIndirectFirstPass<AlphaRef>();
     m_solid_cmd_buffer.drawIndirectFirstPass<UnlitMat>();
@@ -557,6 +558,7 @@ void DrawCalls::drawIndirectSolidFirstPass() const
  */ 
 void DrawCalls::multidrawSolidFirstPass() const
 {
+    m_solid_cmd_buffer.bind();
     m_solid_cmd_buffer.multidrawFirstPass<DefaultMaterial>();
     m_solid_cmd_buffer.multidrawFirstPass<AlphaRef>();
     m_solid_cmd_buffer.multidrawFirstPass<SphereMap>();
@@ -569,6 +571,7 @@ void DrawCalls::multidrawSolidFirstPass() const
 // ----------------------------------------------------------------------------
 void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled_tex) const
 {
+    m_solid_cmd_buffer.bind();
     m_solid_cmd_buffer.drawIndirectSecondPass<DefaultMaterial>(prefilled_tex);
     m_solid_cmd_buffer.drawIndirectSecondPass<AlphaRef>(prefilled_tex);
     m_solid_cmd_buffer.drawIndirectSecondPass<UnlitMat>(prefilled_tex);
@@ -581,6 +584,7 @@ void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled
 // ----------------------------------------------------------------------------
 void DrawCalls::multidrawSolidSecondPass(const std::vector<uint64_t> &handles) const
 {
+    m_solid_cmd_buffer.bind();
     m_solid_cmd_buffer.multidraw2ndPass<DefaultMaterial>(handles);
     m_solid_cmd_buffer.multidraw2ndPass<AlphaRef>(handles);
     m_solid_cmd_buffer.multidraw2ndPass<SphereMap>(handles);
@@ -593,6 +597,7 @@ void DrawCalls::multidrawSolidSecondPass(const std::vector<uint64_t> &handles) c
 // ----------------------------------------------------------------------------
 void DrawCalls::drawIndirectNormals() const
 {
+    m_solid_cmd_buffer.bind();
     m_solid_cmd_buffer.drawIndirectNormals<DefaultMaterial>();
     m_solid_cmd_buffer.drawIndirectNormals<AlphaRef>();
     m_solid_cmd_buffer.drawIndirectNormals<UnlitMat>();
@@ -604,6 +609,7 @@ void DrawCalls::drawIndirectNormals() const
 // ----------------------------------------------------------------------------
 void DrawCalls::multidrawNormals() const
 {
+    m_solid_cmd_buffer.bind();
     m_solid_cmd_buffer.multidrawNormals<DefaultMaterial>();
     m_solid_cmd_buffer.multidrawNormals<AlphaRef>();
     m_solid_cmd_buffer.multidrawNormals<UnlitMat>();
@@ -615,17 +621,19 @@ void DrawCalls::multidrawNormals() const
 // ----------------------------------------------------------------------------
 void DrawCalls::drawIndirectShadows(unsigned cascade) const
 {
+    m_shadow_cmd_buffer.bind();
     m_shadow_cmd_buffer.drawIndirect<DefaultMaterial>(cascade);
     m_shadow_cmd_buffer.drawIndirect<DetailMat>(cascade);
     m_shadow_cmd_buffer.drawIndirect<AlphaRef>(cascade);
     m_shadow_cmd_buffer.drawIndirect<UnlitMat>(cascade);
     m_shadow_cmd_buffer.drawIndirect<GrassMat,irr::core::vector3df>(windDir, cascade);
     m_shadow_cmd_buffer.drawIndirect<NormalMat>(cascade);
-    
+    m_shadow_cmd_buffer.drawIndirect<SplattingMat>(cascade);
 }
 
 void DrawCalls::multidrawShadows(unsigned cascade) const
 {
+    m_shadow_cmd_buffer.bind();
     m_shadow_cmd_buffer.multidrawShadow<DefaultMaterial>(cascade);
     m_shadow_cmd_buffer.multidrawShadow<DetailMat>(cascade);
     m_shadow_cmd_buffer.multidrawShadow<NormalMat>(cascade);
@@ -637,6 +645,7 @@ void DrawCalls::multidrawShadows(unsigned cascade) const
 // ----------------------------------------------------------------------------
 void DrawCalls::drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const
 {
+    m_reflective_shadow_map_cmd_buffer.bind();
     m_reflective_shadow_map_cmd_buffer.drawIndirect<DefaultMaterial>(rsm_matrix);
     m_reflective_shadow_map_cmd_buffer.drawIndirect<AlphaRef>(rsm_matrix);
     m_reflective_shadow_map_cmd_buffer.drawIndirect<UnlitMat>(rsm_matrix);
@@ -647,6 +656,7 @@ void DrawCalls::drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix
 // ----------------------------------------------------------------------------
 void DrawCalls::multidrawReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const
 {
+    m_reflective_shadow_map_cmd_buffer.bind();
     m_reflective_shadow_map_cmd_buffer.multidraw<DefaultMaterial>(rsm_matrix);
     m_reflective_shadow_map_cmd_buffer.multidraw<NormalMat>(rsm_matrix);
     m_reflective_shadow_map_cmd_buffer.multidraw<AlphaRef>(rsm_matrix);
@@ -657,11 +667,13 @@ void DrawCalls::multidrawReflectiveShadowMaps(const core::matrix4 &rsm_matrix) c
 // ----------------------------------------------------------------------------
 void DrawCalls::drawIndirectGlow() const
 {
+    m_glow_cmd_buffer.bind();
     m_glow_cmd_buffer.drawIndirect();
 }
 
 // ----------------------------------------------------------------------------
 void DrawCalls::multidrawGlow() const
 {
+    m_glow_cmd_buffer.bind();
     m_glow_cmd_buffer.multidraw();
 }

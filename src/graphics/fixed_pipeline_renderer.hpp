@@ -26,7 +26,7 @@ public:
     
     void render(float dt);
     void renderScene(irr::scene::ICameraSceneNode * const camnode,
-                     std::vector<GlowData>& glows,
+                     const std::vector<GlowData>& glows,
                      float dt, bool hasShadows, bool forceRTT){}
     void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                               float dt){}

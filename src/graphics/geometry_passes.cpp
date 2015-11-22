@@ -176,9 +176,6 @@ void GeometryPasses::renderSolidFirstPass(const DrawCalls& draw_calls)
 {
     m_wind_dir = getWindDir(); //TODO: why this function instead of Wind::getWind()?
 
-    if (CVS->supportsIndirectInstancingRendering())
-        draw_calls.bindSolidCmd();
-
     {
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
         irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
@@ -279,9 +276,6 @@ void GeometryPasses::renderSolidSecondPass( const DrawCalls& draw_calls,
         if (!glIsTextureHandleResidentARB(DepthHandle))
             glMakeTextureHandleResidentARB(DepthHandle);
     }
-
-    if (CVS->supportsIndirectInstancingRendering())
-        draw_calls.bindSolidCmd();
         
     {
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS2));
@@ -344,7 +338,7 @@ void GeometryPasses::renderNormalsVisualisation(const DrawCalls& draw_calls)
 
 // ----------------------------------------------------------------------------
 
-void GeometryPasses::renderGlow(const DrawCalls& draw_calls, std::vector<GlowData>& glows)
+void GeometryPasses::renderGlow(const DrawCalls& draw_calls, const std::vector<GlowData>& glows)
 {
     irr_driver->getSceneManager()->setCurrentRendertime(scene::ESNRP_SOLID);
     irr_driver->getRTT()->getFBO(FBO_TMP1_WITH_DS).bind();
@@ -377,7 +371,6 @@ void GeometryPasses::renderGlow(const DrawCalls& draw_calls, std::vector<GlowDat
 
     if (CVS->supportsIndirectInstancingRendering())
     {
-        draw_calls.bindGlowCmd();
          if (CVS->isAZDOEnabled())
         {
             draw_calls.multidrawGlow();
@@ -632,15 +625,11 @@ void GeometryPasses::renderShadows(const DrawCalls& draw_calls,
         renderShadow<DefaultMaterial, 1>(cascade);
         renderShadow<SphereMap, 1>(cascade);
         renderShadow<DetailMat, 1>(cascade);
-        renderShadow<SplattingMat, 1>(cascade);
+        //renderShadow<SplattingMat, 1>(cascade);
         renderShadow<NormalMat, 1>(cascade);
         renderShadow<AlphaRef, 1>(cascade);
         renderShadow<UnlitMat, 1>(cascade);
         renderShadow<GrassMat, 3, 1>(cascade);
-
-        if (CVS->supportsIndirectInstancingRendering())
-            draw_calls.bindShadowCmd();
-
 
         if (CVS->isAZDOEnabled())
         {
@@ -715,9 +704,6 @@ void GeometryPasses::renderReflectiveShadowMap(const DrawCalls& draw_calls,
     drawRSM<UnlitMat, 3, 1>(rsm_matrix);
     drawRSM<DetailMat, 3, 1>(rsm_matrix);
     drawRSM<SplattingMat, 1>(rsm_matrix);
-
-    if (CVS->supportsIndirectInstancingRendering())
-        draw_calls.bindReflectiveShadowMapsCmd();
 
     if (CVS->isAZDOEnabled())
     {
