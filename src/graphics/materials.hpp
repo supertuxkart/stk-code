@@ -23,34 +23,6 @@
 #include "graphics/stk_mesh.hpp"
 #include "graphics/vao_manager.hpp"
 
-/*class InstancedObjectPass1Shader;
-class InstancedObjectPass2Shader;
-class InstancedShadowShader;
-class CInstancedRSMShader;
-class ShadowShader;
-class CRSMShader;
-class InstancedObjectRefPass1Shader;
-class InstancedObjectRefPass2Shader;
-class InstancedRefShadowShader;
-class ObjectRefPass1Shader;
-class ObjectRefPass2Shader;
-class RefShadowShader;
-class InstancedSphereMapShader;
-class SphereMapShader;
-class InstancedObjectUnlitShader;
-class ObjectUnlitShader;
-class InstancedGrassPass1Shader;
-class InstancedGrassPass2Shader;
-class InstancedGrassShadowShader;
-class GrassPass1Shader;
-class GrassPass2Shader;
-class GrassShadowShader;
-class InstancedNormalMapShader;
-class NormalMapShader;
-class InstancedDetailedObjectPass2Shader;
-class DetailedObjectPass2Shader;
-class SplattingShader;
-class SplattingRSMShader;*/
 
 // ============================================================================
 class InstancedObjectPass1Shader : public TextureShader<InstancedObjectPass1Shader, 1>
@@ -245,7 +217,6 @@ public:
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // CInstancedRSMShader
 };   // CInstancedRSMShader
-
 
 // ============================================================================
 class SphereMapShader : public TextureShader<SphereMapShader, 4, core::matrix4,
@@ -822,8 +793,8 @@ struct SplattingMat
     typedef InstancedObjectPass1Shader InstancedFirstPassShader;
     //TODO: InstancedSecondPassShader
     typedef InstancedShadowShader InstancedShadowPassShader;
-    //TODO: InstancedRSMShader
-
+    //TODO InstancedRSMShader
+    
     typedef Shaders::ObjectPass1Shader FirstPassShader;
     typedef SplattingShader SecondPassShader;
     typedef ShadowShader ShadowPassShader;

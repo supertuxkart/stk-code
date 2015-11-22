@@ -31,7 +31,7 @@ private:
     
     //GLsync          m_sync; //TODO
     DrawCalls       m_draw_calls;
-    GeometryPasses  m_geometry_passes;
+    AbstractGeometryPasses *m_geometry_passes;
     LightingPasses  m_lighting_passes;
     ShadowMatrices  m_shadow_matrices;
 

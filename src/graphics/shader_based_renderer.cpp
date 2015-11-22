@@ -183,18 +183,18 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
             CVS->isShadowEnabled() && hasShadow)
         {
             PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
-            m_geometry_passes.renderShadows(m_draw_calls,
-                                            m_shadow_matrices,
-                                            irr_driver->getRTT()->getShadowFrameBuffer());
+            m_geometry_passes->renderShadows(m_draw_calls,
+                                             m_shadow_matrices,
+                                             irr_driver->getRTT()->getShadowFrameBuffer());
             PROFILER_POP_CPU_MARKER();
             if (CVS->isGlobalIlluminationEnabled())
             {
                 if (!m_shadow_matrices.isRSMMapAvail())
                 {
                     PROFILER_PUSH_CPU_MARKER("- RSM", 0xFF, 0x0, 0xFF);
-                    m_geometry_passes.renderReflectiveShadowMap(m_draw_calls,
-                                                                m_shadow_matrices, 
-                                                                irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer()); //TODO: move somewhere else as RSM are computed only once per track
+                    m_geometry_passes->renderReflectiveShadowMap(m_draw_calls,
+                                                                 m_shadow_matrices, 
+                                                                 irr_driver->getRTT()->getReflectiveShadowMapFrameBuffer()); //TODO: move somewhere else as RSM are computed only once per track
                     m_shadow_matrices.setRSMMapAvail(true);
                     PROFILER_POP_CPU_MARKER();
                 }
@@ -217,7 +217,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         glClearColor(0., 0., 0., 0.);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        m_geometry_passes.renderSolidFirstPass(m_draw_calls);
+        m_geometry_passes->renderSolidFirstPass(m_draw_calls);
     }
     else
     {
@@ -281,7 +281,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         glClear(GL_COLOR_BUFFER_BIT);
         glDepthMask(GL_FALSE);
     }
-    m_geometry_passes.renderSolidSecondPass( m_draw_calls,
+    m_geometry_passes->renderSolidSecondPass(m_draw_calls,
                                              rtts->getRenderTarget(RTT_DIFFUSE),
                                              rtts->getRenderTarget(RTT_SPECULAR),
                                              rtts->getRenderTarget(RTT_HALF1_R));
@@ -290,7 +290,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     if (irr_driver->getNormals())
     {
         rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
-        m_geometry_passes.renderNormalsVisualisation(m_draw_calls);
+        m_geometry_passes->renderNormalsVisualisation(m_draw_calls);
         rtts->getFBO(FBO_COLORS).bind();
     }
 
@@ -347,7 +347,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GLOW));
         irr_driver->setPhase(GLOW_PASS);
-        m_geometry_passes.renderGlow(m_draw_calls, glows);
+        m_geometry_passes->renderGlow(m_draw_calls, glows);
     } // end glow
     PROFILER_POP_CPU_MARKER();
 
@@ -355,8 +355,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TRANSPARENT));
-        m_geometry_passes.renderTransparent(m_draw_calls,
-                                            irr_driver->getRTT()->getRenderTarget(RTT_DISPLACE));
+        m_geometry_passes->renderTransparent(m_draw_calls,
+                                             irr_driver->getRTT()->getRenderTarget(RTT_DISPLACE));
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -492,10 +492,17 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 
 ShaderBasedRenderer::ShaderBasedRenderer()
 {
+    if (CVS->isAZDOEnabled())
+        m_geometry_passes = new GeometryPasses<MultidrawPolicy>();
+    else if (CVS->supportsIndirectInstancingRendering())
+        m_geometry_passes = new GeometryPasses<IndirectDrawPolicy>();
+    else
+        m_geometry_passes = new GeometryPasses<GL3DrawPolicy>();
 }
 
 ShaderBasedRenderer::~ShaderBasedRenderer()
 {
+    delete m_geometry_passes;
 }
 
 void ShaderBasedRenderer::addSunLight(const core::vector3df &pos) {

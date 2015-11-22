@@ -34,7 +34,6 @@ class DrawCalls
 public:
 
 
-    
     GLsync          m_sync = 0; //TODO: make it private. Should it be in shader_based_renderer?
 
     

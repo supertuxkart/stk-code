@@ -25,7 +25,6 @@
 #include "graphics/shaders.hpp"
 #include "graphics/stk_scene_manager.hpp"
 #include "modes/world.hpp"
-#include "utils/profiler.hpp"
 #include "utils/tuple.hpp"
 #include <SColor.h>
 #include <S3DVertex.h>
@@ -165,45 +164,6 @@ void renderMeshes1stPass(const DrawCalls& draw_calls)
     }
 }   // renderMeshes1stPass
 
-
-GeometryPasses::GeometryPasses()
-{
-    m_displace_tex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");    
-}
-
-// ----------------------------------------------------------------------------
-void GeometryPasses::renderSolidFirstPass(const DrawCalls& draw_calls)
-{
-    m_wind_dir = getWindDir(); //TODO: why this function instead of Wind::getWind()?
-
-    {
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
-        irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
-
-        draw_calls.renderImmediateDrawList();
-
-        //TODO: is it useful if AZDO enabled?
-        renderMeshes1stPass<DefaultMaterial, 2, 1>(draw_calls);
-        renderMeshes1stPass<SplattingMat, 2, 1>(draw_calls);
-        renderMeshes1stPass<UnlitMat, 3, 2, 1>(draw_calls);
-        renderMeshes1stPass<AlphaRef, 3, 2, 1>(draw_calls);
-        renderMeshes1stPass<GrassMat, 3, 2, 1>(draw_calls);
-        renderMeshes1stPass<NormalMat, 2, 1>(draw_calls);
-        renderMeshes1stPass<SphereMap, 2, 1>(draw_calls);
-        renderMeshes1stPass<DetailMat, 2, 1>(draw_calls);
-
-        if (CVS->isAZDOEnabled())
-        {
-            draw_calls.multidrawSolidFirstPass();
-        }
-        else if (CVS->supportsIndirectInstancingRendering())
-        {
-            draw_calls.drawIndirectSolidFirstPass();
-        }
-    }
-}   // renderSolidFirstPass
-
-
 // ----------------------------------------------------------------------------
 template<typename T, int...List>
 void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
@@ -243,7 +203,205 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
 }   // renderMeshes2ndPass
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderSolidSecondPass( const DrawCalls& draw_calls,
+template<typename T, int...List>
+void renderShadow(unsigned cascade)
+{
+    auto &t = T::List::getInstance()->Shadows[cascade];
+    T::ShadowPassShader::getInstance()->use();
+    if (CVS->isARBBaseInstanceUsable())
+        glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
+    for (unsigned i = 0; i < t.size(); i++)
+    {
+        GLMesh *mesh = STK::tuple_get<0>(t.at(i));
+        if (!CVS->isARBBaseInstanceUsable())
+            glBindVertexArray(mesh->vao);
+        if (CVS->isAZDOEnabled())
+            HandleExpander<typename T::ShadowPassShader>::template expand(mesh->TextureHandles, T::ShadowTextures);
+        else
+            TexExpander<typename T::ShadowPassShader>::template expandTex(*mesh, T::ShadowTextures);
+        CustomUnrollArgs<List...>::template drawMesh<typename T::ShadowPassShader>(t.at(i), cascade);
+    }   // for i
+}   // renderShadow
+
+
+// ----------------------------------------------------------------------------
+template<typename T, int... Selector>
+void drawRSM(const core::matrix4 & rsm_matrix)
+{
+    T::RSMShader::getInstance()->use();
+    if (CVS->isARBBaseInstanceUsable())
+        glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
+    auto t = T::List::getInstance()->RSM;
+    for (unsigned i = 0; i < t.size(); i++)
+    {
+        std::vector<GLuint> Textures;
+        GLMesh *mesh = STK::tuple_get<0>(t.at(i));
+        if (!CVS->isARBBaseInstanceUsable())
+            glBindVertexArray(mesh->vao);
+        if (CVS->isAZDOEnabled())
+            HandleExpander<typename T::RSMShader>::template expand(mesh->TextureHandles, T::RSMTextures);
+        else
+            TexExpander<typename T::RSMShader>::template expandTex(*mesh, T::RSMTextures);
+        CustomUnrollArgs<Selector...>::template drawMesh<typename T::RSMShader>(t.at(i), rsm_matrix);
+    }
+}   // drawRSM
+
+
+
+// ----------------------------------------------------------------------------
+void GL3DrawPolicy::drawShadows(const DrawCalls& draw_calls, unsigned cascade) const
+{
+    renderShadow<DefaultMaterial, 1>(cascade);
+    renderShadow<SphereMap, 1>(cascade);
+    renderShadow<DetailMat, 1>(cascade);
+    renderShadow<SplattingMat, 1>(cascade);
+    renderShadow<NormalMat, 1>(cascade);
+    renderShadow<AlphaRef, 1>(cascade);
+    renderShadow<UnlitMat, 1>(cascade);
+    renderShadow<GrassMat, 3, 1>(cascade);    
+}
+
+// ----------------------------------------------------------------------------
+void GL3DrawPolicy::drawReflectiveShadowMap(const DrawCalls& draw_calls,
+                                            const core::matrix4 &rsm_matrix) const
+{
+    drawRSM<DefaultMaterial, 3, 1>(rsm_matrix);
+    drawRSM<AlphaRef, 3, 1>(rsm_matrix);
+    drawRSM<NormalMat, 3, 1>(rsm_matrix);
+    drawRSM<UnlitMat, 3, 1>(rsm_matrix);
+    drawRSM<DetailMat, 3, 1>(rsm_matrix);
+    drawRSM<SplattingMat, 1>(rsm_matrix);    
+}
+
+
+// ----------------------------------------------------------------------------
+void IndirectDrawPolicy::drawNormals(const DrawCalls& draw_calls) const
+{
+    draw_calls.drawIndirectNormals();
+}
+
+// ----------------------------------------------------------------------------
+void IndirectDrawPolicy::drawShadows(const DrawCalls& draw_calls, unsigned cascade) const
+{
+    draw_calls.drawIndirectShadows(cascade);
+}
+
+// ----------------------------------------------------------------------------
+void IndirectDrawPolicy::drawReflectiveShadowMap(const DrawCalls& draw_calls,
+                                                 const core::matrix4 &rsm_matrix) const
+{
+    drawRSM<SplattingMat, 1>(rsm_matrix); //TODO: add instanced splatting RSM shader
+    draw_calls.drawIndirectReflectiveShadowMaps(rsm_matrix);    
+}
+
+// ----------------------------------------------------------------------------
+void MultidrawPolicy::drawNormals(const DrawCalls& draw_calls) const
+{
+    draw_calls.multidrawNormals();
+}
+
+// ----------------------------------------------------------------------------
+void MultidrawPolicy::drawShadows(const DrawCalls& draw_calls, unsigned cascade) const
+{
+    draw_calls.multidrawShadows(cascade);
+}
+
+// ----------------------------------------------------------------------------
+void MultidrawPolicy::drawReflectiveShadowMap(const DrawCalls& draw_calls,
+                                              const core::matrix4 &rsm_matrix) const
+{
+    drawRSM<SplattingMat, 1>(rsm_matrix); //TODO: add instanced splatting RSM shader
+    draw_calls.multidrawReflectiveShadowMaps(rsm_matrix);    
+}
+
+
+// ----------------------------------------------------------------------------
+void AbstractGeometryPasses::prepareShadowRendering(const FrameBuffer& shadow_framebuffer) const
+{
+    glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    
+    shadow_framebuffer.bind();
+    if (!CVS->isESMEnabled())
+    {
+        glDrawBuffer(GL_NONE);
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.5, 50.);
+    }
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+
+    glClearColor(1., 1., 1., 1.);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glClearColor(0., 0., 0., 0.);    
+}
+
+void AbstractGeometryPasses::shadowPostProcessing(const ShadowMatrices& shadow_matrices,
+                                          const FrameBuffer& shadow_framebuffer) const
+{
+    ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SHADOW_POSTPROCESS));
+
+    if (CVS->isARBTextureViewUsable())
+    {
+        const std::pair<float, float>* shadow_scales 
+            = shadow_matrices.getShadowScales();
+
+        for (unsigned i = 0; i < 2; i++)
+        {
+            irr_driver->getPostProcessing()->renderGaussian6BlurLayer(
+                shadow_framebuffer, i,
+                2.f * shadow_scales[0].first / shadow_scales[i].first,
+                2.f * shadow_scales[0].second / shadow_scales[i].second);
+        }
+    }
+    glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_framebuffer.getRTT()[0]);
+    glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+}
+
+
+AbstractGeometryPasses::AbstractGeometryPasses()
+{
+    m_displace_tex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");    
+}
+
+// ----------------------------------------------------------------------------
+void AbstractGeometryPasses::renderSolidFirstPass(const DrawCalls& draw_calls)
+{
+    m_wind_dir = getWindDir(); //TODO: why this function instead of Wind::getWind()?
+
+    {
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
+        irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
+
+        draw_calls.renderImmediateDrawList();
+
+        //TODO: is it useful if AZDO enabled?
+        renderMeshes1stPass<DefaultMaterial, 2, 1>(draw_calls);
+        renderMeshes1stPass<SplattingMat, 2, 1>(draw_calls);
+        renderMeshes1stPass<UnlitMat, 3, 2, 1>(draw_calls);
+        renderMeshes1stPass<AlphaRef, 3, 2, 1>(draw_calls);
+        renderMeshes1stPass<GrassMat, 3, 2, 1>(draw_calls);
+        renderMeshes1stPass<NormalMat, 2, 1>(draw_calls);
+        renderMeshes1stPass<SphereMap, 2, 1>(draw_calls);
+        renderMeshes1stPass<DetailMat, 2, 1>(draw_calls);
+
+        if (CVS->isAZDOEnabled())
+        {
+            draw_calls.multidrawSolidFirstPass();
+        }
+        else if (CVS->supportsIndirectInstancingRendering())
+        {
+            draw_calls.drawIndirectSolidFirstPass();
+        }
+    }
+}   // renderSolidFirstPass
+
+
+
+// ----------------------------------------------------------------------------
+void AbstractGeometryPasses::renderSolidSecondPass( const DrawCalls& draw_calls,
                                             unsigned render_target_diffuse,
                                             unsigned render_target_specular,
                                             unsigned render_target_half_red)
@@ -321,24 +479,9 @@ void GeometryPasses::renderSolidSecondPass( const DrawCalls& draw_calls,
     }
 }   // renderSolidSecondPass
 
-
-// ----------------------------------------------------------------------------
-void GeometryPasses::renderNormalsVisualisation(const DrawCalls& draw_calls)
-{
-    if (CVS->isAZDOEnabled()) {
-        draw_calls.multidrawNormals();
-    }
-    else if (CVS->supportsIndirectInstancingRendering())
-    {
-        draw_calls.drawIndirectNormals();
-    }
-}   // renderNormalsVisualisation
-
-
-
 // ----------------------------------------------------------------------------
 
-void GeometryPasses::renderGlow(const DrawCalls& draw_calls, const std::vector<GlowData>& glows)
+void AbstractGeometryPasses::renderGlow(const DrawCalls& draw_calls, const std::vector<GlowData>& glows)
 {
     irr_driver->getSceneManager()->setCurrentRendertime(scene::ESNRP_SOLID);
     irr_driver->getRTT()->getFBO(FBO_TMP1_WITH_DS).bind();
@@ -437,7 +580,7 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
 }   // renderTransparenPass
 
 // ----------------------------------------------------------------------------
-void GeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsigned render_target)
+void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsigned render_target)
 {
 
     glEnable(GL_DEPTH_TEST);
@@ -572,145 +715,5 @@ void GeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsigned ren
 
 }   // renderTransparent
 
-// ----------------------------------------------------------------------------
-template<typename T, int...List>
-void renderShadow(unsigned cascade)
-{
-    auto &t = T::List::getInstance()->Shadows[cascade];
-    T::ShadowPassShader::getInstance()->use();
-    if (CVS->isARBBaseInstanceUsable())
-        glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
-    for (unsigned i = 0; i < t.size(); i++)
-    {
-        GLMesh *mesh = STK::tuple_get<0>(t.at(i));
-        if (!CVS->isARBBaseInstanceUsable())
-            glBindVertexArray(mesh->vao);
-        if (CVS->isAZDOEnabled())
-            HandleExpander<typename T::ShadowPassShader>::template expand(mesh->TextureHandles, T::ShadowTextures);
-        else
-            TexExpander<typename T::ShadowPassShader>::template expandTex(*mesh, T::ShadowTextures);
-        CustomUnrollArgs<List...>::template drawMesh<typename T::ShadowPassShader>(t.at(i), cascade);
-    }   // for i
-}   // renderShadow
-
-// ----------------------------------------------------------------------------
-void GeometryPasses::renderShadows(const DrawCalls& draw_calls,
-                                   const ShadowMatrices& shadow_matrices,
-                                   const FrameBuffer& shadow_framebuffer)
-{
-    glDepthFunc(GL_LEQUAL);
-    glDepthMask(GL_TRUE);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-    
-    shadow_framebuffer.bind();
-    if (!CVS->isESMEnabled())
-    {
-        glDrawBuffer(GL_NONE);
-        glEnable(GL_POLYGON_OFFSET_FILL);
-        glPolygonOffset(1.5, 50.);
-    }
-    glCullFace(GL_BACK);
-    glEnable(GL_CULL_FACE);
-
-    glClearColor(1., 1., 1., 1.);
-    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glClearColor(0., 0., 0., 0.);
-
-    for (unsigned cascade = 0; cascade < 4; cascade++)
-    {
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SHADOWS_CASCADE0 + cascade));
-
-        //TODO: useless if indirect instancing rendering or AZDO
-        renderShadow<DefaultMaterial, 1>(cascade);
-        renderShadow<SphereMap, 1>(cascade);
-        renderShadow<DetailMat, 1>(cascade);
-        //renderShadow<SplattingMat, 1>(cascade);
-        renderShadow<NormalMat, 1>(cascade);
-        renderShadow<AlphaRef, 1>(cascade);
-        renderShadow<UnlitMat, 1>(cascade);
-        renderShadow<GrassMat, 3, 1>(cascade);
-
-        if (CVS->isAZDOEnabled())
-        {
-            draw_calls.multidrawShadows(cascade);
-        }
-        else if (CVS->supportsIndirectInstancingRendering())
-        {
-            draw_calls.drawIndirectShadows(cascade);
-        }
-    }
-
-    glDisable(GL_POLYGON_OFFSET_FILL);
-
-    if (CVS->isESMEnabled())
-    {
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SHADOW_POSTPROCESS));
-
-        if (CVS->isARBTextureViewUsable())
-        {
-            const std::pair<float, float>* shadow_scales 
-                = shadow_matrices.getShadowScales();
-
-            for (unsigned i = 0; i < 2; i++)
-            {
-                irr_driver->getPostProcessing()->renderGaussian6BlurLayer(
-                    shadow_framebuffer, i,
-                    2.f * shadow_scales[0].first / shadow_scales[i].first,
-                    2.f * shadow_scales[0].second / shadow_scales[i].second);
-            }
-        }
-        glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_framebuffer.getRTT()[0]);
-        glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-    }
-}   // renderShadows
 
 
-// ----------------------------------------------------------------------------
-template<typename T, int... Selector>
-void drawRSM(const core::matrix4 & rsm_matrix)
-{
-    T::RSMShader::getInstance()->use();
-    if (CVS->isARBBaseInstanceUsable())
-        glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
-    auto t = T::List::getInstance()->RSM;
-    for (unsigned i = 0; i < t.size(); i++)
-    {
-        std::vector<GLuint> Textures;
-        GLMesh *mesh = STK::tuple_get<0>(t.at(i));
-        if (!CVS->isARBBaseInstanceUsable())
-            glBindVertexArray(mesh->vao);
-        if (CVS->isAZDOEnabled())
-            HandleExpander<typename T::RSMShader>::template expand(mesh->TextureHandles, T::RSMTextures);
-        else
-            TexExpander<typename T::RSMShader>::template expandTex(*mesh, T::RSMTextures);
-        CustomUnrollArgs<Selector...>::template drawMesh<typename T::RSMShader>(t.at(i), rsm_matrix);
-    }
-}   // drawRSM
-
-// ----------------------------------------------------------------------------
-void GeometryPasses::renderReflectiveShadowMap(const DrawCalls& draw_calls,
-                                               const ShadowMatrices& shadow_matrices,
-                                               const FrameBuffer& reflective_shadow_map_framebuffer)
-{
-    ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_RSM));
-    reflective_shadow_map_framebuffer.bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    const core::matrix4 &rsm_matrix = shadow_matrices.getRSMMatrix();
-    drawRSM<DefaultMaterial, 3, 1>(rsm_matrix);
-    drawRSM<AlphaRef, 3, 1>(rsm_matrix);
-    drawRSM<NormalMat, 3, 1>(rsm_matrix);
-    drawRSM<UnlitMat, 3, 1>(rsm_matrix);
-    drawRSM<DetailMat, 3, 1>(rsm_matrix);
-    drawRSM<SplattingMat, 1>(rsm_matrix);
-
-    if (CVS->isAZDOEnabled())
-    {
-        draw_calls.multidrawReflectiveShadowMaps(rsm_matrix);
-    }
-    else if (CVS->supportsIndirectInstancingRendering())
-    {
-        draw_calls.drawIndirectReflectiveShadowMaps(rsm_matrix);
-    }
-}   // renderRSM
