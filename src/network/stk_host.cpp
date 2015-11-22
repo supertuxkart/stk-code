@@ -399,6 +399,23 @@ int STKHost::mustStopListening()
     return 1;
 }   // mustStopListening
 
+// --------------------------------------------------------------------
+/** Returns true if this instance is allowed to control the server.
+ */
+bool STKHost::isAuthorisedToControl() const 
+{
+    // If we are not properly connected (i.e. only enet connection, but not
+    // stk logic), no peer is authorised.
+    if(m_peers.size()==0)
+        return false;
+
+    return true;
+
+    // Does not yet work: m_peers[0] has address 0xcdcdcdcd
+    Server *server = ServersManager::get()->getJoinedServer();
+    return m_peers[0]->getAddress() == server->getAddress().getIP();
+}   // isAuthorisedToControl
+
 // ----------------------------------------------------------------------------
 /** \brief Thread function checking if data is received.
  *  This function tries to get data from network low-level functions as
@@ -432,7 +449,8 @@ void* STKHost::mainLoop(void* self)
             if (event.type == ENET_EVENT_TYPE_NONE)
                 continue;
 
-            // Create an STKEvent with the event data
+            // Create an STKEvent with the event data. This will also
+            // create the peer if it doesn't exist already
             Event* stk_event = new Event(&event);
             if (stk_event->getType() == EVENT_TYPE_MESSAGE)
                 Network::logPacket(stk_event->data(), true);
@@ -442,8 +460,6 @@ void* STKHost::mainLoop(void* self)
             STKPeer* peer = stk_event->getPeer();
             if (stk_event->getType() == EVENT_TYPE_CONNECTED)
             {
-                // Add the new peer:
-                myself->m_peers.push_back(peer);
                 Log::info("STKHost", "A client has just connected. There are "
                           "now %lu peers.", myself->m_peers.size());
                 Log::debug("STKHost", "Addresses are : %lx, %lx",
