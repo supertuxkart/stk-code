@@ -819,12 +819,19 @@ struct DetailMat
 // ----------------------------------------------------------------------------
 struct SplattingMat
 {
+    typedef InstancedObjectPass1Shader InstancedFirstPassShader;
+    //TODO: InstancedSecondPassShader
+    typedef InstancedShadowShader InstancedShadowPassShader;
+    //TODO: InstancedRSMShader
+
     typedef Shaders::ObjectPass1Shader FirstPassShader;
     typedef SplattingShader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
     typedef SplattingRSMShader RSMShader;
     typedef ListMatSplatting List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
+    static const enum Material::ShaderType MaterialType
+                                          = Material::SHADERTYPE_SPLATTING;
     static const STK::Tuple<size_t> FirstPassTextures;
     static const STK::Tuple<size_t, size_t, size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;

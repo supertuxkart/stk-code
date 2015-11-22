@@ -182,6 +182,8 @@ void ShadowCommandBuffer::fill(MeshMap *mesh_map)
                                            + Material::SHADERTYPE_DETAIL_MAP);
         shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
                                            + Material::SHADERTYPE_VEGETATION);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_SPLATTING);
     }
     
     fillInstanceData<InstanceDataSingleTex>(mesh_map, shadow_tex_material_list, InstanceTypeShadow);

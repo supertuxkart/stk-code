@@ -248,14 +248,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
             {
                 for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
-                    if (Mat != Material::SHADERTYPE_SPLATTING)
-                        m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].emplace_back(mesh, Node);
-                    else
-                    {
-                        core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
-                        ModelMatrix.getInverse(InvModelMatrix);
-                        ListMatSplatting::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix);
-                    }
+                    m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].emplace_back(mesh, Node);
                 }
             }
             else
