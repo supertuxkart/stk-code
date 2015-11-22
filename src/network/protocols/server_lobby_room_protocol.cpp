@@ -85,6 +85,7 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         switch(message_type)
         {
         case LE_CONNECTION_REQUESTED: connectionRequested(event); break;
+        case LE_REQUEST_BEGIN: startSelection();                  break;
         case LE_KART_SELECTION: kartSelectionRequested(event);    break;
         case LE_VOTE_MAJOR: playerMajorVote(event);               break;
         case LE_VOTE_RACE_COUNT: playerRaceCountVote(event);      break;
@@ -169,7 +170,7 @@ void ServerLobbyRoomProtocol::callback(Protocol *protocol)
 
 //-----------------------------------------------------------------------------
 /** Register this server (i.e. its public address) with the STK server
- *  so that clients can find it. It blocks till a responsce from the
+ *  so that clients can find it. It blocks till a response from the
  *  stk server is received (this function is executed from the 
  *  ProtocolManager thread). The information about this client is added
  *  to the table 'server'.

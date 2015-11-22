@@ -32,31 +32,33 @@
  */
 class LobbyRoomProtocol : public Protocol
 {
-protected:
-    /** The game setup. */
-    GameSetup* m_setup;
-
+public:
     /** Lists all lobby events (LE). */
     enum 
     { 
         LE_CONNECTION_REQUESTED   = 1,
-        LE_NEW_PLAYER_CONNECTED   = 0x01,
-        LE_KART_SELECTION         = 2,
-        LE_PLAYER_DISCONNECTED    = 0x02,
-        LE_KART_SELECTION_UPDATE  = 0x03,
-        LE_START_RACE             = 0x04,
-        LE_START_SELECTION        = 0x05,
-        LE_RACE_FINISHED          = 0x06,
-        LE_CONNECTION_REFUSED     = 0x80,
-        LE_CONNECTION_ACCEPTED    = 0x81,
-        LE_KART_SELECTION_REFUSED = 0x82,
-        LE_VOTE_MAJOR             = 0xc0,
-        LE_VOTE_RACE_COUNT        = 0xc1,
-        LE_VOTE_MINOR             = 0xc2,
-        LE_VOTE_TRACK             = 0xc3,
-        LE_VOTE_REVERSE           = 0xc4,
-        LE_VOTE_LAPS              = 0xc5,
+        LE_REQUEST_BEGIN,
+        LE_NEW_PLAYER_CONNECTED,
+        LE_KART_SELECTION,
+        LE_PLAYER_DISCONNECTED,
+        LE_KART_SELECTION_UPDATE,
+        LE_START_RACE,
+        LE_START_SELECTION,
+        LE_RACE_FINISHED,
+        LE_CONNECTION_REFUSED,
+        LE_CONNECTION_ACCEPTED,
+        LE_KART_SELECTION_REFUSED,
+        LE_VOTE_MAJOR,
+        LE_VOTE_RACE_COUNT,
+        LE_VOTE_MINOR,
+        LE_VOTE_TRACK,
+        LE_VOTE_REVERSE,
+        LE_VOTE_LAPS,
     };
+
+protected:
+    /** The game setup. */
+    GameSetup* m_setup;
 
 
 public:

@@ -25,7 +25,11 @@
                 </box>
                 <spacer width="20" height="20"/>
                 <box id="actions" proportion="1" height="100%" layout="vertical-row">
-                    <label I18N="In networking lobby" word_wrap="true" text="actions" align="center" text-align="center"/>
+<!--                    <label I18N="In networking lobby" word_wrap="true" text="actions" align="center" text-align="center"/>
+-->
+                  <icon-button id="start" width="64" height="64" icon="gui/green_check.png"
+                      I18N="In the network lobby" text="Start Race"/>
+
                 </box>
             </div>
         </div>

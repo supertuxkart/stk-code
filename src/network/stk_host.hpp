@@ -24,6 +24,7 @@
 
 #include "network/network.hpp"
 #include "network/network_string.hpp"
+#include "network/servers_manager.hpp"
 #include "network/transport_address.hpp"
 #include "utils/synchronised.hpp"
 
@@ -146,6 +147,7 @@ public:
     int         mustStopListening();
     uint16_t    getPort() const;
     void        setErrorMessage(const irr::core::stringw &message);
+    bool        isAuthorisedToControl() const;
     const irr::core::stringw& 
                 getErrorMessage() const;
 
@@ -201,7 +203,7 @@ public:
     {
         return m_is_registered;
     }   // isRegistered
-
+    // --------------------------------------------------------------------
 };   // class STKHost
 
 #endif // STK_HOST_HPP
