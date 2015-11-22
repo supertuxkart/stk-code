@@ -102,6 +102,10 @@ enum DebugMenuCommand
     DEBUG_GUI_CAM_NORMAL,
     DEBUG_GUI_CAM_SMOOTH,
     DEBUG_GUI_CAM_ATTACH,
+    DEBUG_VIEW_KART_ONE,
+    DEBUG_VIEW_KART_TWO,
+    DEBUG_VIEW_KART_THREE,
+    DEBUG_VIEW_KART_FOUR,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
@@ -154,7 +158,27 @@ void addAttachment(Attachment::AttachmentType type)
 
 }   // addAttachment
 
+// ----------------------------------------------------------------------------
+void changeCameraTarget(u32 num)
+{
+    World* world = World::getWorld();
+    Camera *cam = Camera::getActiveCamera();
+    if (world == NULL || cam == NULL) return;
+
+    if ((num - 1) < (world->getNumKarts() + 1))
+    {
+        AbstractKart* kart = world->getKart(num - 1);
+        if (kart->isEliminated()) return;
+        cam->setMode(Camera::CM_NORMAL);
+        cam->setKart(kart);
+    }
+    else
+        return;
+
+}   // changeCameraTarget
+
 // -----------------------------------------------------------------------------
+
 /** returns the light node with the lowest distance to the player kart (excluding
  * nitro emitters) */
 LightNode* findNearestLight()
@@ -452,6 +476,22 @@ bool handleContextMenuAction(s32 cmdID)
         Camera *cam = Camera::getActiveCamera();
         cam->setAttachedFpsCam(!cam->getAttachedFpsCam());
     }
+    else if (cmdID == DEBUG_VIEW_KART_ONE)
+    {
+        changeCameraTarget(1);
+    }
+    else if (cmdID == DEBUG_VIEW_KART_TWO)
+    {
+        changeCameraTarget(2);
+    }
+    else if (cmdID == DEBUG_VIEW_KART_THREE)
+    {
+        changeCameraTarget(3);
+    }
+    else if (cmdID == DEBUG_VIEW_KART_FOUR)
+    {
+        changeCameraTarget(4);
+    }
     else if (cmdID == DEBUG_PRINT_START_POS)
     {
         if (!world) return false;
@@ -642,6 +682,13 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Normal view (Ctrl + F2)", DEBUG_GUI_CAM_NORMAL);
             sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
             sub->addItem(L"Attach fps camera to kart", DEBUG_GUI_CAM_ATTACH);
+
+            mnu->addItem(L"Change camera target >",-1,true, true);
+            sub = mnu->getSubMenu(4);
+            sub->addItem(L"To kart one", DEBUG_VIEW_KART_ONE);
+            sub->addItem(L"To kart two", DEBUG_VIEW_KART_TWO);
+            sub->addItem(L"To kart three", DEBUG_VIEW_KART_THREE);
+            sub->addItem(L"To kart four", DEBUG_VIEW_KART_FOUR);
 
             mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 

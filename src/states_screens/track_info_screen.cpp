@@ -156,7 +156,13 @@ void TrackInfoScreen::init()
         if (num_ai < 0) num_ai = 0;
         m_ai_kart_spinner->setValue(num_ai);
         race_manager->setNumKarts(num_ai + race_manager->getNumLocalPlayers());
-        m_ai_kart_spinner->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers());
+        // Currently battle arena only has 4 starting position
+        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+        {
+            m_ai_kart_spinner->setMax(4 - race_manager->getNumLocalPlayers());
+        }
+        else
+            m_ai_kart_spinner->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers());
         // A ftl reace needs at least three karts to make any sense
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {

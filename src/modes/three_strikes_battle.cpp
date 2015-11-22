@@ -21,6 +21,7 @@
 #include <IMeshSceneNode.h>
 
 #include "audio/music_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
@@ -178,7 +179,8 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
         if(wheels[1]) wheels[1]->setVisible(false);
         if(wheels[2]) wheels[2]->setVisible(false);
         if(wheels[3]) wheels[3]->setVisible(false);
-        eliminateKart(kart_id, /*notify_of_elimination*/ true);
+        if (getCurrentNumPlayers())
+            eliminateKart(kart_id, /*notify_of_elimination*/ true);
         // Find a camera of the kart with the most lives ("leader"), and
         // attach all cameras for this kart to the leader.
         int max_lives = 0;
@@ -196,7 +198,7 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
         }
         // leader could be 0 if the last two karts hit each other in
         // the same frame
-        if(leader)
+        if(leader && getCurrentNumPlayers())
         {
             for(unsigned int i=0; i<Camera::getNumCameras(); i++)
             {
@@ -418,7 +420,9 @@ void ThreeStrikesBattle::updateKartRanks()
 bool ThreeStrikesBattle::isRaceOver()
 {
     // for tests : never over when we have a single player there :)
-    if (race_manager->getNumPlayers() < 2)
+    if (race_manager->getNumberOfKarts()==1 &&
+        getCurrentNumKarts()==1 &&
+        UserConfigParams::m_artist_debug_mode)
     {
         return false;
     }
@@ -432,6 +436,8 @@ bool ThreeStrikesBattle::isRaceOver()
  */
 void ThreeStrikesBattle::updateKartNodes()
 {
+    if (isRaceOver()) return;
+
     const unsigned int n = getNumKarts();
     for(unsigned int i=0; i<n; i++)
     {

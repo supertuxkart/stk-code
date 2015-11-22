@@ -18,15 +18,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-//#define AI_DEBUG
-#include <iostream>
-using namespace std;
-
+#undef AI_DEBUG
 #include "karts/controller/battle_ai.hpp"
 
-//#ifdef AI_DEBUG
+#ifdef AI_DEBUG
 #include "graphics/irr_driver.hpp"
-//#endif
+#endif
 
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
@@ -201,7 +198,7 @@ void BattleAI::handleSteering(const float dt)
         }
     }
 
-    //After this AI kart has a powerup, try to follow a closet kart in the map
+    // After this AI kart has a powerup, try to follow a closest kart in the map
     findClosestKart(&m_target_point , &m_target_node);
     if (m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
@@ -252,7 +249,7 @@ void BattleAI::findClosestKart(Vec3* aim_point, int* target_node)
         const AbstractKart* kart = m_world->getKart(i);
         if(kart->isEliminated()) continue;
 
-        if (kart->getXYZ() == m_kart->getXYZ())
+        if (kart->getWorldKartId() == m_kart->getWorldKartId())
             continue; // Skip the same kart
 
         Vec3 d = kart->getXYZ() - m_kart->getXYZ();
