@@ -411,9 +411,28 @@ bool STKHost::isAuthorisedToControl() const
 
     return true;
 
-    // Does not yet work: m_peers[0] has address 0xcdcdcdcd
+    // FIXME Does not yet work: m_peers[0] has address 0xcdcdcdcd on client
     Server *server = ServersManager::get()->getJoinedServer();
     return m_peers[0]->getAddress() == server->getAddress().getIP();
+}   // isAuthorisedToControl
+
+// ----------------------------------------------------------------------------
+/** Server-side check if the client sending a command is really authorised 
+ *  to do so.
+ *  \param peer Peer sending the command.
+ */
+bool STKHost::isAuthorisedToControl(const STKPeer *peer) const 
+{
+    // If we are not properly connected (i.e. only enet connection, but not
+    // stk logic), no peer is authorised.
+    if(m_peers.size()==0)
+        return false;
+
+    //FIXME
+    return true;
+
+    // getAddress returns 0 on server
+   return peer->getAddress()==getAddress();
 }   // isAuthorisedToControl
 
 // ----------------------------------------------------------------------------

@@ -85,7 +85,7 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         switch(message_type)
         {
         case LE_CONNECTION_REQUESTED: connectionRequested(event); break;
-        case LE_REQUEST_BEGIN: startSelection();                  break;
+        case LE_REQUEST_BEGIN: startSelection(event);             break;
         case LE_KART_SELECTION: kartSelectionRequested(event);    break;
         case LE_VOTE_MAJOR: playerMajorVote(event);               break;
         case LE_VOTE_RACE_COUNT: playerRaceCountVote(event);      break;
@@ -229,9 +229,18 @@ void ServerLobbyRoomProtocol::startGame()
 }   // startGame
 
 //-----------------------------------------------------------------------------
-
-void ServerLobbyRoomProtocol::startSelection()
+/** Instructs all clients to start the kart selection. If event is not NULL,
+ *  the command comes from a client (which needs to be authorised).
+ */
+void ServerLobbyRoomProtocol::startSelection(const Event *event)
 {
+    if(event && !STKHost::get()->isAuthorisedToControl(event->getPeer()))
+    {
+        Log::warn("ServerLobby", 
+                  "Client %lx is not authorised to start selection.",
+                  event->getPeer());
+        return;
+    }
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {

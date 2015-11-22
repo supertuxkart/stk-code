@@ -49,7 +49,7 @@ public:
     virtual void asynchronousUpdate() {};
 
     void startGame();
-    void startSelection();
+    void startSelection(const Event *event=NULL);
     void checkIncomingConnectionRequests();
     void checkRaceFinished();
 
