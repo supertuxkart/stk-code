@@ -214,8 +214,6 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         STKHost::get()->deleteAllPeers();
         ProtocolManager::getInstance()->requestTerminate(this);
         STKHost::get()->reset();
-        // probably the same as m_server
-        STKHost::get()->removePeer(event->getPeer());
         return true;
     } // disconnection
     return false;
