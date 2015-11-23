@@ -370,14 +370,6 @@ void ConnectToServer::handleSameLAN()
     STKHost* host = STKHost::get();
     host->stopListening(); // stop the listening
 
-#ifdef XX
-    TransportAddress broadcast_address;
-    broadcast_address.setIP(-1); // 255.255.255.255
-    broadcast_address.setPort(7321);
-    char data2[] = "aloha_stk\0";
-    host->sendRawPacket((uint8_t*)(data2), 10, broadcast_address);
-#endif
-
     Log::info("ConnectToServer", "Waiting broadcast message.");
 
     TransportAddress sender;
