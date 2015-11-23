@@ -408,12 +408,10 @@ bool STKHost::isAuthorisedToControl() const
     // stk logic), no peer is authorised.
     if(m_peers.size()==0)
         return false;
-
-    return true;
-
-    // FIXME Does not yet work: m_peers[0] has address 0xcdcdcdcd on client
     Server *server = ServersManager::get()->getJoinedServer();
-    return m_peers[0]->getAddress() == server->getAddress().getIP();
+    return NetworkConfig::get()->getMyAddress().getIP() == 
+            server->getAddress().getIP();
+
 }   // isAuthorisedToControl
 
 // ----------------------------------------------------------------------------
@@ -427,12 +425,9 @@ bool STKHost::isAuthorisedToControl(const STKPeer *peer) const
     // stk logic), no peer is authorised.
     if(m_peers.size()==0)
         return false;
-
-    //FIXME
+    // FIXME peer has ip 0
     return true;
-
-    // getAddress returns 0 on server
-   return peer->getAddress()==getAddress();
+    return peer->getAddress()==NetworkConfig::get()->getMyAddress().getIP();
 }   // isAuthorisedToControl
 
 // ----------------------------------------------------------------------------
