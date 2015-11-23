@@ -29,10 +29,10 @@
  *  \return The key of type S that has the highest second value.
  */
 template<typename S>
-S getHighestInHistogram(std::map<S,int>* histogram, S default)
+S getHighestInHistogram(std::map<S,int>* histogram, S default_value)
 {
     if(histogram->empty())
-        return default;
+        return default_value;
 
     S best_item = histogram->begin()->first;
     uint8_t highest_count = histogram->begin()->second;
