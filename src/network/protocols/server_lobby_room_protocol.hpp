@@ -13,7 +13,8 @@ private:
     {
         NONE,
         GETTING_PUBLIC_ADDRESS,
-        WORKING,
+        ACCEPTING_CLIENTS,
+        SELECTING_KARTS,
         DONE,
         EXITING
     } m_state;

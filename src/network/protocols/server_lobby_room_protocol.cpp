@@ -59,9 +59,10 @@ void ServerLobbyRoomProtocol::setup()
     m_setup             = STKHost::get()->setupNewGame();
     m_next_id           = 0;
 
-    // In case of LAN we don't need our public address or register with the STK
-    // server, so we can directly go to the working state.
-    m_state             = NetworkConfig::get()->isLAN() ? WORKING : NONE;
+    // In case of LAN we don't need our public address or register with the
+    // STK server, so we can directly go to the accepting clients state.
+    m_state             = NetworkConfig::get()->isLAN() ? ACCEPTING_CLIENTS 
+                                                        : NONE;
     m_selection_enabled = false;
     m_in_race           = false;
     m_current_protocol  = NULL;
@@ -134,10 +135,10 @@ void ServerLobbyRoomProtocol::update()
             // to react to any requests before the server is registered.
             registerServer();
             Log::info("ServerLobbyRoomProtocol", "Server registered.");
-            m_state = WORKING;
+            m_state = ACCEPTING_CLIENTS;
         }
         break;
-    case WORKING:
+    case ACCEPTING_CLIENTS:
     {
         // Only poll the STK server if this is a WAN server.
         if(NetworkConfig::get()->isWAN())
@@ -150,6 +151,8 @@ void ServerLobbyRoomProtocol::update()
 
         break;
     }
+    case SELECTING_KARTS:
+        break;   // Nothing to do, this is event based
     case DONE:
         m_state = EXITING;
         requestTerminate();
@@ -250,6 +253,8 @@ void ServerLobbyRoomProtocol::startSelection(const Event *event)
         sendMessage(peers[i], ns, true); // reliably
     }
     m_selection_enabled = true;
+
+    m_state = SELECTING_KARTS;
 }   // startSelection
 
 //-----------------------------------------------------------------------------
@@ -425,7 +430,8 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     uint32_t player_id = 0;
     player_id = data.getUInt32(1);
     // can we add the player ?
-    if (m_setup->getPlayerCount() < NetworkConfig::get()->getMaxPlayers())
+    if (m_setup->getPlayerCount() < NetworkConfig::get()->getMaxPlayers() &&
+        m_state==ACCEPTING_CLIENTS                                           )
     {
         // add the player to the game setup
         m_next_id = m_setup->getPlayerCount();
@@ -479,7 +485,10 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         NetworkString message(3);
         message.ai8(LE_CONNECTION_REFUSED);
         message.ai8(1);               // 1 bytes for the error code
-        message.ai8(0);               // 0 = too much players
+        if(m_state!=ACCEPTING_CLIENTS)
+            message.ai8(2);               // 2 = Busy
+        else
+            message.ai8(0);               // 0 = too many players
         // send only to the peer that made the request
         sendMessage(peer, message);
         Log::verbose("ServerLobbyRoomProtocol", "Player refused");
@@ -500,6 +509,13 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
  */
 void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
 {
+    if(m_state!=SELECTING_KARTS)
+    {
+        Log::warn("Server", "Received kart selection while in state %d.",
+                  m_state);
+        return;
+    }
+
     const NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 6))

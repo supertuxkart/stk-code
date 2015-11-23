@@ -468,6 +468,9 @@ void ClientLobbyRoomProtocol::connectionRefused(Event* event)
     case 1:
         Log::info("ClientLobbyRoomProtocol", "Connection refused : banned.");
         break;
+    case 2:
+        Log::info("ClientLobbyRoomProtocol", "Client busy.");
+        break;
     default:
         Log::info("ClientLobbyRoomProtocol", "Connection refused.");
         break;
