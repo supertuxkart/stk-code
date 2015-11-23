@@ -2455,7 +2455,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 
     if (!CVS->supportsShadows())
     {
-        m_shadow = new Shadow(m_kart_properties, m_node,
+        m_shadow = new Shadow(m_kart_properties.get(), m_node,
                               -m_kart_model->getLowestPoint());
     }
     World::getWorld()->kartAdded(this, m_node);

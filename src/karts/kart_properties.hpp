@@ -19,6 +19,7 @@
 #ifndef HEADER_KART_PROPERTIES_HPP
 #define HEADER_KART_PROPERTIES_HPP
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -63,7 +64,7 @@ private:
      *  reduce dependencies (and therefore compile time) when changing
      *  any AI property. There is one separate object for each
      *  difficulty. */
-    AIProperties *m_ai_properties[RaceManager::DIFFICULTY_COUNT];
+    std::shared_ptr<AIProperties> m_ai_properties[RaceManager::DIFFICULTY_COUNT];
 
     /** The absolute path of the icon texture to use. */
     Material                *m_icon_material;
@@ -212,6 +213,7 @@ public:
 
           KartProperties    (const std::string &filename="");
          ~KartProperties    ();
+    void  copyForPlayer     (const KartProperties *source);
     void  copyFrom          (const KartProperties *source);
     void  getAllData        (const XMLNode * root);
     void  checkAllSet       (const std::string &filename);
@@ -373,7 +375,7 @@ public:
     /** Returns a pointer to the AI properties. */
     const AIProperties *getAIPropertiesForDifficulty() const
     {
-        return m_ai_properties[race_manager->getDifficulty()];
+        return m_ai_properties[race_manager->getDifficulty()].get();
     }   // getAIProperties
 
     // ------------------------------------------------------------------------

@@ -74,7 +74,7 @@ private:
 
 protected:
     /** The kart properties. */
-    const KartProperties *m_kart_properties;
+    std::unique_ptr<KartProperties> m_kart_properties;
 
     /** The per-player difficulty. */
     PerPlayerDifficulty m_difficulty;
@@ -128,10 +128,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the kart properties of this kart. */
     const KartProperties* getKartProperties() const
-                            { return m_kart_properties; }
-    // ------------------------------------------------------------------------
-    /** Sets the kart properties. */
-    void setKartProperties(const KartProperties *kp) { m_kart_properties=kp; }
+                            { return m_kart_properties.get(); }
     // ------------------------------------------------------------------------
     /** Returns the characteristics of this kart. */
     const AbstractCharacteristic* getCharacteristic() const;

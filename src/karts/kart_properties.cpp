@@ -94,14 +94,12 @@ KartProperties::KartProperties(const std::string &filename)
     // The default constructor for stk_config uses filename=""
     if (filename != "")
     {
-        for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
-            m_ai_properties[i]= NULL;
         load(filename, "kart");
     }
     else
     {
-        for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
-            m_ai_properties[i]= new AIProperties((RaceManager::Difficulty)i);
+        for (unsigned int i = 0; i < RaceManager::DIFFICULTY_COUNT; i++)
+            m_ai_properties[i].reset(new AIProperties((RaceManager::Difficulty) i));
     }
 }   // KartProperties
 
@@ -110,19 +108,18 @@ KartProperties::KartProperties(const std::string &filename)
 KartProperties::~KartProperties()
 {
     delete m_kart_model;
-    for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
-        if(m_ai_properties[i])
-            delete m_ai_properties[i];
 }   // ~KartProperties
 
 //-----------------------------------------------------------------------------
-/** Copies this KartProperties to another one. Importnat: if you add any
+/** Copies this KartProperties to another one. Important: if you add any
  *  pointers to kart_properties, the data structure they are pointing to
  *  need to be copied here explicitely!
+ *  The AIProperties won't get cloned here as they don't differ for each player.
+ *  To clone this object for another kart use the copyFrom method.
  *  \param source The source kart properties from which to copy this objects'
  *         values.
  */
-void KartProperties::copyFrom(const KartProperties *source)
+void KartProperties::copyForPlayer(const KartProperties *source)
 {
     *this = *source;
 
@@ -136,10 +133,24 @@ void KartProperties::copyFrom(const KartProperties *source)
         // this object has other pointers (to m_characteristic).
         combineCharacteristics();
     }
+}   // copyForPlayer
 
-    for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
+//-----------------------------------------------------------------------------
+/** Copies this KartProperties to another one. Important: if you add any
+ *  pointers to kart_properties, the data structure they are pointing to
+ *  need to be copied here explicitely!
+ *  \param source The source kart properties from which to copy this objects'
+ *         values.
+ */
+void KartProperties::copyFrom(const KartProperties *source)
+{
+    copyForPlayer(source);
+
+    // Also copy the AIProperties because they can differ for each car
+    // (but not for each player).
+    for (unsigned int i = 0; i < RaceManager::DIFFICULTY_COUNT; i++)
     {
-        m_ai_properties[i] = new AIProperties((RaceManager::Difficulty)i);
+        m_ai_properties[i].reset(new AIProperties((RaceManager::Difficulty) i));
         assert(m_ai_properties);
         *m_ai_properties[i] = *source->m_ai_properties[i];
     }
@@ -337,7 +348,7 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("shadow-x-offset",   &m_shadow_x_offset  );
     root->get("shadow-z-offset",   &m_shadow_z_offset  );
 
-    root->get("type",     &m_kart_type        );
+    root->get("type",              &m_kart_type        );
 
     if(const XMLNode *dimensions_node = root->getNode("center"))
         dimensions_node->get("gravity-shift", &m_gravity_center_shift);
