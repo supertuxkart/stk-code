@@ -281,10 +281,16 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         glClear(GL_COLOR_BUFFER_BIT);
         glDepthMask(GL_FALSE);
     }
-    m_geometry_passes->renderSolidSecondPass(m_draw_calls,
-                                             rtts->getRenderTarget(RTT_DIFFUSE),
-                                             rtts->getRenderTarget(RTT_SPECULAR),
-                                             rtts->getRenderTarget(RTT_HALF1_R));
+    
+        std::vector<GLuint> prefilled_textures =
+            createVector<GLuint>(rtts->getRenderTarget(RTT_DIFFUSE),
+                                 rtts->getRenderTarget(RTT_SPECULAR),
+                                 rtts->getRenderTarget(RTT_HALF1_R),
+                                 irr_driver->getDepthStencilTexture());
+        m_geometry_passes->setFirstPassRenderTargets(prefilled_textures);
+        //TODO: no need to update it every frame
+    
+    m_geometry_passes->renderSolidSecondPass(m_draw_calls);
     PROFILER_POP_CPU_MARKER();
 
     if (irr_driver->getNormals())
@@ -491,7 +497,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 
 
 ShaderBasedRenderer::ShaderBasedRenderer()
-{
+{    
     if (CVS->isAZDOEnabled())
         m_geometry_passes = new GeometryPasses<MultidrawPolicy>();
     else if (CVS->supportsIndirectInstancingRendering())

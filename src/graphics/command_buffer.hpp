@@ -49,7 +49,7 @@ void fillOriginOrientationScale(scene::ISceneNode *node, InstanceData &instance)
     instance.Orientation.Z = Orientation.Z;
     instance.Scale.X = Scale.X;
     instance.Scale.Y = Scale.Y;
-    instance.Scale.Z = Scale.Z;        
+    instance.Scale.Z = Scale.Z;
 }
 
 template<typename InstanceData>

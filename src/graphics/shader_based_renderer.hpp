@@ -20,6 +20,7 @@
 
 #include "graphics/abstract_renderer.hpp"
 #include "graphics/draw_calls.hpp"
+#include "graphics/draw_policies.hpp"
 #include "graphics/geometry_passes.hpp"
 #include "graphics/lighting_passes.hpp"
 #include "graphics/shadow_matrices.hpp"

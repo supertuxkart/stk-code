@@ -133,188 +133,6 @@ namespace RenderGeometry
 using namespace RenderGeometry;
 
 
-
-
-// ----------------------------------------------------------------------------
-template<typename T, int ...List>
-void renderMeshes1stPass(const DrawCalls& draw_calls)
-{
-    auto &meshes = T::List::getInstance()->SolidPass;
-    T::FirstPassShader::getInstance()->use();
-    if (CVS->isARBBaseInstanceUsable())
-        glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
-    for (unsigned i = 0; i < meshes.size(); i++)
-    {
-        GLMesh &mesh = *(STK::tuple_get<0>(meshes.at(i)));
-        if (!CVS->isARBBaseInstanceUsable())
-            glBindVertexArray(mesh.vao);
-        if (mesh.VAOType != T::VertexType)
-        {
-#ifdef DEBUG
-            Log::error("Materials", "Wrong vertex Type associed to pass 1 (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
-#endif
-            continue;
-        }
-
-        if (CVS->isAZDOEnabled())
-            HandleExpander<typename T::FirstPassShader>::template expand(mesh.TextureHandles, T::FirstPassTextures);
-        else
-            TexExpander<typename T::FirstPassShader>::template expandTex(mesh, T::FirstPassTextures);
-        CustomUnrollArgs<List...>::template drawMesh<typename T::FirstPassShader>(meshes.at(i));
-    }
-}   // renderMeshes1stPass
-
-// ----------------------------------------------------------------------------
-template<typename T, int...List>
-void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
-    const std::vector<GLuint> &Prefilled_Tex)
-{
-    auto &meshes = T::List::getInstance()->SolidPass;
-    T::SecondPassShader::getInstance()->use();
-    if (CVS->isARBBaseInstanceUsable())
-        glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
-    for (unsigned i = 0; i < meshes.size(); i++)
-    {
-        GLMesh &mesh = *(STK::tuple_get<0>(meshes.at(i)));
-        if (!CVS->isARBBaseInstanceUsable())
-            glBindVertexArray(mesh.vao);
-
-        if (mesh.VAOType != T::VertexType)
-        {
-#ifdef DEBUG
-            Log::error("Materials", "Wrong vertex Type associed to pass 2 "
-                                    "(hint texture : %s)", 
-                       mesh.textures[0]->getName().getPath().c_str());
-#endif
-            continue;
-        }
-
-        if (CVS->isAZDOEnabled())
-            HandleExpander<typename T::SecondPassShader>::template 
-                expand(mesh.TextureHandles, T::SecondPassTextures, 
-                       Prefilled_Handle[0], Prefilled_Handle[1],
-                       Prefilled_Handle[2]);
-        else
-            TexExpander<typename T::SecondPassShader>::template 
-                expandTex(mesh, T::SecondPassTextures, Prefilled_Tex[0], 
-                          Prefilled_Tex[1], Prefilled_Tex[2]);
-        CustomUnrollArgs<List...>::template drawMesh<typename T::SecondPassShader>(meshes.at(i));
-    }
-}   // renderMeshes2ndPass
-
-// ----------------------------------------------------------------------------
-template<typename T, int...List>
-void renderShadow(unsigned cascade)
-{
-    auto &t = T::List::getInstance()->Shadows[cascade];
-    T::ShadowPassShader::getInstance()->use();
-    if (CVS->isARBBaseInstanceUsable())
-        glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
-    for (unsigned i = 0; i < t.size(); i++)
-    {
-        GLMesh *mesh = STK::tuple_get<0>(t.at(i));
-        if (!CVS->isARBBaseInstanceUsable())
-            glBindVertexArray(mesh->vao);
-        if (CVS->isAZDOEnabled())
-            HandleExpander<typename T::ShadowPassShader>::template expand(mesh->TextureHandles, T::ShadowTextures);
-        else
-            TexExpander<typename T::ShadowPassShader>::template expandTex(*mesh, T::ShadowTextures);
-        CustomUnrollArgs<List...>::template drawMesh<typename T::ShadowPassShader>(t.at(i), cascade);
-    }   // for i
-}   // renderShadow
-
-
-// ----------------------------------------------------------------------------
-template<typename T, int... Selector>
-void drawRSM(const core::matrix4 & rsm_matrix)
-{
-    T::RSMShader::getInstance()->use();
-    if (CVS->isARBBaseInstanceUsable())
-        glBindVertexArray(VAOManager::getInstance()->getVAO(T::VertexType));
-    auto t = T::List::getInstance()->RSM;
-    for (unsigned i = 0; i < t.size(); i++)
-    {
-        std::vector<GLuint> Textures;
-        GLMesh *mesh = STK::tuple_get<0>(t.at(i));
-        if (!CVS->isARBBaseInstanceUsable())
-            glBindVertexArray(mesh->vao);
-        if (CVS->isAZDOEnabled())
-            HandleExpander<typename T::RSMShader>::template expand(mesh->TextureHandles, T::RSMTextures);
-        else
-            TexExpander<typename T::RSMShader>::template expandTex(*mesh, T::RSMTextures);
-        CustomUnrollArgs<Selector...>::template drawMesh<typename T::RSMShader>(t.at(i), rsm_matrix);
-    }
-}   // drawRSM
-
-
-
-// ----------------------------------------------------------------------------
-void GL3DrawPolicy::drawShadows(const DrawCalls& draw_calls, unsigned cascade) const
-{
-    renderShadow<DefaultMaterial, 1>(cascade);
-    renderShadow<SphereMap, 1>(cascade);
-    renderShadow<DetailMat, 1>(cascade);
-    renderShadow<SplattingMat, 1>(cascade);
-    renderShadow<NormalMat, 1>(cascade);
-    renderShadow<AlphaRef, 1>(cascade);
-    renderShadow<UnlitMat, 1>(cascade);
-    renderShadow<GrassMat, 3, 1>(cascade);    
-}
-
-// ----------------------------------------------------------------------------
-void GL3DrawPolicy::drawReflectiveShadowMap(const DrawCalls& draw_calls,
-                                            const core::matrix4 &rsm_matrix) const
-{
-    drawRSM<DefaultMaterial, 3, 1>(rsm_matrix);
-    drawRSM<AlphaRef, 3, 1>(rsm_matrix);
-    drawRSM<NormalMat, 3, 1>(rsm_matrix);
-    drawRSM<UnlitMat, 3, 1>(rsm_matrix);
-    drawRSM<DetailMat, 3, 1>(rsm_matrix);
-    drawRSM<SplattingMat, 1>(rsm_matrix);    
-}
-
-
-// ----------------------------------------------------------------------------
-void IndirectDrawPolicy::drawNormals(const DrawCalls& draw_calls) const
-{
-    draw_calls.drawIndirectNormals();
-}
-
-// ----------------------------------------------------------------------------
-void IndirectDrawPolicy::drawShadows(const DrawCalls& draw_calls, unsigned cascade) const
-{
-    draw_calls.drawIndirectShadows(cascade);
-}
-
-// ----------------------------------------------------------------------------
-void IndirectDrawPolicy::drawReflectiveShadowMap(const DrawCalls& draw_calls,
-                                                 const core::matrix4 &rsm_matrix) const
-{
-    drawRSM<SplattingMat, 1>(rsm_matrix); //TODO: add instanced splatting RSM shader
-    draw_calls.drawIndirectReflectiveShadowMaps(rsm_matrix);    
-}
-
-// ----------------------------------------------------------------------------
-void MultidrawPolicy::drawNormals(const DrawCalls& draw_calls) const
-{
-    draw_calls.multidrawNormals();
-}
-
-// ----------------------------------------------------------------------------
-void MultidrawPolicy::drawShadows(const DrawCalls& draw_calls, unsigned cascade) const
-{
-    draw_calls.multidrawShadows(cascade);
-}
-
-// ----------------------------------------------------------------------------
-void MultidrawPolicy::drawReflectiveShadowMap(const DrawCalls& draw_calls,
-                                              const core::matrix4 &rsm_matrix) const
-{
-    drawRSM<SplattingMat, 1>(rsm_matrix); //TODO: add instanced splatting RSM shader
-    draw_calls.multidrawReflectiveShadowMaps(rsm_matrix);    
-}
-
-
 // ----------------------------------------------------------------------------
 void AbstractGeometryPasses::prepareShadowRendering(const FrameBuffer& shadow_framebuffer) const
 {
@@ -363,124 +181,30 @@ void AbstractGeometryPasses::shadowPostProcessing(const ShadowMatrices& shadow_m
 
 AbstractGeometryPasses::AbstractGeometryPasses()
 {
-    m_displace_tex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");    
+    m_displace_tex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
 }
 
 // ----------------------------------------------------------------------------
-void AbstractGeometryPasses::renderSolidFirstPass(const DrawCalls& draw_calls)
-{
-    m_wind_dir = getWindDir(); //TODO: why this function instead of Wind::getWind()?
-
-    {
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
-        irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
-
-        draw_calls.renderImmediateDrawList();
-
-        //TODO: is it useful if AZDO enabled?
-        renderMeshes1stPass<DefaultMaterial, 2, 1>(draw_calls);
-        renderMeshes1stPass<SplattingMat, 2, 1>(draw_calls);
-        renderMeshes1stPass<UnlitMat, 3, 2, 1>(draw_calls);
-        renderMeshes1stPass<AlphaRef, 3, 2, 1>(draw_calls);
-        renderMeshes1stPass<GrassMat, 3, 2, 1>(draw_calls);
-        renderMeshes1stPass<NormalMat, 2, 1>(draw_calls);
-        renderMeshes1stPass<SphereMap, 2, 1>(draw_calls);
-        renderMeshes1stPass<DetailMat, 2, 1>(draw_calls);
-
-        if (CVS->isAZDOEnabled())
-        {
-            draw_calls.multidrawSolidFirstPass();
-        }
-        else if (CVS->supportsIndirectInstancingRendering())
-        {
-            draw_calls.drawIndirectSolidFirstPass();
-        }
-    }
-}   // renderSolidFirstPass
-
-
-
-// ----------------------------------------------------------------------------
-void AbstractGeometryPasses::renderSolidSecondPass( const DrawCalls& draw_calls,
-                                            unsigned render_target_diffuse,
-                                            unsigned render_target_specular,
-                                            unsigned render_target_half_red)
-{
-    irr_driver->setPhase(SOLID_LIT_PASS);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-
-    uint64_t DiffuseHandle = 0, SpecularHandle = 0, SSAOHandle = 0, DepthHandle = 0;
+void AbstractGeometryPasses::setFirstPassRenderTargets(const std::vector<GLuint>& prefilled_textures)
+{    
+    m_prefilled_textures = prefilled_textures;
 
     if (CVS->isAZDOEnabled())
     {
-        DiffuseHandle = glGetTextureSamplerHandleARB(render_target_diffuse,
-                          Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
-        if (!glIsTextureHandleResidentARB(DiffuseHandle))
-            glMakeTextureHandleResidentARB(DiffuseHandle);
-
-        SpecularHandle = glGetTextureSamplerHandleARB(render_target_specular,
-                           Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[1]);
-        if (!glIsTextureHandleResidentARB(SpecularHandle))
-            glMakeTextureHandleResidentARB(SpecularHandle);
-
-        SSAOHandle = glGetTextureSamplerHandleARB(render_target_half_red,
-                        Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[2]);
-        if (!glIsTextureHandleResidentARB(SSAOHandle))
-            glMakeTextureHandleResidentARB(SSAOHandle);
-
-        DepthHandle = glGetTextureSamplerHandleARB(irr_driver->getDepthStencilTexture(),
-                     Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[3]);
-        if (!glIsTextureHandleResidentARB(DepthHandle))
-            glMakeTextureHandleResidentARB(DepthHandle);
-    }
-        
-    {
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS2));
-
-        irr_driver->setPhase(SOLID_LIT_PASS);
-
-        draw_calls.renderImmediateDrawList();
-
-        std::vector<GLuint> DiffSpecSSAOTex = 
-            createVector<GLuint>(render_target_diffuse, 
-                                 render_target_specular,
-                                 render_target_half_red);
-
-        //TODO: is it useful when AZDO enabled?
-        renderMeshes2ndPass<DefaultMaterial, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<AlphaRef, 3, 1 >(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<UnlitMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<SplattingMat, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<SphereMap, 2, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<DetailMat, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<GrassMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<NormalMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-
-        if (CVS->isAZDOEnabled())
+        for(size_t i=0;i<m_prefilled_textures.size();i++)
         {
-            std::vector<uint64_t> handles = 
-                createVector<uint64_t>(DiffuseHandle,
-                                       SpecularHandle,
-                                       SSAOHandle,
-                                       DepthHandle);
-            
-            draw_calls.multidrawSolidSecondPass(handles);
+            uint64_t handle = 0;
+            handle = glGetTextureSamplerHandleARB(m_prefilled_textures[i],
+                Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[i]);
+            if (!glIsTextureHandleResidentARB(handle))
+                glMakeTextureHandleResidentARB(handle);
+            m_textures_handles.push_back(handle);
         }
-        else if (CVS->supportsIndirectInstancingRendering())
-        {
-            std::vector<GLuint> prefilled_tex =
-                createVector<GLuint>(render_target_diffuse, 
-                                     render_target_specular,
-                                     render_target_half_red,
-                                     irr_driver->getDepthStencilTexture());
-            draw_calls.drawIndirectSolidSecondPass(prefilled_tex);
-        }
-    }
-}   // renderSolidSecondPass
+    }    
+}
+
 
 // ----------------------------------------------------------------------------
-
 void AbstractGeometryPasses::renderGlow(const DrawCalls& draw_calls, const std::vector<GlowData>& glows)
 {
     irr_driver->getSceneManager()->setCurrentRendertime(scene::ESNRP_SOLID);

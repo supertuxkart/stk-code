@@ -1,4 +1,4 @@
-//  SuperTuxéKart - a fun racing game with go-kart
+//  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
@@ -25,54 +25,18 @@
 #include <ITexture.h>
 
 
-/** Rendering methods in this class only require
- *  OpenGL3.2 functions */
-class GL3DrawPolicy
-{
-public:
-    
-    void drawNormals(const DrawCalls& draw_calls) const {}
-    
-    void drawShadows(const DrawCalls& draw_calls, unsigned cascade) const;
-    void drawReflectiveShadowMap(const DrawCalls& draw_calls,
-                                 const core::matrix4 &rsm_matrix) const;
-};
-
-/** Faster than GL3GeometryPasses.
-  * Require at least OpenGL 4.0
-  * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)*/
-class IndirectDrawPolicy
-{
-public:
-    
-    void drawNormals(const DrawCalls& draw_calls) const;
-    
-    void drawShadows(const DrawCalls& draw_calls, unsigned cascade) const;
-    void drawReflectiveShadowMap(const DrawCalls& draw_calls,
-                                 const core::matrix4 &rsm_matrix) const;    
-};
-
-/** Faster than IndirectGeometryPasses.
-  * Require OpenGL AZDO extensions */
-class MultidrawPolicy
-{
-public:
-
-    void drawNormals(const DrawCalls& draw_calls) const;
-
-    void drawShadows(const DrawCalls& draw_calls, unsigned cascade) const;
-    void drawReflectiveShadowMap(const DrawCalls& draw_calls,
-                                 const core::matrix4 &rsm_matrix) const;    
-};
-
 
 
 class AbstractGeometryPasses
 {
 protected:
 
-    irr::core::vector3df m_wind_dir;
+    irr::core::vector3df m_wind_dir; //TODO
     irr::video::ITexture *m_displace_tex;
+
+    std::vector<GLuint>   m_prefilled_textures;    
+    std::vector<uint64_t> m_textures_handles;
+    
 
     void prepareShadowRendering(const FrameBuffer& shadow_framebuffer) const;
     void shadowPostProcessing(const ShadowMatrices& shadow_matrices,
@@ -82,11 +46,11 @@ public:
     AbstractGeometryPasses();
     virtual ~AbstractGeometryPasses(){}
     
-    void renderSolidFirstPass(const DrawCalls& draw_calls);
-    void renderSolidSecondPass( const DrawCalls& draw_calls,
-                                unsigned render_target_diffuse,
-                                unsigned render_target_specular,
-                                unsigned render_target_half_red);
+    void setFirstPassRenderTargets(const std::vector<GLuint>& prefilled_textures);
+    
+    virtual void renderSolidFirstPass(const DrawCalls& draw_calls) const = 0;
+    
+    virtual void renderSolidSecondPass( const DrawCalls& draw_calls) const = 0;
                                 
     virtual void renderNormalsVisualisation(const DrawCalls& draw_calls) const = 0;
     
@@ -111,6 +75,29 @@ template<typename DrawPolicy>
 class GeometryPasses: public AbstractGeometryPasses, public DrawPolicy
 {
 public:
+    void renderSolidFirstPass(const DrawCalls& draw_calls) const
+    {
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
+        irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
+
+        draw_calls.renderImmediateDrawList();
+        DrawPolicy::drawSolidFirstPass(draw_calls);
+        
+    }   // renderSolidFirstPass
+
+    void renderSolidSecondPass( const DrawCalls& draw_calls) const
+    {
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS2));
+        irr_driver->setPhase(SOLID_LIT_PASS);
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
+        
+        draw_calls.renderImmediateDrawList();
+        DrawPolicy::drawSolidSecondPass(draw_calls,
+                                        m_textures_handles,
+                                        m_prefilled_textures);
+    }
+
 
     void renderNormalsVisualisation(const DrawCalls& draw_calls) const
     {
