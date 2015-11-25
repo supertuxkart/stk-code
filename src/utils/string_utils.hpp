@@ -226,8 +226,20 @@ namespace StringUtils
 
     // ------------------------------------------------------------------------
     
-    std::string wide_to_utf8(const wchar_t* input);
-    irr::core::stringw utf8_to_wide(const char* input);
+    irr::core::stringw utf8ToWide(const char* input);
+    std::string wideToUtf8(const wchar_t* input);
+    // ------------------------------------------------------------------------
+    /** Converts a utf8-encoded std::string into an irrlicht wide string. */
+    static irr::core::stringw utf8ToWide(const std::string &input)
+    {
+        return utf8ToWide(input.c_str());
+    }   // utf8ToWide
+    // ------------------------------------------------------------------------
+    /** Converts the irrlicht wide string to an utf8-encoded std::string. */
+    static std::string wideToUtf8(const irr::core::stringw& input)
+    {
+        return wideToUtf8(input.c_str());
+    }   // wideToUtf8
 
 } // namespace StringUtils
 

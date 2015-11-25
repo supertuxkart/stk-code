@@ -198,7 +198,7 @@ void OptionsScreenUI::init()
     {
         std::string code_name = (*lang_list)[n];
         std::string s_name = tinygettext::Language::from_name(code_name).get_name();
-        core::stringw nice_name = StringUtils::utf8_to_wide(s_name.c_str());
+        core::stringw nice_name = StringUtils::utf8ToWide(s_name);
         nice_lang_list.push_back(nice_name);
         nice_name_2_id[nice_name] = code_name;
     }

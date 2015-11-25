@@ -86,7 +86,7 @@ namespace Scripting
 
         void createTextBillboard(std::string* text, SimpleVec3* location)
         {
-            core::stringw wtext = StringUtils::utf8_to_wide(text->c_str());
+            core::stringw wtext = StringUtils::utf8ToWide(*text);
             core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()
                 ->getDimension(wtext.c_str());
 

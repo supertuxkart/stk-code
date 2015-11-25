@@ -176,7 +176,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     uint8_t name_len = s.getUInt8(0);
                     std::string name = s.getString(1, name_len);
                     irr::core::stringw name_w =
-                                       StringUtils::utf8_to_wide(name.c_str());
+                                       StringUtils::utf8ToWide(name);
                     uint8_t max_players = s.getUInt8(1+name_len  );
                     uint8_t players     = s.getUInt8(1+name.size()+1);
                     uint32_t my_ip      = s.getUInt32(1+name.size()+2);

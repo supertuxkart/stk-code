@@ -282,7 +282,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 
                 core::stringw s;
                 s = Text.subString(realmbgn, realmend - realmbgn).c_str();
-                Operator->copyToClipboard(StringUtils::wide_to_utf8(s.c_str()).c_str());
+                Operator->copyToClipboard(StringUtils::wideToUtf8(s).c_str());
             }
             break;
         case KEY_KEY_X:
@@ -295,7 +295,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
                 // copy
                 core::stringw sc;
                 sc = Text.subString(realmbgn, realmend - realmbgn).c_str();
-                Operator->copyToClipboard(StringUtils::wide_to_utf8(sc.c_str()).c_str());
+                Operator->copyToClipboard(StringUtils::wideToUtf8(sc).c_str());
 
                 if (isEnabled())
                 {
@@ -331,13 +331,13 @@ bool CGUIEditBox::processKey(const SEvent& event)
                     {
                         // insert text
                         core::stringw s = Text.subString(0, CursorPos);
-                        s.append(StringUtils::utf8_to_wide(p));
+                        s.append(StringUtils::utf8ToWide(p));
                         s.append( Text.subString(CursorPos, Text.size()-CursorPos) );
 
                         if (!Max || s.size()<=Max) // thx to Fish FH for fix
                         {
                             Text = s;
-                            s = StringUtils::utf8_to_wide(p);
+                            s = StringUtils::utf8ToWide(p);
                             CursorPos += s.size();
                         }
                     }
@@ -346,13 +346,13 @@ bool CGUIEditBox::processKey(const SEvent& event)
                         // replace text
 
                         core::stringw s = Text.subString(0, realmbgn);
-                        s.append(StringUtils::utf8_to_wide(p));
+                        s.append(StringUtils::utf8ToWide(p));
                         s.append( Text.subString(realmend, Text.size()-realmend) );
 
                         if (!Max || s.size()<=Max)  // thx to Fish FH for fix
                         {
                             Text = s;
-                            s = StringUtils::utf8_to_wide(p);
+                            s = StringUtils::utf8ToWide(p);
                             CursorPos = realmbgn + s.size();
                         }
                     }

@@ -515,8 +515,7 @@ void STKHost::handleLANRequests()
     {
         Log::verbose("STKHost", "Received LAN server query");
         std::string name = 
-            StringUtils::wide_to_utf8(NetworkConfig::get()
-                                      ->getServerName().c_str());
+            StringUtils::wideToUtf8(NetworkConfig::get()->getServerName());
         // Avoid buffer overflows
         if (name.size() > 255)
             name = name.substr(0, 255);

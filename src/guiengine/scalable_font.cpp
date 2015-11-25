@@ -607,11 +607,13 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 
         if (gp_creator->newchar.size() > 0 && !m_is_hollow_copy && m_scale == 1)
         {
-            Log::debug("ScalableFont::getDimension", "New character(s) %s discoverd, perform lazy loading",
-                         StringUtils::wide_to_utf8(gp_creator->getNewChar().c_str()).c_str());
+            Log::debug("ScalableFont::getDimension",
+                       "New character(s) %s discoverd, perform lazy loading",
+                       StringUtils::wideToUtf8(gp_creator->getNewChar()).c_str());
 
             if (!GUIEngine::getFont()->lazyLoadChar())
-                Log::error("ScalableFont::lazyLoadChar", "Can't insert new char into glyph pages.");
+                Log::error("ScalableFont::lazyLoadChar",
+                           "Can't insert new char into glyph pages.");
         }
     }
 
@@ -736,19 +738,24 @@ void ScalableFont::doDraw(const core::stringw& text,
                 [GUIEngine::getFont()->getSpriteNoFromChar(&c)].Frames[0].textureNumber
                 == SpriteBank->getTextureCount() - 1) //Prevent overwriting texture used by billboard text
             {
-                 Log::debug("ScalableFont::doDraw", "Character used by billboard text is in the last glyph page of normal font."
-                              " Create a new glyph page for new characters inserted later to prevent it from being removed.");
+                 Log::debug("ScalableFont::doDraw", 
+                            "Character used by billboard text is in the last "
+                            "glyph page of normal font. Create a new glyph "
+                            "page for new characters inserted later to prevent "
+                            "it from being removed.");
                  GUIEngine::getFont()->forceNewPage();
             }
         }
 
         if (gp_creator->newchar.size() > 0 && !m_is_hollow_copy && m_scale == 1)
         {
-            Log::debug("ScalableFont::doDraw", "New character(s) %s discoverd, perform lazy loading",
-                         StringUtils::wide_to_utf8(gp_creator->getNewChar().c_str()).c_str());
+            Log::debug("ScalableFont::doDraw",
+                       "New character(s) %s discoverd, perform lazy loading",
+                       StringUtils::wideToUtf8(gp_creator->getNewChar()).c_str());
 
             if (!GUIEngine::getFont()->lazyLoadChar())
-                Log::error("ScalableFont::lazyLoadChar", "Can't insert new char into glyph pages.");
+                Log::error("ScalableFont::lazyLoadChar",
+                           "Can't insert new char into glyph pages.");
         }
     }
 
@@ -773,27 +780,29 @@ void ScalableFont::doDraw(const core::stringw& text,
         if (charCollector == NULL)
         {
             //floor is used to prevent negligible movement when m_scale changes with resolution
-            int Hpadding = floor((float) area.bearingx*
-                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
-            int Vpadding = floor((float) area.offsety*
-                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
+            int Hpadding = int(floor((float) area.bearingx*
+                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale)) );
+            int Vpadding = int(floor((float) area.offsety*
+                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale)) );
             offset.X += Hpadding;
-            offset.Y += Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0); //Additional offset for digit text
+            // Additional offset for digit text
+            offset.Y += int(Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0));
             offsets.push_back(offset);
             offset.X -= Hpadding;
-            offset.Y -= Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0);
+            offset.Y -= int(Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0));
         }
         else //Billboard text specific
         {
-            int Hpadding = floor((float) area.bearingx*
-                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
-            int Vpadding = floor((float) area.offsety_bt*
-                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
+            int Hpadding = int(floor((float) area.bearingx*
+                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale)) );
+            int Vpadding = int(floor((float) area.offsety_bt*
+                           (fallback[i] ? m_scale*m_fallback_font_scale : m_scale)) );
             offset.X += Hpadding;
-            offset.Y += Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0); //Additional offset for digit text
+            // Additional offset for digit text
+            offset.Y += int(Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0));
             offsets.push_back(offset);
             offset.X -= Hpadding;
-            offset.Y -= Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0);
+            offset.Y -= int(Vpadding + floor(m_type == T_DIGIT ? 20*m_scale : 0));
         }
         // Invisible character. add something to the array anyway so that
         // indices from the various arrays remain in sync
