@@ -449,7 +449,7 @@ bool Translations::isRTLText(const wchar_t *in_ptr)
  */
 const wchar_t* Translations::w_gettext(const wchar_t* original, const char* context)
 {
-    std::string in = StringUtils::wide_to_utf8(original);
+    std::string in = StringUtils::wideToUtf8(original);
     return w_gettext(in.c_str(), context);
 }
 
@@ -473,7 +473,7 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     if (original_t == original)
     {
         static irr::core::stringw converted_string;
-        converted_string = StringUtils::utf8_to_wide(original);
+        converted_string = StringUtils::utf8ToWide(original);
 
 #if TRANSLATE_VERBOSE
         std::wcout << L"  translation : " << converted_string << std::endl;
@@ -485,7 +485,7 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
     //for (int n=0;; n+=4)
 
     static core::stringw original_tw;
-    original_tw = StringUtils::utf8_to_wide(original_t.c_str());
+    original_tw = StringUtils::utf8ToWide(original_t);
 
     const wchar_t* out_ptr = original_tw.c_str();
     if (REMOVE_BOM) out_ptr++;
@@ -506,8 +506,8 @@ const wchar_t* Translations::w_gettext(const char* original, const char* context
  */
 const wchar_t* Translations::w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context)
 {
-    std::string in = StringUtils::wide_to_utf8(singular);
-    std::string in2 = StringUtils::wide_to_utf8(plural);
+    std::string in = StringUtils::wideToUtf8(singular);
+    std::string in2 = StringUtils::wideToUtf8(plural);
     return w_ngettext(in.c_str(), in2.c_str(), num, context);
 }
 
@@ -524,8 +524,7 @@ const wchar_t* Translations::w_ngettext(const char* singular, const char* plural
                               m_dictionary.translate_plural(singular, plural, num) :
                               m_dictionary.translate_ctxt_plural(context, singular, plural, num));
 
-    static core::stringw str_buffer;
-    str_buffer = StringUtils::utf8_to_wide(res.c_str());
+    static core::stringw str_buffer = StringUtils::utf8ToWide(res);
     const wchar_t* out_ptr = str_buffer.c_str();
     if (REMOVE_BOM) out_ptr++;
 
