@@ -21,6 +21,7 @@
 #include "config/player_manager.hpp"
 #include "modes/world_with_rank.hpp"
 #include "network/event.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
 #include "network/protocol_manager.hpp"
@@ -300,7 +301,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
     }
 
     uint32_t global_id = data.gui32(1);
-    uint8_t race_id = data.gui8(6);
+    uint8_t player_id = data.gui8(6);
 
     if (global_id == PlayerManager::getCurrentOnlineId())
     {
@@ -308,14 +309,15 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
                    "The server notified me that I'm a new player in the "
                    "room (not normal).");
     }
-    else if (m_setup->getProfile(race_id) == NULL ||
+    else if (m_setup->getProfile(player_id) == NULL ||
              m_setup->getProfile(global_id) == NULL)
     {
         Log::verbose("ClientLobbyRoomProtocol", "New player connected.");
-        NetworkPlayerProfile* profile = new NetworkPlayerProfile();
-        profile->kart_name = "";
-        profile->race_id = race_id;
-        profile->user_profile = new Online::OnlineProfile(global_id, "");
+        // FIXME: what player id to use?
+        NetworkPlayerProfile* profile = new NetworkPlayerProfile(-1);
+        profile->setPlayerID(player_id);
+        // FIXME: memory leak??
+        profile->setOnlineProfile(new Online::OnlineProfile(global_id, ""));
         m_setup->addPlayer(profile);
     }
     else
@@ -347,8 +349,7 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
                    "as expected.");
         return;
     }
-    uint8_t id = data[1];
-    if (m_setup->removePlayer(id))
+    if (m_setup->removePlayer(event->getPeer()->getPlayerProfile()))
     {
         Log::info("ClientLobbyRoomProtocol", "Peer removed successfully.");
     }
@@ -391,10 +392,10 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
                   "The server accepted the connection.");
 
         // self profile
-        NetworkPlayerProfile* profile = new NetworkPlayerProfile();
-        profile->kart_name = "";
-        profile->race_id = data.gui8(1);
-        profile->user_profile = PlayerManager::getCurrentOnlineProfile();
+        //FIXME
+        NetworkPlayerProfile* profile = new NetworkPlayerProfile(-1);
+        profile->setPlayerID(data.gui8(1));
+        profile->setOnlineProfile(PlayerManager::getCurrentOnlineProfile());
         m_setup->addPlayer(profile);
         // connection token
         uint32_t token = data.gui32(3);
@@ -419,10 +420,10 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
             Online::OnlineProfile* new_user =
                 new Online::OnlineProfile(global_id, "");
 
-            NetworkPlayerProfile* profile2 = new NetworkPlayerProfile();
-            profile2->race_id = race_id;
-            profile2->user_profile = new_user;
-            profile2->kart_name = "";
+            // FIXME
+            NetworkPlayerProfile* profile2 = new NetworkPlayerProfile(-1);
+            profile2->setPlayerID(race_id);
+            profile2->setOnlineProfile(new_user);
             m_setup->addPlayer(profile2);
             data.removeFront(7);
         }

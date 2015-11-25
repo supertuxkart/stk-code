@@ -8,6 +8,7 @@
 #include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -53,7 +54,8 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             uint8_t kart_race_id = data.gui8(5);
             // now set the kart powerup
             AbstractKart* kart = World::getWorld()->getKart(
-                STKHost::get()->getGameSetup()->getProfile(kart_race_id)->world_kart_id);
+                STKHost::get()->getGameSetup()
+                              ->getProfile(kart_race_id)->getWorldKartID());
             ItemManager::get()->collectedItem(
                 ItemManager::get()->getItem(item_id),
                 kart,
@@ -93,7 +95,8 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
         else if (item->getType() == Item::ITEM_BONUS_BOX)
             powerup = (((int)(kart->getPowerup()->getType()) << 4)&0xf0) + (kart->getPowerup()->getNum()&0x0f);
 
-        ns.ai8(0x01).ai32(item->getItemId()).ai8(powerup).ai8(player_profile->race_id); // send item,
+        ns.ai8(0x01).ai32(item->getItemId()).ai8(powerup)
+                    .ai8(player_profile->getPlayerID());
         ProtocolManager::getInstance()->sendMessage(this, peers[i], ns, true); // reliable
         Log::info("GameEventsProtocol", "Notified a peer that a kart collected item %d.", (int)(kart->getPowerup()->getType()));
     }

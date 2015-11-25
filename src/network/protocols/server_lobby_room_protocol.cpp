@@ -24,6 +24,7 @@
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/network_world.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/start_game_protocol.hpp"
@@ -393,11 +394,11 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
     {
         NetworkString msg(3);
         msg.ai8(LE_PLAYER_DISCONNECTED).ai8(1)
-           .ai8(peer->getPlayerProfile()->race_id);
+           .ai8(peer->getPlayerProfile()->getPlayerID());
         sendMessage(msg);
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
-                  peer->getPlayerProfile()->race_id);
-        m_setup->removePlayer(peer->getPlayerProfile()->race_id);
+                  peer->getPlayerProfile()->getPlayerID());
+        m_setup->removePlayer(peer->getPlayerProfile());
         STKHost::get()->removePeer(peer);
     }
     else
@@ -461,21 +462,20 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         for (unsigned int i = 0; i < players.size(); i++)
         {
             // do not duplicate the player into the message
-            if (players[i]->race_id != m_next_id && 
-                players[i]->user_profile->getID() != player_id)
+            if (players[i]->getPlayerID() != m_next_id && 
+                players[i]->getGlobalID() != player_id)
             {
-                message_ack.ai8(1).ai8(players[i]->race_id).ai8(4)
-                           .ai32(players[i]->user_profile->getID());
+                message_ack.ai8(1).ai8(players[i]->getPlayerID()).ai8(4)
+                           .ai32(players[i]->getGlobalID());
             }
         }
         sendMessage(peer, message_ack);
 
         peer->setClientServerToken(token);
 
-        NetworkPlayerProfile* profile = new NetworkPlayerProfile();
-        profile->race_id = m_next_id;
-        profile->kart_name = "";
-        profile->user_profile = new Online::OnlineProfile(player_id, "");
+        NetworkPlayerProfile* profile = new NetworkPlayerProfile(m_next_id);
+        // FIXME: memory leak OnlineProfile
+        profile->setOnlineProfile(new Online::OnlineProfile(player_id, ""));
         m_setup->addPlayer(profile);
         peer->setPlayerProfile(profile);
         Log::verbose("ServerLobbyRoomProtocol", "New player.");
@@ -559,11 +559,11 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     // send a kart update to everyone
     NetworkString answer(3+1+kart_name.size());
     // kart update (3), 1, race id
-    answer.ai8(0x03).ai8(1).ai8(peer->getPlayerProfile()->race_id);
+    answer.ai8(0x03).ai8(1).ai8(peer->getPlayerProfile()->getPlayerID());
     //  kart name size, kart name
     answer.add(kart_name);
     sendMessage(answer);
-    m_setup->setPlayerKart(peer->getPlayerProfile()->race_id, kart_name);
+    m_setup->setPlayerKart(peer->getPlayerProfile()->getPlayerID(), kart_name);
 }   // kartSelectionRequested
 
 //-----------------------------------------------------------------------------
@@ -586,7 +586,7 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
         return;
     if (!isByteCorrect(event, 5, 1))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
     m_setup->getRaceConfig()->setPlayerMajorVote(player_id, data[6]);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token
@@ -618,7 +618,7 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
         return;
     if (!isByteCorrect(event, 5, 1))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
     m_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, data[6]);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token
@@ -650,7 +650,7 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
         return;
     if (!isByteCorrect(event, 5, 1))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
     m_setup->getRaceConfig()->setPlayerMinorVote(player_id, data[6]);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token
@@ -684,7 +684,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
     std::string track_name = data.getString(6, N);
     if (!isByteCorrect(event, N+6, 1))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
     m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name, data[N+7]);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token
@@ -718,7 +718,7 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
         return;
     if (!isByteCorrect(event, 7, 1))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
     m_setup->getRaceConfig()->setPlayerReversedVote(player_id,
                                                     data[6]!=0, data[8]);
     // Send the vote to everybody (including the sender)
@@ -753,7 +753,7 @@ void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
         return;
     if (!isByteCorrect(event, 7, 1))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->race_id;
+    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
     m_setup->getRaceConfig()->setPlayerLapsVote(player_id, data[6], data[8]);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token

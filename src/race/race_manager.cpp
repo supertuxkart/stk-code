@@ -166,11 +166,12 @@ void RaceManager::setLocalKartSoccerTeam(unsigned int player_id, SoccerTeam team
 //-----------------------------------------------------------------------------
 /** Sets the per-player difficulty for a player.
  */
-void RaceManager::setPlayerDifficulty(unsigned int player_id, PerPlayerDifficulty difficulty)
+void RaceManager::setPlayerDifficulty(unsigned int player_id,
+                                      PerPlayerDifficulty difficulty)
 {
     assert(player_id < m_local_player_karts.size());
 
-    m_local_player_karts[player_id].setDifficulty(difficulty);
+    m_local_player_karts[player_id].setPerPlayerDifficulty(difficulty);
 }
 
 //-----------------------------------------------------------------------------

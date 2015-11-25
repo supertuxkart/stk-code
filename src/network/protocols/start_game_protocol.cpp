@@ -9,6 +9,7 @@
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/network_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
@@ -99,10 +100,10 @@ void StartGameProtocol::setup()
 }
 
 // ----------------------------------------------------------------------------
-bool sortKarts(NetworkPlayerProfile* a, NetworkPlayerProfile* b)
+bool compareKarts(NetworkPlayerProfile* a, NetworkPlayerProfile* b)
 { 
-    return (a->race_id < b->race_id); 
-}   // sortKarts
+    return (a->getPlayerID() < b->getPlayerID()); 
+}   // compareKarts
 
 // ----------------------------------------------------------------------------
 void StartGameProtocol::update()
@@ -122,22 +123,22 @@ void StartGameProtocol::update()
         race_manager->setNumPlayers(m_game_setup->getPlayerCount());
         race_manager->setNumLocalPlayers(1);
         std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
-        std::sort(players.begin(), players.end(), sortKarts);
+        std::sort(players.begin(), players.end(), compareKarts);
         // have to add self first
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->user_profile ==
+            bool is_me = (players[i]->getOnlineProfile() ==
                           PlayerManager::getCurrentOnlineProfile());
             if (is_me)
             {
                 NetworkPlayerProfile* profile = players[i];
-                RemoteKartInfo rki(profile->race_id, profile->kart_name,
-                                   profile->user_profile->getUserName(),
-                                   profile->race_id, !is_me);
-                rki.setDifficulty(profile->difficulty);
-                rki.setGlobalPlayerId(profile->race_id);
+                RemoteKartInfo rki(profile->getPlayerID(), profile->getKartName(),
+                                   profile->getOnlineProfile()->getUserName().c_str(),
+                                   profile->getPlayerID(), !is_me);
+                rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
+                rki.setGlobalPlayerId(profile->getPlayerID());
                 rki.setLocalPlayerId(is_me?0:1);
-                rki.setHostId(profile->race_id);
+                rki.setHostId(profile->getPlayerID());
                 PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
                 assert(profile_to_use);
                 InputDevice* device = input_manager->getDeviceManager()
@@ -156,32 +157,32 @@ void StartGameProtocol::update()
                 input_manager->getDeviceManager()->setSinglePlayer(ap);
 
                 race_manager->setPlayerKart(i, rki);
-                race_manager->setLocalKartInfo(new_player_id, profile->kart_name);
+                race_manager->setLocalKartInfo(new_player_id, profile->getKartName());
                 // self config
                 Log::info("StartGameProtocol", "Self player device added.");
-                NetworkWorld::getInstance()->m_self_kart = profile->kart_name;
+                NetworkWorld::getInstance()->m_self_kart = profile->getKartName();
                 break;
             }
         }
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->user_profile ==
+            bool is_me = (players[i]->getOnlineProfile() ==
                           PlayerManager::getCurrentOnlineProfile());
             NetworkPlayerProfile* profile = players[i];
-            RemoteKartInfo rki(profile->race_id, profile->kart_name,
-                               profile->user_profile->getUserName(),
-                               profile->race_id, !is_me);
-            rki.setDifficulty(profile->difficulty);
-            rki.setGlobalPlayerId(profile->race_id);
+            RemoteKartInfo rki(profile->getPlayerID(), profile->getKartName(),
+                               profile->getOnlineProfile()->getUserName(),
+                               profile->getPlayerID(), !is_me);
+            rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
+            rki.setGlobalPlayerId(profile->getPlayerID());
             // on the server, the race id must be the local one.
             rki.setLocalPlayerId(NetworkConfig::get()->isServer() 
-                                 ? profile->race_id
+                                 ? profile->getPlayerID()
                                  : (is_me ? 0 : 1)                         );
-            rki.setHostId(profile->race_id);
+            rki.setHostId(profile->getPlayerID());
             Log::info("StartGameProtocol",
                       "Creating kart %s for Player#%d with race_id %d",
-                      profile->kart_name.c_str(), i, profile->race_id);
-
+                      profile->getKartName().c_str(), i,
+                      profile->getPlayerID());
             if (!is_me)
             {
                 StateManager::get()->createActivePlayer( NULL, NULL );

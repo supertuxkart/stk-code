@@ -26,6 +26,7 @@
 #include "items/item_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/stk_host.hpp"
@@ -85,22 +86,23 @@ void NetworkKartSelectionScreen::init()
 
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        if (players[i]->user_profile == PlayerManager::getCurrentOnlineProfile())
+        if (players[i]->getOnlineProfile()== PlayerManager::getCurrentOnlineProfile())
         {
-            m_id_mapping.insert(m_id_mapping.begin(),players[i]->race_id); //!< first kart widget always me
-            Log::info("NKSS", "Insert %d at pos 0", players[i]->race_id);
+            m_id_mapping.insert(m_id_mapping.begin(),players[i]->getPlayerID()); //!< first kart widget always me
+            Log::info("NKSS", "Insert %d at pos 0", players[i]->getPlayerID());
             continue; // it is me, don't add again
         }
 
-        Log::info("NKSS", "Adding %d at pos %d", players[i]->race_id, i);
-        m_id_mapping.push_back(players[i]->race_id);
+        Log::info("NKSS", "Adding %d at pos %d", players[i]->getPlayerID(), i);
+        m_id_mapping.push_back(players[i]->getPlayerID());
 
         StateManager::ActivePlayer* aplayer = NULL; // player is remote
 
         std::string selected_kart_group = "standard"; // standard group
 
         PlayerKartWidget* newPlayerWidget =
-            new PlayerKartWidget(this, aplayer, players[i]->user_profile, kartsArea, m_kart_widgets.size(),
+            new PlayerKartWidget(this, aplayer, players[i]->getOnlineProfile(),
+                                 kartsArea, m_kart_widgets.size(),
                                  selected_kart_group);
 
         manualAddWidget(newPlayerWidget);

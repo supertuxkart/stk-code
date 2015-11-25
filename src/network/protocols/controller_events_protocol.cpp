@@ -5,6 +5,7 @@
 #include "karts/controller/controller.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_world.hpp"
@@ -45,12 +46,14 @@ void ControllerEventsProtocol::setup()
         {
             for (unsigned int j = 0; j < peers.size(); j++)
             {
-                if (peers[j]->getPlayerProfile()->kart_name == karts[i]->getIdent())
+                if (peers[j]->getPlayerProfile()->getKartName() 
+                    == karts[i]->getIdent())
                 {
                     peer = peers[j];
                 }
                 Log::info("ControllerEventsProtocol", "Compared %s and %s",
-                        peers[j]->getPlayerProfile()->kart_name.c_str(), karts[i]->getIdent().c_str());
+                          peers[j]->getPlayerProfile()->getKartName().c_str(), 
+                          karts[i]->getIdent().c_str());
             }
         }
         else
