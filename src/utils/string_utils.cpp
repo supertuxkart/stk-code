@@ -698,7 +698,15 @@ namespace StringUtils
     }   // wideToUtf8
 
     // ------------------------------------------------------------------------
+    /** Converts the irrlicht wide string to an utf8-encoded std::string.
+     */
+    std::string wideToUtf8(const irr::core::stringw& input)
+    {
+        return wideToUtf8(input.c_str());
+    }   // wideToUtf8
 
+    // ------------------------------------------------------------------------
+    /** Converts the irrlicht wide string to an utf8-encoded std::string. */
     irr::core::stringw utf8ToWide(const char* input)
     {
         static std::vector<wchar_t> utf16line;
@@ -708,6 +716,13 @@ namespace StringUtils
         utf16line.push_back(0);
 
         return irr::core::stringw(&utf16line[0]);
+    }   // utf8ToWide
+
+    // ------------------------------------------------------------------------
+    /** Converts a utf8-encoded std::string into an irrlicht wide string. */
+    irr::core::stringw utf8ToWide(const std::string &input)
+    {
+        return utf8ToWide(input.c_str());
     }   // utf8ToWide
 
     // ------------------------------------------------------------------------
