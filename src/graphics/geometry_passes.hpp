@@ -41,6 +41,11 @@ protected:
     void prepareShadowRendering(const FrameBuffer& shadow_framebuffer) const;
     void shadowPostProcessing(const ShadowMatrices& shadow_matrices,
                               const FrameBuffer& shadow_framebuffer) const;
+                              
+    void glowPostProcessing(const FrameBuffer& glow_framebuffer,
+                            const FrameBuffer& half_framebuffer,
+                            const FrameBuffer& quater_framebuffer,
+                            const FrameBuffer& color_framebuffer) const;
 
 public:
     AbstractGeometryPasses();
@@ -54,7 +59,12 @@ public:
                                 
     virtual void renderNormalsVisualisation(const DrawCalls& draw_calls) const = 0;
     
-    void renderGlow(const DrawCalls& draw_calls, const std::vector<GlowData>& glows);
+    virtual void renderGlow(const DrawCalls& draw_calls,
+                            const std::vector<GlowData>& glows,
+                            const FrameBuffer& glow_framebuffer,
+                            const FrameBuffer& half_framebuffer,
+                            const FrameBuffer& quarter_framebuffer,
+                            const FrameBuffer& color_framebuffer   ) const = 0;
     
     void renderTransparent(const DrawCalls& draw_calls, 
                            unsigned render_target);
@@ -102,6 +112,38 @@ public:
     void renderNormalsVisualisation(const DrawCalls& draw_calls) const
     {
         DrawPolicy::drawNormals(draw_calls);
+    }
+
+    void renderGlow(const DrawCalls& draw_calls,
+                    const std::vector<GlowData>& glows,
+                    const FrameBuffer& glow_framebuffer,
+                    const FrameBuffer& half_framebuffer,
+                    const FrameBuffer& quarter_framebuffer,
+                    const FrameBuffer& color_framebuffer   ) const
+    {
+        irr_driver->getSceneManager()->setCurrentRendertime(scene::ESNRP_SOLID);
+        glow_framebuffer.bind();
+        glClearStencil(0);
+        glClearColor(0, 0, 0, 0);
+        glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, ~0);
+        glEnable(GL_STENCIL_TEST);
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+        glDisable(GL_BLEND);
+        
+        DrawPolicy::drawGlow(draw_calls, glows);
+        
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glDisable(GL_STENCIL_TEST);
+        glDisable(GL_BLEND);
+        
+        glowPostProcessing(glow_framebuffer, half_framebuffer,
+                           quarter_framebuffer, color_framebuffer);
+        
     }
 
 

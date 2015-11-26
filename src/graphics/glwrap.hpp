@@ -78,7 +78,7 @@ public:
     GLuint getDepthTexture() const { assert(DepthTexture); return DepthTexture; }
     size_t getWidth() const { return width; }
     size_t getHeight() const { return height; }
-    static void Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST);
+    static void Blit(const FrameBuffer &Src, const FrameBuffer &Dst, GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST);
     void BlitToDefault(size_t, size_t, size_t, size_t);
 
     LEAK_CHECK();

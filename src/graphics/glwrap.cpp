@@ -262,7 +262,7 @@ void FrameBuffer::bindLayer(unsigned i) const
     glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
-void FrameBuffer::Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask, GLenum filter)
+void FrameBuffer::Blit(const FrameBuffer &Src, const FrameBuffer &Dst, GLbitfield mask, GLenum filter)
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, Src.fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst.fbo);

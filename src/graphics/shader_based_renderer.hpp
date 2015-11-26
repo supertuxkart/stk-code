@@ -36,11 +36,19 @@ private:
     LightingPasses  m_lighting_passes;
     ShadowMatrices  m_shadow_matrices;
 
+    /** Static glowing things are loaded once per track.
+     * Glowing items can appear ordisappear each frame */
+    std::vector<GlowData> m_glowing;
+    int m_nb_static_glowing;
+
     irr::core::vector3df m_wind_dir;
     
     void compressPowerUpTextures();
     void setOverrideMaterial();
-    std::vector<GlowData> updateGlowingList();
+    
+    void addItemsInGlowingList();
+    void removeItemsInGlowingList();
+    
     void prepareForwardRenderer();
     
     void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
@@ -54,7 +62,6 @@ private:
     void prepareDrawCalls(scene::ICameraSceneNode *camnode);
 
     void renderScene(irr::scene::ICameraSceneNode * const camnode,
-                     const std::vector<GlowData>& glows,
                      float dt, bool hasShadows, bool forceRTT);
                      
     void renderParticles();
@@ -69,6 +76,11 @@ public:
     ~ShaderBasedRenderer();
 
     void addSunLight(const irr::core::vector3df &pos) override;
+    
+    void addGlowingNode(scene::ISceneNode *n,
+                        float r = 1.0f, float g = 1.0f, float b = 1.0f) override;
+                        
+    void clearGlowingNodes() override;
     
     void render(float dt);
 };

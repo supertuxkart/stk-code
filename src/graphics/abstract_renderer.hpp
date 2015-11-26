@@ -21,7 +21,11 @@
 #include <irrlicht.h>
 #include <vector>
 
-struct GlowData;
+
+struct GlowData {
+    irr::scene::ISceneNode * node;
+    float r, g, b;
+};
 
 class AbstractRenderer
 {
@@ -45,11 +49,15 @@ public:
 
     virtual void addSunLight(const irr::core::vector3df &pos){}
 
+    virtual void addGlowingNode(irr::scene::ISceneNode *n,
+                                float r = 1.0f, float g = 1.0f, float b = 1.0f) {}
+    
+    virtual void clearGlowingNodes() {}
+
     
     virtual void render(float dt) = 0;
 
     virtual void renderScene(irr::scene::ICameraSceneNode * const camnode,
-                             const std::vector<GlowData>& glows,
                              float dt, bool hasShadows, bool forceRTT) = 0;
                              
     virtual void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,

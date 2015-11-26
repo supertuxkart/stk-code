@@ -82,12 +82,9 @@ void ShaderBasedRenderer::setOverrideMaterial()
     }       
 }
 
-std::vector<GlowData> ShaderBasedRenderer::updateGlowingList()
+//Add glowing items, they may appear or disappear each frame.
+void ShaderBasedRenderer::addItemsInGlowingList()
 {
-    // Get a list of all glowing things. The driver's list contains the static ones,
-    // here we add items, as they may disappear each frame.
-    std::vector<GlowData> glows = irr_driver->getGlowingNodes();
-
     ItemManager * const items = ItemManager::get();
     const u32 itemcount = items->getNumberOfItems();
     u32 i;
@@ -123,11 +120,20 @@ std::vector<GlowData> ShaderBasedRenderer::updateGlowingList()
         dat.g = c.getGreen();
         dat.b = c.getBlue();
 
-        glows.push_back(dat);
-    }
-    
-    return glows;
+        STKMeshSceneNode *stk_node = static_cast<STKMeshSceneNode *>(node);
+        stk_node->setGlowColors(irr::video::SColor(0, (unsigned) (dat.b * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.r * 255.f)));
+
+        m_glowing.push_back(dat);
+    }    
 }
+
+//Remove all non static glowing things
+void ShaderBasedRenderer::removeItemsInGlowingList()
+{
+    while(m_glowing.size() > m_nb_static_glowing)
+        m_glowing.pop_back();    
+}
+
 
 void ShaderBasedRenderer::prepareForwardRenderer()
 {
@@ -160,7 +166,6 @@ void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *con
 
 // ============================================================================
 void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
-                                      const std::vector<GlowData>& glows,
                                       float dt,
                                       bool hasShadow,
                                       bool forceRTT)
@@ -353,7 +358,11 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GLOW));
         irr_driver->setPhase(GLOW_PASS);
-        m_geometry_passes->renderGlow(m_draw_calls, glows);
+        m_geometry_passes->renderGlow(m_draw_calls, m_glowing,
+                                      irr_driver->getRTT()->getFBO(FBO_TMP1_WITH_DS),
+                                      irr_driver->getRTT()->getFBO(FBO_HALF1),
+                                      irr_driver->getRTT()->getFBO(FBO_QUARTER1),
+                                      irr_driver->getRTT()->getFBO(FBO_COLORS));
     } // end glow
     PROFILER_POP_CPU_MARKER();
 
@@ -498,6 +507,8 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 
 ShaderBasedRenderer::ShaderBasedRenderer()
 {    
+    m_nb_static_glowing = 0;
+    
     if (CVS->isAZDOEnabled())
         m_geometry_passes = new GeometryPasses<MultidrawPolicy>();
     else if (CVS->supportsIndirectInstancingRendering())
@@ -515,6 +526,26 @@ void ShaderBasedRenderer::addSunLight(const core::vector3df &pos) {
     m_shadow_matrices.addLight(pos);
 }
 
+void ShaderBasedRenderer::addGlowingNode(scene::ISceneNode *n, float r, float g, float b)
+{
+    GlowData dat;
+    dat.node = n;
+    dat.r = r;
+    dat.g = g;
+    dat.b = b;
+    
+    STKMeshSceneNode *node = static_cast<STKMeshSceneNode *>(n);
+    node->setGlowColors(irr::video::SColor(0, (unsigned) (dat.b * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.r * 255.f)));
+    
+    m_glowing.push_back(dat);
+    m_nb_static_glowing++;
+}
+
+void ShaderBasedRenderer::clearGlowingNodes()
+{
+    m_glowing.clear();
+    m_nb_static_glowing = 0;
+}
 
 void ShaderBasedRenderer::render(float dt)
 {
@@ -524,7 +555,7 @@ void ShaderBasedRenderer::render(float dt)
     
     setOverrideMaterial(); //TODO: is it useful every frame?
     
-    std::vector<GlowData> glows = updateGlowingList();
+    addItemsInGlowingList();
     
     // Start the RTT for post-processing.
     // We do this before beginScene() because we want to capture the glClear()
@@ -568,7 +599,7 @@ void ShaderBasedRenderer::render(float dt)
         m_shadow_matrices.updateSunOrthoMatrices();
         irr_driver->uploadLightingData(); //TODO: move method; update "global" lighting (sun and spherical harmonics)
         PROFILER_POP_CPU_MARKER();
-        renderScene(camnode, glows, dt, track->hasShadows(), false); 
+        renderScene(camnode, dt, track->hasShadows(), false); 
         
         if (irr_driver->getBoundingBoxesViz())
         {        
@@ -642,7 +673,8 @@ void ShaderBasedRenderer::render(float dt)
     irr_driver->getVideoDriver()->endScene();
     PROFILER_POP_CPU_MARKER();
 
-    irr_driver->getPostProcessing()->update(dt);    
+    irr_driver->getPostProcessing()->update(dt);
+    removeItemsInGlowingList();
 }
 
 

@@ -182,10 +182,7 @@ enum TypeRTT
 };
 
 
-    struct GlowData {
-        scene::ISceneNode * node;
-        float r, g, b;
-    };
+
 
 /**
   * \brief class that creates the irrLicht device and offers higher-level
@@ -299,7 +296,6 @@ private:
     core::vector3df m_sun_direction;
     video::SColorf m_suncolor;
 
-    std::vector<GlowData> m_glowing;
 
     std::vector<LightNode *> m_lights;
 
@@ -601,18 +597,10 @@ public:
     void addGlowingNode(scene::ISceneNode *n, float r = 1.0f, float g = 1.0f,
                         float b = 1.0f)
     {
-        GlowData dat;
-        dat.node = n;
-        dat.r = r;
-        dat.g = g;
-        dat.b = b;
-
-        m_glowing.push_back(dat);
+        m_renderer->addGlowingNode(n, r, g, b);
     }
     // ------------------------------------------------------------------------
-    void clearGlowingNodes() { m_glowing.clear(); }
-    // ------------------------------------------------------------------------
-    std::vector<GlowData> getGlowingNodes() { return m_glowing;}
+    void clearGlowingNodes() { m_renderer->clearGlowingNodes(); }
     // ------------------------------------------------------------------------
     void addForcedBloomNode(scene::ISceneNode *n, float power = 1)
     {

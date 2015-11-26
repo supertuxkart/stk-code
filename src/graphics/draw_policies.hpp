@@ -34,6 +34,9 @@ public:
                              
     void drawNormals            (const DrawCalls& draw_calls             ) const {}
     
+    void drawGlow               (const DrawCalls& draw_calls,
+                                 const std::vector<GlowData>& glows      ) const;
+                                     
     void drawShadows            (const DrawCalls& draw_calls,
                                 unsigned cascade                         ) const;
     
@@ -55,6 +58,9 @@ public:
                              
     void drawNormals            (const DrawCalls& draw_calls             ) const;
     
+    void drawGlow               (const DrawCalls& draw_calls,
+                                 const std::vector<GlowData>& glows      ) const;
+    
     void drawShadows            (const DrawCalls& draw_calls,
                                 unsigned cascade                         ) const;
     
@@ -75,6 +81,9 @@ public:
                              
     void drawNormals            (const DrawCalls& draw_calls             ) const;
     
+    void drawGlow               (const DrawCalls& draw_calls,
+                                 const std::vector<GlowData>& glows      ) const;
+                                     
     void drawShadows            (const DrawCalls& draw_calls,
                                 unsigned cascade                         ) const;
     

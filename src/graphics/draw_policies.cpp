@@ -163,6 +163,15 @@ void GL3DrawPolicy::drawSolidSecondPass (const DrawCalls& draw_calls,
 }
 
 // ----------------------------------------------------------------------------
+void GL3DrawPolicy::drawGlow(const DrawCalls& draw_calls,
+                             const std::vector<GlowData>& glows) const
+{
+    for (u32 i = 0; i < glows.size(); i++)
+        glows[i].node->render();    
+}
+
+
+// ----------------------------------------------------------------------------
 void GL3DrawPolicy::drawShadows(const DrawCalls& draw_calls, unsigned cascade) const
 {
     renderShadow<DefaultMaterial, 1>(cascade);
@@ -223,6 +232,13 @@ void IndirectDrawPolicy::drawNormals(const DrawCalls& draw_calls) const
 }
 
 // ----------------------------------------------------------------------------
+void IndirectDrawPolicy::drawGlow(const DrawCalls& draw_calls,
+                                  const std::vector<GlowData>& glows) const
+{
+    draw_calls.drawIndirectGlow();
+}
+
+// ----------------------------------------------------------------------------
 void IndirectDrawPolicy::drawShadows(const DrawCalls& draw_calls, unsigned cascade) const
 {
     draw_calls.drawIndirectShadows(cascade);
@@ -263,6 +279,13 @@ void MultidrawPolicy::drawSolidSecondPass (const DrawCalls& draw_calls,
     renderMeshes2ndPass<SplattingMat,    1   > (handles, prefilled_tex);
     
     draw_calls.multidrawSolidSecondPass(handles);
+}
+
+// ----------------------------------------------------------------------------
+void MultidrawPolicy::drawGlow(const DrawCalls& draw_calls,
+                               const std::vector<GlowData>& glows) const
+{
+    draw_calls.multidrawGlow();
 }
 
 // ----------------------------------------------------------------------------
