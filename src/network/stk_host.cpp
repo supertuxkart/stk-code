@@ -525,8 +525,7 @@ void STKHost::handleLANRequests()
         // number (which solves the problem which network interface
         // might be the right one if there is more than one).
         NetworkString s;
-        s.addUInt8((uint8_t)name.size());
-        s.addString(name.c_str());
+        s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
         s.addUInt8(0);   // FIXME: current number of connected players
         s.addUInt32(sender.getIP());

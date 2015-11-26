@@ -528,14 +528,8 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     if (!checkDataSizeAndToken(event, 6))
         return;
 
-    uint8_t kart_name_size = data.gui8(5);
-    std::string kart_name = data.getString(6, kart_name_size);
-    if (kart_name.size() != kart_name_size)
-    {
-        Log::error("ServerLobbyRoomProtocol", "Kart names sizes differ: told:"
-                   "%d, real: %d.", kart_name_size, kart_name.size());
-        return;
-    }
+    std::string kart_name;
+    data.decodeString(5, &kart_name);
     // check if selection is possible
     if (!m_selection_enabled)
     {
@@ -566,9 +560,8 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     // send a kart update to everyone
     NetworkString answer(3+1+kart_name.size());
     // kart update (3), 1, race id
-    answer.ai8(0x03).ai8(1).ai8(peer->getPlayerProfile()->getPlayerID());
-    //  kart name size, kart name
-    answer.add(kart_name);
+    answer.ai8(0x03).ai8(1).ai8(peer->getPlayerProfile()->getPlayerID())
+          .encodeString(kart_name);
     sendMessage(answer);
     m_setup->setPlayerKart(peer->getPlayerProfile()->getPlayerID(), kart_name);
 }   // kartSelectionRequested
@@ -687,8 +680,8 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
     STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 8))
         return;
-    int N = data[5];
-    std::string track_name = data.getString(6, N);
+    std::string track_name;
+    int N = data.decodeString(5, &track_name);
     if (!isByteCorrect(event, N+6, 1))
         return;
     uint8_t player_id = peer->getPlayerProfile()->getPlayerID();

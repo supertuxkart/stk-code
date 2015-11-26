@@ -61,7 +61,7 @@ void ClientLobbyRoomProtocol::requestKartSelection(const std::string &kart_name)
     NetworkString request(6+1+kart_name.size());
     // size_token (4), token, size kart name, kart name
     request.ai8(LE_KART_SELECTION).ai8(4).ai32(m_server->getClientServerToken())
-           .add(kart_name);
+           .encodeString(kart_name);
     sendMessage(request, true);
 }   // requestKartSelection
 
@@ -106,7 +106,7 @@ void ClientLobbyRoomProtocol::voteTrack(const std::string &track,
     NetworkString request(8+1+track.size());
     // size_token (4), token, size track, track, size #track, #track
     request.ai8(LE_VOTE_TRACK).ai8(4).ai32(m_server->getClientServerToken())
-           .add(track).ai8(1).ai8(track_nb);
+           .encodeString(track).ai8(1).ai8(track_nb);
     sendMessage(request, true);
 }   // voteTrack
 
@@ -310,9 +310,9 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
 
     uint32_t global_id = data.gui32(1);
     uint8_t player_id = data.gui8(6);
-    int name_len = data.getUInt8(7);
-    std::string name_utf8 = data.getString(8, name_len);
-    core::stringw name = StringUtils::utf8ToWide(name_utf8);
+
+    core::stringw name;
+    data.decodeStringW(7, &name);
     if (global_id == PlayerManager::getCurrentOnlineId())
     {
         Log::error("ClientLobbyRoomProtocol",
@@ -554,15 +554,8 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
         return;
     }
     uint8_t player_id = data[1];
-    uint8_t kart_name_length = data[2];
-    std::string kart_name = data.getString(3, kart_name_length);
-    if (kart_name.size() != kart_name_length)
-    {
-        Log::error("ClientLobbyRoomProtocol",
-                   "Kart names sizes differ: told: %d, real: %d.",
-                   kart_name_length, kart_name.size());
-        return;
-    }
+    std::string kart_name;
+    data.decodeString(2, &kart_name);
     if (!m_setup->isKartAvailable(kart_name))
     {
         Log::error("ClientLobbyRoomProtocol",
@@ -811,11 +804,12 @@ void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
         return;
     if (!isByteCorrect(event, 5, 1))
         return;
-    int N = data[7];
-    std::string track_name = data.getString(8, N);
+    std::string track_name;
+    int N = data.decodeString(7, &track_name);
     if (!isByteCorrect(event, N+8, 1))
         return;
-    m_setup->getRaceConfig()->setPlayerTrackVote(data[6], track_name, data[N+9]);
+    m_setup->getRaceConfig()->setPlayerTrackVote(data[6], track_name,
+                                                 data[N+9]);
 }   // playerTrackVote
 
 //-----------------------------------------------------------------------------

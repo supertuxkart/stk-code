@@ -58,6 +58,18 @@ private:
 
     std::vector<uint8_t> m_string;
 
+    // ------------------------------------------------------------------------
+    /** Returns a part of the network string as a std::string. This is an
+     *  internal function only, the user should call decodeString(W) instead.
+     *  \param pos First position to be in the string.
+     *  \param len Number of bytes to copy.
+     */
+    std::string getString(int pos, int len) const 
+    {
+        return std::string(m_string.begin() + pos,
+            m_string.begin() + pos + len); 
+    }   // getString
+
 public:
     /** Dummy constructor. */
     NetworkString() { }
@@ -91,11 +103,6 @@ public:
     NetworkString& encodeString(const irr::core::stringw &value);
     int decodeString(int n, std::string *out) const;
     int decodeStringW(int n, irr::core::stringw *out) const;
-    // ------------------------------------------------------------------------
-    NetworkString& add(const std::string &s)
-    {
-        return addUInt8(uint8_t(s.size())).as(s);
-    }   // add
 
     // ------------------------------------------------------------------------
     NetworkString& removeFront(int size)
@@ -316,17 +323,6 @@ public:
     {
         return get<unsigned char>(pos); 
     }   // getUChar
-    // ------------------------------------------------------------------------
-    /** Returns a part of the network string as a std::string.
-     *  \param pos First position to be in the string.
-     *  \param len Number of bytes to copy.
-     */
-    std::string getString(int pos, int len) const 
-    {
-        return std::string(m_string.begin() + pos,
-                           m_string.begin() + pos + len); 
-    }   // getString
-
     // ------------------------------------------------------------------------
     /** Returns a standard integer. */
     inline int gi(int pos = 0) const { return get<int, 4>(pos); }
