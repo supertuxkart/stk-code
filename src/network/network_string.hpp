@@ -25,6 +25,8 @@
 
 #include "utils/types.hpp"
 
+#include "irrString.h"
+
 #include <assert.h>
 #include <stdarg.h>
 #include <string>
@@ -84,6 +86,11 @@ public:
         m_string.resize(len);
         memcpy(m_string.data(), p, len);
     }   // NetworkString(char*, int)
+    // ------------------------------------------------------------------------
+    NetworkString& encodeString(const std::string &value);
+    NetworkString& encodeString(const irr::core::stringw &value);
+    int decodeString(int n, std::string *out) const;
+    int decodeStringW(int n, irr::core::stringw *out) const;
     // ------------------------------------------------------------------------
     NetworkString& add(const std::string &s)
     {
@@ -218,7 +225,6 @@ public:
     /** Adds a single character. */
     inline NetworkString& ac(const char& value) { return addChar(value); }
 
-    // ------------------------------------------------------------------------
     /** Adds a string. */
     NetworkString& addString(const std::string& value)
     {

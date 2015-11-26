@@ -234,10 +234,18 @@ void ClientLobbyRoomProtocol::update()
         break;
     case LINKED:
     {
-        NetworkString ns(6);
+        core::stringw name;
+        if(PlayerManager::getCurrentOnlineState()==PlayerProfile::OS_SIGNED_IN)
+            name = PlayerManager::getCurrentOnlineUserName();
+        else
+            name = PlayerManager::getCurrentPlayer()->getName();
+
+        std::string name_u8 = StringUtils::wideToUtf8(name);
+        NetworkString ns(6+1+name_u8.size());
         // 4 (size of id), global id
         ns.ai8(LE_CONNECTION_REQUESTED).ai8(4)
-          .ai32(PlayerManager::getCurrentOnlineId());
+          .addUInt32(PlayerManager::getCurrentOnlineId())
+          .encodeString(name);
         sendMessage(ns);
         m_state = REQUESTING_CONNECTION;
     }
@@ -283,11 +291,11 @@ void ClientLobbyRoomProtocol::update()
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1                  5   6                   7
- *       ------------------------------------------------
- *  Size | 1 |         4        | 1 |          1        |
- *  Data | 4 | player global id | 1 | 0 <= race id < 16 |
- *       ------------------------------------------------
+ *  Byte 0   1                  5   6                   7     8
+ *       -------------------------------------------------------------------
+ *  Size | 1 |         4        | 1 |          1        | 1   |            |
+ *  Data | 4 | player global id | 1 | 0 <= race id < 16 | len | player name|
+ *       -------------------------------------------------------------------
  */
 void ClientLobbyRoomProtocol::newPlayer(Event* event)
 {
@@ -302,7 +310,9 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
 
     uint32_t global_id = data.gui32(1);
     uint8_t player_id = data.gui8(6);
-
+    int name_len = data.getUInt8(7);
+    std::string name_utf8 = data.getString(8, name_len);
+    core::stringw name = StringUtils::utf8ToWide(name_utf8);
     if (global_id == PlayerManager::getCurrentOnlineId())
     {
         Log::error("ClientLobbyRoomProtocol",
@@ -313,8 +323,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
              m_setup->getProfile(global_id) == NULL)
     {
         Log::verbose("ClientLobbyRoomProtocol", "New player connected.");
-        // FIXME: what player id to use?
-        NetworkPlayerProfile* profile = new NetworkPlayerProfile(-1);
+        NetworkPlayerProfile* profile = new NetworkPlayerProfile(player_id, name);
         profile->setPlayerID(player_id);
         // FIXME: memory leak??
         profile->setOnlineProfile(new Online::OnlineProfile(global_id, ""));
@@ -369,13 +378,13 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
  *  Byte 0   1                   2   3            7   8           12
  *       ----------------------------------------------------------
  *  Size | 1 |         1         | 1 |      4     | 1 |     4     |
- *  Data | 1 | 0 <= race id < 16 | 4 | priv token | 4 | global id |
+ *  Data | 1 | 0 <= race id < 16 | 4 | priv token | 4 | global id | playernames*
  *       ----------------------------------------------------------
  */
 void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 {
     NetworkString &data = event->data();
-    // 12 bytes should remain now
+    // At least 12 bytes should remain now
     if (data.size() < 12 || data[0] != 1 || data[2] != 4 || data[7] != 4)
     {
         Log::error("ClientLobbyRoomProtocol",
@@ -386,55 +395,60 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     STKPeer* peer = event->getPeer();
 
     uint32_t global_id = data.gui32(8);
-    if (global_id == PlayerManager::getCurrentOnlineId())
+    if (global_id != PlayerManager::getCurrentOnlineId())
     {
         Log::info("ClientLobbyRoomProtocol",
-                  "The server accepted the connection.");
-
-        // self profile
-        //FIXME
-        NetworkPlayerProfile* profile = new NetworkPlayerProfile(-1);
-        profile->setPlayerID(data.gui8(1));
-        profile->setOnlineProfile(PlayerManager::getCurrentOnlineProfile());
-        m_setup->addPlayer(profile);
-        // connection token
-        uint32_t token = data.gui32(3);
-        peer->setClientServerToken(token);
-        // add all players
-        data.removeFront(12); // remove the 12 first bytes
-        int remaining = data.size();
-        if (remaining%7 != 0)
-        {
-            Log::error("ClientLobbyRoomProtocol",
-                       "ConnectionAccepted : Error in the server list");
-        }
-        remaining /= 7;
-        for (int i = 0; i < remaining; i++)
-        {
-            if (data[0] != 1 || data[2] != 4)
-                Log::error("ClientLobbyRoomProtocol",
-                           "Bad format in players list.");
-
-            uint8_t race_id = data[1];
-            uint32_t global_id = data.gui32(3);
-            Online::OnlineProfile* new_user =
-                new Online::OnlineProfile(global_id, "");
-
-            // FIXME
-            NetworkPlayerProfile* profile2 = new NetworkPlayerProfile(-1);
-            profile2->setPlayerID(race_id);
-            profile2->setOnlineProfile(new_user);
-            m_setup->addPlayer(profile2);
-            data.removeFront(7);
-        }
-
-        // add self
-        m_server = event->getPeer();
-        m_state = CONNECTED;
-    }
-    else
-        Log::info("ClientLobbyRoomProtocol",
                   "Failure during the connection acceptation process.");
+        return;
+    }
+
+    // Accepted
+    // ========
+    Log::info("ClientLobbyRoomProtocol",
+              "The server accepted the connection.");
+
+    // self profile
+    irr::core::stringw name;
+    if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
+        name = PlayerManager::getCurrentOnlineUserName();
+    else
+        name = PlayerManager::getCurrentPlayer()->getName();
+    NetworkPlayerProfile* profile = new NetworkPlayerProfile(-1, name);
+    profile->setPlayerID(data.gui8(1));
+    profile->setOnlineProfile(PlayerManager::getCurrentOnlineProfile());
+    m_setup->addPlayer(profile);
+    // connection token
+    uint32_t token = data.gui32(3);
+    peer->setClientServerToken(token);
+
+    // Add all players
+    // ===============
+    int n = 12;
+    while (n < data.size())
+    {
+        if (data[n] != 1 || data[n + 2] != 4)
+            Log::error("ClientLobbyRoomProtocol",
+                       "Bad format in players list.");
+
+        uint8_t race_player_id = data[n + 1];
+        uint32_t global_id = data.gui32(n + 3);
+        irr::core::stringw name;
+        int bytes_read = data.decodeStringW(n + 7, &name);
+        // FIXME - leak?
+        Online::OnlineProfile* new_user =
+            new Online::OnlineProfile(global_id, name);
+
+        NetworkPlayerProfile* profile2 =
+            new NetworkPlayerProfile(race_player_id, name);
+        profile2->setPlayerID(race_player_id);
+        profile2->setOnlineProfile(new_user);
+        m_setup->addPlayer(profile2);
+        n += bytes_read+7;
+    }
+
+    // add self
+    m_server = event->getPeer();
+    m_state = CONNECTED;
 }   // connectionAccepted
 
 //-----------------------------------------------------------------------------

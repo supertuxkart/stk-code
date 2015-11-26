@@ -412,16 +412,16 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
  *
  *  Format of the data :
  *  Byte 0   1                  5
- *       ------------------------
- *  Size | 1 |          4       |
- *  Data | 4 | global player id |
- *       ------------------------
+ *       ----------------------------------------
+ *  Size | 1 |          4       |1|             |
+ *  Data | 4 | global player id |n| player name |
+ *       ----------------------------------------
  */
 void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 {
     STKPeer* peer = event->getPeer();
     const NetworkString &data = event->data();
-    if (data.size() != 5 || data[0] != 4)
+    if (data[0] != 4)
     {
         Log::warn("ServerLobbyRoomProtocol",
               "Receiving badly formated message. Size is %d and first byte %d",
@@ -431,68 +431,75 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     uint32_t player_id = 0;
     player_id = data.getUInt32(1);
     // can we add the player ?
-    if (m_setup->getPlayerCount() < NetworkConfig::get()->getMaxPlayers() &&
-        m_state==ACCEPTING_CLIENTS                                           )
-    {
-        // add the player to the game setup
-        m_next_id = m_setup->getPlayerCount();
-        // notify everybody that there is a new player
-        NetworkString message(8);
-        // size of id -- id -- size of local id -- local id;
-        message.ai8(LE_NEW_PLAYER_CONNECTED).ai8(4).ai32(player_id)
-               .ai8(1).ai8(m_next_id);
-        ProtocolManager::getInstance()->sendMessageExcept(this, peer, message);
-
-        /// now answer to the peer that just connected
-        RandomGenerator token_generator;
-        // use 4 random numbers because rand_max is probably 2^15-1.
-        uint32_t token = (uint32_t)(((token_generator.get(RAND_MAX)<<24) & 0xff) +
-                                    ((token_generator.get(RAND_MAX)<<16) & 0xff) +
-                                    ((token_generator.get(RAND_MAX)<<8)  & 0xff) +
-                                    ((token_generator.get(RAND_MAX)      & 0xff)));
-
-        std::vector<NetworkPlayerProfile*> players = m_setup->getPlayers();
-        // send a message to the one that asked to connect
-        // Size is overestimated, probably one player's data will not be sent
-        NetworkString message_ack(13+players.size()*7);
-        // connection success (129) -- size of token -- token
-        message_ack.ai8(LE_CONNECTION_ACCEPTED).ai8(1).ai8(m_next_id).ai8(4)
-                   .ai32(token).ai8(4).ai32(player_id);
-        // add all players so that this user knows
-        for (unsigned int i = 0; i < players.size(); i++)
-        {
-            // do not duplicate the player into the message
-            if (players[i]->getPlayerID() != m_next_id && 
-                players[i]->getGlobalID() != player_id)
-            {
-                message_ack.ai8(1).ai8(players[i]->getPlayerID()).ai8(4)
-                           .ai32(players[i]->getGlobalID());
-            }
-        }
-        sendMessage(peer, message_ack);
-
-        peer->setClientServerToken(token);
-
-        NetworkPlayerProfile* profile = new NetworkPlayerProfile(m_next_id);
-        // FIXME: memory leak OnlineProfile
-        profile->setOnlineProfile(new Online::OnlineProfile(player_id, ""));
-        m_setup->addPlayer(profile);
-        peer->setPlayerProfile(profile);
-        Log::verbose("ServerLobbyRoomProtocol", "New player.");
-    } // accept player
-    else  // refuse the connection with code 0 (too much players)
+    if (m_setup->getPlayerCount() >= NetworkConfig::get()->getMaxPlayers() ||
+        m_state!=ACCEPTING_CLIENTS                                           )
     {
         NetworkString message(3);
-        message.ai8(LE_CONNECTION_REFUSED);
-        message.ai8(1);               // 1 bytes for the error code
-        if(m_state!=ACCEPTING_CLIENTS)
-            message.ai8(2);               // 2 = Busy
-        else
-            message.ai8(0);               // 0 = too many players
+        // Len, error code: 2 = busy, 0 = too many players
+        message.ai8(LE_CONNECTION_REFUSED).ai8(1)
+                .ai8(m_state!=ACCEPTING_CLIENTS ? 2 : 0);
+
         // send only to the peer that made the request
         sendMessage(peer, message);
         Log::verbose("ServerLobbyRoomProtocol", "Player refused");
+        return;
     }
+
+    // Connection accepted.
+    // ====================
+    std::string name_u8;
+    int name_len = data.decodeString(5, &name_u8);
+    core::stringw name = StringUtils::utf8ToWide(name_u8);
+
+    // add the player to the game setup
+    m_next_id = m_setup->getPlayerCount();
+
+    NetworkPlayerProfile* profile = new NetworkPlayerProfile(m_next_id, name);
+    // FIXME: memory leak OnlineProfile
+    profile->setOnlineProfile(new Online::OnlineProfile(player_id, ""));
+    m_setup->addPlayer(profile);
+    peer->setPlayerProfile(profile);
+
+    // notify everybody that there is a new player
+    NetworkString message(8);
+    // size of id -- id -- size of local id -- local id;
+    message.ai8(LE_NEW_PLAYER_CONNECTED).ai8(4).ai32(player_id)
+           .ai8(1).ai8(m_next_id).encodeString(name_u8);
+    ProtocolManager::getInstance()->sendMessageExcept(this, peer, message);
+
+    // Now answer to the peer that just connected
+    RandomGenerator token_generator;
+    // use 4 random numbers because rand_max is probably 2^15-1.
+    uint32_t token = (uint32_t)(((token_generator.get(RAND_MAX) << 24) & 0xff) +
+                                ((token_generator.get(RAND_MAX) << 16) & 0xff) +
+                                ((token_generator.get(RAND_MAX) << 8)  & 0xff) +
+                                ((token_generator.get(RAND_MAX)        & 0xff)));
+
+    std::vector<NetworkPlayerProfile*> players = m_setup->getPlayers();
+    // send a message to the one that asked to connect
+    // Size is overestimated, probably one player's data will not be sent
+    NetworkString message_ack(13 + players.size() * 7);
+    // connection success (129) -- size of token -- token
+    message_ack.ai8(LE_CONNECTION_ACCEPTED).ai8(1).ai8(m_next_id).ai8(4)
+               .ai32(token).ai8(4).ai32(player_id);
+    // add all players so that this user knows
+    for (unsigned int i = 0; i < players.size(); i++)
+    {
+        // do not duplicate the player into the message
+        if (players[i]->getPlayerID() != m_next_id &&
+            players[i]->getGlobalID() != player_id)
+        {
+            message_ack.ai8(1).ai8(players[i]->getPlayerID()).ai8(4)
+                       .ai32(players[i]->getGlobalID())
+                       .encodeString(players[i]->getName());
+        }
+    }
+    sendMessage(peer, message_ack);
+
+    peer->setClientServerToken(token);
+
+    Log::verbose("ServerLobbyRoomProtocol", "New player.");
+
 }   // connectionRequested
 
 //-----------------------------------------------------------------------------

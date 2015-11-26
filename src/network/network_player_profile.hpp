@@ -36,11 +36,16 @@ namespace Online { class OnlineProfile; }
 class NetworkPlayerProfile
 {
 private:
-    /** The id of the player for the race. */
+    /** The unique id of the player for this race. The number is assigned
+     *  by the server (and it might not be the index of this player in the
+     *  peer list. */
     uint8_t m_race_player_id;
 
-    /** The selected kart. */
+    /** The selected kart id. */
     std::string m_kart_name; 
+
+    /** The name of the player. */
+    irr::core::stringw m_player_name;
 
     /** Pointer to the online profile of this player. */
     Online::OnlineProfile* m_online_profile;
@@ -51,8 +56,9 @@ private:
     /** Per player difficulty. */
     PerPlayerDifficulty m_per_player_difficulty;
 public:
-    NetworkPlayerProfile(int race_player_id);
-    ~NetworkPlayerProfile();
+        NetworkPlayerProfile(int race_player_id,
+                             const irr::core::stringw &name);
+       ~NetworkPlayerProfile();
     int getGlobalID() const;
 
     // ------------------------------------------------------------------------
@@ -85,8 +91,13 @@ public:
     Online::OnlineProfile *getOnlineProfile() { return m_online_profile; }
     // ------------------------------------------------------------------------
     /** Returns the per-player difficulty. */
-    PerPlayerDifficulty getPerPlayerDifficulty() const { return m_per_player_difficulty; }
+    PerPlayerDifficulty getPerPlayerDifficulty() const
+    {
+        return m_per_player_difficulty;
+    }   // getPerPlayerDifficulty
     // ------------------------------------------------------------------------
+    /** Returns the name of this player. */
+    const irr::core::stringw& getName() const { return m_player_name; }
     // ------------------------------------------------------------------------
 
 };   // class NetworkPlayerProfile
