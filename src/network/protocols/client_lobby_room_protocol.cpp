@@ -28,6 +28,7 @@
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
+#include "states_screens/networking_lobby.hpp"
 #include "states_screens/network_kart_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
@@ -328,6 +329,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
         // FIXME: memory leak??
         profile->setOnlineProfile(new Online::OnlineProfile(global_id, ""));
         m_setup->addPlayer(profile);
+        NetworkingLobby::getInstance()->addPlayer(profile);
     }
     else
     {
@@ -420,6 +422,8 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     // connection token
     uint32_t token = data.gui32(3);
     peer->setClientServerToken(token);
+    NetworkingLobby::getInstance()->addPlayer(profile);
+
 
     // Add all players
     // ===============
@@ -444,6 +448,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         profile2->setOnlineProfile(new_user);
         m_setup->addPlayer(profile2);
         n += bytes_read+7;
+        NetworkingLobby::getInstance()->addPlayer(profile2);
     }
 
     // add self

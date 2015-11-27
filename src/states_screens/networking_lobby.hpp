@@ -30,6 +30,8 @@ namespace GUIEngine {
     class RibbonWidget;
 }
 
+class NetworkPlayerProfile;
+
 /**
   * \brief Handles the main menu
   * \ingroup states_screens
@@ -50,6 +52,7 @@ private:
     GUIEngine::RibbonWidget * m_bottom_menu_widget;
     GUIEngine::IconButtonWidget * m_exit_widget;
     GUIEngine::IconButtonWidget *m_start_button;
+    GUIEngine::ListWidget *m_player_list;
 
     /** \brief Sets which widget has to be focused. Depends on the user state. */
     void setInitialFocus();
@@ -82,6 +85,9 @@ public:
 
     /** \brief Implements the callback when a dialog gets closed. */
     virtual void onDialogClose() OVERRIDE;
-};
+
+    void addPlayer(NetworkPlayerProfile *profile);
+    void removePlayer(NetworkPlayerProfile *profile);
+};   // class NetworkingLobby
 
 #endif

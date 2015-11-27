@@ -27,10 +27,12 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/servers_manager.hpp"
@@ -70,6 +72,9 @@ void NetworkingLobby::loadedFromFile()
 
     m_bottom_menu_widget = getWidget<RibbonWidget>("menu_bottomrow");
     assert(m_bottom_menu_widget != NULL);
+
+    m_player_list = getWidget<ListWidget>("players");
+    assert(m_player_list!= NULL);
 
     m_exit_widget = (IconButtonWidget *) m_bottom_menu_widget
                                          ->findWidgetNamed("exit");
@@ -169,3 +174,15 @@ void NetworkingLobby::onDialogClose()
 {
     setInitialFocus();
 }   // onDialogClose()
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::addPlayer(NetworkPlayerProfile *profile)
+{
+    m_player_list->addItem(StringUtils::toString(profile->getPlayerID()),
+                           profile->getName());
+}  // addPlayer
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::removePlayer(NetworkPlayerProfile *profile)
+{
+}   // removePlayer
