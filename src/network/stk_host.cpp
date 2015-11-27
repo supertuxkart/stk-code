@@ -233,6 +233,7 @@ void STKHost::init()
  */
 STKHost::~STKHost()
 {
+    ProtocolManager::kill();
     // delete the game setup
     if (m_game_setup)
         delete m_game_setup;
@@ -247,7 +248,6 @@ STKHost::~STKHost()
 
     Network::closeLog();
     stopListening();
-    ProtocolManager::kill();
 
     delete m_network;
 }   // ~STKHost
@@ -295,11 +295,10 @@ void STKHost::deleteAllPeers()
  */
 void STKHost::abort()
 {
-    stopListening();
-    // FIXME: Why a reset here? This creates a new stk_host, which will open
-    // a new packet_log file (and therefore delete the previous file)???
-    // reset();
+    // Finish protocol manager first, to avoid that it access data
+    // in STKHost.
     ProtocolManager::getInstance()->abort();
+    stopListening();
 }   // abort
 
 // --------------------------------------------------------------------
