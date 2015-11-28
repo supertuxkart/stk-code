@@ -271,6 +271,7 @@ void STKHost::requestShutdown()
  */
 void STKHost::shutdown()
 {
+    ServersManager::get()->unsetJoinedServer();
     ProtocolManager::getInstance()->abort();
     deleteAllPeers();
     destroy();

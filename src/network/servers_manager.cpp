@@ -60,8 +60,6 @@ ServersManager::ServersManager()
 ServersManager::~ServersManager()
 {
     cleanUpServers();
-    MutexLocker(m_joined_server);
-    delete m_joined_server.getData();
 }   // ~ServersManager
 
 // ------------------------------------------------------------------------
@@ -272,15 +270,8 @@ const Server* ServersManager::getQuickPlay() const
  */
 void ServersManager::setJoinedServer(uint32_t id)
 {
-    {
-        MutexLocker(m_joined_server);
-        delete m_joined_server.getData();
-    }
-
-    {
-        MutexLocker(m_mapped_servers);
-        m_joined_server.getData() = m_mapped_servers.getData().at(id);
-    }
+    MutexLocker(m_mapped_servers);
+    m_joined_server.getData() = m_mapped_servers.getData().at(id);
 }   // setJoinedServer
 
 // ----------------------------------------------------------------------------
@@ -289,7 +280,6 @@ void ServersManager::setJoinedServer(uint32_t id)
 void ServersManager::unsetJoinedServer()
 {
     MutexLocker(m_joined_server);
-    delete m_joined_server.getData();
     m_joined_server.getData() = NULL;
 }   // unsetJoinedServer
 
