@@ -130,6 +130,9 @@ IrrDriver::IrrDriver()
     m_boundingboxesviz = false;
     m_last_light_bucket_distance = 0;
     memset(object_count, 0, sizeof(object_count));
+    
+    m_avi_writer = NULL;
+    m_request_recording = false;
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -137,6 +140,8 @@ IrrDriver::IrrDriver()
  */
 IrrDriver::~IrrDriver()
 {
+    stopRecording();
+
     // Note that we can not simply delete m_post_processing here:
     // m_post_processing uses a material that has a reference to
     // m_post_processing (for a callback). So when the material is
@@ -2118,6 +2123,56 @@ void IrrDriver::doScreenShot()
     image->drop();
 }   // doScreenShot
 
+
+void IrrDriver::startRecording()
+{
+    if (m_avi_writer != NULL)
+        return;
+        
+    time_t rawtime;
+    time(&rawtime);
+    tm* timeInfo = localtime(&rawtime);
+    char time_buffer[256];
+    sprintf(time_buffer, "%i.%02i.%02i_%02i.%02i.%02i",
+            timeInfo->tm_year + 1900, timeInfo->tm_mon+1,
+            timeInfo->tm_mday, timeInfo->tm_hour,
+            timeInfo->tm_min, timeInfo->tm_sec);
+
+    std::string track_name = World::getWorld() != NULL ? 
+                                        race_manager->getTrackName() : "menu";
+        
+    std::string path = file_manager->getScreenshotDir() + track_name + "-"
+                                                         + time_buffer + ".avi";
+
+    m_request_recording = true;
+    int msec_per_frame = 1000 / m_video_driver->getFPS();
+    m_avi_writer = new AVIWriter();
+    m_avi_writer->createFile(path, AVI_FORMAT_JPG, m_actual_screen_size.Width, 
+                             m_actual_screen_size.Height, msec_per_frame, 24, 70);
+    
+}
+
+void IrrDriver::stopRecording()
+{
+    if (m_avi_writer == NULL)
+        return;
+
+    m_avi_writer->closeFile();
+    delete m_avi_writer;
+    m_avi_writer = NULL;
+    m_request_recording = false;
+    
+    RaceGUIBase* base = World::getWorld() ? World::getWorld()->getRaceGUI()
+                                          : NULL;
+    if (base)
+    {
+        std::string path = file_manager->getScreenshotDir();
+        base->addMessage(
+                  core::stringw(("Video saved in\n" + path).c_str()),
+                  NULL, 2.0f, video::SColor(255,255,255,255), true, false);
+    }
+}
+
 // ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
@@ -2207,6 +2262,37 @@ void IrrDriver::update(float dt)
     // menu.
     //if(World::getWorld() && World::getWorld()->isRacePhase())
     //    printRenderStats();
+    
+    if (m_request_recording == true && m_avi_writer != NULL)
+    {
+        video::IImage* image = m_video_driver->createScreenShot();
+        
+        if (image != NULL)
+        {
+            int bits = image->getBytesPerPixel();
+            int w = image->getDimension().Width;
+            int h = image->getDimension().Height;
+            
+            unsigned char* img = (unsigned char*)image->lock();
+            
+            int buf_length = bits * w * h;
+            unsigned char* img_jpg = new unsigned char[buf_length];
+            
+            int len = m_avi_writer->bmpToJpg(img, img_jpg, buf_length, w, h, 
+                                             bits, 70);
+            m_avi_writer->addImage(img_jpg, len);
+            
+            delete[] img_jpg;
+            
+            image->unlock();
+            image->drop();
+            
+            // update msec per frame using the fps during recording to get
+            // something closer to the real value
+            int msec_per_frame = 1000 / m_video_driver->getFPS();
+            m_avi_writer->updateMsecPerFrame(msec_per_frame);
+        }
+    }
 }   // update
 
 // ----------------------------------------------------------------------------

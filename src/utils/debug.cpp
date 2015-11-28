@@ -107,7 +107,9 @@ enum DebugMenuCommand
     DEBUG_VISUAL_VALUES,
     DEBUG_PRINT_START_POS,
     DEBUG_ADJUST_LIGHTS,
-    DEBUG_SCRIPT_CONSOLE
+    DEBUG_SCRIPT_CONSOLE,
+    DEBUG_START_RECORDING,
+    DEBUG_STOP_RECORDING
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -566,6 +568,14 @@ bool handleContextMenuAction(s32 cmdID)
     {
         ScriptingConsole* console = new ScriptingConsole();
     }
+    else if (cmdID == DEBUG_START_RECORDING)
+    {
+        irr_driver->startRecording();
+    }
+    else if (cmdID == DEBUG_STOP_RECORDING)
+    {
+        irr_driver->stopRecording();
+    }
 
     return false;
 }
@@ -642,6 +652,11 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Normal view (Ctrl + F2)", DEBUG_GUI_CAM_NORMAL);
             sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
             sub->addItem(L"Attach fps camera to kart", DEBUG_GUI_CAM_ATTACH);
+            
+            int idx = mnu->addItem(L"Recording >",-1,true, true);
+            sub = mnu->getSubMenu(idx);
+            sub->addItem(L"Start recording", DEBUG_START_RECORDING);
+            sub->addItem(L"Stop recording", DEBUG_STOP_RECORDING);
 
             mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 

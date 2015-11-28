@@ -42,6 +42,7 @@
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
+#include "utils/avi_writer.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
@@ -306,6 +307,9 @@ private:
     float m_ssao_radius;
     float m_ssao_k;
     float m_ssao_sigma;
+    
+    bool m_request_recording;
+    AVIWriter* m_avi_writer;
 
 #ifdef DEBUG
     /** Used to visualise skeletons. */
@@ -429,6 +433,8 @@ public:
     void                  printRenderStats();
     bool                  supportsSplatting();
     void                  requestScreenshot();
+    void                  startRecording();
+    void                  stopRecording();
     void                  setTextureErrorMessage(const std::string &error,
                                                  const std::string &detail="");
     void                  unsetTextureErrorMessage();
