@@ -80,6 +80,10 @@ private:
     /** Id of thread listening to enet events. */
     pthread_t*  m_listening_thread;
 
+    /** Flag which is set from the protocol manager thread which
+     *  triggers a shutdown of the STKHost (and the Protocolmanager). */
+    bool m_shutdown;
+
     /** Mutex used to stop this thread. */
     pthread_mutex_t m_exit_mutex;
 
@@ -128,8 +132,9 @@ public:
     virtual GameSetup* setupNewGame();
     void abort();
     void deleteAllPeers();
-    void reset();
     bool connect(const TransportAddress& peer);
+    void requestShutdown();
+    void shutdown();
 
     void sendMessage(const NetworkString& data, bool reliable = true);
     void sendPacketExcept(STKPeer* peer,
@@ -152,6 +157,10 @@ public:
     const irr::core::stringw& 
                 getErrorMessage() const;
 
+    // --------------------------------------------------------------------
+    /** Returns true if a shutdown of the network infrastructure was
+     *  requested. */
+    bool requestedShutdown() const { return m_shutdown; }
     // --------------------------------------------------------------------
     /** Returns the current game setup. */
     GameSetup* getGameSetup() { return m_game_setup; }

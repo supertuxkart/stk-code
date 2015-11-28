@@ -210,12 +210,13 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
     } // connection
     else if (event->getType() == EVENT_TYPE_DISCONNECTED) 
     {
-        // means we left essentially
-        STKHost::get()->removePeer(m_server);
-        m_server = NULL;
-        STKHost::get()->deleteAllPeers();
-        ProtocolManager::getInstance()->requestTerminate(this);
-        STKHost::get()->reset();
+        // This means we left essentially.
+        // We can't delete STKHost from this thread, since the main
+        // thread might still test if STKHost exists and then call
+        // the ProtocolManager, which might already have been deleted.
+        // So only signal tha the STKHost should exit, which will be tested
+        // from the main thread.
+        STKHost::get()->requestShutdown();
         return true;
     } // disconnection
     return false;

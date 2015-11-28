@@ -200,6 +200,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
  */
 void STKHost::init()
 {
+    m_shutdown         = false;
     m_network          = NULL;
     m_lan_network      = NULL;
     m_listening_thread = NULL;
@@ -253,6 +254,29 @@ STKHost::~STKHost()
 }   // ~STKHost
 
 //-----------------------------------------------------------------------------
+/** Requests that the network infrastructure is to be shut down. This function
+ *  is called from a thread, but the actual shutdown needs to be done from 
+ *  the main thread to avoid race conditions (e.g. ProtocolManager might still
+ *  access data structures when the main thread tests if STKHost exist (which
+ *  it does, but ProtocolManager might be shut down already.
+ */
+void STKHost::requestShutdown()
+{
+    m_shutdown = true;
+}   // requestExit
+
+//-----------------------------------------------------------------------------
+/** Called from the main thread when the network infrastructure is to be shut
+ *  down.
+ */
+void STKHost::shutdown()
+{
+    ProtocolManager::getInstance()->abort();
+    deleteAllPeers();
+    destroy();
+}   // shutdown
+
+//-----------------------------------------------------------------------------
 /** A previous GameSetup is deletea and a new one is created.
  *  \return Newly create GameSetup object.
  */
@@ -263,17 +287,6 @@ GameSetup* STKHost::setupNewGame()
     m_game_setup = new GameSetup();
     return m_game_setup;
 }   // setupNewGame
-
-//-----------------------------------------------------------------------------
-/** \brief Function to reset the host - called in case that a client
- *  is disconnected from a server. 
- *  This function resets the peers and the listening host.
- */
-void STKHost::reset()
-{
-    deleteAllPeers();
-    destroy();
-}   // reset
 
 //-----------------------------------------------------------------------------
 /** Called when you leave a server.
