@@ -132,7 +132,6 @@ IrrDriver::IrrDriver()
     memset(object_count, 0, sizeof(object_count));
     
     m_avi_writer = NULL;
-    m_request_recording = false;
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -2144,32 +2143,42 @@ void IrrDriver::startRecording()
     std::string path = file_manager->getScreenshotDir() + track_name + "-"
                                                          + time_buffer + ".avi";
 
-    m_request_recording = true;
     int msec_per_frame = 1000 / m_video_driver->getFPS();
     m_avi_writer = new AVIWriter();
-    m_avi_writer->createFile(path, AVI_FORMAT_JPG, m_actual_screen_size.Width, 
-                             m_actual_screen_size.Height, msec_per_frame, 24, 70);
+    bool success = m_avi_writer->createFile(path, AVI_FORMAT_JPG, 
+                                            m_actual_screen_size.Width, 
+                                            m_actual_screen_size.Height, 
+                                            msec_per_frame, 24, 70);
+                             
+    if (!success)
+    {
+        stopRecording(false);
+    }
     
 }
 
-void IrrDriver::stopRecording()
+void IrrDriver::stopRecording(bool success)
 {
     if (m_avi_writer == NULL)
         return;
 
-    m_avi_writer->closeFile();
+    success = success && m_avi_writer->closeFile();
     delete m_avi_writer;
     m_avi_writer = NULL;
-    m_request_recording = false;
     
     RaceGUIBase* base = World::getWorld() ? World::getWorld()->getRaceGUI()
                                           : NULL;
     if (base)
     {
-        std::string path = file_manager->getScreenshotDir();
-        base->addMessage(
-                  core::stringw(("Video saved in\n" + path).c_str()),
-                  NULL, 2.0f, video::SColor(255,255,255,255), true, false);
+        std::string message;
+        
+        if (success)
+            message = "Video saved in\n" + file_manager->getScreenshotDir();
+        else
+            message = "Recording failed.";
+            
+        base->addMessage(core::stringw(message.c_str()), NULL, 2.0f, 
+                                video::SColor(255,255,255,255), true, false);
     }
 }
 
@@ -2263,7 +2272,7 @@ void IrrDriver::update(float dt)
     //if(World::getWorld() && World::getWorld()->isRacePhase())
     //    printRenderStats();
     
-    if (m_request_recording == true && m_avi_writer != NULL)
+    if (m_avi_writer != NULL)
     {
         video::IImage* image = m_video_driver->createScreenShot();
         
@@ -2280,7 +2289,7 @@ void IrrDriver::update(float dt)
             
             int len = m_avi_writer->bmpToJpg(img, img_jpg, buf_length, w, h, 
                                              bits, 70);
-            m_avi_writer->addImage(img_jpg, len);
+            AVIErrCode result = m_avi_writer->addImage(img_jpg, len);
             
             delete[] img_jpg;
             
@@ -2291,6 +2300,19 @@ void IrrDriver::update(float dt)
             // something closer to the real value
             int msec_per_frame = 1000 / m_video_driver->getFPS();
             m_avi_writer->updateMsecPerFrame(msec_per_frame);
+            
+            if (result == AVI_SIZE_LIMIT_ERR)
+            {
+                // File size limit reached. Starting new file...
+                delete m_avi_writer;
+                m_avi_writer = NULL;
+                
+                startRecording();
+            }
+            else if (result == AVI_IO_ERR)
+            {
+                stopRecording(false);
+            }
         }
     }
 }   // update

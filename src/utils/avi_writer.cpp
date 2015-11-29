@@ -51,17 +51,17 @@ error:
     return false;
 }
 
-bool AVIWriter::addImage(unsigned char* buffer, int buf_size)
+AVIErrCode AVIWriter::addImage(unsigned char* buffer, int buf_size)
 {
     if (m_file == NULL)
-        return false;
+        goto error;
 
-    int num = ftell(m_file);
+    int num; num = ftell(m_file);
     if (num < 0)
         goto error;
 
     if (m_total_frames >= MAX_FRAMES)
-        goto error;
+        goto size_limit;
 
     CHUNK chunk;
     chunk.fcc = m_chunk_fcc;
@@ -100,13 +100,17 @@ bool AVIWriter::addImage(unsigned char* buffer, int buf_size)
 
     // check if we reached the file size limit
     if (num >= MAX_FILE_SIZE)
-        goto error;
+        goto size_limit;
 
-    return true;
+    return AVI_SUCCESS;
 
 error:
     closeFile(true);
-    return false;
+    return AVI_IO_ERR;
+    
+size_limit:
+    closeFile();
+    return AVI_SIZE_LIMIT_ERR;
 }
 
 bool AVIWriter::closeFile(bool delete_file)

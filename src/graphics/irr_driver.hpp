@@ -308,7 +308,6 @@ private:
     float m_ssao_k;
     float m_ssao_sigma;
     
-    bool m_request_recording;
     AVIWriter* m_avi_writer;
 
 #ifdef DEBUG
@@ -434,7 +433,7 @@ public:
     bool                  supportsSplatting();
     void                  requestScreenshot();
     void                  startRecording();
-    void                  stopRecording();
+    void                  stopRecording(bool success = true);
     void                  setTextureErrorMessage(const std::string &error,
                                                  const std::string &detail="");
     void                  unsetTextureErrorMessage();

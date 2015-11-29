@@ -45,7 +45,19 @@ const uint32_t AVIIF_MIDPART = 0x00000060;
 const uint32_t AVIIF_NOTIME = 0x00000100;
 const uint32_t AVIIF_COMPUSE = 0x0FFF0000;
 
-enum AVIFormat {AVI_FORMAT_BMP, AVI_FORMAT_JPG};
+enum AVIFormat 
+{
+	AVI_FORMAT_BMP, 
+	AVI_FORMAT_JPG
+};
+
+enum AVIErrCode
+{
+	AVI_SUCCESS,
+	AVI_SIZE_LIMIT_ERR,
+	AVI_IO_ERR
+};
+
 const int MAX_FRAMES = 1000000;
 const int MAX_FILE_SIZE = 2000000000;
 
@@ -163,7 +175,7 @@ private:
 public:
     AVIWriter() {m_file = NULL;}
 
-    bool addImage(unsigned char* buffer, int size);
+    AVIErrCode addImage(unsigned char* buffer, int size);
     bool closeFile(bool delete_file = false);
     bool createFile(std::string filename, AVIFormat avi_format, int width,
                     int height, unsigned int msec_per_frame, int bits,
