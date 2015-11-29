@@ -2651,14 +2651,14 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     const float steer_frac = m_skidding->getSteeringFraction();
 
-    const float roll_speed = m_kart_properties->getLeanSpeed();
+    const float roll_speed = m_kart_properties->getLeanSpeed() * DEGREE_TO_RAD;
     if(speed_frac > 0.8f && fabsf(steer_frac)>0.5f)
     {
         // Use steering ^ 7, which means less effect at lower
         // steering
         const float f = m_skidding->getSteeringFraction();
         const float f2 = f*f;
-        const float max_lean = -m_kart_properties->getMaxLean()
+        const float max_lean = -m_kart_properties->getLeanMax() * DEGREE_TO_RAD
                              * f2*f2*f2*f
                              * speed_frac;
         if(max_lean>0)

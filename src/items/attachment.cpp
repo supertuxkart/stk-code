@@ -268,7 +268,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
         float f = std::max(item->getDisableTime(),
-                         m_kart->getCharacteristic()->getExplosionDuration() + 2.0f);
+                         m_kart->getKartProperties()->getExplosionDuration() + 2.0f);
         item->setDisableTime(f);
         break;
         }
@@ -296,7 +296,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         switch (new_attachment)
         {
         case 0:
-            set(ATTACH_PARACHUTE, m_kart->getCharacteristic()->
+            set(ATTACH_PARACHUTE, m_kart->getKartProperties()->
                 getParachuteDuration() + leftover_time);
             m_initial_speed = m_kart->getSpeed();
 
@@ -311,13 +311,13 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
             break ;
         case 2:
-            set(ATTACH_ANVIL, m_kart->getCharacteristic()->
+            set(ATTACH_ANVIL, m_kart->getKartProperties()->
                 getAnvilDuration() + leftover_time);
             // if ( m_kart == m_kart[0] )
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
             // Reduce speed once (see description above), all other changes are
             // handled in Kart::updatePhysics
-            m_kart->adjustSpeed(m_kart->getCharacteristic()->getAnvilSpeedFactor());
+            m_kart->adjustSpeed(m_kart->getKartProperties()->getAnvilSpeedFactor());
             m_kart->updateWeight();
             break ;
         }   // switch
@@ -422,12 +422,12 @@ void Attachment::update(float dt)
         // This percentage is based on the ratio of
         // initial_speed / initial_max_speed
 
-        float f = m_initial_speed / m_kart->getCharacteristic()->getParachuteMaxSpeed();
+        float f = m_initial_speed / m_kart->getKartProperties()->getParachuteMaxSpeed();
         if (f > 1.0f) f = 1.0f;   // cap fraction
         if (m_kart->getSpeed() <= m_initial_speed *
-                                 (m_kart->getCharacteristic()->getParachuteLboundFraction() +
-                                  f * (  m_kart->getCharacteristic()->getParachuteUboundFraction()
-                                       - m_kart->getCharacteristic()->getParachuteLboundFraction())))
+                                 (m_kart->getKartProperties()->getParachuteLboundFraction() +
+                                  f * (  m_kart->getKartProperties()->getParachuteUboundFraction()
+                                       - m_kart->getKartProperties()->getParachuteLboundFraction())))
         {
             m_time_left = -1;
         }
@@ -512,7 +512,7 @@ void Attachment::update(float dt)
 // ----------------------------------------------------------------------------
 float Attachment::weightAdjust() const
 {
-    return m_type == ATTACH_ANVIL ? m_kart->getCharacteristic()->getAnvilWeight() : 0.0f;
+    return m_type == ATTACH_ANVIL ? m_kart->getKartProperties()->getAnvilWeight() : 0.0f;
 }
 
 // ----------------------------------------------------------------------------

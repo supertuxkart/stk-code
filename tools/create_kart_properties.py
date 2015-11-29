@@ -140,60 +140,35 @@ def joinSubName(group, member, titleCase):
     else:
         return "_".join(words)
 
-def main():
-    # Find out what to do
-    if len(sys.argv) == 1:
-        print("""Usage: ./create_kart_properties.py <operation>
-Operations:
-    enum     List the enum values for all characteristics in abstract_characteristic.hpp
-    defs     Create the headers in abstract_characteristic.hpp
-    getter   The getter implementations in abstract_characteristic.cpp
-    getProp1 Creates the getType function in abstract_characteristic.cpp
-    getProp2 Creates the getName funciton in abstract_characteristic.cpp
-    getXml   Used to load the characteristics from an xml file in xml_characteristic.cpp""")
-        return
-    task = sys.argv[1]
+# Functions to generate code
 
-    groups = [Group.parse(line) for line in characteristics.split("\n")]
+def createEnum(groups):
+    for g in groups:
+        print()
+        print("        // {0}".format(g.getBaseName().title()))
+        for m in g.members:
+            print("        {0},".format(joinSubName(g, m, False).upper()))
 
-    # Find longest name to align the function bodies
-    nameLengthTitle = 0
-    nameLengthUnderscore = 0
+def createAcDefs(groups):
+    for g in groups:
+        print()
+        for m in g.members:
+            nameTitle = joinSubName(g, m, True)
+            nameUnderscore = joinSubName(g, m, False)
+            typeC = m.typeC
+
+            print("    {0} get{1}() const;".
+                format(typeC, nameTitle, nameUnderscore))
+
+def createAcGetter(groups):
     for g in groups:
         for m in g.members:
-            l = len(joinSubName(g, m, True))
-            if l > nameLengthTitle:
-                nameLengthTitle = l
-            l = len(joinSubName(g, m, False))
-            if l > nameLengthUnderscore:
-                nameLengthUnderscore = l
+            nameTitle = joinSubName(g, m, True)
+            nameUnderscore = joinSubName(g, m, False)
+            typeC = m.typeC
+            result = "result"
 
-    # Print the results
-    if task == "enum":
-        for g in groups:
-            print()
-            print("        // {0}".format(g.getBaseName().title()))
-            for m in g.members:
-                print("        {0},".format(joinSubName(g, m, False).upper()))
-    elif task == "defs":
-        for g in groups:
-            print()
-            for m in g.members:
-                nameTitle = joinSubName(g, m, True)
-                nameUnderscore = joinSubName(g, m, False)
-                typeC = m.typeC
-
-                print("    {0} get{1}() const;".
-                    format(typeC, nameTitle, nameUnderscore))
-    elif task == "getter":
-        for g in groups:
-            for m in g.members:
-                nameTitle = joinSubName(g, m, True)
-                nameUnderscore = joinSubName(g, m, False)
-                typeC = m.typeC
-                result = "result"
-
-                print("""// ----------------------------------------------------------------------------
+            print("""// ----------------------------------------------------------------------------
 {3} AbstractCharacteristic::get{1}() const
 {{
     {0} result;
@@ -205,33 +180,105 @@ Operations:
     return {4};
 }}  // get{1}
 """.format(m.typeC, nameTitle, nameUnderscore.upper(), typeC, result))
-    elif task == "getProp1":
-        for g in groups:
-            for m in g.members:
-                nameTitle = joinSubName(g, m, True)
-                nameUnderscore = joinSubName(g, m, False)
-                print("    case {0}:\n        return TYPE_{1};".
-                    format(nameUnderscore.upper(), "_".join(toList(m.typeStr)).upper()))
-    elif task == "getProp2":
-        for g in groups:
-            for m in g.members:
-                nameTitle = joinSubName(g, m, True)
-                nameUnderscore = joinSubName(g, m, False).upper()
-                print("    case {0}:\n        return \"{0}\";".
-                    format(nameUnderscore))
-    elif task == "getXml":
-        for g in groups:
-            print("    if (const XMLNode *sub_node = node->getNode(\"{0}\"))\n    {{".
-                format(g.baseName.lower()))
-            for m in g.members:
-                nameUnderscore = joinSubName(g, m, False)
-                nameMinus = "-".join(toList(m.name))
-                print("""        sub_node->get(\"{0}\",
+
+def createKpDefs(groups):
+    for g in groups:
+        print()
+        for m in g.members:
+            nameTitle = joinSubName(g, m, True)
+            nameUnderscore = joinSubName(g, m, False)
+            typeC = m.typeC
+
+            print("    {0} get{1}() const;".
+                format(typeC, nameTitle, nameUnderscore))
+
+def createKpGetter(groups):
+    for g in groups:
+        for m in g.members:
+            nameTitle = joinSubName(g, m, True)
+            nameUnderscore = joinSubName(g, m, False)
+            typeC = m.typeC
+            result = "result"
+
+            print("""// ----------------------------------------------------------------------------
+{1} KartProperties::get{0}() const
+{{
+    return m_cached_characteristic->get{0}();
+}}  // get{0}
+""".format(nameTitle, typeC))
+
+def createGetType(groups):
+    for g in groups:
+        for m in g.members:
+            nameTitle = joinSubName(g, m, True)
+            nameUnderscore = joinSubName(g, m, False)
+            print("    case {0}:\n        return TYPE_{1};".
+                format(nameUnderscore.upper(), "_".join(toList(m.typeStr)).upper()))
+
+def createGetName(groups):
+    for g in groups:
+        for m in g.members:
+            nameTitle = joinSubName(g, m, True)
+            nameUnderscore = joinSubName(g, m, False).upper()
+            print("    case {0}:\n        return \"{0}\";".
+                format(nameUnderscore))
+
+def createLoadXml(groups):
+    for g in groups:
+        print("    if (const XMLNode *sub_node = node->getNode(\"{0}\"))\n    {{".
+            format(g.baseName.lower()))
+        for m in g.members:
+            nameUnderscore = joinSubName(g, m, False)
+            nameMinus = "-".join(toList(m.name))
+            print("""        sub_node->get(\"{0}\",
             &m_values[{1}]);""".
-                    format(nameMinus, nameUnderscore.upper()))
-            print("    }\n")
-    else:
-        print("Unknown task")
+                format(nameMinus, nameUnderscore.upper()))
+        print("    }\n")
+
+# Dicionary that maps an argument string to a tupel of
+# a generator function, a help string and a filename
+functions = {
+    "enum":     (createEnum,     "List the enum values for all characteristics",           "karts/abstract_characteristic.hpp"),
+    "acdefs":   (createAcDefs,   "Create the header function definitions",                 "karts/abstract_characteristic.hpp"),
+    "acgetter": (createAcGetter, "Implement the getters",                                  "karts/abstract_characteristic.cpp"),
+    "getType":  (createGetType,  "Implement the getType function",                         "karts/abstract_characteristic.cpp"),
+    "getName":  (createGetName,  "Implement the getName function",                         "karts/abstract_characteristic.cpp"),
+    "kpdefs":   (createKpDefs,   "Create the header function definitions for the getters", "karts/kart_properties.hpp"),
+    "kpgetter": (createKpGetter, "Implement the getters",                                  "karts/kart_properties.cpp"),
+    "loadXml":  (createLoadXml,  "Code to load the characteristics from an xml file",      "karts/xml_characteristic.hpp"),
+}
+
+def main():
+    # Find out what to do
+    if len(sys.argv) != 2:
+        print("""Usage: ./create_kart_properties.py <operation>
+Operations:""")
+        maxOperationLength = 0
+        maxDescriptionLength = 0
+        for o, f in functions.items():
+            l = len(o)
+            if l > maxOperationLength:
+                maxOperationLength = l
+            l = len(f[1])
+            if l > maxDescriptionLength:
+                maxDescriptionLength = l
+
+        formatString = "    {{0:{0}}}    {{1:{1}}} in {{2}}".format(maxOperationLength, maxDescriptionLength)
+        for o, f in functions.items():
+            print(formatString.format(o, f[1], f[2]))
+        return
+
+    task = sys.argv[1]
+
+    if task not in functions:
+        print("The wanted operation was not found. Please call this script without arguments to list available arguments.")
+        return
+
+    # Parse properties
+    groups = [Group.parse(line) for line in characteristics.split("\n")]
+
+    # Create the wanted code
+    functions[task][0](groups)
 
 if __name__ == '__main__':
     main()

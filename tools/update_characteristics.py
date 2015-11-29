@@ -26,30 +26,24 @@ import os
 import re
 import subprocess
 
-# Where and what should be replaced
-replacements = [
-    ["enum",     "karts/abstract_characteristic.hpp"],
-    ["defs",     "karts/abstract_characteristic.hpp"],
-    ["getter",   "karts/abstract_characteristic.cpp"],
-    ["getProp1", "karts/abstract_characteristic.cpp"],
-    ["getProp2", "karts/abstract_characteristic.cpp"],
-    ["getXml",   "karts/xml_characteristic.cpp"]]
+from create_kart_properties import functions
 
 def main():
     # Check, if it runs in the root directory
     if not os.path.isfile("tools/update_characteristics.py"):
         print("Please run this script in the root directory of the project.")
         exit(1)
-    for replacement in replacements:
+    for operation, function in functions.items():
+        #  + " 2> /dev/null"
         result = subprocess.Popen("tools/create_kart_properties.py " +
-            replacement[0] + " 2> /dev/null", shell = True,
+            operation, shell = True,
             stdout = subprocess.PIPE).stdout.read().decode('UTF-8')
-        with open("src/" + replacement[1], "r") as f:
+        with open("src/" + function[2], "r") as f:
             text = f.read()
         # Replace the text by using look behinds and look forwards
-        text = re.sub("(?<=/\* \<characteristics-start " + replacement[0] +
-            "\> \*/\\n)(.|\n)*(?=\\n\s*/\* <characteristics-end " + replacement[0] + "> \*/)", result, text)
-        with open("src/" + replacement[1], "w") as f:
+        text = re.sub("(?<=/\* \<characteristics-start " + operation +
+            "\> \*/\\n)(.|\n)*(?=\\n\s*/\* <characteristics-end " + operation + "> \*/)", result, text)
+        with open("src/" + function[2], "w") as f:
             f.write(text)
 
 if __name__ == '__main__':

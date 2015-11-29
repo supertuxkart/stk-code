@@ -150,7 +150,7 @@ void RubberBand::update(float dt)
     // Check for rubber band snapping
     // ------------------------------
     float l = (m_end_position-k).length2();
-    float max_len = m_owner->getCharacteristic()->getPlungerBandMaxLength();
+    float max_len = m_owner->getKartProperties()->getPlungerBandMaxLength();
     if(l>max_len*max_len)
     {
         // Rubber band snaps
@@ -163,7 +163,7 @@ void RubberBand::update(float dt)
     // ----------------------------
     if(m_attached_state!=RB_TO_PLUNGER)
     {
-        float force = m_owner->getCharacteristic()->getPlungerBandForce();
+        float force = m_owner->getKartProperties()->getPlungerBandForce();
         Vec3 diff   = m_end_position-k;
 
         // detach rubber band if kart gets very close to hit point
@@ -179,10 +179,10 @@ void RubberBand::update(float dt)
         diff.normalize();   // diff can't be zero here
         m_owner->getBody()->applyCentralForce(diff*force);
         m_owner->increaseMaxSpeed(MaxSpeed::MS_INCREASE_RUBBER,
-            m_owner->getCharacteristic()->getPlungerBandSpeedIncrease(),
+            m_owner->getKartProperties()->getPlungerBandSpeedIncrease(),
             /*engine_force*/ 0.0f,
             /*duration*/0.1f,
-            m_owner->getCharacteristic()->getPlungerBandFadeOutTime());
+            m_owner->getKartProperties()->getPlungerBandFadeOutTime());
         if(m_attached_state==RB_TO_KART)
             m_hit_kart->getBody()->applyCentralForce(diff*(-force));
     }
