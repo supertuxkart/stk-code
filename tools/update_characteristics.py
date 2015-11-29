@@ -34,7 +34,6 @@ def main():
         print("Please run this script in the root directory of the project.")
         exit(1)
     for operation, function in functions.items():
-        #  + " 2> /dev/null"
         result = subprocess.Popen("tools/create_kart_properties.py " +
             operation, shell = True,
             stdout = subprocess.PIPE).stdout.read().decode('UTF-8')

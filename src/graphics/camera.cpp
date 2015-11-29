@@ -379,8 +379,8 @@ void Camera::smoothMoveCamera(float dt)
     core::vector3df current_position  =  m_camera->getPosition();
     // Smoothly interpolate towards the position and target
     const KartProperties *kp = m_kart->getKartProperties();
-    float max_increase_with_zipper   = kp->getZipperMaxSpeedIncrease();
-    float max_speed_without_zipper   = kp->getEngineMaxSpeed();
+    float max_increase_with_zipper = kp->getZipperMaxSpeedIncrease();
+    float max_speed_without_zipper = kp->getEngineMaxSpeed();
     float current_speed = m_kart->getSpeed();
 
     const Skidding *ks = m_kart->getSkidding();

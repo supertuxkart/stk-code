@@ -233,12 +233,12 @@
                 fade-out-time="1.0" />
 
         <!-- Swatter
-            duration: how long can the swatter be active.
+            duration: How long can the swatter be active.
             distance: How close a kart or an item must be before it can be hit.
-                      This is the square of the distance to accelerate the
+                      This is the square of the real distance to accelerate the
                       compution.
             squash-duration: How long a kart will remain squashed.
-            squash-slowdown: percentage of max speed that a kart is
+            squash-slowdown: Percentage of max speed that a kart is
                 restricted to. -->
         <swatter duration="10" distance="9" squash-duration="5"
                  squash-slowdown="0.5" />

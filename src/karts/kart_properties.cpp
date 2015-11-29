@@ -89,7 +89,6 @@ KartProperties::KartProperties(const std::string &filename)
     m_color                      = video::SColor(255, 0, 0, 0);
     m_shape                      = 32;  // close enough to a circle.
     m_engine_sfx_type            = "engine_small";
-    m_kart_model                 = NULL;
     m_nitro_min_consumption      = 0.53f;
     // The default constructor for stk_config uses filename=""
     if (filename != "")
@@ -107,7 +106,6 @@ KartProperties::KartProperties(const std::string &filename)
 /** Destructor, dereferences the kart model. */
 KartProperties::~KartProperties()
 {
-    delete m_kart_model;
 }   // ~KartProperties
 
 //-----------------------------------------------------------------------------
@@ -187,7 +185,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // m_kart_model must be initialised after assigning the default
     // values from stk_config (otherwise all kart_properties will
     // share the same KartModel
-    m_kart_model  = new KartModel(/*is_master*/true);
+    m_kart_model.reset(new KartModel(/*is_master*/true));
 
     m_root  = StringUtils::getPath(filename)+"/";
     m_ident = StringUtils::getBasename(StringUtils::getPath(filename));
@@ -204,7 +202,6 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             msg << "Couldn't load kart properties '" << filename <<
                 "': no kart node.";
 
-            delete m_kart_model;
             throw std::runtime_error(msg.str());
         }
         getAllData(root);
@@ -262,7 +259,6 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         const bool success = m_kart_model->loadModels(*this);
         if (!success)
         {
-            delete m_kart_model;
             file_manager->popTextureSearchPath();
             file_manager->popModelSearchPath();
             throw std::runtime_error("Cannot load kart models");
