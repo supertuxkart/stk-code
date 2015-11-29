@@ -55,14 +55,14 @@ namespace Scripting
             DeviceConfig* config = device->getConfiguration();
             PlayerAction ScriptAction = (PlayerAction)Enum_value;
             irr::core::stringw control = config->getBindingAsString(ScriptAction);
-            std::string key = StringUtils::wide_to_utf8(control.c_str());
+            std::string key = StringUtils::wideToUtf8(control);
             return key;
         }
 
         /** Show the specified message in a popup */
         void displayModalMessage(std::string* input)
         {
-            irr::core::stringw out = StringUtils::utf8_to_wide(input->c_str());
+            irr::core::stringw out = StringUtils::utf8ToWide(*input);
             new TutorialMessageDialog((out), true);
         }
 
@@ -74,7 +74,7 @@ namespace Scripting
         /** Display text in the center of the screen for a few seconds */
         void displayOverlayMessage(std::string* input)
         {
-            irr::core::stringw msg = StringUtils::utf8_to_wide(input->c_str());
+            irr::core::stringw msg = StringUtils::utf8ToWide(*input);
             std::vector<core::stringw> parts =
                 StringUtils::split(msg, '\n', false);
                         
@@ -92,7 +92,7 @@ namespace Scripting
         {
             irr::core::stringw out = translations->fribidize(translations->w_gettext(input->c_str()));
 
-            return StringUtils::wide_to_utf8(out.c_str());
+            return StringUtils::wideToUtf8(out);
         }
 
         /** Translate string and insert values. e.g. GUI::translate("Hello %s !", "John") */
@@ -101,11 +101,11 @@ namespace Scripting
             irr::core::stringw out = translations->w_gettext(formatString->c_str());
 
             out = StringUtils::insertValues(out,
-                StringUtils::utf8_to_wide(arg1->c_str()));
+                                            StringUtils::utf8ToWide(*arg1));
 
             out = translations->fribidize(out);
 
-            return StringUtils::wide_to_utf8(out.c_str());
+            return StringUtils::wideToUtf8(out);
         }
 
         /** Translate string and insert values. e.g. GUI::translate("Hello %s !", "John") */
@@ -114,12 +114,12 @@ namespace Scripting
             irr::core::stringw out = translations->w_gettext(formatString->c_str());
 
             out = StringUtils::insertValues(out,
-                StringUtils::utf8_to_wide(arg1->c_str()),
-                StringUtils::utf8_to_wide(arg2->c_str()));
+                                            StringUtils::utf8ToWide(*arg1),
+                                            StringUtils::utf8ToWide(*arg2));
 
             out = translations->fribidize(out);
 
-            return StringUtils::wide_to_utf8(out.c_str());
+            return StringUtils::wideToUtf8(out);
         }
 
         /** Translate string and insert values. e.g. GUI::translate("Hello %s !", "John") */
@@ -129,13 +129,13 @@ namespace Scripting
             irr::core::stringw out = translations->w_gettext(formatString->c_str());
 
             out = StringUtils::insertValues(out,
-                StringUtils::utf8_to_wide(arg1->c_str()),
-                StringUtils::utf8_to_wide(arg2->c_str()),
-                StringUtils::utf8_to_wide(arg3->c_str()));
+                                            StringUtils::utf8ToWide(*arg1),
+                                            StringUtils::utf8ToWide(*arg2),
+                                            StringUtils::utf8ToWide(*arg3));
 
             out = translations->fribidize(out);
 
-            return StringUtils::wide_to_utf8(out.c_str());
+            return StringUtils::wideToUtf8(out);
         }
         /** @}*/
         /** @}*/

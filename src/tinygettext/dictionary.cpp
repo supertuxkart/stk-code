@@ -221,7 +221,7 @@ std::set<wchar_t> Dictionary::get_all_used_chars()
         const std::vector<std::string>& msgstrs = i->second;
         for (unsigned int k = 0; k < msgstrs.size(); k++)
         {
-            irr::core::stringw ws = translations->fribidize((StringUtils::utf8_to_wide(msgstrs[k].c_str())).c_str());
+            irr::core::stringw ws = translations->fribidize((StringUtils::utf8ToWide(msgstrs[k])).c_str());
                 for (unsigned int l = 0; l < ws.size(); ++l)
                     UsedChars.insert(ws[l]);
         }
@@ -234,7 +234,7 @@ std::set<wchar_t> Dictionary::get_all_used_chars()
             const std::vector<std::string>& msgstrs = j->second;
             for (unsigned int k = 0; k < msgstrs.size(); k++)
             {
-                irr::core::stringw ws = translations->fribidize((StringUtils::utf8_to_wide(msgstrs[k].c_str())).c_str());
+                irr::core::stringw ws = translations->fribidize((StringUtils::utf8ToWide(msgstrs[k])).c_str());
                 for (unsigned int l = 0; l < ws.size(); ++l)
                     UsedChars.insert(ws[l]);
             }
