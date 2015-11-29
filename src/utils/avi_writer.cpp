@@ -163,7 +163,7 @@ bool AVIWriter::closeFile(bool delete_file)
             goto error;
 
         m_avi_hdr.riff.cb = size - sizeof(m_avi_hdr.riff);
-        m_avi_hdr.avih.dwMicroSecPerFrame = m_msec_per_frame;
+        m_avi_hdr.avih.dwMicroSecPerFrame = m_msec_per_frame * 1000;
         m_avi_hdr.avih.dwMaxBytesPerSec = (uint32_t)(((m_stream_bytes / m_total_frames) *
                                     m_format_hdr.strh.dwRate) / m_msec_per_frame + 0.5f);
         m_avi_hdr.avih.dwTotalFrames = m_total_frames;
@@ -243,7 +243,7 @@ bool AVIWriter::createFile(std::string filename, AVIFormat avi_format,
     m_avi_hdr.hdrl = FOURCC('h', 'd', 'r', 'l');
     m_avi_hdr.avihhdr.fcc = FOURCC('a', 'v', 'i', 'h');
     m_avi_hdr.avihhdr.cb = sizeof(m_avi_hdr.avih);
-    m_avi_hdr.avih.dwMicroSecPerFrame = m_msec_per_frame;
+    m_avi_hdr.avih.dwMicroSecPerFrame = m_msec_per_frame * 1000;
     m_avi_hdr.avih.dwMaxBytesPerSec = 0; // update when finished
     m_avi_hdr.avih.dwPaddingGranularity = 0;
     m_avi_hdr.avih.dwFlags = AVIF_WASCAPTUREFILE | AVIF_HASINDEX;
