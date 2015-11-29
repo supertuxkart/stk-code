@@ -58,7 +58,7 @@ ServerLobbyRoomProtocol::~ServerLobbyRoomProtocol()
 void ServerLobbyRoomProtocol::setup()
 {
     m_setup             = STKHost::get()->setupNewGame();
-    m_next_id           = 0;
+    m_next_player_id.setAtomic(0);
 
     // In case of LAN we don't need our public address or register with the
     // STK server, so we can directly go to the accepting clients state.
@@ -454,9 +454,12 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     core::stringw name = StringUtils::utf8ToWide(name_u8);
 
     // add the player to the game setup
-    m_next_id = m_setup->getPlayerCount();
+    m_next_player_id.lock();
+    m_next_player_id.getData()++;
+    int next_player_id = m_next_player_id.getData();
+    m_next_player_id.unlock();
 
-    NetworkPlayerProfile* profile = new NetworkPlayerProfile(m_next_id, name);
+    NetworkPlayerProfile* profile = new NetworkPlayerProfile(next_player_id, name);
     // FIXME: memory leak OnlineProfile
     profile->setOnlineProfile(new Online::OnlineProfile(player_id, ""));
     m_setup->addPlayer(profile);
@@ -466,7 +469,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     NetworkString message(8);
     // size of id -- id -- size of local id -- local id;
     message.ai8(LE_NEW_PLAYER_CONNECTED).ai8(4).ai32(player_id)
-           .ai8(1).ai8(m_next_id).encodeString(name_u8);
+           .ai8(1).ai8(next_player_id).encodeString(name_u8);
     ProtocolManager::getInstance()->sendMessageExcept(this, peer, message);
 
     // Now answer to the peer that just connected
@@ -482,13 +485,13 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // Size is overestimated, probably one player's data will not be sent
     NetworkString message_ack(13 + players.size() * 7);
     // connection success (129) -- size of token -- token
-    message_ack.ai8(LE_CONNECTION_ACCEPTED).ai8(1).ai8(m_next_id).ai8(4)
+    message_ack.ai8(LE_CONNECTION_ACCEPTED).ai8(1).ai8(next_player_id).ai8(4)
                .ai32(token).ai8(4).ai32(player_id);
     // add all players so that this user knows
     for (unsigned int i = 0; i < players.size(); i++)
     {
         // do not duplicate the player into the message
-        if (players[i]->getPlayerID() != m_next_id &&
+        if (players[i]->getPlayerID() != next_player_id &&
             players[i]->getGlobalID() != player_id)
         {
             message_ack.ai8(1).ai8(players[i]->getPlayerID()).ai8(4)

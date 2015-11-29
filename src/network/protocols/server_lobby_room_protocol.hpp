@@ -3,6 +3,7 @@
 
 #include "network/protocols/lobby_room_protocol.hpp"
 #include "utils/cpp2011.hpp"
+#include "utils/synchronised.hpp"
 
 class ServerLobbyRoomProtocol : public LobbyRoomProtocol
                               , public CallbackObject
@@ -20,7 +21,7 @@ private:
     } m_state;
 
     /** Next id to assign to a peer. */
-    uint8_t m_next_id;
+    Synchronised<int> m_next_player_id;
 
     Protocol *m_current_protocol;
     bool m_selection_enabled;
