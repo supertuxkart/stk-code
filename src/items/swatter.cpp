@@ -34,7 +34,6 @@
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_characteristic.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"

@@ -26,7 +26,6 @@
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"

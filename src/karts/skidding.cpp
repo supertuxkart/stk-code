@@ -23,7 +23,6 @@
 #endif
 #include "achievements/achievement_info.hpp"
 #include "config/player_manager.hpp"
-#include "karts/abstract_characteristic.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_gfx.hpp"
@@ -48,7 +47,7 @@ Skidding::Skidding(Kart *kart)
     m_actual_curve->setVisible(false);
 #endif
     m_kart = kart;
-    m_skid_reduce_turn_delta = m_kart->getCharacteristic()->getSkidReduceTurnMax() - m_kart->getCharacteristic()->getSkidReduceTurnMin();
+    m_skid_reduce_turn_delta = m_kart->getKartProperties()->getSkidReduceTurnMax() - m_kart->getKartProperties()->getSkidReduceTurnMin();
     reset();
 }   // Skidding
 
@@ -101,7 +100,7 @@ void Skidding::updateSteering(float steer, float dt)
     case SKID_SHOW_GFX_RIGHT:
     case SKID_NONE:
         m_real_steering = steer;
-        if (m_skid_time < m_kart->getCharacteristic()->getSkidVisualTime() && m_skid_time > 0)
+        if (m_skid_time < m_kart->getKartProperties()->getSkidVisualTime() && m_skid_time > 0)
         {
             float f = m_visual_rotation - m_visual_rotation*dt/m_skid_time;
             // Floating point errors when m_skid_time is very close to 0
@@ -125,27 +124,27 @@ void Skidding::updateSteering(float steer, float dt)
     case SKID_ACCUMULATE_RIGHT:
         {
             float f = (1.0f+steer)*0.5f;   // map [-1,1] --> [0, 1]
-            m_real_steering  = m_kart->getCharacteristic()->getSkidReduceTurnMin()
+            m_real_steering  = m_kart->getKartProperties()->getSkidReduceTurnMin()
                              + m_skid_reduce_turn_delta * f;
-            if(m_skid_time < m_kart->getCharacteristic()->getSkidVisualTime())
-                m_visual_rotation = m_kart->getCharacteristic()->getSkidVisual()
+            if(m_skid_time < m_kart->getKartProperties()->getSkidVisualTime())
+                m_visual_rotation = m_kart->getKartProperties()->getSkidVisual()
                                   * m_real_steering * m_skid_time
-                                  / m_kart->getCharacteristic()->getSkidVisualTime();
+                                  / m_kart->getKartProperties()->getSkidVisualTime();
             else
-                m_visual_rotation = m_kart->getCharacteristic()->getSkidVisual() * m_real_steering;
+                m_visual_rotation = m_kart->getKartProperties()->getSkidVisual() * m_real_steering;
             break;
         }
     case SKID_ACCUMULATE_LEFT:
         {
             float f = (-1.0f+steer)*0.5f;   // map [-1,1] --> [-1, 0]
-            m_real_steering   = -m_kart->getCharacteristic()->getSkidReduceTurnMin()
+            m_real_steering   = -m_kart->getKartProperties()->getSkidReduceTurnMin()
                                + m_skid_reduce_turn_delta * f;
-            if(m_skid_time < m_kart->getCharacteristic()->getSkidVisualTime())
-                m_visual_rotation = m_kart->getCharacteristic()->getSkidVisual()
+            if(m_skid_time < m_kart->getKartProperties()->getSkidVisualTime())
+                m_visual_rotation = m_kart->getKartProperties()->getSkidVisual()
                                   * m_real_steering * m_skid_time
-                                  / m_kart->getCharacteristic()->getSkidVisualTime();
+                                  / m_kart->getKartProperties()->getSkidVisualTime();
             else
-                m_visual_rotation = m_kart->getCharacteristic()->getSkidVisual() * m_real_steering;
+                m_visual_rotation = m_kart->getKartProperties()->getSkidVisual() * m_real_steering;
             break;
         }
         
@@ -175,13 +174,13 @@ float Skidding::getSteeringWhenSkidding(float steering) const
         break;
     case SKID_ACCUMULATE_RIGHT:
         {
-            float f = (steering - m_kart->getCharacteristic()->getSkidReduceTurnMin())
+            float f = (steering - m_kart->getKartProperties()->getSkidReduceTurnMin())
                    /  m_skid_reduce_turn_delta;
             return f *2.0f-1.0f;
         }
     case SKID_ACCUMULATE_LEFT:
         {
-            float f = (steering + m_kart->getCharacteristic()->getSkidReduceTurnMin())
+            float f = (steering + m_kart->getKartProperties()->getSkidReduceTurnMin())
                     / m_skid_reduce_turn_delta;
             return 2.0f * f +1.0f;
         }
@@ -214,7 +213,7 @@ void Skidding::update(float dt, bool is_on_ground,
 #endif
 
     // No skidding backwards or while stopped
-    if(m_kart->getSpeed() < m_kart->getCharacteristic()->getSkidMinSpeed() &&
+    if(m_kart->getSpeed() < m_kart->getKartProperties()->getSkidMinSpeed() &&
        m_skid_state != SKID_NONE && m_skid_state != SKID_BREAK)
     {
         m_skid_state = SKID_BREAK;
@@ -226,15 +225,15 @@ void Skidding::update(float dt, bool is_on_ground,
     if (is_on_ground)
     {
         if ((fabs(steering) > 0.001f) &&
-            m_kart->getSpeed() > m_kart->getCharacteristic()->getSkidMinSpeed() &&
+            m_kart->getSpeed() > m_kart->getKartProperties()->getSkidMinSpeed() &&
             (skidding == KartControl::SC_LEFT || skidding == KartControl::SC_RIGHT))
         {
-            m_skid_factor += m_kart->getCharacteristic()->getSkidIncrease()
-                           * dt / m_kart->getCharacteristic()->getSkidTimeTillMax();
+            m_skid_factor += m_kart->getKartProperties()->getSkidIncrease()
+                           * dt / m_kart->getKartProperties()->getSkidTimeTillMax();
         }
         else if (m_skid_factor > 1.0f)
         {
-            m_skid_factor *= m_kart->getCharacteristic()->getSkidDecrease();
+            m_skid_factor *= m_kart->getKartProperties()->getSkidDecrease();
         }
     }
     else
@@ -242,8 +241,8 @@ void Skidding::update(float dt, bool is_on_ground,
         m_skid_factor = 1.0f; // Lose any skid factor as soon as we fly
     }
 
-    if (m_skid_factor > m_kart->getCharacteristic()->getSkidMax())
-        m_skid_factor = m_kart->getCharacteristic()->getSkidMax();
+    if (m_skid_factor > m_kart->getKartProperties()->getSkidMax())
+        m_skid_factor = m_kart->getKartProperties()->getSkidMax();
     else
         if (m_skid_factor < 1.0f) m_skid_factor = 1.0f;
 
@@ -292,7 +291,7 @@ void Skidding::update(float dt, bool is_on_ground,
             // Don't allow skidding while the kart is (apparently)
             // still in the air, or when the kart is too slow
             if (m_remaining_jump_time > 0 ||
-                m_kart->getSpeed() < m_kart->getCharacteristic()->getSkidMinSpeed())
+                m_kart->getSpeed() < m_kart->getKartProperties()->getSkidMinSpeed())
                 break;
 
             m_skid_state = skidding==KartControl::SC_RIGHT
@@ -304,14 +303,14 @@ void Skidding::update(float dt, bool is_on_ground,
             // Then use this speed to determine the impulse necessary to
             // reach this speed.
             float v = World::getWorld()->getTrack()->getGravity()
-                    * 0.5f * m_kart->getCharacteristic()->getSkidPhysicalJumpTime();
+                    * 0.5f * m_kart->getKartProperties()->getSkidPhysicalJumpTime();
             btVector3 imp(0, v / m_kart->getBody()->getInvMass(),0);
             m_kart->getVehicle()->getRigidBody()->applyCentralImpulse(imp);
 
             // Some karts might use a graphical-only jump. Set it up:
             m_jump_speed = World::getWorld()->getTrack()->getGravity()
-                         * 0.5f * m_kart->getCharacteristic()->getSkidGraphicalJumpTime();
-            m_remaining_jump_time = m_kart->getCharacteristic()->getSkidGraphicalJumpTime();
+                         * 0.5f * m_kart->getKartProperties()->getSkidGraphicalJumpTime();
+            m_remaining_jump_time = m_kart->getKartProperties()->getSkidGraphicalJumpTime();
 
 #ifdef SKID_DEBUG
 #define SPEED 20.0f
@@ -392,11 +391,11 @@ void Skidding::update(float dt, bool is_on_ground,
                 m_skid_state = m_skid_state == SKID_ACCUMULATE_LEFT
                              ? SKID_SHOW_GFX_LEFT
                              : SKID_SHOW_GFX_RIGHT;
-                float t = std::min(m_skid_time, m_kart->getCharacteristic()->getSkidVisualTime());
-                t       = std::min(t,           m_kart->getCharacteristic()->getSkidRevertVisualTime());
+                float t = std::min(m_skid_time, m_kart->getKartProperties()->getSkidVisualTime());
+                t       = std::min(t,           m_kart->getKartProperties()->getSkidRevertVisualTime());
 
                 float vso = getVisualSkidRotation();
-                btVector3 rot(0, vso * m_kart->getCharacteristic()->getSkidPostSkidRotateFactor(), 0);
+                btVector3 rot(0, vso * m_kart->getKartProperties()->getSkidPostSkidRotateFactor(), 0);
                 m_kart->getVehicle()->setTimedRotation(t, rot);
                 // skid_time is used to count backwards for the GFX
                 m_skid_time = t;
@@ -459,14 +458,14 @@ unsigned int Skidding::getSkidBonus(float *bonus_time,
     *bonus_time  = 0;
     *bonus_speed = 0;
     *bonus_force = 0;
-    for (unsigned int i = 0; i < m_kart->getCharacteristic()->getSkidBonusSpeed().size(); i++)
+    for (unsigned int i = 0; i < m_kart->getKartProperties()->getSkidBonusSpeed().size(); i++)
     {
-        if (m_skid_time <= m_kart->getCharacteristic()->getSkidTimeTillBonus()[i])
+        if (m_skid_time <= m_kart->getKartProperties()->getSkidTimeTillBonus()[i])
             return i;
-        *bonus_speed = m_kart->getCharacteristic()->getSkidBonusSpeed()[i];
-        *bonus_time  = m_kart->getCharacteristic()->getSkidBonusTime()[i];
-        *bonus_force = m_kart->getCharacteristic()->getSkidBonusForce()[i];
+        *bonus_speed = m_kart->getKartProperties()->getSkidBonusSpeed()[i];
+        *bonus_time  = m_kart->getKartProperties()->getSkidBonusTime()[i];
+        *bonus_force = m_kart->getKartProperties()->getSkidBonusForce()[i];
     }
-    return (unsigned int) m_kart->getCharacteristic()->getSkidBonusSpeed().size();
+    return (unsigned int) m_kart->getKartProperties()->getSkidBonusSpeed().size();
 }   // getSkidBonusForce
 

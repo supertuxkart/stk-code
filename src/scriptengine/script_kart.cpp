@@ -18,7 +18,6 @@
 
 #include "script_kart.hpp"
 
-#include "karts/abstract_characteristic.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "scriptvec3.hpp"
@@ -123,7 +122,7 @@ namespace Scripting
         float getMaxSpeed(int idKart)
         {
             AbstractKart* kart = World::getWorld()->getKart(idKart);
-            return kart->getCharacteristic()->getEngineMaxSpeed();
+            return kart->getKartProperties()->getEngineMaxSpeed();
         }
 
         /** @}*/

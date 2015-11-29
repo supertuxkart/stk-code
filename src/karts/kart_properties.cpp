@@ -309,6 +309,9 @@ void KartProperties::combineCharacteristics()
     m_combined_characteristic.reset(new CombinedCharacteristic());
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getBaseCharacteristic());
+    m_combined_characteristic->addCharacteristic(kart_properties_manager->
+        getDifficultyCharacteristic(race_manager->getDifficultyAsString(
+            race_manager->getDifficulty())));
 
     // Try to get the kart type
     const AbstractCharacteristic *characteristic = kart_properties_manager->

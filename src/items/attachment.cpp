@@ -30,7 +30,6 @@
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "items/swatter.hpp"
-#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"

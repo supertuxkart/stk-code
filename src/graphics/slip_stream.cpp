@@ -25,7 +25,6 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
@@ -68,9 +67,9 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     setTextureMatrix(&(m_node->getMaterial(0).getTextureMatrix(0)));
     m_slipstream_time      = 0.0f;
 
-    float length = m_kart->getCharacteristic()->getSlipstreamLength();
+    float length = m_kart->getKartProperties()->getSlipstreamLength();
     float kw     = m_kart->getKartWidth();
-    float ew     = m_kart->getCharacteristic()->getSlipstreamWidth();
+    float ew     = m_kart->getKartProperties()->getSlipstreamWidth();
     float kl     = m_kart->getKartLength();
 
     Vec3 p[4];
@@ -313,7 +312,7 @@ void SlipStream::setIntensity(float f, const AbstractKart *kart)
 bool SlipStream::isSlipstreamReady() const
 {
     return m_slipstream_time>
-        m_kart->getCharacteristic()->getSlipstreamCollectTime();
+        m_kart->getKartProperties()->getSlipstreamCollectTime();
 }   // isSlipstreamReady
 
 //-----------------------------------------------------------------------------
@@ -327,12 +326,12 @@ void SlipStream::updateSlipstreamPower()
     if(m_slipstream_mode==SS_USE)
     {
         setIntensity(2.0f, NULL);
-        const AbstractCharacteristic *ch=m_kart->getCharacteristic();
+        const KartProperties *kp = m_kart->getKartProperties();
         m_kart->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM,
-                                ch->getSlipstreamMaxSpeedIncrease(),
-                                ch->getSlipstreamAddPower(),
-                                ch->getSlipstreamDuration(),
-                                ch->getSlipstreamFadeOutTime());
+                                kp->getSlipstreamMaxSpeedIncrease(),
+                                kp->getSlipstreamAddPower(),
+                                kp->getSlipstreamDuration(),
+                                kp->getSlipstreamFadeOutTime());
     }
 }   // upateSlipstreamPower
 
@@ -388,7 +387,7 @@ void SlipStream::update(float dt)
     // not moving. This is useful for debugging the graphics of SS-ing.
 //#define DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
 #ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
-    if(m_kart->getSpeed() < m_kart->getCharacteristic()->getSlipstreamMinSpeed())
+    if(m_kart->getSpeed() < m_kart->getKartProperties()->getSlipstreamMinSpeed())
     {
         setIntensity(0, NULL);
         m_slipstream_mode = SS_NONE;
@@ -430,7 +429,7 @@ void SlipStream::update(float dt)
         // give karts different slipstream properties.
 #ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
         if(m_target_kart->getSpeed() <
-            m_kart->getCharacteristic()->getSlipstreamMinSpeed())
+            m_kart->getKartProperties()->getSlipstreamMinSpeed())
         {
             if(UserConfigParams::m_slipstream_debug &&
                 m_kart->getController()->isPlayerController())
@@ -444,7 +443,7 @@ void SlipStream::update(float dt)
         // slipstream length+0.5*kart_length()+0.5*target_kart_length
         // away from the other kart
         Vec3 delta = m_kart->getXYZ() - m_target_kart->getXYZ();
-        float l    = m_kart->getCharacteristic()->getSlipstreamLength()
+        float l    = m_kart->getKartProperties()->getSlipstreamLength()
                    + 0.5f*( m_target_kart->getKartLength()
                            +m_kart->getKartLength()        );
         if(delta.length2_2d() > l*l)
@@ -485,7 +484,7 @@ void SlipStream::update(float dt)
                 m_slipstream_mode = SS_USE;
                 m_kart->handleZipper();
                 m_slipstream_time =
-                    m_kart->getCharacteristic()->getSlipstreamCollectTime();
+                    m_kart->getKartProperties()->getSlipstreamCollectTime();
                 return;
             }
         }
@@ -506,7 +505,7 @@ void SlipStream::update(float dt)
     setIntensity(m_slipstream_time, m_target_kart);
 
     m_slipstream_mode = SS_COLLECT;
-    if(m_slipstream_time>m_kart->getCharacteristic()->getSlipstreamCollectTime())
+    if(m_slipstream_time>m_kart->getKartProperties()->getSlipstreamCollectTime())
     {
         setIntensity(1.0f, m_target_kart);
     }

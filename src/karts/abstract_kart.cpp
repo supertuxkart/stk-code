@@ -20,8 +20,6 @@
 #include "karts/abstract_kart.hpp"
 
 #include "items/powerup.hpp"
-#include "karts/cached_characteristic.hpp"
-#include "karts/combined_characteristic.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
@@ -60,26 +58,6 @@ AbstractKart::AbstractKart(const std::string& ident,
     m_kart_length = m_kart_model->getLength();
     m_kart_highest_point = m_kart_model->getHighestPoint();
     m_wheel_graphics_position = m_kart_model->getWheelsGraphicsPosition();
-
-    // Combine the characteristics for this player
-    m_combined_characteristic.reset(new CombinedCharacteristic());
-    m_combined_characteristic->addCharacteristic(kart_properties_manager->
-        getBaseCharacteristic());
-    m_combined_characteristic->addCharacteristic(kart_properties_manager->
-        getDifficultyCharacteristic(race_manager->getDifficultyAsString(
-            race_manager->getDifficulty())));
-
-    // Try to get the kart type
-    const AbstractCharacteristic *characteristic = kart_properties_manager->
-            getKartTypeCharacteristic(m_kart_properties->getKartType());
-    if (characteristic)
-        m_combined_characteristic->addCharacteristic(characteristic);
-
-    m_combined_characteristic->addCharacteristic(kart_properties_manager->
-        getPlayerCharacteristic(KartProperties::getPerPlayerDifficultyAsString(
-            m_difficulty)));
-    m_combined_characteristic->addCharacteristic(m_kart_properties->getCharacteristic());
-    m_characteristic.reset(new CachedCharacteristic(m_combined_characteristic.get()));
 }   // AbstractKart
 
 // ----------------------------------------------------------------------------
@@ -100,12 +78,6 @@ void AbstractKart::reset()
         m_kart_animation = NULL;
     }
 }   // reset
-
-// ----------------------------------------------------------------------------
-const AbstractCharacteristic* AbstractKart::getCharacteristic() const
-{
-    return m_characteristic.get();
-}
 
 // ----------------------------------------------------------------------------
 /** Returns a name to be displayed for this kart. */

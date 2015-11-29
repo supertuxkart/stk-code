@@ -25,7 +25,6 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart.hpp"
@@ -327,7 +326,7 @@ void KartGFX::updateTerrain(const ParticleKind *pk)
     if (skidding > 1.0f && on_ground)
         rate = fabsf(m_kart->getControls().m_steer) > 0.8 ? skidding - 1 : 0;
     else if (speed >= 0.5f && on_ground)
-        rate = speed/m_kart->getCharacteristic()->getEngineMaxSpeed();
+        rate = speed/m_kart->getKartProperties()->getEngineMaxSpeed();
     else
     {
         pe->setCreationRateAbsolute(0);

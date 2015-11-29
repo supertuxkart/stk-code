@@ -22,7 +22,6 @@
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
 #include "items/attachment.hpp"
-#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
@@ -41,7 +40,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
 {
     if(kart->isInvulnerable()) return NULL;
 
-    float r = kart->getCharacteristic()->getExplosionRadius();
+    float r = kart->getKartProperties()->getExplosionRadius();
 
     // Ignore explosion that are too far away.
     if(!direct_hit && pos.distance2(kart->getXYZ())>r*r) return NULL;
@@ -79,7 +78,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     m_xyz = m_kart->getXYZ();
     m_orig_y = m_xyz.getY();
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
-    m_timer = m_kart->getCharacteristic()->getExplosionDuration();
+    m_timer = m_kart->getKartProperties()->getExplosionDuration();
 
     // Non-direct hits will be only affected half as much.
     if(!direct_hit) m_timer*=0.5f;
@@ -106,7 +105,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     m_add_rotation.setRoll(    (rand()%(2*max_rotation+1)-max_rotation)*f );
 
     // Set invulnerable time, and graphical effects
-    float t = m_kart->getCharacteristic()->getExplosionInvulnerabilityTime();
+    float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
     m_kart->setInvulnerableTime(t);
     m_kart->showStarEffect(t);
     

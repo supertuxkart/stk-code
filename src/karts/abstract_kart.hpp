@@ -34,13 +34,10 @@ namespace irr
     }
 }
 
-class AbstractCharacteristic;
 class AbstractKartAnimation;
 class Attachment;
 class btKart;
 class btQuaternion;
-class CachedCharacteristic;
-class CombinedCharacteristic;
 class Controller;
 class Item;
 class KartModel;
@@ -78,10 +75,6 @@ protected:
 
     /** The per-player difficulty. */
     PerPlayerDifficulty m_difficulty;
-    /** The combined properties of the kart, the player, etc. */
-    std::unique_ptr<CombinedCharacteristic> m_combined_characteristic;
-    /** The cached combined characteristics. */
-    std::unique_ptr<CachedCharacteristic> m_characteristic;
 
     /** This stores a copy of the kart model. It has to be a copy
      *  since otherwise incosistencies can happen if the same kart
@@ -129,9 +122,6 @@ public:
     /** Returns the kart properties of this kart. */
     const KartProperties* getKartProperties() const
                             { return m_kart_properties.get(); }
-    // ------------------------------------------------------------------------
-    /** Returns the characteristics of this kart. */
-    const AbstractCharacteristic* getCharacteristic() const;
 
     // ========================================================================
     // Access to the per-player difficulty.

@@ -40,6 +40,7 @@ using namespace irr;
 
 class AbstractCharacteristic;
 class AIProperties;
+class CachedCharacteristic;
 class CombinedCharacteristic;
 class Material;
 class XMLNode;
@@ -124,7 +125,7 @@ private:
     /** The base characteristics combined with the characteristics of this kart. */
     std::shared_ptr<CombinedCharacteristic> m_combined_characteristic;
     /** The cached combined characteristics. */
-    std::unique_ptr<CachedCharacteristic> m_cached_characteristic;
+    std::shared_ptr<CachedCharacteristic> m_cached_characteristic;
 
     // Physic properties
     // -----------------
