@@ -38,15 +38,18 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( NetworkKartSelectionScreen );
 
-NetworkKartSelectionScreen::NetworkKartSelectionScreen() : KartSelectionScreen("karts_online.stkgui")
+NetworkKartSelectionScreen::NetworkKartSelectionScreen()
+                          : KartSelectionScreen("karts_online.stkgui")
 {
     KartSelectionScreen::m_instance_ptr = this;
-}
+}   // NetworkKartSelectionScreen
 
+// ----------------------------------------------------------------------------
 NetworkKartSelectionScreen::~NetworkKartSelectionScreen()
 {
-}
+}   // ~NetworkKartSelectionScreen
 
+// ----------------------------------------------------------------------------
 void NetworkKartSelectionScreen::init()
 {
     m_multiplayer = false;
@@ -54,7 +57,8 @@ void NetworkKartSelectionScreen::init()
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
-    tabs->select( "standard", PLAYER_ID_GAME_MASTER); // select standard kart group
+    // Select standard kart group
+    tabs->select( "standard", PLAYER_ID_GAME_MASTER);
     tabs->setActive(false);
     tabs->setVisible(false);
 
@@ -68,7 +72,8 @@ void NetworkKartSelectionScreen::init()
     GameSetup* setup = STKHost::get()->getGameSetup();
     if (!setup)
     {
-        Log::error("NetworkKartSelectionScreen", "No network game setup registered.");
+        Log::error("NetworkKartSelectionScreen",
+                   "No network game setup registered.");
         return;
     }
     std::vector<NetworkPlayerProfile*> players = setup->getPlayers();
@@ -88,7 +93,8 @@ void NetworkKartSelectionScreen::init()
     {
         if(game_setup->isLocalMaster(players[i]->getPlayerID()))
         {
-            m_id_mapping.insert(m_id_mapping.begin(),players[i]->getPlayerID()); //!< first kart widget always me
+            // First kart widget always me
+            m_id_mapping.insert(m_id_mapping.begin(),players[i]->getPlayerID());
             Log::info("NKSS", "Insert %d at pos 0", players[i]->getPlayerID());
             continue; // it is me, don't add again
         }
@@ -122,8 +128,9 @@ void NetworkKartSelectionScreen::init()
                                 fullarea->m_y, splitWidth, fullarea->m_h);
     }
 
-}
+}   // init
 
+// ----------------------------------------------------------------------------
 void NetworkKartSelectionScreen::playerConfirm(const int playerID)
 {
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
@@ -151,32 +158,37 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
                 ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
         protocol->requestKartSelection(selection);
     }
-}
+}   // playerConfirm
 
-void NetworkKartSelectionScreen::playerSelected(uint8_t race_id, std::string kart_name)
+// ----------------------------------------------------------------------------
+void NetworkKartSelectionScreen::playerSelected(uint8_t race_id,
+                                                const std::string &kart_name)
 {
     uint8_t widget_id = -1;
     for (unsigned int i = 0; i < m_id_mapping.size(); i++)
     {
-        Log::info("NKSS", "Checking race id %d : mapped of %d is %d", race_id, i, m_id_mapping[i]);
+        Log::info("NKSS", "Checking race id %d : mapped of %d is %d",
+                   race_id, i, m_id_mapping[i]);
         if (m_id_mapping[i] == race_id)
             widget_id = i;
     }
 
     assert(widget_id>=0 && widget_id < m_kart_widgets.size());
 
-    KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name, irr::core::stringw(kart_name.c_str()));
+    KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name,
+                                       irr::core::stringw(kart_name.c_str()));
     KartSelectionScreen::updateKartStats(widget_id, kart_name);
     m_kart_widgets[widget_id].setKartInternalName(kart_name);
     m_kart_widgets[widget_id].markAsReady(); // mark player ready
-}
+}   // playerSelected
 
-
+// ----------------------------------------------------------------------------
 /**
  * Callback handling events from the kart selection menu
  */
-void NetworkKartSelectionScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name,
-                               const int playerID)
+void NetworkKartSelectionScreen::eventCallback(GUIEngine::Widget* widget,
+                                               const std::string& name,
+                                               const int playerID)
 {
     if (name == "karts")
     {
@@ -192,7 +204,7 @@ void NetworkKartSelectionScreen::eventCallback(GUIEngine::Widget* widget, const 
     }
 }   // eventCallback
 
-
+// ----------------------------------------------------------------------------
 bool NetworkKartSelectionScreen::onEscapePressed()
 {
     // then remove the lobby screen (you left the server)
@@ -203,4 +215,4 @@ bool NetworkKartSelectionScreen::onEscapePressed()
     if (protocol)
         protocol->leave();
     return true; // remove the screen
-}
+}   // onEscapePressed
