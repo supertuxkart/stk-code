@@ -138,6 +138,7 @@ void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
 void ClientLobbyRoomProtocol::leave()
 {
     m_server->disconnect();
+    STKHost::get()->removePeer(m_server);
     m_server_address.clear();
 }   // leave
 
@@ -364,6 +365,7 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
         Log::error("ClientLobbyRoomProtocol",
                    "The disconnected peer wasn't known.");
     }
+    STKHost::get()->removePeer(event->getPeer());
 }   // disconnectedPlayer
 
 //-----------------------------------------------------------------------------

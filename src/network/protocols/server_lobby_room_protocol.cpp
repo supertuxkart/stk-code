@@ -398,9 +398,9 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
         sendMessage(msg);
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
                   peer->getPlayerProfile()->getPlayerID());
+        m_setup->removePlayer(peer->getPlayerProfile());
         // Remove the profile from the peer (to avoid double free)
         peer->setPlayerProfile(NULL);
-        m_setup->removePlayer(peer->getPlayerProfile());
         STKHost::get()->removePeer(peer);
     }
     else
