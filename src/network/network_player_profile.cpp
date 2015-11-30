@@ -27,7 +27,6 @@ NetworkPlayerProfile::NetworkPlayerProfile(int race_player_id,
                                            const irr::core::stringw &name)
 {
     m_race_player_id        = race_player_id;
-    m_online_profile        = NULL;
     m_kart_name             = "";
     m_world_kart_id         = 0;
     m_per_player_difficulty = PLAYER_DIFFICULTY_NORMAL;
@@ -38,15 +37,3 @@ NetworkPlayerProfile::NetworkPlayerProfile(int race_player_id,
 NetworkPlayerProfile::~NetworkPlayerProfile()
 {
 }   // ~NetworkPlayerProfile
-
-// ----------------------------------------------------------------------------
-/** Returns the global id for the player. This is either the online user id
- *  if that player is online, or -1 otherwise. 
- */
-int NetworkPlayerProfile::getGlobalID() const
-{
-    if(m_online_profile)
-        return m_online_profile->getID();
-    else
-        return -1;
-}   // getGlobalID

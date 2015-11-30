@@ -125,15 +125,15 @@ void StartGameProtocol::update()
         std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
         std::sort(players.begin(), players.end(), compareKarts);
         // have to add self first
+        GameSetup *setup = STKHost::get()->getGameSetup();
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->getOnlineProfile() ==
-                          PlayerManager::getCurrentOnlineProfile());
+            bool is_me = setup->isLocalMaster(players[i]->getPlayerID());
             if (is_me)
             {
                 NetworkPlayerProfile* profile = players[i];
                 RemoteKartInfo rki(profile->getPlayerID(), profile->getKartName(),
-                                   profile->getOnlineProfile()->getUserName().c_str(),
+                                   profile->getName(),
                                    profile->getPlayerID(), !is_me);
                 rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
                 rki.setGlobalPlayerId(profile->getPlayerID());
@@ -166,11 +166,10 @@ void StartGameProtocol::update()
         }
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->getOnlineProfile() ==
-                          PlayerManager::getCurrentOnlineProfile());
+            bool is_me = setup->isLocalMaster(players[i]->getPlayerID());
             NetworkPlayerProfile* profile = players[i];
             RemoteKartInfo rki(profile->getPlayerID(), profile->getKartName(),
-                               profile->getOnlineProfile()->getUserName(),
+                               profile->getName(),
                                profile->getPlayerID(), !is_me);
             rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
             rki.setGlobalPlayerId(profile->getPlayerID());

@@ -29,7 +29,8 @@
 
 GameSetup::GameSetup()
 {
-    m_race_config = new RaceConfig();
+    m_race_config  = new RaceConfig();
+    m_local_master = 0;
 }   // GameSetup
 
 //-----------------------------------------------------------------------------
@@ -50,9 +51,8 @@ GameSetup::~GameSetup()
 void GameSetup::addPlayer(NetworkPlayerProfile* profile)
 {
     m_players.push_back(profile);
-    Log::info("GameSetup", "New player in the game setup. Global id : %d, "
-                           "Race id : %d.",
-              profile->getGlobalID(), profile->getPlayerID());
+    Log::info("GameSetup", "New player in the game setup. Race id : %d.",
+              profile->getPlayerID());
 }   // addPlayer
 
 //-----------------------------------------------------------------------------
@@ -76,6 +76,25 @@ bool GameSetup::removePlayer(const NetworkPlayerProfile *profile)
     }
     return false;
 }   // removePlayer
+
+//-----------------------------------------------------------------------------
+/** Sets the player id of the local master.
+ *  \param player_id The id of the player who is the local master.
+ */
+void GameSetup::setLocalMaster(uint8_t player_id)
+{
+    m_local_master = player_id;
+}   // setLocalMaster
+
+//-----------------------------------------------------------------------------
+/** Returns true if the player id is the local game master (used in the
+ *  network game selection.
+ *  \param Local player id to test.
+ */
+bool GameSetup::isLocalMaster(uint8_t player_id)
+{
+    return m_local_master == player_id;
+}   // isLocalMaster
 
 //-----------------------------------------------------------------------------
 /** Sets the kart the specified player uses.
@@ -138,21 +157,11 @@ void GameSetup::bindKartsToProfiles()
 }   // bindKartsToProfiles
 
 //-----------------------------------------------------------------------------
-
-const NetworkPlayerProfile* GameSetup::getProfile(uint32_t id)
-{
-    for (unsigned int i = 0; i < m_players.size(); i++)
-    {
-        if (m_players[i]->getOnlineProfile()->getID() == id)
-        {
-            return m_players[i];
-        }
-    }
-    return NULL;
-}   // getProfile(id)
-
-//-----------------------------------------------------------------------------
-
+/** \brief Get a network player profile with the specified player id.
+ *  \param player_id : Player id in this race.
+ *  \return The profile of the player having the specified player id, or
+ *          NULL if no such player exists.
+ */
 const NetworkPlayerProfile* GameSetup::getProfile(uint8_t player_id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
@@ -163,9 +172,14 @@ const NetworkPlayerProfile* GameSetup::getProfile(uint8_t player_id)
         }
     }
     return NULL;
-}
+}   // getProfile
 
 //-----------------------------------------------------------------------------
+/** \brief Get a network player profile matching a kart name.
+ *  \param kart_name : Name of the kart used by the player.
+ *  \return The profile of the player having the kart kart_name, or NULL
+ *           if no such network profile exists.
+ */
 
 const NetworkPlayerProfile* GameSetup::getProfile(const std::string &kart_name)
 {

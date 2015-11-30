@@ -83,10 +83,10 @@ void NetworkKartSelectionScreen::init()
                             kartsAreaWidget->m_y,
                             kartsAreaWidget->m_x + shift + kartsAreaWidget->m_w,
                             kartsAreaWidget->m_y + kartsAreaWidget->m_h);
-
+    GameSetup *game_setup = STKHost::get()->getGameSetup();
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        if (players[i]->getOnlineProfile()== PlayerManager::getCurrentOnlineProfile())
+        if(game_setup->isLocalMaster(players[i]->getPlayerID()))
         {
             m_id_mapping.insert(m_id_mapping.begin(),players[i]->getPlayerID()); //!< first kart widget always me
             Log::info("NKSS", "Insert %d at pos 0", players[i]->getPlayerID());
@@ -101,7 +101,7 @@ void NetworkKartSelectionScreen::init()
         std::string selected_kart_group = "standard"; // standard group
 
         PlayerKartWidget* newPlayerWidget =
-            new PlayerKartWidget(this, aplayer, players[i]->getOnlineProfile(),
+            new PlayerKartWidget(this, aplayer, players[i],
                                  kartsArea, m_kart_widgets.size(),
                                  selected_kart_group);
 

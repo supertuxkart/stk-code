@@ -46,6 +46,9 @@ private:
     /** The race configuration. */
     RaceConfig* m_race_config;
 
+    /** The player id of the local game master, used in 
+     *  kart selection screen. */
+    uint8_t m_local_master;
 public:
              GameSetup();
     virtual ~GameSetup();
@@ -54,26 +57,10 @@ public:
     bool removePlayer(const NetworkPlayerProfile *profile);
     void setPlayerKart(uint8_t player_id, const std::string &kart_name);
     void bindKartsToProfiles(); //!< Sets the right world_kart_id in profiles
+    void setLocalMaster(uint8_t player_id);
 
-    /** \brief Get the players that are in the game
-     *  \return A vector containing pointers on the players profiles.
-     */
-    const std::vector<NetworkPlayerProfile*>& getPlayers() { return m_players; }
-    int getPlayerCount() { return (int)m_players.size(); }
-    /*! \brief Get a network player profile matching a universal id.
-     *  \param id : Global id of the player (the one in the SQL database)
-     *  \return The profile of the player matching the id.
-     */
-    const NetworkPlayerProfile* getProfile(uint32_t id);
-    /*! \brief Get a network player profile matching a kart name.
-     *  \param kart_name : Name of the kart used by the player.
-     *  \return The profile of the player having the kart kart_name
-     */
+    bool isLocalMaster(uint8_t player_id);
     const NetworkPlayerProfile* getProfile(uint8_t id);
-    /*! \brief Get a network player profile matching a kart name.
-     *  \param kart_name : Name of the kart used by the player.
-     *  \return The profile of the player having the kart kart_name.
-     */
     const NetworkPlayerProfile* getProfile(const std::string &kart_name);
 
     /*! \brief Used to know if a kart is available.
@@ -81,6 +68,7 @@ public:
      *  \return True if the kart hasn't been selected yet, false elseway.
      */
     bool isKartAvailable(std::string kart_name);
+    // ------------------------------------------------------------------------
     /*! \brief Used to know if a kart is playable.
      *  \param kart_name : Name of the kart to check.
      *  \return True if the kart is playable (standard kart).
@@ -88,8 +76,18 @@ public:
      *  only the standard karts.
      */
     bool isKartAllowed(std::string kart_name) { return true; }
-
+    // ------------------------------------------------------------------------
+    /** Returns the configuration for this race. */
     RaceConfig* getRaceConfig() { return m_race_config; }
+    // ------------------------------------------------------------------------
+    /** \brief Get the players that are in the game
+    *  \return A vector containing pointers on the players profiles. */
+    const std::vector<NetworkPlayerProfile*>& getPlayers()
+    {
+        return m_players;
+    }   // getPlayers
+    // ------------------------------------------------------------------------
+    int getPlayerCount() { return (int)m_players.size(); }
 
 };
 

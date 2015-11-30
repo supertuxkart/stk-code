@@ -174,10 +174,10 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     irr::core::stringw name;
                     // name_len is the number of bytes read
                     uint8_t bytes_read = s.decodeStringW(0, &name);
-                    uint8_t max_players = s.getUInt8(1+bytes_read  );
-                    uint8_t players     = s.getUInt8(1+bytes_read+1);
-                    uint32_t my_ip      = s.getUInt32(1+bytes_read+2);
-                    uint32_t my_port    = s.getUInt16(1+bytes_read+6);
+                    uint8_t max_players = s.getUInt8(bytes_read  );
+                    uint8_t players     = s.getUInt8(bytes_read+1);
+                    uint32_t my_ip      = s.getUInt32(bytes_read+2);
+                    uint32_t my_port    = s.getUInt16(bytes_read+6);
                     ServersManager::get()
                           ->addServer(new Server(name, /*lan*/true,
                                                  max_players, players, 

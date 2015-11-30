@@ -57,7 +57,7 @@ int NetworkString::decodeString(int pos, std::string *out) const
 {
     uint8_t len = getUInt8(pos);
     *out = getString(pos+1, len);
-    return len;
+    return len+1;
 }    // decodeString
 
 // ----------------------------------------------------------------------------

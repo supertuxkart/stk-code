@@ -413,25 +413,17 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1                  5
- *       ----------------------------------------
- *  Size | 1 |          4       |1|             |
- *  Data | 4 | global player id |n| player name |
- *       ----------------------------------------
+ *  Byte 0   1                
+ *       ---------------------
+ *  Size | 1 |1|             |
+ *  Data | 4 |n| player name |
+ *       ---------------------
  */
 void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 {
     STKPeer* peer = event->getPeer();
     const NetworkString &data = event->data();
-    if (data[0] != 4)
-    {
-        Log::warn("ServerLobbyRoomProtocol",
-              "Receiving badly formated message. Size is %d and first byte %d",
-              data.size(), data[0]);
-        return;
-    }
-    uint32_t player_id = 0;
-    player_id = data.getUInt32(1);
+
     // can we add the player ?
     if (m_setup->getPlayerCount() >= NetworkConfig::get()->getMaxPlayers() ||
         m_state!=ACCEPTING_CLIENTS                                           )
@@ -450,26 +442,24 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // Connection accepted.
     // ====================
     std::string name_u8;
-    int name_len = data.decodeString(5, &name_u8);
+    int name_len = data.decodeString(0, &name_u8);
     core::stringw name = StringUtils::utf8ToWide(name_u8);
 
     // add the player to the game setup
     m_next_player_id.lock();
     m_next_player_id.getData()++;
-    int next_player_id = m_next_player_id.getData();
+    int new_player_id = m_next_player_id.getData();
     m_next_player_id.unlock();
 
-    NetworkPlayerProfile* profile = new NetworkPlayerProfile(next_player_id, name);
-    // FIXME: memory leak OnlineProfile
-    profile->setOnlineProfile(new Online::OnlineProfile(player_id, ""));
+    NetworkPlayerProfile* profile = new NetworkPlayerProfile(new_player_id, name);
     m_setup->addPlayer(profile);
     peer->setPlayerProfile(profile);
 
     // notify everybody that there is a new player
     NetworkString message(8);
     // size of id -- id -- size of local id -- local id;
-    message.ai8(LE_NEW_PLAYER_CONNECTED).ai8(4).ai32(player_id)
-           .ai8(1).ai8(next_player_id).encodeString(name_u8);
+    message.ai8(LE_NEW_PLAYER_CONNECTED).ai8(1).ai8(new_player_id)
+           .encodeString(name_u8);
     ProtocolManager::getInstance()->sendMessageExcept(this, peer, message);
 
     // Now answer to the peer that just connected
@@ -484,18 +474,16 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // send a message to the one that asked to connect
     // Size is overestimated, probably one player's data will not be sent
     NetworkString message_ack(13 + players.size() * 7);
-    // connection success (129) -- size of token -- token
-    message_ack.ai8(LE_CONNECTION_ACCEPTED).ai8(1).ai8(next_player_id).ai8(4)
-               .ai32(token).ai8(4).ai32(player_id);
+    // connection success -- size of token -- token
+    message_ack.ai8(LE_CONNECTION_ACCEPTED).ai8(1).ai8(new_player_id).ai8(4)
+               .ai32(token);
     // add all players so that this user knows
     for (unsigned int i = 0; i < players.size(); i++)
     {
         // do not duplicate the player into the message
-        if (players[i]->getPlayerID() != next_player_id &&
-            players[i]->getGlobalID() != player_id)
+        if (players[i]->getPlayerID() != new_player_id )
         {
-            message_ack.ai8(1).ai8(players[i]->getPlayerID()).ai8(4)
-                       .ai32(players[i]->getGlobalID())
+            message_ack.ai8(1).ai8(players[i]->getPlayerID())
                        .encodeString(players[i]->getName());
         }
     }

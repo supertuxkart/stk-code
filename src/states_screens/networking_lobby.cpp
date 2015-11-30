@@ -106,7 +106,9 @@ void NetworkingLobby::init()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
 {
-    m_start_button->setVisible(STKHost::get()->isAuthorisedToControl());
+    // FIXME Network looby should be closed when stkhost is shut down
+    m_start_button->setVisible(STKHost::existHost() &&
+                               STKHost::get()->isAuthorisedToControl());
 }   // onUpdate
 
 // ----------------------------------------------------------------------------

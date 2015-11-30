@@ -47,19 +47,15 @@ private:
     /** The name of the player. */
     irr::core::stringw m_player_name;
 
-    /** Pointer to the online profile of this player. */
-    Online::OnlineProfile* m_online_profile;
-
     /** The kart id in the World class (pointer to AbstractKart). */
     uint8_t m_world_kart_id;
 
     /** Per player difficulty. */
     PerPlayerDifficulty m_per_player_difficulty;
 public:
-        NetworkPlayerProfile(int race_player_id,
-                             const irr::core::stringw &name);
-       ~NetworkPlayerProfile();
-    int getGlobalID() const;
+         NetworkPlayerProfile(int race_player_id,
+                              const irr::core::stringw &name);
+        ~NetworkPlayerProfile();
 
     // ------------------------------------------------------------------------
     /** Sets the player id of this player. */
@@ -67,12 +63,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the loca ID of this player in this race. */
     int getPlayerID() const { return m_race_player_id; }
-    // ------------------------------------------------------------------------
-    /** Sets the online profile for this player. */
-    void setOnlineProfile(Online::OnlineProfile *profile)
-    {
-        m_online_profile = profile;
-    }   // setOnlineProfile
     // ------------------------------------------------------------------------
     /** Sets the kart name for this player. */
     void setKartName(const std::string &kart_name) { m_kart_name = kart_name; }
@@ -85,10 +75,6 @@ public:
     // ------------------------------------------------------------------------
     /** Retuens the world kart id for this player. */
     int getWorldKartID() const { return m_world_kart_id; }
-    // ------------------------------------------------------------------------
-    /** Returns the pointer to the online profile of this player, or NULL if
-     *  the player is not online. */
-    Online::OnlineProfile *getOnlineProfile() { return m_online_profile; }
     // ------------------------------------------------------------------------
     /** Returns the per-player difficulty. */
     PerPlayerDifficulty getPerPlayerDifficulty() const
