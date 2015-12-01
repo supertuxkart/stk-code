@@ -465,10 +465,10 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // Now answer to the peer that just connected
     RandomGenerator token_generator;
     // use 4 random numbers because rand_max is probably 2^15-1.
-    uint32_t token = (uint32_t)(((token_generator.get(RAND_MAX) << 24) & 0xff) +
-                                ((token_generator.get(RAND_MAX) << 16) & 0xff) +
-                                ((token_generator.get(RAND_MAX) << 8)  & 0xff) +
-                                ((token_generator.get(RAND_MAX)        & 0xff)));
+    uint32_t token = (uint32_t)((token_generator.get(RAND_MAX) & 0xff) << 24 |
+                                (token_generator.get(RAND_MAX) & 0xff) << 16 |
+                                (token_generator.get(RAND_MAX) & 0xff) <<  8 |
+                                (token_generator.get(RAND_MAX) & 0xff));
 
     std::vector<NetworkPlayerProfile*> players = m_setup->getPlayers();
     // send a message to the one that asked to connect
