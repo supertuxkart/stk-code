@@ -184,28 +184,6 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t race_id,
 }   // playerSelected
 
 // ----------------------------------------------------------------------------
-/**
- * Callback handling events from the kart selection menu
- */
-void NetworkKartSelectionScreen::eventCallback(GUIEngine::Widget* widget,
-                                               const std::string& name,
-                                               const int playerID)
-{
-    if (name == "karts")
-    {
-        KartSelectionScreen::eventCallback(widget, name, playerID);
-    }
-    else if (name == "back")
-    {
-        KartSelectionScreen::eventCallback(widget, name, playerID);
-    }
-    else // name != karts
-    {
-        KartSelectionScreen::eventCallback(widget, name, playerID);
-    }
-}   // eventCallback
-
-// ----------------------------------------------------------------------------
 bool NetworkKartSelectionScreen::onEscapePressed()
 {
     // then remove the lobby screen (you left the server)

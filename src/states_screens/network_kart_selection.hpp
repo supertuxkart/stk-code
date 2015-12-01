@@ -36,12 +36,7 @@ protected:
     void considerKartHovered(uint8_t widget_id, std::string selection);
 public:
     virtual void init() OVERRIDE;
-    virtual void eventCallback(GUIEngine::Widget* widget,
-                               const std::string& name,
-                               const int playerID) OVERRIDE;
-
     virtual bool onEscapePressed() OVERRIDE;
-
     virtual void playerSelected(uint8_t race_id, const std::string &kart_name);
 };
 
