@@ -140,6 +140,7 @@ void ClientLobbyRoomProtocol::leave()
     m_server->disconnect();
     STKHost::get()->removePeer(m_server);
     m_server_address.clear();
+    ServersManager::get()->unsetJoinedServer();
 }   // leave
 
 //-----------------------------------------------------------------------------
