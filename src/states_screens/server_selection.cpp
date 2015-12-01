@@ -54,7 +54,12 @@ ServerSelection::~ServerSelection()
  */
 void ServerSelection::tearDown()
 {
-    delete m_refresh_request;
+    // If the refresh request is being executed, and stk should exit,
+    // then a crash can happen when the refresh request is deleted, but
+    // then the request manager tries to activate this request. So only
+    // delete this request if it is finished.
+    if(m_refresh_request && m_refresh_request->isDone())
+        delete m_refresh_request;
 }   // tearDown
 
 // ----------------------------------------------------------------------------
