@@ -30,6 +30,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/stk_host.hpp"
+#include "states_screens/server_selection.hpp"
 #include "states_screens/state_manager.hpp"
 
 static const char ID_LOCKED[] = "locked/";
@@ -209,6 +210,7 @@ bool NetworkKartSelectionScreen::onEscapePressed()
 {
     // then remove the lobby screen (you left the server)
     StateManager::get()->popMenu();
+    ServerSelection::getInstance()->refresh();
     // notify the server that we left
     ClientLobbyRoomProtocol* protocol = static_cast<ClientLobbyRoomProtocol*>(
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));

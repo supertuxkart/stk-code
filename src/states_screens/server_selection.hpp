@@ -49,9 +49,10 @@ private:
     /** A pointer to the http request for getting a server list. */
     const Online::XMLRequest *m_refresh_request;
 
-    void refresh();
 
 public:
+
+    void refresh();
 
     /** Load the addons into the main list.*/
     void loadList();
