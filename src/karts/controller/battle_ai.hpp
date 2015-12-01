@@ -45,10 +45,41 @@ class BattleAI : public AIBaseController
 
 private:
 
+    /** Holds the position info of targets. */
+    struct posData {bool behind; float angle; float distance;};
+
     /** Holds the current position of the AI on the battle graph. Sets to
      *  BattleGraph::UNKNOWN_POLY if the location is unknown. This variable is
-     *  updated in ThreeStrikesBattle::updateKartNodes() */
+     *  updated in ThreeStrikesBattle::updateKartNodes(). */
     int m_current_node;
+
+    int m_closest_kart_node;
+    Vec3 m_closest_kart_point;
+
+    posData m_closest_kart_pos_data;
+    posData m_cur_kart_pos_data;
+
+   /** Indicates that the kart is currently stuck, and m_time_since_stuck is
+     * counting down. */
+    bool m_is_stuck;
+
+    /** Indicates that the kart need a uturn to reach a node behind, and
+     *  m_time_since_uturn is counting down. */
+    bool m_is_uturn;
+
+    const Item *m_item_to_collect;
+
+    /** Holds the unique node ai has walked through, useful to tell if AI is
+     *  stuck by determine the size of this set. */
+    std::set <int> m_on_node;
+
+    /** Holds the corner points computed using the funnel algorithm that the AI
+     *  will eventaully move through. See stringPull(). */
+    std::vector<Vec3> m_path_corners;
+
+    /** Holds the set of portals that the kart will cross when moving through
+     *  polygon channel. See findPortals(). */
+    std::vector<std::pair<Vec3,Vec3> > m_portals;
 
     /** The node(poly) at which the target point lies in. */
     int m_target_node;
@@ -56,50 +87,42 @@ private:
     /** The target point. */
     Vec3 m_target_point;
 
-    /** Holds the set of portals that the kart will cross when moving through
-     *  polygon channel. See findPortals() */
-    std::vector<std::pair<Vec3,Vec3> > m_portals;
-
-    /** Holds the corner points computed using the funnel algorithm that the AI
-     * will eventaully move through. See stringPull() */
-    std::vector<Vec3> m_path_corners;
-
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
 
-    /** This is a timer that counts down when the kart is reversing to get unstuck */
+    /** This is a timer that counts down when the kart is reversing to get unstuck. */
+    float m_time_since_reversing;
+
+    /** This is a timer that counts down when the kart is starting to get stuck. */
     float m_time_since_stuck;
 
-    /** Indicates that the kart is currently reversing, and m_time_since_stuck is
-     *  counting down. */
-    bool m_currently_reversing;
+    /** This is a timer that counts down when the kart is doing u-turn. */
+    float m_time_since_uturn;
 
-    float m_closest_kart_distance;
-
-    const Item *m_item_to_collect;
-
+    void  checkIfStuck(const float dt);
+    void  checkPosition(const Vec3 &, posData*);
     float determineTurnRadius(std::vector<Vec3>& points);
-    void findPortals(int start, int end);
-    void stringPull(const Vec3&, const Vec3&);
-    void handleAcceleration(const float dt);
-    void handleSteering(const float dt);
-    void handleBraking();
-    void handleGetUnstuck(const float dt);
-    void handleItems(const float dt);
-
-    void handleItemCollection(Vec3*, int*);
-    void findClosestKart(Vec3*, int*);
+    void  findClosestKart();
+    void  findPortals(int start, int end);
+    void  findTarget();
+    void  handleAcceleration(const float dt);
+    void  handleBraking();
+    void  handleItems(const float dt);
+    void  handleItemCollection(Vec3*, int*);
+    void  handleSteering(const float dt);
+    void  handleUTurn(const float dt);
+    void  stringPull(const Vec3&, const Vec3&);
 
 protected:
 
     /** Keep a pointer to world. */
     ThreeStrikesBattle *m_world;
 
-#ifdef AI_DEBUG
+//#ifdef AI_DEBUG
     /** For debugging purpose: a sphere indicating where the AI
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
-#endif
+//#endif
 
 public:
                  BattleAI(AbstractKart *kart,

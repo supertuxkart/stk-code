@@ -21,9 +21,9 @@
 #undef AI_DEBUG
 #include "karts/controller/battle_ai.hpp"
 
-#ifdef AI_DEBUG
+//#ifdef AI_DEBUG
 #include "graphics/irr_driver.hpp"
-#endif
+//#endif
 
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
@@ -55,6 +55,7 @@ using namespace irr;
 #endif
 
 #include <iostream>
+using namespace std;
 
 BattleAI::BattleAI(AbstractKart *kart,
                    StateManager::ActivePlayer *player)
@@ -63,12 +64,12 @@ BattleAI::BattleAI(AbstractKart *kart,
 
     reset();
 
-#ifdef AI_DEBUG
+//#ifdef AI_DEBUG
     video::SColor col_debug(128, 128,0,0);
     m_debug_sphere = irr_driver->addSphere(1.0f, col_debug);
     m_debug_sphere->setVisible(true);
     //m_item_sphere  = irr_driver->addSphere(1.0f);
-#endif
+//#endif
 
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
@@ -93,9 +94,9 @@ BattleAI::BattleAI(AbstractKart *kart,
 
 BattleAI::~BattleAI()
 {
-#ifdef AI_DEBUG
+//#ifdef AI_DEBUG
     irr_driver->removeNode(m_debug_sphere);
-#endif
+//#endif
 }   //  ~BattleAI
 
 //-----------------------------------------------------------------------------
@@ -105,12 +106,23 @@ void BattleAI::reset()
 {
     m_current_node = BattleGraph::UNKNOWN_POLY;
     m_target_node = BattleGraph::UNKNOWN_POLY;
+    m_closest_kart_node = BattleGraph::UNKNOWN_POLY;
+    m_closest_kart_point = Vec3(0,0,0);
+    m_closest_kart_pos_data = {0};
+    m_cur_kart_pos_data = {0};
+    m_is_stuck = false;
+    m_is_uturn = false;
     m_target_point = Vec3(0,0,0);
+    m_time_since_last_shot = 0.0f;
+    m_time_since_reversing = 0.0f;
     m_time_since_stuck = 0.0f;
-    m_currently_reversing = false;
-    m_closest_kart_distance = 99999.9f;
+    m_time_since_uturn = 0.0f;
+    m_on_node.clear();
+    m_path_corners.clear();
+    m_portals.clear();
+
     AIBaseController::reset();
-}
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** This is the main entry point for the AI.
@@ -119,29 +131,168 @@ void BattleAI::reset()
  */
 void BattleAI::update(float dt)
 {
+    // This is used to enable firing an item backwards.
+    m_controls->m_look_back = false;
+    m_controls->m_nitro     = false;
 
-   if (m_world->isStartPhase())
-   {
-       AIBaseController::update(dt);
-       return;
-   }
+    // Don't do anything if there is currently a kart animations shown.
+    if(m_kart->getKartAnimation())
+        return;
 
-    handleAcceleration(dt);
-    handleSteering(dt);
+    if (m_world->isStartPhase())
+    {
+        AIBaseController::update(dt);
+        return;
+    }
+
+    checkIfStuck(dt);
+    if (m_is_stuck && !m_is_uturn)
+    {
+        cout <<"correct"<<endl;
+        m_controls->m_accel = -1.0f;
+        setSteering(1.0f,dt);
+        m_time_since_reversing += dt;
+
+        if (m_time_since_reversing >= 0.6f)
+        {
+            cout <<"correctfinished"<<endl;
+            m_controls->m_accel = 1.0f;
+            m_is_stuck = false;
+            m_time_since_reversing = 0.0f;
+        }
+        AIBaseController::update(dt);
+        return;
+    }
+
+    findClosestKart();
+    findTarget();
     handleItems(dt);
-    handleBraking();
-    handleGetUnstuck(dt);
+
+    if (m_kart->getSpeed() > 15.0f)
+        m_controls->m_nitro = true;
+
+    if (m_is_uturn)
+    {
+        handleUTurn(dt);
+    }
+    else
+    {
+        handleAcceleration(dt);
+        handleSteering(dt);
+        handleBraking();
+    }
+
     AIBaseController::update(dt);
 
-}   //update
+}   // update
+
+//-----------------------------------------------------------------------------
+void BattleAI::checkIfStuck(const float dt)
+{
+    if (m_is_stuck) return;
+
+    // Check if current kart is stuck
+    if (m_kart->getSpeed() < 2.0f && !m_kart->getKartAnimation() &&
+       !m_world->isStartPhase() && !m_is_uturn)
+    {
+        m_time_since_stuck += dt;
+        m_on_node.insert(m_current_node);
+    }
+
+    if (m_time_since_stuck >= 2.0f)
+    {
+        if (m_on_node.size() > 2)
+        {
+            cout<<m_on_node.size()<<endl;
+            // Reset timer to zero for any correct movement
+            m_time_since_stuck = 0.0f;
+            return;
+        }
+        cout<<"stuck"<<endl;
+        m_on_node.clear();
+        m_time_since_stuck = 0.0f;
+        m_is_stuck = true;
+    }
+
+}   //  checkIfStuck
+
+//-----------------------------------------------------------------------------
+void BattleAI::checkPosition(const Vec3 &point, posData *pos_data)
+{
+    btQuaternion q(btVector3(0,1,0), -m_kart->getHeading());
+    Vec3 p  = point - m_kart->getXYZ();
+    Vec3 lc = quatRotate(q, p);
+
+    if (lc.getZ() < 0)
+        pos_data->behind = true;
+    else
+        pos_data->behind = false;
+
+    pos_data->angle = atan2(point.getX(), point.getZ());
+    pos_data->distance = p.length_2d();
+}   //  checkPosition
+
+//-----------------------------------------------------------------------------
+void BattleAI::findClosestKart()
+{
+    float distance = 99999.9f;
+    const unsigned int n = m_world->getNumKarts();
+    int closest_kart_num = 0;
+
+    for (unsigned int i = 0; i < n; i++)
+    {
+        const AbstractKart* kart = m_world->getKart(i);
+        if (kart->isEliminated()) continue;
+
+        if (kart->getWorldKartId() == m_kart->getWorldKartId())
+            continue; // Skip the same kart
+
+        Vec3 d = kart->getXYZ() - m_kart->getXYZ();
+        if (d.length_2d() <= distance)
+        {
+            distance = d.length_2d();
+            closest_kart_num = i;
+        }
+    }
+
+    const AbstractKart* closest_kart = m_world->getKart(closest_kart_num);
+    if (!closest_kart->getController()->isPlayerController())
+    {
+        BattleAI* controller = (BattleAI*)(closest_kart->getController());
+        m_closest_kart_node = controller->getCurrentNode();
+        m_closest_kart_point = closest_kart->getXYZ();
+    }
+
+    else if (closest_kart->getController()->isPlayerController())
+    {
+        PlayerController* controller = (PlayerController*)(closest_kart->getController());
+        m_closest_kart_node = controller->getCurrentNode();
+        m_closest_kart_point = closest_kart->getXYZ();
+    }
+    checkPosition(m_closest_kart_point, &m_closest_kart_pos_data);
+}   // findClosestKart
+
+//-----------------------------------------------------------------------------
+void BattleAI::findTarget()
+{
+    // Find a suitable target to drive to, either powerup or kart
+    if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING &&
+        m_kart->getAttachment()->getType() != Attachment::ATTACH_SWATTER)
+        handleItemCollection(&m_target_point , &m_target_node);
+    else
+    {
+        m_target_point = m_closest_kart_point;
+        m_target_node  = m_closest_kart_node;
+    }
+}   // findTarget
 
 //-----------------------------------------------------------------------------
 /** Handles acceleration.
  *  \param dt Time step size.
  */
-void BattleAI::handleAcceleration( const float dt)
+void BattleAI::handleAcceleration(const float dt)
 {
-    if(m_controls->m_brake)
+    if (m_controls->m_brake)
     {
         m_controls->m_accel = 0.0f;
         return;
@@ -151,131 +302,78 @@ void BattleAI::handleAcceleration( const float dt)
 }   // handleAcceleration
 
 //-----------------------------------------------------------------------------
+void BattleAI::handleUTurn(const float dt)
+{
+    m_controls->m_accel = -2.0f;
+    if (m_time_since_uturn >= 1.0f)
+        setSteering(M_PI,dt); // Preventing keep going around circle
+    else
+        setSteering(-M_PI,dt);
+    m_time_since_uturn += dt;
+
+    checkPosition(m_target_point, &m_cur_kart_pos_data);
+    if (!m_cur_kart_pos_data.behind || m_time_since_uturn >= 1.5f)
+    {
+        m_is_uturn = false;
+        m_controls->m_accel = 2.0f;
+        m_time_since_uturn = 0.0f;
+    }
+}   // handleUTurn
+
+//-----------------------------------------------------------------------------
 /** This function sets the steering.
  *  \param dt Time step size.
  */
 void BattleAI::handleSteering(const float dt)
 {
-    if (m_current_node == BattleGraph::UNKNOWN_POLY) return;
+    if (m_current_node == BattleGraph::UNKNOWN_POLY ||
+        m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
-    if (m_kart->getPowerup()->getType()==PowerupManager::POWERUP_NOTHING)
+    if (m_target_node == m_current_node)
     {
-        handleItemCollection(&m_target_point , &m_target_node);
-        if (m_target_node == BattleGraph::UNKNOWN_POLY) return;
-
-        if (m_target_node != m_current_node)
+        // Very close to the item, steer directly
+        checkPosition(m_target_point, &m_cur_kart_pos_data);
+        m_debug_sphere->setPosition(m_target_point.toIrrVector());
+        if (m_cur_kart_pos_data.behind)
         {
-            findPortals(m_current_node, m_target_node);
-            stringPull(m_kart->getXYZ(), m_target_point);
-            if (m_path_corners.size() > 0)
-            {
-                //m_debug_sphere->setPosition(m_path_corners[0].toIrrVector());
-                m_target_point = m_path_corners.front();
-                float target_angle = steerToPoint(m_target_point);
-                setSteering(target_angle,dt);
-
-                return;
-            }
+            m_is_uturn = true;
         }
-
-        else if (m_target_node == m_current_node)
-        {
-            // Very close to the item, steer directly
-            float target_angle = steerToPoint(m_target_point);
-            setSteering(target_angle,dt);
-            m_controls->m_brake = true;
-
-            return;
-        }
-
         else
         {
-            // Do nothing if no targets found
-            m_target_node = 0;
-            m_target_point = 0.0f;
-            setSteering(0.0f,dt);
-            return;
+            float target_angle = steerToPoint(m_target_point);
+            setSteering(target_angle,dt);
         }
+        return;
     }
 
-    // After this AI kart has a powerup, try to follow a closest kart in the map
-    findClosestKart(&m_target_point , &m_target_node);
-    if (m_target_node == BattleGraph::UNKNOWN_POLY) return;
-
-    if (m_target_node != m_current_node)
+    else if (m_target_node != m_current_node)
     {
         findPortals(m_current_node, m_target_node);
         stringPull(m_kart->getXYZ(), m_target_point);
         if (m_path_corners.size() > 0)
+            m_target_point = m_path_corners[0];
+
+        checkPosition(m_target_point, &m_cur_kart_pos_data);
+        m_debug_sphere->setPosition(m_target_point.toIrrVector());
+        if (m_cur_kart_pos_data.behind)
         {
-            //m_debug_sphere->setPosition(m_path_corners[0].toIrrVector());
-            m_target_point = m_path_corners.front();
+            m_is_uturn = true;
+        }
+        else
+        {
             float target_angle = steerToPoint(m_target_point);
             setSteering(target_angle,dt);
-
-            return;
         }
-    }
-
-    else if (m_target_node == m_current_node)
-    {
-        // Very close to the target kart, steer directly
-        float target_angle = steerToPoint(m_target_point);
-        setSteering(target_angle,dt);
-        m_controls->m_brake = true;
-
         return;
     }
 
     else
     {
-        // Do nothing if no targets found
-        m_target_node = 0;
-        m_target_point = 0.0f;
-        setSteering(0.0f,dt);
+        // Do nothing (go straight) if no targets found
+        setSteering(1.0f,dt);
+        return;
     }
 }   // handleSteering
-
-//-----------------------------------------------------------------------------
-
-void BattleAI::findClosestKart(Vec3* aim_point, int* target_node)
-{
-    float distance = 99999.9f;
-    const unsigned int n = m_world->getNumKarts();
-    int closet_kart_num = 0;
-
-    for (unsigned int i = 0; i < n; i++)
-    {
-        const AbstractKart* kart = m_world->getKart(i);
-        if(kart->isEliminated()) continue;
-
-        if (kart->getWorldKartId() == m_kart->getWorldKartId())
-            continue; // Skip the same kart
-
-        Vec3 d = kart->getXYZ() - m_kart->getXYZ();
-        if (d.length_2d() <= distance)
-        {
-            distance = d.length_2d();
-            closet_kart_num = i;
-        }
-    }
-
-    const AbstractKart* closet_kart = m_world->getKart(closet_kart_num);
-    if (!closet_kart->getController()->isPlayerController())
-    {
-        BattleAI* controller = (BattleAI*)(closet_kart->getController());
-        *target_node = controller->getCurrentNode();
-        *aim_point = closet_kart->getXYZ();
-    }
-
-    else if (closet_kart->getController()->isPlayerController())
-    {
-        PlayerController* controller = (PlayerController*)(closet_kart->getController());
-        *target_node = controller->getCurrentNode();
-        *aim_point = closet_kart->getXYZ();
-    }
-    m_closest_kart_distance = distance;
-}
 
 //-----------------------------------------------------------------------------
 /** This function finds the polyon edges(portals) that the AI will cross before
@@ -379,7 +477,8 @@ void BattleAI::stringPull(const Vec3& start_pos, const Vec3& end_pos)
         Vec3 portal_right = m_portals[i].second;
 
         //Compute for left edge
-        if ((funnel_left == funnel_apex) || portal_left.sideOfLine2D(funnel_apex, funnel_left) <= -eps)
+        if ((funnel_left == funnel_apex) ||
+             portal_left.sideOfLine2D(funnel_apex, funnel_left) <= -eps)
         {
             funnel_left = 0.98f*portal_left + 0.02f*portal_right;
             //funnel_left = portal_left;
@@ -399,7 +498,8 @@ void BattleAI::stringPull(const Vec3& start_pos, const Vec3& end_pos)
         }
 
         //Compute for right edge
-        if ((funnel_right == funnel_apex) || portal_right.sideOfLine2D(funnel_apex, funnel_right) >= eps)
+        if ((funnel_right == funnel_apex) ||
+             portal_right.sideOfLine2D(funnel_apex, funnel_right) >= eps)
         {
             funnel_right = 0.98f*portal_right + 0.02f*portal_left;
             //funnel_right = portal_right;
@@ -422,34 +522,7 @@ void BattleAI::stringPull(const Vec3& start_pos, const Vec3& end_pos)
 
     //Push end_pos to m_path_corners so if no corners, we aim at target
     m_path_corners.push_back(end_pos);
-}   //  stringPull
-
-//-----------------------------------------------------------------------------
-/** Calls AIBaseController::isStuck() to determine if the AI is stuck.
- *  If the AI is stuck then it will override the controls and start reverse
- *  the kart while turning.
- */
-void BattleAI::handleGetUnstuck(const float dt)
-{
-    if (isStuck() == true)
-    {
-        m_time_since_stuck = 0.0f;
-        m_currently_reversing = true;
-        m_controls->reset();
-    }
-    if (m_currently_reversing == true)
-    {
-        m_controls->m_accel = -0.35f;
-        setSteering(-M_PI,dt);
-        m_time_since_stuck += dt;
-
-        if(m_time_since_stuck >= 0.6f)
-        {
-            m_currently_reversing = false;
-            m_time_since_stuck = 0.0f;
-        }
-    }
-} // handleGetUnstuck
+}   // stringPull
 
 //-----------------------------------------------------------------------------
 /** This function handles braking. It calls determineTurnRadius() to find out
@@ -468,8 +541,8 @@ void BattleAI::handleBraking()
 
     std::vector<Vec3> points;
 
-    if (m_current_node == -1 || m_target_node == -1)
-        return;
+    if (m_current_node == BattleGraph::UNKNOWN_POLY ||
+        m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
     points.push_back(m_kart->getXYZ());
     points.push_back(m_path_corners[0]);
@@ -477,7 +550,8 @@ void BattleAI::handleBraking()
 
     float current_curve_radius = BattleAI::determineTurnRadius(points);
 
-    Vec3 d1 = m_kart->getXYZ() - m_target_point; Vec3 d2 = m_kart->getXYZ() - m_path_corners[0];
+    Vec3 d1 = m_kart->getXYZ() - m_target_point;
+    Vec3 d2 = m_kart->getXYZ() - m_path_corners[0];
     if (d1.length2_2d() < d2.length2_2d())
         current_curve_radius = d1.length_2d();
 
@@ -485,20 +559,12 @@ void BattleAI::handleBraking()
           m_kart->getKartProperties()
           ->getSpeedForTurnRadius(current_curve_radius);
 
-    if (m_kart->getSpeed() > max_turn_speed  &&
-        m_kart->getSpeed()>MIN_SPEED )//     &&
-        //fabsf(m_controls->m_steer) > 0.95f)
+    if (m_kart->getSpeed() > max_turn_speed &&
+        m_kart->getSpeed() > MIN_SPEED)
     {
         m_controls->m_brake = true;
-#ifdef DEBUG
-        if(m_ai_debug)
-            Log::debug("BattleAI",
-                       "speed %f too tight curve: radius %f ",
-                       m_kart->getSpeed(),
-                       m_kart->getIdent().c_str(),
-                       current_curve_radius);
-#endif
     }
+
 }   // handleBraking
 
 //-----------------------------------------------------------------------------
@@ -555,39 +621,14 @@ float BattleAI::determineTurnRadius( std::vector<Vec3>& points )
     float radius = pow(abs(1 + pow(dx_by_dz,2)),1.5f)/ abs(d2x_by_dz);
 
     return radius;
-}
+}   // determineTurnRadius
 
 //-----------------------------------------------------------------------------
-// Alternative implementation of isStuck()
-/*
-float BattleAI::isStuck(const float dt)
-{
-    // check if kart is stuck
-    if(m_kart->getSpeed()<2.0f && !m_kart->getKartAnimation() &&
-        !m_world->isStartPhase())
-    {
-        m_time_since_stuck += dt;
-        if(m_time_since_stuck > 2.0f)
-        {
-            return true;
-            m_time_since_stuck=0.0f;
-        }   // m_time_since_stuck > 2.0f
-    }
-    else
-    {
-        m_time_since_stuck = 0.0f;
-        return false;
-    }
-}
-
-*/
-
-//-----------------------------------------------------------------------------
-
 void BattleAI::handleItems(const float dt)
 {
     m_controls->m_fire = false;
-    if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING)
+    if (m_kart->getKartAnimation() ||
+        m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING)
         return;
 
     m_time_since_last_shot += dt;
@@ -618,13 +659,11 @@ void BattleAI::handleItems(const float dt)
             // Avoid dropping all bubble gums one after another
             if (m_time_since_last_shot < 3.0f) break;
 
-            // Use bubblegum if the next kart  behind is 'close' but not too close
-            // (too close likely means that the kart is not behind but more to the
-            // side of this kart and so won't be hit by the bubble gum anyway).
-            // Should we check the speed of the kart as well? I.e. only drop if
-            // the kart behind is faster? Otoh this approach helps preventing an
-            // overtaken kart to overtake us again.
-            if (m_closest_kart_distance < 15.0f && m_closest_kart_distance > 3.0f)
+            // Use bubblegum if the next kart behind is 'close' but not too close,
+            // or can't find a close kart for too long time
+            if ((m_closest_kart_pos_data.distance < 15.0f &&
+                m_closest_kart_pos_data.distance > 3.0f) ||
+                m_time_since_last_shot > 15.0f)
             {
                 m_controls->m_fire      = true;
                 m_controls->m_look_back = true;
@@ -633,20 +672,24 @@ void BattleAI::handleItems(const float dt)
 
             break;   // POWERUP_BUBBLEGUM
         }
-    // All the thrown/fired items might be improved by considering the angle
-    // towards m_kart_ahead.
+    // FIXME:: All the thrown/fired items might be improved by considering
+    // the angle towards (m_closest_kart_pos_data.angle).
     case PowerupManager::POWERUP_CAKE:
         {
             // if the kart has a shield, do not break it by using a cake.
             if (m_kart->getShieldTime() > min_bubble_time)
                 break;
-            // Leave some time between shots
-            if (m_time_since_last_shot < 3.0f) break;
 
-            if (m_closest_kart_distance < 25.0f)
+            // Leave some time between shots
+            if (m_time_since_last_shot < 1.0f) break;
+
+            if (m_closest_kart_pos_data.distance < 25.0f)
             {
                 m_controls->m_fire      = true;
-                m_controls->m_look_back = false;
+                if (m_closest_kart_pos_data.behind)
+                    m_controls->m_look_back = true;
+                else
+                    m_controls->m_look_back = false;
                 break;
             }
 
@@ -658,15 +701,17 @@ void BattleAI::handleItems(const float dt)
             // if the kart has a shield, do not break it by using a bowling ball.
             if (m_kart->getShieldTime() > min_bubble_time)
                 break;
-            // Leave more time between bowling balls, since they are
-            // slower, so it should take longer to hit something which
-            // can result in changing our target.
-            if (m_time_since_last_shot < 5.0f) break;
 
-            if (m_closest_kart_distance < 5.0f)
+            // Leave some time between shots
+            if (m_time_since_last_shot < 1.0f) break;
+
+            if (m_closest_kart_pos_data.distance < 5.0f)
             {
                 m_controls->m_fire      = true;
-                m_controls->m_look_back = false;
+                if (m_closest_kart_pos_data.behind)
+                    m_controls->m_look_back = true;
+                else
+                    m_controls->m_look_back = false;
                 break;
             }
 
@@ -679,7 +724,7 @@ void BattleAI::handleItems(const float dt)
             if(m_kart->getShieldTime() > min_bubble_time)
                 break;
 
-            if (m_closest_kart_distance < 5.0f)
+            if (m_closest_kart_pos_data.distance < 5.0f)
             {
                 m_controls->m_fire      = true;
                 m_controls->m_look_back = false;
@@ -715,42 +760,39 @@ void BattleAI::handleItems(const float dt)
         assert(false);
     }
     if (m_controls->m_fire)
-    {
-    m_closest_kart_distance = 99999.9f;
-    m_time_since_last_shot  = 0.0f;
-    }
-}
+        m_time_since_last_shot  = 0.0f;
+}   // handleItems
 
 //-----------------------------------------------------------------------------
-
 void BattleAI::handleItemCollection(Vec3* aim_point, int* target_node)
 {
-    float distance = 5.0f;
-    bool found_suitable_item = false;
+    float distance = 99999.9f;
     const std::vector< std::pair<Item*, int> >& item_list =
         BattleGraph::get()->getItemList();
     unsigned int items_count = item_list.size();
+    unsigned int closest_item_num = 0;
 
-    for (unsigned int j = 0; j < 50; j++)
+    for (unsigned int i = 0; i < items_count; ++i)
     {
-        for (unsigned int i = 0; i < items_count; ++i)
+        Item* item = item_list[i].first;
+        if ((item->getType() == Item::ITEM_NITRO_BIG ||
+             item->getType() == Item::ITEM_NITRO_SMALL) &&
+            ((m_kart->getKartProperties()->getNitroSmallContainer() +
+              m_kart->getKartProperties()->getNitroBigContainer()) > 1.0f))
+                continue; // Ignore nitro when already has some
+
+        Vec3 d = item->getXYZ() - m_kart->getXYZ();
+        if (d.length_2d() <= distance && (item->getType() ==
+            Item::ITEM_BONUS_BOX || item->getType() ==
+            Item::ITEM_NITRO_BIG || item->getType() ==
+            Item::ITEM_NITRO_SMALL) && !item->wasCollected())
         {
-            Item* item = item_list[i].first;
-            Vec3 d = item->getXYZ() - m_kart->getXYZ();
-            if (d.length_2d() <= distance)
-            {
-                if ((item->getType() == Item::ITEM_BONUS_BOX)
-                     && !item->wasCollected())
-                {
-                    m_item_to_collect = item;
-                    found_suitable_item = true;
-                    *aim_point = item->getXYZ();
-                    *target_node = item_list[i].second;
-                    break;
-                }
-            }
+            closest_item_num = i;
+            distance = d.length_2d();
         }
-        if (found_suitable_item) break;
-        distance = 2.0f * distance;
     }
-}
+
+    m_item_to_collect = item_list[closest_item_num].first;
+    *aim_point = (item_list[closest_item_num].first)->getXYZ();
+    *target_node = item_list[closest_item_num].second;
+}   // handleItemCollection

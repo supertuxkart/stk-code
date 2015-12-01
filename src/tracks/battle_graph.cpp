@@ -87,11 +87,13 @@ void BattleGraph::computeFloydWarshall()
     // AI must check this
     m_parent_poly = std::vector< std::vector<int> > (n, std::vector<int>(n,BattleGraph::UNKNOWN_POLY));
     for(unsigned int i=0; i<n; i++)
+    {
         for(unsigned int j=0; j<n; j++)
         {
             if(i == j || m_distance_matrix[i][j]>=9899.9f) m_parent_poly[i][j]=-1;
             else    m_parent_poly[i][j] = i;
         }
+    }
 
     for(unsigned int k=0; k<n; k++)
     {
@@ -256,7 +258,11 @@ void BattleGraph::findItemsOnGraphNodes(ItemManager * item_manager)
         for (unsigned int j = 0; j < this->getNumNodes(); ++j)
         {
             if (NavMesh::get()->getNavPoly(j).pointInPoly(xyz))
-                polygon = j;
+            {
+                float dist = xyz.getY() - NavMesh::get()->getCenterOfPoly(j).getY();
+                if (fabsf(dist) < 1.0f )
+                    polygon = j;
+            }
         }
 
         if (polygon != BattleGraph::UNKNOWN_POLY)
