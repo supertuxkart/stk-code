@@ -53,7 +53,6 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,
     m_self_destroy = false;
     m_enter_lobby = false;
     m_from_server_creation = from_server_creation;
-    m_server_join_request = NULL;
 
     loadFromFile("online/server_info_dialog.stkgui");
 
@@ -79,22 +78,16 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,
 
 ServerInfoDialog::~ServerInfoDialog()
 {
-    if (m_server_join_request)
-        delete m_server_join_request;
-    m_server_join_request = NULL;
 }   // ~ServerInfoDialog
 
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
-    // FIXME - without this next line, it appears that m_server_join is completely unused.
-    //m_server_join_request = Online::CurrentUser::get()->requestServerJoin(m_server_id);
     ServersManager::get()->setJoinedServer(m_server_id);
 
     STKHost::create();
     ModalDialog::dismiss();
     NetworkingLobby::getInstance()->push();
-    //Online::CurrentUser::release();
 }   // requestJoin
 
 // -----------------------------------------------------------------------------
@@ -142,34 +135,8 @@ bool ServerInfoDialog::onEscapePressed()
 }   // onEscapePressed
 
 // -----------------------------------------------------------------------------
-
 void ServerInfoDialog::onUpdate(float dt)
 {
-    if(m_server_join_request != NULL)
-    {
-        if(m_server_join_request->isDone())
-        {
-            if(m_server_join_request->isSuccess())
-            {
-                m_enter_lobby = true;
-            }
-            else
-            {
-                SFXManager::get()->quickSound( "anvil" );
-                m_info_widget->setErrorColor();
-                m_info_widget->setText(m_server_join_request->getInfo(), false);
-            }
-            delete m_server_join_request;
-            m_server_join_request = NULL;
-        }
-        else
-        {
-            m_info_widget->setDefaultColor();
-            m_info_widget->setText(StringUtils::loadingDots(_("Joining server")),
-                                   false);
-        }
-    }
-
     //If we want to open the registration dialog, we need to close this one first
     if (m_enter_lobby) m_self_destroy = true;
 
@@ -179,7 +146,7 @@ void ServerInfoDialog::onUpdate(float dt)
         ModalDialog::dismiss();
         if (m_from_server_creation)
             StateManager::get()->popMenu();
-        if (m_enter_lobby)
+        else if (m_enter_lobby)
             NetworkingLobby::getInstance()->push();
         return;
     }

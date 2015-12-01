@@ -28,10 +28,7 @@
 
 #include <irrString.h>
 
-namespace Online { class XMLRequest; }
-
-/**
- * \brief Dialog that allows a user to sign in
+/** \brief Dialog that allows a user to sign in
  * \ingroup states_screens
  */
 class ServerInfoDialog : public GUIEngine::ModalDialog
@@ -42,9 +39,6 @@ private:
     bool m_self_destroy;
     bool m_enter_lobby;
     bool m_from_server_creation;
-
-    /** Pointer to the server join request. */
-    Online::XMLRequest *m_server_join_request;
 
     const uint32_t m_server_id;
     uint32_t m_host_id;
