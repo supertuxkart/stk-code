@@ -553,10 +553,11 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     // send a kart update to everyone
     NetworkString answer(3+1+kart_name.size());
     // kart update (3), 1, race id
-    answer.ai8(0x03).ai8(1).ai8(peer->getPlayerProfile()->getPlayerID())
+    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
+    answer.ai8(LE_KART_SELECTION_UPDATE).ai8(1).ai8(player_id)
           .encodeString(kart_name);
     sendMessage(answer);
-    m_setup->setPlayerKart(peer->getPlayerProfile()->getPlayerID(), kart_name);
+    m_setup->setPlayerKart(player_id, kart_name);
 }   // kartSelectionRequested
 
 //-----------------------------------------------------------------------------
