@@ -206,6 +206,8 @@ private:
     bool                     m_is_arena;
     /** True if this track has easter eggs. */
     bool                     m_has_easter_eggs;
+    /** True if this track has navmesh. */
+    bool                     m_has_navmesh;
     /** True if this track is a soccer arena. */
     bool                     m_is_soccer;
 
@@ -441,6 +443,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this track has easter eggs. */
     bool hasEasterEggs() const { return m_has_easter_eggs; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this track navmesh. */
+    bool hasNavMesh() const { return m_has_navmesh; }
     // ------------------------------------------------------------------------
     void loadObjects(const XMLNode* root, const std::string& path,
         ModelDefinitionLoader& lod_loader, bool create_lod_definitions,

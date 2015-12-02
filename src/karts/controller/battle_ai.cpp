@@ -136,7 +136,7 @@ void BattleAI::update(float dt)
     m_controls->m_nitro     = false;
 
     // Don't do anything if there is currently a kart animations shown.
-    if(m_kart->getKartAnimation())
+    if (m_kart->getKartAnimation())
         return;
 
     if (m_world->isStartPhase())

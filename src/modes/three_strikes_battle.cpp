@@ -294,8 +294,10 @@ void ThreeStrikesBattle::update(float dt)
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
 
-    updateKartNodes();    // insert blown away tire(s) now if was requested
+    if (m_track->hasNavMesh())
+        updateKartNodes();
 
+    // insert blown away tire(s) now if was requested
     while (m_insert_tire > 0)
     {
         std::string tire;

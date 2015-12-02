@@ -143,7 +143,9 @@ void TrackInfoScreen::init()
 
     // Number of AIs
     // -------------
-    const bool has_AI = race_manager->hasAI();
+    const bool has_AI =
+        (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ?
+         m_track->hasNavMesh() : race_manager->hasAI());
     m_ai_kart_spinner->setVisible(has_AI);
     getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
     if (has_AI)
@@ -172,6 +174,8 @@ void TrackInfoScreen::init()
             m_ai_kart_spinner->setMin(0);
 
     }   // has_AI
+    else
+        race_manager->setNumKarts(race_manager->getNumLocalPlayers());
 
     // Reverse track
     // -------------

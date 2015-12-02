@@ -100,7 +100,9 @@ void ArenasScreen::beforeAddingWidget()
         }
         else
         {
-            if(temp->isArena())
+            if(temp->isArena() && (temp->hasNavMesh()  ||
+                race_manager->getNumLocalPlayers() > 1 ||
+                UserConfigParams::m_artist_debug_mode))
                 num_of_arenas++;
         }
     }
@@ -215,6 +217,7 @@ void ArenasScreen::buildTrackList()
     const std::string curr_group_name = tabs->getSelectionIDString(0);
 
     bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    bool arenas_have_navmesh = false;
 
     if (curr_group_name == ALL_ARENA_GROUPS_ID)
     {
@@ -229,7 +232,14 @@ void ArenasScreen::buildTrackList()
             }
             else
             {
-                if(!curr->isArena()) continue;
+                if(curr->isArena() && curr->hasNavMesh() && !arenas_have_navmesh)
+                    arenas_have_navmesh = true;
+
+                if(!curr->isArena()                      ||
+                  (!(curr->hasNavMesh()                  ||
+                  race_manager->getNumLocalPlayers() > 1 ||
+                  UserConfigParams::m_artist_debug_mode)))
+                    continue;
             }
 
             if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
@@ -259,7 +269,14 @@ void ArenasScreen::buildTrackList()
             }
             else
             {
-                if(!curr->isArena()) continue;
+                if(curr->isArena() && curr->hasNavMesh() && !arenas_have_navmesh)
+                    arenas_have_navmesh = true;
+
+                if(!curr->isArena()                      ||
+                  (!(curr->hasNavMesh()                  ||
+                  race_manager->getNumLocalPlayers() > 1 ||
+                  UserConfigParams::m_artist_debug_mode)))
+                    continue;
             }
 
             if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
@@ -274,7 +291,9 @@ void ArenasScreen::buildTrackList()
             }
         }
     }
-    w->addItem(_("Random Arena"), "random_track", "/gui/track_random.png");
+    if (arenas_have_navmesh || race_manager->getNumLocalPlayers() > 1 ||
+        UserConfigParams::m_artist_debug_mode)
+        w->addItem(_("Random Arena"), "random_track", "/gui/track_random.png");
     w->updateItemDisplay();
 
     assert(w->getItems().size() > 0);

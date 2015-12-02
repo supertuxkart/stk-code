@@ -116,6 +116,7 @@ Track::Track(const std::string &filename)
     m_reverse_available     = false;
     m_is_arena              = false;
     m_has_easter_eggs       = false;
+    m_has_navmesh           = false;
     m_is_soccer             = false;
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
@@ -583,6 +584,18 @@ void Track::loadTrackInfo()
         }
         delete easter;
     }
+
+    XMLNode *navmesh = file_manager->createXMLTree(m_root+"navmesh.xml");
+
+    if(!navmesh || navmesh->getName()!="navmesh")
+    {
+        Log::warn("Track", "NavMesh is not found for this arena, "
+                  "disable AI for it.\n");
+    }
+    else
+        m_has_navmesh = true;
+    delete navmesh;
+
 }   // loadTrackInfo
 
 //-----------------------------------------------------------------------------
@@ -715,7 +728,8 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
  */
 void Track::loadBattleGraph()
 {
-    BattleGraph::create(m_root+"navmesh.xml");
+    if (m_has_navmesh)
+        BattleGraph::create(m_root+"navmesh.xml");
 }
 
 // -----------------------------------------------------------------------------
@@ -1830,7 +1844,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Battle Graph needs ItemManager to be created, and all items to be
     // added to ItemManager. Loading battle graph here is therefore a workaround
     // to the main problem.
-    if (m_is_arena && !m_is_soccer && !m_is_cutscene) loadBattleGraph();
+    if (m_is_arena && !m_is_soccer && !m_is_cutscene && m_has_navmesh)
+        loadBattleGraph();
 
     if (UserConfigParams::m_track_debug &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
@@ -1839,7 +1854,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         QuadGraph::get()->createDebugMesh();
     }
 
-    if (UserConfigParams::m_track_debug &&
+    if (UserConfigParams::m_track_debug && m_has_navmesh &&
         race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
         !m_is_cutscene)
         BattleGraph::get()->createDebugMesh();
