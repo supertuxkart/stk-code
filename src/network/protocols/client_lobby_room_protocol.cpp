@@ -795,10 +795,10 @@ void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
         return;
     std::string track_name;
     int N = data.decodeString(7, &track_name);
-    if (!isByteCorrect(event, N+8, 1))
+    if (!isByteCorrect(event, N+7, 1))
         return;
     m_setup->getRaceConfig()->setPlayerTrackVote(data[6], track_name,
-                                                 data[N+9]);
+                                                 data[N+8]);
 }   // playerTrackVote
 
 //-----------------------------------------------------------------------------

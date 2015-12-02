@@ -678,10 +678,10 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
         return;
     std::string track_name;
     int N = data.decodeString(5, &track_name);
-    if (!isByteCorrect(event, N+6, 1))
+    if (!isByteCorrect(event, N+5, 1))
         return;
     uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
-    m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name, data[N+7]);
+    m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name, data[N+6]);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token
     NetworkString other(2+data.size());
