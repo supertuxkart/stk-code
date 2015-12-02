@@ -576,7 +576,7 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
                    "selection update wasn't formated as expected.");
         return;
     }
-    uint8_t token = data.gui32(1);
+    uint32_t token = data.gui32(1);
     if (token == STKHost::get()->getPeers()[0]->getClientServerToken())
     {
         m_state = PLAYING;
