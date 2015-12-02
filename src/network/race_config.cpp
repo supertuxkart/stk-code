@@ -108,7 +108,7 @@ RaceVote::RaceVote()
 //-----------------------------------------------------------------------------
 /** Sets the selected major race vote.
  */
-void RaceVote::voteMajor(uint8_t major)
+void RaceVote::voteMajor(uint32_t major)
 {
     m_has_voted_major = true;
     m_major_mode      = major;
@@ -126,7 +126,7 @@ void RaceVote::voteRaceCount(uint8_t count)
 //-----------------------------------------------------------------------------
 /** Sets vote for minor race mode.
  */
-void RaceVote::voteMinor(uint8_t minor)
+void RaceVote::voteMinor(uint32_t minor)
 {
     m_has_voted_minor = true;
     m_minor_mode = minor;
@@ -247,7 +247,7 @@ void RaceConfig::setMaxPlayerCount(uint8_t count)
 }   // setMaxPlayerCount
 
 //-----------------------------------------------------------------------------
-void RaceConfig::setPlayerMajorVote(uint8_t player_id, uint8_t major)
+void RaceConfig::setPlayerMajorVote(uint8_t player_id, uint32_t major)
 {
     Log::info("RaceConfig", "Player %d voted for major %d", player_id, major);
     m_votes[player_id].voteMajor(major);
@@ -262,7 +262,7 @@ void RaceConfig::setPlayerRaceCountVote(uint8_t player_id, uint8_t count)
 }   // setPlayerRaceCountVote
 
 //-----------------------------------------------------------------------------
-void RaceConfig::setPlayerMinorVote(uint8_t player_id, uint8_t minor)
+void RaceConfig::setPlayerMinorVote(uint8_t player_id, uint32_t minor)
 {
     Log::info("RaceConfig", "Player %d voted for minor %d", player_id, minor);
     m_votes[player_id].voteMinor(minor);

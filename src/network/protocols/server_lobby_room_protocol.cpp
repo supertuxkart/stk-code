@@ -566,10 +566,10 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6                 7
+ *  Byte 0   1            5   6                 10
  *       ----------------------------------------
- *  Size | 1 |      4     | 1 |        1        |
- *  Data | 4 | priv token | 1 | major mode vote |
+ *  Size | 1 |      4     | 1 |        4        |
+ *  Data | 4 | priv token | 4 | major mode vote |
  *       ----------------------------------------
  */
 void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
@@ -578,13 +578,14 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
     STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 7))
         return;
-    if (!isByteCorrect(event, 5, 1))
+    if (!isByteCorrect(event, 5, 4))
         return;
     uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
-    m_setup->getRaceConfig()->setPlayerMajorVote(player_id, data[6]);
+    uint32_t major = data.getUInt32(6);
+    m_setup->getRaceConfig()->setPlayerMajorVote(player_id, major);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token
-    NetworkString other(2+data.size());
+    NetworkString other(5+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
     NetworkString prefix(1);
@@ -630,10 +631,10 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6                 7
+ *  Byte 0   1            5   6                 10
  *       ----------------------------------------
- *  Size | 1 |      4     | 1 |        1        |
- *  Data | 4 | priv token | 1 | minor mode vote |
+ *  Size | 1 |      4     | 1 |        4        |
+ *  Data | 4 | priv token | 4 | minor mode vote |
  *       ----------------------------------------
  */
 void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
@@ -642,10 +643,11 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
     STKPeer* peer = event->getPeer();
     if (!checkDataSizeAndToken(event, 7))
         return;
-    if (!isByteCorrect(event, 5, 1))
+    if (!isByteCorrect(event, 5, 4))
         return;
     uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
-    m_setup->getRaceConfig()->setPlayerMinorVote(player_id, data[6]);
+    uint32_t minor = data.getUInt32(6);
+    m_setup->getRaceConfig()->setPlayerMinorVote(player_id, minor);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token
     NetworkString other(2+data.size());

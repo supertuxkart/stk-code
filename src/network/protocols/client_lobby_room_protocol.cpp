@@ -68,12 +68,12 @@ void ClientLobbyRoomProtocol::requestKartSelection(const std::string &kart_name)
 
 //-----------------------------------------------------------------------------
 
-void ClientLobbyRoomProtocol::voteMajor(uint8_t major)
+void ClientLobbyRoomProtocol::voteMajor(uint32_t major)
 {
     NetworkString request(8);
     // size_token (4), token, size major(1),major
     request.ai8(LE_VOTE_MAJOR).ai8(4)
-           .ai32(m_server->getClientServerToken()).ai8(1).ai8(major);
+           .ai32(m_server->getClientServerToken()).ai8(4).addUInt32(major);
     sendMessage(request, true);
 }   // voteMajor
 
@@ -90,12 +90,12 @@ void ClientLobbyRoomProtocol::voteRaceCount(uint8_t count)
 
 //-----------------------------------------------------------------------------
 
-void ClientLobbyRoomProtocol::voteMinor(uint8_t minor)
+void ClientLobbyRoomProtocol::voteMinor(uint32_t minor)
 {
     NetworkString request(8);
     // size_token (4), token, size minor(1),minor
     request.ai8(LE_VOTE_MINOR).ai8(4).ai32(m_server->getClientServerToken())
-           .ai8(1).ai8(minor);
+           .ai8(4).addUInt32(minor);
     sendMessage(request, true);
 }   // voteMinor
 
@@ -723,7 +723,7 @@ void ClientLobbyRoomProtocol::playerMajorVote(Event* event)
         return;
     if (!isByteCorrect(event, 5, 1))
         return;
-    if (!isByteCorrect(event, 7, 1))
+    if (!isByteCorrect(event, 7, 4))
         return;
     m_setup->getRaceConfig()->setPlayerMajorVote(data[6], data[8]);
 }   // playerMajorVote
@@ -758,8 +758,8 @@ void ClientLobbyRoomProtocol::playerRaceCountVote(Event* event)
  *  Format of the data :
  *  Byte 0   1            5   6           7   8                 9
  *       --------------------------------------------------------
- *  Size | 1 |      4     | 1 |      1    | 1 |        1        |
- *  Data | 4 | priv token | 1 | player id | 1 | minor mode vote |
+ *  Size | 1 |      4     | 1 |      1    | 1 |        4        |
+ *  Data | 4 | priv token | 1 | player id | 4 | minor mode vote |
  *       --------------------------------------------------------
  */
 void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
@@ -769,7 +769,7 @@ void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
         return;
     if (!isByteCorrect(event, 5, 1))
         return;
-    if (!isByteCorrect(event, 7, 1))
+    if (!isByteCorrect(event, 7, 4))
         return;
     m_setup->getRaceConfig()->setPlayerMinorVote(data[6], data[8]);
 }   // playerMinorVote

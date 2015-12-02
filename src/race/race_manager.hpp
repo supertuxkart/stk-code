@@ -414,6 +414,7 @@ public:
       * \param diff Difficulty.
       */
     void setDifficulty(Difficulty diff);
+    static Difficulty convertDifficulty(const std::string &difficulty);
 
     // ------------------------------------------------------------------------
     void setCoinTarget(int num)   { m_coin_target = num;        }

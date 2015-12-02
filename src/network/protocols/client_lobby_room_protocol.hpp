@@ -13,9 +13,9 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         virtual ~ClientLobbyRoomProtocol();
 
         void requestKartSelection(const std::string &kart_name);
-        void voteMajor(uint8_t major);
+        void voteMajor(uint32_t major);
         void voteRaceCount(uint8_t count);
-        void voteMinor(uint8_t minor);
+        void voteMinor(uint32_t minor);
         void voteTrack(const std::string &track, uint8_t track_nb = 0);
         void voteReversed(bool reversed, uint8_t track_nb = 0);
         void voteLaps(uint8_t laps, uint8_t track_nb = 0);

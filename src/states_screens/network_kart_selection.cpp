@@ -32,6 +32,7 @@
 #include "network/stk_host.hpp"
 #include "states_screens/server_selection.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/tracks_screen.hpp"
 
 static const char ID_LOCKED[] = "locked/";
 
@@ -162,15 +163,15 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
 }   // playerConfirm
 
 // ----------------------------------------------------------------------------
-void NetworkKartSelectionScreen::playerSelected(uint8_t race_id,
+void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
                                                 const std::string &kart_name)
 {
     uint8_t widget_id = -1;
     for (unsigned int i = 0; i < m_id_mapping.size(); i++)
     {
         Log::info("NKSS", "Checking race id %d : mapped of %d is %d",
-                   race_id, i, m_id_mapping[i]);
-        if (m_id_mapping[i] == race_id)
+                   player_id, i, m_id_mapping[i]);
+        if (m_id_mapping[i] == player_id)
             widget_id = i;
     }
 
@@ -181,6 +182,25 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t race_id,
     KartSelectionScreen::updateKartStats(widget_id, kart_name);
     m_kart_widgets[widget_id].setKartInternalName(kart_name);
     m_kart_widgets[widget_id].markAsReady(); // mark player ready
+
+    // If this is the authorised client, send the currently set race config
+    // to the server.
+    if(STKHost::get()->isAuthorisedToControl())
+    {
+        // FIXME: for now we submit a vote from the authorised user
+        // for the various modes based on the settings in the race manager. 
+        // This needs more/better gui elements (and some should be set when
+        // defining the server).
+        Protocol* protocol = ProtocolManager::getInstance()
+                           ->getProtocol(PROTOCOL_LOBBY_ROOM);
+        ClientLobbyRoomProtocol* clrp =
+                           static_cast<ClientLobbyRoomProtocol*>(protocol);
+        clrp->voteMajor(race_manager->getMajorMode());
+        clrp->voteMinor(race_manager->getMinorMode());
+        clrp->voteReversed(race_manager->getReverseTrack());
+        clrp->voteRaceCount(1);
+    }
+    TracksScreen::getInstance()->push();
 }   // playerSelected
 
 // ----------------------------------------------------------------------------

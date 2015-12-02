@@ -192,6 +192,14 @@ void CreateServerScreen::createServer()
     // request is finished.
     NetworkConfig::get()->setMaxPlayers(max_players);
     NetworkConfig::get()->setServerName(name);
+
+    // FIXME: Add the following fields to the create server screen
+    // FIXME: Long term we might add a 'vote' option (e.g. GP vs single race,
+    // and normal vs FTL vs time trial could be voted about).
+    race_manager->setDifficulty(RaceManager::convertDifficulty("hard"));
+    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+    race_manager->setReverseTrack(false);
     STKHost::create();
 
 }   // createServer

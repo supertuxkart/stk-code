@@ -222,6 +222,26 @@ void RaceManager::setNumPlayers(int num)
     m_player_karts.resize(num);
 }   // setNumPlayers
 
+// ----------------------------------------------------------------------------
+/** Converst the difficulty given as a string into a Difficult enum. Defaults
+ *  to HARD.
+ *  \param difficulty The difficulty as string.
+ */
+RaceManager::Difficulty 
+                  RaceManager::convertDifficulty(const std::string &difficulty)
+{
+    if (difficulty == "novice")
+        return DIFFICULTY_EASY;
+    else if (difficulty == "intermediate")
+        return DIFFICULTY_MEDIUM;
+    else if (difficulty == "expert")
+        return DIFFICULTY_HARD;
+    else if (difficulty == "best")
+        return DIFFICULTY_BEST;
+    else
+        return DIFFICULTY_HARD;
+}   // convertDifficulty
+
 //-----------------------------------------------------------------------------
 /** Sets the difficulty to use.
  *  \param diff The difficulty to use.
