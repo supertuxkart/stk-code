@@ -339,9 +339,6 @@
     <!-- The different kart types, that can be specified in the kart.xml file -->
     <kart-types>
         <characteristic name="light">
-            <turn radius="0:3.0 10:10.0 25:20.0 45:40.0"
-                  time-full-steer="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25"
-                  time-reset-steer="0.1" />
             <engine power="*0.46" max-speed="*0.92" brake-factor="*1"
                  max-speed-reverse-ratio="*0.77" />
             <gear switch-ratio="0.20 0.55 1" power-increase="5 4 3" />
@@ -357,9 +354,6 @@
                         fade-out-time="2.3" />
         </characteristic>
         <characteristic name="medium">
-            <turn radius="0:4.5 10:16.0 25:30.0 45:60.0"
-                  time-full-steer="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28"
-                  time-reset-steer="0.1" />
             <engine power="*0.63" max-speed="*1" brake-factor="*0.73"
                     max-speed-reverse-ratio="*0.62" />
             <gear switch-ratio="0.30 0.7 1.0" power-increase="2.2 2.2 2.5" />
@@ -373,9 +367,6 @@
                         fade-out-time="1.6" />
         </characteristic>
         <characteristic name="heavy">
-            <turn radius="0:4.0 10:18.5 25:43.0 45:72.5"
-                  time-full-steer="0:0.23 0.5:0.23 0.5:0.41 1.0:0.41"
-                  time-reset-steer="0.1" />
             <engine power="*1" max-speed="*1" brake-factor="*0.66"
                     max-speed-reverse-ratio="*1" />
             <gear switch-ratio="0.45 0.70 1" power-increase="1.5 1.7 2.5" />
