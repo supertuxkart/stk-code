@@ -585,16 +585,13 @@ void Track::loadTrackInfo()
         delete easter;
     }
 
-    XMLNode *navmesh = file_manager->createXMLTree(m_root+"navmesh.xml");
-
-    if(!navmesh || navmesh->getName()!="navmesh")
-    {
-        Log::warn("Track", "NavMesh is not found for this arena, "
-                  "disable AI for it.\n");
-    }
-    else
+    if(file_manager->fileExists(m_root+"navmesh.xml"))
         m_has_navmesh = true;
-    delete navmesh;
+    else if (m_is_arena)
+    {
+        Log::warn("Track", "NavMesh is not found for arena %s, "
+                  "disable AI for it.\n", m_name.c_str());
+    }
 
 }   // loadTrackInfo
 

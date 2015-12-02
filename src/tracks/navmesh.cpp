@@ -41,6 +41,11 @@ NavMesh::NavMesh(const std::string &filename)
     m_n_polys=0;
 
     XMLNode *xml = file_manager->createXMLTree(filename);
+    if(xml->getName()!="navmesh")
+    {
+        Log::error("NavMesh", "NavMesh is invalid. \n");
+        return;
+    }
 
     // Assigning m_nav_mesh here because constructing NavPoly requires m_nav_mesh to be defined
     m_nav_mesh = this;
