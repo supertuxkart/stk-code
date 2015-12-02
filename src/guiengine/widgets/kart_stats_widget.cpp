@@ -80,6 +80,9 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
     }
 
     // Scale the values so they look better
+    // The scaling factor and offset were found by trial and error.
+    // It should look nice and you should be able to see the difference between
+    // different masses or velocities.
     m_skills[SKILL_MASS]->setValue((int)
             ((props->getCombinedCharacteristic()->getMass() - 20) / 4));
     m_skills[SKILL_MASS]->setLabel(_("WEIGHT"));

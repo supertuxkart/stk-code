@@ -1030,6 +1030,8 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
                                std::vector<const Item *> *items_to_avoid,
                                std::vector<const Item *> *items_to_collect)
 {
+    const KartProperties *kp = m_kart->getKartProperties();
+
     // Ignore items that are currently disabled
     if(item->getDisableTime()>0) return;
 
@@ -1050,18 +1052,16 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
         // Positive items: try to collect
         case Item::ITEM_NITRO_BIG:
             // Only collect nitro, if it can actually be stored.
-            if(m_kart->getEnergy() +
-                    m_kart->getKartProperties()->getNitroBigContainer()
-                  > m_kart->getKartProperties()->getNitroMax())
+            if (m_kart->getEnergy() + kp->getNitroBigContainer()
+                > kp->getNitroMax())
                   return;
             // fall through: if we have enough space to store a big
             // container, we can also store a small container, and
             // finally fall through to the bonus box code.
         case Item::ITEM_NITRO_SMALL: avoid = false;
             // Only collect nitro, if it can actually be stored.
-            if (m_kart->getEnergy() +
-                    m_kart->getKartProperties()->getNitroSmallContainer()
-                  > m_kart->getKartProperties()->getNitroMax())
+            if (m_kart->getEnergy() + kp->getNitroSmallContainer()
+                > kp->getNitroMax())
                   return;
         case Item::ITEM_BONUS_BOX:
             break;
@@ -1091,7 +1091,7 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
         // be if the kart would need to turn sharper, therefore stops
         // skidding, and will get the bonus speed.
         bool high_speed = (m_kart->getCurrentMaxSpeed() >
-                             m_kart->getKartProperties()->getEngineMaxSpeed() ) ||
+                           kp->getEngineMaxSpeed() ) ||
                           m_kart->getSkidding()->getSkidBonusReady();
         float max_angle = high_speed
                         ? m_ai_properties->m_max_item_angle_high_speed

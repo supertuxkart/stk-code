@@ -2137,7 +2137,7 @@ void Kart::updatePhysics(float dt)
     // Only apply if near ground instead of purely based on speed avoiding
     // the "parachute on top" look.
     const Vec3 &v = m_body->getLinearVelocity();
-    if(/*isNearGround() &&*/ v.getY() < - m_kart_properties->getSuspensionTravel() * 0.01f * 60)
+    if(/*isNearGround() &&*/ v.getY() < - m_kart_properties->getSuspensionTravel() * 60)
     {
         Vec3 v_clamped = v;
         // clamp the speed to 99% of the maxium falling speed.
