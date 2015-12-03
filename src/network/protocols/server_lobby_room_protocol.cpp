@@ -450,6 +450,8 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     m_next_player_id.getData()++;
     int new_player_id = m_next_player_id.getData();
     m_next_player_id.unlock();
+    if(STKHost::get()->getGameSetup()->getLocalMasterID()==0)
+        STKHost::get()->getGameSetup()->setLocalMaster(new_player_id);
 
     NetworkPlayerProfile* profile = new NetworkPlayerProfile(new_player_id, name);
     m_setup->addPlayer(profile);

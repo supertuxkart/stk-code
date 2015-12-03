@@ -87,8 +87,11 @@ public:
         return m_players;
     }   // getPlayers
     // ------------------------------------------------------------------------
+    /** Returns the number of connected players. */
     int getPlayerCount() { return (int)m_players.size(); }
-
+    // ------------------------------------------------------------------------
+    /** Returns the id of the local master. */
+    int getLocalMasterID() const { return m_local_master; }
 };
 
 #endif // GAME_SETUP_HPP
