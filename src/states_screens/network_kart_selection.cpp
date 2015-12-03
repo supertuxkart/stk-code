@@ -91,33 +91,11 @@ void NetworkKartSelectionScreen::init()
                             kartsAreaWidget->m_x + shift + kartsAreaWidget->m_w,
                             kartsAreaWidget->m_y + kartsAreaWidget->m_h);
     GameSetup *game_setup = STKHost::get()->getGameSetup();
-    for (unsigned int i = 0; i < players.size(); i++)
-    {
-        if(game_setup->isLocalMaster(players[i]->getPlayerID()))
-        {
-            // First kart widget always me
-            m_id_mapping.insert(m_id_mapping.begin(),players[i]->getPlayerID());
-            Log::info("NKSS", "Insert %d at pos 0", players[i]->getPlayerID());
-            continue; // it is me, don't add again
-        }
 
-        Log::info("NKSS", "Adding %d at pos %d", players[i]->getPlayerID(), i);
-        m_id_mapping.push_back(players[i]->getPlayerID());
-
-        StateManager::ActivePlayer* aplayer = NULL; // player is remote
-
-        std::string selected_kart_group = "standard"; // standard group
-
-        PlayerKartWidget* newPlayerWidget =
-            new PlayerKartWidget(this, aplayer, players[i],
-                                 kartsArea, m_kart_widgets.size(),
-                                 selected_kart_group);
-
-        manualAddWidget(newPlayerWidget);
-        m_kart_widgets.push_back(newPlayerWidget);
-
-        newPlayerWidget->add();
-    }
+    // FIXME: atm only adds the local master, split screen supports
+    // needs to be added
+    int player_id = game_setup->getLocalMasterID();
+    m_id_mapping.insert(m_id_mapping.begin(), player_id);
 
     const int amount = m_kart_widgets.size();
     Widget* fullarea = getWidget("playerskarts");
