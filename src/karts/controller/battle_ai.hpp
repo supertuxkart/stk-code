@@ -59,6 +59,9 @@ private:
     posData m_closest_kart_pos_data;
     posData m_cur_kart_pos_data;
 
+    /** Holds the current difficulty. */
+    RaceManager::Difficulty m_cur_difficulty;
+
    /** Indicates that the kart is currently stuck, and m_time_since_stuck is
      * counting down. */
     bool m_is_stuck;
@@ -102,7 +105,7 @@ private:
     void  checkIfStuck(const float dt);
     void  checkPosition(const Vec3 &, posData*);
     float determineTurnRadius(std::vector<Vec3>& points);
-    void  findClosestKart();
+    void  findClosestKart(bool difficulty);
     void  findPortals(int start, int end);
     void  findTarget();
     void  handleAcceleration(const float dt);

@@ -587,7 +587,7 @@ void Track::loadTrackInfo()
 
     if(file_manager->fileExists(m_root+"navmesh.xml"))
         m_has_navmesh = true;
-    else if (m_is_arena)
+    else if(m_is_arena)
     {
         Log::warn("Track", "NavMesh is not found for arena %s, "
                   "disable AI for it.\n", m_name.c_str());
@@ -718,16 +718,6 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
         }
     }
 }   // loadQuadGraph
-
-// -----------------------------------------------------------------------------
-/** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
- *  they are connected to each other. Input file name is hardcoded for now
- */
-void Track::loadBattleGraph()
-{
-    if (m_has_navmesh)
-        BattleGraph::create(m_root+"navmesh.xml");
-}
 
 // -----------------------------------------------------------------------------
 
@@ -1842,7 +1832,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // added to ItemManager. Loading battle graph here is therefore a workaround
     // to the main problem.
     if (m_is_arena && !m_is_soccer && !m_is_cutscene && m_has_navmesh)
-        loadBattleGraph();
+        BattleGraph::create(m_root + "navmesh.xml");
 
     if (UserConfigParams::m_track_debug &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&

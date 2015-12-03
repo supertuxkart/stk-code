@@ -121,6 +121,7 @@ void BattleAI::reset()
     m_path_corners.clear();
     m_portals.clear();
 
+    m_cur_difficulty = race_manager->getDifficulty();
     AIBaseController::reset();
 }   // reset
 
@@ -164,7 +165,7 @@ void BattleAI::update(float dt)
         return;
     }
 
-    findClosestKart();
+    findClosestKart(true);
     findTarget();
     handleItems(dt);
 
@@ -233,7 +234,7 @@ void BattleAI::checkPosition(const Vec3 &point, posData *pos_data)
 }   //  checkPosition
 
 //-----------------------------------------------------------------------------
-void BattleAI::findClosestKart()
+void BattleAI::findClosestKart(bool difficulty)
 {
     float distance = 99999.9f;
     const unsigned int n = m_world->getNumKarts();
@@ -246,6 +247,26 @@ void BattleAI::findClosestKart()
 
         if (kart->getWorldKartId() == m_kart->getWorldKartId())
             continue; // Skip the same kart
+
+        // Test whether takes current difficulty into account for closest kart
+        // Notice: it don't affect aiming, this function will be called once
+        // more in handleItems, which ignore difficulty.
+        if (m_cur_difficulty == RaceManager::DIFFICULTY_EASY && difficulty)
+        {
+            // Skip human players for novice mode unless only human players left
+            const AbstractKart* temp = m_world->getKart(i);
+            if (temp->getController()->isPlayerController() &&
+               (m_world->getCurrentNumKarts() -
+                m_world->getCurrentNumPlayers()) > 1)
+                continue;
+        }
+        else if (m_cur_difficulty == RaceManager::DIFFICULTY_BEST && difficulty)
+        {
+            // Skip AI players for supertux mode
+            const AbstractKart* temp = m_world->getKart(i);
+            if (!(temp->getController()->isPlayerController()))
+                continue;
+        }
 
         Vec3 d = kart->getXYZ() - m_kart->getXYZ();
         if (d.length_2d() <= distance)
@@ -269,15 +290,24 @@ void BattleAI::findClosestKart()
         m_closest_kart_node = controller->getCurrentNode();
         m_closest_kart_point = closest_kart->getXYZ();
     }
-    checkPosition(m_closest_kart_point, &m_closest_kart_pos_data);
+
+    if (!difficulty)
+        checkPosition(m_closest_kart_point, &m_closest_kart_pos_data);
 }   // findClosestKart
 
 //-----------------------------------------------------------------------------
 void BattleAI::findTarget()
 {
+    // Don't try to hit a player continuously with swatter for easy and medium
+    // mode, which make it too aggressive
+    const bool continuous_swatter =
+        m_kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER   &&
+        (m_cur_difficulty                  == RaceManager::DIFFICULTY_HARD ||
+         m_cur_difficulty                  == RaceManager::DIFFICULTY_BEST);
+
     // Find a suitable target to drive to, either powerup or kart
     if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING &&
-        m_kart->getAttachment()->getType() != Attachment::ATTACH_SWATTER)
+        !continuous_swatter)
         handleItemCollection(&m_target_point , &m_target_node);
     else
     {
@@ -297,14 +327,20 @@ void BattleAI::handleAcceleration(const float dt)
         m_controls->m_accel = 0.0f;
         return;
     }
-    m_controls->m_accel = stk_config->m_ai_acceleration;
+
+    const float handicap =
+        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 0.7f : 1.0f);
+    m_controls->m_accel = stk_config->m_ai_acceleration * handicap;
 
 }   // handleAcceleration
 
 //-----------------------------------------------------------------------------
 void BattleAI::handleUTurn(const float dt)
 {
-    m_controls->m_accel = -2.0f;
+    const float handicap =
+        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 0.7f : 1.0f);
+
+    m_controls->m_accel = -2.0f * handicap;
     if (m_time_since_uturn >= 1.0f)
         setSteering(M_PI,dt); // Preventing keep going around circle
     else
@@ -315,7 +351,7 @@ void BattleAI::handleUTurn(const float dt)
     if (!m_cur_kart_pos_data.behind || m_time_since_uturn >= 1.5f)
     {
         m_is_uturn = false;
-        m_controls->m_accel = 2.0f;
+        m_controls->m_accel = 2.0f * handicap;
         m_time_since_uturn = 0.0f;
     }
 }   // handleUTurn
@@ -631,9 +667,14 @@ void BattleAI::handleItems(const float dt)
         m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING)
         return;
 
+    // Find a closest kart again, this time we ignore difficulty
+    findClosestKart(false);
     m_time_since_last_shot += dt;
 
     float min_bubble_time = 2.0f;
+    bool fire_behind = m_closest_kart_pos_data.behind &&
+                       !(m_cur_difficulty == RaceManager::DIFFICULTY_EASY ||
+                         m_cur_difficulty == RaceManager::DIFFICULTY_MEDIUM);
 
     switch(m_kart->getPowerup()->getType())
     {
@@ -686,10 +727,7 @@ void BattleAI::handleItems(const float dt)
             if (m_closest_kart_pos_data.distance < 25.0f)
             {
                 m_controls->m_fire      = true;
-                if (m_closest_kart_pos_data.behind)
-                    m_controls->m_look_back = true;
-                else
-                    m_controls->m_look_back = false;
+                m_controls->m_look_back = fire_behind;
                 break;
             }
 
@@ -707,11 +745,9 @@ void BattleAI::handleItems(const float dt)
 
             if (m_closest_kart_pos_data.distance < 5.0f)
             {
+                cout << m_closest_kart_pos_data.angle<<endl;
                 m_controls->m_fire      = true;
-                if (m_closest_kart_pos_data.behind)
-                    m_controls->m_look_back = true;
-                else
-                    m_controls->m_look_back = false;
+                m_controls->m_look_back = fire_behind;
                 break;
             }
 
@@ -775,6 +811,9 @@ void BattleAI::handleItemCollection(Vec3* aim_point, int* target_node)
     for (unsigned int i = 0; i < items_count; ++i)
     {
         Item* item = item_list[i].first;
+
+        if (item->wasCollected()) continue;
+
         if ((item->getType() == Item::ITEM_NITRO_BIG ||
              item->getType() == Item::ITEM_NITRO_SMALL) &&
             ((m_kart->getKartProperties()->getNitroSmallContainer() +
@@ -782,10 +821,10 @@ void BattleAI::handleItemCollection(Vec3* aim_point, int* target_node)
                 continue; // Ignore nitro when already has some
 
         Vec3 d = item->getXYZ() - m_kart->getXYZ();
-        if (d.length_2d() <= distance && (item->getType() ==
-            Item::ITEM_BONUS_BOX || item->getType() ==
-            Item::ITEM_NITRO_BIG || item->getType() ==
-            Item::ITEM_NITRO_SMALL) && !item->wasCollected())
+        if (d.length_2d() <= distance               &&
+           (item->getType() == Item::ITEM_BONUS_BOX ||
+            item->getType() == Item::ITEM_NITRO_BIG ||
+            item->getType() == Item::ITEM_NITRO_SMALL))
         {
             closest_item_num = i;
             distance = d.length_2d();
