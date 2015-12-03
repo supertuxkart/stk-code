@@ -1637,14 +1637,19 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     }
     
     // Handle lightning rendering
-    if (World::getWorld() != NULL)
     {
-        Weather* m_weather = World::getWorld()->getWeather();
-        
-        if (m_weather != NULL && m_weather->shouldLightning())
+        PROFILER_PUSH_CPU_MARKER("- Lightning", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTNING));
+        if (World::getWorld() != NULL)
         {
-            renderLightning(m_weather->getIntensity());
+            Weather* m_weather = World::getWorld()->getWeather();
+            
+            if (m_weather != NULL && m_weather->shouldLightning())
+            {
+                renderLightning(m_weather->getIntensity());
+            }
         }
+        PROFILER_POP_CPU_MARKER();
     }
 
     // Workaround a bug with srgb fbo on sandy bridge windows
