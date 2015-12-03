@@ -27,6 +27,7 @@
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/weather.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
@@ -1633,6 +1634,17 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             std::swap(in_fbo, out_fbo);
         }
         PROFILER_POP_CPU_MARKER();
+    }
+    
+    // Handle lightning rendering
+    if (World::getWorld() != NULL)
+    {
+        Weather* m_weather = World::getWorld()->getWeather();
+        
+        if (m_weather != NULL && m_weather->shouldLightning())
+        {
+            renderLightning(m_weather->getIntensity());
+        }
     }
 
     // Workaround a bug with srgb fbo on sandy bridge windows

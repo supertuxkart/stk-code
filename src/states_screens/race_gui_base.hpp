@@ -68,9 +68,6 @@ public:
     };   // KartIconDisplayInfo
 
 private:
-    /** Delight in seconds between lightnings. */
-    float m_lightning;
-
     /** True if unimportant messags (like item messages) should not
      *  be displayed. */
     bool  m_ignore_unimportant_messages;
@@ -238,9 +235,6 @@ public:
                   getMiniMapSize() const = 0;
     // ------------------------------------------------------------------------
     virtual void clearAllMessages() { m_messages.clear(); }
-
-    /** Set the flag that a lightning should be shown. */
-    void doLightning() { m_lightning = 1.0f; }
 
     void drawGlobalPlayerIcons(int bottom_margin);
 
