@@ -361,7 +361,7 @@ void PhysicalObject::init()
                 return;
         }   // switch node->getType()
 
-        std::auto_ptr<TriangleMesh> triangle_mesh(new TriangleMesh());
+        std::unique_ptr<TriangleMesh> triangle_mesh(new TriangleMesh());
 
         for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
         {
