@@ -2141,7 +2141,7 @@ void Kart::updatePhysics(float dt)
     {
         Vec3 v_clamped = v;
         // clamp the speed to 99% of the maxium falling speed.
-        v_clamped.setY(-m_kart_properties->getSuspensionTravel() * 0.01f * 60 * 0.99f);
+        v_clamped.setY(-m_kart_properties->getSuspensionTravel() * 60 * 0.99f);
         //m_body->setLinearVelocity(v_clamped);
     }
 
