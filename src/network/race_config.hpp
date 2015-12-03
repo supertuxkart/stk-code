@@ -115,6 +115,7 @@ public:
     const TrackInfo* getNextTrackInfo() const;
     bool getReverse() const;
     bool getLapCount() const;
+    int getNumTrackVotes() const;
 
     protected:
     std::vector<TrackInfo> m_tracks;

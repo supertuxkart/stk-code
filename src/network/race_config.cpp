@@ -447,3 +447,14 @@ const TrackInfo* RaceConfig::getNextTrackInfo() const
 }   // getNextTrackInfo
 
 //-----------------------------------------------------------------------------
+int RaceConfig::getNumTrackVotes() const
+{
+    int count = 0;
+
+    for (unsigned int i = 0; i < m_max_players; i++)
+    {
+        if (m_votes[i].hasVotedTrack())
+            count ++;
+    }
+    return count;
+}   // getNumTrackVotes

@@ -692,6 +692,8 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
     NetworkString prefix(1);
     prefix.ai8(LE_VOTE_TRACK); // prefix the token with the ype
     sendMessageToPeersChangingToken(prefix, other);
+    if(m_setup->getRaceConfig()->getNumTrackVotes()==m_setup->getPlayerCount())
+        startGame();
 }   // playerTrackVote
 
 //-----------------------------------------------------------------------------
