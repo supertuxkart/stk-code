@@ -15,7 +15,6 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
-option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
@@ -32,7 +31,9 @@ else()
 endif()
 
 if(MINGW OR CYGWIN)
-    set(USE_WIIUSE OFF)
+    option(USE_WIIUSE "Support for wiimote input devices" OFF)
+else()
+    option(USE_WIIUSE "Support for wiimote input devices" ON)
 endif()
 
 if(UNIX AND NOT APPLE)
