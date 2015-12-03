@@ -429,6 +429,18 @@ void RaceConfig::computeNextTrack()
 }   // computeNextTrack
 
 //-----------------------------------------------------------------------------
+/** Computes the selected setting (based on the users' vote) and sets them
+ *  in the race manager.
+ */
+void RaceConfig::setRaceData()
+{
+    computeRaceMode();
+    computeNextTrack();
+    race_manager->startSingleRace(m_tracks[0].track, m_tracks[0].laps,
+                                  m_tracks[0].reversed);
+}   // setRaceData
+
+//-----------------------------------------------------------------------------
 const TrackInfo* RaceConfig::getNextTrackInfo() const
 {
     return &m_tracks[0];

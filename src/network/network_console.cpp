@@ -88,16 +88,6 @@ void* NetworkConsole::mainLoop(void* data)
             assert(protocol);
             protocol->startSelection();
         }
-        else if (str == "compute_race"&& NetworkConfig::get()->isServer())
-        {
-            GameSetup* setup = STKHost::get()->getGameSetup();
-            setup->getRaceConfig()->computeRaceMode();
-        }
-        else if (str == "compute_track" && NetworkConfig::get()->isServer())
-        {
-            GameSetup* setup = STKHost::get()->getGameSetup();
-            setup->getRaceConfig()->computeNextTrack();
-        }
         else if (str == "select" && NetworkConfig::get()->isclient())
         {
             std::string str2;

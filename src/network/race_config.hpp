@@ -93,7 +93,10 @@ class RaceVote
 // ============================================================================
 class RaceConfig
 {
-    public:
+private:
+    void computeRaceMode();
+    void computeNextTrack();
+public:
     RaceConfig();
 
     void setMaxPlayerCount(uint8_t count);
@@ -107,8 +110,7 @@ class RaceConfig
     void setPlayerLapsVote(uint8_t player_id, uint8_t lap_count,
                            uint8_t track_nb = 0);
 
-    void computeRaceMode();
-    void computeNextTrack();
+    void setRaceData();
 
     const TrackInfo* getNextTrackInfo() const;
     bool getReverse() const;
