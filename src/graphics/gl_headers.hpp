@@ -41,7 +41,7 @@ extern "C" {
 #elif defined(ANDROID)
 #    include <GLES/gl.h>
 #elif defined(WIN32)
-#    define _WINSOCKAPI_
+#    define WIN32_LEAN_AND_MEAN
 #    include <windows.h>
 #else
 #define GL_GLEXT_PROTOTYPES

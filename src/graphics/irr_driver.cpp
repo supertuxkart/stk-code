@@ -82,6 +82,7 @@ please use the included version."
 using namespace irr;
 
 #ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 #if defined(__linux__) && !defined(ANDROID)
