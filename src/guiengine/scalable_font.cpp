@@ -22,6 +22,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
 #include "io/file_manager.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <clocale>
@@ -62,7 +63,8 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, TTFLoadingType type)
         // don't grab environment, to avoid circular references
         m_video_driver = m_gui_env->getVideoDriver();
 
-        m_spritebank = m_gui_env->addEmptySpriteBank((std::to_string(type)).c_str());
+        m_spritebank = m_gui_env->addEmptySpriteBank(
+                                        (StringUtils::toString(type)).c_str());
         if (m_spritebank)
             m_spritebank->grab();
     }
@@ -824,7 +826,7 @@ void ScalableFont::doDraw(const core::stringw& text,
                 [GUIEngine::getFont()->getSpriteNoFromChar(&c)].Frames[0].textureNumber
                 == m_spritebank->getTextureCount() - 1) //Prevent overwriting texture used by billboard text
             {
-                 Log::debug("ScalableFont::doDraw", 
+                 Log::debug("ScalableFont::doDraw",
                             "Character used by billboard text is in the last "
                             "glyph page of normal font. Create a new glyph "
                             "page for new characters inserted later to prevent "
