@@ -1248,8 +1248,6 @@ void PostProcessing::renderHorizontalBlur(const FrameBuffer &in_fbo,
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
-    float inv_width  = 1.0f / in_fbo.getWidth();
-    float inv_height = 1.0f / in_fbo.getHeight();
 
     auxiliary.bind();
     Gaussian6HBlurShader::getInstance()->render(in_fbo, in_fbo.getWidth(),
@@ -1268,8 +1266,6 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
            in_fbo.getHeight() == auxiliary.getHeight());
     if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
-    float inv_width = 1.0f / in_fbo.getWidth();
-    float inv_height = 1.0f / in_fbo.getHeight();
     {
         if (!CVS->supportsComputeShadersFiltering())
         {

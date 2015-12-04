@@ -21,19 +21,27 @@ before_install:
   - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
   - sudo apt-get update -qq
   - sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev libglew-dev cmake
+
+before_script:
+  - export THREADS=`nproc`
+  # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
+  - export THREADS=4
+  - echo "THREADS = $THREADS"
+
 script:
+  
   # First a debug build: 
   - mkdir build-debug
   - cd build-debug
   - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCHECK_ASSETS=off
-  - make VERBOSE=1 -j 4 
+  - make VERBOSE=1 -j $THREADS
 
   # Then a release build: 
   - cd ..
   - mkdir build-release
   - cd build-release
   - cmake .. -DCMAKE_BUILD_TYPE=Release -DCHECK_ASSETS=off
-  - make VERBOSE=1 -j 4 
+  - make VERBOSE=1 -j $THREADS
 
 notifications:
   irc:

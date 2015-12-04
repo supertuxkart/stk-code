@@ -19,6 +19,7 @@
 #include "guiengine/ft_environment.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
+#include "config/stk_config.hpp"
 
 #include <algorithm>
 
@@ -70,31 +71,31 @@ void FTEnvironment::checkError(FT_Error err, const irr::core::stringc desc)
 void FTEnvironment::loadFont()
 {
     checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
-                                (FileManager::TTF, "Ubuntu-R.ttf", true)).c_str(),
+                                (FileManager::TTF, stk_config->m_font_default.c_str(), true)).c_str(),
                                 0, &m_ft_face[F_DEFAULT]), "loading F_DEFAULT");
 
     checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
-                                (FileManager::TTF, "FreeSans.ttf",true)).c_str(),
+                                (FileManager::TTF, stk_config->m_font_default_fallback.c_str(), true)).c_str(),
                                 0, &m_ft_face[F_DEFAULT_FALLBACK]), "loading F_DEFAULT_FALLBACK");
 
     checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
-                                (FileManager::TTF, "wqy-microhei.ttf",true)).c_str(),
+                                (FileManager::TTF, stk_config->m_font_cjk.c_str(), true)).c_str(),
                                  0, &m_ft_face[F_CJK]), "loading F_CJK");
 
     checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
-                                (FileManager::TTF, "NotoNaskhArabicUI-Bold.ttf",true)).c_str(),
+                                (FileManager::TTF, stk_config->m_font_ar.c_str(), true)).c_str(),
                                  0, &m_ft_face[F_AR]), "loading F_AR");
 
     checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
-                                (FileManager::TTF, "Ubuntu-B.ttf", true)).c_str(),
+                                (FileManager::TTF, stk_config->m_font_bold.c_str(), true)).c_str(),
                                 0, &m_ft_face[F_BOLD]), "loading F_BOLD");
 
     checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
-                                (FileManager::TTF, "FreeSansBold.ttf", true)).c_str(),
+                                (FileManager::TTF, stk_config->m_font_bold_fallback.c_str(), true)).c_str(),
                                 0, &m_ft_face[F_BOLD_FALLBACK]), "loading F_BOLD_FALLBACK");
 
     checkError(FT_New_Face(m_ft_lib, (file_manager->getAssetChecked
-                                (FileManager::TTF, "SigmarOne.otf",true)).c_str(),
+                                (FileManager::TTF, stk_config->m_font_digit.c_str(),true)).c_str(),
                                  0, &m_ft_face[F_DIGIT]), "loading F_DIGIT");
 
     //Set charmap

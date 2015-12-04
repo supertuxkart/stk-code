@@ -20,13 +20,9 @@
 
 #include "graphics/2dutils.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/skin.hpp"
 #include "io/file_manager.hpp"
 #include "utils/translation.hpp"
-
-#include <IAttributes.h>
-#include <IGUIEnvironment.h>
-#include <IGUISpriteBank.h>
-#include <IVideoDriver.h>
 
 #include <clocale>
 #include <cmath>
@@ -310,7 +306,7 @@ bool ScalableFont::loadTTF()
 
     m_glyph_max_height = curr_maxheight;
 
-    for(wchar_t c='0'; c<='9'; c++)
+    for(wchar_t c = '0'; c <= '9'; c++)
     {
         SFontArea a = getAreaFromCharacter(c, NULL);
         m_max_digit_area.width     = a.width;
@@ -692,11 +688,13 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 
         if (gp_creator->getNewChar().size() > 0 && !m_is_hollow_copy && m_scale == 1)
         {
-            Log::debug("ScalableFont::getDimension", "New character(s) %s discoverd, perform lazy loading",
-                         StringUtils::wide_to_utf8(gp_creator->getNewChar().c_str()).c_str());
+            Log::debug("ScalableFont::getDimension",
+                       "New character(s) %s discoverd, perform lazy loading",
+                       StringUtils::wideToUtf8(gp_creator->getNewChar()).c_str());
 
             if (!GUIEngine::getFont()->lazyLoadChar())
-                Log::error("ScalableFont::lazyLoadChar", "Can't insert new char into glyph pages.");
+                Log::error("ScalableFont::lazyLoadChar",
+                           "Can't insert new char into glyph pages.");
         }
     }
 
@@ -815,7 +813,7 @@ void ScalableFont::doDraw(const core::stringw& text,
 
     if (m_type == T_NORMAL || T_BOLD) //lazy load char, have to do this again
     {                                 //because some text isn't drawn with getDimension
-        for (u32 i = 0; i<text_size; i++)
+        for (u32 i = 0; i < text_size; i++)
         {
             wchar_t c = text[i];
             if (c == L'\r' ||  c == L'\n' || c == L' ' || c < 32) continue;
@@ -826,23 +824,28 @@ void ScalableFont::doDraw(const core::stringw& text,
                 [GUIEngine::getFont()->getSpriteNoFromChar(&c)].Frames[0].textureNumber
                 == m_spritebank->getTextureCount() - 1) //Prevent overwriting texture used by billboard text
             {
-                 Log::debug("ScalableFont::doDraw", "Character used by billboard text is in the last glyph page of normal font."
-                              " Create a new glyph page for new characters inserted later to prevent it from being removed.");
+                 Log::debug("ScalableFont::doDraw", 
+                            "Character used by billboard text is in the last "
+                            "glyph page of normal font. Create a new glyph "
+                            "page for new characters inserted later to prevent "
+                            "it from being removed.");
                  GUIEngine::getFont()->forceNewPage();
             }
         }
 
         if (gp_creator->getNewChar().size() > 0 && !m_is_hollow_copy && m_scale == 1)
         {
-            Log::debug("ScalableFont::doDraw", "New character(s) %s discoverd, perform lazy loading",
-                         StringUtils::wide_to_utf8(gp_creator->getNewChar().c_str()).c_str());
+            Log::debug("ScalableFont::doDraw",
+                       "New character(s) %s discoverd, perform lazy loading",
+                       StringUtils::wideToUtf8(gp_creator->getNewChar()).c_str());
 
             if (!GUIEngine::getFont()->lazyLoadChar())
-                Log::error("ScalableFont::lazyLoadChar", "Can't insert new char into glyph pages.");
+                Log::error("ScalableFont::lazyLoadChar",
+                           "Can't insert new char into glyph pages.");
         }
     }
 
-    for (u32 i = 0; i<text_size; i++)
+    for (u32 i = 0; i < text_size; i++)
     {
         wchar_t c = text[i];
 
@@ -997,10 +1000,11 @@ void ScalableFont::doDraw(const core::stringw& text,
 
         if (fallback[n] || m_type == T_BOLD)
         {
-            // TODO: don't hardcode colors?
-            video::SColor orange(color.getAlpha(), 255, 100, 0);
-            video::SColor yellow(color.getAlpha(), 255, 220, 15);
-            video::SColor title_colors[] = {orange, yellow, orange, yellow};
+            video::SColor title_colors[] = {GUIEngine::getSkin()->getColor("font::top"   ),
+                                            GUIEngine::getSkin()->getColor("font::bottom"),
+                                            GUIEngine::getSkin()->getColor("font::top"   ),
+                                            GUIEngine::getSkin()->getColor("font::bottom")
+                                           };
 
             if (charCollector != NULL)
             {

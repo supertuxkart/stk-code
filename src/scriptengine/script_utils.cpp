@@ -52,53 +52,58 @@ namespace Scripting
         /** Replaces placeholders with values. Note, in angelscript, omit the trailing number.
           * e.g. Utils::insertValues("Hello %s !", "world");
           */
-        std::string insertValues(std::string* formatString, std::string* arg1)
+        std::string insertValues(std::string* format_string, std::string* arg1)
         {
-            irr::core::stringw out = StringUtils::insertValues(StringUtils::utf8_to_wide(formatString->c_str()),
-                StringUtils::utf8_to_wide(arg1->c_str()));
+            irr::core::stringw out = 
+                StringUtils::insertValues(StringUtils::utf8ToWide(*format_string),
+                                          StringUtils::utf8ToWide(*arg1));
 
-            return StringUtils::wide_to_utf8(out.c_str());
+            return StringUtils::wideToUtf8(out);
         }
 
         /** Replaces placeholders with values. Note, in angelscript, omit the trailing number.
         * e.g. Utils::insertValues("Hello %s %s !", "John", "Doe");
         */
-        std::string insertValues(std::string* formatString, std::string* arg1, std::string* arg2)
+        std::string insertValues(std::string* format_string, std::string* arg1, std::string* arg2)
         {
-            irr::core::stringw out = StringUtils::insertValues(StringUtils::utf8_to_wide(formatString->c_str()),
-                StringUtils::utf8_to_wide(arg1->c_str()),
-                StringUtils::utf8_to_wide(arg2->c_str()));
+            irr::core::stringw out = 
+                StringUtils::insertValues(StringUtils::utf8ToWide(*format_string),
+                                          StringUtils::utf8ToWide(*arg1),
+                                          StringUtils::utf8ToWide(*arg2));
 
-            return StringUtils::wide_to_utf8(out.c_str());
+            return StringUtils::wideToUtf8(out);
         }
 
         /** Replaces placeholders with values. Note, in angelscript, omit the trailing number.
           * e.g. Utils::insertValues("Hello %s %s %s !", "Mr", "John", "Doe");
           */
-        std::string insertValues(std::string* formatString, std::string* arg1, std::string* arg2,
+        std::string insertValues(std::string* format_string, std::string* arg1, std::string* arg2,
             std::string* arg3)
         {
-            irr::core::stringw out = StringUtils::insertValues(StringUtils::utf8_to_wide(formatString->c_str()),
-                StringUtils::utf8_to_wide(arg1->c_str()),
-                StringUtils::utf8_to_wide(arg2->c_str()),
-                StringUtils::utf8_to_wide(arg3->c_str()));
+            irr::core::stringw out =
+                StringUtils::insertValues(StringUtils::utf8ToWide(*format_string),
+                                          StringUtils::utf8ToWide(*arg1),
+                                          StringUtils::utf8ToWide(*arg2),
+                                          StringUtils::utf8ToWide(*arg3));
 
-            return StringUtils::wide_to_utf8(out.c_str());
+            return StringUtils::wideToUtf8(out);
         }
 
         /** Replaces placeholders with values. Note, in angelscript, omit the trailing number.
           * e.g. Utils::insertValues("%s %s %s %s !", "Hello", "Mr", "John", "Doe");
           */
-        std::string insertValues(std::string* formatString, std::string* arg1, std::string* arg2,
-            std::string* arg3, std::string* arg4)
+        std::string insertValues(std::string* format_string, std::string* arg1,
+                                 std::string* arg2, std::string* arg3,
+                                 std::string* arg4)
         {
-            irr::core::stringw out = StringUtils::insertValues(StringUtils::utf8_to_wide(formatString->c_str()),
-                StringUtils::utf8_to_wide(arg1->c_str()),
-                StringUtils::utf8_to_wide(arg2->c_str()),
-                StringUtils::utf8_to_wide(arg3->c_str()),
-                StringUtils::utf8_to_wide(arg4->c_str()));
+            irr::core::stringw out =
+                StringUtils::insertValues(StringUtils::utf8ToWide(*format_string),
+                                          StringUtils::utf8ToWide(*arg1),
+                                          StringUtils::utf8ToWide(*arg2),
+                                          StringUtils::utf8ToWide(*arg3),
+                                          StringUtils::utf8ToWide(*arg4));
 
-            return StringUtils::wide_to_utf8(out.c_str());
+            return StringUtils::wideToUtf8(out);
         }
 
         /** Runs the script function specified by the given string */

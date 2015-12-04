@@ -229,7 +229,7 @@ void CustomVideoSettingsDialog::updateActivation()
 {
     bool light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
     getWidget<CheckBoxWidget>("motionblur")->setActive(light);
-    getWidget<CheckBoxWidget>("dof")->setActive(true);
+    getWidget<CheckBoxWidget>("dof")->setActive(light);
     getWidget<SpinnerWidget>("shadows")->setActive(light);
     getWidget<CheckBoxWidget>("mlaa")->setActive(light);
     getWidget<CheckBoxWidget>("ssao")->setActive(light);

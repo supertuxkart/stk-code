@@ -88,6 +88,7 @@ public:
         SFX_MUSIC_WAITING,
         SFX_MUSIC_DEFAULT_VOLUME,
         SFX_EXIT,
+        SFX_CREATE_SOURCE
     };   // SFXCommands
 
     /**

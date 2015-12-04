@@ -524,16 +524,27 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
  */
 void Camera::update(float dt)
 {
-    if (race_manager->getNumLocalPlayers() < 2)
+    if (m_kart == NULL)
     {
-        Vec3 pos(m_camera->getPosition());
-        SFXManager::get()->positionListener(pos,
-                                            Vec3(m_camera->getTarget()) - pos,
-                                            Vec3(0, 1, 0));
+        if (race_manager->getNumLocalPlayers() < 2)
+        {
+            Vec3 pos(m_camera->getPosition());
+            SFXManager::get()->positionListener(pos,
+                Vec3(m_camera->getTarget()) - pos,
+                Vec3(0, 1, 0));
+        }
+
+        return; // cameras not attached to kart must be positioned manually
     }
 
-    if (m_kart == NULL) return; // cameras not attached to kart must be positioned manually
-
+    if (race_manager->getNumLocalPlayers() < 2)
+    {
+        Vec3 heading(sin(m_kart->getHeading()), 0.0f, cos(m_kart->getHeading()));
+        SFXManager::get()->positionListener(m_kart->getXYZ(),
+            heading,
+            Vec3(0, 1, 0));
+    }
+    
     float above_kart, cam_angle, side_way, distance;
     bool  smoothing;
 

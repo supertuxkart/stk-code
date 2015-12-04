@@ -275,7 +275,7 @@ void History::Load()
     // Optional (not supported in older history files): include reverse
     fgets(s, 1023, fd);
     char r;
-    if (!sscanf(s, "reverse: %c", &r) != 1)
+    if (sscanf(s, "reverse: %c", &r) == 1)
     {
         fgets(s, 1023, fd);
         race_manager->setReverseTrack(r == 'y');
