@@ -121,11 +121,11 @@ protected:
     /** Keep a pointer to world. */
     ThreeStrikesBattle *m_world;
 
-//#ifdef AI_DEBUG
+#ifdef AI_DEBUG
     /** For debugging purpose: a sphere indicating where the AI
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
-//#endif
+#endif
 
 public:
                  BattleAI(AbstractKart *kart,
