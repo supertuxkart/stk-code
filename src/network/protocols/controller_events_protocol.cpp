@@ -36,7 +36,7 @@ void ControllerEventsProtocol::setup()
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < karts.size(); i++)
     {
-        if (karts[i]->getIdent() == NetworkWorld::getInstance()->m_self_kart)
+        if (karts[i]->getIdent() == NetworkWorld::getInstance()->getSelfKart())
         {
             Log::info("ControllerEventsProtocol", "My id is %d", i);
             m_self_controller_index = i;

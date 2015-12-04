@@ -36,27 +36,36 @@ class Item;
 */
 class NetworkWorld : public AbstractSingleton<NetworkWorld>
 {
+private:
+    bool m_running;
+    float m_race_time;
+    bool m_has_run;
+    std::string m_self_kart;
+
     friend class AbstractSingleton<NetworkWorld>;
-    public:
-        void update(float dt);
 
-        void start();
-        void stop();
-        bool isRunning() { return m_running; }
-        bool isRaceOver();
+             NetworkWorld();
+    virtual ~NetworkWorld();
 
-        void collectedItem(Item *item, AbstractKart *kart);
-        void controllerAction(Controller* controller, PlayerAction action, int value);
+public:
+    void update(float dt);
 
-        std::string m_self_kart;
-    protected:
-        bool m_running;
-        float m_race_time;
-        bool m_has_run;
+    void start();
+    void stop();
+    bool isRaceOver();
 
-    private:
-        NetworkWorld();
-        virtual ~NetworkWorld();
+    void collectedItem(Item *item, AbstractKart *kart);
+    void controllerAction(Controller* controller, PlayerAction action, 
+                          int value);
+    // ------------------------------------------------------------------------
+    /** Sets the name of the kart of this player. */
+    void setSelfKart(const std::string &name) { m_self_kart = name; }
+    // ------------------------------------------------------------------------
+    const std::string& getSelfKart() const { return m_self_kart; }
+    // ------------------------------------------------------------------------
+    /** Returns if this instance is in running state or not. */
+    bool isRunning() { return m_running; }
+
 };
 
 #endif // NETWORK_WORLD_HPP

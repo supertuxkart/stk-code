@@ -157,10 +157,11 @@ void StartGameProtocol::update()
                 input_manager->getDeviceManager()->setSinglePlayer(ap);
 
                 race_manager->setPlayerKart(i, rki);
-                race_manager->setLocalKartInfo(new_player_id, profile->getKartName());
+                race_manager->setLocalKartInfo(new_player_id, 
+                                               profile->getKartName());
                 // self config
                 Log::info("StartGameProtocol", "Self player device added.");
-                NetworkWorld::getInstance()->m_self_kart = profile->getKartName();
+                NetworkWorld::getInstance()->setSelfKart(profile->getKartName());
                 break;
             }
         }
@@ -230,10 +231,12 @@ void StartGameProtocol::update()
 }   // update
 
 // ----------------------------------------------------------------------------
+/** Callback from the race manager when the world was setup.
+ */
 void StartGameProtocol::ready()
 {
     // On clients this means the loading is finished
-    if (!NetworkConfig::get()->isServer())
+    if (NetworkConfig::get()->isclient())
     {
         assert(STKHost::get()->getPeerCount() == 1);
         NetworkString ns(5);

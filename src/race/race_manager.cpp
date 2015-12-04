@@ -336,7 +336,7 @@ void RaceManager::startNew(bool from_overworld)
                 if (m_saved_gp == NULL)
                 {
                     Log::error("Race Manager", "Can not continue Grand Prix '%s'"
-                                               "because it could not exist",
+                                               "because it could not be loaded",
                                                m_grand_prix.getId().c_str());
                     m_continue_saved_gp = false; // simple and working
                 }
@@ -347,10 +347,10 @@ void RaceManager::startNew(bool from_overworld)
                     m_grand_prix.changeReverse((GrandPrixData::GPReverseType)
                                                 m_saved_gp->getReverseType());
                     m_reverse_track = m_grand_prix.getReverse();
-                }
-            }
-        }
-    }
+                }   // if m_saved_gp==NULL
+            }   // if m_continue_saved_gp
+        }   // if !network_world
+    }   // if grand prix
 
     // command line parameters: negative numbers=all karts
     if(m_num_karts < 0 ) m_num_karts = stk_config->m_max_karts;
@@ -364,14 +364,12 @@ void RaceManager::startNew(bool from_overworld)
         (unsigned int) m_num_karts, m_ai_kart_list.size(), m_player_karts.size());
 
     assert((unsigned int)m_num_karts == m_ai_kart_list.size()+m_player_karts.size());
+
     // First add the AI karts (randomly chosen)
     // ----------------------------------------
 
     // GP ranks start with -1 for the leader.
-    int init_gp_rank =
-        race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER
-        ? -1
-        : 0;
+    int init_gp_rank = getMinorMode()==MINOR_MODE_FOLLOW_LEADER ? -1 : 0;
     const unsigned int ai_kart_count = m_ai_kart_list.size();
     for(unsigned int i = 0; i < ai_kart_count; i++)
     {
@@ -389,7 +387,8 @@ void RaceManager::startNew(bool from_overworld)
     // -------------------------------------------------
     for(unsigned int i = 0; i < m_player_karts.size(); i++)
     {
-        KartType kt= m_player_karts[i].isNetworkPlayer() ? KT_NETWORK_PLAYER : KT_PLAYER;
+        KartType kt= m_player_karts[i].isNetworkPlayer() ? KT_NETWORK_PLAYER 
+                                                         : KT_PLAYER;
         m_kart_status.push_back(KartStatus(m_player_karts[i].getKartName(), i,
                                            m_player_karts[i].getLocalPlayerId(),
                                            m_player_karts[i].getGlobalPlayerId(),
@@ -423,9 +422,9 @@ void RaceManager::startNew(bool from_overworld)
                                              m_grand_prix.getId(),
                                              m_minor_mode,
                                              m_player_karts.size());
-            }
-        }
-    }
+            }   // while m_saved_gp
+        }   // if m_continue_saved_gp
+    }   // if grand prix
 
     startNextRace();
 }   // startNew
@@ -511,7 +510,7 @@ void RaceManager::startNextRace()
 
     // A second constructor phase is necessary in order to be able to
     // call functions which are overwritten (otherwise polymorphism
-    // will fail and the results will be incorrect . Also in init() functions
+    // will fail and the results will be incorrect). Also in init() functions
     // can be called that use World::getWorld().
     World::getWorld()->init();
 
@@ -533,6 +532,8 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_time  = 0;
     }
 
+    // In networked races, inform the start game protocol that
+    // the world has been setup
     if(NetworkConfig::get()->isNetworking())
     {
         StartGameProtocol* protocol = static_cast<StartGameProtocol*>(

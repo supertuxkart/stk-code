@@ -15,9 +15,11 @@ KartUpdateProtocol::KartUpdateProtocol() : Protocol(PROTOCOL_KART_UPDATE)
     {
         //if (m_karts[i]->getWorldKartId())
         {
-            Log::info("KartUpdateProtocol", "Kart %d has id %d and name %s", i, m_karts[i]->getWorldKartId(), m_karts[i]->getIdent().c_str());
+            Log::info("KartUpdateProtocol", "Kart %d has id %d and name %s",
+                      i, m_karts[i]->getWorldKartId(),
+                      m_karts[i]->getIdent().c_str());
         }
-        if (m_karts[i]->getIdent() == NetworkWorld::getInstance()->m_self_kart)
+        if (m_karts[i]->getIdent() == NetworkWorld::getInstance()->getSelfKart())
         {
             Log::info("KartUpdateProtocol", "My id is %d", i);
             m_self_kart_index = i;
