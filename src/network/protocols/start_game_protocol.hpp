@@ -7,6 +7,8 @@
 class GameSetup;
 class NetworkPlayerProfile;
 
+/** This protocol runs on both server and clients.
+ */
 class StartGameProtocol : public Protocol
 {
 protected:

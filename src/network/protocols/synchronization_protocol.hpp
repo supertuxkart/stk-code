@@ -26,9 +26,9 @@ public:
     virtual void setup();
     virtual void update() {}
     virtual void asynchronousUpdate();
-
     void startCountdown(int ms_countdown);
 
+    // ------------------------------------------------------------------------
     int getCountdown() { return (int)(m_countdown*1000.0); }
 
 };   // class SynchronizationProtocol

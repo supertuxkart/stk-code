@@ -39,7 +39,16 @@ StartGameProtocol::StartGameProtocol(GameSetup* game_setup)
 // ----------------------------------------------------------------------------
 StartGameProtocol::~StartGameProtocol()
 {
-}
+}   // ~StartGameProtocol
+
+// ----------------------------------------------------------------------------
+void StartGameProtocol::setup()
+{
+    m_state = NONE;
+    m_ready_count = 0;
+    m_ready = false;
+    Log::info("SynchronizationProtocol", "Ready !");
+}   // setup
 
 // ----------------------------------------------------------------------------
 bool StartGameProtocol::notifyEventAsynchronous(Event* event)
@@ -88,16 +97,7 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
         Log::error("StartGameProtocol", "Received a message with bad format.");
     }
     return true;
-}
-
-// ----------------------------------------------------------------------------
-void StartGameProtocol::setup()
-{
-    m_state = NONE;
-    m_ready_count = 0;
-    m_ready = false;
-    Log::info("SynchronizationProtocol", "Ready !");
-}
+}   // notifyEventAsynchronous
 
 // ----------------------------------------------------------------------------
 bool compareKarts(NetworkPlayerProfile* a, NetworkPlayerProfile* b)
