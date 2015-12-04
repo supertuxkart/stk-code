@@ -39,7 +39,8 @@ public:
                                     const FrameBuffer& diffuse_framebuffer);
     void renderLights(  bool has_shadow,
                         const FrameBuffer& shadow_framebuffer,
-                        const FrameBuffer& diffuse_specular_framebuffer);
+                        const FrameBuffer& diffuse_specular_framebuffer,
+                        GLuint specular_probe);
     void renderAmbientScatter();
     void renderLightsScatter();
     

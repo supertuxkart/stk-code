@@ -124,7 +124,6 @@ IrrDriver::IrrDriver()
     m_post_processing     = NULL;
     m_renderer            = NULL;
     m_wind                = new Wind();
-    m_skybox              = NULL;
     m_spherical_harmonics = NULL;
 
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = false;
@@ -1382,10 +1381,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
 {
     assert(texture.size() == 6);
 
-    if (CVS->isGLSL())
-    {
-        m_skybox = new Skybox(texture);
-    }
+    m_renderer->addSkyBox(texture);
 
     if(spherical_harmonics_textures.size() == 6)
     {
@@ -1399,8 +1395,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
 
 void IrrDriver::suppressSkyBox()
 {
-    delete m_skybox;
-    m_skybox = NULL;
+    m_renderer->removeSkyBox();;
 }
 
 // ----------------------------------------------------------------------------

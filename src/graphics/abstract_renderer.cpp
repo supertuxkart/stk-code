@@ -199,6 +199,7 @@ void AbstractRenderer::drawJoint(bool drawline, bool drawname,
 
 AbstractRenderer::AbstractRenderer()
 {
-    m_wireframe = false;
-    m_mipviz = false;
+    
+    m_wireframe  = false;
+    m_mipviz     = false;
 }

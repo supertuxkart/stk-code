@@ -38,7 +38,6 @@
 #include "ISkinnedMesh.h"
 #include "graphics/abstract_renderer.hpp"
 #include "graphics/gl_headers.hpp"
-#include "graphics/skybox.hpp"
 #include "graphics/sphericalHarmonics.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
@@ -223,7 +222,6 @@ private:
     /** Matrixes used in several places stored here to avoid recomputation. */
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
-    Skybox *m_skybox;
     SphericalHarmonics *m_spherical_harmonics;
 
 private:
@@ -328,7 +326,6 @@ public:
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
-    void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;
     void IncreaseObjectCount();
@@ -510,9 +507,7 @@ public:
     inline PostProcessing* getPostProcessing()  {return m_post_processing;}
     // ------------------------------------------------------------------------
     inline core::vector3df getWind()  {return m_wind->getWind();}
-    // -----------------------------------------------------------------------
-    /** Returns a pointer to the skybox. */
-    inline Skybox *getSkybox()  {return m_skybox;}
+
     // -----------------------------------------------------------------------
     /** Returns a pointer to spherical harmonics. */
     inline SphericalHarmonics *getSphericalHarmonics()  {return m_spherical_harmonics;}

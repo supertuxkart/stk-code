@@ -43,9 +43,15 @@ protected:
                    irr::scene::ISkinnedMesh* mesh, int id) const;
 #endif
 
+    void renderSkybox(const irr::scene::ICameraSceneNode *camera) const;
+
+
 public:
     AbstractRenderer();
     virtual ~AbstractRenderer(){}
+
+    virtual void addSkyBox(const std::vector<irr::video::ITexture*> &texture) {}
+    virtual void removeSkyBox() {}
 
     virtual void addSunLight(const irr::core::vector3df &pos){}
 

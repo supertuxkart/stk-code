@@ -24,11 +24,16 @@
 #include "graphics/geometry_passes.hpp"
 #include "graphics/lighting_passes.hpp"
 #include "graphics/shadow_matrices.hpp"
+#include "graphics/skybox.hpp"
+#include "graphics/sphericalHarmonics.hpp"
 
 
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:
+    Skybox *m_skybox;
+    //SphericalHarmonics *m_spherical_harmonics;
+
     
     //GLsync          m_sync; //TODO
     DrawCalls       m_draw_calls;
@@ -59,6 +64,9 @@ private:
     
     void resetShadowCamNodes(){m_shadow_matrices.resetShadowCamNodes();}
     
+    void renderSkybox(const scene::ICameraSceneNode *camera) const;
+    
+    
     void prepareDrawCalls(scene::ICameraSceneNode *camnode);
 
     void renderScene(irr::scene::ICameraSceneNode * const camnode,
@@ -74,6 +82,9 @@ private:
 public:
     ShaderBasedRenderer();
     ~ShaderBasedRenderer();
+
+    void addSkyBox(const std::vector<irr::video::ITexture*> &texture) override;
+    void removeSkyBox() override;
 
     void addSunLight(const irr::core::vector3df &pos) override;
     

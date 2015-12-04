@@ -164,6 +164,16 @@ void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *con
     m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height);
 }   // computeMatrixesAndCameras
 
+// ----------------------------------------------------------------------------
+void ShaderBasedRenderer::renderSkybox(const scene::ICameraSceneNode *camera) const
+{
+    if(m_skybox)
+    {
+        m_skybox->render(camera);
+    }
+}   // renderSkybox
+
+
 // ============================================================================
 void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                                       float dt,
@@ -258,9 +268,20 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                                                             irr_driver->getRTT()->getFBO(FBO_DIFFUSE));
             }            
             
+            GLuint specular_probe;
+            if(m_skybox)
+            {
+                specular_probe = m_skybox->getSpecularProbe();
+            }
+            else 
+            {
+                specular_probe = 0;
+            }              
+            
             m_lighting_passes.renderLights( hasShadow,
                                             irr_driver->getRTT()->getShadowFrameBuffer(),
-                                            irr_driver->getRTT()->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR));
+                                            irr_driver->getRTT()->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR),
+                                            specular_probe);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -318,7 +339,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SKYBOX));
-        irr_driver->renderSkybox(camnode);
+        renderSkybox(camnode);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -507,6 +528,8 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 
 ShaderBasedRenderer::ShaderBasedRenderer()
 {    
+    
+    m_skybox            = NULL;
     m_nb_static_glowing = 0;
     
     if (CVS->isAZDOEnabled())
@@ -522,7 +545,20 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_geometry_passes;
 }
 
-void ShaderBasedRenderer::addSunLight(const core::vector3df &pos) {
+
+void ShaderBasedRenderer::addSkyBox(const std::vector<video::ITexture*> &texture)
+{
+    m_skybox = new Skybox(texture);
+}
+
+void ShaderBasedRenderer::removeSkyBox()
+{
+    delete m_skybox;
+    m_skybox = NULL;    
+}
+
+void ShaderBasedRenderer::addSunLight(const core::vector3df &pos)
+{
     m_shadow_matrices.addLight(pos);
 }
 

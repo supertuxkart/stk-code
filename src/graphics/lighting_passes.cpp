@@ -465,7 +465,8 @@ void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_mat
 // ----------------------------------------------------------------------------
 void LightingPasses::renderLights(  bool has_shadow,
                                     const FrameBuffer& shadow_framebuffer,
-                                    const FrameBuffer& diffuse_specular_framebuffer)
+                                    const FrameBuffer& diffuse_specular_framebuffer,
+                                    GLuint specular_probe)
 {
     PostProcessing *post_processing = irr_driver->getPostProcessing();
     
@@ -474,15 +475,7 @@ void LightingPasses::renderLights(  bool has_shadow,
 
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
-        Skybox *skybox = irr_driver->getSkybox();
-        if(skybox)
-        {
-            post_processing->renderEnvMap(skybox->getSpecularProbe());
-        }
-        else 
-        {
-            post_processing->renderEnvMap(0);
-        }           
+        post_processing->renderEnvMap(specular_probe);       
     } 
     
     // Render sunlight if and only if track supports shadow
