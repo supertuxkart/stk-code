@@ -194,7 +194,7 @@ void CachedCharacteristic::process(CharacteristicType type, Value value,
             *value.ia = *static_cast<InterpolationArray*>(v);
             break;
         case TYPE_BOOL:
-            *value.f = *static_cast<bool*>(v);
+            *value.b = *static_cast<bool*>(v);
             break;
         }
         *is_set = true;
