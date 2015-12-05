@@ -22,6 +22,11 @@
 #ifndef HEADER_BATTLE_AI_HPP
 #define HEADER_BATTLE_AI_HPP
 
+#undef AI_DEBUG
+#ifdef AI_DEBUG
+#include "graphics/irr_driver.hpp"
+#endif
+
 #include "karts/controller/ai_base_controller.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/battle_graph.hpp"
@@ -62,7 +67,7 @@ private:
     /** Holds the current difficulty. */
     RaceManager::Difficulty m_cur_difficulty;
 
-   /** Indicates that the kart is currently stuck, and m_time_since_stuck is
+   /** Indicates that the kart is currently stuck, and m_time_since_reversing is
      * counting down. */
     bool m_is_stuck;
 
@@ -72,7 +77,7 @@ private:
 
     const Item *m_item_to_collect;
 
-    /** Holds the unique node ai has walked through, useful to tell if AI is
+    /** Holds the unique node ai has driven through, useful to tell if AI is
      *  stuck by determine the size of this set. */
     std::set <int> m_on_node;
 
@@ -96,8 +101,8 @@ private:
     /** This is a timer that counts down when the kart is reversing to get unstuck. */
     float m_time_since_reversing;
 
-    /** This is a timer that counts down when the kart is starting to get stuck. */
-    float m_time_since_stuck;
+    /** This is a timer that counts down when the kart is starting to drive. */
+    float m_time_since_driving;
 
     /** This is a timer that counts down when the kart is doing u-turn. */
     float m_time_since_uturn;

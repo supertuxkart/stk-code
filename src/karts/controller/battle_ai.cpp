@@ -18,12 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#undef AI_DEBUG
 #include "karts/controller/battle_ai.hpp"
-
-#ifdef AI_DEBUG
-#include "graphics/irr_driver.hpp"
-#endif
 
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
@@ -45,10 +40,12 @@
 
 #ifdef AI_DEBUG
 #include "irrlicht.h"
+#include <iostream>
 using namespace irr;
+using namespace std;
 #endif
 
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #define isnan _isnan
 #else
 #include <math.h>
@@ -111,7 +108,7 @@ void BattleAI::reset()
     m_target_point = Vec3(0,0,0);
     m_time_since_last_shot = 0.0f;
     m_time_since_reversing = 0.0f;
-    m_time_since_stuck = 0.0f;
+    m_time_since_driving = 0.0f;
     m_time_since_uturn = 0.0f;
     m_on_node.clear();
     m_path_corners.clear();
@@ -145,16 +142,19 @@ void BattleAI::update(float dt)
     checkIfStuck(dt);
     if (m_is_stuck && !m_is_uturn)
     {
-        setSteering(1.0f,dt);
-        if (m_kart->getSpeed() > 0.1f)   // Hard-brake for the first time
-            m_controls->m_accel = -4.0f; // human players can also do the same
+        setSteering(0.0f,dt);
+
+        if (fabsf(m_kart->getSpeed()) >
+            (m_kart->getKartProperties()->getMaxSpeed() / 5)
+            && m_kart->getSpeed() < 0)
+            m_controls->m_accel = -0.06f;
         else
-            m_controls->m_accel = -(stk_config->m_ai_acceleration * 0.5f);
+            m_controls->m_accel = -4.0f;
+
         m_time_since_reversing += dt;
 
-        if (m_time_since_reversing >= 1.5f)
+        if (m_time_since_reversing >= 1.0f)
         {
-            m_controls->m_accel = 1.0f;
             m_is_stuck = false;
             m_time_since_reversing = 0.0f;
         }
@@ -192,23 +192,27 @@ void BattleAI::checkIfStuck(const float dt)
     if (m_kart->getKartAnimation() || m_world->isStartPhase())
     {
         m_on_node.clear();
-        m_time_since_stuck = 0.0f;
+        m_time_since_driving = 0.0f;
     }
 
     m_on_node.insert(m_current_node);
-    m_time_since_stuck += dt;
+    m_time_since_driving += dt;
 
-    if (m_time_since_stuck >= 2.0f && m_on_node.size() < 3 && !m_is_uturn)
+    if (m_time_since_driving >=
+        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 2.0f : 1.5f)
+        && m_on_node.size() < 2 && !m_is_uturn &&
+        fabsf(m_kart->getSpeed()) < 3.0f)
     {
-        // Check whether a kart stay between two node for more than 2.0f time
+        // Check whether a kart stay on the same node for a period of time
         m_on_node.clear();
-        m_time_since_stuck = 0.0f;
+        m_time_since_driving = 0.0f;
         m_is_stuck = true;
     }
-    else if (m_time_since_stuck >= 2.0f)
+    else if (m_time_since_driving >=
+        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 2.0f : 1.5f))
     {
-        m_on_node.clear();
-        m_time_since_stuck = 0.0f;
+        m_on_node.clear(); // Reset for any correct movement
+        m_time_since_driving = 0.0f;
     }
 
 }   //  checkIfStuck
@@ -333,26 +337,27 @@ void BattleAI::handleAcceleration(const float dt)
 //-----------------------------------------------------------------------------
 void BattleAI::handleUTurn(const float dt)
 {
-
-    if (m_kart->getSpeed() > 0.1f)   // Hard-brake when speed too fast
-        m_controls->m_accel = -4.0f; // human players can also do the same
+    if (fabsf(m_kart->getSpeed()) >
+        (m_kart->getKartProperties()->getMaxSpeed() / 5)
+        && m_kart->getSpeed() < 0)    // Try to emulate reverse like human players
+        m_controls->m_accel = -0.06f;
     else
-        m_controls->m_accel = -(stk_config->m_ai_acceleration * 0.5f);
+        m_controls->m_accel = -5.0f;
 
-    if (m_time_since_uturn >= 1.0f)
+    if (m_time_since_uturn >= 1.5f)
         setSteering(M_PI,dt); // Preventing keep going around circle
     else
-        setSteering(-M_PI,dt);
+        setSteering(-1.0f,dt);
     m_time_since_uturn += dt;
 
     checkPosition(m_target_point, &m_cur_kart_pos_data);
-    if ((!m_cur_kart_pos_data.behind || m_time_since_uturn >= 2.0f) &&
-        m_time_since_uturn >= 0.1f)
+    if (!m_cur_kart_pos_data.behind || m_time_since_uturn > 3.0f)
     {
         m_is_uturn = false;
-        m_controls->m_accel = 1.0f;
         m_time_since_uturn = 0.0f;
     }
+    else
+        m_is_uturn = true;
 }   // handleUTurn
 
 //-----------------------------------------------------------------------------
@@ -409,7 +414,7 @@ void BattleAI::handleSteering(const float dt)
     else
     {
         // Do nothing (go straight) if no targets found
-        setSteering(1.0f,dt);
+        setSteering(0.0f,dt);
         return;
     }
 }   // handleSteering
