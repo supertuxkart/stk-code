@@ -528,9 +528,9 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 
 ShaderBasedRenderer::ShaderBasedRenderer()
 {    
-    
-    m_skybox            = NULL;
-    m_nb_static_glowing = 0;
+    m_skybox                = NULL;
+    m_spherical_harmonics   = new SphericalHarmonics(irr_driver->getAmbientLight().toSColor());
+    m_nb_static_glowing     = 0;
     
     if (CVS->isAZDOEnabled())
         m_geometry_passes = new GeometryPasses<MultidrawPolicy>();
@@ -543,18 +543,37 @@ ShaderBasedRenderer::ShaderBasedRenderer()
 ShaderBasedRenderer::~ShaderBasedRenderer()
 {
     delete m_geometry_passes;
+    delete m_spherical_harmonics;
+    delete m_skybox;
 }
 
 
-void ShaderBasedRenderer::addSkyBox(const std::vector<video::ITexture*> &texture)
+void ShaderBasedRenderer::addSkyBox(const std::vector<video::ITexture*> &texture,
+                                    const std::vector<video::ITexture*> &spherical_harmonics_textures)
 {
     m_skybox = new Skybox(texture);
+    if(spherical_harmonics_textures.size() == 6)
+    {
+        m_spherical_harmonics->setTextures(spherical_harmonics_textures);
+    }    
 }
 
 void ShaderBasedRenderer::removeSkyBox()
 {
     delete m_skybox;
     m_skybox = NULL;    
+}
+
+const SHCoefficients* ShaderBasedRenderer::getSHCoefficients() const
+{
+    return m_spherical_harmonics->getCoefficients();
+}
+
+void ShaderBasedRenderer::setAmbientLight(const video::SColorf &light,
+                                          bool force_SH_computation)
+{
+    if(!m_spherical_harmonics->has6Textures() || force_SH_computation)
+        m_spherical_harmonics->setAmbientLight(light.toSColor());
 }
 
 void ShaderBasedRenderer::addSunLight(const core::vector3df &pos)

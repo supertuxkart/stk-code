@@ -121,10 +121,8 @@ IrrDriver::IrrDriver()
                                          file_manager->getFileSystem());
     m_request_screenshot = false;
     m_rtts                = NULL;
-    m_post_processing     = NULL;
     m_renderer            = NULL;
     m_wind                = new Wind();
-    m_spherical_harmonics = NULL;
 
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = false;
     m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
@@ -162,7 +160,6 @@ IrrDriver::~IrrDriver()
         Shaders::destroy();
     }
     delete m_wind;
-    delete m_spherical_harmonics;
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -509,8 +506,6 @@ void IrrDriver::initDevice()
         m_renderer = new ShaderBasedRenderer();
     else
         m_renderer = new FixedPipelineRenderer();
-
-    m_spherical_harmonics = new SphericalHarmonics(m_scene_manager->getAmbientLight().toSColor());
 
     if (UserConfigParams::m_shadows_resolution != 0 &&
         (UserConfigParams::m_shadows_resolution < 512 ||
@@ -1381,12 +1376,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
 {
     assert(texture.size() == 6);
 
-    m_renderer->addSkyBox(texture);
-
-    if(spherical_harmonics_textures.size() == 6)
-    {
-        m_spherical_harmonics->setTextures(spherical_harmonics_textures);
-    }
+    m_renderer->addSkyBox(texture, spherical_harmonics_textures);
     
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
@@ -1771,11 +1761,13 @@ void IrrDriver::onUnloadWorld()
 // ----------------------------------------------------------------------------
 /** Sets the ambient light.
  *  \param light The colour of the light to set.
+ *  \param force_SH_computation If false, do not recompute spherical harmonics
+ *  coefficient when spherical harmonics textures have been defined
  */
-void IrrDriver::setAmbientLight(const video::SColorf &light)
+void IrrDriver::setAmbientLight(const video::SColorf &light, bool force_SH_computation)
 {
     m_scene_manager->setAmbientLight(light);
-    m_spherical_harmonics->setAmbientLight(light.toSColor());
+    m_renderer->setAmbientLight(light, force_SH_computation);    
 }   // setAmbientLight
 
 video::SColorf IrrDriver::getAmbientLight() const

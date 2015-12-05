@@ -38,7 +38,6 @@
 #include "ISkinnedMesh.h"
 #include "graphics/abstract_renderer.hpp"
 #include "graphics/gl_headers.hpp"
-#include "graphics/sphericalHarmonics.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
@@ -222,7 +221,6 @@ private:
     /** Matrixes used in several places stored here to avoid recomputation. */
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
-    SphericalHarmonics *m_spherical_harmonics;
 
 private:
 
@@ -340,7 +338,8 @@ public:
                                     const std::string& mask_path);
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
-    void                  setAmbientLight(const video::SColorf &light);
+    void                  setAmbientLight(const video::SColorf &light,
+                                          bool force_SH_computation = true);
     std::string           generateSmallerTextures(const std::string& dir);
     std::string           getSmallerTexture(const std::string& texture);
     video::ITexture      *getTexture(FileManager::AssetType type,
@@ -509,8 +508,8 @@ public:
     inline core::vector3df getWind()  {return m_wind->getWind();}
 
     // -----------------------------------------------------------------------
-    /** Returns a pointer to spherical harmonics. */
-    inline SphericalHarmonics *getSphericalHarmonics()  {return m_spherical_harmonics;}
+    /** Returns a pointer to the spherical harmonics coefficients. */
+    inline const SHCoefficients* getSHCoefficients()  {return m_renderer->getSHCoefficients();}
     // -----------------------------------------------------------------------
     const core::vector3df& getSunDirection() const { return m_sun_direction; };
     // -----------------------------------------------------------------------

@@ -18,6 +18,7 @@
 #ifndef HEADER_ABSTRACT_RENDERER_HPP
 #define HEADER_ABSTRACT_RENDERER_HPP
 
+#include "graphics/sphericalHarmonics.hpp"
 #include <irrlicht.h>
 #include <vector>
 
@@ -50,8 +51,13 @@ public:
     AbstractRenderer();
     virtual ~AbstractRenderer(){}
 
-    virtual void addSkyBox(const std::vector<irr::video::ITexture*> &texture) {}
+    virtual void addSkyBox(const std::vector<irr::video::ITexture*> &texture,
+                           const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) {}
     virtual void removeSkyBox() {}
+    virtual const SHCoefficients* getSHCoefficients() const { return NULL; }
+    virtual void setAmbientLight(const irr::video::SColorf &light,
+                                  bool force_SH_computation = true) {}
+
 
     virtual void addSunLight(const irr::core::vector3df &pos){}
 

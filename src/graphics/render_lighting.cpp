@@ -54,10 +54,12 @@ void IrrDriver::uploadLightingData()
     Lighting[6] = m_suncolor.getBlue();
     Lighting[7] = 0.54f;
 
-    if(m_spherical_harmonics) {
-        memcpy(&Lighting[8], m_spherical_harmonics->getBlueSHCoeff(), 9 * sizeof(float));
-        memcpy(&Lighting[17], m_spherical_harmonics->getGreenSHCoeff(), 9 * sizeof(float));
-        memcpy(&Lighting[26], m_spherical_harmonics->getRedSHCoeff(), 9 * sizeof(float));
+    const SHCoefficients* sh_coeff = irr_driver->getSHCoefficients();
+
+    if(sh_coeff) {
+        memcpy(&Lighting[8], sh_coeff->blue_SH_coeff, 9 * sizeof(float));
+        memcpy(&Lighting[17], sh_coeff->green_SH_coeff, 9 * sizeof(float));
+        memcpy(&Lighting[26], sh_coeff->red_SH_coeff, 9 * sizeof(float));
     }
 
     glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getLightingDataUBO());

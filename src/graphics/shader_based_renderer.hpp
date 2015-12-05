@@ -25,14 +25,13 @@
 #include "graphics/lighting_passes.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include "graphics/skybox.hpp"
-#include "graphics/sphericalHarmonics.hpp"
 
 
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:
     Skybox *m_skybox;
-    //SphericalHarmonics *m_spherical_harmonics;
+    SphericalHarmonics *m_spherical_harmonics;
 
     
     //GLsync          m_sync; //TODO
@@ -83,8 +82,12 @@ public:
     ShaderBasedRenderer();
     ~ShaderBasedRenderer();
 
-    void addSkyBox(const std::vector<irr::video::ITexture*> &texture) override;
+    void addSkyBox(const std::vector<irr::video::ITexture*> &texture,
+                   const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) override;
     void removeSkyBox() override;
+    const SHCoefficients* getSHCoefficients() const override;
+    void                  setAmbientLight(const irr::video::SColorf &light,
+                                          bool force_SH_computation = true) override;
 
     void addSunLight(const irr::core::vector3df &pos) override;
     
