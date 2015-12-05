@@ -42,13 +42,22 @@
 #include <hidsdi.h>
 #include <setupapi.h>
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && __GNUC__ < 5
 /* this prototype is missing from the mingw headers so we must add it
 	or suffer linker errors. */
+
+#ifndef HIDAPI
+#define HIDAPI
+#endif
+
+#ifndef BOOLEAN
+#define BOOLEAN BOOL
+#endif
+
 #	ifdef __cplusplus
 extern "C" {
 #	endif
-	HIDAPI BOOL NTAPI HidD_SetOutputReport(HANDLE, PVOID, ULONG);
+	HIDAPI BOOLEAN NTAPI HidD_SetOutputReport(HANDLE, PVOID, ULONG);
 #	ifdef __cplusplus
 }
 #	endif
