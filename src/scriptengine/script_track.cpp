@@ -26,6 +26,7 @@
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "modes/world.hpp"
+#include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "tracks/track.hpp"
@@ -230,7 +231,11 @@ namespace Scripting
 
             void animateEnergy(float energy, float duration, /** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
             {
-                ((TrackObjectPresentationLight*)memory)->setEnergy(energy, duration);
+                TrackObjectPresentationLight* light = ((TrackObjectPresentationLight*)memory);
+                PropertyAnimator::get()->add(
+                    new AnimatedProperty(AP_LIGHT_ENERGY, light->getEnergy(), energy, duration, light)
+                );
+                //((TrackObjectPresentationLight*)memory)->setEnergy(energy, duration);
             }
 
             /** @} */
