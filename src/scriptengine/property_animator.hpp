@@ -18,27 +18,39 @@
 #ifndef HEADER_PROPERTY_ANIMATOR_HPP
 #define HEADER_PROPERTY_ANIMATOR_HPP
 
+#include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 
 enum AnimatablePropery
 {
     AP_LIGHT_ENERGY,
-    FOG_START,
-    FOG_END,
-    FOG_MAX
+    FOG_RANGE,
+    FOG_MAX,
+    FOG_COLOR
 };
 
-class AnimatedProperty
+class AnimatedProperty : NoCopy
 {
     AnimatablePropery m_property;
-    double m_value_from;
-    double m_value_to;
+    int m_values_count;
+    double* m_values_from;
+    double* m_values_to;
+    double* m_new_values;
     double m_total_time;
     double m_remaining_time;
     void* m_data;
 
 public:
-    AnimatedProperty(AnimatablePropery property, double from, double to, double duration, void* data);
+    AnimatedProperty(AnimatablePropery property, int values_count,
+        double* values_from, double* values_to, 
+        double duration, void* data);
+
+    ~AnimatedProperty()
+    {
+        delete[] m_values_from;
+        delete[] m_values_to;
+        delete[] m_new_values;
+    }
 
     bool update(double dt);
 };

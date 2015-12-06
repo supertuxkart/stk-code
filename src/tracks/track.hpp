@@ -566,6 +566,8 @@ public:
     // ------------------------------------------------------------------------
     video::SColor getFogColor() const { return m_fog_color; }
     // ------------------------------------------------------------------------
+    void setFogColor(video::SColor& color) { m_fog_color = color; }
+    // ------------------------------------------------------------------------
     video::SColor getSunColor() const { return m_sun_diffuse_color; }
     // ------------------------------------------------------------------------
     /** Whether this is an "internal" track. If so it won't be offered

@@ -3,14 +3,17 @@
 #include "tracks/track_object_presentation.hpp"
 #include "utils/log.hpp"
 
-AnimatedProperty::AnimatedProperty(AnimatablePropery property, double from, double to,
+AnimatedProperty::AnimatedProperty(AnimatablePropery property, 
+    int values_count, double* values_from, double* values_to,
     double duration, void* data)
 {
     m_property = property;
-    m_value_from = from;
-    m_value_to = to;
     m_remaining_time = m_total_time = duration;
     m_data = data;
+    m_values_count = values_count;
+    m_values_from = values_from;
+    m_values_to = values_to;
+    m_new_values = new double[values_count];
 }
 
 // ----------------------------------------------------------------------------
@@ -26,35 +29,41 @@ bool AnimatedProperty::update(double dt)
     }
 
     double ratio = 1.0 - m_remaining_time / m_total_time;
-    double new_value = m_value_from + (m_value_to - m_value_from) * ratio;
+
+    for (int i = 0; i < m_values_count; i++)
+    {
+        m_new_values[i] = m_values_from[i] + (m_values_to[i] - m_values_from[i]) * ratio;
+    }
 
     switch (m_property)
     {
         case AnimatablePropery::AP_LIGHT_ENERGY:
         {
             TrackObjectPresentationLight* light = (TrackObjectPresentationLight*)m_data;
-            light->setEnergy((float)new_value);
+            light->setEnergy((float)m_new_values[0]);
             break;
         }
 
-        case AnimatablePropery::FOG_START:
+        case AnimatablePropery::FOG_RANGE:
         {
             Track* track = (Track*)m_data;
-            track->setFogStart((float)new_value);
-            break;
-        }
-
-        case AnimatablePropery::FOG_END:
-        {
-            Track* track = (Track*)m_data;
-            track->setFogEnd((float)new_value);
+            track->setFogStart((float)m_new_values[0]);
+            track->setFogEnd((float)m_new_values[1]);
             break;
         }
 
         case AnimatablePropery::FOG_MAX:
         {
             Track* track = (Track*)m_data;
-            track->setFogMax((float)new_value);
+            track->setFogMax((float)m_new_values[0]);
+            break;
+        }
+
+        case AnimatablePropery::FOG_COLOR:
+        {
+            Track* track = (Track*)m_data;
+            video::SColor color(255, (int)m_new_values[0], (int)m_new_values[1], (int)m_new_values[2]);
+            track->setFogColor(color);
             break;
         }
 

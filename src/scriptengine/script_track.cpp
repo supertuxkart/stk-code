@@ -140,16 +140,31 @@ namespace Scripting
             PropertyAnimator* animator = PropertyAnimator::get();
             ::Track* track = World::getWorld()->getTrack();
             animator->add(
-                new AnimatedProperty(FOG_MAX, track->getFogMax(), maxDensity, duration, track)
+                new AnimatedProperty(FOG_MAX, 1,
+                    new double[1] { track->getFogMax() }, 
+                    new double[1] { maxDensity }, duration, track)
             );
             animator->add(
-                new AnimatedProperty(FOG_START, track->getFogStart(), start, duration, track)
-            );
-            animator->add(
-                new AnimatedProperty(FOG_END, track->getFogEnd(), end, duration, track)
+                new AnimatedProperty(FOG_RANGE, 2,
+                    new double[2] { track->getFogStart(), track->getFogEnd() },
+                    new double[2] { start, end }, duration, track)
             );
 
-            // TODO: animate fog color
+            video::SColor color = track->getFogColor();
+            animator->add(
+                new AnimatedProperty(FOG_COLOR, 3,
+                    new double[3] { 
+                        (double)color.getRed(), 
+                        (double)color.getGreen(), 
+                        (double)color.getBlue() 
+                    },
+                    new double[3] { 
+                        (double)r,
+                        (double)g,
+                        (double)b
+                    }, 
+                    duration, track)
+            );
         }
     }
 
@@ -250,9 +265,10 @@ namespace Scripting
             {
                 TrackObjectPresentationLight* light = ((TrackObjectPresentationLight*)memory);
                 PropertyAnimator::get()->add(
-                    new AnimatedProperty(AP_LIGHT_ENERGY, light->getEnergy(), energy, duration, light)
+                    new AnimatedProperty(AP_LIGHT_ENERGY, 1,
+                    new double[1] { light->getEnergy() },
+                    new double[1] { energy }, duration, light)
                 );
-                //((TrackObjectPresentationLight*)memory)->setEnergy(energy, duration);
             }
 
             /** @} */
