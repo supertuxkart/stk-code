@@ -134,6 +134,23 @@ namespace Scripting
         {
             new RacePausedDialog(0.8f, 0.6f);
         }
+
+        void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)
+        {
+            PropertyAnimator* animator = PropertyAnimator::get();
+            ::Track* track = World::getWorld()->getTrack();
+            animator->add(
+                new AnimatedProperty(FOG_MAX, track->getFogMax(), maxDensity, duration, track)
+            );
+            animator->add(
+                new AnimatedProperty(FOG_START, track->getFogStart(), start, duration, track)
+            );
+            animator->add(
+                new AnimatedProperty(FOG_END, track->getFogEnd(), end, duration, track)
+            );
+
+            // TODO: animate fog color
+        }
     }
 
     /** \cond DOXYGEN_IGNORE */
@@ -331,6 +348,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in, const string &in)", asFUNCTION(getTrackObject), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void exitRace()", asFUNCTION(exitRace), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void pauseRace()", asFUNCTION(pauseRace), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)", asFUNCTION(setFog), asCALL_CDECL); assert(r >= 0);
 
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", asMETHOD(::TrackObject, setEnabled), asCALL_THISCALL); assert(r >= 0);
