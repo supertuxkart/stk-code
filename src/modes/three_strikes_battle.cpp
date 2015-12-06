@@ -327,8 +327,8 @@ void ThreeStrikesBattle::update(float dt)
                 tire = m_tire_dir+"/wheel-front-right.b3d";
             else if(m_insert_tire == 5)
                 tire = m_tire_dir+"/wheel-rear-right.b3d";
+            if(!file_manager->fileExists(tire)) continue;
         }
-
 
         core::vector3df tire_xyz = m_tire_position + tire_offset;
         core::vector3df tire_hpr = core::vector3df(800.0f,0,
