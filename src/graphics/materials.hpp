@@ -571,7 +571,7 @@ public:
 
 // ============================================================================
 class InstancedGrassPass2Shader : public TextureShader<InstancedGrassPass2Shader, 6,
-                                             core::vector3df, core::vector3df>
+                                             core::vector3df>
 {
 public:
     InstancedGrassPass2Shader()
@@ -580,7 +580,7 @@ public:
                             GL_VERTEX_SHADER, "instanced_grass.vert",
                             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "instanced_grass_pass2.frag");
-        assignUniforms("windDir", "SunDir");
+        assignUniforms("windDir");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,

@@ -569,7 +569,7 @@ void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled
     m_solid_cmd_buffer.drawIndirectSecondPass<AlphaRef>(prefilled_tex);
     m_solid_cmd_buffer.drawIndirectSecondPass<UnlitMat>(prefilled_tex);
     m_solid_cmd_buffer.drawIndirectSecondPass<SphereMap>(prefilled_tex);
-    m_solid_cmd_buffer.drawIndirectSecondPass<GrassMat>(prefilled_tex, windDir, irr_driver->getSunDirection());
+    m_solid_cmd_buffer.drawIndirectSecondPass<GrassMat>(prefilled_tex, windDir);
     m_solid_cmd_buffer.drawIndirectSecondPass<DetailMat>(prefilled_tex);
     m_solid_cmd_buffer.drawIndirectSecondPass<NormalMat>(prefilled_tex);
 }
@@ -584,7 +584,7 @@ void DrawCalls::multidrawSolidSecondPass(const std::vector<uint64_t> &handles) c
     m_solid_cmd_buffer.multidraw2ndPass<UnlitMat>(handles);
     m_solid_cmd_buffer.multidraw2ndPass<NormalMat>(handles);
     m_solid_cmd_buffer.multidraw2ndPass<DetailMat>(handles);
-    m_solid_cmd_buffer.multidraw2ndPass<GrassMat>(handles, windDir, irr_driver->getSunDirection());
+    m_solid_cmd_buffer.multidraw2ndPass<GrassMat>(handles, windDir);
 }
 
 // ----------------------------------------------------------------------------
