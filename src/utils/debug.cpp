@@ -165,9 +165,10 @@ void changeCameraTarget(u32 num)
     Camera *cam = Camera::getActiveCamera();
     if (world == NULL || cam == NULL) return;
 
-    if ((num - 1) < (world->getNumKarts() + 1))
+    if (num < (world->getNumKarts() + 1))
     {
         AbstractKart* kart = world->getKart(num - 1);
+        if (kart == NULL) return;
         if (kart->isEliminated()) return;
         cam->setMode(Camera::CM_NORMAL);
         cam->setKart(kart);

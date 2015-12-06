@@ -355,7 +355,7 @@ Controller* World::loadAIController(AbstractKart *kart)
 
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
         turn=1;
-    // If different AIs 8should be used, adjust turn (or switch randomly
+    // If different AIs should be used, adjust turn (or switch randomly
     // or dependent on difficulty)
     switch(turn)
     {

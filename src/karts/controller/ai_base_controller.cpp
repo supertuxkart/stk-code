@@ -242,7 +242,7 @@ bool AIBaseController::doSkid(float steer_fraction)
     // code is activated, since the AI can not handle this
     // properly.
     if(m_kart->getKartProperties()->getSkiddingProperties()
-                                    ->getSkidVisualTime()>0)
+                                  ->getSkidVisualTime()>0)
         return false;
 
     // Otherwise return if we need a sharp turn (which is

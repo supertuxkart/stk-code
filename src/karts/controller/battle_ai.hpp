@@ -51,7 +51,7 @@ class BattleAI : public AIBaseController
 private:
 
     /** Holds the position info of targets. */
-    struct posData {bool behind; float angle; float distance;};
+    struct posData {bool behind; bool on_side; float angle; float distance;};
 
     /** Holds the current position of the AI on the battle graph. Sets to
      *  BattleGraph::UNKNOWN_POLY if the location is unknown. This variable is
@@ -70,6 +70,10 @@ private:
    /** Indicates that the kart is currently stuck, and m_time_since_reversing is
      * counting down. */
     bool m_is_stuck;
+
+   /** Indicates that the steering of kart is overridden, and
+     * m_time_since_steering_overridden is counting down. */
+    bool m_is_steering_overridden;
 
     /** Indicates that the kart need a uturn to reach a node behind, and
      *  m_time_since_uturn is counting down. */
@@ -104,6 +108,9 @@ private:
     /** This is a timer that counts down when the kart is starting to drive. */
     float m_time_since_driving;
 
+    /** This is a timer that counts down when the steering of kart is overridden. */
+    float m_time_since_steering_overridden;
+
     /** This is a timer that counts down when the kart is doing u-turn. */
     float m_time_since_uturn;
 
@@ -118,6 +125,7 @@ private:
     void  handleItems(const float dt);
     void  handleItemCollection(Vec3*, int*);
     void  handleSteering(const float dt);
+    void  handleSwatter();
     void  handleUTurn(const float dt);
     void  stringPull(const Vec3&, const Vec3&);
 

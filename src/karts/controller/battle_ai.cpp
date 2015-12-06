@@ -59,7 +59,7 @@ BattleAI::BattleAI(AbstractKart *kart,
     reset();
 
 #ifdef AI_DEBUG
-    video::SColor col_debug(128, 128,0,0);
+    video::SColor col_debug(128, 128, 0, 0);
     m_debug_sphere = irr_driver->addSphere(1.0f, col_debug);
     m_debug_sphere->setVisible(true);
 #endif
@@ -100,15 +100,17 @@ void BattleAI::reset()
     m_current_node = BattleGraph::UNKNOWN_POLY;
     m_target_node = BattleGraph::UNKNOWN_POLY;
     m_closest_kart_node = BattleGraph::UNKNOWN_POLY;
-    m_closest_kart_point = Vec3(0,0,0);
+    m_closest_kart_point = Vec3(0, 0, 0);
     m_closest_kart_pos_data = {0};
     m_cur_kart_pos_data = {0};
     m_is_stuck = false;
     m_is_uturn = false;
-    m_target_point = Vec3(0,0,0);
+    m_is_steering_overridden = false;
+    m_target_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
-    m_time_since_reversing = 0.0f;
     m_time_since_driving = 0.0f;
+    m_time_since_reversing = 0.0f;
+    m_time_since_steering_overridden = 0.0f;
     m_time_since_uturn = 0.0f;
     m_on_node.clear();
     m_path_corners.clear();
@@ -142,7 +144,7 @@ void BattleAI::update(float dt)
     checkIfStuck(dt);
     if (m_is_stuck && !m_is_uturn)
     {
-        setSteering(0.0f,dt);
+        setSteering(0.0f, dt);
 
         if (fabsf(m_kart->getSpeed()) >
             (m_kart->getKartProperties()->getMaxSpeed() / 5)
@@ -165,9 +167,13 @@ void BattleAI::update(float dt)
     findClosestKart(true);
     findTarget();
     handleItems(dt);
+    handleSwatter();
 
-    if (m_kart->getSpeed() > 15.0f)
+    if (m_kart->getSpeed() > 15.0f && m_cur_kart_pos_data.angle < 0.2f)
+    {
+        // Only use nitro when target is straight
         m_controls->m_nitro = true;
+    }
 
     if (m_is_uturn)
     {
@@ -198,14 +204,16 @@ void BattleAI::checkIfStuck(const float dt)
     m_on_node.insert(m_current_node);
     m_time_since_driving += dt;
 
-    if (m_time_since_driving >=
+    if ((m_time_since_driving >=
         (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 2.0f : 1.5f)
         && m_on_node.size() < 2 && !m_is_uturn &&
-        fabsf(m_kart->getSpeed()) < 3.0f)
+        fabsf(m_kart->getSpeed()) < 3.0f) || isStuck() == true)
     {
         // Check whether a kart stay on the same node for a period of time
+        // Or crashed 3 times
         m_on_node.clear();
         m_time_since_driving = 0.0f;
+        AIBaseController::reset();
         m_is_stuck = true;
     }
     else if (m_time_since_driving >=
@@ -220,16 +228,25 @@ void BattleAI::checkIfStuck(const float dt)
 //-----------------------------------------------------------------------------
 void BattleAI::checkPosition(const Vec3 &point, posData *pos_data)
 {
-    btQuaternion q(btVector3(0,1,0), -m_kart->getHeading());
+    // Convert to local coordinates from the point of view of current kart
+    btQuaternion q(btVector3(0, 1, 0), -m_kart->getHeading());
     Vec3 p  = point - m_kart->getXYZ();
-    Vec3 lc = quatRotate(q, p);
+    Vec3 local_coordinates = quatRotate(q, p);
 
-    if (lc.getZ() < 0)
+    // on_side: tell whether it's left or right hand side
+    if (local_coordinates.getX() < 0)
+        pos_data->on_side = true;
+    else
+        pos_data->on_side = false;
+
+    // behind: tell whether it's behind or not
+    if (local_coordinates.getZ() < 0)
         pos_data->behind = true;
     else
         pos_data->behind = false;
 
-    pos_data->angle = atan2(point.getX(), point.getZ());
+    pos_data->angle = atan2(fabsf(local_coordinates.getX()),
+        fabsf(local_coordinates.getZ()));
     pos_data->distance = p.length_2d();
 }   //  checkPosition
 
@@ -337,6 +354,8 @@ void BattleAI::handleAcceleration(const float dt)
 //-----------------------------------------------------------------------------
 void BattleAI::handleUTurn(const float dt)
 {
+    const float turn_side = (m_cur_kart_pos_data.on_side ? 1.0f : -1.0f);
+
     if (fabsf(m_kart->getSpeed()) >
         (m_kart->getKartProperties()->getMaxSpeed() / 5)
         && m_kart->getSpeed() < 0)    // Try to emulate reverse like human players
@@ -344,14 +363,16 @@ void BattleAI::handleUTurn(const float dt)
     else
         m_controls->m_accel = -5.0f;
 
-    if (m_time_since_uturn >= 1.5f)
-        setSteering(M_PI,dt); // Preventing keep going around circle
+    if (m_time_since_uturn >=
+        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 2.0f : 1.5f))
+        setSteering(-(turn_side), dt); // Preventing keep going around circle
     else
-        setSteering(-1.0f,dt);
+        setSteering(turn_side, dt);
     m_time_since_uturn += dt;
 
     checkPosition(m_target_point, &m_cur_kart_pos_data);
-    if (!m_cur_kart_pos_data.behind || m_time_since_uturn > 3.0f)
+    if (!m_cur_kart_pos_data.behind || m_time_since_uturn >
+        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 3.5f : 3.0f))
     {
         m_is_uturn = false;
         m_time_since_uturn = 0.0f;
@@ -369,6 +390,19 @@ void BattleAI::handleSteering(const float dt)
     if (m_current_node == BattleGraph::UNKNOWN_POLY ||
         m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
+    if (m_is_steering_overridden)
+    {
+        // Steering is overridden to avoid collision with the target kart
+        m_time_since_steering_overridden += dt;
+        setSteering(-1.0f, dt);
+        if (m_time_since_steering_overridden > 0.5f)
+        {
+            m_is_steering_overridden = false;
+            m_time_since_steering_overridden = 0.0f;
+        }
+        return;
+    }
+
     if (m_target_node == m_current_node)
     {
         // Very close to the item, steer directly
@@ -383,7 +417,7 @@ void BattleAI::handleSteering(const float dt)
         else
         {
             float target_angle = steerToPoint(m_target_point);
-            setSteering(target_angle,dt);
+            setSteering(target_angle, dt);
         }
         return;
     }
@@ -406,7 +440,7 @@ void BattleAI::handleSteering(const float dt)
         else
         {
             float target_angle = steerToPoint(m_target_point);
-            setSteering(target_angle,dt);
+            setSteering(target_angle, dt);
         }
         return;
     }
@@ -414,10 +448,31 @@ void BattleAI::handleSteering(const float dt)
     else
     {
         // Do nothing (go straight) if no targets found
-        setSteering(0.0f,dt);
+        setSteering(0.0f, dt);
         return;
     }
 }   // handleSteering
+
+//-----------------------------------------------------------------------------
+/** Make AI avoid collison with target as much as possible when attacking with
+ *  swatter.
+ */
+void BattleAI::handleSwatter()
+{
+    if (m_is_steering_overridden) return;
+
+    if (m_kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
+    {
+        findClosestKart(false);
+        if (m_closest_kart_pos_data.angle < 0.25f &&
+            m_closest_kart_pos_data.distance < 5.0f)
+        {
+            // Check whether it's straight ahead towards target
+            m_is_steering_overridden = true;
+        }
+    }
+
+}   // handleSwatter
 
 //-----------------------------------------------------------------------------
 /** This function finds the polyon edges(portals) that the AI will cross before
@@ -578,6 +633,18 @@ void BattleAI::handleBraking()
 {
     m_controls->m_brake = false;
 
+    if (m_is_steering_overridden && m_kart->getSpeed() > 10.0f)
+    {
+        // Hard-brake for too fast
+        if (m_kart->getSpeed() > 15.0f)
+        {
+            m_controls->m_accel = -12.5f;
+            return;
+        }
+        m_controls->m_brake = true;
+        return;
+    }
+
     // A kart will not brake when the speed is already slower than this
     // value. This prevents a kart from going too slow (or even backwards)
     // in tight curves.
@@ -622,7 +689,7 @@ void BattleAI::handleBraking()
 float BattleAI::determineTurnRadius( std::vector<Vec3>& points )
 {
     // Declaring variables
-    float a,b;
+    float a, b;
     irr::core::CMatrix4<float> A;
     irr::core::CMatrix4<float> X;
     irr::core::CMatrix4<float> B;
@@ -630,22 +697,22 @@ float BattleAI::determineTurnRadius( std::vector<Vec3>& points )
     //Populating matrices
     for (unsigned int i = 0; i < 3; i++)
     {
-        A(i,0) = points[i].x()*points[i].x();
-        A(i,1) = points[i].x();
-        A(i,2) = 1.0f;
-        A(i,3) = 0.0f;
+        A(i, 0) = points[i].x()*points[i].x();
+        A(i, 1) = points[i].x();
+        A(i, 2) = 1.0f;
+        A(i, 3) = 0.0f;
     }
-    A(3,0) = A(3,1) = A(3,2) = 0.0f;
-    A(3,3) = 1.0f;
+    A(3, 0) = A(3, 1) = A(3, 2) = 0.0f;
+    A(3, 3) = 1.0f;
 
     for (unsigned int i = 0; i < 3; i++)
     {
-        B(i,0) = points[i].z();
-        B(i,1) = 0.0f;
-        B(i,2) = 0.0f;
-        B(i,3) = 0.0f;
+        B(i, 0) = points[i].z();
+        B(i, 1) = 0.0f;
+        B(i, 2) = 0.0f;
+        B(i, 3) = 0.0f;
     }
-    B(3,0) = B(3,1) = B(3,2) = B(3,3) = 0.0f;
+    B(3, 0) = B(3, 1) = B(3, 2) = B(3, 3) = 0.0f;
 
     //Computing inverse : X = inv(A)*B
     irr::core::CMatrix4<float> invA;
@@ -653,16 +720,16 @@ float BattleAI::determineTurnRadius( std::vector<Vec3>& points )
         return -1;
 
     X = invA*B;
-    a = X(0,0);
-    b = X(0,1);
-    //c = X(0,2);
+    a = X(0, 0);
+    b = X(0, 1);
+    //c = X(0, 2);
 
     float x = points.front().x();
-    //float z = a*pow(x,2) + b*x + c;
+    //float z = a*pow(x, 2) + b*x + c;
     float dx_by_dz = 2*a*x + b;
     float d2x_by_dz = 2*a;
 
-    float radius = pow(abs(1 + pow(dx_by_dz,2)),1.5f)/ abs(d2x_by_dz);
+    float radius = pow(abs(1 + pow(dx_by_dz, 2)), 1.5f)/ abs(d2x_by_dz);
 
     return radius;
 }   // determineTurnRadius
@@ -680,9 +747,12 @@ void BattleAI::handleItems(const float dt)
     m_time_since_last_shot += dt;
 
     float min_bubble_time = 2.0f;
-    bool fire_behind = m_closest_kart_pos_data.behind &&
-                       !(m_cur_difficulty == RaceManager::DIFFICULTY_EASY ||
-                         m_cur_difficulty == RaceManager::DIFFICULTY_MEDIUM);
+    const bool difficulty = m_cur_difficulty == RaceManager::DIFFICULTY_EASY ||
+                            m_cur_difficulty == RaceManager::DIFFICULTY_MEDIUM;
+
+    const bool fire_behind = m_closest_kart_pos_data.behind && !difficulty;
+
+    const bool perfect_aim = m_closest_kart_pos_data.angle < 0.5f;
 
     switch(m_kart->getPowerup()->getType())
     {
@@ -721,8 +791,6 @@ void BattleAI::handleItems(const float dt)
 
             break;   // POWERUP_BUBBLEGUM
         }
-    // FIXME:: All the thrown/fired items might be improved by considering
-    // the angle towards (m_closest_kart_pos_data.angle).
     case PowerupManager::POWERUP_CAKE:
         {
             // if the kart has a shield, do not break it by using a cake.
@@ -751,7 +819,8 @@ void BattleAI::handleItems(const float dt)
             // Leave some time between shots
             if (m_time_since_last_shot < 1.0f) break;
 
-            if (m_closest_kart_pos_data.distance < 5.0f)
+            if (m_closest_kart_pos_data.distance < 5.0f &&
+                (difficulty || perfect_aim))
             {
                 m_controls->m_fire      = true;
                 m_controls->m_look_back = fire_behind;
@@ -767,7 +836,7 @@ void BattleAI::handleItems(const float dt)
             if(m_kart->getShieldTime() > min_bubble_time)
                 break;
 
-            if (m_closest_kart_pos_data.distance < 5.0f)
+            if (m_closest_kart_pos_data.distance < 7.0f)
             {
                 m_controls->m_fire      = true;
                 m_controls->m_look_back = false;
@@ -823,8 +892,8 @@ void BattleAI::handleItemCollection(Vec3* aim_point, int* target_node)
 
         if ((item->getType() == Item::ITEM_NITRO_BIG ||
              item->getType() == Item::ITEM_NITRO_SMALL) &&
-            ((m_kart->getKartProperties()->getNitroSmallContainer() +
-              m_kart->getKartProperties()->getNitroBigContainer()) > 1.0f))
+            (m_kart->getEnergy() >
+             m_kart->getKartProperties()->getNitroSmallContainer()))
                 continue; // Ignore nitro when already has some
 
         Vec3 d = item->getXYZ() - m_kart->getXYZ();
