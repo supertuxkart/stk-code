@@ -112,6 +112,7 @@ Swatter::~Swatter()
  */
 bool Swatter::updateAndTestFinished(float dt)
 {
+    bool discard_now = false;
     if (m_removing_bomb)
     {
         m_swat_bomb_frame += dt*25.0f;
@@ -181,7 +182,12 @@ bool Swatter::updateAndTestFinished(float dt)
             {
                 // Squash the karts and items around and
                 // change the current phase
-                squashThingsAround();
+                if (squashThingsAround() &&
+                    race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+                {
+                    //Remove swatter from kart in 3 strikes battle after one successful hit
+                    discard_now = true;
+                }
                 m_animation_phase = SWATTER_FROM_TARGET;
             }
         }
@@ -194,7 +200,7 @@ bool Swatter::updateAndTestFinished(float dt)
     // If the swatter is used up, trigger cleaning up
     // TODO: use a timeout
     // TODO: how does it work currently...?
-    return false;
+    return (discard_now ? true : false);
 }   // updateAndTestFinished
 
 // ----------------------------------------------------------------------------
@@ -261,8 +267,9 @@ void Swatter::pointToTarget()
 // ----------------------------------------------------------------------------
 /** Squash karts or items that are around the end position (determined using
  *  a joint) of the swatter.
+ *  \return True if target kart is hit.
  */
-void Swatter::squashThingsAround()
+bool Swatter::squashThingsAround()
 {
     const KartProperties*  kp           = m_kart->getKartProperties();
     // Square of the minimum distance
@@ -277,6 +284,7 @@ void Swatter::squashThingsAround()
 
     m_swat_sound->setPosition(swatter_pos);
     m_swat_sound->play();
+    bool target_is_hit = false;
 
     // Squash karts around
     for(unsigned int i=0; i<world->getNumKarts(); i++)
@@ -295,6 +303,7 @@ void Swatter::squashThingsAround()
 
         kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
             kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
+        target_is_hit = true;
 
         //Handle achievement if the swatter is used by the current player
         const StateManager::ActivePlayer *const ap = m_kart->getController()
@@ -316,6 +325,7 @@ void Swatter::squashThingsAround()
         }   // if kart has bomb attached
         World::getWorld()->kartHit(kart->getWorldKartId());
     }   // for i < num_kartrs
+    return target_is_hit;
 
     // TODO: squash items
 }   // squashThingsAround

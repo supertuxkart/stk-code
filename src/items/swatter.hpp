@@ -91,7 +91,7 @@ private:
     void    pointToTarget();
 
     /** Squash karts or items that are around the end position (determined using a joint) of the swatter */
-    void    squashThingsAround();
+    bool    squashThingsAround();
 };   // Swatter
 
 #endif
