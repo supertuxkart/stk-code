@@ -16,32 +16,30 @@ SynchronizationProtocol::SynchronizationProtocol()
 {
     unsigned int size = STKHost::get()->getPeerCount();
     m_pings.resize(size, std::map<uint32_t,double>());
-    m_pings_count.resize(size);
-    for (unsigned int i = 0; i < size; i++)
-    {
-        m_pings_count[i] = 0;
-    }
-    m_successed_pings.resize(size);
-    m_total_diff.resize(size);
-    m_average_ping.resize(size);
+    m_pings_count.resize(size, 0);
+    m_successed_pings.resize(size, 0);
+    m_total_diff.resize(size, 0);
+    m_average_ping.resize(size, 0);
     m_countdown_activated = false;
+    m_last_time = -1;
 }   // SynchronizationProtocol
 
 //-----------------------------------------------------------------------------
-
 SynchronizationProtocol::~SynchronizationProtocol()
 {
 }   // ~SynchronizationProtocol
+
 //-----------------------------------------------------------------------------
 
 bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
+
     const NetworkString &data = event->data();
     if (data.size() < 10)
     {
-        Log::warn("SynchronizationProtocol", "Received a message too short.");
+        Log::warn("SynchronizationProtocol", "Received a too short message.");
         return true;
     }
     uint8_t talk_id = data.gui8();
@@ -67,6 +65,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         if (peers[i]->isSamePeer(event->getPeer()))
         {
             peer_id = i;
+            break;
         }
     }
     if (peers[peer_id]->getClientServerToken() != token)
@@ -133,7 +132,6 @@ void SynchronizationProtocol::setup()
 
 void SynchronizationProtocol::asynchronousUpdate()
 {
-    static double timer = StkTime::getRealTime();
     double current_time = StkTime::getRealTime();
     if (m_countdown_activated)
     {
@@ -164,12 +162,12 @@ void SynchronizationProtocol::asynchronousUpdate()
                       seconds);
         }
     }
-    if (current_time > timer+0.1)
+    if (current_time > m_last_time+0.1)
     {
         const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
-            NetworkString ns(10);
+            NetworkString ns(14);
             ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1)
                                                 .addUInt32(m_pings[i].size());
             // now add the countdown if necessary
@@ -182,12 +180,12 @@ void SynchronizationProtocol::asynchronousUpdate()
             Log::verbose("SynchronizationProtocol",
                          "Added sequence number %u for peer %d",
                          m_pings[i].size(), i);
-            timer = current_time;
-            m_pings[i].insert(std::pair<int,double>(m_pings_count[i], timer));
+            m_last_time = current_time;
+            m_pings[i].insert(std::pair<int,double>(m_pings_count[i], m_last_time));
             sendMessage(peers[i], ns, false);
             m_pings_count[i]++;
         }   // for i M peers
-    }   // if current_time > timer + 0.1
+    }   // if current_time > m_last_time + 0.1
 }   // asynchronousUpdate
 
 //-----------------------------------------------------------------------------
