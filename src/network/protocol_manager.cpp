@@ -377,7 +377,7 @@ bool ProtocolManager::sendEvent(EventProcessingInfo* event, bool synchronous)
             index++;
             continue;
         }
-        bool result = synchronous ?  p->notifyEvent(event->m_event)
+        bool result = synchronous ? p->notifyEvent(event->m_event)
                                   : p->notifyEventAsynchronous(event->m_event);
         if (result)
         {
@@ -456,8 +456,8 @@ void ProtocolManager::asynchronousUpdate()
         if (result)
         {
             m_events_to_process.getData()
-                               .erase(m_events_to_process.getData().begin()+i+offset,
-                                      m_events_to_process.getData().begin()+i+offset+1);
+                               .erase(m_events_to_process.getData().begin()+(i+offset),
+                                      m_events_to_process.getData().begin()+(i+offset+1));
             offset --;
         }
     }
