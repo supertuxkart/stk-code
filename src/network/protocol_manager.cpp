@@ -368,30 +368,23 @@ void ProtocolManager::terminateProtocol(Protocol *protocol)
 bool ProtocolManager::sendEvent(EventProcessingInfo* event, bool synchronous)
 {
     m_protocols.lock();
-    int index = 0;
-    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
+    unsigned int index = 0;
+    while(index < event->m_protocols_ids.size())
     {
-        if (event->m_protocols_ids[index] == m_protocols.getData()[i]->getId())
+        Protocol *p = getProtocol(event->m_protocols_ids[index]);
+        if(!p) 
         {
-            bool result = false;
-            if (synchronous)
-                result = m_protocols.getData()[i]
-                         ->notifyEvent(event->m_event);
-            else
-                result = m_protocols.getData()[i]
-                         ->notifyEventAsynchronous(event->m_event);
-            if (result)
-            {
-                event->m_protocols_ids.pop_back();
-                // Exit if all protocols ids have been handled. This is,
-                // important,otherwise the test m_protocols_ids[index]
-                // causes a crash
-                if(event->m_protocols_ids.size()<=(unsigned int)index)
-                    break;
-            }
-            else  // !result
-                index++;
+            index++;
+            continue;
         }
+        bool result = synchronous ?  p->notifyEvent(event->m_event)
+                                  : p->notifyEventAsynchronous(event->m_event);
+        if (result)
+        {
+            event->m_protocols_ids.pop_back();
+        }
+        else  // !result
+            index++;
     }
     m_protocols.unlock();
 
