@@ -11,7 +11,6 @@
 NetworkWorld::NetworkWorld()
 {
     m_running = false;
-    m_has_run = false;
 }   // NetworkWorld
 
 // ----------------------------------------------------------------------------
@@ -23,8 +22,6 @@ NetworkWorld::~NetworkWorld()
 // ----------------------------------------------------------------------------
 void NetworkWorld::update(float dt)
 {
-    if (!m_has_run)
-        m_has_run = true;
     SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
     if (protocol) // if this protocol exists, that's that we play online

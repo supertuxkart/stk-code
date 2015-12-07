@@ -39,7 +39,6 @@ class NetworkWorld : public AbstractSingleton<NetworkWorld>
 private:
     bool m_running;
     float m_race_time;
-    bool m_has_run;
     std::string m_self_kart;
 
     friend class AbstractSingleton<NetworkWorld>;
