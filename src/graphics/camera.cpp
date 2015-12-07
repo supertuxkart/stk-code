@@ -380,7 +380,7 @@ void Camera::smoothMoveCamera(float dt)
     // Smoothly interpolate towards the position and target
     const KartProperties *kp = m_kart->getKartProperties();
     float max_increase_with_zipper = kp->getZipperMaxSpeedIncrease();
-    float max_speed_without_zipper = kp->getMaxSpeed();
+    float max_speed_without_zipper = kp->getEngineMaxSpeed();
     float current_speed = m_kart->getSpeed();
 
     const Skidding *ks = m_kart->getSkidding();
@@ -469,7 +469,7 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
             else
             {
                 *above_kart    = 0.75f;
-                *cam_angle     = kp->getCameraForwardUpAngle();
+                *cam_angle     = kp->getCameraForwardUpAngle() * DEGREE_TO_RAD;
                 *distance      = -m_distance;
             }
             float steering = m_kart->getSteerPercent()
@@ -484,7 +484,7 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
     case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
         {
             *above_kart = 0.75f;
-            *cam_angle  = kp->getCameraBackwardUpAngle();
+            *cam_angle  = kp->getCameraBackwardUpAngle() * DEGREE_TO_RAD;
             *sideway    = 0;
             *distance   = 2.0f*m_distance;
             *smoothing  = false;
@@ -843,8 +843,7 @@ void Camera::handleEndCamera(float dt)
         }
     case EndCameraInformation::EC_AHEAD_OF_KART:
         {
-            const KartProperties *kp=m_kart->getKartProperties();
-            float cam_angle  = kp->getCameraBackwardUpAngle();
+            float cam_angle = m_kart->getKartProperties()->getCameraBackwardUpAngle() * DEGREE_TO_RAD;
 
             positionCamera(dt, /*above_kart*/0.75f,
                            cam_angle, /*side_way*/0,

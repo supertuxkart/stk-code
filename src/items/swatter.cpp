@@ -156,7 +156,7 @@ bool Swatter::updateAndTestFinished(float dt)
                 (m_target->getXYZ()- Vec3(m_scene_node->getAbsolutePosition()))
                 .length2();
             float min_dist2
-                 = m_kart->getKartProperties()->getSwatterDistance2();
+                 = m_kart->getKartProperties()->getSwatterDistance();
             if(dist_to_target2 < min_dist2)
             {
                 // Start squashing
@@ -264,10 +264,10 @@ void Swatter::pointToTarget()
  */
 void Swatter::squashThingsAround()
 {
-    const KartProperties*  kp           = m_kart->getKartProperties();
+    const KartProperties *kp = m_kart->getKartProperties();
     // Square of the minimum distance
-    float                  min_dist2    = kp->getSwatterDistance2();
-    const World*           world        = World::getWorld();
+    float                  min_dist2 = kp->getSwatterDistance();
+    const World*           world     = World::getWorld();
 
     // Get the node corresponding to the joint at the center of the swatter
     // (by swatter, I mean the thing hold in the hand, not the whole thing)
@@ -279,7 +279,7 @@ void Swatter::squashThingsAround()
     m_swat_sound->play();
 
     // Squash karts around
-    for(unsigned int i=0; i<world->getNumKarts(); i++)
+    for(unsigned int i = 0; i < world->getNumKarts(); i++)
     {
         AbstractKart *kart = world->getKart(i);
         // TODO: isSwatterReady()
@@ -293,8 +293,7 @@ void Swatter::squashThingsAround()
 
         if(dist2 >= min_dist2) continue;   // too far away, ignore this kart
 
-        kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
-            kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
+        kart->setSquash(kp->getSwatterSquashDuration(), kp->getSwatterSquashSlowdown());
 
         //Handle achievement if the swatter is used by the current player
         const StateManager::ActivePlayer *const ap = m_kart->getController()

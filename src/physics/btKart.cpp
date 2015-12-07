@@ -461,7 +461,7 @@ void btKart::updateVehicle( btScalar step )
         av.setZ(0);
         m_chassisBody->setAngularVelocity(av);
         // Give a nicely balanced feeling for rebalancing the kart
-        m_chassisBody->applyTorqueImpulse(axis * m_kart->getKartProperties()->getSmoothFlyingImpulse());
+        m_chassisBody->applyTorqueImpulse(axis * m_kart->getKartProperties()->getStabilitySmoothFlyingImpulse());
     }
     
     // Work around: make sure that either both wheels on one axis
@@ -543,7 +543,7 @@ void btKart::updateVehicle( btScalar step )
 
     // If configured, add a force to keep karts on the track
     // -----------------------------------------------------
-    float dif = m_kart->getKartProperties()->getDownwardImpulseFactor();
+    float dif = m_kart->getKartProperties()->getStabilityDownwardImpulseFactor();
     if(dif!=0 && m_num_wheels_on_ground==4)
     {
         float f = -fabsf(m_kart->getSpeed()) * dif;
@@ -655,7 +655,7 @@ void btKart::updateSuspension(btScalar deltaTime)
             // is already guaranteed that either both or no wheels on one axis
             // are on the ground, so we have to test only one of the wheels
             wheel_info.m_wheelsSuspensionForce =
-                 -m_kart->getKartProperties()->getTrackConnectionAccel()
+                 -m_kart->getKartProperties()->getStabilityTrackConnectionAccel()
                 * chassisMass;
             continue;
         }
@@ -666,7 +666,7 @@ void btKart::updateSuspension(btScalar deltaTime)
         btScalar susp_length    = wheel_info.getSuspensionRestLength();
         btScalar current_length = wheel_info.m_raycastInfo.m_suspensionLength;
         btScalar length_diff    = (susp_length - current_length);
-        if(m_kart->getKartProperties()->getExpSpringResponse())
+        if(m_kart->getKartProperties()->getSuspensionExpSpringResponse())
             length_diff *= fabsf(length_diff)/susp_length;
         float f = (1.0f + fabsf(length_diff) / susp_length);
         // Scale the length diff. This results that in uphill sections, when

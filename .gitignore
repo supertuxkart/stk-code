@@ -9,6 +9,7 @@ stk-editor/
 .config/
 supertuxkart-64
 make*.bat
+__pycache__
 
 data/editor
 data/karts

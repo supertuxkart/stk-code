@@ -78,8 +78,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     m_xyz = m_kart->getXYZ();
     m_orig_y = m_xyz.getY();
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
-    m_timer = m_kart->getKartProperties()->getExplosionTime() *
-              m_kart->getPlayerDifficulty()->getExplosionTime();
+    m_timer = m_kart->getKartProperties()->getExplosionDuration();
 
     // Non-direct hits will be only affected half as much.
     if(!direct_hit) m_timer*=0.5f;
@@ -106,8 +105,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     m_add_rotation.setRoll(    (rand()%(2*max_rotation+1)-max_rotation)*f );
 
     // Set invulnerable time, and graphical effects
-    float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime() *
-              m_kart->getPlayerDifficulty()->getExplosionInvulnerabilityTime();
+    float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
     m_kart->setInvulnerableTime(t);
     m_kart->showStarEffect(t);
     

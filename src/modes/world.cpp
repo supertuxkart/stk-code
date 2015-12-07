@@ -184,12 +184,10 @@ void World::init()
                                : race_manager->getKartIdent(i);
         int local_player_id  = race_manager->getKartLocalPlayerId(i);
         int global_player_id = race_manager->getKartGlobalPlayerId(i);
-        const PlayerDifficulty *player_difficulty =
-            stk_config->getPlayerDifficulty(race_manager->getPlayerDifficulty(i));
         AbstractKart* newkart = createKart(kart_ident, i, local_player_id,
                                    global_player_id,
                                    race_manager->getKartType(i),
-                                   player_difficulty);
+                                   race_manager->getPlayerDifficulty(i));
         m_karts.push_back(newkart);
         m_track->adjustForFog(newkart->getNode());
 
@@ -300,7 +298,7 @@ void World::createRaceGUI()
 AbstractKart *World::createKart(const std::string &kart_ident, int index,
                                 int local_player_id, int global_player_id,
                                 RaceManager::KartType kart_type,
-                                const PlayerDifficulty *difficulty)
+                                PerPlayerDifficulty difficulty)
 {
     int position           = index+1;
     btTransform init_pos   = getStartTransform(index);

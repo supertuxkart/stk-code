@@ -26,6 +26,7 @@
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart_properties.hpp"
 #include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "physics/irr_debug_drawer.hpp"
@@ -136,14 +137,14 @@ void addAttachment(Attachment::AttachmentType type)
         if (type == Attachment::ATTACH_ANVIL)
         {
             kart->getAttachment()
-                ->set(type, stk_config->m_anvil_time);
-            kart->adjustSpeed(stk_config->m_anvil_speed_factor);
+                ->set(type, kart->getKartProperties()->getAnvilDuration());
+            kart->adjustSpeed(kart->getKartProperties()->getAnvilSpeedFactor());
             kart->updateWeight();
         }
         else if (type == Attachment::ATTACH_PARACHUTE)
         {
             kart->getAttachment()
-                ->set(type, stk_config->m_parachute_time);
+                ->set(type, kart->getKartProperties()->getParachuteDuration());
         }
         else if (type == Attachment::ATTACH_BOMB)
         {

@@ -130,8 +130,7 @@ public:
     AbstractKart* getPreviousOwner() const { return m_previous_owner; }
     // ------------------------------------------------------------------------
     /** Returns additional weight for the kart. */
-    float weightAdjust() const {
-        return m_type==ATTACH_ANVIL ? stk_config->m_anvil_weight : 0.0f; }
+    float weightAdjust() const;
     // ------------------------------------------------------------------------
     /** Return the currently associated scene node (used by e.g the swatter) */
     scene::IAnimatedMeshSceneNode* getNode() {return m_node;}

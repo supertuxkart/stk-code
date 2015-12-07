@@ -197,7 +197,7 @@ void NetworkPlayerController::steer(float dt, int steer_val)
     // change speed is used.
     const float STEER_CHANGE = ( (steer_val<=0 && m_controls->m_steer<0) ||
                                  (steer_val>=0 && m_controls->m_steer>0)   )
-                     ? dt/m_kart->getKartProperties()->getTimeResetSteer()
+                     ? dt/m_kart->getKartProperties()->getTurnTimeResetSteer()
                      : dt/m_kart->getTimeFullSteer(fabsf(m_controls->m_steer));
     if (steer_val < 0)
     {

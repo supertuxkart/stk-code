@@ -2354,4 +2354,3 @@ bool Track::findGround(AbstractKart *kart)
 
     return true;
 }   // findGround
-
