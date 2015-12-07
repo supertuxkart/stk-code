@@ -1345,6 +1345,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
         // to lower case, for case-insensitive comparison
         name = StringUtils::toLowerCase(name);
 
+        int moving_textures_found = 0;
         for(unsigned int i=0; i<node->getMaterialCount(); i++)
         {
             video::SMaterial &irrMaterial=node->getMaterial(i);
@@ -1361,8 +1362,12 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
                 if (texture_name != name) continue;
                 core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
                 m_animated_textures.push_back(new MovingTexture(m, *texture_node));
+                moving_textures_found++;
             }   // for j<MATERIAL_MAX_TEXTURES
         }   // for i<getMaterialCount
+
+        if (moving_textures_found == 0)
+            Log::warn("AnimTexture", "Did not find animate texture '%s'", name.c_str());
     }   // for node_number < xml->getNumNodes
 }   // handleAnimatedTextures
 
