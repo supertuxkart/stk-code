@@ -158,6 +158,8 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
  */
 void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
 {
+    if (isRaceOver()) return;
+
     assert(kart_id < m_karts.size());
     // make kart lose a life
     m_kart_info[kart_id].m_lives--;
