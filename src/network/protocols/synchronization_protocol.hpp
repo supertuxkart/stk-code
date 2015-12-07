@@ -18,6 +18,10 @@ private:
     double m_last_countdown_update;
     bool m_has_quit;
 
+    /** Keeps track of last time that an update was sent. */
+    double m_last_time;
+
+
 public:
              SynchronizationProtocol();
     virtual ~SynchronizationProtocol();
