@@ -290,6 +290,16 @@ void TrackInfoScreen::onEnterPressedInternal()
         m_track->setActualNumberOfLaps(num_laps);
     race_manager->setReverseTrack(reverse_track);
 
+    // Avoid invaild Ai karts number during switching game modes
+    const int num_ai = m_ai_kart_spinner->getValue();
+    if (UserConfigParams::m_num_karts != (signed)(race_manager
+        ->getNumLocalPlayers() + num_ai))
+    {
+        race_manager->setNumKarts(race_manager->getNumLocalPlayers() + num_ai);
+        UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers() +
+                                        num_ai;
+    }
+
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
