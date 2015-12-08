@@ -1,3 +1,20 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2015  Supertuxkart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "network/protocols/controller_events_protocol.hpp"
 
 #include "modes/world.hpp"
@@ -19,16 +36,17 @@
 ControllerEventsProtocol::ControllerEventsProtocol()
                         : Protocol( PROTOCOL_CONTROLLER_EVENTS)
 {
-}
+}   // ControllerEventsProtocol
 
 //-----------------------------------------------------------------------------
 
 ControllerEventsProtocol::~ControllerEventsProtocol()
 {
-}
+}   // ~ControllerEventsProtocol
 
 //-----------------------------------------------------------------------------
-
+/** Sets up the mapping of KartController and STKPeer.
+ */
 void ControllerEventsProtocol::setup()
 {
     m_self_controller_index = 0;
@@ -52,22 +70,24 @@ void ControllerEventsProtocol::setup()
                     peer = peers[j];
                 }
                 Log::info("ControllerEventsProtocol", "Compared %s and %s",
-                          peers[j]->getPlayerProfile()->getKartName().c_str(), 
+                          peers[j]->getPlayerProfile()->getKartName().c_str(),
                           karts[i]->getIdent().c_str());
-            }
+            }   // for j in peers
         }
-        else
+        else   // isClient
         {
             if (peers.size() > 0)
                 peer = peers[0];
         }
         if (peer == NULL)
         {
-            Log::error("ControllerEventsProtocol", "Couldn't find the peer corresponding to the kart.");
+            Log::error("ControllerEventsProtocol",
+                       "Could not find the peer corresponding to the kart.");
         }
-        m_controllers.push_back(std::pair<Controller*, STKPeer*>(karts[i]->getController(), peer));
+        m_controllers.push_back(
+            std::pair<Controller*, STKPeer*>(karts[i]->getController(), peer));
     }
-}
+}   // setup
 
 //-----------------------------------------------------------------------------
 
@@ -76,7 +96,9 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
     const NetworkString &data = event->data();
     if (data.size() < 17)
     {
-        Log::error("ControllerEventsProtocol", "The data supplied was not complete. Size was %d.", data.size());
+        Log::error("ControllerEventsProtocol",
+                   "The data supplied was not complete. Size was %d.",
+                    data.size());
         return true;
     }
     uint32_t token = data.gui32();
@@ -99,7 +121,8 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
         PlayerAction action  = (PlayerAction)(ns.gui8(4));
         int action_value = ns.gui32(5);
 
-        KartControl* controls   = m_controllers[controller_index].first->getControls();
+        KartControl* controls   = m_controllers[controller_index].first
+                                                               ->getControls();
         controls->m_brake       = (serialized_1 & 0x40)!=0;
         controls->m_nitro       = (serialized_1 & 0x20)!=0;
         controls->m_rescue      = (serialized_1 & 0x10)!=0;
@@ -113,7 +136,8 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
     }
     if (ns.size() > 0 && ns.size() != 9)
     {
-        Log::warn("ControllerEventProtocol", "The data seems corrupted. Remains %d", ns.size());
+        Log::warn("ControllerEventProtocol",
+                  "The data seems corrupted. Remains %d", ns.size());
         return true;
     }
     if (client_index < 0)
@@ -132,8 +156,8 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
             ns2.ai32(m_controllers[i].second->getClientServerToken());
             ns2 += pure_message;
             ProtocolManager::getInstance()
-                           ->sendMessage(this, m_controllers[i].second, ns2, false);
-            //Log::info("ControllerEventsProtocol", "Sizes are %d and %d", ns2.size(), pure_message.size());
+                           ->sendMessage(this, m_controllers[i].second, ns2,
+                                         false);
         }
     }
     return true;
@@ -143,10 +167,16 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
 
 void ControllerEventsProtocol::update()
 {
-}
+}   // update
 
 //-----------------------------------------------------------------------------
-
+/** Called from the local kart controller when an action (like steering,
+ *  acceleration, ...) was triggered. It compresses the current kart control
+ *  state and sends a message with the new info to the server.
+ *  \param controller The controller that triggered the action.
+ *  \param action Which action was triggered.
+ *  \param value New value for the given action.
+ */
 void ControllerEventsProtocol::controllerAction(Controller* controller,
                                                 PlayerAction action, int value)
 {
@@ -169,7 +199,8 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     uint8_t serialized_3 = (uint8_t)(controls->m_steer*127.0);
 
     NetworkString ns(17);
-    ns.ai32(m_controllers[m_self_controller_index].second->getClientServerToken());
+    ns.ai32(m_controllers[m_self_controller_index].second
+                                                    ->getClientServerToken());
     ns.af(World::getWorld()->getTime());
     ns.ai8(m_self_controller_index);
     ns.ai8(serialized_1).ai8(serialized_2).ai8(serialized_3);
@@ -177,6 +208,4 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
 
     Log::info("ControllerEventsProtocol", "Action %d value %d", action, value);
     sendMessage(ns, false); // send message to server
-}
-
-
+}   // controllerAction
