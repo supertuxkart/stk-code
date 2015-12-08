@@ -11,15 +11,25 @@ class NetworkPlayerProfile;
  */
 class StartGameProtocol : public Protocol
 {
-protected:
-    enum STATE { NONE, SYNCHRONIZATION_WAIT, LOADING, READY, EXITING };
+private:
+    /** State for the finite state machine, and also for
+     *  remote clients. */
+    enum STATE { NONE, SYNCHRONIZATION_WAIT, 
+                 LOADING, READY, EXITING };
+
+    /** State of the finite state machine. */
+    STATE m_state;
+
+    /** Keeps the state for all clients. */
     std::map<NetworkPlayerProfile*, STATE> m_player_states;
 
+    /** Stores a handy pointer to the game setup structure. */
     GameSetup* m_game_setup;
-    int m_ready_count;
-    double m_sending_time;
 
-    STATE m_state;
+    /** Counts how many clients have reported to be ready (which is then
+     *  used to trigger the next state one all clients are ready). */
+    int m_ready_count;
+
     bool m_ready;
 
 public:
