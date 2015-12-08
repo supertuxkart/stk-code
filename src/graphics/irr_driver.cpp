@@ -57,6 +57,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
+#include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
@@ -2152,6 +2153,8 @@ void IrrDriver::update(float dt)
     }
 
     m_wind->update();
+
+    PropertyAnimator::get()->update(dt);
 
     World *world = World::getWorld();
 

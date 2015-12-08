@@ -69,7 +69,7 @@ CannonAnimation::~CannonAnimation()
                                  m_kart->getHeading()        ));
 
     m_kart->getBody()->setCenterOfMassTransform(pos);
-    Vec3 v(0, 0, m_kart->getKartProperties()->getMaxSpeed());
+    Vec3 v(0, 0, m_kart->getKartProperties()->getEngineMaxSpeed());
     m_kart->setVelocity(pos.getBasis()*v);
 }   // ~CannonAnimation
 

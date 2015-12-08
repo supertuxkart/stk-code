@@ -1159,6 +1159,11 @@ void initRest()
     track_manager->addTrackSearchDir(
                  file_manager->getAddonsFile("tracks/"));
 
+    {
+        XMLNode characteristicsNode(file_manager->getAsset("kart_characteristics.xml"));
+        kart_properties_manager->loadCharacteristics(&characteristicsNode);
+    }
+
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 

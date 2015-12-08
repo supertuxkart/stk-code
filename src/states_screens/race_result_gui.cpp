@@ -43,6 +43,7 @@
 #include "modes/soccer_world.hpp"
 #include "modes/world_with_rank.hpp"
 #include "race/highscores.hpp"
+#include "scriptengine/property_animator.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/networking_lobby.hpp"
@@ -270,6 +271,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 
                 // kart will no longer be available during cutscene, drop reference
                 StateManager::get()->getActivePlayer(playerID)->setKart(NULL);
+                PropertyAnimator::get()->clear();
                 World::deleteWorld();
 
                 CutsceneWorld::setUseDuration(true);
@@ -287,6 +289,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             else
             {
                 StateManager::get()->popMenu();
+                PropertyAnimator::get()->clear();
                 World::deleteWorld();
 
                 CutsceneWorld::setUseDuration(false);

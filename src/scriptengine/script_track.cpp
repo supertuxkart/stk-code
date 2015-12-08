@@ -26,6 +26,7 @@
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "modes/world.hpp"
+#include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "tracks/track.hpp"
@@ -133,6 +134,38 @@ namespace Scripting
         {
             new RacePausedDialog(0.8f, 0.6f);
         }
+
+        void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)
+        {
+            PropertyAnimator* animator = PropertyAnimator::get();
+            ::Track* track = World::getWorld()->getTrack();
+            animator->add(
+                new AnimatedProperty(FOG_MAX, 1,
+                    new double[1] { track->getFogMax() }, 
+                    new double[1] { maxDensity }, duration, track)
+            );
+            animator->add(
+                new AnimatedProperty(FOG_RANGE, 2,
+                    new double[2] { track->getFogStart(), track->getFogEnd() },
+                    new double[2] { start, end }, duration, track)
+            );
+
+            video::SColor color = track->getFogColor();
+            animator->add(
+                new AnimatedProperty(FOG_COLOR, 3,
+                    new double[3] { 
+                        (double)color.getRed(), 
+                        (double)color.getGreen(), 
+                        (double)color.getBlue() 
+                    },
+                    new double[3] { 
+                        (double)r,
+                        (double)g,
+                        (double)b
+                    }, 
+                    duration, track)
+            );
+        }
     }
 
     /** \cond DOXYGEN_IGNORE */
@@ -230,7 +263,12 @@ namespace Scripting
 
             void animateEnergy(float energy, float duration, /** \cond DOXYGEN_IGNORE */void *memory /** \endcond */)
             {
-                ((TrackObjectPresentationLight*)memory)->setEnergy(energy, duration);
+                TrackObjectPresentationLight* light = ((TrackObjectPresentationLight*)memory);
+                PropertyAnimator::get()->add(
+                    new AnimatedProperty(AP_LIGHT_ENERGY, 1,
+                    new double[1] { light->getEnergy() },
+                    new double[1] { energy }, duration, light)
+                );
             }
 
             /** @} */
@@ -326,6 +364,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in, const string &in)", asFUNCTION(getTrackObject), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void exitRace()", asFUNCTION(exitRace), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void pauseRace()", asFUNCTION(pauseRace), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)", asFUNCTION(setFog), asCALL_CDECL); assert(r >= 0);
 
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", asMETHOD(::TrackObject, setEnabled), asCALL_THISCALL); assert(r >= 0);
