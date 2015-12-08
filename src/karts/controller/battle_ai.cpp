@@ -32,7 +32,6 @@
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
-#include "karts/skidding_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "tracks/nav_poly.hpp"
 #include "tracks/navmesh.hpp"
@@ -147,7 +146,7 @@ void BattleAI::update(float dt)
         setSteering(0.0f, dt);
 
         if (fabsf(m_kart->getSpeed()) >
-            (m_kart->getKartProperties()->getMaxSpeed() / 5)
+            (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
             && m_kart->getSpeed() < 0)
             m_controls->m_accel = -0.06f;
         else
@@ -357,7 +356,7 @@ void BattleAI::handleUTurn(const float dt)
     const float turn_side = (m_cur_kart_pos_data.on_side ? 1.0f : -1.0f);
 
     if (fabsf(m_kart->getSpeed()) >
-        (m_kart->getKartProperties()->getMaxSpeed() / 5)
+        (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
         && m_kart->getSpeed() < 0)    // Try to emulate reverse like human players
         m_controls->m_accel = -0.06f;
     else
@@ -666,9 +665,7 @@ void BattleAI::handleBraking()
     if (d1.length2_2d() < d2.length2_2d())
         current_curve_radius = d1.length_2d();
 
-    float max_turn_speed =
-          m_kart->getKartProperties()
-          ->getSpeedForTurnRadius(current_curve_radius);
+    float max_turn_speed = m_kart->getSpeedForTurnRadius(current_curve_radius);
 
     if (m_kart->getSpeed() > max_turn_speed &&
         m_kart->getSpeed() > MIN_SPEED)

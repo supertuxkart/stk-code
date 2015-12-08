@@ -23,7 +23,6 @@
 
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/skidding_properties.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "tracks/track.hpp"
