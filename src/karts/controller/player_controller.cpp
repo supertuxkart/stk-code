@@ -34,6 +34,7 @@
 #include "karts/skidding.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/network_world.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -220,7 +221,11 @@ void PlayerController::action(PlayerAction action, int value)
     default:
        break;
     }
-    if (World::getWorld()->isNetworkWorld() && NetworkWorld::getInstance()->isRunning())
+
+    // If this is a client, send the action to the server
+    if (World::getWorld()->isNetworkWorld()      && 
+        NetworkConfig::get()->isClient()         &&
+        NetworkWorld::getInstance()->isRunning()    )
     {
         NetworkWorld::getInstance()->controllerAction(this, action, value);
     }
