@@ -88,7 +88,7 @@ void* NetworkConsole::mainLoop(void* data)
             assert(protocol);
             protocol->startSelection();
         }
-        else if (str == "select" && NetworkConfig::get()->isclient())
+        else if (str == "select" && NetworkConfig::get()->isClient())
         {
             std::string str2;
             getline(std::cin, str2);
@@ -97,7 +97,7 @@ void* NetworkConsole::mainLoop(void* data)
             ClientLobbyRoomProtocol* clrp = static_cast<ClientLobbyRoomProtocol*>(protocol);
             clrp->requestKartSelection(str2);
         }
-        else if (str == "vote" && NetworkConfig::get()->isclient())
+        else if (str == "vote" && NetworkConfig::get()->isClient())
         {
             std::cout << "Vote for ? (track/laps/reversed/major/minor/race#) :";
             std::string str2;

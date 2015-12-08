@@ -30,8 +30,7 @@ StartGameProtocol::StartGameProtocol(GameSetup* game_setup)
                                                     m_game_setup->getPlayers();
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        std::pair<NetworkPlayerProfile*, STATE> player_state(players[i], LOADING);
-        m_player_states.insert(player_state);
+        m_player_states[ players[i] ] = LOADING;
     }
     m_ready_count = 0;
 }   // StartGameProtocol
@@ -236,7 +235,7 @@ void StartGameProtocol::update()
 void StartGameProtocol::ready()
 {
     // On clients this means the loading is finished
-    if (NetworkConfig::get()->isclient())
+    if (NetworkConfig::get()->isClient())
     {
         assert(STKHost::get()->getPeerCount() == 1);
         NetworkString ns(5);

@@ -116,7 +116,7 @@ public:
     bool isServer() const { return m_is_server;  }
     // --------------------------------------------------------------------
     /** Returns if this instance is a client. */
-    bool isclient() const { return !m_is_server; }
+    bool isClient() const { return !m_is_server; }
     // --------------------------------------------------------------------
     /** Sets the name of this server. */
     void setServerName(const irr::core::stringw &name)
