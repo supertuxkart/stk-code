@@ -30,6 +30,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 #include "utils/translation.hpp"
+#include "utils/vs.hpp"
 
 #include "wiiuse.h"
 
@@ -373,6 +374,7 @@ void WiimoteManager::threadFunc()
  */
 void* WiimoteManager::threadFuncWrapper(void *data)
 {
+    VS::setThreadName("WiimoteManager");
     ((WiimoteManager*)data)->threadFunc();
     return NULL;
 }   // threadFuncWrapper

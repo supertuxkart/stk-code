@@ -24,6 +24,7 @@
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
+#include "utils/vs.hpp"
 
 #include <assert.h>
 #include <cstdlib>
@@ -50,6 +51,8 @@ ProtocolManager::ProtocolManager()
 
 void* ProtocolManager::mainLoop(void* data)
 {
+    VS::setThreadName("ProtocolManager");
+
     ProtocolManager* manager = static_cast<ProtocolManager*>(data);
     manager->m_asynchronous_thread_running = true;
     while(manager && !manager->exit())

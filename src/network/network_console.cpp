@@ -28,6 +28,7 @@
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
+#include "utils/vs.hpp"
 
 #include <iostream>
 
@@ -58,6 +59,7 @@ void NetworkConsole::run()
 // ----------------------------------------------------------------------------
 void* NetworkConsole::mainLoop(void* data)
 {
+    VS::setThreadName("NetworkConsole");
     NetworkConsole *me = static_cast<NetworkConsole*>(data);
     std::string str = "";
     bool stop = false;

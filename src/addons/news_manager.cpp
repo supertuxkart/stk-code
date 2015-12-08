@@ -26,6 +26,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 #include "utils/translation.hpp"
+#include "utils/vs.hpp"
 
 #include <iostream>
 
@@ -93,6 +94,7 @@ void NewsManager::init(bool force_refresh)
  */
 void* NewsManager::downloadNews(void *obj)
 {
+    VS::setThreadName("downloadNews");
     NewsManager *me = (NewsManager*)obj;
     me->clearErrorMessage();
 

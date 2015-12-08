@@ -32,6 +32,7 @@
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
+#include "utils/vs.hpp"
 
 #include <string.h>
 #if defined(WIN32)
@@ -452,6 +453,7 @@ bool STKHost::isAuthorisedToControl(const STKPeer *peer) const
  */
 void* STKHost::mainLoop(void* self)
 {
+    VS::setThreadName("STKHost");
     ENetEvent event;
     STKHost* myself = (STKHost*)(self);
     ENetHost* host = myself->m_network->getENetHost();

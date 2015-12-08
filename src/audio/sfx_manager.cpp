@@ -24,6 +24,7 @@
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
+#include "utils/vs.hpp"
 
 #include <pthread.h>
 #include <stdexcept>
@@ -295,6 +296,7 @@ void SFXManager::stopThread()
  */
 void* SFXManager::mainLoop(void *obj)
 {
+    VS::setThreadName("SFXManager");
     SFXManager *me = (SFXManager*)obj;
 
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
