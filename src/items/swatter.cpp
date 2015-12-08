@@ -59,7 +59,10 @@ Swatter::Swatter(AbstractKart *kart, bool was_bomb,
        : AttachmentPlugin(kart)
 {
     m_animation_phase  = SWATTER_AIMING;
+    m_discard_now      = false;
+    m_discard_timeout  = 0.0f;
     m_target           = NULL;
+    m_closest_kart     = NULL;
     m_removing_bomb    = was_bomb;
     m_bomb_scene_node  = bomb_scene_node;
     m_swat_bomb_frame  = 0.0f;
@@ -112,95 +115,106 @@ Swatter::~Swatter()
  */
 bool Swatter::updateAndTestFinished(float dt)
 {
-    bool discard_now = false;
-    if (m_removing_bomb)
+    if (!m_discard_now)
     {
-        m_swat_bomb_frame += dt*25.0f;
-        m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
-
-        m_scene_node->setCurrentFrame(m_swat_bomb_frame);
-
-        if (m_swat_bomb_frame >= 32.5f && m_bomb_scene_node != NULL)
+        if (m_removing_bomb)
         {
-            m_bomb_scene_node->setPosition(m_bomb_scene_node->getPosition() +
-                                      core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
-            m_bomb_scene_node->setRotation(m_bomb_scene_node->getRotation() +
-                                      core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
-        }
+            m_swat_bomb_frame += dt*25.0f;
+            m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
 
-        if (m_swat_bomb_frame >= m_scene_node->getEndFrame())
-        {
-            return true;
-        }
-        else if (m_swat_bomb_frame >= 35)
-        {
-            if (m_bomb_scene_node != NULL)
+            m_scene_node->setCurrentFrame(m_swat_bomb_frame);
+
+            if (m_swat_bomb_frame >= 32.5f && m_bomb_scene_node != NULL)
             {
-                irr_driver->removeNode(m_bomb_scene_node);
-                m_bomb_scene_node = NULL;
+                m_bomb_scene_node->setPosition(m_bomb_scene_node
+                    ->getPosition() + core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
+                m_bomb_scene_node->setRotation(m_bomb_scene_node
+                    ->getRotation() + core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
             }
-        }   // bom_frame > 35
 
-        return false;
-    }   // if removing bomb
-
-    switch(m_animation_phase)
-    {
-    case SWATTER_AIMING:
-        {
-            chooseTarget();
-            pointToTarget();
-            if(!m_target) break;
-
-            // Is the target too near?
-            float dist_to_target2 =
-                (m_target->getXYZ()- Vec3(m_scene_node->getAbsolutePosition()))
-                .length2();
-            float min_dist2
-                 = m_kart->getKartProperties()->getSwatterDistance();
-            if(dist_to_target2 < min_dist2)
+            if (m_swat_bomb_frame >= m_scene_node->getEndFrame())
             {
-                // Start squashing
-                m_animation_phase = SWATTER_TO_TARGET;
-
-                // Setup the animation
-                m_scene_node->setCurrentFrame(0.0f);
-                m_scene_node->setLoopMode(false);
-                m_scene_node->setAnimationSpeed(SWATTER_ANIMATION_SPEED);
+                return true;
             }
-        }
-        break;
-    case SWATTER_TO_TARGET:
-        {
-            pointToTarget();
-
-            const float middle_frame    = m_scene_node->getEndFrame()/2.0f;
-            float       current_frame   = m_scene_node->getFrameNr();
-
-            // Did we just finish the first part of the movement?
-            if(current_frame >= middle_frame)
+            else if (m_swat_bomb_frame >= 35)
             {
-                // Squash the karts and items around and
-                // change the current phase
-                if (squashThingsAround() &&
-                    race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+                if (m_bomb_scene_node != NULL)
                 {
-                    //Remove swatter from kart in 3 strikes battle after one successful hit
-                    discard_now = true;
+                    irr_driver->removeNode(m_bomb_scene_node);
+                    m_bomb_scene_node = NULL;
                 }
-                m_animation_phase = SWATTER_FROM_TARGET;
+            }   // bom_frame > 35
+
+            return false;
+        }   // if removing bomb
+
+        switch(m_animation_phase)
+        {
+        case SWATTER_AIMING:
+            {
+                chooseTarget();
+                pointToTarget();
+                if(!m_target || !m_closest_kart) break;
+
+                // Get the node corresponding to the joint at the center of the
+                // swatter (by swatter, I mean the thing hold in the hand, not
+                // the whole thing)
+                scene::ISceneNode* swatter_node =
+                    m_scene_node->getJointNode("Swatter");
+                assert(swatter_node);
+                Vec3 swatter_pos = swatter_node->getAbsolutePosition();
+                float dist2 = (m_closest_kart->getXYZ()-swatter_pos).length2();
+                float min_dist2
+                     = m_kart->getKartProperties()->getSwatterDistance();
+
+                if(dist2 < min_dist2)
+                {
+                    // Start squashing
+                    m_animation_phase = SWATTER_TO_TARGET;
+
+                    // Setup the animation
+                    m_scene_node->setCurrentFrame(0.0f);
+                    m_scene_node->setLoopMode(false);
+                    m_scene_node->setAnimationSpeed(SWATTER_ANIMATION_SPEED);
+
+                    // Play swat sound
+                    m_swat_sound->setPosition(swatter_pos);
+                    m_swat_sound->play();
+                }
             }
+            break;
+        case SWATTER_TO_TARGET:
+            {
+                pointToTarget();
+                const float middle_frame    = m_scene_node->getEndFrame()/2.0f;
+                float       current_frame   = m_scene_node->getFrameNr();
+
+                // Did we just finish the first part of the movement?
+                if(current_frame >= middle_frame)
+                {
+                    // Squash the karts and items around and
+                    // change the current phase
+                    squashThingsAround();
+                    m_animation_phase = SWATTER_FROM_TARGET;
+                    if (race_manager->getMinorMode()==
+                        RaceManager::MINOR_MODE_3_STRIKES)
+                    {
+                        // Remove swatter from kart in 3 strikes battle
+                        // after one successful hit
+                        m_discard_now = true;
+                    }
+                }
+            }
+            break;
+
+        case SWATTER_FROM_TARGET:
+            break;
         }
-        break;
-
-    case SWATTER_FROM_TARGET:
-        break;
     }
+    else
+        m_discard_timeout += dt;
 
-    // If the swatter is used up, trigger cleaning up
-    // TODO: use a timeout
-    // TODO: how does it work currently...?
-    return (discard_now ? true : false);
+    return (m_discard_now && m_discard_timeout > 0.5f ? true : false);
 }   // updateAndTestFinished
 
 // ----------------------------------------------------------------------------
@@ -240,6 +254,7 @@ void Swatter::chooseTarget()
         }
     }
     m_target = closest_kart;    // may be NULL
+    m_closest_kart = closest_kart;
 }
 
 // ----------------------------------------------------------------------------
@@ -267,64 +282,33 @@ void Swatter::pointToTarget()
 // ----------------------------------------------------------------------------
 /** Squash karts or items that are around the end position (determined using
  *  a joint) of the swatter.
- *  \return True if target kart is hit.
  */
-bool Swatter::squashThingsAround()
+void Swatter::squashThingsAround()
 {
     const KartProperties *kp = m_kart->getKartProperties();
-    // Square of the minimum distance
-    float                  min_dist2 = kp->getSwatterDistance();
-    const World*           world     = World::getWorld();
 
-    // Get the node corresponding to the joint at the center of the swatter
-    // (by swatter, I mean the thing hold in the hand, not the whole thing)
-    scene::ISceneNode* swatter_node = m_scene_node->getJointNode("Swatter");
-    assert(swatter_node);
-    Vec3 swatter_pos = swatter_node->getAbsolutePosition();
+    m_closest_kart->setSquash(kp->getSwatterSquashDuration(),
+        kp->getSwatterSquashSlowdown());
 
-    m_swat_sound->setPosition(swatter_pos);
-    m_swat_sound->play();
-    bool target_is_hit = false;
-
-    // Squash karts around
-    for(unsigned int i = 0; i < world->getNumKarts(); i++)
+    //Handle achievement if the swatter is used by the current player
+    const StateManager::ActivePlayer *const ap = m_kart->getController()
+        ->getPlayer();
+    if (ap && ap->getConstProfile() == PlayerManager::getCurrentPlayer())
     {
-        AbstractKart *kart = world->getKart(i);
-        // TODO: isSwatterReady()
-        if(kart->isEliminated() || kart==m_kart)
-            continue;
-        // don't swat an already hurt kart
-        if (kart->isInvulnerable() || kart->isSquashed())
-            continue;
+        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MOSQUITO,
+            "swatter", 1);
+    }
 
-        float dist2 = (kart->getXYZ()-swatter_pos).length2();
-
-        if(dist2 >= min_dist2) continue;   // too far away, ignore this kart
-
-        kart->setSquash(kp->getSwatterSquashDuration(), kp->getSwatterSquashSlowdown());
-        target_is_hit = true;
-
-        //Handle achievement if the swatter is used by the current player
-        const StateManager::ActivePlayer *const ap = m_kart->getController()
-            ->getPlayer();
-        if (ap && ap->getConstProfile() == PlayerManager::getCurrentPlayer())
-        {
-            PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MOSQUITO,
-                "swatter", 1);
-        }
-
-        if (kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
-        {   // make bomb explode
-            kart->getAttachment()->update(10000);
-            HitEffect *he = new Explosion(m_kart->getXYZ(),  "explosion", "explosion.xml");
-            if(m_kart->getController()->isPlayerController())
-                he->setPlayerKartHit();
-            projectile_manager->addHitEffect(he);
-            ExplosionAnimation::create(kart);
-        }   // if kart has bomb attached
-        World::getWorld()->kartHit(kart->getWorldKartId());
-    }   // for i < num_kartrs
-    return target_is_hit;
+    if (m_closest_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
+    {   // make bomb explode
+        m_closest_kart->getAttachment()->update(10000);
+        HitEffect *he = new Explosion(m_kart->getXYZ(),  "explosion", "explosion.xml");
+        if(m_kart->getController()->isPlayerController())
+            he->setPlayerKartHit();
+        projectile_manager->addHitEffect(he);
+        ExplosionAnimation::create(m_closest_kart);
+    }   // if kart has bomb attached
+    World::getWorld()->kartHit(m_closest_kart->getWorldKartId());
 
     // TODO: squash items
 }   // squashThingsAround

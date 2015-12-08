@@ -61,6 +61,9 @@ private:
     int m_closest_kart_node;
     Vec3 m_closest_kart_point;
 
+    /** Pointer to the closest kart around this kart. */
+    AbstractKart *m_closest_kart;
+
     posData m_closest_kart_pos_data;
     posData m_cur_kart_pos_data;
 
@@ -70,10 +73,6 @@ private:
    /** Indicates that the kart is currently stuck, and m_time_since_reversing is
      * counting down. */
     bool m_is_stuck;
-
-   /** Indicates that the steering of kart is overridden, and
-     * m_time_since_steering_overridden is counting down. */
-    bool m_is_steering_overridden;
 
     /** Indicates that the kart need a uturn to reach a node behind, and
      *  m_time_since_uturn is counting down. */
@@ -107,9 +106,6 @@ private:
 
     /** This is a timer that counts down when the kart is starting to drive. */
     float m_time_since_driving;
-
-    /** This is a timer that counts down when the steering of kart is overridden. */
-    float m_time_since_steering_overridden;
 
     /** This is a timer that counts down when the kart is doing u-turn. */
     float m_time_since_uturn;

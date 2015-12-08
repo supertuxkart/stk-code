@@ -98,18 +98,17 @@ void BattleAI::reset()
 {
     m_current_node = BattleGraph::UNKNOWN_POLY;
     m_target_node = BattleGraph::UNKNOWN_POLY;
+    m_closest_kart = NULL;
     m_closest_kart_node = BattleGraph::UNKNOWN_POLY;
     m_closest_kart_point = Vec3(0, 0, 0);
     m_closest_kart_pos_data = {0};
     m_cur_kart_pos_data = {0};
     m_is_stuck = false;
     m_is_uturn = false;
-    m_is_steering_overridden = false;
     m_target_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
     m_time_since_reversing = 0.0f;
-    m_time_since_steering_overridden = 0.0f;
     m_time_since_uturn = 0.0f;
     m_on_node.clear();
     m_path_corners.clear();
@@ -166,7 +165,6 @@ void BattleAI::update(float dt)
     findClosestKart(true);
     findTarget();
     handleItems(dt);
-    handleSwatter();
 
     if (m_kart->getSpeed() > 15.0f && m_cur_kart_pos_data.angle < 0.2f)
     {
@@ -308,22 +306,17 @@ void BattleAI::findClosestKart(bool difficulty)
     }
 
     if (!difficulty)
+    {
+        m_closest_kart = m_world->getKart(closest_kart_num);
         checkPosition(m_closest_kart_point, &m_closest_kart_pos_data);
+    }
 }   // findClosestKart
 
 //-----------------------------------------------------------------------------
 void BattleAI::findTarget()
 {
-    // Don't try to hit a player continuously with swatter for easy and medium
-    // mode, which make it too aggressive
-    const bool continuous_swatter =
-        m_kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER   &&
-        (m_cur_difficulty                  == RaceManager::DIFFICULTY_HARD ||
-         m_cur_difficulty                  == RaceManager::DIFFICULTY_BEST);
-
     // Find a suitable target to drive to, either powerup or kart
-    if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING &&
-        !continuous_swatter)
+    if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING)
         handleItemCollection(&m_target_point , &m_target_node);
     else
     {
@@ -389,19 +382,6 @@ void BattleAI::handleSteering(const float dt)
     if (m_current_node == BattleGraph::UNKNOWN_POLY ||
         m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
-    if (m_is_steering_overridden)
-    {
-        // Steering is overridden to avoid collision with the target kart
-        m_time_since_steering_overridden += dt;
-        setSteering(-1.0f, dt);
-        if (m_time_since_steering_overridden > 0.5f)
-        {
-            m_is_steering_overridden = false;
-            m_time_since_steering_overridden = 0.0f;
-        }
-        return;
-    }
-
     if (m_target_node == m_current_node)
     {
         // Very close to the item, steer directly
@@ -451,27 +431,6 @@ void BattleAI::handleSteering(const float dt)
         return;
     }
 }   // handleSteering
-
-//-----------------------------------------------------------------------------
-/** Make AI avoid collison with target as much as possible when attacking with
- *  swatter.
- */
-void BattleAI::handleSwatter()
-{
-    if (m_is_steering_overridden) return;
-
-    if (m_kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER)
-    {
-        findClosestKart(false);
-        if (m_closest_kart_pos_data.angle < 0.25f &&
-            m_closest_kart_pos_data.distance < 5.0f)
-        {
-            // Check whether it's straight ahead towards target
-            m_is_steering_overridden = true;
-        }
-    }
-
-}   // handleSwatter
 
 //-----------------------------------------------------------------------------
 /** This function finds the polyon edges(portals) that the AI will cross before
@@ -632,18 +591,6 @@ void BattleAI::handleBraking()
 {
     m_controls->m_brake = false;
 
-    if (m_is_steering_overridden && m_kart->getSpeed() > 10.0f)
-    {
-        // Hard-brake for too fast
-        if (m_kart->getSpeed() > 15.0f)
-        {
-            m_controls->m_accel = -12.5f;
-            return;
-        }
-        m_controls->m_brake = true;
-        return;
-    }
-
     // A kart will not brake when the speed is already slower than this
     // value. This prevents a kart from going too slow (or even backwards)
     // in tight curves.
@@ -741,6 +688,9 @@ void BattleAI::handleItems(const float dt)
 
     // Find a closest kart again, this time we ignore difficulty
     findClosestKart(false);
+
+    if (!m_closest_kart) return;
+
     m_time_since_last_shot += dt;
 
     float min_bubble_time = 2.0f;
@@ -797,7 +747,8 @@ void BattleAI::handleItems(const float dt)
             // Leave some time between shots
             if (m_time_since_last_shot < 1.0f) break;
 
-            if (m_closest_kart_pos_data.distance < 25.0f)
+            if (m_closest_kart_pos_data.distance < 25.0f &&
+                !m_closest_kart->isInvulnerable())
             {
                 m_controls->m_fire      = true;
                 m_controls->m_look_back = fire_behind;
@@ -829,11 +780,15 @@ void BattleAI::handleItems(const float dt)
 
     case PowerupManager::POWERUP_SWATTER:
         {
+            // Squared distance for which the swatter works
+            float d2 = m_kart->getKartProperties()->getSwatterDistance();
             // if the kart has a shield, do not break it by using a swatter.
-            if(m_kart->getShieldTime() > min_bubble_time)
+            if (m_kart->getShieldTime() > min_bubble_time)
                 break;
 
-            if (m_closest_kart_pos_data.distance < 7.0f)
+            if (!m_closest_kart->isSquashed()          &&
+                 m_closest_kart_pos_data.distance < d2 &&
+                 m_closest_kart->getSpeed() < m_kart->getSpeed())
             {
                 m_controls->m_fire      = true;
                 m_controls->m_look_back = false;
