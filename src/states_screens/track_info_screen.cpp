@@ -170,6 +170,11 @@ void TrackInfoScreen::init()
         {
             m_ai_kart_spinner->setMin(3-race_manager->getNumLocalPlayers());
         }
+        // Make sure in battle mode at least 1 ai for single player
+        else if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
+            race_manager->getNumLocalPlayers() == 1 &&
+            !UserConfigParams::m_artist_debug_mode)
+            m_ai_kart_spinner->setMin(1);
         else
             m_ai_kart_spinner->setMin(0);
 
@@ -291,7 +296,14 @@ void TrackInfoScreen::onEnterPressedInternal()
     race_manager->setReverseTrack(reverse_track);
 
     // Avoid invaild Ai karts number during switching game modes
-    const int num_ai = m_ai_kart_spinner->getValue();
+    const bool has_AI =
+        (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ?
+         m_track->hasNavMesh() : race_manager->hasAI());
+
+    int num_ai = 0;
+    if (has_AI)
+       num_ai = m_ai_kart_spinner->getValue();
+
     if (UserConfigParams::m_num_karts != (signed)(race_manager
         ->getNumLocalPlayers() + num_ai))
     {
