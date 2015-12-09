@@ -316,7 +316,8 @@ void BattleAI::findClosestKart(bool difficulty)
 void BattleAI::findTarget()
 {
     // Find a suitable target to drive to, either powerup or kart
-    if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING)
+    if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING &&
+        m_kart->getAttachment()->getType() != Attachment::ATTACH_SWATTER)
         handleItemCollection(&m_target_point , &m_target_node);
     else
     {
@@ -699,7 +700,7 @@ void BattleAI::handleItems(const float dt)
 
     const bool fire_behind = m_closest_kart_pos_data.behind && !difficulty;
 
-    const bool perfect_aim = m_closest_kart_pos_data.angle < 0.5f;
+    const bool perfect_aim = m_closest_kart_pos_data.angle < 0.2f;
 
     switch(m_kart->getPowerup()->getType())
     {
@@ -767,7 +768,7 @@ void BattleAI::handleItems(const float dt)
             // Leave some time between shots
             if (m_time_since_last_shot < 1.0f) break;
 
-            if (m_closest_kart_pos_data.distance < 5.0f &&
+            if (m_closest_kart_pos_data.distance < 6.0f &&
                 (difficulty || perfect_aim))
             {
                 m_controls->m_fire      = true;
@@ -833,12 +834,12 @@ void BattleAI::handleItemCollection(Vec3* aim_point, int* target_node)
     float distance = 99999.9f;
     const std::vector< std::pair<Item*, int> >& item_list =
         BattleGraph::get()->getItemList();
-    unsigned int items_count = item_list.size();
+    const unsigned int items_count = item_list.size();
     unsigned int closest_item_num = 0;
 
     for (unsigned int i = 0; i < items_count; ++i)
     {
-        Item* item = item_list[i].first;
+        const Item* item = item_list[i].first;
 
         if (item->wasCollected()) continue;
 
@@ -859,7 +860,18 @@ void BattleAI::handleItemCollection(Vec3* aim_point, int* target_node)
         }
     }
 
-    m_item_to_collect = item_list[closest_item_num].first;
-    *aim_point = (item_list[closest_item_num].first)->getXYZ();
-    *target_node = item_list[closest_item_num].second;
+    const Item *item_selected = item_list[closest_item_num].first;
+    if (item_selected->getType() == Item::ITEM_BONUS_BOX ||
+        item_selected->getType() == Item::ITEM_NITRO_BIG ||
+        item_selected->getType() == Item::ITEM_NITRO_SMALL)
+    {
+        *aim_point = item_selected->getXYZ();
+        *target_node = item_list[closest_item_num].second;
+    }
+    else
+    {
+        // Handle when all targets are swapped, which make AIs follow karts
+        *aim_point = m_closest_kart_point;
+        *target_node = m_closest_kart_node;
+    }
 }   // handleItemCollection

@@ -78,8 +78,6 @@ private:
      *  m_time_since_uturn is counting down. */
     bool m_is_uturn;
 
-    const Item *m_item_to_collect;
-
     /** Holds the unique node ai has driven through, useful to tell if AI is
      *  stuck by determine the size of this set. */
     std::set <int> m_on_node;
