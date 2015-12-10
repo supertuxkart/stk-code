@@ -449,6 +449,7 @@ void IrrDriver::initDevice()
             params.WindowSize    =
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
+            params.HandleSRGB    = true;
 
             /*
             switch ((int)UserConfigParams::m_antialiasing)
