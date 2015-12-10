@@ -817,7 +817,8 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
     }
 }
 
-void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
+// ----------------------------------------------------------------------------
+void KartSelectionScreen::updateKartWidgetModel(int widget_id,
                 const std::string& selection,
                 const irr::core::stringw& selectionText)
 {

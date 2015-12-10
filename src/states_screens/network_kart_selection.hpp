@@ -33,11 +33,11 @@ protected:
     virtual ~NetworkKartSelectionScreen();
 
     virtual void playerConfirm(const int playerID);
-    void considerKartHovered(uint8_t widget_id, std::string selection);
 public:
     virtual void init() OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
-    virtual void playerSelected(uint8_t race_id, const std::string &kart_name);
+    virtual void playerSelected(uint8_t player_id,
+                                const std::string &kart_name);
 };
 
 #endif // NETWORK_KART_SELECTION_HPP

@@ -144,7 +144,7 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
 void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
                                                 const std::string &kart_name)
 {
-    uint8_t widget_id = -1;
+    int widget_id = -1;
     for (unsigned int i = 0; i < m_id_mapping.size(); i++)
     {
         Log::info("NKSS", "Checking race id %d : mapped of %d is %d",
@@ -153,7 +153,10 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
             widget_id = i;
     }
 
-    assert(widget_id>=0 && widget_id < m_kart_widgets.size());
+    // This selection was for a remote kart, which is not shown
+    // Just ignore it.
+    if(widget_id==-1)
+        return;
 
     KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name,
                                        irr::core::stringw(kart_name.c_str()));
