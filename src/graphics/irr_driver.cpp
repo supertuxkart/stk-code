@@ -346,6 +346,8 @@ void IrrDriver::createListOfVideoModes()
  */
 void IrrDriver::initDevice()
 {
+    SIrrlichtCreationParameters params;
+    
     // If --no-graphics option was used, the null device can still be used.
     if (!ProfileWorld::isNoGraphics())
     {
@@ -428,7 +430,6 @@ void IrrDriver::initDevice()
         m_device->drop();
         m_device  = NULL;
 
-        SIrrlichtCreationParameters params;
         params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device || 
             UserConfigParams::m_gamepad_visualisation);
 
@@ -450,7 +451,7 @@ void IrrDriver::initDevice()
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
             params.HandleSRGB    = true;
-
+            
             /*
             switch ((int)UserConfigParams::m_antialiasing)
             {
@@ -508,6 +509,28 @@ void IrrDriver::initDevice()
     {
         Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
     }
+    
+    CVS->init();
+    
+    // This is the ugly hack for intel driver on linux, which doesn't
+    // use sRGB-capable visual, even if we request it. This causes
+    // the screen to be darker than expected. Setting WithAlphaChannel
+    // to true forces using the proper format on mesa side.
+    if (!ProfileWorld::isNoGraphics() && GraphicsRestrictions::isDisabled(
+                            GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_CAPABLE))
+    {
+        m_device->closeDevice();
+        m_device->drop();
+
+        params.WithAlphaChannel = true;
+        
+        m_device = createDeviceEx(params);
+        
+        if(!m_device)
+        {
+            Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
+        }
+    }
 
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
@@ -515,8 +538,6 @@ void IrrDriver::initDevice()
     m_sync = 0;
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
-
-    CVS->init();
 
     m_spherical_harmonics = new SphericalHarmonics(m_scene_manager->getAmbientLight().toSColor());
 
