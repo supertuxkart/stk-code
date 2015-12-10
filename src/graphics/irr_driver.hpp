@@ -544,45 +544,49 @@ public:
         m_boundingboxesviz = false;
     }
     // ------------------------------------------------------------------------
-    void toggleWireframe() { m_renderer->toggleWireframe(); }
+    void toggleWireframe()        { m_wireframe = !m_wireframe;     }
     // ------------------------------------------------------------------------
-    void toggleMipVisualization() { m_renderer->toggleMipVisualization(); }
+    bool getWireframe()           { return m_wireframe;             }
     // ------------------------------------------------------------------------
-    void toggleNormals() { m_normals = !m_normals; }
+    void toggleMipVisualization() { m_mipviz = !m_mipviz;           }
     // ------------------------------------------------------------------------
-    bool getNormals() { return m_normals; }
+    bool getMipViz()              { return m_mipviz;                }
+    // ------------------------------------------------------------------------    
+    void toggleNormals()          { m_normals = !m_normals;         }
     // ------------------------------------------------------------------------
-    void toggleSSAOViz() { m_ssaoviz = !m_ssaoviz; }
+    bool getNormals()             { return m_normals;               }
     // ------------------------------------------------------------------------
-    void toggleLightViz() { m_lightviz = !m_lightviz; }
+    void toggleSSAOViz()          { m_ssaoviz = !m_ssaoviz;         }
     // ------------------------------------------------------------------------
-    bool getLightViz() { return m_lightviz; }
+    void toggleLightViz()         { m_lightviz = !m_lightviz;       }
     // ------------------------------------------------------------------------
-    bool getSSAOViz() { return m_ssaoviz; }
+    bool getLightViz()            { return m_lightviz;              }
     // ------------------------------------------------------------------------
-    void toggleRSM() { m_rsm = !m_rsm; }
+    bool getSSAOViz()             { return m_ssaoviz;               }
     // ------------------------------------------------------------------------
-    bool getRSM() { return m_rsm; }
+    void toggleRSM()              { m_rsm = !m_rsm;                 }
     // ------------------------------------------------------------------------
-    void toggleRH() { m_rh = !m_rh; }
+    bool getRSM()                 { return m_rsm;                   }
     // ------------------------------------------------------------------------
-    bool getRH() { return m_rh; }
+    void toggleRH()               { m_rh = !m_rh;                   }
     // ------------------------------------------------------------------------
-    void toggleGI() { m_gi = !m_gi; }
+    bool getRH()                  { return m_rh;                    }
     // ------------------------------------------------------------------------
-    bool getGI() { return m_gi; }
+    void toggleGI()               { m_gi = !m_gi;                   }
     // ------------------------------------------------------------------------
-    void toggleShadowViz() { m_shadowviz = !m_shadowviz; }
+    bool getGI()                  { return m_gi;                    }
     // ------------------------------------------------------------------------
-    bool getShadowViz() { return m_shadowviz; }
+    void toggleShadowViz()        { m_shadowviz = !m_shadowviz;     }
     // ------------------------------------------------------------------------
-    void toggleDistortViz() { m_distortviz = !m_distortviz; }
+    bool getShadowViz()           { return m_shadowviz;             }
     // ------------------------------------------------------------------------
-    bool getDistortViz() { return m_distortviz; }
+    void toggleDistortViz()       { m_distortviz = !m_distortviz;   }
+    // ------------------------------------------------------------------------
+    bool getDistortViz()          { return m_distortviz;            }
     // ------------------------------------------------------------------------
     void toggleBoundingBoxesViz() { m_boundingboxesviz = !m_boundingboxesviz; }
     // ------------------------------------------------------------------------
-    bool getBoundingBoxesViz() { return m_boundingboxesviz; }
+    bool getBoundingBoxesViz()    { return m_boundingboxesviz;      }
     // ------------------------------------------------------------------------
     u32 getRenderPass() { return m_renderpass; }
     // ------------------------------------------------------------------------

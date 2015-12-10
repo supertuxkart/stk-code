@@ -69,12 +69,12 @@ void ShaderBasedRenderer::setOverrideMaterial()
     overridemat.EnablePasses = scene::ESNRP_SOLID | scene::ESNRP_TRANSPARENT;
     overridemat.EnableFlags = 0;
 
-    if (m_wireframe)
+    if (irr_driver->getWireframe())
     {
         overridemat.Material.Wireframe = 1;
         overridemat.EnableFlags |= video::EMF_WIREFRAME;
     }
-    if (m_mipviz)
+    if (irr_driver->getMipViz())
     {
         overridemat.Material.MaterialType = Shaders::getShader(ES_MIPVIZ);
         overridemat.EnableFlags |= video::EMF_MATERIAL_TYPE;
@@ -157,6 +157,37 @@ void ShaderBasedRenderer::updateLightsInfo(scene::ICameraSceneNode * const camno
 }
 
 // ----------------------------------------------------------------------------
+/** Upload lighting info to the dedicated uniform buffer
+ */
+void ShaderBasedRenderer::uploadLightingData() const
+{
+    float Lighting[36];
+    
+    core::vector3df sun_direction = irr_driver->getSunDirection();
+    video::SColorf sun_color = irr_driver->getSunColor();
+
+    Lighting[0] = sun_direction.X;
+    Lighting[1] = sun_direction.Y;
+    Lighting[2] = sun_direction.Z;
+    Lighting[4] = sun_color.getRed();
+    Lighting[5] = sun_color.getGreen();
+    Lighting[6] = sun_color.getBlue();
+    Lighting[7] = 0.54f;
+
+    const SHCoefficients* sh_coeff = irr_driver->getSHCoefficients();
+
+    if(sh_coeff) {
+        memcpy(&Lighting[8], sh_coeff->blue_SH_coeff, 9 * sizeof(float));
+        memcpy(&Lighting[17], sh_coeff->green_SH_coeff, 9 * sizeof(float));
+        memcpy(&Lighting[26], sh_coeff->red_SH_coeff, 9 * sizeof(float));
+    }
+
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getLightingDataUBO());
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 36 * sizeof(float), Lighting);
+}   // uploadLightingData
+
+
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
                                                     size_t width, size_t height)
 {
@@ -173,6 +204,22 @@ void ShaderBasedRenderer::renderSkybox(const scene::ICameraSceneNode *camera) co
     }
 }   // renderSkybox
 
+// ============================================================================
+void ShaderBasedRenderer::renderSSAO() const
+{
+    RTT *rtts = irr_driver->getRTT();
+    rtts->getFBO(FBO_SSAO).bind();
+    glClearColor(1., 1., 1., 1.);
+    glClear(GL_COLOR_BUFFER_BIT);
+    irr_driver->getPostProcessing()->renderSSAO();
+    // Blur it to reduce noise.
+    FrameBuffer::Blit(rtts->getFBO(FBO_SSAO),
+                      rtts->getFBO(FBO_HALF1_R), 
+                      GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    irr_driver->getPostProcessing()->renderGaussian17TapBlur(irr_driver->getFBO(FBO_HALF1_R), 
+                                                             irr_driver->getFBO(FBO_HALF2_R));
+
+}   // renderSSAO
 
 // ============================================================================
 void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
@@ -290,7 +337,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         PROFILER_PUSH_CPU_MARKER("- SSAO", 0xFF, 0xFF, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SSAO));
         if (UserConfigParams::m_ssao)
-            irr_driver->renderSSAO();
+            renderSSAO();
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -375,7 +422,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
 
     PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
     // Render anything glowing.
-    if (!m_mipviz && !m_wireframe && UserConfigParams::m_glow)
+    if (!irr_driver->getWireframe() && !irr_driver->getMipViz() && UserConfigParams::m_glow)
     {
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GLOW));
         irr_driver->setPhase(GLOW_PASS);
@@ -652,7 +699,7 @@ void ShaderBasedRenderer::render(float dt)
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         computeMatrixesAndCameras(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         m_shadow_matrices.updateSunOrthoMatrices();
-        irr_driver->uploadLightingData(); //TODO: move method; update "global" lighting (sun and spherical harmonics)
+        uploadLightingData();
         PROFILER_POP_CPU_MARKER();
         renderScene(camnode, dt, track->hasShadows(), false); 
         

@@ -33,8 +33,8 @@ class AbstractRenderer
 protected:
     irr::core::vector2df m_current_screen_size;
     
-    bool                 m_wireframe;
-    bool                 m_mipviz;
+    //bool                 m_wireframe;
+    //bool                 m_mipviz;
 
 #ifdef DEBUG
     void drawDebugMeshes() const;
@@ -48,7 +48,6 @@ protected:
 
 
 public:
-    AbstractRenderer();
     virtual ~AbstractRenderer(){}
 
     virtual void addSkyBox(const std::vector<irr::video::ITexture*> &texture,
@@ -74,6 +73,7 @@ public:
                              
     virtual void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                                       float dt) = 0;
+    virtual void uploadLightingData() const {}
 
     virtual void computeMatrixesAndCameras(irr::scene::ICameraSceneNode * const camnode,
                                    size_t width, size_t height) {}
@@ -87,10 +87,11 @@ public:
         return m_current_screen_size;
     }
  
+    /*
     // ------------------------------------------------------------------------
     void toggleWireframe() { m_wireframe = !m_wireframe; }
     // ------------------------------------------------------------------------
-    void toggleMipVisualization() { m_mipviz = !m_mipviz; }
+    void toggleMipVisualization() { m_mipviz = !m_mipviz; }*/
 };
 
 #endif //HEADER_ABSTRACT_RENDERER_HPP

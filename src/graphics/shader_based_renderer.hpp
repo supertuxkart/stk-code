@@ -43,7 +43,7 @@ private:
     /** Static glowing things are loaded once per track.
      * Glowing items can appear ordisappear each frame */
     std::vector<GlowData> m_glowing;
-    int m_nb_static_glowing;
+    size_t m_nb_static_glowing;
 
     irr::core::vector3df m_wind_dir;
     
@@ -57,6 +57,8 @@ private:
     
     void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                           float dt);
+                          
+    void uploadLightingData() const override;
 
     void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
                                    size_t width, size_t height);
@@ -67,6 +69,8 @@ private:
     
     
     void prepareDrawCalls(scene::ICameraSceneNode *camnode);
+
+    void renderSSAO() const;
 
     void renderScene(irr::scene::ICameraSceneNode * const camnode,
                      float dt, bool hasShadows, bool forceRTT);
