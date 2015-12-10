@@ -39,6 +39,7 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
                                  std::string kart_group, bool multiplayer,
                                  bool display_text) : Widget(WTYPE_DIV)
 {
+    m_title_font = !multiplayer;
     m_player_id = player_id;
 
     const std::string default_kart = UserConfigParams::m_default_kart;
@@ -153,7 +154,7 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
 
     // -- sizes
     m_skill_bar_w = w;
-    m_skill_bar_h = GUIEngine::getTitleFontHeight();
+    m_skill_bar_h = (m_title_font ? GUIEngine::getTitleFontHeight() : GUIEngine::getFontHeight());
 
     // for shrinking effect
     if (h < 175)

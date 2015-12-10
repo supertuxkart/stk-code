@@ -218,6 +218,7 @@ void ArenasScreen::buildTrackList()
 
     bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     bool arenas_have_navmesh = false;
+    int skipped = 0;
 
     if (curr_group_name == ALL_ARENA_GROUPS_ID)
     {
@@ -276,7 +277,10 @@ void ArenasScreen::buildTrackList()
                   (!(curr->hasNavMesh()                  ||
                   race_manager->getNumLocalPlayers() > 1 ||
                   UserConfigParams::m_artist_debug_mode)))
+                {
+                    skipped++;
                     continue;
+                }
             }
 
             if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
@@ -291,12 +295,13 @@ void ArenasScreen::buildTrackList()
             }
         }
     }
-    if (arenas_have_navmesh || race_manager->getNumLocalPlayers() > 1 ||
-        UserConfigParams::m_artist_debug_mode)
+    if ((arenas_have_navmesh || race_manager->getNumLocalPlayers() > 1 ||
+        UserConfigParams::m_artist_debug_mode) && !skipped)
         w->addItem(_("Random Arena"), "random_track", "/gui/track_random.png");
     w->updateItemDisplay();
 
-    assert(w->getItems().size() > 0);
+    if (skipped > 0)
+        w->setText( _("%i arenas unavailable in single player", skipped) );
 }
 
 // ------------------------------------------------------------------------------------------------------

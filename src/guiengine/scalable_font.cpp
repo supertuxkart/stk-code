@@ -1002,12 +1002,12 @@ void ScalableFont::doDraw(const core::stringw& text,
 
         if (fallback[n] || m_type == T_BOLD)
         {
-            video::SColor title_colors[] = {GUIEngine::getSkin()->getColor("font::top"   ),
-                                            GUIEngine::getSkin()->getColor("font::bottom"),
-                                            GUIEngine::getSkin()->getColor("font::top"   ),
-                                            GUIEngine::getSkin()->getColor("font::bottom")
-                                           };
+            video::SColor top = GUIEngine::getSkin()->getColor("font::top");
+            video::SColor bottom = GUIEngine::getSkin()->getColor("font::bottom");
+            top.setAlpha(color.getAlpha());
+            bottom.setAlpha(color.getAlpha());
 
+            video::SColor title_colors[] = {top, bottom, top, bottom};
             if (charCollector != NULL)
             {
                 charCollector->collectChar(texture,
