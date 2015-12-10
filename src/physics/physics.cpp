@@ -28,7 +28,7 @@
 #include "items/flyable.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
-#include "karts/controller/player_controller.hpp"
+#include "karts/controller/local_player_controller.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
 #include "karts/explosion_animation.hpp"
@@ -307,7 +307,8 @@ void Physics::update(float dt)
 
                 // Check for achievements
                 AbstractKart * kart = World::getWorld()->getKart(f->getOwnerId());
-                PlayerController *c = dynamic_cast<PlayerController*>(kart->getController());
+                LocalPlayerController *c =
+                    dynamic_cast<LocalPlayerController*>(kart->getController());
 
                 // Check that it's not a kart hitting itself (this can
                 // happen at the time a flyable is shot - release too close

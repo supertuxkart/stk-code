@@ -18,8 +18,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_PLAYERKART_HPP
-#define HEADER_PLAYERKART_HPP
+#ifndef HEADER_LOCAL_PLAYER_CONTROLLER_HPP
+#define HEADER_LOCAL_PLAYER_CONTROLLER_HPP
 
 #include "karts/controller/controller.hpp"
 
@@ -33,7 +33,7 @@ class SFXBase;
   *
   * \ingroup controller
   */
-class PlayerController : public Controller
+class LocalPlayerController : public Controller
 {
 private:
     int            m_steer_val, m_steer_val_l, m_steer_val_r;
@@ -56,10 +56,10 @@ private:
 
     void           steer(float, int);
 public:
-                   PlayerController  (AbstractKart *kart,
+                   LocalPlayerController  (AbstractKart *kart,
                                       StateManager::ActivePlayer *_player,
                                       unsigned int player_index);
-                  ~PlayerController  ();
+                  ~LocalPlayerController  ();
     void           update            (float);
     void           action            (PlayerAction action, int value);
     void           handleZipper      (bool play_sound);
@@ -82,6 +82,6 @@ public:
     /** Player will always be able to get a slipstream bonus. */
     virtual bool  disableSlipstreamBonus() const { return false; }
 
-};   // PlayerController
+};   // LocalPlayerController
 
 #endif

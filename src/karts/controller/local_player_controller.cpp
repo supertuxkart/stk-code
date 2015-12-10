@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "karts/controller/player_controller.hpp"
+#include "karts/controller/local_player_controller.hpp"
 
 #include "audio/sfx_base.hpp"
 #include "config/stk_config.hpp"
@@ -49,7 +49,7 @@
  *  \param init_pos The start coordinates and heading of the kart.
  *  \param player_index  Index of the player kart.
  */
-PlayerController::PlayerController(AbstractKart *kart,
+LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player,
                                    unsigned int player_index)
                 : Controller(kart)
@@ -68,24 +68,24 @@ PlayerController::PlayerController(AbstractKart *kart,
     m_full_sound   = SFXManager::get()->createSoundSource( "energy_bar_full" );
 
     reset();
-}   // PlayerController
+}   // LocalPlayerController
 
 //-----------------------------------------------------------------------------
 /** Destructor for a player kart.
  */
-PlayerController::~PlayerController()
+LocalPlayerController::~LocalPlayerController()
 {
     m_bzzt_sound->deleteSFX();
     m_wee_sound ->deleteSFX();
     m_ugh_sound ->deleteSFX();
     m_grab_sound->deleteSFX();
     m_full_sound->deleteSFX();
-}   // ~PlayerController
+}   // ~LocalPlayerController
 
 //-----------------------------------------------------------------------------
 /** Resets the player kart for a new or restarted race.
  */
-void PlayerController::reset()
+void LocalPlayerController::reset()
 {
     m_steer_val_l  = 0;
     m_steer_val_r  = 0;
@@ -102,7 +102,7 @@ void PlayerController::reset()
  *  avoid that any keys pressed at the time the menu is opened are still
  *  considered to be pressed.
  */
-void PlayerController::resetInputState()
+void LocalPlayerController::resetInputState()
 {
     m_steer_val_l           = 0;
     m_steer_val_r           = 0;
@@ -127,7 +127,7 @@ void PlayerController::resetInputState()
  *                and if it's 0 it indicates that the corresponding button
  *                was released.
  */
-void PlayerController::action(PlayerAction action, int value)
+void LocalPlayerController::action(PlayerAction action, int value)
 {
     switch (action)
     {
@@ -235,11 +235,11 @@ void PlayerController::action(PlayerAction action, int value)
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
  */
-void PlayerController::steer(float dt, int steer_val)
+void LocalPlayerController::steer(float dt, int steer_val)
 {
     if(UserConfigParams::m_gamepad_debug)
     {
-        Log::debug("PlayerController", "steering: steer_val %d ", steer_val);
+        Log::debug("LocalPlayerController", "steering: steer_val %d ", steer_val);
         RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
         gui_base->clearAllMessages();
         gui_base->addMessage(StringUtils::insertValues(L"steer_val %i", steer_val), m_kart, 1.0f,
@@ -292,7 +292,7 @@ void PlayerController::steer(float dt, int steer_val)
     }   // no key is pressed
     if(UserConfigParams::m_gamepad_debug)
     {
-        Log::debug("PlayerController", "  set to: %f\n", m_controls->m_steer);
+        Log::debug("LocalPlayerController", "  set to: %f\n", m_controls->m_steer);
     }
 
     m_controls->m_steer = std::min(1.0f, std::max(-1.0f, m_controls->m_steer));
@@ -303,7 +303,7 @@ void PlayerController::steer(float dt, int steer_val)
 /** Callback when the skidding bonus is triggered. The player controller
  *  resets the current steering to 0, which makes the kart easier to control.
  */
-void PlayerController::skidBonusTriggered()
+void LocalPlayerController::skidBonusTriggered()
 {
     m_controls->m_steer = 0;
 }   // skidBonusTriggered
@@ -311,13 +311,13 @@ void PlayerController::skidBonusTriggered()
 //-----------------------------------------------------------------------------
 /** Updates the player kart, called once each timestep.
  */
-void PlayerController::update(float dt)
+void LocalPlayerController::update(float dt)
 {
     if (UserConfigParams::m_gamepad_debug)
     {
         // Print a dividing line so that it's easier to see which events
         // get received in which order in the one frame.
-        Log::debug("PlayerController", "irr_driver", "-------------------------------------");
+        Log::debug("LocalPlayerController", "irr_driver", "-------------------------------------");
     }
 
     // Don't do steering if it's replay. In position only replay it doesn't
@@ -410,7 +410,7 @@ void PlayerController::update(float dt)
 //-----------------------------------------------------------------------------
 /** Checks if the kart was overtaken, and if so plays a sound
 */
-void PlayerController::setPosition(int p)
+void LocalPlayerController::setPosition(int p)
 {
     if(m_kart->getPosition()<p)
     {
@@ -433,7 +433,7 @@ void PlayerController::setPosition(int p)
 /** Called when a kart finishes race.
  *  /param time Finishing time for this kart.
  d*/
-void PlayerController::finishedRace(float time)
+void LocalPlayerController::finishedRace(float time)
 {
     // This will implicitely trigger setting the first end camera to be active
     m_camera->setMode(Camera::CM_FINAL);
@@ -443,7 +443,7 @@ void PlayerController::finishedRace(float time)
 //-----------------------------------------------------------------------------
 /** Called when a kart hits or uses a zipper.
  */
-void PlayerController::handleZipper(bool play_sound)
+void LocalPlayerController::handleZipper(bool play_sound)
 {
     // Only play a zipper sound if it's not already playing, and
     // if the material has changed (to avoid machine gun effect
@@ -471,7 +471,7 @@ void PlayerController::handleZipper(bool play_sound)
  *                  let the server determine the powerup/attachment for
  *                  the clients.
  */
-void PlayerController::collectedItem(const Item &item, int add_info, float old_energy)
+void LocalPlayerController::collectedItem(const Item &item, int add_info, float old_energy)
 {
     if (old_energy < m_kart->getKartProperties()->getNitroMax() &&
         m_kart->getEnergy() == m_kart->getKartProperties()->getNitroMax())

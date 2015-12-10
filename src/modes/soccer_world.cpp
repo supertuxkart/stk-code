@@ -26,7 +26,7 @@
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
-#include "karts/controller/player_controller.hpp"
+#include "karts/controller/local_player_controller.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -409,7 +409,7 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
     switch(kart_type)
     {
     case RaceManager::KT_PLAYER:
-        controller = new PlayerController(new_kart,
+        controller = new LocalPlayerController(new_kart,
                           StateManager::get()->getActivePlayer(local_player_id),
                                          local_player_id);
         m_num_players ++;

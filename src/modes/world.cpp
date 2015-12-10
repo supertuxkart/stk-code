@@ -31,7 +31,7 @@
 #include "input/device_manager.hpp"
 #include "input/keyboard_device.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/controller/player_controller.hpp"
+#include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
 #include "karts/controller/network_player_controller.hpp"
@@ -311,7 +311,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     switch(kart_type)
     {
     case RaceManager::KT_PLAYER:
-        controller = new PlayerController(new_kart,
+        controller = new LocalPlayerController(new_kart,
                          StateManager::get()->getActivePlayer(local_player_id),
                                           local_player_id);
         m_num_players ++;
@@ -1090,7 +1090,8 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
 
         Highscores* highscores = getHighscores();
 
-        PlayerController *controller = (PlayerController*)(k->getController());
+        LocalPlayerController *controller = 
+                                  (LocalPlayerController*)(k->getController());
 
         int highscore_rank = 0;
         if (controller->getPlayer()->getProfile() != NULL) // if we have the player profile here
@@ -1230,8 +1231,8 @@ void World::unpause()
         // Note that we can not test for isPlayerController here, since
         // an EndController will also return 'isPlayerController' if the
         // kart belonged to a player.
-        PlayerController *pc =
-            dynamic_cast<PlayerController*>(m_karts[i]->getController());
+        LocalPlayerController *pc =
+            dynamic_cast<LocalPlayerController*>(m_karts[i]->getController());
         if(pc)
             pc->resetInputState();
     }
