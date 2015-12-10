@@ -805,13 +805,13 @@ bool COpenGLDriver::genericDriverInit()
 
 	Params.HandleSRGB &= ((FeatureAvailable[IRR_ARB_framebuffer_sRGB] || FeatureAvailable[IRR_EXT_framebuffer_sRGB]) &&
 		FeatureAvailable[IRR_EXT_texture_sRGB]);
-#if defined(GL_ARB_framebuffer_sRGB)
-	if (Params.HandleSRGB)
-		glEnable(GL_FRAMEBUFFER_SRGB);
-#elif defined(GL_EXT_framebuffer_sRGB)
-	if (Params.HandleSRGB)
-		glEnable(GL_FRAMEBUFFER_SRGB_EXT);
-#endif
+//#if defined(GL_ARB_framebuffer_sRGB)
+//	if (Params.HandleSRGB)
+//		glEnable(GL_FRAMEBUFFER_SRGB);
+//#elif defined(GL_EXT_framebuffer_sRGB)
+//	if (Params.HandleSRGB)
+//		glEnable(GL_FRAMEBUFFER_SRGB_EXT);
+//#endif
 
 // This is a fast replacement for NORMALIZE_NORMALS
 //	if ((Version>101) || FeatureAvailable[IRR_EXT_rescale_normal])
