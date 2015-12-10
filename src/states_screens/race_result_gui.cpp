@@ -458,15 +458,15 @@ void RaceResultGUI::determineTableLayout()
         const AbstractKart *kart = rank_world->getKartAtPosition(position);
 
         // Save a pointer to the current row_info entry
-        RowInfo *ri              = &(m_all_row_infos[position-first_position]);
-        ri->m_is_player_kart     = kart->getController()->isPlayerController();
-        ri->m_kart_name          = translations->fribidize(kart->getName());
-        ri->m_player             = ri->m_is_player_kart
-                                 ? kart->getController()->getPlayer() : NULL;
+        RowInfo *ri           = &(m_all_row_infos[position-first_position]);
+        ri->m_is_player_kart  = kart->getController()->isLocalPlayerController();
+        ri->m_kart_name       = translations->fribidize(kart->getName());
+        ri->m_player          = ri->m_is_player_kart
+                              ? kart->getController()->getPlayer() : NULL;
 
-        video::ITexture *icon    =
+        video::ITexture *icon =
             kart->getKartProperties()->getIconMaterial()->getTexture();
-        ri->m_kart_icon          = icon;
+        ri->m_kart_icon       = icon;
 
         // FTL karts will get a time assigned, they are not shown as eliminated
         if (kart->isEliminated() && 
@@ -828,7 +828,7 @@ void RaceResultGUI::determineGPLayout()
         ri->m_kart_icon      =
             kart->getKartProperties()->getIconMaterial()->getTexture();
         ri->m_kart_name      = translations->fribidize(kart->getName());
-        ri->m_is_player_kart = kart->getController()->isPlayerController();
+        ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
         ri->m_player         = ri->m_is_player_kart
                              ? kart->getController()->getPlayer() : NULL;
 

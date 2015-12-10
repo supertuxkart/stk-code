@@ -526,11 +526,11 @@ void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1         2                    3           N+3
- *       ------------------------------------------------
- *  Size | 1 |    1    |       1            |     N     |
- *  Data | 1 | race id | N (kart name size) | kart name |
- *       ------------------------------------------------
+ *  Byte 0   1           2                    3           N+3
+ *       --------------------------------------------------
+ *  Size | 1 |    1      |       1            |     N     |
+ *  Data | 1 | player id | N (kart name size) | kart name |
+ *       --------------------------------------------------
  */
 void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
 {

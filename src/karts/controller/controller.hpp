@@ -69,8 +69,14 @@ public:
     virtual void  crashed            (const AbstractKart *k) = 0;
     virtual void  crashed            (const Material *m) = 0;
     virtual void  setPosition        (int p) = 0;
+    /** This function checks if this is a local player. A local player will get 
+     *  special graphical effects enabled, has a camera, and sound effects will
+     *  be played with normal volume. */
+    virtual bool  isLocalPlayerController () const = 0;
+    /** This function checks if this player is not an AI, i.e. it is either a
+     *  a local or a remote/networked player. This is tested e.g. by the AI for
+     *  rubber-banding. */
     virtual bool  isPlayerController () const = 0;
-    virtual bool  isNetworkController() const = 0;
     virtual bool  disableSlipstreamBonus() const = 0;
     // ---------------------------------------------------------------------------
     /** Sets the controller name for this controller. */

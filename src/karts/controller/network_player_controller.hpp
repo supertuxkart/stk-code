@@ -28,8 +28,8 @@ public:
                                       float previous_energy=0);
     virtual void   skidBonusTriggered();
     virtual void   setPosition       (int p);
-    virtual bool   isPlayerController() const { return false; }
-    virtual bool   isNetworkController() const { return true; }
+    virtual bool   isPlayerController() const { return true; }
+    virtual bool   isLocalPlayerController() const { return false; }
     virtual void   reset             ();
     void           resetInputState   ();
     virtual void   finishedRace      (float time);

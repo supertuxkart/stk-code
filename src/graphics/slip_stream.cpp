@@ -441,7 +441,7 @@ void SlipStream::update(float dt)
             m_kart->getPlayerDifficulty()->getSlipstreamMinSpeed())
         {
             if(UserConfigParams::m_slipstream_debug &&
-                m_kart->getController()->isPlayerController())
+                m_kart->getController()->isLocalPlayerController())
                 m_target_kart->getSlipstream()
                               ->setDebugColor(video::SColor(255, 0, 0, 0));
 
@@ -459,7 +459,7 @@ void SlipStream::update(float dt)
         if(delta.length2_2d() > l*l)
         {
             if(UserConfigParams::m_slipstream_debug &&
-                m_kart->getController()->isPlayerController())
+                m_kart->getController()->isLocalPlayerController())
                 m_target_kart->getSlipstream()
                              ->setDebugColor(video::SColor(255, 0, 0, 128));
             continue;
@@ -472,7 +472,7 @@ void SlipStream::update(float dt)
             break;
         }
         if(UserConfigParams::m_slipstream_debug &&
-            m_kart->getController()->isPlayerController())
+            m_kart->getController()->isLocalPlayerController())
             m_target_kart->getSlipstream()
                          ->setDebugColor(video::SColor(255, 0, 0, 255));
     }   // for i < num_karts
@@ -480,7 +480,7 @@ void SlipStream::update(float dt)
     if(!is_sstreaming)
     {
         if(UserConfigParams::m_slipstream_debug &&
-            m_kart->getController()->isPlayerController())
+            m_kart->getController()->isLocalPlayerController())
             m_target_kart->getSlipstream()
                          ->setDebugColor(video::SColor(255, 255, 0, 0));
 
@@ -506,7 +506,7 @@ void SlipStream::update(float dt)
     }   // if !is_sstreaming
 
     if(UserConfigParams::m_slipstream_debug &&
-        m_kart->getController()->isPlayerController())
+        m_kart->getController()->isLocalPlayerController())
         m_target_kart->getSlipstream()->setDebugColor(video::SColor(255, 0, 255, 0));
     // Accumulate slipstream credits now
     m_slipstream_time = m_slipstream_mode==SS_NONE ? dt

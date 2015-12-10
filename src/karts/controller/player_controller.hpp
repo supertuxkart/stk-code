@@ -68,7 +68,7 @@ public:
     virtual void   skidBonusTriggered();
     virtual void   setPosition       (int p);
     virtual bool   isPlayerController() const {return true;}
-    virtual bool   isNetworkController() const { return false; }
+    virtual bool   isLocalPlayerController() const {return true;}
     virtual void   reset             ();
     void           resetInputState   ();
     virtual void   finishedRace      (float time);

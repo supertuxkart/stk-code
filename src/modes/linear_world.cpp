@@ -840,7 +840,7 @@ void LinearWorld::updateRacePosition()
  */
 void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 {
-    if (!m_karts[i]->getController()->isPlayerController()) 
+    if (!m_karts[i]->getController()->isLocalPlayerController()) 
         return;
 
     float wrongway_counter = m_karts[i]->getWrongwayCounter();

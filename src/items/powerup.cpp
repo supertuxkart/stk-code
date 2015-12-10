@@ -154,7 +154,7 @@ void  Powerup::adjustSound()
     {
         // player karts played at full volume; AI karts much dimmer
 
-        if (m_owner->getController()->isPlayerController())
+        if (m_owner->getController()->isLocalPlayerController())
         {
             m_sound_use->setVolume( 1.0f );
         }
@@ -308,7 +308,7 @@ void Powerup::use()
                 // or the kart "throwing" the anvil? Ideally it should be both.
                 // Meanwhile, don't play it near AI karts since they obviously
                 // don't hear anything
-                if(kart->getController()->isPlayerController())
+                if(kart->getController()->isLocalPlayerController())
                     m_sound_use->setPosition(kart->getXYZ());
                 else
                     m_sound_use->setPosition(m_owner->getXYZ());
@@ -341,7 +341,7 @@ void Powerup::use()
                         ->set(Attachment::ATTACH_PARACHUTE,
                               stk_config->m_parachute_time_other);
 
-                    if(kart->getController()->isPlayerController())
+                    if(kart->getController()->isLocalPlayerController())
                         player_kart = kart;
                 }
             }
@@ -350,7 +350,7 @@ void Powerup::use()
             // or the kart "throwing" the anvil? Ideally it should be both.
             // Meanwhile, don't play it near AI karts since they obviously
             // don't hear anything
-            if(m_owner->getController()->isPlayerController())
+            if(m_owner->getController()->isLocalPlayerController())
                 m_sound_use->setPosition(m_owner->getXYZ());
             else if(player_kart)
                 m_sound_use->setPosition(player_kart->getXYZ());

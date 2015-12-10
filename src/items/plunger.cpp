@@ -165,7 +165,7 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
         if(kart)
         {
             kart->blockViewWithPlunger();
-            if (kart->getController()->isPlayerController())
+            if (kart->getController()->isLocalPlayerController())
                 SFXManager::get()->quickSound("plunger");
         }
 

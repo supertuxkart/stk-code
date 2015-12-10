@@ -110,8 +110,8 @@ public:
     virtual void collectedItem(const Item &item, int add_info=-1,
                                float previous_energy=0) {};
     virtual void setPosition(int p) {};
-    virtual bool isNetworkController() const { return false; }
     virtual bool isPlayerController() const { return false; }
+    virtual bool isLocalPlayerController() const { return false; }
     virtual void action(PlayerAction action, int value) {};
     virtual void  skidBonusTriggered() {};
     virtual bool  disableSlipstreamBonus() const;

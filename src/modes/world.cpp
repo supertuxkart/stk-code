@@ -1079,9 +1079,9 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
             continue;
         }
 
-        // Only record times for player karts and only if
+        // Only record times for local player karts and only if
         // they finished the race
-        if(!m_karts[index[pos]]->getController()->isPlayerController())
+        if(!m_karts[index[pos]]->getController()->isLocalPlayerController())
             continue;
         if (!m_karts[index[pos]]->hasFinishedRace()) continue;
 
@@ -1126,8 +1126,7 @@ AbstractKart *World::getPlayerKart(unsigned int n) const
     unsigned int count=-1;
 
     for(unsigned int i=0; i<m_karts.size(); i++)
-        if(m_karts[i]->getController()->isPlayerController() ||
-            m_karts[i]->getController()->isNetworkController())
+        if(m_karts[i]->getController()->isPlayerController())
         {
             count++;
             if(count==n) return m_karts[i];
@@ -1170,7 +1169,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
         }  // for i < number of cameras
     }   // if notify_of_elimination
 
-    if(kart->getController()->isPlayerController())
+    if(kart->getController()->isLocalPlayerController())
     {
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
