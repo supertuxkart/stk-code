@@ -805,6 +805,8 @@ bool COpenGLDriver::genericDriverInit()
 
 	Params.HandleSRGB &= ((FeatureAvailable[IRR_ARB_framebuffer_sRGB] || FeatureAvailable[IRR_EXT_framebuffer_sRGB]) &&
 		FeatureAvailable[IRR_EXT_texture_sRGB]);
+		
+	glDisable(GL_FRAMEBUFFER_SRGB);
 //#if defined(GL_ARB_framebuffer_sRGB)
 //	if (Params.HandleSRGB)
 //		glEnable(GL_FRAMEBUFFER_SRGB);
