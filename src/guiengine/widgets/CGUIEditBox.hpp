@@ -137,6 +137,11 @@ using namespace gui;
 
         bool processKey(const SEvent& event);
         bool processMouse(const SEvent& event);
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+        bool processIMEEvent(const SEvent& event);
+        //! calculates the input composition position
+        core::position2di calculateICPos();
+#endif
         s32 getCursorPos(s32 x, s32 y);
 
         bool MouseMarking;
