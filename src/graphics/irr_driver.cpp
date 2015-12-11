@@ -511,14 +511,16 @@ void IrrDriver::initDevice()
     }
     
     CVS->init();
-    
+                    
     // This is the ugly hack for intel driver on linux, which doesn't
     // use sRGB-capable visual, even if we request it. This causes
-    // the screen to be darker than expected. Setting WithAlphaChannel
-    // to true forces using the proper format on mesa side.
-    if (!ProfileWorld::isNoGraphics() && GraphicsRestrictions::isDisabled(
-                            GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_CAPABLE))
+    // the screen to be darker than expected. It affects mesa 10.6 and newer. 
+    // Though we are able to force to use the proper format on mesa side by 
+    // setting WithAlphaChannel parameter.
+    if (!ProfileWorld::isNoGraphics() && CVS->needsSRGBCapableVisualWorkaround())
     {
+        Log::warn("irr_driver", "Created visual is not sRGB-capable. "
+                                "Re-creating device to workaround the issue.");
         m_device->closeDevice();
         m_device->drop();
 
