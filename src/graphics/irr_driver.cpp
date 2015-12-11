@@ -547,7 +547,7 @@ void IrrDriver::initDevice()
         (UserConfigParams::m_shadows_resolution < 512 ||
          UserConfigParams::m_shadows_resolution > 2048))
     {
-        Log::warn("IrrDriver", 
+        Log::warn("irr_driver", 
                "Invalid value for UserConfigParams::m_shadows_resolution : %i",
             (int)UserConfigParams::m_shadows_resolution);
         UserConfigParams::m_shadows_resolution = 0;
@@ -2098,7 +2098,7 @@ void IrrDriver::doScreenShot()
     video::IImage* image = m_video_driver->createScreenShot();
     if(!image)
     {
-        Log::error("IrrDriver", "Could not create screen shot.");
+        Log::error("irr_driver", "Could not create screen shot.");
         return;
     }
 
