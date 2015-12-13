@@ -59,6 +59,7 @@ namespace GraphicsRestrictions
             "HighDefinitionTextures",
             "AdvancedPipeline",
             "FramebufferSRGBWorking",
+            "FramebufferSRGBCapable",
             "GI",
         };
     }   // namespace Private

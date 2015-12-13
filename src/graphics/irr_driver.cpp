@@ -346,6 +346,8 @@ void IrrDriver::createListOfVideoModes()
  */
 void IrrDriver::initDevice()
 {
+    SIrrlichtCreationParameters params;
+    
     // If --no-graphics option was used, the null device can still be used.
     if (!ProfileWorld::isNoGraphics())
     {
@@ -428,7 +430,6 @@ void IrrDriver::initDevice()
         m_device->drop();
         m_device  = NULL;
 
-        SIrrlichtCreationParameters params;
         params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device || 
             UserConfigParams::m_gamepad_visualisation);
 
@@ -449,7 +450,8 @@ void IrrDriver::initDevice()
             params.WindowSize    =
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
-
+            params.HandleSRGB    = true;
+            
             /*
             switch ((int)UserConfigParams::m_antialiasing)
             {
@@ -507,6 +509,30 @@ void IrrDriver::initDevice()
     {
         Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
     }
+    
+    CVS->init();
+                    
+    // This is the ugly hack for intel driver on linux, which doesn't
+    // use sRGB-capable visual, even if we request it. This causes
+    // the screen to be darker than expected. It affects mesa 10.6 and newer. 
+    // Though we are able to force to use the proper format on mesa side by 
+    // setting WithAlphaChannel parameter.
+    if (!ProfileWorld::isNoGraphics() && CVS->needsSRGBCapableVisualWorkaround())
+    {
+        Log::warn("irr_driver", "Created visual is not sRGB-capable. "
+                                "Re-creating device to workaround the issue.");
+        m_device->closeDevice();
+        m_device->drop();
+
+        params.WithAlphaChannel = true;
+        
+        m_device = createDeviceEx(params);
+        
+        if(!m_device)
+        {
+            Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
+        }
+    }
 
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
@@ -515,15 +541,13 @@ void IrrDriver::initDevice()
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
 
-    CVS->init();
-
     m_spherical_harmonics = new SphericalHarmonics(m_scene_manager->getAmbientLight().toSColor());
 
     if (UserConfigParams::m_shadows_resolution != 0 &&
         (UserConfigParams::m_shadows_resolution < 512 ||
          UserConfigParams::m_shadows_resolution > 2048))
     {
-        Log::warn("IrrDriver", 
+        Log::warn("irr_driver", 
                "Invalid value for UserConfigParams::m_shadows_resolution : %i",
             (int)UserConfigParams::m_shadows_resolution);
         UserConfigParams::m_shadows_resolution = 0;
@@ -2074,7 +2098,7 @@ void IrrDriver::doScreenShot()
     video::IImage* image = m_video_driver->createScreenShot();
     if(!image)
     {
-        Log::error("IrrDriver", "Could not create screen shot.");
+        Log::error("irr_driver", "Could not create screen shot.");
         return;
     }
 

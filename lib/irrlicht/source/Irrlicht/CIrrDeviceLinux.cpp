@@ -653,11 +653,11 @@ bool CIrrDeviceLinux::createWindow()
 					GLX_SAMPLE_BUFFERS_SGIS, 1,
 					GLX_SAMPLES_SGIS, CreationParams.AntiAlias, // 18,19
 #endif
-//#ifdef GL_ARB_framebuffer_sRGB
-//					GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, CreationParams.HandleSRGB,
-//#elif defined(GL_EXT_framebuffer_sRGB)
-//					GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, CreationParams.HandleSRGB,
-//#endif
+#ifdef GLX_ARB_framebuffer_sRGB
+					GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, CreationParams.HandleSRGB,
+#elif defined(GLX_EXT_framebuffer_sRGB)
+					GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, CreationParams.HandleSRGB,
+#endif
 					GLX_STEREO, CreationParams.Stereobuffer?True:False,
 					None
 				};
@@ -804,11 +804,11 @@ bool CIrrDeviceLinux::createWindow()
 					// GLX_USE_GL, which is silently ignored by glXChooseVisual
 					CreationParams.Doublebuffer?GLX_DOUBLEBUFFER:GLX_USE_GL, // 14
 					CreationParams.Stereobuffer?GLX_STEREO:GLX_USE_GL, // 15
-//#ifdef GL_ARB_framebuffer_sRGB
-//					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB:GLX_USE_GL,
-//#elif defined(GL_EXT_framebuffer_sRGB)
-//					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT:GLX_USE_GL,
-//#endif
+#ifdef GLX_ARB_framebuffer_sRGB
+					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB:GLX_USE_GL,
+#elif defined(GLX_EXT_framebuffer_sRGB)
+					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT:GLX_USE_GL,
+#endif
 					None
 				};
 
