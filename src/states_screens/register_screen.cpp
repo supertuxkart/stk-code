@@ -84,7 +84,7 @@ void RegisterScreen::init()
     stringw username = "";
     if(m_existing_player)
     {
-        username = m_existing_player->getName();
+        username = m_existing_player->getName(true/*ignoreRTL*/);
     }
     else if (PlayerManager::get()->getNumPlayers() == 0)
     {

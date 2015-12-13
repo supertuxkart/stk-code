@@ -24,6 +24,7 @@
     double click/ctrl click: word select + drag to select whole words, triple click to select line
     optional? dragging selected text
     numerical
+    correct the mark position in RTL text, currently you can identify by highlight the text
 */
 
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
@@ -53,7 +54,11 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
     PasswordChar(L'*'), HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_CENTER),
     CurrentTextRect(0,0,1,1), FrameRect(rectangle)
 {
-    m_rtl = is_rtl;
+    //m_rtl = is_rtl;
+    m_rtl = false;
+    // FIXME quick hack to enable mark movement with keyboard and mouse for rtl language,
+    // don't know why it's disabled in the first place, because STK fail
+    // to input unicode characters before?
 
     #ifdef _DEBUG
     setDebugName("CGUIEditBox");
@@ -985,20 +990,12 @@ void CGUIEditBox::draw()
                     startPos = ml ? BrokenTextPositions[i] : 0;
                 }
 
-
-                if (m_rtl)
-                {
-                    font->draw(translations->fribidize(txtLine->c_str()), CurrentTextRect,
-                               OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
-                               false, true, &localClipRect);
-                }
-                else
-                {
-                    // draw normal text
-                    font->draw(txtLine->c_str(), CurrentTextRect,
-                        OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
-                        false, true, &localClipRect);
-                }
+                font->draw(translations->fribidize(txtLine->c_str()), CurrentTextRect,
+                           OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
+                           false, true, &localClipRect);
+                // draw with fribidize no matter what language, because in fribidize function,
+                // it will return the input pointer if (this->isRTLLanguage()) from Translations::isRTLText
+                // is false
 
                 // draw mark and marked text
                 if (focus && MarkBegin != MarkEnd && i >= hlineStart && i < hlineStart + hlineCount)

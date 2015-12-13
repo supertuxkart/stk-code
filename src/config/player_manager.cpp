@@ -269,7 +269,7 @@ void PlayerManager::save()
         if(m_current_player)
         {
             players_file << L"    <current player=\""
-                         << StringUtils::xmlEncode(m_current_player->getName()) << L"\"/>\n";
+                         << StringUtils::xmlEncode(m_current_player->getName(true/*ignoreRTL*/)) << L"\"/>\n";
         }
 
         // Save all non-guest players
@@ -327,7 +327,7 @@ void PlayerManager::enforceCurrentPlayer()
         if (!player->isGuestAccount())
         {
             Log::info("PlayerManager", "Enforcing current player '%ls'.",
-                      player->getName().c_str()           );
+                      player->getName(true/*ignoreRTL*/).c_str());
             m_current_player = player;
             return;
         }
@@ -341,7 +341,7 @@ void PlayerManager::enforceCurrentPlayer()
         if (!player->isGuestAccount())
         {
             Log::info("PlayerManager", "Enforcing current player '%s'.",
-                       player->getName().c_str());
+                       player->getName(true/*ignoreRTL*/).c_str());
             m_current_player = player;
             return;
         }
@@ -454,7 +454,7 @@ PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
 {
     for (PlayerProfile* player : m_all_players)
     {
-        if(player->getName()==name)
+        if(player->getName(true/*ignoreRTL*/)==name)
             return player;
     }
     return NULL;
