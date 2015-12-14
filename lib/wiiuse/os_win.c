@@ -42,27 +42,6 @@
 #include <hidsdi.h>
 #include <setupapi.h>
 
-#if defined(__MINGW32__) && __GNUC__ < 5
-/* this prototype is missing from the mingw headers so we must add it
-	or suffer linker errors. */
-
-#ifndef HIDAPI
-#define HIDAPI
-#endif
-
-#ifndef BOOLEAN
-#define BOOLEAN BOOL
-#endif
-
-#	ifdef __cplusplus
-extern "C" {
-#	endif
-	HIDAPI BOOLEAN NTAPI HidD_SetOutputReport(HANDLE, PVOID, ULONG);
-#	ifdef __cplusplus
-}
-#	endif
-#endif
-
 int wiiuse_os_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
 	GUID device_id;
 	HANDLE dev;
