@@ -182,9 +182,10 @@ void CentralVideoSettings::init()
         }
 
         // Check if visual is sRGB-capable
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_CAPABLE))
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_CAPABLE) &&
+            m_glsl == true)
         {
-            GLint param;
+            GLint param = GL_SRGB;
             glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT,
                               GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
             hasSRGBCapableVisual = (param == GL_SRGB);
