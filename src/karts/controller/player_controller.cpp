@@ -1,4 +1,23 @@
-#include "karts/controller/network_player_controller.hpp"
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Joerg Henrichs, Steve Baker
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+#include "karts/controller/player_controller.hpp"
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -18,7 +37,7 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
-NetworkPlayerController::NetworkPlayerController(AbstractKart *kart,
+PlayerController::PlayerController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player)
                 : Controller(kart)
 {
@@ -26,23 +45,19 @@ NetworkPlayerController::NetworkPlayerController(AbstractKart *kart,
     m_player       = player;
     m_player->setKart(kart);
     m_penalty_time = 0.0f;
-
-    reset();
-
-    Log::info("NetworkPlayerController", "New network player controller.");
-}   // NetworkPlayerController
+}   // PlayerController
 
 //-----------------------------------------------------------------------------
 /** Destructor for a player kart.
  */
-NetworkPlayerController::~NetworkPlayerController()
+PlayerController::~PlayerController()
 {
-}   // ~NetworkPlayerController
+}   // ~PlayerController
 
 //-----------------------------------------------------------------------------
 /** Resets the player kart for a new or restarted race.
  */
-void NetworkPlayerController::reset()
+void PlayerController::reset()
 {
     m_steer_val_l  = 0;
     m_steer_val_r  = 0;
@@ -58,7 +73,7 @@ void NetworkPlayerController::reset()
  *  avoid that any keys pressed at the time the menu is opened are still
  *  considered to be pressed.
  */
-void NetworkPlayerController::resetInputState()
+void PlayerController::resetInputState()
 {
     m_steer_val_l           = 0;
     m_steer_val_r           = 0;
@@ -82,7 +97,7 @@ void NetworkPlayerController::resetInputState()
  *                and if it's 0 it indicates that the corresponding button
  *                was released.
  */
-void NetworkPlayerController::action(PlayerAction action, int value)
+void PlayerController::action(PlayerAction action, int value)
 {
     switch (action)
     {
@@ -152,10 +167,8 @@ void NetworkPlayerController::action(PlayerAction action, int value)
         m_controls->m_rescue = (value!=0);
         break;
     case PA_FIRE:
-    {
         m_controls->m_fire = (value!=0);
         break;
-    }
     case PA_LOOK_BACK:
         m_controls->m_look_back = (value!=0);
         break;
@@ -163,12 +176,14 @@ void NetworkPlayerController::action(PlayerAction action, int value)
         if(value==0)
             m_controls->m_skid = KartControl::SC_NONE;
         else
+        {
             if(m_steer_val==0)
                 m_controls->m_skid = KartControl::SC_NO_DIRECTION;
             else
                 m_controls->m_skid = m_steer_val<0
                                    ? KartControl::SC_RIGHT
                                    : KartControl::SC_LEFT;
+        }
         break;
     case PA_PAUSE_RACE:
         if (value != 0) StateManager::get()->escapePressed();
@@ -182,7 +197,7 @@ void NetworkPlayerController::action(PlayerAction action, int value)
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
  */
-void NetworkPlayerController::steer(float dt, int steer_val)
+void PlayerController::steer(float dt, int steer_val)
 {
     if(stk_config->m_disable_steer_while_unskid &&
         m_controls->m_skid==KartControl::SC_NONE &&
@@ -228,10 +243,6 @@ void NetworkPlayerController::steer(float dt, int steer_val)
             if(m_controls->m_steer>0.0f) m_controls->m_steer=0.0f;
         }   // if m_controls->m_steer<=0.0f
     }   // no key is pressed
-    if(UserConfigParams::m_gamepad_debug)
-    {
-        Log::debug("PlayerController", "  set to: %f\n", m_controls->m_steer);
-    }
 
     m_controls->m_steer = std::min(1.0f, std::max(-1.0f, m_controls->m_steer));
 
@@ -241,7 +252,7 @@ void NetworkPlayerController::steer(float dt, int steer_val)
 /** Callback when the skidding bonus is triggered. The player controller
  *  resets the current steering to 0, which makes the kart easier to control.
  */
-void NetworkPlayerController::skidBonusTriggered()
+void PlayerController::skidBonusTriggered()
 {
     m_controls->m_steer = 0;
 }   // skidBonusTriggered
@@ -249,15 +260,8 @@ void NetworkPlayerController::skidBonusTriggered()
 //-----------------------------------------------------------------------------
 /** Updates the player kart, called once each timestep.
  */
-void NetworkPlayerController::update(float dt)
+void PlayerController::update(float dt)
 {
-    if (UserConfigParams::m_gamepad_debug)
-    {
-        // Print a dividing line so that it's easier to see which events
-        // get received in which order in the one frame.
-        Log::debug("PlayerController", "irr_driver", "-------------------------------------");
-    }
-
     // Don't do steering if it's replay. In position only replay it doesn't
     // matter, but if it's physics replay the gradual steering causes
     // incorrect results, since the stored values are already adjusted.
@@ -275,15 +279,7 @@ void NetworkPlayerController::update(float dt)
             if (m_penalty_time == 0.0 &&
                 World::getWorld()->getPhase() == WorldStatus::SET_PHASE)
             {
-                RaceGUIBase* m=World::getWorld()->getRaceGUI();
-                if (m)
-                {
-                    m->addMessage(_("Penalty time!!"), m_kart, 2.0f,
-                                  video::SColor(255, 255, 128, 0));
-                    m->addMessage(_("Don't accelerate before go"), m_kart, 2.0f,
-                                  video::SColor(255, 210, 100, 50));
-                }
-
+                displayPenaltyWarning();
                 m_penalty_time = stk_config->m_penalty_time;
             }   // if penalty_time = 0
 
@@ -300,9 +296,6 @@ void NetworkPlayerController::update(float dt)
         return;
     }
 
-    // We can't restrict rescue to fulfil isOnGround() (which would be more like
-    // MK), since e.g. in the City track it is possible for the kart to end
-    // up sitting on a brick wall, with all wheels in the air :((
     // Only accept rescue if there is no kart animation is already playing
     // (e.g. if an explosion happens, wait till the explosion is over before
     // starting any other animation).
@@ -314,55 +307,9 @@ void NetworkPlayerController::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-/** Checks if the kart was overtaken, and if so plays a sound
-*/
-void NetworkPlayerController::setPosition(int p)
-{
-    if(m_kart->getPosition()<p)
-    {
-        World *world = World::getWorld();
-        //have the kart that did the passing beep.
-        //I'm not sure if this method of finding the passing kart is fail-safe.
-        for(unsigned int i = 0 ; i < world->getNumKarts(); i++ )
-        {
-            AbstractKart *kart = world->getKart(i);
-            if(kart->getPosition() == p + 1)
-            {
-                kart->beep();
-                break;
-            }
-        }
-    }
-}   // setPosition
-
-//-----------------------------------------------------------------------------
-/** Called when a kart finishes race.
- *  /param time Finishing time for this kart.
- d*/
-void NetworkPlayerController::finishedRace(float time)
-{
-
-}   // finishedRace
-
-//-----------------------------------------------------------------------------
 /** Called when a kart hits or uses a zipper.
  */
-void NetworkPlayerController::handleZipper(bool play_sound)
+void PlayerController::handleZipper(bool play_sound)
 {
     m_kart->showZipperFire();
 }   // handleZipper
-
-//-----------------------------------------------------------------------------
-/** Called when a kart hits an item.
- *  \param item Item that was collected.
- *  \param add_info Additional info to be used then handling the item. If
- *                  this is -1 (default), the item type is selected
- *                  randomly. Otherwise it contains the powerup or
- *                  attachment for the kart. This is used in network mode to
- *                  let the server determine the powerup/attachment for
- *                  the clients.
- */
-void NetworkPlayerController::collectedItem(const Item &item, int add_info, float old_energy)
-{
-
-}   // collectedItem

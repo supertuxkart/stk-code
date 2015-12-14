@@ -21,7 +21,7 @@
 #ifndef HEADER_LOCAL_PLAYER_CONTROLLER_HPP
 #define HEADER_LOCAL_PLAYER_CONTROLLER_HPP
 
-#include "karts/controller/controller.hpp"
+#include "karts/controller/player_controller.hpp"
 
 class AbstractKart;
 class Camera;
@@ -33,16 +33,11 @@ class SFXBase;
   *
   * \ingroup controller
   */
-class LocalPlayerController : public Controller
+class LocalPlayerController : public PlayerController
 {
 private:
-    int            m_steer_val, m_steer_val_l, m_steer_val_r;
-    int            m_prev_accel;
-    bool           m_prev_brake;
-    bool           m_prev_nitro;
-    bool           m_sound_schedule;
 
-    float          m_penalty_time;
+    bool           m_sound_schedule;
 
     /** The camera attached to the kart for this controller. The camera
      *  object is managed in the Camera class, so no need to free it. */
@@ -54,33 +49,26 @@ private:
     SFXBase       *m_grab_sound;
     SFXBase       *m_full_sound;
 
-    void           steer(float, int);
+    virtual void steer(float, int) OVERRIDE;
+    virtual void displayPenaltyWarning() OVERRIDE;
 public:
-                   LocalPlayerController  (AbstractKart *kart,
-                                      StateManager::ActivePlayer *_player,
-                                      unsigned int player_index);
-                  ~LocalPlayerController  ();
-    void           update            (float);
-    void           action            (PlayerAction action, int value);
-    void           handleZipper      (bool play_sound);
-    void           collectedItem     (const Item &item, int add_info=-1,
-                                      float previous_energy=0);
-    virtual void   skidBonusTriggered();
-    virtual void   setPosition       (int p);
-    virtual bool   isPlayerController() const {return true;}
-    virtual bool   isLocalPlayerController() const {return true;}
-    virtual void   reset             ();
-    void           resetInputState   ();
-    virtual void   finishedRace      (float time);
-    virtual void   crashed           (const AbstractKart *k) {}
-    virtual void   crashed           (const Material *m) {}
+                 LocalPlayerController(AbstractKart *kart,
+                                       StateManager::ActivePlayer *_player,
+                                       unsigned int player_index);
+                ~LocalPlayerController();
+    void         update            (float) OVERRIDE;
+    void         action            (PlayerAction action, int value) OVERRIDE;
+    virtual void handleZipper      (bool play_sound) OVERRIDE;
+    void         collectedItem     (const Item &item, int add_info=-1,
+                                    float previous_energy=0) OVERRIDE;
+    virtual void setPosition       (int p) OVERRIDE;
+    virtual void reset             () OVERRIDE;
+    virtual void finishedRace      (float time) OVERRIDE;
+    virtual void resetInputState   () OVERRIDE;
     // ------------------------------------------------------------------------
-    /** Callback whenever a new lap is triggered. Used by the AI
-     *  to trigger a recomputation of the way to use, not used for players. */
-    virtual void  newLap(int lap) {}
+    virtual bool isPlayerController() const OVERRIDE {return true;}
     // ------------------------------------------------------------------------
-    /** Player will always be able to get a slipstream bonus. */
-    virtual bool  disableSlipstreamBonus() const { return false; }
+    virtual bool isLocalPlayerController() const OVERRIDE {return true;}
 
 };   // LocalPlayerController
 

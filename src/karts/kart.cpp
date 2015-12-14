@@ -1197,7 +1197,7 @@ void Kart::update(float dt)
     // automatic rescue
     // But only do this if auto-rescue is enabled (i.e. it will be disabled in
     // battle mode), and the material the kart is driving on does not have
-    // gravity (which can
+    // gravity (which atm affects the roll angle).
     if(World::getWorld()->getTrack()->isAutoRescueEnabled()     &&
         (!m_terrain_info->getMaterial() ||
          !m_terrain_info->getMaterial()->hasGravity())          &&
