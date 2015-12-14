@@ -658,6 +658,53 @@ void Track::startMusic() const
 }   // startMusic
 
 //-----------------------------------------------------------------------------
+/** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
+ *  they are connected to each other. Input file name is hardcoded for now
+ */
+void Track::loadBattleGraph()
+{
+    BattleGraph::create(m_root+"navmesh.xml");
+
+    if(BattleGraph::get()->getNumNodes()==0)
+    {
+        Log::warn("track", "No graph nodes defined for track '%s'\n",
+                m_filename.c_str());
+    }
+    else
+    {
+        //Check whether the hardware can do nonsquare or
+        // non power-of-two textures
+        video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
+        bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+        bool nonsquare =
+            video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
+
+        //Create the minimap resizing it as necessary.
+        m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
+        core::dimension2du size = m_mini_map_size
+                                 .getOptimalSize(!nonpower,!nonsquare);
+
+        BattleGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
+            &m_old_rtt_mini_map, &m_new_rtt_mini_map);
+        if (m_old_rtt_mini_map)
+        {
+            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_old_rtt_mini_map->getSize().Width);
+            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_old_rtt_mini_map->getSize().Height);
+        }
+        else if (m_new_rtt_mini_map)
+        {
+            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_new_rtt_mini_map->getWidth());
+            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_new_rtt_mini_map->getHeight());
+        }
+        else
+        {
+            m_minimap_x_scale = 0;
+            m_minimap_y_scale = 0;
+        }
+    }
+}   // loadBattleGraph
+
+//-----------------------------------------------------------------------------
 /** Loads the quad graph, i.e. the definition of all quads, and the way
  *  they are connected to each other.
  */
@@ -723,7 +770,10 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
 
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
-    QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
+    if (m_is_arena && m_has_navmesh)
+        BattleGraph::get()->mapPoint2MiniMap(xyz, draw_at);
+    else
+        QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
     draw_at->setX(draw_at->getX() * m_minimap_x_scale);
     draw_at->setY(draw_at->getY() * m_minimap_y_scale);
 }
@@ -1605,6 +1655,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the information about the size of the texture to render the mini
     // map to.
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+    else if (m_is_arena && !m_is_soccer && !m_is_cutscene && m_has_navmesh)
+        loadBattleGraph();
 
     ItemManager::create();
 
@@ -1829,15 +1881,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     delete root;
 
-    // ItemManager assumes the existence of a QuadGraph, that is why the
-    // quad graph is loaded before ItemManager::create(). This is undesirable
-    // but requires signifcant code overhaul to fix. The new battle graph
-    // performs its own computatoins separate from ItemManager. But
-    // Battle Graph needs ItemManager to be created, and all items to be
-    // added to ItemManager. Loading battle graph here is therefore a workaround
-    // to the main problem.
     if (m_is_arena && !m_is_soccer && !m_is_cutscene && m_has_navmesh)
-        BattleGraph::create(m_root + "navmesh.xml");
+        BattleGraph::get()->findItemsOnGraphNodes();
 
     if (UserConfigParams::m_track_debug &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&

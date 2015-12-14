@@ -23,11 +23,8 @@
 #include <string>
 #include <set>
 
+#include <dimension2d.h>
 #include "tracks/navmesh.hpp"
-
-class Navmesh;
-class Item;
-class ItemManager;
 
 namespace irr
 {
@@ -35,6 +32,12 @@ namespace irr
     namespace video { class ITexture; }
 }
 using namespace irr;
+
+class FrameBuffer;
+class Item;
+class ItemManager;
+class Navmesh;
+class RTT;
 
 /**
 * \ingroup tracks
@@ -52,6 +55,8 @@ class BattleGraph
 private:
     static BattleGraph        *m_battle_graph;
 
+    RTT* m_new_rtt;
+
     /** The actual graph data structure, it is an adjacency matrix */
     std::vector< std::vector< float > > m_distance_matrix;
     /** The matrix that is used to store computed shortest paths */
@@ -63,16 +68,21 @@ private:
     /** For debug only: the actual mesh buffer storing the quads. */
     scene::IMeshBuffer      *m_mesh_buffer;
 
-    /** Stores the name of the file containing the NavMesh data */
-    std::string             m_navmesh_file;
+    /** The minimum coordinates of the quad graph. */
+    Vec3                     m_min_coord;
 
-    std::vector< std::pair<Item*, int> > m_items_on_graph;
+    /** Scaling for mini map. */
+    float                    m_scaling;
+
+    /** Stores the name of the file containing the NavMesh data */
+    std::string              m_navmesh_file;
+
+    std::vector< std::pair<const Item*, int> > m_items_on_graph;
 
     void buildGraph(NavMesh*);
     void computeFloydWarshall();
     void createMesh(bool enable_transparency=false,
                     const video::SColor *track_color=NULL);
-    void findItemsOnGraphNodes(ItemManager*);
 
     BattleGraph(const std::string &navmesh_file_name);
     ~BattleGraph(void);
@@ -105,7 +115,7 @@ public:
     // ----------------------------------------------------------------------
     /** Returns the number of nodes in the BattleGraph (equal to the number of
     *    polygons in the NavMesh */
-    unsigned int    getNumNodes() const { return m_distance_matrix.size(); }
+    unsigned int      getNumNodes() const { return m_distance_matrix.size(); }
 
     // ----------------------------------------------------------------------
     /** Returns the NavPoly corresponding to the i-th node of the BattleGraph */
@@ -116,13 +126,20 @@ public:
     /** Returns the next polygon on the shortest path from i to j.
      *    Note: m_parent_poly[j][i] contains the parent of i on path from j to i,
      *    which is the next node on the path from i to j (undirected graph) */
-    const int & getNextShortestPathPoly(int i, int j) const;
+    const int &       getNextShortestPathPoly(int i, int j) const;
 
-    const std::vector< std::pair<Item*, int> >& getItemList()
+    const std::vector < std::pair<const Item*, int> >& getItemList()
                                         { return m_items_on_graph; }
 
-    void            createDebugMesh();
-    void            cleanupDebugMesh();
+    void              createDebugMesh();
+    void              cleanupDebugMesh();
+    void              findItemsOnGraphNodes();
+    void              makeMiniMap(const core::dimension2du &where,
+                                  const std::string &name,
+                                  const video::SColor &fill_color,
+                                  video::ITexture** oldRttMinimap,
+                                  FrameBuffer** newRttMinimap);
+    void              mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
 };    //BattleGraph
 
 #endif

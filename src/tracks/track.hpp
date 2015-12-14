@@ -379,6 +379,7 @@ private:
 
     void loadTrackInfo();
     void loadQuadGraph(unsigned int mode_id, const bool reverse);
+    void loadBattleGraph();
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
     void createWater(const XMLNode &node);

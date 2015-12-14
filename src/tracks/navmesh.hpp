@@ -55,6 +55,10 @@ class NavMesh
 private:
     static NavMesh                  *m_nav_mesh;
 
+    /** The 2d bounding box, used for hashing. */
+    Vec3                m_min;
+    Vec3                m_max;
+
     /** The actual set of nav polys that constitute the nav mesh */
     std::vector<NavPoly>            m_polys;
 
@@ -102,39 +106,53 @@ public:
     *  also don't create one if it doesn't exists. */
     static NavMesh          *get() { return m_nav_mesh; }
 
+    // ------------------------------------------------------------------------
+    /** Return the minimum and maximum coordinates of this navmesh. */
+    void                    getBoundingBox(Vec3 *min, Vec3 *max)
+                                { *min=m_min; *max=m_max; }
+    // ------------------------------------------------------------------------
     /** Returns a const reference to a NavPoly */
     const NavPoly&          getNavPoly(int n) const
                                 { return m_polys[n]; }
-
+    // ------------------------------------------------------------------------
     /** Returns a const reference to a vertex(Vec3) */
     const Vec3&             getVertex(int n) const
                                 { return m_verts[n]; }
-
+    // ------------------------------------------------------------------------
+    /** Sets the vertices in a irrlicht vertex array to
+     *  the 4 points of a navpoly.
+     *  \param n The number of a navpoly.
+     *  \param v The vertex array in which to set the vertices.
+     *  \param color The color to use for this quad.
+     */
+    void                    setVertices(int n, video::S3DVertex *v,
+                                        const video::SColor &color) const;
+    // ------------------------------------------------------------------------
     /** Returns a const reference to a vector containing all vertices */
     const std::vector<Vec3>& getAllVertices() const
                                 { return m_verts;   }
-
+    // ------------------------------------------------------------------------
     /** Returns the total number of polys */
     unsigned int            getNumberOfPolys() const
                                 { return m_n_polys; }
-
+    // ------------------------------------------------------------------------
     /** Returns the total number of vertices */
     unsigned int            getNumberOfVerts() const
                                 { return m_n_verts; }
-
+    // ------------------------------------------------------------------------
     /** Returns maximum vertices per polygon */
     unsigned int            getMaxVertsPerPoly() const
                                 { return m_nvp; }
-
+    // ------------------------------------------------------------------------
     /** Returns the center of a polygon */
     const Vec3&             getCenterOfPoly(int n) const
                                 {return m_polys[n].getCenter();}
-
+    // ------------------------------------------------------------------------
     /** Returns a const referece to a vector containing the indices
      *    of polygons adjacent to a given polygon */
     const std::vector<int>& getAdjacentPolys(int n) const
                                 {return m_polys[n].getAdjacents();}
-
+    // ------------------------------------------------------------------------
     /** Returns a const reference to a vector containing the vertices
      *    of a given polygon. */
     const std::vector<Vec3> getVertsOfPoly(int n)

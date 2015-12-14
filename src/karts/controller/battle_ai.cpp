@@ -832,7 +832,7 @@ void BattleAI::handleItems(const float dt)
 void BattleAI::handleItemCollection(Vec3* aim_point, int* target_node)
 {
     float distance = 99999.9f;
-    const std::vector< std::pair<Item*, int> >& item_list =
+    const std::vector< std::pair<const Item*, int> >& item_list =
         BattleGraph::get()->getItemList();
     const unsigned int items_count = item_list.size();
     unsigned int closest_item_num = 0;

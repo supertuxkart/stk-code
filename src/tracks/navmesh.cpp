@@ -37,6 +37,8 @@ NavMesh *NavMesh::m_nav_mesh = NULL;
 NavMesh::NavMesh(const std::string &filename)
 {
 
+    m_min = Vec3( 99999,  99999,  99999);
+    m_max = Vec3(-99999, -99999, -99999);
     m_n_verts=0;
     m_n_polys=0;
 
@@ -68,6 +70,8 @@ NavMesh::NavMesh(const std::string &filename)
                 //Reading vertices
                 Vec3 p;
                 readVertex(xml_node_node, &p);
+                m_max.max(p);
+                m_min.min(p);
                 m_n_verts++;
                 m_verts.push_back(p);
             }
@@ -115,6 +119,44 @@ NavMesh::NavMesh(const std::string &filename)
 NavMesh::~NavMesh()
 {
 }  // ~NavMesh
+
+// ----------------------------------------------------------------------------
+/** Sets the vertices in a irrlicht vertex array to the 4 points of this quad.
+ */
+void NavMesh::setVertices(int n, video::S3DVertex *v, const video::SColor &color) const
+{
+    NavPoly poly = NavMesh::get()->getNavPoly(n);
+    const std::vector<Vec3>& p = poly.getVertices();
+
+    if (p.size() !=4) return;
+
+    // Eps is used to raise the track debug quads a little bit higher than
+    // the ground, so that they are actually visible.
+    core::vector3df eps(0, 0.1f, 0);
+    v[0].Pos = p[0].toIrrVector()+eps;
+    v[1].Pos = p[1].toIrrVector()+eps;
+    v[2].Pos = p[2].toIrrVector()+eps;
+    v[3].Pos = p[3].toIrrVector()+eps;
+
+    core::triangle3df tri(p[0].toIrrVector(), p[1].toIrrVector(),
+                          p[2].toIrrVector());
+    core::vector3df normal = tri.getNormal();
+    normal.normalize();
+    v[0].Normal = normal;
+    v[1].Normal = normal;
+    v[2].Normal = normal;
+
+    core::triangle3df tri1(p[0].toIrrVector(), p[2].toIrrVector(),
+                           p[3].toIrrVector());
+    core::vector3df normal1 = tri1.getNormal();
+    normal1.normalize();
+    v[3].Normal = normal1;
+
+    v[0].Color  = color;
+    v[1].Color  = color;
+    v[2].Color  = color;
+    v[3].Color  = color;
+}   // setVertices
 
 // ----------------------------------------------------------------------------
 
