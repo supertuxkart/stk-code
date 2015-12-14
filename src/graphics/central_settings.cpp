@@ -46,7 +46,7 @@ void CentralVideoSettings::init()
     hasTextureCompression = false;
     hasUBO = false;
     hasGS = false;
-    hasSRGBCapableVisual = false;
+    hasSRGBCapableVisual = true;
     m_GI_has_artifact = false;
 
     m_need_rh_workaround = false;
@@ -180,12 +180,15 @@ void CentralVideoSettings::init()
             // Bindless textures are all treated RGB even sRGB one
             m_need_srgb_workaround = true;
         }
-        
+
         // Check if visual is sRGB-capable
-        GLint param;
-        glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT,
-                          GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
-        hasSRGBCapableVisual = (param == GL_SRGB);
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_CAPABLE))
+        {
+            GLint param;
+            glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT,
+                              GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
+            hasSRGBCapableVisual = (param == GL_SRGB);
+        }
     }
 }
 
@@ -216,7 +219,7 @@ bool CentralVideoSettings::needsRGBBindlessWorkaround() const
 
 bool CentralVideoSettings::needsSRGBCapableVisualWorkaround() const
 {
-    return !hasSRGBCapableVisual && GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_CAPABLE);
+    return !hasSRGBCapableVisual;
 }
 
 bool CentralVideoSettings::isARBGeometryShader4Usable() const
