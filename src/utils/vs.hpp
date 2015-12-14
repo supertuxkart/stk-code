@@ -39,9 +39,14 @@
 #if defined(WIN32) && defined(DEBUG)
 #  define WIN32_LEAN_AND_MEAN
 #  include <Windows.h>
+#endif
 
 namespace VS
 {
+#if defined(WIN32) && defined(DEBUG)
+#  define WIN32_LEAN_AND_MEAN
+#  include <Windows.h>
+
     /** This function sets the name of this thread in the VS debugger.
      *  \param name Name of the thread.
      */
@@ -79,5 +84,7 @@ namespace VS
     {
     }
 #endif
+
 }   // namespace VS
+
 #endif   // HEADER_VS_HPP
