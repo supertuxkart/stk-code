@@ -384,7 +384,7 @@ bool ProtocolManager::sendEvent(EventProcessingInfo* event, bool synchronous)
                                   : p->notifyEventAsynchronous(event->m_event);
         if (result)
         {
-            event->m_protocols_ids.pop_back();
+            event->m_protocols_ids.erase(event->m_protocols_ids.begin()+index);
         }
         else  // !result
             index++;
