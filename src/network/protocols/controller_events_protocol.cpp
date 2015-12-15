@@ -93,6 +93,9 @@ void ControllerEventsProtocol::setup()
 
 bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
 {
+    if (event->getType() != EVENT_TYPE_MESSAGE)
+        return true;
+
     const NetworkString &data = event->data();
     if (data.size() < 17)
     {
