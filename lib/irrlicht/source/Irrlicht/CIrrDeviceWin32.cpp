@@ -34,6 +34,9 @@
 #endif
 #endif
 
+#include <imm.h>
+#pragma comment(lib, "imm32.lib")
+
 namespace irr
 {
 	namespace video
@@ -692,6 +695,28 @@ irr::CIrrDeviceWin32* getDeviceFromHWnd(HWND hWnd)
 }
 
 
+namespace irr
+{
+	void updateICPos(void* hWnd, s32 x, s32 y, s32 height)
+	{
+		COMPOSITIONFORM cf;
+		HWND hwnd = (HWND)hWnd;
+		HIMC hIMC = ImmGetContext(hwnd);
+
+		if(hIMC)
+		{
+			cf.dwStyle = CFS_POINT;
+			cf.ptCurrentPos.x = x;
+			cf.ptCurrentPos.y = y - height;
+
+			ImmSetCompositionWindow(hIMC, &cf);
+
+			ImmReleaseContext(hwnd, hIMC);
+		}
+	}
+} // end of namespace irr
+
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	#ifndef WM_MOUSEWHEEL
@@ -802,6 +827,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
+
+		if (m->irrMessage == irr::EMIE_LMOUSE_PRESSED_DOWN || m->irrMessage == irr::EMIE_LMOUSE_LEFT_UP)
+		{
+			event.EventType = irr::EET_IMPUT_METHOD_EVENT;
+			event.InputMethodEvent.Event = irr::EIME_CHANGE_POS;
+			event.InputMethodEvent.Handle = hWnd;
+
+			if (dev)
+				dev->postEventFromUser(event);
+		}
 		return 0;
 	}
 
@@ -817,6 +852,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_ERASEBKGND:
 		return 0;
+
+	case WM_IME_CHAR:
+		{
+			event.EventType = irr::EET_IMPUT_METHOD_EVENT;
+			event.InputMethodEvent.Event = irr::EIME_CHAR_INPUT;
+			event.InputMethodEvent.Handle = hWnd;
+
+			event.KeyInput.Char = 0;
+			event.KeyInput.Key = irr::KEY_OEM_CLEAR;
+			event.KeyInput.Shift = 0;
+			event.KeyInput.Control = 0;
+
+			char bits[2] = { (char)((wParam & 0xff00) >> 8), (char)(wParam & 0xff) };
+			if (bits[0] == 0)
+				event.InputMethodEvent.Char = (wchar_t)wParam;
+			else
+				MultiByteToWideChar(CP_OEMCP, MB_PRECOMPOSED, bits, 2, &event.InputMethodEvent.Char, 1);
+
+			dev = getDeviceFromHWnd(hWnd);
+			if (dev)
+				dev->postEventFromUser(event);
+
+			return	0;
+		}
 
 	case WM_SYSKEYDOWN:
 	case WM_SYSKEYUP:
@@ -882,6 +941,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (dev)
 				dev->postEventFromUser(event);
 
+			event.EventType = irr::EET_IMPUT_METHOD_EVENT;
+			event.InputMethodEvent.Event = irr::EIME_CHANGE_POS;
+			event.InputMethodEvent.Handle = hWnd;
+
+			if (dev)
+				dev->postEventFromUser(event);
+
 			if (message == WM_SYSKEYDOWN || message == WM_SYSKEYUP)
 				return DefWindowProc(hWnd, message, wParam, lParam);
 			else
@@ -932,6 +998,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				dev->switchToFullScreen();
 			}
 		}
+		event.EventType = irr::EET_IMPUT_METHOD_EVENT;
+		event.InputMethodEvent.Event = irr::EIME_CHANGE_POS;
+		event.InputMethodEvent.Handle = hWnd;
+
+		if (dev)
+			dev->postEventFromUser(event);
 		break;
 
 	case WM_USER:
@@ -1115,6 +1187,9 @@ CIrrDeviceWin32::CIrrDeviceWin32(const SIrrlichtCreationParameters& params)
 
 	// inform driver about the window size etc.
 	resizeIfNecessary();
+
+	// for reset the position of composition window
+	updateICPos(HWnd, 0, 0, 0);
 }
 
 
@@ -1869,6 +1944,8 @@ void CIrrDeviceWin32::handleSystemMessages()
 	{
 		// No message translation because we don't use WM_CHAR and it would conflict with our
 		// deadkey handling.
+
+		TranslateMessage(&msg);
 
 		if (ExternalWindow && msg.hwnd == HWnd)
 			WndProc(HWnd, msg.message, msg.wParam, msg.lParam);

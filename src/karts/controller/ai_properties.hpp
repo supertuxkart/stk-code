@@ -43,7 +43,9 @@ public:
 protected:
     // Give them access to the members
     friend class AIBaseController;
+    friend class AIBaseLapController;
     friend class SkiddingAI;
+    friend class BattleAI;
 
     /** Used to check that all values are defined in the xml file. */
     static float UNDEFINED;

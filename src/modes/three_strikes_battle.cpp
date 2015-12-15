@@ -21,10 +21,13 @@
 #include <IMeshSceneNode.h>
 
 #include "audio/music_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/battle_ai.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "physics/physics.hpp"
@@ -55,12 +58,6 @@ void ThreeStrikesBattle::init()
 {
     WorldWithRank::init();
     m_display_rank = false;
-
-    // check for possible problems if AI karts were incorrectly added
-    if(getNumKarts() > race_manager->getNumPlayers())
-    {
-        Log::fatal("[Three Strikes Battle]", "No AI exists for this game mode");
-    }
     m_kart_info.resize(m_karts.size());
 }   // ThreeStrikesBattle
 
@@ -161,6 +158,8 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
  */
 void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
 {
+    if (isRaceOver()) return;
+
     assert(kart_id < m_karts.size());
     // make kart lose a life
     m_kart_info[kart_id].m_lives--;
@@ -182,7 +181,8 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
         if(wheels[1]) wheels[1]->setVisible(false);
         if(wheels[2]) wheels[2]->setVisible(false);
         if(wheels[3]) wheels[3]->setVisible(false);
-        eliminateKart(kart_id, /*notify_of_elimination*/ true);
+        if (getCurrentNumPlayers())
+            eliminateKart(kart_id, /*notify_of_elimination*/ true);
         // Find a camera of the kart with the most lives ("leader"), and
         // attach all cameras for this kart to the leader.
         int max_lives = 0;
@@ -200,7 +200,7 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
         }
         // leader could be 0 if the last two karts hit each other in
         // the same frame
-        if(leader)
+        if(leader && getCurrentNumPlayers())
         {
             for(unsigned int i=0; i<Camera::getNumCameras(); i++)
             {
@@ -296,6 +296,9 @@ void ThreeStrikesBattle::update(float dt)
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
 
+    if (m_track->hasNavMesh())
+        updateKartNodes();
+
     // insert blown away tire(s) now if was requested
     while (m_insert_tire > 0)
     {
@@ -326,6 +329,13 @@ void ThreeStrikesBattle::update(float dt)
                 tire = m_tire_dir+"/wheel-front-right.b3d";
             else if(m_insert_tire == 5)
                 tire = m_tire_dir+"/wheel-rear-right.b3d";
+            if(!file_manager->fileExists(tire))
+            {
+                m_insert_tire--;
+                if(m_insert_tire == 1)
+                    m_insert_tire = 0;
+                continue;
+            }
         }
 
 
@@ -421,13 +431,129 @@ void ThreeStrikesBattle::updateKartRanks()
 bool ThreeStrikesBattle::isRaceOver()
 {
     // for tests : never over when we have a single player there :)
-    if (race_manager->getNumPlayers() < 2)
+    if (race_manager->getNumberOfKarts()==1 &&
+        getCurrentNumKarts()==1 &&
+        UserConfigParams::m_artist_debug_mode)
     {
         return false;
     }
 
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
+
+//-----------------------------------------------------------------------------
+/** Updates the m_current_node value of each kart controller to localize it
+ *  on the navigation mesh.
+ */
+void ThreeStrikesBattle::updateKartNodes()
+{
+    if (isRaceOver()) return;
+
+    const unsigned int n = getNumKarts();
+    for(unsigned int i=0; i<n; i++)
+    {
+        if(m_karts[i]->isEliminated()) continue;
+
+        const AbstractKart* kart = m_karts[i];
+
+        if(!kart->getController()->isPlayerController())
+        {
+            BattleAI* controller = (BattleAI*)(kart->getController());
+
+            int saved_current_node = controller->getCurrentNode();
+
+            if (saved_current_node != BattleGraph::UNKNOWN_POLY)
+            {
+                //check if the kart is still on the same node
+                const NavPoly& p = BattleGraph::get()->getPolyOfNode(controller->getCurrentNode());
+                if(p.pointInPoly(kart->getXYZ())) continue;
+
+                //if not then check all adjacent polys
+                const std::vector<int>& adjacents =
+                    NavMesh::get()->getAdjacentPolys(controller->getCurrentNode());
+
+                // Set m_current_node to unknown so that if no adjacent poly checks true
+                // we look everywhere the next time updateCurrentNode is called. This is
+                // useful in cases when you are "teleported" to some other poly, ex. rescue
+                controller->setCurrentNode(BattleGraph::UNKNOWN_POLY);
+
+                for(unsigned int i=0; i<adjacents.size(); i++)
+                {
+                    const NavPoly& p_temp =
+                            BattleGraph::get()->getPolyOfNode(adjacents[i]);
+                    if(p_temp.pointInPoly(kart->getXYZ()))
+                        controller->setCurrentNode(adjacents[i]);
+                }
+            }
+
+            //Current node is still unkown
+            if (saved_current_node == BattleGraph::UNKNOWN_POLY)
+            {
+                bool flag = 0;
+                unsigned int max_count = BattleGraph::get()->getNumNodes();
+                for(unsigned int i=0; i<max_count; i++)
+                {
+                    const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
+                    if((p.pointInPoly(kart->getXYZ())))
+                    {
+                        controller->setCurrentNode(i);
+                        flag = 1;
+                    }
+                }
+
+                if(flag == 0) controller->setCurrentNode(saved_current_node);
+            }
+
+        }
+        else
+        {
+            PlayerController* controller = (PlayerController*)(kart->getController());
+
+            int saved_current_node = controller->getCurrentNode();
+
+            if (saved_current_node != BattleGraph::UNKNOWN_POLY)
+            {
+                //check if the kart is still on the same node
+                const NavPoly& p = BattleGraph::get()->getPolyOfNode(controller->getCurrentNode());
+                if(p.pointInPoly(kart->getXYZ())) continue;
+
+                //if not then check all adjacent polys
+                const std::vector<int>& adjacents =
+                    NavMesh::get()->getAdjacentPolys(controller->getCurrentNode());
+
+                // Set m_current_node to unknown so that if no adjacent poly checks true
+                // we look everywhere the next time updateCurrentNode is called. This is
+                // useful in cases when you are "teleported" to some other poly, ex. rescue
+                controller->setCurrentNode(BattleGraph::UNKNOWN_POLY);
+
+                for(unsigned int i=0; i<adjacents.size(); i++)
+                {
+                    const NavPoly& p_temp =
+                            BattleGraph::get()->getPolyOfNode(adjacents[i]);
+                    if(p_temp.pointInPoly(kart->getXYZ()))
+                        controller->setCurrentNode(adjacents[i]);
+                }
+            }
+
+            if (saved_current_node == BattleGraph::UNKNOWN_POLY)
+            {
+                bool flag = 0;
+                unsigned int max_count = BattleGraph::get()->getNumNodes();
+                for(unsigned int i =0; i<max_count; i++)
+                {
+                    const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
+                    if((p.pointInPoly(kart->getXYZ())))
+                    {
+                        controller->setCurrentNode(i);
+                        flag = 1;
+                    }
+                }
+
+                if(flag == 0) controller->setCurrentNode(saved_current_node);
+            }
+        }
+    }
+}
 
 //-----------------------------------------------------------------------------
 /** Called when the race finishes, i.e. after playing (if necessary) an

@@ -34,6 +34,9 @@ protected:
 
     float          m_penalty_time;
 
+    /** This variable is required for battle mode **/
+    int            m_current_node;
+
     virtual void  steer(float, int);
     // ------------------------------------------------------------------------
     /** Called when this kart started too early and got a start penalty. */
@@ -55,6 +58,10 @@ public:
                                 float previous_energy=0            ) OVERRIDE
     {
     };
+    // ------------------------------------------------------------------------
+    unsigned int getCurrentNode() const { return m_current_node; }
+    // ------------------------------------------------------------------------
+    void         setCurrentNode(int i)  { m_current_node = i;   }
     // ------------------------------------------------------------------------
     virtual bool isPlayerController() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------

@@ -34,7 +34,6 @@
 #include <map>
 
 class KartProperties;
-class PlayerDifficulty;
 class MusicInformation;
 class XMLNode;
 
@@ -51,8 +50,6 @@ protected:
     /** Default kart properties. */
     KartProperties *m_default_kart_properties;
     std::map<std::string, KartProperties*> m_kart_properties;
-    /** Per-player difficulties. */
-    PlayerDifficulty* m_player_difficulties[PLAYER_DIFFICULTY_COUNT];
 
 public:
     /** What to do if a kart already has a powerup when it hits a bonus box:
@@ -66,26 +63,12 @@ public:
           m_same_powerup_mode;
 
     static float UNDEFINED;
-    float m_anvil_weight;              /**<Additional kart weight if anvil is
-                                           attached.                           */
-    float m_anvil_speed_factor;        /**<Speed decrease when attached first. */
-    float m_parachute_friction;        /**<Increased parachute air friction.   */
-    float m_parachute_ubound_fraction; /**<Upper bound fraction of speed when
-                                           lost will detach parachute.         */
-    float m_parachute_lbound_fraction; /**<Lower bound fraction of speed when
-                                           lost will detach parachute.           */
-    float m_parachute_max_speed;       /**<Max speed to rate current speed     */
-    float m_parachute_time;            /**<Time a parachute is active.         */
-    float m_parachute_time_other;      /**<Time a parachute attached to other
-                                           karts is active.                    */
     float m_bomb_time;                 /**<Time before a bomb explodes.        */
     float m_bomb_time_increase;        /**<Time added to bomb timer when it's
                                            passed on.                          */
-    float m_anvil_time;                /**<Time an anvil is active.            */
     float m_item_switch_time;          /**< Time items will be switched.       */
     int   m_bubblegum_counter;         /**< How many times bubble gums must be
                                             driven over before they disappear. */
-    float m_bubblegum_shield_time;     /**<How long a bubble gum shield lasts. */
     bool  m_shield_restrict_weapos;    /**<Wether weapon usage is punished. */
     float m_explosion_impulse_objects; /**<Impulse of explosion on moving
                                             objects, e.g. road cones, ...      */
@@ -160,6 +143,15 @@ public:
     /** The field of view for 1, 2, 3, 4 player split screen. */
     float m_camera_fov[4];
 
+    /** File names of the default fonts in STK. */
+    std::string m_font_default;
+    std::string m_font_default_fallback;
+    std::string m_font_cjk;
+    std::string m_font_ar;
+    std::string m_font_bold;
+    std::string m_font_bold_fallback;
+    std::string m_font_digit;
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid
@@ -190,10 +182,6 @@ public:
     {
         return *m_kart_properties.at(type); 
     }   // getKartProperties
-
-    // ------------------------------------------------------------------------
-    const PlayerDifficulty * getPlayerDifficulty(PerPlayerDifficulty difficulty)
-        { return m_player_difficulties[difficulty]; }
 }
 ;   // STKConfig
 

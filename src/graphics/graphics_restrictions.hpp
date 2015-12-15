@@ -53,6 +53,7 @@ namespace GraphicsRestrictions
         GR_HIGHDEFINITION_TEXTURES,
         GR_ADVANCED_PIPELINE,
         GR_FRAMEBUFFER_SRGB_WORKING,
+        GR_FRAMEBUFFER_SRGB_CAPABLE,
         GR_GI,
         GR_COUNT  /** MUST be last entry. */
     } ;

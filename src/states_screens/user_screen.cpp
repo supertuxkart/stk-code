@@ -198,7 +198,7 @@ void BaseUserScreen::selectUser(int index)
                             focus_it);
     
     if (!m_new_registered_data)
-        m_username_tb->setText(profile->getLastOnlineName());
+        m_username_tb->setText(profile->getLastOnlineName(true/*ignoreRTL*/));
 
     if (!m_new_registered_data)
     {
@@ -401,16 +401,18 @@ void BaseUserScreen::login()
     // If a different player is connecting, or the same local player with
     // a different online account, log out the current player.
     if(current && current->isLoggedIn() &&
-        (player!=current || current->getLastOnlineName()!=new_username) )
+        (player!=current ||
+        current->getLastOnlineName(true/*ignoreRTL*/)!=new_username) )
     {
-        m_sign_out_name = current->getLastOnlineName();
+        m_sign_out_name = current->getLastOnlineName(true/*ignoreRTL*/);
         current->requestSignOut();
         m_state = (UserScreenState)(m_state | STATE_LOGOUT);
 
         // If the online user name was changed, reset the save data
         // for this user (otherwise later the saved session will be
         // resumed, not logging the user with the new account).
-        if(player==current && current->getLastOnlineName()!=new_username)
+        if(player==current &&
+            current->getLastOnlineName(true/*ignoreRTL*/)!=new_username)
             current->clearSession();
     }
     PlayerManager::get()->setCurrentPlayer(player);
@@ -422,7 +424,7 @@ void BaseUserScreen::login()
     {
         if(player->isLoggedIn())
         {
-            m_sign_out_name =player->getLastOnlineName();
+            m_sign_out_name =player->getLastOnlineName(true/*ignoreRTL*/);
             player->requestSignOut();
             m_state =(UserScreenState)(m_state| STATE_LOGOUT);
         }
@@ -449,7 +451,7 @@ void BaseUserScreen::login()
     // can decide what to do about them.
     if (player->hasSavedSession())
     {
-        m_sign_in_name = player->getLastOnlineName();
+        m_sign_in_name = player->getLastOnlineName(true/*ignoreRTL*/);
         // Online login with saved token
         player->requestSavedSession();
     }
@@ -569,7 +571,7 @@ void BaseUserScreen::deletePlayer()
     PlayerProfile *player = getSelectedPlayer();
     irr::core::stringw message =
         //I18N: In the player info dialog (when deleting)
-        _("Do you really want to delete player '%s' ?", player->getName());
+        _("Do you really want to delete player '%s' ?", player->getName(true/*ignoreRTL*/));
 
     class ConfirmServer : public MessageDialog::IConfirmDialogListener
     {

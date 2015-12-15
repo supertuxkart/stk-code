@@ -47,6 +47,7 @@
 #include "network/network_config.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
+#include "scriptengine/property_animator.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
@@ -546,6 +547,7 @@ void RaceManager::startNextRace()
 //-----------------------------------------------------------------------------
 void RaceManager::next()
 {
+    PropertyAnimator::get()->clear();
     World::deleteWorld();
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
@@ -746,7 +748,11 @@ void RaceManager::exitRace(bool delete_world)
             }
         }
 
-        if (delete_world) World::deleteWorld();
+        if (delete_world)
+        {
+            PropertyAnimator::get()->clear();
+            World::deleteWorld();
+        }
         delete_world = false;
 
         StateManager::get()->enterGameState();
@@ -783,7 +789,11 @@ void RaceManager::exitRace(bool delete_world)
         }
     }
 
-    if (delete_world) World::deleteWorld();
+    if (delete_world)
+    {
+        PropertyAnimator::get()->clear();
+        World::deleteWorld();
+    }
 
     m_saved_gp = NULL;
     m_track_number = 0;

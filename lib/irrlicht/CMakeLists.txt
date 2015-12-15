@@ -25,8 +25,14 @@ elseif(MINGW)
   add_definitions(-D_IRR_STATIC_LIB_)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
-  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
+  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -I/usr/X11R6/include")
+  set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -I/usr/X11R6/include")
+  if(CMAKE_COMPILER_IS_GNUCC)
+	  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -fexpensive-optimizations")
+  endif()
+  if(CMAKE_COMPILER_IS_GNUCXX)
+	  set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -fexpensive-optimizations")
+  endif()
 endif()
 
 # Xrandr
@@ -504,5 +510,6 @@ endif()
 add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
 target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY} ${ZLIB_LIBRARY})
 
-
-
+if(WIN32)
+    target_link_libraries(stkirrlicht imm32)
+endif()

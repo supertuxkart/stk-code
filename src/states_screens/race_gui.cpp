@@ -342,8 +342,10 @@ void RaceGUI::drawGlobalTimer()
 void RaceGUI::drawGlobalMiniMap()
 {
     World *world = World::getWorld();
-    // arenas currently don't have a map.
-    if(world->getTrack()->isArena() || world->getTrack()->isSoccer()) return;
+    // draw a map when arena has a navigation mesh.
+    if ((world->getTrack()->isArena() && !(world->getTrack()->hasNavMesh())) ||
+        world->getTrack()->isSoccer())
+        return;
 
     const video::ITexture *old_rtt_mini_map = world->getTrack()->getOldRttMiniMap();
     const FrameBuffer* new_rtt_mini_map = world->getTrack()->getNewRttMiniMap();

@@ -197,7 +197,7 @@ public:
             case MINOR_MODE_NORMAL_RACE:    return true;
             case MINOR_MODE_TIME_TRIAL:     return true;
             case MINOR_MODE_FOLLOW_LEADER:  return true;
-            case MINOR_MODE_3_STRIKES:      return false;
+            case MINOR_MODE_3_STRIKES:      return true;
             case MINOR_MODE_EASTER_EGG:     return false;
             case MINOR_MODE_SOCCER:         return false;
             default: assert(false);         return false;

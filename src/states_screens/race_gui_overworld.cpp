@@ -467,7 +467,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                      irr_driver->getActualScreenSize().Width,
                                      irr_driver->getActualScreenSize().Height);
                 GUIEngine::getOutlineFont()->draw(_("Press fire to play the tutorial"), pos2,
-                                           video::SColor(255,255,150,60),
+                                           GUIEngine::getSkin()->getColor("font::normal"),
                                            true, true /* vcenter */, NULL);
                 continue;
             }
@@ -537,7 +537,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                  irr_driver->getActualScreenSize().Width,
                                  irr_driver->getActualScreenSize().Height);
             GUIEngine::getOutlineFont()->draw(_("Press fire to start the challenge"), pos2,
-                                       video::SColor(255,255,150,60),
+                                       GUIEngine::getSkin()->getColor("font::normal"),
                                        true, true /* vcenter */, NULL);
         }
     }

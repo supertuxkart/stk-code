@@ -302,6 +302,8 @@ namespace GUIEngine
         /** \brief callback from IRibbonListener */
         virtual void onSelectionChange(){}
 
+        virtual void setText(const wchar_t *text);
+
         virtual void update(float delta);
 
         /** Set approximately how many items are expected to be in this ribbon; will help the layout

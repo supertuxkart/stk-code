@@ -22,9 +22,10 @@
 #ifndef HEADER_NETWORK_PLAYER_PROFILE
 #define HEADER_NETWORK_PLAYER_PROFILE
 
+#include "network/remote_kart_info.hpp"
 #include "utils/types.hpp"
 
-#include "karts/player_difficulty.hpp"
+#include "irrString.h"
 
 #include <string>
 namespace Online { class OnlineProfile; }

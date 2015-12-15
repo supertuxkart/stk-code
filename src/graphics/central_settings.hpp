@@ -40,6 +40,7 @@ private:
     bool hasSSBO;
     bool hasImageLoadStore;
     bool hasMultiDrawIndirect;
+    bool hasSRGBCapableVisual;
 
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
@@ -52,6 +53,7 @@ public:
     // Needs special handle ?
     bool needRHWorkaround() const;
     bool needsRGBBindlessWorkaround() const;
+    bool needsSRGBCapableVisualWorkaround() const;
 
     // Extension is available and safe to use
     bool isARBUniformBufferObjectUsable() const;

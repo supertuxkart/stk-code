@@ -380,7 +380,10 @@ void* SFXManager::mainLoop(void *obj)
         case SFX_MUSIC_DEFAULT_VOLUME:
         {
             current->m_music_information->setDefaultVolume();
+            break;
         }
+        case SFX_CREATE_SOURCE:
+            current->m_sfx->init(); break;
         default: assert("Not yet supported.");
         }
         delete current;

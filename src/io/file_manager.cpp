@@ -52,6 +52,7 @@ namespace irr {
 #  include <dirent.h>
 #  include <unistd.h>
 #else
+#  define WIN32_LEAN_AND_MEAN
 #  include <direct.h>
 #  include <windows.h>
 #  include <stdio.h>
