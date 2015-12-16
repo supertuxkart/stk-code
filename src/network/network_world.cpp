@@ -66,6 +66,11 @@ bool NetworkWorld::isRaceOver()
 }   // isRaceOver
 
 // ----------------------------------------------------------------------------
+/** Called from the item manager on a server. It triggers a notification to
+ *  all clients in the GameEventsProtocol.
+ *  \param item The item that was collected.
+ *  \param kart The kart that collected the item.
+ */
 void NetworkWorld::collectedItem(Item *item, AbstractKart *kart)
 {
     // this is only called in the server

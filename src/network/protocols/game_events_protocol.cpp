@@ -53,15 +53,15 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             }
             uint32_t item_id = data.gui32();
             uint8_t powerup_type = data.gui8(4);
-            uint8_t kart_race_id = data.gui8(5);
+            uint8_t player_id = data.gui8(5);
             // now set the kart powerup
             AbstractKart* kart = World::getWorld()->getKart(
-                STKHost::get()->getGameSetup()
-                              ->getProfile(kart_race_id)->getWorldKartID());
+                      STKHost::get()->getGameSetup()
+                                    ->getProfile(player_id)->getWorldKartID());
             ItemManager::get()->collectedItem(
-                ItemManager::get()->getItem(item_id),
-                kart,
-                powerup_type);
+                                          ItemManager::get()->getItem(item_id),
+                                          kart,
+                                          powerup_type);
             Log::info("GameEventsProtocol", "Item %d picked by a player.",
                        powerup_type);
         }   break;

@@ -322,6 +322,9 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
                 collectedItem(*i, kart);
             else if (NetworkConfig::get()->isServer())
             {
+                // Only the server side detects item being collected
+                // A client does the collection upon receiving the 
+                // event from the server!
                 collectedItem(*i, kart);
                 NetworkWorld::getInstance()->collectedItem(*i, kart);
             }
