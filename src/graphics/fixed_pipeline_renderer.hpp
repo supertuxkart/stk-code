@@ -23,6 +23,10 @@
 class FixedPipelineRenderer: public AbstractRenderer
 {
 public:
+    FixedPipelineRenderer();
+    
+    void onLoadWorld()  ;
+    void onUnloadWorld();
     
     void render(float dt);
     void renderScene(irr::scene::ICameraSceneNode * const camnode,

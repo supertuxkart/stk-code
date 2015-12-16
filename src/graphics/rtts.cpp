@@ -292,14 +292,14 @@ RTT::~RTT()
 
 void RTT::prepareRender(scene::ICameraSceneNode* camera)
 {
-    irr_driver->setRTT(this);
+    irr_driver->setRTT(this); //FIXME
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
 }
 
 FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
 {
-    irr_driver->setRTT(this);
+    irr_driver->setRTT(this); //FIXME
 
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
@@ -313,7 +313,7 @@ FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
     glViewport(0, 0,
         irr_driver->getActualScreenSize().Width,
         irr_driver->getActualScreenSize().Height);
-    irr_driver->setRTT(NULL);
+    irr_driver->setRTT(NULL); //FIXME
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     irr_driver->getSceneManager()->setActiveCamera(NULL);

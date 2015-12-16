@@ -1,4 +1,4 @@
-//  SuperTuxKart - a fun racing game with go-kart
+//  SuperTuxKart - a fun racing game with }go-kart
 //  Copyright (C) 2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
@@ -18,6 +18,7 @@
 #ifndef HEADER_ABSTRACT_RENDERER_HPP
 #define HEADER_ABSTRACT_RENDERER_HPP
 
+#include "graphics/rtts.hpp"
 #include "graphics/sphericalHarmonics.hpp"
 #include <irrlicht.h>
 #include <vector>
@@ -32,9 +33,8 @@ class AbstractRenderer
 {
 protected:
     irr::core::vector2df m_current_screen_size;
-    
-    //bool                 m_wireframe;
-    //bool                 m_mipviz;
+    RTT                  *m_rtts;
+
 
 #ifdef DEBUG
     void drawDebugMeshes() const;
@@ -48,7 +48,15 @@ protected:
 
 
 public:
+    AbstractRenderer();
     virtual ~AbstractRenderer(){}
+    
+    RTT* getRTT() { return m_rtts;} //FIXME: remove this
+    void setRTT(RTT *rtts) { m_rtts = rtts; } //FIXME: remove this
+    
+    virtual void onLoadWorld()   = 0;
+    virtual void onUnloadWorld() = 0;
+
 
     virtual void addSkyBox(const std::vector<irr::video::ITexture*> &texture,
                            const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) {}

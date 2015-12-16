@@ -42,7 +42,10 @@ public:
                         const FrameBuffer& diffuse_specular_framebuffer,
                         GLuint specular_probe);
     void renderAmbientScatter();
-    void renderLightsScatter();
+    void renderLightsScatter(const FrameBuffer& half1_framebuffer,
+                             const FrameBuffer& half2_framebuffer,
+                             const FrameBuffer& colors_framebuffer,
+                             GLuint half1_render_target);
     
     
     

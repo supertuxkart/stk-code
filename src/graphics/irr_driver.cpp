@@ -120,7 +120,6 @@ IrrDriver::IrrDriver()
                                          /*event receiver*/ NULL,
                                          file_manager->getFileSystem());
     m_request_screenshot = false;
-    m_rtts                = NULL;
     m_renderer            = NULL;
     m_wind                = new Wind();
 
@@ -1737,26 +1736,17 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
 void IrrDriver::setRTT(RTT* rtt)
 {
     m_renderer->resetShadowCamNodes();
-    m_rtts = rtt;
+    m_renderer->setRTT(rtt); //FIXME
 }
 // ----------------------------------------------------------------------------
 void IrrDriver::onLoadWorld()
 {
-    if (CVS->isGLSL())
-    {
-        const core::recti &viewport = Camera::getCamera(0)->getViewport();
-        size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
-        size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
-        m_rtts = new RTT(width, height);
-    }
+    m_renderer->onLoadWorld();
 }
 // ----------------------------------------------------------------------------
 void IrrDriver::onUnloadWorld()
 {
-    delete m_rtts;
-    m_rtts = NULL;
-
-    suppressSkyBox();
+    m_renderer->onUnloadWorld();
 }
 // ----------------------------------------------------------------------------
 /** Sets the ambient light.
@@ -2404,20 +2394,21 @@ void IrrDriver::clearLights()
 
 GLuint IrrDriver::getRenderTargetTexture(TypeRTT which)
 {
-    return m_rtts->getRenderTarget(which);
+    return m_renderer->getRTT()->getRenderTarget(which);
 }   // getRenderTargetTexture
 
 // ----------------------------------------------------------------------------
 
 FrameBuffer& IrrDriver::getFBO(TypeFBO which)
 {
-    return m_rtts->getFBO(which);
+    return m_renderer->getRTT()->getFBO(which);
 }   // getFBO
 
 // ----------------------------------------------------------------------------
 
 GLuint IrrDriver::getDepthStencilTexture()
 {
-    return m_rtts->getDepthStencilTexture();
+    return m_renderer->getRTT()->getDepthStencilTexture();
 }   // getDepthStencilTexture
+
 

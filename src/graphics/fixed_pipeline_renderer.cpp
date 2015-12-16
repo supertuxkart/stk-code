@@ -23,6 +23,21 @@
 #include "physics/physics.hpp"
 #include "utils/profiler.hpp"
 
+
+
+FixedPipelineRenderer::FixedPipelineRenderer(): AbstractRenderer() {}
+
+    
+void FixedPipelineRenderer::onLoadWorld()
+{
+    
+}
+
+void FixedPipelineRenderer::onUnloadWorld()
+{
+    
+}
+
 void FixedPipelineRenderer::render(float dt)
 {
     World *world = World::getWorld(); // Never NULL.

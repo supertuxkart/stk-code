@@ -18,7 +18,6 @@
 #include "graphics/shadow_matrices.hpp"
 
 #include "graphics/central_settings.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
@@ -217,7 +216,8 @@ core::matrix4 ShadowMatrices::getTighestFitOrthoProj(const core::matrix4 &transf
  *         I have some motivation
  */
 void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
-                                                                     unsigned int height)
+                                                                     unsigned int height,
+                                                                     GLuint depth_stencil_texture)
 {
     struct CascadeBoundingBox
     {
@@ -254,7 +254,7 @@ void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned in
 
     LightspaceBoundingBoxShader::getInstance()->use();
     LightspaceBoundingBoxShader::getInstance()
-        ->setTextureUnits(irr_driver->getDepthStencilTexture());
+        ->setTextureUnits(depth_stencil_texture);
     LightspaceBoundingBoxShader::getInstance()
         ->setUniforms(m_sun_cam->getViewMatrix(),
                       ShadowMatrices::m_shadow_split[1],
@@ -295,7 +295,7 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
                                                unsigned int width, unsigned int height)
 {
     if (CVS->isSDSMEnabled())
-        updateSplitAndLightcoordRangeFromComputeShaders(width, height);
+        updateSplitAndLightcoordRangeFromComputeShaders(width, height, irr_driver->getRTT()->getDepthStencilTexture());
     static_cast<scene::CSceneManager *>(irr_driver->getSceneManager())
         ->OnAnimate(os::Timer::getTime());
     camnode->render();

@@ -32,7 +32,6 @@ class ShaderBasedRenderer: public AbstractRenderer
 private:
     Skybox *m_skybox;
     SphericalHarmonics *m_spherical_harmonics;
-
     
     //GLsync          m_sync; //TODO
     DrawCalls       m_draw_calls;
@@ -85,6 +84,10 @@ private:
 public:
     ShaderBasedRenderer();
     ~ShaderBasedRenderer();
+    
+    void onLoadWorld()  ;
+    void onUnloadWorld();
+    
 
     void addSkyBox(const std::vector<irr::video::ITexture*> &texture,
                    const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) override;

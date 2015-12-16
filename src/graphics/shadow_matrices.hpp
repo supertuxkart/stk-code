@@ -19,6 +19,8 @@
 #ifndef HEADER_SHADOW_MATRICES_HPP
 #define HEADER_SHADOW_MATRICES_HPP
 
+#include "graphics/glwrap.hpp"
+
 #include "matrix4.h"
 #include "vector3d.h"
 
@@ -53,7 +55,8 @@ private:
 
 
     void updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
-                                                         unsigned int height);
+                                                         unsigned int height,
+                                                         GLuint depth_stencil_texture);
     core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform,
                               const std::vector<core::vector3df> &pointsInside,
                               std::pair<float, float> &size);

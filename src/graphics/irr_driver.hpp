@@ -38,6 +38,8 @@
 #include "ISkinnedMesh.h"
 #include "graphics/abstract_renderer.hpp"
 #include "graphics/gl_headers.hpp"
+#include "graphics/sphericalHarmonics.hpp"
+#include "graphics/rtts.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
@@ -56,6 +58,8 @@ namespace irr
 }
 using namespace irr;
 
+
+struct GlowData;
 class RTT;
 class FrameBuffer;
 class ShadowImportanceProvider;
@@ -77,108 +81,6 @@ enum STKRenderingPass
     SHADOW_PASS,
     PASS_COUNT,
 };
-
-enum TypeFBO
-{
-    FBO_SSAO,
-    FBO_NORMAL_AND_DEPTHS,
-    FBO_COMBINED_DIFFUSE_SPECULAR,
-    FBO_COLORS,
-    FBO_DIFFUSE,
-    FBO_SPECULAR,
-    FBO_MLAA_COLORS,
-    FBO_MLAA_BLEND,
-    FBO_MLAA_TMP,
-    FBO_TMP1_WITH_DS,
-    FBO_TMP2_WITH_DS,
-    FBO_TMP4,
-    FBO_LINEAR_DEPTH,
-    FBO_HALF1,
-    FBO_HALF1_R,
-    FBO_HALF2,
-    FBO_HALF2_R,
-    FBO_QUARTER1,
-    FBO_QUARTER2,
-    FBO_EIGHTH1,
-    FBO_EIGHTH2,
-    FBO_DISPLACE,
-    FBO_BLOOM_1024,
-    FBO_SCALAR_1024,
-    FBO_BLOOM_512,
-    FBO_TMP_512,
-    FBO_LENS_512,
-
-    FBO_BLOOM_256,
-    FBO_TMP_256,
-    FBO_LENS_256,
-
-    FBO_BLOOM_128,
-    FBO_TMP_128,
-    FBO_LENS_128,
-    FBO_COUNT
-};
-
-enum TypeRTT
-{
-    RTT_TMP1 = 0,
-    RTT_TMP2,
-    RTT_TMP3,
-    RTT_TMP4,
-    RTT_LINEAR_DEPTH,
-    RTT_NORMAL_AND_DEPTH,
-    RTT_COLOR,
-    RTT_DIFFUSE,
-    RTT_SPECULAR,
-
-
-    RTT_HALF1,
-    RTT_HALF2,
-    RTT_HALF1_R,
-    RTT_HALF2_R,
-
-    RTT_QUARTER1,
-    RTT_QUARTER2,
-    //    RTT_QUARTER3,
-    //    RTT_QUARTER4,
-
-    RTT_EIGHTH1,
-    RTT_EIGHTH2,
-
-    //    RTT_SIXTEENTH1,
-    //    RTT_SIXTEENTH2,
-
-    RTT_SSAO,
-
-    //    RTT_COLLAPSE,
-    //    RTT_COLLAPSEH,
-    //    RTT_COLLAPSEV,
-    //    RTT_COLLAPSEH2,
-    //    RTT_COLLAPSEV2,
-    //    RTT_WARPH,
-    //    RTT_WARPV,
-
-    //    RTT_HALF_SOFT,
-
-    RTT_DISPLACE,
-    RTT_MLAA_COLORS,
-    RTT_MLAA_BLEND,
-    RTT_MLAA_TMP,
-
-    RTT_BLOOM_1024,
-    RTT_SCALAR_1024,
-    RTT_BLOOM_512,
-    RTT_TMP_512,
-    RTT_LENS_512,
-    RTT_BLOOM_256,
-    RTT_TMP_256,
-    RTT_LENS_256,
-    RTT_BLOOM_128,
-    RTT_TMP_128,
-    RTT_LENS_128,
-
-    RTT_COUNT
-};
-
 
 
 
@@ -207,8 +109,7 @@ private:
     
     /** Wind. */
     Wind                 *m_wind;
-    /** RTTs. */
-    RTT                *m_rtts;
+
     core::dimension2du m_actual_screen_size;
 
     /** Additional details to be shown in case that a texture is not found.
@@ -472,10 +373,9 @@ public:
     {
         return m_texture_error_message;
     }   // getTextureErrorMessage
+
     // ------------------------------------------------------------------------
-    void setRTT(RTT* rtt);
-    // ------------------------------------------------------------------------
-    RTT* getRTT() { return m_rtts; }
+    RTT* getRTT() { return m_renderer->getRTT(); } //TODO: remove this
     // ------------------------------------------------------------------------
     AbstractRenderer* getRenderer() { return m_renderer; }
     // ------------------------------------------------------------------------
@@ -731,7 +631,7 @@ public:
     }   // addDebugMesh
 
 #endif
-
+    void setRTT(RTT* rtt); //FIXME
     void onLoadWorld();
     void onUnloadWorld();
 

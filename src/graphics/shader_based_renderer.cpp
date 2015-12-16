@@ -396,7 +396,10 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
-        m_lighting_passes.renderLightsScatter();
+        m_lighting_passes.renderLightsScatter(irr_driver->getRTT()->getFBO(FBO_HALF1),
+                                              irr_driver->getRTT()->getFBO(FBO_HALF2),
+                                              irr_driver->getRTT()->getFBO(FBO_COLORS),
+                                              irr_driver->getRTT()->getRenderTarget(RTT_HALF1));
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -573,7 +576,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 }
 
 
-ShaderBasedRenderer::ShaderBasedRenderer()
+ShaderBasedRenderer::ShaderBasedRenderer():AbstractRenderer()
 {    
     m_skybox                = NULL;
     m_spherical_harmonics   = new SphericalHarmonics(irr_driver->getAmbientLight().toSColor());
@@ -592,6 +595,22 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_geometry_passes;
     delete m_spherical_harmonics;
     delete m_skybox;
+}
+
+    
+void ShaderBasedRenderer::onLoadWorld()
+{
+    const core::recti &viewport = Camera::getCamera(0)->getViewport();
+    size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
+    size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
+    m_rtts = new RTT(width, height);    
+}
+
+void ShaderBasedRenderer::onUnloadWorld()
+{
+    delete m_rtts;
+    m_rtts = NULL;
+    removeSkyBox();    
 }
 
 

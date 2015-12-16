@@ -194,5 +194,13 @@ void AbstractRenderer::drawJoint(bool drawline, bool drawname,
     }
 } //drawJoint
 
+
+AbstractRenderer::AbstractRenderer()
+{
+    m_rtts                  = NULL;
+}    
+
+
+
 #endif //DEBUG
 
