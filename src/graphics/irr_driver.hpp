@@ -375,8 +375,6 @@ public:
     }   // getTextureErrorMessage
 
     // ------------------------------------------------------------------------
-    RTT* getRTT() { return m_renderer->getRTT(); } //TODO: remove this
-    // ------------------------------------------------------------------------
     AbstractRenderer* getRenderer() { return m_renderer; }
     // ------------------------------------------------------------------------
     /** Returns a list of all video modes supports by the graphics card. */

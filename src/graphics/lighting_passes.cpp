@@ -470,6 +470,8 @@ void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_mat
 
 // ----------------------------------------------------------------------------
 void LightingPasses::renderLights(  bool has_shadow,
+                                    GLuint normal_depth_rander_target,
+                                    GLuint depth_stencil_texture,
                                     const FrameBuffer& shadow_framebuffer,
                                     const FrameBuffer& diffuse_specular_framebuffer,
                                     GLuint specular_probe)
@@ -483,9 +485,7 @@ void LightingPasses::renderLights(  bool has_shadow,
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
         post_processing->renderEnvMap(specular_probe);       
     } 
-    
-    RTT *rtts = irr_driver->getRTT();
-    
+        
     // Render sunlight if and only if track supports shadow
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
@@ -500,14 +500,14 @@ void LightingPasses::renderLights(  bool has_shadow,
 
             if (CVS->isESMEnabled())
             {
-                ShadowedSunLightShaderESM::getInstance()->render(rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
-                                                                 rtts->getDepthStencilTexture(),
+                ShadowedSunLightShaderESM::getInstance()->render(normal_depth_rander_target,
+                                                                 depth_stencil_texture,
                                                                  shadow_framebuffer);
             }
             else
             {
-                ShadowedSunLightShaderPCF::getInstance()->render(rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
-                                                                 rtts->getDepthStencilTexture(),
+                ShadowedSunLightShaderPCF::getInstance()->render(normal_depth_rander_target,
+                                                                 depth_stencil_texture,
                                                                  shadow_framebuffer);
             }
         }
@@ -520,13 +520,13 @@ void LightingPasses::renderLights(  bool has_shadow,
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_POINTLIGHTS));
         renderPointLights(std::min(m_point_light_count, LightBaseClass::MAXLIGHT),
-                          rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
-                          rtts->getDepthStencilTexture());
+                          normal_depth_rander_target,
+                          depth_stencil_texture);
     }
 }   // renderLights    
 
 // ----------------------------------------------------------------------------
-void LightingPasses::renderAmbientScatter()
+void LightingPasses::renderAmbientScatter(GLuint depth_stencil_texture)
 {
     const Track * const track = World::getWorld()->getTrack();
 
@@ -544,7 +544,7 @@ void LightingPasses::renderAmbientScatter()
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    FogShader::getInstance()->render(start, col, irr_driver->getRTT()->getDepthStencilTexture());
+    FogShader::getInstance()->render(start, col, depth_stencil_texture);
 }   // renderAmbientScatter
 
 // ----------------------------------------------------------------------------

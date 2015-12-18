@@ -182,7 +182,8 @@ void AbstractGeometryPasses::shadowPostProcessing(const ShadowMatrices& shadow_m
 void AbstractGeometryPasses::glowPostProcessing(const FrameBuffer& glow_framebuffer,
                                                 const FrameBuffer& half_framebuffer,
                                                 const FrameBuffer& quarter_framebuffer,
-                                                const FrameBuffer& color_framebuffer) const
+                                                const FrameBuffer& color_framebuffer,
+                                                GLuint quarter_render_target) const
 {
     // To half
     FrameBuffer::Blit(glow_framebuffer, half_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
@@ -197,7 +198,7 @@ void AbstractGeometryPasses::glowPostProcessing(const FrameBuffer& glow_framebuf
     glStencilFunc(GL_EQUAL, 0, ~0);
     glEnable(GL_STENCIL_TEST);
     color_framebuffer.bind();
-    irr_driver->getPostProcessing()->renderGlow(irr_driver->getRTT()->getRenderTarget(RTT_QUARTER1));//TODO
+    irr_driver->getPostProcessing()->renderGlow(quarter_render_target);//TODO
     glDisable(GL_STENCIL_TEST);    
     
 }

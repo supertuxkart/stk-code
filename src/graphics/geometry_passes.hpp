@@ -41,11 +41,13 @@ protected:
     void prepareShadowRendering(const FrameBuffer& shadow_framebuffer) const;
     void shadowPostProcessing(const ShadowMatrices& shadow_matrices,
                               const FrameBuffer& shadow_framebuffer) const;
-                              
+                
+    //TODO: move it in ShaderBasedRenderer
     void glowPostProcessing(const FrameBuffer& glow_framebuffer,
                             const FrameBuffer& half_framebuffer,
                             const FrameBuffer& quater_framebuffer,
-                            const FrameBuffer& color_framebuffer) const;
+                            const FrameBuffer& color_framebuffer,
+                            GLuint quarter_render_target) const;
 
 public:
     AbstractGeometryPasses();
@@ -64,7 +66,8 @@ public:
                             const FrameBuffer& glow_framebuffer,
                             const FrameBuffer& half_framebuffer,
                             const FrameBuffer& quarter_framebuffer,
-                            const FrameBuffer& color_framebuffer   ) const = 0;
+                            const FrameBuffer& color_framebuffer,
+                            GLuint quarter_render_target          ) const = 0;
     
     void renderTransparent(const DrawCalls& draw_calls, 
                            unsigned render_target);
@@ -119,7 +122,8 @@ public:
                     const FrameBuffer& glow_framebuffer,
                     const FrameBuffer& half_framebuffer,
                     const FrameBuffer& quarter_framebuffer,
-                    const FrameBuffer& color_framebuffer   ) const
+                    const FrameBuffer& color_framebuffer,
+                    GLuint quarter_render_target   ) const
     {
         irr_driver->getSceneManager()->setCurrentRendertime(scene::ESNRP_SOLID);
         glow_framebuffer.bind();
@@ -142,7 +146,8 @@ public:
         glDisable(GL_BLEND);
         
         glowPostProcessing(glow_framebuffer, half_framebuffer,
-                           quarter_framebuffer, color_framebuffer);
+                           quarter_framebuffer, color_framebuffer,
+                           quarter_render_target);
         
     }
 

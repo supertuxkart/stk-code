@@ -290,12 +290,6 @@ RTT::~RTT()
     }
 }
 
-void RTT::prepareRender(scene::ICameraSceneNode* camera)
-{
-    irr_driver->setRTT(this); //FIXME
-    irr_driver->getSceneManager()->setActiveCamera(camera);
-
-}
 
 FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
 {

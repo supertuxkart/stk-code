@@ -292,10 +292,11 @@ void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned in
  *   \param height of the rendering viewport
  */
 void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
-                                               unsigned int width, unsigned int height)
+                                               unsigned int width, unsigned int height,
+                                               GLuint depth_stencil_texture)
 {
     if (CVS->isSDSMEnabled())
-        updateSplitAndLightcoordRangeFromComputeShaders(width, height, irr_driver->getRTT()->getDepthStencilTexture());
+        updateSplitAndLightcoordRangeFromComputeShaders(width, height, depth_stencil_texture);
     static_cast<scene::CSceneManager *>(irr_driver->getSceneManager())
         ->OnAnimate(os::Timer::getTime());
     camnode->render();
@@ -474,25 +475,24 @@ void ShadowMatrices::renderWireFrameFrustrum(float *tmp, unsigned i)
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 }
 // ----------------------------------------------------------------------------
-void ShadowMatrices::renderShadowsDebug()
+void ShadowMatrices::renderShadowsDebug(const FrameBuffer &shadow_framebuffer)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, UserConfigParams::m_height / 2,
                UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
     PostProcessing *post_processing = irr_driver->getPostProcessing();
-    RTT *rtt = irr_driver->getRTT();
-    post_processing->renderTextureLayer(rtt->getShadowFrameBuffer().getRTT()[0], 0);
+    post_processing->renderTextureLayer(shadow_framebuffer.getRTT()[0], 0);
     renderWireFrameFrustrum(m_shadows_cam[0], 0);
     glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2,
                UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFrameBuffer().getRTT()[0], 1);
+    post_processing->renderTextureLayer(shadow_framebuffer.getRTT()[0], 1);
     renderWireFrameFrustrum(m_shadows_cam[1], 1);
     glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFrameBuffer().getRTT()[0], 2);
+    post_processing->renderTextureLayer(shadow_framebuffer.getRTT()[0], 2);
     renderWireFrameFrustrum(m_shadows_cam[2], 2);
     glViewport(UserConfigParams::m_width / 2, 0, UserConfigParams::m_width / 2,
                UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFrameBuffer().getRTT()[0], 3);
+    post_processing->renderTextureLayer(shadow_framebuffer.getRTT()[0], 3);
     renderWireFrameFrustrum(m_shadows_cam[3], 3);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }

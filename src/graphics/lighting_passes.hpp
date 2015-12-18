@@ -38,10 +38,12 @@ public:
                                     const FrameBuffer& reflective_shadow_map_framebuffer,
                                     const FrameBuffer& diffuse_framebuffer);
     void renderLights(  bool has_shadow,
+                        GLuint normal_depth_rander_target,
+                        GLuint depth_stencil_texture,
                         const FrameBuffer& shadow_framebuffer,
                         const FrameBuffer& diffuse_specular_framebuffer,
                         GLuint specular_probe);
-    void renderAmbientScatter();
+    void renderAmbientScatter(GLuint depth_stencil_texture);
     void renderLightsScatter(const FrameBuffer& half1_framebuffer,
                              const FrameBuffer& half2_framebuffer,
                              const FrameBuffer& colors_framebuffer,
