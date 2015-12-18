@@ -382,6 +382,7 @@ private:
     void loadBattleGraph();
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
+    void loadMinimap();
     void createWater(const XMLNode &node);
     void getMusicInformation(std::vector<std::string>&  filenames,
                              std::vector<MusicInformation*>& m_music   );
