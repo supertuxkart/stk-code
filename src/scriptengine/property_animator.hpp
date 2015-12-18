@@ -26,7 +26,8 @@ enum AnimatablePropery
     AP_LIGHT_ENERGY,
     FOG_RANGE,
     FOG_MAX,
-    FOG_COLOR
+    FOG_COLOR,
+    SUN_COLOR
 };
 
 class AnimatedProperty : NoCopy

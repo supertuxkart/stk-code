@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "scriptengine/property_animator.hpp"
+#include "graphics/irr_driver.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_presentation.hpp"
 #include "utils/log.hpp"
@@ -81,6 +82,15 @@ bool AnimatedProperty::update(double dt)
             Track* track = (Track*)m_data;
             video::SColor color(255, (int)m_new_values[0], (int)m_new_values[1], (int)m_new_values[2]);
             track->setFogColor(color);
+            break;
+        }
+
+        case AnimatablePropery::SUN_COLOR:
+        {
+            Track* track = (Track*)m_data;
+            video::SColor color(255, (int)m_new_values[0], (int)m_new_values[1], (int)m_new_values[2]);
+            track->setSunColor(color);
+            irr_driver->setSunColor(color);
             break;
         }
 

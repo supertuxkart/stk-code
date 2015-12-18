@@ -577,6 +577,8 @@ public:
     // ------------------------------------------------------------------------
     video::SColor getSunColor() const { return m_sun_diffuse_color; }
     // ------------------------------------------------------------------------
+    void setSunColor(video::SColor color) { m_sun_diffuse_color = color; }
+    // ------------------------------------------------------------------------
     /** Whether this is an "internal" track. If so it won't be offered
      * in the track selection screen. */
     bool isInternal() const { return m_internal; }

@@ -166,6 +166,27 @@ namespace Scripting
                     duration, track)
             );
         }
+
+        void setSunColor(int r, int g, int b, float duration)
+        {
+            PropertyAnimator* animator = PropertyAnimator::get();
+            ::Track* track = World::getWorld()->getTrack();
+            video::SColor color = track->getSunColor();
+            animator->add(
+                new AnimatedProperty(SUN_COLOR, 3,
+                new double[3] {
+                    (double)color.getRed(),
+                    (double)color.getGreen(),
+                    (double)color.getBlue()
+                },
+                new double[3] {
+                    (double)r,
+                    (double)g,
+                    (double)b
+                },
+                duration, track)
+            );
+        }
     }
 
     /** \cond DOXYGEN_IGNORE */
@@ -365,7 +386,8 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void exitRace()", asFUNCTION(exitRace), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void pauseRace()", asFUNCTION(pauseRace), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)", asFUNCTION(setFog), asCALL_CDECL); assert(r >= 0);
-
+            r = engine->RegisterGlobalFunction("void setSunColor(int r, int g, int b, float duration)", asFUNCTION(setSunColor), asCALL_CDECL); assert(r >= 0);
+            
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", asMETHOD(::TrackObject, setEnabled), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "SoundEmitter@ getSoundEmitter()", asMETHOD(::TrackObject, getSoundEmitter), asCALL_THISCALL); assert(r >= 0);
