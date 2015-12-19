@@ -73,6 +73,24 @@ private:
                         const std::string &graph_file_name,
                         const bool reverse);
         ~QuadGraph     ();
+
+    // ------------------------------------------------------------------------
+    virtual void set3DVerticesOfGraph(int i, video::S3DVertex *v,
+                                      const video::SColor &color) const
+                         { m_all_nodes[i]->getQuad().getVertices(v, color); }
+    // ------------------------------------------------------------------------
+    virtual void getGraphBoundingBox(Vec3 *min, Vec3 *max) const
+                                { QuadSet::get()->getBoundingBox(min, max); }
+    // ------------------------------------------------------------------------
+    virtual const bool isNodeInvisible(int n) const
+                          { return m_all_nodes[n]->getQuad().isInvisible(); }
+    // ------------------------------------------------------------------------
+    virtual const bool isNodeInvalid(int n) const
+                                                            { return false; }
+    // ------------------------------------------------------------------------
+    virtual const bool hasLapLine() const
+                                                            { return true;  }
+
 public:
     static const int UNKNOWN_SECTOR;
 
@@ -160,12 +178,6 @@ public:
     float        getLapLength() const {return m_lap_length; }
     // ------------------------------------------------------------------------
     bool         isReverse() const {return m_reverse; }
-    // ------------------------------------------------------------------------
-    /** Sets the type of this graph. */
-    virtual void      setType() { m_graph_type = GraphType::GT_RACE; }
-    // ------------------------------------------------------------------------
-    virtual const std::vector<GraphNode*> getAllNodes() const
-                            { return m_all_nodes; }
 };   // QuadGraph
 
 #endif

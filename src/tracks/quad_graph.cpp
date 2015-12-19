@@ -57,7 +57,6 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_quad_filename        = quad_file_name;
     m_quad_graph           = this;
     load(graph_file_name);
-    setType();
 }   // QuadGraph
 
 // -----------------------------------------------------------------------------

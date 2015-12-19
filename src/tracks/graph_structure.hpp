@@ -23,14 +23,13 @@
 
 #include <dimension2d.h>
 #include <SColor.h>
-#include "tracks/graph_node.hpp"
 #include "utils/vec3.hpp"
 #include "utils/no_copy.hpp"
 
 namespace irr
 {
     namespace scene { class ISceneNode; class IMesh; class IMeshBuffer; }
-    namespace video { class ITexture; }
+    namespace video { class ITexture; struct S3DVertex; }
 }
 using namespace irr;
 
@@ -38,25 +37,17 @@ class FrameBuffer;
 class RTT;
 
 /**
- * \brief Virtual base class for a graph structure.
+ *  \brief Virtual base class for a graph structure.
+ *  This is mainly used for drawing minimap in game.
  *
- *  A graph structure has a certain type:
- *  GT_RACE  :  Graph used by a lap race.
- *  GT_BATTLE:  Graph used by a battle arena.
- *
- * \ingroup tracks
+ *  \ingroup tracks
  */
 class GraphStructure : public NoCopy
 {
-public:
-    enum GraphType {GT_RACE, GT_BATTLE};
-
 protected:
-    /** The type of this graph. */
-    GraphType         m_graph_type;
 
-    void              cleanupDebugMesh();
-    void              destroyRTT();
+    void                    cleanupDebugMesh();
+    void                    destroyRTT();
 
 private:
     RTT* m_new_rtt;
@@ -76,10 +67,16 @@ private:
     /** Scaling for mini map. */
     float                    m_scaling;
 
-    void  createMesh(bool show_invisible=true,
-                     bool enable_transparency=false,
-                     const video::SColor *track_color=NULL,
-                     const video::SColor *lap_color=NULL);
+    void createMesh(bool show_invisible=true,
+                    bool enable_transparency=false,
+                    const video::SColor *track_color=NULL);
+
+    virtual void set3DVerticesOfGraph(int i, video::S3DVertex *v,
+                                      const video::SColor &color) const = 0;
+    virtual void getGraphBoundingBox(Vec3 *min, Vec3 *max) const = 0;
+    virtual const bool isNodeInvisible(int n) const = 0;
+    virtual const bool isNodeInvalid(int n) const = 0;
+    virtual const bool hasLapLine() const = 0;
 
 public:
              GraphStructure();
@@ -91,9 +88,7 @@ public:
                          video::ITexture** oldRttMinimap,
                          FrameBuffer** newRttMinimap);
     void     mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
-    virtual const unsigned int            getNumNodes() const = 0;
-    virtual const std::vector<GraphNode*> getAllNodes() const = 0;
-    virtual void                          setType() = 0;
+    virtual const unsigned int getNumNodes() const = 0;
 };   // GraphStructure
 
 #endif

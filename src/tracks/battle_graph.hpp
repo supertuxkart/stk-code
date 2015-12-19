@@ -63,6 +63,23 @@ private:
     BattleGraph(const std::string &navmesh_file_name);
     ~BattleGraph(void);
 
+    // ------------------------------------------------------------------------
+    virtual void set3DVerticesOfGraph(int i, video::S3DVertex *v,
+                                      const video::SColor &color) const
+                                { NavMesh::get()->setVertices(i, v, color); }
+    // ------------------------------------------------------------------------
+    virtual void getGraphBoundingBox(Vec3 *min, Vec3 *max) const
+                                { NavMesh::get()->getBoundingBox(min, max); }
+    // ------------------------------------------------------------------------
+    virtual const bool isNodeInvisible(int n) const
+                                                            { return false; }
+    // ------------------------------------------------------------------------
+    virtual const bool isNodeInvalid(int n) const
+     { return (NavMesh::get()->getNavPoly(n).getVerticesIndex()).size()!=4; }
+    // ------------------------------------------------------------------------
+    virtual const bool hasLapLine() const
+                                                            { return false; }
+
 public:
     static const int UNKNOWN_POLY;
 
@@ -92,12 +109,12 @@ public:
     /** Returns the number of nodes in the BattleGraph (equal to the number of
     *    polygons in the NavMesh */
     virtual const unsigned int getNumNodes() const
-                                        { return m_distance_matrix.size(); }
+                                         { return m_distance_matrix.size(); }
 
     // ----------------------------------------------------------------------
     /** Returns the NavPoly corresponding to the i-th node of the BattleGraph */
     const NavPoly&    getPolyOfNode(int i) const
-                                        { return NavMesh::get()->getNavPoly(i); }
+                                    { return NavMesh::get()->getNavPoly(i); }
 
     // ----------------------------------------------------------------------
     /** Returns the next polygon on the shortest path from i to j.
@@ -106,15 +123,9 @@ public:
     const int &       getNextShortestPathPoly(int i, int j) const;
 
     const std::vector < std::pair<const Item*, int> >& getItemList()
-                                        { return m_items_on_graph; }
+                                                 { return m_items_on_graph; }
 
     void              findItemsOnGraphNodes();
-    // ------------------------------------------------------------------------
-    /** Sets the type of this graph. */
-    virtual void      setType() { m_graph_type = GraphType::GT_BATTLE; }
-    // ------------------------------------------------------------------------
-    virtual const std::vector<GraphNode*> getAllNodes() const
-                                {return std::vector<GraphNode*>();}
 };    //BattleGraph
 
 #endif

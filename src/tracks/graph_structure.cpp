@@ -22,21 +22,17 @@
 #include <ICameraSceneNode.h>
 #include <IMeshSceneNode.h>
 
-#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/rtts.hpp"
 #include "modes/world.hpp"
-#include "tracks/quad_set.hpp"
-#include "tracks/navmesh.hpp"
 #include "utils/log.hpp"
 
 // -----------------------------------------------------------------------------
 
 GraphStructure::GraphStructure()
 {
-    m_graph_type  = GT_RACE;
     m_min_coord   = 0;
     m_scaling     = 0;
     m_node        = NULL;
@@ -101,8 +97,7 @@ void GraphStructure::createDebugMesh()
 /** Creates the actual mesh that is used by createDebugMesh() or makeMiniMap() */
 void GraphStructure::createMesh(bool show_invisible,
                                 bool enable_transparency,
-                                const video::SColor *track_color,
-                                const video::SColor *lap_color)
+                                const video::SColor *track_color)
 {
     // The debug track will not be lighted or culled.
     video::SMaterial m;
@@ -115,21 +110,15 @@ void GraphStructure::createMesh(bool show_invisible,
     m_mesh             = irr_driver->createQuadMesh(&m);
     m_mesh_buffer      = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
-    const std::vector<GraphNode*> all_nodes = getAllNodes();
 
-    unsigned int n;
-    if (m_graph_type == GT_RACE)
+    unsigned int n = 0;
+    // Count the number of quads to display (some quads might be invisible
+
+    for (unsigned int i = 0; i < getNumNodes(); i++)
     {
-        // Count the number of quads to display (some quads might be invisible
-        n = 0;
-        for (unsigned int i = 0; i < getNumNodes(); i++)
-        {
-            if (show_invisible || !all_nodes[i]->getQuad().isInvisible())
-                n++;
-        }
+        if (show_invisible || !isNodeInvisible(i))
+            n++;
     }
-    else
-        n = getNumNodes();
 
     // Four vertices for each of the n-1 remaining quads
     video::S3DVertex *new_v = new video::S3DVertex[4*n];
@@ -146,16 +135,12 @@ void GraphStructure::createMesh(bool show_invisible,
     for (unsigned int count = 0; count < getNumNodes(); count++)
     {
         // Ignore invisible quads
-        if (m_graph_type == GT_RACE)
+        if (!show_invisible && isNodeInvisible(count))
+            continue;
+        else if (isNodeInvalid(count))
         {
-            if (!show_invisible && all_nodes[count]->getQuad().isInvisible())
-                continue;
-        }
-        else if ((NavMesh::get()->getNavPoly(count).getVerticesIndex()).size() !=4 &&
-                 m_graph_type == GT_BATTLE)
-        {
-            // There should not be a poly which isn't made of 4 vertices
-            Log::warn("Battle Graph", "There is an invalid poly!");
+            // There should not be a node which isn't made of 4 vertices
+            Log::warn("Graph Structure", "There is an invalid node!");
             continue;
         }
 
@@ -167,10 +152,7 @@ void GraphStructure::createMesh(bool show_invisible,
         }
 
         // Transfer the 4 points of the current quad to the list of vertices
-        if (m_graph_type == GT_RACE)
-            all_nodes[count]->getQuad().getVertices(new_v+4*i, c);
-        else
-            NavMesh::get()->setVertices(count, new_v+4*i, c);
+        set3DVerticesOfGraph(count, new_v+4*i, c);
 
         // Set up the indices for the triangles
         // (note, afaik with opengl we could use quads directly, but the code
@@ -186,17 +168,17 @@ void GraphStructure::createMesh(bool show_invisible,
 
     m_mesh_buffer->append(new_v, n*4, ind, n*6);
 
-    if (lap_color && m_graph_type == GT_RACE)
+    if (hasLapLine())
     {
         video::S3DVertex lap_v[4];
         irr::u16         lap_ind[6];
-        video::SColor     c(128, 255, 0, 0);
-        all_nodes[0]->getQuad().getVertices(lap_v, *lap_color);
+        video::SColor    lap_color(128, 255, 0, 0);
+        set3DVerticesOfGraph(0, lap_v, lap_color);
 
         // Now scale the length (distance between vertix 0 and 3
         // and between 1 and 2) to be 'length':
         Vec3 bb_min, bb_max;
-        QuadSet::get()->getBoundingBox(&bb_min, &bb_max);
+        getGraphBoundingBox(&bb_min, &bb_max);
         // Length of the lap line about 3% of the 'height'
         // of the track.
         const float length = (bb_max.getZ()-bb_min.getZ())*0.03f;
@@ -278,21 +260,9 @@ void GraphStructure::makeMiniMap(const core::dimension2du &dimension,
 
     irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 255, 255, 255));
 
-    if (m_graph_type == GT_RACE)
-    {
-        video::SColor red(128, 255, 0, 0);
-        createMesh(/*show_invisible part of the track*/ false,
-                   /*enable_transparency*/ false,
-                   /*track_color*/    &fill_color,
-                   /*lap line color*/ &red);
-    }
-    else
-    {
-        createMesh(/*show_invisible part of the track*/ false,
-                   /*enable_transparency*/ false,
-                   /*track_color*/    &fill_color,
-                   /*lap line color*/ NULL);
-    }
+    createMesh(/*show_invisible part of the track*/ false,
+               /*enable_transparency*/ false,
+               /*track_color*/    &fill_color);
 
     m_node = irr_driver->addMesh(m_mesh, "mini_map");
 #ifdef DEBUG
@@ -306,10 +276,7 @@ void GraphStructure::makeMiniMap(const core::dimension2du &dimension,
     // ---------------
     scene::ICameraSceneNode *camera = irr_driver->addCameraSceneNode();
     Vec3 bb_min, bb_max;
-    if (m_graph_type == GT_RACE)
-        QuadSet::get()->getBoundingBox(&bb_min, &bb_max);
-    else
-        NavMesh::get()->getBoundingBox(&bb_min, &bb_max);
+    getGraphBoundingBox(&bb_min, &bb_max);
     Vec3 center = (bb_max+bb_min)*0.5f;
 
     float dx = bb_max.getX()-bb_min.getX();
@@ -384,8 +351,8 @@ void GraphStructure::makeMiniMap(const core::dimension2du &dimension,
 
     if (texture == NULL && frame_buffer == NULL)
     {
-        Log::error("BattleGraph", "[makeMiniMap] WARNING: RTT does not appear to work,"
-                                  "mini-map will not be available.");
+        Log::error("Graph Structure", "[makeMiniMap] WARNING: RTT does not"
+                   "appear to work, mini-map will not be available.");
     }
 
     *oldRttMinimap = texture;

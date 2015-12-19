@@ -40,7 +40,6 @@ BattleGraph::BattleGraph(const std::string &navmesh_file_name)
     NavMesh::create(navmesh_file_name);
     m_navmesh_file = navmesh_file_name;
     buildGraph(NavMesh::get());
-    setType();
     computeFloydWarshall();
 } // BattleGraph
 
