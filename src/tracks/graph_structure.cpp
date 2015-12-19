@@ -112,7 +112,7 @@ void GraphStructure::createMesh(bool show_invisible,
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
 
     unsigned int n = 0;
-    // Count the number of quads to display (some quads might be invisible
+    // Count the number of quads to display (some quads might be invisible)
 
     for (unsigned int i = 0; i < getNumNodes(); i++)
     {
