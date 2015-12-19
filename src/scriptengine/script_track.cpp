@@ -135,6 +135,16 @@ namespace Scripting
             new RacePausedDialog(0.8f, 0.6f);
         }
 
+        int getNumberOfKarts()
+        {
+            return race_manager->getNumberOfKarts();
+        }
+
+        int getNumLocalPlayers()
+        {
+            return race_manager->getNumLocalPlayers();
+        }
+
         void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)
         {
             PropertyAnimator* animator = PropertyAnimator::get();
@@ -365,6 +375,8 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void exitRace()", asFUNCTION(exitRace), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void pauseRace()", asFUNCTION(pauseRace), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)", asFUNCTION(setFog), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("int getNumberOfKarts()", asFUNCTION(getNumberOfKarts), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("int getNumLocalPlayers()", asFUNCTION(getNumLocalPlayers), asCALL_CDECL); assert(r >= 0);
 
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", asMETHOD(::TrackObject, setEnabled), asCALL_THISCALL); assert(r >= 0);
