@@ -39,7 +39,7 @@ extern bool GLContextDebugBit;
 
 #ifdef __FreeBSD__
 #include <sys/joystick.h>
-#else
+#elif defined(__linux__)
 
 // linux/joystick.h includes linux/input.h, which #defines values for various KEY_FOO keys.
 // These override the irr::KEY_FOO equivalents, which stops key handling from working.
@@ -2185,7 +2185,7 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 #ifdef __FreeBSD__
 		info.axes=2;
 		info.buttons=2;
-#else
+#elif defined(__linux__)
 		ioctl( info.fd, JSIOCGAXES, &(info.axes) );
 		ioctl( info.fd, JSIOCGBUTTONS, &(info.buttons) );
 		fcntl( info.fd, F_SETFL, O_NONBLOCK );
@@ -2207,7 +2207,7 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 		returnInfo.Axes = info.axes;
 		returnInfo.Buttons = info.buttons;
 
-#ifndef __FreeBSD__
+#if !defined(__FreeBSD__) && !defined(__OpenBSD__)
 		char name[80];
 		ioctl( info.fd, JSIOCGNAME(80), name);
 		returnInfo.Name = name;
@@ -2252,7 +2252,7 @@ void CIrrDeviceLinux::pollJoysticks()
 			info.persistentData.JoystickEvent.Axis[0] = js.x; /* X axis */
 			info.persistentData.JoystickEvent.Axis[1] = js.y; /* Y axis */
 		}
-#else
+#elif defined(__linux__)
 		struct js_event event;
 		while (sizeof(event) == read(info.fd, &event, sizeof(event)))
 		{
