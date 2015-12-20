@@ -115,6 +115,7 @@ Track::Track(const std::string &filename)
     m_enable_push_back      = true;
     m_reverse_available     = false;
     m_is_arena              = false;
+    m_max_arena_players     = 0;
     m_has_easter_eggs       = false;
     m_has_navmesh           = false;
     m_is_soccer             = false;
@@ -510,6 +511,7 @@ void Track::loadTrackInfo()
     root->get("gravity",               &m_gravity);
     root->get("soccer",                &m_is_soccer);
     root->get("arena",                 &m_is_arena);
+    root->get("max-arena-players",     &m_max_arena_players);
     root->get("cutscene",              &m_is_cutscene);
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);

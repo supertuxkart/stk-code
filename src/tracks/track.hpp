@@ -204,6 +204,8 @@ private:
     Vec3                     m_aabb_max;
     /** True if this track is an arena. */
     bool                     m_is_arena;
+    /** Max players supported by an arena. */
+    unsigned int             m_max_arena_players;
     /** True if this track has easter eggs. */
     bool                     m_has_easter_eggs;
     /** True if this track has navmesh. */
@@ -543,6 +545,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the graphical effect mesh for this track. */
     const TriangleMesh& getGFXEffectMesh() const {return *m_gfx_effect_mesh;}
+    // ------------------------------------------------------------------------
+    /** Get the max players supported for this track, for arena only. */
+    unsigned int getMaxArenaPlayers() const
+                                                { return m_max_arena_players; }
     // ------------------------------------------------------------------------
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const
