@@ -23,21 +23,13 @@
 #include <string>
 #include <set>
 
-#include <dimension2d.h>
+#include "tracks/graph_structure.hpp"
 #include "tracks/navmesh.hpp"
 
-namespace irr
-{
-    namespace scene { class ISceneNode; class IMesh; class IMeshBuffer; }
-    namespace video { class ITexture; }
-}
-using namespace irr;
-
-class FrameBuffer;
+class GraphStructure;
 class Item;
 class ItemManager;
 class Navmesh;
-class RTT;
 
 /**
 * \ingroup tracks
@@ -49,30 +41,16 @@ class RTT;
 *    design pattern to create an instance).
 \ingroup tracks
 */
-class BattleGraph
+class BattleGraph : public GraphStructure
 {
 
 private:
     static BattleGraph        *m_battle_graph;
 
-    RTT* m_new_rtt;
-
     /** The actual graph data structure, it is an adjacency matrix */
     std::vector< std::vector< float > > m_distance_matrix;
     /** The matrix that is used to store computed shortest paths */
     std::vector< std::vector< int > > m_parent_poly;
-     /** For debug mode only: the node of the debug mesh. */
-    scene::ISceneNode       *m_node;
-    /** For debug only: the mesh of the debug mesh. */
-    scene::IMesh            *m_mesh;
-    /** For debug only: the actual mesh buffer storing the quads. */
-    scene::IMeshBuffer      *m_mesh_buffer;
-
-    /** The minimum coordinates of the quad graph. */
-    Vec3                     m_min_coord;
-
-    /** Scaling for mini map. */
-    float                    m_scaling;
 
     /** Stores the name of the file containing the NavMesh data */
     std::string              m_navmesh_file;
@@ -81,11 +59,26 @@ private:
 
     void buildGraph(NavMesh*);
     void computeFloydWarshall();
-    void createMesh(bool enable_transparency=false,
-                    const video::SColor *track_color=NULL);
 
     BattleGraph(const std::string &navmesh_file_name);
     ~BattleGraph(void);
+
+    // ------------------------------------------------------------------------
+    virtual void set3DVerticesOfGraph(int i, video::S3DVertex *v,
+                                      const video::SColor &color) const
+                                { NavMesh::get()->setVertices(i, v, color); }
+    // ------------------------------------------------------------------------
+    virtual void getGraphBoundingBox(Vec3 *min, Vec3 *max) const
+                                { NavMesh::get()->getBoundingBox(min, max); }
+    // ------------------------------------------------------------------------
+    virtual const bool isNodeInvisible(int n) const
+                                                            { return false; }
+    // ------------------------------------------------------------------------
+    virtual const bool isNodeInvalid(int n) const
+     { return (NavMesh::get()->getNavPoly(n).getVerticesIndex()).size()!=4; }
+    // ------------------------------------------------------------------------
+    virtual const bool hasLapLine() const
+                                                            { return false; }
 
 public:
     static const int UNKNOWN_POLY;
@@ -115,12 +108,13 @@ public:
     // ----------------------------------------------------------------------
     /** Returns the number of nodes in the BattleGraph (equal to the number of
     *    polygons in the NavMesh */
-    unsigned int      getNumNodes() const { return m_distance_matrix.size(); }
+    virtual const unsigned int getNumNodes() const
+                                         { return m_distance_matrix.size(); }
 
     // ----------------------------------------------------------------------
     /** Returns the NavPoly corresponding to the i-th node of the BattleGraph */
     const NavPoly&    getPolyOfNode(int i) const
-                                        { return NavMesh::get()->getNavPoly(i); }
+                                    { return NavMesh::get()->getNavPoly(i); }
 
     // ----------------------------------------------------------------------
     /** Returns the next polygon on the shortest path from i to j.
@@ -129,17 +123,9 @@ public:
     const int &       getNextShortestPathPoly(int i, int j) const;
 
     const std::vector < std::pair<const Item*, int> >& getItemList()
-                                        { return m_items_on_graph; }
+                                                 { return m_items_on_graph; }
 
-    void              createDebugMesh();
-    void              cleanupDebugMesh();
     void              findItemsOnGraphNodes();
-    void              makeMiniMap(const core::dimension2du &where,
-                                  const std::string &name,
-                                  const video::SColor &fill_color,
-                                  video::ITexture** oldRttMinimap,
-                                  FrameBuffer** newRttMinimap);
-    void              mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
 };    //BattleGraph
 
 #endif
