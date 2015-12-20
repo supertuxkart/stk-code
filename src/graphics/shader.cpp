@@ -66,8 +66,24 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
     std::ostringstream code;
     code << "#version " << CVS->getGLSLVersion()<<"\n";
 
+    // Some drivers report that the compute shaders extension is available,
+    // but they report only OpenGL 3.x version, and thus these extensions
+    // must be enabled manually. Otherwise the shaders compilation will fail
+    // because STK tries to use extensions which are available, but disabled
+    // by default.
+    if (type == GL_COMPUTE_SHADER)
+    {
+        if (CVS->isARBComputeShaderUsable())
+            code << "#extension GL_ARB_compute_shader : enable\n";
+        if (CVS->isARBImageLoadStoreUsable())
+            code << "#extension GL_ARB_shader_image_load_store : enable\n";
+        if (CVS->isARBArraysOfArraysUsable())
+            code << "#extension GL_ARB_arrays_of_arrays : enable\n";
+    }
+    
     if (CVS->isAMDVertexShaderLayerUsable())
         code << "#extension GL_AMD_vertex_shader_layer : enable\n";
+    
     if (CVS->isAZDOEnabled())
     {
         code << "#extension GL_ARB_bindless_texture : enable\n";
@@ -80,7 +96,7 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
         code << "#define VSLayer\n";
     if (CVS->needsRGBBindlessWorkaround())
         code << "#define SRGBBindlessFix\n";
-        
+
     //shader compilation fails with some drivers if there is no precision qualifier
     if (type == GL_FRAGMENT_SHADER)
         code << "precision mediump float;\n";
