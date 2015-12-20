@@ -47,11 +47,11 @@ void CentralVideoSettings::init()
     hasTextureCompression = false;
     hasUBO = false;
     hasGS = false;
-    hasSRGBCapableVisual = true;
-    m_GI_has_artifact = false;
 
+    m_GI_has_artifact = false;
     m_need_rh_workaround = false;
     m_need_srgb_workaround = false;
+    m_need_srgb_visual_workaround = false;
 
     // Call to glGetIntegerv should not be made if --no-graphics is used
     if (!ProfileWorld::isNoGraphics())
@@ -194,7 +194,7 @@ void CentralVideoSettings::init()
             GLint param = GL_SRGB;
             glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT,
                               GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
-            hasSRGBCapableVisual = (param == GL_SRGB);
+            m_need_srgb_visual_workaround = (param != GL_SRGB);
         }
     }
 }
@@ -226,7 +226,7 @@ bool CentralVideoSettings::needsRGBBindlessWorkaround() const
 
 bool CentralVideoSettings::needsSRGBCapableVisualWorkaround() const
 {
-    return !hasSRGBCapableVisual;
+    return m_need_srgb_visual_workaround;
 }
 
 bool CentralVideoSettings::isARBGeometryShader4Usable() const
