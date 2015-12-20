@@ -578,8 +578,9 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 }
 
 
-ShaderBasedRenderer::ShaderBasedRenderer():AbstractRenderer()
-{    
+ShaderBasedRenderer::ShaderBasedRenderer()
+{
+    m_rtts                  = NULL;
     m_skybox                = NULL;
     m_spherical_harmonics   = new SphericalHarmonics(irr_driver->getAmbientLight().toSColor());
     m_nb_static_glowing     = 0;

@@ -20,6 +20,7 @@
 
 #include "utils/ptr_vector.hpp"
 #include "utils/leak_check.hpp"
+#include <stddef.h>
 
 class FrameBuffer;
 

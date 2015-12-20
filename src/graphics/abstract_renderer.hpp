@@ -48,7 +48,6 @@ protected:
 
 
 public:
-    AbstractRenderer();
     virtual ~AbstractRenderer(){}
     
     RTT* getRTT() { return m_rtts;} //FIXME: remove this

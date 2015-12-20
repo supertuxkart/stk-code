@@ -24,9 +24,6 @@
 #include "utils/profiler.hpp"
 
 
-
-FixedPipelineRenderer::FixedPipelineRenderer(): AbstractRenderer() {}
-
     
 void FixedPipelineRenderer::onLoadWorld()
 {

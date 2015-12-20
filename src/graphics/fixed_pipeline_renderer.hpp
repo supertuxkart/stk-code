@@ -23,7 +23,6 @@
 class FixedPipelineRenderer: public AbstractRenderer
 {
 public:
-    FixedPipelineRenderer();
     
     void onLoadWorld()  ;
     void onUnloadWorld();
