@@ -30,6 +30,7 @@ private:
     bool hasDrawIndirect;
     bool hasBuffserStorage;
     bool hasComputeShaders;
+    bool hasArraysOfArrays;
     bool hasTextureStorage;
     bool hasTextureView;
     bool hasBindlessTexture;
@@ -63,6 +64,7 @@ public:
     bool isARBTextureStorageUsable() const;
     bool isAMDVertexShaderLayerUsable() const;
     bool isARBComputeShaderUsable() const;
+    bool isARBArraysOfArraysUsable() const;
     bool isARBBindlessTextureUsable() const;
     bool isARBBufferStorageUsable() const;
     bool isARBBaseInstanceUsable() const;

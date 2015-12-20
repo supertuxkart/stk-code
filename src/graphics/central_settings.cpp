@@ -36,6 +36,7 @@ void CentralVideoSettings::init()
     hasBuffserStorage = false;
     hasDrawIndirect = false;
     hasComputeShaders = false;
+    hasArraysOfArrays = false;
     hasTextureStorage = false;
     hasTextureView = false;
     hasBindlessTexture = false;
@@ -102,6 +103,11 @@ void CentralVideoSettings::init()
             hasGLExtension("GL_ARB_compute_shader")) {
             hasComputeShaders = true;
             Log::info("GLDriver", "ARB Compute Shader Present");
+        }
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_ARRAYS_OF_ARRAYS) &&
+            hasGLExtension("GL_ARB_arrays_of_arrays")) {
+            hasArraysOfArrays = true;
+            Log::info("GLDriver", "ARB Arrays of Arrays Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_STORAGE) &&
             hasGLExtension("GL_ARB_texture_storage")) {
@@ -263,6 +269,11 @@ bool CentralVideoSettings::isARBComputeShaderUsable() const
     return hasComputeShaders;
 }
 
+bool CentralVideoSettings::isARBArraysOfArraysUsable() const
+{
+    return hasArraysOfArrays;
+}
+
 bool CentralVideoSettings::isARBTextureStorageUsable() const
 {
     return hasTextureStorage;
@@ -315,7 +326,7 @@ bool CentralVideoSettings::supportsIndirectInstancingRendering() const
 
 bool CentralVideoSettings::supportsComputeShadersFiltering() const
 {
-    return isARBBufferStorageUsable() && isARBImageLoadStoreUsable() && isARBComputeShaderUsable();
+    return isARBBufferStorageUsable() && isARBImageLoadStoreUsable() && isARBComputeShaderUsable() && isARBArraysOfArraysUsable();
 }
 
 bool CentralVideoSettings::supportsAsyncInstanceUpload() const

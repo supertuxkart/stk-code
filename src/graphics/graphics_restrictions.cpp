@@ -48,6 +48,7 @@ namespace GraphicsRestrictions
             "ImageLoadStore",
             "BaseInstance",
             "ComputeShader",
+            "ArraysOfArrays",
             "ShaderStorageBufferObject",
             "MultiDrawIndirect",
             "ShaderAtomicCounters",
