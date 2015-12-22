@@ -216,6 +216,7 @@ void AbstractGeometryPasses::setFirstPassRenderTargets(const std::vector<GLuint>
 
     if (CVS->isAZDOEnabled())
     {
+        m_textures_handles.clear();
         for(size_t i=0;i<m_prefilled_textures.size();i++)
         {
             uint64_t handle = 0;
