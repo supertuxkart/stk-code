@@ -43,6 +43,9 @@
                 <spacer width="1" height="10%"/>
 
                 <label id="author" width="100%" text_align="center" word_wrap="true"/>
+
+                <spacer width="1" height="10%"/>
+                <label id="max-arena-players" width="100%" text_align="center" word_wrap="true"/>
             </div>
 
         </box>

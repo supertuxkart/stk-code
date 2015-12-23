@@ -97,8 +97,9 @@ void TrackInfoScreen::setTrack(Track *track)
  */
 void TrackInfoScreen::init()
 {
-    const bool has_laps       = race_manager->modeHasLaps();
-    const bool has_highscores = race_manager->modeHasHighscores();
+    const int max_arena_players = m_track->getMaxArenaPlayers();
+    const bool has_laps         = race_manager->modeHasLaps();
+    const bool has_highscores   = race_manager->modeHasHighscores();
 
     getWidget<LabelWidget>("name")->setText(translations->fribidize(m_track->getName()), false);
 
@@ -106,6 +107,14 @@ void TrackInfoScreen::init()
     //I18N: (place %s where the name of the author should appear)
     getWidget<LabelWidget>("author")->setText( _("Track by %s", m_track->getDesigner()),
                                                false );
+
+    LabelWidget* max_players = getWidget<LabelWidget>("max-arena-players");
+    max_players->setVisible(m_track->isArena());
+    if (m_track->isArena())
+    {
+        //I18N: the max players supported by an arena.
+        max_players->setText( _("Max players supported: %d", max_arena_players), false );
+    }
 
     // ---- Track screenshot
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
@@ -143,7 +152,6 @@ void TrackInfoScreen::init()
 
     // Number of AIs
     // -------------
-    const int max_arena_players = m_track->getMaxArenaPlayers();
     const int local_players = race_manager->getNumLocalPlayers();
     const bool has_AI =
         (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ?
