@@ -98,17 +98,20 @@ void BattleAI::reset()
 {
     m_current_node = BattleGraph::UNKNOWN_POLY;
     m_target_node = BattleGraph::UNKNOWN_POLY;
+    m_adjusting_side = false;
     m_closest_kart = NULL;
     m_closest_kart_node = BattleGraph::UNKNOWN_POLY;
     m_closest_kart_point = Vec3(0, 0, 0);
     m_closest_kart_pos_data = {0};
     m_cur_kart_pos_data = {0};
+    m_is_steering_overridden = false;
     m_is_stuck = false;
     m_is_uturn = false;
     m_target_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
     m_time_since_reversing = 0.0f;
+    m_time_since_steering_overridden = 0.0f;
     m_time_since_uturn = 0.0f;
     m_on_node.clear();
     m_path_corners.clear();
@@ -165,6 +168,7 @@ void BattleAI::update(float dt)
     findClosestKart(true);
     findTarget();
     handleItems(dt);
+    handleBanana();
 
     if (m_kart->getSpeed() > 15.0f && m_cur_kart_pos_data.angle < 0.2f)
     {
@@ -347,7 +351,7 @@ void BattleAI::handleAcceleration(const float dt)
 //-----------------------------------------------------------------------------
 void BattleAI::handleUTurn(const float dt)
 {
-    const float turn_side = (m_cur_kart_pos_data.on_side ? 1.0f : -1.0f);
+    const float turn_side = (m_adjusting_side ? 1.0f : -1.0f);
 
     if (fabsf(m_kart->getSpeed()) >
         (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
@@ -383,6 +387,23 @@ void BattleAI::handleSteering(const float dt)
     if (m_current_node == BattleGraph::UNKNOWN_POLY ||
         m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
+    if (m_is_steering_overridden)
+    {
+        // Steering is overridden to avoid eating banana
+        const float turn_side = (m_adjusting_side ? 1.0f : -1.0f);
+        m_time_since_steering_overridden += dt;
+        if (m_time_since_steering_overridden > 0.35f)
+            setSteering(-(turn_side), dt);
+        else
+            setSteering(turn_side, dt);
+        if (m_time_since_steering_overridden > 0.7f)
+        {
+            m_is_steering_overridden = false;
+            m_time_since_steering_overridden = 0.0f;
+        }
+        return;
+    }
+
     if (m_target_node == m_current_node)
     {
         // Very close to the item, steer directly
@@ -392,6 +413,7 @@ void BattleAI::handleSteering(const float dt)
 #endif
         if (m_cur_kart_pos_data.behind)
         {
+            m_adjusting_side = m_cur_kart_pos_data.on_side;
             m_is_uturn = true;
         }
         else
@@ -415,6 +437,7 @@ void BattleAI::handleSteering(const float dt)
 #endif
         if (m_cur_kart_pos_data.behind)
         {
+            m_adjusting_side = m_cur_kart_pos_data.on_side;
             m_is_uturn = true;
         }
         else
@@ -432,6 +455,34 @@ void BattleAI::handleSteering(const float dt)
         return;
     }
 }   // handleSteering
+
+//-----------------------------------------------------------------------------
+void BattleAI::handleBanana()
+{
+    if (m_is_steering_overridden || m_is_uturn) return;
+
+    const std::vector< std::pair<const Item*, int> >& item_list =
+        BattleGraph::get()->getItemList();
+    const unsigned int items_count = item_list.size();
+    for (unsigned int i = 0; i < items_count; ++i)
+    {
+        const Item* item = item_list[i].first;
+        if (item->getType() == Item::ITEM_BANANA && !item->wasCollected())
+        {
+            posData banana_pos = {0};
+            checkPosition(item->getXYZ(), &banana_pos);
+            if (banana_pos.angle < 0.2f && banana_pos.distance < 7.5f &&
+               !banana_pos.behind)
+            {
+                // Check whether it's straight ahead towards a banana
+                // If so, try to do hard turn to avoid
+                m_adjusting_side = banana_pos.on_side;
+                m_is_steering_overridden = true;
+            }
+        }
+    }
+
+}   // handleBanana
 
 //-----------------------------------------------------------------------------
 /** This function finds the polyon edges(portals) that the AI will cross before
@@ -592,15 +643,16 @@ void BattleAI::handleBraking()
 {
     m_controls->m_brake = false;
 
+    if (m_current_node == BattleGraph::UNKNOWN_POLY ||
+        m_target_node  == BattleGraph::UNKNOWN_POLY ||
+        m_is_steering_overridden) return;
+
     // A kart will not brake when the speed is already slower than this
     // value. This prevents a kart from going too slow (or even backwards)
     // in tight curves.
     const float MIN_SPEED = 5.0f;
 
     std::vector<Vec3> points;
-
-    if (m_current_node == BattleGraph::UNKNOWN_POLY ||
-        m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
     points.push_back(m_kart->getXYZ());
     points.push_back(m_path_corners[0]);

@@ -52,6 +52,10 @@ private:
     /** Holds the position info of targets. */
     struct posData {bool behind; bool on_side; float angle; float distance;};
 
+    /** Used by handleBanana and UTurn, it tells whether to do left or right
+     *  turning when steering is overridden. */
+    bool m_adjusting_side;
+
     /** Holds the current position of the AI on the battle graph. Sets to
      *  BattleGraph::UNKNOWN_POLY if the location is unknown. This variable is
      *  updated in ThreeStrikesBattle::updateKartNodes(). */
@@ -68,6 +72,10 @@ private:
 
     /** Holds the current difficulty. */
     RaceManager::Difficulty m_cur_difficulty;
+
+    /** Indicates that the steering of kart is overridden, and
+      * m_time_since_steering_overridden is counting down. */
+    bool m_is_steering_overridden;
 
    /** Indicates that the kart is currently stuck, and m_time_since_reversing is
      * counting down. */
@@ -104,6 +112,9 @@ private:
     /** This is a timer that counts down when the kart is starting to drive. */
     float m_time_since_driving;
 
+    /** This is a timer that counts down when the steering of kart is overridden. */
+    float m_time_since_steering_overridden;
+
     /** This is a timer that counts down when the kart is doing u-turn. */
     float m_time_since_uturn;
 
@@ -114,6 +125,7 @@ private:
     void  findPortals(int start, int end);
     void  findTarget();
     void  handleAcceleration(const float dt);
+    void  handleBanana();
     void  handleBraking();
     void  handleItems(const float dt);
     void  handleItemCollection(Vec3*, int*);
