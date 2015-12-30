@@ -143,6 +143,9 @@ class RTT
 public:
     RTT(size_t width, size_t height);
     ~RTT();
+    
+    size_t getWidth () const { return m_width ; }
+    size_t getHeight() const { return m_height; }
 
     FrameBuffer &getShadowFrameBuffer() { return *m_shadow_FBO; }
     FrameBuffer &getRadianceHintFrameBuffer() { return *m_RH_FBO; }
@@ -152,15 +155,13 @@ public:
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
     FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
 
-    FrameBuffer* render(irr::scene::ICameraSceneNode* camera, float dt);
-
 private:
     unsigned RenderTargetTextures[RTT_COUNT];
     PtrVector<FrameBuffer> FrameBuffers;
     unsigned DepthStencilTexture;
 
-    int m_width;
-    int m_height;
+    size_t m_width;
+    size_t m_height;
 
     unsigned shadowColorTex, shadowDepthTex;
     unsigned RSM_Color, RSM_Normal, RSM_Depth;

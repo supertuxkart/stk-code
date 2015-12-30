@@ -28,6 +28,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/screen_quad.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/render_target.hpp"
 #include "graphics/rtts.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -55,7 +56,7 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_mesh                 = NULL;
     m_mesh_buffer          = NULL;
     m_lap_length           = 0;
-    m_new_rtt              = NULL;
+    m_render_target        = NULL;
     QuadSet::create();
     QuadSet::get()->init(quad_file_name);
     m_quad_filename        = quad_file_name;
@@ -73,8 +74,9 @@ QuadGraph::~QuadGraph()
     }
     if(UserConfigParams::m_track_debug)
         cleanupDebugMesh();
-    if (m_new_rtt != NULL)
-        delete m_new_rtt;
+    //if (m_render_target != NULL)
+    //    delete m_render_target;
+    //irr_driver->removeRenderTarget(name); //TODO
 }   // ~QuadGraph
 
 // -----------------------------------------------------------------------------
@@ -990,11 +992,12 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     *oldRttMinimap = NULL;
     *newRttMinimap = NULL;
 
-    RTT* newRttProvider = NULL;
+    //RTT* newRttProvider = NULL;
     IrrDriver::RTTProvider* oldRttProvider = NULL;
     if (CVS->isGLSL())
     {
-        m_new_rtt = newRttProvider = new RTT(dimension.Width, dimension.Height);
+        //m_new_rtt = newRttProvider = new RTT(dimension.Width, dimension.Height);
+        m_render_target = irr_driver->addRenderTarget(dimension, name);
     }
     else
     {
@@ -1081,7 +1084,9 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
 
     if (CVS->isGLSL())
     {
-        frame_buffer = newRttProvider->render(camera, GUIEngine::getLatestDt());
+        //frame_buffer = newRttProvider->render(camera, GUIEngine::getLatestDt());
+        irr_driver->renderToTexture(m_render_target, camera, GUIEngine::getLatestDt());
+        frame_buffer = dynamic_cast<GL3RenderTarget*>(m_render_target)->getFrameBuffer();
     }
     else
     {

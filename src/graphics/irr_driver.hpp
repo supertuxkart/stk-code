@@ -71,6 +71,7 @@ class PostProcessing;
 class LightNode;
 class ShadowImportance;
 class ShadowMatrices;
+class RenderTarget;
 
 enum STKRenderingPass
 {
@@ -205,6 +206,8 @@ private:
     float m_ssao_radius;
     float m_ssao_k;
     float m_ssao_sigma;
+    
+    std::map<std::string, RenderTarget*> m_render_targets;
 
 #ifdef DEBUG
     /** Used to visualise skeletons. */
@@ -316,14 +319,18 @@ public:
     void                  unsetTextureErrorMessage();
     class GPUTimer        &getGPUTimer(unsigned);
 
-    void draw2dTriangle(const core::vector2df &a, const core::vector2df &b,
-                        const core::vector2df &c,
-                        const video::ITexture *texture = NULL,
-                        const video::SColor *ca=NULL,
-                        const video::SColor *cb=NULL,
-                        const video::SColor *cc=NULL);
-
-
+    RenderTarget*         addRenderTarget(const irr::core::dimension2du &dimension,
+                                          const std::string &name);
+    void                  removeRenderTarget(const std::string &name);
+    
+    /*GLuint                renderToTexture(size_t width,
+                                          size_t height,
+                                          irr::scene::ICameraSceneNode* camera,
+                                          float dt,
+                                          const std::string &rtt_name);*/
+    void                  renderToTexture(RenderTarget *render_target,
+                                          irr::scene::ICameraSceneNode* camera,
+                                          float dt);
 
     // ------------------------------------------------------------------------
     /** Convenience function that loads a texture with default parameters

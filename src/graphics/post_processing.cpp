@@ -24,6 +24,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
+#include "graphics/render_target.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
@@ -1385,13 +1386,15 @@ static void renderDoF(const FrameBuffer &fbo, GLuint rtt)
 }   // renderDoF
 
 // ----------------------------------------------------------------------------
-void PostProcessing::applyMLAA()
+void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
+                               const FrameBuffer& mlaa_blend_framebuffer,
+                               const FrameBuffer& mlaa_colors_framebuffer)
 {
     const core::vector2df &PIXEL_SIZE =
                      core::vector2df(1.0f / UserConfigParams::m_width,
                                      1.0f / UserConfigParams::m_height);
 
-    irr_driver->getFBO(FBO_MLAA_TMP).bind();
+    mlaa_tmp_framebuffer.bind();
     glEnable(GL_STENCIL_TEST);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -1405,17 +1408,17 @@ void PostProcessing::applyMLAA()
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
     // Pass 2: blend weights
-    irr_driver->getFBO(FBO_MLAA_BLEND).bind();
+    mlaa_blend_framebuffer.bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
     MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE);
 
     // Blit in to tmp1
-    FrameBuffer::Blit(irr_driver->getFBO(FBO_MLAA_COLORS),
-                      irr_driver->getFBO(FBO_MLAA_TMP));
+    FrameBuffer::Blit(mlaa_colors_framebuffer,
+                      mlaa_tmp_framebuffer);
 
     // Pass 3: gather
-    irr_driver->getFBO(FBO_MLAA_COLORS).bind();
+    mlaa_colors_framebuffer.bind();
     MLAAGatherSHader::getInstance()->render(PIXEL_SIZE);
 
     // Done.
@@ -1437,7 +1440,8 @@ void PostProcessing::renderLightning(core::vector3df intensity)
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
 FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
-                                    bool isRace)
+                                    bool isRace,
+                                    GL3RenderTarget *specified_render_target)
 {
     FrameBuffer *in_fbo = &irr_driver->getFBO(FBO_COLORS);
     FrameBuffer *out_fbo = &irr_driver->getFBO(FBO_TMP1_WITH_DS);
@@ -1640,17 +1644,24 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         return in_fbo;
 
     glEnable(GL_FRAMEBUFFER_SRGB);
-    irr_driver->getFBO(FBO_MLAA_COLORS).bind();
+    if(specified_render_target == NULL)
+        out_fbo = &irr_driver->getFBO(FBO_MLAA_COLORS);
+    else
+        out_fbo = specified_render_target->getFrameBuffer();
+    
+    out_fbo->bind();
     renderPassThrough(in_fbo->getRTT()[0],
-                      irr_driver->getFBO(FBO_MLAA_COLORS).getWidth(),
-                      irr_driver->getFBO(FBO_MLAA_COLORS).getHeight());
-    out_fbo = &irr_driver->getFBO(FBO_MLAA_COLORS);
+                      out_fbo->getWidth(),
+                      out_fbo->getHeight());
+    
 
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
     {
         PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MLAA));
-        applyMLAA();
+        applyMLAA(irr_driver->getFBO(FBO_MLAA_TMP),
+                  irr_driver->getFBO(FBO_MLAA_BLEND),
+                  *out_fbo);
         PROFILER_POP_CPU_MARKER();
     }
     glDisable(GL_FRAMEBUFFER_SRGB);

@@ -18,10 +18,14 @@
 #ifndef HEADER_ABSTRACT_RENDERER_HPP
 #define HEADER_ABSTRACT_RENDERER_HPP
 
+#include "graphics/gl_headers.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/sphericalHarmonics.hpp"
 #include <irrlicht.h>
+#include <string>
 #include <vector>
+
+class RenderTarget;
 
 
 struct GlowData {
@@ -94,11 +98,14 @@ public:
         return m_current_screen_size;
     }
  
-    /*
-    // ------------------------------------------------------------------------
-    void toggleWireframe() { m_wireframe = !m_wireframe; }
-    // ------------------------------------------------------------------------
-    void toggleMipVisualization() { m_mipviz = !m_mipviz; }*/
+    /*virtual GLuint renderToTexture(size_t width,
+                                   size_t height,
+                                   irr::scene::ICameraSceneNode* camera,
+                                   float dt,
+                                   const std::string &rtt_name) { return 0;}*/
+    virtual void renderToTexture(RenderTarget *render_target,
+                                 irr::scene::ICameraSceneNode* camera,
+                                 float dt) {}
 };
 
 #endif //HEADER_ABSTRACT_RENDERER_HPP

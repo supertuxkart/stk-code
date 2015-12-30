@@ -51,6 +51,7 @@ namespace GUIEngine
         std::vector<int> m_model_frames;
         
         RTT* m_rtt_provider;
+        RenderTarget *m_render_target;
         
         float angle;
         

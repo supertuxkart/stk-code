@@ -290,26 +290,3 @@ RTT::~RTT()
     }
 }
 
-
-FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
-{
-    irr_driver->setRTT(this); //FIXME
-
-    irr_driver->getSceneManager()->setActiveCamera(camera);
-
-    irr_driver->getRenderer()->computeMatrixesAndCameras(camera, m_width, m_height);
-    irr_driver->getRenderer()->updateLightsInfo(camera, dt);
-    irr_driver->getRenderer()->uploadLightingData();
-    irr_driver->getRenderer()->renderScene(camera, dt, false, true);
-    FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
-
-    // reset
-    glViewport(0, 0,
-        irr_driver->getActualScreenSize().Width,
-        irr_driver->getActualScreenSize().Height);
-    irr_driver->setRTT(NULL); //FIXME
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    irr_driver->getSceneManager()->setActiveCamera(NULL);
-    return frame_buffer;
-}

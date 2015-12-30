@@ -104,6 +104,16 @@ public:
     void clearGlowingNodes() override;
     
     void render(float dt);
+    
+    /*GLuint renderToTexture(size_t width,
+                           size_t height,
+                           irr::scene::ICameraSceneNode* camera,
+                           float dt,
+                           const std::string &rtt_name) override;*/
+    
+    void renderToTexture(RenderTarget *render_target,
+                         irr::scene::ICameraSceneNode* camera,
+                         float dt) override;
 };
 
 #endif //HEADER_SHADER_BASED_RENDERER_HPP

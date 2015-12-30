@@ -24,6 +24,7 @@
 #include "graphics/camera.hpp"
 
 class FrameBuffer;
+class GL3RenderTarget;
 
 #include <vector>
 
@@ -100,7 +101,9 @@ public:
     /** Render tex. Used for blit/texture resize */
     void renderPassThrough(unsigned tex, unsigned width, unsigned height);
     void renderTextureLayer(unsigned tex, unsigned layer);
-    void applyMLAA();
+    void applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
+                   const FrameBuffer& mlaa_blend_framebuffer,
+                   const FrameBuffer& mlaa_colors_framebuffer);
 
     void renderMotionBlur(unsigned cam, const FrameBuffer &in_fbo,
                           FrameBuffer &out_fbo);
@@ -108,7 +111,8 @@ public:
     void renderLightning(core::vector3df intensity);
 
     /** Render the post-processed scene */
-    FrameBuffer *render(scene::ICameraSceneNode * const camnode, bool isRace);
+    FrameBuffer *render(scene::ICameraSceneNode * const camnode, bool isRace,
+                        GL3RenderTarget *specified_render_target = NULL);
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);
