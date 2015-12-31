@@ -887,6 +887,18 @@ void BattleAI::handleItemCollection(Vec3* aim_point, int* target_node)
     const std::vector< std::pair<const Item*, int> >& item_list =
         BattleGraph::get()->getItemList();
     const unsigned int items_count = item_list.size();
+
+    if (item_list.empty())
+    {
+        // Notice: this should not happen, as it makes no sense
+        // for an arean without items, if so how can attack happen?
+        Log::fatal ("BattleAI",
+                    "AI can't find any items in the arena, "
+                    "maybe there is something wrong with the navmesh, "
+                    "make sure it lies closely to the ground.");
+        return;
+    }
+
     unsigned int closest_item_num = 0;
 
     for (unsigned int i = 0; i < items_count; ++i)
