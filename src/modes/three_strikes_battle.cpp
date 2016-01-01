@@ -174,6 +174,8 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
     // check if kart is 'dead'
     if (m_kart_info[kart_id].m_lives < 1)
     {
+        if (getCurrentNumPlayers())
+            eliminateKart(kart_id, /*notify_of_elimination*/ true);
         m_karts[kart_id]->finishedRace(WorldStatus::getTime());
         scene::ISceneNode** wheels = m_karts[kart_id]->getKartModel()
                                                      ->getWheelNodes();
@@ -181,8 +183,6 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
         if(wheels[1]) wheels[1]->setVisible(false);
         if(wheels[2]) wheels[2]->setVisible(false);
         if(wheels[3]) wheels[3]->setVisible(false);
-        if (getCurrentNumPlayers())
-            eliminateKart(kart_id, /*notify_of_elimination*/ true);
         // Find a camera of the kart with the most lives ("leader"), and
         // attach all cameras for this kart to the leader.
         int max_lives = 0;

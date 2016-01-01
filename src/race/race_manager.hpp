@@ -774,6 +774,8 @@ public:
     {
         return m_kart_last_position_on_overworld;
     }
+    // ------------------------------------------------------------------------
+    bool getKartResult(AbstractKart* kart) const;
 
 };   // RaceManager
 

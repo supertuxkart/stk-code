@@ -109,6 +109,9 @@ private:
     /** Offset of the graphical kart chassis from the physical chassis. */
     float m_graphical_y_offset;
 
+    /** True if the kart wins, false otherwise. */
+    bool m_race_result;
+
     /** True if the kart is eliminated. */
     bool m_eliminated;
 
@@ -438,6 +441,9 @@ public:
     float getWrongwayCounter() { return m_wrongway_counter; }
     // ------------------------------------------------------------------------
     void setWrongwayCounter(float counter) { m_wrongway_counter = counter; }
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart wins or loses. */
+    virtual bool getRaceResult() const { return m_race_result;  }
 
 };   // Kart
 
