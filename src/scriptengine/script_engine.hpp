@@ -41,13 +41,9 @@ namespace Scripting
         std::string m_callback_name;
         asIScriptFunction* m_callback_delegate;
 
-        PendingTimeout()
+        PendingTimeout(double time, const std::string& callback_name)
         {
             m_callback_delegate = NULL;
-        }
-
-        PendingTimeout(double time, const std::string& callback_name) : PendingTimeout()
-        {
             m_time = time;
             m_callback_name = callback_name;
         }

@@ -509,7 +509,6 @@ namespace Scripting
     //-----------------------------------------------------------------------------
 
     PendingTimeout::PendingTimeout(double time, asIScriptFunction* callback_delegate) 
-        : PendingTimeout()
     {
         m_time = time;
         m_callback_delegate = callback_delegate;
