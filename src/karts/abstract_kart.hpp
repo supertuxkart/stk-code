@@ -447,6 +447,9 @@ public:
     /** Counter which is used for displaying wrong way message after a delay */
     virtual float getWrongwayCounter() = 0;
     virtual void setWrongwayCounter(float counter) = 0;
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart wins or loses. */
+    virtual bool getRaceResult() const = 0;
 
 };   // AbstractKart
 
