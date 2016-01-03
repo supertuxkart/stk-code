@@ -83,7 +83,6 @@ void RaceResultGUI::init()
     getWidget("bottom")->setVisible(false);
 
     music_manager->stopMusic();
-    m_finish_sound = SFXManager::get()->quickSound("race_finish");
 
     bool human_win = true;
     unsigned int num_karts = race_manager->getNumberOfKarts();
@@ -94,9 +93,13 @@ void RaceResultGUI::init()
             human_win = human_win && kart->getRaceResult();
     }
 
-    std::string path = (human_win ? //TODO proper win / lose music
-        file_manager->getAsset(FileManager::MUSIC, "Boom_boom_boom.music") :
-        file_manager->getAsset(FileManager::MUSIC, "race_summary.music"));
+    m_finish_sound = SFXManager::get()->quickSound(
+        human_win ? "gp_end" : "race_finish");
+
+    //std::string path = (human_win ? Different result music too later
+    //    file_manager->getAsset(FileManager::MUSIC, "race_summary.music") :
+    //    file_manager->getAsset(FileManager::MUSIC, "race_summary.music"));
+    std::string path = file_manager->getAsset(FileManager::MUSIC, "race_summary.music");
     m_race_over_music = music_manager->getMusicInformation(path);
 
     if (!m_finish_sound)

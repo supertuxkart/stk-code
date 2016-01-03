@@ -867,7 +867,7 @@ void Kart::finishedRace(float time)
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
     {
         // Save for music handling in race result gui
-        m_race_result = race_manager->getKartResult(this);
+        setRaceResult();
         setController(new EndController(this, m_controller->getPlayer(),
                                         m_controller));
 
@@ -878,6 +878,62 @@ void Kart::finishedRace(float time)
             KartModel::AF_WIN_START : KartModel::AF_LOSE_START);
     }
 }   // finishedRace
+
+//-----------------------------------------------------------------------------
+void Kart::setRaceResult()
+{
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
+        race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+    {
+        // TODO NetworkController?
+        if (this->getController()->isPlayerController())
+        {
+            PlayerProfile *player = PlayerManager::getCurrentPlayer();
+            const ChallengeStatus *challenge = player->getCurrentChallengeStatus();
+            // In case of a GP challenge don't make the end animation depend
+            // on if the challenge is fulfilled
+            if (challenge && !challenge->getData()->isGrandPrix())
+            {
+                if (challenge->getData()->isChallengeFulfilled())
+                    m_race_result = true;
+                else
+                    m_race_result = false;
+            }
+            else if (this->getPosition() <= 0.5f*race_manager->getNumberOfKarts() ||
+                     this->getPosition() == 1)
+                m_race_result = true;
+            else
+                m_race_result = false;
+        }
+        else
+        {
+            if (this->getPosition() <= 0.5f*race_manager->getNumberOfKarts() ||
+                this->getPosition() == 1)
+                m_race_result = true;
+            else
+                m_race_result = false;
+        }
+    }
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
+             race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+    {
+        // the kart wins if it isn't eliminated
+        m_race_result = !this->isEliminated();
+    }
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    {
+        // TODO complete together with soccer ai!
+        m_race_result = true;
+    }
+    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
+    {
+        // Easter egg mode only has one player, so always win
+        m_race_result = true;
+    }
+    else
+        Log::warn("Kart", "Unknown game mode given.");
+
+}   // setKartResult
 
 //-----------------------------------------------------------------------------
 /** Called when an item is collected. It will either adjust the collected

@@ -21,7 +21,6 @@
 #include <iostream>
 #include <algorithm>
 
-#include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/saved_grand_prix.hpp"
@@ -889,60 +888,5 @@ void RaceManager::setupPlayerKartInfo()
 
     computeRandomKartList();
 }   // setupPlayerKartInfo
-
-//-----------------------------------------------------------------------------
-bool RaceManager::getKartResult(AbstractKart* kart) const
-{
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
-    {
-        // TODO NetworkController?
-        if (kart->getController()->isPlayerController())
-        {
-            PlayerProfile *player = PlayerManager::getCurrentPlayer();
-            const ChallengeStatus *challenge = player->getCurrentChallengeStatus();
-            // In case of a GP challenge don't make the end animation depend
-            // on if the challenge is fulfilled
-            if (challenge && !challenge->getData()->isGrandPrix())
-            {
-                if (challenge->getData()->isChallengeFulfilled())
-                    return true;
-                else
-                    return false;
-            }
-            else if (kart->getPosition() <= 0.5f*race_manager->getNumberOfKarts() ||
-                     kart->getPosition() == 1)
-                return true;
-            else
-                return false;
-        }
-        else
-        {
-            if (kart->getPosition() <= 0.5f*race_manager->getNumberOfKarts() ||
-                kart->getPosition() == 1)
-                return true;
-            else
-                return false;
-        }
-    }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-             race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
-    {
-        // the kart wins if it isn't eliminated
-        return !kart->isEliminated();
-    }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
-    {
-        // TODO complete together with soccer ai!
-        return true;
-    }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
-    {
-        // Easter egg mode only has one player, so always win
-        return true;
-    }
-
-    return true; // Fallback
-}   // getKartResult
 
 /* EOF */

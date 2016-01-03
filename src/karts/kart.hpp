@@ -444,6 +444,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const { return m_race_result;  }
+    // ------------------------------------------------------------------------
+    /** Set this kart race result. */
+    void setRaceResult();
 
 };   // Kart
 
