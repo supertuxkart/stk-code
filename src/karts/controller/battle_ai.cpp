@@ -33,8 +33,7 @@
 #include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
 #include "modes/three_strikes_battle.hpp"
-#include "tracks/nav_poly.hpp"
-#include "tracks/navmesh.hpp"
+#include "tracks/battle_graph.hpp"
 #include "utils/log.hpp"
 
 #ifdef AI_DEBUG
@@ -295,19 +294,9 @@ void BattleAI::findClosestKart(bool difficulty)
     }
 
     const AbstractKart* closest_kart = m_world->getKart(closest_kart_num);
-    if (!closest_kart->getController()->isPlayerController())
-    {
-        BattleAI* controller = (BattleAI*)(closest_kart->getController());
-        m_closest_kart_node = controller->getCurrentNode();
-        m_closest_kart_point = closest_kart->getXYZ();
-    }
-
-    else if (closest_kart->getController()->isPlayerController())
-    {
-        PlayerController* controller = (PlayerController*)(closest_kart->getController());
-        m_closest_kart_node = controller->getCurrentNode();
-        m_closest_kart_point = closest_kart->getXYZ();
-    }
+    Controller* controller = (Controller*)(closest_kart->getController());
+    m_closest_kart_node = controller->getCurrentNode();
+    m_closest_kart_point = closest_kart->getXYZ();
 
     if (!difficulty)
     {

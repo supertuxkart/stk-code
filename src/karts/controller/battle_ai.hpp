@@ -28,13 +28,9 @@
 
 #include "karts/controller/ai_base_controller.hpp"
 #include "race/race_manager.hpp"
-#include "tracks/battle_graph.hpp"
 #include "utils/random_generator.hpp"
 
-class AIProperties;
 class ThreeStrikesBattle;
-class BattleGraph;
-class Track;
 class Vec3;
 class Item;
 
@@ -55,11 +51,6 @@ private:
     /** Used by handleBanana and UTurn, it tells whether to do left or right
      *  turning when steering is overridden. */
     bool m_adjusting_side;
-
-    /** Holds the current position of the AI on the battle graph. Sets to
-     *  BattleGraph::UNKNOWN_POLY if the location is unknown. This variable is
-     *  updated in ThreeStrikesBattle::updateKartNodes(). */
-    int m_current_node;
 
     int m_closest_kart_node;
     Vec3 m_closest_kart_point;
@@ -149,8 +140,6 @@ public:
                  BattleAI(AbstractKart *kart,
                           StateManager::ActivePlayer *player=NULL);
                 ~BattleAI();
-    unsigned int getCurrentNode() const { return m_current_node; }
-    void         setCurrentNode(int i)  { m_current_node = i;    }
     virtual void update      (float delta);
     virtual void reset       ();
 

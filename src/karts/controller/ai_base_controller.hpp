@@ -23,10 +23,6 @@
 #include "states_screens/state_manager.hpp"
 
 class AIProperties;
-class LinearWorld;
-class ThreeStrikesBattle;
-class QuadGraph;
-class BattleGraph;
 class Track;
 class Vec3;
 

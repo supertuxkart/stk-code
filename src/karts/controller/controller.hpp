@@ -57,6 +57,10 @@ protected:
 
     /** The name of the controller, mainly used for debugging purposes. */
     std::string  m_controller_name;
+
+    /** This variable is required for used in arena **/
+    int m_current_node;
+
 public:
                   Controller         (AbstractKart *kart,
                                       StateManager::ActivePlayer *player=NULL);
@@ -103,6 +107,12 @@ public:
     // ------------------------------------------------------------------------
     /** Get a pointer on the kart controls. */
     virtual KartControl* getControls() { return m_controls; }
+    // ------------------------------------------------------------------------
+    /** For arena only, get the current node in arena. */
+    int           getCurrentNode() const { return m_current_node; }
+    // ------------------------------------------------------------------------
+    /** For arena only, set the current node in arena. */
+    void          setCurrentNode(int i)  { m_current_node = i;    }
     // ------------------------------------------------------------------------
 };   // Controller
 
