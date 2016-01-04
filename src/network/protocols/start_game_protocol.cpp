@@ -208,6 +208,7 @@ void StartGameProtocol::update()
         {
             // now the synchronization protocol exists.
             Log::info("StartGameProtocol", "Starting the race loading.");
+            // This will create the world instance
             m_game_setup->getRaceConfig()->setRaceData();
             World::getWorld()->setNetworkWorld(true);
             m_state = LOADING;
