@@ -15,8 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/central_settings.hpp"
+#include "graphics/2dutils.hpp"
 #include "graphics/render_target.hpp"
+#include "graphics/central_settings.hpp"
+#include "graphics/shader_based_renderer.hpp"
+
 
 //-----------------------------------------------------------------------------
 GL1RenderTarget::GL1RenderTarget(const irr::core::dimension2du &dimension,
@@ -25,21 +28,47 @@ GL1RenderTarget::GL1RenderTarget(const irr::core::dimension2du &dimension,
     
 }
 
-//-----------------------------------------------------------------------------
-GLuint GL1RenderTarget::getTextureId() const
+GL1RenderTarget::~GL1RenderTarget()
 {
-    
+        /*assert(m_old_rtt_mini_map->getReferenceCount() == 1);
+        irr_driver->removeTexture(m_old_rtt_mini_map);
+        m_old_rtt_mini_map = NULL;*/
 }
 
 //-----------------------------------------------------------------------------
 irr::core::dimension2du GL1RenderTarget::getTextureSize() const
 {
+    return m_render_target_texture->getSize();
+}
+
+//-----------------------------------------------------------------------------
+void GL1RenderTarget::renderToTexture(irr::scene::ICameraSceneNode* camera, float dt)
+{
     
 }
 
 //-----------------------------------------------------------------------------
-GL3RenderTarget::GL3RenderTarget(const irr::core::dimension2du &dimension)
+void GL1RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
+                                  const irr::core::rect<s32>* clip_rect,
+                                  const irr::video::SColor &colors,
+                                  bool use_alpha_channel_of_texture) const
 {
+    irr::core::rect<s32> source_rect(irr::core::position2di(0, 0),
+                                      m_render_target_texture->getSize());
+                                     
+    irr_driver->getVideoDriver()->draw2DImage(m_render_target_texture,
+                                              dest_rect, source_rect,
+                                              clip_rect, &colors,
+                                              use_alpha_channel_of_texture);    
+}
+
+//-----------------------------------------------------------------------------
+GL3RenderTarget::GL3RenderTarget(const irr::core::dimension2du &dimension,
+                                 const std::string &name,
+                                 ShaderBasedRenderer *renderer)
+{
+    m_renderer = renderer;
+    
     glGenTextures(1, &m_texture_id);
     glBindTexture(GL_TEXTURE_2D, m_texture_id);
     if (CVS->isARBTextureStorageUsable())
@@ -64,4 +93,31 @@ irr::core::dimension2du GL3RenderTarget::getTextureSize() const
 {
     return irr::core::dimension2du(m_frame_buffer->getWidth(),
                                    m_frame_buffer->getHeight());
+}
+
+//-----------------------------------------------------------------------------
+FrameBuffer* GL3RenderTarget::getFrameBuffer()
+{
+    return m_frame_buffer;
+}
+
+//-----------------------------------------------------------------------------
+void GL3RenderTarget::renderToTexture(irr::scene::ICameraSceneNode* camera, float dt)
+{
+    m_renderer->renderToTexture(this, camera, dt);
+}
+
+//-----------------------------------------------------------------------------
+void GL3RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
+                                  const irr::core::rect<s32>* clip_rect,
+                                  const irr::video::SColor &colors,
+                                  bool use_alpha_channel_of_texture) const
+{
+    irr::core::rect<s32> source_rect(0, 0, m_frame_buffer->getWidth(),
+                                     m_frame_buffer->getHeight());
+                                     
+    draw2DImageFromRTT(m_texture_id,
+                       m_frame_buffer->getWidth(), m_frame_buffer->getHeight(),
+                       dest_rect, source_rect,
+                       clip_rect, colors, use_alpha_channel_of_texture);    
 }

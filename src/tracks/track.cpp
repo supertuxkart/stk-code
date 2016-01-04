@@ -118,8 +118,6 @@ Track::Track(const std::string &filename)
     m_is_soccer             = false;
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
-    m_old_rtt_mini_map      = NULL;
-    m_new_rtt_mini_map      = NULL;
     m_bloom                 = true;
     m_bloom_threshold       = 0.75f;
     m_color_inlevel         = core::vector3df(0.0,1.0, 255.0);
@@ -360,17 +358,6 @@ void Track::cleanup()
         irr_driver->removeMeshFromCache(m_detached_cached_meshes[i]);
     }
     m_detached_cached_meshes.clear();
-
-    if (m_old_rtt_mini_map)
-    {
-        assert(m_old_rtt_mini_map->getReferenceCount() == 1);
-        irr_driver->removeTexture(m_old_rtt_mini_map);
-        m_old_rtt_mini_map = NULL;
-    }
-    if (m_new_rtt_mini_map)
-    {
-        m_new_rtt_mini_map = NULL; // already deleted by QuadGraph::~QuadGraph
-    }
 
     for(unsigned int i=0; i<m_sky_textures.size(); i++)
     {
@@ -687,23 +674,19 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
         core::dimension2du size = m_mini_map_size
                                  .getOptimalSize(!nonpower,!nonsquare);
 
-        QuadGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
-            &m_old_rtt_mini_map, &m_new_rtt_mini_map);
-        if (m_old_rtt_mini_map)
-        {
-            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_old_rtt_mini_map->getSize().Width);
-            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_old_rtt_mini_map->getSize().Height);
-        }
-        else if (m_new_rtt_mini_map)
-        {
-            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_new_rtt_mini_map->getWidth());
-            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_new_rtt_mini_map->getHeight());
-        }
+        QuadGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
+        
+        core::dimension2du mini_map_texture_size = QuadGraph::get()->getMiniMapTextureSize();
+        
+        if(mini_map_texture_size.Width) 
+            m_minimap_x_scale = float(m_mini_map_size.Width) / float(mini_map_texture_size.Width);
         else
-        {
             m_minimap_x_scale = 0;
-            m_minimap_y_scale = 0;
-        }
+            
+        if(mini_map_texture_size.Height) 
+            m_minimap_y_scale = float(m_mini_map_size.Height) / float(mini_map_texture_size.Height);
+        else
+            m_minimap_y_scale = 0;           
     }
 }   // loadQuadGraph
 

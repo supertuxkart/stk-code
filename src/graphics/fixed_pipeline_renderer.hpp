@@ -19,9 +19,13 @@
 #define HEADER_FIXED_PIPELINE_RENDERER_HPP
 
 #include "graphics/abstract_renderer.hpp"
+#include <map>
+
+class RenderTarget;
+class GL1RenderTarget;
 
 class FixedPipelineRenderer: public AbstractRenderer
-{
+{  
 public:
     
     void onLoadWorld()  ;
@@ -32,6 +36,10 @@ public:
                      float dt, bool hasShadows, bool forceRTT){}
     void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                               float dt){}
+    
+    std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
+                                                     const std::string &name);
+    
 };
 
 #endif //HEADER_FIXED_PIPELINE_RENDERER_HPP

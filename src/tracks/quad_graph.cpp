@@ -29,7 +29,6 @@
 #include "graphics/screen_quad.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/render_target.hpp"
-#include "graphics/rtts.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
@@ -982,27 +981,13 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
  */
 void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
                             const std::string &name,
-                            const video::SColor &fill_color,
-                            video::ITexture** oldRttMinimap,
-                            FrameBuffer** newRttMinimap)
+                            const video::SColor &fill_color)
 {
     const SColor oldClearColor = World::getWorld()->getClearColor();
     World::getWorld()->setClearbackBufferColor(SColor(0, 255, 255, 255));
     World::getWorld()->forceFogDisabled(true);
-    *oldRttMinimap = NULL;
-    *newRttMinimap = NULL;
 
-    //RTT* newRttProvider = NULL;
-    IrrDriver::RTTProvider* oldRttProvider = NULL;
-    if (CVS->isGLSL())
-    {
-        //m_new_rtt = newRttProvider = new RTT(dimension.Width, dimension.Height);
-        m_render_target = irr_driver->addRenderTarget(dimension, name);
-    }
-    else
-    {
-        oldRttProvider = new IrrDriver::RTTProvider(dimension, name, true);
-    }
+    m_render_target = irr_driver->createRenderTarget(dimension, name);
 
     irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 255, 255, 255));
 
@@ -1079,34 +1064,12 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     //camera->setAspectRatio(1.0f);
     camera->updateAbsolutePosition();
 
-    video::ITexture* texture = NULL;
-    FrameBuffer* frame_buffer = NULL;
-
-    if (CVS->isGLSL())
-    {
-        //frame_buffer = newRttProvider->render(camera, GUIEngine::getLatestDt());
-        irr_driver->renderToTexture(m_render_target, camera, GUIEngine::getLatestDt());
-        frame_buffer = dynamic_cast<GL3RenderTarget*>(m_render_target)->getFrameBuffer();
-    }
-    else
-    {
-        texture = oldRttProvider->renderToTexture();
-        delete oldRttProvider;
-    }
+    m_render_target->renderToTexture(camera, GUIEngine::getLatestDt());
 
     cleanupDebugMesh();
     irr_driver->removeCameraSceneNode(camera);
     m_min_coord = bb_min;
-
-
-    if (texture == NULL && frame_buffer == NULL)
-    {
-        Log::error("Quad Graph", "[makeMiniMap] WARNING: RTT does not appear to work,"
-                        "mini-map will not be available.");
-    }
-
-    *oldRttMinimap = texture;
-    *newRttMinimap = frame_buffer;
+    
     World::getWorld()->setClearbackBufferColor(oldClearColor);
     World::getWorld()->forceFogDisabled(false);
 
@@ -1117,6 +1080,23 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     irr_driver->clearForcedBloom();
     irr_driver->clearBackgroundNodes();
 }   // makeMiniMap
+
+//-----------------------------------------------------------------------------
+core::dimension2du QuadGraph::getMiniMapTextureSize() const
+{
+    if(m_render_target)
+        return m_render_target->getTextureSize();
+    else
+        return core::dimension2du(0,0);
+}
+
+//-----------------------------------------------------------------------------
+void QuadGraph::drawMiniMap(const core::rect<s32>& dest_rect) const
+{
+   m_render_target->draw2DImage(dest_rect, NULL,
+                                video::SColor(127, 255, 255, 255),
+                                true);
+}
 
 //-----------------------------------------------------------------------------
     /** Returns the 2d coordinates of a point when drawn on the mini map

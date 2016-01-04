@@ -27,9 +27,6 @@
  * management, etc...)
  */
 
-#include <string>
-#include <vector>
-
 #include <IVideoDriver.h>
 #include <vector2d.h>
 #include <dimension2d.h>
@@ -46,7 +43,9 @@
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
-
+#include <memory>
+#include <string>
+#include <vector>
 
 
 namespace irr
@@ -207,8 +206,6 @@ private:
     float m_ssao_k;
     float m_ssao_sigma;
     
-    std::map<std::string, RenderTarget*> m_render_targets;
-
 #ifdef DEBUG
     /** Used to visualise skeletons. */
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
@@ -319,18 +316,8 @@ public:
     void                  unsetTextureErrorMessage();
     class GPUTimer        &getGPUTimer(unsigned);
 
-    RenderTarget*         addRenderTarget(const irr::core::dimension2du &dimension,
-                                          const std::string &name);
-    void                  removeRenderTarget(const std::string &name);
-    
-    /*GLuint                renderToTexture(size_t width,
-                                          size_t height,
-                                          irr::scene::ICameraSceneNode* camera,
-                                          float dt,
-                                          const std::string &rtt_name);*/
-    void                  renderToTexture(RenderTarget *render_target,
-                                          irr::scene::ICameraSceneNode* camera,
-                                          float dt);
+    std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
+                                                     const std::string &name);
 
     // ------------------------------------------------------------------------
     /** Convenience function that loads a texture with default parameters

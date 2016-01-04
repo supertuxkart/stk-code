@@ -22,11 +22,20 @@
 #include <irrlicht.h>
 #include <string>
 
+class ShaderBasedRenderer;
+
 class RenderTarget
 {
 public:
-    virtual GLuint                   getTextureId()   const = 0;
-    virtual irr::core::dimension2du  getTextureSize() const = 0;
+    virtual ~RenderTarget() {}
+
+    virtual irr::core::dimension2du  getTextureSize()          const = 0;
+
+    virtual void renderToTexture(irr::scene::ICameraSceneNode* camera, float dt) = 0;
+    virtual void draw2DImage(const irr::core::rect<s32>& dest_rect,
+                             const irr::core::rect<s32>* clip_rect,
+                             const irr::video::SColor &colors,
+                             bool use_alpha_channel_of_texture) const = 0;    
 };
 
 class GL1RenderTarget: public RenderTarget
@@ -38,27 +47,40 @@ private:
 public:
     GL1RenderTarget(const irr::core::dimension2du &dimension,
                     const std::string &name);
+    ~GL1RenderTarget();
+                    
     
-    GLuint getTextureId() const;
-    irr::core::dimension2du getTextureSize() const;   
+    irr::core::dimension2du getTextureSize() const;
     
+    void renderToTexture(irr::scene::ICameraSceneNode* camera, float dt);
+    void draw2DImage(const irr::core::rect<s32>& dest_rect,
+                     const irr::core::rect<s32>* clip_rect,
+                     const irr::video::SColor &colors,
+                     bool use_alpha_channel_of_texture) const;
     
 };
 
 class GL3RenderTarget: public RenderTarget
 {
 private:
+    ShaderBasedRenderer *m_renderer;
     FrameBuffer *m_frame_buffer;
     GLuint m_texture_id;
     
 public:
-    GL3RenderTarget(const irr::core::dimension2du &dimension);
+    GL3RenderTarget(const irr::core::dimension2du &dimension,
+                    const std::string &name,
+                    ShaderBasedRenderer *renderer);
     ~GL3RenderTarget();
     
-    GLuint getTextureId() const                       { return m_texture_id;    }
     irr::core::dimension2du getTextureSize() const;
-    FrameBuffer* getFrameBuffer()                     { return m_frame_buffer; }
+    FrameBuffer* getFrameBuffer();
     
+    void renderToTexture(irr::scene::ICameraSceneNode* camera, float dt);
+    void draw2DImage(const irr::core::rect<s32>& dest_rect,
+                     const irr::core::rect<s32>* clip_rect,
+                     const irr::video::SColor &colors,
+                     bool use_alpha_channel_of_texture) const;    
 };
 
 

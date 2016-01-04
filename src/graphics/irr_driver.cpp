@@ -201,40 +201,12 @@ GPUTimer &IrrDriver::getGPUTimer(unsigned i)
 }
 
 
-RenderTarget* IrrDriver::addRenderTarget(const irr::core::dimension2du &dimension,
-                                         const std::string &name)
+
+std::unique_ptr<RenderTarget> IrrDriver::createRenderTarget(const irr::core::dimension2du &dimension,
+                                                            const std::string &name)
 {
-    RenderTarget* render_target;
-    if(CVS->isGLSL())
-        render_target = new GL3RenderTarget(dimension);
-    else
-        render_target = new GL1RenderTarget(dimension, name);
-    
-    m_render_targets[name] = render_target;
-    return render_target;
+    return m_renderer->createRenderTarget(dimension, name);
 }
-
-void IrrDriver::removeRenderTarget(const std::string &name)
-{
-    m_render_targets.erase(name);
-}
-
-/*GLuint IrrDriver::renderToTexture(size_t width,
-                                size_t height,
-                                irr::scene::ICameraSceneNode* camera,
-                                float dt,
-                                const std::string &rtt_name)
-{
-    return m_renderer->renderToTexture(width, height, camera, dt, rtt_name);
-}*/
-
-void IrrDriver::renderToTexture(RenderTarget *render_target,
-                                irr::scene::ICameraSceneNode* camera,
-                                float dt)
-{
-    m_renderer->renderToTexture(render_target, camera, dt);
-}
-
 
 
 // ----------------------------------------------------------------------------

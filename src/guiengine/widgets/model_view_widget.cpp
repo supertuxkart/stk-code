@@ -22,7 +22,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/render_target.hpp"
-#include "graphics/rtts.hpp"
 
 #include <IAnimatedMesh.h>
 #include <IAnimatedMeshSceneNode.h>
@@ -40,12 +39,10 @@ using namespace irr::gui;
 ModelViewWidget::ModelViewWidget() :
 IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false)
 {
-    m_frame_buffer = NULL;
     m_rtt_main_node = NULL;
     m_camera = NULL;
     m_light = NULL;
     m_type = WTYPE_MODEL_VIEW;
-    m_rtt_provider = NULL;
     m_render_target = NULL;
     m_rotation_mode = ROTATE_OFF;
     
@@ -58,10 +55,6 @@ IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, 
 ModelViewWidget::~ModelViewWidget()
 {
     GUIEngine::needsUpdate.remove(this);
-    
-    delete m_rtt_provider;
-    m_rtt_provider = NULL;
-    //TODO: remove render target
 }
 // -----------------------------------------------------------------------------
 void ModelViewWidget::add()
@@ -164,21 +157,13 @@ void ModelViewWidget::update(float delta)
     
     if (!CVS->isGLSL())
         return;
-    
-    /*if (m_rtt_provider == NULL)
-    {
-        std::string name = "model view ";
-        name += m_properties[PROP_ID].c_str();
-        
-        m_rtt_provider = new RTT(512, 512);
-    }*/
+
     if (m_render_target == NULL)
     {
         std::string name = "model view ";
         name += m_properties[PROP_ID].c_str();
-        m_render_target = irr_driver->addRenderTarget(irr::core::dimension2du(512,512), name);
+        m_render_target = irr_driver->createRenderTarget(irr::core::dimension2du(512,512), name);
     }
-    
     
     if (m_rtt_main_node == NULL)
     {
@@ -189,9 +174,7 @@ void ModelViewWidget::update(float delta)
     
     m_rtt_main_node->setVisible(true);
 
-    //m_frame_buffer = m_rtt_provider->render(m_camera, GUIEngine::getLatestDt());
-    irr_driver->renderToTexture(m_render_target, m_camera, GUIEngine::getLatestDt());
-    m_frame_buffer = dynamic_cast<GL3RenderTarget*>(m_render_target)->getFrameBuffer();
+    m_render_target->renderToTexture(m_camera, GUIEngine::getLatestDt());
 
     m_rtt_main_node->setVisible(false);
 }
@@ -319,13 +302,17 @@ bool ModelViewWidget::isRotating()
 
 void ModelViewWidget::elementRemoved()
 {
-    delete m_rtt_provider;
-    m_rtt_provider = NULL;
+    m_render_target = NULL;
     IconButtonWidget::elementRemoved();
 }
 
 void ModelViewWidget::clearRttProvider()
 {
-    delete m_rtt_provider;
-    m_rtt_provider = NULL;
+    m_render_target = NULL;;
 }
+
+void ModelViewWidget::drawRTTScene(const irr::core::rect<s32>& dest_rect) const
+{
+    m_render_target->draw2DImage(dest_rect, NULL, video::SColor(255, 255, 255, 255), true);
+}
+

@@ -599,6 +599,7 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_geometry_passes;
     delete m_spherical_harmonics;
     delete m_skybox;
+    delete m_rtts;
 }
 
     
@@ -607,6 +608,7 @@ void ShaderBasedRenderer::onLoadWorld()
     const core::recti &viewport = Camera::getCamera(0)->getViewport();
     size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
     size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
+    delete m_rtts;
     m_rtts = new RTT(width, height);    
 }
 
@@ -803,44 +805,14 @@ void ShaderBasedRenderer::render(float dt)
 }
 
 
-/*GLuint ShaderBasedRenderer::renderToTexture(size_t width,
-                                            size_t height,
-                                            irr::scene::ICameraSceneNode* camera,
-                                            float dt,
-                                            const std::string &rtt_name)
+std::unique_ptr<RenderTarget> ShaderBasedRenderer::createRenderTarget(const irr::core::dimension2du &dimension,
+                                                                      const std::string &name)
 {
-    if(m_rtts == NULL)
-        m_rtts = new RTT(width, height);
-    else
-    {
-        if((m_rtts->getWidth() != width) || (m_rtts->getHeight() != height))
-        {
-            delete m_rtts;
-            m_rtts = new RTT(width, height);
-        }
-    }
-    
-    irr_driver->getSceneManager()->setActiveCamera(camera);
+    return std::unique_ptr<RenderTarget>(new GL3RenderTarget(dimension, name, this));
+    //return std::make_unique<GL3RenderTarget>(dimension, name, this);
+}
 
-    computeMatrixesAndCameras(camera, width, height);
-    updateLightsInfo(camera, dt);
-    uploadLightingData();
-    renderScene(camera, dt, false, true);
-    FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
-    GLuint render_target = frame_buffer->getRTT()[0];
-
-    // reset
-    glViewport(0, 0,
-        irr_driver->getActualScreenSize().Width,
-        irr_driver->getActualScreenSize().Height);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    irr_driver->getSceneManager()->setActiveCamera(NULL);
-    
-    return render_target;
-}*/
-
-void ShaderBasedRenderer::renderToTexture(RenderTarget *render_target,
+void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
                                           irr::scene::ICameraSceneNode* camera,
                                           float dt)
 {
@@ -866,9 +838,7 @@ void ShaderBasedRenderer::renderToTexture(RenderTarget *render_target,
     updateLightsInfo(camera, dt);
     uploadLightingData();
     renderScene(camera, dt, false, true);
-    FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false, dynamic_cast<GL3RenderTarget*>(render_target));
-    //TODO
-    
+    irr_driver->getPostProcessing()->render(camera, false, render_target);    
 
     // reset
     glViewport(0, 0,
@@ -879,3 +849,4 @@ void ShaderBasedRenderer::renderToTexture(RenderTarget *render_target,
     irr_driver->getSceneManager()->setActiveCamera(NULL);
         
 }
+

@@ -50,8 +50,7 @@ namespace GUIEngine
         AlignedArray<Vec3> m_model_scale;
         std::vector<int> m_model_frames;
         
-        RTT* m_rtt_provider;
-        RenderTarget *m_render_target;
+        std::unique_ptr<RenderTarget> m_render_target;
         
         float angle;
         
@@ -62,8 +61,6 @@ namespace GUIEngine
         scene::ICameraSceneNode    *m_camera;
 
         scene::ISceneNode          *m_light;
-
-        FrameBuffer                *m_frame_buffer;
 
     public:
         
@@ -102,7 +99,7 @@ namespace GUIEngine
             AlignedArray<Vec3>& mesh_scale,
             const std::vector<int>& model_frames);
 
-        FrameBuffer* getFrameBuffer() { return m_frame_buffer; }
+        void drawRTTScene(const irr::core::rect<s32>& dest_rect) const;
     };
     
 }

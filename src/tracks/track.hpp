@@ -337,8 +337,6 @@ private:
     video::SColor       m_fog_color;
 
     /** The texture for the mini map, which is displayed in the race gui. */
-    video::ITexture         *m_old_rtt_mini_map;
-    FrameBuffer             *m_new_rtt_mini_map;
     core::dimension2du      m_mini_map_size;
     float                   m_minimap_x_scale;
     float                   m_minimap_y_scale;
@@ -420,10 +418,6 @@ public:
     bool findGround(AbstractKart *kart);
 
     std::vector< std::vector<float> > buildHeightMap();
-    // ------------------------------------------------------------------------
-    /** Returns the texture with the mini map for this track. */
-    const video::ITexture*    getOldRttMiniMap() const { return m_old_rtt_mini_map; }
-    const FrameBuffer*        getNewRttMiniMap() const { return m_new_rtt_mini_map; }
     // ------------------------------------------------------------------------
     const core::dimension2du& getMiniMapSize() const { return m_mini_map_size; }
     // ------------------------------------------------------------------------

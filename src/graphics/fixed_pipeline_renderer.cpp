@@ -19,6 +19,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_target.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "utils/profiler.hpp"
@@ -105,3 +106,14 @@ void FixedPipelineRenderer::render(float dt)
     irr_driver->getVideoDriver()->endScene();
     
 }
+
+std::unique_ptr<RenderTarget> FixedPipelineRenderer::createRenderTarget(const irr::core::dimension2du &dimension,
+                                                                        const std::string &name)
+{
+    /*GL1RenderTarget *render_target = new GL1RenderTarget(dimension, name);
+    if (m_render_targets.find("name") != m_render_targets.end())
+        delete m_render_targets[name];
+    m_render_targets[name] = render_target;
+    return render_target;*/
+}
+

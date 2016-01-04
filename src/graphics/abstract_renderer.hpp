@@ -22,6 +22,7 @@
 #include "graphics/rtts.hpp"
 #include "graphics/sphericalHarmonics.hpp"
 #include <irrlicht.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -98,14 +99,10 @@ public:
         return m_current_screen_size;
     }
  
-    /*virtual GLuint renderToTexture(size_t width,
-                                   size_t height,
-                                   irr::scene::ICameraSceneNode* camera,
-                                   float dt,
-                                   const std::string &rtt_name) { return 0;}*/
-    virtual void renderToTexture(RenderTarget *render_target,
-                                 irr::scene::ICameraSceneNode* camera,
-                                 float dt) {}
+ 
+    virtual std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
+                                                             const std::string &name) = 0;
+ 
 };
 
 #endif //HEADER_ABSTRACT_RENDERER_HPP

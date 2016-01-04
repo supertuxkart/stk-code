@@ -19,6 +19,7 @@
 #ifndef HEADER_QUAD_GRAPH_HPP
 #define HEADER_QUAD_GRAPH_HPP
 
+#include <memory>
 #include <vector>
 #include <string>
 #include <set>
@@ -29,6 +30,8 @@
 #include "utils/no_copy.hpp"
 
 #include <dimension2d.h>
+#include <rect.h>
+
 namespace irr
 {
     namespace scene { class ISceneNode; class IMesh; class IMeshBuffer; }
@@ -38,8 +41,6 @@ using namespace irr;
 
 class CheckLine;
 class RenderTarget;
-class RTT;
-class FrameBuffer;
 
 /**
  *  \brief This class stores a graph of quads. It uses a 'simplified singleton'
@@ -58,7 +59,7 @@ private:
     static QuadGraph        *m_quad_graph;
 
     //RTT* m_new_rtt;
-    RenderTarget            *m_render_target;
+    std::unique_ptr<RenderTarget> m_render_target;
 
     /** The actual graph data structure. */
     std::vector<GraphNode*>  m_all_nodes;
@@ -126,9 +127,9 @@ public:
                                          float upwards_distance=0.0f) const;
     void        makeMiniMap(const core::dimension2du &where,
                             const std::string &name,
-                            const video::SColor &fill_color,
-                            video::ITexture** oldRttMinimap,
-                            FrameBuffer** newRttMinimap);
+                            const video::SColor &fill_color);
+    core::dimension2du getMiniMapTextureSize() const;
+    void         drawMiniMap(const irr::core::rect<s32>& dest_rect) const;
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
     void         updateDistancesForAllSuccessors(unsigned int indx,
                                                  float delta,

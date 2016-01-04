@@ -25,7 +25,11 @@
 #include "graphics/lighting_passes.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include "graphics/skybox.hpp"
+#include <map>
+#include <string>
 
+class RenderTarget;
+class GL3RenderTarget;
 
 class ShaderBasedRenderer: public AbstractRenderer
 {
@@ -104,16 +108,13 @@ public:
     void clearGlowingNodes() override;
     
     void render(float dt);
+
+    std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
+                                                     const std::string &name);
     
-    /*GLuint renderToTexture(size_t width,
-                           size_t height,
-                           irr::scene::ICameraSceneNode* camera,
-                           float dt,
-                           const std::string &rtt_name) override;*/
-    
-    void renderToTexture(RenderTarget *render_target,
+    void renderToTexture(GL3RenderTarget *render_target,
                          irr::scene::ICameraSceneNode* camera,
-                         float dt) override;
+                         float dt);
 };
 
 #endif //HEADER_SHADER_BASED_RENDERER_HPP
