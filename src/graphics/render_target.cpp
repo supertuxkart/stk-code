@@ -25,7 +25,16 @@
 GL1RenderTarget::GL1RenderTarget(const irr::core::dimension2du &dimension,
                                  const std::string &name)
 {
-    
+    m_render_target_texture =
+        irr_driver->getVideoDriver()->addRenderTargetTexture(dimension,
+                                                             name.c_str(),
+                                                             video::ECF_A8R8G8B8);
+    if (m_render_target_texture != NULL)
+    {
+        irr_driver->getVideoDriver()->setRenderTarget(m_render_target_texture);
+    }
+
+    m_rtt_main_node = NULL;
 }
 
 GL1RenderTarget::~GL1RenderTarget()
@@ -44,7 +53,34 @@ irr::core::dimension2du GL1RenderTarget::getTextureSize() const
 //-----------------------------------------------------------------------------
 void GL1RenderTarget::renderToTexture(irr::scene::ICameraSceneNode* camera, float dt)
 {
-    
+    // m_render_target_texture will be NULL if RTT doesn't work on this computer
+    if (m_render_target_texture == NULL)
+    {
+        Log::error("GL1RenderTarget", "Cannot render to texture.");
+        return;
+    }
+
+    irr_driver->getVideoDriver()->setRenderTarget(m_render_target_texture);
+
+    irr::video::SOverrideMaterial &overridemat = irr_driver->getVideoDriver()->getOverrideMaterial();
+    overridemat.EnablePasses = scene::ESNRP_SOLID;
+    overridemat.EnableFlags = video::EMF_MATERIAL_TYPE;
+    overridemat.Material.MaterialType = video::EMT_SOLID;
+
+    if (m_rtt_main_node == NULL)
+    {
+        irr_driver->getSceneManager()->drawAll();
+    }
+    else
+    {
+        m_rtt_main_node->setVisible(true);
+        irr_driver->getSceneManager()->drawAll();
+        m_rtt_main_node->setVisible(false);
+    }
+
+    overridemat.EnablePasses = 0;
+
+    irr_driver->getVideoDriver()->setRenderTarget(0, false, false);
 }
 
 //-----------------------------------------------------------------------------

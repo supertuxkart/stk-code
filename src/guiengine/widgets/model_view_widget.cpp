@@ -154,9 +154,6 @@ void ModelViewWidget::update(float delta)
         // stop rotating when target reached
         if (fabsf(angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
-    
-    if (!CVS->isGLSL())
-        return;
 
     if (m_render_target == NULL)
     {

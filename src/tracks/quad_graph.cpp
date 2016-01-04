@@ -73,9 +73,6 @@ QuadGraph::~QuadGraph()
     }
     if(UserConfigParams::m_track_debug)
         cleanupDebugMesh();
-    //if (m_render_target != NULL)
-    //    delete m_render_target;
-    //irr_driver->removeRenderTarget(name); //TODO
 }   // ~QuadGraph
 
 // -----------------------------------------------------------------------------

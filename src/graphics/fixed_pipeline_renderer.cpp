@@ -110,10 +110,6 @@ void FixedPipelineRenderer::render(float dt)
 std::unique_ptr<RenderTarget> FixedPipelineRenderer::createRenderTarget(const irr::core::dimension2du &dimension,
                                                                         const std::string &name)
 {
-    /*GL1RenderTarget *render_target = new GL1RenderTarget(dimension, name);
-    if (m_render_targets.find("name") != m_render_targets.end())
-        delete m_render_targets[name];
-    m_render_targets[name] = render_target;
-    return render_target;*/
+    return std::unique_ptr<RenderTarget>(new GL1RenderTarget(dimension, name));
 }
 

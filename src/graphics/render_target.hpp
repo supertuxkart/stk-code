@@ -41,8 +41,12 @@ public:
 class GL1RenderTarget: public RenderTarget
 {
 private:
-    irr::video::ITexture *m_render_target_texture;
+    /** A pointer to texture on which a scene is rendered. Only used
+     *  in between beginRenderToTexture() and endRenderToTexture calls. */
+    irr::video::ITexture            *m_render_target_texture;
     
+    /** Main node of the RTT scene */
+    irr::scene::ISceneNode          *m_rtt_main_node;
     
 public:
     GL1RenderTarget(const irr::core::dimension2du &dimension,

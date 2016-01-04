@@ -160,6 +160,7 @@ IrrDriver::~IrrDriver()
         Shaders::destroy();
     }
     delete m_wind;
+    delete m_renderer;
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
