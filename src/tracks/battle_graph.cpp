@@ -138,11 +138,7 @@ void BattleGraph::findItemsOnGraphNodes()
         for (unsigned int j = 0; j < this->getNumNodes(); ++j)
         {
             if (NavMesh::get()->getNavPoly(j).pointInPoly(xyz))
-            {
-                float dist = xyz.getY() - NavMesh::get()->getCenterOfPoly(j).getY();
-                if (fabsf(dist) < 1.0f )
-                    polygon = j;
-            }
+                polygon = j;
         }
 
         if (polygon != BattleGraph::UNKNOWN_POLY)
