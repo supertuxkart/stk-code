@@ -432,6 +432,8 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
             new NetworkPlayerProfile(race_player_id, name);
         m_setup->addPlayer(profile2);
         n += bytes_read+2;
+        // Inform the network lobby of all players so that the GUI can
+        // show all currently connected players.
         NetworkingLobby::getInstance()->addPlayer(profile2);
     }
 

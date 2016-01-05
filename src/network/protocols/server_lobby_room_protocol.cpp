@@ -442,22 +442,19 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // Connection accepted.
     // ====================
     std::string name_u8;
-    int name_len = data.decodeString(0, &name_u8);
+    data.decodeString(0, &name_u8);
     core::stringw name = StringUtils::utf8ToWide(name_u8);
 
-    // add the player to the game setup
+    // Get the unique global ID for this player.
     m_next_player_id.lock();
     m_next_player_id.getData()++;
     int new_player_id = m_next_player_id.getData();
     m_next_player_id.unlock();
-    if(STKHost::get()->getGameSetup()->getLocalMasterID()==0)
-        STKHost::get()->getGameSetup()->setLocalMaster(new_player_id);
+    if(m_setup->getLocalMasterID()==0)
+        m_setup->setLocalMaster(new_player_id);
 
-    NetworkPlayerProfile* profile = new NetworkPlayerProfile(new_player_id, name);
-    m_setup->addPlayer(profile);
-    peer->setPlayerProfile(profile);
-
-    // notify everybody that there is a new player
+    // Notify everybody that there is a new player
+    // -------------------------------------------
     NetworkString message(8);
     // size of id -- id -- size of local id -- local id;
     message.ai8(LE_NEW_PLAYER_CONNECTED).ai8(1).ai8(new_player_id)
@@ -465,6 +462,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     ProtocolManager::getInstance()->sendMessageExcept(this, peer, message);
 
     // Now answer to the peer that just connected
+    // ------------------------------------------
     RandomGenerator token_generator;
     // use 4 random numbers because rand_max is probably 2^15-1.
     uint32_t token = (uint32_t)((token_generator.get(RAND_MAX) & 0xff) << 24 |
@@ -472,25 +470,25 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
                                 (token_generator.get(RAND_MAX) & 0xff) <<  8 |
                                 (token_generator.get(RAND_MAX) & 0xff));
 
-    std::vector<NetworkPlayerProfile*> players = m_setup->getPlayers();
+    const std::vector<NetworkPlayerProfile*> &players = m_setup->getPlayers();
     // send a message to the one that asked to connect
     // Size is overestimated, probably one player's data will not be sent
     NetworkString message_ack(13 + players.size() * 7);
     // connection success -- size of token -- token
     message_ack.ai8(LE_CONNECTION_ACCEPTED).ai8(1).ai8(new_player_id).ai8(4)
                .ai32(token);
-    // add all players so that this user knows
+    // Add all players so that this user knows (this new player is only added
+    // to the list of players later, so the new player's info is not included)
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        // do not duplicate the player into the message
-        if (players[i]->getPlayerID() != new_player_id )
-        {
-            message_ack.ai8(1).ai8(players[i]->getPlayerID())
-                       .encodeString(players[i]->getName());
-        }
+        message_ack.ai8(1).ai8(players[i]->getPlayerID())
+                   .encodeString(players[i]->getName());
     }
     sendMessage(peer, message_ack);
 
+    NetworkPlayerProfile* profile = new NetworkPlayerProfile(new_player_id, name);
+    m_setup->addPlayer(profile);
+    peer->setPlayerProfile(profile);
     peer->setClientServerToken(token);
 
     Log::verbose("ServerLobbyRoomProtocol", "New player.");
