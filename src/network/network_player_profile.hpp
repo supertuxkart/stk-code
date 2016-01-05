@@ -40,7 +40,7 @@ private:
     /** The unique id of the player for this race. The number is assigned
      *  by the server (and it might not be the index of this player in the
      *  peer list. */
-    uint8_t m_race_player_id;
+    uint8_t m_global_player_id;
 
     /** The selected kart id. */
     std::string m_kart_name; 
@@ -59,11 +59,11 @@ public:
         ~NetworkPlayerProfile();
 
     // ------------------------------------------------------------------------
-    /** Sets the player id of this player. */
-    void setPlayerID(int player_id) { m_race_player_id = player_id; }
+    /** Sets the global player id of this player. */
+    void setGlobalPlayerId(int player_id) { m_global_player_id = player_id; }
     // ------------------------------------------------------------------------
-    /** Returns the loca ID of this player in this race. */
-    int getPlayerID() const { return m_race_player_id; }
+    /** Returns the global ID of this player in this race. */
+    int getGlobalPlayerId() const { return m_global_player_id; }
     // ------------------------------------------------------------------------
     /** Sets the kart name for this player. */
     void setKartName(const std::string &kart_name) { m_kart_name = kart_name; }

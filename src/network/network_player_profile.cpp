@@ -26,7 +26,7 @@
 NetworkPlayerProfile::NetworkPlayerProfile(int race_player_id,
                                            const irr::core::stringw &name)
 {
-    m_race_player_id        = race_player_id;
+    m_global_player_id      = race_player_id;
     m_kart_name             = "";
     m_world_kart_id         = 0;
     m_per_player_difficulty = PLAYER_DIFFICULTY_NORMAL;

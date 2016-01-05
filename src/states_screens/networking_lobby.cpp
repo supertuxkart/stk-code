@@ -180,7 +180,7 @@ void NetworkingLobby::onDialogClose()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::addPlayer(NetworkPlayerProfile *profile)
 {
-    m_player_list->addItem(StringUtils::toString(profile->getPlayerID()),
+    m_player_list->addItem(StringUtils::toString(profile->getGlobalPlayerId()),
                            profile->getName());
 }  // addPlayer
 

@@ -52,7 +52,7 @@ void GameSetup::addPlayer(NetworkPlayerProfile* profile)
 {
     m_players.push_back(profile);
     Log::info("GameSetup", "New player in the game setup. Race id : %d.",
-              profile->getPlayerID());
+              profile->getGlobalPlayerId());
 }   // addPlayer
 
 //-----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ void GameSetup::setPlayerKart(uint8_t player_id, const std::string &kart_name)
     bool found = false;
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
-        if (m_players[i]->getPlayerID() == player_id)
+        if (m_players[i]->getGlobalPlayerId() == player_id)
         {
             m_players[i]->setKartName(kart_name);
             Log::info("GameSetup::setPlayerKart", "Player %d took kart %s",
@@ -130,7 +130,8 @@ void GameSetup::bindKartsToProfiles()
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
         Log::info("GameSetup", "Player %d has id %d and kart %s", i,
-                  m_players[i]->getPlayerID(), m_players[i]->getKartName().c_str());
+                  m_players[i]->getGlobalPlayerId(),
+                  m_players[i]->getKartName().c_str());
     }
     for (unsigned int i = 0; i < karts.size(); i++)
     {
@@ -166,7 +167,7 @@ const NetworkPlayerProfile* GameSetup::getProfile(uint8_t player_id)
 {
     for (unsigned int i = 0; i < m_players.size(); i++)
     {
-        if (m_players[i]->getPlayerID()== player_id)
+        if (m_players[i]->getGlobalPlayerId()== player_id)
         {
             return m_players[i];
         }

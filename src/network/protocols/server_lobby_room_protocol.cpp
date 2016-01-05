@@ -396,10 +396,10 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
     {
         NetworkString msg(3);
         msg.ai8(LE_PLAYER_DISCONNECTED).ai8(1)
-           .ai8(peer->getPlayerProfile()->getPlayerID());
+           .ai8(peer->getPlayerProfile()->getGlobalPlayerId());
         sendMessage(msg);
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
-                  peer->getPlayerProfile()->getPlayerID());
+                  peer->getPlayerProfile()->getGlobalPlayerId());
         m_setup->removePlayer(peer->getPlayerProfile());
         // Remove the profile from the peer (to avoid double free)
         peer->setPlayerProfile(NULL);
@@ -483,7 +483,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // to the list of players later, so the new player's info is not included)
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        message_ack.ai8(1).ai8(players[i]->getPlayerID())
+        message_ack.ai8(1).ai8(players[i]->getGlobalPlayerId())
                    .encodeString(players[i]->getName());
     }
     sendMessage(peer, message_ack);
@@ -555,7 +555,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     // send a kart update to everyone
     NetworkString answer(3+1+kart_name.size());
     // kart update (3), 1, race id
-    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
+    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     answer.ai8(LE_KART_SELECTION_UPDATE).ai8(1).ai8(player_id)
           .encodeString(kart_name);
     sendMessage(answer);
@@ -582,7 +582,7 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
         return;
     if (!isByteCorrect(event, 5, 4))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
+    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     uint32_t major = data.getUInt32(6);
     m_setup->getRaceConfig()->setPlayerMajorVote(player_id, major);
     // Send the vote to everybody (including the sender)
@@ -615,7 +615,7 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
         return;
     if (!isByteCorrect(event, 5, 1))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
+    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     m_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, data[6]);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token
@@ -647,7 +647,7 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
         return;
     if (!isByteCorrect(event, 5, 4))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
+    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     uint32_t minor = data.getUInt32(6);
     m_setup->getRaceConfig()->setPlayerMinorVote(player_id, minor);
     // Send the vote to everybody (including the sender)
@@ -682,7 +682,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
     int N = data.decodeString(5, &track_name);
     if (!isByteCorrect(event, N+5, 1))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
+    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name, data[N+6]);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token
@@ -718,7 +718,7 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
         return;
     if (!isByteCorrect(event, 7, 1))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
+    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     m_setup->getRaceConfig()->setPlayerReversedVote(player_id,
                                                     data[6]!=0, data[8]);
     // Send the vote to everybody (including the sender)
@@ -753,7 +753,7 @@ void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
         return;
     if (!isByteCorrect(event, 7, 1))
         return;
-    uint8_t player_id = peer->getPlayerProfile()->getPlayerID();
+    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     m_setup->getRaceConfig()->setPlayerLapsVote(player_id, data[6], data[8]);
     // Send the vote to everybody (including the sender)
     data.removeFront(5); // remove the token

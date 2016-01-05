@@ -105,7 +105,7 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
                            + (kart->getPowerup()->getNum()         & 0x0f);
 
         ns.ai8(0x01).ai32(item->getItemId()).ai8(powerup)
-                    .ai8(player_profile->getPlayerID());
+                    .ai8(player_profile->getGlobalPlayerId());
         ProtocolManager::getInstance()->sendMessage(this, peers[i], ns,
                                                     /*reliable*/true);
         Log::info("GameEventsProtocol",
