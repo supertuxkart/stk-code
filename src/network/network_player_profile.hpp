@@ -31,7 +31,7 @@
 namespace Online { class OnlineProfile; }
 
 
-/*! \class PlayerProfile
+/*! \class NetworkPlayerProfile
  *  \brief Contains the profile of a player.
  */
 class NetworkPlayerProfile

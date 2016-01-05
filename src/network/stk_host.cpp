@@ -99,54 +99,105 @@ void STKHost::create()
  *  client to a server in more details:
  *
  *  Server:
- *    1) ServerLobbyRoomProtocol:
+ *
+ *    1. ServerLobbyRoomProtocol:
  *       Spawns the following sub-protocols:
- *       a) GetPublicAddress: Use STUN to discover the public ip address
+ *       1. GetPublicAddress: Use STUN to discover the public ip address
  *          and port number of this host.
- *       b) Register this server with stk server (i.e. publish its public
+ *       2. Register this server with stk server (i.e. publish its public
  *          ip address and port number) - 'start' request. This enters the
  *          public information into the 'client_sessions' table, and then
  *          the server into the 'servers' table. This server can now
  *          be detected by other clients, so they can request a connection.
- *       c) The server lobby now polls the stk server for client connection
+ *       3. The server lobby now polls the stk server for client connection
  *          requests using the 'poll-connection-requests', which queries the
  *          servers table to get the server id (based on address and user id),
  *          and then the server_conn table. The rows in this table are updated
  *          by setting the 'request' bit to 0 (i.e. connection request was
  *          send to server).
  *      
- *  Client: The GUI queries the stk server to get a list of available servers
+ *  Client:
+ *
+ *    The GUI queries the stk server to get a list of available servers
  *    ('get-all' request, submitted from ServersManager to query the 'servers'
  *    table). The user picks one (or in case of quick play one is picked
  *    randomly), and then instantiates STKHost with the id of this server.
- *    STKHost then triggers:
- *    1) ConnectToServer, which starts the following protocols:
- *       a) GetPublicAddress: Use STUN to discover the public ip address
+ *    STKHost then triggers ConnectToServer, which starts the following
+ *    protocols:
+ *       1. GetPublicAddress: Use STUN to discover the public ip address
  *          and port number of this host.
- *       b) Register the client with the STK host ('set' command, into the
+ *       2. Register the client with the STK host ('set' command, into the
  *          table 'client_sessions'). Its public ip address and port will
  *          be registerd.
- *       c) GetPeerAddress. Submits a 'get' request to the STK server to get
+ *       3. GetPeerAddress. Submits a 'get' request to the STK server to get
  *          the ip address and port for the selected server from
  *          'client_sessions'. 
  *          If the ip address of the server is the same as this client, they
  *          will connect using the LAN connection.
- *       d) RequestConnection will do a 'request-connection' to the stk server.
+ *       4. RequestConnection will do a 'request-connection' to the stk server.
  *          The user id and server id are stored in server_conn. This is the
  *          request that the server will detect using polling.
+ *
  * Server:
- *   1) ServerLobbyRoomProtocol
- *      Will the detect the above client requests, and start a ConnectToPeer
- *      protocol for each incoming client:
- *      a) ConnectToPeer
- *         This protocol uses:
- *         A) GetPeerAddress to get the ip address and port of the client.
+ *
+ *   The ServerLobbyRoomProtocol (SLR) will the detect the above client
+ *   requests, and start a ConnectToPeer protocol for each incoming client.
+ *   The ConnectToPeer protocol uses:
+ *         1. GetPeerAddress to get the ip address and port of the client.
  *            Once this is received, it will start the:
- *         B) PingProtocol
+ *         2. PingProtocol
  *            This sends a raw packet (i.e. no enet header) to the
- *            destination.
- *            (unless if it is a LAN connection, then UDP broadcasts will
- *            be used). 
+ *            destination (unless if it is a LAN connection, then UDP
+ *            broadcasts will be used). 
+ *
+ *  Each client will run a ClientLobbyRoomProtocol (CLR) to handle the further
+ *  interaction with the server. The client will first request a connection
+ *  with the server (this is for
+ *  the 'logical' connection to the server; so far it was mostly about the
+ *  'physical' connection, i.e. being able to send a message to the server).
+ *  The server will reply with either a reject message (e.g. too many clients
+ *  already connected), or an accept message. The accept message will contain
+ *  the global player id of the client, and a unique (random) token used to
+ *  authenticate all further messages from the server: each message from the
+ *  client to the server and vice versa will contain this token. The message
+ *  also contains the global ids and names of all currently connected
+ *  clients for the new client. The server then informs all existing clients
+ *  about the newly connected client, and its global player id.
+ *
+ *  --> At this stage all clients and the server know the name and global id
+ *  of all connected clients. This information is stored in an array of
+ *  NetworkPlayerProfile managed in GameSetup (which is stored in STKHost).
+ *
+ *  When the authorised clients starts the kart selection, the SLR
+ *  informs all clients to start the kart selection (SLR::startSelection).
+ *  This triggers the creation of the kart selection screen in 
+ *  CLR::startSelection / CLR::update. The kart selection in a client calls
+ *  (NetworkKartSelection::playerConfirm) which calls CLR::requestKartSelection.
+ *  This sends a message to SLR::kartSelectionRequested, which verifies the
+ *  selected kart and sends this information to all clients (including the
+ *  client selecting the kart in the first place). This message is handled
+ *  by CLR::kartSelectionUpdate. Server and all clients store this information
+ *  in the NetworkPlayerProfile for the corresponding player, so server and
+ *  all clients now have identical information about global player id, player
+ *  name and selected kart. The authorised client will set some default votes
+ *  for game modes, number of laps etc (temporary, see
+ *  NetworkKartSelection::playerSelected).
+ *
+ *  After selecting a kart, the track selection screen is shown. On selecting
+ *  a track, a vote for the track is sent to the client
+ *  (TrackScreen::eventCallback, using CLR::voteTrack). The server will send
+ *  all votes (track, #laps, ...) to all clients (see e.g. SLR::playerTrackVote
+ *  etc), which are handled in e.g. CLR::playerTrackVote().
+ *
+ *  --> Server and all clients have identical information about all votes
+ *  stored in RaceConfig of GameSetup.
+ * 
+ *  The server will detect when the track votes from each client have been
+ *  received and will trigger the start of the race (SLR::startGame, called
+ *  from playerTrackVote). In SLR::startGame the server will start the 
+ *  StartGameProtocol and the clients will be informed to start the game.
+ *  In a client the StartGame protocol will be started in CLR::startGame. 
+ *  
  */
 
 // ============================================================================

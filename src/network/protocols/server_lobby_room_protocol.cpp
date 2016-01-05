@@ -217,7 +217,9 @@ void ServerLobbyRoomProtocol::registerServer()
 }   // registerServer
 
 //-----------------------------------------------------------------------------
-
+/** This function informs each client to start the race, and then starts the
+ *  StartGameProtocol.
+ */
 void ServerLobbyRoomProtocol::startGame()
 {
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();

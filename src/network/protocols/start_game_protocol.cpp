@@ -109,7 +109,6 @@ void StartGameProtocol::update()
 {
     if (m_state == NONE)
     {
-        // if no synchronization protocol exists, create one
         Protocol *p = new SynchronizationProtocol();
         p->requestStart();
         Log::info("StartGameProtocol", "SynchronizationProtocol started.");
