@@ -196,11 +196,6 @@ void StartGameProtocol::update()
         race_manager->computeRandomKartList();
         Log::info("StartGameProtocol", "Player configuration ready.");
         m_state = SYNCHRONIZATION_WAIT;
-/*
-        KartSelectionScreen* s = KartSelectionScreen::getInstance();
-        s->setMultiplayer(false);
-        s->setFromOverworld(false);
-        s->push();*/
     }
     else if (m_state == SYNCHRONIZATION_WAIT)
     {

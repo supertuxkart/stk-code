@@ -152,9 +152,19 @@ void STKHost::create()
  *
  *  Each client will run a ClientLobbyRoomProtocol (CLR) to handle the further
  *  interaction with the server. The client will first request a connection
- *  with the server (this is for
- *  the 'logical' connection to the server; so far it was mostly about the
- *  'physical' connection, i.e. being able to send a message to the server).
+ *  with the server (this is for the 'logical' connection to the server; so
+ *  far it was mostly about the 'physical' connection, i.e. being able to send
+ *  a message to the server).
+ *
+ *  Each protocol has its own protocol id, which is added to each message in
+ *  Protocol::sendMessage(). The ProtocolManager will automatically forward
+ *  each received message to the protocol with the same id. So any message
+ *  sent by protocol X on the server will be received by protocol X on the
+ *  client and vice versa. The only exception are the client- and server-lobby:
+ *  They share the same id (set in LobbyRoomProtocol), so a message sent by
+ *  the SLR will be received by the CLR, and a message from the CLR will be
+ *  received by the SLR.
+ *
  *  The server will reply with either a reject message (e.g. too many clients
  *  already connected), or an accept message. The accept message will contain
  *  the global player id of the client, and a unique (random) token used to
