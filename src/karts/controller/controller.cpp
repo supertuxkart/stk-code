@@ -29,10 +29,9 @@
  */
 Controller::Controller(AbstractKart *kart, StateManager::ActivePlayer *player)
 {
-    m_controls     = &(kart->getControls());
-    m_kart         = kart;
-    m_player       = player;
-    m_current_node = -1;
+    m_controls = &(kart->getControls());
+    m_kart     = kart;
+    m_player   = player;
     setControllerName("Controller");
 }   // Controller
 

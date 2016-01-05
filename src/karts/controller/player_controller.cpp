@@ -95,7 +95,6 @@ void PlayerController::reset()
     m_prev_nitro   = false;
     m_sound_schedule = false;
     m_penalty_time = 0;
-    m_current_node = BattleGraph::UNKNOWN_POLY;
 }   // reset
 
 // ----------------------------------------------------------------------------

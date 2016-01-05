@@ -95,7 +95,6 @@ BattleAI::~BattleAI()
  */
 void BattleAI::reset()
 {
-    m_current_node = BattleGraph::UNKNOWN_POLY;
     m_target_node = BattleGraph::UNKNOWN_POLY;
     m_adjusting_side = false;
     m_closest_kart = NULL;
@@ -201,7 +200,7 @@ void BattleAI::checkIfStuck(const float dt)
         m_time_since_driving = 0.0f;
     }
 
-    m_on_node.insert(m_current_node);
+    m_on_node.insert(m_world->getKartNode(m_kart->getWorldKartId()));
     m_time_since_driving += dt;
 
     if ((m_time_since_driving >=
@@ -294,8 +293,7 @@ void BattleAI::findClosestKart(bool difficulty)
     }
 
     const AbstractKart* closest_kart = m_world->getKart(closest_kart_num);
-    Controller* controller = (Controller*)(closest_kart->getController());
-    m_closest_kart_node = controller->getCurrentNode();
+    m_closest_kart_node = m_world->getKartNode(closest_kart_num);
     m_closest_kart_point = closest_kart->getXYZ();
 
     if (!difficulty)
@@ -373,7 +371,9 @@ void BattleAI::handleUTurn(const float dt)
  */
 void BattleAI::handleSteering(const float dt)
 {
-    if (m_current_node == BattleGraph::UNKNOWN_POLY ||
+    const int current_node = m_world->getKartNode(m_kart->getWorldKartId());
+
+    if (current_node == BattleGraph::UNKNOWN_POLY ||
         m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
     if (m_is_steering_overridden)
@@ -393,7 +393,7 @@ void BattleAI::handleSteering(const float dt)
         return;
     }
 
-    if (m_target_node == m_current_node)
+    if (m_target_node == current_node)
     {
         // Very close to the item, steer directly
         checkPosition(m_target_point, &m_cur_kart_pos_data);
@@ -413,9 +413,9 @@ void BattleAI::handleSteering(const float dt)
         return;
     }
 
-    else if (m_target_node != m_current_node)
+    else if (m_target_node != current_node)
     {
-        findPortals(m_current_node, m_target_node);
+        findPortals(current_node, m_target_node);
         stringPull(m_kart->getXYZ(), m_target_point);
         if (m_path_corners.size() > 0)
             m_target_point = m_path_corners[0];
@@ -632,7 +632,8 @@ void BattleAI::handleBraking()
 {
     m_controls->m_brake = false;
 
-    if (m_current_node == BattleGraph::UNKNOWN_POLY ||
+    if (m_world->getKartNode(m_kart->getWorldKartId())
+        == BattleGraph::UNKNOWN_POLY                ||
         m_target_node  == BattleGraph::UNKNOWN_POLY ||
         m_is_steering_overridden) return;
 
