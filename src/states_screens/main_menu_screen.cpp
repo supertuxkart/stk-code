@@ -494,7 +494,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         if (PlayerManager::getCurrentOnlineId())
         {
             // For 0.8.2 disable the server menu, instead go to online profile
-#define ENABLE_NETWORK_MULTIPLAYER_SCREEN
             #ifdef ENABLE_NETWORK_MULTIPLAYER_SCREEN
             OnlineScreen::getInstance()->push();
             #else
