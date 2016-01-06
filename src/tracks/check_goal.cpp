@@ -115,6 +115,8 @@ bool CheckGoal::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
 // ----------------------------------------------------------------------------
 void CheckGoal::reset(const Track &track)
 {
+    CheckStructure::reset(track);
+
     const TrackObjectManager* tom = track.getTrackObjectManager();
     assert(tom);
 
