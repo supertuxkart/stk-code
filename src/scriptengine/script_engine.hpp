@@ -23,21 +23,34 @@
 #include <angelscript.h>
 #include <functional>
 
+#include "scriptengine/script_utils.hpp"
+#include "utils/ptr_vector.hpp"
+
 class TrackObjectPresentation;
 
 namespace Scripting
 {
     /** Represents a scripting function to execute after a given time */
-    struct PendingTimeout
+    struct PendingTimeout : NoCopy
     {
         double m_time;
+
+        /** We have two callback types: a string containing the name of the function
+          * to call (simple callback) or a "TimeoutBase" object (advanced callback)
+          */
         std::string m_callback_name;
+        asIScriptFunction* m_callback_delegate;
 
         PendingTimeout(double time, const std::string& callback_name)
         {
+            m_callback_delegate = NULL;
             m_time = time;
             m_callback_name = callback_name;
         }
+
+        PendingTimeout(double time, asIScriptFunction* callback_delegate);
+
+        ~PendingTimeout();
     };
 
     class ScriptEngine
@@ -53,6 +66,7 @@ namespace Scripting
         void runFunction(bool warn_if_not_found, std::string function_name,
             std::function<void(asIScriptContext*)> callback,
             std::function<void(asIScriptContext*)> get_return_value);
+        void runDelegate(asIScriptFunction* delegate_fn);
         void evalScript(std::string script_fragment);
         void cleanupCache();
 
@@ -60,12 +74,15 @@ namespace Scripting
         bool compileLoadedScripts();
 
         void addPendingTimeout(double time, const std::string& callback_name);
+        void addPendingTimeout(double time, asIScriptFunction* delegate_fn);
         void update(double dt);
+
+        asIScriptEngine* getEngine() { return m_engine; }
 
     private:
         asIScriptEngine *m_engine;
         std::map<std::string, asIScriptFunction*> m_functions_cache;
-        std::vector<PendingTimeout> m_pending_timeouts;
+        PtrVector<PendingTimeout> m_pending_timeouts;
 
         void configureEngine(asIScriptEngine *engine);
     };   // class ScriptEngine

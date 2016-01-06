@@ -491,6 +491,7 @@ std::set<wchar_t> ScalableFont::getPreloadCharacters(const GUIEngine::TTFLoading
                 preload_char.insert((wchar_t)i); //Include basic Latin too, starting from A (char code 65)
 
             setlocale(LC_ALL, "en_US.UTF8");
+            std::set<wchar_t> upper;
             std::set<wchar_t>::iterator it = preload_char.begin();
 
             while (it != preload_char.end())
@@ -498,7 +499,15 @@ std::set<wchar_t> ScalableFont::getPreloadCharacters(const GUIEngine::TTFLoading
                 //Only use all capital letter for bold char with latin (<640 of char code).
                 //Remove all characters (>char code 8191) not used by the title
                 if (((iswlower((wchar_t)*it) || !iswalpha((wchar_t)*it)) && *it < 640) || *it > 8191)
+                {
+                    if (*it < 8192 && iswalpha((wchar_t)*it))
+                    {
+                        //Make sure we include all upper case letters,
+                        //because the title font shows all characters as capital letters
+                        upper.insert(towupper((wchar_t)*it));
+                    }
                     it = preload_char.erase(it);
+                }
                 else
                     ++it;
             }
@@ -507,6 +516,7 @@ std::set<wchar_t> ScalableFont::getPreloadCharacters(const GUIEngine::TTFLoading
             for (u32 i = 32; i < 65; ++i)
                 preload_char.insert((wchar_t)i); //Include basic symbol (from space (char code 32) to @(char code 64))
 
+            preload_char.insert(upper.begin(), upper.end());
             preload_char.insert((wchar_t)160);   //Non-breaking space
 
             //Remove Ordinal indicator (char code 170 and 186)

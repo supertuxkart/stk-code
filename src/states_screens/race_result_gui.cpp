@@ -63,10 +63,6 @@ DEFINE_SCREEN_SINGLETON( RaceResultGUI );
 RaceResultGUI::RaceResultGUI() : Screen("race_result.stkgui",
                                         /*pause race*/ false)
 {
-    std::string path = file_manager->getAsset(FileManager::MUSIC,
-                                              "race_summary.music");
-    m_race_over_music = music_manager->getMusicInformation(path);
-
 }   // RaceResultGUI
 
 //-----------------------------------------------------------------------------
@@ -87,7 +83,25 @@ void RaceResultGUI::init()
     getWidget("bottom")->setVisible(false);
 
     music_manager->stopMusic();
-    m_finish_sound = SFXManager::get()->quickSound("race_finish");
+
+    bool human_win = true;
+    unsigned int num_karts = race_manager->getNumberOfKarts();
+    for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
+    {
+        const AbstractKart *kart = World::getWorld()->getKart(kart_id);
+        if (kart->getController()->isPlayerController())
+            human_win = human_win && kart->getRaceResult();
+    }
+
+    m_finish_sound = SFXManager::get()->quickSound(
+        human_win ? "gp_end" : "race_finish");
+
+    //std::string path = (human_win ? Different result music too later
+    //    file_manager->getAsset(FileManager::MUSIC, "race_summary.music") :
+    //    file_manager->getAsset(FileManager::MUSIC, "race_summary.music"));
+    std::string path = file_manager->getAsset(FileManager::MUSIC, "race_summary.music");
+    m_race_over_music = music_manager->getMusicInformation(path);
+
     if (!m_finish_sound)
     {
         // If there is no finish sound (because sfx are disabled), start

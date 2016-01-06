@@ -115,6 +115,7 @@ Track::Track(const std::string &filename)
     m_enable_push_back      = true;
     m_reverse_available     = false;
     m_is_arena              = false;
+    m_max_arena_players     = 0;
     m_has_easter_eggs       = false;
     m_has_navmesh           = false;
     m_is_soccer             = false;
@@ -510,6 +511,7 @@ void Track::loadTrackInfo()
     root->get("gravity",               &m_gravity);
     root->get("soccer",                &m_is_soccer);
     root->get("arena",                 &m_is_arena);
+    root->get("max-arena-players",     &m_max_arena_players);
     root->get("cutscene",              &m_is_cutscene);
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);
@@ -672,35 +674,7 @@ void Track::loadBattleGraph()
     }
     else
     {
-        //Check whether the hardware can do nonsquare or
-        // non power-of-two textures
-        video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
-        bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
-        bool nonsquare =
-            video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
-
-        //Create the minimap resizing it as necessary.
-        m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
-        core::dimension2du size = m_mini_map_size
-                                 .getOptimalSize(!nonpower,!nonsquare);
-
-        BattleGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
-            &m_old_rtt_mini_map, &m_new_rtt_mini_map);
-        if (m_old_rtt_mini_map)
-        {
-            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_old_rtt_mini_map->getSize().Width);
-            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_old_rtt_mini_map->getSize().Height);
-        }
-        else if (m_new_rtt_mini_map)
-        {
-            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_new_rtt_mini_map->getWidth());
-            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_new_rtt_mini_map->getHeight());
-        }
-        else
-        {
-            m_minimap_x_scale = 0;
-            m_minimap_y_scale = 0;
-        }
+        loadMinimap();
     }
 }   // loadBattleGraph
 
@@ -734,35 +708,7 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
     }
     else
     {
-        //Check whether the hardware can do nonsquare or
-        // non power-of-two textures
-        video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
-        bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
-        bool nonsquare =
-            video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
-
-        //Create the minimap resizing it as necessary.
-        m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
-        core::dimension2du size = m_mini_map_size
-                                 .getOptimalSize(!nonpower,!nonsquare);
-
-        QuadGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
-            &m_old_rtt_mini_map, &m_new_rtt_mini_map);
-        if (m_old_rtt_mini_map)
-        {
-            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_old_rtt_mini_map->getSize().Width);
-            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_old_rtt_mini_map->getSize().Height);
-        }
-        else if (m_new_rtt_mini_map)
-        {
-            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_new_rtt_mini_map->getWidth());
-            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_new_rtt_mini_map->getHeight());
-        }
-        else
-        {
-            m_minimap_x_scale = 0;
-            m_minimap_y_scale = 0;
-        }
+        loadMinimap();
     }
 }   // loadQuadGraph
 
@@ -1069,6 +1015,50 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     }   // for i<getMeshBufferCount
 
 }   // convertTrackToBullet
+
+// ----------------------------------------------------------------------------
+
+void Track::loadMinimap()
+{
+    //Check whether the hardware can do nonsquare or
+    // non power-of-two textures
+    video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
+    bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+    bool nonsquare =
+        video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
+
+    //Create the minimap resizing it as necessary.
+    m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
+    core::dimension2du size = m_mini_map_size
+                             .getOptimalSize(!nonpower,!nonsquare);
+
+    if (m_is_arena && m_has_navmesh)
+    {
+        BattleGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
+            &m_old_rtt_mini_map, &m_new_rtt_mini_map);
+    }
+    else
+    {
+        QuadGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
+            &m_old_rtt_mini_map, &m_new_rtt_mini_map);
+    }
+
+    if (m_old_rtt_mini_map)
+    {
+        m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_old_rtt_mini_map->getSize().Width);
+        m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_old_rtt_mini_map->getSize().Height);
+    }
+    else if (m_new_rtt_mini_map)
+    {
+        m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_new_rtt_mini_map->getWidth());
+        m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_new_rtt_mini_map->getHeight());
+    }
+    else
+    {
+        m_minimap_x_scale = 0;
+        m_minimap_y_scale = 0;
+    }
+}   // loadMinimap
 
 // ----------------------------------------------------------------------------
 /** Loads the main track model (i.e. all other objects contained in the

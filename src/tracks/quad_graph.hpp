@@ -24,21 +24,12 @@
 #include <set>
 
 #include "tracks/graph_node.hpp"
+#include "tracks/graph_structure.hpp"
 #include "tracks/quad_set.hpp"
 #include "utils/aligned_array.hpp"
-#include "utils/no_copy.hpp"
-
-#include <dimension2d.h>
-namespace irr
-{
-    namespace scene { class ISceneNode; class IMesh; class IMeshBuffer; }
-    namespace video { class ITexture; }
-}
-using namespace irr;
 
 class CheckLine;
-class RTT;
-class FrameBuffer;
+class GraphStructure;
 
 /**
  *  \brief This class stores a graph of quads. It uses a 'simplified singleton'
@@ -50,31 +41,17 @@ class FrameBuffer;
  *  returns NULL in this case, and this is tested where necessary.
  * \ingroup tracks
   */
-class QuadGraph : public NoCopy
+class QuadGraph : public GraphStructure
 {
 
 private:
     static QuadGraph        *m_quad_graph;
 
-    RTT* m_new_rtt;
-
     /** The actual graph data structure. */
     std::vector<GraphNode*>  m_all_nodes;
-    /** For debug mode only: the node of the debug mesh. */
-    scene::ISceneNode       *m_node;
-    /** For debug only: the mesh of the debug mesh. */
-    scene::IMesh            *m_mesh;
-    /** For debug only: the actual mesh buffer storing the quads. */
-    scene::IMeshBuffer      *m_mesh_buffer;
 
     /** The length of the first loop. */
     float                    m_lap_length;
-
-    /** The minimum coordinates of the quad graph. */
-    Vec3                     m_min_coord;
-
-    /** Scaling for mini map. */
-    float                    m_scaling;
 
     /** Stores the filename - just used for error messages. */
     std::string              m_quad_filename;
@@ -91,20 +68,32 @@ private:
     void addSuccessor(unsigned int from, unsigned int to);
     void load         (const std::string &filename);
     void computeDistanceFromStart(unsigned int start_node, float distance);
-    void createMesh(bool show_invisible=true,
-                    bool enable_transparency=false,
-                    const video::SColor *track_color=NULL,
-                    const video::SColor *lap_color=NULL);
     unsigned int getStartNode() const;
          QuadGraph     (const std::string &quad_file_name,
                         const std::string &graph_file_name,
                         const bool reverse);
         ~QuadGraph     ();
+
+    // ------------------------------------------------------------------------
+    virtual void set3DVerticesOfGraph(int i, video::S3DVertex *v,
+                                      const video::SColor &color) const
+                         { m_all_nodes[i]->getQuad().getVertices(v, color); }
+    // ------------------------------------------------------------------------
+    virtual void getGraphBoundingBox(Vec3 *min, Vec3 *max) const
+                                { QuadSet::get()->getBoundingBox(min, max); }
+    // ------------------------------------------------------------------------
+    virtual const bool isNodeInvisible(int n) const
+                          { return m_all_nodes[n]->getQuad().isInvisible(); }
+    // ------------------------------------------------------------------------
+    virtual const bool isNodeInvalid(int n) const
+                                                            { return false; }
+    // ------------------------------------------------------------------------
+    virtual const bool hasLapLine() const
+                                                            { return true;  }
+
 public:
     static const int UNKNOWN_SECTOR;
 
-    void         createDebugMesh();
-    void         cleanupDebugMesh();
     void         getSuccessors(int node_number,
                                std::vector<unsigned int>& succ,
                                bool for_ai=false) const;
@@ -122,12 +111,6 @@ public:
                                          float forwards_distance=1.5f,
                                          float sidewards_distance=1.5f,
                                          float upwards_distance=0.0f) const;
-    void        makeMiniMap(const core::dimension2du &where,
-                            const std::string &name,
-                            const video::SColor &fill_color,
-                            video::ITexture** oldRttMinimap,
-                            FrameBuffer** newRttMinimap);
-    void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
     void         updateDistancesForAllSuccessors(unsigned int indx,
                                                  float delta,
                                                  unsigned int count);
@@ -164,7 +147,8 @@ public:
     }   // destroy
     // ------------------------------------------------------------------------
     /** Returns the number of nodes in the graph. */
-    unsigned int getNumNodes() const { return (unsigned int)m_all_nodes.size();}
+    virtual const unsigned int getNumNodes() const
+                         { return (unsigned int)m_all_nodes.size();}
     // ------------------------------------------------------------------------
     /** Return the distance to the j-th successor of node n. */
     float        getDistanceToNext(int n, int j) const
@@ -193,9 +177,7 @@ public:
     /** Returns the length of the main driveline. */
     float        getLapLength() const {return m_lap_length; }
     // ------------------------------------------------------------------------
-    /** Returns true if the graph is to be reversed. */
     bool         isReverse() const {return m_reverse; }
-
 };   // QuadGraph
 
 #endif

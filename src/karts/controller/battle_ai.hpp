@@ -1,9 +1,8 @@
-
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
 //  Copyright (C) 2006-2007 Eduardo Hernandez Munoz
-//  Copyright (C) 2010      Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -29,13 +28,9 @@
 
 #include "karts/controller/ai_base_controller.hpp"
 #include "race/race_manager.hpp"
-#include "tracks/battle_graph.hpp"
 #include "utils/random_generator.hpp"
 
-class AIProperties;
 class ThreeStrikesBattle;
-class BattleGraph;
-class Track;
 class Vec3;
 class Item;
 
@@ -53,10 +48,9 @@ private:
     /** Holds the position info of targets. */
     struct posData {bool behind; bool on_side; float angle; float distance;};
 
-    /** Holds the current position of the AI on the battle graph. Sets to
-     *  BattleGraph::UNKNOWN_POLY if the location is unknown. This variable is
-     *  updated in ThreeStrikesBattle::updateKartNodes(). */
-    int m_current_node;
+    /** Used by handleBanana and UTurn, it tells whether to do left or right
+     *  turning when steering is overridden. */
+    bool m_adjusting_side;
 
     int m_closest_kart_node;
     Vec3 m_closest_kart_point;
@@ -69,6 +63,10 @@ private:
 
     /** Holds the current difficulty. */
     RaceManager::Difficulty m_cur_difficulty;
+
+    /** Indicates that the steering of kart is overridden, and
+      * m_time_since_steering_overridden is counting down. */
+    bool m_is_steering_overridden;
 
    /** Indicates that the kart is currently stuck, and m_time_since_reversing is
      * counting down. */
@@ -105,6 +103,9 @@ private:
     /** This is a timer that counts down when the kart is starting to drive. */
     float m_time_since_driving;
 
+    /** This is a timer that counts down when the steering of kart is overridden. */
+    float m_time_since_steering_overridden;
+
     /** This is a timer that counts down when the kart is doing u-turn. */
     float m_time_since_uturn;
 
@@ -115,6 +116,7 @@ private:
     void  findPortals(int start, int end);
     void  findTarget();
     void  handleAcceleration(const float dt);
+    void  handleBanana();
     void  handleBraking();
     void  handleItems(const float dt);
     void  handleItemCollection(Vec3*, int*);
@@ -138,8 +140,6 @@ public:
                  BattleAI(AbstractKart *kart,
                           StateManager::ActivePlayer *player=NULL);
                 ~BattleAI();
-    unsigned int getCurrentNode() const { return m_current_node; }
-    void         setCurrentNode(int i)  { m_current_node = i;    }
     virtual void update      (float delta);
     virtual void reset       ();
 

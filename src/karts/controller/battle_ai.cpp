@@ -2,7 +2,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
 //  Copyright (C) 2006-2007 Eduardo Hernandez Munoz
-//  Copyright (C) 2008-2012 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -33,8 +33,7 @@
 #include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
 #include "modes/three_strikes_battle.hpp"
-#include "tracks/nav_poly.hpp"
-#include "tracks/navmesh.hpp"
+#include "tracks/battle_graph.hpp"
 #include "utils/log.hpp"
 
 #ifdef AI_DEBUG
@@ -96,19 +95,21 @@ BattleAI::~BattleAI()
  */
 void BattleAI::reset()
 {
-    m_current_node = BattleGraph::UNKNOWN_POLY;
     m_target_node = BattleGraph::UNKNOWN_POLY;
+    m_adjusting_side = false;
     m_closest_kart = NULL;
     m_closest_kart_node = BattleGraph::UNKNOWN_POLY;
     m_closest_kart_point = Vec3(0, 0, 0);
     m_closest_kart_pos_data = {0};
     m_cur_kart_pos_data = {0};
+    m_is_steering_overridden = false;
     m_is_stuck = false;
     m_is_uturn = false;
     m_target_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
     m_time_since_reversing = 0.0f;
+    m_time_since_steering_overridden = 0.0f;
     m_time_since_uturn = 0.0f;
     m_on_node.clear();
     m_path_corners.clear();
@@ -165,6 +166,7 @@ void BattleAI::update(float dt)
     findClosestKart(true);
     findTarget();
     handleItems(dt);
+    handleBanana();
 
     if (m_kart->getSpeed() > 15.0f && m_cur_kart_pos_data.angle < 0.2f)
     {
@@ -198,7 +200,7 @@ void BattleAI::checkIfStuck(const float dt)
         m_time_since_driving = 0.0f;
     }
 
-    m_on_node.insert(m_current_node);
+    m_on_node.insert(m_world->getKartNode(m_kart->getWorldKartId()));
     m_time_since_driving += dt;
 
     if ((m_time_since_driving >=
@@ -291,19 +293,8 @@ void BattleAI::findClosestKart(bool difficulty)
     }
 
     const AbstractKart* closest_kart = m_world->getKart(closest_kart_num);
-    if (!closest_kart->getController()->isPlayerController())
-    {
-        BattleAI* controller = (BattleAI*)(closest_kart->getController());
-        m_closest_kart_node = controller->getCurrentNode();
-        m_closest_kart_point = closest_kart->getXYZ();
-    }
-
-    else if (closest_kart->getController()->isPlayerController())
-    {
-        PlayerController* controller = (PlayerController*)(closest_kart->getController());
-        m_closest_kart_node = controller->getCurrentNode();
-        m_closest_kart_point = closest_kart->getXYZ();
-    }
+    m_closest_kart_node = m_world->getKartNode(closest_kart_num);
+    m_closest_kart_point = closest_kart->getXYZ();
 
     if (!difficulty)
     {
@@ -347,7 +338,7 @@ void BattleAI::handleAcceleration(const float dt)
 //-----------------------------------------------------------------------------
 void BattleAI::handleUTurn(const float dt)
 {
-    const float turn_side = (m_cur_kart_pos_data.on_side ? 1.0f : -1.0f);
+    const float turn_side = (m_adjusting_side ? 1.0f : -1.0f);
 
     if (fabsf(m_kart->getSpeed()) >
         (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
@@ -380,10 +371,29 @@ void BattleAI::handleUTurn(const float dt)
  */
 void BattleAI::handleSteering(const float dt)
 {
-    if (m_current_node == BattleGraph::UNKNOWN_POLY ||
+    const int current_node = m_world->getKartNode(m_kart->getWorldKartId());
+
+    if (current_node == BattleGraph::UNKNOWN_POLY ||
         m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
-    if (m_target_node == m_current_node)
+    if (m_is_steering_overridden)
+    {
+        // Steering is overridden to avoid eating banana
+        const float turn_side = (m_adjusting_side ? 1.0f : -1.0f);
+        m_time_since_steering_overridden += dt;
+        if (m_time_since_steering_overridden > 0.35f)
+            setSteering(-(turn_side), dt);
+        else
+            setSteering(turn_side, dt);
+        if (m_time_since_steering_overridden > 0.7f)
+        {
+            m_is_steering_overridden = false;
+            m_time_since_steering_overridden = 0.0f;
+        }
+        return;
+    }
+
+    if (m_target_node == current_node)
     {
         // Very close to the item, steer directly
         checkPosition(m_target_point, &m_cur_kart_pos_data);
@@ -392,6 +402,7 @@ void BattleAI::handleSteering(const float dt)
 #endif
         if (m_cur_kart_pos_data.behind)
         {
+            m_adjusting_side = m_cur_kart_pos_data.on_side;
             m_is_uturn = true;
         }
         else
@@ -402,9 +413,9 @@ void BattleAI::handleSteering(const float dt)
         return;
     }
 
-    else if (m_target_node != m_current_node)
+    else if (m_target_node != current_node)
     {
-        findPortals(m_current_node, m_target_node);
+        findPortals(current_node, m_target_node);
         stringPull(m_kart->getXYZ(), m_target_point);
         if (m_path_corners.size() > 0)
             m_target_point = m_path_corners[0];
@@ -415,6 +426,7 @@ void BattleAI::handleSteering(const float dt)
 #endif
         if (m_cur_kart_pos_data.behind)
         {
+            m_adjusting_side = m_cur_kart_pos_data.on_side;
             m_is_uturn = true;
         }
         else
@@ -432,6 +444,34 @@ void BattleAI::handleSteering(const float dt)
         return;
     }
 }   // handleSteering
+
+//-----------------------------------------------------------------------------
+void BattleAI::handleBanana()
+{
+    if (m_is_steering_overridden || m_is_uturn) return;
+
+    const std::vector< std::pair<const Item*, int> >& item_list =
+        BattleGraph::get()->getItemList();
+    const unsigned int items_count = item_list.size();
+    for (unsigned int i = 0; i < items_count; ++i)
+    {
+        const Item* item = item_list[i].first;
+        if (item->getType() == Item::ITEM_BANANA && !item->wasCollected())
+        {
+            posData banana_pos = {0};
+            checkPosition(item->getXYZ(), &banana_pos);
+            if (banana_pos.angle < 0.2f && banana_pos.distance < 7.5f &&
+               !banana_pos.behind)
+            {
+                // Check whether it's straight ahead towards a banana
+                // If so, try to do hard turn to avoid
+                m_adjusting_side = banana_pos.on_side;
+                m_is_steering_overridden = true;
+            }
+        }
+    }
+
+}   // handleBanana
 
 //-----------------------------------------------------------------------------
 /** This function finds the polyon edges(portals) that the AI will cross before
@@ -592,15 +632,17 @@ void BattleAI::handleBraking()
 {
     m_controls->m_brake = false;
 
+    if (m_world->getKartNode(m_kart->getWorldKartId())
+        == BattleGraph::UNKNOWN_POLY                ||
+        m_target_node  == BattleGraph::UNKNOWN_POLY ||
+        m_is_steering_overridden) return;
+
     // A kart will not brake when the speed is already slower than this
     // value. This prevents a kart from going too slow (or even backwards)
     // in tight curves.
     const float MIN_SPEED = 5.0f;
 
     std::vector<Vec3> points;
-
-    if (m_current_node == BattleGraph::UNKNOWN_POLY ||
-        m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
     points.push_back(m_kart->getXYZ());
     points.push_back(m_path_corners[0]);
@@ -835,6 +877,18 @@ void BattleAI::handleItemCollection(Vec3* aim_point, int* target_node)
     const std::vector< std::pair<const Item*, int> >& item_list =
         BattleGraph::get()->getItemList();
     const unsigned int items_count = item_list.size();
+
+    if (item_list.empty())
+    {
+        // Notice: this should not happen, as it makes no sense
+        // for an arean without items, if so how can attack happen?
+        Log::fatal ("BattleAI",
+                    "AI can't find any items in the arena, "
+                    "maybe there is something wrong with the navmesh, "
+                    "make sure it lies closely to the ground.");
+        return;
+    }
+
     unsigned int closest_item_num = 0;
 
     for (unsigned int i = 0; i < items_count; ++i)

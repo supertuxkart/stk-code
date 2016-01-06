@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "script_track.hpp"
+#include "script_utils.hpp"
 
 #include "animations/three_d_animation.hpp"
 #include "input/device_manager.hpp"
@@ -132,6 +132,12 @@ namespace Scripting
             World::getWorld()->getScriptEngine()->addPendingTimeout(delay, *callback_name);
         }
 
+        /** Call a method from the given object after the specified delay */
+        void setTimeoutDelegate(asIScriptFunction* obj, float delay)
+        {
+            World::getWorld()->getScriptEngine()->addPendingTimeout(delay, obj);
+        }
+
         /** Log to the console */
         void logInfo(std::string* log)
         {
@@ -180,6 +186,7 @@ namespace Scripting
         {
             int r; // of type asERetCodes
             engine->SetDefaultNamespace("Utils");
+
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in)", asFUNCTION(proxy_insertValues1), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues2), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string insertValues(const string &in, const string &in, const string &in, const string &in)", asFUNCTION(proxy_insertValues3), asCALL_CDECL); assert(r >= 0);
@@ -190,6 +197,9 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("int randomInt(int, int)", asFUNCTION(randomInt), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("float randomFloat(int, int)", asFUNCTION(randomFloat), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void setTimeout(const string &in, float)", asFUNCTION(setTimeout), asCALL_CDECL); assert(r >= 0);
+            
+            r = engine->RegisterFuncdef("void TimeoutCallback()"); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void setTimeoutDelegate(TimeoutCallback@, float)", asFUNCTION(setTimeoutDelegate), asCALL_CDECL); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("void logInfo(const string &in)", asFUNCTION(logInfo), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void logWarning(const string &in)", asFUNCTION(logWarning), asCALL_CDECL); assert(r >= 0);

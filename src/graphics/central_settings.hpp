@@ -30,6 +30,7 @@ private:
     bool hasDrawIndirect;
     bool hasBuffserStorage;
     bool hasComputeShaders;
+    bool hasArraysOfArrays;
     bool hasTextureStorage;
     bool hasTextureView;
     bool hasBindlessTexture;
@@ -40,10 +41,10 @@ private:
     bool hasSSBO;
     bool hasImageLoadStore;
     bool hasMultiDrawIndirect;
-    bool hasSRGBCapableVisual;
 
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
+    bool m_need_srgb_visual_workaround;
     bool m_GI_has_artifact;
 public:
     void init();
@@ -63,6 +64,7 @@ public:
     bool isARBTextureStorageUsable() const;
     bool isAMDVertexShaderLayerUsable() const;
     bool isARBComputeShaderUsable() const;
+    bool isARBArraysOfArraysUsable() const;
     bool isARBBindlessTextureUsable() const;
     bool isARBBufferStorageUsable() const;
     bool isARBBaseInstanceUsable() const;

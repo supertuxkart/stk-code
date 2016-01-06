@@ -70,6 +70,10 @@ bool NavPoly::pointInPoly(const Vec3& p) const
             return false;
     }
 
+    // Check for vertical distance too
+    const float dist = p.getY() - m_center.getY();
+    if (fabsf(dist) > 1.0f )
+        return false;
     return true;
 }
 
