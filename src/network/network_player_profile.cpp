@@ -20,13 +20,15 @@
 
 #include "online/online_player_profile.hpp"
 
-/** Constructor. The player id is a unique number assigned from the server
- *  to this player (though it might not be the index in the peer list).
+/** Constructor. 
+ *  \param global_player_id A unique number assigned from the server to this
+ *         player (though it might not be the index in the peer list).
+ *  \param name Name of this player.
  */
-NetworkPlayerProfile::NetworkPlayerProfile(int race_player_id,
+NetworkPlayerProfile::NetworkPlayerProfile(int global_player_id,
                                            const irr::core::stringw &name)
 {
-    m_global_player_id      = race_player_id;
+    m_global_player_id      = global_player_id;
     m_kart_name             = "";
     m_world_kart_id         = 0;
     m_per_player_difficulty = PLAYER_DIFFICULTY_NORMAL;

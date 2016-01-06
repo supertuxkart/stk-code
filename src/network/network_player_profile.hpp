@@ -54,7 +54,7 @@ private:
     /** Per player difficulty. */
     PerPlayerDifficulty m_per_player_difficulty;
 public:
-         NetworkPlayerProfile(int race_player_id,
+         NetworkPlayerProfile(int global_player_id,
                               const irr::core::stringw &name);
         ~NetworkPlayerProfile();
 

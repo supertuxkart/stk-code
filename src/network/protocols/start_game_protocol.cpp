@@ -46,9 +46,9 @@ StartGameProtocol::~StartGameProtocol()
  */
 void StartGameProtocol::setup()
 {
-    m_state = NONE;
+    m_state       = NONE;
     m_ready_count = 0;
-    m_ready = false;
+    m_ready       = false;
     Log::info("SynchronizationProtocol", "Ready !");
 
     Protocol *p = new SynchronizationProtocol();
@@ -62,6 +62,61 @@ void StartGameProtocol::setup()
     race_manager->setNumKarts(m_game_setup->getPlayerCount());
     race_manager->setNumPlayers(m_game_setup->getPlayerCount());
     race_manager->setNumLocalPlayers(1);
+
+    // Create the kart information for the race manager:
+    // -------------------------------------------------
+    std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
+    for (unsigned int i = 0; i < players.size(); i++)
+    {
+        NetworkPlayerProfile* profile = players[i];
+        bool is_me =  profile->getGlobalPlayerId()
+                   == STKHost::get()->getGameSetup()->getLocalMasterID();
+        RemoteKartInfo rki(profile->getGlobalPlayerId(),
+                           profile->getKartName(),
+                           profile->getName(),
+                           /*hostid*/profile->getGlobalPlayerId(),
+                           !is_me);
+        rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
+        rki.setLocalPlayerId(0);
+        // FIXME: for now (only one local player) the global player id
+        // can be used as host id.
+        rki.setHostId(profile->getGlobalPlayerId());
+
+        // Inform the race manager about the data for this kart.
+        race_manager->setPlayerKart(i, rki);
+
+        if(is_me)
+        {
+            PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
+            assert(profile_to_use);
+            InputDevice* device = input_manager->getDeviceManager()
+                                ->getLatestUsedDevice();
+            int new_player_id = 0;
+
+            // more than one player, we're the first
+            if (StateManager::get()->getActivePlayers().size() >= 1)
+                new_player_id = 0;
+            else
+                new_player_id = StateManager::get()
+                              ->createActivePlayer(profile_to_use, device);
+            StateManager::ActivePlayer *ap =
+                           StateManager::get()->getActivePlayer(new_player_id);
+            device->setPlayer(ap);
+            input_manager->getDeviceManager()->setSinglePlayer(ap);
+            race_manager->setLocalKartInfo(new_player_id,
+                                           profile->getKartName());
+            NetworkWorld::getInstance()->setSelfKart(profile->getKartName());
+        }   // if is_me
+        else
+        {
+            StateManager::get()->createActivePlayer( NULL, NULL );
+            race_manager->setPlayerKart(i, rki);
+        }
+    }   // for i in players
+
+    race_manager->computeRandomKartList();
+    Log::info("StartGameProtocol", "Player configuration ready.");
+    m_state = SYNCHRONIZATION_WAIT;
 
 }   // setup
 
@@ -105,7 +160,7 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
             else
                 Log::error("StartGameProtocol",
                           "The Synchronization protocol hasn't been started.");
-        }
+        }   // if m_ready_count == number of players
     }
     else // on the client, we shouldn't even receive messages.
     {
@@ -115,118 +170,43 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 // ----------------------------------------------------------------------------
-bool compareKarts(NetworkPlayerProfile* a, NetworkPlayerProfile* b)
-{ 
-    return (a->getGlobalPlayerId() < b->getGlobalPlayerId()); 
-}   // compareKarts
-
-// ----------------------------------------------------------------------------
 void StartGameProtocol::update()
 {
-    if (m_state == NONE)
+    switch(m_state)
     {
-        std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
-        std::sort(players.begin(), players.end(), compareKarts);
-        // have to add self first
-        GameSetup *setup = STKHost::get()->getGameSetup();
-        for (unsigned int i = 0; i < players.size(); i++)
+        case SYNCHRONIZATION_WAIT:
         {
-            bool is_me = setup->isLocalMaster(players[i]->getGlobalPlayerId());
-            if (is_me)
+            // Wait till the synchronisation protocol is running
+            Protocol *p = ProtocolManager::getInstance()
+                        ->getProtocol(PROTOCOL_SYNCHRONIZATION);
+            SynchronizationProtocol* protocol =
+                              static_cast<SynchronizationProtocol*>(p);
+            if (protocol)
             {
-                NetworkPlayerProfile* profile = players[i];
-                RemoteKartInfo rki(profile->getGlobalPlayerId(), profile->getKartName(),
-                                   profile->getName(),
-                                   profile->getGlobalPlayerId(), !is_me);
-                rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
-                rki.setGlobalPlayerId(profile->getGlobalPlayerId());
-                rki.setLocalPlayerId(is_me?0:1);
-                rki.setHostId(profile->getGlobalPlayerId());
-                PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
-                assert(profile_to_use);
-                InputDevice* device = input_manager->getDeviceManager()
-                                                   ->getLatestUsedDevice();
-                int new_player_id = 0;
-
-                // more than one player, we're the first
-                if (StateManager::get()->getActivePlayers().size() >= 1)
-                    new_player_id = 0;
-                else
-                    new_player_id = StateManager::get()
-                                  ->createActivePlayer( profile_to_use, device);
-                StateManager::ActivePlayer *ap = 
-                    StateManager::get()->getActivePlayer(new_player_id);
-                device->setPlayer(ap);
-                input_manager->getDeviceManager()->setSinglePlayer(ap);
-
-                race_manager->setPlayerKart(i, rki);
-                race_manager->setLocalKartInfo(new_player_id, 
-                                               profile->getKartName());
-                // self config
-                Log::info("StartGameProtocol", "Self player device added.");
-                NetworkWorld::getInstance()->setSelfKart(profile->getKartName());
-                break;
+                // Now the synchronization protocol exists.
+                Log::info("StartGameProtocol", "Starting the race loading.");
+                // This will create the world instance,
+                // i.e. load track and karts
+                m_game_setup->getRaceConfig()->setRaceData();
+                World::getWorld()->setNetworkWorld(true);
+                m_state = LOADING;
             }
+            break;
         }
-        for (unsigned int i = 0; i < players.size(); i++)
+        case LOADING:
         {
-            bool is_me = setup->isLocalMaster(players[i]->getGlobalPlayerId());
-            NetworkPlayerProfile* profile = players[i];
-            RemoteKartInfo rki(profile->getGlobalPlayerId(), profile->getKartName(),
-                               profile->getName(),
-                               profile->getGlobalPlayerId(), !is_me);
-            rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
-            rki.setGlobalPlayerId(profile->getGlobalPlayerId());
-            // on the server, the race id must be the local one.
-            rki.setLocalPlayerId(NetworkConfig::get()->isServer() 
-                                 ? profile->getGlobalPlayerId()
-                                 : (is_me ? 0 : 1)                         );
-            rki.setHostId(profile->getGlobalPlayerId());
-            Log::info("StartGameProtocol",
-                      "Creating kart %s for Player#%d with race_id %d",
-                      profile->getKartName().c_str(), i,
-                      profile->getGlobalPlayerId());
-            if (!is_me)
-            {
-                StateManager::get()->createActivePlayer( NULL, NULL );
-
-                race_manager->setPlayerKart(i, rki);
-            }
+            if (m_ready) m_state = READY;
+            break;
         }
-        race_manager->computeRandomKartList();
-        Log::info("StartGameProtocol", "Player configuration ready.");
-        m_state = SYNCHRONIZATION_WAIT;
-    }
-    else if (m_state == SYNCHRONIZATION_WAIT)
-    {
-        Protocol *p = ProtocolManager::getInstance()
-                                     ->getProtocol(PROTOCOL_SYNCHRONIZATION);
-        SynchronizationProtocol* protocol = 
-                                    static_cast<SynchronizationProtocol*>(p);
-        if (protocol)
+        case READY:
         {
-            // now the synchronization protocol exists.
-            Log::info("StartGameProtocol", "Starting the race loading.");
-            // This will create the world instance
-            m_game_setup->getRaceConfig()->setRaceData();
-            World::getWorld()->setNetworkWorld(true);
-            m_state = LOADING;
+            // set karts into the network game setup
+            STKHost::get()->getGameSetup()->bindKartsToProfiles();
+            m_state = EXITING;
+            requestTerminate();
+            break;
         }
-    }
-    else if (m_state == LOADING)
-    {
-        if (m_ready)
-        {
-            m_state = READY;
-        }
-    }
-    else if (m_state == READY)
-    {
-        // set karts into the network game setup
-        STKHost::get()->getGameSetup()->bindKartsToProfiles();
-        m_state = EXITING;
-        requestTerminate();
-    }
+    }   // switch
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -234,7 +214,8 @@ void StartGameProtocol::update()
  */
 void StartGameProtocol::ready()
 {
-    // On clients this means the loading is finished
+    // On clients this means the loading is finished.
+    // Inform the server that this client is ready.
     if (NetworkConfig::get()->isClient())
     {
         assert(STKHost::get()->getPeerCount() == 1);
@@ -245,9 +226,6 @@ void StartGameProtocol::ready()
         m_state = READY;
         m_ready = true;
         return;
-    }
-    else // on the server
-    {
     }
 }   // ready
 
