@@ -43,12 +43,12 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
-/** The constructor for a player kart.
+/** The constructor for a loca player kart, i.e. a player that is playing
+ *  on this machine (non-local player would be network clients).
  *  \param kart_name Name of the kart.
  *  \param position The starting position (1 to n).
  *  \param player The player to which this kart belongs.
  *  \param init_pos The start coordinates and heading of the kart.
- *  \param player_index  Index of the player kart.
  */
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player)
