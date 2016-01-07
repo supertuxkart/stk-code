@@ -36,6 +36,7 @@ void CentralVideoSettings::init()
     hasBuffserStorage = false;
     hasDrawIndirect = false;
     hasComputeShaders = false;
+    hasArraysOfArrays = false;
     hasTextureStorage = false;
     hasTextureView = false;
     hasBindlessTexture = false;
@@ -46,10 +47,11 @@ void CentralVideoSettings::init()
     hasTextureCompression = false;
     hasUBO = false;
     hasGS = false;
-    m_GI_has_artifact = false;
 
+    m_GI_has_artifact = false;
     m_need_rh_workaround = false;
     m_need_srgb_workaround = false;
+    m_need_srgb_visual_workaround = false;
 
     // Call to glGetIntegerv should not be made if --no-graphics is used
     if (!ProfileWorld::isNoGraphics())
@@ -101,6 +103,11 @@ void CentralVideoSettings::init()
             hasGLExtension("GL_ARB_compute_shader")) {
             hasComputeShaders = true;
             Log::info("GLDriver", "ARB Compute Shader Present");
+        }
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_ARRAYS_OF_ARRAYS) &&
+            hasGLExtension("GL_ARB_arrays_of_arrays")) {
+            hasArraysOfArrays = true;
+            Log::info("GLDriver", "ARB Arrays of Arrays Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_STORAGE) &&
             hasGLExtension("GL_ARB_texture_storage")) {
@@ -179,6 +186,16 @@ void CentralVideoSettings::init()
             // Bindless textures are all treated RGB even sRGB one
             m_need_srgb_workaround = true;
         }
+
+        // Check if visual is sRGB-capable
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_CAPABLE) &&
+            m_glsl == true)
+        {
+            GLint param = GL_SRGB;
+            glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT,
+                              GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
+            m_need_srgb_visual_workaround = (param != GL_SRGB);
+        }
     }
 }
 
@@ -205,6 +222,11 @@ bool CentralVideoSettings::needRHWorkaround() const
 bool CentralVideoSettings::needsRGBBindlessWorkaround() const
 {
     return m_need_srgb_workaround;
+}
+
+bool CentralVideoSettings::needsSRGBCapableVisualWorkaround() const
+{
+    return m_need_srgb_visual_workaround;
 }
 
 bool CentralVideoSettings::isARBGeometryShader4Usable() const
@@ -245,6 +267,11 @@ bool CentralVideoSettings::isARBBufferStorageUsable() const
 bool CentralVideoSettings::isARBComputeShaderUsable() const
 {
     return hasComputeShaders;
+}
+
+bool CentralVideoSettings::isARBArraysOfArraysUsable() const
+{
+    return hasArraysOfArrays;
 }
 
 bool CentralVideoSettings::isARBTextureStorageUsable() const
@@ -299,7 +326,7 @@ bool CentralVideoSettings::supportsIndirectInstancingRendering() const
 
 bool CentralVideoSettings::supportsComputeShadersFiltering() const
 {
-    return isARBBufferStorageUsable() && isARBImageLoadStoreUsable() && isARBComputeShaderUsable();
+    return isARBBufferStorageUsable() && isARBImageLoadStoreUsable() && isARBComputeShaderUsable() && isARBArraysOfArraysUsable();
 }
 
 bool CentralVideoSettings::supportsAsyncInstanceUpload() const

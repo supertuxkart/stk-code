@@ -100,7 +100,9 @@ void ArenasScreen::beforeAddingWidget()
         }
         else
         {
-            if(temp->isArena())
+            if(temp->isArena() && (temp->hasNavMesh()  ||
+                race_manager->getNumLocalPlayers() > 1 ||
+                UserConfigParams::m_artist_debug_mode))
                 num_of_arenas++;
         }
     }
@@ -114,6 +116,7 @@ void ArenasScreen::beforeAddingWidget()
 
 void ArenasScreen::init()
 {
+    m_unsupported_arena.clear();
     Screen::init();
     buildTrackList();
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
@@ -158,6 +161,16 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
             {
                 curr_group = track_manager->getArenasInGroup(
                         tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER), soccer_mode );
+            }
+            // Remove unsupported arena
+            if (m_unsupported_arena.size() > 0)
+            {
+                for (std::set<int>::iterator it = m_unsupported_arena.begin();
+                    it != m_unsupported_arena.end(); ++it)
+                {
+                    curr_group.erase(std::remove(curr_group.begin(),
+                        curr_group.end(), *it), curr_group.end());
+                }
             }
 
             RandomGenerator random;
@@ -215,6 +228,7 @@ void ArenasScreen::buildTrackList()
     const std::string curr_group_name = tabs->getSelectionIDString(0);
 
     bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    bool arenas_have_navmesh = false;
 
     if (curr_group_name == ALL_ARENA_GROUPS_ID)
     {
@@ -229,7 +243,18 @@ void ArenasScreen::buildTrackList()
             }
             else
             {
-                if(!curr->isArena()) continue;
+                if(curr->isArena() && curr->hasNavMesh() && !arenas_have_navmesh)
+                    arenas_have_navmesh = true;
+
+                if(!curr->isArena()                      ||
+                  (!(curr->hasNavMesh()                  ||
+                  race_manager->getNumLocalPlayers() > 1 ||
+                  UserConfigParams::m_artist_debug_mode)))
+                {
+                    if (curr->isArena())
+                        m_unsupported_arena.insert(n);
+                    continue;
+                }
             }
 
             if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
@@ -259,7 +284,18 @@ void ArenasScreen::buildTrackList()
             }
             else
             {
-                if(!curr->isArena()) continue;
+                if(curr->isArena() && curr->hasNavMesh() && !arenas_have_navmesh)
+                    arenas_have_navmesh = true;
+
+                if(!curr->isArena()                      ||
+                  (!(curr->hasNavMesh()                  ||
+                  race_manager->getNumLocalPlayers() > 1 ||
+                  UserConfigParams::m_artist_debug_mode)))
+                {
+                    if (curr->isArena())
+                        m_unsupported_arena.insert(currArenas[n]);
+                    continue;
+                }
             }
 
             if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
@@ -274,10 +310,15 @@ void ArenasScreen::buildTrackList()
             }
         }
     }
-    w->addItem(_("Random Arena"), "random_track", "/gui/track_random.png");
+    if (arenas_have_navmesh || race_manager->getNumLocalPlayers() > 1 ||
+        UserConfigParams::m_artist_debug_mode)
+        w->addItem(_("Random Arena"), "random_track", "/gui/track_random.png");
     w->updateItemDisplay();
 
-    assert(w->getItems().size() > 0);
+    if (m_unsupported_arena.size() > 0)
+        w->setText( _P("%d arena unavailable in single player.",
+                       "%d arenas unavailable in single player.",
+                       m_unsupported_arena.size()) );
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -288,6 +329,7 @@ void ArenasScreen::setFocusOnTrack(const std::string& trackName)
     assert( w != NULL );
 
     w->setSelection(trackName, PLAYER_ID_GAME_MASTER, true);
+
 }   // setFOxuOnTrack
 
 // ------------------------------------------------------------------------------------------------------

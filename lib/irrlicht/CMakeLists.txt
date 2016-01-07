@@ -510,5 +510,6 @@ endif()
 add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
 target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY} ${ZLIB_LIBRARY})
 
-
-
+if(WIN32)
+    target_link_libraries(stkirrlicht imm32)
+endif()

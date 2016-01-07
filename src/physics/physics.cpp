@@ -218,9 +218,9 @@ void Physics::update(float dt)
             }
             else if (obj->isFlattenKartObject())
             {
-                const KartProperties* kp = kart->getKartProperties();
-                kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
-                    kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
+                const KartProperties *kp = kart->getKartProperties();
+                kart->setSquash(kp->getSwatterSquashDuration(),
+                    kp->getSwatterSquashSlowdown());
             }
             else if(obj->isSoccerBall() && 
                     race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
@@ -248,9 +248,9 @@ void Physics::update(float dt)
             else if (anim->isFlattenKartObject())
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
-                const KartProperties* kp = kart->getKartProperties();
-                kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
-                    kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
+                const KartProperties *kp = kart->getKartProperties();
+                kart->setSquash(kp->getSwatterSquashDuration(),
+                    kp->getSwatterSquashSlowdown());
             }
             continue;
 

@@ -324,7 +324,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     core::rect<s32> dest(m_map_left, upper_y,
                          m_map_left + m_map_width, lower_y);
 
-    QuadGraph::get()->drawMiniMap(dest);
+    world->getTrack()->drawMiniMap(dest);
 
     Vec3 kart_xyz;
 

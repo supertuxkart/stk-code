@@ -48,6 +48,7 @@ namespace GraphicsRestrictions
             "ImageLoadStore",
             "BaseInstance",
             "ComputeShader",
+            "ArraysOfArrays",
             "ShaderStorageBufferObject",
             "MultiDrawIndirect",
             "ShaderAtomicCounters",
@@ -59,6 +60,7 @@ namespace GraphicsRestrictions
             "HighDefinitionTextures",
             "AdvancedPipeline",
             "FramebufferSRGBWorking",
+            "FramebufferSRGBCapable",
             "GI",
         };
     }   // namespace Private

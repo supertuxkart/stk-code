@@ -225,6 +225,7 @@ void Attachment::clear()
 */
 void Attachment::hitBanana(Item *item, int new_attachment)
 {
+    const KartProperties *kp = m_kart->getKartProperties();
     const StateManager::ActivePlayer *const ap = m_kart->getController()
                                                        ->getPlayer();
     if(ap && ap->getConstProfile()==PlayerManager::getCurrentPlayer())
@@ -266,9 +267,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         // default time. This is necessary to avoid that a kart lands on the
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
-        float f = std::max(item->getDisableTime(),
-                         m_kart->getKartProperties()->getExplosionTime() *
-                         m_kart->getPlayerDifficulty()->getExplosionTime() + 2.0f);
+        float f = std::max(item->getDisableTime(), kp->getExplosionDuration() + 2.0f);
         item->setDisableTime(f);
         break;
         }
@@ -296,7 +295,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         switch (new_attachment)
         {
         case 0:
-            set( ATTACH_PARACHUTE,stk_config->m_parachute_time+leftover_time);
+            set(ATTACH_PARACHUTE, kp->getParachuteDuration() + leftover_time);
             m_initial_speed = m_kart->getSpeed();
 
             // if going very slowly or backwards,
@@ -310,12 +309,12 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
             break ;
         case 2:
-            set( ATTACH_ANVIL, stk_config->m_anvil_time+leftover_time);
+            set(ATTACH_ANVIL, kp->getAnvilDuration() + leftover_time);
             // if ( m_kart == m_kart[0] )
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
             // Reduce speed once (see description above), all other changes are
             // handled in Kart::updatePhysics
-            m_kart->adjustSpeed(stk_config->m_anvil_speed_factor);
+            m_kart->adjustSpeed(kp->getAnvilSpeedFactor());
             m_kart->updateWeight();
             break ;
         }   // switch
@@ -420,12 +419,14 @@ void Attachment::update(float dt)
         // This percentage is based on the ratio of
         // initial_speed / initial_max_speed
 
-        float f = m_initial_speed / stk_config->m_parachute_max_speed;
+        const KartProperties *kp = m_kart->getKartProperties();
+
+        float f = m_initial_speed / kp->getParachuteMaxSpeed();
         if (f > 1.0f) f = 1.0f;   // cap fraction
         if (m_kart->getSpeed() <= m_initial_speed *
-                                 (stk_config->m_parachute_lbound_fraction +
-                                  f * (  stk_config->m_parachute_ubound_fraction
-                                       - stk_config->m_parachute_lbound_fraction)))
+                                 (kp->getParachuteLboundFraction() +
+                                  f * (kp->getParachuteUboundFraction()
+                                     - kp->getParachuteLboundFraction())))
         {
             m_time_left = -1;
         }
@@ -506,6 +507,12 @@ void Attachment::update(float dt)
     if ( m_time_left <= 0.0f)
         clear();
 }   // update
+
+// ----------------------------------------------------------------------------
+float Attachment::weightAdjust() const
+{
+    return m_type == ATTACH_ANVIL ? m_kart->getKartProperties()->getAnvilWeight() : 0.0f;
+}
 
 // ----------------------------------------------------------------------------
 /** Inform any eventual plugin when an animation is done. */

@@ -4,6 +4,8 @@
   <card is="Intel(R) HD Graphics 3000" os="windows"                disable="AdvancedPipeline"/>
   <card is="Intel(R) HD Graphics 3000" os="windows"                disable="FramebufferSRGBWorking"/>
   <card contains="Intel"          os="osx"                         disable="GI"/>
+  <card contains="Intel"          os="linux"    version="<12.0"    disable="ComputeShader"/>
+  <card contains="Intel"          os="linux"    version="<12.0"    disable="FramebufferSRGBCapable"/>
   <card contains="Intel"                                           disable="TextureCompressionS3TC"/>
   <card contains="Intel"          os="windows"                     disable="HighDefinitionTextures"/>
   <card contains="NVIDIA"         os="windows"  version="<344.65"  disable="BufferStorage"/>

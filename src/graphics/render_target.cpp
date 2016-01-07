@@ -151,7 +151,6 @@ void GL3RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
 {
     irr::core::rect<s32> source_rect(0, 0, m_frame_buffer->getWidth(),
                                      m_frame_buffer->getHeight());
-                                     
     draw2DImageFromRTT(m_texture_id,
                        m_frame_buffer->getWidth(), m_frame_buffer->getHeight(),
                        dest_rect, source_rect,

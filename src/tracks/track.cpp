@@ -54,6 +54,7 @@
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"
+#include "tracks/battle_graph.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track_manager.hpp"
@@ -114,7 +115,9 @@ Track::Track(const std::string &filename)
     m_enable_push_back      = true;
     m_reverse_available     = false;
     m_is_arena              = false;
+    m_max_arena_players     = 0;
     m_has_easter_eggs       = false;
+    m_has_navmesh           = false;
     m_is_soccer             = false;
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
@@ -136,6 +139,7 @@ Track::Track(const std::string &filename)
     m_weather_sound         = "";
     m_cache_track           = UserConfigParams::m_cache_overworld &&
                               m_ident=="overworld";
+    m_render_target         = NULL;
     m_minimap_x_scale       = 1.0f;
     m_minimap_y_scale       = 1.0f;
     m_startup_run = false;
@@ -272,6 +276,7 @@ void Track::reset()
 void Track::cleanup()
 {
     QuadGraph::destroy();
+    BattleGraph::destroy();
     ItemManager::destroy();
     VAOManager::kill();
 
@@ -494,6 +499,7 @@ void Track::loadTrackInfo()
     root->get("gravity",               &m_gravity);
     root->get("soccer",                &m_is_soccer);
     root->get("arena",                 &m_is_arena);
+    root->get("max-arena-players",     &m_max_arena_players);
     root->get("cutscene",              &m_is_cutscene);
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);
@@ -568,6 +574,15 @@ void Track::loadTrackInfo()
         }
         delete easter;
     }
+
+    if(file_manager->fileExists(m_root+"navmesh.xml"))
+        m_has_navmesh = true;
+    else if(m_is_arena)
+    {
+        Log::warn("Track", "NavMesh is not found for arena %s, "
+                  "disable AI for it.\n", m_name.c_str());
+    }
+
 }   // loadTrackInfo
 
 //-----------------------------------------------------------------------------
@@ -633,6 +648,25 @@ void Track::startMusic() const
 }   // startMusic
 
 //-----------------------------------------------------------------------------
+/** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
+ *  they are connected to each other. Input file name is hardcoded for now
+ */
+void Track::loadBattleGraph()
+{
+    BattleGraph::create(m_root+"navmesh.xml");
+
+    if(BattleGraph::get()->getNumNodes()==0)
+    {
+        Log::warn("track", "No graph nodes defined for track '%s'\n",
+                m_filename.c_str());
+    }
+    else
+    {
+        loadMinimap();
+    }
+}   // loadBattleGraph
+
+//-----------------------------------------------------------------------------
 /** Loads the quad graph, i.e. the definition of all quads, and the way
  *  they are connected to each other.
  */
@@ -662,38 +696,18 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
     }
     else
     {
-        //Check whether the hardware can do nonsquare or
-        // non power-of-two textures
-        video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
-        bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
-        bool nonsquare =
-            video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
-
-        //Create the minimap resizing it as necessary.
-        m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
-        core::dimension2du size = m_mini_map_size
-                                 .getOptimalSize(!nonpower,!nonsquare);
-
-        QuadGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
-        
-        core::dimension2du mini_map_texture_size = QuadGraph::get()->getMiniMapTextureSize();
-        
-        if(mini_map_texture_size.Width) 
-            m_minimap_x_scale = float(m_mini_map_size.Width) / float(mini_map_texture_size.Width);
-        else
-            m_minimap_x_scale = 0;
-            
-        if(mini_map_texture_size.Height) 
-            m_minimap_y_scale = float(m_mini_map_size.Height) / float(mini_map_texture_size.Height);
-        else
-            m_minimap_y_scale = 0;           
+        loadMinimap();
     }
 }   // loadQuadGraph
 
 // -----------------------------------------------------------------------------
+
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
-    QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
+    if (m_is_arena && m_has_navmesh)
+        BattleGraph::get()->mapPoint2MiniMap(xyz, draw_at);
+    else
+        QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
     draw_at->setX(draw_at->getX() * m_minimap_x_scale);
     draw_at->setY(draw_at->getY() * m_minimap_y_scale);
 }
@@ -989,6 +1003,40 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
     }   // for i<getMeshBufferCount
 
 }   // convertTrackToBullet
+
+// ----------------------------------------------------------------------------
+
+void Track::loadMinimap()
+{
+    //Check whether the hardware can do nonsquare or
+    // non power-of-two textures
+    video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
+    bool nonpower = false; //video_driver->queryFeature(video::EVDF_TEXTURE_NPOT);
+    bool nonsquare =
+        video_driver->queryFeature(video::EVDF_TEXTURE_NSQUARE);
+
+    //Create the minimap resizing it as necessary.
+    m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
+    core::dimension2du size = m_mini_map_size
+                             .getOptimalSize(!nonpower,!nonsquare);
+
+    if (m_is_arena && m_has_navmesh)
+        m_render_target = BattleGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
+    else
+        m_render_target = QuadGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
+        
+    core::dimension2du mini_map_texture_size = m_render_target->getTextureSize();
+        
+    if(mini_map_texture_size.Width) 
+        m_minimap_x_scale = float(m_mini_map_size.Width) / float(mini_map_texture_size.Width);
+    else
+        m_minimap_x_scale = 0;
+        
+    if(mini_map_texture_size.Height) 
+        m_minimap_y_scale = float(m_mini_map_size.Height) / float(mini_map_texture_size.Height);
+    else
+        m_minimap_y_scale = 0;
+}   // loadMinimap
 
 // ----------------------------------------------------------------------------
 /** Loads the main track model (i.e. all other objects contained in the
@@ -1328,6 +1376,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
         // to lower case, for case-insensitive comparison
         name = StringUtils::toLowerCase(name);
 
+        int moving_textures_found = 0;
         for(unsigned int i=0; i<node->getMaterialCount(); i++)
         {
             video::SMaterial &irrMaterial=node->getMaterial(i);
@@ -1344,8 +1393,12 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
                 if (texture_name != name) continue;
                 core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
                 m_animated_textures.push_back(new MovingTexture(m, *texture_node));
+                moving_textures_found++;
             }   // for j<MATERIAL_MAX_TEXTURES
         }   // for i<getMaterialCount
+
+        if (moving_textures_found == 0)
+            Log::warn("AnimTexture", "Did not find animate texture '%s'", name.c_str());
     }   // for node_number < xml->getNumNodes
 }   // handleAnimatedTextures
 
@@ -1570,6 +1623,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the information about the size of the texture to render the mini
     // map to.
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+    else if (m_is_arena && !m_is_soccer && !m_is_cutscene && m_has_navmesh)
+        loadBattleGraph();
 
     ItemManager::create();
 
@@ -1792,12 +1847,20 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     delete root;
 
+    if (m_is_arena && !m_is_soccer && !m_is_cutscene && m_has_navmesh)
+        BattleGraph::get()->findItemsOnGraphNodes();
+
     if (UserConfigParams::m_track_debug &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
         !m_is_cutscene)
     {
         QuadGraph::get()->createDebugMesh();
     }
+
+    if (UserConfigParams::m_track_debug && m_has_navmesh &&
+        race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
+        !m_is_cutscene)
+        BattleGraph::get()->createDebugMesh();
 
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
@@ -2265,6 +2328,15 @@ std::vector< std::vector<float> > Track::buildHeightMap()
 }   // buildHeightMap
 
 // ----------------------------------------------------------------------------
+void Track::drawMiniMap(const core::rect<s32>& dest_rect) const
+{
+    if(m_render_target)
+        m_render_target->draw2DImage(dest_rect, NULL,
+                                     video::SColor(127, 255, 255, 255),
+                                     true);
+}
+
+// ----------------------------------------------------------------------------
 /** Returns the rotation of the sun. */
 const core::vector3df& Track::getSunRotation()
 {
@@ -2330,4 +2402,3 @@ bool Track::findGround(AbstractKart *kart)
 
     return true;
 }   // findGround
-

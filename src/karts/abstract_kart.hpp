@@ -19,10 +19,11 @@
 #ifndef HEADER_ABSTRACT_KART_HPP
 #define HEADER_ABSTRACT_KART_HPP
 
+#include <memory>
+
 #include "items/powerup_manager.hpp"
 #include "karts/moveable.hpp"
 #include "karts/controller/kart_control.hpp"
-#include "karts/player_difficulty.hpp"
 #include "race/race_manager.hpp"
 
 namespace irr
@@ -70,10 +71,10 @@ private:
 
 protected:
     /** The kart properties. */
-    const KartProperties *m_kart_properties;
+    std::unique_ptr<KartProperties> m_kart_properties;
 
     /** The per-player difficulty. */
-    const PlayerDifficulty *m_difficulty;
+    PerPlayerDifficulty m_difficulty;
 
     /** This stores a copy of the kart model. It has to be a copy
      *  since otherwise incosistencies can happen if the same kart
@@ -95,7 +96,7 @@ public:
                    AbstractKart(const std::string& ident,
                                 int world_kart_id,
                                 int position, const btTransform& init_transform,
-                                const PlayerDifficulty *difficulty);
+                                PerPlayerDifficulty difficulty);
     virtual       ~AbstractKart();
     virtual core::stringw getName() const;
     virtual void   reset();
@@ -120,20 +121,17 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the kart properties of this kart. */
     const KartProperties* getKartProperties() const
-                            { return m_kart_properties; }
-    // ------------------------------------------------------------------------
-    /** Sets the kart properties. */
-    void setKartProperties(const KartProperties *kp) { m_kart_properties=kp; }
+                            { return m_kart_properties.get(); }
 
     // ========================================================================
     // Access to the per-player difficulty.
     // ------------------------------------------------------------------------
     /** Returns the per-player difficulty of this kart. */
-    const PlayerDifficulty* getPlayerDifficulty() const
+    const PerPlayerDifficulty getPerPlayerDifficulty() const
                             { return m_difficulty; }
     // ------------------------------------------------------------------------
     /** Sets the per-player difficulty. */
-    void setPlayerDifficulty(const PlayerDifficulty *pd) { m_difficulty=pd; }
+    void setPerPlayerDifficulty(const PerPlayerDifficulty d) { m_difficulty=d; }
 
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this kart (name of the directory the
@@ -143,6 +141,10 @@ public:
     /** Returns the maximum steering angle for this kart, which depends on the
      *  speed. */
     virtual float getMaxSteerAngle () const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the (maximum) speed for a given turn radius.
+     *  \param radius The radius for which the speed needs to be computed. */
+    virtual float  getSpeedForTurnRadius(float radius) const = 0;
     // ------------------------------------------------------------------------
     /** Returns the time till full steering is reached for this kart.
      *  This can depend on the current steering value, which must be >= 0.
@@ -445,6 +447,9 @@ public:
     /** Counter which is used for displaying wrong way message after a delay */
     virtual float getWrongwayCounter() = 0;
     virtual void setWrongwayCounter(float counter) = 0;
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart wins or loses. */
+    virtual bool getRaceResult() const = 0;
 
 };   // AbstractKart
 

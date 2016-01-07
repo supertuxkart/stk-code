@@ -98,7 +98,6 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name, con
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
             UserConfigParams::m_game_mode = CONFIG_CODE_3STRIKES;
-            race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
             ArenasScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_EASTER)
@@ -223,14 +222,11 @@ void RaceSetupScreen::init()
         w2->addItem(name3, IDENT_FTL, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
 
-    if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_mode)
-    {
-        irr::core::stringw name4 = irr::core::stringw(
-            RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) + L"\n";
-        //FIXME: avoid duplicating descriptions from the help menu!
-        name4 += _("Hit others with weapons until they lose all their lives (only in multiplayer games).");
-        w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
-    }
+    irr::core::stringw name4 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) + L"\n";
+    //FIXME: avoid duplicating descriptions from the help menu!
+    name4 += _("Hit others with weapons until they lose all their lives (only in multiplayer games).");
+    w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
 
 #ifdef ENABLE_SOCCER_MODE
     if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_mode)

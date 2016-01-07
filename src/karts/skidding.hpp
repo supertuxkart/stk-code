@@ -19,7 +19,6 @@
 #ifndef HEADER_SKIDDING_HPP
 #define HEADER_SKIDDING_HPP
 
-#include "karts/skidding_properties.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
@@ -35,7 +34,7 @@ class ShowCurve;
 
 #undef SKID_DEBUG
 
-class Skidding : public SkiddingProperties
+class Skidding
 {
 public:
     LEAK_CHECK();
@@ -101,7 +100,7 @@ private:
                               float *bonus_force) const;
     void  updateSteering(float steer, float dt);
 public:
-         Skidding(Kart *kart, const SkiddingProperties *sp);
+         Skidding(Kart *kart);
         ~Skidding();
     void reset();
     void update(float dt, bool is_on_ground, float steer,

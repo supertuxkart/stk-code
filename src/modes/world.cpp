@@ -31,6 +31,7 @@
 #include "input/device_manager.hpp"
 #include "input/keyboard_device.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/controller/battle_ai.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
@@ -184,12 +185,10 @@ void World::init()
                                : race_manager->getKartIdent(i);
         int local_player_id  = race_manager->getKartLocalPlayerId(i);
         int global_player_id = race_manager->getKartGlobalPlayerId(i);
-        const PlayerDifficulty *player_difficulty =
-            stk_config->getPlayerDifficulty(race_manager->getPlayerDifficulty(i));
         AbstractKart* newkart = createKart(kart_ident, i, local_player_id,
                                    global_player_id,
                                    race_manager->getKartType(i),
-                                   player_difficulty);
+                                   race_manager->getPlayerDifficulty(i));
         m_karts.push_back(newkart);
         m_track->adjustForFog(newkart->getNode());
 
@@ -300,7 +299,7 @@ void World::createRaceGUI()
 AbstractKart *World::createKart(const std::string &kart_ident, int index,
                                 int local_player_id, int global_player_id,
                                 RaceManager::KartType kart_type,
-                                const PlayerDifficulty *difficulty)
+                                PerPlayerDifficulty difficulty)
 {
     int position           = index+1;
     btTransform init_pos   = getStartTransform(index);
@@ -351,12 +350,18 @@ Controller* World::loadAIController(AbstractKart *kart)
 {
     Controller *controller;
     int turn=0;
+
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+        turn=1;
     // If different AIs should be used, adjust turn (or switch randomly
     // or dependent on difficulty)
     switch(turn)
     {
         case 0:
             controller = new SkiddingAI(kart);
+            break;
+        case 1:
+            controller = new BattleAI(kart);
             break;
         default:
             Log::warn("[World]", "Unknown AI, using default.");

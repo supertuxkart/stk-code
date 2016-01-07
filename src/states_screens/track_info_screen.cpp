@@ -97,8 +97,9 @@ void TrackInfoScreen::setTrack(Track *track)
  */
 void TrackInfoScreen::init()
 {
-    const bool has_laps       = race_manager->modeHasLaps();
-    const bool has_highscores = race_manager->modeHasHighscores();
+    const int max_arena_players = m_track->getMaxArenaPlayers();
+    const bool has_laps         = race_manager->modeHasLaps();
+    const bool has_highscores   = race_manager->modeHasHighscores();
 
     getWidget<LabelWidget>("name")->setText(translations->fribidize(m_track->getName()), false);
 
@@ -106,6 +107,14 @@ void TrackInfoScreen::init()
     //I18N: (place %s where the name of the author should appear)
     getWidget<LabelWidget>("author")->setText( _("Track by %s", m_track->getDesigner()),
                                                false );
+
+    LabelWidget* max_players = getWidget<LabelWidget>("max-arena-players");
+    max_players->setVisible(m_track->isArena());
+    if (m_track->isArena())
+    {
+        //I18N: the max players supported by an arena.
+        max_players->setText( _("Max players supported: %d", max_arena_players), false );
+    }
 
     // ---- Track screenshot
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
@@ -143,7 +152,11 @@ void TrackInfoScreen::init()
 
     // Number of AIs
     // -------------
-    const bool has_AI = race_manager->hasAI();
+    const int local_players = race_manager->getNumLocalPlayers();
+    const bool has_AI =
+        (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ?
+         m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
+         race_manager->hasAI());
     m_ai_kart_spinner->setVisible(has_AI);
     getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
     if (has_AI)
@@ -152,20 +165,33 @@ void TrackInfoScreen::init()
 
         // Avoid negative numbers (which can happen if e.g. the number of karts
         // in a previous race was lower than the number of players now.
-        int num_ai = UserConfigParams::m_num_karts - race_manager->getNumLocalPlayers();
+        int num_ai = UserConfigParams::m_num_karts - local_players;
         if (num_ai < 0) num_ai = 0;
         m_ai_kart_spinner->setValue(num_ai);
-        race_manager->setNumKarts(num_ai + race_manager->getNumLocalPlayers());
-        m_ai_kart_spinner->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers());
+        race_manager->setNumKarts(num_ai + local_players);
+        // Set the max karts supported based on the battle arena selected
+        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+        {
+            m_ai_kart_spinner->setMax(max_arena_players - local_players);
+        }
+        else
+            m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
         // A ftl reace needs at least three karts to make any sense
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
-            m_ai_kart_spinner->setMin(3-race_manager->getNumLocalPlayers());
+            m_ai_kart_spinner->setMin(3 - local_players);
         }
+        // Make sure in battle mode at least 1 ai for single player
+        else if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
+            local_players == 1 &&
+            !UserConfigParams::m_artist_debug_mode)
+            m_ai_kart_spinner->setMin(1);
         else
             m_ai_kart_spinner->setMin(0);
 
     }   // has_AI
+    else
+        race_manager->setNumKarts(local_players);
 
     // Reverse track
     // -------------
@@ -279,6 +305,24 @@ void TrackInfoScreen::onEnterPressedInternal()
     if(num_laps>=0)
         m_track->setActualNumberOfLaps(num_laps);
     race_manager->setReverseTrack(reverse_track);
+
+    // Avoid invaild Ai karts number during switching game modes
+    const int max_arena_players = m_track->getMaxArenaPlayers();
+    const int local_players = race_manager->getNumLocalPlayers();
+    const bool has_AI =
+        (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ?
+         m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
+         race_manager->hasAI());
+
+    int num_ai = 0;
+    if (has_AI)
+       num_ai = m_ai_kart_spinner->getValue();
+
+    if (UserConfigParams::m_num_karts != (local_players + num_ai))
+    {
+        race_manager->setNumKarts(local_players + num_ai);
+        UserConfigParams::m_num_karts = local_players + num_ai;
+    }
 
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");

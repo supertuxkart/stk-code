@@ -59,7 +59,6 @@ namespace irr
 RaceGUIBase::RaceGUIBase()
 {
     m_ignore_unimportant_messages = false;
-    m_lightning             = 0.0f;
     m_max_font_height       = GUIEngine::getFontHeight() + 10;
     m_small_font_max_height = GUIEngine::getSmallFontHeight() + 5;
     //I18N: as in "ready, set, go", shown at the beginning of the race
@@ -341,7 +340,6 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
  */
 void RaceGUIBase::renderGlobal(float dt)
 {
-    if (m_lightning > 0.0f) m_lightning -= dt;
 
 }   // renderGlobal
 
@@ -412,73 +410,7 @@ void RaceGUIBase::preRenderCallback(const Camera *camera)
 // ----------------------------------------------------------------------------
 void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 {
-    if (CVS->isGLSL())
-    {
-        if (m_lightning > 0.0f)
-        {
-            core::vector3df intensity = {0.7f * m_lightning, 
-                                         0.7f * m_lightning, 
-                                         0.7f * std::min(1.0f, m_lightning * 1.5f)};
-            irr_driver->getPostProcessing()->renderLightning(intensity);
-        }
-    }
-    
-#if 0
-    const core::recti &viewport = camera->getViewport();
 
-    if (m_lightning > 0.0f)
-    {
-        GLint glviewport[4];
-        glviewport[0] = viewport.UpperLeftCorner.X;
-        glviewport[1] = viewport.UpperLeftCorner.Y;
-        glviewport[2] = viewport.LowerRightCorner.X;
-        glviewport[3] = viewport.LowerRightCorner.Y;
-        //glGetIntegerv(GL_VIEWPORT, glviewport);
-
-        if (!irr::video::useCoreContext)
-            glDisable(GL_TEXTURE_2D);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glColor4f(0.7f*m_lightning, 0.7f*m_lightning, 0.7f*std::min(1.0f, m_lightning*1.5f), 1.0f);
-        glEnable(GL_COLOR_MATERIAL);
-        glDisable(GL_CULL_FACE);
-        glBegin(GL_QUADS);
-
-        glVertex3d(glviewport[0],glviewport[1],0);
-        glVertex3d(glviewport[0],glviewport[3],0);
-        glVertex3d(glviewport[2],glviewport[3],0);
-        glVertex3d(glviewport[2],glviewport[1],0);
-        glEnd();
-        if (!irr::video::useCoreContext)
-            glEnable(GL_TEXTURE_2D);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-    else
-    {
-        GLint glviewport[4];
-        glGetIntegerv(GL_VIEWPORT, glviewport);
-
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glColor4f(0.0f, 0.0f, 0.0f, 0.4f);
-
-        glEnable(GL_COLOR_MATERIAL);
-        glDisable(GL_CULL_FACE);
-        glBegin(GL_QUADS);
-
-        glVertex3d(glviewport[0],glviewport[1],0);
-        glVertex3d(glviewport[0],glviewport[3],0);
-        glVertex3d(glviewport[2],glviewport[3],0);
-        glVertex3d(glviewport[2],glviewport[1],0);
-        glEnd();
-        glEnable(GL_BLEND);
-    }
-#endif
 }   // renderPlayerView
 
 

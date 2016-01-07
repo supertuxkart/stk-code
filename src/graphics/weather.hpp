@@ -19,12 +19,15 @@
 #ifndef HEADER_WEATHER_HPP
 #define HEADER_WEATHER_HPP
 
+#include <vector3d.h>
+
 class SFXBase;
 
 class Weather
 {
-    bool m_lightning;
+    bool m_lightning_enabled;
     float m_next_lightning;
+    float m_lightning;
 
     SFXBase* m_thunder_sound;
     SFXBase* m_weather_sound;
@@ -35,6 +38,12 @@ public:
 
     void update(float dt);
     void playSound();
+    
+    /** Set the flag that a lightning should be shown. */
+    void startLightning() { m_lightning = 1.0f; }
+    bool shouldLightning() { return m_lightning > 0.0f; }
+    
+    irr::core::vector3df getIntensity();
 };
 
 #endif

@@ -34,6 +34,9 @@ class ArenasScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     ArenasScreen();
     void buildTrackList();
 
+private:
+    std::set<int> m_unsupported_arena;
+
 public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */

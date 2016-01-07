@@ -172,6 +172,99 @@ namespace Scripting
 
     //-----------------------------------------------------------------------------
 
+    void ScriptEngine::runDelegate(asIScriptFunction* delegate)
+    {
+        asIScriptContext *ctx = m_engine->CreateContext();
+        if (ctx == NULL)
+        {
+            Log::error("Scripting", "runMethod: Failed to create the context.");
+            //m_engine->Release();
+            return;
+        }
+
+        int r = ctx->Prepare(delegate);
+        if (r < 0)
+        {
+            Log::error("Scripting", "runMethod: Failed to prepare the context.");
+            ctx->Release();
+            return;
+        }
+
+        // Execute the function
+        r = ctx->Execute();
+        if (r != asEXECUTION_FINISHED)
+        {
+            // The execution didn't finish as we had planned. Determine why.
+            if (r == asEXECUTION_ABORTED)
+            {
+                Log::error("Scripting", "The script was aborted before it could finish. Probably it timed out.");
+            }
+            else if (r == asEXECUTION_EXCEPTION)
+            {
+                Log::error("Scripting", "The script ended with an exception : (line %i) %s",
+                    ctx->GetExceptionLineNumber(), 
+                    ctx->GetExceptionString());
+            }
+            else
+            {
+                Log::error("Scripting", "The script ended for some unforeseen reason (%i)", r);
+            }
+        }
+
+        ctx->Release();
+    }
+
+    //-----------------------------------------------------------------------------
+    
+    /*
+    void ScriptEngine::runMethod(asIScriptObject* obj, std::string methodName)
+    {
+        asIObjectType* type = obj->GetObjectType();
+        asIScriptFunction* method = type->GetMethodByName(methodName.c_str());
+        if (method == NULL)
+            Log::error("Scripting", ("runMethod: object does not implement method " + methodName).c_str());
+
+
+        asIScriptContext *ctx = m_engine->CreateContext();
+        if (ctx == NULL)
+        {
+            Log::error("Scripting", "runMethod: Failed to create the context.");
+            //m_engine->Release();
+            return;
+        }
+
+        int r = ctx->Prepare(method);
+        if (r < 0)
+        {
+            Log::error("Scripting", "runMethod: Failed to prepare the context.");
+            ctx->Release();
+            return;
+        }
+
+        // Execute the function
+        r = ctx->Execute();
+        if (r != asEXECUTION_FINISHED)
+        {
+            // The execution didn't finish as we had planned. Determine why.
+            if (r == asEXECUTION_ABORTED)
+            {
+                Log::error("Scripting", "The script was aborted before it could finish. Probably it timed out.");
+            }
+            else if (r == asEXECUTION_EXCEPTION)
+            {
+                Log::error("Scripting", "The script ended with an exception.");
+            }
+            else
+            {
+                Log::error("Scripting", "The script ended for some unforeseen reason (%i)", r);
+            }
+        }
+
+        ctx->Release();
+    }
+    */
+    //-----------------------------------------------------------------------------
+
     /** runs the specified script
     *  \param string scriptName = name of script to run
     */
@@ -415,9 +508,35 @@ namespace Scripting
 
     //-----------------------------------------------------------------------------
 
+    PendingTimeout::PendingTimeout(double time, asIScriptFunction* callback_delegate) 
+    {
+        m_time = time;
+        m_callback_delegate = callback_delegate;
+    }
+
+    //-----------------------------------------------------------------------------
+
+    PendingTimeout::~PendingTimeout()
+    {
+        if (m_callback_delegate != NULL)
+        {
+            asIScriptEngine* engine = World::getWorld()->getScriptEngine()->getEngine();
+            m_callback_delegate->Release();
+        }
+    }
+
+    //-----------------------------------------------------------------------------
+
     void ScriptEngine::addPendingTimeout(double time, const std::string& callback_name)
     {
-        m_pending_timeouts.push_back(PendingTimeout(time, callback_name));
+        m_pending_timeouts.push_back(new PendingTimeout(time, callback_name));
+    }
+
+    //-----------------------------------------------------------------------------
+
+    void ScriptEngine::addPendingTimeout(double time, asIScriptFunction* delegate)
+    {
+        m_pending_timeouts.push_back(new PendingTimeout(time, delegate));
     }
 
     //-----------------------------------------------------------------------------
@@ -430,8 +549,16 @@ namespace Scripting
             curr.m_time -= dt;
             if (curr.m_time <= 0.0)
             {
-                runFunction(true, "void " + curr.m_callback_name + "()");
-                m_pending_timeouts.erase(m_pending_timeouts.begin() + i);
+                if (curr.m_callback_delegate != NULL)
+                {
+                    runDelegate(curr.m_callback_delegate);
+                }
+                else
+                {
+                    runFunction(true, "void " + curr.m_callback_name + "()");
+                }
+
+                m_pending_timeouts.erase(i);
             }
         }
     }

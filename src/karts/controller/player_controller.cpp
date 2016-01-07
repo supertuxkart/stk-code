@@ -37,6 +37,7 @@
 #include "network/network_world.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/battle_graph.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -254,7 +255,7 @@ void PlayerController::steer(float dt, int steer_val)
     // change speed is used.
     const float STEER_CHANGE = ( (steer_val<=0 && m_controls->m_steer<0) ||
                                  (steer_val>=0 && m_controls->m_steer>0)   )
-                     ? dt/m_kart->getKartProperties()->getTimeResetSteer()
+                     ? dt/m_kart->getKartProperties()->getTurnTimeResetSteer()
                      : dt/m_kart->getTimeFullSteer(fabsf(m_controls->m_steer));
     if (steer_val < 0)
     {

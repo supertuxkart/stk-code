@@ -57,6 +57,7 @@ protected:
 
     /** The name of the controller, mainly used for debugging purposes. */
     std::string  m_controller_name;
+
 public:
                   Controller         (AbstractKart *kart,
                                       StateManager::ActivePlayer *player=NULL);

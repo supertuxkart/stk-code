@@ -28,6 +28,7 @@
 #endif
 
 #ifdef WIN32
+#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #endif
 
@@ -196,7 +197,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     OutputDebugString(szBuff);
     OutputDebugString("\r\n");
 #endif
-    
+
 
     if(m_file_stdout)
     {
@@ -205,6 +206,25 @@ void Log::printMessage(int level, const char *component, const char *format,
         fprintf (m_file_stdout, "\n");
         va_end(copy);
     }
+
+#ifdef WIN32
+    if (level >= LL_FATAL)
+    {
+        std::string message;
+
+        char tmp[2048];
+        sprintf(tmp, "[%s] %s: ", names[level], component);
+        message += tmp;
+
+        VALIST out;
+        va_copy(out, args);
+        vsprintf(tmp, format, out);
+        message += tmp;
+        va_end(out);
+
+        MessageBoxA(NULL, message.c_str(), "SuperTuxKart - Fatal error", MB_OK);
+    }
+#endif
 
 #endif
 }   // printMessage

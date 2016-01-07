@@ -153,7 +153,8 @@ namespace Online
                 PlayerProfile *player = PlayerManager::get()->getPlayer(i);
                 if(player != current &&
                     player->hasSavedSession() &&
-                    player->getLastOnlineName() == current->getLastOnlineName())
+                    player->getLastOnlineName(true/*ignoreRTL*/) ==
+                    current->getLastOnlineName(true/*ignoreRTL*/))
                 {
                     player->clearSession();
                 }

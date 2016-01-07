@@ -42,6 +42,7 @@ namespace GraphicsRestrictions
         GR_IMAGE_LOAD_STORE,
         GR_BASE_INSTANCE,
         GR_COMPUTE_SHADER,
+        GR_ARRAYS_OF_ARRAYS,
         GR_SHADER_STORAGE_BUFFER_OBJECT,
         GR_MULTI_DRAW_INDIRECT,
         GR_SHADER_ATOMIC_COUNTERS,
@@ -53,6 +54,7 @@ namespace GraphicsRestrictions
         GR_HIGHDEFINITION_TEXTURES,
         GR_ADVANCED_PIPELINE,
         GR_FRAMEBUFFER_SRGB_WORKING,
+        GR_FRAMEBUFFER_SRGB_CAPABLE,
         GR_GI,
         GR_COUNT  /** MUST be last entry. */
     } ;

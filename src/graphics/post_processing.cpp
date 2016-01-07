@@ -28,6 +28,7 @@
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/weather.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
@@ -1635,6 +1636,22 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         {
             renderMotionBlur(0, *in_fbo, *out_fbo);
             std::swap(in_fbo, out_fbo);
+        }
+        PROFILER_POP_CPU_MARKER();
+    }
+    
+    // Handle lightning rendering
+    {
+        PROFILER_PUSH_CPU_MARKER("- Lightning", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTNING));
+        if (World::getWorld() != NULL)
+        {
+            Weather* m_weather = World::getWorld()->getWeather();
+            
+            if (m_weather != NULL && m_weather->shouldLightning())
+            {
+                renderLightning(m_weather->getIntensity());
+            }
         }
         PROFILER_POP_CPU_MARKER();
     }

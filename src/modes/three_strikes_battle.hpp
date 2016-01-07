@@ -39,7 +39,8 @@ class ThreeStrikesBattle : public WorldWithRank
 private:
     struct BattleInfo
     {
-        int m_lives;
+        int  m_lives;
+        int  m_on_node;
     };
 
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
@@ -69,6 +70,9 @@ private:
     float m_tire_rotation;
 
     PtrVector<TrackObject, REF> m_tires;
+
+    /** Function to udpate the locations of all karts on the polygon map */
+    void updateKartNodes();
 
 public:
 
@@ -105,6 +109,7 @@ public:
 
     virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node);
 
+    int getKartNode(unsigned int kart_id) const;
 
     void updateKartRanks();
 };   // ThreeStrikesBattles

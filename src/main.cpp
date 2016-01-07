@@ -122,8 +122,6 @@
 #    include <unistd.h>
 #  endif
 #  define WIN32_LEAN_AND_MEAN
-#  define _WINSOCKAPI_
-#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #  ifdef _MSC_VER
 #    include <direct.h>
@@ -169,7 +167,7 @@
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/controller/ai_base_controller.hpp"
+#include "karts/controller/ai_base_lap_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/demo_world.hpp"
@@ -1160,6 +1158,11 @@ void initRest()
                  file_manager->getAddonsFile("karts/"));
     track_manager->addTrackSearchDir(
                  file_manager->getAddonsFile("tracks/"));
+
+    {
+        XMLNode characteristicsNode(file_manager->getAsset("kart_characteristics.xml"));
+        kart_properties_manager->loadCharacteristics(&characteristicsNode);
+    }
 
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();

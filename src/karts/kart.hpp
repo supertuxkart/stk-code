@@ -31,7 +31,6 @@
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/player_difficulty.hpp"
 #include "utils/no_copy.hpp"
 
 class btKart;
@@ -109,6 +108,9 @@ private:
 
     /** Offset of the graphical kart chassis from the physical chassis. */
     float m_graphical_y_offset;
+
+    /** True if the kart wins, false otherwise. */
+    bool m_race_result;
 
     /** True if the kart is eliminated. */
     bool m_eliminated;
@@ -228,7 +230,7 @@ private:
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
-                        const PlayerDifficulty *difficulty);
+                        PerPlayerDifficulty difficulty);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();
@@ -236,6 +238,8 @@ public:
                                   const btQuaternion& off_rotation);
     virtual void   createPhysics    ();
     virtual void   updateWeight     ();
+    virtual float  getSpeedForTurnRadius(float radius) const;
+    virtual float  getMaxSteerAngle(float speed) const;
     virtual bool   isInRest         () const;
     virtual void   applyEngineForce (float force);
 
@@ -251,6 +255,8 @@ public:
                                float fade_in_time);
     virtual float getSpeedIncreaseTimeLeft(unsigned int category) const;
     virtual void  collectedItem(Item *item, int random_attachment);
+    virtual float getStartupBoost() const;
+
     virtual const Material *getMaterial() const;
     virtual const Material *getLastMaterial() const;
     /** Returns the pitch of the terrain depending on the heading. */
@@ -331,15 +337,12 @@ public:
     /** Returns the time till full steering is reached for this kart.
      *  \param steer Current steer value (must be >=0), on which the time till
      *         full steer depends. */
-    virtual float getTimeFullSteer(float steer) const
-    {
-        return m_kart_properties->getTimeFullSteer(steer);
-    }   // getTimeFullSteer
+    virtual float getTimeFullSteer(float steer) const;
     // ------------------------------------------------------------------------
     /** Returns the maximum steering angle for this kart, which depends on the
      *  speed. */
     virtual float getMaxSteerAngle () const
-                    { return m_kart_properties->getMaxSteerAngle(getSpeed()); }
+                    { return getMaxSteerAngle(getSpeed()); }
     // ------------------------------------------------------------------------
     /** Returns the skidding object for this kart (which can be used to query
      *  skidding related values). */
@@ -438,6 +441,12 @@ public:
     float getWrongwayCounter() { return m_wrongway_counter; }
     // ------------------------------------------------------------------------
     void setWrongwayCounter(float counter) { m_wrongway_counter = counter; }
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart wins or loses. */
+    virtual bool getRaceResult() const { return m_race_result;  }
+    // ------------------------------------------------------------------------
+    /** Set this kart race result. */
+    void setRaceResult();
 
 };   // Kart
 

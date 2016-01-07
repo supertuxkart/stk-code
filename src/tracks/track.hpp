@@ -43,6 +43,7 @@ class ModelDefinitionLoader;
 #include "items/item.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "tracks/quad_graph.hpp"
+#include "tracks/battle_graph.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/translation.hpp"
 #include "utils/vec3.hpp"
@@ -203,8 +204,12 @@ private:
     Vec3                     m_aabb_max;
     /** True if this track is an arena. */
     bool                     m_is_arena;
+    /** Max players supported by an arena. */
+    unsigned int             m_max_arena_players;
     /** True if this track has easter eggs. */
     bool                     m_has_easter_eggs;
+    /** True if this track has navmesh. */
+    bool                     m_has_navmesh;
     /** True if this track is a soccer arena. */
     bool                     m_is_soccer;
 
@@ -336,7 +341,8 @@ private:
     video::SColor       m_sun_diffuse_color;
     video::SColor       m_fog_color;
 
-    /** The texture for the mini map, which is displayed in the race gui. */
+    /** The render target for the mini map, which is displayed in the race gui. */
+    RenderTarget           *m_render_target;
     core::dimension2du      m_mini_map_size;
     float                   m_minimap_x_scale;
     float                   m_minimap_y_scale;
@@ -374,8 +380,10 @@ private:
 
     void loadTrackInfo();
     void loadQuadGraph(unsigned int mode_id, const bool reverse);
+    void loadBattleGraph();
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
+    void loadMinimap();
     void createWater(const XMLNode &node);
     void getMusicInformation(std::vector<std::string>&  filenames,
                              std::vector<MusicInformation*>& m_music   );
@@ -418,6 +426,7 @@ public:
     bool findGround(AbstractKart *kart);
 
     std::vector< std::vector<float> > buildHeightMap();
+    void               drawMiniMap(const core::rect<s32>& dest_rect) const;
     // ------------------------------------------------------------------------
     const core::dimension2du& getMiniMapSize() const { return m_mini_map_size; }
     // ------------------------------------------------------------------------
@@ -426,13 +435,16 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this track is a racing track. This means it is not an
      *  internal track (like cut scenes), arena, or soccer field. */
-    bool isRaceTrack() const 
+    bool isRaceTrack() const
     {
         return !m_internal && !m_is_arena && !m_is_soccer;
     }   // isRaceTrack
     // ------------------------------------------------------------------------
     /** Returns true if this track has easter eggs. */
     bool hasEasterEggs() const { return m_has_easter_eggs; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this track navmesh. */
+    bool hasNavMesh() const { return m_has_navmesh; }
     // ------------------------------------------------------------------------
     void loadObjects(const XMLNode* root, const std::string& path,
         ModelDefinitionLoader& lod_loader, bool create_lod_definitions,
@@ -530,6 +542,10 @@ public:
     /** Returns the graphical effect mesh for this track. */
     const TriangleMesh& getGFXEffectMesh() const {return *m_gfx_effect_mesh;}
     // ------------------------------------------------------------------------
+    /** Get the max players supported for this track, for arena only. */
+    unsigned int getMaxArenaPlayers() const
+                                                { return m_max_arena_players; }
+    // ------------------------------------------------------------------------
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const
                             { return (unsigned int)m_start_transforms.size(); }
@@ -544,7 +560,11 @@ public:
     // ------------------------------------------------------------------------
     float getFogStart()  const { return m_fog_start; }
     // ------------------------------------------------------------------------
+    void setFogStart(float start) { m_fog_start = start; }
+    // ------------------------------------------------------------------------
     float getFogEnd()    const { return m_fog_end; }
+    // ------------------------------------------------------------------------
+    void setFogEnd(float end) { m_fog_end = end; }
     // ------------------------------------------------------------------------
     float getFogStartHeight()  const { return m_fog_height_start; }
     // ------------------------------------------------------------------------
@@ -552,7 +572,11 @@ public:
     // ------------------------------------------------------------------------
     float getFogMax()    const { return m_fog_max; }
     // ------------------------------------------------------------------------
+    void setFogMax(float max) { m_fog_max = max; }
+    // ------------------------------------------------------------------------
     video::SColor getFogColor() const { return m_fog_color; }
+    // ------------------------------------------------------------------------
+    void setFogColor(video::SColor& color) { m_fog_color = color; }
     // ------------------------------------------------------------------------
     video::SColor getSunColor() const { return m_sun_diffuse_color; }
     // ------------------------------------------------------------------------

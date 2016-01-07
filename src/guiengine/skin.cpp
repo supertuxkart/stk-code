@@ -1959,12 +1959,6 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     {
         ModelViewWidget* mvw = dynamic_cast<ModelViewWidget*>(widget);
         mvw->drawRTTScene(rect);
-        /*FrameBuffer* fb = mvw->getFrameBuffer();
-        if (fb != NULL && fb->getRTT().size() > 0)
-        {
-            draw2DImageFromRTT(fb->getRTT()[0], 512, 512,
-                rect, core::rect<s32>(0, 0, 512, 512), NULL, SColor(255, 255, 255, 255), true);
-        }*/
     }
     else if (type == WTYPE_ICON_BUTTON || type == WTYPE_MODEL_VIEW)
     {

@@ -286,7 +286,11 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
+#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+				core::stringw s;
+#else
 				core::stringc s;
+#endif
 				s = Text.subString(realmbgn, realmend - realmbgn).c_str();
 				Operator->copyToClipboard(s.c_str());
 			}
@@ -299,7 +303,11 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
 				// copy
+#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+				core::stringw sc;
+#else
 				core::stringc sc;
+#endif
 				sc = Text.subString(realmbgn, realmend - realmbgn).c_str();
 				Operator->copyToClipboard(sc.c_str());
 
@@ -329,7 +337,11 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
 				// add new character
+#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+				const wchar_t* p = Operator->getTextFromClipboard();
+#else
 				const c8* p = Operator->getTextFromClipboard();
+#endif
 				if (p)
 				{
 					if (MarkBegin == MarkEnd)

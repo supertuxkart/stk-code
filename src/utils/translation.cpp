@@ -524,7 +524,8 @@ const wchar_t* Translations::w_ngettext(const char* singular, const char* plural
                               m_dictionary.translate_plural(singular, plural, num) :
                               m_dictionary.translate_ctxt_plural(context, singular, plural, num));
 
-    static core::stringw str_buffer = StringUtils::utf8ToWide(res);
+    static core::stringw str_buffer;
+    str_buffer = StringUtils::utf8ToWide(res);
     const wchar_t* out_ptr = str_buffer.c_str();
     if (REMOVE_BOM) out_ptr++;
 
