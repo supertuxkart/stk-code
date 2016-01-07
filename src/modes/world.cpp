@@ -311,8 +311,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     {
     case RaceManager::KT_PLAYER:
         controller = new LocalPlayerController(new_kart,
-                         StateManager::get()->getActivePlayer(local_player_id),
-                                          local_player_id);
+                         StateManager::get()->getActivePlayer(local_player_id));
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:

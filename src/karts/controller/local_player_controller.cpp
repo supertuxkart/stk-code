@@ -51,8 +51,7 @@
  *  \param player_index  Index of the player kart.
  */
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
-                                   StateManager::ActivePlayer *player,
-                                   unsigned int player_index)
+                                   StateManager::ActivePlayer *player)
                      : PlayerController(kart, player)
 {
     // Keep a pointer to the camera to remove the need to search for

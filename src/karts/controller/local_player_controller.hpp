@@ -53,8 +53,7 @@ private:
     virtual void displayPenaltyWarning() OVERRIDE;
 public:
                  LocalPlayerController(AbstractKart *kart,
-                                       StateManager::ActivePlayer *_player,
-                                       unsigned int player_index);
+                                       StateManager::ActivePlayer *player);
                 ~LocalPlayerController();
     void         update            (float) OVERRIDE;
     void         action            (PlayerAction action, int value) OVERRIDE;
