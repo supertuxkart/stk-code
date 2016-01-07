@@ -369,8 +369,6 @@ public:
     }   // getTextureErrorMessage
 
     // ------------------------------------------------------------------------
-    AbstractRenderer* getRenderer() { return m_renderer; }
-    // ------------------------------------------------------------------------
     /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
     // ------------------------------------------------------------------------
@@ -623,7 +621,6 @@ public:
     }   // addDebugMesh
 
 #endif
-    void setRTT(RTT* rtt); //FIXME
     void onLoadWorld();
     void onUnloadWorld();
 

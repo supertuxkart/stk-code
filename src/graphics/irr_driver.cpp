@@ -1771,12 +1771,7 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
     mask->drop();
     return t;
 }   // applyMask
-// ----------------------------------------------------------------------------
-void IrrDriver::setRTT(RTT* rtt)
-{
-    m_renderer->resetShadowCamNodes();
-    m_renderer->setRTT(rtt); //FIXME
-}
+
 // ----------------------------------------------------------------------------
 void IrrDriver::onLoadWorld()
 {

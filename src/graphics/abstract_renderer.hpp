@@ -56,7 +56,6 @@ public:
     virtual ~AbstractRenderer(){}
     
     RTT* getRTT() { return m_rtts;} //FIXME: remove this
-    void setRTT(RTT *rtts) { m_rtts = rtts; } //FIXME: remove this
     
     virtual void onLoadWorld()   = 0;
     virtual void onUnloadWorld() = 0;
@@ -79,19 +78,6 @@ public:
 
     
     virtual void render(float dt) = 0;
-
-    virtual void renderScene(irr::scene::ICameraSceneNode * const camnode,
-                             float dt, bool hasShadows, bool forceRTT) = 0;
-                             
-    virtual void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
-                                      float dt) = 0;
-    virtual void uploadLightingData() const {}
-
-    virtual void computeMatrixesAndCameras(irr::scene::ICameraSceneNode * const camnode,
-                                   size_t width, size_t height) {}
-
-    virtual void resetShadowCamNodes() {}
-
  
      // ------------------------------------------------------------------------
     const irr::core::vector2df &getCurrentScreenSize() const

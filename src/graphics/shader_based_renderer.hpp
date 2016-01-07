@@ -61,7 +61,7 @@ private:
     void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                           float dt);
                           
-    void uploadLightingData() const override;
+    void uploadLightingData() const;
 
     void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
                                    size_t width, size_t height);
