@@ -428,8 +428,6 @@ public:
     std::vector< std::vector<float> > buildHeightMap();
     void               drawMiniMap(const core::rect<s32>& dest_rect) const;
     // ------------------------------------------------------------------------
-    const core::dimension2du& getMiniMapSize() const { return m_mini_map_size; }
-    // ------------------------------------------------------------------------
     /** Returns true if this track has an arena mode. */
     bool isArena() const { return m_is_arena; }
     // ------------------------------------------------------------------------

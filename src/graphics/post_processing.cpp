@@ -730,10 +730,10 @@ public:
         assignSamplerNames(0, "colorMapG", ST_NEAREST_FILTERED);
     }   // MLAAColorEdgeDetectionSHader
     // ------------------------------------------------------------------------
-    void render(const core::vector2df &pixel_size)
+    void render(const core::vector2df &pixel_size, GLuint rtt_mlaa_colors)
     {
         use();
-        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS));
+        setTextureUnits(rtt_mlaa_colors);
         drawFullScreenEffect(pixel_size);
     }   // render
 };   // MLAAColorEdgeDetectionSHader
@@ -1403,7 +1403,7 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     // Pass 1: color edge detection
-    MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE);
+    MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE, mlaa_colors_framebuffer.getRTT()[0]);
 
     glStencilFunc(GL_EQUAL, 1, ~0);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
