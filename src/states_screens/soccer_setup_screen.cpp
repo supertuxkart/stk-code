@@ -137,10 +137,10 @@ void SoccerSetupScreen::beforeAddingWidget()
     label_vs->m_h = vs_height;
 
     // Add the 3D views for the karts
-    int nb_players = race_manager->getNumLocalPlayers();
+    int nb_players = race_manager->getNumPlayers();
     for(int i=0 ; i < nb_players ; i++)
     {
-        const RemoteKartInfo&   kart_info   = race_manager->getLocalKartInfo(i);
+        const RemoteKartInfo&   kart_info   = race_manager->getKartInfo(i);
         const std::string&      kart_name   = kart_info.getKartName();
 
         const KartProperties*   props       = kart_properties_manager->getKart(kart_name);
@@ -176,10 +176,9 @@ void SoccerSetupScreen::beforeAddingWidget()
         KartViewInfo    info;
         info.view            = kart_view;
         info.confirmed       = false;
-        info.local_player_id = i;
         info.team            = i&1 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED;
         m_kart_view_info.push_back(info);
-        race_manager->setLocalKartSoccerTeam(i, info.team);
+        race_manager->setKartSoccerTeam(i, info.team);
     }
 
     // Update layout
@@ -353,7 +352,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
      
     if(team_switch != SOCCER_TEAM_NONE) // A player wants to change his team?
     {
-        race_manager->setLocalKartSoccerTeam(playerId, team_switch);
+        race_manager->setKartSoccerTeam(playerId, team_switch);
         m_kart_view_info[playerId].team = team_switch;
         updateKartViewsLayout();
     }

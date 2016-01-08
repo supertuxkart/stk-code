@@ -1131,13 +1131,11 @@ void KartSelectionScreen::allPlayersDone()
             ->incrementUseFrequency();
     }
     // ---- Give player info to race manager
+    race_manager->setNumPlayers(players.size());
     race_manager->setNumLocalPlayers( players.size() );
 
     // ---- Manage 'random kart' selection(s)
     RandomGenerator random;
-
-    //m_kart_widgets.clearAndDeleteAll();
-    //race_manager->setLocalKartInfo(0, w->getSelectionIDString());
 
     std::vector<ItemDescription> items = w->getItems();
 

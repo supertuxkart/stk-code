@@ -78,6 +78,7 @@ RaceManager::RaceManager()
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumLocalPlayers(0);
+    setNumPlayers(0);
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
@@ -96,16 +97,6 @@ void RaceManager::reset()
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
 }  // reset
-
-//-----------------------------------------------------------------------------
-/** \brief Sets a player kart (local and non-local).
- *  \param player_id  Id of the player.
- *  \param ki         Kart info structure for this player.
- */
-void RaceManager::setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki)
-{
-    m_player_karts[player_id] = ki;
-}   // setPlayerKart
 
 // ----------------------------------------------------------------------------
 /** Sets the default list of AI karts to use.
@@ -136,6 +127,16 @@ void RaceManager::setDefaultAIKartList(const std::vector<std::string>& ai_list)
     }
 }   // setDefaultAIKartList
 
+//-----------------------------------------------------------------------------
+/** \brief Sets a player kart (local and non-local).
+ *  \param player_id  Id of the player.
+ *  \param ki         Kart info structure for this player.
+ */
+void RaceManager::setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki)
+{
+    m_player_karts[player_id] = ki;
+}   // setPlayerKart
+    
 // ----------------------------------------------------------------------------
 /** Sets information about a kart used by a local player (i.e. on this
  *  computer).
@@ -146,23 +147,23 @@ void RaceManager::setLocalKartInfo(unsigned int player_id,
                                    const std::string& kart)
 {
     assert(kart.size() > 0);
-    assert(player_id <m_local_player_karts.size());
+    assert(player_id <getNumLocalPlayers());
     assert(kart_properties_manager->getKart(kart) != NULL);
 
     const PlayerProfile* profile = StateManager::get()->getActivePlayerProfile(player_id);
-    m_local_player_karts[player_id] = RemoteKartInfo(player_id, kart, profile->getName(),
+    m_player_karts[player_id] = RemoteKartInfo(player_id, kart, profile->getName(),
                                                      0, false);
 }   // setLocalKartInfo
 
 //-----------------------------------------------------------------------------
 /** Sets additional information for a player to indicate which soccer team it belong to
 */
-void RaceManager::setLocalKartSoccerTeam(unsigned int player_id, SoccerTeam team)
+void RaceManager::setKartSoccerTeam(unsigned int player_id, SoccerTeam team)
 {
-    assert(player_id < m_local_player_karts.size());
+    assert(player_id < m_player_karts.size());
 
-    m_local_player_karts[player_id].setSoccerTeam(team);
-}
+    m_player_karts[player_id].setSoccerTeam(team);
+}   // setKartSoccerTeam
 
 //-----------------------------------------------------------------------------
 /** Sets the per-player difficulty for a player.
@@ -170,10 +171,10 @@ void RaceManager::setLocalKartSoccerTeam(unsigned int player_id, SoccerTeam team
 void RaceManager::setPlayerDifficulty(unsigned int player_id,
                                       PerPlayerDifficulty difficulty)
 {
-    assert(player_id < m_local_player_karts.size());
+    assert(player_id < m_player_karts.size());
 
-    m_local_player_karts[player_id].setPerPlayerDifficulty(difficulty);
-}
+    m_player_karts[player_id].setPerPlayerDifficulty(difficulty);
+}   // setPlayerDifficulty
 
 //-----------------------------------------------------------------------------
 /** Returns a pointer to the kart which has a given GP rank.
@@ -211,7 +212,7 @@ int RaceManager::getLocalPlayerGPRank(const int player_id) const
  */
 void RaceManager::setNumLocalPlayers(unsigned int n)
 {
-    m_local_player_karts.resize(n);
+    m_num_local_players = n;
 }   // setNumLocalPlayers
 
 //-----------------------------------------------------------------------------
@@ -884,25 +885,21 @@ void RaceManager::startSingleRace(const std::string &track_ident,
         race_manager->setupPlayerKartInfo(); // do this setup player kart
 
     startNew(from_overworld);
-}
+}   // startSingleRace
 
 //-----------------------------------------------------------------------------
 /** Receive and store the information from sendKartsInformation()
 */
 void RaceManager::setupPlayerKartInfo()
 {
-
     std::vector<RemoteKartInfo> kart_info;
 
     // Get the local kart info
-    for(unsigned int i=0; i<getNumLocalPlayers(); i++)
-        kart_info.push_back(getLocalKartInfo(i));
+    for(unsigned int i=0; i<getNumPlayers(); i++)
+        kart_info.push_back(getKartInfo(i));
 
     // Now sort by (hostid, playerid)
     std::sort(kart_info.begin(), kart_info.end());
-
-    // Set the player kart information
-    setNumPlayers((int)kart_info.size());
 
     // Set the global player ID for each player
     for(unsigned int i=0; i<kart_info.size(); i++)

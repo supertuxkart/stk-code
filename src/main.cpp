@@ -1188,6 +1188,7 @@ void initRest()
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
     race_manager->setNumLocalPlayers(1);
+    race_manager->setNumPlayers(1);
     race_manager->setNumLaps   (3);
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);

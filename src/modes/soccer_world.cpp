@@ -335,7 +335,7 @@ void SoccerWorld::initKartList()
     {
         scene::ISceneNode *arrowNode;
         float arrow_pos_height = m_karts[i]->getKartModel()->getHeight()+0.5f;
-        SoccerTeam team = race_manager->getLocalKartInfo(i).getSoccerTeam();
+        SoccerTeam team = race_manager->getKartInfo(i).getSoccerTeam();
 
         arrowNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f),
                         team==SOCCER_TEAM_RED ? redTeamTexture : blueTeamTexture,
@@ -353,7 +353,7 @@ void SoccerWorld::initKartList()
     // Set kart positions, ordering them by team
     for(unsigned int n=0; n<kart_amount; n++)
     {
-        SoccerTeam team = race_manager->getLocalKartInfo(n).getSoccerTeam();
+        SoccerTeam team = race_manager->getKartInfo(n).getSoccerTeam();
 #ifdef DEBUG
         // In debug mode it's possible to play soccer with a single player
         // (in artist debug mode). Avoid overwriting memory in this case.
@@ -375,7 +375,7 @@ int SoccerWorld::getTeamLeader(unsigned int team)
 {
     for(unsigned int i = 0; i< m_karts.size(); i++)
     {
-        if(race_manager->getLocalKartInfo(i).getSoccerTeam() == (SoccerTeam) team)
+        if(race_manager->getKartInfo(i).getSoccerTeam() == (SoccerTeam) team)
             return i;
     }
     return -1;
@@ -390,7 +390,7 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
     int posIndex = index;
     int position = index+1;
 
-    if(race_manager->getLocalKartInfo(index).getSoccerTeam() == SOCCER_TEAM_RED)
+    if(race_manager->getKartInfo(index).getSoccerTeam() == SOCCER_TEAM_RED)
     {
         if(index % 2 != 1) posIndex += 1;
     }

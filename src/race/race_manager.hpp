@@ -302,9 +302,11 @@ private:
     MinorRaceModeType                m_minor_mode;
     /** Stores remote kart information about all player karts. */
     std::vector<RemoteKartInfo>      m_player_karts;
-    std::vector<RemoteKartInfo>      m_local_player_karts;
     std::vector<std::string>         m_tracks;
     std::vector<int>                 m_host_ids;
+
+    /** Number of local players. */
+    unsigned int m_num_local_players;
 
     /** The number of laps for each track of a GP (only one element
      *  is used if only a single track is used. */
@@ -363,15 +365,13 @@ public:
       * \name Setting race parameters
       */
 
-    /** \brief Stores the information which local players uses which karts.
-      * \param player_id  Id of the local player for which the kart is set.
-      * \param kart       Kart name this player is using.
-      */
     void setLocalKartInfo(unsigned int player_id, const std::string& kart);
+    void setPlayerKart(unsigned int player_id,
+                       const RemoteKartInfo& ki);
 
     /** Sets additional information for a player to indicate which soccer team it belong to
     */
-    void setLocalKartSoccerTeam(unsigned int player_id, SoccerTeam team);
+    void setKartSoccerTeam(unsigned int player_id, SoccerTeam team);
 
     /** Sets the per-player difficulty for a player.
      */
@@ -466,24 +466,15 @@ public:
     /** \} */
 
     // ------------------------------------------------------------------------
-    /** \{
-      * \name Getters
-      * Get current race manager state and settings
-      */
-    const RemoteKartInfo& getLocalKartInfo(unsigned int n) const
-    {
-        return m_local_player_karts[n];
-    }
-    // ------------------------------------------------------------------------
     const RemoteKartInfo& getKartInfo(unsigned int n) const
     {
         return m_player_karts[n];
-    }
+    }   // getKartInfo
     // ------------------------------------------------------------------------
     unsigned int getNumLocalPlayers() const
     {
-        return (unsigned int)m_local_player_karts.size();
-    }
+        return m_num_local_players;
+    }   // getNumLocalPlayers
     // ------------------------------------------------------------------------
     /** Returns the selected number of karts (selected number of players and
      *  AI karts. */
@@ -741,8 +732,6 @@ public:
      */
     void setNumPlayers(int num);
 
-    void setPlayerKart(unsigned int player_id,
-                       const RemoteKartInfo& ki);
     void setDefaultAIKartList(const std::vector<std::string> &ai_list);
     void computeRandomKartList();
     /** Sets the AI to use. This is used in networking mode to set the karts
