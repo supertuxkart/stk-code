@@ -38,14 +38,14 @@
 
 #if defined(WIN32) && defined(DEBUG)
 #  define WIN32_LEAN_AND_MEAN
-#  include <Windows.h>
+#  include <windows.h>
 #endif
 
 namespace VS
 {
-#if defined(WIN32) && defined(DEBUG)
+#if defined(_MSC_VER) && defined(DEBUG)
 #  define WIN32_LEAN_AND_MEAN
-#  include <Windows.h>
+#  include <windows.h>
 
     /** This function sets the name of this thread in the VS debugger.
      *  \param name Name of the thread.
