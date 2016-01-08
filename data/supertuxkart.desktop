@@ -12,3 +12,4 @@ Terminal=false
 StartupNotify=false
 Type=Application
 Categories=Game;ArcadeGame;
+Keywords=tux;game;race;
