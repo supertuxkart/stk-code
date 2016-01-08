@@ -2198,7 +2198,6 @@ void IrrDriver::update(float dt)
 
         GUIEngine::render(dt);
         //m_video_driver->endScene();
-        return;
     }
     else if (!world)
     {
@@ -2208,24 +2207,24 @@ void IrrDriver::update(float dt)
         GUIEngine::render(dt);
 
         m_video_driver->endScene();
-        return;
     }
-
-    if (CVS->isGLSL())
-        renderGLSL(dt);
     else
-        renderFixed(dt);
-
-
-    if (world != NULL && world->getPhysics() != NULL)
     {
-        IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
-        if (debug_drawer != NULL && debug_drawer->debugEnabled())
+        if (CVS->isGLSL())
+            renderGLSL(dt);
+        else
+            renderFixed(dt);
+    
+        if (world != NULL && world->getPhysics() != NULL)
         {
-            debug_drawer->beginNextFrame();
+            IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
+            if (debug_drawer != NULL && debug_drawer->debugEnabled())
+            {
+                debug_drawer->beginNextFrame();
+            }
         }
     }
-
+    
     if (m_request_screenshot) doScreenShot();
 
     // Enable this next print statement to get render information printed
