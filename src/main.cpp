@@ -1284,6 +1284,8 @@ int main(int argc, char *argv[] )
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
         initUserConfig();
+	if (!file_manager->createPidFile())
+		Log::fatal("main", "an instance is already running");
 
         handleCmdLinePreliminary();
 
@@ -1530,6 +1532,7 @@ int main(int argc, char *argv[] )
     MemoryLeaks::checkForLeaks();
 #endif
 
+    file_manager->removePidFile();
 #ifndef WIN32
     if (user_config) //close logfiles
     {
