@@ -414,7 +414,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "startTutorial")
     {
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
         race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
         race_manager->setNumKarts( 1 );
@@ -457,7 +457,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
             race_manager->setNumKarts( 0 );
             race_manager->setNumPlayers(0);
-            race_manager->setNumLocalPlayers(0);
             race_manager->startSingleRace("introcutscene", 999, false);
 
             std::vector<std::string> parts;

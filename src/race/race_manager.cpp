@@ -77,7 +77,6 @@ RaceManager::RaceManager()
     setReverseTrack(false);
     setTrack("jungle");
     m_default_ai_list.clear();
-    setNumLocalPlayers(0);
     setNumPlayers(0);
 }   // RaceManager
 
@@ -90,7 +89,8 @@ RaceManager::~RaceManager()
 
 //-----------------------------------------------------------------------------
 /** Resets the race manager in preparation for a new race. It sets the
- *  counter of finished karts to zero.
+ *  counter of finished karts to zero. It is called by world when 
+ *  restarting a race.
  */
 void RaceManager::reset()
 {
@@ -156,7 +156,8 @@ void RaceManager::setLocalKartInfo(unsigned int player_id,
 }   // setLocalKartInfo
 
 //-----------------------------------------------------------------------------
-/** Sets additional information for a player to indicate which soccer team it belong to
+/** Sets additional information for a player to indicate which soccer team it
+ *  belongs to.
 */
 void RaceManager::setKartSoccerTeam(unsigned int player_id, SoccerTeam team)
 {
@@ -206,22 +207,17 @@ int RaceManager::getLocalPlayerGPRank(const int player_id) const
 }   // getLocalPlayerGPRank
 
 //-----------------------------------------------------------------------------
-/** Sets the number of local players, i.e. the number of players on this
- *  computer.
- *  \param n Number of local players.
- */
-void RaceManager::setNumLocalPlayers(unsigned int n)
-{
-    m_num_local_players = n;
-}   // setNumLocalPlayers
-
-//-----------------------------------------------------------------------------
-/** Sets the number of players.
+/** Sets the number of players and optional the number of local players.
  *  \param num Number of players.
+ *  \param local_players
  */
-void RaceManager::setNumPlayers(int num)
+void RaceManager::setNumPlayers(int players, int local_players)
 {
-    m_player_karts.resize(num);
+    m_player_karts.resize(players);
+    if(local_players>-1)
+        m_num_local_players = local_players;
+    else
+        m_num_local_players = players;
 }   // setNumPlayers
 
 // ----------------------------------------------------------------------------
@@ -308,7 +304,16 @@ void RaceManager::computeRandomKartList()
 }   // computeRandomKartList
 
 //-----------------------------------------------------------------------------
-
+/** \brief Starts a new race or GP (or other mode).
+ *  It sets up the list of player karts, AI karts, GP tracks if relevant
+ *  etc.
+ *  \pre The list of AI karts to use must be set up first. This is
+ *       usually being done by a call to computeRandomKartList() from
+ *       NetworkManager::setupPlayerKartInfo, but could be done differently
+ *       (e.g. depending on user command line options to test certain AIs)
+ *  \param from_overworld True if the race/GP is started from overworld
+ *         (used to return to overworld at end of race/GP).
+ */
 void RaceManager::startNew(bool from_overworld)
 {
     m_started_from_overworld = from_overworld;
@@ -546,6 +551,10 @@ void RaceManager::startNextRace()
 }   // startNextRace
 
 //-----------------------------------------------------------------------------
+/** \brief Start the next race or go back to the start screen
+ * If there are more races to do, starts the next race, otherwise
+ * calls exitRace to finish the race.
+ */
 void RaceManager::next()
 {
     PropertyAnimator::get()->clear();
@@ -569,6 +578,8 @@ void RaceManager::next()
 }   // next
 
 //-----------------------------------------------------------------------------
+/** Saves the current GP to the config.
+ */
 void RaceManager::saveGP()
 {
     // If Player 1 has already saved a GP, we adapt it
@@ -699,7 +710,10 @@ void RaceManager::computeGPRanks()
 }   // computeGPRanks
 
 //-----------------------------------------------------------------------------
-
+/** \brief Exit a race (and don't start the next one)
+ * \note In GP, displays the GP result screen first
+ * \param delete_world If set deletes the world.
+ */
 void RaceManager::exitRace(bool delete_world)
 {
     // Only display the grand prix result screen if all tracks
@@ -714,7 +728,7 @@ void RaceManager::exitRace(bool delete_world)
         }
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
 
-        bool someHumanPlayerWon = false;
+        bool some_human_player_won = false;
         const unsigned int kart_status_count = (unsigned int)m_kart_status.size();
 
         const int loserThreshold = 3;
@@ -736,7 +750,7 @@ void RaceManager::exitRace(bool delete_world)
                 if (m_kart_status[i].m_kart_type == KT_PLAYER ||
                     m_kart_status[i].m_kart_type == KT_NETWORK_PLAYER)
                 {
-                    someHumanPlayerWon = true;
+                    some_human_player_won = true;
                 }
             }
             else if (rank >= loserThreshold)
@@ -760,9 +774,8 @@ void RaceManager::exitRace(bool delete_world)
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
 
-        if (someHumanPlayerWon)
+        if (some_human_player_won)
         {
             race_manager->startSingleRace("gpwin", 999, race_manager->raceWasStartedFromOverworld());
             GrandPrixWin* scene = GrandPrixWin::getInstance();
@@ -836,7 +849,10 @@ void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
 }   // kartFinishedRace
 
 //-----------------------------------------------------------------------------
-
+/** \brief Rerun the same race again
+ * This is called after a race is finished, and it will adjust
+ * the number of points and the overall time before restarting the race.
+ */
 void RaceManager::rerunRace()
 {
     // Subtract last score from all karts:
@@ -849,7 +865,9 @@ void RaceManager::rerunRace()
 }   // rerunRace
 
 //-----------------------------------------------------------------------------
-
+/** \brief Higher-level method to start a GP without having to care about
+ *  the exact startup sequence
+ */
 void RaceManager::startGP(const GrandPrixData &gp, bool from_overworld,
                           bool continue_saved_gp)
 {

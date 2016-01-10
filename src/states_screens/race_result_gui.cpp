@@ -293,7 +293,6 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
                 race_manager->setNumKarts( 0 );
                 race_manager->setNumPlayers(0);
-                race_manager->setNumLocalPlayers(0);
                 race_manager->startSingleRace("endcutscene", 999, false);
 
                 std::vector<std::string> parts;
@@ -311,7 +310,6 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
                 race_manager->setNumKarts(0);
                 race_manager->setNumPlayers(0);
-                race_manager->setNumLocalPlayers(0);
                 race_manager->startSingleRace("featunlocked", 999, race_manager->raceWasStartedFromOverworld());
 
                 FeatureUnlockedCutScene* scene =

@@ -861,7 +861,7 @@ void World::updateWorld(float dt)
             if (m_schedule_tutorial)
             {
                 m_schedule_tutorial = false;
-                race_manager->setNumLocalPlayers(1);
+                race_manager->setNumPlayers(1);
                 race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
                 race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
                 race_manager->setNumKarts( 1 );

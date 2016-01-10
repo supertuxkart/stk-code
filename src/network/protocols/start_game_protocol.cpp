@@ -61,7 +61,10 @@ void StartGameProtocol::setup()
     NetworkWorld::getInstance<NetworkWorld>()->start();
     race_manager->setNumKarts(m_game_setup->getPlayerCount());
     race_manager->setNumPlayers(m_game_setup->getPlayerCount());
-    race_manager->setNumLocalPlayers(1);
+    // setNumPlayers by default sets number of local players to
+    // number of players - so avoid this to keep the original number:
+    race_manager->setNumPlayers(1, 
+                         /*local players*/race_manager->getNumLocalPlayers());
 
     // Create the kart information for the race manager:
     // -------------------------------------------------

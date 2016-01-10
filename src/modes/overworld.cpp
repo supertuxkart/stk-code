@@ -56,7 +56,7 @@ OverWorld::~OverWorld()
 /** Function to simplify the start process */
 void OverWorld::enterOverWorld()
 {
-    race_manager->setNumLocalPlayers(1);
+    race_manager->setNumPlayers(1);
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);
     race_manager->setNumKarts( 1 );

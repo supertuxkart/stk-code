@@ -41,7 +41,7 @@ bool  ProfileWorld::m_no_graphics = false;
  */
 ProfileWorld::ProfileWorld()
 {
-    race_manager->setNumLocalPlayers(0);
+    race_manager->setNumPlayers(0);
     // Set number of laps so that the end of the race can be detected by
     // quering the number of finished karts from the race manager (in laps
     // based profiling) - in case of time based profiling, the number of
