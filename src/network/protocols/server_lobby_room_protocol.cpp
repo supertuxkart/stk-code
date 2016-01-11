@@ -455,12 +455,14 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     if(m_setup->getLocalMasterID()==0)
         m_setup->setLocalMaster(new_player_id);
 
+    int new_host_id = STKHost::get()->getPeerCount();
+
     // Notify everybody that there is a new player
     // -------------------------------------------
     NetworkString message(8);
     // size of id -- id -- size of local id -- local id;
     message.ai8(LE_NEW_PLAYER_CONNECTED).ai8(1).ai8(new_player_id)
-           .encodeString(name_u8);
+           .encodeString(name_u8).addUInt8(new_host_id);
     ProtocolManager::getInstance()->sendMessageExcept(this, peer, message);
 
     // Now answer to the peer that just connected
@@ -478,17 +480,19 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     NetworkString message_ack(13 + players.size() * 7);
     // connection success -- size of token -- token
     message_ack.ai8(LE_CONNECTION_ACCEPTED).ai8(1).ai8(new_player_id).ai8(4)
-               .ai32(token);
+               .ai32(token).addUInt8(new_host_id);
     // Add all players so that this user knows (this new player is only added
     // to the list of players later, so the new player's info is not included)
     for (unsigned int i = 0; i < players.size(); i++)
     {
         message_ack.ai8(1).ai8(players[i]->getGlobalPlayerId())
-                   .encodeString(players[i]->getName());
+                   .encodeString(players[i]->getName())
+                   .addUInt8(players[i]->getHostId());
     }
     sendMessage(peer, message_ack);
 
     NetworkPlayerProfile* profile = new NetworkPlayerProfile(new_player_id, name);
+    profile->setHostId(new_host_id);
     m_setup->addPlayer(profile);
     peer->setPlayerProfile(profile);
     peer->setClientServerToken(token);

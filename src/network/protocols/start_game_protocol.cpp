@@ -69,26 +69,25 @@ void StartGameProtocol::setup()
     // Create the kart information for the race manager:
     // -------------------------------------------------
     std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
+    int local_player_id = 0;
     for (unsigned int i = 0; i < players.size(); i++)
     {
         NetworkPlayerProfile* profile = players[i];
-        bool is_me =  profile->getGlobalPlayerId()
-                   == STKHost::get()->getGameSetup()->getLocalMasterID();
+        bool is_local =  profile->getHostId()
+                   == STKHost::get()->getMyHostId();
         RemoteKartInfo rki(profile->getGlobalPlayerId(),
                            profile->getKartName(),
                            profile->getName(),
-                           /*hostid*/profile->getGlobalPlayerId(),
-                           !is_me);
+                           profile->getHostId(),
+                           !is_local);
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
-        rki.setLocalPlayerId(0);
-        // FIXME: for now (only one local player) the global player id
-        // can be used as host id.
-        rki.setHostId(profile->getGlobalPlayerId());
+        rki.setLocalPlayerId(local_player_id);
+        if(is_local) local_player_id++;
 
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
 
-        if(is_me)
+        if(is_local)
         {
             PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
             assert(profile_to_use);
@@ -109,7 +108,7 @@ void StartGameProtocol::setup()
             race_manager->setLocalKartInfo(new_player_id,
                                            profile->getKartName());
             NetworkWorld::getInstance()->setSelfKart(profile->getKartName());
-        }   // if is_me
+        }   // if is_local
         else
         {
             StateManager::get()->createActivePlayer( NULL, NULL );
