@@ -90,7 +90,7 @@ public:
     /** Returns if the original controller of the kart was a player
      *  controller. This way e.g. highscores can still be assigned
      *  to the right player. */
-    virtual bool isPlayerController () const {return m_player!=NULL;}
+    virtual bool isPlayerController () const {return getPlayer()!=NULL;}
     virtual void  action             (PlayerAction action, int value);
     virtual void  newLap             (int lap);
 
