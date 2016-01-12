@@ -215,6 +215,9 @@ void STKHost::create()
  */
 STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 {
+    // Will be overwritten with the correct value once a connection with the
+    // server is made.
+    m_host_id = 0;
     init();
 
     m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
@@ -236,6 +239,7 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 STKHost::STKHost(const irr::core::stringw &server_name)
 {
     init();
+    m_host_id = 0;   // indicates a server host.
 
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;

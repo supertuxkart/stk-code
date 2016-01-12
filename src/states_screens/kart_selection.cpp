@@ -1131,13 +1131,10 @@ void KartSelectionScreen::allPlayersDone()
             ->incrementUseFrequency();
     }
     // ---- Give player info to race manager
-    race_manager->setNumLocalPlayers( players.size() );
+    race_manager->setNumPlayers(players.size());
 
     // ---- Manage 'random kart' selection(s)
     RandomGenerator random;
-
-    //m_kart_widgets.clearAndDeleteAll();
-    //race_manager->setLocalKartInfo(0, w->getSelectionIDString());
 
     std::vector<ItemDescription> items = w->getItems();
 
@@ -1197,7 +1194,7 @@ void KartSelectionScreen::allPlayersDone()
             }
         }
 
-        race_manager->setLocalKartInfo(n, selected_kart);
+        race_manager->setPlayerKart(n, selected_kart);
 
         // Set per player difficulty if needed
         if (m_multiplayer && UserConfigParams::m_per_player_difficulty &&

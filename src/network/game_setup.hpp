@@ -46,6 +46,9 @@ private:
     /** The race configuration. */
     RaceConfig* m_race_config;
 
+    /** Stores the number of local players. */
+    int m_num_local_players;
+
     /** The player id of the local game master, used in 
      *  kart selection screen. */
     uint8_t m_local_master;
@@ -68,6 +71,12 @@ public:
      *  \return True if the kart hasn't been selected yet, false elseway.
      */
     bool isKartAvailable(std::string kart_name);
+    // ------------------------------------------------------------------------
+    /** Sets the number of local players. */
+    void setNumLocalPlayers(int n) { m_num_local_players = n; } 
+    // ------------------------------------------------------------------------
+    /** Returns the nunber of local players. */
+    int getNumLocalPlayers() const { return m_num_local_players; }
     // ------------------------------------------------------------------------
     /*! \brief Used to know if a kart is playable.
      *  \param kart_name : Name of the kart to check.

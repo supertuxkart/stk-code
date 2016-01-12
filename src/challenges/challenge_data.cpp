@@ -369,7 +369,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
         race_manager->setTrack(m_track_id);
         race_manager->setNumLaps(m_num_laps);
         race_manager->setNumKarts(m_num_karts[d]);
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
         race_manager->setCoinTarget(m_energy[d]);
         race_manager->setDifficulty(d);
 
@@ -384,7 +384,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
         race_manager->setGrandPrix(*grand_prix_manager->getGrandPrix(m_gp_id));
         race_manager->setDifficulty(d);
         race_manager->setNumKarts(m_num_karts[d]);
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
     }
 
     if (m_ai_kart_ident[d] != "")

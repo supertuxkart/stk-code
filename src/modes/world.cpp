@@ -861,7 +861,7 @@ void World::updateWorld(float dt)
             if (m_schedule_tutorial)
             {
                 m_schedule_tutorial = false;
-                race_manager->setNumLocalPlayers(1);
+                race_manager->setNumPlayers(1);
                 race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
                 race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
                 race_manager->setNumKarts( 1 );
@@ -883,7 +883,7 @@ void World::updateWorld(float dt)
                               UserConfigParams::m_default_kart.c_str());
                     UserConfigParams::m_default_kart.revertToDefaults();
                 }
-                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+                race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
                 // ASSIGN should make sure that only input from assigned devices
                 // is read.

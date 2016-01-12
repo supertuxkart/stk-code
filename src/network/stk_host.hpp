@@ -74,6 +74,9 @@ private:
     /** The list of peers connected to this instance. */
     std::vector<STKPeer*> m_peers;
 
+    /** Host id of this host. */
+    uint8_t m_host_id;
+
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
 
@@ -197,7 +200,6 @@ public:
     // --------------------------------------------------------------------
     /** Returns a const reference to the list of peers. */
     const std::vector<STKPeer*> &getPeers() { return m_peers; }
-
     // --------------------------------------------------------------------
     /** Returns the number of currently connected peers. */
     unsigned int getPeerCount() { return (int)m_peers.size(); }
@@ -213,6 +215,12 @@ public:
     {
         return m_is_registered;
     }   // isRegistered
+    // --------------------------------------------------------------------
+    /** Sets the global host id of this host. */
+    void setMyHostId(uint8_t my_host_id) { m_host_id = my_host_id; }
+    // --------------------------------------------------------------------
+    /** Returns the host id of this host. */
+    uint8_t getMyHostId() const { return m_host_id; }
     // --------------------------------------------------------------------
 };   // class STKHost
 

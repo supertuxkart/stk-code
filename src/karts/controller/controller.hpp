@@ -41,6 +41,11 @@ class Material;
  */
 class Controller
 {
+private:
+    /** If this belongs to a player, it stores the active player data
+    *  structure. Otherwise it is 0. */
+    StateManager::ActivePlayer *m_player;
+
 protected:
     /** Pointer to the kart that is controlled by this controller. */
     AbstractKart *m_kart;
@@ -48,10 +53,6 @@ protected:
     /** A pointer to the main controller, from which the kart takes
      *  it commands. */
     KartControl  *m_controls;
-
-    /** If this belongs to a player, it stores the active player data
-     *  structure. Otherwise it is 0. */
-    StateManager::ActivePlayer *m_player;
 
     /** The name of the controller, mainly used for debugging purposes. */
     std::string  m_controller_name;

@@ -29,8 +29,9 @@
 
 GameSetup::GameSetup()
 {
-    m_race_config  = new RaceConfig();
-    m_local_master = 0;
+    m_race_config       = new RaceConfig();
+    m_num_local_players = 0;
+    m_local_master      = 0;
 }   // GameSetup
 
 //-----------------------------------------------------------------------------

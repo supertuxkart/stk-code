@@ -42,6 +42,9 @@ private:
      *  peer list. */
     uint8_t m_global_player_id;
 
+    /** Host id of this player. */
+    uint8_t m_host_id;
+
     /** The selected kart id. */
     std::string m_kart_name; 
 
@@ -64,6 +67,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the global ID of this player in this race. */
     int getGlobalPlayerId() const { return m_global_player_id; }
+    // ------------------------------------------------------------------------
+    /** Sets the host id of this player. */
+    void setHostId(int host_id) { m_host_id = host_id; }
+    // ------------------------------------------------------------------------
+    /** Returns the host id of this player. */
+    uint8_t getHostId() const { return m_host_id; }
     // ------------------------------------------------------------------------
     /** Sets the kart name for this player. */
     void setKartName(const std::string &kart_name) { m_kart_name = kart_name; }

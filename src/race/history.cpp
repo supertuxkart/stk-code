@@ -264,7 +264,7 @@ void History::Load()
     fgets(s, 1023, fd);
     if(sscanf(s, "numplayers: %d",&n)!=1)
         Log::fatal("History", "No number of players found in history file.");
-    race_manager->setNumLocalPlayers(n);
+    race_manager->setNumPlayers(n);
 
     fgets(s, 1023, fd);
     if(sscanf(s, "difficulty: %d",&n)!=1)
@@ -297,7 +297,7 @@ void History::Load()
         m_kart_ident.push_back(s1);
         if(i<race_manager->getNumPlayers())
         {
-            race_manager->setLocalKartInfo(i, s1);
+            race_manager->setPlayerKart(i, s1);
         }
     }   // for i<nKarts
     // FIXME: The model information is currently ignored

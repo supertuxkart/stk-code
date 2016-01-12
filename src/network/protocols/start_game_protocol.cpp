@@ -59,33 +59,36 @@ void StartGameProtocol::setup()
     // ---------------------
     // builds it and starts
     NetworkWorld::getInstance<NetworkWorld>()->start();
+
+    // The number of karts includes the AI karts, which are not supported atn
     race_manager->setNumKarts(m_game_setup->getPlayerCount());
-    race_manager->setNumPlayers(m_game_setup->getPlayerCount());
-    race_manager->setNumLocalPlayers(1);
+
+    // Set number of global and local players.
+    race_manager->setNumPlayers(m_game_setup->getPlayerCount(),
+                                m_game_setup->getNumLocalPlayers());
 
     // Create the kart information for the race manager:
     // -------------------------------------------------
     std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();
+    int local_player_id = 0;
     for (unsigned int i = 0; i < players.size(); i++)
     {
         NetworkPlayerProfile* profile = players[i];
-        bool is_me =  profile->getGlobalPlayerId()
-                   == STKHost::get()->getGameSetup()->getLocalMasterID();
+        bool is_local =  profile->getHostId()
+                   == STKHost::get()->getMyHostId();
         RemoteKartInfo rki(profile->getGlobalPlayerId(),
                            profile->getKartName(),
                            profile->getName(),
-                           /*hostid*/profile->getGlobalPlayerId(),
-                           !is_me);
+                           profile->getHostId(),
+                           !is_local);
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
-        rki.setLocalPlayerId(0);
-        // FIXME: for now (only one local player) the global player id
-        // can be used as host id.
-        rki.setHostId(profile->getGlobalPlayerId());
+        rki.setLocalPlayerId(local_player_id);
+        if(is_local) local_player_id++;
 
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
 
-        if(is_me)
+        if(is_local)
         {
             PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
             assert(profile_to_use);
@@ -103,10 +106,10 @@ void StartGameProtocol::setup()
                            StateManager::get()->getActivePlayer(new_player_id);
             device->setPlayer(ap);
             input_manager->getDeviceManager()->setSinglePlayer(ap);
-            race_manager->setLocalKartInfo(new_player_id,
-                                           profile->getKartName());
+            race_manager->setPlayerKart(new_player_id,
+                                        profile->getKartName());
             NetworkWorld::getInstance()->setSelfKart(profile->getKartName());
-        }   // if is_me
+        }   // if is_local
         else
         {
             StateManager::get()->createActivePlayer( NULL, NULL );

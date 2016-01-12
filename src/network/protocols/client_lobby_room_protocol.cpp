@@ -375,17 +375,17 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1                   2   3            7   8 
- *       ---------------------------------------------------------
- *  Size | 1 |         1         | 1 |      4     |              |
- *  Data | 1 | 0 <= race id < 16 | 4 | priv token | playernames* |
- *       ---------------------------------------------------------
+ *  Byte 0   1                   2   3            7        8
+ *       ------------------------------------------------------------------
+ *  Size | 1 |         1         | 1 |      4     |   1    |              |
+ *  Data | 1 | 0 <= race id < 16 | 4 | priv token | hostid | playernames* |
+ *       ------------------------------------------------------------------
  */
 void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 {
     NetworkString &data = event->data();
     // At least 12 bytes should remain now
-    if (data.size() < 7|| data[0] != 1 || data[2] != 4)
+    if (data.size() < 8|| data[0] != 1 || data[2] != 4)
     {
         Log::error("ClientLobbyRoomProtocol",
                    "A message notifying an accepted connection wasn't "
@@ -406,8 +406,13 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     else
         name = PlayerManager::getCurrentPlayer()->getName();
     uint8_t my_player_id = data.getUInt8(1);
+    uint8_t my_host_id   = data.getUInt8(7);
+    STKHost::get()->setMyHostId(my_host_id);
+
     NetworkPlayerProfile* profile = new NetworkPlayerProfile(my_player_id, name);
+    profile->setHostId(my_host_id);
     STKHost::get()->getGameSetup()->setLocalMaster(my_player_id);
+    m_setup->setNumLocalPlayers(1);
     m_setup->addPlayer(profile);
     // connection token
     uint32_t token = data.gui32(3);
@@ -417,21 +422,22 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 
     // Add all players
     // ===============
-    int n = 7;
+    int n = 8;
     while (n < data.size())
     {
         if (data[n] != 1 )
             Log::error("ClientLobbyRoomProtocol",
                        "Bad format in players list.");
 
-        uint8_t race_player_id = data[n + 1];
+        uint8_t player_id = data[n + 1];
         irr::core::stringw name;
         int bytes_read = data.decodeStringW(n + 2, &name);
+        uint8_t host_id = data.getUInt8(n+2+bytes_read);
 
         NetworkPlayerProfile* profile2 =
-            new NetworkPlayerProfile(race_player_id, name);
+            new NetworkPlayerProfile(player_id, name);
         m_setup->addPlayer(profile2);
-        n += bytes_read+2;
+        n += bytes_read+3;
         // Inform the network lobby of all players so that the GUI can
         // show all currently connected players.
         NetworkingLobby::getInstance()->addPlayer(profile2);

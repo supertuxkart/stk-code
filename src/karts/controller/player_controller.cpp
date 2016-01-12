@@ -40,11 +40,9 @@
 
 PlayerController::PlayerController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player)
-                : Controller(kart)
+                : Controller(kart, player)
 {
     assert(player != NULL);
-    m_player       = player;
-    m_player->setKart(kart);
     m_penalty_time = 0.0f;
 }   // PlayerController
 
