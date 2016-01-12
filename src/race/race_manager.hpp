@@ -56,14 +56,12 @@ static const std::string IDENT_CUTSCENE ("CUTSCENE"        );
  *     manager stores the GP information, but World queries only track
  *     and number of laps, so in case of GP this information is taken from
  *     the GrandPrix object), and local player information (number of local
- *     players, and selected karts). The local player information is read
- *     from the NetworkManager, gathered on the server (from all clients and
- *     the server, see NetworkManager::setupPlayerKartInfo), and then the
- *     combined information distributed to all RaceManagers in all clients
- *     and server. Even in no networking mode, the data flow is the same:
- *     information about local players is stored here, then processed by
- *     NetworkManager::setupPlayerKartInfo and the 'global' information about
- *     player karts is set in the RaceManager, to be used by World later on.
+ *     players, and selected karts). 
+ *     Information about player karts (which player selected which kart,
+ *     player ids) is stored in a RemoteKartInfo structure and used later
+ *     to initialise the KartStatus array (startNew()). The KartStatus array
+ *     stores information about all karts (player and AI), and is used to
+ *     determine the order in which karts are started (see startNextRace()).
  *  2) when a race is started, it creates the world, and keeps track of
  *     score during the race. When a race is finished, it deletes the world,
  *     and (depending on race mode) starts the next race by creating a new
@@ -357,7 +355,7 @@ public:
         ~RaceManager();
 
     void reset();
-    void setLocalKartInfo(unsigned int player_id, const std::string& kart);
+    void setPlayerKart(unsigned int player_id, const std::string &kart_name);
     void setPlayerKart(unsigned int player_id,
                        const RemoteKartInfo& ki);
 

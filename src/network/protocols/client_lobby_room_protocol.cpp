@@ -412,6 +412,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     NetworkPlayerProfile* profile = new NetworkPlayerProfile(my_player_id, name);
     profile->setHostId(my_host_id);
     STKHost::get()->getGameSetup()->setLocalMaster(my_player_id);
+    m_setup->setNumLocalPlayers(1);
     m_setup->addPlayer(profile);
     // connection token
     uint32_t token = data.gui32(3);

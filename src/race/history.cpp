@@ -297,7 +297,7 @@ void History::Load()
         m_kart_ident.push_back(s1);
         if(i<race_manager->getNumPlayers())
         {
-            race_manager->setLocalKartInfo(i, s1);
+            race_manager->setPlayerKart(i, s1);
         }
     }   // for i<nKarts
     // FIXME: The model information is currently ignored

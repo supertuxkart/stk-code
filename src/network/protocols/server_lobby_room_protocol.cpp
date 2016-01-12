@@ -58,6 +58,7 @@ ServerLobbyRoomProtocol::~ServerLobbyRoomProtocol()
 void ServerLobbyRoomProtocol::setup()
 {
     m_setup             = STKHost::get()->setupNewGame();
+    m_setup->setNumLocalPlayers(0);    // no local players on a server
     m_next_player_id.setAtomic(0);
 
     // In case of LAN we don't need our public address or register with the

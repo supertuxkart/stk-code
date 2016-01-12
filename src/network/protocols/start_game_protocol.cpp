@@ -59,12 +59,13 @@ void StartGameProtocol::setup()
     // ---------------------
     // builds it and starts
     NetworkWorld::getInstance<NetworkWorld>()->start();
+
+    // The number of karts includes the AI karts, which are not supported atn
     race_manager->setNumKarts(m_game_setup->getPlayerCount());
-    race_manager->setNumPlayers(m_game_setup->getPlayerCount());
-    // setNumPlayers by default sets number of local players to
-    // number of players - so avoid this to keep the original number:
-    race_manager->setNumPlayers(1, 
-                         /*local players*/race_manager->getNumLocalPlayers());
+
+    // Set number of global and local players.
+    race_manager->setNumPlayers(m_game_setup->getPlayerCount(),
+                                m_game_setup->getNumLocalPlayers());
 
     // Create the kart information for the race manager:
     // -------------------------------------------------
@@ -105,8 +106,8 @@ void StartGameProtocol::setup()
                            StateManager::get()->getActivePlayer(new_player_id);
             device->setPlayer(ap);
             input_manager->getDeviceManager()->setSinglePlayer(ap);
-            race_manager->setLocalKartInfo(new_player_id,
-                                           profile->getKartName());
+            race_manager->setPlayerKart(new_player_id,
+                                        profile->getKartName());
             NetworkWorld::getInstance()->setSelfKart(profile->getKartName());
         }   // if is_local
         else

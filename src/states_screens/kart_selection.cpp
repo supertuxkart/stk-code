@@ -1194,7 +1194,7 @@ void KartSelectionScreen::allPlayersDone()
             }
         }
 
-        race_manager->setLocalKartInfo(n, selected_kart);
+        race_manager->setPlayerKart(n, selected_kart);
 
         // Set per player difficulty if needed
         if (m_multiplayer && UserConfigParams::m_per_player_difficulty &&

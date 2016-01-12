@@ -138,22 +138,14 @@ void RaceManager::setPlayerKart(unsigned int player_id, const RemoteKartInfo& ki
 }   // setPlayerKart
     
 // ----------------------------------------------------------------------------
-/** Sets information about a kart used by a local player (i.e. on this
- *  computer).
- *  \param player_id  Id of this player.
- *  \param kart The kart this player uses.
- */
-void RaceManager::setLocalKartInfo(unsigned int player_id,
-                                   const std::string& kart)
+void RaceManager::setPlayerKart(unsigned int player_id,
+                                 const std::string &kart_name)
 {
-    assert(kart.size() > 0);
-    assert(player_id <getNumLocalPlayers());
-    assert(kart_properties_manager->getKart(kart) != NULL);
-
-    const PlayerProfile* profile = StateManager::get()->getActivePlayerProfile(player_id);
-    m_player_karts[player_id] = RemoteKartInfo(player_id, kart, profile->getName(),
-                                                     0, false);
-}   // setLocalKartInfo
+    const PlayerProfile* profile =
+                    StateManager::get()->getActivePlayerProfile(player_id);
+    RemoteKartInfo rki(player_id, kart_name, profile->getName(), 0, false);
+    m_player_karts[player_id] = rki;
+}   // setPlayerKart
 
 //-----------------------------------------------------------------------------
 /** Sets additional information for a player to indicate which soccer team it
@@ -209,7 +201,7 @@ int RaceManager::getLocalPlayerGPRank(const int player_id) const
 //-----------------------------------------------------------------------------
 /** Sets the number of players and optional the number of local players.
  *  \param num Number of players.
- *  \param local_players
+ *  \param local_players Number of local players, only used from networking.
  */
 void RaceManager::setNumPlayers(int players, int local_players)
 {
@@ -390,8 +382,8 @@ void RaceManager::startNew(bool from_overworld)
         }
     }
 
-    // Then the players, which start behind the AI karts
-    // -------------------------------------------------
+    // Then add the players, which start behind the AI karts
+    // -----------------------------------------------------
     for(unsigned int i = 0; i < m_player_karts.size(); i++)
     {
         KartType kt= m_player_karts[i].isNetworkPlayer() ? KT_NETWORK_PLAYER 
@@ -906,26 +898,10 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 }   // startSingleRace
 
 //-----------------------------------------------------------------------------
-/** Receive and store the information from sendKartsInformation()
-*/
+/** Fills up the remaining kart slots with AI karts.
+v*/
 void RaceManager::setupPlayerKartInfo()
 {
-    std::vector<RemoteKartInfo> kart_info;
-
-    // Get the local kart info
-    for(unsigned int i=0; i<getNumPlayers(); i++)
-        kart_info.push_back(getKartInfo(i));
-
-    // Now sort by (hostid, playerid)
-    std::sort(kart_info.begin(), kart_info.end());
-
-    // Set the global player ID for each player
-    for(unsigned int i=0; i<kart_info.size(); i++)
-    {
-        kart_info[i].setGlobalPlayerId(i);
-        setPlayerKart(i, kart_info[i]);
-    }
-
     computeRandomKartList();
 }   // setupPlayerKartInfo
 

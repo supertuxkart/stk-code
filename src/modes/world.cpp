@@ -883,7 +883,7 @@ void World::updateWorld(float dt)
                               UserConfigParams::m_default_kart.c_str());
                     UserConfigParams::m_default_kart.revertToDefaults();
                 }
-                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+                race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
                 // ASSIGN should make sure that only input from assigned devices
                 // is read.

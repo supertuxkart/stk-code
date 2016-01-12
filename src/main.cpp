@@ -466,12 +466,13 @@ void setupRaceStart()
         Log::warn("main", "Kart '%s' is unknown so will use the "
             "default kart.",
             UserConfigParams::m_default_kart.c_str());
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart.getDefaultValue());
+        race_manager->setPlayerKart(0, 
+                           UserConfigParams::m_default_kart.getDefaultValue());
     }
     else
     {
         // Set up race manager appropriately
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
     }
 
     // ASSIGN should make sure that only input from assigned devices
@@ -836,7 +837,7 @@ int handleCmdLine()
             // up upon player creation.
             if (StateManager::get()->activePlayerCount() > 0)
             {
-                race_manager->setLocalKartInfo(0, s);
+                race_manager->setPlayerKart(0, s);
             }
             Log::verbose("main", "You chose to use kart '%s'.",
                          s.c_str());
