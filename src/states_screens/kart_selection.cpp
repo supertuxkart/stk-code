@@ -1205,15 +1205,10 @@ void KartSelectionScreen::allPlayersDone()
     // ---- Switch to assign mode
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
-    if (!m_multiplayer)
-    {
-        input_manager->getDeviceManager()
-            ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-    }
-    else
-    {
-        input_manager->getDeviceManager()->setSinglePlayer( NULL );
-    }
+    StateManager::ActivePlayer *ap = m_multiplayer 
+                                   ? NULL 
+                                   : StateManager::get()->getActivePlayer(0);
+    input_manager->getDeviceManager()->setSinglePlayer(ap);
 
     // ---- Go to next screen or return to overworld
     if (m_from_overworld || m_go_to_overworld_next)
