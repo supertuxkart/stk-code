@@ -413,12 +413,9 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     profile->setHostId(my_host_id);
     STKHost::get()->getGameSetup()->setLocalMaster(my_player_id);
     m_setup->setNumLocalPlayers(1);
-    m_setup->addPlayer(profile);
     // connection token
     uint32_t token = data.gui32(3);
     peer->setClientServerToken(token);
-    NetworkingLobby::getInstance()->addPlayer(profile);
-
 
     // Add all players
     // ===============
@@ -436,6 +433,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 
         NetworkPlayerProfile* profile2 =
             new NetworkPlayerProfile(player_id, name);
+        profile2->setHostId(host_id);
         m_setup->addPlayer(profile2);
         n += bytes_read+3;
         // Inform the network lobby of all players so that the GUI can
@@ -443,7 +441,10 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         NetworkingLobby::getInstance()->addPlayer(profile2);
     }
 
-    // add self
+    // Add self after other players so that player order is identical
+    // on server and all clients.
+    m_setup->addPlayer(profile);
+    NetworkingLobby::getInstance()->addPlayer(profile);
     m_server = event->getPeer();
     m_state = CONNECTED;
 }   // connectionAccepted

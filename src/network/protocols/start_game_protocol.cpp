@@ -74,50 +74,51 @@ void StartGameProtocol::setup()
     for (unsigned int i = 0; i < players.size(); i++)
     {
         NetworkPlayerProfile* profile = players[i];
-        bool is_local =  profile->getHostId()
-                   == STKHost::get()->getMyHostId();
-        RemoteKartInfo rki(profile->getGlobalPlayerId(),
+        bool is_local = profile->isLocalPlayer();
+
+        // A server does not create a NetworkingLobby (where clients
+        // create the ActivePlayers for local players, in order to bind the
+        // correct input device to the players). All non-local players (esp.
+        // all karts on the server) are created here.
+        if(NetworkConfig::get()->isServer() || !is_local)
+        {
+            // On the server no device or player profile is needed.
+            StateManager::get()->createActivePlayer(NULL, NULL);
+        }
+
+        // Adjust the local player id so that local players have the numbers
+        // 0 to num-1; and all other karts start with num. This way the local
+        // players get the first ActivePlayers assigned (which have the 
+        // corresponding device associated with it).
+        RemoteKartInfo rki(is_local ? local_player_id
+                                    : i-local_player_id+STKHost::get()->getGameSetup()->getNumLocalPlayers(),
                            profile->getKartName(),
                            profile->getName(),
                            profile->getHostId(),
                            !is_local);
+        rki.setGlobalPlayerId(profile->getGlobalPlayerId());
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
-        rki.setLocalPlayerId(local_player_id);
-        if(is_local) local_player_id++;
+        if(is_local)
+        {
+            // Set the local player kart
+            if(local_player_id==0)
+                NetworkWorld::getInstance()->setSelfKart(profile->getKartName());
+            rki.setLocalPlayerId(local_player_id);
+            local_player_id++;
+        }
 
         // Inform the race manager about the data for this kart.
         race_manager->setPlayerKart(i, rki);
-
-        if(is_local)
-        {
-            PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
-            assert(profile_to_use);
-            InputDevice* device = input_manager->getDeviceManager()
-                                ->getLatestUsedDevice();
-            int new_player_id = 0;
-
-            // more than one player, we're the first
-            if (StateManager::get()->getActivePlayers().size() >= 1)
-                new_player_id = 0;
-            else
-                new_player_id = StateManager::get()
-                              ->createActivePlayer(profile_to_use, device);
-            StateManager::ActivePlayer *ap =
-                           StateManager::get()->getActivePlayer(new_player_id);
-            device->setPlayer(ap);
-            input_manager->getDeviceManager()->setSinglePlayer(ap);
-            race_manager->setPlayerKart(new_player_id,
-                                        profile->getKartName());
-            NetworkWorld::getInstance()->setSelfKart(profile->getKartName());
-        }   // if is_local
-        else
-        {
-            StateManager::get()->createActivePlayer( NULL, NULL );
-            race_manager->setPlayerKart(i, rki);
-        }
     }   // for i in players
 
-    race_manager->computeRandomKartList();
+    // Make sure that if there is only a single local player this player can
+    // use all input devices.
+    StateManager::ActivePlayer *ap = race_manager->getNumLocalPlayers()>1
+                                   ? NULL 
+                                   : StateManager::get()->getActivePlayer(0);
+
+    input_manager->getDeviceManager()->setSinglePlayer(ap);
+
     Log::info("StartGameProtocol", "Player configuration ready.");
     m_state = SYNCHRONIZATION_WAIT;
 
