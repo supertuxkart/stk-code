@@ -171,16 +171,7 @@ private:
     MusicInformation          *m_race_over_music;
 
     /** For highscores */
-    std::string m_highscore_who;
-
-    /** For highscores */
-    StateManager::ActivePlayer *m_highscore_player;
-
-    /** For highscores */
     int m_highscore_rank;
-
-    /** For highscores */
-    int m_highscore_time;
 
     unsigned int m_width_all_points;
 
@@ -261,8 +252,7 @@ public:
       * \param rank Highscore rank (first highscore, second highscore, etc.). This is not the race rank
       * \param time Finish time in seconds
       */
-    void setHighscore(const std::string &kart,
-                      StateManager::ActivePlayer* player, int rank, int time);
+    void setHighscore(int rank);
 
     virtual void onConfirm();
 };   // RaceResultGUI

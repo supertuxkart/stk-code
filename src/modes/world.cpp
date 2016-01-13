@@ -471,13 +471,10 @@ void World::terminateRace()
     // Update highscores, and retrieve the best highscore if relevant
     // to show it in the GUI
     int best_highscore_rank = -1;
-    int best_finish_time = -1;
     std::string highscore_who = "";
-    StateManager::ActivePlayer* best_player = NULL;
     if (!this->isNetworkWorld())
     {
-        updateHighscores(&best_highscore_rank, &best_finish_time, &highscore_who,
-                     &best_player);
+        updateHighscores(&best_highscore_rank);
     }
 
     // Check achievements
@@ -562,8 +559,7 @@ void World::terminateRace()
 
     if (best_highscore_rank > 0)
     {
-        results->setHighscore(highscore_who, best_player, best_highscore_rank,
-                              best_finish_time);
+        results->setHighscore(best_highscore_rank);
     }
     else
     {
@@ -1037,12 +1033,9 @@ Highscores* World::getHighscores() const
  *  score, if so it notifies the HighscoreManager so the new score is added
  *  and saved.
  */
-void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
-                             std::string* highscore_who,
-                             StateManager::ActivePlayer** best_player)
+void World::updateHighscores(int* best_highscore_rank)
 {
     *best_highscore_rank = -1;
-    *best_player = NULL;
 
     if(!m_use_highscores) return;
 
@@ -1109,9 +1102,6 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
                 highscore_rank < *best_highscore_rank)
             {
                 *best_highscore_rank = highscore_rank;
-                *best_finish_time = (int)(k->getFinishTime());
-                *best_player = controller->getPlayer();
-                *highscore_who = k->getIdent();
             }
 
             highscore_manager->saveHighscores();

@@ -1119,22 +1119,14 @@ void RaceResultGUI::displaySoccerResults()
 
 void RaceResultGUI::clearHighscores()
 {
-    m_highscore_who = "";
-    m_highscore_player = NULL;
     m_highscore_rank = 0;
-    m_highscore_time = -1;
 }   // clearHighscores
 
 //-----------------------------------------------------------------------------
 
-void RaceResultGUI::setHighscore(const std::string &who,
-                                 StateManager::ActivePlayer* player, int rank,
-                                 int time)
+void RaceResultGUI::setHighscore(int rank)
 {
-    m_highscore_who = who;
-    m_highscore_player = player;
     m_highscore_rank = rank;
-    m_highscore_time = time;
 }   // setHighscore
 
 // ----------------------------------------------------------------------------
