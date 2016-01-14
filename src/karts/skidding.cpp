@@ -416,10 +416,10 @@ void Skidding::update(float dt, bool is_on_ground,
                                              bonus_force, bonus_time,
                                              /*fade-out-time*/ 1.0f);
                     
-                    StateManager::ActivePlayer *c = m_kart->getController()->getPlayer();
-                    if (c && c->getConstProfile() == PlayerManager::getCurrentPlayer())
+                    if (m_kart->getController()->canGetAchievements())
                     {
-                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_SKIDDING, "skidding");
+                        PlayerManager::increaseAchievement(
+                                AchievementInfo::ACHIEVE_SKIDDING, "skidding");
                     }
                 }
                 else {

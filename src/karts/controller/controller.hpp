@@ -61,6 +61,7 @@ public:
                   Controller         (AbstractKart *kart,
                                       StateManager::ActivePlayer *player=NULL);
     virtual      ~Controller         () {};
+    virtual bool  canGetAchievements () const;
     virtual void  reset              () = 0;
     virtual void  update             (float dt) = 0;
     virtual void  handleZipper       (bool play_sound) = 0;
@@ -93,7 +94,6 @@ public:
     // ---------------------------------------------------------------------------
     /** Returns the player object (or NULL if it's a computer controller). */
     const StateManager::ActivePlayer *getPlayer () const { return m_player; }
-
     // ------------------------------------------------------------------------
     /** Default: ignore actions. Only PlayerController get them. */
     virtual void action(PlayerAction action, int value) = 0;

@@ -307,15 +307,14 @@ void Physics::update(float dt)
 
                 // Check for achievements
                 AbstractKart * kart = World::getWorld()->getKart(f->getOwnerId());
-                LocalPlayerController *c =
+                LocalPlayerController *lpc =
                     dynamic_cast<LocalPlayerController*>(kart->getController());
 
                 // Check that it's not a kart hitting itself (this can
                 // happen at the time a flyable is shot - release too close
                 // to the kart, and it's the current player. At this stage
                 // only the current player can get achievements.
-                if (target_kart != kart && c &&
-                    c->getPlayer()->getConstProfile() == PlayerManager::getCurrentPlayer())
+                if (target_kart != kart && lpc && lpc->canGetAchievements())
                 {
                     // Compare the current value of hits with the 'hit' goal value
                     // (otherwise it would be compared with the kart id goal value,

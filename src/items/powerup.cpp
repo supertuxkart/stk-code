@@ -174,9 +174,8 @@ void Powerup::use()
     const KartProperties *kp = m_owner->getKartProperties();
 
     // The player gets an achievement point for using a powerup
-    StateManager::ActivePlayer * player = m_owner->getController()->getPlayer();
-    if (m_type != PowerupManager::POWERUP_NOTHING &&
-        player != NULL && player->getConstProfile() == PlayerManager::getCurrentPlayer())
+    if (m_type != PowerupManager::POWERUP_NOTHING      &&
+        m_owner->getController()->canGetAchievements()    )
     {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER, "poweruplover");
     }

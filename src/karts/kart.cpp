@@ -868,8 +868,7 @@ void Kart::finishedRace(float time)
     {
         // Save for music handling in race result gui
         setRaceResult();
-        setController(new EndController(this, m_controller->getPlayer(),
-                                        m_controller));
+        setController(new EndController(this, m_controller));
         // Skip animation if this kart is eliminated
         if (m_eliminated) return;
 

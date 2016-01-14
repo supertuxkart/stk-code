@@ -500,8 +500,7 @@ void World::terminateRace()
         for(unsigned int i = 0; i < kart_amount; i++)
         {
             // Retrieve the current player
-            StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
-            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
+            if (m_karts[i]->getController()->canGetAchievements())
             {
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == winner_position && kart_amount > opponents )
@@ -525,8 +524,7 @@ void World::terminateRace()
         for(unsigned int i = 0; i < kart_amount; i++)
         {
             // Retrieve the current player
-            StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
-            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
+            if (m_karts[i]->getController()->canGetAchievements())
             {
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == 1 )
@@ -1091,6 +1089,7 @@ void World::updateHighscores(int* best_highscore_rank)
                                   (LocalPlayerController*)(k->getController());
 
         int highscore_rank = 0;
+        // The player is a local player, so it is sure that getPlayer() exists.
         if (controller->getPlayer()->getProfile() != NULL) // if we have the player profile here
             highscore_rank = highscores->addData(k->getIdent(),
                               controller->getPlayer()->getProfile()->getName(),

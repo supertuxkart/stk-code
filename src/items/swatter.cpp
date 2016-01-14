@@ -290,13 +290,11 @@ void Swatter::squashThingsAround()
     m_closest_kart->setSquash(kp->getSwatterSquashDuration(),
         kp->getSwatterSquashSlowdown());
 
-    //Handle achievement if the swatter is used by the current player
-    const StateManager::ActivePlayer *const ap = m_kart->getController()
-        ->getPlayer();
-    if (ap && ap->getConstProfile() == PlayerManager::getCurrentPlayer())
+    // Handle achievement if the swatter is used by the current player
+    if (m_kart->getController()->canGetAchievements())
     {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MOSQUITO,
-            "swatter", 1);
+                                           "swatter", 1);
     }
 
     if (m_closest_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)

@@ -82,8 +82,6 @@ private:
         float            m_y_pos;
         /** True if kart is a player kart. */
         bool             m_is_player_kart;
-        /** Only if m_is_player_kart is true */
-        const StateManager::ActivePlayer* m_player;
         /** The radius to use when sorting the entries. Positive values
             will rotate downwards, negatives are upwards. */
         float            m_radius;

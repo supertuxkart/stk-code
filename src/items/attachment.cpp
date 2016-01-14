@@ -225,10 +225,7 @@ void Attachment::clear()
 */
 void Attachment::hitBanana(Item *item, int new_attachment)
 {
-    const KartProperties *kp = m_kart->getKartProperties();
-    const StateManager::ActivePlayer *const ap = m_kart->getController()
-                                                       ->getPlayer();
-    if(ap && ap->getConstProfile()==PlayerManager::getCurrentPlayer())
+    if(m_kart->getController()->canGetAchievements())
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_BANANA,
                                            "banana",1                      );
     //Bubble gum shield effect:
@@ -250,6 +247,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         return;
     }
 
+    const KartProperties *kp = m_kart->getKartProperties();
     switch(getType())   // If there already is an attachment, make it worse :)
     {
     case ATTACH_BOMB:

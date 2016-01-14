@@ -476,8 +476,6 @@ void RaceResultGUI::determineTableLayout()
         RowInfo *ri           = &(m_all_row_infos[position-first_position]);
         ri->m_is_player_kart  = kart->getController()->isLocalPlayerController();
         ri->m_kart_name       = translations->fribidize(kart->getName());
-        ri->m_player          = ri->m_is_player_kart
-                              ? kart->getController()->getPlayer() : NULL;
 
         video::ITexture *icon =
             kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -844,8 +842,6 @@ void RaceResultGUI::determineGPLayout()
             kart->getKartProperties()->getIconMaterial()->getTexture();
         ri->m_kart_name      = translations->fribidize(kart->getName());
         ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
-        ri->m_player         = ri->m_is_player_kart
-                             ? kart->getController()->getPlayer() : NULL;
 
         // In FTL karts do have a time, which is shown even when the kart
         // is eliminated
