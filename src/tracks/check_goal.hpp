@@ -27,6 +27,7 @@ using namespace irr;
 class CheckManager;
 class XMLNode;
 class Track;
+class Vec3;
 
 /**
  *  \brief Implements a simple checkline that will score a point when the
@@ -51,6 +52,11 @@ public:
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              unsigned int indx) OVERRIDE;
     virtual void reset(const Track &track) OVERRIDE;
+
+    // ------------------------------------------------------------------------
+    bool getTeam() const                             { return m_first_goal; }
+    // ------------------------------------------------------------------------
+    Vec3 convertTo3DCenter() const;
 };   // CheckLine
 
 #endif

@@ -43,6 +43,7 @@ private:
     bool m_stuck;
 
 protected:
+
     /** Length of the kart, storing it here saves many function calls. */
     float m_kart_length;
 
@@ -57,6 +58,9 @@ protected:
 
     static bool m_ai_debug;
 
+    /** Position info structure of targets. */
+    struct posData {bool behind; bool on_side; float angle; float distance;};
+
     virtual void update      (float delta) ;
     virtual void setSteering   (float angle, float dt);
     void    setControllerName(const std::string &name);
@@ -67,6 +71,7 @@ protected:
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
     bool     isStuck() const { return m_stuck; }
+    void     checkPosition(const Vec3&, posData*, Vec3* lc = NULL) const;
 
 public:
              AIBaseController(AbstractKart *kart,
@@ -85,7 +90,8 @@ public:
     virtual bool isPlayerController() const { return false; }
     virtual bool isLocalPlayerController() const { return false; }
     virtual void action(PlayerAction action, int value) {};
-    virtual void  skidBonusTriggered() {};
+    virtual void skidBonusTriggered() {};
+
 };   // AIBaseController
 
 #endif

@@ -1,8 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2007 Eduardo Hernandez Munoz
-//  Copyright (C) 2010-2015 Joerg Henrichs
+//  Copyright (C) 2016 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,34 +16,38 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_BATTLE_AI_HPP
-#define HEADER_BATTLE_AI_HPP
+#ifndef HEADER_SOCCER_AI_HPP
+#define HEADER_SOCCER_AI_HPP
 
 #include "karts/controller/arena_ai.hpp"
 
-class ThreeStrikesBattle;
+class SoccerWorld;
 class Vec3;
 class Item;
 
-/** The actual battle AI.
+/** The actual soccer AI.
  * \ingroup controller
  */
-class BattleAI : public ArenaAI
+class SoccerAI : public ArenaAI
 {
 private:
     /** Keep a pointer to world. */
-    ThreeStrikesBattle *m_world;
+    SoccerWorld *m_world;
+
+    bool m_cur_team;
+    Vec3 correctBallPosition(const Vec3&);
 
     virtual void findClosestKart(bool use_difficulty);
     virtual void findTarget();
     virtual int  getCurrentNode() const;
     virtual bool isWaiting() const;
 public:
-                 BattleAI(AbstractKart *kart,
+                 SoccerAI(AbstractKart *kart,
                           StateManager::ActivePlayer *player = NULL);
-                ~BattleAI();
+                ~SoccerAI();
     virtual void update      (float delta);
     virtual void reset       ();
+    bool         getAITeam() const          { return m_cur_team; }
 };
 
 #endif

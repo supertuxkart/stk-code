@@ -107,6 +107,10 @@ enum DebugMenuCommand
     DEBUG_VIEW_KART_TWO,
     DEBUG_VIEW_KART_THREE,
     DEBUG_VIEW_KART_FOUR,
+    DEBUG_VIEW_KART_FIVE,
+    DEBUG_VIEW_KART_SIX,
+    DEBUG_VIEW_KART_SEVEN,
+    DEBUG_VIEW_KART_EIGHT,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
@@ -494,6 +498,22 @@ bool handleContextMenuAction(s32 cmdID)
     {
         changeCameraTarget(4);
     }
+    else if (cmdID == DEBUG_VIEW_KART_FIVE)
+    {
+        changeCameraTarget(5);
+    }
+    else if (cmdID == DEBUG_VIEW_KART_SIX)
+    {
+        changeCameraTarget(6);
+    }
+    else if (cmdID == DEBUG_VIEW_KART_SEVEN)
+    {
+        changeCameraTarget(7);
+    }
+    else if (cmdID == DEBUG_VIEW_KART_EIGHT)
+    {
+        changeCameraTarget(8);
+    }
     else if (cmdID == DEBUG_PRINT_START_POS)
     {
         if (!world) return false;
@@ -691,6 +711,10 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"To kart two", DEBUG_VIEW_KART_TWO);
             sub->addItem(L"To kart three", DEBUG_VIEW_KART_THREE);
             sub->addItem(L"To kart four", DEBUG_VIEW_KART_FOUR);
+            sub->addItem(L"To kart five", DEBUG_VIEW_KART_FIVE);
+            sub->addItem(L"To kart six", DEBUG_VIEW_KART_SIX);
+            sub->addItem(L"To kart seven", DEBUG_VIEW_KART_SEVEN);
+            sub->addItem(L"To kart eight", DEBUG_VIEW_KART_EIGHT);
 
             mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 

@@ -154,7 +154,8 @@ void TrackInfoScreen::init()
     // -------------
     const int local_players = race_manager->getNumLocalPlayers();
     const bool has_AI =
-        (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ?
+        (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
+         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ?
          m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
          race_manager->hasAI());
     m_ai_kart_spinner->setVisible(has_AI);
@@ -170,7 +171,8 @@ void TrackInfoScreen::init()
         m_ai_kart_spinner->setValue(num_ai);
         race_manager->setNumKarts(num_ai + local_players);
         // Set the max karts supported based on the battle arena selected
-        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+           race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         {
             m_ai_kart_spinner->setMax(max_arena_players - local_players);
         }
@@ -181,8 +183,9 @@ void TrackInfoScreen::init()
         {
             m_ai_kart_spinner->setMin(3 - local_players);
         }
-        // Make sure in battle mode at least 1 ai for single player
-        else if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
+        // Make sure in battle and soccer mode at least 1 ai for single player
+        else if((race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+            race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER) &&
             local_players == 1 &&
             !UserConfigParams::m_artist_debug_mode)
             m_ai_kart_spinner->setMin(1);
@@ -310,7 +313,8 @@ void TrackInfoScreen::onEnterPressedInternal()
     const int max_arena_players = m_track->getMaxArenaPlayers();
     const int local_players = race_manager->getNumLocalPlayers();
     const bool has_AI =
-        (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ?
+        (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
+         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ?
          m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
          race_manager->hasAI());
 

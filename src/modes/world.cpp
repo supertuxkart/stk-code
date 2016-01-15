@@ -32,6 +32,7 @@
 #include "input/keyboard_device.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/battle_ai.hpp"
+#include "karts/controller/soccer_ai.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
@@ -352,6 +353,8 @@ Controller* World::loadAIController(AbstractKart *kart)
 
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
         turn=1;
+    else if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
+        turn=2;
     // If different AIs should be used, adjust turn (or switch randomly
     // or dependent on difficulty)
     switch(turn)
@@ -361,6 +364,9 @@ Controller* World::loadAIController(AbstractKart *kart)
             break;
         case 1:
             controller = new BattleAI(kart);
+            break;
+        case 2:
+            controller = new SoccerAI(kart);
             break;
         default:
             Log::warn("[World]", "Unknown AI, using default.");

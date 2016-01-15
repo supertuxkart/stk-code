@@ -31,7 +31,6 @@ enum SoccerTeam
     SOCCER_TEAM_NONE=-1,
     SOCCER_TEAM_RED=0,
     SOCCER_TEAM_BLUE=1,
-    NB_SOCCER_TEAMS
 };
 
 /** Game difficulty per player. */

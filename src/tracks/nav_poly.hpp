@@ -61,7 +61,8 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns true if a given point lies in this polygon. */
-    bool                        pointInPoly(const Vec3& p) const;
+    bool                        pointInPoly(const Vec3& p,
+                                            bool ignore_vertical) const;
 
     const Vec3&                 operator[](int i) const ;
 
