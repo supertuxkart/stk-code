@@ -47,7 +47,6 @@ public:
                 ~SoccerAI();
     virtual void update      (float delta);
     virtual void reset       ();
-    bool         getAITeam() const          { return m_cur_team; }
 };
 
 #endif

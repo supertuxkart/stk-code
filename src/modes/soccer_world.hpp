@@ -62,6 +62,7 @@ private:
     std::vector<float> m_red_score_times;
     std::vector<int> m_blue_scorers;
     std::vector<float> m_blue_score_times;
+    std::map<int, bool> m_kart_team_map;
 
     /** Data generated from navmesh */
     std::vector<int> m_kart_on_node;

@@ -70,6 +70,7 @@ SoccerWorld::~SoccerWorld()
  */
 void SoccerWorld::init()
 {
+    m_kart_team_map.clear();
     WorldWithRank::init();
     m_display_rank = false;
     m_goal_timer = 0.f;
@@ -319,9 +320,21 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
     bool team = true;
 
     if (kart_type == RaceManager::KT_AI)
+    {
         team = (index % 2 == 0 ? true : false);
+        m_kart_team_map[index] = team;
+    }
     else
-        team = getKartTeam(index);
+    {
+        int rm_id = index -
+            (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
+
+        assert(rm_id >= 0);
+        team = (race_manager
+            ->getKartInfo(rm_id).getSoccerTeam() == SOCCER_TEAM_BLUE ?
+            true : false);
+        m_kart_team_map[index] = team;
+    }
 
     if(!team)
     {
@@ -458,24 +471,14 @@ void SoccerWorld::resetAllNodes()
 //-----------------------------------------------------------------------------
 bool SoccerWorld::getKartTeam(unsigned int kart_id) const
 {
-    // Test for human player first
-    int rm_id = kart_id -
-        (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
+    std::map<int, bool>::const_iterator n = m_kart_team_map.find(kart_id);
+    if (n != m_kart_team_map.end())
+    {
+        return n->second;
+    }
 
-    if (rm_id >= 0)
-    {
-        return (race_manager
-            ->getKartInfo(rm_id).getSoccerTeam() == SOCCER_TEAM_BLUE ?
-            true : false);
-    }
-    else if (m_karts.size() > 0)
-    {
-        SoccerAI* controller =
-            dynamic_cast<SoccerAI*>(m_karts[kart_id]->getController());
-        if (controller)
-            return controller->getAITeam();
-    }
     // Fallback
     Log::warn("SoccerWorld", "Unknown team, using blue default.");
     return true;
+
 }
