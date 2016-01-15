@@ -370,7 +370,7 @@ void RaceGUI::drawGlobalMiniMap()
         Vec3 draw_at;
         world->getTrack()->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
         video::ITexture* icon =
-            irr_driver->getTexture(FileManager::GUI, "soccer_ball_blue.png");
+            irr_driver->getTexture(FileManager::GUI, "soccer_ball_normal.png");
 
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_ai_size>>2)),
