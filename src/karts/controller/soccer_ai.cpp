@@ -82,8 +82,25 @@ void SoccerAI::reset()
     ArenaAI::reset();
     AIBaseController::reset();
 
-    m_cur_team = (m_kart->getWorldKartId() % 2 == 0 ?
-        SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
+    if (race_manager->getNumPlayers() == 1)
+    {
+        // Same handle in SoccerWorld::createKart
+        if (race_manager->getKartInfo(0).getSoccerTeam() == SOCCER_TEAM_RED)
+        {
+            m_cur_team = (m_kart->getWorldKartId() % 2 == 0 ?
+               SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
+        }
+        else
+        {
+            m_cur_team = (m_kart->getWorldKartId() % 2 == 0 ?
+               SOCCER_TEAM_RED : SOCCER_TEAM_BLUE);
+        }
+    }
+    else
+    {
+        m_cur_team = (m_kart->getWorldKartId() % 2 == 0 ?
+            SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
+    }
 }   // reset
 
 //-----------------------------------------------------------------------------

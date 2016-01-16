@@ -321,7 +321,22 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
 
     if (kart_type == RaceManager::KT_AI)
     {
-        team = (index % 2 == 0 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
+        if (race_manager->getNumPlayers() == 1)
+        {
+            // Make AI even when single player choose a different team
+            if (race_manager->getKartInfo(0).getSoccerTeam() == SOCCER_TEAM_RED)
+            {
+                team = (index % 2 == 0 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
+            }
+            else
+            {
+                team = (index % 2 == 0 ? SOCCER_TEAM_RED : SOCCER_TEAM_BLUE);
+            }
+        }
+        else
+        {
+            team = (index % 2 == 0 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
+        }
         m_kart_team_map[index] = team;
     }
     else

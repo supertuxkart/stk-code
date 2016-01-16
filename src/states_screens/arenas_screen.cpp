@@ -198,14 +198,6 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
             Track* clicked_track = track_manager->getTrack(selection);
             if (clicked_track != NULL)
             {
-                //HACK hardcode for single player soccer
-                if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER &&
-                    race_manager->getNumPlayers() == 1)
-                {
-                    race_manager->setMaxGoal(4);
-                    race_manager->setKartSoccerTeam(0, SOCCER_TEAM_RED);
-                }
-
                 TrackInfoScreen::getInstance()->setTrack(clicked_track);
                 TrackInfoScreen::getInstance()->push();
             }   // clickedTrack !=  NULL
