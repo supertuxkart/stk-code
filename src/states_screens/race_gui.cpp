@@ -235,7 +235,7 @@ void RaceGUI::drawScores()
     irr::video::ITexture *red_team = irr_driver->getTexture(FileManager::GUI,
                                                             "soccer_ball_red.png");
     irr::video::ITexture *blue_team = irr_driver->getTexture(FileManager::GUI,
-                                                             "soccer_ball_blue.png");
+                                                            "soccer_ball_blue.png");
     irr::video::ITexture *team_icon = red_team;
 
     for(unsigned int i=0; i<2; i++)
@@ -243,7 +243,7 @@ void RaceGUI::drawScores()
         core::recti position(offset_x, offset_y,
             offset_x + 2*m_minimap_player_size, offset_y + 2*m_minimap_player_size);
 
-        core::stringw score = StringUtils::toWString(soccerWorld->getScore(i));
+        core::stringw score = StringUtils::toWString(soccerWorld->getScore((SoccerTeam)i));
         int string_height =
             GUIEngine::getFont()->getDimension(score.c_str()).Height;
         core::recti pos(position.UpperLeftCorner.X + 5,
@@ -364,22 +364,6 @@ void RaceGUI::drawGlobalMiniMap()
             dest, source, NULL, video::SColor(127, 255, 255, 255), true);
     }
 
-    SoccerWorld *sw = dynamic_cast<SoccerWorld*>(World::getWorld());
-    if (sw)
-    {
-        Vec3 draw_at;
-        world->getTrack()->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
-        video::ITexture* icon =
-            irr_driver->getTexture(FileManager::GUI, "soccer_ball_normal.png");
-
-        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
-        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_ai_size>>2)),
-                                 lower_y   -(int)(draw_at.getY()+(m_minimap_ai_size>>2)),
-                                 m_map_left+(int)(draw_at.getX()+(m_minimap_ai_size>>2)),
-                                 lower_y   -(int)(draw_at.getY()-(m_minimap_ai_size>>2)));
-        draw2DImage(icon, position, source, NULL, NULL, true);
-    }
-
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const AbstractKart *kart = world->getKart(i);
@@ -401,6 +385,22 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
         draw2DImage(icon, position, source, NULL, NULL, true);
     }   // for i<getNumKarts
+
+    SoccerWorld *sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+    if (sw)
+    {
+        Vec3 draw_at;
+        world->getTrack()->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
+        video::ITexture* icon =
+            irr_driver->getTexture(FileManager::GUI, "soccer_ball_normal.png");
+
+        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
+        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_ai_size>>2)),
+                                 lower_y   -(int)(draw_at.getY()+(m_minimap_ai_size>>2)),
+                                 m_map_left+(int)(draw_at.getX()+(m_minimap_ai_size>>2)),
+                                 lower_y   -(int)(draw_at.getY()-(m_minimap_ai_size>>2)));
+        draw2DImage(icon, position, source, NULL, NULL, true);
+    }
 
 }   // drawGlobalMiniMap
 

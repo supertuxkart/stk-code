@@ -38,6 +38,9 @@ class Vec3;
 class CheckGoal : public CheckStructure
 {
 private:
+    /** Previois ball position. */
+    Vec3            m_previous_ball_position;
+
     /** Which team is this goal for? */
     bool            m_first_goal;
 

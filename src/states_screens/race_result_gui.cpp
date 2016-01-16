@@ -988,8 +988,8 @@ void RaceResultGUI::displaySoccerResults()
     RowInfo *ri = &(m_all_row_infos[0]);
     int current_y = (int)ri->m_y_pos;
     SoccerWorld* sw = (SoccerWorld*)World::getWorld();
-    const int red_score = sw->getScore(false);
-    const int blue_score = sw->getScore(true);
+    const int red_score = sw->getScore(SOCCER_TEAM_RED);
+    const int blue_score = sw->getScore(SOCCER_TEAM_BLUE);
 
     GUIEngine::Widget *table_area = getWidget("result-table");
     int height = table_area->m_h + table_area->m_y;
@@ -1018,7 +1018,7 @@ void RaceResultGUI::displaySoccerResults()
     irr::video::ITexture* red_icon = irr_driver->getTexture(FileManager::GUI,
                                                               "soccer_ball_red.png");
     irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI,
-                                                               "soccer_ball_blue.png");
+                                                              "soccer_ball_blue.png");
 
     core::recti source_rect(core::vector2di(0,0), red_icon->getSize());
     core::recti dest_rect(current_x, current_y, current_x+red_icon->getSize().Width/2,
@@ -1052,8 +1052,8 @@ void RaceResultGUI::displaySoccerResults()
     //The red scorers:
     current_y += rect.Height/2 + rect.Height/4;
     font = GUIEngine::getSmallFont();
-    std::vector<int> scorers = sw->getScorers(false);
-    std::vector<float> score_times = sw->getScoreTimes(false);
+    std::vector<int> scorers = sw->getScorers(SOCCER_TEAM_RED);
+    std::vector<float> score_times = sw->getScoreTimes(SOCCER_TEAM_RED);
     irr::video::ITexture* scorer_icon;
 
     int prev_y = current_y;
@@ -1086,8 +1086,8 @@ void RaceResultGUI::displaySoccerResults()
     //The blue scorers:
     current_y = prev_y;
     current_x += UserConfigParams::m_width/2 - red_icon->getSize().Width/2;
-    scorers = sw->getScorers(true);
-    score_times = sw->getScoreTimes(true);
+    scorers = sw->getScorers(SOCCER_TEAM_BLUE);
+    score_times = sw->getScoreTimes(SOCCER_TEAM_BLUE);
     for(unsigned int i=0; i<scorers.size(); i++)
     {
         result_text = sw->getKart(scorers.at(i))->

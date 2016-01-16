@@ -34,7 +34,7 @@ private:
     /** Keep a pointer to world. */
     SoccerWorld *m_world;
 
-    bool m_cur_team;
+    SoccerTeam m_cur_team;
     Vec3 correctBallPosition(const Vec3&);
 
     virtual void findClosestKart(bool use_difficulty);

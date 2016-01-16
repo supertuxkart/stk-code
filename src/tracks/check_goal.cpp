@@ -56,7 +56,7 @@ void CheckGoal::update(float dt)
     if (world)
     {
         const Vec3 &xyz = world->getBallPosition();
-        if (isTriggered(m_previous_position[0], xyz, -1))
+        if (isTriggered(m_previous_ball_position, xyz, -1))
         {
             if (UserConfigParams::m_check_debug)
             {
@@ -65,7 +65,7 @@ void CheckGoal::update(float dt)
             }
             trigger(0);
         }
-        m_previous_position[0] = xyz;
+        m_previous_ball_position = xyz;
     }
 }   // update
 
@@ -102,15 +102,14 @@ bool CheckGoal::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
 void CheckGoal::reset(const Track &track)
 {
     CheckStructure::reset(track);
-    // Clean again as kart info is stored in CheckStructure::reset
-    m_previous_position.clear();
+    m_previous_ball_position = Vec3(0, 0, 0);
 
     SoccerWorld* world = dynamic_cast<SoccerWorld*>(World::getWorld());
 
     if (world)
     {
         const Vec3 &xyz = world->getBallPosition();
-        m_previous_position[0] = xyz;
+        m_previous_ball_position = xyz;
     }
 
 }   // reset

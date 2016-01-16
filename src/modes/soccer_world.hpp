@@ -31,7 +31,7 @@ class AbstractKart;
 class Controller;
 
 /** An implementation of World, to provide the soccer game mode
- *  Notice: In soccer world, true team means blue, false means red.
+ *  Notice: In soccer world, true goal means blue, false means red.
  * \ingroup modes
  */
 class SoccerWorld : public WorldWithRank
@@ -56,13 +56,14 @@ private:
     float m_goal_timer;
     int m_last_kart_to_hit_ball;
 
-    /** Number of goals each team scored */
-    std::vector<int> m_team_goals;
+    /** Goals data of each team scored */
+    int m_red_goal;
+    int m_blue_goal;
     std::vector<int> m_red_scorers;
     std::vector<float> m_red_score_times;
     std::vector<int> m_blue_scorers;
     std::vector<float> m_blue_score_times;
-    std::map<int, bool> m_kart_team_map;
+    std::map<int, SoccerTeam> m_kart_team_map;
 
     /** Data generated from navmesh */
     std::vector<int> m_kart_on_node;
@@ -115,16 +116,19 @@ public:
     bool getKartSoccerResult(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
     /** Get the team of kart in soccer world (including AIs) */
-    bool getKartTeam(unsigned int kart_id) const;
+    SoccerTeam getKartTeam(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
-    const int getScore(bool team) const
-                        { return (team ? m_team_goals[0] : m_team_goals[1]); }
+    const int getScore(SoccerTeam team) const
+             { return (team == SOCCER_TEAM_BLUE ? m_blue_goal : m_red_goal); }
     // ------------------------------------------------------------------------
-    const std::vector<int>& getScorers(bool team) const
-                           { return (team ? m_blue_scorers : m_red_scorers); }
+    const std::vector<int>& getScorers(SoccerTeam team) const
+       { return (team == SOCCER_TEAM_BLUE ? m_blue_scorers : m_red_scorers); }
     // ------------------------------------------------------------------------
-    const std::vector<float>& getScoreTimes(bool team) const
-                   { return (team ? m_blue_score_times : m_red_score_times); }
+    const std::vector<float>& getScoreTimes(SoccerTeam team) const
+    {
+        return (team == SOCCER_TEAM_BLUE ?
+            m_blue_score_times : m_red_score_times);
+    }
     // ------------------------------------------------------------------------
     const int& getKartNode(unsigned int kart_id) const
                                           {  return m_kart_on_node[kart_id]; }
@@ -135,8 +139,10 @@ public:
     const Vec3& getBallPosition() const
                                           {  return m_ball_position;         }
     // ------------------------------------------------------------------------
-    const int& getGoalNode(bool team) const
-                       { return (team ? m_blue_goal_node : m_red_goal_node); }
+    const int& getGoalNode(SoccerTeam team) const
+    {
+        return (team == SOCCER_TEAM_BLUE ? m_blue_goal_node : m_red_goal_node);
+    }
 
 };   // SoccerWorld
 

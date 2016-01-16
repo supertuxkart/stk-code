@@ -82,7 +82,8 @@ void SoccerAI::reset()
     ArenaAI::reset();
     AIBaseController::reset();
 
-    m_cur_team = (m_kart->getWorldKartId() % 2 == 0 ? true : false);
+    m_cur_team = (m_kart->getWorldKartId() % 2 == 0 ?
+        SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -154,9 +155,10 @@ Vec3 SoccerAI::correctBallPosition(const Vec3& orig_pos)
     Vec3 ball_lc(0, 0, 0);
     checkPosition(orig_pos, &ball_pos, &ball_lc);
 
-    // !m_cur_team for opposite team goal
+    // opposite team goal
     checkPosition(NavMesh::get()->getNavPoly(m_world
-        ->getGoalNode(!m_cur_team)).getCenter(), &goal_pos);
+        ->getGoalNode(m_cur_team == SOCCER_TEAM_BLUE ?
+        SOCCER_TEAM_RED : SOCCER_TEAM_BLUE)).getCenter(), &goal_pos);
 
     if (goal_pos.behind)
     {

@@ -94,10 +94,8 @@ void SoccerWorld::reset()
     else WorldStatus::setClockMode(CLOCK_CHRONO);
 
     m_can_score_points = true;
-    m_team_goals.clear();
-    m_team_goals.resize(2);
-    m_team_goals[0] = 0;
-    m_team_goals[1] = 0;
+    m_red_goal = 0;
+    m_blue_goal = 0;
 
     // Reset original positions for the soccer balls
     TrackObjectManager* tom = getTrack()->getTrackObjectManager();
@@ -173,7 +171,7 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 
     if (m_can_score_points)
     {
-        m_team_goals[first_goal ? 1 : 0]++;
+        (first_goal ? m_red_goal++ : m_blue_goal++);
 
         World *world = World::getWorld();
         world->setPhase(WorldStatus::GOAL_PHASE);
@@ -244,7 +242,8 @@ bool SoccerWorld::isRaceOver()
     // One team scored the target goals ...
     else
     {
-      return (getScore(true) >= m_goal_target || getScore(false) >= m_goal_target);
+      return (getScore(SOCCER_TEAM_BLUE) >= m_goal_target ||
+          getScore(SOCCER_TEAM_RED) >= m_goal_target);
     }
 
 }   // isRaceOver
@@ -284,15 +283,15 @@ void SoccerWorld::initKartList()
     {
         scene::ISceneNode *arrowNode;
         float arrow_pos_height = m_karts[i]->getKartModel()->getHeight()+0.5f;
-        bool team = getKartTeam(i);
+        SoccerTeam team = getKartTeam(i);
 
         arrowNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f),
-                    team ? blue : red, m_karts[i]->getNode(), true);
+                    team == SOCCER_TEAM_BLUE ? blue : red, m_karts[i]->getNode(), true);
 
         arrowNode->setPosition(core::vector3df(0, arrow_pos_height, 0));
     }
 
-}
+}   // initKartList
 
 //-----------------------------------------------------------------------------
 bool SoccerWorld::getKartSoccerResult(unsigned int kart_id) const
@@ -300,9 +299,10 @@ bool SoccerWorld::getKartSoccerResult(unsigned int kart_id) const
     if (m_red_scorers.size() == m_blue_scorers.size()) return true;
 
     bool red_win = m_red_scorers.size() > m_blue_scorers.size();
-    bool team_win = getKartTeam(kart_id);
+    SoccerTeam team = getKartTeam(kart_id);
 
-    if ((red_win && !team_win) || (!red_win && team_win))
+    if ((red_win && team == SOCCER_TEAM_RED) ||
+        (!red_win && team == SOCCER_TEAM_BLUE))
         return true;
     else
         return false;
@@ -317,11 +317,11 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
 {
     int posIndex = index;
     int position = index+1;
-    bool team = true;
+    SoccerTeam team = SOCCER_TEAM_BLUE;
 
     if (kart_type == RaceManager::KT_AI)
     {
-        team = (index % 2 == 0 ? true : false);
+        team = (index % 2 == 0 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
         m_kart_team_map[index] = team;
     }
     else
@@ -330,9 +330,7 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
             (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
 
         assert(rm_id >= 0);
-        team = (race_manager
-            ->getKartInfo(rm_id).getSoccerTeam() == SOCCER_TEAM_BLUE ?
-            true : false);
+        team = race_manager->getKartInfo(rm_id).getSoccerTeam();
         m_kart_team_map[index] = team;
     }
 
@@ -395,7 +393,7 @@ void SoccerWorld::updateKartNodes()
         m_kart_on_node[i] = BattleGraph::get()->pointToNode(m_kart_on_node[i],
                             m_karts[i]->getXYZ(), false/*ignore_vertical*/);
     }
-}
+}   // updateKartNodes
 
 //-----------------------------------------------------------------------------
 /** Localize the ball on the navigation mesh.
@@ -425,7 +423,7 @@ void SoccerWorld::updateBallPosition()
                           m_ball_position, true/*ignore_vertical*/);
     }
 
-}
+}   // updateBallPosition
 
 //-----------------------------------------------------------------------------
 /** Localize two goals on the navigation mesh.
@@ -445,7 +443,7 @@ void SoccerWorld::initGoalNodes()
             if (goal->getTeam())
             {
                 m_blue_goal_node = BattleGraph::get()->pointToNode(m_blue_goal_node,
-                                  goal->convertTo3DCenter(), true/*ignore_vertical*/);
+                                   goal->convertTo3DCenter(), true/*ignore_vertical*/);
             }
             else
             {
@@ -454,7 +452,7 @@ void SoccerWorld::initGoalNodes()
             }
         }
     }
-}
+}   // initGoalNodes
 
 //-----------------------------------------------------------------------------
 void SoccerWorld::resetAllNodes()
@@ -467,11 +465,11 @@ void SoccerWorld::resetAllNodes()
     m_ball_position = Vec3(0, 0, 0);
     m_red_goal_node = BattleGraph::UNKNOWN_POLY;
     m_blue_goal_node = BattleGraph::UNKNOWN_POLY;
-}
+}   // resetAllNodes
 //-----------------------------------------------------------------------------
-bool SoccerWorld::getKartTeam(unsigned int kart_id) const
+SoccerTeam SoccerWorld::getKartTeam(unsigned int kart_id) const
 {
-    std::map<int, bool>::const_iterator n = m_kart_team_map.find(kart_id);
+    std::map<int, SoccerTeam>::const_iterator n = m_kart_team_map.find(kart_id);
     if (n != m_kart_team_map.end())
     {
         return n->second;
@@ -479,6 +477,6 @@ bool SoccerWorld::getKartTeam(unsigned int kart_id) const
 
     // Fallback
     Log::warn("SoccerWorld", "Unknown team, using blue default.");
-    return true;
+    return SOCCER_TEAM_BLUE;
 
-}
+}   // getKartTeam
