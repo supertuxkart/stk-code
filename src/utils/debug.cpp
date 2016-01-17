@@ -136,7 +136,7 @@ void addAttachment(Attachment::AttachmentType type)
     for (unsigned int i = 0; i < world->getNumKarts(); i++)
     {
         AbstractKart *kart = world->getKart(i);
-        if (!kart->getController()->isPlayerController())
+        if (!kart->getController()->isLocalPlayerController())
             continue;
         if (type == Attachment::ATTACH_ANVIL)
         {

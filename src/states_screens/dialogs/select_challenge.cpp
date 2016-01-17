@@ -29,7 +29,6 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track_manager.hpp"
@@ -191,8 +190,8 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         assert(device != NULL);
 
         // Set up race manager appropriately
-        race_manager->setNumLocalPlayers(1);
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+        race_manager->setNumPlayers(1);
+        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
         race_manager->setReverseTrack(false);
 
         //int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );

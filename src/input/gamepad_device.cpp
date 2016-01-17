@@ -21,7 +21,7 @@
 
 #include "input/gamepad_config.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/controller/player_controller.hpp"
+#include "karts/controller/local_player_controller.hpp"
 
 /** Constructor for GamePadDevice from a connected gamepad for which no
  *  configuration existed (defaults will be used)
@@ -124,7 +124,7 @@ void GamePadDevice::resetAxisDirection(const int axis,
            bind.getDirection()== direction &&
            pk->getController() != NULL)
         {
-            ((PlayerController*)(pk->getController()))
+            ((LocalPlayerController*)(pk->getController()))
                                                   ->action((PlayerAction)n, 0);
             return;
         }

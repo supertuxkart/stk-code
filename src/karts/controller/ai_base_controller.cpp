@@ -38,8 +38,9 @@ AIBaseController::AIBaseController(AbstractKart *kart,
     m_kart          = kart;
     m_kart_length   = m_kart->getKartLength();
     m_kart_width    = m_kart->getKartWidth();
-    m_ai_properties = m_kart->getKartProperties()->getAIPropertiesForDifficulty();
-}
+    m_ai_properties = m_kart->getKartProperties()
+                            ->getAIPropertiesForDifficulty();
+}   // AIBaseController
 
 //-----------------------------------------------------------------------------
 

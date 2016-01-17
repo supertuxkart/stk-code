@@ -55,7 +55,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
 {
     if (name == "startTutorial")
     {
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
         race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
         race_manager->setNumKarts( 1 );
@@ -76,7 +76,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
                       UserConfigParams::m_default_kart.c_str());
             UserConfigParams::m_default_kart.revertToDefaults();
         }
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
         // ASSIGN should make sure that only input from assigned devices
         // is read.

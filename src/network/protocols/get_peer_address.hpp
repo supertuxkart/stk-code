@@ -20,34 +20,37 @@
 #define GET_PEER_ADDRESS_HPP
 
 #include "network/protocol.hpp"
+#include "network/transport_address.hpp"
 
 namespace Online { class XMLRequest; }
 
 class GetPeerAddress : public Protocol
 {
-    public:
-        GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object);
-        virtual ~GetPeerAddress();
+private:
+    uint32_t m_peer_id;
+    Online::XMLRequest* m_request;
 
-        virtual bool notifyEvent(Event* event) { return true; }
-        virtual bool notifyEventAsynchronous(Event* event) { return true; }
-        virtual void setup();
-        virtual void update() {}
-        virtual void asynchronousUpdate();
+    /** Stores the address found. Used in a callback from the parent protocol
+     *  to get the result. */
+    TransportAddress m_address;
+public:
+             GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object);
+    virtual ~GetPeerAddress();
 
-        void setPeerID(uint32_t m_peer_id);
-    protected:
-        uint32_t m_peer_id;
-        Online::XMLRequest* m_request;
-        enum STATE
-        {
-            NONE,
-            REQUEST_PENDING,
-            DONE,
-            EXITING
-        };
-        STATE m_state;
+    virtual void setup();
+    virtual void asynchronousUpdate();
+    void setPeerID(uint32_t m_peer_id);
 
-};
+    // ------------------------------------------------------------------------
+    /** Returns the address found. */
+    const TransportAddress &getAddress() const { return m_address;  }
+    // ------------------------------------------------------------------------
+    virtual void update() {}
+    // ------------------------------------------------------------------------
+    virtual bool notifyEvent(Event* event) { return true; }
+    // ------------------------------------------------------------------------
+    virtual bool notifyEventAsynchronous(Event* event) { return true; }
+
+};   // class GetPeerAddress
 
 #endif // GET_PEER_ADDRESS_HPP

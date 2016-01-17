@@ -124,9 +124,9 @@ void FTEnvironment::loadFont()
     if (screen_width < 1200) scale = std::max(0, screen_width - 640) / 750.0f;
     if (screen_width < 900 || screen_height < 700) scale = std::min(scale, 0.05f);
 
-    const u32 normal_dpi = ((0.7f + 0.2f*scale)*27);
-    const u32 title_dpi  = ((0.2f + 0.2f*scale)*120);
-    const u32 digit_dpi  = ((0.7f + 0.2f*scale)*40);
+    const u32 normal_dpi = u32((0.7f + 0.2f*scale)*27);
+    const u32 title_dpi  = u32((0.2f + 0.2f*scale)*120);
+    const u32 digit_dpi  = u32((0.7f + 0.2f*scale)*40);
 
     Log::info("Freetype Environment", "DPI for Normal Font is %d.", normal_dpi);
     Log::info("Freetype Environment", "DPI for Title Font is %d.", title_dpi);

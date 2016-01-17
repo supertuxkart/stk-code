@@ -30,7 +30,6 @@
 
 class NetworkPlayerProfile;
 class NetworkString;
-class STKHost;
 class TransportAddress;
 
 /*! \class STKPeer
@@ -39,7 +38,6 @@ class TransportAddress;
  */
 class STKPeer : public NoCopy
 {
-    friend class Event;
 protected:
     /** Pointer to the corresponding ENet peer data structure. */
     ENetPeer* m_enet_peer;
@@ -53,18 +51,17 @@ protected:
     bool m_token_set;
 
 public:
-             STKPeer();
+             STKPeer(ENetPeer *enet_peer);
     virtual ~STKPeer();
 
     virtual void sendPacket(const NetworkString& data, bool reliable = true);
-    static bool connectToHost(STKHost* localhost, const TransportAddress& host,
-                              uint32_t channel_count, uint32_t data);
     void disconnect();
     bool isConnected() const;
     bool exists() const;
     uint32_t getAddress() const;
     uint16_t getPort() const;
     bool isSamePeer(const STKPeer* peer) const;
+    bool isSamePeer(const ENetPeer* peer) const;
 
     // ------------------------------------------------------------------------
     /** Sets the token for this client. */

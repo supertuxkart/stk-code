@@ -25,10 +25,13 @@
 
 #include "utils/types.hpp"
 
-#include <string>
-#include <vector>
-#include <stdarg.h>
+#include "irrString.h"
+
 #include <assert.h>
+#include <stdarg.h>
+#include <string>
+#include <string.h>
+#include <vector>
 
 typedef unsigned char uchar;
 
@@ -55,6 +58,18 @@ private:
 
     std::vector<uint8_t> m_string;
 
+    // ------------------------------------------------------------------------
+    /** Returns a part of the network string as a std::string. This is an
+     *  internal function only, the user should call decodeString(W) instead.
+     *  \param pos First position to be in the string.
+     *  \param len Number of bytes to copy.
+     */
+    std::string getString(int pos, int len) const 
+    {
+        return std::string(m_string.begin() + pos,
+            m_string.begin() + pos + len); 
+    }   // getString
+
 public:
     /** Dummy constructor. */
     NetworkString() { }
@@ -78,10 +93,16 @@ public:
     }   // NetworkString
 
     // ------------------------------------------------------------------------
-    NetworkString& add(const std::string &s)
+    NetworkString(const char *p, int len)
     {
-        return addUInt8(uint8_t(s.size())).as(s);
-    }   // add
+        m_string.resize(len);
+        memcpy(m_string.data(), p, len);
+    }   // NetworkString(char*, int)
+    // ------------------------------------------------------------------------
+    NetworkString& encodeString(const std::string &value);
+    NetworkString& encodeString(const irr::core::stringw &value);
+    int decodeString(int n, std::string *out) const;
+    int decodeStringW(int n, irr::core::stringw *out) const;
 
     // ------------------------------------------------------------------------
     NetworkString& removeFront(int size)
@@ -211,7 +232,6 @@ public:
     /** Adds a single character. */
     inline NetworkString& ac(const char& value) { return addChar(value); }
 
-    // ------------------------------------------------------------------------
     /** Adds a string. */
     NetworkString& addString(const std::string& value)
     {
@@ -303,17 +323,6 @@ public:
     {
         return get<unsigned char>(pos); 
     }   // getUChar
-    // ------------------------------------------------------------------------
-    /** Returns a part of the network string as a std::string.
-     *  \param pos First position to be in the string.
-     *  \param len Number of bytes to copy.
-     */
-    std::string getString(int pos, int len) const 
-    {
-        return std::string(m_string.begin() + pos,
-                           m_string.begin() + pos + len); 
-    }   // getString
-
     // ------------------------------------------------------------------------
     /** Returns a standard integer. */
     inline int gi(int pos = 0) const { return get<int, 4>(pos); }

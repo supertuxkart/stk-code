@@ -32,8 +32,8 @@
 #include "input/keyboard_device.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/battle_ai.hpp"
-#include "karts/controller/player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
+#include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
 #include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
@@ -310,9 +310,8 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     switch(kart_type)
     {
     case RaceManager::KT_PLAYER:
-        controller = new PlayerController(new_kart,
-                         StateManager::get()->getActivePlayer(local_player_id),
-                                          local_player_id);
+        controller = new LocalPlayerController(new_kart,
+                         StateManager::get()->getActivePlayer(local_player_id));
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
@@ -862,7 +861,7 @@ void World::updateWorld(float dt)
             if (m_schedule_tutorial)
             {
                 m_schedule_tutorial = false;
-                race_manager->setNumLocalPlayers(1);
+                race_manager->setNumPlayers(1);
                 race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
                 race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
                 race_manager->setNumKarts( 1 );
@@ -884,7 +883,7 @@ void World::updateWorld(float dt)
                               UserConfigParams::m_default_kart.c_str());
                     UserConfigParams::m_default_kart.revertToDefaults();
                 }
-                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+                race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
                 // ASSIGN should make sure that only input from assigned devices
                 // is read.
@@ -1084,9 +1083,9 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
             continue;
         }
 
-        // Only record times for player karts and only if
+        // Only record times for local player karts and only if
         // they finished the race
-        if(!m_karts[index[pos]]->getController()->isPlayerController())
+        if(!m_karts[index[pos]]->getController()->isLocalPlayerController())
             continue;
         if (!m_karts[index[pos]]->hasFinishedRace()) continue;
 
@@ -1095,7 +1094,8 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
 
         Highscores* highscores = getHighscores();
 
-        PlayerController *controller = (PlayerController*)(k->getController());
+        LocalPlayerController *controller = 
+                                  (LocalPlayerController*)(k->getController());
 
         int highscore_rank = 0;
         if (controller->getPlayer()->getProfile() != NULL) // if we have the player profile here
@@ -1131,8 +1131,7 @@ AbstractKart *World::getPlayerKart(unsigned int n) const
     unsigned int count=-1;
 
     for(unsigned int i=0; i<m_karts.size(); i++)
-        if(m_karts[i]->getController()->isPlayerController() ||
-            m_karts[i]->getController()->isNetworkController())
+        if(m_karts[i]->getController()->isPlayerController())
         {
             count++;
             if(count==n) return m_karts[i];
@@ -1175,7 +1174,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
         }  // for i < number of cameras
     }   // if notify_of_elimination
 
-    if(kart->getController()->isPlayerController())
+    if(kart->getController()->isLocalPlayerController())
     {
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
@@ -1236,8 +1235,8 @@ void World::unpause()
         // Note that we can not test for isPlayerController here, since
         // an EndController will also return 'isPlayerController' if the
         // kart belonged to a player.
-        PlayerController *pc =
-            dynamic_cast<PlayerController*>(m_karts[i]->getController());
+        LocalPlayerController *pc =
+            dynamic_cast<LocalPlayerController*>(m_karts[i]->getController());
         if(pc)
             pc->resetInputState();
     }

@@ -49,11 +49,11 @@ HitSFX::~HitSFX()
  *  played louder than for a non-player kart if split screen is used).
  *  If this sfx is for a player kart in split screen, make it louder again.
  */
-void HitSFX::setPlayerKartHit()
+void HitSFX::setLocalPlayerKartHit()
 {
     if(race_manager->getNumLocalPlayers())
         m_sfx->setVolume(1.0f);
-}   // setPlayerKartHit
+}   // setLocalPlayerKartHit
 
 //-----------------------------------------------------------------------------
 /** Updates the hit sfx, called one per time step. If this function returns

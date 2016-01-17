@@ -107,8 +107,9 @@ protected:
     void updateKartStats(uint8_t widget_id,
                          const std::string& selection);
 
-    /** updates model of a kart widget, to have the good selection when the user validates */
-    void updateKartWidgetModel(uint8_t widget_id,
+    /** updates model of a kart widget, to have the good selection when the
+     *  user validates */
+    void updateKartWidgetModel(int widget_id,
                 const std::string& selection,
                 const irr::core::stringw& selectionText);
 

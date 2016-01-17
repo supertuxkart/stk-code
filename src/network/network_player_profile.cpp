@@ -16,16 +16,26 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network/protocols/lobby_room_protocol.hpp"
+#include "network/network_player_profile.hpp"
 
-LobbyRoomProtocol::LobbyRoomProtocol(CallbackObject* callback_object) :
-    Protocol(callback_object, PROTOCOL_LOBBY_ROOM)
+#include "online/online_player_profile.hpp"
+
+/** Constructor. 
+ *  \param global_player_id A unique number assigned from the server to this
+ *         player (though it might not be the index in the peer list).
+ *  \param name Name of this player.
+ */
+NetworkPlayerProfile::NetworkPlayerProfile(int global_player_id,
+                                           const irr::core::stringw &name)
 {
-    m_setup = NULL;
-}
+    m_global_player_id      = global_player_id;
+    m_kart_name             = "";
+    m_world_kart_id         = 0;
+    m_per_player_difficulty = PLAYER_DIFFICULTY_NORMAL;
+    m_player_name           = name;
+}   // BetworkPlayerProfile
 
-//-----------------------------------------------------------------------------
-
-LobbyRoomProtocol::~LobbyRoomProtocol()
+// ----------------------------------------------------------------------------
+NetworkPlayerProfile::~NetworkPlayerProfile()
 {
-}
+}   // ~NetworkPlayerProfile

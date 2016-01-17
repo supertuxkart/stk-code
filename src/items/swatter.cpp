@@ -303,8 +303,8 @@ void Swatter::squashThingsAround()
     {   // make bomb explode
         m_closest_kart->getAttachment()->update(10000);
         HitEffect *he = new Explosion(m_kart->getXYZ(),  "explosion", "explosion.xml");
-        if(m_kart->getController()->isPlayerController())
-            he->setPlayerKartHit();
+        if(m_kart->getController()->isLocalPlayerController())
+            he->setLocalPlayerKartHit();
         projectile_manager->addHitEffect(he);
         ExplosionAnimation::create(m_closest_kart);
     }   // if kart has bomb attached

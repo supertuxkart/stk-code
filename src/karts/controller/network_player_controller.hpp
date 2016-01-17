@@ -1,48 +1,49 @@
-#ifndef NETWORK_PLAYER_CONTROLLER_HPP
-#define NETWORK_PLAYER_CONTROLLER_HPP
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2015 Joerg Henrichs
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "karts/controller/controller.hpp"
+#ifndef HEADER_NETWORK_PLAYER_CONTROLLER_HPP
+#define HEADER_NETWORK_PLAYER_CONTROLLER_HPP
+
+#include "karts/controller/player_controller.hpp"
 
 class AbstractKart;
 class Player;
 
-class NetworkPlayerController : public Controller
+class NetworkPlayerController : public PlayerController
 {
-protected:
-    int            m_steer_val, m_steer_val_l, m_steer_val_r;
-    int            m_prev_accel;
-    bool           m_prev_brake;
-    bool           m_prev_nitro;
-
-    float          m_penalty_time;
-
-    void           steer(float, int);
 public:
-    NetworkPlayerController  (AbstractKart *kart,
-                       StateManager::ActivePlayer *_player);
-    virtual ~NetworkPlayerController  ();
-    void           update            (float);
-    void           action            (PlayerAction action, int value);
-    void           handleZipper      (bool play_sound);
-    void           collectedItem     (const Item &item, int add_info=-1,
-                                      float previous_energy=0);
-    virtual void   skidBonusTriggered();
-    virtual void   setPosition       (int p);
-    virtual bool   isPlayerController() const { return false; }
-    virtual bool   isNetworkController() const { return true; }
-    virtual void   reset             ();
-    void           resetInputState   ();
-    virtual void   finishedRace      (float time);
-    virtual void   crashed           (const AbstractKart *k) {}
-    virtual void   crashed           (const Material *m) {}
+    NetworkPlayerController(AbstractKart *kart,
+                            StateManager::ActivePlayer *player)
+        : PlayerController(kart, player)
+    {
+        Log::info("NetworkPlayerController",
+                  "New network player controller.");
+    }   // NetworkPlayerController
     // ------------------------------------------------------------------------
-    /** Callback whenever a new lap is triggered. Used by the AI
-     *  to trigger a recomputation of the way to use, not used for players. */
-    virtual void  newLap(int lap) {}
+    virtual ~NetworkPlayerController()
+    {
+    }   // ~NetworkPlayerController
     // ------------------------------------------------------------------------
-    /** Player will always be able to get a slipstream bonus. */
-    virtual bool  disableSlipstreamBonus() const { return false; }
-
-};
+    /** This player is not a local player. This affect e.g. special sfx and
+     *  camera effects to be triggered. */
+    virtual bool isLocalPlayerController() const OVERRIDE
+    {
+        return false; 
+    }   // isLocal
+    // ------------------------------------------------------------------------
+};   // NetworkPlayerController
 
 #endif // NETWORK_PLAYER_CONTROLLER_HPP

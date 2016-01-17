@@ -19,10 +19,7 @@
 
 #include "karts/controller/player_controller.hpp"
 
-#include "audio/sfx_base.hpp"
-#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/post_processing.hpp"
 #include "input/input_manager.hpp"
@@ -34,7 +31,6 @@
 #include "karts/skidding.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
-#include "network/network_world.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/battle_graph.hpp"
@@ -42,32 +38,12 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
-/** The constructor for a player kart.
- *  \param kart_name Name of the kart.
- *  \param position The starting position (1 to n).
- *  \param player The player to which this kart belongs.
- *  \param init_pos The start coordinates and heading of the kart.
- *  \param player_index  Index of the player kart.
- */
 PlayerController::PlayerController(AbstractKart *kart,
-                                   StateManager::ActivePlayer *player,
-                                   unsigned int player_index)
-                : Controller(kart)
+                                   StateManager::ActivePlayer *player)
+                : Controller(kart, player)
 {
     assert(player != NULL);
-    m_player       = player;
-    m_player->setKart(kart);
     m_penalty_time = 0.0f;
-    // Keep a pointer to the camera to remove the need to search for
-    // the right camera once per frame later.
-    m_camera       = Camera::createCamera(kart);
-    m_bzzt_sound   = SFXManager::get()->createSoundSource( "bzzt" );
-    m_wee_sound    = SFXManager::get()->createSoundSource( "wee"  );
-    m_ugh_sound    = SFXManager::get()->createSoundSource( "ugh"  );
-    m_grab_sound   = SFXManager::get()->createSoundSource( "grab_collectable" );
-    m_full_sound   = SFXManager::get()->createSoundSource( "energy_bar_full" );
-
-    reset();
 }   // PlayerController
 
 //-----------------------------------------------------------------------------
@@ -75,11 +51,6 @@ PlayerController::PlayerController(AbstractKart *kart,
  */
 PlayerController::~PlayerController()
 {
-    m_bzzt_sound->deleteSFX();
-    m_wee_sound ->deleteSFX();
-    m_ugh_sound ->deleteSFX();
-    m_grab_sound->deleteSFX();
-    m_full_sound->deleteSFX();
 }   // ~PlayerController
 
 //-----------------------------------------------------------------------------
@@ -93,7 +64,6 @@ void PlayerController::reset()
     m_prev_brake   = 0;
     m_prev_accel   = 0;
     m_prev_nitro   = false;
-    m_sound_schedule = false;
     m_penalty_time = 0;
 }   // reset
 
@@ -110,7 +80,6 @@ void PlayerController::resetInputState()
     m_prev_brake            = 0;
     m_prev_accel            = 0;
     m_prev_nitro            = false;
-    m_sound_schedule        = false;
     m_controls->reset();
 }   // resetInputState
 
@@ -221,10 +190,6 @@ void PlayerController::action(PlayerAction action, int value)
     default:
        break;
     }
-    if (World::getWorld()->isNetworkWorld() && NetworkWorld::getInstance()->isRunning())
-    {
-        NetworkWorld::getInstance()->controllerAction(this, action, value);
-    }
 
 }   // action
 
@@ -233,15 +198,6 @@ void PlayerController::action(PlayerAction action, int value)
  */
 void PlayerController::steer(float dt, int steer_val)
 {
-    if(UserConfigParams::m_gamepad_debug)
-    {
-        Log::debug("PlayerController", "steering: steer_val %d ", steer_val);
-        RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
-        gui_base->clearAllMessages();
-        gui_base->addMessage(StringUtils::insertValues(L"steer_val %i", steer_val), m_kart, 1.0f,
-                             video::SColor(255, 255, 0, 255), false);
-    }
-
     if(stk_config->m_disable_steer_while_unskid &&
         m_controls->m_skid==KartControl::SC_NONE &&
        m_kart->getSkidding()->getVisualSkidRotation()!=0)
@@ -286,10 +242,6 @@ void PlayerController::steer(float dt, int steer_val)
             if(m_controls->m_steer>0.0f) m_controls->m_steer=0.0f;
         }   // if m_controls->m_steer<=0.0f
     }   // no key is pressed
-    if(UserConfigParams::m_gamepad_debug)
-    {
-        Log::debug("PlayerController", "  set to: %f\n", m_controls->m_steer);
-    }
 
     m_controls->m_steer = std::min(1.0f, std::max(-1.0f, m_controls->m_steer));
 
@@ -309,36 +261,11 @@ void PlayerController::skidBonusTriggered()
  */
 void PlayerController::update(float dt)
 {
-    if (UserConfigParams::m_gamepad_debug)
-    {
-        // Print a dividing line so that it's easier to see which events
-        // get received in which order in the one frame.
-        Log::debug("PlayerController", "irr_driver", "-------------------------------------");
-    }
-
     // Don't do steering if it's replay. In position only replay it doesn't
     // matter, but if it's physics replay the gradual steering causes
     // incorrect results, since the stored values are already adjusted.
     if (!history->replayHistory())
         steer(dt, m_steer_val);
-
-
-    // look backward when the player requests or
-    // if automatic reverse camera is active
-    if (m_camera->getMode() != Camera::CM_FINAL)
-    {
-        if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold > 0 &&
-            m_kart->getSpeed() < -UserConfigParams::m_reverse_look_threshold))
-        {
-            m_camera->setMode(Camera::CM_REVERSE);
-        }
-        else
-        {
-            if (m_camera->getMode() == Camera::CM_REVERSE)
-                m_camera->setMode(Camera::CM_NORMAL);
-        }
-    }
-
 
     if (World::getWorld()->isStartPhase())
     {
@@ -351,16 +278,7 @@ void PlayerController::update(float dt)
             if (m_penalty_time == 0.0 &&
                 World::getWorld()->getPhase() == WorldStatus::SET_PHASE)
             {
-                RaceGUIBase* m=World::getWorld()->getRaceGUI();
-                if (m)
-                {
-                    m->addMessage(_("Penalty time!!"), m_kart, 2.0f,
-                                  GUIEngine::getSkin()->getColor("font::top"));
-                    m->addMessage(_("Don't accelerate before go"), m_kart, 2.0f,
-                                  GUIEngine::getSkin()->getColor("font::normal"));
-                }
-                m_bzzt_sound->play();
-
+                displayPenaltyWarning();
                 m_penalty_time = stk_config->m_penalty_time;
             }   // if penalty_time = 0
 
@@ -377,127 +295,20 @@ void PlayerController::update(float dt)
         return;
     }
 
-
-
-    // We can't restrict rescue to fulfil isOnGround() (which would be more like
-    // MK), since e.g. in the City track it is possible for the kart to end
-    // up sitting on a brick wall, with all wheels in the air :((
     // Only accept rescue if there is no kart animation is already playing
     // (e.g. if an explosion happens, wait till the explosion is over before
     // starting any other animation).
-    if (m_controls->m_rescue && !m_kart->getKartAnimation())
+    if ( m_controls->m_rescue && !m_kart->getKartAnimation() )
     {
         new RescueAnimation(m_kart);
         m_controls->m_rescue=false;
     }
-
-    if (m_kart->getKartAnimation() && m_sound_schedule == false &&
-        m_kart->getAttachment()->getType() != Attachment::ATTACH_TINYTUX)
-    {
-        m_sound_schedule = true;
-    }
-    else if (!m_kart->getKartAnimation() && m_sound_schedule == true)
-    {
-        m_sound_schedule = false;
-        m_bzzt_sound->play();
-    }
 }   // update
-
-//-----------------------------------------------------------------------------
-/** Checks if the kart was overtaken, and if so plays a sound
-*/
-void PlayerController::setPosition(int p)
-{
-    if(m_kart->getPosition()<p)
-    {
-        World *world = World::getWorld();
-        //have the kart that did the passing beep.
-        //I'm not sure if this method of finding the passing kart is fail-safe.
-        for(unsigned int i = 0 ; i < world->getNumKarts(); i++ )
-        {
-            AbstractKart *kart = world->getKart(i);
-            if(kart->getPosition() == p + 1)
-            {
-                kart->beep();
-                break;
-            }
-        }
-    }
-}   // setPosition
-
-//-----------------------------------------------------------------------------
-/** Called when a kart finishes race.
- *  /param time Finishing time for this kart.
- d*/
-void PlayerController::finishedRace(float time)
-{
-    // This will implicitely trigger setting the first end camera to be active
-    m_camera->setMode(Camera::CM_FINAL);
-
-}   // finishedRace
 
 //-----------------------------------------------------------------------------
 /** Called when a kart hits or uses a zipper.
  */
 void PlayerController::handleZipper(bool play_sound)
 {
-    // Only play a zipper sound if it's not already playing, and
-    // if the material has changed (to avoid machine gun effect
-    // on conveyor belt zippers).
-    if (play_sound || (m_wee_sound->getStatus() != SFXBase::SFX_PLAYING &&
-                       m_kart->getMaterial()!=m_kart->getLastMaterial()      ) )
-    {
-        m_wee_sound->play();
-    }
-
-    // Apply the motion blur according to the speed of the kart
-    irr_driver->giveBoost(m_camera->getIndex());
-
     m_kart->showZipperFire();
-
 }   // handleZipper
-
-//-----------------------------------------------------------------------------
-/** Called when a kart hits an item.
- *  \param item Item that was collected.
- *  \param add_info Additional info to be used then handling the item. If
- *                  this is -1 (default), the item type is selected
- *                  randomly. Otherwise it contains the powerup or
- *                  attachment for the kart. This is used in network mode to
- *                  let the server determine the powerup/attachment for
- *                  the clients.
- */
-void PlayerController::collectedItem(const Item &item, int add_info, float old_energy)
-{
-    if (old_energy < m_kart->getKartProperties()->getNitroMax() &&
-        m_kart->getEnergy() == m_kart->getKartProperties()->getNitroMax())
-    {
-        m_full_sound->play();
-    }
-    else if (race_manager->getCoinTarget() > 0 &&
-             old_energy < race_manager->getCoinTarget() &&
-             m_kart->getEnergy() == race_manager->getCoinTarget())
-    {
-        m_full_sound->play();
-    }
-    else
-    {
-        switch(item.getType())
-        {
-        case Item::ITEM_BANANA:
-            m_ugh_sound->play();
-            break;
-        case Item::ITEM_BUBBLEGUM:
-            //More sounds are played by the kart class
-            //See Kart::collectedItem()
-            m_ugh_sound->play();
-            break;
-        case Item::ITEM_TRIGGER:
-            // no default sound for triggers
-            break;
-        default:
-            m_grab_sound->play();
-            break;
-        }
-    }
-}   // collectedItem

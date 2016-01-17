@@ -878,27 +878,27 @@ void ScalableFont::doDraw(const core::stringw& text,
         if (charCollector == NULL)
         {
             //Try to use ceil to make offset calculate correctly when m_scale is smaller than 1
-            s32 glyph_offset_x = ceil((float) area.bearingx*
+            s32 glyph_offset_x = (s32)((float) area.bearingx*
                                  (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
-            s32 glyph_offset_y = ceil((float) area.offsety*
+            s32 glyph_offset_y = (s32)ceil((float) area.offsety*
                                  (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
             offset.X += glyph_offset_x;
-            offset.Y += glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0); //Additional offset for digit text
+            offset.Y += s32(glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0)); //Additional offset for digit text
             offsets.push_back(offset);
             offset.X -= glyph_offset_x;
-            offset.Y -= glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0);
+            offset.Y -= s32(glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0));
         }
         else //Billboard text specific
         {
-            s32 glyph_offset_x = ceil((float) area.bearingx*
+            s32 glyph_offset_x = (s32)ceil((float) area.bearingx*
                                  (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
-            s32 glyph_offset_y = ceil((float) area.offsety_bt*
+            s32 glyph_offset_y = (s32)ceil((float) area.offsety_bt*
                                  (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
             offset.X += glyph_offset_x;
-            offset.Y += glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0); //Additional offset for digit text
+            offset.Y += s32(glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0)); //Additional offset for digit text
             offsets.push_back(offset);
             offset.X -= glyph_offset_x;
-            offset.Y -= glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0);
+            offset.Y -= s32(glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0));
         }
         // Invisible character. add something to the array anyway so that
         // indices from the various arrays remain in sync

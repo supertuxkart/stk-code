@@ -340,7 +340,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             if(kart->isEliminated()) continue;   // don't draw eliminated kart
                                                  // Make sure to only draw AI kart icons first, then
                                                  // only player karts.
-            if(kart->getController()->isPlayerController()
+            if(kart->getController()->isLocalPlayerController()
                !=(only_draw_player_kart==1)) continue;
             kart_xyz= kart->getXYZ();
             Vec3 draw_at;
@@ -348,7 +348,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
             video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
             core::rect<s32> source(core::position2di(0, 0), icon->getSize());
-            int marker_half_size = (kart->getController()->isPlayerController()
+            int marker_half_size = (kart->getController()->isLocalPlayerController()
                                     ? m_minimap_player_size
                                     : m_minimap_challenge_size                        )>>1;
             core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
@@ -357,7 +357,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                      lower_y   -(int)(draw_at.getY()-marker_half_size));
 
             // Highlight the player icons with some backgorund image.
-            if (kart->getController()->isPlayerController())
+            if (kart->getController()->isLocalPlayerController())
             {
                 video::SColor colors[4];
                 for (unsigned int i=0;i<4;i++)

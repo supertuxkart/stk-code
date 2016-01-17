@@ -172,17 +172,11 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
-#include "network/client_network_manager.hpp"
-#include "network/network_manager.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
-#include "network/client_network_manager.hpp"
-#include "network/server_network_manager.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "network/network_config.hpp"
+#include "network/servers_manager.hpp"
+#include "network/stk_host.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
-#include "online/servers_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
@@ -472,12 +466,13 @@ void setupRaceStart()
         Log::warn("main", "Kart '%s' is unknown so will use the "
             "default kart.",
             UserConfigParams::m_default_kart.c_str());
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart.getDefaultValue());
+        race_manager->setPlayerKart(0, 
+                           UserConfigParams::m_default_kart.getDefaultValue());
     }
     else
     {
         // Set up race manager appropriately
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
     }
 
     // ASSIGN should make sure that only input from assigned devices
@@ -536,7 +531,8 @@ void cmdLineHelp()
     // "       --history=n        Replay history file 'history.dat' using:\n"
     // "                            n=1: recorded positions\n"
     // "                            n=2: recorded key strokes\n"
-    "       --server           Start a server (not a playing client).\n"
+    "       --server=name      Start a server (not a playing client).\n"
+    "       --lan-server=name  Start a LAN server (not a playing client).\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
@@ -778,11 +774,24 @@ int handleCmdLine()
     }
 
     // Networking command lines
-    if(CommandLine::has("--server") )
+    NetworkConfig::get()->
+        setMaxPlayers(UserConfigParams::m_server_max_players);
+    if(CommandLine::has("--server", &s))
     {
-        NetworkManager::getInstance<ServerNetworkManager>();
-        Log::info("main", "Creating a server network manager.");
-    }   // -server
+        NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
+        NetworkConfig::get()->setIsServer(true);
+        NetworkConfig::get()->setIsWAN();
+        STKHost::create();
+        Log::info("main", "Creating a WAN server '%s'.", s.c_str());
+    } 
+    if (CommandLine::has("--lan-server", &s))
+    {
+        NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
+        NetworkConfig::get()->setIsServer(true);
+        NetworkConfig::get()->setIsLAN();
+        STKHost::create();
+        Log::info("main", "Creating a LAN server '%s'.", s.c_str());
+    }   
 
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;
@@ -799,8 +808,8 @@ int handleCmdLine()
     // Race parameters
     if(CommandLine::has("--kartsize-debug"))
     {
-        for(unsigned int i=0;
-            i<kart_properties_manager->getNumberOfKarts(); i++)
+        for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts();
+           i++)
         {
             const KartProperties *km =
                 kart_properties_manager->getKartById(i);
@@ -828,7 +837,7 @@ int handleCmdLine()
             // up upon player creation.
             if (StateManager::get()->activePlayerCount() > 0)
             {
-                race_manager->setLocalKartInfo(0, s);
+                race_manager->setPlayerKart(0, s);
             }
             Log::verbose("main", "You chose to use kart '%s'.",
                          s.c_str());
@@ -1179,7 +1188,7 @@ void initRest()
 
     race_manager            = new RaceManager          ();
     // default settings for Quickstart
-    race_manager->setNumLocalPlayers(1);
+    race_manager->setNumPlayers(1);
     race_manager->setNumLaps   (3);
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
@@ -1344,20 +1353,6 @@ int main(int argc, char *argv[] )
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if(!handleCmdLine()) exit(0);
-
-        // load the network manager
-        // If the server has been created (--server option), this will do nothing (just a warning):
-        NetworkManager::getInstance<ClientNetworkManager>();
-        if (NetworkManager::getInstance()->isServer())
-        {
-            ServerNetworkManager::getInstance()->setMaxPlayers(
-                    UserConfigParams::m_server_max_players);
-        }
-        NetworkManager::getInstance()->run();
-        if (NetworkManager::getInstance()->isServer())
-        {
-            ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
-        }
 
         addons_manager->checkInstalledAddons();
 
@@ -1526,7 +1521,9 @@ int main(int argc, char *argv[] )
     // so we don't crash later when StateManager tries to access input devices.
     StateManager::get()->resetActivePlayers();
     if(input_manager) delete input_manager; // if early crash avoid delete NULL
-    NetworkManager::getInstance()->abort();
+
+    if(NetworkConfig::get()->isNetworking() && STKHost::existHost())
+        STKHost::get()->abort();
 
     cleanSuperTuxKart();
 
@@ -1634,8 +1631,9 @@ static void cleanSuperTuxKart()
 
     // FIXME: do we need to wait for threads there, can they be
     // moved further up?
-    Online::ServersManager::deallocate();
-    NetworkManager::kill();
+    ServersManager::deallocate();
+    if(NetworkConfig::get()->isNetworking() && STKHost::existHost())
+        STKHost::destroy();
 
     cleanUserConfig();
 

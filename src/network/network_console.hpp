@@ -16,38 +16,43 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-/*! \file network_interface.hpp
- *  \brief Defines an interface to network middle-level functions.
- */
+#ifndef HEADER_NETWORK_CONSOLE_HPP
+#define HEADER_NETWORK_CONSOLE_HPP
 
-#ifndef NETWORK_INTERFACE_H
-#define NETWORK_INTERFACE_H
+#include "utils/types.hpp"
 
-#include "network/types.hpp"
-#include "network/network_manager.hpp"
-#include "utils/singleton.hpp"
+#include "pthread.h"
 
-#include <pthread.h>
-#include <string>
+class NetworkString;
+class STKHost;
 
-/** \class NetworkInterface
-  * \ingroup network
-  */
-class NetworkInterface : public AbstractSingleton<NetworkInterface>
+class NetworkConsole
 {
-    friend class AbstractSingleton<NetworkInterface>;
-    public:
+protected:
 
-        /*! \brief Used to init the network.
-         *  \param server : True if we're a server.
-         */
-        void initNetwork(bool server);
+    STKHost *m_localhost;
 
-    protected:
-        // protected functions
-        NetworkInterface();
-        virtual ~NetworkInterface();
+    pthread_t* m_thread_keyboard;
 
-};
+    uint8_t m_max_players;
 
-#endif // NETWORK_INTERFACE_H
+    static void* mainLoop(void* data);
+
+public:
+             NetworkConsole();
+    virtual ~NetworkConsole();
+
+    virtual void run();
+
+    void setMaxPlayers(uint8_t count) { m_max_players = count; }
+    uint8_t getMaxPlayers() { return m_max_players; }
+
+    void kickAllPlayers();
+
+    virtual void sendPacket(const NetworkString& data, bool reliable = true);
+
+    virtual bool isServer() { return true; }
+
+};   // class NetworkConsole
+
+#endif // SERVER_CONSOLE_HPP

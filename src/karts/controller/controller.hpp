@@ -1,5 +1,3 @@
-
-//
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010-2015  Joerg Henrichs
 //
@@ -43,6 +41,11 @@ class Material;
  */
 class Controller
 {
+private:
+    /** If this belongs to a player, it stores the active player data
+    *  structure. Otherwise it is 0. */
+    StateManager::ActivePlayer *m_player;
+
 protected:
     /** Pointer to the kart that is controlled by this controller. */
     AbstractKart *m_kart;
@@ -50,10 +53,6 @@ protected:
     /** A pointer to the main controller, from which the kart takes
      *  it commands. */
     KartControl  *m_controls;
-
-    /** If this belongs to a player, it stores the active player data
-     *  structure. Otherwise it is 0. */
-    StateManager::ActivePlayer *m_player;
 
     /** The name of the controller, mainly used for debugging purposes. */
     std::string  m_controller_name;
@@ -70,8 +69,14 @@ public:
     virtual void  crashed            (const AbstractKart *k) = 0;
     virtual void  crashed            (const Material *m) = 0;
     virtual void  setPosition        (int p) = 0;
+    /** This function checks if this is a local player. A local player will get 
+     *  special graphical effects enabled, has a camera, and sound effects will
+     *  be played with normal volume. */
+    virtual bool  isLocalPlayerController () const = 0;
+    /** This function checks if this player is not an AI, i.e. it is either a
+     *  a local or a remote/networked player. This is tested e.g. by the AI for
+     *  rubber-banding. */
     virtual bool  isPlayerController () const = 0;
-    virtual bool  isNetworkController() const = 0;
     virtual bool  disableSlipstreamBonus() const = 0;
     // ---------------------------------------------------------------------------
     /** Sets the controller name for this controller. */

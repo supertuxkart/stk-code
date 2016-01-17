@@ -17,18 +17,19 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/stk_peer.hpp"
-#include "network/network_manager.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_string.hpp"
+#include "network/network_player_profile.hpp"
+#include "network/transport_address.hpp"
 #include "utils/log.hpp"
 
 #include <string.h>
 
 /** Constructor for an empty peer.
  */
-STKPeer::STKPeer()
+STKPeer::STKPeer(ENetPeer *enet_peer)
 {
-    m_enet_peer           = NULL;
+    m_enet_peer           = enet_peer;
     m_player_profile      = NULL;
     m_client_server_token = 0;
     m_token_set           = false;
@@ -39,32 +40,12 @@ STKPeer::STKPeer()
  */
 STKPeer::~STKPeer()
 {
-    if (m_enet_peer)
-        m_enet_peer = NULL;
+    m_enet_peer = NULL;
     if (m_player_profile)
         delete m_player_profile;
     m_player_profile = NULL;
     m_client_server_token = 0;
 }   // ~STKPeer
-
-//-----------------------------------------------------------------------------
-/** Connect to the specified host.
- */
-bool STKPeer::connectToHost(STKHost* localhost, const TransportAddress &host,
-                            uint32_t channel_count, uint32_t data)
-{
-    const ENetAddress address = host.toEnetAddress();
-
-    ENetPeer* peer = enet_host_connect(localhost->m_host, &address, 2, 0);
-    if (peer == NULL)
-    {
-        Log::error("STKPeer", "Could not try to connect to server.\n");
-        return false;
-    }
-    TransportAddress a(peer->address);
-    Log::verbose("STKPeer", "Connecting to %s", a.toString().c_str());
-    return true;
-}   // connectToHost
 
 //-----------------------------------------------------------------------------
 /** Disconnect from the server.
@@ -83,7 +64,7 @@ void STKPeer::sendPacket(NetworkString const& data, bool reliable)
 {
     TransportAddress a(m_enet_peer->address);
     Log::verbose("STKPeer", "sending packet of size %d to %s",
-                 a.toString().c_str());
+                 data.size(), a.toString().c_str());
          
     ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
                                     (reliable ? ENET_PACKET_FLAG_RELIABLE
@@ -124,11 +105,20 @@ bool STKPeer::exists() const
 }
 
 //-----------------------------------------------------------------------------
-
+/** Returns if this STKPeer is the same as the given peer.
+ */
 bool STKPeer::isSamePeer(const STKPeer* peer) const
 {
     return peer->m_enet_peer==m_enet_peer;
-}
+}   // isSamePeer
+
+//-----------------------------------------------------------------------------
+/** Returns if this STKPeer is the same as the given peer.
+*/
+bool STKPeer::isSamePeer(const ENetPeer* peer) const
+{
+    return peer==m_enet_peer;
+}   // isSamePeer
 
 //-----------------------------------------------------------------------------
 

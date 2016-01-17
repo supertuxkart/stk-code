@@ -421,7 +421,6 @@ void CutsceneWorld::enterRaceOverState()
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
                 race_manager->setNumKarts(0);
                 race_manager->setNumPlayers(0);
-                race_manager->setNumLocalPlayers(0);
                 race_manager->startSingleRace("featunlocked", 999, race_manager->raceWasStartedFromOverworld());
 
                 FeatureUnlockedCutScene* scene =
@@ -474,7 +473,6 @@ void CutsceneWorld::enterRaceOverState()
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
                 race_manager->setNumKarts(0);
                 race_manager->setNumPlayers(0);
-                race_manager->setNumLocalPlayers(0);
                 race_manager->startSingleRace("featunlocked", 999, race_manager->raceWasStartedFromOverworld());
 
                 FeatureUnlockedCutScene* scene =

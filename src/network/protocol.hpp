@@ -24,106 +24,160 @@
 #define PROTOCOL_HPP
 
 #include "network/network_string.hpp"
-#include "network/types.hpp"
+#include "utils/leak_check.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
 class Event;
-class ProtocolManager;
+class STKPeer;
+
 
 /** \enum ProtocolType
-  * \brief The types that protocols can have. This is used to select which protocol receives which event.
-  * \ingroup network
-  */
+ *  \brief The types that protocols can have. This is used to select which 
+ *   protocol receives which event.
+ *  \ingroup network
+ */
 enum ProtocolType
 {
-    PROTOCOL_NONE = 0,          //!< No protocol type assigned.
-    PROTOCOL_CONNECTION = 1,    //!< Protocol that deals with client-server connection.
-    PROTOCOL_LOBBY_ROOM = 2,    //!< Protocol that is used during the lobby room phase.
-    PROTOCOL_START_GAME = 3,    //!< Protocol used when starting the game.
-    PROTOCOL_SYNCHRONIZATION = 4,//!<Protocol used to synchronize clocks.
-    PROTOCOL_KART_UPDATE = 5,   //!< Protocol to update karts position, rotation etc...
-    PROTOCOL_GAME_EVENTS = 6,   //!< Protocol to communicate the game events.
-    PROTOCOL_CONTROLLER_EVENTS = 7,//!< Protocol to transfer controller modifications
-    PROTOCOL_SILENT = 0xffff    //!< Used for protocols that do not subscribe to any network event.
-};
+    PROTOCOL_NONE              = 0,  //!< No protocol type assigned.
+    PROTOCOL_CONNECTION        = 1,  //!< Protocol that deals with client-server connection.
+    PROTOCOL_LOBBY_ROOM        = 2,  //!< Protocol that is used during the lobby room phase.
+    PROTOCOL_START_GAME        = 3,  //!< Protocol used when starting the game.
+    PROTOCOL_SYNCHRONIZATION   = 4,  //!<Protocol used to synchronize clocks.
+    PROTOCOL_KART_UPDATE       = 5,  //!< Protocol to update karts position, rotation etc...
+    PROTOCOL_GAME_EVENTS       = 6,  //!< Protocol to communicate the game events.
+    PROTOCOL_CONTROLLER_EVENTS = 7,  //!< Protocol to transfer controller modifications
+    PROTOCOL_SILENT            = 0xffff  //!< Used for protocols that do not subscribe to any network event.
+};   // ProtocolType
 
-/** \class Protocol
-  * \brief Abstract class used to define the global protocol functions.
-  * A protocol is an entity that is started at a point, and that is updated by a thread.
-  * A protocol can be terminated by an other class, or it can terminate itself if has fulfilled its role.
-  * This class must be inherited to make any network job.
-  * \ingroup network
-  */
-class Protocol
+// ----------------------------------------------------------------------------
+/** \enum ProtocolState
+ *  \brief Defines the three states that a protocol can have.
+ */
+enum ProtocolState
 {
-    public:
-        /*!
-         * \brief Constructor
-         *
-         * Sets the basic protocol parameters, as the callback object and the protocol type.
-         *
-         * \param callback_object The callback object that will be used by the protocol. Protocols that do not use callback objects must set it to NULL.
-         * \param type The type of the protocol.
-         */
-        Protocol(CallbackObject* callback_object, ProtocolType type);
-        /*! \brief Destructor
-         */
-        virtual ~Protocol();
+    PROTOCOL_STATE_INITIALISING, //!< The protocol is waiting to be started
+    PROTOCOL_STATE_RUNNING,      //!< The protocol is being updated everytime.
+    PROTOCOL_STATE_PAUSED,       //!< The protocol is paused.
+    PROTOCOL_STATE_TERMINATED    //!< The protocol is terminated/does not exist.
+};   // ProtocolState
 
-        /*! \brief Notify a protocol matching the Event type of that event.
-         *  \param event : Pointer to the event.
-         *  \return True if the event has been treated, false elseway
-         */
-        virtual bool notifyEvent(Event* event) { return false; }
+class Protocol;
 
-        /*! \brief Notify a protocol matching the Event type of that event.
-         *  This update is done asynchronously :
-         *  \param event : Pointer to the event.
-         *  \return True if the event has been treated, false elseway
-         */
-        virtual bool notifyEventAsynchronous(Event* event) { return false; }
+// ============================================================================*
+/** \class CallbackObject
+ *  \brief Class that must be inherited to pass objects to protocols.
+ */
+class CallbackObject
+{
+public:
+             CallbackObject() {}
+    virtual ~CallbackObject() {}
 
-        /*! \brief Set the protocol listener.
-         *  \param listener : Pointer to the listener.
-         */
-        void setListener(ProtocolManager* listener);
+    virtual void callback(Protocol *protocol) = 0;
+};   // CallbackObject
 
-        /*! \brief Called when the protocol is going to start. Must be re-defined by subclasses.
-         */
-        virtual void setup() = 0;
-        /*! \brief Called when the protocol is paused (by an other entity or by itself).
-         *  This function must be called by the subclasse's pause function if re-defined.
-         */
-        virtual void pause();
-        /*! \brief Called when the protocol is unpaused.
-         *  This function must be called by the subclasse's unpause function if re-defined.
-         */
-        virtual void unpause();
-        /*! \brief Called by the protocol listener, synchronously with the main loop. Must be re-defined.
-         */
-        virtual void update() = 0;
-        /*! \brief Called by the protocol listener as often as possible. Must be re-defined.
-         */
-        virtual void asynchronousUpdate() = 0;
-        /*! \brief Called when the protocol is to be killed.
-         */
-        virtual void kill();
+// ============================================================================
+/** \class Protocol
+ *  \brief Abstract class used to define the global protocol functions.
+ *  A protocol is an entity that is started at a point, and that is updated
+ *  by a thread. A protocol can be terminated by an other class, or it can
+ *  terminate itself if has fulfilled its role. This class must be inherited
+ *  to make any network job.
+ * \ingroup network
+ */
+class Protocol : public NoCopy
+{
+    LEAK_CHECK()
+protected:
+    /** The type of the protocol. */
+    ProtocolType m_type;
 
-        /*! \brief Method to get a protocol's type.
-         *  \return The protocol type.
-         */
-        ProtocolType getProtocolType();
+    /** The callback object, if needed. */
+    CallbackObject* m_callback_object;
 
-        /// functions to check incoming data easily
-        bool checkDataSizeAndToken(Event* event, int minimum_size);
-        bool isByteCorrect(Event* event, int byte_nb, int value);
-        void sendMessageToPeersChangingToken(NetworkString prefix, NetworkString message);
+    /** The state this protocol is in (e.g. running, paused, ...). */
+    ProtocolState m_state;
+
+    /** The unique id of the protocol. */
+    uint32_t        m_id;
+
+public:
+             Protocol(ProtocolType type, CallbackObject* callback_object=NULL);
+    virtual ~Protocol();
+
+    /** \brief Called when the protocol is going to start. Must be re-defined
+     *  by subclasses. */
+    virtual void setup() = 0;
+    // ------------------------------------------------------------------------
+
+    /** \brief Called by the protocol listener, synchronously with the main
+     *  loop. Must be re-defined.*/
+    virtual void update() = 0;
+
+    /** \brief Called by the protocol listener as often as possible.
+     *  Must be re-defined. */
+    virtual void asynchronousUpdate() = 0;
+
+    /// functions to check incoming data easily
+    bool checkDataSizeAndToken(Event* event, int minimum_size);
+    bool isByteCorrect(Event* event, int byte_nb, int value);
+    void sendMessageToPeersChangingToken(NetworkString prefix,
+                                         NetworkString message);
+    void sendMessage(const NetworkString& message,
+                     bool reliable = true);
+    void sendMessage(STKPeer* peer, const NetworkString& message,
+                     bool reliable = true);
+    void requestStart();
+    void requestPause();
+    void requestUnpause();
+    void requestTerminate();
+
+    // ------------------------------------------------------------------------
+    /** \brief Called when the protocol is paused (by an other entity or by
+    *  itself). */
+    virtual void paused() { }
+    // ------------------------------------------------------------------------
+    /** \brief Called when the protocol is used.
+    */
+    virtual void unpaused() { }
+    // ------------------------------------------------------------------------
+    /** \brief Called when the protocol was just killed. It triggers the 
+     *  callback if defined. */
+    virtual void terminated()
+    {
+        if (m_callback_object)
+            m_callback_object->callback(this);
+    }   // terminated
+    // ------------------------------------------------------------------------
+    /** Returns the current protocol state. */
+    ProtocolState getState() const { return m_state;  }
+    // ------------------------------------------------------------------------
+    /** Sets the current protocol state. */
+    void setState(ProtocolState s) { m_state = s; }
+    // ------------------------------------------------------------------------
+    /** Returns the unique protocol ID. */
+    uint32_t getId() const { return m_id;  }
+    // ------------------------------------------------------------------------
+    /** Sets the unique protocol id. */
+    void setId(uint32_t id) { m_id = id;  }
+    // ------------------------------------------------------------------------
+    /** \brief Notify a protocol matching the Event type of that event.
+     *  \param event : Pointer to the event.
+     *  \return True if the event has been treated, false otherwise. */
+    virtual bool notifyEvent(Event* event) { return false; }
+    // ------------------------------------------------------------------------
+    /** \brief Notify a protocol matching the Event type of that event.
+     *  This update is done asynchronously :
+     *  \param event : Pointer to the event.
+     *  \return True if the event has been treated, false otherwise */
+    virtual bool notifyEventAsynchronous(Event* event) { return false; }
+    // ------------------------------------------------------------------------
+    /** \brief Method to get a protocol's type.
+     *  \return The protocol type. */
+    ProtocolType getProtocolType() const { return m_type; }
 
 
-    protected:
-        ProtocolManager* m_listener;        //!< The protocol listener
-        ProtocolType m_type;               //!< The type of the protocol
-        CallbackObject* m_callback_object;   //!< The callback object, if needed
-};
+};   // class Protocol
 
 #endif // PROTOCOL_HPP

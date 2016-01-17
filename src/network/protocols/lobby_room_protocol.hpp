@@ -26,21 +26,52 @@
 
 /*!
  * \class LobbyRoomProtocol
- * \brief Class used while the game is being prepared.
- * This protocol starts when a server opens a game, or when a client joins a game.
- * It is used to exchange data about the race settings, like kart selection.
+ * \brief Base class for both client and server lobby. The lobbies are started
+ *  when a server opens a game, or when a client joins a game.
+ *  It is used to exchange data about the race settings, like kart selection.
  */
 class LobbyRoomProtocol : public Protocol
 {
-    public:
-        LobbyRoomProtocol(CallbackObject* callback_object);
-        virtual ~LobbyRoomProtocol();
+public:
+    /** Lists all lobby events (LE). */
+    enum 
+    { 
+        LE_CONNECTION_REQUESTED   = 1,
+        LE_REQUEST_BEGIN,
+        LE_NEW_PLAYER_CONNECTED,
+        LE_KART_SELECTION,
+        LE_PLAYER_DISCONNECTED,
+        LE_KART_SELECTION_UPDATE,
+        LE_START_RACE,
+        LE_START_SELECTION,
+        LE_RACE_FINISHED,
+        LE_CONNECTION_REFUSED,
+        LE_CONNECTION_ACCEPTED,
+        LE_KART_SELECTION_REFUSED,
+        LE_VOTE_MAJOR,
+        LE_VOTE_RACE_COUNT,
+        LE_VOTE_MINOR,
+        LE_VOTE_TRACK,
+        LE_VOTE_REVERSE,
+        LE_VOTE_LAPS,
+    };
 
-        virtual void setup() = 0;
-        virtual void update() = 0;
+protected:
+    /** The game setup. */
+    GameSetup* m_setup;
 
-    protected:
-        GameSetup* m_setup; //!< The game setup.
-};
+
+public:
+    LobbyRoomProtocol(CallbackObject* callback_object)
+        : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
+    {
+        m_setup = NULL;
+    }   // LobbyRoomProtocol
+    // ------------------------------------------------------------------------
+    virtual ~LobbyRoomProtocol() {}
+    // ------------------------------------------------------------------------
+    virtual void setup() = 0;
+    virtual void update() = 0;
+};   // class LobbyRoomProtocol
 
 #endif // LOBBY_ROOM_PROTOCOL_HPP

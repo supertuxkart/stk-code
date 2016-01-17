@@ -21,9 +21,18 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "network/event.hpp"
-#include "network/network_manager.hpp"
+#include "network/network_config.hpp"
+#include "network/network_console.hpp"
+#include "network/network_string.hpp"
+#include "network/protocols/connect_to_peer.hpp"
+#include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/servers_manager.hpp"
+#include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
+#include "utils/vs.hpp"
 
 #include <string.h>
 #if defined(WIN32)
@@ -37,44 +46,252 @@
 #include <pthread.h>
 #include <signal.h>
 
-#ifdef __MINGW32__
-const char* inet_ntop(int af, const void* src, char* dst, int cnt)
+STKHost *STKHost::m_stk_host = NULL;
+
+void STKHost::create()
 {
-    struct sockaddr_in srcaddr;
-
-    memset(&srcaddr, 0, sizeof(struct sockaddr_in));
-    memcpy(&(srcaddr.sin_addr), src, sizeof(srcaddr.sin_addr));
-
-    srcaddr.sin_family = af;
-    if (WSAAddressToString((struct sockaddr*) &srcaddr,
-        sizeof(struct sockaddr_in), 0, dst, (LPDWORD) &cnt) != 0)
+    assert(m_stk_host == NULL);
+    if(NetworkConfig::get()->isServer())
+        m_stk_host = new STKHost(NetworkConfig::get()->getServerName());
+    else
     {
-        return NULL;
+        Server *server = ServersManager::get()->getJoinedServer();
+        m_stk_host = new STKHost(server->getServerId(), 0);
     }
-    return dst;
-}
-#endif
-
-Synchronised<FILE*> STKHost::m_log_file = NULL;
+   if(!m_stk_host->m_network)
+    {
+        delete m_stk_host;
+        m_stk_host = NULL;
+    }
+}   // create
 
 // ============================================================================
-/** Constructor that just initialises this object (esp. opening the packet
- *  log file), but it does not start a listener thread.
+/** \class STKHost
+ *  \brief Represents the local host. It is the main managing point for 
+ *  networking. It is responsible for sending and receiving messages,
+ *  and keeping track of onnected peers. It also provides some low
+ *  level socket functions (i.e. to avoid that enet adds its headers
+ *  to messages, useful for broadcast in LAN and for stun). It can be
+ *  either instantiated as server, or as client. 
+ *  Additionally this object stores information from the various protocols,
+ *  which can be queried by the GUI. The online game works
+ *  closely together with the stk server: a (game) server first connects
+ *  to the stk server and registers itself, clients find the list of servers
+ *  from the stk server. They insert a connections request into the stk
+ *  server, which is regularly polled by the client. On detecting a new
+ *  connection request the server will try to send a message to the client.
+ *  This allows connections between server and client even if they are 
+ *  sitting behind a NAT translating firewall. The following tables on
+ *  the stk server are used:
+ *  client_sessions: It stores the list of all online users (so loging in
+ *         means to insert a row in this table), including their token
+ *         used for authentication. In case of a client or server, their
+ *         public ip address and port number and private port (for LAN)
+ *         are added to the entry.
+ *  servers: Registers all servers and gives them a unique id, together
+ *         with the user id (which is stored as host_id in this table).
+ *  server_conn: This table stores connection requests from clients to
+ *         servers. A 'request' bit is set to 1 if the request has not
+ *         been handled, and is reset to 0 the moment the server receives
+ *         the information about the client request.
+ *
+ *  The following outlines the protocol happening in order to connect a
+ *  client to a server in more details:
+ *
+ *  Server:
+ *
+ *    1. ServerLobbyRoomProtocol:
+ *       Spawns the following sub-protocols:
+ *       1. GetPublicAddress: Use STUN to discover the public ip address
+ *          and port number of this host.
+ *       2. Register this server with stk server (i.e. publish its public
+ *          ip address and port number) - 'start' request. This enters the
+ *          public information into the 'client_sessions' table, and then
+ *          the server into the 'servers' table. This server can now
+ *          be detected by other clients, so they can request a connection.
+ *       3. The server lobby now polls the stk server for client connection
+ *          requests using the 'poll-connection-requests', which queries the
+ *          servers table to get the server id (based on address and user id),
+ *          and then the server_conn table. The rows in this table are updated
+ *          by setting the 'request' bit to 0 (i.e. connection request was
+ *          send to server).
+ *      
+ *  Client:
+ *
+ *    The GUI queries the stk server to get a list of available servers
+ *    ('get-all' request, submitted from ServersManager to query the 'servers'
+ *    table). The user picks one (or in case of quick play one is picked
+ *    randomly), and then instantiates STKHost with the id of this server.
+ *    STKHost then triggers ConnectToServer, which starts the following
+ *    protocols:
+ *       1. GetPublicAddress: Use STUN to discover the public ip address
+ *          and port number of this host.
+ *       2. Register the client with the STK host ('set' command, into the
+ *          table 'client_sessions'). Its public ip address and port will
+ *          be registerd.
+ *       3. GetPeerAddress. Submits a 'get' request to the STK server to get
+ *          the ip address and port for the selected server from
+ *          'client_sessions'. 
+ *          If the ip address of the server is the same as this client, they
+ *          will connect using the LAN connection.
+ *       4. RequestConnection will do a 'request-connection' to the stk server.
+ *          The user id and server id are stored in server_conn. This is the
+ *          request that the server will detect using polling.
+ *
+ * Server:
+ *
+ *   The ServerLobbyRoomProtocol (SLR) will the detect the above client
+ *   requests, and start a ConnectToPeer protocol for each incoming client.
+ *   The ConnectToPeer protocol uses:
+ *         1. GetPeerAddress to get the ip address and port of the client.
+ *            Once this is received, it will start the:
+ *         2. PingProtocol
+ *            This sends a raw packet (i.e. no enet header) to the
+ *            destination (unless if it is a LAN connection, then UDP
+ *            broadcasts will be used). 
+ *
+ *  Each client will run a ClientLobbyRoomProtocol (CLR) to handle the further
+ *  interaction with the server. The client will first request a connection
+ *  with the server (this is for the 'logical' connection to the server; so
+ *  far it was mostly about the 'physical' connection, i.e. being able to send
+ *  a message to the server).
+ *
+ *  Each protocol has its own protocol id, which is added to each message in
+ *  Protocol::sendMessage(). The ProtocolManager will automatically forward
+ *  each received message to the protocol with the same id. So any message
+ *  sent by protocol X on the server will be received by protocol X on the
+ *  client and vice versa. The only exception are the client- and server-lobby:
+ *  They share the same id (set in LobbyRoomProtocol), so a message sent by
+ *  the SLR will be received by the CLR, and a message from the CLR will be
+ *  received by the SLR.
+ *
+ *  The server will reply with either a reject message (e.g. too many clients
+ *  already connected), or an accept message. The accept message will contain
+ *  the global player id of the client, and a unique (random) token used to
+ *  authenticate all further messages from the server: each message from the
+ *  client to the server and vice versa will contain this token. The message
+ *  also contains the global ids and names of all currently connected
+ *  clients for the new client. The server then informs all existing clients
+ *  about the newly connected client, and its global player id.
+ *
+ *  --> At this stage all clients and the server know the name and global id
+ *  of all connected clients. This information is stored in an array of
+ *  NetworkPlayerProfile managed in GameSetup (which is stored in STKHost).
+ *
+ *  When the authorised clients starts the kart selection, the SLR
+ *  informs all clients to start the kart selection (SLR::startSelection).
+ *  This triggers the creation of the kart selection screen in 
+ *  CLR::startSelection / CLR::update. The kart selection in a client calls
+ *  (NetworkKartSelection::playerConfirm) which calls CLR::requestKartSelection.
+ *  This sends a message to SLR::kartSelectionRequested, which verifies the
+ *  selected kart and sends this information to all clients (including the
+ *  client selecting the kart in the first place). This message is handled
+ *  by CLR::kartSelectionUpdate. Server and all clients store this information
+ *  in the NetworkPlayerProfile for the corresponding player, so server and
+ *  all clients now have identical information about global player id, player
+ *  name and selected kart. The authorised client will set some default votes
+ *  for game modes, number of laps etc (temporary, see
+ *  NetworkKartSelection::playerSelected).
+ *
+ *  After selecting a kart, the track selection screen is shown. On selecting
+ *  a track, a vote for the track is sent to the client
+ *  (TrackScreen::eventCallback, using CLR::voteTrack). The server will send
+ *  all votes (track, #laps, ...) to all clients (see e.g. SLR::playerTrackVote
+ *  etc), which are handled in e.g. CLR::playerTrackVote().
+ *
+ *  --> Server and all clients have identical information about all votes
+ *  stored in RaceConfig of GameSetup.
+ * 
+ *  The server will detect when the track votes from each client have been
+ *  received and will trigger the start of the race (SLR::startGame, called
+ *  from playerTrackVote). In SLR::startGame the server will start the 
+ *  StartGameProtocol and the clients will be informed to start the game.
+ *  In a client the StartGame protocol will be started in CLR::startGame. 
+ *  
  */
-STKHost::STKHost()
+
+// ============================================================================
+/** Constructor for a client
+ */
+STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 {
-    m_host             = NULL;
-    m_listening_thread = NULL;
-    m_log_file.setAtomic(NULL);
-    pthread_mutex_init(&m_exit_mutex, NULL);
-    if (UserConfigParams::m_packets_log_filename.toString() != "")
+    // Will be overwritten with the correct value once a connection with the
+    // server is made.
+    m_host_id = 0;
+    init();
+
+    m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
+                            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0);
+    if (!m_network)
     {
-        std::string s = file_manager
-                 ->getUserConfigFile(UserConfigParams::m_packets_log_filename);
-        m_log_file.setAtomic(fopen(s.c_str(), "w+"));
+        Log::fatal ("STKHost", "An error occurred while trying to create "
+                               "an ENet client host.");
     }
-    if (!m_log_file.getData())
-        Log::warn("STKHost", "Network packets won't be logged: no file.");
+
+    Protocol *connect = new ConnectToServer(server_id, host_id);
+    connect->requestStart();
+}   // STKHost
+
+// ----------------------------------------------------------------------------
+/** The constructor for a server.
+ *  The server control flow starts with the ServerLobbyRoomProtocol.
+ */
+STKHost::STKHost(const irr::core::stringw &server_name)
+{
+    init();
+    m_host_id = 0;   // indicates a server host.
+
+    ENetAddress addr;
+    addr.host = STKHost::HOST_ANY;
+    addr.port = 2758;
+
+    m_network= new Network(NetworkConfig::get()->getMaxPlayers(),
+                           /*channel_limit*/2,
+                           /*max_in_bandwidth*/0,
+                           /*max_out_bandwidth*/ 0, &addr);
+    if (!m_network)
+    {
+        Log::fatal("STKHost", "An error occurred while trying to create an "
+                              "ENet server host.");
+    }
+
+    startListening();
+    ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
+
+}   // STKHost(server_name)
+
+// ----------------------------------------------------------------------------
+/** Initialises the internal data structures and starts the protocol manager
+ *  and the debug console.
+ */
+void STKHost::init()
+{
+    m_shutdown         = false;
+    m_network          = NULL;
+    m_lan_network      = NULL;
+    m_listening_thread = NULL;
+    m_game_setup       = NULL;
+    m_is_registered    = false;
+    m_error_message    = "";
+
+    pthread_mutex_init(&m_exit_mutex, NULL);
+
+    // Start with initialising ENet
+    // ============================
+    if (enet_initialize() != 0)
+    {
+        Log::error("NetworkConsole", "Could not initialize enet.");
+        return;
+    }
+
+    Log::info("NetworkConsole", "Host initialized.");
+    Network::openLog();  // Open packet log file
+    ProtocolManager::getInstance<ProtocolManager>();
+
+    // Optional: start the network console
+    m_network_console = new NetworkConsole();
+    m_network_console->run();
+
 }   // STKHost
 
 // ----------------------------------------------------------------------------
@@ -83,45 +300,143 @@ STKHost::STKHost()
  */
 STKHost::~STKHost()
 {
+    ProtocolManager::kill();
+    // delete the game setup
+    if (m_game_setup)
+        delete m_game_setup;
+    m_game_setup = NULL;
+
+    // Delete all connected peers
+    while (!m_peers.empty())
+    {
+        delete m_peers.back();
+        m_peers.pop_back();
+    }
+
+    Network::closeLog();
     stopListening();
-    if (m_log_file.getData())
-    {
-        m_log_file.lock();
-        fclose(m_log_file.getData());
-        Log::warn("STKHost", "Packet logging file has been closed.");
-        m_log_file.getData() = NULL;
-        m_log_file.unlock();
-    }
-    if (m_host)
-    {
-        enet_host_destroy(m_host);
-    }
+
+    delete m_network;
 }   // ~STKHost
 
-// ----------------------------------------------------------------------------
-/** \brief Log packets into a file
- *  \param ns : The data in the packet
- *  \param incoming : True if the packet comes from a peer.
- *  False if it's sent to a peer.
+//-----------------------------------------------------------------------------
+/** Requests that the network infrastructure is to be shut down. This function
+ *  is called from a thread, but the actual shutdown needs to be done from 
+ *  the main thread to avoid race conditions (e.g. ProtocolManager might still
+ *  access data structures when the main thread tests if STKHost exist (which
+ *  it does, but ProtocolManager might be shut down already.
  */
-void STKHost::logPacket(const NetworkString &ns, bool incoming)
+void STKHost::requestShutdown()
 {
-    if (m_log_file.getData() == NULL) // read only access, no need to lock
-        return;
+    m_shutdown = true;
+}   // requestExit
 
-    const char *arrow = incoming ? "<--" : "-->";
+//-----------------------------------------------------------------------------
+/** Called from the main thread when the network infrastructure is to be shut
+ *  down.
+ */
+void STKHost::shutdown()
+{
+    ServersManager::get()->unsetJoinedServer();
+    ProtocolManager::getInstance()->abort();
+    deleteAllPeers();
+    destroy();
+}   // shutdown
 
-    m_log_file.lock();
-    fprintf(m_log_file.getData(), "[%d\t]  %s  ",
-            (int)(StkTime::getRealTime()), arrow);
+//-----------------------------------------------------------------------------
+/** A previous GameSetup is deletea and a new one is created.
+ *  \return Newly create GameSetup object.
+ */
+GameSetup* STKHost::setupNewGame()
+{
+    if (m_game_setup)
+        delete m_game_setup;
+    m_game_setup = new GameSetup();
+    return m_game_setup;
+}   // setupNewGame
 
-    for (int i = 0; i < ns.size(); i++)
+//-----------------------------------------------------------------------------
+/** Called when you leave a server.
+*/
+void STKHost::deleteAllPeers()
+{
+    // remove all peers
+    for (unsigned int i = 0; i < m_peers.size(); i++)
     {
-        fprintf(m_log_file.getData(), "%d.", ns[i]);
+        delete m_peers[i];
+        m_peers[i] = NULL;
     }
-    fprintf(m_log_file.getData(), "\n");
-    m_log_file.unlock();
-}   // logPacket
+    m_peers.clear();
+}   // deleteAllPeers
+
+// ----------------------------------------------------------------------------
+/** Called when STK exits. It stops the listening thread and the
+ *  ProtocolManager.
+ */
+void STKHost::abort()
+{
+    // Finish protocol manager first, to avoid that it access data
+    // in STKHost.
+    ProtocolManager::getInstance()->abort();
+    stopListening();
+}   // abort
+
+// --------------------------------------------------------------------
+/** Sets an error message for the gui.
+ */
+void STKHost::setErrorMessage(const irr::core::stringw &message)
+{
+    irr::core::stringc s(message.c_str());
+    Log::error("STKHost", "%s", s.c_str());
+    m_error_message = message;
+}   // setErrorMessage
+
+// --------------------------------------------------------------------
+/** Returns the last error (or "" if no error has happened). */
+const irr::core::stringw& STKHost::getErrorMessage() const
+{
+    return m_error_message; 
+}   // getErrorMessage
+
+// --------------------------------------------------------------------
+/** \brief Try to establish a connection to a given transport address.
+ *  \param peer : The transport address which you want to connect to.
+ *  \return True if we're successfully connected. False elseway.
+ */
+bool STKHost::connect(const TransportAddress& address)
+{
+    if (peerExists(address))
+        return isConnectedTo(address);
+
+    ENetPeer* peer = m_network->connectTo(address);
+
+    if (peer == NULL)
+    {
+        Log::error("STKHost", "Could not try to connect to server.");
+        return false;
+    }
+    TransportAddress a(peer->address);
+    Log::verbose("STKPeer", "Connecting to %s", a.toString().c_str());
+    return true;
+}   // connect
+
+// --------------------------------------------------------------------
+/** Sends a message to the server if this is a client, or to all
+ *  clients if this is the server.
+ *  \param data Message to sent.
+ *  \param reliable If the message is to be sent reliable.
+ */
+void STKHost::sendMessage(const NetworkString& data, bool reliable)
+{
+    if (NetworkConfig::get()->isServer())
+        broadcastPacket(data, reliable);
+    else
+    {
+        if (m_peers.size() > 1)
+            Log::warn("ClientNetworkManager", "Ambiguous send of data.");
+        m_peers[0]->sendPacket(data, reliable);
+    }
+}   // sendMessage
 
 // ----------------------------------------------------------------------------
 /** \brief Starts the listening of events from ENet.
@@ -163,6 +478,37 @@ int STKHost::mustStopListening()
     return 1;
 }   // mustStopListening
 
+// --------------------------------------------------------------------
+/** Returns true if this instance is allowed to control the server.
+ */
+bool STKHost::isAuthorisedToControl() const 
+{
+    // If we are not properly connected (i.e. only enet connection, but not
+    // stk logic), no peer is authorised.
+    if(m_peers.size()==0)
+        return false;
+    Server *server = ServersManager::get()->getJoinedServer();
+    return NetworkConfig::get()->getMyAddress().getIP() == 
+            server->getAddress().getIP();
+
+}   // isAuthorisedToControl
+
+// ----------------------------------------------------------------------------
+/** Server-side check if the client sending a command is really authorised 
+ *  to do so.
+ *  \param peer Peer sending the command.
+ */
+bool STKHost::isAuthorisedToControl(const STKPeer *peer) const 
+{
+    // If we are not properly connected (i.e. only enet connection, but not
+    // stk logic), no peer is authorised.
+    if(m_peers.size()==0)
+        return false;
+    // FIXME peer has ip 0
+    return true;
+    return peer->getAddress()==NetworkConfig::get()->getMyAddress().getIP();
+}   // isAuthorisedToControl
+
 // ----------------------------------------------------------------------------
 /** \brief Thread function checking if data is received.
  *  This function tries to get data from network low-level functions as
@@ -172,25 +518,59 @@ int STKHost::mustStopListening()
  */
 void* STKHost::mainLoop(void* self)
 {
+    VS::setThreadName("STKHost");
     ENetEvent event;
     STKHost* myself = (STKHost*)(self);
-    ENetHost* host = myself->m_host;
+    ENetHost* host = myself->m_network->getENetHost();
+
+    if(NetworkConfig::get()->isServer() && 
+        NetworkConfig::get()->isLAN()      )
+    {
+        TransportAddress address(0, 2757);
+        ENetAddress eaddr = address.toEnetAddress();
+        myself->m_lan_network = new Network(1, 1, 0, 0, &eaddr);
+    }
+
     while (!myself->mustStopListening())
     {
+        if(myself->m_lan_network)
+        {
+            myself->handleLANRequests();
+        }   // if discovery host
+
         while (enet_host_service(host, &event, 20) != 0)
         {
             if (event.type == ENET_EVENT_TYPE_NONE)
                 continue;
 
-            // Create an STKEvent with the event data
+            // Create an STKEvent with the event data. This will also
+            // create the peer if it doesn't exist already
             Event* stk_event = new Event(&event);
             if (stk_event->getType() == EVENT_TYPE_MESSAGE)
-                logPacket(stk_event->data(), true);
+                Network::logPacket(stk_event->data(), true);
 
-            // The event is forwarded to the NetworkManger and from there
-            // there to the ProtocolManager. The ProtocolManager is
-            // responsible for freeing the memory.
-            NetworkManager::getInstance()->propagateEvent(stk_event);
+            Log::verbose("STKHost", "Event of type %d received",
+                         (int)(stk_event->getType()));
+            STKPeer* peer = stk_event->getPeer();
+            if (stk_event->getType() == EVENT_TYPE_CONNECTED)
+            {
+                Log::info("STKHost", "A client has just connected. There are "
+                          "now %lu peers.", myself->m_peers.size());
+                Log::debug("STKHost", "Addresses are : %lx, %lx",
+                           stk_event->getPeer(), peer);
+            }   // EVENT_TYPE_CONNECTED
+            else if (stk_event->getType() == EVENT_TYPE_MESSAGE)
+            {
+                TransportAddress stk_addr(peer->getAddress());
+                Log::verbose("NetworkManager",
+                             "Message, Sender : %s, message = \"%s\"",
+                             stk_addr.toString(/*show port*/false).c_str(),
+                             stk_event->data().std_string().c_str());
+
+            }   // if message event
+
+            // notify for the event now.
+            ProtocolManager::getInstance()->propagateEvent(stk_event);
             
         }   // while enet_host_service
     }   // while !mustStopListening
@@ -202,204 +582,46 @@ void* STKHost::mainLoop(void* self)
 }   // mainLoop
 
 // ----------------------------------------------------------------------------
-/** \brief Setups this host as a server.
- *  \param address : The IPv4 address of incoming connections.
- *  \param port : The port on which the server listens.
- *  \param peer_count : The maximum number of peers.
- *  \param channel_limit : The maximum number of channels per peer.
- *  \param max_incoming_bandwidth : The maximum incoming bandwidth.
- *  \param max_outgoing_bandwidth : The maximum outgoing bandwidth.
- */
-void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
-                            int channel_limit, uint32_t max_incoming_bandwidth,
-                            uint32_t max_outgoing_bandwidth)
+void STKHost::handleLANRequests()
 {
-    ENetAddress* addr = (ENetAddress*)(malloc(sizeof(ENetAddress)));
-    addr->host = address;
-    addr->port = port;
+    const int LEN=2048;
+    char buffer[LEN];
 
-#ifdef WIN32/*
-    addr->host = 0;
-    addr->host += ((unsigned int)(192)<<0); // 192.168.0.11
-    addr->host += ((unsigned int)(168)<<8); // 192.168.0.11
-    addr->host += ((unsigned int)(11)<<24); // 192.168.0.11*/
-#endif
+    TransportAddress sender;
+    int len = m_lan_network->receiveRawPacket(buffer, LEN, &sender, 1);
+    if(len<=0) return;
 
-    m_host = enet_host_create(addr, peer_count, channel_limit,
-                              max_incoming_bandwidth, max_outgoing_bandwidth);
-    if (!m_host)
+    if (std::string(buffer, len) == "stk-server")
     {
-        Log::fatal("STKHost", "An error occurred while trying to create an ENet"
-                          " server host.");
-    }
-}   // setupServer
+        Log::verbose("STKHost", "Received LAN server query");
+        std::string name = 
+            StringUtils::wideToUtf8(NetworkConfig::get()->getServerName());
+        // Avoid buffer overflows
+        if (name.size() > 255)
+            name = name.substr(0, 255);
 
-// ----------------------------------------------------------------------------
-/** \brief Setups the host as a client.
- *  In fact there is only one peer connected to this host.
- *  \param peer_count : The maximum number of peers.
- *  \param channel_limit : The maximum number of channels per peer.
- *  \param max_incoming_bandwidth : The maximum incoming bandwidth.
- *  \param max_outgoing_bandwidth : The maximum outgoing bandwidth.
- */
-
-void STKHost::setupClient(int peer_count, int channel_limit,
-                          uint32_t max_incoming_bandwidth,
-                          uint32_t max_outgoing_bandwidth)
-{
-    m_host = enet_host_create(NULL, peer_count, channel_limit,
-                              max_incoming_bandwidth, max_outgoing_bandwidth);
-    if (!m_host)
+        // Send the answer, consisting of server name, max players, 
+        // current players, and the client's ip address and port
+        // number (which solves the problem which network interface
+        // might be the right one if there is more than one).
+        NetworkString s;
+        s.encodeString(name);
+        s.addUInt8(NetworkConfig::get()->getMaxPlayers());
+        s.addUInt8(0);   // FIXME: current number of connected players
+        s.addUInt32(sender.getIP());
+        s.addUInt16(sender.getPort());
+        m_lan_network->sendRawPacket(s.getBytes(), s.size(), sender);
+    }   // if message is server-requested
+    else if (std::string(buffer, len) == "connection-request")
     {
-        Log::fatal ("STKHost", "An error occurred while trying to create an "
-                          "ENet client host.");
+        Protocol *c = new ConnectToPeer(sender);
+        c->requestStart();
     }
-}   // setupClient
+    else
+        Log::info("STKHost", "Received unknown command '%s'",
+                  std::string(buffer, len).c_str());
 
-// ----------------------------------------------------------------------------
-/** \brief Sends a packet whithout ENet adding its headers.
- *  This function is used in particular to achieve the STUN protocol.
- *  \param data : Data to send.
- *  \param length : Length of the sent data.
- *  \param dst : Destination of the packet.
- */
-void STKHost::sendRawPacket(uint8_t* data, int length,
-                            const TransportAddress& dst)
-{
-    struct sockaddr_in to;
-    int to_len = sizeof(to);
-    memset(&to,0,to_len);
-
-    to.sin_family = AF_INET;
-    to.sin_port = htons(dst.getPort());
-    to.sin_addr.s_addr = htonl(dst.getIP());
-
-    sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
-    Log::verbose("STKHost", "Raw packet sent to %s", dst.toString().c_str());
-    STKHost::logPacket(NetworkString(std::string((char*)(data), length)),
-                       false);
-}   // sendRawPacket
-
-// ----------------------------------------------------------------------------
-/** \brief Receives a packet directly from the network interface.
- *  Receive a packet whithout ENet processing it and returns the
- *  sender's ip address and port in the TransportAddress structure.
- *  \param sender : Stores the transport address of the sender of the
- *                  received packet.
- *  \return A string containing the data of the received packet.
- */
-uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
-{
-    const int LEN = 2048;
-    // max size needed normally (only used for stun)
-    uint8_t* buffer = new uint8_t[LEN]; 
-    memset(buffer, 0, LEN);
-
-    socklen_t from_len;
-    struct sockaddr_in addr;
-
-    from_len = sizeof(addr);
-    int len = recvfrom(m_host->socket, (char*)buffer, LEN, 0,
-                       (struct sockaddr*)(&addr), &from_len   );
-
-    int i = 0;
-     // wait to receive the message because enet sockets are non-blocking
-    while(len == -1) // nothing received
-    {
-        StkTime::sleep(1); // wait 1 millisecond between two checks
-        i++;
-        len = recvfrom(m_host->socket, (char*)buffer, LEN, 0,
-                       (struct sockaddr*)(&addr), &from_len   );
-    }
-    if (len == SOCKET_ERROR)
-    {
-        Log::error("STKHost",
-                   "Problem with the socket. Please contact the dev team.");
-    }
-    // we received the data
-    sender->setIP( ntohl((uint32_t)(addr.sin_addr.s_addr)) );
-    sender->setPort( ntohs(addr.sin_port) );
-
-    if (addr.sin_family == AF_INET)
-    {
-        Log::info("STKHost", "IPv4 Address of the sender was %s",
-                  sender->toString().c_str());
-    }
-    STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
-    return buffer;
-}   // receiveRawPacket(TransportAddress* sender)
-
-// ----------------------------------------------------------------------------
-/** \brief Receives a packet directly from the network interface and
- *  filter its address.
- *  Receive a packet whithout ENet processing it. Checks that the
- *  sender of the packet is the one that corresponds to the sender
- *  parameter. Does not check the port right now.
- *  \param sender : Transport address of the original sender of the
- *                  wanted packet.
- *  \param max_tries : Number of times we try to read data from the
- *                  socket. This is aproximately the time we wait in
- *                  milliseconds. -1 means eternal tries.
- *  \return A string containing the data of the received packet
- *          matching the sender's ip address.
- */
-uint8_t* STKHost::receiveRawPacket(const TransportAddress& sender,
-                                   int max_tries)
-{
-    const int LEN = 2048;
-    uint8_t* buffer = new uint8_t[LEN];
-    memset(buffer, 0, LEN);
-
-    socklen_t from_len;
-    struct sockaddr_in addr;
-
-    from_len = sizeof(addr);
-    int len = recvfrom(m_host->socket, (char*)buffer, LEN, 0,
-                       (struct sockaddr*)(&addr), &from_len    );
-
-    int count = 0;
-     // wait to receive the message because enet sockets are non-blocking
-    while(len < 0 || addr.sin_addr.s_addr == sender.getIP())
-    {
-        count++;
-        if (len>=0)
-        {
-            Log::info("STKHost", "Message received but the ip address didn't "
-                                 "match the expected one.");
-        }
-        len = recvfrom(m_host->socket, (char*)buffer, LEN, 0, 
-                       (struct sockaddr*)(&addr), &from_len);
-        StkTime::sleep(1); // wait 1 millisecond between two checks
-        if (count >= max_tries && max_tries != -1)
-        {
-            TransportAddress a(m_host->address);
-            Log::verbose("STKHost", "No answer from the server on %s",
-                         a.toString().c_str());
-            return NULL;
-        }
-    }
-    if (addr.sin_family == AF_INET)
-    {
-        TransportAddress a(ntohl(addr.sin_addr.s_addr));
-        Log::info("STKHost", "IPv4 Address of the sender was %s",
-                  a.toString(false).c_str());
-    }
-    STKHost::logPacket(NetworkString(std::string((char*)(buffer), len)), true);
-    return buffer;
-}   // receiveRawPacket(const TransportAddress& sender, int max_tries)
-
-// ----------------------------------------------------------------------------
-/** \brief Broadcasts a packet to all peers.
- *  \param data : Data to send.
- */
-void STKHost::broadcastPacket(const NetworkString& data, bool reliable)
-{
-    ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
-                                      reliable ? ENET_PACKET_FLAG_RELIABLE
-                                               : ENET_PACKET_FLAG_UNSEQUENCED);
-    enet_host_broadcast(m_host, 0, packet);
-    STKHost::logPacket(data, false);
-}   // broadcastPacket
+}   // handleLANRequests
 
 // ----------------------------------------------------------------------------
 /** \brief Tells if a peer is known.
@@ -407,10 +629,11 @@ void STKHost::broadcastPacket(const NetworkString& data, bool reliable)
  */
 bool STKHost::peerExists(const TransportAddress& peer)
 {
-    for (unsigned int i = 0; i < m_host->peerCount; i++)
+    ENetHost *host = m_network->getENetHost();
+    for (unsigned int i = 0; i < host->peerCount ; i++)
     {
-        if (m_host->peers[i].address.host == ntohl(peer.getIP()) &&
-            m_host->peers[i].address.port == peer.getPort()        )
+        if (host->peers[i].address.host == ntohl(peer.getIP()) &&
+            host->peers[i].address.port == peer.getPort()        )
         {
             return true;
         }
@@ -419,15 +642,38 @@ bool STKHost::peerExists(const TransportAddress& peer)
 }   // peerExists
 
 // ----------------------------------------------------------------------------
+/** Returns the STK peer belonging to the given enet_peer. If no STKPeer
+ *  exists, create a new STKPeer.
+ *  \param enet_peer The EnetPeer.
+ */
+STKPeer* STKHost::getPeer(ENetPeer *enet_peer)
+{
+    for(unsigned int i=0; i<m_peers.size(); i++)
+    {
+        if(m_peers[i]->isSamePeer(enet_peer))
+            return m_peers[i];
+    }
+    //FIXME Should we check #clients here? It might be easier to only
+    // handle this at connect time, not in all getPeer calls.
+    STKPeer *peer = new STKPeer(enet_peer);
+    Log::debug("getPeer", 
+               "Creating a new peer, address are STKPeer:%p, Peer:%p",
+               peer, enet_peer);
+
+    m_peers.push_back(peer);
+    return peer;
+}   // getPeer
+// ----------------------------------------------------------------------------
 /** \brief Tells if a peer is known and connected.
  *  \return True if the peer is known and connected, false elseway.
  */
 bool STKHost::isConnectedTo(const TransportAddress& peer)
 {
-    for (unsigned int i = 0; i < m_host->peerCount; i++)
+    ENetHost *host = m_network->getENetHost();
+    for (unsigned int i = 0; i < host->peerCount; i++)
     {
-        if (peer == m_host->peers[i].address &&
-            m_host->peers[i].state == ENET_PEER_STATE_CONNECTED)
+        if (peer == host->peers[i].address &&
+            host->peers[i].state == ENET_PEER_STATE_CONNECTED)
         {
             return true;
         }
@@ -435,14 +681,74 @@ bool STKHost::isConnectedTo(const TransportAddress& peer)
     return false;
 }   // isConnectedTo
 
+
 // ----------------------------------------------------------------------------
+void STKHost::removePeer(const STKPeer* peer)
+{
+    if (!peer || !peer->exists()) // peer does not exist (already removed)
+        return;
+
+    TransportAddress addr(peer->getAddress());
+    Log::debug("STKHost", "Disconnected host: %s", addr.toString().c_str());
+            
+    // remove the peer:
+    bool removed = false;
+    for (unsigned int i = 0; i < m_peers.size(); i++)
+    {
+        if (m_peers[i]->isSamePeer(peer) && !removed) // remove only one
+        {
+            delete m_peers[i];
+            m_peers.erase(m_peers.begin() + i, m_peers.begin() + i + 1);
+            Log::verbose("NetworkManager",
+                "The peer has been removed from the Network Manager.");
+            removed = true;
+        }
+        else if (m_peers[i]->isSamePeer(peer))
+        {
+            Log::fatal("NetworkManager",
+                       "Multiple peers match the disconnected one.");
+        }
+    }   // for i < m_peers.size()
+
+    if (!removed)
+        Log::warn("NetworkManager", "The peer that has been disconnected was "
+                                    "not registered by the Network Manager.");
+
+    Log::info("NetworkManager",
+              "Somebody is now disconnected. There are now %lu peers.",
+              m_peers.size());
+}   // removePeer
+
+//-----------------------------------------------------------------------------
+
 uint16_t STKHost::getPort() const
 {
     struct sockaddr_in sin;
     socklen_t len = sizeof(sin);
-    if (getsockname(m_host->socket, (struct sockaddr *)&sin, &len) == -1)
+    ENetHost *host = m_network->getENetHost();
+    if (getsockname(host->socket, (struct sockaddr *)&sin, &len) == -1)
         Log::error("STKHost", "Error while using getsockname().");
     else
         return ntohs(sin.sin_port);
     return 0;
-}
+}   // getPort
+
+//-----------------------------------------------------------------------------
+/** Sends data to all peers except the specified one.
+ *  \param peer Peer which will not receive the message.
+ *  \param data Data to sent.
+ *  \param reliable If the data should be sent reliable or now.
+ */
+void STKHost::sendPacketExcept(STKPeer* peer, const NetworkString& data,
+                               bool reliable)
+{
+    for (unsigned int i = 0; i < m_peers.size(); i++)
+    {
+        STKPeer* p = m_peers[i];
+        if (!p->isSamePeer(peer))
+        {
+            p->sendPacket(data, reliable);
+        }
+    }
+}   // sendPacketExcept
+

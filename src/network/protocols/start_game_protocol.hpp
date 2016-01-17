@@ -7,30 +7,41 @@
 class GameSetup;
 class NetworkPlayerProfile;
 
+/** This protocol runs on both server and clients.
+ */
 class StartGameProtocol : public Protocol
 {
-    protected:
-        enum STATE { NONE, SYNCHRONIZATION_WAIT, LOADING, READY, EXITING };
-        std::map<NetworkPlayerProfile*, STATE> m_player_states;
+private:
+    /** State for the finite state machine, and also for
+     *  remote clients. */
+    enum STATE { NONE, SYNCHRONIZATION_WAIT, 
+                 LOADING, READY, EXITING };
 
-        GameSetup* m_game_setup;
-        int m_ready_count;
-        double m_sending_time;
+    /** State of the finite state machine. */
+    STATE m_state;
 
-        STATE m_state;
-        bool m_ready;
+    /** Keeps the state for all clients. */
+    std::map<NetworkPlayerProfile*, STATE> m_player_states;
 
-    public:
-        StartGameProtocol(GameSetup* game_setup);
-        virtual ~StartGameProtocol();
+    /** Stores a handy pointer to the game setup structure. */
+    GameSetup* m_game_setup;
 
-        virtual bool notifyEventAsynchronous(Event* event);
-        virtual void setup();
-        virtual void update();
-        virtual void asynchronousUpdate() {}
+    /** Counts how many clients have reported to be ready (which is then
+     *  used to trigger the next state one all clients are ready). */
+    int m_ready_count;
 
-        void ready();
+    bool m_ready;
 
-};
+public:
+             StartGameProtocol(GameSetup* game_setup);
+    virtual ~StartGameProtocol();
+
+    virtual bool notifyEventAsynchronous(Event* event);
+    virtual void setup();
+    virtual void update();
+    void ready();
+    virtual void asynchronousUpdate() {}
+
+};   // class StartGameProtocol
 
 #endif // START_GAME_PROTOCOL_HPP

@@ -3,21 +3,23 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/event.hpp"
+#include "network/network_config.hpp"
 #include "network/network_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "utils/time.hpp"
 
-KartUpdateProtocol::KartUpdateProtocol()
-    : Protocol(NULL, PROTOCOL_KART_UPDATE)
+KartUpdateProtocol::KartUpdateProtocol() : Protocol(PROTOCOL_KART_UPDATE)
 {
     m_karts = World::getWorld()->getKarts();
     for (unsigned int i = 0; i < m_karts.size(); i++)
     {
         //if (m_karts[i]->getWorldKartId())
         {
-            Log::info("KartUpdateProtocol", "Kart %d has id %d and name %s", i, m_karts[i]->getWorldKartId(), m_karts[i]->getIdent().c_str());
+            Log::info("KartUpdateProtocol", "Kart %d has id %d and name %s",
+                      i, m_karts[i]->getWorldKartId(),
+                      m_karts[i]->getIdent().c_str());
         }
-        if (m_karts[i]->getIdent() == NetworkWorld::getInstance()->m_self_kart)
+        if (m_karts[i]->getIdent() == NetworkWorld::getInstance()->getSelfKart())
         {
             Log::info("KartUpdateProtocol", "My id is %d", i);
             m_self_kart_index = i;
@@ -77,7 +79,7 @@ void KartUpdateProtocol::update()
     if (current_time > time + 0.1) // 10 updates per second
     {
         time = current_time;
-        if (m_listener->isServer())
+        if (NetworkConfig::get()->isServer())
         {
             NetworkString ns(4+m_karts.size()*32);
             ns.af( World::getWorld()->getTime());
@@ -89,9 +91,11 @@ void KartUpdateProtocol::update()
                 ns.ai32( kart->getWorldKartId());
                 ns.af(v[0]).af(v[1]).af(v[2]); // add position
                 ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
-                Log::verbose("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
+                Log::verbose("KartUpdateProtocol",
+                             "Sending %d's positions %f %f %f",
+                             kart->getWorldKartId(), v[0], v[1], v[2]);
             }
-            m_listener->sendMessage(this, ns, false);
+            sendMessage(ns, false);
         }
         else
         {
@@ -103,8 +107,10 @@ void KartUpdateProtocol::update()
             ns.ai32( kart->getWorldKartId());
             ns.af(v[0]).af(v[1]).af(v[2]); // add position
             ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
-            Log::verbose("KartUpdateProtocol", "Sending %d's positions %f %f %f", kart->getWorldKartId(), v[0], v[1], v[2]);
-            m_listener->sendMessage(this, ns, false);
+            Log::verbose("KartUpdateProtocol",
+                         "Sending %d's positions %f %f %f",
+                         kart->getWorldKartId(), v[0], v[1], v[2]);
+            sendMessage(ns, false);
         }
     }
     switch(pthread_mutex_trylock(&m_positions_updates_mutex))
@@ -113,7 +119,8 @@ void KartUpdateProtocol::update()
             while (!m_next_positions.empty())
             {
                 uint32_t id = m_karts_ids.back();
-                if (id != m_self_kart_index || m_listener->isServer()) // server takes all updates
+                // server takes all updates
+                if (id != m_self_kart_index || NetworkConfig::get()->isServer())
                 {
                     Vec3 pos = m_next_positions.back();
                     btTransform transform = m_karts[id]->getBody()->getInterpolationWorldTransform();

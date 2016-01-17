@@ -73,9 +73,19 @@ public:
                               StateManager::ActivePlayer *player=NULL);
     virtual ~AIBaseController() {};
     virtual void reset();
-    static void enableDebug() {m_ai_debug = true; }
-    virtual bool  disableSlipstreamBonus() const;
-    virtual void  crashed(const Material *m);
+    virtual bool disableSlipstreamBonus() const;
+    virtual void crashed(const Material *m);
+    static  void enableDebug() {m_ai_debug = true; }
+    virtual void crashed(const AbstractKart *k) {};
+    virtual void handleZipper(bool play_sound) {};
+    virtual void finishedRace(float time) {};
+    virtual void collectedItem(const Item &item, int add_info=-1,
+                               float previous_energy=0) {};
+    virtual void setPosition(int p) {};
+    virtual bool isPlayerController() const { return false; }
+    virtual bool isLocalPlayerController() const { return false; }
+    virtual void action(PlayerAction action, int value) {};
+    virtual void  skidBonusTriggered() {};
 };   // AIBaseController
 
 #endif

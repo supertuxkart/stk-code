@@ -2,7 +2,7 @@
 #define CLIENT_LOBBY_ROOM_PROTOCOL_HPP
 
 #include "network/protocols/lobby_room_protocol.hpp"
-#include "network/types.hpp"
+#include "network/transport_address.hpp"
 
 class STKPeer;
 
@@ -12,14 +12,13 @@ class ClientLobbyRoomProtocol : public LobbyRoomProtocol
         ClientLobbyRoomProtocol(const TransportAddress& server_address);
         virtual ~ClientLobbyRoomProtocol();
 
-        void requestKartSelection(std::string kart_name);
-        void voteMajor(uint8_t major);
+        void requestKartSelection(const std::string &kart_name);
+        void voteMajor(uint32_t major);
         void voteRaceCount(uint8_t count);
-        void voteMinor(uint8_t minor);
-        void voteTrack(std::string track, uint8_t track_nb = 0);
+        void voteMinor(uint32_t minor);
+        void voteTrack(const std::string &track, uint8_t track_nb = 0);
         void voteReversed(bool reversed, uint8_t track_nb = 0);
         void voteLaps(uint8_t laps, uint8_t track_nb = 0);
-        void sendMessage(std::string message);
         void leave();
 
         virtual bool notifyEvent(Event* event);

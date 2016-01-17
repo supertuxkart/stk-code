@@ -1958,22 +1958,26 @@ void IrrDriver::update(float dt)
 
     World *world = World::getWorld();
 
-    if (GUIEngine::getCurrentScreen() != NULL &&
-        GUIEngine::getCurrentScreen()->needs3D() &&
-        world != NULL)
+    if (world)
     {
-        //printf("Screen that needs 3D\n");
-        //m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,
-        //                           video::SColor(0,0,0,255));
-        //m_scene_manager->drawAll();
-
         m_renderer->render(dt);
-
-        GUIEngine::render(dt);
-        //m_video_driver->endScene();
-        return;
+            
+        GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
+        if (current_screen != NULL && current_screen->needs3D())
+        {
+            GUIEngine::render(dt);
+        }
+        
+        if (world->getPhysics() != NULL)
+        {
+            IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
+            if (debug_drawer != NULL && debug_drawer->debugEnabled())
+            {
+                debug_drawer->beginNextFrame();
+            }
+        }
     }
-    else if (!world)
+    else
     {
         m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
                                    video::SColor(255,100,101,140));
@@ -1981,21 +1985,8 @@ void IrrDriver::update(float dt)
         GUIEngine::render(dt);
 
         m_video_driver->endScene();
-        return;
     }
-
-    m_renderer->render(dt);
-
-
-    if (world != NULL && world->getPhysics() != NULL)
-    {
-        IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
-        if (debug_drawer != NULL && debug_drawer->debugEnabled())
-        {
-            debug_drawer->beginNextFrame();
-        }
-    }
-
+    
     if (m_request_screenshot) doScreenShot();
 
     // Enable this next print statement to get render information printed

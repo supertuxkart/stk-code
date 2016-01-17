@@ -15,6 +15,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+
+#ifndef HEADER_VS_HPP
+#define HEADER_VS_HPP
 /** Visual studio workarounds in one place
  *  Note that Visual Studio 2013 does have the maths functions defined,
  *  so we define the work arounds only for compiler versions before 18.00
@@ -32,3 +35,56 @@
 	#include <cmath>
 	using std::isnan;
 #endif
+
+#if defined(WIN32) && defined(DEBUG)
+#  define WIN32_LEAN_AND_MEAN
+#  include <windows.h>
+#endif
+
+namespace VS
+{
+#if defined(_MSC_VER) && defined(DEBUG)
+#  define WIN32_LEAN_AND_MEAN
+#  include <windows.h>
+
+    /** This function sets the name of this thread in the VS debugger.
+     *  \param name Name of the thread.
+     */
+    static void setThreadName(const char *name)
+    {
+        const DWORD MS_VC_EXCEPTION=0x406D1388;
+#pragma pack(push,8)
+        typedef struct tagTHREADNAME_INFO
+        {
+            DWORD dwType; // Must be 0x1000.
+            LPCSTR szName; // Pointer to name (in user addr space).
+            DWORD dwThreadID; // Thread ID (-1=caller thread).
+            DWORD dwFlags; // Reserved for future use, must be zero.
+        } THREADNAME_INFO;
+#pragma pack(pop)
+
+        THREADNAME_INFO info;
+        info.dwType = 0x1000;
+        info.szName = name;
+        info.dwThreadID = -1;
+        info.dwFlags = 0;
+
+        __try
+        {
+            RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR),
+                            (ULONG_PTR*)&info );
+        }
+        __except(EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+
+    }   // setThreadName
+#else
+    static void setThreadName(const char* name)
+    {
+    }
+#endif
+
+}   // namespace VS
+
+#endif   // HEADER_VS_HPP

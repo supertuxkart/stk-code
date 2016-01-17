@@ -23,7 +23,9 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "modes/demo_world.hpp"
-#include "online/servers_manager.hpp"
+#include "network/network_config.hpp"
+#include "network/servers_manager.hpp"
+#include "network/stk_host.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -38,7 +40,6 @@
 
 
 using namespace GUIEngine;
-using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( CreateServerScreen );
 
@@ -46,8 +47,6 @@ DEFINE_SCREEN_SINGLETON( CreateServerScreen );
 
 CreateServerScreen::CreateServerScreen() : Screen("online/create_server.stkgui")
 {
-    m_server_creation_request = NULL;
-    m_is_lan                  = false;
 }   // CreateServerScreen
 
 // ----------------------------------------------------------------------------
@@ -81,13 +80,15 @@ void CreateServerScreen::init()
     m_info_widget->setText("", false);
     LabelWidget *title = getWidget<LabelWidget>("title");
 
-    title->setText(m_is_lan ? _("Create LAN Server")
-                            : _("Create Server")    , false);
+    title->setText(NetworkConfig::get()->isLAN() ? _("Create LAN Server")
+                                                 : _("Create Server")    ,
+                   false);
 
     // I18n: Name of the server. %s is either the online or local user name
     m_name_widget->setText(_("%s's server",
-                       m_is_lan ? PlayerManager::getCurrentPlayer()->getName()
-                                : PlayerManager::getCurrentOnlineUserName()
+                             NetworkConfig::get()->isLAN() 
+                             ? PlayerManager::getCurrentPlayer()->getName()
+                             : PlayerManager::getCurrentOnlineUserName()
                              )
                           );
 }   // init
@@ -104,11 +105,12 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
             m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
+            NetworkConfig::get()->unsetNetworking();
             StateManager::get()->escapePressed();
         }
         else if (selection == m_create_widget->m_properties[PROP_ID])
         {
-            serverCreationRequest();
+            createServer();
         }   // is create_widget
     }
 }   // eventCallback
@@ -119,10 +121,24 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
  */
 void CreateServerScreen::onUpdate(float delta)
 {
-    if (!m_server_creation_request) return;
+    // If no host has been created, keep on waiting.
+    if(!STKHost::existHost())
+        return;
 
-    // If the request is not ready, wait till it is done.
-    if (!m_server_creation_request->isDone())
+    // First check if an error happened while registering the server:
+    // --------------------------------------------------------------
+    const irr::core::stringw &error = STKHost::get()->getErrorMessage();
+    if(error!="")
+    {
+        SFXManager::get()->quickSound("anvil");
+        m_info_widget->setErrorColor();
+        m_info_widget->setText(error, false);
+        return;
+    }
+
+    // Otherwise wait till we get an answer from the server:
+    // -----------------------------------------------------
+    if(!STKHost::get()->isRegistered())
     {
         m_info_widget->setDefaultColor();
         m_info_widget->setText(StringUtils::loadingDots(_("Creating server")),
@@ -130,29 +146,17 @@ void CreateServerScreen::onUpdate(float delta)
         return;
     }
 
-    // Now the request has been executed.
-    // ----------------------------------
-    if (m_server_creation_request->isSuccess())
-    {
-        new ServerInfoDialog(m_server_creation_request->getCreatedServerID(),
-                             true);
-    }
-    else
-    {
-        SFXManager::get()->quickSound("anvil");
-        m_info_widget->setErrorColor();
-        m_info_widget->setText(m_server_creation_request->getInfo(), false);
-    }
-    delete m_server_creation_request;
-    m_server_creation_request = NULL;
-
+    //FIXME If we really want a gui, we need to decide what else to do here
+    // For now start the (wrong i.e. client) lobby, to prevent to create
+    // a server more than once.
+    NetworkingLobby::getInstance()->push();
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
 /** In case of WAN it adds the server to the list of servers. In case of LAN
  *  networking, it registers this game server with the stk server.
  */
-void CreateServerScreen::serverCreationRequest()
+void CreateServerScreen::createServer()
 {
     const irr::core::stringw name = m_name_widget->getText().trim();
     const int max_players = m_max_players_widget->getValue();
@@ -173,47 +177,36 @@ void CreateServerScreen::serverCreationRequest()
         return;
     }
 
-    if (m_is_lan)
+    // In case of a LAN game, we can create the new server object now
+    if (NetworkConfig::get()->isLAN())
     {
-        const irr::core::stringw name = m_name_widget->getText().trim();
-        const int max_players = m_max_players_widget->getValue();
+        // FIXME Is this actually necessary?? Only in case of WAN, or LAN and WAN?
+        TransportAddress address(0x7f000001,0);  // 127.0.0.1
         Server *server = new Server(name, /*lan*/true, max_players,
-            /*current_player*/1);
+                                    /*current_player*/1, address);
         ServersManager::get()->addServer(server);
-        new ServerInfoDialog(server->getServerId(), true);
-        return;
     }
 
-    // Now must be WAN: forward request to the stk server
-    m_server_creation_request = new ServerCreationRequest();
-    PlayerManager::setUserDetails(m_server_creation_request, "create",
-                                  Online::API::SERVER_PATH);
-    m_server_creation_request->addParameter("name", name);
-    m_server_creation_request->addParameter("max_players", max_players);
-    m_server_creation_request->queue();
+    // In case of a WAN game, we register this server with the
+    // stk server, and will get the server's id when this 
+    // request is finished.
+    NetworkConfig::get()->setMaxPlayers(max_players);
+    NetworkConfig::get()->setServerName(name);
 
-}   // serverCreationRequest
+    // FIXME: Add the following fields to the create server screen
+    // FIXME: Long term we might add a 'vote' option (e.g. GP vs single race,
+    // and normal vs FTL vs time trial could be voted about).
+    race_manager->setDifficulty(RaceManager::convertDifficulty("hard"));
+    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+    race_manager->setReverseTrack(false);
+    STKHost::create();
 
-// ----------------------------------------------------------------------------
-/** Callbacks from the online create server request.
- */
-void CreateServerScreen::ServerCreationRequest::callback()
-{
-    if (isSuccess())
-    {
-        // Must be a WAN server
-        Server *server = new Server(*getXMLData()->getNode("server"),
-                                    /*is lan*/false);
-        ServersManager::get()->addServer(server);
-        m_created_server_id = server->getServerId();
-    }   // isSuccess
-}   // callback
+}   // createServer
 
 // ----------------------------------------------------------------------------
 
 void CreateServerScreen::tearDown()
 {
-    delete m_server_creation_request;
-    m_server_creation_request = NULL;
 }   // tearDown
 

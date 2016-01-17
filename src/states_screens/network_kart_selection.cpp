@@ -26,10 +26,13 @@
 #include "items/item_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
-#include "network/network_manager.hpp"
+#include "network/stk_host.hpp"
+#include "states_screens/server_selection.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/tracks_screen.hpp"
 
 static const char ID_LOCKED[] = "locked/";
 
@@ -37,15 +40,18 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( NetworkKartSelectionScreen );
 
-NetworkKartSelectionScreen::NetworkKartSelectionScreen() : KartSelectionScreen("karts_online.stkgui")
+NetworkKartSelectionScreen::NetworkKartSelectionScreen()
+                          : KartSelectionScreen("karts_online.stkgui")
 {
     KartSelectionScreen::m_instance_ptr = this;
-}
+}   // NetworkKartSelectionScreen
 
+// ----------------------------------------------------------------------------
 NetworkKartSelectionScreen::~NetworkKartSelectionScreen()
 {
-}
+}   // ~NetworkKartSelectionScreen
 
+// ----------------------------------------------------------------------------
 void NetworkKartSelectionScreen::init()
 {
     m_multiplayer = false;
@@ -53,7 +59,8 @@ void NetworkKartSelectionScreen::init()
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
-    tabs->select( "standard", PLAYER_ID_GAME_MASTER); // select standard kart group
+    // Select standard kart group
+    tabs->select( "standard", PLAYER_ID_GAME_MASTER);
     tabs->setActive(false);
     tabs->setVisible(false);
 
@@ -64,10 +71,11 @@ void NetworkKartSelectionScreen::init()
     m_multiplayer = false;
 
     // add a widget for each player except self (already exists):
-    GameSetup* setup = NetworkManager::getInstance()->getGameSetup();
+    GameSetup* setup = STKHost::get()->getGameSetup();
     if (!setup)
     {
-        Log::error("NetworkKartSelectionScreen", "No network game setup registered.");
+        Log::error("NetworkKartSelectionScreen",
+                   "No network game setup registered.");
         return;
     }
     std::vector<NetworkPlayerProfile*> players = setup->getPlayers();
@@ -82,32 +90,12 @@ void NetworkKartSelectionScreen::init()
                             kartsAreaWidget->m_y,
                             kartsAreaWidget->m_x + shift + kartsAreaWidget->m_w,
                             kartsAreaWidget->m_y + kartsAreaWidget->m_h);
+    GameSetup *game_setup = STKHost::get()->getGameSetup();
 
-    for (unsigned int i = 0; i < players.size(); i++)
-    {
-        if (players[i]->user_profile == PlayerManager::getCurrentOnlineProfile())
-        {
-            m_id_mapping.insert(m_id_mapping.begin(),players[i]->race_id); //!< first kart widget always me
-            Log::info("NKSS", "Insert %d at pos 0", players[i]->race_id);
-            continue; // it is me, don't add again
-        }
-
-        Log::info("NKSS", "Adding %d at pos %d", players[i]->race_id, i);
-        m_id_mapping.push_back(players[i]->race_id);
-
-        StateManager::ActivePlayer* aplayer = NULL; // player is remote
-
-        std::string selected_kart_group = "standard"; // standard group
-
-        PlayerKartWidget* newPlayerWidget =
-            new PlayerKartWidget(this, aplayer, players[i]->user_profile, kartsArea, m_kart_widgets.size(),
-                                 selected_kart_group);
-
-        manualAddWidget(newPlayerWidget);
-        m_kart_widgets.push_back(newPlayerWidget);
-
-        newPlayerWidget->add();
-    }
+    // FIXME: atm only adds the local master, split screen supports
+    // needs to be added
+    int player_id = game_setup->getLocalMasterID();
+    m_id_mapping.insert(m_id_mapping.begin(), player_id);
 
     const int amount = m_kart_widgets.size();
     Widget* fullarea = getWidget("playerskarts");
@@ -120,8 +108,9 @@ void NetworkKartSelectionScreen::init()
                                 fullarea->m_y, splitWidth, fullarea->m_h);
     }
 
-}
+}   // init
 
+// ----------------------------------------------------------------------------
 void NetworkKartSelectionScreen::playerConfirm(const int playerID)
 {
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
@@ -149,56 +138,62 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
                 ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
         protocol->requestKartSelection(selection);
     }
-}
+}   // playerConfirm
 
-void NetworkKartSelectionScreen::playerSelected(uint8_t race_id, std::string kart_name)
+// ----------------------------------------------------------------------------
+void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
+                                                const std::string &kart_name)
 {
-    uint8_t widget_id = -1;
+    int widget_id = -1;
     for (unsigned int i = 0; i < m_id_mapping.size(); i++)
     {
-        Log::info("NKSS", "Checking race id %d : mapped of %d is %d", race_id, i, m_id_mapping[i]);
-        if (m_id_mapping[i] == race_id)
+        Log::info("NKSS", "Checking race id %d : mapped of %d is %d",
+                   player_id, i, m_id_mapping[i]);
+        if (m_id_mapping[i] == player_id)
             widget_id = i;
     }
 
-    assert(widget_id>=0 && widget_id < m_kart_widgets.size());
+    // This selection was for a remote kart, which is not shown
+    // Just ignore it.
+    if(widget_id==-1)
+        return;
 
-    KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name, irr::core::stringw(kart_name.c_str()));
+    KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name,
+                                       irr::core::stringw(kart_name.c_str()));
     KartSelectionScreen::updateKartStats(widget_id, kart_name);
     m_kart_widgets[widget_id].setKartInternalName(kart_name);
     m_kart_widgets[widget_id].markAsReady(); // mark player ready
-}
 
-
-/**
- * Callback handling events from the kart selection menu
- */
-void NetworkKartSelectionScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name,
-                               const int playerID)
-{
-    if (name == "karts")
+    // If this is the authorised client, send the currently set race config
+    // to the server.
+    if(STKHost::get()->isAuthorisedToControl())
     {
-        KartSelectionScreen::eventCallback(widget, name, playerID);
+        // FIXME: for now we submit a vote from the authorised user
+        // for the various modes based on the settings in the race manager. 
+        // This needs more/better gui elements (and some should be set when
+        // defining the server).
+        Protocol* protocol = ProtocolManager::getInstance()
+                           ->getProtocol(PROTOCOL_LOBBY_ROOM);
+        ClientLobbyRoomProtocol* clrp =
+                           static_cast<ClientLobbyRoomProtocol*>(protocol);
+        clrp->voteMajor(race_manager->getMajorMode());
+        clrp->voteMinor(race_manager->getMinorMode());
+        clrp->voteReversed(race_manager->getReverseTrack());
+        clrp->voteRaceCount(1);
     }
-    else if (name == "back")
-    {
-        KartSelectionScreen::eventCallback(widget, name, playerID);
-    }
-    else // name != karts
-    {
-        KartSelectionScreen::eventCallback(widget, name, playerID);
-    }
-}   // eventCallback
+    TracksScreen::getInstance()->push();
+}   // playerSelected
 
-
+// ----------------------------------------------------------------------------
 bool NetworkKartSelectionScreen::onEscapePressed()
 {
     // then remove the lobby screen (you left the server)
     StateManager::get()->popMenu();
+    ServerSelection::getInstance()->refresh();
     // notify the server that we left
     ClientLobbyRoomProtocol* protocol = static_cast<ClientLobbyRoomProtocol*>(
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
     if (protocol)
         protocol->leave();
     return true; // remove the screen
-}
+}   // onEscapePressed

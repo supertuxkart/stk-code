@@ -19,9 +19,8 @@
 #include "network/protocols/get_public_address.hpp"
 
 #include "config/user_config.hpp"
-#include "network/client_network_manager.hpp"
-#include "network/network_interface.hpp"
-#include "network/network_manager.hpp"
+#include "network/network.hpp"
+#include "network/network_config.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "utils/log.hpp"
 
@@ -45,8 +44,8 @@
 // make the linker happy
 const uint32_t GetPublicAddress::m_stun_magic_cookie = 0x2112A442;
 
-GetPublicAddress::GetPublicAddress()
-                : Protocol(NULL, PROTOCOL_SILENT)
+GetPublicAddress::GetPublicAddress(CallbackObject *callback)
+                : Protocol(PROTOCOL_SILENT, callback)
 {
     m_state = NOTHING_DONE;
 }   // GetPublicAddress
@@ -85,8 +84,9 @@ void GetPublicAddress::createStunRequest()
     assert(res != NULL);
     struct sockaddr_in* current_interface = (struct sockaddr_in*)(res->ai_addr);
     m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
-    m_transaction_host = new STKHost();
-    m_transaction_host->setupClient(1, 1, 0, 0);
+
+    // Create a new socket for the stun server.
+    m_transaction_host = new Network(1, 1, 0, 0);
 
     // Assemble the message for the stun server
     NetworkString s(21);
@@ -122,21 +122,24 @@ void GetPublicAddress::createStunRequest()
 */
 std::string GetPublicAddress::parseStunResponse()
 {
-    uint8_t* s = m_transaction_host
-        ->receiveRawPacket(TransportAddress(m_stun_server_ip,
-                                            m_stun_server_port),  2000);
+    TransportAddress sender;
+    const int LEN = 2048;
+    char buffer[LEN];
+    int len = m_transaction_host->receiveRawPacket(buffer, LEN, &sender, 2000);
 
-    if (!s)
+    if(sender.getIP()!=m_stun_server_ip)
+    {
+        TransportAddress stun(m_stun_server_ip, m_stun_server_port);
+        Log::warn("GetPublicAddress", 
+                  "Received stun response from %s instead of %s.",
+                  sender.toString().c_str(), stun.toString().c_str());
+    }
+
+    if (len<0)
         return "STUN response contains no data at all";
 
     // Convert to network string.
-    // FIXME: the length is not known (atm 2048 bytes are allocated in 
-    // receiveRawPacket, and it looks like 32 are actually used in a normal
-    // stun reply
-    NetworkString datas(std::string((char*)s, 32));
-
-    // The received data has been copied and can now be deleted
-    delete s;
+    NetworkString datas(std::string(buffer, len));
 
     // check that the stun response is a response, contains the magic cookie
     // and the transaction ID
@@ -181,7 +184,7 @@ std::string GetPublicAddress::parseStunResponse()
             Log::debug("GetPublicAddress", 
                        "The public address has been found: %s",
                         address.toString().c_str());
-            NetworkManager::getInstance()->setPublicAddress(address);
+            NetworkConfig::get()->setMyAddress(address);
             break;
         }   // type = 0 or 1
         pos +=  4 + size;
@@ -191,10 +194,6 @@ std::string GetPublicAddress::parseStunResponse()
         if (message_size < 4) // cannot even read the size
             return "STUN response is invalid.";
     }   // while true
-
-    // The address and the port are known, so the connection can be closed
-    m_state = EXITING;
-    m_listener->requestTerminate(this);
 
     return "";
 }   // parseStunResponse
@@ -211,10 +210,17 @@ void GetPublicAddress::asynchronousUpdate()
     if (m_state == STUN_REQUEST_SENT)
     {
         std::string message = parseStunResponse();
+        delete m_transaction_host;
         if (message != "")
         {
             Log::warn("GetPublicAddress", "%s", message.c_str());
-            m_state = NOTHING_DONE;
+            m_state = NOTHING_DONE;  // try again
+        }
+        else
+        {
+            // The address and the port are known, so the connection can be closed
+            m_state = EXITING;
+            requestTerminate();
         }
     }
 }   // asynchronousUpdate

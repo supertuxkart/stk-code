@@ -20,7 +20,8 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/servers_manager.hpp"
+
+namespace Online { class XMLRequest; }
 
 namespace GUIEngine { class Widget; }
 
@@ -38,7 +39,6 @@ private:
     ServerSelection();
     ~ServerSelection();
 
-    GUIEngine::IconButtonWidget *               m_back_widget;
     GUIEngine::IconButtonWidget *               m_reload_widget;
     GUIEngine::LabelWidget *                    m_update_status;
     GUIEngine::ListWidget *                     m_server_list_widget;
@@ -46,15 +46,13 @@ private:
     /** \brief To check (and set) if sort order is descending **/
     bool                                        m_sort_desc;
 
-    const Online::ServersManager::RefreshRequest *m_refresh_request;
-    bool                                        m_fake_refresh;
+    /** A pointer to the http request for getting a server list. */
+    const Online::XMLRequest *m_refresh_request;
 
-    /** True if only lan servers should be shown. */
-    bool m_is_lan;
-
-    void refresh();
 
 public:
+
+    void refresh();
 
     /** Load the addons into the main list.*/
     void loadList();

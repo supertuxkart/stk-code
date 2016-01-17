@@ -7,29 +7,34 @@
 
 class SynchronizationProtocol : public Protocol
 {
-    public:
-        SynchronizationProtocol();
-        virtual ~SynchronizationProtocol();
+private:
+    std::vector<std::map<uint32_t, double> > m_pings;
+    std::vector<uint32_t> m_average_ping;
+    std::vector<uint32_t> m_pings_count;
+    std::vector<uint32_t> m_successed_pings;
+    std::vector<double> m_total_diff;
+    bool m_countdown_activated;
+    double m_countdown;
+    double m_last_countdown_update;
+    bool m_has_quit;
 
-        virtual bool notifyEventAsynchronous(Event* event);
-        virtual void setup();
-        virtual void update() {}
-        virtual void asynchronousUpdate();
+    /** Keeps track of last time that an update was sent. */
+    double m_last_time;
 
-        void startCountdown(int ms_countdown);
 
-        int getCountdown() { return (int)(m_countdown*1000.0); }
+public:
+             SynchronizationProtocol();
+    virtual ~SynchronizationProtocol();
 
-    protected:
-        std::vector<std::map<uint32_t, double> > m_pings;
-        std::vector<uint32_t> m_average_ping;
-        std::vector<uint32_t> m_pings_count;
-        std::vector<uint32_t> m_successed_pings;
-        std::vector<double> m_total_diff;
-        bool m_countdown_activated;
-        double m_countdown;
-        double m_last_countdown_update;
-        bool m_has_quit;
-};
+    virtual bool notifyEventAsynchronous(Event* event);
+    virtual void setup();
+    virtual void update() {}
+    virtual void asynchronousUpdate();
+    void startCountdown(int ms_countdown);
+
+    // ------------------------------------------------------------------------
+    int getCountdown() { return (int)(m_countdown*1000.0); }
+
+};   // class SynchronizationProtocol
 
 #endif // SYNCHRONIZATION_PROTOCOL_HPP

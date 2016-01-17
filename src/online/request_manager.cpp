@@ -23,6 +23,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/vs.hpp"
 
 #include <iostream>
 #include <stdio.h>
@@ -185,6 +186,7 @@ namespace Online
      */
     void *RequestManager::mainLoop(void *obj)
     {
+        VS::setThreadName("RequestManager");
         RequestManager *me = (RequestManager*) obj;
 
         pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);

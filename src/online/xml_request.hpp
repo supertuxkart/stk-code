@@ -46,10 +46,10 @@ namespace Online
          *  message if a problem occurred). */
         irr::core::stringw m_info;
 
+    protected:
         /** True if the request was successful executed on the server. */
         bool m_success;
 
-    protected:
         virtual void afterOperation() OVERRIDE;
 
     public :

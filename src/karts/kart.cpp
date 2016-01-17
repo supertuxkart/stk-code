@@ -56,8 +56,8 @@
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
+#include "network/network_config.hpp"
 #include "network/network_world.hpp"
-#include "network/network_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
 #include "physics/physics.hpp"
@@ -744,7 +744,7 @@ void Kart::startEngineSFX()
         // player karts twice as loud as AIs toghether
         const float players_volume = (np * 2.0f) / (np*2.0f + np);
 
-        if (m_controller->isPlayerController())
+        if (m_controller->isLocalPlayerController())
             m_engine_sound->setVolume( players_volume / np );
         else
             m_engine_sound->setVolume( (1.0f - players_volume) / nai );
@@ -870,7 +870,6 @@ void Kart::finishedRace(float time)
         setRaceResult();
         setController(new EndController(this, m_controller->getPlayer(),
                                         m_controller));
-
         // Skip animation if this kart is eliminated
         if (m_eliminated) return;
 
@@ -886,7 +885,7 @@ void Kart::setRaceResult()
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
     {
         // TODO NetworkController?
-        if (this->getController()->isPlayerController())
+        if (m_controller->isLocalPlayerController()) // if player is on this computer
         {
             PlayerProfile *player = PlayerManager::getCurrentPlayer();
             const ChallengeStatus *challenge = player->getCurrentChallengeStatus();
@@ -1276,7 +1275,7 @@ void Kart::update(float dt)
     // automatic rescue
     // But only do this if auto-rescue is enabled (i.e. it will be disabled in
     // battle mode), and the material the kart is driving on does not have
-    // gravity (which can
+    // gravity (which atm affects the roll angle).
     if(World::getWorld()->getTrack()->isAutoRescueEnabled()     &&
         (!m_terrain_info->getMaterial() ||
          !m_terrain_info->getMaterial()->hasGravity())          &&
@@ -1393,8 +1392,10 @@ void Kart::update(float dt)
     PROFILER_POP_CPU_MARKER();
 
     // Check if any item was hit.
-    // check it if we're not in a network world, or if we're on the server (when network mode is on)
-    if (!NetworkWorld::getInstance()->isRunning() || NetworkManager::getInstance()->isServer())
+    // check it if we're not in a network world, or if we're on the server
+    // (when network mode is on)
+    if (!NetworkWorld::getInstance()->isRunning() ||
+        NetworkConfig::get()->isServer())
         ItemManager::get()->checkItemHit(this);
 
     static video::SColor pink(255, 255, 133, 253);
@@ -1552,7 +1553,7 @@ void Kart::handleMaterialSFX(const Material *material)
         // multiple listeners. This would make the sounds of all AIs be
         // audible at all times. So silence AI karts.
         if (s.size()!=0 && (race_manager->getNumPlayers()==1 ||
-                            m_controller->isPlayerController()  ) )
+                            m_controller->isLocalPlayerController()  ) )
         {
             m_terrain_sound = SFXManager::get()->createSoundSource(s);
             m_terrain_sound->play();
@@ -1634,7 +1635,7 @@ void Kart::handleMaterialGFX()
     // has the 'below surface' flag set. Detect if there is a surface
     // on top of the kart.
     // --------------------------------------------------------------
-    if (m_controller->isPlayerController() && !hasFinishedRace())
+    if (m_controller->isLocalPlayerController() && !hasFinishedRace())
     {
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {

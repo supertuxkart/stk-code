@@ -25,6 +25,9 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/stk_host.hpp"
 #include "race/grand_prix_data.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
@@ -55,8 +58,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
         if(!w2) return;
 
-        const std::string &selection =
-                               w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (UserConfigParams::logGUI())
         {
             Log::info("TracksScreen", "Clicked on track '%s'.",
@@ -64,40 +66,45 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         }
 
         UserConfigParams::m_last_track = selection;
+        if (selection == "locked" && race_manager->getNumLocalPlayers() == 1)
+        {
+            unlock_manager->playLockSound();
+            return;
+        }
+        else if (selection == RibbonWidget::NO_ITEM_ID)
+        {
+            return;
+        }
 
         if (selection == "random_track")
         {
             if (m_random_track_list.empty()) return;
 
-            std::string track = m_random_track_list.front();
+            selection = m_random_track_list.front();
             m_random_track_list.pop_front();
-            m_random_track_list.push_back(track);
-
-            Track* clicked_track = track_manager->getTrack(track);
-
-            if (clicked_track)
-            {
-                TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                TrackInfoScreen::getInstance()->push();
-            }   // if clicked_track
+            m_random_track_list.push_back(selection);
 
         }   // selection=="random_track"
-        else if (selection == "locked" && race_manager->getNumLocalPlayers() == 1)
+        Track *track = track_manager->getTrack(selection);
+
+        if (track)
         {
-            unlock_manager->playLockSound();
-        }
-        else if (selection == RibbonWidget::NO_ITEM_ID)
-        {
-        }
-        else
-        {
-            Track* clicked_track = track_manager->getTrack(selection);
-            if (clicked_track)
+            if(STKHost::existHost())
             {
-                TrackInfoScreen::getInstance()->setTrack(clicked_track);
+                Protocol* protocol = ProtocolManager::getInstance()
+                                   ->getProtocol(PROTOCOL_LOBBY_ROOM);
+                ClientLobbyRoomProtocol* clrp =
+                              static_cast<ClientLobbyRoomProtocol*>(protocol);
+                clrp->voteTrack(selection);
+
+            }
+            else
+            {
+                TrackInfoScreen::getInstance()->setTrack(track);
                 TrackInfoScreen::getInstance()->push();
             }
-        }
+        }   // if clicked_track
+
     }   // name=="tracks"
     else if (name == "gps")
     {
@@ -111,9 +118,17 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else
         {
-            GPInfoScreen *gpis = GPInfoScreen::getInstance();
-            gpis->setGP( selection );
-            gpis->push();
+            if(STKHost::existHost())
+            {
+                Log::warn("TracksScreen",
+                          "FIXME: for now do not select a grand prix.");
+            }
+            else
+            {
+                GPInfoScreen *gpis = GPInfoScreen::getInstance();
+                gpis->setGP(selection);
+                gpis->push();
+            }
         }
     }
     else if (name == "trackgroups")

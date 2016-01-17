@@ -19,12 +19,18 @@
 #define HEADER_NETWORKING_LOBBY_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
-#include "online/server.hpp"
 
-namespace GUIEngine { class Widget; class ListWidget; }
+class Server;
+
+namespace GUIEngine { 
+    class Widget;
+    class ListWidget; 
+    class IconButtonWidget;
+    class LabelWidget;
+    class RibbonWidget;
+}
+
+class NetworkPlayerProfile;
 
 /**
   * \brief Handles the main menu
@@ -36,18 +42,17 @@ class NetworkingLobby :     public GUIEngine::Screen,
 private:
     friend class GUIEngine::ScreenSingleton<NetworkingLobby>;
 
-    Online::Server * m_server;
+    Server * m_server;
 
     NetworkingLobby();
 
     GUIEngine::IconButtonWidget * m_back_widget;
-
     GUIEngine::LabelWidget * m_server_name_widget;
-
     GUIEngine::LabelWidget * m_online_status_widget;
-
     GUIEngine::RibbonWidget * m_bottom_menu_widget;
     GUIEngine::IconButtonWidget * m_exit_widget;
+    GUIEngine::IconButtonWidget *m_start_button;
+    GUIEngine::ListWidget *m_player_list;
 
     /** \brief Sets which widget has to be focused. Depends on the user state. */
     void setInitialFocus();
@@ -80,6 +85,9 @@ public:
 
     /** \brief Implements the callback when a dialog gets closed. */
     virtual void onDialogClose() OVERRIDE;
-};
+
+    void addPlayer(NetworkPlayerProfile *profile);
+    void removePlayer(NetworkPlayerProfile *profile);
+};   // class NetworkingLobby
 
 #endif

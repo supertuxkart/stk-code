@@ -29,80 +29,78 @@
 #include <string>
 
 namespace Online { class OnlineProfile; }
+class NetworkPlayerProfile;
 
 
-/*! \class PlayerProfile
- *  \brief Contains the profile of a player.
- */
-class NetworkPlayerProfile
-{
-    public:
-        NetworkPlayerProfile() { race_id = 0; user_profile = NULL; }
-        ~NetworkPlayerProfile() {}
-
-        uint8_t race_id; //!< The id of the player for the race
-        std::string kart_name; //!< The selected kart.
-        Online::OnlineProfile* user_profile; //!< Pointer to the lobby profile
-        uint8_t world_kart_id; //!< the kart id in the World class (pointer to AbstractKart)
-        PerPlayerDifficulty difficulty;
-};
-
+// ============================================================================
 /*! \class GameSetup
  *  \brief Used to store the needed data about the players that join a game.
  *  This class stores all the possible information about players in a lobby.
  */
 class GameSetup
 {
-    public:
-        GameSetup();
-        virtual ~GameSetup();
+private:
+    /** Information about all connected players. */
+    std::vector<NetworkPlayerProfile*> m_players;
 
-        void addPlayer(NetworkPlayerProfile* profile); //!< Add a player.
-        bool removePlayer(uint32_t id); //!< Remove a player by id.
-        bool removePlayer(uint8_t id); //!< Remove a player by local id.
-        void setPlayerKart(uint8_t id, std::string kart_name); //!< Set the kart of a player
-        void bindKartsToProfiles(); //!< Sets the right world_kart_id in profiles
+    /** The race configuration. */
+    RaceConfig* m_race_config;
 
-        /** \brief Get the players that are in the game
-         *  \return A vector containing pointers on the players profiles.
-         */
-        std::vector<NetworkPlayerProfile*> getPlayers() { return m_players; }
-        int getPlayerCount() { return (int)m_players.size(); }
-        /*! \brief Get a network player profile matching a universal id.
-         *  \param id : Global id of the player (the one in the SQL database)
-         *  \return The profile of the player matching the id.
-         */
-        const NetworkPlayerProfile* getProfile(uint32_t id);
-        /*! \brief Get a network player profile matching a kart name.
-         *  \param kart_name : Name of the kart used by the player.
-         *  \return The profile of the player having the kart kart_name
-         */
-        const NetworkPlayerProfile* getProfile(uint8_t id);
-        /*! \brief Get a network player profile matching a kart name.
-         *  \param kart_name : Name of the kart used by the player.
-         *  \return The profile of the player having the kart kart_name.
-         */
-        const NetworkPlayerProfile* getProfile(std::string kart_name);
+    /** Stores the number of local players. */
+    int m_num_local_players;
 
-        /*! \brief Used to know if a kart is available.
-         *  \param kart_name : Name of the kart to check.
-         *  \return True if the kart hasn't been selected yet, false elseway.
-         */
-        bool isKartAvailable(std::string kart_name);
-        /*! \brief Used to know if a kart is playable.
-         *  \param kart_name : Name of the kart to check.
-         *  \return True if the kart is playable (standard kart).
-         *  Currently this is always true as the kart selection screen shows
-         *  only the standard karts.
-         */
-        bool isKartAllowed(std::string kart_name) {return true; }
+    /** The player id of the local game master, used in 
+     *  kart selection screen. */
+    uint8_t m_local_master;
+public:
+             GameSetup();
+    virtual ~GameSetup();
 
-        RaceConfig* getRaceConfig() { return m_race_config; }
+    void addPlayer(NetworkPlayerProfile* profile); //!< Add a player.
+    bool removePlayer(const NetworkPlayerProfile *profile);
+    void setPlayerKart(uint8_t player_id, const std::string &kart_name);
+    void bindKartsToProfiles(); //!< Sets the right world_kart_id in profiles
+    void setLocalMaster(uint8_t player_id);
 
-    protected:
-        std::vector<NetworkPlayerProfile*> m_players; //!< Information about players
-        NetworkPlayerProfile m_self_profile; //!< Information about self (client only)
-        RaceConfig* m_race_config;
+    bool isLocalMaster(uint8_t player_id);
+    const NetworkPlayerProfile* getProfile(uint8_t id);
+    const NetworkPlayerProfile* getProfile(const std::string &kart_name);
+
+    /*! \brief Used to know if a kart is available.
+     *  \param kart_name : Name of the kart to check.
+     *  \return True if the kart hasn't been selected yet, false elseway.
+     */
+    bool isKartAvailable(std::string kart_name);
+    // ------------------------------------------------------------------------
+    /** Sets the number of local players. */
+    void setNumLocalPlayers(int n) { m_num_local_players = n; } 
+    // ------------------------------------------------------------------------
+    /** Returns the nunber of local players. */
+    int getNumLocalPlayers() const { return m_num_local_players; }
+    // ------------------------------------------------------------------------
+    /*! \brief Used to know if a kart is playable.
+     *  \param kart_name : Name of the kart to check.
+     *  \return True if the kart is playable (standard kart).
+     *  Currently this is always true as the kart selection screen shows
+     *  only the standard karts.
+     */
+    bool isKartAllowed(std::string kart_name) { return true; }
+    // ------------------------------------------------------------------------
+    /** Returns the configuration for this race. */
+    RaceConfig* getRaceConfig() { return m_race_config; }
+    // ------------------------------------------------------------------------
+    /** \brief Get the players that are in the game
+    *  \return A vector containing pointers on the players profiles. */
+    const std::vector<NetworkPlayerProfile*>& getPlayers()
+    {
+        return m_players;
+    }   // getPlayers
+    // ------------------------------------------------------------------------
+    /** Returns the number of connected players. */
+    int getPlayerCount() { return (int)m_players.size(); }
+    // ------------------------------------------------------------------------
+    /** Returns the id of the local master. */
+    int getLocalMasterID() const { return m_local_master; }
 };
 
 #endif // GAME_SETUP_HPP

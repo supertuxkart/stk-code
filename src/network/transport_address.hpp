@@ -19,8 +19,8 @@
 /*! \file types.hpp
  *  \brief Declares the general types that are used by the network.
  */
-#ifndef TYPES_HPP
-#define TYPES_HPP
+#ifndef HEADER_TRANSPORT_ADDRESS_HPP
+#define HEADER_TRANSPORT_ADDRESS_HPP
 
 #include "utils/no_copy.hpp"
 #include "utils/string_utils.hpp"
@@ -31,23 +31,11 @@
 #include <string>
 
 // ============================================================================
-/*! \class CallbackObject
- *  \brief Class that must be inherited to pass objects to protocols.
- */
-class CallbackObject
-{
-    public:
-        CallbackObject() {}
-        ~CallbackObject() {}
-
-};   // CallbackObject
-
-// ============================================================================
 /*! \class TransportAddress
  *  \brief Describes a transport-layer address.
  *  For IP networks, a transport address is the couple ip:port.
  */
-class TransportAddress : public CallbackObject, public NoCopy
+class TransportAddress : public NoCopy
 {
 private:
     uint32_t m_ip;    //!< The IPv4 address
@@ -65,7 +53,7 @@ public:
     /** Construct an transport address from an ENetAddress. */
     TransportAddress(const ENetAddress &a)
     {
-        m_ip   = a.host;
+        m_ip   = htonl(a.host);
         m_port = a.port;
     }   // TransportAddress(EnetAddress)
 
@@ -73,10 +61,10 @@ public:
     ~TransportAddress() {}
     // ------------------------------------------------------------------------
 private:
-    friend class NetworkManager;
+    friend class NetworkConfig;
     /** The copy constructor is private, so that the friend class
-     *  NetworkManager can access it to create a copy, but no other
-     *  class can. */
+     *  NetworkConfig can access it to create a copy (getMyAddress), but
+     *  no other class can. */
     TransportAddress(const TransportAddress &other)
     {
         copy(other);
@@ -164,20 +152,5 @@ public:
         return s;
     }   // toString
 };   // TransportAddress
-
-// ============================================================================
-/*! \class PlayerLogin
- *  \brief Contains the information needed to authenticate a user.
- */
-class PlayerLogin : public CallbackObject
-{
-    public:
-    PlayerLogin() {}
-    ~PlayerLogin() { username.clear(); password.clear(); }
-
-    std::string username;   //!< Username of the player
-    std::string password;   //!< Password of the player
-};   // class PlayerLogin
-
 
 #endif // TYPES_HPP
