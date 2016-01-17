@@ -76,11 +76,10 @@ void StartGameProtocol::setup()
         NetworkPlayerProfile* profile = players[i];
         bool is_local = profile->isLocalPlayer();
 
-        // A server does not create a NetworkingLobby (where clients
-        // create the ActivePlayers for local players, in order to bind the
-        // correct input device to the players). All non-local players (esp.
-        // all karts on the server) are created here.
-        if(NetworkConfig::get()->isServer() || !is_local)
+        // All non-local players are created here. This means all players
+        // on the server, and all non-local players on a client (the local
+        // karts are created in the NetworkingLobby).
+        if(!is_local)
         {
             // On the server no device or player profile is needed.
             StateManager::get()->createActivePlayer(NULL, NULL);
