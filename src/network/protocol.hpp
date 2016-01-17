@@ -122,8 +122,8 @@ public:
     /// functions to check incoming data easily
     bool checkDataSizeAndToken(Event* event, int minimum_size);
     bool isByteCorrect(Event* event, int byte_nb, int value);
-    void sendMessageToPeersChangingToken(NetworkString prefix,
-                                         NetworkString message);
+    void sendMessageToPeersChangingToken(uint8_t type,
+                                         const NetworkString &message);
     void sendMessage(const NetworkString& message,
                      bool reliable = true);
     void sendMessage(STKPeer* peer, const NetworkString& message,

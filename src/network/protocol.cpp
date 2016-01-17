@@ -114,15 +114,23 @@ void Protocol::requestTerminate()
 }   // requestTerminate
 
 // ----------------------------------------------------------------------------
-void Protocol::sendMessageToPeersChangingToken(NetworkString prefix,
-                                               NetworkString message)
+/** Sends a message to all peers, inserting the peer's token into the message.
+ *  The message is composed of a 1-byte message (usually the message type)
+ *  followed by the token of this client and then actual message).
+ *  \param type The first byte of the combined message.
+ *  \param message The actual message content.
+*/
+void Protocol::sendMessageToPeersChangingToken(uint8_t type,
+                                               const NetworkString &message)
 {
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        prefix.ai8(4).ai32(peers[i]->getClientServerToken());
-        prefix += message;
-        ProtocolManager::getInstance()->sendMessage(this, peers[i], prefix);
+        NetworkString combined(1+4+message.size());
+        combined.addUInt8(type).addUInt8(4)
+                .addUInt32(peers[i]->getClientServerToken());
+        combined+=message;
+        ProtocolManager::getInstance()->sendMessage(this, peers[i], combined);
     }
 }   // sendMessageToPeersChangingToken
 

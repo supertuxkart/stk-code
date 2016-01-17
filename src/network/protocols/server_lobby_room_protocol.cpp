@@ -595,9 +595,7 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
     NetworkString other(5+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_MAJOR); // prefix the token with the type
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_MAJOR, other);
 }   // playerMajorVote
 
 //-----------------------------------------------------------------------------
@@ -627,9 +625,7 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
     NetworkString other(2+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_RACE_COUNT); // prefix the token with the type
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_RACE_COUNT, other);
 }   // playerRaceCountVote
 
 //-----------------------------------------------------------------------------
@@ -660,9 +656,7 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
     NetworkString other(2+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_MINOR); // prefix the token with the ype
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_MINOR, other);
 }   // playerMinorVote
 
 //-----------------------------------------------------------------------------
@@ -694,9 +688,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
     NetworkString other(2+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_TRACK); // prefix the token with the ype
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_TRACK, other);
     if(m_setup->getRaceConfig()->getNumTrackVotes()==m_setup->getPlayerCount())
         startGame();
 }   // playerTrackVote
@@ -731,9 +723,7 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
     NetworkString other(2+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_REVERSE); // prefix the token with the ype
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_REVERSE, other);
 }   // playerReversedVote
 
 //-----------------------------------------------------------------------------
@@ -765,9 +755,7 @@ void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
     NetworkString other(2+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_LAPS); // prefix the token with the ype
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_LAPS, other);
 }   // playerLapsVote
 
 //-----------------------------------------------------------------------------
