@@ -81,7 +81,7 @@ void SoccerWorld::init()
 }   // init
 
 //-----------------------------------------------------------------------------
-/** Called when a battle is restarted.
+/** Called when a soccer game is restarted.
  */
 void SoccerWorld::reset()
 {
@@ -230,7 +230,7 @@ void SoccerWorld::setLastKartTohitBall(unsigned int kart_id)
 }   // setLastKartTohitBall
 
 //-----------------------------------------------------------------------------
-/** The battle is over if only one kart is left, or no player kart.
+/** The soccer game is over if time up or either team wins.
  */
 bool SoccerWorld::isRaceOver()
 {
@@ -272,23 +272,15 @@ void SoccerWorld::initKartList()
 {
     const unsigned int kart_amount = (unsigned int)m_karts.size();
 
-    //Loading the indicator textures
-    irr::video::ITexture *red =
-            irr_driver->getTexture(FileManager::GUI, "soccer_player_red.png");
-    irr::video::ITexture *blue =
-            irr_driver->getTexture(FileManager::GUI, "soccer_player_blue.png");
-
-    //Assigning indicators
+    // Assigning billboard text on the karts
     for(unsigned int i=0; i<kart_amount; i++)
     {
-        scene::ISceneNode *arrowNode;
-        float arrow_pos_height = m_karts[i]->getKartModel()->getHeight()+0.5f;
-        SoccerTeam team = getKartTeam(i);
+        int human_player_id = i - (kart_amount - race_manager->getNumPlayers());
+        stringw name = (human_player_id >= 0 ? race_manager
+            ->getKartInfo(human_player_id).getPlayerName() :
+            translations->fribidize(m_karts[i]->getName()));
 
-        arrowNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f),
-                    team == SOCCER_TEAM_BLUE ? blue : red, m_karts[i]->getNode(), true);
-
-        arrowNode->setPosition(core::vector3df(0, arrow_pos_height, 0));
+        m_karts[i]->setOnScreenText(name.c_str());
     }
 
 }   // initKartList

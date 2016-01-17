@@ -2807,13 +2807,32 @@ void Kart::setOnScreenText(const wchar_t *text)
     // is started without splash screen (since "Loading" is shown even in this
     // case). A smaller font would be better
 
+    irr::video::SColor top;
+    irr::video::SColor bottom;
+    SoccerTeam team = SOCCER_TEAM_BLUE;
+    SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+    if (sw)
+    {
+        // Override color of text by kart team in soccer world
+        team = sw->getKartTeam(this->getWorldKartId());
+        top = (team == SOCCER_TEAM_RED ?
+            video::SColor(255, 255, 30, 200) : video::SColor(255, 100, 200, 220));
+        bottom = (team == SOCCER_TEAM_RED ?
+            video::SColor(255, 255, 100, 100) : video::SColor(255, 80, 80, 220));
+    }
+    else
+    {
+        top = GUIEngine::getSkin()->getColor("font::top");
+        bottom = GUIEngine::getSkin()->getColor("font::bottom");
+    }
+
     if (CVS->isGLSL())
     {
         gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont()
                                                        : GUIEngine::getTitleFont();
         new STKTextBillboard(text, font,
-            GUIEngine::getSkin()->getColor("font::bottom"),
-            GUIEngine::getSkin()->getColor("font::top"),
+            bottom,
+            top,
             getNode(), irr_driver->getSceneManager(), -1,
             core::vector3df(0.0f, 1.5f, 0.0f),
             core::vector3df(1.0f, 1.0f, 1.0f));
@@ -2829,8 +2848,8 @@ void Kart::setOnScreenText(const wchar_t *text)
             textsize.Height/55.0f),
             core::vector3df(0.0f, 1.5f, 0.0f),
             -1, // id
-            GUIEngine::getSkin()->getColor("font::bottom"),
-            GUIEngine::getSkin()->getColor("font::top"));
+            bottom,
+            top);
     }
 
     // No need to store the reference to the billboard scene node:
