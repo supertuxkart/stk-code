@@ -287,7 +287,8 @@ void RaceGUI::drawGlobalTimer()
     bool use_digit_font = true;
 
     float elapsed_time = World::getWorld()->getTime();
-    if (!race_manager->hasTimeTarget())
+    if (!race_manager->hasTimeTarget() || race_manager
+        ->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
     {
         sw = core::stringw (
             StringUtils::timeToString(elapsed_time).c_str() );
@@ -321,7 +322,8 @@ void RaceGUI::drawGlobalTimer()
     }
 
     gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());
-    font->setShadow(video::SColor(255, 128, 0, 0));
+    if (use_digit_font)
+        font->setShadow(video::SColor(255, 128, 0, 0));
     font->setScale(1.0f);
     font->draw(sw.c_str(), pos, time_color, false, false, NULL,
                true /* ignore RTL */);
