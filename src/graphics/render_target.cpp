@@ -88,14 +88,13 @@ void GL1RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
                                   const irr::core::rect<s32>* clip_rect,
                                   const irr::video::SColor &colors,
                                   bool use_alpha_channel_of_texture) const
-{
+{    
     irr::core::rect<s32> source_rect(irr::core::position2di(0, 0),
                                       m_render_target_texture->getSize());
-                                     
     irr_driver->getVideoDriver()->draw2DImage(m_render_target_texture,
                                               dest_rect, source_rect,
                                               clip_rect, &colors,
-                                              use_alpha_channel_of_texture);    
+                                              use_alpha_channel_of_texture);
 }
 
 //-----------------------------------------------------------------------------
@@ -151,8 +150,10 @@ void GL3RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
 {
     irr::core::rect<s32> source_rect(0, 0, m_frame_buffer->getWidth(),
                                      m_frame_buffer->getHeight());
+    glEnable(GL_FRAMEBUFFER_SRGB);
     draw2DImageFromRTT(m_texture_id,
                        m_frame_buffer->getWidth(), m_frame_buffer->getHeight(),
                        dest_rect, source_rect,
-                       clip_rect, colors, use_alpha_channel_of_texture);    
+                       clip_rect, colors, use_alpha_channel_of_texture);
+    glDisable(GL_FRAMEBUFFER_SRGB);
 }

@@ -310,8 +310,6 @@ void ModelViewWidget::clearRttProvider()
 
 void ModelViewWidget::drawRTTScene(const irr::core::rect<s32>& dest_rect) const
 {
-    glEnable(GL_FRAMEBUFFER_SRGB);
     m_render_target->draw2DImage(dest_rect, NULL, video::SColor(255, 255, 255, 255), true);
-    glDisable(GL_FRAMEBUFFER_SRGB);
 }
 
