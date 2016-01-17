@@ -29,7 +29,6 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/per_camera_node.hpp"
-#include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/render_target.hpp"
 #include "graphics/shader_based_renderer.hpp"
@@ -138,19 +137,6 @@ IrrDriver::IrrDriver()
  */
 IrrDriver::~IrrDriver()
 {
-    // Note that we can not simply delete m_post_processing here:
-    // m_post_processing uses a material that has a reference to
-    // m_post_processing (for a callback). So when the material is
-    // removed it will try to drop the ref count of its callback object,
-    // which is m_post_processing, and which was already deleted. So
-    // instead we just decrease the ref count here. When the material
-    // is deleted, it will trigger the actual deletion of
-    // PostProcessing when decreasing the refcount of its callback object.
-    if(m_post_processing)
-    {
-        // check if we createad the OpenGL device by calling initDevice()
-        m_post_processing->drop();
-    }
     assert(m_device != NULL);
 
     m_device->drop();
@@ -170,7 +156,7 @@ IrrDriver::~IrrDriver()
  */
 void IrrDriver::reset()
 {
-    if (CVS->isGLSL()) m_post_processing->reset();
+    m_renderer->reset();
 }   // reset
 
 void IrrDriver::setPhase(STKRenderingPass p)
@@ -641,9 +627,6 @@ void IrrDriver::initDevice()
     }
     material2D.AntiAliasing=video::EAAM_FULL_BASIC;
     //m_video_driver->enableMaterial2D();
-
-    // Initialize post-processing if supported
-    m_post_processing = new PostProcessing(m_video_driver);
 
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
@@ -2427,7 +2410,6 @@ void IrrDriver::clearLights()
 }   // clearLights
 
 // ----------------------------------------------------------------------------
-
 GLuint IrrDriver::getRenderTargetTexture(TypeRTT which)
 {
     return m_renderer->getRTT()->getRenderTarget(which);

@@ -40,14 +40,16 @@ protected:
 
     void prepareShadowRendering(const FrameBuffer& shadow_framebuffer) const;
     void shadowPostProcessing(const ShadowMatrices& shadow_matrices,
-                              const FrameBuffer& shadow_framebuffer) const;
+                              const FrameBuffer& shadow_framebuffer,
+                              const PostProcessing* post_processing) const;
                 
     //TODO: move it in ShaderBasedRenderer
     void glowPostProcessing(const FrameBuffer& glow_framebuffer,
                             const FrameBuffer& half_framebuffer,
                             const FrameBuffer& quater_framebuffer,
                             const FrameBuffer& color_framebuffer,
-                            GLuint quarter_render_target) const;
+                            GLuint quarter_render_target,
+                            const PostProcessing* post_processing) const;
 
 public:
     AbstractGeometryPasses();
@@ -67,14 +69,17 @@ public:
                             const FrameBuffer& half_framebuffer,
                             const FrameBuffer& quarter_framebuffer,
                             const FrameBuffer& color_framebuffer,
-                            GLuint quarter_render_target          ) const = 0;
+                            GLuint quarter_render_target,
+                            const PostProcessing* post_processing  ) const = 0;
     
     void renderTransparent(const DrawCalls& draw_calls, 
-                           unsigned render_target);
+                           unsigned render_target,
+                           const PostProcessing* post_processing);
                            
     virtual void renderShadows(const DrawCalls& draw_calls,
                                const ShadowMatrices& shadow_matrices,
-                               const FrameBuffer& shadow_framebuffer) const = 0;
+                               const FrameBuffer& shadow_framebuffer,
+                               const PostProcessing* post_processing) const = 0;
                        
                        
     virtual void renderReflectiveShadowMap(const DrawCalls& draw_calls,
@@ -123,7 +128,8 @@ public:
                     const FrameBuffer& half_framebuffer,
                     const FrameBuffer& quarter_framebuffer,
                     const FrameBuffer& color_framebuffer,
-                    GLuint quarter_render_target   ) const
+                    GLuint quarter_render_target,
+                    const PostProcessing* post_processing) const
     {
         irr_driver->getSceneManager()->setCurrentRendertime(scene::ESNRP_SOLID);
         glow_framebuffer.bind();
@@ -147,14 +153,16 @@ public:
         
         glowPostProcessing(glow_framebuffer, half_framebuffer,
                            quarter_framebuffer, color_framebuffer,
-                           quarter_render_target);
+                           quarter_render_target,
+                           post_processing);
         
     }
 
 
     void renderShadows(const DrawCalls& draw_calls,
                                    const ShadowMatrices& shadow_matrices,
-                                   const FrameBuffer& shadow_framebuffer) const
+                                   const FrameBuffer& shadow_framebuffer,
+                                   const PostProcessing* post_processing) const
     {
         prepareShadowRendering(shadow_framebuffer);
 
@@ -167,7 +175,7 @@ public:
         glDisable(GL_POLYGON_OFFSET_FILL);
 
         if (CVS->isESMEnabled())
-            shadowPostProcessing(shadow_matrices, shadow_framebuffer);
+            shadowPostProcessing(shadow_matrices, shadow_framebuffer, post_processing);
     }
 
 

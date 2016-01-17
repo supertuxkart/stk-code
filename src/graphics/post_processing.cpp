@@ -21,7 +21,6 @@
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
 #include "graphics/render_target.hpp"
@@ -217,10 +216,11 @@ public:
                            1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian17TapHShader
     // ------------------------------------------------------------------------
-    void render(const FrameBuffer &fb, int width, int height)
+    void render(const FrameBuffer &fb, const FrameBuffer &linear_depth,
+                int width, int height)
     {
         setTextureUnits(fb.getRTT()[0],
-                        irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0] );
+                        linear_depth.getRTT()[0] );
         drawFullScreenEffect(core::vector2df(1.0f/width, 1.0f/height));
 
     }   // render
@@ -243,12 +243,13 @@ public:
     }   // ComputeGaussian17TapHShader
     // ------------------------------------------------------------------------
     void render(const FrameBuffer &fb, const FrameBuffer &auxiliary,
+                const FrameBuffer &linear_depth,
                 int width, int height)
     {
         use();
         glBindSampler(m_dest_tu, 0);
         setTextureUnits(fb.getRTT()[0],
-                        irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
+                        linear_depth.getRTT()[0]);
         glBindImageTexture(m_dest_tu, auxiliary.getRTT()[0], 0, false,
                            0, GL_WRITE_ONLY, GL_R16F);
         setUniforms(core::vector2df(1.0f/width, 1.0f/height));
@@ -272,10 +273,11 @@ public:
                            1, "depth", ST_BILINEAR_CLAMPED_FILTERED);
     }   // Gaussian17TapVShader
     // ------------------------------------------------------------------------
-    void render(const FrameBuffer &auxiliary, int width, int height)
+    void render(const FrameBuffer &auxiliary, const FrameBuffer &linear_depth,
+                int width, int height)
     {
         setTextureUnits(auxiliary.getRTT()[0],
-                        irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
+                        linear_depth.getRTT()[0]);
         drawFullScreenEffect(core::vector2df(1.0f/width, 1.0f/height));
 
     }   // render
@@ -298,13 +300,14 @@ public:
         assignTextureUnit(m_dest_tu, "dest");
     }   // ComputeGaussian17TapVShader
     // ------------------------------------------------------------------------
-    void render(const FrameBuffer &auxiliary, const FrameBuffer &fb, 
+    void render(const FrameBuffer &auxiliary, const FrameBuffer &fb,
+                const FrameBuffer &linear_depth,
                 int width, int height)
     {
         use();
         glBindSampler(m_dest_tu, 0);
         setTextureUnits(auxiliary.getRTT()[0],
-                        irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0]);
+                        linear_depth.getRTT()[0]);
         glBindImageTexture(m_dest_tu, fb.getRTT()[0], 0, false, 0,
                            GL_WRITE_ONLY, GL_R16F);
         setUniforms(core::vector2df(1.0f/width, 1.0f/height));
@@ -354,11 +357,13 @@ public:
 						   3, "tex_dust", ST_BILINEAR_FILTERED);
     }   // BloomBlendShader
     // ------------------------------------------------------------------------
-    void render()
+    void render(GLuint render_target_bloom_128,
+                GLuint render_target_bloom_256,
+                GLuint render_target_bloom_512)
     {
-        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_BLOOM_128),
-                        irr_driver->getRenderTargetTexture(RTT_BLOOM_256),
-                        irr_driver->getRenderTargetTexture(RTT_BLOOM_512),
+        setTextureUnits(render_target_bloom_128,
+                        render_target_bloom_256,
+                        render_target_bloom_512,
 						getTextureGLuint(lensDustTex));
         drawFullScreenEffect();
     }   // render
@@ -379,11 +384,13 @@ public:
                            2, "tex_512", ST_BILINEAR_FILTERED);
     }   // LensBlendShader
     // ------------------------------------------------------------------------
-    void render()
+    void render(GLuint render_target_lens_128,
+                GLuint render_target_lens_256,
+                GLuint render_target_lens_512)
     {
-        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_LENS_128),
-                        irr_driver->getRenderTargetTexture(RTT_LENS_256),
-                        irr_driver->getRenderTargetTexture(RTT_LENS_512));
+        setTextureUnits(render_target_lens_128,
+                        render_target_lens_256,
+                        render_target_lens_512);
         drawFullScreenEffect();
 
     }   // render
@@ -426,50 +433,14 @@ public:
                            1, "dtex", ST_NEAREST_FILTERED);
     }   // DepthOfFieldShader
     // ------------------------------------------------------------------------
-    void render(const FrameBuffer &fb, GLuint rtt)
+    void render(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture)
     {
-        fb.bind();
-        setTextureUnits(rtt, irr_driver->getDepthStencilTexture());
+        framebuffer.bind();
+        setTextureUnits(color_texture, depth_stencil_texture);
         drawFullScreenEffect();
 
     }   // render
 };   // DepthOfFieldShader
-
-// ============================================================================
-class IBLShader : public TextureShader<IBLShader, 3>
-{
-public:
-    IBLShader()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-                            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
-                            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
-                            GL_FRAGMENT_SHADER, "IBL.frag");
-        assignUniforms();
-        assignSamplerNames(0, "ntex",  ST_NEAREST_FILTERED,
-                           1, "dtex",  ST_NEAREST_FILTERED,
-                           2, "probe", ST_TRILINEAR_CUBEMAP);
-    }   // IBLShader
-};   // IBLShader
-
-// ============================================================================
-class DegradedIBLShader : public TextureShader<DegradedIBLShader, 1>
-{
-public:
-    DegradedIBLShader()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-                            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
-                            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
-                            GL_FRAGMENT_SHADER, "degraded_ibl.frag");
-        assignUniforms();
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED);
-    }   // DegradedIBLShader
-};   // DegradedIBLShader
 
 // ============================================================================
 class RHDebug : public Shader<RHDebug, core::matrix4, core::vector3df>
@@ -489,41 +460,6 @@ public:
                           m_tu_shb, "SHB");
     }   // RHDebug
 };   // RHDebug
-
-// ============================================================================
-class GlobalIlluminationReconstructionShader 
-    : public TextureShader<GlobalIlluminationReconstructionShader, 5,
-                           core::matrix4, core::matrix4, core::vector3df >
-{
-public:
-    GlobalIlluminationReconstructionShader()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-                            GL_FRAGMENT_SHADER, "gi.frag");
-
-        assignUniforms("rh_matrix", "inv_rh_matrix", "extents");
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
-                           1, "dtex", ST_NEAREST_FILTERED,
-                           2, "SHR", ST_VOLUME_LINEAR_FILTERED,
-                           3, "SHG", ST_VOLUME_LINEAR_FILTERED,
-                           4, "SHB", ST_VOLUME_LINEAR_FILTERED);
-    }   // GlobalIlluminationReconstructionShader
-
-    // ------------------------------------------------------------------------
-    void render(const core::matrix4 &rh_matrix,
-                const core::vector3df &rh_extend, const FrameBuffer &fb)
-    {
-        core::matrix4 inv_rh_matrix;
-        rh_matrix.getInverse(inv_rh_matrix);
-        glDisable(GL_DEPTH_TEST);
-        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
-                        irr_driver->getDepthStencilTexture(),
-                        fb.getRTT()[0], fb.getRTT()[1], fb.getRTT()[2]);
-        drawFullScreenEffect(rh_matrix, inv_rh_matrix, rh_extend);
-    }   // render
-};   // GlobalIlluminationReconstructionShader
 
 // ============================================================================
 class PassThroughShader : public TextureShader<PassThroughShader, 1, int, int>
@@ -587,9 +523,9 @@ public:
         assignSamplerNames(0, "texture", ST_BILINEAR_FILTERED);
     }   // LinearizeDepthShader
     // ------------------------------------------------------------------------
-    void render()
+    void render(GLuint depth_stencil_texture)
     {
-        setTextureUnits(irr_driver->getDepthStencilTexture());
+        setTextureUnits(depth_stencil_texture);
         scene::ICameraSceneNode *c = irr_driver->getSceneManager()->getActiveCamera();
         drawFullScreenEffect(c->getNearValue(), c->getFarValue()  );
 
@@ -637,9 +573,9 @@ public:
         assignSamplerNames(0, "dtex", ST_SEMI_TRILINEAR);
     }   // SSAOShader
     // ------------------------------------------------------------------------
-    void render()
+    void render(GLuint render_target_linear_depth)
     {
-        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH));
+        setTextureUnits(render_target_linear_depth);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         drawFullScreenEffect(irr_driver->getSSAORadius(),
@@ -666,9 +602,9 @@ public:
                            1, "dtex", ST_NEAREST_FILTERED);
     }    // MotionBlurShader
     // ------------------------------------------------------------------------
-    void render(const FrameBuffer &fb, float boost_time)
+    void render(const FrameBuffer &fb, float boost_time, GLuint depth_stencil_texture)
     {
-        setTextureUnits(fb.getRTT()[0],  irr_driver->getDepthStencilTexture());
+        setTextureUnits(fb.getRTT()[0],  depth_stencil_texture);
         Camera *cam = Camera::getActiveCamera();
         // Todo : use a previousPVMatrix per cam, not global
         drawFullScreenEffect(cam->getPreviousPVMatrix(),
@@ -753,10 +689,12 @@ public:
                            1, "areaMap", ST_NEAREST_FILTERED);
     }   // MLAABlendWeightSHader
     // ------------------------------------------------------------------------
-    void render(video::ITexture *area_map, const core::vector2df &pixel_size)
+    void render(video::ITexture *area_map,
+                const core::vector2df &pixel_size,
+                GLuint rtt_mlaa_tmp)
     {
         use();
-        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_TMP),
+        setTextureUnits(rtt_mlaa_tmp,
                         getTextureGLuint(area_map));
         drawFullScreenEffect(pixel_size);
 
@@ -777,48 +715,17 @@ public:
                            1, "colorMap", ST_NEAREST_FILTERED);
     }   // MLAAGatherSHader
     // ------------------------------------------------------------------------
-    void render(const core::vector2df &pixel_size)
+    void render(const core::vector2df &pixel_size,
+                GLuint rtt_mlaa_blend,
+                GLuint rtt_mlaa_tmp)
     {
         use();
-        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND),
-                        irr_driver->getRenderTargetTexture(RTT_MLAA_TMP));
+        setTextureUnits(rtt_mlaa_blend,
+                        rtt_mlaa_tmp);
         drawFullScreenEffect(pixel_size);
 
     }   // render
 };   // MLAAGatherSHader
-
-// ============================================================================
-class SunLightShader : public TextureShader<SunLightShader, 2,
-                                            core::vector3df, video::SColorf>
-{
-public:
-    SunLightShader()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
-                            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-                            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
-                            GL_FRAGMENT_SHADER, "sunlight.frag");
-
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
-                           1, "dtex", ST_NEAREST_FILTERED);
-        assignUniforms("direction", "col");
-    }   // SunLightShader
-    // ------------------------------------------------------------------------
-    void render(const core::vector3df &direction, const video::SColorf &col)
-    {
-        glEnable(GL_BLEND);
-        glDisable(GL_DEPTH_TEST);
-        glBlendFunc(GL_ONE, GL_ONE);
-        glBlendEquation(GL_FUNC_ADD);
-
-        setTextureUnits(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
-                        irr_driver->getDepthStencilTexture());
-        drawFullScreenEffect(direction, col);
-    }   // render
-};   // SunLightShader
 
 // ============================================================================
 class LightningShader : public TextureShader<LightningShader, 1, 
@@ -1008,47 +915,10 @@ void PostProcessing::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
-static void renderBloom(GLuint in)
+void PostProcessing::renderBloom(GLuint in)
 {
     BloomShader::getInstance()->render(in);
 }   // renderBloom
-
-// ----------------------------------------------------------------------------
-void PostProcessing::renderEnvMap(GLuint skybox)
-{
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE);
-
-    if (UserConfigParams::m_degraded_IBL)
-    {
-        DegradedIBLShader::getInstance()->use();
-        glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
-
-        DegradedIBLShader::getInstance()
-            ->setTextureUnits(irr_driver
-                              ->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
-        DegradedIBLShader::getInstance()->setUniforms();
-    }
-    else
-    {
-        IBLShader::getInstance()->use();
-        glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
-
-        IBLShader::getInstance()->setTextureUnits(
-            irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH),
-            irr_driver->getDepthStencilTexture(), skybox);
-        IBLShader::getInstance()->setUniforms();
-    }
-
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-}   // renderEnvMap
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB,
@@ -1067,23 +937,6 @@ void PostProcessing::renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB,
     glDrawArrays(GL_POINTS, 0, 32 * 16 * 32);
     glDisable(GL_PROGRAM_POINT_SIZE);
 }   // renderRHDebug
-
-// ----------------------------------------------------------------------------
-void PostProcessing::renderGI(const core::matrix4 &rh_matrix,
-                              const core::vector3df &rh_extend,
-                              const FrameBuffer &fb)
-{
-    GlobalIlluminationReconstructionShader::getInstance()->render(rh_matrix,
-                                                                  rh_extend,
-                                                                  fb);
-}   // renderGI
-
-// ----------------------------------------------------------------------------
-void PostProcessing::renderSunlight(const core::vector3df &direction,
-                                    const video::SColorf &col)
-{
-    SunLightShader::getInstance()->render(direction, col);
-}   // renderSunlight
 
 // ----------------------------------------------------------------------------
 static std::vector<float> getGaussianWeight(float sigma, size_t count)
@@ -1109,7 +962,7 @@ static std::vector<float> getGaussianWeight(float sigma, size_t count)
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo, 
-                                         const FrameBuffer &auxiliary)
+                                         const FrameBuffer &auxiliary) const
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() && 
            in_fbo.getHeight() == auxiliary.getHeight());
@@ -1130,7 +983,7 @@ void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
                                               size_t layer, float sigma_h,
-                                              float sigma_v)
+                                              float sigma_v) const
 {
     GLuint layer_tex;
     glGenTextures(1, &layer_tex);
@@ -1190,7 +1043,7 @@ void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
                                          const FrameBuffer &auxiliary, float sigma_v,
-                                         float sigma_h)
+                                         float sigma_h) const
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() && 
            in_fbo.getHeight() == auxiliary.getHeight());
@@ -1246,7 +1099,7 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderHorizontalBlur(const FrameBuffer &in_fbo,
-                                          const FrameBuffer &auxiliary)
+                                          const FrameBuffer &auxiliary) const
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
@@ -1262,7 +1115,8 @@ void PostProcessing::renderHorizontalBlur(const FrameBuffer &in_fbo,
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
-                                             const FrameBuffer &auxiliary)
+                                             const FrameBuffer &auxiliary,
+                                             const FrameBuffer &linear_depth) const
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
@@ -1273,6 +1127,7 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
         {
             auxiliary.bind();
             Gaussian17TapHShader::getInstance()->render(in_fbo,
+                                                        linear_depth,
                                                         in_fbo.getWidth(),
                                                         in_fbo.getHeight());
         }
@@ -1280,6 +1135,7 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
         {
             ComputeGaussian17TapHShader::getInstance()->render(in_fbo,
                                                                auxiliary,
+                                                               linear_depth,
                                                                in_fbo.getWidth(),
                                                                in_fbo.getHeight());
         }
@@ -1291,6 +1147,7 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
         {
             in_fbo.bind();
             Gaussian17TapVShader::getInstance()->render(auxiliary,
+                                                        linear_depth,
                                                         in_fbo.getWidth(),
                                                         in_fbo.getHeight());
         }
@@ -1298,6 +1155,7 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
         {
             ComputeGaussian17TapVShader::getInstance()->render(auxiliary,
                                                                in_fbo, 
+                                                               linear_depth,
                                                                in_fbo.getWidth(),
                                                                in_fbo.getHeight());
         }
@@ -1308,13 +1166,13 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderPassThrough(GLuint tex, unsigned width,
-                                       unsigned height)
+                                       unsigned height) const
 {
     PassThroughShader::getInstance()->render(tex, width, height);
 }   // renderPassThrough
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
+void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer) const
 {
     LayerPassThroughShader::getInstance()->use();
     LayerPassThroughShader::getInstance()->bindVertexArray();
@@ -1328,27 +1186,30 @@ void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
 }   // renderTextureLayer
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGlow(unsigned tex)
+void PostProcessing::renderGlow(unsigned tex) const
 {
     GlowShader::getInstance()->render(tex);
 }   // renderGlow
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderSSAO()
+void PostProcessing::renderSSAO(const FrameBuffer& linear_depth_framebuffer,
+                                const FrameBuffer& ssao_framebuffer,
+                                GLuint depth_stencil_texture)
 {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
     // Generate linear depth buffer
-    irr_driver->getFBO(FBO_LINEAR_DEPTH).bind();
-    LinearizeDepthShader::getInstance()->render();
-    irr_driver->getFBO(FBO_SSAO).bind();
-    SSAOShader::getInstance()->render();
+    linear_depth_framebuffer.bind();
+    LinearizeDepthShader::getInstance()->render(depth_stencil_texture);
+    ssao_framebuffer.bind();
+    SSAOShader::getInstance()->render(linear_depth_framebuffer.getRTT()[0]);
 }   // renderSSAO
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderMotionBlur(unsigned , const FrameBuffer &in_fbo,
-                                      FrameBuffer &out_fbo)
+                                      FrameBuffer &out_fbo,
+                                      GLuint depth_stencil_texture)
 {
     MotionBlurProvider * const cb =
                       (MotionBlurProvider *)Shaders::getCallback(ES_MOTIONBLUR);
@@ -1376,15 +1237,87 @@ void PostProcessing::renderMotionBlur(unsigned , const FrameBuffer &in_fbo,
     glClear(GL_COLOR_BUFFER_BIT);
 
     float boost_time = cb->getBoostTime(cam->getIndex()) * 10;
-    MotionBlurShader::getInstance()->render(in_fbo, boost_time);
+    MotionBlurShader::getInstance()->render(in_fbo, boost_time, depth_stencil_texture);
 }   // renderMotionBlur
 
 
 // ----------------------------------------------------------------------------
-static void renderDoF(const FrameBuffer &fbo, GLuint rtt)
+void PostProcessing::renderDoF(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture)
 {
-    DepthOfFieldShader::getInstance()->render(fbo, rtt);
+    DepthOfFieldShader::getInstance()->render(framebuffer, color_texture, depth_stencil_texture);
 }   // renderDoF
+
+// ----------------------------------------------------------------------------
+void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
+                                   const FrameBuffer &fbo,
+                                   const FrameBuffer &quarter1_fbo,
+                                   const FrameBuffer &quarter2_fbo)
+{
+    Track* track = World::getWorld()->getTrack();
+
+    glEnable(GL_DEPTH_TEST);
+    // Grab the sky
+    fbo.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+//            irr_driver->renderSkybox(camnode);
+
+    // Set the sun's color
+    const SColor col = track->getGodRaysColor();
+
+    // The sun interposer
+    STKMeshSceneNode *sun = irr_driver->getSunInterposer();
+    sun->setGlowColors(col);
+    sun->setPosition(track->getGodRaysPosition());
+    sun->updateAbsolutePosition();
+    irr_driver->setPhase(GLOW_PASS);
+    sun->render();
+    glDisable(GL_DEPTH_TEST);
+
+    // Fade to quarter
+    irr_driver->getFBO(FBO_QUARTER1).bind();
+    glViewport(0, 0, irr_driver->getActualScreenSize().Width / 4,
+                     irr_driver->getActualScreenSize().Height / 4);
+    GodFadeShader::getInstance()->render(fbo.getRTT()[0], col);
+
+    // Blur
+    renderGaussian3Blur(quarter1_fbo, quarter2_fbo);
+
+    // Calculate the sun's position in texcoords
+    const core::vector3df pos = track->getGodRaysPosition();
+    float ndc[4];
+    core::matrix4 trans = camnode->getProjectionMatrix();
+    trans *= camnode->getViewMatrix();
+
+    trans.transformVect(ndc, pos);
+
+    const float texh = 
+        m_vertices[0].v1.TCoords.Y - m_vertices[0].v0.TCoords.Y;
+    const float texw = 
+        m_vertices[0].v3.TCoords.X - m_vertices[0].v0.TCoords.X;
+
+    const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f) * texw;
+    const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
+
+    // Rays please
+    irr_driver->getFBO(FBO_QUARTER2).bind();
+    GodRayShader::getInstance()
+        ->render(quarter1_fbo.getRTT()[0], core::vector2df(sunx, suny));
+
+    // Blur
+    renderGaussian3Blur(quarter2_fbo, quarter1_fbo);
+
+    // Blend
+    glEnable(GL_BLEND);
+    glBlendColor(0., 0., 0., track->getGodRaysOpacity());
+    glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE);
+    glBlendEquation(GL_FUNC_ADD);
+
+    fbo.bind();
+    renderPassThrough(quarter2_fbo.getRTT()[0], fbo.getWidth(), fbo.getHeight());
+    glDisable(GL_BLEND);
+    
+}
+
 
 // ----------------------------------------------------------------------------
 void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
@@ -1412,7 +1345,7 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
     mlaa_blend_framebuffer.bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE);
+    MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE, mlaa_tmp_framebuffer.getRTT()[0]);
 
     // Blit in to tmp1
     FrameBuffer::Blit(mlaa_colors_framebuffer,
@@ -1420,7 +1353,8 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
 
     // Pass 3: gather
     mlaa_colors_framebuffer.bind();
-    MLAAGatherSHader::getInstance()->render(PIXEL_SIZE);
+    MLAAGatherSHader::getInstance()
+        ->render(PIXEL_SIZE, mlaa_blend_framebuffer.getRTT()[0], mlaa_tmp_framebuffer.getRTT()[0]);
 
     // Done.
     glDisable(GL_STENCIL_TEST);
@@ -1442,10 +1376,11 @@ void PostProcessing::renderLightning(core::vector3df intensity)
 /** Render the post-processed scene */
 FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
                                     bool isRace,
+                                    RTT *rtts,
                                     GL3RenderTarget *specified_render_target)
 {
-    FrameBuffer *in_fbo = &irr_driver->getFBO(FBO_COLORS);
-    FrameBuffer *out_fbo = &irr_driver->getFBO(FBO_TMP1_WITH_DS);
+    FrameBuffer *in_fbo = &rtts->getFBO(FBO_COLORS);
+    FrameBuffer *out_fbo = &rtts->getFBO(FBO_TMP1_WITH_DS);
     // Each effect uses these as named, and sets them up for the next effect.
     // This allows chaining effects where some may be disabled.
 
@@ -1457,97 +1392,28 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     World *world = World::getWorld();
     Physics *physics = world ? world->getPhysics() : NULL;
 
-
     if (isRace && UserConfigParams::m_dof && (physics == NULL || !physics->isDebug()))
     {
         PROFILER_PUSH_CPU_MARKER("- DoF", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_DOF));
-        renderDoF(*out_fbo, in_fbo->getRTT()[0]);
+        renderDoF(*out_fbo, in_fbo->getRTT()[0], rtts->getDepthStencilTexture());
         std::swap(in_fbo, out_fbo);
         PROFILER_POP_CPU_MARKER();
     }
 
+    bool hasgodrays = false;
+    if (World::getWorld() != NULL)
+        hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+
+    if (isRace && UserConfigParams::m_light_shaft && hasgodrays)
     {
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GODRAYS));
-        bool hasgodrays = false;
-        if (World::getWorld() != NULL)
-            hasgodrays = World::getWorld()->getTrack()->hasGodRays();
-
-        if (isRace && UserConfigParams::m_light_shaft && hasgodrays)
-        {
-            Track* track = World::getWorld()->getTrack();
-
-            glEnable(GL_DEPTH_TEST);
-            // Grab the sky
-            out_fbo->bind();
-            glClear(GL_COLOR_BUFFER_BIT);
-//            irr_driver->renderSkybox(camnode);
-
-            // Set the sun's color
-            const SColor col = track->getGodRaysColor();
-
-            // The sun interposer
-            STKMeshSceneNode *sun = irr_driver->getSunInterposer();
-            sun->setGlowColors(col);
-            sun->setPosition(track->getGodRaysPosition());
-            sun->updateAbsolutePosition();
-            irr_driver->setPhase(GLOW_PASS);
-            sun->render();
-            glDisable(GL_DEPTH_TEST);
-
-            // Fade to quarter
-            irr_driver->getFBO(FBO_QUARTER1).bind();
-            glViewport(0, 0, irr_driver->getActualScreenSize().Width / 4,
-                             irr_driver->getActualScreenSize().Height / 4);
-            GodFadeShader::getInstance()->render(out_fbo->getRTT()[0], col);
-
-            // Blur
-            renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER1),
-                                irr_driver->getFBO(FBO_QUARTER2));
-
-            // Calculate the sun's position in texcoords
-            const core::vector3df pos = track->getGodRaysPosition();
-            float ndc[4];
-            core::matrix4 trans = camnode->getProjectionMatrix();
-            trans *= camnode->getViewMatrix();
-
-            trans.transformVect(ndc, pos);
-
-            const float texh = 
-                m_vertices[0].v1.TCoords.Y - m_vertices[0].v0.TCoords.Y;
-            const float texw = 
-                m_vertices[0].v3.TCoords.X - m_vertices[0].v0.TCoords.X;
-
-            const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f) * texw;
-            const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
-
-            // Rays please
-            irr_driver->getFBO(FBO_QUARTER2).bind();
-            GodRayShader::getInstance()
-                ->render(irr_driver->getRenderTargetTexture(RTT_QUARTER1),
-                       core::vector2df(sunx, suny)                       );
-
-            // Blur
-            renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER2),
-                                irr_driver->getFBO(FBO_QUARTER1));
-
-            // Blend
-            glEnable(GL_BLEND);
-            glBlendColor(0., 0., 0., track->getGodRaysOpacity());
-            glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE);
-            glBlendEquation(GL_FUNC_ADD);
-
-            in_fbo->bind();
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER2),
-                              in_fbo->getWidth(), in_fbo->getHeight());
-            glDisable(GL_BLEND);
-        }
+        renderGodRays(camnode, *out_fbo, rtts->getFBO(FBO_QUARTER1), rtts->getFBO(FBO_QUARTER2));
         PROFILER_POP_CPU_MARKER();
     }
 
     // Simulate camera defects from there
-
     {
         PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_BLOOM));
@@ -1557,46 +1423,48 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             glClear(GL_STENCIL_BUFFER_BIT);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 
-            FrameBuffer::Blit(*in_fbo, irr_driver->getFBO(FBO_BLOOM_1024),
+            FrameBuffer::Blit(*in_fbo, rtts->getFBO(FBO_BLOOM_1024),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-            irr_driver->getFBO(FBO_BLOOM_512).bind();
-            renderBloom(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024));
+            rtts->getFBO(FBO_BLOOM_512).bind();
+            renderBloom(rtts->getRenderTarget(RTT_BLOOM_1024));
+
+
 
             // Downsample
-            FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512),
-                              irr_driver->getFBO(FBO_BLOOM_256), 
+            FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_512),
+                              rtts->getFBO(FBO_BLOOM_256), 
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-            FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256),
-                              irr_driver->getFBO(FBO_BLOOM_128),
+            FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_256),
+                              rtts->getFBO(FBO_BLOOM_128),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 			// Copy for lens flare
-			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512),
-                              irr_driver->getFBO(FBO_LENS_512), 
+			FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_512),
+                              rtts->getFBO(FBO_LENS_512), 
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256),
-                              irr_driver->getFBO(FBO_LENS_256),
+			FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_256),
+                              rtts->getFBO(FBO_LENS_256),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_128),
-                              irr_driver->getFBO(FBO_LENS_128),
+			FrameBuffer::Blit(rtts->getFBO(FBO_BLOOM_128),
+                              rtts->getFBO(FBO_LENS_128),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 			
 
             // Blur
-            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512),
-                                irr_driver->getFBO(FBO_TMP_512), 1., 1.);
-            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256),
-                                irr_driver->getFBO(FBO_TMP_256), 1., 1.);
-            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128),
-                                irr_driver->getFBO(FBO_TMP_128), 1., 1.);
+            renderGaussian6Blur(rtts->getFBO(FBO_BLOOM_512),
+                                rtts->getFBO(FBO_TMP_512), 1., 1.);
+            renderGaussian6Blur(rtts->getFBO(FBO_BLOOM_256),
+                                rtts->getFBO(FBO_TMP_256), 1., 1.);
+            renderGaussian6Blur(rtts->getFBO(FBO_BLOOM_128),
+                                rtts->getFBO(FBO_TMP_128), 1., 1.);
 
-            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_512), 
-                                 irr_driver->getFBO(FBO_TMP_512));
-            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_256),
-                                 irr_driver->getFBO(FBO_TMP_256));
-            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_128), 
-                                 irr_driver->getFBO(FBO_TMP_128));
+            renderHorizontalBlur(rtts->getFBO(FBO_LENS_512), 
+                                 rtts->getFBO(FBO_TMP_512));
+            renderHorizontalBlur(rtts->getFBO(FBO_LENS_256),
+                                 rtts->getFBO(FBO_TMP_256));
+            renderHorizontalBlur(rtts->getFBO(FBO_LENS_128), 
+                                 rtts->getFBO(FBO_TMP_128));
             
 
             // Additively blend on top of tmp1
@@ -1605,8 +1473,14 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
             
-            BloomBlendShader::getInstance()->render();
-            LensBlendShader::getInstance()->render();
+            BloomBlendShader::getInstance()
+                ->render(rtts->getRenderTarget(RTT_BLOOM_128),
+                         rtts->getRenderTarget(RTT_BLOOM_256),
+                         rtts->getRenderTarget(RTT_BLOOM_512));
+            LensBlendShader::getInstance()
+                ->render(rtts->getRenderTarget(RTT_LENS_128),
+                         rtts->getRenderTarget(RTT_LENS_256),
+                         rtts->getRenderTarget(RTT_LENS_512));
 
             glDisable(GL_BLEND);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -1634,7 +1508,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         if (isRace && UserConfigParams::m_motionblur && World::getWorld() &&
             cb->getBoostTime(Camera::getActiveCamera()->getIndex()) > 0.) // motion blur
         {
-            renderMotionBlur(0, *in_fbo, *out_fbo);
+            renderMotionBlur(0, *in_fbo, *out_fbo, irr_driver->getDepthStencilTexture());
             std::swap(in_fbo, out_fbo);
         }
         PROFILER_POP_CPU_MARKER();
@@ -1668,16 +1542,16 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     
     out_fbo->bind();
     renderPassThrough(in_fbo->getRTT()[0],
-                      out_fbo->getWidth(),
-                      out_fbo->getHeight());
+                                         out_fbo->getWidth(),
+                                         out_fbo->getHeight());
     
 
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
     {
         PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MLAA));
-        applyMLAA(irr_driver->getFBO(FBO_MLAA_TMP),
-                  irr_driver->getFBO(FBO_MLAA_BLEND),
+        applyMLAA(rtts->getFBO(FBO_MLAA_TMP),
+                  rtts->getFBO(FBO_MLAA_BLEND),
                   *out_fbo);
         PROFILER_POP_CPU_MARKER();
     }

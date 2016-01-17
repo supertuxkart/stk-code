@@ -60,6 +60,8 @@ public:
     virtual void onLoadWorld()   = 0;
     virtual void onUnloadWorld() = 0;
 
+    virtual void reset() {}
+    virtual void giveBoost(unsigned int cam_index) {}
 
     virtual void addSkyBox(const std::vector<irr::video::ITexture*> &texture,
                            const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) {}

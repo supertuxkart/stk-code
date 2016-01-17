@@ -229,6 +229,80 @@ public:
 };   // NVWorkaroundRadianceHintsConstructionShader
 
 // ============================================================================
+class GlobalIlluminationReconstructionShader 
+    : public TextureShader<GlobalIlluminationReconstructionShader, 5,
+                           core::matrix4, core::matrix4, core::vector3df >
+{
+public:
+    GlobalIlluminationReconstructionShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "gi.frag");
+
+        assignUniforms("rh_matrix", "inv_rh_matrix", "extents");
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED,
+                           2, "SHR", ST_VOLUME_LINEAR_FILTERED,
+                           3, "SHG", ST_VOLUME_LINEAR_FILTERED,
+                           4, "SHB", ST_VOLUME_LINEAR_FILTERED);
+    }   // GlobalIlluminationReconstructionShader
+
+    // ------------------------------------------------------------------------
+    void render(const core::matrix4 &rh_matrix,
+                const core::vector3df &rh_extend,
+                const FrameBuffer &framebuffer,
+                GLuint normal_depth_texture,
+                GLuint depth_stencil_texture)
+    {
+        core::matrix4 inv_rh_matrix;
+        rh_matrix.getInverse(inv_rh_matrix);
+        glDisable(GL_DEPTH_TEST);
+        setTextureUnits(normal_depth_texture,
+                        depth_stencil_texture,
+                        framebuffer.getRTT()[0], framebuffer.getRTT()[1], framebuffer.getRTT()[2]);
+        drawFullScreenEffect(rh_matrix, inv_rh_matrix, rh_extend);
+    }   // render
+};   // GlobalIlluminationReconstructionShader
+
+// ============================================================================
+class IBLShader : public TextureShader<IBLShader, 3>
+{
+public:
+    IBLShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
+                            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
+                            GL_FRAGMENT_SHADER, "IBL.frag");
+        assignUniforms();
+        assignSamplerNames(0, "ntex",  ST_NEAREST_FILTERED,
+                           1, "dtex",  ST_NEAREST_FILTERED,
+                           2, "probe", ST_TRILINEAR_CUBEMAP);
+    }   // IBLShader
+};   // IBLShader
+
+// ============================================================================
+class DegradedIBLShader : public TextureShader<DegradedIBLShader, 1>
+{
+public:
+    DegradedIBLShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
+                            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
+                            GL_FRAGMENT_SHADER, "degraded_ibl.frag");
+        assignUniforms();
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED);
+    }   // DegradedIBLShader
+};   // DegradedIBLShader
+
+// ============================================================================
 class ShadowedSunLightShaderPCF : public TextureShader<ShadowedSunLightShaderPCF,
                                                        3,  float, float, float,
                                                        float, float>
@@ -306,6 +380,42 @@ public:
 };   // ShadowedSunLightShaderESM
 
 // ============================================================================
+class SunLightShader : public TextureShader<SunLightShader, 2,
+                                            core::vector3df, video::SColorf>
+{
+public:
+    SunLightShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
+                            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
+                            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
+                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
+                            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
+                            GL_FRAGMENT_SHADER, "sunlight.frag");
+
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED);
+        assignUniforms("direction", "col");
+    }   // SunLightShader
+    // ------------------------------------------------------------------------
+    void render(const core::vector3df &direction, const video::SColorf &col,
+                GLuint normal_depth_texture,
+                GLuint depth_stencil_texture)
+    {
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBlendEquation(GL_FUNC_ADD);
+
+        setTextureUnits(normal_depth_texture,
+                        depth_stencil_texture);
+        drawFullScreenEffect(direction, col);
+    }   // render
+};   // SunLightShader
+
+
+// ============================================================================
 static void renderPointLights(unsigned count,
                               GLuint normal_depth_rander_target,
                               GLuint depth_stencil_texture)
@@ -330,6 +440,57 @@ static void renderPointLights(unsigned count,
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 }   // renderPointLights
+
+// ----------------------------------------------------------------------------
+void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
+                                  GLuint depth_stencil_texture,
+                                  GLuint specular_probe)
+{
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    if (UserConfigParams::m_degraded_IBL)
+    {
+        DegradedIBLShader::getInstance()->use();
+        glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
+
+        DegradedIBLShader::getInstance()
+            ->setTextureUnits(normal_depth_texture);
+        DegradedIBLShader::getInstance()->setUniforms();
+    }
+    else
+    {
+        IBLShader::getInstance()->use();
+        glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
+
+        IBLShader::getInstance()->setTextureUnits(
+            normal_depth_texture,
+            depth_stencil_texture,
+            specular_probe);
+        IBLShader::getInstance()->setUniforms();
+    }
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+}   // renderEnvMap
+
+// ----------------------------------------------------------------------------
+void LightingPasses::renderSunlight(const core::vector3df &direction,
+                                    const video::SColorf &col,
+                                    GLuint normal_depth_texture,
+                                    GLuint depth_stencil_texture)
+{
+    SunLightShader::getInstance()->render(direction, col,
+                                          normal_depth_texture,
+                                          depth_stencil_texture);
+}   // renderSunlight
+
 
 // ----------------------------------------------------------------------------
 void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
@@ -416,7 +577,9 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
 void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_matrices,
                                                 const FrameBuffer& radiance_hint_framebuffer,
                                                 const FrameBuffer& reflective_shadow_map_framebuffer,
-                                                const FrameBuffer& diffuse_framebuffer)
+                                                const FrameBuffer& diffuse_framebuffer,
+                                                GLuint normal_depth_texture,
+                                                GLuint depth_stencil_texture)
 {
     //Radiance hints
     ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
@@ -462,28 +625,31 @@ void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_mat
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
         diffuse_framebuffer.bind();
-        irr_driver->getPostProcessing()->renderGI(  shadow_matrices.getRHMatrix(),
-                                                    shadow_matrices.getRHExtend(),
-                                                    radiance_hint_framebuffer);
+        GlobalIlluminationReconstructionShader::getInstance()
+            ->render(shadow_matrices.getRHMatrix(),
+                     shadow_matrices.getRHExtend(),
+                     radiance_hint_framebuffer,
+                     normal_depth_texture,
+                     depth_stencil_texture);
     }
 }
 
 // ----------------------------------------------------------------------------
 void LightingPasses::renderLights(  bool has_shadow,
-                                    GLuint normal_depth_rander_target,
+                                    GLuint normal_depth_texture,
                                     GLuint depth_stencil_texture,
                                     const FrameBuffer& shadow_framebuffer,
                                     const FrameBuffer& diffuse_specular_framebuffer,
                                     GLuint specular_probe)
-{
-    PostProcessing *post_processing = irr_driver->getPostProcessing();
-    
+{    
     diffuse_specular_framebuffer.bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
-        post_processing->renderEnvMap(specular_probe);       
+        renderEnvMap(normal_depth_texture,
+                     depth_stencil_texture,
+                     specular_probe);       
     } 
         
     // Render sunlight if and only if track supports shadow
@@ -500,27 +666,29 @@ void LightingPasses::renderLights(  bool has_shadow,
 
             if (CVS->isESMEnabled())
             {
-                ShadowedSunLightShaderESM::getInstance()->render(normal_depth_rander_target,
+                ShadowedSunLightShaderESM::getInstance()->render(normal_depth_texture,
                                                                  depth_stencil_texture,
                                                                  shadow_framebuffer);
             }
             else
             {
-                ShadowedSunLightShaderPCF::getInstance()->render(normal_depth_rander_target,
+                ShadowedSunLightShaderPCF::getInstance()->render(normal_depth_texture,
                                                                  depth_stencil_texture,
                                                                  shadow_framebuffer);
             }
         }
         else
-            post_processing->renderSunlight(irr_driver->getSunDirection(),
-                                            irr_driver->getSunColor());
+            renderSunlight(irr_driver->getSunDirection(),
+                           irr_driver->getSunColor(),
+                           normal_depth_texture,
+                           depth_stencil_texture);
     }
     
     //points lights
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_POINTLIGHTS));
         renderPointLights(std::min(m_point_light_count, LightBaseClass::MAXLIGHT),
-                          normal_depth_rander_target,
+                          normal_depth_texture,
                           depth_stencil_texture);
     }
 }   // renderLights    
@@ -548,10 +716,11 @@ void LightingPasses::renderAmbientScatter(GLuint depth_stencil_texture)
 }   // renderAmbientScatter
 
 // ----------------------------------------------------------------------------
-void LightingPasses::renderLightsScatter(const FrameBuffer& half1_framebuffer,
+void LightingPasses::renderLightsScatter(GLuint depth_stencil_texture,
+                                         const FrameBuffer& half1_framebuffer,
                                          const FrameBuffer& half2_framebuffer,
                                          const FrameBuffer& colors_framebuffer,
-                                         GLuint half1_render_target)
+                                         const PostProcessing* post_processing)
 {
     half1_framebuffer.bind();
     glClearColor(0., 0., 0., 0.);
@@ -579,23 +748,23 @@ void LightingPasses::renderLightsScatter(const FrameBuffer& half1_framebuffer,
     glBindVertexArray(PointLightScatterShader::getInstance()->vao);
 
     PointLightScatterShader::getInstance()
-        ->setTextureUnits(irr_driver->getDepthStencilTexture());
+        ->setTextureUnits(depth_stencil_texture);
     PointLightScatterShader::getInstance()
         ->setUniforms(1.f / (40.f * start), col2);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4,
-                          std::min(m_point_light_count, LightBaseClass::MAXLIGHT));
+                          std::min(m_point_light_count,
+                          LightBaseClass::MAXLIGHT));
 
     glDisable(GL_BLEND);
-    PostProcessing *post_processing = irr_driver->getPostProcessing();
     post_processing->renderGaussian6Blur(half1_framebuffer,
                                          half2_framebuffer, 5., 5.);
     glEnable(GL_BLEND);
 
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    irr_driver->getFBO(FBO_COLORS).bind();
-    post_processing->renderPassThrough(half1_render_target,
+    colors_framebuffer.bind();
+    post_processing->renderPassThrough(half1_framebuffer.getRTT()[0],
                                        colors_framebuffer.getWidth(),
                                        colors_framebuffer.getHeight());
 }   // renderLightsScatter

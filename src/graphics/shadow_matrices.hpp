@@ -34,7 +34,7 @@ namespace irr
 
 using namespace irr;
 
-
+class PostProcessing;
 
 class ShadowMatrices
 {
@@ -70,7 +70,8 @@ public:
                                    GLuint depth_stencil_texture);
     void addLight(const core::vector3df &pos);
     void updateSunOrthoMatrices();
-    void renderShadowsDebug(const FrameBuffer &shadow_framebuffer);
+    void renderShadowsDebug(const FrameBuffer &shadow_framebuffer,
+                            const PostProcessing *post_processing);
 
     // ------------------------------------------------------------------------
     void resetShadowCamNodes()

@@ -28,8 +28,9 @@
 #include <map>
 #include <string>
 
-class RenderTarget;
 class GL3RenderTarget;
+class RenderTarget;
+class PostProcessing;
 
 class ShaderBasedRenderer: public AbstractRenderer
 {
@@ -42,6 +43,8 @@ private:
     AbstractGeometryPasses *m_geometry_passes;
     LightingPasses  m_lighting_passes;
     ShadowMatrices  m_shadow_matrices;
+    /** Post-processing. */
+    PostProcessing             *m_post_processing;
 
     /** Static glowing things are loaded once per track.
      * Glowing items can appear ordisappear each frame */
@@ -92,6 +95,8 @@ public:
     void onLoadWorld()  ;
     void onUnloadWorld();
     
+    void reset() override;
+    void giveBoost(unsigned int cam_index) override;
 
     void addSkyBox(const std::vector<irr::video::ITexture*> &texture,
                    const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) override;

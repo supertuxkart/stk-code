@@ -157,7 +157,8 @@ void AbstractGeometryPasses::prepareShadowRendering(const FrameBuffer& shadow_fr
 }
 
 void AbstractGeometryPasses::shadowPostProcessing(const ShadowMatrices& shadow_matrices,
-                                          const FrameBuffer& shadow_framebuffer) const
+                                                  const FrameBuffer& shadow_framebuffer,
+                                                  const PostProcessing* post_processing) const
 {
     ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SHADOW_POSTPROCESS));
 
@@ -168,7 +169,7 @@ void AbstractGeometryPasses::shadowPostProcessing(const ShadowMatrices& shadow_m
 
         for (unsigned i = 0; i < 2; i++)
         {
-            irr_driver->getPostProcessing()->renderGaussian6BlurLayer(
+            post_processing->renderGaussian6BlurLayer(
                 shadow_framebuffer, i,
                 2.f * shadow_scales[0].first / shadow_scales[i].first,
                 2.f * shadow_scales[0].second / shadow_scales[i].second);
@@ -183,7 +184,8 @@ void AbstractGeometryPasses::glowPostProcessing(const FrameBuffer& glow_framebuf
                                                 const FrameBuffer& half_framebuffer,
                                                 const FrameBuffer& quarter_framebuffer,
                                                 const FrameBuffer& color_framebuffer,
-                                                GLuint quarter_render_target) const
+                                                GLuint quarter_render_target,
+                                                const PostProcessing* post_processing) const
 {
     // To half
     FrameBuffer::Blit(glow_framebuffer, half_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
@@ -198,7 +200,7 @@ void AbstractGeometryPasses::glowPostProcessing(const FrameBuffer& glow_framebuf
     glStencilFunc(GL_EQUAL, 0, ~0);
     glEnable(GL_STENCIL_TEST);
     color_framebuffer.bind();
-    irr_driver->getPostProcessing()->renderGlow(quarter_render_target);//TODO
+    post_processing->renderGlow(quarter_render_target);//TODO
     glDisable(GL_STENCIL_TEST);    
     
 }
@@ -262,7 +264,7 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
 }   // renderTransparenPass
 
 // ----------------------------------------------------------------------------
-void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsigned render_target)
+void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsigned render_target, const PostProcessing* post_processing)
 {
 
     glEnable(GL_DEPTH_TEST);
@@ -390,9 +392,9 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsi
 
     irr_driver->getFBO(FBO_COLORS).bind();
     glStencilFunc(GL_EQUAL, 1, 0xFF);
-    irr_driver->getPostProcessing()->renderPassThrough(render_target,
-                                                       irr_driver->getFBO(FBO_COLORS).getWidth(), 
-                                                       irr_driver->getFBO(FBO_COLORS).getHeight());
+    post_processing->renderPassThrough(render_target,
+                                       irr_driver->getFBO(FBO_COLORS).getWidth(), 
+                                       irr_driver->getFBO(FBO_COLORS).getHeight());
     glDisable(GL_STENCIL_TEST);
 
 }   // renderTransparent

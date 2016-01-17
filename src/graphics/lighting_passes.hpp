@@ -21,11 +21,22 @@
 #include "graphics/glwrap.hpp"
 #include <irrlicht.h>
 
+class PostProcessing;
+
 class LightingPasses
 {
 private:
     unsigned m_point_light_count;
 
+    void renderEnvMap(GLuint normal_depth_texture,
+                      GLuint depth_stencil_texture,
+                      GLuint specular_probe);
+
+    /** Generate diffuse and specular map */
+    void         renderSunlight(const core::vector3df &direction,
+                                const video::SColorf &col,
+                                GLuint normal_depth_texture,
+                                GLuint depth_stencil_texture);
 
 public:
     LightingPasses(): m_point_light_count(0){}
@@ -36,18 +47,21 @@ public:
     void renderGlobalIllumination(  const ShadowMatrices& shadow_matrices,
                                     const FrameBuffer& radiance_hint_framebuffer,
                                     const FrameBuffer& reflective_shadow_map_framebuffer,
-                                    const FrameBuffer& diffuse_framebuffer);
+                                    const FrameBuffer& diffuse_framebuffer,
+                                    GLuint normal_depth_texture,
+                                    GLuint depth_stencil_texture);
     void renderLights(  bool has_shadow,
-                        GLuint normal_depth_rander_target,
+                        GLuint normal_depth_texture,
                         GLuint depth_stencil_texture,
                         const FrameBuffer& shadow_framebuffer,
                         const FrameBuffer& diffuse_specular_framebuffer,
                         GLuint specular_probe);
     void renderAmbientScatter(GLuint depth_stencil_texture);
-    void renderLightsScatter(const FrameBuffer& half1_framebuffer,
+    void renderLightsScatter(GLuint depth_stencil_texture,
+                             const FrameBuffer& half1_framebuffer,
                              const FrameBuffer& half2_framebuffer,
                              const FrameBuffer& colors_framebuffer,
-                             GLuint half1_render_target);
+                             const PostProcessing* post_processing);
     
     
     

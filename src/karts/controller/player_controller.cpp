@@ -451,7 +451,7 @@ void PlayerController::handleZipper(bool play_sound)
     }
 
     // Apply the motion blur according to the speed of the kart
-    irr_driver->getPostProcessing()->giveBoost(m_camera->getIndex());
+    irr_driver->giveBoost(m_camera->getIndex());
 
     m_kart->showZipperFire();
 

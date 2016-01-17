@@ -66,7 +66,6 @@ class AbstractKart;
 class AbstractRenderer;
 class Camera;
 class PerCameraNode;
-class PostProcessing;
 class LightNode;
 class ShadowImportance;
 class ShadowMatrices;
@@ -102,8 +101,6 @@ private:
     video::IVideoDriver        *m_video_driver;
     /** Irrlicht race font. */
     gui::IGUIFont              *m_race_font;
-    /** Post-processing. */
-    PostProcessing             *m_post_processing;
     /** Renderer. */
     AbstractRenderer           *m_renderer;
     
@@ -392,8 +389,8 @@ public:
      *  application. Value in msec. */
     unsigned int getRealTime() {return m_device->getTimer()->getRealTime(); }
     // ------------------------------------------------------------------------
-    /** Returns a pointer to the post processing object. */
-    inline PostProcessing* getPostProcessing()  {return m_post_processing;}
+    /** Use motion blur for a short time */
+    void giveBoost(unsigned int cam_index) { m_renderer->giveBoost(cam_index);}
     // ------------------------------------------------------------------------
     inline core::vector3df getWind()  {return m_wind->getWind();}
 

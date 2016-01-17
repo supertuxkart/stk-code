@@ -475,12 +475,12 @@ void ShadowMatrices::renderWireFrameFrustrum(float *tmp, unsigned i)
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 }
 // ----------------------------------------------------------------------------
-void ShadowMatrices::renderShadowsDebug(const FrameBuffer &shadow_framebuffer)
+void ShadowMatrices::renderShadowsDebug(const FrameBuffer &shadow_framebuffer,
+                                        const PostProcessing *post_processing)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, UserConfigParams::m_height / 2,
                UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    PostProcessing *post_processing = irr_driver->getPostProcessing();
     post_processing->renderTextureLayer(shadow_framebuffer.getRTT()[0], 0);
     renderWireFrameFrustrum(m_shadows_cam[0], 0);
     glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2,
