@@ -19,6 +19,8 @@
 
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 
@@ -92,11 +94,19 @@ void STKBillboard::render()
 {
     if (irr_driver->getPhase() != TRANSPARENT_PASS)
         return;
+
     core::vector3df pos = getAbsolutePosition();
     glBindVertexArray(billboardvao);
     video::ITexture *tex = Material.getTexture(0);
     if (!tex )
         return;
+
+    ::Material* material = material_manager->getMaterialFor(tex, 
+        video::E_MATERIAL_TYPE::EMT_ONETEXTURE_BLEND);
+    if (material->getShaderType() == Material::SHADERTYPE_ADDITIVE)
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    else
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     compressTexture(tex, true, true);
     GLuint texid = getTextureGLuint(tex);
