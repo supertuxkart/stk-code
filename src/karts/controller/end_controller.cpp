@@ -52,7 +52,7 @@
 
 EndController::EndController(AbstractKart *kart,
                              Controller *prev_controller)
-             : AIBaseLapController(kart, NULL)
+             : AIBaseLapController(kart)
 {
     m_previous_controller = prev_controller;
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&

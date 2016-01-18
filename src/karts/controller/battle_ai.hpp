@@ -137,8 +137,7 @@ protected:
 #endif
 
 public:
-                 BattleAI(AbstractKart *kart,
-                          StateManager::ActivePlayer *player=NULL);
+                 BattleAI(AbstractKart *kart);
                 ~BattleAI();
     virtual void update      (float delta);
     virtual void reset       ();

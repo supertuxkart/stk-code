@@ -20,7 +20,6 @@
 #define HEADER_AI_BASE_CONTROLLER_HPP
 
 #include "karts/controller/controller.hpp"
-#include "states_screens/state_manager.hpp"
 
 class AIProperties;
 class Track;
@@ -69,8 +68,7 @@ protected:
     bool     isStuck() const { return m_stuck; }
 
 public:
-             AIBaseController(AbstractKart *kart,
-                              StateManager::ActivePlayer *player=NULL);
+             AIBaseController(AbstractKart *kart);
     virtual ~AIBaseController() {};
     virtual void reset();
     virtual bool disableSlipstreamBonus() const;

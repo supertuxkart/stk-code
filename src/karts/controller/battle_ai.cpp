@@ -49,9 +49,8 @@ using namespace std;
 #include <math.h>
 #endif
 
-BattleAI::BattleAI(AbstractKart *kart,
-                   StateManager::ActivePlayer *player)
-         : AIBaseController(kart, player)
+BattleAI::BattleAI(AbstractKart *kart)
+         : AIBaseController(kart)
 {
 
     reset();

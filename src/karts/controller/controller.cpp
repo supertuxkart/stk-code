@@ -28,25 +28,9 @@
 /** Constructor, saves the kart pointer and a pointer to the KartControl
  *  of the kart.
  */
-Controller::Controller(AbstractKart *kart, StateManager::ActivePlayer *player)
+Controller::Controller(AbstractKart *kart)
 {
     m_controls = &(kart->getControls());
     m_kart     = kart;
-    m_player   = player;
-    if(player)
-        player->setKart(kart);
     setControllerName("Controller");
 }   // Controller
-
-// ----------------------------------------------------------------------------
-/** Returns true if the player of this controller can collect achievements.
-*  At the moment only the current player can collect them.
-*  TODO: check this, possible all local players should be able to
-*        collect achievements - synching to online account will happen
-*        next time the account gets online.
-*/
-bool Controller::canGetAchievements() const 
-{
-    return    m_player && m_player->getConstProfile()
-           == PlayerManager::getCurrentPlayer();
-}   // canGetAchievements

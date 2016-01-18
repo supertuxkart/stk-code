@@ -44,8 +44,7 @@ protected:
     // ------------------------------------------------------------------------
 
 public:
-                 PlayerController(AbstractKart *kart,
-                                  StateManager::ActivePlayer *_player);
+                 PlayerController(AbstractKart *kart);
     virtual     ~PlayerController  ();
     virtual void update            (float) OVERRIDE;
     virtual void action            (PlayerAction action, int value) OVERRIDE;

@@ -109,6 +109,10 @@ public:
     {
         return m_previous_controller->isLocalPlayerController();
     }   // isLocalPlayerController
+    // ------------------------------------------------------------------------
+    /** Returns the name of the previous controller (which has the right
+     *  player name associated). */
+    core::stringw getName() const { return m_previous_controller->getName(); }
 
 };   // EndKart
 

@@ -42,9 +42,6 @@ class Material;
 class Controller
 {
 private:
-    /** If this belongs to a player, it stores the active player data
-    *  structure. Otherwise it is 0. */
-    StateManager::ActivePlayer *m_player;
 
 protected:
     /** Pointer to the kart that is controlled by this controller. */
@@ -58,10 +55,8 @@ protected:
     std::string  m_controller_name;
 
 public:
-                  Controller         (AbstractKart *kart,
-                                      StateManager::ActivePlayer *player=NULL);
+                  Controller         (AbstractKart *kart);
     virtual      ~Controller         () {};
-    virtual bool  canGetAchievements () const;
     virtual void  reset              () = 0;
     virtual void  update             (float dt) = 0;
     virtual void  handleZipper       (bool play_sound) = 0;
@@ -86,14 +81,6 @@ public:
     // ---------------------------------------------------------------------------
     /** Returns the name of this controller. */
     const std::string &getControllerName() const { return m_controller_name; }
-    // ---------------------------------------------------------------------------
-    /** Returns the active player for this controller (NULL
-     *  if this controller does not belong to a player.    */
-    StateManager::ActivePlayer *getPlayer () {return m_player;}
-
-    // ---------------------------------------------------------------------------
-    /** Returns the player object (or NULL if it's a computer controller). */
-    const StateManager::ActivePlayer *getPlayer () const { return m_player; }
     // ------------------------------------------------------------------------
     /** Default: ignore actions. Only PlayerController get them. */
     virtual void action(PlayerAction action, int value) = 0;
@@ -110,6 +97,15 @@ public:
     /** Get a pointer on the kart controls. */
     virtual KartControl* getControls() { return m_controls; }
     // ------------------------------------------------------------------------
+    /** Only local players can get achievements. */
+    virtual bool  canGetAchievements () const { return false; }
+    // ------------------------------------------------------------------------
+    /** This should only be called for End- and LocalPlayer-Controller. */
+    virtual core::stringw getName() const
+    {
+        assert(false);
+        return core::stringw(""); 
+    }   // getName
 };   // Controller
 
 #endif

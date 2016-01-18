@@ -25,9 +25,7 @@ class Player;
 class NetworkPlayerController : public PlayerController
 {
 public:
-    NetworkPlayerController(AbstractKart *kart,
-                            StateManager::ActivePlayer *player)
-        : PlayerController(kart, player)
+    NetworkPlayerController(AbstractKart *kart) : PlayerController(kart)
     {
         Log::info("NetworkPlayerController",
                   "New network player controller.");

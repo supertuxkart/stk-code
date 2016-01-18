@@ -20,6 +20,7 @@
 #include "karts/controller/local_player_controller.hpp"
 
 #include "audio/sfx_base.hpp"
+#include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
@@ -52,8 +53,12 @@
  */
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player)
-                     : PlayerController(kart, player)
+                     : PlayerController(kart)
 {
+    m_player = player;
+    if(player)
+        player->setKart(kart);
+
     // Keep a pointer to the camera to remove the need to search for
     // the right camera once per frame later.
     m_camera       = Camera::createCamera(kart);
@@ -309,3 +314,15 @@ void LocalPlayerController::collectedItem(const Item &item, int add_info,
         }
     }
 }   // collectedItem
+
+// ----------------------------------------------------------------------------
+/** Returns true if the player of this controller can collect achievements.
+ *  At the moment only the current player can collect them.
+ *  TODO: check this, possible all local players should be able to
+ *        collect achievements - synching to online account will happen
+ *        next time the account gets online.
+ */
+bool LocalPlayerController::canGetAchievements() const 
+{
+    return m_player->getConstProfile() == PlayerManager::getCurrentPlayer();
+}   // canGetAchievements

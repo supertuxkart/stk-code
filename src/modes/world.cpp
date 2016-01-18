@@ -315,8 +315,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
-        controller = new NetworkPlayerController(new_kart,
-                        StateManager::get()->getActivePlayer(local_player_id));
+        controller = new NetworkPlayerController(new_kart);
         m_num_players++;
         break;
     case RaceManager::KT_AI:
@@ -1085,15 +1084,11 @@ void World::updateHighscores(int* best_highscore_rank)
 
         Highscores* highscores = getHighscores();
 
-        LocalPlayerController *controller = 
-                                  (LocalPlayerController*)(k->getController());
-
         int highscore_rank = 0;
-        // The player is a local player, so it is sure that getPlayer() exists.
-        if (controller->getPlayer()->getProfile() != NULL) // if we have the player profile here
-            highscore_rank = highscores->addData(k->getIdent(),
-                              controller->getPlayer()->getProfile()->getName(),
-                                                 k->getFinishTime());
+        // The player is a local player, so there is a name:
+        highscore_rank = highscores->addData(k->getIdent(),
+                                             k->getController()->getName(),
+                                             k->getFinishTime()    );
 
         if (highscore_rank > 0)
         {
