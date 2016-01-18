@@ -181,7 +181,9 @@ void STKHost::create()
  *  When the authorised clients starts the kart selection, the SLR
  *  informs all clients to start the kart selection (SLR::startSelection).
  *  This triggers the creation of the kart selection screen in 
- *  CLR::startSelection / CLR::update. The kart selection in a client calls
+ *  CLR::startSelection / CLR::update for all clients. The clients create
+ *  the ActivePlayer object (which stores which device is used by which
+ *  plauyer).  The kart selection in a client calls
  *  (NetworkKartSelection::playerConfirm) which calls CLR::requestKartSelection.
  *  This sends a message to SLR::kartSelectionRequested, which verifies the
  *  selected kart and sends this information to all clients (including the
@@ -208,6 +210,14 @@ void STKHost::create()
  *  StartGameProtocol and the clients will be informed to start the game.
  *  In a client the StartGame protocol will be started in CLR::startGame. 
  *  
+ *  The StartGame protocol will create the ActivePlayers for all non-local
+ *  players: on a server, all karts are non-local. On a client, the
+ *  ActivePlayer objects for each local players have been created (to store
+ *  the device used by each player when joining), so they are used to create
+ *  the LocalPlayerController for each kart. Each remote player gets a
+ *  NULL ActivePlayer (the ActivePlayer is only used for assigning the input
+ *  device to each kart, achievements and highscores, so it's not needed for
+ *  remote players).
  */
 
 // ============================================================================
