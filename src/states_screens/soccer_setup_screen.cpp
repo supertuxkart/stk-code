@@ -19,6 +19,7 @@
 
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
+#include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
@@ -245,7 +246,8 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
     if(m_schedule_continue)
         return EVENT_BLOCK;
 
-    ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
+    ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
+    BubbleWidget* bubble = getWidget<BubbleWidget>("lblLeftRight");
     GUIEngine::EventPropagation result = EVENT_LET;
     SoccerTeam  team_switch = SOCCER_TEAM_NONE;
     int nb_players = (int)m_kart_view_info.size();
@@ -253,7 +255,8 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
     switch(action)
     {
     case PA_MENU_LEFT:
-        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+        if ((bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
+            bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)) &&
             m_kart_view_info[playerId].confirmed == false)
         {
             team_switch = SOCCER_TEAM_RED;
@@ -265,7 +268,8 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         }
         break;
     case PA_MENU_RIGHT:
-        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+        if ((bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
+            bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)) &&
             m_kart_view_info[playerId].confirmed == false)
         {
             team_switch = SOCCER_TEAM_BLUE;

@@ -31,7 +31,7 @@
 
         <spacer height="10" width="25"/>
 
-        <bright height="10" width="25" I18N="In soccer setup screen" text="Use left/right to choose your team and press fire" text_align="center" align="center" />
+        <bubble height="fit" width="100%" id="lblLeftRight" I18N="In soccer setup screen" text="Use left/right to choose your team and press fire" word_wrap="true" text_align="center"/>
 
         <div id="central_div" layout="horizontal-row" width="100%" proportion="1" align="center">
             <roundedbox y="5%" width="100%" layout="horizontal-row" height="95%">
