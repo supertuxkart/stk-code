@@ -181,8 +181,8 @@ Vec3 SoccerAI::correctBallPosition(const Vec3& orig_pos)
     {
         // If facing the wrong goal, apply more offset to the ball
         // to prevent shooting into its own team goal
-        ball_lc = (goal_pos.on_side ? ball_lc + Vec3 (2, 0, 2) :
-                   ball_lc - Vec3 (2, 0, 0) + Vec3 (0, 0, 2));
+        ball_lc = (goal_pos.on_side ? ball_lc - Vec3 (2, 0, 0) + Vec3 (0, 0, 2):
+                   ball_lc + Vec3 (2, 0, 2));
 
         return m_kart->getTrans()(ball_lc);
     }
