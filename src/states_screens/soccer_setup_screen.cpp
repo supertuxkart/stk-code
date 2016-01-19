@@ -109,23 +109,14 @@ void SoccerSetupScreen::beforeAddingWidget()
 {
     Widget* central_div = getWidget<Widget>("central_div");
 
-    // Compute some dimensions
-    const core::dimension2d<u32>    text_size = GUIEngine::getFont()->getDimension( L"X" );
-    const int text_width = (int)text_size.Width;
-    const int text_height = (int)text_size.Height;
+    // Add red/blue team icon above the karts
+    IconButtonWidget*    red = getWidget<IconButtonWidget>("red_team");
+    IconButtonWidget*    blue = getWidget<IconButtonWidget>("blue_team");
+    red->m_x = central_div->m_x + central_div->m_w/4;
+    red->m_y = central_div->m_y + red->m_h;
 
-    // Add team name label above the karts
-    LabelWidget*    label_red = getWidget<LabelWidget>("red_team");
-    LabelWidget*    label_blue = getWidget<LabelWidget>("blue_team");
-    label_red->m_x = central_div->m_x + central_div->m_w/4;
-    label_red->m_y = central_div->m_y + text_height;
-    label_red->m_w = text_width;
-    label_red->m_h = text_height;
-
-    label_blue->m_x = central_div->m_x + (central_div->m_w/4)*3;
-    label_blue->m_y = central_div->m_y + text_height;
-    label_blue->m_w = text_width;
-    label_blue->m_h = text_height;
+    blue->m_x = central_div->m_x + (central_div->m_w/4)*3;
+    blue->m_y = central_div->m_y + blue->m_h;
 
     // Add the 3D views for the karts
     int nb_players = race_manager->getNumPlayers();

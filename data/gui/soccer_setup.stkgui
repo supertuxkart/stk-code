@@ -37,8 +37,8 @@
             <roundedbox y="5%" width="100%" layout="horizontal-row" height="95%">
                 <!-- Content is added programmatically -->
             </roundedbox>
-            <bright I18N="In soccer setup screen" id="red_team" text="Red Team"/>     <!-- Layout is done programmatically -->
-            <bright I18N="In soccer setup screen" id="blue_team" text="Blue Team"/>
+            <icon id="red_team" I18N="In soccer setup screen" text="Red Team" icon="gui/soccer_ball_red.png" width="font" height="font"/>  <!-- Layout is done programmatically -->
+            <icon id="blue_team" I18N="In soccer setup screen" text="Blue Team" icon="gui/soccer_ball_blue.png" width="font" height="font"/>
         </div>
 
         <button id="continue" I18N="In soccer setup screen" text="Continue" align="center" width="60%"/>
