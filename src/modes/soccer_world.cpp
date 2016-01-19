@@ -73,8 +73,8 @@ void SoccerWorld::init()
     m_kart_team_map.clear();
     WorldWithRank::init();
     m_display_rank = false;
-    m_goal_timer = 0.f;
-    m_last_kart_to_hit_ball = -1;
+    m_goal_timer = 0.0f;
+    m_ball_hitter = -1;
     m_goal_target = race_manager->getMaxGoal();
     m_goal_sound = SFXManager::get()->createSoundSource("goal_scored");
 
@@ -93,6 +93,8 @@ void SoccerWorld::reset()
     }
     else WorldStatus::setClockMode(CLOCK_CHRONO);
 
+    m_animation_timer = 0.0f;
+    m_animation_showing_kart = -1;
     m_can_score_points = true;
     m_red_goal = 0;
     m_blue_goal = 0;
@@ -104,7 +106,7 @@ void SoccerWorld::reset()
     m_red_score_times.clear();
     m_blue_scorers.clear();
     m_blue_score_times.clear();
-    m_last_kart_to_hit_ball = -1;
+    m_ball_hitter = -1;
     PtrVector<TrackObject>& objects = tom->getObjects();
     for(unsigned int i=0; i<objects.size(); i++)
     {
@@ -158,7 +160,19 @@ void SoccerWorld::update(float dt)
         if (m_goal_timer > 3.0f)
         {
             world->setPhase(WorldStatus::RACE_PHASE);
-            m_goal_timer = 0;
+            m_goal_timer = 0.0f;
+        }
+    }
+
+    if (!(isRaceOver() || isStartPhase()) && m_animation_showing_kart != -1)
+    {
+        m_animation_timer += dt;
+        if (m_animation_timer > 6.0f)
+        {
+            m_karts[m_animation_showing_kart]
+                ->getKartModel()->setAnimation(KartModel::AF_BEGIN);
+            m_animation_timer = 0.0f;
+            m_animation_showing_kart = -1;
         }
     }
 }   // update
@@ -176,23 +190,40 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         World *world = World::getWorld();
         world->setPhase(WorldStatus::GOAL_PHASE);
         m_goal_sound->play();
-        if(m_last_kart_to_hit_ball != -1)
+        if (m_ball_hitter != -1)
         {
-            if(first_goal)
+            m_animation_showing_kart = m_ball_hitter;
+            ScorerData sd;
+            sd.m_id = m_ball_hitter;
+            sd.m_correct_goal = isCorrectGoal(m_ball_hitter, first_goal);
+
+            if (sd.m_correct_goal)
+            {
+                m_karts[m_ball_hitter]->getKartModel()
+                    ->setAnimation(KartModel::AF_WIN_START);
+            }
+
+            if (first_goal)
             {
                 // Notice: true first_goal means it's blue goal being shoot,
                 // so red team can score
-                m_red_scorers.push_back(m_last_kart_to_hit_ball);
+                m_red_scorers.push_back(sd);
                 if(race_manager->hasTimeTarget())
-                    m_red_score_times.push_back(race_manager->getTimeTarget() - world->getTime());
+                {
+                    m_red_score_times.push_back(race_manager
+                        ->getTimeTarget() - world->getTime());
+                }
                 else
                     m_red_score_times.push_back(world->getTime());
             }
             else
             {
-                m_blue_scorers.push_back(m_last_kart_to_hit_ball);
-                if(race_manager->hasTimeTarget())
-                    m_blue_score_times.push_back(race_manager->getTimeTarget() - world->getTime());
+                m_blue_scorers.push_back(sd);
+                if (race_manager->hasTimeTarget())
+                {
+                    m_blue_score_times.push_back(race_manager
+                        ->getTimeTarget() - world->getTime());
+                }
                 else
                     m_blue_score_times.push_back(world->getTime());
             }
@@ -222,12 +253,12 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 
 //-----------------------------------------------------------------------------
 /** Sets the last kart that hit the ball, to be able to
-* identify the scorer later.
-*/
-void SoccerWorld::setLastKartTohitBall(unsigned int kart_id)
+ * identify the scorer later.
+ */
+void SoccerWorld::setBallHitter(unsigned int kart_id)
 {
-    m_last_kart_to_hit_ball = kart_id;
-}   // setLastKartTohitBall
+    m_ball_hitter = kart_id;
+}   // setBallHitter
 
 //-----------------------------------------------------------------------------
 /** The soccer game is over if time up or either team wins.
@@ -261,7 +292,7 @@ void SoccerWorld::terminateRace()
 
 //-----------------------------------------------------------------------------
 /** Called when the match time ends.
-*/
+ */
 void SoccerWorld::countdownReachedZero()
 {
     m_count_down_reached_zero = true;
@@ -495,3 +526,20 @@ SoccerTeam SoccerWorld::getKartTeam(unsigned int kart_id) const
     return SOCCER_TEAM_BLUE;
 
 }   // getKartTeam
+
+//-----------------------------------------------------------------------------
+bool SoccerWorld::isCorrectGoal(unsigned int kart_id, bool first_goal) const
+{
+    SoccerTeam team = getKartTeam(kart_id);
+    if (first_goal)
+    {
+        if (team == SOCCER_TEAM_RED)
+            return true;
+    }
+    else if (!first_goal)
+    {
+        if (team == SOCCER_TEAM_BLUE)
+            return true;
+    }
+    return false;
+}   // isCorrectGoal

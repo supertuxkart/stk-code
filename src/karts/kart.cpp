@@ -932,7 +932,7 @@ void Kart::setRaceResult()
     else
         Log::warn("Kart", "Unknown game mode given.");
 
-}   // setKartResult
+}   // setRaceResult
 
 //-----------------------------------------------------------------------------
 /** Called when an item is collected. It will either adjust the collected

@@ -36,6 +36,16 @@ class Controller;
  */
 class SoccerWorld : public WorldWithRank
 {
+public:
+    class ScorerData
+    {
+    public:
+        /** World ID of kart which scores. */
+        unsigned int    m_id;
+        /** Whether this goal is socred correctly (identify for own goal). */
+        bool            m_correct_goal;
+    };   // ScorerData
+
 protected:
     virtual AbstractKart *createKart(const std::string &kart_ident, int index,
                              int local_player_id, int global_player_id,
@@ -54,14 +64,18 @@ private:
 
     /** Timer for displaying goal text*/
     float m_goal_timer;
-    int m_last_kart_to_hit_ball;
+    int m_ball_hitter;
+
+    /** Timer for win/lose animation showing after each goal*/
+    float m_animation_timer;
+    int m_animation_showing_kart;
 
     /** Goals data of each team scored */
     int m_red_goal;
     int m_blue_goal;
-    std::vector<int> m_red_scorers;
+    std::vector<ScorerData> m_red_scorers;
     std::vector<float> m_red_score_times;
-    std::vector<int> m_blue_scorers;
+    std::vector<ScorerData> m_blue_scorers;
     std::vector<float> m_blue_score_times;
     std::map<int, SoccerTeam> m_kart_team_map;
 
@@ -110,7 +124,7 @@ public:
     // ------------------------------------------------------------------------
     void onCheckGoalTriggered(bool first_goal);
     // ------------------------------------------------------------------------
-    void setLastKartTohitBall(unsigned int kart_id);
+    void setBallHitter(unsigned int kart_id);
     // ------------------------------------------------------------------------
     /** Get the soccer result of kart in soccer world (including AIs) */
     bool getKartSoccerResult(unsigned int kart_id) const;
@@ -121,7 +135,7 @@ public:
     const int getScore(SoccerTeam team) const
              { return (team == SOCCER_TEAM_BLUE ? m_blue_goal : m_red_goal); }
     // ------------------------------------------------------------------------
-    const std::vector<int>& getScorers(SoccerTeam team) const
+    const std::vector<ScorerData>& getScorers(SoccerTeam team) const
        { return (team == SOCCER_TEAM_BLUE ? m_blue_scorers : m_red_scorers); }
     // ------------------------------------------------------------------------
     const std::vector<float>& getScoreTimes(SoccerTeam team) const
@@ -143,6 +157,8 @@ public:
     {
         return (team == SOCCER_TEAM_BLUE ? m_blue_goal_node : m_red_goal_node);
     }
+    // ------------------------------------------------------------------------
+    bool isCorrectGoal(unsigned int kart_id, bool first_goal) const;
 
 };   // SoccerWorld
 

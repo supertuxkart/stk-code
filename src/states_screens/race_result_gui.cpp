@@ -475,7 +475,16 @@ void RaceResultGUI::determineTableLayout()
         // Save a pointer to the current row_info entry
         RowInfo *ri           = &(m_all_row_infos[position-first_position]);
         ri->m_is_player_kart  = kart->getController()->isLocalPlayerController();
-        ri->m_kart_name       = translations->fribidize(kart->getName());
+
+        // Identify Human player, if so display real name other than kart name
+        const int rm_id       = kart->getWorldKartId() -
+            (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
+
+        if (rm_id >= 0)
+            ri->m_kart_name   = race_manager->getKartInfo(rm_id).getPlayerName();
+        else
+            ri->m_kart_name   = translations->fribidize(kart->getName());
+
         ri->m_player          = ri->m_is_player_kart
                               ? kart->getController()->getPlayer() : NULL;
 
@@ -842,7 +851,15 @@ void RaceResultGUI::determineGPLayout()
         RowInfo *ri          = &(m_all_row_infos[rank]);
         ri->m_kart_icon      =
             kart->getKartProperties()->getIconMaterial()->getTexture();
-        ri->m_kart_name      = translations->fribidize(kart->getName());
+
+        const int rm_id      = kart_id -
+            (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
+
+        if (rm_id >= 0)
+            ri->m_kart_name  = race_manager->getKartInfo(rm_id).getPlayerName();
+        else
+            ri->m_kart_name  = translations->fribidize(kart->getName());
+
         ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
         ri->m_player         = ri->m_is_player_kart
                              ? kart->getController()->getPlayer() : NULL;
@@ -1052,16 +1069,32 @@ void RaceResultGUI::displaySoccerResults()
     //The red scorers:
     current_y += rect.Height/2 + rect.Height/4;
     font = GUIEngine::getSmallFont();
-    std::vector<int> scorers = sw->getScorers(SOCCER_TEAM_RED);
+    std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(SOCCER_TEAM_RED);
     std::vector<float> score_times = sw->getScoreTimes(SOCCER_TEAM_RED);
     irr::video::ITexture* scorer_icon;
 
     int prev_y = current_y;
     for(unsigned int i=0; i<scorers.size(); i++)
     {
-        result_text = sw->getKart(scorers.at(i))->
-            getKartProperties()->getName();
-        result_text.append(" ");
+        const bool own_goal = !(scorers.at(i).m_correct_goal);
+
+        const int kart_id = scorers.at(i).m_id;
+        const int rm_id = kart_id -
+            (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
+
+        if (rm_id >= 0)
+            result_text = race_manager->getKartInfo(rm_id).getPlayerName();
+        else
+            result_text = sw->getKart(kart_id)->
+                getKartProperties()->getName();
+
+        if (own_goal)
+        {
+            result_text.append(" ");
+            result_text.append( _("(Own Goal)") );
+        }
+
+        result_text.append("  ");
         result_text.append(StringUtils::timeToString(score_times.at(i)).c_str());
         rect = m_font->getDimension(result_text.c_str());
 
@@ -1073,8 +1106,9 @@ void RaceResultGUI::displaySoccerResults()
         if(current_y > height) break;
 
         pos = core::rect<s32>(current_x,current_y,current_x,current_y);
-        font->draw(result_text,pos, color, true, false);
-        scorer_icon = sw->getKart(scorers.at(i))
+        font->draw(result_text, pos, (own_goal ?
+            video::SColor(255, 255, 0, 0) : color), true, false);
+        scorer_icon = sw->getKart(scorers.at(i).m_id)
                                 ->getKartProperties()->getIconMaterial()->getTexture();
         source_rect = core::recti(core::vector2di(0,0), scorer_icon->getSize());
         irr::u32 offset_x = GUIEngine::getFont()->getDimension(result_text.c_str()).Width/2;
@@ -1090,9 +1124,25 @@ void RaceResultGUI::displaySoccerResults()
     score_times = sw->getScoreTimes(SOCCER_TEAM_BLUE);
     for(unsigned int i=0; i<scorers.size(); i++)
     {
-        result_text = sw->getKart(scorers.at(i))->
-            getKartProperties()->getName();
-        result_text.append(" ");
+        const bool own_goal = !(scorers.at(i).m_correct_goal);
+
+        const int kart_id = scorers.at(i).m_id;
+        const int rm_id = kart_id -
+            (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
+
+        if (rm_id >= 0)
+            result_text = race_manager->getKartInfo(rm_id).getPlayerName();
+        else
+            result_text = sw->getKart(kart_id)->
+                getKartProperties()->getName();
+
+        if (own_goal)
+        {
+            result_text.append(" ");
+            result_text.append( _("(Own Goal)") );
+        }
+
+        result_text.append("  ");
         result_text.append(StringUtils::timeToString(score_times.at(i)).c_str());
         rect = m_font->getDimension(result_text.c_str());
 
@@ -1104,8 +1154,9 @@ void RaceResultGUI::displaySoccerResults()
         if(current_y > height) break;
 
         pos = core::rect<s32>(current_x,current_y,current_x,current_y);
-        font->draw(result_text,pos, color, true, false);
-        scorer_icon = sw->getKart(scorers.at(i))->
+        font->draw(result_text,pos, (own_goal ?
+            video::SColor(255, 255, 0, 0) : color), true, false);
+        scorer_icon = sw->getKart(scorers.at(i).m_id)->
                      getKartProperties()->getIconMaterial()->getTexture();
         source_rect = core::recti(core::vector2di(0,0), scorer_icon->getSize());
         irr::u32 offset_x = GUIEngine::getFont()->getDimension(result_text.c_str()).Width/2;

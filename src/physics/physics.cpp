@@ -226,7 +226,7 @@ void Physics::update(float dt)
                     race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
-                soccerWorld->setLastKartTohitBall(kartId);
+                soccerWorld->setBallHitter(kartId);
             }
             continue;
         }
@@ -288,7 +288,7 @@ void Physics::update(float dt)
             {
                 int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
-                soccerWorld->setLastKartTohitBall(kartId);
+                soccerWorld->setBallHitter(kartId);
             }
 
         }
