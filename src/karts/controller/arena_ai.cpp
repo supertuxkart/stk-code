@@ -48,14 +48,12 @@ void ArenaAI::reset()
     m_closest_kart_point = Vec3(0, 0, 0);
     m_closest_kart_pos_data = {0};
     m_cur_kart_pos_data = {0};
-    m_is_steering_overridden = false;
     m_is_stuck = false;
     m_is_uturn = false;
     m_target_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
     m_time_since_reversing = 0.0f;
-    m_time_since_steering_overridden = 0.0f;
     m_time_since_uturn = 0.0f;
     m_on_node.clear();
     m_path_corners.clear();
@@ -236,23 +234,6 @@ void ArenaAI::handleArenaSteering(const float dt)
     if (current_node == BattleGraph::UNKNOWN_POLY ||
         m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
-    if (m_is_steering_overridden)
-    {
-        // Steering is overridden to avoid eating banana
-        const float turn_side = (m_adjusting_side ? 1.0f : -1.0f);
-        m_time_since_steering_overridden += dt;
-        if (m_time_since_steering_overridden > 0.35f)
-            setSteering(-(turn_side), dt);
-        else
-            setSteering(turn_side, dt);
-        if (m_time_since_steering_overridden > 0.7f)
-        {
-            m_is_steering_overridden = false;
-            m_time_since_steering_overridden = 0.0f;
-        }
-        return;
-    }
-
     if (m_target_node == current_node)
     {
         // Very close to the item, steer directly
@@ -308,7 +289,7 @@ void ArenaAI::handleArenaSteering(const float dt)
 //-----------------------------------------------------------------------------
 void ArenaAI::handleArenaBanana()
 {
-    if (m_is_steering_overridden || m_is_uturn) return;
+    if (m_is_uturn) return;
 
     const std::vector< std::pair<const Item*, int> >& item_list =
         BattleGraph::get()->getItemList();
@@ -319,14 +300,22 @@ void ArenaAI::handleArenaBanana()
         if (item->getType() == Item::ITEM_BANANA && !item->wasCollected())
         {
             posData banana_pos = {0};
-            checkPosition(item->getXYZ(), &banana_pos);
+            Vec3 banana_lc(0, 0, 0);
+            checkPosition(item->getXYZ(), &banana_pos, &banana_lc);
             if (banana_pos.angle < 0.2f && banana_pos.distance < 7.5f &&
                !banana_pos.behind)
             {
                 // Check whether it's straight ahead towards a banana
-                // If so, try to do hard turn to avoid
-                m_adjusting_side = banana_pos.on_side;
-                m_is_steering_overridden = true;
+                // If so, adjust target point
+                banana_lc = (banana_pos.on_side ? banana_lc + Vec3 (2, 0, 0) :
+                    banana_lc - Vec3 (2, 0, 0));
+                m_target_point = m_kart->getTrans()(banana_lc);
+                m_target_node  = BattleGraph::get()
+                    ->pointToNode(getCurrentNode(), m_target_point,
+                    false/*ignore_vertical*/);
+
+                // Handle one banana only
+                break;
             }
         }
     }
@@ -493,8 +482,7 @@ void ArenaAI::handleArenaBraking()
     m_controls->m_brake = false;
 
     if (getCurrentNode() == BattleGraph::UNKNOWN_POLY ||
-        m_target_node  == BattleGraph::UNKNOWN_POLY   ||
-        m_is_steering_overridden) return;
+        m_target_node    == BattleGraph::UNKNOWN_POLY) return;
 
     // A kart will not brake when the speed is already slower than this
     // value. This prevents a kart from going too slow (or even backwards)
