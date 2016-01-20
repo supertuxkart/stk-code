@@ -66,10 +66,6 @@ private:
     float m_goal_timer;
     int m_ball_hitter;
 
-    /** Timer for win/lose animation showing after each goal*/
-    float m_animation_timer;
-    int m_animation_showing_kart;
-
     /** Goals data of each team scored */
     int m_red_goal;
     int m_blue_goal;

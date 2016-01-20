@@ -93,8 +93,6 @@ void SoccerWorld::reset()
     }
     else WorldStatus::setClockMode(CLOCK_CHRONO);
 
-    m_animation_timer = 0.0f;
-    m_animation_showing_kart = -1;
     m_can_score_points = true;
     m_red_goal = 0;
     m_blue_goal = 0;
@@ -164,17 +162,6 @@ void SoccerWorld::update(float dt)
         }
     }
 
-    if (!(isRaceOver() || isStartPhase()) && m_animation_showing_kart != -1)
-    {
-        m_animation_timer += dt;
-        if (m_animation_timer > 6.0f)
-        {
-            m_karts[m_animation_showing_kart]
-                ->getKartModel()->setAnimation(KartModel::AF_BEGIN);
-            m_animation_timer = 0.0f;
-            m_animation_showing_kart = -1;
-        }
-    }
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -192,7 +179,6 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         m_goal_sound->play();
         if (m_ball_hitter != -1)
         {
-            m_animation_showing_kart = m_ball_hitter;
             ScorerData sd;
             sd.m_id = m_ball_hitter;
             sd.m_correct_goal = isCorrectGoal(m_ball_hitter, first_goal);
@@ -200,7 +186,13 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             if (sd.m_correct_goal)
             {
                 m_karts[m_ball_hitter]->getKartModel()
-                    ->setAnimation(KartModel::AF_WIN_START);
+                    ->setAnimation(KartModel::AF_WIN_START, true/* play_non_loop*/);
+            }
+
+            else if (!sd.m_correct_goal)
+            {
+                m_karts[m_ball_hitter]->getKartModel()
+                    ->setAnimation(KartModel::AF_LOSE_START, true/* play_non_loop*/);
             }
 
             if (first_goal)
