@@ -82,6 +82,9 @@ private:
     int m_red_goal_node;
     int m_blue_goal_node;
 
+    int m_red_defender;
+    int m_blue_defender;
+
     /** Set the team for the karts */
     void initKartList();
     /** Function to init the locations of two goals on the polygon map */
@@ -92,6 +95,7 @@ private:
     void updateBallPosition();
     /** Clean up */
     void resetAllNodes();
+    void updateDefenders();
 
 public:
 
@@ -155,6 +159,11 @@ public:
     }
     // ------------------------------------------------------------------------
     bool isCorrectGoal(unsigned int kart_id, bool first_goal) const;
+    // ------------------------------------------------------------------------
+    const int& getDefender(SoccerTeam team) const
+    {
+        return (team == SOCCER_TEAM_BLUE ? m_blue_defender : m_red_defender);
+    }
 
 };   // SoccerWorld
 

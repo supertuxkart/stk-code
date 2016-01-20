@@ -148,8 +148,18 @@ void SoccerAI::findClosestKart(bool use_difficulty)
 //-----------------------------------------------------------------------------
 void SoccerAI::findTarget()
 {
+    // Check whether any defense is needed
+    if ((m_world->getBallPosition() - NavMesh::get()->getNavPoly(m_world
+        ->getGoalNode(m_cur_team)).getCenter()).length_2d() < 50.0f &&
+        m_world->getDefender(m_cur_team) == (signed)m_kart->getWorldKartId())
+    {
+        m_target_node = m_world->getBallNode();
+        m_target_point = correctBallPosition(m_world->getBallPosition());
+        return;
+    }
+
     // Find a suitable target to drive to, either ball or powerup
-    if ((m_world->getBallPosition() - m_kart->getXYZ()).length_2d() > 10.0f &&
+    if ((m_world->getBallPosition() - m_kart->getXYZ()).length_2d() > 20.0f &&
         (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING &&
          m_kart->getAttachment()->getType() != Attachment::ATTACH_SWATTER))
         collectItemInArena(&m_target_point , &m_target_node);

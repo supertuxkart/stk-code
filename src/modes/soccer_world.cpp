@@ -105,6 +105,8 @@ void SoccerWorld::reset()
     m_blue_scorers.clear();
     m_blue_score_times.clear();
     m_ball_hitter = -1;
+    m_red_defender = -1;
+    m_blue_defender = -1;
     PtrVector<TrackObject>& objects = tom->getObjects();
     for(unsigned int i=0; i<objects.size(); i++)
     {
@@ -149,7 +151,10 @@ void SoccerWorld::update(float dt)
 
     updateBallPosition();
     if (m_track->hasNavMesh())
+    {
         updateKartNodes();
+        updateDefenders();
+    }
 
     if (world->getPhase() == World::GOAL_PHASE)
     {
@@ -535,3 +540,54 @@ bool SoccerWorld::isCorrectGoal(unsigned int kart_id, bool first_goal) const
     }
     return false;
 }   // isCorrectGoal
+
+//-----------------------------------------------------------------------------
+void SoccerWorld::updateDefenders()
+{
+    if (isRaceOver()) return;
+
+    float distance = 99999.9f;
+    int defender = -1;
+
+    // Check for red team
+    for (unsigned int i = 0; i < (unsigned)m_karts.size(); ++i)
+    {
+        if (m_karts[i]->getController()->isPlayerController() ||
+            getKartTeam(m_karts[i]->getWorldKartId()) != SOCCER_TEAM_RED)
+            continue;
+
+        Vec3 d = NavMesh::get()->getNavPoly(this
+            ->getGoalNode(SOCCER_TEAM_RED)).getCenter()
+            - m_karts[i]->getXYZ();
+
+        if (d.length_2d() <= distance)
+        {
+            defender = i;
+            distance = d.length_2d();
+        }
+    }
+    if (defender != -1) m_red_defender = defender;
+
+    distance = 99999.9f;
+    defender = -1;
+
+    // Check for blue team
+    for (unsigned int i = 0; i < (unsigned)m_karts.size(); ++i)
+    {
+        if (m_karts[i]->getController()->isPlayerController() ||
+            getKartTeam(m_karts[i]->getWorldKartId()) != SOCCER_TEAM_BLUE)
+            continue;
+
+        Vec3 d = NavMesh::get()->getNavPoly(this
+            ->getGoalNode(SOCCER_TEAM_BLUE)).getCenter()
+            - m_karts[i]->getXYZ();
+
+        if (d.length_2d() <= distance)
+        {
+            defender = i;
+            distance = d.length_2d();
+        }
+    }
+    if (defender != -1) m_blue_defender = defender;
+
+}   // updateDefenders
