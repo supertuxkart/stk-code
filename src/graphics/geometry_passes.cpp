@@ -158,6 +158,7 @@ void AbstractGeometryPasses::prepareShadowRendering(const FrameBuffer& shadow_fr
 
 void AbstractGeometryPasses::shadowPostProcessing(const ShadowMatrices& shadow_matrices,
                                                   const FrameBuffer& shadow_framebuffer,
+                                                  const FrameBuffer& scalar_framebuffer,
                                                   const PostProcessing* post_processing) const
 {
     ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SHADOW_POSTPROCESS));
@@ -170,7 +171,7 @@ void AbstractGeometryPasses::shadowPostProcessing(const ShadowMatrices& shadow_m
         for (unsigned i = 0; i < 2; i++)
         {
             post_processing->renderGaussian6BlurLayer(
-                shadow_framebuffer, i,
+                shadow_framebuffer, scalar_framebuffer, i,
                 2.f * shadow_scales[0].first / shadow_scales[i].first,
                 2.f * shadow_scales[0].second / shadow_scales[i].second);
         }
@@ -264,7 +265,11 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
 }   // renderTransparenPass
 
 // ----------------------------------------------------------------------------
-void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsigned render_target, const PostProcessing* post_processing)
+void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
+                                               const FrameBuffer& tmp_framebuffer,
+                                               const FrameBuffer& displace_framebuffer,
+                                               const FrameBuffer& colors_framebuffer,
+                                               const PostProcessing* post_processing)
 {
 
     glEnable(GL_DEPTH_TEST);
@@ -312,9 +317,9 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsi
         return;
 
     // Render displacement nodes
-    irr_driver->getFBO(FBO_TMP1_WITH_DS).bind();
+    tmp_framebuffer.bind();
     glClear(GL_COLOR_BUFFER_BIT);
-    irr_driver->getFBO(FBO_DISPLACE).bind();
+    displace_framebuffer.bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
     DisplaceProvider * const cb =
@@ -333,7 +338,7 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsi
         glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_2TCOORDS));
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
-    irr_driver->getFBO(FBO_TMP1_WITH_DS).bind();
+    tmp_framebuffer.bind();
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh =
@@ -360,7 +365,7 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsi
                                  (GLvoid *)mesh.vaoOffset, (int)mesh.vaoBaseVertex);
     }
 
-    irr_driver->getFBO(FBO_DISPLACE).bind();
+    displace_framebuffer.bind();
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh = 
@@ -378,8 +383,8 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsi
         // Render the effect
         DisplaceShader::getInstance()->setTextureUnits(
             getTextureGLuint(m_displace_tex),
-            irr_driver->getRenderTargetTexture(RTT_COLOR),
-            irr_driver->getRenderTargetTexture(RTT_TMP1),
+            colors_framebuffer.getRTT()[0],
+            tmp_framebuffer.getRTT()[0],
             getTextureGLuint(mesh.textures[0]));
         DisplaceShader::getInstance()->use();
         DisplaceShader::getInstance()->setUniforms(AbsoluteTransformation,
@@ -390,11 +395,11 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls, unsi
                                  (int)mesh.vaoBaseVertex);
     }
 
-    irr_driver->getFBO(FBO_COLORS).bind();
+    colors_framebuffer.bind();
     glStencilFunc(GL_EQUAL, 1, 0xFF);
-    post_processing->renderPassThrough(render_target,
-                                       irr_driver->getFBO(FBO_COLORS).getWidth(), 
-                                       irr_driver->getFBO(FBO_COLORS).getHeight());
+    post_processing->renderPassThrough(displace_framebuffer.getRTT()[0],
+                                       colors_framebuffer.getWidth(), 
+                                       colors_framebuffer.getHeight());
     glDisable(GL_STENCIL_TEST);
 
 }   // renderTransparent

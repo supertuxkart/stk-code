@@ -30,11 +30,13 @@
 
 class GL3RenderTarget;
 class RenderTarget;
+class RTT;
 class PostProcessing;
 
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:
+    //RTT                  *m_rtts;
     Skybox *m_skybox;
     SphericalHarmonics *m_spherical_harmonics;
     
@@ -95,7 +97,7 @@ public:
     void onLoadWorld()  ;
     void onUnloadWorld();
     
-    void reset() override;
+    void resetPostProcessing() override;
     void giveBoost(unsigned int cam_index) override;
 
     void addSkyBox(const std::vector<irr::video::ITexture*> &texture,

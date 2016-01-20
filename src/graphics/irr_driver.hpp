@@ -208,10 +208,7 @@ private:
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
 #endif
 
-public: //TODO: move into renderer class
-    void renderGlow(std::vector<GlowData>& glows);
-    void renderSSAO();
-    void renderShadowsDebug();
+public:
     void doScreenShot();    
 public:
          IrrDriver();
@@ -413,7 +410,6 @@ public:
     }
     // ------------------------------------------------------------------------
     GLuint getRenderTargetTexture(TypeRTT which);
-    FrameBuffer& getFBO(TypeFBO which);
     GLuint getDepthStencilTexture();
     // ------------------------------------------------------------------------
     void resetDebugModes()

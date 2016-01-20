@@ -250,6 +250,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
             m_geometry_passes->renderShadows(m_draw_calls,
                                              m_shadow_matrices,
                                              m_rtts->getShadowFrameBuffer(),
+                                             m_rtts->getFBO(FBO_SCALAR_1024),
                                              m_post_processing);
             PROFILER_POP_CPU_MARKER();
             if (CVS->isGlobalIlluminationEnabled())
@@ -455,7 +456,9 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TRANSPARENT));
         m_geometry_passes->renderTransparent(m_draw_calls,
-                                             m_rtts->getRenderTarget(RTT_DISPLACE),
+                                             m_rtts->getFBO(FBO_TMP1_WITH_DS),
+                                             m_rtts->getFBO(FBO_DISPLACE),
+                                             m_rtts->getFBO(FBO_COLORS),                                             
                                              m_post_processing);
         PROFILER_POP_CPU_MARKER();
     }
@@ -560,7 +563,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
     FrameBuffer *fbo = m_post_processing->render(camnode, isRace, m_rtts);
 
     if (irr_driver->getNormals())
-        irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
     else if (irr_driver->getSSAOViz())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -644,7 +647,7 @@ void ShaderBasedRenderer::onUnloadWorld()
     removeSkyBox();    
 }
 
-void ShaderBasedRenderer::reset()
+void ShaderBasedRenderer::resetPostProcessing()
 {
     m_post_processing->reset();
 }

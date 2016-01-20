@@ -982,6 +982,7 @@ void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
+                                              const FrameBuffer &scalar_fbo,
                                               size_t layer, float sigma_h,
                                               float sigma_v) const
 {
@@ -992,14 +993,14 @@ void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
     if (!CVS->supportsComputeShadersFiltering())
     {
         // Used as temp
-        irr_driver->getFBO(FBO_SCALAR_1024).bind();
+        scalar_fbo.bind();
         Gaussian6VBlurShader::getInstance()
             ->render(layer_tex, UserConfigParams::m_shadows_resolution, 
                      UserConfigParams::m_shadows_resolution, sigma_v);
 
         in_fbo.bindLayer(layer);
         Gaussian6HBlurShader::getInstance()
-            ->render(irr_driver->getFBO(FBO_SCALAR_1024),
+            ->render(scalar_fbo,
                      UserConfigParams::m_shadows_resolution, 
                      UserConfigParams::m_shadows_resolution, sigma_h);
     }
@@ -1011,7 +1012,7 @@ void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
         ComputeShadowBlurVShader::getInstance()->setTextureUnits(layer_tex);
         glBindSampler(ComputeShadowBlurVShader::getInstance()->m_dest_tu, 0);
         glBindImageTexture(ComputeShadowBlurVShader::getInstance()->m_dest_tu,
-                           irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0], 0,
+                           scalar_fbo.getRTT()[0], 0,
                            false, 0, GL_WRITE_ONLY, GL_R32F);
         ComputeShadowBlurVShader::getInstance()->setUniforms
             (core::vector2df(1.f / UserConfigParams::m_shadows_resolution,
@@ -1025,7 +1026,7 @@ void PostProcessing::renderGaussian6BlurLayer(const FrameBuffer &in_fbo,
                         | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         ComputeShadowBlurHShader::getInstance()->use();
         ComputeShadowBlurHShader::getInstance()
-            ->setTextureUnits(irr_driver->getFBO(FBO_SCALAR_1024).getRTT()[0]);
+            ->setTextureUnits(scalar_fbo.getRTT()[0]);
         glBindSampler(ComputeShadowBlurHShader::getInstance()->m_dest_tu, 0);
         glBindImageTexture(ComputeShadowBlurHShader::getInstance()->m_dest_tu,
                            layer_tex, 0, false, 0, GL_WRITE_ONLY, GL_R32F);
@@ -1274,7 +1275,7 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     glDisable(GL_DEPTH_TEST);
 
     // Fade to quarter
-    irr_driver->getFBO(FBO_QUARTER1).bind();
+    quarter1_fbo.bind();
     glViewport(0, 0, irr_driver->getActualScreenSize().Width / 4,
                      irr_driver->getActualScreenSize().Height / 4);
     GodFadeShader::getInstance()->render(fbo.getRTT()[0], col);
@@ -1299,7 +1300,7 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
 
     // Rays please
-    irr_driver->getFBO(FBO_QUARTER2).bind();
+    quarter2_fbo.bind();
     GodRayShader::getInstance()
         ->render(quarter1_fbo.getRTT()[0], core::vector2df(sunx, suny));
 
@@ -1536,7 +1537,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
     glEnable(GL_FRAMEBUFFER_SRGB);
     if(specified_render_target == NULL)
-        out_fbo = &irr_driver->getFBO(FBO_MLAA_COLORS);
+        out_fbo = &rtts->getFBO(FBO_MLAA_COLORS);
     else
         out_fbo = specified_render_target->getFrameBuffer();
     

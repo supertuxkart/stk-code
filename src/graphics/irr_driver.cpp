@@ -156,7 +156,7 @@ IrrDriver::~IrrDriver()
  */
 void IrrDriver::reset()
 {
-    m_renderer->reset();
+    m_renderer->resetPostProcessing();
 }   // reset
 
 void IrrDriver::setPhase(STKRenderingPass p)
@@ -2193,14 +2193,6 @@ GLuint IrrDriver::getRenderTargetTexture(TypeRTT which)
 }   // getRenderTargetTexture
 
 // ----------------------------------------------------------------------------
-
-FrameBuffer& IrrDriver::getFBO(TypeFBO which)
-{
-    return m_renderer->getRTT()->getFBO(which);
-}   // getFBO
-
-// ----------------------------------------------------------------------------
-
 GLuint IrrDriver::getDepthStencilTexture()
 {
     return m_renderer->getRTT()->getDepthStencilTexture();
