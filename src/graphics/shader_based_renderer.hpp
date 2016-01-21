@@ -55,6 +55,8 @@ private:
 
     irr::core::vector3df m_wind_dir;
     
+    void setRTTDimensions(size_t width, size_t height);
+    
     void compressPowerUpTextures();
     void setOverrideMaterial();
     

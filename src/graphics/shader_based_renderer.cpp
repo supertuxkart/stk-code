@@ -40,6 +40,33 @@
 extern std::vector<float> BoundingBoxes; //TODO
 
 
+void ShaderBasedRenderer::setRTTDimensions(size_t width, size_t height)
+{    
+    if(m_rtts == NULL)
+        m_rtts = new RTT(width, height);
+    else
+    {
+        if((m_rtts->getWidth() != width) || (m_rtts->getHeight() != height))
+        {
+            delete m_rtts;
+            m_rtts = new RTT(width, height);
+        }
+        else
+        {
+            //same dimensions; we don't need to create a new RTT
+            return;
+        }
+    }
+    
+    std::vector<GLuint> prefilled_textures =
+        createVector<GLuint>(m_rtts->getRenderTarget(RTT_DIFFUSE),
+                             m_rtts->getRenderTarget(RTT_SPECULAR),
+                             m_rtts->getRenderTarget(RTT_HALF1_R),
+                             m_rtts->getDepthStencilTexture());
+    m_geometry_passes->setFirstPassRenderTargets(prefilled_textures);    
+}
+
+
 void ShaderBasedRenderer::compressPowerUpTextures()
 {
     for (unsigned i = 0; i < PowerupManager::POWERUP_MAX; i++)
@@ -363,14 +390,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         glDepthMask(GL_FALSE);
     }
     
-        std::vector<GLuint> prefilled_textures =
-            createVector<GLuint>(m_rtts->getRenderTarget(RTT_DIFFUSE),
-                                 m_rtts->getRenderTarget(RTT_SPECULAR),
-                                 m_rtts->getRenderTarget(RTT_HALF1_R),
-                                 m_rtts->getDepthStencilTexture());
-        m_geometry_passes->setFirstPassRenderTargets(prefilled_textures);
-        //TODO: no need to update it every frame
-    
     m_geometry_passes->renderSolidSecondPass(m_draw_calls);
     PROFILER_POP_CPU_MARKER();
 
@@ -636,8 +655,7 @@ void ShaderBasedRenderer::onLoadWorld()
     const core::recti &viewport = Camera::getCamera(0)->getViewport();
     size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
     size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
-    delete m_rtts;
-    m_rtts = new RTT(width, height);    
+    setRTTDimensions(width, height); 
 }
 
 void ShaderBasedRenderer::onUnloadWorld()
@@ -859,16 +877,7 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     size_t width  = texture_size.Width ;
     size_t height = texture_size.Height;
     
-    if(m_rtts == NULL)
-        m_rtts = new RTT(width, height);
-    else
-    {
-        if((m_rtts->getWidth() != width) || (m_rtts->getHeight() != height))
-        {
-            delete m_rtts;
-            m_rtts = new RTT(width, height);
-        }
-    }
+    setRTTDimensions(width, height);
     
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
