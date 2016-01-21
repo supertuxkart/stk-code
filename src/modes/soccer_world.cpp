@@ -71,6 +71,7 @@ SoccerWorld::~SoccerWorld()
 void SoccerWorld::init()
 {
     m_kart_team_map.clear();
+    m_kart_position_map.clear();
     WorldWithRank::init();
     m_display_rank = false;
     m_goal_timer = 0.0f;
@@ -158,12 +159,24 @@ void SoccerWorld::update(float dt)
 
     if (world->getPhase() == World::GOAL_PHASE)
     {
+        if (m_goal_timer == 0.0f)
+        {
+            // Stop all karts
+            for (unsigned int i = 0; i < m_karts.size(); i++)
+                m_karts[i]->setVelocity(btVector3(0, 0, 0));
+        }
         m_goal_timer += dt;
 
         if (m_goal_timer > 3.0f)
         {
             world->setPhase(WorldStatus::RACE_PHASE);
             m_goal_timer = 0.0f;
+            if (!isRaceOver())
+            {
+                // Reset all karts
+                for (unsigned int i = 0; i < m_karts.size(); i++)
+                    moveKartAfterRescue(m_karts[i]);
+            }
         }
     }
 
@@ -309,14 +322,15 @@ void SoccerWorld::initKartList()
     //Assigning indicators
     for(unsigned int i=0; i<kart_amount; i++)
     {
-        scene::ISceneNode *arrowNode;
+        scene::ISceneNode *arrow_node;
         float arrow_pos_height = m_karts[i]->getKartModel()->getHeight()+0.5f;
         SoccerTeam team = getKartTeam(i);
 
-        arrowNode = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,0.3f),
-                    team == SOCCER_TEAM_BLUE ? blue : red, m_karts[i]->getNode(), true);
+        arrow_node = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,
+            0.3f), team == SOCCER_TEAM_BLUE ? blue : red, m_karts[i]
+            ->getNode(), true);
 
-        arrowNode->setPosition(core::vector3df(0, arrow_pos_height, 0));
+        arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
     }
 
 }   // initKartList
@@ -343,8 +357,10 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
                                 RaceManager::KartType kart_type,
                                 PerPlayerDifficulty difficulty)
 {
-    int posIndex = index;
-    int position = index+1;
+    int cur_red = getTeamNum(SOCCER_TEAM_RED);
+    int cur_blue = getTeamNum(SOCCER_TEAM_BLUE);
+    int pos_index = 0;
+    int position  = index + 1;
     SoccerTeam team = SOCCER_TEAM_BLUE;
 
     if (kart_type == RaceManager::KT_AI)
@@ -377,16 +393,19 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
         m_kart_team_map[index] = team;
     }
 
-    if(!team)
+    // Notice: In blender, please set 1,3,5,7... for blue starting position;
+    // 2,4,6,8... for red.
+    if (team == SOCCER_TEAM_BLUE)
     {
-        if(index % 2 != 1) posIndex += 1;
+        pos_index = 1 + 2 * cur_blue;
     }
     else
     {
-        if(index % 2 != 0) posIndex += 1;
+        pos_index = 2 + 2 * cur_red;
     }
 
-    btTransform init_pos = getStartTransform(posIndex);
+    btTransform init_pos = getStartTransform(pos_index - 1);
+    m_kart_position_map[index] = (unsigned)(pos_index - 1);
 
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
             difficulty);
@@ -591,3 +610,32 @@ void SoccerWorld::updateDefenders()
     if (defender != -1) m_blue_defender = defender;
 
 }   // updateDefenders
+
+//-----------------------------------------------------------------------------
+int SoccerWorld::getTeamNum(SoccerTeam team) const
+{
+    int total = 0;
+    if (m_kart_team_map.empty()) return total;
+
+    for (unsigned int i = 0; i < (unsigned)m_karts.size(); ++i)
+    {
+        if (team == getKartTeam(m_karts[i]->getWorldKartId())) total++;
+    }
+
+    return total;
+}   // getTeamNum
+
+//-----------------------------------------------------------------------------
+unsigned int SoccerWorld::getRescuePositionIndex(AbstractKart *kart)
+{
+    std::map<int, unsigned int>::const_iterator n =
+        m_kart_position_map.find(kart->getWorldKartId());
+    if (n != m_kart_position_map.end())
+    {
+        return n->second;
+    }
+
+    // Fallback
+    Log::warn("SoccerWorld", "Unknown kart, using default starting position.");
+    return 0;
+}   // getRescuePositionIndex

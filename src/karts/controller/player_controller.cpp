@@ -267,6 +267,13 @@ void PlayerController::update(float dt)
     if (!history->replayHistory())
         steer(dt, m_steer_val);
 
+    if (World::getWorld()->getPhase() == World::GOAL_PHASE)
+    {
+        m_controls->m_brake = false;
+        m_controls->m_accel = 0.0f;
+        return;
+    }
+
     if (World::getWorld()->isStartPhase())
     {
         if (m_controls->m_accel || m_controls->m_brake ||

@@ -596,8 +596,8 @@ void Track::loadTrackInfo()
     }
     if (m_is_soccer)
     {
-        // Currently only max six players in soccer mode
-        m_max_arena_players = 6;
+        // Currently only max eight players in soccer mode
+        m_max_arena_players = 8;
     }
 
 }   // loadTrackInfo

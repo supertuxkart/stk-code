@@ -73,7 +73,9 @@ private:
     std::vector<float> m_red_score_times;
     std::vector<ScorerData> m_blue_scorers;
     std::vector<float> m_blue_score_times;
+
     std::map<int, SoccerTeam> m_kart_team_map;
+    std::map<int, unsigned int> m_kart_position_map;
 
     /** Data generated from navmesh */
     std::vector<int> m_kart_on_node;
@@ -95,7 +97,10 @@ private:
     void updateBallPosition();
     /** Clean up */
     void resetAllNodes();
+    /** Function to update the AI which is the closest to its goal to defend. */
     void updateDefenders();
+    /** Get number of teammates in a team, used by starting position assign. */
+    int getTeamNum(SoccerTeam team) const;
 
 public:
 
@@ -111,6 +116,8 @@ public:
 
     // overriding World methods
     virtual void reset();
+
+    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
 
     virtual bool useFastMusicNearEnd() const { return false; }
     virtual void getKartsDisplayInfo(

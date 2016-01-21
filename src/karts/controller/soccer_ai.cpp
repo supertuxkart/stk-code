@@ -106,6 +106,13 @@ void SoccerAI::reset()
 //-----------------------------------------------------------------------------
 void SoccerAI::update(float dt)
 {
+    if (World::getWorld()->getPhase() == World::GOAL_PHASE)
+    {
+        m_controls->m_accel = 0.0f;
+        AIBaseController::update(dt);
+        return;
+    }
+
     ArenaAI::update(dt);
 }   // update
 
