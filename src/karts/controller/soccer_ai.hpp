@@ -35,12 +35,15 @@ private:
     SoccerWorld *m_world;
 
     SoccerTeam m_cur_team;
+    bool m_saving_ball;
+
     Vec3 correctBallPosition(const Vec3&);
 
     virtual void findClosestKart(bool use_difficulty);
     virtual void findTarget();
     virtual int  getCurrentNode() const;
     virtual bool isWaiting() const;
+    virtual bool canSkid(float steer_fraction) { return m_saving_ball; }
 public:
                  SoccerAI(AbstractKart *kart,
                           StateManager::ActivePlayer *player = NULL);

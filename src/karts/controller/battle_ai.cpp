@@ -45,19 +45,8 @@ BattleAI::BattleAI(AbstractKart *kart,
     m_debug_sphere = irr_driver->addSphere(1.0f, col_debug);
     m_debug_sphere->setVisible(true);
 #endif
-
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
-    {
-        m_world     = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
-        m_track     = m_world->getTrack();
-    }
-    else
-    {
-        // Those variables are not defined in a battle mode (m_world is
-        // a linear world, since it assumes the existance of drivelines)
-        m_world           = NULL;
-        m_track           = NULL;
-    }
+    m_world = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
+    m_track = m_world->getTrack();
 
     // Don't call our own setControllerName, since this will add a
     // billboard showing 'AIBaseController' to the kart.

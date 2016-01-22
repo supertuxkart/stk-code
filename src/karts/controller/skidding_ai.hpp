@@ -94,7 +94,7 @@ the AI does the following steps:
     behaviour.
     The function handleSteering() then calls setSteering() to set the
     actually steering amount. The latter function also decides if skidding
-    should be done or not (by calling doSkid()).
+    should be done or not (by calling canSkid()).
   - decide if to try to collect or avoid items (handeItems).
     It considers all items on quads between the current quad of the kart
     and the quad the AI is aiming at (see handleSteering). If it finds
@@ -270,7 +270,7 @@ private:
                               const Vec3 &end,
                               Vec3 *center,
                               float *radius);
-    virtual bool doSkid(float steer_fraction);
+    virtual bool canSkid(float steer_fraction);
     virtual void setSteering(float angle, float dt);
     void handleCurve();
 

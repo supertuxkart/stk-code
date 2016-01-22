@@ -184,7 +184,7 @@ float AIBaseController::normalizeAngle(float angle)
 void AIBaseController::setSteering(float angle, float dt)
 {
     float steer_fraction = angle / m_kart->getMaxSteerAngle();
-    if(!doSkid(steer_fraction))
+    if(!canSkid(steer_fraction))
         m_controls->m_skid = KartControl::SC_NONE;
     else
         m_controls->m_skid = steer_fraction > 0 ? KartControl::SC_RIGHT
@@ -214,15 +214,6 @@ void AIBaseController::setSteering(float angle, float dt)
     }
 }   // setSteering
 
-// ----------------------------------------------------------------------------
-/** Determines if the kart should skid. The base implementation enables
- *  skidding if a sharp turn is needed (which is for the old skidding
- *  implementation).
- *  \param steer_fraction The steering fraction as computed by the
- *          AIBaseController.
- *  \return True if the kart should skid.
- */
-
 // ------------------------------------------------------------------------
 /** Certain AI levels will not receive a slipstream bonus in order to
  *  be not as hard.
@@ -231,23 +222,6 @@ bool AIBaseController::disableSlipstreamBonus() const
 {
     return m_ai_properties->disableSlipstreamUsage();
 }   // disableSlipstreamBonus
-
-
-bool AIBaseController::doSkid(float steer_fraction)
-{
-    // Disable skidding when a plunger is in the face
-    if(m_kart->getBlockedByPlungerTime()>0) return false;
-
-    // FIXME: Disable skidding for now if the new skidding
-    // code is activated, since the AI can not handle this
-    // properly.
-    if(m_kart->getKartProperties()->getSkidVisualTime() > 0)
-        return false;
-
-    // Otherwise return if we need a sharp turn (which is
-    // for the old skidding implementation).
-    return fabsf(steer_fraction)>=m_ai_properties->m_skidding_threshold;
-}   // doSkid
 
 //-----------------------------------------------------------------------------
 /** This is called when the kart crashed with the terrain. This subroutine

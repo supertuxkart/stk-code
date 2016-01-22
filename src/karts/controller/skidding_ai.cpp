@@ -2210,7 +2210,7 @@ void SkiddingAI::handleCurve()
  *          AIBaseLapController.
  *  \return True if the kart should skid.
  */
-bool SkiddingAI::doSkid(float steer_fraction)
+bool SkiddingAI::canSkid(float steer_fraction)
 {
     if(fabsf(steer_fraction)>1.5f)
     {
@@ -2319,7 +2319,7 @@ bool SkiddingAI::doSkid(float steer_fraction)
                    m_kart->getIdent().c_str());
 #endif
     return false;
-}   // doSkid
+}   // canSkid
 
 //-----------------------------------------------------------------------------
 /** Converts the steering angle to a lr steering in the range of -1 to 1.
@@ -2341,7 +2341,7 @@ void SkiddingAI::setSteering(float angle, float dt)
     // Use a simple finite state machine to make sure to randomly decide
     // whether to skid or not only once per skid section. See docs for
     // m_skid_probability_state for more details.
-    if(!doSkid(steer_fraction))
+    if(!canSkid(steer_fraction))
     {
         m_skid_probability_state = SKID_PROBAB_NOT_YET;
         m_controls->m_skid       = KartControl::SC_NONE;

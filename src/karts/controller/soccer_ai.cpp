@@ -45,19 +45,8 @@ SoccerAI::SoccerAI(AbstractKart *kart,
     m_debug_sphere = irr_driver->addSphere(1.0f, col_debug);
     m_debug_sphere->setVisible(true);
 #endif
-
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
-    {
-        m_world     = dynamic_cast<SoccerWorld*>(World::getWorld());
-        m_track     = m_world->getTrack();
-    }
-    else
-    {
-        // Those variables are not defined in a battle mode (m_world is
-        // a linear world, since it assumes the existance of drivelines)
-        m_world           = NULL;
-        m_track           = NULL;
-    }
+    m_world = dynamic_cast<SoccerWorld*>(World::getWorld());
+    m_track = m_world->getTrack();
 
     // Don't call our own setControllerName, since this will add a
     // billboard showing 'AIBaseController' to the kart.
@@ -82,6 +71,7 @@ void SoccerAI::reset()
     ArenaAI::reset();
     AIBaseController::reset();
 
+    m_saving_ball = false;
     if (race_manager->getNumPlayers() == 1)
     {
         // Same handle in SoccerWorld::createKart
@@ -106,6 +96,7 @@ void SoccerAI::reset()
 //-----------------------------------------------------------------------------
 void SoccerAI::update(float dt)
 {
+    m_saving_ball = false;
     if (World::getWorld()->getPhase() == World::GOAL_PHASE)
     {
         m_controls->m_accel = 0.0f;
@@ -196,12 +187,40 @@ Vec3 SoccerAI::correctBallPosition(const Vec3& orig_pos)
 
     if (goal_pos.behind)
     {
-        // If facing the wrong goal, apply more offset to the ball
-        // to prevent shooting into its own team goal
-        ball_lc = (goal_pos.on_side ? ball_lc - Vec3 (2, 0, 0) + Vec3 (0, 0, 2):
-                   ball_lc + Vec3 (2, 0, 2));
+        if (goal_pos.angle > 0.3f && ball_pos.distance < 3.0f &&
+            !ball_pos.behind)
+        {
+            // Only steer with ball if same sides for ball and goal
+            if (ball_pos.on_side && goal_pos.on_side)
+            {
+                ball_lc = ball_lc + Vec3 (1, 0, 1);
+                return m_kart->getTrans()(ball_lc);
+            }
+            else if (!ball_pos.on_side && !goal_pos.on_side)
+            {
+                ball_lc = ball_lc - Vec3 (1, 0, 0) + Vec3 (0, 0, 1);
+                return m_kart->getTrans()(ball_lc);
+            }
+            else
+                m_controls->m_brake = true;
+        }
+        else
+        {
+            // This case is facing straight ahead opposite goal
+            // (which is straight behind itself), apply more
+            // offset for skidding, to save the ball from behind
+            // scored.
+            // Notice: this assume map maker make soccer field
+            // with two goals facing each other straight
+            ball_lc = (goal_pos.on_side ? ball_lc - Vec3 (2, 0, 0) +
+                       Vec3 (0, 0, 2) : ball_lc + Vec3 (2, 0, 2));
 
-        return m_kart->getTrans()(ball_lc);
+            if (ball_pos.distance < 3.0f &&
+               (m_cur_difficulty == RaceManager::DIFFICULTY_HARD ||
+                m_cur_difficulty == RaceManager::DIFFICULTY_BEST))
+                m_saving_ball = true;
+            return m_kart->getTrans()(ball_lc);
+        }
     }
 
     if (ball_pos.distance < 3.0f &&
@@ -211,9 +230,19 @@ Vec3 SoccerAI::correctBallPosition(const Vec3& orig_pos)
             return orig_pos;
         else
         {
-            ball_lc = (goal_pos.on_side ? ball_lc + Vec3 (1, 0, 1) :
-                       ball_lc - Vec3 (1, 0, 0) + Vec3 (0, 0, 1));
-            return m_kart->getTrans()(ball_lc);
+            // Same with above
+            if (ball_pos.on_side && goal_pos.on_side)
+            {
+                ball_lc = ball_lc + Vec3 (1, 0, 1);
+                return m_kart->getTrans()(ball_lc);
+            }
+            else if (!ball_pos.on_side && !goal_pos.on_side)
+            {
+                ball_lc = ball_lc - Vec3 (1, 0, 0) + Vec3 (0, 0, 1);
+                return m_kart->getTrans()(ball_lc);
+            }
+            else
+                m_controls->m_brake = true;
         }
     }
     return orig_pos;

@@ -51,7 +51,7 @@ protected:
     float m_kart_width;
 
     /** Keep a pointer to the track to reduce calls */
-    Track       *m_track;
+    Track *m_track;
 
     /** A pointer to the AI properties for this kart. */
     const AIProperties *m_ai_properties;
@@ -61,17 +61,17 @@ protected:
     /** Position info structure of targets. */
     struct posData {bool behind; bool on_side; float angle; float distance;};
 
+    void         setControllerName(const std::string &name);
+    float        steerToPoint(const Vec3 &point);
+    float        normalizeAngle(float angle);
     virtual void update      (float delta) ;
     virtual void setSteering   (float angle, float dt);
-    void    setControllerName(const std::string &name);
-    float   steerToPoint(const Vec3 &point);
-    float    normalizeAngle(float angle);
-    virtual bool doSkid(float steer_fraction);
+    virtual bool canSkid(float steer_fraction) { return false; }
     // ------------------------------------------------------------------------
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
-    bool     isStuck() const { return m_stuck; }
-    void     checkPosition(const Vec3&, posData*, Vec3* lc = NULL) const;
+    bool         isStuck() const { return m_stuck; }
+    void         checkPosition(const Vec3&, posData*, Vec3* lc = NULL) const;
 
 public:
              AIBaseController(AbstractKart *kart,
