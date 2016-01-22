@@ -439,11 +439,15 @@ void RaceGUIBase::drawGlobalMusicDescription()
     gui::IGUIFont*       font = GUIEngine::getFont();
 
     float race_time = World::getWorld()->getTime();
-    // In follow the leader the clock counts backwards, so convert the
+    // In the modes that the clock counts backwards, convert the
     // countdown time to time since start:
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         race_time = ((FollowTheLeaderRace*)World::getWorld())->getClockStartTime()
                   - race_time;
+    else if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER &&
+             race_manager->hasTimeTarget())
+        race_time = race_manager->getTimeTarget() - World::getWorld()->getTime();
+
     // ---- Manage pulsing effect
     // 3.0 is the duration of ready/set (TODO: don't hardcode)
     float timeProgression = (float)(race_time) /
