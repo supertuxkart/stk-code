@@ -158,7 +158,9 @@ void SoccerSetupScreen::beforeAddingWidget()
         KartViewInfo    info;
         info.view            = kart_view;
         info.confirmed       = false;
-        info.team            = i&1 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED;
+        int single_team      = UserConfigParams::m_soccer_default_team;
+        info.team            = nb_players == 1 ? (SoccerTeam)single_team :
+                               (i&1 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
         m_kart_view_info.push_back(info);
         race_manager->setKartSoccerTeam(i, info.team);
     }
@@ -327,6 +329,8 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
 
     if(team_switch != SOCCER_TEAM_NONE) // A player wants to change his team?
     {
+        if (nb_players == 1)
+            UserConfigParams::m_soccer_default_team = (int)team_switch;
         race_manager->setKartSoccerTeam(playerId, team_switch);
         m_kart_view_info[playerId].team = team_switch;
         updateKartViewsLayout();

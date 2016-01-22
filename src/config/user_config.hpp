@@ -335,9 +335,12 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_num_goals
             PARAM_DEFAULT(  IntUserConfigParam(3, "numgoals",
             &m_race_setup_group, "Default number of goals in soccer mode.") );
+    PARAM_PREFIX IntUserConfigParam          m_soccer_default_team
+            PARAM_DEFAULT(  IntUserConfigParam(0, "soccer-default-team",
+            &m_race_setup_group, "Default team in soccer mode for single player.") );
     PARAM_PREFIX IntUserConfigParam          m_soccer_time_limit
             PARAM_DEFAULT(  IntUserConfigParam(3, "soccer-time-limit",
-            &m_race_setup_group, "Limit in soccer time mode.") );
+            &m_race_setup_group, "Time limit in soccer mode.") );
     PARAM_PREFIX IntUserConfigParam          m_difficulty
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty",
                             &m_race_setup_group,
