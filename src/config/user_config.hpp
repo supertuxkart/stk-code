@@ -341,6 +341,9 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_soccer_time_limit
             PARAM_DEFAULT(  IntUserConfigParam(3, "soccer-time-limit",
             &m_race_setup_group, "Time limit in soccer mode.") );
+    PARAM_PREFIX BoolUserConfigParam         m_soccer_use_time_limit
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-use-time-limit",
+            &m_race_setup_group, "Enable time limit in soccer mode.") );
     PARAM_PREFIX IntUserConfigParam          m_difficulty
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty",
                             &m_race_setup_group,

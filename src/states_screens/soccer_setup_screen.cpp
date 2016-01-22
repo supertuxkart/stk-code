@@ -99,6 +99,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
     {
         CheckBoxWidget* timeEnabled = dynamic_cast<CheckBoxWidget*>(widget);
         bool timed = timeEnabled->getState();
+        UserConfigParams::m_soccer_use_time_limit = timed;
         getWidget<SpinnerWidget>("goalamount")->setActive(!timed);
         getWidget<SpinnerWidget>("timeamount")->setActive(timed);
     }
@@ -184,14 +185,14 @@ void SoccerSetupScreen::init()
 
     SpinnerWidget*  goalamount = getWidget<SpinnerWidget>("goalamount");
     goalamount->setValue(UserConfigParams::m_num_goals);
-    goalamount->setActive(true);
+    goalamount->setActive(!UserConfigParams::m_soccer_use_time_limit);
 
     SpinnerWidget* timeAmount = getWidget<SpinnerWidget>("timeamount");
     timeAmount->setValue(UserConfigParams::m_soccer_time_limit);
-    timeAmount->setActive(false);
+    timeAmount->setActive(UserConfigParams::m_soccer_use_time_limit);
 
     CheckBoxWidget* timeEnabled = getWidget<CheckBoxWidget>("time_enabled");
-    timeEnabled->setState(false);
+    timeEnabled->setState(UserConfigParams::m_soccer_use_time_limit);
 
     // Set focus on "continue"
     ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
