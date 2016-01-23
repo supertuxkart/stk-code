@@ -70,6 +70,7 @@ void BattleAI::reset()
 {
     ArenaAI::reset();
     AIBaseController::reset();
+    m_mini_skid = false;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -135,7 +136,7 @@ void BattleAI::findClosestKart(bool use_difficulty)
         // not straight ahead, not too far, in front of it
         // and with suitable difficulties.
         if (m_closest_kart_pos_data.angle > 0.2f             &&
-            m_closest_kart_pos_data.distance < 20.f          &&
+            m_closest_kart_pos_data.distance < 20.0f         &&
            !m_closest_kart_pos_data.behind                   &&
            (m_cur_difficulty == RaceManager::DIFFICULTY_HARD ||
             m_cur_difficulty == RaceManager::DIFFICULTY_BEST))
