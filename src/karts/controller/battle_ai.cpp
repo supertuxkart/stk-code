@@ -75,6 +75,7 @@ void BattleAI::reset()
 //-----------------------------------------------------------------------------
 void BattleAI::update(float dt)
 {
+    m_mini_skid = false;
     ArenaAI::update(dt);
 }   // update
 
@@ -129,6 +130,16 @@ void BattleAI::findClosestKart(bool use_difficulty)
     {
         m_closest_kart = m_world->getKart(closest_kart_num);
         checkPosition(m_closest_kart_point, &m_closest_kart_pos_data);
+
+        // Do a mini-skid to closest kart only when firing target,
+        // not straight ahead, not too far, in front of it
+        // and with suitable difficulties.
+        if (m_closest_kart_pos_data.angle > 0.2f             &&
+            m_closest_kart_pos_data.distance < 20.f          &&
+           !m_closest_kart_pos_data.behind                   &&
+           (m_cur_difficulty == RaceManager::DIFFICULTY_HARD ||
+            m_cur_difficulty == RaceManager::DIFFICULTY_BEST))
+            m_mini_skid = true;
     }
 }   // findClosestKart
 

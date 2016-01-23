@@ -66,7 +66,7 @@ protected:
     float        normalizeAngle(float angle);
     virtual void update      (float delta) ;
     virtual void setSteering   (float angle, float dt);
-    virtual bool canSkid(float steer_fraction) { return false; }
+    virtual bool canSkid(float steer_fraction) = 0;
     // ------------------------------------------------------------------------
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */

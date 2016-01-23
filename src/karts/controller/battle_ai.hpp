@@ -36,10 +36,13 @@ private:
     /** Keep a pointer to world. */
     ThreeStrikesBattle *m_world;
 
+    bool m_mini_skid;
+
     virtual void findClosestKart(bool use_difficulty);
     virtual void findTarget();
     virtual int  getCurrentNode() const;
     virtual bool isWaiting() const;
+    virtual bool canSkid(float steer_fraction) { return m_mini_skid; }
 public:
                  BattleAI(AbstractKart *kart,
                           StateManager::ActivePlayer *player = NULL);
