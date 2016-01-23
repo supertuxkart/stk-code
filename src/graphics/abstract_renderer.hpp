@@ -34,12 +34,16 @@ struct GlowData {
     float r, g, b;
 };
 
+/**
+ *  \class AbstractRenderer
+ *  \brief Virtual base class for the renderer
+ *
+ *  \ingroup graphics
+ */
 class AbstractRenderer
 {
 protected:
     irr::core::vector2df m_current_screen_size;
-    RTT                  *m_rtts;
-
 
 #ifdef DEBUG
     void drawDebugMeshes() const;
@@ -51,12 +55,9 @@ protected:
 
     void renderSkybox(const irr::scene::ICameraSceneNode *camera) const;
 
-
 public:
     virtual ~AbstractRenderer(){}
-    
-    RTT* getRTT() { return m_rtts;} //FIXME: remove this
-    
+        
     virtual void onLoadWorld()   = 0;
     virtual void onUnloadWorld() = 0;
 
@@ -66,10 +67,14 @@ public:
     virtual void addSkyBox(const std::vector<irr::video::ITexture*> &texture,
                            const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) {}
     virtual void removeSkyBox() {}
-    virtual const SHCoefficients* getSHCoefficients() const { return NULL; }
+    
+    //FIXME: these three methods should not appear in the public Renderer interface
+    virtual const SHCoefficients* getSHCoefficients()    const { return NULL; }
+    virtual GLuint getRenderTargetTexture(TypeRTT which) const { return 0;}
+    virtual GLuint getDepthStencilTexture(             ) const { return 0;}
+    
     virtual void setAmbientLight(const irr::video::SColorf &light,
                                   bool force_SH_computation = true) {}
-
 
     virtual void addSunLight(const irr::core::vector3df &pos){}
 
@@ -78,7 +83,6 @@ public:
     
     virtual void clearGlowingNodes() {}
 
-    
     virtual void render(float dt) = 0;
  
      // ------------------------------------------------------------------------
@@ -86,11 +90,14 @@ public:
     {
         return m_current_screen_size;
     }
- 
- 
+    
+    // ----------------------------------------------------------------------------
+    /** Create a RenderTarget (for rendering to a texture)
+     *  \param dimension The dimension of the texture
+     *  \param name A unique name for the render target
+     */
     virtual std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
                                                              const std::string &name) = 0;
- 
 };
 
 #endif //HEADER_ABSTRACT_RENDERER_HPP

@@ -2189,13 +2189,13 @@ void IrrDriver::clearLights()
 // ----------------------------------------------------------------------------
 GLuint IrrDriver::getRenderTargetTexture(TypeRTT which)
 {
-    return m_renderer->getRTT()->getRenderTarget(which);
+    return m_renderer->getRenderTargetTexture(which);
 }   // getRenderTargetTexture
 
 // ----------------------------------------------------------------------------
 GLuint IrrDriver::getDepthStencilTexture()
 {
-    return m_renderer->getRTT()->getDepthStencilTexture();
+    return m_renderer->getDepthStencilTexture();
 }   // getDepthStencilTexture
 
 

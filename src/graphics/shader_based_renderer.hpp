@@ -36,7 +36,7 @@ class PostProcessing;
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:
-    //RTT                  *m_rtts;
+    RTT                  *m_rtts;
     Skybox *m_skybox;
     SphericalHarmonics *m_spherical_harmonics;
     
@@ -106,6 +106,9 @@ public:
                    const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) override;
     void removeSkyBox() override;
     const SHCoefficients* getSHCoefficients() const override;
+    GLuint getRenderTargetTexture(TypeRTT which) const override;
+    GLuint getDepthStencilTexture() const override;
+    
     void                  setAmbientLight(const irr::video::SColorf &light,
                                           bool force_SH_computation = true) override;
 

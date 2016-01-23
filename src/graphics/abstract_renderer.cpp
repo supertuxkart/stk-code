@@ -71,7 +71,7 @@ void AbstractRenderer::drawDebugMeshes() const
 }  // drawDebugMeshes
 
 // ----------------------------------------------------------------------------
-/** Draws a joing for debugging skeletons.
+/** Draws a joint for debugging skeletons.
  *  \param drawline If true draw a line to the parent.
  *  \param drawname If true draw the name of the joint.
  *  \param joint The joint to draw.
@@ -129,7 +129,6 @@ void AbstractRenderer::drawJoint(bool drawline, bool drawname,
                                                      parentpos,
                                                      color);
         }
-
     }
 
     if (joint->Children.size() == 0)
@@ -193,10 +192,6 @@ void AbstractRenderer::drawJoint(bool drawline, bool drawname,
                                          color, false, false );
     }
 } //drawJoint
-
-    
-
-
 
 #endif //DEBUG
 

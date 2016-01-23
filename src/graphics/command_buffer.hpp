@@ -22,18 +22,24 @@
 #include "graphics/gl_headers.hpp"
 #include "graphics/material.hpp"
 #include "graphics/materials.hpp"
-
-
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/vao_manager.hpp"
 #include <irrlicht.h>
 #include <unordered_map>
 
+struct InstanceList
+{
+    GLMesh *m_mesh;
+    std::vector<irr::scene::ISceneNode*> m_scene_nodes;
+};
 
-typedef std::vector<std::pair<GLMesh *, irr::scene::ISceneNode*> > InstanceList;
 typedef std::unordered_map <irr::scene::IMeshBuffer *, InstanceList > MeshMap;
 
-
+// ----------------------------------------------------------------------------
+/** Fill origin, orientation and scale attributes
+ *  \param node The scene node of the mesh
+ *  \param[out] instance The instance to fill
+ */
 template<typename InstanceData>
 void fillOriginOrientationScale(scene::ISceneNode *node, InstanceData &instance)
 {
@@ -52,12 +58,24 @@ void fillOriginOrientationScale(scene::ISceneNode *node, InstanceData &instance)
     instance.Scale.Z = Scale.Z;
 }
 
+// ----------------------------------------------------------------------------
 template<typename InstanceData>
 struct InstanceFiller
 {
     static void add(GLMesh *, scene::ISceneNode *, InstanceData &);
 };
 
+// ----------------------------------------------------------------------------
+/** Fill a command buffer (in video RAM) with meshes data
+ *  \param instance_list A vector of scene nodes associated with the same mesh
+ *  \param[in,out] instance_buffer Mesh data (position, orientation, textures, etc)
+ *  \param[in,out] command_buffer A pointer to meshes data in VRAM.
+ *  \param[in,out] instance_buffer_offset Current offset for instance_buffer.
+ *                 Will be updated to next offset.
+ *  \param[in,out] command_buffer_offset Current offset for command_buffer.
+ *                 Will be updated to next offset.
+ *  \param[in,out] poly_count Number of triangles. Will be updated.
+ */
 template<typename T>
 void FillInstances_impl(InstanceList instance_list,
                         T * instance_buffer,
@@ -67,15 +85,14 @@ void FillInstances_impl(InstanceList instance_list,
                         size_t &poly_count)
 {
     // Should never be empty
-    GLMesh *mesh = instance_list.front().first;
+    GLMesh *mesh = instance_list.m_mesh;
     size_t initial_offset = instance_buffer_offset;
 
-    for (unsigned i = 0; i < instance_list.size(); i++)
+    for (unsigned i = 0; i < instance_list.m_scene_nodes.size(); i++)
     {
-        auto &Tp = instance_list[i];
-        scene::ISceneNode *node = Tp.second;
+        scene::ISceneNode *node = instance_list.m_scene_nodes[i];
         InstanceFiller<T>::add(mesh, node, instance_buffer[instance_buffer_offset++]);
-        assert(instance_buffer_offset * sizeof(T) < 10000 * sizeof(InstanceDataDualTex)); //TODO
+        assert(instance_buffer_offset * sizeof(T) < 10000 * sizeof(InstanceDataDualTex));
     }
 
     DrawElementsIndirectCommand &CurrentCommand = command_buffer[command_buffer_offset++];
@@ -88,25 +105,11 @@ void FillInstances_impl(InstanceList instance_list,
     poly_count += (instance_buffer_offset - initial_offset) * mesh->IndexCount / 3;
 }
 
-//TODO: clean draw_calls and remove this function
-template<typename T>
-void FillInstances( const MeshMap &gathered_GL_mesh,
-                    std::vector<GLMesh *> &instanced_list,
-                    T *instance_buffer,
-                    DrawElementsIndirectCommand *command_buffer,
-                    size_t &instance_buffer_offset,
-                    size_t &command_buffer_offset,
-                    size_t &poly_count)
-{
-    auto It = gathered_GL_mesh.begin(), E = gathered_GL_mesh.end();
-    for (; It != E; ++It)
-    {
-        FillInstances_impl<T>(It->second, instance_buffer, command_buffer, instance_buffer_offset, command_buffer_offset, poly_count);
-        if (!CVS->isAZDOEnabled())
-            instanced_list.push_back(It->second.front().first);
-    }
-}
-
+// ----------------------------------------------------------------------------
+/** Bind textures for second rendering pass.
+ *  \param mesh The mesh which owns the textures
+ *  \param prefilled_tex Textures which have been drawn during previous rendering passes.
+ */
 template<typename T>
 void expandTexSecondPass(const GLMesh &mesh,
                          const std::vector<GLuint> &prefilled_tex)
@@ -119,8 +122,13 @@ void expandTexSecondPass(const GLMesh &mesh,
 template<>
 void expandTexSecondPass<GrassMat>(const GLMesh &mesh,
                                    const std::vector<GLuint> &prefilled_tex);
-
-
+                                   
+// ----------------------------------------------------------------------------
+/** Give acces textures for second rendering pass in shaders 
+ * without first binding them in order to reduce driver overhead.
+ * (require GL_ARB_bindless_texture extension) 
+ *  \param handles The handles to textures
+ */ 
 template<typename T>
 void expandHandlesSecondPass(const std::vector<uint64_t> &handles)
 {
@@ -133,7 +141,12 @@ void expandHandlesSecondPass(const std::vector<uint64_t> &handles)
 template<>
 void expandHandlesSecondPass<GrassMat>(const std::vector<uint64_t> &handles);
 
-
+// ----------------------------------------------------------------------------
+/**
+ *  \class CommandBuffer
+ *  \brief Template class to draw meshes with as few draw calls as possible
+ *
+ */
 template<int N>
 class CommandBuffer
 {
@@ -149,10 +162,15 @@ protected:
     size_t m_instance_buffer_offset;
     size_t m_command_buffer_offset;
 
-
     void clearMeshes();
     void unmapBuffers();
-
+    
+    // ------------------------------------------------------------------------
+    /** Send in VRAM all meshes associated with same material
+     *  \param material_id The id of the material shared by the meshes
+     *  \param mesh_map List of meshes
+     *  \param[in,out] instance_buffer Meshes data (position, orientation, textures, etc)
+     */
     template<typename T>
     void fillMaterial(int material_id,
                       MeshMap *mesh_map,
@@ -168,13 +186,20 @@ protected:
                                   m_command_buffer_offset,
                                   m_poly_count);
             if (!CVS->isAZDOEnabled())
-                m_meshes[material_id].push_back(instance_list.second.front().first);
+                m_meshes[material_id].push_back(instance_list.second.m_mesh);
         }
                 
         m_size[material_id] = m_command_buffer_offset - m_offset[material_id];
     }
     
-    
+    // ------------------------------------------------------------------------
+    /** Send into VRAM all meshes associated with same type of material
+     *  \param mesh_map List of meshes to send into VRAM
+     *  \param material_list Ids of materials: meshes associated to these materials
+     *         will be sent into VRAM
+     *  \param instance_type The type of material
+     * 
+     */
     template<typename InstanceData>
     void fillInstanceData(MeshMap *mesh_map,
                           const std::vector<int> &material_list,
@@ -192,17 +217,17 @@ protected:
             glBindBuffer(GL_ARRAY_BUFFER,
                          VAOManager::getInstance()->getInstanceBuffer(instance_type));
             instance_buffer = (InstanceData*)
-                              glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                                               10000 * sizeof(InstanceDataDualTex),
-                                               GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+                glMapBufferRange(GL_ARRAY_BUFFER, 0,
+                                 10000 * sizeof(InstanceDataDualTex),
+                                 GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
             glBindBuffer(GL_DRAW_INDIRECT_BUFFER,
                          m_draw_indirect_cmd_id);
             
             
             m_draw_indirect_cmd = (DrawElementsIndirectCommand*)
-                                  glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0,
-                                                   10000 * sizeof(DrawElementsIndirectCommand),
-                                                   GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+                glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0,
+                                 10000 * sizeof(DrawElementsIndirectCommand),
+                                 GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
         }
         
         for(int material_id: material_list)
@@ -211,9 +236,7 @@ protected:
                           mesh_map,
                           instance_buffer);
         }
-        
     }
-    
     
 public:
     CommandBuffer();
@@ -227,7 +250,12 @@ public:
     }
 }; //CommandBuffer
 
-
+// ----------------------------------------------------------------------------
+/**
+ *  \class SolidCommandBuffer
+ *  This class is used for rendering meshes during solid first pass 
+ *  and solid second pass.
+ */
 class SolidCommandBuffer: public CommandBuffer<static_cast<int>(Material::SHADERTYPE_COUNT)>
 {
 public:
@@ -235,6 +263,13 @@ public:
     void fill(MeshMap *mesh_map);
     
     // ----------------------------------------------------------------------------
+    /** First rendering pass; draw all meshes associated with the same material
+     * Require OpenGL 4.0 (or higher)
+     * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+     * 
+     *  \tparam T The material
+     *  \param uniforms Uniforms needed by the shader associated with T material
+     */
     template<typename T, typename...Uniforms>
     void drawIndirectFirstPass(Uniforms...uniforms) const
     {
@@ -265,6 +300,12 @@ public:
     } //drawIndirectFirstPass
 
     // ----------------------------------------------------------------------------
+    /** First rendering pass; draw all meshes associated with the same material
+     * Faster than drawIndirectFirstPass.
+     * Require OpenGL AZDO extensions
+     *  \tparam T The material
+     *  \param uniforms Uniforms needed by the shader associated with T material
+     */
     template<typename T, typename...Uniforms>
     void multidrawFirstPass(Uniforms...uniforms) const
     {
@@ -284,9 +325,17 @@ public:
     }   // multidrawFirstPass
 
     // ----------------------------------------------------------------------------
+    /** Second rendering pass; draw all meshes associated with the same material
+     * Require OpenGL 4.0 (or higher)
+     * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+     * 
+     *  \tparam T The material
+     *  \param prefilled_tex Textures filled during previous rendering passes (diffuse, depth, etc)
+     *  \param uniforms Uniforms needed by the shader associated with T material
+     */
     template<typename T, typename...Uniforms>
     void drawIndirectSecondPass(const std::vector<GLuint> &prefilled_tex,
-                             Uniforms...uniforms                       ) const
+                                Uniforms...uniforms                       ) const
     {
         T::InstancedSecondPassShader::getInstance()->use();
         T::InstancedSecondPassShader::getInstance()->setUniforms(uniforms...);
@@ -304,6 +353,15 @@ public:
     } //drawIndirectSecondPass
 
     // ----------------------------------------------------------------------------
+    /** Second rendering pass; draw all meshes associated with the same material
+     * Faster than drawIndirectSecondPass.
+     * Require OpenGL AZDO extensions
+     * 
+     *  \tparam T The material
+     *  \param handles Handles to textures filled during previous rendering passes
+     *                 (diffuse, depth, etc)
+     *  \param uniforms Uniforms needed by the shader associated with T material
+     */
     template<typename T, typename...Uniforms>
     void multidraw2ndPass(const std::vector<uint64_t> &handles,
                           Uniforms... uniforms) const
@@ -324,8 +382,13 @@ public:
         }
     }   // multidraw2ndPass
 
-
     // ----------------------------------------------------------------------------
+    /** Draw normals (debug): draw all meshes associated with the same material
+     * Require OpenGL 4.0 (or higher)
+     * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+     * 
+     *  \tparam T The material
+     */
     template<typename T>
     void drawIndirectNormals() const
     {
@@ -342,6 +405,12 @@ public:
     }   // drawIndirectNormals
 
     // ----------------------------------------------------------------------------
+    /** Draw normals (debug): draw all meshes associated with the same material
+     * Faster than drawIndirectNormals.
+     * Require OpenGL AZDO extensions
+     * 
+     *  \tparam T The material
+     */
     template<typename T>
     void multidrawNormals() const
     {
@@ -363,6 +432,11 @@ public:
     }   // multidrawNormals
 }; //SolidCommandBuffer
 
+// ----------------------------------------------------------------------------
+/**
+ *  \class ShadowCommandBuffer
+ *  This class is used for rendering shadows.
+ */
 class ShadowCommandBuffer: public CommandBuffer<4*static_cast<int>(Material::SHADERTYPE_COUNT)>
 {
 public:
@@ -370,6 +444,14 @@ public:
     void fill(MeshMap *mesh_map);
     
     // ----------------------------------------------------------------------------
+    /** Draw shadowmaps for meshes with the same material
+     * Require OpenGL 4.0 (or higher)
+     * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+     * 
+     *  \tparam T The material
+     *  \param uniforms Uniforms needed by the shadow shader associated with T material
+     *  \param cascade The cascade id (see cascading shadow maps)
+     */    
     template<typename T, typename...Uniforms>
     void drawIndirect(Uniforms ...uniforms, unsigned cascade) const
     {
@@ -395,6 +477,14 @@ public:
     }   // drawIndirect
     
     // ----------------------------------------------------------------------------
+    /** Draw shadowmaps for meshes with the same material
+     * Faster than drawIndirect.
+     * Require OpenGL AZDO extensions
+     * 
+     *  \tparam T The material
+     *  \param uniforms Uniforms needed by the shadow shader associated with T material
+     *  \param cascade The cascade id (see cascading shadow maps)
+     */ 
     template<typename T, typename...Uniforms>
     void multidrawShadow(Uniforms ...uniforms, unsigned cascade) const
     {
@@ -414,10 +504,13 @@ public:
                                         sizeof(DrawElementsIndirectCommand));
         }
     }   // multidrawShadow
-    
-    
 }; //ShadowCommandBuffer
 
+// ----------------------------------------------------------------------------
+/**
+ *  \class ReflectiveShadowMapCommandBuffer
+ *  This class is used for rendering the reflective shadow map once per track.
+ */
 class ReflectiveShadowMapCommandBuffer: public CommandBuffer<static_cast<int>(Material::SHADERTYPE_COUNT)>
 {
 public:
@@ -425,6 +518,13 @@ public:
     void fill(MeshMap *mesh_map);
     
     // ----------------------------------------------------------------------------
+    /** Draw reflective shadow map for meshes with the same material
+     * Require OpenGL 4.0 (or higher)
+     * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+     * 
+     *  \tparam T The material
+     *  \param uniforms Uniforms needed by the shadow shader associated with T material
+     */    
     template<typename T, typename...Uniforms>
     void drawIndirect(Uniforms ...uniforms) const
     {
@@ -446,6 +546,13 @@ public:
     } //drawIndirect
     
     // ----------------------------------------------------------------------------
+    /** Draw reflective shadow map for meshes with the same material
+     * Faster than drawIndirect.
+     * Require OpenGL AZDO extensions
+     * 
+     *  \tparam T The material
+     *  \param uniforms Uniforms needed by the shadow shader associated with T material
+     */ 
     template<typename T, typename... Uniforms>
     void multidraw(Uniforms...uniforms) const
     {
@@ -463,11 +570,14 @@ public:
                                         sizeof(DrawElementsIndirectCommand));
         }
     }   // multidraw
-    
 }; //ReflectiveShadowMapCommandBuffer
 
 
-// ============================================================================
+// ----------------------------------------------------------------------------
+/**
+ *  \class InstancedColorizeShader
+ *  Draw meshes with glow color.
+ */
 class InstancedColorizeShader : public Shader<InstancedColorizeShader>
 {
 public:
@@ -480,12 +590,22 @@ public:
     }   // InstancedColorizeShader
 };   // InstancedColorizeShader
 
+// ----------------------------------------------------------------------------
+/**
+ *  \class GlowCommandBuffer
+ *  This class is used for rendering glowing meshes.
+ */
 class GlowCommandBuffer: public CommandBuffer<1>
 {
 public:
     GlowCommandBuffer();
     void fill(MeshMap *mesh_map);
-    
+
+    // ----------------------------------------------------------------------------
+    /** Draw glowing meshes.
+     * Require OpenGL 4.0 (or higher)
+     * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+     */      
     void drawIndirect() const
     {
         InstancedColorizeShader::getInstance()->use();
@@ -497,9 +617,13 @@ public:
                                    GL_UNSIGNED_SHORT,
                                    (const void*)((m_offset[0] + i) * sizeof(DrawElementsIndirectCommand)));
         }
-        
     } //drawIndirect
     
+    // ----------------------------------------------------------------------------
+    /** Draw glowing meshes.
+     * Faster than drawIndirect.
+     * Require OpenGL AZDO extensions
+     */  
     void multidraw() const
     {
         InstancedColorizeShader::getInstance()->use();
@@ -512,7 +636,7 @@ public:
                                         (const void*)(m_offset[0] * sizeof(DrawElementsIndirectCommand)),
                                         (int) m_size[0],
                                         sizeof(DrawElementsIndirectCommand));
-        }                                                                        
+        }
     } // multidraw
 };
 

@@ -37,8 +37,6 @@ namespace
             const_cast<core::aabbox3df&>(node->getBoundingBox()).addInternalBox(child->getBoundingBox());
         }
     }
-    
-
 } //namespace
 
 
@@ -172,10 +170,16 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                 for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
                     if (node->glow())
-                        m_glow_pass_mesh[mesh->mb].emplace_back(mesh, Node);
+                    {
+                        m_glow_pass_mesh[mesh->mb].m_mesh = mesh;
+                        m_glow_pass_mesh[mesh->mb].m_scene_nodes.emplace_back(Node);
+                    }
 
                     if (Mat != Material::SHADERTYPE_SPLATTING && mesh->TextureMatrix.isIdentity())
-                        m_solid_pass_mesh[Mat][mesh->mb].emplace_back(mesh, Node);
+                    {
+                        m_solid_pass_mesh[Mat][mesh->mb].m_mesh = mesh;
+                        m_solid_pass_mesh[Mat][mesh->mb].m_scene_nodes.emplace_back(Node);
+                    }
                     else
                     {
                         core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
@@ -248,7 +252,8 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
             {
                 for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
-                    m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].emplace_back(mesh, Node);
+                    m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].m_mesh = mesh;
+                    m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].m_scene_nodes.emplace_back(Node);
                 }
             }
             else
@@ -306,7 +311,10 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                 else
                 {
                     for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
-                        m_reflective_shadow_map_mesh[Mat][mesh->mb].emplace_back(mesh, Node);
+                    {
+                        m_reflective_shadow_map_mesh[Mat][mesh->mb].m_mesh = mesh;
+                        m_reflective_shadow_map_mesh[Mat][mesh->mb].m_scene_nodes.emplace_back(Node);
+                    }
                 }
             }
             else

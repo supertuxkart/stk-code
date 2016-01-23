@@ -23,7 +23,6 @@
 #include "graphics/lod_node.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/render_target.hpp"
-#include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_scene_manager.hpp"
 #include "graphics/texture_manager.hpp"
@@ -202,7 +201,7 @@ void ShaderBasedRenderer::uploadLightingData() const
     Lighting[6] = sun_color.getBlue();
     Lighting[7] = 0.54f;
 
-    const SHCoefficients* sh_coeff = irr_driver->getSHCoefficients();
+    const SHCoefficients* sh_coeff = m_spherical_harmonics->getCoefficients();
 
     if(sh_coeff) {
         memcpy(&Lighting[8], sh_coeff->blue_SH_coeff, 9 * sizeof(float));
@@ -624,7 +623,6 @@ ShaderBasedRenderer::ShaderBasedRenderer()
     else
         m_geometry_passes = new GeometryPasses<GL3DrawPolicy>();
         
-    // Initialize post-processing if supported
     m_post_processing = new PostProcessing(irr_driver->getVideoDriver());
 }
 
@@ -695,6 +693,16 @@ void ShaderBasedRenderer::removeSkyBox()
 const SHCoefficients* ShaderBasedRenderer::getSHCoefficients() const
 {
     return m_spherical_harmonics->getCoefficients();
+}
+
+GLuint ShaderBasedRenderer::getRenderTargetTexture(TypeRTT which) const
+{
+    return m_rtts->getRenderTarget(which);
+}
+
+GLuint ShaderBasedRenderer::getDepthStencilTexture() const
+{
+    return m_rtts->getDepthStencilTexture();
 }
 
 void ShaderBasedRenderer::setAmbientLight(const video::SColorf &light,

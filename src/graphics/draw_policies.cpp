@@ -215,7 +215,7 @@ void IndirectDrawPolicy::drawSolidSecondPass (const DrawCalls& draw_calls,
                                               const std::vector<uint64_t>& handles,
                                               const std::vector<GLuint>& prefilled_tex) const
 {
-    //TODO: find a way to add TextureMarix in instanced shaders,
+    //TODO: find a way to add TextureMatrix in instanced shaders,
     //and remove these four lines
     renderMeshes2ndPass<DefaultMaterial, 3, 1> (handles, prefilled_tex);
     renderMeshes2ndPass<AlphaRef,        3, 1> (handles, prefilled_tex);
