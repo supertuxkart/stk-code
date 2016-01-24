@@ -129,7 +129,6 @@ IrrDriver::IrrDriver()
     m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
     m_boundingboxesviz = false;
     m_last_light_bucket_distance = 0;
-    memset(object_count, 0, sizeof(object_count));
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -171,12 +170,7 @@ STKRenderingPass IrrDriver::getPhase() const
 
 void IrrDriver::IncreaseObjectCount()
 {
-    object_count[m_phase]++;
-}
-
-void IrrDriver::IncreasePolyCount(unsigned Polys)
-{
-    poly_count[m_phase] += Polys;
+    m_renderer->incObjectCount(m_phase);
 }
 
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
@@ -1842,26 +1836,21 @@ void IrrDriver::displayFPS()
     if (low > kilotris) low = kilotris;
     if (high < kilotris) high = kilotris;
 
-    core::stringw fpsString;
+    core::stringw fps_string;
 
-    if (UserConfigParams::m_artist_debug_mode)
+    if ((UserConfigParams::m_artist_debug_mode)&&(CVS->isGLSL()))
     {
-        fpsString = _("FPS: %d/%d/%d  - PolyCount: %d Solid, "
+        fps_string = _("FPS: %d/%d/%d  - PolyCount: %d Solid, "
                       "%d Shadows - LightDist : %d",
-                    min, fps, max, poly_count[SOLID_NORMAL_AND_DEPTH_PASS],
-                    poly_count[SHADOW_PASS], m_last_light_bucket_distance);
-        poly_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
-        poly_count[SHADOW_PASS] = 0;
-        object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
-        object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
-        object_count[TRANSPARENT_PASS] = 0;
+                    min, fps, max, m_renderer->getPolyCount(SOLID_NORMAL_AND_DEPTH_PASS),
+                    m_renderer->getPolyCount(SHADOW_PASS), m_last_light_bucket_distance);
     }
     else
-        fpsString = _("FPS: %d/%d/%d - %d KTris", min, fps, max, (int)roundf(kilotris));
+        fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max, (int)roundf(kilotris)); 
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
 
-    font->draw( fpsString.c_str(), position, fpsColor, false );
+    font->draw( fps_string.c_str(), position, fpsColor, false );
 }   // updateFPS
 
 // ----------------------------------------------------------------------------

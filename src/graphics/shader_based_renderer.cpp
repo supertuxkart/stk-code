@@ -263,8 +263,13 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
-    m_draw_calls.prepareDrawCalls(m_shadow_matrices, camnode);
+    unsigned solid_poly_count;
+    unsigned shadow_poly_count;
+    m_draw_calls.prepareDrawCalls(m_shadow_matrices, camnode, solid_poly_count, shadow_poly_count);
+    m_poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += solid_poly_count;
+    m_poly_count[SHADOW_PASS] += shadow_poly_count;
     PROFILER_POP_CPU_MARKER();
+    
     // Shadows
     {
         // To avoid wrong culling, use the largest view possible
@@ -295,7 +300,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         irr_driver->getSceneManager()->setActiveCamera(camnode);
 
     }
-
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
     glDepthMask(GL_TRUE);
@@ -481,7 +485,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         PROFILER_POP_CPU_MARKER();
     }
 
-    m_draw_calls.m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+    m_draw_calls.setFenceSync();
 
     // Render particles
     {
@@ -623,7 +627,7 @@ ShaderBasedRenderer::ShaderBasedRenderer()
     else
         m_geometry_passes = new GeometryPasses<GL3DrawPolicy>();
         
-    m_post_processing = new PostProcessing(irr_driver->getVideoDriver());
+    m_post_processing = new PostProcessing(irr_driver->getVideoDriver());    
 }
 
 ShaderBasedRenderer::~ShaderBasedRenderer()
@@ -740,6 +744,9 @@ void ShaderBasedRenderer::clearGlowingNodes()
 
 void ShaderBasedRenderer::render(float dt)
 {
+    resetObjectCount();
+    resetPolyCount();
+    
     BoundingBoxes.clear(); //TODO: what is it doing here?
     
     compressPowerUpTextures(); //TODO: is it useful every frame?
@@ -904,4 +911,3 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     irr_driver->getSceneManager()->setActiveCamera(NULL);
         
 }
-

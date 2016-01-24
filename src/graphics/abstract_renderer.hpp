@@ -28,6 +28,15 @@
 
 class RenderTarget;
 
+enum STKRenderingPass
+{
+    SOLID_NORMAL_AND_DEPTH_PASS,
+    SOLID_LIT_PASS,
+    TRANSPARENT_PASS,
+    GLOW_PASS,
+    SHADOW_PASS,
+    PASS_COUNT,
+};
 
 struct GlowData {
     irr::scene::ISceneNode * node;
@@ -45,6 +54,10 @@ class AbstractRenderer
 protected:
     irr::core::vector2df m_current_screen_size;
 
+    /** Performance stats */
+    unsigned             m_object_count[PASS_COUNT];
+    unsigned             m_poly_count  [PASS_COUNT];
+
 #ifdef DEBUG
     void drawDebugMeshes() const;
 
@@ -56,6 +69,7 @@ protected:
     void renderSkybox(const irr::scene::ICameraSceneNode *camera) const;
 
 public:
+    AbstractRenderer();
     virtual ~AbstractRenderer(){}
         
     virtual void onLoadWorld()   = 0;
@@ -98,6 +112,14 @@ public:
      */
     virtual std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
                                                              const std::string &name) = 0;
+    
+    void resetObjectCount()                     { memset(m_object_count, 0, sizeof(m_object_count));}
+    void resetPolyCount()                       { memset(m_poly_count, 0, sizeof(m_poly_count));    }
+    void incObjectCount(STKRenderingPass phase) {  m_object_count[phase]++;                         }
+    
+    unsigned getObjectCount(STKRenderingPass pass) const { return m_object_count[pass];             }
+    unsigned getPolyCount(STKRenderingPass pass) const   { return m_poly_count  [pass];             }
+    
 };
 
 #endif //HEADER_ABSTRACT_RENDERER_HPP

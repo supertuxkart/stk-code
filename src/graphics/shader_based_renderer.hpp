@@ -40,7 +40,6 @@ private:
     Skybox *m_skybox;
     SphericalHarmonics *m_spherical_harmonics;
     
-    //GLsync          m_sync; //TODO
     DrawCalls       m_draw_calls;
     AbstractGeometryPasses *m_geometry_passes;
     LightingPasses  m_lighting_passes;
@@ -127,6 +126,7 @@ public:
     void renderToTexture(GL3RenderTarget *render_target,
                          irr::scene::ICameraSceneNode* camera,
                          float dt);
+    
 };
 
 #endif //HEADER_SHADER_BASED_RENDERER_HPP

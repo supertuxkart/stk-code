@@ -30,14 +30,9 @@
 
 
 class DrawCalls
-{
-public:
-
-
-    GLsync          m_sync = 0; //TODO: make it private. Should it be in shader_based_renderer?
-
-    
+{  
 private:
+    GLsync                                m_sync = 0;
     
     std::vector<irr::scene::ISceneNode *> m_immediate_draw_list;
     std::vector<STKBillboard *>           m_billboard_list;
@@ -60,31 +55,36 @@ private:
     void clearLists();
 
     void handleSTKCommon(scene::ISceneNode *Node,
-                                std::vector<scene::ISceneNode *> *ImmediateDraw,
-                                const scene::ICameraSceneNode *cam,
-                                scene::ICameraSceneNode *shadowcam[4],
-                                const scene::ICameraSceneNode *rsmcam,
-                                bool &culledforcam,
-                                bool culledforshadowcam[4],
-                                bool &culledforrsm,
-                                bool drawRSM);
+                         std::vector<scene::ISceneNode *> *ImmediateDraw,
+                         const scene::ICameraSceneNode *cam,
+                         scene::ICameraSceneNode *shadowcam[4],
+                         const scene::ICameraSceneNode *rsmcam,
+                         bool &culledforcam,
+                         bool culledforshadowcam[4],
+                         bool &culledforrsm,
+                         bool drawRSM);
     
      void parseSceneManager(core::list<scene::ISceneNode*> &List,
                             std::vector<scene::ISceneNode *> *ImmediateDraw,
                             const scene::ICameraSceneNode* cam,
-                            scene::ICameraSceneNode *shadow_cam[4],const scene::ICameraSceneNode *rsmcam,
+                            scene::ICameraSceneNode *shadow_cam[4],
+                            const scene::ICameraSceneNode *rsmcam,
                             bool culledforcam,
                             bool culledforshadowcam[4],
                             bool culledforrsm,
                             bool drawRSM);
-
     
 public:
-    void prepareDrawCalls(ShadowMatrices& shadow_matrices, irr::scene::ICameraSceneNode *camnode);
+    void prepareDrawCalls(ShadowMatrices& shadow_matrices,
+                          irr::scene::ICameraSceneNode *camnode,
+                          unsigned &solid_poly_count,
+                          unsigned &shadow_poly_count);
+                          
+    void setFenceSync() { m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0); }
 
     void renderImmediateDrawList() const;
-    void renderBillboardList()      const;
-    void renderParticlesList()     const;
+    void renderBillboardList() const;
+    void renderParticlesList() const;
 
     void drawIndirectSolidFirstPass() const;
     void multidrawSolidFirstPass() const;

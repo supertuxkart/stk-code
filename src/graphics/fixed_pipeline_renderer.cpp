@@ -37,7 +37,7 @@ void FixedPipelineRenderer::onUnloadWorld()
 }
 
 void FixedPipelineRenderer::render(float dt)
-{
+{    
     World *world = World::getWorld(); // Never NULL.
 
     irr_driver->getVideoDriver()->beginScene(/*backBuffer clear*/ true, 
@@ -112,4 +112,3 @@ std::unique_ptr<RenderTarget> FixedPipelineRenderer::createRenderTarget(const ir
 {
     return std::unique_ptr<RenderTarget>(new GL1RenderTarget(dimension, name));
 }
-

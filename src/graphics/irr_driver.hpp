@@ -71,17 +71,6 @@ class ShadowImportance;
 class ShadowMatrices;
 class RenderTarget;
 
-enum STKRenderingPass
-{
-    SOLID_NORMAL_AND_DEPTH_PASS,
-    SOLID_LIT_PASS,
-    TRANSPARENT_PASS,
-    GLOW_PASS,
-    SHADOW_PASS,
-    PASS_COUNT,
-};
-
-
 
 /**
   * \brief class that creates the irrLicht device and offers higher-level
@@ -181,10 +170,8 @@ private:
     bool                 m_lightviz;
     bool                 m_distortviz;
     bool                 m_boundingboxesviz;
-    /** Performance stats */
+
     unsigned             m_last_light_bucket_distance;
-    unsigned             object_count[PASS_COUNT];
-    unsigned             poly_count[PASS_COUNT];
     u32                  m_renderpass;
     class STKMeshSceneNode *m_sun_interposer;
     core::vector3df m_sun_direction;
@@ -222,7 +209,6 @@ public:
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;
     void IncreaseObjectCount();
-    void IncreasePolyCount(unsigned);
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;

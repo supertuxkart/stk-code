@@ -39,7 +39,6 @@ public:
     
     std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
                                                      const std::string &name);
-    
 };
 
 #endif //HEADER_FIXED_PIPELINE_RENDERER_HPP

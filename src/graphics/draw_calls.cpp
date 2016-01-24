@@ -403,7 +403,10 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
 }
 
 
-void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICameraSceneNode *camnode)
+void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
+                                  scene::ICameraSceneNode *camnode,
+                                  unsigned &solid_poly_count,
+                                  unsigned &shadow_poly_count)
 {
     windDir = getWindDir();
     clearLists();
@@ -509,10 +512,8 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices, scene::ICamer
         }
     }
     PROFILER_POP_CPU_MARKER();
-    //poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += SolidPoly;
-    //poly_count[SHADOW_PASS] += ShadowPoly;
-    //TODO: return polycount and update it in renderer class
-    
+    solid_poly_count = m_solid_cmd_buffer.getPolyCount();
+    shadow_poly_count = m_shadow_cmd_buffer.getPolyCount();    
     
     if (CVS->supportsAsyncInstanceUpload())
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
