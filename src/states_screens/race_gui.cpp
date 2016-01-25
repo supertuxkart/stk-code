@@ -225,7 +225,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
  */
 void RaceGUI::drawScores()
 {
-    SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
+    SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     int offset_y = 5;
     int offset_x = 5;
     gui::ScalableFont* font = GUIEngine::getTitleFont();
@@ -243,7 +243,7 @@ void RaceGUI::drawScores()
         core::recti position(offset_x, offset_y,
             offset_x + 2*m_minimap_player_size, offset_y + 2*m_minimap_player_size);
 
-        core::stringw score = StringUtils::toWString(soccerWorld->getScore((SoccerTeam)i));
+        core::stringw score = StringUtils::toWString(sw->getScore((SoccerTeam)i));
         int string_height =
             GUIEngine::getFont()->getDimension(score.c_str()).Height;
         core::recti pos(position.UpperLeftCorner.X + 5,
@@ -264,7 +264,7 @@ void RaceGUI::drawScores()
                                                    team_icon->getSize());
         draw2DImage(team_icon,indicator_pos,source_rect,
             NULL,NULL,true);
-        offset_x += position.LowerRightCorner.X;
+        offset_x += position.LowerRightCorner.X + 30;
     }
 }   // drawScores
 
