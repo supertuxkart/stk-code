@@ -611,9 +611,20 @@ public:
         const int id = (int)m_minor_mode;
         // This uses the  numerical id of the mode, see the macros
         // LINEAR_RACE and BATTLE_ARENA above for exact meaning.
-        if (id >= 2000) return true;
+        if (id >= 2000 && id != 2001) return true;
         else            return false;
     }   // isBattleMode
+
+    // ------------------------------------------------------------------------
+    /** \brief Returns true if the current mode is a soccer mode. */
+    bool isSoccerMode()
+    {
+        const int id = (int)m_minor_mode;
+        // This uses the  numerical id of the mode, see the macros
+        // LINEAR_RACE and BATTLE_ARENA above for exact meaning.
+        if (id == 2001) return true;
+        else            return false;
+    }   // isSoccerMode
 
     // ------------------------------------------------------------------------
     bool isTutorialMode()
@@ -624,7 +635,7 @@ public:
     /** \brief Returns true if the current mode has laps. */
     bool modeHasLaps()
     {
-        if (isBattleMode()) return false;
+        if (isBattleMode() || isSoccerMode()) return false;
         const int id = (int)m_minor_mode;
         // See meaning of IDs above
         const int answer = (id-1000)/100;

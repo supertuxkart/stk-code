@@ -96,6 +96,7 @@ public:
                         POSITION_END33,
                         POSITION_LAST,
                         POSITION_BATTLE_MODE,
+                        POSITION_SOCCER_MODE,
                         POSITION_TUTORIAL_MODE,
                         POSITION_COUNT};
 
