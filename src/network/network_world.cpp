@@ -22,6 +22,11 @@ NetworkWorld::~NetworkWorld()
 // ----------------------------------------------------------------------------
 void NetworkWorld::update(float dt)
 {
+    // This can happen in case of disconnects - protocol manager is
+    // shut down, but still events to process.
+    if(!ProtocolManager::getInstance())
+        return;
+
     SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
     if (protocol) // if this protocol exists, that's that we play online
