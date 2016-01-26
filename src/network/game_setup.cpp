@@ -52,7 +52,7 @@ GameSetup::~GameSetup()
 void GameSetup::addPlayer(NetworkPlayerProfile* profile)
 {
     m_players.push_back(profile);
-    Log::info("GameSetup", "New player in the game setup. Race id : %d.",
+    Log::info("GameSetup", "New player in the game setup. Player id : %d.",
               profile->getGlobalPlayerId());
 }   // addPlayer
 

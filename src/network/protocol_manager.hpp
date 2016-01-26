@@ -78,18 +78,26 @@ public:
     Protocol *getProtocol() { return m_protocol;  }
 };   // class ProtocolRequest;
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 /** \struct ProtocolRequest
  *  \brief Used to pass the event to protocols that need it
  */
-typedef struct EventProcessingInfo
+struct EventProcessingInfo
 {
+    /** The event to process. */
     Event* m_event;
+
+    /** Arrival time of the event. Used to time out events that are not
+     *  handled in time (e.g. because the receiving protocol is not running).*/
     double m_arrival_time;
+
+    /** The list of protocol ids to which this event can be
+     *  sent to. */
     std::vector<unsigned int> m_protocols_ids;
+
 } EventProcessingInfo;
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 /** \class ProtocolManager
  *  \brief Manages the protocols at runtime.
  *
