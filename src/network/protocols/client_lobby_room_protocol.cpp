@@ -180,9 +180,6 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         const NetworkString &data = event->data();
         assert(data.size()); // assert that data isn't empty
         uint8_t message_type = data[0];
-        if (message_type == LE_KART_SELECTION_UPDATE ||
-            message_type == LE_RACE_FINISHED           )
-            return false; // don't treat the event
 
         event->removeFront(1);
         Log::info("ClientLobbyRoomProtocol", "Asynchronous message of type %d",

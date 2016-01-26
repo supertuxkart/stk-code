@@ -348,9 +348,9 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
         for (unsigned int i = 0; i < peers.size(); i++)
         {
             NetworkString ns(6);
-            ns.ai8(0x06).ai8(4).ai32(peers[i]->getClientServerToken());
+            ns.ai8(LE_RACE_FINISHED).ai8(4).ai32(peers[i]->getClientServerToken());
             NetworkString total = ns + queue;
-            sendMessage(peers[i], total, true);
+            sendSynchronousMessage(peers[i], total, true);
         }
         Log::info("ServerLobbyRoomProtocol", "End of game message sent");
         m_in_race = false;
@@ -563,7 +563,8 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     answer.ai8(LE_KART_SELECTION_UPDATE).ai8(1).ai8(player_id)
           .encodeString(kart_name);
-    sendMessage(answer);
+    // This message must be handled synchronously on the client.
+    sendSynchronousMessage(answer);
     m_setup->setPlayerKart(player_id, kart_name);
 }   // kartSelectionRequested
 

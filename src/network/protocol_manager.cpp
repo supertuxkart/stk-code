@@ -131,6 +131,14 @@ void ProtocolManager::propagateEvent(Event* event)
     Log::verbose("ProtocolManager", "Received event for protocols of type %d",
                   searched_protocol);
 
+    bool is_synchronous = false;
+    if(searched_protocol & PROTOCOL_SYNCHRONOUS)
+    {
+        is_synchronous = true;
+        // Reset synchronous flag to restore original protocol id
+        searched_protocol = ProtocolType(searched_protocol & 
+                                         ~PROTOCOL_SYNCHRONOUS  );
+    }
     std::vector<unsigned int> protocols_ids;
     m_protocols.lock();
     for (unsigned int i = 0; i < m_protocols.getData().size() ; i++)
@@ -155,9 +163,10 @@ void ProtocolManager::propagateEvent(Event* event)
     if (protocols_ids.size() != 0)
     {
         EventProcessingInfo epi;
-        epi.m_arrival_time = (double)StkTime::getTimeSinceEpoch();
-        epi.m_event = event;
-        epi.m_protocols_ids = protocols_ids;
+        epi.m_arrival_time   = (double)StkTime::getTimeSinceEpoch();
+        epi.m_is_synchronous = is_synchronous;
+        epi.m_event          = event;
+        epi.m_protocols_ids  = protocols_ids;
         // Add the event to the queue. After the event is handled
         // its memory will be freed.
         m_events_to_process.getData().push_back(epi); 
@@ -175,20 +184,29 @@ void ProtocolManager::propagateEvent(Event* event)
 
 // ----------------------------------------------------------------------------
 void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message,
-                                  bool reliable)
+                                  bool reliable, bool send_synchronously)
 {
     NetworkString new_message(1+message.size());
-    new_message.ai8(sender->getProtocolType()); // add one byte to add protocol type
+    ProtocolType type = sender->getProtocolType();
+    // Set flag if the message must be handled synchronously on arrivat
+    if(send_synchronously)
+        type = ProtocolType(type | PROTOCOL_SYNCHRONOUS);
+    new_message.ai8(type); // add one byte to add protocol type
     new_message += message;
     STKHost::get()->sendMessage(new_message, reliable);
 }   // sendMessage
 
 // ----------------------------------------------------------------------------
 void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer,
-                                  const NetworkString& message, bool reliable)
+                                  const NetworkString& message, bool reliable,
+                                  bool send_synchronously)
 {
     NetworkString new_message(1+message.size());
-    new_message.ai8(sender->getProtocolType()); // add one byte to add protocol type
+    ProtocolType type = sender->getProtocolType();
+    // Set flag if the message must be handled synchronously on arrivat
+    if(send_synchronously)
+        type = ProtocolType(type | PROTOCOL_SYNCHRONOUS);
+    new_message.ai8(type); // add one byte to add protocol type
     new_message += message;
     peer->sendPacket(new_message, reliable);
 }   // sendMessage
@@ -418,6 +436,8 @@ void ProtocolManager::update()
     int offset = 0;
     for (int i = 0; i < size; i++)
     {
+        // Don't handle asynchronous events here.
+        if(!m_events_to_process.getData()[i+offset].m_is_synchronous) continue;
         bool result = sendEvent(&m_events_to_process.getData()[i+offset], true);
         if (result)
         {
@@ -455,6 +475,8 @@ void ProtocolManager::asynchronousUpdate()
     int offset = 0;
     for (int i = 0; i < size; i++)
     {
+        // Don't handle synchronous events here.
+        if(m_events_to_process.getData()[i+offset].m_is_synchronous) continue;
         bool result = sendEvent(&m_events_to_process.getData()[i+offset], false);
         if (result)
         {

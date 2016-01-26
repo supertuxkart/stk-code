@@ -137,12 +137,30 @@ void Protocol::sendMessageToPeersChangingToken(uint8_t type,
 // ----------------------------------------------------------------------------
 void Protocol::sendMessage(const NetworkString& message, bool reliable)
 {
-    ProtocolManager::getInstance()->sendMessage(this, message, reliable);
+    ProtocolManager::getInstance()->sendMessage(this, message, reliable,
+                                                /*synchronous*/false);
 }   // sendMessage
 
+// ----------------------------------------------------------------------------
+void Protocol::sendSynchronousMessage(const NetworkString& message, 
+                                      bool reliable)
+{
+    ProtocolManager::getInstance()->sendMessage(this, message, reliable,
+                                                /*synchron*/true);
+}   // sendMessage
 // ----------------------------------------------------------------------------
 void Protocol::sendMessage(STKPeer* peer, const NetworkString& message,
                            bool reliable)
 {
-    ProtocolManager::getInstance()->sendMessage(this, peer, message, reliable);
+    ProtocolManager::getInstance()->sendMessage(this, peer, message, reliable,
+                                                /*synchronous*/false);
 }   // sendMessage
+
+// ----------------------------------------------------------------------------
+void Protocol::sendSynchronousMessage(STKPeer* peer,
+                                      const NetworkString& message,
+                                      bool reliable)
+{
+    ProtocolManager::getInstance()->sendMessage(this, peer, message, reliable,
+                                                /*synchronous*/true);
+}   // sendSynchronousMessage

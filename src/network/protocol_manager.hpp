@@ -95,7 +95,10 @@ struct EventProcessingInfo
      *  sent to. */
     std::vector<unsigned int> m_protocols_ids;
 
-} EventProcessingInfo;
+    /** Indicates if this received message must be handled synchronously or
+     *  asynchronously. */
+    bool m_is_synchronous;
+};   // EventProcessingInfo
 
 // ============================================================================
 /** \class ProtocolManager
@@ -120,10 +123,12 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         virtual void propagateEvent(Event* event);
         virtual void sendMessage(Protocol* sender,
                                  const NetworkString& message,
-                                 bool reliable = true);
+                                 bool reliable = true,
+                                 bool send_synchronously = false);
         virtual void sendMessage(Protocol* sender, STKPeer* peer,
                                  const NetworkString& message,
-                                 bool reliable = true);
+                                 bool reliable = true,
+                                 bool send_synchronously = false);
         virtual void sendMessageExcept(Protocol* sender, STKPeer* peer,
                                        const NetworkString& message,
                                        bool reliable = true);
