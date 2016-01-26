@@ -127,7 +127,8 @@ void expandTexSecondPass<GrassMat>(const GLMesh &mesh,
 /** Give acces textures for second rendering pass in shaders 
  * without first binding them in order to reduce driver overhead.
  * (require GL_ARB_bindless_texture extension) 
- *  \param handles The handles to textures
+ *  \param handles The handles to textures which have been drawn 
+ *                 during previous rendering passes.
  */ 
 template<typename T>
 void expandHandlesSecondPass(const std::vector<uint64_t> &handles)

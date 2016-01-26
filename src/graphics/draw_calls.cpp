@@ -39,8 +39,7 @@ namespace
     }
 } //namespace
 
-
-
+// ----------------------------------------------------------------------------
 void DrawCalls::clearLists()
 {
     ListBlendTransparent::getInstance()->clear();
@@ -63,7 +62,7 @@ void DrawCalls::clearLists()
     m_particles_list.clear();
 }
 
-
+// ----------------------------------------------------------------------------
 void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                             std::vector<scene::ISceneNode *> *ImmediateDraw,
                             const scene::ICameraSceneNode *cam,
@@ -233,7 +232,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
                     case Material::SHADERTYPE_VEGETATION:
-                        ListMatGrass::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, windDir);
+                        ListMatGrass::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
                         break;
                     }
                 }
@@ -287,7 +286,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         ListMatSplatting::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
                     case Material::SHADERTYPE_VEGETATION:
-                        ListMatGrass::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, windDir);
+                        ListMatGrass::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
                     }
                 }
             }
@@ -349,7 +348,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
                     case Material::SHADERTYPE_VEGETATION:
-                        ListMatGrass::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, windDir);
+                        ListMatGrass::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
                         break;
                     }
                 }
@@ -402,13 +401,19 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
     }
 }
 
-
+// ----------------------------------------------------------------------------
+ /** Prepare draw calls before scene rendering
+ * \param[out] solid_poly_count Total number of polygons in objects 
+ *                              that will be rendered in this frame
+ * \param[out] shadow_poly_count Total number of polygons for shadow
+ *                               (rendered this frame)
+ */ 
 void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
                                   scene::ICameraSceneNode *camnode,
                                   unsigned &solid_poly_count,
                                   unsigned &shadow_poly_count)
 {
-    windDir = getWindDir();
+    m_wind_dir = getWindDir();
     clearLists();
     
     for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
@@ -519,18 +524,21 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 }
 
+// ----------------------------------------------------------------------------
 void DrawCalls::renderImmediateDrawList() const
 {
     for(auto node: m_immediate_draw_list)
         node->render();
 }
 
+// ----------------------------------------------------------------------------
 void DrawCalls::renderBillboardList() const
 {
     for(auto billboard: m_billboard_list)
         billboard->render();
 }
 
+// ----------------------------------------------------------------------------
 void DrawCalls::renderParticlesList() const
 {
     for(auto particles: m_particles_list)
@@ -549,14 +557,14 @@ void DrawCalls::drawIndirectSolidFirstPass() const
     m_solid_cmd_buffer.drawIndirectFirstPass<AlphaRef>();
     m_solid_cmd_buffer.drawIndirectFirstPass<UnlitMat>();
     m_solid_cmd_buffer.drawIndirectFirstPass<SphereMap>();
-    m_solid_cmd_buffer.drawIndirectFirstPass<GrassMat>(windDir);
+    m_solid_cmd_buffer.drawIndirectFirstPass<GrassMat>(m_wind_dir);
     m_solid_cmd_buffer.drawIndirectFirstPass<DetailMat>();
     m_solid_cmd_buffer.drawIndirectFirstPass<NormalMat>();  
 }
 
 // ----------------------------------------------------------------------------
  /** Render the solid first pass (depth and normals)
- * Require OpenGL AZDO extensions
+ * Require OpenGL AZDO extensions. Faster than drawIndirectSolidFirstPass.
  */ 
 void DrawCalls::multidrawSolidFirstPass() const
 {
@@ -565,12 +573,18 @@ void DrawCalls::multidrawSolidFirstPass() const
     m_solid_cmd_buffer.multidrawFirstPass<AlphaRef>();
     m_solid_cmd_buffer.multidrawFirstPass<SphereMap>();
     m_solid_cmd_buffer.multidrawFirstPass<UnlitMat>();
-    m_solid_cmd_buffer.multidrawFirstPass<GrassMat>(windDir);
+    m_solid_cmd_buffer.multidrawFirstPass<GrassMat>(m_wind_dir);
     m_solid_cmd_buffer.multidrawFirstPass<NormalMat>();
     m_solid_cmd_buffer.multidrawFirstPass<DetailMat>();  
 }
 
 // ----------------------------------------------------------------------------
+ /** Render the solid second pass (apply lighting on materials)
+ * Require at least OpenGL 4.0
+ * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+ * \param prefilled_tex The textures which have been drawn 
+ *                      during previous rendering passes.
+ */ 
 void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled_tex) const
 {
     m_solid_cmd_buffer.bind();
@@ -578,12 +592,17 @@ void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled
     m_solid_cmd_buffer.drawIndirectSecondPass<AlphaRef>(prefilled_tex);
     m_solid_cmd_buffer.drawIndirectSecondPass<UnlitMat>(prefilled_tex);
     m_solid_cmd_buffer.drawIndirectSecondPass<SphereMap>(prefilled_tex);
-    m_solid_cmd_buffer.drawIndirectSecondPass<GrassMat>(prefilled_tex, windDir);
+    m_solid_cmd_buffer.drawIndirectSecondPass<GrassMat>(prefilled_tex, m_wind_dir);
     m_solid_cmd_buffer.drawIndirectSecondPass<DetailMat>(prefilled_tex);
     m_solid_cmd_buffer.drawIndirectSecondPass<NormalMat>(prefilled_tex);
 }
 
 // ----------------------------------------------------------------------------
+ /** Render the solid second pass (apply lighting on materials)
+ * Require OpenGL AZDO extensions. Faster than drawIndirectSolidSecondPass.
+ * \param handles The handles to textures which have been drawn 
+ *                during previous rendering passes.
+ */
 void DrawCalls::multidrawSolidSecondPass(const std::vector<uint64_t> &handles) const
 {
     m_solid_cmd_buffer.bind();
@@ -593,10 +612,14 @@ void DrawCalls::multidrawSolidSecondPass(const std::vector<uint64_t> &handles) c
     m_solid_cmd_buffer.multidraw2ndPass<UnlitMat>(handles);
     m_solid_cmd_buffer.multidraw2ndPass<NormalMat>(handles);
     m_solid_cmd_buffer.multidraw2ndPass<DetailMat>(handles);
-    m_solid_cmd_buffer.multidraw2ndPass<GrassMat>(handles, windDir);
+    m_solid_cmd_buffer.multidraw2ndPass<GrassMat>(handles, m_wind_dir);
 }
 
 // ----------------------------------------------------------------------------
+ /** Render normals (for debug)
+ * Require at least OpenGL 4.0
+ * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+ */ 
 void DrawCalls::drawIndirectNormals() const
 {
     m_solid_cmd_buffer.bind();
@@ -609,6 +632,9 @@ void DrawCalls::drawIndirectNormals() const
 }
 
 // ----------------------------------------------------------------------------
+ /** Render normals (for debug)
+ * Require OpenGL AZDO extensions. Faster than drawIndirectNormals.
+ */ 
 void DrawCalls::multidrawNormals() const
 {
     m_solid_cmd_buffer.bind();
@@ -621,6 +647,11 @@ void DrawCalls::multidrawNormals() const
 }
 
 // ----------------------------------------------------------------------------
+ /** Render shadow map
+ * Require at least OpenGL 4.0
+ * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+ * \param cascade The id of the cascading shadow map.
+ */
 void DrawCalls::drawIndirectShadows(unsigned cascade) const
 {
     m_shadow_cmd_buffer.bind();
@@ -628,12 +659,17 @@ void DrawCalls::drawIndirectShadows(unsigned cascade) const
     m_shadow_cmd_buffer.drawIndirect<DetailMat>(cascade);
     m_shadow_cmd_buffer.drawIndirect<AlphaRef>(cascade);
     m_shadow_cmd_buffer.drawIndirect<UnlitMat>(cascade);
-    m_shadow_cmd_buffer.drawIndirect<GrassMat,irr::core::vector3df>(windDir, cascade);
+    m_shadow_cmd_buffer.drawIndirect<GrassMat,irr::core::vector3df>(m_wind_dir, cascade);
     m_shadow_cmd_buffer.drawIndirect<NormalMat>(cascade);
     m_shadow_cmd_buffer.drawIndirect<SplattingMat>(cascade);
     m_shadow_cmd_buffer.drawIndirect<SphereMap>(cascade);
 }
 
+// ----------------------------------------------------------------------------
+ /** Render shadow map
+ * Require OpenGL AZDO extensions. Faster than drawIndirectShadows.
+ * \param cascade The id of the cascading shadow map.
+ */
 void DrawCalls::multidrawShadows(unsigned cascade) const
 {
     m_shadow_cmd_buffer.bind();
@@ -642,12 +678,17 @@ void DrawCalls::multidrawShadows(unsigned cascade) const
     m_shadow_cmd_buffer.multidrawShadow<NormalMat>(cascade);
     m_shadow_cmd_buffer.multidrawShadow<AlphaRef>(cascade);
     m_shadow_cmd_buffer.multidrawShadow<UnlitMat>(cascade);
-    m_shadow_cmd_buffer.multidrawShadow<GrassMat,irr::core::vector3df>(windDir, cascade); 
+    m_shadow_cmd_buffer.multidrawShadow<GrassMat,irr::core::vector3df>(m_wind_dir, cascade); 
     m_shadow_cmd_buffer.multidrawShadow<SplattingMat>(cascade);
     m_shadow_cmd_buffer.multidrawShadow<SphereMap>(cascade);
 }
 
 // ----------------------------------------------------------------------------
+ /** Render reflective shadow map (need to be called only once per track)
+ * Require at least OpenGL 4.0
+ * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+ * \param rsm_matrix The reflective shadow map matrix
+ */
 void DrawCalls::drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const
 {
     m_reflective_shadow_map_cmd_buffer.bind();
@@ -659,6 +700,10 @@ void DrawCalls::drawIndirectReflectiveShadowMaps(const core::matrix4 &rsm_matrix
 }
 
 // ----------------------------------------------------------------------------
+ /** Render reflective shadow map (need to be called only once per track)
+ * Require OpenGL AZDO extensions. Faster than drawIndirectReflectiveShadowMaps.
+ * \param rsm_matrix The reflective shadow map matrix
+ */
 void DrawCalls::multidrawReflectiveShadowMaps(const core::matrix4 &rsm_matrix) const
 {
     m_reflective_shadow_map_cmd_buffer.bind();
@@ -670,6 +715,10 @@ void DrawCalls::multidrawReflectiveShadowMaps(const core::matrix4 &rsm_matrix) c
 }
 
 // ----------------------------------------------------------------------------
+ /** Render glowing objects.
+ * Require at least OpenGL 4.0
+ * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+ */
 void DrawCalls::drawIndirectGlow() const
 {
     m_glow_cmd_buffer.bind();
@@ -677,6 +726,9 @@ void DrawCalls::drawIndirectGlow() const
 }
 
 // ----------------------------------------------------------------------------
+ /** Render glowing objects.
+ * Require OpenGL AZDO extensions. Faster than drawIndirectGlow.
+ */
 void DrawCalls::multidrawGlow() const
 {
     m_glow_cmd_buffer.bind();

@@ -31,7 +31,6 @@ class AbstractGeometryPasses
 {
 protected:
 
-    irr::core::vector3df m_wind_dir; //TODO
     irr::video::ITexture *m_displace_tex;
 
     std::vector<GLuint>   m_prefilled_textures;    

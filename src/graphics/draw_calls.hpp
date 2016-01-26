@@ -32,25 +32,25 @@
 class DrawCalls
 {  
 private:
+    std::vector <STKMeshCommon *>         m_deferred_update;
+    irr::core::vector3df                  m_wind_dir;
     GLsync                                m_sync = 0;
     
     std::vector<irr::scene::ISceneNode *> m_immediate_draw_list;
     std::vector<STKBillboard *>           m_billboard_list;
     std::vector<ParticleSystemProxy *>    m_particles_list;
-    
+            
+    /** meshes to draw */
+    MeshMap m_solid_pass_mesh            [    Material::SHADERTYPE_COUNT];
+    MeshMap m_shadow_pass_mesh           [4 * Material::SHADERTYPE_COUNT];
+    MeshMap m_reflective_shadow_map_mesh [    Material::SHADERTYPE_COUNT];
+    MeshMap m_glow_pass_mesh;
+
+    /** meshes data in VRAM */
     SolidCommandBuffer                    m_solid_cmd_buffer;
     ShadowCommandBuffer                   m_shadow_cmd_buffer;
     ReflectiveShadowMapCommandBuffer      m_reflective_shadow_map_cmd_buffer;
     GlowCommandBuffer                     m_glow_cmd_buffer;
-        
-    irr::core::vector3df windDir; //TODO: same member in geometry_passes
-    
-    MeshMap m_solid_pass_mesh           [Material::SHADERTYPE_COUNT]    ;
-    MeshMap m_shadow_pass_mesh          [4 * Material::SHADERTYPE_COUNT] ;
-    MeshMap m_reflective_shadow_map_mesh[Material::SHADERTYPE_COUNT]    ;
-    MeshMap m_glow_pass_mesh;
-    std::vector <STKMeshCommon *> m_deferred_update;
-    
     
     void clearLists();
 
