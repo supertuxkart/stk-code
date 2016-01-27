@@ -106,6 +106,9 @@ public:
         assert(false);
         return core::stringw(""); 
     }   // getName
+    // ------------------------------------------------------------------------
+    /** Returns the kart controlled by this controller. */
+    AbstractKart *getKart() const { return m_kart; }
 };   // Controller
 
 #endif
