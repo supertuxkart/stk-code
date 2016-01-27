@@ -41,7 +41,7 @@
 #endif
 
 // ----------------------------------------------------------------------------
-/** Connects to a server. This is the quick connect constructor, which 
+/** Connects to a server. This is the quick connect constructor, which
  *  will pick a server randomly.
  */
 ConnectToServer::ConnectToServer() : Protocol(PROTOCOL_CONNECTION)
@@ -69,7 +69,7 @@ ConnectToServer::ConnectToServer(uint32_t server_id, uint32_t host_id)
 }   // ConnectToServer(server, host)
 
 // ----------------------------------------------------------------------------
-/** Destructor. 
+/** Destructor.
  */
 ConnectToServer::~ConnectToServer()
 {
@@ -109,7 +109,7 @@ void ConnectToServer::asynchronousUpdate()
             // instance to STKHost.
             m_current_protocol = new GetPublicAddress(this);
             m_current_protocol->requestStart();
-            // This protocol will be unpaused in the callback from 
+            // This protocol will be unpaused in the callback from
             // GetPublicAddress
             ProtocolManager::getInstance()->pauseProtocol(this);
             m_state = GETTING_SELF_ADDRESS;
@@ -172,7 +172,7 @@ void ConnectToServer::asynchronousUpdate()
                 Log::info("ConnectToServer", "Connection request made");
                 if (m_server_address.getIP() == 0 ||
                     m_server_address.getPort() == 0  )
-                { 
+                {
                     // server data not correct, hide address and stop
                     m_state = HIDING_ADDRESS;
                     Log::error("ConnectToServer", "Server address is %s",
@@ -181,7 +181,7 @@ void ConnectToServer::asynchronousUpdate()
                     m_current_protocol->requestStart();
                     return;
                 }
-                if (m_server_address.getIP() 
+                if (m_server_address.getIP()
                       == NetworkConfig::get()->getMyAddress().getIP())
                 {
                     // We're in the same lan (same public ip address).
@@ -300,7 +300,7 @@ void ConnectToServer::registerWithSTKServer()
               addr.toString().c_str());
 
     // This can be done blocking: till we are registered with the
-    // stk server, there is no need to to react to any other 
+    // stk server, there is no need to to react to any other
     // network requests
     request->executeNow();
 
@@ -341,7 +341,7 @@ void ConnectToServer::handleQuickConnect()
 
         uint16_t port;
         // If we are using a LAN connection, we need the private (local) port
-        if (m_server_address.getIP() == 
+        if (m_server_address.getIP() ==
             NetworkConfig::get()->getMyAddress().getIP())
         {
             result->get("private_port", &port);
@@ -365,7 +365,7 @@ void ConnectToServer::handleQuickConnect()
  */
 void ConnectToServer::handleSameLAN()
 {
-    // just send a broadcast packet, the client will know our 
+    // just send a broadcast packet, the client will know our
     // ip address and will connect
     STKHost* host = STKHost::get();
     host->stopListening(); // stop the listening
@@ -376,7 +376,7 @@ void ConnectToServer::handleSameLAN()
     // get the sender
     const int LEN=256;
     char buffer[LEN];
-    int len = host->receiveRawPacket(buffer, LEN, &sender, 2000);
+    //int len = host->receiveRawPacket(buffer, LEN, &sender, 2000);
 
     host->startListening(); // start listening again
     const char data[] = "aloha_stk\0";
@@ -385,7 +385,7 @@ void ConnectToServer::handleSameLAN()
         Log::info("ConnectToServer", "LAN Server found : %s",
                    sender.toString().c_str());
 #ifndef WIN32
-        // just check if the ip is ours : if so, 
+        // just check if the ip is ours : if so,
         // then just use localhost (127.0.0.1)
         struct ifaddrs *ifap, *ifa;
         struct sockaddr_in *sa;
@@ -451,7 +451,7 @@ bool ConnectToServer::notifyEventAsynchronous(Event* event)
         Log::info("ConnectToServer", "The Connect To Server protocol has "
             "received an event notifying that he's connected to the peer.");
         m_state = CONNECTED; // we received a message, we are connected
-        Server *server = ServersManager::get()->getJoinedServer();
+        //Server *server = ServersManager::get()->getJoinedServer();
     }
     return true;
 }   // notifyEventAsynchronous
