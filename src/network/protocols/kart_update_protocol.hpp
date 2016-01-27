@@ -12,24 +12,24 @@ class AbstractKart;
 
 class KartUpdateProtocol : public Protocol
 {
-    public:
-        KartUpdateProtocol();
-        virtual ~KartUpdateProtocol();
+protected:
+    std::vector<AbstractKart*> m_karts;
+    uint32_t m_self_kart_index;
 
-        virtual bool notifyEventAsynchronous(Event* event);
-        virtual void setup();
-        virtual void update();
-        virtual void asynchronousUpdate() {};
+    std::list<Vec3> m_next_positions;
+    std::list<btQuaternion> m_next_quaternions;
+    std::list<uint32_t> m_karts_ids;
 
-    protected:
-        std::vector<AbstractKart*> m_karts;
-        uint32_t m_self_kart_index;
+    pthread_mutex_t m_positions_updates_mutex;
+public:
+             KartUpdateProtocol();
+    virtual ~KartUpdateProtocol();
 
-        std::list<Vec3> m_next_positions;
-        std::list<btQuaternion> m_next_quaternions;
-        std::list<uint32_t> m_karts_ids;
+    virtual bool notifyEventAsynchronous(Event* event);
+    virtual void setup();
+    virtual void update();
+    virtual void asynchronousUpdate() {};
 
-        pthread_mutex_t m_positions_updates_mutex;
-};
+};   // KartUpdateProtocol
 
 #endif // KART_UPDATE_PROTOCOL_HPP

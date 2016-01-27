@@ -26,12 +26,14 @@ KartUpdateProtocol::KartUpdateProtocol() : Protocol(PROTOCOL_KART_UPDATE)
         }
     }
     pthread_mutex_init(&m_positions_updates_mutex, NULL);
-}
+}   // KartUpdateProtocol
 
+// ----------------------------------------------------------------------------
 KartUpdateProtocol::~KartUpdateProtocol()
 {
-}
+}   // ~KartUpdateProtocol
 
+// ----------------------------------------------------------------------------
 bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
@@ -64,12 +66,14 @@ bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
         ns.removeFront(32);
     }
     return true;
-}
+}   // notifyEventAsynchronous
 
+// ----------------------------------------------------------------------------
 void KartUpdateProtocol::setup()
 {
-}
+}   // setup
 
+// ----------------------------------------------------------------------------
 void KartUpdateProtocol::update()
 {
     if (!World::getWorld())
@@ -86,30 +90,30 @@ void KartUpdateProtocol::update()
             for (unsigned int i = 0; i < m_karts.size(); i++)
             {
                 AbstractKart* kart = m_karts[i];
-                Vec3 v = kart->getXYZ();
+                Vec3 xyz = kart->getXYZ();
                 btQuaternion quat = kart->getRotation();
                 ns.ai32( kart->getWorldKartId());
-                ns.af(v[0]).af(v[1]).af(v[2]); // add position
+                ns.af(xyz[0]).af(xyz[1]).af(xyz[2]); // add position
                 ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
                 Log::verbose("KartUpdateProtocol",
                              "Sending %d's positions %f %f %f",
-                             kart->getWorldKartId(), v[0], v[1], v[2]);
+                             kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
             }
             sendMessage(ns, false);
         }
         else
         {
             AbstractKart* kart = m_karts[m_self_kart_index];
-            Vec3 v = kart->getXYZ();
+            Vec3 xyz = kart->getXYZ();
             btQuaternion quat = kart->getRotation();
             NetworkString ns(36);
             ns.af( World::getWorld()->getTime());
             ns.ai32( kart->getWorldKartId());
-            ns.af(v[0]).af(v[1]).af(v[2]); // add position
+            ns.af(xyz[0]).af(xyz[1]).af(xyz[2]); // add position
             ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
             Log::verbose("KartUpdateProtocol",
                          "Sending %d's positions %f %f %f",
-                         kart->getWorldKartId(), v[0], v[1], v[2]);
+                         kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
             sendMessage(ns, false);
         }
     }
@@ -139,8 +143,5 @@ void KartUpdateProtocol::update()
         default:
             break;
     }
-}
-
-
-
+}   // update
 
