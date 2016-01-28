@@ -30,6 +30,13 @@ SynchronizationProtocol::~SynchronizationProtocol()
 }   // ~SynchronizationProtocol
 
 //-----------------------------------------------------------------------------
+void SynchronizationProtocol::setup()
+{
+    Log::info("SynchronizationProtocol", "Ready !");
+    m_countdown = 5.0; // init the countdown to 5s
+    m_has_quit = false;
+}   // setup
+ //-----------------------------------------------------------------------------
 
 bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 {
@@ -118,15 +125,6 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
     }
     return true;
 }   // notifyEventAsynchronous
-
-//-----------------------------------------------------------------------------
-
-void SynchronizationProtocol::setup()
-{
-    Log::info("SynchronizationProtocol", "Ready !");
-    m_countdown = 5.0; // init the countdown to 5s
-    m_has_quit = false;
-}   // setup
 
 //-----------------------------------------------------------------------------
 

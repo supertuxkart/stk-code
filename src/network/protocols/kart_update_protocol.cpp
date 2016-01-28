@@ -27,6 +27,11 @@ KartUpdateProtocol::~KartUpdateProtocol()
 }   // ~KartUpdateProtocol
 
 // ----------------------------------------------------------------------------
+void KartUpdateProtocol::setup()
+{
+}   // setup
+
+// ----------------------------------------------------------------------------
 bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
@@ -54,11 +59,6 @@ bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
     }   // while ns.size()>29
     return true;
 }   // notifyEventAsynchronous
-
-// ----------------------------------------------------------------------------
-void KartUpdateProtocol::setup()
-{
-}   // setup
 
 // ----------------------------------------------------------------------------
 void KartUpdateProtocol::update()
