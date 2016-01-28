@@ -42,18 +42,12 @@ bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
     {
         uint8_t kart_id = ns.getUInt8(0);
 
-        float a,b,c;
-        a = ns.getFloat(1);
-        b = ns.getFloat(5);
-        c = ns.getFloat(9);
-        float d,e,f,g;
-        d = ns.getFloat(13);
-        e = ns.getFloat(17);
-        f = ns.getFloat(21);
-        g = ns.getFloat(25);
+        Vec3 xyz;
+        btQuaternion quat;
+        ns.get(&xyz, 1).get(&quat, 13);
         pthread_mutex_trylock(&m_positions_updates_mutex);
-        m_next_positions.push_back(Vec3(a,b,c));
-        m_next_quaternions.push_back(btQuaternion(d,e,f,g));
+        m_next_positions.push_back(xyz);
+        m_next_quaternions.push_back(quat);
         m_karts_ids.push_back(kart_id);
         pthread_mutex_unlock(&m_positions_updates_mutex);
         ns.removeFront(29);
@@ -85,10 +79,8 @@ void KartUpdateProtocol::update()
             {
                 AbstractKart* kart = world->getKart(i);
                 Vec3 xyz = kart->getXYZ();
-                btQuaternion quat = kart->getRotation();
                 ns.addUInt8( kart->getWorldKartId());
-                ns.af(xyz[0]).af(xyz[1]).af(xyz[2]); // add position
-                ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
+                ns.add(xyz).add(kart->getRotation());
                 Log::verbose("KartUpdateProtocol",
                              "Sending %d's positions %f %f %f",
                              kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
@@ -103,10 +95,8 @@ void KartUpdateProtocol::update()
             {
                 AbstractKart *kart = World::getWorld()->getLocalPlayerKart(i);
                 const Vec3 &xyz = kart->getXYZ();
-                btQuaternion quat = kart->getRotation();
                 ns.addUInt8(kart->getWorldKartId());
-                ns.af(xyz[0]).af(xyz[1]).af(xyz[2]); // add position
-                ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
+                ns.add(xyz).add(kart->getRotation());
                 Log::verbose("KartUpdateProtocol",
                              "Sending %d's positions %f %f %f",
                               kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
