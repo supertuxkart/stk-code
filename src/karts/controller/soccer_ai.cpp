@@ -99,6 +99,7 @@ void SoccerAI::update(float dt)
     m_saving_ball = false;
     if (World::getWorld()->getPhase() == World::GOAL_PHASE)
     {
+        m_controls->m_brake = false;
         m_controls->m_accel = 0.0f;
         AIBaseController::update(dt);
         return;
