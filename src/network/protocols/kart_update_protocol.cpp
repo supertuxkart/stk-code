@@ -1,6 +1,7 @@
 #include "network/protocols/kart_update_protocol.hpp"
 
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
@@ -10,20 +11,12 @@
 
 KartUpdateProtocol::KartUpdateProtocol() : Protocol(PROTOCOL_KART_UPDATE)
 {
-    m_karts = World::getWorld()->getKarts();
-    for (unsigned int i = 0; i < m_karts.size(); i++)
+    World *world = World::getWorld();
+    for (unsigned int i = 0; i < world->getNumKarts(); i++)
     {
-        //if (m_karts[i]->getWorldKartId())
-        {
-            Log::info("KartUpdateProtocol", "Kart %d has id %d and name %s",
-                      i, m_karts[i]->getWorldKartId(),
-                      m_karts[i]->getIdent().c_str());
-        }
-        if (m_karts[i]->getIdent() == NetworkWorld::getInstance()->getSelfKart())
-        {
-            Log::info("KartUpdateProtocol", "My id is %d", i);
-            m_self_kart_index = i;
-        }
+        Log::info("KartUpdateProtocol", "Kart %d has id %d and name %s",
+                  i, world->getKart(i)->getWorldKartId(),
+                  world->getKart(i)->getIdent().c_str());
     }
     pthread_mutex_init(&m_positions_updates_mutex, NULL);
 }   // KartUpdateProtocol
@@ -39,32 +32,32 @@ bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
     NetworkString &ns = event->data();
-    if (ns.size() < 36)
+    if (ns.size() < 29)
     {
         Log::info("KartUpdateProtocol", "Message too short.");
         return true;
     }
     ns.removeFront(4);
-    while(ns.size() >= 16)
+    while(ns.size() >= 29)
     {
-        uint32_t kart_id = ns.getUInt32(0);
+        uint8_t kart_id = ns.getUInt8(0);
 
         float a,b,c;
-        a = ns.getFloat(4);
-        b = ns.getFloat(8);
-        c = ns.getFloat(12);
+        a = ns.getFloat(1);
+        b = ns.getFloat(5);
+        c = ns.getFloat(9);
         float d,e,f,g;
-        d = ns.getFloat(16);
-        e = ns.getFloat(20);
-        f = ns.getFloat(24);
-        g = ns.getFloat(28);
+        d = ns.getFloat(13);
+        e = ns.getFloat(17);
+        f = ns.getFloat(21);
+        g = ns.getFloat(25);
         pthread_mutex_trylock(&m_positions_updates_mutex);
         m_next_positions.push_back(Vec3(a,b,c));
         m_next_quaternions.push_back(btQuaternion(d,e,f,g));
         m_karts_ids.push_back(kart_id);
         pthread_mutex_unlock(&m_positions_updates_mutex);
-        ns.removeFront(32);
-    }
+        ns.removeFront(29);
+    }   // while ns.size()>29
     return true;
 }   // notifyEventAsynchronous
 
@@ -85,14 +78,15 @@ void KartUpdateProtocol::update()
         time = current_time;
         if (NetworkConfig::get()->isServer())
         {
-            NetworkString ns(4+m_karts.size()*32);
-            ns.af( World::getWorld()->getTime());
-            for (unsigned int i = 0; i < m_karts.size(); i++)
+            World *world = World::getWorld();
+            NetworkString ns(4+world->getNumKarts()*29);
+            ns.af( world->getTime() );
+            for (unsigned int i = 0; i < world->getNumKarts(); i++)
             {
-                AbstractKart* kart = m_karts[i];
+                AbstractKart* kart = world->getKart(i);
                 Vec3 xyz = kart->getXYZ();
                 btQuaternion quat = kart->getRotation();
-                ns.ai32( kart->getWorldKartId());
+                ns.addUInt8( kart->getWorldKartId());
                 ns.af(xyz[0]).af(xyz[1]).af(xyz[2]); // add position
                 ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
                 Log::verbose("KartUpdateProtocol",
@@ -103,36 +97,46 @@ void KartUpdateProtocol::update()
         }
         else
         {
-            AbstractKart* kart = m_karts[m_self_kart_index];
-            Vec3 xyz = kart->getXYZ();
-            btQuaternion quat = kart->getRotation();
-            NetworkString ns(36);
-            ns.af( World::getWorld()->getTime());
-            ns.ai32( kart->getWorldKartId());
-            ns.af(xyz[0]).af(xyz[1]).af(xyz[2]); // add position
-            ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
-            Log::verbose("KartUpdateProtocol",
-                         "Sending %d's positions %f %f %f",
-                         kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
+            NetworkString ns(4+29*race_manager->getNumLocalPlayers());
+            ns.af(World::getWorld()->getTime());
+            for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
+            {
+                AbstractKart *kart = World::getWorld()->getLocalPlayerKart(i);
+                const Vec3 &xyz = kart->getXYZ();
+                btQuaternion quat = kart->getRotation();
+                ns.addUInt8(kart->getWorldKartId());
+                ns.af(xyz[0]).af(xyz[1]).af(xyz[2]); // add position
+                ns.af(quat.x()).af(quat.y()).af(quat.z()).af(quat.w()); // add rotation
+                Log::verbose("KartUpdateProtocol",
+                             "Sending %d's positions %f %f %f",
+                              kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
+            }
             sendMessage(ns, false);
-        }
-    }
+        }   // if server
+    }   // if (current_time > time + 0.1)
+
     switch(pthread_mutex_trylock(&m_positions_updates_mutex))
     {
         case 0: /* if we got the lock */
             while (!m_next_positions.empty())
             {
                 uint32_t id = m_karts_ids.back();
-                // server takes all updates
-                if (id != m_self_kart_index || NetworkConfig::get()->isServer())
+                AbstractKart *kart = World::getWorld()->getKart(id);
+                if(!kart->getController()->isLocalPlayerController())
                 {
                     Vec3 pos = m_next_positions.back();
-                    btTransform transform = m_karts[id]->getBody()->getInterpolationWorldTransform();
+                    btTransform transform = kart->getBody()
+                                          ->getInterpolationWorldTransform();
                     transform.setOrigin(pos);
                     transform.setRotation(m_next_quaternions.back());
-                    m_karts[id]->getBody()->setCenterOfMassTransform(transform);
-                    //m_karts[id]->getBody()->setLinearVelocity(Vec3(0,0,0));
-                    Log::verbose("KartUpdateProtocol", "Update kart %i pos to %f %f %f", id, pos[0], pos[1], pos[2]);
+                    kart->getBody()->setCenterOfMassTransform(transform);
+                    Log::verbose("KartUpdateProtocol",
+                                 "Update kart %i pos to %f %f %f",
+                                 id, pos[0], pos[1], pos[2]);
+                }
+                else
+                {
+                    // We should use smoothing here!
                 }
                 m_next_positions.pop_back();
                 m_next_quaternions.pop_back();

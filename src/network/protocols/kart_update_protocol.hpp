@@ -12,10 +12,8 @@ class AbstractKart;
 
 class KartUpdateProtocol : public Protocol
 {
-protected:
-    std::vector<AbstractKart*> m_karts;
-    uint32_t m_self_kart_index;
-
+private:
+   
     std::list<Vec3> m_next_positions;
     std::list<btQuaternion> m_next_quaternions;
     std::list<uint32_t> m_karts_ids;
