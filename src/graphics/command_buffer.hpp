@@ -454,10 +454,10 @@ public:
      *  \param cascade The cascade id (see cascading shadow maps)
      */    
     template<typename T, typename...Uniforms>
-    void drawIndirect(Uniforms ...uniforms, unsigned cascade) const
+    void drawIndirect(unsigned cascade, Uniforms ...uniforms) const
     {
         T::InstancedShadowPassShader::getInstance()->use();
-        T::InstancedShadowPassShader::getInstance()->setUniforms(uniforms..., cascade);
+        T::InstancedShadowPassShader::getInstance()->setUniforms(cascade, uniforms...);
         
         glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                     InstanceTypeShadow));
@@ -487,14 +487,14 @@ public:
      *  \param cascade The cascade id (see cascading shadow maps)
      */ 
     template<typename T, typename...Uniforms>
-    void multidrawShadow(Uniforms ...uniforms, unsigned cascade) const
+    void multidrawShadow(unsigned cascade, Uniforms ...uniforms) const
     {
         int material_id = T::MaterialType + cascade * Material::SHADERTYPE_COUNT;
                             
         if (m_size[material_id])
         {
             T::InstancedShadowPassShader::getInstance()->use();
-            T::InstancedShadowPassShader::getInstance()->setUniforms(uniforms..., cascade);
+            T::InstancedShadowPassShader::getInstance()->setUniforms(cascade, uniforms...);
             
             glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                         InstanceTypeShadow));

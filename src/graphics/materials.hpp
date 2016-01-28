@@ -522,7 +522,7 @@ public:
 
 // ============================================================================
 class InstancedGrassShadowShader : public TextureShader<InstancedGrassShadowShader, 1, 
-                                                 core::vector3df, int>
+                                                 int, core::vector3df>
 {
 public:
     InstancedGrassShadowShader()
@@ -545,7 +545,7 @@ public:
         }
 
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-        assignUniforms("windDir", "layer");
+        assignUniforms("layer", "windDir");
     }   // InstancedGrassShadowShader
 };   // InstancedGrassShadowShader
 

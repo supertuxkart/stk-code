@@ -659,7 +659,7 @@ void DrawCalls::drawIndirectShadows(unsigned cascade) const
     m_shadow_cmd_buffer.drawIndirect<DetailMat>(cascade);
     m_shadow_cmd_buffer.drawIndirect<AlphaRef>(cascade);
     m_shadow_cmd_buffer.drawIndirect<UnlitMat>(cascade);
-    m_shadow_cmd_buffer.drawIndirect<GrassMat,irr::core::vector3df>(m_wind_dir, cascade);
+    m_shadow_cmd_buffer.drawIndirect<GrassMat,irr::core::vector3df>(cascade, m_wind_dir);
     m_shadow_cmd_buffer.drawIndirect<NormalMat>(cascade);
     m_shadow_cmd_buffer.drawIndirect<SplattingMat>(cascade);
     m_shadow_cmd_buffer.drawIndirect<SphereMap>(cascade);
@@ -678,7 +678,7 @@ void DrawCalls::multidrawShadows(unsigned cascade) const
     m_shadow_cmd_buffer.multidrawShadow<NormalMat>(cascade);
     m_shadow_cmd_buffer.multidrawShadow<AlphaRef>(cascade);
     m_shadow_cmd_buffer.multidrawShadow<UnlitMat>(cascade);
-    m_shadow_cmd_buffer.multidrawShadow<GrassMat,irr::core::vector3df>(m_wind_dir, cascade); 
+    m_shadow_cmd_buffer.multidrawShadow<GrassMat,irr::core::vector3df>(cascade, m_wind_dir); 
     m_shadow_cmd_buffer.multidrawShadow<SplattingMat>(cascade);
     m_shadow_cmd_buffer.multidrawShadow<SphereMap>(cascade);
 }
