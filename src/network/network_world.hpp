@@ -39,7 +39,6 @@ class NetworkWorld : public AbstractSingleton<NetworkWorld>
 private:
     bool m_running;
     float m_race_time;
-    std::string m_self_kart;
 
     friend class AbstractSingleton<NetworkWorld>;
 
@@ -56,11 +55,6 @@ public:
     void collectedItem(Item *item, AbstractKart *kart);
     void controllerAction(Controller* controller, PlayerAction action, 
                           int value);
-    // ------------------------------------------------------------------------
-    /** Sets the name of the kart of this player. */
-    void setSelfKart(const std::string &name) { m_self_kart = name; }
-    // ------------------------------------------------------------------------
-    const std::string& getSelfKart() const { return m_self_kart; }
     // ------------------------------------------------------------------------
     /** Returns if this instance is in running state or not. */
     bool isRunning() { return m_running; }

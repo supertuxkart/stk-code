@@ -99,9 +99,6 @@ void StartGameProtocol::setup()
         rki.setPerPlayerDifficulty(profile->getPerPlayerDifficulty());
         if(is_local)
         {
-            // Set the local player kart
-            if(local_player_id==0)
-                NetworkWorld::getInstance()->setSelfKart(profile->getKartName());
             rki.setLocalPlayerId(local_player_id);
             local_player_id++;
         }
