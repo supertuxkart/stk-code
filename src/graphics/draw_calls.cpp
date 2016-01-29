@@ -487,12 +487,8 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     int enableOpenMP = 0;
     
     if (CVS->supportsAsyncInstanceUpload())
-    {
         enableOpenMP = 1;
-    }
     
-    size_t SolidPoly = 0, ShadowPoly = 0, MiscPoly = 0;
-
     PROFILER_PUSH_CPU_MARKER("- Draw Command upload", 0xFF, 0x0, 0xFF);
 
 #pragma omp parallel sections if(enableOpenMP)
