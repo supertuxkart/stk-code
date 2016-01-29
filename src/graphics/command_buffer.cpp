@@ -85,13 +85,15 @@ void CommandBuffer<N>::clearMeshes()
 }
 
 template<int N>
-void CommandBuffer<N>::unmapBuffers()
+void CommandBuffer<N>::mapIndirectBuffer()
 {
-    if (!CVS->supportsAsyncInstanceUpload())
-    {
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-    }    
+    glBindBuffer(GL_DRAW_INDIRECT_BUFFER,
+        m_draw_indirect_cmd_id);
+        
+    m_draw_indirect_cmd = (DrawElementsIndirectCommand*)
+        glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0,
+                         10000 * sizeof(DrawElementsIndirectCommand),
+                         GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);    
 }
 
 template<int N>
@@ -132,6 +134,9 @@ void SolidCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
     
+    if(!CVS->supportsAsyncInstanceUpload())
+        mapIndirectBuffer();
+    
     std::vector<int> dual_tex_material_list =
         createVector<int>(Material::SHADERTYPE_SOLID,
                           Material::SHADERTYPE_ALPHA_TEST,
@@ -142,7 +147,7 @@ void SolidCommandBuffer::fill(MeshMap *mesh_map)
     fillInstanceData<InstanceDataDualTex>(mesh_map,
                                           dual_tex_material_list,
                                           InstanceTypeDualTex);
-                                           
+    
     std::vector<int> three_tex_material_list =
         createVector<int>(Material::SHADERTYPE_DETAIL_MAP,
                           Material::SHADERTYPE_NORMAL_MAP);
@@ -152,8 +157,8 @@ void SolidCommandBuffer::fill(MeshMap *mesh_map)
                                            InstanceTypeThreeTex);
         
     
-    unmapBuffers();
-    
+    if (!CVS->supportsAsyncInstanceUpload())
+        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 } //SolidCommandBuffer::fill
 
 
@@ -164,6 +169,9 @@ ShadowCommandBuffer::ShadowCommandBuffer(): CommandBuffer()
 void ShadowCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
+    
+    if(!CVS->supportsAsyncInstanceUpload())
+        mapIndirectBuffer();
     
     std::vector<int> shadow_tex_material_list;
     for(int cascade=0; cascade<4; cascade++)
@@ -188,7 +196,8 @@ void ShadowCommandBuffer::fill(MeshMap *mesh_map)
     
     fillInstanceData<InstanceDataSingleTex>(mesh_map, shadow_tex_material_list, InstanceTypeShadow);
     
-    unmapBuffers();
+    if (!CVS->supportsAsyncInstanceUpload())
+        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
     
 } //ShadowCommandBuffer::fill
 
@@ -201,6 +210,9 @@ void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
     
+    if(!CVS->supportsAsyncInstanceUpload())
+        mapIndirectBuffer();
+    
     std::vector<int> rsm_material_list =
         createVector<int>(Material::SHADERTYPE_SOLID,
                           Material::SHADERTYPE_ALPHA_TEST,
@@ -212,8 +224,9 @@ void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
                                             rsm_material_list,
                                             InstanceTypeRSM);
 
-    unmapBuffers();   
-    
+    if (!CVS->supportsAsyncInstanceUpload())
+        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
+        
 } //ReflectiveShadowMapCommandBuffer::fill
 
 GlowCommandBuffer::GlowCommandBuffer()
@@ -223,8 +236,14 @@ GlowCommandBuffer::GlowCommandBuffer()
 void GlowCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
+    
+    if(!CVS->supportsAsyncInstanceUpload())
+        mapIndirectBuffer();
+    
     fillInstanceData<GlowInstanceData>(mesh_map,
                                           createVector<int>(0),
                                           InstanceTypeGlow);
-    unmapBuffers();
+    if (!CVS->supportsAsyncInstanceUpload())
+        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
+    
 } //GlowCommandBuffer::fill

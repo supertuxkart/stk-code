@@ -164,7 +164,7 @@ protected:
     size_t m_command_buffer_offset;
 
     void clearMeshes();
-    void unmapBuffers();
+    void mapIndirectBuffer();
     
     // ------------------------------------------------------------------------
     /** Send in VRAM all meshes associated with same material
@@ -205,7 +205,7 @@ protected:
     void fillInstanceData(MeshMap *mesh_map,
                           const std::vector<int> &material_list,
                           InstanceType instance_type)
-    {
+    {        
         InstanceData *instance_buffer;
         
         if (CVS->supportsAsyncInstanceUpload())
@@ -221,14 +221,6 @@ protected:
                 glMapBufferRange(GL_ARRAY_BUFFER, 0,
                                  10000 * sizeof(InstanceDataDualTex),
                                  GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-            glBindBuffer(GL_DRAW_INDIRECT_BUFFER,
-                         m_draw_indirect_cmd_id);
-            
-            
-            m_draw_indirect_cmd = (DrawElementsIndirectCommand*)
-                glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0,
-                                 10000 * sizeof(DrawElementsIndirectCommand),
-                                 GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
         }
         
         for(int material_id: material_list)
@@ -237,6 +229,12 @@ protected:
                           mesh_map,
                           instance_buffer);
         }
+        
+        if (!CVS->supportsAsyncInstanceUpload())
+        {
+            glUnmapBuffer(GL_ARRAY_BUFFER);
+        }
+        
     }
     
 public:
