@@ -26,9 +26,9 @@
 #include <IMesh.h>
 #include <string>
 
-class PhysicalObject;
 class AbstractKart;
 class Controller;
+class TrackObject;
 
 /** An implementation of World, to provide the soccer game mode
  *  Notice: In soccer world, true goal means blue, false means red.
@@ -53,6 +53,9 @@ protected:
                              PerPlayerDifficulty difficulty);
 
 private:
+    /** Keep a pointer to the track object of soccer ball */
+    TrackObject* m_ball;
+
     /** Number of goals needed to win */
     int m_goal_target;
     bool m_count_down_reached_zero;
@@ -64,6 +67,7 @@ private:
 
     /** Timer for displaying goal text*/
     float m_goal_timer;
+    float m_ball_invalid_timer;
     int m_ball_hitter;
 
     /** Goals data of each team scored */
@@ -94,9 +98,11 @@ private:
     /** Function to update the locations of all karts on the polygon map */
     void updateKartNodes();
     /** Function to update the location the ball on the polygon map */
-    void updateBallPosition();
+    void updateBallPosition(float dt);
     /** Clean up */
     void resetAllNodes();
+    /** Reset the ball to original starting position. */
+    void resetBall();
     /** Function to update the AI which is the closest to its goal to defend. */
     void updateDefenders();
     /** Get number of teammates in a team, used by starting position assign. */

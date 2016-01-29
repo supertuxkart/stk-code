@@ -97,27 +97,30 @@ void SoccerWorld::reset()
     m_can_score_points = true;
     m_red_goal = 0;
     m_blue_goal = 0;
-
-    // Reset original positions for the soccer balls
-    TrackObjectManager* tom = getTrack()->getTrackObjectManager();
-    assert(tom);
     m_red_scorers.clear();
     m_red_score_times.clear();
     m_blue_scorers.clear();
     m_blue_score_times.clear();
     m_ball_hitter = -1;
+    m_ball = NULL;
     m_red_defender = -1;
     m_blue_defender = -1;
+    m_ball_invalid_timer = 0.0f;
+
+    TrackObjectManager* tom = getTrack()->getTrackObjectManager();
+    assert(tom);
     PtrVector<TrackObject>& objects = tom->getObjects();
-    for(unsigned int i=0; i<objects.size(); i++)
+    for (unsigned int i = 0; i < objects.size(); i++)
     {
         TrackObject* obj = objects.get(i);
         if(!obj->isSoccerBall())
             continue;
-
-        obj->reset();
-        obj->getPhysicalObject()->reset();
+        m_ball = obj;
+        // Handle one ball only
+        break;
     }
+    if (!m_ball)
+        Log::fatal("SoccerWorld","Ball is missing in soccer field, abort.");
 
     if (m_goal_sound != NULL &&
         m_goal_sound->getStatus() == SFXBase::SFX_PLAYING)
@@ -128,6 +131,7 @@ void SoccerWorld::reset()
     initKartList();
     resetAllNodes();
     initGoalNodes();
+    resetBall();
 
 }   // reset
 
@@ -150,7 +154,7 @@ void SoccerWorld::update(float dt)
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
 
-    updateBallPosition();
+    updateBallPosition(dt);
     if (m_track->hasNavMesh())
     {
         updateKartNodes();
@@ -240,21 +244,7 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         }
     }
 
-    // Reset original positions for the soccer balls
-    TrackObjectManager* tom = getTrack()->getTrackObjectManager();
-    assert(tom);
-
-    PtrVector<TrackObject>& objects = tom->getObjects();
-    for(unsigned int i=0; i<objects.size(); i++)
-    {
-        TrackObject* obj = objects.get(i);
-        if(!obj->isSoccerBall())
-            continue;
-
-        obj->reset();
-        obj->getPhysicalObject()->reset();
-    }
-
+    resetBall();
     //Resetting the ball triggers the goal check line one more time.
     //This ensures that only one goal is counted, and the second is ignored.
     m_can_score_points = !m_can_score_points;
@@ -460,29 +450,33 @@ void SoccerWorld::updateKartNodes()
 //-----------------------------------------------------------------------------
 /** Localize the ball on the navigation mesh.
  */
-void SoccerWorld::updateBallPosition()
+void SoccerWorld::updateBallPosition(float dt)
 {
     if (isRaceOver()) return;
 
-    TrackObjectManager* tom = getTrack()->getTrackObjectManager();
-    assert(tom);
-
-    PtrVector<TrackObject>& objects = tom->getObjects();
-    for (unsigned int i = 0; i < objects.size(); i++)
-    {
-        TrackObject* obj = objects.get(i);
-        if (obj->isSoccerBall())
-        {
-            m_ball_position = obj->getPresentation<TrackObjectPresentationMesh>()
-                              ->getNode()->getPosition();
-            break;
-        }
-    }
+    m_ball_position = m_ball->getPresentation<TrackObjectPresentationMesh>()
+        ->getNode()->getPosition();
 
     if (m_track->hasNavMesh())
     {
         m_ball_on_node  = BattleGraph::get()->pointToNode(m_ball_on_node,
                           m_ball_position, true/*ignore_vertical*/);
+
+        if (m_ball_on_node == BattleGraph::UNKNOWN_POLY &&
+            World::getWorld()->getPhase() == RACE_PHASE)
+        {
+            m_ball_invalid_timer += dt;
+            // Reset the ball and karts if out of navmesh after 2 seconds
+            if (m_ball_invalid_timer >= 2.0f)
+            {
+                m_ball_invalid_timer = 0.0f;
+                resetBall();
+                for (unsigned int i = 0; i < m_karts.size(); i++)
+                    moveKartAfterRescue(m_karts[i]);
+            }
+        }
+        else
+            m_ball_invalid_timer = 0.0f;
     }
 
 }   // updateBallPosition
@@ -639,3 +633,10 @@ unsigned int SoccerWorld::getRescuePositionIndex(AbstractKart *kart)
     Log::warn("SoccerWorld", "Unknown kart, using default starting position.");
     return 0;
 }   // getRescuePositionIndex
+
+//-----------------------------------------------------------------------------
+void SoccerWorld::resetBall()
+{
+    m_ball->reset();
+    m_ball->getPhysicalObject()->reset();
+}   // resetBall
