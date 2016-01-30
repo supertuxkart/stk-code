@@ -74,23 +74,24 @@ private:
      *that can be done, and end up setting their respective m_controls
      *variable.
      */
-    void         handleSteering(float dt);
-    void         handleRescue(const float DELTA);
+    void          handleSteering(float dt);
+    void          handleRescue(const float DELTA);
 
-    void         checkCrashes(const int STEPS, const Vec3& pos);
-    void         findNonCrashingPoint(Vec3 *result);
-    int          calcSteps();
+    void          checkCrashes(const int STEPS, const Vec3& pos);
+    void          findNonCrashingPoint(Vec3 *result);
+    int           calcSteps();
+    virtual bool  canSkid(float steer_fraction) { return false; }
 public:
-                 EndController(AbstractKart *kart,
-                               StateManager::ActivePlayer* player,
-                               Controller *prev_controller);
-                ~EndController();
-    virtual void update      (float delta) ;
-    virtual void reset       ();
+                  EndController(AbstractKart *kart,
+                                StateManager::ActivePlayer* player,
+                                Controller *prev_controller);
+                 ~EndController();
+    virtual void  update      (float delta) ;
+    virtual void  reset       ();
     /** Returns if the original controller of the kart was a player
      *  controller. This way e.g. highscores can still be assigned
      *  to the right player. */
-    virtual bool isPlayerController () const {return getPlayer()!=NULL;}
+    virtual bool  isPlayerController () const { return getPlayer() != NULL; }
     virtual void  action             (PlayerAction action, int value);
     virtual void  newLap             (int lap);
 

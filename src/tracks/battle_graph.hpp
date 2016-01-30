@@ -126,6 +126,10 @@ public:
                                                  { return m_items_on_graph; }
 
     void              findItemsOnGraphNodes();
+    // ----------------------------------------------------------------------
+    int               pointToNode(const int cur_node,
+                                  const Vec3& cur_point,
+                                  bool ignore_vertical) const;
 };    //BattleGraph
 
 #endif

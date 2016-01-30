@@ -71,7 +71,7 @@ private:
 
     PtrVector<TrackObject, REF> m_tires;
 
-    /** Function to udpate the locations of all karts on the polygon map */
+    /** Function to update the locations of all karts on the polygon map */
     void updateKartNodes();
 
 public:

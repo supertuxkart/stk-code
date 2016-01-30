@@ -52,7 +52,7 @@ const std::vector<Vec3>  NavPoly::getVertices()
 
 //-----------------------------------------------------------------------------
 
-bool NavPoly::pointInPoly(const Vec3& p) const
+bool NavPoly::pointInPoly(const Vec3& p, bool ignore_vertical) const
 {
     std::vector<Vec3> points;
     for(unsigned int i=0; i<m_vertices.size(); i++)
@@ -69,6 +69,8 @@ bool NavPoly::pointInPoly(const Vec3& p) const
                             points[(i+1)% points.size()]) * side < 0)
             return false;
     }
+
+    if (ignore_vertical) return true;
 
     // Check for vertical distance too
     const float dist = p.getY() - m_center.getY();

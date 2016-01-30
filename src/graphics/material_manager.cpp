@@ -65,10 +65,18 @@ MaterialManager::~MaterialManager()
 //-----------------------------------------------------------------------------
 
 Material* MaterialManager::getMaterialFor(video::ITexture* t,
-                                          scene::IMeshBuffer *mb)
+    scene::IMeshBuffer *mb)
+{
+    return getMaterialFor(t, mb->getMaterial().MaterialType);
+}
+
+//-----------------------------------------------------------------------------
+
+Material* MaterialManager::getMaterialFor(video::ITexture* t,
+    video::E_MATERIAL_TYPE material_type)
 {
     if (t == NULL)
-        return getDefaultMaterial(mb->getMaterial().MaterialType);
+        return getDefaultMaterial(material_type);
 
     core::stringc img_path = core::stringc(t->getName());
     const std::string image = StringUtils::getBasename(img_path.c_str());
@@ -94,7 +102,7 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
         }   // for i
     }
 
-    return getDefaultMaterial(mb->getMaterial().MaterialType);
+    return getDefaultMaterial(material_type);
 }
 
 //-----------------------------------------------------------------------------

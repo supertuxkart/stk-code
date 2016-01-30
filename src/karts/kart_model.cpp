@@ -138,6 +138,7 @@ KartModel::KartModel(bool is_master)
         m_animation_frame[i]=-1;
     m_animation_speed   = 25;
     m_current_animation = AF_DEFAULT;
+    m_play_non_loop     = false;
 }   // KartModel
 
 // ----------------------------------------------------------------------------
@@ -682,11 +683,12 @@ void KartModel::finishedRace()
 /** Enables- or disables the end animation.
  *  \param type The type of animation to play.
  */
-void KartModel::setAnimation(AnimationFrameType type)
+void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
 {
     // if animations disabled, give up
     if (m_animated_node == NULL) return;
 
+    m_play_non_loop = play_non_loop;
     m_current_animation = type;
     if(m_current_animation==AF_DEFAULT)
     {
@@ -824,6 +826,12 @@ void KartModel::update(float dt, float distance, float steer,  float speed)
 
     // If animations are disabled, stop here
     if (m_animated_node == NULL) return;
+
+    if (m_play_non_loop && m_animated_node->getLoopMode() == true)
+    {
+        m_play_non_loop = false;
+        this->setAnimation(AF_DEFAULT);
+    }
 
     // Update the speed-weighted objects' animations
     if (m_kart != NULL)

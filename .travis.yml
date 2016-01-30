@@ -3,44 +3,45 @@
 # Configuration manual:
 # http://docs.travis-ci.com/user/build-configuration/
 #
+sudo: false
 language: cpp
 compiler:
   - gcc
-# - clang
-#branches:
-#  only:
-#    - master
-before_install:
-  # Update repos
-  - sudo apt-get update -qq
-  # Install dependencies
-  - sudo apt-get install build-essential libogg-dev libvorbis-dev libopenal-dev libxxf86vm-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev
-  # Install mesa from an other repo (a newer version is required). Quantal is not supported anymore, saucy is only supported till July 2014,
-  # so we try to use trusty (precise which is what traiv uses a too old mesa version which doesn't link)
-  - sudo apt-add-repository "deb http://archive.ubuntu.com/ubuntu trusty main restricted"
-  - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
-  - sudo apt-get update -qq
-  - sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev libglew-dev cmake
+  - clang
+
+matrix:
+  fast_finish: true
+
+env:
+  matrix:
+    - BUILD_TYPE="Debug"
+    - BUILD_TYPE="Release"
+
+addons:
+  apt:
+    packages:
+    - build-essential
+    - libogg-dev
+    - libvorbis-dev
+    - libopenal-dev
+    - libxxf86vm-dev
+    - libcurl4-openssl-dev
+    - libfribidi-dev
+    - libbluetooth-dev
+    - libgl1-mesa-dev
+    - libglu1-mesa-dev
+    - libglew-dev
+    - cmake
 
 before_script:
-  - export THREADS=`nproc`
-  # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
-  - export THREADS=4
+  - export THREADS=$((`nproc` + 1))
   - echo "THREADS = $THREADS"
+  - free -mt
 
 script:
-  
-  # First a debug build: 
-  - mkdir build-debug
-  - cd build-debug
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCHECK_ASSETS=off
-  - make VERBOSE=1 -j $THREADS
-
-  # Then a release build: 
-  - cd ..
-  - mkdir build-release
-  - cd build-release
-  - cmake .. -DCMAKE_BUILD_TYPE=Release -DCHECK_ASSETS=off
+  - mkdir "build"
+  - cd "build"
+  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCHECK_ASSETS=off
   - make VERBOSE=1 -j $THREADS
 
 notifications:

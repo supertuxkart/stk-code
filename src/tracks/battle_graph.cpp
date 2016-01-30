@@ -136,7 +136,7 @@ void BattleGraph::findItemsOnGraphNodes()
 
         for (unsigned int j = 0; j < this->getNumNodes(); ++j)
         {
-            if (NavMesh::get()->getNavPoly(j).pointInPoly(xyz))
+            if (NavMesh::get()->getNavPoly(j).pointInPoly(xyz, false))
                 polygon = j;
         }
 
@@ -148,7 +148,70 @@ void BattleGraph::findItemsOnGraphNodes()
         else
             Log::debug("BattleGraph","Can't map item number %d with a suitable polygon", i);
     }
-}
+}    // findItemsOnGraphNodes
+
+// -----------------------------------------------------------------------------
+
+int BattleGraph::pointToNode(const int cur_node,
+                             const Vec3& cur_point,
+                             bool ignore_vertical) const
+{
+    int final_node = BattleGraph::UNKNOWN_POLY;
+
+    if (cur_node == BattleGraph::UNKNOWN_POLY)
+    {
+        // Try all nodes in the battle graph
+        bool found = false;
+        unsigned int node = 0;
+        while (!found && node < this->getNumNodes())
+        {
+            const NavPoly& p_all = this->getPolyOfNode(node);
+            if (p_all.pointInPoly(cur_point, ignore_vertical))
+            {
+                final_node = node;
+                found = true;
+            }
+            node++;
+        }
+    }
+    else
+    {
+        // Check if the point is still on the same node
+        const NavPoly& p_cur = this->getPolyOfNode(cur_node);
+        if (p_cur.pointInPoly(cur_point, ignore_vertical)) return cur_node;
+
+        // If not then check all adjacent polys
+        const std::vector<int>& adjacents = NavMesh::get()
+            ->getAdjacentPolys(cur_node);
+
+        bool found = false;
+        unsigned int num = 0;
+        while (!found && num < adjacents.size())
+        {
+            const NavPoly& p_temp = this->getPolyOfNode(adjacents[num]);
+            if (p_temp.pointInPoly(cur_point, ignore_vertical))
+            {
+                final_node = adjacents[num];
+                found = true;
+            }
+            num++;
+        }
+
+        // Current node is still unkown
+        if (final_node == BattleGraph::UNKNOWN_POLY)
+        {
+            // Calculated distance from saved node to current position,
+            // if it's close enough than use the saved node anyway, it
+            // may happen when the kart stays on the edge of obstacles
+            const NavPoly& p = this->getPolyOfNode(cur_node);
+            const float dist = (p.getCenter() - cur_point).length_2d();
+
+            if (dist < 3.0f)
+                final_node = cur_node;
+        }
+    }
+    return final_node;
+}    // pointToNode
 
 // -----------------------------------------------------------------------------
 
@@ -157,4 +220,4 @@ const int & BattleGraph::getNextShortestPathPoly(int i, int j) const
     if (i == BattleGraph::UNKNOWN_POLY || j == BattleGraph::UNKNOWN_POLY)
         return BattleGraph::UNKNOWN_POLY;
     return m_parent_poly[j][i];
-}
+}    // getNextShortestPathPoly

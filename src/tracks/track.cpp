@@ -577,10 +577,15 @@ void Track::loadTrackInfo()
 
     if(file_manager->fileExists(m_root+"navmesh.xml"))
         m_has_navmesh = true;
-    else if(m_is_arena)
+    else if(m_is_arena || m_is_soccer)
     {
         Log::warn("Track", "NavMesh is not found for arena %s, "
                   "disable AI for it.\n", m_name.c_str());
+    }
+    if (m_is_soccer)
+    {
+        // Currently only max eight players in soccer mode
+        m_max_arena_players = 8;
     }
 
 }   // loadTrackInfo
@@ -704,7 +709,7 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
 
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
-    if (m_is_arena && m_has_navmesh)
+    if ((m_is_arena || m_is_soccer) && m_has_navmesh)
         BattleGraph::get()->mapPoint2MiniMap(xyz, draw_at);
     else
         QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
@@ -1020,7 +1025,7 @@ void Track::loadMinimap()
     core::dimension2du size = m_mini_map_size
                              .getOptimalSize(!nonpower,!nonsquare);
 
-    if (m_is_arena && m_has_navmesh)
+    if ((m_is_arena || m_is_soccer) && m_has_navmesh)
         m_render_target = BattleGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
     else
         m_render_target = QuadGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
@@ -1623,7 +1628,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the information about the size of the texture to render the mini
     // map to.
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
-    else if (m_is_arena && !m_is_soccer && !m_is_cutscene && m_has_navmesh)
+    else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
         loadBattleGraph();
 
     ItemManager::create();
@@ -1847,7 +1852,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     delete root;
 
-    if (m_is_arena && !m_is_soccer && !m_is_cutscene && m_has_navmesh)
+    if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
         BattleGraph::get()->findItemsOnGraphNodes();
 
     if (UserConfigParams::m_track_debug &&

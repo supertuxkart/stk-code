@@ -72,16 +72,6 @@ public:
                                  StateManager::ActivePlayer *player=NULL);
     virtual ~AIBaseLapController() {};
     virtual void reset();
-    virtual void crashed(const AbstractKart *k) {};
-    virtual void handleZipper(bool play_sound) {};
-    virtual void finishedRace(float time) {};
-    virtual void collectedItem(const Item &item, int add_info=-1,
-                               float previous_energy=0) {};
-    virtual void setPosition(int p) {};
-    virtual bool isNetworkController() const { return false; }
-    virtual bool isPlayerController() const { return false;  }
-    virtual void action(PlayerAction action, int value) {};
-    virtual void  skidBonusTriggered() {};
 };   // AIBaseLapController
 
 #endif

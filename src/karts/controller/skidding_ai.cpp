@@ -1238,8 +1238,6 @@ void SkiddingAI::handleItems(const float dt)
             }
             break;   // POWERUP_BUBBLEGUM
         }
-    // All the thrown/fired items might be improved by considering the angle
-    // towards m_kart_ahead.
     case PowerupManager::POWERUP_CAKE:
         {
             // if the kart has a shield, do not break it by using a cake.
@@ -1297,6 +1295,22 @@ void SkiddingAI::handleItems(const float dt)
             // slower, so it should take longer to hit something which
             // can result in changing our target.
             if(m_time_since_last_shot < 5.0f) break;
+            // Consider angle towards karts
+            bool straight_behind = false;
+            bool straight_ahead = false;
+            if (m_kart_behind)
+            {
+                posData behind_pos = {0};
+                checkPosition(m_kart_behind->getXYZ(), &behind_pos);
+                if (behind_pos.angle < 0.2f) straight_behind = true;
+            }
+            if (m_kart_ahead)
+            {
+                posData ahead_pos = {0};
+                checkPosition(m_kart_ahead->getXYZ(), &ahead_pos);
+                if (ahead_pos.angle < 0.2f) straight_ahead = true;
+            }
+
             // Bowling balls are slower, so only fire on closer karts - but when
             // firing backwards, the kart can be further away, since the ball
             // acts a bit like a mine (and the kart is racing towards it, too)
@@ -1307,7 +1321,8 @@ void SkiddingAI::handleItems(const float dt)
                                             : m_distance_ahead;
             m_controls->m_fire = ( (fire_backwards && distance < 30.0f)  ||
                                    (!fire_backwards && distance <10.0f)    ) &&
-                                m_time_since_last_shot > 3.0f;
+                                m_time_since_last_shot > 3.0f &&
+                                (straight_behind || straight_ahead);
             if(m_controls->m_fire)
                 m_controls->m_look_back = fire_backwards;
             break;
@@ -2195,7 +2210,7 @@ void SkiddingAI::handleCurve()
  *          AIBaseLapController.
  *  \return True if the kart should skid.
  */
-bool SkiddingAI::doSkid(float steer_fraction)
+bool SkiddingAI::canSkid(float steer_fraction)
 {
     if(fabsf(steer_fraction)>1.5f)
     {
@@ -2304,7 +2319,7 @@ bool SkiddingAI::doSkid(float steer_fraction)
                    m_kart->getIdent().c_str());
 #endif
     return false;
-}   // doSkid
+}   // canSkid
 
 //-----------------------------------------------------------------------------
 /** Converts the steering angle to a lr steering in the range of -1 to 1.
@@ -2326,7 +2341,7 @@ void SkiddingAI::setSteering(float angle, float dt)
     // Use a simple finite state machine to make sure to randomly decide
     // whether to skid or not only once per skid section. See docs for
     // m_skid_probability_state for more details.
-    if(!doSkid(steer_fraction))
+    if(!canSkid(steer_fraction))
     {
         m_skid_probability_state = SKID_PROBAB_NOT_YET;
         m_controls->m_skid       = KartControl::SC_NONE;
