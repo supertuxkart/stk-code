@@ -25,6 +25,7 @@
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/vao_manager.hpp"
 #include <irrlicht.h>
+#include <array>
 #include <unordered_map>
 
 struct InstanceList
