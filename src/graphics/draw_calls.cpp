@@ -197,6 +197,24 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         case Material::SHADERTYPE_SPLATTING:
                             ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                             break;
+ 
+                        case Material::SHADERTYPE_ALPHA_BLEND:
+                            break;
+                        case Material::SHADERTYPE_ADDITIVE:
+                            break;
+                        case Material::SHADERTYPE_VEGETATION:
+                            break;
+                        case Material::SHADERTYPE_WATER:
+                            break;
+                        case Material::SHADERTYPE_SPHERE_MAP:
+                            break;
+                        case Material::SHADERTYPE_NORMAL_MAP:
+                            break;
+                        case Material::SHADERTYPE_DETAIL_MAP:
+                            break;
+
+                        default:
+                            Log::warn("DrawCalls", "Unknown material type: %d", Mat);
                         }
                     }
                 }
@@ -234,6 +252,16 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     case Material::SHADERTYPE_VEGETATION:
                         ListMatGrass::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
                         break;
+                    
+                    case Material::SHADERTYPE_ALPHA_BLEND:
+                        break;
+                    case Material::SHADERTYPE_ADDITIVE:
+                        break;
+                    case Material::SHADERTYPE_WATER:
+                        break;
+                        
+                    default:
+                        Log::warn("DrawCalls", "Unknown material type: %d", Mat);
                     }
                 }
             }
@@ -287,6 +315,16 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         break;
                     case Material::SHADERTYPE_VEGETATION:
                         ListMatGrass::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
+                    
+                    case Material::SHADERTYPE_ALPHA_BLEND:
+                        break;
+                    case Material::SHADERTYPE_ADDITIVE:
+                        break;
+                    case Material::SHADERTYPE_WATER:
+                        break;
+                        
+                    default:
+                        Log::warn("DrawCalls", "Unknown material type: %d", Mat);
                     }
                 }
             }
@@ -350,6 +388,16 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     case Material::SHADERTYPE_VEGETATION:
                         ListMatGrass::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
                         break;
+                    
+                    case Material::SHADERTYPE_ALPHA_BLEND:
+                        break;
+                    case Material::SHADERTYPE_ADDITIVE:
+                        break;
+                    case Material::SHADERTYPE_WATER:
+                        break;
+                        
+                    default:
+                        Log::warn("DrawCalls", "Unknown material type: %d", Mat);
                     }
                 }
             }

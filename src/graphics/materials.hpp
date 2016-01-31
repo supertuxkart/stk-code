@@ -631,9 +631,6 @@ public:
 };   // InstancedDetailedObjectPass2Shader
 
 
-
-
-
 // ============================================================================
 struct DefaultMaterial
 {
@@ -808,7 +805,5 @@ struct SplattingMat
     static const STK::Tuple<> ShadowTextures;
     static const STK::Tuple<size_t, size_t, size_t, size_t, size_t> RSMTextures;
 };   // SplattingMat
-
-
 
 #endif //HEADER_MATERIAL_TYPE_HPP
