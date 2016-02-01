@@ -388,7 +388,6 @@ void ProtocolManager::terminateProtocol(Protocol *protocol)
  */
 bool ProtocolManager::sendEvent(EventProcessingInfo* event, bool synchronous)
 {
-    m_protocols.lock();
     unsigned int index = 0;
     while(index < event->m_protocols_ids.size())
     {
@@ -407,7 +406,6 @@ bool ProtocolManager::sendEvent(EventProcessingInfo* event, bool synchronous)
         else  // !result
             index++;
     }
-    m_protocols.unlock();
 
     if (event->m_protocols_ids.size() == 0 || 
         (StkTime::getTimeSinceEpoch()-event->m_arrival_time) >= TIME_TO_KEEP_EVENTS)
