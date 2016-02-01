@@ -225,6 +225,7 @@ void STKHost::create()
  */
 STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 {
+    m_next_unique_host_id = -1;
     // Will be overwritten with the correct value once a connection with the
     // server is made.
     m_host_id = 0;
@@ -249,6 +250,9 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 STKHost::STKHost(const irr::core::stringw &server_name)
 {
     init();
+    // The host id will be increased whenever a new peer is added, so the
+    // first client will have host id 1 (host id 0 is the server).
+    m_next_unique_host_id = 0;
     m_host_id = 0;   // indicates a server host.
 
     ENetAddress addr;
@@ -671,6 +675,7 @@ STKPeer* STKHost::getPeer(ENetPeer *enet_peer)
                peer, enet_peer);
 
     m_peers.push_back(peer);
+    m_next_unique_host_id ++;
     return peer;
 }   // getPeer
 // ----------------------------------------------------------------------------

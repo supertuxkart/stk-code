@@ -456,7 +456,9 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     if(m_setup->getLocalMasterID()==0)
         m_setup->setLocalMaster(new_player_id);
 
-    int new_host_id = STKHost::get()->getPeerCount();
+    // The host id has already been incremented when the peer
+    // was added, so it is the right id now.
+    int new_host_id = STKHost::get()->getNextHostId();
 
     // Notify everybody that there is a new player
     // -------------------------------------------

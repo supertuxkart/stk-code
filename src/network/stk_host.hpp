@@ -74,6 +74,12 @@ private:
     /** The list of peers connected to this instance. */
     std::vector<STKPeer*> m_peers;
 
+    /** Next unique host id. It is increased whenever a new peer is added (see
+     *  getPeer()), but not decreased whena host (=peer) disconnects. This
+     *  results in a unique host id for each host, even when a host should
+     *  disconnect and then reconnect. */
+    int m_next_unique_host_id;
+
     /** Host id of this host. */
     uint8_t m_host_id;
 
@@ -200,6 +206,13 @@ public:
     // --------------------------------------------------------------------
     /** Returns a const reference to the list of peers. */
     const std::vector<STKPeer*> &getPeers() { return m_peers; }
+    // --------------------------------------------------------------------
+    /** Returns the next (unique) host id. */
+    unsigned int getNextHostId() const
+    {
+        assert(m_next_unique_host_id >= 0);
+        return m_next_unique_host_id;
+    }
     // --------------------------------------------------------------------
     /** Returns the number of currently connected peers. */
     unsigned int getPeerCount() { return (int)m_peers.size(); }
