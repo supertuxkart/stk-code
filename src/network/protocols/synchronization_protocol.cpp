@@ -44,29 +44,22 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         return true;
 
     const NetworkString &data = event->data();
-    if (data.size() < 10)
+    if (data.size() < 9)
     {
         Log::warn("SynchronizationProtocol", "Received a too short message.");
         return true;
     }
-    uint8_t player_id = data.gui8();
-    uint32_t token = data.gui32(1);
-    uint32_t request = data.gui8(5);
-    uint32_t sequence = data.gui32(6);
+    uint32_t token    = data.gui32(0);
+    uint32_t request  = data.gui8(4);
+    uint32_t sequence = data.gui32(5);
 
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     assert(peers.size() > 0);
 
-    if (NetworkConfig::get()->isServer())
-    {
-        if (player_id > peers.size())
-        {
-            Log::warn("SynchronizationProtocol", "The ID isn't known.");
-            return true;
-        }
-    }
-
-    uint8_t peer_id = 0;
+    // Find the right peer id. The host id (i.e. each host sendings its
+    // host id) can not be used here, since host ids can have gaps (if a
+    // host should disconnect)
+    uint8_t peer_id = -1;
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         if (peers[i]->isSamePeer(event->getPeer()))
@@ -75,37 +68,45 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
             break;
         }
     }
-    if (peers[peer_id]->getClientServerToken() != token)
+    if (event->getPeer()->getClientServerToken() != token)
     {
         Log::warn("SynchronizationProtocol", "Bad token from peer %d",
-                  player_id);
+                  peer_id);
         return true;
     }
 
     if (request)
     {
+        // Only a client should receive a request for a ping response
+        assert(NetworkConfig::get()->isClient());
         NetworkString response(10);
-        response.ai8(data.gui8(player_id)).ai32(token).ai8(0).ai32(sequence);
-        sendMessage(peers[peer_id], response, false);
-        Log::verbose("SynchronizationProtocol", "Answering sequence %u",
-                     sequence);
+        // The '0' indicates a response to a ping request
+        response.ai32(token).ai8(0).ai32(sequence);
+        sendMessage(event->getPeer(), response, false);
+        Log::verbose("SynchronizationProtocol", "Answering sequence %u at %lf",
+                     sequence, StkTime::getRealTime());
 
         // countdown time in the message
-        if (data.size() == 14 && !NetworkConfig::get()->isServer())
+        if (data.size() == 13)
         {
-            uint32_t time_to_start = data.gui32(10);
+            uint32_t time_to_start = data.gui32(9);
             Log::debug("SynchronizationProtocol",
                        "Request to start game in %d.", time_to_start);
             if (!m_countdown_activated)
                 startCountdown(time_to_start);
             else
+            {
+                // Adjust the time based on the value sent from the server.
                 m_countdown = (double)(time_to_start/1000.0);
+            }
         }
         else
             Log::verbose("SynchronizationProtocol", "No countdown for now.");
     }
-    else // response
+    else // receive response to a ping request
     {
+        // Only a server should receive this kind of message
+        assert(NetworkConfig::get()->isServer());
         if (sequence >= m_pings[peer_id].size())
         {
             Log::warn("SynchronizationProtocol",
@@ -114,14 +115,16 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         }
         double current_time = StkTime::getRealTime();
         m_total_diff[peer_id] += current_time - m_pings[peer_id][sequence];
-        Log::verbose("SynchronizationProtocol", "InstantPing is %u",
-            (unsigned int)((current_time - m_pings[peer_id][sequence])*1000));
         m_successed_pings[peer_id]++;
         m_average_ping[peer_id] =
             (int)((m_total_diff[peer_id]/m_successed_pings[peer_id])*1000.0);
 
-        Log::debug("SynchronizationProtocol", "Ping is %u",
-                   m_average_ping[peer_id]);
+        Log::debug("SynchronizationProtocol",
+            "Peer %d sequence %d ping %u average %u at %lf",
+            peer_id, sequence,
+            (unsigned int)((current_time - m_pings[peer_id][sequence])*1000),
+            m_average_ping[peer_id],
+            StkTime::getRealTime());
     }
     return true;
 }   // notifyEventAsynchronous
@@ -161,30 +164,30 @@ void SynchronizationProtocol::asynchronousUpdate()
         }
     }   // if m_countdown_activated
 
-    if (current_time > m_last_time+0.1)
+    if (NetworkConfig::get()->isServer() &&  current_time > m_last_time+1)
     {
         const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
-            NetworkString ns(14);
-            ns.ai8(i).addUInt32(peers[i]->getClientServerToken()).addUInt8(1)
-                                                .addUInt32(m_pings[i].size());
+            NetworkString ping_request(13);
+            ping_request.addUInt32(peers[i]->getClientServerToken())
+                        .addUInt8(1).addUInt32(m_pings[i].size());
             // Server adds the countdown if it has started. This will indicate
             // to the client to start the countdown as well (first time the 
             // message is received), or to update the countdown time.
-            if (m_countdown_activated && NetworkConfig::get()->isServer())
+            if (m_countdown_activated )
             {
-                ns.addUInt32((int)(m_countdown*1000.0));
+                ping_request.addUInt32((int)(m_countdown*1000.0));
                 Log::debug("SynchronizationProtocol",
                            "CNTActivated: Countdown value : %f", m_countdown);
             }
             Log::verbose("SynchronizationProtocol",
-                         "Added sequence number %u for peer %d",
-                         m_pings[i].size(), i);
-            m_last_time = current_time;
-            m_pings[i] [ m_pings_count ] = m_last_time;
-            sendMessage(peers[i], ns, false);
+                         "Added sequence number %u for peer %d at %lf",
+                         m_pings[i].size(), i, StkTime::getRealTime());
+            m_pings[i] [ m_pings_count ] = current_time;
+            sendMessage(peers[i], ping_request, false);
         }   // for i M peers
+        m_last_time = current_time;
         m_pings_count++;
     }   // if current_time > m_last_time + 0.1
 }   // asynchronousUpdate
