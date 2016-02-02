@@ -59,7 +59,6 @@ Event::Event(ENetEvent* event)
     }
     m_packet = NULL;
 
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     m_peer = STKHost::get()->getPeer(event->peer);
 }   // Event(ENetEvent)
 
