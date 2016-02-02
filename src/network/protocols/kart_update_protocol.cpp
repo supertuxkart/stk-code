@@ -50,7 +50,7 @@ bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
         Vec3 xyz;
         btQuaternion quat;
         ns.get(&xyz, 1).get(&quat, 13);
-        pthread_mutex_trylock(&m_positions_updates_mutex);
+        pthread_mutex_lock(&m_positions_updates_mutex);
         m_next_positions.push_back(xyz);
         m_next_quaternions.push_back(quat);
         m_karts_ids.push_back(kart_id);
