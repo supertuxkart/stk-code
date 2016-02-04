@@ -35,10 +35,8 @@
 ProtocolManager::ProtocolManager()
 {
     pthread_mutex_init(&m_asynchronous_protocols_mutex, NULL);
-    pthread_mutex_init(&m_exit_mutex, NULL);
+    m_exit.setAtomic(false);
     m_next_protocol_id.setAtomic(0);
-
-    pthread_mutex_lock(&m_exit_mutex); // will let the update function run
 
     m_asynchronous_update_thread = (pthread_t*)(malloc(sizeof(pthread_t)));
     pthread_create(m_asynchronous_update_thread, NULL,
@@ -53,7 +51,7 @@ void* ProtocolManager::mainLoop(void* data)
 
     ProtocolManager* manager = static_cast<ProtocolManager*>(data);
     manager->m_asynchronous_thread_running = true;
-    while(manager && !manager->exit())
+    while(manager && !manager->m_exit.getAtomic())
     {
         manager->asynchronousUpdate();
         StkTime::sleep(2);
@@ -73,8 +71,7 @@ ProtocolManager::~ProtocolManager()
  */
 void ProtocolManager::abort()
 {
-    pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
-    pthread_join(*m_asynchronous_update_thread, NULL); // wait the thread to finish
+    m_exit.setAtomic(true);
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
 
     m_protocols.lock();
@@ -97,7 +94,7 @@ void ProtocolManager::abort()
     pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
 
     pthread_mutex_destroy(&m_asynchronous_protocols_mutex);
-    pthread_mutex_destroy(&m_exit_mutex);
+    pthread_join(*m_asynchronous_update_thread, NULL); // wait the thread to finish
 }   // abort
 
 // ----------------------------------------------------------------------------
@@ -573,21 +570,6 @@ Protocol* ProtocolManager::getProtocol(ProtocolType type)
     }
     return NULL;
 }   // getProtocol
-
-// ----------------------------------------------------------------------------
-/*! \brief Tells if we need to stop the update thread.
- */
-int ProtocolManager::exit()
-{
-  switch(pthread_mutex_trylock(&m_exit_mutex)) {
-    case 0: /* if we got the lock, unlock and return 1 (true) */
-      pthread_mutex_unlock(&m_exit_mutex);
-      return 1;
-    case EBUSY: /* return 0 (false) if the mutex was locked */
-      return 0;
-  }
-  return 1;
-}   // exit
 
 // ----------------------------------------------------------------------------
 /** \brief Assign an id to a protocol.
