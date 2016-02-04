@@ -72,7 +72,7 @@ public:
     // Not needed to create any physics for a ghost kart.
     virtual void createPhysics() {}
     // ------------------------------------------------------------------------
-    const float& getSuspensionLength(int index, int wheel) const
+    const float getSuspensionLength(int index, int wheel) const
                { return m_all_physic_info[index].m_suspension_length[wheel]; }
     // ------------------------------------------------------------------------
 };   // GhostKart

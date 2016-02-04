@@ -157,23 +157,23 @@ public:
             m_blue_score_times : m_red_score_times);
     }
     // ------------------------------------------------------------------------
-    const int& getKartNode(unsigned int kart_id) const
+    const int getKartNode(unsigned int kart_id) const
                                           {  return m_kart_on_node[kart_id]; }
     // ------------------------------------------------------------------------
-    const int& getBallNode() const
+    const int getBallNode() const
                                           {  return m_ball_on_node;          }
     // ------------------------------------------------------------------------
     const Vec3& getBallPosition() const
                                           {  return m_ball_position;         }
     // ------------------------------------------------------------------------
-    const int& getGoalNode(SoccerTeam team) const
+    const int getGoalNode(SoccerTeam team) const
     {
         return (team == SOCCER_TEAM_BLUE ? m_blue_goal_node : m_red_goal_node);
     }
     // ------------------------------------------------------------------------
     bool isCorrectGoal(unsigned int kart_id, bool first_goal) const;
     // ------------------------------------------------------------------------
-    const int& getDefender(SoccerTeam team) const
+    const int getDefender(SoccerTeam team) const
     {
         return (team == SOCCER_TEAM_BLUE ? m_blue_defender : m_red_defender);
     }

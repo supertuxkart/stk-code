@@ -216,7 +216,7 @@ int BattleGraph::pointToNode(const int cur_node,
 
 // -----------------------------------------------------------------------------
 
-const int & BattleGraph::getNextShortestPathPoly(int i, int j) const
+const int BattleGraph::getNextShortestPathPoly(int i, int j) const
 {
     if (i == BattleGraph::UNKNOWN_POLY || j == BattleGraph::UNKNOWN_POLY)
         return BattleGraph::UNKNOWN_POLY;
