@@ -285,8 +285,10 @@ Item* ItemManager::newItem(const Vec3& xyz, float distance,
 void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
 {
     assert(item);
-    if((item->getType() == Item::ITEM_BUBBLEGUM || item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
-    {// shielded karts can simply drive over bubble gums without any effect.
+    if( (item->getType() == Item::ITEM_BUBBLEGUM || 
+         item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
+    {
+        // shielded karts can simply drive over bubble gums without any effect.
         return;
     }
     item->collected(kart);
