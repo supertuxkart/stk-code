@@ -179,13 +179,11 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
          * If a protocol has an id lower than this value, it means that it has
          * been formerly started.
          */
-        uint32_t                        m_next_protocol_id;
+        Synchronised<uint32_t> m_next_protocol_id;
 
         // mutexes:
         /*! Used to ensure that the protocol vector is used thread-safely.   */
         pthread_mutex_t                 m_asynchronous_protocols_mutex;
-        /*! Used to ensure that the protocol id is used in a thread-safe way.*/
-        pthread_mutex_t                 m_id_mutex;
         /*! Used when need to quit.*/
         pthread_mutex_t                 m_exit_mutex;
 
@@ -196,6 +194,6 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         /*! True if the thread is running. */
         bool m_asynchronous_thread_running;
 
-};
+};   // class ProtocolManager
 
 #endif // PROTOCOL_MANAGER_HPP

@@ -35,7 +35,6 @@
 ProtocolManager::ProtocolManager()
 {
     pthread_mutex_init(&m_asynchronous_protocols_mutex, NULL);
-    pthread_mutex_init(&m_id_mutex, NULL);
     pthread_mutex_init(&m_exit_mutex, NULL);
     m_next_protocol_id = 0;
 
@@ -77,7 +76,6 @@ void ProtocolManager::abort()
     pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
     pthread_join(*m_asynchronous_update_thread, NULL); // wait the thread to finish
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
-    pthread_mutex_lock(&m_id_mutex);
 
     m_protocols.lock();
     for (unsigned int i = 0; i < m_protocols.getData().size() ; i++)
@@ -97,10 +95,8 @@ void ProtocolManager::abort()
     m_requests.unlock();
 
     pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
-    pthread_mutex_unlock(&m_id_mutex);
 
     pthread_mutex_destroy(&m_asynchronous_protocols_mutex);
-    pthread_mutex_destroy(&m_id_mutex);
     pthread_mutex_destroy(&m_exit_mutex);
 }   // abort
 
@@ -602,10 +598,10 @@ int ProtocolManager::exit()
  */
 uint32_t ProtocolManager::getNextProtocolId()
 {
-    pthread_mutex_lock(&m_id_mutex);
+    m_next_protocol_id.lock();
     uint32_t id = m_next_protocol_id;
     m_next_protocol_id++;
-    pthread_mutex_unlock(&m_id_mutex);
+    m_next_protocol_id.unlock();
     return id;
 }   // getNextProtocolId
 
