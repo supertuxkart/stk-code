@@ -493,6 +493,7 @@ void Track::loadTrackInfo()
 
     if(!root || root->getName()!="track")
     {
+        delete root;
         std::ostringstream o;
         o<<"Can't load track '"<<m_filename<<"', no track element.";
         throw std::runtime_error(o.str());
