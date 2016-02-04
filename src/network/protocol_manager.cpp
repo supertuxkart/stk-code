@@ -36,7 +36,7 @@ ProtocolManager::ProtocolManager()
 {
     pthread_mutex_init(&m_asynchronous_protocols_mutex, NULL);
     pthread_mutex_init(&m_exit_mutex, NULL);
-    m_next_protocol_id = 0;
+    m_next_protocol_id.setAtomic(0);
 
     pthread_mutex_lock(&m_exit_mutex); // will let the update function run
 
@@ -599,8 +599,8 @@ int ProtocolManager::exit()
 uint32_t ProtocolManager::getNextProtocolId()
 {
     m_next_protocol_id.lock();
-    uint32_t id = m_next_protocol_id;
-    m_next_protocol_id++;
+    uint32_t id = m_next_protocol_id.getData();
+    m_next_protocol_id.getData()++;
     m_next_protocol_id.unlock();
     return id;
 }   // getNextProtocolId
