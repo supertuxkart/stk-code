@@ -11,14 +11,14 @@
 
 KartUpdateProtocol::KartUpdateProtocol() : Protocol(PROTOCOL_KART_UPDATE)
 {
-    World *world = World::getWorld();
-    for (unsigned int i = 0; i < world->getNumKarts(); i++)
-    {
-        Log::info("KartUpdateProtocol", "Kart %d has id %d and name %s",
-                  i, world->getKart(i)->getWorldKartId(),
-                  world->getKart(i)->getIdent().c_str());
-    }
-    pthread_mutex_init(&m_positions_updates_mutex, NULL);
+    // Allocate arrays to store one position and rotation for each kart
+    // (which is the update information from the server to the client).
+    m_next_positions.resize(World::getWorld()->getNumKarts());
+    m_next_quaternions.resize(World::getWorld()->getNumKarts());
+
+    // This flag keeps track if valid data for an update is in
+    // the arrays
+    m_was_updated = false;
 }   // KartUpdateProtocol
 
 // ----------------------------------------------------------------------------
@@ -32,12 +32,15 @@ void KartUpdateProtocol::setup()
 }   // setup
 
 // ----------------------------------------------------------------------------
-bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
+/** Store the update events in the queue. Since the events are handled in the
+ *  synchronous notify function, there is no lock necessary to 
+ */
+bool KartUpdateProtocol::notifyEvent(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
     NetworkString &ns = event->data();
-    if (ns.size() < 29)
+    if (ns.size() < 33)
     {
         Log::info("KartUpdateProtocol", "Message too short.");
         return true;
@@ -46,21 +49,27 @@ bool KartUpdateProtocol::notifyEventAsynchronous(Event* event)
     while(ns.size() >= 29)
     {
         uint8_t kart_id = ns.getUInt8(0);
-
         Vec3 xyz;
         btQuaternion quat;
         ns.get(&xyz, 1).get(&quat, 13);
-        pthread_mutex_lock(&m_positions_updates_mutex);
-        m_next_positions.push_back(xyz);
-        m_next_quaternions.push_back(quat);
-        m_karts_ids.push_back(kart_id);
-        pthread_mutex_unlock(&m_positions_updates_mutex);
+        m_next_positions  [kart_id] = xyz;
+        m_next_quaternions[kart_id] = quat;
         ns.removeFront(29);
     }   // while ns.size()>29
+
+    // Set the flag that a new update was received
+    m_was_updated = true;
     return true;
-}   // notifyEventAsynchronous
+}   // notifyEvent
 
 // ----------------------------------------------------------------------------
+/** Sends regular update events from the server to all clients and from the
+ *  clients to the server (FIXME - is that actually necessary??)
+ *  Then it applies all update events that have been received in notifyEvent.
+ *  This two-part implementation means that if the server should send two
+ *  or more updates before this client handles them, only the last one will
+ *  actually be handled (i.e. outdated kart position updates are discarded).
+ */
 void KartUpdateProtocol::update()
 {
     if (!World::getWorld())
@@ -85,7 +94,7 @@ void KartUpdateProtocol::update()
                              "Sending %d's positions %f %f %f",
                              kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
             }
-            sendMessage(ns, false);
+            sendSynchronousMessage(ns, false);
         }
         else
         {
@@ -101,41 +110,32 @@ void KartUpdateProtocol::update()
                              "Sending %d's positions %f %f %f",
                               kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
             }
-            sendMessage(ns, false);
+            sendSynchronousMessage(ns, false);
         }   // if server
     }   // if (current_time > time + 0.1)
 
-    switch(pthread_mutex_trylock(&m_positions_updates_mutex))
+
+    // Now handle all update events that have been received.
+    // There is no lock necessary, since receiving new positions is done in
+    // notifyEvent, which is called from the same thread that calls this
+    // function.
+    if(m_was_updated)
     {
-        case 0: /* if we got the lock */
-            while (!m_next_positions.empty())
+        for (unsigned id = 0; id < m_next_positions.size(); id++)
+        {
+            AbstractKart *kart = World::getWorld()->getKart(id);
+            if (!kart->getController()->isLocalPlayerController())
             {
-                uint32_t id = m_karts_ids.back();
-                AbstractKart *kart = World::getWorld()->getKart(id);
-                if(!kart->getController()->isLocalPlayerController())
-                {
-                    Vec3 pos = m_next_positions.back();
-                    btTransform transform = kart->getBody()
-                                          ->getInterpolationWorldTransform();
-                    transform.setOrigin(pos);
-                    transform.setRotation(m_next_quaternions.back());
-                    kart->getBody()->setCenterOfMassTransform(transform);
-                    Log::verbose("KartUpdateProtocol",
-                                 "Update kart %i pos to %f %f %f",
-                                 id, pos[0], pos[1], pos[2]);
-                }
-                else
-                {
-                    // We should use smoothing here!
-                }
-                m_next_positions.pop_back();
-                m_next_quaternions.pop_back();
-                m_karts_ids.pop_back();
-            }
-            pthread_mutex_unlock(&m_positions_updates_mutex);
-            break;
-        default:
-            break;
-    }
+                btTransform transform = kart->getBody()
+                                      ->getInterpolationWorldTransform();
+                transform.setOrigin(m_next_positions[id]);
+                transform.setRotation(m_next_quaternions[id]);
+                kart->getBody()->setCenterOfMassTransform(transform);
+                Log::verbose("KartUpdateProtocol", "Update kart %i pos",
+                             id);
+            }   // if not local player
+        }   // for id < num_karts
+        m_was_updated = false;  // mark that all updates were applied
+    }   // if m_was_updated
 }   // update
 
