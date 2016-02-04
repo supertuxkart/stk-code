@@ -440,8 +440,8 @@ void ProtocolManager::update()
         if (result)
         {
             m_events_to_process.getData()
-                               .erase(m_events_to_process.getData().begin()+i+offset,
-                                      m_events_to_process.getData().begin()+i+offset+1);
+                               .erase(m_events_to_process.getData().begin()+(i+offset),
+                                      m_events_to_process.getData().begin()+(i+offset+1));
             offset --;
         }
     }
