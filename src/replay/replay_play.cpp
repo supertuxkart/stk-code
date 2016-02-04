@@ -172,20 +172,28 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
     for(unsigned int i=0; i<size; i++)
     {
         fgets(s, 1023, fd);
-        float x, y, z, rx, ry, rz, rw, time;
+        float x, y, z, rx, ry, rz, rw, time, speed, steer, w1, w2, w3, w4;
 
         // Check for EV_TRANSFORM event:
         // -----------------------------
-        if(sscanf(s, "%f  %f %f %f  %f %f %f %f\n",
+        if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f\n",
             &time,
             &x, &y, &z,
-            &rx, &ry, &rz, &rw
-            )==8)
+            &rx, &ry, &rz, &rw,
+            &speed, &steer, &w1, &w2, &w3, &w4
+            )==14)
         {
             btQuaternion q(rx, ry, rz, rw);
             btVector3 xyz(x, y, z);
+            PhysicInfo pi = {0};
+            pi.m_speed = speed;
+            pi.m_steer = steer;
+            pi.m_suspension_length[0] = w1;
+            pi.m_suspension_length[1] = w2;
+            pi.m_suspension_length[2] = w3;
+            pi.m_suspension_length[3] = w4;
             m_ghost_karts[m_ghost_karts.size()-1].addTransform(time,
-                                                          btTransform(q, xyz));
+                                                          btTransform(q, xyz), pi);
         }
         else
         {

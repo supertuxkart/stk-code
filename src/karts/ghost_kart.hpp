@@ -42,6 +42,8 @@ private:
     /** The transforms to assume at the corresponding time in m_all_times. */
     std::vector<btTransform> m_all_transform;
 
+    std::vector<ReplayBase::PhysicInfo> m_all_physic_info;
+
     std::vector<ReplayBase::KartReplayEvent> m_replay_events;
 
     /** Pointer to the last index in m_all_times that is smaller than
@@ -55,7 +57,9 @@ private:
 public:
                  GhostKart(const std::string& ident);
     virtual void update (float dt);
-    virtual void addTransform(float time, const btTransform &trans);
+    virtual void addTransform(float time,
+                              const btTransform &trans,
+                              const ReplayBase::PhysicInfo &pi);
     virtual void addReplayEvent(const ReplayBase::KartReplayEvent &kre);
     virtual void reset();
     // ------------------------------------------------------------------------
@@ -68,6 +72,8 @@ public:
     // Not needed to create any physics for a ghost kart.
     virtual void createPhysics() {}
     // ------------------------------------------------------------------------
-
+    const float& getSuspensionLength(int index, int wheel) const
+               { return m_all_physic_info[index].m_suspension_length[wheel]; }
+    // ------------------------------------------------------------------------
 };   // GhostKart
 #endif

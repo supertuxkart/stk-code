@@ -42,10 +42,21 @@ protected:
     struct TransformEvent
     {
         /** Time at which this event happens. */
-        float       m_time;
+        float               m_time;
         /** The transform at a certain time. */
-        btTransform m_transform;
+        btTransform         m_transform;
     };   // TransformEvent
+
+    // ------------------------------------------------------------------------
+    struct PhysicInfo
+    {
+        /** The speed at a certain time. */
+        float               m_speed;
+        /** The steering at a certain time. */
+        float               m_steer;
+        /** The suspension length of 4 wheels at a certain time. */
+        float               m_suspension_length[4];
+    };   // PhysicInfo
 
     // ------------------------------------------------------------------------
     /** Records all other events - atm start and end skidding. */

@@ -22,6 +22,7 @@
 #include "io/file_manager.hpp"
 #include "karts/ghost_kart.hpp"
 #include "modes/world.hpp"
+#include "physics/btKart.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 
@@ -43,6 +44,7 @@ ReplayRecorder::ReplayRecorder()
 ReplayRecorder::~ReplayRecorder()
 {
     m_transform_events.clear();
+    m_physic_info.clear();
 }   // ~Replay
 
 //-----------------------------------------------------------------------------
@@ -52,7 +54,9 @@ ReplayRecorder::~ReplayRecorder()
 void ReplayRecorder::init()
 {
     m_transform_events.clear();
+    m_physic_info.clear();
     m_transform_events.resize(race_manager->getNumberOfKarts());
+    m_physic_info.resize(race_manager->getNumberOfKarts());
     m_skid_control.resize(race_manager->getNumberOfKarts());
     m_kart_replay_event.resize(race_manager->getNumberOfKarts());
     unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time
@@ -60,6 +64,7 @@ void ReplayRecorder::init()
     for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
     {
         m_transform_events[i].resize(max_frames);
+        m_physic_info[i].resize(max_frames);
         // Rather arbitraritly sized, it will be added with push_back
         m_kart_replay_event[i].reserve(500);
     }
@@ -140,10 +145,25 @@ void ReplayRecorder::update(float dt)
             }
             continue;
         }
-        TransformEvent *p = &(m_transform_events[i][m_count_transforms[i]-1]);
-        p->m_time      = World::getWorld()->getTime();
+        TransformEvent *p      = &(m_transform_events[i][m_count_transforms[i]-1]);
+        PhysicInfo *q          = &(m_physic_info[i][m_count_transforms[i]-1]);
+        p->m_time              = World::getWorld()->getTime();
         p->m_transform.setOrigin(kart->getXYZ());
         p->m_transform.setRotation(kart->getVisualRotation());
+
+        q->m_speed             = kart->getSpeed();
+        q->m_steer             = kart->getSteerPercent();
+        const int num_wheels = kart->getVehicle()->getNumWheels();
+        for (int j = 0; j < 4; j++)
+        {
+            if (j > num_wheels || num_wheels == 0)
+                q->m_suspension_length[j] = 0.0f;
+            else
+            {
+                q->m_suspension_length[j] = kart->getVehicle()
+                    ->getWheelInfo(j).m_raycastInfo.m_suspensionLength;
+            }
+        }
     }   // for i
 }   // update
 
@@ -184,8 +204,9 @@ void ReplayRecorder::Save()
                                                m_count_transforms[k]);
         for(unsigned int i=0; i<num_transforms; i++)
         {
-            const TransformEvent *p=&(m_transform_events[k][i]);
-            fprintf(fd, "%f  %f %f %f  %f %f %f %f\n",
+            const TransformEvent *p = &(m_transform_events[k][i]);
+            const PhysicInfo *q     = &(m_physic_info[k][i]);
+            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f\n",
                     p->m_time,
                     p->m_transform.getOrigin().getX(),
                     p->m_transform.getOrigin().getY(),
@@ -193,7 +214,13 @@ void ReplayRecorder::Save()
                     p->m_transform.getRotation().getX(),
                     p->m_transform.getRotation().getY(),
                     p->m_transform.getRotation().getZ(),
-                    p->m_transform.getRotation().getW()
+                    p->m_transform.getRotation().getW(),
+                    q->m_speed,
+                    q->m_steer,
+                    q->m_suspension_length[0],
+                    q->m_suspension_length[1],
+                    q->m_suspension_length[2],
+                    q->m_suspension_length[3]
                 );
         }   // for i
         fprintf(fd, "events: %d\n", (int)m_kart_replay_event[k].size());

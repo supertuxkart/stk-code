@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "karts/ghost_kart.hpp"
+#include "karts/kart_model.hpp"
 #include "modes/world.hpp"
 
 #include "LinearMath/btQuaternion.h"
@@ -28,6 +29,9 @@ GhostKart::GhostKart(const std::string& ident)
 {
     m_current_transform = 0;
     m_next_event        = 0;
+    m_all_times.clear();
+    m_all_transform.clear();
+    m_all_physic_info.clear();
 }   // GhostKart
 
 // ----------------------------------------------------------------------------
@@ -46,7 +50,9 @@ void GhostKart::reset()
  *  the previous time and transform.
  *  \param
  */
-void GhostKart::addTransform(float time, const btTransform &trans)
+void GhostKart::addTransform(float time,
+                             const btTransform &trans,
+                             const ReplayBase::PhysicInfo &pi)
 {
     // FIXME: for now avoid that transforms for the same time are set
     // twice (to avoid division by zero in update). This should be
@@ -55,6 +61,19 @@ void GhostKart::addTransform(float time, const btTransform &trans)
         return;
     m_all_times.push_back(time);
     m_all_transform.push_back(trans);
+    m_all_physic_info.push_back(pi);
+
+    // Use first frame of replay to calculate default suspension
+    if (m_all_physic_info.size() == 1)
+    {
+        float f = 0;
+        for (int i = 0; i < 4; i++)
+            f += m_all_physic_info[0].m_suspension_length[i];
+        m_graphical_y_offset = -f / 4 + getKartModel()->getLowestPoint();
+        m_kart_model
+            ->setDefaultSuspension();
+    }
+
 }   // addTransform
 
 // ----------------------------------------------------------------------------
@@ -114,5 +133,14 @@ void GhostKart::updateTransform(float t, float dt)
                                  .getRotation(),
                                  f);
     setRotation(q);
-    Moveable::updateGraphics(dt, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
+
+    Vec3 center_shift(0, 0, 0);
+    center_shift.setY(m_graphical_y_offset);
+    center_shift = getTrans().getBasis() * center_shift;
+
+    Moveable::updateGraphics(dt, center_shift, btQuaternion(0, 0, 0, 1));
+    getKartModel()->update(dt, dt*(m_all_physic_info[m_current_transform].m_speed),
+        m_all_physic_info[m_current_transform].m_steer,
+        m_all_physic_info[m_current_transform].m_speed,
+        m_current_transform);
 }   // update

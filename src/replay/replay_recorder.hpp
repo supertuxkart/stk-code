@@ -34,6 +34,9 @@ private:
     /** A separate vector of Replay Events for all transforms. */
     std::vector< std::vector<TransformEvent> > m_transform_events;
 
+    /** A separate vector of Replay Events for all transforms. */
+    std::vector< std::vector<PhysicInfo> > m_physic_info;
+
     /** Time at which a transform was saved for the last time. */
     std::vector<float> m_last_saved_time;
 

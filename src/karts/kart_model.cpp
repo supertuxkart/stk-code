@@ -769,6 +769,14 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
 // ----------------------------------------------------------------------------
 void KartModel::setDefaultSuspension()
 {
+    GhostKart* gk = dynamic_cast<GhostKart*>(m_kart);
+    if (gk)
+    {
+        for (int i = 0; i < 4; i++)
+            m_default_physics_suspension[i] = gk->getSuspensionLength(0, i);
+        return;
+    }
+
     for(int i=0; i<m_kart->getVehicle()->getNumWheels(); i++)
     {
         const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
@@ -786,30 +794,42 @@ void KartModel::setDefaultSuspension()
  *  \param suspension Suspension height for all four wheels.
  *  \param speed The speed of the kart in meters/sec, used for the
  *         speed-weighted objects' animations
+ *  \param gt_replay_index The index to get replay data, used by ghost kart
  */
-void KartModel::update(float dt, float distance, float steer,  float speed)
+void KartModel::update(float dt, float distance, float steer, float speed,
+                       int gt_replay_index)
 {
     core::vector3df wheel_steer(0, steer*30.0f, 0);
 
     for(unsigned int i=0; i<4; i++)
     {
-       if (!m_kart || !m_wheel_node[i]) continue;
+        if (!m_kart || !m_wheel_node[i]) continue;
 #ifdef DEBUG
-       if (UserConfigParams::m_physics_debug && 
-           !dynamic_cast<GhostKart*>(m_kart)     )
-       {
-           const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
-           // Make wheels that are not touching the ground invisible
-           m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
-       }
+        if (UserConfigParams::m_physics_debug &&
+            !dynamic_cast<GhostKart*>(m_kart)     )
+        {
+            const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+            // Make wheels that are not touching the ground invisible
+            m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
+        }
 #endif
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
 
-        const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
+        float suspension_length = 0.0f;
+        GhostKart* gk = dynamic_cast<GhostKart*>(m_kart);
+        if (gk && gt_replay_index != -1)
+        {
+            suspension_length = gk->getSuspensionLength(gt_replay_index, i);
+        }
+        else if (!gk)
+        {
+            suspension_length = m_kart->getVehicle()->getWheelInfo(i).
+                m_raycastInfo.m_suspensionLength;
+        }
 
         // Check documentation of Kart::updateGraphics for the following line
         pos.Y +=   m_default_physics_suspension[i]
-                 - wi.m_raycastInfo.m_suspensionLength
+                 - suspension_length
                  - m_kart_lowest_point;
         m_wheel_node[i]->setPosition(pos);
 

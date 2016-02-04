@@ -64,6 +64,10 @@ class TerrainInfo;
 class Kart : public AbstractKart
 {
     friend class Skidding;
+protected:
+    /** Offset of the graphical kart chassis from the physical chassis. */
+    float m_graphical_y_offset;
+
 private:
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed *m_max_speed;
@@ -105,9 +109,6 @@ private:
     /** The coordinates of the front of the kart, used to determine when a
      *  new lap is triggered. */
     Vec3 m_xyz_front;
-
-    /** Offset of the graphical kart chassis from the physical chassis. */
-    float m_graphical_y_offset;
 
     /** True if the kart wins, false otherwise. */
     bool m_race_result;
