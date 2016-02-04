@@ -137,11 +137,12 @@ private:
      */
     Synchronised<uint32_t> m_next_protocol_id;
 
+    /** When set to true, the main thread will exit. */
+    Synchronised<bool> m_exit;
+
     // mutexes:
     /*! Used to ensure that the protocol vector is used thread-safely.   */
     pthread_mutex_t m_asynchronous_protocols_mutex;
-    /*! Used when need to quit.*/
-    pthread_mutex_t m_exit_mutex;
 
     /*! Update thread.*/
     pthread_t* m_update_thread;
@@ -183,7 +184,6 @@ public:
     virtual uint32_t  getProtocolID(Protocol* protocol);
     virtual Protocol* getProtocol(uint32_t id);
     virtual Protocol* getProtocol(ProtocolType type);
-    int exit();
 };   // class ProtocolManager
 
 #endif // PROTOCOL_MANAGER_HPP
