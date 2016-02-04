@@ -167,14 +167,16 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
          * state and their unique id. */
         Synchronised<std::vector<Protocol*> >m_protocols;
 
-        /** Contains the network events to pass to protocols. */
+        /** Contains the network events to pass asynchronously to protocols 
+         *  (i.e. from the separate ProtocolManager thread). */
         Synchronised<std::vector<EventProcessingInfo> > m_events_to_process;
 
         /** Contains the requests to start/pause etc... protocols. */
-        std::vector<ProtocolRequest>    m_requests;
+        Synchronised< std::vector<ProtocolRequest> >    m_requests;
+
         /*! \brief The next id to assign to a protocol.
          * This value is incremented by 1 each time a protocol is started.
-         * If a protocol has an id lower than this value, it means that it have
+         * If a protocol has an id lower than this value, it means that it has
          * been formerly started.
          */
         uint32_t                        m_next_protocol_id;
@@ -182,8 +184,6 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
         // mutexes:
         /*! Used to ensure that the protocol vector is used thread-safely.   */
         pthread_mutex_t                 m_asynchronous_protocols_mutex;
-        /*! Used to ensure that the request vector is used thread-safely.    */
-        pthread_mutex_t                 m_requests_mutex;
         /*! Used to ensure that the protocol id is used in a thread-safe way.*/
         pthread_mutex_t                 m_id_mutex;
         /*! Used when need to quit.*/

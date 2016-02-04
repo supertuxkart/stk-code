@@ -35,7 +35,6 @@
 ProtocolManager::ProtocolManager()
 {
     pthread_mutex_init(&m_asynchronous_protocols_mutex, NULL);
-    pthread_mutex_init(&m_requests_mutex, NULL);
     pthread_mutex_init(&m_id_mutex, NULL);
     pthread_mutex_init(&m_exit_mutex, NULL);
     m_next_protocol_id = 0;
@@ -77,26 +76,30 @@ void ProtocolManager::abort()
 {
     pthread_mutex_unlock(&m_exit_mutex); // will stop the update function
     pthread_join(*m_asynchronous_update_thread, NULL); // wait the thread to finish
-    m_events_to_process.lock();
-    m_protocols.lock();
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);
-    pthread_mutex_lock(&m_requests_mutex);
     pthread_mutex_lock(&m_id_mutex);
+
+    m_protocols.lock();
     for (unsigned int i = 0; i < m_protocols.getData().size() ; i++)
         delete m_protocols.getData()[i];
+    m_protocols.getData().clear();
+    m_protocols.unlock();
+
+    m_events_to_process.lock();
     for (unsigned int i = 0; i < m_events_to_process.getData().size() ; i++)
         delete m_events_to_process.getData()[i].m_event;
-    m_protocols.getData().clear();
-    m_requests.clear();
     m_events_to_process.getData().clear();
     m_events_to_process.unlock();
-    m_protocols.unlock();
+    
+    
+    m_requests.lock();
+    m_requests.getData().clear();
+    m_requests.unlock();
+
     pthread_mutex_unlock(&m_asynchronous_protocols_mutex);
-    pthread_mutex_unlock(&m_requests_mutex);
     pthread_mutex_unlock(&m_id_mutex);
 
     pthread_mutex_destroy(&m_asynchronous_protocols_mutex);
-    pthread_mutex_destroy(&m_requests_mutex);
     pthread_mutex_destroy(&m_id_mutex);
     pthread_mutex_destroy(&m_exit_mutex);
 }   // abort
@@ -236,9 +239,9 @@ uint32_t ProtocolManager::requestStart(Protocol* protocol)
     // create the request
     ProtocolRequest req(PROTOCOL_REQUEST_START, protocol);
     // add it to the request stack
-    pthread_mutex_lock(&m_requests_mutex);
-    m_requests.push_back(req);
-    pthread_mutex_unlock(&m_requests_mutex);
+    m_requests.lock();
+    m_requests.getData().push_back(req);
+    m_requests.unlock();
 
     return req.getProtocol()->getId();
 }   // requestStart
@@ -256,9 +259,9 @@ void ProtocolManager::requestPause(Protocol* protocol)
     // create the request
     ProtocolRequest req(PROTOCOL_REQUEST_PAUSE, protocol);
     // add it to the request stack
-    pthread_mutex_lock(&m_requests_mutex);
-    m_requests.push_back(req);
-    pthread_mutex_unlock(&m_requests_mutex);
+    m_requests.lock();
+    m_requests.getData().push_back(req);
+    m_requests.unlock();
 }   // requestPause
 
 // ----------------------------------------------------------------------------
@@ -274,9 +277,9 @@ void ProtocolManager::requestUnpause(Protocol* protocol)
     // create the request
     ProtocolRequest req(PROTOCOL_REQUEST_UNPAUSE, protocol);;
     // add it to the request stack
-    pthread_mutex_lock(&m_requests_mutex);
-    m_requests.push_back(req);
-    pthread_mutex_unlock(&m_requests_mutex);
+    m_requests.lock();
+    m_requests.getData().push_back(req);
+    m_requests.unlock();
 }   // requestUnpause
 
 // ----------------------------------------------------------------------------
@@ -292,18 +295,18 @@ void ProtocolManager::requestTerminate(Protocol* protocol)
     // create the request
     ProtocolRequest req(PROTOCOL_REQUEST_TERMINATE, protocol);
     // add it to the request stack
-    pthread_mutex_lock(&m_requests_mutex);
+    m_requests.lock();
     // check that the request does not already exist :
-    for (unsigned int i = 0; i < m_requests.size(); i++)
+    for (unsigned int i = 0; i < m_requests.getData().size(); i++)
     {
-        if (m_requests[i].m_protocol == protocol)
+        if (m_requests.getData()[i].m_protocol == protocol)
         {
-            pthread_mutex_unlock(&m_requests_mutex);
+            m_requests.unlock();
             return;
         }
     }
-    m_requests.push_back(req);
-    pthread_mutex_unlock(&m_requests_mutex);
+    m_requests.getData().push_back(req);
+    m_requests.unlock();
 }   // requestTerminate
 
 // ----------------------------------------------------------------------------
@@ -498,12 +501,12 @@ void ProtocolManager::asynchronousUpdate()
 
     // Process queued events for protocols
     // these requests are asynchronous
-    pthread_mutex_lock(&m_requests_mutex);
-    while(m_requests.size()>0)
+    m_requests.lock();
+    while(m_requests.getData().size()>0)
     {
-        ProtocolRequest request = m_requests[0];
-        m_requests.erase(m_requests.begin());
-        pthread_mutex_unlock(&m_requests_mutex);
+        ProtocolRequest request = m_requests.getData()[0];
+        m_requests.getData().erase(m_requests.getData().begin());
+        m_requests.unlock();
         // Make sure new requests can be queued up while handling requests.
         // This is often used that terminating a protocol unpauses another,
         // so the m_requests queue must not be locked while executing requests.
@@ -522,9 +525,9 @@ void ProtocolManager::asynchronousUpdate()
                 terminateProtocol(request.getProtocol());
                 break;
         }   // switch (type)
-        pthread_mutex_lock(&m_requests_mutex);
+        m_requests.lock();
     }   // while m_requests.size()>0
-    pthread_mutex_unlock(&m_requests_mutex);
+    m_requests.unlock();
 }   // asynchronousUpdate
 
 // ----------------------------------------------------------------------------
