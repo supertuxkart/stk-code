@@ -111,7 +111,7 @@ void ConnectToServer::asynchronousUpdate()
             m_current_protocol->requestStart();
             // This protocol will be unpaused in the callback from 
             // GetPublicAddress
-            ProtocolManager::getInstance()->pauseProtocol(this);
+            requestPause();
             m_state = GETTING_SELF_ADDRESS;
             break;
         }
@@ -138,7 +138,7 @@ void ConnectToServer::asynchronousUpdate()
                 m_state = GOT_SERVER_ADDRESS;
                 // Pause this protocol till GetPeerAddress finishes.
                 // The callback then will unpause this protocol/
-                ProtocolManager::getInstance()->pauseProtocol(this);
+                requestPause();
             }
         }
         break;
@@ -266,12 +266,12 @@ void ConnectToServer::callback(Protocol *protocol)
         case GETTING_SELF_ADDRESS:
             // The GetPublicAddress protocol stores our address in
             // STKHost, so we only need to unpause this protocol
-            ProtocolManager::getInstance()->unpauseProtocol(this);
+            requestUnpause();
             break;
         case GOT_SERVER_ADDRESS:
             // Get the server address from the protocol.
             m_server_address.copy(((GetPeerAddress*)protocol)->getAddress());
-            ProtocolManager::getInstance()->unpauseProtocol(this);
+            requestUnpause();
             break;
         default:
             Log::error("ConnectToServer",

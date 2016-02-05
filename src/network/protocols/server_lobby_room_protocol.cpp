@@ -124,7 +124,7 @@ void ServerLobbyRoomProtocol::update()
         m_current_protocol->requestStart();
         m_state = GETTING_PUBLIC_ADDRESS;
         // The callback from GetPublicAddress will wake this protocol up
-        ProtocolManager::getInstance()->pauseProtocol(this);
+        requestPause();
         break;
     case GETTING_PUBLIC_ADDRESS:
         {
@@ -170,7 +170,7 @@ void ServerLobbyRoomProtocol::update()
  */
 void ServerLobbyRoomProtocol::callback(Protocol *protocol)
 {
-    ProtocolManager::getInstance()->unpauseProtocol(this);
+    requestUnpause();
 }   // callback
 
 //-----------------------------------------------------------------------------

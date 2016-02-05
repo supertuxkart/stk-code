@@ -153,6 +153,12 @@ private:
     uint32_t     getNextProtocolId();
     bool         sendEvent(EventProcessingInfo* event, bool synchronous);
 
+    virtual void startProtocol(Protocol *protocol);
+    virtual void terminateProtocol(Protocol *protocol);
+    virtual void asynchronousUpdate();
+    virtual void pauseProtocol(Protocol *protocol);
+    virtual void unpauseProtocol(Protocol *protocol);
+
 public:
     virtual void      abort();
     virtual void      propagateEvent(Event* event);
@@ -171,12 +177,7 @@ public:
     virtual void      requestPause(Protocol* protocol);
     virtual void      requestUnpause(Protocol* protocol);
     virtual void      requestTerminate(Protocol* protocol);
-    virtual void      startProtocol(Protocol *protocol);
-    virtual void      pauseProtocol(Protocol *protocol);
-    virtual void      unpauseProtocol(Protocol *protocol);
-    virtual void      terminateProtocol(Protocol *protocol);
     virtual void      update();
-    virtual void      asynchronousUpdate();
     virtual Protocol* getProtocol(uint32_t id);
     virtual Protocol* getProtocol(ProtocolType type);
 };   // class ProtocolManager
