@@ -50,13 +50,11 @@ void* ProtocolManager::mainLoop(void* data)
     VS::setThreadName("ProtocolManager");
 
     ProtocolManager* manager = static_cast<ProtocolManager*>(data);
-    manager->m_asynchronous_thread_running = true;
     while(manager && !manager->m_exit.getAtomic())
     {
         manager->asynchronousUpdate();
         StkTime::sleep(2);
     }
-    manager->m_asynchronous_thread_running = false;
     return NULL;
 }   // protocolManagerAsynchronousUpdate
 
@@ -309,7 +307,6 @@ void ProtocolManager::requestTerminate(Protocol* protocol)
  */
 void ProtocolManager::startProtocol(Protocol *protocol)
 {
-  //  assert(protocol_info.m_state == PROTOCOL_STATE_INITIALISING);
     // add the protocol to the protocol vector so that it's updated
     m_protocols.lock();
     pthread_mutex_lock(&m_asynchronous_protocols_mutex);

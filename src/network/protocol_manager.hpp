@@ -144,12 +144,8 @@ private:
     /*! Used to ensure that the protocol vector is used thread-safely.   */
     pthread_mutex_t m_asynchronous_protocols_mutex;
 
-    /*! Update thread.*/
-    pthread_t* m_update_thread;
     /*! Asynchronous update thread.*/
     pthread_t* m_asynchronous_update_thread;
-    /*! True if the thread is running. */
-    bool m_asynchronous_thread_running;
 
                  ProtocolManager();
     virtual     ~ProtocolManager();
