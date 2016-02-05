@@ -34,19 +34,17 @@ private:
     /** A separate vector of Replay Events for all transforms. */
     std::vector< std::vector<TransformEvent> > m_transform_events;
 
-    /** A separate vector of Replay Events for all transforms. */
+    /** A separate vector of Replay Events for all physic info. */
     std::vector< std::vector<PhysicInfo> > m_physic_info;
+
+    /** A separate vector of Replay Events for all other events. */
+    std::vector< std::vector<KartReplayEvent> > m_kart_replay_event;
 
     /** Time at which a transform was saved for the last time. */
     std::vector<float> m_last_saved_time;
 
     /** Counts the number of transform events for each kart. */
     std::vector<unsigned int> m_count_transforms;
-
-    /** Stores the last skid state. */
-    std::vector<KartControl::SkidControl> m_skid_control;
-
-    std::vector< std::vector<KartReplayEvent> > m_kart_replay_event;
 
     /** Static pointer to the one instance of the replay object. */
     static ReplayRecorder *m_replay_recorder;

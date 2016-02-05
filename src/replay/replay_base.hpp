@@ -59,17 +59,12 @@ protected:
     };   // PhysicInfo
 
     // ------------------------------------------------------------------------
-    /** Records all other events - atm start and end skidding. */
+    /** Records all other events - atm nitro and zipper handling. */
     struct KartReplayEvent
     {
         /** The type of event. */
-        enum KartReplayEventType {KRE_NONE,
-                                  KRE_SKID_LEFT,
-                                  KRE_SKID_MIN = KRE_SKID_LEFT,
-                                  KRE_SKID_RIGHT, KRE_SKID_RELEASE} m_type;
-
-        /** Time at which this event happens. */
-        float       m_time;
+        bool        m_on_nitro;
+        bool        m_on_zipper;
     };   // KartReplayEvent
 
     // ------------------------------------------------------------------------

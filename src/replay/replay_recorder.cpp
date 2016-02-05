@@ -24,6 +24,7 @@
 #include "modes/world.hpp"
 #include "physics/btKart.hpp"
 #include "race/race_manager.hpp"
+#include "tracks/terrain_info.hpp"
 #include "tracks/track.hpp"
 
 #include <algorithm>
@@ -45,6 +46,7 @@ ReplayRecorder::~ReplayRecorder()
 {
     m_transform_events.clear();
     m_physic_info.clear();
+    m_kart_replay_event.clear();
 }   // ~Replay
 
 //-----------------------------------------------------------------------------
@@ -55,9 +57,9 @@ void ReplayRecorder::init()
 {
     m_transform_events.clear();
     m_physic_info.clear();
+    m_kart_replay_event.clear();
     m_transform_events.resize(race_manager->getNumberOfKarts());
     m_physic_info.resize(race_manager->getNumberOfKarts());
-    m_skid_control.resize(race_manager->getNumberOfKarts());
     m_kart_replay_event.resize(race_manager->getNumberOfKarts());
     unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time
                                              / stk_config->m_replay_dt);
@@ -65,8 +67,7 @@ void ReplayRecorder::init()
     {
         m_transform_events[i].resize(max_frames);
         m_physic_info[i].resize(max_frames);
-        // Rather arbitraritly sized, it will be added with push_back
-        m_kart_replay_event[i].reserve(500);
+        m_kart_replay_event[i].resize(max_frames);
     }
     m_count_transforms.clear();
     m_count_transforms.resize(race_manager->getNumberOfKarts(), 0);
@@ -103,40 +104,22 @@ void ReplayRecorder::update(float dt)
     for(unsigned int i=0; i<num_karts; i++)
     {
         const AbstractKart *kart = world->getKart(i);
-
-        // Check if skidding state has changed. If so, store this
-        if(kart->getControls().m_skid != m_skid_control[i])
-        {
-            KartReplayEvent kre;
-            kre.m_time = World::getWorld()->getTime();
-            if(kart->getControls().m_skid==KartControl::SC_LEFT)
-                kre.m_type = KartReplayEvent::KRE_SKID_LEFT;
-            else if(kart->getControls().m_skid==KartControl::SC_RIGHT)
-                kre.m_type = KartReplayEvent::KRE_SKID_RIGHT;
-            else
-                kre.m_type = KartReplayEvent::KRE_NONE;
-            m_kart_replay_event[i].push_back(kre);
-            if(m_skid_control[i]!=KartControl::SC_NONE)
-                m_skid_control[i] = KartControl::SC_NONE;
-            else
-                m_skid_control[i] = kart->getControls().m_skid;
-        }
 #ifdef DEBUG
-        m_count ++;
+        m_count++;
 #endif
-        if(time - m_last_saved_time[i]<stk_config->m_replay_dt)
+        if (time - m_last_saved_time[i] < stk_config->m_replay_dt)
         {
 #ifdef DEBUG
-            m_count_skipped_time ++;
+            m_count_skipped_time++;
 #endif
             continue;
         }
         m_last_saved_time[i] = time;
         m_count_transforms[i]++;
-        if(m_count_transforms[i]>=m_transform_events[i].size())
+        if (m_count_transforms[i] >= m_transform_events[i].size())
         {
             // Only print this message once.
-            if(m_count_transforms[i]==m_transform_events[i].size())
+            if (m_count_transforms[i] == m_transform_events[i].size())
             {
                 char buffer[100];
                 sprintf(buffer, "Can't store more events for kart %s.",
@@ -147,6 +130,8 @@ void ReplayRecorder::update(float dt)
         }
         TransformEvent *p      = &(m_transform_events[i][m_count_transforms[i]-1]);
         PhysicInfo *q          = &(m_physic_info[i][m_count_transforms[i]-1]);
+        KartReplayEvent *r     = &(m_kart_replay_event[i][m_count_transforms[i]-1]);
+
         p->m_time              = World::getWorld()->getTime();
         p->m_transform.setOrigin(kart->getXYZ());
         p->m_transform.setRotation(kart->getVisualRotation());
@@ -164,6 +149,28 @@ void ReplayRecorder::update(float dt)
                     ->getWheelInfo(j).m_raycastInfo.m_suspensionLength;
             }
         }
+
+        bool nitro = false;
+        bool zipper = false;
+        const KartControl kc = kart->getControls();
+        const Material* m = kart->getTerrainInfo()->getMaterial();
+        if (kc.m_nitro && kart->isOnGround() &&
+            kart->isOnMinNitroTime() > 0.0f && kart->getEnergy() > 0.0f)
+        {
+            nitro = true;
+        }
+        if (m)
+        {
+            if (m->isZipper() && kart->isOnGround())
+                zipper = true;
+        }
+        if (kc.m_fire &&
+            kart->getPowerup()->getType() == PowerupManager::POWERUP_ZIPPER)
+        {
+            zipper = true;
+        }
+        r->m_on_nitro = nitro;
+        r->m_on_zipper = zipper;
     }   // for i
 }   // update
 
@@ -177,7 +184,7 @@ void ReplayRecorder::Save()
            m_count, m_count_skipped_time);
 #endif
     FILE *fd = openReplayFile(/*writeable*/true);
-    if(!fd)
+    if (!fd)
     {
         Log::error("ReplayRecorder", "Can't open '%s' for writing - can't save replay data.",
                    getReplayFilename().c_str());
@@ -195,18 +202,19 @@ void ReplayRecorder::Save()
 
     unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time 
                                              / stk_config->m_replay_dt      );
-    for(unsigned int k=0; k<num_karts; k++)
+    for (unsigned int k = 0; k < num_karts; k++)
     {
         fprintf(fd, "model: %s\n", world->getKart(k)->getIdent().c_str());
         fprintf(fd, "size:     %d\n", m_count_transforms[k]);
 
         unsigned int num_transforms = std::min(max_frames,
                                                m_count_transforms[k]);
-        for(unsigned int i=0; i<num_transforms; i++)
+        for (unsigned int i = 0; i < num_transforms; i++)
         {
-            const TransformEvent *p = &(m_transform_events[k][i]);
-            const PhysicInfo *q     = &(m_physic_info[k][i]);
-            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f\n",
+            const TransformEvent *p  = &(m_transform_events[k][i]);
+            const PhysicInfo *q      = &(m_physic_info[k][i]);
+            const KartReplayEvent *r = &(m_kart_replay_event[k][i]);
+            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f  %d  %d\n",
                     p->m_time,
                     p->m_transform.getOrigin().getX(),
                     p->m_transform.getOrigin().getY(),
@@ -220,15 +228,11 @@ void ReplayRecorder::Save()
                     q->m_suspension_length[0],
                     q->m_suspension_length[1],
                     q->m_suspension_length[2],
-                    q->m_suspension_length[3]
+                    q->m_suspension_length[3],
+                    (int)r->m_on_nitro,
+                    (int)r->m_on_zipper
                 );
         }   // for i
-        fprintf(fd, "events: %d\n", (int)m_kart_replay_event[k].size());
-        for(unsigned int i=0; i<m_kart_replay_event[k].size(); i++)
-        {
-            const KartReplayEvent *p=&(m_kart_replay_event[k][i]);
-            fprintf(fd, "%f %d\n", p->m_time, p->m_type);
-        }
     }
     fclose(fd);
 }   // Save

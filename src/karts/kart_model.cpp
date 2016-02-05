@@ -817,11 +817,14 @@ void KartModel::update(float dt, float distance, float steer, float speed,
 
         float suspension_length = 0.0f;
         GhostKart* gk = dynamic_cast<GhostKart*>(m_kart);
-        if (gk && gt_replay_index != -1)
+        // Prevent using m_default_physics_suspension uninitialized
+        if (gk && gt_replay_index == -1) break;
+
+        if (gk)
         {
             suspension_length = gk->getSuspensionLength(gt_replay_index, i);
         }
-        else if (!gk)
+        else
         {
             suspension_length = m_kart->getVehicle()->getWheelInfo(i).
                 m_raycastInfo.m_suspensionLength;

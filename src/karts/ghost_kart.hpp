@@ -44,23 +44,15 @@ private:
 
     std::vector<ReplayBase::PhysicInfo> m_all_physic_info;
 
-    std::vector<ReplayBase::KartReplayEvent> m_replay_events;
+    std::vector<ReplayBase::KartReplayEvent> m_all_replay_events;
 
     /** Pointer to the last index in m_all_times that is smaller than
      *  the current world time. */
     unsigned int m_current_transform;
 
-    /** Index of the next kart replay event. */
-    unsigned int m_next_event;
-
-    void         updateTransform(float t, float dt);
 public:
                  GhostKart(const std::string& ident);
     virtual void update (float dt);
-    virtual void addTransform(float time,
-                              const btTransform &trans,
-                              const ReplayBase::PhysicInfo &pi);
-    virtual void addReplayEvent(const ReplayBase::KartReplayEvent &kre);
     virtual void reset();
     // ------------------------------------------------------------------------
     /** No physics body for ghost kart, so nothing to adjust. */
@@ -72,8 +64,13 @@ public:
     // Not needed to create any physics for a ghost kart.
     virtual void createPhysics() {}
     // ------------------------------------------------------------------------
-    const float getSuspensionLength(int index, int wheel) const
+    const float  getSuspensionLength(int index, int wheel) const
                { return m_all_physic_info[index].m_suspension_length[wheel]; }
+    // ------------------------------------------------------------------------
+    void         addReplayEvent(float time,
+                                const btTransform &trans,
+                                const ReplayBase::PhysicInfo &pi,
+                                const ReplayBase::KartReplayEvent &kre);
     // ------------------------------------------------------------------------
 };   // GhostKart
 #endif

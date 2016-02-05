@@ -173,27 +173,32 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
     {
         fgets(s, 1023, fd);
         float x, y, z, rx, ry, rz, rw, time, speed, steer, w1, w2, w3, w4;
+        int nitro, zipper;
 
         // Check for EV_TRANSFORM event:
         // -----------------------------
-        if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f\n",
+        if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f  %d  %d\n",
             &time,
             &x, &y, &z,
             &rx, &ry, &rz, &rw,
-            &speed, &steer, &w1, &w2, &w3, &w4
-            )==14)
+            &speed, &steer, &w1, &w2, &w3, &w4,
+            &nitro, &zipper
+            )==16)
         {
             btQuaternion q(rx, ry, rz, rw);
             btVector3 xyz(x, y, z);
             PhysicInfo pi = {0};
+            KartReplayEvent kre = {0};
             pi.m_speed = speed;
             pi.m_steer = steer;
             pi.m_suspension_length[0] = w1;
             pi.m_suspension_length[1] = w2;
             pi.m_suspension_length[2] = w3;
             pi.m_suspension_length[3] = w4;
-            m_ghost_karts[m_ghost_karts.size()-1].addTransform(time,
-                                                          btTransform(q, xyz), pi);
+            kre.m_on_nitro = (bool)nitro;
+            kre.m_on_zipper = (bool)zipper;
+            m_ghost_karts[m_ghost_karts.size()-1].addReplayEvent(time,
+                btTransform(q, xyz), pi, kre);
         }
         else
         {
@@ -204,31 +209,5 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
             Log::warn("Replay", "Ignored.");
         }
     }   // for i
-    fgets(s, 1023, fd);
-    unsigned int num_events;
-    if(sscanf(s,"events: %u",&num_events)!=1)
-        Log::warn("Replay", "Number of events not found in replay file "
-                "for kart %d.", m_ghost_karts.size()-1);
-
-    for(unsigned int i=0; i<num_events; i++)
-    {
-        fgets(s, 1023, fd);
-        KartReplayEvent kre;
-        int type;
-        if(sscanf(s, "%f %d\n", &kre.m_time, &type)==2)
-        {
-            kre.m_type = (KartReplayEvent::KartReplayEventType)type;
-            m_ghost_karts[m_ghost_karts.size()-1].addReplayEvent(kre);
-        }
-        else
-        {
-            // Invalid record found
-            // ---------------------
-            Log::warn("Replay", "Can't read replay event line %d:", i);
-            Log::warn("Replay", "%s", s);
-            Log::warn("Replay", "Ignored.");
-        }
-
-    }   // for i < events
 
 }   // readKartData

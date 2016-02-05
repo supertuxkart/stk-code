@@ -431,7 +431,7 @@ public:
     virtual void showStarEffect(float t);
     // ------------------------------------------------------------------------
     /** Returns the terrain info oject. */
-    TerrainInfo *getTerrainInfo() { return m_terrain_info; }
+    virtual const TerrainInfo *getTerrainInfo() const { return m_terrain_info; }
     // ------------------------------------------------------------------------
     virtual void setOnScreenText(const wchar_t *text);
     // ------------------------------------------------------------------------

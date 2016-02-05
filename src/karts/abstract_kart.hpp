@@ -46,6 +46,7 @@ class Material;
 class Powerup;
 class Skidding;
 class SlipStream;
+class TerrainInfo;
 
 /** An abstract interface for the actual karts. Some functions are actually
  *  implemented here in order to allow inlining.
@@ -420,6 +421,9 @@ public:
 
     /** Shows the star effect for a certain time. */
     virtual void showStarEffect(float t) = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the terrain info oject. */
+    virtual const TerrainInfo *getTerrainInfo() const = 0;
     // ------------------------------------------------------------------------
     /** Called when the kart crashes against another kart.
      *  \param k The kart that was hit.

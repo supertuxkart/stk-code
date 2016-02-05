@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "karts/ghost_kart.hpp"
+#include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
 #include "modes/world.hpp"
 
@@ -27,11 +28,10 @@ GhostKart::GhostKart(const std::string& ident)
              : Kart(ident, /*world kart id*/99999,
                     /*position*/-1, btTransform(), PLAYER_DIFFICULTY_NORMAL)
 {
-    m_current_transform = 0;
-    m_next_event        = 0;
     m_all_times.clear();
     m_all_transform.clear();
     m_all_physic_info.clear();
+    m_all_replay_events.clear();
 }   // GhostKart
 
 // ----------------------------------------------------------------------------
@@ -40,19 +40,15 @@ void GhostKart::reset()
     m_node->setVisible(true);
     Kart::reset();
     m_current_transform = 0;
-    m_next_event        = 0;
     // This will set the correct start position
     update(0);
 }   // reset
 
 // ----------------------------------------------------------------------------
-/** Sets the next time and transform. The current time and transform becomes
- *  the previous time and transform.
- *  \param
- */
-void GhostKart::addTransform(float time,
-                             const btTransform &trans,
-                             const ReplayBase::PhysicInfo &pi)
+void GhostKart::addReplayEvent(float time,
+                               const btTransform &trans,
+                               const ReplayBase::PhysicInfo &pi,
+                               const ReplayBase::KartReplayEvent &kre)
 {
     // FIXME: for now avoid that transforms for the same time are set
     // twice (to avoid division by zero in update). This should be
@@ -62,6 +58,7 @@ void GhostKart::addTransform(float time,
     m_all_times.push_back(time);
     m_all_transform.push_back(trans);
     m_all_physic_info.push_back(pi);
+    m_all_replay_events.push_back(kre);
 
     // Use first frame of replay to calculate default suspension
     if (m_all_physic_info.size() == 1)
@@ -74,54 +71,44 @@ void GhostKart::addTransform(float time,
             ->setDefaultSuspension();
     }
 
-}   // addTransform
-
-// ----------------------------------------------------------------------------
-/** Adds a replay event for this kart.
- */
-void GhostKart::addReplayEvent(const ReplayBase::KartReplayEvent &kre)
-{
-    m_replay_events.push_back(kre);
 }   // addReplayEvent
 
 // ----------------------------------------------------------------------------
-/** Updates the ghost data each time step. It uses interpolation to get a new
- *  position and rotation.
+/** Updates the current event of the ghost kart using interpolation
  *  \param dt Time step size.
  */
 void GhostKart::update(float dt)
 {
     float t = World::getWorld()->getTime();
-    // Don't do anything at startup
-    if(t==0) return;
-    updateTransform(t, dt);
-    while(m_next_event < m_replay_events.size() &&
-          m_replay_events[m_next_event].m_time <= t)
-    {
-        Log::debug("Ghost_Kart", "Handling event %d", m_next_event);
-        // Handle the next event now
-        m_next_event++;
-    }
-}
-// ----------------------------------------------------------------------------
-/** Updates the current transform of the ghost kart using interpolation
- *  \param t Current world time.
- *  \param dt Time step size.
- */
-void GhostKart::updateTransform(float t, float dt)
-{
-
     // Find (if necessary) the next index to use
-    while(m_current_transform+1 < m_all_times.size() &&
-          t>=m_all_times[m_current_transform+1])
+    if (t != 0.0f)
     {
-          m_current_transform ++;
+        while (m_current_transform + 1 < m_all_times.size() &&
+               t >= m_all_times[m_current_transform+1])
+        {
+            m_current_transform++;
+        }
     }
-    if(m_current_transform+1>=m_all_times.size())
+
+    if (m_current_transform + 1 >= m_all_times.size())
     {
         m_node->setVisible(false);
         return;
     }
+
+    float nitro_frac = 0;
+    if (m_all_replay_events[m_current_transform].m_on_nitro)
+    {
+        nitro_frac = fabsf(m_all_physic_info[m_current_transform].m_speed) /
+            (m_kart_properties->getEngineMaxSpeed());
+
+        if (nitro_frac > 1.0f)
+            nitro_frac = 1.0f;
+    }
+    getKartGFX()->updateNitroGraphics(nitro_frac);
+
+    if (m_all_replay_events[m_current_transform].m_on_zipper)
+        showZipperFire();
 
     float f =(t - m_all_times[m_current_transform])
            / (  m_all_times[m_current_transform+1]
@@ -143,4 +130,6 @@ void GhostKart::updateTransform(float t, float dt)
         m_all_physic_info[m_current_transform].m_steer,
         m_all_physic_info[m_current_transform].m_speed,
         m_current_transform);
+
+    getKartGFX()->update(dt);
 }   // update
