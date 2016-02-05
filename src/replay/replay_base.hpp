@@ -62,7 +62,8 @@ protected:
     /** Records all other events - atm nitro and zipper handling. */
     struct KartReplayEvent
     {
-        /** The type of event. */
+        /** True if the kart recorded is using nitro/zipper.
+          * If true, a suitable GFX will be replayed. */
         bool        m_on_nitro;
         bool        m_on_zipper;
     };   // KartReplayEvent
