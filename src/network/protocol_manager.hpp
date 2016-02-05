@@ -177,7 +177,6 @@ public:
     virtual void      terminateProtocol(Protocol *protocol);
     virtual void      update();
     virtual void      asynchronousUpdate();
-    virtual uint32_t  getProtocolID(Protocol* protocol);
     virtual Protocol* getProtocol(uint32_t id);
     virtual Protocol* getProtocol(ProtocolType type);
 };   // class ProtocolManager

@@ -521,22 +521,6 @@ void ProtocolManager::asynchronousUpdate()
 }   // asynchronousUpdate
 
 // ----------------------------------------------------------------------------
-/** \brief Get the id of a protocol.
- *  \param protocol : A pointer to the protocol you seek the id.
- *  \return The id of the protocol pointed by the protocol parameter.
- */
-uint32_t ProtocolManager::getProtocolID(Protocol* protocol)
-{
-    // FIXME: Does this need to be locked?
-    for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
-    {
-        if (m_protocols.getData()[i] == protocol)
-            return m_protocols.getData()[i]->getId();
-    }
-    return 0;
-}   // getProtocolID
-
-// ----------------------------------------------------------------------------
 /** \brief Get a protocol using its id.
  *  \param id : Unique ID of the seek protocol.
  *  \return The protocol that has the ID id.
