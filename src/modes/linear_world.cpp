@@ -245,20 +245,24 @@ void LinearWorld::newLap(unsigned int kart_index)
 {
     KartInfo &kart_info = m_kart_info[kart_index];
     AbstractKart *kart  = m_karts[kart_index];
+    const bool is_gk    = kart->isGhostKart();
 
     // Reset reset-after-lap achievements
-    StateManager::ActivePlayer *c = kart->getController()->getPlayer();
-    PlayerProfile *p = PlayerManager::getCurrentPlayer();
-    if (c && c->getConstProfile() == p)
+    if (!is_gk)
     {
-        p->getAchievementsStatus()->onLapEnd();
+        StateManager::ActivePlayer *c = kart->getController()->getPlayer();
+        PlayerProfile *p = PlayerManager::getCurrentPlayer();
+        if (c && c->getConstProfile() == p)
+        {
+            p->getAchievementsStatus()->onLapEnd();
+        }
     }
 
     // Only update the kart controller if a kart that has already finished
     // the race crosses the start line again. This avoids 'fastest lap'
     // messages if the end controller does a fastest lap, but especially
     // allows the end controller to switch end cameras
-    if(kart->hasFinishedRace())
+    if(kart->hasFinishedRace() && !is_gk)
     {
         kart->getController()->newLap(kart_info.m_race_lap);
         return;
@@ -374,7 +378,8 @@ void LinearWorld::newLap(unsigned int kart_index)
     } // end if new fastest lap
 
     kart_info.m_lap_start_time = getTime();
-    kart->getController()->newLap(kart_info.m_race_lap);
+    if (!is_gk)
+        kart->getController()->newLap(kart_info.m_race_lap);
 }   // newLap
 
 //-----------------------------------------------------------------------------
@@ -840,6 +845,8 @@ void LinearWorld::updateRacePosition()
  */
 void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 {
+    if (m_karts[i]->isGhostKart()) return;
+
     if (!m_karts[i]->getController()->isLocalPlayerController()) 
         return;
 

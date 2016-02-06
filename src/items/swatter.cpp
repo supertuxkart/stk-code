@@ -243,7 +243,7 @@ void Swatter::chooseTarget()
     {
         AbstractKart *kart = world->getKart(i);
         // TODO: isSwatterReady(), isSquashable()?
-        if(kart->isEliminated() || kart==m_kart)
+        if(kart->isEliminated() || kart == m_kart || kart->isGhostKart())
             continue;
         // don't squash an already hurt kart
         if (kart->isInvulnerable() || kart->isSquashed())

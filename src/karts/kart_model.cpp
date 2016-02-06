@@ -806,7 +806,7 @@ void KartModel::update(float dt, float distance, float steer, float speed,
         if (!m_kart || !m_wheel_node[i]) continue;
 #ifdef DEBUG
         if (UserConfigParams::m_physics_debug &&
-            !dynamic_cast<GhostKart*>(m_kart)     )
+            !m_kart->isGhostKart())
         {
             const btWheelInfo &wi = m_kart->getVehicle()->getWheelInfo(i);
             // Make wheels that are not touching the ground invisible

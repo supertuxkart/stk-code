@@ -512,7 +512,8 @@ void Kart::setController(Controller *controller)
  */
 void Kart::setPosition(int p)
 {
-    m_controller->setPosition(p);
+    if (m_controller)
+        m_controller->setPosition(p);
     m_race_position = p;
 }   // setPosition
 
@@ -834,14 +835,15 @@ void Kart::finishedRace(float time)
     if(m_finished_race) return;
     m_finished_race = true;
     m_finish_time   = time;
-    m_controller->finishedRace(time);
+    if(!isGhostKart())
+        m_controller->finishedRace(time);
     m_kart_model->finishedRace();
     race_manager->kartFinishedRace(this, time);
 
     if ((race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
          race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
          race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
-         && m_controller->isPlayerController())
+         && (isGhostKart() ? false : m_controller->isPlayerController()))
     {
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if (m)
@@ -869,10 +871,13 @@ void Kart::finishedRace(float time)
     {
         // Save for music handling in race result gui
         setRaceResult();
-        setController(new EndController(this, m_controller->getPlayer(),
-                                        m_controller));
+        if(!isGhostKart())
+        {
+            setController(new EndController(this, m_controller->getPlayer(),
+                                            m_controller));
+        }
         // Skip animation if this kart is eliminated
-        if (m_eliminated) return;
+        if (m_eliminated || isGhostKart()) return;
 
         m_kart_model->setAnimation(m_race_result ?
             KartModel::AF_WIN_START : KartModel::AF_LOSE_START);
@@ -885,8 +890,9 @@ void Kart::setRaceResult()
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
     {
-        if (m_controller->isLocalPlayerController()) // if player is on this computer
+        if (isGhostKart() ? false : m_controller->isPlayerController())
         {
+            // if player is on this computer
             PlayerProfile *player = PlayerManager::getCurrentPlayer();
             const ChallengeStatus *challenge = player->getCurrentChallengeStatus();
             // In case of a GP challenge don't make the end animation depend
@@ -1487,7 +1493,7 @@ void Kart::showZipperFire()
  */
 void Kart::setSquash(float time, float slowdown)
 {
-    if (isInvulnerable()) return;
+    if (isInvulnerable() || isGhostKart()) return;
 
     if (isShielded())
     {

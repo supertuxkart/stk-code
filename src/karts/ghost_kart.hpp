@@ -51,7 +51,8 @@ private:
     unsigned int m_current_transform;
 
 public:
-                 GhostKart(const std::string& ident);
+                 GhostKart(const std::string& ident,
+                           unsigned int world_kart_id, int position);
     virtual void update (float dt);
     virtual void reset();
     // ------------------------------------------------------------------------
@@ -72,5 +73,8 @@ public:
                                 const ReplayBase::PhysicInfo &pi,
                                 const ReplayBase::KartReplayEvent &kre);
     // ------------------------------------------------------------------------
+    /** Returns whether this kart is a ghost (replay) kart. */
+    virtual bool isGhostKart() const                         { return true;  }
+
 };   // GhostKart
 #endif

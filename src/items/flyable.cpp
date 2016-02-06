@@ -226,7 +226,8 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
         // it is not considered a target anymore.
         if(kart->isEliminated() || kart == m_owner ||
             kart->isInvulnerable()                 ||
-            kart->getKartAnimation()                   ) continue;
+            kart->getKartAnimation()               ||
+            kart->isGhostKart()  ) continue;
 
         const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
         if (sw)
@@ -480,6 +481,7 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
                 ->getKartTeam(m_owner->getWorldKartId()))
             continue;
         }
+        if (kart->isGhostKart()) continue;
 
         // If no secondary hits should be done, only hit the
         // direct hit kart.

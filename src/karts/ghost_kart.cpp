@@ -24,9 +24,11 @@
 #include "LinearMath/btQuaternion.h"
 #include "utils/log.hpp"
 
-GhostKart::GhostKart(const std::string& ident)
-             : Kart(ident, /*world kart id*/99999,
-                    /*position*/-1, btTransform(), PLAYER_DIFFICULTY_NORMAL)
+GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
+                     int position)
+          : Kart(ident, world_kart_id,
+                 position, btTransform(btQuaternion(0, 0, 0, 1)),
+                 PLAYER_DIFFICULTY_NORMAL)
 {
     m_all_times.clear();
     m_all_transform.clear();
@@ -131,5 +133,7 @@ void GhostKart::update(float dt)
         m_all_physic_info[m_current_transform].m_speed,
         m_current_transform);
 
+    Vec3 front(0, 0, getKartLength()*0.5f);
+    m_xyz_front = getTrans()(front);
     getKartGFX()->update(dt);
 }   // update

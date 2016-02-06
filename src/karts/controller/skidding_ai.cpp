@@ -1757,7 +1757,7 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
             {
                 const AbstractKart* kart = m_world->getKart(j);
                 // Ignore eliminated karts
-                if(kart==m_kart||kart->isEliminated()) continue;
+                if(kart==m_kart||kart->isEliminated()||kart->isGhostKart()) continue;
                 const AbstractKart *other_kart = m_world->getKart(j);
                 // Ignore karts ahead that are faster than this kart.
                 if(m_kart->getVelocityLC().getZ() < other_kart->getVelocityLC().getZ())

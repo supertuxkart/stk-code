@@ -47,6 +47,7 @@
 #include "network/network_config.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
+#include "replay/replay_play.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
 #include "states_screens/grand_prix_lose.hpp"
@@ -308,6 +309,13 @@ void RaceManager::computeRandomKartList()
  */
 void RaceManager::startNew(bool from_overworld)
 {
+    unsigned int gk = 0;
+    if (ReplayPlay::get())
+    {
+        ReplayPlay::get()->loadKartInfo();
+        gk = ReplayPlay::get()->getNumGhostKart();
+    }
+
     m_started_from_overworld = from_overworld;
     m_saved_gp = NULL; // There will be checks for this being NULL done later
 
@@ -359,16 +367,30 @@ void RaceManager::startNew(bool from_overworld)
     // Create the kart status data structure to keep track of scores, times, ...
     // ==========================================================================
     m_kart_status.clear();
-    Log::verbose("RaceManager", "Nb of karts=%u, ai:%lu players:%lu\n",
-        (unsigned int) m_num_karts, m_ai_kart_list.size(), m_player_karts.size());
+    if (gk > 0)
+        m_num_karts += gk;
 
-    assert((unsigned int)m_num_karts == m_ai_kart_list.size()+m_player_karts.size());
+    Log::verbose("RaceManager", "Nb of karts=%u, ghost karts:%u ai:%lu players:%lu\n",
+        (unsigned int) m_num_karts, gk, m_ai_kart_list.size(), m_player_karts.size());
 
-    // First add the AI karts (randomly chosen)
+    assert((unsigned int)m_num_karts == gk+m_ai_kart_list.size()+m_player_karts.size());
+
+    // First add the ghost karts (if any)
     // ----------------------------------------
-
     // GP ranks start with -1 for the leader.
     int init_gp_rank = getMinorMode()==MINOR_MODE_FOLLOW_LEADER ? -1 : 0;
+    if (gk > 0)
+    {
+        for(unsigned int i = 0; i < gk; i++)
+        {
+            m_kart_status.push_back(KartStatus(ReplayPlay::get()->getGhostKartName(i),
+                i, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
+            init_gp_rank ++;
+        }
+    }
+
+    // Then add the AI karts (randomly chosen)
+    // ----------------------------------------
     const unsigned int ai_kart_count = m_ai_kart_list.size();
     for(unsigned int i = 0; i < ai_kart_count; i++)
     {
@@ -382,7 +404,7 @@ void RaceManager::startNew(bool from_overworld)
         }
     }
 
-    // Then add the players, which start behind the AI karts
+    // Finally add the players, which start behind the AI karts
     // -----------------------------------------------------
     for(unsigned int i = 0; i < m_player_karts.size(); i++)
     {
@@ -836,6 +858,7 @@ void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
     m_kart_status[id].m_overall_time += time;
     m_kart_status[id].m_last_time     = time;
     m_num_finished_karts ++;
+    if(kart->isGhostKart()) return;
     if(kart->getController()->isPlayerController())
         m_num_finished_players++;
 }   // kartFinishedRace

@@ -35,7 +35,8 @@ ReplayPlay *ReplayPlay::m_replay_play = NULL;
  */
 ReplayPlay::ReplayPlay()
 {
-    m_next            = 0;
+    m_next = 0;
+    m_ghost_karts_list.clear();
 }   // ReplayPlay
 
 //-----------------------------------------------------------------------------
@@ -45,20 +46,12 @@ ReplayPlay::~ReplayPlay()
 }   // ~Replay
 
 //-----------------------------------------------------------------------------
-/** Starts replay from the replay file in the current directory.
- */
-void ReplayPlay::init()
-{
-    m_next = 0;
-    Load();
-}   // init
-
-//-----------------------------------------------------------------------------
 /** Resets all ghost karts back to start position.
  */
 void ReplayPlay::reset()
 {
     m_next = 0;
+    m_ghost_karts_list.clear();
     for(unsigned int i=0; i<(unsigned int)m_ghost_karts.size(); i++)
     {
         m_ghost_karts[i].reset();
@@ -78,9 +71,42 @@ void ReplayPlay::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** Loads the ghost karts info in the replay file, required by race manager.
+ */
+void ReplayPlay::loadKartInfo()
+{
+    char s[1024];
+
+    FILE *fd = openReplayFile(/*writeable*/false);
+    if(!fd)
+    {
+        Log::error("Replay", "Can't read '%s', ghost replay disabled.",
+               getReplayFilename().c_str());
+        destroy();
+        return;
+    }
+
+    Log::info("Replay", "Reading ghost karts info");
+    while(true)
+    {
+        if (fgets(s, 1023, fd) == NULL)
+            Log::fatal("Replay", "Could not read '%s'.", getReplayFilename().c_str());
+        std::string is_end = std::string(s);
+        if (is_end == "kart_list_end\n" || is_end == "kart_list_end\r\n") break;
+        char s1[1024];
+
+        if (sscanf(s,"kart: %s", s1) != 1)
+            Log::fatal("Replay", "Could not read ghost karts info!");
+
+        m_ghost_karts_list.push_back(std::string(s1));
+    }
+    fclose(fd);
+}   // loadKartInfo
+
+//-----------------------------------------------------------------------------
 /** Loads a replay data from  file called 'trackname'.replay.
  */
-void ReplayPlay::Load()
+void ReplayPlay::load()
 {
     m_ghost_karts.clearAndDeleteAll();
     char s[1024], s1[1024];
@@ -95,12 +121,21 @@ void ReplayPlay::Load()
     }
 
     Log::info("Replay", "Reading replay file '%s'.", getReplayFilename().c_str());
-
     if (fgets(s, 1023, fd) == NULL)
         Log::fatal("Replay", "Could not read '%s'.", getReplayFilename().c_str());
 
+    for (unsigned int i = 0; i < m_ghost_karts_list.size(); i++)
+    {
+        if (fgets(s, 1023, fd) == NULL)
+            Log::fatal("Replay", "Could not read '%s'.", getReplayFilename().c_str());
+        // Skip kart info which is already read.
+    }
+    if (fgets(s, 1023, fd) == NULL)
+        Log::fatal("Replay", "Could not read '%s'.", getReplayFilename().c_str());
+    // Skip kart_list_end
+
     unsigned int version;
-    if (sscanf(s,"Version: %u", &version) != 1)
+    if (sscanf(s,"version: %u", &version) != 1)
         Log::fatal("Replay", "No Version information found in replay file (bogus replay file).");
 
     if (version != getReplayVersion())
@@ -113,7 +148,7 @@ void ReplayPlay::Load()
     if (fgets(s, 1023, fd) == NULL)
         Log::fatal("Replay", "Could not read '%s'.", getReplayFilename().c_str());
 
-    int  n;
+    int n;
     if(sscanf(s, "difficulty: %d", &n) != 1)
         Log::fatal("Replay", " No difficulty found in replay file.");
 
@@ -130,7 +165,7 @@ void ReplayPlay::Load()
 
     unsigned int num_laps;
     fgets(s, 1023, fd);
-    if(sscanf(s, "Laps: %u", &num_laps) != 1)
+    if(sscanf(s, "laps: %u", &num_laps) != 1)
         Log::fatal("Replay", "No number of laps found in replay file.");
 
     race_manager->setNumLaps(num_laps);
@@ -142,11 +177,11 @@ void ReplayPlay::Load()
         if(fgets(s, 1023, fd)==NULL)  // eof reached
             break;
         readKartData(fd, s);
-    }   // for k<num_ghost_karts
+    }
 
     fprintf(fd, "Replay file end.\n");
     fclose(fd);
-}   // Load
+}   // load
 
 //-----------------------------------------------------------------------------
 /** Reads all data from a replay file for a specific kart.
@@ -155,16 +190,13 @@ void ReplayPlay::Load()
 void ReplayPlay::readKartData(FILE *fd, char *next_line)
 {
     char s[1024];
-    if(sscanf(next_line, "model: %s", s)!=1)
-        Log::fatal("Replay", "No model information for kart %d found.",
-            m_ghost_karts.size());
+    const unsigned int kart_num = m_ghost_karts.size();
+    m_ghost_karts.push_back(new GhostKart(m_ghost_karts_list.at(kart_num),
+        kart_num, kart_num + 1));
+    m_ghost_karts[kart_num].init(RaceManager::KT_GHOST);
 
-    m_ghost_karts.push_back(new GhostKart(std::string(s)));
-    m_ghost_karts[m_ghost_karts.size()-1].init(RaceManager::KT_GHOST);
-
-    fgets(s, 1023, fd);
     unsigned int size;
-    if(sscanf(s,"size: %u",&size)!=1)
+    if(sscanf(next_line,"size: %u",&size)!=1)
         Log::fatal("Replay", "Number of records not found in replay file "
             "for kart %d.",
             m_ghost_karts.size()-1);

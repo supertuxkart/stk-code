@@ -104,6 +104,7 @@ void ReplayRecorder::update(float dt)
     for(unsigned int i=0; i<num_karts; i++)
     {
         const AbstractKart *kart = world->getKart(i);
+        if (kart->isGhostKart()) continue;
 #ifdef DEBUG
         m_count++;
 #endif
@@ -195,16 +196,24 @@ void ReplayRecorder::Save()
 
     World *world   = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
-    fprintf(fd, "Version:  %d\n",   getReplayVersion());
+    for (unsigned int real_karts = 0; real_karts < num_karts; real_karts++)
+    {
+        if (world->getKart(real_karts)->isGhostKart()) continue;
+        fprintf(fd, "kart: %s\n",
+            world->getKart(real_karts)->getIdent().c_str());
+    }
+
+    fprintf(fd, "kart_list_end\n");
+    fprintf(fd, "version: %d\n",    getReplayVersion());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
-    fprintf(fd, "Laps: %d\n",       race_manager->getNumLaps());
+    fprintf(fd, "laps: %d\n",       race_manager->getNumLaps());
 
     unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time 
                                              / stk_config->m_replay_dt      );
     for (unsigned int k = 0; k < num_karts; k++)
     {
-        fprintf(fd, "model: %s\n", world->getKart(k)->getIdent().c_str());
+        if (world->getKart(k)->isGhostKart()) continue;
         fprintf(fd, "size:     %d\n", m_count_transforms[k]);
 
         unsigned int num_transforms = std::min(max_frames,

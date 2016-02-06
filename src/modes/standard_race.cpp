@@ -102,10 +102,11 @@ void StandardRace::endRaceEarly()
             continue;
         }
 
-        if (kart->getController()->isPlayerController())
+        if (!kart->isGhostKart())
         {
             // Keep active players apart for now
-            active_players.push_back(kartid);
+            if (kart->getController()->isPlayerController())
+                active_players.push_back(kartid);
         }
         else
         {

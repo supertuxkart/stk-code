@@ -19,6 +19,7 @@
 #ifndef HEADER_REPLAY__PLAY_HPP
 #define HEADER_REPLAY__PLAY_HPP
 
+#include "karts/ghost_kart.hpp"
 #include "replay/replay_base.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -38,6 +39,8 @@ private:
     /** Points to the next free entry. */
     unsigned int m_next;
 
+    std::vector<std::string> m_ghost_karts_list;
+
     /** All ghost karts. */
     PtrVector<GhostKart>    m_ghost_karts;
 
@@ -45,20 +48,30 @@ private:
          ~ReplayPlay();
     void  readKartData(FILE *fd, char *next_line);
 public:
-    void  init();
     void  update(float dt);
     void  reset();
-    void  Load();
+    void  load();
+    void  loadKartInfo();
 
     // ------------------------------------------------------------------------
+    GhostKart*         getGhostKart(int n)    { return m_ghost_karts.get(n); }
+    // ------------------------------------------------------------------------
+    const unsigned int getNumGhostKart() const
+                                         { return m_ghost_karts_list.size(); }
+    // ------------------------------------------------------------------------
+    const std::string& getGhostKartName(int n) const
+                                          { return m_ghost_karts_list.at(n); }
+    // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */
-    static void create() { m_replay_play = new ReplayPlay(); }
+    static void        create()          { m_replay_play = new ReplayPlay(); }
     // ------------------------------------------------------------------------
     /** Returns the instance of the replay object. */
-    static ReplayPlay *get() { return m_replay_play; }
+    static ReplayPlay  *get()                        { return m_replay_play; }
     // ------------------------------------------------------------------------
     /** Delete the instance of the replay object. */
-    static void destroy() { delete m_replay_play; m_replay_play=NULL; }
+    static void        destroy()
+                               { delete m_replay_play; m_replay_play = NULL; }
+    // ------------------------------------------------------------------------
 };   // Replay
 
 #endif

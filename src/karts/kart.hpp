@@ -68,6 +68,10 @@ protected:
     /** Offset of the graphical kart chassis from the physical chassis. */
     float m_graphical_y_offset;
 
+    /** The coordinates of the front of the kart, used to determine when a
+     *  new lap is triggered. */
+    Vec3 m_xyz_front;
+
 private:
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed *m_max_speed;
@@ -105,10 +109,6 @@ private:
 
     /** Current race position (1-num_karts). */
     int m_race_position;
-
-    /** The coordinates of the front of the kart, used to determine when a
-     *  new lap is triggered. */
-    Vec3 m_xyz_front;
 
     /** True if the kart wins, false otherwise. */
     bool m_race_result;
@@ -448,6 +448,9 @@ public:
     // ------------------------------------------------------------------------
     /** Set this kart race result. */
     void setRaceResult();
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is a ghost (replay) kart. */
+    virtual bool isGhostKart() const { return false;  }
 
 };   // Kart
 
