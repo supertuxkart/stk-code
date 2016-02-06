@@ -393,6 +393,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         glDepthMask(GL_FALSE);
     }
     
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
     m_geometry_passes->renderSolidSecondPass(m_draw_calls);
     PROFILER_POP_CPU_MARKER();
 
@@ -463,13 +465,13 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GLOW));
         irr_driver->setPhase(GLOW_PASS);
-        m_geometry_passes->renderGlow(m_draw_calls, m_glowing,
-                                      m_rtts->getFBO(FBO_TMP1_WITH_DS),
+        m_geometry_passes->renderGlowingObjects(m_draw_calls, m_glowing,
+                                                m_rtts->getFBO(FBO_TMP1_WITH_DS));
+                                                
+        m_post_processing->renderGlow(m_rtts->getFBO(FBO_TMP1_WITH_DS),
                                       m_rtts->getFBO(FBO_HALF1),
                                       m_rtts->getFBO(FBO_QUARTER1),
-                                      m_rtts->getFBO(FBO_COLORS),
-                                      m_rtts->getRenderTarget(RTT_QUARTER1),
-                                      m_post_processing);
+                                      m_rtts->getFBO(FBO_COLORS));
     } // end glow
     PROFILER_POP_CPU_MARKER();
 

@@ -29,9 +29,6 @@
 #include <SColor.h>
 #include <S3DVertex.h>
 
-
-
-
 /**
 \page geometry_passes Geometry Rendering Overview
 
@@ -41,9 +38,9 @@ You need to consider twice before adding a new material : in the worst case a ma
 one for each solid pass, one for shadow pass, one for RSM pass, and you need to double that for instanced version.
 
 You need to declare a new enum in MeshMaterial and to write the corresponding dispatch code in getMeshMaterialFromType
-and to create 2 new List* structures (one for standard and one for instanced version).
+and to create a new List* structure for non instanced.
 
-Then you need to write the code in shader_based_renderer.cpp that will add any mesh with the new material to their corresponding
+Then you need to write the code in draw_calls.cpp that will add any mesh with the new material to their corresponding
 lists : in handleSTKCommon for the standard version and in the body of prepareDrawCalls for instanced version.
 
 \section vertex_layout Available Vertex Layout
@@ -73,11 +70,7 @@ layout(location = 2) in vec4 Color;
 layout(location = 3) in vec2 Texcoord;
 layout(location = 5) in vec3 Tangent;
 layout(location = 6) in vec3 Bitangent;
-
 */
-
-
-
 
 // ============================================================================
 namespace RenderGeometry
@@ -132,7 +125,6 @@ namespace RenderGeometry
 
 using namespace RenderGeometry;
 
-
 // ----------------------------------------------------------------------------
 void AbstractGeometryPasses::prepareShadowRendering(const FrameBuffer& shadow_framebuffer) const
 {
@@ -156,6 +148,7 @@ void AbstractGeometryPasses::prepareShadowRendering(const FrameBuffer& shadow_fr
     glClearColor(0., 0., 0., 0.);    
 }
 
+// ----------------------------------------------------------------------------
 void AbstractGeometryPasses::shadowPostProcessing(const ShadowMatrices& shadow_matrices,
                                                   const FrameBuffer& shadow_framebuffer,
                                                   const FrameBuffer& scalar_framebuffer,
@@ -179,33 +172,6 @@ void AbstractGeometryPasses::shadowPostProcessing(const ShadowMatrices& shadow_m
     glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_framebuffer.getRTT()[0]);
     glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }
-
-
-void AbstractGeometryPasses::glowPostProcessing(const FrameBuffer& glow_framebuffer,
-                                                const FrameBuffer& half_framebuffer,
-                                                const FrameBuffer& quarter_framebuffer,
-                                                const FrameBuffer& color_framebuffer,
-                                                GLuint quarter_render_target,
-                                                const PostProcessing* post_processing) const
-{
-    // To half
-    FrameBuffer::Blit(glow_framebuffer, half_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-    // To quarter
-    FrameBuffer::Blit(half_framebuffer, quarter_framebuffer, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glStencilFunc(GL_EQUAL, 0, ~0);
-    glEnable(GL_STENCIL_TEST);
-    color_framebuffer.bind();
-    post_processing->renderGlow(quarter_render_target);//TODO
-    glDisable(GL_STENCIL_TEST);    
-    
-}
-
 
 AbstractGeometryPasses::AbstractGeometryPasses()
 {

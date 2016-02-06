@@ -24,9 +24,6 @@
 #include "utils/profiler.hpp"
 #include <ITexture.h>
 
-
-
-
 class AbstractGeometryPasses
 {
 protected:
@@ -42,15 +39,7 @@ protected:
                               const FrameBuffer& shadow_framebuffer,
                               const FrameBuffer& scalar_framebuffer,
                               const PostProcessing* post_processing) const;
-                
-    //TODO: move it in ShaderBasedRenderer
-    void glowPostProcessing(const FrameBuffer& glow_framebuffer,
-                            const FrameBuffer& half_framebuffer,
-                            const FrameBuffer& quater_framebuffer,
-                            const FrameBuffer& color_framebuffer,
-                            GLuint quarter_render_target,
-                            const PostProcessing* post_processing) const;
-
+    
 public:
     AbstractGeometryPasses();
     virtual ~AbstractGeometryPasses(){}
@@ -63,14 +52,9 @@ public:
                                 
     virtual void renderNormalsVisualisation(const DrawCalls& draw_calls) const = 0;
     
-    virtual void renderGlow(const DrawCalls& draw_calls,
-                            const std::vector<GlowData>& glows,
-                            const FrameBuffer& glow_framebuffer,
-                            const FrameBuffer& half_framebuffer,
-                            const FrameBuffer& quarter_framebuffer,
-                            const FrameBuffer& color_framebuffer,
-                            GLuint quarter_render_target,
-                            const PostProcessing* post_processing  ) const = 0;
+    virtual void renderGlowingObjects(const DrawCalls& draw_calls,
+                                      const std::vector<GlowData>& glows,
+                                      const FrameBuffer& glow_framebuffer) const = 0;
     
     void renderTransparent(const DrawCalls& draw_calls,
                            const FrameBuffer& tmp_framebuffer,
@@ -78,41 +62,38 @@ public:
                            const FrameBuffer& colors_framebuffer,
                            const PostProcessing* post_processing);
                            
-    virtual void renderShadows(const DrawCalls& draw_calls,
-                               const ShadowMatrices& shadow_matrices,
-                               const FrameBuffer& shadow_framebuffer,
-                               const FrameBuffer& scalar_framebuffer,
-                               const PostProcessing* post_processing) const = 0;
+    virtual void renderShadows (const DrawCalls& draw_calls,
+                                const ShadowMatrices& shadow_matrices,
+                                const FrameBuffer& shadow_framebuffer,
+                                const FrameBuffer& scalar_framebuffer,
+                                const PostProcessing* post_processing  ) const = 0;
                        
                        
     virtual void renderReflectiveShadowMap(const DrawCalls& draw_calls,
                                            const ShadowMatrices& shadow_matrices,
                                            const FrameBuffer& reflective_shadow_map_framebuffer) const = 0 ;
-
-
 };
 
 template<typename DrawPolicy>
 class GeometryPasses: public AbstractGeometryPasses, public DrawPolicy
 {
 public:
+    // ----------------------------------------------------------------------------
+    /** Render the solid first pass (depth and normals)*/ 
     void renderSolidFirstPass(const DrawCalls& draw_calls) const
     {
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS1));
         irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
-
         draw_calls.renderImmediateDrawList();
         DrawPolicy::drawSolidFirstPass(draw_calls);
-        
     }   // renderSolidFirstPass
 
+    // ----------------------------------------------------------------------------
+    /** Render the solid second pass (apply lighting on materials) */
     void renderSolidSecondPass( const DrawCalls& draw_calls) const
     {
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SOLID_PASS2));
         irr_driver->setPhase(SOLID_LIT_PASS);
-        glEnable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
-        
         draw_calls.renderImmediateDrawList();
         DrawPolicy::drawSolidSecondPass(draw_calls,
                                         m_textures_handles,
@@ -125,14 +106,9 @@ public:
         DrawPolicy::drawNormals(draw_calls);
     }
 
-    void renderGlow(const DrawCalls& draw_calls,
-                    const std::vector<GlowData>& glows,
-                    const FrameBuffer& glow_framebuffer,
-                    const FrameBuffer& half_framebuffer,
-                    const FrameBuffer& quarter_framebuffer,
-                    const FrameBuffer& color_framebuffer,
-                    GLuint quarter_render_target,
-                    const PostProcessing* post_processing) const
+    void renderGlowingObjects(const DrawCalls& draw_calls,
+                              const std::vector<GlowData>& glows,
+                              const FrameBuffer& glow_framebuffer) const
     {
         irr_driver->getSceneManager()->setCurrentRendertime(scene::ESNRP_SOLID);
         glow_framebuffer.bind();
@@ -152,13 +128,6 @@ public:
         
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         glDisable(GL_STENCIL_TEST);
-        glDisable(GL_BLEND);
-        
-        glowPostProcessing(glow_framebuffer, half_framebuffer,
-                           quarter_framebuffer, color_framebuffer,
-                           quarter_render_target,
-                           post_processing);
-        
     }
 
 
