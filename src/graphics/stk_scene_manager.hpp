@@ -28,11 +28,8 @@
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh.hpp"
 
-
-//TODO
 void addEdge(const core::vector3df &P0, const core::vector3df &P1);
 
 bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node);
-
 
 #endif

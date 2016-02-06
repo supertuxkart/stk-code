@@ -43,26 +43,6 @@
 #include <functional>
 
 
-namespace 
-{
-
-    
-} //namespace
-
-
-
-
-
-///TODO
-/*static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForSolidPass[Material::SHADERTYPE_COUNT], MeshForShadowPass[Material::SHADERTYPE_COUNT][4], MeshForRSM[Material::SHADERTYPE_COUNT];
-static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForGlowPass;
-static std::vector <STKMeshCommon *> DeferredUpdate;*/
-///TODO
-
-static core::vector3df windDir;
-
-
-
 // From irrlicht code
 static
 bool isBoxInFrontOfPlane(const core::plane3df &plane, const core::vector3df edges[8])
@@ -104,11 +84,5 @@ bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode
             return true;
     return false;
 }
-
-
-
-
-
-
 
 
