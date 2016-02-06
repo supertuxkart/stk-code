@@ -35,7 +35,7 @@
 #include "ISkinnedMesh.h"
 #include "graphics/abstract_renderer.hpp"
 #include "graphics/gl_headers.hpp"
-#include "graphics/sphericalHarmonics.hpp"
+#include "graphics/spherical_harmonics.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"

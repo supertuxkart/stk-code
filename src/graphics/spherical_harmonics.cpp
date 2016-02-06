@@ -17,7 +17,7 @@
 
 
 #include "graphics/irr_driver.hpp"
-#include "graphics/sphericalHarmonics.hpp"
+#include "graphics/spherical_harmonics.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm> 

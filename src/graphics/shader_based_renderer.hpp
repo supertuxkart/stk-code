@@ -36,23 +36,21 @@ class PostProcessing;
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:
-    RTT                  *m_rtts;
-    Skybox *m_skybox;
-    SphericalHarmonics *m_spherical_harmonics;
-    
-    DrawCalls       m_draw_calls;
-    AbstractGeometryPasses *m_geometry_passes;
-    LightingPasses  m_lighting_passes;
-    ShadowMatrices  m_shadow_matrices;
-    /** Post-processing. */
+    RTT                        *m_rtts;
+    Skybox                     *m_skybox;
+    SphericalHarmonics         *m_spherical_harmonics;
+    DrawCalls                   m_draw_calls;
+    AbstractGeometryPasses     *m_geometry_passes;
+    LightingPasses              m_lighting_passes;
+    ShadowMatrices              m_shadow_matrices;
     PostProcessing             *m_post_processing;
 
     /** Static glowing things are loaded once per track.
      * Glowing items can appear ordisappear each frame */
-    std::vector<GlowData> m_glowing;
-    size_t m_nb_static_glowing;
+    std::vector<GlowData>       m_glowing;
+    size_t                      m_nb_static_glowing;
 
-    irr::core::vector3df m_wind_dir;
+    irr::core::vector3df        m_wind_dir;
     
     void setRTTDimensions(size_t width, size_t height);
     

@@ -20,7 +20,7 @@
 
 #include "graphics/gl_headers.hpp"
 #include "graphics/rtts.hpp"
-#include "graphics/sphericalHarmonics.hpp"
+#include "graphics/spherical_harmonics.hpp"
 #include <irrlicht.h>
 #include <memory>
 #include <string>
