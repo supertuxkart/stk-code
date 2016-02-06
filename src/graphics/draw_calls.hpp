@@ -19,20 +19,16 @@
 #define HEADER_DRAW_CALLS_HPP
 
 #include "graphics/command_buffer.hpp"
-#include "graphics/draw_tools.hpp"
-#include "graphics/gpu_particles.hpp"
-#include "graphics/shadow_matrices.hpp"
-#include "graphics/stk_billboard.hpp"
-#include "graphics/stk_mesh.hpp"
 #include <irrlicht.h>
-
 #include <unordered_map>
 
+class ParticleSystemProxy;
+class STKBillboard;
 
 class DrawCalls
 {  
 private:
-    std::vector <STKMeshCommon *>         m_deferred_update;
+    std::vector<STKMeshCommon *>          m_deferred_update;
     irr::core::vector3df                  m_wind_dir;
     GLsync                                m_sync = 0;
     

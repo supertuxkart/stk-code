@@ -16,8 +16,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/draw_calls.hpp"
+#include "graphics/draw_tools.hpp"
+#include "graphics/gpu_particles.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/materials.hpp"
+#include "graphics/shadow_matrices.hpp"
+#include "graphics/stk_billboard.hpp"
+#include "graphics/stk_mesh.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/stk_scene_manager.hpp"
 #include "graphics/vao_manager.hpp"

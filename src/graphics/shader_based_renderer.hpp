@@ -20,17 +20,16 @@
 
 #include "graphics/abstract_renderer.hpp"
 #include "graphics/draw_calls.hpp"
-#include "graphics/draw_policies.hpp"
-#include "graphics/geometry_passes.hpp"
 #include "graphics/lighting_passes.hpp"
 #include "graphics/shadow_matrices.hpp"
-#include "graphics/skybox.hpp"
 #include <map>
 #include <string>
 
+class AbstractGeometryPasses;
 class GL3RenderTarget;
 class RenderTarget;
 class RTT;
+class Skybox;
 class PostProcessing;
 
 class ShaderBasedRenderer: public AbstractRenderer

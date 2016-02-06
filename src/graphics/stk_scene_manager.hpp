@@ -22,14 +22,12 @@
 #ifndef HEADER_STKSCENEMANAGER_HPP
 #define HEADER_STKSCENEMANAGER_HPP
 
-#include "graphics/central_settings.hpp"
-#include "graphics/gl_headers.hpp"
-#include "graphics/gpu_particles.hpp"
-#include "graphics/stk_billboard.hpp"
-#include "graphics/stk_mesh.hpp"
+#include <ICameraSceneNode.h>
+#include <ISceneNode.h>
+#include <vector3d.h>
 
-void addEdge(const core::vector3df &P0, const core::vector3df &P1);
+void addEdge(const irr::core::vector3df &P0, const irr::core::vector3df &P1);
 
-bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node);
+bool isCulledPrecise(const irr::scene::ICameraSceneNode *cam, const irr::scene::ISceneNode *node);
 
 #endif

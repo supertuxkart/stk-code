@@ -16,32 +16,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/stk_scene_manager.hpp"
-
-#include "graphics/callbacks.hpp"
-#include "graphics/central_settings.hpp"
-#include "graphics/glwrap.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/lod_node.hpp"
-#include "graphics/shadow_matrices.hpp"
-#include "graphics/stk_animated_mesh.hpp"
-#include "graphics/stk_mesh.hpp"
-#include "graphics/stk_mesh_scene_node.hpp"
-#include "modes/world.hpp"
-#include "tracks/track.hpp"
-#include "utils/cpp2011.hpp"
-#include "utils/profiler.hpp"
-#include "utils/ptr_vector.hpp"
-#include "utils/time.hpp"
-
-#include <ICameraSceneNode.h>
-#include <ISceneManager.h>
-#include <ISceneNode.h>
 #include <SViewFrustum.h>
+#include <vector>
 
-#include <unordered_map>
-#include <SViewFrustum.h>
-#include <functional>
-
+using namespace irr;
 
 // From irrlicht code
 static
