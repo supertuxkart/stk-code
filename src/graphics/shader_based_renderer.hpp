@@ -48,8 +48,6 @@ private:
      * Glowing items can appear ordisappear each frame */
     std::vector<GlowData>       m_glowing;
     size_t                      m_nb_static_glowing;
-
-    irr::core::vector3df        m_wind_dir;
     
     void setRTTDimensions(size_t width, size_t height);
     

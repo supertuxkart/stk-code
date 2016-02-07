@@ -39,9 +39,9 @@
 
 #include <algorithm> 
 
-extern std::vector<float> BoundingBoxes; //TODO
+extern std::vector<float> BoundingBoxes; //TODO: replace global variable by something cleaner
 
-
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::setRTTDimensions(size_t width, size_t height)
 {    
     if(m_rtts == NULL)
@@ -66,9 +66,9 @@ void ShaderBasedRenderer::setRTTDimensions(size_t width, size_t height)
                              m_rtts->getRenderTarget(RTT_HALF1_R),
                              m_rtts->getDepthStencilTexture());
     m_geometry_passes->setFirstPassRenderTargets(prefilled_textures);    
-}
+} //setRTTDimensions
 
-
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::compressPowerUpTextures()
 {
     for (unsigned i = 0; i < PowerupManager::POWERUP_MAX; i++)
@@ -90,11 +90,11 @@ void ShaderBasedRenderer::compressPowerUpTextures()
             }
         }
     }
-}
+} //compressPowerUpTextures
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::setOverrideMaterial()
 {
-    // Overrides
     video::SOverrideMaterial &overridemat = irr_driver->getVideoDriver()->getOverrideMaterial();
     overridemat.EnablePasses = scene::ESNRP_SOLID | scene::ESNRP_TRANSPARENT;
     overridemat.EnableFlags = 0;
@@ -110,9 +110,10 @@ void ShaderBasedRenderer::setOverrideMaterial()
         overridemat.EnableFlags |= video::EMF_MATERIAL_TYPE;
         overridemat.EnablePasses = scene::ESNRP_SOLID;
     }       
-}
+} //setOverrideMaterial
 
-//Add glowing items, they may appear or disappear each frame.
+// ----------------------------------------------------------------------------
+/** Add glowing items, they may appear or disappear each frame. */
 void ShaderBasedRenderer::addItemsInGlowingList()
 {
     ItemManager * const items = ItemManager::get();
@@ -155,16 +156,17 @@ void ShaderBasedRenderer::addItemsInGlowingList()
 
         m_glowing.push_back(dat);
     }    
-}
+} //addItemsInGlowingList
 
-//Remove all non static glowing things
+// ----------------------------------------------------------------------------
+/** Remove all non static glowing things */
 void ShaderBasedRenderer::removeItemsInGlowingList()
 {
     while(m_glowing.size() > m_nb_static_glowing)
         m_glowing.pop_back();    
 }
 
-
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::prepareForwardRenderer()
 {
     irr::video::SColor clearColor(0, 150, 150, 150);
@@ -234,7 +236,7 @@ void ShaderBasedRenderer::renderSkybox(const scene::ICameraSceneNode *camera) co
     }
 }   // renderSkybox
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::renderSSAO() const
 {
     m_rtts->getFBO(FBO_SSAO).bind();
@@ -253,14 +255,12 @@ void ShaderBasedRenderer::renderSSAO() const
 
 }   // renderSSAO
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                                       float dt,
                                       bool hasShadow,
                                       bool forceRTT)
-{
-    m_wind_dir = getWindDir(); //TODO
-    
+{    
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
     glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
     irr_driver->getSceneManager()->setActiveCamera(camnode);
@@ -509,10 +509,9 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
 
     // Ensure that no object will be drawn after that by using invalid pass
     irr_driver->setPhase(PASS_COUNT);
-}
+} //renderScene
 
 // ----------------------------------------------------------------------------
-
 void ShaderBasedRenderer::renderParticles()
 {
     glDepthMask(GL_FALSE);
@@ -522,8 +521,9 @@ void ShaderBasedRenderer::renderParticles()
     m_draw_calls.renderParticlesList();
 
 //    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
-}
+} //renderParticles
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::renderBoundingBoxes()
 {
     Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
@@ -539,8 +539,9 @@ void ShaderBasedRenderer::renderBoundingBoxes()
 
         glDrawArrays(GL_LINES, 0, count / 3);
     }
-}
+} //renderBoundingBoxes
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::debugPhysics()
 {
     // Note that drawAll must be called before rendering
@@ -579,8 +580,9 @@ void ShaderBasedRenderer::debugPhysics()
             glBindVertexArray(0);
         }
     }
-}
+} //debugPhysics
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
 {
     scene::ICameraSceneNode * const camnode = camera->getCameraSceneNode();
@@ -615,9 +617,9 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
         m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         glDisable(GL_FRAMEBUFFER_SRGB);
     }
-}
+} //renderPostProcessing
 
-
+// ----------------------------------------------------------------------------
 ShaderBasedRenderer::ShaderBasedRenderer()
 {
     m_rtts                  = NULL;
@@ -635,6 +637,7 @@ ShaderBasedRenderer::ShaderBasedRenderer()
     m_post_processing = new PostProcessing(irr_driver->getVideoDriver());    
 }
 
+// ----------------------------------------------------------------------------
 ShaderBasedRenderer::~ShaderBasedRenderer()
 {
     // Note that we can not simply delete m_post_processing here:
@@ -656,15 +659,18 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_rtts;
 }
 
-    
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::onLoadWorld()
 {
     const core::recti &viewport = Camera::getCamera(0)->getViewport();
     size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
     size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
-    setRTTDimensions(width, height); 
+    setRTTDimensions(width, height);
+    
+    compressPowerUpTextures();
 }
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::onUnloadWorld()
 {
     delete m_rtts;
@@ -672,17 +678,19 @@ void ShaderBasedRenderer::onUnloadWorld()
     removeSkyBox();    
 }
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::resetPostProcessing()
 {
     m_post_processing->reset();
 }
 
-
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::giveBoost(unsigned int cam_index)
 {
     m_post_processing->giveBoost(cam_index);
 }
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::addSkyBox(const std::vector<video::ITexture*> &texture,
                                     const std::vector<video::ITexture*> &spherical_harmonics_textures)
 {
@@ -693,27 +701,32 @@ void ShaderBasedRenderer::addSkyBox(const std::vector<video::ITexture*> &texture
     }    
 }
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::removeSkyBox()
 {
     delete m_skybox;
     m_skybox = NULL;    
 }
 
+// ----------------------------------------------------------------------------
 const SHCoefficients* ShaderBasedRenderer::getSHCoefficients() const
 {
     return m_spherical_harmonics->getCoefficients();
 }
 
+// ----------------------------------------------------------------------------
 GLuint ShaderBasedRenderer::getRenderTargetTexture(TypeRTT which) const
 {
     return m_rtts->getRenderTarget(which);
 }
 
+// ----------------------------------------------------------------------------
 GLuint ShaderBasedRenderer::getDepthStencilTexture() const
 {
     return m_rtts->getDepthStencilTexture();
 }
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::setAmbientLight(const video::SColorf &light,
                                           bool force_SH_computation)
 {
@@ -721,11 +734,13 @@ void ShaderBasedRenderer::setAmbientLight(const video::SColorf &light,
         m_spherical_harmonics->setAmbientLight(light.toSColor());
 }
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::addSunLight(const core::vector3df &pos)
 {
     m_shadow_matrices.addLight(pos);
 }
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::addGlowingNode(scene::ISceneNode *n, float r, float g, float b)
 {
     GlowData dat;
@@ -739,24 +754,24 @@ void ShaderBasedRenderer::addGlowingNode(scene::ISceneNode *n, float r, float g,
     
     m_glowing.push_back(dat);
     m_nb_static_glowing++;
-}
+} //addGlowingNode
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::clearGlowingNodes()
 {
     m_glowing.clear();
     m_nb_static_glowing = 0;
 }
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::render(float dt)
 {
     resetObjectCount();
     resetPolyCount();
     
-    BoundingBoxes.clear(); //TODO: what is it doing here?
+    BoundingBoxes.clear(); //TODO: do not use a global variable
     
-    compressPowerUpTextures(); //TODO: is it useful every frame?
-    
-    setOverrideMaterial(); //TODO: is it useful every frame?
+    setOverrideMaterial();
     
     addItemsInGlowingList();
     
@@ -878,16 +893,17 @@ void ShaderBasedRenderer::render(float dt)
 
     m_post_processing->update(dt);
     removeItemsInGlowingList();
-}
+} //render
 
-
+// ----------------------------------------------------------------------------
 std::unique_ptr<RenderTarget> ShaderBasedRenderer::createRenderTarget(const irr::core::dimension2du &dimension,
                                                                       const std::string &name)
 {
     return std::unique_ptr<RenderTarget>(new GL3RenderTarget(dimension, name, this));
-    //return std::make_unique<GL3RenderTarget>(dimension, name, this);
+    //return std::make_unique<GL3RenderTarget>(dimension, name, this); //require C++14
 }
 
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
                                           irr::scene::ICameraSceneNode* camera,
                                           float dt)
@@ -914,5 +930,4 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     irr_driver->getSceneManager()->setActiveCamera(NULL);
-        
-}
+} //renderToTexture
