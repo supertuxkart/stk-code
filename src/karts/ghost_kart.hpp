@@ -75,6 +75,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart is a ghost (replay) kart. */
     virtual bool isGhostKart() const                         { return true;  }
+    // ------------------------------------------------------------------------
+    /** Ghost can't be hunted. */
+    virtual bool isInvulnerable() const                       { return true; }
 
 };   // GhostKart
 #endif

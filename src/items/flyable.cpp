@@ -226,8 +226,7 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
         // it is not considered a target anymore.
         if(kart->isEliminated() || kart == m_owner ||
             kart->isInvulnerable()                 ||
-            kart->getKartAnimation()               ||
-            kart->isGhostKart()  ) continue;
+            kart->getKartAnimation()                   ) continue;
 
         const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
         if (sw)

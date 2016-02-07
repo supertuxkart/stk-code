@@ -25,6 +25,7 @@
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 
+#include <irrlicht.h>
 #include <stdio.h>
 #include <string>
 
@@ -91,8 +92,9 @@ void ReplayPlay::loadKartInfo()
     {
         if (fgets(s, 1023, fd) == NULL)
             Log::fatal("Replay", "Could not read '%s'.", getReplayFilename().c_str());
-        std::string is_end = std::string(s);
-        if (is_end == "kart_list_end\n" || is_end == "kart_list_end\r\n") break;
+        core::stringc is_end(s);
+        is_end.trim();
+        if (is_end == "kart_list_end") break;
         char s1[1024];
 
         if (sscanf(s,"kart: %s", s1) != 1)

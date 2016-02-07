@@ -1493,7 +1493,7 @@ void Kart::showZipperFire()
  */
 void Kart::setSquash(float time, float slowdown)
 {
-    if (isInvulnerable() || isGhostKart()) return;
+    if (isInvulnerable()) return;
 
     if (isShielded())
     {
