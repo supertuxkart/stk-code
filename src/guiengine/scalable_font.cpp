@@ -483,6 +483,7 @@ std::set<wchar_t> ScalableFont::getPreloadCharacters(const GUIEngine::TTFLoading
 
             for (u32 i = 47; i < 59; ++i)
                 preload_char.insert((wchar_t)i); //Include chars used by timer and laps count only
+            preload_char.insert((wchar_t)120);   //Used when displaying multiple items, e.g. 6x
             break;
         case T_BOLD:
             preload_char = translations->getCurrentAllChar(); //Loading unique characters
