@@ -69,8 +69,7 @@ void GhostKart::addReplayEvent(float time,
         for (int i = 0; i < 4; i++)
             f += m_all_physic_info[0].m_suspension_length[i];
         m_graphical_y_offset = -f / 4 + getKartModel()->getLowestPoint();
-        m_kart_model
-            ->setDefaultSuspension();
+        m_kart_model->setDefaultSuspension();
     }
 
 }   // addReplayEvent
@@ -118,9 +117,7 @@ void GhostKart::update(float dt)
     setXYZ((1-f)*m_all_transform[m_current_transform  ].getOrigin()
            + f  *m_all_transform[m_current_transform+1].getOrigin() );
     const btQuaternion q = m_all_transform[m_current_transform].getRotation()
-                          .slerp(m_all_transform[m_current_transform+1]
-                                 .getRotation(),
-                                 f);
+        .slerp(m_all_transform[m_current_transform+1].getRotation(), f);
     setRotation(q);
 
     Vec3 center_shift(0, 0, 0);

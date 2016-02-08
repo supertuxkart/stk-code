@@ -37,47 +37,52 @@ class GhostKart : public Kart
 {
 private:
     /** The list of the times at which the transform were reached. */
-    std::vector<float>       m_all_times;
+    std::vector<float>                       m_all_times;
 
     /** The transforms to assume at the corresponding time in m_all_times. */
-    std::vector<btTransform> m_all_transform;
+    std::vector<btTransform>                 m_all_transform;
 
-    std::vector<ReplayBase::PhysicInfo> m_all_physic_info;
+    std::vector<ReplayBase::PhysicInfo>      m_all_physic_info;
 
     std::vector<ReplayBase::KartReplayEvent> m_all_replay_events;
 
     /** Pointer to the last index in m_all_times that is smaller than
      *  the current world time. */
-    unsigned int m_current_transform;
+    unsigned int                             m_current_transform;
 
 public:
-                 GhostKart(const std::string& ident,
-                           unsigned int world_kart_id, int position);
-    virtual void update (float dt);
-    virtual void reset();
+                  GhostKart(const std::string& ident,
+                            unsigned int world_kart_id, int position);
+    virtual void  update (float dt);
+    virtual void  reset();
     // ------------------------------------------------------------------------
     /** No physics body for ghost kart, so nothing to adjust. */
-    virtual void updateWeight() {};
+    virtual void  updateWeight() {};
     // ------------------------------------------------------------------------
     /** No physics for ghost kart. */
-    virtual void applyEngineForce (float force) {}
+    virtual void  applyEngineForce (float force) {}
     // ------------------------------------------------------------------------
     // Not needed to create any physics for a ghost kart.
-    virtual void createPhysics() {}
+    virtual void  createPhysics() {}
     // ------------------------------------------------------------------------
-    const float  getSuspensionLength(int index, int wheel) const
+    const float   getSuspensionLength(int index, int wheel) const
                { return m_all_physic_info[index].m_suspension_length[wheel]; }
     // ------------------------------------------------------------------------
-    void         addReplayEvent(float time,
-                                const btTransform &trans,
-                                const ReplayBase::PhysicInfo &pi,
-                                const ReplayBase::KartReplayEvent &kre);
+    void          addReplayEvent(float time,
+                                 const btTransform &trans,
+                                 const ReplayBase::PhysicInfo &pi,
+                                 const ReplayBase::KartReplayEvent &kre);
     // ------------------------------------------------------------------------
     /** Returns whether this kart is a ghost (replay) kart. */
-    virtual bool isGhostKart() const                         { return true;  }
+    virtual bool  isGhostKart() const                         { return true; }
     // ------------------------------------------------------------------------
     /** Ghost can't be hunted. */
-    virtual bool isInvulnerable() const                       { return true; }
+    virtual bool  isInvulnerable() const                      { return true; }
+    // ------------------------------------------------------------------------
+    /** Returns the speed of the kart in meters/second. */
+    virtual float getSpeed() const
+                    { return m_all_physic_info[m_current_transform].m_speed; }
+    // ------------------------------------------------------------------------
 
 };   // GhostKart
 #endif
