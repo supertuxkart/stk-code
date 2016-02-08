@@ -389,7 +389,7 @@ void RaceConfig::computeNextTrack()
                     tracks_histogram[m_votes[i].getTrackVote()] = 1;
                 }
             }
-            else if (m_votes[i].hasVotedReversed())
+            if (m_votes[i].hasVotedReversed())
             {
                 try // reversed
                 {
@@ -400,7 +400,7 @@ void RaceConfig::computeNextTrack()
                     reversed_histogram[m_votes[i].getReversedVote()] = 1;
                 }
             }
-            else if (m_votes[i].hasVotedLaps())
+            if (m_votes[i].hasVotedLaps())
             {
                 try // laps
                 {
