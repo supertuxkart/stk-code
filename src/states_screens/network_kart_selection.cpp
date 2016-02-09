@@ -179,6 +179,8 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
         clrp->voteMinor(race_manager->getMinorMode());
         clrp->voteReversed(race_manager->getReverseTrack());
         clrp->voteRaceCount(1);
+        // FIXME: for debugging set only 0 laps
+        clrp->voteLaps(0);
     }
     TracksScreen::getInstance()->push();
 }   // playerSelected
