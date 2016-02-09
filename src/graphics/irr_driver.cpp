@@ -517,8 +517,6 @@ void IrrDriver::initDevice()
     m_video_driver  = m_device->getVideoDriver();
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
-
-    CVS->init();
     
     if(CVS->isGLSL())
         m_renderer = new ShaderBasedRenderer();
