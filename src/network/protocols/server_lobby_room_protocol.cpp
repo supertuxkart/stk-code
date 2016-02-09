@@ -499,6 +499,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     m_setup->addPlayer(profile);
     peer->setPlayerProfile(profile);
     peer->setClientServerToken(token);
+    peer->setHostId(new_host_id);
 
     Log::verbose("ServerLobbyRoomProtocol", "New player.");
 

@@ -494,6 +494,8 @@ int STKHost::mustStopListening()
 
 // --------------------------------------------------------------------
 /** Returns true if this instance is allowed to control the server.
+ *  Only the first connected client (i.e. the one with host id 1) is
+ *  allowed to control the server. Only called from a client.
  */
 bool STKHost::isAuthorisedToControl() const 
 {
@@ -501,15 +503,13 @@ bool STKHost::isAuthorisedToControl() const
     // stk logic), no peer is authorised.
     if(m_peers.size()==0)
         return false;
-    Server *server = ServersManager::get()->getJoinedServer();
-    return NetworkConfig::get()->getMyAddress().getIP() == 
-            server->getAddress().getIP();
-
+    return m_host_id == 1;
 }   // isAuthorisedToControl
 
 // ----------------------------------------------------------------------------
 /** Server-side check if the client sending a command is really authorised 
- *  to do so.
+ *  to do so. Only the first connected client (i.e. host id = 1) is allowed
+ *  to control the server.
  *  \param peer Peer sending the command.
  */
 bool STKHost::isAuthorisedToControl(const STKPeer *peer) const 
@@ -518,9 +518,7 @@ bool STKHost::isAuthorisedToControl(const STKPeer *peer) const
     // stk logic), no peer is authorised.
     if(m_peers.size()==0)
         return false;
-    // FIXME peer has ip 0
-    return true;
-    return peer->getAddress()==NetworkConfig::get()->getMyAddress().getIP();
+    return peer->getHostId()==1;
 }   // isAuthorisedToControl
 
 // ----------------------------------------------------------------------------

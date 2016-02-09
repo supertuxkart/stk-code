@@ -50,6 +50,8 @@ protected:
     /** True if the token for this peer has been set. */
     bool m_token_set;
 
+    /** Host id of this peer. */
+    int m_host_id;
 public:
              STKPeer(ENetPeer *enet_peer);
     virtual ~STKPeer();
@@ -89,7 +91,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if the token for this client is known. */
     bool isClientServerTokenSet() const { return m_token_set; }
-
+    // ------------------------------------------------------------------------
+    /** Sets the host if of this peer. */
+    void setHostId(int host_id) { m_host_id = host_id; }
+    // ------------------------------------------------------------------------
+    /** Returns the host id of this peer. */
+    int getHostId() const { return m_host_id; }
 };   // STKPeer
 
 #endif // STK_PEER_HPP
