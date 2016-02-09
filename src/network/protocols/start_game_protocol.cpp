@@ -57,7 +57,7 @@ void StartGameProtocol::setup()
 
     // Race startup sequence
     // ---------------------
-    // builds it and starts
+    // This creates the network world.
     NetworkWorld::getInstance<NetworkWorld>()->start();
 
     // The number of karts includes the AI karts, which are not supported atn
