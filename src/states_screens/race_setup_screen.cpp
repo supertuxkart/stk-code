@@ -33,8 +33,6 @@
 #include "states_screens/tracks_screen.hpp"
 #include "utils/translation.hpp"
 
-#define ENABLE_SOCCER_MODE
-
 const int CONFIG_CODE_NORMAL    = 0;
 const int CONFIG_CODE_TIMETRIAL = 1;
 const int CONFIG_CODE_FTL       = 2;
@@ -114,15 +112,10 @@ void RaceSetupScreen::init()
     name4 += _("Hit others with weapons until they lose all their lives (only in multiplayer games).");
     w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
 
-#ifdef ENABLE_SOCCER_MODE
-    if (race_manager->getNumLocalPlayers() > 1 || UserConfigParams::m_artist_debug_mode)
-    {
-        irr::core::stringw name5 = irr::core::stringw(
-            RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
-        name5 += _("Push the ball to the opposite cage to score goals (only in multiplayer games).");
-        w2->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
-    }
-#endif
+    irr::core::stringw name5 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
+    name5 += _("Push the ball to the opposite cage to score goals (only in multiplayer games).");
+    w2->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
 
 #define ENABLE_EASTER_EGG_MODE
 #ifdef ENABLE_EASTER_EGG_MODE
@@ -237,12 +230,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
             UserConfigParams::m_game_mode = CONFIG_CODE_SOCCER;
-            race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
-            // 1 player -> no need to choose a team or determine when the match ends
-            if(race_manager->getNumLocalPlayers() <= 1)
-                ArenasScreen::getInstance()->push();
-            else
-                SoccerSetupScreen::getInstance()->push();
+            SoccerSetupScreen::getInstance()->push();
         }
         else if (selectedMode == "locked")
         {

@@ -207,8 +207,13 @@ private:
 
     /** True if this is the master copy, managed by KartProperties. This
      *  is mainly used for debugging, e.g. the master copies might not have
-     * anything attached to it etc. */
+     *  anything attached to it etc. */
     bool  m_is_master;
+
+    /** True if the animation played is non-loop, which will reset to
+     *  AF_DEFAULT after first loop ends. Mainly used in soccer mode for
+     *  animation playing after scored. */
+    bool  m_play_non_loop;
 
     void  loadWheelInfo(const XMLNode &node,
                         const std::string &wheel_name, int index);
@@ -306,7 +311,7 @@ public:
     AnimationFrameType getAnimation() { return m_current_animation; }
     // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
-    void  setAnimation(AnimationFrameType type);
+    void  setAnimation(AnimationFrameType type, bool play_non_loop = false);
     // ------------------------------------------------------------------------
     /** Sets the kart this model is currently used for */
     void  setKart(AbstractKart* k) { m_kart = k; }

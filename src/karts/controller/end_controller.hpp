@@ -74,12 +74,13 @@ private:
      *that can be done, and end up setting their respective m_controls
      *variable.
      */
-    void         handleSteering(float dt);
-    void         handleRescue(const float DELTA);
+    void          handleSteering(float dt);
+    void          handleRescue(const float DELTA);
 
-    void         checkCrashes(const int STEPS, const Vec3& pos);
-    void         findNonCrashingPoint(Vec3 *result);
-    int          calcSteps();
+    void          checkCrashes(const int STEPS, const Vec3& pos);
+    void          findNonCrashingPoint(Vec3 *result);
+    int           calcSteps();
+    virtual bool  canSkid(float steer_fraction) { return false; }
 public:
                  EndController(AbstractKart *kart,
                                Controller *prev_controller);

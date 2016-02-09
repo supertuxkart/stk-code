@@ -44,6 +44,7 @@
 #include "karts/kart_gfx.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/overworld.hpp"
+#include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
@@ -883,7 +884,6 @@ void Kart::setRaceResult()
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
     {
-        // TODO NetworkController?
         if (m_controller->isLocalPlayerController()) // if player is on this computer
         {
             PlayerProfile *player = PlayerManager::getCurrentPlayer();
@@ -920,8 +920,8 @@ void Kart::setRaceResult()
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
     {
-        // TODO complete together with soccer ai!
-        m_race_result = true;
+        SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+        m_race_result = sw->getKartSoccerResult(this->getWorldKartId());
     }
     else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
     {
@@ -931,7 +931,7 @@ void Kart::setRaceResult()
     else
         Log::warn("Kart", "Unknown game mode given.");
 
-}   // setKartResult
+}   // setRaceResult
 
 //-----------------------------------------------------------------------------
 /** Called when an item is collected. It will either adjust the collected

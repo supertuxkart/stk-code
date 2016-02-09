@@ -38,6 +38,7 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
+#include "modes/soccer_world.hpp"
 #include "karts/abstract_kart.hpp"
 
 #define SWAT_POS_OFFSET        core::vector3df(0.0, 0.2f, -0.4f)
@@ -196,10 +197,12 @@ bool Swatter::updateAndTestFinished(float dt)
                     // change the current phase
                     squashThingsAround();
                     m_animation_phase = SWATTER_FROM_TARGET;
-                    if (race_manager->getMinorMode()==
-                        RaceManager::MINOR_MODE_3_STRIKES)
+                    if (race_manager
+                        ->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+                        race_manager
+                        ->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
                     {
-                        // Remove swatter from kart in 3 strikes battle
+                        // Remove swatter from kart in arena gameplay
                         // after one successful hit
                         m_discard_now = true;
                     }
@@ -245,6 +248,15 @@ void Swatter::chooseTarget()
         // don't squash an already hurt kart
         if (kart->isInvulnerable() || kart->isSquashed())
             continue;
+
+        const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+        if (sw)
+        {
+            // Don't hit teammates in soccer world
+            if (sw->getKartTeam(kart->getWorldKartId()) == sw
+                ->getKartTeam(m_kart->getWorldKartId()))
+            continue;
+        }
 
         float dist2 = (kart->getXYZ()-m_kart->getXYZ()).length2();
         if(dist2<min_dist2)

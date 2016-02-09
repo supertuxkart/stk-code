@@ -492,6 +492,10 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         m_frame_end = node->getEndFrame();
         if (xml_node)
             xml_node->get("frame-end", &m_frame_end);
+
+        if (World::getWorld() && World::getWorld()->getTrack() && xml_node)
+            World::getWorld()->getTrack()
+            ->handleAnimatedTextures(m_node, *xml_node);
     }
     else
     {

@@ -297,7 +297,7 @@ void RaceGUIBase::cleanupMessages(const float dt)
 /** Draws the powerup icons on the screen (called once for each player).
  *  \param kart The kart for which to draw the powerup icons.
  *  \param viewport The viewport into which to draw the icons.
- *  \param scaling The scaling to use when draing the icons.
+ *  \param scaling The scaling to use when drawing the icons.
  */
 void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
                                    const core::recti &viewport,
@@ -309,8 +309,13 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
         || kart->hasFinishedRace()) return;
 
     int n = kart->getPowerup()->getNum() ;
+    int many_powerups = 0;
     if (n<1) return;    // shouldn't happen, but just in case
-    if (n>5) n=5;       // Display at most 5 items
+    if (n>5)
+    {
+        many_powerups = n;
+        n = 1;
+    }
 
     int nSize = (int)(64.0f*std::min(scaling.X, scaling.Y));
 
@@ -320,6 +325,8 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
            - (n * itemSpacing)/2;
     int y1 = viewport.UpperLeftCorner.Y  + (int)(20 * scaling.Y);
 
+    int x2 = 0;
+
     assert(powerup != NULL);
     assert(powerup->getIcon() != NULL);
     video::ITexture *t=powerup->getIcon()->getTexture();
@@ -328,11 +335,21 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     for ( int i = 0 ; i < n ; i++ )
     {
-        int x2 = (int)(x1+i*itemSpacing);
+        x2 = (int)(x1+i*itemSpacing);
         core::rect<s32> pos(x2, y1, x2+nSize, y1+nSize);
         draw2DImage(t, pos, rect, NULL,
                                                   NULL, true);
     }   // for i
+
+    if (many_powerups > 0)
+    {
+        gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+        core::rect<s32> pos(x2+nSize, y1, x2+nSize+nSize, y1+nSize);
+        font->setScale(1.5f);
+        font->draw(StringUtils::toWString(many_powerups)+L"x",
+            pos, video::SColor(255, 255, 255, 255));
+        font->setScale(1.0f);
+    }
 }   // drawPowerupIcons
 
 // ----------------------------------------------------------------------------
@@ -439,11 +456,15 @@ void RaceGUIBase::drawGlobalMusicDescription()
     gui::IGUIFont*       font = GUIEngine::getFont();
 
     float race_time = World::getWorld()->getTime();
-    // In follow the leader the clock counts backwards, so convert the
+    // In the modes that the clock counts backwards, convert the
     // countdown time to time since start:
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         race_time = ((FollowTheLeaderRace*)World::getWorld())->getClockStartTime()
                   - race_time;
+    else if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER &&
+             race_manager->hasTimeTarget())
+        race_time = race_manager->getTimeTarget() - World::getWorld()->getTime();
+
     // ---- Manage pulsing effect
     // 3.0 is the duration of ready/set (TODO: don't hardcode)
     float timeProgression = (float)(race_time) /

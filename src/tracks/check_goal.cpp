@@ -51,42 +51,28 @@ CheckGoal::CheckGoal(const XMLNode &node,  unsigned int index)
  */
 void CheckGoal::update(float dt)
 {
-    World *world = World::getWorld();
-    assert(world);
+    SoccerWorld* world = dynamic_cast<SoccerWorld*>(World::getWorld());
 
-    Track* track = world->getTrack();
-    assert(track);
-
-    TrackObjectManager* tom = track->getTrackObjectManager();
-    assert(tom);
-
-    PtrVector<TrackObject>&   objects = tom->getObjects();
-    unsigned int ball_index = 0;
-    for(unsigned int i=0; i<objects.size(); i++)
+    if (world)
     {
-        TrackObject* obj = objects.get(i);
-        if(!obj->isSoccerBall())
-            continue;
-
-        const Vec3 &xyz = obj->getPresentation<TrackObjectPresentationMesh>()->getNode()->getPosition();
-        if(isTriggered(m_previous_position[ball_index], xyz, -1))
+        const Vec3 &xyz = world->getBallPosition();
+        if (isTriggered(m_previous_ball_position, xyz, -1))
         {
-            if(UserConfigParams::m_check_debug)
-                Log::info("CheckGoal", "Goal check structure %d triggered for object %s.",
-                          m_index, obj->getPresentation<TrackObjectPresentationMesh>()->getNode()->getDebugName());
-            trigger(ball_index);
+            if (UserConfigParams::m_check_debug)
+            {
+                Log::info("CheckGoal", "Goal check structure"
+                          "%d triggered for ball.", m_index);
+            }
+            trigger(0);
         }
-        m_previous_position[ball_index] = xyz;
-        ball_index++;
+        m_previous_ball_position = xyz;
     }
 }   // update
 
 // ----------------------------------------------------------------------------
-/** Called when the check line is triggered. This function  creates a cannon
- *  animation object and attaches it to the kart.
- *  \param kart_index The index of the kart that triggered the check line.
+/** Called when the goal line is triggered. Input any integer for i to use
  */
-void CheckGoal::trigger(unsigned int kart_index)
+void CheckGoal::trigger(unsigned int i)
 {
     SoccerWorld* world = dynamic_cast<SoccerWorld*>(World::getWorld());
     if(!world)
@@ -116,21 +102,22 @@ bool CheckGoal::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
 void CheckGoal::reset(const Track &track)
 {
     CheckStructure::reset(track);
+    m_previous_ball_position = Vec3(0, 0, 0);
 
-    const TrackObjectManager* tom = track.getTrackObjectManager();
-    assert(tom);
+    SoccerWorld* world = dynamic_cast<SoccerWorld*>(World::getWorld());
 
-    m_previous_position.clear();
-
-    const PtrVector<TrackObject>&   objects = tom->getObjects();
-    for(unsigned int i=0; i<objects.size(); i++)
+    if (world)
     {
-        const TrackObject* obj = objects.get(i);
-        if(!obj->isSoccerBall())
-            continue;
-
-        const Vec3 &xyz = obj->getPresentation<TrackObjectPresentationMesh>()->getNode()->getPosition();
-
-        m_previous_position.push_back(xyz);
+        const Vec3 &xyz = world->getBallPosition();
+        m_previous_ball_position = xyz;
     }
+
 }   // reset
+
+// ----------------------------------------------------------------------------
+Vec3 CheckGoal::convertTo3DCenter() const
+{
+    float x = m_line.getMiddle().X;
+    float y = m_line.getMiddle().Y;
+    return Vec3(x, 0, y);
+}

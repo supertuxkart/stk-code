@@ -35,6 +35,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "modes/world.hpp"
+#include "modes/soccer_world.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -226,6 +227,16 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
         if(kart->isEliminated() || kart == m_owner ||
             kart->isInvulnerable()                 ||
             kart->getKartAnimation()                   ) continue;
+
+        const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+        if (sw)
+        {
+            // Don't hit teammates in soccer world
+            if (sw->getKartTeam(kart->getWorldKartId()) == sw
+                ->getKartTeam(m_owner->getWorldKartId()))
+            continue;
+        }
+
         btTransform t=kart->getTrans();
 
         Vec3 delta      = t.getOrigin()-trans_projectile.getOrigin();
@@ -460,6 +471,15 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
     for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
     {
         AbstractKart *kart = world->getKart(i);
+
+        const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+        if (sw)
+        {
+            // Don't explode teammates in soccer world
+            if (sw->getKartTeam(kart->getWorldKartId()) == sw
+                ->getKartTeam(m_owner->getWorldKartId()))
+            continue;
+        }
 
         // If no secondary hits should be done, only hit the
         // direct hit kart.

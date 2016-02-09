@@ -59,6 +59,8 @@ public:
     void      loadMaterial     ();
     Material* getMaterialFor(video::ITexture* t,
                              scene::IMeshBuffer *mb);
+    Material* getMaterialFor(video::ITexture* t,
+                             video::E_MATERIAL_TYPE material_type);
     void      setAllMaterialFlags(video::ITexture* t,
                                   scene::IMeshBuffer *mb);
     void      adjustForFog(video::ITexture* t,

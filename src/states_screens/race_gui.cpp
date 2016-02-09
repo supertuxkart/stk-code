@@ -48,6 +48,7 @@ using namespace irr;
 #include "modes/soccer_world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -224,55 +225,46 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
  */
 void RaceGUI::drawScores()
 {
-    SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
-    int offsetY = 5;
-    int offsetX = 5;
-    gui::ScalableFont* font = GUIEngine::getFont();
+    SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+    int offset_y = 5;
+    int offset_x = 5;
+    gui::ScalableFont* font = GUIEngine::getTitleFont();
     static video::SColor color = video::SColor(255,255,255,255);
 
-    //Draw kart icons above score(denoting teams)
+    //Draw two teams score
     irr::video::ITexture *red_team = irr_driver->getTexture(FileManager::GUI,
                                                             "soccer_ball_red.png");
     irr::video::ITexture *blue_team = irr_driver->getTexture(FileManager::GUI,
-                                                             "soccer_ball_blue.png");
+                                                            "soccer_ball_blue.png");
     irr::video::ITexture *team_icon = red_team;
 
-    int numLeader = 1;
-    for(unsigned int i=0; i<soccerWorld->getNumKarts(); i++)
+    for(unsigned int i=0; i<2; i++)
     {
-        int j = soccerWorld->getTeamLeader(i);
-        if(j < 0) break;
+        core::recti position(offset_x, offset_y,
+            offset_x + 2*m_minimap_player_size, offset_y + 2*m_minimap_player_size);
 
-        AbstractKart* kart = soccerWorld->getKart(i);
-        video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
-        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
-        core::recti position(offsetX, offsetY,
-            offsetX + 2*m_minimap_player_size, offsetY + 2*m_minimap_player_size);
-        draw2DImage(icon, position, source,
-            NULL, NULL, true);
-        core::stringw score = StringUtils::toWString(soccerWorld->getScore(i));
+        core::stringw score = StringUtils::toWString(sw->getScore((SoccerTeam)i));
         int string_height =
             GUIEngine::getFont()->getDimension(score.c_str()).Height;
         core::recti pos(position.UpperLeftCorner.X + 5,
-                        position.LowerRightCorner.Y + offsetY,
+                        position.LowerRightCorner.Y + offset_y,
                         position.LowerRightCorner.X,
                         position.LowerRightCorner.Y + string_height);
 
         font->draw(score.c_str(),pos,color);
 
-        if (numLeader == 2)
+        if (i == 1)
         {
             team_icon = blue_team;
         }
-        core::rect<s32> indicatorPos(offsetX, offsetY,
-                                     offsetX + (int)(m_minimap_player_size/1.25f),
-                                     offsetY + (int)(m_minimap_player_size/1.25f));
-        core::rect<s32> sourceRect(core::position2d<s32>(0,0),
+        core::rect<s32> indicator_pos(offset_x, offset_y,
+                                     offset_x + (int)(m_minimap_player_size*2),
+                                     offset_y + (int)(m_minimap_player_size*2));
+        core::rect<s32> source_rect(core::position2d<s32>(0,0),
                                                    team_icon->getSize());
-        draw2DImage(team_icon,indicatorPos,sourceRect,
+        draw2DImage(team_icon,indicator_pos,source_rect,
             NULL,NULL,true);
-        numLeader++;
-        offsetX += position.LowerRightCorner.X;
+        offset_x += position.LowerRightCorner.X + 30;
     }
 }   // drawScores
 
@@ -295,7 +287,8 @@ void RaceGUI::drawGlobalTimer()
     bool use_digit_font = true;
 
     float elapsed_time = World::getWorld()->getTime();
-    if (!race_manager->hasTimeTarget())
+    if (!race_manager->hasTimeTarget() || race_manager
+        ->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
     {
         sw = core::stringw (
             StringUtils::timeToString(elapsed_time).c_str() );
@@ -329,7 +322,8 @@ void RaceGUI::drawGlobalTimer()
     }
 
     gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());
-    font->setShadow(video::SColor(255, 128, 0, 0));
+    if (use_digit_font)
+        font->setShadow(video::SColor(255, 128, 0, 0));
     font->setScale(1.0f);
     font->draw(sw.c_str(), pos, time_color, false, false, NULL,
                true /* ignore RTL */);
@@ -343,8 +337,8 @@ void RaceGUI::drawGlobalMiniMap()
 {
     World *world = World::getWorld();
     // draw a map when arena has a navigation mesh.
-    if ((world->getTrack()->isArena() && !(world->getTrack()->hasNavMesh())) ||
-        world->getTrack()->isSoccer())
+    if ((world->getTrack()->isArena() || world->getTrack()->isSoccer()) &&
+        !(world->getTrack()->hasNavMesh()))
         return;
 
     const video::ITexture *old_rtt_mini_map = world->getTrack()->getOldRttMiniMap();
@@ -393,6 +387,23 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
         draw2DImage(icon, position, source, NULL, NULL, true);
     }   // for i<getNumKarts
+
+    SoccerWorld *sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+    if (sw)
+    {
+        Vec3 draw_at;
+        world->getTrack()->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
+        video::ITexture* icon =
+            irr_driver->getTexture(FileManager::GUI, "soccer_ball_normal.png");
+
+        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
+        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_ai_size>>2)),
+                                 lower_y   -(int)(draw_at.getY()+(m_minimap_ai_size>>2)),
+                                 m_map_left+(int)(draw_at.getX()+(m_minimap_ai_size>>2)),
+                                 lower_y   -(int)(draw_at.getY()-(m_minimap_ai_size>>2)));
+        draw2DImage(icon, position, source, NULL, NULL, true);
+    }
+
 }   // drawGlobalMiniMap
 
 //-----------------------------------------------------------------------------

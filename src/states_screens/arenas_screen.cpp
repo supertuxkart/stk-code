@@ -95,7 +95,9 @@ void ArenasScreen::beforeAddingWidget()
         Track* temp = track_manager->getTrack(n);
         if (soccer_mode)
         {
-            if(temp->isSoccer())
+            if(temp->isSoccer() && (temp->hasNavMesh() ||
+                race_manager->getNumLocalPlayers() > 1 ||
+                UserConfigParams::m_artist_debug_mode))
                 num_of_arenas++;
         }
         else
@@ -239,7 +241,18 @@ void ArenasScreen::buildTrackList()
             Track* curr = track_manager->getTrack(n);
             if (soccer_mode)
             {
-                if(!curr->isSoccer()) continue;
+                if(curr->isSoccer() && curr->hasNavMesh() && !arenas_have_navmesh)
+                    arenas_have_navmesh = true;
+
+                if(!curr->isSoccer()                     ||
+                  (!(curr->hasNavMesh()                  ||
+                  race_manager->getNumLocalPlayers() > 1 ||
+                  UserConfigParams::m_artist_debug_mode)))
+                {
+                    if (curr->isSoccer())
+                        m_unsupported_arena.insert(n);
+                    continue;
+                }
             }
             else
             {
@@ -280,7 +293,18 @@ void ArenasScreen::buildTrackList()
             Track* curr = track_manager->getTrack(currArenas[n]);
             if (soccer_mode)
             {
-                if(!curr->isSoccer()) continue;
+                if(curr->isSoccer() && curr->hasNavMesh() && !arenas_have_navmesh)
+                    arenas_have_navmesh = true;
+
+                if(!curr->isSoccer()                     ||
+                  (!(curr->hasNavMesh()                  ||
+                  race_manager->getNumLocalPlayers() > 1 ||
+                  UserConfigParams::m_artist_debug_mode)))
+                {
+                    if (curr->isSoccer())
+                        m_unsupported_arena.insert(currArenas[n]);
+                    continue;
+                }
             }
             else
             {
