@@ -344,6 +344,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
         if (CVS->isDefferedEnabled())
+        {
             if (CVS->isGlobalIlluminationEnabled() && hasShadow)
             {    
                 m_lighting_passes.renderGlobalIllumination( m_shadow_matrices,
@@ -370,6 +371,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                                             m_rtts->getShadowFrameBuffer(),
                                             m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR),
                                             specular_probe);
+            }
         PROFILER_POP_CPU_MARKER();
     }
 
