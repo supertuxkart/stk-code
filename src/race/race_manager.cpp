@@ -312,7 +312,7 @@ void RaceManager::startNew(bool from_overworld)
     unsigned int gk = 0;
     if (ReplayPlay::get())
     {
-        ReplayPlay::get()->loadKartInfo();
+        ReplayPlay::get()->loadBasicInfo();
         gk = ReplayPlay::get()->getNumGhostKart();
     }
 

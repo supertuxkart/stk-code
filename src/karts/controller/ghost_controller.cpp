@@ -17,14 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "karts/controller/ghost_controller.hpp"
-
-#include "config/user_config.hpp"
-#include "karts/abstract_kart.hpp"
-#include "karts/kart_properties.hpp"
-#include "karts/controller/ai_properties.hpp"
 #include "modes/world.hpp"
-#include "tracks/track.hpp"
-#include "utils/constants.hpp"
 
 GhostController::GhostController(AbstractKart *kart,
                                  StateManager::ActivePlayer *player)
@@ -37,7 +30,7 @@ GhostController::GhostController(AbstractKart *kart,
 void GhostController::reset()
 {
     m_current_index = 0;
-    m_current_time = 0;
+    m_current_time = 0.0f;
 }   // reset
 
 //-----------------------------------------------------------------------------

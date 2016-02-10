@@ -73,9 +73,10 @@ void ReplayPlay::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-/** Loads the ghost karts info in the replay file, required by race manager.
+/** Loads the basic (ghost karts, reverse track) info in the replay file,
+ *  required by race manager.
  */
-void ReplayPlay::loadKartInfo()
+void ReplayPlay::loadBasicInfo()
 {
     char s[1024];
 
@@ -87,6 +88,12 @@ void ReplayPlay::loadKartInfo()
         destroy();
         return;
     }
+
+    int reverse;
+    fgets(s, 1023, fd);
+    if(sscanf(s, "reverse: %d", &reverse) != 1)
+        Log::fatal("Replay", "Reverse info found in replay file.");
+    race_manager->setReverseTrack((bool)reverse);
 
     Log::info("Replay", "Reading ghost karts info");
     while(true)
@@ -104,7 +111,7 @@ void ReplayPlay::loadKartInfo()
         m_ghost_karts_list.push_back(std::string(s1));
     }
     fclose(fd);
-}   // loadKartInfo
+}   // loadBasicInfo
 
 //-----------------------------------------------------------------------------
 /** Loads a replay data from  file called 'trackname'.replay.
@@ -126,6 +133,10 @@ void ReplayPlay::load()
     Log::info("Replay", "Reading replay file '%s'.", getReplayFilename().c_str());
     if (fgets(s, 1023, fd) == NULL)
         Log::fatal("Replay", "Could not read '%s'.", getReplayFilename().c_str());
+
+    if (fgets(s, 1023, fd) == NULL)
+        Log::fatal("Replay", "Could not read '%s'.", getReplayFilename().c_str());
+    // Skip reverse info which is already read.
 
     for (unsigned int i = 0; i < m_ghost_karts_list.size(); i++)
     {

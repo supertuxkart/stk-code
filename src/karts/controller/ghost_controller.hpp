@@ -66,9 +66,9 @@ public:
     // ------------------------------------------------------------------------
     float        getReplayDelta() const
     {
-                    return ((m_current_time - m_all_times[m_current_index])
-                                       / (m_all_times[m_current_index + 1]
-                                           - m_all_times[m_current_index]));
+        assert(m_current_index < m_all_times.size());
+        return ((m_current_time - m_all_times[m_current_index]) /
+            (m_all_times[m_current_index + 1] - m_all_times[m_current_index]));
     }
     // ------------------------------------------------------------------------
     unsigned int getCurrentReplayIndex() const

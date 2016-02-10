@@ -51,7 +51,7 @@ public:
     void  update(float dt);
     void  reset();
     void  load();
-    void  loadKartInfo();
+    void  loadBasicInfo();
 
     // ------------------------------------------------------------------------
     GhostKart*         getGhostKart(int n)    { return m_ghost_karts.get(n); }

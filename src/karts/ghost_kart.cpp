@@ -23,7 +23,6 @@
 #include "modes/world.hpp"
 
 #include "LinearMath/btQuaternion.h"
-#include "utils/log.hpp"
 
 GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
                      int position)
@@ -85,6 +84,7 @@ void GhostKart::update(float dt)
 
     const unsigned int idx = gc->getCurrentReplayIndex();
     const float rd         = gc->getReplayDelta();
+    assert(idx < m_all_transform.size());
 
     float nitro_frac = 0;
     if (m_all_replay_events[idx].m_on_nitro)
@@ -121,9 +121,12 @@ void GhostKart::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
+/** Returns the speed of the kart in meters/second. */
 float GhostKart::getSpeed() const
 {
     const GhostController* gc =
         dynamic_cast<const GhostController*>(getController());
+
+    assert(gc->getCurrentReplayIndex() < m_all_physic_info.size());
     return m_all_physic_info[gc->getCurrentReplayIndex()].m_speed;
-}
+}   // getSpeed

@@ -208,6 +208,7 @@ void ReplayRecorder::Save()
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
     fprintf(fd, "laps: %d\n",       race_manager->getNumLaps());
+    fprintf(fd, "reverse: %d\n",    (int)race_manager->getReverseTrack());
 
     unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time 
                                              / stk_config->m_replay_dt      );
