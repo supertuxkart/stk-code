@@ -36,19 +36,12 @@
 class GhostKart : public Kart
 {
 private:
-    /** The list of the times at which the transform were reached. */
-    std::vector<float>                       m_all_times;
-
     /** The transforms to assume at the corresponding time in m_all_times. */
     std::vector<btTransform>                 m_all_transform;
 
     std::vector<ReplayBase::PhysicInfo>      m_all_physic_info;
 
     std::vector<ReplayBase::KartReplayEvent> m_all_replay_events;
-
-    /** Pointer to the last index in m_all_times that is smaller than
-     *  the current world time. */
-    unsigned int                             m_current_transform;
 
 public:
                   GhostKart(const std::string& ident,
@@ -80,8 +73,7 @@ public:
     virtual bool  isInvulnerable() const                      { return true; }
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
-    virtual float getSpeed() const
-                    { return m_all_physic_info[m_current_transform].m_speed; }
+    virtual float getSpeed() const;
     // ------------------------------------------------------------------------
 
 };   // GhostKart

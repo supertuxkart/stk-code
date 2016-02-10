@@ -21,6 +21,7 @@
 #include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
 #include "karts/ghost_kart.hpp"
+#include "karts/controller/ghost_controller.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -196,6 +197,8 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
     m_ghost_karts.push_back(new GhostKart(m_ghost_karts_list.at(kart_num),
         kart_num, kart_num + 1));
     m_ghost_karts[kart_num].init(RaceManager::KT_GHOST);
+    Controller* controller = new GhostController(getGhostKart(kart_num));
+    getGhostKart(kart_num)->setController(controller);
 
     unsigned int size;
     if(sscanf(next_line,"size: %u",&size)!=1)

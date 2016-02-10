@@ -1,0 +1,368 @@
+diff --git a/sources.cmake b/sources.cmake
+index ddc029d..7c1db62 100644
+--- a/sources.cmake
++++ b/sources.cmake
+@@ -1,5 +1,5 @@
+ # Modify this file to change the last-modified date when you add/remove a file. 
+-# This will then trigger a new cmake run automatically.
++# This will then trigger a new cmake run automatically.                       
+ file(GLOB_RECURSE STK_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.hpp")
+ file(GLOB_RECURSE STK_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp")
+ file(GLOB_RECURSE STK_SHADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "data/shaders/*")
+diff --git a/src/karts/controller/ai_base_controller.hpp b/src/karts/controller/ai_base_controller.hpp
+index d108ebe..fbea900 100644
+--- a/src/karts/controller/ai_base_controller.hpp
++++ b/src/karts/controller/ai_base_controller.hpp
+@@ -64,7 +64,7 @@ protected:
+     void         setControllerName(const std::string &name);
+     float        steerToPoint(const Vec3 &point);
+     float        normalizeAngle(float angle);
+-    virtual void update      (float delta) ;
++    virtual void update      (float delta);
+     virtual void setSteering   (float angle, float dt);
+     virtual bool canSkid(float steer_fraction) = 0;
+     // ------------------------------------------------------------------------
+diff --git a/src/karts/controller/ghost_controller.cpp b/src/karts/controller/ghost_controller.cpp
+new file mode 100644
+index 0000000..5f4000d
+--- /dev/null
++++ b/src/karts/controller/ghost_controller.cpp
+@@ -0,0 +1,70 @@
++//
++//  SuperTuxKart - a fun racing game with go-kart
++//  Copyright (C) 2016 SuperTuxKart-Team
++//
++//  This program is free software; you can redistribute it and/or
++//  modify it under the terms of the GNU General Public License
++//  as published by the Free Software Foundation; either version 3
++//  of the License, or (at your option) any later version.
++//
++//  This program is distributed in the hope that it will be useful,
++//  but WITHOUT ANY WARRANTY; without even the implied warranty of
++//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++//  GNU General Public License for more details.
++//
++//  You should have received a copy of the GNU General Public License
++//  along with this program; if not, write to the Free Software
++//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
++
++#include "karts/controller/ghost_controller.hpp"
++
++#include "config/user_config.hpp"
++#include "karts/abstract_kart.hpp"
++#include "karts/kart_properties.hpp"
++#include "karts/controller/ai_properties.hpp"
++#include "modes/world.hpp"
++#include "tracks/track.hpp"
++#include "utils/constants.hpp"
++
++GhostController::GhostController(AbstractKart *kart,
++                                 StateManager::ActivePlayer *player)
++                : Controller(kart, player)
++{
++    m_kart = kart;
++}   // GhostController
++
++//-----------------------------------------------------------------------------
++void GhostController::reset()
++{
++    m_current_index = 0;
++    m_current_time = 0;
++    m_all_times.clear();
++}   // reset
++
++//-----------------------------------------------------------------------------
++void GhostController::update(float dt)
++{
++    m_current_time = World::getWorld()->getTime();
++    // Find (if necessary) the next index to use
++    if (m_current_time != 0.0f)
++    {
++        while (m_current_index + 1 < m_all_times.size() &&
++               m_current_time >= m_all_times[m_current_index + 1])
++        {
++            m_current_index++;
++        }
++    }
++
++}   // update
++
++//-----------------------------------------------------------------------------
++void GhostController::addReplayTime(float time)
++{
++    // FIXME: for now avoid that transforms for the same time are set
++    // twice (to avoid division by zero in update). This should be
++    // done when saving in replay
++    if (m_all_times.size() > 0 && m_all_times.back() == time)
++        return;
++    m_all_times.push_back(time);
++
++}   // addReplayTime
+diff --git a/src/karts/controller/ghost_controller.hpp b/src/karts/controller/ghost_controller.hpp
+new file mode 100644
+index 0000000..64e4f22
+--- /dev/null
++++ b/src/karts/controller/ghost_controller.hpp
+@@ -0,0 +1,79 @@
++//
++//  SuperTuxKart - a fun racing game with go-kart
++//  Copyright (C) 2016 SuperTuxKart-Team
++//
++//  This program is free software; you can redistribute it and/or
++//  modify it under the terms of the GNU General Public License
++//  as published by the Free Software Foundation; either version 3
++//  of the License, or (at your option) any later version.
++//
++//  This program is distributed in the hope that it will be useful,
++//  but WITHOUT ANY WARRANTY; without even the implied warranty of
++//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++//  GNU General Public License for more details.
++//
++//  You should have received a copy of the GNU General Public License
++//  along with this program; if not, write to the Free Software
++//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
++
++#ifndef HEADER_GHOST_CONTROLLER_HPP
++#define HEADER_GHOST_CONTROLLER_HPP
++
++#include "karts/controller/controller.hpp"
++#include "states_screens/state_manager.hpp"
++
++#include <vector>
++
++/** A class for Ghost controller.
++ * \ingroup controller
++ */
++class GhostController : public Controller
++{
++private:
++    /** Pointer to the last index in m_all_times that is smaller than
++     *  the current world time. */
++    unsigned int m_current_index;
++
++    /** The current world time. */
++    float m_current_time;
++
++    /** The list of the times at which the events of kart were reached. */
++    std::vector<float> m_all_times;
++
++public:
++             GhostController(AbstractKart *kart,
++                             StateManager::ActivePlayer *player=NULL);
++    virtual ~GhostController() {};
++    virtual void reset();
++    virtual void update (float dt);
++    virtual bool disableSlipstreamBonus() const { return true; }
++    virtual void crashed(const Material *m) {};
++    virtual void crashed(const AbstractKart *k) {};
++    virtual void handleZipper(bool play_sound) {};
++    virtual void finishedRace(float time) {};
++    virtual void collectedItem(const Item &item, int add_info=-1,
++                               float previous_energy=0) {};
++    virtual void setPosition(int p) {};
++    virtual bool isPlayerController() const { return false; }
++    virtual bool isLocalPlayerController() const { return false; }
++    virtual void action(PlayerAction action, int value) {};
++    virtual void skidBonusTriggered() {};
++    virtual void newLap(int lap) {};
++    void         addReplayTime(float time);
++    // ------------------------------------------------------------------------
++    bool         isReplayEnd() const
++                         { return m_current_index + 1 >= m_all_times.size(); }
++    // ------------------------------------------------------------------------
++    float        getReplayDelta() const
++    {
++                    return ((m_current_time - m_all_times[m_current_index])
++                                       / (m_all_times[m_current_index + 1]
++                                           - m_all_times[m_current_index]));
++    }
++    // ------------------------------------------------------------------------
++    unsigned int getCurrentReplayIndex() const
++                                                   { return m_current_index; }
++    // ------------------------------------------------------------------------
++};   // GhostController
++
++#endif
+diff --git a/src/karts/ghost_kart.cpp b/src/karts/ghost_kart.cpp
+index 0d6d713..4e1c321 100644
+--- a/src/karts/ghost_kart.cpp
++++ b/src/karts/ghost_kart.cpp
+@@ -17,6 +17,7 @@
+ //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ 
+ #include "karts/ghost_kart.hpp"
++#include "karts/controller/ghost_controller.hpp"
+ #include "karts/kart_gfx.hpp"
+ #include "karts/kart_model.hpp"
+ #include "modes/world.hpp"
+@@ -30,7 +31,6 @@ GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
+                  position, btTransform(btQuaternion(0, 0, 0, 1)),
+                  PLAYER_DIFFICULTY_NORMAL)
+ {
+-    m_all_times.clear();
+     m_all_transform.clear();
+     m_all_physic_info.clear();
+     m_all_replay_events.clear();
+@@ -41,7 +41,6 @@ void GhostKart::reset()
+ {
+     m_node->setVisible(true);
+     Kart::reset();
+-    m_current_transform = 0;
+     // This will set the correct start position
+     update(0);
+ }   // reset
+@@ -52,12 +51,9 @@ void GhostKart::addReplayEvent(float time,
+                                const ReplayBase::PhysicInfo &pi,
+                                const ReplayBase::KartReplayEvent &kre)
+ {
+-    // FIXME: for now avoid that transforms for the same time are set
+-    // twice (to avoid division by zero in update). This should be
+-    // done when saving in replay
+-    if(m_all_times.size()>0 && m_all_times.back()==time)
+-        return;
+-    m_all_times.push_back(time);
++    GhostController* gc = dynamic_cast<GhostController*>(getController());
++    gc->addReplayTime(time);
++
+     m_all_transform.push_back(trans);
+     m_all_physic_info.push_back(pi);
+     m_all_replay_events.push_back(kre);
+@@ -80,27 +76,23 @@ void GhostKart::addReplayEvent(float time,
+  */
+ void GhostKart::update(float dt)
+ {
+-    float t = World::getWorld()->getTime();
+-    // Find (if necessary) the next index to use
+-    if (t != 0.0f)
+-    {
+-        while (m_current_transform + 1 < m_all_times.size() &&
+-               t >= m_all_times[m_current_transform+1])
+-        {
+-            m_current_transform++;
+-        }
+-    }
++    GhostController* gc = dynamic_cast<GhostController*>(getController());
++    if (gc == NULL) return;
+ 
+-    if (m_current_transform + 1 >= m_all_times.size())
++    gc->update(dt);
++    if (gc->isReplayEnd())
+     {
+         m_node->setVisible(false);
+         return;
+     }
+ 
++    const unsigned int idx = gc->getCurrentReplayIndex();
++    const float rd         = gc->getReplayDelta();
++
+     float nitro_frac = 0;
+-    if (m_all_replay_events[m_current_transform].m_on_nitro)
++    if (m_all_replay_events[idx].m_on_nitro)
+     {
+-        nitro_frac = fabsf(m_all_physic_info[m_current_transform].m_speed) /
++        nitro_frac = fabsf(m_all_physic_info[idx].m_speed) /
+             (m_kart_properties->getEngineMaxSpeed());
+ 
+         if (nitro_frac > 1.0f)
+@@ -108,16 +100,14 @@ void GhostKart::update(float dt)
+     }
+     getKartGFX()->updateNitroGraphics(nitro_frac);
+ 
+-    if (m_all_replay_events[m_current_transform].m_on_zipper)
++    if (m_all_replay_events[idx].m_on_zipper)
+         showZipperFire();
+ 
+-    float f =(t - m_all_times[m_current_transform])
+-           / (  m_all_times[m_current_transform+1]
+-              - m_all_times[m_current_transform]  );
+-    setXYZ((1-f)*m_all_transform[m_current_transform  ].getOrigin()
+-           + f  *m_all_transform[m_current_transform+1].getOrigin() );
+-    const btQuaternion q = m_all_transform[m_current_transform].getRotation()
+-        .slerp(m_all_transform[m_current_transform+1].getRotation(), f);
++    setXYZ((1- rd)*m_all_transform[idx    ].getOrigin()
++           +  rd  *m_all_transform[idx + 1].getOrigin() );
++
++    const btQuaternion q = m_all_transform[idx].getRotation()
++        .slerp(m_all_transform[idx + 1].getRotation(), rd);
+     setRotation(q);
+ 
+     Vec3 center_shift(0, 0, 0);
+@@ -125,12 +115,18 @@ void GhostKart::update(float dt)
+     center_shift = getTrans().getBasis() * center_shift;
+ 
+     Moveable::updateGraphics(dt, center_shift, btQuaternion(0, 0, 0, 1));
+-    getKartModel()->update(dt, dt*(m_all_physic_info[m_current_transform].m_speed),
+-        m_all_physic_info[m_current_transform].m_steer,
+-        m_all_physic_info[m_current_transform].m_speed,
+-        m_current_transform);
++    getKartModel()->update(dt, dt*(m_all_physic_info[idx].m_speed),
++        m_all_physic_info[idx].m_steer, m_all_physic_info[idx].m_speed, idx);
+ 
+     Vec3 front(0, 0, getKartLength()*0.5f);
+     m_xyz_front = getTrans()(front);
+     getKartGFX()->update(dt);
+ }   // update
++
++// ----------------------------------------------------------------------------
++float GhostKart::getSpeed() const
++{
++    const GhostController* gc =
++        dynamic_cast<const GhostController*>(getController());
++    return m_all_physic_info[gc->getCurrentReplayIndex()].m_speed;
++}
+diff --git a/src/karts/ghost_kart.hpp b/src/karts/ghost_kart.hpp
+index dc8f605..d95ad8d 100644
+--- a/src/karts/ghost_kart.hpp
++++ b/src/karts/ghost_kart.hpp
+@@ -36,9 +36,6 @@
+ class GhostKart : public Kart
+ {
+ private:
+-    /** The list of the times at which the transform were reached. */
+-    std::vector<float>                       m_all_times;
+-
+     /** The transforms to assume at the corresponding time in m_all_times. */
+     std::vector<btTransform>                 m_all_transform;
+ 
+@@ -46,10 +43,6 @@ private:
+ 
+     std::vector<ReplayBase::KartReplayEvent> m_all_replay_events;
+ 
+-    /** Pointer to the last index in m_all_times that is smaller than
+-     *  the current world time. */
+-    unsigned int                             m_current_transform;
+-
+ public:
+                   GhostKart(const std::string& ident,
+                             unsigned int world_kart_id, int position);
+@@ -80,8 +73,7 @@ public:
+     virtual bool  isInvulnerable() const                      { return true; }
+     // ------------------------------------------------------------------------
+     /** Returns the speed of the kart in meters/second. */
+-    virtual float getSpeed() const
+-                    { return m_all_physic_info[m_current_transform].m_speed; }
++    virtual float getSpeed() const;
+     // ------------------------------------------------------------------------
+ 
+ };   // GhostKart
+diff --git a/src/replay/replay_play.cpp b/src/replay/replay_play.cpp
+index 863d253..9babedc 100644
+--- a/src/replay/replay_play.cpp
++++ b/src/replay/replay_play.cpp
+@@ -21,6 +21,7 @@
+ #include "config/stk_config.hpp"
+ #include "io/file_manager.hpp"
+ #include "karts/ghost_kart.hpp"
++#include "karts/controller/ghost_controller.hpp"
+ #include "modes/world.hpp"
+ #include "race/race_manager.hpp"
+ #include "tracks/track.hpp"
+@@ -196,6 +197,8 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
+     m_ghost_karts.push_back(new GhostKart(m_ghost_karts_list.at(kart_num),
+         kart_num, kart_num + 1));
+     m_ghost_karts[kart_num].init(RaceManager::KT_GHOST);
++    Controller* controller = new GhostController(getGhostKart(kart_num));
++    getGhostKart(kart_num)->setController(controller);
+ 
+     unsigned int size;
+     if(sscanf(next_line,"size: %u",&size)!=1)

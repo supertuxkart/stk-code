@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "karts/ghost_kart.hpp"
+#include "karts/controller/ghost_controller.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
 #include "modes/world.hpp"
@@ -30,10 +31,6 @@ GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
                  position, btTransform(btQuaternion(0, 0, 0, 1)),
                  PLAYER_DIFFICULTY_NORMAL)
 {
-    m_all_times.clear();
-    m_all_transform.clear();
-    m_all_physic_info.clear();
-    m_all_replay_events.clear();
 }   // GhostKart
 
 // ----------------------------------------------------------------------------
@@ -41,7 +38,6 @@ void GhostKart::reset()
 {
     m_node->setVisible(true);
     Kart::reset();
-    m_current_transform = 0;
     // This will set the correct start position
     update(0);
 }   // reset
@@ -52,12 +48,9 @@ void GhostKart::addReplayEvent(float time,
                                const ReplayBase::PhysicInfo &pi,
                                const ReplayBase::KartReplayEvent &kre)
 {
-    // FIXME: for now avoid that transforms for the same time are set
-    // twice (to avoid division by zero in update). This should be
-    // done when saving in replay
-    if(m_all_times.size()>0 && m_all_times.back()==time)
-        return;
-    m_all_times.push_back(time);
+    GhostController* gc = dynamic_cast<GhostController*>(getController());
+    gc->addReplayTime(time);
+
     m_all_transform.push_back(trans);
     m_all_physic_info.push_back(pi);
     m_all_replay_events.push_back(kre);
@@ -80,27 +73,23 @@ void GhostKart::addReplayEvent(float time,
  */
 void GhostKart::update(float dt)
 {
-    float t = World::getWorld()->getTime();
-    // Find (if necessary) the next index to use
-    if (t != 0.0f)
-    {
-        while (m_current_transform + 1 < m_all_times.size() &&
-               t >= m_all_times[m_current_transform+1])
-        {
-            m_current_transform++;
-        }
-    }
+    GhostController* gc = dynamic_cast<GhostController*>(getController());
+    if (gc == NULL) return;
 
-    if (m_current_transform + 1 >= m_all_times.size())
+    gc->update(dt);
+    if (gc->isReplayEnd())
     {
         m_node->setVisible(false);
         return;
     }
 
+    const unsigned int idx = gc->getCurrentReplayIndex();
+    const float rd         = gc->getReplayDelta();
+
     float nitro_frac = 0;
-    if (m_all_replay_events[m_current_transform].m_on_nitro)
+    if (m_all_replay_events[idx].m_on_nitro)
     {
-        nitro_frac = fabsf(m_all_physic_info[m_current_transform].m_speed) /
+        nitro_frac = fabsf(m_all_physic_info[idx].m_speed) /
             (m_kart_properties->getEngineMaxSpeed());
 
         if (nitro_frac > 1.0f)
@@ -108,16 +97,14 @@ void GhostKart::update(float dt)
     }
     getKartGFX()->updateNitroGraphics(nitro_frac);
 
-    if (m_all_replay_events[m_current_transform].m_on_zipper)
+    if (m_all_replay_events[idx].m_on_zipper)
         showZipperFire();
 
-    float f =(t - m_all_times[m_current_transform])
-           / (  m_all_times[m_current_transform+1]
-              - m_all_times[m_current_transform]  );
-    setXYZ((1-f)*m_all_transform[m_current_transform  ].getOrigin()
-           + f  *m_all_transform[m_current_transform+1].getOrigin() );
-    const btQuaternion q = m_all_transform[m_current_transform].getRotation()
-        .slerp(m_all_transform[m_current_transform+1].getRotation(), f);
+    setXYZ((1- rd)*m_all_transform[idx    ].getOrigin()
+           +  rd  *m_all_transform[idx + 1].getOrigin() );
+
+    const btQuaternion q = m_all_transform[idx].getRotation()
+        .slerp(m_all_transform[idx + 1].getRotation(), rd);
     setRotation(q);
 
     Vec3 center_shift(0, 0, 0);
@@ -125,12 +112,18 @@ void GhostKart::update(float dt)
     center_shift = getTrans().getBasis() * center_shift;
 
     Moveable::updateGraphics(dt, center_shift, btQuaternion(0, 0, 0, 1));
-    getKartModel()->update(dt, dt*(m_all_physic_info[m_current_transform].m_speed),
-        m_all_physic_info[m_current_transform].m_steer,
-        m_all_physic_info[m_current_transform].m_speed,
-        m_current_transform);
+    getKartModel()->update(dt, dt*(m_all_physic_info[idx].m_speed),
+        m_all_physic_info[idx].m_steer, m_all_physic_info[idx].m_speed, idx);
 
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
     getKartGFX()->update(dt);
 }   // update
+
+// ----------------------------------------------------------------------------
+float GhostKart::getSpeed() const
+{
+    const GhostController* gc =
+        dynamic_cast<const GhostController*>(getController());
+    return m_all_physic_info[gc->getCurrentReplayIndex()].m_speed;
+}
