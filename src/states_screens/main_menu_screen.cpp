@@ -490,10 +490,12 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Connect to the Internet\"."));
             return;
         }
-        if (PlayerManager::getCurrentOnlineId())
+        if(1)
+//        if (PlayerManager::getCurrentOnlineId())
         {
             // For 0.8.2 disable the server menu, instead go to online profile
-            #ifdef ENABLE_NETWORK_MULTIPLAYER_SCREEN
+#define ENABLE_NETWORK_MULTIPLAYER_SCREEN
+#ifdef ENABLE_NETWORK_MULTIPLAYER_SCREEN
             OnlineScreen::getInstance()->push();
             #else
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
