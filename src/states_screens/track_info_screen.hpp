@@ -55,6 +55,9 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** Check box for reverse mode. */
     GUIEngine::CheckBoxWidget* m_reverse;
 
+    /** Check box for record race. */
+    GUIEngine::CheckBoxWidget* m_record_race;
+
     /** The label of the highscore list. */
     GUIEngine::LabelWidget* m_highscore_label;
 

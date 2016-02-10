@@ -55,6 +55,8 @@ ReplayRecorder::~ReplayRecorder()
  */
 void ReplayRecorder::init()
 {
+    m_complete_replay = false;
+    m_incorrect_replay = false;
     m_transform_events.clear();
     m_physic_info.clear();
     m_kart_replay_event.clear();
@@ -82,18 +84,13 @@ void ReplayRecorder::init()
 }   // init
 
 //-----------------------------------------------------------------------------
-/** Resets all ghost karts back to start position.
- */
-void ReplayRecorder::reset()
-{
-}   // reset
-
-//-----------------------------------------------------------------------------
 /** Saves the current replay data.
  *  \param dt Time step size.
  */
 void ReplayRecorder::update(float dt)
 {
+    if (m_incorrect_replay || m_complete_replay) return;
+
     const World *world = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
 
@@ -104,6 +101,9 @@ void ReplayRecorder::update(float dt)
     for(unsigned int i=0; i<num_karts; i++)
     {
         const AbstractKart *kart = world->getKart(i);
+        // Don't record give-up race
+        if (kart->isEliminated()) return;
+
         if (kart->isGhostKart()) continue;
 #ifdef DEBUG
         m_count++;
@@ -126,6 +126,7 @@ void ReplayRecorder::update(float dt)
                 sprintf(buffer, "Can't store more events for kart %s.",
                         kart->getIdent().c_str());
                 Log::warn("ReplayRecorder", buffer);
+                m_incorrect_replay = true;
             }
             continue;
         }
@@ -173,13 +174,25 @@ void ReplayRecorder::update(float dt)
         r->m_on_nitro = nitro;
         r->m_on_zipper = zipper;
     }   // for i
+
+    if (world->getPhase() == World::RESULT_DISPLAY_PHASE && !m_complete_replay)
+    {
+        m_complete_replay = true;
+        save();
+    }
 }   // update
 
 //-----------------------------------------------------------------------------
 /** Saves the replay data stored in the internal data structures.
  */
-void ReplayRecorder::Save()
+void ReplayRecorder::save()
 {
+    if (m_incorrect_replay || !m_complete_replay)
+    {
+        Log::warn("ReplayRecorder", "Incomplete replay file will not be saved.");
+        return;
+    }
+
 #ifdef DEBUG
     printf("%d frames, %d removed because of frequency compression\n",
            m_count, m_count_skipped_time);
@@ -194,6 +207,7 @@ void ReplayRecorder::Save()
 
     Log::info("ReplayRecorder", "Replay saved in '%s'.\n", getReplayFilename().c_str());
 
+    fprintf(fd, "reverse: %d\n", (int)race_manager->getReverseTrack());
     World *world   = World::getWorld();
     unsigned int num_karts = world->getNumKarts();
     for (unsigned int real_karts = 0; real_karts < num_karts; real_karts++)
@@ -208,7 +222,6 @@ void ReplayRecorder::Save()
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
     fprintf(fd, "laps: %d\n",       race_manager->getNumLaps());
-    fprintf(fd, "reverse: %d\n",    (int)race_manager->getReverseTrack());
 
     unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time 
                                              / stk_config->m_replay_dt      );
@@ -245,5 +258,4 @@ void ReplayRecorder::Save()
         }   // for i
     }
     fclose(fd);
-}   // Save
-
+}   // save

@@ -61,18 +61,6 @@ void ReplayPlay::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-/** Updates all ghost karts.
- *  \param dt Time step size.
- */
-void ReplayPlay::update(float dt)
-{
-    // First update all ghost karts
-    for(unsigned int i=0; i<(unsigned int)m_ghost_karts.size(); i++)
-        m_ghost_karts[i].update(dt);
-
-}   // update
-
-//-----------------------------------------------------------------------------
 /** Loads the basic (ghost karts, reverse track) info in the replay file,
  *  required by race manager.
  */

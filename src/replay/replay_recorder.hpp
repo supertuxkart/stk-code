@@ -49,6 +49,10 @@ private:
     /** Static pointer to the one instance of the replay object. */
     static ReplayRecorder *m_replay_recorder;
 
+    bool  m_complete_replay;
+
+    bool  m_incorrect_replay;
+
 #ifdef DEBUG
     /** Counts overall number of events stored. */
     unsigned int m_count;
@@ -66,8 +70,7 @@ private:
 public:
     void  init();
     void  update(float dt);
-    void  reset();
-    void  Save();
+    void  save();
 
     // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */

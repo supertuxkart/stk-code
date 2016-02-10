@@ -279,7 +279,7 @@ void World::reset()
     race_manager->reset();
     // Make sure to overwrite the data from the previous race.
     if(!history->replayHistory()) history->initRecording();
-    if(ReplayRecorder::get()) ReplayRecorder::get()->init();
+    if(race_manager->willRecordRace()) ReplayRecorder::get()->init();
 
     // Reset all data structures that depend on number of karts.
     irr_driver->reset();
@@ -970,8 +970,7 @@ void World::update(float dt)
 
     PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
     history->update(dt);
-    if(ReplayRecorder::get()) ReplayRecorder::get()->update(dt);
-    if(ReplayPlay::get()) ReplayPlay::get()->update(dt);
+    if(race_manager->willRecordRace()) ReplayRecorder::get()->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
     if (m_script_engine) m_script_engine->update(dt);

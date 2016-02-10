@@ -23,7 +23,6 @@ GhostController::GhostController(AbstractKart *kart,
                                  StateManager::ActivePlayer *player)
                 : Controller(kart, player)
 {
-    m_kart = kart;
 }   // GhostController
 
 //-----------------------------------------------------------------------------

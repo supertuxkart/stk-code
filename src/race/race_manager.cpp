@@ -76,6 +76,7 @@ RaceManager::RaceManager()
     m_started_from_overworld = false;
     m_have_kart_last_position_on_overworld = false;
     setReverseTrack(false);
+    setRecordRace(false);
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumPlayers(0);

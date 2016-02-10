@@ -350,6 +350,7 @@ private:
     /** Determines if saved GP should be continued or not*/
     bool m_continue_saved_gp;
 
+    bool m_will_record_race;
 public:
          RaceManager();
         ~RaceManager();
@@ -697,6 +698,16 @@ public:
     {
         return m_kart_last_position_on_overworld;
     }   // getKartLastPositionOnOverworld
+    // ------------------------------------------------------------------------
+    void setRecordRace(bool record)
+    {
+        m_will_record_race = record;
+    }   // setRecordRace
+    // ------------------------------------------------------------------------
+    bool willRecordRace() const
+    {
+        return m_will_record_race;
+    }   // willRecordRace
 
 };   // RaceManager
 

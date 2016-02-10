@@ -53,10 +53,10 @@ public:
     virtual void  updateWeight() {};
     // ------------------------------------------------------------------------
     /** No physics for ghost kart. */
-    virtual void  applyEngineForce (float force) {}
+    virtual void  applyEngineForce (float force) {};
     // ------------------------------------------------------------------------
     // Not needed to create any physics for a ghost kart.
-    virtual void  createPhysics() {}
+    virtual void  createPhysics() {};
     // ------------------------------------------------------------------------
     const float   getSuspensionLength(int index, int wheel) const
                { return m_all_physic_info[index].m_suspension_length[wheel]; }
