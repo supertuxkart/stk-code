@@ -30,7 +30,7 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
+#include "network/race_event_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
@@ -320,7 +320,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         if((*i)->hitKart(kart->getXYZ(), kart))
         {
             // if we're not playing online, pick the item.
-            if (!NetworkWorld::getInstance()->isRunning())
+            if (!RaceEventManager::getInstance()->isRunning())
                 collectedItem(*i, kart);
             else if (NetworkConfig::get()->isServer())
             {
@@ -328,7 +328,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
                 // A client does the collection upon receiving the 
                 // event from the server!
                 collectedItem(*i, kart);
-                NetworkWorld::getInstance()->collectedItem(*i, kart);
+                RaceEventManager::getInstance()->collectedItem(*i, kart);
             }
         }   // if hit
     }   // for m_all_items

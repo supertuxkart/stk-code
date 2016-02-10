@@ -25,7 +25,6 @@
 #include "network/network_player_profile.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"

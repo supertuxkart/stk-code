@@ -492,33 +492,21 @@ int STKHost::mustStopListening()
     return 1;
 }   // mustStopListening
 
-// --------------------------------------------------------------------
-/** Returns true if this instance is allowed to control the server.
- *  Only the first connected client (i.e. the one with host id 1) is
- *  allowed to control the server. Only called from a client.
+// ----------------------------------------------------------------------------
+/** Returns true if this client instance is allowed to control the server.
+ *  A client can authorise itself by providing the server's password. It is
+ *  then allowed to control the server (e.g. start kart selection).
+ *  The information if this client was authorised by the server is actually
+ *  stored in the peer (which is the server peer on a client).
  */
 bool STKHost::isAuthorisedToControl() const 
 {
+    assert(NetworkConfig::get()->isClient());
     // If we are not properly connected (i.e. only enet connection, but not
     // stk logic), no peer is authorised.
     if(m_peers.size()==0)
         return false;
-    return m_host_id == 1;
-}   // isAuthorisedToControl
-
-// ----------------------------------------------------------------------------
-/** Server-side check if the client sending a command is really authorised 
- *  to do so. Only the first connected client (i.e. host id = 1) is allowed
- *  to control the server.
- *  \param peer Peer sending the command.
- */
-bool STKHost::isAuthorisedToControl(const STKPeer *peer) const 
-{
-    // If we are not properly connected (i.e. only enet connection, but not
-    // stk logic), no peer is authorised.
-    if(m_peers.size()==0)
-        return false;
-    return peer->getHostId()==1;
+    return m_peers[0]->isAuthorised();
 }   // isAuthorisedToControl
 
 // ----------------------------------------------------------------------------

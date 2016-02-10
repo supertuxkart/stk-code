@@ -90,12 +90,8 @@ public:
     /** Sets the password for a server. */
     void setPassword(const std::string &password) { m_password = password; }
     // ------------------------------------------------------------------------
-    /** Returns if the specified password is the correct password for this 
-     *  server. */
-    bool checkPassword(const std::string &password)
-    {
-        return m_password == password;
-    }
+    /** Returns the password. */
+    const std::string& getPassword() const { return m_password; }
     // ------------------------------------------------------------------------
     /** Return if a network setting is happening. A network setting is active
      *  if a host (server or client) exists. */

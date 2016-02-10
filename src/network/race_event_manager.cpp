@@ -1,4 +1,5 @@
-#include "network/network_world.hpp"
+
+#include "network/race_event_manager.hpp"
 
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
@@ -8,19 +9,19 @@
 #include "modes/world.hpp"
 
 
-NetworkWorld::NetworkWorld()
+RaceEventManager::RaceEventManager()
 {
     m_running = false;
-}   // NetworkWorld
+}   // RaceEventManager
 
 // ----------------------------------------------------------------------------
 #include "karts/controller/controller.hpp"
-NetworkWorld::~NetworkWorld()
+RaceEventManager::~RaceEventManager()
 {
-}   // ~NetworkWorld
+}   // ~RaceEventManager
 
 // ----------------------------------------------------------------------------
-void NetworkWorld::update(float dt)
+void RaceEventManager::update(float dt)
 {
     // This can happen in case of disconnects - protocol manager is
     // shut down, but still events to process.
@@ -31,7 +32,7 @@ void NetworkWorld::update(float dt)
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
     if (protocol) // if this protocol exists, that's that we play online
     {
-        Log::debug("NetworkWorld", "Coutdown value is %f",
+        Log::debug("RaceEventManager", "Coutdown value is %f",
                    protocol->getCountdown());
         if (protocol->getCountdown() > 0.0)
         {
@@ -46,24 +47,24 @@ void NetworkWorld::update(float dt)
     {
         // consider the world finished.
         stop();
-        Log::info("NetworkWorld", "The game is considered finish.");
+        Log::info("RaceEventManager", "The game is considered finish.");
     }
 }   // update
 
 // ----------------------------------------------------------------------------
-void NetworkWorld::start()
+void RaceEventManager::start()
 {
     m_running = true;
 }   // start
 
 // ----------------------------------------------------------------------------
-void NetworkWorld::stop()
+void RaceEventManager::stop()
 {
     m_running = false;
 }   // stop
 
 // ----------------------------------------------------------------------------
-bool NetworkWorld::isRaceOver()
+bool RaceEventManager::isRaceOver()
 {
     if(!World::getWorld())
         return false;
@@ -76,7 +77,7 @@ bool NetworkWorld::isRaceOver()
  *  \param item The item that was collected.
  *  \param kart The kart that collected the item.
  */
-void NetworkWorld::collectedItem(Item *item, AbstractKart *kart)
+void RaceEventManager::collectedItem(Item *item, AbstractKart *kart)
 {
     // this is only called in the server
     assert(NetworkConfig::get()->isServer());
@@ -87,7 +88,7 @@ void NetworkWorld::collectedItem(Item *item, AbstractKart *kart)
 }   // collectedItem
 
 // ----------------------------------------------------------------------------
-void NetworkWorld::controllerAction(Controller* controller,
+void RaceEventManager::controllerAction(Controller* controller,
                                     PlayerAction action, int value)
 {
     ControllerEventsProtocol* protocol = static_cast<ControllerEventsProtocol*>(

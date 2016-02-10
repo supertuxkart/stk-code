@@ -21,10 +21,11 @@
 #include "config/player_manager.hpp"
 #include "modes/world_with_rank.hpp"
 #include "network/event.hpp"
+#include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
@@ -242,9 +243,11 @@ void ClientLobbyRoomProtocol::update()
             name = PlayerManager::getCurrentPlayer()->getName();
 
         std::string name_u8 = StringUtils::wideToUtf8(name);
-        NetworkString ns(6+1+name_u8.size());
+        const std::string &password = NetworkConfig::get()->getPassword();
+        NetworkString ns(6+1+name_u8.size()+1+password.size());
         // 4 (size of id), global id
-        ns.ai8(LE_CONNECTION_REQUESTED).encodeString(name);
+        ns.ai8(LE_CONNECTION_REQUESTED).encodeString(name)
+          .encodeString(NetworkConfig::get()->getPassword());
         sendMessage(ns);
         m_state = REQUESTING_CONNECTION;
     }
@@ -266,7 +269,7 @@ void ClientLobbyRoomProtocol::update()
     case PLAYING:
     {
         // race is now over, kill race protocols and return to connected state
-        if (NetworkWorld::getInstance<NetworkWorld>()->isRaceOver())
+        if (RaceEventManager::getInstance<RaceEventManager>()->isRaceOver())
         {
             Log::info("ClientLobbyRoomProtocol", "Game finished.");
             m_state = RACE_FINISHED;
@@ -372,17 +375,17 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1                   2   3            7        8
- *       ------------------------------------------------------------------
- *  Size | 1 |         1         | 1 |      4     |   1    |              |
- *  Data | 1 | 0 <= race id < 16 | 4 | priv token | hostid | playernames* |
- *       ------------------------------------------------------------------
+ *  Byte 0   1                   2   3            7        8             9
+ *       -----------------------------------------------------------------------------
+ *  Size | 1 |         1         | 1 |      4     |   1    | 1          |             |
+ *  Data | 1 | 0 <= race id < 16 | 4 | priv token | hostid | authorised |playernames* |
+ *       ------------------------------------------------------------------------------
  */
 void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 {
     NetworkString &data = event->data();
     // At least 12 bytes should remain now
-    if (data.size() < 8|| data[0] != 1 || data[2] != 4)
+    if (data.size() < 9|| data[0] != 1 || data[2] != 4)
     {
         Log::error("ClientLobbyRoomProtocol",
                    "A message notifying an accepted connection wasn't "
@@ -404,6 +407,10 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         name = PlayerManager::getCurrentPlayer()->getName();
     uint8_t my_player_id = data.getUInt8(1);
     uint8_t my_host_id   = data.getUInt8(7);
+    uint8_t authorised   = data.getUInt8(8);
+    // Store this client's authorisation status in the peer information
+    // for the server.
+    event->getPeer()->setAuthorised(authorised!=0);
     STKHost::get()->setMyHostId(my_host_id);
 
     NetworkPlayerProfile* profile = new NetworkPlayerProfile(my_player_id, name);
@@ -416,7 +423,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 
     // Add all players
     // ===============
-    int n = 8;
+    int n = 9;
     while (n < data.size())
     {
         if (data[n] != 1 )

@@ -162,7 +162,6 @@ public:
     uint16_t    getPort() const;
     void        setErrorMessage(const irr::core::stringw &message);
     bool        isAuthorisedToControl() const;
-    bool        isAuthorisedToControl(const STKPeer *peer) const;
     const irr::core::stringw& 
                 getErrorMessage() const;
 

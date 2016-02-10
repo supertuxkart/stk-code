@@ -37,7 +37,7 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
+#include "network/race_event_manager.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "utils/constants.hpp"
@@ -121,9 +121,9 @@ void LocalPlayerController::action(PlayerAction action, int value)
     // If this is a client, send the action to the server
     if (World::getWorld()->isNetworkWorld()      && 
         NetworkConfig::get()->isClient()         &&
-        NetworkWorld::getInstance()->isRunning()    )
+        RaceEventManager::getInstance()->isRunning()    )
     {
-        NetworkWorld::getInstance()->controllerAction(this, action, value);
+        RaceEventManager::getInstance()->controllerAction(this, action, value);
     }
 
 }   // action

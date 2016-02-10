@@ -32,7 +32,7 @@
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/network_world.hpp"
+#include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "online/request_manager.hpp"
 #include "race/race_manager.hpp"
@@ -121,8 +121,9 @@ void MainLoop::updateRace(float dt)
 {
     if(ProfileWorld::isProfileMode()) dt=1.0f/60.0f;
 
-    if (NetworkWorld::getInstance<NetworkWorld>()->isRunning())
-        NetworkWorld::getInstance<NetworkWorld>()->update(dt);
+    // The race event manager will update world in case of an online race
+    if (RaceEventManager::getInstance<RaceEventManager>()->isRunning())
+        RaceEventManager::getInstance<RaceEventManager>()->update(dt);
     else
         World::getWorld()->updateWorld(dt);
 }   // updateRace

@@ -5,7 +5,6 @@
 #include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "utils/time.hpp"
 

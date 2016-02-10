@@ -34,16 +34,16 @@ class Item;
 /*! \brief Manages the world updates during an online game
  *  This function's update is to be called instead of the normal World update
 */
-class NetworkWorld : public AbstractSingleton<NetworkWorld>
+class RaceEventManager : public AbstractSingleton<RaceEventManager>
 {
 private:
     bool m_running;
     float m_race_time;
 
-    friend class AbstractSingleton<NetworkWorld>;
+    friend class AbstractSingleton<RaceEventManager>;
 
-             NetworkWorld();
-    virtual ~NetworkWorld();
+             RaceEventManager();
+    virtual ~RaceEventManager();
 
 public:
     void update(float dt);

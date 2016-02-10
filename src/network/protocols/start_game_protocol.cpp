@@ -10,7 +10,7 @@
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/network_world.hpp"
+#include "network/race_event_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
 #include "network/stk_host.hpp"
@@ -58,7 +58,7 @@ void StartGameProtocol::setup()
     // Race startup sequence
     // ---------------------
     // This creates the network world.
-    NetworkWorld::getInstance<NetworkWorld>()->start();
+    RaceEventManager::getInstance<RaceEventManager>()->start();
 
     // The number of karts includes the AI karts, which are not supported atn
     race_manager->setNumKarts(m_game_setup->getPlayerCount());

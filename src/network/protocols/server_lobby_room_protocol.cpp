@@ -23,12 +23,12 @@
 #include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/start_game_protocol.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
@@ -146,7 +146,7 @@ void ServerLobbyRoomProtocol::update()
         if(NetworkConfig::get()->isWAN())
             checkIncomingConnectionRequests();
         if (m_in_race && World::getWorld() &&
-            NetworkWorld::getInstance<NetworkWorld>()->isRunning())
+            RaceEventManager::getInstance<RaceEventManager>()->isRunning())
         {
             checkRaceFinished();
         }
@@ -241,7 +241,7 @@ void ServerLobbyRoomProtocol::startGame()
  */
 void ServerLobbyRoomProtocol::startSelection(const Event *event)
 {
-    if(event && !STKHost::get()->isAuthorisedToControl(event->getPeer()))
+    if(event && !event->getPeer()->isAuthorised())
     {
         Log::warn("ServerLobby", 
                   "Client %lx is not authorised to start selection.",
@@ -313,10 +313,10 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
 
 void ServerLobbyRoomProtocol::checkRaceFinished()
 {
-    assert(NetworkWorld::getInstance()->isRunning());
+    assert(RaceEventManager::getInstance()->isRunning());
     assert(World::getWorld());
     // if race is over, give the final score to everybody
-    if (NetworkWorld::getInstance()->isRaceOver())
+    if (RaceEventManager::getInstance()->isRaceOver())
     {
         // calculate karts ranks :
         int num_players = race_manager->getNumberOfKarts();
@@ -381,7 +381,7 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
                        "No game events protocol registered.");
 
         // notify the network world that it is stopped
-        NetworkWorld::getInstance()->stop();
+        RaceEventManager::getInstance()->stop();
         // exit the race now
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
@@ -445,8 +445,11 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // Connection accepted.
     // ====================
     std::string name_u8;
-    data.decodeString(0, &name_u8);
+    int len = data.decodeString(0, &name_u8);
     core::stringw name = StringUtils::utf8ToWide(name_u8);
+    std::string password;
+    data.decodeString(len, &password);
+    bool is_authorised = (password==NetworkConfig::get()->getPassword());
 
     // Get the unique global ID for this player.
     m_next_player_id.lock();
@@ -480,10 +483,10 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     const std::vector<NetworkPlayerProfile*> &players = m_setup->getPlayers();
     // send a message to the one that asked to connect
     // Size is overestimated, probably one player's data will not be sent
-    NetworkString message_ack(13 + players.size() * 7);
+    NetworkString message_ack(14 + players.size() * 7);
     // connection success -- size of token -- token
     message_ack.ai8(LE_CONNECTION_ACCEPTED).ai8(1).ai8(new_player_id).ai8(4)
-               .ai32(token).addUInt8(new_host_id);
+               .ai32(token).addUInt8(new_host_id).addUInt8(is_authorised);
     // Add all players so that this user knows (this new player is only added
     // to the list of players later, so the new player's info is not included)
     for (unsigned int i = 0; i < players.size(); i++)
@@ -499,6 +502,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     m_setup->addPlayer(profile);
     peer->setPlayerProfile(profile);
     peer->setClientServerToken(token);
+    peer->setAuthorised(is_authorised);
     peer->setHostId(new_host_id);
 
     Log::verbose("ServerLobbyRoomProtocol", "New player.");
