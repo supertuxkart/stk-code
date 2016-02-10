@@ -533,6 +533,7 @@ void cmdLineHelp()
     // "                            n=2: recorded key strokes\n"
     "       --server=name      Start a server (not a playing client).\n"
     "       --lan-server=name  Start a LAN server (not a playing client).\n"
+    "       --server-password= Sets a password for a server (both client&server).\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
@@ -792,6 +793,10 @@ int handleCmdLine()
         STKHost::create();
         Log::info("main", "Creating a LAN server '%s'.", s.c_str());
     }   
+    if (CommandLine::has("--server-password", &s))
+    {
+        NetworkConfig::get()->setPassword(s);
+    }
 
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;

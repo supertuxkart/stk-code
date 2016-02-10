@@ -166,7 +166,7 @@ void ServerLobbyRoomProtocol::update()
 
 //-----------------------------------------------------------------------------
 /** Callback when the GetPublicAddress terminates. It will unpause this
- * protocol, which triggers the next state of the finite state machine.
+ *  protocol, which triggers the next state of the finite state machine.
  */
 void ServerLobbyRoomProtocol::callback(Protocol *protocol)
 {
