@@ -75,6 +75,8 @@ public:
     /** Returns the speed of the kart in meters/second. */
     virtual float getSpeed() const;
     // ------------------------------------------------------------------------
+    virtual void  kartIsInRestNow() {};
+    // ------------------------------------------------------------------------
 
 };   // GhostKart
 #endif

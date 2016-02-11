@@ -92,6 +92,7 @@ void ReplayRecorder::update(float dt)
     if (m_incorrect_replay || m_complete_replay) return;
 
     const World *world = World::getWorld();
+    const bool single_player = race_manager->getNumPlayers() == 1;
     unsigned int num_karts = world->getNumKarts();
 
     float time = world->getTime();
@@ -101,8 +102,8 @@ void ReplayRecorder::update(float dt)
     for(unsigned int i=0; i<num_karts; i++)
     {
         const AbstractKart *kart = world->getKart(i);
-        // Don't record give-up race
-        if (kart->isEliminated()) return;
+        // If a single player give up in game menu, stop recording
+        if (kart->isEliminated() && single_player) return;
 
         if (kart->isGhostKart()) continue;
 #ifdef DEBUG
@@ -126,7 +127,7 @@ void ReplayRecorder::update(float dt)
                 sprintf(buffer, "Can't store more events for kart %s.",
                         kart->getIdent().c_str());
                 Log::warn("ReplayRecorder", buffer);
-                m_incorrect_replay = true;
+                m_incorrect_replay = true && single_player;
             }
             continue;
         }

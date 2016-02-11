@@ -731,7 +731,6 @@ void World::resetAllKarts()
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
-        if ((*i)->isGhostKart()) continue;
         (*i)->kartIsInRestNow();
     }
 
