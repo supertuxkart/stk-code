@@ -295,7 +295,7 @@ void Powerup::use()
         for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
         {
             AbstractKart *kart=world->getKart(i);
-            if(kart->isEliminated() || kart->isGhostKart()) continue;
+            if(kart->isEliminated() || kart->isInvulnerable()) continue;
             if(kart == m_owner) continue;
             if(kart->getPosition() == 1)
             {
@@ -329,7 +329,7 @@ void Powerup::use()
             for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
             {
                 AbstractKart *kart=world->getKart(i);
-                if(kart->isEliminated() || kart== m_owner || kart->isGhostKart()) continue;
+                if(kart->isEliminated() || kart== m_owner || kart->isInvulnerable()) continue;
                 if(kart->isShielded())
                 {
                     kart->decreaseShieldTime();
