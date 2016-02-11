@@ -19,7 +19,7 @@
 #include "graphics/central_settings.hpp"
 #include "utils/cpp2011.hpp"
 
-
+// ----------------------------------------------------------------------------
 template<>
 void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataSingleTex &instance)
 {
@@ -27,6 +27,7 @@ void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, scene::ISceneNode 
     instance.Texture = mesh->TextureHandles[0];
 }
 
+// ----------------------------------------------------------------------------
 template<>
 void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataDualTex &instance)
 {
@@ -35,6 +36,7 @@ void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, scene::ISceneNode *n
     instance.SecondTexture = mesh->TextureHandles[1];
 }
 
+// ----------------------------------------------------------------------------
 template<>
 void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataThreeTex &instance)
 {
@@ -44,6 +46,7 @@ void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, scene::ISceneNode *
     instance.ThirdTexture = mesh->TextureHandles[2];
 }
 
+// ----------------------------------------------------------------------------
 template<>
 void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, scene::ISceneNode *node, GlowInstanceData &instance)
 {
@@ -52,6 +55,7 @@ void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, scene::ISceneNode *node
     instance.Color = nd->getGlowColor().color;
 }
 
+// ----------------------------------------------------------------------------
 template<>
 void expandTexSecondPass<GrassMat>(const GLMesh &mesh,
                                    const std::vector<GLuint> &prefilled_tex)
@@ -61,6 +65,7 @@ void expandTexSecondPass<GrassMat>(const GLMesh &mesh,
                   prefilled_tex[1], prefilled_tex[2], prefilled_tex[3]);
 }
 
+// ----------------------------------------------------------------------------
 template<>
 void expandHandlesSecondPass<GrassMat>(const std::vector<uint64_t> &handles)
 {
@@ -70,7 +75,7 @@ void expandHandlesSecondPass<GrassMat>(const std::vector<uint64_t> &handles)
                handles[0], handles[1], handles[2], handles[3]);
 }
 
-
+// ----------------------------------------------------------------------------
 template<int N>
 void CommandBuffer<N>::clearMeshes()
 {
@@ -84,6 +89,7 @@ void CommandBuffer<N>::clearMeshes()
     }   
 }
 
+// ----------------------------------------------------------------------------
 template<int N>
 void CommandBuffer<N>::mapIndirectBuffer()
 {
@@ -96,6 +102,7 @@ void CommandBuffer<N>::mapIndirectBuffer()
                          GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);    
 }
 
+// ----------------------------------------------------------------------------
 template<int N>
 CommandBuffer<N>::CommandBuffer():
 m_poly_count(0)
@@ -120,11 +127,12 @@ m_poly_count(0)
     }    
 }
 
-
+// ----------------------------------------------------------------------------
 SolidCommandBuffer::SolidCommandBuffer(): CommandBuffer()
 {
 }
 
+// ----------------------------------------------------------------------------
 void SolidCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
@@ -156,11 +164,12 @@ void SolidCommandBuffer::fill(MeshMap *mesh_map)
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 } //SolidCommandBuffer::fill
 
-
+// ----------------------------------------------------------------------------
 ShadowCommandBuffer::ShadowCommandBuffer(): CommandBuffer()
 {
 }
 
+// ----------------------------------------------------------------------------
 void ShadowCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
@@ -196,11 +205,12 @@ void ShadowCommandBuffer::fill(MeshMap *mesh_map)
     
 } //ShadowCommandBuffer::fill
 
+// ----------------------------------------------------------------------------
 ReflectiveShadowMapCommandBuffer::ReflectiveShadowMapCommandBuffer()
 {
 }
 
-
+// ----------------------------------------------------------------------------
 void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
@@ -224,10 +234,12 @@ void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
         
 } //ReflectiveShadowMapCommandBuffer::fill
 
+// ----------------------------------------------------------------------------
 GlowCommandBuffer::GlowCommandBuffer()
 {   
 }
 
+// ----------------------------------------------------------------------------
 void GlowCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
