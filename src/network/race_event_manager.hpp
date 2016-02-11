@@ -31,8 +31,11 @@ class KartUpdateProtocol;
 class AbstractKart;
 class Item;
 
-/*! \brief Manages the world updates during an online game
- *  This function's update is to be called instead of the normal World update
+/** \brief This is the interface between the main game and the online
+ *  implementation. The main game informs this object about important
+ *  events (e.g. item collected), which need to be forwarded from the
+ *  server to all clients. This object then triggers the right message
+ *  from the various running protocols.
 */
 class RaceEventManager : public AbstractSingleton<RaceEventManager>
 {

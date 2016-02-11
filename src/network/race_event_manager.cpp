@@ -1,12 +1,13 @@
 
 #include "network/race_event_manager.hpp"
 
+#include "karts/controller/controller.hpp"
+#include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
 #include "network/protocols/controller_events_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
-#include "modes/world.hpp"
 
 
 RaceEventManager::RaceEventManager()
@@ -15,12 +16,16 @@ RaceEventManager::RaceEventManager()
 }   // RaceEventManager
 
 // ----------------------------------------------------------------------------
-#include "karts/controller/controller.hpp"
 RaceEventManager::~RaceEventManager()
 {
 }   // ~RaceEventManager
 
 // ----------------------------------------------------------------------------
+/** In network games this update function is called instead of
+ *  World::updateWorld(). This allow this function to postpone calling
+ *  the worl update while the countdown from the SynchronisationProtocol is
+ *  running.
+ */
 void RaceEventManager::update(float dt)
 {
     // This can happen in case of disconnects - protocol manager is
@@ -30,7 +35,7 @@ void RaceEventManager::update(float dt)
 
     SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
-    if (protocol) // if this protocol exists, that's that we play online
+    if (protocol) // The existance of this protocol indicates that we play online
     {
         Log::debug("RaceEventManager", "Coutdown value is %f",
                    protocol->getCountdown());
@@ -89,7 +94,7 @@ void RaceEventManager::collectedItem(Item *item, AbstractKart *kart)
 
 // ----------------------------------------------------------------------------
 void RaceEventManager::controllerAction(Controller* controller,
-                                    PlayerAction action, int value)
+                                        PlayerAction action, int value)
 {
     ControllerEventsProtocol* protocol = static_cast<ControllerEventsProtocol*>(
         ProtocolManager::getInstance()->getProtocol(PROTOCOL_CONTROLLER_EVENTS));
