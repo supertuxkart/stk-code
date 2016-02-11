@@ -245,33 +245,24 @@ void LinearWorld::newLap(unsigned int kart_index)
 {
     KartInfo &kart_info = m_kart_info[kart_index];
     AbstractKart *kart  = m_karts[kart_index];
-    const bool is_gk    = kart->isGhostKart();
 
     // Reset reset-after-lap achievements
-    if (!is_gk)
+    StateManager::ActivePlayer *c = kart->getController()->getPlayer();
+    PlayerProfile *p = PlayerManager::getCurrentPlayer();
+    if (c && c->getConstProfile() == p)
     {
-        StateManager::ActivePlayer *c = kart->getController()->getPlayer();
-        PlayerProfile *p = PlayerManager::getCurrentPlayer();
-        if (c && c->getConstProfile() == p)
-        {
-            p->getAchievementsStatus()->onLapEnd();
-        }
+        p->getAchievementsStatus()->onLapEnd();
     }
 
     // Only update the kart controller if a kart that has already finished
     // the race crosses the start line again. This avoids 'fastest lap'
     // messages if the end controller does a fastest lap, but especially
     // allows the end controller to switch end cameras
-    if (!is_gk)
+    if(kart->hasFinishedRace())
     {
-        if (kart->hasFinishedRace())
-        {
-            kart->getController()->newLap(kart_info.m_race_lap);
-            return;
-        }
-    }
-    else if (kart->hasFinishedRace())
+        kart->getController()->newLap(kart_info.m_race_lap);
         return;
+    }
 
     const int lap_count = race_manager->getNumLaps();
 
@@ -383,8 +374,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     } // end if new fastest lap
 
     kart_info.m_lap_start_time = getTime();
-    if (!is_gk)
-        kart->getController()->newLap(kart_info.m_race_lap);
+    kart->getController()->newLap(kart_info.m_race_lap);
 }   // newLap
 
 //-----------------------------------------------------------------------------
@@ -850,8 +840,6 @@ void LinearWorld::updateRacePosition()
  */
 void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 {
-    if (m_karts[i]->isGhostKart()) return;
-
     if (!m_karts[i]->getController()->isLocalPlayerController()) 
         return;
 

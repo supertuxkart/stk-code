@@ -802,14 +802,13 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         // draw icon
         video::ITexture *icon =
         kart->getKartProperties()->getIconMaterial()->getTexture();
-        int w = kart->isGhostKart() ? ICON_WIDTH : (kart->getController()
+        int w = kart->getController()
                     ->isLocalPlayerController() ? ICON_PLAYER_WIDTH
-                                                : ICON_WIDTH);
+                                                : ICON_WIDTH;
         const core::rect<s32> pos(x, y, x+w, y+w);
 
         //to bring to light the player's icon: add a background
-        if (kart->isGhostKart() ?
-            false : kart->getController()->isLocalPlayerController())
+        if (kart->getController()->isLocalPlayerController())
         {
             video::SColor colors[4];
             for (unsigned int i=0;i<4;i++)

@@ -512,8 +512,7 @@ void Kart::setController(Controller *controller)
  */
 void Kart::setPosition(int p)
 {
-    if (m_controller)
-        m_controller->setPosition(p);
+    m_controller->setPosition(p);
     m_race_position = p;
 }   // setPosition
 
@@ -835,15 +834,14 @@ void Kart::finishedRace(float time)
     if(m_finished_race) return;
     m_finished_race = true;
     m_finish_time   = time;
-    if(!isGhostKart())
-        m_controller->finishedRace(time);
+    m_controller->finishedRace(time);
     m_kart_model->finishedRace();
     race_manager->kartFinishedRace(this, time);
 
     if ((race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
          race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
          race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
-         && (isGhostKart() ? false : m_controller->isPlayerController()))
+         && m_controller->isPlayerController())
     {
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if (m)
@@ -890,9 +888,8 @@ void Kart::setRaceResult()
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
     {
-        if (isGhostKart() ? false : m_controller->isPlayerController())
+        if (m_controller->isLocalPlayerController()) // if player is on this computer
         {
-            // if player is on this computer
             PlayerProfile *player = PlayerManager::getCurrentPlayer();
             const ChallengeStatus *challenge = player->getCurrentChallengeStatus();
             // In case of a GP challenge don't make the end animation depend

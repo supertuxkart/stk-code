@@ -378,9 +378,9 @@ void RaceGUI::drawGlobalMiniMap()
 
         // int marker_height = m_marker->getSize().Height;
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
-        int marker_half_size = (kart->isGhostKart() ? m_minimap_ai_size :
-            (kart->getController()->isLocalPlayerController() ? m_minimap_player_size :
-            m_minimap_ai_size))>>1;
+        int marker_half_size = (kart->getController()->isLocalPlayerController()
+                                ? m_minimap_player_size
+                                : m_minimap_ai_size                        )>>1;
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
                                  lower_y   -(int)(draw_at.getY()+marker_half_size),
                                  m_map_left+(int)(draw_at.getX()+marker_half_size),

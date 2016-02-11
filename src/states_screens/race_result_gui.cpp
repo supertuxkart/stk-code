@@ -89,7 +89,6 @@ void RaceResultGUI::init()
     for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
     {
         const AbstractKart *kart = World::getWorld()->getKart(kart_id);
-        if (kart->isGhostKart()) continue;
         if (kart->getController()->isPlayerController())
             human_win = human_win && kart->getRaceResult();
     }
@@ -475,8 +474,7 @@ void RaceResultGUI::determineTableLayout()
 
         // Save a pointer to the current row_info entry
         RowInfo *ri           = &(m_all_row_infos[position-first_position]);
-        ri->m_is_player_kart  = kart->isGhostKart() ? false :
-            kart->getController()->isLocalPlayerController();
+        ri->m_is_player_kart  = kart->getController()->isLocalPlayerController();
 
         // Identify Human player, if so display real name other than kart name
         const int rm_id       = kart->getWorldKartId() -
@@ -862,8 +860,7 @@ void RaceResultGUI::determineGPLayout()
         else
             ri->m_kart_name  = translations->fribidize(kart->getName());
 
-        ri->m_is_player_kart = kart->isGhostKart() ? false :
-            kart->getController()->isLocalPlayerController();
+        ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
         ri->m_player         = ri->m_is_player_kart
                              ? kart->getController()->getPlayer() : NULL;
 

@@ -520,7 +520,6 @@ void World::terminateRace()
         }
         for(unsigned int i = 0; i < kart_amount; i++)
         {
-            if (m_karts[i]->isGhostKart()) continue;
             // Retrieve the current player
             StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
             if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
@@ -546,7 +545,6 @@ void World::terminateRace()
     {
         for(unsigned int i = 0; i < kart_amount; i++)
         {
-            if (m_karts[i]->isGhostKart()) continue;
             // Retrieve the current player
             StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
             if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
@@ -1090,7 +1088,6 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
 
     for (unsigned int pos=0; pos<kart_amount; pos++)
     {
-        if (m_karts[index[pos]]->isGhostKart()) continue;
         if(index[pos] == 999)
         {
             // no kart claimed to be in this position, most likely means
@@ -1155,14 +1152,11 @@ AbstractKart *World::getPlayerKart(unsigned int n) const
     unsigned int count=-1;
 
     for(unsigned int i=0; i<m_karts.size(); i++)
-    {
-        if(m_karts[i]->isGhostKart()) continue;
         if(m_karts[i]->getController()->isPlayerController())
         {
             count++;
             if(count==n) return m_karts[i];
         }
-    }
     return NULL;
 }   // getPlayerKart
 
@@ -1260,7 +1254,6 @@ void World::unpause()
 
     for(unsigned int i=0; i<m_karts.size(); i++)
     {
-        if (m_karts[i]->isGhostKart()) continue;
         // Note that we can not test for isPlayerController here, since
         // an EndController will also return 'isPlayerController' if the
         // kart belonged to a player.

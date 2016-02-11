@@ -102,25 +102,16 @@ void StandardRace::endRaceEarly()
             continue;
         }
 
-        if (kart->isGhostKart())
+        if (kart->getController()->isPlayerController())
         {
-            // Ghost karts finish
-            setKartPosition(kartid, i - (unsigned int) active_players.size());
-            kart->finishedRace(estimateFinishTimeForKart(kart));
+            // Keep active players apart for now
+            active_players.push_back(kartid);
         }
         else
         {
-            if (kart->getController()->isPlayerController())
-            {
-                // Keep active players apart for now
-                active_players.push_back(kartid);
-            }
-            else
-            {
-                // AI karts finish
-                setKartPosition(kartid, i - (unsigned int) active_players.size());
-                kart->finishedRace(estimateFinishTimeForKart(kart));
-            }
+            // AI karts finish
+            setKartPosition(kartid, i - (unsigned int) active_players.size());
+            kart->finishedRace(estimateFinishTimeForKart(kart));
         }
     } // i <= kart_amount
     // Now make the active players finish
