@@ -120,11 +120,6 @@ m_poly_count(0)
     }    
 }
 
-template<int N>
-CommandBuffer<N>::~CommandBuffer()
-{
-    glDeleteBuffers(1, &m_draw_indirect_cmd_id);
-}
 
 SolidCommandBuffer::SolidCommandBuffer(): CommandBuffer()
 {

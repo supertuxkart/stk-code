@@ -240,7 +240,7 @@ protected:
     
 public:
     CommandBuffer();
-    virtual ~CommandBuffer();
+    virtual ~CommandBuffer() { glDeleteBuffers(1, &m_draw_indirect_cmd_id); }
 
     inline size_t getPolyCount() const {return m_poly_count;}
 

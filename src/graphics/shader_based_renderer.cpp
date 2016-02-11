@@ -371,7 +371,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                                             m_rtts->getShadowFrameBuffer(),
                                             m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR),
                                             specular_probe);
-            }
+        }
         PROFILER_POP_CPU_MARKER();
     }
 
