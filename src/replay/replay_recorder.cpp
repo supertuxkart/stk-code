@@ -127,7 +127,7 @@ void ReplayRecorder::update(float dt)
                 sprintf(buffer, "Can't store more events for kart %s.",
                         kart->getIdent().c_str());
                 Log::warn("ReplayRecorder", buffer);
-                m_incorrect_replay = true && single_player;
+                m_incorrect_replay = single_player;
             }
             continue;
         }
