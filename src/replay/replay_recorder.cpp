@@ -20,6 +20,7 @@
 
 #include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
+#include "guiengine/message_queue.hpp"
 #include "karts/ghost_kart.hpp"
 #include "modes/world.hpp"
 #include "physics/btKart.hpp"
@@ -190,23 +191,25 @@ void ReplayRecorder::save()
 {
     if (m_incorrect_replay || !m_complete_replay)
     {
-        Log::warn("ReplayRecorder", "Incomplete replay file will not be saved.");
+        MessageQueue::add(MessageQueue::MT_ERROR,
+            _("Incomplete replay file will not be saved."));
         return;
     }
 
 #ifdef DEBUG
-    printf("%d frames, %d removed because of frequency compression\n",
-           m_count, m_count_skipped_time);
+    Log::debug("ReplayRecorder", "%d frames, %d removed because of"
+        "frequency compression", m_count, m_count_skipped_time);
 #endif
     FILE *fd = openReplayFile(/*writeable*/true);
     if (!fd)
     {
-        Log::error("ReplayRecorder", "Can't open '%s' for writing - can't save replay data.",
-                   getReplayFilename().c_str());
+        Log::error("ReplayRecorder", "Can't open '%s' for writing - "
+            "can't save replay data.", getReplayFilename().c_str());
         return;
     }
 
-    Log::info("ReplayRecorder", "Replay saved in '%s'.\n", getReplayFilename().c_str());
+    core::stringw msg = _("Replay saved in \"%s\".", getReplayFilename().c_str());
+    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
 
     fprintf(fd, "reverse: %d\n", (int)race_manager->getReverseTrack());
     World *world   = World::getWorld();
