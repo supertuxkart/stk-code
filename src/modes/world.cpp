@@ -147,7 +147,7 @@ void World::init()
     m_eliminated_players  = 0;
     m_num_players         = 0;
     unsigned int gk       = 0;
-    if (ReplayPlay::get())
+    if (race_manager->hasGhostKarts())
         gk = ReplayPlay::get()->getNumGhostKart();
 
     // Create the race gui before anything else is attached to the scene node
@@ -257,7 +257,7 @@ void World::reset()
         Camera::getCamera(i)->reset();
     }
 
-    if(ReplayPlay::get())
+    if(race_manager->hasGhostKarts())
         ReplayPlay::get()->reset();
 
     resetAllKarts();
@@ -420,7 +420,7 @@ World::~World()
         delete m_karts[i];
     }
 
-    if(ReplayPlay::get())
+    if(race_manager->hasGhostKarts())
     {
         // Destroy the old replay object, which also stored the ghost
         // karts, and create a new one (which means that in further
@@ -429,6 +429,7 @@ World::~World()
         ReplayPlay::create();
     }
     m_karts.clear();
+    race_manager->setRaceGhostKarts(false);
 
     Camera::removeAllCameras();
 

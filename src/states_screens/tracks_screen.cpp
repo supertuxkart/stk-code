@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
@@ -30,9 +31,10 @@
 #include "network/stk_host.hpp"
 #include "race/grand_prix_data.hpp"
 #include "race/grand_prix_manager.hpp"
+#include "states_screens/ghost_replay_selection.hpp"
+#include "states_screens/gp_info_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
-#include "states_screens/gp_info_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -137,10 +139,15 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_last_used_track_group = tabs->getSelectionIDString(0);
         buildTrackList();
     }
+    else if (name == "ghost")
+    {
+        GhostReplaySelection::getInstance()->push();
+    }
     else if (name == "back")
     {
         StateManager::get()->escapePressed();
     }
+
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
@@ -254,6 +261,9 @@ void TracksScreen::init()
         tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
     }
     irr_driver->unsetTextureErrorMessage();
+
+    const bool ghost_available = race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL;
+    getWidget<ButtonWidget>("ghost")->setVisible(ghost_available);
 }   // init
 
 // -----------------------------------------------------------------------------

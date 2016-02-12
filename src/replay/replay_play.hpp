@@ -34,15 +34,14 @@ class GhostKart;
 class ReplayPlay : public ReplayBase
 {
 private:
-    static ReplayPlay *m_replay_play;
+    static ReplayPlay       *m_replay_play;
 
-    /** Points to the next free entry. */
-    unsigned int m_next;
+    unsigned int             m_current_replay_file;
 
-    std::vector<std::string> m_ghost_karts_list;
+    std::vector<ReplayData>  m_replay_file_list;
 
     /** All ghost karts. */
-    PtrVector<GhostKart>    m_ghost_karts;
+    PtrVector<GhostKart>     m_ghost_karts;
 
           ReplayPlay();
          ~ReplayPlay();
@@ -50,16 +49,30 @@ private:
 public:
     void  reset();
     void  load();
-    void  loadBasicInfo();
-
+    void  loadAllReplayFile();
+    // ------------------------------------------------------------------------
+    void               setReplayFile(unsigned int n)
+                                                { m_current_replay_file = n; }
+    // ------------------------------------------------------------------------
+    const ReplayData&  getReplayData(unsigned int n) const
+                                          { return m_replay_file_list.at(n); }
+    // ------------------------------------------------------------------------
+    const unsigned int getNumReplayFile() const
+                                         { return m_replay_file_list.size(); }
     // ------------------------------------------------------------------------
     GhostKart*         getGhostKart(int n)    { return m_ghost_karts.get(n); }
     // ------------------------------------------------------------------------
     const unsigned int getNumGhostKart() const
-                                         { return m_ghost_karts_list.size(); }
+    {
+        assert(m_replay_file_list.size() > 0);
+        return m_replay_file_list.at(m_current_replay_file).m_kart_list.size();
+    }
     // ------------------------------------------------------------------------
     const std::string& getGhostKartName(int n) const
-                                          { return m_ghost_karts_list.at(n); }
+    {
+        assert(m_replay_file_list.size() > 0);
+        return m_replay_file_list.at(m_current_replay_file).m_kart_list.at(n);
+    }
     // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */
     static void        create()          { m_replay_play = new ReplayPlay(); }
@@ -70,6 +83,13 @@ public:
     /** Delete the instance of the replay object. */
     static void        destroy()
                                { delete m_replay_play; m_replay_play = NULL; }
+    // ------------------------------------------------------------------------
+    /** Returns the filename that was opened. */
+    virtual const std::string& getReplayFilename() const
+    {
+        assert(m_replay_file_list.size() > 0);
+        return m_replay_file_list.at(m_current_replay_file).m_filename;
+    }
     // ------------------------------------------------------------------------
 };   // Replay
 

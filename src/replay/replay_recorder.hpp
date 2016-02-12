@@ -30,6 +30,7 @@
 class ReplayRecorder : public ReplayBase
 {
 private:
+    std::string m_filename;
 
     /** A separate vector of Replay Events for all transforms. */
     std::vector< std::vector<TransformEvent> > m_transform_events;
@@ -85,6 +86,10 @@ public:
     // ------------------------------------------------------------------------
     /** Delete the instance of the replay object. */
     static void destroy() { delete m_replay_recorder; m_replay_recorder=NULL; }
+    // ------------------------------------------------------------------------
+    /** Returns the filename that was opened. */
+    virtual const std::string& getReplayFilename() const { return m_filename; }
+    // ------------------------------------------------------------------------
 };   // ReplayRecorder
 
 #endif

@@ -526,7 +526,6 @@ void cmdLineHelp()
     "                          spaces are allowed in the track names.\n"
     "       --demo-laps=n      Number of laps in a demo.\n"
     "       --demo-karts=n     Number of karts to use in a demo.\n"
-    "       --ghost            Replay ghost data together with one player kart.\n"
     // "       --history          Replay history file 'history.dat'.\n"
     // "       --history=n        Replay history file 'history.dat' using:\n"
     // "                            n=1: recorded positions\n"
@@ -998,9 +997,6 @@ int handleCmdLine()
         }
     }   // --with-profile
 
-    if(CommandLine::has("--ghost"))
-        ReplayPlay::create();
-
     if(CommandLine::has("--history",  &n))
     {
         history->doReplayHistory( (History::HistoryReplayMode)n);
@@ -1151,6 +1147,7 @@ void initRest()
     // The order here can be important, e.g. KartPropertiesManager needs
     // defaultKartProperties, which are defined in stk_config.
     history                 = new History              ();
+    ReplayPlay::create();
     ReplayRecorder::create();
     material_manager        = new MaterialManager      ();
     track_manager           = new TrackManager         ();
@@ -1575,7 +1572,6 @@ static void cleanSuperTuxKart()
     irr_driver->updateConfigIfRelevant();
     AchievementsManager::destroy();
     Referee::cleanup();
-    if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
@@ -1587,6 +1583,7 @@ static void cleanSuperTuxKart()
     if(track_manager)           delete track_manager;
     if(material_manager)        delete material_manager;
     if(history)                 delete history;
+    ReplayPlay::destroy();
     ReplayRecorder::destroy();
     delete ParticleKindManager::get();
     PlayerManager::destroy();

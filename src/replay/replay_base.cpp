@@ -23,19 +23,16 @@
 // -----------------------------------------------------------------------------
 ReplayBase::ReplayBase()
 {
-    m_filename = "";
 }   // ReplayBaese
 // -----------------------------------------------------------------------------
-/** Opens a replay file (depending on the track name, which is taken from
- *  the race manager).
+/** Opens a replay file which is determined by sub classes.
  *  \param writeable True if the file should be opened for writing.
  *  \return A FILE *, or NULL if the file could not be opened.
  */
 FILE* ReplayBase::openReplayFile(bool writeable)
 {
-    m_filename = file_manager->getReplayDir() +
-        race_manager->getTrackName() + ".replay";
-    FILE *fd = fopen(m_filename.c_str(), writeable ? "w" : "r");
+    FILE *fd = fopen((file_manager->getReplayDir() +
+        getReplayFilename()).c_str(), writeable ? "w" : "r");
     if (!fd)
     {
         return NULL;

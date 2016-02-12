@@ -351,6 +351,8 @@ private:
     bool m_continue_saved_gp;
 
     bool m_will_record_race;
+
+    bool m_has_ghost_karts;
 public:
          RaceManager();
         ~RaceManager();
@@ -704,10 +706,20 @@ public:
         m_will_record_race = record;
     }   // setRecordRace
     // ------------------------------------------------------------------------
+    void setRaceGhostKarts(bool ghost)
+    {
+        m_has_ghost_karts = ghost;
+    }   // setRaceGhostKarts
+    // ------------------------------------------------------------------------
     bool willRecordRace() const
     {
         return m_will_record_race;
     }   // willRecordRace
+    // ------------------------------------------------------------------------
+    bool hasGhostKarts() const
+    {
+        return m_has_ghost_karts;
+    }   // hasGhostKarts
 
 };   // RaceManager
 

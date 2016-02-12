@@ -77,6 +77,7 @@ RaceManager::RaceManager()
     m_have_kart_last_position_on_overworld = false;
     setReverseTrack(false);
     setRecordRace(false);
+    setRaceGhostKarts(false);
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumPlayers(0);
@@ -311,11 +312,8 @@ void RaceManager::computeRandomKartList()
 void RaceManager::startNew(bool from_overworld)
 {
     unsigned int gk = 0;
-    if (ReplayPlay::get())
-    {
-        ReplayPlay::get()->loadBasicInfo();
+    if (m_has_ghost_karts)
         gk = ReplayPlay::get()->getNumGhostKart();
-    }
 
     m_started_from_overworld = from_overworld;
     m_saved_gp = NULL; // There will be checks for this being NULL done later

@@ -39,6 +39,7 @@ ReplayRecorder *ReplayRecorder::m_replay_recorder = NULL;
  */
 ReplayRecorder::ReplayRecorder()
 {
+    m_filename = "TODO.replay";
 }   // ReplayRecorder
 
 //-----------------------------------------------------------------------------
@@ -97,9 +98,6 @@ void ReplayRecorder::update(float dt)
     unsigned int num_karts = world->getNumKarts();
 
     float time = world->getTime();
-    // Once we use interpolate results, we don't have to increase
-    // m_next by num_karts, so count how often to increase
-
     for(unsigned int i=0; i<num_karts; i++)
     {
         const AbstractKart *kart = world->getKart(i);

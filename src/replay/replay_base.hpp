@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 /**
   * \ingroup race
@@ -32,10 +33,20 @@ class ReplayBase : public NoCopy
 {
     // Needs access to KartReplayEvent
     friend class GhostKart;
-private:
-    /** The filename of the replay file. Only defined after calling
-     *  openReplayFile. */
-    std::string m_filename;
+
+public:
+    class ReplayData
+    {
+    public:
+        std::string              m_filename;
+        bool                     m_reverse;
+        std::vector<std::string> m_kart_list;
+        unsigned int             m_difficulty;
+        std::string              m_track_name;
+        unsigned int             m_laps;
+        float                    m_min_time;
+    };   // ReplayData
+
 protected:
     /** Stores a transform event, i.e. a position and rotation of a kart
      *  at a certain time. */
@@ -69,16 +80,19 @@ protected:
     };   // KartReplayEvent
 
     // ------------------------------------------------------------------------
-          ReplayBase();
     FILE *openReplayFile(bool writeable);
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the filename that was opened. */
-    const std::string &getReplayFilename() const { return m_filename;}
-    // ----------------------------------------------------------------------
+    virtual const std::string& getReplayFilename() const = 0;
+    // ------------------------------------------------------------------------
     /** Returns the version number of the replay file. This is used to check
      *  that a loaded replay file can still be understood by this
      *  executable. */
     unsigned int getReplayVersion() const { return 1; }
+
+public:
+             ReplayBase();
+    virtual ~ReplayBase() {};
 };   // ReplayBase
 
 #endif

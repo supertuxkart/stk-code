@@ -25,6 +25,8 @@
         <!-- Populated dynamically at runtime -->
         <tabs width="100%" height="25" id="trackgroups"> </tabs>
 
-        <spacer width="100%" height="2%" />
+        <spacer width="100%" height="3%" />
+
+        <button id="ghost" I18N="In the track selection screen" text="Load Ghost Replay" />
     </div>
 </stkgui>
