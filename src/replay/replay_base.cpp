@@ -33,13 +33,12 @@ ReplayBase::ReplayBase()
  */
 FILE* ReplayBase::openReplayFile(bool writeable)
 {
-    m_filename = file_manager->getUserConfigFile(
-                                       race_manager->getTrackName()+".replay");
+    m_filename = file_manager->getReplayDir() +
+        race_manager->getTrackName() + ".replay";
     FILE *fd = fopen(m_filename.c_str(), writeable ? "w" : "r");
-    if(!fd)
+    if (!fd)
     {
-        m_filename = race_manager->getTrackName()+".replay";
-        fd = fopen(m_filename.c_str(), writeable ? "w" : "r");
+        return NULL;
     }
     return fd;
 
