@@ -67,7 +67,11 @@ void GhostReplaySelection::beforeAddingWidget()
 {
     m_replay_list_widget->clearColumns();
     m_replay_list_widget->addColumn( _("Track"), 3 );
+    m_replay_list_widget->addColumn( _("Players"), 1);
+    m_replay_list_widget->addColumn( _("Reverse"), 1);
+    m_replay_list_widget->addColumn( _("Difficulty"), 1);
     m_replay_list_widget->addColumn( _("Laps"), 1);
+    m_replay_list_widget->addColumn( _("Finish Time"), 1);
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -86,34 +90,41 @@ void GhostReplaySelection::loadList()
     m_replay_list_widget->clear();
     for (unsigned int i = 0; i < ReplayPlay::get()->getNumReplayFile() ; i++)
     {
-        const ReplayBase::ReplayData rd = ReplayPlay::get()->getReplayData(i);
+        const ReplayBase::ReplayData& rd = ReplayPlay::get()->getReplayData(i);
 
         std::vector<GUIEngine::ListWidget::ListCell> row;
         Track* t = track_manager->getTrack(rd.m_track_name);
         row.push_back(GUIEngine::ListWidget::ListCell
             (translations->fribidize(t->getName()) , -1, 3));
         row.push_back(GUIEngine::ListWidget::ListCell
+            (StringUtils::toWString(rd.m_kart_list.size()), -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
+            (rd.m_reverse ? _("Yes") : _("No"), -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
+            (rd.m_difficulty == 3 ? _("Supertux") : rd.m_difficulty == 2 ?
+            _("Expert") : rd.m_difficulty == 1 ?
+            _("Intermediate") : _("Novice") , -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
             (StringUtils::toWString(rd.m_laps), -1, 1, true));
+        row.push_back(GUIEngine::ListWidget::ListCell
+            (StringUtils::toWString(rd.m_min_time) + L"s", -1, 1, true));
         m_replay_list_widget->addItem("replay", row);
     }
 }   // loadList
 
 // ----------------------------------------------------------------------------
-void GhostReplaySelection::eventCallback( GUIEngine::Widget* widget,
-                                     const std::string& name,
-                                     const int playerID)
+void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
+                                         const std::string& name,
+                                         const int playerID)
 {
     if (name == "back")
     {
-        race_manager->setRaceGhostKarts(false);
         StateManager::get()->escapePressed();
     }
-
     else if (name == "reload")
     {
         refresh();
     }
-
     else if (name == m_replay_list_widget->m_properties[GUIEngine::PROP_ID])
     {
         unsigned int selected_index = m_replay_list_widget->getSelectionID();

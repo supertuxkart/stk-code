@@ -18,7 +18,6 @@
 #include "replay/replay_base.hpp"
 
 #include "io/file_manager.hpp"
-#include "race/race_manager.hpp"
 
 // -----------------------------------------------------------------------------
 ReplayBase::ReplayBase()

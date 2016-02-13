@@ -279,7 +279,11 @@ void World::reset()
     race_manager->reset();
     // Make sure to overwrite the data from the previous race.
     if(!history->replayHistory()) history->initRecording();
-    if(race_manager->willRecordRace()) ReplayRecorder::get()->init();
+    if(race_manager->willRecordRace())
+    {
+        Log::info("World", "Start Recording race.");
+        ReplayRecorder::get()->init();
+    }
 
     // Reset all data structures that depend on number of karts.
     irr_driver->reset();
@@ -430,6 +434,7 @@ World::~World()
     }
     m_karts.clear();
     race_manager->setRaceGhostKarts(false);
+    race_manager->setRecordRace(false);
 
     Camera::removeAllCameras();
 

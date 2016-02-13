@@ -24,8 +24,6 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "replay/replay_base.hpp"
 
-#include <irrString.h>
-
 /** \brief Dialog that allows a user to do action with ghost replay file
  * \ingroup states_screens
  */
@@ -50,6 +48,6 @@ public:
 
     virtual bool onEscapePressed();
     virtual void onUpdate(float dt);
-};   // class ServerInfoDialog
+};   // class GhostReplayInfoDialog
 
 #endif

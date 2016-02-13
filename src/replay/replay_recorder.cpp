@@ -39,16 +39,13 @@ ReplayRecorder *ReplayRecorder::m_replay_recorder = NULL;
  */
 ReplayRecorder::ReplayRecorder()
 {
-    m_filename = "TODO.replay";
+    m_filename = "";
 }   // ReplayRecorder
 
 //-----------------------------------------------------------------------------
 /** Frees all stored data. */
 ReplayRecorder::~ReplayRecorder()
 {
-    m_transform_events.clear();
-    m_physic_info.clear();
-    m_kart_replay_event.clear();
 }   // ~Replay
 
 //-----------------------------------------------------------------------------
@@ -198,6 +195,26 @@ void ReplayRecorder::save()
     Log::debug("ReplayRecorder", "%d frames, %d removed because of"
         "frequency compression", m_count, m_count_skipped_time);
 #endif
+    const World *world           = World::getWorld();
+    const unsigned int num_karts = world->getNumKarts();
+    float min_time = 99999.99f;
+    for (unsigned int k = 0; k < num_karts; k++)
+    {
+        if (world->getKart(k)->isGhostKart()) continue;
+        float cur_time = m_transform_events[k][m_count_transforms[k]-1].m_time;
+        if (cur_time < min_time)
+            min_time = cur_time;
+    }
+
+    int day, month, year;
+    StkTime::getDate(&day, &month, &year);
+    std::string time = StringUtils::toString(min_time);
+    std::replace(time.begin(), time.end(), '.', '_');
+    std::ostringstream oss;
+    oss << world->getTrack()->getIdent() << "_" << year << month << day
+        << "_" << num_karts << "_" << time << ".replay";
+    m_filename = oss.str();
+
     FILE *fd = openReplayFile(/*writeable*/true);
     if (!fd)
     {
@@ -206,12 +223,11 @@ void ReplayRecorder::save()
         return;
     }
 
-    core::stringw msg = _("Replay saved in \"%s\".", getReplayFilename().c_str());
+    core::stringw msg = _("Replay saved in \"%s\".",
+        (file_manager->getReplayDir() + getReplayFilename()).c_str());
     MessageQueue::add(MessageQueue::MT_GENERIC, msg);
 
-    fprintf(fd, "reverse: %d\n", (int)race_manager->getReverseTrack());
-    World *world   = World::getWorld();
-    unsigned int num_karts = world->getNumKarts();
+    fprintf(fd, "version: %d\n",    getReplayVersion());
     for (unsigned int real_karts = 0; real_karts < num_karts; real_karts++)
     {
         if (world->getKart(real_karts)->isGhostKart()) continue;
@@ -220,10 +236,11 @@ void ReplayRecorder::save()
     }
 
     fprintf(fd, "kart_list_end\n");
-    fprintf(fd, "version: %d\n",    getReplayVersion());
+    fprintf(fd, "reverse: %d\n",    (int)race_manager->getReverseTrack());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
     fprintf(fd, "laps: %d\n",       race_manager->getNumLaps());
+    fprintf(fd, "min_time: %f\n",   min_time);
 
     unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time 
                                              / stk_config->m_replay_dt      );

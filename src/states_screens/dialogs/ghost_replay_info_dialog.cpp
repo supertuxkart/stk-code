@@ -28,7 +28,7 @@ using namespace irr::core;
 
 // -----------------------------------------------------------------------------
 GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id)
-                : ModalDialog(0.5f,0.5f), m_replay_id(replay_id)
+                      : ModalDialog(0.8f,0.5f), m_replay_id(replay_id)
 {
     m_self_destroy = false;
     m_rd = ReplayPlay::get()->getReplayData(m_replay_id);
