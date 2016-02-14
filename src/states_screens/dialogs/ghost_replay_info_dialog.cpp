@@ -79,10 +79,11 @@ GUIEngine::EventPropagation
         }
         else if(selection == "remove")
         {
-            m_self_destroy = true;
-            if (!file_manager
-                ->removeFile(file_manager->getReplayDir() + m_rd.m_filename))
-                Log::warn("GhostReplayInfoDialog", "Failed to delete file.");
+            std::string fn = m_rd.m_filename;
+            ModalDialog::dismiss();
+
+            dynamic_cast<GhostReplaySelection*>(GUIEngine::getCurrentScreen())
+                ->onDeleteReplay(fn);
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "back")

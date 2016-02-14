@@ -20,10 +20,12 @@
 
 #include "replay/replay_play.hpp"
 #include "states_screens/dialogs/ghost_replay_info_dialog.hpp"
+#include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
+
+using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( GhostReplaySelection );
 
@@ -32,6 +34,7 @@ DEFINE_SCREEN_SINGLETON( GhostReplaySelection );
  */
 GhostReplaySelection::GhostReplaySelection() : Screen("ghost_replay_selection.stkgui")
 {
+    m_file_to_be_deleted = "";
 }   // GhostReplaySelection
 
 // ----------------------------------------------------------------------------
@@ -139,3 +142,23 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
     }   // click on replay file
 
 }   // eventCallback
+
+// ----------------------------------------------------------------------------
+void GhostReplaySelection::onDeleteReplay(std::string& filename)
+{
+    m_file_to_be_deleted = filename;
+    new MessageDialog( _("Are you sure you want to remove '%s'?",
+        m_file_to_be_deleted.c_str()), MessageDialog::MESSAGE_DIALOG_CONFIRM,
+        this, false);
+}   // onDeleteReplay
+
+// ----------------------------------------------------------------------------
+void GhostReplaySelection::onConfirm()
+{
+    if (!file_manager
+        ->removeFile(file_manager->getReplayDir() + m_file_to_be_deleted))
+        Log::warn("GhostReplayInfoDialog", "Failed to delete file.");
+
+    ModalDialog::dismiss();
+    GhostReplaySelection::getInstance()->refresh();
+}   // onConfirm

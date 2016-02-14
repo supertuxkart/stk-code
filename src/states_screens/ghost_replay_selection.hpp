@@ -21,6 +21,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -30,7 +31,8 @@ namespace GUIEngine { class Widget; }
   */
 class GhostReplaySelection : public GUIEngine::Screen,
                              public GUIEngine::ScreenSingleton<GhostReplaySelection>,
-                             public GUIEngine::IListWidgetHeaderListener
+                             public GUIEngine::IListWidgetHeaderListener,
+                             public MessageDialog::IConfirmDialogListener
 
 {
     friend class GUIEngine::ScreenSingleton<GhostReplaySelection>;
@@ -39,7 +41,8 @@ private:
     GhostReplaySelection();
     ~GhostReplaySelection();
 
-    GUIEngine::ListWidget *                     m_replay_list_widget;
+    GUIEngine::ListWidget* m_replay_list_widget;
+    std::string            m_file_to_be_deleted;
 
 public:
 
@@ -47,6 +50,8 @@ public:
 
     /** Load the addons into the main list.*/
     void loadList();
+
+    void onDeleteReplay(std::string& filename);
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
@@ -64,8 +69,8 @@ public:
 
     virtual void tearDown() OVERRIDE {};
 
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onUpdate(float dt) OVERRIDE {};
+    /** \brief Implement IConfirmDialogListener callback */
+    virtual void onConfirm() OVERRIDE;
 
 };   // GhostReplaySelection
 
