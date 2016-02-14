@@ -22,7 +22,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
-#include "replay/replay_base.hpp"
+#include "replay/replay_play.hpp"
 
 /** \brief Dialog that allows a user to do action with ghost replay file
  * \ingroup states_screens
@@ -35,7 +35,7 @@ private:
     bool m_self_destroy;
 
     const unsigned int m_replay_id;
-    ReplayBase::ReplayData m_rd;
+    ReplayPlay::ReplayData m_rd;
 
     GUIEngine::RibbonWidget* m_action_widget;
     GUIEngine::IconButtonWidget* m_back_widget;

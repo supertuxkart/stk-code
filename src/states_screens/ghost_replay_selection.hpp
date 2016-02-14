@@ -43,10 +43,11 @@ private:
 
     GUIEngine::ListWidget* m_replay_list_widget;
     std::string            m_file_to_be_deleted;
+    bool                   m_sort_desc;
 
 public:
 
-    void refresh();
+    void refresh(bool forced_update = true);
 
     /** Load the addons into the main list.*/
     void loadList();
@@ -63,7 +64,7 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
-    virtual void onColumnClicked(int columnId) {};
+    virtual void onColumnClicked(int columnId);
 
     virtual void init() OVERRIDE;
 

@@ -23,6 +23,7 @@
 #include "replay/replay_base.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -33,8 +34,62 @@ class GhostKart;
   */
 class ReplayPlay : public ReplayBase
 {
+
+public:
+    /** Order of sort for ReplayData */
+    enum SortOrder
+    {
+        SO_DEFAULT,
+        SO_TRACK = SO_DEFAULT,
+        SO_REV,
+        SO_KART_NUM,
+        SO_DIFF,
+        SO_LAPS,
+        SO_TIME
+    };
+
+    class ReplayData
+    {
+    public:
+        std::string              m_filename;
+        std::string              m_track_name;
+        std::vector<std::string> m_kart_list;
+        bool                     m_reverse;
+        unsigned int             m_difficulty;
+        unsigned int             m_laps;
+        float                    m_min_time;
+
+        bool operator < (const ReplayData& r) const
+        {
+            switch (m_sort_order)
+            {
+                case SO_TRACK:
+                    return m_track_name < r.m_track_name;
+                    break;
+                case SO_KART_NUM:
+                    return m_kart_list.size() < r.m_kart_list.size();
+                    break;
+                case SO_REV:
+                    return m_reverse < r.m_reverse;
+                    break;
+                case SO_DIFF:
+                    return m_difficulty < r.m_difficulty;
+                    break;
+                case SO_LAPS:
+                    return m_laps < r.m_laps;
+                    break;
+                case SO_TIME:
+                    return m_min_time < r.m_min_time;
+                    break;
+            }   // switch
+            return true;
+        }   // operator <
+    };   // ReplayData
+
 private:
     static ReplayPlay       *m_replay_play;
+
+    static SortOrder         m_sort_order;
 
     unsigned int             m_current_replay_file;
 
@@ -50,6 +105,15 @@ public:
     void  reset();
     void  load();
     void  loadAllReplayFile();
+    // ------------------------------------------------------------------------
+    static void        setSortOrder(SortOrder so)       { m_sort_order = so; }
+    // ------------------------------------------------------------------------
+    void               sortReplay(bool reverse)
+    {
+        (reverse ? std::sort(m_replay_file_list.rbegin(),
+            m_replay_file_list.rend()) : std::sort(m_replay_file_list.begin(),
+            m_replay_file_list.end()));
+    }
     // ------------------------------------------------------------------------
     void               setReplayFile(unsigned int n)
                                                 { m_current_replay_file = n; }

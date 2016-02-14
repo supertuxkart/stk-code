@@ -18,7 +18,6 @@
 
 #include "states_screens/ghost_replay_selection.hpp"
 
-#include "replay/replay_play.hpp"
 #include "states_screens/dialogs/ghost_replay_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
@@ -35,6 +34,7 @@ DEFINE_SCREEN_SINGLETON( GhostReplaySelection );
 GhostReplaySelection::GhostReplaySelection() : Screen("ghost_replay_selection.stkgui")
 {
     m_file_to_be_deleted = "";
+    m_sort_desc = true;
 }   // GhostReplaySelection
 
 // ----------------------------------------------------------------------------
@@ -47,9 +47,10 @@ GhostReplaySelection::~GhostReplaySelection()
 // ----------------------------------------------------------------------------
 /** Triggers a refresh of the replay file list.
  */
-void GhostReplaySelection::refresh()
+void GhostReplaySelection::refresh(bool forced_update)
 {
-    ReplayPlay::get()->loadAllReplayFile();
+    if (ReplayPlay::get()->getNumReplayFile() == 0 || forced_update)
+        ReplayPlay::get()->loadAllReplayFile();
     loadList();
 }   // refresh
 
@@ -81,7 +82,7 @@ void GhostReplaySelection::beforeAddingWidget()
 void GhostReplaySelection::init()
 {
     Screen::init();
-    refresh();
+    refresh(/*forced_update*/false);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -90,10 +91,11 @@ void GhostReplaySelection::init()
  */
 void GhostReplaySelection::loadList()
 {
+    ReplayPlay::get()->sortReplay(m_sort_desc);
     m_replay_list_widget->clear();
     for (unsigned int i = 0; i < ReplayPlay::get()->getNumReplayFile() ; i++)
     {
-        const ReplayBase::ReplayData& rd = ReplayPlay::get()->getReplayData(i);
+        const ReplayPlay::ReplayData& rd = ReplayPlay::get()->getReplayData(i);
 
         std::vector<GUIEngine::ListWidget::ListCell> row;
         Track* t = track_manager->getTrack(rd.m_track_name);
@@ -133,8 +135,8 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
         unsigned int selected_index = m_replay_list_widget->getSelectionID();
         // This can happen e.g. when the list is empty and the user
         // clicks somewhere.
-        if(selected_index >= ReplayPlay::get()->getNumReplayFile() ||
-           selected_index < 0                                        )
+        if (selected_index >= ReplayPlay::get()->getNumReplayFile() ||
+            selected_index < 0                                        )
         {
             return;
         }
@@ -162,3 +164,40 @@ void GhostReplaySelection::onConfirm()
     ModalDialog::dismiss();
     GhostReplaySelection::getInstance()->refresh();
 }   // onConfirm
+
+// ----------------------------------------------------------------------------
+/** Change the sort order if a column was clicked.
+ *  \param column_id ID of the column that was clicked.
+ */
+void GhostReplaySelection::onColumnClicked(int column_id)
+{
+    switch (column_id)
+    {
+        case 0:
+            ReplayPlay::setSortOrder(ReplayPlay::SO_TRACK);
+            break;
+        case 1:
+            ReplayPlay::setSortOrder(ReplayPlay::SO_KART_NUM);
+            break;
+        case 2:
+            ReplayPlay::setSortOrder(ReplayPlay::SO_REV);
+            break;
+        case 3:
+            ReplayPlay::setSortOrder(ReplayPlay::SO_DIFF);
+            break;
+        case 4:
+            ReplayPlay::setSortOrder(ReplayPlay::SO_LAPS);
+            break;
+        case 5:
+            ReplayPlay::setSortOrder(ReplayPlay::SO_TIME);
+            break;
+        default:
+            assert(0);
+            break;
+    }   // switch
+    /** \brief Toggle the sort order after column click **/
+    m_sort_desc = !m_sort_desc;
+    loadList();
+}   // onColumnClicked
+
+// ----------------------------------------------------------------------------

@@ -34,19 +34,6 @@ class ReplayBase : public NoCopy
     // Needs access to KartReplayEvent
     friend class GhostKart;
 
-public:
-    class ReplayData
-    {
-    public:
-        std::string              m_filename;
-        bool                     m_reverse;
-        std::vector<std::string> m_kart_list;
-        unsigned int             m_difficulty;
-        std::string              m_track_name;
-        unsigned int             m_laps;
-        float                    m_min_time;
-    };   // ReplayData
-
 protected:
     /** Stores a transform event, i.e. a position and rotation of a kart
      *  at a certain time. */

@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <string>
 
+ReplayPlay::SortOrder ReplayPlay::m_sort_order = ReplayPlay::SO_DEFAULT;
 ReplayPlay *ReplayPlay::m_replay_play = NULL;
 
 //-----------------------------------------------------------------------------
@@ -155,7 +156,8 @@ void ReplayPlay::loadAllReplayFile()
         fclose(fd);
         m_replay_file_list.push_back(rd);
     }
-}
+}   // loadAllReplayFile
+
 //-----------------------------------------------------------------------------
 void ReplayPlay::load()
 {

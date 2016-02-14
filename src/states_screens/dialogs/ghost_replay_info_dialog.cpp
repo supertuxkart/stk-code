@@ -109,7 +109,6 @@ void GhostReplayInfoDialog::onUpdate(float dt)
     if (m_self_destroy)
     {
         ModalDialog::dismiss();
-        GhostReplaySelection::getInstance()->refresh();
         return;
     }
 }   // onUpdate
