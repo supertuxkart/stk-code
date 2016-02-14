@@ -60,16 +60,21 @@ GUIEngine::EventPropagation
 
         if(selection == "start")
         {
+            bool reverse = m_rd.m_reverse; 
+            std::string track_name = m_rd.m_track_name; 
+            int laps = m_rd.m_laps;
+            int replay_id = m_replay_id;
+
             ModalDialog::dismiss();
-            ReplayPlay::get()->setReplayFile(m_replay_id);
+            ReplayPlay::get()->setReplayFile(replay_id);
             race_manager->setRaceGhostKarts(true);
             race_manager->setNumKarts(race_manager->getNumLocalPlayers());
 
             // Disable accidentally unlocking of a challenge
             PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
-            race_manager->setReverseTrack(m_rd.m_reverse);
-            race_manager->startSingleRace(m_rd.m_track_name, m_rd.m_laps, false);
+            race_manager->setReverseTrack(reverse);
+            race_manager->startSingleRace(track_name, laps, false);
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == "remove")
