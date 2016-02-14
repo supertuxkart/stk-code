@@ -25,6 +25,7 @@
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 
 #include <irrlicht.h>
 #include <stdio.h>
@@ -132,11 +133,19 @@ void ReplayPlay::loadAllReplayFile()
         fgets(s, 1023, fd);
         if (sscanf(s, "track: %s", s1) != 1)
         {
-            Log::warn("Replay", "Track not found in replay file.");
+            Log::warn("Replay", "Track info not found in replay file.");
             fclose(fd);
             continue;
         }
         rd.m_track_name = std::string(s1);
+        Track* t = track_manager->getTrack(rd.m_track_name);
+        if (t == NULL)
+        {
+            Log::warn("Replay", "Track '%s' used in replay not found in STK!",
+                rd.m_track_name.c_str());
+            fclose(fd);
+            continue;
+        }
 
         fgets(s, 1023, fd);
         if (sscanf(s, "laps: %u", &rd.m_laps) != 1)
