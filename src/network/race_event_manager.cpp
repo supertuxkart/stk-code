@@ -77,6 +77,14 @@ bool RaceEventManager::isRaceOver()
 }   // isRaceOver
 
 // ----------------------------------------------------------------------------
+void RaceEventManager::kartFinishedRace(AbstractKart *kart, float time)
+{
+    GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
+        ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
+    protocol->kartFinishedRace(kart, time);
+}   // kartFinishedRace
+
+// ----------------------------------------------------------------------------
 /** Called from the item manager on a server. It triggers a notification to
  *  all clients in the GameEventsProtocol.
  *  \param item The item that was collected.

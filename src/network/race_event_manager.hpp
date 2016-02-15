@@ -58,6 +58,7 @@ public:
     void collectedItem(Item *item, AbstractKart *kart);
     void controllerAction(Controller* controller, PlayerAction action, 
                           int value);
+    void kartFinishedRace(AbstractKart *kart, float time);
     // ------------------------------------------------------------------------
     /** Returns if this instance is in running state or not. */
     bool isRunning() { return m_running; }

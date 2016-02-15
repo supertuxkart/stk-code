@@ -247,7 +247,7 @@ public:
     /** Marks this kart to be eliminated. */
     virtual void eliminate() = 0;
     // ------------------------------------------------------------------------
-    virtual void finishedRace(float time) = 0;
+    virtual void finishedRace(float time, bool from_server=false) = 0;
     // ------------------------------------------------------------------------
     /** Returns the finished time for a kart. */
     virtual float getFinishTime() const = 0;

@@ -44,7 +44,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     data.removeFront(5);
     switch (type)
     {
-        case 0x01: // item picked
+        case GE_ITEM_COLLECTED:
         {
             if (data.size() < 6)
             {
@@ -65,6 +65,9 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             Log::info("GameEventsProtocol", "Item %d picked by a player.",
                        powerup_type);
         }   break;
+        case GE_KART_FINISHED_RACE:
+            kartFinishedRace(data);
+            break;
         default:
             Log::warn("GameEventsProtocol", "Unkown message type.");
             break;
@@ -104,8 +107,8 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
             powerup = (((int)(kart->getPowerup()->getType()) << 4) & 0xf0) 
                            + (kart->getPowerup()->getNum()         & 0x0f);
 
-        ns.ai8(0x01).ai32(item->getItemId()).ai8(powerup)
-                    .ai8(player_profile->getGlobalPlayerId());
+        ns.ai8(GE_ITEM_COLLECTED).ai32(item->getItemId()).ai8(powerup)
+          .ai8(player_profile->getGlobalPlayerId());
         ProtocolManager::getInstance()->sendMessage(this, peers[i], ns,
                                                     /*reliable*/true,
                                                     /*synchronous*/true);
@@ -114,3 +117,39 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
                   (int)(kart->getPowerup()->getType()));
     }
 }   // collectedItem
+
+// ----------------------------------------------------------------------------
+/** This function is called from the server when a kart finishes a race. It
+ *  sends a notification to all clients about this event.
+ *  \param kart The kart that finished the race.
+ *  \param time The time at which the kart finished.
+ */
+void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
+{
+    NetworkString ns(20);
+
+    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
+    for (unsigned int i = 0; i < peers.size(); i++)
+    {
+        ns.addUInt32(peers[i]->getClientServerToken())
+          .addUInt8(GE_KART_FINISHED_RACE)
+          .addUInt8(kart->getWorldKartId()).addFloat(time);
+
+        ProtocolManager::getInstance()->sendMessage(this, peers[i], ns,
+                                                    /*reliable*/true,
+                                                    /*synchronous*/true);
+    }   // for i in peers
+}   // kartFinishedRace
+
+// ----------------------------------------------------------------------------
+/** This function is called on a client when it receives a kartFinishedRace
+ *  event from the server. It updates the game with this information.
+ *  \param ns The message from the server.
+ */
+void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
+{
+    uint8_t kart_id = ns.getUInt8(0);
+    float time      = ns.getFloat(1);
+    World::getWorld()->getKart(kart_id)->finishedRace(time,
+                                                      /*from_server*/true);
+}   // kartFinishedRace
