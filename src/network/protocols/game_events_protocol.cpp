@@ -8,7 +8,6 @@
 #include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
-#include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -82,16 +81,13 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
 {
     GameSetup* setup = STKHost::get()->getGameSetup();
     assert(setup);
-    // use kart name
-    const NetworkPlayerProfile* player_profile =
-                                           setup->getProfile(kart->getIdent());
 
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
         NetworkString ns(11);
         ns.ai32(peers[i]->getClientServerToken());
-        // 0x01 : item picked : send item id, powerup type and kart race id
+        // Item picked : send item id, powerup type and kart race id
         uint8_t powerup = 0;
         if (item->getType() == Item::ITEM_BANANA)
             powerup = (int)(kart->getAttachment()->getType());
@@ -100,7 +96,7 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
                            + (kart->getPowerup()->getNum()         & 0x0f);
 
         ns.ai8(GE_ITEM_COLLECTED).ai32(item->getItemId()).ai8(powerup)
-          .ai8(player_profile->getGlobalPlayerId());
+          .ai8(kart->getWorldKartId());
         ProtocolManager::getInstance()->sendMessage(this, peers[i], ns,
                                                     /*reliable*/true,
                                                     /*synchronous*/true);
@@ -117,20 +113,18 @@ void GameEventsProtocol::collectedItem(const NetworkString &data)
 {
     if (data.size() < 6)
     {
-        Log::warn("GameEventsProtocol", "Too short message.");
-    }
-    uint32_t item_id = data.gui32();
-    uint8_t powerup_type = data.gui8(4);
-    uint8_t player_id = data.gui8(5);
-    // now set the kart powerup
-    AbstractKart* kart = World::getWorld()->getKart(
-                           STKHost::get()->getGameSetup()
-                                  ->getProfile(player_id)->getWorldKartID() );
-    ItemManager::get()->collectedItem(ItemManager::get()->getItem(item_id),
-                                      kart, powerup_type);
-    Log::info("GameEventsProtocol", "Item %d picked by a player.",
-              powerup_type);
-}   // collectedItem
+            Log::warn("GameEventsProtocol", "Too short message.");
+        }
+        uint32_t item_id = data.gui32();
+        uint8_t powerup_type = data.gui8(4);
+        uint8_t kart_id = data.gui8(5);
+        // now set the kart powerup
+        AbstractKart* kart = World::getWorld()->getKart(kart_id);
+        ItemManager::get()->collectedItem(ItemManager::get()->getItem(item_id),
+                                          kart, powerup_type);
+        Log::info("GameEventsProtocol", "Item %d picked by a player.",
+                  powerup_type);
+    }   // collectedItem
 
 // ----------------------------------------------------------------------------
 /** This function is called from the server when a kart finishes a race. It
