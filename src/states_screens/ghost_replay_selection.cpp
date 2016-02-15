@@ -33,7 +33,6 @@ DEFINE_SCREEN_SINGLETON( GhostReplaySelection );
  */
 GhostReplaySelection::GhostReplaySelection() : Screen("ghost_replay_selection.stkgui")
 {
-    m_file_to_be_deleted = "";
     m_sort_desc = true;
 }   // GhostReplaySelection
 

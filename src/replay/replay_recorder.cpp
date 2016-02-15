@@ -39,7 +39,6 @@ ReplayRecorder *ReplayRecorder::m_replay_recorder = NULL;
  */
 ReplayRecorder::ReplayRecorder()
 {
-    m_filename = "";
 }   // ReplayRecorder
 
 //-----------------------------------------------------------------------------

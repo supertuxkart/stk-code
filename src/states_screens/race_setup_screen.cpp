@@ -28,6 +28,7 @@
 #include "race/race_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
 #include "states_screens/easter_egg_screen.hpp"
+#include "states_screens/ghost_replay_selection.hpp"
 #include "states_screens/soccer_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
@@ -39,6 +40,7 @@ const int CONFIG_CODE_FTL       = 2;
 const int CONFIG_CODE_3STRIKES  = 3;
 const int CONFIG_CODE_EASTER    = 4;
 const int CONFIG_CODE_SOCCER    = 5;
+const int CONFIG_CODE_GHOST     = 6;
 
 using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( RaceSetupScreen );
@@ -131,6 +133,10 @@ void RaceSetupScreen::init()
     }
 #endif
 
+    irr::core::stringw name6 = irr::core::stringw( _("Ghost replay race")) + L"\n";
+    name6 += _("Race against ghost karts and try to beat them!");
+    w2->addItem( name6, IDENT_GHOST, "/gui/mode_ghost.png");
+
     w2->updateItemDisplay();
 
     // restore saved game mode
@@ -153,6 +159,9 @@ void RaceSetupScreen::init()
         break;
     case CONFIG_CODE_SOCCER :
         w2->setSelection(IDENT_SOCCER, PLAYER_ID_GAME_MASTER, true);
+        break;
+    case CONFIG_CODE_GHOST :
+        w2->setSelection(IDENT_GHOST, PLAYER_ID_GAME_MASTER, true);
         break;
     }
 
@@ -231,6 +240,12 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
             race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
             UserConfigParams::m_game_mode = CONFIG_CODE_SOCCER;
             SoccerSetupScreen::getInstance()->push();
+        }
+        else if (selectedMode == IDENT_GHOST)
+        {
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+            UserConfigParams::m_game_mode = CONFIG_CODE_GHOST;
+            GhostReplaySelection::getInstance()->push();
         }
         else if (selectedMode == "locked")
         {
