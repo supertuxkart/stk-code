@@ -22,6 +22,7 @@ public:
     virtual void setup();
     virtual void update();
     void collectedItem(Item* item, AbstractKart* kart);
+    void collectedItem(const NetworkString &ns);
     void kartFinishedRace(AbstractKart *kart, float time);
     void kartFinishedRace(const NetworkString &ns);
     // ------------------------------------------------------------------------

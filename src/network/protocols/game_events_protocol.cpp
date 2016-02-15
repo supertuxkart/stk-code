@@ -15,6 +15,16 @@
 
 #include <stdint.h>
 
+/** This class handles all 'major' game events. E.g. collecting an item,
+ *  finishing a race etc. The game events manager is notified from the 
+ *  game code, and it calls the corresponding function in this class.
+ *  The server then notifies all clients. Clients receive the message
+ *  in the synchronous notifyEvent function here, decode the message
+ *  and call the original game code. The functions name are identical,
+ *  e.g. kartFinishedRace(some parameter) is called from the GameEventManager
+ *  on the server, and the received message is then handled by 
+ *  kartFinishedRace(const NetworkString &).
+ */
 GameEventsProtocol::GameEventsProtocol() : Protocol(PROTOCOL_GAME_EVENTS)
 {
 }   // GameEventsProtocol
@@ -45,29 +55,9 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     switch (type)
     {
         case GE_ITEM_COLLECTED:
-        {
-            if (data.size() < 6)
-            {
-                Log::warn("GameEventsProtocol", "Too short message.");
-                return true;
-            }
-            uint32_t item_id = data.gui32();
-            uint8_t powerup_type = data.gui8(4);
-            uint8_t player_id = data.gui8(5);
-            // now set the kart powerup
-            AbstractKart* kart = World::getWorld()->getKart(
-                      STKHost::get()->getGameSetup()
-                                    ->getProfile(player_id)->getWorldKartID());
-            ItemManager::get()->collectedItem(
-                                          ItemManager::get()->getItem(item_id),
-                                          kart,
-                                          powerup_type);
-            Log::info("GameEventsProtocol", "Item %d picked by a player.",
-                       powerup_type);
-        }   break;
+            collectedItem(data);      break;
         case GE_KART_FINISHED_RACE:
-            kartFinishedRace(data);
-            break;
+            kartFinishedRace(data);   break;
         default:
             Log::warn("GameEventsProtocol", "Unkown message type.");
             break;
@@ -86,6 +76,8 @@ void GameEventsProtocol::update()
 }   // update
 
 // ----------------------------------------------------------------------------
+/** Called on the server when an item is collected.
+ */
 void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
 {
     GameSetup* setup = STKHost::get()->getGameSetup();
@@ -116,6 +108,28 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
                   "Notified a peer that a kart collected item %d.",
                   (int)(kart->getPowerup()->getType()));
     }
+}   // collectedItem
+
+// ----------------------------------------------------------------------------
+/** Called on the client when an itemCollected message is received.
+ */
+void GameEventsProtocol::collectedItem(const NetworkString &data)
+{
+    if (data.size() < 6)
+    {
+        Log::warn("GameEventsProtocol", "Too short message.");
+    }
+    uint32_t item_id = data.gui32();
+    uint8_t powerup_type = data.gui8(4);
+    uint8_t player_id = data.gui8(5);
+    // now set the kart powerup
+    AbstractKart* kart = World::getWorld()->getKart(
+                           STKHost::get()->getGameSetup()
+                                  ->getProfile(player_id)->getWorldKartID() );
+    ItemManager::get()->collectedItem(ItemManager::get()->getItem(item_id),
+                                      kart, powerup_type);
+    Log::info("GameEventsProtocol", "Item %d picked by a player.",
+              powerup_type);
 }   // collectedItem
 
 // ----------------------------------------------------------------------------
