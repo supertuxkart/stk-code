@@ -33,9 +33,8 @@ using namespace irr;
 using namespace std;
 #endif
 
-SoccerAI::SoccerAI(AbstractKart *kart,
-                   StateManager::ActivePlayer *player)
-         : ArenaAI(kart, player)
+SoccerAI::SoccerAI(AbstractKart *kart)
+        : ArenaAI(kart)
 {
 
     reset();

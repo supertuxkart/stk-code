@@ -42,6 +42,9 @@ private:
     /** True if this host is a server, false otherwise. */
     bool m_is_server;
 
+    /** The password for a server (or to authenticate to a server). */
+    std::string m_password;
+
     /** This is either this computer's public IP address, or the LAN
      *  address in case of a LAN game. With lock since it can
      *  be updated from a separate thread. */
@@ -83,6 +86,12 @@ public:
     // ------------------------------------------------------------------------
     void setMyAddress(const TransportAddress& addr);
 
+    // ------------------------------------------------------------------------
+    /** Sets the password for a server. */
+    void setPassword(const std::string &password) { m_password = password; }
+    // ------------------------------------------------------------------------
+    /** Returns the password. */
+    const std::string& getPassword() const { return m_password; }
     // ------------------------------------------------------------------------
     /** Return if a network setting is happening. A network setting is active
      *  if a host (server or client) exists. */

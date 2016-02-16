@@ -39,6 +39,7 @@ NetworkConfig::NetworkConfig()
     m_max_players   = 4;
     m_is_registered = false;
     m_server_name   = "";
+    m_password      = "";
     m_private_port  = 0;
     m_my_address.lock();
     m_my_address.getData().clear();

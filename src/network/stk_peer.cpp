@@ -30,8 +30,10 @@
 STKPeer::STKPeer(ENetPeer *enet_peer)
 {
     m_enet_peer           = enet_peer;
+    m_is_authorised       = false;
     m_player_profile      = NULL;
     m_client_server_token = 0;
+    m_host_id             = 0;
     m_token_set           = false;
 }   // STKPeer
 

@@ -115,9 +115,7 @@ protected:
     */
     bool        m_use_highscores;
 
-    void  updateHighscores  (int* best_highscore_rank, int* best_finish_time,
-                             std::string* highscore_who,
-                             StateManager::ActivePlayer** best_player);
+    void  updateHighscores  (int* best_highscore_rank);
     void  resetAllKarts     ();
     void  eliminateKart     (int kart_number, bool notifyOfElimination=true);
     Controller*

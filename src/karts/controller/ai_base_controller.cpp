@@ -31,9 +31,8 @@
 
 bool AIBaseController::m_ai_debug = false;
 
-AIBaseController::AIBaseController(AbstractKart *kart,
-                                   StateManager::ActivePlayer *player)
-                : Controller(kart, player)
+AIBaseController::AIBaseController(AbstractKart *kart)
+                : Controller(kart)
 {
     m_kart          = kart;
     m_kart_length   = m_kart->getKartLength();

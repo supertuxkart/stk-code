@@ -19,9 +19,8 @@
 #include "karts/controller/ghost_controller.hpp"
 #include "modes/world.hpp"
 
-GhostController::GhostController(AbstractKart *kart,
-                                 StateManager::ActivePlayer *player)
-                : Controller(kart, player)
+GhostController::GhostController(AbstractKart *kart)
+                : Controller(kart)
 {
 }   // GhostController
 

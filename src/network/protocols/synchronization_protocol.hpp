@@ -10,7 +10,9 @@ class SynchronizationProtocol : public Protocol
 private:
     std::vector<std::map<uint32_t, double> > m_pings;
     std::vector<uint32_t> m_average_ping;
-    std::vector<uint32_t> m_pings_count;
+
+    /** Counts the number of pings sent. */
+    uint32_t m_pings_count;
     std::vector<uint32_t> m_successed_pings;
     std::vector<double> m_total_diff;
     bool m_countdown_activated;

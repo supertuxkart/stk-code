@@ -45,8 +45,7 @@ private:
     virtual bool isWaiting() const;
     virtual bool canSkid(float steer_fraction) { return m_saving_ball; }
 public:
-                 SoccerAI(AbstractKart *kart,
-                          StateManager::ActivePlayer *player = NULL);
+                 SoccerAI(AbstractKart *kart);
                 ~SoccerAI();
     virtual void update      (float delta);
     virtual void reset       ();

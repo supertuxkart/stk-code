@@ -24,6 +24,9 @@
 #define NETWORK_STRING_HPP
 
 #include "utils/types.hpp"
+#include "utils/vec3.hpp"
+
+#include "LinearMath/btQuaternion.h"
 
 #include "irrString.h"
 
@@ -256,6 +259,19 @@ public:
         return *this;
     }   // operator+=
 
+    // ------------------------------------------------------------------------
+    /** Adds the xyz components of a Vec3 to the string. */
+    NetworkString& add(const Vec3 &xyz)
+    {
+        return addFloat(xyz.getX()).addFloat(xyz.getY()).addFloat(xyz.getZ());
+    }   // add
+    // ------------------------------------------------------------------------
+    /** Adds the four components of a quaternion. */
+    NetworkString& add(const btQuaternion &quat)
+    {
+        return addFloat(quat.getX()).addFloat(quat.getY())
+              .addFloat(quat.getZ()).addFloat(quat.getW());
+    }   // add
     // ------------------------------------------------------------------------
     /** Returns the content of the network string as a std::string. */
     const std::string std_string() const
@@ -500,6 +516,25 @@ public:
         *dst = getAndRemoveUChar(0);
         return *this; 
     }   // guc
+    // ------------------------------------------------------------------------
+    /** Reads the three components of a Vec3 from the given position. */
+    NetworkString& get(Vec3 *xyz, int pos)
+    {
+        xyz->setX(getFloat(pos  ));
+        xyz->setY(getFloat(pos+4));
+        xyz->setZ(getFloat(pos+8));
+        return *this;
+    }   // addVec3
+    // ------------------------------------------------------------------------
+    /** Reads the four components of a quaternion from the given position. */
+    NetworkString& get(btQuaternion *quat, int pos)
+    {
+        quat->setX(getFloat(pos   ));
+        quat->setY(getFloat(pos+ 4));
+        quat->setZ(getFloat(pos+ 8));
+        quat->setW(getFloat(pos+12));
+        return *this;
+    }   // addVec3
 
 };   // class NetworkString
 

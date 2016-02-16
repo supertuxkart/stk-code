@@ -20,7 +20,6 @@
 #define HEADER_AI_BASE_CONTROLLER_HPP
 
 #include "karts/controller/controller.hpp"
-#include "states_screens/state_manager.hpp"
 
 class AIProperties;
 class Track;
@@ -74,8 +73,7 @@ protected:
     void         checkPosition(const Vec3&, posData*, Vec3* lc = NULL) const;
 
 public:
-             AIBaseController(AbstractKart *kart,
-                              StateManager::ActivePlayer *player=NULL);
+             AIBaseController(AbstractKart *kart);
     virtual ~AIBaseController() {};
     virtual void reset();
     virtual bool disableSlipstreamBonus() const;

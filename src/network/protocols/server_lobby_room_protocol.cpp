@@ -23,12 +23,12 @@
 #include "modes/world.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/start_game_protocol.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
@@ -124,7 +124,7 @@ void ServerLobbyRoomProtocol::update()
         m_current_protocol->requestStart();
         m_state = GETTING_PUBLIC_ADDRESS;
         // The callback from GetPublicAddress will wake this protocol up
-        ProtocolManager::getInstance()->pauseProtocol(this);
+        requestPause();
         break;
     case GETTING_PUBLIC_ADDRESS:
         {
@@ -146,7 +146,7 @@ void ServerLobbyRoomProtocol::update()
         if(NetworkConfig::get()->isWAN())
             checkIncomingConnectionRequests();
         if (m_in_race && World::getWorld() &&
-            NetworkWorld::getInstance<NetworkWorld>()->isRunning())
+            RaceEventManager::getInstance<RaceEventManager>()->isRunning())
         {
             checkRaceFinished();
         }
@@ -166,11 +166,11 @@ void ServerLobbyRoomProtocol::update()
 
 //-----------------------------------------------------------------------------
 /** Callback when the GetPublicAddress terminates. It will unpause this
- * protocol, which triggers the next state of the finite state machine.
+ *  protocol, which triggers the next state of the finite state machine.
  */
 void ServerLobbyRoomProtocol::callback(Protocol *protocol)
 {
-    ProtocolManager::getInstance()->unpauseProtocol(this);
+    requestUnpause();
 }   // callback
 
 //-----------------------------------------------------------------------------
@@ -241,7 +241,7 @@ void ServerLobbyRoomProtocol::startGame()
  */
 void ServerLobbyRoomProtocol::startSelection(const Event *event)
 {
-    if(event && !STKHost::get()->isAuthorisedToControl(event->getPeer()))
+    if(event && !event->getPeer()->isAuthorised())
     {
         Log::warn("ServerLobby", 
                   "Client %lx is not authorised to start selection.",
@@ -313,10 +313,10 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
 
 void ServerLobbyRoomProtocol::checkRaceFinished()
 {
-    assert(NetworkWorld::getInstance()->isRunning());
+    assert(RaceEventManager::getInstance()->isRunning());
     assert(World::getWorld());
     // if race is over, give the final score to everybody
-    if (NetworkWorld::getInstance()->isRaceOver())
+    if (RaceEventManager::getInstance()->isRaceOver())
     {
         // calculate karts ranks :
         int num_players = race_manager->getNumberOfKarts();
@@ -348,9 +348,9 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
         for (unsigned int i = 0; i < peers.size(); i++)
         {
             NetworkString ns(6);
-            ns.ai8(0x06).ai8(4).ai32(peers[i]->getClientServerToken());
+            ns.ai8(LE_RACE_FINISHED).ai8(4).ai32(peers[i]->getClientServerToken());
             NetworkString total = ns + queue;
-            sendMessage(peers[i], total, true);
+            sendSynchronousMessage(peers[i], total, true);
         }
         Log::info("ServerLobbyRoomProtocol", "End of game message sent");
         m_in_race = false;
@@ -381,7 +381,7 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
                        "No game events protocol registered.");
 
         // notify the network world that it is stopped
-        NetworkWorld::getInstance()->stop();
+        RaceEventManager::getInstance()->stop();
         // exit the race now
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
@@ -445,8 +445,11 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // Connection accepted.
     // ====================
     std::string name_u8;
-    data.decodeString(0, &name_u8);
+    int len = data.decodeString(0, &name_u8);
     core::stringw name = StringUtils::utf8ToWide(name_u8);
+    std::string password;
+    data.decodeString(len, &password);
+    bool is_authorised = (password==NetworkConfig::get()->getPassword());
 
     // Get the unique global ID for this player.
     m_next_player_id.lock();
@@ -456,7 +459,9 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     if(m_setup->getLocalMasterID()==0)
         m_setup->setLocalMaster(new_player_id);
 
-    int new_host_id = STKHost::get()->getPeerCount();
+    // The host id has already been incremented when the peer
+    // was added, so it is the right id now.
+    int new_host_id = STKHost::get()->getNextHostId();
 
     // Notify everybody that there is a new player
     // -------------------------------------------
@@ -478,10 +483,10 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     const std::vector<NetworkPlayerProfile*> &players = m_setup->getPlayers();
     // send a message to the one that asked to connect
     // Size is overestimated, probably one player's data will not be sent
-    NetworkString message_ack(13 + players.size() * 7);
+    NetworkString message_ack(14 + players.size() * 7);
     // connection success -- size of token -- token
     message_ack.ai8(LE_CONNECTION_ACCEPTED).ai8(1).ai8(new_player_id).ai8(4)
-               .ai32(token).addUInt8(new_host_id);
+               .ai32(token).addUInt8(new_host_id).addUInt8(is_authorised);
     // Add all players so that this user knows (this new player is only added
     // to the list of players later, so the new player's info is not included)
     for (unsigned int i = 0; i < players.size(); i++)
@@ -497,6 +502,8 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     m_setup->addPlayer(profile);
     peer->setPlayerProfile(profile);
     peer->setClientServerToken(token);
+    peer->setAuthorised(is_authorised);
+    peer->setHostId(new_host_id);
 
     Log::verbose("ServerLobbyRoomProtocol", "New player.");
 
@@ -563,7 +570,8 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     answer.ai8(LE_KART_SELECTION_UPDATE).ai8(1).ai8(player_id)
           .encodeString(kart_name);
-    sendMessage(answer);
+    // This message must be handled synchronously on the client.
+    sendSynchronousMessage(answer);
     m_setup->setPlayerKart(player_id, kart_name);
 }   // kartSelectionRequested
 
@@ -595,9 +603,7 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
     NetworkString other(5+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_MAJOR); // prefix the token with the type
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_MAJOR, other);
 }   // playerMajorVote
 
 //-----------------------------------------------------------------------------
@@ -627,9 +633,7 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
     NetworkString other(2+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_RACE_COUNT); // prefix the token with the type
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_RACE_COUNT, other);
 }   // playerRaceCountVote
 
 //-----------------------------------------------------------------------------
@@ -660,9 +664,7 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
     NetworkString other(2+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_MINOR); // prefix the token with the ype
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_MINOR, other);
 }   // playerMinorVote
 
 //-----------------------------------------------------------------------------
@@ -694,9 +696,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
     NetworkString other(2+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_TRACK); // prefix the token with the ype
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_TRACK, other);
     if(m_setup->getRaceConfig()->getNumTrackVotes()==m_setup->getPlayerCount())
         startGame();
 }   // playerTrackVote
@@ -731,9 +731,7 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
     NetworkString other(2+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_REVERSE); // prefix the token with the ype
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_REVERSE, other);
 }   // playerReversedVote
 
 //-----------------------------------------------------------------------------
@@ -765,9 +763,7 @@ void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
     NetworkString other(2+data.size());
     other.ai8(1).ai8(player_id); // add the player id
     other += data; // add the data
-    NetworkString prefix(1);
-    prefix.ai8(LE_VOTE_LAPS); // prefix the token with the ype
-    sendMessageToPeersChangingToken(prefix, other);
+    sendMessageToPeersChangingToken(LE_VOTE_LAPS, other);
 }   // playerLapsVote
 
 //-----------------------------------------------------------------------------

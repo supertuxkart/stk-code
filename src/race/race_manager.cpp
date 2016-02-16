@@ -45,8 +45,8 @@
 #include "modes/soccer_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
+#include "network/race_event_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
@@ -325,7 +325,7 @@ void RaceManager::startNew(bool from_overworld)
         m_num_laps      = m_grand_prix.getLaps();
         m_reverse_track = m_grand_prix.getReverse();
 
-        if (!NetworkWorld::getInstance<NetworkWorld>()->isRunning())
+        if (!RaceEventManager::getInstance<RaceEventManager>()->isRunning())
         {
             // We look if Player 1 has a saved version of this GP.
             m_saved_gp = SavedGrandPrix::getSavedGP(
@@ -462,8 +462,8 @@ void RaceManager::startNextRace()
     IrrlichtDevice* device = irr_driver->getDevice();
     GUIEngine::renderLoading();
     device->getVideoDriver()->endScene();
-    device->getVideoDriver()->beginScene(true, true, video::SColor(255,100,101,140));
-
+    device->getVideoDriver()->beginScene(true, true,
+                                         video::SColor(255,100,101,140));
 
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
@@ -577,7 +577,8 @@ void RaceManager::next()
     m_track_number++;
     if(m_track_number<(int)m_tracks.size())
     {
-        if(m_major_mode==MAJOR_MODE_GRAND_PRIX && !NetworkWorld::getInstance()->isRunning())
+        if( m_major_mode==MAJOR_MODE_GRAND_PRIX &&
+            !RaceEventManager::getInstance()->isRunning() )
         {
             // Saving GP state
             saveGP();
@@ -622,7 +623,8 @@ void RaceManager::saveGP()
         {
             // Delete other save files (and random GP, which should never
             // have been saved in the first place)
-            const SavedGrandPrix &sgp = UserConfigParams::m_saved_grand_prix_list[i];
+            const SavedGrandPrix &sgp =
+                                  UserConfigParams::m_saved_grand_prix_list[i];
             if (sgp.getGPID() == "random"                          ||
                 (sgp.getGPID() == m_saved_gp->getGPID() &&
                  sgp.getDifficulty() == m_saved_gp->getDifficulty())    )
@@ -700,9 +702,10 @@ void RaceManager::computeGPRanks()
         sort_data.push_back(sd);
         if(UserConfigParams::m_ftl_debug)
         {
-            Log::debug("Race Manager","[ftl] kart '%s' has position %d score %d.",
-                World::getWorld()->getKart(kart_id)->getIdent().c_str(),
-                sd->m_position, sd->m_score);
+            Log::debug("Race Manager",
+                       "[ftl] kart '%s' has position %d score %d.",
+                       World::getWorld()->getKart(kart_id)->getIdent().c_str(),
+                       sd->m_position, sd->m_score);
         }
     }
 
@@ -731,10 +734,12 @@ void RaceManager::exitRace(bool delete_world)
 {
     // Only display the grand prix result screen if all tracks
     // were finished, and not when a race is aborted.
-    if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size())
+    if ( m_major_mode==MAJOR_MODE_GRAND_PRIX &&
+         m_track_number==(int)m_tracks.size()   )
     {
         PlayerManager::getCurrentPlayer()->grandPrixFinished();
-        if(m_major_mode==MAJOR_MODE_GRAND_PRIX&& !NetworkWorld::getInstance()->isRunning())
+        if( m_major_mode==MAJOR_MODE_GRAND_PRIX &&
+            !RaceEventManager::getInstance()->isRunning() )
         {
             if(m_saved_gp != NULL)
                 m_saved_gp->remove();
@@ -747,7 +752,8 @@ void RaceManager::exitRace(bool delete_world)
         const int loserThreshold = 3;
 
         std::string winners[3];
-        std::vector<std::string> humanLosers; // because we don't care about AIs that lost
+        // because we don't care about AIs that lost
+        std::vector<std::string> humanLosers;
         for (unsigned int i=0; i < kart_status_count; ++i)
         {
             if(UserConfigParams::logMisc())
@@ -790,14 +796,16 @@ void RaceManager::exitRace(bool delete_world)
 
         if (some_human_player_won)
         {
-            race_manager->startSingleRace("gpwin", 999, race_manager->raceWasStartedFromOverworld());
+            race_manager->startSingleRace("gpwin", 999,
+                                  race_manager->raceWasStartedFromOverworld());
             GrandPrixWin* scene = GrandPrixWin::getInstance();
             scene->push();
             scene->setKarts(winners);
         }
         else
         {
-            race_manager->startSingleRace("gplose", 999, race_manager->raceWasStartedFromOverworld());
+            race_manager->startSingleRace("gplose", 999,
+                                  race_manager->raceWasStartedFromOverworld());
             GrandPrixLose* scene = GrandPrixLose::getInstance();
             scene->push();
 
@@ -851,7 +859,8 @@ void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
         m_kart_status[id].m_score += wwr->getScoreForPosition(pos);
     else
     {
-        Log::error("RaceManager", "World with scores that is not a WorldWithRank??");
+        Log::error("RaceManager",
+                   "World with scores that is not a WorldWithRank??");
     }
 
     m_kart_status[id].m_overall_time += time;
@@ -912,7 +921,9 @@ void RaceManager::startSingleRace(const std::string &track_ident,
     setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     setCoinTarget( 0 ); // Might still be set from a previous challenge
-    if (!NetworkWorld::getInstance<NetworkWorld>()->isRunning()) // if not in a network world
+
+    // if not in a network world, setup player karts
+    if (!RaceEventManager::getInstance<RaceEventManager>()->isRunning())
         race_manager->setupPlayerKartInfo(); // do this setup player kart
 
     startNew(from_overworld);

@@ -39,15 +39,16 @@ class STKPeer;
  */
 enum ProtocolType
 {
-    PROTOCOL_NONE              = 0,  //!< No protocol type assigned.
-    PROTOCOL_CONNECTION        = 1,  //!< Protocol that deals with client-server connection.
-    PROTOCOL_LOBBY_ROOM        = 2,  //!< Protocol that is used during the lobby room phase.
-    PROTOCOL_START_GAME        = 3,  //!< Protocol used when starting the game.
-    PROTOCOL_SYNCHRONIZATION   = 4,  //!<Protocol used to synchronize clocks.
-    PROTOCOL_KART_UPDATE       = 5,  //!< Protocol to update karts position, rotation etc...
-    PROTOCOL_GAME_EVENTS       = 6,  //!< Protocol to communicate the game events.
-    PROTOCOL_CONTROLLER_EVENTS = 7,  //!< Protocol to transfer controller modifications
-    PROTOCOL_SILENT            = 0xffff  //!< Used for protocols that do not subscribe to any network event.
+    PROTOCOL_NONE              = 0x00,  //!< No protocol type assigned.
+    PROTOCOL_CONNECTION        = 0x01,  //!< Protocol that deals with client-server connection.
+    PROTOCOL_LOBBY_ROOM        = 0x02,  //!< Protocol that is used during the lobby room phase.
+    PROTOCOL_START_GAME        = 0x03,  //!< Protocol used when starting the game.
+    PROTOCOL_SYNCHRONIZATION   = 0x04,  //!<Protocol used to synchronize clocks.
+    PROTOCOL_KART_UPDATE       = 0x05,  //!< Protocol to update karts position, rotation etc...
+    PROTOCOL_GAME_EVENTS       = 0x06,  //!< Protocol to communicate the game events.
+    PROTOCOL_CONTROLLER_EVENTS = 0x07,  //!< Protocol to transfer controller modifications
+    PROTOCOL_SYNCHRONOUS       = 0x80,  //!< Flag, indicates synchronous delivery
+    PROTOCOL_SILENT            = 0xff   //!< Used for protocols that do not subscribe to any network event.
 };   // ProtocolType
 
 // ----------------------------------------------------------------------------
@@ -122,12 +123,16 @@ public:
     /// functions to check incoming data easily
     bool checkDataSizeAndToken(Event* event, int minimum_size);
     bool isByteCorrect(Event* event, int byte_nb, int value);
-    void sendMessageToPeersChangingToken(NetworkString prefix,
-                                         NetworkString message);
+    void sendMessageToPeersChangingToken(uint8_t type,
+                                         const NetworkString &message);
     void sendMessage(const NetworkString& message,
                      bool reliable = true);
     void sendMessage(STKPeer* peer, const NetworkString& message,
                      bool reliable = true);
+    void sendSynchronousMessage(const NetworkString& message, 
+                                bool reliable=true);
+    void sendSynchronousMessage(STKPeer* peer, const NetworkString& message,
+                                bool reliable = true);
     void requestStart();
     void requestPause();
     void requestUnpause();

@@ -31,20 +31,22 @@ class KartUpdateProtocol;
 class AbstractKart;
 class Item;
 
-/*! \brief Manages the world updates during an online game
- *  This function's update is to be called instead of the normal World update
+/** \brief This is the interface between the main game and the online
+ *  implementation. The main game informs this object about important
+ *  events (e.g. item collected), which need to be forwarded from the
+ *  server to all clients. This object then triggers the right message
+ *  from the various running protocols.
 */
-class NetworkWorld : public AbstractSingleton<NetworkWorld>
+class RaceEventManager : public AbstractSingleton<RaceEventManager>
 {
 private:
     bool m_running;
     float m_race_time;
-    std::string m_self_kart;
 
-    friend class AbstractSingleton<NetworkWorld>;
+    friend class AbstractSingleton<RaceEventManager>;
 
-             NetworkWorld();
-    virtual ~NetworkWorld();
+             RaceEventManager();
+    virtual ~RaceEventManager();
 
 public:
     void update(float dt);
@@ -56,11 +58,7 @@ public:
     void collectedItem(Item *item, AbstractKart *kart);
     void controllerAction(Controller* controller, PlayerAction action, 
                           int value);
-    // ------------------------------------------------------------------------
-    /** Sets the name of the kart of this player. */
-    void setSelfKart(const std::string &name) { m_self_kart = name; }
-    // ------------------------------------------------------------------------
-    const std::string& getSelfKart() const { return m_self_kart; }
+    void kartFinishedRace(AbstractKart *kart, float time);
     // ------------------------------------------------------------------------
     /** Returns if this instance is in running state or not. */
     bool isRunning() { return m_running; }

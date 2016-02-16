@@ -328,8 +328,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
-        controller = new NetworkPlayerController(new_kart,
-                        StateManager::get()->getActivePlayer(local_player_id));
+        controller = new NetworkPlayerController(new_kart);
         m_num_players++;
         break;
     case RaceManager::KT_AI:
@@ -495,13 +494,10 @@ void World::terminateRace()
     // Update highscores, and retrieve the best highscore if relevant
     // to show it in the GUI
     int best_highscore_rank = -1;
-    int best_finish_time = -1;
     std::string highscore_who = "";
-    StateManager::ActivePlayer* best_player = NULL;
     if (!this->isNetworkWorld())
     {
-        updateHighscores(&best_highscore_rank, &best_finish_time, &highscore_who,
-                     &best_player);
+        updateHighscores(&best_highscore_rank);
     }
 
     // Check achievements
@@ -527,8 +523,7 @@ void World::terminateRace()
         for(unsigned int i = 0; i < kart_amount; i++)
         {
             // Retrieve the current player
-            StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
-            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
+            if (m_karts[i]->getController()->canGetAchievements())
             {
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == winner_position && kart_amount > opponents )
@@ -552,8 +547,7 @@ void World::terminateRace()
         for(unsigned int i = 0; i < kart_amount; i++)
         {
             // Retrieve the current player
-            StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
-            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
+            if (m_karts[i]->getController()->canGetAchievements())
             {
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == 1 )
@@ -586,8 +580,7 @@ void World::terminateRace()
 
     if (best_highscore_rank > 0)
     {
-        results->setHighscore(highscore_who, best_player, best_highscore_rank,
-                              best_finish_time);
+        results->setHighscore(best_highscore_rank);
     }
     else
     {
@@ -1063,12 +1056,9 @@ Highscores* World::getHighscores() const
  *  score, if so it notifies the HighscoreManager so the new score is added
  *  and saved.
  */
-void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
-                             std::string* highscore_who,
-                             StateManager::ActivePlayer** best_player)
+void World::updateHighscores(int* best_highscore_rank)
 {
     *best_highscore_rank = -1;
-    *best_player = NULL;
 
     if(!m_use_highscores) return;
 
@@ -1120,14 +1110,11 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
 
         Highscores* highscores = getHighscores();
 
-        LocalPlayerController *controller = 
-                                  (LocalPlayerController*)(k->getController());
-
         int highscore_rank = 0;
-        if (controller->getPlayer()->getProfile() != NULL) // if we have the player profile here
-            highscore_rank = highscores->addData(k->getIdent(),
-                              controller->getPlayer()->getProfile()->getName(),
-                                                 k->getFinishTime());
+        // The player is a local player, so there is a name:
+        highscore_rank = highscores->addData(k->getIdent(),
+                                             k->getController()->getName(),
+                                             k->getFinishTime()    );
 
         if (highscore_rank > 0)
         {
@@ -1135,9 +1122,6 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
                 highscore_rank < *best_highscore_rank)
             {
                 *best_highscore_rank = highscore_rank;
-                *best_finish_time = (int)(k->getFinishTime());
-                *best_player = controller->getPlayer();
-                *highscore_who = k->getIdent();
             }
 
             highscore_manager->saveHighscores();

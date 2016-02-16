@@ -58,7 +58,7 @@
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
+#include "network/race_event_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
 #include "physics/physics.hpp"
@@ -824,14 +824,34 @@ float Kart::getMaxSteerAngle(float speed) const
  *         world->getTime()), or the estimated time in case that all
  *         player kart have finished the race and all AI karts get
  *         an estimated finish time set.
+ *  \param from_server In a network game, only the server can notify
+ *         about a kart finishing a race. This parameter is to distinguish
+ *         between a local detection (which is ignored on clients in a
+ *         network game), and a server notification.
  */
-void Kart::finishedRace(float time)
+void Kart::finishedRace(float time, bool from_server)
 {
     // m_finished_race can be true if e.g. an AI kart was set to finish
     // because the race was over (i.e. estimating the finish time). If
     // this kart then crosses the finish line (with the end controller)
     // it would trigger a race end again.
     if(m_finished_race) return;
+
+    if(!from_server)
+    {
+        if(NetworkConfig::get()->isServer())
+        {
+            RaceEventManager::getInstance()->kartFinishedRace(this, time);
+        }   // isServer
+
+        // Ignore local detection of a kart finishing a race in a 
+        // network game.
+        else if(NetworkConfig::get()->isClient())
+        {
+            return;
+        }
+    }   // !from_server
+
     m_finished_race = true;
     m_finish_time   = time;
     m_controller->finishedRace(time);
@@ -871,8 +891,7 @@ void Kart::finishedRace(float time)
         setRaceResult();
         if(!isGhostKart())
         {
-            setController(new EndController(this, m_controller->getPlayer(),
-                                            m_controller));
+            setController(new EndController(this, m_controller));
         }
         // Skip animation if this kart is eliminated
         if (m_eliminated || isGhostKart()) return;
@@ -1397,7 +1416,7 @@ void Kart::update(float dt)
     // Check if any item was hit.
     // check it if we're not in a network world, or if we're on the server
     // (when network mode is on)
-    if (!NetworkWorld::getInstance()->isRunning() ||
+    if (!RaceEventManager::getInstance()->isRunning() ||
         NetworkConfig::get()->isServer())
         ItemManager::get()->checkItemHit(this);
 

@@ -125,8 +125,7 @@ private:
     virtual void findClosestKart(bool use_difficulty) = 0;
     virtual void findTarget() = 0;
 public:
-                 ArenaAI(AbstractKart *kart,
-                         StateManager::ActivePlayer *player = NULL);
+                 ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};
     virtual void update      (float delta);
     virtual void reset       ();

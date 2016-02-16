@@ -60,6 +60,7 @@ public:
          NetworkPlayerProfile(int global_player_id,
                               const irr::core::stringw &name);
         ~NetworkPlayerProfile();
+    bool isLocalPlayer() const;
 
     // ------------------------------------------------------------------------
     /** Sets the global player id of this player. */

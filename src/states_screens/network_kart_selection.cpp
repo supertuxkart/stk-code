@@ -68,8 +68,6 @@ void NetworkKartSelectionScreen::init()
     IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
     back_button->setImage("gui/main_quit.png");
 
-    m_multiplayer = false;
-
     // add a widget for each player except self (already exists):
     GameSetup* setup = STKHost::get()->getGameSetup();
     if (!setup)
@@ -95,6 +93,7 @@ void NetworkKartSelectionScreen::init()
     // FIXME: atm only adds the local master, split screen supports
     // needs to be added
     int player_id = game_setup->getLocalMasterID();
+    m_id_mapping.clear();
     m_id_mapping.insert(m_id_mapping.begin(), player_id);
 
     const int amount = m_kart_widgets.size();
@@ -180,6 +179,8 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
         clrp->voteMinor(race_manager->getMinorMode());
         clrp->voteReversed(race_manager->getReverseTrack());
         clrp->voteRaceCount(1);
+        // FIXME: for debugging set only 0 laps
+        clrp->voteLaps(0);
     }
     TracksScreen::getInstance()->push();
 }   // playerSelected

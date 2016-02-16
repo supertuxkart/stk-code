@@ -47,8 +47,18 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 
+/** This is the lobby screen that is shown on all clients, but not on the
+ *  server. It shows currently connected clients, and allows the 'master'
+ *  client (i.e. the stk instance that created the server) to control the
+ *  server. This especially means that it can initialise the actual start
+ *  of the racing.
+ *  This class is responsible for creating the ActivePlayers data structure
+ *  for all local players (the ActivePlayer maps device to player, i.e.
+ *  controls which device is used by which player). Note that a server
+ *  does not create an instance of this class and will create the ActivePlayer
+ *  data structure in the StartGameProtocol.
+ */
 // ----------------------------------------------------------------------------
-
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
     m_server = NULL;
@@ -88,9 +98,11 @@ void NetworkingLobby::beforeAddingWidget()
 
 } // beforeAddingWidget
 
-
-
 // ----------------------------------------------------------------------------
+/** This function is a callback from the parent class, and is called each time
+ *  this screen is shown to initialise the screen. This class is responsible
+ *  for creating the active players and binding them to the right device.
+ */
 void NetworkingLobby::init()
 {
     Screen::init();
@@ -98,9 +110,13 @@ void NetworkingLobby::init()
     m_server = ServersManager::get()->getJoinedServer();
     if(m_server)
         m_server_name_widget->setText(m_server->getName(), false);
-
     m_start_button->setVisible(STKHost::get()->isAuthorisedToControl());
 
+    // For now create the active player and bind it to the right
+    // input device.
+    InputDevice *device = input_manager->getDeviceManager()->getLatestUsedDevice();
+    PlayerProfile* profile = PlayerManager::getCurrentPlayer();
+    StateManager::get()->createActivePlayer(profile, device);
 }   // init
 
 // ----------------------------------------------------------------------------

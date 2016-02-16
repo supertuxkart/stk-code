@@ -18,6 +18,7 @@
 
 #include "network/network_player_profile.hpp"
 
+#include "network/stk_host.hpp"
 #include "online/online_player_profile.hpp"
 
 /** Constructor. 
@@ -39,3 +40,12 @@ NetworkPlayerProfile::NetworkPlayerProfile(int global_player_id,
 NetworkPlayerProfile::~NetworkPlayerProfile()
 {
 }   // ~NetworkPlayerProfile
+// ----------------------------------------------------------------------------
+/** Returns true if this player is local, i.e. running on this computer. This
+ *  is done by comparing the host id of this player with the host id of this
+ *  computer.
+ */
+bool NetworkPlayerProfile::isLocalPlayer() const
+{
+    return m_host_id == STKHost::get()->getMyHostId();
+}   // isLocalPlayer

@@ -41,8 +41,7 @@ private:
     std::vector<float> m_all_times;
 
 public:
-             GhostController(AbstractKart *kart,
-                             StateManager::ActivePlayer *player=NULL);
+             GhostController(AbstractKart *kart);
     virtual ~GhostController() {};
     virtual void reset();
     virtual void update (float dt);

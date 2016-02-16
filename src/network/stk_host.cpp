@@ -181,7 +181,9 @@ void STKHost::create()
  *  When the authorised clients starts the kart selection, the SLR
  *  informs all clients to start the kart selection (SLR::startSelection).
  *  This triggers the creation of the kart selection screen in 
- *  CLR::startSelection / CLR::update. The kart selection in a client calls
+ *  CLR::startSelection / CLR::update for all clients. The clients create
+ *  the ActivePlayer object (which stores which device is used by which
+ *  plauyer).  The kart selection in a client calls
  *  (NetworkKartSelection::playerConfirm) which calls CLR::requestKartSelection.
  *  This sends a message to SLR::kartSelectionRequested, which verifies the
  *  selected kart and sends this information to all clients (including the
@@ -208,6 +210,14 @@ void STKHost::create()
  *  StartGameProtocol and the clients will be informed to start the game.
  *  In a client the StartGame protocol will be started in CLR::startGame. 
  *  
+ *  The StartGame protocol will create the ActivePlayers for all non-local
+ *  players: on a server, all karts are non-local. On a client, the
+ *  ActivePlayer objects for each local players have been created (to store
+ *  the device used by each player when joining), so they are used to create
+ *  the LocalPlayerController for each kart. Each remote player gets a
+ *  NULL ActivePlayer (the ActivePlayer is only used for assigning the input
+ *  device to each kart, achievements and highscores, so it's not needed for
+ *  remote players).
  */
 
 // ============================================================================
@@ -215,6 +225,7 @@ void STKHost::create()
  */
 STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 {
+    m_next_unique_host_id = -1;
     // Will be overwritten with the correct value once a connection with the
     // server is made.
     m_host_id = 0;
@@ -239,6 +250,9 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 STKHost::STKHost(const irr::core::stringw &server_name)
 {
     init();
+    // The host id will be increased whenever a new peer is added, so the
+    // first client will have host id 1 (host id 0 is the server).
+    m_next_unique_host_id = 0;
     m_host_id = 0;   // indicates a server host.
 
     ENetAddress addr;
@@ -478,35 +492,21 @@ int STKHost::mustStopListening()
     return 1;
 }   // mustStopListening
 
-// --------------------------------------------------------------------
-/** Returns true if this instance is allowed to control the server.
+// ----------------------------------------------------------------------------
+/** Returns true if this client instance is allowed to control the server.
+ *  A client can authorise itself by providing the server's password. It is
+ *  then allowed to control the server (e.g. start kart selection).
+ *  The information if this client was authorised by the server is actually
+ *  stored in the peer (which is the server peer on a client).
  */
 bool STKHost::isAuthorisedToControl() const 
 {
+    assert(NetworkConfig::get()->isClient());
     // If we are not properly connected (i.e. only enet connection, but not
     // stk logic), no peer is authorised.
     if(m_peers.size()==0)
         return false;
-    Server *server = ServersManager::get()->getJoinedServer();
-    return NetworkConfig::get()->getMyAddress().getIP() == 
-            server->getAddress().getIP();
-
-}   // isAuthorisedToControl
-
-// ----------------------------------------------------------------------------
-/** Server-side check if the client sending a command is really authorised 
- *  to do so.
- *  \param peer Peer sending the command.
- */
-bool STKHost::isAuthorisedToControl(const STKPeer *peer) const 
-{
-    // If we are not properly connected (i.e. only enet connection, but not
-    // stk logic), no peer is authorised.
-    if(m_peers.size()==0)
-        return false;
-    // FIXME peer has ip 0
-    return true;
-    return peer->getAddress()==NetworkConfig::get()->getMyAddress().getIP();
+    return m_peers[0]->isAuthorised();
 }   // isAuthorisedToControl
 
 // ----------------------------------------------------------------------------
@@ -661,6 +661,7 @@ STKPeer* STKHost::getPeer(ENetPeer *enet_peer)
                peer, enet_peer);
 
     m_peers.push_back(peer);
+    m_next_unique_host_id ++;
     return peer;
 }   // getPeer
 // ----------------------------------------------------------------------------

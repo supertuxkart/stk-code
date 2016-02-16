@@ -29,9 +29,8 @@
 #include "tracks/battle_graph.hpp"
 #include "utils/log.hpp"
 
-ArenaAI::ArenaAI(AbstractKart *kart,
-                 StateManager::ActivePlayer *player)
-        : AIBaseController(kart, player)
+ArenaAI::ArenaAI(AbstractKart *kart)
+       : AIBaseController(kart)
 {
     m_debug_sphere = NULL;
 }   // ArenaAI

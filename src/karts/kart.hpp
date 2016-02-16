@@ -272,8 +272,8 @@ public:
     virtual void   crashed          (const Material *m, const Vec3 &normal);
     virtual float  getHoT           () const;
     virtual void   update           (float dt);
-    virtual void   finishedRace(float time);
-    virtual void   setPosition(int p);
+    virtual void   finishedRace     (float time, bool from_server=false);
+    virtual void   setPosition      (int p);
     virtual void   beep             ();
     virtual void   showZipperFire   ();
     virtual float  getCurrentMaxSpeed() const;

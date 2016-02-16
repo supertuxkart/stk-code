@@ -485,9 +485,6 @@ void RaceResultGUI::determineTableLayout()
         else
             ri->m_kart_name   = translations->fribidize(kart->getName());
 
-        ri->m_player          = ri->m_is_player_kart
-                              ? kart->getController()->getPlayer() : NULL;
-
         video::ITexture *icon =
             kart->getKartProperties()->getIconMaterial()->getTexture();
         ri->m_kart_icon       = icon;
@@ -861,8 +858,6 @@ void RaceResultGUI::determineGPLayout()
             ri->m_kart_name  = translations->fribidize(kart->getName());
 
         ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
-        ri->m_player         = ri->m_is_player_kart
-                             ? kart->getController()->getPlayer() : NULL;
 
         // In FTL karts do have a time, which is shown even when the kart
         // is eliminated
@@ -1171,22 +1166,14 @@ void RaceResultGUI::displaySoccerResults()
 
 void RaceResultGUI::clearHighscores()
 {
-    m_highscore_who = "";
-    m_highscore_player = NULL;
     m_highscore_rank = 0;
-    m_highscore_time = -1;
 }   // clearHighscores
 
 //-----------------------------------------------------------------------------
 
-void RaceResultGUI::setHighscore(const std::string &who,
-                                 StateManager::ActivePlayer* player, int rank,
-                                 int time)
+void RaceResultGUI::setHighscore(int rank)
 {
-    m_highscore_who = who;
-    m_highscore_player = player;
     m_highscore_rank = rank;
-    m_highscore_time = time;
 }   // setHighscore
 
 // ----------------------------------------------------------------------------

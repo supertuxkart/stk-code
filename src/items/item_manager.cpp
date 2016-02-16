@@ -30,7 +30,7 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
+#include "network/race_event_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
@@ -285,8 +285,10 @@ Item* ItemManager::newItem(const Vec3& xyz, float distance,
 void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
 {
     assert(item);
-    if((item->getType() == Item::ITEM_BUBBLEGUM || item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
-    {// shielded karts can simply drive over bubble gums without any effect.
+    if( (item->getType() == Item::ITEM_BUBBLEGUM || 
+         item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
+    {
+        // shielded karts can simply drive over bubble gums without any effect.
         return;
     }
     item->collected(kart);
@@ -318,7 +320,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         if((*i)->hitKart(kart->getXYZ(), kart))
         {
             // if we're not playing online, pick the item.
-            if (!NetworkWorld::getInstance()->isRunning())
+            if (!RaceEventManager::getInstance()->isRunning())
                 collectedItem(*i, kart);
             else if (NetworkConfig::get()->isServer())
             {
@@ -326,7 +328,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
                 // A client does the collection upon receiving the 
                 // event from the server!
                 collectedItem(*i, kart);
-                NetworkWorld::getInstance()->collectedItem(*i, kart);
+                RaceEventManager::getInstance()->collectedItem(*i, kart);
             }
         }   // if hit
     }   // for m_all_items

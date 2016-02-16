@@ -33,9 +33,14 @@ using namespace irr;
 using namespace std;
 #endif
 
-BattleAI::BattleAI(AbstractKart *kart,
-                   StateManager::ActivePlayer *player)
-         : ArenaAI(kart, player)
+#if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
+#define isnan _isnan
+#else
+#include <math.h>
+#endif
+
+BattleAI::BattleAI(AbstractKart *kart)
+         : ArenaAI(kart)
 {
 
     reset();

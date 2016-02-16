@@ -82,9 +82,8 @@ in all AIs, e.g.:
    in [-1,1].
 
 */
-AIBaseLapController::AIBaseLapController(AbstractKart *kart,
-                                   StateManager::ActivePlayer *player)
-                   : AIBaseController(kart, player)
+AIBaseLapController::AIBaseLapController(AbstractKart *kart)
+                   : AIBaseController(kart)
 {
 
     if (race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
