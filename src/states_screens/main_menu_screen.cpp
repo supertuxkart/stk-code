@@ -44,7 +44,7 @@
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/online_profile_achievements.hpp"
-#include "states_screens/online_screen.hpp"
+#include "states_screens/online_profile_servers.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
@@ -490,15 +490,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Connect to the Internet\"."));
             return;
         }
+        
         if (PlayerManager::getCurrentOnlineId())
         {
-            // For 0.8.2 disable the server menu, instead go to online profile
-            #ifdef ENABLE_NETWORK_MULTIPLAYER_SCREEN
-            OnlineScreen::getInstance()->push();
-            #else
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-            TabOnlineProfileAchievements::getInstance()->push();
-            #endif
+            OnlineProfileServers::getInstance()->push();
         }
         else
         {

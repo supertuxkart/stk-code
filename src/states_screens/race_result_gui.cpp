@@ -48,7 +48,7 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/network_kart_selection.hpp"
-#include "states_screens/online_screen.hpp"
+#include "states_screens/online_profile_servers.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/server_selection.hpp"
 #include "tracks/track.hpp"
@@ -339,7 +339,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             race_manager->exitRace();
             race_manager->setAIKartOverride("");
             Screen* newStack[] = {MainMenuScreen::getInstance(),
-                                  OnlineScreen::getInstance(),
+                                  OnlineProfileServers::getInstance(),
                                   ServerSelection::getInstance(),
                                   NetworkingLobby::getInstance(),
                                   NULL};
