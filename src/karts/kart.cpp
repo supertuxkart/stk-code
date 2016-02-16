@@ -837,7 +837,7 @@ void Kart::finishedRace(float time, bool from_server)
     // it would trigger a race end again.
     if(m_finished_race) return;
 
-    if(!from_server)
+/*    if(!from_server)
     {
         if(NetworkConfig::get()->isServer())
         {
@@ -851,7 +851,7 @@ void Kart::finishedRace(float time, bool from_server)
             return;
         }
     }   // !from_server
-
+*/
     m_finished_race = true;
     m_finish_time   = time;
     m_controller->finishedRace(time);
