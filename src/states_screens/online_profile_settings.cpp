@@ -58,6 +58,7 @@ void OnlineProfileSettings::init()
 {
     OnlineProfileBase::init();
     m_profile_tabs->select( m_settings_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
+    m_settings_tab->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // -----------------------------------------------------------------------------

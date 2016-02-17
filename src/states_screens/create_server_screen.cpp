@@ -26,7 +26,6 @@
 #include "network/network_config.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
