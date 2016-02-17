@@ -225,17 +225,17 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
     {
         fgets(s, 1023, fd);
         float x, y, z, rx, ry, rz, rw, time, speed, steer, w1, w2, w3, w4;
-        int nitro, zipper;
+        int nitro, zipper, jumping;
 
         // Check for EV_TRANSFORM event:
         // -----------------------------
-        if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f  %d  %d\n",
+        if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f  %d %d %d\n",
             &time,
             &x, &y, &z,
             &rx, &ry, &rz, &rw,
             &speed, &steer, &w1, &w2, &w3, &w4,
-            &nitro, &zipper
-            )==16)
+            &nitro, &zipper, &jumping
+            )==17)
         {
             btQuaternion q(rx, ry, rz, rw);
             btVector3 xyz(x, y, z);
@@ -249,6 +249,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
             pi.m_suspension_length[3] = w4;
             kre.m_on_nitro = (bool)nitro;
             kre.m_on_zipper = (bool)zipper;
+            kre.m_jumping = (bool)jumping;
             m_ghost_karts[kart_num].addReplayEvent(time,
                 btTransform(q, xyz), pi, kre);
         }

@@ -169,6 +169,7 @@ void ReplayRecorder::update(float dt)
         }
         r->m_on_nitro = nitro;
         r->m_on_zipper = zipper;
+        r->m_jumping = kart->isJumping();
     }   // for i
 
     if (world->getPhase() == World::RESULT_DISPLAY_PHASE && !m_complete_replay)
@@ -255,7 +256,7 @@ void ReplayRecorder::save()
             const TransformEvent *p  = &(m_transform_events[k][i]);
             const PhysicInfo *q      = &(m_physic_info[k][i]);
             const KartReplayEvent *r = &(m_kart_replay_event[k][i]);
-            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f  %d  %d\n",
+            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f  %d %d %d\n",
                     p->m_time,
                     p->m_transform.getOrigin().getX(),
                     p->m_transform.getOrigin().getY(),
@@ -271,7 +272,8 @@ void ReplayRecorder::save()
                     q->m_suspension_length[2],
                     q->m_suspension_length[3],
                     (int)r->m_on_nitro,
-                    (int)r->m_on_zipper
+                    (int)r->m_on_zipper,
+                    (int)r->m_jumping
                 );
         }   // for i
     }

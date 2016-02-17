@@ -72,6 +72,9 @@ protected:
      *  new lap is triggered. */
     Vec3 m_xyz_front;
 
+    /** Is time flying activated */
+    bool m_is_jumping;
+
 private:
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed *m_max_speed;
@@ -169,9 +172,6 @@ private:
 
     // Graphical effects
     // -----------------
-
-    /** Is time flying activated */
-    bool             m_is_jumping;
 
     /** The shadow of a kart. */
     Shadow          *m_shadow;
@@ -451,6 +451,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart is a ghost (replay) kart. */
     virtual bool isGhostKart() const { return false;  }
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is jumping. */
+    virtual bool isJumping() const { return m_is_jumping; };
 
 };   // Kart
 

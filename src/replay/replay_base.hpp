@@ -57,13 +57,14 @@ protected:
     };   // PhysicInfo
 
     // ------------------------------------------------------------------------
-    /** Records all other events - atm nitro and zipper handling. */
+    /** Records all other events - atm nitro, zipper and jumping handling. */
     struct KartReplayEvent
     {
-        /** True if the kart recorded is using nitro/zipper.
-          * If true, a suitable GFX will be replayed. */
+        /** True if the kart recorded is using nitro/zipper or jumping.
+          * If true, a suitable GFX or animation will be replayed. */
         bool        m_on_nitro;
         bool        m_on_zipper;
+        bool        m_jumping;
     };   // KartReplayEvent
 
     // ------------------------------------------------------------------------
@@ -75,7 +76,7 @@ protected:
     /** Returns the version number of the replay file. This is used to check
      *  that a loaded replay file can still be understood by this
      *  executable. */
-    unsigned int getReplayVersion() const { return 1; }
+    unsigned int getReplayVersion() const { return 2; }
 
 public:
              ReplayBase();

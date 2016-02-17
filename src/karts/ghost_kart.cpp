@@ -114,10 +114,22 @@ void GhostKart::update(float dt)
     Moveable::updateGraphics(dt, center_shift, btQuaternion(0, 0, 0, 1));
     getKartModel()->update(dt, dt*(m_all_physic_info[idx].m_speed),
         m_all_physic_info[idx].m_steer, m_all_physic_info[idx].m_speed, idx);
+    getKartGFX()->update(dt);
 
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
-    getKartGFX()->update(dt);
+
+    if (m_all_replay_events[idx].m_jumping && !m_is_jumping)
+    {
+        m_is_jumping = true;
+        getKartModel()->setAnimation(KartModel::AF_JUMP_START);
+    }
+    else if (!m_all_replay_events[idx].m_jumping && m_is_jumping)
+    {
+        m_is_jumping = false;
+        getKartModel()->setAnimation(KartModel::AF_DEFAULT);
+    }
+
 }   // update
 
 // ----------------------------------------------------------------------------

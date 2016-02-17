@@ -457,6 +457,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart is a ghost (replay) kart. */
     virtual bool isGhostKart() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is jumping. */
+    virtual bool isJumping() const = 0;
 
 };   // AbstractKart
 
