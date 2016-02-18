@@ -1,6 +1,6 @@
 /*
   AngelCode Scripting Library
-  Copyright (c) 2003-2009 Andreas Jonsson
+  Copyright (c) 2003-2015 Andreas Jonsson
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any
@@ -34,6 +34,8 @@
 
 // Adapted to GNUC by darktemplar216 in September 2009
 // Small fixed to work under XCode GCC by Gilad Novik in October 2009
+
+#if !defined(AS_MAX_PORTABILITY)
 
 #if defined(__arm__) || defined(__ARM__)
 
@@ -235,3 +237,6 @@ nomoreargsarmFuncR0R1:
     ldmia   sp!, {r4-r8, pc}
 
 #endif
+
+#endif /* !AS_MAX_PORTABILITY */
+

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -486,21 +486,16 @@ int asCGarbageCollector::ReportAndReleaseUndestroyedObjects()
 		engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, msg.AddressOf());
 
 		// Add additional info for builtin types
-		if( gcObj.type->name == "_builtin_function_" )
+		if( gcObj.type->name == "$func" )
 		{
 			// Unfortunately we can't show the function declaration here, because the engine may have released the parameter list already so the declaration would only be misleading
 			// We need to show the function type too as for example delegates do not have a name
 			msg.Format(TXT_PREV_FUNC_IS_NAMED_s_TYPE_IS_d, reinterpret_cast<asCScriptFunction*>(gcObj.obj)->GetName(), reinterpret_cast<asCScriptFunction*>(gcObj.obj)->GetFuncType());
 			engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, msg.AddressOf());
 		}
-		else if( gcObj.type->name == "_builtin_objecttype_" )
+		else if( gcObj.type->name == "$obj" )
 		{
 			msg.Format(TXT_PREV_TYPE_IS_NAMED_s, reinterpret_cast<asCObjectType*>(gcObj.obj)->GetName());
-			engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, msg.AddressOf());
-		}
-		else if( gcObj.type->name == "_builtin_globalprop_" )
-		{
-			msg.Format(TXT_PREV_TYPE_IS_NAMED_s, reinterpret_cast<asCGlobalProperty*>(gcObj.obj)->name.AddressOf());
 			engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, msg.AddressOf());
 		}
 
