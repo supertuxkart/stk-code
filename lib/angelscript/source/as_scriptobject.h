@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -153,9 +153,6 @@ void ScriptObject_Construct(asCObjectType *objType, asCScriptObject *self);
 asCScriptObject &ScriptObject_Assignment(asCScriptObject *other, asCScriptObject *self);
 
 void ScriptObject_ConstructUnitialized(asCObjectType *objType, asCScriptObject *self);
-
-void ScriptObject_Construct_Generic(asIScriptGeneric *gen);
-void ScriptObject_Assignment_Generic(asIScriptGeneric *gen);
 
 void RegisterScriptObject(asCScriptEngine *engine);
 

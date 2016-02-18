@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -74,11 +74,19 @@ typedef double float64_t;
 #include <direct.h>
 #endif
 
+#endif // AS_PSVITA
+#endif // _WIN32_WCE
+#endif // AS_WII
+
+#endif // !defined(AS_DEBUG)
+
+
 
 #if defined(_MSC_VER) && defined(AS_PROFILE)
 // Currently only do profiling with MSVC++
 
 #include <mmsystem.h>
+#include <direct.h>
 #include "as_string.h"
 #include "as_map.h"
 #include "as_string_util.h"
@@ -144,7 +152,7 @@ public:
 		return time;
 	}
 
-	void End(const char *name, double beginTime)
+	void End(const char * /*name*/, double beginTime)
 	{
 		double time = GetTime();
 
@@ -247,7 +255,7 @@ protected:
 
 END_AS_NAMESPACE
 
-#else // _MSC_VER && AS_PROFILE
+#else // !(_MSC_VER && AS_PROFILE)
 
 // Define it so nothing is done
 #define TimeIt(x) 
@@ -257,20 +265,6 @@ END_AS_NAMESPACE
 
 
 
-
-
-
-#endif // AS_PSVITA
-#endif // _WIN32_WCE
-#endif // AS_WII
-
-#else // !defined(AS_DEBUG)
-
-// Define it so nothing is done
-#define TimeIt(x) 
-
-#endif // !defined(AS_DEBUG)
-
-#endif
+#endif // defined(AS_DEBUG_H)
 
 

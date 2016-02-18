@@ -1015,6 +1015,21 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 				ChangeFirstDeleteNext(curr, asBC_PSF);
 				instr = GoForward(curr);
 			}
+			// VAR a, GETOBJREF 0 -> PshVPtr a
+			else if( curr->next && curr->next->op == asBC_GETOBJREF && curr->next->wArg[0] == 0 )
+			{
+				ChangeFirstDeleteNext(curr, asBC_PshVPtr);
+				instr = GoForward(curr);
+			}
+			// VAR, PSF, GETREF {PTR_SIZE} -> PSF, PSF
+			if( curr->next && curr->next->op == asBC_PSF &&
+				curr->next->next && curr->next->next->op == asBC_GETREF &&
+				curr->next->next->wArg[0] == AS_PTR_SIZE )
+			{
+				curr->op = asBC_PSF;
+				DeleteInstruction(curr->next->next);
+				instr = GoForward(curr);
+			}
 		}
 	}
 
@@ -2220,6 +2235,13 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 				}
 				break;
 
+			case asBC_FuncPtr:
+				{
+					asCScriptFunction *func = *(asCScriptFunction**)ARG_DW(instr->arg);
+					fprintf(file, "   %-8s 0x%x          (func:%s)\n", asBCInfo[instr->op].name, (asUINT)*ARG_DW(instr->arg), func->GetDeclaration());
+				}
+				break;
+
 			case asBC_PshC4:
 			case asBC_Cast:
 				fprintf(file, "   %-8s 0x%x          (i:%d, f:%g)\n", asBCInfo[instr->op].name, (asUINT)*ARG_DW(instr->arg), *((int*) ARG_DW(instr->arg)), *((float*) ARG_DW(instr->arg)));
@@ -2233,6 +2255,7 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 			case asBC_CALLSYS:
 			case asBC_CALLBND:
 			case asBC_CALLINTF:
+			case asBC_Thiscall1:
 				{
 					int funcID = *(int*)ARG_DW(instr->arg);
 					asCString decl = engine->GetFunctionDeclaration(funcID);
@@ -2268,8 +2291,15 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 			{
 			case asBC_OBJTYPE:
 				{
-					asCObjectType *ot = *(asCObjectType**)ARG_DW(instr->arg);
+					asCObjectType *ot = *(asCObjectType**)ARG_QW(instr->arg);
 					fprintf(file, "   %-8s 0x%x          (type:%s)\n", asBCInfo[instr->op].name, (asUINT)*ARG_QW(instr->arg), ot->GetName());
+				}
+				break;
+
+			case asBC_FuncPtr:
+				{
+					asCScriptFunction *func = *(asCScriptFunction**)ARG_QW(instr->arg);
+					fprintf(file, "   %-8s 0x%x          (func:%s)\n", asBCInfo[instr->op].name, (asUINT)*ARG_QW(instr->arg), func->GetDeclaration());
 				}
 				break;
 	
@@ -2288,15 +2318,27 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 
 		case asBCTYPE_wW_QW_ARG:
 		case asBCTYPE_rW_QW_ARG:
+			switch( instr->op )
+			{
+			case asBC_RefCpyV:
+			case asBC_FREE:
+				{
+					asCObjectType *ot = *(asCObjectType**)ARG_QW(instr->arg);
+					fprintf(file, "   %-8s v%d, 0x%x          (type:%s)\n", asBCInfo[instr->op].name, instr->wArg[0], (asUINT)*ARG_QW(instr->arg), ot->GetName());
+				}
+				break;
+
+			default:
 #ifdef __GNUC__
 #ifdef _LP64
-			fprintf(file, "   %-8s v%d, 0x%lx           (i:%ld, f:%g)\n", asBCInfo[instr->op].name, instr->wArg[0], *ARG_QW(instr->arg), *((asINT64*) ARG_QW(instr->arg)), *((double*) ARG_QW(instr->arg)));
+				fprintf(file, "   %-8s v%d, 0x%lx           (i:%ld, f:%g)\n", asBCInfo[instr->op].name, instr->wArg[0], *ARG_QW(instr->arg), *((asINT64*) ARG_QW(instr->arg)), *((double*) ARG_QW(instr->arg)));
 #else
-			fprintf(file, "   %-8s v%d, 0x%llx           (i:%lld, f:%g)\n", asBCInfo[instr->op].name, instr->wArg[0], *ARG_QW(instr->arg), *((asINT64*) ARG_QW(instr->arg)), *((double*) ARG_QW(instr->arg)));
+				fprintf(file, "   %-8s v%d, 0x%llx           (i:%lld, f:%g)\n", asBCInfo[instr->op].name, instr->wArg[0], *ARG_QW(instr->arg), *((asINT64*) ARG_QW(instr->arg)), *((double*) ARG_QW(instr->arg)));
 #endif
 #else
-			fprintf(file, "   %-8s v%d, 0x%I64x          (i:%I64d, f:%g)\n", asBCInfo[instr->op].name, instr->wArg[0], *ARG_QW(instr->arg), *((asINT64*) ARG_QW(instr->arg)), *((double*) ARG_QW(instr->arg)));
+				fprintf(file, "   %-8s v%d, 0x%I64x          (i:%I64d, f:%g)\n", asBCInfo[instr->op].name, instr->wArg[0], *ARG_QW(instr->arg), *((asINT64*) ARG_QW(instr->arg)), *((double*) ARG_QW(instr->arg)));
 #endif
+			}
 			break;
 
 		case asBCTYPE_DW_DW_ARG:
