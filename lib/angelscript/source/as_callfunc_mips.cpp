@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -35,7 +35,9 @@
 // These functions handle the actual calling of system functions
 //
 // This version is MIPS specific and was originally written
-// by Manu Evans in April, 2006
+// by Manu Evans in April, 2006 for Playstation Portable (PSP)
+//
+// Support for Linux with MIPS was added by Andreas Jonsson in April, 2015
 //
 
 
@@ -52,9 +54,319 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#if !defined(AS_ANDROID)
 #include <regdef.h>
+#endif
 
 BEGIN_AS_NAMESPACE
+
+#if defined(__linux__) && defined(_ABIO32)
+
+// The MIPS ABI used by Linux is implemented here
+// (Tested on CI20 MIPS Creator with Debian Linux)
+//
+// ref: SYSTEM V 
+//      APPLICATION BINARY INTERFACE
+//      MIPS RISC Processor
+//      http://math-atlas.sourceforge.net/devel/assembly/mipsabi32.pdf
+//
+// ref: MIPS Instruction Reference
+//      http://www.mrc.uidaho.edu/mrc/people/jff/digital/MIPSir.html
+
+union SFloatRegs
+{
+	union { double d0; struct { float f0; asDWORD dummy0; };};
+	union { double d1; struct { float f1; asDWORD dummy1; };};
+} ;
+
+extern "C" asQWORD mipsFunc(asUINT argSize, asDWORD *argBuffer, void *func, SFloatRegs &floatRegs);
+asDWORD GetReturnedFloat();
+asQWORD GetReturnedDouble();
+
+asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/, void *secondObject)
+{
+	asCScriptEngine *engine = context->m_engine;
+	asSSystemFunctionInterface *sysFunc = descr->sysFuncIntf;
+	int callConv = sysFunc->callConv;
+
+	asQWORD retQW = 0;
+
+	void *func = (void*)sysFunc->func;
+	void **vftable;
+
+	asDWORD argBuffer[128]; // Ought to be big enough
+	asASSERT( sysFunc->paramSize < 128 );
+	
+	asDWORD argOffset = 0;
+	
+	SFloatRegs floatRegs;
+	asDWORD floatOffset = 0;
+	
+	// If the application function returns the value in memory then
+	// the first argument must be the pointer to that memory
+	if( sysFunc->hostReturnInMemory )
+	{
+		asASSERT( retPointer );
+		argBuffer[argOffset++] = (asPWORD)retPointer;
+	}
+	
+	if( callConv == ICC_CDECL_OBJFIRST || callConv == ICC_CDECL_OBJFIRST_RETURNINMEM ||
+		callConv == ICC_THISCALL || callConv == ICC_THISCALL_RETURNINMEM ||
+		callConv == ICC_VIRTUAL_THISCALL || callConv == ICC_VIRTUAL_THISCALL_RETURNINMEM ||
+		callConv == ICC_THISCALL_OBJFIRST || callConv == ICC_VIRTUAL_THISCALL_OBJFIRST ||
+		callConv == ICC_THISCALL_OBJFIRST_RETURNINMEM || callConv == ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM || 
+		callConv == ICC_THISCALL_OBJLAST || callConv == ICC_VIRTUAL_THISCALL_OBJLAST ||
+		callConv == ICC_THISCALL_OBJLAST_RETURNINMEM || callConv == ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM )
+	{
+		// Add the object pointer as the first argument
+		argBuffer[argOffset++] = (asPWORD)obj;
+	}
+	
+	if( callConv == ICC_THISCALL_OBJFIRST || callConv == ICC_VIRTUAL_THISCALL_OBJFIRST ||
+		callConv == ICC_THISCALL_OBJFIRST_RETURNINMEM || callConv == ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM )
+	{
+		// Add the second object pointer 
+		argBuffer[argOffset++] = (asPWORD)secondObject;
+	}
+	
+	int spos = 0;
+	for( asUINT n = 0; n < descr->parameterTypes.GetLength(); n++ )
+	{
+		asCDataType &paramType = descr->parameterTypes[n];
+		if( paramType.IsObject() && !paramType.IsObjectHandle() && !paramType.IsReference() )
+		{
+			if( paramType.GetObjectType()->flags & COMPLEX_MASK )
+			{
+				// The object is passed by reference
+				argBuffer[argOffset++] = args[spos++];
+			}
+			else
+			{
+				// Ensure 8byte alignment for classes that need it
+				if( (paramType.GetObjectType()->flags & asOBJ_APP_CLASS_ALIGN8) && (argOffset & 1) )
+					argOffset++;
+			
+				// Copy the object's memory to the buffer
+				memcpy(&argBuffer[argOffset], *(void**)(args+spos), paramType.GetSizeInMemoryBytes());
+				// Delete the original memory
+				engine->CallFree(*(char**)(args+spos));
+				spos++;
+				argOffset += paramType.GetSizeInMemoryDWords();
+			}
+		}
+		else if( paramType.GetTokenType() == ttQuestion )
+		{
+			// Copy both pointer and type id
+			argBuffer[argOffset++] = args[spos++];
+			argBuffer[argOffset++] = args[spos++];
+		}
+		else
+		{
+			// The first 2 floats or doubles are loaded into the float registers.
+			// Actually this is only done if they are the first arguments to the function, 
+			// but it doesn't cause any harm to load them into the registers even if they 
+			// won't be used so we don't need to check if they really are the first args.
+			if( floatOffset == 0 )
+			{
+				if( paramType.GetTokenType() == ttFloat )
+					floatRegs.f0 = *reinterpret_cast<float*>(&args[spos]);
+				else if( paramType.GetTokenType() == ttDouble )
+					floatRegs.d0 = *reinterpret_cast<double*>(&args[spos]);
+				floatOffset++;
+			}
+			else if( floatOffset == 1 )
+			{
+				if( paramType.GetTokenType() == ttFloat )
+					floatRegs.f1 = *reinterpret_cast<float*>(&args[spos]);
+				else if( paramType.GetTokenType() == ttDouble )
+					floatRegs.d1 = *reinterpret_cast<double*>(&args[spos]);
+				floatOffset++;
+			}
+		
+			// Copy the value directly
+			if( paramType.GetSizeOnStackDWords() > 1 )
+			{
+				// Make sure the argument is 8byte aligned
+				if( argOffset & 1 )
+					argOffset++;
+				*reinterpret_cast<asQWORD*>(&argBuffer[argOffset]) = *reinterpret_cast<asQWORD*>(&args[spos]);
+				argOffset += 2;
+				spos += 2;
+			}
+			else
+				argBuffer[argOffset++] = args[spos++];
+		}
+	}
+	
+	if( callConv == ICC_CDECL_OBJLAST || callConv == ICC_CDECL_OBJLAST_RETURNINMEM )
+	{
+		// Add the object pointer as the last argument
+		argBuffer[argOffset++] = (asPWORD)obj;
+	}
+
+	if( callConv == ICC_THISCALL_OBJLAST || callConv == ICC_VIRTUAL_THISCALL_OBJLAST ||
+		callConv == ICC_THISCALL_OBJLAST_RETURNINMEM || callConv == ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM )
+	{
+		// Add the second object pointer 
+		argBuffer[argOffset++] = (asPWORD)secondObject;
+	}
+
+	switch( callConv )
+	{
+	case ICC_CDECL:
+	case ICC_CDECL_RETURNINMEM:
+	case ICC_STDCALL:
+	case ICC_STDCALL_RETURNINMEM:
+	case ICC_CDECL_OBJLAST:
+	case ICC_CDECL_OBJLAST_RETURNINMEM:
+	case ICC_CDECL_OBJFIRST:
+	case ICC_CDECL_OBJFIRST_RETURNINMEM:
+	case ICC_THISCALL:
+	case ICC_THISCALL_RETURNINMEM:
+	case ICC_THISCALL_OBJFIRST:
+	case ICC_THISCALL_OBJFIRST_RETURNINMEM:
+	case ICC_THISCALL_OBJLAST:
+	case ICC_THISCALL_OBJLAST_RETURNINMEM:
+		retQW = mipsFunc(argOffset*4, argBuffer, func, floatRegs);
+		break;
+
+	case ICC_VIRTUAL_THISCALL:
+	case ICC_VIRTUAL_THISCALL_RETURNINMEM:
+	case ICC_VIRTUAL_THISCALL_OBJFIRST:
+	case ICC_VIRTUAL_THISCALL_OBJFIRST_RETURNINMEM:
+	case ICC_VIRTUAL_THISCALL_OBJLAST:
+	case ICC_VIRTUAL_THISCALL_OBJLAST_RETURNINMEM:
+		// Get virtual function table from the object pointer
+		vftable = *(void***)obj;
+		retQW = mipsFunc(argOffset*4, argBuffer, vftable[asPWORD(func)>>2], floatRegs);
+		break;
+	default:
+		context->SetInternalException(TXT_INVALID_CALLING_CONVENTION);
+	}
+
+	// If the return is a float value we need to get the value from the FP register
+	if( sysFunc->hostReturnFloat )
+	{
+		if( sysFunc->hostReturnSize == 1 )
+			*(asDWORD*)&retQW = GetReturnedFloat();
+		else
+			retQW = GetReturnedDouble();
+	}
+
+	return retQW;
+}
+
+asDWORD GetReturnedFloat()
+{
+	asDWORD f;
+
+	asm("swc1 $f0, %0\n" : "=m"(f));
+
+	return f;
+}
+
+asQWORD GetReturnedDouble()
+{
+	asQWORD d = 0;
+
+	asm("sdc1 $f0, %0\n" : "=m"(d));
+
+	return d;
+}
+
+// asQWORD mipsFunc(asUINT argSize, asDWORD *argBuffer, void *func, SFloatRegs &floatRegs);
+// $2,$3                   $4                $5               $6                $7
+asm(
+"	.text\n"
+//"	.align 2\n"
+"	.cfi_startproc\n"
+"	.global mipsFunc\n"
+"	.ent	mipsFunc\n"
+"mipsFunc:\n"
+//"	.frame	$fp,64,$31		# vars= 0, regs= 0/0, args= 0, gp= 0\n"
+//"	.mask	0x00000000,0\n"
+//"	.fmask	0x00000000,0\n"
+"	.set	noreorder\n"
+"	.set	nomacro\n"
+
+// align the stack frame to 8 bytes
+"	addiu	$12, $4, 7\n"		// t4 ($12) = argSize ($4) + 7
+"	li		$13, -8\n"			// t5 ($13) = 0xfffffffffffffff8
+"	and		$12, $12, $13\n"	// t4 ($12) &= t5 ($13). t4 holds the size of the argument block
+// It is required that the caller reserves space for at least 16 bytes even if there are less than 4 arguments
+// and add 8 bytes for the return pointer and s0 ($16) backup
+"	addiu	$13, $12, 24\n"		// t5 = t4 + 24. t5 ($13) holds the total size of the stack frame (including return pointer)
+// save the s0 register (so we can use it to remember where our return pointer is lives)
+"	sw		$16, -4($sp)\n"		// store the s0 register (so we can use it to remember how big our stack frame is)
+"	.cfi_offset 16, -4\n"
+// store the return pointer
+"	sw		$31, -8($sp)\n"
+"	.cfi_offset 31, -8\n"
+// keep original stack pointer
+"	move	$16, $sp\n"
+"	.cfi_def_cfa_register 16\n"
+// push the stack
+"	subu	$sp, $sp, $13\n"
+
+// store the argument in temporary registers
+"	addiu	$25, $6, 0\n"		// t9 ($25) holds the function pointer (must be t9 for position independent code)
+"	addiu	$3, $4, 0\n"		// v1 ($3) holds the size of the argument buffer
+"	move	$15, $5\n"			// t7 ($15) holds the pointer to the argBuffer
+"	move	$14, $7\n"			// t6 ($14) holds the values for the float registers
+
+// load integer registers
+"	lw		$4, 0($15)\n"		// a0 ($4)
+"	lw		$5, 4($15)\n"		// a1 ($5)
+"	lw		$6, 8($15)\n"		// a2 ($6)
+"	lw		$7, 12($15)\n"		// a3 ($7)
+
+// load float registers
+"	ldc1	$f12, 8($14)\n"
+"	ldc1	$f14, 0($14)\n"
+
+// skip stack parameters if there are 4 or less as they are moved into the registers
+"	addi	$14, $3, -16\n"		// The first 4 args were already loaded into registers
+"	blez	$14, andCall\n"
+"	nop\n"
+
+// push stack parameters
+"pushArgs:\n"
+"	addi	$3, -4\n"
+// load from $15 + stack bytes ($3)
+"	addu	$14, $15, $3\n"
+"	lw		$14, 0($14)\n"
+// store to $sp + stack bytes ($3)
+"	addu	$13, $sp, $3\n"
+"	sw		$14, 0($13)\n"
+// if there are more, loop...
+"	bne		$3, $0, pushArgs\n"
+"	nop\n"
+
+// and call the function
+"andCall:\n"
+"	jalr	$25\n"
+"	nop\n"
+
+// restore original stack pointer
+"	move	$sp, $16\n"
+// restore the return pointer
+"	lw		$31, -8($sp)\n"
+// restore the original value of $16
+"	lw		$16, -4($sp)\n"
+// and return from the function
+"	jr		$31\n"
+"	nop\n"
+
+"	.set	macro\n"
+"	.set	reorder\n"
+"	.end	mipsFunc\n"
+"	.cfi_endproc\n"
+"	.size	mipsFunc, .-mipsFunc\n"
+);
+
+#else // !(defined(__linux__) && defined(_ABIO32))
+
+// The MIPS ABI used by PSP and PS2 is implemented here
 
 #define AS_MIPS_MAX_ARGS 32
 #define AS_NUM_REG_FLOATS 8
@@ -191,33 +503,12 @@ asDWORD GetReturnedFloat()
 	return f;
 }
 
-/*
-asDWORD GetReturnedFloat();
-
-asm(
-"	.align 4\n"
-"	.global GetReturnedFloat\n"
-"GetReturnedFloat:\n"
-"	.set	noreorder\n"
-"	.set	nomacro\n"
-"	j	$ra\n"
-"	mfc1 $v0, $f0\n"
-"	.set	macro\n"
-"	.set	reorder\n"
-"	.end	Func\n"
-*/
-
-
-// sizeof(double) == 4 with sh-elf-gcc (3.4.0) -m4
-// so this isn't really used...
 asQWORD GetReturnedDouble()
 {
 	asQWORD d = 0;
 
-	printf("Broken!!!");
-/*
-	asm("sw $v0, %0\n" : "=m"(d));
-*/
+	asm("sdc1 $f0, %0\n" : "=m"(d));
+
 	return d;
 }
 
@@ -352,7 +643,7 @@ asm(
 "	.set	nomacro\n"
 // align the stack frame to 8 bytes
 "	addiu	$12, $6, 7\n"
-"	li		$13, -8\n"			// 0xfffffffffffffffc
+"	li		$13, -8\n"			// 0xfffffffffffffff8
 "	and		$12, $12, $13\n"	// t4 holds the size of the argument block
 // and add 8 bytes for the return pointer and s0 backup
 "	addiu	$13, $12, 8\n"		// t5 holds the total size of the stack frame (including return pointer)
@@ -432,6 +723,8 @@ asm(
 "	.size	mipsFunc, .-mipsFunc\n"
 );
 
+#endif // PSP and PS2 MIPS ABI
+	
 END_AS_NAMESPACE
 
 #endif // AS_MIPS

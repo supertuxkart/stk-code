@@ -142,6 +142,7 @@
 #define TXT_INVALID_CONTINUE                       "Invalid 'continue'"
 #define TXT_INVALID_ESCAPE_SEQUENCE                "Invalid escape sequence"
 #define TXT_INVALID_EXPRESSION_AMBIGUOUS_NAME      "Invalid expression: ambiguous name"
+#define TXT_INVALID_EXPRESSION_LAMBDA              "Invalid expression: stand-alone anonymous function"
 #define TXT_INVALID_OP_ON_METHOD                   "Invalid operation on method"
 #define TXT_INVALID_REF_PROP_ACCESS                "Invalid reference. Property accessors cannot be used in combined read/write operations"
 #define TXT_INVALID_SCOPE                          "Invalid scope resolution"
@@ -252,6 +253,7 @@
 #define TXT_TOO_MANY_JUMP_LABELS               "The function has too many jump labels to handle. Split the function into smaller ones."
 #define TXT_TOO_MANY_VALUES_FOR_LIST           "Too many values to match pattern"
 #define TXT_TYPE_s_NOT_AVAILABLE_FOR_MODULE    "Type '%s' is not available for this module"
+#define TXT_TYPE_s_NOT_TEMPLATE                "Type '%s' is not a template type"
 
 #define TXT_UNEXPECTED_END_OF_FILE             "Unexpected end of file"
 #define TXT_UNEXPECTED_TOKEN_s                 "Unexpected token '%s'"

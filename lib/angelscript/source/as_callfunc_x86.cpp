@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1263,13 +1263,13 @@ endcopy:
 		"subl  $4, %%ecx       \n"
 		"jne   copyloop3       \n"
 		"endcopy3:             \n"
-#if defined(__MINGW32__) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 7) || __GNUC__ > 4)
-        // MinGW made some strange choices with 4.7, and the thiscall calling convention
-        // when returning an object in memory is completely different from when not returning
-        // in memory
-        "pushl 0(%%ebx)        \n" // push obj on the stack
-        "movl 16(%%ebx), %%ecx \n" // move the return pointer into ECX
-        "call  *12(%%ebx)      \n" // call the function
+#ifdef AS_MINGW47
+		// MinGW made some strange choices with 4.7 and the thiscall calling convention,
+		// returning an object in memory is completely different from when not returning
+		// in memory
+		"pushl 0(%%ebx)        \n" // push obj on the stack
+		"movl 16(%%ebx), %%ecx \n" // move the return pointer into ECX
+		"call  *12(%%ebx)      \n" // call the function
 #else
 		"movl  0(%%ebx), %%ecx \n" // move obj into ECX
 #ifdef THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
@@ -1286,7 +1286,7 @@ endcopy:
 		"addl  $4, %%esp       \n" // pop the object pointer
 #endif
 #endif
-#endif // MINGW
+#endif // AS_MINGW47
 		// Pop the alignment bytes
 		"popl  %%esp           \n"
 		"popl  %%ebx           \n"
