@@ -131,11 +131,11 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
     }
     else if (name == m_replay_list_widget->m_properties[GUIEngine::PROP_ID])
     {
-        unsigned int selected_index = m_replay_list_widget->getSelectionID();
+        int selected_index = m_replay_list_widget->getSelectionID();
         // This can happen e.g. when the list is empty and the user
         // clicks somewhere.
-        if (selected_index >= ReplayPlay::get()->getNumReplayFile() ||
-            selected_index < 0                                        )
+        if (selected_index >= (signed)ReplayPlay::get()->getNumReplayFile() ||
+            selected_index < 0)
         {
             return;
         }

@@ -64,7 +64,7 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
-    virtual void onColumnClicked(int columnId);
+    virtual void onColumnClicked(int columnId) OVERRIDE;
 
     virtual void init() OVERRIDE;
 
