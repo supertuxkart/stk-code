@@ -45,10 +45,10 @@ public:
              ServerLobbyRoomProtocol();
     virtual ~ServerLobbyRoomProtocol();
 
-    virtual bool notifyEventAsynchronous(Event* event);
-    virtual void setup();
-    virtual void update();
-    virtual void asynchronousUpdate() {};
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
+    virtual void setup() OVERRIDE;
+    virtual void update() OVERRIDE;
+    virtual void asynchronousUpdate() OVERRIDE {};
 
     void startGame();
     void startSelection(const Event *event=NULL);

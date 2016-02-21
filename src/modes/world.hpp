@@ -175,7 +175,7 @@ protected:
     Weather* m_weather;
 
 
-    virtual void  onGo();
+    virtual void  onGo() OVERRIDE;
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool  isRaceOver() = 0;
     virtual void  update(float dt);

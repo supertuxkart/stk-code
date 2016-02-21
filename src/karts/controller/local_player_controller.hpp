@@ -75,7 +75,7 @@ public:
     virtual bool isLocalPlayerController() const OVERRIDE {return true;}
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
-    core::stringw getName() const { return m_player->getProfile()->getName(); }
+    core::stringw getName() const OVERRIDE { return m_player->getProfile()->getName(); }
 
 
 };   // LocalPlayerController

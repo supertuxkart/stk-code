@@ -160,7 +160,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of laps a kart has completed.
      *  \param kart_index World index of the kart. */
-    int getKartLaps(unsigned int kart_index) const
+    int getKartLaps(unsigned int kart_index) const OVERRIDE
     {
         assert(kart_index < m_kart_info.size());
         return m_kart_info[kart_index].m_race_lap;
