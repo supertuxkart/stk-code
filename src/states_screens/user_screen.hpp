@@ -103,20 +103,20 @@ private:
 
 public:
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile();
+    virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget,
-                               const std::string& name, const int playerID);
+                               const std::string& name, const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void init();
+    virtual void init() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void tearDown();
+    virtual void tearDown() OVERRIDE;
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
-    virtual void unloaded();
+    virtual void unloaded() OVERRIDE;
 
     void setNewAccountData(bool online, bool auto_login,
                            const core::stringw &online_name="",
@@ -149,9 +149,9 @@ private:
 public:
     friend class GUIEngine::ScreenSingleton<TabbedUserScreen>;
 
-    virtual void init();
+    virtual void init() OVERRIDE;
     virtual void eventCallback(GUIEngine::Widget* widget,
-                               const std::string& name, const int playerID);
+                               const std::string& name, const int playerID) OVERRIDE;
 };   // class TabbedUserScreen
 
 #endif

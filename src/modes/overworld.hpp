@@ -37,7 +37,7 @@ class OverWorld : public WorldWithRank
 protected:
 
     /** Override from base class */
-    virtual void  createRaceGUI();
+    virtual void  createRaceGUI() OVERRIDE;
 
     bool m_return_to_garage;
 

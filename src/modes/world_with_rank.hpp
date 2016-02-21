@@ -65,7 +65,7 @@ public:
     /** call just after instanciating. can't be moved to the contructor as child
         classes must be instanciated, otherwise polymorphism will fail and the
         results will be incorrect */
-    virtual void  init();
+    virtual void  init() OVERRIDE;
 
     bool          displayRank() const { return m_display_rank; }
 

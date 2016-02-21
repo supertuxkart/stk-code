@@ -200,10 +200,10 @@ private:
 public:
 
                  RaceResultGUI();
-    virtual void renderGlobal(float dt);
+    virtual void renderGlobal(float dt) OVERRIDE;
 
     /** \brief Implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() {};
+    virtual void loadedFromFile() OVERRIDE {};
 
     virtual void init() OVERRIDE;
     virtual void tearDown() OVERRIDE;
@@ -218,11 +218,11 @@ public:
     friend class GUIEngine::ScreenSingleton<RaceResultGUI>;
 
     /** Should not be called anymore.  */
-    const core::dimension2du getMiniMapSize() const
+    const core::dimension2du getMiniMapSize() const OVERRIDE
                   { assert(false); return core::dimension2du(0, 0); }
 
     /** No kart specific view needs to be rendered in the result gui. */
-    virtual void renderPlayerView(const Camera *camera, float dt) {}
+    virtual void renderPlayerView(const Camera *camera, float dt) OVERRIDE {}
 
     virtual void onUpdate(float dt) OVERRIDE;
 
@@ -236,7 +236,7 @@ public:
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
                             bool important=true,
-                            bool big_font=false) { }
+                            bool big_font=false) OVERRIDE { }
 
     void nextPhase();
 
@@ -252,7 +252,7 @@ public:
       */
     void setHighscore(int rank);
 
-    virtual void onConfirm();
+    virtual void onConfirm() OVERRIDE;
 };   // RaceResultGUI
 
 #endif

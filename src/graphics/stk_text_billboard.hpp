@@ -84,7 +84,7 @@ public:
     virtual void collectChar(irr::video::ITexture* texture,
         const irr::core::rect<irr::s32>& destRect,
         const irr::core::rect<irr::s32>& sourceRect,
-        const irr::video::SColor* const colors);
+        const irr::video::SColor* const colors) OVERRIDE;
 
     virtual void updateAbsolutePosition() OVERRIDE;
 };
