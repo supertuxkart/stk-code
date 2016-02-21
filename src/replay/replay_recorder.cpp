@@ -39,6 +39,8 @@ ReplayRecorder *ReplayRecorder::m_replay_recorder = NULL;
  */
 ReplayRecorder::ReplayRecorder()
 {
+    m_complete_replay = false;
+    m_incorrect_replay = false;
 }   // ReplayRecorder
 
 //-----------------------------------------------------------------------------

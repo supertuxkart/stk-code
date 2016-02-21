@@ -367,7 +367,7 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F10:
             if(world && value)
             {
-                if(control_is_pressed && ReplayRecorder::get())
+                if(control_is_pressed)
                     ReplayRecorder::get()->save();
                 else
                     history->Save();
