@@ -70,7 +70,7 @@ public:
 
     core::stringw toString();
 
-    virtual void save(std::ofstream& stream);
+    virtual void save(std::ofstream& stream) OVERRIDE;
     void        setDefaultBinds     ();
     virtual core::stringw getBindingAsString(const PlayerAction action) const OVERRIDE;
     virtual bool load(const XMLNode *config) OVERRIDE;
@@ -81,7 +81,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this device should desensitize its input at values
      *  close to 0 (to avoid 'oversteering'). */
-    virtual bool desensitize() const { return m_desensitize;}
+    virtual bool desensitize() const OVERRIDE { return m_desensitize;}
 
     // ------------------------------------------------------------------------
     /** Returns the number of buttons in this configuration. */
@@ -103,9 +103,9 @@ public:
     /** Return deadzone of this configuration. */
     int getDeadzone() const { return m_deadzone; }
     // ------------------------------------------------------------------------
-    virtual bool isGamePad()  const { return true; }
+    virtual bool isGamePad()  const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    virtual bool isKeyboard() const { return false; }
+    virtual bool isKeyboard() const OVERRIDE { return false; }
 
 };   // class GamepadConfig
 

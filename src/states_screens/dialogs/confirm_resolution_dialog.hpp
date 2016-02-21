@@ -38,10 +38,10 @@ private:
 public:
 
     ConfirmResolutionDialog();
-    void onEnterPressedInternal();
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    void onEnterPressedInternal() OVERRIDE;
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
     
-    virtual void onUpdate(float dt);
+    virtual void onUpdate(float dt) OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
 };
   

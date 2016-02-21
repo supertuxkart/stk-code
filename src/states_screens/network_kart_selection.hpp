@@ -32,7 +32,7 @@ protected:
     NetworkKartSelectionScreen();
     virtual ~NetworkKartSelectionScreen();
 
-    virtual void playerConfirm(const int playerID);
+    virtual void playerConfirm(const int playerID) OVERRIDE;
 public:
     virtual void init() OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;

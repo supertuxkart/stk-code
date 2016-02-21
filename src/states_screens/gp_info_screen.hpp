@@ -88,12 +88,12 @@ public:
 
     void onEnterPressedInternal();
     virtual void eventCallback(GUIEngine::Widget *, const std::string &name,
-                               const int player_id);
+                               const int player_id) OVERRIDE;
     virtual void loadedFromFile() OVERRIDE;
     virtual void init() OVERRIDE;
     virtual void beforeAddingWidget() OVERRIDE;
 
-    virtual void onUpdate(float dt);
+    virtual void onUpdate(float dt) OVERRIDE;
 
     void setGP(const std::string &gp_ident);
 };   // GPInfoScreen

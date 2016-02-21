@@ -49,7 +49,7 @@ public:
     virtual void onEnterPressedInternal() OVERRIDE;
     virtual void onUpdate(float dt) OVERRIDE;
 
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
 };
 
 
