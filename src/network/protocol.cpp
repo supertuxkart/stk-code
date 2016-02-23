@@ -19,6 +19,7 @@
 #include "network/protocol.hpp"
 
 #include "network/event.hpp"
+#include "network/network_string.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -47,9 +48,18 @@ Protocol::~Protocol()
 }   // ~Protocol
 
 // ----------------------------------------------------------------------------
+/** Returns a network string with the given type.
+ *  \capacity Default preallocated size for the message.
+ */
+NewNetworkString* Protocol::getNetworkString(int capacity)
+{
+    return new NewNetworkString(m_type, capacity);
+}   // getNetworkString
+
+// ----------------------------------------------------------------------------
 bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (data.size() < minimum_size || data[0] != 4)
     {
         Log::warn("Protocol", "Receiving a badly "
@@ -58,7 +68,7 @@ bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
         return false;
     }
     STKPeer* peer = event->getPeer();
-    uint32_t token = data.gui32(1);
+    uint32_t token = data.getUInt32(1);
     if (token != peer->getClientServerToken())
     {
         Log::warn("Protocol", "Peer sending bad token. Request "
@@ -71,7 +81,7 @@ bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
 // ----------------------------------------------------------------------------
 bool Protocol::isByteCorrect(Event* event, int byte_nb, int value)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (data[byte_nb] != value)
     {
         Log::info("Protocol", "Bad byte at pos %d. %d "
@@ -117,50 +127,28 @@ void Protocol::requestTerminate()
 /** Sends a message to all peers, inserting the peer's token into the message.
  *  The message is composed of a 1-byte message (usually the message type)
  *  followed by the token of this client and then actual message).
- *  \param type The first byte of the combined message.
  *  \param message The actual message content.
 */
-void Protocol::sendMessageToPeersChangingToken(uint8_t type,
-                                               const NetworkString &message)
+void Protocol::sendMessageToPeersChangingToken(NewNetworkString *message)
 {
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        NetworkString combined(1+4+message.size());
-        combined.addUInt8(type).addUInt8(4)
-                .addUInt32(peers[i]->getClientServerToken());
-        combined+=message;
-        ProtocolManager::getInstance()->sendMessage(this, peers[i], combined);
+        message->setToken(peers[i]->getClientServerToken());
+        ProtocolManager::getInstance()->sendMessage(peers[i], *message);
     }
 }   // sendMessageToPeersChangingToken
 
 // ----------------------------------------------------------------------------
-void Protocol::sendMessage(const NetworkString& message, bool reliable)
+void Protocol::sendMessage(const NewNetworkString &message, bool reliable)
 {
-    ProtocolManager::getInstance()->sendMessage(this, message, reliable,
-                                                /*synchronous*/false);
+    ProtocolManager::getInstance()->sendMessage(message, reliable);
 }   // sendMessage
 
 // ----------------------------------------------------------------------------
-void Protocol::sendSynchronousMessage(const NetworkString& message, 
-                                      bool reliable)
-{
-    ProtocolManager::getInstance()->sendMessage(this, message, reliable,
-                                                /*synchron*/true);
-}   // sendMessage
-// ----------------------------------------------------------------------------
-void Protocol::sendMessage(STKPeer* peer, const NetworkString& message,
+void Protocol::sendMessage(STKPeer* peer, const NewNetworkString &message,
                            bool reliable)
 {
-    ProtocolManager::getInstance()->sendMessage(this, peer, message, reliable,
-                                                /*synchronous*/false);
+    ProtocolManager::getInstance()->sendMessage(peer, message, reliable);
 }   // sendMessage
 
-// ----------------------------------------------------------------------------
-void Protocol::sendSynchronousMessage(STKPeer* peer,
-                                      const NetworkString& message,
-                                      bool reliable)
-{
-    ProtocolManager::getInstance()->sendMessage(this, peer, message, reliable,
-                                                /*synchronous*/true);
-}   // sendSynchronousMessage

@@ -23,7 +23,7 @@
 
 #include "pthread.h"
 
-class NetworkString;
+class NewNetworkString;
 class STKHost;
 
 class NetworkConsole
@@ -43,14 +43,14 @@ public:
     virtual ~NetworkConsole();
 
     virtual void run();
-
-    void setMaxPlayers(uint8_t count) { m_max_players = count; }
-    uint8_t getMaxPlayers() { return m_max_players; }
-
     void kickAllPlayers();
-
-    virtual void sendPacket(const NetworkString& data, bool reliable = true);
-
+    virtual void sendPacket(const NewNetworkString& data,
+                            bool reliable = true);
+    // ------------------------------------------------------------------------
+    void setMaxPlayers(uint8_t count) { m_max_players = count; }
+    // ------------------------------------------------------------------------
+    uint8_t getMaxPlayers() { return m_max_players; }
+    // ------------------------------------------------------------------------
     virtual bool isServer() { return true; }
 
 };   // class NetworkConsole

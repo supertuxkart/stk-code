@@ -38,7 +38,7 @@ bool KartUpdateProtocol::notifyEvent(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
-    NetworkString &ns = event->data();
+    NewNetworkString &ns = event->data();
     if (ns.size() < 33)
     {
         Log::info("KartUpdateProtocol", "Message too short.");
@@ -48,9 +48,8 @@ bool KartUpdateProtocol::notifyEvent(Event* event)
     while(ns.size() >= 29)
     {
         uint8_t kart_id = ns.getUInt8(0);
-        Vec3 xyz;
-        btQuaternion quat;
-        ns.get(&xyz, 1).get(&quat, 13);
+        Vec3 xyz = ns.getVec3(1);
+        btQuaternion quat = ns.getQuat(13);
         m_next_positions  [kart_id] = xyz;
         m_next_quaternions[kart_id] = quat;
         ns.removeFront(29);
@@ -81,35 +80,40 @@ void KartUpdateProtocol::update()
         if (NetworkConfig::get()->isServer())
         {
             World *world = World::getWorld();
-            NetworkString ns(4+world->getNumKarts()*29);
-            ns.af( world->getTime() );
+            NewNetworkString *ns = getNetworkString(4+world->getNumKarts()*29);
+            ns->setSynchronous(true);
+            ns->addFloat( world->getTime() );
             for (unsigned int i = 0; i < world->getNumKarts(); i++)
             {
                 AbstractKart* kart = world->getKart(i);
                 Vec3 xyz = kart->getXYZ();
-                ns.addUInt8( kart->getWorldKartId());
-                ns.add(xyz).add(kart->getRotation());
+                ns->addUInt8( kart->getWorldKartId());
+                ns->add(xyz).add(kart->getRotation());
                 Log::verbose("KartUpdateProtocol",
                              "Sending %d's positions %f %f %f",
                              kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
             }
-            sendSynchronousMessage(ns, false);
+            sendMessage(*ns, /*reliable*/false);
+            delete ns;
         }
         else
         {
-            NetworkString ns(4+29*race_manager->getNumLocalPlayers());
-            ns.af(World::getWorld()->getTime());
+            NewNetworkString *ns =
+                     getNetworkString(4+29*race_manager->getNumLocalPlayers());
+            ns->setSynchronous(true);
+            ns->addFloat(World::getWorld()->getTime());
             for(unsigned int i=0; i<race_manager->getNumLocalPlayers(); i++)
             {
                 AbstractKart *kart = World::getWorld()->getLocalPlayerKart(i);
                 const Vec3 &xyz = kart->getXYZ();
-                ns.addUInt8(kart->getWorldKartId());
-                ns.add(xyz).add(kart->getRotation());
+                ns->addUInt8(kart->getWorldKartId());
+                ns->add(xyz).add(kart->getRotation());
                 Log::verbose("KartUpdateProtocol",
                              "Sending %d's positions %f %f %f",
                               kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
             }
-            sendSynchronousMessage(ns, false);
+            sendMessage(*ns, /*reliable*/false);
+            delete ns;
         }   // if server
     }   // if (current_time > time + 0.1)
 

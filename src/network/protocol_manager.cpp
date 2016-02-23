@@ -177,43 +177,25 @@ void ProtocolManager::propagateEvent(Event* event)
 }   // propagateEvent
 
 // ----------------------------------------------------------------------------
-void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message,
-                                  bool reliable, bool send_synchronously)
+void ProtocolManager::sendMessage(const NewNetworkString &message, bool reliable)
 {
-    NetworkString new_message(1+message.size());
-    ProtocolType type = sender->getProtocolType();
-    // Set flag if the message must be handled synchronously on arrivat
-    if(send_synchronously)
-        type = ProtocolType(type | PROTOCOL_SYNCHRONOUS);
-    new_message.ai8(type); // add one byte to add protocol type
-    new_message += message;
-    STKHost::get()->sendMessage(new_message, reliable);
+    STKHost::get()->sendMessage(message, reliable);
 }   // sendMessage
 
 // ----------------------------------------------------------------------------
-void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer,
-                                  const NetworkString& message, bool reliable,
-                                  bool send_synchronously)
+void ProtocolManager::sendMessage(STKPeer *peer,
+                                  const NewNetworkString &message,
+                                  bool reliable)
 {
-    NetworkString new_message(1+message.size());
-    ProtocolType type = sender->getProtocolType();
-    // Set flag if the message must be handled synchronously on arrivat
-    if(send_synchronously)
-        type = ProtocolType(type | PROTOCOL_SYNCHRONOUS);
-    new_message.ai8(type); // add one byte to add protocol type
-    new_message += message;
-    peer->sendPacket(new_message, reliable);
+    peer->sendPacket(message, reliable);
 }   // sendMessage
 
 // ----------------------------------------------------------------------------
-void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer,
-                                        const NetworkString& message,
+void ProtocolManager::sendMessageExcept(STKPeer *peer,
+                                        const NewNetworkString &message,
                                         bool reliable)
 {
-    NetworkString new_message(1+message.size());
-    new_message.ai8(sender->getProtocolType()); // add one byte to add protocol type
-    new_message += message;
-    STKHost::get()->sendPacketExcept(peer, new_message, reliable);
+    STKHost::get()->sendPacketExcept(peer, message, reliable);
 }   // sendMessageExcept
 
 // ----------------------------------------------------------------------------

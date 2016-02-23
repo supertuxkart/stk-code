@@ -99,8 +99,7 @@ void Network::sendRawPacket(uint8_t* data, int length,
     sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
     Log::verbose("Network", "Raw packet sent to %s",
                  dst.toString().c_str());
-    Network::logPacket(NetworkString(std::string((char*)(data), length)),
-                       false);
+    Network::logPacket(NewNetworkString(data, length), false);
 }   // sendRawPacket
 
 // ----------------------------------------------------------------------------
@@ -146,7 +145,7 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
     if(len<0)
         return -1;
 
-    Network::logPacket(NetworkString(std::string(buffer, len)), true);
+    Network::logPacket(NewNetworkString((uint8_t*)buffer, len), true);
     sender->setIP(ntohl((uint32_t)(addr.sin_addr.s_addr)) );
     sender->setPort( ntohs(addr.sin_port) );
     if (addr.sin_family == AF_INET)
@@ -161,9 +160,9 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
 /** \brief Broadcasts a packet to all peers.
  *  \param data : Data to send.
  */
-void Network::broadcastPacket(const NetworkString& data, bool reliable)
+void Network::broadcastPacket(const NewNetworkString& data, bool reliable)
 {
-    ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
+    ENetPacket* packet = enet_packet_create(data.getData(), data.size() + 1,
                                       reliable ? ENET_PACKET_FLAG_RELIABLE
                                                : ENET_PACKET_FLAG_UNSEQUENCED);
     enet_host_broadcast(m_host, 0, packet);
@@ -189,7 +188,7 @@ void Network::openLog()
  *  \param incoming : True if the packet comes from a peer.
  *  False if it's sent to a peer.
  */
-void Network::logPacket(const NetworkString &ns, bool incoming)
+void Network::logPacket(const NewNetworkString &ns, bool incoming)
 {
     if (m_log_file.getData() == NULL) // read only access, no need to lock
         return;

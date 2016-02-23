@@ -29,7 +29,7 @@
 #include <enet/enet.h>
 
 class NetworkPlayerProfile;
-class NetworkString;
+class NewNetworkString;
 class TransportAddress;
 
 /*! \class STKPeer
@@ -59,7 +59,8 @@ public:
              STKPeer(ENetPeer *enet_peer);
     virtual ~STKPeer();
 
-    virtual void sendPacket(const NetworkString& data, bool reliable = true);
+    virtual void sendPacket(const NewNetworkString &data,
+                            bool reliable = true);
     void disconnect();
     bool isConnected() const;
     bool exists() const;

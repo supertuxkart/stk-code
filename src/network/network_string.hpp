@@ -23,6 +23,7 @@
 #ifndef NETWORK_STRING_HPP
 #define NETWORK_STRING_HPP
 
+#include "network/protocol.hpp"
 #include "utils/types.hpp"
 #include "utils/vec3.hpp"
 
@@ -539,5 +540,290 @@ public:
 };   // class NetworkString
 
 NetworkString operator+(NetworkString const& a, NetworkString const& b);
+// ============================================================================
+
+/** A new implementation of NetworkString, which has a fixed format:
+ *  Byte 0: The type of the message, which is actually a bit field:
+ *          bit 7:    if set, the message needs to be handled synchronously,
+ *                    otherwise it can be handled by the separate protocol
+ *                    manager thread.
+ *          bits 6-0: The protocol ID, which identifies the receiving protocol
+ *                    for this message.
+ *  Byte 1-4: A token to authenticate the sender.
+ * 
+ *  Otherwise this class offers template functions to add arbitrary variables,
+ *  and retrieve them again. It kept the functionality of 'removing' bytes
+ *  (e.g. the ProtocolManager would remove the first byte - protocol type -
+ *  so that the protocols would not see this byte). But this is implemented
+ *  now by using a base pointer (and not by moving the buffer content).
+ */
+class NewNetworkString
+{
+private:
+    /** The actual buffer. */
+    std::vector<uint8_t> m_buffer;
+
+    /** To avoid copying the buffer when bytes are deleted (which only
+     *  happens at the front), use an offset index. All positions given
+     *  by the user will be relative to this index. Note that the type
+     *  should be left as signed, otherwise certain arithmetic (e.g.
+     *  1-m_current_offset in checkToken() will be done unsigned).
+     */
+    int m_current_offset;
+
+    // ------------------------------------------------------------------------
+    /** Returns a part of the network string as a std::string. This is an
+    *  internal function only, the user should call decodeString(W) instead.
+    *  \param pos First position to be in the string.
+    *  \param len Number of bytes to copy.
+    */
+    std::string getString(int pos, int len) const 
+    {
+        return std::string(m_buffer.begin() + (m_current_offset+pos      ),
+                           m_buffer.begin() + (m_current_offset+pos + len) ); 
+    }   // getString
+    // ------------------------------------------------------------------------
+    /** Adds a std::string. Internal use only. */
+    NewNetworkString& addString(const std::string& value)
+    {
+        for (unsigned int i = 0; i < value.size(); i++)
+            m_buffer.push_back((uint8_t)(value[i]));
+        return *this;
+    }   // addString
+
+public:
+    static void unitTesting();
+        
+    /** Constructor, sets the protocol type of this message. */
+    NewNetworkString(ProtocolType type,  int capacity=16)
+    {
+        m_buffer.reserve(capacity);
+        m_buffer.push_back(type);
+        m_current_offset = 0;
+    }   // NewNetworkString
+
+    // ------------------------------------------------------------------------
+    NewNetworkString(const uint8_t *data, int len)
+    {
+        m_buffer.resize(len);
+        memcpy(m_buffer.data(), data, len);
+    }   // NewNetworkString
+
+    // ------------------------------------------------------------------------
+    /** Returns a byte pointer to the content of the network string. */
+    uint8_t* getData() { return &m_buffer[0]; };
+
+    // ------------------------------------------------------------------------
+    /** Returns a byte pointer to the content of the network string. */
+    const uint8_t* getData() const { return &m_buffer[0]; };
+
+    // ------------------------------------------------------------------------
+    /** Returns the protocol type of this message. */
+    ProtocolType getProtocolType() const
+    {
+        assert(!m_buffer.empty());
+        return (ProtocolType)m_buffer[0];
+    }   // getProtocolType
+
+    // ------------------------------------------------------------------------
+    /** Sets if this message is to be sent synchronous or asynchronous. */
+    void setSynchronous(bool b)
+    {
+        if(b)
+            m_buffer[0] |= PROTOCOL_SYNCHRONOUS;
+        else
+            m_buffer[0] &= !PROTOCOL_SYNCHRONOUS;
+    }   // setSynchronous
+    // ------------------------------------------------------------------------
+    /** Returns if this message is synchronous or not. */
+    bool isSynchronous() const
+    {
+        return (m_buffer[0] & PROTOCOL_SYNCHRONOUS) != 0;
+    }   // isSynchronous
+    // ------------------------------------------------------------------------
+    /** Sets a token for a message. Note that the token in an already
+    *  assembled message might be updated (e.g. if the same message is sent
+    *  from the server to a set of clients). */
+    void setToken(uint32_t token)
+    {
+        // Make sure there is enough space for the token:
+        if(m_buffer.size()<5)
+            m_buffer.resize(5);
+
+        m_buffer[1] = (token >> 24) & 0xff;
+        m_buffer[2] = (token >> 16) & 0xff;
+        m_buffer[3] = (token >>  8) & 0xff;
+        m_buffer[4] =  token        & 0xff;
+    }   // setToken
+
+    // ------------------------------------------------------------------------
+    /** Returns if the security token of this message is the same as the
+     *  specified token. */
+    uint32_t getToken() const 
+    {
+        // Since m_current_offset might be set, we need to make sure
+        // to really access bytes 1-4
+        return getUInt32(1-m_current_offset);
+    }   // getToken
+    // ------------------------------------------------------------------------
+    /** Returns the current length of the network string. */
+    int size() const { return (int)m_buffer.size(); }
+    // ------------------------------------------------------------------------
+    /** Returns the content of the network string as a std::string. */
+    const std::string std_string() const
+    {
+        std::string str(m_buffer.begin(), m_buffer.end());
+        return str;
+    }   // std_string
+    // ------------------------------------------------------------------------
+
+    // All functions related to adding data to a network string
+    // ========================================================
+    /** Add 8 bit unsigned int. */
+    NewNetworkString& addUInt8(const uint8_t value)
+    {
+        m_buffer.push_back(value);
+        return *this;
+    }   // addUInt8
+
+    // ------------------------------------------------------------------------
+    /** Adds 16 bit unsigned int. */
+    NewNetworkString& addUInt16(const uint16_t value)
+    {
+        m_buffer.push_back((value >> 8) & 0xff);
+        m_buffer.push_back(value & 0xff);
+        return *this;
+    }   // addUInt16
+
+    // ------------------------------------------------------------------------
+    /** Adds unsigned 32 bit integer. */
+    NewNetworkString& addUInt32(const uint32_t& value)
+    {
+        m_buffer.push_back((value >> 24) & 0xff);
+        m_buffer.push_back((value >> 16) & 0xff);
+        m_buffer.push_back((value >>  8) & 0xff);
+        m_buffer.push_back( value        & 0xff);
+        return *this;
+    }   // addUInt32
+
+    // ------------------------------------------------------------------------
+    /** Adds a 4 byte floating point value. */
+    NewNetworkString& addFloat(const float value)
+    {
+        uint32_t *p = (uint32_t*)&value;
+        return addUInt32(*p);
+    }   // addFloat
+
+    // ------------------------------------------------------------------------
+    /** Adds the content of another network string. */
+    NewNetworkString& operator+=(NewNetworkString const& value)
+    {
+        m_buffer.insert(m_buffer.end(), value.m_buffer.begin(), 
+                        value.m_buffer.end()   );
+        return *this;
+    }   // operator+=
+
+    // ------------------------------------------------------------------------
+    /** Adds the xyz components of a Vec3 to the string. */
+    NewNetworkString& add(const Vec3 &xyz)
+    {
+        return addFloat(xyz.getX()).addFloat(xyz.getY()).addFloat(xyz.getZ());
+    }   // add
+
+    // ------------------------------------------------------------------------
+    /** Adds the four components of a quaternion. */
+    NewNetworkString& add(const btQuaternion &quat)
+    {
+        return addFloat(quat.getX()).addFloat(quat.getY())
+              .addFloat(quat.getZ()).addFloat(quat.getW());
+    }   // add
+
+    // Functions related to getting data from a network string
+    // =======================================================
+    /** Ignore the next num_bytes from the message.
+     */
+    void removeFront(unsigned int num_bytes)
+    {
+        assert(m_current_offset + num_bytes <= m_buffer.size());
+        m_current_offset += num_bytes;
+    }   // removeFront
+
+    // ------------------------------------------------------------------------
+    /** Gets the byte at the specified position (taking current offset into
+     *  account). */
+    uint8_t operator[](const int pos) const
+    {
+        return m_buffer[m_current_offset + pos];
+    }   // operator[]
+
+private:
+    // ------------------------------------------------------------------------
+    /** Template to get n bytes from a buffer into a single data type. */
+    template<typename T, size_t n>
+    T get(int pos) const
+    {
+        int a = n;
+        T result = 0;
+        int offset = m_current_offset + pos + n -1;
+        while (a--)
+        {
+            result <<= 8; // offset one byte
+                          // add the data to result
+            result += m_buffer[offset - a];
+        }
+        return result;
+    }   // get(int pos)
+    // ------------------------------------------------------------------------
+    /** Another function for n == 1 to surpress warnings in clang. */
+    template<typename T>
+    T get(int pos) const
+    {
+        return m_buffer[pos];
+    }   // get
+
+public:
+    // ------------------------------------------------------------------------
+    /** Returns a unsigned 32 bit integer. */
+    inline uint32_t getUInt32(int pos = 0) const { return get<uint32_t, 4>(pos); }
+    // ------------------------------------------------------------------------
+    /** Returns an unsigned 16 bit integer. */
+    inline uint16_t getUInt16(int pos=0) const { return get<uint16_t, 2>(pos); }
+    // ------------------------------------------------------------------------
+    /** Returns an unsigned 8-bit integer. */
+    inline uint8_t getUInt8(int pos = 0)  const
+    {
+        return m_buffer[m_current_offset + pos];
+    }   // getUInt8
+    
+    // ------------------------------------------------------------------------
+    /** Gets a 4 byte floating point value. */
+    float getFloat(int pos=0) const
+    {
+        uint32_t u = getUInt32(pos);
+        return *(float*)&u;
+    }   // getFloat
+
+    // ------------------------------------------------------------------------
+    /** Gets a Vec3. */
+    Vec3 getVec3(int pos=0) const
+    {
+        return Vec3(getFloat(pos), getFloat(pos+4), getFloat(pos+8));
+    }   // getVec3
+    // ------------------------------------------------------------------------
+    /** Gets a Vec3. */
+    btQuaternion getQuat(int pos=0) const
+    {
+        return btQuaternion(getFloat(pos),   getFloat(pos+ 4),
+                            getFloat(pos+8), getFloat(pos+12) );
+    }   // getQuat
+    // ------------------------------------------------------------------------
+    NewNetworkString& encodeString(const std::string &value);
+    NewNetworkString& encodeString(const irr::core::stringw &value);
+    int decodeString(int n, std::string *out) const;
+    int decodeStringW(int n, irr::core::stringw *out) const;
+    // ------------------------------------------------------------------------
+
+};   // class NetworkString
+
 
 #endif // NETWORK_STRING_HPP

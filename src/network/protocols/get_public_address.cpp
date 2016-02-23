@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "network/network.hpp"
 #include "network/network_config.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "utils/log.hpp"
 

@@ -123,14 +123,14 @@ void StartGameProtocol::setup()
 // ----------------------------------------------------------------------------
 bool StartGameProtocol::notifyEventAsynchronous(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (data.size() < 5)
     {
         Log::error("StartGameProtocol", "Too short message.");
         return true;
     }
-    uint32_t token = data.gui32();
-    uint8_t ready = data.gui8(4);
+    uint32_t token = data.getUInt32();
+    uint8_t ready = data.getUInt8(4);
     STKPeer* peer = event->getPeer();
     if (peer->getClientServerToken() != token)
     {
@@ -219,10 +219,12 @@ void StartGameProtocol::ready()
     if (NetworkConfig::get()->isClient())
     {
         assert(STKHost::get()->getPeerCount() == 1);
-        NetworkString ns(5);
-        ns.ai32(STKHost::get()->getPeers()[0]->getClientServerToken()).ai8(1);
+        NewNetworkString *ns = getNetworkString(5);
+        ns->setToken(STKHost::get()->getPeers()[0]->getClientServerToken());
+        ns->addUInt8(1);
         Log::info("StartGameProtocol", "Player ready, notifying server.");
-        sendMessage(ns, true);
+        sendMessage(*ns, /*reliable*/true);
+        delete ns;
         m_state = READY;
         m_ready = true;
         return;

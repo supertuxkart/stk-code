@@ -440,7 +440,7 @@ bool STKHost::connect(const TransportAddress& address)
  *  \param data Message to sent.
  *  \param reliable If the message is to be sent reliable.
  */
-void STKHost::sendMessage(const NetworkString& data, bool reliable)
+void STKHost::sendMessage(const NewNetworkString& data, bool reliable)
 {
     if (NetworkConfig::get()->isServer())
         broadcastPacket(data, reliable);
@@ -604,13 +604,13 @@ void STKHost::handleLANRequests()
         // current players, and the client's ip address and port
         // number (which solves the problem which network interface
         // might be the right one if there is more than one).
-        NetworkString s;
+        NewNetworkString s(PROTOCOL_NONE);
         s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
         s.addUInt8(0);   // FIXME: current number of connected players
         s.addUInt32(sender.getIP());
         s.addUInt16(sender.getPort());
-        m_lan_network->sendRawPacket(s.getBytes(), s.size(), sender);
+        m_lan_network->sendRawPacket(s.getData(), s.size(), sender);
     }   // if message is server-requested
     else if (std::string(buffer, len) == "connection-request")
     {
@@ -740,7 +740,7 @@ uint16_t STKHost::getPort() const
  *  \param data Data to sent.
  *  \param reliable If the data should be sent reliable or now.
  */
-void STKHost::sendPacketExcept(STKPeer* peer, const NetworkString& data,
+void STKHost::sendPacketExcept(STKPeer* peer, const NewNetworkString &data,
                                bool reliable)
 {
     for (unsigned int i = 0; i < m_peers.size(); i++)

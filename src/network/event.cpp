@@ -46,20 +46,24 @@ Event::Event(ENetEvent* event)
     }
     if (m_type == EVENT_TYPE_MESSAGE)
     {
-        m_data = NetworkString(std::string((char*)(event->packet->data),
-                               event->packet->dataLength-1));
+        m_data = new NewNetworkString(event->packet->data, 
+                                      event->packet->dataLength);
     }
 
-    m_packet = NULL;
     if (event->packet)
     {
-        m_packet = event->packet;
         // we got all we need, just remove the data.
-        enet_packet_destroy(m_packet);
+        enet_packet_destroy(event->packet);
     }
-    m_packet = NULL;
 
     m_peer = STKHost::get()->getPeer(event->peer);
+    if(m_data->getToken()!=m_peer->getClientServerToken() )
+    {
+        Log::error("Event", "Received event with invalid token!");
+        Log::error("Event", "HostID %d Token %d message token %d",
+            m_peer->getHostId(), m_peer->getClientServerToken(),
+            m_data->getToken());
+    }
 }   // Event(ENetEvent)
 
 // ----------------------------------------------------------------------------
@@ -70,7 +74,7 @@ Event::~Event()
     // Do not delete m_peer, it's a pointer to the enet data structure
     // which is persistent.
     m_peer = NULL;
-    m_packet = NULL;
+    delete m_data;
 }   // ~Event
 
 // ----------------------------------------------------------------------------
@@ -79,6 +83,6 @@ Event::~Event()
  */
 void Event::removeFront(int size)
 {
-    m_data.removeFront(size);
+    m_data->removeFront(size);
 }   // removeFront
 

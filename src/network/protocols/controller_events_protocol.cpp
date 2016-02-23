@@ -50,7 +50,7 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
 
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (data.size() < 17)
     {
         Log::error("ControllerEventsProtocol",
@@ -58,15 +58,15 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
                     data.size());
         return true;
     }
-    uint32_t token = data.gui32();
-    NetworkString pure_message = data;
+    uint32_t token = data.getUInt32();
+    NewNetworkString pure_message = data;
     pure_message.removeFront(4);
     if (token != event->getPeer()->getClientServerToken())
     {
         Log::error("ControllerEventsProtocol", "Bad token from peer.");
         return true;
     }
-    NetworkString ns = pure_message;
+    NewNetworkString ns = pure_message;
 
     ns.removeFront(4);
     uint8_t client_index = -1;
@@ -80,9 +80,9 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
                       kart_id);
             return true;
         }
-        uint8_t serialized_1   = ns.gui8(1);
-        PlayerAction action    = (PlayerAction)(ns.gui8(4));
-        int action_value       = ns.gui32(5);
+        uint8_t serialized_1   = ns.getUInt8(1);
+        PlayerAction action    = (PlayerAction)(ns.getUInt8(4));
+        int action_value       = ns.getUInt32(5);
         Controller *controller = World::getWorld()->getKart(kart_id)
                                                   ->getController();
         KartControl *controls  = controller->getControls();
@@ -113,11 +113,9 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
             // was sent from originally
             if(peer != event->getPeer())
             {
-                NetworkString ns2(4+pure_message.size());
-                ns2.ai32(peer->getClientServerToken());
-                ns2 += pure_message;
-                ProtocolManager::getInstance()->sendMessage(this, peer, 
-                                                            ns2, false);
+                pure_message.setToken(peer->getClientServerToken());
+                ProtocolManager::getInstance()->sendMessage(peer, pure_message,
+                                                            false);
             }   // if peer != event->getPeer()
         }   // for i in peers
     }   // if server
@@ -159,14 +157,13 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     uint8_t serialized_2 = (uint8_t)(controls->m_accel*255.0);
     uint8_t serialized_3 = (uint8_t)(controls->m_steer*127.0);
 
-    NetworkString ns(17);
-    uint32_t token = STKHost::get()->getPeers()[0]->getClientServerToken();
-    ns.ai32(token);
-    ns.af(World::getWorld()->getTime());
-    ns.addUInt8(controller->getKart()->getWorldKartId());
-    ns.ai8(serialized_1).ai8(serialized_2).ai8(serialized_3);
-    ns.ai8((uint8_t)(action)).ai32(value);
+    NewNetworkString *ns = getNetworkString(17);
+    ns->setToken(STKHost::get()->getPeers()[0]->getClientServerToken());
+    ns->addFloat(World::getWorld()->getTime());
+    ns->addUInt8(controller->getKart()->getWorldKartId());
+    ns->addUInt8(serialized_1).addUInt8(serialized_2).addUInt8(serialized_3);
+    ns->addUInt8((uint8_t)(action)).addUInt32(value);
 
     Log::info("ControllerEventsProtocol", "Action %d value %d", action, value);
-    sendMessage(ns, false); // send message to server
+    sendMessage(*ns, false); // send message to server
 }   // controllerAction

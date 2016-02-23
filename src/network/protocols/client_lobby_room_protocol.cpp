@@ -60,44 +60,55 @@ void ClientLobbyRoomProtocol::setup()
 
 void ClientLobbyRoomProtocol::requestKartSelection(const std::string &kart_name)
 {
-    NetworkString request(6+1+kart_name.size());
+    NewNetworkString *request = getNetworkString(6+1+kart_name.size());
     // size_token (4), token, size kart name, kart name
-    request.ai8(LE_KART_SELECTION).ai8(4).ai32(m_server->getClientServerToken())
-           .encodeString(kart_name);
-    sendMessage(request, true);
+    request->setToken(m_server->getClientServerToken());
+    request->addUInt8(LE_KART_SELECTION).encodeString(kart_name);
+
+    NewNetworkString *r = getNetworkString(7+kart_name.size());
+    r->setToken(m_server->getClientServerToken());
+    r->addUInt8(LE_KART_SELECTION).addUInt8(4).encodeString(kart_name);
+    sendMessage(*r, true);
+    delete r;
 }   // requestKartSelection
 
 //-----------------------------------------------------------------------------
 
 void ClientLobbyRoomProtocol::voteMajor(uint32_t major)
 {
-    NetworkString request(8);
+    NewNetworkString *request = getNetworkString(8);
+    request->setToken(m_server->getClientServerToken());
     // size_token (4), token, size major(1),major
-    request.ai8(LE_VOTE_MAJOR).ai8(4)
-           .ai32(m_server->getClientServerToken()).ai8(4).addUInt32(major);
-    sendMessage(request, true);
+    request->addUInt8(LE_VOTE_MAJOR).addUInt8(4)
+           .addUInt8(4).addUInt32(major);
+    sendMessage(*request, true);
+    delete request;
 }   // voteMajor
 
 //-----------------------------------------------------------------------------
 
 void ClientLobbyRoomProtocol::voteRaceCount(uint8_t count)
 {
-    NetworkString request(8);
+    NewNetworkString *request = getNetworkString(8);
+    request->setToken(m_server->getClientServerToken());
     // size_token (4), token, size race count(1), count
-    request.ai8(LE_VOTE_RACE_COUNT).ai8(4)
-           .ai32(m_server->getClientServerToken()).ai8(1).ai8(count);
-    sendMessage(request, true);
+    request->addUInt8(LE_VOTE_RACE_COUNT).addUInt8(4)
+           .addUInt8(1).addUInt8(count);
+    sendMessage(*request, true);
+    delete request;
 }   // voteRaceCount
 
 //-----------------------------------------------------------------------------
 
 void ClientLobbyRoomProtocol::voteMinor(uint32_t minor)
 {
-    NetworkString request(8);
+    NewNetworkString *request = getNetworkString(8);
+    request->setToken(m_server->getClientServerToken());
     // size_token (4), token, size minor(1),minor
-    request.ai8(LE_VOTE_MINOR).ai8(4).ai32(m_server->getClientServerToken())
-           .ai8(4).addUInt32(minor);
-    sendMessage(request, true);
+    request->addUInt8(LE_VOTE_MINOR).addUInt8(4)
+           .addUInt8(4).addUInt32(minor);
+    sendMessage(*request, true);
+    delete request;
 }   // voteMinor
 
 //-----------------------------------------------------------------------------
@@ -105,33 +116,38 @@ void ClientLobbyRoomProtocol::voteMinor(uint32_t minor)
 void ClientLobbyRoomProtocol::voteTrack(const std::string &track,
                                         uint8_t track_nb)
 {
-    NetworkString request(8+1+track.size());
+    NewNetworkString *request = getNetworkString(8+1+track.size());
+    request->setToken(m_server->getClientServerToken());
     // size_token (4), token, size track, track, size #track, #track
-    request.ai8(LE_VOTE_TRACK).ai8(4).ai32(m_server->getClientServerToken())
-           .encodeString(track).ai8(1).ai8(track_nb);
-    sendMessage(request, true);
+    request->addUInt8(LE_VOTE_TRACK).addUInt8(4)
+           .encodeString(track).addUInt8(1).addUInt8(track_nb);
+    sendMessage(*request, true);
+    delete request;
 }   // voteTrack
 
 //-----------------------------------------------------------------------------
 
 void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
 {
-    NetworkString request(9);
+    NewNetworkString *request = getNetworkString(9);
+    request->setToken(m_server->getClientServerToken());
     // size_token (4), token, size reversed(1),reversed, size #track, #track
-    request.ai8(LE_VOTE_REVERSE).ai8(4).ai32(m_server->getClientServerToken())
-           .ai8(1).ai8(reversed).ai8(1).ai8(track_nb);
-    sendMessage(request, true);
+    request->addUInt8(LE_VOTE_REVERSE).addUInt8(4)
+           .addUInt8(1).addUInt8(reversed).addUInt8(1).addUInt8(track_nb);
+    sendMessage(*request, true);
+    delete request;
 }   // voteReversed
 
 //-----------------------------------------------------------------------------
 
 void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
 {
-    NetworkString request(10);
+    NewNetworkString *request = getNetworkString(10);
+    request->setToken(m_server->getClientServerToken());
     // size_token (4), token, size laps(1),laps, size #track, #track
-    request.ai8(LE_VOTE_LAPS).ai8(4).ai32(m_server->getClientServerToken())
-           .ai8(1).ai8(laps).ai8(1).ai8(track_nb);
-    sendMessage(request, true);
+    request->addUInt8(LE_VOTE_LAPS)
+           .addUInt8(1).addUInt8(laps).addUInt8(1).addUInt8(track_nb);
+    sendMessage(*request, true);
 }   // voteLaps
 
 //-----------------------------------------------------------------------------
@@ -151,7 +167,7 @@ bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
     assert(m_setup); // assert that the setup exists
     if (event->getType() == EVENT_TYPE_MESSAGE)
     {
-        const NetworkString &data = event->data();
+        const NewNetworkString &data = event->data();
         assert(data.size()); // assert that data isn't empty
         uint8_t message_type = data[0];
         if (message_type != LE_KART_SELECTION_UPDATE &&
@@ -178,7 +194,7 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
     assert(m_setup); // assert that the setup exists
     if (event->getType() == EVENT_TYPE_MESSAGE)
     {
-        const NetworkString &data = event->data();
+        const NewNetworkString &data = event->data();
         assert(data.size()); // assert that data isn't empty
         uint8_t message_type = data[0];
 
@@ -244,11 +260,13 @@ void ClientLobbyRoomProtocol::update()
 
         std::string name_u8 = StringUtils::wideToUtf8(name);
         const std::string &password = NetworkConfig::get()->getPassword();
-        NetworkString ns(6+1+name_u8.size()+1+password.size());
+        NewNetworkString *ns = getNetworkString(6+1+name_u8.size()
+                                                 +1+password.size());
         // 4 (size of id), global id
-        ns.ai8(LE_CONNECTION_REQUESTED).encodeString(name)
+        ns->addUInt8(LE_CONNECTION_REQUESTED).encodeString(name)
           .encodeString(NetworkConfig::get()->getPassword());
-        sendMessage(ns);
+        sendMessage(*ns);
+        delete ns;
         m_state = REQUESTING_CONNECTION;
     }
     break;
@@ -301,7 +319,7 @@ void ClientLobbyRoomProtocol::update()
  */
 void ClientLobbyRoomProtocol::newPlayer(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (data[0] != 1)
     {
         Log::error("ClientLobbyRoomProtocol",
@@ -310,7 +328,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
         return;
     }
 
-    uint8_t player_id = data.gui8(1);
+    uint8_t player_id = data.getUInt8(1);
 
     core::stringw name;
     data.decodeStringW(2, &name);
@@ -349,7 +367,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
  */
 void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (data.size() != 2 || data[0] != 1)
     {
         Log::error("ClientLobbyRoomProtocol",
@@ -383,7 +401,7 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
  */
 void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 {
-    NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     // At least 12 bytes should remain now
     if (data.size() < 9|| data[0] != 1 || data[2] != 4)
     {
@@ -418,7 +436,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     STKHost::get()->getGameSetup()->setLocalMaster(my_player_id);
     m_setup->setNumLocalPlayers(1);
     // connection token
-    uint32_t token = data.gui32(3);
+    uint32_t token = data.getUInt32(3);
     peer->setClientServerToken(token);
 
     // Add all players
@@ -467,7 +485,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
  */
 void ClientLobbyRoomProtocol::connectionRefused(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (data.size() != 2 || data[0] != 1) // 2 bytes remains now
     {
         Log::error("ClientLobbyRoomProtocol",
@@ -508,7 +526,7 @@ void ClientLobbyRoomProtocol::connectionRefused(Event* event)
  */
 void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (data.size() != 2 || data[0] != 1)
     {
         Log::error("ClientLobbyRoomProtocol",
@@ -547,7 +565,7 @@ void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
  */
 void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (data.size() < 3 || data[0] != 1)
     {
         Log::error("ClientLobbyRoomProtocol", 
@@ -582,14 +600,14 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
  */
 void ClientLobbyRoomProtocol::startGame(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (data.size() < 5 || data[0] != 4)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
                    "selection update wasn't formated as expected.");
         return;
     }
-    uint32_t token = data.gui32(1);
+    uint32_t token = data.getUInt32(1);
     if (token == STKHost::get()->getPeers()[0]->getClientServerToken())
     {
         m_state = PLAYING;
@@ -616,14 +634,14 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
  */
 void ClientLobbyRoomProtocol::startSelection(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (data.size() < 5 || data[0] != 4)
     {
         Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
                    "selection update wasn't formated as expected.");
         return;
     }
-    uint32_t token = data.gui32(1);
+    uint32_t token = data.getUInt32(1);
     if (token == STKHost::get()->getPeers()[0]->getClientServerToken())
     {
         m_state = KART_SELECTION;
@@ -648,13 +666,13 @@ void ClientLobbyRoomProtocol::startSelection(Event* event)
  */
 void ClientLobbyRoomProtocol::raceFinished(Event* event)
 {
-    NetworkString &data = event->data();
+    NewNetworkString &data = event->data();
     if (data.size() < 5)
     {
         Log::error("ClientLobbyRoomProtocol", "Not enough data provided.");
         return;
     }
-    if (event->getPeer()->getClientServerToken() != data.gui32(1))
+    if (event->getPeer()->getClientServerToken() != data.getUInt32(1))
     {
         Log::error("ClientLobbyRoomProtocol", "Bad token");
         return;
@@ -731,7 +749,7 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
  */
 void ClientLobbyRoomProtocol::playerMajorVote(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -754,7 +772,7 @@ void ClientLobbyRoomProtocol::playerMajorVote(Event* event)
  */
 void ClientLobbyRoomProtocol::playerRaceCountVote(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -777,7 +795,7 @@ void ClientLobbyRoomProtocol::playerRaceCountVote(Event* event)
  */
 void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -801,7 +819,7 @@ void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
  */
 void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 10))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -828,7 +846,7 @@ void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
  */
 void ClientLobbyRoomProtocol::playerReversedVote(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 11))
         return;
     if (!isByteCorrect(event, 5, 1))
@@ -854,7 +872,7 @@ void ClientLobbyRoomProtocol::playerReversedVote(Event* event)
  */
 void ClientLobbyRoomProtocol::playerLapsVote(Event* event)
 {
-    const NetworkString &data = event->data();
+    const NewNetworkString &data = event->data();
     if (!checkDataSizeAndToken(event, 9))
         return;
     if (!isByteCorrect(event, 5, 1))

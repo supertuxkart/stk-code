@@ -173,6 +173,7 @@
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
+#include "network/network_string.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
 #include "online/profile_manager.hpp"
@@ -1669,6 +1670,7 @@ static void cleanUserConfig()
 void runUnitTests()
 {
     GraphicsRestrictions::unitTesting();
+    NewNetworkString::unitTesting();
     // Test easter mode: in 2015 Easter is 5th of April - check with 0 days
     // before and after
     int saved_easter_mode = UserConfigParams::m_easter_ear_mode;
@@ -1698,4 +1700,4 @@ void runUnitTests()
     assert( isEasterMode(22, 3, 2016, 5));
     assert(!isEasterMode(21, 3, 2016, 5));
     UserConfigParams::m_easter_ear_mode = saved_easter_mode;
-}   // unitTesting
+}   // runUnitTests

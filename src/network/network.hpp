@@ -33,7 +33,7 @@
 
 #include <stdio.h>
 
-class NetworkString;
+class NewNetworkString;
 class TransportAddress;
 
 /** \class EnetHost
@@ -57,14 +57,14 @@ public:
     virtual  ~Network();
 
     static void openLog();
-    static void logPacket(const NetworkString &ns, bool incoming);
+    static void logPacket(const NewNetworkString &ns, bool incoming);
     static void closeLog();
     ENetPeer *connectTo(const TransportAddress &address);
     void     sendRawPacket(uint8_t* data, int length,
                            const TransportAddress& dst);
     int receiveRawPacket(char *buffer, int buf_len,
                          TransportAddress* sender, int max_tries = -1);
-    void     broadcastPacket(const NetworkString& data,
+    void     broadcastPacket(const NewNetworkString& data,
                              bool reliable = true);
     // ------------------------------------------------------------------------
     /** Returns a pointer to the ENet host object. */

@@ -38,18 +38,18 @@ bool GameEventsProtocol::notifyEvent(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
-    NetworkString &data = event->data();
+    NewNetworkString &data = event->data();
     if (data.size() < 5) // for token and type
     {
         Log::warn("GameEventsProtocol", "Too short message.");
         return true;
     }
-    if ( event->getPeer()->getClientServerToken() != data.gui32())
+    if ( event->getPeer()->getClientServerToken() != data.getUInt32())
     {
         Log::warn("GameEventsProtocol", "Bad token.");
         return true;
     }
-    int8_t type = data.gui8(4);
+    int8_t type = data.getUInt8(4);
     data.removeFront(5);
     switch (type)
     {
@@ -85,8 +85,9 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        NetworkString ns(11);
-        ns.ai32(peers[i]->getClientServerToken());
+        NewNetworkString *ns = getNetworkString(11);
+        ns->setToken(peers[i]->getClientServerToken());
+        ns->setSynchronous(true);
         // Item picked : send item id, powerup type and kart race id
         uint8_t powerup = 0;
         if (item->getType() == Item::ITEM_BANANA)
@@ -95,11 +96,11 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
             powerup = (((int)(kart->getPowerup()->getType()) << 4) & 0xf0) 
                            + (kart->getPowerup()->getNum()         & 0x0f);
 
-        ns.ai8(GE_ITEM_COLLECTED).ai32(item->getItemId()).ai8(powerup)
-          .ai8(kart->getWorldKartId());
-        ProtocolManager::getInstance()->sendMessage(this, peers[i], ns,
-                                                    /*reliable*/true,
-                                                    /*synchronous*/true);
+        ns->addUInt8(GE_ITEM_COLLECTED).addUInt32(item->getItemId())
+           .addUInt8(powerup).addUInt8(kart->getWorldKartId());
+        ProtocolManager::getInstance()->sendMessage(peers[i], *ns,
+                                                    /*reliable*/true);
+        delete ns;
         Log::info("GameEventsProtocol",
                   "Notified a peer that a kart collected item %d.",
                   (int)(kart->getPowerup()->getType()));
@@ -109,15 +110,15 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
 // ----------------------------------------------------------------------------
 /** Called on the client when an itemCollected message is received.
  */
-void GameEventsProtocol::collectedItem(const NetworkString &data)
+void GameEventsProtocol::collectedItem(const NewNetworkString &data)
 {
     if (data.size() < 6)
     {
             Log::warn("GameEventsProtocol", "Too short message.");
         }
-        uint32_t item_id = data.gui32();
-        uint8_t powerup_type = data.gui8(4);
-        uint8_t kart_id = data.gui8(5);
+        uint32_t item_id = data.getUInt32();
+        uint8_t powerup_type = data.getUInt8(4);
+        uint8_t kart_id = data.getUInt8(5);
         // now set the kart powerup
         AbstractKart* kart = World::getWorld()->getKart(kart_id);
         ItemManager::get()->collectedItem(ItemManager::get()->getItem(item_id),
@@ -134,18 +135,20 @@ void GameEventsProtocol::collectedItem(const NetworkString &data)
  */
 void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
 {
-    NetworkString ns(20);
-
+    NewNetworkString *ns = getNetworkString(20);
+    ns->setSynchronous(true);
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
+
+    // FIXME - TODO THIS APPEARS COMPLETELY BROKEN!!!
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        ns.addUInt32(peers[i]->getClientServerToken())
+        ns->addUInt32(peers[i]->getClientServerToken())
           .addUInt8(GE_KART_FINISHED_RACE)
           .addUInt8(kart->getWorldKartId()).addFloat(time);
 
-        ProtocolManager::getInstance()->sendMessage(this, peers[i], ns,
-                                                    /*reliable*/true,
-                                                    /*synchronous*/true);
+        ProtocolManager::getInstance()->sendMessage(peers[i], *ns,
+                                                    /*reliable*/true);
+        delete ns;
     }   // for i in peers
 }   // kartFinishedRace
 
@@ -154,7 +157,7 @@ void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
  *  event from the server. It updates the game with this information.
  *  \param ns The message from the server.
  */
-void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
+void GameEventsProtocol::kartFinishedRace(const NewNetworkString &ns)
 {
     uint8_t kart_id = ns.getUInt8(0);
     float time      = ns.getFloat(1);
