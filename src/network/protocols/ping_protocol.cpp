@@ -50,8 +50,9 @@ void PingProtocol::asynchronousUpdate()
     if (StkTime::getRealTime() > m_last_ping_time+m_delay_between_pings)
     {
         m_last_ping_time = StkTime::getRealTime();
-        uint8_t data = 0;
-        STKHost::get()->sendRawPacket(&data, 1, m_ping_dst);
+        BareNetworkString data;
+        data.addUInt8(0);
+        STKHost::get()->sendRawPacket(data, m_ping_dst);
         Log::info("PingProtocol", "Ping message sent");
     }
 }   // asynchronousUpdate

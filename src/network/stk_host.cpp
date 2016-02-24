@@ -564,8 +564,9 @@ void* STKHost::mainLoop(void* self)
                 TransportAddress stk_addr(peer->getAddress());
                 Log::verbose("NetworkManager",
                              "Message, Sender : %s, message = \"%s\"",
-                             stk_addr.toString(/*show port*/false).c_str(),
-                             stk_event->data().std_string().c_str());
+                             stk_addr.toString(/*show port*/false).c_str());
+                Log::verbose("NetworkManager",
+                             stk_event->data().getLogMessage().c_str());
 
             }   // if message event
 
@@ -604,13 +605,13 @@ void STKHost::handleLANRequests()
         // current players, and the client's ip address and port
         // number (which solves the problem which network interface
         // might be the right one if there is more than one).
-        NewNetworkString s(PROTOCOL_NONE);
+        BareNetworkString s(name.size()+1+8);
         s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
         s.addUInt8(0);   // FIXME: current number of connected players
         s.addUInt32(sender.getIP());
         s.addUInt16(sender.getPort());
-        m_lan_network->sendRawPacket(s.getData(), s.size(), sender);
+        m_lan_network->sendRawPacket(s, sender);
     }   // if message is server-requested
     else if (std::string(buffer, len) == "connection-request")
     {

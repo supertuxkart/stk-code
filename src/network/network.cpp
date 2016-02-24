@@ -82,10 +82,9 @@ ENetPeer *Network::connectTo(const TransportAddress &address)
 /** \brief Sends a packet whithout ENet adding its headers.
  *  This function is used in particular to achieve the STUN protocol.
  *  \param data : Data to send.
- *  \param length : Length of the sent data.
  *  \param dst : Destination of the packet.
  */
-void Network::sendRawPacket(uint8_t* data, int length,
+void Network::sendRawPacket(const BareNetworkString &buffer,
                             const TransportAddress& dst)
 {
     struct sockaddr_in to;
@@ -96,10 +95,11 @@ void Network::sendRawPacket(uint8_t* data, int length,
     to.sin_port = htons(dst.getPort());
     to.sin_addr.s_addr = htonl(dst.getIP());
 
-    sendto(m_host->socket, (char*)data, length, 0,(sockaddr*)&to, to_len);
+    sendto(m_host->socket, buffer.getData(), buffer.size(), 0,
+           (sockaddr*)&to, to_len);
     Log::verbose("Network", "Raw packet sent to %s",
                  dst.toString().c_str());
-    Network::logPacket(NewNetworkString(data, length), false);
+    Network::logPacket(buffer, false);
 }   // sendRawPacket
 
 // ----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
     if(len<0)
         return -1;
 
-    Network::logPacket(NewNetworkString((uint8_t*)buffer, len), true);
+    Network::logPacket(BareNetworkString(buffer, len), true);
     sender->setIP(ntohl((uint32_t)(addr.sin_addr.s_addr)) );
     sender->setPort( ntohs(addr.sin_port) );
     if (addr.sin_family == AF_INET)
@@ -188,7 +188,7 @@ void Network::openLog()
  *  \param incoming : True if the packet comes from a peer.
  *  False if it's sent to a peer.
  */
-void Network::logPacket(const NewNetworkString &ns, bool incoming)
+void Network::logPacket(const BareNetworkString &ns, bool incoming)
 {
     if (m_log_file.getData() == NULL) // read only access, no need to lock
         return;
@@ -198,12 +198,8 @@ void Network::logPacket(const NewNetworkString &ns, bool incoming)
     m_log_file.lock();
     fprintf(m_log_file.getData(), "[%d\t]  %s  ",
             (int)(StkTime::getRealTime()), arrow);
-
-    for (int i = 0; i < ns.size(); i++)
-    {
-        fprintf(m_log_file.getData(), "%d.", ns[i]);
-    }
-    fprintf(m_log_file.getData(), "\n");
+    
+    fprintf(m_log_file.getData(), ns.getLogMessage().c_str());
     m_log_file.unlock();
 }   // logPacket
 // ----------------------------------------------------------------------------

@@ -378,9 +378,13 @@ void ConnectToServer::handleSameLAN()
     char buffer[LEN];
     int len = host->receiveRawPacket(buffer, LEN, &sender, 2000);
 
+    BareNetworkString message(buffer, len
+        );
+    std::string received;
+    message.decodeString(0, &received);
     host->startListening(); // start listening again
-    const char data[] = "aloha_stk\0";
-    if (strcmp(data, buffer) == 0)
+    std::string aloha("aloha_stk");
+    if (received==aloha)
     {
         Log::info("ConnectToServer", "LAN Server found : %s",
                    sender.toString().c_str());

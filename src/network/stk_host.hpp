@@ -188,10 +188,10 @@ public:
     }   // broadcastPacket
 
     // --------------------------------------------------------------------
-    void sendRawPacket(uint8_t* data, int length,
+    void sendRawPacket(const BareNetworkString &buffer,
                        const TransportAddress& dst)
     {
-        m_network->sendRawPacket(data, length, dst);
+        m_network->sendRawPacket(buffer, dst);
     }  // sendRawPacket
 
     // --------------------------------------------------------------------

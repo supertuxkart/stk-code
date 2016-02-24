@@ -441,7 +441,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 
     // Add all players
     // ===============
-    int n = 9;
+    unsigned int n = 9;
     while (n < data.size())
     {
         if (data[n] != 1 )

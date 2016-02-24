@@ -14,71 +14,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "network/network_string.hpp"
 
 #include "utils/string_utils.hpp"
 
-NetworkString operator+(NetworkString const& a, NetworkString const& b)
-{
-    NetworkString ns(a);
-    ns += b;
-    return ns;
-}   // operator+
-
-// ----------------------------------------------------------------------------
-/** Adds one byte for the length of the string, and then (up to 255 of)
- *  the characters of the given string. */
-NetworkString& NetworkString::encodeString(const std::string &value)
-{
-    int len = value.size();
-    if(len<=255)
-        return addUInt8(len).addString(value);
-    else
-        return addUInt8(255).addString(value.substr(0, 255));
-}   // encodeString
-
-// ----------------------------------------------------------------------------
-/** Adds one byte for the length of the string, and then (up to 255 of)
- *  the characters of the given string. */
-NetworkString& NetworkString::encodeString(const irr::core::stringw &value)
-{
-    std::string v = StringUtils::wideToUtf8(value);
-    return encodeString(v);
-}   // encodeString
-
-// ----------------------------------------------------------------------------
-/** Returns a string at the given position. The first byte indicates the
- *  length, followed by the actual string (not 0 terminated).
- *  \param[in] pos Buffer position where the encoded string starts.
- *  \param[out] out The decoded string.
- *  \return number of bytes read = 1+length of string
- */
-int NetworkString::decodeString(int pos, std::string *out) const
-{
-    uint8_t len = getUInt8(pos);
-    *out = getString(pos+1, len);
-    return len+1;
-}    // decodeString
-
-// ----------------------------------------------------------------------------
-/** Returns an irrlicht wide string from the utf8 encoded string at the 
- *  given position.
- *  \param[in] pos Buffer position where the encoded string starts.
- *  \param[out] out The decoded string.
- *  \return number of bytes read. If there are no special characters in the
- *          string that will be 1+length of string, but multi-byte encoded
- *          characters can mean that the length of the returned string is
- *          less than the number of bytes read.
- */
-int NetworkString::decodeStringW(int pos, irr::core::stringw *out) const
-{
-    std::string s;
-    int len = decodeString(pos, &s);
-    *out = StringUtils::utf8ToWide(s);
-    return len;
-}   // decodeString 
+#include <algorithm>   // for std::min
+#include <ostream>
 
 // ============================================================================
+/** Unit testing function.
+ */
 void NewNetworkString::unitTesting()
 {
     NewNetworkString s(PROTOCOL_LOBBY_ROOM);
@@ -120,7 +66,7 @@ void NewNetworkString::unitTesting()
 // ----------------------------------------------------------------------------
 /** Adds one byte for the length of the string, and then (up to 255 of)
  *  the characters of the given string. */
-NewNetworkString& NewNetworkString::encodeString(const std::string &value)
+BareNetworkString& BareNetworkString::encodeString(const std::string &value)
 {
     int len = value.size();
     if(len<=255)
@@ -132,7 +78,7 @@ NewNetworkString& NewNetworkString::encodeString(const std::string &value)
 // ----------------------------------------------------------------------------
  /** Adds one byte for the length of the string, and then (up to 255 of)
  *  the characters of the given string. */
-NewNetworkString& NewNetworkString::encodeString(const irr::core::stringw &value)
+BareNetworkString& BareNetworkString::encodeString(const irr::core::stringw &value)
 {
     std::string v = StringUtils::wideToUtf8(value);
     return encodeString(v);
@@ -145,7 +91,7 @@ NewNetworkString& NewNetworkString::encodeString(const irr::core::stringw &value
  *  \param[out] out The decoded string.
  *  \return number of bytes read = 1+length of string
  */
-int NewNetworkString::decodeString(int pos, std::string *out) const
+int BareNetworkString::decodeString(int pos, std::string *out) const
 {
     uint8_t len = get<uint8_t>(pos);
     *out = getString(pos+1, len);
@@ -162,11 +108,39 @@ int NewNetworkString::decodeString(int pos, std::string *out) const
  *          characters can mean that the length of the returned string is
  *          less than the number of bytes read.
  */
-int NewNetworkString::decodeStringW(int pos, irr::core::stringw *out) const
+int BareNetworkString::decodeStringW(int pos, irr::core::stringw *out) const
 {
     std::string s;
     int len = decodeString(pos, &s);
     *out = StringUtils::utf8ToWide(s);
     return len;
 }   // decodeString 
+
+// ----------------------------------------------------------------------------
+/** Returns a string representing this message suitable to be printed
+ *  to stdout or via the Log mechanism. Format
+ *   0000 : 1234 5678 9abc  ...    ASCII-
+ */
+std::string BareNetworkString::getLogMessage() const
+{
+    std::ostringstream oss;
+    for(unsigned int line=0; line<16; line+=16)
+    {
+        oss << line << " : ";
+        unsigned int upper_limit = std::min(line+16, size());
+        for(unsigned int i=line; i<upper_limit; i++)
+        {
+            oss << getUInt8(i);
+            if(i%2==1) oss << " ";
+        }   // for i
+        // Add ascii representation
+        for(unsigned int i=line; i<upper_limit; i++)
+        {
+            oss << getUInt8(i);
+        }   // for i
+        oss << "\n";
+    }   // for line
+
+    return oss.str();
+}   // getLogMessage
 

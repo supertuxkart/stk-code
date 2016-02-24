@@ -33,6 +33,7 @@
 
 #include <stdio.h>
 
+class BareNetworkString;
 class NewNetworkString;
 class TransportAddress;
 
@@ -57,10 +58,10 @@ public:
     virtual  ~Network();
 
     static void openLog();
-    static void logPacket(const NewNetworkString &ns, bool incoming);
+    static void logPacket(const BareNetworkString &ns, bool incoming);
     static void closeLog();
     ENetPeer *connectTo(const TransportAddress &address);
-    void     sendRawPacket(uint8_t* data, int length,
+    void     sendRawPacket(const BareNetworkString &buffer,
                            const TransportAddress& dst);
     int receiveRawPacket(char *buffer, int buf_len,
                          TransportAddress* sender, int max_tries = -1);

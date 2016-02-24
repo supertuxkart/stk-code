@@ -57,7 +57,7 @@ NewNetworkString* Protocol::getNetworkString(int capacity)
 }   // getNetworkString
 
 // ----------------------------------------------------------------------------
-bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
+bool Protocol::checkDataSizeAndToken(Event* event, unsigned int minimum_size)
 {
     const NewNetworkString &data = event->data();
     if (data.size() < minimum_size || data[0] != 4)

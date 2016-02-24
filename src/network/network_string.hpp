@@ -39,289 +39,198 @@
 
 typedef unsigned char uchar;
 
-/** \class NetworkString
+/** \class BareNetworkString
  *  \brief Describes a chain of 8-bit unsigned integers.
- *  This class allows you to easily create and parse 8-bit strings.
+ *  This class allows you to easily create and parse 8-bit strings, has 
+ *  functions to add and read other data types (e.g. int, strings). It does
+ *  not enforce any structure on the sequence (NetworkString uses this as
+ *  a base class, and enforces a protocol type in the first byte, and a
+ *  4-byte authentication token in bytes 2-5)
  */
-class NetworkString
+
+class BareNetworkString
 {
-private:
-    union FloatAsInt 
-    {
-        float f;
-        uint8_t i[4];
-    }; // float as integer
+protected:
+    /** The actual buffer. */
+    std::vector<uint8_t> m_buffer;
 
-    // ------------------------------------------------------------------------
-    union {
-        double d;
-        uint8_t i[8];
-    } d_as_i; // double as integer
-
-    // ------------------------------------------------------------------------
-
-    std::vector<uint8_t> m_string;
+    /** To avoid copying the buffer when bytes are deleted (which only
+    *  happens at the front), use an offset index. All positions given
+    *  by the user will be relative to this index. Note that the type
+    *  should be left as signed, otherwise certain arithmetic (e.g.
+    *  1-m_current_offset in checkToken() will be done unsigned).
+    */
+    int m_current_offset;
 
     // ------------------------------------------------------------------------
     /** Returns a part of the network string as a std::string. This is an
-     *  internal function only, the user should call decodeString(W) instead.
-     *  \param pos First position to be in the string.
-     *  \param len Number of bytes to copy.
-     */
+    *  internal function only, the user should call decodeString(W) instead.
+    *  \param pos First position to be in the string.
+    *  \param len Number of bytes to copy.
+    */
     std::string getString(int pos, int len) const 
     {
-        return std::string(m_string.begin() + pos,
-            m_string.begin() + pos + len); 
+        return std::string(m_buffer.begin() + (m_current_offset+pos      ),
+            m_buffer.begin() + (m_current_offset+pos + len) ); 
     }   // getString
-
-public:
-    /** Dummy constructor. */
-    NetworkString() { }
-
     // ------------------------------------------------------------------------
-    /** Constructor to store one byte. */
-    NetworkString(int len)
-    {
-        m_string.reserve(len);
-    }   // NetworkString(int)
-
-    // ------------------------------------------------------------------------
-    /** Copy constructor. */
-    NetworkString(NetworkString const& copy) { m_string = copy.m_string; }
-
-    // ------------------------------------------------------------------------
-    /** Copy the data from a string. */
-    NetworkString(const std::string & value)
-    {
-        m_string = std::vector<uint8_t>(value.begin(), value.end());
-    }   // NetworkString
-
-    // ------------------------------------------------------------------------
-    NetworkString(const char *p, int len)
-    {
-        m_string.resize(len);
-        memcpy(m_string.data(), p, len);
-    }   // NetworkString(char*, int)
-    // ------------------------------------------------------------------------
-    NetworkString& encodeString(const std::string &value);
-    NetworkString& encodeString(const irr::core::stringw &value);
-    int decodeString(int n, std::string *out) const;
-    int decodeStringW(int n, irr::core::stringw *out) const;
-
-    // ------------------------------------------------------------------------
-    NetworkString& removeFront(int size)
-    {
-        m_string.erase(m_string.begin(), m_string.begin() + size);
-        return *this;
-    }   // removeFront
-
-    // ------------------------------------------------------------------------
-    NetworkString& remove(int pos, int size)
-    {
-        m_string.erase(m_string.begin() + pos, m_string.begin() + pos + size);
-        return *this;
-    }   // remove
-
-    // ------------------------------------------------------------------------
-    uint8_t operator[](const int& pos) const
-    {
-        return getUInt8(pos);
-    }   // operator[]
-
-    // ------------------------------------------------------------------------
-    /** Add 8 bit unsigned int. */
-    NetworkString& addUInt8(const uint8_t& value)
-    {
-        m_string.push_back(value);
-        return *this;
-    }   // addUInt8
-
-    // ------------------------------------------------------------------------
-    /** Adds 8 bit integer. */
-    inline NetworkString& ai8(const uint8_t& value) { return addUInt8(value); }
-
-    // ------------------------------------------------------------------------
-    /** Adds 16 bit unsigned int. */
-    NetworkString& addUInt16(const uint16_t& value)
-    {
-        m_string.push_back((value >> 8) & 0xff);
-        m_string.push_back(value & 0xff);
-        return *this;
-    }   // addUInt16
-
-    // ------------------------------------------------------------------------
-    /** Adds 16 bit integer. */
-    inline NetworkString& ai16(const uint16_t& value)
-    {
-        return addUInt16(value); 
-    }   // ai16
-
-    // ------------------------------------------------------------------------
-    /** Adds unsigned 32 bit integer. */
-    NetworkString& addUInt32(const uint32_t& value)
-    {
-        m_string.push_back((value >> 24) & 0xff);
-        m_string.push_back((value >> 16) & 0xff);
-        m_string.push_back((value >> 8) & 0xff);
-        m_string.push_back(value & 0xff);
-        return *this;
-    }   // addUInt32
-
-    // ------------------------------------------------------------------------
-    /** Adds 32 bit integer. */
-    inline NetworkString& ai32(const uint32_t& value)
-    {
-        return addUInt32(value); 
-    }   // ai32
-
-    // ------------------------------------------------------------------------
-    NetworkString& addInt(const int& value)
-    {
-        m_string.push_back((value >> 24) & 0xff);
-        m_string.push_back((value >> 16) & 0xff);
-        m_string.push_back((value >> 8) & 0xff);
-        m_string.push_back(value & 0xff);
-        return *this;
-    }   // addInt
-
-    // ------------------------------------------------------------------------
-    inline NetworkString& ai(const int& value) { return addInt(value); }
-    // ------------------------------------------------------------------------
-    /** Adds a 4 byte floating point value. */
-    NetworkString& addFloat(const float& value) //!< BEWARE OF PRECISION
-    {
-        assert(sizeof(float) == 4);
-        FloatAsInt f_as_i;
-        f_as_i.f = value;
-        m_string.push_back(f_as_i.i[0]);
-        m_string.push_back(f_as_i.i[1]);
-        m_string.push_back(f_as_i.i[2]);
-        m_string.push_back(f_as_i.i[3]);
-        return *this;
-    }
-    // ------------------------------------------------------------------------
-    /** Adds a 4 byte floating point value. */
-    inline NetworkString& af(const float& value) { return addFloat(value); }
-
-    // ------------------------------------------------------------------------
-    /** Adds a 8 byte floating point value. */
-    NetworkString& addDouble(const double& value) //!< BEWARE OF PRECISION
-    {
-        assert(sizeof(double) == 8);
-        d_as_i.d = value;
-        m_string.push_back(d_as_i.i[0]);
-        m_string.push_back(d_as_i.i[1]);
-        m_string.push_back(d_as_i.i[2]);
-        m_string.push_back(d_as_i.i[3]);
-        m_string.push_back(d_as_i.i[4]);
-        m_string.push_back(d_as_i.i[5]);
-        m_string.push_back(d_as_i.i[6]);
-        m_string.push_back(d_as_i.i[7]);
-        return *this;
-    }   // addDouble
-
-    // ------------------------------------------------------------------------
-    /** Adds n 8 byte floating point value. */
-    inline NetworkString& ad(const double& value) { return addDouble(value); }
-
-    // ------------------------------------------------------------------------
-    /** Adds a single character to the string. */
-    NetworkString& addChar(const char& value)
-    {
-        m_string.push_back((uint8_t)(value));
-        return *this;
-    }   // addChar
-
-    // ------------------------------------------------------------------------
-    /** Adds a single character. */
-    inline NetworkString& ac(const char& value) { return addChar(value); }
-
-    /** Adds a string. */
-    NetworkString& addString(const std::string& value)
+    /** Adds a std::string. Internal use only. */
+    BareNetworkString& addString(const std::string& value)
     {
         for (unsigned int i = 0; i < value.size(); i++)
-            m_string.push_back((uint8_t)(value[i]));
+            m_buffer.push_back((uint8_t)(value[i]));
         return *this;
-    }
+    }   // addString
 
     // ------------------------------------------------------------------------
-    /** Adds a string. */
-    inline NetworkString& as(const std::string& value)
-    {
-        return addString(value);
-    }   // as
-
-    // ------------------------------------------------------------------------
-    /** Adds the content of another network string. */
-    NetworkString& operator+=(NetworkString const& value)
-    {
-        m_string.insert(m_string.end(), value.m_string.begin(), 
-                                        value.m_string.end()   );
-        return *this;
-    }   // operator+=
-
-    // ------------------------------------------------------------------------
-    /** Adds the xyz components of a Vec3 to the string. */
-    NetworkString& add(const Vec3 &xyz)
-    {
-        return addFloat(xyz.getX()).addFloat(xyz.getY()).addFloat(xyz.getZ());
-    }   // add
-    // ------------------------------------------------------------------------
-    /** Adds the four components of a quaternion. */
-    NetworkString& add(const btQuaternion &quat)
-    {
-        return addFloat(quat.getX()).addFloat(quat.getY())
-              .addFloat(quat.getZ()).addFloat(quat.getW());
-    }   // add
-    // ------------------------------------------------------------------------
-    /** Returns the content of the network string as a std::string. */
-    const std::string std_string() const
-    {
-        std::string str(m_string.begin(), m_string.end());
-        return str;
-    }   // std_string
-
-    // ------------------------------------------------------------------------
-    /** Returns the current length of the network string. */
-    int size() const { return (int)m_string.size(); }
-
-    // ------------------------------------------------------------------------
-    /** Returns a byte pointer to the content of the network string. */
-    uint8_t* getBytes() { return &m_string[0]; };
-
-    // ------------------------------------------------------------------------
-    /** Returns a byte pointer to the content of the network string. */
-    const uint8_t* getBytes() const { return &m_string[0]; };
-
-    // ------------------------------------------------------------------------
+    /** Template to get n bytes from a buffer into a single data type. */
     template<typename T, size_t n>
     T get(int pos) const
     {
         int a = n;
         T result = 0;
+        int offset = m_current_offset + pos + n -1;
         while (a--)
         {
             result <<= 8; // offset one byte
-            // add the data to result
-            result += ((uint8_t)(m_string[pos + n - 1 - a]) & 0xff);
+                          // add the data to result
+            result += m_buffer[offset - a];
         }
         return result;
     }   // get(int pos)
-
     // ------------------------------------------------------------------------
-    // Another function for n == 1 to surpress warnings in clang
+    /** Another function for n == 1 to surpress warnings in clang. */
     template<typename T>
     T get(int pos) const
     {
-        return m_string[pos];
+        return m_buffer[pos];
     }   // get
 
+public:
+
+    /** Constructor, sets the protocol type of this message. */
+    BareNetworkString(int capacity=16)
+    {
+        m_buffer.reserve(capacity);
+        m_current_offset = 0;
+    }   // BareNetworkString
+
     // ------------------------------------------------------------------------
-    /** Returns a standard integer. */
-    inline int getInt(int pos = 0) const { return get<int, 4>(pos); }
+    BareNetworkString(const std::string &s)
+    {
+        encodeString(s);
+    }   // BareNetworkString
     // ------------------------------------------------------------------------
-    /** Returns a standard unsigned integer. */
-    inline uint32_t getUInt(int pos = 0) const { return get<uint32_t, 4>(pos); }
+    /** Initialises the string with a sequence of characters. */
+    BareNetworkString(const char *data, int len)
+    {
+        m_buffer.resize(len);
+        memcpy(m_buffer.data(), data, len);
+    }   // BareNetworkString
+
+    // ------------------------------------------------------------------------
+    BareNetworkString& encodeString(const std::string &value);
+    BareNetworkString& encodeString(const irr::core::stringw &value);
+    int decodeString(int n, std::string *out) const;
+    int decodeStringW(int n, irr::core::stringw *out) const;
+    std::string getLogMessage() const;
+    // ------------------------------------------------------------------------
+    /** Returns a byte pointer to the content of the network string. */
+    char* getData() { return (char*)(m_buffer.data()); };
+
+    // ------------------------------------------------------------------------
+    /** Returns a byte pointer to the content of the network string. */
+    const char* getData() const { return (char*)(m_buffer.data()); };
+
+    // ------------------------------------------------------------------------
+    /** Returns the current length of the network string. */
+    unsigned int size() const { return (int)m_buffer.size(); }
+
+    // ------------------------------------------------------------------------
+    // All functions related to adding data to a network string
+    /** Add 8 bit unsigned int. */
+    BareNetworkString& addUInt8(const uint8_t value)
+    {
+        m_buffer.push_back(value);
+        return *this;
+    }   // addUInt8
+
+    // ------------------------------------------------------------------------
+    /** Adds a single character to the string. */
+    BareNetworkString& addChar(const char& value)
+    {
+        m_buffer.push_back((uint8_t)(value));
+        return *this;
+    }   // addChar
+    // ------------------------------------------------------------------------
+    /** Adds 16 bit unsigned int. */
+    BareNetworkString& addUInt16(const uint16_t value)
+    {
+        m_buffer.push_back((value >> 8) & 0xff);
+        m_buffer.push_back(value & 0xff);
+        return *this;
+    }   // addUInt16
+
+    // ------------------------------------------------------------------------
+    /** Adds unsigned 32 bit integer. */
+    BareNetworkString& addUInt32(const uint32_t& value)
+    {
+        m_buffer.push_back((value >> 24) & 0xff);
+        m_buffer.push_back((value >> 16) & 0xff);
+        m_buffer.push_back((value >>  8) & 0xff);
+        m_buffer.push_back( value        & 0xff);
+        return *this;
+    }   // addUInt32
+
+    // ------------------------------------------------------------------------
+    /** Adds a 4 byte floating point value. */
+    BareNetworkString& addFloat(const float value)
+    {
+        uint32_t *p = (uint32_t*)&value;
+        return addUInt32(*p);
+    }   // addFloat
+
+    // ------------------------------------------------------------------------
+    /** Adds the content of another network string. */
+    BareNetworkString& operator+=(BareNetworkString const& value)
+    {
+        m_buffer.insert(m_buffer.end(), value.m_buffer.begin(), 
+            value.m_buffer.end()   );
+        return *this;
+    }   // operator+=
+
+    // ------------------------------------------------------------------------
+    /** Adds the xyz components of a Vec3 to the string. */
+    BareNetworkString& add(const Vec3 &xyz)
+    {
+        return addFloat(xyz.getX()).addFloat(xyz.getY()).addFloat(xyz.getZ());
+    }   // add
+
+    // ------------------------------------------------------------------------
+    /** Adds the four components of a quaternion. */
+    BareNetworkString& add(const btQuaternion &quat)
+    {
+        return addFloat(quat.getX()).addFloat(quat.getY())
+              .addFloat(quat.getZ()).addFloat(quat.getW());
+    }   // add
+
+    // Functions related to getting data from a network string
+    // ------------------------------------------------------------------------
+    /** Ignore the next num_bytes from the message. */
+    void removeFront(unsigned int num_bytes)
+    {
+        assert(m_current_offset + num_bytes <= m_buffer.size());
+        m_current_offset += num_bytes;
+    }   // removeFront
+
+    // ------------------------------------------------------------------------
+    /** Gets the byte at the specified position (taking current offset into
+    *  account). */
+    uint8_t operator[](const int pos) const
+    {
+        return m_buffer[m_current_offset + pos];
+    }   // operator[]
+
     // ------------------------------------------------------------------------
     /** Returns a unsigned 32 bit integer. */
     inline uint32_t getUInt32(int pos = 0) const { return get<uint32_t, 4>(pos); }
@@ -330,216 +239,38 @@ public:
     inline uint16_t getUInt16(int pos=0) const { return get<uint16_t, 2>(pos); }
     // ------------------------------------------------------------------------
     /** Returns an unsigned 8-bit integer. */
-    inline uint8_t getUInt8(int pos = 0)  const { return get<uint8_t>(pos); }
-    // ------------------------------------------------------------------------
-    /** Returns a character. */
-    inline char getChar(int pos = 0) const { return get<char>(pos); }
-    // ------------------------------------------------------------------------
-    /** Returns an unsigned character. */
-    inline unsigned char getUChar(int pos = 0) const
+    inline uint8_t getUInt8(int pos = 0)  const
     {
-        return get<unsigned char>(pos); 
-    }   // getUChar
-    // ------------------------------------------------------------------------
-    /** Returns a standard integer. */
-    inline int gi(int pos = 0) const { return get<int, 4>(pos); }
-    // ------------------------------------------------------------------------
-    /** Retrusn an unsigned standard integer. */
-    inline uint32_t gui(int pos = 0) const { return get<uint32_t, 4>(pos); }
-    // ------------------------------------------------------------------------
-    /** Returns an unsigned 32-bit integer. */
-    inline uint32_t gui32(int pos = 0) const { return get<uint32_t, 4>(pos); }
-    // ------------------------------------------------------------------------
-    /** Returns an unsigned 16-bit integer. */
-    inline uint16_t gui16(int pos = 0) const { return get<uint16_t, 2>(pos); }
-    // ------------------------------------------------------------------------
-    /** Returns an unsigned 8-bit integer. */
-    inline uint8_t gui8(int pos = 0) const { return get<uint8_t>(pos); }
-    // ------------------------------------------------------------------------
-    /** Return a character. */
-    inline char gc(int pos = 0) const { return get<char>(pos); }
-    // ------------------------------------------------------------------------
-    /** Return an unsigned character. */
-    inline unsigned char guc(int pos = 0) const
-    {
-        return get<unsigned char>(pos); 
-    }   // guc
+        return m_buffer[m_current_offset + pos];
+    }   // getUInt8
 
     // ------------------------------------------------------------------------
-    /** Returns a 4-byte floating point value. */
-    float getFloat(int pos = 0) const //!< BEWARE OF PRECISION
+    /** Gets a 4 byte floating point value. */
+    float getFloat(int pos=0) const
     {
-        FloatAsInt f_as_i;
-        for (int i = 0; i < 4; i++)
-            f_as_i.i[i] = m_string[pos + i];
-        return f_as_i.f;
-    }  // getFloat
+        uint32_t u = getUInt32(pos);
+        return *(float*)&u;
+    }   // getFloat
 
     // ------------------------------------------------------------------------
-    //! Functions to get while removing
-    template<typename T, size_t n>
-    T getAndRemove(int pos)
+    /** Gets a Vec3. */
+    Vec3 getVec3(int pos=0) const
     {
-        int a = n;
-        T result = 0;
-        while (a--)
-        {
-            result <<= 8; // offset one byte
-            result += ((uint8_t)(m_string[pos + n - 1 - a]) & 0xff); // add the data
-        }
-        remove(pos, n);
-        return result;
-    }   // getAndRemove
+        return Vec3(getFloat(pos), getFloat(pos+4), getFloat(pos+8));
+    }   // getVec3
 
     // ------------------------------------------------------------------------
-    // Another function for n == 1 to surpress warnings in clang
-    template<typename T>
-    T getAndRemove(int pos)
+    /** Gets a Vec3. */
+    btQuaternion getQuat(int pos=0) const
     {
-        T result = m_string[pos];
-        remove(pos, 1);
-        return result;
-    }   // getAndRemove
+        return btQuaternion(getFloat(pos),   getFloat(pos+ 4),
+            getFloat(pos+8), getFloat(pos+12) );
+    }   // getQuat
+    // ------------------------------------------------------------------------
 
-    // ------------------------------------------------------------------------
-    inline int getAndRemoveInt(int pos = 0)
-    {
-        return getAndRemove<int, 4>(pos);
-    }   // getAndRemoveInt
+};   // class BareNetworkString
 
-    // ------------------------------------------------------------------------
-    inline uint32_t getAndRemoveUInt(int pos = 0)
-    {
-        return getAndRemove<uint32_t, 4>(pos);
-    }   // getAndRemoveUInt
 
-    // ------------------------------------------------------------------------
-    inline uint32_t getAndRemoveUInt32(int pos = 0)
-    {
-        return getAndRemove<uint32_t, 4>(pos); 
-    }   // getAndRemoveUInt32
-    
-    // ------------------------------------------------------------------------
-    inline uint16_t getAndRemoveUInt16(int pos = 0)
-    {
-        return getAndRemove<uint16_t, 2>(pos); 
-    }   // getAndRemoveUInt16
-
-    // ------------------------------------------------------------------------
-    inline uint8_t getAndRemoveUInt8(int pos = 0)
-    {
-        return getAndRemove<uint8_t>(pos); 
-    }   // getAndRemoveUInt8
-    // ------------------------------------------------------------------------
-    inline char getAndRemoveChar(int pos = 0)
-    {
-        return getAndRemove<char>(pos); 
-    }   // getAndRemoveChar
-
-    // ------------------------------------------------------------------------
-    inline unsigned char getAndRemoveUChar(int pos = 0)
-    {
-        return getAndRemove<unsigned char>(pos); 
-    }   // getAndRemoveUChar
-
-    // ------------------------------------------------------------------------
-    double getAndRemoveDouble(int pos = 0) //!< BEWARE OF PRECISION
-    {
-        for (int i = 0; i < 8; i++)
-            d_as_i.i[i] = m_string[pos + i];
-        return d_as_i.d;
-        remove(pos, 8);
-    }   // getAndRemoveDouble
-
-    // ------------------------------------------------------------------------
-    /** Get and remove a 4 byte floating point value. */
-    float getAndRemoveFloat(int pos = 0) //!< BEWARE OF PRECISION
-    {
-        FloatAsInt f_as_i;
-        for (int i = 0; i < 4; i++)
-            f_as_i.i[i] = m_string[pos + i];
-        return f_as_i.f;
-        remove(pos, 4);
-    }   // getAndRemoveFloat
-
-    // ------------------------------------------------------------------------
-    /** Removes a 8 bit unsigned int. */
-    inline NetworkString& gui8(uint8_t* dst)
-    {
-        *dst = getAndRemoveUInt8(0);
-        return *this; 
-    }   // gui8
-
-    // ------------------------------------------------------------------------
-    /** Returns a 16 bit integer. */
-    inline NetworkString& gui16(uint16_t* dst)
-    {
-        *dst = getAndRemoveUInt16(0);
-        return *this; 
-    }   // gui16
-
-    // ------------------------------------------------------------------------
-    /** Returns a 32 bit integer. */
-    inline NetworkString& gui32(uint32_t* dst)
-    {
-        *dst = getAndRemoveUInt32(0);
-        return *this; 
-    }   // gui32
-
-    // ------------------------------------------------------------------------
-    /** Returns a 32 bit integer. */
-    inline NetworkString& gui(uint32_t* dst)
-    {
-        *dst = getAndRemoveUInt32(0);
-        return *this;
-    }   // gui
-    
-    // ------------------------------------------------------------------------
-    /** Returns 4 byte integer. */
-    inline NetworkString& gi(int* dst)
-    {
-        *dst = getAndRemoveInt(0);
-        return *this;
-    }    // gi
-
-    // ------------------------------------------------------------------------
-    /** Returns a single character. */
-    inline NetworkString& gc(char* dst)
-    {
-        *dst = getAndRemoveChar(0);
-        return *this; 
-    }   // gc
-
-    // ------------------------------------------------------------------------
-    /** Returns an unsigned character. */
-    inline NetworkString& guc(uchar* dst)
-    {
-        *dst = getAndRemoveUChar(0);
-        return *this; 
-    }   // guc
-    // ------------------------------------------------------------------------
-    /** Reads the three components of a Vec3 from the given position. */
-    NetworkString& get(Vec3 *xyz, int pos)
-    {
-        xyz->setX(getFloat(pos  ));
-        xyz->setY(getFloat(pos+4));
-        xyz->setZ(getFloat(pos+8));
-        return *this;
-    }   // addVec3
-    // ------------------------------------------------------------------------
-    /** Reads the four components of a quaternion from the given position. */
-    NetworkString& get(btQuaternion *quat, int pos)
-    {
-        quat->setX(getFloat(pos   ));
-        quat->setY(getFloat(pos+ 4));
-        quat->setZ(getFloat(pos+ 8));
-        quat->setW(getFloat(pos+12));
-        return *this;
-    }   // addVec3
-
-};   // class NetworkString
-
-NetworkString operator+(NetworkString const& a, NetworkString const& b);
 // ============================================================================
 
 /** A new implementation of NetworkString, which has a fixed format:
@@ -557,65 +288,23 @@ NetworkString operator+(NetworkString const& a, NetworkString const& b);
  *  so that the protocols would not see this byte). But this is implemented
  *  now by using a base pointer (and not by moving the buffer content).
  */
-class NewNetworkString
+class NewNetworkString : public BareNetworkString
 {
-private:
-    /** The actual buffer. */
-    std::vector<uint8_t> m_buffer;
-
-    /** To avoid copying the buffer when bytes are deleted (which only
-     *  happens at the front), use an offset index. All positions given
-     *  by the user will be relative to this index. Note that the type
-     *  should be left as signed, otherwise certain arithmetic (e.g.
-     *  1-m_current_offset in checkToken() will be done unsigned).
-     */
-    int m_current_offset;
-
-    // ------------------------------------------------------------------------
-    /** Returns a part of the network string as a std::string. This is an
-    *  internal function only, the user should call decodeString(W) instead.
-    *  \param pos First position to be in the string.
-    *  \param len Number of bytes to copy.
-    */
-    std::string getString(int pos, int len) const 
-    {
-        return std::string(m_buffer.begin() + (m_current_offset+pos      ),
-                           m_buffer.begin() + (m_current_offset+pos + len) ); 
-    }   // getString
-    // ------------------------------------------------------------------------
-    /** Adds a std::string. Internal use only. */
-    NewNetworkString& addString(const std::string& value)
-    {
-        for (unsigned int i = 0; i < value.size(); i++)
-            m_buffer.push_back((uint8_t)(value[i]));
-        return *this;
-    }   // addString
-
 public:
     static void unitTesting();
         
     /** Constructor, sets the protocol type of this message. */
     NewNetworkString(ProtocolType type,  int capacity=16)
+        : BareNetworkString(capacity)
     {
-        m_buffer.reserve(capacity);
         m_buffer.push_back(type);
-        m_current_offset = 0;
     }   // NewNetworkString
 
     // ------------------------------------------------------------------------
-    NewNetworkString(const uint8_t *data, int len)
+    NewNetworkString(const uint8_t *data, int len) 
+        : BareNetworkString((char*)data, len)
     {
-        m_buffer.resize(len);
-        memcpy(m_buffer.data(), data, len);
     }   // NewNetworkString
-
-    // ------------------------------------------------------------------------
-    /** Returns a byte pointer to the content of the network string. */
-    uint8_t* getData() { return &m_buffer[0]; };
-
-    // ------------------------------------------------------------------------
-    /** Returns a byte pointer to the content of the network string. */
-    const uint8_t* getData() const { return &m_buffer[0]; };
 
     // ------------------------------------------------------------------------
     /** Returns the protocol type of this message. */
@@ -665,163 +354,6 @@ public:
         // to really access bytes 1-4
         return getUInt32(1-m_current_offset);
     }   // getToken
-    // ------------------------------------------------------------------------
-    /** Returns the current length of the network string. */
-    int size() const { return (int)m_buffer.size(); }
-    // ------------------------------------------------------------------------
-    /** Returns the content of the network string as a std::string. */
-    const std::string std_string() const
-    {
-        std::string str(m_buffer.begin(), m_buffer.end());
-        return str;
-    }   // std_string
-    // ------------------------------------------------------------------------
-
-    // All functions related to adding data to a network string
-    // ========================================================
-    /** Add 8 bit unsigned int. */
-    NewNetworkString& addUInt8(const uint8_t value)
-    {
-        m_buffer.push_back(value);
-        return *this;
-    }   // addUInt8
-
-    // ------------------------------------------------------------------------
-    /** Adds 16 bit unsigned int. */
-    NewNetworkString& addUInt16(const uint16_t value)
-    {
-        m_buffer.push_back((value >> 8) & 0xff);
-        m_buffer.push_back(value & 0xff);
-        return *this;
-    }   // addUInt16
-
-    // ------------------------------------------------------------------------
-    /** Adds unsigned 32 bit integer. */
-    NewNetworkString& addUInt32(const uint32_t& value)
-    {
-        m_buffer.push_back((value >> 24) & 0xff);
-        m_buffer.push_back((value >> 16) & 0xff);
-        m_buffer.push_back((value >>  8) & 0xff);
-        m_buffer.push_back( value        & 0xff);
-        return *this;
-    }   // addUInt32
-
-    // ------------------------------------------------------------------------
-    /** Adds a 4 byte floating point value. */
-    NewNetworkString& addFloat(const float value)
-    {
-        uint32_t *p = (uint32_t*)&value;
-        return addUInt32(*p);
-    }   // addFloat
-
-    // ------------------------------------------------------------------------
-    /** Adds the content of another network string. */
-    NewNetworkString& operator+=(NewNetworkString const& value)
-    {
-        m_buffer.insert(m_buffer.end(), value.m_buffer.begin(), 
-                        value.m_buffer.end()   );
-        return *this;
-    }   // operator+=
-
-    // ------------------------------------------------------------------------
-    /** Adds the xyz components of a Vec3 to the string. */
-    NewNetworkString& add(const Vec3 &xyz)
-    {
-        return addFloat(xyz.getX()).addFloat(xyz.getY()).addFloat(xyz.getZ());
-    }   // add
-
-    // ------------------------------------------------------------------------
-    /** Adds the four components of a quaternion. */
-    NewNetworkString& add(const btQuaternion &quat)
-    {
-        return addFloat(quat.getX()).addFloat(quat.getY())
-              .addFloat(quat.getZ()).addFloat(quat.getW());
-    }   // add
-
-    // Functions related to getting data from a network string
-    // =======================================================
-    /** Ignore the next num_bytes from the message.
-     */
-    void removeFront(unsigned int num_bytes)
-    {
-        assert(m_current_offset + num_bytes <= m_buffer.size());
-        m_current_offset += num_bytes;
-    }   // removeFront
-
-    // ------------------------------------------------------------------------
-    /** Gets the byte at the specified position (taking current offset into
-     *  account). */
-    uint8_t operator[](const int pos) const
-    {
-        return m_buffer[m_current_offset + pos];
-    }   // operator[]
-
-private:
-    // ------------------------------------------------------------------------
-    /** Template to get n bytes from a buffer into a single data type. */
-    template<typename T, size_t n>
-    T get(int pos) const
-    {
-        int a = n;
-        T result = 0;
-        int offset = m_current_offset + pos + n -1;
-        while (a--)
-        {
-            result <<= 8; // offset one byte
-                          // add the data to result
-            result += m_buffer[offset - a];
-        }
-        return result;
-    }   // get(int pos)
-    // ------------------------------------------------------------------------
-    /** Another function for n == 1 to surpress warnings in clang. */
-    template<typename T>
-    T get(int pos) const
-    {
-        return m_buffer[pos];
-    }   // get
-
-public:
-    // ------------------------------------------------------------------------
-    /** Returns a unsigned 32 bit integer. */
-    inline uint32_t getUInt32(int pos = 0) const { return get<uint32_t, 4>(pos); }
-    // ------------------------------------------------------------------------
-    /** Returns an unsigned 16 bit integer. */
-    inline uint16_t getUInt16(int pos=0) const { return get<uint16_t, 2>(pos); }
-    // ------------------------------------------------------------------------
-    /** Returns an unsigned 8-bit integer. */
-    inline uint8_t getUInt8(int pos = 0)  const
-    {
-        return m_buffer[m_current_offset + pos];
-    }   // getUInt8
-    
-    // ------------------------------------------------------------------------
-    /** Gets a 4 byte floating point value. */
-    float getFloat(int pos=0) const
-    {
-        uint32_t u = getUInt32(pos);
-        return *(float*)&u;
-    }   // getFloat
-
-    // ------------------------------------------------------------------------
-    /** Gets a Vec3. */
-    Vec3 getVec3(int pos=0) const
-    {
-        return Vec3(getFloat(pos), getFloat(pos+4), getFloat(pos+8));
-    }   // getVec3
-    // ------------------------------------------------------------------------
-    /** Gets a Vec3. */
-    btQuaternion getQuat(int pos=0) const
-    {
-        return btQuaternion(getFloat(pos),   getFloat(pos+ 4),
-                            getFloat(pos+8), getFloat(pos+12) );
-    }   // getQuat
-    // ------------------------------------------------------------------------
-    NewNetworkString& encodeString(const std::string &value);
-    NewNetworkString& encodeString(const irr::core::stringw &value);
-    int decodeString(int n, std::string *out) const;
-    int decodeStringW(int n, irr::core::stringw *out) const;
-    // ------------------------------------------------------------------------
 
 };   // class NetworkString
 

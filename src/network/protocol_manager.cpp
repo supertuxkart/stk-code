@@ -150,8 +150,17 @@ void ProtocolManager::propagateEvent(Event* event)
     // no protocol was aimed, show the msg to debug
     if (searched_protocol == PROTOCOL_NONE)
     {
+        std::ostringstream oss;
+        for(unsigned int i=0; i<event->data().size(); i++)
+        {
+            oss << event->data()[i];
+            if(i%16==0)
+                oss << "\n";
+            else if (i % 4 == 0)
+                oss << ' ';
+        }
         Log::debug("ProtocolManager", "NO PROTOCOL : Message is \"%s\"",
-                    event->data().std_string().c_str());
+                    oss.str().c_str());
     }
 
     if (protocols_ids.size() != 0)
