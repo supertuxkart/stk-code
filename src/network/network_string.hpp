@@ -118,12 +118,14 @@ public:
     // ------------------------------------------------------------------------
     BareNetworkString(const std::string &s)
     {
+        m_current_offset = 0;
         encodeString(s);
     }   // BareNetworkString
     // ------------------------------------------------------------------------
     /** Initialises the string with a sequence of characters. */
     BareNetworkString(const char *data, int len)
     {
+        m_current_offset = 0;
         m_buffer.resize(len);
         memcpy(m_buffer.data(), data, len);
     }   // BareNetworkString
