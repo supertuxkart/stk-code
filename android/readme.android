@@ -1,0 +1,17 @@
+First, download and extract the ndk android-ndk-r10e to this folder (i.e. android/android-ndk-r10e/).
+
+The android sdk must be installed in /opt.
+
+ant is also needed.
+
+Download a suitable jpeglib
+===========================
+> git clone https://github.com/folecr/jpeg8d jni/jpeglib
+
+Build an apk
+============
+> make build apk
+
+Install and run
+===============
+> make install run
