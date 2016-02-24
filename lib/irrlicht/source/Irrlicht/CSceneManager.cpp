@@ -70,6 +70,14 @@
 //! Enable debug features
 #define SCENEMANAGER_DEBUG
 
+#ifdef _IRR_COMPILE_WITH_3DS_LOADER_
+#include "C3DSMeshFileLoader.h"
+#endif
+
+#ifdef _IRR_COMPILE_WITH_X_LOADER_
+#include "CXMeshFileLoader.h"
+#endif
+
 namespace irr
 {
 namespace scene
@@ -125,6 +133,13 @@ CSceneManager::CSceneManager(video::IVideoDriver* driver, io::IFileSystem* fs,
 	// as these are checked last
 	#ifdef _IRR_COMPILE_WITH_B3D_LOADER_
 	MeshLoaderList.push_back(new CB3DMeshFileLoader(this));
+	#endif
+	
+	#ifdef _IRR_COMPILE_WITH_3DS_LOADER_
+	MeshLoaderList.push_back(new C3DSMeshFileLoader(this, FileSystem));
+	#endif
+	#ifdef _IRR_COMPILE_WITH_X_LOADER_
+	MeshLoaderList.push_back(new CXMeshFileLoader(this, FileSystem));
 	#endif
 
 

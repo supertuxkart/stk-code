@@ -17,6 +17,8 @@
 #include <SDL/SDL.h>
 #endif
 
+#include <android/log.h>
+
 namespace irr
 {
 namespace video
@@ -41,6 +43,8 @@ COGLES1Driver::COGLES1Driver(const SIrrlichtCreationParameters& params,
 	,ViewDepthRenderbuffer(0)
 #endif
 {
+__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "frame %d", __LINE__);
+__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "frame %s %d", __FILE__, __LINE__);
 	#ifdef _DEBUG
 	setDebugName("COGLESDriver");
 	#endif
@@ -55,8 +59,11 @@ COGLES1Driver::COGLES1Driver(const SIrrlichtCreationParameters& params,
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 	Device = device;
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
+__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "frame %s %d", __FILE__, __LINE__);
+__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "frame %d %d", __LINE__, ((struct android_app *)(params.PrivateData)));
 	EglWindow =	((struct android_app *)(params.PrivateData))->window;
 	EglDisplay = EGL_NO_DISPLAY;
+__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "frame %s %d", __FILE__, __LINE__);
 #endif
 #ifdef EGL_VERSION_1_0
 	if(EglDisplay == EGL_NO_DISPLAY)

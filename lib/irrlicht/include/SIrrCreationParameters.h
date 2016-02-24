@@ -81,6 +81,7 @@ namespace irr
 			DisplayAdapter = other.DisplayAdapter;
 			UsePerformanceTimer = other.UsePerformanceTimer;
             ForceLegacyDevice = other.ForceLegacyDevice;
+			PrivateData = other.PrivateData;
 			return *this;
 		}
 

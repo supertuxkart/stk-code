@@ -4,7 +4,7 @@
 
 #include "IrrCompileConfig.h"
 
-//static const char* const copyright = "Irrlicht Engine (c) 2002-2012 Nikolaus Gebhardt";
+static const char* const copyright = "Irrlicht Engine (c) 2002-2012 Nikolaus Gebhardt";
 
 #ifdef _IRR_WINDOWS_
 	#include <windows.h>
@@ -30,6 +30,10 @@
 #include "CIrrDeviceLinux.h"
 #endif
 
+#ifdef _IRR_COMPILE_WITH_IPHONE_DEVICE_
+#include "iOS/CIrrDeviceiOS.h"
+#endif
+
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
 #include "CIrrDeviceSDL.h"
 #endif
@@ -42,14 +46,18 @@
 #include "CIrrDeviceConsole.h"
 #endif
 
+#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
+#include "CIrrDeviceAndroid.h"
+#include <android/log.h>
+#endif
+
 namespace irr
 {
 	//! stub for calling createDeviceEx
 	IRRLICHT_API IrrlichtDevice* IRRCALLCONV createDevice(video::E_DRIVER_TYPE driverType,
 			const core::dimension2d<u32>& windowSize,
 			u32 bits, bool fullscreen,
-			bool stencilbuffer, bool vsync, IEventReceiver* res,
-            io::IFileSystem *file_system)
+			bool stencilbuffer, bool vsync, IEventReceiver* res)
 	{
 		SIrrlichtCreationParameters p;
 		p.DriverType = driverType;
@@ -59,7 +67,6 @@ namespace irr
 		p.Stencilbuffer = stencilbuffer;
 		p.Vsync = vsync;
 		p.EventReceiver = res;
-        p.FileSystem = file_system;
 
 		return createDeviceEx(p);
 	}
@@ -88,6 +95,11 @@ namespace irr
 		if (params.DeviceType == EIDT_X11 || (!dev && params.DeviceType == EIDT_BEST))
 			dev = new CIrrDeviceLinux(params);
 #endif
+        
+#ifdef _IRR_COMPILE_WITH_IPHONE_DEVICE_
+		if (params.DeviceType == EIDT_IPHONE || (!dev && params.DeviceType == EIDT_BEST))
+			dev = new CIrrDeviceIPhone(params);
+#endif
 
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
 		if (params.DeviceType == EIDT_SDL || (!dev && params.DeviceType == EIDT_BEST))
@@ -97,6 +109,12 @@ namespace irr
 #ifdef _IRR_COMPILE_WITH_FB_DEVICE_
 		if (params.DeviceType == EIDT_FRAMEBUFFER || (!dev && params.DeviceType == EIDT_BEST))
 			dev = new CIrrDeviceFB(params);
+#endif
+
+#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
+		if (params.DeviceType == EIDT_ANDROID || (!dev && params.DeviceType == EIDT_BEST)) {
+			dev = new CIrrDeviceAndroid(params);
+			}
 #endif
 
 #ifdef _IRR_COMPILE_WITH_CONSOLE_DEVICE_
@@ -129,7 +147,7 @@ namespace video
 } // end namespace irr
 
 
-#if defined(_IRR_WINDOWS_API_) && !defined(_IRR_STATIC_LIB_)
+#if defined(_IRR_WINDOWS_API_)
 
 BOOL APIENTRY DllMain( HANDLE hModule,
                        DWORD  ul_reason_for_call,
