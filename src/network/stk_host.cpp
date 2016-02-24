@@ -591,8 +591,10 @@ void STKHost::handleLANRequests()
     TransportAddress sender;
     int len = m_lan_network->receiveRawPacket(buffer, LEN, &sender, 1);
     if(len<=0) return;
-
-    if (std::string(buffer, len) == "stk-server")
+    BareNetworkString message(buffer, len);
+    std::string command;
+    message.decodeString(0, &command);
+    if (command == "stk-server")
     {
         Log::verbose("STKHost", "Received LAN server query");
         std::string name = 
