@@ -170,10 +170,10 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                 int len = broadcast->receiveRawPacket(buffer, LEN, &sender, 1);
                 if(len>0)
                 {
-                    NewNetworkString s((uint8_t*)buffer, len);
+                    BareNetworkString s(buffer, len);
                     irr::core::stringw name;
-                    // name_len is the number of bytes read
-                    uint8_t bytes_read = s.decodeStringW(0, &name);
+                    // bytes_read is the number of bytes read
+                    uint8_t bytes_read  = s.decodeStringW(0, &name);
                     uint8_t max_players = s.getUInt8(bytes_read  );
                     uint8_t players     = s.getUInt8(bytes_read+1);
                     uint32_t my_ip      = s.getUInt32(bytes_read+2);
