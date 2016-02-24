@@ -300,6 +300,13 @@ namespace irr
 		/** Always set it to IRRLICHT_SDK_VERSION, which is done by default.
 		This is needed for sdk version checks. */
 		const c8* const SDK_version_do_not_use;
+
+		//! Define some private data storage.
+		/** Used when platform devices need access to OS specific data structures etc.
+		This is only used for Android at th emoment in order to access the native
+		Java RE. */
+		void *PrivateData;
+
 	};
 
 

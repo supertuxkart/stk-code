@@ -14,7 +14,7 @@
 #if !defined(_IRR_SOLARIS_PLATFORM_) && !defined(__CYGWIN__)
 #include <sys/param.h>
 #include <sys/types.h>
-#include <sys/sysctl.h>
+#include <linux/sysctl.h>
 #endif
 #endif
 
