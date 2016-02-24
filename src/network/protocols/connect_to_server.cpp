@@ -377,9 +377,14 @@ void ConnectToServer::handleSameLAN()
     const int LEN=256;
     char buffer[LEN];
     int len = host->receiveRawPacket(buffer, LEN, &sender, 2000);
+    if(len<0)
+    {
+        Log::warn("ConnectToServer",
+                  "Received invalid server information message.");
+        return;
+    }
 
-    BareNetworkString message(buffer, len
-        );
+    BareNetworkString message(buffer, len);
     std::string received;
     message.decodeString(0, &received);
     host->startListening(); // start listening again
