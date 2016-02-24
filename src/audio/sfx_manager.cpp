@@ -85,6 +85,7 @@ SFXManager::SFXManager()
 
     loadSfx();
 
+#ifndef NO_SOUND
     pthread_cond_init(&m_cond_request, NULL);
 
     pthread_attr_t  attr;
@@ -109,6 +110,7 @@ SFXManager::SFXManager()
                    errno);
     }
     pthread_attr_destroy(&attr);
+#endif
 
     setMasterSFXVolume( UserConfigParams::m_sfx_volume );
     m_sfx_commands.lock();
@@ -122,6 +124,7 @@ SFXManager::SFXManager()
  */
 SFXManager::~SFXManager()
 {
+#ifndef NO_SOUND
     m_thread_id.lock();
     pthread_join(*m_thread_id.getData(), NULL);
     delete m_thread_id.getData();
@@ -164,6 +167,7 @@ SFXManager::~SFXManager()
         m_all_sfx_types.clear();
     }
     m_all_sfx_types.clear();
+#endif
 
 }   // ~SFXManager
 
@@ -283,9 +287,11 @@ void SFXManager::queueCommand(SFXCommand *command)
  */
 void SFXManager::stopThread()
 {
+#ifndef NO_SOUND
     queue(SFX_EXIT);
     // Make sure the thread wakes up.
     pthread_cond_signal(&m_cond_request);
+#endif
 }   // stopThread
 
 //----------------------------------------------------------------------------
@@ -296,6 +302,7 @@ void SFXManager::stopThread()
  */
 void* SFXManager::mainLoop(void *obj)
 {
+#ifndef NO_SOUND
     VS::setThreadName("SFXManager");
     SFXManager *me = (SFXManager*)obj;
 
@@ -414,6 +421,7 @@ void* SFXManager::mainLoop(void *obj)
         delete me->m_sfx_commands.getData().front();
         me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
     }
+#endif
     return NULL;
 }   // mainLoop
 
@@ -632,7 +640,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
     SFXBase* sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);
 #else
-    SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain(), owns_buffer);
+    SFXBase* sfx = new DummySFX(buffer, positional, buffer->getGain());
 #endif
 
     sfx->setMasterVolume(m_master_gain);
@@ -701,9 +709,11 @@ void SFXManager::deleteSFXMapping(const std::string &name)
  */
 void SFXManager::update()
 {
+#ifndef NO_SOUND
     queue(SFX_UPDATE, (SFXBase*)NULL);
     // Wake up the sfx thread to handle all queued up audio commands.
     pthread_cond_signal(&m_cond_request);
+#endif
 }   // update
 
 //----------------------------------------------------------------------------

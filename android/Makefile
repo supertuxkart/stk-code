@@ -3,7 +3,7 @@ NDK_PATH=android-ndk-r10e/
 all: build apk
 
 # target: build - Build the native code
-build:
+build: obj/freetype.stamp
 	NDK_CCACHE=ccache ${NDK_PATH}/ndk-build -j3
 
 # target: apk - Make a debug APK
@@ -20,3 +20,11 @@ help:
 
 run:
 	adb shell am start -n org.supertuxkart.stk/android.app.NativeActivity
+
+obj/freetype.stamp:
+	mkdir -p obj/freetype
+	cd jni/freetype && \
+	./configure --host=arm-linux-androideabi --prefix=/freetype --without-zlib --with-png=no --with-harfbuzz=no && \
+	make -j4 && \
+	make install DESTDIR=`pwd`/../../obj/freetype
+	touch obj/freetype.stamp

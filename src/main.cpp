@@ -1117,6 +1117,9 @@ void initUserConfig()
 //=============================================================================
 void initRest()
 {
+
+	UserConfigParams::m_no_start_screen = true;
+
     stk_config->load(file_manager->getAsset("stk_config.xml"));
 
     irr_driver = new IrrDriver();

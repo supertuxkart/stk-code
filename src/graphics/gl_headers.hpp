@@ -21,7 +21,9 @@
 #define GLEW_STATIC
 
 extern "C" {
-#include <GL/glew.h>
+#ifndef ANDROID
+#   include <GL/glew.h>
+#endif
 }
 #include <cinttypes>
 

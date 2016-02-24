@@ -35,7 +35,9 @@
 #  include <winsock2.h>
 #endif
 
-#include <curl/curl.h>
+#ifndef NO_CURL
+#  include <curl/curl.h>
+#endif
 #include <queue>
 #include <pthread.h>
 

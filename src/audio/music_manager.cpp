@@ -34,6 +34,7 @@
 
 #include "audio/music_ogg.hpp"
 #include "audio/sfx_openal.hpp"
+#include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
