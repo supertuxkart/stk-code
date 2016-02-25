@@ -185,6 +185,7 @@ void Skybox::generateCubeMapFromTextures()
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
+#ifndef ANDROID
         if (CVS->isTextureCompressionEnabled())
         {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
@@ -197,6 +198,7 @@ void Skybox::generateCubeMapFromTextures()
                          GL_SRGB_ALPHA, size, size, 0, GL_BGRA,
                          GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
         }
+#endif
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     for (unsigned i = 0; i < 6; i++)
@@ -207,6 +209,7 @@ void Skybox::generateCubeMapFromTextures()
 // ----------------------------------------------------------------------------
 void Skybox::generateSpecularCubemap()
 {
+#ifndef ANDROID
     glGenTextures(1, &m_specular_probe);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_specular_probe);
     size_t cubemap_size = 256;
@@ -299,6 +302,7 @@ void Skybox::generateSpecularCubemap()
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);
+#endif
 }   // generateSpecularCubemap
 
 
@@ -317,7 +321,9 @@ Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
 {
     m_skybox_textures = skybox_textures;
     
+#ifndef ANDROID
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+#endif
 
     if (!skybox_textures.empty())
     {

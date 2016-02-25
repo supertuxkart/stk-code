@@ -20,7 +20,12 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 
+#ifdef ANDROID_DEVICE
+#include "jni/irrlicht/source/Irrlicht/COGLES2Texture.h"
+#else
 #include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
+#endif
+
 
 #include <fstream>
 #include <sstream>
@@ -28,13 +33,21 @@
 
 GLuint getTextureGLuint(irr::video::ITexture *tex)
 {
+#ifdef ANDROID_DEVICE
+    return static_cast<irr::video::COGLES2Texture*>(tex)->getOpenGLTextureName();
+#else
     return static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
+#endif
 }
 
 GLuint getDepthTexture(irr::video::ITexture *tex)
 {
     assert(tex->isRenderTarget());
+#ifdef ANDROID_DEVICE
+    return 1; //static_cast<irr::video::COGLES2FBODepthTexture*>(tex)->DepthRenderBuffer;
+#else
     return static_cast<irr::video::COpenGLFBOTexture*>(tex)->DepthBufferTexture;
+#endif
 }
 
 static std::set<irr::video::ITexture *> AlreadyTransformedTexture;
@@ -45,6 +58,11 @@ void resetTextureTable()
     AlreadyTransformedTexture.clear();
     unicolor_cache.clear();
 }
+
+#ifdef ANDROID
+#define GL_BGRA GL_RGBA
+#define GL_BGR GL_RGB
+#endif
 
 void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
 {
@@ -91,6 +109,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
         }
     }
 
+#ifndef ANDROID
     if (!CVS->isTextureCompressionEnabled())
     {
         if (srgb)
@@ -105,6 +124,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
         else
             internalFormat = (tex->hasAlpha()) ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
     }
+#endif
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, Format, GL_UNSIGNED_BYTE, (GLvoid *)data);
     glGenerateMipmap(GL_TEXTURE_2D);
     delete[] data;
@@ -167,6 +187,7 @@ bool loadCompressedTexture(const std::string& compressed_tex)
 */
 void saveCompressedTexture(const std::string& compressed_tex)
 {
+#ifndef ANDROID
     int internal_format, width, height, size, compressionSuccessful;
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, (GLint *)&internal_format);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, (GLint *)&width);
@@ -189,6 +210,7 @@ void saveCompressedTexture(const std::string& compressed_tex)
         ofs.close();
     }
     delete[] data;
+#endif
 }
 
 video::ITexture* getUnicolorTexture(const video::SColor &c)

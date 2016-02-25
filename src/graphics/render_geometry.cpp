@@ -1948,7 +1948,7 @@ void renderRSMShadow(Args ...args)
 template<typename T, typename... Args>
 void multidrawRSM(Args...args)
 {
-#ifndef ANDROIDD
+#ifndef ANDROID
     T::InstancedRSMShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                InstanceTypeRSM));

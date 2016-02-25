@@ -38,7 +38,9 @@ public:
     CommandBuffer()
     {
         glGenBuffers(1, &drawindirectcmd);
+#ifndef ANDROID_DEVICE
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
+#endif
 #ifndef ANDROID
         if (CVS->supportsAsyncInstanceUpload())
         {

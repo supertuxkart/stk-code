@@ -215,9 +215,11 @@ public:
     template<int N, typename... HandlesId>
     void setTextureHandlesImpl(uint64_t handle, HandlesId... args)
     {
+#ifndef ANDROID
         if (handle)
             glUniformHandleui64ARB(m_texture_location[N], handle);
         setTextureHandlesImpl<N + 1>(args...);
+#endif
     }   // setTextureHandlesImpl
 
     // ------------------------------------------------------------------------

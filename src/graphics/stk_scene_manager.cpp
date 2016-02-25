@@ -858,6 +858,8 @@ PROFILER_POP_CPU_MARKER();
     poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += SolidPoly;
     poly_count[SHADOW_PASS] += ShadowPoly;
 
+#ifndef ANDROID
     if (CVS->supportsAsyncInstanceUpload())
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
+#endif
 }

@@ -41,7 +41,10 @@ extern "C" {
 #        define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
 #    endif
 #elif defined(ANDROID_DEVICE)
-#    include <GLES/gl.h>
+#    include <GLES3/gl3.h>
+#    include <GLES3/gl31.h>
+#    include <GLES3/gl3ext.h>
+#    define glVertexAttribDivisorARB glVertexAttribDivisor
 #elif defined(WIN32)
 #    define WIN32_LEAN_AND_MEAN
 #    include <windows.h>

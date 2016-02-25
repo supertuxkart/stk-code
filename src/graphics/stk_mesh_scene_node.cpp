@@ -127,7 +127,9 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
     ColorizeShader::getInstance()->setUniforms(AbsoluteTransformation, video::SColorf(glowcolor.getRed() / 255.f, glowcolor.getGreen() / 255.f, glowcolor.getBlue() / 255.f));
+#ifndef ANDROID
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
+#endif
 }
 
 void STKMeshSceneNode::updatevbo()
@@ -303,6 +305,7 @@ void STKMeshSceneNode::render()
             size_t count = mesh.IndexCount;
 
             compressTexture(mesh.textures[0], true);
+#ifndef ANDROID
             if (CVS->isAZDOEnabled())
             {
                 if (!mesh.TextureHandles[0])
@@ -317,6 +320,7 @@ void STKMeshSceneNode::render()
                 Shaders::ObjectPass1Shader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
             }
             else
+#endif
                 Shaders::ObjectPass1Shader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]));
             Shaders::ObjectPass1Shader::getInstance()->setUniforms(AbsoluteTransformation, invmodel);
             assert(mesh.vao);
@@ -346,6 +350,7 @@ void STKMeshSceneNode::render()
             GLenum itype = mesh.IndexType;
             size_t count = mesh.IndexCount;
 
+#ifndef ANDROID
             if (CVS->isAZDOEnabled())
             {
                 GLuint64 DiffuseHandle =
@@ -384,6 +389,7 @@ void STKMeshSceneNode::render()
                                         mesh.TextureHandles[0], mesh.TextureHandles[1]);
             }
             else
+#endif
                 Shaders::ObjectPass2Shader::getInstance()->setTextureUnits(
                 irr_driver->getRenderTargetTexture(RTT_DIFFUSE),
                 irr_driver->getRenderTargetTexture(RTT_SPECULAR),
@@ -456,6 +462,7 @@ void STKMeshSceneNode::render()
                         tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
+#ifndef ANDROID
                     if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])
@@ -468,6 +475,7 @@ void STKMeshSceneNode::render()
                                     ->setTextureHandles(mesh.TextureHandles[0]);
                     }
                     else
+#endif
                     {
                         Shaders::TransparentFogShader::getInstance()
                             ->setTextureUnits(getTextureGLuint(mesh.textures[0]));
@@ -494,6 +502,7 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
+#ifndef ANDROID
                     if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])
@@ -505,6 +514,7 @@ void STKMeshSceneNode::render()
                         Shaders::TransparentShader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
                     }
                     else
+#endif
                         Shaders::TransparentShader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]));
 
                     Shaders::TransparentShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);

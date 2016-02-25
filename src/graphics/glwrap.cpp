@@ -177,12 +177,14 @@ void initGL()
         return;
     is_gl_init = true;
     // For Mesa extension reporting
+#ifndef ANDROID_DEVICE
 #ifndef WIN32
     glewExperimental = GL_TRUE;
 #endif
     GLenum err = glewInit();
     if (GLEW_OK != err)
         Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
+#endif
 #ifdef ARB_DEBUG_OUTPUT
     if (glDebugMessageCallbackARB)
         glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);

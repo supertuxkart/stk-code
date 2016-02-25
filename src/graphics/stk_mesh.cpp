@@ -344,6 +344,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
                       getUnicolorTexture(video::SColor(255, 127, 127, 127));
     }
     compressTexture(mesh.textures[i], is_srgb);
+#ifndef ANDROID
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[i])
@@ -355,6 +356,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
             glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
     }
+#endif
 }   // setTexture
 
 // ----------------------------------------------------------------------------
@@ -423,6 +425,7 @@ void initTexturesTransparent(GLMesh &mesh)
         return;
     }
     compressTexture(mesh.textures[0], true);
+#ifndef ANDROID
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[0])
@@ -434,4 +437,5 @@ void initTexturesTransparent(GLMesh &mesh)
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
     }
+#endif
 }   // initTexturesTransparent

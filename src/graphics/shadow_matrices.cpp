@@ -54,7 +54,9 @@ public:
         GLuint block_idx = 
             glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, 
                                       "BoundingBoxes");
+#ifndef ANDROID
         glShaderStorageBlockBinding(m_program, block_idx, 2);
+#endif
     }   // LightspaceBoundingBoxShader
 };   // LightspaceBoundingBoxShader
 
@@ -70,11 +72,13 @@ public:
         GLuint block_idx = 
             glGetProgramResourceIndex(m_program, 
                                       GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
+#ifndef ANDROID
         glShaderStorageBlockBinding(m_program, block_idx, 2);
         block_idx = 
             glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK,
                                       "NewMatrixData");
         glShaderStorageBlockBinding(m_program, block_idx, 1);
+#endif
     }
 
 
