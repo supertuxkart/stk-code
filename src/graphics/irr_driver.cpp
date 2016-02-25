@@ -94,6 +94,10 @@ using namespace irr;
 /** singleton */
 IrrDriver *irr_driver = NULL;
 
+#ifdef ANDROID
+extern void* global_android_app;
+#endif
+
 GPUTimer          m_perf_query[Q_LAST];
 
 const int MIN_SUPPORTED_HEIGHT = 768;
@@ -113,6 +117,15 @@ IrrDriver::IrrDriver()
     m_shadow_matrices     = NULL;
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
+#ifdef ANDROID
+	struct irr::SIrrlichtCreationParameters p;
+	p.DriverType = video::EDT_NULL;
+	// The android app object is needed by the irrlicht device.
+	p.PrivateData = global_android_app;
+	p.WindowSize = core::dimension2d<u32>(1280,800);
+
+	m_device = createDeviceEx(p);
+#else
     m_device              = irr::createDevice(video::EDT_NULL,
                                          irr::core::dimension2d<u32>(640, 480),
                                          /*bits*/16U, /**fullscreen*/ false,
@@ -120,6 +133,7 @@ IrrDriver::IrrDriver()
                                          /*vsync*/false,
                                          /*event receiver*/ NULL,
                                          file_manager->getFileSystem());
+#endif
     m_request_screenshot = false;
     m_rtts                = NULL;
     m_post_processing     = NULL;
@@ -440,10 +454,13 @@ void IrrDriver::initDevice()
                 Log::verbose("irr_driver", "Trying to create device with "
                              "%i bits\n", bits);
 
+            if(m_device)
+                break;
 #ifndef ANDROID_DEVICE
             params.DriverType    = video::EDT_OPENGL;
 #else
             params.DriverType    = video::EDT_OGLES2;
+			params.PrivateData = global_android_app;
 #endif
             params.Stencilbuffer = false;
             params.Bits          = bits;
@@ -493,9 +510,6 @@ void IrrDriver::initDevice()
 
 #ifndef ANDROID_DEVICE
             m_device = createDevice(video::EDT_OPENGL,
-#else
-            m_device = createDevice(video::EDT_OGLES2,
-#endif
                         core::dimension2du(UserConfigParams::m_width,
                                            UserConfigParams::m_height ),
                                     32, //bits per pixel
@@ -505,6 +519,15 @@ void IrrDriver::initDevice()
                                     this,   // event receiver
                                     file_manager->getFileSystem()
                                     );
+#else
+			struct irr::SIrrlichtCreationParameters p;
+			p.DriverType = video::EDT_OGLES2;
+			// The android app object is needed by the irrlicht device.
+			p.PrivateData = global_android_app;
+			p.WindowSize = core::dimension2d<u32>(1280,800);
+
+            m_device = createDeviceEx(p);
+#endif
             if (m_device)
             {
                 Log::verbose("irr_driver", "An invalid resolution was set in "
