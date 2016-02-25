@@ -126,17 +126,19 @@ LOCAL_SRC_FILES += \
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
 
 include $(BUILD_STATIC_LIBRARY)
+include $(CLEAR_VARS)
 
 LOCAL_CPP_FEATURES += rtti
 
 
-LOCAL_PATH := .
 # glew
-LOCAL_SRC_FILES := $(wildcard jni/glew/src/*.c) 
+LOCAL_PATH:= jni
+LOCAL_SRC_FILES := jni/glew/src/glew.c 
+LOCAL_PATH := .
 LOCAL_MODULE    := glew
 LOCAL_LDLIBS    := -llog -landroid
-LOCAL_CFLAGS := -Ijni/glew/include
-#include $(BUILD_SHARED_LIBRARY)
+LOCAL_CFLAGS := -Ijni/glew/include -DGLEW_NO_GLU
+#include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CPP_FEATURES += rtti
@@ -150,6 +152,16 @@ LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv1_CM -lGLESv2
 LOCAL_CFLAGS := -Ijni/bullet/src/ -I../include -I../../include
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
+
+# ifaddrs
+LOCAL_SRC_FILES := jni/ifaddrs/ifaddrs.c
+LOCAL_PATH:=.
+LOCAL_MODULE    := ifaddrs
+LOCAL_LDLIBS    := -llog -landroid
+LOCAL_CFLAGS := -Ijni/ifaddrs/
+include $(BUILD_STATIC_LIBRARY)
+include $(CLEAR_VARS)
+
 
 
 # Freetype
@@ -182,11 +194,11 @@ LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES := $(wildcard jni/src/*.cpp) $(wildcard jni/src/*/*.cpp) $(wildcard jni/src/*/*/*.cpp)
 LOCAL_PATH:=.
 LOCAL_MODULE    := stk
-LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv1_CM -lGLESv2
-LOCAL_CFLAGS := -Ijni/irrlicht/source/Irrlicht/ -Ijni/irrlicht/include/ -Ijni/jpeglib/ -Ijni/libpng/ -Ijni/ -Iinclude/ -I$(call my-dir)/../../sources/android/native_app_glue/ -DBUILD_OGLES2 -DNO_IRR_COMPILE_WITH_SOFTWARE_ -DNO_IRR_COMPILE_WITH_BURNINGSVIDEO_ -DSUPERTUXKART_DATADIR=\"/sdcard/stk/\" -DANDROID -Ijni/src/ -Ijni/bullet/src -DNO_CURL -std=c++11 -Iobj/freetype/freetype/include/freetype2/ -Ijni/enet/include/ -Ijni/angelscript/include/ -DDEBUG -DNO_SOUND
+LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv1_CM -lGLESv2 -lGLESv3
+LOCAL_CFLAGS := -Ijni/irrlicht/source/Irrlicht/ -Ijni/irrlicht/include/ -Ijni/jpeglib/ -Ijni/libpng/ -Ijni/ -Iinclude/ -I$(call my-dir)/../../sources/android/native_app_glue/ -DBUILD_OGLES2 -DNO_IRR_COMPILE_WITH_SOFTWARE_ -DNO_IRR_COMPILE_WITH_BURNINGSVIDEO_ -DSUPERTUXKART_DATADIR=\"/sdcard/stk/\" -DANDROID_DEVICE -DANDROID -Ijni/src/ -Ijni/bullet/src -DNO_CURL -std=c++11 -Iobj/freetype/freetype/include/freetype2/ -Ijni/enet/include/ -Ijni/angelscript/include/ -DDEBUG -DNO_SOUND -DGLEW_NO_GLU -Ijni/ifaddrs
 
 LOCAL_SHARED_LIBRARIES := irrlicht
-LOCAL_STATIC_LIBRARIES := bullet enet freetype
+LOCAL_STATIC_LIBRARIES := bullet enet freetype  ifaddrs
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_PATH:= jni
