@@ -93,7 +93,7 @@ BareNetworkString& BareNetworkString::encodeString(const irr::core::stringw &val
  */
 int BareNetworkString::decodeString(int pos, std::string *out) const
 {
-    uint8_t len = get<uint8_t>(pos);
+    uint8_t len = get<uint8_t>(m_current_offset+pos);
     *out = getString(pos+1, len);
     return len+1;
 }    // decodeString
@@ -136,7 +136,11 @@ std::string BareNetworkString::getLogMessage() const
         // Add ascii representation
         for(unsigned int i=line; i<upper_limit; i++)
         {
-            oss << getUInt8(i);
+            uint8_t c = getUInt8(i);
+            if(isprint(c))
+                oss << char(getUInt8(i));
+            else
+                oss << '.';
         }   // for i
         oss << "\n";
     }   // for line
