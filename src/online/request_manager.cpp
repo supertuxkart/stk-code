@@ -104,6 +104,7 @@ namespace Online
      */
     void RequestManager::startNetworkThread()
     {
+#ifndef NO_CURL
         pthread_attr_t  attr;
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
@@ -134,6 +135,7 @@ namespace Online
         {
             PlayerManager::resumeSavedSession();
         }
+#endif
     }   // startNetworkThread
 
     // ------------------------------------------------------------------------
@@ -144,6 +146,7 @@ namespace Online
      */
     void RequestManager::stopNetworkThread()
     {
+#ifndef NO_CURL
         // This will queue a sign-out or client-quit request
         PlayerManager::onSTKQuit();
 
@@ -163,6 +166,7 @@ namespace Online
         // be executed (before the quit request is executed, which causes this
         // thread to exit).
         m_abort.setAtomic(true);
+#endif
     }   // stopNetworkThread
 
     // ------------------------------------------------------------------------
@@ -190,6 +194,7 @@ namespace Online
      */
     void *RequestManager::mainLoop(void *obj)
     {
+#ifndef NO_CURL
         VS::setThreadName("RequestManager");
         RequestManager *me = (RequestManager*) obj;
 
@@ -246,6 +251,7 @@ namespace Online
         pthread_exit(NULL);
 
         return 0;
+#endif
     }   // mainLoop
 
     // ------------------------------------------------------------------------
