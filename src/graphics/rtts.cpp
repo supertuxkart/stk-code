@@ -76,6 +76,10 @@ RTT::RTT(size_t width, size_t height)
 
     // All RTTs are currently RGBA16F mostly with stencil. The four tmp RTTs are the same size
     // as the screen, for use in post-processing.
+#ifdef ANDROID
+#define GL_BGRA GL_RGBA
+#define GL_BGR GL_RGB
+#endif
 
     RenderTargetTextures[RTT_TMP1] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_TMP2] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);

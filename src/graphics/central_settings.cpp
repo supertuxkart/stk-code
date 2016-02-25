@@ -23,6 +23,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/graphics_restrictions.hpp"
 
+
 CentralVideoSettings *CVS = new CentralVideoSettings();
 
 void CentralVideoSettings::init()
@@ -191,10 +192,12 @@ void CentralVideoSettings::init()
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_CAPABLE) &&
             m_glsl == true)
         {
+#ifndef ANDROID
             GLint param = GL_SRGB;
             glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT,
                               GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
             m_need_srgb_visual_workaround = (param != GL_SRGB);
+#endif
         }
     }
 }

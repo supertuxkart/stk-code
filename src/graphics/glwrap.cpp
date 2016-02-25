@@ -30,6 +30,49 @@
 #include <string>
 #include <sstream>
 
+#ifndef GL_DEBUG_SEVERITY_HIGH_ARB
+    // Extension: ARB_debug_output
+    #define GL_DEBUG_SEVERITY_HIGH_ARB       0x9146
+    #define GL_DEBUG_SEVERITY_LOW_ARB        0x9148
+    #define GL_DEBUG_SEVERITY_MEDIUM_ARB     0x9147
+    #define GL_DEBUG_SOURCE_API_ARB          0x8246
+    #define GL_DEBUG_SOURCE_APPLICATION_ARB  0x824A
+    #define GL_DEBUG_SOURCE_OTHER_ARB        0x824B
+    #define GL_DEBUG_SOURCE_SHADER_COMPILER_ARB 0x8248
+    #define GL_DEBUG_SOURCE_THIRD_PARTY_ARB  0x8249
+    #define GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB 0x8247
+    #define GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB 0x824D
+    #define GL_DEBUG_TYPE_ERROR_ARB          0x824C
+    #define GL_DEBUG_TYPE_OTHER_ARB          0x8251
+    #define GL_DEBUG_TYPE_PERFORMANCE_ARB    0x8250
+    #define GL_DEBUG_TYPE_PORTABILITY_ARB    0x824F
+    #define GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB 0x824E
+#endif
+
+#ifndef GL_DEBUG_SEVERITY_HIGH
+    // Extension: KHR_debug
+    #define GL_DEBUG_SEVERITY_HIGH           0x9146
+    #define GL_DEBUG_SEVERITY_LOW            0x9148
+    #define GL_DEBUG_SEVERITY_MEDIUM         0x9147
+    #define GL_DEBUG_SEVERITY_NOTIFICATION   0x826B
+    #define GL_DEBUG_SOURCE_API              0x8246
+    #define GL_DEBUG_SOURCE_APPLICATION      0x824A
+    #define GL_DEBUG_SOURCE_OTHER            0x824B
+    #define GL_DEBUG_SOURCE_SHADER_COMPILER  0x8248
+    #define GL_DEBUG_SOURCE_THIRD_PARTY      0x8249
+    #define GL_DEBUG_SOURCE_WINDOW_SYSTEM    0x8247
+    #define GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR 0x824D
+    #define GL_DEBUG_TYPE_ERROR              0x824C
+    #define GL_DEBUG_TYPE_MARKER             0x8268
+    #define GL_DEBUG_TYPE_OTHER              0x8251
+    #define GL_DEBUG_TYPE_PERFORMANCE        0x8250
+    #define GL_DEBUG_TYPE_POP_GROUP          0x826A
+    #define GL_DEBUG_TYPE_PORTABILITY        0x824F
+    #define GL_DEBUG_TYPE_PUSH_GROUP         0x8269
+    #define GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR 0x824E
+#endif
+
+
 static bool is_gl_init = false;
 
 #if DEBUG
@@ -40,7 +83,7 @@ bool GLContextDebugBit = false;
 
 
 #ifdef DEBUG
-#if !defined(__APPLE__)
+#if !defined(__APPLE__) && !defined(ANDROID)
 #define ARB_DEBUG_OUTPUT
 #endif
 #endif
@@ -198,6 +241,7 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+#ifndef ANDROID
     if (layered)
     {
         for (unsigned i = 0; i < RTTs.size(); i++)
@@ -205,11 +249,14 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
     }
     else
     {
+#endif
         for (unsigned i = 0; i < RTTs.size(); i++)
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
+#ifndef ANDROID
     }
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+#endif
 }
 
 FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
@@ -219,6 +266,7 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+#ifndef ANDROID
     if (layered)
     {
         for (unsigned i = 0; i < RTTs.size(); i++)
@@ -227,14 +275,17 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
     }
     else
     {
+#endif
         for (unsigned i = 0; i < RTTs.size(); i++)
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DS, 0);
+#ifndef ANDROID
     }
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
     if (layered)
         glGenFramebuffers(1, &fbolayer);
+#endif
 }
 
 FrameBuffer::~FrameBuffer()

@@ -21,7 +21,7 @@
 #define GLEW_STATIC
 
 extern "C" {
-#ifndef ANDROID
+#ifndef ANDROID_DEVICE
 #   include <GL/glew.h>
 #endif
 }
@@ -40,7 +40,7 @@ extern "C" {
 #    ifndef GL_TEXTURE_SWIZZLE_RGBA
 #        define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
 #    endif
-#elif defined(ANDROID)
+#elif defined(ANDROID_DEVICE)
 #    include <GLES/gl.h>
 #elif defined(WIN32)
 #    define WIN32_LEAN_AND_MEAN

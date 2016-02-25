@@ -105,10 +105,12 @@ public:
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
 
+#ifndef ANDROID
         glVertexAttribDivisorARB(attrib_Position, 1);
         glVertexAttribDivisorARB(attrib_Energy, 1);
         glVertexAttribDivisorARB(attrib_Color, 1);
         glVertexAttribDivisorARB(attrib_Radius, 1);
+#endif
     }   // PointLightShader
 };   // PointLightShader
 
@@ -155,10 +157,12 @@ public:
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
 
+#ifndef ANDROID
         glVertexAttribDivisorARB(attrib_Position, 1);
         glVertexAttribDivisorARB(attrib_Energy, 1);
         glVertexAttribDivisorARB(attrib_Color, 1);
         glVertexAttribDivisorARB(attrib_Radius, 1);
+#endif
     }   // PointLightScatterShader
 };
 
@@ -243,6 +247,7 @@ class RadianceHintsConstructionShader
 public:
     RadianceHintsConstructionShader()
     {
+#ifndef ANDROID
         if (CVS->isAMDVertexShaderLayerUsable())
         {
             loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
@@ -259,6 +264,7 @@ public:
         assignSamplerNames(0, "ctex", ST_BILINEAR_FILTERED,
                            1, "ntex", ST_BILINEAR_FILTERED,
                            2, "dtex", ST_BILINEAR_FILTERED);
+#endif
     }   // RadianceHintsConstructionShader
 };   // RadianceHintsConstructionShader
 
@@ -272,6 +278,7 @@ class NVWorkaroundRadianceHintsConstructionShader
 public:
     NVWorkaroundRadianceHintsConstructionShader()
     {
+#ifndef ANDROID
         loadProgram(OBJECT,GL_VERTEX_SHADER,"slicedscreenquad_nvworkaround.vert",
                            GL_GEOMETRY_SHADER, "rhpassthrough.geom",
                            GL_FRAGMENT_SHADER, "rh.frag");
@@ -281,6 +288,7 @@ public:
         assignSamplerNames(0, "ctex", ST_BILINEAR_FILTERED,
                            1, "ntex", ST_BILINEAR_FILTERED,
                            2, "dtex", ST_BILINEAR_FILTERED);
+#endif
     }   // NVWorkaroundRadianceHintsConstructionShader
 };   // NVWorkaroundRadianceHintsConstructionShader
 

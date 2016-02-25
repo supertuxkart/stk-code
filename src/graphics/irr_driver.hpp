@@ -46,10 +46,6 @@
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
 
-#ifdef ANDROID
-#   include <GLES2/gl2ext.h>
-#endif
-
 namespace irr
 {
     namespace scene { class ISceneManager; class IMesh; class IAnimatedMeshSceneNode; class IAnimatedMesh;

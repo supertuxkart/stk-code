@@ -189,8 +189,10 @@ void IrrDriver::renderGLSL(float dt)
         if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && m_spherical_harmonics->has6Textures())
             irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
+#ifndef ANDROID
         if (!CVS->isDefferedEnabled())
             glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
 
         PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
         unsigned plc = updateLightsInfo(camnode, dt);
@@ -282,12 +284,16 @@ void IrrDriver::renderGLSL(float dt)
             }
             else
             {
+#ifndef ANDROID
                 glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 if (CVS->isDefferedEnabled())
                     camera->activate();
                 m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
+#ifndef ANDROID
                 glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
             }
         }
         // Save projection-view matrix for the next frame
@@ -400,8 +406,10 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     else
     {
         // We need a cleared depth buffer for some effect (eg particles depth blending)
+#ifndef ANDROID
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
             glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
         m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).bind();
         // Bind() modifies the viewport. In order not to affect anything else,
         // the viewport is just reset here and not removed in Bind().
@@ -411,8 +419,10 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
                    vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
                    vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
         glClear(GL_DEPTH_BUFFER_BIT);
+#ifndef ANDROID
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
             glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     PROFILER_POP_CPU_MARKER();
@@ -535,7 +545,9 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     }
     if (!CVS->isDefferedEnabled() && !forceRTT)
     {
+#ifndef ANDROID
         glDisable(GL_FRAMEBUFFER_SRGB);
+#endif
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
         return;
@@ -684,10 +696,12 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
         {
             if (GlowPassCmd::getInstance()->Size)
             {
+#ifndef ANDROID
                 glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
                     (const void*)(GlowPassCmd::getInstance()->Offset * sizeof(DrawElementsIndirectCommand)),
                     (int)GlowPassCmd::getInstance()->Size,
                     sizeof(DrawElementsIndirectCommand));
+#endif
             }
         }
         else

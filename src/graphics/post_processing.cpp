@@ -22,6 +22,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/gl_headers.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
 #include "graphics/shaders.hpp"

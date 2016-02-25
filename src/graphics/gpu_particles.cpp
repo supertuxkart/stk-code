@@ -184,6 +184,7 @@ void ParticleSystemProxy::setFlip()
 void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &hm,
     float f1, float f2, float f3, float f4)
 {
+#ifndef ANDROID
     track_x = f1, track_z = f2, track_x_len = f3, track_z_len = f4;
 
     unsigned width  = (unsigned)hm.size();
@@ -206,6 +207,7 @@ void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &h
     glBindBuffer(GL_TEXTURE_BUFFER, 0);
 
     delete[] hm_array;
+#endif
 }
 
 static
@@ -412,6 +414,7 @@ void ParticleSystemProxy::cleanGL()
 
 void ParticleSystemProxy::CommonRenderingVAO(GLuint PositionBuffer)
 {
+#ifndef ANDROID
     glBindBuffer(GL_ARRAY_BUFFER, SharedGPUObjects::getParticleQuadVBO());
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
@@ -428,10 +431,12 @@ void ParticleSystemProxy::CommonRenderingVAO(GLuint PositionBuffer)
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(7 * sizeof(float)));
     glVertexAttribDivisorARB(2, 1);
+#endif
 }
 
 void ParticleSystemProxy::AppendQuaternionRenderingVAO(GLuint QuaternionBuffer)
 {
+#ifndef ANDROID
     glBindBuffer(GL_ARRAY_BUFFER, QuaternionBuffer);
     glEnableVertexAttribArray(5);
 
@@ -441,10 +446,12 @@ void ParticleSystemProxy::AppendQuaternionRenderingVAO(GLuint QuaternionBuffer)
     glEnableVertexAttribArray(6);
     glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
     glVertexAttribDivisorARB(6, 1);
+#endif
 }
 
 void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo)
 {
+#ifndef ANDROID
     glBindBuffer(GL_ARRAY_BUFFER, position_vbo);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)0);
@@ -464,10 +471,12 @@ void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initia
     glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
     glEnableVertexAttribArray(7);
     glVertexAttribPointer(7, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
+#endif
 }
 
 void ParticleSystemProxy::simulate()
 {    
+#ifndef ANDROID
     int timediff = int(GUIEngine::getLatestDt() * 1000.f);
     int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
     core::matrix4 matrix = getAbsoluteTransformation();
@@ -517,6 +526,7 @@ void ParticleSystemProxy::simulate()
     std::swap(tfb_buffers[0], tfb_buffers[1]);
     std::swap(current_rendering_vao, non_current_rendering_vao);
     std::swap(current_simulation_vao, non_current_simulation_vao);
+#endif
 }
 
 void ParticleSystemProxy::drawFlip()

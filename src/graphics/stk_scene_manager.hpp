@@ -39,6 +39,7 @@ public:
     {
         glGenBuffers(1, &drawindirectcmd);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
+#ifndef ANDROID
         if (CVS->supportsAsyncInstanceUpload())
         {
             glBufferStorage(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
@@ -46,8 +47,11 @@ public:
         }
         else
         {
+#endif
             glBufferData(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_STREAM_DRAW);
+#ifndef ANDROID
         }
+#endif
     }
 };
 
