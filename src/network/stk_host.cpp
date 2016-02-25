@@ -563,7 +563,7 @@ void* STKHost::mainLoop(void* self)
             {
                 TransportAddress stk_addr(peer->getAddress());
                 Log::verbose("NetworkManager",
-                             "Message, Sender : %s, message = \"%s\"",
+                             "Message, Sender : %s, message:",
                              stk_addr.toString(/*show port*/false).c_str());
                 Log::verbose("NetworkManager",
                              stk_event->data().getLogMessage().c_str());
@@ -615,7 +615,7 @@ void STKHost::handleLANRequests()
         s.addUInt16(sender.getPort());
         m_lan_network->sendRawPacket(s, sender);
     }   // if message is server-requested
-    else if (std::string(buffer, len) == "connection-request")
+    else if (command == "connection-request")
     {
         Protocol *c = new ConnectToPeer(sender);
         c->requestStart();
