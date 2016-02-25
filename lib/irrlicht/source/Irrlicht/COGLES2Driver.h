@@ -29,6 +29,10 @@
 #if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
+#elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
+#include <EGL/egl.h>
+#include <GLES2/gl2.h>
+#include "android_native_app_glue.h"
 #else
 #include <EGL/eglplatform.h>
 #endif

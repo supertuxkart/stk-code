@@ -43,8 +43,6 @@ COGLES1Driver::COGLES1Driver(const SIrrlichtCreationParameters& params,
 	,ViewDepthRenderbuffer(0)
 #endif
 {
-__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "frame %d", __LINE__);
-__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "frame %s %d", __FILE__, __LINE__);
 	#ifdef _DEBUG
 	setDebugName("COGLESDriver");
 	#endif

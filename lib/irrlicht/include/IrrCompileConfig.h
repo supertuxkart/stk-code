@@ -233,6 +233,8 @@ define out. */
 #ifndef IRR_OGLES2_SHADER_PATH
 #ifdef _IRR_COMPILE_WITH_IPHONE_DEVICE_
 #define IRR_OGLES2_SHADER_PATH ""
+#elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
+#define IRR_OGLES2_SHADER_PATH "media/Shaders/"
 #else
 #define IRR_OGLES2_SHADER_PATH "../../media/Shaders/"
 #endif

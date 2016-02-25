@@ -24,6 +24,7 @@ namespace io
 
 CAndroidAssetReader::CAndroidAssetReader(const io::path &filename)
 {
+__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "path %s",  core::stringc(filename).c_str());
   AssetManager = CIrrDeviceAndroid::getAndroidApp()->activity->assetManager;
   Asset        = AAssetManager_open(AssetManager, 
 			            core::stringc(filename).c_str(),

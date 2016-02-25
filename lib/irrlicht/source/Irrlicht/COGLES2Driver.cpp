@@ -68,6 +68,9 @@ namespace video
 		EglDisplay = eglGetDisplay((NativeDisplayType)ExposedData.OpenGLLinux.X11Display);
 #elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 		Device = device;
+#elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
+		EglWindow =	((struct android_app *)(params.PrivateData))->window;
+		EglDisplay = EGL_NO_DISPLAY;
 #endif
 #ifdef EGL_VERSION_1_0
 		if (EglDisplay == EGL_NO_DISPLAY)
@@ -94,6 +97,14 @@ namespace video
 
 		EGLint attribs[] =
 		{
+#if defined( _IRR_COMPILE_WITH_ANDROID_DEVICE_ )
+		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+		EGL_BLUE_SIZE, 8,
+		EGL_GREEN_SIZE, 8,
+		EGL_RED_SIZE, 8,
+		EGL_DEPTH_SIZE, 16,
+		EGL_NONE
+#else		
 			EGL_RED_SIZE, 5,
 			EGL_GREEN_SIZE, 5,
 			EGL_BLUE_SIZE, 5,
@@ -109,6 +120,7 @@ namespace video
 			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
 #endif
 			EGL_NONE, 0
+#endif
 		};
 		EGLint contextAttrib[] =
 		{
@@ -196,6 +208,16 @@ namespace video
 			os::Printer::log("No full depth buffer.");
 		if (params.Bits > attribs[9])
 			os::Printer::log("No full color buffer.");
+		#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
+	   /* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
+		* guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
+		* As soon as we picked a EGLConfig, we can safely reconfigure the
+		* ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
+	   EGLint format;
+	   eglGetConfigAttrib(EglDisplay, config, EGL_NATIVE_VISUAL_ID, &format);
+
+	   ANativeWindow_setBuffersGeometry(EglWindow, 0, 0, format);
+	   #endif
 		os::Printer::log(" Creating EglSurface with nativeWindow...");
 		EglSurface = eglCreateWindowSurface(EglDisplay, config, EglWindow, NULL);
 		if (EGL_NO_SURFACE == EglSurface)
@@ -406,6 +428,7 @@ namespace video
 
 		core::stringc FPVSPath = IRR_OGLES2_SHADER_PATH;
 		FPVSPath += "COGLES2FixedPipeline.vsh";
+		os::Printer::log(FPVSPath.c_str());
 
 		core::stringc FPFSPath = IRR_OGLES2_SHADER_PATH;
 		FPFSPath += "COGLES2FixedPipeline.fsh";

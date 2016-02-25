@@ -92,15 +92,15 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 	// Create cursor control
 	CursorControl = new CCursorControl(this);
 
+	io::CAndroidAssetFileArchive *assets = io::createAndroidAssetFileArchive(false, false);
+	assets->addDirectory("media");
+	FileSystem->addFileArchive(assets);
 	// Create the driver.
 	createDriver();
 		
 	if (VideoDriver)	
 		createGUIAndScene();
 		
-	io::CAndroidAssetFileArchive *assets = io::createAndroidAssetFileArchive(false, false);
-	assets->addDirectory("media");
-	FileSystem->addFileArchive(assets);
 	// TODO
 	//
 	// if engine->app->savedState is not NULL then use postEventFromUser() 
