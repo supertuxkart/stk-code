@@ -5,7 +5,7 @@ export PATH :=$(shell pwd)/obj/bin:${PATH}
 all: build apk
 
 # target: build - Build the native code
-build: obj/freetype.stamp jni/ifaddrs/ifaddrs.h
+build: obj/freetype.stamp jni/ifaddrs/ifaddrs.h jni/jpeglib/jpeglib.h
 	NDK_CCACHE=ccache ${NDK_PATH}/ndk-build -j3
 
 # target: apk - Make a debug APK
@@ -37,5 +37,9 @@ obj/freetype.stamp:
 
 jni/ifaddrs/ifaddrs.h:
 	cd jni && git clone https://github.com/morristech/android-ifaddrs.git ifaddrs
+
+jni/jpeglib/jpeglib.h:
+	git clone https://github.com/folecr/jpeg8d jni/jpeglib
+
 
 #wget http://mirror6.layerjet.com/nongnu//freetype/freetype-2.6.tar.gz

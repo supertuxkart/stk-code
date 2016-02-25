@@ -4,8 +4,8 @@ The android sdk must be installed in /opt.
 
 ant is also needed.
 
-Download a suitable jpeglib
-===========================
+[not needed anymore] Download a suitable jpeglib (done automatically by the Makefile)
+================================================================
 > git clone https://github.com/folecr/jpeg8d jni/jpeglib
 
 Build an apk
