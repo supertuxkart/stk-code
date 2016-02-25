@@ -130,15 +130,15 @@ std::string BareNetworkString::getLogMessage() const
         unsigned int upper_limit = std::min(line+16, size());
         for(unsigned int i=line; i<upper_limit; i++)
         {
-            oss << getUInt8(i);
+            oss << m_buffer[i];
             if(i%2==1) oss << " ";
         }   // for i
         // Add ascii representation
         for(unsigned int i=line; i<upper_limit; i++)
         {
-            uint8_t c = getUInt8(i);
+            uint8_t c = m_buffer[i];
             if(isprint(c))
-                oss << char(getUInt8(i));
+                oss << char(c);
             else
                 oss << '.';
         }   // for i
