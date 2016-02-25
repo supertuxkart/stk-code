@@ -41,7 +41,7 @@ extern "C" void android_main2(struct android_app* app)
 __android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "The value of 1 + 1 is %d", 1+1);
 #ifdef _IRR_ANDROID_PLATFORM_
         const bool shadows = false;
-	video::E_DRIVER_TYPE driverType=video::EDT_OGLES1;
+	video::E_DRIVER_TYPE driverType=video::EDT_OGLES2;
 #else
 	// ask if user would like shadows
 	char i;
@@ -404,7 +404,6 @@ __android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "frame %d", __LINE__
 			device->setWindowCaption(str.c_str());
 			lastFPS = fps;
 		}
-__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "frame %d", lastFPS);
 	}
 
 	device->drop();
