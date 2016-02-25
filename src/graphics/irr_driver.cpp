@@ -440,7 +440,7 @@ void IrrDriver::initDevice()
                 Log::verbose("irr_driver", "Trying to create device with "
                              "%i bits\n", bits);
 
-#ifdef ANDROID_DEVICE
+#ifndef ANDROID_DEVICE
             params.DriverType    = video::EDT_OPENGL;
 #else
             params.DriverType    = video::EDT_OGLES2;
@@ -491,7 +491,7 @@ void IrrDriver::initDevice()
             UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
             UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
 
-#ifdef ANDROID_DEVICE
+#ifndef ANDROID_DEVICE
             m_device = createDevice(video::EDT_OPENGL,
 #else
             m_device = createDevice(video::EDT_OGLES2,

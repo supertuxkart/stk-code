@@ -104,15 +104,17 @@ namespace irr
 			dev = new CIrrDeviceFB(params);
 #endif
 
+#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
+__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "%s %d", __FILE__, __LINE__);
+	   if (params.DeviceType == EIDT_ANDROID || (!dev && params.DeviceType == EIDT_BEST)) {
+__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "%s %d", __FILE__, __LINE__);
+		   dev = new CIrrDeviceAndroid(params);
+	   }
+#endif
+
 #ifdef _IRR_COMPILE_WITH_CONSOLE_DEVICE_
 		if (params.DeviceType == EIDT_CONSOLE || (!dev && params.DeviceType == EIDT_BEST))
 			dev = new CIrrDeviceConsole(params);
-#endif
-
-#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
-               if (params.DeviceType == EIDT_ANDROID || (!dev && params.DeviceType == EIDT_BEST)) {
-                       dev = new CIrrDeviceAndroid(params);
-                       }
 #endif
 
 		if (dev && !dev->getVideoDriver() && params.DriverType != video::EDT_NULL)
