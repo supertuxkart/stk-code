@@ -32,13 +32,21 @@ using namespace irr;
 #pragma comment(lib, "Irrlicht.lib")
 #endif
 
+void* global_android_app;
+
+void stk_main ();
+void stk_run ();
 #ifndef _IRR_ANDROID_PLATFORM_
 int main()
 #else
 extern "C" void android_main2(struct android_app* app)
 #endif
 {
-__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "The value of 1 + 1 is %d", 1+1);
+	global_android_app = app;
+	__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "Launching stk main…");
+	stk_main ();
+	__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "Main launched, now the mainloop…");
+	stk_run ();
 #ifdef _IRR_ANDROID_PLATFORM_
         const bool shadows = false;
 	video::E_DRIVER_TYPE driverType=video::EDT_OGLES2;

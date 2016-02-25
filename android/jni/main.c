@@ -290,7 +290,7 @@ void android_main(struct android_app* state) {
     dlstk = dlopen("/data/data/com.example.native_activity/lib/libstk.so", RTLD_NOW);*/
     dlstk = dlopen("/data/data/org.supertuxkart.stk/lib/libenet.so", RTLD_NOW);
     dlstk = dlopen("/data/data/org.supertuxkart.stk/lib/libbullet.so", RTLD_NOW);
-    //dlstk = dlopen("/data/data/org.supertuxkart.stk/lib/libstkmain.so", RTLD_NOW);
+    dlstk = dlopen("/data/data/org.supertuxkart.stk/lib/libstk.so", RTLD_NOW);
     if(dlhandle == NULL)
         LOGW("Can't open libirrlicht.so. %s", dlerror());
     if(dlstk == NULL)
@@ -298,7 +298,9 @@ void android_main(struct android_app* state) {
     //plug_main_loop_interation = (void(*)(void))dlsym(dlstk, "main_loop_interation");
     //if(plug_main_loop_interation == NULL)
     //    LOGW("Can't open plug_main_loop");
-    plug_android_main_2 = (void(*)(void))dlsym(dlhandle, "android_main2");
+    plug_android_main_2 = (void(*)(void))dlsym(dlstk, "android_main2");
+    if(plug_android_main_2 == NULL)
+        LOGW("Can't find android_main2 %s", dlerror());
 	LOGW("----------------------------------------------------------- lanchit");
     app_dummy();
 __android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "frame %d %d", __LINE__, ((struct android_app *)(state))->window);

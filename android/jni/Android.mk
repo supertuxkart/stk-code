@@ -177,7 +177,7 @@ LOCAL_CPP_FEATURES += rtti
 LOCAL_PATH:= jni
 
 # Irrlicht
-LOCAL_SRC_FILES := $(wildcard jni/irrlicht/source/Irrlicht/*.cpp) $(wildcard jni/irrlicht/source/Irrlicht/Android/*.cpp) jni/irrexample.cpp
+LOCAL_SRC_FILES := $(wildcard jni/irrlicht/source/Irrlicht/*.cpp) $(wildcard jni/irrlicht/source/Irrlicht/Android/*.cpp)
 LOCAL_PATH:=.
 LOCAL_MODULE    := irrlicht
 LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv1_CM -lGLESv2
@@ -191,7 +191,7 @@ LOCAL_CPP_FEATURES += rtti exceptions
 
 
 # STK
-LOCAL_SRC_FILES := $(wildcard jni/src/*.cpp) $(wildcard jni/src/*/*.cpp) $(wildcard jni/src/*/*/*.cpp)
+LOCAL_SRC_FILES := $(wildcard jni/src/*.cpp) $(wildcard jni/src/*/*.cpp) $(wildcard jni/src/*/*/*.cpp) jni/irrexample.cpp
 LOCAL_PATH:=.
 LOCAL_MODULE    := stk
 LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv1_CM -lGLESv2 -lGLESv3
