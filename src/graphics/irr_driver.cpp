@@ -113,7 +113,7 @@ IrrDriver::IrrDriver()
     m_shadow_matrices     = NULL;
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
-    m_device              = createDevice(video::EDT_NULL,
+    m_device              = irr::createDevice(video::EDT_NULL,
                                          irr::core::dimension2d<u32>(640, 480),
                                          /*bits*/16U, /**fullscreen*/ false,
                                          /*stencilBuffer*/ false,
@@ -440,7 +440,11 @@ void IrrDriver::initDevice()
                 Log::verbose("irr_driver", "Trying to create device with "
                              "%i bits\n", bits);
 
+#ifdef ANDROID_DEVICE
             params.DriverType    = video::EDT_OPENGL;
+#else
+            params.DriverType    = video::EDT_OGLES2;
+#endif
             params.Stencilbuffer = false;
             params.Bits          = bits;
             params.EventReceiver = this;
@@ -473,7 +477,7 @@ void IrrDriver::initDevice()
                            (int)UserConfigParams::m_antialiasing);
             }
             */
-            m_device = createDeviceEx(params);
+            m_device = irr::createDeviceEx(params);
 
             if(m_device)
                 break;
@@ -487,7 +491,11 @@ void IrrDriver::initDevice()
             UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
             UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
 
+#ifdef ANDROID_DEVICE
             m_device = createDevice(video::EDT_OPENGL,
+#else
+            m_device = createDevice(video::EDT_OGLES2,
+#endif
                         core::dimension2du(UserConfigParams::m_width,
                                            UserConfigParams::m_height ),
                                     32, //bits per pixel
