@@ -1270,10 +1270,19 @@ void askForInternetPermission()
 #endif
 
 // ----------------------------------------------------------------------------
+#ifdef ANDROID
+void stk_run() {
+    main_loop->run();
+}
+int stk_main()
+{
+    CommandLine::init(0, {});
+#else
 int main(int argc, char *argv[] )
 {
     CommandLine::init(argc, argv);
 
+#endif
     CrashReporting::installHandlers();
 
     srand(( unsigned ) time( 0 ));
@@ -1509,7 +1518,11 @@ int main(int argc, char *argv[] )
             race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
+#ifdef ANDROID
+		return 0;
+#else
         main_loop->run();
+#endif
 
     }  // try
     catch (std::exception &e)
