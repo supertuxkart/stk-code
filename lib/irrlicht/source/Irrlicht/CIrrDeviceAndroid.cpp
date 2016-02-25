@@ -74,6 +74,8 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 	// Android OS.
 	os::Printer::log("Waiting for Android activity window to be created.", ELL_DEBUG);
 
+	if(Android->window == NULL) {
+
 	do	
 	{
 		while( (ident = ALooper_pollAll(	0, NULL, &events,(void**)&source)) >= 0 )
@@ -86,6 +88,8 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 		}	
 	}
 	while( IsReady == false );
+	}
+	os::Printer::log("Done", ELL_DEBUG);
 	
 	assert( Android->window );
 
