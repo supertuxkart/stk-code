@@ -3,7 +3,7 @@ NDK_PATH=android-ndk-r10e/
 all: build apk
 
 # target: build - Build the native code
-build: obj/freetype.stamp
+build: obj/freetype.stamp jni/ifaddrs/ifaddrs.h
 	NDK_CCACHE=ccache ${NDK_PATH}/ndk-build -j3
 
 # target: apk - Make a debug APK
@@ -28,3 +28,6 @@ obj/freetype.stamp:
 	make -j4 && \
 	make install DESTDIR=`pwd`/../../obj/freetype
 	touch obj/freetype.stamp
+
+jni/ifaddrs/ifaddrs.h:
+	cd jni && git clone https://github.com/morristech/android-ifaddrs.git ifaddrs
