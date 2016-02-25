@@ -61,6 +61,14 @@ namespace irr
 		user receiver then no text will be sent to the console. */
 		EET_LOG_TEXT_EVENT,
 
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+		//! A input method event
+		/** Input method events are created by the input method message and passed to IrrlichtDevice::postEventFromUser.
+		Windows: Implemented.
+		Linux / Other: Not yet implemented. */
+		EET_IMPUT_METHOD_EVENT,
+#endif
+
 		//! A user event with user data.
 		/** This is not used by Irrlicht and can be used to send user
 		specific data though the system. The Irrlicht 'window handle'
@@ -153,6 +161,20 @@ namespace irr
 
 		EMBSM_FORCE_32_BIT = 0x7fffffff
 	};
+
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+	//! Enumeration for all input method events
+	enum EINPUT_METHOD_EVENT
+	{
+		//! a character from input method.
+		EIME_CHAR_INPUT = 0,
+
+		//! change position of composition window
+		EIME_CHANGE_POS,
+
+		EIME_FORCE_32_BIT = 0x7fffffff
+	}
+#endif
     
     //! Enumeration for all touch input events
 	enum EMULTI_TOUCH_INPUT_EVENT
@@ -473,7 +495,7 @@ struct SEvent
 			AXIS_R,		// e.g. rudder, or analog 2 stick 2 top to bottom
 			AXIS_U,
 			AXIS_V,
-			NUMBER_OF_AXES
+			NUMBER_OF_AXES = 32
 		};
 
 		/** A bitmap of button states.  You can use IsButtonPressed() to
@@ -531,6 +553,21 @@ struct SEvent
 		//! Another user specified data as int
 		s32 UserData2;
 	};
+
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+	struct SInputMethodEvent
+	{
+		//! Parent window handle for IMM functions (Windows only)
+		void* Handle;
+
+		//! Character from Input Method
+		wchar_t Char;
+
+		//! Type of input method event
+		EINPUT_METHOD_EVENT Event;
+	};
+#endif
+
 
 	EEVENT_TYPE EventType;
 	union
@@ -606,6 +643,14 @@ struct SJoystickInfo
 		//! The presence or absence of a hat cannot be determined.
 		POV_HAT_UNKNOWN
 	} PovHat;
+
+    //! Set if the name of the joystick is useful:
+    /** On windows the generic name is useless, since it's always the same
+     *  indepentent of what joystick is connected ("Microsoft PC-joystick driver").
+     *  We will try to get a better name from the registry, but if this should
+     *  fail this flag is set and used by STK. */
+    bool HasGenericName;
+
 }; // struct SJoystickInfo
 
 
