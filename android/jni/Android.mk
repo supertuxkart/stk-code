@@ -81,7 +81,7 @@ LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES := $(wildcard $(LOCAL_PATH)/angelscript/source/*.S)
 LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/angelscript/source/*.cpp)
 LOCAL_PATH:=.
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
@@ -198,7 +198,7 @@ LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv1_CM -lGLESv2 -lGLESv3
 LOCAL_CFLAGS := -Ijni/irrlicht/source/Irrlicht/ -Ijni/irrlicht/include/ -Ijni/jpeglib/ -Ijni/libpng/ -Ijni/ -Iinclude/ -I$(call my-dir)/../../sources/android/native_app_glue/ -DBUILD_OGLES2 -DNO_IRR_COMPILE_WITH_SOFTWARE_ -DNO_IRR_COMPILE_WITH_BURNINGSVIDEO_ -DSUPERTUXKART_DATADIR=\"/sdcard/stk/\" -DANDROID_DEVICE -DANDROID -Ijni/src/ -Ijni/bullet/src -DNO_CURL -std=c++11 -Iobj/freetype/freetype/include/freetype2/ -Ijni/enet/include/ -Ijni/angelscript/include/ -DDEBUG -DNO_SOUND -DGLEW_NO_GLU -Ijni/ifaddrs
 
 LOCAL_SHARED_LIBRARIES := irrlicht
-LOCAL_STATIC_LIBRARIES := bullet enet freetype  ifaddrs
+LOCAL_STATIC_LIBRARIES := bullet enet freetype  ifaddrs angelscript
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_PATH:= jni
