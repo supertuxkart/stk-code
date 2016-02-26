@@ -68,7 +68,7 @@ void STKPeer::sendPacket(NewNetworkString const& data, bool reliable)
     Log::verbose("STKPeer", "sending packet of size %d to %s",
                  data.size(), a.toString().c_str());
          
-    ENetPacket* packet = enet_packet_create(data.getData(), data.size() + 1,
+    ENetPacket* packet = enet_packet_create(data.getData(), data.size(),
                                     (reliable ? ENET_PACKET_FLAG_RELIABLE
                                               : ENET_PACKET_FLAG_UNSEQUENCED));
     enet_peer_send(m_enet_peer, 0, packet);

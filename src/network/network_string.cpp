@@ -20,6 +20,7 @@
 #include "utils/string_utils.hpp"
 
 #include <algorithm>   // for std::min
+#include <iomanip>
 #include <ostream>
 
 // ============================================================================
@@ -126,11 +127,11 @@ std::string BareNetworkString::getLogMessage() const
     std::ostringstream oss;
     for(unsigned int line=0; line<16; line+=16)
     {
-        oss << line << " : ";
+        oss << std::hex << std::setw(3) << line << " : ";
         unsigned int upper_limit = std::min(line+16, size());
         for(unsigned int i=line; i<upper_limit; i++)
         {
-            oss << m_buffer[i];
+            oss << std::hex << std::setw(2) << int(m_buffer[i]);
             if(i%2==1) oss << " ";
         }   // for i
         // Add ascii representation

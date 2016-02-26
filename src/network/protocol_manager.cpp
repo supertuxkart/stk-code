@@ -110,8 +110,7 @@ void ProtocolManager::propagateEvent(Event* event)
     {
         if (event->data().size() > 0)
         {
-            searched_protocol = (ProtocolType)(event->data()[0]);
-            event->removeFront(1);
+            searched_protocol = event->data().getProtocolType();
         }
         else
         {
@@ -125,14 +124,7 @@ void ProtocolManager::propagateEvent(Event* event)
     Log::verbose("ProtocolManager", "Received event for protocols of type %d",
                   searched_protocol);
 
-    bool is_synchronous = false;
-    if(searched_protocol & PROTOCOL_SYNCHRONOUS)
-    {
-        is_synchronous = true;
-        // Reset synchronous flag to restore original protocol id
-        searched_protocol = ProtocolType(searched_protocol & 
-                                         ~PROTOCOL_SYNCHRONOUS  );
-    }
+
     std::vector<unsigned int> protocols_ids;
     m_protocols.lock();
     for (unsigned int i = 0; i < m_protocols.getData().size() ; i++)
@@ -163,7 +155,9 @@ void ProtocolManager::propagateEvent(Event* event)
     {
         EventProcessingInfo epi;
         epi.m_arrival_time   = (double)StkTime::getTimeSinceEpoch();
-        epi.m_is_synchronous = is_synchronous;
+        // Only message events will optionally be delivered synchronously
+        epi.m_is_synchronous = event->getType()==EVENT_TYPE_MESSAGE &&
+                               event->data().isSynchronous();
         epi.m_event          = event;
         epi.m_protocols_ids  = protocols_ids;
         // Add the event to the queue. After the event is handled

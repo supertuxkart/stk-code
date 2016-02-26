@@ -393,17 +393,17 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1                   2   3            7        8             9
- *       -----------------------------------------------------------------------------
- *  Size | 1 |         1         | 1 |      4     |   1    | 1          |             |
- *  Data | 1 | 0 <= race id < 16 | 4 | priv token | hostid | authorised |playernames* |
- *       ------------------------------------------------------------------------------
+ *  Byte 0                   1        2            3       
+ *       ---------------------------------------------------------
+ *  Size |         1         |   1    | 1          |             |
+ *  Data | 0 <= race id < 16 | hostid | authorised |playernames* |
+ *       ---------------------------------------------------------
  */
 void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 {
-    const NewNetworkString &data = event->data();
+    NewNetworkString &data = event->data();
     // At least 12 bytes should remain now
-    if (data.size() < 9|| data[0] != 1 || data[2] != 4)
+    if (data.size() < 3)
     {
         Log::error("ClientLobbyRoomProtocol",
                    "A message notifying an accepted connection wasn't "
@@ -423,9 +423,10 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         name = PlayerManager::getCurrentOnlineUserName();
     else
         name = PlayerManager::getCurrentPlayer()->getName();
-    uint8_t my_player_id = data.getUInt8(1);
-    uint8_t my_host_id   = data.getUInt8(7);
-    uint8_t authorised   = data.getUInt8(8);
+    uint8_t my_player_id = data.getUInt8(0);
+    uint8_t my_host_id   = data.getUInt8(1);
+    uint8_t authorised   = data.getUInt8(2);
+    data.removeFront(3);
     // Store this client's authorisation status in the peer information
     // for the server.
     event->getPeer()->setAuthorised(authorised!=0);
@@ -436,31 +437,26 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     STKHost::get()->getGameSetup()->setLocalMaster(my_player_id);
     m_setup->setNumLocalPlayers(1);
     // connection token
-    uint32_t token = data.getUInt32(3);
+    uint32_t token = data.getToken();
     peer->setClientServerToken(token);
 
     // Add all players
     // ===============
-    unsigned int n = 9;
-    while (n < data.size())
+    while (data.size() > 0)
     {
-        if (data[n] != 1 )
-            Log::error("ClientLobbyRoomProtocol",
-                       "Bad format in players list.");
-
-        uint8_t player_id = data[n + 1];
+        uint8_t player_id = data[0];
+        uint8_t host_id   = data[1];
         irr::core::stringw name;
-        int bytes_read = data.decodeStringW(n + 2, &name);
-        uint8_t host_id = data.getUInt8(n+2+bytes_read);
-
+        int bytes_read = data.decodeStringW(2, &name);
+        
         NetworkPlayerProfile* profile2 =
             new NetworkPlayerProfile(player_id, name);
         profile2->setHostId(host_id);
         m_setup->addPlayer(profile2);
-        n += bytes_read+3;
         // Inform the network lobby of all players so that the GUI can
         // show all currently connected players.
         NetworkingLobby::getInstance()->addPlayer(profile2);
+        data.removeFront(bytes_read+2);
     }
 
     // Add self after other players so that player order is identical

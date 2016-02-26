@@ -496,15 +496,15 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     NewNetworkString *message_ack = getNetworkString(14 + players.size() * 7);
     message_ack->setToken(token);
     // connection success -- size of token -- token
-    message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt8(1).addUInt8(new_player_id).addUInt8(4)
-               .addUInt8(new_host_id).addUInt8(is_authorised);
+    message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt8(new_player_id)
+                .addUInt8(new_host_id).addUInt8(is_authorised);
     // Add all players so that this user knows (this new player is only added
     // to the list of players later, so the new player's info is not included)
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        message_ack->addUInt8(1).addUInt8(players[i]->getGlobalPlayerId())
-                   .encodeString(players[i]->getName())
-                   .addUInt8(players[i]->getHostId());
+        message_ack->addUInt8(players[i]->getGlobalPlayerId())
+                    .addUInt8(players[i]->getHostId())
+                    .encodeString(players[i]->getName());
     }
     sendMessage(peer, *message_ack);
     delete message_ack;

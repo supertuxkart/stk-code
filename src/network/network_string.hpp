@@ -145,8 +145,8 @@ public:
     const char* getData() const { return (char*)(m_buffer.data()); };
 
     // ------------------------------------------------------------------------
-    /** Returns the current length of the network string. */
-    unsigned int size() const { return (int)m_buffer.size(); }
+    /** Returns the remaining length of the network string. */
+    unsigned int size() const { return (int)m_buffer.size()-m_current_offset; }
 
     // ------------------------------------------------------------------------
     // All functions related to adding data to a network string
@@ -159,7 +159,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Adds a single character to the string. */
-    BareNetworkString& addChar(const char& value)
+    BareNetworkString& addChar(const char value)
     {
         m_buffer.push_back((uint8_t)(value));
         return *this;
@@ -295,17 +295,23 @@ class NewNetworkString : public BareNetworkString
 public:
     static void unitTesting();
         
-    /** Constructor, sets the protocol type of this message. */
+    /** Constructor for a message to be sent. It sets the 
+     *  protocol type of this message. */
     NewNetworkString(ProtocolType type,  int capacity=16)
         : BareNetworkString(capacity)
     {
         m_buffer.push_back(type);
+        addUInt32(0);   // add dummy token for now
     }   // NewNetworkString
 
     // ------------------------------------------------------------------------
+    /** Constructor for a received message. It automatically ignored the first
+     *  5 bytes which contain the type and token. Those will be access using
+     *  special functions. */
     NewNetworkString(const uint8_t *data, int len) 
         : BareNetworkString((char*)data, len)
     {
+        m_current_offset = 5;   // ignore type and token
     }   // NewNetworkString
 
     // ------------------------------------------------------------------------
@@ -313,7 +319,7 @@ public:
     ProtocolType getProtocolType() const
     {
         assert(!m_buffer.empty());
-        return (ProtocolType)m_buffer[0];
+        return (ProtocolType)(m_buffer[0] & ~PROTOCOL_SYNCHRONOUS);
     }   // getProtocolType
 
     // ------------------------------------------------------------------------
@@ -323,13 +329,13 @@ public:
         if(b)
             m_buffer[0] |= PROTOCOL_SYNCHRONOUS;
         else
-            m_buffer[0] &= !PROTOCOL_SYNCHRONOUS;
+            m_buffer[0] &= ~PROTOCOL_SYNCHRONOUS;
     }   // setSynchronous
     // ------------------------------------------------------------------------
     /** Returns if this message is synchronous or not. */
     bool isSynchronous() const
     {
-        return (m_buffer[0] & PROTOCOL_SYNCHRONOUS) != 0;
+        return (m_buffer[0] & PROTOCOL_SYNCHRONOUS) == PROTOCOL_SYNCHRONOUS;
     }   // isSynchronous
     // ------------------------------------------------------------------------
     /** Sets a token for a message. Note that the token in an already
