@@ -171,6 +171,7 @@ bool CIrrDeviceAndroid::run( void )
 	// If not animating, we will block forever waiting for events.
 	// If animating, we loop until all events are read, then continue
 	// to draw the next frame of animation.
+#if 0
 	while( ( ident = ALooper_pollAll(	( Animating || IsClosing ) ? 0 : -1, 
 										NULL, &events,
 										(void**)&source)) >= 0 )
@@ -180,7 +181,6 @@ bool CIrrDeviceAndroid::run( void )
 		{
 			source->process( Android, source );
 		}
-#if 0
          // If a sensor has data, process it now.
          if (ident == LOOPER_ID_USER) {
              if (engine.accelerometerSensor != NULL) {
@@ -193,13 +193,13 @@ bool CIrrDeviceAndroid::run( void )
                  }
              }
          }
-#endif
 		// Check if we are exiting.
 		if( Android->destroyRequested != 0 )
 		{                  
 			close = true;
 		}
 	}
+#endif
     	
 	os::Timer::tick();
 	return( !close );
