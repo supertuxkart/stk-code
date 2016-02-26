@@ -25,7 +25,11 @@
 #include "glwrap.hpp"
 #include "utils/cpp2011.hpp"
 
-#include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
+#ifdef ANDROID
+#   include "../../lib/irrlicht/source/Irrlicht/COGLES2Texture.h"
+#else
+#   include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
+#endif
 
 
 // ============================================================================
@@ -104,7 +108,6 @@ private:
                                       -1.,  1., -1., -1.,   // LowerLeft
                                        1., -1.,  1.,  1.,   // UpperRight
                                        1.,  1.,  1., -1. }; // LowerRight 
-#ifndef ANDROID
         glGenBuffers(1, &m_quad_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, m_quad_buffer);
         glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad_vertex,
@@ -119,7 +122,6 @@ private:
         glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 
                               (GLvoid *)(2 * sizeof(float)));
         glBindVertexArray(0);
-#endif
     }   // initQuadBuffer
 #endif
 public:
@@ -128,7 +130,6 @@ public:
 
     ColoredTextureRectShader()
     {
-#ifndef ANDROID
 #ifdef XX
         initQuadBuffer();
 #endif
@@ -157,7 +158,6 @@ public:
                      GL_DYNAMIC_DRAW);
         glVertexAttribIPointer(2, 4, GL_UNSIGNED_INT, 4 * sizeof(unsigned), 0);
         glBindVertexArray(0);
-#endif
     }   // ColoredTextureRectShader
 };   // ColoredTextureRectShader
 
@@ -169,7 +169,6 @@ static void drawTexColoredQuad(const video::ITexture *texture,
                                float tex_center_pos_y, float tex_width,
                                float tex_height)
 {
-#ifndef ANDROID
     unsigned colors[] = {
         col[0].getRed(), col[0].getGreen(), col[0].getBlue(), col[0].getAlpha(),
         col[1].getRed(), col[1].getGreen(), col[1].getBlue(), col[1].getAlpha(),
@@ -184,8 +183,13 @@ static void drawTexColoredQuad(const video::ITexture *texture,
     ColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(ColoredTextureRectShader::getInstance()->m_vao);
 
+#ifndef ANDROID
     const irr::video::COpenGLTexture *t = 
                        static_cast<const irr::video::COpenGLTexture*>(texture);
+#else
+    const irr::video::COGLES2Texture *t = 
+                       static_cast<const irr::video::COGLES2Texture*>(texture);
+#endif
     ColoredTextureRectShader::getInstance()
         ->setTextureUnits(t->getOpenGLTextureName());
     ColoredTextureRectShader::getInstance()
@@ -199,7 +203,6 @@ static void drawTexColoredQuad(const video::ITexture *texture,
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGetError();
-#endif
 }   // drawTexColoredQuad
 
 // ----------------------------------------------------------------------------
@@ -208,7 +211,6 @@ static void drawTexQuad(GLuint texture, float width, float height,
                         float tex_center_pos_x, float tex_center_pos_y,
                         float tex_width, float tex_height)
 {
-#ifndef ANDROID
     TextureRectShader::getInstance()->use();
     glBindVertexArray(SharedGPUObjects::getUI_VAO());
 
@@ -224,7 +226,6 @@ static void drawTexQuad(GLuint texture, float width, float height,
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGetError();
-#endif
 }   // drawTexQuad
 
 
@@ -278,7 +279,6 @@ void draw2DImage(const video::ITexture* texture,
                  const core::rect<s32>* clip_rect,
                  const video::SColor &colors, bool use_alpha_channel_of_texture)
 {
-#ifndef ANDROID
     if (!CVS->isGLSL())
     {
         video::SColor duplicatedArray[4] = { colors, colors, colors, colors };
@@ -321,8 +321,13 @@ void draw2DImage(const video::ITexture* texture,
     UniformColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(SharedGPUObjects::getUI_VAO());
 
+#ifndef ANDROID
     const video::COpenGLTexture *c_texture = 
         static_cast<const video::COpenGLTexture*>(texture);
+#else
+    const video::COGLES2Texture *c_texture = 
+        static_cast<const video::COGLES2Texture*>(texture);
+#endif
     UniformColoredTextureRectShader::getInstance()
         ->setTextureUnits(c_texture->getOpenGLTextureName());
 
@@ -341,7 +346,6 @@ void draw2DImage(const video::ITexture* texture,
     glUseProgram(0);
 
     glGetError();
-#endif
 }   // draw2DImage
 
 // ----------------------------------------------------------------------------
@@ -352,7 +356,6 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
                         const video::SColor &colors,
                         bool use_alpha_channel_of_texture)
 {
-#ifndef ANDROID
     if (use_alpha_channel_of_texture)
     {
         glEnable(GL_BLEND);
@@ -380,7 +383,6 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-#endif
 }   // draw2DImageFromRTT
 
 // ----------------------------------------------------------------------------
@@ -391,7 +393,6 @@ void draw2DImage(const video::ITexture* texture,
                  const video::SColor* const colors,
                  bool use_alpha_channel_of_texture)
 {
-#ifndef ANDROID
     if (!CVS->isGLSL())
     {
         irr_driver->getVideoDriver()->draw2DImage(texture, destRect, sourceRect,
@@ -437,8 +438,13 @@ void draw2DImage(const video::ITexture* texture,
     }
     else
     {
+#ifndef ANDROID
         const video::COpenGLTexture *c_texture = 
                             static_cast<const video::COpenGLTexture*>(texture);
+#else
+        const video::COGLES2Texture *c_texture = 
+                            static_cast<const video::COGLES2Texture*>(texture);
+#endif
         drawTexQuad(c_texture->getOpenGLTextureName(), width, height,
                     center_pos_x, center_pos_y, tex_center_pos_x,
                     tex_center_pos_y, tex_width, tex_height);
@@ -448,7 +454,6 @@ void draw2DImage(const video::ITexture* texture,
     glUseProgram(0);
 
     glGetError();
-#endif
 }   // draw2DImage
 
 // ----------------------------------------------------------------------------
@@ -458,7 +463,6 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
                                scene::E_PRIMITIVE_TYPE pType,
                                video::E_INDEX_TYPE iType)
 {
-#ifndef ANDROID
     if (!CVS->isGLSL())
     {
         irr_driver->getVideoDriver()
@@ -492,7 +496,6 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
     glDeleteBuffers(1, &tmpvbo);
     glDeleteBuffers(1, &tmpibo);
 
-#endif
 }   // draw2DVertexPrimitiveList
 
 // ----------------------------------------------------------------------------
@@ -500,12 +503,9 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
                           const core::rect<s32>* clip)
 {
 
-#ifndef ANDROID
     if (!CVS->isGLSL())
     {
-#endif
         irr_driver->getVideoDriver()->draw2DRectangle(color, position, clip);
-#ifndef ANDROID
         return;
     }
 
@@ -560,5 +560,4 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
     glUseProgram(0);
 
     glGetError();
-#endif
 }   // GL32_draw2DRectangle
