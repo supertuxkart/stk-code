@@ -23,6 +23,9 @@ help:
 run:
 	adb shell am start -n org.supertuxkart.stk/android.app.NativeActivity
 
+stop:
+	adb shell am force-stop org.supertuxkart.stk
+
 obj/freetype.stamp:
 	mkdir -p obj/deps && cd obj/deps && wget http://mirror6.layerjet.com/nongnu//freetype/freetype-2.6.tar.gz && tar -xzf freetype-2.6.tar.gz
 	mkdir -p obj/freetype
