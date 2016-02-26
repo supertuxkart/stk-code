@@ -2219,11 +2219,9 @@ void IrrDriver::update(float dt)
 
     if (world)
     {
-#ifndef ANDROID
         if (CVS->isGLSL())
             renderGLSL(dt);
         else
-#endif
             renderFixed(dt);
             
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
