@@ -39,6 +39,14 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
 
+#ifdef ANDROID
+#include <android/sensor.h>
+#include <android/log.h>
+#include <android_native_app_glue.h>
+extern void* global_android_app;
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
+#endif
+
 MainLoop* main_loop = 0;
 
 MainLoop::MainLoop() :
@@ -128,6 +136,32 @@ void MainLoop::updateRace(float dt)
         World::getWorld()->updateWorld(dt);
 }   // updateRace
 
+bool pressed[4] = { false, false, false, false};
+
+void post_key(int key, bool end) {
+    irr::SEvent irrevent;
+    switch(key)
+    {
+    case 0:
+        irrevent.KeyInput.Key = irr::KEY_UP;
+        break;
+    case 1:
+        irrevent.KeyInput.Key = irr::KEY_DOWN;
+        break;
+    case 2:
+        irrevent.KeyInput.Key = irr::KEY_LEFT;
+        break;
+    case 3:
+        irrevent.KeyInput.Key = irr::KEY_RIGHT;
+        break;
+    }
+	if(pressed[key] != end) {
+		irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
+		irrevent.KeyInput.PressedDown = end;
+		pressed[key] = end;
+		irr_driver->getDevice()->postEventFromUser(irrevent);
+	}
+}
 //-----------------------------------------------------------------------------
 /** Run the actual main loop.
  */
@@ -136,8 +170,48 @@ void MainLoop::run()
     IrrlichtDevice* device = irr_driver->getDevice();
 
     m_curr_time = device->getTimer()->getRealTime();
+	auto sensorManager = ASensorManager_getInstance();
+	auto accelerometerSensor = ASensorManager_getDefaultSensor(sensorManager,
+            ASENSOR_TYPE_ACCELEROMETER);
+    auto sensorEventQueue = ASensorManager_createEventQueue(sensorManager,
+           ((android_app*)global_android_app)->looper, LOOPER_ID_USER, NULL, NULL);
+	ASensorEventQueue_enableSensor(sensorEventQueue,
+			accelerometerSensor);
+	// We'd like to get 60 events per second (in us).
+	ASensorEventQueue_setEventRate(sensorEventQueue,
+			accelerometerSensor, (1000L/1)*1000);
     while(!m_abort)
     {
+        int ident;
+        int events;
+        struct android_poll_source* source;
+        while ((ident=ALooper_pollAll(0, NULL, &events,
+                (void**)&source)) >= 0) {
+            
+			// Process this event.
+            if (source != NULL) {
+                source->process((android_app*)global_android_app, source);
+            }
+
+
+            // If a sensor has data, process it now.
+            if (ident == LOOPER_ID_USER) {
+                if (accelerometerSensor != NULL) {
+                    ASensorEvent event;
+                    while (ASensorEventQueue_getEvents(sensorEventQueue,
+                            &event, 1) > 0) {
+                        LOGI("accelerometer: x=%f y=%f z=%f",
+                                event.acceleration.x, event.acceleration.y,
+                                event.acceleration.z);
+						post_key(1, event.acceleration.z < 0);
+						post_key(0, event.acceleration.z > 4);
+						post_key(3, event.acceleration.y > 2);
+						post_key(2, event.acceleration.y < -2);
+                    }
+                }
+            }
+
+        }
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
         m_prev_time = m_curr_time;
