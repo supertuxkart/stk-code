@@ -256,6 +256,16 @@ namespace video
 
 		genericDriverInit(params.WindowSize, params.Stencilbuffer);
 
+#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
+		int backingWidth;
+		int backingHeight;
+		eglQuerySurface(EglDisplay, EglSurface, EGL_WIDTH, &backingWidth);
+		eglQuerySurface(EglDisplay, EglSurface, EGL_HEIGHT, &backingHeight);
+        core::dimension2d<u32> WindowSize(backingWidth, backingHeight);
+        CNullDriver::ScreenSize = WindowSize;
+#endif
+        
+
 		// set vsync
 		if (params.Vsync)
 			eglSwapInterval(EglDisplay, 1);
@@ -268,7 +278,7 @@ namespace video
         ExposedData.OGLESIPhone.AppDelegate = Device;
         Device->displayInitialize(&ExposedData.OGLESIPhone.Context, &ExposedData.OGLESIPhone.View);
 #endif
-        
+
         GLint backingWidth;
         GLint backingHeight;
         glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &backingWidth);
