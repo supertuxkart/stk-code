@@ -571,6 +571,10 @@ void IrrDriver::initDevice()
     m_sync = 0;
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
+#ifdef ANDROID // resolution is not configurable, and we can not predict it before creating the driver, so let's set the width/height now to avoid glitches
+	UserConfigParams::m_width  = m_actual_screen_size.Width;
+	UserConfigParams::m_height = m_actual_screen_size.Height;
+#endif
 
     m_spherical_harmonics = new SphericalHarmonics(m_scene_manager->getAmbientLight().toSColor());
 
@@ -2215,9 +2219,11 @@ void IrrDriver::update(float dt)
 
     if (world)
     {
+#ifndef ANDROID
         if (CVS->isGLSL())
             renderGLSL(dt);
         else
+#endif
             renderFixed(dt);
             
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
