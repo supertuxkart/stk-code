@@ -176,12 +176,6 @@ void ProtocolManager::propagateEvent(Event* event)
 }   // propagateEvent
 
 // ----------------------------------------------------------------------------
-void ProtocolManager::sendMessage(NetworkString *message, bool reliable)
-{
-    STKHost::get()->sendMessage(message, reliable);
-}   // sendMessage
-
-// ----------------------------------------------------------------------------
 void ProtocolManager::sendMessageExcept(STKPeer *peer,
                                         NetworkString *message,
                                         bool reliable)

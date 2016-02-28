@@ -141,5 +141,5 @@ void Protocol::sendMessageToPeersChangingToken(NetworkString *message)
 // ----------------------------------------------------------------------------
 void Protocol::sendMessage(NetworkString *message, bool reliable)
 {
-    ProtocolManager::getInstance()->sendMessage(message, reliable);
+    STKHost::get()->sendMessage(message, reliable);
 }   // sendMessage

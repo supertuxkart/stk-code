@@ -162,8 +162,6 @@ private:
 public:
     virtual void      abort();
     virtual void      propagateEvent(Event* event);
-    virtual void      sendMessage(NetworkString *message,
-                                  bool reliable = true);
     virtual void      sendMessageExcept(STKPeer* peer,
                                         NetworkString *message,
                                         bool reliable = true);
