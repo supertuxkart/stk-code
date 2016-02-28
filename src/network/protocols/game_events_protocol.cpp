@@ -98,8 +98,7 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
 
         ns->addUInt8(GE_ITEM_COLLECTED).addUInt32(item->getItemId())
            .addUInt8(powerup).addUInt8(kart->getWorldKartId());
-        ProtocolManager::getInstance()->sendMessage(peers[i], *ns,
-                                                    /*reliable*/true);
+        peers[i]->sendPacket(ns, /*reliable*/true);
         delete ns;
         Log::info("GameEventsProtocol",
                   "Notified a peer that a kart collected item %d.",
@@ -145,9 +144,7 @@ void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
         ns->addUInt32(peers[i]->getClientServerToken())
           .addUInt8(GE_KART_FINISHED_RACE)
           .addUInt8(kart->getWorldKartId()).addFloat(time);
-
-        ProtocolManager::getInstance()->sendMessage(peers[i], *ns,
-                                                    /*reliable*/true);
+        peers[i]->sendPacket(ns, /*reliable*/true);
         delete ns;
     }   // for i in peers
 }   // kartFinishedRace

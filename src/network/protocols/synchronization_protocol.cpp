@@ -83,7 +83,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         response->setToken(token);
         // The '0' indicates a response to a ping request
         response->addUInt8(0).addUInt32(sequence);
-        sendMessage(event->getPeer(), *response, false);
+        event->getPeer()->sendPacket(response, false);
         delete response;
         Log::verbose("SynchronizationProtocol", "Answering sequence %u at %lf",
                      sequence, StkTime::getRealTime());
@@ -172,7 +172,6 @@ void SynchronizationProtocol::asynchronousUpdate()
         for (unsigned int i = 0; i < peers.size(); i++)
         {
             NetworkString *ping_request = getNetworkString(13);
-            ping_request->setToken(peers[i]->getClientServerToken());
             ping_request->addUInt8(1).addUInt32(m_pings[i].size());
             // Server adds the countdown if it has started. This will indicate
             // to the client to start the countdown as well (first time the 
@@ -187,7 +186,7 @@ void SynchronizationProtocol::asynchronousUpdate()
                          "Added sequence number %u for peer %d at %lf",
                          m_pings[i].size(), i, StkTime::getRealTime());
             m_pings[i] [ m_pings_count ] = current_time;
-            sendMessage(peers[i], *ping_request, false);
+            peers[i]->sendPacket(ping_request, false);
             delete ping_request;
         }   // for i M peers
         m_last_time = current_time;

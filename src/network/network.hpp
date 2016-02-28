@@ -65,7 +65,7 @@ public:
                            const TransportAddress& dst);
     int receiveRawPacket(char *buffer, int buf_len,
                          TransportAddress* sender, int max_tries = -1);
-    void     broadcastPacket(const NetworkString& data,
+    void     broadcastPacket(NetworkString *data,
                              bool reliable = true);
     // ------------------------------------------------------------------------
     /** Returns a pointer to the ENet host object. */

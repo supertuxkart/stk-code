@@ -59,7 +59,7 @@ Event::Event(ENetEvent* event)
     }
 
     m_peer = STKHost::get()->getPeer(event->peer);
-    if(m_type == EVENT_TYPE_MESSAGE &&
+    if(m_type == EVENT_TYPE_MESSAGE && m_peer->isClientServerTokenSet() &&
         m_data->getToken()!=m_peer->getClientServerToken() )
     {
         Log::error("Event", "Received event with invalid token!");

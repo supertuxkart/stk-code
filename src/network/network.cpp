@@ -160,9 +160,9 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
 /** \brief Broadcasts a packet to all peers.
  *  \param data : Data to send.
  */
-void Network::broadcastPacket(const NetworkString& data, bool reliable)
+void Network::broadcastPacket(NetworkString *data, bool reliable)
 {
-    ENetPacket* packet = enet_packet_create(data.getData(), data.size() + 1,
+    ENetPacket* packet = enet_packet_create(data->getData(), data->size() + 1,
                                       reliable ? ENET_PACKET_FLAG_RELIABLE
                                                : ENET_PACKET_FLAG_UNSEQUENCED);
     enet_host_broadcast(m_host, 0, packet);

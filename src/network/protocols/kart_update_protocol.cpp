@@ -93,7 +93,7 @@ void KartUpdateProtocol::update()
                              "Sending %d's positions %f %f %f",
                              kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
             }
-            sendMessage(*ns, /*reliable*/false);
+            sendMessage(ns, /*reliable*/false);
             delete ns;
         }
         else
@@ -112,7 +112,7 @@ void KartUpdateProtocol::update()
                              "Sending %d's positions %f %f %f",
                               kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
             }
-            sendMessage(*ns, /*reliable*/false);
+            sendMessage(ns, /*reliable*/false);
             delete ns;
         }   // if server
     }   // if (current_time > time + 0.1)

@@ -229,7 +229,7 @@ void ServerLobbyRoomProtocol::startGame()
         NetworkString *ns = getNetworkString(6);
         ns->setToken(peers[i]->getClientServerToken());
         ns->addUInt8(LE_START_RACE).addUInt8(4);
-        sendMessage(peers[i], *ns, true); // reliably
+        peers[i]->sendPacket(ns, /*reliable*/true);
         delete ns;
     }
     Protocol *p = new StartGameProtocol(m_setup);
@@ -251,15 +251,15 @@ void ServerLobbyRoomProtocol::startSelection(const Event *event)
         return;
     }
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
+    NetworkString *ns = getNetworkString(6);
+    // start selection
+    ns->addUInt8(LE_START_SELECTION);
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        NetworkString *ns = getNetworkString(6);
-        ns->setToken(peers[i]->getClientServerToken());
-        // start selection
-        ns->addUInt8(LE_START_SELECTION).addUInt8(4);
-        sendMessage(peers[i], *ns, true); // reliably
-        delete ns;
+        peers[i]->sendPacket(ns, /*reliable*/true);
     }
+    delete ns;
+
     m_selection_enabled = true;
 
     m_state = SELECTING_KARTS;
@@ -356,7 +356,7 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
             total->setToken(peers[i]->getClientServerToken());
             total->addUInt8(LE_RACE_FINISHED).addUInt8(4);
             *total += *queue;
-            sendMessage(peers[i], *total, /*reliable*/true);
+            peers[i]->sendPacket(total, /*reliable*/true);
             delete total;
         }
         Log::info("ServerLobbyRoomProtocol", "End of game message sent");
@@ -405,7 +405,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
         NetworkString *msg = getNetworkString(3);
         msg->addUInt8(LE_PLAYER_DISCONNECTED).addUInt8(1)
            .addUInt8(peer->getPlayerProfile()->getGlobalPlayerId());
-        sendMessage(*msg);
+        sendMessage(msg);
         delete msg;
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
                   peer->getPlayerProfile()->getGlobalPlayerId());
@@ -445,7 +445,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
                 .addUInt8(m_state!=ACCEPTING_CLIENTS ? 2 : 0);
 
         // send only to the peer that made the request
-        sendMessage(peer, *message);
+        peer->sendPacket(message);
         delete message;
         Log::verbose("ServerLobbyRoomProtocol", "Player refused");
         return;
@@ -478,7 +478,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // size of id -- id -- size of local id -- local id;
     message->addUInt8(LE_NEW_PLAYER_CONNECTED).addUInt8(1).addUInt8(new_player_id)
            .encodeString(name_u8).addUInt8(new_host_id);
-    ProtocolManager::getInstance()->sendMessageExcept(peer, *message);
+    ProtocolManager::getInstance()->sendMessageExcept(peer, message);
     delete message;
 
     // Now answer to the peer that just connected
@@ -506,7 +506,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
                     .addUInt8(players[i]->getHostId())
                     .encodeString(players[i]->getName());
     }
-    sendMessage(peer, *message_ack);
+    peer->sendPacket(message_ack);
     delete message_ack;
 
     NetworkPlayerProfile* profile = new NetworkPlayerProfile(new_player_id, name);
@@ -555,7 +555,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
         NetworkString *answer = getNetworkString(3);
         // selection still not started
         answer->addUInt8(LE_KART_SELECTION_REFUSED).addUInt8(1).addUInt8(2);
-        sendMessage(peer, *answer);
+        peer->sendPacket(answer);
         delete answer;
         return;
     }
@@ -565,7 +565,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
         NetworkString *answer = getNetworkString(3);
         // kart is already taken
         answer->addUInt8(LE_KART_SELECTION_REFUSED).addUInt8(1).addUInt8(0);
-        sendMessage(peer, *answer);
+        peer->sendPacket(answer);
         delete answer;
         return;
     }
@@ -575,7 +575,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
         NetworkString *answer = getNetworkString(3);
         // kart is not authorized
         answer->addUInt8(LE_KART_SELECTION_REFUSED).addUInt8(1).addUInt8(1);
-        sendMessage(peer, *answer);
+        peer->sendPacket(answer);
         delete answer;
         return;
     }
@@ -587,7 +587,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     answer->addUInt8(LE_KART_SELECTION_UPDATE).addUInt8(1).addUInt8(player_id)
           .encodeString(kart_name);
-    sendMessage(*answer);
+    sendMessage(answer);
     delete answer;
     m_setup->setPlayerKart(player_id, kart_name);
 }   // kartSelectionRequested

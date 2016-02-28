@@ -162,13 +162,10 @@ private:
 public:
     virtual void      abort();
     virtual void      propagateEvent(Event* event);
-    virtual void      sendMessage(const NetworkString &message,
-                                  bool reliable = true);
-    virtual void      sendMessage(STKPeer* peer,
-                                  const NetworkString &message,
+    virtual void      sendMessage(NetworkString *message,
                                   bool reliable = true);
     virtual void      sendMessageExcept(STKPeer* peer,
-                                        const NetworkString &message,
+                                        NetworkString *message,
                                         bool reliable = true);
     virtual uint32_t  requestStart(Protocol* protocol);
     virtual void      requestPause(Protocol* protocol);

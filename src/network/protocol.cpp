@@ -134,21 +134,12 @@ void Protocol::sendMessageToPeersChangingToken(NetworkString *message)
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        message->setToken(peers[i]->getClientServerToken());
-        ProtocolManager::getInstance()->sendMessage(peers[i], *message);
+        peers[i]->sendPacket(message);
     }
 }   // sendMessageToPeersChangingToken
 
 // ----------------------------------------------------------------------------
-void Protocol::sendMessage(const NetworkString &message, bool reliable)
+void Protocol::sendMessage(NetworkString *message, bool reliable)
 {
     ProtocolManager::getInstance()->sendMessage(message, reliable);
 }   // sendMessage
-
-// ----------------------------------------------------------------------------
-void Protocol::sendMessage(STKPeer* peer, const NetworkString &message,
-                           bool reliable)
-{
-    ProtocolManager::getInstance()->sendMessage(peer, message, reliable);
-}   // sendMessage
-

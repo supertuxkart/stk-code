@@ -114,8 +114,7 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
             if(peer != event->getPeer())
             {
                 pure_message.setToken(peer->getClientServerToken());
-                ProtocolManager::getInstance()->sendMessage(peer, pure_message,
-                                                            false);
+                peer->sendPacket(&pure_message, false);
             }   // if peer != event->getPeer()
         }   // for i in peers
     }   // if server
@@ -165,5 +164,5 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     ns->addUInt8((uint8_t)(action)).addUInt32(value);
 
     Log::info("ControllerEventsProtocol", "Action %d value %d", action, value);
-    sendMessage(*ns, false); // send message to server
+    sendMessage(ns, false); // send message to server
 }   // controllerAction
