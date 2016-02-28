@@ -223,7 +223,7 @@ void StartGameProtocol::ready()
         ns->setToken(STKHost::get()->getPeers()[0]->getClientServerToken());
         ns->addUInt8(1);
         Log::info("StartGameProtocol", "Player ready, notifying server.");
-        sendMessage(ns, /*reliable*/true);
+        sendToServer(ns, /*reliable*/true);
         delete ns;
         m_state = READY;
         m_ready = true;

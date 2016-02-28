@@ -125,8 +125,9 @@ public:
     bool checkDataSizeAndToken(Event* event, unsigned int minimum_size);
     bool isByteCorrect(Event* event, int byte_nb, int value);
     void sendMessageToPeersChangingToken(NetworkString *message);
-    void sendMessage(NetworkString *message,
-                     bool reliable = true);
+    void broadcastToClients(NetworkString *message, bool reliable=true);
+    void sendToServer(NetworkString *message,
+                      bool reliable = true);
     void requestStart();
     void requestPause();
     void requestUnpause();

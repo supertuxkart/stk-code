@@ -68,7 +68,7 @@ void ClientLobbyRoomProtocol::requestKartSelection(const std::string &kart_name)
     NetworkString *r = getNetworkString(7+kart_name.size());
     r->setToken(m_server->getClientServerToken());
     r->addUInt8(LE_KART_SELECTION).addUInt8(4).encodeString(kart_name);
-    sendMessage(r, true);
+    sendToServer(r, true);
     delete r;
 }   // requestKartSelection
 
@@ -81,7 +81,7 @@ void ClientLobbyRoomProtocol::voteMajor(uint32_t major)
     // size_token (4), token, size major(1),major
     request->addUInt8(LE_VOTE_MAJOR).addUInt8(4)
            .addUInt8(4).addUInt32(major);
-    sendMessage(request, true);
+    sendToServer(request, true);
     delete request;
 }   // voteMajor
 
@@ -94,7 +94,7 @@ void ClientLobbyRoomProtocol::voteRaceCount(uint8_t count)
     // size_token (4), token, size race count(1), count
     request->addUInt8(LE_VOTE_RACE_COUNT).addUInt8(4)
            .addUInt8(1).addUInt8(count);
-    sendMessage(request, true);
+    sendToServer(request, true);
     delete request;
 }   // voteRaceCount
 
@@ -107,7 +107,7 @@ void ClientLobbyRoomProtocol::voteMinor(uint32_t minor)
     // size_token (4), token, size minor(1),minor
     request->addUInt8(LE_VOTE_MINOR).addUInt8(4)
            .addUInt8(4).addUInt32(minor);
-    sendMessage(request, true);
+    sendToServer(request, true);
     delete request;
 }   // voteMinor
 
@@ -121,7 +121,7 @@ void ClientLobbyRoomProtocol::voteTrack(const std::string &track,
     // size_token (4), token, size track, track, size #track, #track
     request->addUInt8(LE_VOTE_TRACK).addUInt8(4)
            .encodeString(track).addUInt8(1).addUInt8(track_nb);
-    sendMessage(request, true);
+    sendToServer(request, true);
     delete request;
 }   // voteTrack
 
@@ -134,7 +134,7 @@ void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
     // size_token (4), token, size reversed(1),reversed, size #track, #track
     request->addUInt8(LE_VOTE_REVERSE).addUInt8(4)
            .addUInt8(1).addUInt8(reversed).addUInt8(1).addUInt8(track_nb);
-    sendMessage(request, true);
+    sendToServer(request, true);
     delete request;
 }   // voteReversed
 
@@ -147,7 +147,7 @@ void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
     // size_token (4), token, size laps(1),laps, size #track, #track
     request->addUInt8(LE_VOTE_LAPS)
            .addUInt8(1).addUInt8(laps).addUInt8(1).addUInt8(track_nb);
-    sendMessage(request, true);
+    sendToServer(request, true);
 }   // voteLaps
 
 //-----------------------------------------------------------------------------
@@ -265,7 +265,7 @@ void ClientLobbyRoomProtocol::update()
         // 4 (size of id), global id
         ns->addUInt8(LE_CONNECTION_REQUESTED).encodeString(name)
           .encodeString(NetworkConfig::get()->getPassword());
-        sendMessage(ns);
+        sendToServer(ns);
         delete ns;
         m_state = REQUESTING_CONNECTION;
     }

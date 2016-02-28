@@ -405,7 +405,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
         NetworkString *msg = getNetworkString(3);
         msg->addUInt8(LE_PLAYER_DISCONNECTED).addUInt8(1)
            .addUInt8(peer->getPlayerProfile()->getGlobalPlayerId());
-        sendMessage(msg);
+        broadcastToClients(msg);
         delete msg;
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
                   peer->getPlayerProfile()->getGlobalPlayerId());
@@ -579,6 +579,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
         delete answer;
         return;
     }
+
     // send a kart update to everyone
     NetworkString *answer = getNetworkString(3+1+kart_name.size());
     // This message must be handled synchronously on the client.
@@ -587,7 +588,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     answer->addUInt8(LE_KART_SELECTION_UPDATE).addUInt8(1).addUInt8(player_id)
           .encodeString(kart_name);
-    sendMessage(answer);
+    broadcastToClients(answer);
     delete answer;
     m_setup->setPlayerKart(player_id, kart_name);
 }   // kartSelectionRequested

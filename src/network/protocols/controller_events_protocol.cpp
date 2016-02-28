@@ -164,5 +164,5 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     ns->addUInt8((uint8_t)(action)).addUInt32(value);
 
     Log::info("ControllerEventsProtocol", "Action %d value %d", action, value);
-    sendMessage(ns, false); // send message to server
+    sendToServer(ns, false); // send message to server
 }   // controllerAction

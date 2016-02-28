@@ -656,6 +656,15 @@ STKPeer* STKHost::getPeer(ENetPeer *enet_peer)
         if(m_peers[i]->isSamePeer(enet_peer))
             return m_peers[i];
     }
+
+    // Make sure that a client only adds one other peer (=the server).
+    if(NetworkConfig::get()->isClient() && m_peers.size()>0)
+    {
+        Log::error("STKHost",
+                   "Client is adding more than one server, ignored for now.");
+    }
+
+
     //FIXME Should we check #clients here? It might be easier to only
     // handle this at connect time, not in all getPeer calls.
     STKPeer *peer = new STKPeer(enet_peer);

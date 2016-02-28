@@ -23,8 +23,10 @@
 #define STK_HOST_HPP
 
 #include "network/network.hpp"
+#include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/servers_manager.hpp"
+#include "network/stk_peer.hpp"
 #include "network/transport_address.hpp"
 #include "utils/synchronised.hpp"
 
@@ -40,7 +42,6 @@
 
 class GameSetup;
 class NetworkConsole;
-class STKPeer;
 
 class STKHost
 {
@@ -234,6 +235,12 @@ public:
     /** Returns the host id of this host. */
     uint8_t getMyHostId() const { return m_host_id; }
     // --------------------------------------------------------------------
+    /** Sends a message from a client to the server. */
+    void sendToServer(NetworkString *data, bool reliable = true)
+    {
+        assert(NetworkConfig::get()->isClient());
+        m_peers[0]->sendPacket(data, reliable);
+    }   // sendToServer
 };   // class STKHost
 
 #endif // STK_HOST_HPP
