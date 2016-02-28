@@ -146,7 +146,6 @@ public:
     void requestShutdown();
     void shutdown();
 
-    void sendMessage(NetworkString *data, bool reliable = true);
     void sendPacketExcept(STKPeer* peer,
                           NetworkString *data,
                           bool reliable = true);

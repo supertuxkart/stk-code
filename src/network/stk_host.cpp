@@ -434,24 +434,6 @@ bool STKHost::connect(const TransportAddress& address)
     return true;
 }   // connect
 
-// --------------------------------------------------------------------
-/** Sends a message to the server if this is a client, or to all
- *  clients if this is the server.
- *  \param data Message to sent.
- *  \param reliable If the message is to be sent reliable.
- */
-void STKHost::sendMessage(NetworkString *data, bool reliable)
-{
-    if (NetworkConfig::get()->isServer())
-        broadcastPacket(data, reliable);
-    else
-    {
-        if (m_peers.size() > 1)
-            Log::warn("ClientNetworkManager", "Ambiguous send of data.");
-        m_peers[0]->sendPacket(data, reliable);
-    }
-}   // sendMessage
-
 // ----------------------------------------------------------------------------
 /** \brief Starts the listening of events from ENet.
  *  Starts a thread for receiveData that updates it as often as possible.

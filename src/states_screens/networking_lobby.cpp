@@ -143,7 +143,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         // Send a message to the server to start
         NetworkString start(PROTOCOL_LOBBY_ROOM);
         start.addUInt8(LobbyRoomProtocol::LE_REQUEST_BEGIN);
-        STKHost::get()->sendMessage(&start, true);
+        STKHost::get()->sendToServer(&start, true);
     }
 
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
