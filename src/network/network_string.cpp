@@ -46,7 +46,6 @@ void NewNetworkString::unitTesting()
     // Append some values from the message
     s.addUInt16(12345);
     s.addFloat(1.2345f);
-
     // Ignore message type and token
     s.removeFront(5);
 
@@ -60,6 +59,13 @@ void NewNetworkString::unitTesting()
     assert(s.getToken()!=token);
     assert(s.getToken()==new_token);
 
+    // Check log message format
+    BareNetworkString slog(28);
+    for(unsigned int i=0; i<28; i++)
+        slog.addUInt8(i);
+    std::string log = slog.getLogMessage();
+    assert(log=="0x000 | 00 01 02 03 04 05 06 07  08 09 0a 0b 0c 0d 0e 0f   | ................\n"
+                "0x010 | 10 11 12 13 14 15 16 17  18 19 1a 1b               | ............\n");
 }   // unitTesting
 
 // ============================================================================
@@ -125,20 +131,30 @@ int BareNetworkString::decodeStringW(int pos, irr::core::stringw *out) const
 std::string BareNetworkString::getLogMessage() const
 {
     std::ostringstream oss;
-    for(unsigned int line=0; line<16; line+=16)
+    for(unsigned int line=0; line<m_buffer.size(); line+=16)
     {
-        oss << std::hex << std::setw(3) << line << " : ";
-        unsigned int upper_limit = std::min(line+16, size());
+        oss << "0x" << std::hex << std::setw(3) << std::setfill('0') 
+            << line << " | ";
+        unsigned int upper_limit = std::min(line+16, m_buffer.size());
         for(unsigned int i=line; i<upper_limit; i++)
         {
-            oss << std::hex << std::setw(2) << int(m_buffer[i]);
-            if(i%2==1) oss << " ";
+            oss << std::hex << std::setfill('0') << std::setw(2) 
+                << int(m_buffer[i])<< ' ';
+            if(i%8==7) oss << " ";
         }   // for i
+        // fill with spaces if necessary to properly align ascii columns
+        for(unsigned int i=upper_limit; i<line+16; i++)
+        {
+            oss << "   ";
+            if (i%8==7) oss << " ";
+        }
+
         // Add ascii representation
+        oss << " | ";
         for(unsigned int i=line; i<upper_limit; i++)
         {
             uint8_t c = m_buffer[i];
-            if(isprint(c))
+            if(isprint(c) && c!=0x09)   // Don't print tabs
                 oss << char(c);
             else
                 oss << '.';
