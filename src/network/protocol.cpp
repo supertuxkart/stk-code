@@ -129,12 +129,13 @@ void Protocol::requestTerminate()
  *  followed by the token of this client and then actual message).
  *  \param message The actual message content.
 */
-void Protocol::sendMessageToPeersChangingToken(NetworkString *message)
+void Protocol::sendMessageToPeersChangingToken(NetworkString *message,
+                                               bool reliable)
 {
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        peers[i]->sendPacket(message);
+        peers[i]->sendPacket(message, reliable);
     }
 }   // sendMessageToPeersChangingToken
 

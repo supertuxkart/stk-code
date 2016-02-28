@@ -224,14 +224,10 @@ void ServerLobbyRoomProtocol::registerServer()
 void ServerLobbyRoomProtocol::startGame()
 {
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-    for (unsigned int i = 0; i < peers.size(); i++)
-    {
-        NetworkString *ns = getNetworkString(6);
-        ns->setToken(peers[i]->getClientServerToken());
-        ns->addUInt8(LE_START_RACE).addUInt8(4);
-        peers[i]->sendPacket(ns, /*reliable*/true);
-        delete ns;
-    }
+    NetworkString *ns = getNetworkString(6);
+    ns->addUInt8(LE_START_RACE);
+    sendMessageToPeersChangingToken(ns, /*reliable*/true);
+    delete ns;
     Protocol *p = new StartGameProtocol(m_setup);
     p->requestStart();
     m_in_race = true;
@@ -349,16 +345,12 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
             Log::info("ServerLobbyRoomProtocol", "Kart %d finished #%d",
                       karts_results[i], i + 1);
         }
-        for (unsigned int i = 0; i < peers.size(); i++)
-        {
-            NetworkString *total = getNetworkString();
-            total->setSynchronous(true);
-            total->setToken(peers[i]->getClientServerToken());
-            total->addUInt8(LE_RACE_FINISHED).addUInt8(4);
-            *total += *queue;
-            peers[i]->sendPacket(total, /*reliable*/true);
-            delete total;
-        }
+        NetworkString *total = getNetworkString();
+        total->setSynchronous(true);
+        total->addUInt8(LE_RACE_FINISHED).addUInt8(4);
+        *total += *queue;
+        sendMessageToPeersChangingToken(total, /*reliable*/ true);
+        delete total;
         Log::info("ServerLobbyRoomProtocol", "End of game message sent");
         m_in_race = false;
 
@@ -490,6 +482,8 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
                                 (token_generator.get(RAND_MAX) & 0xff) <<  8 |
                                 (token_generator.get(RAND_MAX) & 0xff));
 
+    peer->setClientServerToken(token);
+
     const std::vector<NetworkPlayerProfile*> &players = m_setup->getPlayers();
     // send a message to the one that asked to connect
     // Size is overestimated, probably one player's data will not be sent
@@ -513,7 +507,6 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     profile->setHostId(new_host_id);
     m_setup->addPlayer(profile);
     peer->setPlayerProfile(profile);
-    peer->setClientServerToken(token);
     peer->setAuthorised(is_authorised);
     peer->setHostId(new_host_id);
 
