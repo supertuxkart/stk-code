@@ -1670,7 +1670,7 @@ static void cleanUserConfig()
 void runUnitTests()
 {
     GraphicsRestrictions::unitTesting();
-    NewNetworkString::unitTesting();
+    NetworkString::unitTesting();
     // Test easter mode: in 2015 Easter is 5th of April - check with 0 days
     // before and after
     int saved_easter_mode = UserConfigParams::m_easter_ear_mode;

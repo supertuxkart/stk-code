@@ -28,7 +28,7 @@
 #include "utils/types.hpp"
 
 class Event;
-class NewNetworkString;
+class NetworkString;
 class STKPeer;
 
 
@@ -121,13 +121,13 @@ public:
     virtual void asynchronousUpdate() = 0;
 
     /// functions to check incoming data easily
-    NewNetworkString* getNetworkString(int capacity=16);
+    NetworkString* getNetworkString(int capacity=16);
     bool checkDataSizeAndToken(Event* event, unsigned int minimum_size);
     bool isByteCorrect(Event* event, int byte_nb, int value);
-    void sendMessageToPeersChangingToken(NewNetworkString *message);
-    void sendMessage(const NewNetworkString &message,
+    void sendMessageToPeersChangingToken(NetworkString *message);
+    void sendMessage(const NetworkString &message,
                      bool reliable = true);
-    void sendMessage(STKPeer* peer, const NewNetworkString &message,
+    void sendMessage(STKPeer* peer, const NetworkString &message,
                      bool reliable = true);
     void requestStart();
     void requestPause();

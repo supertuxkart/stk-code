@@ -62,7 +62,7 @@ void STKPeer::disconnect()
  *  \param data The data to send.
  *  \param reliable If the data is sent reliable or not.
  */
-void STKPeer::sendPacket(NewNetworkString const& data, bool reliable)
+void STKPeer::sendPacket(NetworkString const& data, bool reliable)
 {
     TransportAddress a(m_enet_peer->address);
     Log::verbose("STKPeer", "sending packet of size %d to %s",

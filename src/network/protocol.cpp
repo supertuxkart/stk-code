@@ -51,15 +51,15 @@ Protocol::~Protocol()
 /** Returns a network string with the given type.
  *  \capacity Default preallocated size for the message.
  */
-NewNetworkString* Protocol::getNetworkString(int capacity)
+NetworkString* Protocol::getNetworkString(int capacity)
 {
-    return new NewNetworkString(m_type, capacity);
+    return new NetworkString(m_type, capacity);
 }   // getNetworkString
 
 // ----------------------------------------------------------------------------
 bool Protocol::checkDataSizeAndToken(Event* event, unsigned int minimum_size)
 {
-    const NewNetworkString &data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < minimum_size || data[0] != 4)
     {
         Log::warn("Protocol", "Receiving a badly "
@@ -81,7 +81,7 @@ bool Protocol::checkDataSizeAndToken(Event* event, unsigned int minimum_size)
 // ----------------------------------------------------------------------------
 bool Protocol::isByteCorrect(Event* event, int byte_nb, int value)
 {
-    const NewNetworkString &data = event->data();
+    const NetworkString &data = event->data();
     if (data[byte_nb] != value)
     {
         Log::info("Protocol", "Bad byte at pos %d. %d "
@@ -129,7 +129,7 @@ void Protocol::requestTerminate()
  *  followed by the token of this client and then actual message).
  *  \param message The actual message content.
 */
-void Protocol::sendMessageToPeersChangingToken(NewNetworkString *message)
+void Protocol::sendMessageToPeersChangingToken(NetworkString *message)
 {
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
@@ -140,13 +140,13 @@ void Protocol::sendMessageToPeersChangingToken(NewNetworkString *message)
 }   // sendMessageToPeersChangingToken
 
 // ----------------------------------------------------------------------------
-void Protocol::sendMessage(const NewNetworkString &message, bool reliable)
+void Protocol::sendMessage(const NetworkString &message, bool reliable)
 {
     ProtocolManager::getInstance()->sendMessage(message, reliable);
 }   // sendMessage
 
 // ----------------------------------------------------------------------------
-void Protocol::sendMessage(STKPeer* peer, const NewNetworkString &message,
+void Protocol::sendMessage(STKPeer* peer, const NetworkString &message,
                            bool reliable)
 {
     ProtocolManager::getInstance()->sendMessage(peer, message, reliable);

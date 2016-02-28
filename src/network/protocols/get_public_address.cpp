@@ -140,7 +140,7 @@ std::string GetPublicAddress::parseStunResponse()
         return "STUN response contains no data at all";
 
     // Convert to network string.
-    NewNetworkString datas((uint8_t*)buffer, len);
+    NetworkString datas((uint8_t*)buffer, len);
 
     // check that the stun response is a response, contains the magic cookie
     // and the transaction ID

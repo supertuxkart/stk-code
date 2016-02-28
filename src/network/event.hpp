@@ -29,7 +29,7 @@
 
 #include "enet/enet.h"
 
-class NewNetworkString;
+class NetworkString;
 class STKPeer;
 
 /*!
@@ -59,7 +59,7 @@ private:
     LEAK_CHECK()
 
     /** Copy of the data passed by the event. */
-    NewNetworkString *m_data;
+    NetworkString *m_data;
 
     /**  Type of the event. */
     EVENT_TYPE m_type;
@@ -83,12 +83,12 @@ public:
     /** \brief Get a const reference to the received data.
      *  This is empty for events like connection or disconnections. 
      */
-    const NewNetworkString& data() const { return *m_data; }
+    const NetworkString& data() const { return *m_data; }
     // ------------------------------------------------------------------------
     /** \brief Get a non-const reference to the received data.
      *  A copy of the message data. This is empty for events like
      *  connection or disconnections. */
-    NewNetworkString& data() { return *m_data; }
+    NetworkString& data() { return *m_data; }
     // ------------------------------------------------------------------------
 
 };   // class Event

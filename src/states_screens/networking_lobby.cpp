@@ -141,7 +141,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     if(name==m_start_button->m_properties[PROP_ID])
     {
         // Send a message to the server to start
-        NewNetworkString start(PROTOCOL_LOBBY_ROOM);
+        NetworkString start(PROTOCOL_LOBBY_ROOM);
         start.addUInt8(LobbyRoomProtocol::LE_REQUEST_BEGIN);
         STKHost::get()->sendMessage(start, true);
     }

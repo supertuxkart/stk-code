@@ -38,7 +38,7 @@ bool KartUpdateProtocol::notifyEvent(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
-    NewNetworkString &ns = event->data();
+    NetworkString &ns = event->data();
     if (ns.size() < 33)
     {
         Log::info("KartUpdateProtocol", "Message too short.");
@@ -80,7 +80,7 @@ void KartUpdateProtocol::update()
         if (NetworkConfig::get()->isServer())
         {
             World *world = World::getWorld();
-            NewNetworkString *ns = getNetworkString(4+world->getNumKarts()*29);
+            NetworkString *ns = getNetworkString(4+world->getNumKarts()*29);
             ns->setSynchronous(true);
             ns->addFloat( world->getTime() );
             for (unsigned int i = 0; i < world->getNumKarts(); i++)
@@ -98,7 +98,7 @@ void KartUpdateProtocol::update()
         }
         else
         {
-            NewNetworkString *ns =
+            NetworkString *ns =
                      getNetworkString(4+29*race_manager->getNumLocalPlayers());
             ns->setSynchronous(true);
             ns->addFloat(World::getWorld()->getTime());

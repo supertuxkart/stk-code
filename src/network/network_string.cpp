@@ -26,9 +26,9 @@
 // ============================================================================
 /** Unit testing function.
  */
-void NewNetworkString::unitTesting()
+void NetworkString::unitTesting()
 {
-    NewNetworkString s(PROTOCOL_LOBBY_ROOM);
+    NetworkString s(PROTOCOL_LOBBY_ROOM);
     assert(s.getProtocolType() == PROTOCOL_LOBBY_ROOM);
     assert(s.getProtocolType() != PROTOCOL_KART_UPDATE);
     assert(!s.isSynchronous());

@@ -160,7 +160,7 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
 /** \brief Broadcasts a packet to all peers.
  *  \param data : Data to send.
  */
-void Network::broadcastPacket(const NewNetworkString& data, bool reliable)
+void Network::broadcastPacket(const NetworkString& data, bool reliable)
 {
     ENetPacket* packet = enet_packet_create(data.getData(), data.size() + 1,
                                       reliable ? ENET_PACKET_FLAG_RELIABLE

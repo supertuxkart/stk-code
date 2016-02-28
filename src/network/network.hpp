@@ -34,7 +34,7 @@
 #include <stdio.h>
 
 class BareNetworkString;
-class NewNetworkString;
+class NetworkString;
 class TransportAddress;
 
 /** \class EnetHost
@@ -65,7 +65,7 @@ public:
                            const TransportAddress& dst);
     int receiveRawPacket(char *buffer, int buf_len,
                          TransportAddress* sender, int max_tries = -1);
-    void     broadcastPacket(const NewNetworkString& data,
+    void     broadcastPacket(const NetworkString& data,
                              bool reliable = true);
     // ------------------------------------------------------------------------
     /** Returns a pointer to the ENet host object. */

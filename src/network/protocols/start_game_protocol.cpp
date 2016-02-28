@@ -123,7 +123,7 @@ void StartGameProtocol::setup()
 // ----------------------------------------------------------------------------
 bool StartGameProtocol::notifyEventAsynchronous(Event* event)
 {
-    const NewNetworkString &data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 5)
     {
         Log::error("StartGameProtocol", "Too short message.");
@@ -219,7 +219,7 @@ void StartGameProtocol::ready()
     if (NetworkConfig::get()->isClient())
     {
         assert(STKHost::get()->getPeerCount() == 1);
-        NewNetworkString *ns = getNetworkString(5);
+        NetworkString *ns = getNetworkString(5);
         ns->setToken(STKHost::get()->getPeers()[0]->getClientServerToken());
         ns->addUInt8(1);
         Log::info("StartGameProtocol", "Player ready, notifying server.");

@@ -22,9 +22,9 @@ public:
     virtual void setup();
     virtual void update();
     void collectedItem(Item* item, AbstractKart* kart);
-    void collectedItem(const NewNetworkString &ns);
+    void collectedItem(const NetworkString &ns);
     void kartFinishedRace(AbstractKart *kart, float time);
-    void kartFinishedRace(const NewNetworkString &ns);
+    void kartFinishedRace(const NetworkString &ns);
     // ------------------------------------------------------------------------
     virtual void asynchronousUpdate() {}
     // ------------------------------------------------------------------------

@@ -145,9 +145,9 @@ public:
     void requestShutdown();
     void shutdown();
 
-    void sendMessage(const NewNetworkString& data, bool reliable = true);
+    void sendMessage(const NetworkString& data, bool reliable = true);
     void sendPacketExcept(STKPeer* peer,
-                          const NewNetworkString& data,
+                          const NetworkString& data,
                           bool reliable = true);
     void        setupClient(int peer_count, int channel_limit,
                             uint32_t max_incoming_bandwidth,
@@ -181,7 +181,7 @@ public:
     }   // receiveRawPacket
 
     // --------------------------------------------------------------------
-    void broadcastPacket(const NewNetworkString& data,
+    void broadcastPacket(const NetworkString& data,
                          bool reliable = true)
     {
         m_network->broadcastPacket(data, reliable);

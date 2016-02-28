@@ -43,7 +43,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
 
-    const NewNetworkString &data = event->data();
+    const NetworkString &data = event->data();
     if (data.size() < 9)
     {
         Log::warn("SynchronizationProtocol", "Received a too short message.");
@@ -79,7 +79,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
     {
         // Only a client should receive a request for a ping response
         assert(NetworkConfig::get()->isClient());
-        NewNetworkString *response = getNetworkString(10);
+        NetworkString *response = getNetworkString(10);
         response->setToken(token);
         // The '0' indicates a response to a ping request
         response->addUInt8(0).addUInt32(sequence);
@@ -171,7 +171,7 @@ void SynchronizationProtocol::asynchronousUpdate()
         const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
-            NewNetworkString *ping_request = getNetworkString(13);
+            NetworkString *ping_request = getNetworkString(13);
             ping_request->setToken(peers[i]->getClientServerToken());
             ping_request->addUInt8(1).addUInt32(m_pings[i].size());
             // Server adds the countdown if it has started. This will indicate

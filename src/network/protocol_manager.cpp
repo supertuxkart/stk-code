@@ -176,14 +176,14 @@ void ProtocolManager::propagateEvent(Event* event)
 }   // propagateEvent
 
 // ----------------------------------------------------------------------------
-void ProtocolManager::sendMessage(const NewNetworkString &message, bool reliable)
+void ProtocolManager::sendMessage(const NetworkString &message, bool reliable)
 {
     STKHost::get()->sendMessage(message, reliable);
 }   // sendMessage
 
 // ----------------------------------------------------------------------------
 void ProtocolManager::sendMessage(STKPeer *peer,
-                                  const NewNetworkString &message,
+                                  const NetworkString &message,
                                   bool reliable)
 {
     peer->sendPacket(message, reliable);
@@ -191,7 +191,7 @@ void ProtocolManager::sendMessage(STKPeer *peer,
 
 // ----------------------------------------------------------------------------
 void ProtocolManager::sendMessageExcept(STKPeer *peer,
-                                        const NewNetworkString &message,
+                                        const NetworkString &message,
                                         bool reliable)
 {
     STKHost::get()->sendPacketExcept(peer, message, reliable);

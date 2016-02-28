@@ -290,29 +290,29 @@ public:
  *  so that the protocols would not see this byte). But this is implemented
  *  now by using a base pointer (and not by moving the buffer content).
  */
-class NewNetworkString : public BareNetworkString
+class NetworkString : public BareNetworkString
 {
 public:
     static void unitTesting();
         
     /** Constructor for a message to be sent. It sets the 
      *  protocol type of this message. */
-    NewNetworkString(ProtocolType type,  int capacity=16)
+    NetworkString(ProtocolType type,  int capacity=16)
         : BareNetworkString(capacity)
     {
         m_buffer.push_back(type);
         addUInt32(0);   // add dummy token for now
-    }   // NewNetworkString
+    }   // NetworkString
 
     // ------------------------------------------------------------------------
     /** Constructor for a received message. It automatically ignored the first
      *  5 bytes which contain the type and token. Those will be access using
      *  special functions. */
-    NewNetworkString(const uint8_t *data, int len) 
+    NetworkString(const uint8_t *data, int len) 
         : BareNetworkString((char*)data, len)
     {
         m_current_offset = 5;   // ignore type and token
-    }   // NewNetworkString
+    }   // NetworkString
 
     // ------------------------------------------------------------------------
     /** Returns the protocol type of this message. */

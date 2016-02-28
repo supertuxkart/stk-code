@@ -38,7 +38,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
-    NewNetworkString &data = event->data();
+    NetworkString &data = event->data();
     if (data.size() < 5) // for token and type
     {
         Log::warn("GameEventsProtocol", "Too short message.");
@@ -85,7 +85,7 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        NewNetworkString *ns = getNetworkString(11);
+        NetworkString *ns = getNetworkString(11);
         ns->setToken(peers[i]->getClientServerToken());
         ns->setSynchronous(true);
         // Item picked : send item id, powerup type and kart race id
@@ -110,7 +110,7 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
 // ----------------------------------------------------------------------------
 /** Called on the client when an itemCollected message is received.
  */
-void GameEventsProtocol::collectedItem(const NewNetworkString &data)
+void GameEventsProtocol::collectedItem(const NetworkString &data)
 {
     if (data.size() < 6)
     {
@@ -135,7 +135,7 @@ void GameEventsProtocol::collectedItem(const NewNetworkString &data)
  */
 void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
 {
-    NewNetworkString *ns = getNetworkString(20);
+    NetworkString *ns = getNetworkString(20);
     ns->setSynchronous(true);
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
 
@@ -157,7 +157,7 @@ void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
  *  event from the server. It updates the game with this information.
  *  \param ns The message from the server.
  */
-void GameEventsProtocol::kartFinishedRace(const NewNetworkString &ns)
+void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
 {
     uint8_t kart_id = ns.getUInt8(0);
     float time      = ns.getFloat(1);

@@ -440,7 +440,7 @@ bool STKHost::connect(const TransportAddress& address)
  *  \param data Message to sent.
  *  \param reliable If the message is to be sent reliable.
  */
-void STKHost::sendMessage(const NewNetworkString& data, bool reliable)
+void STKHost::sendMessage(const NetworkString& data, bool reliable)
 {
     if (NetworkConfig::get()->isServer())
         broadcastPacket(data, reliable);
@@ -743,7 +743,7 @@ uint16_t STKHost::getPort() const
  *  \param data Data to sent.
  *  \param reliable If the data should be sent reliable or now.
  */
-void STKHost::sendPacketExcept(STKPeer* peer, const NewNetworkString &data,
+void STKHost::sendPacketExcept(STKPeer* peer, const NetworkString &data,
                                bool reliable)
 {
     for (unsigned int i = 0; i < m_peers.size(); i++)

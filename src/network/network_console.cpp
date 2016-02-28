@@ -173,7 +173,7 @@ void NetworkConsole::kickAllPlayers()
 }   // kickAllPlayers
 
 // ----------------------------------------------------------------------------
-void NetworkConsole::sendPacket(const NewNetworkString& data, bool reliable)
+void NetworkConsole::sendPacket(const NetworkString& data, bool reliable)
 {
     m_localhost->broadcastPacket(data, reliable);
 }   // sendPacket
