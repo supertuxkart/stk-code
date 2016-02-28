@@ -60,16 +60,9 @@ void ClientLobbyRoomProtocol::setup()
 
 void ClientLobbyRoomProtocol::requestKartSelection(const std::string &kart_name)
 {
-    NetworkString *request = getNetworkString(6+1+kart_name.size());
-    // size_token (4), token, size kart name, kart name
-    request->setToken(m_server->getClientServerToken());
+    NetworkString *request = getNetworkString(2+kart_name.size());
     request->addUInt8(LE_KART_SELECTION).encodeString(kart_name);
-
-    NetworkString *r = getNetworkString(7+kart_name.size());
-    r->setToken(m_server->getClientServerToken());
-    r->addUInt8(LE_KART_SELECTION).addUInt8(4).encodeString(kart_name);
-    sendToServer(r, true);
-    delete r;
+    delete request;
 }   // requestKartSelection
 
 //-----------------------------------------------------------------------------
@@ -77,8 +70,6 @@ void ClientLobbyRoomProtocol::requestKartSelection(const std::string &kart_name)
 void ClientLobbyRoomProtocol::voteMajor(uint32_t major)
 {
     NetworkString *request = getNetworkString(8);
-    request->setToken(m_server->getClientServerToken());
-    // size_token (4), token, size major(1),major
     request->addUInt8(LE_VOTE_MAJOR).addUInt8(4)
            .addUInt8(4).addUInt32(major);
     sendToServer(request, true);
@@ -90,10 +81,7 @@ void ClientLobbyRoomProtocol::voteMajor(uint32_t major)
 void ClientLobbyRoomProtocol::voteRaceCount(uint8_t count)
 {
     NetworkString *request = getNetworkString(8);
-    request->setToken(m_server->getClientServerToken());
-    // size_token (4), token, size race count(1), count
-    request->addUInt8(LE_VOTE_RACE_COUNT).addUInt8(4)
-           .addUInt8(1).addUInt8(count);
+    request->addUInt8(LE_VOTE_RACE_COUNT).addUInt8(count);
     sendToServer(request, true);
     delete request;
 }   // voteRaceCount
@@ -103,10 +91,7 @@ void ClientLobbyRoomProtocol::voteRaceCount(uint8_t count)
 void ClientLobbyRoomProtocol::voteMinor(uint32_t minor)
 {
     NetworkString *request = getNetworkString(8);
-    request->setToken(m_server->getClientServerToken());
-    // size_token (4), token, size minor(1),minor
-    request->addUInt8(LE_VOTE_MINOR).addUInt8(4)
-           .addUInt8(4).addUInt32(minor);
+    request->addUInt8(LE_VOTE_MINOR).addUInt32(minor);
     sendToServer(request, true);
     delete request;
 }   // voteMinor
@@ -117,10 +102,7 @@ void ClientLobbyRoomProtocol::voteTrack(const std::string &track,
                                         uint8_t track_nb)
 {
     NetworkString *request = getNetworkString(8+1+track.size());
-    request->setToken(m_server->getClientServerToken());
-    // size_token (4), token, size track, track, size #track, #track
-    request->addUInt8(LE_VOTE_TRACK).addUInt8(4)
-           .encodeString(track).addUInt8(1).addUInt8(track_nb);
+    request->addUInt8(LE_VOTE_TRACK).encodeString(track).addUInt8(track_nb);
     sendToServer(request, true);
     delete request;
 }   // voteTrack
@@ -130,10 +112,7 @@ void ClientLobbyRoomProtocol::voteTrack(const std::string &track,
 void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
 {
     NetworkString *request = getNetworkString(9);
-    request->setToken(m_server->getClientServerToken());
-    // size_token (4), token, size reversed(1),reversed, size #track, #track
-    request->addUInt8(LE_VOTE_REVERSE).addUInt8(4)
-           .addUInt8(1).addUInt8(reversed).addUInt8(1).addUInt8(track_nb);
+    request->addUInt8(LE_VOTE_REVERSE).addUInt8(reversed).addUInt8(track_nb);
     sendToServer(request, true);
     delete request;
 }   // voteReversed
@@ -143,10 +122,7 @@ void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
 void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
 {
     NetworkString *request = getNetworkString(10);
-    request->setToken(m_server->getClientServerToken());
-    // size_token (4), token, size laps(1),laps, size #track, #track
-    request->addUInt8(LE_VOTE_LAPS)
-           .addUInt8(1).addUInt8(laps).addUInt8(1).addUInt8(track_nb);
+    request->addUInt8(LE_VOTE_LAPS).addUInt8(laps).addUInt8(track_nb);
     sendToServer(request, true);
 }   // voteLaps
 
@@ -603,17 +579,10 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
                    "selection update wasn't formated as expected.");
         return;
     }
-    uint32_t token = data.getUInt32(1);
-    if (token == STKHost::get()->getPeers()[0]->getClientServerToken())
-    {
-        m_state = PLAYING;
-        ProtocolManager::getInstance()
-                       ->requestStart(new StartGameProtocol(m_setup));
-        Log::error("ClientLobbyRoomProtocol", "Starting new game");
-    }
-    else
-        Log::error("ClientLobbyRoomProtocol", "Bad token when starting game");
-
+    m_state = PLAYING;
+    ProtocolManager::getInstance()
+        ->requestStart(new StartGameProtocol(m_setup));
+    Log::error("ClientLobbyRoomProtocol", "Starting new game");
 }   // startGame
 
 //-----------------------------------------------------------------------------
@@ -637,15 +606,8 @@ void ClientLobbyRoomProtocol::startSelection(Event* event)
                    "selection start wasn't formated as expected.");
         return;
     }
-    uint32_t token = data.getUInt32(1);
-    if (token == STKHost::get()->getPeers()[0]->getClientServerToken())
-    {
-        m_state = KART_SELECTION;
-        Log::info("ClientLobbyRoomProtocol", "Kart selection starts now");
-    }
-    else
-        Log::error("ClientLobbyRoomProtocol", "Bad token");
-
+    m_state = KART_SELECTION;
+    Log::info("ClientLobbyRoomProtocol", "Kart selection starts now");
 }   // startSelection
 
 //-----------------------------------------------------------------------------
@@ -666,11 +628,6 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
     if (data.size() < 5)
     {
         Log::error("ClientLobbyRoomProtocol", "Not enough data provided.");
-        return;
-    }
-    if (event->getPeer()->getClientServerToken() != data.getUInt32(1))
-    {
-        Log::error("ClientLobbyRoomProtocol", "Bad token");
         return;
     }
     data.removeFront(5);
