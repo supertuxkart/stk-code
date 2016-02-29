@@ -37,7 +37,7 @@ void RaceEventManager::update(float dt)
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
     if (protocol) // The existance of this protocol indicates that we play online
     {
-        Log::debug("RaceEventManager", "Coutdown value is %f",
+        Log::debug("RaceEventManager", "Countdown value is %f",
                    protocol->getCountdown());
         if (protocol->getCountdown() > 0.0)
         {
