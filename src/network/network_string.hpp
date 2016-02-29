@@ -24,6 +24,7 @@
 #define NETWORK_STRING_HPP
 
 #include "network/protocol.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/types.hpp"
 #include "utils/vec3.hpp"
 
@@ -50,6 +51,9 @@ typedef unsigned char uchar;
 
 class BareNetworkString
 {
+private:
+    LEAK_CHECK();
+
 protected:
     /** The actual buffer. */
     std::vector<uint8_t> m_buffer;
@@ -193,11 +197,13 @@ public:
     }   // addFloat
 
     // ------------------------------------------------------------------------
-    /** Adds the content of another network string. */
+    /** Adds the content of another network string. It only copies data which
+     *  has not been 'removed' (i.e. skipped). */
     BareNetworkString& operator+=(BareNetworkString const& value)
     {
-        m_buffer.insert(m_buffer.end(), value.m_buffer.begin(), 
-            value.m_buffer.end()   );
+        m_buffer.insert(m_buffer.end(),
+                       value.m_buffer.begin()+value.m_current_offset,
+                       value.m_buffer.end()   );
         return *this;
     }   // operator+=
 
@@ -251,7 +257,21 @@ public:
     float getFloat(int pos=0) const
     {
         uint32_t u = getUInt32(pos);
-        return *(float*)&u;
+        float f;
+        // Doig a "return *(float*)&u;" appears to be more efficient,
+        // but it can create incorrect code on higher optimisation: c++
+        // makes the assumption that pointer of different types never
+        // overlap. So the compiler can assume that the int pointer (&u)
+        // and float pointer do point to different aras, so there read
+        // (*(float*) can be done before the write to u (and then the
+        // write to u is basically a no-op and can be removed, too).
+        // Using a union of int and float is not valid either, there
+        // is no guarantee that writing to the int part of the union
+        // will affect the float part. So, an explicit memcpy is the
+        // more or less only portable guaranteed to be correct way of
+        // converting the int to a float.
+        memcpy(&f, &u, sizeof(float));
+        return f;
     }   // getFloat
 
     // ------------------------------------------------------------------------
@@ -296,9 +316,10 @@ public:
     static void unitTesting();
         
     /** Constructor for a message to be sent. It sets the 
-     *  protocol type of this message. */
+     *  protocol type of this message. It adds 5 bytes to the capacity: 
+     *  1 byte for the protocol type, and 4 bytes for the token. */
     NetworkString(ProtocolType type,  int capacity=16)
-        : BareNetworkString(capacity)
+        : BareNetworkString(capacity+5)
     {
         m_buffer.push_back(type);
         addUInt32(0);   // add dummy token for now
