@@ -135,7 +135,7 @@ std::string BareNetworkString::getLogMessage() const
     {
         oss << "0x" << std::hex << std::setw(3) << std::setfill('0') 
             << line << " | ";
-        unsigned int upper_limit = std::min(line+16, m_buffer.size());
+        unsigned int upper_limit = std::min(line+16, (unsigned int)m_buffer.size());
         for(unsigned int i=line; i<upper_limit; i++)
         {
             oss << std::hex << std::setfill('0') << std::setw(2) 
