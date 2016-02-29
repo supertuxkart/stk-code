@@ -111,12 +111,12 @@ void RaceSetupScreen::init()
     irr::core::stringw name4 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
-    name4 += _("Hit others with weapons until they lose all their lives (only in multiplayer games).");
+    name4 += _("Hit others with weapons until they lose all their lives.");
     w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
 
     irr::core::stringw name5 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
-    name5 += _("Push the ball to the opposite cage to score goals (only in multiplayer games).");
+    name5 += _("Push the ball to the opposite cage to score goals.");
     w2->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
 
 #define ENABLE_EASTER_EGG_MODE
