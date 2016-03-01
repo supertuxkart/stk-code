@@ -1676,7 +1676,7 @@ void runUnitTests()
     Log::info("UnitTest", " - NetworkString");
     NetworkString::unitTesting();
 
-    Log::warn("UnitTest", " - Easter detection");
+    Log::info("UnitTest", " - Easter detection");
     // Test easter mode: in 2015 Easter is 5th of April - check with 0 days
     // before and after
     int saved_easter_mode = UserConfigParams::m_easter_ear_mode;
