@@ -392,7 +392,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
         NetworkString *msg = getNetworkString(2);
         msg->addUInt8(LE_PLAYER_DISCONNECTED)
            .addUInt8(peer->getPlayerProfile()->getGlobalPlayerId());
-        broadcastToClients(msg);
+        sendMessageToPeersChangingToken(msg, /*reliable*/true);
         delete msg;
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
                   peer->getPlayerProfile()->getGlobalPlayerId());

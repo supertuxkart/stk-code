@@ -122,14 +122,6 @@ void Protocol::sendMessageToPeersChangingToken(NetworkString *message,
 }   // sendMessageToPeersChangingToken
 
 // ----------------------------------------------------------------------------
-/** Broadcasts a message from the server to all clients.
- */
-void Protocol::broadcastToClients(NetworkString *message, bool reliable)
-{
-    STKHost::get()->broadcastPacket(message, reliable);
-}   // broadcastToClients
-
-// ----------------------------------------------------------------------------
 /** Sends a message from a client to the server.
  */
 void Protocol::sendToServer(NetworkString *message, bool reliable)
