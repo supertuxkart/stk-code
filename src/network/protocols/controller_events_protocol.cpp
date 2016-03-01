@@ -106,8 +106,8 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
     if (NetworkConfig::get()->isServer())
     {
         // Send update to all clients except the original sender.
-        ProtocolManager::getInstance()->sendMessageExcept(event->getPeer(), 
-                                                         &pure_message, false);
+        STKHost::get()->sendPacketExcept(event->getPeer(), 
+                                         &pure_message, false);
     }   // if server
     return true;
 }   // notifyEventAsynchronous

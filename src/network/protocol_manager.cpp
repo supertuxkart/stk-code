@@ -176,14 +176,6 @@ void ProtocolManager::propagateEvent(Event* event)
 }   // propagateEvent
 
 // ----------------------------------------------------------------------------
-void ProtocolManager::sendMessageExcept(STKPeer *peer,
-                                        NetworkString *message,
-                                        bool reliable)
-{
-    STKHost::get()->sendPacketExcept(peer, message, reliable);
-}   // sendMessageExcept
-
-// ----------------------------------------------------------------------------
 /** \brief Asks the manager to start a protocol.
  * This function will store the request, and process it at a time it is
  * thread-safe.

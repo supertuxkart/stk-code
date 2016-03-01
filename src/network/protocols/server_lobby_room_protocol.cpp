@@ -465,7 +465,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // size of id -- id -- size of local id -- local id;
     message->addUInt8(LE_NEW_PLAYER_CONNECTED).addUInt8(new_player_id)
             .addUInt8(new_host_id).encodeString(name_u8);
-    ProtocolManager::getInstance()->sendMessageExcept(peer, message);
+    STKHost::get()->sendPacketExcept(peer, message);
     delete message;
 
     // Now answer to the peer that just connected
