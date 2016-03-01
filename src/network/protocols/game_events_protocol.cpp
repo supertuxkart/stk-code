@@ -85,8 +85,7 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        NetworkString *ns = getNetworkString(11);
-        ns->setToken(peers[i]->getClientServerToken());
+        NetworkString *ns = getNetworkString(7);
         ns->setSynchronous(true);
         // Item picked : send item id, powerup type and kart race id
         uint8_t powerup = 0;
