@@ -57,39 +57,21 @@ NetworkString* Protocol::getNetworkString(int capacity)
 }   // getNetworkString
 
 // ----------------------------------------------------------------------------
-bool Protocol::checkDataSizeAndToken(Event* event, unsigned int minimum_size)
+/** Checks if the message has at least the specified size, and if not prints
+ *  a warning message including the message content.
+ *  \return True if the message is long enough, false otherwise.
+ */
+bool Protocol::checkDataSize(Event* event, unsigned int minimum_size)
 {
     const NetworkString &data = event->data();
-    if (data.size() < minimum_size || data[0] != 4)
+    if (data.size() < minimum_size)
     {
-        Log::warn("Protocol", "Receiving a badly "
-                  "formated message. Size is %d and first byte %d",
-                  data.size(), data[0]);
-        return false;
-    }
-    STKPeer* peer = event->getPeer();
-    uint32_t token = data.getUInt32(1);
-    if (token != peer->getClientServerToken())
-    {
-        Log::warn("Protocol", "Peer sending bad token. Request "
-                  "aborted.");
+        Log::warn("Protocol", "Receiving a badly formated message:");
+        Log::warn("Protocol", data.getLogMessage().c_str());
         return false;
     }
     return true;
-}   // checkDataSizeAndToken
-
-// ----------------------------------------------------------------------------
-bool Protocol::isByteCorrect(Event* event, int byte_nb, int value)
-{
-    const NetworkString &data = event->data();
-    if (data[byte_nb] != value)
-    {
-        Log::info("Protocol", "Bad byte at pos %d. %d "
-                "should be %d", byte_nb, data[byte_nb], value);
-        return false;
-    }
-    return true;
-}   // isByteCorrect
+}   // checkDataSize
 
 // ----------------------------------------------------------------------------
 /** Starts a request in the protocol manager to start this protocol. 

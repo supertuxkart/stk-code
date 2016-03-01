@@ -66,6 +66,7 @@ Event::Event(ENetEvent* event)
         Log::error("Event", "HostID %d Token %d message token %d",
             m_peer->getHostId(), m_peer->getClientServerToken(),
             m_data->getToken());
+        Log::error("Event", m_data->getLogMessage().c_str());
     }
 }   // Event(ENetEvent)
 
@@ -79,13 +80,4 @@ Event::~Event()
     m_peer = NULL;
     delete m_data;
 }   // ~Event
-
-// ----------------------------------------------------------------------------
-/** \brief Remove bytes at the beginning of data.
- *  \param size : The number of bytes to remove.
- */
-void Event::removeFront(int size)
-{
-    m_data->removeFront(size);
-}   // removeFront
 

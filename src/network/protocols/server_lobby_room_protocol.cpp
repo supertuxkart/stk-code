@@ -78,11 +78,11 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
     assert(m_setup); // assert that the setup exists
     if (event->getType() == EVENT_TYPE_MESSAGE)
     {
-        const NetworkString &data = event->data();
+        NetworkString &data = event->data();
         assert(data.size()); // message not empty
         uint8_t message_type;
         message_type = data[0];
-        event->removeFront(1);
+        data.removeFront(1);
         Log::info("ServerLobbyRoomProtocol", "Message received with type %d.",
                   message_type);
         switch(message_type)
@@ -224,7 +224,7 @@ void ServerLobbyRoomProtocol::registerServer()
 void ServerLobbyRoomProtocol::startGame()
 {
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-    NetworkString *ns = getNetworkString(6);
+    NetworkString *ns = getNetworkString(1);
     ns->addUInt8(LE_START_RACE);
     sendMessageToPeersChangingToken(ns, /*reliable*/true);
     delete ns;
@@ -247,13 +247,10 @@ void ServerLobbyRoomProtocol::startSelection(const Event *event)
         return;
     }
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-    NetworkString *ns = getNetworkString(6);
+    NetworkString *ns = getNetworkString(1);
     // start selection
     ns->addUInt8(LE_START_SELECTION);
-    for (unsigned int i = 0; i < peers.size(); i++)
-    {
-        peers[i]->sendPacket(ns, /*reliable*/true);
-    }
+    sendMessageToPeersChangingToken(ns, /*reliable*/true);
     delete ns;
 
     m_selection_enabled = true;
@@ -338,17 +335,15 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
 
         const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
 
-        NetworkString *queue = getNetworkString(karts_results.size()*2);
+        NetworkString *total = getNetworkString(1+karts_results.size());
+        total->setSynchronous(true);
+        total->addUInt8(LE_RACE_FINISHED);
         for (unsigned int i = 0; i < karts_results.size(); i++)
         {
-            queue->addUInt8(1).addUInt8(karts_results[i]); // kart pos = i+1
+            total->addUInt8(karts_results[i]); // kart pos = i+1
             Log::info("ServerLobbyRoomProtocol", "Kart %d finished #%d",
                       karts_results[i], i + 1);
         }
-        NetworkString *total = getNetworkString();
-        total->setSynchronous(true);
-        total->addUInt8(LE_RACE_FINISHED).addUInt8(4);
-        *total += *queue;
         sendMessageToPeersChangingToken(total, /*reliable*/ true);
         delete total;
         Log::info("ServerLobbyRoomProtocol", "End of game message sent");
@@ -394,8 +389,8 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
     STKPeer* peer = event->getPeer();
     if (peer->getPlayerProfile() != NULL) // others knew him
     {
-        NetworkString *msg = getNetworkString(3);
-        msg->addUInt8(LE_PLAYER_DISCONNECTED).addUInt8(1)
+        NetworkString *msg = getNetworkString(2);
+        msg->addUInt8(LE_PLAYER_DISCONNECTED)
            .addUInt8(peer->getPlayerProfile()->getGlobalPlayerId());
         broadcastToClients(msg);
         delete msg;
@@ -431,9 +426,9 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     if (m_setup->getPlayerCount() >= NetworkConfig::get()->getMaxPlayers() ||
         m_state!=ACCEPTING_CLIENTS                                           )
     {
-        NetworkString *message = getNetworkString(3);
+        NetworkString *message = getNetworkString(2);
         // Len, error code: 2 = busy, 0 = too many players
-        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(1)
+        message->addUInt8(LE_CONNECTION_REFUSED)
                 .addUInt8(m_state!=ACCEPTING_CLIENTS ? 2 : 0);
 
         // send only to the peer that made the request
@@ -466,10 +461,10 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 
     // Notify everybody that there is a new player
     // -------------------------------------------
-    NetworkString *message = getNetworkString(8);
+    NetworkString *message = getNetworkString(3+1+name_u8.size());
     // size of id -- id -- size of local id -- local id;
-    message->addUInt8(LE_NEW_PLAYER_CONNECTED).addUInt8(1).addUInt8(new_player_id)
-           .encodeString(name_u8).addUInt8(new_host_id);
+    message->addUInt8(LE_NEW_PLAYER_CONNECTED).addUInt8(new_player_id)
+            .addUInt8(new_host_id).encodeString(name_u8);
     ProtocolManager::getInstance()->sendMessageExcept(peer, message);
     delete message;
 
@@ -486,9 +481,8 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 
     const std::vector<NetworkPlayerProfile*> &players = m_setup->getPlayers();
     // send a message to the one that asked to connect
-    // Size is overestimated, probably one player's data will not be sent
-    NetworkString *message_ack = getNetworkString(14 + players.size() * 7);
-    message_ack->setToken(token);
+    // Estimate 10 as average name length
+    NetworkString *message_ack = getNetworkString(4 + players.size() * (2+10));
     // connection success -- size of token -- token
     message_ack->addUInt8(LE_CONNECTION_ACCEPTED).addUInt8(new_player_id)
                 .addUInt8(new_host_id).addUInt8(is_authorised);
@@ -520,11 +514,11 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5                    6           N+6
- *       -----------------------------------------------
- *  Size |      4     |          1         |     N     |
- *  Data | priv token | N (kart name size) | kart name |
- *       -----------------------------------------------
+ *  Byte 0                    1
+ *       ----------------------------------
+ *  Size |          1         |     N     |
+ *  Data | N (kart name size) | kart name |
+ *       ----------------------------------
  */
 void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
 {
@@ -535,19 +529,19 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
         return;
     }
 
+    if (!checkDataSize(event, 1)) return;
+
     const NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
-    if (!checkDataSizeAndToken(event, 6))
-        return;
 
     std::string kart_name;
-    data.decodeString(5, &kart_name);
+    data.decodeString(0, &kart_name);
     // check if selection is possible
     if (!m_selection_enabled)
     {
-        NetworkString *answer = getNetworkString(3);
+        NetworkString *answer = getNetworkString(2);
         // selection still not started
-        answer->addUInt8(LE_KART_SELECTION_REFUSED).addUInt8(1).addUInt8(2);
+        answer->addUInt8(LE_KART_SELECTION_REFUSED).addUInt8(2);
         peer->sendPacket(answer);
         delete answer;
         return;
@@ -555,9 +549,9 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     // check if somebody picked that kart
     if (!m_setup->isKartAvailable(kart_name))
     {
-        NetworkString *answer = getNetworkString(3);
+        NetworkString *answer = getNetworkString(2);
         // kart is already taken
-        answer->addUInt8(LE_KART_SELECTION_REFUSED).addUInt8(1).addUInt8(0);
+        answer->addUInt8(LE_KART_SELECTION_REFUSED).addUInt8(0);
         peer->sendPacket(answer);
         delete answer;
         return;
@@ -565,23 +559,23 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     // check if this kart is authorized
     if (!m_setup->isKartAllowed(kart_name))
     {
-        NetworkString *answer = getNetworkString(3);
+        NetworkString *answer = getNetworkString(2);
         // kart is not authorized
-        answer->addUInt8(LE_KART_SELECTION_REFUSED).addUInt8(1).addUInt8(1);
+        answer->addUInt8(LE_KART_SELECTION_REFUSED).addUInt8(1);
         peer->sendPacket(answer);
         delete answer;
         return;
     }
 
     // send a kart update to everyone
-    NetworkString *answer = getNetworkString(3+1+kart_name.size());
+    NetworkString *answer = getNetworkString(3+kart_name.size());
     // This message must be handled synchronously on the client.
     answer->setSynchronous(true);
     // kart update (3), 1, race id
     uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
-    answer->addUInt8(LE_KART_SELECTION_UPDATE).addUInt8(1).addUInt8(player_id)
+    answer->addUInt8(LE_KART_SELECTION_UPDATE).addUInt8(player_id)
           .encodeString(kart_name);
-    broadcastToClients(answer);
+    sendMessageToPeersChangingToken(answer);
     delete answer;
     m_setup->setPlayerKart(player_id, kart_name);
 }   // kartSelectionRequested
@@ -592,28 +586,24 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6                 10
- *       ----------------------------------------
- *  Size | 1 |      4     | 1 |        4        |
- *  Data | 4 | priv token | 4 | major mode vote |
- *       ----------------------------------------
+ *  Byte 0                 1
+ *       -------------------
+ *  Size |        4        |
+ *  Data | major mode vote |
+ *       -------------------
  */
 void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
 {
+    if (!checkDataSize(event, 1)) return;
+
     NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
-    if (!checkDataSizeAndToken(event, 7))
-        return;
-    if (!isByteCorrect(event, 5, 4))
-        return;
     uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
-    uint32_t major = data.getUInt32(6);
+    uint32_t major = data.getUInt32(0);
     m_setup->getRaceConfig()->setPlayerMajorVote(player_id, major);
     // Send the vote to everybody (including the sender)
-    data.removeFront(5); // remove the token
-    NetworkString *other = getNetworkString(6+data.size());
-    other->addUInt8(LE_VOTE_MAJOR).addUInt8(1).addUInt8(player_id); // add the player id
-    *other += data; // add the data
+    NetworkString *other = getNetworkString(6);
+    other->addUInt8(LE_VOTE_MAJOR).addUInt8(player_id).addUInt32(major);
     sendMessageToPeersChangingToken(other);
     delete other;
 }   // playerMajorVote
@@ -624,28 +614,24 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6             7
- *       ------------------------------------
- *  Size | 1 |      4     | 1 |      1      |
- *  Data | 4 | priv token | 1 | races count |
- *       ------------------------------------
+ *  Byte 0             1
+ *       ---------------
+ *  Size |      1      |
+ *  Data | races count |
+ *       ---------------
  */
 void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
 {
+    if (!checkDataSize(event, 1)) return;
     NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
-    if (!checkDataSizeAndToken(event, 7))
-        return;
-    if (!isByteCorrect(event, 5, 1))
-        return;
     uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
-    m_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, data[6]);
+    uint8_t race_count = data[0];
+    m_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, race_count);
     // Send the vote to everybody (including the sender)
-    data.removeFront(5); // remove the token
-    NetworkString *other = getNetworkString(3+data.size());
-    other->addUInt8(LE_VOTE_RACE_COUNT).addUInt8(1)
-          .addUInt8(player_id); // add the player id
-    *other += data; // add the data
+    NetworkString *other = getNetworkString(3);
+    other->addUInt8(LE_VOTE_RACE_COUNT).addUInt8(player_id)
+          .addUInt8(race_count);
     sendMessageToPeersChangingToken(other);
     delete other;
 }   // playerRaceCountVote
@@ -656,28 +642,24 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6                 10
- *       ----------------------------------------
- *  Size | 1 |      4     | 1 |        4        |
- *  Data | 4 | priv token | 4 | minor mode vote |
- *       ----------------------------------------
+ *  Byte 0                 1
+ *       -------------------
+ *  Size |        4        |
+ *  Data | minor mode vote |
+ *       -------------------
  */
 void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
 {
+    if (!checkDataSize(event, 1)) return;
     NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
-    if (!checkDataSizeAndToken(event, 7))
-        return;
-    if (!isByteCorrect(event, 5, 4))
-        return;
     uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
-    uint32_t minor = data.getUInt32(6);
+    uint32_t minor = data.getUInt32(0);
     m_setup->getRaceConfig()->setPlayerMinorVote(player_id, minor);
+
     // Send the vote to everybody (including the sender)
-    data.removeFront(5); // remove the token
-    NetworkString *other = getNetworkString(3+data.size());
-    other->addUInt8(LE_VOTE_MINOR).addUInt8(1).addUInt8(player_id); 
-    *other += data; // add the data
+    NetworkString *other = getNetworkString(3);
+    other->addUInt8(LE_VOTE_MINOR).addUInt8(player_id).addUInt8(minor); 
     sendMessageToPeersChangingToken(other);
     delete other;
 }   // playerMinorVote
@@ -688,29 +670,29 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6            N+6 N+7                 N+8
- *       -----------------------------------------------------------
- *  Size | 1 |      4     | 1 |      N     | 1 |       1           |
- *  Data | 4 | priv token | N | track name | 1 | track number (gp) |
- *       -----------------------------------------------------------
+ *  Byte 0                   1   2
+ *       --------------------------------------
+ *  Size |        1          | 1 |      N     |
+ *  Data | track number (gp) | N | track name |
+ *       --------------------------------------
  */
 void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
 {
+    if (!checkDataSize(event, 2)) return;
     NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
-    if (!checkDataSizeAndToken(event, 8))
-        return;
+    // As which track this track should be used, e.g. 1st track: Santrack
+    // 2nd track Mathclass, ...
+    uint8_t track_number = data[0];
     std::string track_name;
-    int N = data.decodeString(5, &track_name);
-    if (!isByteCorrect(event, N+5, 1))
-        return;
+    int N = data.decodeString(1, &track_name);
     uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
-    m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name, data[N+6]);
+    m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
+                                                 track_number);
     // Send the vote to everybody (including the sender)
-    data.removeFront(5); // remove the token
-    NetworkString *other = getNetworkString(3+data.size());
-    other->addUInt8(LE_VOTE_TRACK).addUInt8(1).addUInt8(player_id);
-    *other += data; // add the data
+    NetworkString *other = getNetworkString(3+1+data.size());
+    other->addUInt8(LE_VOTE_TRACK).addUInt8(player_id).addUInt8(track_number)
+          .encodeString(track_name);
     sendMessageToPeersChangingToken(other);
     delete other;
     if(m_setup->getRaceConfig()->getNumTrackVotes()==m_setup->getPlayerCount())
@@ -723,30 +705,27 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6          7   8                   9
- *       ---------------------------------------------------------
- *  Size | 1 |      4     | 1 |     1    | 1 |       1           |
- *  Data | 4 | priv token | 1 | reversed | 1 | track number (gp) |
- *       ---------------------------------------------------------
+ *  Byte 0          1
+ *       --------------------------------
+ *  Size |     1    |       1           |
+ *  Data | reversed | track number (gp) |
+ *       --------------------------------
  */
 void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
 {
+    if (!checkDataSize(event, 2)) return;
+
     NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
-    if (!checkDataSizeAndToken(event, 9))
-        return;
-    if (!isByteCorrect(event, 5, 1))
-        return;
-    if (!isByteCorrect(event, 7, 1))
-        return;
     uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
+    uint8_t reverse  = data[0];
+    uint8_t nb_track = data[1];
     m_setup->getRaceConfig()->setPlayerReversedVote(player_id,
-                                                    data[6]!=0, data[8]);
+                                                    reverse!=0, nb_track);
     // Send the vote to everybody (including the sender)
-    data.removeFront(5); // remove the token
-    NetworkString *other = getNetworkString(3+data.size());
-    other->addUInt8(LE_VOTE_REVERSE).addUInt8(1).addUInt8(player_id);
-    *other += data; // add the data
+    NetworkString *other = getNetworkString(4);
+    other->addUInt8(LE_VOTE_REVERSE).addUInt8(player_id).addUInt8(reverse)
+          .addUInt8(nb_track);
     sendMessageToPeersChangingToken(other);
     delete other;
 }   // playerReversedVote
@@ -757,29 +736,25 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6      7   8                   9
- *       -----------------------------------------------------
- *  Size | 1 |      4     | 1 |   1  | 1 |       1           |
- *  Data | 4 | priv token | 1 | laps | 1 | track number (gp) |
- *       -----------------------------------------------------
+ *  Byte 0      1 
+ *       ----------------------------
+ *  Size |   1  |       1           |
+ *  Data | laps | track number (gp) |
+ *       ----------------------------
  */
 void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
 {
+    if (!checkDataSize(event, 2)) return;
     NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
-    if (!checkDataSizeAndToken(event, 9))
-        return;
-    if (!isByteCorrect(event, 5, 1))
-        return;
-    if (!isByteCorrect(event, 7, 1))
-        return;
     uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
-    m_setup->getRaceConfig()->setPlayerLapsVote(player_id, data[6], data[8]);
-    // Send the vote to everybody (including the sender)
-    data.removeFront(5); // remove the token
-    NetworkString *other = getNetworkString(3+data.size());
-    other->addUInt8(LE_VOTE_LAPS).addUInt8(1).addUInt8(player_id);
-    *other += data; // add the data
+    uint8_t lap_count = data[0];
+    uint8_t track_nb  = data[1];
+    m_setup->getRaceConfig()->setPlayerLapsVote(player_id, lap_count,
+                                                track_nb);
+    NetworkString *other = getNetworkString(4);
+    other->addUInt8(LE_VOTE_LAPS).addUInt8(player_id).addUInt8(lap_count)
+          .addUInt8(track_nb);
     sendMessageToPeersChangingToken(other);
     delete other;
 }   // playerLapsVote

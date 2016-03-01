@@ -124,8 +124,7 @@ public:
 
     /// functions to check incoming data easily
     NetworkString* getNetworkString(int capacity=16);
-    bool checkDataSizeAndToken(Event* event, unsigned int minimum_size);
-    bool isByteCorrect(Event* event, int byte_nb, int value);
+    bool checkDataSize(Event* event, unsigned int minimum_size);
     void sendMessageToPeersChangingToken(NetworkString *message,
                                          bool reliable = true);
     void broadcastToClients(NetworkString *message, bool reliable=true);

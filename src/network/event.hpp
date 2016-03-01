@@ -70,7 +70,6 @@ private:
 public:
          Event(ENetEvent* event);
         ~Event();
-    void removeFront(int size);
 
     // ------------------------------------------------------------------------
     /** Returns the type of this event. */
