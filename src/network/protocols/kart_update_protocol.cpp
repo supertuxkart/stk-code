@@ -93,7 +93,7 @@ void KartUpdateProtocol::update()
                              "Sending %d's positions %f %f %f",
                              kart->getWorldKartId(), xyz[0], xyz[1], xyz[2]);
             }
-            broadcastToClients(ns, /*reliable*/false);
+            sendMessageToPeersChangingToken(ns, /*reliable*/false);
             delete ns;
         }
         else
