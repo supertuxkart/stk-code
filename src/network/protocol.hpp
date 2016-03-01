@@ -27,6 +27,8 @@
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
+#include <stddef.h>
+
 class Event;
 class NetworkString;
 class STKPeer;
