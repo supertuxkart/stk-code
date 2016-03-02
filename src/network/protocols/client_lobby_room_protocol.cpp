@@ -125,6 +125,7 @@ void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
     NetworkString *request = getNetworkString(10);
     request->addUInt8(LE_VOTE_LAPS).addUInt8(laps).addUInt8(track_nb);
     sendToServer(request, true);
+    delete request;
 }   // voteLaps
 
 //-----------------------------------------------------------------------------
