@@ -140,7 +140,8 @@ void ProtocolManager::propagateEvent(Event* event)
     m_protocols.unlock();
 
     // no protocol was aimed, show the msg to debug
-    if (searched_protocol == PROTOCOL_NONE)
+    if (searched_protocol == PROTOCOL_NONE && 
+        event->getType() != EVENT_TYPE_DISCONNECTED)
     {
         if(event->getType()==EVENT_TYPE_MESSAGE)
         {
