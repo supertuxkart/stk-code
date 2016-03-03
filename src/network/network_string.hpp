@@ -139,7 +139,7 @@ public:
     BareNetworkString& encodeString(const irr::core::stringw &value);
     int decodeString(int n, std::string *out) const;
     int decodeStringW(int n, irr::core::stringw *out) const;
-    std::string getLogMessage() const;
+    std::string getLogMessage(const std::string &indent="") const;
     // ------------------------------------------------------------------------
     /** Returns a byte pointer to the content of the network string. */
     char* getData() { return (char*)(m_buffer.data()); };

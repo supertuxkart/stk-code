@@ -593,9 +593,9 @@ namespace UserConfigParams
                             "stun.voxgratia.org",
                             "stun.xten.com") );
 
-    PARAM_PREFIX StringUserConfigParam m_packets_log_filename
-            PARAM_DEFAULT( StringUserConfigParam("packets_log.txt", "packets_log_filename",
-                                                 "Where to log received and sent packets.") );
+    PARAM_PREFIX BoolUserConfigParam m_log_packets
+            PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",
+                                                 "If all network packets should be logged") );
 
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality

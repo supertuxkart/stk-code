@@ -146,6 +146,9 @@ public:
         return fileExists(std::string(prefix) + path);
     }
     // ------------------------------------------------------------------------
+    /** Returns the name of the stdout file for log messages. */
+    static const std::string& getStdoutName() { return m_stdout_filename; }
+    // ------------------------------------------------------------------------
     void        listFiles        (std::set<std::string>& result,
                                   const std::string& dir,
                                   bool make_full_path=false) const;
