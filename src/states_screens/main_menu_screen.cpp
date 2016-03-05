@@ -245,7 +245,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts( 0 );
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("endcutscene", 999, false);
 
         std::vector<std::string> parts;
@@ -268,7 +268,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("gpwin", 999, false);
         GrandPrixWin* scene = GrandPrixWin::getInstance();
         scene->push();
@@ -281,7 +281,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("gplose", 999, false);
         GrandPrixLose* scene = GrandPrixLose::getInstance();
         scene->push();
@@ -302,7 +302,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("featunlocked", 999, false);
 
         FeatureUnlockedCutScene* scene =
@@ -355,7 +355,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("introcutscene", 999, false);
 
         std::vector<std::string> parts;
@@ -372,7 +372,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
         race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
+        race_manager->setNumPlayers(0);
         race_manager->startSingleRace("endcutscene", 999, false);
 
         std::vector<std::string> parts;
