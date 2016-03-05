@@ -416,7 +416,8 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 bool Translations::isRTLText(const wchar_t *in_ptr)
 {
 #if ENABLE_BIDI
-    if (this->isRTLLanguage())
+    //if (this->isRTLLanguage())
+    if (true) // For language screen to display properly
     {
         std::size_t length = wcslen(in_ptr);
         FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
