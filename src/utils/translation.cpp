@@ -416,27 +416,23 @@ const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
 bool Translations::isRTLText(const wchar_t *in_ptr)
 {
 #if ENABLE_BIDI
-    //if (this->isRTLLanguage())
-    if (true) // For language screen to display properly
+    std::size_t length = wcslen(in_ptr);
+    FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
+
+    FriBidiCharType *types = new FriBidiCharType[length];
+    fribidi_get_bidi_types(fribidiInput, length, types);
+    freeFribidiChar(fribidiInput);
+
+    // Declare as RTL if one character is RTL
+    for (std::size_t i = 0; i < length; i++)
     {
-        std::size_t length = wcslen(in_ptr);
-        FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
-
-        FriBidiCharType *types = new FriBidiCharType[length];
-        fribidi_get_bidi_types(fribidiInput, length, types);
-        freeFribidiChar(fribidiInput);
-
-        // Declare as RTL if one character is RTL
-        for (std::size_t i = 0; i < length; i++)
+        if (types[i] & FRIBIDI_MASK_RTL)
         {
-            if (types[i] & FRIBIDI_MASK_RTL)
-            {
-                delete[] types;
-                return true;
-            }
+            delete[] types;
+            return true;
         }
-        delete[] types;
     }
+    delete[] types;
     return false;
 #else
     return false;
