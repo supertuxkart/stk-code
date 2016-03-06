@@ -53,6 +53,7 @@ asCObjectType::asCObjectType()
 	module      = 0;
 	derivedFrom = 0;
 	size        = 0;
+	typeId      = -1; // start as -1 to signal that it hasn't been defined
 
 	acceptValueSubType = true;
 	acceptRefSubType   = true;
@@ -74,6 +75,7 @@ asCObjectType::asCObjectType(asCScriptEngine *engine)
 	this->engine = engine; 
 	module       = 0;
 	derivedFrom  = 0;
+	typeId      = -1; // start as -1 to signal that it hasn't been defined
 
 	acceptValueSubType = true;
 	acceptRefSubType   = true;
@@ -241,7 +243,8 @@ void asCObjectType::DestroyInternal()
 	userData.SetLength(0);
 
 	// Remove the type from the engine
-	engine->RemoveFromTypeIdMap(this);
+	if( typeId != -1 )
+		engine->RemoveFromTypeIdMap(this);
 
 	// Clear the engine pointer to mark the object type as invalid
 	engine = 0;
@@ -252,7 +255,6 @@ asCObjectType::~asCObjectType()
 	if( engine == 0 )
 		return;
 
-	// TODO: 2.30.0: redesign: Shouldn't this have been done already?
 	DestroyInternal();
 }
 
@@ -322,12 +324,18 @@ asUINT asCObjectType::GetSize() const
 // interface
 int asCObjectType::GetTypeId() const
 {
-	// We need a non const pointer to create the asCDataType object.
-	// We're not breaking anything here because this function is not
-	// modifying the object, so this const cast is safe.
-	asCObjectType *ot = const_cast<asCObjectType*>(this);
+	if( typeId == -1 )
+	{
+		// We need a non const pointer to create the asCDataType object.
+		// We're not breaking anything here because this function is not
+		// modifying the object, so this const cast is safe.
+		asCObjectType *ot = const_cast<asCObjectType*>(this);
 
-	return engine->GetTypeIdFromDataType(asCDataType::CreateObject(ot, false));
+		// The engine will define the typeId for this object type
+		engine->GetTypeIdFromDataType(asCDataType::CreateObject(ot, false));
+	}
+
+	return typeId;
 }
 
 // interface

@@ -120,7 +120,7 @@ public:
     /** Returns the next polygon on the shortest path from i to j.
      *    Note: m_parent_poly[j][i] contains the parent of i on path from j to i,
      *    which is the next node on the path from i to j (undirected graph) */
-    const int &       getNextShortestPathPoly(int i, int j) const;
+    const int         getNextShortestPathPoly(int i, int j) const;
 
     const std::vector < std::pair<const Item*, int> >& getItemList()
                                                  { return m_items_on_graph; }

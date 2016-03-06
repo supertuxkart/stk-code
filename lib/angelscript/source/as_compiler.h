@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -73,14 +73,9 @@ struct asSExprContext
 {
 	asSExprContext(asCScriptEngine *engine) : bc(engine) 
 	{
-		exprNode        = 0; 
-		origExpr        = 0; 
-		property_get    = 0; 
-		property_set    = 0; 
-		property_const  = false;
-		property_handle = false;
-		property_ref    = false;
-		property_arg    = 0;
+		property_arg     = 0;
+
+		Clear();
 	}
 	~asSExprContext() 
 	{
@@ -90,43 +85,95 @@ struct asSExprContext
 	void Clear()
 	{
 		bc.ClearAll();
-		type.SetDummy();
+		type.Set(asCDataType());
+		deferredParams.SetLength(0);
 		if( property_arg )
 			asDELETE(property_arg, asSExprContext);
-		property_arg = 0;
-		deferredParams.SetLength(0);
-		exprNode        = 0; 
-		origExpr        = 0; 
-		property_get    = 0; 
-		property_set    = 0; 
-		property_const  = false;
-		property_handle = false;
-		property_ref    = false;
-		methodName      = "";
-		enumValue       = "";
+		property_arg     = 0;
+		exprNode         = 0; 
+		origExpr         = 0; 
+		property_get     = 0; 
+		property_set     = 0; 
+		property_const   = false;
+		property_handle  = false;
+		property_ref     = false;
+		methodName       = "";
+		enumValue        = "";
+		isVoidExpression = false;
+		isCleanArg       = false;
 	}
-	bool IsClassMethod()
+	bool IsClassMethod() const
 	{
 		if( type.dataType.GetObjectType() == 0 ) return false;
 		if( methodName == "" ) return false;
 		if( type.dataType.GetObjectType() == &type.dataType.GetObjectType()->engine->functionBehaviours ) return false;
 		return true;
 	}
-	bool IsGlobalFunc()
+	bool IsGlobalFunc() const
 	{
 		if( type.dataType.GetObjectType() == 0 ) return false;
 		if( methodName == "" ) return false;
 		if( type.dataType.GetObjectType() != &type.dataType.GetObjectType()->engine->functionBehaviours ) return false;
 		return true;
 	}
+	void SetLambda(asCScriptNode *funcDecl)
+	{
+		asASSERT( funcDecl && funcDecl->nodeType == snFunction );
+		asASSERT( bc.GetLastInstr() == -1 );
+
+		Clear();
+		type.SetUndefinedFuncHandle(bc.GetEngine());
+		exprNode = funcDecl;
+	}
+	bool IsLambda() const
+	{
+		if( type.IsUndefinedFuncHandle() && exprNode && exprNode->nodeType == snFunction )
+			return true;
+
+		return false;
+	}
+	void SetVoidExpression()
+	{
+		Clear();
+		type.SetVoid();
+		isVoidExpression = true;
+	}
+	bool IsVoidExpression() const
+	{
+		if( isVoidExpression && type.IsVoid() && exprNode == 0 )
+			return true;
+
+		return false;
+	}
+	void Merge(asSExprContext *after)
+	{
+		type             = after->type;
+		property_get     = after->property_get;
+		property_set     = after->property_set;
+		property_const   = after->property_const;
+		property_handle  = after->property_handle;
+		property_ref     = after->property_ref;
+		property_arg     = after->property_arg;
+		exprNode         = after->exprNode;
+		methodName       = after->methodName;
+		enumValue        = after->enumValue;
+		isVoidExpression = after->isVoidExpression;
+		isCleanArg       = after->isCleanArg;
+
+		after->property_arg = 0;
+
+		// Do not copy the origExpr member
+	}
 
 	asCByteCode bc;
 	asCTypeInfo type;
 	int  property_get;
 	int  property_set;
-	bool property_const;  // If the object that is being accessed through property accessor is read-only
-	bool property_handle; // If the property accessor is called on an object stored in a handle
-	bool property_ref;    // If the property accessor is called on a reference
+	bool property_const;   // If the object that is being accessed through property accessor is read-only
+	bool property_handle;  // If the property accessor is called on an object stored in a handle
+	bool property_ref;     // If the property accessor is called on a reference
+	bool isVoidExpression; // Set to true if the expression is an explicit 'void', e.g. used to ignore out parameters in func calls
+	bool isCleanArg;       // Set to true if the expression has only been initialized with default constructor
 	asSExprContext *property_arg;
 	asCArray<asSDeferredParam> deferredParams;
 	asCScriptNode  *exprNode;
@@ -212,8 +259,8 @@ protected:
 	int  CompileExpressionPostOp(asCScriptNode *node, asSExprContext *out);
 	int  CompileExpressionValue(asCScriptNode *node, asSExprContext *out);
 	int  CompileFunctionCall(asCScriptNode *node, asSExprContext *out, asCObjectType *objectType, bool objIsConst, const asCString &scope = "");
-	void CompileConstructCall(asCScriptNode *node, asSExprContext *out);
-	void CompileConversion(asCScriptNode *node, asSExprContext *out);
+	int  CompileConstructCall(asCScriptNode *node, asSExprContext *out);
+	int  CompileConversion(asCScriptNode *node, asSExprContext *out);
 	int  CompileOperator(asCScriptNode *node, asSExprContext *l, asSExprContext *r, asSExprContext *out, eTokenType opToken = ttUnrecognizedToken);
 	void CompileOperatorOnHandles(asCScriptNode *node, asSExprContext *l, asSExprContext *r, asSExprContext *out, eTokenType opToken = ttUnrecognizedToken);
 	void CompileMathOperator(asCScriptNode *node, asSExprContext *l, asSExprContext *r, asSExprContext *out, eTokenType opToken = ttUnrecognizedToken);
@@ -239,6 +286,7 @@ protected:
 	void CompileInitAsCopy(asCDataType &type, int offset, asCByteCode *bc, asSExprContext *arg, asCScriptNode *node, bool derefDestination);
 
 	// Helper functions
+	void ConvertToPostFix(asCScriptNode *expr, asCArray<asCScriptNode *> &postfix);
 	void ProcessPropertyGetAccessor(asSExprContext *ctx, asCScriptNode *node);
 	int  ProcessPropertySetAccessor(asSExprContext *ctx, asSExprContext *arg, asCScriptNode *node);
 	int  ProcessPropertyGetSetAccessor(asSExprContext *ctx, asSExprContext *lctx, asSExprContext *rctx, eTokenType op, asCScriptNode *errNode);
@@ -288,6 +336,7 @@ protected:
 	asUINT ImplicitConvObjectValue(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode);
 	void   ImplicitConversionConstant(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType);
 	void   ImplicitConvObjectToBestMathType(asSExprContext *ctx, asCScriptNode *node);
+	asUINT ImplicitConvLambdaToFunc(asSExprContext *ctx, const asCDataType &to, asCScriptNode *node, EImplicitConv convType, bool generateCode = true);
 
 	void LineInstr(asCByteCode *bc, size_t pos);
 
@@ -307,16 +356,18 @@ protected:
 	bool hasCompileErrors;
 
 	int nextLabel;
+	int numLambdas;
 
-	asCVariableScope *variables;
-	asCBuilder *builder;
-	asCScriptEngine *engine;
-	asCScriptCode *script;
+	asCVariableScope  *variables;
+	asCBuilder        *builder;
+	asCScriptEngine   *engine;
+	asCScriptCode     *script;
 	asCScriptFunction *outFunc;
 
-	bool               m_isConstructor;
-	bool               m_isConstructorCalled;
-	sClassDeclaration *m_classDecl;
+	bool                        m_isConstructor;
+	bool                        m_isConstructorCalled;
+	sClassDeclaration          *m_classDecl;
+	sGlobalVariableDescription *m_globalVar;
 
 	asCArray<int> breakLabels;
 	asCArray<int> continueLabels;
@@ -353,7 +404,7 @@ protected:
 
 	bool isCompilingDefaultArg;
 	bool isProcessingDeferredParams;
-	int noCodeOutput;
+	int  noCodeOutput;
 };
 
 END_AS_NAMESPACE

@@ -87,8 +87,11 @@ void BaseOnlineProfileAchievements::init()
 {
     OnlineProfileBase::init();
     if (m_profile_tabs)
+    {
         m_profile_tabs->select(m_achievements_tab->m_properties[PROP_ID],
-                               PLAYER_ID_GAME_MASTER);
+            PLAYER_ID_GAME_MASTER);
+        m_profile_tabs->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    }
 
     // For current user add the progrss information.
     // m_visiting_profile is NULL if the user is not logged in.

@@ -213,6 +213,7 @@ FileManager::FileManager()
     checkAndCreateConfigDir();
     checkAndCreateAddonsDir();
     checkAndCreateScreenshotDir();
+    checkAndCreateReplayDir();
     checkAndCreateCachedTexturesDir();
     checkAndCreateGPDir();
 
@@ -642,6 +643,14 @@ std::string FileManager::getScreenshotDir() const
 }   // getScreenshotDir
 
 //-----------------------------------------------------------------------------
+/** Returns the directory in which replay file should be stored.
+ */
+std::string FileManager::getReplayDir() const
+{
+    return m_replay_dir;
+}   // getReplayDir
+
+//-----------------------------------------------------------------------------
 /** Returns the directory in which resized textures should be cached.
 */
 std::string FileManager::getCachedTexturesDir() const
@@ -909,6 +918,32 @@ void FileManager::checkAndCreateScreenshotDir()
     }
 
 }   // checkAndCreateScreenshotDir
+
+// ----------------------------------------------------------------------------
+/** Creates the directories for replay recorded. This will set m_replay_dir
+ *  with the appropriate path.
+ */
+void FileManager::checkAndCreateReplayDir()
+{
+#if defined(WIN32) || defined(__CYGWIN__)
+    m_replay_dir = m_user_config_dir + "replay/";
+#elif defined(__APPLE__)
+    m_replay_dir  = getenv("HOME");
+    m_replay_dir += "/Library/Application Support/SuperTuxKart/replay/";
+#else
+    m_replay_dir = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart",
+                                          ".local/share", ".supertuxkart");
+    m_replay_dir += "replay/";
+#endif
+
+    if(!checkAndCreateDirectory(m_replay_dir))
+    {
+        Log::error("FileManager", "Can not create replay directory '%s', "
+                   "falling back to '.'.", m_replay_dir.c_str());
+        m_replay_dir = ".";
+    }
+
+}   // checkAndCreateReplayDir
 
 // ----------------------------------------------------------------------------
 /** Creates the directories for cached textures. This will set

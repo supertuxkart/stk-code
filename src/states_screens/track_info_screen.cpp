@@ -68,7 +68,9 @@ void TrackInfoScreen::loadedFromFile()
     m_lap_spinner     = getWidget<SpinnerWidget>("lap-spinner");
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
     m_reverse         = getWidget<CheckBoxWidget>("reverse");
+    m_record_race     = getWidget<CheckBoxWidget>("record");
     m_reverse->setState(false);
+    m_record_race->setState(false);
 
     m_highscore_label = getWidget<LabelWidget>("highscores");
 
@@ -208,6 +210,14 @@ void TrackInfoScreen::init()
     }
     else
         m_reverse->setState(false);
+
+    // Record race or not
+    // -------------
+    const bool record_available = race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL;
+    m_record_race->setVisible(record_available);
+    getWidget<LabelWidget>("record-race-text")->setVisible(record_available);
+    if (record_available)
+        m_record_race->setState(false);
 
     // ---- High Scores
     m_highscore_label->setVisible(has_highscores);
@@ -357,6 +367,23 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         // Makes sure the highscores get swapped when clicking the 'reverse'
         // checkbox.
         updateHighScores();
+    }
+    else if (name == "record")
+    {
+        const bool record = m_record_race->getState();
+        race_manager->setRecordRace(record);
+        m_ai_kart_spinner->setValue(0);
+        // Disable AI when recording ghost race
+        if (record)
+        {
+            m_ai_kart_spinner->setActive(false);
+            race_manager->setNumKarts(race_manager->getNumLocalPlayers());
+            UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers();
+        }
+        else
+        {
+            m_ai_kart_spinner->setActive(true);
+        }
     }
     else if (name == "lap-spinner")
     {

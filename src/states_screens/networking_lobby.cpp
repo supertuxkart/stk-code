@@ -23,6 +23,7 @@
 #include <iostream>
 
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -37,7 +38,6 @@
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/translation.hpp"

@@ -40,7 +40,7 @@ private:
     void makeEntryFieldsVisible();
     void handleLocalName(const irr::core::stringw &local_name);
     void doRegister();
-    void init();
+    void init() OVERRIDE;
     RegisterScreen();
 
     /** Save the pointer to the info widget, it is widely used. */
@@ -81,7 +81,7 @@ public:
     virtual void onDialogClose() OVERRIDE;
     virtual void onFocusChanged(GUIEngine::Widget *previous, 
                                 GUIEngine::Widget *focus,
-                                int playerID);
+                                int playerID) OVERRIDE;
     void setRename(PlayerProfile *player);
 
     void acceptTerms();

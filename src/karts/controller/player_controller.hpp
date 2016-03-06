@@ -64,22 +64,22 @@ public:
     {
     }   // setPosition
     // ------------------------------------------------------------------------
-    virtual void crashed(const AbstractKart *k) 
+    virtual void crashed(const AbstractKart *k) OVERRIDE
     {
     }   // crashed(AbstractKart)
     // ------------------------------------------------------------------------
-    virtual void crashed(const Material *m)
+    virtual void crashed(const Material *m) OVERRIDE
     {
     }   // crashed(Material)
     // ------------------------------------------------------------------------
     /** Callback whenever a new lap is triggered. Used by the AI
      *  to trigger a recomputation of the way to use, not used for players. */
-    virtual void  newLap(int lap)
+    virtual void  newLap(int lap) OVERRIDE
     {
     }
     // ------------------------------------------------------------------------
     /** Player will always be able to get a slipstream bonus. */
-    virtual bool  disableSlipstreamBonus() const
+    virtual bool  disableSlipstreamBonus() const OVERRIDE
     {
         return false; 
     }

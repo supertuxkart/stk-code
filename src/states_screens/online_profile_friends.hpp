@@ -72,7 +72,7 @@ public:
 
     virtual void onUpdate(float delta) OVERRIDE;
     virtual void beforeAddingWidget() OVERRIDE;
-    virtual void onColumnClicked(int columnId);
+    virtual void onColumnClicked(int columnId) OVERRIDE;
 
     // ------------------------------------------------------------------------
     /** Triggers a reload of the friend list next time this menu is shown. */

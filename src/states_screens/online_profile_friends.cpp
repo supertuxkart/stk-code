@@ -87,6 +87,7 @@ void OnlineProfileFriends::init()
     m_sort_increasing = true;
     m_profile_tabs->select( m_friends_tab->m_properties[PROP_ID],
                             PLAYER_ID_GAME_MASTER );
+    m_profile_tabs->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     assert(m_visiting_profile != NULL);
     m_visiting_profile->fetchFriends();
     m_waiting_for_friends = true;

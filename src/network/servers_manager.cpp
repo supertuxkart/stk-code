@@ -148,7 +148,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
         {
         }   // prepareOperation
         // --------------------------------------------------------------------
-        virtual void operation()
+        virtual void operation() OVERRIDE
         {
             Network *broadcast = new Network(1, 1, 0, 0);
 

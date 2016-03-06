@@ -46,6 +46,7 @@ class Material;
 class Powerup;
 class Skidding;
 class SlipStream;
+class TerrainInfo;
 
 /** An abstract interface for the actual karts. Some functions are actually
  *  implemented here in order to allow inlining.
@@ -421,6 +422,9 @@ public:
     /** Shows the star effect for a certain time. */
     virtual void showStarEffect(float t) = 0;
     // ------------------------------------------------------------------------
+    /** Returns the terrain info oject. */
+    virtual const TerrainInfo *getTerrainInfo() const = 0;
+    // ------------------------------------------------------------------------
     /** Called when the kart crashes against another kart.
      *  \param k The kart that was hit.
      *  \param update_attachments If true the attachment of this kart and the
@@ -450,6 +454,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is a ghost (replay) kart. */
+    virtual bool isGhostKart() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is jumping. */
+    virtual bool isJumping() const = 0;
 
 };   // AbstractKart
 

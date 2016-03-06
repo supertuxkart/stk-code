@@ -33,6 +33,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
 #include "states_screens/gp_info_screen.hpp"
+#include "states_screens/waiting_for_others.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -96,7 +97,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                 ClientLobbyRoomProtocol* clrp =
                               static_cast<ClientLobbyRoomProtocol*>(protocol);
                 clrp->voteTrack(selection);
-
+                WaitingForOthersScreen::getInstance()->push();
             }
             else
             {
