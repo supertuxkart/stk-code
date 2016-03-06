@@ -120,7 +120,7 @@ void ReplayPlay::loadAllReplayFile()
             fclose(fd);
             continue;
         }
-        rd.m_reverse = (bool)reverse;
+        rd.m_reverse = reverse!=0;
 
         fgets(s, 1023, fd);
         if (sscanf(s, "difficulty: %u", &rd.m_difficulty) != 1)
@@ -247,9 +247,9 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
             pi.m_suspension_length[1] = w2;
             pi.m_suspension_length[2] = w3;
             pi.m_suspension_length[3] = w4;
-            kre.m_on_nitro = (bool)nitro;
-            kre.m_on_zipper = (bool)zipper;
-            kre.m_jumping = (bool)jumping;
+            kre.m_on_nitro = nitro!=0;
+            kre.m_on_zipper = zipper!=0;
+            kre.m_jumping = jumping!=0;
             m_ghost_karts[kart_num].addReplayEvent(time,
                 btTransform(q, xyz), pi, kre);
         }
