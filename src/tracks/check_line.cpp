@@ -164,13 +164,14 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     unsigned int kart_index)
 {
     World* w = World::getWorld();
-    core::vector2df p=new_pos.toIrrVector2d();
-    bool sign = m_line.getPointOrientation(p)>=0;
+    core::vector2df p = new_pos.toIrrVector2d();
+    bool sign = m_line.getPointOrientation(p) >= 0;
     bool result;
+    const unsigned int max_kart_index = -1;
 
     bool previous_sign;
 
-    if (kart_index == -1)
+    if (kart_index == max_kart_index)
     {
         core::vector2df p = old_pos.toIrrVector2d();
         previous_sign = (m_line.getPointOrientation(p) >= 0);
@@ -211,10 +212,10 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     else
         result = false;
 
-    if (kart_index != -1)
+    if (kart_index != max_kart_index)
         m_previous_sign[kart_index] = sign;
 
-    if (result && kart_index != -1)
+    if (result && kart_index != max_kart_index)
     {
         LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
         if (lw != NULL)

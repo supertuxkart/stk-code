@@ -235,7 +235,7 @@ btScalar btKart::rayCast(unsigned int index)
     btScalar max_susp_len = wheel.getSuspensionRestLength()
                           + wheel.m_maxSuspensionTravel;
 
-    // Do a slightly longer raycast to see if the kart might soon hit the 
+    // Do a slightly longer raycast to see if the kart might soon hit the
     // ground and some 'cushioning' is needed to avoid that the chassis
     // hits the ground.
     btScalar raylen = max_susp_len + 0.5f;
@@ -394,7 +394,7 @@ void btKart::updateVehicle( btScalar step )
             m_num_wheels_on_ground++;
     }
 
-    // Test if the kart is falling so fast 
+    // Test if the kart is falling so fast
     // that the chassis might hit the track
     // ------------------------------------
     bool needs_cushioning_test = false;
@@ -418,14 +418,14 @@ void btKart::updateVehicle( btScalar step )
         // speed that can be caught by the suspension without the chassis
         // hitting the ground can be based on that. Note that there are
         // 4 suspensions, all adding together.
-        btScalar max_compensate_speed = m_wheelInfo[0].m_maxSuspensionForce 
-                                      * m_chassisBody->getInvMass() 
+        btScalar max_compensate_speed = m_wheelInfo[0].m_maxSuspensionForce
+                                      * m_chassisBody->getInvMass()
                                       * step * 4;
         // If the downward speed is too fast to be caught by the suspension,
         // slow down the falling speed by applying an appropriately impulse:
         if(-v_down.getY() > max_compensate_speed)
         {
-            btVector3 impulse = down * (-v_down.getY() - max_compensate_speed) 
+            btVector3 impulse = down * (-v_down.getY() - max_compensate_speed)
                               / m_chassisBody->getInvMass()*0.5f;
             //float v_old = m_chassisBody->getLinearVelocity().getY();
             //float x = m_wheelInfo[0].m_raycastInfo.m_isInContact ?    m_wheelInfo[0].m_raycastInfo.m_contactPointWS.getY() : -100;
@@ -463,7 +463,7 @@ void btKart::updateVehicle( btScalar step )
         // Give a nicely balanced feeling for rebalancing the kart
         m_chassisBody->applyTorqueImpulse(axis * m_kart->getKartProperties()->getStabilitySmoothFlyingImpulse());
     }
-    
+
     // Work around: make sure that either both wheels on one axis
     // are on ground, or none of them. This avoids the problem of
     // the kart suddenly getting additional angular velocity because
@@ -522,9 +522,8 @@ void btKart::updateVehicle( btScalar step )
     for (int i=0;i<m_wheelInfo.size();i++)
     {
         btWheelInfo& wheel = m_wheelInfo[i];
-        btVector3 relpos   = wheel.m_raycastInfo.m_hardPointWS
-                           - getRigidBody()->getCenterOfMassPosition();
-        btVector3 vel      = getRigidBody()->getVelocityInLocalPoint(relpos);
+//        btVector3 relpos   = wheel.m_raycastInfo.m_hardPointWS
+//                           - getRigidBody()->getCenterOfMassPosition();
 
         if (wheel.m_raycastInfo.m_isInContact)
         {
@@ -538,7 +537,7 @@ void btKart::updateVehicle( btScalar step )
 
             btScalar proj = fwd.dot(wheel.m_raycastInfo.m_contactNormalWS);
             fwd -= wheel.m_raycastInfo.m_contactNormalWS * proj;
-        } 
+        }
     }
 
     // If configured, add a force to keep karts on the track

@@ -69,7 +69,7 @@ namespace Scripting
         // The script compiler will write any compiler messages to the callback.
         m_engine->SetMessageCallback(asFUNCTION(AngelScript_ErrorCallback), 0, asCALL_CDECL);
 
-        // Configure the script engine with all the functions, 
+        // Configure the script engine with all the functions,
         // and variables that the script should be able to use.
         configureEngine(m_engine);
     }
@@ -97,7 +97,7 @@ namespace Scripting
             return "";
         }
 
-        // Determine the size of the file   
+        // Determine the size of the file
         fseek(f, 0, SEEK_END);
         int len = ftell(f);
         fseek(f, 0, SEEK_SET);
@@ -202,7 +202,7 @@ namespace Scripting
             else if (r == asEXECUTION_EXCEPTION)
             {
                 Log::error("Scripting", "The script ended with an exception : (line %i) %s",
-                    ctx->GetExceptionLineNumber(), 
+                    ctx->GetExceptionLineNumber(),
                     ctx->GetExceptionString());
             }
             else
@@ -215,7 +215,7 @@ namespace Scripting
     }
 
     //-----------------------------------------------------------------------------
-    
+
     /*
     void ScriptEngine::runMethod(asIScriptObject* obj, std::string methodName)
     {
@@ -307,7 +307,7 @@ namespace Scripting
             //      asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void func(arg1Type, arg2Type)");
             func = m_engine->GetModule(MODULE_ID_MAIN_SCRIPT_FILE)
                         ->GetFunctionByDecl(function_name.c_str());
-        
+
             if (func == NULL)
             {
                 if (warn_if_not_found)
@@ -345,8 +345,8 @@ namespace Scripting
 
         // Prepare the script context with the function we wish to execute. Prepare()
         // must be called on the context before each new script function that will be
-        // executed. Note, that if because we intend to execute the same function 
-        // several times, we will store the function returned by 
+        // executed. Note, that if because we intend to execute the same function
+        // several times, we will store the function returned by
         // GetFunctionByDecl(), so that this relatively slow call can be skipped.
         r = ctx->Prepare(func);
         if (r < 0)
@@ -357,7 +357,7 @@ namespace Scripting
             return;
         }
 
-        // Here, we can pass parameters to the script functions. 
+        // Here, we can pass parameters to the script functions.
         //ctx->setArgType(index, value);
         //for example : ctx->SetArgFloat(0, 3.14159265359f);
 
@@ -378,7 +378,7 @@ namespace Scripting
                 Log::error("Scripting", "The script ended with an exception.");
 
                 // Write some information about the script exception
-                asIScriptFunction *func = ctx->GetExceptionFunction();
+                //asIScriptFunction *func = ctx->GetExceptionFunction();
                 //std::cout << "func: " << func->GetDeclaration() << std::endl;
                 //std::cout << "modl: " << func->GetModuleName() << std::endl;
                 //std::cout << "sect: " << func->GetScriptSectionName() << std::endl;
@@ -437,11 +437,11 @@ namespace Scripting
         Scripting::GUI::registerScriptEnums(m_engine);
         Scripting::Audio::registerScriptFunctions(m_engine);
 
-        // It is possible to register the functions, properties, and types in 
+        // It is possible to register the functions, properties, and types in
         // configuration groups as well. When compiling the scripts it can then
         // be defined which configuration groups should be available for that
         // script. If necessary a configuration group can also be removed from
-        // the engine, so that the engine configuration could be changed 
+        // the engine, so that the engine configuration could be changed
         // without having to recompile all the scripts.
     }
 
@@ -459,7 +459,7 @@ namespace Scripting
         }
 
         // Add the script sections that will be compiled into executable code.
-        // If we want to combine more than one file into the same script, then 
+        // If we want to combine more than one file into the same script, then
         // we can call AddScriptSection() several times for the same module and
         // the script engine will treat them all as if they were one. The script
         // section name, will allow us to localize any errors in the script code.
@@ -471,7 +471,7 @@ namespace Scripting
             Log::error("Scripting", "AddScriptSection() failed");
             return false;
         }
-    
+
         return true;
     }
 
@@ -483,7 +483,7 @@ namespace Scripting
         asIScriptModule *mod = m_engine->GetModule(MODULE_ID_MAIN_SCRIPT_FILE, asGM_CREATE_IF_NOT_EXISTS);
 
         // Compile the script. If there are any compiler messages they will
-        // be written to the message stream that we set right after creating the 
+        // be written to the message stream that we set right after creating the
         // script engine. If there are no errors, and no warnings, nothing will
         // be written to the stream.
         r = mod->Build();
@@ -497,9 +497,9 @@ namespace Scripting
         // returned. So if the script needs to be recompiled, then all the script
         // sections must be added again.
 
-        // If we want to have several scripts executing at different times but 
+        // If we want to have several scripts executing at different times but
         // that have no direct relation with each other, then we can compile them
-        // into separate script modules. Each module uses their own namespace and 
+        // into separate script modules. Each module uses their own namespace and
         // scope, so function names, and global variables will not conflict with
         // each other.
 
@@ -508,7 +508,7 @@ namespace Scripting
 
     //-----------------------------------------------------------------------------
 
-    PendingTimeout::PendingTimeout(double time, asIScriptFunction* callback_delegate) 
+    PendingTimeout::PendingTimeout(double time, asIScriptFunction* callback_delegate)
     {
         m_time = time;
         m_callback_delegate = callback_delegate;
@@ -520,7 +520,7 @@ namespace Scripting
     {
         if (m_callback_delegate != NULL)
         {
-            asIScriptEngine* engine = World::getWorld()->getScriptEngine()->getEngine();
+            //asIScriptEngine* engine = World::getWorld()->getScriptEngine()->getEngine();
             m_callback_delegate->Release();
         }
     }

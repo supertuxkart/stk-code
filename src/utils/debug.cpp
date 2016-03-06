@@ -626,7 +626,7 @@ bool handleContextMenuAction(s32 cmdID)
     }
     else if (cmdID == DEBUG_SCRIPT_CONSOLE)
     {
-        ScriptingConsole* console = new ScriptingConsole();
+        new ScriptingConsole();
     }
 
     return false;

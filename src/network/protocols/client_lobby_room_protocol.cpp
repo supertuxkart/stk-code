@@ -208,7 +208,7 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
     {
         return true;
     } // connection
-    else if (event->getType() == EVENT_TYPE_DISCONNECTED) 
+    else if (event->getType() == EVENT_TYPE_DISCONNECTED)
     {
         // This means we left essentially.
         // We can't delete STKHost from this thread, since the main
@@ -433,7 +433,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         uint8_t player_id = data[n + 1];
         irr::core::stringw name;
         int bytes_read = data.decodeStringW(n + 2, &name);
-        uint8_t host_id = data.getUInt8(n+2+bytes_read);
+        //uint8_t host_id = data.getUInt8(n+2+bytes_read);
 
         NetworkPlayerProfile* profile2 =
             new NetworkPlayerProfile(player_id, name);
@@ -550,7 +550,7 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
     const NetworkString &data = event->data();
     if (data.size() < 3 || data[0] != 1)
     {
-        Log::error("ClientLobbyRoomProtocol", 
+        Log::error("ClientLobbyRoomProtocol",
                    "A message notifying a kart selection update wasn't "
                    "formated as expected.");
         return;
@@ -643,7 +643,7 @@ void ClientLobbyRoomProtocol::startSelection(Event* event)
  *  Byte 0   1       5   6           7   8           9
  *       ---------------------------------------------------
  *  Size | 1 |    4  | 1 |     1     | 1 |     1     |     |
- *  Data | 4 | token | 1 | Kart 1 ID | 1 | kart id 2 | ... |
+ *  Data | 4 | token | 1 | Kart 1 ID | 1 | kart id 2 | ... |
  *       ---------------------------------------------------
  */
 void ClientLobbyRoomProtocol::raceFinished(Event* event)
@@ -672,7 +672,7 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
         Log::error("ClientLobbyRoomProtocol",
                    "No controller events protocol registered.");
 
-    protocol = ProtocolManager::getInstance() 
+    protocol = ProtocolManager::getInstance()
              ->getProtocol(PROTOCOL_KART_UPDATE);
     if (protocol)
         ProtocolManager::getInstance()->requestTerminate(protocol);
@@ -796,7 +796,7 @@ void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
  *  Byte 0   1            5   6           7   8            N+8 N+9              N+10
  *       ---------------------------------------------------------------------------
  *  Size | 1 |      4     | 1 |      1    | 1 |      N     | 1 |       1           |
- *  Data | 4 | priv token | 1 | player id | N | track name | 1 | track number (gp) |
+ *  Data | 4 | priv token | 1 | player id | N | track name | 1 | track number (gp) |
  *       ---------------------------------------------------------------------------
  */
 void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
@@ -823,7 +823,7 @@ void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
  *  Byte 0   1            5   6           7   8          9   10                  11
  *       -------------------------------------------------------------------------
  *  Size | 1 |      4     | 1 |     1     | 1 |     1    | 1 |       1           |
- *  Data | 4 | priv token | 1 | player id | 1 | reversed | 1 | track number (gp) |
+ *  Data | 4 | priv token | 1 | player id | 1 | reversed | 1 | track number (gp) |
  *       -------------------------------------------------------------------------
  */
 void ClientLobbyRoomProtocol::playerReversedVote(Event* event)
@@ -849,7 +849,7 @@ void ClientLobbyRoomProtocol::playerReversedVote(Event* event)
  *  Byte 0   1            5   6           7   8      9   10                  11
  *       ---------------------------------------------------------------------
  *  Size | 1 |      4     | 1 |     1     | 1 |   1  | 1 |       1           |
- *  Data | 4 | priv token | 1 | player id | 1 | laps | 1 | track number (gp) |
+ *  Data | 4 | priv token | 1 | player id | 1 | laps | 1 | track number (gp) |
  *       ---------------------------------------------------------------------
  */
 void ClientLobbyRoomProtocol::playerLapsVote(Event* event)
