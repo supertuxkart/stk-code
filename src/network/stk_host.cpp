@@ -547,7 +547,7 @@ void* STKHost::mainLoop(void* self)
                 Log::verbose("NetworkManager",
                              "Message, Sender : %s, message:",
                              stk_addr.toString(/*show port*/false).c_str());
-                Log::verbose("NetworkManager",
+                Log::verbose("NetworkManager", "%s",
                              stk_event->data().getLogMessage().c_str());
 
             }   // if message event

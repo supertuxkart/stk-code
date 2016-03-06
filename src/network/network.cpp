@@ -201,7 +201,7 @@ void Network::logPacket(const BareNetworkString &ns, bool incoming)
     // Indentation for all lines after the first, so that the dump
     // is nicely aligned.
     std::string indent("                ");
-    fprintf(m_log_file.getData(), ns.getLogMessage(indent).c_str());
+    fprintf(m_log_file.getData(), "%s", ns.getLogMessage(indent).c_str());
     m_log_file.unlock();
 }   // logPacket
 // ----------------------------------------------------------------------------
