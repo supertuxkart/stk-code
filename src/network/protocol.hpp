@@ -23,12 +23,14 @@
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 
-#include "network/network_string.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
+#include <stddef.h>
+
 class Event;
+class NetworkString;
 class STKPeer;
 
 
@@ -121,18 +123,12 @@ public:
     virtual void asynchronousUpdate() = 0;
 
     /// functions to check incoming data easily
-    bool checkDataSizeAndToken(Event* event, int minimum_size);
-    bool isByteCorrect(Event* event, int byte_nb, int value);
-    void sendMessageToPeersChangingToken(uint8_t type,
-                                         const NetworkString &message);
-    void sendMessage(const NetworkString& message,
-                     bool reliable = true);
-    void sendMessage(STKPeer* peer, const NetworkString& message,
-                     bool reliable = true);
-    void sendSynchronousMessage(const NetworkString& message, 
-                                bool reliable=true);
-    void sendSynchronousMessage(STKPeer* peer, const NetworkString& message,
-                                bool reliable = true);
+    NetworkString* getNetworkString(int capacity=16);
+    bool checkDataSize(Event* event, unsigned int minimum_size);
+    void sendMessageToPeersChangingToken(NetworkString *message,
+                                         bool reliable = true);
+    void sendToServer(NetworkString *message,
+                      bool reliable = true);
     void requestStart();
     void requestPause();
     void requestUnpause();

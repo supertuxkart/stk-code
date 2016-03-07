@@ -434,24 +434,6 @@ bool STKHost::connect(const TransportAddress& address)
     return true;
 }   // connect
 
-// --------------------------------------------------------------------
-/** Sends a message to the server if this is a client, or to all
- *  clients if this is the server.
- *  \param data Message to sent.
- *  \param reliable If the message is to be sent reliable.
- */
-void STKHost::sendMessage(const NetworkString& data, bool reliable)
-{
-    if (NetworkConfig::get()->isServer())
-        broadcastPacket(data, reliable);
-    else
-    {
-        if (m_peers.size() > 1)
-            Log::warn("ClientNetworkManager", "Ambiguous send of data.");
-        m_peers[0]->sendPacket(data, reliable);
-    }
-}   // sendMessage
-
 // ----------------------------------------------------------------------------
 /** \brief Starts the listening of events from ENet.
  *  Starts a thread for receiveData that updates it as often as possible.
@@ -563,9 +545,10 @@ void* STKHost::mainLoop(void* self)
             {
                 TransportAddress stk_addr(peer->getAddress());
                 Log::verbose("NetworkManager",
-                             "Message, Sender : %s, message = \"%s\"",
-                             stk_addr.toString(/*show port*/false).c_str(),
-                             stk_event->data().std_string().c_str());
+                             "Message, Sender : %s, message:",
+                             stk_addr.toString(/*show port*/false).c_str());
+                Log::verbose("NetworkManager", "%s",
+                             stk_event->data().getLogMessage().c_str());
 
             }   // if message event
 
@@ -590,8 +573,10 @@ void STKHost::handleLANRequests()
     TransportAddress sender;
     int len = m_lan_network->receiveRawPacket(buffer, LEN, &sender, 1);
     if(len<=0) return;
-
-    if (std::string(buffer, len) == "stk-server")
+    BareNetworkString message(buffer, len);
+    std::string command;
+    message.decodeString(0, &command);
+    if (command == "stk-server")
     {
         Log::verbose("STKHost", "Received LAN server query");
         std::string name = 
@@ -604,15 +589,15 @@ void STKHost::handleLANRequests()
         // current players, and the client's ip address and port
         // number (which solves the problem which network interface
         // might be the right one if there is more than one).
-        NetworkString s;
+        BareNetworkString s(name.size()+1+8);
         s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
         s.addUInt8(0);   // FIXME: current number of connected players
         s.addUInt32(sender.getIP());
         s.addUInt16(sender.getPort());
-        m_lan_network->sendRawPacket(s.getBytes(), s.size(), sender);
+        m_lan_network->sendRawPacket(s, sender);
     }   // if message is server-requested
-    else if (std::string(buffer, len) == "connection-request")
+    else if (command == "connection-request")
     {
         Protocol *c = new ConnectToPeer(sender);
         c->requestStart();
@@ -653,6 +638,15 @@ STKPeer* STKHost::getPeer(ENetPeer *enet_peer)
         if(m_peers[i]->isSamePeer(enet_peer))
             return m_peers[i];
     }
+
+    // Make sure that a client only adds one other peer (=the server).
+    if(NetworkConfig::get()->isClient() && m_peers.size()>0)
+    {
+        Log::error("STKHost",
+                   "Client is adding more than one server, ignored for now.");
+    }
+
+
     //FIXME Should we check #clients here? It might be easier to only
     // handle this at connect time, not in all getPeer calls.
     STKPeer *peer = new STKPeer(enet_peer);
@@ -740,7 +734,7 @@ uint16_t STKHost::getPort() const
  *  \param data Data to sent.
  *  \param reliable If the data should be sent reliable or now.
  */
-void STKHost::sendPacketExcept(STKPeer* peer, const NetworkString& data,
+void STKHost::sendPacketExcept(STKPeer* peer, NetworkString *data,
                                bool reliable)
 {
     for (unsigned int i = 0; i < m_peers.size(); i++)

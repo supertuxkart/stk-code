@@ -24,12 +24,12 @@
 #ifndef EVENT_HPP
 #define EVENT_HPP
 
-#include "network/network_string.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/types.hpp"
 
 #include "enet/enet.h"
 
+class NetworkString;
 class STKPeer;
 
 /*!
@@ -57,11 +57,9 @@ class Event
 {
 private:
     LEAK_CHECK()
-    /** Copy of the data passed by the event. */
-    NetworkString m_data;
 
-    /** A pointer on the ENetPacket to be deleted. */
-    ENetPacket* m_packet;
+    /** Copy of the data passed by the event. */
+    NetworkString *m_data;
 
     /**  Type of the event. */
     EVENT_TYPE m_type;
@@ -72,7 +70,6 @@ private:
 public:
          Event(ENetEvent* event);
         ~Event();
-    void removeFront(int size);
 
     // ------------------------------------------------------------------------
     /** Returns the type of this event. */
@@ -85,12 +82,12 @@ public:
     /** \brief Get a const reference to the received data.
      *  This is empty for events like connection or disconnections. 
      */
-    const NetworkString& data() const { return m_data; }
+    const NetworkString& data() const { return *m_data; }
     // ------------------------------------------------------------------------
     /** \brief Get a non-const reference to the received data.
      *  A copy of the message data. This is empty for events like
      *  connection or disconnections. */
-    NetworkString& data() { return m_data; }
+    NetworkString& data() { return *m_data; }
     // ------------------------------------------------------------------------
 
 };   // class Event

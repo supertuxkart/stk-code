@@ -171,9 +171,3 @@ void NetworkConsole::kickAllPlayers()
         peers[i]->disconnect();
     }
 }   // kickAllPlayers
-
-// ----------------------------------------------------------------------------
-void NetworkConsole::sendPacket(const NetworkString& data, bool reliable)
-{
-    m_localhost->broadcastPacket(data, reliable);
-}   // sendPacket

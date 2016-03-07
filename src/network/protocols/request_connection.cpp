@@ -79,9 +79,8 @@ void RequestConnection::asynchronousUpdate()
             {
                 const Server *server = 
                     ServersManager::get()->getServerByID(m_server_id);
-                NetworkString s(std::string("connection-request"));
-                STKHost::get()->sendRawPacket(s.getBytes(), s.size(),
-                                             server->getAddress());
+                BareNetworkString message(std::string("connection-request"));
+                STKHost::get()->sendRawPacket(message, server->getAddress());
                 m_state = DONE;
             }
             else

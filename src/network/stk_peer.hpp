@@ -59,7 +59,8 @@ public:
              STKPeer(ENetPeer *enet_peer);
     virtual ~STKPeer();
 
-    virtual void sendPacket(const NetworkString& data, bool reliable = true);
+    virtual void sendPacket(NetworkString *data,
+                            bool reliable = true);
     void disconnect();
     bool isConnected() const;
     bool exists() const;

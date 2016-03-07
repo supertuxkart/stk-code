@@ -110,8 +110,7 @@ void ProtocolManager::propagateEvent(Event* event)
     {
         if (event->data().size() > 0)
         {
-            searched_protocol = (ProtocolType)(event->data()[0]);
-            event->removeFront(1);
+            searched_protocol = event->data().getProtocolType();
         }
         else
         {
@@ -125,14 +124,7 @@ void ProtocolManager::propagateEvent(Event* event)
     Log::verbose("ProtocolManager", "Received event for protocols of type %d",
                   searched_protocol);
 
-    bool is_synchronous = false;
-    if(searched_protocol & PROTOCOL_SYNCHRONOUS)
-    {
-        is_synchronous = true;
-        // Reset synchronous flag to restore original protocol id
-        searched_protocol = ProtocolType(searched_protocol & 
-                                         ~PROTOCOL_SYNCHRONOUS  );
-    }
+
     std::vector<unsigned int> protocols_ids;
     m_protocols.lock();
     for (unsigned int i = 0; i < m_protocols.getData().size() ; i++)
@@ -148,17 +140,25 @@ void ProtocolManager::propagateEvent(Event* event)
     m_protocols.unlock();
 
     // no protocol was aimed, show the msg to debug
-    if (searched_protocol == PROTOCOL_NONE)
+    if (searched_protocol == PROTOCOL_NONE && 
+        event->getType() != EVENT_TYPE_DISCONNECTED)
     {
-        Log::debug("ProtocolManager", "NO PROTOCOL : Message is \"%s\"",
-                    event->data().std_string().c_str());
+        if(event->getType()==EVENT_TYPE_MESSAGE)
+        {
+            Log::warn("ProtocolManager", "NO PROTOCOL. Message is:");
+            Log::warn("ProtocolManager", event->data().getLogMessage().c_str());
+        }
+        else
+            Log::debug("ProtocolManager", "NO PROTOCOL, no data");
     }
 
     if (protocols_ids.size() != 0)
     {
         EventProcessingInfo epi;
         epi.m_arrival_time   = (double)StkTime::getTimeSinceEpoch();
-        epi.m_is_synchronous = is_synchronous;
+        // Only message events will optionally be delivered synchronously
+        epi.m_is_synchronous = event->getType()==EVENT_TYPE_MESSAGE &&
+                               event->data().isSynchronous();
         epi.m_event          = event;
         epi.m_protocols_ids  = protocols_ids;
         // Add the event to the queue. After the event is handled
@@ -175,46 +175,6 @@ void ProtocolManager::propagateEvent(Event* event)
     }
     m_events_to_process.unlock();
 }   // propagateEvent
-
-// ----------------------------------------------------------------------------
-void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message,
-                                  bool reliable, bool send_synchronously)
-{
-    NetworkString new_message(1+message.size());
-    ProtocolType type = sender->getProtocolType();
-    // Set flag if the message must be handled synchronously on arrivat
-    if(send_synchronously)
-        type = ProtocolType(type | PROTOCOL_SYNCHRONOUS);
-    new_message.ai8(type); // add one byte to add protocol type
-    new_message += message;
-    STKHost::get()->sendMessage(new_message, reliable);
-}   // sendMessage
-
-// ----------------------------------------------------------------------------
-void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer,
-                                  const NetworkString& message, bool reliable,
-                                  bool send_synchronously)
-{
-    NetworkString new_message(1+message.size());
-    ProtocolType type = sender->getProtocolType();
-    // Set flag if the message must be handled synchronously on arrivat
-    if(send_synchronously)
-        type = ProtocolType(type | PROTOCOL_SYNCHRONOUS);
-    new_message.ai8(type); // add one byte to add protocol type
-    new_message += message;
-    peer->sendPacket(new_message, reliable);
-}   // sendMessage
-
-// ----------------------------------------------------------------------------
-void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer,
-                                        const NetworkString& message,
-                                        bool reliable)
-{
-    NetworkString new_message(1+message.size());
-    new_message.ai8(sender->getProtocolType()); // add one byte to add protocol type
-    new_message += message;
-    STKHost::get()->sendPacketExcept(peer, new_message, reliable);
-}   // sendMessageExcept
 
 // ----------------------------------------------------------------------------
 /** \brief Asks the manager to start a protocol.

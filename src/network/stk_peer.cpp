@@ -62,13 +62,14 @@ void STKPeer::disconnect()
  *  \param data The data to send.
  *  \param reliable If the data is sent reliable or not.
  */
-void STKPeer::sendPacket(NetworkString const& data, bool reliable)
+void STKPeer::sendPacket(NetworkString *data, bool reliable)
 {
+    data->setToken(m_client_server_token);
     TransportAddress a(m_enet_peer->address);
     Log::verbose("STKPeer", "sending packet of size %d to %s",
-                 data.size(), a.toString().c_str());
+                 data->size(), a.toString().c_str());
          
-    ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
+    ENetPacket* packet = enet_packet_create(data->getData(), data->size(),
                                     (reliable ? ENET_PACKET_FLAG_RELIABLE
                                               : ENET_PACKET_FLAG_UNSEQUENCED));
     enet_peer_send(m_enet_peer, 0, packet);
