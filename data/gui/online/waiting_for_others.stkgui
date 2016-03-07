@@ -6,6 +6,6 @@
 
         <spacer height="40" width="50"/>
 
-        Waiting...
+        <label proportion="1" width="100%" text_align="left" id="lblDetails"/>
     </div>
 </stkgui>

@@ -33,6 +33,7 @@
 #include "states_screens/server_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
+#include "states_screens/waiting_for_others.hpp"
 
 static const char ID_LOCKED[] = "locked/";
 
@@ -180,7 +181,9 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
         clrp->voteReversed(race_manager->getReverseTrack());
         clrp->voteRaceCount(1);
         // FIXME: for debugging set only 0 laps
-        clrp->voteLaps(0);
+        clrp->voteLaps(3);
+        //WaitingForOthersScreen::getInstance()->push();
+        //return;
     }
     TracksScreen::getInstance()->push();
 }   // playerSelected

@@ -19,12 +19,15 @@
 
 #include "config/user_config.hpp"
 #include "guiengine/widget.hpp"
-#include "guiengine/widgets/list_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "input/keyboard_device.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "network/game_setup.hpp"
+#include "network/network_player_profile.hpp"
+#include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -58,3 +61,42 @@ void WaitingForOthersScreen::init()
 }   //init
 
 // -----------------------------------------------------------------------------
+
+void WaitingForOthersScreen::onUpdate(float dt)
+{
+    const std::vector<STKPeer*>& peers = STKHost::get()->getPeers();
+    RaceConfig* config = STKHost::get()->getGameSetup()->getRaceConfig();
+    core::stringw w;
+    for (int i = 0; i < peers.size(); i++)
+    {
+        //race_manager->get
+        
+        
+        STKPeer* peer = peers[i];
+        NetworkPlayerProfile* profile = peer->getPlayerProfile();
+        if (profile == NULL)
+            continue;
+        core::stringw name = profile->getName();
+
+        w += name + L" : ";
+
+        int playerId = profile->getGlobalPlayerId();
+        const RaceVote& vote = config->getRaceVote(playerId);
+        if (vote.hasVotedTrack())
+        {
+            w += vote.getTrackVote().c_str();
+        }
+        else
+        {
+            w += L"...";
+        }
+
+        w += "\n";
+    }
+
+    GUIEngine::LabelWidget* lbl = getWidget<GUIEngine::LabelWidget>("lblDetails");
+    lbl->setText(w.c_str(), true);
+}
+
+// -----------------------------------------------------------------------------
+
