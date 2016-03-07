@@ -1666,8 +1666,14 @@ static void cleanUserConfig()
 //=============================================================================
 void runUnitTests()
 {
+    Log::info("UnitTest", "Starting unit testing");
+    Log::info("UnitTest", "=====================");
+    Log::info("UnitTest", "- GraphicsRestrictions");
     GraphicsRestrictions::unitTesting();
+    Log::info("UnitTest", " - NetworkString");
     NetworkString::unitTesting();
+
+    Log::info("UnitTest", " - Easter detection");
     // Test easter mode: in 2015 Easter is 5th of April - check with 0 days
     // before and after
     int saved_easter_mode = UserConfigParams::m_easter_ear_mode;
@@ -1697,4 +1703,7 @@ void runUnitTests()
     assert( isEasterMode(22, 3, 2016, 5));
     assert(!isEasterMode(21, 3, 2016, 5));
     UserConfigParams::m_easter_ear_mode = saved_easter_mode;
+    Log::info("UnitTest", "=====================");
+    Log::info("UnitTest", "Testing successful   ");
+    Log::info("UnitTest", "=====================");
 }   // runUnitTests
