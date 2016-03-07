@@ -30,9 +30,16 @@
 class ReplayRecorder : public ReplayBase
 {
 private:
+    std::string m_filename;
 
     /** A separate vector of Replay Events for all transforms. */
     std::vector< std::vector<TransformEvent> > m_transform_events;
+
+    /** A separate vector of Replay Events for all physic info. */
+    std::vector< std::vector<PhysicInfo> > m_physic_info;
+
+    /** A separate vector of Replay Events for all other events. */
+    std::vector< std::vector<KartReplayEvent> > m_kart_replay_event;
 
     /** Time at which a transform was saved for the last time. */
     std::vector<float> m_last_saved_time;
@@ -40,13 +47,12 @@ private:
     /** Counts the number of transform events for each kart. */
     std::vector<unsigned int> m_count_transforms;
 
-    /** Stores the last skid state. */
-    std::vector<KartControl::SkidControl> m_skid_control;
-
-    std::vector< std::vector<KartReplayEvent> > m_kart_replay_event;
-
     /** Static pointer to the one instance of the replay object. */
     static ReplayRecorder *m_replay_recorder;
+
+    bool  m_complete_replay;
+
+    bool  m_incorrect_replay;
 
 #ifdef DEBUG
     /** Counts overall number of events stored. */
@@ -65,8 +71,7 @@ private:
 public:
     void  init();
     void  update(float dt);
-    void  reset();
-    void  Save();
+    void  save();
 
     // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */
@@ -81,6 +86,10 @@ public:
     // ------------------------------------------------------------------------
     /** Delete the instance of the replay object. */
     static void destroy() { delete m_replay_recorder; m_replay_recorder=NULL; }
+    // ------------------------------------------------------------------------
+    /** Returns the filename that was opened. */
+    virtual const std::string& getReplayFilename() const { return m_filename; }
+    // ------------------------------------------------------------------------
 };   // ReplayRecorder
 
 #endif

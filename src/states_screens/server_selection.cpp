@@ -200,7 +200,7 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
  */
 void ServerSelection::onUpdate(float dt)
 {
-    if(!m_refresh_request) return;
+    if (!m_refresh_request) return;
 
     if (m_refresh_request->isDone())
     {

@@ -63,7 +63,7 @@ protected:
     void         setControllerName(const std::string &name);
     float        steerToPoint(const Vec3 &point);
     float        normalizeAngle(float angle);
-    virtual void update      (float delta) ;
+    virtual void update      (float delta);
     virtual void setSteering   (float angle, float dt);
     virtual bool canSkid(float steer_fraction) = 0;
     // ------------------------------------------------------------------------

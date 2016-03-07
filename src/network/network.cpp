@@ -172,10 +172,10 @@ void Network::broadcastPacket(NetworkString *data, bool reliable)
 void Network::openLog()
 {
     m_log_file.setAtomic(NULL);
-    if (UserConfigParams::m_packets_log_filename.toString() != "")
+    if (UserConfigParams::m_log_packets)
     {
         std::string s = file_manager
-            ->getUserConfigFile(UserConfigParams::m_packets_log_filename);
+            ->getUserConfigFile(FileManager::getStdoutName()+".packet");
         m_log_file.setAtomic(fopen(s.c_str(), "w+"));
     }
     if (!m_log_file.getData())
@@ -198,8 +198,10 @@ void Network::logPacket(const BareNetworkString &ns, bool incoming)
     m_log_file.lock();
     fprintf(m_log_file.getData(), "[%d\t]  %s  ",
             (int)(StkTime::getRealTime()), arrow);
-    
-    fprintf(m_log_file.getData(), ns.getLogMessage().c_str());
+    // Indentation for all lines after the first, so that the dump
+    // is nicely aligned.
+    std::string indent("                ");
+    fprintf(m_log_file.getData(), "%s", ns.getLogMessage(indent).c_str());
     m_log_file.unlock();
 }   // logPacket
 // ----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -186,12 +186,12 @@ public:
 
 	void     DestroyHalfCreated();
 
-	// TODO: 2.29.0: operator==
-	// TODO: 2.29.0: The asIScriptFunction should provide operator== and operator!= that should do a
-	//               a value comparison. Two delegate objects that point to the same object and class method should compare as equal
-	// TODO: 2.29.0: The operator== should also be provided in script as opEquals to allow the same comparison in script
-	//               To do this we'll need some way to adapt the argtype for opEquals for each funcdef, preferrably without instantiating lots of different methods
-	//               Perhaps reusing 'auto' to mean the same type as the object
+	// TODO: operator==
+	// TODO: The asIScriptFunction should provide operator== and operator!= that should do a
+	//       a value comparison. Two delegate objects that point to the same object and class method should compare as equal
+	// TODO: The operator== should also be provided in script as opEquals to allow the same comparison in script
+	//       To do this we'll need some way to adapt the argtype for opEquals for each funcdef, preferrably without instantiating lots of different methods
+	//       Perhaps reusing 'auto' to mean the same type as the object
 	//bool      operator==(const asCScriptFunction &other) const;
 
 	void      DestroyInternal();
@@ -329,7 +329,7 @@ public:
 	asSSystemFunctionInterface  *sysFuncIntf;
 };
 
-const char * const DELEGATE_FACTORY = "%delegate_factory";
+const char * const DELEGATE_FACTORY = "$dlgte";
 asCScriptFunction *CreateDelegate(asCScriptFunction *func, void *obj);
 
 END_AS_NAMESPACE

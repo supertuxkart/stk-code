@@ -42,6 +42,7 @@ protected:
     /** Pointer to the various widgets on the screen. */
     GUIEngine::LabelWidget * m_header;
     GUIEngine::RibbonWidget* m_profile_tabs;
+    GUIEngine::IconButtonWidget * m_servers_tab;
     GUIEngine::IconButtonWidget * m_friends_tab;
     GUIEngine::IconButtonWidget * m_achievements_tab;
     GUIEngine::IconButtonWidget * m_settings_tab;

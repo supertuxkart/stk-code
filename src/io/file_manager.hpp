@@ -75,6 +75,9 @@ private:
     /** Directory to store screenshots in. */
     std::string       m_screenshot_dir;
 
+    /** Directory to store replays in. */
+    std::string       m_replay_dir;
+
     /** Directory where resized textures are cached. */
     std::string       m_cached_textures_dir;
 
@@ -97,6 +100,7 @@ private:
     bool              isDirectory(const std::string &path) const;
     void              checkAndCreateAddonsDir();
     void              checkAndCreateScreenshotDir();
+    void              checkAndCreateReplayDir();
     void              checkAndCreateCachedTexturesDir();
     void              checkAndCreateGPDir();
     void              discoverPaths();
@@ -118,6 +122,7 @@ public:
     XMLNode          *createXMLTreeFromString(const std::string & content);
 
     std::string       getScreenshotDir() const;
+    std::string       getReplayDir() const;
     std::string       getCachedTexturesDir() const;
     std::string       getGPDir() const;
     std::string       getTextureCacheLocation(const std::string& filename);
@@ -145,6 +150,9 @@ public:
     {
         return fileExists(std::string(prefix) + path);
     }
+    // ------------------------------------------------------------------------
+    /** Returns the name of the stdout file for log messages. */
+    static const std::string& getStdoutName() { return m_stdout_filename; }
     // ------------------------------------------------------------------------
     void        listFiles        (std::set<std::string>& result,
                                   const std::string& dir,

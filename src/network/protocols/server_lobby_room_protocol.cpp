@@ -392,7 +392,7 @@ void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
         NetworkString *msg = getNetworkString(2);
         msg->addUInt8(LE_PLAYER_DISCONNECTED)
            .addUInt8(peer->getPlayerProfile()->getGlobalPlayerId());
-        broadcastToClients(msg);
+        sendMessageToPeersChangingToken(msg, /*reliable*/true);
         delete msg;
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
                   peer->getPlayerProfile()->getGlobalPlayerId());
@@ -465,7 +465,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // size of id -- id -- size of local id -- local id;
     message->addUInt8(LE_NEW_PLAYER_CONNECTED).addUInt8(new_player_id)
             .addUInt8(new_host_id).encodeString(name_u8);
-    ProtocolManager::getInstance()->sendMessageExcept(peer, message);
+    STKHost::get()->sendPacketExcept(peer, message);
     delete message;
 
     // Now answer to the peer that just connected

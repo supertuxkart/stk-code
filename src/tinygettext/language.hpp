@@ -70,6 +70,9 @@ public:
   /** Returns the human readable name of the Language */
   std::string get_name() const;
 
+  /** Returns the human readable name of the language in the language itself */
+  std::string get_localized_name() const;
+
   /** Returns the Language as string in the form of an environment
       variable: {language}_{country}@{modifier} */
   std::string str() const;

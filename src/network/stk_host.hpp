@@ -181,13 +181,6 @@ public:
     }   // receiveRawPacket
 
     // --------------------------------------------------------------------
-    void broadcastPacket(NetworkString *data,
-                         bool reliable = true)
-    {
-        m_network->broadcastPacket(data, reliable);
-    }   // broadcastPacket
-
-    // --------------------------------------------------------------------
     void sendRawPacket(const BareNetworkString &buffer,
                        const TransportAddress& dst)
     {

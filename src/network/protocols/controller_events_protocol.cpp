@@ -105,18 +105,9 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
     }
     if (NetworkConfig::get()->isServer())
     {
-        const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-        for(unsigned int i=0; i<peers.size(); i++)
-        {
-            STKPeer *peer = peers[i];
-            // Don't send message to the host from which the message 
-            // was sent from originally
-            if(peer != event->getPeer())
-            {
-                pure_message.setToken(peer->getClientServerToken());
-                peer->sendPacket(&pure_message, false);
-            }   // if peer != event->getPeer()
-        }   // for i in peers
+        // Send update to all clients except the original sender.
+        STKHost::get()->sendPacketExcept(event->getPeer(), 
+                                         &pure_message, false);
     }   // if server
     return true;
 }   // notifyEventAsynchronous
@@ -157,7 +148,6 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     uint8_t serialized_3 = (uint8_t)(controls->m_steer*127.0);
 
     NetworkString *ns = getNetworkString(17);
-    ns->setToken(STKHost::get()->getPeers()[0]->getClientServerToken());
     ns->addFloat(World::getWorld()->getTime());
     ns->addUInt8(controller->getKart()->getWorldKartId());
     ns->addUInt8(serialized_1).addUInt8(serialized_2).addUInt8(serialized_3);

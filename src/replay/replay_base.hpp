@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 /**
   * \ingroup race
@@ -32,46 +33,54 @@ class ReplayBase : public NoCopy
 {
     // Needs access to KartReplayEvent
     friend class GhostKart;
-private:
-    /** The filename of the replay file. Only defined after calling
-     *  openReplayFile. */
-    std::string m_filename;
+
 protected:
     /** Stores a transform event, i.e. a position and rotation of a kart
      *  at a certain time. */
     struct TransformEvent
     {
         /** Time at which this event happens. */
-        float       m_time;
+        float               m_time;
         /** The transform at a certain time. */
-        btTransform m_transform;
+        btTransform         m_transform;
     };   // TransformEvent
 
     // ------------------------------------------------------------------------
-    /** Records all other events - atm start and end skidding. */
+    struct PhysicInfo
+    {
+        /** The speed at a certain time. */
+        float               m_speed;
+        /** The steering at a certain time. */
+        float               m_steer;
+        /** The suspension length of 4 wheels at a certain time. */
+        float               m_suspension_length[4];
+    };   // PhysicInfo
+
+    // ------------------------------------------------------------------------
+    /** Records all other events - atm nitro, zipper and jumping handling. */
     struct KartReplayEvent
     {
-        /** The type of event. */
-        enum KartReplayEventType {KRE_NONE,
-                                  KRE_SKID_LEFT,
-                                  KRE_SKID_MIN = KRE_SKID_LEFT,
-                                  KRE_SKID_RIGHT, KRE_SKID_RELEASE} m_type;
-
-        /** Time at which this event happens. */
-        float       m_time;
+        /** True if the kart recorded is using nitro/zipper or jumping.
+          * If true, a suitable GFX or animation will be replayed. */
+        bool        m_on_nitro;
+        bool        m_on_zipper;
+        bool        m_jumping;
     };   // KartReplayEvent
 
     // ------------------------------------------------------------------------
-          ReplayBase();
     FILE *openReplayFile(bool writeable);
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the filename that was opened. */
-    const std::string &getReplayFilename() const { return m_filename;}
-    // ----------------------------------------------------------------------
+    virtual const std::string& getReplayFilename() const = 0;
+    // ------------------------------------------------------------------------
     /** Returns the version number of the replay file. This is used to check
      *  that a loaded replay file can still be understood by this
      *  executable. */
-    unsigned int getReplayVersion() const { return 1; }
+    unsigned int getReplayVersion() const { return 2; }
+
+public:
+             ReplayBase();
+    virtual ~ReplayBase() {};
 };   // ReplayBase
 
 #endif

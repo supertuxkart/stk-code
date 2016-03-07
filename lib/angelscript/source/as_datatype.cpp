@@ -227,7 +227,7 @@ asCString asCDataType::Format(asSNameSpace *currNs, bool includeNamespace) const
 			str += "const";
 	}
 
-    if( isReference )
+	if( isReference )
 		str += "&";
 
 	return str;

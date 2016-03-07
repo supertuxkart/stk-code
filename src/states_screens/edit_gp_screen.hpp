@@ -43,8 +43,8 @@ class EditGPScreen :
 
          EditGPScreen();
 
-    void onConfirm();
-    void onCancel();
+    void onConfirm() OVERRIDE;
+    void onCancel() OVERRIDE;
 
     void loadList(const int selected);
     void setModified(const bool modified);

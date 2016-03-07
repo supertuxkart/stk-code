@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row">
+        <div x="5%" y="0%" width="90%" proportion="6" layout="horizontal-row">
+            <div width="40%" height="100%" layout="vertical-row">
+                <icon id="icon" align="center" proportion="8" width="100%" icon="gui/loading.png" />
+                <spacer proportion="1" />
+            </div>
+            <spacer proportion="1" />
+            <div width="60%" height="50%" layout="vertical-row">
+                <label id="name" width="100%" text_align="left"/>
+                <spacer height="10"/>
+            </div>
+        </div>
+
+        <div width="80%" proportion="5" align="center">
+            <buttonbar id="actions" x="0" y="0" height="100%" width="100%" align="center">
+                <icon-button id="start" width="128" height="128"
+                             icon="gui/green_check.png"
+                             I18N="Ghost replay info screen action" text="Start Race" />
+                <icon-button id="remove" width="128" height="128"
+                             icon="gui/remove.png"
+                             I18N="Ghost replay info action" text="Remove" />
+                <icon-button id="back" width="128" height="128"
+                             icon="gui/back.png"
+                             I18N="Ghost replay info action" text="Back" />
+            </buttonbar>
+        </div>
+    </div>
+</stkgui>

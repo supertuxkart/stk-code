@@ -44,8 +44,6 @@ public:
 
     virtual void run();
     void kickAllPlayers();
-    virtual void sendPacket(NetworkString *data,
-                            bool reliable = true);
     // ------------------------------------------------------------------------
     void setMaxPlayers(uint8_t count) { m_max_players = count; }
     // ------------------------------------------------------------------------

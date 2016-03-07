@@ -1,6 +1,6 @@
 /*
   AngelCode Scripting Library
-  Copyright (c) 2003-2013 Andreas Jonsson
+  Copyright (c) 2003-2015 Andreas Jonsson
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any
@@ -34,6 +34,8 @@
    This code was adapted from as_callfunc_arm_gcc (ARM, Linux hard float) by Brandon Bare on October 2014.
 */
 
+#if !defined(AS_MAX_PORTABILITY)
+
 #ifdef __psp2__
 
 .syntax unified
@@ -61,7 +63,7 @@
 
 /* --------------------------------------------------------------------------------------------*/
 armFunc:
-	.fnstart
+    .fnstart
 
     push    {r4-r8, r10, r11, lr}   /* sp must be 8-byte alignment for ABI compliance, so the pushed registers must be even */
 
@@ -81,19 +83,19 @@ armFunc:
     /* Load the first 4 arguments into r0-r3 */
     cmp     r7, #4
 
-	it ge
+    it ge
     ldrge   r0, [r6]
     cmp     r7, #8
 
-	it ge
+    it ge
     ldrge   r1, [r6, #4]
     cmp     r7, #12
 
-	it ge
+    it ge
     ldrge   r2, [r6, #8]
     cmp     r7, #16
 
-	it ge
+    it ge
     ldrge   r3, [r6, #12]
 
 stackargs:
@@ -128,11 +130,11 @@ nomoreargs:
 
     pop {r4-r8, r10, r11, pc}
 
-	.fnend
+    .fnend
 
 /* --------------------------------------------------------------------------------------------*/
 armFuncObjLast:
-	.fnstart
+    .fnstart
 
     push {r4-r8, r10, r11, lr}  /* We´re storing r11 just to keep the stack aligned to an 8 byte boundary */
 
@@ -157,28 +159,28 @@ armFuncObjLast:
     /* Load the first 4 arguments into r0-r3 */
     cmp     r7, #4
 
-	it ge
+    it ge
     ldrge   r0, [r6]
     cmp     r7, #8
 
-	it ge
+    it ge
     ldrge   r1, [r6,#4]
 
-	it lt
+    it lt
     movlt   r1, r5
     cmp     r7, #12
 
-	it ge
+    it ge
     ldrge   r2, [r6,#8]
 
-	it lt
+    it lt
     movlt   r2, r5
     cmp     r7, #16
 
-	it ge
+    it ge
     ldrge   r3, [r6,#12]
 
-	ittt lt
+    ittt lt
     movlt   r3, r5
     movlt   r5, #0                  /* If objlast got placed into a register, r5 = 0 */
     blt     stackargsFuncObjLast    /* If objlast got placed into a register, go to stackargsFuncObjLast */
@@ -220,11 +222,11 @@ nomoreargsarmFuncObjLast:
 
     pop   {r4-r8, r10,r11, pc}
 
-	.fnend
+    .fnend
 
 /* --------------------------------------------------------------------------------------------*/
 armFuncR0ObjLast:
-	.fnstart
+    .fnstart
 
     push    {r4-r8, r10, r11, lr}
 
@@ -252,35 +254,35 @@ armFuncR0ObjLast:
     /* Load the first 3 arguments into r1-r3 */
     cmp     r7, #4
 
-	it ge
+    it ge
     ldrge   r1, [r6]
     cmp     r7, #8
 
-	it ge
+    it ge
     ldrge   r2, [r6,#4]
 
-	it lt
+    it lt
     movlt   r2, r5
     cmp     r7, #12
 
-	it ge
+    it ge
     ldrge   r3, [r6,#8]
 
-	ittt lt
+    ittt lt
     movlt   r3, r5
     movlt   r5, #0                  /* If objlast got placed into a register, r5 = 0 */
     blt     stackargsFuncR0ObjLast  /* If objlast got placed into a register, go to stackargsFuncR0ObjLast */
 
     cmp     r7, #16                 /* Else if we have one last arg set the offset accordingly and store the arg in the array */
 
-	itt ge
+    itt ge
     ldrge   r7, [r6, #12]
     strge   r7, [r6, #8]
 
     str     r5, [r6, #12]           /* Put objlast in r6 + 12 */
-	mov     r5, #0
+    mov     r5, #0
 
-	it ge
+    it ge
     movge   r5, #4                  /* Set r5 with an offset of #4 if there´s one last arg that couldn´t be placed in r registers */
     add     r5, r5, #4              /* Set r5 with an offset of + #4, so objlast can be loaded into the stack */
 
@@ -318,11 +320,11 @@ nomoreargsarmFuncR0ObjLast:
 
     pop {r4-r8, r10, r11, pc}
 
-	.fnend
+    .fnend
 
 /* --------------------------------------------------------------------------------------------*/
 armFuncR0:
-	.fnstart
+    .fnstart
 
     push {r4-r8, r10, r11, lr}
 
@@ -344,19 +346,19 @@ armFuncR0:
     /* Load the first 3 arguments into r1-r3 */
     cmp     r7, #4
 
-	it ge
+    it ge
     ldrge   r1, [r6]
     cmp     r7, #8
 
-	it ge
+    it ge
     ldrge   r2, [r6, #4]
     cmp     r7, #12
 
-	it ge
+    it ge
     ldrge   r3, [r6, #8]
     cmp     r7, #16
 
-	it ge
+    it ge
     movge   r11, #4         /* If there is still one arg to be placed, set the offset in r11 to #4 */
 
 stackargsarmFuncR0:
@@ -393,11 +395,11 @@ nomoreargsarmFuncR0:
 
     pop {r4-r8, r10, r11, pc}
 
-	.fnend
+    .fnend
 
 /* --------------------------------------------------------------------------------------------*/
 armFuncR0R1:
-	.fnstart
+    .fnstart
 
     push {r4-r8, r10, r11, lr}
 
@@ -421,23 +423,23 @@ armFuncR0R1:
     /* Load the first 2 arguments into r2-r3 */
     cmp     r7, #4
 
-	it ge
+    it ge
     ldrge   r2, [r6]
     cmp     r7, #8
 
-	it ge
+    it ge
     ldrge   r3, [r6, #4]
     cmp     r7, #12
 
-	it ge
+    it ge
     movge   r11, #4         /* If there is a third arg to be placed, set the offset in r11 to #4 */
 
     cmp     r7, #16
 
-	it ge
+    it ge
     movge   r11, #8         /* If there is a fourth arg to be placed, set the offset in r11 to #8 */
 
-	itt lt
+    itt lt
     ldrlt   r7, [r6, #8]    /* Else copy the third arg to the correct place in the array */
     strlt   r7, [r6, #12]
 
@@ -475,6 +477,9 @@ nomoreargsarmFuncR0R1:
 
     pop {r4-r8, r10, r11, pc}
 
-	.fnend
+    .fnend
 
 #endif
+
+#endif /* !AS_MAX_PORTABILITY */
+

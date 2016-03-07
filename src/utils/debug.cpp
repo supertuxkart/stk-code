@@ -357,7 +357,7 @@ bool handleContextMenuAction(s32 cmdID)
     }
     else if (cmdID == DEBUG_SAVE_REPLAY)
     {
-        ReplayRecorder::get()->Save();
+        ReplayRecorder::get()->save();
     }
     else if (cmdID == DEBUG_SAVE_HISTORY)
     {

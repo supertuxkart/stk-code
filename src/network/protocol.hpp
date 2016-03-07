@@ -127,7 +127,6 @@ public:
     bool checkDataSize(Event* event, unsigned int minimum_size);
     void sendMessageToPeersChangingToken(NetworkString *message,
                                          bool reliable = true);
-    void broadcastToClients(NetworkString *message, bool reliable=true);
     void sendToServer(NetworkString *message,
                       bool reliable = true);
     void requestStart();

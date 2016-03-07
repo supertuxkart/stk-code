@@ -85,8 +85,7 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        NetworkString *ns = getNetworkString(11);
-        ns->setToken(peers[i]->getClientServerToken());
+        NetworkString *ns = getNetworkString(7);
         ns->setSynchronous(true);
         // Item picked : send item id, powerup type and kart race id
         uint8_t powerup = 0;
@@ -136,17 +135,10 @@ void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
 {
     NetworkString *ns = getNetworkString(20);
     ns->setSynchronous(true);
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-
-    // FIXME - TODO THIS APPEARS COMPLETELY BROKEN!!!
-    for (unsigned int i = 0; i < peers.size(); i++)
-    {
-        ns->addUInt32(peers[i]->getClientServerToken())
-          .addUInt8(GE_KART_FINISHED_RACE)
-          .addUInt8(kart->getWorldKartId()).addFloat(time);
-        peers[i]->sendPacket(ns, /*reliable*/true);
-        delete ns;
-    }   // for i in peers
+    ns->addUInt8(GE_KART_FINISHED_RACE).addUInt8(kart->getWorldKartId())
+       .addFloat(time);
+    sendMessageToPeersChangingToken(ns, /*reliable*/true);
+    delete ns;
 }   // kartFinishedRace
 
 // ----------------------------------------------------------------------------

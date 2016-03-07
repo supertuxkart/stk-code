@@ -46,32 +46,6 @@
 
 BEGIN_AS_NAMESPACE
 
-// TODO: 2.30.0: redesign: Improved method for discarding modules (faster clean-up, less abuse of garbage collector)
-//
-// I need to separate the reference counter for internal references and outside references:
-//
-//  - Internal references are for example, when the module refers to a function or object since it is declared in the module, or when
-//    a function refers to another function since it is being called in the code.
-//  - Outside references are for example object instances holding a reference to the object type, or a context currently
-//    executing a function.
-//
-// If no object instances are alive or no contexts are alive it is known that functions from a discarded module
-// can be called, so they can be destroyed without any need to execute the complex garbage collection routines.
-//
-// If there are live objects, the entire module should be kept for safe keeping, though no longer visible.
-//
-// TODO: It may not be necessary to keep track of internal references. Without keeping track of internal references, can I still
-//       handle RemoveFunction and RemoveGlobalVariable correctly?
-//
-// TODO: How to avoid global variables keeping code alive? For example a script object, or a funcdef?
-//       Can I do a quick check of the object types and functions to count number of outside references, and then do another
-//       check over the global variables to subtract the outside references coming from these? What if the outside reference
-//       is added by an application type in a global variable that the engine doesn't know about? Example, a global dictionary 
-//       holding object instances. Should discarding a module immediately destroy the content of the global variables? What if
-//       a live object tries to access the global variable after it has been discarded? Throwing a script exception is acceptable?
-//       Perhaps I need to allow the user to provide a clean-up routine that will be executed before destroying the objects. 
-//       Or I might just put that responsibility on the application.
-
 
 // internal
 asCModule::asCModule(const char *name, asCScriptEngine *engine)
@@ -315,7 +289,7 @@ int asCModule::Build()
 
 	// Don't allow the module to be rebuilt if there are still 
 	// external references that will need the previous code
-	// TODO: 2.30.0: interface: The asIScriptModule must have a method for querying if the module is used
+	// TODO: interface: The asIScriptModule must have a method for querying if the module is used
 	if( HasExternalReferences(false) )
 	{
 		engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, TXT_MODULE_IS_IN_USE);
@@ -944,9 +918,6 @@ int asCModule::GetGlobalVarIndexByName(const char *name) const
 // interface
 int asCModule::RemoveGlobalVar(asUINT index)
 {
-	// TODO: 2.30.0: redesign: Before removing the variable, clear it to free the object
-	//                         The property shouldn't be orphaned.
-
 	asCGlobalProperty *prop = scriptGlobals.Get(index);
 	if( !prop )
 		return asINVALID_ARG;
@@ -1272,6 +1243,33 @@ int asCModule::AddScriptFunction(asCScriptFunction *func)
 	scriptFunctions.PushLast(func);
 	func->AddRefInternal();
 	engine->AddScriptFunction(func);
+
+	// If the function that is being added is an already compiled shared function
+	// then it is necessary to look for anonymous functions that may be declared
+	// within it and add those as well
+	if( func->isShared && func->funcType == asFUNC_SCRIPT )
+	{
+		// Loop through the byte code and check all the 
+		// asBC_FuncPtr instructions for anonymous functions
+		asDWORD *bc = func->scriptData->byteCode.AddressOf();
+		asUINT bcLength = (asUINT)func->scriptData->byteCode.GetLength();
+		for( asUINT n = 0; n < bcLength; )
+		{
+			int c = *(asBYTE*)&bc[n];
+			if( c == asBC_FuncPtr )
+			{
+				asCScriptFunction *f = reinterpret_cast<asCScriptFunction*>(asBC_PTRARG(&bc[n]));
+				// Anonymous functions start with $
+				// There are never two equal anonymous functions so it is not necessary to look for duplicates
+				if( f && f->name[0] == '$' )
+				{
+					AddScriptFunction(f);
+					globalFunctions.Put(f);
+				}
+			}
+			n += asBCTypeSize[asBCInfo[c].type];
+		}
+	}
 
 	return 0;
 }
@@ -1700,16 +1698,6 @@ int asCModule::CompileFunction(const char *sectionName, const char *code, int li
 // interface
 int asCModule::RemoveFunction(asIScriptFunction *func)
 {
-	// TODO: 2.30.0: redesign: Check if there are any references before removing the function
-	//                         if there are, just hide it from the visible but do not destroy or 
-	//                         remove it from the module.
-	//
-	//                         Only if the function has no live references, nor internal references
-	//                         can it be immediately removed, and its internal references released.
-	//
-	//                         Check if any previously hidden functions are without references,
-	//                         if so they should removed too.
-
 	// Find the global function
 	asCScriptFunction *f = static_cast<asCScriptFunction*>(func);
 	int idx = globalFunctions.GetIndex(f);
@@ -1734,6 +1722,7 @@ int asCModule::AddFuncDef(const asCString &name, asSNameSpace *ns)
 
 	func->name      = name;
 	func->nameSpace = ns;
+	func->module    = this;
 
 	funcDefs.PushLast(func);
 

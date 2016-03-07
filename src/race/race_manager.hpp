@@ -45,6 +45,7 @@ static const std::string IDENT_FTL      ("FOLLOW_LEADER"   );
 static const std::string IDENT_STRIKES  ("BATTLE_3_STRIKES");
 static const std::string IDENT_EASTER   ("EASTER_EGG_HUNT" );
 static const std::string IDENT_SOCCER   ("SOCCER"          );
+static const std::string IDENT_GHOST    ("GHOST"           );
 static const std::string IDENT_OVERWORLD("OVERWORLD"       );
 static const std::string IDENT_CUTSCENE ("CUTSCENE"        );
 
@@ -350,6 +351,9 @@ private:
     /** Determines if saved GP should be continued or not*/
     bool m_continue_saved_gp;
 
+    bool m_will_record_race;
+
+    bool m_has_ghost_karts;
 public:
          RaceManager();
         ~RaceManager();
@@ -697,6 +701,26 @@ public:
     {
         return m_kart_last_position_on_overworld;
     }   // getKartLastPositionOnOverworld
+    // ------------------------------------------------------------------------
+    void setRecordRace(bool record)
+    {
+        m_will_record_race = record;
+    }   // setRecordRace
+    // ------------------------------------------------------------------------
+    void setRaceGhostKarts(bool ghost)
+    {
+        m_has_ghost_karts = ghost;
+    }   // setRaceGhostKarts
+    // ------------------------------------------------------------------------
+    bool willRecordRace() const
+    {
+        return m_will_record_race;
+    }   // willRecordRace
+    // ------------------------------------------------------------------------
+    bool hasGhostKarts() const
+    {
+        return m_has_ghost_karts;
+    }   // hasGhostKarts
 
 };   // RaceManager
 

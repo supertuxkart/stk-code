@@ -237,8 +237,8 @@ public:
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
     void          setDefaultSuspension();
-    void          update(float dt, float distance, float steer,
-                         float speed);
+    void          update(float dt, float distance, float steer, float speed,
+                         int gt_replay_index = -1);
     void          finishedRace();
     scene::ISceneNode*
                   attachModel(bool animatedModels, bool always_animated);

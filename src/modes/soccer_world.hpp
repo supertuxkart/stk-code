@@ -50,7 +50,7 @@ protected:
     virtual AbstractKart *createKart(const std::string &kart_ident, int index,
                              int local_player_id, int global_player_id,
                              RaceManager::KartType type,
-                             PerPlayerDifficulty difficulty);
+                             PerPlayerDifficulty difficulty) OVERRIDE;
 
 private:
     /** Keep a pointer to the track object of soccer ball */
@@ -113,27 +113,27 @@ public:
     SoccerWorld();
     virtual ~SoccerWorld();
 
-    virtual void init();
+    virtual void init() OVERRIDE;
 
     // clock events
-    virtual bool isRaceOver();
-    virtual void terminateRace();
+    virtual bool isRaceOver() OVERRIDE;
+    virtual void terminateRace() OVERRIDE;
     virtual void countdownReachedZero() OVERRIDE;
 
     // overriding World methods
-    virtual void reset();
+    virtual void reset() OVERRIDE;
 
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
 
-    virtual bool useFastMusicNearEnd() const { return false; }
+    virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
     virtual void getKartsDisplayInfo(
-                 std::vector<RaceGUIBase::KartIconDisplayInfo> *info) {}
+                 std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE {}
 
-    virtual bool raceHasLaps() { return false; }
+    virtual bool raceHasLaps() OVERRIDE { return false; }
 
-    virtual const std::string& getIdent() const;
+    virtual const std::string& getIdent() const OVERRIDE;
 
-    virtual void update(float dt);
+    virtual void update(float dt) OVERRIDE;
     // ------------------------------------------------------------------------
     void onCheckGoalTriggered(bool first_goal);
     // ------------------------------------------------------------------------
@@ -157,23 +157,23 @@ public:
             m_blue_score_times : m_red_score_times);
     }
     // ------------------------------------------------------------------------
-    const int& getKartNode(unsigned int kart_id) const
+    const int getKartNode(unsigned int kart_id) const
                                           {  return m_kart_on_node[kart_id]; }
     // ------------------------------------------------------------------------
-    const int& getBallNode() const
+    const int getBallNode() const
                                           {  return m_ball_on_node;          }
     // ------------------------------------------------------------------------
     const Vec3& getBallPosition() const
                                           {  return m_ball_position;         }
     // ------------------------------------------------------------------------
-    const int& getGoalNode(SoccerTeam team) const
+    const int getGoalNode(SoccerTeam team) const
     {
         return (team == SOCCER_TEAM_BLUE ? m_blue_goal_node : m_red_goal_node);
     }
     // ------------------------------------------------------------------------
     bool isCorrectGoal(unsigned int kart_id, bool first_goal) const;
     // ------------------------------------------------------------------------
-    const int& getDefender(SoccerTeam team) const
+    const int getDefender(SoccerTeam team) const
     {
         return (team == SOCCER_TEAM_BLUE ? m_blue_defender : m_red_defender);
     }

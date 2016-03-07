@@ -586,6 +586,7 @@
 		#define AS_NO_MEMORY_H
 		#define AS_MIPS
 		#define AS_PSP
+		#define AS_USE_DOUBLE_AS_FLOAT
 	// PSVita
 	#elif defined(__psp2__)
 		#define AS_PSVITA
@@ -799,6 +800,14 @@
 			// As of version 4.7 MinGW changed the ABI, presumably
 			// to be better aligned with how MSVC works
 			#if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7) || __GNUC__ > 4
+				#define AS_MINGW47
+			#endif
+		
+			#if (__clang_major__ == 3 && __clang_minor__ > 4) || __clang_major > 3
+				#define AS_MINGW47
+			#endif
+
+			#ifdef AS_MINGW47
 				#undef  CALLEE_POPS_HIDDEN_RETURN_POINTER
 				#define THISCALL_CALLEE_POPS_ARGUMENTS
 			#else
@@ -845,7 +854,7 @@
 			// STDCALL is not available on 64bit Linux
 			#undef STDCALL
 			#define STDCALL
-		#elif defined(__ARMEL__) || defined(__arm__)
+		#elif (defined(__ARMEL__) || defined(__arm__)) && !(defined(__ARM_ARCH_4__) || defined(__ARM_ARCH_4T__))
 			#define AS_ARM
 
 			// TODO: The stack unwind on exceptions currently fails due to the assembler code in as_callfunc_arm_gcc.S
@@ -884,11 +893,24 @@
 
 		#elif defined(__mips__)
 			#define AS_MIPS
-			#define AS_BIG_ENDIAN
-			#define AS_USE_DOUBLE_AS_FLOAT
+			#undef STDCALL
+			#define STDCALL
 
-			// Native calling conventions for Linux/Mips do not work yet.
-			#define AS_MAX_PORTABILITY
+			#ifdef _ABIO32
+				#define AS_MIPS
+
+				// All structures are returned in memory regardless of size or complexity
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY
+				#define	THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 0
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 0
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 0
+				#undef AS_NO_THISCALL_FUNCTOR_METHOD
+			#else
+				// For other ABIs the native calling convention is not available (yet)
+				#define AS_MAX_PORTABILITY
+			#endif
 		#else
 			#define AS_MAX_PORTABILITY
 		#endif
@@ -936,6 +958,7 @@
 		// Support native calling conventions on MIPS architecture
 		#if (defined(_MIPS_ARCH) || defined(_mips) || defined(__MIPSEL__)) && !defined(__LP64__)
 			#define AS_MIPS
+			#define AS_USE_DOUBLE_AS_FLOAT
 		#else
 			#define AS_MAX_PORTABILITY
 		#endif
@@ -988,6 +1011,9 @@
 		#if (defined(_ARM_) || defined(__arm__))
 			// Android ARM
 
+			// TODO: The stack unwind on exceptions currently fails due to the assembler code in as_callfunc_arm_gcc.S
+			#define AS_NO_EXCEPTIONS
+
 			#undef THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
 			#undef CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
 			#undef STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
@@ -1013,6 +1039,26 @@
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
 			#define AS_X86
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
+		#elif defined(__mips__)
+			#define AS_MIPS
+			#undef STDCALL
+			#define STDCALL
+
+			#ifdef _ABIO32
+				#define AS_MIPS
+
+				// All structures are returned in memory regardless of size or complexity
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY
+				#define	THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 0
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 0
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 0
+				#undef AS_NO_THISCALL_FUNCTOR_METHOD
+			#else
+				// For other ABIs the native calling convention is not available (yet)
+				#define AS_MAX_PORTABILITY
+			#endif
 		#endif
 
 	// Haiku OS
@@ -1047,7 +1093,7 @@
 			// Support native calling conventions on Intel 32bit CPU
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
 			#define AS_X86
-		#elif defined(__LP64__)
+		#elif defined(__x86_64__)
 			#define AS_X64_GCC
 			#define HAS_128_BIT_PRIMITIVES
 			#define SPLIT_OBJS_BY_MEMBER_TYPES
@@ -1110,11 +1156,6 @@
 // X86, Intel, AMD, etc, i.e. most PCs
 #if defined(__i386__) || defined(_M_IX86)
 	// Nothing special here
-#endif
-
-// MIPS architecture (generally PS2 and PSP consoles, potentially supports N64 as well)
-#if defined(_MIPS_ARCH) || defined(_mips) || defined(__MIPSEL__) || defined(__PSP__) || defined(__psp__) || defined(_EE_) || defined(_PSP) || defined(_PS2)
-	#define AS_USE_DOUBLE_AS_FLOAT	// use 32bit floats instead of doubles
 #endif
 
 // PowerPC, e.g. Mac, GameCube, PS3, XBox 360, Wii

@@ -45,7 +45,7 @@ public:
 
     virtual void onEnterPressedInternal() OVERRIDE{ runScript(); }
     void runScript();
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
 };
 
 #endif

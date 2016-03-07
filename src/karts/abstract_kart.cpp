@@ -40,7 +40,14 @@ AbstractKart::AbstractKart(const std::string& ident,
 {
     m_world_kart_id   = world_kart_id;
     m_kart_properties.reset(new KartProperties());
-    m_kart_properties->copyForPlayer(kart_properties_manager->getKart(ident));
+    const KartProperties* kp = kart_properties_manager->getKart(ident);
+    if (kp == NULL)
+    {
+        Log::warn("Abstract_Kart", "Unknown kart %s, fallback to tux",
+            ident.c_str());
+        kp = kart_properties_manager->getKart(std::string("tux"));
+    }
+    m_kart_properties->copyForPlayer(kp);
     m_difficulty = difficulty;
     m_kart_animation  = NULL;
     assert(m_kart_properties);

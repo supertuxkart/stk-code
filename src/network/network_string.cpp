@@ -128,7 +128,7 @@ int BareNetworkString::decodeStringW(int pos, irr::core::stringw *out) const
  *  to stdout or via the Log mechanism. Format
  *   0000 : 1234 5678 9abc  ...    ASCII-
  */
-std::string BareNetworkString::getLogMessage() const
+std::string BareNetworkString::getLogMessage(const std::string &indent) const
 {
     std::ostringstream oss;
     for(unsigned int line=0; line<m_buffer.size(); line+=16)
@@ -154,12 +154,18 @@ std::string BareNetworkString::getLogMessage() const
         for(unsigned int i=line; i<upper_limit; i++)
         {
             uint8_t c = m_buffer[i];
-            if(isprint(c) && c!=0x09)   // Don't print tabs
+            // Don't print tabs, and characters >=128, which are often shown
+            // as more than one character.
+            if(isprint(c) && c!=0x09 && c<=0x80)
                 oss << char(c);
             else
                 oss << '.';
         }   // for i
         oss << "\n";
+        // If it's not the last line, add the indentation in front
+        // of the next line
+        if(line+16<m_buffer.size())
+            oss << indent;
     }   // for line
 
     return oss.str();
