@@ -717,6 +717,11 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
         m_animated_node->setLoopMode(false);
         m_animated_node->setAnimationEndCallback(this);
     }
+    else
+    {
+        // Special animation not found, revert to default
+        m_current_animation = AF_DEFAULT;
+    }
 }   // setAnimation
 
 // ----------------------------------------------------------------------------
