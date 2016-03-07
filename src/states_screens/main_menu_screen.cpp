@@ -74,6 +74,8 @@ bool MainMenuScreen::m_enable_online = false;
 
 MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 {
+    m_online_string = _("Online");
+    m_login_string = _("Login");
 }   // MainMenuScreen
 
 // ----------------------------------------------------------------------------
@@ -167,12 +169,12 @@ void MainMenuScreen::onUpdate(float delta)
     {
         m_user_id->setText(player->getLastOnlineName() + "@stk");
         m_online->setActive(true);
-        m_online->setLabel( _("Online"));
+        m_online->setLabel(m_online_string);
     }
     else if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_OUT)
     {
         m_online->setActive(true);
-        m_online->setLabel( _("Login" ));
+        m_online->setLabel(m_login_string);
         m_user_id->setText(player->getName());
     }
     else
@@ -182,8 +184,8 @@ void MainMenuScreen::onUpdate(float delta)
         m_user_id->setText(player->getName());
     }
 
-    m_online->setLabel(PlayerManager::getCurrentOnlineId() ? _("Online")
-                                                           : _("Login" )  );
+    m_online->setLabel(PlayerManager::getCurrentOnlineId() ? m_online_string
+                                                           : m_login_string);
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
