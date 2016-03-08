@@ -42,9 +42,13 @@ ConnectToPeer::ConnectToPeer(uint32_t peer_id)  : Protocol(PROTOCOL_CONNECTION)
     m_state            = NONE;
     m_current_protocol = NULL;
     m_is_lan           = false;
+    setHandleConnections(true);
 }   // ConnectToPeer(peer_id)
 
 // ----------------------------------------------------------------------------
+/** Constructor for a LAN connection.
+ *  \param address The address to connect to.
+ */
 ConnectToPeer::ConnectToPeer(const TransportAddress &address)
              : Protocol(PROTOCOL_CONNECTION)
 {
@@ -54,6 +58,7 @@ ConnectToPeer::ConnectToPeer(const TransportAddress &address)
     m_state            = RECEIVED_PEER_ADDRESS;
     m_current_protocol = NULL;
     m_is_lan           = true;
+    setHandleConnections(true);
 }   // ConnectToPeers(TransportAddress)
 
 // ----------------------------------------------------------------------------

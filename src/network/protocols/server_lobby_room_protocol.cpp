@@ -44,6 +44,7 @@
  */
 ServerLobbyRoomProtocol::ServerLobbyRoomProtocol() : LobbyRoomProtocol(NULL)
 {
+    setHandleDisconnections(true);
 }   // ServerLobbyRoomProtocol
 
 //-----------------------------------------------------------------------------
@@ -99,9 +100,6 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         }   // switch
            
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
-    else if (event->getType() == EVENT_TYPE_CONNECTED)
-    {
-    } // if (event->getType() == EVENT_TYPE_CONNECTED)
     else if (event->getType() == EVENT_TYPE_DISCONNECTED)
     {
         kartDisconnected(event);

@@ -24,12 +24,12 @@
 #ifndef EVENT_HPP
 #define EVENT_HPP
 
+#include "network/network_string.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/types.hpp"
 
 #include "enet/enet.h"
 
-class NetworkString;
 class STKPeer;
 
 /*!
@@ -67,6 +67,9 @@ private:
     /** Pointer to the peer that triggered that event. */
     STKPeer* m_peer;
 
+    /** Arrivial time of the event, for timeouts. */
+    double m_arrival_time;
+
 public:
          Event(ENetEvent* event);
         ~Event();
@@ -88,6 +91,15 @@ public:
      *  A copy of the message data. This is empty for events like
      *  connection or disconnections. */
     NetworkString& data() { return *m_data; }
+    // ------------------------------------------------------------------------
+    /** Determines if this event should be delivered synchronous or not.
+     *  Only messages can be delivered synchronous. */
+    bool isSynchronous() const { return m_type==EVENT_TYPE_MESSAGE &&
+                                        m_data->isSynchronous();     }
+    // ------------------------------------------------------------------------
+    /** Returns the arrival time of this event. */
+    double getArrivalTime() const { return m_arrival_time; }
+
     // ------------------------------------------------------------------------
 
 };   // class Event

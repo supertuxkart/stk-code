@@ -34,10 +34,12 @@
  */
 Protocol::Protocol(ProtocolType type, CallbackObject* callback_object)
 {
-    m_callback_object = callback_object;
-    m_type            = type;
-    m_state           = PROTOCOL_STATE_INITIALISING;
-    m_id              = 0;
+    m_callback_object       = callback_object;
+    m_type                  = type;
+    m_state                 = PROTOCOL_STATE_INITIALISING;
+    m_id                    = 0;
+    m_handle_connections    = false;
+    m_handle_disconnections = false;
 }   // Protocol
 
 // ----------------------------------------------------------------------------

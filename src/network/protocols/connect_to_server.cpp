@@ -50,6 +50,7 @@ ConnectToServer::ConnectToServer() : Protocol(PROTOCOL_CONNECTION)
     m_host_id    = 0;
     m_quick_join = true;
     m_server_address.clear();
+    setHandleConnections(true);
 }   // ConnectToServer()
 
 // ----------------------------------------------------------------------------
@@ -65,7 +66,7 @@ ConnectToServer::ConnectToServer(uint32_t server_id, uint32_t host_id)
     m_quick_join = false;
     const Server *server = ServersManager::get()->getServerByID(server_id);
     m_server_address.copy(server->getAddress());
-
+    setHandleConnections(true);
 }   // ConnectToServer(server, host)
 
 // ----------------------------------------------------------------------------

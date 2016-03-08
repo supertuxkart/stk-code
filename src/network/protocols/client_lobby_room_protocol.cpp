@@ -40,6 +40,7 @@ ClientLobbyRoomProtocol(const TransportAddress& server_address)
 {
     m_server_address.copy(server_address);
     m_server = NULL;
+    setHandleDisconnections(true);
 }   // ClientLobbyRoomProtocol
 
 //-----------------------------------------------------------------------------
@@ -198,17 +199,13 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
 
         return true;
     } // message
-    else if (event->getType() == EVENT_TYPE_CONNECTED)
-    {
-        return true;
-    } // connection
     else if (event->getType() == EVENT_TYPE_DISCONNECTED) 
     {
         // This means we left essentially.
         // We can't delete STKHost from this thread, since the main
         // thread might still test if STKHost exists and then call
         // the ProtocolManager, which might already have been deleted.
-        // So only signal tha the STKHost should exit, which will be tested
+        // So only signal that STKHost should exit, which will be tested
         // from the main thread.
         STKHost::get()->requestShutdown();
         return true;

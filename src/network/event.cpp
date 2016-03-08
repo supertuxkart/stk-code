@@ -29,6 +29,8 @@
  */
 Event::Event(ENetEvent* event)
 {
+    m_arrival_time = (double)StkTime::getTimeSinceEpoch();
+
     switch (event->type)
     {
     case ENET_EVENT_TYPE_CONNECT:

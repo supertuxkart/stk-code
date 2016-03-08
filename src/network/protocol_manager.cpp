@@ -80,7 +80,7 @@ void ProtocolManager::abort()
 
     m_events_to_process.lock();
     for (unsigned int i = 0; i < m_events_to_process.getData().size() ; i++)
-        delete m_events_to_process.getData()[i].m_event;
+        delete m_events_to_process.getData()[i];
     m_events_to_process.getData().clear();
     m_events_to_process.unlock();
     
@@ -103,77 +103,9 @@ void ProtocolManager::abort()
 void ProtocolManager::propagateEvent(Event* event)
 {
     m_events_to_process.lock();
-
-    // register protocols that will receive this event
-    ProtocolType searched_protocol = PROTOCOL_NONE;
-    if (event->getType() == EVENT_TYPE_MESSAGE)
-    {
-        if (event->data().size() > 0)
-        {
-            searched_protocol = event->data().getProtocolType();
-        }
-        else
-        {
-            Log::warn("ProtocolManager", "Not enough data.");
-        }
-    }
-    else if (event->getType() == EVENT_TYPE_CONNECTED)
-    {
-        searched_protocol = PROTOCOL_CONNECTION;
-    }
-    Log::verbose("ProtocolManager", "Received event for protocols of type %d",
-                  searched_protocol);
-
-
-    std::vector<unsigned int> protocols_ids;
-    m_protocols.lock();
-    for (unsigned int i = 0; i < m_protocols.getData().size() ; i++)
-    {
-        const Protocol *p = m_protocols.getData()[i];
-        // Pass data to protocols even when paused
-        if (p->getProtocolType() == searched_protocol ||
-            event->getType() == EVENT_TYPE_DISCONNECTED)
-        {
-            protocols_ids.push_back(p->getId());
-        }
-    }    // for i in m_protocols
-    m_protocols.unlock();
-
-    // no protocol was aimed, show the msg to debug
-    if (searched_protocol == PROTOCOL_NONE && 
-        event->getType() != EVENT_TYPE_DISCONNECTED)
-    {
-        if(event->getType()==EVENT_TYPE_MESSAGE)
-        {
-            Log::warn("ProtocolManager", "NO PROTOCOL. Message is:");
-            Log::warn("ProtocolManager", event->data().getLogMessage().c_str());
-        }
-        else
-            Log::debug("ProtocolManager", "NO PROTOCOL, no data");
-    }
-
-    if (protocols_ids.size() != 0)
-    {
-        EventProcessingInfo epi;
-        epi.m_arrival_time   = (double)StkTime::getTimeSinceEpoch();
-        // Only message events will optionally be delivered synchronously
-        epi.m_is_synchronous = event->getType()==EVENT_TYPE_MESSAGE &&
-                               event->data().isSynchronous();
-        epi.m_event          = event;
-        epi.m_protocols_ids  = protocols_ids;
-        // Add the event to the queue. After the event is handled
-        // its memory will be freed.
-        m_events_to_process.getData().push_back(epi); 
-    }
-    else
-    {
-        Log::warn("ProtocolManager",
-                  "Received an event for %d that has no destination protocol.",
-                  searched_protocol);
-        // Free the memory for the vent
-        delete event;
-    }
+    m_events_to_process.getData().push_back(event); 
     m_events_to_process.unlock();
+    return;
 }   // propagateEvent
 
 // ----------------------------------------------------------------------------
@@ -339,31 +271,41 @@ void ProtocolManager::terminateProtocol(Protocol *protocol)
 // ----------------------------------------------------------------------------
 /** Sends the event to the corresponding protocol.
  */
-bool ProtocolManager::sendEvent(EventProcessingInfo* event, bool synchronous)
+bool ProtocolManager::sendEvent(Event* event)
 {
-    unsigned int index = 0;
-    while(index < event->m_protocols_ids.size())
+    m_protocols.lock();
+    int count=0;
+    for(unsigned int i=0; i<m_protocols.getData().size(); i++)
     {
-        Protocol *p = getProtocol(event->m_protocols_ids[index]);
-        if(!p) 
+        Protocol *p = m_protocols.getData()[i];
+        bool is_right_protocol = false;
+        switch(event->getType())
         {
-            index++;
-            continue;
-        }
-        bool result = synchronous ? p->notifyEvent(event->m_event)
-                                  : p->notifyEventAsynchronous(event->m_event);
-        if (result)
-        {
-            event->m_protocols_ids.erase(event->m_protocols_ids.begin()+index);
-        }
-        else  // !result
-            index++;
-    }
+        case EVENT_TYPE_MESSAGE:
+            is_right_protocol = event->data().getProtocolType()==p->getProtocolType();
+            break;
+        case EVENT_TYPE_DISCONNECTED:
+            is_right_protocol = p->handleDisconnects();
+            break;
+        case EVENT_TYPE_CONNECTED:
+            is_right_protocol = p->handleConnects(); 
+            break;
+        }   // switch event->getType()
 
-    if (event->m_protocols_ids.size() == 0 || 
-        (StkTime::getTimeSinceEpoch()-event->m_arrival_time) >= TIME_TO_KEEP_EVENTS)
+        if( is_right_protocol)  
+        {
+            count ++;
+            event->isSynchronous() ? p->notifyEvent(event)
+                                   : p->notifyEventAsynchronous(event);
+        }
+    }   // for i in protocols
+
+    m_protocols.unlock();
+
+    if (count>0 || StkTime::getTimeSinceEpoch()-event->getArrivalTime()
+                    >= TIME_TO_KEEP_EVENTS                                  )
     {
-        delete event->m_event;
+        delete event;
         return true;
     }
     return false;
@@ -388,8 +330,8 @@ void ProtocolManager::update()
     for (int i = 0; i < size; i++)
     {
         // Don't handle asynchronous events here.
-        if(!m_events_to_process.getData()[i+offset].m_is_synchronous) continue;
-        bool result = sendEvent(&m_events_to_process.getData()[i+offset], true);
+        if(!m_events_to_process.getData()[i+offset]->isSynchronous()) continue;
+        bool result = sendEvent(m_events_to_process.getData()[i+offset]);
         if (result)
         {
             m_events_to_process.getData()
@@ -427,8 +369,8 @@ void ProtocolManager::asynchronousUpdate()
     for (int i = 0; i < size; i++)
     {
         // Don't handle synchronous events here.
-        if(m_events_to_process.getData()[i+offset].m_is_synchronous) continue;
-        bool result = sendEvent(&m_events_to_process.getData()[i+offset], false);
+        if(m_events_to_process.getData()[i+offset]->isSynchronous()) continue;
+        bool result = sendEvent(m_events_to_process.getData()[i+offset]);
         if (result)
         {
             m_events_to_process.getData()

@@ -105,6 +105,11 @@ protected:
     /** The unique id of the protocol. */
     uint32_t        m_id;
 
+    /** True if this protocol should receive connection events. */
+    bool m_handle_connections;
+
+    /** TRue if this protocol should recceiver disconnection events. */
+    bool m_handle_disconnections;
 public:
              Protocol(ProtocolType type, CallbackObject* callback_object=NULL);
     virtual ~Protocol();
@@ -177,7 +182,18 @@ public:
     /** \brief Method to get a protocol's type.
      *  \return The protocol type. */
     ProtocolType getProtocolType() const { return m_type; }
-
+    // ------------------------------------------------------------------------
+    /** Sets if this protocol should receive connection events. */
+    void setHandleConnections(bool b) { m_handle_connections = b; }
+    // ------------------------------------------------------------------------
+    /** Sets if this protocol should receive disconnection events. */
+    void setHandleDisconnections(bool b) { m_handle_disconnections = b; }
+    // ------------------------------------------------------------------------
+    /** Return true if this protocol should be informed about connects. */
+    virtual bool handleConnects() const { return m_handle_connections; }
+    // ------------------------------------------------------------------------
+    /** Return true if this protocol should be informed about disconnects. */
+    virtual bool handleDisconnects() const { return m_handle_disconnections; }
 
 };   // class Protocol
 
