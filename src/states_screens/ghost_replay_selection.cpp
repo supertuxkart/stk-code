@@ -105,7 +105,7 @@ void GhostReplaySelection::loadList()
         row.push_back(GUIEngine::ListWidget::ListCell
             (rd.m_reverse ? _("Yes") : _("No"), -1, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell
-            (rd.m_difficulty == 3 ? _("Supertux") : rd.m_difficulty == 2 ?
+            (rd.m_difficulty == 3 ? _("SuperTux") : rd.m_difficulty == 2 ?
             _("Expert") : rd.m_difficulty == 1 ?
             _("Intermediate") : _("Novice") , -1, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell
