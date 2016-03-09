@@ -47,7 +47,7 @@ ControllerEventsProtocol::~ControllerEventsProtocol()
 
 bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
 {
-    if(checkDataSize(event, 13)) return true;
+    if(!checkDataSize(event, 13)) return true;
 
     NetworkString &data = event->data();
     float time = data.getFloat(0);
@@ -130,12 +130,13 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     uint8_t serialized_2 = (uint8_t)(controls->m_accel*255.0);
     uint8_t serialized_3 = (uint8_t)(controls->m_steer*127.0);
 
-    NetworkString *ns = getNetworkString(17);
+    NetworkString *ns = getNetworkString(13);
     ns->addFloat(World::getWorld()->getTime());
     ns->addUInt8(controller->getKart()->getWorldKartId());
     ns->addUInt8(serialized_1).addUInt8(serialized_2).addUInt8(serialized_3);
     ns->addUInt8((uint8_t)(action)).addUInt32(value);
+    sendToServer(ns, false); // send message to server
+    delete ns;
 
     Log::info("ControllerEventsProtocol", "Action %d value %d", action, value);
-    sendToServer(ns, false); // send message to server
 }   // controllerAction
