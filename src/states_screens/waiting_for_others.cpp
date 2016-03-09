@@ -67,7 +67,7 @@ void WaitingForOthersScreen::onUpdate(float dt)
     const std::vector<STKPeer*>& peers = STKHost::get()->getPeers();
     RaceConfig* config = STKHost::get()->getGameSetup()->getRaceConfig();
     core::stringw w;
-    for (int i = 0; i < peers.size(); i++)
+    for (unsigned int i = 0; i < peers.size(); i++)
     {
         //race_manager->get
         

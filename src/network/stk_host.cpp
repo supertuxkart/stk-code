@@ -528,9 +528,6 @@ void* STKHost::mainLoop(void* self)
             // Create an STKEvent with the event data. This will also
             // create the peer if it doesn't exist already
             Event* stk_event = new Event(&event);
-            if (stk_event->getType() == EVENT_TYPE_MESSAGE)
-                Network::logPacket(stk_event->data(), true);
-
             Log::verbose("STKHost", "Event of type %d received",
                          (int)(stk_event->getType()));
             STKPeer* peer = stk_event->getPeer();
@@ -543,13 +540,13 @@ void* STKHost::mainLoop(void* self)
             }   // EVENT_TYPE_CONNECTED
             else if (stk_event->getType() == EVENT_TYPE_MESSAGE)
             {
+                Network::logPacket(stk_event->data(), true);
                 TransportAddress stk_addr(peer->getAddress());
                 Log::verbose("NetworkManager",
                              "Message, Sender : %s, message:",
                              stk_addr.toString(/*show port*/false).c_str());
                 Log::verbose("NetworkManager", "%s",
                              stk_event->data().getLogMessage().c_str());
-
             }   // if message event
 
             // notify for the event now.
