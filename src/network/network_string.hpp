@@ -153,6 +153,12 @@ public:
     unsigned int size() const { return (int)m_buffer.size()-m_current_offset; }
 
     // ------------------------------------------------------------------------
+    /** Returns the send size, which is the full length of the buffer. A 
+     *  difference to size() happens if the string to be sent was previously
+     *  read, and has m_current_offset != 0. Even in this case the whole
+     *  string must be sent. */
+    unsigned int getTotalSize() const { return m_buffer.size(); }
+    // ------------------------------------------------------------------------
     // All functions related to adding data to a network string
     /** Add 8 bit unsigned int. */
     BareNetworkString& addUInt8(const uint8_t value)
