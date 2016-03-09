@@ -536,7 +536,7 @@ void ClientLobbyRoomProtocol::startGame(Event* event)
     m_state = PLAYING;
     ProtocolManager::getInstance()
         ->requestStart(new StartGameProtocol(m_setup));
-    Log::error("ClientLobbyRoomProtocol", "Starting new game");
+    Log::info("ClientLobbyRoomProtocol", "Starting new game");
 }   // startGame
 
 //-----------------------------------------------------------------------------
