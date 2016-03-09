@@ -91,7 +91,7 @@ public:
     // ------------------------------------------------------------------------
     /** \brief Get the players that are in the game
     *  \return A vector containing pointers on the players profiles. */
-    const std::vector<NetworkPlayerProfile*>& getPlayers()
+    const std::vector<NetworkPlayerProfile*>& getPlayers() const
     {
         return m_players;
     }   // getPlayers

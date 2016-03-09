@@ -64,16 +64,14 @@ void WaitingForOthersScreen::init()
 
 void WaitingForOthersScreen::onUpdate(float dt)
 {
-    const std::vector<STKPeer*>& peers = STKHost::get()->getPeers();
+    const GameSetup *setup = STKHost::get()->getGameSetup();
+    const std::vector<NetworkPlayerProfile*> &all_profiles = setup->getPlayers();
+
     RaceConfig* config = STKHost::get()->getGameSetup()->getRaceConfig();
     core::stringw w;
-    for (unsigned int i = 0; i < peers.size(); i++)
+    for (unsigned int i = 0; i < all_profiles.size(); i++)
     {
-        //race_manager->get
-        
-        
-        STKPeer* peer = peers[i];
-        NetworkPlayerProfile* profile = peer->getPlayerProfile();
+        const NetworkPlayerProfile* profile = all_profiles[i];
         if (profile == NULL)
             continue;
         core::stringw name = profile->getName();
