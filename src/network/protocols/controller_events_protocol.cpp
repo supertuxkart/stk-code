@@ -68,6 +68,8 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
         uint8_t serialized_1   = data.getUInt8(1);
         PlayerAction action    = (PlayerAction)(data.getUInt8(4));
         int action_value       = data.getUInt32(5);
+        Log::info("ControllerEventsProtocol", "KartID %d action %d value %d",
+                  kart_id, action, action_value);
         Controller *controller = World::getWorld()->getKart(kart_id)
                                                   ->getController();
         KartControl *controls  = controller->getControls();
