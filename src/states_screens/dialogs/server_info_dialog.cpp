@@ -56,10 +56,19 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,
 
     loadFromFile("online/server_info_dialog.stkgui");
 
-    GUIEngine::LabelWidget *name = getWidget<LabelWidget>("name");
+    GUIEngine::LabelWidget *name = getWidget<LabelWidget>("server_name");
     assert(name);
     const Server * server = ServersManager::get()->getServerByID(m_server_id);
     name->setText(server->getName(),false);
+
+    core::stringw difficulty = race_manager->getDifficultyName(server->getDifficulty());
+    GUIEngine::LabelWidget *lbldifficulty = getWidget<LabelWidget>("server_difficulty");
+    lbldifficulty->setText(difficulty, false);
+
+    core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
+    GUIEngine::LabelWidget *gamemode = getWidget<LabelWidget>("server_game_mode");
+    gamemode->setText(mode, false);
+
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
     if (m_from_server_creation)

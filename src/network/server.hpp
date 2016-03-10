@@ -25,6 +25,7 @@
   */
 
 #include "network/transport_address.hpp"
+#include "race/race_manager.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
@@ -78,6 +79,10 @@ protected:
      *  connection using the private port is possible. */
     uint16_t m_private_port;
 
+    RaceManager::MinorRaceModeType m_minor_mode;
+
+    RaceManager::Difficulty m_difficulty;
+
     /** The sort order to be used in the comparison. */
     static SortOrder m_sort_order;
 
@@ -111,6 +116,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of currently connected players. */
     const int getCurrentPlayers() const { return m_current_players; }
+    // ------------------------------------------------------------------------
+    RaceManager::MinorRaceModeType getRaceMinorMode() const { return m_minor_mode; }
+    // ------------------------------------------------------------------------
+    RaceManager::Difficulty getDifficulty() const { return m_difficulty; }
     // ------------------------------------------------------------------------
     /** Compares two servers according to the sort order currently defined.
      *  \param a The addon to compare this addon to.
