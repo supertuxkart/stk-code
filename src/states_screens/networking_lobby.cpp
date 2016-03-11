@@ -77,6 +77,12 @@ void NetworkingLobby::loadedFromFile()
     m_server_name_widget = getWidget<LabelWidget>("server_name");
     assert(m_server_name_widget != NULL);
 
+    m_server_difficulty = getWidget<LabelWidget>("server_difficulty");
+    assert(m_server_difficulty != NULL);
+
+    m_server_game_mode = getWidget<LabelWidget>("server_game_mode");
+    assert(m_server_game_mode != NULL);
+
     m_online_status_widget = getWidget<LabelWidget>("online_status");
     assert(m_online_status_widget != NULL);
 
@@ -108,8 +114,17 @@ void NetworkingLobby::init()
     Screen::init();
     setInitialFocus();
     m_server = ServersManager::get()->getJoinedServer();
-    if(m_server)
+    if (m_server)
+    {
         m_server_name_widget->setText(m_server->getName(), false);
+
+        core::stringw difficulty = race_manager->getDifficultyName(m_server->getDifficulty());
+        m_server_difficulty->setText(difficulty, false);
+
+        core::stringw mode = RaceManager::getNameOf(m_server->getRaceMinorMode());
+        m_server_game_mode->setText(mode, false);
+    }
+
     m_start_button->setVisible(STKHost::get()->isAuthorisedToControl());
 
     // For now create the active player and bind it to the right

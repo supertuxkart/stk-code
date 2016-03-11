@@ -38,6 +38,8 @@ Server::Server(const XMLNode & xml, bool is_lan)
     m_current_players = 0;
     m_max_players = 0;
     m_is_lan = is_lan;
+    m_minor_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
+    m_difficulty = RaceManager::DIFFICULTY_HARD;
 
     xml.get("name", &m_lower_case_name);
     m_name = StringUtils::xmlDecode(m_lower_case_name);
@@ -71,6 +73,9 @@ Server::Server(const core::stringw &name, bool is_lan, int max_players,
     m_address.copy(address);
     // In case of LAN server, public and private port are the same.
     m_private_port       = m_address.getPort();
+    m_minor_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
+    m_difficulty = RaceManager::DIFFICULTY_HARD;
+
 }   // server(name, ...)
 
 // ----------------------------------------------------------------------------

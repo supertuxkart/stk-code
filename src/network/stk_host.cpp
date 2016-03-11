@@ -586,12 +586,14 @@ void STKHost::handleLANRequests()
         // current players, and the client's ip address and port
         // number (which solves the problem which network interface
         // might be the right one if there is more than one).
-        BareNetworkString s(name.size()+1+8);
+        BareNetworkString s(name.size()+1+11);
         s.encodeString(name);
         s.addUInt8(NetworkConfig::get()->getMaxPlayers());
         s.addUInt8(0);   // FIXME: current number of connected players
         s.addUInt32(sender.getIP());
         s.addUInt16(sender.getPort());
+        s.addUInt16((uint16_t)race_manager->getMinorMode());
+        s.addUInt8((uint8_t)race_manager->getDifficulty());
         m_lan_network->sendRawPacket(s, sender);
     }   // if message is server-requested
     else if (command == "connection-request")

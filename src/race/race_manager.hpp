@@ -529,6 +529,21 @@ public:
         }
         return "";
     }   // getDifficultyAsString
+
+    // ------------------------------------------------------------------------
+    /** Returns the specified difficulty as a string. */
+    core::stringw getDifficultyName(Difficulty diff) const
+    {
+        switch (diff)
+        {
+        case RaceManager::DIFFICULTY_EASY:   return _("Novice");   break;
+        case RaceManager::DIFFICULTY_MEDIUM: return _("Intermediate"); break;
+        case RaceManager::DIFFICULTY_HARD:   return _("Expert");   break;
+        case RaceManager::DIFFICULTY_BEST:   return _("SuperTux");   break;
+        default:  assert(false);
+        }
+        return "";
+    }   // getDifficultyName
     // ------------------------------------------------------------------------
     const std::string& getTrackName() const { return m_tracks[m_track_number];}
     // ------------------------------------------------------------------------
