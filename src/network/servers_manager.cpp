@@ -178,10 +178,14 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     uint8_t players     = s.getUInt8(bytes_read+1);
                     uint32_t my_ip      = s.getUInt32(bytes_read+2);
                     uint32_t my_port    = s.getUInt16(bytes_read+6);
-                    ServersManager::get()
-                          ->addServer(new Server(name, /*lan*/true,
-                                                 max_players, players, 
-                                                 sender)               );
+                    uint16_t mode        = s.getUInt16(bytes_read+8);
+                    uint8_t difficulty  = s.getUInt8(bytes_read+10);
+                    Server* server = new Server(name, /*lan*/true,
+                        max_players, players, sender);
+                    server->setDifficulty((RaceManager::Difficulty)difficulty);
+                    server->setRaceMinorMode((RaceManager::MinorRaceModeType)mode);
+                    ServersManager::get()->addServer(server);
+
                     TransportAddress me(my_ip, my_port);
                     NetworkConfig::get()->setMyAddress(me);
                     m_success = true;

@@ -119,7 +119,11 @@ public:
     // ------------------------------------------------------------------------
     RaceManager::MinorRaceModeType getRaceMinorMode() const { return m_minor_mode; }
     // ------------------------------------------------------------------------
+    void setRaceMinorMode(RaceManager::MinorRaceModeType m) { m_minor_mode = m; }
+    // ------------------------------------------------------------------------
     RaceManager::Difficulty getDifficulty() const { return m_difficulty; }
+    // ------------------------------------------------------------------------
+    void setDifficulty(RaceManager::Difficulty d) { m_difficulty = d; }
     // ------------------------------------------------------------------------
     /** Compares two servers according to the sort order currently defined.
      *  \param a The addon to compare this addon to.

@@ -38,10 +38,6 @@ Server::Server(const XMLNode & xml, bool is_lan)
     m_current_players = 0;
     m_max_players = 0;
     m_is_lan = is_lan;
-
-    // TODO: get minor mode and difficulty from network protocol
-    // See STKHost::handleLANRequests
-    // and this is unpacked in ServersManager  operation(
     m_minor_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
     m_difficulty = RaceManager::DIFFICULTY_HARD;
 
@@ -77,10 +73,6 @@ Server::Server(const core::stringw &name, bool is_lan, int max_players,
     m_address.copy(address);
     // In case of LAN server, public and private port are the same.
     m_private_port       = m_address.getPort();
-
-    // TODO: get minor mode and difficulty from network protocol
-    // See STKHost::handleLANRequests
-    // and this is unpacked in ServersManager  operation(
     m_minor_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
     m_difficulty = RaceManager::DIFFICULTY_HARD;
 
