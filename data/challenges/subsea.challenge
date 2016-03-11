@@ -10,10 +10,10 @@
     </hard>
     <medium>
         <karts number="4"/>
-        <requirements time="225"/>
+        <requirements time="258"/>
     </medium>
     <easy>
         <karts number="4"/>
-        <requirements time="290"/>
+        <requirements time="330"/>
     </easy>
 </challenge>
