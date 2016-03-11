@@ -20,6 +20,7 @@
 #include "network/game_setup.hpp"
 #include "network/network_string.hpp"
 #include "network/network_player_profile.hpp"
+#include "network/stk_host.hpp"
 #include "network/transport_address.hpp"
 #include "utils/log.hpp"
 
@@ -31,7 +32,6 @@ STKPeer::STKPeer(ENetPeer *enet_peer)
 {
     m_enet_peer           = enet_peer;
     m_is_authorised       = false;
-    m_player_profile      = NULL;
     m_client_server_token = 0;
     m_host_id             = 0;
     m_token_set           = false;
@@ -42,10 +42,7 @@ STKPeer::STKPeer(ENetPeer *enet_peer)
  */
 STKPeer::~STKPeer()
 {
-    m_enet_peer = NULL;
-    if (m_player_profile)
-        delete m_player_profile;
-    m_player_profile = NULL;
+    m_enet_peer           = NULL;
     m_client_server_token = 0;
 }   // ~STKPeer
 
@@ -125,4 +122,12 @@ bool STKPeer::isSamePeer(const ENetPeer* peer) const
 }   // isSamePeer
 
 //-----------------------------------------------------------------------------
+/** Returns the list of all player profiles connected to this peer. Note that
+ *  this function is somewhat expensive (it loops over all network profiles
+ *  to find the ones with the same host id as this peer.
+ */
+std::vector<NetworkPlayerProfile*> STKPeer::getAllPlayerProfiles()
+{
+    return STKHost::get()->getGameSetup()->getAllPlayersOnHost(getHostId());
+}   // getAllPlayerProfiles
 

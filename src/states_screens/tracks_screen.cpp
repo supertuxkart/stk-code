@@ -25,6 +25,7 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/stk_host.hpp"
@@ -96,7 +97,15 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                                    ->getProtocol(PROTOCOL_LOBBY_ROOM);
                 ClientLobbyRoomProtocol* clrp =
                               static_cast<ClientLobbyRoomProtocol*>(protocol);
-                clrp->voteTrack(selection);
+                // FIXME SPLITSCREEN: we need to supply the global player id of the 
+                // player selecting the track here. For now ... just vote the same
+                // track for each local player.
+                std::vector<NetworkPlayerProfile*> players =
+                                         STKHost::get()->getMyPlayerProfiles();
+                for(unsigned int i=0; i<players.size(); i++)
+                {
+                    clrp->voteTrack(players[i]->getGlobalPlayerId(),selection);
+                }
                 WaitingForOthersScreen::getInstance()->push();
             }
             else

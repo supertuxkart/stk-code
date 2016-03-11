@@ -28,7 +28,7 @@ private:
     bool m_in_race;
 
     // connection management
-    void kartDisconnected(Event* event);
+    void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
     // kart selection
     void kartSelectionRequested(Event* event);

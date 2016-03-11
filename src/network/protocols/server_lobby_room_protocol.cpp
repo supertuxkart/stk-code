@@ -102,7 +102,7 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
     else if (event->getType() == EVENT_TYPE_DISCONNECTED)
     {
-        kartDisconnected(event);
+        clientDisconnected(event);
     } // if (event->getType() == EVENT_TYPE_DISCONNECTED)
     return true;
 }   // notifyEventAsynchronous
@@ -381,27 +381,31 @@ void ServerLobbyRoomProtocol::checkRaceFinished()
 }   // checkRaceFinished
 
 //-----------------------------------------------------------------------------
-
-void ServerLobbyRoomProtocol::kartDisconnected(Event* event)
+/** Called when a client disconnects.
+ *  \param event The disconnect event.
+ */
+void ServerLobbyRoomProtocol::clientDisconnected(Event* event)
 {
-    STKPeer* peer = event->getPeer();
-    if (peer->getPlayerProfile() != NULL) // others knew him
+    std::vector<NetworkPlayerProfile*> players_on_host = 
+                                      event->getPeer()->getAllPlayerProfiles();
+
+    NetworkString *msg = getNetworkString(2);
+    msg->addUInt8(LE_PLAYER_DISCONNECTED);
+
+    for(unsigned int i=0; i<players_on_host.size(); i++)
     {
-        NetworkString *msg = getNetworkString(2);
-        msg->addUInt8(LE_PLAYER_DISCONNECTED)
-           .addUInt8(peer->getPlayerProfile()->getGlobalPlayerId());
-        sendMessageToPeersChangingToken(msg, /*reliable*/true);
-        delete msg;
+        msg->addUInt8(players_on_host[i]->getGlobalPlayerId());
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
-                  peer->getPlayerProfile()->getGlobalPlayerId());
-        m_setup->removePlayer(peer->getPlayerProfile());
-        // Remove the profile from the peer (to avoid double free)
-        peer->setPlayerProfile(NULL);
-        STKHost::get()->removePeer(peer);
+                  players_on_host[i]->getGlobalPlayerId());
+        m_setup->removePlayer(players_on_host[i]);
     }
-    else
-        Log::info("ServerLobbyRoomProtocol", "The DC peer wasn't registered.");
-}   // kartDisconnected
+
+    sendMessageToPeersChangingToken(msg, /*reliable*/true);
+    // Remove the profile from the peer (to avoid double free)
+    STKHost::get()->removePeer(event->getPeer());
+    delete msg;
+    
+}   // clientDisconnected
 
 //-----------------------------------------------------------------------------
 
@@ -476,6 +480,8 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
                                 (token_generator.get(RAND_MAX) & 0xff));
 
     peer->setClientServerToken(token);
+    peer->setAuthorised(is_authorised);
+    peer->setHostId(new_host_id);
 
     const std::vector<NetworkPlayerProfile*> &players = m_setup->getPlayers();
     // send a message to the one that asked to connect
@@ -495,12 +501,9 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     peer->sendPacket(message_ack);
     delete message_ack;
 
-    NetworkPlayerProfile* profile = new NetworkPlayerProfile(new_player_id, name);
-    profile->setHostId(new_host_id);
+    NetworkPlayerProfile* profile = 
+        new NetworkPlayerProfile(name, new_player_id, new_host_id);
     m_setup->addPlayer(profile);
-    peer->setPlayerProfile(profile);
-    peer->setAuthorised(is_authorised);
-    peer->setHostId(new_host_id);
 
     Log::verbose("ServerLobbyRoomProtocol", "New player.");
 
@@ -512,11 +515,11 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0                    1
- *       ----------------------------------
- *  Size |          1         |     N     |
- *  Data | N (kart name size) | kart name |
- *       ----------------------------------
+ *  Byte 0          1                      2            
+ *       ----------------------------------------------
+ *  Size |    1     |           1         |     N     |
+ *  Data |player id |  N (kart name size) | kart name |
+ *       ----------------------------------------------
  */
 void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
 {
@@ -532,8 +535,9 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     const NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
 
+    uint8_t player_id = data[0];
     std::string kart_name;
-    data.decodeString(0, &kart_name);
+    data.decodeString(1, &kart_name);
     // check if selection is possible
     if (!m_selection_enabled)
     {
@@ -570,7 +574,6 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     // This message must be handled synchronously on the client.
     answer->setSynchronous(true);
     // kart update (3), 1, race id
-    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
     answer->addUInt8(LE_KART_SELECTION_UPDATE).addUInt8(player_id)
           .encodeString(kart_name);
     sendMessageToPeersChangingToken(answer);
@@ -584,20 +587,19 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0                 1
- *       -------------------
- *  Size |        4        |
- *  Data | major mode vote |
- *       -------------------
+ *  Byte 0           1
+ *       -------------------------------
+ *  Size |      1    |       4         |
+ *  Data | player-id | major mode vote |
+ *       -------------------------------
  */
 void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
 {
-    if (!checkDataSize(event, 1)) return;
+    if (!checkDataSize(event, 5)) return;
 
     NetworkString &data = event->data();
-    STKPeer* peer = event->getPeer();
-    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
-    uint32_t major = data.getUInt32(0);
+    uint8_t player_id   = data.getUInt8(0);
+    uint32_t major      = data.getUInt32(1);
     m_setup->getRaceConfig()->setPlayerMajorVote(player_id, major);
     // Send the vote to everybody (including the sender)
     NetworkString *other = getNetworkString(6);
@@ -607,24 +609,22 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
 }   // playerMajorVote
 
 //-----------------------------------------------------------------------------
-
-/*! \brief Called when a player votes for the number of races in a GP.
+/** \brief Called when a player votes for the number of races in a GP.
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0             1
- *       ---------------
- *  Size |      1      |
- *  Data | races count |
- *       ---------------
+ *  Byte 0           1
+ *       ---------------------------
+ *  Size |      1    |       4     |
+ *  Data | player-id | races count |
+ *       ---------------------------
  */
 void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
     NetworkString &data = event->data();
-    STKPeer* peer = event->getPeer();
-    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
-    uint8_t race_count = data[0];
+    uint8_t player_id   = data.getUInt8(0);
+    uint8_t race_count  = data.getUInt8(1);
     m_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, race_count);
     // Send the vote to everybody (including the sender)
     NetworkString *other = getNetworkString(3);
@@ -640,19 +640,18 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0                 1
- *       -------------------
- *  Size |        4        |
- *  Data | minor mode vote |
- *       -------------------
+ *  Byte 0           1
+ *       -------------------------------
+ *  Size |      1    |         4       |
+ *  Data | player-id | minor mode vote |
+ *       -------------------------------
  */
 void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
     NetworkString &data = event->data();
-    STKPeer* peer = event->getPeer();
-    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
-    uint32_t minor = data.getUInt32(0);
+    uint8_t player_id   = data.getUInt8(0);
+    uint32_t minor      = data.getUInt32(1);
     m_setup->getRaceConfig()->setPlayerMinorVote(player_id, minor);
 
     // Send the vote to everybody (including the sender)
@@ -668,23 +667,22 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0                   1   2
- *       --------------------------------------
- *  Size |        1          | 1 |      N     |
- *  Data | track number (gp) | N | track name |
- *       --------------------------------------
+ *  Byte 0           1                    2  3
+ *       --------------------------------------------------
+ *  Size |     1     |        1          | 1 |      N     |
+ *  Data | player id | track number (gp) | N | track name |
+ *       --------------------------------------------------
  */
 void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
 {
-    if (!checkDataSize(event, 2)) return;
-    NetworkString &data = event->data();
-    STKPeer* peer = event->getPeer();
-    // As which track this track should be used, e.g. 1st track: Santrack
+    if (!checkDataSize(event, 3)) return;
+    NetworkString &data  = event->data();
+    uint8_t player_id    = data.getUInt8(0);
+    // As which track this track should be used, e.g. 1st track: Sandtrack
     // 2nd track Mathclass, ...
-    uint8_t track_number = data[0];
+    uint8_t track_number = data.getUInt8(1);
     std::string track_name;
-    int N = data.decodeString(1, &track_name);
-    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
+    int N = data.decodeString(2, &track_name);
     m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
                                                  track_number);
     // Send the vote to everybody (including the sender)
@@ -698,26 +696,24 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
 }   // playerTrackVote
 
 //-----------------------------------------------------------------------------
-
 /*! \brief Called when a player votes for the reverse mode of a race
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0          1
- *       --------------------------------
- *  Size |     1    |       1           |
- *  Data | reversed | track number (gp) |
- *       --------------------------------
+ *  Byte 0           1          2
+ *       --------------------------------------------
+ *  Size |     1     |     1    |       1           |
+ *  Data | player id | reversed | track number (gp) |
+ *       --------------------------------------------
  */
 void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
 {
-    if (!checkDataSize(event, 2)) return;
+    if (!checkDataSize(event, 3)) return;
 
     NetworkString &data = event->data();
-    STKPeer* peer = event->getPeer();
-    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
-    uint8_t reverse  = data[0];
-    uint8_t nb_track = data[1];
+    uint8_t player_id   = data.getUInt8(0);
+    uint8_t reverse     = data.getUInt8(1);
+    uint8_t nb_track    = data.getUInt8(2);
     m_setup->getRaceConfig()->setPlayerReversedVote(player_id,
                                                     reverse!=0, nb_track);
     // Send the vote to everybody (including the sender)
@@ -729,25 +725,23 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
 }   // playerReversedVote
 
 //-----------------------------------------------------------------------------
-
 /*! \brief Called when a player votes for a major race mode.
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0      1 
- *       ----------------------------
- *  Size |   1  |       1           |
- *  Data | laps | track number (gp) |
- *       ----------------------------
+ *  Byte 0           1      2 
+ *       ----------------------------------------
+ *  Size |     1     |   1  |       1           |
+ *  Data | player id | laps | track number (gp) |
+ *       ----------------------------------------
  */
 void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
 {
     if (!checkDataSize(event, 2)) return;
     NetworkString &data = event->data();
-    STKPeer* peer = event->getPeer();
-    uint8_t player_id = peer->getPlayerProfile()->getGlobalPlayerId();
-    uint8_t lap_count = data[0];
-    uint8_t track_nb  = data[1];
+    uint8_t player_id   = data.getUInt8(0);
+    uint8_t lap_count   = data.getUInt8(1);
+    uint8_t track_nb    = data.getUInt8(2);
     m_setup->getRaceConfig()->setPlayerLapsVote(player_id, lap_count,
                                                 track_nb);
     NetworkString *other = getNetworkString(4);

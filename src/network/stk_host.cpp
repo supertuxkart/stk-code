@@ -624,6 +624,12 @@ bool STKHost::peerExists(const TransportAddress& peer)
 }   // peerExists
 
 // ----------------------------------------------------------------------------
+std::vector<NetworkPlayerProfile*> STKHost::getMyPlayerProfiles()
+{
+    return m_game_setup->getAllPlayersOnHost(m_host_id);
+}   // getMyPlayerProfiles
+
+// ----------------------------------------------------------------------------
 /** Returns the STK peer belonging to the given enet_peer. If no STKPeer
  *  exists, create a new STKPeer.
  *  \param enet_peer The EnetPeer.

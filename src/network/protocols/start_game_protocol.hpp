@@ -21,7 +21,7 @@ private:
     STATE m_state;
 
     /** Keeps the state for all clients. */
-    std::map<NetworkPlayerProfile*, STATE> m_player_states;
+    std::map<uint8_t, STATE> m_player_states;
 
     /** Stores a handy pointer to the game setup structure. */
     GameSetup* m_game_setup;
@@ -31,6 +31,8 @@ private:
     int m_ready_count;
 
     bool m_ready;
+
+    void startRace();
 
 public:
              StartGameProtocol(GameSetup* game_setup);
