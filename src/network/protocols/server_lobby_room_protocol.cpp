@@ -82,8 +82,7 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         NetworkString &data = event->data();
         assert(data.size()); // message not empty
         uint8_t message_type;
-        message_type = data[0];
-        data.removeFront(1);
+        message_type = data.getUInt8();
         Log::info("ServerLobbyRoomProtocol", "Message received with type %d.",
                   message_type);
         switch(message_type)
@@ -443,10 +442,10 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // Connection accepted.
     // ====================
     std::string name_u8;
-    int len = data.decodeString(0, &name_u8);
+    int len = data.decodeString(&name_u8);
     core::stringw name = StringUtils::utf8ToWide(name_u8);
     std::string password;
-    data.decodeString(len, &password);
+    data.decodeString(&password);
     bool is_authorised = (password==NetworkConfig::get()->getPassword());
 
     // Get the unique global ID for this player.
@@ -535,9 +534,9 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
     const NetworkString &data = event->data();
     STKPeer* peer = event->getPeer();
 
-    uint8_t player_id = data[0];
+    uint8_t player_id = data.getUInt8();
     std::string kart_name;
-    data.decodeString(1, &kart_name);
+    data.decodeString(&kart_name);
     // check if selection is possible
     if (!m_selection_enabled)
     {
@@ -598,8 +597,8 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
     if (!checkDataSize(event, 5)) return;
 
     NetworkString &data = event->data();
-    uint8_t player_id   = data.getUInt8(0);
-    uint32_t major      = data.getUInt32(1);
+    uint8_t player_id   = data.getUInt8();
+    uint32_t major      = data.getUInt32();
     m_setup->getRaceConfig()->setPlayerMajorVote(player_id, major);
     // Send the vote to everybody (including the sender)
     NetworkString *other = getNetworkString(6);
@@ -623,8 +622,8 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
     NetworkString &data = event->data();
-    uint8_t player_id   = data.getUInt8(0);
-    uint8_t race_count  = data.getUInt8(1);
+    uint8_t player_id   = data.getUInt8();
+    uint8_t race_count  = data.getUInt8();
     m_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, race_count);
     // Send the vote to everybody (including the sender)
     NetworkString *other = getNetworkString(3);
@@ -650,8 +649,8 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
     NetworkString &data = event->data();
-    uint8_t player_id   = data.getUInt8(0);
-    uint32_t minor      = data.getUInt32(1);
+    uint8_t player_id   = data.getUInt8();
+    uint32_t minor      = data.getUInt32();
     m_setup->getRaceConfig()->setPlayerMinorVote(player_id, minor);
 
     // Send the vote to everybody (including the sender)
@@ -677,12 +676,12 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
 {
     if (!checkDataSize(event, 3)) return;
     NetworkString &data  = event->data();
-    uint8_t player_id    = data.getUInt8(0);
+    uint8_t player_id    = data.getUInt8();
     // As which track this track should be used, e.g. 1st track: Sandtrack
     // 2nd track Mathclass, ...
-    uint8_t track_number = data.getUInt8(1);
+    uint8_t track_number = data.getUInt8();
     std::string track_name;
-    int N = data.decodeString(2, &track_name);
+    int N = data.decodeString(&track_name);
     m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
                                                  track_number);
     // Send the vote to everybody (including the sender)
@@ -711,9 +710,9 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
     if (!checkDataSize(event, 3)) return;
 
     NetworkString &data = event->data();
-    uint8_t player_id   = data.getUInt8(0);
-    uint8_t reverse     = data.getUInt8(1);
-    uint8_t nb_track    = data.getUInt8(2);
+    uint8_t player_id   = data.getUInt8();
+    uint8_t reverse     = data.getUInt8();
+    uint8_t nb_track    = data.getUInt8();
     m_setup->getRaceConfig()->setPlayerReversedVote(player_id,
                                                     reverse!=0, nb_track);
     // Send the vote to everybody (including the sender)
@@ -739,9 +738,9 @@ void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
 {
     if (!checkDataSize(event, 2)) return;
     NetworkString &data = event->data();
-    uint8_t player_id   = data.getUInt8(0);
-    uint8_t lap_count   = data.getUInt8(1);
-    uint8_t track_nb    = data.getUInt8(2);
+    uint8_t player_id   = data.getUInt8();
+    uint8_t lap_count   = data.getUInt8();
+    uint8_t track_nb    = data.getUInt8();
     m_setup->getRaceConfig()->setPlayerLapsVote(player_id, lap_count,
                                                 track_nb);
     NetworkString *other = getNetworkString(4);

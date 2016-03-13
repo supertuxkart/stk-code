@@ -387,7 +387,7 @@ void ConnectToServer::handleSameLAN()
 
     BareNetworkString message(buffer, len);
     std::string received;
-    message.decodeString(0, &received);
+    message.decodeString(&received);
     host->startListening(); // start listening again
     std::string aloha("aloha_stk");
     if (received==aloha)

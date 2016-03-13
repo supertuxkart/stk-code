@@ -192,12 +192,11 @@ bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
     {
         NetworkString &data = event->data();
         assert(data.size()); // assert that data isn't empty
-        uint8_t message_type = data[0];
+        uint8_t message_type = data.getUInt8();
         if (message_type != LE_KART_SELECTION_UPDATE &&
             message_type != LE_RACE_FINISHED            )
             return false; // don't treat the event
 
-        data.removeFront(1);
         Log::info("ClientLobbyRoomProtocol", "Synchronous message of type %d",
                   message_type);
         if (message_type == LE_KART_SELECTION_UPDATE) // kart selection update
@@ -219,9 +218,8 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
     {
         NetworkString &data = event->data();
         assert(data.size()); // assert that data isn't empty
-        uint8_t message_type = data[0];
+        uint8_t message_type = data.getUInt8();
 
-        data.removeFront(1);
         Log::info("ClientLobbyRoomProtocol", "Asynchronous message of type %d",
                   message_type);
         switch(message_type)
@@ -341,10 +339,10 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
     if (!checkDataSize(event, 2)) return;
     const NetworkString &data = event->data();
 
-    uint8_t player_id = data[0];
-    uint8_t host_id   = data[1];
+    uint8_t player_id = data.getUInt8();
+    uint8_t host_id   = data.getUInt8();
     core::stringw name;
-    data.decodeStringW(2, &name);
+    data.decodeStringW(&name);
     // FIXME need adjusting when splitscreen is used/
     if(STKHost::get()->getGameSetup()->isLocalMaster(player_id))
     {
@@ -386,7 +384,8 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
     NetworkString &data = event->data();
     while(data.size()>0)
     {
-        const NetworkPlayerProfile *profile = m_setup->getProfile(data[0]);
+        const NetworkPlayerProfile *profile = 
+                        m_setup->getProfile(data.getUInt8());
         if (m_setup->removePlayer(profile))
         {
             Log::info("ClientLobbyRoomProtocol",
@@ -398,7 +397,6 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
             Log::error("ClientLobbyRoomProtocol",
                        "The disconnected peer wasn't known.");
         }
-        data.removeFront(1);
     }   // while
 
     STKHost::get()->removePeer(event->getPeer());
@@ -435,10 +433,9 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         name = PlayerManager::getCurrentOnlineUserName();
     else
         name = PlayerManager::getCurrentPlayer()->getName();
-    uint8_t my_player_id = data[0];
-    uint8_t my_host_id   = data[1];
-    uint8_t authorised   = data[2];
-    data.removeFront(3);
+    uint8_t my_player_id = data.getUInt8();
+    uint8_t my_host_id   = data.getUInt8();
+    uint8_t authorised   = data.getUInt8();
     // Store this client's authorisation status in the peer information
     // for the server.
     event->getPeer()->setAuthorised(authorised!=0);
@@ -456,10 +453,10 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     // ===============
     while (data.size() > 0)
     {
-        uint8_t player_id = data[0];
-        uint8_t host_id   = data[1];
+        uint8_t player_id = data.getUInt8();
+        uint8_t host_id   = data.getUInt8();
         irr::core::stringw name;
-        int bytes_read = data.decodeStringW(2, &name);
+        int bytes_read = data.decodeStringW(&name);
         
         NetworkPlayerProfile* profile2 =
             new NetworkPlayerProfile(name, player_id, host_id);
@@ -467,7 +464,6 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         // Inform the network lobby of all players so that the GUI can
         // show all currently connected players.
         NetworkingLobby::getInstance()->addPlayer(profile2);
-        data.removeFront(bytes_read+2);
     }
 
     // Add self after other players so that player order is identical
@@ -495,7 +491,7 @@ void ClientLobbyRoomProtocol::connectionRefused(Event* event)
     if (!checkDataSize(event, 1)) return;
     const NetworkString &data = event->data();
     
-    switch (data[0]) // the second byte
+    switch (data.getUInt8()) // the second byte
     {
     case 0:
         Log::info("ClientLobbyRoomProtocol",
@@ -531,7 +527,7 @@ void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
 
     const NetworkString &data = event->data();
 
-    switch (data[0]) // the error code
+    switch (data.getUInt8()) // the error code
     {
     case 0:
         Log::info("ClientLobbyRoomProtocol",
@@ -563,9 +559,9 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
 {
     if(!checkDataSize(event, 3)) return;
     const NetworkString &data = event->data();
-    uint8_t player_id = data[0];
+    uint8_t player_id = data.getUInt8();
     std::string kart_name;
-    data.decodeString(1, &kart_name);
+    data.decodeString(&kart_name);
     if (!m_setup->isKartAvailable(kart_name))
     {
         Log::error("ClientLobbyRoomProtocol",
@@ -655,11 +651,10 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
     int position = 1;
     while(data.size()>0)
     {
-        uint8_t kart_id = data[0];
+        uint8_t kart_id = data.getUInt8();
         ranked_world->setKartPosition(kart_id,position);
         Log::info("ClientLobbyRoomProtocol", "Kart %d has finished #%d",
                   kart_id, position);
-        data.removeFront(1);
         position++;
     }
     ranked_world->endSetKartPositions();
@@ -684,7 +679,9 @@ void ClientLobbyRoomProtocol::playerMajorVote(Event* event)
     const NetworkString &data = event->data();
     if (!checkDataSize(event, 2))
         return;
-    m_setup->getRaceConfig()->setPlayerMajorVote(data[0], data[1]);
+    uint8_t player_id = data.getUInt8();
+    uint8_t mode      = data.getUInt8();
+    m_setup->getRaceConfig()->setPlayerMajorVote(player_id, mode);
 }   // playerMajorVote
 
 //-----------------------------------------------------------------------------
@@ -702,7 +699,9 @@ void ClientLobbyRoomProtocol::playerRaceCountVote(Event* event)
 {
     if (!checkDataSize(event, 2)) return;
     const NetworkString &data = event->data();
-    m_setup->getRaceConfig()->setPlayerRaceCountVote(data[0], data[1]);
+    uint8_t player_id = data.getUInt8();
+    uint8_t count     = data.getUInt8();
+    m_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, count);
 }   // playerRaceCountVote
 
 //-----------------------------------------------------------------------------
@@ -720,7 +719,9 @@ void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
 {
     if (!checkDataSize(event, 2)) return;
     const NetworkString &data = event->data();
-    m_setup->getRaceConfig()->setPlayerMinorVote(data[0], data[1]);
+    uint8_t player_id = data.getUInt8();
+    uint8_t minor     = data.getUInt8();
+    m_setup->getRaceConfig()->setPlayerMinorVote(player_id, minor);
 }   // playerMinorVote
 
 //-----------------------------------------------------------------------------
@@ -740,9 +741,11 @@ void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
     if (!checkDataSize(event, 3)) return;
     const NetworkString &data = event->data();
     std::string track_name;
-    int N = data.decodeString(2, &track_name);
-    m_setup->getRaceConfig()->setPlayerTrackVote(data[0], track_name,
-                                                 data[1]);
+    uint8_t player_id = data.getUInt8();
+    uint8_t number    = data.getUInt8();
+    int N = data.decodeString(&track_name);
+    m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
+                                                 number);
 }   // playerTrackVote
 
 //-----------------------------------------------------------------------------
@@ -761,8 +764,11 @@ void ClientLobbyRoomProtocol::playerReversedVote(Event* event)
 {
     if (!checkDataSize(event, 3)) return;
     const NetworkString &data = event->data();
-    m_setup->getRaceConfig()->setPlayerReversedVote(data[0], data[1]!=0,
-                                                    data[2]);
+    uint8_t player_id = data.getUInt8();
+    uint8_t reversed  = data.getUInt8();
+    uint8_t number    = data.getUInt8();
+    m_setup->getRaceConfig()->setPlayerReversedVote(player_id, reversed!=0,
+                                                    number);
 }   // playerReversedVote
 
 //-----------------------------------------------------------------------------
@@ -781,7 +787,10 @@ void ClientLobbyRoomProtocol::playerLapsVote(Event* event)
 {
     if (!checkDataSize(event, 3)) return;
     const NetworkString &data = event->data();
-    m_setup->getRaceConfig()->setPlayerLapsVote(data[0], data[1], data[2]);
+    uint8_t player_id = data.getUInt8();
+    uint8_t laps      = data.getUInt8();
+    uint8_t number    = data.getUInt8();
+    m_setup->getRaceConfig()->setPlayerLapsVote(player_id, laps, number);
 }   // playerLapsVote
 
 //-----------------------------------------------------------------------------

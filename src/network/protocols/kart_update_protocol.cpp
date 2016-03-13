@@ -44,15 +44,14 @@ bool KartUpdateProtocol::notifyEvent(Event* event)
         Log::info("KartUpdateProtocol", "Message too short.");
         return true;
     }
-    ns.removeFront(4);
+    float time = ns.getFloat();
     while(ns.size() >= 29)
     {
-        uint8_t kart_id = ns.getUInt8(0);
-        Vec3 xyz = ns.getVec3(1);
-        btQuaternion quat = ns.getQuat(13);
+        uint8_t kart_id             = ns.getUInt8();
+        Vec3 xyz                    = ns.getVec3();
+        btQuaternion quat           = ns.getQuat();
         m_next_positions  [kart_id] = xyz;
         m_next_quaternions[kart_id] = quat;
-        ns.removeFront(29);
     }   // while ns.size()>29
 
     // Set the flag that a new update was received

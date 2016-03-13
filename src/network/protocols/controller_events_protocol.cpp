@@ -50,9 +50,8 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
     if(!checkDataSize(event, 13)) return true;
 
     NetworkString &data = event->data();
-    float time = data.getFloat(0);
+    float time = data.getFloat();
 
-    data.removeFront(4);   // remove time
     uint8_t client_index = -1;
     while (data.size() >= 9)
     {
@@ -62,12 +61,11 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
         {
             Log::warn("ControllerEventProtocol", "No valid kart id (%s).",
                       kart_id);
-            data.removeFront(9);
             continue;
         }
-        uint8_t serialized_1   = data.getUInt8(1);
-        PlayerAction action    = (PlayerAction)(data.getUInt8(4));
-        int action_value       = data.getUInt32(5);
+        uint8_t serialized_1   = data.getUInt8();
+        PlayerAction action    = (PlayerAction)(data.getUInt8());
+        int action_value       = data.getUInt32();
         Log::info("ControllerEventsProtocol", "KartID %d action %d value %d",
                   kart_id, action, action_value);
         Controller *controller = World::getWorld()->getKart(kart_id)
@@ -81,7 +79,6 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
         controls->m_skid       = KartControl::SkidControl(serialized_1 & 0x03);
 
         controller->action(action, action_value);
-        data.removeFront(9);
     }
     if (data.size() > 0 )
     {

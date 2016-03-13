@@ -45,8 +45,8 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
     if(!checkDataSize(event, 5)) return true;
 
     const NetworkString &data = event->data();
-    uint32_t request  = data.getUInt8(0);
-    uint32_t sequence = data.getUInt32(1);
+    uint32_t request  = data.getUInt8();
+    uint32_t sequence = data.getUInt32();
 
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     assert(peers.size() > 0);
@@ -77,9 +77,9 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
                      sequence, StkTime::getRealTime());
 
         // countdown time in the message
-        if (data.size() == 9)
+        if (data.size() == 4)
         {
-            uint32_t time_to_start = data.getUInt32(5);
+            uint32_t time_to_start = data.getUInt32();
             Log::debug("SynchronizationProtocol",
                        "Request to start game in %d.", time_to_start);
             if (!m_countdown_activated)

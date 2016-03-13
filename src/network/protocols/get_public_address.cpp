@@ -144,23 +144,22 @@ std::string GetPublicAddress::parseStunResponse()
 
     // check that the stun response is a response, contains the magic cookie
     // and the transaction ID
-    if (datas.getUInt16(0) != 0x0101)
+    if (datas.getUInt16() != 0x0101)
         return "STUN response doesn't contain the magic cookie";
-
-    if (datas.getUInt32(4) != m_stun_magic_cookie)
+    int message_size = datas.getUInt16();
+    if (datas.getUInt32() != m_stun_magic_cookie)
     {
         return "STUN response doesn't contain the magic cookie";
     }
 
     for (int i = 0; i < 12; i++)
     {
-        if (datas.getUInt8(i+8) != m_stun_tansaction_id[i])
+        if (datas.getUInt8() != m_stun_tansaction_id[i])
             return "STUN response doesn't contain the transaction ID";
     }
 
     Log::debug("GetPublicAddress",
                "The STUN server responded with a valid answer");
-    int message_size = datas.getUInt16(2);
 
     // The stun message is valid, so we parse it now:
     if (message_size == 0)
@@ -173,14 +172,16 @@ std::string GetPublicAddress::parseStunResponse()
     int pos = 20;
     while (true)
     {
-        int type = datas.getUInt16(pos);
-        int size = datas.getUInt16(pos+2);
+        int type = datas.getUInt16();
+        int size = datas.getUInt16();
         if (type == 0 || type == 1)
         {
             assert(size == 8);
-            assert(datas.getUInt8(pos+5) == 0x01); // Family IPv4 only
-            TransportAddress address(datas.getUInt32(pos + 8), 
-                                     datas.getUInt16(pos + 6));
+            datas.getUInt8();    // skip 1 byte
+            assert(datas.getUInt8() == 0x01); // Family IPv4 only
+            uint16_t port = datas.getUInt16();
+            uint32_t ip   = datas.getUInt32();
+            TransportAddress address(ip, port);
             // finished parsing, we know our public transport address
             Log::debug("GetPublicAddress", 
                        "The public address has been found: %s",
@@ -188,7 +189,7 @@ std::string GetPublicAddress::parseStunResponse()
             NetworkConfig::get()->setMyAddress(address);
             break;
         }   // type = 0 or 1
-        pos +=  4 + size;
+        datas.skip(4 + size);
         message_size -= 4 + size;
         if (message_size == 0)
             return "STUN response is invalid.";
