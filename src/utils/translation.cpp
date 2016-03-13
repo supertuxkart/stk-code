@@ -176,19 +176,50 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 {
     m_dictionary_manager.add_directory(
                         file_manager->getAsset(FileManager::TRANSLATION,""));
-                        
+
     if (g_language_list.size() == 0)
     {
         std::set<Language> languages = m_dictionary_manager.get_languages();      
-        
+
         // English is always there but won't be found on file system
         g_language_list.push_back("en");
-    
+
         std::set<Language>::iterator it;
         for (it = languages.begin(); it != languages.end(); it++)
         {
             g_language_list.push_back((*it).str());
         }
+    }
+
+    const std::string file_name = file_manager->getAsset("localized_name.txt");
+    try
+    {
+        std::unique_ptr<std::istream> in(new std::ifstream(file_name.c_str()));
+        if (!in.get())
+        {
+            Log::error("translation", "error: failure opening: '%s'.",
+                file_name.c_str());
+        }
+        else
+        {
+            for (std::string line; std::getline(*in, line); )
+            {
+                std::size_t pos = line.find("=");
+                std::string name = line.substr(0, pos);
+                std::string localized_name = line.substr(pos + 1);
+                if (localized_name == "0")
+                {
+                    localized_name =
+                        tinygettext::Language::from_name(name).get_name();
+                }
+                m_localized_name[name] = localized_name;
+            }
+        }
+    }
+    catch(std::exception& e)
+    {
+        Log::error("translation", "error: failure extract localized name.");
+        Log::error("translation", "%s", e.what());
     }
 
     // LC_ALL does not work, sscanf will then not always be able
@@ -603,4 +634,12 @@ core::stringw Translations::fribidizeLine(const core::stringw &str)
 #else
     return core::stringw(str);
 #endif // ENABLE_BIDI
+
+}
+
+const std::string& Translations::getLocalizedName(const std::string& str) const
+{
+    std::map<std::string, std::string>::const_iterator n = m_localized_name.find(str);
+    assert (n != m_localized_name.end());
+    return n->second;
 }
