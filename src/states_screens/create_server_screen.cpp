@@ -220,6 +220,10 @@ void CreateServerScreen::createServer()
     else
         race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
 
+    core::stringw password_w = getWidget<TextBoxWidget>("password")->getText();
+    std::string password(core::stringc(password_w.c_str()).c_str());
+    NetworkConfig::get()->setPassword(password);
+
     race_manager->setReverseTrack(false);
     STKHost::create();
 
