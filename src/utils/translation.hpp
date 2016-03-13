@@ -53,6 +53,8 @@ private:
     std::map<const irr::core::stringw, const irr::core::stringw> m_fribidized_strings;
     bool m_rtl;
 
+    std::map<std::string, std::string> m_localized_name;
+
     std::string m_current_language_name;
     std::string m_current_language_name_code;
 
@@ -80,6 +82,8 @@ public:
     std::string              getCurrentLanguageName();
 
     std::string              getCurrentLanguageNameCode();
+
+    const std::string&       getLocalizedName(const std::string& str) const;
 
 private:
     irr::core::stringw fribidizeLine(const irr::core::stringw &str);
