@@ -41,6 +41,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
+#include "network/network_config.hpp"
 #include "physics/btKart.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -283,6 +284,13 @@ void World::reset()
     {
         Log::info("World", "Start Recording race.");
         ReplayRecorder::get()->init();
+    }
+    if(NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics())
+    {
+        // In case that the server is running with gui, create a camera and
+        // attach it to the first kart.
+        Camera::createCamera(World::getWorld()->getKart(0));
+
     }
 
     // Reset all data structures that depend on number of karts.
