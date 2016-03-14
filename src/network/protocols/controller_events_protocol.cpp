@@ -55,7 +55,6 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
     uint8_t client_index = -1;
     while (data.size() >= 9)
     {
-        //uint8_t controller_index = ns.gui8();
         uint8_t kart_id = data.getUInt8();
         if (kart_id >=World::getWorld()->getNumKarts())
         {
@@ -64,6 +63,8 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
             continue;
         }
         uint8_t serialized_1   = data.getUInt8();
+        uint8_t serialized_2   = data.getUInt8();
+        uint8_t serialized_3   = data.getUInt8();
         PlayerAction action    = (PlayerAction)(data.getUInt8());
         int action_value       = data.getUInt32();
         Log::info("ControllerEventsProtocol", "KartID %d action %d value %d",
