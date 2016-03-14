@@ -64,7 +64,7 @@ protected:
     *  should be left as signed, otherwise certain arithmetic (e.g.
     *  1-m_current_offset in checkToken() will be done unsigned).
     */
-    int m_current_offset;
+    mutable int m_current_offset;
 
     // ------------------------------------------------------------------------
     /** Returns a part of the network string as a std::string. This is an
@@ -72,10 +72,12 @@ protected:
     *  \param pos First position to be in the string.
     *  \param len Number of bytes to copy.
     */
-    std::string getString(int pos, int len) const 
+    std::string getString(int len) const
     {
-        return std::string(m_buffer.begin() + (m_current_offset+pos      ),
-            m_buffer.begin() + (m_current_offset+pos + len) ); 
+        std::string a(m_buffer.begin() + (m_current_offset      ),
+                      m_buffer.begin() + (m_current_offset + len));
+        m_current_offset += len;
+        return a;
     }   // getString
     // ------------------------------------------------------------------------
     /** Adds a std::string. Internal use only. */
@@ -89,11 +91,12 @@ protected:
     // ------------------------------------------------------------------------
     /** Template to get n bytes from a buffer into a single data type. */
     template<typename T, size_t n>
-    T get(int pos) const
+    T get() const
     {
         int a = n;
         T result = 0;
-        int offset = m_current_offset + pos + n -1;
+        m_current_offset += n;
+        int offset = m_current_offset -1;
         while (a--)
         {
             result <<= 8; // offset one byte
@@ -105,9 +108,9 @@ protected:
     // ------------------------------------------------------------------------
     /** Another function for n == 1 to surpress warnings in clang. */
     template<typename T>
-    T get(int pos) const
+    T get() const
     {
-        return m_buffer[pos];
+        return m_buffer[m_current_offset++];
     }   // get
 
 public:
@@ -137,8 +140,8 @@ public:
     // ------------------------------------------------------------------------
     BareNetworkString& encodeString(const std::string &value);
     BareNetworkString& encodeString(const irr::core::stringw &value);
-    int decodeString(int n, std::string *out) const;
-    int decodeStringW(int n, irr::core::stringw *out) const;
+    int decodeString(std::string *out) const;
+    int decodeStringW(irr::core::stringw *out) const;
     std::string getLogMessage(const std::string &indent="") const;
     // ------------------------------------------------------------------------
     /** Returns a byte pointer to the content of the network string. */
@@ -152,6 +155,14 @@ public:
     /** Returns the remaining length of the network string. */
     unsigned int size() const { return (int)m_buffer.size()-m_current_offset; }
 
+    // ------------------------------------------------------------------------
+    /** Skips the specified number of bytes when reading. */
+    void skip(int n)
+    {
+        m_current_offset += n;
+        assert(m_current_offset >=0 &&
+               m_current_offset < (int)m_buffer.size());
+    }   // skip
     // ------------------------------------------------------------------------
     /** Returns the send size, which is the full length of the buffer. A 
      *  difference to size() happens if the string to be sent was previously
@@ -230,39 +241,23 @@ public:
 
     // Functions related to getting data from a network string
     // ------------------------------------------------------------------------
-    /** Ignore the next num_bytes from the message. */
-    void removeFront(unsigned int num_bytes)
-    {
-        assert(m_current_offset + num_bytes <= m_buffer.size());
-        m_current_offset += num_bytes;
-    }   // removeFront
-
-    // ------------------------------------------------------------------------
-    /** Gets the byte at the specified position (taking current offset into
-    *  account). */
-    uint8_t operator[](const int pos) const
-    {
-        return m_buffer[m_current_offset + pos];
-    }   // operator[]
-
-    // ------------------------------------------------------------------------
     /** Returns a unsigned 32 bit integer. */
-    inline uint32_t getUInt32(int pos = 0) const { return get<uint32_t, 4>(pos); }
+    inline uint32_t getUInt32() const { return get<uint32_t, 4>(); }
     // ------------------------------------------------------------------------
     /** Returns an unsigned 16 bit integer. */
-    inline uint16_t getUInt16(int pos=0) const { return get<uint16_t, 2>(pos); }
+    inline uint16_t getUInt16() const { return get<uint16_t, 2>(); }
     // ------------------------------------------------------------------------
     /** Returns an unsigned 8-bit integer. */
-    inline uint8_t getUInt8(int pos = 0)  const
+    inline uint8_t getUInt8() const
     {
-        return m_buffer[m_current_offset + pos];
+        return m_buffer[m_current_offset++];
     }   // getUInt8
 
     // ------------------------------------------------------------------------
     /** Gets a 4 byte floating point value. */
-    float getFloat(int pos=0) const
+    float getFloat() const
     {
-        uint32_t u = getUInt32(pos);
+        uint32_t u = getUInt32();
         float f;
         // Doig a "return *(float*)&u;" appears to be more efficient,
         // but it can create incorrect code on higher optimisation: c++
@@ -282,17 +277,25 @@ public:
 
     // ------------------------------------------------------------------------
     /** Gets a Vec3. */
-    Vec3 getVec3(int pos=0) const
+    Vec3 getVec3() const
     {
-        return Vec3(getFloat(pos), getFloat(pos+4), getFloat(pos+8));
+        Vec3 r;
+        r.setX(getFloat());
+        r.setY(getFloat());
+        r.setZ(getFloat());
+        return r;
     }   // getVec3
 
     // ------------------------------------------------------------------------
-    /** Gets a Vec3. */
-    btQuaternion getQuat(int pos=0) const
+    /** Gets a bullet quaternion. */
+    btQuaternion getQuat() const
     {
-        return btQuaternion(getFloat(pos),   getFloat(pos+ 4),
-            getFloat(pos+8), getFloat(pos+12) );
+        btQuaternion q;
+        q.setX(getFloat());
+        q.setY(getFloat());
+        q.setZ(getFloat());
+        q.setW(getFloat());
+        return q;
     }   // getQuat
     // ------------------------------------------------------------------------
 
@@ -333,7 +336,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Constructor for a received message. It automatically ignored the first
-     *  5 bytes which contain the type and token. Those will be access using
+     *  5 bytes which contain the type and token. Those will be accessed using
      *  special functions. */
     NetworkString(const uint8_t *data, int len) 
         : BareNetworkString((char*)data, len)
@@ -385,9 +388,13 @@ public:
      *  specified token. */
     uint32_t getToken() const 
     {
-        // Since m_current_offset might be set, we need to make sure
-        // to really access bytes 1-4
-        return getUInt32(1-m_current_offset);
+        // We need to reset the current position to 1 so that we can use the
+        // existing read 4 byte integer function to get the token.
+        int save_pos = m_current_offset;
+        m_current_offset = 1;
+        uint32_t token   = getUInt32();
+        m_current_offset = save_pos;
+        return token;
     }   // getToken
 
 };   // class NetworkString

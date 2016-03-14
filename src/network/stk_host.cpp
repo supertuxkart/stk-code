@@ -572,7 +572,7 @@ void STKHost::handleLANRequests()
     if(len<=0) return;
     BareNetworkString message(buffer, len);
     std::string command;
-    message.decodeString(0, &command);
+    message.decodeString(&command);
     if (command == "stk-server")
     {
         Log::verbose("STKHost", "Received LAN server query");

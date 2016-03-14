@@ -126,8 +126,8 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
     if(!checkDataSize(event, 1)) return true;
 
     const NetworkString &data = event->data();
-    uint8_t player_id = data.getUInt8(0);
-    uint8_t ready     = data.getUInt8(1);
+    uint8_t player_id = data.getUInt8();
+    uint8_t ready     = data.getUInt8();
     if (NetworkConfig::get()->isServer() && ready) // on server, player is ready
     {
         Log::info("StartGameProtocol", "One of the players is ready.");

@@ -173,13 +173,13 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     BareNetworkString s(buffer, len);
                     irr::core::stringw name;
                     // bytes_read is the number of bytes read
-                    uint8_t bytes_read  = s.decodeStringW(0, &name);
-                    uint8_t max_players = s.getUInt8(bytes_read  );
-                    uint8_t players     = s.getUInt8(bytes_read+1);
-                    uint32_t my_ip      = s.getUInt32(bytes_read+2);
-                    uint32_t my_port    = s.getUInt16(bytes_read+6);
-                    uint16_t mode        = s.getUInt16(bytes_read+8);
-                    uint8_t difficulty  = s.getUInt8(bytes_read+10);
+                    uint8_t bytes_read  = s.decodeStringW(&name);
+                    uint8_t max_players = s.getUInt8();
+                    uint8_t players     = s.getUInt8();
+                    uint32_t my_ip      = s.getUInt32();
+                    uint16_t my_port    = s.getUInt16();
+                    uint16_t mode       = s.getUInt16();
+                    uint8_t difficulty  = s.getUInt8();
                     Server* server = new Server(name, /*lan*/true,
                         max_players, players, sender);
                     server->setDifficulty((RaceManager::Difficulty)difficulty);

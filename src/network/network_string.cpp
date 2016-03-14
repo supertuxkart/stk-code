@@ -46,11 +46,9 @@ void NetworkString::unitTesting()
     // Append some values from the message
     s.addUInt16(12345);
     s.addFloat(1.2345f);
-    // Ignore message type and token
-    s.removeFront(5);
 
-    assert(s.getUInt16(0) == 12345);
-    float f = s.getFloat(2);
+    assert(s.getUInt16() == 12345);
+    float f = s.getFloat();
     assert(f==1.2345f);
 
     // Check modifying a token in an already assembled message
@@ -98,27 +96,26 @@ BareNetworkString& BareNetworkString::encodeString(const irr::core::stringw &val
  *  \param[out] out The decoded string.
  *  \return number of bytes read = 1+length of string
  */
-int BareNetworkString::decodeString(int pos, std::string *out) const
+int BareNetworkString::decodeString(std::string *out) const
 {
-    uint8_t len = get<uint8_t>(m_current_offset+pos);
-    *out = getString(pos+1, len);
+    uint8_t len = get<uint8_t>();
+    *out = getString(len);
     return len+1;
 }    // decodeString
 
 // ----------------------------------------------------------------------------
 /** Returns an irrlicht wide string from the utf8 encoded string at the 
  *  given position.
- *  \param[in] pos Buffer position where the encoded string starts.
  *  \param[out] out The decoded string.
  *  \return number of bytes read. If there are no special characters in the
  *          string that will be 1+length of string, but multi-byte encoded
  *          characters can mean that the length of the returned string is
  *          less than the number of bytes read.
  */
-int BareNetworkString::decodeStringW(int pos, irr::core::stringw *out) const
+int BareNetworkString::decodeStringW(irr::core::stringw *out) const
 {
     std::string s;
-    int len = decodeString(pos, &s);
+    int len = decodeString(&s);
     *out = StringUtils::utf8ToWide(s);
     return len;
 }   // decodeString 

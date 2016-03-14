@@ -49,8 +49,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         Log::warn("GameEventsProtocol", "Bad token.");
         return true;
     }
-    int8_t type = data.getUInt8(4);
-    data.removeFront(5);
+    int8_t type = data.getUInt8();
     switch (type)
     {
         case GE_ITEM_COLLECTED:
@@ -115,8 +114,8 @@ void GameEventsProtocol::collectedItem(const NetworkString &data)
             Log::warn("GameEventsProtocol", "Too short message.");
         }
         uint32_t item_id = data.getUInt32();
-        uint8_t powerup_type = data.getUInt8(4);
-        uint8_t kart_id = data.getUInt8(5);
+        uint8_t powerup_type = data.getUInt8();
+        uint8_t kart_id = data.getUInt8();
         // now set the kart powerup
         AbstractKart* kart = World::getWorld()->getKart(kart_id);
         ItemManager::get()->collectedItem(ItemManager::get()->getItem(item_id),
@@ -148,8 +147,8 @@ void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
  */
 void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
 {
-    uint8_t kart_id = ns.getUInt8(0);
-    float time      = ns.getFloat(1);
+    uint8_t kart_id = ns.getUInt8();
+    float time      = ns.getFloat();
     World::getWorld()->getKart(kart_id)->finishedRace(time,
                                                       /*from_server*/true);
 }   // kartFinishedRace
