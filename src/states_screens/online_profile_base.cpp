@@ -81,6 +81,15 @@ void OnlineProfileBase::loadedFromFile()
 void OnlineProfileBase::beforeAddingWidget()
 {
     m_visiting_profile = ProfileManager::get()->getVisitingProfile();
+}   // beforeAddingWidget
+
+// -----------------------------------------------------------------------------
+/** Called when entering this menu (before widgets are added).
+ */
+void OnlineProfileBase::init()
+{
+    Screen::init();
+
     if (m_profile_tabs)
     {
         if (!m_visiting_profile || !m_visiting_profile->isCurrentUser())
@@ -95,14 +104,6 @@ void OnlineProfileBase::beforeAddingWidget()
             m_profile_tabs->setVisible(false);
         }
     }   // if m_profile_tabhs
-}   // beforeAddingWidget
-
-// -----------------------------------------------------------------------------
-/** Called when entering this menu (before widgets are added).
- */
-void OnlineProfileBase::init()
-{
-    Screen::init();
 
     if (m_profile_tabs)
     {
