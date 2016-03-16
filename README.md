@@ -41,8 +41,6 @@ this has been done (check with the forum for details).
 ### Mac OS X
 The latest information about compilation on Mac are on our wiki:
 <http://supertuxkart.sourceforge.net/Building_and_packaging_on_OSX>
-The Xcode project file is in `/src/ide/Xcode/`, but it still 
-requires that all dependencies are installed as explained on the wiki.
 
 ### UNIX
 See [`INSTALL.md`](INSTALL.md) for details.
