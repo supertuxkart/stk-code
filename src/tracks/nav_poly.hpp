@@ -45,11 +45,11 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the center point of a polygon. */
-    const Vec3&        getCenter() const   {return m_center;}
+    const Vec3&        getCenter() const                 { return m_center; }
 
     // ------------------------------------------------------------------------
     /** Returns the adjacent polygons of a polygon. */
-    const std::vector<int>&     getAdjacents() const {return m_adjacents;}
+    const std::vector<int>&     getAdjacents() const  { return m_adjacents; }
 
     // ------------------------------------------------------------------------
     /** Returns the vertices(Vec3) of this polygon. */
@@ -57,13 +57,17 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the indices of the vertices of this polygon */
-    const std::vector<int>      getVerticesIndex() const {return m_vertices;}
-
+    const std::vector<int>      getVerticesIndex() const
+                                                       { return m_vertices; }
     // ------------------------------------------------------------------------
     /** Returns true if a given point lies in this polygon. */
     bool                        pointInPoly(const Vec3& p,
                                             bool ignore_vertical) const;
-
+    // ------------------------------------------------------------------------
+    /** Returns true if this polygon lies near the edge. */
+    bool                        isPolyNearEdge() const
+                                           { return m_adjacents.size() < 4; }
+    // ------------------------------------------------------------------------
     const Vec3&                 operator[](int i) const ;
 
 }; // class NavPoly
