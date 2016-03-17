@@ -67,9 +67,9 @@ void TrackInfoScreen::loadedFromFile()
 {
     m_lap_spinner     = getWidget<SpinnerWidget>("lap-spinner");
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
-    m_reverse         = getWidget<CheckBoxWidget>("reverse");
+    m_option          = getWidget<CheckBoxWidget>("option");
     m_record_race     = getWidget<CheckBoxWidget>("record");
-    m_reverse->setState(false);
+    m_option->setState(false);
     m_record_race->setState(false);
 
     m_highscore_label = getWidget<LabelWidget>("highscores");
@@ -198,18 +198,31 @@ void TrackInfoScreen::init()
     else
         race_manager->setNumKarts(local_players);
 
-    // Reverse track
+    // Reverse track or random item in arena
     // -------------
     const bool reverse_available = m_track->reverseAvailable() &&
                race_manager->getMinorMode() != RaceManager::MINOR_MODE_EASTER_EGG;
-    m_reverse->setVisible(reverse_available);
-    getWidget<LabelWidget>("reverse-text")->setVisible(reverse_available);
+    const bool random_item = m_track->hasNavMesh();
+
+    m_option->setVisible(reverse_available || random_item);
+    getWidget<LabelWidget>("option-text")->setVisible(reverse_available || random_item);
     if (reverse_available)
     {
-        m_reverse->setState(race_manager->getReverseTrack());
+        //I18N: In the track info screen
+        getWidget<LabelWidget>("option-text")->setText(_("Drive in reverse"), false);
+    }
+    else if (random_item)
+    {
+        //I18N: In the track info screen
+        getWidget<LabelWidget>("option-text")->setText(_("Random item location"), false);
+    }
+
+    if (reverse_available)
+    {
+        m_option->setState(race_manager->getReverseTrack());
     }
     else
-        m_reverse->setState(false);
+        m_option->setState(false);
 
     // Record race or not
     // -------------
@@ -312,12 +325,16 @@ void TrackInfoScreen::onEnterPressedInternal()
     // not be accessible after dismiss:
     const int num_laps = race_manager->modeHasLaps() ? m_lap_spinner->getValue()
                                                      : -1;
-    const bool reverse_track = m_reverse == NULL ? false
-                                                 : m_reverse->getState();
+    const bool option_state = m_option == NULL ? false
+                                               : m_option->getState();
     // Avoid negative lap numbers (after e.g. easter egg mode).
     if(num_laps>=0)
         m_track->setActualNumberOfLaps(num_laps);
-    race_manager->setReverseTrack(reverse_track);
+
+    if(m_track->hasNavMesh())
+        UserConfigParams::m_random_arena_item = option_state;
+    else
+        race_manager->setReverseTrack(option_state);
 
     // Avoid invaild Ai karts number during switching game modes
     const int max_arena_players = m_track->getMaxArenaPlayers();
@@ -361,12 +378,19 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     {
         StateManager::get()->escapePressed();
     }
-    else if (name == "reverse")
+    else if (name == "option")
     {
-        race_manager->setReverseTrack(m_reverse->getState());
-        // Makes sure the highscores get swapped when clicking the 'reverse'
-        // checkbox.
-        updateHighScores();
+        if (m_track->hasNavMesh())
+        {
+            UserConfigParams::m_random_arena_item = m_option->getState();
+        }
+        else
+        {
+            race_manager->setReverseTrack(m_option->getState());
+            // Makes sure the highscores get swapped when clicking the 'reverse'
+            // checkbox.
+            updateHighScores();
+        }
     }
     else if (name == "record")
     {

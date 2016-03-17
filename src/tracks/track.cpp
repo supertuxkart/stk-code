@@ -1862,10 +1862,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     createPhysicsModel(main_track_count);
 
-    const bool arena_random_item = (m_has_navmesh && ItemManager::get()
-        ->randomItemsForArena(m_start_transforms,5,2,2,1));
+    const bool arena_random_item_created =
+        ItemManager::get()->randomItemsForArena(m_start_transforms);
 
-    if (!arena_random_item)
+    if (!arena_random_item_created)
     {
         for (unsigned int i=0; i<root->getNumNodes(); i++)
         {
@@ -1882,7 +1882,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     delete root;
 
-    if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh && !arena_random_item)
+    if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh && !arena_random_item_created)
         BattleGraph::get()->findItemsOnGraphNodes();
 
     if (UserConfigParams::m_track_debug &&

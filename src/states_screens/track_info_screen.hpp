@@ -52,8 +52,8 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
 
-    /** Check box for reverse mode. */
-    GUIEngine::CheckBoxWidget* m_reverse;
+    /** Check box for reverse mode or random item in arena. */
+    GUIEngine::CheckBoxWidget* m_option;
 
     /** Check box for record race. */
     GUIEngine::CheckBoxWidget* m_record_race;

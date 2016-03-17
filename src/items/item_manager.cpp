@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -476,18 +477,13 @@ void ItemManager::switchItems()
 }   // switchItems
 
 //-----------------------------------------------------------------------------
-bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos,
-                                      unsigned int bonus, unsigned int big_nitro,
-                                      unsigned int small_nitro, unsigned int banana)
+bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
 {
+    if (!UserConfigParams::m_random_arena_item) return false;
     if (!BattleGraph::get()) return false;
-
-    if (bonus == 0 && big_nitro == 0 && small_nitro == 0 && banana == 0)
-        return false;
 
     std::vector<int> used_location;
     std::vector<int> invalid_location;
-    std::vector<int> final_location;
     for (unsigned int i = 0; i < pos.size(); i++)
     {
         // Load all starting positions of arena, so no items will be near them
@@ -498,21 +494,25 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos,
         invalid_location.push_back(node);
     }
 
-    const unsigned int total_item = bonus + big_nitro + small_nitro + banana;
-    for (unsigned int i = 0; i < total_item; i++)
+    RandomGenerator random;
+    const unsigned int MIN_DIST = sqrt(BattleGraph::get()->getNumNodes());
+    const unsigned int TOTAL_ITEM = MIN_DIST / 2;
+
+    Log::info("[ItemManager]","Creating %d random items for arena", TOTAL_ITEM);
+    for (unsigned int i = 0; i < TOTAL_ITEM; i++)
     {
         int chosen_node = -1;
         const unsigned int total_node = BattleGraph::get()->getNumNodes();
         while(true)
         {
-            if (final_location.size() + invalid_location.size() == total_node)
+            if (used_location.size() - pos.size() +
+                invalid_location.size() == total_node)
             {
                 Log::warn("[ItemManager]","Can't place more random items! "
                     "Use default item location.");
                 return false;
             }
 
-            RandomGenerator random;
             const int node = random.get(total_node);
 
             // Check if tried
@@ -535,7 +535,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos,
                 Vec3 d = BattleGraph::get()
                     ->getPolyOfNode(used_location[j]).getCenter() -
                     BattleGraph::get()->getPolyOfNode(node).getCenter();
-                found = d.length_2d() > 20.0f;
+                found = d.length_2d() > MIN_DIST;
             }
             if (found)
             {
@@ -549,20 +549,28 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos,
 
         assert(chosen_node != -1);
         used_location.push_back(chosen_node);
-        final_location.push_back(chosen_node);
     }
 
-    assert (final_location.size() == total_item);
-    for (unsigned int i = 0; i < total_item; i++)
+    for (unsigned int i = 0; i < pos.size(); i++)
+        used_location.erase(used_location.begin());
+
+    assert (used_location.size() == TOTAL_ITEM);
+
+    // Hard-coded ratio for now
+    const int BONUS_BOX = 4;
+    const int NITRO_BIG = 2;
+    const int NITRO_SMALL = 1;
+
+    for (unsigned int i = 0; i < TOTAL_ITEM; i++)
     {
-        Item::ItemType type = (i < bonus ? Item::ITEM_BONUS_BOX :
-            i < bonus + big_nitro ? Item::ITEM_NITRO_BIG :
-            i < bonus + big_nitro + small_nitro ? Item::ITEM_NITRO_SMALL :
-            Item::ITEM_BANANA);
+        const int j = random.get(10);
+        Item::ItemType type = (j > BONUS_BOX ? Item::ITEM_BONUS_BOX :
+            j > NITRO_BIG ? Item::ITEM_NITRO_BIG :
+            j > NITRO_SMALL ? Item::ITEM_NITRO_SMALL : Item::ITEM_BANANA);
         Vec3 loc = BattleGraph::get()
-            ->getPolyOfNode(final_location[i]).getCenter();
+            ->getPolyOfNode(used_location[i]).getCenter();
         Item* item = newItem(type, loc, Vec3(0, 1, 0));
-        BattleGraph::get()->insertItems(item, final_location[i]);
+        BattleGraph::get()->insertItems(item, used_location[i]);
     }
 
     return true;
