@@ -138,6 +138,7 @@ public:
     void requestPause();
     void requestUnpause();
     void requestTerminate();
+    void findAndTerminateProtocol(ProtocolType type);
 
     // ------------------------------------------------------------------------
     /** \brief Called when the protocol is paused (by an other entity or by

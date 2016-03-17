@@ -33,6 +33,7 @@
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
+#include "states_screens/race_result_gui.hpp"
 #include "utils/log.hpp"
 #include "utils/random_generator.hpp"
 #include "utils/time.hpp"
@@ -67,7 +68,6 @@ void ServerLobbyRoomProtocol::setup()
     m_state             = NetworkConfig::get()->isLAN() ? ACCEPTING_CLIENTS 
                                                         : NONE;
     m_selection_enabled = false;
-    m_in_race           = false;
     m_current_protocol  = NULL;
     Log::info("ServerLobbyRoomProtocol", "Starting the protocol.");
 }   // setup
@@ -96,6 +96,7 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         case LE_VOTE_TRACK: playerTrackVote(event);               break;
         case LE_VOTE_REVERSE: playerReversedVote(event);          break;
         case LE_VOTE_LAPS:  playerLapsVote(event);                break;
+        case LE_RACE_FINISHED_ACK: playerFinishedResult(event);   break;
         }   // switch
            
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -142,16 +143,38 @@ void ServerLobbyRoomProtocol::update()
         // Only poll the STK server if this is a WAN server.
         if(NetworkConfig::get()->isWAN())
             checkIncomingConnectionRequests();
-        if (m_in_race && World::getWorld() &&
+        break;
+    }
+    case SELECTING:
+        break;   // Nothing to do, this is event based
+    case RACING:
+        if (World::getWorld() &&
             RaceEventManager::getInstance<RaceEventManager>()->isRunning())
         {
             checkRaceFinished();
         }
-
         break;
-    }
-    case SELECTING_KARTS:
-        break;   // Nothing to do, this is event based
+    case RESULT_DISPLAY:
+        if(StkTime::getRealTime() > m_timeout)
+        {
+            // Send a notification to all clients to exit 
+            // the race result screen
+            NetworkString *exit_result_screen = getNetworkString(1);
+            exit_result_screen->setSynchronous(true);
+            exit_result_screen->addUInt8(LE_EXIT_RESULT);
+            sendMessageToPeersChangingToken(exit_result_screen,
+                                            /*reliable*/true);
+            delete exit_result_screen;
+            m_state = ACCEPTING_CLIENTS;
+            RaceResultGUI::getInstance()->backToLobby();
+            // notify the network world that it is stopped
+            RaceEventManager::getInstance()->stop();
+            // stop race protocols
+            findAndTerminateProtocol(PROTOCOL_CONTROLLER_EVENTS);
+            findAndTerminateProtocol(PROTOCOL_KART_UPDATE);
+            findAndTerminateProtocol(PROTOCOL_GAME_EVENTS);
+        }
+        break;
     case DONE:
         m_state = EXITING;
         requestTerminate();
@@ -227,7 +250,7 @@ void ServerLobbyRoomProtocol::startGame()
     delete ns;
     Protocol *p = new StartGameProtocol(m_setup);
     p->requestStart();
-    m_in_race = true;
+    m_state = RACING;
 }   // startGame
 
 //-----------------------------------------------------------------------------
@@ -252,7 +275,7 @@ void ServerLobbyRoomProtocol::startSelection(const Event *event)
 
     m_selection_enabled = true;
 
-    m_state = SELECTING_KARTS;
+    m_state = SELECTING;
 }   // startSelection
 
 //-----------------------------------------------------------------------------
@@ -304,79 +327,55 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
 }   // checkIncomingConnectionRequests
 
 //-----------------------------------------------------------------------------
-
-void ServerLobbyRoomProtocol::checkRaceFinished()
+/** Checks if the race is finished, and if so informs the clients and switches
+ *  to state RESULT_DISPLAY, during which the race result gui is shown and all
+ *  clients can click on 'continue'.
+ */
+ void ServerLobbyRoomProtocol::checkRaceFinished()
 {
     assert(RaceEventManager::getInstance()->isRunning());
     assert(World::getWorld());
-    // if race is over, give the final score to everybody
-    if (RaceEventManager::getInstance()->isRaceOver())
+    if(!RaceEventManager::getInstance()->isRaceOver()) return;
+
+    m_player_ready_counter = 0;
+    // Set the delay before the server forces all clients to exit the race
+    // result screen and go back to the lobby
+    m_timeout = (float)(StkTime::getRealTime()+15.0f);
+    m_state = RESULT_DISPLAY;
+
+    // calculate karts ranks :
+    int num_karts = race_manager->getNumberOfKarts();
+    std::vector<int> karts_results;
+    std::vector<float> karts_times;
+    for (int j = 0; j < num_karts; j++)
     {
-        // calculate karts ranks :
-        int num_players = race_manager->getNumberOfKarts();
-        std::vector<int> karts_results;
-        std::vector<float> karts_times;
-        for (int j = 0; j < num_players; j++)
+        float kart_time = race_manager->getKartRaceTime(j);
+        for (unsigned int i = 0; i < karts_times.size(); i++)
         {
-            float kart_time = race_manager->getKartRaceTime(j);
-            for (unsigned int i = 0; i < karts_times.size(); i++)
+            if (kart_time < karts_times[i])
             {
-                if (kart_time < karts_times[i])
-                {
-                    karts_times.insert(karts_times.begin()+i, kart_time);
-                    karts_results.insert(karts_results.begin()+i, j);
-                    break;
-                }
+                karts_times.insert(karts_times.begin() + i, kart_time);
+                karts_results.insert(karts_results.begin() + i, j);
+                break;
             }
         }
-
-        const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-
-        NetworkString *total = getNetworkString(1+karts_results.size());
-        total->setSynchronous(true);
-        total->addUInt8(LE_RACE_FINISHED);
-        for (unsigned int i = 0; i < karts_results.size(); i++)
-        {
-            total->addUInt8(karts_results[i]); // kart pos = i+1
-            Log::info("ServerLobbyRoomProtocol", "Kart %d finished #%d",
-                      karts_results[i], i + 1);
-        }
-        sendMessageToPeersChangingToken(total, /*reliable*/ true);
-        delete total;
-        Log::info("ServerLobbyRoomProtocol", "End of game message sent");
-        m_in_race = false;
-
-        // stop race protocols
-        Protocol* protocol = ProtocolManager::getInstance()
-                           ->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
-        if (protocol)
-            protocol->requestTerminate();
-        else
-            Log::error("ClientLobbyRoomProtocol",
-                       "No controller events protocol registered.");
-
-        protocol = ProtocolManager::getInstance()
-                 ->getProtocol(PROTOCOL_KART_UPDATE);
-        if (protocol)
-            protocol->requestTerminate();
-        else
-            Log::error("ClientLobbyRoomProtocol",
-                       "No kart update protocol registered.");
-
-        protocol = ProtocolManager::getInstance()
-                 ->getProtocol(PROTOCOL_GAME_EVENTS);
-        if (protocol)
-            protocol->requestTerminate();
-        else
-            Log::error("ClientLobbyRoomProtocol",
-                       "No game events protocol registered.");
-
-        // notify the network world that it is stopped
-        RaceEventManager::getInstance()->stop();
-        // exit the race now
-        race_manager->exitRace();
-        race_manager->setAIKartOverride("");
     }
+
+    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
+
+    NetworkString *total = getNetworkString(1 + karts_results.size());
+    total->setSynchronous(true);
+    total->addUInt8(LE_RACE_FINISHED);
+    for (unsigned int i = 0; i < karts_results.size(); i++)
+    {
+        total->addUInt8(karts_results[i]); // kart pos = i+1
+        Log::info("ServerLobbyRoomProtocol", "Kart %d finished #%d",
+            karts_results[i], i + 1);
+    }
+    sendMessageToPeersChangingToken(total, /*reliable*/ true);
+    delete total;
+    Log::info("ServerLobbyRoomProtocol", "End of game message sent");
+        
 }   // checkRaceFinished
 
 //-----------------------------------------------------------------------------
@@ -522,7 +521,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
  */
 void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
 {
-    if(m_state!=SELECTING_KARTS)
+    if(m_state!=SELECTING)
     {
         Log::warn("Server", "Received kart selection while in state %d.",
                   m_state);
@@ -749,5 +748,21 @@ void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
     sendMessageToPeersChangingToken(other);
     delete other;
 }   // playerLapsVote
+
+//-----------------------------------------------------------------------------
+/** Called when a client clicks on 'ok' on the race result screen.
+ *  If all players have clicked on 'ok', go back to the lobby.
+ */
+void ServerLobbyRoomProtocol::playerFinishedResult(Event *event)
+{
+    m_player_ready_counter++;
+    if(m_player_ready_counter == STKHost::get()->getPeerCount())
+    {
+        // We can't trigger the world/race exit here, since this is called
+        // from the protocol manager thread. So instead we force the timeout
+        // to get triggered (which is done from the main thread):
+        m_timeout = 0;
+    }
+}   // playerFinishedResult
 
 //-----------------------------------------------------------------------------

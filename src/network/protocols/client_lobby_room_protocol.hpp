@@ -18,6 +18,7 @@ private:
     void startGame(Event* event);
     void startSelection(Event* event);
     void raceFinished(Event* event);
+    void exitResultScreen(Event *event);
     // race votes
     void playerMajorVote(Event* event);
     void playerRaceCountVote(Event* event);
@@ -60,6 +61,7 @@ public:
                    uint8_t track_nb = 0);
     void voteReversed(uint8_t player_id, bool reversed, uint8_t track_nb = 0);
     void voteLaps(uint8_t player_id, uint8_t laps, uint8_t track_nb = 0);
+    void doneWithResults();
     void leave();
 
     virtual bool notifyEvent(Event* event);
