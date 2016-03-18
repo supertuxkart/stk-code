@@ -3,6 +3,7 @@
 
 #include "network/protocol.hpp"
 #include "network/transport_address.hpp"
+#include "utils/cpp2011.hpp"
 
 class PingProtocol : public Protocol
 {
@@ -16,16 +17,19 @@ private:
     /** Time of last ping. */
     double m_last_ping_time;
 public:
-                 PingProtocol(const TransportAddress& ping_dst,
-                              double delay_between_pings);
-        virtual ~PingProtocol();
+    PingProtocol(const TransportAddress& ping_dst,
+        double delay_between_pings);
+    virtual ~PingProtocol();
 
-        virtual bool notifyEvent(Event* event) { return true; }
-        virtual bool notifyEventAsynchronous(Event* event) { return true; }
-        virtual void setup();
-        virtual void update() {}
-        virtual void asynchronousUpdate();
+    virtual void asynchronousUpdate() OVERRIDE;
 
+    virtual void setup() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool notifyEvent(Event* event) OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    virtual void update(float dt) OVERRIDE {}
 };
 
 #endif // PING_PROTOCOL_HPP

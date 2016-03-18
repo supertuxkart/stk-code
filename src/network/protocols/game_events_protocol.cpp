@@ -64,16 +64,6 @@ bool GameEventsProtocol::notifyEvent(Event* event)
 }   // notifyEvent
 
 // ----------------------------------------------------------------------------
-void GameEventsProtocol::setup()
-{
-}   // setup
-
-// ----------------------------------------------------------------------------
-void GameEventsProtocol::update()
-{
-}   // update
-
-// ----------------------------------------------------------------------------
 /** Called on the server when an item is collected.
  */
 void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)

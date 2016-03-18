@@ -112,7 +112,7 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
  *  is known, register the server and its address with the stk server so that
  *  client can find it.
  */
-void ServerLobbyRoomProtocol::update()
+void ServerLobbyRoomProtocol::update(float dt)
 {
     switch (m_state)
     {

@@ -67,7 +67,7 @@ bool KartUpdateProtocol::notifyEvent(Event* event)
  *  or more updates before this client handles them, only the last one will
  *  actually be handled (i.e. outdated kart position updates are discarded).
  */
-void KartUpdateProtocol::update()
+void KartUpdateProtocol::update(float dt)
 {
     if (!World::getWorld())
         return;

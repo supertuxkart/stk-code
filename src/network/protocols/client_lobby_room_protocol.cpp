@@ -269,7 +269,7 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
 
 //-----------------------------------------------------------------------------
 
-void ClientLobbyRoomProtocol::update()
+void ClientLobbyRoomProtocol::update(float dt)
 {
     switch (m_state)
     {

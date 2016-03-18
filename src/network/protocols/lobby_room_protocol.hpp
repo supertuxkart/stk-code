@@ -73,7 +73,7 @@ public:
     virtual ~LobbyRoomProtocol() {}
     // ------------------------------------------------------------------------
     virtual void setup() = 0;
-    virtual void update() = 0;
+    virtual void update(float dt) = 0;
 };   // class LobbyRoomProtocol
 
 #endif // LOBBY_ROOM_PROTOCOL_HPP

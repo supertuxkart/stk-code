@@ -2,6 +2,8 @@
 #define SYNCHRONIZATION_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
+#include "utils/cpp2011.hpp"
+
 #include <vector>
 #include <map>
 
@@ -28,12 +30,13 @@ public:
              SynchronizationProtocol();
     virtual ~SynchronizationProtocol();
 
-    virtual bool notifyEventAsynchronous(Event* event);
-    virtual void setup();
-    virtual void update() {}
-    virtual void asynchronousUpdate();
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
+    virtual void setup() OVERRIDE;
+    virtual void asynchronousUpdate() OVERRIDE;
     void startCountdown(int ms_countdown);
 
+    // ------------------------------------------------------------------------
+    virtual void update(float dt) OVERRIDE {}
     // ------------------------------------------------------------------------
     int getCountdown() { return (int)(m_countdown*1000.0); }
 

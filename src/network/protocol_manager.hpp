@@ -144,7 +144,7 @@ public:
     virtual void      requestPause(Protocol* protocol);
     virtual void      requestUnpause(Protocol* protocol);
     virtual void      requestTerminate(Protocol* protocol);
-    virtual void      update();
+    virtual void      update(float dt);
     virtual Protocol* getProtocol(uint32_t id);
     virtual Protocol* getProtocol(ProtocolType type);
 };   // class ProtocolManager

@@ -184,7 +184,7 @@ void MainLoop::run()
                 if (STKHost::get()->requestedShutdown())
                     STKHost::get()->shutdown();
                 else
-                    ProtocolManager::getInstance()->update();
+                    ProtocolManager::getInstance()->update(dt);
             }
             PROFILER_POP_CPU_MARKER();
 
@@ -196,7 +196,7 @@ void MainLoop::run()
         {
             PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
             if(NetworkConfig::get()->isNetworking())
-                ProtocolManager::getInstance()->update();
+                ProtocolManager::getInstance()->update(dt);
             PROFILER_POP_CPU_MARKER();
 
             PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);

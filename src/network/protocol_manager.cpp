@@ -321,7 +321,7 @@ bool ProtocolManager::sendEvent(Event* event)
  *  This function is called by the main thread (i.e. from main_loop).
  *  This function IS FPS-dependant.
  */
-void ProtocolManager::update()
+void ProtocolManager::update(float dt)
 {
     // before updating, notify protocols that they have received events
     m_events_to_process.lock();
@@ -346,7 +346,7 @@ void ProtocolManager::update()
     for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
         if (m_protocols.getData()[i]->getState() == PROTOCOL_STATE_RUNNING)
-            m_protocols.getData()[i]->update();
+            m_protocols.getData()[i]->update(dt);
     }
     m_protocols.unlock();
 }   // update

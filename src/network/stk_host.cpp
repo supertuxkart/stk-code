@@ -305,8 +305,8 @@ void STKHost::init()
     // Optional: start the network console
     m_network_console = new NetworkConsole();
     m_network_console->run();
-
-}   // STKHost
+ 
+}  // STKHost
 
 // ----------------------------------------------------------------------------
 /** Destructor. Stops the listening thread, closes the packet log file and

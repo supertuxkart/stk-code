@@ -3,6 +3,7 @@
 
 #include "network/protocols/lobby_room_protocol.hpp"
 #include "network/transport_address.hpp"
+#include "utils/cpp2011.hpp"
 
 class STKPeer;
 
@@ -64,11 +65,11 @@ public:
     void doneWithResults();
     void leave();
 
-    virtual bool notifyEvent(Event* event);
-    virtual bool notifyEventAsynchronous(Event* event);
-    virtual void setup();
-    virtual void update();
-    virtual void asynchronousUpdate() {}
+    virtual bool notifyEvent(Event* event) OVERRIDE;
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
+    virtual void setup() OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
+    virtual void asynchronousUpdate() OVERRIDE {}
 
 };
 
