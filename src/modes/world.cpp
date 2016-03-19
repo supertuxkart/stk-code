@@ -322,8 +322,12 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
                                 RaceManager::KartType kart_type,
                                 PerPlayerDifficulty difficulty)
 {
+    unsigned int gk = 0;
+    if (race_manager->hasGhostKarts())
+        gk = ReplayPlay::get()->getNumGhostKart();
+
     int position           = index+1;
-    btTransform init_pos   = getStartTransform(index);
+    btTransform init_pos   = getStartTransform(index - gk);
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
                                       difficulty);
     new_kart->init(race_manager->getKartType(index));
@@ -440,6 +444,8 @@ World::~World()
         ReplayPlay::create();
     }
     m_karts.clear();
+    if(race_manager->willRecordRace())
+        ReplayRecorder::get()->reset();
     race_manager->setRaceGhostKarts(false);
     race_manager->setRecordRace(false);
 

@@ -70,8 +70,9 @@ private:
          ~ReplayRecorder();
 public:
     void  init();
-    void  update(float dt);
+    void  reset();
     void  save();
+    void  update(float dt);
 
     // ------------------------------------------------------------------------
     /** Creates a new instance of the replay object. */

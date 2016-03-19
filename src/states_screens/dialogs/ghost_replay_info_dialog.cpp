@@ -31,6 +31,9 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id)
                       : ModalDialog(0.8f,0.5f), m_replay_id(replay_id)
 {
     m_self_destroy = false;
+    m_record_race = false;
+    m_watch_only = false;
+
     m_rd = ReplayPlay::get()->getReplayData(m_replay_id);
     loadFromFile("ghost_replay_info_dialog.stkgui");
 
@@ -41,6 +44,12 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id)
     m_back_widget = getWidget<IconButtonWidget>("back");
     m_back_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     m_action_widget = getWidget<RibbonWidget>("actions");
+    m_record_widget = getWidget<CheckBoxWidget>("record-race");
+    m_watch_widget = getWidget<CheckBoxWidget>("watch-only");
+
+    m_record_widget->setState(false);
+    m_watch_widget->setState(false);
+
 }   // GhostReplayInfoDialog
 
 // -----------------------------------------------------------------------------
@@ -64,10 +73,12 @@ GUIEngine::EventPropagation
             std::string track_name = m_rd.m_track_name; 
             int laps = m_rd.m_laps;
             int replay_id = m_replay_id;
+            bool record = m_record_race;
 
             ModalDialog::dismiss();
             ReplayPlay::get()->setReplayFile(replay_id);
             race_manager->setRaceGhostKarts(true);
+            race_manager->setRecordRace(record);
             race_manager->setNumKarts(race_manager->getNumLocalPlayers());
 
             // Disable accidentally unlocking of a challenge
@@ -92,6 +103,20 @@ GUIEngine::EventPropagation
             return GUIEngine::EVENT_BLOCK;
         }
     }
+
+    if (event_source == "record-race")
+    {
+        m_record_race = m_record_widget->getState();
+    }
+    else if (event_source == "watch-only")
+    {
+        m_watch_only = m_watch_widget->getState();
+        m_record_race = false;
+        m_record_widget->setState(false);
+        m_record_widget->setVisible(!m_watch_only);
+        getWidget<LabelWidget>("record-race-text")->setVisible(!m_watch_only);
+    }
+
     return GUIEngine::EVENT_LET;
 }   // processEvent
 

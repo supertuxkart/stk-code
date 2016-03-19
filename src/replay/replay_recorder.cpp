@@ -50,16 +50,31 @@ ReplayRecorder::~ReplayRecorder()
 }   // ~Replay
 
 //-----------------------------------------------------------------------------
-/** Initialise the replay recorder. It especially allocates memory
- *  to store the replay data.
- */
-void ReplayRecorder::init()
+/** Reset the replay recorder. */
+void ReplayRecorder::reset()
 {
     m_complete_replay = false;
     m_incorrect_replay = false;
     m_transform_events.clear();
     m_physic_info.clear();
     m_kart_replay_event.clear();
+    m_count_transforms.clear();
+    m_last_saved_time.clear();
+
+#ifdef DEBUG
+    m_count                       = 0;
+    m_count_skipped_time          = 0;
+    m_count_skipped_interpolation = 0;
+#endif
+}   // clear
+
+//-----------------------------------------------------------------------------
+/** Initialise the replay recorder. It especially allocates memory
+ *  to store the replay data.
+ */
+void ReplayRecorder::init()
+{
+    reset();
     m_transform_events.resize(race_manager->getNumberOfKarts());
     m_physic_info.resize(race_manager->getNumberOfKarts());
     m_kart_replay_event.resize(race_manager->getNumberOfKarts());
@@ -71,16 +86,10 @@ void ReplayRecorder::init()
         m_physic_info[i].resize(max_frames);
         m_kart_replay_event[i].resize(max_frames);
     }
-    m_count_transforms.clear();
+
     m_count_transforms.resize(race_manager->getNumberOfKarts(), 0);
-    m_last_saved_time.clear();
     m_last_saved_time.resize(race_manager->getNumberOfKarts(), -1.0f);
 
-#ifdef DEBUG
-    m_count                       = 0;
-    m_count_skipped_time          = 0;
-    m_count_skipped_interpolation = 0;
-#endif
 }   // init
 
 //-----------------------------------------------------------------------------
