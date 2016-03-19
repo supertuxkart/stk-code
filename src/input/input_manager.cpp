@@ -710,7 +710,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
         // ... when in-game
         if (StateManager::get()->getGameState() == GUIEngine::GAME &&
-             !GUIEngine::ModalDialog::isADialogActive()                  )
+             !GUIEngine::ModalDialog::isADialogActive()            &&
+             !race_manager->isWatchingReplay() )
         {
             if (player == NULL)
             {

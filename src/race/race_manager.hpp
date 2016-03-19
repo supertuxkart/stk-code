@@ -354,6 +354,8 @@ private:
     bool m_will_record_race;
 
     bool m_has_ghost_karts;
+
+    bool m_watching_replay;
 public:
          RaceManager();
         ~RaceManager();
@@ -407,6 +409,7 @@ public:
     void saveGP();
     void startSingleRace(const std::string &track_ident, const int num_laps,
                           bool from_overworld);
+    void startWatchingReplay(const std::string &track_ident, const int num_laps);
     void setupPlayerKartInfo();
     void kartFinishedRace(const AbstractKart* kart, float time);
     void setNumPlayers(int players, int local_players=-1);
@@ -727,6 +730,11 @@ public:
         m_has_ghost_karts = ghost;
     }   // setRaceGhostKarts
     // ------------------------------------------------------------------------
+    void setWatchingReplay(bool watch)
+    {
+        m_watching_replay = watch;
+    }   // setWatchingReplay
+    // ------------------------------------------------------------------------
     bool willRecordRace() const
     {
         return m_will_record_race;
@@ -736,6 +744,11 @@ public:
     {
         return m_has_ghost_karts;
     }   // hasGhostKarts
+    // ------------------------------------------------------------------------
+    bool isWatchingReplay() const
+    {
+        return m_watching_replay;
+    }   // isWatchingReplay
 
 };   // RaceManager
 

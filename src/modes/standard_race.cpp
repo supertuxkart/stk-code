@@ -21,6 +21,7 @@
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/controller/ghost_controller.hpp"
 #include "network/network_config.hpp"
 
 //-----------------------------------------------------------------------------
@@ -34,6 +35,11 @@ StandardRace::StandardRace() : LinearWorld()
  */
 bool StandardRace::isRaceOver()
 {
+    if (race_manager->isWatchingReplay())
+    {
+        return dynamic_cast<GhostController*>
+            (m_karts[0]->getController())->isReplayEnd();
+    }
     // The race is over if all players have finished the race. Remaining
     // times for AI opponents will be estimated in enterRaceOverState
     return race_manager->allPlayerFinished();

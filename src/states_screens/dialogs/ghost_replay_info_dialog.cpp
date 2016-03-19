@@ -73,19 +73,26 @@ GUIEngine::EventPropagation
             std::string track_name = m_rd.m_track_name; 
             int laps = m_rd.m_laps;
             int replay_id = m_replay_id;
-            bool record = m_record_race;
+
+            race_manager->setRecordRace(m_record_race);
+            race_manager->setWatchingReplay(m_watch_only);
 
             ModalDialog::dismiss();
             ReplayPlay::get()->setReplayFile(replay_id);
             race_manager->setRaceGhostKarts(true);
-            race_manager->setRecordRace(record);
+
             race_manager->setNumKarts(race_manager->getNumLocalPlayers());
 
             // Disable accidentally unlocking of a challenge
             PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
             race_manager->setReverseTrack(reverse);
-            race_manager->startSingleRace(track_name, laps, false);
+
+            if (race_manager->isWatchingReplay())
+                race_manager->startWatchingReplay(track_name, laps);
+            else
+                race_manager->startSingleRace(track_name, laps, false);
+
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == "remove")

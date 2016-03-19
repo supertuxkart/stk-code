@@ -19,7 +19,7 @@
             <div width="100%" height="fit" layout="horizontal-row" >
                 <checkbox width="fit" id="watch-only" I18N="Ghost replay info action" text_align="left"/>
                 <spacer width="10"/>
-                <label proportion="1" height="100%" text_align="left" I18N="Ghost replay info action" text="Watch the race"/>
+                <label proportion="1" height="100%" text_align="left" I18N="Ghost replay info action" text="Watch replay only"/>
             </div>
         </div>
 

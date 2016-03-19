@@ -285,10 +285,11 @@ void World::reset()
         Log::info("World", "Start Recording race.");
         ReplayRecorder::get()->init();
     }
-    if(NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics())
+    if((NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics()) ||
+        race_manager->isWatchingReplay())
     {
-        // In case that the server is running with gui, create a camera and
-        // attach it to the first kart.
+        // In case that the server is running with gui or watching replay,
+        // create a camera and attach it to the first kart.
         Camera::createCamera(World::getWorld()->getKart(0));
 
     }
@@ -448,6 +449,7 @@ World::~World()
         ReplayRecorder::get()->reset();
     race_manager->setRaceGhostKarts(false);
     race_manager->setRecordRace(false);
+    race_manager->setWatchingReplay(false);
 
     Camera::removeAllCameras();
 
