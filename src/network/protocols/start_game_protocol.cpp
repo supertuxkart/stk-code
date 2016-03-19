@@ -170,7 +170,7 @@ void StartGameProtocol::startRace()
 }   // startRace
 
 // ----------------------------------------------------------------------------
-void StartGameProtocol::update()
+void StartGameProtocol::update(float dt)
 {
     switch(m_state)
     {

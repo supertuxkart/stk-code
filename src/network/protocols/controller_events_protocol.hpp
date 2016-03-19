@@ -22,6 +22,7 @@
 #include "network/protocol.hpp"
 
 #include "input/input.hpp"
+#include "utils/cpp2011.hpp"
 
 class Controller;
 class STKPeer;
@@ -33,10 +34,10 @@ public:
              ControllerEventsProtocol();
     virtual ~ControllerEventsProtocol();
 
-    virtual bool notifyEventAsynchronous(Event* event);
-    virtual void update();
-    virtual void setup() {};
-    virtual void asynchronousUpdate() {}
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
+    virtual void update(float dt) OVERRIDE {};
+    virtual void setup() OVERRIDE {};
+    virtual void asynchronousUpdate() OVERRIDE {}
 
     void controllerAction(Controller* controller, PlayerAction action,
                           int value);

@@ -108,6 +108,21 @@ void Protocol::requestTerminate()
 }   // requestTerminate
 
 // ----------------------------------------------------------------------------
+/** Finds a protocol with the given type and requests it to be terminated.
+ *  If no such protocol exist, log an error message.
+ *  \param type The protocol type to delete.
+ */
+void Protocol::findAndTerminateProtocol(ProtocolType type)
+{
+    Protocol* protocol = ProtocolManager::getInstance()->getProtocol(type);
+    if (protocol)
+        protocol->requestTerminate();
+    else
+        Log::error("ClientLobbyRoomProtocol",
+                    "No protocol %d registered.", type);
+}   // findAndTerminateProtocol
+
+// ----------------------------------------------------------------------------
 /** Sends a message to all peers, inserting the peer's token into the message.
  *  The message is composed of a 1-byte message (usually the message type)
  *  followed by the token of this client and then actual message).

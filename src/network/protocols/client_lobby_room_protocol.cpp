@@ -31,6 +31,7 @@
 #include "online/online_profile.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/network_kart_selection.hpp"
+#include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
 
@@ -174,7 +175,8 @@ void ClientLobbyRoomProtocol::voteLaps(uint8_t player_id, uint8_t laps,
 }   // voteLaps
 
 //-----------------------------------------------------------------------------
-
+/** Called when a client selects to exit a server.
+ */
 void ClientLobbyRoomProtocol::leave()
 {
     m_server->disconnect();
@@ -184,29 +186,39 @@ void ClientLobbyRoomProtocol::leave()
 }   // leave
 
 //-----------------------------------------------------------------------------
+/** Called from the gui when a client clicked on 'continue' on the race result
+ *  screen. It notifies the server that this client has exited the screen and
+ *  is back at the lobby.
+ */
+void ClientLobbyRoomProtocol::doneWithResults()
+{
+    NetworkString *done = getNetworkString(1);
+    done->addUInt8(LE_RACE_FINISHED_ACK);
+    sendToServer(done, /*reliable*/true);
+    delete done;
+}   // doneWithResults
+
+//-----------------------------------------------------------------------------
 
 bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
 {
     assert(m_setup); // assert that the setup exists
-    if (event->getType() == EVENT_TYPE_MESSAGE)
+
+    NetworkString &data = event->data();
+    assert(data.size()); // assert that data isn't empty
+    uint8_t message_type = data.getUInt8();
+    Log::info("ClientLobbyRoomProtocol", "Synchronous message of type %d",
+              message_type);
+    switch(message_type)
     {
-        NetworkString &data = event->data();
-        assert(data.size()); // assert that data isn't empty
-        uint8_t message_type = data.getUInt8();
-        if (message_type != LE_KART_SELECTION_UPDATE &&
-            message_type != LE_RACE_FINISHED            )
-            return false; // don't treat the event
-
-        Log::info("ClientLobbyRoomProtocol", "Synchronous message of type %d",
-                  message_type);
-        if (message_type == LE_KART_SELECTION_UPDATE) // kart selection update
-            kartSelectionUpdate(event);
-        else if (message_type == LE_RACE_FINISHED) // end of race
-            raceFinished(event);
-
-        return true;
-    }
-    return false;
+        case LE_KART_SELECTION_UPDATE: kartSelectionUpdate(event); break;
+        case LE_RACE_FINISHED:         raceFinished(event);        break;
+        case LE_EXIT_RESULT:           exitResultScreen(event);    break;
+        default:
+            return false;
+            break;
+    }   // switch
+    return true;
 }   // notifyEvent
 
 //-----------------------------------------------------------------------------
@@ -257,7 +269,7 @@ bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
 
 //-----------------------------------------------------------------------------
 
-void ClientLobbyRoomProtocol::update()
+void ClientLobbyRoomProtocol::update(float dt)
 {
     switch (m_state)
     {
@@ -302,15 +314,7 @@ void ClientLobbyRoomProtocol::update()
     case SELECTING_KARTS:
         break;
     case PLAYING:
-    {
-        // race is now over, kill race protocols and return to connected state
-        if (RaceEventManager::getInstance<RaceEventManager>()->isRaceOver())
-        {
-            Log::info("ClientLobbyRoomProtocol", "Game finished.");
-            m_state = RACE_FINISHED;
-        }
-    }
-    break;
+        break;
     case RACE_FINISHED:
         break;
     case DONE:
@@ -663,7 +667,15 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
 }   // raceFinished
 
 //-----------------------------------------------------------------------------
+/** Called when the server informs the clients to exit the race result screen.
+ *  It exits the race, and goes back to the lobby.
+ */
+void ClientLobbyRoomProtocol::exitResultScreen(Event *event)
+{
+    RaceResultGUI::getInstance()->backToLobby();
+}   // exitResultScreen
 
+//-----------------------------------------------------------------------------
 /*! \brief Called when a player votes for a major race mode.
  *  \param event : Event providing the information.
  *

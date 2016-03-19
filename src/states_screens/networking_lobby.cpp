@@ -125,7 +125,8 @@ void NetworkingLobby::init()
         m_server_game_mode->setText(mode, false);
     }
 
-    m_start_button->setVisible(STKHost::get()->isAuthorisedToControl());
+    if(!NetworkConfig::get()->isServer())
+        m_start_button->setVisible(STKHost::get()->isAuthorisedToControl());
 
     // For now create the active player and bind it to the right
     // input device.
@@ -138,8 +139,11 @@ void NetworkingLobby::init()
 void NetworkingLobby::onUpdate(float delta)
 {
     // FIXME Network looby should be closed when stkhost is shut down
-    m_start_button->setVisible(STKHost::existHost() &&
-                               STKHost::get()->isAuthorisedToControl());
+    if(NetworkConfig::get()->isClient())
+    {
+        m_start_button->setVisible(STKHost::existHost() &&
+                                   STKHost::get()->isAuthorisedToControl());
+    }
 }   // onUpdate
 
 // ----------------------------------------------------------------------------

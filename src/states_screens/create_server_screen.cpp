@@ -148,7 +148,7 @@ void CreateServerScreen::onUpdate(float delta)
 
     // Otherwise wait till we get an answer from the server:
     // -----------------------------------------------------
-    if(!STKHost::get()->isRegistered())
+    if(!STKHost::get()->isRegistered() && !NetworkConfig::get()->isLAN())
     {
         m_info_widget->setDefaultColor();
         m_info_widget->setText(StringUtils::loadingDots(_("Creating server")),

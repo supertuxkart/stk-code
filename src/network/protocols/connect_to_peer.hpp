@@ -56,7 +56,7 @@ public:
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
-    virtual void update() OVERRIDE {}
+    virtual void update(float dt) OVERRIDE {}
     virtual void asynchronousUpdate() OVERRIDE;
     virtual void callback(Protocol *protocol) OVERRIDE;
 };   // class ConnectToPeer

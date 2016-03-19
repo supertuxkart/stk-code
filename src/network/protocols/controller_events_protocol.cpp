@@ -96,12 +96,6 @@ bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
-
-void ControllerEventsProtocol::update()
-{
-}   // update
-
-//-----------------------------------------------------------------------------
 /** Called from the local kart controller when an action (like steering,
  *  acceleration, ...) was triggered. It compresses the current kart control
  *  state and sends a message with the new info to the server.

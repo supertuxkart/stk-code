@@ -121,7 +121,7 @@ public:
 
     /** \brief Called by the protocol listener, synchronously with the main
      *  loop. Must be re-defined.*/
-    virtual void update() = 0;
+    virtual void update(float dt) = 0;
 
     /** \brief Called by the protocol listener as often as possible.
      *  Must be re-defined. */
@@ -138,6 +138,7 @@ public:
     void requestPause();
     void requestUnpause();
     void requestTerminate();
+    void findAndTerminateProtocol(ProtocolType type);
 
     // ------------------------------------------------------------------------
     /** \brief Called when the protocol is paused (by an other entity or by

@@ -2,7 +2,9 @@
 #define KART_UPDATE_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/vec3.hpp"
+
 #include "LinearMath/btQuaternion.h"
 
 #include <vector>
@@ -27,10 +29,10 @@ public:
              KartUpdateProtocol();
     virtual ~KartUpdateProtocol();
 
-    virtual bool notifyEvent(Event* event);
-    virtual void setup();
-    virtual void update();
-    virtual void asynchronousUpdate() {};
+    virtual bool notifyEvent(Event* event) OVERRIDE;
+    virtual void setup() OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
+    virtual void asynchronousUpdate() OVERRIDE {};
 
 };   // KartUpdateProtocol
 

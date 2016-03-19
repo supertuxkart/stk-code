@@ -2,6 +2,8 @@
 #define START_GAME_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
+#include "utils/cpp2011.hpp"
+
 #include <map>
 
 class GameSetup;
@@ -39,10 +41,10 @@ public:
     virtual ~StartGameProtocol();
 
     virtual bool notifyEventAsynchronous(Event* event);
-    virtual void setup();
-    virtual void update();
+    virtual void setup() OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
     void ready();
-    virtual void asynchronousUpdate() {}
+    virtual void asynchronousUpdate() OVERRIDE {}
 
 };   // class StartGameProtocol
 

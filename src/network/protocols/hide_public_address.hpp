@@ -20,6 +20,7 @@
 #define HIDE_PUBLIC_ADDRESS_HPP
 
 #include "network/protocol.hpp"
+#include "utils/cpp2011.hpp"
 
 #include <string>
 
@@ -27,26 +28,29 @@ namespace Online { class XMLRequest; }
 
 class HidePublicAddress : public Protocol
 {
-    public:
-        HidePublicAddress();
-        virtual ~HidePublicAddress();
+private:
+    Online::XMLRequest* m_request;
+    enum STATE
+    {
+        NONE,
+        REQUEST_PENDING,
+        DONE,
+        EXITING
+    };
+    STATE m_state;
 
-        virtual bool notifyEvent(Event* event) { return true; }
-        virtual bool notifyEventAsynchronous(Event* event) { return true; }
-        virtual void setup();
-        virtual void update() {}
-        virtual void asynchronousUpdate();
+public:
+    HidePublicAddress();
+    virtual ~HidePublicAddress();
 
-    protected:
-        Online::XMLRequest* m_request;
-        enum STATE
-        {
-            NONE,
-            REQUEST_PENDING,
-            DONE,
-            EXITING
-        };
-        STATE m_state;
-};
+    virtual void asynchronousUpdate() OVERRIDE;
+    virtual void setup() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool notifyEvent(Event* event) OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    virtual void update(float dt) OVERRIDE {}
+};   // class HidePublicAddress
 
 #endif // HIDE_PUBLIC_ADDRESS_HPP

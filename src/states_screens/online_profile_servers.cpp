@@ -137,6 +137,11 @@ void OnlineProfileServers::doQuickPlay()
 
     // select first one
     const Server *server = ServersManager::get()->getQuickPlay();
+    if(!server)
+    {
+        Log::error("OnlineProfileServers", "Can not find quick play server.");
+        return;
+    }
 
     // do a join request
     XMLRequest *join_request = new RequestConnection::ServerJoinRequest();
