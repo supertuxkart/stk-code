@@ -36,6 +36,7 @@
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
@@ -159,10 +160,20 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
 
     if(name==m_start_button->m_properties[PROP_ID])
     {
-        // Send a message to the server to start
-        NetworkString start(PROTOCOL_LOBBY_ROOM);
-        start.addUInt8(LobbyRoomProtocol::LE_REQUEST_BEGIN);
-        STKHost::get()->sendToServer(&start, true);
+        if(NetworkConfig::get()->isServer())
+        {
+            ServerLobbyRoomProtocol* slrp = static_cast<ServerLobbyRoomProtocol*>(
+                ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
+            if (slrp)
+                slrp->startSelection();
+        }
+        else // client
+        {
+            // Send a message to the server to start
+            NetworkString start(PROTOCOL_LOBBY_ROOM);
+            start.addUInt8(LobbyRoomProtocol::LE_REQUEST_BEGIN);
+            STKHost::get()->sendToServer(&start, true);
+        }
     }
 
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
