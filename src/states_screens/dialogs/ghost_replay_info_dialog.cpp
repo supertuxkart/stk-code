@@ -47,6 +47,13 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id)
     m_record_widget = getWidget<CheckBoxWidget>("record-race");
     m_watch_widget = getWidget<CheckBoxWidget>("watch-only");
 
+    if (race_manager->getNumLocalPlayers() > 1)
+    {
+        // No watching replay when split-screen
+        m_watch_widget->setVisible(false);
+        getWidget<LabelWidget>("watch-only-text")->setVisible(false);
+    }
+
     m_record_widget->setState(false);
     m_watch_widget->setState(false);
 
