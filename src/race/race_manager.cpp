@@ -951,6 +951,7 @@ void RaceManager::startWatchingReplay(const std::string &track_ident,
     assert(m_watching_replay && m_has_ghost_karts && !m_will_record_race);
     StateManager::get()->enterGameState();
     setTrack(track_ident);
+    setNumLaps(num_laps);
     setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
     setCoinTarget(0);
     m_num_karts = ReplayPlay::get()->getNumGhostKart();
