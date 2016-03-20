@@ -33,6 +33,7 @@
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
+#include "states_screens//networking_lobby.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/waiting_for_others.hpp"
 #include "utils/log.hpp"
@@ -504,6 +505,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     NetworkPlayerProfile* profile = 
         new NetworkPlayerProfile(name, new_player_id, new_host_id);
     m_setup->addPlayer(profile);
+    NetworkingLobby::getInstance()->addPlayer(profile);
 
     Log::verbose("ServerLobbyRoomProtocol", "New player.");
 
