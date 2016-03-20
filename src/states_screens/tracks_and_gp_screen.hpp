@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2015 Marianne Gagnon
+//  Copyright (C) 2016 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,8 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_TRACKS_SCREEN_HPP
-#define HEADER_TRACKS_SCREEN_HPP
+#ifndef HEADER_TRACKS_AND_GP_SCREEN_HPP
+#define HEADER_TRACKS_AND_GP_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
 #include <deque>
@@ -24,23 +24,22 @@
 namespace GUIEngine { class Widget; }
 
 /**
-  * \brief screen where the user can select a track
+  * \brief screen where the user can select a track or grand prix
   * \ingroup states_screens
   */
-class TracksScreen : public GUIEngine::Screen,
-                     public GUIEngine::ScreenSingleton<TracksScreen>
+class TracksAndGPScreen : public GUIEngine::Screen,
+                          public GUIEngine::ScreenSingleton<TracksAndGPScreen>
 {
-    friend class GUIEngine::ScreenSingleton<TracksScreen>;
+    friend class GUIEngine::ScreenSingleton<TracksAndGPScreen>;
 
 private:
-    TracksScreen() : Screen("tracks.stkgui") {}
+
+    TracksAndGPScreen() : Screen("tracks_and_gp.stkgui") {}
 
     /** adds the tracks from the current track group into the tracks ribbon */
     void buildTrackList();
 
     std::deque<std::string> m_random_track_list;
-
-    bool m_offical_track;
 
 public:
 
@@ -58,9 +57,9 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
-    void setOfficalTrack(bool offical) { m_offical_track = offical; }
 
     void setFocusOnTrack(const std::string& trackName);
+    void setFocusOnGP(const std::string& gpName);
 
 };
 

@@ -30,7 +30,7 @@
 #include "race/grand_prix_data.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/tracks_screen.hpp"
+#include "states_screens/tracks_and_gp_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -70,8 +70,8 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident)
 GPInfoDialog::~GPInfoDialog()
 {
     GUIEngine::Screen* curr_screen = GUIEngine::getCurrentScreen();
-    if (curr_screen->getName() == "tracks.stkgui")
-        static_cast<TracksScreen*>(curr_screen)->setFocusOnGP(m_gp.getId());
+    if (curr_screen->getName() == "tracks_and_gp.stkgui")
+        static_cast<TracksAndGPScreen*>(curr_screen)->setFocusOnGP(m_gp.getId());
 }
 
 // ----------------------------------------------------------------------------
