@@ -3,7 +3,7 @@
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
     <div x="1%" y="1%" width="98%" height="96%" layout="vertical-row" >
-        <header width="100%" I18N="In the track selection screen" text="All Tracks"
+        <header width="80%" I18N="In the track selection screen" text="All Tracks"
                 align="center" text_align="center" />
 
         <box proportion="1" width="100%" layout="vertical-row" padding="1">
