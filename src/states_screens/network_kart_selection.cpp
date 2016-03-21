@@ -200,6 +200,7 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
         //WaitingForOthersScreen::getInstance()->push();
         //return;
     }
+    TracksScreen::getInstance()->setOfficalTrack(true);
     TracksScreen::getInstance()->push();
 }   // playerSelected
 
