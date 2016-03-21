@@ -3,13 +3,23 @@
     <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row">
         <div x="5%" y="0%" width="90%" proportion="6" layout="horizontal-row">
             <div width="40%" height="100%" layout="vertical-row">
-                <icon id="icon" align="center" proportion="8" width="100%" icon="gui/loading.png" />
-                <spacer proportion="1" />
+                <icon id="icon" align="center" width="100%" icon="gui/loading.png" />
             </div>
-            <spacer proportion="1" />
             <div width="60%" height="50%" layout="vertical-row">
                 <label id="name" width="100%" text_align="left"/>
-                <spacer height="10"/>
+            </div>
+        </div>
+
+        <div width="90%" align="center" layout="vertical-row" height="fit">
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <checkbox width="fit" id="record-race" I18N="Ghost replay info action" text_align="left"/>
+                <spacer width="10"/>
+                <label proportion="1" id="record-race-text" height="100%" text_align="left" I18N="Ghost replay info action" text="Record the race for ghost replay"/>
+            </div>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <checkbox width="fit" id="watch-only" I18N="Ghost replay info action" text_align="left"/>
+                <spacer width="10"/>
+                <label proportion="1" id="watch-only-text" height="100%" text_align="left" I18N="Ghost replay info action" text="Watch replay only"/>
             </div>
         </div>
 

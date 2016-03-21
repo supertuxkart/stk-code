@@ -78,6 +78,7 @@ RaceManager::RaceManager()
     setReverseTrack(false);
     setRecordRace(false);
     setRaceGhostKarts(false);
+    setWatchingReplay(false);
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumPlayers(0);
@@ -913,6 +914,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
                                   const int num_laps,
                                   bool from_overworld)
 {
+    assert(!m_watching_replay);
     StateManager::get()->enterGameState();
     setTrack(track_ident);
 
@@ -931,10 +933,46 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 
 //-----------------------------------------------------------------------------
 /** Fills up the remaining kart slots with AI karts.
-v*/
+ */
 void RaceManager::setupPlayerKartInfo()
 {
     computeRandomKartList();
 }   // setupPlayerKartInfo
+
+//-----------------------------------------------------------------------------
+/** \brief Function to start the race with only ghost kart(s) and watch.
+ * \param trackIdent Internal name of the track to race on
+ * \param num_laps   Number of laps to race, or -1 if number of laps is
+ *        not relevant in current mode
+ */
+void RaceManager::startWatchingReplay(const std::string &track_ident,
+                                      const int num_laps)
+{
+    assert(m_watching_replay && m_has_ghost_karts && !m_will_record_race);
+    StateManager::get()->enterGameState();
+    setTrack(track_ident);
+    setNumLaps(num_laps);
+    setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    setCoinTarget(0);
+    m_num_karts = ReplayPlay::get()->getNumGhostKart();
+    m_kart_status.clear();
+
+    Log::verbose("RaceManager", "%u ghost kart(s) for watching replay only\n",
+        (unsigned int)m_num_karts);
+
+    int init_gp_rank = 0;
+
+    for(int i = 0; i < m_num_karts; i++)
+    {
+        m_kart_status.push_back(KartStatus(ReplayPlay::get()->getGhostKartName(i),
+            i, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
+        init_gp_rank ++;
+    }
+
+    m_track_number = 0;
+    startNextRace();
+}   // startSingleRace
+
+//-----------------------------------------------------------------------------
 
 /* EOF */

@@ -70,11 +70,11 @@
             </div>
             <spacer height="10"/>
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label id="reverse-text" proportion="1" I18N="In the track info screen" text="Drive in reverse" text_align="right"/>
+                <label id="option-text" proportion="1" I18N="In the track info screen" text_align="right"/>
                 <spacer width="40"/>
                 <div proportion="1" height="fit" layout="horizontal-row">
                     <div width="50%" height="fit" text-align="center" layout="vertical-row" >
-                        <checkbox id="reverse" align="center"/>
+                        <checkbox id="option" align="center"/>
                     </div>
                 </div>
             </div>

@@ -20,6 +20,7 @@
 #define HEADER_GHOST_REPLAY_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "replay/replay_play.hpp"
@@ -34,11 +35,16 @@ private:
 
     bool m_self_destroy;
 
+    bool m_record_race;
+    bool m_watch_only;
+
     const unsigned int m_replay_id;
     ReplayPlay::ReplayData m_rd;
 
     GUIEngine::RibbonWidget* m_action_widget;
     GUIEngine::IconButtonWidget* m_back_widget;
+    GUIEngine::CheckBoxWidget* m_record_widget;
+    GUIEngine::CheckBoxWidget* m_watch_widget;
 
 public:
     GhostReplayInfoDialog(unsigned int replay_id);

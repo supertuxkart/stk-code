@@ -497,7 +497,7 @@ void RaceResultGUI::backToLobby()
             const int rm_id = kart->getWorldKartId() -
                 (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
 
-            if (rm_id >= 0)
+            if (rm_id >= 0 && !race_manager->isWatchingReplay())
                 ri->m_kart_name = race_manager->getKartInfo(rm_id).getPlayerName();
             else
                 ri->m_kart_name = translations->fribidize(kart->getName());
@@ -869,7 +869,7 @@ void RaceResultGUI::backToLobby()
             const int rm_id = kart_id -
                 (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
 
-            if (rm_id >= 0)
+            if (rm_id >= 0 && !race_manager->isWatchingReplay())
                 ri->m_kart_name = race_manager->getKartInfo(rm_id).getPlayerName();
             else
                 ri->m_kart_name = translations->fribidize(kart->getName());

@@ -285,10 +285,11 @@ void World::reset()
         Log::info("World", "Start Recording race.");
         ReplayRecorder::get()->init();
     }
-    if(NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics())
+    if((NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics()) ||
+        race_manager->isWatchingReplay())
     {
-        // In case that the server is running with gui, create a camera and
-        // attach it to the first kart.
+        // In case that the server is running with gui or watching replay,
+        // create a camera and attach it to the first kart.
         Camera::createCamera(World::getWorld()->getKart(0));
 
     }
@@ -322,8 +323,12 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
                                 RaceManager::KartType kart_type,
                                 PerPlayerDifficulty difficulty)
 {
+    unsigned int gk = 0;
+    if (race_manager->hasGhostKarts())
+        gk = ReplayPlay::get()->getNumGhostKart();
+
     int position           = index+1;
-    btTransform init_pos   = getStartTransform(index);
+    btTransform init_pos   = getStartTransform(index - gk);
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
                                       difficulty);
     new_kart->init(race_manager->getKartType(index));
@@ -440,8 +445,11 @@ World::~World()
         ReplayPlay::create();
     }
     m_karts.clear();
+    if(race_manager->willRecordRace())
+        ReplayRecorder::get()->reset();
     race_manager->setRaceGhostKarts(false);
     race_manager->setRecordRace(false);
+    race_manager->setWatchingReplay(false);
 
     Camera::removeAllCameras();
 

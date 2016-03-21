@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -32,6 +33,7 @@
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
 #include "tracks/quad_graph.hpp"
+#include "tracks/battle_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
@@ -473,3 +475,103 @@ void ItemManager::switchItems()
     m_switch_time = m_switch_time < 0 ? stk_config->m_item_switch_time : -1;
 
 }   // switchItems
+
+//-----------------------------------------------------------------------------
+bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
+{
+    if (!UserConfigParams::m_random_arena_item) return false;
+    if (!BattleGraph::get()) return false;
+
+    std::vector<int> used_location;
+    std::vector<int> invalid_location;
+    for (unsigned int i = 0; i < pos.size(); i++)
+    {
+        // Load all starting positions of arena, so no items will be near them
+        int node = BattleGraph::get()->pointToNode(/*cur_node*/-1,
+            Vec3(pos[i].getOrigin()), /*ignore_vertical*/true);
+        assert(node != -1);
+        used_location.push_back(node);
+        invalid_location.push_back(node);
+    }
+
+    RandomGenerator random;
+    const unsigned int MIN_DIST = sqrt(BattleGraph::get()->getNumNodes());
+    const unsigned int TOTAL_ITEM = MIN_DIST / 2;
+
+    Log::info("[ItemManager]","Creating %d random items for arena", TOTAL_ITEM);
+    for (unsigned int i = 0; i < TOTAL_ITEM; i++)
+    {
+        int chosen_node = -1;
+        const unsigned int total_node = BattleGraph::get()->getNumNodes();
+        while(true)
+        {
+            if (used_location.size() - pos.size() +
+                invalid_location.size() == total_node)
+            {
+                Log::warn("[ItemManager]","Can't place more random items! "
+                    "Use default item location.");
+                return false;
+            }
+
+            const int node = random.get(total_node);
+
+            // Check if tried
+            std::vector<int>::iterator it = std::find(invalid_location.begin(),
+                invalid_location.end(), node);
+            if (it != invalid_location.end())
+                continue;
+
+            // Check if near edge
+            if (BattleGraph::get()->isNearEdge(node))
+            {
+                invalid_location.push_back(node);
+                continue;
+            }
+            // Check if too close
+            bool found = true;
+            for (unsigned int j = 0; j < used_location.size(); j++)
+            {
+                if (!found) continue;
+                Vec3 d = BattleGraph::get()
+                    ->getPolyOfNode(used_location[j]).getCenter() -
+                    BattleGraph::get()->getPolyOfNode(node).getCenter();
+                found = d.length_2d() > MIN_DIST;
+            }
+            if (found)
+            {
+                chosen_node = node;
+                invalid_location.push_back(node);
+                break;
+            }
+            else
+                invalid_location.push_back(node);
+        }
+
+        assert(chosen_node != -1);
+        used_location.push_back(chosen_node);
+    }
+
+    for (unsigned int i = 0; i < pos.size(); i++)
+        used_location.erase(used_location.begin());
+
+    assert (used_location.size() == TOTAL_ITEM);
+
+    // Hard-coded ratio for now
+    const int BONUS_BOX = 4;
+    const int NITRO_BIG = 2;
+    const int NITRO_SMALL = 1;
+
+    for (unsigned int i = 0; i < TOTAL_ITEM; i++)
+    {
+        const int j = random.get(10);
+        Item::ItemType type = (j > BONUS_BOX ? Item::ITEM_BONUS_BOX :
+            j > NITRO_BIG ? Item::ITEM_NITRO_BIG :
+            j > NITRO_SMALL ? Item::ITEM_NITRO_SMALL : Item::ITEM_BANANA);
+        Vec3 loc = BattleGraph::get()
+            ->getPolyOfNode(used_location[i]).getCenter();
+        Item* item = newItem(type, loc, Vec3(0, 1, 0));
+        BattleGraph::get()->insertItems(item, used_location[i]);
+    }
+
+    return true;
+}   // randomItemsForArena

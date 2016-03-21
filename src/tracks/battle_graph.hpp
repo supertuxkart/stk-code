@@ -116,7 +116,11 @@ public:
     const NavPoly&    getPolyOfNode(int i) const
                                     { return NavMesh::get()->getNavPoly(i); }
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    /** Returns true if the NavPoly lies near the edge. */
+    bool              isNearEdge(int i) const
+                   { return NavMesh::get()->getNavPoly(i).isPolyNearEdge(); }
+    // ------------------------------------------------------------------------
     /** Returns the next polygon on the shortest path from i to j.
      *    Note: m_parent_poly[j][i] contains the parent of i on path from j to i,
      *    which is the next node on the path from i to j (undirected graph) */
@@ -124,9 +128,12 @@ public:
 
     const std::vector < std::pair<const Item*, int> >& getItemList()
                                                  { return m_items_on_graph; }
-
+    // ------------------------------------------------------------------------
+    void              insertItems(Item* item, int polygon)
+               { m_items_on_graph.push_back(std::make_pair(item, polygon)); }
+    // ------------------------------------------------------------------------
     void              findItemsOnGraphNodes();
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     int               pointToNode(const int cur_node,
                                   const Vec3& cur_point,
                                   bool ignore_vertical) const;

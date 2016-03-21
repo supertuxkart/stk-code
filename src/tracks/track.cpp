@@ -1862,22 +1862,27 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     createPhysicsModel(main_track_count);
 
+    const bool arena_random_item_created =
+        ItemManager::get()->randomItemsForArena(m_start_transforms);
 
-    for (unsigned int i=0; i<root->getNumNodes(); i++)
+    if (!arena_random_item_created)
     {
-        const XMLNode *node = root->getNode(i);
-        const std::string &name = node->getName();
-        if (name=="banana"      || name=="item"      ||
-            name=="small-nitro" || name=="big-nitro" ||
-            name=="easter-egg"                           )
+        for (unsigned int i=0; i<root->getNumNodes(); i++)
         {
-            itemCommand(node);
-        }
-    }   // for i<root->getNumNodes()
+            const XMLNode *node = root->getNode(i);
+            const std::string &name = node->getName();
+            if (name=="banana"      || name=="item"      ||
+                name=="small-nitro" || name=="big-nitro" ||
+                name=="easter-egg"                           )
+            {
+                itemCommand(node);
+            }
+        }   // for i<root->getNumNodes()
+    }
 
     delete root;
 
-    if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
+    if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh && !arena_random_item_created)
         BattleGraph::get()->findItemsOnGraphNodes();
 
     if (UserConfigParams::m_track_debug &&

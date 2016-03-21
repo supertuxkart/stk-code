@@ -83,6 +83,19 @@ void GhostKart::update(float dt)
     }
 
     const unsigned int idx = gc->getCurrentReplayIndex();
+    if (!race_manager->isWatchingReplay())
+    {
+        if (idx == 0)
+        {
+            m_node->setVisible(false);
+        }
+        if (idx == 1)
+        {
+            // Start showing the ghost when it start racing
+            m_node->setVisible(true);
+        }
+    }
+
     const float rd         = gc->getReplayDelta();
     assert(idx < m_all_transform.size());
 

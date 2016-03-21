@@ -515,6 +515,9 @@ namespace UserConfigParams
     /** If track debugging is enabled. */
     PARAM_PREFIX int m_track_debug PARAM_DEFAULT( false );
 
+    /** If random number of items is used in an arena. */
+    PARAM_PREFIX bool m_random_arena_item PARAM_DEFAULT( false );
+
     /** True if check structures should be debugged. */
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
 
