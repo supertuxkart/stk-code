@@ -115,7 +115,6 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
         }
     }
 
-
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
@@ -171,8 +170,12 @@ void OnlineProfileServers::doQuickPlay()
 }   // doQuickPlay
 
 // ----------------------------------------------------------------------------
-void OnlineProfileServers::tearDown()
+/** Also called when pressing the back button. It resets the flags to indicate
+ *  a networked game.
+ */
+bool OnlineProfileServers::onEscapePressed()
 {
-    //NetworkConfig::get()->unsetNetworking();
-}   // onDialogClose
+    NetworkConfig::get()->unsetNetworking();
+    return OnlineProfileBase::onEscapePressed();
+}   // onEscapePressed
 
