@@ -127,7 +127,18 @@ private:
     static SortOrder m_sort_order;
 
 public:
-         Addon() {};
+         Addon():
+            m_revision(),
+            m_installed_revision(),
+            m_icon_revision(),
+            m_status(),
+            m_still_exists(),
+            m_date(),
+            m_icon_ready(),
+            m_installed(),
+            m_size(),
+            m_rating()
+        {};
          /** Initialises the object from an XML node. */
          Addon(const XMLNode &xml);
 
