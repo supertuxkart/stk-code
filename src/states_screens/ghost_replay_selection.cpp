@@ -35,8 +35,6 @@ DEFINE_SCREEN_SINGLETON( GhostReplaySelection );
 GhostReplaySelection::GhostReplaySelection() : Screen("ghost_replay_selection.stkgui")
 {
     m_sort_desc = true;
-    m_go_recording_ghost = false;
-    m_choose_replay = false;
 }   // GhostReplaySelection
 
 // ----------------------------------------------------------------------------
@@ -146,7 +144,7 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
     }   // click on replay file
     else if (name == "record-ghost")
     {
-        m_go_recording_ghost = true;
+        race_manager->setRecordRace(true);
         TracksScreen::getInstance()->setOfficalTrack(false);
         TracksScreen::getInstance()->push();
     }
@@ -209,24 +207,11 @@ void GhostReplaySelection::onColumnClicked(int column_id)
 }   // onColumnClicked
 
 // ----------------------------------------------------------------------------
-void GhostReplaySelection::tearDown()
+bool GhostReplaySelection::onEscapePressed()
 {
-    if (m_go_recording_ghost)
-    {
-        m_go_recording_ghost = false;
-        race_manager->setRecordRace(true);
-        return;
-    }
-    if (m_choose_replay)
-    {
-        m_choose_replay = false;
-        return;
-    }
-
-    // Reset them when leave this screen normally (not from dialog)
-    m_go_recording_ghost = false;
+    // Reset it when leave this screen
     race_manager->setRecordRace(false);
-
-}   // tearDown
+    return true;
+}   // onEscapePressed
 
 // ----------------------------------------------------------------------------

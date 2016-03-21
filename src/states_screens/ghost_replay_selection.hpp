@@ -44,8 +44,6 @@ private:
     GUIEngine::ListWidget* m_replay_list_widget;
     std::string            m_file_to_be_deleted;
     bool                   m_sort_desc;
-    bool                   m_go_recording_ghost;
-    bool                   m_choose_replay;
 
 public:
 
@@ -55,8 +53,6 @@ public:
     void loadList();
 
     void onDeleteReplay(std::string& filename);
-
-    void setConfirmReplay() { m_choose_replay = true; }
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
@@ -72,7 +68,7 @@ public:
 
     virtual void init() OVERRIDE;
 
-    virtual void tearDown() OVERRIDE;
+    virtual bool onEscapePressed() OVERRIDE;
 
     /** \brief Implement IConfirmDialogListener callback */
     virtual void onConfirm() OVERRIDE;

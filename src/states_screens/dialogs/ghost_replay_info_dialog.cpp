@@ -95,9 +95,6 @@ GUIEngine::EventPropagation
 
             race_manager->setReverseTrack(reverse);
 
-            dynamic_cast<GhostReplaySelection*>(GUIEngine::getCurrentScreen())
-                ->setConfirmReplay();
-
             if (race_manager->isWatchingReplay())
                 race_manager->startWatchingReplay(track_name, laps);
             else
