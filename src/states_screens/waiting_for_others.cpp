@@ -76,9 +76,13 @@ void WaitingForOthersScreen::onUpdate(float dt)
             continue;
         core::stringw name = profile->getName();
 
-        w += name + L" : ";
 
         int playerId = profile->getGlobalPlayerId();
+        const std::string &kart = profile->getKartName();
+        if (!kart.empty())
+            name += StringUtils::insertValues(L" (%s)", core::stringw(kart.c_str()));
+
+        w += name + L" : ";
         const RaceVote& vote = config->getRaceVote(playerId);
         if (vote.hasVotedTrack())
         {
