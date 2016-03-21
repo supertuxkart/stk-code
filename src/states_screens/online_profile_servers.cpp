@@ -168,8 +168,11 @@ void OnlineProfileServers::doQuickPlay()
     {
         SFXManager::get()->quickSound("anvil");
     }
-
 }   // doQuickPlay
 
 // ----------------------------------------------------------------------------
+void OnlineProfileServers::tearDown()
+{
+    //NetworkConfig::get()->unsetNetworking();
+}   // onDialogClose
 
