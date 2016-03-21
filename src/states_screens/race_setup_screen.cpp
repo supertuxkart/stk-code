@@ -31,7 +31,7 @@
 #include "states_screens/ghost_replay_selection.hpp"
 #include "states_screens/soccer_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/tracks_screen.hpp"
+#include "states_screens/tracks_and_gp_screen.hpp"
 #include "utils/translation.hpp"
 
 const int CONFIG_CODE_NORMAL    = 0;
@@ -204,13 +204,13 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
             UserConfigParams::m_game_mode = CONFIG_CODE_NORMAL;
-            TracksScreen::getInstance()->push();
+            TracksAndGPScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_TTRIAL)
         {
             race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
             UserConfigParams::m_game_mode = CONFIG_CODE_TIMETRIAL;
-            TracksScreen::getInstance()->push();
+            TracksAndGPScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_FTL)
         {
@@ -220,7 +220,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
 
             race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
             UserConfigParams::m_game_mode = CONFIG_CODE_FTL;
-            TracksScreen::getInstance()->push();
+            TracksAndGPScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_STRIKES)
         {
