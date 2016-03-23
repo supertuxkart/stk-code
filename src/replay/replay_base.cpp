@@ -26,12 +26,14 @@ ReplayBase::ReplayBase()
 // -----------------------------------------------------------------------------
 /** Opens a replay file which is determined by sub classes.
  *  \param writeable True if the file should be opened for writing.
+ *  \param full_path True if the file is full path.
  *  \return A FILE *, or NULL if the file could not be opened.
  */
-FILE* ReplayBase::openReplayFile(bool writeable)
+FILE* ReplayBase::openReplayFile(bool writeable, bool full_path)
 {
-    FILE *fd = fopen((file_manager->getReplayDir() +
-        getReplayFilename()).c_str(), writeable ? "w" : "r");
+    FILE *fd = fopen(full_path ? getReplayFilename().c_str() :
+        (file_manager->getReplayDir() + getReplayFilename()).c_str(),
+        writeable ? "w" : "r");
     if (!fd)
     {
         return NULL;

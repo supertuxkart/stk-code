@@ -63,8 +63,11 @@ core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* 
         label.append( _("Required Nitro Points: %i", c->getEnergy(difficulty)) );
     }
 
-    if (label.size() > 0) label.append(L"\n");
-    label.append(_("Number of AI Karts: %i", c->getNumKarts(difficulty) - 1));
+    if (!c->isGhostReplay())
+    {
+        if (label.size() > 0) label.append(L"\n");
+        label.append(_("Number of AI Karts: %i", c->getNumKarts(difficulty) - 1));
+    }
 
     return label;
 }
@@ -144,6 +147,8 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
         typeLbl->setText(_("Grand Prix"), false );
     else if (c->getData()->getEnergy(RaceManager::DIFFICULTY_EASY) > 0)
         typeLbl->setText(_("Nitro challenge"), false );
+    else if (c->getData()->isGhostReplay())
+        typeLbl->setText(_("Ghost replay race"), false );
     else
         typeLbl->setText( RaceManager::getNameOf(c->getData()->getMinorMode()), false );
 

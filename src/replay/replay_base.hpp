@@ -68,7 +68,7 @@ protected:
     };   // KartReplayEvent
 
     // ------------------------------------------------------------------------
-    FILE *openReplayFile(bool writeable);
+    FILE *openReplayFile(bool writeable, bool full_path = false);
     // ------------------------------------------------------------------------
     /** Returns the filename that was opened. */
     virtual const std::string& getReplayFilename() const = 0;

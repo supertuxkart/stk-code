@@ -93,6 +93,8 @@ private:
 
     unsigned int             m_current_replay_file;
 
+    bool                     m_custom_replay_file;
+
     std::vector<ReplayData>  m_replay_file_list;
 
     /** All ghost karts. */
@@ -117,6 +119,9 @@ public:
     // ------------------------------------------------------------------------
     void               setReplayFile(unsigned int n)
                                                 { m_current_replay_file = n; }
+    // ------------------------------------------------------------------------
+    bool               addReplayFile(const std::string& fn,
+                                     bool custom_replay = false);
     // ------------------------------------------------------------------------
     const ReplayData&  getReplayData(unsigned int n) const
                                           { return m_replay_file_list.at(n); }
