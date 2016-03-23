@@ -62,7 +62,8 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 // ----------------------------------------------------------------------------
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
-    m_server = NULL;
+    m_server      = NULL;
+    m_player_list = NULL;
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------
@@ -225,8 +226,11 @@ void NetworkingLobby::onDialogClose()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::addPlayer(NetworkPlayerProfile *profile)
 {
-    m_player_list->addItem(StringUtils::toString(profile->getGlobalPlayerId()),
-                           profile->getName());
+    // In GUI-less server this function will be called without proper
+    // initialisation
+    if(m_player_list)
+        m_player_list->addItem(StringUtils::toString(profile->getGlobalPlayerId()),
+                               profile->getName());
 }  // addPlayer
 
 // ----------------------------------------------------------------------------
