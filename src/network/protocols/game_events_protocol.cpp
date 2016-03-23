@@ -44,11 +44,6 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         Log::warn("GameEventsProtocol", "Too short message.");
         return true;
     }
-    if ( event->getPeer()->getClientServerToken() != data.getUInt32())
-    {
-        Log::warn("GameEventsProtocol", "Bad token.");
-        return true;
-    }
     int8_t type = data.getUInt8();
     switch (type)
     {
