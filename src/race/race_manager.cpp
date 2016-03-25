@@ -948,7 +948,7 @@ void RaceManager::setupPlayerKartInfo()
 void RaceManager::startWatchingReplay(const std::string &track_ident,
                                       const int num_laps)
 {
-    assert(m_watching_replay && m_has_ghost_karts && !m_will_record_race);
+    assert(m_watching_replay && m_has_ghost_karts && !m_is_recording_race);
     StateManager::get()->enterGameState();
     setTrack(track_ident);
     setNumLaps(num_laps);

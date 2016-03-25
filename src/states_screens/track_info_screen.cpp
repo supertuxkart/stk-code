@@ -231,9 +231,9 @@ void TrackInfoScreen::init()
     const bool record_available = race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL;
     m_record_race->setVisible(record_available);
     getWidget<LabelWidget>("record-race-text")->setVisible(record_available);
-    if (race_manager->willRecordRace())
+    if (race_manager->isRecordingRace())
     {
-        // willRecordRace() is true when it's pre-set by ghost replay selection
+        // isRecordingRace() is true when it's pre-set by ghost replay selection
         // which force record this race
         m_record_this_race = true;
         m_record_race->setState(true);

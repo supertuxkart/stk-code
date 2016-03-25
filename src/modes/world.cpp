@@ -280,7 +280,7 @@ void World::reset()
     race_manager->reset();
     // Make sure to overwrite the data from the previous race.
     if(!history->replayHistory()) history->initRecording();
-    if(race_manager->willRecordRace())
+    if(race_manager->isRecordingRace())
     {
         Log::info("World", "Start Recording race.");
         ReplayRecorder::get()->init();
@@ -436,16 +436,18 @@ World::~World()
         delete m_karts[i];
     }
 
-    if(race_manager->hasGhostKarts())
+    if(race_manager->hasGhostKarts() || race_manager->isRecordingRace())
     {
         // Destroy the old replay object, which also stored the ghost
         // karts, and create a new one (which means that in further
         // races the usage of ghosts will still be enabled).
+        // It can allow auto recreation of ghost replay file lists
+        // when next time visit the ghost replay selection screen.
         ReplayPlay::destroy();
         ReplayPlay::create();
     }
     m_karts.clear();
-    if(race_manager->willRecordRace())
+    if(race_manager->isRecordingRace())
         ReplayRecorder::get()->reset();
     race_manager->setRaceGhostKarts(false);
     race_manager->setRecordRace(false);
@@ -982,7 +984,7 @@ void World::update(float dt)
 
     PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
     history->update(dt);
-    if(race_manager->willRecordRace()) ReplayRecorder::get()->update(dt);
+    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
     if (m_script_engine) m_script_engine->update(dt);

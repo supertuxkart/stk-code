@@ -351,7 +351,7 @@ private:
     /** Determines if saved GP should be continued or not*/
     bool m_continue_saved_gp;
 
-    bool m_will_record_race;
+    bool m_is_recording_race;
 
     bool m_has_ghost_karts;
 
@@ -722,7 +722,7 @@ public:
     // ------------------------------------------------------------------------
     void setRecordRace(bool record)
     {
-        m_will_record_race = record;
+        m_is_recording_race = record;
     }   // setRecordRace
     // ------------------------------------------------------------------------
     void setRaceGhostKarts(bool ghost)
@@ -735,10 +735,10 @@ public:
         m_watching_replay = watch;
     }   // setWatchingReplay
     // ------------------------------------------------------------------------
-    bool willRecordRace() const
+    bool isRecordingRace() const
     {
-        return m_will_record_race;
-    }   // willRecordRace
+        return m_is_recording_race;
+    }   // isRecordingRace
     // ------------------------------------------------------------------------
     bool hasGhostKarts() const
     {
