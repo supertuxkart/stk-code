@@ -22,10 +22,10 @@
 #include "io/file_manager.hpp"
 #include "guiengine/message_queue.hpp"
 #include "karts/ghost_kart.hpp"
+#include "karts/kart_gfx.hpp"
 #include "modes/world.hpp"
 #include "physics/btKart.hpp"
 #include "race/race_manager.hpp"
-#include "tracks/terrain_info.hpp"
 #include "tracks/track.hpp"
 
 #include <algorithm>
@@ -100,14 +100,14 @@ void ReplayRecorder::update(float dt)
 {
     if (m_incorrect_replay || m_complete_replay) return;
 
-    const World *world = World::getWorld();
+    World *world = World::getWorld();
     const bool single_player = race_manager->getNumPlayers() == 1;
     unsigned int num_karts = world->getNumKarts();
 
     float time = world->getTime();
     for(unsigned int i=0; i<num_karts; i++)
     {
-        const AbstractKart *kart = world->getKart(i);
+        AbstractKart *kart = world->getKart(i);
         // If a single player give up in game menu, stop recording
         if (kart->isEliminated() && single_player) return;
 
@@ -159,27 +159,8 @@ void ReplayRecorder::update(float dt)
             }
         }
 
-        bool nitro = false;
-        bool zipper = false;
-        const KartControl kc = kart->getControls();
-        const Material* m = kart->getTerrainInfo()->getMaterial();
-        if (kc.m_nitro && kart->isOnGround() &&
-            kart->isOnMinNitroTime() > 0.0f && kart->getEnergy() > 0.0f)
-        {
-            nitro = true;
-        }
-        if (m)
-        {
-            if (m->isZipper() && kart->isOnGround())
-                zipper = true;
-        }
-        if (kc.m_fire &&
-            kart->getPowerup()->getType() == PowerupManager::POWERUP_ZIPPER)
-        {
-            zipper = true;
-        }
-        r->m_on_nitro = nitro;
-        r->m_on_zipper = zipper;
+        kart->getKartGFX()->getGFXStatus(&(r->m_nitro_zipper_usage),
+            &(r->m_skidding_state));
         r->m_jumping = kart->isJumping();
     }   // for i
 
@@ -282,8 +263,8 @@ void ReplayRecorder::save()
                     q->m_suspension_length[1],
                     q->m_suspension_length[2],
                     q->m_suspension_length[3],
-                    (int)r->m_on_nitro,
-                    (int)r->m_on_zipper,
+                    (int)r->m_nitro_zipper_usage,
+                    (int)r->m_skidding_state,
                     (int)r->m_jumping
                 );
         }   // for i

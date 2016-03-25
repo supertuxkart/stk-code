@@ -40,6 +40,7 @@ class btKart;
 class btQuaternion;
 class Controller;
 class Item;
+class KartGFX;
 class KartModel;
 class KartProperties;
 class Material;
@@ -375,6 +376,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current powerup. */
     virtual Powerup *getPowerup() = 0;
+    // ------------------------------------------------------------------------
+    /** Returns a points to this kart's graphical effects. */
+    virtual KartGFX* getKartGFX() = 0;
     // ------------------------------------------------------------------------
     virtual void setPowerup (PowerupManager::PowerupType t, int n) = 0;
     // ------------------------------------------------------------------------

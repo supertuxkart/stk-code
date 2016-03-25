@@ -79,6 +79,7 @@ void GhostKart::update(float dt)
     if (gc->isReplayEnd())
     {
         m_node->setVisible(false);
+        getKartGFX()->setGFXInvisible();
         return;
     }
 
@@ -99,20 +100,6 @@ void GhostKart::update(float dt)
     const float rd         = gc->getReplayDelta();
     assert(idx < m_all_transform.size());
 
-    float nitro_frac = 0;
-    if (m_all_replay_events[idx].m_on_nitro)
-    {
-        nitro_frac = fabsf(m_all_physic_info[idx].m_speed) /
-            (m_kart_properties->getEngineMaxSpeed());
-
-        if (nitro_frac > 1.0f)
-            nitro_frac = 1.0f;
-    }
-    getKartGFX()->updateNitroGraphics(nitro_frac);
-
-    if (m_all_replay_events[idx].m_on_zipper)
-        showZipperFire();
-
     setXYZ((1- rd)*m_all_transform[idx    ].getOrigin()
            +  rd  *m_all_transform[idx + 1].getOrigin() );
 
@@ -127,6 +114,9 @@ void GhostKart::update(float dt)
     Moveable::updateGraphics(dt, center_shift, btQuaternion(0, 0, 0, 1));
     getKartModel()->update(dt, dt*(m_all_physic_info[idx].m_speed),
         m_all_physic_info[idx].m_steer, m_all_physic_info[idx].m_speed, idx);
+
+    getKartGFX()->setGFXFromReplay(m_all_replay_events[idx].m_nitro_zipper_usage,
+        m_all_replay_events[idx].m_skidding_state);
     getKartGFX()->update(dt);
 
     Vec3 front(0, 0, getKartLength()*0.5f);

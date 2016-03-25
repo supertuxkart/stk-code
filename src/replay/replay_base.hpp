@@ -57,13 +57,14 @@ protected:
     };   // PhysicInfo
 
     // ------------------------------------------------------------------------
-    /** Records all other events - atm nitro, zipper and jumping handling. */
+    /** Records all other events. */
     struct KartReplayEvent
     {
-        /** True if the kart recorded is using nitro/zipper or jumping.
-          * If true, a suitable GFX or animation will be replayed. */
-        bool        m_on_nitro;
-        bool        m_on_zipper;
+        /** Combined info for nitro and zipper usage for the kart recored. */
+        uint32_t    m_nitro_zipper_usage;
+        /** Combined info for skidding info for the kart recored. */
+        uint32_t    m_skidding_state;
+        /** True if the kart recorded is jumping. */
         bool        m_jumping;
     };   // KartReplayEvent
 
