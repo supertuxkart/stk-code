@@ -403,7 +403,7 @@ void KartGFX::getGFXStatus(int* nitro, bool* zipper,
 
     if (m_all_emitters[KGFX_NITRO1])
     {
-        n = (uint16_t)(m_all_emitters[KGFX_NITRO1]->getCreationRate());
+        n = m_all_emitters[KGFX_NITRO1]->getCreationRate();
     }
 
     if (m_all_emitters[KGFX_ZIPPER])
@@ -413,7 +413,7 @@ void KartGFX::getGFXStatus(int* nitro, bool* zipper,
 
     if (m_all_emitters[KGFX_SKIDL])
     {
-        s = (uint16_t)(m_all_emitters[KGFX_SKIDL]->getCreationRate());
+        s = m_all_emitters[KGFX_SKIDL]->getCreationRate();
         r = m_skidding_light_2->isVisible();
     }
 
