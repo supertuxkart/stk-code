@@ -16,19 +16,7 @@ subject to the following restrictions:
 #ifndef BT_COLLISION_OBJECT_H
 #define BT_COLLISION_OBJECT_H
 
-#if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && _MSC_VER < 1800
-#  undef isnan
-#  define isnan _isnan
-#  define isinf(x) (!_finite(x))
-#else
-#  include <math.h>
-#endif
-
-#if defined(__MINGW32__) && __cplusplus >= 201103
-	#include <cmath>
-	using std::isinf;
-	using std::isnan;
-#endif
+#include <cmath>
 
 #include "LinearMath/btTransform.h"
 
@@ -308,12 +296,12 @@ public:
 
 	void	setWorldTransform(const btTransform& worldTrans)
 	{
-        btAssert(!isnan(worldTrans.getOrigin().getX()));
-        btAssert(!isnan(worldTrans.getOrigin().getY()));
-        btAssert(!isnan(worldTrans.getOrigin().getZ()));
-        btAssert(!isinf(worldTrans.getOrigin().getX()));
-        btAssert(!isinf(worldTrans.getOrigin().getY()));
-        btAssert(!isinf(worldTrans.getOrigin().getZ()));
+        btAssert(!std::isnan(worldTrans.getOrigin().getX()));
+        btAssert(!std::isnan(worldTrans.getOrigin().getY()));
+        btAssert(!std::isnan(worldTrans.getOrigin().getZ()));
+        btAssert(!std::isinf(worldTrans.getOrigin().getX()));
+        btAssert(!std::isinf(worldTrans.getOrigin().getY()));
+        btAssert(!std::isinf(worldTrans.getOrigin().getZ()));
 		m_worldTransform = worldTrans;
 	}
 

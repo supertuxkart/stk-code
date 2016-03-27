@@ -19,7 +19,7 @@
 
 #include "graphics/camera.hpp"
 
-#include <math.h>
+#include <cmath>
 
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
@@ -353,9 +353,9 @@ void Camera::setInitialTransform()
     m_camera->setRotation( core::vector3df( 0.0f, 0.0f, 0.0f ) );
     m_camera->setFOV(m_fov);
 
-    assert(!isnan(m_camera->getPosition().X));
-    assert(!isnan(m_camera->getPosition().Y));
-    assert(!isnan(m_camera->getPosition().Z));
+    assert(!std::isnan(m_camera->getPosition().X));
+    assert(!std::isnan(m_camera->getPosition().Y));
+    assert(!std::isnan(m_camera->getPosition().Z));
 }   // setInitialTransform
 
 //-----------------------------------------------------------------------------
@@ -429,9 +429,9 @@ void Camera::smoothMoveCamera(float dt)
         m_camera->setPosition(current_position);
     m_camera->setTarget(current_target);//set new target
 
-    assert(!isnan(m_camera->getPosition().X));
-    assert(!isnan(m_camera->getPosition().Y));
-    assert(!isnan(m_camera->getPosition().Z));
+    assert(!std::isnan(m_camera->getPosition().X));
+    assert(!std::isnan(m_camera->getPosition().Y));
+    assert(!std::isnan(m_camera->getPosition().Z));
 
 }   // smoothMoveCamera
 
