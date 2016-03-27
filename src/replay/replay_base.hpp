@@ -60,10 +60,14 @@ protected:
     /** Records all other events. */
     struct KartReplayEvent
     {
-        /** Combined info for nitro and zipper usage for the kart recored. */
-        uint32_t    m_nitro_zipper_usage;
-        /** Combined info for skidding info for the kart recored. */
-        uint32_t    m_skidding_state;
+        /** Nitro usage for the kart recorded. */
+        int    m_nitro_usage;
+        /** Zipper usage for the kart recorded. */
+        bool   m_zipper_usage;
+        /** Skidding state for the kart recorded. */
+        int    m_skidding_state;
+        /** Kart skidding showing red flame or not. */
+        bool   m_red_skidding;
         /** True if the kart recorded is jumping. */
         bool        m_jumping;
     };   // KartReplayEvent
@@ -77,7 +81,7 @@ protected:
     /** Returns the version number of the replay file. This is used to check
      *  that a loaded replay file can still be understood by this
      *  executable. */
-    unsigned int getReplayVersion() const { return 2; }
+    unsigned int getReplayVersion() const { return 3; }
 
 public:
              ReplayBase();

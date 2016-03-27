@@ -159,8 +159,8 @@ void ReplayRecorder::update(float dt)
             }
         }
 
-        kart->getKartGFX()->getGFXStatus(&(r->m_nitro_zipper_usage),
-            &(r->m_skidding_state));
+        kart->getKartGFX()->getGFXStatus(&(r->m_nitro_usage),
+            &(r->m_zipper_usage), &(r->m_skidding_state), &(r->m_red_skidding));
         r->m_jumping = kart->isJumping();
     }   // for i
 
@@ -248,7 +248,7 @@ void ReplayRecorder::save()
             const TransformEvent *p  = &(m_transform_events[k][i]);
             const PhysicInfo *q      = &(m_physic_info[k][i]);
             const KartReplayEvent *r = &(m_kart_replay_event[k][i]);
-            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f  %d %d %d\n",
+            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f  %d %d %d %d %d\n",
                     p->m_time,
                     p->m_transform.getOrigin().getX(),
                     p->m_transform.getOrigin().getY(),
@@ -263,8 +263,10 @@ void ReplayRecorder::save()
                     q->m_suspension_length[1],
                     q->m_suspension_length[2],
                     q->m_suspension_length[3],
-                    (int)r->m_nitro_zipper_usage,
-                    (int)r->m_skidding_state,
+                    r->m_nitro_usage,
+                    (int)r->m_zipper_usage,
+                    r->m_skidding_state,
+                    (int)r->m_red_skidding,
                     (int)r->m_jumping
                 );
         }   // for i

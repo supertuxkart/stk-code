@@ -248,17 +248,17 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
     {
         fgets(s, 1023, fd);
         float x, y, z, rx, ry, rz, rw, time, speed, steer, w1, w2, w3, w4;
-        int nitro_zipper, skidding, jumping;
+        int nitro, zipper, skidding, red_skidding, jumping;
 
         // Check for EV_TRANSFORM event:
         // -----------------------------
-        if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f  %d %d %d\n",
+        if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f  %d %d %d %d %d\n",
             &time,
             &x, &y, &z,
             &rx, &ry, &rz, &rw,
             &speed, &steer, &w1, &w2, &w3, &w4,
-            &nitro_zipper, &skidding, &jumping
-            )==17)
+            &nitro, &zipper, &skidding, &red_skidding, &jumping
+            )==19)
         {
             btQuaternion q(rx, ry, rz, rw);
             btVector3 xyz(x, y, z);
@@ -270,8 +270,10 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
             pi.m_suspension_length[1] = w2;
             pi.m_suspension_length[2] = w3;
             pi.m_suspension_length[3] = w4;
-            kre.m_nitro_zipper_usage = (uint32_t)nitro_zipper;
-            kre.m_skidding_state = (uint32_t)skidding;
+            kre.m_nitro_usage = nitro;
+            kre.m_zipper_usage = (bool)zipper;
+            kre.m_skidding_state = skidding;
+            kre.m_red_skidding = (bool)red_skidding;
             kre.m_jumping = jumping != 0;
             m_ghost_karts[kart_num].addReplayEvent(time,
                 btTransform(q, xyz), pi, kre);

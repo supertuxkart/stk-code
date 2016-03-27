@@ -393,55 +393,50 @@ void KartGFX::updateSkidLight(unsigned int level)
 }   // updateSkidLight
 
 // ----------------------------------------------------------------------------
-void KartGFX::getGFXStatus(uint32_t* nitro_zipper, uint32_t* skidding) const
+void KartGFX::getGFXStatus(int* nitro, bool* zipper,
+                           int* skidding, bool* red_skidding) const
 {
-    uint32_t n_z, s;
-    n_z = 0;
-    s = 0;
+    int n = 0;
+    bool z = false;
+    int s = 0;
+    bool r = false;
+
+    if (m_all_emitters[KGFX_NITRO1])
+    {
+        n = (uint16_t)(m_all_emitters[KGFX_NITRO1]->getCreationRate());
+    }
 
     if (m_all_emitters[KGFX_ZIPPER])
     {
-        n_z |= m_all_emitters[KGFX_ZIPPER]->getCreationRate() > 0;
-        n_z <<= 16;
-    }
-    if (m_all_emitters[KGFX_NITRO1])
-    {
-        n_z += (uint16_t)(m_all_emitters[KGFX_NITRO1]->getCreationRate());
+        z = m_all_emitters[KGFX_ZIPPER]->getCreationRate() > 0;
     }
 
     if (m_all_emitters[KGFX_SKIDL])
     {
-        s |= m_skidding_light_2->isVisible();
-        s <<= 16;
-        s += (uint16_t)(m_all_emitters[KGFX_SKIDL]->getCreationRate());
+        s = (uint16_t)(m_all_emitters[KGFX_SKIDL]->getCreationRate());
+        r = m_skidding_light_2->isVisible();
     }
 
-    *nitro_zipper = n_z;
+    *nitro = n;
+    *zipper = z;
     *skidding = s;
+    *red_skidding = r;
 
 }   // getGFXStatus
 
 // ----------------------------------------------------------------------------
-void KartGFX::setGFXFromReplay(uint32_t nitro_zipper, uint32_t skidding)
+void KartGFX::setGFXFromReplay(int nitro, bool zipper,
+                               int skidding, bool red_skidding)
 {
-    const int nitro_rate = (int)(nitro_zipper & 0xffff);
-    const bool zipper_fire = ((nitro_zipper >> 16) & 0xffff) != 0;
-
-    const int skidding_rate = (int)(skidding & 0xffff);
-    const bool red_fire_skidding = ((skidding >> 16) & 0xffff) != 0;
-
-    if (zipper_fire)
-        setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 800.0f);
-
-    if (nitro_rate > 0)
+    if (nitro > 0)
     {
-        setCreationRateAbsolute(KartGFX::KGFX_NITRO1,      (float)nitro_rate);
-        setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      (float)nitro_rate);
-        setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, (float)nitro_rate);
-        setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, (float)nitro_rate);
+        setCreationRateAbsolute(KartGFX::KGFX_NITRO1,      (float)nitro);
+        setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      (float)nitro);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, (float)nitro);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, (float)nitro);
         m_nitro_light->setVisible(true);
     }
-    else if (m_nitro_light->isVisible() && nitro_rate == 0)
+    else if (m_nitro_light->isVisible() && nitro == 0)
     {
         setCreationRateAbsolute(KartGFX::KGFX_NITRO1,      0.0f);
         setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      0.0f);
@@ -450,9 +445,12 @@ void KartGFX::setGFXFromReplay(uint32_t nitro_zipper, uint32_t skidding)
         m_nitro_light->setVisible(false);
     }
 
-    if (skidding_rate > 0)
+    if (zipper)
+        setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 800.0f);
+
+    if (skidding > 0)
     {
-        if (!m_skidding_light_1->isVisible() && !red_fire_skidding)
+        if (!m_skidding_light_1->isVisible() && !red_skidding)
         {
             if (m_all_emitters[KGFX_SKID1L])
                 m_all_emitters[KGFX_SKID1L]->setParticleType(m_skid_kind1);
@@ -462,7 +460,7 @@ void KartGFX::setGFXFromReplay(uint32_t nitro_zipper, uint32_t skidding)
             m_skidding_light_1->setVisible(true);
             m_skidding_light_2->setVisible(false);
         }
-        if (!m_skidding_light_2->isVisible() && red_fire_skidding)
+        if (!m_skidding_light_2->isVisible() && red_skidding)
         {
             if (m_all_emitters[KGFX_SKID1L])
                 m_all_emitters[KGFX_SKID1L]->setParticleType(m_skid_kind2);
@@ -472,11 +470,11 @@ void KartGFX::setGFXFromReplay(uint32_t nitro_zipper, uint32_t skidding)
             m_skidding_light_1->setVisible(false);
             m_skidding_light_2->setVisible(true);
         }
-        setCreationRateAbsolute(KartGFX::KGFX_SKIDL, (float)skidding_rate);
-        setCreationRateAbsolute(KartGFX::KGFX_SKIDR, (float)skidding_rate);
+        setCreationRateAbsolute(KartGFX::KGFX_SKIDL, (float)skidding);
+        setCreationRateAbsolute(KartGFX::KGFX_SKIDR, (float)skidding);
     }
     else if ((m_skidding_light_1->isVisible() ||
-        m_skidding_light_2->isVisible()) && skidding_rate == 0)
+        m_skidding_light_2->isVisible()) && skidding == 0)
     {
         setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0.0f);
         setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0.0f);

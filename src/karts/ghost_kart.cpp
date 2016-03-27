@@ -115,8 +115,10 @@ void GhostKart::update(float dt)
     getKartModel()->update(dt, dt*(m_all_physic_info[idx].m_speed),
         m_all_physic_info[idx].m_steer, m_all_physic_info[idx].m_speed, idx);
 
-    getKartGFX()->setGFXFromReplay(m_all_replay_events[idx].m_nitro_zipper_usage,
-        m_all_replay_events[idx].m_skidding_state);
+    getKartGFX()->setGFXFromReplay(m_all_replay_events[idx].m_nitro_usage,
+        m_all_replay_events[idx].m_zipper_usage,
+        m_all_replay_events[idx].m_skidding_state,
+        m_all_replay_events[idx].m_red_skidding);
     getKartGFX()->update(dt);
 
     Vec3 front(0, 0, getKartLength()*0.5f);
