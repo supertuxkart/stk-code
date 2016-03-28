@@ -1039,7 +1039,7 @@ void RaceResultGUI::backToLobby()
         core::rect<s32> pos(current_x, current_y, current_x, current_y);
         font->draw(result_text.c_str(), pos, color, true, true);
 
-        core::dimension2du rect = m_font->getDimension(result_text.c_str());
+        core::dimension2du rect = font->getDimension(result_text.c_str());
 
         //Draw team scores:
         current_y += rect.Height;
@@ -1061,11 +1061,10 @@ void RaceResultGUI::backToLobby()
             NULL, NULL, true);
 
         result_text = StringUtils::toWString(blue_score);
-        rect = m_font->getDimension(result_text.c_str());
+        rect = font->getDimension(result_text.c_str());
         current_x += red_icon->getSize().Width / 4;
         current_y += red_icon->getSize().Height / 2 + rect.Height / 4;
         pos = core::rect<s32>(current_x, current_y, current_x, current_y);
-        color = video::SColor(255, 255, 255, 255);
         font->draw(result_text.c_str(), pos, color, true, false);
 
         current_x -= UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
@@ -1108,7 +1107,7 @@ void RaceResultGUI::backToLobby()
 
             result_text.append("  ");
             result_text.append(StringUtils::timeToString(score_times.at(i)).c_str());
-            rect = m_font->getDimension(result_text.c_str());
+            rect = font->getDimension(result_text.c_str());
 
             if (height - prev_y < ((short)scorers.size() + 1)*(short)rect.Height)
                 current_y += (height - prev_y) / ((short)scorers.size() + 1);
@@ -1123,7 +1122,7 @@ void RaceResultGUI::backToLobby()
             scorer_icon = sw->getKart(scorers.at(i).m_id)
                 ->getKartProperties()->getIconMaterial()->getTexture();
             source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
-            irr::u32 offset_x = GUIEngine::getFont()->getDimension(result_text.c_str()).Width / 2;
+            irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
             dest_rect = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
             draw2DImage(scorer_icon, dest_rect, source_rect,
                 NULL, NULL, true);
@@ -1156,7 +1155,7 @@ void RaceResultGUI::backToLobby()
 
             result_text.append("  ");
             result_text.append(StringUtils::timeToString(score_times.at(i)).c_str());
-            rect = m_font->getDimension(result_text.c_str());
+            rect = font->getDimension(result_text.c_str());
 
             if (height - prev_y < ((short)scorers.size() + 1)*(short)rect.Height)
                 current_y += (height - prev_y) / ((short)scorers.size() + 1);
@@ -1171,7 +1170,7 @@ void RaceResultGUI::backToLobby()
             scorer_icon = sw->getKart(scorers.at(i).m_id)->
                 getKartProperties()->getIconMaterial()->getTexture();
             source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
-            irr::u32 offset_x = GUIEngine::getFont()->getDimension(result_text.c_str()).Width / 2;
+            irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
 
             dest_rect = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
             draw2DImage(scorer_icon, dest_rect, source_rect,
