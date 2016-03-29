@@ -56,9 +56,9 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node, TrackObject* object) : Ani
                         object->getInitRotation() );
     m_hpr = object->getInitRotation();
 
-    assert(!isnan(m_hpr.getX()));
-    assert(!isnan(m_hpr.getY()));
-    assert(!isnan(m_hpr.getZ()));
+    assert(!std::isnan(m_hpr.getX()));
+    assert(!std::isnan(m_hpr.getY()));
+    assert(!std::isnan(m_hpr.getZ()));
 }   // ThreeDAnimation
 
 // ----------------------------------------------------------------------------
@@ -94,9 +94,9 @@ void ThreeDAnimation::update(float dt)
         core::matrix4 m;
         m.makeIdentity();
         core::matrix4 mx;
-        assert(!isnan(m_hpr.getX()));
-        assert(!isnan(m_hpr.getY()));
-        assert(!isnan(m_hpr.getZ()));
+        assert(!std::isnan(m_hpr.getX()));
+        assert(!std::isnan(m_hpr.getY()));
+        assert(!std::isnan(m_hpr.getZ()));
         mx.setRotationDegrees(core::vector3df(m_hpr.getX(), 0, 0));
         core::matrix4 my;
         my.setRotationDegrees(core::vector3df(0, m_hpr.getY(), 0));

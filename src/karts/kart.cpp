@@ -84,12 +84,6 @@
 #  pragma warning(disable:4355)
 #endif
 
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
-
 /** The kart constructor.
  *  \param ident  The identifier for the kart model to use.
  *  \param position The position (or rank) for this kart (between 1 and
@@ -1038,20 +1032,20 @@ float Kart::getStartupBoost() const
 float Kart::getActualWheelForce()
 {
     float add_force = m_max_speed->getCurrentAdditionalEngineForce();
-    assert(!isnan(add_force));
+    assert(!std::isnan(add_force));
     const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
     for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
         if(m_speed <= m_kart_properties->getEngineMaxSpeed() * gear_ratio[i])
         {
-            assert(!isnan(m_kart_properties->getEnginePower()));
-            assert(!isnan(m_kart_properties->getGearPowerIncrease()[i]));
+            assert(!std::isnan(m_kart_properties->getEnginePower()));
+            assert(!std::isnan(m_kart_properties->getGearPowerIncrease()[i]));
             return m_kart_properties->getEnginePower()
                  * m_kart_properties->getGearPowerIncrease()[i]
                  + add_force;
         }
     }
-    assert(!isnan(m_kart_properties->getEnginePower()));
+    assert(!std::isnan(m_kart_properties->getEnginePower()));
     return m_kart_properties->getEnginePower() + add_force * 2;
 
 }   // getActualWheelForce
@@ -2255,7 +2249,7 @@ void Kart::updateEngineSFX()
         if (f>1.0f) f=1.0f;
 
         float gears = 3.0f * fmod(f, 0.333334f);
-        assert(!isnan(f));
+        assert(!std::isnan(f));
         m_engine_sound->setSpeedPosition(0.6f + (f + gears) * 0.35f, getXYZ());
     }
     else
@@ -2350,8 +2344,8 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         {
             m_brake_time = 0;
             // lift the foot from throttle, brakes with 10% engine_power
-            assert(!isnan(m_controls.m_accel));
-            assert(!isnan(engine_power));
+            assert(!std::isnan(m_controls.m_accel));
+            assert(!std::isnan(engine_power));
             applyEngineForce(-m_controls.m_accel*engine_power*0.1f);
 
             // If not giving power (forward or reverse gear), and speed is low
@@ -2526,7 +2520,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
  */
 void Kart::applyEngineForce(float force)
 {
-    assert(!isnan(force));
+    assert(!std::isnan(force));
     // Split power to simulate a 4WD 40-60, other values possible
     // FWD or RWD is a matter of putting a 0 and 1 in the right place
     float frontForce = force*0.4f;
