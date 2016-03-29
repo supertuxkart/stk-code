@@ -24,7 +24,7 @@
 #include "utils/vs.hpp"
 
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 
 AnimationBase::AnimationBase(const XMLNode &node)
@@ -93,13 +93,13 @@ void AnimationBase::reset()
  */
 void AnimationBase::update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
 {
-    assert(!isnan(m_current_time));
+    assert(!std::isnan(m_current_time));
 
     // Don't do anything if the animation is disabled
     if(!m_playing) return;
     m_current_time += dt;
 
-    assert(!isnan(m_current_time));
+    assert(!std::isnan(m_current_time));
 
     for_var_in (Ipo*, curr, m_all_ipos)
     {
