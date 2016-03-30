@@ -286,8 +286,8 @@ private:
     bool                 m_boundingboxesviz;
     /** Performance stats */
     unsigned             m_last_light_bucket_distance;
-    unsigned             object_count[PASS_COUNT];
-    unsigned             poly_count[PASS_COUNT];
+    unsigned             m_object_count[PASS_COUNT];
+    unsigned             m_poly_count[PASS_COUNT];
     u32                  m_renderpass;
     class STKMeshSceneNode *m_sun_interposer;
     core::vector3df m_sun_direction;
