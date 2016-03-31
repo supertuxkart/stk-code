@@ -11,8 +11,9 @@ class GameEventsProtocol : public Protocol
 {
 private:
     enum GameEventType {
-        GE_ITEM_COLLECTED     = 0x01,
-        GE_KART_FINISHED_RACE = 0x02
+        GE_START_READY_SET_GO = 0x01,
+        GE_ITEM_COLLECTED     = 0x02,
+        GE_KART_FINISHED_RACE = 0x03
     };   // GameEventType
 
 public:
@@ -24,6 +25,8 @@ public:
     void collectedItem(const NetworkString &ns);
     void kartFinishedRace(AbstractKart *kart, float time);
     void kartFinishedRace(const NetworkString &ns);
+    void startReadySetGo();
+    void receivedReadySetGo();
     virtual void setup() OVERRIDE {};
     virtual void update(float dt) OVERRIDE {};
     virtual void asynchronousUpdate() OVERRIDE{}

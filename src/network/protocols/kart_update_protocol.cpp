@@ -36,7 +36,9 @@ void KartUpdateProtocol::setup()
  */
 bool KartUpdateProtocol::notifyEvent(Event* event)
 {
-    if (event->getType() != EVENT_TYPE_MESSAGE)
+    // It might be possible that we still receive messages after
+    // the game was exited, so make sure we still have a world.
+    if (event->getType() != EVENT_TYPE_MESSAGE || !World::getWorld())
         return true;
     NetworkString &ns = event->data();
     if (ns.size() < 33)

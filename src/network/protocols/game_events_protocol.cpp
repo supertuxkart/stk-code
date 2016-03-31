@@ -39,7 +39,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
     NetworkString &data = event->data();
-    if (data.size() < 5) // for token and type
+    if (data.size() < 1) // for token and type
     {
         Log::warn("GameEventsProtocol", "Too short message.");
         return true;
@@ -56,6 +56,9 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             collectedItem(data);      break;
         case GE_KART_FINISHED_RACE:
             kartFinishedRace(data);   break;
+        case GE_START_READY_SET_GO:
+            receivedReadySetGo();     break;
+
         default:
             Log::warn("GameEventsProtocol", "Unkown message type.");
             break;
@@ -101,18 +104,18 @@ void GameEventsProtocol::collectedItem(const NetworkString &data)
 {
     if (data.size() < 6)
     {
-            Log::warn("GameEventsProtocol", "Too short message.");
-        }
-        uint32_t item_id = data.getUInt32();
-        uint8_t powerup_type = data.getUInt8();
-        uint8_t kart_id = data.getUInt8();
-        // now set the kart powerup
-        AbstractKart* kart = World::getWorld()->getKart(kart_id);
-        ItemManager::get()->collectedItem(ItemManager::get()->getItem(item_id),
-                                          kart, powerup_type);
-        Log::info("GameEventsProtocol", "Item %d picked by a player.",
-                  powerup_type);
-    }   // collectedItem
+        Log::warn("GameEventsProtocol", "collectedItem: Too short message.");
+    }
+    uint32_t item_id = data.getUInt32();
+    uint8_t powerup_type = data.getUInt8();
+    uint8_t kart_id = data.getUInt8();
+    // now set the kart powerup
+    AbstractKart* kart = World::getWorld()->getKart(kart_id);
+    ItemManager::get()->collectedItem(ItemManager::get()->getItem(item_id),
+                                      kart, powerup_type);
+    Log::info("GameEventsProtocol", "Item %d picked by a player.",
+               powerup_type);
+}   // collectedItem
 
 // ----------------------------------------------------------------------------
 /** This function is called from the server when a kart finishes a race. It
@@ -137,8 +140,39 @@ void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
  */
 void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
 {
+    if (ns.size() < 5) // for token and type
+    {
+        Log::warn("GameEventsProtocol", "kartFinisheRace: Too short message.");
+        return;
+    }
+
     uint8_t kart_id = ns.getUInt8();
     float time      = ns.getFloat();
     World::getWorld()->getKart(kart_id)->finishedRace(time,
                                                       /*from_server*/true);
 }   // kartFinishedRace
+
+// ----------------------------------------------------------------------------
+/** This function is called on a server when the world starts the ready-set-go
+ *  phase. It signals to all clients to do the same.
+ */
+void GameEventsProtocol::startReadySetGo()
+{
+    assert(NetworkConfig::get()->isServer());
+    NetworkString *ns = getNetworkString(1);
+    ns->setSynchronous(true);
+    ns->addUInt8(GE_START_READY_SET_GO);
+    sendMessageToPeersChangingToken(ns, /*reliable*/true);
+    delete ns;
+}   // startReadySetGo
+
+// ----------------------------------------------------------------------------
+/** Called on the client when it receives the message that the server has
+ *  started its ready-set-go. Signal to world that it can go to the next
+ *  phase (ready phase) now.
+ */
+void GameEventsProtocol::receivedReadySetGo()
+{
+    assert(NetworkConfig::get()->isClient());
+    World::getWorld()->startReadySetGo();
+}   // receivedReadySetGo
