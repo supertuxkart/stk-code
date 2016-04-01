@@ -25,6 +25,10 @@ private:
     /** True if a new update for the kart positions was received. */
     bool m_was_updated;
 
+    /** Time the last kart update was sent. Used to send updates with
+     * a fixed frequency. */
+    double m_previous_time;
+
 public:
              KartUpdateProtocol();
     virtual ~KartUpdateProtocol();
