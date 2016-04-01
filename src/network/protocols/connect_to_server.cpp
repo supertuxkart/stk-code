@@ -183,7 +183,8 @@ void ConnectToServer::asynchronousUpdate()
                     return;
                 }
                 if (m_server_address.getIP() 
-                      == NetworkConfig::get()->getMyAddress().getIP())
+                      == NetworkConfig::get()->getMyAddress().getIP() ||
+                      NetworkConfig::get()->isLAN())
                 {
                     // We're in the same lan (same public ip address).
                     // The state will change to CONNECTING
