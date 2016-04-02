@@ -23,6 +23,9 @@ namespace scene
 	class IMesh : public virtual IReferenceCounted
 	{
 	public:
+		IMesh() : cmt(video::ECMT_DEFAULT) {}
+
+		virtual ~IMesh() {}
 
 		//! Get the amount of mesh buffers.
 		/** \return Amount of mesh buffers (IMeshBuffer) in this mesh. */
@@ -66,6 +69,15 @@ namespace scene
 		indices have changed. Otherwise, changes won't be updated
 		on the GPU in the next render cycle. */
 		virtual void setDirty(E_BUFFER_TYPE buffer=EBT_VERTEX_AND_INDEX) = 0;
+
+		//! Set the mesh to use custom material type (mainly karts in STK)
+		/** \param m New custom material type for the mesh. */
+		void setCustomMaterialType(video::E_CUSTOM_MATERIAL_TYPE m) { cmt = m; }
+
+		//! Get the mesh to use custom material type (mainly karts in STK)
+		video::E_CUSTOM_MATERIAL_TYPE getCustomMaterialType() const { return cmt; }
+	private:
+		video::E_CUSTOM_MATERIAL_TYPE cmt;
 	};
 
 } // end namespace scene
