@@ -19,6 +19,7 @@
 #include "karts/kart_model.hpp"
 
 #include <IMeshSceneNode.h>
+#include <SMesh.h>
 #include <ISceneManager.h>
 
 #include "config/stk_config.hpp"
@@ -226,6 +227,16 @@ KartModel::~KartModel()
             // Master KartModels should never have a wheel attached.
             assert(!m_is_master);
 
+            // Drop the cloned transparent mesh wheel if created
+            if (m_wheel_model[i])
+            {
+                // m_wheel_model[i] can be NULL
+                if (m_wheel_model[i]
+                    ->getCustomMaterialType() == video::ECMT_TRANSPARENT)
+                {
+                    m_wheel_model[i]->drop();
+                }
+            }
             m_wheel_node[i]->drop();
         }
         if(m_is_master && m_wheel_model[i])
@@ -242,6 +253,12 @@ KartModel::~KartModel()
             // Master KartModels should never have a speed weighted object attached.
             assert(!m_is_master);
 
+            // Drop the cloned model if created
+            if (m_speed_weighted_objects[i].m_model
+                ->getCustomMaterialType() != video::ECMT_DEFAULT)
+            {
+                m_speed_weighted_objects[i].m_model->drop();
+            }
             m_speed_weighted_objects[i].m_node->drop();
         }
         if(m_is_master && m_speed_weighted_objects[i].m_model)
@@ -305,12 +322,23 @@ KartModel* KartModel::makeCopy(video::E_CUSTOM_MATERIAL_TYPE cmt)
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
     km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
     km->m_has_nitro_emitter = m_has_nitro_emitter;
-    
+
+    scene::IMeshManipulator *mani =
+        irr_driver->getVideoDriver()->getMeshManipulator();
     for(unsigned int i=0; i<4; i++)
     {
-        km->m_wheel_model[i]             = m_wheel_model[i];
         // Master should not have any wheel nodes.
         assert(!m_wheel_node[i]);
+        if (m_wheel_model[i] && cmt == video::ECMT_TRANSPARENT)
+        {
+            // Only clone the mesh if transparence is used
+            scene::SMesh* clone = mani->createMeshCopy(m_wheel_model[i]);
+            clone->setCustomMaterialType(cmt);
+            km->m_wheel_model[i] = dynamic_cast<scene::IMesh*>(clone);
+        }
+        else
+            km->m_wheel_model[i] = m_wheel_model[i];
+
         km->m_wheel_filename[i]             = m_wheel_filename[i];
         km->m_wheel_graphics_position[i]    = m_wheel_graphics_position[i];
         km->m_wheel_graphics_radius[i]      = m_wheel_graphics_radius[i];
@@ -325,6 +353,12 @@ KartModel* KartModel::makeCopy(video::E_CUSTOM_MATERIAL_TYPE cmt)
         // Master should not have any speed weighted nodes.
         assert(!m_speed_weighted_objects[i].m_node);
         km->m_speed_weighted_objects[i] = m_speed_weighted_objects[i];
+        if (cmt != video::ECMT_DEFAULT)
+        {
+            // Only clone the mesh if default type is not used
+            km->m_speed_weighted_objects[i].m_model = irr_driver
+                ->copyAnimatedMesh(m_speed_weighted_objects[i].m_model, cmt);
+        }
     }
 
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
