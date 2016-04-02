@@ -74,7 +74,7 @@ namespace scene
 		/** \param m New custom material type for the mesh. */
 		void setCustomMaterialType(video::E_CUSTOM_MATERIAL_TYPE m) { cmt = m; }
 
-		//! Get the mesh to use custom material type (mainly karts in STK)
+		//! Get the custom material type for the mesh(mainly karts in STK)
 		video::E_CUSTOM_MATERIAL_TYPE getCustomMaterialType() const { return cmt; }
 	private:
 		video::E_CUSTOM_MATERIAL_TYPE cmt;
