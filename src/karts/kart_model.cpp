@@ -281,7 +281,7 @@ KartModel::~KartModel()
  *  It is also marked not to be a master copy, so attachModel can be called
  *  for this instance.
  */
-KartModel* KartModel::makeCopy()
+KartModel* KartModel::makeCopy(video::E_CUSTOM_MATERIAL_TYPE cmt)
 {
     // Make sure that we are copying from a master objects, and
     // that there is indeed no animated node defined here ...
@@ -294,7 +294,7 @@ KartModel* KartModel::makeCopy()
     km->m_kart_height       = m_kart_height;
     km->m_kart_highest_point= m_kart_highest_point;
     km->m_kart_lowest_point = m_kart_lowest_point;
-    km->m_mesh              = irr_driver->copyAnimatedMesh(m_mesh);
+    km->m_mesh              = irr_driver->copyAnimatedMesh(m_mesh, cmt);
     km->m_model_filename    = m_model_filename;
     km->m_animation_speed   = m_animation_speed;
     km->m_current_animation = AF_DEFAULT;

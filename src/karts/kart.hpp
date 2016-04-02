@@ -231,7 +231,8 @@ private:
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
-                        PerPlayerDifficulty difficulty);
+                        PerPlayerDifficulty difficulty,
+                        video::E_CUSTOM_MATERIAL_TYPE cmt = video::ECMT_DEFAULT);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();

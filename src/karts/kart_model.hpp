@@ -232,7 +232,7 @@ private:
 public:
                   KartModel(bool is_master);
                  ~KartModel();
-    KartModel*    makeCopy();
+    KartModel*    makeCopy(video::E_CUSTOM_MATERIAL_TYPE cmt);
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);

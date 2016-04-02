@@ -19,6 +19,7 @@
 #ifndef HEADER_ABSTRACT_KART_HPP
 #define HEADER_ABSTRACT_KART_HPP
 
+#include <EMaterialTypes.h>
 #include <memory>
 
 #include "items/powerup_manager.hpp"
@@ -98,7 +99,8 @@ public:
                    AbstractKart(const std::string& ident,
                                 int world_kart_id,
                                 int position, const btTransform& init_transform,
-                                PerPlayerDifficulty difficulty);
+                                PerPlayerDifficulty difficulty,
+                                video::E_CUSTOM_MATERIAL_TYPE cmt);
     virtual       ~AbstractKart();
     virtual core::stringw getName() const;
     virtual void   reset();

@@ -353,7 +353,8 @@ public:
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
-    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig);
+    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig,
+                                           video::E_CUSTOM_MATERIAL_TYPE cmt);
     video::ITexture      *applyMask(video::ITexture* texture,
                                     const std::string& mask_path);
     void displayFPS();
