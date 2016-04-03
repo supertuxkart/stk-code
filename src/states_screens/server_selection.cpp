@@ -127,7 +127,7 @@ void ServerSelection::init()
  */
 void ServerSelection::loadList()
 {
-    m_server_list_widget->clear();
+	m_server_list_widget->clear();
     ServersManager *manager = ServersManager::get();
     manager->sort(m_sort_desc);
     for(int i=0; i <  manager->getNumServers(); i++)
@@ -215,7 +215,14 @@ void ServerSelection::onUpdate(float dt)
     {
         if (m_refresh_request->isSuccess())
         {
+			int selection = m_server_list_widget->getSelectionID();
+			std::string selection_str = m_server_list_widget->getSelectionInternalName();
+
             loadList();
+
+			// restore previous selection
+			if (selection != -1 && selection_str != "spacer" && selection_str != "loading")
+				m_server_list_widget->setSelectionID(selection);
         }
         else
         {
@@ -227,9 +234,21 @@ void ServerSelection::onUpdate(float dt)
         m_refresh_request = NULL;
         m_reload_widget->setActive(true);
     }
-    else
-    {
-        m_server_list_widget->renameItem("loading",
-                              StringUtils::loadingDots(_("Fetching servers")));
+	else
+	{
+		int selection = m_server_list_widget->getSelectionID();
+		std::string selection_str = m_server_list_widget->getSelectionInternalName();
+
+		m_server_list_widget->clear();
+
+		ServersManager *manager = ServersManager::get();
+		loadList();
+		m_server_list_widget->addItem("spacer", L"");
+		m_server_list_widget->addItem("loading",
+			StringUtils::loadingDots(_("Fetching servers")));
+
+		// restore previous selection
+		if (selection != -1 && selection_str != "spacer" && selection_str != "loading")
+			m_server_list_widget->setSelectionID(selection);
     }
 }   // onUpdate
