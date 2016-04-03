@@ -398,8 +398,9 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
 
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
-            difficulty, team == SOCCER_TEAM_BLUE ?
-            video::ERT_BLUE : video::ERT_RED);
+              difficulty);
+            //difficulty, team == SOCCER_TEAM_BLUE ?
+            //video::ERT_BLUE : video::ERT_RED);
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
 
