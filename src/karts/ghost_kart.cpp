@@ -28,7 +28,7 @@ GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
                      int position)
           : Kart(ident, world_kart_id,
                  position, btTransform(btQuaternion(0, 0, 0, 1)),
-                 PLAYER_DIFFICULTY_NORMAL, video::ECMT_TRANSPARENT)
+                 PLAYER_DIFFICULTY_NORMAL, video::ERT_TRANSPARENT)
 {
 }   // GhostKart
 

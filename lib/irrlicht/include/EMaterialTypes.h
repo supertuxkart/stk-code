@@ -10,13 +10,13 @@ namespace irr
 namespace video
 {
 
-	//! Flag for karts in STK to use specific material
-	enum E_CUSTOM_MATERIAL_TYPE
+	//! Flag for mesh (mainly karts in STK) to use specific render type
+	enum E_RENDER_TYPE
 	{
-		ECMT_DEFAULT	= 0,
-		ECMT_TRANSPARENT,
-		ECMT_RED,
-		ECMT_BLUE
+		ERT_DEFAULT	= 0,
+		ERT_TRANSPARENT,
+		ERT_RED,
+		ERT_BLUE
 	};
 
 	//! Abstracted and easy to use fixed function/programmable pipeline material modes.

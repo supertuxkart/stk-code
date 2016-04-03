@@ -232,7 +232,7 @@ KartModel::~KartModel()
             {
                 // m_wheel_model[i] can be NULL
                 if (m_wheel_model[i]
-                    ->getCustomMaterialType() == video::ECMT_TRANSPARENT)
+                    ->getRenderType() == video::ERT_TRANSPARENT)
                 {
                     m_wheel_model[i]->drop();
                 }
@@ -255,7 +255,7 @@ KartModel::~KartModel()
 
             // Drop the cloned model if created
             if (m_speed_weighted_objects[i].m_model
-                ->getCustomMaterialType() != video::ECMT_DEFAULT)
+                ->getRenderType() != video::ERT_DEFAULT)
             {
                 m_speed_weighted_objects[i].m_model->drop();
             }
@@ -298,7 +298,7 @@ KartModel::~KartModel()
  *  It is also marked not to be a master copy, so attachModel can be called
  *  for this instance.
  */
-KartModel* KartModel::makeCopy(video::E_CUSTOM_MATERIAL_TYPE cmt)
+KartModel* KartModel::makeCopy(video::E_RENDER_TYPE rt)
 {
     // Make sure that we are copying from a master objects, and
     // that there is indeed no animated node defined here ...
@@ -311,7 +311,7 @@ KartModel* KartModel::makeCopy(video::E_CUSTOM_MATERIAL_TYPE cmt)
     km->m_kart_height       = m_kart_height;
     km->m_kart_highest_point= m_kart_highest_point;
     km->m_kart_lowest_point = m_kart_lowest_point;
-    km->m_mesh              = irr_driver->copyAnimatedMesh(m_mesh, cmt);
+    km->m_mesh              = irr_driver->copyAnimatedMesh(m_mesh, rt);
     km->m_model_filename    = m_model_filename;
     km->m_animation_speed   = m_animation_speed;
     km->m_current_animation = AF_DEFAULT;
@@ -329,11 +329,11 @@ KartModel* KartModel::makeCopy(video::E_CUSTOM_MATERIAL_TYPE cmt)
     {
         // Master should not have any wheel nodes.
         assert(!m_wheel_node[i]);
-        if (m_wheel_model[i] && cmt == video::ECMT_TRANSPARENT)
+        if (m_wheel_model[i] && rt == video::ERT_TRANSPARENT)
         {
             // Only clone the mesh if transparence is used
             scene::SMesh* clone = mani->createMeshCopy(m_wheel_model[i]);
-            clone->setCustomMaterialType(cmt);
+            clone->setRenderType(rt);
             km->m_wheel_model[i] = dynamic_cast<scene::IMesh*>(clone);
         }
         else
@@ -353,11 +353,11 @@ KartModel* KartModel::makeCopy(video::E_CUSTOM_MATERIAL_TYPE cmt)
         // Master should not have any speed weighted nodes.
         assert(!m_speed_weighted_objects[i].m_node);
         km->m_speed_weighted_objects[i] = m_speed_weighted_objects[i];
-        if (cmt != video::ECMT_DEFAULT)
+        if (rt != video::ERT_DEFAULT)
         {
             // Only clone the mesh if default type is not used
             km->m_speed_weighted_objects[i].m_model = irr_driver
-                ->copyAnimatedMesh(m_speed_weighted_objects[i].m_model, cmt);
+                ->copyAnimatedMesh(m_speed_weighted_objects[i].m_model, rt);
         }
     }
 

@@ -23,7 +23,7 @@ namespace scene
 	class IMesh : public virtual IReferenceCounted
 	{
 	public:
-		IMesh() : cmt(video::ECMT_DEFAULT) {}
+		IMesh() : m_rt(video::ERT_DEFAULT) {}
 
 		virtual ~IMesh() {}
 
@@ -70,14 +70,14 @@ namespace scene
 		on the GPU in the next render cycle. */
 		virtual void setDirty(E_BUFFER_TYPE buffer=EBT_VERTEX_AND_INDEX) = 0;
 
-		//! Set the mesh to use custom material type (mainly karts in STK)
-		/** \param m New custom material type for the mesh. */
-		void setCustomMaterialType(video::E_CUSTOM_MATERIAL_TYPE m) { cmt = m; }
+		//! Set the mesh to use a specific render type (mainly karts in STK)
+		/** \param t New render type for the mesh. */
+		void setRenderType(video::E_RENDER_TYPE t) { m_rt = t; }
 
-		//! Get the custom material type for the mesh(mainly karts in STK)
-		video::E_CUSTOM_MATERIAL_TYPE getCustomMaterialType() const { return cmt; }
+		//! Get the specific render type for the mesh (mainly karts in STK)
+		video::E_RENDER_TYPE getRenderType() const { return m_rt; }
 	private:
-		video::E_CUSTOM_MATERIAL_TYPE cmt;
+		video::E_RENDER_TYPE m_rt;
 	};
 
 } // end namespace scene

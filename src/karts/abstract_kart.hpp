@@ -100,7 +100,7 @@ public:
                                 int world_kart_id,
                                 int position, const btTransform& init_transform,
                                 PerPlayerDifficulty difficulty,
-                                video::E_CUSTOM_MATERIAL_TYPE cmt);
+                                video::E_RENDER_TYPE rt);
     virtual       ~AbstractKart();
     virtual core::stringw getName() const;
     virtual void   reset();
