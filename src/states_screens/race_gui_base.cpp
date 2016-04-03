@@ -828,8 +828,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         {
             const core::rect<s32> rect(core::position2d<s32>(0,0),
                                        icon->getSize());
-            draw2DImage(icon, pos, rect,
-                                                      NULL, NULL, true);
+            draw2DImage(icon, pos, rect, NULL, NULL, true, kart->isGhostKart());
         }
 
         //draw status info - icon fade out in case of rescue/explode

@@ -47,7 +47,7 @@ void draw2DImage(const irr::video::ITexture* texture,
                  const irr::core::rect<irr::s32>& sourceRect,
                  const irr::core::rect<irr::s32>* clipRect,
                  const irr::video::SColor* const colors,
-                 bool useAlphaChannelOfTexture);
+                 bool useAlphaChannelOfTexture, bool draw_translucently = false);
 
 void draw2DVertexPrimitiveList(irr::video::ITexture *t, const void* vertices,
                   irr::u32 vertexCount, const void* indexList,
