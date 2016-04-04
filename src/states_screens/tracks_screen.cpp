@@ -216,12 +216,13 @@ void TracksScreen::buildTrackList()
         tracks.push_back(curr);
     }   // for n<track_amount
 
+	bool is_network = (STKHost::existHost());
     tracks.insertionSort();
     for (unsigned int i = 0; i < tracks.size(); i++)
     {
         Track *curr = tracks.get(i);
         if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()) &&
-            race_manager->getNumLocalPlayers() == 1)
+            race_manager->getNumLocalPlayers() == 1 && !is_network)
         {
             tracks_widget->addItem(
                 _("Locked: solve active challenges to gain access to more!"),
