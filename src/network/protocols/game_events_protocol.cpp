@@ -36,7 +36,9 @@ GameEventsProtocol::~GameEventsProtocol()
 // ----------------------------------------------------------------------------
 bool GameEventsProtocol::notifyEvent(Event* event)
 {
-    if (event->getType() != EVENT_TYPE_MESSAGE)
+    // Avoid crash in case that we still receive race events when
+    // the race is actually over.
+    if (event->getType() != EVENT_TYPE_MESSAGE || !World::getWorld())
         return true;
     NetworkString &data = event->data();
     if (data.size() < 1) // for token and type
