@@ -55,7 +55,7 @@ public:
     virtual void setPosition(int p) {};
     virtual bool isPlayerController() const { return false; }
     virtual bool isLocalPlayerController() const { return false; }
-    virtual void action(PlayerAction action, int value) {};
+    virtual void action(PlayerAction action, int value) OVERRIDE;
     virtual void skidBonusTriggered() {};
     virtual void newLap(int lap) {};
     void         addReplayTime(float time);
