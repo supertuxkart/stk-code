@@ -215,40 +215,40 @@ void ServerSelection::onUpdate(float dt)
     {
         if (m_refresh_request->isSuccess())
         {
-			int selection = m_server_list_widget->getSelectionID();
-			std::string selection_str = m_server_list_widget->getSelectionInternalName();
+            int selection = m_server_list_widget->getSelectionID();
+            std::string selection_str = m_server_list_widget->getSelectionInternalName();
 
             loadList();
 
-			// restore previous selection
-			if (selection != -1 && selection_str != "spacer" && selection_str != "loading")
-				m_server_list_widget->setSelectionID(selection);
+            // restore previous selection
+            if (selection != -1 && selection_str != "spacer" && selection_str != "loading")
+                m_server_list_widget->setSelectionID(selection);
         }
         else
         {
             SFXManager::get()->quickSound("anvil");
             new MessageDialog(m_refresh_request->getInfo());
-			m_server_list_widget->clear();
+            m_server_list_widget->clear();
         }
         delete m_refresh_request;
         m_refresh_request = NULL;
         m_reload_widget->setActive(true);
     }
-	else
-	{
-		int selection = m_server_list_widget->getSelectionID();
-		std::string selection_str = m_server_list_widget->getSelectionInternalName();
+    else
+    {
+        int selection = m_server_list_widget->getSelectionID();
+        std::string selection_str = m_server_list_widget->getSelectionInternalName();
 
-		m_server_list_widget->clear();
+        m_server_list_widget->clear();
 
-		ServersManager *manager = ServersManager::get();
-		loadList();
-		m_server_list_widget->addItem("spacer", L"");
-		m_server_list_widget->addItem("loading",
-			StringUtils::loadingDots(_("Fetching servers")));
+        ServersManager *manager = ServersManager::get();
+        loadList();
+        m_server_list_widget->addItem("spacer", L"");
+        m_server_list_widget->addItem("loading",
+        StringUtils::loadingDots(_("Fetching servers")));
 
-		// restore previous selection
-		if (selection != -1 && selection_str != "spacer" && selection_str != "loading")
-			m_server_list_widget->setSelectionID(selection);
+        // restore previous selection
+        if (selection != -1 && selection_str != "spacer" && selection_str != "loading")
+            m_server_list_widget->setSelectionID(selection);
     }
 }   // onUpdate
