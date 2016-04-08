@@ -267,6 +267,36 @@ public:
 
 		*this = &tmpbuf[idx];
 	}
+	
+	//! Constructs a string from an unsigned long long
+	explicit string(unsigned long long number)
+	: array(0), allocated(0), used(0)
+	{
+		// temporary buffer for 32 numbers
+
+		c8 tmpbuf[32]={0};
+		u32 idx = 31;
+
+		// special case '0'
+
+		if (!number)
+		{
+			tmpbuf[30] = '0';
+			*this = &tmpbuf[30];
+			return;
+		}
+
+		// add numbers
+
+		while(number && idx)
+		{
+			--idx;
+			tmpbuf[idx] = (c8)('0' + (number % 10));
+			number /= 10;
+		}
+
+		*this = &tmpbuf[idx];
+	}
 
 
 	//! Constructor for copying a string from a pointer with a given length

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,7 +26,7 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/dialogs/track_info_dialog.hpp"
+#include "states_screens/track_info_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -65,8 +65,7 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
         {
             const std::string selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
             if(UserConfigParams::logGUI())
-                std::cout << "Clicked on track " << selection.c_str()
-                          << std::endl;
+                Log::info("EasterEggScreen", "Clicked on track %s", selection.c_str());
 
             UserConfigParams::m_last_track = selection;
 
@@ -80,19 +79,13 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
                 std::string track = m_random_track_list.front();
                 m_random_track_list.pop_front();
                 m_random_track_list.push_back(track);
-                Track* clickedTrack = track_manager->getTrack( track );
+                Track* clicked_track = track_manager->getTrack( track );
 
 
-                if (clickedTrack != NULL)
+                if (clicked_track != NULL)
                 {
-                    ITexture* screenshot =
-                        irr_driver->getTexture( clickedTrack->getScreenshotFile(),
-                                                "While loading screenshot for track '%s':",
-                                                clickedTrack->getFilename()   );
-
-                    new TrackInfoDialog(selection, clickedTrack->getIdent(),
-                                        translations->fribidize(clickedTrack->getName()),
-                                        screenshot, 0.8f, 0.7f);
+                    TrackInfoScreen::getInstance()->setTrack(clicked_track);
+                    TrackInfoScreen::getInstance()->push();
                 }
 
             }
@@ -100,22 +93,13 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
             {
                 unlock_manager->playLockSound();
             }
-            else if (selection == RibbonWidget::NO_ITEM_ID)
+            else if (selection != RibbonWidget::NO_ITEM_ID)
             {
-            }
-            else
-            {
-                Track* clickedTrack = track_manager->getTrack(selection);
-                if (clickedTrack != NULL)
+                Track* clicked_track = track_manager->getTrack(selection);
+                if (clicked_track != NULL)
                 {
-                    ITexture* screenshot =
-                        irr_driver->getTexture( clickedTrack->getScreenshotFile(),
-                                                "While loading screenshot for track '%s'",
-                                                clickedTrack->getFilename());
-
-                    new TrackInfoDialog(selection, clickedTrack->getIdent(),
-                                        translations->fribidize(clickedTrack->getName()),
-                                        screenshot, 0.8f, 0.7f);
+                    TrackInfoScreen::getInstance()->setTrack(clicked_track);
+                    TrackInfoScreen::getInstance()->push();
                 }
             }
         }
@@ -145,7 +129,7 @@ void EasterEggScreen::beforeAddingWidget()
     tabs->clearAllChildren();
 
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
-    const int group_amount = groups.size();
+    const int group_amount = (int)groups.size();
 
     if (group_amount > 1)
     {
@@ -225,7 +209,7 @@ void EasterEggScreen::buildTrackList()
     // Build track list
     if (curr_group_name == ALL_TRACK_GROUPS_ID)
     {
-        const int trackAmount = track_manager->getNumberOfTracks();
+        const int trackAmount = (int)track_manager->getNumberOfTracks();
 
         for (int n=0; n<trackAmount; n++)
         {
@@ -255,7 +239,7 @@ void EasterEggScreen::buildTrackList()
     else
     {
         const std::vector<int>& curr_group = track_manager->getTracksInGroup( curr_group_name );
-        const int trackAmount = curr_group.size();
+        const int trackAmount = (int)curr_group.size();
 
         for (int n=0; n<trackAmount; n++)
         {

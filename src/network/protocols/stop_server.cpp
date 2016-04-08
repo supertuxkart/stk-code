@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,10 +20,10 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "network/network_manager.hpp"
+#include "network/network_config.hpp"
 #include "online/request_manager.hpp"
 
-StopServer::StopServer() : Protocol(NULL, PROTOCOL_SILENT)
+StopServer::StopServer() : Protocol(PROTOCOL_SILENT)
 {
 }
 
@@ -45,13 +45,14 @@ void StopServer::asynchronousUpdate()
 {
     if (m_state == NONE)
     {
-        TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
+        const TransportAddress& addr = NetworkConfig::get()->getMyAddress();
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "stop-server",
-                                      "address-management.php");
-        m_request->addParameter("address",addr.ip);
-        m_request->addParameter("port",addr.port);
-        Log::info("StopServer", "address %u, port %d", addr.ip, addr.port);
+        PlayerManager::setUserDetails(m_request, "stop", Online::API::SERVER_PATH);
+
+        m_request->addParameter("address", addr.getIP());
+        m_request->addParameter("port", addr.getPort());
+
+        Log::info("StopServer", "address %s", addr.toString().c_str());
 
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;
@@ -83,6 +84,6 @@ void StopServer::asynchronousUpdate()
         m_state = EXITING;
         delete m_request;
         m_request = NULL;
-        m_listener->requestTerminate(this);
+        requestTerminate();
     }
-}
+}   // asynchronousUpdate

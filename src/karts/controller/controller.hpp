@@ -1,7 +1,5 @@
-
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013  Joerg Henrichs
+//  Copyright (C) 2010-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -43,6 +41,8 @@ class Material;
  */
 class Controller
 {
+private:
+
 protected:
     /** Pointer to the kart that is controlled by this controller. */
     AbstractKart *m_kart;
@@ -51,15 +51,11 @@ protected:
      *  it commands. */
     KartControl  *m_controls;
 
-    /** If this belongs to a player, it stores the active player data
-     *  structure. Otherwise it is 0. */
-    StateManager::ActivePlayer *m_player;
-
     /** The name of the controller, mainly used for debugging purposes. */
     std::string  m_controller_name;
+
 public:
-                  Controller         (AbstractKart *kart,
-                                      StateManager::ActivePlayer *player=NULL);
+                  Controller         (AbstractKart *kart);
     virtual      ~Controller         () {};
     virtual void  reset              () = 0;
     virtual void  update             (float dt) = 0;
@@ -69,8 +65,14 @@ public:
     virtual void  crashed            (const AbstractKart *k) = 0;
     virtual void  crashed            (const Material *m) = 0;
     virtual void  setPosition        (int p) = 0;
+    /** This function checks if this is a local player. A local player will get 
+     *  special graphical effects enabled, has a camera, and sound effects will
+     *  be played with normal volume. */
+    virtual bool  isLocalPlayerController () const = 0;
+    /** This function checks if this player is not an AI, i.e. it is either a
+     *  a local or a remote/networked player. This is tested e.g. by the AI for
+     *  rubber-banding. */
     virtual bool  isPlayerController () const = 0;
-    virtual bool  isNetworkController() const = 0;
     virtual bool  disableSlipstreamBonus() const = 0;
     // ---------------------------------------------------------------------------
     /** Sets the controller name for this controller. */
@@ -79,15 +81,6 @@ public:
     // ---------------------------------------------------------------------------
     /** Returns the name of this controller. */
     const std::string &getControllerName() const { return m_controller_name; }
-    // ---------------------------------------------------------------------------
-    /** Returns the active player for this controller (NULL
-     *  if this controller does not belong to a player.    */
-    StateManager::ActivePlayer *getPlayer () {return m_player;}
-
-    // ---------------------------------------------------------------------------
-    /** Returns the player object (or NULL if it's a computer controller). */
-    const StateManager::ActivePlayer *getPlayer () const { return m_player; }
-
     // ------------------------------------------------------------------------
     /** Default: ignore actions. Only PlayerController get them. */
     virtual void action(PlayerAction action, int value) = 0;
@@ -104,6 +97,18 @@ public:
     /** Get a pointer on the kart controls. */
     virtual KartControl* getControls() { return m_controls; }
     // ------------------------------------------------------------------------
+    /** Only local players can get achievements. */
+    virtual bool  canGetAchievements () const { return false; }
+    // ------------------------------------------------------------------------
+    /** This should only be called for End- and LocalPlayer-Controller. */
+    virtual core::stringw getName() const
+    {
+        assert(false);
+        return core::stringw(""); 
+    }   // getName
+    // ------------------------------------------------------------------------
+    /** Returns the kart controlled by this controller. */
+    AbstractKart *getKart() const { return m_kart; }
 };   // Controller
 
 #endif

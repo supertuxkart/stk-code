@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013  Joerg Henrichs
+//  Copyright (C) 2009-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 
 #include <string.h>
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 const std::string Ipo::m_all_channel_names[IPO_MAX] =
                 {"LocX", "LocY", "LocZ", "LocXYZ",
@@ -444,7 +444,7 @@ void Ipo::reset()
  */
 void Ipo::update(float time, Vec3 *xyz, Vec3 *hpr,Vec3 *scale)
 {
-    assert(!isnan(time));
+    assert(!std::isnan(time));
     switch(m_ipo_data->m_channel)
     {
     case Ipo::IPO_LOCX   : if(xyz)   xyz  ->setX(get(time, 0)); break;
@@ -478,7 +478,7 @@ void Ipo::update(float time, Vec3 *xyz, Vec3 *hpr,Vec3 *scale)
  */
 float Ipo::get(float time, unsigned int index) const
 {
-    assert(!isnan(time));
+    assert(!std::isnan(time));
 
     // Avoid crash in case that only one point is given for this IPO.
     if(m_next_n==0)
@@ -496,6 +496,6 @@ float Ipo::get(float time, unsigned int index) const
          time >=m_ipo_data->m_points[m_next_n].getW())
         m_next_n++;
     float rval = m_ipo_data->get(time, index, m_next_n-1);
-    assert(!isnan(rval));
+    assert(!std::isnan(rval));
     return rval;
 }   // get

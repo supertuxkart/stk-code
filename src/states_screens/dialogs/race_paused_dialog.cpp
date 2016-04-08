@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,7 +27,6 @@
 #include "io/file_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/main_menu_screen.hpp"
@@ -103,7 +102,7 @@ void RacePausedDialog::onEnterPressedInternal()
 GUIEngine::EventPropagation
            RacePausedDialog::processEvent(const std::string& eventSource)
 {
-    GUIEngine::RibbonWidget* chocie_ribbon =
+    GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
 
     if (eventSource == "backbtn")
@@ -115,7 +114,7 @@ GUIEngine::EventPropagation
     else if (eventSource == "choiceribbon")
     {
         const std::string& selection =
-            chocie_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+            choice_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection == "exit")
         {
@@ -134,13 +133,13 @@ GUIEngine::EventPropagation
         else if (selection == "help")
         {
             dismiss();
-            StateManager::get()->pushScreen(HelpScreen1::getInstance());
+            HelpScreen1::getInstance()->push();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "options")
         {
             dismiss();
-            StateManager::get()->pushScreen(OptionsScreenVideo::getInstance());
+            OptionsScreenVideo::getInstance()->push();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "restart")

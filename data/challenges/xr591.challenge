@@ -6,15 +6,15 @@
     
     <hard>
         <karts number="1"/>
-        <requirements energy="18" time="135"/>
+        <requirements energy="18" time="120"/>
     </hard>
     <medium>
         <karts number="1"/>
-        <requirements energy="15" time="155"/>
+        <requirements energy="15" time="135"/>
     </medium>
     <easy>
         <karts number="1"/>
-        <requirements energy="12" time="170"/>
+        <requirements energy="12" time="180"/>
     </easy>
 </challenge>
 

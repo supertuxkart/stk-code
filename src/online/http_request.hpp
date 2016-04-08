@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //                2013 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
@@ -34,6 +34,13 @@
 
 namespace Online
 {
+    class API
+    {
+    public:
+        static const std::string USER_PATH;
+        static const std::string SERVER_PATH;
+    };
+
     /** A http request.
      */
     class HTTPRequest : public Request
@@ -78,22 +85,20 @@ namespace Online
         void init();
 
     public :
-                           HTTPRequest(bool manage_memory = false,
-                                       int priority = 1);
-                           HTTPRequest(const std::string &filename,
-                                       bool manage_memory = false,
-                                       int priority = 1);
-                           HTTPRequest(const char * const filename,
-                                       bool manage_memory = false,
-                                       int priority = 1);
-        virtual           ~HTTPRequest() {};
+        HTTPRequest(bool manage_memory = false, int priority = 1);
+        HTTPRequest(const std::string &filename, bool manage_memory = false,
+                    int priority = 1);
+        HTTPRequest(const char * const filename, bool manage_memory = false,
+                    int priority = 1);
+        virtual           ~HTTPRequest() {}
         virtual bool       isAllowedToAdd() const OVERRIDE;
-        void               setServerURL(const std::string& url);
+        void               setApiURL(const std::string& url, const std::string &action);
         void               setAddonsURL(const std::string& path);
+
         // ------------------------------------------------------------------------
-        /** Returns true if there was an error downloading the file.
-         */
-        bool hadDownloadError() const { return m_curl_code!=CURLE_OK; }
+        /** Returns true if there was an error downloading the file. */
+        bool hadDownloadError() const { return m_curl_code != CURLE_OK; }
+
         // ------------------------------------------------------------------------
         /** Returns the curl error message if an error has occurred.
          *  \pre m_curl_code!=CURLE_OK
@@ -116,47 +121,50 @@ namespace Online
         }   // getData
 
         // --------------------------------------------------------------------
-        /** Sets a parameter to 'value' (std::string).
-         */
+        /** Sets a parameter to 'value' (std::string). */
         void addParameter(const std::string & name, const std::string &value)
         {
             // Call the template, so that the strings are escaped properly
             addParameter(name, value.c_str());
-        };   // addParameter
+        }   // addParameter
+
         // --------------------------------------------------------------------
-        /** Sets a parameter to 'value' (stringw).
-         */
-        void addParameter(const std::string & name,
+        /** Sets a parameter to 'value' (stringw). */
+        void addParameter(const std::string &name,
                           const irr::core::stringw &value)
         {
             core::stringc s = core::stringc(value.c_str());
+
             // Call the template to escape strings properly
             addParameter(name, s.c_str());
         }   // addParameter
 
         // --------------------------------------------------------------------
-        /** Sets a parameter to 'value' (arbitrary types).
-         */
+        /** Sets a parameter to 'value' (arbitrary types). */
         template <typename T>
-        void addParameter(const std::string & name, const T& value)
+        void addParameter(const std::string &name, const T& value)
         {
             assert(isPreparing());
             std::string s = StringUtils::toString(value);
-            char *s1 = curl_easy_escape(m_curl_session, name.c_str(),
-                                        name.size() );
-            char *s2 = curl_easy_escape(m_curl_session, s.c_str(), s.size());
-            m_parameters.append(std::string(s1)+"="+s2+"&");
+
+            char *s1 = curl_easy_escape(m_curl_session, name.c_str(), (int)name.size());
+            char *s2 = curl_easy_escape(m_curl_session, s.c_str(), (int)s.size());
+            m_parameters.append(std::string(s1) + "=" + s2 + "&");
             curl_free(s1);
             curl_free(s2);
         }   // addParameter
+
         // --------------------------------------------------------------------
         /** Returns the current progress. */
         float getProgress() const { return m_progress.getAtomic(); }
+
         // --------------------------------------------------------------------
         /** Sets the current progress. */
-        void setProgress(float f)  { m_progress.setAtomic(f); }
+        void setProgress(float f) { m_progress.setAtomic(f); }
+
         // --------------------------------------------------------------------
         const std::string & getURL() const { assert(isBusy()); return m_url;}
+
         // --------------------------------------------------------------------
         /** Sets the URL for this request. */
         void setURL(const std::string & url)
@@ -166,8 +174,5 @@ namespace Online
         }   // setURL
 
     };   // class HTTPRequest
-
 } //namespace Online
-
-#endif
-
+#endif // HEADER_HTTP_REQUEST_HPP

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -62,6 +62,10 @@ GUIEngine::EventPropagation EnterGPNameDialog::processEvent(const std::string& e
         dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
+    else if (eventSource == "accept")
+    {
+        validateName();
+    }
     return GUIEngine::EVENT_LET;
 }
 
@@ -77,37 +81,8 @@ void EnterGPNameDialog::onEnterPressedInternal()
         return;
     }
 
-    //Otherwise, see if we can accept the new name
-    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-    assert(textCtrl != NULL);
-    stringw name = textCtrl->getText().trim();
-    if (name.size() > 0 && name != "Random Grand Prix")
-    {
-        // check for duplicate names
-        for (unsigned int i = 0; i < grand_prix_manager->getNumberOfGrandPrix(); i++)
-        {
-            const GrandPrixData* gp = grand_prix_manager->getGrandPrix(i);
-            if (gp->getName() == name)
-            {
-                LabelWidget* label = getWidget<LabelWidget>("title");
-                assert(label != NULL);
-                label->setText(_("Another grand prix with this name already exists."), false);
-                sfx_manager->quickSound("anvil");
-                return;
-            }
-        }
-
-        // It's unsafe to delete from inside the event handler so we do it
-        // in onUpdate (which checks for m_self_destroy)
-        m_self_destroy = true;
-    }
-    else
-    {
-        LabelWidget* label = getWidget<LabelWidget>("title");
-        assert(label != NULL);
-        label->setText(_("Cannot add a grand prix with this name"), false);
-        sfx_manager->quickSound("anvil");
-    }
+    //Otherwise, see if we can accept the new name and create the grand prix
+    validateName();
 }
 
 // -----------------------------------------------------------------------------
@@ -134,4 +109,39 @@ void EnterGPNameDialog::onUpdate(float dt)
         if (listener != NULL)
             listener->onNewGPWithName(name);
     }
+}
+
+// ----------------------------------------------------------------------------
+void EnterGPNameDialog::validateName()
+{
+    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
+    assert(textCtrl != NULL);
+    LabelWidget* label = getWidget<LabelWidget>("title");
+    assert(label != NULL);
+
+    stringw name = textCtrl->getText().trim();
+    if (name.size() == 0)
+    {
+        label->setText(_("Name is empty."), false);
+        SFXManager::get()->quickSound("anvil");
+    }
+    else if (grand_prix_manager->existsName(name) ||
+        name == GrandPrixData::getRandomGPName())
+    {
+        // check for duplicate names
+        label->setText(_("Another grand prix with this name already exists."), false);
+        SFXManager::get()->quickSound("anvil");
+    }
+    else if (name.size() > 30)
+    {
+        label->setText(_("Name is too long."), false);
+        SFXManager::get()->quickSound("anvil");
+    }
+    else
+    {
+        // It's unsafe to delete from inside the event handler so we do it
+        // in onUpdate (which checks for m_self_destroy)
+        m_self_destroy = true;
+    }
+
 }

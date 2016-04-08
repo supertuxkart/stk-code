@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007-2013 Joerg Henrichs
+//  Copyright (C) 2007-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,6 +23,7 @@ class LODNode;
 class Track;
 class STKInstancedSceneNode;
 
+#include <cassert>
 #include <map>
 #include <vector>
 #include <string>
@@ -41,26 +42,30 @@ namespace irr
 struct ModelDefinition
 {
     std::string m_model_file;
-    bool m_tangent;
+    bool m_tangent; // obsolete, TODO remove
     const XMLNode* m_xml;
 
     /** For LOD */
     int m_distance;
 
+    bool m_skeletal_animation;
+
     /** Constructor to allow storing this in STL containers */
     ModelDefinition()
     {
         m_tangent = false;
+        m_skeletal_animation = false;
         m_distance = 0;
         m_xml = NULL;
     }
 
-    ModelDefinition(const XMLNode* xml, int distance, std::string& model, bool tangent)
+    ModelDefinition(const XMLNode* xml, int distance, std::string& model, bool tangent, bool skeletal_animation)
     {
         m_model_file = model;
         m_tangent = tangent;
         m_xml = xml;
         m_distance = distance;
+        m_skeletal_animation = skeletal_animation;
     }
 
     ~ModelDefinition()
@@ -68,12 +73,13 @@ struct ModelDefinition
     }
 };
 
-/** Utility class to load level-of-detail nodes and instaincing nodes
+/** Utility class to load level-of-detail nodes and library nodes
  * \ingroup tracks
  */
 class ModelDefinitionLoader
 {
 private:
+    std::map<std::string, XMLNode*> m_library_nodes;
     std::map< std::string, std::vector< ModelDefinition > > m_lod_groups;
     std::map< std::string, STKInstancedSceneNode* > m_instancing_nodes;
     Track* m_track;
@@ -83,15 +89,28 @@ public:
 
     void addModelDefinition(const XMLNode* xml);
     LODNode* instanciateAsLOD(const XMLNode* xml_node, scene::ISceneNode* parent);
-    STKInstancedSceneNode* instanciate(const core::vector3df& position,
-                                       const irr::core::vector3df& rotation,
-                                       const irr::core::vector3df scale,
-                                       const std::string& name);
 
     void clear();
 
-
     scene::IMesh* getFirstMeshFor(const std::string& name);
+
+    std::map<std::string, XMLNode*>& getLibraryNodes()
+    {
+        return m_library_nodes;
+    }
+
+    void cleanLibraryNodesAfterLoad();
+
+    bool containsLibraryNode(const std::string& name) const
+    {
+        return m_library_nodes.find(name) != m_library_nodes.end();
+    }
+
+    void addToLibrary(const std::string& name, XMLNode* xml)
+    {
+        assert(xml != NULL);
+        m_library_nodes[name] = xml;
+    }
 };  // ModelDefinitionLoader
 
 #endif // HEADER_LOD_NODE_LOADER_HPP

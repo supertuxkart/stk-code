@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <particles emitter="box" box_x="0.023" box_y="0.023" box_z="-0.5">
 
-    <spreading angle="5"         />
+    <spreading angle="5"          />
     
     <velocity  x="0.0"
-               y="0.001"
+               y="0.0"
                z="-0.003"         />
     
     <material  file="skid-particle2.png"  />
@@ -12,16 +12,16 @@
     <!-- Amount of particles emitted per second. The minimum rate
          is used to show that the skidding bonus is now available,
          the maximum is used when the skid bonus is applied to the kart -->
-    <rate      min="900"
-               max="900"          />
+    <rate      min="1400"
+               max="1500"          />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="10"
-               max="10"          />
+    <lifetime  min="15"
+               max="25"          />
     
     <!-- Size of the particles -->
     <size      min="0.35"
-               max="0.75"         />
+               max="0.45"         />
     
     <color     min="255 255 255"
                max="255 255 255"  />

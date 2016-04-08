@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Lauri Kasanen
+//  Copyright (C) 2013-2015 Lauri Kasanen
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -59,9 +59,14 @@ public:
     float getEnergy() const { return m_energy; }
     float getEffectiveEnergy() const { return m_energy_multiplier * m_energy; }
     core::vector3df getColor() const { return core::vector3df(m_color[0], m_color[1], m_color[2]); }
+    void setColor(float r, float g, float b) { m_color[0] = r; m_color[1] = g; m_color[2] = b; }
 
     float getEnergyMultiplier() const { return m_energy_multiplier; }
-    void setEnergyMultiplier(float newval) { m_energy_multiplier = newval; }
+    void  setEnergyMultiplier(float newval) { m_energy_multiplier = newval; }
+
+    // For the debug menu
+    void setEnergy(float energy) { m_energy = energy; }
+    void setRadius(float radius) { m_radius = radius; }
 
 protected:
     static core::aabbox3df box;

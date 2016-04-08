@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //                2013 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
@@ -35,7 +35,6 @@
 
 namespace Online
 {
-
     /** Stores a request for the HTTP Manager. They will be sorted by
      *  prioritiy.  Requests have four different states they can be in, and
      *  this state determines which thread can access it. This allows
@@ -119,9 +118,11 @@ namespace Online
         /** The actual operation to be executed. Empty as default, which
          *  allows to create a 'quit' request without any additional code. */
         virtual void operation() {}
+
         // --------------------------------------------------------------------
         /** Virtual function to be called before an operation. */
         virtual void prepareOperation() {}
+
         // --------------------------------------------------------------------
         /** Virtual function to be called after an operation. */
         virtual void afterOperation()   {}
@@ -132,71 +133,87 @@ namespace Online
             RT_QUIT = 1
         };
 
-                 Request(bool manage_memory, int priority, int type);
+        Request(bool manage_memory, int priority, int type);
         virtual ~Request() {}
         void     execute();
         void     executeNow();
         void     queue();
+
         // --------------------------------------------------------------------
         /** Executed when a request has finished. */
         virtual void callback() {}
+
         // --------------------------------------------------------------------
         /** Returns the type of the request. */
         int getType() const  { return m_type; }
+
         // --------------------------------------------------------------------
         /** Returns if the memory for this object should be managed by
         *  by network_http (i.e. freed once the request is handled). */
         bool manageMemory() const   { return m_manage_memory; }
+
         // --------------------------------------------------------------------
         /** Sets the memory management flag of this request. This function
          *  must only be called by the main thread, since it is only tested by
          *  the main thread. */
         void setManageMemory(bool m) { m_manage_memory = m;  }
+
         // --------------------------------------------------------------------
         /** Returns the priority of this request. */
         int getPriority() const   { return m_priority; }
+
         // --------------------------------------------------------------------
         /** Signals that this request should be canceled. */
         void cancel() { m_cancel.setAtomic(true); }
+
         // --------------------------------------------------------------------
         /** Returns if this request is to be canceled. */
         bool isCancelled() const   { return m_cancel.getAtomic(); }
+
         // --------------------------------------------------------------------
         /** Returns if this request can be aborted. */
         bool isAbortable() const { return m_is_abortable.getAtomic(); }
+
         // --------------------------------------------------------------------
         /** Sets if this request is abortable or not. */
         void setAbortable(bool b) { m_is_abortable.setAtomic(b); }
+
         // --------------------------------------------------------------------
         /** Sets the request state to busy. */
         void setBusy()
         {
-            assert(m_state.getAtomic()==S_PREPARING);
+            assert(m_state.getAtomic() == S_PREPARING);
             m_state.setAtomic(S_BUSY);
         }   // setBusy
+
         // --------------------------------------------------------------------
         /** Sets the request to be completed. */
         void setExecuted()
         {
-            assert(m_state.getAtomic()==S_BUSY);
+            assert(m_state.getAtomic() == S_BUSY);
             m_state.setAtomic(S_EXECUTED);
         }   // setExecuted
+
         // --------------------------------------------------------------------
         /** Should only be called by the manager */
         void setDone()
         {
-            assert(m_state.getAtomic()==S_EXECUTED);
+            assert(m_state.getAtomic() == S_EXECUTED);
             m_state.setAtomic(S_DONE);
         }   // setDone
+
         // --------------------------------------------------------------------
         /** Returns if this request is done. */
         bool isDone() const { return m_state.getAtomic() == S_DONE; }
+
         // --------------------------------------------------------------------
         /** Returns if this request is being prepared. */
         bool isPreparing() const { return m_state.getAtomic() == S_PREPARING; }
+
         // --------------------------------------------------------------------
         /** Returns if this request is busy. */
         bool isBusy() const   { return m_state.getAtomic() == S_BUSY; }
+
         // --------------------------------------------------------------------
         /** Checks if the request has completed or done (i.e. callbacks were
          *  executed).
@@ -204,8 +221,9 @@ namespace Online
         bool hasBeenExecuted() const
         {
             State s = m_state.getAtomic();
-            return s==S_EXECUTED || s==S_DONE;
+            return s == S_EXECUTED || s == S_DONE;
         }   // hasBeenExecuted
+
         // --------------------------------------------------------------------
         /** Virtual method to check if a request has initialized all needed
          *  members to a valid value. */
@@ -226,9 +244,5 @@ namespace Online
             }
         };   // class Compare
     };   // class Request
-
-
 } //namespace Online
-
-#endif
-
+#endif // HEADER_ONLINE_REQUEST_HPP

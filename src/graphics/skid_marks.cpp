@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Ingo Ruhnke <grumbel@gmx.de>
-//  Copyright (C) 2013-2013 Joerg Henrichs
+//  Copyright (C) 2004-2015 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2013-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,11 +21,11 @@
 
 #include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
-#include "graphics/stkmeshscenenode.hpp"
 
 #include <IMeshSceneNode.h>
 #include <SMesh.h>
@@ -146,12 +146,11 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         delta.normalize();
         delta *= m_width*0.5f;
 
-        float distance = 0.0f;
         Vec3 start = m_left[m_current]->getCenterStart();
         Vec3 newPoint = (raycast_left + raycast_right)/2;
         // this linear distance does not account for the kart turning, it's true,
         // but it produces good enough results
-        distance = (newPoint - start).length();
+        float distance = (newPoint - start).length();
 
         m_left [m_current]->add(raycast_left-delta, raycast_left+delta,
                                 distance);
@@ -190,7 +189,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         new SkidMarkQuads(raycast_right-delta, raycast_right+delta,
                           m_material, m_avoid_z_fighting, custom_color);
     new_mesh->addMeshBuffer(smq_right);
-    scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh);
+    scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh, "skidmark");
     if (STKMeshSceneNode* stkm = dynamic_cast<STKMeshSceneNode*>(new_node))
         stkm->setReloadEachFrame(true);
 #ifdef DEBUG

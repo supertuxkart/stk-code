@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -42,19 +42,17 @@ TrackObjectManager::~TrackObjectManager()
 // ----------------------------------------------------------------------------
 /** Adds an object to the track object manager. The type to add is specified
  *  in the xml_node.
- * \note If you add add any objects with LOD, don't forget to call
- *       TrackObjectManager::assingLodNodes after everything is loaded
- *       to finalize their creation.
- *
- * FIXME: all of this is horrible, just make the exporter write LOD definitions
- *        in a separate section that's read before everything and remove all this
- *        crap
  */
-void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader)
+void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
+                             ModelDefinitionLoader& model_def_loader,
+                             TrackObject* parent_library)
 {
     try
     {
-        m_all_objects.push_back(new TrackObject(xml_node, parent, model_def_loader));
+        TrackObject *obj = new TrackObject(xml_node, parent, model_def_loader, parent_library);
+        m_all_objects.push_back(obj);
+        if(obj->isDriveable())
+            m_driveable_objects.push_back(obj);
     }
     catch (std::exception& e)
     {
@@ -68,10 +66,9 @@ void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
  */
 void TrackObjectManager::init()
 {
-    TrackObject* curr;
-    for_in (curr, m_all_objects)
+    for_var_in(TrackObject*, curr, m_all_objects)
     {
-        curr->init();
+        curr->onWorldReady();
     }
 }   // reset
 // ----------------------------------------------------------------------------
@@ -79,14 +76,47 @@ void TrackObjectManager::init()
  */
 void TrackObjectManager::reset()
 {
-    TrackObject* curr;
-    for_in (curr, m_all_objects)
+    for (TrackObject* curr : m_all_objects)
     {
         curr->reset();
+        curr->resetEnabled();
     }
 }   // reset
-
 // ----------------------------------------------------------------------------
+/** returns a reference to the track object
+ *  with a particular ID
+ *  \param name Name or ID of track object
+ */
+TrackObject* TrackObjectManager::getTrackObject(const std::string& libraryInstance,
+    const std::string& name)
+{
+    for (TrackObject* curr : m_all_objects)
+    {
+        //if (curr->getParentLibrary() != NULL)
+        //    Log::info("TrackObjectManager", "Found %s::%s", curr->getParentLibrary()->getID().c_str(), curr->getID().c_str());
+        //else
+        //    Log::info("TrackObjectManager", "Found ::%s", curr->getID().c_str());
+
+        if (curr->getParentLibrary() == NULL)
+        {
+            if (libraryInstance.size() > 0)
+                continue;
+        }
+        else
+        {
+            if (libraryInstance != curr->getParentLibrary()->getID())
+                continue;
+        }
+
+        if (curr->getID() == name)
+        {
+            return curr;
+        }
+    }
+    //object not found
+    Log::warn("TrackObjectManager", "Object not found : %s::%s", libraryInstance.c_str(), name.c_str());
+    return NULL;
+}
 /** Handles an explosion, i.e. it makes sure that all physical objects are
  *  affected accordingly.
  *  \param pos  Position of the explosion.
@@ -119,6 +149,60 @@ void TrackObjectManager::update(float dt)
         curr->update(dt);
     }
 }   // update
+
+// ----------------------------------------------------------------------------
+/** Does a raycast against all driveable objects. This way part of the track
+ *  can be a physical object, and can e.g. be animated. A separate list of all
+ *  driveable objects is maintained (in one case there were over 2000 bodies,
+ *  but only one is driveable). The result of the raycast against the track
+ *  mesh are the input parameter. It is then tested if the raycast against 
+ *  a track object gives a 'closer' result. If so, the parameters hit_point,
+ *  normal, and material will be updated.
+ *  \param from/to The from and to position for the raycast.
+ *  \param xyz The position in world where the ray hit.
+ *  \param material The material of the mesh that was hit.
+ *  \param normal The intrapolated normal at that position.
+ *  \param interpolate_normal If true, the returned normal is the interpolated
+ *         based on the three normals of the triangle and the location of the
+ *         hit point (which is more compute intensive, but results in much
+ *         smoother results).
+ *  \return True if a triangle was hit, false otherwise (and no output
+ *          variable will be set.
+ 
+ */
+void TrackObjectManager::castRay(const btVector3 &from, 
+                                 const btVector3 &to, btVector3 *hit_point, 
+                                 const Material **material,
+                                 btVector3 *normal,
+                                 bool interpolate_normal) const
+{
+    float distance = 9999.9f;
+    // If there was a hit already, compute the current distance
+    if(*material)
+    {
+        distance = hit_point->distance(from);
+    }
+    for (const TrackObject* curr : m_driveable_objects)
+    {
+        btVector3 new_hit_point;
+        const Material *new_material;
+        btVector3 new_normal;
+        if(curr->castRay(from, to, &new_hit_point, &new_material, &new_normal,
+                      interpolate_normal))
+        {
+            float new_distance = new_hit_point.distance(from);
+            // If the new hit is closer than the current hit, save
+            // the data.
+            if (new_distance < distance)
+            {
+                *material  = new_material;
+                *hit_point = new_hit_point;
+                *normal    = new_normal;
+                distance   = new_distance;
+            }   // if new_distance < distance
+        }   // if hit
+    }   // for all track objects.
+}   // castRay
 
 // ----------------------------------------------------------------------------
 /** Enables or disables fog for a given scene node.
@@ -206,21 +290,4 @@ void TrackObjectManager::removeObject(TrackObject* obj)
 
 // ----------------------------------------------------------------------------
 
-/*
-void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
-{
-    for (unsigned int n=0; n<lod_nodes.size(); n++)
-    {
-        std::vector<const XMLNode*>& queue = m_lod_objects[ lod_nodes[n]->getGroupName() ];
-        assert( queue.size() > 0 );
-        const XMLNode* xml = queue[ queue.size() - 1 ];
 
-        TrackObject* obj = new TrackObject(*xml, lod_nodes[n]->getParent(), lod_nodes[n]);
-        queue.erase( queue.end() - 1 );
-
-        m_all_objects.push_back(obj);
-    }
-
-    m_lod_objects.clear();
-}
-*/

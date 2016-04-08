@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -32,12 +32,15 @@ class TracksScreen : public GUIEngine::Screen,
 {
     friend class GUIEngine::ScreenSingleton<TracksScreen>;
 
+private:
     TracksScreen() : Screen("tracks.stkgui") {}
 
     /** adds the tracks from the current track group into the tracks ribbon */
     void buildTrackList();
 
     std::deque<std::string> m_random_track_list;
+
+    bool m_offical_track;
 
 public:
 
@@ -55,9 +58,9 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
+    void setOfficalTrack(bool offical) { m_offical_track = offical; }
 
     void setFocusOnTrack(const std::string& trackName);
-    void setFocusOnGP(const std::string& gpName);
 
 };
 

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -41,7 +41,7 @@ bool  ProfileWorld::m_no_graphics = false;
  */
 ProfileWorld::ProfileWorld()
 {
-    race_manager->setNumLocalPlayers(0);
+    race_manager->setNumPlayers(0);
     // Set number of laps so that the end of the race can be detected by
     // quering the number of finished karts from the race manager (in laps
     // based profiling) - in case of time based profiling, the number of
@@ -105,14 +105,15 @@ void ProfileWorld::setProfileModeLaps(int laps)
  */
 AbstractKart *ProfileWorld::createKart(const std::string &kart_ident, int index,
                                        int local_player_id, int global_player_id,
-                                       RaceManager::KartType type)
+                                       RaceManager::KartType type,
+                                       PerPlayerDifficulty difficulty)
 {
-    btTransform init_pos   = m_track->getStartTransform(index);
+    btTransform init_pos   = getStartTransform(index);
 
     Kart *new_kart         = new KartWithStats(kart_ident,
                                                /*world kart id*/ index,
                                                /*position*/ index+1,
-                                               init_pos);
+                                               init_pos, difficulty);
     new_kart->init(RaceManager::KT_AI);
     Controller *controller = loadAIController(new_kart);
     new_kart->setController(controller);
@@ -263,7 +264,7 @@ void ProfileWorld::enterRaceOverState()
     for(std::set<std::string>::iterator it = all_groups.begin();
         it !=all_groups.end(); it++)
     {
-        if(it->size()>max_len) max_len = it->size();
+        if(it->size()>max_len) max_len = (unsigned int) it->size();
     }
     max_len++;  // increase by 1 for one additional space after the name
 
@@ -281,7 +282,7 @@ void ProfileWorld::enterRaceOverState()
         int   expl_count    = 0,    off_track_count = 0;
         float skidding_time = 0.0f, rescue_time     = 0.0f, expl_time    = 0.0f;
         float av_time       = 0.0f;
-        for ( unsigned int i = 0; i < m_karts.size(); ++i)
+        for ( unsigned int i = 0; i < (unsigned int)m_karts.size(); ++i)
         {
             KartWithStats* kart = dynamic_cast<KartWithStats*>(m_karts[i]);
             const std::string &name=kart->getController()->getControllerName();
@@ -327,7 +328,7 @@ void ProfileWorld::enterRaceOverState()
             expl_count      += kart->getExplosionCount();
             off_track_count += kart->getOffTrackCount();
         }    // for i < m_karts.size
-        
+
         Log::verbose("profile", std::string(max_len+85, '-').c_str());
         ss.clear();
         ss.str("");

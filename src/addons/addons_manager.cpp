@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Lucas Baudin
+//  Copyright (C) 2010-2015 Lucas Baudin
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -114,13 +114,13 @@ void AddonsManager::init(const XMLNode *xml,
     
     if (download)
     {
-        Log::info("NetworkHttp", "Downloading updated addons.xml");
+        Log::info("addons", "Downloading updated addons.xml.");
         Online::HTTPRequest *download_request = new Online::HTTPRequest("addons.xml");
         download_request->setURL(addon_list_url);
         download_request->executeNow();
         if(download_request->hadDownloadError())
         {
-            Log::error("addons", "Error on download addons.xml: %s\n",
+            Log::error("addons", "Error on download addons.xml: %s.",
                        download_request->getDownloadErrorMessage());
             delete download_request;
             return;
@@ -129,12 +129,12 @@ void AddonsManager::init(const XMLNode *xml,
         UserConfigParams::m_addons_last_updated=StkTime::getTimeSinceEpoch();
     }
     else
-        Log::info("NetworkHttp", "Using cached addons.xml");
+        Log::info("addons", "Using cached addons.xml.");
         
     const XMLNode *xml_addons = new XMLNode(filename);
     addons_manager->initAddons(xml_addons);   // will free xml_addons
     if(UserConfigParams::logAddons())
-        Log::info("addons", "Addons manager list downloaded");
+        Log::info("addons", "Addons manager list downloaded.");
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -195,7 +195,7 @@ void AddonsManager::initAddons(const XMLNode *xml)
                 if(file_manager->fileExists(full_path))
                 {
                     if(UserConfigParams::logAddons())
-                        Log::warn("[AddonsManager] Removing cached icon '%s'.\n",
+                        Log::warn("addons", "Removing cached icon '%s'.",
                                addon.getIconBasename().c_str());
                     file_manager->removeFile(full_path);
                 }
@@ -218,7 +218,7 @@ void AddonsManager::initAddons(const XMLNode *xml)
             else
             {
                 m_addons_list.getData().push_back(addon);
-                index = m_addons_list.getData().size()-1;
+                index = (int) m_addons_list.getData().size()-1;
             }
             // Mark that this addon still exists on the server
             m_addons_list.getData()[index].setStillExists();
@@ -226,9 +226,9 @@ void AddonsManager::initAddons(const XMLNode *xml)
         }
         else
         {
-            Log::error("[AddonsManager]", "Found invalid node '%s' while downloading addons.",
+            Log::error("addons", "Found invalid node '%s' while downloading addons.",
                     node->getName().c_str());
-            Log::error("[AddonsManager]", "Ignored.");
+            Log::error("addons", "Ignored.");
         }
     }   // for i<xml->getNumNodes
     delete xml;
@@ -240,7 +240,7 @@ void AddonsManager::initAddons(const XMLNode *xml)
     // an addon that's still on the server and an invalid entry in the
     // addons installed file), it will be re-downloaded later.
     m_addons_list.lock();
-    unsigned int count = m_addons_list.getData().size();
+    unsigned int count = (unsigned int) m_addons_list.getData().size();
 
     for(unsigned int i=0; i<count;)
     {
@@ -254,7 +254,7 @@ void AddonsManager::initAddons(const XMLNode *xml)
         // it from the list.
         if(UserConfigParams::logAddons())
             Log::warn(
-                "[AddonsManager] Removing '%s' which is not on the server anymore.\n",
+                "addons", "Removing '%s' which is not on the server anymore.",
                 m_addons_list.getData()[i].getId().c_str() );
         const std::string &icon = m_addons_list.getData()[i].getIconBasename();
         std::string icon_file =file_manager->getAddonsFile("icons/"+icon);
@@ -311,7 +311,7 @@ void AddonsManager::checkInstalledAddons()
         if(n<0) continue;
         if(!m_addons_list.getData()[n].isInstalled())
         {
-            Log::info("[AddonsManager] Marking '%s' as being installed.",
+            Log::info("addons", "Marking '%s' as being installed.",
                    kp->getIdent().c_str());
             m_addons_list.getData()[n].setInstalled(true);
             something_was_changed = true;
@@ -330,7 +330,7 @@ void AddonsManager::checkInstalledAddons()
         if(n<0) continue;
         if(!m_addons_list.getData()[n].isInstalled())
         {
-            Log::info("[AddonsManager] Marking '%s' as being installed.",
+            Log::info("addons", "Marking '%s' as being installed.",
                    track->getIdent().c_str());
             m_addons_list.getData()[n].setInstalled(true);
             something_was_changed = true;
@@ -361,7 +361,7 @@ void AddonsManager::downloadIcons()
             if(icon=="")
             {
                 if(UserConfigParams::logAddons())
-                    Log::error("[AddonsManager]", "No icon or image specified for '%s'.",
+                    Log::error("addons", "No icon or image specified for '%s'.",
                                 addon.getId().c_str());
                 continue;
             }
@@ -400,7 +400,7 @@ void AddonsManager::loadInstalledAddons()
     /* checking for installed addons */
     if(UserConfigParams::logAddons())
     {
-        Log::info("[AddonsManager]", "Loading an xml file for installed addons: %s",
+        Log::info("addons", "Loading an xml file for installed addons: %s.",
                     m_file_installed.c_str());
     }
     const XMLNode *xml = file_manager->createXMLTree(m_file_installed);
@@ -466,7 +466,6 @@ bool AddonsManager::anyAddonsInstalled() const
  */
 bool AddonsManager::install(const Addon &addon)
 {
-    bool success=true;
     file_manager->checkAndCreateDirForAddons(addon.getDataDir());
 
     //extract the zip in the addons folder called like the addons name
@@ -474,19 +473,19 @@ bool AddonsManager::install(const Addon &addon)
     std::string from      = file_manager->getAddonsFile("tmp/"+base_name);
     std::string to        = addon.getDataDir();
 
-    success = extract_zip(from, to);
+    bool success = extract_zip(from, to);
     if (!success)
     {
         // TODO: show a message in the interface
-        Log::error("[AddonsManager]", "Failed to unzip '%s' to '%s'",
+        Log::error("addons", "Failed to unzip '%s' to '%s'.",
                     from.c_str(), to.c_str());
-        Log::error("[AddonsManager]", "Zip file will not be removed.");
+        Log::error("addons", "Zip file will not be removed.");
         return false;
     }
 
     if(!file_manager->removeFile(from))
     {
-        Log::error("[AddonsManager]", "Problems removing temporary file '%s'",
+        Log::error("addons", "Problems removing temporary file '%s'.",
                     from.c_str());
     }
 
@@ -520,7 +519,7 @@ bool AddonsManager::install(const Addon &addon)
         }
         catch (std::exception& e)
         {
-            Log::error("[AddonsManager]", "ERROR: Cannot load track <%s> : %s",
+            Log::error("addons", "Cannot load track '%s' : %s.",
                         addon.getDataDir().c_str(), e.what());
         }
     }
@@ -535,8 +534,8 @@ bool AddonsManager::install(const Addon &addon)
  */
 bool AddonsManager::uninstall(const Addon &addon)
 {
-    Log::info("[AddonsManager]", "Uninstalling <%s>",
-                core::stringc(addon.getName()).c_str());
+    Log::info("addons", "Uninstalling '%s'.",
+               core::stringc(addon.getName()).c_str());
 
     // addon is a const reference, and to avoid removing the const, we
     // find the proper index again to modify the installed state
@@ -584,13 +583,19 @@ bool AddonsManager::uninstall(const Addon &addon)
  */
 void AddonsManager::saveInstalled()
 {
-    //Put the addons in the xml file
-    //Manually because the irrlicht xml writer doesn't seem finished, FIXME ?
+    // Put the addons in the xml file
+    // Manually because the irrlicht xml writer doesn't seem finished, FIXME ?
     std::ofstream xml_installed(m_file_installed.c_str());
 
-    //write the header of the xml file
+    // Write the header of the xml file
     xml_installed << "<?xml version=\"1.0\"?>" << std::endl;
-    xml_installed << "<addons  xmlns='http://stkaddons.net/'>"
+
+    // Get server address from config
+    std::string server = UserConfigParams::m_server_addons;
+    // Find the third slash (end of the domain)
+    std::string::size_type index = server.find('/');
+    index = server.find('/', index + 2) + 1; // Omit one slash
+    xml_installed << "<addons  xmlns='" << server.substr(0, index) << "'>"
                     << std::endl;
 
     for(unsigned int i = 0; i < m_addons_list.getData().size(); i++)

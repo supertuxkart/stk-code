@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 2.8.1)
 
 # libbluetooth is required on Unix platforms
-if(UNIX)
+if(UNIX AND (NOT APPLE))
     include(FindPkgConfig)
     pkg_check_modules(BLUETOOTH bluez)
     if(NOT BLUETOOTH_FOUND)
@@ -29,8 +29,8 @@ set(WIIUSE_SOURCES
 )
 
 if(APPLE)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch x86_64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -F/Library/Frameworks")
     set(WIIUSE_SOURCES ${WIIUSE_SOURCES}
         os_mac/os_mac_find.m
         os_mac/os_mac_interface.m
@@ -38,7 +38,7 @@ if(APPLE)
     )
 endif()
 
-if(MSVC)
+if(WIN32)
     add_definitions("/DWIIUSE_STATIC")
     add_library(wiiuse STATIC ${WIIUSE_SOURCES})
 else()
@@ -81,5 +81,6 @@ if(MSVC)
     else()
         set_target_properties(wiiuse PROPERTIES STATIC_LIBRARY_FLAGS "setupapi.lib hid.lib")
     endif()
-
+elseif(MINGW)
+    target_link_libraries(wiiuse hid setupapi)
 endif()

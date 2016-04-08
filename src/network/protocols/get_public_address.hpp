@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,32 +20,47 @@
 #define GET_PUBLIC_ADDRESS_HPP
 
 #include "network/protocol.hpp"
+#include "utils/cpp2011.hpp"
+
+#include <string>
+
+class Network;
 
 class GetPublicAddress : public Protocol
 {
-    public:
-        GetPublicAddress(CallbackObject* callback_object);
-        virtual ~GetPublicAddress();
+private:
+    void createStunRequest();
+    std::string parseStunResponse();
 
-        virtual bool notifyEvent(Event* event) { return true; }
-        virtual bool notifyEventAsynchronous(Event* event) { return true; }
-        virtual void setup();
-        virtual void update() {}
-        virtual void asynchronousUpdate();
+    // Constants
+    static const uint32_t m_stun_magic_cookie;
+    static const int m_stun_server_port = 3478;
 
-    protected:
-        enum STATE
-        {
-            NOTHING_DONE,
-            TEST_SENT,
-            ADDRESS_KNOWN,
-            EXITING
-        };
-        STATE m_state;
-        uint32_t m_stun_tansaction_id[3];
-        static const uint32_t m_stun_magic_cookie = 0x2112A442;
-        uint32_t m_stun_server_ip;
-        STKHost* m_transaction_host;
-};
+    enum State
+    {
+        NOTHING_DONE,
+        STUN_REQUEST_SENT,
+        EXITING
+    } m_state;
+
+    uint8_t m_stun_tansaction_id[12];
+    uint32_t m_stun_server_ip;
+    Network* m_transaction_host;
+
+public:
+    GetPublicAddress(CallbackObject *callback = NULL);
+    virtual ~GetPublicAddress() {}
+
+    virtual void asynchronousUpdate() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void update(float dt) OVERRIDE {}
+    // ------------------------------------------------------------------------
+    virtual bool notifyEvent(Event* event) OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    virtual void setup() { m_state = NOTHING_DONE; }
+
+};   // class GetPublicAddress
 
 #endif // GET_PUBLIC_ADDRESS_HPP

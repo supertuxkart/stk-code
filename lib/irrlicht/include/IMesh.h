@@ -23,6 +23,9 @@ namespace scene
 	class IMesh : public virtual IReferenceCounted
 	{
 	public:
+		IMesh() : m_rt(video::ERT_DEFAULT) {}
+
+		virtual ~IMesh() {}
 
 		//! Get the amount of mesh buffers.
 		/** \return Amount of mesh buffers (IMeshBuffer) in this mesh. */
@@ -66,6 +69,15 @@ namespace scene
 		indices have changed. Otherwise, changes won't be updated
 		on the GPU in the next render cycle. */
 		virtual void setDirty(E_BUFFER_TYPE buffer=EBT_VERTEX_AND_INDEX) = 0;
+
+		//! Set the mesh to use a specific render type (mainly karts in STK)
+		/** \param t New render type for the mesh. */
+		void setRenderType(video::E_RENDER_TYPE t) { m_rt = t; }
+
+		//! Get the specific render type for the mesh (mainly karts in STK)
+		video::E_RENDER_TYPE getRenderType() const { return m_rt; }
+	private:
+		video::E_RENDER_TYPE m_rt;
 	};
 
 } // end namespace scene

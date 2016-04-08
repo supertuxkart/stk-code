@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 #include "online/request_manager.hpp"
 #include "utils/log.hpp"
 
-HidePublicAddress::HidePublicAddress() : Protocol(NULL, PROTOCOL_SILENT)
+HidePublicAddress::HidePublicAddress() : Protocol(PROTOCOL_SILENT)
 {
 }
 
@@ -42,8 +42,7 @@ void HidePublicAddress::asynchronousUpdate()
     if (m_state == NONE)
     {
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "unset",
-                                      "address-management.php");
+        PlayerManager::setUserDetails(m_request, "unset", Online::API::SERVER_PATH);
 
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;
@@ -57,16 +56,16 @@ void HidePublicAddress::asynchronousUpdate()
         {
             if(rec_success == "yes")
             {
-                Log::debug("ShowPublicAddress", "Address hidden successfully.");
+                Log::debug("HidePublicAddress", "Address hidden successfully.");
             }
             else
             {
-                Log::error("ShowPublicAddress", "Fail to hide address.");
+                Log::error("HidePublicAddress", "Fail to hide address.");
             }
         }
         else
         {
-            Log::error("ShowPublicAddress", "Fail to hide address.");
+            Log::error("HidePublicAddress", "Fail to hide address.");
         }
         m_state = DONE;
     }
@@ -75,6 +74,6 @@ void HidePublicAddress::asynchronousUpdate()
         m_state = EXITING;
         delete m_request;
         m_request = NULL;
-        m_listener->requestTerminate(this);
+        requestTerminate();
     }
 }

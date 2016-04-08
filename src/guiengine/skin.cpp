@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@
 #include <algorithm>
 
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/2dutils.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -346,8 +346,7 @@ void Skin::drawBgImage()
 
         source_area = core::recti(0, 0, texture_w, texture_h);
 
-        core::dimension2d<u32> frame_size =
-            GUIEngine::getDriver()->getCurrentRenderTargetSize();
+        core::dimension2d<u32> frame_size = irr_driver->getActualScreenSize();
         const int screen_w = frame_size.Width;
         const int screen_h = frame_size.Height;
 
@@ -971,7 +970,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         // automatically guess from position on-screen if tabs go up or down
         const bool vertical_flip =
             (unsigned int)rect.UpperLeftCorner.Y <
-              GUIEngine::getDriver()->getCurrentRenderTargetSize().Height/2;
+                irr_driver->getActualScreenSize().Height / 2;
         params->m_vertical_flip = vertical_flip;
 
         core::recti rect2 = rect;
@@ -1268,6 +1267,12 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
             params=&SkinConfig::m_render_params["spinner3::neutral"];
         else if(player_id==3)
             params=&SkinConfig::m_render_params["spinner4::neutral"];
+        else
+        {
+            Log::fatal("Skin::drawSpinnerBody", "Unknown playerID (more than 4 players?)");
+            // Silence compiler warning
+            params = NULL;
+        }
     }
     else if (widget->m_deactivated)
     {
@@ -1375,9 +1380,9 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         const core::recti source_area(0, 0, texture_w, texture_h);
 
         draw2DImage(texture,
-                                            dest_area, source_area,
-                                            0 /* no clipping */, 0,
-                                            true /* alpha */);
+                    dest_area, source_area,
+                    0 /* no clipping */, 0,
+                    true /* alpha */);
 
     }
 
@@ -1512,13 +1517,13 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
                              SColor(100,255,255,255),
                              SColor(100,255,255,255) };
         core::recti r(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h);
-        draw2DImage(icon_widget->m_texture, sized_rect,
+        draw2DImage(icon_widget->getTexture(), sized_rect,
                                             r, 0 /* no clipping */, colors,
                                             true /* alpha */);
     }
     else
     {
-        video::ITexture* t = icon_widget->m_texture;
+        const video::ITexture* t = icon_widget->getTexture();
 
         const bool mouseInside =
             rect.isPointInside(irr_driver->getDevice()->getCursorControl()
@@ -1599,15 +1604,28 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
                              SColor(100,255,255,255),
                              SColor(100,255,255,255),
                              SColor(100,255,255,255) };
-        draw2DImage( texture, rect, source_area,
-                                            0 /* no clipping */, colors,
-                                            true /* alpha */);
+        draw2DImage(texture, rect, source_area,
+                    0 /* no clipping */, colors,
+                    true /* alpha */);
     }
     else
     {
-        draw2DImage( texture, rect, source_area,
-                                             0 /* no clipping */, 0,
-                                             true /* alpha */);
+        draw2DImage(texture, rect, source_area,
+                    0 /* no clipping */, 0,
+                    true /* alpha */);
+    }
+
+
+    if (focused && widget->hasTooltip())
+    {
+        const core::position2di mouse_position =
+            irr_driver->getDevice()->getCursorControl()->getPosition();
+
+        if (rect.isPointInside(mouse_position))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
     }
 }   // drawCheckBox
 
@@ -1843,7 +1861,7 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
     if (atMouse)
     {
         pos = irr_driver->getDevice()->getCursorControl()->getPosition()
-            + core::position2di(15, 15);
+            + core::position2di(10 - size.Width / 2, 20);
     }
 
     core::recti r(pos, size);
@@ -1943,8 +1961,10 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
         FrameBuffer* fb = mvw->getFrameBuffer();
         if (fb != NULL && fb->getRTT().size() > 0)
         {
+            glEnable(GL_FRAMEBUFFER_SRGB);
             draw2DImageFromRTT(fb->getRTT()[0], 512, 512,
                 rect, core::rect<s32>(0, 0, 512, 512), NULL, SColor(255, 255, 255, 255), true);
+            glDisable(GL_FRAMEBUFFER_SRGB);
         }
     }
     else if (type == WTYPE_ICON_BUTTON || type == WTYPE_MODEL_VIEW)
@@ -2081,6 +2101,20 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
                                                           "hourglass.png");
         doDrawBadge(texture, rect, max_icon_size, true);
+    }
+    if (widget->m_badges & ZIPPER_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(FileManager::MODEL,
+                                                          "zipper_collect.png");
+        doDrawBadge(texture, rect, max_icon_size, false);
+    }
+    if (widget->m_badges & ANCHOR_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(FileManager::MODEL,
+                                                          "anchor-icon.png");
+        doDrawBadge(texture, rect, max_icon_size, false);
     }
 }   // drawBadgeOn
 
@@ -2240,9 +2274,8 @@ void Skin::drawBGFadeColor()
     SColor color = SkinConfig::m_colors["dialog_background::neutral"];
     if (m_dialog_size < 1.0f)
         color.setAlpha( (unsigned int)(color.getAlpha()*m_dialog_size ));
-    GL32_draw2DRectangle(color,
-                                            core::recti(position2d< s32 >(0,0),
-                       GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
+    GL32_draw2DRectangle(color, core::recti(position2d< s32 >(0,0),
+                         irr_driver->getActualScreenSize()));
 }   // drawBGFadeColor
 
 // -----------------------------------------------------------------------------

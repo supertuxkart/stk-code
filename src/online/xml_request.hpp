@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //                2013 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
@@ -42,18 +42,19 @@ namespace Online
         /** On a successful download contains the converted XML tree. */
         XMLNode *m_xml_data;
 
-        /** Additional info contained the downloaded data (or an error
-         *  message if a problem occurred). */
-        irr::core::stringw m_info;
+    protected:
+
+		/** Additional info contained the downloaded data (or an error
+		*  message if a problem occurred). */
+		irr::core::stringw m_info;
 
         /** True if the request was successful executed on the server. */
         bool m_success;
 
-    protected:
         virtual void afterOperation() OVERRIDE;
 
     public :
-                 XMLRequest(bool manage_memory = false, int priority = 1);
+        XMLRequest(bool manage_memory = false, int priority = 1);
         virtual ~XMLRequest();
 
         // ------------------------------------------------------------------------
@@ -73,7 +74,7 @@ namespace Online
         * \pre request had to be executed.
         * \return get the info from the request reply
         */
-        const irr::core::stringw & getInfo()   const
+        const irr::core::stringw & getInfo() const
         {
             assert(hasBeenExecuted());
             return m_info;
@@ -90,8 +91,5 @@ namespace Online
         }   // isSuccess
 
     };   // class XMLRequest
-
 } //namespace Online
-
-#endif
-
+#endif // HEADER_XML_REQUEST_HPP

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,7 +23,6 @@
 #include "online/http_request.hpp"
 #include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
-#include "online/server.hpp"
 #include "online/xml_request.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
@@ -37,7 +36,6 @@ class PlayerManager;
 
 namespace Online
 {
-
     class OnlineProfile;
 
     // ============================================================================
@@ -48,75 +46,73 @@ namespace Online
       */
     class OnlinePlayerProfile : public PlayerProfile
     {
+    public:
+        // ----------------------------------------------------------------
+        class SignInRequest : public XMLRequest
+        {
+            virtual void callback ();
         public:
-            // ----------------------------------------------------------------
-            class SignInRequest : public XMLRequest
-            {
-                virtual void callback ();
-            public:
-                SignInRequest(bool manage_memory = false)
-                    : XMLRequest(manage_memory, /*priority*/10) {}
-            };   // SignInRequest
+            SignInRequest(bool manage_memory = false)
+                : XMLRequest(manage_memory, /*priority*/10) {}
+        };   // SignInRequest
 
-            // ----------------------------------------------------------------
-            class PollRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                PollRequest() : XMLRequest(true) {}
-            };   // PollRequest
-
-        private:
-            std::string                 m_token;
-            OnlineProfile              *m_profile;
-
-            /** The state of the player (logged in, logging in, ...) */
-            PlayerProfile::OnlineState  m_online_state;
-
-            virtual void signIn(bool success, const XMLNode * input);
-            virtual void signOut(bool success, const XMLNode * input,
-                                const irr::core::stringw &info);
-            virtual uint32_t getOnlineId() const;
-            virtual void setUserDetails(Online::HTTPRequest *request,
-                                        const std::string &action,
-                                        const std::string &php_script = "") const;
-
-            virtual void requestPoll() const;
-            // ----------------------------------------------------------------
-            /** Returns if this user is logged in. */
-            virtual bool isLoggedIn() const
-            {
-                return m_online_state == PlayerProfile::OS_SIGNED_IN;
-            }   // isLoggedIn
-
-            // ----------------------------------------------------------------
-            /** The online state of the player (i.e. logged out, logging in,
-             *  logged in, ...). */
-            PlayerProfile::OnlineState getOnlineState() const
-            {
-                return m_online_state;
-            }   // getOnlineState
-            // ----------------------------------------------------------------
-            /** Returns a pointer to the profile associated with the current
-            *  user. */
-            OnlineProfile* getProfile() const { return m_profile; }
-            // ----------------------------------------------------------------
-            /** Returns the session token of the signed in user. */
-            const std::string& getToken() const { return m_token; }
-            virtual void requestSavedSession();
-            virtual void requestSignOut();
-            virtual SignInRequest *requestSignIn(const irr::core::stringw &username,
-                                                 const irr::core::stringw &password);
-
+        // ----------------------------------------------------------------
+        class PollRequest : public XMLRequest
+        {
+            virtual void callback ();
         public:
-            OnlinePlayerProfile(const XMLNode *player);
-            OnlinePlayerProfile(const core::stringw &name, bool is_guest = false);
-            virtual ~OnlinePlayerProfile() {};
-            // ----------------------------------------------------------------
+            PollRequest() : XMLRequest(true) {}
+        };   // PollRequest
 
-    };   // class OnlinePlayerProfile
+    private:
+        std::string                 m_token;
+        OnlineProfile              *m_profile;
 
+        /** The state of the player (logged in, logging in, ...) */
+        PlayerProfile::OnlineState  m_online_state;
+
+        virtual void signIn(bool success, const XMLNode * input);
+        virtual void signOut(bool success, const XMLNode * input,
+                            const irr::core::stringw &info);
+        virtual uint32_t getOnlineId() const;
+        virtual void setUserDetails(Online::HTTPRequest *request,
+                                    const std::string &action,
+                                    const std::string &url_path = "") const;
+
+        virtual void requestPoll() const;
+
+        // ----------------------------------------------------------------
+        /** Returns if this user is logged in. */
+        virtual bool isLoggedIn() const
+        {
+            return m_online_state == PlayerProfile::OS_SIGNED_IN;
+        }   // isLoggedIn
+
+        // ----------------------------------------------------------------
+        /** The online state of the player (i.e. logged out, logging in,
+         *  logged in, ...). */
+        PlayerProfile::OnlineState getOnlineState() const
+        {
+            return m_online_state;
+        }   // getOnlineState
+
+        // ----------------------------------------------------------------
+        /** Returns a pointer to the profile associated with the current user. */
+        OnlineProfile* getProfile() const { return m_profile; }
+
+        // ----------------------------------------------------------------
+        /** Returns the session token of the signed in user. */
+        const std::string& getToken() const { return m_token; }
+        virtual void requestSavedSession();
+        virtual void requestSignOut();
+        virtual SignInRequest *requestSignIn(const irr::core::stringw &username,
+                                             const irr::core::stringw &password);
+
+    public:
+        OnlinePlayerProfile(const XMLNode *player);
+        OnlinePlayerProfile(const core::stringw &name, bool is_guest = false);
+        virtual ~OnlinePlayerProfile() {}
+        // ----------------------------------------------------------------
+    }; // class OnlinePlayerProfile
 } // namespace Online
-
-#endif
-
-/*EOF*/
+#endif // HEADER_CURRENT_ONLINE_USER_HPP

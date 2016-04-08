@@ -84,11 +84,6 @@ namespace scene
 		//! returns amount of materials used by this scene node.
 		virtual u32 getMaterialCount() const;
 
-		//! Creates shadow volume scene node as child of this node
-		//! and returns a pointer to it.
-		virtual IShadowVolumeSceneNode* addShadowVolumeSceneNode(const IMesh* shadowMesh,
-			s32 id, bool zfailmethod=true, f32 infinity=1000.0f);
-
 		//! Returns a pointer to a child node, which has the same transformation as
 		//! the corrsesponding joint, if the mesh in this scene node is a skinned mesh.
 		virtual IBoneSceneNode* getJointNode(const c8* jointName);
@@ -109,12 +104,6 @@ namespace scene
 		//! Implemented here, to be able to remove the shadow properly, if there is one,
 		//! or to remove attached childs.
 		virtual bool removeChild(ISceneNode* child);
-
-		//! Starts a MD2 animation.
-		virtual bool setMD2Animation(EMD2_ANIMATION_TYPE anim);
-
-		//! Starts a special MD2 animation.
-		virtual bool setMD2Animation(const c8* animationName);
 
 		//! Returns the current displayed frame number.
 		virtual f32 getFrameNr() const;
@@ -145,10 +134,6 @@ namespace scene
 
 		//! Returns type of the scene node
 		virtual ESCENE_NODE_TYPE getType() const { return ESNT_ANIMATED_MESH; }
-
-		// returns the absolute transformation for a special MD3 Tag if the mesh is a md3 mesh,
-		// or the absolutetransformation if it's a normal scenenode
-		const SMD3QuaternionTag* getMD3TagTransformation( const core::stringc & tagname);
 
 		//! updates the absolute position based on the relative and the parents position
 		virtual void updateAbsolutePosition();
@@ -209,25 +194,8 @@ namespace scene
 		IAnimationEndCallBack* LoopCallBack;
 		s32 PassCount;
 
-		IShadowVolumeSceneNode* Shadow;
-
 		core::array<IBoneSceneNode* > JointChildSceneNodes;
 		core::array<core::matrix4> PretransitingSave;
-
-		// Quake3 Model
-		struct SMD3Special : public virtual IReferenceCounted
-		{
-			core::stringc Tagname;
-			SMD3QuaternionTagList AbsoluteTagList;
-
-			SMD3Special & operator = (const SMD3Special & copyMe)
-			{
-				Tagname = copyMe.Tagname;
-				AbsoluteTagList = copyMe.AbsoluteTagList;
-				return *this;
-			}
-		};
-		SMD3Special *MD3Special;
 	};
 
 } // end namespace scene

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013  Joerg Henrichs
+//  Copyright (C) 2009-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -44,6 +44,7 @@ private:
            CheckManager()       {m_all_checks.clear();};
           ~CheckManager();
 public:
+    void   add(CheckStructure* strct) { m_all_checks.push_back(strct); }
     void   load(const XMLNode &node);
     void   update(float dt);
     void   reset(const Track &track);
@@ -64,7 +65,7 @@ public:
     static void destroy() { delete m_check_manager; m_check_manager = NULL; }
     // ------------------------------------------------------------------------
     /** Returns the number of check structures defined. */
-    unsigned int getCheckStructureCount() const { return m_all_checks.size(); }
+    unsigned int getCheckStructureCount() const { return (unsigned int) m_all_checks.size(); }
     // ------------------------------------------------------------------------
     /** Returns the nth. check structure. */
     CheckStructure *getCheckStructure(unsigned int n) const

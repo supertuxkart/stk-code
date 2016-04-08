@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2012-2013 Marianne Gagnon
+//  Copyright (C) 2012-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -35,12 +35,7 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Determines the rescue position index of the specified kart. */
-    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE
-    {
-        // Don't use LinearWorld's function, but WorldWithRank, since the
-        // latter is based on rescuing to start positions
-        return WorldWithRank::getRescuePositionIndex(kart);
-    }
+    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns the bullet transformation for the specified rescue index. */
     virtual btTransform getRescueTransform(unsigned int index) const OVERRIDE
@@ -49,6 +44,8 @@ public:
         // latter is based on rescuing to start positions
         return WorldWithRank::getRescueTransform(index);
     }
+
+
 
 };   // class TutorialWorld
 

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -25,10 +25,8 @@
 
 #include <assert.h>
 
-
 namespace Online
 {
-
     // ========================================================================
     /**
      *  Creates a request that can be handled by the RequestManager
@@ -62,11 +60,17 @@ namespace Online
     void Request::execute()
     {
         assert(isBusy());
+        // Abort as early as possible if abort is requested
+        if (RequestManager::get()->getAbort() && isAbortable()) return;
         prepareOperation();
+        if (RequestManager::get()->getAbort() && isAbortable()) return;
         operation();
+        if (RequestManager::get()->getAbort() && isAbortable()) return;
         setExecuted();
+        if (RequestManager::get()->getAbort() && isAbortable()) return;
         afterOperation();
     }   // execute
+
     // ------------------------------------------------------------------------
     /** Executes the request now, i.e. in the main thread and without involving
      *  the manager thread.. This calles prepareOperation, operation, and
@@ -80,6 +84,5 @@ namespace Online
         callback();
         setDone();
     }   // executeNow
-
 
 } // namespace Online

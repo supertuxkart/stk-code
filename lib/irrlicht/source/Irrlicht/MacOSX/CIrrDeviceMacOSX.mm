@@ -719,7 +719,7 @@ bool CIrrDeviceMacOSX::createWindow()
 					if (!CreationParams.WindowId)
 					{
 						[Window center];
-						[Window setDelegate:[NSApp delegate]];
+						[(NSFileManager *)Window setDelegate:[NSApp delegate]];
 
 						if(CreationParams.DriverType == video::EDT_OPENGL)
 							[OGLContext setView:[Window contentView]];
@@ -800,29 +800,47 @@ bool CIrrDeviceMacOSX::createWindow()
 						{
 							CGLPixelFormatAttribute	fullattribs[] =
 							{
-								kCGLPFAFullScreen,
-								kCGLPFADisplayMask, (CGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(display),
+                                kCGLPFAOpenGLProfile, (CGLPixelFormatAttribute)kCGLOGLPVersion_3_2_Core,
+								//kCGLPFAFullScreen,
+								//kCGLPFADisplayMask, (CGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(display),
 								kCGLPFADoubleBuffer,
-								kCGLPFANoRecovery,
-								kCGLPFAAccelerated,
+								//kCGLPFANoRecovery,
+								//kCGLPFAAccelerated,
 								kCGLPFADepthSize, (CGLPixelFormatAttribute)depthSize,
 								kCGLPFAColorSize, (CGLPixelFormatAttribute)CreationParams.Bits,
-								kCGLPFAAlphaSize, (CGLPixelFormatAttribute)alphaSize,
-								kCGLPFASampleBuffers, (CGLPixelFormatAttribute)(CreationParams.AntiAlias?1:0),
-								kCGLPFASamples, (CGLPixelFormatAttribute)CreationParams.AntiAlias,
-								kCGLPFAStencilSize, (CGLPixelFormatAttribute)(CreationParams.Stencilbuffer?1:0),
+								//kCGLPFAAlphaSize, (CGLPixelFormatAttribute)alphaSize,
+								//kCGLPFASampleBuffers, (CGLPixelFormatAttribute)(CreationParams.AntiAlias?1:0),
+								//kCGLPFASamples, (CGLPixelFormatAttribute)CreationParams.AntiAlias,
+								//kCGLPFAStencilSize, (CGLPixelFormatAttribute)(CreationParams.Stencilbuffer?1:0),
 								(CGLPixelFormatAttribute)NULL
 							};
 
+                            printf("Creating OpenGL device with flags: kCGLPFAColorSize : %i | kCGLPFADepthSize : %i ",
+                                   (int)CreationParams.Bits,
+                                   (int)depthSize
+                                   );
+                            
 							pixelFormat = NULL;
 							numPixelFormats = 0;
-							CGLChoosePixelFormat(fullattribs,&pixelFormat,&numPixelFormats);
+							CGLError error = CGLChoosePixelFormat(fullattribs,&pixelFormat,&numPixelFormats);
 
+                            if (error != kCGErrorSuccess)
+                            {
+                                os::Printer::log("CGLChoosePixelFormat returned error", ELL_WARNING);
+                                printf("OSX DEBUG: CGLChoosePixelFormat returned error %i (%s)\n",
+                                       (int)error, CGLErrorString (error));
+                            }
+                            
 							if (pixelFormat != NULL)
 							{
+                                printf("OSX DEBUG: pixelFormat != NULL\n");
 								CGLCreateContext(pixelFormat,NULL,&CGLContext);
 								CGLDestroyPixelFormat(pixelFormat);
 							}
+                            else
+                            {
+                                os::Printer::log("CGLChoosePixelFormat returned NULL pixelFormat", ELL_WARNING);
+                            }
 
 							if (CGLContext != NULL)
 							{
@@ -837,6 +855,10 @@ bool CIrrDeviceMacOSX::createWindow()
 								CreationParams.WindowSize.set(ScreenWidth, ScreenHeight);
 								result = true;
 							}
+                            else
+                            {
+                                os::Printer::log("CGLContext is null", ELL_WARNING);
+                            }
 						}
 						else
 						{
@@ -1290,6 +1312,9 @@ void CIrrDeviceMacOSX::storeMouseLocation()
 		x = (int)point.x;
 		y = (int)point.y;
 
+        if (CursorControl == NULL)
+            return;
+        
 		const core::position2di& curr = ((CCursorControl *)CursorControl)->getPosition();
 		if (curr.X != x || curr.Y != y)
 		{
@@ -1302,8 +1327,9 @@ void CIrrDeviceMacOSX::storeMouseLocation()
 			postEventFromUser(ievent);
 		}
 	}
-
-	((CCursorControl *)CursorControl)->updateInternalCursorPosition(x,y);
+    
+    if (CursorControl != NULL)
+        ((CCursorControl *)CursorControl)->updateInternalCursorPosition(x,y);
 }
 
 
@@ -1709,6 +1735,7 @@ bool CIrrDeviceMacOSX::activateJoysticks(core::array<SJoystickInfo> & joystickIn
 
 				SJoystickInfo returnInfo;
 				returnInfo.Joystick = jindex;
+                returnInfo.HasGenericName = false;
 				returnInfo.Axes = info.axes;
 				//returnInfo.Hats = info.hats;
 				returnInfo.Buttons = info.buttons;

@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007-2013 Robert Schuster <robertschuster@fsfe.org>
-//  Copyright (C) 2012-2013 SuperTuxKart-Team
+//  Copyright (C) 2007-2015 Robert Schuster <robertschuster@fsfe.org>
+//  Copyright (C) 2012-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,13 +27,6 @@
 
 #include <string>
 #include <irrString.h>
-
-class Binding;
-
-const int DEADZONE_MOUSE       =  150;
-const int DEADZONE_MOUSE_SENSE =  200;
-const int DEADZONE_JOYSTICK    = 2000;
-const int MULTIPLIER_MOUSE     =  750;
 
 /**
   * \ingroup input

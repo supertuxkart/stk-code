@@ -1,11 +1,24 @@
-in vec2 quadcorner;
-in vec2 texcoord;
-in vec3 position;
+#if __VERSION__ >= 330
+layout(location=0) in vec3 Position;
+layout(location = 1) in float lifetime;
+layout(location = 2) in float size;
+
+layout(location = 3) in vec2 Texcoord;
+layout(location = 4) in vec2 quadcorner;
+
+layout(location = 5) in vec3 rotationvec;
+layout(location = 6) in float anglespeed;
+#else
+in vec3 Position;
 in float lifetime;
 in float size;
 
+in vec2 Texcoord;
+in vec2 quadcorner;
+
 in vec3 rotationvec;
-in float anglespeed;
+float anglespeed;
+#endif
 
 out float lf;
 out vec2 tc;
@@ -13,9 +26,9 @@ out vec3 pc;
 
 void main(void)
 {
-	tc = texcoord;
+	tc = Texcoord;
 	lf = lifetime;
-	vec3 newposition = position;
+	vec3 newposition = Position;
 
 	// from http://jeux.developpez.com/faq/math
 	float angle = lf * anglespeed;

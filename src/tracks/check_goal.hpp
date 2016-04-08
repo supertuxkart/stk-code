@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@ using namespace irr;
 class CheckManager;
 class XMLNode;
 class Track;
+class Vec3;
 
 /**
  *  \brief Implements a simple checkline that will score a point when the
@@ -37,6 +38,9 @@ class Track;
 class CheckGoal : public CheckStructure
 {
 private:
+    /** Previois ball position. */
+    Vec3            m_previous_ball_position;
+
     /** Which team is this goal for? */
     bool            m_first_goal;
 
@@ -47,10 +51,15 @@ public:
              CheckGoal(const XMLNode &node, unsigned int index);
     virtual ~CheckGoal() {}
     virtual void update(float dt) OVERRIDE;
-    virtual void trigger(unsigned int kart_index);
+    virtual void trigger(unsigned int kart_index) OVERRIDE;
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              unsigned int indx) OVERRIDE;
     virtual void reset(const Track &track) OVERRIDE;
+
+    // ------------------------------------------------------------------------
+    bool getTeam() const                             { return m_first_goal; }
+    // ------------------------------------------------------------------------
+    Vec3 convertTo3DCenter() const;
 };   // CheckLine
 
 #endif

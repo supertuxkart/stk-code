@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
+        <header id="name" height="7%" width="80%" align="center" text_align="center"/>
+
+        <spacer width="1" height="1%"/>
+
+        <box width="100%" height="40%" padding="10" layout="horizontal-row">
+            <!-- Left pane -->
+            <div proportion="1" height="100%" layout="vertical-row">
+                <icon-button proportion="1" width="100%" height="100%" id="screenshot" custom_ratio="1.33333"/>
+            </div>
+            <!-- Right pane -->
+            <div proportion="1" height="100%" layout="vertical-row">
+                <label id="highscores" width="100%" text_align="center" text="= Highscores ="/>
+
+                <spacer width="1" height="2%"/>
+
+                <div width="95%" height="fit" layout="horizontal-row">
+                    <icon id="iconscore1" icon="gui/random_kart.png" width="font" height="font"/>
+                    <spacer width="2%" height="1"/>
+                    <label id="highscore1" proportion="1" text="(Empty)"/>
+                </div>
+
+                <spacer width="1" height="2%"/>
+
+                <div width="95%" height="fit" layout="horizontal-row">
+                    <icon id="iconscore2" icon="gui/random_kart.png" width="font" height="font"/>
+                    <spacer width="2%" height="1"/>
+                    <label id="highscore2" proportion="1" text="(Empty)"/>
+                </div>
+
+                <spacer width="1" height="2%"/>
+
+                <div width="95%" height="fit" layout="horizontal-row">
+                    <icon id="iconscore3" icon="gui/random_kart.png" width="font" height="font"/>
+                    <spacer width="2%" height="1"/>
+                    <label id="highscore3" proportion="1" text="(Empty)"/>
+                </div>
+
+                <spacer width="1" height="2%"/>
+
+                <label id="author" width="100%" text_align="center" word_wrap="true"/>
+
+                <spacer width="1" height="10%"/>
+                <label id="max-arena-players" width="100%" text_align="center" word_wrap="true"/>
+            </div>
+
+        </box>
+        <spacer width="1" height="1%"/>
+        <box width="100%" height="33%" padding="15" layout="vertical-row">
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="lap-text" proportion="1" I18N="In the track info screen" text="Number of laps" text_align="right"/>
+                <spacer width="40"/>
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <spinner id="lap-spinner" width="50%" min_value="1" max_value="20" align="center"
+                             wrap_around="true" />
+                </div>
+            </div>
+            <spacer height="10"/>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="ai-text" proportion="1" I18N="In the track info screen" text="Number of AI karts" text_align="right"/>
+                <spacer width="40"/>
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <spinner id="ai-spinner" width="50%" min_value="1" max_value="20" align="center"
+                             wrap_around="true" />
+                </div>
+            </div>
+            <spacer height="10"/>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="option-text" proportion="1" I18N="In the track info screen" text_align="right"/>
+                <spacer width="40"/>
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <div width="50%" height="fit" text-align="center" layout="vertical-row" >
+                        <checkbox id="option" align="center"/>
+                    </div>
+                </div>
+            </div>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="record-race-text" proportion="1" I18N="In the track info screen" text="Record the race for ghost replay" text_align="right"/>
+                <spacer width="40"/>
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <div width="50%" height="fit" text-align="center" layout="vertical-row" >
+                        <checkbox id="record" align="center"/>
+                    </div>
+                </div>
+            </div>
+            <spacer width="1" height="1%"/>
+        </box>
+        <spacer width="1" height="1%"/>
+        <buttonbar id="buttons" height="15%" width="100%" align="center">
+            <icon-button id="start" width="64" height="64" icon="gui/green_check.png"
+                    I18N="In the track info screen" text="Start Race"/>
+
+        </buttonbar>
+    </div>
+</stkgui>

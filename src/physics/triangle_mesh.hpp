@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -37,6 +37,9 @@ private:
     UserPointer                  m_user_pointer;
     std::vector<const Material*> m_triangleIndex2Material;
     btRigidBody                 *m_body;
+    /** Keep track if the physical body was created here or not. */
+    bool                         m_free_body;
+
     btCollisionObject           *m_collision_object;
     btTriangleMesh               m_mesh;
     btVector3 dummy1, dummy2;
@@ -44,6 +47,8 @@ private:
     btCollisionShape            *m_collision_shape;
     /** The three normals for each triangle. */
     AlignedArray<btVector3>      m_normals;
+    /** Pre-compute value used in smoothing. */
+    AlignedArray<float>          m_p1p2p3;
 public:
          TriangleMesh();
         ~TriangleMesh();
@@ -60,6 +65,20 @@ public:
     btVector3 getInterpolatedNormal(unsigned int index,
                                     const btVector3 &position) const;
     // ------------------------------------------------------------------------
+    /** In case of physical objects of shape 'exact', the physical body is
+     *  created outside of the mesh. Since raycasts need the body's world
+     *  transform, the body can be set using this function. This will also
+     *  cause the body not to be freed (since it will be freed as part of
+     *  the physical object). */
+    void setBody(btRigidBody *body)
+    {
+        assert(!m_body);
+        // Mark that the body should not be deleted when this object is 
+        // deleted, since the body is managed elsewhere.
+        m_free_body = false;
+        m_body = body;
+    }
+    // ------------------------------------------------------------------------
     const Material* getMaterial(int n) const
                                           {return m_triangleIndex2Material[n];}
     // ------------------------------------------------------------------------
@@ -75,28 +94,36 @@ public:
     /** Returns the points of the 'indx' triangle.
      *  \param indx Index of the triangle to get.
      *  \param p1,p2,p3 On return the three points of the triangle. */
-    void getTriangle(unsigned int indx, btVector3 *p1, btVector3 *p2,
-                     btVector3 *p3) const
+    void getTriangle(unsigned int indx, btVector3 **p1, btVector3 **p2,
+                     btVector3 **p3) const
     {
         const IndexedMeshArray &m = m_mesh.getIndexedMeshArray();
         btVector3 *p = &(((btVector3*)(m[0].m_vertexBase))[3*indx]);
-        *p1 = p[0];
-        *p2 = p[1];
-        *p3 = p[2];
+        *p1 = &(p[0]);
+        *p2 = &(p[1]);
+        *p3 = &(p[2]);
     }   // getTriangle
     // ------------------------------------------------------------------------
     /** Returns the normals of the triangle with the given index.
      *  \param indx Index of the triangle to get the three normals of.
      *  \result n1,n2,n3 The three normals. */
-    void getNormals(unsigned int indx, btVector3 *n1, btVector3 *n2,
-                    btVector3 *n3) const
+    void getNormals(unsigned int indx, const btVector3 **n1, 
+                    const btVector3 **n2, const btVector3 **n3) const
     {
         assert(indx < m_triangleIndex2Material.size());
         unsigned int n = indx*3;
-        *n1 = m_normals[n  ];
-        *n2 = m_normals[n+1];
-        *n3 = m_normals[n+2];
+        *n1 = &(m_normals[n  ]);
+        *n2 = &(m_normals[n+1]);
+        *n3 = &(m_normals[n+2]);
     }   // getNormals
+    // ------------------------------------------------------------------------
+    /** Returns basically the area of the triangle, which is needed when
+     *  smoothing the normals. */
+    float getP1P2P3(unsigned int indx) const
+    {
+        assert(indx < m_p1p2p3.size());
+        return m_p1p2p3[indx];
+    }
 };
 #endif
 /* EOF */

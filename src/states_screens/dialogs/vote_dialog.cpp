@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -48,22 +48,24 @@ VoteDialog::VoteDialog(const std::string & addon_id)
 
     m_rating_widget = getWidget<RatingBarWidget>("rating");
     assert(m_rating_widget != NULL);
+
     m_rating_widget->setRating(0);
     m_rating_widget->allowVoting();
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
+
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
-    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
+    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     m_fetch_vote_request = new XMLRequest();
     PlayerManager::setUserDetails(m_fetch_vote_request, "get-addon-vote");
     m_fetch_vote_request->addParameter("addonid", addon_id.substr(6));
     m_fetch_vote_request->queue();
 
-    m_rating_widget->setDeactivated();
-    m_cancel_widget->setDeactivated();
+    m_rating_widget->setActive(false);
+    m_cancel_widget->setActive(false);
 }    // VoteDialog
 
 // -----------------------------------------------------------------------------
@@ -102,8 +104,9 @@ void VoteDialog::sendVote()
             if (isSuccess())
             {
                 std::string addon_id;
-                getXMLData()->get("addon-id", &addon_id);
                 float average;
+
+                getXMLData()->get("addon-id", &addon_id);
                 getXMLData()->get("new-average", &average);
                 addons_manager->getAddon(Addon::createAddonId(addon_id))
                               ->setRating(average);
@@ -112,9 +115,7 @@ void VoteDialog::sendVote()
     public:
         SetAddonVoteRequest() : XMLRequest() {}
     };   // SetAddonVoteRequest
-
     // ------------------------------------------------------------------------
-
 
     m_perform_vote_request = new SetAddonVoteRequest();
     PlayerManager::setUserDetails(m_perform_vote_request, "set-addon-vote");
@@ -122,8 +123,8 @@ void VoteDialog::sendVote()
     m_perform_vote_request->addParameter("rating", m_rating_widget->getRating());
     m_perform_vote_request->queue();
 
-    m_rating_widget->setDeactivated();
-    m_cancel_widget->setDeactivated();
+    m_rating_widget->setActive(false);
+    m_cancel_widget->setActive(false);
 
 }   // sendVote
 
@@ -144,12 +145,15 @@ GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& event)
     {
         const std::string& selection =
             m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
+
             return GUIEngine::EVENT_BLOCK;
         }
     }
+
     return GUIEngine::EVENT_LET;
 }   // processEvent
 
@@ -163,16 +167,21 @@ void VoteDialog::updateFetchVote()
     if (!m_fetch_vote_request->isDone())
     {
         // request still pending
-        m_info_widget->setText(StringUtils::loadingDots(_("Fetching last vote")),
-                               false                                          );
+        m_info_widget->setText(
+            StringUtils::loadingDots(_("Fetching last vote")),
+            false
+        );
+
         return;
     }   // !isDone
 
     if (m_fetch_vote_request->isSuccess())
     {
-        m_info_widget->setDefaultColor();
         std::string voted("");
+
+        m_info_widget->setDefaultColor();
         m_fetch_vote_request->getXMLData()->get("voted", &voted);
+
         if (voted == "yes")
         {
             float rating;
@@ -187,15 +196,15 @@ void VoteDialog::updateFetchVote()
                                      "Select your desired rating by clicking "
                                      "the stars beneath"),              false);
         }
-        m_cancel_widget->setActivated();
-        m_rating_widget->setActivated();
+        m_cancel_widget->setActive(true);
+        m_rating_widget->setActive(true);
     }   // isSuccess
     else
     {
-        sfx_manager->quickSound("anvil");
+        SFXManager::get()->quickSound("anvil");
         m_info_widget->setErrorColor();
         m_info_widget->setText(m_fetch_vote_request->getInfo(), false);
-        m_cancel_widget->setActivated();
+        m_cancel_widget->setActive(true);
     }   // !isSuccess
 
     delete m_fetch_vote_request;
@@ -220,15 +229,15 @@ void VoteDialog::onUpdate(float dt)
                 m_info_widget->setDefaultColor();
                 m_info_widget->setText(_("Vote successful! You can now close "
                                          "the window."),                false);
-                m_cancel_widget->setActivated();
+                m_cancel_widget->setActive(true);
             }   // isSuccess
             else
             {
-                sfx_manager->quickSound( "anvil" );
+                SFXManager::get()->quickSound( "anvil" );
                 m_info_widget->setErrorColor();
                 m_info_widget->setText(m_perform_vote_request->getInfo(), false);
-                m_cancel_widget->setActivated();
-                m_rating_widget->setActivated();
+                m_cancel_widget->setActive(true);
+                m_rating_widget->setActive(true);
             }   // !isSuccess
             delete m_perform_vote_request;
             m_perform_vote_request = NULL;

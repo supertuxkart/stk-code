@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013  Joerg Henrichs
+//  Copyright (C) 2011-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,9 +25,10 @@
 
 KartWithStats::KartWithStats(const std::string& ident,
                              unsigned int world_kart_id,
-                             int position, const btTransform& init_transform)
+                             int position, const btTransform& init_transform,
+                             PerPlayerDifficulty difficulty)
              : Kart(ident, world_kart_id, position,
-                    init_transform)
+                    init_transform, difficulty)
 {
 }   // KartWithStats
 

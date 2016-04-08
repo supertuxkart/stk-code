@@ -1,39 +1,33 @@
 <?xml version="1.0"?>
-<!--
-  Particle system to simulate it's raining heavily over an item/kart.
-  It should be applied no matter if kart is flying or on (any) ground,
-  and rotate to always fire up, it just simulates the rain bouncing
-  off the kart and being fired by wheels. It could also be applied to
-  bowling balls, for example.
--->
-<particles emitter="box" box_x="0.5" box_y="1.0" box_z="1.0">
 
-    <spreading angle="10"       />
+<!-- For sky particles, the size of the box is ignored -->
+<particles emitter="box" randomize-initial-y="true">
+
+    <spreading angle="3"           />
     
-    <velocity  x="0.000"
-               y="0.009"
-               z="0.000"         />
+    <velocity  x="-0.00"
+               y="-0.03"
+               z="-0.00"             />
     
-    <material  file="water-splash.png"  />
+    <material  file="rain.png" clampu="Y" clampv="Y" />
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="50"
-               max="60"         />
+    <rate      min="100"
+               max="250"           />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="1000"
-               max="1000"         />
+    <lifetime  min="10000"
+               max="10000"          />
     
     <!-- Size of the particles -->
-    <size      min="0.35"
-               max="0.70"        />
-
+    <size      min="1.00"
+               max="1.50"          />
+    
     <color     min="255 255 255"
-               max="255 255 255" />
-
+               max="255 255 255"   />
+    
     <!-- How much time in milliseconds before the particle is fully faded out  -->
-    <fadeout   time="750"        />
+    <fadeout   time="100"          />
 
-    <gravity   strength="-0.01"
-               only-force-time="500" />
+
 </particles>

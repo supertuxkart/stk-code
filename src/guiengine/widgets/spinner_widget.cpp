@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -144,7 +145,8 @@ void SpinnerWidget::add()
     else
     {
         rect<s32> subsize_label = rect<s32>(m_h, 0, m_w - m_h, m_h);
-        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(stringw(m_value).c_str(), subsize_label,
+        stringw text = stringw(m_value);
+        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(text.c_str(), subsize_label,
                                                                       false /* border */, true /* word wrap */,
                                                                       btn, getNewNoFocusID());
         m_children[1].m_element = label;
@@ -154,6 +156,7 @@ void SpinnerWidget::add()
         label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         label->setTabStop(false);
         label->setNotClipped(true);
+        label->setRightToLeft(translations->isRTLText(text));
 
 
         if (m_labels.size() > 0)
@@ -161,6 +164,10 @@ void SpinnerWidget::add()
             label->setText(m_labels[m_value].c_str() );
         }
 
+        if (widget_size.getHeight() < GUIEngine::getFontHeight())
+        {
+            label->setOverrideFont(GUIEngine::getSmallFont());
+        }
     }
 
 
@@ -226,7 +233,7 @@ EventPropagation SpinnerWidget::rightPressed(const int playerID)
     // if widget is deactivated, do nothing
     if (m_deactivated) return EVENT_BLOCK;
 
-    //std::cout  << "Right pressed\n";
+    //Log::info("SpinnerWidget", "Right pressed");
     if (m_value+1 <= m_max)
     {
         setValue(m_value+1);
@@ -248,7 +255,7 @@ EventPropagation SpinnerWidget::leftPressed(const int playerID)
     // if widget is deactivated, do nothing
     if (m_deactivated) return EVENT_BLOCK;
 
-    //std::cout  << "Left pressed\n";
+    //Log::info("SpinnerWidget", "Left pressed");
     if (m_value-1 >= m_min)
     {
         setValue(m_value-1);
@@ -321,6 +328,7 @@ void SpinnerWidget::addLabel(stringw label)
 void SpinnerWidget::setValue(const int new_value)
 {
     m_value = new_value;
+    m_customText = "";
 
     if (m_graphical)
     {
@@ -328,7 +336,7 @@ void SpinnerWidget::setValue(const int new_value)
         std::string imagefile = file_manager->searchTexture(s);
         ((IGUIImage*)(m_children[1].m_element))->setImage(irr_driver->getTexture(imagefile));
     }
-    else if (m_labels.size() > 0 && m_children.size() > 0)
+    else if (m_labels.size() > 0 && m_children.size() > 0 && !m_deactivated)
     {
         assert(new_value >= 0);
         assert(new_value < (int)m_labels.size());
@@ -371,7 +379,7 @@ stringw SpinnerWidget::getStringValue() const
 
 void SpinnerWidget::setValue(irr::core::stringw new_value)
 {
-    const int size = m_labels.size();
+    const int size = (int)m_labels.size();
     for (int n=0; n<size; n++)
     {
         if (m_labels[n] == new_value)
@@ -381,35 +389,81 @@ void SpinnerWidget::setValue(irr::core::stringw new_value)
         }
     }
 
-    std::cerr << "ERROR [SpinnerWidget::setValue] : cannot find element named '"
-              <<  irr::core::stringc(new_value.c_str()).c_str() << "'\n";
-    assert(false);
+    Log::fatal("SpinnerWidget::setValue", "Cannot find element named '%s'",
+        irr::core::stringc(new_value.c_str()).c_str());
 }
 
 // -----------------------------------------------------------------------------
 
-void SpinnerWidget::setActivated()
+void SpinnerWidget::setActive(bool active)
 {
-    Widget::setActivated();
+    Widget::setActive(active);
 
-    setText(L"");
-    setValue( getValue() ); // Update the display
-}
+    if (active)
+    {
+        setText(L"");
+        if (m_customText.empty())
+        {
+            setValue(getValue()); // Update the display
+        }
+        else
+        {
+            setCustomText(m_customText);
+        }
+    }
+    else
+    {
+        // Save it temporary because setValue(which is uses for update in
+        // this case) overwrites it
+        core::stringw customText = m_customText;
+        setText(L"-");
+        setValue(getValue()); // Update the display
+        m_customText = customText;
+    }
+}   // setActive
 
 // -----------------------------------------------------------------------------
-
-void SpinnerWidget::setDeactivated()
-{
-    Widget::setDeactivated();
-
-    setText(L"-");
-    setValue( getValue() ); // Update the display
-}
-
-// -----------------------------------------------------------------------------
-
 void SpinnerWidget::setCustomText(const core::stringw& text)
 {
-    m_children[1].m_element->setText(text.c_str());
+    m_customText = text;
+    if (m_children.size() > 0)
+    {
+        m_children[1].m_element->setText(text.c_str());
+    }
 }
 
+// -----------------------------------------------------------------------------
+
+void SpinnerWidget::onClick()
+{
+    if (m_children[1].m_deactivated || 
+        m_children[1].m_properties[PROP_ID] != "spinnerbody"  || 
+        !isGauge()) 
+    { 
+        return; 
+    }
+
+    const core::position2di mouse_position
+        = irr_driver->getDevice()->getCursorControl()->getPosition();
+
+    core::recti body_rect 
+        = m_children[1].getIrrlichtElement()->getAbsolutePosition();
+
+    if (body_rect.isPointInside(mouse_position))
+    {
+        float exact_hover = (float)((mouse_position.X -
+            body_rect.UpperLeftCorner.X) /
+            (float)body_rect.getWidth()) * (m_max-m_min);
+
+        float new_value_f = ((exact_hover * (m_max - m_min)) /
+            (m_max - m_min)) + m_min;
+        int new_value = (int)roundf(new_value_f);
+
+        if (new_value > m_max) new_value = m_max;
+        if (new_value < m_min) new_value = m_min;
+
+        setValue(new_value);
+    }
+}
+
+// -----------------------------------------------------------------------------

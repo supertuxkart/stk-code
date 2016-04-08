@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Joerg Henrichs
+//  Copyright (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,11 +20,12 @@
 
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine { class Widget; class LabelWidget;
-                      class RibbonWidget;              }
+namespace GUIEngine { class Widget;       class LabelWidget;
+                      class RibbonWidget; class TextBoxWidget; }
 namespace Online    { class XMLRequest;                }
 
 class PlayerProfile;
+class BaseUserScreen;
 
 /**
   * \brief Screen to register an online account.
@@ -36,10 +37,10 @@ class RegisterScreen : public GUIEngine::Screen,
 private:
     friend class GUIEngine::ScreenSingleton<RegisterScreen>;
 
-    void makeEntryFieldsVisible(bool online);
+    void makeEntryFieldsVisible();
     void handleLocalName(const irr::core::stringw &local_name);
     void doRegister();
-    void init();
+    void init() OVERRIDE;
     RegisterScreen();
 
     /** Save the pointer to the info widget, it is widely used. */
@@ -47,6 +48,9 @@ private:
 
     /** Save the pointer to the options widget, it is widely used. */
     GUIEngine::RibbonWidget *m_options_widget;
+
+    /** Save the pointer to the options widget, it is widely used. */
+    GUIEngine::TextBoxWidget *m_password_widget;
 
     /** The XML request to the server. */
     Online::XMLRequest *m_signup_request;
@@ -58,6 +62,16 @@ private:
     /** True if the info message (email was sent...) is shown. */
     bool m_info_message_shown;
 
+    /** Which kind of account to create: new online account, new account
+     *  using an existing online account, offline account. */
+    enum { ACCOUNT_NEW_ONLINE, 
+           ACCOUNT_EXISTING_ONLINE, 
+           ACCOUNT_OFFLINE } m_account_mode;
+
+    /** A pointer to the parent UserScreen, in order to allow this screen
+     *  to pass information back. */
+    BaseUserScreen *m_parent_screen;
+
 public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
@@ -65,6 +79,9 @@ public:
     virtual void onUpdate(float dt) OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
     virtual void onDialogClose() OVERRIDE;
+    virtual void onFocusChanged(GUIEngine::Widget *previous, 
+                                GUIEngine::Widget *focus,
+                                int playerID) OVERRIDE;
     void setRename(PlayerProfile *player);
 
     void acceptTerms();
@@ -73,6 +90,9 @@ public:
                                const std::string& name,
                                const int playerID) OVERRIDE;
 
+    // ------------------------------------------------------------------------
+    /** Set the parent screen. */
+    void setParent(BaseUserScreen *us) { m_parent_screen = us; }
 };   // class RegisterScreen
 
 #endif

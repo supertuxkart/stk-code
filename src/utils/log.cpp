@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2013 Joerg Henrichs
+//  Copyright (C) 2013-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,6 +28,7 @@
 #endif
 
 #ifdef WIN32
+#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #endif
 
@@ -56,6 +57,7 @@ void Log::setTerminalColor(LogLevel level)
     char color;
     switch(level)
     {
+    default:
     case LL_VERBOSE: color = TERM_BLACK     << 4 | TERM_LIGHTGRAY; break;
     case LL_DEBUG:   color = TERM_BLACK     << 4 | TERM_LIGHTGRAY; break;
     case LL_INFO:    color = TERM_BLACK     << 4 | TERM_LIGHTGRAY; break;
@@ -153,7 +155,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     }
     __android_log_vprint(alp, "SuperTuxKart", format, args);
 #else
-    static const char *names[] = {"verbose", "debug  ", "info   ",
+    static const char *names[] = {"debug", "verbose  ", "info   ",
                                   "warn   ", "error  ", "fatal  "};
 
     // Using a va_list twice produces undefined results, ie crash.
@@ -195,7 +197,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     OutputDebugString(szBuff);
     OutputDebugString("\r\n");
 #endif
-    
+
 
     if(m_file_stdout)
     {
@@ -204,6 +206,25 @@ void Log::printMessage(int level, const char *component, const char *format,
         fprintf (m_file_stdout, "\n");
         va_end(copy);
     }
+
+#ifdef WIN32
+    if (level >= LL_FATAL)
+    {
+        std::string message;
+
+        char tmp[2048];
+        sprintf(tmp, "[%s] %s: ", names[level], component);
+        message += tmp;
+
+        VALIST out;
+        va_copy(out, args);
+        vsprintf(tmp, format, out);
+        message += tmp;
+        va_end(out);
+
+        MessageBoxA(NULL, message.c_str(), "SuperTuxKart - Fatal error", MB_OK);
+    }
+#endif
 
 #endif
 }   // printMessage

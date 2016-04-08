@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -38,8 +38,7 @@ using namespace Online;
 
 /** Creates a modal dialog with given percentage of screen width and height
  */
-ChangePasswordDialog::ChangePasswordDialog()
-                    : ModalDialog(0.8f,0.7f)
+ChangePasswordDialog::ChangePasswordDialog() : ModalDialog(0.8f, 0.7f)
 {
     m_self_destroy = false;
     m_success = false;
@@ -49,15 +48,15 @@ ChangePasswordDialog::ChangePasswordDialog()
     m_current_password_widget = getWidget<TextBoxWidget>("current_password");
     assert(m_current_password_widget != NULL);
     m_current_password_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    m_current_password_widget->setPasswordBox(true,L'*');
+    m_current_password_widget->setPasswordBox(true, L'*');
 
     m_new_password1_widget = getWidget<TextBoxWidget>("new_password1");
     assert(m_new_password1_widget != NULL);
-    m_new_password1_widget->setPasswordBox(true,L'*');
+    m_new_password1_widget->setPasswordBox(true, L'*');
 
     m_new_password2_widget = getWidget<TextBoxWidget>("new_password2");
     assert(m_new_password2_widget != NULL);
-    m_new_password2_widget->setPasswordBox(true,L'*');
+    m_new_password2_widget->setPasswordBox(true, L'*');
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
@@ -71,7 +70,6 @@ ChangePasswordDialog::ChangePasswordDialog()
 }   // ChangePasswordDialog
 
 // ----------------------------------------------------------------------------
-
 ChangePasswordDialog::~ChangePasswordDialog()
 {
 }   // ~ChangePasswordDialog
@@ -93,6 +91,7 @@ void ChangePasswordDialog::changePassword(const stringw &current_password,
         virtual void callback()
         {
             if (!GUIEngine::ModalDialog::isADialogActive()) return;
+
             ChangePasswordDialog * dialog =
                 dynamic_cast<ChangePasswordDialog*>(GUIEngine::ModalDialog
                                                      ::getCurrent());
@@ -111,8 +110,9 @@ void ChangePasswordDialog::changePassword(const stringw &current_password,
     // ------------------------------------------------------------------------
 
     ChangePasswordRequest * request = new ChangePasswordRequest();
-    PlayerManager::setUserDetails(request, "change_password");
+    PlayerManager::setUserDetails(request, "change-password");
     request->addParameter("current", current_password);
+
     // The server code expects two passwords (and verifies again that they
     // are identical), so send the passwod twice.
     request->addParameter("new1", new_password);
@@ -126,29 +126,31 @@ void ChangePasswordDialog::submit()
     const stringw current_password = m_current_password_widget->getText().trim();
     const stringw new_password1 = m_new_password1_widget->getText().trim();
     const stringw new_password2 = m_new_password2_widget->getText().trim();
+
     if (current_password.size() < 8 || current_password.size() > 30)
     {
-        sfx_manager->quickSound("anvil");
+        SFXManager::get()->quickSound("anvil");
         m_info_widget->setErrorColor();
         m_info_widget->setText(_("Current password invalid."), false);
     }
     else if (new_password1.size() < 8 || new_password1.size() > 30)
     {
-        sfx_manager->quickSound("anvil");
+        SFXManager::get()->quickSound("anvil");
         m_info_widget->setErrorColor();
         m_info_widget->setText(_("Password has to be between 8 and 30 "
                                  "characters long!"),                   false);
     }
     else if (new_password1 != new_password2)
     {
-        sfx_manager->quickSound("anvil");
+        SFXManager::get()->quickSound("anvil");
         m_info_widget->setErrorColor();
         m_info_widget->setText(_("Passwords don't match!"), false);
     }
     else
     {
-        m_options_widget->setDeactivated();
+        m_options_widget->setActive(false);
         m_info_widget->setDefaultColor();
+
         // We don't need to use password 2 anymore, it was already confirmed
         // that both passwords are identical.
         changePassword(current_password, new_password1);
@@ -159,42 +161,45 @@ void ChangePasswordDialog::submit()
 GUIEngine::EventPropagation
              ChangePasswordDialog::processEvent(const std::string& eventSource)
 {
-
     if (eventSource == m_options_widget->m_properties[PROP_ID])
     {
         const std::string& selection =
                  m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
+
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == m_submit_widget->m_properties[PROP_ID])
         {
             submit();
+
             return GUIEngine::EVENT_BLOCK;
         }
     }
+
     return GUIEngine::EVENT_LET;
 }   // processEvent
 
 // ----------------------------------------------------------------------------
-
 void ChangePasswordDialog::onEnterPressedInternal()
 {
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;
+
     if (m_submit_widget->isActivated())
         submit();
 }   // onEnterPressedInternal
 
 // ----------------------------------------------------------------------------
-
 bool ChangePasswordDialog::onEscapePressed()
 {
     if (m_cancel_widget->isActivated())
         m_self_destroy = true;
+
     return false;
 }   // onEscapePressed
 
@@ -203,7 +208,7 @@ void ChangePasswordDialog::success()
 {
     m_info_widget->setDefaultColor();
     m_info_widget->setText(_("Password successfully changed."), false);
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
     m_current_password_widget->setText("");
     m_new_password1_widget->setText("");
     m_new_password2_widget->setText("");
@@ -212,22 +217,25 @@ void ChangePasswordDialog::success()
 // ----------------------------------------------------------------------------
 void ChangePasswordDialog::error(const irr::core::stringw & error)
 {
-    sfx_manager->quickSound("anvil");
+    SFXManager::get()->quickSound("anvil");
     m_info_widget->setErrorColor();
     m_info_widget->setText(error, false);
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
     m_current_password_widget->setText("");
     m_new_password1_widget->setText("");
     m_new_password2_widget->setText("");
 }   // error
 
 // -----------------------------------------------------------------------------
-
 void ChangePasswordDialog::onUpdate(float dt)
 {
     if(!m_options_widget->isActivated())
-        m_info_widget->setText(StringUtils::loadingDots(_("Validating info")),
-                              false                                          );
+    {
+        m_info_widget->setText(
+            StringUtils::loadingDots(_("Validating info")),
+            false
+        );
+    }
 
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)

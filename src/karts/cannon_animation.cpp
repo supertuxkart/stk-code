@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -46,8 +46,6 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo)
     const float dt = 0.1f;
     Vec3 xyz1;
     m_curve->update(dt, &xyz1);
-    core::vector3df rot1 = (xyz1-m_previous_orig_xyz).toIrrVector()
-                                                     .getHorizontalAngle();
     core::vector3df rot = (m_previous_orig_xyz-xyz1).toIrrVector()
                                                     .getHorizontalAngle();
     btQuaternion q(Vec3(0,1,0),rot.Y*DEGREE_TO_RAD);
@@ -71,7 +69,7 @@ CannonAnimation::~CannonAnimation()
                                  m_kart->getHeading()        ));
 
     m_kart->getBody()->setCenterOfMassTransform(pos);
-    Vec3 v(0, 0, m_kart->getKartProperties()->getMaxSpeed());
+    Vec3 v(0, 0, m_kart->getKartProperties()->getEngineMaxSpeed());
     m_kart->setVelocity(pos.getBasis()*v);
 }   // ~CannonAnimation
 

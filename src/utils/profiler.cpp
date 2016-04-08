@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "profiler.hpp"
-#include "graphics/irr_driver.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/2dutils.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -28,6 +28,37 @@
 #include <sstream>
 #include <algorithm>
 #include <fstream>
+
+static const char* GPU_Phase[Q_LAST] =
+{
+    "Shadows Cascade 0",
+    "Shadows Cascade 1",
+    "Shadows Cascade 2",
+    "Shadows Cascade 3",
+    "Shadows Postprocess",
+    "Solid Pass 1",
+    "RSM",
+    "RH",
+    "GI",
+    "Env Map",
+    "SunLight",
+    "PointLights",
+    "SSAO",
+    "Solid Pass 2",
+    "Fog",
+    "Skybox",
+    "Glow",
+    "Transparent",
+    "Particles",
+    "Displacement",
+    "Depth of Field",
+    "Godrays",
+    "Bloom",
+    "Tonemap",
+    "Motion Blur",
+    "MLAA",
+    "GUI",
+};
 
 Profiler profiler;
 
@@ -43,6 +74,7 @@ Profiler profiler;
 
 // --- Begin portable precise timer ---
 #ifdef WIN32
+    #define WIN32_LEAN_AND_MEAN
     #include <windows.h>
 
     double getTimeMilliseconds()
@@ -77,6 +109,7 @@ Profiler::Profiler()
     m_freeze_state = UNFROZEN;
     m_capture_report = false;
     m_first_capture_sweep = true;
+    m_first_gpu_capture_sweep = true;
     m_capture_report_buffer = NULL;
 }
 
@@ -93,9 +126,11 @@ void Profiler::setCaptureReport(bool captureReport)
     {
         m_capture_report = true;
         m_first_capture_sweep = true;
+        m_first_gpu_capture_sweep = true;
         // TODO: a 20 MB hardcoded buffer for now. That should amply suffice for
         // all reasonable purposes. But it's not too clean to hardcode
         m_capture_report_buffer = new StringBuffer(20 * 1024 * 1024);
+        m_gpu_capture_report_buffer = new StringBuffer(20 * 1024 * 1024);
     }
     else if (m_capture_report && !captureReport)
     {
@@ -105,9 +140,19 @@ void Profiler::setCaptureReport(bool captureReport)
             const char* str = m_capture_report_buffer->getRawBuffer();
             filewriter.write(str, strlen(str));
         }
+        {
+            std::ofstream filewriter(file_manager->getUserConfigFile("profiling_gpu.csv").c_str(), std::ios::out | std::ios::binary);
+            const char* str = m_gpu_capture_report_buffer->getRawBuffer();
+            filewriter.write(str, strlen(str));
+        }
+
         m_capture_report = false;
+
         delete m_capture_report_buffer;
         m_capture_report_buffer = NULL;
+
+        delete m_gpu_capture_report_buffer;
+        m_gpu_capture_report_buffer = NULL;
     }
 }
 
@@ -219,6 +264,7 @@ void Profiler::synchronizeFrame()
 /// Draw the markers
 void Profiler::draw()
 {
+    PROFILER_PUSH_CPU_MARKER("ProfilerDraw", 0xFF, 0xFF, 0x00);
     video::IVideoDriver*    driver = irr_driver->getVideoDriver();
     std::stack<Marker>      hovered_markers;
 
@@ -227,7 +273,7 @@ void Profiler::draw()
     // Force to show the pointer
     irr_driver->showPointer();
 
-    int read_id = (m_freeze_state == FROZEN ? !m_write_id : m_write_id);
+    int read_id = !m_write_id;
 
     // Compute some values for drawing (unit: pixels, but we keep floats for reducing errors accumulation)
     core::dimension2d<u32>    screen_size    = driver->getScreenSize();
@@ -257,7 +303,7 @@ void Profiler::draw()
             else end = std::max(end, m.end);
         }
     }
-
+    
     const double duration = end - start;
     const double factor = profiler_width / duration;
 
@@ -315,33 +361,36 @@ void Profiler::draw()
             m_first_capture_sweep = false;
         }
     }
-
+    
+    // GPU profiler
     QueryPerf hovered_gpu_marker = Q_LAST;
     long hovered_gpu_marker_elapsed = 0;
-    if (hovered_markers.size() == 0)
+    int gpu_y = int(y_offset + nb_thread_infos*line_height + line_height/2);
+    float total = 0;
+    unsigned int gpu_timers[Q_LAST];
+    for (unsigned i = 0; i < Q_LAST; i++)
     {
-        int gpu_y = int(y_offset + nb_thread_infos*line_height + line_height/2);
-        float total = 0;
-        for (unsigned i = 0; i < Q_LAST; i++)
-        {
-            total += irr_driver->getGPUTimer(i).elapsedTimeus();
-        }
+        gpu_timers[i] = irr_driver->getGPUTimer(i).elapsedTimeus();
+        total += gpu_timers[i];
+    }
+    
+    static video::SColor colors[] = {
+        video::SColor(255, 255, 0, 0),
+        video::SColor(255, 0, 255, 0),
+        video::SColor(255, 0, 0, 255),
+        video::SColor(255, 255, 255, 0),
+        video::SColor(255, 255, 0, 255),
+        video::SColor(255, 0, 255, 255)
+    };
 
-        static video::SColor colors[] = {
-            video::SColor(255, 255, 0, 0),
-            video::SColor(255, 0, 255, 0),
-            video::SColor(255, 0, 0, 255),
-            video::SColor(255, 255, 255, 0),
-            video::SColor(255, 255, 0, 255),
-            video::SColor(255, 0, 255, 255)
-        };
-
+    if (hovered_markers.empty())
+    {
         float curr_val = 0;
         for (unsigned i = 0; i < Q_LAST; i++)
         {
             //Log::info("GPU Perf", "Phase %d : %d us\n", i, irr_driver->getGPUTimer(i).elapsedTimeus());
 
-            float elapsed = float(irr_driver->getGPUTimer(i).elapsedTimeus());
+            float elapsed = float(gpu_timers[i]);
             core::rect<s32> pos((s32)(x_offset + (curr_val / total)*profiler_width),
                 (s32)(y_offset + gpu_y),
                 (s32)(x_offset + ((curr_val + elapsed) / total)*profiler_width),
@@ -353,8 +402,22 @@ void Profiler::draw()
             if (pos.isPointInside(mouse_pos))
             {
                 hovered_gpu_marker = (QueryPerf)i;
-                hovered_gpu_marker_elapsed = irr_driver->getGPUTimer(i).elapsedTimeus();
+                hovered_gpu_marker_elapsed = gpu_timers[i];
             }
+
+            if (m_capture_report)
+            {
+                if (m_first_gpu_capture_sweep)
+                    m_gpu_capture_report_buffer->getStdStream() << GPU_Phase[i] << ";";
+                else
+                    m_gpu_capture_report_buffer->getStdStream() << elapsed << ";";
+            }
+        }
+
+        if (m_capture_report)
+        {
+            m_gpu_capture_report_buffer->getStdStream() << "\n";
+            m_first_gpu_capture_sweep = false;
         }
     }
 
@@ -371,7 +434,7 @@ void Profiler::draw()
 
     // Draw the hovered markers' names
     gui::ScalableFont* font = GUIEngine::getFont();
-    if(font)
+    if (font)
     {
         core::stringw text;
         while(!hovered_markers.empty())
@@ -389,30 +452,8 @@ void Profiler::draw()
 
         if (hovered_gpu_marker != Q_LAST)
         {
-            static const char *Phase[Q_LAST] =
-            {
-                "Solid Pass 1",
-                "Shadows",
-                "RH",
-                "GI",
-                "Env Map",
-                "SunLight",
-                "PointLights",
-                "SSAO",
-                "Solid Pass 2",
-                "Transparent",
-                "Particles",
-                "Displacement",
-                "Depth of Field",
-                "Godrays",
-                "Bloom",
-                "Tonemap",
-                "Motion Blur",
-                "MLAA",
-                "GUI",
-            };
             std::ostringstream oss;
-            oss << Phase[hovered_gpu_marker] << " : " << hovered_gpu_marker_elapsed << " us";
+            oss << GPU_Phase[hovered_gpu_marker] << " : " << hovered_gpu_marker_elapsed << " us";
             font->draw(oss.str().c_str(), GPU_MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
         }
     }
@@ -421,6 +462,8 @@ void Profiler::draw()
     {
         font->draw("Capturing profiler report...", MARKERS_NAMES_POS, video::SColor(0xFF, 0x00, 0x90, 0x00));
     }
+
+    PROFILER_POP_CPU_MARKER();
 }
 
 //-----------------------------------------------------------------------------

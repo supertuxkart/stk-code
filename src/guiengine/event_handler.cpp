@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -181,9 +181,25 @@ bool EventHandler::OnEvent (const SEvent &event)
             World::getWorld()->onMouseClick(event.MouseInput.X, event.MouseInput.Y);
         }
 
+        if (UserConfigParams::m_keyboard_debug)
+        {
+            Log::verbose("keyboard", "char %d key %d ctrl %d down %d shift %d",
+                event.KeyInput.Char, event.KeyInput.Key,
+                event.KeyInput.Control, event.KeyInput.PressedDown, 
+                event.KeyInput.Shift);
+        }
         // FIXME? it may be a bit unclean that all input events go trough
         // the gui module
         const EventPropagation blockPropagation = input_manager->input(event);
+
+        if (event.EventType == EET_KEY_INPUT_EVENT &&
+            event.KeyInput.Key == irr::KEY_TAB)
+        {
+            // block all tab events, if we let them go, irrlicht will try
+            // to apply its own focus code
+            return true; // EVENT_BLOCK
+        }
+
         return blockPropagation == EVENT_BLOCK;
     }
     else if (event.EventType == EET_LOG_TEXT_EVENT)
@@ -199,7 +215,7 @@ bool EventHandler::OnEvent (const SEvent &event)
             // mode ignore this error message, but leave it in for debugging.
             if(std::string(event.LogEvent.Text)=="Unsupported texture format")
 #ifdef DEBUG
-                printf("The following message will not be printed in release mode:\n");
+                Log::info("EventHandler", "The following message will not be printed in release mode");
 #else
             return true; // EVENT_BLOCK
 #endif
@@ -414,7 +430,7 @@ void EventHandler::navigate(const int playerID, Input::InputType type, const boo
 
         if (el == NULL)
         {
-            std::cerr << "WARNING : m_tab_down/up_root is set to an ID for which I can't find the widget\n";
+            Log::warn("EventHandler::navigate", "m_tab_down/up_root is set to an ID for which I can't find the widget");
             return;
         }
     }
@@ -448,7 +464,7 @@ void EventHandler::navigate(const int playerID, Input::InputType type, const boo
 
                 if (NAVIGATION_DEBUG)
                 {
-                    std::cout << "Navigating " << (reverse ? "up" : "down") << " to " << closest->getID() << std::endl;
+                    Log::info("EventHandler", "Navigating %s to %d", (reverse ? "up" : "down"), closest->getID());
                 }
 
                 assert(closestWidget != NULL);
@@ -474,7 +490,7 @@ void EventHandler::navigate(const int playerID, Input::InputType type, const boo
     if (!found)
     {
         if (NAVIGATION_DEBUG)
-            std::cout << "EventHandler::navigat : wrap around\n";
+            Log::info( "EventHandler::navigate", "Wrap around");
 
         // select the last/first widget
         Widget* wrapWidget = NULL;
@@ -529,7 +545,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
         if (w->m_event_handler == NULL) return EVENT_LET;
     }
 
-    //std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
+    //Log::info("EventHandler", "Widget activated: %s", w->m_properties[PROP_ID].c_str());
 
     if (w->m_event_handler != NULL)
     {

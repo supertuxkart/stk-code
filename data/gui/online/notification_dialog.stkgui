@@ -4,7 +4,7 @@
 
         <label id="info" proportion="1" width="90%" align="center" text_align="center" word_wrap="true" text=""/>
 
-        <spacer height="20" width="50">
+        <spacer height="20" width="50"/>
 
         <buttonbar id="options" width="90%" height="30%" align="center">
             <icon-button id="view" width="64" height="64" icon="gui/difficulty_medium.png"

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -32,40 +32,28 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-DebugSliderDialog::DebugSliderDialog(std::string id, irr::core::stringw msg) :
-    ModalDialog(0.85f, 0.25f, MODAL_DIALOG_LOCATION_BOTTOM)
+DebugSliderDialog::DebugSliderDialog() : ModalDialog(0.85f, 0.25f, MODAL_DIALOG_LOCATION_BOTTOM)
 {
-    //if (StateManager::get()->getGameState() == GUIEngine::GAME)
-    //{
-    //    World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
-    //}
-
-    m_id = id;
     m_fade_background = false;
 
     loadFromFile("debug_slider.stkgui");
-
-
-    LabelWidget* message = getWidget<LabelWidget>("title");
-    message->setText( msg.c_str(), false );
-
-    float val;
-    if (m_id == "lwhite")
-      val = irr_driver->getLwhite() * 10.f;
-    if (m_id == "exposure")
-      val = irr_driver->getExposure() * 100.f;
-
-    getWidget<SpinnerWidget>("value_slider")->setValue(int(val));
 }
+
+#if !defined(__APPLE__)
+void DebugSliderDialog::setSliderHook(std::string id, unsigned min, unsigned max, std::function<int()> G, std::function<void(int)> S)
+{
+    getWidget<SpinnerWidget>(id.c_str())->setValue(G());
+    getWidget<SpinnerWidget>(id.c_str())->setMin(min);
+    getWidget<SpinnerWidget>(id.c_str())->setMax(max);
+    Setters[id] = S;
+}
+#endif
 
 // ------------------------------------------------------------------------------------------------------
 
-DebugSliderDialog::~DebugSliderDialog()
+void DebugSliderDialog::changeLabel(std::string id, std::string new_label)
 {
-    //if (StateManager::get()->getGameState() == GUIEngine::GAME)
-    //{
-    //    World::getWorld()->scheduleUnpause();
-    //}
+    getWidget<LabelWidget>(id.c_str())->setText(stringw(new_label.c_str()), true);
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -78,18 +66,17 @@ void DebugSliderDialog::onEnterPressedInternal()
 
 GUIEngine::EventPropagation DebugSliderDialog::processEvent(const std::string& eventSource)
 {
-    if (eventSource == "value_slider")
-    {
-        int value = getWidget<SpinnerWidget>("value_slider")->getValue();
-        Log::info("DebugSlider", "Value for <%s> : %i", m_id.c_str(), value);
-        if (m_id == "lwhite")
-            irr_driver->setLwhite(value / 10.f);
-        if (m_id == "exposure")
-            irr_driver->setExposure(value / 100.f);
-        return GUIEngine::EVENT_BLOCK;
-    }
+#if !defined(__APPLE__)
+    if (Setters.find(eventSource) == Setters.end())
+        return GUIEngine::EVENT_LET;
 
+    int value = getWidget<SpinnerWidget>(eventSource.c_str())->getValue();
+    Log::info("DebugSlider", "Value for <%s> : %i", eventSource.c_str(), value);
+    Setters[eventSource](value);
+    return GUIEngine::EVENT_BLOCK;
+#else
     return GUIEngine::EVENT_LET;
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,9 +20,10 @@
 
 #include <IMeshSceneNode.h>
 
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -32,8 +33,6 @@
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
-
-#include "utils/log.hpp" //TODO: remove after debugging is done
 
 #include <IMesh.h>
 
@@ -69,8 +68,12 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
         verts[i].Color = color;
     }
 
+    // Color
+    mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+    // Gloss
+    mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     updatePosition();
-    m_node = irr_driver->addMesh(m_mesh);
+    m_node = irr_driver->addMesh(m_mesh, "rubberband");
     irr_driver->applyObjectPassShader(m_node);
     if (STKMeshSceneNode *stkm = dynamic_cast<STKMeshSceneNode *>(m_node))
         stkm->setReloadEachFrame(true);
@@ -131,6 +134,8 @@ void RubberBand::updatePosition()
  */
 void RubberBand::update(float dt)
 {
+    const KartProperties *kp = m_owner->getKartProperties();
+
     if(m_owner->isEliminated())
     {
         // Rubber band snaps
@@ -146,7 +151,7 @@ void RubberBand::update(float dt)
     // Check for rubber band snapping
     // ------------------------------
     float l = (m_end_position-k).length2();
-    float max_len = m_owner->getKartProperties()->getRubberBandMaxLength();
+    float max_len = kp->getPlungerBandMaxLength();
     if(l>max_len*max_len)
     {
         // Rubber band snaps
@@ -159,7 +164,7 @@ void RubberBand::update(float dt)
     // ----------------------------
     if(m_attached_state!=RB_TO_PLUNGER)
     {
-        float force = m_owner->getKartProperties()->getRubberBandForce();
+        float force = kp->getPlungerBandForce();
         Vec3 diff   = m_end_position-k;
 
         // detach rubber band if kart gets very close to hit point
@@ -175,10 +180,10 @@ void RubberBand::update(float dt)
         diff.normalize();   // diff can't be zero here
         m_owner->getBody()->applyCentralForce(diff*force);
         m_owner->increaseMaxSpeed(MaxSpeed::MS_INCREASE_RUBBER,
-            m_owner->getKartProperties()->getRubberBandSpeedIncrease(),
+            kp->getPlungerBandSpeedIncrease(),
             /*engine_force*/ 0.0f,
             /*duration*/0.1f,
-            m_owner->getKartProperties()->getRubberBandFadeOutTime());
+            kp->getPlungerBandFadeOutTime());
         if(m_attached_state==RB_TO_KART)
             m_hit_kart->getBody()->applyCentralForce(diff*(-force));
     }

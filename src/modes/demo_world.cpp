@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "input/device_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "input/input_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -49,8 +50,8 @@ DemoWorld::DemoWorld()
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
     race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
     race_manager->setNumKarts(m_num_karts);
-    race_manager->setNumLocalPlayers(1);
-    race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+    race_manager->setNumPlayers(1);
+    race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
 }   // DemoWorld
 
@@ -136,20 +137,20 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     }
 
     StateManager::get()->enterGameState();
-    race_manager->setNumLocalPlayers(1);
+    race_manager->setNumPlayers(1);
     InputDevice *device;
 
     // Use keyboard 0 by default in --no-start-screen
-    device = input_manager->getDeviceList()->getKeyboard(0);
+    device = input_manager->getDeviceManager()->getKeyboard(0);
     StateManager::get()->createActivePlayer(
                            PlayerManager::get()->getPlayer(0), device);
     // ASSIGN should make sure that only input from assigned devices
     // is read.
-    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+    input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
     m_do_demo = true;
     race_manager->setNumKarts(m_num_karts);
-    race_manager->setLocalKartInfo(0, "tux");
+    race_manager->setPlayerKart(0, "tux");
     race_manager->setupPlayerKartInfo();
     race_manager->startSingleRace(m_demo_tracks[0], m_num_laps, false);
     m_demo_tracks.push_back(m_demo_tracks[0]);

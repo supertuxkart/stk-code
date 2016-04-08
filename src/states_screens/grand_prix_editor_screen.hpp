@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,8 +18,9 @@
 #ifndef HEADER_GRAND_PRIX_EDITOR_SCREEN_HPP
 #define HEADER_GRAND_PRIX_EDITOR_SCREEN_HPP
 
-#include "dialogs/enter_gp_name_dialog.hpp"
 #include "guiengine/screen.hpp"
+#include "race/grand_prix_data.hpp"
+#include "states_screens/dialogs/enter_gp_name_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 
 
@@ -45,14 +46,21 @@ class GrandPrixEditorScreen :
     void loadGPList();
     void loadTrackList(const std::string& gpname);
     void showEditScreen(GrandPrixData* gp);
+    void enableButtons();
 
-    void onNewGPWithName(const irr::core::stringw& newName);
-    void onConfirm();
+    void onNewGPWithName(const irr::core::stringw& newName) OVERRIDE;
+    void onConfirm() OVERRIDE;
 
-    GrandPrixData*   m_selection;
-    std::string      m_action;
+    static const core::stringw getGroupName(enum GrandPrixData::GPGroupType group);
+
+    GrandPrixData*                  m_selection;
+    std::string                     m_action;
+    enum GrandPrixData::GPGroupType m_gpgroup;
 
 public:
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void beforeAddingWidget() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

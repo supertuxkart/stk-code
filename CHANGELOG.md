@@ -1,4 +1,31 @@
-##SuperTuxKart 0.8.1
+## SupertTuxKart 0.9.1
+* Many bug fixes
+* Started to use scripting in tracks
+* Significant audio performance improvements
+* Smaller tweaks and improvements to several tracks including 
+** Math class
+** XR591
+** Fort Magma
+** Gran Paradiso
+** Subsea
+* Tweak to challenges
+* Better support for driving tracks in reverse
+
+## SupertTuxKart 0.9 (April 2015)
+* Fully shader-based rendering engine
+* New tracks Cocoa Temple and Gran Paradiso
+* Graphical improvements to many other tracks
+* New karts amanda and gavroche
+* New and improved tux, adiumy, sara the wizard and the racer, xue kart
+* Online login which allows to:
+** connect with friends and see when they are playing
+** vote for addons
+** collect online achievements
+* Grand Prix editor, including creation of random GPs 
+* Different kart physics
+
+
+## SuperTuxKart 0.8.1 (26. November 2013)
 * New track STK Enterprise
 * Updated track The old mines
 * Updated Lighthouse track
@@ -10,7 +37,7 @@
 * Added Tutorial
 * Added new Supertux difficulty
 * New bubblegum shield weapon
-* New Speeodmeter and nitro meter
+* New Speedometer and nitro meter
 * Add ability to filter addons
 * Updated nitro models
 * Add ability to save and resume Grand Prix
@@ -18,8 +45,7 @@
 * Wiimote support
 
 
-
-##SuperTuxKart 0.8
+## SuperTuxKart 0.8 (11. December 2012)
 * Story mode and new challenge set
 * Improved AI
 * Skidding and better collision physics
@@ -34,7 +60,7 @@
 * New music
 
 
-##SuperTuxKart 0.7.3
+## SuperTuxKart 0.7.3 (2. November 2011)
 * New Zen Garden and Subsea tracks
 * New Island battle arena
 * New Suzanne kart
@@ -50,7 +76,7 @@
 * Better placement of rescued karts
 * Transition track-making to blender 2.5/2.6
 
-##SuperTuxKart 0.7.2
+## SuperTuxKart 0.7.2 (15. July 2011)
 * Added in-game addon manager
 * Fixed major memory leaks
 * New Snow Peak track by Samuncle
@@ -60,11 +86,11 @@
 * Improve gamepad configuration under Windows (add ability to tell gamepads apart)
 * Various other tweaks done and glitches fixed
 
-##SuperTuxKart 0.7.1b
+## SuperTuxKart 0.7.1b (21. April 2011)
 * Fix circular dependency in challenges
 * Updated translations
 
-##SuperTuxKart 0.7.1
+## SuperTuxKart 0.7.1 (15. April 2011)
 * Particle  (smoke, splash, fire) and weather effects
 * New Fort Magma by Samuncle, new Shiny Suburbs track by Horace
 * New Beagle kart by wolterh
@@ -83,7 +109,7 @@
 * Full RTL (right to left) support
 * Various other tweaks done and glitches fixed
 
-##SuperTuxKart 0.7 (December 2010)
+## SuperTuxKart 0.7 (December 2010)
 Too many to list them all. Main points:
 
 * Irrlicht:
@@ -97,11 +123,11 @@ Too many to list them all. Main points:
 * New art:
   - New tracks farm, hacienda, scotland, secret garden
 
-##SuperTuxKart 0.6.2a (October 2009)
+## SuperTuxKart 0.6.2a (October 2009)
 * Bugfix: STK would crash while trying to save the config file
           on Windows Vista.
 
-##SuperTuxKart 0.6.2 (July 2009)
+## SuperTuxKart 0.6.2 (July 2009)
 * Bugfix: Game could crash in rare circumstances.
 * Bugfix: Restarting a GP (with the in-race menu ESC) would not subtract already allocated points.
 * Bugfix: A race could be finished with an invalid shortcut.
@@ -111,10 +137,10 @@ Too many to list them all. Main points:
 * Bugfix: GP result showed kart identifier instead of name.
 * Improvement: there is now 1 1 sec. wait period for the race result screen, avoiding the problem that someone presses space/enter at the end of a race, immediately quitting the menu before it can be read.
 
-##SuperTuxKart 0.6.1a (February 2009)
+## SuperTuxKart 0.6.1a (February 2009)
 * Bugfix: battle mode would not display track groups.
 
-##SuperTuxKart 0.6.1 (February 2009)
+## SuperTuxKart 0.6.1 (February 2009)
 * Added new kart ("Puffy"), new battle map ("Cave"), and new music for Snow Mountain.
 * Fixed bug in track selection screen that could cause a crash when track groups were used.
 * Fixed crash in character selection that could happen if an old user config file existed.
@@ -124,7 +150,7 @@ Too many to list them all. Main points:
 * Added slow-down for karts driving backwards.
 * Somewhat reduced 'shaking' of AI driven karts.
 
-##SuperTuxKart 0.6 (January 2009)
+## SuperTuxKart 0.6 (January 2009)
 * New improved physics and kart handling
 * Added sharp turns and nitro speed boost (replacing wheelies and jump)
 * Totally rewrote powerups (plunger, bowling ball, cake, bubblegum) and new look for bananas
@@ -147,7 +173,7 @@ Too many to list them all. Main points:
   - Fixed 'joystick locks' (kart would turn even if the joystick is in neutral),
     thanks to Samjam for the patch.
 
-##SuperTuxKart 0.5 (May 2008)
+## SuperTuxKart 0.5 (May 2008)
 * Six new tracks and one improved track: Fort Magma, SnowTux Peak, Amazonian Journey, City, Canyon, Crescent Crossing and StarTrack
 * Complete Challenges to unlock game modes, new tracks and a skidding preview
 * New Follow the Leader game mode
@@ -161,7 +187,7 @@ Too many to list them all. Main points:
 	- an AI crash fix (Chris Morris)
 
 
-##SuperTuxKart 0.4 (February 2008)
+## SuperTuxKart 0.4 (February 2008)
 * New physics handling using the bullet physics engine
 * New kart: wilber
 * Improved 'Shifting Sands' and 'Lighthouse' tracks
@@ -172,7 +198,7 @@ Too many to list them all. Main points:
 * Additional music and main theme
 	
 	
-##SuperTuxKart 0.3 (May 2007)
+## SuperTuxKart 0.3 (May 2007)
 * Highscore lists	
 * Shortcut detection 	
 * Improved AI

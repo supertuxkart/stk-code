@@ -1,4 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -94,36 +95,6 @@ void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int use
 }
 
 //-------------------------------------
-void SkyboxProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    srv->setVertexShaderConstant("time", &time, 1);
-
-    vector3df sun_pos = m_sunpos;
-    srv->setVertexShaderConstant("sun_pos", &sun_pos.X, 3);
-    
-    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-
-    if (!firstdone)
-    {
-        s32 tex = 0;
-        srv->setPixelShaderConstant("tex", &tex, 1);
-        s32 glow_tex = 1;
-        srv->setPixelShaderConstant("glow_tex", &glow_tex, 1);
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
-void BubbleEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-}
-
-//-------------------------------------
 
 void MotionBlurProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
@@ -160,13 +131,6 @@ void MotionBlurProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void GaussianBlurProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setVertexShaderConstant("pixel", m_pixel, 2);
-}
-
-//-------------------------------------
-
 void MipVizProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const ITexture * const tex = mat.TextureLayer[0].Texture;
@@ -183,74 +147,6 @@ void MipVizProvider::OnSetConstants(IMaterialRendererServices *srv, int)
         };
 
     srv->setVertexShaderConstant("texsize", texsize, 2);
-}
-
-//-------------------------------------
-
-void ColorizeProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-}
-
-//-------------------------------------
-
-void ObjectPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-}
-
-//-------------------------------------
-
-void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const int hasclouds = World::getWorld()->getTrack()->hasClouds() &&
-                          UserConfigParams::m_weather_effects;
-
-    srv->setVertexShaderConstant("screen", m_screen, 2);
-    srv->setVertexShaderConstant("col", m_color, 3);
-    srv->setVertexShaderConstant("center", m_pos, 3);
-    srv->setVertexShaderConstant("invproj", irr_driver->getInvProjMatrix().pointer(), 16);
-    srv->setVertexShaderConstant("hasclouds", &hasclouds, 1);
-
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-
-    float strength = time;
-    strength = fabsf(noise2d(strength / 10.0f)) * 0.003f;
-
-    const vector3df winddir = irr_driver->getWind() * strength;
-    m_wind[0] += winddir.X;
-    m_wind[1] += winddir.Z;
-    srv->setVertexShaderConstant("wind", m_wind, 2);
-
-    if (UserConfigParams::m_shadows)
-    {
-        srv->setVertexShaderConstant("shadowmat", m_shadowmat.pointer(), 16);
-    }
-
-    // Can't use the firstdone optimization, as this callback is used for multiple shaders
-    //if (!firstdone)
-    {
-        int tex = 0;
-        srv->setVertexShaderConstant("ntex", &tex, 1);
-
-        tex = 1;
-        srv->setVertexShaderConstant("dtex", &tex, 1);
-
-        tex = 2;
-        srv->setVertexShaderConstant("cloudtex", &tex, 1);
-
-        tex = 3;
-        srv->setVertexShaderConstant("shadowtex", &tex, 1);
-
-        tex = 4;
-        srv->setVertexShaderConstant("warpx", &tex, 1);
-
-        tex = 5;
-        srv->setVertexShaderConstant("warpy", &tex, 1);
-
-//        const float shadowoffset = 1.0f / irr_driver->getRTT(RTT_SHADOW)->getSize().Width;
-//        srv->setVertexShaderConstant("shadowoffset", &shadowoffset, 1);
-
-        firstdone = true;
-    }
 }
 
 //-------------------------------------

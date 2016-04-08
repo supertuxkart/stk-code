@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013  Joerg Henrichs
+//  Copyright (C) 2009-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -50,9 +50,6 @@ private:
     /** The current time used in the IPOs. */
     float m_current_time;
 
-    /** For cyclic animations: duration of the cycle. */
-    float m_cycle_length;
-
     /** The inital position of this object. */
     Vec3 m_initial_xyz;
 
@@ -90,8 +87,7 @@ public:
     {
         float duration = -1;
 
-        const Ipo* currIpo;
-        for_in (currIpo, m_all_ipos)
+        for (const Ipo* currIpo : m_all_ipos)
         {
             duration = std::max(duration, currIpo->getEndTime());
         }

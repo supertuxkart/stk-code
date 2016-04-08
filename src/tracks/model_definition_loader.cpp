@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007-2013 Joerg Henrichs
+//  Copyright (C) 2007-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@ using namespace irr;
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
-#include "graphics/stkinstancedscenenode.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "io/xml_node.hpp"
 #include "tracks/track.hpp"
 
@@ -45,13 +45,13 @@ void ModelDefinitionLoader::addModelDefinition(const XMLNode* xml)
     std::string lodgroup;
     xml->get("lod_group", &lodgroup);
 
-    bool tangent = false;
-    xml->get("tangents", &tangent);
+    bool skeletal_animation = false;
+    xml->get("skeletal-animation", &skeletal_animation);
 
     std::string model_name;
     xml->get("model", &model_name);
 
-    m_lod_groups[lodgroup].push_back(ModelDefinition(xml, (int)lod_distance, model_name, tangent));
+    m_lod_groups[lodgroup].push_back(ModelDefinition(xml, (int)lod_distance, model_name, false, skeletal_animation));
 }
 
 // ----------------------------------------------------------------------------
@@ -72,33 +72,51 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
         lod_node->updateAbsolutePosition();
         for (unsigned int m=0; m<group.size(); m++)
         {
-            // TODO: check whether the mesh contains animations or not?
-            scene::IMesh* a_mesh = irr_driver->getMesh(group[m].m_model_file);
-
-            if (!a_mesh)
+            if (group[m].m_skeletal_animation)
             {
-                Log::warn("LODNodeLoad", "Warning: object model '%s' not found, ignored.\n",
-                          group[m].m_model_file.c_str());
-                continue;
-            }
+                scene::IAnimatedMesh* a_mesh = irr_driver->getAnimatedMesh(group[m].m_model_file);
+                if (!a_mesh)
+                {
+                    Log::warn("LODNodeLoad", "Warning: object model '%s' not found, ignored.\n",
+                        group[m].m_model_file.c_str());
+                    continue;
+                }
 
-            if (group[m].m_tangent && a_mesh->getMeshBuffer(0)->getVertexType() != video::EVT_TANGENTS)
-            {
-                scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
-                scene::IMesh* m2 = manip->createMeshWithTangents(a_mesh);
-                // FIXME: do we need to clean up 'a_mesh' ?
-                a_mesh = m2;
                 irr_driver->setAllMaterialFlags(a_mesh);
+
+                a_mesh->grab();
+                //cache.push_back(a_mesh);
+                irr_driver->grabAllTextures(a_mesh);
+                m_track->addCachedMesh(a_mesh);
+                scene::IAnimatedMeshSceneNode* scene_node = irr_driver->addAnimatedMesh(a_mesh, group[m].m_model_file);
+
+                m_track->handleAnimatedTextures(scene_node, *group[m].m_xml);
+
+                lod_node->add(group[m].m_distance, scene_node, true);
             }
+            else
+            {
+                scene::IMesh* a_mesh = irr_driver->getMesh(group[m].m_model_file);
+                if (!a_mesh)
+                {
+                    Log::warn("LODNodeLoad", "Warning: object model '%s' not found, ignored.\n",
+                        group[m].m_model_file.c_str());
+                    continue;
+                }
 
-            a_mesh->grab();
-            //cache.push_back(a_mesh);
-            irr_driver->grabAllTextures(a_mesh);
-            scene::IMeshSceneNode* scene_node = irr_driver->addMesh(a_mesh);
+                a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
+                irr_driver->setAllMaterialFlags(a_mesh);
 
-            m_track->handleAnimatedTextures( scene_node, *group[m].m_xml );
+                a_mesh->grab();
+                //cache.push_back(a_mesh);
+                irr_driver->grabAllTextures(a_mesh);
+                m_track->addCachedMesh(a_mesh);
+                scene::IMeshSceneNode* scene_node = irr_driver->addMesh(a_mesh, group[m].m_model_file);
 
-            lod_node->add( group[m].m_distance, scene_node, true );
+                m_track->handleAnimatedTextures(scene_node, *group[m].m_xml);
+
+                lod_node->add(group[m].m_distance, scene_node, true);
+            }
         }
 
 #ifdef DEBUG
@@ -116,32 +134,6 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
 
 // ----------------------------------------------------------------------------
 
-STKInstancedSceneNode* ModelDefinitionLoader::instanciate(const irr::core::vector3df& position,
-                                const irr::core::vector3df& rotation,
-                                const irr::core::vector3df scale,
-                                const std::string& name)
-{
-    if (m_instancing_nodes.find(name) == m_instancing_nodes.end())
-    {
-        if (m_lod_groups.find(name) == m_lod_groups.end())
-        {
-            Log::warn("Instancing", "Cannot find instancing model <%s>", name.c_str());
-            return NULL;
-        }
-
-        scene::IMesh* mesh = irr_driver->getMesh(m_lod_groups[name][0].m_model_file);
-        m_instancing_nodes[name] = new STKInstancedSceneNode(mesh,
-            irr_driver->getSceneManager()->getRootSceneNode(), irr_driver->getSceneManager(), -1);
-        m_track->addNode(m_instancing_nodes[name]);
-    }
-
-    m_instancing_nodes[name]->addInstance(position, rotation, scale);
-    m_instancing_nodes[name]->instanceGrab();
-    return m_instancing_nodes[name];
-}
-
-// ----------------------------------------------------------------------------
-
 void ModelDefinitionLoader::clear()
 {
     m_lod_groups.clear();
@@ -152,4 +144,18 @@ void ModelDefinitionLoader::clear()
 scene::IMesh* ModelDefinitionLoader::getFirstMeshFor(const std::string& name)
 {
     return irr_driver->getMesh(m_lod_groups[name][0].m_model_file);
+}
+
+// ----------------------------------------------------------------------------
+
+void ModelDefinitionLoader::cleanLibraryNodesAfterLoad()
+{
+    for (std::map<std::string, XMLNode*>::iterator it = m_library_nodes.begin();
+        it != m_library_nodes.end(); it++)
+    {
+        delete it->second;
+
+        file_manager->popTextureSearchPath();
+        file_manager->popModelSearchPath();
+    }
 }

@@ -7,10 +7,10 @@
             <div width="90%" align="center" layout="vertical-row" height="fit" >
                 <div width="100%" height="fit" layout="horizontal-row" >
                     <label proportion="1" text_align="left" I18N="In the lobby settings screen" text="Name of the server"/>
-                    <textbox proportion="2" id="name" I18N="In the login dialog"/>
+                    <textbox proportion="2" id="name" I18N="In the lobby settings screen"/>
                 </div>
 
-                <spacer height="20" width="20">
+                <spacer height="20" width="20"/>
 
                 <div width="100%" height="fit" layout="horizontal-row" >
                     <label proportion="1" text_align="left" I18N="In the lobby settings screen" text="Max. number of players"/>

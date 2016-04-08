@@ -1,4 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -137,87 +138,6 @@ private:
 
 //
 
-class SkyboxProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-    
-    void setSunPosition(const core::vector3df &in)
-    {
-        m_sunpos = in;
-        //m_sunpos.normalize();
-    }
-
-private:
-    core::vector3df m_sunpos;
-};
-
-//
-
-class BubbleEffectProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    BubbleEffectProvider()
-    {
-    }
-
-    // We hijack the material type param 2 of bubbles.
-    // It's time to start the fade, negative if fade out, positive if in.
-    // It'd be unused otherwise.
-
-    void onMadeVisible(scene::IMeshBuffer * const mb)
-    {
-        if (!contains(mb))
-            return;
-
-        video::SMaterial &mat = mb->getMaterial();
-        mat.MaterialTypeParam2 = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    }
-
-    void onHidden(scene::IMeshBuffer * const mb)
-    {
-        if (!contains(mb))
-            return;
-
-        video::SMaterial &mat = mb->getMaterial();
-        mat.MaterialTypeParam2 = irr_driver->getDevice()->getTimer()->getTime() / -1000.0f;
-    }
-
-    void isInitiallyHidden(scene::IMeshBuffer * const mb)
-    {
-        if (!contains(mb))
-            return;
-
-        video::SMaterial &mat = mb->getMaterial();
-        mat.MaterialTypeParam2 = irr_driver->getDevice()->getTimer()->getTime() / -1000.0f;
-    }
-
-    void removeBubble(const scene::IMeshBuffer * const mb)
-    {
-        m_bubbles.erase(mb);
-    }
-
-    void addBubble(scene::IMeshBuffer * const mb)
-    {
-        m_bubbles.insert(mb);
-
-        video::SMaterial &mat = mb->getMaterial();
-        mat.MaterialTypeParam2 = 1;
-    }
-
-    bool contains(const scene::IMeshBuffer * const mb) const
-    {
-        return m_bubbles.count(mb)!=0;
-    }
-
-private:
-    std::set<const scene::IMeshBuffer *> m_bubbles;
-};
-
-//
-
 class MotionBlurProvider: public CallBase
 {
 public:
@@ -284,143 +204,10 @@ private:
 
 //
 
-class GaussianBlurProvider: public CallBase
-{
-public:
-    GaussianBlurProvider()
-    {
-        m_pixel[0] = 1.0f / UserConfigParams::m_width;
-        m_pixel[1] = 1.0f / UserConfigParams::m_height;
-    }
-
-    void setResolution(int x, int y)
-    {
-        m_pixel[0] = 1.0f / x;
-        m_pixel[1] = 1.0f / y;
-    }
-
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-private:
-    float m_pixel[2];
-};
-
-//
-
 class MipVizProvider: public CallBase
 {
 public:
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class ColorizeProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    void setColor(float r, float g, float b)
-    {
-        m_color[0] = r;
-        m_color[1] = g;
-        m_color[2] = b;
-    }
-
-    float getRed() const
-    {
-        return m_color[0];
-    }
-
-    float getGreen() const
-    {
-        return m_color[1];
-    }
-
-    float getBlue() const
-    {
-        return m_color[2];
-    }
-
-private:
-    float m_color[3];
-};
-
-//
-
-class ObjectPassProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class SunLightProvider: public CallBase
-{
-public:
-    SunLightProvider()
-    {
-        m_screen[0] = (float)UserConfigParams::m_width;
-        m_screen[1] = (float)UserConfigParams::m_height;
-
-        m_wind[0] = m_wind[1] = 0;
-    }
-
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    void setColor(float r, float g, float b)
-    {
-        m_color[0] = r;
-        m_color[1] = g;
-        m_color[2] = b;
-    }
-    
-    float getRed() const
-    {
-      return m_color[0];
-    }
-
-    float getGreen() const
-    {
-      return m_color[1];
-    }
-    
-    float getBlue() const
-    {
-      return m_color[2];
-    }
-
-    void setPosition(float x, float y, float z)
-    {
-        // Sun "position" is actually a direction and not a position
-        core::matrix4 m_view = irr_driver->getViewMatrix();
-        m_view.makeInverse();
-        m_view = m_view.getTransposed();
-        core::vector3df pos(x, y, z);
-        m_view.transformVect(pos);
-        pos.normalize();
-        m_pos[0] = pos.X;
-        m_pos[1] = pos.Y;
-        m_pos[2] = pos.Z;
-    }
-    
-    core::vector3df getPosition() const
-    {
-      return core::vector3df(m_pos[0], m_pos[1], m_pos[2]);
-    }
-
-    void setShadowMatrix(const core::matrix4 &mat)
-    {
-        m_shadowmat = mat;
-    }
-
-private:
-    core::matrix4 m_shadowmat;
-    float m_color[3];
-    float m_pos[3];
-    float m_screen[2];
-    float m_wind[2];
 };
 
 //

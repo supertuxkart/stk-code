@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -52,7 +52,9 @@ void History::startReplay()
  */
 void History::initRecording()
 {
-    allocateMemory(stk_config->m_max_history);
+    unsigned int max_frames = (unsigned int)(  stk_config->m_replay_max_time
+                                             / stk_config->m_replay_dt      );
+    allocateMemory(max_frames);
     m_current = -1;
     m_wrapped = false;
     m_size    = 0;
@@ -180,6 +182,8 @@ void History::Save()
     fprintf(fd, "numkarts: %d\n",   num_karts);
     fprintf(fd, "numplayers: %d\n", race_manager->getNumPlayers());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
+    fprintf(fd, "reverse: %c\n", race_manager->getReverseTrack() ? 'y' : 'n');
+
     fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
 
     assert(num_karts > 0);
@@ -253,21 +257,31 @@ void History::Load()
         Log::fatal("History", "Could not read history.dat.");
 
     unsigned int num_karts;
-    if(sscanf(s, "numkarts: %d",&num_karts)!=1)
+    if(sscanf(s, "numkarts: %u", &num_karts)!=1)
         Log::fatal("History", "No number of karts found in history file.");
     race_manager->setNumKarts(num_karts);
 
     fgets(s, 1023, fd);
     if(sscanf(s, "numplayers: %d",&n)!=1)
         Log::fatal("History", "No number of players found in history file.");
-    race_manager->setNumLocalPlayers(n);
+    race_manager->setNumPlayers(n);
 
     fgets(s, 1023, fd);
     if(sscanf(s, "difficulty: %d",&n)!=1)
         Log::fatal("History", "No difficulty found in history file.");
     race_manager->setDifficulty((RaceManager::Difficulty)n);
 
+
+    // Optional (not supported in older history files): include reverse
     fgets(s, 1023, fd);
+    char r;
+    if (sscanf(s, "reverse: %c", &r) == 1)
+    {
+        fgets(s, 1023, fd);
+        race_manager->setReverseTrack(r == 'y');
+    }
+
+
     if(sscanf(s, "track: %1023s",s1)!=1)
         Log::warn("History", "Track not found in history file.");
     race_manager->setTrack(s1);
@@ -283,7 +297,7 @@ void History::Load()
         m_kart_ident.push_back(s1);
         if(i<race_manager->getNumPlayers())
         {
-            race_manager->setLocalKartInfo(i, s1);
+            race_manager->setPlayerKart(i, s1);
         }
     }   // for i<nKarts
     // FIXME: The model information is currently ignored

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -36,27 +36,37 @@
 #endif
 
 //----------------------------------------------------------------------------
-
+/** Creates a sfx. The parameter are taken from the parameters:
+ *  \param file File name of the buffer.
+ *  \param positional If the sfx is positional.
+ *  \param rolloff Rolloff value of this sfx.
+ *  \param max_dist Maximum distance the sfx can be heard.
+ *  \param gain Gain value of this sfx.
+ */
 SFXBuffer::SFXBuffer(const std::string& file,
                      bool  positional,
                      float rolloff,
-                     float max_width,
+                     float max_dist,
                      float gain)
 {
     m_buffer      = 0;
     m_gain        = 1.0f;
     m_rolloff     = 0.1f;
     m_loaded      = false;
-    m_max_dist    = max_width;
+    m_max_dist    = max_dist;
+    m_duration    = -1.0f;
     m_file        = file;
 
     m_rolloff     = rolloff;
     m_positional  = positional;
     m_gain        = gain;
-}
+}   // SFXBuffer
 
 //----------------------------------------------------------------------------
-
+/** Constructor getting the sfx parameters from an XML node.
+ *  \param file File name of the data.
+ *  \param node XML Node with the data for this sfx.
+ */
 SFXBuffer::SFXBuffer(const std::string& file,
                      const XMLNode* node)
 {
@@ -64,6 +74,7 @@ SFXBuffer::SFXBuffer(const std::string& file,
     m_gain        = 1.0f;
     m_rolloff     = 0.1f;
     m_max_dist    = 300.0f;
+    m_duration    = -1.0f;
     m_positional  = false;
     m_loaded      = false;
     m_file        = file;
@@ -72,10 +83,15 @@ SFXBuffer::SFXBuffer(const std::string& file,
     node->get("positional",  &m_positional );
     node->get("volume",      &m_gain       );
     node->get("max_dist",    &m_max_dist   );
-}
+    node->get("duration",    &m_duration   );
+}   // SFXBuffer(XMLNode)
 
 //----------------------------------------------------------------------------
-
+/** \brief load the buffer from file into OpenAL.
+ *  \note If this buffer is already loaded, this call does nothing and 
+  *       returns false.
+ *  \return Whether loading was successful.
+ */
 bool SFXBuffer::load()
 {
     if (UserConfigParams::m_sfx == false) return false;
@@ -95,7 +111,8 @@ bool SFXBuffer::load()
 
     if (!loadVorbisBuffer(m_file, m_buffer))
     {
-        Log::error("SFXBuffer", "Could not load sound effect %s\n", m_file.c_str());
+        Log::error("SFXBuffer", "Could not load sound effect %s",
+                   m_file.c_str());
         // TODO: free al buffer here?
         return false;
     }
@@ -103,9 +120,13 @@ bool SFXBuffer::load()
 
     m_loaded = true;
     return true;
-}
+}   // load
 
 //----------------------------------------------------------------------------
+/** \brief Frees the loaded buffer.
+ *  Cannot appear in destructor because copy-constructors may be used,
+ *  and the OpenAL source must not be deleted on a copy
+ */
 
 void SFXBuffer::unload()
 {
@@ -117,7 +138,7 @@ void SFXBuffer::unload()
     }
 #endif
     m_loaded = false;
-}
+}   // unload
 
 //----------------------------------------------------------------------------
 /** Load a vorbis file into an OpenAL buffer
@@ -145,26 +166,28 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
 
     if(!file)
     {
-        Log::error("SFXBuffer", "[SFXBuffer] LoadVorbisBuffer() - couldn't open file!\n");
+        Log::error("SFXBuffer", "LoadVorbisBuffer() - couldn't open file!");
         return false;
     }
 
     if (ov_open_callbacks(file, &oggFile, NULL, 0,  OV_CALLBACKS_NOCLOSE) != 0)
     {
         fclose(file);
-        Log::error("SFXBuffer", "[SFXBuffer] LoadVorbisBuffer() - ov_open_callbacks() failed, file isn't vorbis?\n");
+        Log::error("SFXBuffer", "LoadVorbisBuffer() - ov_open_callbacks() failed, "
+                                "file isn't vorbis?");
         return false;
     }
 
     info = ov_info(&oggFile, -1);
 
-    long len = (long)ov_pcm_total(&oggFile, -1) * info->channels * 2;    // always 16 bit data
+    // always 16 bit data
+    long len = (long)ov_pcm_total(&oggFile, -1) * info->channels * 2;
 
     char *data = (char *) malloc(len);
     if(!data)
     {
         ov_clear(&oggFile);
-        Log::error("SFXBuffer", "[SFXBuffer] loadVorbisBuffer() - Error : LoadVorbisBuffer() - couldn't allocate decode buffer\n");
+        Log::error("SFXBuffer", "[SFXBuffer] Could not allocate decode buffer.");
         return false;
     }
 
@@ -188,9 +211,22 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
 
     ov_clear(&oggFile);
     fclose(file);
+
+    // Allow the xml data to overwrite the duration, but if there is no
+    // duration (which is the norm), compute it:
+    if(m_duration < 0)
+    {
+        ALint buffer_size, frequency, bits_per_sample, channels;
+        alGetBufferi(buffer, AL_SIZE,      &buffer_size    );
+        alGetBufferi(buffer, AL_FREQUENCY, &frequency      );
+        alGetBufferi(buffer, AL_CHANNELS,  &channels       );
+        alGetBufferi(buffer, AL_BITS,      &bits_per_sample);
+        m_duration = float(buffer_size) 
+                   / (frequency*channels*(bits_per_sample / 8));
+    }
     return success;
 #else
     return false;
 #endif
-}
+}   // loadVorbisBuffer
 

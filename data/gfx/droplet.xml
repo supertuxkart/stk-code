@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<particles emitter="sphere" radius="5">
+<particles emitter="sphere" radius="2">
 
-    <spreading angle="45"      />
+    <spreading angle="12"      />
     
     <velocity  x="0.000"
                y="0.005"
@@ -18,8 +18,8 @@
                max="2000"         />
     
     <!-- Size of the particles -->
-    <size      min="4.0"
-               max="7.2"       
+    <size      min="2.0"
+               max="3.2"       
                x-increase-factor="2.6"
                y-increase-factor="2.6" />
     

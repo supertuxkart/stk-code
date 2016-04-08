@@ -1,8 +1,8 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2004-2013  Steve Baker <sjbaker1@airmail.net>,
-//  Copyright (C) 2004-2013  Ingo Ruhnke <grumbel@gmx.de>
-//  Copyright (C) 2006-2013  SuperTuxKart-Team
+//  Copyright (C) 2004-2015  Steve Baker <sjbaker1@airmail.net>,
+//  Copyright (C) 2004-2015  Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015  SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,19 +22,20 @@
 
 #include "utils/log.hpp"
 #include "utils/time.hpp"
-
+#include "utils/utf8.h"
 #include "coreutil.h"
 
-#include <math.h>
 #include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdio>
 #include <cstring>
-#include <stdio.h>
+#include <cwchar>
 #include <exception>
-#include <assert.h>
 
 namespace StringUtils
 {
-    bool hasSuffix(const std::string& lhs, const std::string rhs)
+    bool hasSuffix(const std::string& lhs, const std::string &rhs)
     {
         if (lhs.length() < rhs.length())
             return false;
@@ -167,14 +168,14 @@ namespace StringUtils
         try
         {
             std::string::size_type start=0;
-            while(start!=std::string::npos && start<s.size())
+            while(start < (unsigned int) s.size())
             {
                 std::string::size_type i=s.find(c, start);
                 if (i!=std::string::npos)
                 {
                     if (keepSplitChar)
                     {
-                        int from = start-1;
+                        int from = (int)start-1;
                         if (from < 0) from = 0;
 
                         result.push_back(std::string(s, from, i-from));
@@ -185,11 +186,11 @@ namespace StringUtils
                 }
                 else   // end of string reached
                 {
-                    if (keepSplitChar)
+                    if (keepSplitChar && start != 0)
                         result.push_back(std::string(s,start-1));
                     else
                         result.push_back(std::string(s,start));
-                    start = i;
+                    return result;
                 }
             }
             return result;
@@ -243,14 +244,13 @@ namespace StringUtils
                 }
                 else
                 {
-                    if (keepSplitChar)
+                    if (keepSplitChar && start != 0)
                         result.push_back( s.subString(start - 1,
                                                       s.size()-start + 1) );
                     else
                         result.push_back( s.subString(start, s.size()-start) );
 
                     return result;
-                    //start = i+1;
                 }
             }
             return result;
@@ -310,7 +310,7 @@ namespace StringUtils
             for(int i=(int)dirs.size()-1; i>=0; i--)
             {
                 if(dirs[i].size()>1) continue;
-                if(i==dirs.size()-1)    // last element
+                if(i==(int)dirs.size()-1)    // last element
                 {
                     dirs[i]+=":";      // turn "c" back into "c:"
                 }
@@ -344,7 +344,7 @@ namespace StringUtils
 
             unsigned int insertValID = 0;
 
-            const unsigned int item_count = sv.size();
+            const unsigned int item_count = (int)sv.size();
             for (unsigned int i=0; i<item_count; i++)
             {
                 if(sv[i][0] != '%')
@@ -416,7 +416,7 @@ namespace StringUtils
 
             irr::core::stringw new_string="";
 
-            const unsigned int size = sv.size();
+            const unsigned int size = (int)sv.size();
             for (unsigned int i=0; i<size; i++)
             {
                 if(sv[i][0] != '%')
@@ -563,7 +563,7 @@ namespace StringUtils
 
         while (true)
         {
-            const int pos = wip.find(from);
+            const int pos = (int) wip.find(from);
             if (pos == -1)
             {
                 return wip;
@@ -574,11 +574,11 @@ namespace StringUtils
     }
 
     // ------------------------------------------------------------------------
-    /** Converts ASCII text with HTML entities (e.g. &xE9;) to unicode strings
+    /** Converts ASCII text with XML entities (e.g. &x00;) to unicode strings
      *  \param input The input string which should be decoded.
      *  \return A irrlicht wide string with unicode characters.
      */
-    irr::core::stringw decodeFromHtmlEntities(const std::string& input)
+    irr::core::stringw xmlDecode(const std::string& input)
     {
         irr::core::stringw output;
         std::string entity;
@@ -659,35 +659,71 @@ namespace StringUtils
         }
 
         return output;
-    }   // decodeFromHtmlEntities
+    }   // xmlDecode
 
     // ------------------------------------------------------------------------
-    /** Converts a unicode string to plain ASCII using html-like & codes.
+    /** Converts a unicode string to plain ASCII using XML entites (e.g. &x00;)
      *  \param s The input string which should be encoded.
      *  \return A std:;string with ASCII characters.
      */
-    std::string encodeToHtmlEntities(const irr::core::stringw &s)
+    std::string xmlEncode(const irr::core::stringw &s)
     {
         std::ostringstream output;
         for(unsigned int i=0; i<s.size(); i++)
         {
-            if(s[i]=='&')
-                output<<"&amp;";
+            if (s[i] >= 128 || s[i] == '&' || s[i] == '<' || s[i] == '>' || s[i] == '\"')
+            {
+                output << "&#x" << std::hex << std::uppercase << s[i] << ";";
+            }
             else
             {
-                if(s[i]<128)
-                {
-                    irr::c8 c=(char)(s[i]);
-                    output<<c;
-                }
-                else
-                {
-                    output <<"&#x" << std::hex <<std::uppercase<< s[i]<<";";
-                }
+                irr::c8 c = (char)(s[i]);
+                output << c;
             }
         }
         return output.str();
-    }   // encodeToHtmlEntities
+    }   // xmlEncode
+
+    // ------------------------------------------------------------------------
+
+    std::string wideToUtf8(const wchar_t* input)
+    {
+        static std::vector<char> utf8line;
+        utf8line.clear();
+
+        utf8::utf16to8(input, input + wcslen(input), back_inserter(utf8line));
+        utf8line.push_back(0);
+
+        return std::string(&utf8line[0]);
+    }   // wideToUtf8
+
+    // ------------------------------------------------------------------------
+    /** Converts the irrlicht wide string to an utf8-encoded std::string.
+     */
+    std::string wideToUtf8(const irr::core::stringw& input)
+    {
+        return wideToUtf8(input.c_str());
+    }   // wideToUtf8
+
+    // ------------------------------------------------------------------------
+    /** Converts the irrlicht wide string to an utf8-encoded std::string. */
+    irr::core::stringw utf8ToWide(const char* input)
+    {
+        static std::vector<wchar_t> utf16line;
+        utf16line.clear();
+
+        utf8::utf8to16(input, input + strlen(input), back_inserter(utf16line));
+        utf16line.push_back(0);
+
+        return irr::core::stringw(&utf16line[0]);
+    }   // utf8ToWide
+
+    // ------------------------------------------------------------------------
+    /** Converts a utf8-encoded std::string into an irrlicht wide string. */
+    irr::core::stringw utf8ToWide(const std::string &input)
+    {
+        return utf8ToWide(input.c_str());
+    }   // utf8ToWide
 
     // ------------------------------------------------------------------------
     /** Converts a version string (in the form of 'X.Y.Za-rcU' into an
@@ -696,10 +732,10 @@ namespace StringUtils
      */
     int versionToInt(const std::string &version_string)
     {
-        // Special case: SVN
-        if(version_string=="SVN" || version_string=="svn")
+        // Special case: GIT
+        if(version_string=="GIT" || version_string=="git")
         {
-            // SVN version will be version 99.99.99i-rcJ
+            // GIT version will be version 99.99.99i-rcJ
             return 1000000*99
                     +  10000*99
                     +    100*99

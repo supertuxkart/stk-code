@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -99,7 +99,7 @@ public:
     // ------------------------------------------------------------------------
     unsigned int size() const
     {
-        return m_contents_vector.size();
+        return (int) m_contents_vector.size();
     }   // size
 
     // ------------------------------------------------------------------------
@@ -221,6 +221,26 @@ public:
 
     }   // remove
 
+    typename AlignedArray<TYPE*>::iterator begin()
+    {
+        return m_contents_vector.begin();
+    }
+
+    typename AlignedArray<TYPE*>::iterator end()
+    {
+        return m_contents_vector.end();
+    }
+
+    typename AlignedArray<TYPE*>::const_iterator begin() const
+    {
+        return m_contents_vector.begin();
+    }
+
+    typename AlignedArray<TYPE*>::const_iterator end() const
+    {
+        return m_contents_vector.end();
+    }
+
     // ------------------------------------------------------------------------
     /**
     * \brief Removes and deletes the given object.
@@ -303,6 +323,8 @@ public:
 #define for_in( VAR, VECTOR ) for (unsigned int _foreach_i = 0; \
            VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL),\
            _foreach_i < VECTOR.size(); _foreach_i++)
-
+#define for_var_in( TYPE, VAR, VECTOR ) TYPE VAR; for (unsigned int _foreach_i = 0; \
+    VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL), \
+    _foreach_i < VECTOR.size(); _foreach_i++)
 
 #endif

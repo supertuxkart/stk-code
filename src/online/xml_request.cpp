@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -24,15 +24,12 @@
 #ifdef WIN32
 #  include <winsock2.h>
 #endif
-
 #include <curl/curl.h>
 
 #include <assert.h>
 
-
 namespace Online
 {
-
     /** Creates a HTTP(S) request that will automatically parse the answer into
      *  a XML structure.
      *  \param manage_memory whether or not the RequestManager should take care of
@@ -61,22 +58,32 @@ namespace Online
     void XMLRequest::afterOperation()
     {
         m_xml_data = file_manager->createXMLTreeFromString(getData());
-        if(hadDownloadError())
+        if (hadDownloadError())
+        {
             Log::error("XMLRequest::afterOperation",
                        "curl_easy_perform() failed: %s",
                        getDownloadErrorMessage());
+        }
+
         m_success = false;
         std::string rec_success;
-        if(m_xml_data->get("success", &rec_success))
+        if (m_xml_data->get("success", &rec_success))
         {
-            m_success = rec_success =="yes";
+            m_success = (rec_success == "yes");
             m_xml_data->get("info", &m_info);
+
+            if (!m_success)
+            {
+                Log::debug("XMLRequest::afterOperation",
+                           "Request returned error: %ls", m_info.c_str());
+            }
         }
         else
+        {
             m_info = _("Unable to connect to the server. Check your internet "
                        "connection or try again later.");
+        }
         HTTPRequest::afterOperation();
     }   // afterOperation
-
 
 } // namespace Online

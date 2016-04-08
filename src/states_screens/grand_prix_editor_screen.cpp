@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,13 +23,10 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
-#include "race/grand_prix_data.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/edit_gp_screen.hpp"
 #include "states_screens/dialogs/enter_gp_name_dialog.hpp"
-#include "states_screens/dialogs/gp_info_dialog.hpp"
-#include "states_screens/dialogs/track_info_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -40,28 +37,59 @@ using namespace irr::core;
 
 DEFINE_SCREEN_SINGLETON( GrandPrixEditorScreen );
 
+
 // -----------------------------------------------------------------------------
-GrandPrixEditorScreen::GrandPrixEditorScreen()
-    : Screen("gpeditor.stkgui"), m_selection(NULL)
+GrandPrixEditorScreen::GrandPrixEditorScreen() 
+                     : Screen("grand_prix_editor.stkgui"), m_selection(NULL),
+                       m_gpgroup(GrandPrixData::GP_NONE)
 {
+}
+
+// -----------------------------------------------------------------------------
+void GrandPrixEditorScreen::beforeAddingWidget()
+{
+    RibbonWidget* tabs = getWidget<RibbonWidget>("gpgroups");
+    assert (tabs != NULL);
+
+    tabs->clearAllChildren();
+    for (int i = 0; i < GrandPrixData::GP_GROUP_COUNT; i++)
+    {
+        core::stringw label = getGroupName((enum GrandPrixData::GPGroupType)i);
+        tabs->addTextChild(label.c_str(), StringUtils::toString(i));
+    }
 }
 
 // -----------------------------------------------------------------------------
 void GrandPrixEditorScreen::loadedFromFile()
 {
+    static const int MAX_LABEL_LENGTH = 35;
 
+    DynamicRibbonWidget* gplist_widget = getWidget<DynamicRibbonWidget>("gplist");
+    assert (gplist_widget != NULL);
+    gplist_widget->setMaxLabelLength(MAX_LABEL_LENGTH);
+
+    DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
+    assert(tracks_widget != NULL);
+    tracks_widget->setMaxLabelLength(MAX_LABEL_LENGTH);
 }
 
 // -----------------------------------------------------------------------------
 void GrandPrixEditorScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    DynamicRibbonWidget* gplist_widget = getWidget<DynamicRibbonWidget>("gplist");
-    assert (gplist_widget != NULL);
-    std::string selected = gplist_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-    if (!selected.empty())
-        setSelection (grand_prix_manager->getGrandPrix(selected));
-
-    if (name == "menu")
+    if (name == "gplist")
+    {
+        DynamicRibbonWidget* gplist_widget = getWidget<DynamicRibbonWidget>("gplist");
+        assert (gplist_widget != NULL);
+        std::string selected = gplist_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        if (!selected.empty())
+        {
+            if (m_selection != NULL && selected == m_selection->getId() && m_selection->isEditable())
+                showEditScreen(m_selection);
+            else
+                setSelection (grand_prix_manager->getGrandPrix(selected));
+        }
+    }
+    else if (name == "menu")
     {
         RibbonWidget* menu = getWidget<RibbonWidget>("menu");
         assert(menu != NULL);
@@ -71,52 +99,40 @@ void GrandPrixEditorScreen::eventCallback(Widget* widget, const std::string& nam
         {
             new EnterGPNameDialog(this, 0.5f, 0.4f);
         }
-        else if (m_action == "edit")
+        else if (m_action == "edit" && m_selection != NULL)
         {
-            if (m_selection->isEditable())
-            {
-                showEditScreen(m_selection);
-            }
-            else
-            {
-                new MessageDialog(
-                    _("You can't edit the '%s' grand prix.\nYou might want to copy it first",
-                        m_selection->getName().c_str()),
-                    MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
-            }
+            showEditScreen(m_selection);
         }
-        else if (m_action == "remove")
+        else if (m_action == "remove" && m_selection != NULL)
         {
-            if (m_selection->isEditable())
-            {
-                new MessageDialog(
-                    _("Are you sure you want to remove '%s'?", m_selection->getName().c_str()),
-                    MessageDialog::MESSAGE_DIALOG_CONFIRM,
-                    this, false);
-            }
-            else
-            {
-                new MessageDialog(
-                    _("You can't remove '%s'.", m_selection->getName().c_str()),
-                    MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
-            }
+            new MessageDialog(
+                _("Are you sure you want to remove '%s'?", m_selection->getName().c_str()),
+                MessageDialog::MESSAGE_DIALOG_CONFIRM,
+                this, false);
         }
-        else if (m_action == "rename")
+        else if (m_action == "rename" && m_selection != NULL)
         {
-            if (m_selection->isEditable())
-            {
-                new EnterGPNameDialog(this, 0.5f, 0.4f);
-            }
-            else
-            {
-                new MessageDialog(
-                    _("You can't rename '%s'.", m_selection->getName().c_str()),
-                    MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
-            }
+            new EnterGPNameDialog(this, 0.5f, 0.4f);
+        }
+    }
+    else if (name == "gpgroups")
+    {
+        RibbonWidget* tabs = getWidget<RibbonWidget>("gpgroups");
+        assert(tabs != NULL);
+
+        enum GrandPrixData::GPGroupType group = (enum GrandPrixData::GPGroupType)atoi(
+            tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str());
+        if (m_gpgroup != group)
+        {
+            m_gpgroup = group;
+            loadGPList();
+            setSelection(NULL);
         }
     }
     else if (name == "back")
     {
+        m_gpgroup = GrandPrixData::GP_NONE;
+        setSelection(NULL);
         StateManager::get()->escapePressed();
     }
 }
@@ -124,27 +140,12 @@ void GrandPrixEditorScreen::eventCallback(Widget* widget, const std::string& nam
 // -----------------------------------------------------------------------------
 void GrandPrixEditorScreen::init()
 {
-    if (grand_prix_manager->getNumberOfGrandPrix() > 0)
-    {
-        if (m_selection == NULL)
-        {
-            loadGPList();
-            setSelection (grand_prix_manager->getGrandPrix(0));
-        }
-        else
-        {
-            std::string id = m_selection->getId();
-            grand_prix_manager->reload();
-            loadGPList();
-            m_selection = grand_prix_manager->editGrandPrix(id);
-            m_selection->reload();
-            setSelection (m_selection);
-        }
-    }
-    else
-    {
-        loadGPList();
-    }
+    RibbonWidget* tabs = getWidget<RibbonWidget>("gpgroups");
+    assert (tabs != NULL);
+
+    tabs->select (StringUtils::toString(m_gpgroup), PLAYER_ID_GAME_MASTER);
+    loadGPList();
+    setSelection(m_selection);
 }
 
 // -----------------------------------------------------------------------------
@@ -154,11 +155,25 @@ void GrandPrixEditorScreen::setSelection (const GrandPrixData* gpdata)
     assert(gpname_widget != NULL);
     DynamicRibbonWidget* gplist_widget = getWidget<DynamicRibbonWidget>("gplist");
     assert (gplist_widget != NULL);
+    DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
+    assert(tracks_widget != NULL);
 
-    m_selection = grand_prix_manager->editGrandPrix(gpdata->getId());
-    gpname_widget->setText (gpdata->getName(), true);
-    gplist_widget->setSelection(m_selection->getId(), PLAYER_ID_GAME_MASTER, true);
-    loadTrackList (gpdata->getId());
+    if (gpdata == NULL)
+    {
+        m_selection = NULL;
+        gpname_widget->setText (_("Please select a Grand Prix"), true);
+        tracks_widget->clearItems();
+        tracks_widget->updateItemDisplay();
+    }
+    else
+    {
+        m_selection = grand_prix_manager->editGrandPrix(gpdata->getId());
+        gpname_widget->setText(translations->fribidize(gpdata->getName()), true);
+        gplist_widget->setSelection(m_selection->getId(), PLAYER_ID_GAME_MASTER, true);
+        loadTrackList (gpdata->getId());
+    }
+
+    enableButtons();
 }
 
 // -----------------------------------------------------------------------------
@@ -174,7 +189,7 @@ void GrandPrixEditorScreen::loadTrackList (const std::string& gpname)
     const std::vector<std::string> tracks = gp->getTrackNames(true);
 
     tracks_widget->clearItems();
-    tracks_widget->setItemCountHint(tracks.size());
+    tracks_widget->setItemCountHint((int)tracks.size());
     for (unsigned int t = 0; t < tracks.size(); t++)
     {
         Track* curr = track_manager->getTrack(tracks[t]);
@@ -205,6 +220,9 @@ void GrandPrixEditorScreen::loadGPList()
     // Reset GP list everytime (accounts for locking changes, etc.)
     gplist_widget->clearItems();
 
+    // ensures that no GP and no track is NULL
+    grand_prix_manager->checkConsistency();
+
     // Build GP list
     for (unsigned int i = 0; i < grand_prix_manager->getNumberOfGrandPrix(); i++)
     {
@@ -215,27 +233,18 @@ void GrandPrixEditorScreen::loadGPList()
         for (unsigned int t=0; t<tracks.size(); t++)
         {
             Track* track = track_manager->getTrack(tracks[t]);
-            if (track == NULL)
-            {
-                Log::warn("GrandPrixEditor",
-                    "Grand Prix '%s' refers to track '%s', which does not exist\n",
-                    gp->getId().c_str(), tracks[t].c_str());
-            }
-            else
-            {
-                sshot_files.push_back(track->getScreenshotFile());
-            }
+            sshot_files.push_back(track->getScreenshotFile());
         }
-        if (sshot_files.size() == 0)
-        {
-            Log::warn("GrandPrixEditor",
-                "Grand Prix '%s' does not contain any valid track\n",
-                gp->getId().c_str());
-            sshot_files.push_back("gui/main_help.png");
-        }
+        if (sshot_files.empty())
+            sshot_files.push_back(file_manager->getAsset(FileManager::GUI,"main_help.png"));
 
-        gplist_widget->addAnimatedItem(translations->fribidize(gp->getName()), gp->getId(),
-            sshot_files, 2.0f, 0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+        if (m_gpgroup == GrandPrixData::GP_NONE || m_gpgroup == gp->getGroup())
+        {
+            gplist_widget->addAnimatedItem(
+                translations->fribidize(gp->getName()),
+                gp->getId(), sshot_files, 2.0f, 0,
+                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+        }
     }
 
     gplist_widget->updateItemDisplay();
@@ -247,20 +256,42 @@ void GrandPrixEditorScreen::showEditScreen(GrandPrixData* gp)
     assert(gp != NULL);
     EditGPScreen* edit = EditGPScreen::getInstance();
     edit->setSelectedGP(gp);
-    StateManager::get()->pushScreen(edit);
+    edit->push();
+}
+
+// -----------------------------------------------------------------------------
+void GrandPrixEditorScreen::enableButtons()
+{
+    IconButtonWidget* copy_button = getWidget<IconButtonWidget>("copy");
+    IconButtonWidget* edit_button = getWidget<IconButtonWidget>("edit");
+    IconButtonWidget* remove_button = getWidget<IconButtonWidget>("remove");
+    IconButtonWidget* rename_button = getWidget<IconButtonWidget>("rename");
+    assert(copy_button != NULL);
+    assert(edit_button != NULL);
+    assert(remove_button != NULL);
+    assert(rename_button != NULL);
+
+    bool b = m_selection && m_selection->getNumberOfTracks() > 0;
+    copy_button->setActive(b);
+
+    b = m_selection && m_selection->isEditable();
+    edit_button->setActive(b);
+    remove_button->setActive(b);
+    rename_button->setActive(b);
 }
 
 // -----------------------------------------------------------------------------
 void GrandPrixEditorScreen::onNewGPWithName(const stringw& newName)
 {
-    if (m_action == "copy")
+    if (m_action == "copy" && m_selection != NULL)
     {
         setSelection(grand_prix_manager->copy(m_selection->getId(), newName));
     }
-    else if (m_action == "rename")
+    else if (m_action == "rename" && m_selection != NULL)
     {
         m_selection->setName(newName);
         m_selection->writeToFile();
+        setSelection(grand_prix_manager->getGrandPrix(m_selection->getId()));
     }
     else if (m_action == "new")
     {
@@ -268,14 +299,14 @@ void GrandPrixEditorScreen::onNewGPWithName(const stringw& newName)
     }
 
     loadGPList();
-    if (m_action != "rename")
+    if (m_action != "rename" && m_selection != NULL)
         showEditScreen(m_selection);
 }
 
 // -----------------------------------------------------------------------------
 void GrandPrixEditorScreen::onConfirm()
 {
-    if (m_action == "remove")
+    if (m_action == "remove" && m_selection != NULL)
     {
         grand_prix_manager->remove(m_selection->getId());
         loadGPList();
@@ -283,4 +314,17 @@ void GrandPrixEditorScreen::onConfirm()
             setSelection (grand_prix_manager->getGrandPrix(0));
     }
     ModalDialog::dismiss();
+}
+
+// ----------------------------------------------------------------------------
+const core::stringw GrandPrixEditorScreen::getGroupName(enum GrandPrixData::GPGroupType group)
+{
+    switch (group)
+    {
+        case GrandPrixData::GP_NONE:          return _("All");
+        case GrandPrixData::GP_STANDARD:      return _("Standard");
+        case GrandPrixData::GP_USER_DEFINED:  return _("User defined");
+        case GrandPrixData::GP_ADDONS:        return _("Add-Ons");
+        default:                              return L"???";
+    }
 }

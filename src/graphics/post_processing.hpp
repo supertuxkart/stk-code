@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 the SuperTuxKart-Team
+//  Copyright (C) 2011-2015 the SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,7 +22,8 @@
 #include "S3DVertex.h"
 #include "SMaterial.h"
 #include "graphics/camera.hpp"
-#include "graphics/glwrap.hpp"
+
+class FrameBuffer;
 
 #include <vector>
 
@@ -61,8 +62,6 @@ private:
 
     video::ITexture *m_areamap;
 
-    u32 m_sunpixels;
-
     void setMotionBlurCenterY(const u32 num, const float y);
 
 public:
@@ -70,39 +69,49 @@ public:
     virtual     ~PostProcessing();
 
     void         reset();
-    /** Those should be called around the part where we render the scene to be post-processed */
+    /** Those should be called around the part where we render the scene to be
+     *  post-processed */
     void         begin();
     void         update(float dt);
 
     /** Generate diffuse and specular map */
-    void         renderSunlight();
-    void         renderShadowedSunlight(const std::vector<core::matrix4> &sun_ortho_matrix, unsigned depthtex);
+    void         renderSunlight(const core::vector3df &direction,
+                                const video::SColorf &col);
 
-    void renderFog();
     void renderSSAO();
-    void renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff);
-    void renderGI(const core::matrix4 &RHMatrix, const core::vector3df &rh_extend, unsigned shr, unsigned shg, unsigned shb);
-
+    void renderEnvMap(unsigned skycubemap);
+    void renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB, 
+                       const core::matrix4 &rh_matrix,
+                       const core::vector3df &rh_extend);
+    void renderGI(const core::matrix4 &rh_matrix,
+                  const core::vector3df &rh_extend,
+                  const FrameBuffer &fb);
     /** Blur the in texture */
-    void renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
-    void renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
-    void renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
+    void renderGaussian3Blur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary);
+
+    void renderGaussian6Blur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary,
+                              float sigmaV, float sigmaH);
+	void renderHorizontalBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary);
+
+    void renderGaussian6BlurLayer(FrameBuffer &in_fbo, size_t layer,
+                                  float sigmaH, float sigmaV);
+    void renderGaussian17TapBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary);
 
     /** Render tex. Used for blit/texture resize */
-    void renderPassThrough(unsigned tex);
+    void renderPassThrough(unsigned tex, unsigned width, unsigned height);
     void renderTextureLayer(unsigned tex, unsigned layer);
     void applyMLAA();
 
-    void renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBuffer &out_fbo);
+    void renderMotionBlur(unsigned cam, const FrameBuffer &in_fbo,
+                          FrameBuffer &out_fbo);
     void renderGlow(unsigned tex);
+    void renderLightning(core::vector3df intensity);
 
     /** Render the post-processed scene */
     FrameBuffer *render(scene::ICameraSceneNode * const camnode, bool isRace);
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);
-
-    void         setSunPixels(const u32 in) { m_sunpixels = in; }
-};
+};   // class PostProcessing
 
 #endif // HEADER_POST_PROCESSING_HPP

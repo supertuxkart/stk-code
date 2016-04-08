@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 
 #include "guiengine/screen.hpp"
 #include "karts/kart_model.hpp"
+#include "states_screens/grand_prix_cutscene.hpp"
 
 #include <vector>
 #include <string>
@@ -33,11 +34,13 @@ class TrackObject;
   * \brief Screen shown at the end of a Grand Prix
   * \ingroup states_screens
   */
-class GrandPrixLose : public GUIEngine::CutsceneScreen, public GUIEngine::ScreenSingleton<GrandPrixLose>
+class GrandPrixLose :
+    public GrandPrixCutscene,
+    public GUIEngine::ScreenSingleton<GrandPrixLose>
 {
     friend class GUIEngine::ScreenSingleton<GrandPrixLose>;
 
-    GrandPrixLose();
+    GrandPrixLose(): GrandPrixCutscene("grand_prix_lose.stkgui") {};
 
     /** Global evolution of time */
     float m_global_time;
@@ -52,29 +55,14 @@ class GrandPrixLose : public GUIEngine::CutsceneScreen, public GUIEngine::Screen
     float m_kart_x, m_kart_y, m_kart_z;
 
 public:
-
-    virtual void onCutsceneEnd() OVERRIDE;
-
-    virtual bool onEscapePressed() OVERRIDE;
-    
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() OVERRIDE;
-
-    /** \brief implement optional callback from parent class GUIEngine::Screen */
-    void onUpdate(float dt) OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
+    // implement callbacks from parent class GUIEngine::Screen
     void init() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    void tearDown() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name,
-                       const int playerID) OVERRIDE;
-
+    void loadedFromFile() OVERRIDE;
+    void onCutsceneEnd() OVERRIDE;
+    void onUpdate(float dt) OVERRIDE;
     /** \brief set which karts lost this GP */
     void setKarts(std::vector<std::string> ident);
+    MusicInformation* getInGameMenuMusic() const OVERRIDE;
 };
 
 #endif

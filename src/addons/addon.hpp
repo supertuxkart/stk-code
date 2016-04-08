@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2015 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -127,7 +127,6 @@ private:
     static SortOrder m_sort_order;
 
 public:
-         Addon() {};
          /** Initialises the object from an XML node. */
          Addon(const XMLNode &xml);
 

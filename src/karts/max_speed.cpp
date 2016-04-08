@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013  Joerg Henrichs
+//  Copyright (C) 2010-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -51,6 +51,8 @@ MaxSpeed::MaxSpeed(AbstractKart *kart)
     // Initialise m_add_engine_force since it might be queried before
     // update() is called.
     m_add_engine_force  = 0;
+    // This can be used if command line option -N is used
+    m_current_max_speed = 0;
 }   // MaxSpeed
 
 // ----------------------------------------------------------------------------
@@ -60,7 +62,7 @@ MaxSpeed::MaxSpeed(AbstractKart *kart)
  */
 void MaxSpeed::reset()
 {
-    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed();
+    m_current_max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
     m_min_speed         = -1.0f;
 
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
@@ -240,7 +242,7 @@ void MaxSpeed::update(float dt)
     }
 
     m_add_engine_force  = 0;
-    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed();
+    m_current_max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
 
     // Then add the speed increase from each category
     // ----------------------------------------------

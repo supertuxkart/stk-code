@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,16 +16,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 #include "online/profile_manager.hpp"
 
 #include "online/online_profile.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
+#include <algorithm>
+#include <assert.h>
 #include <sstream>
 #include <stdlib.h>
-#include <assert.h>
 
 using namespace Online;
 
@@ -39,7 +39,7 @@ ProfileManager* ProfileManager::m_profile_manager = NULL;
  */
 ProfileManager::ProfileManager()
 {
-    m_max_cache_size = 2;
+    m_max_cache_size = 100;
     m_currently_visiting = NULL;
 }   // ProfileManager
 
@@ -50,7 +50,8 @@ ProfileManager::~ProfileManager()
 {
     clearPersistent();
     ProfilesMap::iterator it;
-    for (it = m_profiles_cache.begin(); it != m_profiles_cache.end(); ++it) {
+    for (it = m_profiles_cache.begin(); it != m_profiles_cache.end(); ++it)
+    {
         delete it->second;
     }
 }   // ~ProfileManager
@@ -72,8 +73,8 @@ int  ProfileManager::guaranteeCacheSize(unsigned int min_num)
             min_num = 100;
         m_max_cache_size = min_num;
     }
-    return m_max_cache_size;
 
+    return m_max_cache_size;
 }   // guaranteeCacheSize
 
 // ------------------------------------------------------------------------
@@ -88,7 +89,8 @@ OnlineProfile* ProfileManager::getProfileByID(const uint32_t id)
         return m_profiles_persistent[id];
     if (isInCache(id))
         return m_profiles_cache[id];
-    //FIXME not able to get! Now this should actually fetch the info from the
+
+    // FIXME not able to get! Now this should actually fetch the info from the
     // server, but I haven't come up with a good asynchronous idea yet.
     return NULL;
 }   // getProfileByID
@@ -121,26 +123,30 @@ void ProfileManager::addToCache(OnlineProfile * profile)
 void ProfileManager::addDirectToCache(OnlineProfile* profile)
 {
     assert(profile != NULL);
-    if (m_profiles_cache.size() == m_max_cache_size)
+    if (m_profiles_cache.size() >= m_max_cache_size)
     {
-        // We have to replace a cached entry, find one entry that
-        // doesn't have its used bit set
+        // Cache already full, try to find entries that
+        // don't have their used bit set
         ProfilesMap::iterator iter;
         for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end();)
         {
             if (!iter->second->getCacheBit())
             {
+                updateAllFriendFlags(iter->second);
                 delete iter->second;
-                m_profiles_cache.erase(iter);
-                break;
+                iter = m_profiles_cache.erase(iter);
+                // Keep on deleting till enough space is available.
+                if(m_profiles_cache.size()<m_max_cache_size)
+                    break;
             }
             else
+            {
                 ++iter;
-        }
+            }
+        } // for profile in cache
     }
-    m_profiles_cache[profile->getID()] = profile;
-    assert(m_profiles_cache.size() <= m_max_cache_size);
 
+    m_profiles_cache[profile->getID()] = profile;
 }   // addDirectToCache
 
 // ------------------------------------------------------------------------
@@ -155,8 +161,47 @@ bool ProfileManager::isInCache(const uint32_t id)
         updateCacheBits(i->second);
         return true;
     }
+
     return false;
 }   // isInCache
+
+// ------------------------------------------------------------------------
+/** This function is called when the specified profile id is removed from
+ *  cache. It will search all currently cached profiles that have the
+ *  'friends fetched' flag set, and reset that flag if the profile id is
+ *  one of their friends. This fixes the problem that friend lists can
+ *  get shortened if some of their friends are being pushed out of 
+ *  cache. 
+ */
+void ProfileManager::updateFriendFlagsInCache(const ProfilesMap &cache,
+                                              uint32_t profile_id)
+{
+    ProfilesMap::const_iterator i;
+    for(i=cache.begin(); i!=cache.end(); i++)
+    {
+        // Profile has no friends fetched, no need to test
+        if(!(*i).second->hasFetchedFriends()) continue;
+        const OnlineProfile::IDList &friend_list = (*i).second->getFriends();
+        OnlineProfile::IDList::const_iterator frnd;
+        frnd = std::find(friend_list.begin(), friend_list.end(), profile_id);
+        if(frnd!=friend_list.end())
+            (*i).second->unsetHasFetchedFriends();
+    }
+}   // updateFriendFlagsInCache
+
+// ------------------------------------------------------------------------
+/** This function is called when the specified profile is removed from
+ *  cache. It searches through all caches for profiles X, that have the
+ *  given profile as friend, and then reset the 'friends fetched' flag
+ *  in profile X. Otherwise if a profile is pushed out of the cache,
+ *  all friends of this profile in cache will have an incomplete list
+ *  of friends.
+ */
+void ProfileManager::updateAllFriendFlags(const OnlineProfile *profile)
+{
+    updateFriendFlagsInCache(m_profiles_persistent, profile->getID());
+    updateFriendFlagsInCache(m_profiles_cache,      profile->getID());
+}   // updateAllFriendFlags
 
 // ------------------------------------------------------------------------
 /** This function updates the cache bits of all cached entries. It will
@@ -171,7 +216,7 @@ bool ProfileManager::isInCache(const uint32_t id)
 void ProfileManager::updateCacheBits(OnlineProfile * profile)
 {
     profile->setCacheBit(true);
-    if (m_profiles_cache.size() == m_max_cache_size)
+    if (m_profiles_cache.size() >= m_max_cache_size)
     {
         ProfilesMap::iterator iter;
         for (iter = m_profiles_cache.begin();
@@ -180,6 +225,7 @@ void ProfileManager::updateCacheBits(OnlineProfile * profile)
             if (!iter->second->getCacheBit())
                 return;
         }
+
         // All cache bits are set! Set them all to zero except the one
         // currently being visited
         for (iter = m_profiles_cache.begin();
@@ -189,7 +235,6 @@ void ProfileManager::updateCacheBits(OnlineProfile * profile)
         }
         profile->setCacheBit(true);
     }
-
 }   // updateCacheBits
 
 // ------------------------------------------------------------------------
@@ -208,7 +253,7 @@ bool ProfileManager::inPersistent(const uint32_t id)
  *  the friends, while the other could have fetched the achievements.)
  *  \param profile The profile to make persistent.
  */
-void ProfileManager::addPersistent(OnlineProfile * profile)
+OnlineProfile* ProfileManager::addPersistent(OnlineProfile * profile)
 {
     if (inPersistent(profile->getID()))
     {
@@ -218,6 +263,8 @@ void ProfileManager::addPersistent(OnlineProfile * profile)
     {
         m_profiles_persistent[profile->getID()] = profile;
     }
+
+    return m_profiles_persistent[profile->getID()];
 }   // addPersistent
 
 // ------------------------------------------------------------------------
@@ -232,10 +279,13 @@ void ProfileManager::deleteFromPersistent(const uint32_t id)
         m_profiles_persistent.erase(id);
     }
     else
+    {
         Log::warn("ProfileManager",
                   "Tried to remove profile with id %d from persistent while "
                   "not present", id);
+    }
 }   // deleteFromPersistent
+
 
 // ------------------------------------------------------------------------
 /** Deletes all persistent profiles.
@@ -265,10 +315,11 @@ void ProfileManager::moveToCache(const uint32_t id)
         addToCache(profile);
     }
     else
+    {
         Log::warn("ProfileManager",
                   "Tried to move profile with id %d from persistent to "
                   "cache while not present", id);
+    }
 }   // moveToCache
-
 
 } // namespace Online

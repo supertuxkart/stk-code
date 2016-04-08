@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -152,6 +152,8 @@ namespace GUIEngine
           */
         void setLabel(const unsigned int id, irr::core::stringw new_name);
         
+        void setItemVisible(const unsigned int id, bool visible);
+
         /** Returns the ID of the item, or -1 if not found */
         int findItemNamed(const char* internalName);
         
@@ -164,7 +166,7 @@ namespace GUIEngine
           * \pre only valid for ribbons that take text-only contents
           *       (e.g. tab bars)
           */
-        void addTextChild(const wchar_t* text, const std::string id);
+        void addTextChild(const wchar_t* text, const std::string &id);
         
         
         /** \brief Dynamically (at runtime) add an icon item to this ribbon.

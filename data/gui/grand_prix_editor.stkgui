@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
+    <div x="2%" y="1%" width="96%" height="98%" layout="vertical-row" >
+
+        <header width="80%" I18N="Title in grand prix editor screen" text="Grand Prix editor"
+                align="center" text_align="center" />
+
+        <spacer height="20" />
+
+        <box proportion="4" width="100%" layout="vertical-row">
+            <ribbon_grid id="gplist" proportion="1" width="100%" square_items="true"
+                label_location="each" align="left" max_rows="2" child_width="160"
+                child_height="120" keep_selection="true" />
+        </box>
+
+        <!-- Populated dynamically at runtime -->
+        <tabs width="100%" height="30" id="gpgroups"> </tabs>
+
+        <spacer height="20" />
+
+        <box proportion="2" width="100%" layout="vertical-row">
+            <label id="gpname" text_align="center" width="100%" text="" />
+            <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
+                label_location="each" align="left" max_rows="1"
+                child_width="160" child_height="120" />
+        </box>
+
+        <spacer height="20" />
+
+        <buttonbar proportion="1" id="menu" height="135" width="100%" align="center">
+            <icon-button id="new" width="128" height="128" icon="gui/gp_new.png"
+                I18N="Menu item" text="New" />
+            <icon-button id="copy" width="128" height="128" icon="gui/gp_copy.png"
+                I18N="Menu item" text="Copy" />
+            <icon-button id="edit" width="128" height="128" icon="gui/edit.png"
+                I18N="Menu item" text="Edit" />
+            <icon-button id="remove" width="128" height="128" icon="gui/gp_remove.png"
+                I18N="Menu item" text="Remove" />
+            <icon-button id="rename" width="128" height="128" icon="gui/rename.png"
+                I18N="Menu item" text="Rename" />
+        </buttonbar>
+
+    </div>
+</stkgui>

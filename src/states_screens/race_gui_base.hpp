@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -68,9 +68,6 @@ public:
     };   // KartIconDisplayInfo
 
 private:
-    /** Delight in seconds between lightnings. */
-    float m_lightning;
-
     /** True if unimportant messags (like item messages) should not
      *  be displayed. */
     bool  m_ignore_unimportant_messages;
@@ -128,9 +125,6 @@ private:
 
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go, m_string_goal;
-
-    /** Translated string 'Top %d' displayed every frame. */
-    core::stringw    m_string_top;
 
     /** The position of the referee for all karts. */
     std::vector<Vec3> m_referee_pos;
@@ -241,9 +235,6 @@ public:
                   getMiniMapSize() const = 0;
     // ------------------------------------------------------------------------
     virtual void clearAllMessages() { m_messages.clear(); }
-
-    /** Set the flag that a lightning should be shown. */
-    void doLightning() { m_lightning = 1.0f; }
 
     void drawGlobalPlayerIcons(int bottom_margin);
 

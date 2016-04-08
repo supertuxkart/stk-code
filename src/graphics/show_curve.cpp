@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
 
 #include "graphics/show_curve.hpp"
 
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/vec3.hpp"
 
@@ -33,7 +34,7 @@ ShowCurve::ShowCurve(float width, float height,
 {
     m_color = color;
     addEmptyMesh();
-    m_scene_node      = irr_driver->addMesh(m_mesh);
+    m_scene_node      = irr_driver->addMesh(m_mesh, "showcurve");
     // After addMesh ref count is 1 (for the attachment to the
     // scene). We keep a copy here, so increase the ref count.
     m_scene_node->grab();
@@ -64,6 +65,9 @@ void ShowCurve::addEmptyMesh()
     m_mesh            = irr_driver->createQuadMesh(&m,
                                                    /*create_one_quad*/ false);
     m_buffer          = m_mesh->getMeshBuffer(0);
+    m_buffer->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+    m_buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+
     assert(m_buffer->getVertexType()==video::EVT_STANDARD);
 }   // addEmptyMesh
 

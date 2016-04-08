@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,9 +18,6 @@
 
 #include "states_screens/grand_prix_win.hpp"
 
-#include <SColor.h>
-#include <iostream>
-
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
@@ -28,6 +25,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -35,6 +33,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
@@ -42,12 +41,16 @@
 #include "tracks/track_object_manager.hpp"
 #include "utils/translation.hpp"
 
-#include <IGUIEnvironment.h>
 #include <ICameraSceneNode.h>
-#include <ISceneManager.h>
-#include <ILightSceneNode.h>
+#include <IGUIEnvironment.h>
 #include <IGUIImage.h>
+#include <ILightSceneNode.h>
 #include <IMeshSceneNode.h>
+#include <ISceneManager.h>
+#include <SColor.h>
+
+#include <iostream>
+
 
 using namespace irr::core;
 using namespace irr::gui;
@@ -59,30 +62,21 @@ const float KARTS_DELTA_Y = -0.55f;
 const float KARTS_INITIAL_Z = -10.0f;
 const float KARTS_DEST_Z = -1.8f;
 const float INITIAL_Y = 0.0f;
-const float INITIAL_PODIUM_Y = -1.27f;
+const float INITIAL_PODIUM_Y = -1.33f;
 const float PODIUM_HEIGHT[3] = { 0.650f, 1.0f, 0.30f };
 
 DEFINE_SCREEN_SINGLETON( GrandPrixWin );
 
 // -------------------------------------------------------------------------------------
 
-GrandPrixWin::GrandPrixWin() : CutsceneScreen("grand_prix_win.stkgui")
+GrandPrixWin::GrandPrixWin() : GrandPrixCutscene("grand_prix_win.stkgui")
 {
-    m_kart_node[0] = NULL;
-    m_kart_node[1] = NULL;
-    m_kart_node[2] = NULL;
-
-    m_podium_steps[0] = NULL;
-    m_podium_steps[1] = NULL;
-    m_podium_steps[2] = NULL;
-
+    for (int i = 0; i < 3; i++)
+    {
+        m_kart_node[i] = NULL;
+        m_podium_steps[i] = NULL;
+    }
 }   // GrandPrixWin
-
-// -------------------------------------------------------------------------------------
-
-GrandPrixWin::~GrandPrixWin()
-{
-}
 
 // -------------------------------------------------------------------------------------
 
@@ -99,28 +93,14 @@ void GrandPrixWin::onCutsceneEnd()
         m_unlocked_label = NULL;
     }
 
-    TrackObjectManager* tobjman = World::getWorld()->getTrack()->getTrackObjectManager();
-    if (m_kart_node[0] != NULL)
-        m_kart_node[0]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-    if (m_kart_node[1] != NULL)
-        m_kart_node[1]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-    if (m_kart_node[2] != NULL)
-        m_kart_node[2]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-
-    m_kart_node[0] = NULL;
-    m_kart_node[1] = NULL;
-    m_kart_node[2] = NULL;
-
-    m_podium_steps[0] = NULL;
-    m_podium_steps[1] = NULL;
-    m_podium_steps[2] = NULL;
+    for (int i = 0; i < 3; i++)
+    {
+        if (m_kart_node[i] != NULL)
+            m_kart_node[i]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+        m_kart_node[i] = NULL;
+        m_podium_steps[i] = NULL;
+    }
 }
-
-// -------------------------------------------------------------------------------------
-
-void GrandPrixWin::loadedFromFile()
-{
-}   // loadedFromFile
 
 // -------------------------------------------------------------------------------------
 
@@ -136,6 +116,7 @@ void GrandPrixWin::init()
     World::getWorld()->setPhase(WorldStatus::RACE_PHASE);
 
 
+    saveGPButton();
     if (PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size() > 0)
     {
         const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
@@ -190,23 +171,8 @@ void GrandPrixWin::init()
     m_global_time = 0.0f;
     m_phase = 1;
 
-    sfx_manager->quickSound("gp_end");
+    SFXManager::get()->quickSound("gp_end");
 }   // init
-
-// -------------------------------------------------------------------------------------
-
-bool GrandPrixWin::onEscapePressed()
-{
-    ((CutsceneWorld*)World::getWorld())->abortCutscene();
-    return false;
-}
-
-// -------------------------------------------------------------------------------------
-
-void GrandPrixWin::tearDown()
-{
-    Screen::tearDown();
-}   // tearDown
 
 // -------------------------------------------------------------------------------------
 
@@ -228,31 +194,23 @@ void GrandPrixWin::onUpdate(float dt)
                 if (fabsf(m_kart_z[k] - KARTS_DEST_Z) > dt)
                 {
                     if (m_kart_z[k] < KARTS_DEST_Z - dt)
-                    {
                         m_kart_z[k] += dt;
-                    }
                     else if (m_kart_z[k] > KARTS_DEST_Z + dt)
-                    {
                         m_kart_z[k] -= dt;
-                    }
                     else
-                    {
                         m_kart_z[k] = KARTS_DEST_Z;
-                    }
                     karts_not_yet_done++;
                 }
 
                 core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
                 core::vector3df kart_rot(0, m_kart_rotation[k], 0);
                 core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
-                m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
+                m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false, true);
             }
         } // end for
 
         if (karts_not_yet_done == 0)
-        {
             m_phase = 2;
-        }
     }
 
     // ---- Karts Rotate
@@ -270,18 +228,20 @@ void GrandPrixWin::onUpdate(float dt)
                     core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
                     core::vector3df kart_rot(0, m_kart_rotation[k], 0);
                     core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
-                    m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
+                    m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false, true);
 
                     core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
+                    podium_pos.Y = INITIAL_PODIUM_Y;
                     core::vector3df podium_rot(0, m_kart_rotation[k], 0);
-                    m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false);
+                    m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false, true);
 
                     karts_not_yet_done++;
                 }
             }
         } // end for
 
-        if (karts_not_yet_done == 0) m_phase = 3;
+        if (karts_not_yet_done == 0)
+            m_phase = 3;
     }
 
     // ---- Podium Rises
@@ -298,17 +258,16 @@ void GrandPrixWin::onUpdate(float dt)
                     core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
                     core::vector3df kart_rot(0, m_kart_rotation[k], 0);
                     core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
-                    m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
+                    m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false, true);
 
 
                     core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
                     core::vector3df podium_rot(0, m_kart_rotation[k], 0);
                     podium_pos.Y = INITIAL_PODIUM_Y - (INITIAL_Y - m_kart_y[k]) - KARTS_DELTA_Y;
-                    m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false);
+                    m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false, true);
                 }
             }
         } // end for
-
     }
 
 
@@ -325,17 +284,6 @@ void GrandPrixWin::onUpdate(float dt)
                                     true/* center h */, true /* center v */ );
 }   // onUpdate
 
-// -------------------------------------------------------------------------------------
-
-void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
-                                            const std::string& name,
-                                            const int playerID)
-{
-    if (name == "continue")
-    {
-        ((CutsceneWorld*)World::getWorld())->abortCutscene();
-    }
-}   // eventCallback
 
 // -------------------------------------------------------------------------------------
 
@@ -367,9 +315,11 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         core::vector3df kart_rot(0, 0, 0);
         core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
 
-        //FIXME: it's not ideal that both the track object and the presentation know the initial coordinates of the object
-        TrackObjectPresentationSceneNode* presentation = new TrackObjectPresentationSceneNode(
-            kart_main_node, kart_pos, kart_rot, kart_scale);
+        //FIXME: it's not ideal that both the track object and the presentation
+        // know the initial coordinates of the object
+        TrackObjectPresentationSceneNode* presentation = 
+            new TrackObjectPresentationSceneNode(kart_pos, kart_rot, kart_scale,
+                                                 kart_main_node);
         TrackObject* tobj = new TrackObject(kart_pos, kart_rot, kart_scale,
             "ghost", presentation, false /* isDynamic */, NULL /* physics settings */);
         tobjman->insertObject(tobj);
@@ -385,18 +335,19 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         if (meshPresentation != NULL)
         {
             if (meshPresentation->getModelFile() == "gpwin_podium1.b3d")
-            {
                 m_podium_steps[0] = currObj;
-            }
             else if (meshPresentation->getModelFile() == "gpwin_podium2.b3d")
-            {
                 m_podium_steps[1] = currObj;
-            }
             else if (meshPresentation->getModelFile() == "gpwin_podium3.b3d")
-            {
                 m_podium_steps[2] = currObj;
-            }
         }
+    }
+
+    for (int k=0; k<3; k++)
+    {
+        core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
+        podium_pos.Y = INITIAL_PODIUM_Y;
+        m_podium_steps[k]->move(podium_pos, core::vector3df(0, 0, 0), core::vector3df(1.0f, 1.0f, 1.0f), false, true);
     }
 
     assert(m_podium_steps[0] != NULL);
@@ -405,3 +356,12 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
 }   // setKarts
 
 // -------------------------------------------------------------------------------------
+
+MusicInformation* GrandPrixWin::getInGameMenuMusic() const
+{
+    MusicInformation* mi = music_manager->getMusicInformation("win_theme.music");
+    return mi;
+}
+
+// -------------------------------------------------------------------------------------
+

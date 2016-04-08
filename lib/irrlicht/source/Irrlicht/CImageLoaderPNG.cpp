@@ -258,7 +258,7 @@ IImage* CImageLoaderPng::loadImage(io::IReadFile* file) const
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		delete [] RowPointers;
 		image->unlock();
-		delete [] image;
+		delete image;
 		return 0;
 	}
 

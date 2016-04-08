@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,7 +20,7 @@
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
-#include "states_screens/options_screen_input2.hpp"
+#include "states_screens/options_screen_device.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
@@ -44,10 +44,16 @@ GUIEngine::EventPropagation PressAKeyDialog::processEvent(const std::string& eve
         dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
+    else if (eventSource == "assignNone")
+    {
+        Input simulatedInput;
+        OptionsScreenDevice::getInstance()->gotSensedInput(simulatedInput);
+        return GUIEngine::EVENT_BLOCK;
+    }
     else if (eventSource == "assignEsc")
     {
         Input simulatedInput(Input::IT_KEYBOARD, 0 /* deviceID */, KEY_ESCAPE);
-        OptionsScreenInput2::getInstance()->gotSensedInput(simulatedInput);
+        OptionsScreenDevice::getInstance()->gotSensedInput(simulatedInput);
         return GUIEngine::EVENT_BLOCK;
     }
 

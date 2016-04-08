@@ -1,16 +1,18 @@
 uniform sampler2D tex;
-uniform float low;
 
 out vec4 FragColor;
 
 vec3 getCIEYxy(vec3 rgbColor);
+vec3 getRGBFromCIEXxy(vec3 YxyColor);
 
 void main()
 {
     vec2 uv = gl_FragCoord.xy / 512;
     vec3 col = texture(tex, uv).xyz;
-    float luma = getCIEYxy(col).x;
+    vec3 Yxy = getCIEYxy(col);
+    vec3 WhiteYxy = getCIEYxy(vec3(1.));
 
-    col *= smoothstep(1., 10., luma);
-    FragColor = vec4(col, 1.0);
+    Yxy.x = smoothstep(WhiteYxy.x, WhiteYxy.x * 4, Yxy.x);
+
+    FragColor = vec4(max(vec3(0.), getRGBFromCIEXxy(Yxy)), 1.0);
 }

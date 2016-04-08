@@ -9,10 +9,7 @@
 #include "IWriteFile.h"
 #include "CZipReader.h"
 #include "CMountPointReader.h"
-#include "CPakReader.h"
-#include "CNPKReader.h"
 #include "CTarReader.h"
-#include "CWADReader.h"
 #include "CFileList.h"
 #include "CXMLReader.h"
 #include "CXMLWriter.h"
@@ -58,20 +55,8 @@ CFileSystem::CFileSystem()
 	//! reset current working directory
 	getWorkingDirectory();
 
-#ifdef __IRR_COMPILE_WITH_PAK_ARCHIVE_LOADER_
-	ArchiveLoader.push_back(new CArchiveLoaderPAK(this));
-#endif
-
-#ifdef __IRR_COMPILE_WITH_NPK_ARCHIVE_LOADER_
-	ArchiveLoader.push_back(new CArchiveLoaderNPK(this));
-#endif
-
 #ifdef __IRR_COMPILE_WITH_TAR_ARCHIVE_LOADER_
 	ArchiveLoader.push_back(new CArchiveLoaderTAR(this));
-#endif
-
-#ifdef __IRR_COMPILE_WITH_WAD_ARCHIVE_LOADER_
-	ArchiveLoader.push_back(new CArchiveLoaderWAD(this));
 #endif
 
 #ifdef __IRR_COMPILE_WITH_MOUNT_ARCHIVE_LOADER_

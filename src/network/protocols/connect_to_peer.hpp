@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,40 +16,49 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef CONNECT_TO_SERVER_HPP
-#define CONNECT_TO_SERVER_HPP
+#ifndef CONNECT_TO_PEER_HPP
+#define CONNECT_TO_PEER_HPP
 
 #include "network/protocol.hpp"
-#include "network/types.hpp"
-#include <string>
+#include "network/transport_address.hpp"
+#include "utils/cpp2011.hpp"
 
+/** One instance of this is started for every peer who tries to
+ *  connect to this server.
+ */
 class ConnectToPeer : public Protocol, public CallbackObject
 {
-    public:
-        ConnectToPeer(uint32_t peer_id);
-        virtual ~ConnectToPeer();
+protected:
 
-        virtual bool notifyEventAsynchronous(Event* event);
-        virtual void setup();
-        virtual void update() {}
-        virtual void asynchronousUpdate();
+    TransportAddress m_peer_address;
+    uint32_t m_peer_id;
 
-    protected:
-        TransportAddress m_peer_address;
-        TransportAddress m_public_address;
-        uint32_t m_peer_id;
-        uint32_t m_current_protocol_id;
+    /** Pointer to the protocol which is monitored for state changes. */
+    Protocol *m_current_protocol;
 
-        enum STATE
-        {
-            NONE,
-            WAITING_PEER_ADDRESS,
-            CONNECTING,
-            CONNECTED,
-            DONE,
-            EXITING
-        };
-        STATE m_state;
-};
+    /** True if this is a LAN connection. */
+    bool m_is_lan;
+
+    enum STATE
+    {
+        NONE,
+        RECEIVED_PEER_ADDRESS,
+        CONNECTING,
+        CONNECTED,
+        DONE,
+        EXITING
+    }  m_state;
+
+public:
+             ConnectToPeer(uint32_t peer_id);
+             ConnectToPeer(const TransportAddress &address);
+    virtual ~ConnectToPeer();
+
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
+    virtual void setup() OVERRIDE;
+    virtual void update(float dt) OVERRIDE {}
+    virtual void asynchronousUpdate() OVERRIDE;
+    virtual void callback(Protocol *protocol) OVERRIDE;
+};   // class ConnectToPeer
 
 #endif // CONNECT_TO_SERVER_HPP

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 #include "guiengine/screen.hpp"
 
 #include "io/file_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/layout_manager.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -92,6 +93,15 @@ void Screen::init()
     if(m_pause_race && World::getWorld())
         World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
 }   // init
+
+// -----------------------------------------------------------------------------
+/** Displays this screen bu pushing it onto the stack of screen
+ *  in the state manager. 
+ */
+void Screen::push()
+{
+    StateManager::get()->pushScreen(this);
+}   // push
 
 // -----------------------------------------------------------------------------
 /** Prepares removal of this screen. If necessary this will unpause the
@@ -178,11 +188,11 @@ void Screen::addWidgets()
 
     addWidgetsRecursively( m_widgets );
 
-    //std::cout << "*****ScreenAddWidgets " << m_filename.c_str() << " : focusing the first widget*****\n";
+    //Log::info("Screen::AddWidgets", "%s: focusing the first widget",  m_filename.c_str());
 
     // select the first widget (for first players only; if other players need some focus the Screen must provide it).
     Widget* w = getFirstWidget();
-    //std::cout << "First widget is " << (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()) << std::endl;
+    //Log::info("Screen::AddWidgets", "First widget is %s", (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()));
     if (w != NULL) w->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     else           Log::warn("Screen::AddWidgets", "Couldn't select first widget, NULL was returned");
 }   // addWidgets
@@ -225,16 +235,14 @@ void Screen::manualRemoveWidget(Widget* w)
 /** \brief Implementing method from AbstractTopLevelContainer */
 int Screen::getWidth()
 {
-    core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-    return frame_size.Width;
+    return irr_driver->getActualScreenSize().Width;
 }
 
 // -----------------------------------------------------------------------------
 /** \brief Implementing method from AbstractTopLevelContainer */
 int Screen::getHeight()
 {
-    core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-    return frame_size.Height;
+    return irr_driver->getActualScreenSize().Height;
 }
 
 // -----------------------------------------------------------------------------

@@ -599,6 +599,18 @@ bool CGUIEnvironment::postEventFromUser(const SEvent& event)
 
 		}
 		break;
+#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+	case EET_IMPUT_METHOD_EVENT:
+		{
+			// todo : if CGUIEdit has not focus, close input method. Use WM_NOTIFY message.
+			if (Focus)
+			{
+				_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
+				return Focus->OnEvent(event);
+			}
+		}
+		break;
+#endif
 	default:
 		break;
 	} // end switch

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -35,18 +35,20 @@ namespace GUIEngine { class Widget; }
   * \brief Online profiel overview screen
   * \ingroup states_screens
   */
-class OnlineProfileAchievements : public OnlineProfileBase, public GUIEngine::ScreenSingleton<OnlineProfileAchievements>
+class BaseOnlineProfileAchievements : public OnlineProfileBase
 {
 private:
-    OnlineProfileAchievements();
 
     GUIEngine::ListWidget *     m_achievements_list_widget;
 
     int                         m_selected_achievement_index;
     bool                        m_waiting_for_achievements;
 
+protected:
+    BaseOnlineProfileAchievements(const std::string &filename);
+
 public:
-    friend class GUIEngine::ScreenSingleton<OnlineProfileAchievements>;
+    friend class GUIEngine::ScreenSingleton<BaseOnlineProfileAchievements>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
@@ -61,7 +63,46 @@ public:
 
     virtual void beforeAddingWidget() OVERRIDE;
 
-    virtual void refreshAchievementsList() { m_waiting_for_achievements = true; }
+    // ------------------------------------------------------------------------
+    virtual void refreshAchievementsList()
+    { 
+        m_waiting_for_achievements = true; 
+    }   // refreshAchievementsList
 };
+
+// ============================================================================
+/**
+* \brief Online profiel overview screen
+* \ingroup states_screens
+*/
+class TabOnlineProfileAchievements : public BaseOnlineProfileAchievements,
+                public GUIEngine::ScreenSingleton<TabOnlineProfileAchievements>
+{
+protected:
+    friend class GUIEngine::ScreenSingleton<TabOnlineProfileAchievements>;
+
+    TabOnlineProfileAchievements() 
+      : BaseOnlineProfileAchievements("online/profile_achievements_tab.stkgui")
+    {}
+
+};   // TabOnlineProfileAchievements
+
+// ============================================================================
+/**
+* \brief Online profiel overview screen
+* \ingroup states_screens
+*/
+class OnlineProfileAchievements : public BaseOnlineProfileAchievements,
+    public GUIEngine::ScreenSingleton < OnlineProfileAchievements >
+{
+protected:
+    friend class GUIEngine::ScreenSingleton<OnlineProfileAchievements>;
+
+    OnlineProfileAchievements()
+        : BaseOnlineProfileAchievements("online/profile_achievements.stkgui")
+    {}
+
+};   // class
+
 
 #endif

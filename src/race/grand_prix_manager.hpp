@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,8 +19,11 @@
 #ifndef HEADER_GRAND_PRIX_MANAGER_HPP
 #define HEADER_GRAND_PRIX_MANAGER_HPP
 
+#include "race/grand_prix_data.hpp"
+
 #include <vector>
 #include <string>
+#include "utils/ptr_vector.hpp"
 
 #include "irrlicht.h"
 class GrandPrixData;
@@ -33,35 +36,42 @@ class GrandPrixManager
 private:
     static const char* SUFFIX;
 
-    std::vector<GrandPrixData*> m_gp_data;
+    PtrVector<GrandPrixData> m_gp_data;
 
     /** Load all the grands prix from the 3 directories known */
     void loadFiles();
     /** Load all the grands prix in one directory */
-    void loadDir(const std::string& dir);
+    void loadDir(const std::string& dir, enum GrandPrixData::GPGroupType group);
     /** Load a grand prix and add it to m_gp_data*/
-    void load(const std::string &filename);
+    void load(const std::string &filename, enum GrandPrixData::GPGroupType group);
 
     /** Generates a new unique indentifier for a user defined grand prix */
     std::string generateId();
-
-    bool existsName(const irr::core::stringw& name) const;
 
 public:
                    GrandPrixManager();
                   ~GrandPrixManager();
     void           reload();
-    GrandPrixData* getGrandPrix(const int i) const { return m_gp_data[i];     }
-    GrandPrixData* getGrandPrix(const std::string& s) const;
-    unsigned int   getNumberOfGrandPrix()    const { return m_gp_data.size(); }
+    bool existsName(const irr::core::stringw& name) const;
     void           checkConsistency();
 
     // Methods for the gp editor
-    GrandPrixData* editGrandPrix(const std::string& s) const;
+    GrandPrixData* editGrandPrix(const std::string& s);
     GrandPrixData* createNewGP(const irr::core::stringw& newName);
     GrandPrixData* copy(const std::string& id,
                         const irr::core::stringw& newName);
     void           remove(const std::string& id);
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the data for the specified GP.
+    *  \param i Index of the GP. */
+    const GrandPrixData* getGrandPrix(const std::string& s) const;
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the data for the specified GP.
+     *  \param i Index of the GP. */
+    const GrandPrixData* getGrandPrix(const int i) const { return m_gp_data.get(i);     }
+    // ------------------------------------------------------------------------
+    /** Returns the number of GPs. */
+    unsigned int   getNumberOfGrandPrix()    const { return (int)m_gp_data.size(); }
 };   // GrandPrixManager
 
 extern GrandPrixManager *grand_prix_manager;

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 SuperTuxKart-Team
+//  Copyright (C) 2012-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,12 +23,14 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "gamepad_device.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/wiimote.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 #include "utils/translation.hpp"
+#include "utils/vs.hpp"
 
 #include "wiiuse.h"
 
@@ -158,12 +160,12 @@ void WiimoteManager::launchDetection(int timeout)
 
     // ---------------------------------------------------
     // Create or find a GamepadConfig for all wiimotes
-    DeviceManager* device_manager = input_manager->getDeviceList();
+    DeviceManager* device_manager = input_manager->getDeviceManager();
     GamepadConfig* gamepad_config = NULL;
 
     device_manager->getConfigForGamepad(WIIMOTE_START_IRR_ID, "Wiimote",
                                         &gamepad_config);
-    int num_buttons = (int)( log((float)WIIMOTE_BUTTON_ALL) / log(2.0f))+1;
+    int num_buttons = (int)( log((float)WIIMOTE_BUTTON_ALL) / log((float)2.0f))+1;
     gamepad_config->setNumberOfButtons(num_buttons);
     gamepad_config->setNumberOfAxis(1);
 
@@ -212,7 +214,7 @@ void WiimoteManager::launchDetection(int timeout)
  */
 int getButton(int n)
 {
-    return (int)(log((float)n)/log(2.0f));
+    return (int)(log((float)n)/log((float)2.0f));
 }   // getButton
 
 // ----------------------------------------------------------------------------
@@ -245,7 +247,7 @@ void WiimoteManager::cleanup()
 {
     if(m_wiimotes.size() > 0)
     {
-        DeviceManager* device_manager = input_manager->getDeviceList();
+        DeviceManager* device_manager = input_manager->getDeviceManager();
 
         GamePadDevice* first_gamepad_device =
                      device_manager->getGamePadFromIrrID(WIIMOTE_START_IRR_ID);
@@ -372,6 +374,7 @@ void WiimoteManager::threadFunc()
  */
 void* WiimoteManager::threadFuncWrapper(void *data)
 {
+    VS::setThreadName("WiimoteManager");
     ((WiimoteManager*)data)->threadFunc();
     return NULL;
 }   // threadFuncWrapper
@@ -409,12 +412,8 @@ void WiimoteManager::WiimoteDialogListener::onConfirm()
     int nb_wiimotes = wiimote_manager->getNumberOfWiimotes();
     if(nb_wiimotes > 0)
     {
-        core::stringw msg = StringUtils::insertValues(
-            _("Found %d wiimote(s)"),
-            core::stringw(nb_wiimotes));
-
-        new MessageDialog( msg );
-
+        new MessageDialog(_P("Found %d wiimote", "Found %d wiimotes",
+                             nb_wiimotes));
     }
     else
     {

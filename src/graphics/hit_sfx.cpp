@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,15 +26,14 @@
 HitSFX::HitSFX(const Vec3& coord, const char* explosion_sound)
              : HitEffect()
 {
-    m_sfx = sfx_manager->createSoundSource( explosion_sound );
-    m_sfx->position(coord);
+    m_sfx = SFXManager::get()->createSoundSource( explosion_sound );
 
     // in multiplayer mode, sounds are NOT positional (because we have
     // multiple listeners) so the sounds of all AIs are constantly heard.
     // Therefore reduce volume of sounds.
     float vol = race_manager->getNumLocalPlayers() > 1 ? 0.5f : 1.0f;
-    m_sfx->volume(vol);
-    m_sfx->play();
+    m_sfx->setVolume(vol);
+    m_sfx->play(coord);
 }   // HitSFX
 
 //-----------------------------------------------------------------------------
@@ -42,10 +41,7 @@ HitSFX::HitSFX(const Vec3& coord, const char* explosion_sound)
  */
 HitSFX::~HitSFX()
 {
-    if (m_sfx->getStatus() == SFXManager::SFX_PLAYING)
-        m_sfx->stop();
-
-    sfx_manager->deleteSFX(m_sfx);
+    m_sfx->deleteSFX();
 }   // ~HitEffect
 
 //-----------------------------------------------------------------------------
@@ -53,11 +49,11 @@ HitSFX::~HitSFX()
  *  played louder than for a non-player kart if split screen is used).
  *  If this sfx is for a player kart in split screen, make it louder again.
  */
-void HitSFX::setPlayerKartHit()
+void HitSFX::setLocalPlayerKartHit()
 {
     if(race_manager->getNumLocalPlayers())
-        m_sfx->volume(1.0f);
-}   // setPlayerKartHit
+        m_sfx->setVolume(1.0f);
+}   // setLocalPlayerKartHit
 
 //-----------------------------------------------------------------------------
 /** Updates the hit sfx, called one per time step. If this function returns
@@ -67,5 +63,6 @@ void HitSFX::setPlayerKartHit()
  */
 bool HitSFX::updateAndDelete(float dt)
 {
-    return m_sfx->getStatus() != SFXManager::SFX_PLAYING;
+    SFXBase::SFXStatus status = m_sfx->getStatus();
+    return status!= SFXBase::SFX_PLAYING;
 }   // updateAndDelete

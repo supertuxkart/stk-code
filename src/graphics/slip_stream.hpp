@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013  Joerg Henrichs
+//  Copyright (C) 2010-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -32,6 +32,7 @@ using namespace irr;
 
 class AbstractKart;
 class Quad;
+class Material;
 
 /**
   * \ingroup graphics
@@ -53,9 +54,6 @@ private:
 
     /** For debugging: a simple quad to display where slipstream works. */
     scene::IMesh      *m_debug_mesh;
-
-    /** The texture matrix for the slipstream effect. */
-    core::matrix4     *m_matrix;
 
     /** The length of the slipstream cylinder. This is used to scale
      *  the actual scene node correctly. */
@@ -80,7 +78,7 @@ private:
      ** overtake the right kart. */
     AbstractKart* m_target_kart;
 
-    void         createMesh(const video::SMaterial &m);
+    void         createMesh(Material* material);
     void         setDebugColor(const video::SColor &color);
 public:
                  SlipStream  (AbstractKart* kart);

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,9 +24,7 @@
 #include "utils/types.hpp"
 #include "utils/ptr_vector.hpp"
 
-
 #include <irrString.h>
-
 #include <string>
 
 namespace Online
@@ -54,16 +52,21 @@ public:
         bool m_is_pending;
         bool m_is_asker;
         irr::core::stringw m_date;
+
     public:
         RelationInfo(const irr::core::stringw & date, bool is_online,
                      bool is_pending, bool is_asker = false);
         void setOnline(bool online);
+
         // --------------------------------------------------------------------
         bool isPending() const { return m_is_pending; }
+
         // --------------------------------------------------------------------
         bool isAsker()  const { return m_is_asker; }
+
         // --------------------------------------------------------------------
         const irr::core::stringw & getDate() const { return m_date; }
+
         // --------------------------------------------------------------------
         bool isOnline() const { return m_is_online; }
     };  // class RelationInfo
@@ -75,8 +78,8 @@ private:
     /** The profile can either be fetching data, or be ready. */
     enum State
     {
-        S_FETCHING = 1,
-        S_READY
+        S_FETCHING_ACHIEVEMENTS = 0x01,
+        S_FETCHING_FRIENDS      = 0x02,
     };
 
     State                           m_state;
@@ -104,12 +107,11 @@ private:
     void storeAchievements(const XMLNode * input);
 
 public:
-          OnlineProfile(const uint32_t           & userid,
-                        const irr::core::stringw & username,
-                        bool is_current_user = false       );
-          OnlineProfile(const XMLNode * xml,
-                      ConstructorType type = C_DEFAULT);
-         ~OnlineProfile();
+    OnlineProfile(const uint32_t           & userid,
+                  const irr::core::stringw & username,
+                  bool is_current_user = false       );
+    OnlineProfile(const XMLNode * xml, ConstructorType type = C_DEFAULT);
+    ~OnlineProfile();
     void fetchFriends();
     const IDList&   getFriends();
     void fetchAchievements();
@@ -118,49 +120,69 @@ public:
     void deleteRelationalInfo();
     const IDList&   getAchievements();
     void merge(OnlineProfile * profile);
+
     // ------------------------------------------------------------------------
     /** Returns true if the achievements for this profile have been fetched. */
     bool hasFetchedAchievements() const { return m_has_fetched_achievements; }
+
+    // ------------------------------------------------------------------------
+    /** Unsets the flag that all friends of this profile are in cache. Used
+     *  when a profile is pushed out of cache. */
+    void unsetHasFetchedFriends() { m_has_fetched_friends = false;  }
     // ------------------------------------------------------------------------
     /** Returns true if the friend list for this profile has been fetched. */
     bool hasFetchedFriends() const { return m_has_fetched_friends; }
+
     // ------------------------------------------------------------------------
-    /** True if the profile is not fetching data atm. */
-    bool isReady() const { return m_state == S_READY; }
+    /** True if the profile has fetched friends. */
+    bool finishedFetchingFriends() const
+    {
+        return (m_state & S_FETCHING_FRIENDS) == 0;
+    }   // finishedFetchingFriends
+
+    // ------------------------------------------------------------------------
+    /** True if the profile has fetched friends. */
+    bool finishedFetchingAchievements() const
+    {
+        return (m_state & S_FETCHING_ACHIEVEMENTS) == 0;
+    }   // hasFetchedAchievements
+
     // ------------------------------------------------------------------------
     /** Returns true if this item is the current user. */
     bool isCurrentUser() const { return m_is_current_user; }
+
     // ------------------------------------------------------------------------
     bool isFriend() const { return m_is_friend; }
+
     // ------------------------------------------------------------------------
     void setFriend()  { m_is_friend = true; }
+
     // ------------------------------------------------------------------------
     RelationInfo* getRelationInfo() { return m_relation_info; }
+
     // ------------------------------------------------------------------------
     void setRelationInfo(RelationInfo * r)
     {
         delete m_relation_info; m_relation_info = r;
     }   // setRelationInfo
+
     // ------------------------------------------------------------------------
     /** Sets the cache bit of this profile. Used by the cache eviction
      *  algorithm. */
     void setCacheBit(bool cache_bit)  { m_cache_bit = cache_bit; }
+
     // ------------------------------------------------------------------------
     /** Returns the cache bit for this profile. Used by the cache eviction
      *  algorithm. */
     bool getCacheBit() const { return m_cache_bit; }
+
     // ------------------------------------------------------------------------
     /** Returns the online id of this profile. */
     uint32_t getID() const { return m_id; }
+
     // ------------------------------------------------------------------------
     /** Returns the user name of this profile. */
     const irr::core::stringw& getUserName() const { return m_username; }
-    // ------------------------------------------------------------------------
-
 };   // class OnlineProfile
-
 } // namespace Online
-
-#endif
-
-/*EOF*/
+#endif // HEADER_ONLINE_PROFILE_HPP

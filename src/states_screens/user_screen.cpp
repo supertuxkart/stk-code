@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/recovery_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
@@ -45,18 +46,14 @@ DEFINE_SCREEN_SINGLETON( TabbedUserScreen );
 
 BaseUserScreen::BaseUserScreen(const std::string &name) : Screen(name.c_str())
 {
+    m_online_cb           = NULL;
+    m_new_registered_data = false;
+    m_auto_login          = false;
 }   // BaseUserScreen
 
 // ----------------------------------------------------------------------------
 
 void BaseUserScreen::loadedFromFile()
-{
-
-}   // loadedFromFile
-
-// ----------------------------------------------------------------------------
-
-void BaseUserScreen::init()
 {
     m_online_cb = getWidget<CheckBoxWidget>("online");
     assert(m_online_cb);
@@ -64,7 +61,6 @@ void BaseUserScreen::init()
     assert(m_username_tb);
     m_password_tb = getWidget<TextBoxWidget >("password");
     assert(m_password_tb);
-    m_password_tb->setPasswordBox(true, L'*');
     m_players = getWidget<DynamicRibbonWidget>("players");
     assert(m_players);
     m_options_widget = getWidget<RibbonWidget>("options");
@@ -72,11 +68,54 @@ void BaseUserScreen::init()
     m_info_widget = getWidget<LabelWidget>("message");
     assert(m_info_widget);
 
+}   // loadedFromFile
+
+// ----------------------------------------------------------------------------
+/** Stores information from the register screen. It allows this screen to 
+ *  use the entered user name and password to prefill fields so that the user
+ *  does not have to enter them again.
+ *  \param online If the user created an online account.
+ *  \param auto-login If the user should be automatically logged in online.
+ *         This can not be done for newly created online accounts, since they
+ *         need to be confirmed first.
+ * \param online_name The online account name.
+ *  \param password The password for the online account.
+ */
+void BaseUserScreen::setNewAccountData(bool online, bool auto_login,
+                                       const core::stringw &online_name,
+                                       const core::stringw &password)
+{
+    // Indicate for init that new user data is available.
+    m_new_registered_data = true;
+    m_auto_login          = auto_login;
+    m_online_cb->setState(online);
+    m_username_tb->setText(online_name);
+    m_password_tb->setText(password);
+}   // setOnline
+
+// ----------------------------------------------------------------------------
+/** Initialises the user screen. Searches for all players to fill the 
+ *  list of users with their icons, and initialises all widgets for the
+ *  current user (e.g. the online flag etc).
+ */
+void BaseUserScreen::init()
+{
+    m_password_tb->setPasswordBox(true, L'*');
+
+    // The behaviour of the screen is slightly different at startup, i.e.
+    // when it is the first screen: cancel will exit the game, and in
+    // this case no 'back' error should be shown.
+    bool is_first_screen = StateManager::get()->getMenuStackSize()==1;
+    getWidget<IconButtonWidget>("back")->setVisible(!is_first_screen);
+    getWidget<IconButtonWidget>("cancel")->setLabel(is_first_screen 
+                                                    ? _("Exit game") 
+                                                    : _("Cancel")      );
+
     m_sign_out_name = "";
     m_sign_in_name  = "";
 
     // It should always be activated ... but just in case
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
     // Clean any error message still shown
     m_info_widget->setText("", true);
     m_info_widget->setErrorColor();
@@ -101,7 +140,7 @@ void BaseUserScreen::init()
 
     // Select the current player. That can only be done after
     // updateItemDisplay is called.
-    if(current_player_index != -1)
+    if (current_player_index != -1)
         selectUser(current_player_index);
     // no current player found
     // The first player is the most frequently used, so select it
@@ -109,20 +148,20 @@ void BaseUserScreen::init()
         selectUser(0);
 
     // Disable changing the user while in game
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    getWidget<IconButtonWidget>("ok")->setActive(!in_game);
+    getWidget<IconButtonWidget>("new_user")->setActive(!in_game);
+    getWidget<IconButtonWidget>("rename")->setActive(!in_game);
+    getWidget<IconButtonWidget>("delete")->setActive(!in_game);
+
+    m_new_registered_data = false;
+    if (m_auto_login)
     {
-        getWidget<IconButtonWidget>("ok")->setDeactivated();
-        getWidget<IconButtonWidget>("new_user")->setDeactivated();
-        getWidget<IconButtonWidget>("rename")->setDeactivated();
-        getWidget<IconButtonWidget>("delete")->setDeactivated();
+        login();
+        m_auto_login = false;
+        return;
     }
-    else
-    {
-        getWidget<IconButtonWidget>("ok")->setActivated();
-        getWidget<IconButtonWidget>("new_user")->setActivated();
-        getWidget<IconButtonWidget>("rename")->setActivated();
-        getWidget<IconButtonWidget>("delete")->setActivated();
-    }
+    m_auto_login = false;
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -144,22 +183,35 @@ void BaseUserScreen::tearDown()
 
 // ----------------------------------------------------------------------------
 /** Called when a user is selected. It updates the online checkbox and
- *  entrye fields.
+ *  entry fields.
  */
 void BaseUserScreen::selectUser(int index)
 {
     PlayerProfile *profile = PlayerManager::get()->getPlayer(index);
     assert(profile);
 
+    // Only set focus in case of non-tabbed version (so that keyboard
+    // or gamepad navigation with tabs works as expected, i.e. you can
+    // select the next tab without having to go up to the tab list first.
+    bool focus_it = !getWidget<RibbonWidget>("options_choice");
     m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
-                            /*focusIt*/ true);
+                            focus_it);
+    
+    if (!m_new_registered_data)
+        m_username_tb->setText(profile->getLastOnlineName(true/*ignoreRTL*/));
+
+    if (!m_new_registered_data)
+    {
+        // Delete a password that might have been typed for another user
+        m_password_tb->setText("");
+    }
 
     // Last game was not online, so make the offline settings the default
     // (i.e. unckeck online checkbox, and make entry fields invisible).
-    
     if (!profile->wasOnlineLastTime() || profile->getLastOnlineName() == "")
     {
-        m_online_cb->setState(false);
+        if (!m_new_registered_data)
+            m_online_cb->setState(false);
         makeEntryFieldsVisible();
         return;
     }
@@ -167,13 +219,9 @@ void BaseUserScreen::selectUser(int index)
     // Now last use was with online --> Display the saved data
     m_online_cb->setState(true);
     makeEntryFieldsVisible();
-    m_username_tb->setText(profile->getLastOnlineName());
     getWidget<CheckBoxWidget>("remember-user")->setState(
         profile->rememberPassword());
-    if(profile->getLastOnlineName().size()>0)
-        m_username_tb->setDeactivated();
-    else
-        m_username_tb->setActivated();
+    m_username_tb->setActive(profile->getLastOnlineName().size() == 0);
 
     // And make the password invisible if the session is saved (i.e
     // the user does not need to enter a password).
@@ -202,7 +250,15 @@ void BaseUserScreen::makeEntryFieldsVisible()
     getWidget<LabelWidget>("label_remember")->setVisible(online);
     getWidget<CheckBoxWidget>("remember-user")->setVisible(online);
     PlayerProfile *player = getSelectedPlayer();
-    if(player && player->hasSavedSession() && online)
+
+    // Don't show the password fields if the player wants to be online
+    // and either is the current player and logged in (no need to enter a
+    // password then) or has a saved session.
+    if(player && online  &&
+        (player->hasSavedSession() || 
+          (player==PlayerManager::getCurrentPlayer() && player->isLoggedIn() ) 
+        ) 
+      )
     {
         // If we show the online login fields, but the player has a
         // saved session, don't show the password field.
@@ -213,6 +269,10 @@ void BaseUserScreen::makeEntryFieldsVisible()
     {
         getWidget<LabelWidget>("label_password")->setVisible(online);
         m_password_tb->setVisible(online);
+        // Is user has no online name, make sure the user can enter one
+        if (player->getLastOnlineName().empty())
+            m_username_tb->setActive(true);
+
     }
 }   // makeEntryFieldsVisible
 
@@ -256,7 +316,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
                 m_info_widget->setText(
                     _("Internet access is disabled, please enable it in the options"),
                     true);
-                sfx_manager->quickSound( "anvil" );
+                SFXManager::get()->quickSound( "anvil" );
                 m_online_cb->setState(false);
             }
         }
@@ -272,18 +332,30 @@ void BaseUserScreen::eventCallback(Widget* widget,
         }   // button==ok
         else if (button == "new_user")
         {
-            StateManager::get()->pushScreen(RegisterScreen::getInstance());
+            RegisterScreen::getInstance()->push();
+            RegisterScreen::getInstance()->setParent(this);
+            // Make sure the new user will have an empty online name field
+            // that can also be edited.
+            m_username_tb->setText("");
+            m_username_tb->setActive(true);
         }
         else if (button == "cancel")
         {
-            StateManager::get()->popMenu();
-            onEscapePressed();
+            // EscapePressed will pop this screen.
+            StateManager::get()->escapePressed();
+        }
+        else if (button == "recover")
+        {
+            new RecoveryDialog();
         }
         else if (button == "rename")
         {
             PlayerProfile *cp = getSelectedPlayer();
             RegisterScreen::getInstance()->setRename(cp);
-            StateManager::get()->pushScreen(RegisterScreen::getInstance());
+            RegisterScreen::getInstance()->push();
+            RegisterScreen::getInstance()->setParent(this);
+            m_new_registered_data = false;
+            m_auto_login          = false;
             // Init will automatically be called, which
             // refreshes the player list
         }
@@ -320,7 +392,7 @@ void BaseUserScreen::login()
 {
     // If an error occurs, the callback informing this screen about the
     // problem will activate the widget again.
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
     m_state = STATE_NONE;
 
     PlayerProfile *player = getSelectedPlayer();
@@ -329,16 +401,18 @@ void BaseUserScreen::login()
     // If a different player is connecting, or the same local player with
     // a different online account, log out the current player.
     if(current && current->isLoggedIn() &&
-        (player!=current || current->getLastOnlineName()!=new_username) )
+        (player!=current ||
+        current->getLastOnlineName(true/*ignoreRTL*/)!=new_username) )
     {
-        m_sign_out_name = current->getLastOnlineName();
+        m_sign_out_name = current->getLastOnlineName(true/*ignoreRTL*/);
         current->requestSignOut();
         m_state = (UserScreenState)(m_state | STATE_LOGOUT);
 
         // If the online user name was changed, reset the save data
         // for this user (otherwise later the saved session will be
         // resumed, not logging the user with the new account).
-        if(player==current && current->getLastOnlineName()!=new_username)
+        if(player==current &&
+            current->getLastOnlineName(true/*ignoreRTL*/)!=new_username)
             current->clearSession();
     }
     PlayerManager::get()->setCurrentPlayer(player);
@@ -350,7 +424,7 @@ void BaseUserScreen::login()
     {
         if(player->isLoggedIn())
         {
-            m_sign_out_name =player->getLastOnlineName();
+            m_sign_out_name =player->getLastOnlineName(true/*ignoreRTL*/);
             player->requestSignOut();
             m_state =(UserScreenState)(m_state| STATE_LOGOUT);
         }
@@ -377,7 +451,7 @@ void BaseUserScreen::login()
     // can decide what to do about them.
     if (player->hasSavedSession())
     {
-        m_sign_in_name = player->getLastOnlineName();
+        m_sign_in_name = player->getLastOnlineName(true/*ignoreRTL*/);
         // Online login with saved token
         player->requestSavedSession();
     }
@@ -387,8 +461,8 @@ void BaseUserScreen::login()
         if (m_password_tb->getText() == "")
         {
             m_info_widget->setText(_("You need to enter a password."), true);
-            sfx_manager->quickSound("anvil");
-            m_options_widget->setActivated();
+            SFXManager::get()->quickSound("anvil");
+            m_options_widget->setActive(true);
             return;
         }
         m_sign_in_name = m_username_tb->getText();
@@ -407,21 +481,10 @@ void BaseUserScreen::onUpdate(float dt)
     if (!m_options_widget->isActivated())
     {
         core::stringw message = (m_state & STATE_LOGOUT)
-                              ? _(L"Signing out '%s'",m_sign_out_name.c_str())
-                              : _(L"Signing in '%s'", m_sign_in_name.c_str());
+                              ? _(L"Logging out '%s'",m_sign_out_name.c_str())
+                              : _(L"Logging in '%s'", m_sign_in_name.c_str());
         m_info_widget->setText(StringUtils::loadingDots(message.c_str()),
                                false                                      );
-    }
-    PlayerProfile *player = getSelectedPlayer();
-    if(player)
-    {
-        // If the player changes the online name, clear the saved session
-        // flag, and make the password field visible again.
-        if (m_username_tb->getText()!=player->getLastOnlineName())
-        {
-            player->clearSession();
-            makeEntryFieldsVisible();
-        }
     }
 }   // onUpdate
 
@@ -432,7 +495,7 @@ void BaseUserScreen::loginSuccessful()
 {
     PlayerProfile *player  = getSelectedPlayer();
     player->setWasOnlineLastTime(true);
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
     // Clean any error message still shown
     m_info_widget->setText("", true);
     m_info_widget->setErrorColor();
@@ -455,10 +518,10 @@ void BaseUserScreen::loginError(const irr::core::stringw & error_message)
         player->clearSession();
     player->setLastOnlineName("");
     makeEntryFieldsVisible();
-    sfx_manager->quickSound("anvil");
+    SFXManager::get()->quickSound("anvil");
     m_info_widget->setErrorColor();
     m_info_widget->setText(error_message, false);
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
 }   // loginError
 
 // ----------------------------------------------------------------------------
@@ -485,10 +548,10 @@ void BaseUserScreen::logoutError(const irr::core::stringw & error_message)
     if(player && player->hasSavedSession())
         player->clearSession();
     makeEntryFieldsVisible();
-    sfx_manager->quickSound("anvil");
+    SFXManager::get()->quickSound("anvil");
     m_info_widget->setErrorColor();
     m_info_widget->setText(error_message, false);
-    m_options_widget->setActivated();
+    m_options_widget->setActive(true);
 }   // logoutError
 
 // ----------------------------------------------------------------------------
@@ -508,7 +571,7 @@ void BaseUserScreen::deletePlayer()
     PlayerProfile *player = getSelectedPlayer();
     irr::core::stringw message =
         //I18N: In the player info dialog (when deleting)
-        _("Do you really want to delete player '%s' ?", player->getName());
+        _("Do you really want to delete player '%s' ?", player->getName(true/*ignoreRTL*/));
 
     class ConfirmServer : public MessageDialog::IConfirmDialogListener
     {
@@ -569,11 +632,12 @@ void BaseUserScreen::unloaded()
  */
 void TabbedUserScreen::init()
 {
-    RibbonWidget* tab_bar = this->getWidget<RibbonWidget>("options_choice");
-    if (tab_bar != NULL) tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
+    RibbonWidget* tab_bar = getWidget<RibbonWidget>("options_choice");
+    assert(tab_bar != NULL);
+    tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
     tab_bar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tab_bar->getRibbonChildren()[1].setTooltip( _("Audio") );
-    tab_bar->getRibbonChildren()[2].setTooltip(_("User Interface"));
+    tab_bar->getRibbonChildren()[2].setTooltip( _("User Interface") );
     tab_bar->getRibbonChildren()[4].setTooltip( _("Controls") );
     BaseUserScreen::init();
 }   // init

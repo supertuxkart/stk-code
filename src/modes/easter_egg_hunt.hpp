@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -46,26 +46,26 @@ public:
              EasterEggHunt();
     virtual ~EasterEggHunt();
 
-    virtual void init();
+    virtual void init() OVERRIDE;
 
-    virtual bool isRaceOver();
+    virtual bool isRaceOver() OVERRIDE;
 
     // overriding World methods
-    virtual void reset();
+    virtual void reset() OVERRIDE;
 
-    virtual bool raceHasLaps(){ return false; }
+    virtual bool raceHasLaps() OVERRIDE { return false; }
 
-    virtual const std::string& getIdent() const;
-    virtual void terminateRace();
-    virtual void update(float dt);
+    virtual const std::string& getIdent() const OVERRIDE;
+    virtual void terminateRace() OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
     virtual void getKartsDisplayInfo(
-                          std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
+                          std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
 
     void updateKartRanks();
     void collectedEasterEgg(const AbstractKart *kart);
     void readData(const std::string &filename);
 
-    virtual void checkForWrongDirection(unsigned int i) OVERRIDE;
+    virtual void checkForWrongDirection(unsigned int i, float dt) OVERRIDE;
     virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
 
 };   // EasterEggHunt

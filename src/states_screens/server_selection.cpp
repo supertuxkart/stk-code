@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2015 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,64 +17,75 @@
 
 #include "states_screens/server_selection.hpp"
 
-#include <iostream>
-#include <assert.h>
-
+#include "audio/sfx_manager.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "network/servers_manager.hpp"
+#include "online/xml_request.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "audio/sfx_manager.hpp"
+
+#include <iostream>
+#include <assert.h>
 
 using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( ServerSelection );
 
 // ----------------------------------------------------------------------------
-
+/** Constructor, which loads the stkgui file.
+ */
 ServerSelection::ServerSelection() : Screen("online/server_selection.stkgui")
 {
-    m_selected_index = -1;
     m_refresh_request = NULL;
-
 }   // ServerSelection
 
 // ----------------------------------------------------------------------------
-
+/** Destructor.
+ */
 ServerSelection::~ServerSelection()
 {
 }   // ServerSelection
 
 // ----------------------------------------------------------------------------
-
+/** Clean up.
+ */
 void ServerSelection::tearDown()
 {
-    delete m_refresh_request;
+    // If the refresh request is being executed, and stk should exit,
+    // then a crash can happen when the refresh request is deleted, but
+    // then the request manager tries to activate this request. So only
+    // delete this request if it is finished.
+    if(m_refresh_request && m_refresh_request->isDone())
+        delete m_refresh_request;
 }   // tearDown
 
-
 // ----------------------------------------------------------------------------
-
+/** Requests the servers manager to update its list of servers, and disables
+ *  the 'refresh' button (till the refresh was finished).
+ */
 void ServerSelection::refresh()
 {
-    m_refresh_request = ServersManager::get()->refreshRequest();
-    m_fake_refresh = (m_refresh_request == NULL ? true : false);
-    m_server_list_widget->clear();
-    m_server_list_widget->addItem("spacer", L"");
-    m_server_list_widget->addItem("loading",
+    m_refresh_request = ServersManager::get()->getRefreshRequest();
+    // If the request was created (i.e. no error, and not re-requested within
+    // 5 seconds), clear the list and display the waiting message:
+    if(m_refresh_request)
+    {
+        m_server_list_widget->clear();
+        m_server_list_widget->addItem("spacer", L"");
+        m_server_list_widget->addItem("loading",
                               StringUtils::loadingDots(_("Fetching servers")));
-    m_reload_widget->setDeactivated();
-}
-
+        m_reload_widget->setActive(false);
+    }
+}   // refresh
 
 // ----------------------------------------------------------------------------
-
+/** Set pointers to the various widgets.
+ */
 void ServerSelection::loadedFromFile()
 {
-    m_back_widget = getWidget<GUIEngine::IconButtonWidget>("back");
-    assert(m_back_widget != NULL);
     m_reload_widget = getWidget<GUIEngine::IconButtonWidget>("reload");
     assert(m_reload_widget != NULL);
     m_server_list_widget = getWidget<GUIEngine::ListWidget>("server_list");
@@ -82,25 +93,30 @@ void ServerSelection::loadedFromFile()
     m_server_list_widget->setColumnListener(this);
 }   // loadedFromFile
 
-
 // ----------------------------------------------------------------------------
-
+/** Clear the server list, which will be reloaded. 
+ */
 void ServerSelection::beforeAddingWidget()
 {
     m_server_list_widget->clearColumns();
-    m_server_list_widget->addColumn( _("Name"), 3 );
+    m_server_list_widget->addColumn( _("Name"), 2 );
     m_server_list_widget->addColumn( _("Players"), 1);
-}
-// ----------------------------------------------------------------------------
+    m_server_list_widget->addColumn(_("Difficulty"), 1);
+    m_server_list_widget->addColumn(_("Game mode"), 1);
+}   // beforeAddingWidget
 
+// ----------------------------------------------------------------------------
+/** Triggers a refresh of the server list.
+ */
 void ServerSelection::init()
 {
     Screen::init();
     m_sort_desc = true;
 
-
     // Set the default sort order
     Server::setSortOrder(Server::SO_NAME);
+
+    /** Triggers the loading of the server list in the servers manager. */
     refresh();
 }   // init
 
@@ -111,12 +127,12 @@ void ServerSelection::init()
  */
 void ServerSelection::loadList()
 {
-    m_server_list_widget->clear();
-    ServersManager * manager = ServersManager::get();
+	m_server_list_widget->clear();
+    ServersManager *manager = ServersManager::get();
     manager->sort(m_sort_desc);
     for(int i=0; i <  manager->getNumServers(); i++)
     {
-        const Server * server = manager->getServerBySort(i);
+        const Server *server = manager->getServerBySort(i);
         core::stringw num_players;
         num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
         num_players.append("/");
@@ -124,11 +140,21 @@ void ServerSelection::loadList()
         std::vector<GUIEngine::ListWidget::ListCell> row;
         row.push_back(GUIEngine::ListWidget::ListCell(server->getName(),-1,3));
         row.push_back(GUIEngine::ListWidget::ListCell(num_players,-1,1,true));
+
+        core::stringw difficulty = race_manager->getDifficultyName(server->getDifficulty());
+        row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 1, true));
+
+        core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
+        row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 1, true));
+
         m_server_list_widget->addItem("server", row);
     }
 }   // loadList
 
 // ----------------------------------------------------------------------------
+/** Change the sort order if a column was clicked.
+ *  \param column_id ID of the column that was clicked.
+ */
 void ServerSelection::onColumnClicked(int column_id)
 {
     switch(column_id)
@@ -159,61 +185,70 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
 
     else if (name == m_server_list_widget->m_properties[GUIEngine::PROP_ID])
     {
-        m_selected_index = m_server_list_widget->getSelectionID();
-        uint32_t server_id = ServersManager::get()->getServerBySort(m_selected_index)->getServerId();
-        uint32_t host_id = ServersManager::get()->getServerBySort(m_selected_index)->getHostId();
+        int selected_index = m_server_list_widget->getSelectionID();
+        // This can happen e.g. when the list is empty and the user
+        // clicks somewhere.
+        if(selected_index >= ServersManager::get()->getNumServers() ||
+           selected_index<0                                           )
+        {
+            return;
+        }
+
+        const Server *server = 
+            ServersManager::get()->getServerBySort(selected_index);
+        uint32_t server_id = server->getServerId();
+        uint32_t host_id = server->getHostId();
         new ServerInfoDialog(server_id, host_id);
-    }
+    }   // click on server
 
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-/** Selects the last selected item on the list (which is the item that
- *  is just being installed) again. This function is used from the
- *  addons_loading screen: when it is closed, it will reset the
- *  select item so that people can keep on installing from that
- *  point on.
-*/
-void ServerSelection::setLastSelected()
-{
-    if(m_selected_index>-1)
-    {
-        m_server_list_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        m_server_list_widget->setSelectionID(m_selected_index);
-    }
-}   // setLastSelected
-
-// ----------------------------------------------------------------------------
-
+/** If a refresh of the server list was requested, check if it is finished and
+ *  if so, update the list of servers.
+ */
 void ServerSelection::onUpdate(float dt)
 {
-    if(m_refresh_request != NULL)
+    if (!m_refresh_request) return;
+
+    if (m_refresh_request->isDone())
     {
-        if(m_refresh_request->isDone())
+        if (m_refresh_request->isSuccess())
         {
-            if(m_refresh_request->isSuccess())
-            {
-                loadList();
-            }
-            else
-            {
-                sfx_manager->quickSound( "anvil" );
-                new MessageDialog(m_refresh_request->getInfo());
-            }
-            delete m_refresh_request;
-            m_refresh_request = NULL;
-            m_reload_widget->setActivated();
+            int selection = m_server_list_widget->getSelectionID();
+            std::string selection_str = m_server_list_widget->getSelectionInternalName();
+
+            loadList();
+
+            // restore previous selection
+            if (selection != -1 && selection_str != "spacer" && selection_str != "loading")
+                m_server_list_widget->setSelectionID(selection);
         }
         else
         {
-            m_server_list_widget->renameItem("loading",
-                              StringUtils::loadingDots(_("Fetching servers")));
+            SFXManager::get()->quickSound("anvil");
+            new MessageDialog(m_refresh_request->getInfo());
+            m_server_list_widget->clear();
         }
+        delete m_refresh_request;
+        m_refresh_request = NULL;
+        m_reload_widget->setActive(true);
     }
-    else if(m_fake_refresh)
+    else
     {
+        int selection = m_server_list_widget->getSelectionID();
+        std::string selection_str = m_server_list_widget->getSelectionInternalName();
+
+        m_server_list_widget->clear();
+
+        ServersManager *manager = ServersManager::get();
         loadList();
-        m_fake_refresh = false;
-        m_reload_widget->setActivated();
+        m_server_list_widget->addItem("spacer", L"");
+        m_server_list_widget->addItem("loading",
+        StringUtils::loadingDots(_("Fetching servers")));
+
+        // restore previous selection
+        if (selection != -1 && selection_str != "spacer" && selection_str != "loading")
+            m_server_list_widget->setSelectionID(selection);
     }
 }   // onUpdate

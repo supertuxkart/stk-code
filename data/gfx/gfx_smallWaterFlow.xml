@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<particles emitter="sphere" radius="0.1">
+
+    <spreading angle="12"      />
+    
+    <velocity  x="0.000"
+               y="0.000"
+               z="0.005"         />
+    
+    <material  file="particle_water.png"  />
+    
+    <!-- Amount of particles emitted per second -->
+    <rate      min="30"
+               max="50"         />
+    
+    <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
+    <lifetime  min="500"
+               max="1000"         />
+    
+    <!-- Size of the particles -->
+    <size      min="0.1"
+               max="0.2"       
+               x-increase-factor="1.3"
+               y-increase-factor="1.3" />
+    
+    <color     min="255 255 255"
+               max="255 255 255" />
+
+    <fadeout   time="3000" />
+
+
+</particles>

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -46,27 +46,7 @@ private:
     GUIEngine::IconButtonWidget * m_create_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
-    // --------------------------------------------------------------------
-    class ServerCreationRequest : public Online::XMLRequest
-    {
-        virtual void callback();
-        uint32_t m_created_server_id;
-    public:
-        const uint32_t getCreatedServerID() const
-        {
-            assert(isDone());
-            return m_created_server_id;
-        }   // getCreatedServerID
-    };   // ServerCreationRequest
-    // --------------------------------------------------------------------
-
-
-    ServerCreationRequest *m_server_creation_request;
-
-    /** \brief Sets which widget has to be focused. Depends on the user state. */
-    void setInitialFocus();
-
-    void serverCreationRequest();
+    void createServer();
 
 public:
 
@@ -80,19 +60,11 @@ public:
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void beforeAddingWidget() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
 
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
-
-    /** \brief Implements the callback when a dialog gets closed. */
-    virtual void onDialogClose() OVERRIDE;
-};
+};   // class CreateServerScreen
 
 #endif

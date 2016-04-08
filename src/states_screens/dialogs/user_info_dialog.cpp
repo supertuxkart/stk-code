@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,13 +17,12 @@
 
 #include "states_screens/dialogs/user_info_dialog.hpp"
 
-#include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/engine.hpp"
 #include "online/online_profile.hpp"
+#include "states_screens/online_profile_achievements.hpp"
 #include "states_screens/online_profile_friends.hpp"
-#include "states_screens/online_profile_overview.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -54,7 +53,7 @@ void UserInfoDialog::load()
     m_name_widget->setText(m_online_profile->getUserName(),false);
     m_info_widget->setText(m_info, false);
     if(m_remove_widget->isVisible() && !m_online_profile->isFriend())
-        m_remove_widget->setLabel("Cancel Request");
+        m_remove_widget->setLabel(_("Cancel Request"));
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -144,9 +143,10 @@ void UserInfoDialog::sendFriendRequest()
          */
         virtual void callback()
         {
+            core::stringw info_text("");
             uint32_t id(0);
             getXMLData()->get("friendid", &id);
-            core::stringw info_text("");
+
             if (isSuccess())
             {
                 PlayerManager::getCurrentOnlineProfile()->addFriend(id);
@@ -155,10 +155,13 @@ void UserInfoDialog::sendFriendRequest()
                                                              true, false);
                 ProfileManager::get()->getProfileByID(id)->setRelationInfo(info);
                 OnlineProfileFriends::getInstance()->refreshFriendsList();
-                info_text = _("Friend request send!");
+                info_text = _("Friend request sent!");
             }
             else
+            {
                 info_text = getInfo();
+            }
+
             UserInfoDialog *dialog = new UserInfoDialog(id, info_text,
                                                        !isSuccess(), true);
             GUIEngine::DialogQueue::get()->pushDialog(dialog, true);
@@ -176,7 +179,7 @@ void UserInfoDialog::sendFriendRequest()
     request->queue();
 
     m_processing = true;
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
 
 }   // sendFriendRequest
 
@@ -196,8 +199,9 @@ void UserInfoDialog::acceptFriendRequest()
         virtual void callback()
         {
             uint32_t id(0);
-            getXMLData()->get("friendid", &id);
             core::stringw info_text("");
+            getXMLData()->get("friendid", &id);
+
             if (isSuccess())
             {
                 OnlineProfile * profile =
@@ -211,7 +215,10 @@ void UserInfoDialog::acceptFriendRequest()
                 info_text = _("Friend request accepted!");
             }
             else
+            {
                 info_text = getInfo();
+            }
+
             GUIEngine::DialogQueue::get()->pushDialog(
                 new UserInfoDialog(id, info_text, !isSuccess(), true), true);
 
@@ -225,8 +232,9 @@ void UserInfoDialog::acceptFriendRequest()
     PlayerManager::setUserDetails(request, "accept-friend-request");
     request->addParameter("friendid", m_online_profile->getID());
     request->queue();
+
     m_processing = true;
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
 }   // acceptFriendRequest
 
 // -----------------------------------------------------------------------------
@@ -246,8 +254,9 @@ void UserInfoDialog::declineFriendRequest()
         virtual void callback()
         {
             uint32_t id(0);
-            getXMLData()->get("friendid", &id);
             core::stringw info_text("");
+            getXMLData()->get("friendid", &id);
+
             if (isSuccess())
             {
                 PlayerManager::getCurrentOnlineProfile()->removeFriend(id);
@@ -258,7 +267,10 @@ void UserInfoDialog::declineFriendRequest()
                 info_text = _("Friend request declined!");
             }
             else
+            {
                 info_text = getInfo();
+            }
+
             GUIEngine::DialogQueue::get()->pushDialog(
                                 new UserInfoDialog(id, info_text, !isSuccess(),
                                                    true), true);
@@ -273,7 +285,7 @@ void UserInfoDialog::declineFriendRequest()
     request->queue();
 
     m_processing = true;
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
 
 }   // declineFriendRequest
 
@@ -286,9 +298,11 @@ void UserInfoDialog::removeExistingFriend()
     class RemoveFriendRequest : public XMLRequest
     {
         unsigned int m_id;
+
         virtual void callback()
         {
             core::stringw info_text("");
+
             if (isSuccess())
             {
                 PlayerManager::getCurrentOnlineProfile()->removeFriend(m_id);
@@ -299,7 +313,9 @@ void UserInfoDialog::removeExistingFriend()
                 info_text = _("Friend removed!");
             }
             else
+            {
                 info_text = getInfo();
+            }
 
             UserInfoDialog *info = new UserInfoDialog(m_id, info_text,
                                                       !isSuccess(), true);
@@ -335,8 +351,9 @@ void UserInfoDialog::removePendingFriend()
         virtual void callback()
         {
             uint32_t id(0);
-            getXMLData()->get("friendid", &id);
             core::stringw info_text("");
+            getXMLData()->get("friendid", &id);
+
             if (isSuccess())
             {
                 PlayerManager::getCurrentOnlineProfile()->removeFriend(id);
@@ -347,8 +364,9 @@ void UserInfoDialog::removePendingFriend()
                 info_text = _("Friend request cancelled!");
             }
             else
+            {
                 info_text = getInfo();
-
+            }
             UserInfoDialog *dia = new UserInfoDialog(id, info_text,
                                                      !isSuccess(), true);
             GUIEngine::DialogQueue::get()->pushDialog(dia, true);
@@ -380,7 +398,7 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         {
             ProfileManager::get()->setVisiting(m_online_profile->getID());
             m_enter_profile = true;
-            m_options_widget->setDeactivated();
+            m_options_widget->setActive(false);
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == m_friend_widget->m_properties[PROP_ID])
@@ -397,7 +415,7 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
                 removeExistingFriend();
 
             m_processing = true;
-            m_options_widget->setDeactivated();
+            m_options_widget->setActive(false);
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == m_accept_widget->m_properties[PROP_ID])
@@ -417,7 +435,7 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
 // -----------------------------------------------------------------------------
 void UserInfoDialog::deactivate()
 {
-    m_options_widget->setDeactivated();
+    m_options_widget->setActive(false);
 }   // deactivate
 
 // -----------------------------------------------------------------------------
@@ -461,9 +479,10 @@ void UserInfoDialog::onUpdate(float dt)
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
+        bool enter_profile = m_enter_profile;
         ModalDialog::dismiss();
-        if (m_enter_profile)
-            StateManager::get()->replaceTopMostScreen(OnlineProfileOverview::getInstance());
+        if (enter_profile)
+            StateManager::get()->replaceTopMostScreen(TabOnlineProfileAchievements::getInstance());
         return;
     }
 }   // onUpdate

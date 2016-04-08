@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,14 +19,15 @@
 #ifndef HEADER_RACE_RESULT_GUI_HPP
 #define HEADER_RACE_RESULT_GUI_HPP
 
+
+#include "guiengine/screen.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "states_screens/state_manager.hpp"
 
 #include <assert.h>
 #include <vector>
 
-#include "guiengine/screen.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
-#include "states_screens/state_manager.hpp"
 
 namespace irr
 {
@@ -36,6 +37,7 @@ namespace irr
     }
 }
 
+class MusicInformation;
 class SFXBase;
 
 /**
@@ -80,8 +82,6 @@ private:
         float            m_y_pos;
         /** True if kart is a player kart. */
         bool             m_is_player_kart;
-        /** Only if m_is_player_kart is true */
-        const StateManager::ActivePlayer* m_player;
         /** The radius to use when sorting the entries. Positive values
             will rotate downwards, negatives are upwards. */
         float            m_radius;
@@ -162,19 +162,14 @@ private:
     /** The previous monospace state of the font. */
     bool                       m_was_monospace;
 
-    SFXBase*                   m_finish_sound;
+    /** Sound effect at end of race. */
+    SFXBase                   *m_finish_sound;
 
-    /** For highscores */
-    std::string m_highscore_who;
-
-    /** For highscores */
-    StateManager::ActivePlayer* m_highscore_player;
+    /** Music to be played after race ended. */
+    MusicInformation          *m_race_over_music;
 
     /** For highscores */
     int m_highscore_rank;
-
-    /** For highscores */
-    int m_highscore_time;
 
     unsigned int m_width_all_points;
 
@@ -205,10 +200,10 @@ private:
 public:
 
                  RaceResultGUI();
-    virtual void renderGlobal(float dt);
+    virtual void renderGlobal(float dt) OVERRIDE;
 
     /** \brief Implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() {};
+    virtual void loadedFromFile() OVERRIDE {};
 
     virtual void init() OVERRIDE;
     virtual void tearDown() OVERRIDE;
@@ -218,16 +213,17 @@ public:
                                Input::InputType type, int playerId) OVERRIDE;
     void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                        const int playerID) OVERRIDE;
+    void backToLobby();
 
 
     friend class GUIEngine::ScreenSingleton<RaceResultGUI>;
 
     /** Should not be called anymore.  */
-    const core::dimension2du getMiniMapSize() const
+    const core::dimension2du getMiniMapSize() const OVERRIDE
                   { assert(false); return core::dimension2du(0, 0); }
 
     /** No kart specific view needs to be rendered in the result gui. */
-    virtual void renderPlayerView(const AbstractKart *kart) {}
+    virtual void renderPlayerView(const Camera *camera, float dt) OVERRIDE {}
 
     virtual void onUpdate(float dt) OVERRIDE;
 
@@ -240,10 +236,8 @@ public:
                             float time,
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
-                            bool important=true) { }
-
-    /** Should not be called anymore. */
-    virtual void clearAllMessages() {assert(false); }
+                            bool important=true,
+                            bool big_font=false) OVERRIDE { }
 
     void nextPhase();
 
@@ -257,10 +251,9 @@ public:
       * \param rank Highscore rank (first highscore, second highscore, etc.). This is not the race rank
       * \param time Finish time in seconds
       */
-    void setHighscore(const std::string &kart,
-                      StateManager::ActivePlayer* player, int rank, int time);
+    void setHighscore(int rank);
 
-    virtual void onConfirm();
+    virtual void onConfirm() OVERRIDE;
 };   // RaceResultGUI
 
 #endif

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -76,7 +76,7 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
                                               /*word wrap*/true,
                                               m_irrlicht_window);
     b->setTabStop(false);
-    b->setRightToLeft(translations->isRTLLanguage());
+    b->setRightToLeft(translations->isRTLText(msg));
     // because it looks like 'setRightToLeft' applies next time
     // setText is called only
     b->setText(msg.c_str());
@@ -165,8 +165,8 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
     }
     else if (eventSource == "addkeyboard")
     {
-        input_manager->getDeviceList()->addEmptyKeyboard();
-        input_manager->getDeviceList()->serialize();
+        input_manager->getDeviceManager()->addEmptyKeyboard();
+        input_manager->getDeviceManager()->save();
         ModalDialog::dismiss();
 
         ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();

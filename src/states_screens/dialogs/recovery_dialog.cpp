@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -116,7 +116,7 @@ void RecoveryDialog::processInput()
     if (username.size() < 4 || username.size() > 30 ||
         email.size() < 4    || email.size() > 50       )
     {
-        sfx_manager->quickSound("anvil");
+        SFXManager::get()->quickSound("anvil");
         m_info_widget->setErrorColor();
         m_info_widget->setText(_("Username and/or email address invalid."),
                                false);
@@ -124,10 +124,12 @@ void RecoveryDialog::processInput()
     else
     {
         m_info_widget->setDefaultColor();
-        m_options_widget->setDeactivated();
+        m_options_widget->setActive(false);
+
         m_recovery_request = new XMLRequest();
+
         // This function also works when the current user is not logged in
-        PlayerManager::setUserDetails(m_recovery_request, "recovery");
+        PlayerManager::setUserDetails(m_recovery_request, "recover");
         m_recovery_request->addParameter("username", username);
         m_recovery_request->addParameter("email",    email   );
         m_recovery_request->queue();
@@ -142,10 +144,13 @@ GUIEngine::EventPropagation
 {
     std::string selection;
     if (eventSource == m_options_widget->m_properties[PROP_ID])
-        selection =
-                 m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    {
+        selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    }
     else
+    {
         selection = eventSource;
+    }
 
     if (selection == m_cancel_widget->m_properties[PROP_ID])
     {
@@ -165,9 +170,9 @@ GUIEngine::EventPropagation
  */
 void RecoveryDialog::onEnterPressedInternal()
 {
-
     if (GUIEngine::isFocusedForPlayer(m_options_widget, PLAYER_ID_GAME_MASTER))
         return;
+
     if (m_submit_widget->isActivated())
         processInput();
 }
@@ -189,20 +194,24 @@ void RecoveryDialog::onUpdate(float dt)
             }
             else
             {
-                sfx_manager->quickSound( "anvil" );
+                SFXManager::get()->quickSound( "anvil" );
                 m_info_widget->setErrorColor();
                 m_info_widget->setText(m_recovery_request->getInfo(), false);
-                m_options_widget->setActivated();
+                m_options_widget->setActive(true);
             }
+
             delete m_recovery_request;
             m_recovery_request = NULL;
         }
         else
         {
-            m_info_widget->setText(StringUtils::loadingDots(_("Validating info")),
-                                   false);
+            m_info_widget->setText(
+                StringUtils::loadingDots(_("Validating info")),
+                false
+            );
         }
     }
+
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
         ModalDialog::dismiss();

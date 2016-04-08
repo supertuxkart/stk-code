@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2014 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -167,11 +167,14 @@ PlayerManager::PlayerManager()
 PlayerManager::~PlayerManager()
 {
     // If the passwords should not be remembered, clear the saved session.
-    PlayerProfile *player;
-    for_in(player, m_all_players)
+    for_var_in(PlayerProfile*, player, m_all_players)
     {
         if(!player->rememberPassword())
-            player->clearSession();
+        {
+            // Don't let the player trigger a save, since it
+            // will be done below anyway.
+            player->clearSession(/*save*/false);
+        }
     }
     save();
 
@@ -211,7 +214,7 @@ void PlayerManager::load()
     if(current)
     {
         stringw name;
-        current->get("player", &name);
+        current->getAndDecode("player", &name);
         m_current_player = getPlayer(name);
     }
 
@@ -266,12 +269,11 @@ void PlayerManager::save()
         if(m_current_player)
         {
             players_file << L"    <current player=\""
-                         << m_current_player->getName() << L"\"/>\n";
+                         << StringUtils::xmlEncode(m_current_player->getName(true/*ignoreRTL*/)) << L"\"/>\n";
         }
 
         // Save all non-guest players
-        PlayerProfile *player;
-        for_in(player, m_all_players)
+        for (PlayerProfile* player : m_all_players)
         {
             if(!player->isGuestAccount())
                 player->save(players_file);
@@ -320,14 +322,12 @@ void PlayerManager::deletePlayer(PlayerProfile *player)
 void PlayerManager::enforceCurrentPlayer()
 {
     if (m_current_player) return;
-
-    PlayerProfile *player;
-    for_in(player, m_all_players)
+    for (PlayerProfile* player : m_all_players)
     {
         if (!player->isGuestAccount())
         {
-            Log::info("PlayerManager", "Enfocring current player '%ls'.",
-                      player->getName().c_str()           );
+            Log::info("PlayerManager", "Enforcing current player '%ls'.",
+                      player->getName(true/*ignoreRTL*/).c_str());
             m_current_player = player;
             return;
         }
@@ -336,12 +336,12 @@ void PlayerManager::enforceCurrentPlayer()
     // This shouldn't happen - but just in case: add the default players
     // again, and search again for a non-guest player.
     addDefaultPlayer();
-    for_in(player, m_all_players)
+    for (PlayerProfile* player : m_all_players)
     {
         if (!player->isGuestAccount())
         {
-            Log::info("PlayerManager", "Enfocring current player '%s'.",
-                       player->getName().c_str());
+            Log::info("PlayerManager", "Enforcing current player '%s'.",
+                       player->getName(true/*ignoreRTL*/).c_str());
             m_current_player = player;
             return;
         }
@@ -353,8 +353,8 @@ void PlayerManager::enforceCurrentPlayer()
 
 // ----------------------------------------------------------------------------
 /** Called when no player profiles exists. It creates two players: one
- *  guest player, and one non-guest player for whic hit tries to guess a
- *  mame based on environment variables.
+ *  guest player, and one non-guest player for which it tries to guess a
+ *  name based on environment variables.
  */
 void PlayerManager::addDefaultPlayer()
 {
@@ -408,8 +408,7 @@ void PlayerManager::createGuestPlayers(int n)
 unsigned int PlayerManager::getNumNonGuestPlayers() const
 {
     unsigned int count=0;
-    const PlayerProfile *player;
-    for_in(player, m_all_players)
+    for (const PlayerProfile* player : m_all_players)
     {
         if(!player->isGuestAccount()) count ++;
     }
@@ -422,8 +421,7 @@ unsigned int PlayerManager::getNumNonGuestPlayers() const
 unsigned int PlayerManager::getUniqueId() const
 {
     unsigned int max_id=0;
-    const PlayerProfile *player;
-    for_in(player, m_all_players)
+    for (const PlayerProfile* player : m_all_players)
     {
         if(player->getUniqueID()>max_id)
             max_id = player->getUniqueID();
@@ -439,8 +437,7 @@ unsigned int PlayerManager::getUniqueId() const
  */
 const PlayerProfile *PlayerManager::getPlayerById(unsigned int id)
 {
-    const PlayerProfile *player;
-    for_in(player, m_all_players)
+    for (const PlayerProfile* player : m_all_players)
     {
         if(player->getUniqueID()==id)
             return player;
@@ -455,10 +452,9 @@ const PlayerProfile *PlayerManager::getPlayerById(unsigned int id)
  */
 PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
 {
-    PlayerProfile *player;
-    for_in(player, m_all_players)
+    for (PlayerProfile* player : m_all_players)
     {
-        if(player->getName()==name)
+        if(player->getName(true/*ignoreRTL*/)==name)
             return player;
     }
     return NULL;

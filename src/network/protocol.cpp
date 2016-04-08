@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,82 +18,130 @@
 
 #include "network/protocol.hpp"
 
+#include "network/event.hpp"
+#include "network/network_string.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/network_manager.hpp"
+#include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 
-Protocol::Protocol(CallbackObject* callback_object, PROTOCOL_TYPE type)
+/** \brief Constructor
+ *  Sets the basic protocol parameters, as the callback object and the
+ *  protocol type.
+ *  \param callback_object The callback object that will be used by the
+ *          protocol. Protocols that do not use callback objects must set
+ *          it to NULL.
+ *  \param type The type of the protocol.
+ */
+Protocol::Protocol(ProtocolType type, CallbackObject* callback_object)
 {
-    m_callback_object = callback_object;
-    m_type = type;
-}
+    m_callback_object       = callback_object;
+    m_type                  = type;
+    m_state                 = PROTOCOL_STATE_INITIALISING;
+    m_id                    = 0;
+    m_handle_connections    = false;
+    m_handle_disconnections = false;
+}   // Protocol
 
+// ----------------------------------------------------------------------------
+/** \brief Destructor.
+ */
 Protocol::~Protocol()
 {
-}
+}   // ~Protocol
 
-void Protocol::pause()
+// ----------------------------------------------------------------------------
+/** Returns a network string with the given type.
+ *  \capacity Default preallocated size for the message.
+ */
+NetworkString* Protocol::getNetworkString(int capacity)
 {
-    m_listener->requestPause(this);
-}
-void Protocol::unpause()
-{
-    m_listener->requestUnpause(this);
-}
+    return new NetworkString(m_type, capacity);
+}   // getNetworkString
 
-void Protocol::kill()
+// ----------------------------------------------------------------------------
+/** Checks if the message has at least the specified size, and if not prints
+ *  a warning message including the message content.
+ *  \return True if the message is long enough, false otherwise.
+ */
+bool Protocol::checkDataSize(Event* event, unsigned int minimum_size)
 {
-}
-
-void Protocol::setListener(ProtocolManager* listener)
-{
-    m_listener = listener;
-}
-
-PROTOCOL_TYPE Protocol::getProtocolType()
-{
-    return m_type;
-}
-
-bool Protocol::checkDataSizeAndToken(Event* event, int minimum_size)
-{
-    NetworkString data = event->data();
-    if (data.size() < minimum_size || data[0] != 4)
+    const NetworkString &data = event->data();
+    if (data.size() < minimum_size)
     {
-        Log::warn("Protocol", "Receiving a badly "
-                  "formated message. Size is %d and first byte %d",
-                  data.size(), data[0]);
-        return false;
-    }
-    STKPeer* peer = *(event->peer);
-    uint32_t token = data.gui32(1);
-    if (token != peer->getClientServerToken())
-    {
-        Log::warn("Protocol", "Peer sending bad token. Request "
-                  "aborted.");
+        Log::warn("Protocol", "Receiving a badly formated message:");
+        Log::warn("Protocol", data.getLogMessage().c_str());
         return false;
     }
     return true;
-}
+}   // checkDataSize
 
-bool Protocol::isByteCorrect(Event* event, int byte_nb, int value)
+// ----------------------------------------------------------------------------
+/** Starts a request in the protocol manager to start this protocol. 
+ */
+void Protocol::requestStart()
 {
-    NetworkString data = event->data();
-    if (data[byte_nb] != value)
-    {
-        Log::info("Protocol", "Bad byte at pos %d. %d "
-                "should be %d", byte_nb, data[byte_nb], value);
-        return false;
-    }
-    return true;
-}
+    ProtocolManager::getInstance()->requestStart(this);
+}   // requestStart
 
-void Protocol::sendMessageToPeersChangingToken(NetworkString prefix, NetworkString message)
+// ----------------------------------------------------------------------------
+/** Submits a request to the ProtocolManager to pause this protocol.
+ */
+void Protocol::requestPause()
 {
-    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
+    ProtocolManager::getInstance()->requestPause(this);
+}   // requestPause
+
+// ----------------------------------------------------------------------------
+/** Submits a request to the ProtocolManager to unpause this protocol.
+ */
+void Protocol::requestUnpause()
+{
+    ProtocolManager::getInstance()->requestUnpause(this);
+}   // requestUnpause
+
+// ----------------------------------------------------------------------------
+/** Submits a request to the ProtocolManager to terminate this protocol.
+ */
+void Protocol::requestTerminate()
+{
+    ProtocolManager::getInstance()->requestTerminate(this);
+}   // requestTerminate
+
+// ----------------------------------------------------------------------------
+/** Finds a protocol with the given type and requests it to be terminated.
+ *  If no such protocol exist, log an error message.
+ *  \param type The protocol type to delete.
+ */
+void Protocol::findAndTerminateProtocol(ProtocolType type)
+{
+    Protocol* protocol = ProtocolManager::getInstance()->getProtocol(type);
+    if (protocol)
+        protocol->requestTerminate();
+    else
+        Log::error("ClientLobbyRoomProtocol",
+                    "No protocol %d registered.", type);
+}   // findAndTerminateProtocol
+
+// ----------------------------------------------------------------------------
+/** Sends a message to all peers, inserting the peer's token into the message.
+ *  The message is composed of a 1-byte message (usually the message type)
+ *  followed by the token of this client and then actual message).
+ *  \param message The actual message content.
+*/
+void Protocol::sendMessageToPeersChangingToken(NetworkString *message,
+                                               bool reliable)
+{
+    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        prefix.ai8(4).ai32(peers[i]->getClientServerToken());
-        prefix += message;
-        m_listener->sendMessage(this, peers[i], prefix);
+        peers[i]->sendPacket(message, reliable);
     }
-}
+}   // sendMessageToPeersChangingToken
+
+// ----------------------------------------------------------------------------
+/** Sends a message from a client to the server.
+ */
+void Protocol::sendToServer(NetworkString *message, bool reliable)
+{
+    STKHost::get()->sendToServer(message, reliable);
+}   // sendMessage

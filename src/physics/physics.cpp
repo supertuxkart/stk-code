@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,7 +28,7 @@
 #include "items/flyable.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
-#include "karts/controller/player_controller.hpp"
+#include "karts/controller/local_player_controller.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
 #include "karts/explosion_animation.hpp"
@@ -37,7 +37,10 @@
 #include "physics/physical_object.hpp"
 #include "physics/stk_dynamics_world.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "race/race_manager.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_object.hpp"
 #include "utils/profiler.hpp"
 
 // ----------------------------------------------------------------------------
@@ -166,6 +169,14 @@ void Physics::update(float dt)
                               p->getContactPointCS(0),
                               p->getUserPointer(1)->getPointerKart(),
                               p->getContactPointCS(1)                );
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
+            int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
+            script_engine->runFunction(false, "void onKartKartCollision(int, int)",
+                [=](asIScriptContext* ctx) {
+                    ctx->SetArgDWord(0, kartid1);
+                    ctx->SetArgDWord(1, kartid2);
+                });
             continue;
         }  // if kart-kart collision
 
@@ -173,34 +184,54 @@ void Physics::update(float dt)
         {
             // Kart hits physical object
             // -------------------------
-            PhysicalObject *obj = p->getUserPointer(0)
-                                   ->getPointerPhysicalObject();
-            if(obj->isCrashReset())
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+            int kartId = kart->getWorldKartId();
+            PhysicalObject* obj = p->getUserPointer(0)->getPointerPhysicalObject();
+            std::string obj_id = obj->getID();
+            std::string scripting_function = obj->getOnKartCollisionFunction();
+
+            TrackObject* to = obj->getTrackObject();
+            TrackObject* library = to->getParentLibrary();
+            std::string lib_id;
+            std::string* lib_id_ptr = NULL;
+            if (library != NULL)
+                lib_id = library->getID();
+            lib_id_ptr = &lib_id;
+
+            if (scripting_function.size() > 0)
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+                script_engine->runFunction(true, "void " + scripting_function + "(int, const string, const string)",
+                    [&](asIScriptContext* ctx) {
+                        ctx->SetArgDWord(0, kartId);
+                        ctx->SetArgObject(1, lib_id_ptr);
+                        ctx->SetArgObject(2, &obj_id);
+                    });
+            }
+            if (obj->isCrashReset())
+            {
                 new RescueAnimation(kart);
             }
             else if (obj->isExplodeKartObject())
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 ExplosionAnimation::create(kart);
             }
             else if (obj->isFlattenKartObject())
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
-                const KartProperties* kp = kart->getKartProperties();
-                kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
+                const KartProperties *kp = kart->getKartProperties();
+                kart->setSquash(kp->getSwatterSquashDuration(),
+                    kp->getSwatterSquashSlowdown());
             }
-            else if(obj->isSoccerBall())
+            else if(obj->isSoccerBall() && 
+                    race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
-                int kartId = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
-                soccerWorld->setLastKartTohitBall(kartId);
+                soccerWorld->setBallHitter(kartId);
             }
             continue;
         }
 
-        if(p->getUserPointer(0)->is(UserPointer::UP_ANIMATION))
+        if (p->getUserPointer(0)->is(UserPointer::UP_ANIMATION))
         {
             // Kart hits animation
             ThreeDAnimation *anim=p->getUserPointer(0)->getPointerAnimation();
@@ -217,8 +248,9 @@ void Physics::update(float dt)
             else if (anim->isFlattenKartObject())
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
-                const KartProperties* kp = kart->getKartProperties();
-                kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
+                const KartProperties *kp = kart->getKartProperties();
+                kart->setSquash(kp->getSwatterSquashDuration(),
+                    kp->getSwatterSquashSlowdown());
             }
             continue;
 
@@ -235,14 +267,28 @@ void Physics::update(float dt)
         {
             // Projectile hits physical object
             // -------------------------------
-            p->getUserPointer(0)->getPointerFlyable()
-                ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Flyable* flyable = p->getUserPointer(0)->getPointerFlyable();
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
-            if(obj->isSoccerBall())
+            std::string obj_id = obj->getID();
+            std::string scripting_function = obj->getOnItemCollisionFunction();
+            if (scripting_function.size() > 0)
+            {
+                script_engine->runFunction(true, "void " + scripting_function + "(int, int, const string)",
+                        [&](asIScriptContext* ctx) {
+                        ctx->SetArgDWord(0, (int)flyable->getType());
+                        ctx->SetArgDWord(1, flyable->getOwnerId());
+                        ctx->SetArgObject(2, &obj_id);
+                    });
+            }
+            flyable->hit(NULL, obj);
+
+            if (obj->isSoccerBall() && 
+                race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
-                soccerWorld->setLastKartTohitBall(kartId);
+                soccerWorld->setBallHitter(kartId);
             }
 
         }
@@ -261,17 +307,20 @@ void Physics::update(float dt)
 
                 // Check for achievements
                 AbstractKart * kart = World::getWorld()->getKart(f->getOwnerId());
-                PlayerController *c = dynamic_cast<PlayerController*>(kart->getController());
+                LocalPlayerController *lpc =
+                    dynamic_cast<LocalPlayerController*>(kart->getController());
 
                 // Check that it's not a kart hitting itself (this can
                 // happen at the time a flyable is shot - release too close
                 // to the kart, and it's the current player. At this stage
                 // only the current player can get achievements.
-                if (target_kart != kart && c &&
-                    c->getPlayer()->getConstProfile() == PlayerManager::getCurrentPlayer())
+                if (target_kart != kart && lpc && lpc->canGetAchievements())
                 {
+                    // Compare the current value of hits with the 'hit' goal value
+                    // (otherwise it would be compared with the kart id goal value,
+                    // which doesn't exist.
                     PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_ARCH_ENEMY,
-                                                       target_kart->getIdent(), 1);
+                                                       target_kart->getIdent(), 1, "hit");
                     if (type == PowerupManager::POWERUP_BOWLING)
                     {
                         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_STRIKE,
@@ -545,10 +594,21 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                     upA, contact_manifold->getContactPoint(0).m_localPointA,
                     upB, contact_manifold->getContactPoint(0).m_localPointB);
             else if(upB->is(UserPointer::UP_PHYSICAL_OBJECT))
+            {
                 // 2.3 kart hits physical object
                 m_all_collisions.push_back(
                     upB, contact_manifold->getContactPoint(0).m_localPointB,
                     upA, contact_manifold->getContactPoint(0).m_localPointA);
+                // If the object is a statical object (e.g. a door in
+                // overworld) add a push back to avoid that karts get stuck
+                if (objB->isStaticObject())
+                {
+                    AbstractKart *kart = upA->getPointerKart();
+                    const btVector3 &normal = contact_manifold->getContactPoint(0)
+                        .m_normalWorldOnB;
+                    kart->crashed((Material*)NULL, normal);
+                }   // isStatiObject
+            }
             else if(upB->is(UserPointer::UP_ANIMATION))
                 m_all_collisions.push_back(
                     upB, contact_manifold->getContactPoint(0).m_localPointB,

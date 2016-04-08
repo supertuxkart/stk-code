@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,6 +25,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/help_screen_2.hpp"
@@ -54,7 +55,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
 {
     if (name == "startTutorial")
     {
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
         race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
         race_manager->setNumKarts( 1 );
@@ -63,7 +64,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
         race_manager->setReverseTrack(false);
 
         // Use keyboard 0 by default (FIXME: let player choose?)
-        InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+        InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
 
         // Create player and associate player with keyboard
         StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
@@ -75,12 +76,12 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
                       UserConfigParams::m_default_kart.c_str());
             UserConfigParams::m_default_kart.revertToDefaults();
         }
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
         // ASSIGN should make sure that only input from assigned devices
         // is read.
-        input_manager->getDeviceList()->setAssignMode(ASSIGN);
-        input_manager->getDeviceList()
+        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+        input_manager->getDeviceManager()
             ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
         StateManager::get()->enterGameState();
@@ -117,14 +118,8 @@ void HelpScreen1::init()
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
     ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
 
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        tutorial->setDeactivated();
-    }
-    else
-    {
-        tutorial->setActivated();
-    }
+    tutorial->setActive(StateManager::get()->getGameState() != 
+                                                       GUIEngine::INGAME_MENU);
 
     if (w != NULL)  w->select( "page1", PLAYER_ID_GAME_MASTER );
 }   //init

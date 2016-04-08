@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2014 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -143,21 +143,28 @@ public:
     }   // getCurrentAchievementsStatus
     // ------------------------------------------------------------------------
     /** A handy shortcut to increase points for an achievement key of the
-     *  current player. */
-    static void increaseAchievement(unsigned int index, const std::string &key,
-                                    int increase = 1)
+     *  current player.
+     *  \param achievement_id The achievement id.
+     *  \param key The key of the current value to increase.
+     *  \param increase How much to increase the current value.
+     *  \param goal_key Optional: The goal key to compare the current value
+     *         with. If not set, defaults to key.
+     */
+    static void increaseAchievement(unsigned int achievement_id,
+                                    const std::string &key,
+                                    int increase = 1, 
+                                    const std::string &goal_key="")
     {
-        Achievement *a = getCurrentAchievementsStatus()->getAchievement(index);
+        Achievement *a = getCurrentAchievementsStatus()
+                       ->getAchievement(achievement_id);
         if (!a)
         {
-            Log::fatal("PlayerManager", "Achievement '%d' not found.", index);
+            Log::fatal("PlayerManager", "Achievement '%d' not found.",
+                        achievement_id);
         }
-        a->increase(key, increase);
+        a->increase(key, goal_key.empty() ? key : goal_key, increase);
+
     }   // increaseAchievement
     // ------------------------------------------------------------------------
 };   // PlayerManager
-
-
 #endif
-
-/*EOF*/

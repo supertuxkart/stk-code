@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -41,8 +41,8 @@ void Vec3::setHPR(const btQuaternion& q)
  */
 void Vec3::setPitchRoll(const Vec3 &normal)
 {
-    const float X = sin(getHeading());
-    const float Z = cos(getHeading());
+    const float X = sinf(getHeading());
+    const float Z = cosf(getHeading());
     // Compute the angle between the normal of the plane and the line to
     // (x,0,z).  (x,0,z) is normalised, so are the coordinates of the plane,
     // which simplifies the computation of the scalar product.

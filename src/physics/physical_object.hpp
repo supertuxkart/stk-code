@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -47,6 +47,8 @@ public:
     class Settings
     {
     public:
+        /** ID of the object. */
+        std::string               m_id;
         /** Mass of the object. */
         float                     m_mass;
         /** Radius of the object. */
@@ -65,6 +67,14 @@ public:
         /** If the item is below that height, it is reset (when
          *  m_reset_when_too_low is true). */
         float                     m_reset_height;
+        /** If non-empty, the name of the scripting function to call
+          * when a kart collides with this object
+          */
+        std::string               m_on_kart_collision;
+        /** If non-empty, the name of the scripting function to call
+        * when a (flyable) item collides with this object
+        */
+        std::string               m_on_item_collision;
     private:
         void init();
     public:
@@ -91,6 +101,9 @@ private:
     /** The bullet collision shape. */
     btCollisionShape     *m_shape;
 
+    /** ID of the object. */
+    std::string           m_id;
+
     /** The corresponding bullet rigid body. */
     btRigidBody          *m_body;
 
@@ -99,6 +112,8 @@ private:
 
     /** The mass of this object. */
     float                 m_mass;
+
+    bool                  m_body_added;
 
     /** The pointer that is stored in the bullet rigid body back to
      *  this object. */
@@ -135,7 +150,14 @@ private:
     /** If m_reset_when_too_low this object is set back to its start
      *  position if its height is below this value. */
     float                 m_reset_height;
-
+    /** If non-empty, the name of the scripting function to call
+    * when a kart collides with this object
+    */
+    std::string           m_on_kart_collision;
+    /** If non-empty, the name of the scripting function to call
+    * when a (flyable) item collides with this object
+    */
+    std::string           m_on_item_collision;
     /** If this body is a bullet dynamic body, i.e. affected by physics
      *  or not (static (not moving) or kinematic (animated outside
      *  of physics). */
@@ -159,6 +181,15 @@ public:
     void         move           (const Vec3& xyz, const core::vector3df& hpr);
     void         hit            (const Material *m, const Vec3 &normal);
     bool         isSoccerBall   () const;
+    bool castRay(const btVector3 &from,
+                 const btVector3 &to, btVector3 *hit_point,
+                 const Material **material, btVector3 *normal,
+                 bool interpolate_normal) const;
+
+    // ------------------------------------------------------------------------
+    /** Returns the ID of this physical object. */
+    std::string getID()          { return m_id; }
+    // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
     /** Returns the rigid body of this physical object. */
     btRigidBody *getBody        ()          { return m_body; }
@@ -171,10 +202,48 @@ public:
      *  it. */
     bool isExplodeKartObject () const { return m_explode_kart; }
     // ------------------------------------------------------------------------
-    /** Returns true if this object should cause a kart that touches it to
-     *  be flattened. */
-    bool isFlattenKartObject () const { return m_flatten_kart; }
+    /** Sets the interaction type */
+    void setInteraction(std::string interaction);
+    // ------------------------------------------------------------------------
+    /** Remove body from dynamic world */
+    void removeBody();
+    // ------------------------------------------------------------------------
+    /** Add body to dynamic world */
+    void addBody();
+    // ------------------------------------------------------------------------
+    const std::string& getOnKartCollisionFunction() const { return m_on_kart_collision; }
+    // ------------------------------------------------------------------------
+    const std::string& getOnItemCollisionFunction() const { return m_on_item_collision; }
+    // ------------------------------------------------------------------------
+    TrackObject* getTrackObject() { return m_object; }
 
+    // Methods usable by scripts
+
+    /**
+    * \addtogroup Scripting
+    * @{
+    * \addtogroup Scripting_Track Track
+    * @{
+    * \addtogroup Scripting_PhysicalObject PhysicalObject (script binding)
+    * Type returned by trackObject.getPhysicalObject()
+    * @{
+    */
+    /** Returns true if this object should cause a kart that touches it to
+    *  be flattened. */
+    bool isFlattenKartObject() const { return m_flatten_kart; }
+    void disable(/** \cond DOXYGEN_IGNORE */void *memory/** \endcond */)
+    {
+        ((PhysicalObject*)(memory))->removeBody();
+    }
+
+    //enables track object passed from the script
+    void enable(/** \cond DOXYGEN_IGNORE */void *memory/** \endcond */)
+    {
+        ((PhysicalObject*)(memory))->addBody();
+    }
+    /** @} */
+    /** @} */
+    /** @} */
 
     LEAK_CHECK()
 };  // PhysicalObject

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -157,10 +157,6 @@ private:
     /** The position of all four wheels in the 3d model. */
     Vec3          m_wheel_graphics_position[4];
 
-    /** The position of the wheels for the physics, which can be different
-     *  from the graphical position. */
-    Vec3          m_wheel_physics_position[4];
-
     /** Radius of the graphical wheels.  */
     float         m_wheel_graphics_radius[4];
     
@@ -173,12 +169,16 @@ private:
     /** The speed weighted objects. */
     SpeedWeightedObjectList     m_speed_weighted_objects;
     
-    /** Minimum suspension length. If the displayed suspension is
-     *  shorter than this, the wheel would look wrong. */
+    /** Length of the physics suspension when the kart is at rest. */
+    float m_default_physics_suspension[4];
+
+    /** Minimum suspension length (i.e. most compressed). If the displayed
+     *  suspension is shorter than this, the wheel would look wrong. */
     float         m_min_suspension[4];
 
-    /** Maximum suspension length. If the displayed suspension is
-     *  any longer, the wheel would look too far away from the chassis. */
+    /** Maximum suspension length (i.e. most extended). If the displayed
+     *  suspension is any longer, the wheel would look too far away from the
+     *  chassis. */
     float         m_max_suspension[4];
 
     /** value used to divide the visual movement of wheels (because the actual movement
@@ -207,8 +207,13 @@ private:
 
     /** True if this is the master copy, managed by KartProperties. This
      *  is mainly used for debugging, e.g. the master copies might not have
-     * anything attached to it etc. */
+     *  anything attached to it etc. */
     bool  m_is_master;
+
+    /** True if the animation played is non-loop, which will reset to
+     *  AF_DEFAULT after first loop ends. Mainly used in soccer mode for
+     *  animation playing after scored. */
+    bool  m_play_non_loop;
 
     void  loadWheelInfo(const XMLNode &node,
                         const std::string &wheel_name, int index);
@@ -227,14 +232,13 @@ private:
 public:
                   KartModel(bool is_master);
                  ~KartModel();
-    KartModel*    makeCopy();
+    KartModel*    makeCopy(video::E_RENDER_TYPE rt);
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
-    void          update(float dt, float rotation_dt, float steer,
-                         const float height_abve_terrain[4], float speed);
-    void          setDefaultPhysicsPosition(const Vec3 &center_shift,
-                                            float wheel_radius);
+    void          setDefaultSuspension();
+    void          update(float dt, float distance, float steer, float speed,
+                         int gt_replay_index = -1);
     void          finishedRace();
     scene::ISceneNode*
                   attachModel(bool animatedModels, bool always_animated);
@@ -262,14 +266,6 @@ public:
      */
     const Vec3* getWheelsGraphicsPosition() const
                 {return m_wheel_graphics_position;}
-    // ------------------------------------------------------------------------
-    /** Returns the position of a wheel relative to the kart for the physics.
-     *  The physics wheels can be attached at a different place to make the
-     *  karts more stable.
-     *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
-     *           right, 3 = rear left.  */
-    const Vec3& getWheelPhysicsPosition(unsigned int i) const
-                {assert(i<4); return m_wheel_physics_position[i];}
     // ------------------------------------------------------------------------
     /** Returns the radius of the graphical wheels.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
@@ -311,8 +307,11 @@ public:
     /** Lowest coordinate on up axis */
     float getLowestPoint           () const { return m_kart_lowest_point;  }
     // ------------------------------------------------------------------------
+    /** Returns information about currently played animation */
+    AnimationFrameType getAnimation() { return m_current_animation; }
+    // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
-    void  setAnimation(AnimationFrameType type);
+    void  setAnimation(AnimationFrameType type, bool play_non_loop = false);
     // ------------------------------------------------------------------------
     /** Sets the kart this model is currently used for */
     void  setKart(AbstractKart* k) { m_kart = k; }

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,9 +20,11 @@
 #define HEADER_PLAYER_PROFILE_HPP
 
 #include "challenges/story_mode_status.hpp"
+#include "network/remote_kart_info.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
+#include "utils/translation.hpp"
 
 #include <irrString.h>
 using namespace irr;
@@ -66,16 +68,16 @@ public:
 private:
     LEAK_CHECK()
 
+#ifdef DEBUG
+    unsigned int m_magic_number;
+#endif
+
     /** The name of the player (wide string, so it can be in native
      *  language). */
     core::stringw m_local_name;
 
     /** True if this account is a guest account. */
     bool m_is_guest_account;
-
-#ifdef DEBUG
-    unsigned int m_magic_number;
-#endif
 
     /** Counts how often this player was used (always -1 for guests). */
     int m_use_frequency;
@@ -111,8 +113,8 @@ private:
 
 public:
 
-         PlayerProfile(const core::stringw &name, bool is_guest = false);
-         PlayerProfile(const XMLNode *node);
+    PlayerProfile(const core::stringw &name, bool is_guest = false);
+    PlayerProfile(const XMLNode *node);
     virtual ~PlayerProfile();
     void save(UTFWriter &out);
     void loadRemainingData(const XMLNode *node);
@@ -121,13 +123,13 @@ public:
     bool operator<(const PlayerProfile &other);
     void raceFinished();
     void saveSession(int user_id, const std::string &token);
-    void clearSession();
+    void clearSession(bool save=true);
     void addIcon();
 
     /** Abstract virtual classes, to be implemented by the OnlinePlayer. */
     virtual void setUserDetails(Online::HTTPRequest *request,
                                 const std::string &action,
-                                const std::string &php_script = "") const = 0;
+                                const std::string &url_path = "") const = 0;
     virtual uint32_t getOnlineId() const = 0;
     virtual PlayerProfile::OnlineState getOnlineState() const = 0;
     virtual Online::OnlineProfile* getProfile() const = 0;
@@ -153,10 +155,17 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the name of this player. */
-    core::stringw getName() const
+    const core::stringw getName(bool ignore_rtl = false) const
     {
         assert(m_magic_number == 0xABCD1234);
-        return m_local_name.c_str();
+        if (ignore_rtl)
+            return m_local_name;
+        else
+        {
+            const core::stringw fribidized_name =
+                translations->fribidize(m_local_name);
+            return fribidized_name;
+        }
     }   // getName
 
     // ------------------------------------------------------------------------
@@ -170,9 +179,16 @@ public:
     }   // isGuestAccount
     // ------------------------------------------------------------------------
     /** Returns the last used online name. */
-    const core::stringw& getLastOnlineName() const
+    const core::stringw getLastOnlineName(bool ignore_rtl = false) const
     {
-        return m_last_online_name;
+        if (ignore_rtl)
+            return m_last_online_name;
+        else
+        {
+            const core::stringw fribidized_name =
+                translations->fribidize(m_last_online_name);
+            return fribidized_name;
+        }
     }   // getLastOnlineName
     // ------------------------------------------------------------------------
     /** Sets the last used online name. */

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -84,7 +84,7 @@ public:
 
     void setVictoryMusic(bool isVictory) { m_is_victory_music = isVictory; }
 
-    virtual MusicInformation* getMusic() const
+    virtual MusicInformation* getMusic() const OVERRIDE
     {
         if (m_is_victory_music)
             return music_manager->getMusicInformation("win_theme.music");

@@ -9,6 +9,7 @@ uniform mat4 RSMMatrix;
 uniform sampler2D dtex;
 uniform sampler2D ctex;
 uniform sampler2D ntex;
+uniform vec3 suncol;
 
 flat in int slice;
 layout (location = 0) out vec4 SHRed;
@@ -32,6 +33,44 @@ vec4 DirToSh(vec3 dir, float flux)
     return SHBasis (dir) * flux;
 }
 
+// We need to manually unroll the loop, otherwise Nvidia driver crashes.
+void loop(in int i,
+          in vec3 RHcenter,in vec3 RHCellSize, in vec2 RHuv, in float RHdepth,
+          inout vec4 SHr, inout vec4 SHg, inout vec4 SHb)
+{
+    // produce a new sample location on the RSM texture
+    float alpha = (i + .5) / SAMPLES;
+    float theta = 2. * 3.14 * 7. * alpha;
+    float h = alpha;
+    vec2 offset = h * vec2(cos(theta), sin(theta));
+    vec2 uv = RHuv + offset * 0.01;
+
+    // Get world position and normal from the RSM sample
+    float depth = texture(dtex, uv).x;
+    vec4 RSMPos = inverse(RSMMatrix) * (2. * vec4(uv, depth, 1.) - 1.);
+    RSMPos /= RSMPos.w;
+    vec3 RSMAlbedo = texture(ctex, uv).xyz;
+    vec3 normal = normalize(2. * texture(ntex, uv).xyz - 1.);
+
+    // Sampled location inside the RH cell
+    vec3 offset3d = vec3(uv, 0);
+    vec3 SamplePos = RHcenter + .5 * offset3d.xzy * RHCellSize;
+
+    // Normalize distance to RSM sample
+    float dist = distance(SamplePos, RSMPos.xyz) / R_wcs;
+    // Determine the incident direction.
+    // Avoid very close samples (and numerical instability problems)
+    vec3 RSM_to_RH_dir = (dist <= 0.1) ? vec3(0.) : normalize(SamplePos - RSMPos.xyz);
+    float dotprod = max(dot(RSM_to_RH_dir, normal.xyz), 0.);
+    float factor = dotprod / (0.1 + dist * dist);
+
+    vec3 color = RSMAlbedo.rgb * factor * suncol.rgb;
+
+    SHr += DirToSh(RSM_to_RH_dir, color.r);
+    SHg += DirToSh(RSM_to_RH_dir, color.g);
+    SHb += DirToSh(RSM_to_RH_dir, color.b);
+}
+
 void main(void)
 {
     vec3 normalizedRHCenter = 2. * vec3(gl_FragCoord.xy, slice) / resolution - 1.;
@@ -50,40 +89,22 @@ void main(void)
     int x = int(gl_FragCoord.x), y = int(gl_FragCoord.y);
     float phi = 30. * (x ^ y) + 10. * x * y;
 
-    for (int i = 0; i < SAMPLES; i++)
-    {
-        // produce a new sample location on the RSM texture
-        float alpha = (i + .5) / SAMPLES;
-        float theta = 2. * 3.14 * 7. * alpha;
-        float h = alpha;
-        vec2 offset = h * vec2(cos(theta), sin(theta));
-        vec2 uv = RHuv + offset * 0.01;
-
-        // Get world position and normal from the RSM sample
-        float depth = texture(dtex, uv).z;
-        vec4 RSMPos = inverse(RSMMatrix) * (2. * vec4(uv, depth, 1.) - 1.);
-        RSMPos /= RSMPos.w;
-        vec3 RSMAlbedo = texture(ctex, uv).xyz;
-        vec3 normal = normalize(2. * texture(ntex, uv).xyz - 1.);
-
-        // Sampled location inside the RH cell
-        vec3 offset3d = vec3(uv, 0);
-        vec3 SamplePos = RHcenter + .5 * offset3d.xzy * RHCellSize;
-
-        // Normalize distance to RSM sample
-        float dist = distance(SamplePos, RSMPos.xyz) / R_wcs;
-        // Determine the incident direction.
-        // Avoid very close samples (and numerical instability problems)
-        vec3 RSM_to_RH_dir = (dist <= 0.00) ? vec3(0.) : normalize(SamplePos - RSMPos.xyz);
-        float dotprod = max(dot(RSM_to_RH_dir, normal.xyz), 0.);
-        float factor = dotprod / (0.1 + dist * dist);
-
-        vec3 color = RSMAlbedo.rgb * factor;
-
-        SHr += DirToSh(RSM_to_RH_dir, color.r);
-        SHg += DirToSh(RSM_to_RH_dir, color.g);
-        SHb += DirToSh(RSM_to_RH_dir, color.b);
-    }
+    loop(0, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(1, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(2, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(3, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(4, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(5, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(6, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(7, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(8, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(9, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(10, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(11, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(12, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(13, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(14, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(15, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
 
     SHr /= 3.14159 * SAMPLES;
     SHg /= 3.14159 * SAMPLES;

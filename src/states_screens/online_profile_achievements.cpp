@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -40,21 +40,22 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 
-DEFINE_SCREEN_SINGLETON( OnlineProfileAchievements );
+DEFINE_SCREEN_SINGLETON( OnlineProfileAchievements    );
+DEFINE_SCREEN_SINGLETON( TabOnlineProfileAchievements );
 
 // -----------------------------------------------------------------------------
 /** Constructor.
  */
-OnlineProfileAchievements::OnlineProfileAchievements()
-                      : OnlineProfileBase("online/profile_achievements.stkgui")
+BaseOnlineProfileAchievements::BaseOnlineProfileAchievements(const std::string &name)
+                             : OnlineProfileBase(name)
 {
     m_selected_achievement_index = -1;
-}   // OnlineProfileAchievements
+}   // BaseOnlineProfileAchievements
 
 // -----------------------------------------------------------------------------
 /** Callback when the xml file was loaded.
  */
-void OnlineProfileAchievements::loadedFromFile()
+void BaseOnlineProfileAchievements::loadedFromFile()
 {
     OnlineProfileBase::loadedFromFile();
     m_achievements_list_widget = getWidget<ListWidget>("achievements_list");
@@ -65,7 +66,7 @@ void OnlineProfileAchievements::loadedFromFile()
 // ----------------------------------------------------------------------------
 /** Callback before widgets are added. Clears all widgets.
  */
-void OnlineProfileAchievements::beforeAddingWidget()
+void BaseOnlineProfileAchievements::beforeAddingWidget()
 {
     OnlineProfileBase::beforeAddingWidget();
     m_achievements_list_widget->clearColumns();
@@ -82,11 +83,15 @@ void OnlineProfileAchievements::beforeAddingWidget()
 // -----------------------------------------------------------------------------
 /** Called when entering this menu (after widgets have been added).
 */
-void OnlineProfileAchievements::init()
+void BaseOnlineProfileAchievements::init()
 {
     OnlineProfileBase::init();
-    m_profile_tabs->select( m_achievements_tab->m_properties[PROP_ID],
-                            PLAYER_ID_GAME_MASTER                       );
+    if (m_profile_tabs)
+    {
+        m_profile_tabs->select(m_achievements_tab->m_properties[PROP_ID],
+            PLAYER_ID_GAME_MASTER);
+        m_profile_tabs->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    }
 
     // For current user add the progrss information.
     // m_visiting_profile is NULL if the user is not logged in.
@@ -103,7 +108,9 @@ void OnlineProfileAchievements::init()
         {
             std::vector<ListWidget::ListCell> row;
             const Achievement *a = it->second;
-            ListWidget::ListCell title(a->getInfo()->getTitle(), -1, 2);
+            if(a->getInfo()->isSecret() && !a->isAchieved())
+                continue;
+            ListWidget::ListCell title(translations->fribidize(a->getInfo()->getName()), -1, 2);
             ListWidget::ListCell progress(a->getProgressAsString(), -1, 1);
             row.push_back(title);
             row.push_back(progress);
@@ -127,7 +134,7 @@ void OnlineProfileAchievements::init()
 
 // -----------------------------------------------------------------------------
 
-void OnlineProfileAchievements::eventCallback(Widget* widget,
+void BaseOnlineProfileAchievements::eventCallback(Widget* widget,
                                               const std::string& name,
                                               const int playerID)
 {
@@ -153,11 +160,11 @@ void OnlineProfileAchievements::eventCallback(Widget* widget,
 /** Called every frame. It will check if results from an achievement request
  *  have been received, and if so, display them.
  */
-void OnlineProfileAchievements::onUpdate(float delta)
+void BaseOnlineProfileAchievements::onUpdate(float delta)
 {
     if (!m_waiting_for_achievements) return;
 
-    if (!m_visiting_profile->isReady())
+    if (!m_visiting_profile->hasFetchedAchievements())
     {
         // This will display an increasing number of dots while waiting.
         m_achievements_list_widget->renameItem("loading",
@@ -173,7 +180,7 @@ void OnlineProfileAchievements::onUpdate(float delta)
         AchievementInfo *info =
                           AchievementsManager::get()->getAchievementInfo(a[i]);
         m_achievements_list_widget->addItem(StringUtils::toString(info->getID()),
-                                            info->getTitle()                   );
+                                            info->getName()                   );
     }
     m_waiting_for_achievements = false;
 

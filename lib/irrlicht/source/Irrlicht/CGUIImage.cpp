@@ -74,24 +74,23 @@ void CGUIImage::draw()
 		return;
 
 	IGUISkin* skin = Environment->getSkin();
-	video::IVideoDriver* driver = Environment->getVideoDriver();
 
 	if (Texture)
 	{
-		if (ScaleImage)
-		{
+		//if (ScaleImage)
+		//{
 			const video::SColor Colors[] = {Color,Color,Color,Color};
 
-			driver->draw2DImage(Texture, AbsoluteRect,
+            skin->draw2DImage(Texture, AbsoluteRect,
 				core::rect<s32>(core::position2d<s32>(0,0), core::dimension2di(Texture->getOriginalSize())),
 				&AbsoluteClippingRect, Colors, UseAlphaChannel);
-		}
-		else
-		{
-			driver->draw2DImage(Texture, AbsoluteRect.UpperLeftCorner,
-				core::rect<s32>(core::position2d<s32>(0,0), core::dimension2di(Texture->getOriginalSize())),
-				&AbsoluteClippingRect, Color, UseAlphaChannel);
-		}
+		//}
+		//else
+		//{
+		//	Environment->getVideoDriver()->draw2DImage(Texture, AbsoluteRect.UpperLeftCorner,
+		//		core::rect<s32>(core::position2d<s32>(0,0), core::dimension2di(Texture->getOriginalSize())),
+		//		&AbsoluteClippingRect, Color, UseAlphaChannel);
+		//}
 	}
 	else
 	{

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -201,7 +201,7 @@ void StateManager::onGameStateChange(GameState new_state)
     {
         irr_driver->showPointer();
         input_manager->setMode(InputManager::MENU);
-        sfx_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
+        SFXManager::get()->positionListener( Vec3(0,0,0), Vec3(0,1,0), Vec3(0, 1, 0) );
 
         if (new_state == MENU)
         {

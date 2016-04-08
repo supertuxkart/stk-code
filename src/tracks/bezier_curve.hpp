@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -45,9 +45,6 @@ private:
         Vec3 m_handle2;
     };   // BezierData
 
-    /** Overall duration. */
-    float m_time;
-
     /** Vector with all control points and handles. */
     AlignedArray<BezierData> m_all_data;
 public:
@@ -56,6 +53,6 @@ public:
     Vec3 getHPR(float t) const;
 
     /** Returns the number of points in this bezier curve. */
-    unsigned int getNumPoints() const {return m_all_data.size(); }
+    unsigned int getNumPoints() const {return (unsigned int) m_all_data.size(); }
 };   // BezierCurve
 #endif

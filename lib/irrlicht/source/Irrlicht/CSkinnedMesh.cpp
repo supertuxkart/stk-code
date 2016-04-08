@@ -794,6 +794,7 @@ void CSkinnedMesh::checkForAnimation()
 				AllJoints[i]->UseAnimationFrom->RotationKeys.size() )
 			{
 				HasAnimation = true;
+                break;
 			}
 		}
 	}
@@ -803,8 +804,11 @@ void CSkinnedMesh::checkForAnimation()
 	{
 		for(i=0;i<AllJoints.size();++i)
 		{
-			if (AllJoints[i]->Weights.size())
-				HasAnimation = true;
+            if (AllJoints[i]->Weights.size())
+            {
+                HasAnimation = true;
+                break;
+            }
 		}
 	}
 
@@ -1470,6 +1474,76 @@ void CSkinnedMesh::calculateTangents(
 	}
 }
 
+// ----------------------------------------------------------------------------
+/** Copies a mesh.
+ */
+CSkinnedMesh *CSkinnedMesh::clone()
+{
+
+    CSkinnedMesh* skinned_mesh = new CSkinnedMesh();
+
+    for (u32 i = 0; i < getMeshBuffers().size(); i++)
+    {
+        SSkinMeshBuffer * buffer = skinned_mesh->addMeshBuffer();
+        *buffer = *(getMeshBuffers()[i]);
+    }
+
+    for (u32 j = 0; j < getAllJoints().size(); ++j)
+    {
+        ISkinnedMesh::SJoint *joint = skinned_mesh->addJoint();
+        *joint = *(getAllJoints()[j]);
+    }
+
+    // fix children pointers (they still have old pointers)
+    core::array<ISkinnedMesh::SJoint*> & new_joints = skinned_mesh->getAllJoints();
+    for (u32 i = 0; i < new_joints.size(); ++i)
+    {
+        ISkinnedMesh::SJoint * joint = new_joints[i];
+        for (u32 c = 0; c < joint->Children.size(); ++c)
+        {
+            // the child is one of the oldJoints and must be replaced by the newjoint on the same index
+            bool found = false;
+            for (u32 k = 0; k < AllJoints.size(); ++k)
+            {
+                if (joint->Children[c] == AllJoints[k])
+                {
+                    joint->Children[c] = new_joints[k];
+                    found = true;
+                    break;
+                }
+            }   // k < old_joints.size
+
+            if (!found)
+                found = true;
+        }   // c < joint->Children.size()
+    }   // i < new_joints.size()
+
+    // In finalize the values from LocalBuffers are copied into 
+    // Weights[].StaticPos. Since skinned_mesh already has the correct
+    // values in Weights, we have to copy the values from Weights
+    // into LocalBuffer (so that in the copy from LocalBuffer to weights
+    // no values are overwritten).
+    // FIXME: Not ideal, better would be not to copy the values in
+    // finalize().
+    for (unsigned int i = 0; i<AllJoints.size(); ++i)
+    {
+        SJoint *joint = AllJoints[i];
+        for (unsigned int j = 0; j<joint->Weights.size(); ++j)
+        {
+            const u16 buffer_id = joint->Weights[j].buffer_id;
+            const u32 vertex_id = joint->Weights[j].vertex_id;
+
+            skinned_mesh->LocalBuffers[buffer_id]->getVertex(vertex_id)->Pos = joint->Weights[j].StaticPos;
+            skinned_mesh->LocalBuffers[buffer_id]->getVertex(vertex_id)->Normal = joint->Weights[j].StaticNormal;
+        }
+    }
+    skinned_mesh->finalize();
+
+
+
+    return skinned_mesh;
+
+}   // clone
 
 } // end namespace scene
 } // end namespace irr

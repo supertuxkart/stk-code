@@ -15,7 +15,7 @@ namespace irr
 {
 namespace video
 {
-
+    extern bool useCoreContext;
 //! Base class for all internal OpenGL material renderers
 class COpenGLMaterialRenderer : public IMaterialRenderer
 {
@@ -50,7 +50,8 @@ public:
 		{
 			// thanks to Murphy, the following line removed some
 			// bugs with several OpenGL implementations.
-			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+            if (!useCoreContext)
+			    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		}
 	}
 };

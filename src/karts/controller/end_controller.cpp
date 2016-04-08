@@ -1,8 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 Eduardo Hernandez Munoz
-//  Copyright (C) 2008-2013 Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Eduardo Hernandez Munoz
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -50,15 +50,15 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
-EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *player,
+EndController::EndController(AbstractKart *kart,
                              Controller *prev_controller)
-             : AIBaseController(kart, player)
+             : AIBaseLapController(kart)
 {
     m_previous_controller = prev_controller;
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
-        // Overwrite the random selected default path from AIBaseController
+        // Overwrite the random selected default path from AIBaseLapController
         // with a path that always picks the first branch (i.e. it follows
         // the main driveline).
         std::vector<unsigned int> next;
@@ -124,7 +124,7 @@ EndController::~EndController()
 //-----------------------------------------------------------------------------
 void EndController::reset()
 {
-    AIBaseController::reset();
+    AIBaseLapController::reset();
 
     m_crash_time       = 0.0f;
     m_time_since_stuck = 0.0f;
@@ -179,7 +179,7 @@ void EndController::update(float dt)
     m_controls->m_brake     = false;
     m_controls->m_accel     = 1.0f;
 
-    AIBaseController::update(dt);
+    AIBaseLapController::update(dt);
 
     // In case of battle mode: don't do anything
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
@@ -194,9 +194,7 @@ void EndController::update(float dt)
     }
     /*Get information that is needed by more than 1 of the handling funcs*/
     //Detect if we are going to crash with the track and/or kart
-    int steps = 0;
-
-    steps = calcSteps();
+    calcSteps();
 
     /*Response handling functions*/
     handleSteering(dt);

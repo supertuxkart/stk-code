@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2013 Lionel Fuentes
+//  Copyright (C) 2013-2015 Lionel Fuentes
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,7 +20,7 @@
 #include "log.hpp"
 #include <string.h>
 
-#if defined(WIN32) && !defined(DEBUG)
+#if defined(WIN32) && !defined(DEBUG) && !defined(__MINGW32__)
     // --------------------- Windows version -----------------
     #include <Windows.h>
     #include <DbgHelp.h>
@@ -76,7 +76,7 @@
         _In_ DWORD maxStringLength,
         _In_ DWORD flags
     );
-    
+
     namespace CrashReporting
     {
         void getCallStackWithContext(std::string& callstack, PCONTEXT pContext);
@@ -88,7 +88,7 @@
                 getCallStackWithContext(callstack, pContext);
             else
                 getCallStack(callstack);
-            
+
             std::string msg =   "SuperTuxKart crashed!\n"
                                 "Please hit Ctrl+C to copy to clipboard and signal the problem\n"
                                 "to the developers on our forum: http://forum.freegamedev.net/viewforum.php?f=16\n"
@@ -164,7 +164,7 @@
             FreeLibrary(hImageHlpDll);  \
             return; \
     }
-            
+
             GET_FUNC_PTR(SymCleanup                 )
             GET_FUNC_PTR(SymFunctionTableAccess64   )
             GET_FUNC_PTR(SymGetLineFromAddr64       )
@@ -222,7 +222,7 @@
             {
                 // Initialize the IMAGEHLP_SYMBOL64 structure
                 const size_t    MaxNameLength = 256;
-                IMAGEHLP_SYMBOL64*  sym = (IMAGEHLP_SYMBOL64*)alloca(sizeof(IMAGEHLP_SYMBOL64) + MaxNameLength);
+                IMAGEHLP_SYMBOL64*  sym = (IMAGEHLP_SYMBOL64*)_malloca(sizeof(IMAGEHLP_SYMBOL64) + MaxNameLength);
                 sym->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL64);
                 sym->MaxNameLength = MaxNameLength;
 
@@ -302,7 +302,7 @@
             FreeLibrary(hImageHlpDll);
         }
 
-        
+
         void getCallStack(std::string& callstack)
         {
             // Get the current CONTEXT

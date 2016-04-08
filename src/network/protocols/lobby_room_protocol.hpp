@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,21 +26,54 @@
 
 /*!
  * \class LobbyRoomProtocol
- * \brief Class used while the game is being prepared.
- * This protocol starts when a server opens a game, or when a client joins a game.
- * It is used to exchange data about the race settings, like kart selection.
+ * \brief Base class for both client and server lobby. The lobbies are started
+ *  when a server opens a game, or when a client joins a game.
+ *  It is used to exchange data about the race settings, like kart selection.
  */
 class LobbyRoomProtocol : public Protocol
 {
-    public:
-        LobbyRoomProtocol(CallbackObject* callback_object);
-        virtual ~LobbyRoomProtocol();
+public:
+    /** Lists all lobby events (LE). */
+    enum 
+    { 
+        LE_CONNECTION_REQUESTED   = 1,    // a connection to the server
+        LE_CONNECTION_REFUSED,            // Connection to server refused
+        LE_CONNECTION_ACCEPTED,           // Connection to server accepted
+        LE_KART_SELECTION_UPDATE,         // inform client about kart selected
+        LE_REQUEST_BEGIN,                 // begin of kart selection
+        LE_KART_SELECTION_REFUSED,        // Client not auth. to start selection
+        LE_NEW_PLAYER_CONNECTED,          // inform client about new player
+        LE_KART_SELECTION,                // Player selected kart
+        LE_PLAYER_DISCONNECTED,           // Client disconnected
+        LE_START_RACE,                    // start race
+        LE_START_SELECTION,               // inform client to start selection
+        LE_RACE_FINISHED,                 // race has finished, display result
+        LE_RACE_FINISHED_ACK,             // client went back to lobby
+        LE_EXIT_RESULT,                   // Force clients to exit race result screen
+        LE_VOTE_MAJOR,                    // vote of major race mode
+        LE_VOTE_MINOR,                    // vote for minor race mode
+        LE_VOTE_RACE_COUNT,               // vote for number of tracks
+        LE_VOTE_TRACK,                    // vote for a track
+        LE_VOTE_REVERSE,                  // vote if race in reverse
+        LE_VOTE_LAPS,                     // vote number of laps
+    };
 
-        virtual void setup() = 0;
-        virtual void update() = 0;
+protected:
+    /** The game setup. */
+    GameSetup* m_setup;
 
-    protected:
-        GameSetup* m_setup; //!< The game setup.
-};
+
+public:
+    LobbyRoomProtocol(CallbackObject* callback_object)
+        : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
+    {
+        m_setup = NULL;
+    }   // LobbyRoomProtocol
+    // ------------------------------------------------------------------------
+    virtual ~LobbyRoomProtocol() {}
+    // ------------------------------------------------------------------------
+    virtual void setup() = 0;
+    virtual void update(float dt) = 0;
+};   // class LobbyRoomProtocol
 
 #endif // LOBBY_ROOM_PROTOCOL_HPP

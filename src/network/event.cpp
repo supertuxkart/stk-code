@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,81 +17,69 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/event.hpp"
-#include "network/network_manager.hpp"
 
+#include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 
 #include <string.h>
 
+/** \brief Constructor
+ *  \param event : The event that needs to be translated.
+ */
 Event::Event(ENetEvent* event)
 {
+    m_arrival_time = (double)StkTime::getTimeSinceEpoch();
+
     switch (event->type)
     {
     case ENET_EVENT_TYPE_CONNECT:
-        type = EVENT_TYPE_CONNECTED;
+        m_type = EVENT_TYPE_CONNECTED;
         break;
     case ENET_EVENT_TYPE_DISCONNECT:
-        type = EVENT_TYPE_DISCONNECTED;
+        m_type = EVENT_TYPE_DISCONNECTED;
         break;
     case ENET_EVENT_TYPE_RECEIVE:
-        type = EVENT_TYPE_MESSAGE;
+        m_type = EVENT_TYPE_MESSAGE;
         break;
     case ENET_EVENT_TYPE_NONE:
         return;
         break;
     }
-    if (type == EVENT_TYPE_MESSAGE)
+    if (m_type == EVENT_TYPE_MESSAGE)
     {
-        m_data = NetworkString(std::string((char*)(event->packet->data), event->packet->dataLength-1));
+        m_data = new NetworkString(event->packet->data, 
+                                      event->packet->dataLength);
     }
+    else
+        m_data = NULL;
 
-    m_packet = NULL;
     if (event->packet)
-        m_packet = event->packet;
-
-    if (m_packet)
-        enet_packet_destroy(m_packet); // we got all we need, just remove the data.
-    m_packet = NULL;
-
-    std::vector<STKPeer*> peers = NetworkManager::getInstance()->getPeers();
-    peer = new STKPeer*;
-    *peer = NULL;
-    for (unsigned int i = 0; i < peers.size(); i++)
     {
-        if (peers[i]->m_peer == event->peer)
-        {
-            *peer = peers[i];
-            Log::verbose("Event", "The peer you sought has been found on %lx", (long int)(peer));
-            return;
-        }
+        // we got all we need, just remove the data.
+        enet_packet_destroy(event->packet);
     }
-    if (*peer == NULL) // peer does not exist, create him
+
+    m_peer = STKHost::get()->getPeer(event->peer);
+    if(m_type == EVENT_TYPE_MESSAGE && m_peer->isClientServerTokenSet() &&
+        m_data->getToken()!=m_peer->getClientServerToken() )
     {
-        STKPeer* new_peer = new STKPeer();
-        new_peer->m_peer = event->peer;
-        *peer = new_peer;
-        Log::debug("Event", "Creating a new peer, address are STKPeer:%lx, Peer:%lx", (long int)(new_peer), (long int)(event->peer));
+        Log::error("Event", "Received event with invalid token!");
+        Log::error("Event", "HostID %d Token %d message token %d",
+            m_peer->getHostId(), m_peer->getClientServerToken(),
+            m_data->getToken());
+        Log::error("Event", m_data->getLogMessage().c_str());
     }
-}
+}   // Event(ENetEvent)
 
-Event::Event(const Event& event)
-{
-    m_packet = NULL;
-    m_data = event.m_data;
-    // copy the peer
-    peer = event.peer;
-    type = event.type;
-}
-
+// ----------------------------------------------------------------------------
+/** \brief Destructor that frees the memory of the package.
+ */
 Event::~Event()
 {
-    delete peer;
-    peer = NULL;
-    m_packet = NULL;
-}
-
-void Event::removeFront(int size)
-{
-    m_data.removeFront(size);
-}
+    // Do not delete m_peer, it's a pointer to the enet data structure
+    // which is persistent.
+    m_peer = NULL;
+    delete m_data;
+}   // ~Event
 

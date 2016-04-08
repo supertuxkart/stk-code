@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,14 +26,14 @@
 #include <fstream>
 
 // -----------------------------------------------------------------------------
-Highscores::Highscores(const HighscoreType highscore_type,
+Highscores::Highscores(const HighscoreType &highscore_type,
                        int num_karts,
-                       const RaceManager::Difficulty difficulty,
-                       const std::string trackName,
+                       const RaceManager::Difficulty &difficulty,
+                       const std::string &track_name,
                        const int number_of_laps,
                        const bool reverse)
 {
-    m_track           = trackName;
+    m_track           = track_name;
     m_highscore_type  = highscore_type;
     m_number_of_karts = num_karts;
     m_difficulty      = difficulty;
@@ -135,10 +135,10 @@ void Highscores::writeEntry(UTFWriter &writer)
 }   // writeEntry
 
 // -----------------------------------------------------------------------------
-int Highscores::matches(HighscoreType highscore_type,
-                            int num_karts, RaceManager::Difficulty difficulty,
-                            const std::string track, const int number_of_laps,
-                            const bool reverse)
+int Highscores::matches(const HighscoreType &highscore_type,
+                        int num_karts, const RaceManager::Difficulty &difficulty,
+                        const std::string &track, const int number_of_laps,
+                        const bool reverse)
 {
     return (m_highscore_type  == highscore_type   &&
             m_track           == track            &&

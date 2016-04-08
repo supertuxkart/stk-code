@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2014 Glenn De Jonghe
-//                     2014 Joerg Henrichs
+//  Copyright (C) 2013-2015 Glenn De Jonghe
+//            (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -148,7 +148,7 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
     if(ids.size()>0)
     {
         ids = ids.substr(0, ids.size() - 1); // delete the last "," in the string
-        Log::info("Achievements", "Synching achievement %d to server.",
+        Log::info("Achievements", "Synching achievement %s to server.",
                   ids.c_str());
         Online::HTTPRequest * request = new Online::HTTPRequest(true, 2);
         PlayerManager::setUserDetails(request, "achieving");

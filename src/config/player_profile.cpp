@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 SuperTuxKart-Team
+//  Copyright (C) 2012-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -78,7 +78,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_achievements_status = NULL;
     m_icon_filename       = "";
 
-    node->get("name",              &m_local_name       );
+    node->getAndDecode("name",     &m_local_name);
     node->get("guest",             &m_is_guest_account );
     node->get("use-frequency",     &m_use_frequency    );
     node->get("unique-id",         &m_unique_id        );
@@ -99,6 +99,8 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
 //------------------------------------------------------------------------------
 PlayerProfile::~PlayerProfile()
 {
+    delete m_story_mode_status;
+    delete m_achievements_status;
 #ifdef DEBUG
     m_magic_number = 0xDEADBEEF;
 #endif
@@ -152,7 +154,9 @@ void PlayerProfile::addIcon()
     if (m_icon_filename.size() > 0 || isGuestAccount())
         return;
 
-    int n = m_unique_id % kart_properties_manager->getNumberOfKarts();
+    int n = (m_unique_id + kart_properties_manager->getKartId("tux") - 1)
+          % kart_properties_manager->getNumberOfKarts();
+
     std::string source = kart_properties_manager->getKartById(n)
                                                 ->getAbsoluteIconFile();
     // Create the filename for the icon of this player: the unique id
@@ -194,11 +198,11 @@ const std::string PlayerProfile::getIconFilename() const
  */
 void PlayerProfile::save(UTFWriter &out)
 {
-    out << L"    <player name=\"" << m_local_name
+    out << L"    <player name=\"" << StringUtils::xmlEncode(m_local_name)
         << L"\" guest=\""         << m_is_guest_account
         << L"\" use-frequency=\"" << m_use_frequency << L"\"\n";
 
-    out << L"            icon-filename=\"" << m_icon_filename <<L"\"\n";
+    out << L"            icon-filename=\"" << m_icon_filename << L"\"\n";
 
     out << L"            unique-id=\""  << m_unique_id
         << L"\" saved-session=\""       << m_saved_session << L"\"\n";
@@ -235,12 +239,13 @@ void PlayerProfile::saveSession(int user_id, const std::string &token)
 
 // ------------------------------------------------------------------------
 /** Unsets any saved session data. */
-void PlayerProfile::clearSession()
+void PlayerProfile::clearSession(bool save)
 {
     m_saved_session = false;
     m_saved_user_id = 0;
     m_saved_token   = "";
-    PlayerManager::get()->save();
+    if(save)
+        PlayerManager::get()->save();
 }   // clearSession
 
 //------------------------------------------------------------------------------

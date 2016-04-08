@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007-2013 Joerg Henrichs
+//  Copyright (C) 2007-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -90,7 +90,7 @@ Bowling::Bowling(AbstractKart *kart)
     // should not live forever, auto-destruct after 20 seconds
     m_max_lifespan = 20;
 
-    m_roll_sfx = sfx_manager->createSoundSource("bowling_roll");
+    m_roll_sfx = SFXManager::get()->createSoundSource("bowling_roll");
     m_roll_sfx->play();
     m_roll_sfx->setLoop(true);
 
@@ -101,9 +101,9 @@ Bowling::Bowling(AbstractKart *kart)
  */
 Bowling::~Bowling()
 {
-    if(m_roll_sfx->getStatus()==SFXManager::SFX_PLAYING)
-        m_roll_sfx->stop();
-    sfx_manager->deleteSFX(m_roll_sfx);
+    // This will stop the sfx and delete the object.
+    m_roll_sfx->deleteSFX();
+
 }   // ~RubberBall
 
 // -----------------------------------------------------------------------------
@@ -187,8 +187,8 @@ bool Bowling::updateAndDelete(float dt)
         return true;
     }
 
-    if (m_roll_sfx->getStatus()==SFXManager::SFX_PLAYING)
-        m_roll_sfx->position(getXYZ());
+    if (m_roll_sfx->getStatus()==SFXBase::SFX_PLAYING)
+        m_roll_sfx->setPosition(getXYZ());
 
     return false;
 }   // updateAndDelete

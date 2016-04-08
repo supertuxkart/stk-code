@@ -2,15 +2,14 @@
 // and improvements here http://graphics.cs.williams.edu/papers/SAOHPG12/
 
 uniform sampler2D dtex;
-uniform vec4 samplePoints[16];
+uniform float radius;
+uniform float k = 1.5;
+uniform float sigma = 1.;
 out float AO;
 
-const float sigma = 1.;
 const float tau = 7.;
 const float beta = 0.002;
 const float epsilon = .00001;
-const float radius = 1.;
-const float k = 1.5;
 
 #define SAMPLES 16
 
@@ -49,19 +48,19 @@ void main(void)
         float alpha = (i + .5) * invSamples;
         rotations = vec2(rotations.x * offset.x - rotations.y * offset.y, rotations.x * offset.y + rotations.y * offset.x);
         float h = r * alpha;
-        vec2 offset = h * rotations;
+        vec2 localoffset = h * rotations;
 
         m = m + .5;
-        ivec2 ioccluder_uv = ivec2(x, y) + ivec2(offset);
+        ivec2 ioccluder_uv = ivec2(x, y) + ivec2(localoffset);
 
         if (ioccluder_uv.x < 0 || ioccluder_uv.x > screen.x || ioccluder_uv.y < 0 || ioccluder_uv.y > screen.y) continue;
 
-        float LinearoccluderFragmentDepth = textureLod(dtex, vec2(ioccluder_uv) / screen, m).x;
+        float LinearoccluderFragmentDepth = textureLod(dtex, vec2(ioccluder_uv) / screen, max(m, 0.)).x;
         vec3 OccluderPos = getXcYcZc(ioccluder_uv.x, ioccluder_uv.y, LinearoccluderFragmentDepth);
 
         vec3 vi = OccluderPos - FragPos;
         bl += max(0, dot(vi, norm) - FragPos.z * beta) / (dot(vi, vi) + epsilon);
     }
 
-    AO = max(pow(1.0 - 2. * sigma * bl * invSamples, k), 0.);
+    AO = max(pow(1.0 - min(2. * sigma * bl * invSamples, 0.99), k), 0.);
 }

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,221 +20,282 @@
 
 #include "config/player_manager.hpp"
 #include "modes/world_with_rank.hpp"
-#include "network/network_manager.hpp"
-#include "network/network_world.hpp"
+#include "network/event.hpp"
+#include "network/network_config.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/protocols/start_game_protocol.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/race_event_manager.hpp"
+#include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
+#include "states_screens/networking_lobby.hpp"
 #include "states_screens/network_kart_selection.hpp"
+#include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
 
-ClientLobbyRoomProtocol::ClientLobbyRoomProtocol(const TransportAddress& server_address)
-    : LobbyRoomProtocol(NULL)
+ClientLobbyRoomProtocol::
+ClientLobbyRoomProtocol(const TransportAddress& server_address)
+                       : LobbyRoomProtocol(NULL)
 {
-    m_server_address = server_address;
+    m_server_address.copy(server_address);
     m_server = NULL;
-}
+    setHandleDisconnections(true);
+}   // ClientLobbyRoomProtocol
 
 //-----------------------------------------------------------------------------
 
 ClientLobbyRoomProtocol::~ClientLobbyRoomProtocol()
 {
-}
+}   // ClientLobbyRoomProtocol
 
 //-----------------------------------------------------------------------------
 
 void ClientLobbyRoomProtocol::setup()
 {
-    m_setup = NetworkManager::getInstance()->setupNewGame(); // create a new setup
-    m_setup->getRaceConfig()->setPlayerCount(16); //FIXME : this has to be changed when logging into the server
+    m_setup = STKHost::get()->setupNewGame(); // create a new setup
     m_state = NONE;
-}
+}   // setup
 
 //-----------------------------------------------------------------------------
-
-void ClientLobbyRoomProtocol::requestKartSelection(std::string kart_name)
+/** Sends the selection of a kart from this client to the server.
+ *  \param player_id The global player id of the voting player.
+ *  \param kart_name Name of the selected kart.
+ */
+void ClientLobbyRoomProtocol::requestKartSelection(uint8_t player_id,
+                                                   const std::string &kart_name)
 {
-    NetworkString request;
-    // 0x02 : kart selection request, size_token (4), token, size kart name, kart name
-    request.ai8(0x02).ai8(4).ai32(m_server->getClientServerToken()).ai8(kart_name.size()).as(kart_name);
-    m_listener->sendMessage(this, request, true);
-}
+    NetworkString *request = getNetworkString(3+kart_name.size());
+    request->addUInt8(LE_KART_SELECTION).addUInt8(player_id)
+            .encodeString(kart_name);
+    sendToServer(request, /*reliable*/ true);
+    delete request;
+}   // requestKartSelection
 
 //-----------------------------------------------------------------------------
-
-void ClientLobbyRoomProtocol::voteMajor(uint8_t major)
+/** Sends a vote for a major vote from a client to the server. Note that even
+ *  this client will only store the vote when it is received back from the
+ *  server.
+ *  \param player_id The global player id of the voting player.
+ *  \param major Major mode voted for.
+ */
+void ClientLobbyRoomProtocol::voteMajor(uint8_t player_id, uint32_t major)
 {
-    NetworkString request;
-    // 0xc0 : major vote, size_token (4), token, size major(1),major
-    request.ai8(0xc0).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(major);
-    m_listener->sendMessage(this, request, true);
-}
+    NetworkString *request = getNetworkString(6);
+    request->addUInt8(LE_VOTE_MAJOR).addUInt8(player_id)
+           .addUInt32(major);
+    sendToServer(request, true);
+    delete request;
+}   // voteMajor
 
 //-----------------------------------------------------------------------------
-
-void ClientLobbyRoomProtocol::voteRaceCount(uint8_t count)
+/** Sends a vote for the number of tracks from a client to the server. Note
+ *  that even this client will only store the vote when it is received back
+ *  from the server.
+ *  \param player_id The global player id of the voting player.
+ *  \param count NUmber of tracks to play.
+ */
+void ClientLobbyRoomProtocol::voteRaceCount(uint8_t player_id, uint8_t count)
 {
-    NetworkString request;
-    // 0xc0 : race count vote, size_token (4), token, size race count(1), count
-    request.ai8(0xc1).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(count);
-    m_listener->sendMessage(this, request, true);
-}
+    NetworkString *request = getNetworkString(3);
+    request->addUInt8(LE_VOTE_RACE_COUNT).addUInt8(player_id).addUInt8(count);
+    sendToServer(request, true);
+    delete request;
+}   // voteRaceCount
 
 //-----------------------------------------------------------------------------
-
-void ClientLobbyRoomProtocol::voteMinor(uint8_t minor)
+/** Sends a vote for the minor game mode from a client to the server. Note that
+ *  even this client will only store the vote when it is received back from the
+ *  server.
+ *  \param player_id The global player id of the voting player.
+ *  \param minor Voted minor mode.
+ */
+void ClientLobbyRoomProtocol::voteMinor(uint8_t player_id, uint32_t minor)
 {
-    NetworkString request;
-    // 0xc0 : minor vote, size_token (4), token, size minor(1),minor
-    request.ai8(0xc2).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(minor);
-    m_listener->sendMessage(this, request, true);
-}
+    NetworkString *request = getNetworkString(6);
+    request->addUInt8(LE_VOTE_MINOR).addUInt8(player_id).addUInt32(minor);
+    sendToServer(request, true);
+    delete request;
+}   // voteMinor
 
 //-----------------------------------------------------------------------------
-
-void ClientLobbyRoomProtocol::voteTrack(std::string track, uint8_t track_nb)
+/** Sends the vote about which track to play at which place in the list of
+ *  tracks (like a custom GP definition). Note that even this client will only
+ *  store the vote when it is received back from the server.
+ *  \param player_id The global player id of the voting player.
+ *  \param track Name of the track.
+ *  \param At which place in the list of tracks this track should be played.
+ */
+void ClientLobbyRoomProtocol::voteTrack(uint8_t player_id,
+                                        const std::string &track,
+                                        uint8_t track_nb)
 {
-    NetworkString request;
-    // 0xc0 : major vote, size_token (4), token, size track, track, size #track, #track
-    request.ai8(0xc3).ai8(4).ai32(m_server->getClientServerToken()).ai8(track.size()).as(track).ai8(1).ai8(track_nb);
-    m_listener->sendMessage(this, request, true);
-}
+    NetworkString *request = getNetworkString(2+1+track.size());
+    request->addUInt8(LE_VOTE_TRACK).addUInt8(player_id).addUInt8(track_nb)
+            .encodeString(track);
+    sendToServer(request, true);
+    delete request;
+}   // voteTrack
 
 //-----------------------------------------------------------------------------
-
-void ClientLobbyRoomProtocol::voteReversed(bool reversed, uint8_t track_nb)
+/** Sends a vote if a track at a specified place in the list of all tracks
+ *  should be played in reverse or not. Note that even this client will only
+ *  store the vote when it is received back from the server.
+ *  \param player_id Global player id of the voting player.
+ *  \param reversed True if the track should be played in reverse.
+ *  \param track_nb Index for the track to be voted on in the list of all
+ *         tracks.
+ */
+void ClientLobbyRoomProtocol::voteReversed(uint8_t player_id, bool reversed, 
+                                           uint8_t track_nb)
 {
-    NetworkString request;
-    // 0xc0 : major vote, size_token (4), token, size reversed(1),reversed, size #track, #track
-    request.ai8(0xc4).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(reversed).ai8(1).ai8(track_nb);
-    m_listener->sendMessage(this, request, true);
-}
+    NetworkString *request = getNetworkString(9);
+    request->addUInt8(LE_VOTE_REVERSE).addUInt8(player_id).addUInt8(reversed)
+            .addUInt8(track_nb);
+    sendToServer(request, true);
+    delete request;
+}   // voteReversed
 
 //-----------------------------------------------------------------------------
-
-void ClientLobbyRoomProtocol::voteLaps(uint8_t laps, uint8_t track_nb)
+/** Vote for the number of laps of the specified track. Note that even this
+ *  client will only store the vote when it is received back from the server.
+ *  \param player_id Global player id of the voting player.
+ *  \param laps Number of laps for the specified track.
+ *  \param track_nb Index of the track in the list of all tracks.
+ */
+void ClientLobbyRoomProtocol::voteLaps(uint8_t player_id, uint8_t laps,
+                                       uint8_t track_nb)
 {
-    NetworkString request;
-    // 0xc0 : major vote, size_token (4), token, size laps(1),laps, size #track, #track
-    request.ai8(0xc5).ai8(4).ai32(m_server->getClientServerToken()).ai8(1).ai8(laps).ai8(1).ai8(track_nb);
-    m_listener->sendMessage(this, request, true);
-}
+    NetworkString *request = getNetworkString(10);
+    request->addUInt8(LE_VOTE_LAPS).addUInt8(player_id).addUInt8(laps)
+            .addUInt8(track_nb);
+    sendToServer(request, true);
+    delete request;
+}   // voteLaps
 
 //-----------------------------------------------------------------------------
-
+/** Called when a client selects to exit a server.
+ */
 void ClientLobbyRoomProtocol::leave()
 {
     m_server->disconnect();
-    m_server_address.ip = 0;
-    m_server_address.port = 0;
-}
+    STKHost::get()->removePeer(m_server);
+    m_server_address.clear();
+    ServersManager::get()->unsetJoinedServer();
+}   // leave
+
+//-----------------------------------------------------------------------------
+/** Called from the gui when a client clicked on 'continue' on the race result
+ *  screen. It notifies the server that this client has exited the screen and
+ *  is back at the lobby.
+ */
+void ClientLobbyRoomProtocol::doneWithResults()
+{
+    NetworkString *done = getNetworkString(1);
+    done->addUInt8(LE_RACE_FINISHED_ACK);
+    sendToServer(done, /*reliable*/true);
+    delete done;
+}   // doneWithResults
 
 //-----------------------------------------------------------------------------
 
 bool ClientLobbyRoomProtocol::notifyEvent(Event* event)
 {
     assert(m_setup); // assert that the setup exists
-    if (event->type == EVENT_TYPE_MESSAGE)
+
+    NetworkString &data = event->data();
+    assert(data.size()); // assert that data isn't empty
+    uint8_t message_type = data.getUInt8();
+    Log::info("ClientLobbyRoomProtocol", "Synchronous message of type %d",
+              message_type);
+    switch(message_type)
     {
-        NetworkString data = event->data();
-        assert(data.size()); // assert that data isn't empty
-        uint8_t message_type = data[0];
-        if (message_type != 0x03 &&
-            message_type != 0x06)
-            return false; // don't treat the event
-
-        event->removeFront(1);
-        Log::info("ClientLobbyRoomProtocol", "Synchronous message of type %d", message_type);
-        if (message_type == 0x03) // kart selection update
-            kartSelectionUpdate(event);
-        else if (message_type == 0x06) // end of race
-            raceFinished(event);
-
-        return true;
-    }
-    return false;
-}
+        case LE_KART_SELECTION_UPDATE: kartSelectionUpdate(event); break;
+        case LE_RACE_FINISHED:         raceFinished(event);        break;
+        case LE_EXIT_RESULT:           exitResultScreen(event);    break;
+        default:
+            return false;
+            break;
+    }   // switch
+    return true;
+}   // notifyEvent
 
 //-----------------------------------------------------------------------------
 
 bool ClientLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
 {
     assert(m_setup); // assert that the setup exists
-    if (event->type == EVENT_TYPE_MESSAGE)
+    if (event->getType() == EVENT_TYPE_MESSAGE)
     {
-        NetworkString data = event->data();
+        NetworkString &data = event->data();
         assert(data.size()); // assert that data isn't empty
-        uint8_t message_type = data[0];
-        if (message_type == 0x03 ||
-            message_type == 0x06)
-            return false; // don't treat the event
+        uint8_t message_type = data.getUInt8();
 
-        event->removeFront(1);
-        Log::info("ClientLobbyRoomProtocol", "Asynchronous message of type %d", message_type);
-        if (message_type == 0x01) // new player connected
-            newPlayer(event);
-        else if (message_type == 0x02) // player disconnected
-            disconnectedPlayer(event);
-        else if (message_type == 0x04) // start race
-            startGame(event);
-        else if (message_type == 0x05) // start selection phase
-            startSelection(event);
-        else if (message_type == 0x80) // connection refused
-            connectionRefused(event);
-        else if (message_type == 0x81) // connection accepted
-            connectionAccepted(event);
-        else if (message_type == 0x82) // kart selection refused
-            kartSelectionRefused(event);
-        else if (message_type == 0xc0) // vote for major mode
-            playerMajorVote(event);
-        else if (message_type == 0xc1) // vote for race count
-            playerRaceCountVote(event);
-        else if (message_type == 0xc2) // vote for minor mode
-            playerMinorVote(event);
-        else if (message_type == 0xc3) // vote for track
-            playerTrackVote(event);
-        else if (message_type == 0xc4) // vote for reversed mode
-            playerReversedVote(event);
-        else if (message_type == 0xc5) // vote for laps
-            playerLapsVote(event);
+        Log::info("ClientLobbyRoomProtocol", "Asynchronous message of type %d",
+                  message_type);
+        switch(message_type)
+        {
+            case LE_NEW_PLAYER_CONNECTED: newPlayer(event);              break;
+            case LE_PLAYER_DISCONNECTED : disconnectedPlayer(event);     break;
+            case LE_START_RACE: startGame(event);                        break;
+            case LE_START_SELECTION: startSelection(event);              break;
+            case LE_CONNECTION_REFUSED: connectionRefused(event);        break;
+            case LE_CONNECTION_ACCEPTED: connectionAccepted(event);      break;
+            case LE_KART_SELECTION_REFUSED: kartSelectionRefused(event); break;
+            case LE_VOTE_MAJOR : playerMajorVote(event);                 break;
+            case LE_VOTE_RACE_COUNT: playerRaceCountVote(event);         break;
+            case LE_VOTE_MINOR: playerMinorVote(event);                  break;
+            case LE_VOTE_TRACK: playerTrackVote(event);                  break;
+            case LE_VOTE_REVERSE: playerReversedVote(event);             break;
+            case LE_VOTE_LAPS: playerLapsVote(event);                    break;
+        }   // switch
 
         return true;
     } // message
-    else if (event->type == EVENT_TYPE_CONNECTED)
+    else if (event->getType() == EVENT_TYPE_DISCONNECTED) 
     {
-        return true;
-    } // connection
-    else if (event->type == EVENT_TYPE_DISCONNECTED) // means we left essentially
-    {
-        NetworkManager::getInstance()->removePeer(m_server);
-        m_server = NULL;
-        NetworkManager::getInstance()->disconnected();
-        m_listener->requestTerminate(this);
-        NetworkManager::getInstance()->reset();
-        NetworkManager::getInstance()->removePeer(*event->peer); // prolly the same as m_server
+        // This means we left essentially.
+        // We can't delete STKHost from this thread, since the main
+        // thread might still test if STKHost exists and then call
+        // the ProtocolManager, which might already have been deleted.
+        // So only signal that STKHost should exit, which will be tested
+        // from the main thread.
+        STKHost::get()->requestShutdown();
         return true;
     } // disconnection
     return false;
-}
+}   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
 
-void ClientLobbyRoomProtocol::update()
+void ClientLobbyRoomProtocol::update(float dt)
 {
     switch (m_state)
     {
     case NONE:
-        if (NetworkManager::getInstance()->isConnectedTo(m_server_address))
+        if (STKHost::get()->isConnectedTo(m_server_address))
         {
             m_state = LINKED;
         }
         break;
     case LINKED:
     {
-        NetworkString ns;
-        // 1 (connection request), 4 (size of id), global id
-        ns.ai8(1).ai8(4).ai32(PlayerManager::getCurrentOnlineId());
-        m_listener->sendMessage(this, ns);
+        core::stringw name;
+        if(PlayerManager::getCurrentOnlineState()==PlayerProfile::OS_SIGNED_IN)
+            name = PlayerManager::getCurrentOnlineUserName();
+        else
+            name = PlayerManager::getCurrentPlayer()->getName();
+
+        std::string name_u8 = StringUtils::wideToUtf8(name);
+        const std::string &password = NetworkConfig::get()->getPassword();
+        NetworkString *ns = getNetworkString(6+1+name_u8.size()
+                                                 +1+password.size());
+        // 4 (size of id), global id
+        ns->addUInt8(LE_CONNECTION_REQUESTED).encodeString(name)
+          .encodeString(NetworkConfig::get()->getPassword());
+        sendToServer(ns);
+        delete ns;
         m_state = REQUESTING_CONNECTION;
     }
     break;
@@ -244,32 +305,26 @@ void ClientLobbyRoomProtocol::update()
         break;
     case KART_SELECTION:
     {
-        NetworkKartSelectionScreen* screen = NetworkKartSelectionScreen::getInstance();
-        StateManager::get()->pushScreen(screen);
+        NetworkKartSelectionScreen* screen =
+                                     NetworkKartSelectionScreen::getInstance();
+        screen->push();
         m_state = SELECTING_KARTS;
     }
     break;
     case SELECTING_KARTS:
         break;
     case PLAYING:
-    {
-        if (NetworkWorld::getInstance<NetworkWorld>()->isRaceOver()) // race is now over, kill race protocols and return to connected state
-        {
-            Log::info("ClientLobbyRoomProtocol", "Game finished.");
-            m_state = RACE_FINISHED;
-        }
-    }
-    break;
+        break;
     case RACE_FINISHED:
         break;
     case DONE:
         m_state = EXITING;
-        m_listener->requestTerminate(this);
+        ProtocolManager::getInstance()->requestTerminate(this);
         break;
     case EXITING:
         break;
     }
-}
+}   // update
 
 //-----------------------------------------------------------------------------
 
@@ -277,42 +332,42 @@ void ClientLobbyRoomProtocol::update()
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1                  5   6                   7
- *       ------------------------------------------------
- *  Size | 1 |         4        | 1 |          1        |
- *  Data | 4 | player global id | 1 | 0 <= race id < 16 |
- *       ------------------------------------------------
+ *  Byte 0            1         2          
+ *       -------------------------------------
+ *  Size |     1      |    1   |             |
+ *  Data | player_id  | hostid | player name |
+ *       -------------------------------------
  */
 void ClientLobbyRoomProtocol::newPlayer(Event* event)
 {
-    NetworkString data = event->data();
-    if (data.size() != 7 || data[0] != 4 || data[5] != 1) // 7 bytes remains now
-    {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a new player wasn't formated as expected.");
-        return;
-    }
+    if (!checkDataSize(event, 2)) return;
+    const NetworkString &data = event->data();
 
-    uint32_t global_id = data.gui32(1);
-    uint8_t race_id = data.gui8(6);
-
-    if (global_id == PlayerManager::getCurrentOnlineId())
+    uint8_t player_id = data.getUInt8();
+    uint8_t host_id   = data.getUInt8();
+    core::stringw name;
+    data.decodeStringW(&name);
+    // FIXME need adjusting when splitscreen is used/
+    if(STKHost::get()->getGameSetup()->isLocalMaster(player_id))
     {
-        Log::error("ClientLobbyRoomProtocol", "The server notified me that i'm a new player in the room (not normal).");
+        Log::error("ClientLobbyRoomProtocol",
+                   "The server notified me that I'm a new player in the "
+                   "room (not normal).");
     }
-    else if (m_setup->getProfile(race_id) == NULL || m_setup->getProfile(global_id) == NULL)
+    else if (m_setup->getProfile(player_id) == NULL)
     {
         Log::verbose("ClientLobbyRoomProtocol", "New player connected.");
-        NetworkPlayerProfile* profile = new NetworkPlayerProfile();
-        profile->kart_name = "";
-        profile->race_id = race_id;
-        profile->user_profile = new Online::OnlineProfile(global_id, "");
+        NetworkPlayerProfile* profile = 
+                      new NetworkPlayerProfile(name, player_id, host_id);
         m_setup->addPlayer(profile);
+        NetworkingLobby::getInstance()->addPlayer(profile);
     }
     else
     {
-        Log::error("ClientLobbyRoomProtocol", "One of the player notified in the list is myself.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "One of the player notified in the list is myself.");
     }
-}
+}   // newPlayer
 
 //-----------------------------------------------------------------------------
 
@@ -320,30 +375,36 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1                   2
- *       -------------------------
- *  Size | 1 |         1         |
- *  Data | 1 | 0 <= race id < 16 |
- *       -------------------------
+ *  Byte 0 
+ *       --------------
+ *  Size |    1       |
+ *  Data | player id *|
+ *       --------------
  */
 void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
 {
-    NetworkString data = event->data();
-    if (data.size() != 2 || data[0] != 1)
+    if (!checkDataSize(event, 1)) return;
+
+    NetworkString &data = event->data();
+    while(data.size()>0)
     {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a new player wasn't formated as expected.");
-        return;
-    }
-    uint8_t id = data[1];
-    if (m_setup->removePlayer(id))
-    {
-        Log::info("ClientLobbyRoomProtocol", "Peer removed successfully.");
-    }
-    else
-    {
-        Log::error("ClientLobbyRoomProtocol", "The disconnected peer wasn't known.");
-    }
-}
+        const NetworkPlayerProfile *profile = 
+                        m_setup->getProfile(data.getUInt8());
+        if (m_setup->removePlayer(profile))
+        {
+            Log::info("ClientLobbyRoomProtocol",
+                      "Player %d removed successfully.",
+                      profile->getGlobalPlayerId());
+        }
+        else
+        {
+            Log::error("ClientLobbyRoomProtocol",
+                       "The disconnected peer wasn't known.");
+        }
+    }   // while
+
+    STKHost::get()->removePeer(event->getPeer());
+}   // disconnectedPlayer
 
 //-----------------------------------------------------------------------------
 
@@ -351,68 +412,71 @@ void ClientLobbyRoomProtocol::disconnectedPlayer(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1                   2   3            7   8           12
- *       ----------------------------------------------------------
- *  Size | 1 |         1         | 1 |      4     | 1 |     4     |
- *  Data | 1 | 0 <= race id < 16 | 4 | priv token | 4 | global id |
- *       ----------------------------------------------------------
+ *  Byte 0                   1        2            3       
+ *       ---------------------------------------------------------
+ *  Size |    1     |   1    | 1          |             |
+ *  Data | player_id| hostid | authorised |playernames* |
+ *       ---------------------------------------------------------
  */
 void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 {
-    NetworkString data = event->data();
-    if (data.size() < 12 || data[0] != 1 || data[2] != 4 || data[7] != 4) // 12 bytes remains now
-    {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying an accepted connection wasn't formated as expected.");
-        return;
-    }
-    STKPeer* peer = *(event->peer);
+    // At least 3 bytes should remain now
+    if(!checkDataSize(event, 3)) return;
 
-    uint32_t global_id = data.gui32(8);
-    if (global_id == PlayerManager::getCurrentOnlineId())
-    {
-        Log::info("ClientLobbyRoomProtocol", "The server accepted the connection.");
+    NetworkString &data = event->data();
+    STKPeer* peer = event->getPeer();
 
-        // self profile
-        NetworkPlayerProfile* profile = new NetworkPlayerProfile();
-        profile->kart_name = "";
-        profile->race_id = data.gui8(1);
-        profile->user_profile = PlayerManager::getCurrentOnlineProfile();
-        m_setup->addPlayer(profile);
-        // connection token
-        uint32_t token = data.gui32(3);
-        peer->setClientServerToken(token);
-        // add all players
-        data.removeFront(12); // remove the 12 first bytes
-        int remaining = data.size();
-        if (remaining%7 != 0)
-        {
-            Log::error("ClientLobbyRoomProtocol", "ConnectionAccepted : Error in the server list");
-        }
-        remaining /= 7;
-        for (int i = 0; i < remaining; i++)
-        {
-            if (data[0] != 1 || data[2] != 4)
-                Log::error("ClientLobbyRoomProtocol", "Bad format in players list.");
+    // Accepted
+    // ========
+    Log::info("ClientLobbyRoomProtocol",
+              "The server accepted the connection.");
 
-            uint8_t race_id = data[1];
-            uint32_t global_id = data.gui32(3);
-            Online::OnlineProfile* new_user = new Online::OnlineProfile(global_id, "");
-
-            NetworkPlayerProfile* profile2 = new NetworkPlayerProfile();
-            profile2->race_id = race_id;
-            profile2->user_profile = new_user;
-            profile2->kart_name = "";
-            m_setup->addPlayer(profile2);
-            data.removeFront(7);
-        }
-
-        // add self
-        m_server = *(event->peer);
-        m_state = CONNECTED;
-    }
+    // self profile
+    irr::core::stringw name;
+    if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
+        name = PlayerManager::getCurrentOnlineUserName();
     else
-        Log::info("ClientLobbyRoomProtocol", "Failure during the connection acceptation process.");
-}
+        name = PlayerManager::getCurrentPlayer()->getName();
+    uint8_t my_player_id = data.getUInt8();
+    uint8_t my_host_id   = data.getUInt8();
+    uint8_t authorised   = data.getUInt8();
+    // Store this client's authorisation status in the peer information
+    // for the server.
+    event->getPeer()->setAuthorised(authorised!=0);
+    STKHost::get()->setMyHostId(my_host_id);
+
+    NetworkPlayerProfile* profile = 
+        new NetworkPlayerProfile(name, my_player_id, my_host_id);
+    STKHost::get()->getGameSetup()->setLocalMaster(my_player_id);
+    m_setup->setNumLocalPlayers(1);
+    // connection token
+    uint32_t token = data.getToken();
+    peer->setClientServerToken(token);
+
+    // Add all players
+    // ===============
+    while (data.size() > 0)
+    {
+        uint8_t player_id = data.getUInt8();
+        uint8_t host_id   = data.getUInt8();
+        irr::core::stringw name;
+        int bytes_read = data.decodeStringW(&name);
+        
+        NetworkPlayerProfile* profile2 =
+            new NetworkPlayerProfile(name, player_id, host_id);
+        m_setup->addPlayer(profile2);
+        // Inform the network lobby of all players so that the GUI can
+        // show all currently connected players.
+        NetworkingLobby::getInstance()->addPlayer(profile2);
+    }
+
+    // Add self after other players so that player order is identical
+    // on server and all clients.
+    m_setup->addPlayer(profile);
+    NetworkingLobby::getInstance()->addPlayer(profile);
+    m_server = event->getPeer();
+    m_state = CONNECTED;
+}   // connectionAccepted
 
 //-----------------------------------------------------------------------------
 
@@ -420,34 +484,34 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1              2
- *       --------------------
- *  Size | 1 |         1    |
- *  Data | 1 | refusal code |
- *       --------------------
+ *  Byte 0 
+ *       ----------------
+ *  Size |      1       |
+ *  Data | refusal code |
+ *       ----------------
  */
 void ClientLobbyRoomProtocol::connectionRefused(Event* event)
 {
-    NetworkString data = event->data();
-    if (data.size() != 2 || data[0] != 1) // 2 bytes remains now
-    {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a refused connection wasn't formated as expected.");
-        return;
-    }
-
-    switch (data[1]) // the second byte
+    if (!checkDataSize(event, 1)) return;
+    const NetworkString &data = event->data();
+    
+    switch (data.getUInt8()) // the second byte
     {
     case 0:
-        Log::info("ClientLobbyRoomProtocol", "Connection refused : too many players.");
+        Log::info("ClientLobbyRoomProtocol",
+                  "Connection refused : too many players.");
         break;
     case 1:
         Log::info("ClientLobbyRoomProtocol", "Connection refused : banned.");
+        break;
+    case 2:
+        Log::info("ClientLobbyRoomProtocol", "Client busy.");
         break;
     default:
         Log::info("ClientLobbyRoomProtocol", "Connection refused.");
         break;
     }
-}
+}   // connectionRefused
 
 //-----------------------------------------------------------------------------
 
@@ -455,34 +519,33 @@ void ClientLobbyRoomProtocol::connectionRefused(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1              2
- *       --------------------
- *  Size | 1 |      1       |
- *  Data | 1 | refusal code |
- *       --------------------
+ *  Byte 0
+ *       ----------------
+ *  Size |      1       |
+ *  Data | refusal code |
+ *       ----------------
  */
 void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
 {
-    NetworkString data = event->data();
-    if (data.size() != 2 || data[0] != 1)
-    {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a refused kart selection wasn't formated as expected.");
-        return;
-    }
+    if(!checkDataSize(event, 1)) return;
 
-    switch (data[1]) // the error code
+    const NetworkString &data = event->data();
+
+    switch (data.getUInt8()) // the error code
     {
     case 0:
-        Log::info("ClientLobbyRoomProtocol", "Kart selection refused : already taken.");
+        Log::info("ClientLobbyRoomProtocol",
+                  "Kart selection refused : already taken.");
         break;
     case 1:
-        Log::info("ClientLobbyRoomProtocol", "Kart selection refused : not available.");
+        Log::info("ClientLobbyRoomProtocol",
+                  "Kart selection refused : not available.");
         break;
     default:
         Log::info("ClientLobbyRoomProtocol", "Kart selection refused.");
         break;
     }
-}
+}   // kartSelectionRefused
 
 //-----------------------------------------------------------------------------
 
@@ -490,100 +553,55 @@ void ClientLobbyRoomProtocol::kartSelectionRefused(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1         2                    3           N+3
- *       ------------------------------------------------
- *  Size | 1 |    1    |       1            |     N     |
- *  Data | 1 | race id | N (kart name size) | kart name |
- *       ------------------------------------------------
+ *  Byte 0           1           2                    3           N+3
+ *       --------------------------------------------------
+ *  Size |    1      |       1            |     N     |
+ *  Data | player id | N (kart name size) | kart name |
+ *       --------------------------------------------------
  */
 void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
 {
-    NetworkString data = event->data();
-    if (data.size() < 3 || data[0] != 1)
-    {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a kart selection update wasn't formated as expected.");
-        return;
-    }
-    uint8_t player_id = data[1];
-    uint8_t kart_name_length = data[2];
-    std::string kart_name = data.getString(3, kart_name_length);
-    if (kart_name.size() != kart_name_length)
-    {
-        Log::error("ClientLobbyRoomProtocol", "Kart names sizes differ: told: %d, real: %d.", kart_name_length, kart_name.size());
-        return;
-    }
+    if(!checkDataSize(event, 3)) return;
+    const NetworkString &data = event->data();
+    uint8_t player_id = data.getUInt8();
+    std::string kart_name;
+    data.decodeString(&kart_name);
     if (!m_setup->isKartAvailable(kart_name))
     {
-        Log::error("ClientLobbyRoomProtocol", "The updated kart is taken already.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "The updated kart is taken already.");
     }
     m_setup->setPlayerKart(player_id, kart_name);
-    NetworkKartSelectionScreen::getInstance()->playerSelected(player_id, kart_name);
-}
+    NetworkKartSelectionScreen::getInstance()->playerSelected(player_id,
+                                                              kart_name);
+}   // kartSelectionUpdate
 
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when the race needs to be started.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0   1       5
- *       -------------
- *  Size | 1 |    4  |
- *  Data | 4 | token |
- *       -------------
+ *  \param event : Event providing the information (no additional information
+ *                 in this case).
  */
 void ClientLobbyRoomProtocol::startGame(Event* event)
 {
-    NetworkString data = event->data();
-    if (data.size() < 5 || data[0] != 4)
-    {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
-                   "selection update wasn't formated as expected.");
-        return;
-    }
-    uint8_t token = data.gui32(1);
-    if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
-    {
-        m_state = PLAYING;
-        m_listener->requestStart(new StartGameProtocol(m_setup));
-        Log::error("ClientLobbyRoomProtocol", "Starting new game");
-    }
-    else
-        Log::error("ClientLobbyRoomProtocol", "Bad token when starting game");
-
-}
+    const NetworkString &data = event->data();
+    m_state = PLAYING;
+    ProtocolManager::getInstance()
+        ->requestStart(new StartGameProtocol(m_setup));
+    Log::info("ClientLobbyRoomProtocol", "Starting new game");
+}   // startGame
 
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when the kart selection starts.
- *  \param event : Event providing the information.
- *
- *  Format of the data :
- *  Byte 0   1       5
- *       -------------
- *  Size | 1 |    4  |
- *  Data | 4 | token |
- *       -------------
+ *  \param event : Event providing the information (no additional information
+ *                 in this case).
  */
 void ClientLobbyRoomProtocol::startSelection(Event* event)
 {
-    NetworkString data = event->data();
-    if (data.size() < 5 || data[0] != 4)
-    {
-        Log::error("ClientLobbyRoomProtocol", "A message notifying a kart "
-                   "selection update wasn't formated as expected.");
-        return;
-    }
-    uint8_t token = data.gui32(1);
-    if (token == NetworkManager::getInstance()->getPeers()[0]->getClientServerToken())
-    {
-        m_state = KART_SELECTION;
-        Log::info("ClientLobbyRoomProtocol", "Kart selection starts now");
-    }
-    else
-        Log::error("ClientLobbyRoomProtocol", "Bad token");
-
-}
+    m_state = KART_SELECTION;
+    Log::info("ClientLobbyRoomProtocol", "Kart selection starts now");
+}   // startSelection
 
 //-----------------------------------------------------------------------------
 
@@ -591,47 +609,44 @@ void ClientLobbyRoomProtocol::startSelection(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1       5   6           7   8           9
- *       ---------------------------------------------------
- *  Size | 1 |    4  | 1 |     1     | 1 |     1     |     |
- *  Data | 4 | token | 1 | Kart 1 ID | 1 | kart id 2 | ... |
- *       ---------------------------------------------------
+ *  Byte 0           1
+ *       -------------------------------
+ *  Size |     1     |     1     |     |
+ *  Data | Kart 1 ID | kart id 2 | ... |
+ *       -------------------------------
  */
 void ClientLobbyRoomProtocol::raceFinished(Event* event)
 {
-    if (event->data().size() < 5)
-    {
-        Log::error("ClientLobbyRoomProtocol", "Not enough data provided.");
-        return;
-    }
-    NetworkString data = event->data();
-    if ((*event->peer)->getClientServerToken() != data.gui32(1))
-    {
-        Log::error("ClientLobbyRoomProtocol", "Bad token");
-        return;
-    }
-    data.removeFront(5);
-    Log::error("ClientLobbyRoomProtocol", "Server notified that the race is finished.");
+    if(!checkDataSize(event, 1)) return;
+
+    NetworkString &data = event->data();
+    Log::error("ClientLobbyRoomProtocol",
+               "Server notified that the race is finished.");
 
     // stop race protocols
-    Protocol* protocol = NULL;
-    protocol = m_listener->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
+    Protocol* protocol = ProtocolManager::getInstance()
+                       ->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
     if (protocol)
-        m_listener->requestTerminate(protocol);
+        ProtocolManager::getInstance()->requestTerminate(protocol);
     else
-        Log::error("ClientLobbyRoomProtocol", "No controller events protocol registered.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "No controller events protocol registered.");
 
-    protocol = m_listener->getProtocol(PROTOCOL_KART_UPDATE);
+    protocol = ProtocolManager::getInstance() 
+             ->getProtocol(PROTOCOL_KART_UPDATE);
     if (protocol)
-        m_listener->requestTerminate(protocol);
+        ProtocolManager::getInstance()->requestTerminate(protocol);
     else
-        Log::error("ClientLobbyRoomProtocol", "No kart update protocol registered.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "No kart update protocol registered.");
 
-    protocol = m_listener->getProtocol(PROTOCOL_GAME_EVENTS);
+    protocol = ProtocolManager::getInstance()
+             ->getProtocol(PROTOCOL_GAME_EVENTS);
     if (protocol)
-        m_listener->requestTerminate(protocol);
+        ProtocolManager::getInstance()->requestTerminate(protocol);
     else
-        Log::error("ClientLobbyRoomProtocol", "No game events protocol registered.");
+        Log::error("ClientLobbyRoomProtocol",
+                   "No game events protocol registered.");
 
     // finish the race
     WorldWithRank* ranked_world = (WorldWithRank*)(World::getWorld());
@@ -640,167 +655,154 @@ void ClientLobbyRoomProtocol::raceFinished(Event* event)
     int position = 1;
     while(data.size()>0)
     {
-        if (data.size() < 2)
-        {
-            Log::error("ClientLobbyRoomProtocol", "Incomplete field.");
-            return;
-        }
-        if (data[0] != 1)
-        {
-            Log::error("ClientLobbyRoomProtocol", "Badly formatted field.");
-            return;
-        }
-        uint8_t kart_id = data[1];
+        uint8_t kart_id = data.getUInt8();
         ranked_world->setKartPosition(kart_id,position);
-        Log::info("ClientLobbyRoomProtocol", "Kart %d has finished #%d", kart_id, position);
-        data.removeFront(2);
+        Log::info("ClientLobbyRoomProtocol", "Kart %d has finished #%d",
+                  kart_id, position);
         position++;
     }
     ranked_world->endSetKartPositions();
     m_state = RACE_FINISHED;
     ranked_world->terminateRace();
-}
+}   // raceFinished
 
 //-----------------------------------------------------------------------------
+/** Called when the server informs the clients to exit the race result screen.
+ *  It exits the race, and goes back to the lobby.
+ */
+void ClientLobbyRoomProtocol::exitResultScreen(Event *event)
+{
+    RaceResultGUI::getInstance()->backToLobby();
+}   // exitResultScreen
 
+//-----------------------------------------------------------------------------
 /*! \brief Called when a player votes for a major race mode.
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6           7   8                 9
- *       --------------------------------------------------------
- *  Size | 1 |      4     | 1 |     1     | 1 |        1        |
- *  Data | 4 | priv token | 1 | player id | 1 | major mode vote |
- *       --------------------------------------------------------
+ *  Byte 0          1                 2
+ *       ------------------------------
+ *  Size |    1     |        1        |
+ *  Data |player id | major mode vote |
+ *       ------------------------------
  */
 void ClientLobbyRoomProtocol::playerMajorVote(Event* event)
 {
-    NetworkString data = event->data();
-    if (!checkDataSizeAndToken(event, 9))
+    const NetworkString &data = event->data();
+    if (!checkDataSize(event, 2))
         return;
-    if (!isByteCorrect(event, 5, 1))
-        return;
-    if (!isByteCorrect(event, 7, 1))
-        return;
-    m_setup->getRaceConfig()->setPlayerMajorVote(data[6], data[8]);
-}
-//-----------------------------------------------------------------------------
+    uint8_t player_id = data.getUInt8();
+    uint8_t mode      = data.getUInt8();
+    m_setup->getRaceConfig()->setPlayerMajorVote(player_id, mode);
+}   // playerMajorVote
 
+//-----------------------------------------------------------------------------
 /*! \brief Called when a player votes for the number of races in a GP.
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6           7   8             9
- *       ----------------------------------------------------
- *  Size | 1 |      4     | 1 |     1     | 1 |      1      |
- *  Data | 4 | priv token | 1 | player id | 1 | races count |
- *       ----------------------------------------------------
+ *  Byte 0           1
+ *       ---------------------------
+ *  Size |     1     |      1      |
+ *  Data | player id | races count |
+ *       ---------------------------
  */
 void ClientLobbyRoomProtocol::playerRaceCountVote(Event* event)
 {
-    NetworkString data = event->data();
-    if (!checkDataSizeAndToken(event, 9))
-        return;
-    if (!isByteCorrect(event, 5, 1))
-        return;
-    if (!isByteCorrect(event, 7, 1))
-        return;
-    m_setup->getRaceConfig()->setPlayerRaceCountVote(data[6], data[8]);
-}
-//-----------------------------------------------------------------------------
+    if (!checkDataSize(event, 2)) return;
+    const NetworkString &data = event->data();
+    uint8_t player_id = data.getUInt8();
+    uint8_t count     = data.getUInt8();
+    m_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, count);
+}   // playerRaceCountVote
 
+//-----------------------------------------------------------------------------
 /*! \brief Called when a player votes for a minor race mode.
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6           7   8                 9
- *       --------------------------------------------------------
- *  Size | 1 |      4     | 1 |      1    | 1 |        1        |
- *  Data | 4 | priv token | 1 | player id | 1 | minor mode vote |
- *       --------------------------------------------------------
+ *  Byte 0           1
+ *       -------------------------------
+ *  Size |      1    |        4        |
+ *  Data | player id | minor mode vote |
+ *       -------------------------------
  */
 void ClientLobbyRoomProtocol::playerMinorVote(Event* event)
 {
-    NetworkString data = event->data();
-    if (!checkDataSizeAndToken(event, 9))
-        return;
-    if (!isByteCorrect(event, 5, 1))
-        return;
-    if (!isByteCorrect(event, 7, 1))
-        return;
-    m_setup->getRaceConfig()->setPlayerMinorVote(data[6], data[8]);
-}
+    if (!checkDataSize(event, 2)) return;
+    const NetworkString &data = event->data();
+    uint8_t player_id = data.getUInt8();
+    uint8_t minor     = data.getUInt8();
+    m_setup->getRaceConfig()->setPlayerMinorVote(player_id, minor);
+}   // playerMinorVote
+
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when a player votes for a track.
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6           7   8            N+8 N+9                 N+10
- *       ---------------------------------------------------------------------------
- *  Size | 1 |      4     | 1 |      1    | 1 |      N     | 1 |       1           |
- *  Data | 4 | priv token | 1 | player id | N | track name | 1 | track number (gp) |
- *       ---------------------------------------------------------------------------
+ *  Byte 0           1                   2   3
+ *       --------------------------------------------------
+ *  Size |      1    |       1           | 1 |     N      |
+ *  Data | player id | track number (gp) | N | track name |
+ *       --------------------------------------------------
  */
 void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
 {
-    NetworkString data = event->data();
-    if (!checkDataSizeAndToken(event, 10))
-        return;
-    if (!isByteCorrect(event, 5, 1))
-        return;
-    int N = data[7];
-    std::string track_name = data.gs(8, N);
-    if (!isByteCorrect(event, N+8, 1))
-        return;
-    m_setup->getRaceConfig()->setPlayerTrackVote(data[6], track_name, data[N+9]);
-}
+    if (!checkDataSize(event, 3)) return;
+    const NetworkString &data = event->data();
+    std::string track_name;
+    uint8_t player_id = data.getUInt8();
+    uint8_t number    = data.getUInt8();
+    int N = data.decodeString(&track_name);
+    m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
+                                                 number);
+}   // playerTrackVote
+
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when a player votes for the reverse mode of a race
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6           7   8          9   10                  11
- *       -------------------------------------------------------------------------
- *  Size | 1 |      4     | 1 |     1     | 1 |     1    | 1 |       1           |
- *  Data | 4 | priv token | 1 | player id | 1 | reversed | 1 | track number (gp) |
- *       -------------------------------------------------------------------------
+ *  Byte 0           1         2
+ *       -------------------------------------------
+ *  Size |     1     |    1    |       1           |
+ *  Data | player id |reversed | track number (gp) |
+ *       -------------------------------------------
  */
 void ClientLobbyRoomProtocol::playerReversedVote(Event* event)
 {
-    NetworkString data = event->data();
-    if (!checkDataSizeAndToken(event, 11))
-        return;
-    if (!isByteCorrect(event, 5, 1))
-        return;
-    if (!isByteCorrect(event, 7, 1))
-        return;
-    if (!isByteCorrect(event, 9, 1))
-        return;
-    m_setup->getRaceConfig()->setPlayerReversedVote(data[6], data[8]!=0, data[10]);
-}
+    if (!checkDataSize(event, 3)) return;
+    const NetworkString &data = event->data();
+    uint8_t player_id = data.getUInt8();
+    uint8_t reversed  = data.getUInt8();
+    uint8_t number    = data.getUInt8();
+    m_setup->getRaceConfig()->setPlayerReversedVote(player_id, reversed!=0,
+                                                    number);
+}   // playerReversedVote
+
 //-----------------------------------------------------------------------------
 
 /*! \brief Called when a player votes for a major race mode.
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0   1            5   6           7   8      9   10                  11
- *       ---------------------------------------------------------------------
- *  Size | 1 |      4     | 1 |     1     | 1 |   1  | 1 |       1           |
- *  Data | 4 | priv token | 1 | player id | 1 | laps | 1 | track number (gp) |
- *       ---------------------------------------------------------------------
+ *  Byte 0           1      2
+ *       ----------------------------------------
+ *  Size |     1     |   1  |       1           |
+ *  Data | player id | laps | track number (gp) |
+ *       ----------------------------------------
  */
 void ClientLobbyRoomProtocol::playerLapsVote(Event* event)
 {
-    NetworkString data = event->data();
-    if (!checkDataSizeAndToken(event, 9))
-        return;
-    if (!isByteCorrect(event, 5, 1))
-        return;
-    if (!isByteCorrect(event, 7, 1))
-        return;
-    m_setup->getRaceConfig()->setPlayerLapsVote(data[6], data[8], data[10]);
-}
+    if (!checkDataSize(event, 3)) return;
+    const NetworkString &data = event->data();
+    uint8_t player_id = data.getUInt8();
+    uint8_t laps      = data.getUInt8();
+    uint8_t number    = data.getUInt8();
+    m_setup->getRaceConfig()->setPlayerLapsVote(player_id, laps, number);
+}   // playerLapsVote
+
 //-----------------------------------------------------------------------------

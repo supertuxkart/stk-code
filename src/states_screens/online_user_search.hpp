@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -48,9 +48,6 @@ private:
     /** Pointer to the result list. */
     GUIEngine::ListWidget *                     m_user_list_widget;
 
-    /** The currently selected index, used to re-select this item after
-     *  addons_loading is being displayed. */
-    int                                         m_selected_index;
     /** Seach string entered in the search widget. */
     irr::core::stringw                          m_search_string;
     /** Last search string, used to avoid doing the same search again. */
@@ -86,7 +83,6 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
 
-    void setLastSelected();
     /** Sets the search string to an initial value. */
     void setSearchString(const irr::core::stringw & search_string)
     {

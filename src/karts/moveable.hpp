@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013 Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -31,14 +31,13 @@ using namespace irr;
 #include "physics/user_pointer.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
-#include "network/types.hpp"
 
 class Material;
 
 /**
   * \ingroup karts
   */
-class Moveable: public NoCopy, public CallbackObject
+class Moveable: public NoCopy
 {
 private:
     btVector3              m_velocityLC;      /**<Velocity in kart coordinates. */

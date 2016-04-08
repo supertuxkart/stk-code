@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -43,7 +43,9 @@ public:
 protected:
     // Give them access to the members
     friend class AIBaseController;
+    friend class AIBaseLapController;
     friend class SkiddingAI;
+    friend class ArenaAI;
 
     /** Used to check that all values are defined in the xml file. */
     static float UNDEFINED;

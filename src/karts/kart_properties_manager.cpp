@@ -1,7 +1,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2004-2013 Ingo Ruhnke <grumbel@gmx.de>
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,6 +28,7 @@
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/xml_characteristic.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -175,12 +176,68 @@ void KartPropertiesManager::loadAllKarts(bool loading_icon)
 }   // loadAllKarts
 
 //-----------------------------------------------------------------------------
-/** Loads a single kart and (if not disabled) the oorresponding 3d model.
+/** Loads the characteristics from the characteristics config file.
+ *  \param root The xml node where the characteristics are stored.
+ */
+void KartPropertiesManager::loadCharacteristics(const XMLNode *root)
+{
+    // Load base characteristics
+    std::vector<XMLNode*> nodes;
+    root->getNodes("characteristic", nodes);
+    bool found = false;
+    std::string name;
+    for (const XMLNode *baseNode : nodes)
+    {
+        baseNode->get("name", &name);
+        if (name == "base")
+        {
+            found = true;
+            m_base_characteristic.reset(new XmlCharacteristic(baseNode));
+            break;
+        }
+    }
+    if (!found)
+        Log::fatal("KartPropertiesManager", "Base characteristics not found");
+
+    // Load difficulties
+    nodes.clear();
+    root->getNode("difficulties")->getNodes("characteristic", nodes);
+    for (const XMLNode *type : nodes)
+    {
+        type->get("name", &name);
+        m_difficulty_characteristics.insert(std::pair<const std::string,
+            std::unique_ptr<AbstractCharacteristic> >(name,
+            std::unique_ptr<AbstractCharacteristic>(new XmlCharacteristic(type))));
+    }
+    // Load kart type characteristics
+    nodes.clear();
+    root->getNode("kart-types")->getNodes("characteristic", nodes);
+    for (const XMLNode *type : nodes)
+    {
+        type->get("name", &name);
+        m_kart_type_characteristics.insert(std::pair<const std::string,
+            std::unique_ptr<AbstractCharacteristic> >(name,
+            std::unique_ptr<AbstractCharacteristic>(new XmlCharacteristic(type))));
+    }
+    // Load player difficulties
+    nodes.clear();
+    root->getNode("player-characteristics")->getNodes("characteristic", nodes);
+    for (const XMLNode *type : nodes)
+    {
+        type->get("name", &name);
+        m_player_characteristics.insert(std::pair<const std::string,
+            std::unique_ptr<AbstractCharacteristic> >(name,
+            std::unique_ptr<AbstractCharacteristic>(new XmlCharacteristic(type))));
+    }
+}
+
+//-----------------------------------------------------------------------------
+/** Loads a single kart and (if not disabled) the corresponding 3d model.
  *  \param filename Full path to the kart config file.
  */
 bool KartPropertiesManager::loadKart(const std::string &dir)
 {
-    std::string config_filename=dir+"/kart.xml";
+    std::string config_filename = dir + "/kart.xml";
     if(!file_manager->fileExists(config_filename))
         return false;
 
@@ -191,7 +248,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     }
     catch (std::runtime_error& err)
     {
-        Log::error("[Kart_Properties_Manager]","Giving up loading '%s': %s",
+        Log::error("[KartPropertiesManager]", "Giving up loading '%s': %s",
                     config_filename.c_str(), err.what());
         return false;
     }
@@ -201,7 +258,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     if (kart_properties->getVersion() < stk_config->m_min_kart_version ||
         kart_properties->getVersion() > stk_config->m_max_kart_version)
     {
-        Log::warn("[Kart_Properties_Manager]", "Warning: kart '%s' is not "
+        Log::warn("[KartPropertiesManager]", "Warning: kart '%s' is not "
                   "supported by this binary, ignored.",
                   kart_properties->getIdent().c_str());
         delete kart_properties;
@@ -221,7 +278,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     }
     m_all_kart_dirs.push_back(dir);
     return true;
-}   // loadKartData
+}   // loadKart
 
 //-----------------------------------------------------------------------------
 /** Sets the name of a mesh to use as a hat for all karts.
@@ -234,6 +291,36 @@ void KartPropertiesManager::setHatMeshName(const std::string &hat_name)
         m_karts_properties[i].setHatMeshName(hat_name);
     }
 }   // setHatMeshName
+
+//-----------------------------------------------------------------------------
+const AbstractCharacteristic* KartPropertiesManager::getDifficultyCharacteristic(const std::string &type) const
+{
+    std::map<std::string, std::unique_ptr<AbstractCharacteristic> >::const_iterator
+        it = m_difficulty_characteristics.find(type);
+    if (it == m_difficulty_characteristics.cend())
+        return nullptr;
+    return it->second.get();
+}   // getDifficultyCharacteristic
+
+//-----------------------------------------------------------------------------
+const AbstractCharacteristic* KartPropertiesManager::getKartTypeCharacteristic(const std::string &type) const
+{
+    std::map<std::string, std::unique_ptr<AbstractCharacteristic> >::const_iterator
+        it = m_kart_type_characteristics.find(type);
+    if (it == m_kart_type_characteristics.cend())
+        return nullptr;
+    return it->second.get();
+}   // getKartTypeCharacteristic
+
+//-----------------------------------------------------------------------------
+const AbstractCharacteristic* KartPropertiesManager::getPlayerCharacteristic(const std::string &type) const
+{
+    std::map<std::string, std::unique_ptr<AbstractCharacteristic> >::const_iterator
+        it = m_player_characteristics.find(type);
+    if (it == m_player_characteristics.cend())
+        return nullptr;
+    return it->second.get();
+}   // getPlayerCharacteristic
 
 //-----------------------------------------------------------------------------
 /** Returns index of the kart properties with the given ident.
@@ -256,8 +343,7 @@ const int KartPropertiesManager::getKartId(const std::string &ident) const
 const KartProperties* KartPropertiesManager::getKart(
                                                 const std::string &ident) const
 {
-    const KartProperties* kp;
-    for_in (kp, m_karts_properties)
+    for (const KartProperties* kp : m_karts_properties)
     {
         if (kp->getIdent() == ident)
             return kp;

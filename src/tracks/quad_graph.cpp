@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,11 +22,11 @@
 
 #include <IMesh.h>
 #include <ICameraSceneNode.h>
-
+#include "graphics/central_settings.hpp"
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/screenquad.hpp"
+#include "graphics/screen_quad.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/rtts.hpp"
 #include "io/file_manager.hpp"
@@ -37,6 +37,7 @@
 #include "tracks/check_manager.hpp"
 #include "tracks/quad_set.hpp"
 #include "tracks/track.hpp"
+#include "graphics/glwrap.hpp"
 
 const int QuadGraph::UNKNOWN_SECTOR  = -1;
 QuadGraph *QuadGraph::m_quad_graph = NULL;
@@ -47,12 +48,9 @@ QuadGraph *QuadGraph::m_quad_graph = NULL;
  *  \param graph_file_name Name of the file describing the actual graph
  */
 QuadGraph::QuadGraph(const std::string &quad_file_name,
-                     const std::string graph_file_name,
+                     const std::string &graph_file_name,
                      const bool reverse) : m_reverse(reverse)
 {
-    m_node                 = NULL;
-    m_mesh                 = NULL;
-    m_mesh_buffer          = NULL;
     m_lap_length           = 0;
     m_unroll_quad_count    = 6;
     QuadSet::create();
@@ -72,6 +70,7 @@ QuadGraph::~QuadGraph()
     }
     if(UserConfigParams::m_track_debug)
         cleanupDebugMesh();
+    GraphStructure::destroyRTT();
 }   // ~QuadGraph
 
 // -----------------------------------------------------------------------------
@@ -97,7 +96,7 @@ void QuadGraph::load(const std::string &filename)
         // i.e. each quad is part of the graph exactly once.
         // First create an empty graph node for each quad:
         for(unsigned int i=0; i<QuadSet::get()->getNumberOfQuads(); i++)
-            m_all_nodes.push_back(new GraphNode(i, m_all_nodes.size()));
+            m_all_nodes.push_back(new GraphNode(i, (unsigned int) m_all_nodes.size()));
         // Then set the default loop:
         setDefaultSuccessors();
         computeDirectionData();
@@ -131,7 +130,7 @@ void QuadGraph::load(const std::string &filename)
             xml_node->get("to-quad", &to);
             for(unsigned int i=from; i<=to; i++)
             {
-                m_all_nodes.push_back(new GraphNode(i, m_all_nodes.size()));
+                m_all_nodes.push_back(new GraphNode(i, (unsigned int) m_all_nodes.size()));
             }
         }
         else if(xml_node->getName()=="node")
@@ -139,7 +138,7 @@ void QuadGraph::load(const std::string &filename)
             // A single quad is connected to a single graph node.
             unsigned int id;
             xml_node->get("quad", &id);
-            m_all_nodes.push_back(new GraphNode(id, m_all_nodes.size()));
+            m_all_nodes.push_back(new GraphNode(id, (unsigned int) m_all_nodes.size()));
         }
 
         // Then the definition of edges between the graph nodes:
@@ -398,278 +397,6 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
 }   // setStartPositions
 
 // -----------------------------------------------------------------------------
-/** Creates a mesh for this graph. The mesh is not added to a scene node and
- *  is stored in m_mesh.
- *  \param show_invisble  If true, also create a mesh for parts of the
- *         driveline that are invisible.
- *  \param enable_transparency Enable alpha blending to make the mesh
- *         semi transparent.
- *  \param track_color Colour of the actual quads.
- *  \param lap_color If defined, show the lap counting line in that colour.
- */
-void QuadGraph::createMesh(bool show_invisible,
-                           bool enable_transparency,
-                           const video::SColor *track_color,
-                           const video::SColor *lap_color)
-{
-    // The debug track will not be lighted or culled.
-    video::SMaterial m;
-    m.BackfaceCulling  = false;
-    m.Lighting         = false;
-    if(enable_transparency)
-        m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-    m_mesh             = irr_driver->createQuadMesh(&m);
-    m_mesh_buffer      = m_mesh->getMeshBuffer(0);
-    assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
-
-    // Count the number of quads to display (some quads might be invisible
-    unsigned int  n = 0;
-    for(unsigned int i=0; i<m_all_nodes.size(); i++)
-    {
-        if(show_invisible || !m_all_nodes[i]->getQuad().isInvisible())
-            n++;
-    }
-    
-    // Four vertices for each of the n-1 remaining quads
-    video::S3DVertex *new_v = new video::S3DVertex[4*n];
-    // Each quad consists of 2 triangles with 3 elements, so
-    // we need 2*3 indices for each quad.
-    irr::u16         *ind   = new irr::u16[6*n];
-    video::SColor     c(255, 255, 0, 0);
-
-    if(track_color)
-        c = *track_color;
-
-    // Now add all quads
-    int i=0;
-    for(unsigned int count=0; count<m_all_nodes.size(); count++)
-    {
-        // Ignore invisible quads
-        
-        if(!show_invisible && m_all_nodes[count]->getQuad().isInvisible())
-            continue;
-        // Swap the colours from red to blue and back
-        if(!track_color)
-        {
-            c.setRed ((i%2) ? 255 : 0);
-            c.setBlue((i%2) ? 0 : 255);
-        }
-        // Transfer the 4 points of the current quad to the list of vertices
-        m_all_nodes[count]->getQuad().getVertices(new_v+4*i, c);
-
-        // Set up the indices for the triangles
-        // (note, afaik with opengl we could use quads directly, but the code
-        // would not be portable to directx anymore).
-        ind[6*i  ] = 4*i+2;  // First triangle: vertex 0, 1, 2
-        ind[6*i+1] = 4*i+1;
-        ind[6*i+2] = 4*i;
-        ind[6*i+3] = 4*i+3;  // second triangle: vertex 0, 1, 3
-        ind[6*i+4] = 4*i+2;
-        ind[6*i+5] = 4*i;
-        i++;
-    }   // for i=1; i<QuadSet::get()
-
-    m_mesh_buffer->append(new_v, n*4, ind, n*6);
-
-    if(lap_color)
-    {
-        video::S3DVertex lap_v[4];
-        irr::u16         lap_ind[6];
-        video::SColor     c(128, 255, 0, 0);
-        m_all_nodes[0]->getQuad().getVertices(lap_v, *lap_color);
-
-        // Now scale the length (distance between vertix 0 and 3
-        // and between 1 and 2) to be 'length':
-        Vec3 bb_min, bb_max;
-        QuadSet::get()->getBoundingBox(&bb_min, &bb_max);
-        // Length of the lap line about 3% of the 'height'
-        // of the track.
-        const float length=(bb_max.getZ()-bb_min.getZ())*0.03f;
-
-        core::vector3df dl = lap_v[3].Pos-lap_v[0].Pos;
-        float ll2 = dl.getLengthSQ();
-        if(ll2<0.001)
-            lap_v[3].Pos = lap_v[0].Pos+core::vector3df(0, 0, 1);
-        else
-            lap_v[3].Pos = lap_v[0].Pos+dl*length/sqrt(ll2);
-
-        core::vector3df dr = lap_v[2].Pos-lap_v[1].Pos;
-        float lr2 = dr.getLengthSQ();
-        if(lr2<0.001)
-            lap_v[2].Pos = lap_v[1].Pos+core::vector3df(0, 0, 1);
-        else
-            lap_v[2].Pos = lap_v[1].Pos+dr*length/sqrt(lr2);
-        lap_ind[0] = 2;
-        lap_ind[1] = 1;
-        lap_ind[2] = 0;
-        lap_ind[3] = 3;
-        lap_ind[4] = 2;
-        lap_ind[5] = 0;
-        // Set it a bit higher to avoid issued with z fighting,
-        // i.e. part of the lap line might not be visible.
-        for(unsigned int i=0; i<4; i++)
-            lap_v[i].Pos.Y += 0.1f;
-#ifndef USE_TEXTURED_LINE
-        m_mesh_buffer->append(lap_v, 4, lap_ind, 6);
-#else
-        lap_v[0].TCoords = core::vector2df(0,0);
-        lap_v[1].TCoords = core::vector2df(3,0);
-        lap_v[2].TCoords = core::vector2df(3,1);
-        lap_v[3].TCoords = core::vector2df(0,1);
-        m_mesh_buffer->append(lap_v, 4, lap_ind, 6);
-        video::SMaterial &m = m_mesh_buffer->getMaterial();
-        video::ITexture *t = irr_driver->getTexture("chess.png");
-        m.setTexture(0, t);
-#endif
-    }
-
-    // Instead of setting the bounding boxes, we could just disable culling,
-    // since the debug track should always be drawn.
-    //m_node->setAutomaticCulling(scene::EAC_OFF);
-    m_mesh_buffer->recalculateBoundingBox();
-    m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
-
-    delete[] ind;
-    delete[] new_v;
-}   // createMesh
-
-// -----------------------------------------------------------------------------
-/** This is used to draw one set of unrolled quads. This function is mostly a 
-    a copy of createMesh used to draw the entire driveline.
-    FIXME: Either remove this function or name it appropirately*/
-void QuadGraph::createMesh2()
-{
-    // The debug track will not be lighted or culled.
-    video::SMaterial m;
-    m.BackfaceCulling = false;
-    m.Lighting = false;
-   
-        m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-    m_mesh = irr_driver->createQuadMesh(&m);
-    m_mesh_buffer = m_mesh->getMeshBuffer(0);
-    assert(m_mesh_buffer->getVertexType() == video::EVT_STANDARD);
-
-
-    // Eps is used to raise the track debug quads a little bit higher than
-    // the ground, so that they are actually visible. 
-    core::vector3df eps(0, 0.4f, 0);
-    video::SColor     defaultColor(255, 255, 0, 0), c;
-
-    // Declare vector to hold new converted vertices, vertices are copied over 
-    // for each polygon, although it results in redundant vertex copies in the 
-    // final vector, this is the only way I know to make each poly have different color.
-    
-
-    int n_unrolled_quads = getNumberOfUnrolledQuads();
-    // Declare vector to hold indices
-    irr::u16  *ind = new irr::u16[6 * n_unrolled_quads];
-    video::S3DVertex *new_v = new video::S3DVertex[4 * n_unrolled_quads];
-    int i = 0;
-    for (unsigned int count = 0; count< n_unrolled_quads; count++)
-    {
-        ///compute colors
-        
-        {
-            c.setAlpha(178);
-            //c.setRed ((i%2) ? 255 : 0);
-            //c.setBlue((i%3) ? 0 : 255);
-            c.setRed(7 * i % 256);
-            c.setBlue((2 * i) % 256);
-            c.setGreen((3 * i) % 256);
-        }
-
-        Quad flatquad = QuadGraph::get()->getNode(55).getUnrolledQuad(0,count);
-
-        //std::vector<int> vInd = poly.getVerticesIndex();
-        // Four vertices for each of the n-1 remaining quads
-       
-        flatquad.getVertices(new_v + 4*count,c);
-
-        // Number of triangles in the triangle fan
-        unsigned int numberOfTriangles = 2;
-
-        // Set up the indices for the triangles
-
-           
-            
-
-            ind[6 * i] = 4 * i;  // First triangle: vertex 0, 1, 2
-            ind[6 * i + 1] = 4 * i + 1;
-            ind[6 * i + 2] = 4 * i + 2;
-            ind[6 * i + 3] = 4 * i;  // second triangle: vertex 0, 1, 3
-            ind[6 * i + 4] = 4 * i + 2;
-            ind[6 * i + 5] = 4 * i + 3;
-            i++;
-
-
-    }
-
-    m_mesh_buffer->append(new_v, n_unrolled_quads*4, ind, n_unrolled_quads*6);
-
-    // Instead of setting the bounding boxes, we could just disable culling,
-    // since the debug track should always be drawn.
-    //m_node->setAutomaticCulling(scene::EAC_OFF);
-    m_mesh_buffer->recalculateBoundingBox();
-    m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
-
-}   // createMesh2
-
-
-
-// -----------------------------------------------------------------------------
-
-/** Creates the debug mesh to display the quad graph on top of the track
- *  model. */
-void QuadGraph::createDebugMesh()
-{
-    if(m_all_nodes.size()<=0) return;  // no debug output if not graph
-
-    createMesh(/*show_invisible*/true,
-              /*enable_transparency*/true);
-    
-    
-    // Now colour the quads red/blue/red ...
-    video::SColor     c( 128, 255, 0, 0);
-    video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
-    for(unsigned int i=0; i<m_mesh_buffer->getVertexCount(); i++)
-    {
-        // Swap the colours from red to blue and back
-        c.setRed ((i%2) ? 255 : 0);
-        c.setBlue((i%2) ? 0 : 255);
-        v[i].Color = c;
-    }
-    m_node = irr_driver->addMesh(m_mesh);
-#ifdef DEBUG
-    m_node->setName("track-debug-mesh");
-#endif
-    createMesh2();
-    // Now colour the quads red/blue/red ...
-    v = (video::S3DVertex*)m_mesh_buffer->getVertices();
-    for (unsigned int i = 0; i<m_mesh_buffer->getVertexCount(); i++)
-    {
-        // Swap the colours from red to blue and back
-        c.setRed((i % 2) ? 255 : 0);
-        c.setBlue((i % 2) ? 0 : 255);
-        v[i].Color = c;
-    }
-    m_node = irr_driver->addMesh(m_mesh);
-
-}   // createDebugMesh
-
-// -----------------------------------------------------------------------------
-/** Removes the debug mesh from the scene.
- */
-void QuadGraph::cleanupDebugMesh()
-{
-    irr_driver->removeNode(m_node);
-    m_node = NULL;
-    // No need to call irr_driber->removeMeshFromCache, since the mesh
-    // was manually made and so never added to the mesh cache.
-    m_mesh->drop();
-    m_mesh = NULL;
-}   // cleanupDebugMesh
-
-// -----------------------------------------------------------------------------
 /** Returns the list of successors or a node.
  *  \param node_number The number of the node.
  *  \param succ A vector of ints to which the successors are added.
@@ -852,7 +579,7 @@ void QuadGraph::determineDirection(unsigned int current,
 
     // If the direction is still the same during a lap the last node
     // in the same direction is the previous node;
-    int max_step = m_all_nodes.size()-1;
+    int max_step = (int)m_all_nodes.size()-1;
 
     while(max_step-- != 0)
     {
@@ -954,8 +681,8 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
     // the node on F, and then keep on going straight ahead instead of
     // using the loop at all.
     unsigned int max_count  = (*sector!=UNKNOWN_SECTOR && all_sectors!=NULL)
-                            ? all_sectors->size()
-                            : m_all_nodes.size();
+                            ? (unsigned int)all_sectors->size()
+                            : (unsigned int)m_all_nodes.size();
     *sector = UNKNOWN_SECTOR;
     for(unsigned int i=0; i<max_count; i++)
     {
@@ -1009,7 +736,7 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
                                    const int curr_sector,
                                    std::vector<int> *all_sectors) const
 {
-    int count = (all_sectors!=NULL) ? all_sectors->size() : getNumNodes();
+    int count = (all_sectors!=NULL) ? (int) all_sectors->size() : getNumNodes();
     int current_sector = 0;
     if(curr_sector != UNKNOWN_SECTOR && !all_sectors)
     {
@@ -1082,149 +809,3 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
     }
     return min_sector;
 }   // findOutOfRoadSector
-
-//-----------------------------------------------------------------------------
-/** Takes a snapshot of the driveline quads so they can be used as minimap.
- */
-void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
-                            const std::string &name,
-                            const video::SColor &fill_color,
-                            video::ITexture** oldRttMinimap,
-                            FrameBuffer** newRttMinimap)
-{
-    const SColor oldClearColor = World::getWorld()->getClearColor();
-    World::getWorld()->setClearbackBufferColor(SColor(0, 255, 255, 255));
-    *oldRttMinimap = NULL;
-    *newRttMinimap = NULL;
-
-    RTT* newRttProvider = NULL;
-    IrrDriver::RTTProvider* oldRttProvider = NULL;
-    if (irr_driver->isGLSL())
-    {
-        newRttProvider = new RTT(dimension.Width, dimension.Height);
-    }
-    else
-    {
-        oldRttProvider = new IrrDriver::RTTProvider(dimension, name, true);
-    }
-
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 255, 255, 255));
-
-    video::SColor red(128, 255, 0, 0);
-    createMesh(/*show_invisible part of the track*/ false,
-               /*enable_transparency*/ false,
-               /*track_color*/    &fill_color,
-               /*lap line color*/  &red                       );
-
-    m_node = irr_driver->addMesh(m_mesh);
-#ifdef DEBUG
-    m_node->setName("minimap-mesh");
-#endif
-
-    m_node->setAutomaticCulling(0);
-    m_node->setMaterialFlag(video::EMF_LIGHTING, false);
-
-    // Add the camera:
-    // ---------------
-    scene::ICameraSceneNode *camera = irr_driver->addCameraSceneNode();
-    Vec3 bb_min, bb_max;
-    QuadSet::get()->getBoundingBox(&bb_min, &bb_max);
-    Vec3 center = (bb_max+bb_min)*0.5f;
-
-    float dx = bb_max.getX()-bb_min.getX();
-    float dz = bb_max.getZ()-bb_min.getZ();
-
-    // Set the scaling correctly. Also the center point (which is used
-    // as the camera position) needs to be adjusted: the track must
-    // be aligned to the left/top of the texture which is used (otherwise
-    // mapPoint2MiniMap doesn't work), so adjust the camera position
-    // that the track is properly aligned (view from the side):
-    //          c        camera
-    //         / \       .
-    //        /   \     <--- camera angle
-    //       /     \     .
-    //      {  [-]  }   <--- track flat (viewed from the side)
-    // If [-] is the shorter side of the track, then the camera will
-    // actually render the area in { } - which is the length of the
-    // longer side of the track.
-    // To align the [-] side to the left, the camera must be moved
-    // the distance betwwen '{' and '[' to the right. This distance
-    // is exacly (longer_side - shorter_side) / 2.
-    // So, adjust the center point by this amount:
-    if(dz > dx)
-    {
-        center.setX(center.getX() + (dz-dx)*0.5f);
-        m_scaling = dimension.Width / dz;
-    }
-    else
-    {
-        center.setZ(center.getZ() + (dx-dz)*0.5f);
-        m_scaling = dimension.Width / dx;
-    }
-
-    float range = (dx>dz) ? dx : dz;
-
-    core::matrix4 projection;
-    projection.buildProjectionMatrixOrthoLH(range /* width */,
-                                            range /* height */,
-                                            -1, bb_max.getY()-bb_min.getY()+1);
-    camera->setProjectionMatrix(projection, true);
-
-    irr_driver->suppressSkyBox();
-    irr_driver->clearLights();
-
-    // Adjust Y position by +1 for max, -1 for min - this helps in case that
-    // the maximum Y coordinate is negative (otherwise the minimap is mirrored)
-    // and avoids problems for tracks which have a flat (max Y = min Y) minimap.
-    camera->setPosition(core::vector3df(center.getX(), bb_min.getY() + 1.0f, center.getZ()));
-    //camera->setPosition(core::vector3df(center.getX() - 5.0f, bb_min.getY() - 1 - 5.0f, center.getZ() - 15.0f));
-    camera->setUpVector(core::vector3df(0, 0, 1));
-    camera->setTarget(core::vector3df(center.getX(),bb_min.getY()-1,center.getZ()));
-    //camera->setAspectRatio(1.0f);
-    camera->updateAbsolutePosition();
-
-    video::ITexture* texture = NULL;
-    FrameBuffer* frame_buffer = NULL;
-
-    if (irr_driver->isGLSL())
-    {
-        frame_buffer = newRttProvider->render(camera, GUIEngine::getLatestDt());
-
-        // TODO: leak
-        //delete newRttProvider;
-    }
-    else
-    {
-        texture = oldRttProvider->renderToTexture();
-        delete oldRttProvider;
-    }
-
-    cleanupDebugMesh();
-    irr_driver->removeCameraSceneNode(camera);
-    m_min_coord = bb_min;
-
-
-    if (texture == NULL && frame_buffer == NULL)
-    {
-        Log::error("Quad Graph", "[makeMiniMap] WARNING: RTT does not appear to work,"
-                        "mini-map will not be available.");
-    }
-
-    *oldRttMinimap = texture;
-    *newRttMinimap = frame_buffer;
-    World::getWorld()->setClearbackBufferColor(oldClearColor);
-}   // makeMiniMap
-
-//-----------------------------------------------------------------------------
-    /** Returns the 2d coordinates of a point when drawn on the mini map
-     *  texture.
-     *  \param xyz Coordinates of the point to map.
-     *  \param draw_at The coordinates in pixel on the mini map of the point,
-     *         only the first two coordinates will be used.
-     */
-void QuadGraph::mapPoint2MiniMap(const Vec3 &xyz,Vec3 *draw_at) const
-{
-    draw_at->setX((xyz.getX()-m_min_coord.getX())*m_scaling);
-    draw_at->setY((xyz.getZ()-m_min_coord.getZ())*m_scaling);
-
-}   // mapPoint

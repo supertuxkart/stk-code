@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 Marianne Gagnon
+//  Copyright (C) 2012-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -29,7 +29,6 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track_manager.hpp"
@@ -50,22 +49,25 @@ core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* 
         if (c->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER) r--;
 
         if (label.size() > 0) label.append(L"\n");
-        label.append( _("Required Rank : %i", r) );
+        label.append( _("Required Rank: %i", r) );
     }
     if (c->getTime(difficulty) > 0)
     {
         if (label.size() > 0) label.append(L"\n");
-        label.append( _("Required Time : %i",
+        label.append( _("Required Time: %i",
                         StringUtils::timeToString(c->getTime(difficulty)).c_str()) );
     }
     if (c->getEnergy(difficulty) > 0)
     {
         if (label.size() > 0) label.append(L"\n");
-        label.append( _("Required Nitro Points : %i", c->getEnergy(difficulty)) );
+        label.append( _("Required Nitro Points: %i", c->getEnergy(difficulty)) );
     }
 
-    if (label.size() > 0) label.append(L"\n");
-    label.append(_("Number of AI Karts : %i", c->getNumKarts(difficulty) - 1));
+    if (!c->isGhostReplay())
+    {
+        if (label.size() > 0) label.append(L"\n");
+        label.append(_("Number of AI Karts: %i", c->getNumKarts(difficulty) - 1));
+    }
 
     return label;
 }
@@ -131,13 +133,13 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     if (c->getData()->isGrandPrix())
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(c->getData()->getGPId());
-        getWidget<LabelWidget>("title")->setText( gp->getName(), true );
+        getWidget<LabelWidget>("title")->setText(translations->fribidize(gp->getName()), true);
     }
     else
     {
         const core::stringw track_name =
             track_manager->getTrack(c->getData()->getTrackId())->getName();
-        getWidget<LabelWidget>("title")->setText( track_name, true );
+        getWidget<LabelWidget>("title")->setText(translations->fribidize(track_name), true);
     }
 
     LabelWidget* typeLbl = getWidget<LabelWidget>("race_type_val");
@@ -145,6 +147,8 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
         typeLbl->setText(_("Grand Prix"), false );
     else if (c->getData()->getEnergy(RaceManager::DIFFICULTY_EASY) > 0)
         typeLbl->setText(_("Nitro challenge"), false );
+    else if (c->getData()->isGhostReplay())
+        typeLbl->setText(_("Ghost replay race"), false );
     else
         typeLbl->setText( RaceManager::getNameOf(c->getData()->getMinorMode()), false );
 
@@ -187,19 +191,19 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
         //StateManager::get()->resetActivePlayers();
 
         // Use latest used device
-        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
         assert(device != NULL);
 
         // Set up race manager appropriately
-        race_manager->setNumLocalPlayers(1);
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+        race_manager->setNumPlayers(1);
+        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
         race_manager->setReverseTrack(false);
 
         //int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );
-        input_manager->getDeviceList()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+        input_manager->getDeviceManager()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
         // ASSIGN should make sure that only input from assigned devices is read.
-        input_manager->getDeviceList()->setAssignMode(ASSIGN);
+        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
         // Go straight to the race
         StateManager::get()->enterGameState();

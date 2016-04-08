@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2010-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2010-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,12 +22,10 @@
 
 #include "utils/no_copy.hpp"
 
+#include <assert.h>
 #include <map>
 #include <string>
 #include <vector>
-
-#include <IShaderConstantSetCallBack.h>
-
 
 namespace irr
 {
@@ -53,13 +51,14 @@ public:
         SHADERTYPE_ALPHA_BLEND,
         SHADERTYPE_ADDITIVE,
         SHADERTYPE_SOLID_UNLIT,
-        /** Effect where the UV texture is moved in a wave pattern */
-        SHADERTYPE_BUBBLE,
         /** Effect that makes grass wave as in the wind */
         SHADERTYPE_VEGETATION,
         SHADERTYPE_WATER,
         SHADERTYPE_SPHERE_MAP,
-        SHADERTYPE_SPLATTING
+        SHADERTYPE_NORMAL_MAP,
+        SHADERTYPE_DETAIL_MAP,
+        SHADERTYPE_SPLATTING,
+        SHADERTYPE_COUNT,
     };
 
     enum ParticleConditions
@@ -80,9 +79,20 @@ public:
 
 private:
 
+    /** Pointer to the texture. */
     video::ITexture *m_texture;
-    unsigned int     m_index;
+
+    /** Name of the texture. */
     std::string      m_texname;
+
+    std::string      m_full_path;
+
+    /** If true, the texture will not automatically be loaded and bound
+     *  at load time, it must be loaded elsewhere. This is used to store
+     *  material settings for font textures, without loading fonts for
+     *  languages that might not be needed at all. */
+    bool             m_dont_load_texture;
+
     /** Name of a special sfx to play when a kart is on this terrain, or
      *  "" if no special sfx exists. */
     std::string      m_sfx_name;
@@ -113,7 +123,7 @@ private:
     /** If a kart is rescued when driving on this surface. */
     bool             m_drive_reset;
 
-    /** True if this is a texture that will start the jump animatoin when
+    /** True if this is a texture that will start the jump animation when
      *  leaving it and being in the air. */
     bool             m_is_jump_texture;
 
@@ -145,6 +155,11 @@ private:
     bool             m_ignore;
 
     bool             m_fog;
+
+    /** Either ' ' (no mirroring), 'U' or 'V' if a texture needs to be 
+     *  mirrored when driving in reverse. Typically used for arrows indicating
+     *  the direction. */
+    char             m_mirror_axis_when_reverse;
 
     ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
 
@@ -228,41 +243,63 @@ private:
 
     bool  m_deprecated;
 
-    void  init    (unsigned int index);
+    void  init    ();
     void  install (bool is_full_path=false, bool complain_if_not_found=true);
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
 
 public:
-          Material(const XMLNode *node, int index, bool deprecated);
-          Material(const std::string& fname, int index,
+          Material(const XMLNode *node, bool deprecated);
+          Material(const std::string& fname,
                    bool is_full_path=false,
-                   bool complain_if_not_found=true);
+                   bool complain_if_not_found=true,
+                   bool load_texture = true);
          ~Material ();
 
     void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
-    void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, bool use_fog) const;
+    void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, 
+                       bool use_fog) const;
+    void onMadeVisible(scene::IMeshBuffer* who);
+    void onHidden(scene::IMeshBuffer* who);
+    void isInitiallyHidden(scene::IMeshBuffer* who);
 
     /** Returns the ITexture associated with this material. */
-    video::ITexture *getTexture() const   { return m_texture;        }
+    video::ITexture *getTexture() const
+    {
+        // Note that dont load means that the textures are not loaded
+        // via the material. So getTexture should only get called for
+		// automatically loaded textures (used atm for font textures).
+        assert(!m_dont_load_texture);
+        return m_texture;
+    }   // getTexture
+    // ------------------------------------------------------------------------
     bool  isIgnore           () const { return m_ignore;             }
+    // ------------------------------------------------------------------------
     /** Returns true if this material is a zipper. */
     bool  isZipper           () const { return m_zipper;             }
+    // ------------------------------------------------------------------------
     /** Returns if this material should trigger a rescue if a kart
      *  is driving on it. */
     bool  isDriveReset       () const { return m_drive_reset;        }
+    // ------------------------------------------------------------------------
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */
     CollisionReaction  getCollisionReaction() const { return m_collision_reaction; }
 
+    // ------------------------------------------------------------------------
     std::string getCrashResetParticles() const { return m_collision_particles; }
 
+    // ------------------------------------------------------------------------
     bool  highTireAdhesion   () const { return m_high_tire_adhesion; }
+    // ------------------------------------------------------------------------
     const std::string&
           getTexFname        () const { return m_texname;            }
-    int   getIndex           () const { return m_index;              }
+    // ------------------------------------------------------------------------
+    const std::string&
+          getTexFullPath     () const { return m_full_path;          }
 
+    // ------------------------------------------------------------------------
     bool  isTransparent      () const
     {
         return m_shader_type == SHADERTYPE_ADDITIVE ||
@@ -270,12 +307,6 @@ public:
                m_shader_type == SHADERTYPE_ALPHA_TEST;
     }
 
-    // ------------------------------------------------------------------------
-    /** Returns true if this materials need pre-multiply of alpha. */
-    //bool isPreMul() const {return m_adjust_image==ADJ_PREMUL; }
-    // ------------------------------------------------------------------------
-    /** Returns true if this materials need pre-division of alpha. */
-    //bool isPreDiv() const {return m_adjust_image==ADJ_DIV; }
     // ------------------------------------------------------------------------
     /** Returns the fraction of maximum speed on this material. */
     float getMaxSpeedFraction() const { return m_max_speed_fraction; }
@@ -298,17 +329,20 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of a special sfx to play while a kart is on this
      *  terrain. The string will be "" if no special sfx exists. */
-    const std::string &
-         getSFXName          () const { return m_sfx_name; }
+    const std::string &getSFXName() const { return m_sfx_name; }
 
+    // ------------------------------------------------------------------------
+    /** Returns if fog is enabled. */
     bool isFogEnabled() const { return m_fog; }
 
-    /**
-      * \brief Get the kind of particles that are to be used on this material, in the given conditions
-      * \return The particles to use, or NULL if none
-      */
-    const ParticleKind* getParticlesWhen(ParticleConditions cond) const { return m_particles_effects[cond]; }
-
+    // ------------------------------------------------------------------------
+    /** \brief Get the kind of particles that are to be used on this material,
+     *  in the given conditions.
+     * \return The particles to use, or NULL if none. */
+    const ParticleKind* getParticlesWhen(ParticleConditions cond) const
+    {
+        return m_particles_effects[cond]; 
+    }   // getParticlesWhen
     // ------------------------------------------------------------------------
     /** Returns true if a kart falling over this kind of material triggers
      *  the special falling camera. */
@@ -343,10 +377,11 @@ public:
     float getZipperMinSpeed() const { return m_zipper_min_speed; }
     // ------------------------------------------------------------------------
     ShaderType getShaderType() const { return m_shader_type; }
+    void setShaderType(ShaderType st) { m_shader_type = st; }
     // ------------------------------------------------------------------------
-    void onMadeVisible(scene::IMeshBuffer* who);
-    void onHidden(scene::IMeshBuffer* who);
-    void isInitiallyHidden(scene::IMeshBuffer* who);
+    /** True if this texture should have the U coordinates mirrored. */
+    char getMirrorAxisInReverse() const { return m_mirror_axis_when_reverse; }
+    // ------------------------------------------------------------------------
 } ;
 
 

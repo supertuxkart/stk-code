@@ -11,6 +11,8 @@
 #include "COpenGLDriver.h"
 #include "os.h"
 #include "CColorConverter.h"
+#include "IAttributes.h"
+#include "IrrlichtDevice.h"
 
 #include "irrString.h"
 
@@ -18,7 +20,7 @@ namespace irr
 {
 namespace video
 {
-
+    extern bool useCoreContext;
 //! constructor for usual textures
 COpenGLTexture::COpenGLTexture(IImage* origImage, const io::path& name, void* mipmapData, COpenGLDriver* driver)
 	: ITexture(name), ColorFormat(ECF_A8R8G8B8), Driver(driver), Image(0), MipImage(0),
@@ -272,15 +274,15 @@ GLint COpenGLTexture::getOpenGLFormatAndParametersFromColorFormat(ECOLOR_FORMAT 
 			internalformat =  GL_RGBA8;
 		}
 	}
-#if defined(GL_ARB_framebuffer_sRGB) || defined(GL_EXT_framebuffer_sRGB)
-	if (Driver->Params.HandleSRGB)
-	{
-		if (internalformat==GL_RGBA)
-			internalformat=GL_SRGB_ALPHA_EXT;
-		else if (internalformat==GL_RGB)
-			internalformat=GL_SRGB_EXT;
-	}
-#endif
+//#if defined(GL_ARB_framebuffer_sRGB) || defined(GL_EXT_framebuffer_sRGB)
+//	if (Driver->Params.HandleSRGB)
+//	{
+//		if (internalformat==GL_RGBA)
+//			internalformat=GL_SRGB_ALPHA_EXT;
+//		else if (internalformat==GL_RGB)
+//			internalformat=GL_SRGB_EXT;
+//	}
+//#endif
 	return internalformat;
 }
 
@@ -314,7 +316,17 @@ void COpenGLTexture::getImageValues(IImage* image)
 		ImageSize.Width = (u32)(Driver->MaxTextureSize*ratio);
 	}
 	TextureSize=ImageSize.getOptimalSize(!Driver->queryFeature(EVDF_TEXTURE_NPOT));
+    const core::dimension2du max_size = Driver->getDriverAttributes()
+                                 .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
 
+    if (max_size.Width> 0 && TextureSize.Width > max_size.Width)
+    {
+        TextureSize.Width = max_size.Width;
+    }
+    if (max_size.Height> 0 && TextureSize.Height > max_size.Height)
+    {
+        TextureSize.Height = max_size.Height;
+    }
 	ColorFormat = getBestColorFormat(image->getColorFormat());
 }
 
@@ -350,12 +362,12 @@ void COpenGLTexture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 		// auto generate if possible and no mipmap data is given
 		if (HasMipMaps && !mipmapData && Driver->queryFeature(EVDF_MIP_MAP_AUTO_UPDATE))
 		{
-			if (Driver->getTextureCreationFlag(ETCF_OPTIMIZED_FOR_SPEED))
+            if (Driver->getTextureCreationFlag(ETCF_OPTIMIZED_FOR_SPEED) && !useCoreContext)
 				glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_FASTEST);
-			else if (Driver->getTextureCreationFlag(ETCF_OPTIMIZED_FOR_QUALITY))
+            else if (Driver->getTextureCreationFlag(ETCF_OPTIMIZED_FOR_QUALITY) && !useCoreContext)
 				glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_NICEST);
-			else
-				glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_DONT_CARE);
+            else if (!useCoreContext)
+                glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_DONT_CARE);
 
 			AutomaticMipmapUpdate=true;
 
@@ -405,7 +417,8 @@ void COpenGLTexture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 
 	if (!MipmapLegacyMode && AutomaticMipmapUpdate)
 	{
-		glEnable(GL_TEXTURE_2D);
+        if (!useCoreContext)
+		    glEnable(GL_TEXTURE_2D);
 		Driver->extGlGenerateMipmap(GL_TEXTURE_2D);
 	}
 

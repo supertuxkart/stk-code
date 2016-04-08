@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
-<particles emitter="box" box_x="12.0" box_y="0.5" box_z="12.0">
+<particles emitter="box" box_x="3.0" box_y="0.5" box_z="3.0">
 
-    <spreading angle="24"      />
+    <spreading angle="45"      />
     
     <velocity  x="0.000"
-               y="0.005"
+               y="0.001"
                z="0.000"         />
     
     <material  file="waterparticles.png"  />
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="5"
-               max="20"         />
+    <rate      min="1"
+               max="6"         />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
     <lifetime  min="1000"

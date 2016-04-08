@@ -1,7 +1,9 @@
 // Copyright (C) 2002-2012 Nikolaus Gebhardt
-// Copyright (C) 2014 Dawid Gan
+// Copyright (C) 2014-2015 Dawid Gan
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
+
+extern bool GLContextDebugBit;
 
 #include "CIrrDeviceLinux.h"
 
@@ -9,8 +11,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/utsname.h>
 #include <time.h>
+#include <locale.h>
 #include "IEventReceiver.h"
 #include "ISceneManager.h"
 #include "IGUIEnvironment.h"
@@ -33,9 +37,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#ifdef __FREE_BSD_
+#ifdef __FreeBSD__
 #include <sys/joystick.h>
-#else
+#elif defined(__linux__)
 
 // linux/joystick.h includes linux/input.h, which #defines values for various KEY_FOO keys.
 // These override the irr::KEY_FOO equivalents, which stops key handling from working.
@@ -56,6 +60,7 @@ namespace irr
 {
 	namespace video
 	{
+		extern bool useCoreContext;
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
 	}
@@ -79,6 +84,7 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
 #ifdef _IRR_COMPILE_WITH_X11_
 	display(0), visual(0), screennr(0), window(0), StdHints(0), SoftwareImage(0),
+	XInputMethod(0), XInputContext(0),
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 	glxWin(0),
 	Context(0),
@@ -130,6 +136,10 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 	if (!VideoDriver)
 		return;
 
+#ifdef _IRR_COMPILE_WITH_X11_
+	createInputContext();
+#endif
+
 	createGUIAndScene();
 }
 
@@ -164,6 +174,8 @@ CIrrDeviceLinux::~CIrrDeviceLinux()
 		VideoDriver = NULL;
 	}
 
+	destroyInputContext();
+
 	if (display)
 	{
 		#ifdef _IRR_COMPILE_WITH_OPENGL_
@@ -185,15 +197,19 @@ CIrrDeviceLinux::~CIrrDeviceLinux()
 		}
 		#endif // #ifdef _IRR_COMPILE_WITH_OPENGL_
 
-		// Reset fullscreen resolution change
-		switchToFullscreen(true);
-
 		if (SoftwareImage)
 			XDestroyImage(SoftwareImage);
 
 		if (!ExternalWindow)
 		{
 			XDestroyWindow(display,window);
+		}
+		
+		// Reset fullscreen resolution change
+		restoreResolution();		
+		
+		if (!ExternalWindow)
+		{
 			XCloseDisplay(display);
 		}
 	}
@@ -231,43 +247,62 @@ int IrrPrintXError(Display *display, XErrorEvent *event)
 }
 #endif
 
-
-bool CIrrDeviceLinux::switchToFullscreen(bool reset)
+bool CIrrDeviceLinux::restoreResolution()
 {
 	if (!CreationParams.Fullscreen)
 		return true;
-	if (reset)
+
+	#ifdef _IRR_LINUX_X11_VIDMODE_
+	if (UseXVidMode && CreationParams.Fullscreen)
 	{
-		#ifdef _IRR_LINUX_X11_VIDMODE_
-		if (UseXVidMode && CreationParams.Fullscreen)
-		{
-			XF86VidModeSwitchToMode(display, screennr, &oldVideoMode);
-			XF86VidModeSetViewPort(display, screennr, 0, 0);
-		}
-		#endif
-		#ifdef _IRR_LINUX_X11_RANDR_
-		if (UseXRandR && CreationParams.Fullscreen)
-		{
-			XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
-			XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
-			XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
-
-			Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime,
-										crtc->x, crtc->y, old_mode,
-										crtc->rotation, &output_id, 1);
-
-			XRRFreeOutputInfo(output);
-			XRRFreeCrtcInfo(crtc);
-			XRRFreeScreenResources(res);
-
-			if (s != Success)
-				return false;
-		}
-		#endif
-		return true;
+		XF86VidModeSwitchToMode(display, screennr, &oldVideoMode);
+		XF86VidModeSetViewPort(display, screennr, 0, 0);
 	}
+	#endif
+	#ifdef _IRR_LINUX_X11_RANDR_
+	if (UseXRandR && CreationParams.Fullscreen && old_mode != BadRRMode)
+	{
+		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
+		if (!res)
+			return false;
+
+		XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
+		if (!output || !output->crtc || output->connection == RR_Disconnected) 
+		{
+			XRRFreeOutputInfo(output);
+			return false;
+		}
+
+		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
+		if (!crtc) 
+		{
+			XRRFreeOutputInfo(output);
+			return false;
+		}
+
+		Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime,
+									crtc->x, crtc->y, old_mode,
+									crtc->rotation, &output_id, 1);
+
+		XRRFreeOutputInfo(output);
+		XRRFreeCrtcInfo(crtc);
+		XRRFreeScreenResources(res);
+
+		if (s != Success)
+			return false;
+	}
+	#endif
+	return true;
+}
+
+
+bool CIrrDeviceLinux::changeResolution()
+{
+	if (!CreationParams.Fullscreen)
+		return true;
 
 	getVideoModeList();
+
 	#if defined(_IRR_LINUX_X11_VIDMODE_) || defined(_IRR_LINUX_X11_RANDR_)
 	s32 eventbase, errorbase;
 	s32 bestMode = -1;
@@ -329,47 +364,56 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 
 		XFree(modes);
 	}
-	else
 	#endif
 	#ifdef _IRR_LINUX_X11_RANDR_
-	if (XRRQueryExtension(display, &eventbase, &errorbase))
+	while (XRRQueryExtension(display, &eventbase, &errorbase))
 	{
-		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
+		if (output_id == BadRROutput)
+			break;
 
+		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 		if (!res)
-		{
-			CreationParams.Fullscreen = false;
-			return CreationParams.Fullscreen;
-		}
+			break;
 
 		XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
+		if (!output || !output->crtc || output->connection == RR_Disconnected)
+		{
+			XRRFreeOutputInfo(output);
+			XRRFreeScreenResources(res);
+			break;
+		}
+		
 		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
+		if (!crtc)
+		{
+			XRRFreeOutputInfo(output);
+			XRRFreeScreenResources(res);
+			break;
+		}
+
 		float refresh_rate, refresh_rate_new;
-		unsigned int mode0_width = -1, mode0_height = -1;
+		core::dimension2d<u32> mode0_size = core::dimension2d<u32>(0, 0);
 
 		for (int i = 0; i < res->nmode; i++)
 		{
 			const XRRModeInfo* mode = &res->modes[i];
-			unsigned int w, h;
-			
+			core::dimension2d<u32> size;
+
 			if (crtc->rotation & (XRANDR_ROTATION_LEFT|XRANDR_ROTATION_RIGHT))
 			{
-				w = mode->height;
-				h = mode->width;
+				size = core::dimension2d<u32>(mode->height, mode->width);
 			} 
 			else 
 			{
-				w = mode->width;
-				h = mode->height;
+				size = core::dimension2d<u32>(mode->width, mode->height);
 			}
 			
 			if (bestMode == -1 && mode->id == output->modes[0])
 			{
-				mode0_width = w;
-				mode0_height = h;
+				mode0_size = size;
 			}
 
-			if (bestMode == -1 && w == Width && h == Height)
+			if (bestMode == -1 && size.Width == Width && size.Height == Height)
 			{
 				for (int j = 0; j < output->nmode; j++)
 				{
@@ -381,7 +425,7 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 					}
 				}
 			}
-			else if (bestMode != -1 && w == Width && h == Height)
+			else if (bestMode != -1 && size.Width == Width && size.Height == Height)
 			{
 				refresh_rate_new = (mode->dotClock * 1000.0) / (mode->hTotal * mode->vTotal);
 
@@ -404,33 +448,29 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		if (bestMode == -1)
 		{
 			bestMode = 0;
-			Width = mode0_width;
-			Height = mode0_height;
+			Width = mode0_size.Width;
+			Height = mode0_size.Height;
 		}
 
 		Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime,
 									crtc->x, crtc->y, output->modes[bestMode],
 									crtc->rotation, &output_id, 1);
+		
+		if (s == Success)
+			UseXRandR = true;
 
 		XRRFreeCrtcInfo(crtc);
 		XRRFreeOutputInfo(output);
 		XRRFreeScreenResources(res);
-
-		if (s != Success)
-		{
-			CreationParams.Fullscreen = false;
-			return CreationParams.Fullscreen;
-		}
-
-		UseXRandR=true;
+		break;
 	}
-	else
-	#endif
+	
+	if (UseXRandR == false)
 	{
-		os::Printer::log("VidMode or RandR extension must be installed to allow Irrlicht "
-		"to switch to fullscreen mode. Running in windowed mode instead.", ELL_WARNING);
+		os::Printer::log("Could not get video output. Try to run in windowed mode.", ELL_WARNING);
 		CreationParams.Fullscreen = false;
 	}
+	#endif
 
 	return CreationParams.Fullscreen;
 }
@@ -466,18 +506,26 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 }
 #endif
 
-static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
+static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, bool force_legacy_context)
 {
 	GLXContext Context;
-	int compat33ctx[] =
+	irr::video::useCoreContext = true;
+	int core43ctxdebug[] =
 		{
-			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+			GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
 			GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
 			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 			None
 		};
-	int core33ctx[] =
+	int core43ctx[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		None
+	};
+	int core33ctxdebug[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
 			GLX_CONTEXT_MINOR_VERSION_ARB, 3,
@@ -485,44 +533,61 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 			None
 		};
+	int core33ctx[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		None
+	};
+	int core31ctxdebug[] =
+	{
+		GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+		GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+		GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+		None
+	};
 	int core31ctx[] =
 		{
 			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
 			GLX_CONTEXT_MINOR_VERSION_ARB, 1,
 			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
-			None
-		};
-	int legacyctx[] =
-		{
-			GLX_CONTEXT_MAJOR_VERSION_ARB, 2,
-			GLX_CONTEXT_MINOR_VERSION_ARB, 1,
 			None
 		};
 	PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
 	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
+  
+    if(!force_legacy_context)
+    {
+        // create core 4.3 context
+        os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
+        if (!XErrorSignaled)
+            return Context;
+        
+        XErrorSignaled = false;
+        // create core 3.3 context
+        os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
+        if (!XErrorSignaled)
+            return Context;
 
-	// create compat 3.3 context (for proprietary drivers)
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, compat33ctx);
-	if (!XErrorSignaled)
-		return Context;
+        XErrorSignaled = false;
+        // create core 3.1 context (for older mesa)
+        os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
+        Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
+        if (!XErrorSignaled)
+            return Context;
+
+    }   // if(force_legacy_context)
 
 	XErrorSignaled = false;
-	// create core 3.3 context (for mesa)
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, core33ctx);
-	if (!XErrorSignaled)
-		return Context;
-
-	XErrorSignaled = false;
-	// create core 3.1 context (for older mesa)
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, core31ctx);
-	if (!XErrorSignaled)
-		return Context;
-
-	XErrorSignaled = false;
+	irr::video::useCoreContext = false;
 	// fall back to legacy context
-	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, legacyctx);
+	os::Printer::log("Creating legacy OpenGL 2.1 context...", ELL_INFORMATION);
+	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
 
@@ -545,7 +610,7 @@ bool CIrrDeviceLinux::createWindow()
 
 	screennr = DefaultScreen(display);
 
-	switchToFullscreen();
+	changeResolution();
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 
@@ -588,11 +653,11 @@ bool CIrrDeviceLinux::createWindow()
 					GLX_SAMPLE_BUFFERS_SGIS, 1,
 					GLX_SAMPLES_SGIS, CreationParams.AntiAlias, // 18,19
 #endif
-//#ifdef GL_ARB_framebuffer_sRGB
-//					GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, CreationParams.HandleSRGB,
-//#elif defined(GL_EXT_framebuffer_sRGB)
-//					GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, CreationParams.HandleSRGB,
-//#endif
+#ifdef GLX_ARB_framebuffer_sRGB
+					GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, CreationParams.HandleSRGB,
+#elif defined(GLX_EXT_framebuffer_sRGB)
+					GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT, CreationParams.HandleSRGB,
+#endif
 					GLX_STEREO, CreationParams.Stereobuffer?True:False,
 					None
 				};
@@ -739,11 +804,11 @@ bool CIrrDeviceLinux::createWindow()
 					// GLX_USE_GL, which is silently ignored by glXChooseVisual
 					CreationParams.Doublebuffer?GLX_DOUBLEBUFFER:GLX_USE_GL, // 14
 					CreationParams.Stereobuffer?GLX_STEREO:GLX_USE_GL, // 15
-//#ifdef GL_ARB_framebuffer_sRGB
-//					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB:GLX_USE_GL,
-//#elif defined(GL_EXT_framebuffer_sRGB)
-//					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT:GLX_USE_GL,
-//#endif
+#ifdef GLX_ARB_framebuffer_sRGB
+					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB:GLX_USE_GL,
+#elif defined(GLX_EXT_framebuffer_sRGB)
+					CreationParams.HandleSRGB?GLX_FRAMEBUFFER_SRGB_CAPABLE_EXT:GLX_USE_GL,
+#endif
 					None
 				};
 
@@ -855,31 +920,17 @@ bool CIrrDeviceLinux::createWindow()
 				// window is showed in wrong screen. It doesn't matter for vidmode
 				// which displays cloned image in all devices.
 				#ifdef _IRR_LINUX_X11_RANDR_
-				XResizeWindow(display, window, Width, Height);
-				XMoveWindow(display, window, crtc_x, crtc_y);
+				XMoveResizeWindow(display, window, crtc_x, crtc_y, Width, Height);
 				XRaiseWindow(display, window);
 				XFlush(display);
 				#endif
-
-				// Workaround for Gnome which sometimes creates window smaller than display
-				XSizeHints *hints = XAllocSizeHints();
-				hints->flags=PMinSize;
-				hints->min_width=Width;
-				hints->min_height=Height;
-				XSetWMNormalHints(display, window, hints);
-				XFree(hints);
 
 				// Set the fullscreen mode via the window manager. This allows alt-tabing, volume hot keys & others.
 				// Get the needed atom from there freedesktop names
 				Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
 				Atom WMFullscreenAtom = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", true);
-				// Set the fullscreen property
-				XChangeProperty(display, window, WMStateAtom, XA_ATOM, 32, PropModeReplace, 
-								reinterpret_cast<unsigned char*>(&WMFullscreenAtom), 1);
 
-				// Notify the root window
 				XEvent xev = {0}; // The event should be filled with zeros before setting its attributes
-
 				xev.type = ClientMessage;
 				xev.xclient.window = window;
 				xev.xclient.message_type = WMStateAtom;
@@ -890,6 +941,47 @@ bool CIrrDeviceLinux::createWindow()
 							SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 
 				XFlush(display);
+				
+				// Wait until window state is already changed to fullscreen
+				bool fullscreen = false;
+				for (int i = 0; i < 500; i++)
+				{
+					Atom type;
+					int format;
+					unsigned long numItems, bytesAfter;
+					unsigned char* data = NULL;
+
+					int s = XGetWindowProperty(display, window, WMStateAtom,
+											0l, 1024, False, XA_ATOM, &type, 
+											&format,  &numItems, &bytesAfter, 
+											&data);
+
+					if (s == Success) 
+					{
+						Atom* atoms = (Atom*)data;
+						
+						for (unsigned int i = 0; i < numItems; ++i) 
+						{
+							if (atoms[i] == WMFullscreenAtom) 
+							{
+								fullscreen = true;
+								break;
+							}
+						}
+					}
+						
+					XFree(data);
+					
+					if (fullscreen == true)
+						break;
+					
+					usleep(1000);
+				}
+					
+				if (!fullscreen)
+				{
+					os::Printer::log("Warning! Got timeout while checking fullscreen sate", ELL_WARNING);
+				}        
 			}
 			else
 			{
@@ -940,7 +1032,7 @@ bool CIrrDeviceLinux::createWindow()
 		glxWin=glXCreateWindow(display,glxFBConfig,window,NULL);
 		if (glxWin)
 		{
-			Context = getMeAGLContext(display, glxFBConfig);
+			Context = getMeAGLContext(display, glxFBConfig, CreationParams.ForceLegacyDevice);
 			if (Context)
 			{
 				if (!glXMakeContextCurrent(display, glxWin, glxWin, Context))
@@ -1070,6 +1162,123 @@ void CIrrDeviceLinux::createDriver()
 	}
 }
 
+#ifdef _IRR_COMPILE_WITH_X11_
+bool CIrrDeviceLinux::createInputContext()
+{
+	// One one side it would be nicer to let users do that - on the other hand
+	// not setting the environment locale will not work when using i18n X11 functions.
+	// So users would have to call it always or their input is broken badly.
+	// We can restore immediately - so won't mess with anything in users apps.
+	core::stringc oldLocale(setlocale(LC_CTYPE, NULL));
+	setlocale(LC_CTYPE, "");	// use environment locale
+
+	if ( !XSupportsLocale() )
+	{
+		os::Printer::log("Locale not supported. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	XInputMethod = XOpenIM(display, NULL, NULL, NULL);
+	if ( !XInputMethod )
+	{
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		os::Printer::log("XOpenIM failed to create an input method. Falling back to non-i18n input.", ELL_WARNING);
+		return false;
+	}
+
+	XIMStyles *im_supported_styles;
+	XGetIMValues(XInputMethod, XNQueryInputStyle, &im_supported_styles, (char*)NULL);
+	XIMStyle bestStyle = 0;
+	// TODO: If we want to support languages like chinese or japanese as well we probably have to work with callbacks here.
+	XIMStyle supportedStyle = XIMPreeditNone | XIMStatusNone;
+	for (int i=0; i < im_supported_styles->count_styles; ++i)
+	{
+		XIMStyle style = im_supported_styles->supported_styles[i];
+		if ((style & supportedStyle) == style) /* if we can handle it */
+		{
+			bestStyle = style;
+			break;
+		}
+	}
+	XFree(im_supported_styles);
+
+	if ( !bestStyle )
+	{
+		XDestroyIC(XInputContext);
+		XInputContext = 0;
+
+		os::Printer::log("XInputMethod has no input style we can use. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	XInputContext = XCreateIC(XInputMethod,
+							XNInputStyle, bestStyle,
+							XNClientWindow, window,
+							(char*)NULL);
+	if (!XInputContext )
+	{
+		os::Printer::log("XInputContext failed to create an input context. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+	XSetICFocus(XInputContext);
+	setlocale(LC_CTYPE, oldLocale.c_str());
+	return true;
+}
+
+void CIrrDeviceLinux::destroyInputContext()
+{
+	if ( XInputContext )
+	{
+		XUnsetICFocus(XInputContext);
+		XDestroyIC(XInputContext);
+		XInputContext = 0;
+	}
+	if ( XInputMethod )
+	{
+		XCloseIM(XInputMethod);
+		XInputMethod = 0;
+	}
+}
+
+EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
+{
+	EKEY_CODE keyCode = (EKEY_CODE)0;
+
+	SKeyMap mp;
+	mp.X11Key = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 0);
+	// mp.X11Key = XKeycodeToKeysym(XDisplay, event.xkey.keycode, 0);	// deprecated, if we still find platforms which need that we have to use some define
+	const s32 idx = KeyMap.binary_search(mp);
+	if (idx != -1)
+	{
+		keyCode = (EKEY_CODE)KeyMap[idx].Win32Key;
+	}
+	if (keyCode == 0)
+	{
+		// Any value is better than none, that allows at least using the keys.
+		// Worst case is that some keys will be identical, still better than _all_
+		// unknown keys being identical.
+		if ( !mp.X11Key )
+		{
+			keyCode = (EKEY_CODE)event.xkey.keycode;
+			os::Printer::log("No such X11Key, using event keycode", core::stringc(event.xkey.keycode).c_str(), ELL_INFORMATION);
+		}
+		else if (idx == -1)
+		{
+			keyCode = (EKEY_CODE)mp.X11Key;
+			os::Printer::log("EKEY_CODE not found, using orig. X11 keycode", core::stringc(mp.X11Key).c_str(), ELL_INFORMATION);
+		}
+		else
+		{
+			keyCode = (EKEY_CODE)mp.X11Key;
+			os::Printer::log("EKEY_CODE is 0, using orig. X11 keycode", core::stringc(mp.X11Key).c_str(), ELL_INFORMATION);
+		}
+	}
+	return keyCode;
+}
+#endif
 
 //! runs the device. Returns false if device wants to be deleted
 bool CIrrDeviceLinux::run()
@@ -1246,52 +1455,60 @@ bool CIrrDeviceLinux::run()
 						(next_event.xkey.keycode == event.xkey.keycode) &&
 						(next_event.xkey.time - event.xkey.time) < 2)	// usually same time, but on some systems a difference of 1 is possible
 					{
-						/* Ignore the key release event */
+						// Ignore the key release event
 						break;
 					}
 				}
-				// fall-through in case the release should be handled
+
+				irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
+				irrevent.KeyInput.PressedDown = false;
+				irrevent.KeyInput.Char = 0;	// on release that's undefined
+				irrevent.KeyInput.Control = (event.xkey.state & ControlMask) != 0;
+				irrevent.KeyInput.Shift = (event.xkey.state & ShiftMask) != 0;
+				irrevent.KeyInput.Key = getKeyCode(event);
+
+				postEventFromUser(irrevent);
+				break;
+
 			case KeyPress:
 				{
 					SKeyMap mp;
-					char buf[8]={0};
-					XLookupString(&event.xkey, buf, sizeof(buf), &mp.X11Key, NULL);
-
-					irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
-					irrevent.KeyInput.PressedDown = (event.type == KeyPress);
-//					mbtowc(&irrevent.KeyInput.Char, buf, sizeof(buf));
-					irrevent.KeyInput.Char = ((wchar_t*)(buf))[0];
-					irrevent.KeyInput.Control = (event.xkey.state & ControlMask) != 0;
-					irrevent.KeyInput.Shift = (event.xkey.state & ShiftMask) != 0;
-
-					event.xkey.state = 0; // ignore shift-ctrl states for figuring out the key
-					XLookupString(&event.xkey, buf, sizeof(buf), &mp.X11Key, NULL);
-					const s32 idx = KeyMap.binary_search(mp);
-					if (idx != -1)
+					if ( XInputContext )
 					{
-						irrevent.KeyInput.Key = (EKEY_CODE)KeyMap[idx].Win32Key;
-					}
-					else
-					{
-						irrevent.KeyInput.Key = (EKEY_CODE)0;
-					}
-					if (irrevent.KeyInput.Key == 0)
-					{
-						// 1:1 mapping to windows-keys would require testing for keyboard type (us, ger, ...)
-						// So unless we do that we will have some unknown keys here.
-						if (idx == -1)
+						wchar_t buf[8]={0};
+						Status status;
+						int strLen = XwcLookupString(XInputContext, &event.xkey, buf, sizeof(buf), &mp.X11Key, &status);
+						if ( status == XBufferOverflow )
 						{
-							os::Printer::log("Could not find EKEY_CODE, using orig. X11 keycode instead", core::stringc(event.xkey.keycode).c_str(), ELL_INFORMATION);
+							os::Printer::log("XwcLookupString needs a larger buffer", ELL_INFORMATION);
+						}
+						if ( strLen > 0 && (status == XLookupChars || status == XLookupBoth) )
+						{
+							if ( strLen > 1 )
+								os::Printer::log("Additional returned characters dropped", ELL_INFORMATION);
+							irrevent.KeyInput.Char = buf[0];
 						}
 						else
 						{
-							os::Printer::log("EKEY_CODE is 0, using orig. X11 keycode instead", core::stringc(event.xkey.keycode).c_str(), ELL_INFORMATION);
+							irrevent.KeyInput.Char = 0;
 						}
-						// Any value is better than none, that allows at least using the keys.
-						// Worst case is that some keys will be identical, still better than _all_
-						// unknown keys being identical.
-						irrevent.KeyInput.Key = (EKEY_CODE)event.xkey.keycode;
 					}
+					else	// Old version without InputContext. Does not support i18n, but good to have as fallback.
+					{
+						union
+						{
+							char buf[8];
+							wchar_t wbuf[2];
+						} tmp = {0};
+						XLookupString(&event.xkey, tmp.buf, sizeof(tmp.buf), &mp.X11Key, NULL);
+						irrevent.KeyInput.Char = tmp.wbuf[0];
+					}
+
+					irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
+					irrevent.KeyInput.PressedDown = true;
+					irrevent.KeyInput.Control = (event.xkey.state & ControlMask) != 0;
+					irrevent.KeyInput.Shift = (event.xkey.state & ShiftMask) != 0;
+					irrevent.KeyInput.Key = getKeyCode(event);
 
 					postEventFromUser(irrevent);
 				}
@@ -1588,89 +1805,88 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 				}
 				XFree(modes);
 			}
-			else
 			#endif
 			#ifdef _IRR_LINUX_X11_RANDR_
-			if (XRRQueryExtension(display, &eventbase, &errorbase))
+			output_id = BadRROutput;
+			old_mode = BadRRMode;
+			
+			while (XRRQueryExtension(display, &eventbase, &errorbase))
 			{
-				XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
-
-				if (!res)
-					return &VideoModeList;
-
-				XRROutputInfo *output = NULL;
+				XRROutputInfo* output = NULL;
 				XRRCrtcInfo* crtc = NULL;
 				crtc_x = crtc_y = -1;
+
+				XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
+				if (!res)
+					break;
+				
+				RROutput primary_id = XRRGetOutputPrimary(display, DefaultRootWindow(display));
 		
 				for (int i = 0; i < res->noutput; i++) 
 				{
-					output = XRRGetOutputInfo(display, res, res->outputs[i]);
-					
-					if (!output || !output->crtc || output->connection == RR_Disconnected) 
+					XRROutputInfo* output_tmp = XRRGetOutputInfo(display, res, res->outputs[i]);
+					if (!output_tmp || !output_tmp->crtc || output_tmp->connection == RR_Disconnected) 
 					{
-						XRRFreeOutputInfo(output);
+						XRRFreeOutputInfo(output_tmp);
 						continue;
 					}
 		
-					crtc = XRRGetCrtcInfo(display, res, output->crtc);
-		
-					if (!crtc) 
+					XRRCrtcInfo* crtc_tmp = XRRGetCrtcInfo(display, res, output_tmp->crtc);
+					if (!crtc_tmp) 
+					{
+						XRRFreeOutputInfo(output_tmp);
+						continue;
+					}
+					
+					if (res->outputs[i] == primary_id ||
+						output_id == BadRROutput || crtc_tmp->x < crtc->x ||
+						(crtc_tmp->x == crtc->x && crtc_tmp->y < crtc->y))
 					{
 						XRRFreeCrtcInfo(crtc);
-						XRRFreeOutputInfo(output);
-						continue;
-					}
-					
-					if (crtc_x == -1 || crtc->x < crtc_x)
-					{
-						crtc_x = crtc->x;
-						crtc_y = crtc->y;						
+						XRRFreeOutputInfo(output);		
+						
+						output = output_tmp;
+						crtc = crtc_tmp;					
 						output_id = res->outputs[i];
 					}
-					else if (crtc_x == crtc->x && crtc->y < crtc_y)
+					else
 					{
-						crtc_x = crtc->x;
-						crtc_y = crtc->y;
-						output_id = res->outputs[i];			
+						XRRFreeCrtcInfo(crtc_tmp);
+						XRRFreeOutputInfo(output_tmp);			
 					}
 					
-					XRRFreeCrtcInfo(crtc);
-					XRRFreeOutputInfo(output);
+					if (res->outputs[i] == primary_id)
+						break;
 				}
 				
-				output = XRRGetOutputInfo(display, res, output_id);
-				crtc = XRRGetCrtcInfo(display, res, output->crtc);
-
-				if (crtc == NULL)
+				if (output_id == BadRROutput)
 				{
-					XRRFreeCrtcInfo(crtc);
-					XRRFreeOutputInfo(output);
-					XRRFreeScreenResources(res);
-					return &VideoModeList;
+					os::Printer::log("Could not get video output.", ELL_WARNING);
+					break;
 				}
+				
+				crtc_x = crtc->x;
+				crtc_y = crtc->y;
 
 				for (int i = 0; i < res->nmode; i++)
 				{
 					const XRRModeInfo* mode = &res->modes[i];
-					unsigned int w, h;
+					core::dimension2d<u32> size;
 
 					if (crtc->rotation & (XRANDR_ROTATION_LEFT|XRANDR_ROTATION_RIGHT))
 					{
-						w = mode->height;
-						h = mode->width;
+						size = core::dimension2d<u32>(mode->height, mode->width);
 					} 
 					else 
 					{
-						w = mode->width;
-						h = mode->height;
+						size = core::dimension2d<u32>(mode->width, mode->height);
 					}
 
 					for (int j = 0; j < output->nmode; j++)
 					{            
 						if (mode->id == output->modes[j])
 						{
-							VideoModeList.addMode(core::dimension2d<u32>(
-									w, h), defaultDepth);
+							VideoModeList.addMode(size, defaultDepth);
 							break;
 						}
 					}
@@ -1678,21 +1894,18 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					if (mode->id == crtc->mode)
 					{
 						old_mode = crtc->mode;
-						VideoModeList.setDesktop(defaultDepth,
-							core::dimension2d<u32>(w, h));
+						VideoModeList.setDesktop(defaultDepth, size);
 					}
 				}
-
+				
 				XRRFreeCrtcInfo(crtc);
 				XRRFreeOutputInfo(output);
-				XRRFreeScreenResources(res);
+				XRRFreeScreenResources(res);						
+				break;
 			}
-			else
 			#endif
-			{
-				os::Printer::log("VidMode or RandR X11 extension requireed for VideoModeList." , ELL_WARNING);
-			}
 		}
+	
 		if (display && temporaryDisplay)
 		{
 			XCloseDisplay(display);
@@ -1739,7 +1952,7 @@ void CIrrDeviceLinux::createKeyMap()
 	// I find a better version.
 
 #ifdef _IRR_COMPILE_WITH_X11_
-	KeyMap.reallocate(84);
+	KeyMap.reallocate(190);
 	KeyMap.push_back(SKeyMap(XK_BackSpace, KEY_BACK));
 	KeyMap.push_back(SKeyMap(XK_Tab, KEY_TAB));
 	KeyMap.push_back(SKeyMap(XK_ISO_Left_Tab, KEY_TAB));
@@ -1792,16 +2005,16 @@ void CIrrDeviceLinux::createKeyMap()
 	KeyMap.push_back(SKeyMap(XK_KP_Subtract, KEY_SUBTRACT));
 	KeyMap.push_back(SKeyMap(XK_KP_Decimal, KEY_DECIMAL));
 	KeyMap.push_back(SKeyMap(XK_KP_Divide, KEY_DIVIDE));
-	KeyMap.push_back(SKeyMap(XK_KP_0, KEY_KEY_0));
-	KeyMap.push_back(SKeyMap(XK_KP_1, KEY_KEY_1));
-	KeyMap.push_back(SKeyMap(XK_KP_2, KEY_KEY_2));
-	KeyMap.push_back(SKeyMap(XK_KP_3, KEY_KEY_3));
-	KeyMap.push_back(SKeyMap(XK_KP_4, KEY_KEY_4));
-	KeyMap.push_back(SKeyMap(XK_KP_5, KEY_KEY_5));
-	KeyMap.push_back(SKeyMap(XK_KP_6, KEY_KEY_6));
-	KeyMap.push_back(SKeyMap(XK_KP_7, KEY_KEY_7));
-	KeyMap.push_back(SKeyMap(XK_KP_8, KEY_KEY_8));
-	KeyMap.push_back(SKeyMap(XK_KP_9, KEY_KEY_9));
+	KeyMap.push_back(SKeyMap(XK_KP_0, KEY_NUMPAD0));
+	KeyMap.push_back(SKeyMap(XK_KP_1, KEY_NUMPAD1));
+	KeyMap.push_back(SKeyMap(XK_KP_2, KEY_NUMPAD2));
+	KeyMap.push_back(SKeyMap(XK_KP_3, KEY_NUMPAD3));
+	KeyMap.push_back(SKeyMap(XK_KP_4, KEY_NUMPAD4));
+	KeyMap.push_back(SKeyMap(XK_KP_5, KEY_NUMPAD5));
+	KeyMap.push_back(SKeyMap(XK_KP_6, KEY_NUMPAD6));
+	KeyMap.push_back(SKeyMap(XK_KP_7, KEY_NUMPAD7));
+	KeyMap.push_back(SKeyMap(XK_KP_8, KEY_NUMPAD8));
+	KeyMap.push_back(SKeyMap(XK_KP_9, KEY_NUMPAD9));
 	KeyMap.push_back(SKeyMap(XK_F1, KEY_F1));
 	KeyMap.push_back(SKeyMap(XK_F2, KEY_F2));
 	KeyMap.push_back(SKeyMap(XK_F3, KEY_F3));
@@ -1969,10 +2182,10 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 		if (-1 == info.fd)
 			continue;
 
-#ifdef __FREE_BSD_
+#ifdef __FreeBSD__
 		info.axes=2;
 		info.buttons=2;
-#else
+#elif defined(__linux__)
 		ioctl( info.fd, JSIOCGAXES, &(info.axes) );
 		ioctl( info.fd, JSIOCGBUTTONS, &(info.buttons) );
 		fcntl( info.fd, F_SETFL, O_NONBLOCK );
@@ -1988,12 +2201,13 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 
 		ActiveJoysticks.push_back(info);
 
+		returnInfo.HasGenericName = false;
 		returnInfo.Joystick = joystick;
 		returnInfo.PovHat = SJoystickInfo::POV_HAT_UNKNOWN;
 		returnInfo.Axes = info.axes;
 		returnInfo.Buttons = info.buttons;
 
-#ifndef __FREE_BSD_
+#if !defined(__FreeBSD__) && !defined(__OpenBSD__)
 		char name[80];
 		ioctl( info.fd, JSIOCGNAME(80), name);
 		returnInfo.Name = name;
@@ -2027,15 +2241,18 @@ void CIrrDeviceLinux::pollJoysticks()
 	for (u32 j= 0; j< ActiveJoysticks.size(); ++j)
 	{
 		JoystickInfo & info =  ActiveJoysticks[j];
+		bool event_received = false;
 
-#ifdef __FREE_BSD_
+#ifdef __FreeBSD__
 		struct joystick js;
-		if (read(info.fd, &js, JS_RETURN) == JS_RETURN)
+		if (read(info.fd, &js, sizeof(js)) == sizeof(js))
 		{
-			info.persistentData.JoystickEvent.ButtonStates = js.buttons; /* should be a two-bit field */
+			event_received = true;
+			info.persistentData.JoystickEvent.ButtonStates = js.b1 | (js.b2 << 1); /* should be a two-bit field */
 			info.persistentData.JoystickEvent.Axis[0] = js.x; /* X axis */
 			info.persistentData.JoystickEvent.Axis[1] = js.y; /* Y axis */
-#else
+		}
+#elif defined(__linux__)
 		struct js_event event;
 		while (sizeof(event) == read(info.fd, &event, sizeof(event)))
 		{
@@ -2043,14 +2260,23 @@ void CIrrDeviceLinux::pollJoysticks()
 			{
 			case JS_EVENT_BUTTON:
 				if (event.value)
-						info.persistentData.JoystickEvent.ButtonStates |= (1 << event.number);
+				{
+					event_received = true;
+					info.persistentData.JoystickEvent.ButtonStates |= (1 << event.number);
+				}
 				else
-						info.persistentData.JoystickEvent.ButtonStates &= ~(1 << event.number);
+				{
+					event_received = true;
+					info.persistentData.JoystickEvent.ButtonStates &= ~(1 << event.number);
+				}
 				break;
 
 			case JS_EVENT_AXIS:
 				if (event.number < SEvent::SJoystickEvent::NUMBER_OF_AXES)
+				{
+					event_received = true;
 					info.persistentData.JoystickEvent.Axis[event.number] = event.value;
+				}
 				break;
 
 			default:
@@ -2061,6 +2287,13 @@ void CIrrDeviceLinux::pollJoysticks()
 
 		// Send an irrlicht joystick event once per ::run() even if no new data were received.
 		(void)postEventFromUser(info.persistentData);
+		
+#ifdef _IRR_COMPILE_WITH_X11_
+		if (event_received)
+		{
+			XResetScreenSaver(display);
+		}
+#endif
 	}
 #endif // _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 }
@@ -2162,47 +2395,59 @@ bool CIrrDeviceLinux::getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &bright
 const c8* CIrrDeviceLinux::getTextFromClipboard() const
 {
 #if defined(_IRR_COMPILE_WITH_X11_)
-	Window ownerWindow = XGetSelectionOwner (display, X_ATOM_CLIPBOARD);
-	if ( ownerWindow ==  window )
+	if (X_ATOM_CLIPBOARD == None) 
+	{
+		os::Printer::log("Couldn't access X clipboard", ELL_WARNING);
+		return 0;
+	}
+	
+	Window ownerWindow = XGetSelectionOwner(display, X_ATOM_CLIPBOARD);
+	if (ownerWindow == window)
 	{
 		return Clipboard.c_str();
 	}
+
 	Clipboard = "";
-	if (ownerWindow != None )
+
+	if (ownerWindow == None)
+		return 0;
+
+	Atom selection = XInternAtom(display, "IRR_SELECTION", False);
+	XConvertSelection(display, X_ATOM_CLIPBOARD, XA_STRING, selection, window, CurrentTime);
+	
+	const int SELECTION_RETRIES = 500;
+	int i = 0;
+	for (i = 0; i < SELECTION_RETRIES; i++)
 	{
-		XConvertSelection (display, X_ATOM_CLIPBOARD, XA_STRING, None, ownerWindow, CurrentTime);
-		XFlush (display);
+		XEvent xevent;
+		bool res = XCheckTypedWindowEvent(display, window, SelectionNotify, &xevent);
+		
+		if (res && xevent.xselection.selection == X_ATOM_CLIPBOARD) 
+			break;
 
-		// check for data
-		Atom type;
-		int format;
-		unsigned long numItems, bytesLeft, dummy;
-		unsigned char *data;
-		XGetWindowProperty (display, ownerWindow,
-				XA_STRING, // property name
-				0, // offset
-				0, // length (we only check for data, so 0)
-				0, // Delete 0==false
-				AnyPropertyType, // AnyPropertyType or property identifier
-				&type, // return type
-				&format, // return format
-				&numItems, // number items
-				&bytesLeft, // remaining bytes for partial reads
-				&data); // data
-		if ( bytesLeft > 0 )
-		{
-			// there is some data to get
-			int result = XGetWindowProperty (display, ownerWindow, XA_STRING, 0,
-										bytesLeft, 0, AnyPropertyType, &type, &format,
-										&numItems, &dummy, &data);
-			if (result == Success)
-				Clipboard = (irr::c8*)data;
-			XFree (data);
-		}
+		usleep(1000);
 	}
+	
+	if (i == SELECTION_RETRIES)
+	{
+		os::Printer::log("Timed out waiting for SelectionNotify event", ELL_WARNING);
+		return 0;
+	}
+	
+	Atom type;
+	int format;
+	unsigned long numItems, dummy;
+	unsigned char *data;
 
+	int result = XGetWindowProperty(display, window, selection, 0, INT_MAX/4, 
+									False, AnyPropertyType, &type, &format, 
+									&numItems, &dummy, &data);
+
+	if (result == Success)
+		Clipboard = (irr::c8*)data;
+		
+	XFree (data);
 	return Clipboard.c_str();
-
 #else
 	return 0;
 #endif

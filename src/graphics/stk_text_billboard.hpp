@@ -1,13 +1,31 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #ifndef STK_TEXT_BILLBOARD_HPP
 #define STK_TEXT_BILLBOARD_HPP
+
+#include "graphics/stk_mesh_scene_node.hpp"
+#include "guiengine/scalable_font.hpp"
+#include "utils/cpp2011.hpp"
 
 #include "../lib/irrlicht/source/Irrlicht/CBillboardSceneNode.h"
 #include <IBillboardSceneNode.h>
 #include <irrTypes.h>
 #include <IMesh.h>
-#include "graphics/stkmeshscenenode.hpp"
-#include "guiengine/scalable_font.hpp"
-#include "utils/cpp2011.hpp"
 
 class STKTextBillboardChar
 {
@@ -56,12 +74,17 @@ public:
         const irr::core::vector3df& position,
         const irr::core::vector3df& size);
 
-    virtual void OnRegisterSceneNode() OVERRIDE;
+    virtual void updateNoGL() OVERRIDE;
+
+    virtual scene::ESCENE_NODE_TYPE getType() const OVERRIDE
+    {
+        return scene::ESNT_TEXT;
+    }
 
     virtual void collectChar(irr::video::ITexture* texture,
         const irr::core::rect<irr::s32>& destRect,
         const irr::core::rect<irr::s32>& sourceRect,
-        const irr::video::SColor* const colors);
+        const irr::video::SColor* const colors) OVERRIDE;
 
     virtual void updateAbsolutePosition() OVERRIDE;
 };

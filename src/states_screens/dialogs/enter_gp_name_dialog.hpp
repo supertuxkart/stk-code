@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Marc Coll
+//  Copyright (C) 2014-2015 Marc Coll
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -62,8 +62,8 @@ public:
     ~EnterGPNameDialog();
 
     void onEnterPressedInternal();
+    void validateName();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-
     virtual void onUpdate(float dt);
 };
 

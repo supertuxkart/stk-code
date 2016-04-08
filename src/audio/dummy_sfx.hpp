@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Patrick Ammann <pammann@aro.ch>
-//  Copyright (C) 2008-2013 Joerg Henrichs, Patrick Ammann
+//  Copyright (C) 2006-2015 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2008-2015 Joerg Henrichs, Patrick Ammann
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,7 +23,6 @@
 #include "audio/sfx_base.hpp"
 
 
-
 /**
  * \brief Dummy sound when ogg or openal aren't available
  * \ingroup audio
@@ -31,25 +30,43 @@
 class DummySFX : public SFXBase
 {
 public:
-                       DummySFX(SFXBuffer* buffer, bool positional, float gain) {}
+                       DummySFX(SFXBuffer* buffer, bool positional,
+                                float gain) {}
     virtual           ~DummySFX()                     {}
 
     /** Late creation, if SFX was initially disabled */
-    virtual bool       init() { return true; }
-
-    virtual void       position(const Vec3 &position) {}
-    virtual void       setLoop(bool status)           {}
-    virtual void       play()                         {}
-    virtual void       stop()                         {}
-    virtual void       pause()                        {}
-    virtual void       resume()                       {}
-    virtual void       speed(float factor)            {}
-    virtual void       volume(float gain)             {}
-    virtual SFXManager::SFXStatus  getStatus()        { return SFXManager::SFX_STOPPED; }
-    virtual void       onSoundEnabledBack()           {}
-    virtual void       setRolloff(float rolloff)      {}
-
-    virtual const SFXBuffer* getBuffer() const        { return NULL; }
+    virtual bool       init()                           { return true;  }
+    virtual bool       isLooped()                       { return false; }
+    virtual void       updatePlayingSFX(float dt)       {}
+    virtual void       setLoop(bool status)             {}
+    virtual void       reallySetLoop(bool status)       {}
+    virtual void       setPosition(const Vec3 &p)       {}
+    virtual void       reallySetPosition(const Vec3 &p) {}
+    virtual void       setSpeedPosition(float factor,
+                                        const Vec3 &p)  {}
+    virtual void       reallySetSpeedPosition(float f,
+                                         const Vec3 &p) {}
+    virtual void       play()                           {}
+    virtual void       reallyPlayNow()                  {}
+    virtual void       play(const Vec3 &xyz)            {}
+    virtual void       reallyPlayNow(const Vec3 &xyz)   {}
+    virtual void       stop()                           {}
+    virtual void       reallyStopNow()                  {}
+    virtual void       pause()                          {}
+    virtual void       reallyPauseNow()                 {}
+    virtual void       resume()                         {}
+    virtual void       reallyResumeNow()                {}
+    virtual void       deleteSFX()                      { delete this; }
+    virtual void       setSpeed(float factor)           {}
+    virtual void       reallySetSpeed(float factor)     {}
+    virtual void       setVolume(float gain)            {}
+    virtual void       reallySetVolume(float gain)      {}
+    virtual void       setMasterVolume(float gain)      {}
+    virtual void       reallySetMasterVolumeNow(float gain) {}
+    virtual SFXStatus  getStatus()                      { return SFX_STOPPED; }
+    virtual void       onSoundEnabledBack()             {}
+    virtual void       setRolloff(float rolloff)        {}
+    virtual const SFXBuffer* getBuffer() const          { return NULL; }
 
 };   // DummySFX
 

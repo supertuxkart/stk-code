@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -36,37 +36,46 @@
 class GhostKart : public Kart
 {
 private:
-    /** The list of the times at which the transform were reached. */
-    std::vector<float>       m_all_times;
-
     /** The transforms to assume at the corresponding time in m_all_times. */
-    std::vector<btTransform> m_all_transform;
+    std::vector<btTransform>                 m_all_transform;
 
-    std::vector<ReplayBase::KartReplayEvent> m_replay_events;
+    std::vector<ReplayBase::PhysicInfo>      m_all_physic_info;
 
-    /** Pointer to the last index in m_all_times that is smaller than
-     *  the current world time. */
-    unsigned int m_current_transform;
+    std::vector<ReplayBase::KartReplayEvent> m_all_replay_events;
 
-    /** Index of the next kart replay event. */
-    unsigned int m_next_event;
-
-    void         updateTransform(float t, float dt);
 public:
-                 GhostKart(const std::string& ident);
-    virtual void update (float dt);
-    virtual void addTransform(float time, const btTransform &trans);
-    virtual void addReplayEvent(const ReplayBase::KartReplayEvent &kre);
-    virtual void reset();
+                  GhostKart(const std::string& ident,
+                            unsigned int world_kart_id, int position);
+    virtual void  update (float dt);
+    virtual void  reset();
     // ------------------------------------------------------------------------
     /** No physics body for ghost kart, so nothing to adjust. */
-    virtual void updateWeight() {};
+    virtual void  updateWeight() {};
     // ------------------------------------------------------------------------
     /** No physics for ghost kart. */
-    virtual void applyEngineForce (float force) {}
+    virtual void  applyEngineForce (float force) {};
     // ------------------------------------------------------------------------
     // Not needed to create any physics for a ghost kart.
-    virtual void createPhysics() {}
+    virtual void  createPhysics() {};
+    // ------------------------------------------------------------------------
+    const float   getSuspensionLength(int index, int wheel) const
+               { return m_all_physic_info[index].m_suspension_length[wheel]; }
+    // ------------------------------------------------------------------------
+    void          addReplayEvent(float time,
+                                 const btTransform &trans,
+                                 const ReplayBase::PhysicInfo &pi,
+                                 const ReplayBase::KartReplayEvent &kre);
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is a ghost (replay) kart. */
+    virtual bool  isGhostKart() const                         { return true; }
+    // ------------------------------------------------------------------------
+    /** Ghost can't be hunted. */
+    virtual bool  isInvulnerable() const                      { return true; }
+    // ------------------------------------------------------------------------
+    /** Returns the speed of the kart in meters/second. */
+    virtual float getSpeed() const;
+    // ------------------------------------------------------------------------
+    virtual void  kartIsInRestNow() {};
     // ------------------------------------------------------------------------
 
 };   // GhostKart

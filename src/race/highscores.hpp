@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -53,9 +53,9 @@ private:
 public:
     /** Creates a new entry
       */
-    Highscores (const Highscores::HighscoreType highscore_type,
-                int num_karts, const RaceManager::Difficulty difficulty,
-                const std::string trackName, const int number_of_laps,
+    Highscores (const Highscores::HighscoreType &highscore_type,
+                int num_karts, const RaceManager::Difficulty &difficulty,
+                const std::string &trackName, const int number_of_laps,
                 const bool reverse);
     /** Creates an entry from a file
      */
@@ -63,9 +63,9 @@ public:
 
     void readEntry (const XMLNode &node);
     void writeEntry(UTFWriter &writer);
-    int  matches   (HighscoreType highscore_type, int num_karts,
-                    const RaceManager::Difficulty difficulty,
-                    const std::string track, const int number_of_laps,
+    int  matches   (const HighscoreType &highscore_type, int num_karts,
+                    const RaceManager::Difficulty &difficulty,
+                    const std::string &track, const int number_of_laps,
                     const bool reverse);
     int  addData   (const std::string& kart_name,
                     const irr::core::stringw& name, const float time);

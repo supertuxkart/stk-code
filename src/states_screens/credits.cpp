@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -143,7 +143,7 @@ void CreditsScreen::loadedFromFile()
 
     std::string creditsfile = file_manager->getAsset("CREDITS");
 
-    std::ifstream file( creditsfile.c_str() ) ;
+    std::ifstream file( creditsfile.c_str(), std::ios::binary ) ;
 
     if (file.fail() || !file.is_open() || file.eof())
     {
@@ -166,10 +166,18 @@ void CreditsScreen::loadedFromFile()
     }
 
     int lineCount = 0;
-
+#undef DEBUG_TRANSLATIONS    // Enable to only see the translator credits
+#ifdef DEBUG_TRANSLATIONS
+        int my_counter = 0;
+#endif
     // let's assume the file is encoded as UTF-16
     while (getWideLine( file, &line ))
     {
+#ifdef DEBUG_TRANSLATIONS
+        if (my_counter > 0)
+            break;
+        my_counter++;
+#endif
         stringc cversion = line.c_str();
         //printf("CREDITS line : %s\n", cversion.c_str());
 
@@ -207,6 +215,7 @@ void CreditsScreen::loadedFromFile()
 
 
     irr::core::stringw translators_credits = _("translator-credits");
+    const int MAX_PER_SCREEN = 6;
 
     if (translators_credits != L"translator-credits")
     {
@@ -214,13 +223,13 @@ void CreditsScreen::loadedFromFile()
             StringUtils::split(translators_credits, '\n');
 
         m_sections.push_back( new CreditsSection("Translations"));
-        for(unsigned int i = 1; i < translator.size(); i = i + 4)
+        for(unsigned int i = 1; i < translator.size(); i = i + MAX_PER_SCREEN)
         {
             line = stringw(translations->getCurrentLanguageName().c_str());
             CreditsEntry entry(line);
             getCurrentSection()->addEntry( entry );
 
-            for(unsigned int j = 0; i + j < translator.size() && j < 6; j ++)
+            for(unsigned int j = 0; i + j < translator.size() && j < MAX_PER_SCREEN; j ++)
             {
                 getCurrentSection()->addSubEntry(translator[i + j]);
             }
@@ -350,7 +359,7 @@ void CreditsScreen::onUpdate(float elapsed_time)
             color, false /* center h */, true /* center v */, NULL,
             true /* ignore RTL */                                   );
 
-        const int subamount = m_sections[m_curr_section]
+        const int subamount = (int)m_sections[m_curr_section]
                              .m_entries[m_curr_element].m_subentries.size();
         int suby = m_y + m_h/3;
         const int inc = subamount == 0 ? m_h/8

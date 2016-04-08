@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -43,6 +43,8 @@ void ButtonWidget::add()
     m_id = m_element->getID();
     m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
+    if (!m_is_visible)
+        m_element->setVisible(false);
 }
 
 // -----------------------------------------------------------------------------

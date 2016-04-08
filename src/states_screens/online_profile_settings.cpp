@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Glenn De Jonghe
+//  Copyright (C) 2010-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -58,6 +58,7 @@ void OnlineProfileSettings::init()
 {
     OnlineProfileBase::init();
     m_profile_tabs->select( m_settings_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
+    m_settings_tab->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // -----------------------------------------------------------------------------

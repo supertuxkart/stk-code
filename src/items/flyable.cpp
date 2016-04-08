@@ -1,9 +1,9 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007-2013 Joerg Henrichs
+//  Copyright (C) 2007-2015 Joerg Henrichs
 //
 //  Linear item-kart intersection function written by
-//  Copyright (C) 2009-2013 David Mikos
+//  Copyright (C) 2009-2015 David Mikos
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@
 
 #include "items/flyable.hpp"
 
-#include <math.h>
+#include <cmath>
 
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
@@ -35,6 +35,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "modes/linear_world.hpp"
+#include "modes/soccer_world.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -74,7 +75,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
     m_max_lifespan = -1;
 
     // Add the graphical model
-    setNode(irr_driver->addMesh(m_st_model[type]));
+    setNode(irr_driver->addMesh(m_st_model[type], StringUtils::insertValues("flyable_%i", (int)type)));
     irr_driver->applyObjectPassShader(getNode());
 #ifdef DEBUG
     std::string debug_name("flyable: ");
@@ -111,8 +112,8 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     // Apply offset
     btTransform offset_transform;
     offset_transform.setIdentity();
-    assert(!isnan(m_average_height));
-    assert(!isnan(forw_offset));
+    assert(!std::isnan(m_average_height));
+    assert(!std::isnan(forw_offset));
     offset_transform.setOrigin(Vec3(0,m_average_height,forw_offset));
 
     // turn around
@@ -141,16 +142,16 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     {
 #ifdef DEBUG
         // Just to get some additional information if the assert is triggered
-        if(isnan(v.getX()) || isnan(v.getY()) || isnan(v.getZ()))
+        if(std::isnan(v.getX()) || std::isnan(v.getY()) || std::isnan(v.getZ()))
         {
             Log::debug("[Flyable]", "vel %f %f %f v %f %f %f",
                         velocity.getX(),velocity.getY(),velocity.getZ(),
                         v.getX(),v.getY(),v.getZ());
         }
 #endif
-        assert(!isnan(v.getX()));
-        assert(!isnan(v.getY()));
-        assert(!isnan(v.getZ()));
+        assert(!std::isnan(v.getX()));
+        assert(!std::isnan(v.getY()));
+        assert(!std::isnan(v.getZ()));
         m_body->setLinearVelocity(v);
         if(!rotates) m_body->setAngularFactor(0.0f);   // prevent rotations
     }
@@ -226,12 +227,22 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
         if(kart->isEliminated() || kart == m_owner ||
             kart->isInvulnerable()                 ||
             kart->getKartAnimation()                   ) continue;
+
+        const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+        if (sw)
+        {
+            // Don't hit teammates in soccer world
+            if (sw->getKartTeam(kart->getWorldKartId()) == sw
+                ->getKartTeam(m_owner->getWorldKartId()))
+            continue;
+        }
+
         btTransform t=kart->getTrans();
 
         Vec3 delta      = t.getOrigin()-trans_projectile.getOrigin();
         // the Y distance is added again because karts above or below should//
         // not be prioritized when aiming
-        float distance2 = delta.length2() + abs(t.getOrigin().getY()
+        float distance2 = delta.length2() + std::abs(t.getOrigin().getY()
                         - trans_projectile.getOrigin().getY())*2;
 
         if(inFrontOf != NULL)
@@ -371,9 +382,9 @@ bool Flyable::updateAndDelete(float dt)
     // But since we couldn't reproduce the problem, and the epsilon used
     // here does not hurt, I'll leave it in.
     float eps = 0.1f;
-    assert(!isnan(xyz.getX()));
-    assert(!isnan(xyz.getY()));
-    assert(!isnan(xyz.getZ()));
+    assert(!std::isnan(xyz.getX()));
+    assert(!std::isnan(xyz.getY()));
+    assert(!std::isnan(xyz.getZ()));
     if(xyz[0]<(*min)[0]+eps || xyz[2]<(*min)[2]+eps || xyz[1]<(*min)[1]+eps ||
        xyz[0]>(*max)[0]-eps || xyz[2]>(*max)[2]-eps || xyz[1]>(*max)[1]-eps   )
     {
@@ -412,16 +423,16 @@ bool Flyable::updateAndDelete(float dt)
         float delta = m_average_height - std::max(std::min(hat, m_max_height),
                                                   m_min_height);
         Vec3 v = getVelocity();
-        assert(!isnan(v.getX()));
-        assert(!isnan(v.getX()));
-        assert(!isnan(v.getX()));
+        assert(!std::isnan(v.getX()));
+        assert(!std::isnan(v.getX()));
+        assert(!std::isnan(v.getX()));
         float heading = atan2f(v.getX(), v.getZ());
-        assert(!isnan(heading));
+        assert(!std::isnan(heading));
         float pitch   = getTerrainPitch(heading);
         float vel_up = m_force_updown*(delta);
         if (hat < m_max_height) // take into account pitch of surface
             vel_up += v.length_2d()*tanf(pitch);
-        assert(!isnan(vel_up));
+        assert(!std::isnan(vel_up));
         v.setY(vel_up);
         setVelocity(v);
     }   // if m_adjust_up_velocity
@@ -477,6 +488,16 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
     for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
     {
         AbstractKart *kart = world->getKart(i);
+
+        const SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+        if (sw)
+        {
+            // Don't explode teammates in soccer world
+            if (sw->getKartTeam(kart->getWorldKartId()) == sw
+                ->getKartTeam(m_owner->getWorldKartId()))
+            continue;
+        }
+        if (kart->isGhostKart()) continue;
 
         // If no secondary hits should be done, only hit the
         // direct hit kart.

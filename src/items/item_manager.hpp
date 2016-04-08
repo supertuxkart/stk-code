@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,7 +19,10 @@
 #ifndef HEADER_ITEMMANAGER_HPP
 #define HEADER_ITEMMANAGER_HPP
 
+#include "LinearMath/btTransform.h"
+
 #include "items/item.hpp"
+#include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
 
 #include <SColor.h>
@@ -110,8 +113,10 @@ public:
                                     int add_info=-1);
     void           switchItems     ();
     // ------------------------------------------------------------------------
+    bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
+    // ------------------------------------------------------------------------
     /** Returns the number of items. */
-    unsigned int   getNumberOfItems() const { return m_all_items.size(); }
+    unsigned int   getNumberOfItems() const { return (unsigned int) m_all_items.size(); }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the n-th item. */
     const Item*   getItem(unsigned int n) const { return m_all_items[n]; };

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
 
 #include "animations/animation_base.hpp"
 #include "animations/three_d_animation.hpp"
-#include "audio/music_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/camera.hpp"
@@ -59,6 +59,7 @@ CutsceneWorld::CutsceneWorld() : World()
     WorldStatus::setClockMode(CLOCK_NONE);
     m_use_highscores = false;
     m_play_racestart_sounds = false;
+    m_fade_duration = 1.0f;
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------
@@ -76,20 +77,14 @@ void CutsceneWorld::init()
 
     m_duration = -1.0f;
 
-    //const btTransform &s = getTrack()->getStartTransform(0);
-    //const Vec3 &v = s.getOrigin();
     Camera* stk_cam = Camera::createCamera(NULL);
     m_camera = stk_cam->getCameraSceneNode();
-    //m_camera = irr_driver->getSceneManager()
-    //         ->addCameraSceneNode(NULL, core::vector3df(0.0f, 0.0f, 0.0f),
-    //                              core::vector3df(0.0f, 0.0f, 0.0f));
     m_camera->setFOV(0.61f);
     m_camera->bindTargetAndRotation(true); // no "look-at"
 
     // --- Build list of sounds to play at certain frames
     PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
-    TrackObject* curr;
-    for_in(curr, objects)
+    for (TrackObject* curr : objects)
     {
         if (curr->getType() == "particle-emitter" &&
             !curr->getPresentation<TrackObjectPresentationParticles>()->getTriggerCondition().empty())
@@ -240,13 +235,13 @@ void CutsceneWorld::update(float dt)
     float fade = 0.0f;
     float fadeIn = -1.0f;
     float fadeOut = -1.0f;
-    if (m_time < 2.0f)
+    if (m_time < m_fade_duration)
     {
-        fadeIn = 1.0f - (float)m_time / 2.0f;
+        fadeIn = 1.0f - (float)m_time / m_fade_duration;
     }
-    if (m_time > m_duration - 2.0f)
+    if (m_time > m_duration - m_fade_duration)
     {
-        fadeOut = (float)(m_time - (m_duration - 2.0f)) / 2.0f;
+        fadeOut = (float)(m_time - (m_duration - m_fade_duration)) / m_fade_duration;
     }
 
     if (fadeIn >= 0.0f && fadeOut >= 0.0f)
@@ -305,14 +300,12 @@ void CutsceneWorld::update(float dt)
             rot2.setPitch(rot2.getPitch() + 90.0f);
             m_camera->setRotation(rot2.toIrrVector());
 
-            sfx_manager->positionListener(m_camera->getAbsolutePosition(),
+            SFXManager::get()->positionListener(m_camera->getAbsolutePosition(),
                                           m_camera->getTarget() -
-                                            m_camera->getAbsolutePosition());
+                                            m_camera->getAbsolutePosition(),
+                                            Vec3(0,1,0));
 
             break;
-            //printf("Camera %f %f %f\n", curr->getNode()->getPosition().X,
-            //                            curr->getNode()->getPosition().Y,
-            //                             curr->getNode()->getPosition().Z);
         }
     }
     std::map<float, std::vector<TrackObject*> >::iterator it;
@@ -409,7 +402,6 @@ void CutsceneWorld::enterRaceOverState()
             GUIEngine::Screen* newStack[] = { mainMenu, credits, NULL };
             race_manager->exitRace();
             StateManager::get()->resetAndSetStack(newStack);
-            StateManager::get()->pushScreen(credits);
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else  if (m_parts.size() == 1 && m_parts[0] == "gpwin")
@@ -429,8 +421,7 @@ void CutsceneWorld::enterRaceOverState()
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
                 race_manager->setNumKarts(0);
                 race_manager->setNumPlayers(0);
-                race_manager->setNumLocalPlayers(0);
-                race_manager->startSingleRace("featunlocked", 999, false);
+                race_manager->startSingleRace("featunlocked", 999, race_manager->raceWasStartedFromOverworld());
 
                 FeatureUnlockedCutScene* scene =
                     FeatureUnlockedCutScene::getInstance();
@@ -482,8 +473,7 @@ void CutsceneWorld::enterRaceOverState()
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
                 race_manager->setNumKarts(0);
                 race_manager->setNumPlayers(0);
-                race_manager->setNumLocalPlayers(0);
-                race_manager->startSingleRace("featunlocked", 999, false);
+                race_manager->startSingleRace("featunlocked", 999, race_manager->raceWasStartedFromOverworld());
 
                 FeatureUnlockedCutScene* scene =
                     FeatureUnlockedCutScene::getInstance();
@@ -520,13 +510,17 @@ void CutsceneWorld::enterRaceOverState()
             {
                 race_manager->exitRace();
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-
                 player->setFirstTime(false);
                 PlayerManager::get()->save();
                 KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
                 s->setMultiplayer(false);
                 s->setGoToOverworldNext();
-                StateManager::get()->pushScreen( s );
+                s->push();
+            } else
+            {
+                race_manager->exitRace();
+                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                OverWorld::enterOverWorld();
             }
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
@@ -564,7 +558,7 @@ void CutsceneWorld::enterRaceOverState()
         std::string next_part = m_parts[partId + 1];
 
         race_manager->exitRace();
-        race_manager->startSingleRace(next_part, 999, false);
+        race_manager->startSingleRace(next_part, 999, race_manager->raceWasStartedFromOverworld());
     }
 
 }

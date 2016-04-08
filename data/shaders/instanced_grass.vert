@@ -9,6 +9,11 @@ layout(location = 3) in vec2 Texcoord;
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
+#ifdef Use_Bindless_Texture
+layout(location = 10) in sampler2D Handle;
+layout(location = 11) in sampler2D SecondHandle;
+#endif
+
 #else
 in vec3 Position;
 in vec3 Normal;
@@ -22,6 +27,10 @@ in vec3 Scale;
 
 out vec3 nor;
 out vec2 uv;
+#ifdef Use_Bindless_Texture
+flat out sampler2D handle;
+flat out sampler2D secondhandle;
+#endif
 
 mat4 getWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
 mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
@@ -30,7 +39,11 @@ void main()
 {
     mat4 ModelMatrix = getWorldMatrix(Origin + windDir * Color.r, Orientation, Scale);
     mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin + windDir * Color.r, Orientation, Scale) * InverseViewMatrix);
-    gl_Position = ProjectionMatrix * ViewMatrix *  ModelMatrix * vec4(Position, 1.);
+    gl_Position = ProjectionViewMatrix *  ModelMatrix * vec4(Position, 1.);
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
     uv = Texcoord;
+#ifdef Use_Bindless_Texture
+    handle = Handle;
+    secondhandle = SecondHandle;
+#endif
 }

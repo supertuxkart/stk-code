@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
 
 #include <irrString.h>
 
-#include "guiengine/widgets/CGUISTKListBox.h"
+#include "guiengine/widgets/CGUISTKListBox.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "utils/leak_check.hpp"
@@ -167,7 +167,7 @@ namespace GUIEngine
         /**
           * \brief Finds the ID of the item that has a given internal name
           */
-        int getItemID(const std::string internalName) const;
+        int getItemID(const std::string &internalName) const;
         
         /**
           * \brief change the selected item
@@ -180,20 +180,23 @@ namespace GUIEngine
           * \brief rename an item and/or change its icon based on its ID
           * \pre may only be called after the widget has been added to the screen with add()
           */
-        void renameCell(const int row_num, const int col_num, const irr::core::stringw newName, const int icon=-1);
+        void renameCell(const int row_num, const int col_num, 
+                        const irr::core::stringw &newName, const int icon=-1);
         
         /**
          * renames first cell only
          */
-        void renameItem(const int row_num, const irr::core::stringw newName, const int icon=-1);
-        void renameItem(const std::string  & internal_name, const irr::core::stringw newName, const int icon=-1);
+        void renameItem(const int row_num, 
+                        const irr::core::stringw &newName, const int icon=-1);
+        void renameItem(const std::string  & internal_name, 
+                        const irr::core::stringw &newName, const int icon=-1);
 
         /**
           * \brief rename an item and/or change its icon based on its internal name
           * \pre may only be called after the widget has been added to the screen with add()
           */
-        void renameCell(const std::string internalName, const int col_num, const irr::core::stringw newName,
-                        const int icon=-1)
+        void renameCell(const std::string internalName, const int col_num, 
+                        const irr::core::stringw &newName, const int icon=-1)
         {
             const int id = getItemID(internalName);
             assert(id != -1);
@@ -211,14 +214,14 @@ namespace GUIEngine
           * \brief Make an item red to mark an error, for instance
           * \pre may only be called after the widget has been added to the screen with add()
           */
-        void markItemRed(const std::string internalName, bool red=true)
+        void markItemRed(const std::string &internalName, bool red=true)
         {
             const int id = getItemID(internalName);
             assert(id != -1);
             markItemRed( id, red );
         }
 
-        void markItemBlue(const std::string internalName, bool blue=true)
+        void markItemBlue(const std::string &internalName, bool blue=true)
         {
             const int id = getItemID(internalName);
             assert(id != -1);

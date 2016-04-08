@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -53,7 +53,7 @@ Powerup::Powerup(AbstractKart* kart)
  */
 Powerup::~Powerup()
 {
-    if(m_sound_use) sfx_manager->deleteSFX(m_sound_use);
+    if(m_sound_use) m_sound_use->deleteSFX();
 }   // ~Powerup
 
 //-----------------------------------------------------------------------------
@@ -88,7 +88,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
 
     if(m_sound_use != NULL)
     {
-        sfx_manager->deleteSFX(m_sound_use);
+        m_sound_use->deleteSFX();
         m_sound_use = NULL;
     }
 
@@ -102,30 +102,30 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
             break ;
 
         case PowerupManager::POWERUP_BOWLING:
-            m_sound_use = sfx_manager->createSoundSource("bowling_shoot");
+            m_sound_use = SFXManager::get()->createSoundSource("bowling_shoot");
             break ;
 
         case PowerupManager::POWERUP_ANVIL:
-            m_sound_use = sfx_manager->createSoundSource("anvil");
+            m_sound_use = SFXManager::get()->createSoundSource("anvil");
             break;
 
         case PowerupManager::POWERUP_PARACHUTE:
-            m_sound_use = sfx_manager->createSoundSource("parachute");
+            m_sound_use = SFXManager::get()->createSoundSource("parachute");
             break;
 
         case PowerupManager::POWERUP_BUBBLEGUM:
-                m_sound_use = sfx_manager->createSoundSource("goo");
+                m_sound_use = SFXManager::get()->createSoundSource("goo");
             break ;
 
         case PowerupManager::POWERUP_SWITCH:
-            m_sound_use = sfx_manager->createSoundSource("swap");
+            m_sound_use = SFXManager::get()->createSoundSource("swap");
             break;
 
         case PowerupManager::POWERUP_NOTHING:
         case PowerupManager::POWERUP_CAKE:
         case PowerupManager::POWERUP_PLUNGER:
         default :
-            m_sound_use = sfx_manager->createSoundSource("shoot");
+            m_sound_use = SFXManager::get()->createSoundSource("shoot");
             break ;
     }
 
@@ -140,43 +140,42 @@ Material *Powerup::getIcon() const
     // Check if it's one of the types which have a separate
     // data file which includes the icon:
     return powerup_manager->getIcon(m_type);
-}
-
-
-
-
+}   // getIcon
 
 //-----------------------------------------------------------------------------
 /** Does the sound configuration.
  */
 void  Powerup::adjustSound()
 {
-    m_sound_use->position(m_owner->getXYZ());
+    m_sound_use->setPosition(m_owner->getXYZ());
     // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
     // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
     if (race_manager->getNumLocalPlayers() > 1)
     {
         // player karts played at full volume; AI karts much dimmer
 
-        if (m_owner->getController()->isPlayerController())
+        if (m_owner->getController()->isLocalPlayerController())
         {
-            m_sound_use->volume( 1.0f );
+            m_sound_use->setVolume( 1.0f );
         }
         else
         {
-            m_sound_use->volume( std::min(0.5f, 1.0f / race_manager->getNumberOfKarts()) );
+            m_sound_use->setVolume( 
+                     std::min(0.5f, 1.0f / race_manager->getNumberOfKarts()) );
         }
     }
-}
+}   // adjustSound
+
 //-----------------------------------------------------------------------------
 /** Use (fire) this powerup.
  */
 void Powerup::use()
 {
+    const KartProperties *kp = m_owner->getKartProperties();
+
     // The player gets an achievement point for using a powerup
-    StateManager::ActivePlayer * player = m_owner->getController()->getPlayer();
-    if (m_type != PowerupManager::POWERUP_NOTHING &&
-        player != NULL && player->getConstProfile() == PlayerManager::getCurrentPlayer())
+    if (m_type != PowerupManager::POWERUP_NOTHING      &&
+        m_owner->getController()->canGetAchievements()    )
     {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER, "poweruplover");
     }
@@ -190,9 +189,9 @@ void Powerup::use()
     // FIXME - for some collectibles, set() is never called
     if(m_sound_use == NULL)
     {
-        //if (m_type == POWERUP_SWITCH) m_sound_use = sfx_manager->newSFX(SFXManager::SOUND_SWAP);
+        //if (m_type == POWERUP_SWITCH) m_sound_use = SFXManager::get()->newSFX(SFXManager::SOUND_SWAP);
         //else
-        m_sound_use = sfx_manager->createSoundSource("shoot");
+        m_sound_use = SFXManager::get()->createSoundSource("shoot");
     }
 
     m_number--;
@@ -205,7 +204,7 @@ void Powerup::use()
     case PowerupManager::POWERUP_SWITCH:
         {
             ItemManager::get()->switchItems();
-            m_sound_use->position(m_owner->getXYZ());
+            m_sound_use->setPosition(m_owner->getXYZ());
             m_sound_use->play();
             break;
         }
@@ -223,8 +222,7 @@ void Powerup::use()
 
     case PowerupManager::POWERUP_SWATTER:
         m_owner->getAttachment()
-                ->set(Attachment::ATTACH_SWATTER,
-                      m_owner->getKartProperties()->getSwatterDuration());
+                ->set(Attachment::ATTACH_SWATTER, kp->getSwatterDuration());
         break;
 
     case PowerupManager::POWERUP_BUBBLEGUM:
@@ -259,12 +257,12 @@ void Powerup::use()
                 if (m_owner->getIdent() == "nolok")
                 {
                     m_owner->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                                   stk_config->m_bubblegum_shield_time);
+                                                  kp->getBubblegumShieldDuration());
                 }
                 else
                 {
                     m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                                   stk_config->m_bubblegum_shield_time);
+                                                  kp->getBubblegumShieldDuration());
                 }
             }
             else // using a bubble gum while still having a shield
@@ -272,16 +270,16 @@ void Powerup::use()
                 if (m_owner->getIdent() == "nolok")
                 {
                     m_owner->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                                  stk_config->m_bubblegum_shield_time + m_owner->getShieldTime());
+                                                  kp->getBubblegumShieldDuration() + m_owner->getShieldTime());
                 }
                 else
                 {
                     m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                                  stk_config->m_bubblegum_shield_time + m_owner->getShieldTime());
+                                                  kp->getBubblegumShieldDuration() + m_owner->getShieldTime());
                 }
             }
 
-            m_sound_use = sfx_manager->createSoundSource("inflate");//Extraordinary. Usually sounds are set in Powerup::set()
+            m_sound_use = SFXManager::get()->createSoundSource("inflate");//Extraordinary. Usually sounds are set in Powerup::set()
             //In this case this is a workaround, since the bubblegum item has two different sounds.
 
             Powerup::adjustSound();
@@ -296,23 +294,23 @@ void Powerup::use()
         for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
         {
             AbstractKart *kart=world->getKart(i);
-            if(kart->isEliminated()) continue;
+            if(kart->isEliminated() || kart->isInvulnerable()) continue;
             if(kart == m_owner) continue;
             if(kart->getPosition() == 1)
             {
                 kart->getAttachment()->set(Attachment::ATTACH_ANVIL,
-                                           stk_config->m_anvil_time);
+                                           kp->getAnvilDuration());
                 kart->updateWeight();
-                kart->adjustSpeed(stk_config->m_anvil_speed_factor*0.5f);
+                kart->adjustSpeed(kp->getAnvilSpeedFactor() * 0.5f);
 
                 // should we position the sound at the kart that is hit,
                 // or the kart "throwing" the anvil? Ideally it should be both.
                 // Meanwhile, don't play it near AI karts since they obviously
                 // don't hear anything
-                if(kart->getController()->isPlayerController())
-                    m_sound_use->position(kart->getXYZ());
+                if(kart->getController()->isLocalPlayerController())
+                    m_sound_use->setPosition(kart->getXYZ());
                 else
-                    m_sound_use->position(m_owner->getXYZ());
+                    m_sound_use->setPosition(m_owner->getXYZ());
 
                 m_sound_use->play();
                 break;
@@ -330,7 +328,7 @@ void Powerup::use()
             for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
             {
                 AbstractKart *kart=world->getKart(i);
-                if(kart->isEliminated() || kart== m_owner) continue;
+                if(kart->isEliminated() || kart== m_owner || kart->isInvulnerable()) continue;
                 if(kart->isShielded())
                 {
                     kart->decreaseShieldTime();
@@ -338,11 +336,10 @@ void Powerup::use()
                 }
                 if(m_owner->getPosition() > kart->getPosition())
                 {
-                    kart->getAttachment()
-                        ->set(Attachment::ATTACH_PARACHUTE,
-                              stk_config->m_parachute_time_other);
+                    kart->getAttachment()->set(Attachment::ATTACH_PARACHUTE,
+                                               kp->getParachuteDurationOther());
 
-                    if(kart->getController()->isPlayerController())
+                    if(kart->getController()->isLocalPlayerController())
                         player_kart = kart;
                 }
             }
@@ -351,10 +348,10 @@ void Powerup::use()
             // or the kart "throwing" the anvil? Ideally it should be both.
             // Meanwhile, don't play it near AI karts since they obviously
             // don't hear anything
-            if(m_owner->getController()->isPlayerController())
-                m_sound_use->position(m_owner->getXYZ());
+            if(m_owner->getController()->isLocalPlayerController())
+                m_sound_use->setPosition(m_owner->getXYZ());
             else if(player_kart)
-                m_sound_use->position(player_kart->getXYZ());
+                m_sound_use->setPosition(player_kart->getXYZ());
             m_sound_use->play();
         }
         break;

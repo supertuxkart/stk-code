@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="0" y="0" width="100%" height="fit" layout="vertical-row">
+        <button id="user-id" width="20%" height="fit" align="right"/>
+    </div>
+
+    <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
+        <icon id="logo" align="center" proportion="5" width="100%" icon="gui/logo.png"/>
+
+        <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">
+            <icon-button id="story" width="128" height="128"
+                         icon="gui/menu_story.png" focus_icon="gui/menu_story_focus.png"
+                         I18N="Main menu button"  text="Story Mode"/>
+            <icon-button id="new" width="128" height="128"
+                         icon="gui/menu_race.png" focus_icon="gui/menu_race_focus.png"
+                         I18N="Main menu button" text="Singleplayer"/>
+            <icon-button id="multiplayer" width="128" height="128"
+                         icon="gui/menu_multi.png" focus_icon="gui/menu_multi_focus.png"
+                         I18N="Main menu button" text="Multiplayer"/>
+            <icon-button id="online" width="128" height="128"
+                         icon="gui/menu_online.png" focus_icon="gui/menu_online_focus.png"
+                         I18N="Main menu button" text="Online"/>
+            <icon-button id="addons" width="128" height="128"
+                         icon="gui/menu_addons.png" focus_icon="gui/menu_addons_focus.png"
+                         I18N="Main menu button"  text="Addons"/>
+        </buttonbar>
+
+        <spacer width="10" height="7%"/>
+
+        <bottombar width="100%" height="10%" layout="horizontal-row">
+
+            <spacer width="10" height="10" />
+
+            <label proportion="3" height="100%" id="info_addons"
+                   I18N="In the main screen"
+                   text=""
+                   align="center" text_align="left" />
+
+            <spacer width="10" height="10" />
+
+            <buttonbar id="menu_bottomrow" x="0" y="0" width="38%" height="100%" align="center">
+                <icon-button id="test_gpwin" width="64" height="64" icon="gui/main_options.png"
+                             raw_text="TEST: GPWin" label_location="hover"/>
+                <icon-button id="test_gplose" width="64" height="64" icon="gui/main_options.png"
+                             raw_text="TEST: GPLose" label_location="hover"/>
+                <icon-button id="test_unlocked" width="64" height="64" icon="gui/main_options.png"
+                             raw_text="TEST: Unlocked" label_location="hover"/>
+                <icon-button id="test_unlocked2" width="64" height="64" icon="gui/main_options.png"
+                             raw_text="TEST: Unlocked 2" label_location="hover"/>
+                <icon-button id="test_intro" width="64" height="64" icon="gui/main_options.png"
+                             raw_text="TEST: Intro" label_location="hover"/>
+                <icon-button id="test_outro" width="64" height="64" icon="gui/main_options.png"
+                             raw_text="TEST: Outro" label_location="hover"/>     
+                <icon-button id="options" width="64" height="64" icon="gui/main_options.png"
+                             I18N="In the main screen"  text="Options" label_location="hover"/>
+                <icon-button id="help" width="64" height="64" icon="gui/main_help.png"
+                             I18N="In the main screen" text="Help" label_location="hover"/>
+                <icon-button id="startTutorial" width="64" height="64" icon="gui/tutorial.png"
+                             I18N="In the main screen" text="Tutorial" label_location="hover"/>
+                <icon-button id="achievements" width="64" height="64" icon="gui/gp_copy.png"
+                             I18N="In the main screen" text="Achievements" label_location="hover"/>
+                <icon-button id="gpEditor" width="64" height="64" icon="gui/gpeditor.png"
+                             I18N="In the main screen" text="Grand Prix Editor" label_location="hover"/>
+                <icon-button id="about" width="64" height="64" icon="gui/main_about.png"
+                             I18N="In the main screen" text="About" label_location="hover"/>
+                <icon-button id="quit" width="64" height="64" icon="gui/main_quit.png"
+                             I18N="In the main screen" text="Quit" label_location="hover"/>
+            </buttonbar>
+        </bottombar>
+    </div>
+</stkgui>

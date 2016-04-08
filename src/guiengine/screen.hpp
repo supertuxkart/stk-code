@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -228,6 +228,10 @@ namespace GUIEngine
           */
         virtual void init();
 
+        /** Displays this screen bu pushing it onto the stack of screen 
+         *  in the state manager. */
+        void push();
+
         /**
           * \brief Callback invoked before leaving this menu.
           *
@@ -307,6 +311,9 @@ namespace GUIEngine
          *  Can be used to set focus for instance.
          */
         virtual void onDialogClose() {}
+
+        /** Callback called when focus changes */
+        virtual void onFocusChanged(Widget* previous, Widget* focus, int playerID) {}
     };
 
     class CutsceneScreen : public Screen

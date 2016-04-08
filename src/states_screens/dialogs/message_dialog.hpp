@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@
 #define HEADER_CONFIRM_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 
 /**
@@ -62,15 +63,16 @@ public:
     };
 
     enum MessageDialogType { MESSAGE_DIALOG_OK, MESSAGE_DIALOG_CONFIRM,
-                             MESSAGE_DIALOG_OK_CANCEL                    };
+                             MESSAGE_DIALOG_OK_CANCEL, MESSAGE_DIALOG_YESNO };
     
+    MessageDialogType m_type;
+
 private:
     
     IConfirmDialogListener* m_listener;
     bool m_own_listener;
     irr::core::stringw m_msg;
-    void doInit(MessageDialogType type, IConfirmDialogListener* listener,
-                bool own_listener);
+    void doInit(bool from_queue);
 
 public:
 
@@ -81,7 +83,8 @@ public:
       *        along with the dialog.
       */
     MessageDialog(const irr::core::stringw &msg, MessageDialogType type,
-                  IConfirmDialogListener* listener, bool delete_listener);
+                  IConfirmDialogListener* listener, bool delete_listener,
+                  bool from_queue = false, float width = 0.6f, float height = 0.6f);
     
     /**
       * Variant of MessageDialog where cancelling is not possible (i.e. just shows a message box with OK)
@@ -91,11 +94,13 @@ public:
     
     ~MessageDialog();
     
-    virtual void onEnterPressedInternal();
-    virtual void onUpdate(float dt);
-    virtual void load();
+    virtual void onEnterPressedInternal() OVERRIDE;
+    virtual void onUpdate(float dt) OVERRIDE;
+    virtual void load() OVERRIDE;
 
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
+
+    virtual void loadedFromFile() OVERRIDE;
 };
 
 

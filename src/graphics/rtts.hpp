@@ -1,4 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,15 +18,19 @@
 #ifndef HEADER_RTTS_HPP
 #define HEADER_RTTS_HPP
 
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/leak_check.hpp"
+
+class FrameBuffer;
 
 namespace irr {
     namespace video {
         class ITexture;
     };
+    namespace scene {
+        class ICameraSceneNode;
+    }
 };
 
 using irr::video::ITexture;
@@ -40,13 +45,14 @@ public:
     FrameBuffer &getShadowFBO() { return *m_shadow_FBO; }
     FrameBuffer &getRH() { return *m_RH_FBO; }
     FrameBuffer &getRSM() { return *m_RSM; }
-    unsigned getShadowDepthTex() const { return shadowDepthTex; }
 
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
     FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
 
-    FrameBuffer* render(scene::ICameraSceneNode* camera, float dt);
+    FrameBuffer* render(irr::scene::ICameraSceneNode* camera, float dt);
+
+    void prepareRender(scene::ICameraSceneNode* camera);
 
 private:
     unsigned RenderTargetTextures[RTT_COUNT];
@@ -56,7 +62,7 @@ private:
     int m_width;
     int m_height;
 
-    unsigned shadowColorTex, shadowNormalTex, shadowDepthTex;
+    unsigned shadowColorTex, shadowDepthTex;
     unsigned RSM_Color, RSM_Normal, RSM_Depth;
     unsigned RH_Red, RH_Green, RH_Blue;
     FrameBuffer* m_shadow_FBO, *m_RSM, *m_RH_FBO;

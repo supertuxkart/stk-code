@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,6 +22,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
+#include <functional>
 
 /**
  * \brief For internal value tweaking
@@ -32,19 +33,23 @@ class DebugSliderDialog : public GUIEngine::ModalDialog
 private:
 
     std::string m_id;
+#if !defined(__APPLE__)
+    std::map<std::string, std::function<void(int)> >Setters;
+#endif
 
 public:
+    DebugSliderDialog();
 
+    ~DebugSliderDialog() {};
+#if !defined(__APPLE__)
+    void setSliderHook(std::string id, unsigned min, unsigned max, std::function<int()> G, std::function<void(int)> S);
+#endif
+    void changeLabel(std::string id, std::string new_label);
 
-    DebugSliderDialog(std::string id, ::core::stringw msg);
-    
-    ~DebugSliderDialog();
-    
     virtual void onEnterPressedInternal() OVERRIDE;
     virtual void onUpdate(float dt) OVERRIDE;
 
-    
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
 };
 
 

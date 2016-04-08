@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -39,7 +39,8 @@ class ThreeStrikesBattle : public WorldWithRank
 private:
     struct BattleInfo
     {
-        int m_lives;
+        int  m_lives;
+        int  m_on_node;
     };
 
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
@@ -70,6 +71,9 @@ private:
 
     PtrVector<TrackObject, REF> m_tires;
 
+    /** Function to update the locations of all karts on the polygon map */
+    void updateKartNodes();
+
 public:
 
     /** Used to show a nice graph when battle is over */
@@ -97,7 +101,6 @@ public:
     virtual void getKartsDisplayInfo(
                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
     virtual bool raceHasLaps(){ return false; }
-    virtual unsigned int getRescuePositionIndex(AbstractKart *kart);
 
     virtual const std::string& getIdent() const;
 
@@ -106,6 +109,7 @@ public:
 
     virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node);
 
+    int getKartNode(unsigned int kart_id) const;
 
     void updateKartRanks();
 };   // ThreeStrikesBattles

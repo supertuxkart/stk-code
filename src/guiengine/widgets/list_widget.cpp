@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,14 +17,14 @@
 
 #include "guiengine/widgets/list_widget.hpp"
 
-#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 
 #include <IGUIElement.h>
 #include <IGUISkin.h>
 #include <IGUIEnvironment.h>
-#include "IGUIFontBitmap.h"
+#include <IGUIFontBitmap.h>
 
 #include <sstream>
 
@@ -236,7 +236,8 @@ void ListWidget::addItem(const std::string& internal_name,
 }
 
 // -----------------------------------------------------------------------------
-void ListWidget::renameCell(const int row_index, const int col_index, const irr::core::stringw newName, const int icon)
+void ListWidget::renameCell(const int row_index, const int col_index, 
+                            const irr::core::stringw &newName, const int icon)
 {
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
@@ -251,13 +252,15 @@ void ListWidget::renameCell(const int row_index, const int col_index, const irr:
 }
 
 // -----------------------------------------------------------------------------
-void ListWidget::renameItem(const int row_index, const irr::core::stringw newName, const int icon)
+void ListWidget::renameItem(const int row_index,
+                            const irr::core::stringw &newName, const int icon)
 {
     renameCell(row_index, 0, newName, icon);
 }
 
 // -----------------------------------------------------------------------------
-void ListWidget::renameItem(const std::string & internal_name, const irr::core::stringw newName, const int icon)
+void ListWidget::renameItem(const std::string &internal_name, 
+                            const irr::core::stringw &newName, const int icon)
 {
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
@@ -456,7 +459,7 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
 }
 
 // -----------------------------------------------------------------------------
-int ListWidget::getItemID(const std::string internalName) const
+int ListWidget::getItemID(const std::string &internalName) const
 {
     const CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);

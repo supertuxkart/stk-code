@@ -1,7 +1,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2009-2013  Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2009-2015  Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -41,7 +41,9 @@ class ModelDefinitionLoader;
 
 #include "graphics/material.hpp"
 #include "items/item.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "tracks/quad_graph.hpp"
+#include "tracks/battle_graph.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/translation.hpp"
 #include "utils/vec3.hpp"
@@ -59,39 +61,19 @@ class TrackObjectManager;
 class TriangleMesh;
 class World;
 class XMLNode;
+class TrackObject;
+
+namespace Scripting
+{
+    class ScriptEngine;
+}
 
 const int HEIGHT_MAP_RESOLUTION = 256;
 
-enum WeatherType
-{
-    WEATHER_NONE,
-    WEATHER_RAIN
-};
-
-struct OverworldForceField
-{
-    core::vector3df m_position;
-    bool m_is_locked;
-    int m_required_points;
-
-    OverworldForceField()
-    {
-    }
-
-    OverworldForceField(core::vector3df position, bool is_locked, int required_points)
-    {
-        m_position = position;
-        m_is_locked = is_locked;
-        m_required_points = required_points;
-    }
-};
+// TODO: eventually remove this and fully replace with scripting
 struct OverworldChallenge
 {
-private:
-    OverworldForceField m_force_field;
-    bool m_force_field_set;
 public:
-
     core::vector3df m_position;
     std::string m_challenge_id;
 
@@ -99,27 +81,6 @@ public:
     {
         m_position = position;
         m_challenge_id = challenge_id;
-        m_force_field_set = false;
-    }
-
-    void setForceField(OverworldForceField f)
-    {
-        m_force_field = f;
-        m_force_field_set = true;
-    }
-
-    OverworldForceField& getForceField()
-    {
-        assert(m_force_field_set);
-        return m_force_field;
-    }
-
-    bool isForceFieldSet() const { return m_force_field_set; }
-
-    const OverworldForceField& getForceField() const
-    {
-        assert(m_force_field_set);
-        return m_force_field;
     }
 };
 
@@ -159,8 +120,6 @@ private:
     /** Will only be used on overworld */
     std::vector<OverworldChallenge> m_challenges;
 
-    std::vector<OverworldForceField> m_force_fields;
-
     std::vector<Subtitle> m_subtitles;
 
     /** Start transforms of karts (either the default, or the ones taken
@@ -171,6 +130,8 @@ private:
     std::string              m_description;
     core::stringw            m_designer;
 
+    /* For running the startup script */
+    bool m_startup_run;
     /** The full filename of the config (xml) file. */
     std::string              m_filename;
 
@@ -183,7 +144,12 @@ private:
 
     /** The list of all nodes that are to be converted into physics,
      *  but not to be drawn (e.g. invisible walls). */
-    std::vector<scene::ISceneNode*> m_all_physics_only_nodes;
+    std::vector<scene::ISceneNode*> m_static_physics_only_nodes;
+
+    /** Same concept but for track objects. stored separately due to different
+      * memory management.
+      */
+    std::vector<scene::ISceneNode*> m_object_physics_only_nodes;
 
     /** The list of all meshes that are loaded from disk, which means
      *  that those meshes are being cached by irrlicht, and need to be freed. */
@@ -238,8 +204,12 @@ private:
     Vec3                     m_aabb_max;
     /** True if this track is an arena. */
     bool                     m_is_arena;
+    /** Max players supported by an arena. */
+    unsigned int             m_max_arena_players;
     /** True if this track has easter eggs. */
     bool                     m_has_easter_eggs;
+    /** True if this track has navmesh. */
+    bool                     m_has_navmesh;
     /** True if this track is a soccer arena. */
     bool                     m_is_soccer;
 
@@ -310,7 +280,8 @@ private:
     ParticleKind*            m_sky_particles;
 
     /** Use a special built-in wheather */
-    WeatherType              m_weather_type;
+    bool                     m_weather_lightning;
+    std::string              m_weather_sound;
 
     /** A simple class to keep information about a track mode. */
     class TrackMode
@@ -382,8 +353,11 @@ private:
     bool m_bloom;
     float m_bloom_threshold;
 
-    bool m_lensflare;
     bool m_godrays;
+    core::vector3df m_godrays_position;
+    float m_godrays_opacity;
+    video::SColor m_godrays_color;
+
     bool m_shadows;
 
     float m_displacement_speed;
@@ -398,25 +372,28 @@ private:
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
 
-    /** The number of laps the track will be raced if no other value is given.*/
+    /** The number of laps the track will be raced in a random GP.
+     * m_actual_number_of_laps is initialised with this value.*/
     int m_default_number_of_laps;
+
+    /** The number of laps that is predefined in a track info dialog. */
+    int m_actual_number_of_laps;
 
     void loadTrackInfo();
     void loadQuadGraph(unsigned int mode_id, const bool reverse);
+    void loadBattleGraph();
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
+    void loadMinimap();
     void createWater(const XMLNode &node);
     void getMusicInformation(std::vector<std::string>&  filenames,
                              std::vector<MusicInformation*>& m_music   );
     void loadCurves(const XMLNode &node);
     void handleSky(const XMLNode &root, const std::string &filename);
-    void loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& lod_loader,
-                     bool create_lod_definitions, scene::ISceneNode* parent,
-                     std::map<std::string, XMLNode*>& library_nodes);
 
 public:
 
-    bool reverseAvailable() { return m_reverse_available; }
+    bool reverseAvailable() const { return m_reverse_available; }
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
 
     static const float NOHIT;
@@ -460,8 +437,23 @@ public:
     /** Returns true if this track has an arena mode. */
     bool isArena() const { return m_is_arena; }
     // ------------------------------------------------------------------------
+    /** Returns true if this track is a racing track. This means it is not an
+     *  internal track (like cut scenes), arena, or soccer field. */
+    bool isRaceTrack() const
+    {
+        return !m_internal && !m_is_arena && !m_is_soccer;
+    }   // isRaceTrack
+    // ------------------------------------------------------------------------
     /** Returns true if this track has easter eggs. */
     bool hasEasterEggs() const { return m_has_easter_eggs; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this track navmesh. */
+    bool hasNavMesh() const { return m_has_navmesh; }
+    // ------------------------------------------------------------------------
+    void loadObjects(const XMLNode* root, const std::string& path,
+        ModelDefinitionLoader& lod_loader, bool create_lod_definitions,
+        scene::ISceneNode* parent, TrackObject* parent_library);
+    // ------------------------------------------------------------------------
     bool               isSoccer             () const { return m_is_soccer; }
     // ------------------------------------------------------------------------
     void               loadTrackModel  (World* parent,
@@ -498,10 +490,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the start coordinates for a kart with a given index.
      *  \param index Index of kart ranging from 0 to kart_num-1. */
-    btTransform        getStartTransform (unsigned int index) const
+    const btTransform& getStartTransform (unsigned int index) const
     {
         if (index >= m_start_transforms.size())
-            Log::fatal("Tracj", "No start position for kart %i.", index);
+            Log::fatal("Track", "No start position for kart %i.", index);
         return m_start_transforms[index];
     }
     // ------------------------------------------------------------------------
@@ -531,7 +523,7 @@ public:
                                 { return m_root+"/"+s; }
     // ------------------------------------------------------------------------
     /** Returns the number of modes available for this track. */
-    unsigned int       getNumberOfModes() const { return m_all_modes.size();  }
+    unsigned int       getNumberOfModes() const { return (unsigned int) m_all_modes.size();  }
     // ------------------------------------------------------------------------
     /** Returns number of completed challenges. */
     unsigned int getNumOfCompletedChallenges();
@@ -548,16 +540,23 @@ public:
     float  getCameraFar() const { return m_camera_far; }
     // ------------------------------------------------------------------------
     /** Returns the triangle mesh for this track. */
+    const TriangleMesh *getPtrTriangleMesh() const { return m_track_mesh; }
     const TriangleMesh& getTriangleMesh() const {return *m_track_mesh; }
     // ------------------------------------------------------------------------
     /** Returns the graphical effect mesh for this track. */
     const TriangleMesh& getGFXEffectMesh() const {return *m_gfx_effect_mesh;}
     // ------------------------------------------------------------------------
+    /** Get the max players supported for this track, for arena only. */
+    unsigned int getMaxArenaPlayers() const
+                                                { return m_max_arena_players; }
+    // ------------------------------------------------------------------------
     /** Get the number of start positions defined in the scene file. */
     unsigned int getNumberOfStartPositions() const
-                                          { return m_start_transforms.size(); }
+                            { return (unsigned int)m_start_transforms.size(); }
     // ------------------------------------------------------------------------
-    WeatherType   getWeatherType          () const { return m_weather_type; }
+    bool getWeatherLightning() {return m_weather_lightning;}
+    // ------------------------------------------------------------------------
+    std::string getWeatherSound() {return m_weather_sound;}
     // ------------------------------------------------------------------------
     ParticleKind* getSkyParticles         () { return m_sky_particles; }
     // ------------------------------------------------------------------------
@@ -565,7 +564,11 @@ public:
     // ------------------------------------------------------------------------
     float getFogStart()  const { return m_fog_start; }
     // ------------------------------------------------------------------------
+    void setFogStart(float start) { m_fog_start = start; }
+    // ------------------------------------------------------------------------
     float getFogEnd()    const { return m_fog_end; }
+    // ------------------------------------------------------------------------
+    void setFogEnd(float end) { m_fog_end = end; }
     // ------------------------------------------------------------------------
     float getFogStartHeight()  const { return m_fog_height_start; }
     // ------------------------------------------------------------------------
@@ -573,7 +576,11 @@ public:
     // ------------------------------------------------------------------------
     float getFogMax()    const { return m_fog_max; }
     // ------------------------------------------------------------------------
+    void setFogMax(float max) { m_fog_max = max; }
+    // ------------------------------------------------------------------------
     video::SColor getFogColor() const { return m_fog_color; }
+    // ------------------------------------------------------------------------
+    void setFogColor(video::SColor& color) { m_fog_color = color; }
     // ------------------------------------------------------------------------
     video::SColor getSunColor() const { return m_sun_diffuse_color; }
     // ------------------------------------------------------------------------
@@ -590,33 +597,67 @@ public:
     /** Returns true if the normals of this track can be smoothed. */
     bool smoothNormals() const { return m_smooth_normals; }
     // ------------------------------------------------------------------------
-    TrackObjectManager* getTrackObjectManager() const {return m_track_object_manager;}
+    /** Returns the track object manager. */
+    TrackObjectManager* getTrackObjectManager() const
+    {
+        return m_track_object_manager;
+    }   // getTrackObjectManager
 
+    // ------------------------------------------------------------------------
     /** Get list of challenges placed on that world. Works only for overworld. */
     const std::vector<OverworldChallenge>& getChallengeList() const
         { return m_challenges; }
 
+    // ------------------------------------------------------------------------
     const std::vector<Subtitle>& getSubtitles() const { return m_subtitles; }
 
+    // ------------------------------------------------------------------------
     bool hasClouds() const { return m_clouds; }
 
-    bool getBloom() const { return m_bloom; }
+    // ------------------------------------------------------------------------
+    bool hasBloom() const { return m_bloom; }
+
+    // ------------------------------------------------------------------------
     float getBloomThreshold() const { return m_bloom_threshold; }
 
+    // ------------------------------------------------------------------------
     /** Return the color levels for color correction shader */
     core::vector3df getColorLevelIn() const { return m_color_inlevel; }
+    // ------------------------------------------------------------------------
     core::vector2df getColorLevelOut() const { return m_color_outlevel; }
-
-    bool hasLensFlare() const { return m_lensflare; }
+    // ------------------------------------------------------------------------
     bool hasGodRays() const { return m_godrays; }
+    // ------------------------------------------------------------------------
+    core::vector3df getGodRaysPosition() const { return m_godrays_position; }
+    // ------------------------------------------------------------------------
+    float getGodRaysOpacity() const { return m_godrays_opacity; }
+    // ------------------------------------------------------------------------
+    video::SColor getGodRaysColor() const { return m_godrays_color; }
+    // ------------------------------------------------------------------------
     bool hasShadows() const { return m_shadows; }
-
+    // ------------------------------------------------------------------------
     void addNode(scene::ISceneNode* node) { m_all_nodes.push_back(node); }
-
-    float getDisplacementSpeed() const { return m_displacement_speed; }
-    float getCausticsSpeed() const { return m_caustics_speed; }
+    // ------------------------------------------------------------------------
+    void addPhysicsOnlyNode(scene::ISceneNode* node)
+    {
+        m_object_physics_only_nodes.push_back(node);
+    }
+    // ------------------------------------------------------------------------
+    float getDisplacementSpeed() const { return m_displacement_speed;    }
+    // ------------------------------------------------------------------------
+    float getCausticsSpeed() const { return m_caustics_speed;        }
+    // ------------------------------------------------------------------------
     const int getDefaultNumberOfLaps() const { return m_default_number_of_laps;}
+    // ------------------------------------------------------------------------
+    const int getActualNumberOfLap() const { return m_actual_number_of_laps; }
+    // ------------------------------------------------------------------------
+    void setActualNumberOfLaps(unsigned int laps)
+                                         { m_actual_number_of_laps = laps; }
+    // ------------------------------------------------------------------------
     bool operator<(const Track &other) const;
+    // ------------------------------------------------------------------------
+    /** Adds mesh to cleanup list */
+    void addCachedMesh(scene::IMesh* mesh) { m_all_cached_meshes.push_back(mesh); }
 };   // class Track
 
 #endif

@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
-//  Copyright (C) 2012-2013 SuperTuxKart-Team
+//  Copyright (C) 2012-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,6 +26,8 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
+#include "input/gamepad_device.hpp"
+#include "input/keyboard_device.hpp"
 #include "input/input.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
@@ -37,11 +39,13 @@
 #include "replay/replay_recorder.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/options_screen_input2.hpp"
+#include "states_screens/options_screen_device.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/debug.hpp"
 #include "utils/string_utils.hpp"
 
 #include <ISceneManager.h>
+#include <ICameraSceneNode.h>
 #include <ISceneNode.h>
 
 #include <map>
@@ -64,7 +68,7 @@ using GUIEngine::EVENT_BLOCK;
 /** Initialise input
  */
 InputManager::InputManager() : m_mode(BOOTSTRAP),
-                               m_mouse_val_x(0), m_mouse_val_y(0)
+                               m_mouse_val_x(-1), m_mouse_val_y(-1)
 {
     m_device_manager = new DeviceManager();
     m_device_manager->initialize();
@@ -105,6 +109,15 @@ void InputManager::handleStaticAction(int key, int value)
         world->onFirePressed(NULL);
     }
 
+
+    if (world != NULL && UserConfigParams::m_artist_debug_mode && 
+        control_is_pressed && value > 0)
+    {
+        if (Debug::handleStaticAction(key))
+            return;
+    }
+
+    // TODO: move debug shortcuts to Debug::handleStaticAction
     switch (key)
     {
 #ifdef DEBUG
@@ -127,6 +140,7 @@ void InputManager::handleStaticAction(int key, int value)
             break;
         }
 #endif
+
         case KEY_CONTROL:
         case KEY_RCONTROL:
         case KEY_LCONTROL:
@@ -136,6 +150,7 @@ void InputManager::handleStaticAction(int key, int value)
             control_is_pressed = value!=0;
             break;
 
+        // Flying up and down
         case KEY_KEY_I:
         {
             if (!world || !UserConfigParams::m_artist_debug_mode) break;
@@ -156,6 +171,95 @@ void InputManager::handleStaticAction(int key, int value)
             kart->flyDown();
             break;
         }
+        // Moving the first person camera
+        case KEY_KEY_W:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.Z = value ? cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
+            break;
+        }
+        case KEY_KEY_S:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.Z = value ? -cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
+            break;
+        }
+        case KEY_KEY_D:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.X = value ? -cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
+            break;
+        }
+        case KEY_KEY_A:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.X = value ? cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
+            break;
+        }
+        case KEY_KEY_R:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.Y = value ? cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
+            break;
+        }
+        case KEY_KEY_F:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *cam = Camera::getActiveCamera();
+            core::vector3df vel(cam->getLinearVelocity());
+            vel.Y = value ? -cam->getMaximumVelocity() : 0;
+            cam->setLinearVelocity(vel);
+            break;
+        }
+        // Rotating the first person camera
+        case KEY_KEY_Q:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *active_cam = Camera::getActiveCamera();
+            active_cam->setAngularVelocity(value ?
+                UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
+            break;
+        }
+        case KEY_KEY_E:
+        {
+            if (!world || !UserConfigParams::m_artist_debug_mode ||
+                UserConfigParams::m_camera_debug != 3) break;
+
+            Camera *active_cam = Camera::getActiveCamera();
+            active_cam->setAngularVelocity(value ?
+                -UserConfigParams::m_fpscam_max_angular_velocity : 0);
+            break;
+        }
+
         case KEY_SNAPSHOT:
         case KEY_PRINT:
             // on windows we don't get a press event, only release.  So
@@ -168,12 +272,12 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
-                
+
                 if (control_is_pressed)
                     kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
                 else
                     kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL, 10000);
-                    
+
 #ifdef FORCE_RESCUE_ON_FIRST_KART
                 // Can be useful for debugging places where the AI gets into
                 // a rescue loop: rescue, drive, crash, rescue to same place
@@ -185,7 +289,7 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
-                
+
                 kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
             }
             break;
@@ -263,8 +367,8 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F10:
             if(world && value)
             {
-                if(control_is_pressed && ReplayRecorder::get())
-                    ReplayRecorder::get()->Save();
+                if(control_is_pressed)
+                    ReplayRecorder::get()->save();
                 else
                     history->Save();
             }
@@ -286,8 +390,7 @@ void InputManager::handleStaticAction(int key, int value)
         default:
             break;
     } // switch
-
-}
+}   // handleStaticAction
 
 //-----------------------------------------------------------------------------
 /**
@@ -298,7 +401,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
                                 int value)
 {
 #if INPUT_MODE_DEBUG
-    std::cout << "INPUT SENSING... ";
+    Log::info("InputManager::inputSensing", "Start sensing input");
 #endif
 
     // don't store if we're trying to do something like bindings keyboard
@@ -310,7 +413,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
         return;
 
 #if INPUT_MODE_DEBUG
-    std::cout << (store_new ? "storing it" : "ignoring it") << "\n";
+    Log::info("InputManager::inputSensing", store_new ? "storing it" : "ignoring it");
 #endif
 
 
@@ -332,7 +435,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
             sensed_input.m_device_id      = deviceID;
             sensed_input.m_button_id      = button;
             sensed_input.m_character      = deviceID;
-            OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+            OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
             return;
         }
         break;
@@ -344,16 +447,12 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
             sensed_input.m_device_id      = deviceID;
             sensed_input.m_button_id      = button;
             sensed_input.m_character      = deviceID;
-            OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+            OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
             return;
         }
         break;
     case Input::IT_STICKMOTION:
         {
-        std::cout << "%% storing new axis binding, value=" << value <<
-            " deviceID=" << deviceID << " button=" << button <<
-            " axisDirection=" <<
-            (axisDirection == Input::AD_NEGATIVE ? "-" : "+") << "\n";
         // We have to save the direction in which the axis was moved.
         // This is done by storing it as a sign (and since button can
         // be zero, we add one before changing the sign).
@@ -383,12 +482,15 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
                                                            : Input::AD_NEGATIVE;
                 sensed_input.m_axis_range     = Input::AR_FULL;
                 sensed_input.m_character      = deviceID;
-                OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+                OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
 
             }
             else m_sensed_input_high_gamepad.insert(input_id);
         }
-        else if ( abs(value) < Input::MAX_VALUE/8.0f )
+        // At least with xbox controller they can come to a 'rest' with a value of
+        // around 6000! So in order to detect that an axis was released, we need to
+        // test with a rather high deadzone value
+        else if ( abs(value) < Input::MAX_VALUE/3.0f )
         {
             if( id_was_high )
             {
@@ -402,7 +504,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
                 sensed_input.m_axis_range     = id_was_zero ? Input::AR_HALF
                                                             : Input::AR_FULL;
                 sensed_input.m_character      = deviceID;
-                OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+                OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
             }
             else if( inverse_id_was_high )
             {
@@ -418,7 +520,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
                 sensed_input.m_axis_range     = id_was_zero ? Input::AR_HALF
                                                             : Input::AR_FULL;
                 sensed_input.m_character      = deviceID;
-                OptionsScreenInput2::getInstance()->gotSensedInput(sensed_input);
+                OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
             }
             else
             {
@@ -474,7 +576,8 @@ int InputManager::getPlayerKeyboardID() const
  */
 void InputManager::dispatchInput(Input::InputType type, int deviceID,
                                  int button,
-                                 Input::AxisDirection axisDirection, int value)
+                                 Input::AxisDirection axisDirection, int value,
+                                 bool shift_mask)
 {
     // Act different in input sensing mode.
     if (m_mode == INPUT_SENSE_KEYBOARD ||
@@ -484,6 +587,9 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
          if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
         {
              GamePadDevice *gPad = m_device_manager->getGamePadFromIrrID(deviceID);
+             // This can happen in case of automatically ignored accelerator
+             // devices, which are not part of stk's gamepad mapping.
+             if (!gPad) return;
              DeviceConfig *conf = gPad->getConfiguration();
              if (!conf->isEnabled())
                  return;
@@ -524,7 +630,17 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         else if (button == KEY_RIGHT)  action = PA_MENU_RIGHT;
         else if (button == KEY_SPACE)  action = PA_MENU_SELECT;
         else if (button == KEY_RETURN) action = PA_MENU_SELECT;
-        else if (button == KEY_TAB)    action = PA_MENU_DOWN;
+        else if (button == KEY_TAB)    
+        {
+            if (shift_mask)
+            {
+                action = PA_MENU_UP;
+            }
+            else
+            {
+                action = PA_MENU_DOWN;
+            }
+        }
 
         if (button == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
         {
@@ -573,8 +689,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                     InputDevice *device = NULL;
                     if (type == Input::IT_KEYBOARD)
                     {
-                        //std::cout << "==== New Player Joining with Key " <<
-                        // button << " ====" << std::endl;
+                        //Log::info("InputManager", "New Player Joining with Key %d", button);
                         device = m_device_manager->getKeyboardFromBtnID(button);
                     }
                     else if (type == Input::IT_STICKBUTTON ||
@@ -585,8 +700,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
                     if (device != NULL)
                     {
-                        KartSelectionScreen::getRunningInstance()->joinPlayer(device,
-                                                                       false );
+                        KartSelectionScreen::getRunningInstance()->joinPlayer(device);
                     }
                 }
                 return; // we're done here, ignore devices that aren't
@@ -596,7 +710,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
         // ... when in-game
         if (StateManager::get()->getGameState() == GUIEngine::GAME &&
-             !GUIEngine::ModalDialog::isADialogActive()                  )
+             !GUIEngine::ModalDialog::isADialogActive()            &&
+             !race_manager->isWatchingReplay() )
         {
             if (player == NULL)
             {
@@ -609,18 +724,23 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
             if (pk == NULL)
             {
-                std::cerr <<
-                    "Error, trying to process action for an unknown player\n";
+                Log::error("InputManager::dispatchInput", "Trying to process "
+                    "action for an unknown player");
                 return;
             }
 
             Controller* controller = pk->getController();
             if (controller != NULL) controller->action(action, abs(value));
         }
+        else if (race_manager->isWatchingReplay())
+        {
+            // Get the first ghost kart
+            World::getWorld()->getKart(0)
+                ->getController()->action(action, abs(value));
+        }
         // ... when in menus
         else
         {
-
             // reset timer when released
             if (abs(value) == 0 &&  type == Input::IT_STICKBUTTON)
             {
@@ -637,16 +757,16 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                     type == Input::IT_STICKBUTTON)
                 {
                     GamePadDevice* gp =
-                        getDeviceList()->getGamePadFromIrrID(deviceID);
+                        getDeviceManager()->getGamePadFromIrrID(deviceID);
 
-                    if (gp != NULL &&
-                        abs(value)>gp->m_deadzone)
+                    // Check for deadzone
+                    if (gp != NULL && gp->moved(value))
                     {
                         //I18N: message shown when an input device is used but
                         // is not associated to any player
                         GUIEngine::showMessage(
-                            _("Ignoring '%s', you needed to join earlier to play!",
-                            irr::core::stringw(gp->m_name.c_str()).c_str())      );
+                            _("Ignoring '%s'. You needed to join earlier to play!",
+                            core::stringw(gp->getName().c_str())));
                     }
                 }
                 return;
@@ -700,8 +820,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 void InputManager::setMasterPlayerOnly(bool enabled)
 {
 #if INPUT_MODE_DEBUG
-    std::cout <<
-        "====== InputManager::setMasterPlayerOnly(" << enabled << ") ======\n";
+    Log::info("InputManager::setMasterPlayerOnly", enabled ? "enabled" : "disabled");
 #endif
     m_master_player_only = enabled;
 }
@@ -771,7 +890,7 @@ EventPropagation InputManager::input(const SEvent& event)
         }
 
         GamePadDevice* gp =
-            getDeviceList()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
+            getDeviceManager()->getGamePadFromIrrID(event.JoystickEvent.Joystick);
 
         if (gp == NULL)
         {
@@ -779,7 +898,7 @@ EventPropagation InputManager::input(const SEvent& event)
             return EVENT_BLOCK;
         }
 
-        for(int i=0; i<gp->m_button_count; i++)
+        for(int i=0; i<gp->getNumberOfButtons(); i++)
         {
             const bool isButtonPressed = event.JoystickEvent.IsButtonPressed(i);
 
@@ -808,7 +927,7 @@ EventPropagation InputManager::input(const SEvent& event)
         // Key value, but do have a value defined in the Char field.
         // So to distinguish them (otherwise [] would both be mapped to
         // the same value 0, which means we can't distinguish which key
-        // was actually pressed anymore). We set bit 10 which should
+        // was actually pressed anymore), we set bit 10 which should
         // allow us to distinguish those artifical keys from the
         // 'real' keys.
         const int key = event.KeyInput.Key ? event.KeyInput.Key
@@ -841,7 +960,8 @@ EventPropagation InputManager::input(const SEvent& event)
             const bool wasInTextBox = GUIEngine::isWithinATextBox();
 
             dispatchInput(Input::IT_KEYBOARD, event.KeyInput.Char, key,
-                          Input::AD_POSITIVE, Input::MAX_VALUE);
+                          Input::AD_POSITIVE, Input::MAX_VALUE,
+                          event.KeyInput.Shift);
 
             // if this action took us into a text box, don't let event continue
             // (FIXME not the cleanest solution)
@@ -870,20 +990,90 @@ EventPropagation InputManager::input(const SEvent& event)
             }
 
             dispatchInput(Input::IT_KEYBOARD, event.KeyInput.Char, key,
-                          Input::AD_POSITIVE, 0);
+                          Input::AD_POSITIVE, 0, event.KeyInput.Shift);
             return EVENT_BLOCK; // Don't propagate key up events
         }
     }
-#if 0 // in case we ever use mouse in-game...
-    else if(event.EventType == EET_MOUSE_INPUT_EVENT)
+    // Use the mouse to change the looking direction when first person view is activated
+    else if (event.EventType == EET_MOUSE_INPUT_EVENT)
     {
         const int type = event.MouseInput.Event;
 
-        if(type == EMIE_MOUSE_MOVED)
+        if (type == EMIE_MOUSE_MOVED)
         {
-            // m_mouse_x = event.MouseInput.X;
-            // m_mouse_y = event.MouseInput.Y;
-            //const int wheel = event.MouseInput.Wheel;
+            if (UserConfigParams::m_camera_debug == 3)
+            {
+                Camera *cam = Camera::getActiveCamera();
+                // Center of the screen
+                core::vector2df screen_size = irr_driver->getCurrentScreenSize();
+                int mid_x = (int) screen_size.X / 2;
+                int mid_y = (int) screen_size.Y / 2;
+                // Relative mouse movement
+                int diff_x = event.MouseInput.X - m_mouse_val_x;
+                int diff_y = event.MouseInput.Y - m_mouse_val_y;
+                float mouse_x = ((float) diff_x) *
+                    UserConfigParams::m_fpscam_direction_speed;
+                float mouse_y = ((float) diff_y) *
+                    -UserConfigParams::m_fpscam_direction_speed;
+
+                // No movement the first time it's used
+                // At the moment there's also a hard limit because the mouse
+                // gets reset to the middle of the screen and sometimes there
+                // are more events fired than expected.
+                if (m_mouse_val_x != -1 &&
+                   (diff_x + diff_y) < 100 && (diff_x + diff_y) > -100)
+                {
+                    // Rotate camera
+                    cam->applyMouseMovement(mouse_x, mouse_y);
+
+                    // Reset mouse position to the middle of the screen when
+                    // the mouse is far away
+                    if (event.MouseInput.X < mid_x / 2 ||
+                        event.MouseInput.X > (mid_x + mid_x / 2) ||
+                        event.MouseInput.Y < mid_y / 2 ||
+                        event.MouseInput.Y > (mid_y + mid_y / 2))
+                    {
+                        irr_driver->getDevice()->getCursorControl()->setPosition(mid_x, mid_y);
+                        m_mouse_val_x = mid_x;
+                        m_mouse_val_y = mid_y;
+                    }
+                    else
+                    {
+                        m_mouse_val_x = event.MouseInput.X;
+                        m_mouse_val_y = event.MouseInput.Y;
+                    }
+                }
+                else
+                {
+                    m_mouse_val_x = event.MouseInput.X;
+                    m_mouse_val_y = event.MouseInput.Y;
+                }
+                return EVENT_BLOCK;
+            }
+            else
+                // Reset mouse position
+                m_mouse_val_x = m_mouse_val_y = -1;
+        }
+        else if (type == EMIE_MOUSE_WHEEL)
+        {
+            if (UserConfigParams::m_camera_debug == 3)
+            {
+                // Use scrolling to change the maximum speed
+                // Only test if it's more or less than 0 as it seems to be not
+                // reliable accross more platforms.
+                Camera *cam = Camera::getActiveCamera();
+                if (event.MouseInput.Wheel < 0)
+                {
+                    float vel = cam->getMaximumVelocity() - 3;
+                    if (vel < 0.0f)
+                        vel = 0.0f;
+                    cam->setMaximumVelocity(vel);
+                }
+                else if (event.MouseInput.Wheel > 0)
+                {
+                    cam->setMaximumVelocity(cam->getMaximumVelocity() + 3);
+                }
+            }
         }
 
         /*
@@ -899,13 +1089,12 @@ EventPropagation InputManager::input(const SEvent& event)
                             how fast.
          */
     }
-#endif
 
     // block events in all modes but initial menus (except in text boxes to
     // allow typing, and except in modal dialogs in-game)
     // FIXME: 1) that's awful logic 2) that's not what the code below does,
     // events are never blocked in menus
-    if (getDeviceList()->getAssignMode() != NO_ASSIGN &&
+    if (getDeviceManager()->getAssignMode() != NO_ASSIGN &&
         !GUIEngine::isWithinATextBox() &&
         (!GUIEngine::ModalDialog::isADialogActive() &&
         StateManager::get()->getGameState() == GUIEngine::GAME))
@@ -955,7 +1144,7 @@ void InputManager::setMode(InputDriverMode new_mode)
     {
         case MENU:
 #if INPUT_MODE_DEBUG
-            std::cout << "====== InputManager::setMode(MENU) ======\n";
+            Log::info("InputManager::setMode", "MENU");
 #endif
             switch (m_mode)
             {
@@ -967,7 +1156,7 @@ void InputManager::setMode(InputDriverMode new_mode)
 
                     // Reset the helper values for the relative mouse movement
                     // supresses to the notification of them as an input.
-                    m_mouse_val_x = m_mouse_val_y = 0;
+                    m_mouse_val_x = m_mouse_val_y = -1;
 
                     //irr_driver->showPointer();
                     m_mode = MENU;
@@ -1017,7 +1206,7 @@ void InputManager::setMode(InputDriverMode new_mode)
             break;
         case INGAME:
 #if INPUT_MODE_DEBUG
-            std::cout << "====== InputManager::setMode(INGAME) ======\n";
+            Log::info("InputManager::setMode", "INGAME");
 #endif
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
@@ -1036,21 +1225,21 @@ void InputManager::setMode(InputDriverMode new_mode)
         case INPUT_SENSE_KEYBOARD:
         case INPUT_SENSE_GAMEPAD:
 #if INPUT_MODE_DEBUG
-            std::cout << "====== InputManager::setMode(INPUT_SENSE_*) ======\n";
+            Log::info("InputManager::setMode", "INPUT_SENSE_*");
 #endif
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);
 
             // Reset the helper values for the relative mouse movement
             // supresses to the notification of them as an input.
-            m_mouse_val_x = m_mouse_val_y = 0;
+            m_mouse_val_x = m_mouse_val_y = -1;
             m_mode        = new_mode;
 
             break;
             /*
         case LOWLEVEL:
 #if INPUT_MODE_DEBUG
-            std::cout << "====== InputManager::setMode(LOWLEVEL) ======\n";
+            Log::info("InputManager::setMode", "LOWLEVEL");
 #endif
             // We must be in menu mode now in order to switch.
             assert (m_mode == MENU);

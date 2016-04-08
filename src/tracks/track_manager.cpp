@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,16 +18,16 @@
 
 #include "tracks/track_manager.hpp"
 
-#include <stdio.h>
-#include <stdexcept>
-#include <algorithm>
-#include <sstream>
-#include <iostream>
-
-#include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
+
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <stdio.h>
 
 TrackManager* track_manager = 0;
 std::vector<std::string>  TrackManager::m_track_search_path;
@@ -56,6 +56,19 @@ void TrackManager::addTrackSearchDir(const std::string &dir)
 {
     m_track_search_path.push_back(dir);
 }   // addTrackDir
+
+//-----------------------------------------------------------------------------
+/** Returns the number of racing tracks. Those are tracks that are not 
+ *  internal (like cut scenes), arenas, or soccer fields.
+ */
+int TrackManager::getNumberOfRaceTracks() const
+{
+    int n=0;
+    for(unsigned int i=0; i<m_tracks.size(); i++)
+        if(m_tracks[i]->isRaceTrack())
+            n++;
+    return n;
+}   // getNumberOfRaceTracks
 
 //-----------------------------------------------------------------------------
 /** Get TrackData by the track identifier.
@@ -194,6 +207,12 @@ bool TrackManager::loadTrack(const std::string& dirname)
     m_tracks.push_back(track);
     m_track_avail.push_back(true);
     updateGroups(track);
+
+    // Populate the texture cache with track screenshots
+    // (internal tracks like end cutscene don't have screenshots)
+    if (!track->isInternal())
+        irr_driver->getTexture(track->getScreenshotFile());
+
     return true;
 }   // loadTrack
 
@@ -291,14 +310,14 @@ void TrackManager::updateGroups(const Track* track)
              (track->isSoccer() ? m_soccer_arena_group_names :
                m_track_group_names));
 
-    const unsigned int groups_amount = new_groups.size();
+    const unsigned int groups_amount = (unsigned int)new_groups.size();
     for(unsigned int i=0; i<groups_amount; i++)
     {
         bool group_exists = group_2_indices.find(new_groups[i])
                                                       != group_2_indices.end();
         if(!group_exists)
             group_names.push_back(new_groups[i]);
-        group_2_indices[new_groups[i]].push_back(m_tracks.size()-1);
+        group_2_indices[new_groups[i]].push_back((int)m_tracks.size()-1);
     }
 }   // updateGroups
 

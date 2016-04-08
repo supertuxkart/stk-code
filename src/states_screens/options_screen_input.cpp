@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,16 +18,17 @@
 #include "states_screens/options_screen_input.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "guiengine/CGUISpriteBank.h"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
-#include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "input/gamepad_device.hpp"
+#include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
-#include "states_screens/options_screen_input2.hpp"
+#include "states_screens/options_screen_device.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/options_screen_ui.hpp"
@@ -81,7 +82,7 @@ void OptionsScreenInput::buildDeviceList()
     assert( m_icon_bank != NULL );
     devices->setIcons(m_icon_bank);
 
-    const int keyboard_config_count = input_manager->getDeviceList()->getKeyboardConfigAmount();
+    const int keyboard_config_count = input_manager->getDeviceManager()->getKeyboardConfigAmount();
 
     for (int i=0; i<keyboard_config_count; i++)
     {
@@ -96,11 +97,11 @@ void OptionsScreenInput::buildDeviceList()
         devices->addItem(internal_name, (core::stringw("   ") + _("Keyboard %i", i)).c_str(), 0 /* icon */);
     }
 
-    const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();
+    const int gpad_config_count = input_manager->getDeviceManager()->getGamePadConfigAmount();
 
     for (int i = 0; i < gpad_config_count; i++)
     {
-        GamepadConfig *config = input_manager->getDeviceList()->getGamepadConfig(i);
+        GamepadConfig *config = input_manager->getDeviceManager()->getGamepadConfig(i);
 
         // Don't display the configuration if a matching device is not available
         if (config->isPlugged())
@@ -132,7 +133,8 @@ void OptionsScreenInput::init()
 {
     Screen::init();
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
-    if (tabBar != NULL)  tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
+    assert(tabBar != NULL);
+    tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
 
     tabBar->getRibbonChildren()[0].setTooltip( _("Graphics") );
     tabBar->getRibbonChildren()[1].setTooltip( _("Audio") );
@@ -155,14 +157,8 @@ void OptionsScreenInput::init()
     eventCallback(devices, name2, PLAYER_ID_GAME_MASTER);
      */
     // Disable adding keyboard configurations
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        getWidget<ButtonWidget>("add_device")->setDeactivated();
-    }
-    else
-    {
-        getWidget<ButtonWidget>("add_device")->setActivated();
-    }
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    getWidget<ButtonWidget>("add_device")->setActive(!in_game);
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -229,13 +225,14 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
             read = sscanf( selection.c_str(), "gamepad%i", &i );
             if (read == 1 && i != -1)
             {
-                OptionsScreenInput2::getInstance()->setDevice( input_manager->getDeviceList()->getGamepadConfig(i) );
-                StateManager::get()->replaceTopMostScreen(OptionsScreenInput2::getInstance());
+                OptionsScreenDevice::getInstance()->setDevice( input_manager->getDeviceManager()->getGamepadConfig(i) );
+                StateManager::get()->replaceTopMostScreen(OptionsScreenDevice::getInstance());
                 //updateInputButtons( input_manager->getDeviceList()->getGamepadConfig(i) );
             }
             else
             {
-                std::cerr << "Cannot read internal gamepad input device ID : " << selection.c_str() << std::endl;
+                Log::error("OptionsScreenInput", "Cannot read internal gamepad input device ID: %s",
+                    selection.c_str());
             }
         }
         else if (selection.find("keyboard") != std::string::npos)
@@ -245,17 +242,19 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
             if (read == 1 && i != -1)
             {
                 // updateInputButtons( input_manager->getDeviceList()->getKeyboardConfig(i) );
-                OptionsScreenInput2::getInstance()->setDevice( input_manager->getDeviceList()->getKeyboardConfig(i) );
-                StateManager::get()->replaceTopMostScreen(OptionsScreenInput2::getInstance());
+                OptionsScreenDevice::getInstance()
+                    ->setDevice( input_manager->getDeviceManager()->getKeyboardConfig(i) );
+                StateManager::get()->replaceTopMostScreen(OptionsScreenDevice::getInstance());
             }
             else
             {
-                std::cerr << "Cannot read internal keyboard input device ID : " << selection.c_str() << std::endl;
+                Log::error("OptionsScreenInput", "Cannot read internal keyboard input device ID: %s",
+                    selection.c_str());
             }
         }
         else
         {
-            std::cerr << "Cannot read internal input device ID : " << selection.c_str() << std::endl;
+            Log::error("OptionsScreenInput", "Cannot read internal input device ID: %s", selection.c_str());
         }
     }
 
@@ -275,12 +274,11 @@ void OptionsScreenInput::filterInput(Input::InputType type,
                                      int deviceID,
                                      int btnID,
                                      int axisDir,
-                                     int axisRange,
                                      int value)
 {
     if (type == Input::IT_STICKMOTION || type == Input::IT_STICKBUTTON)
     {
-        GamePadDevice* gamepad = input_manager->getDeviceList()->getGamePadFromIrrID(deviceID);
+        GamePadDevice* gamepad = input_manager->getDeviceManager()->getGamePadFromIrrID(deviceID);
         if (gamepad != NULL && gamepad->getConfiguration() != NULL)
         {
             //printf("'%s'\n", gamepad->getConfiguration()->getName().c_str());
@@ -289,10 +287,10 @@ void OptionsScreenInput::filterInput(Input::InputType type,
             assert(devices != NULL);
 
             std::string internal_name;
-            const int gpad_config_count = input_manager->getDeviceList()->getGamePadConfigAmount();
+            const int gpad_config_count = input_manager->getDeviceManager()->getGamePadConfigAmount();
             for (int i = 0; i < gpad_config_count; i++)
             {
-                GamepadConfig *config = input_manager->getDeviceList()->getGamepadConfig(i);
+                GamepadConfig *config = input_manager->getDeviceManager()->getGamepadConfig(i);
 
                 // Don't display the configuration if a matching device is not available
                 if (config == gamepad->getConfiguration())

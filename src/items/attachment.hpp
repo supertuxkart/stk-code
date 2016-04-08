@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2013 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -130,8 +130,7 @@ public:
     AbstractKart* getPreviousOwner() const { return m_previous_owner; }
     // ------------------------------------------------------------------------
     /** Returns additional weight for the kart. */
-    float weightAdjust() const {
-        return m_type==ATTACH_ANVIL ? stk_config->m_anvil_weight : 0.0f; }
+    float weightAdjust() const;
     // ------------------------------------------------------------------------
     /** Return the currently associated scene node (used by e.g the swatter) */
     scene::IAnimatedMeshSceneNode* getNode() {return m_node;}

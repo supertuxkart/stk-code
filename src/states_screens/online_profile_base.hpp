@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -30,19 +30,19 @@ namespace GUIEngine { class Widget; }
 
 
 /** Online profile base screen. Used for displaying friends, achievements,
- *  overview, and settings. It handles the tabs which are common to each
+ *  and settings. It handles the tabs which are common to each
  *  of those screens, and keeps track of the profile to display.
  * \ingroup states_screens
  */
 class OnlineProfileBase : public GUIEngine::Screen
 {
 protected:
-    OnlineProfileBase(const char* filename);
+    OnlineProfileBase(const std::string &filename);
 
     /** Pointer to the various widgets on the screen. */
     GUIEngine::LabelWidget * m_header;
     GUIEngine::RibbonWidget* m_profile_tabs;
-    GUIEngine::IconButtonWidget * m_overview_tab;
+    GUIEngine::IconButtonWidget * m_servers_tab;
     GUIEngine::IconButtonWidget * m_friends_tab;
     GUIEngine::IconButtonWidget * m_achievements_tab;
     GUIEngine::IconButtonWidget * m_settings_tab;
@@ -62,6 +62,8 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
+
+    virtual bool onEscapePressed() OVERRIDE;
 
     virtual void beforeAddingWidget() OVERRIDE;
 };

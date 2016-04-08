@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -81,7 +81,7 @@ RubberBall::RubberBall(AbstractKart *kart)
     m_height_timer       = 0.0f;
     m_interval           = m_st_interval;
     m_current_max_height = m_max_height;
-    m_ping_sfx           = sfx_manager->createSoundSource("ball_bounce");
+    m_ping_sfx           = SFXManager::get()->createSoundSource("ball_bounce");
     // Just init the previoux coordinates with some value that's not getXYZ()
     m_previous_xyz       = m_owner->getXYZ();
     m_previous_height    = 2.0f;  //
@@ -108,9 +108,9 @@ RubberBall::RubberBall(AbstractKart *kart)
  */
 RubberBall::~RubberBall()
 {
-    if(m_ping_sfx->getStatus()==SFXManager::SFX_PLAYING)
+    if(m_ping_sfx->getStatus()==SFXBase::SFX_PLAYING)
         m_ping_sfx->stop();
-    sfx_manager->deleteSFX(m_ping_sfx);
+    m_ping_sfx->deleteSFX();
 }   // ~RubberBall
 
 // ----------------------------------------------------------------------------
@@ -303,7 +303,7 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
  */
 bool RubberBall::updateAndDelete(float dt)
 {
-     LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
+    LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
     // FIXME: what does the rubber ball do in case of battle mode??
     if(!world) return true;
 
@@ -431,10 +431,11 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
     // If ball is close to the target, then explode
     if (diff.length() < m_target->getKartLength()) 
         hit((AbstractKart*)m_target);
-    
-    assert(!isnan((*next_xyz)[0]));
-    assert(!isnan((*next_xyz)[1]));
-    assert(!isnan((*next_xyz)[2]));
+
+    assert(!std::isnan((*next_xyz)[0]));
+    assert(!std::isnan((*next_xyz)[1]));
+    assert(!std::isnan((*next_xyz)[2]));
+
 }   // moveTowardsTarget
 
 // ----------------------------------------------------------------------------
@@ -471,9 +472,9 @@ void RubberBall::interpolate(Vec3 *next_xyz, float dt)
                       + (-  m_control_points[0] +  m_control_points[2])*m_t
                       +   2*m_control_points[1]                              );
                       
-    assert(!isnan((*next_xyz)[0]));
-    assert(!isnan((*next_xyz)[1]));
-    assert(!isnan((*next_xyz)[2]));
+    assert(!std::isnan((*next_xyz)[0]));
+    assert(!std::isnan((*next_xyz)[1]));
+    assert(!std::isnan((*next_xyz)[2]));
 }   // interpolate
 
 // ----------------------------------------------------------------------------
@@ -538,9 +539,9 @@ float RubberBall::updateHeight()
     if(m_height_timer>m_interval)
     {
         m_height_timer -= m_interval;
-        if(m_ping_sfx->getStatus()!=SFXManager::SFX_PLAYING)
+        if(m_ping_sfx->getStatus()!=SFXBase::SFX_PLAYING)
         {
-            m_ping_sfx->position(getXYZ());
+            m_ping_sfx->setPosition(getXYZ());
             m_ping_sfx->play();
         }
 

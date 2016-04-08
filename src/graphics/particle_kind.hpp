@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013  Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2011-2015  Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -99,6 +99,13 @@ private:
     float m_scale_affector_factor_x;
     float m_scale_affector_factor_y;
 
+    /** The particle's billboards should face the
+        player by rotating around the Y axis only */
+    bool m_vertical_particles;
+
+    /** Used mainly for weather, like snow */
+    bool m_randomize_initial_y;
+
 public:
 
     /**
@@ -106,7 +113,7 @@ public:
       * @param file Name of the file to load (no full path)
       * @throw std::runtime_error If the file cannot be found or is heavily malformed
       */
-    ParticleKind(const std::string file);
+    ParticleKind(const std::string &file);
     virtual     ~ParticleKind() {}
 
 
@@ -161,7 +168,11 @@ public:
 
     bool      getFlips() const { return m_flips; }
 
-    std::string getName() const { return m_name; }
+    bool      isVerticalParticles() const { return m_vertical_particles; }
+
+    bool      randomizeInitialY() const { return m_randomize_initial_y; }
+
+    const std::string& getName() const { return m_name; }
 };
 
 #endif

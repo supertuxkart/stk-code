@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -141,14 +141,8 @@ void RibbonWidget::add()
         total_needed_space += m_active_children[i].m_w;
     }
 
-    int free_w_space = m_w - total_needed_space;
-
     //int biggest_y = 0;
     const int button_y = 10;
-    float global_zoom = 1;
-
-    const int min_free_space = 50;
-    global_zoom = (float)m_w / (float)( m_w - free_w_space + min_free_space );
 
     const int one_button_space =
         int(roundf((float)m_w / (float)subbuttons_amount));
@@ -268,6 +262,7 @@ void RibbonWidget::add()
                 label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
                 label->setTabStop(false);
                 label->setNotClipped(true);
+                label->setRightToLeft(translations->isRTLText(message));
                 m_labels.push_back(label);
 
                 subbtn->setTabStop(false);
@@ -320,22 +315,10 @@ void RibbonWidget::add()
 
             float image_h = (float)image->getSize().Height;
             float image_w = image_h*imageRatio;
-
-            // scale to fit (FIXME: calculate the right value directly...)
-            float zoom = global_zoom;
-
-            if (button_y + image_h*zoom + needed_space_under_button > m_h)
-            {
-                // scale down
-                while (button_y + image_h*zoom +
-                       needed_space_under_button > m_h)  zoom -= 0.01f;
-            }
-            else
-            {
-                // scale up
-                while (button_y + image_h*zoom +
-                       needed_space_under_button < m_h)  zoom += 0.01f;
-            }
+            float zoom = (float) (m_h - button_y - needed_space_under_button) / image_h;
+            float zoom_x = (float) one_button_space / image_w;
+            if(zoom_x < zoom)
+                zoom = zoom_x;
 
             // ---- add bitmap button part
             // backup and restore position in case the same object is added
@@ -387,11 +370,14 @@ void RibbonWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
     updateSelection();
+
+    if (!m_is_visible)
+        setVisible(false);
 }   // add
 
 // ----------------------------------------------------------------------------
 
-void RibbonWidget::addTextChild(const wchar_t* text, const std::string id)
+void RibbonWidget::addTextChild(const wchar_t* text, const std::string &id)
 {
     // This method should only be called BEFORE a widget is added
     assert(m_element == NULL);
@@ -443,8 +429,7 @@ void RibbonWidget::removeChildNamed(const char* name)
     // This method should only be called BEFORE a widget is added
     assert(m_element == NULL);
 
-    Widget* child;
-    for_in (child, m_children)
+    for (Widget* child : m_children)
     {
         if (child->m_properties[PROP_ID] == name)
         {
@@ -475,9 +460,11 @@ void RibbonWidget::select(std::string item, const int mousePlayerID)
 // ----------------------------------------------------------------------------
 EventPropagation RibbonWidget::rightPressed(const int playerID)
 {
-    if (m_deactivated) return EVENT_LET;
+    EventPropagation result = m_ribbon_type != RIBBON_TOOLBAR ? EVENT_LET : EVENT_BLOCK;
+    
+    if (m_deactivated) return result;
     // empty ribbon, or only one item (can't move right)
-    if (m_active_children.size() < 2) return EVENT_LET;
+    if (m_active_children.size() < 2) return result;
 
     m_selection[playerID]++;
 
@@ -507,15 +494,17 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
         }
     }
 
-    return m_ribbon_type != RIBBON_TOOLBAR ? EVENT_LET : EVENT_BLOCK;
+    return result;
 }   // rightPressed
 
 // ----------------------------------------------------------------------------
 EventPropagation RibbonWidget::leftPressed(const int playerID)
 {
-    if (m_deactivated) return EVENT_LET;
+    EventPropagation result = m_ribbon_type != RIBBON_TOOLBAR ? EVENT_LET : EVENT_BLOCK;
+    
+    if (m_deactivated) return result;
     // empty ribbon, or only one item (can't move left)
-    if (m_active_children.size() < 2) return EVENT_LET;
+    if (m_active_children.size() < 2) return result;
 
     m_selection[playerID]--;
     if (m_selection[playerID] < 0)
@@ -544,15 +533,12 @@ EventPropagation RibbonWidget::leftPressed(const int playerID)
         if (m_selection[playerID] > 0) leftPressed(playerID);
     }
 
-    if (m_ribbon_type != RIBBON_TOOLBAR)
-    {
+    //if (m_ribbon_type != RIBBON_TOOLBAR)
+    //{
         //GUIEngine::transmitEvent( this, m_properties[PROP_ID], playerID );
-        return EVENT_LET;
-    }
-    else
-    {
-        return EVENT_BLOCK;
-    }
+    //}
+
+    return result;
 }   // leftPressed
 
 // ----------------------------------------------------------------------------
@@ -577,7 +563,9 @@ EventPropagation RibbonWidget::focused(const int playerID)
     {
         if (m_selection[playerID] != -1)
         {
-            m_active_children.get(m_selection[playerID])->focused(playerID);
+            int selection = m_selection[playerID];
+            if (selection < (int)m_active_children.size())
+                m_active_children.get(selection)->focused(playerID);
         }
     }
 
@@ -612,7 +600,7 @@ EventPropagation RibbonWidget::mouseHovered(Widget* child,
 
     if (m_ribbon_type == RIBBON_COMBO || m_ribbon_type == RIBBON_TABS)
     {
-        //std::cout << "SETTING m_mouse_focus\n";
+        //Log::info("RibbonWidget", "Setting m_mouse_focus");
         m_mouse_focus = child;
     }
 
@@ -660,7 +648,6 @@ void RibbonWidget::updateSelection()
 
     // FIXME: m_selection, m_selected, m_mouse_focus... what a mess...
 
-    //std::cout << "----\n";
     // Update selection flags for mouse player
     for (unsigned int p=0; p<MAX_PLAYER_COUNT; p++)
     {
@@ -706,7 +693,8 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w,
     // bring focus back to enclosing ribbon widget
     this->setFocusForPlayer( playerID );
 
-    if (m_selection[playerID] != -1)
+    if (m_selection[playerID] > -1 && 
+        m_selection[playerID] < (int)(m_active_children.size()))
     {
         if (m_active_children[m_selection[playerID]].m_deactivated)
         {
@@ -723,16 +711,34 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w,
 // ----------------------------------------------------------------------------
 void RibbonWidget::setLabel(const unsigned int id, irr::core::stringw new_name)
 {
-    // This method should only be called AFTER a widget is added
-    assert(m_element != NULL);
+    if (m_element == NULL)
+    {
+        // before adding
+        m_children[id].setText(new_name);
+    }
+    else
+    {
+        // after adding
+        // ignore this call for ribbons without labels
+        if (m_labels.size() == 0) return;
+
+        assert(id < m_labels.size());
+        m_labels[id].setText(new_name.c_str());
+        //m_text = new_name;
+    }
+}   // setLabel
+
+// ----------------------------------------------------------------------------
+
+void RibbonWidget::setItemVisible(const unsigned int id, bool visible)
+{
+    m_children[id].setVisible(visible);
 
     // ignore this call for ribbons without labels
     if (m_labels.size() == 0) return;
 
-    assert(id < m_labels.size());
-    m_labels[id].setText( new_name.c_str() );
-    m_text = new_name;
-}   // setLabel
+    m_labels[id].setVisible(visible);
+} // RibbonWidget
 
 // ----------------------------------------------------------------------------
 int RibbonWidget::findItemNamed(const char* internalName)

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -39,7 +39,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
                                                bool direct_hit)
 {
     if(kart->isInvulnerable()) return NULL;
-    
+
     float r = kart->getKartProperties()->getExplosionRadius();
 
     // Ignore explosion that are too far away.
@@ -78,7 +78,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     m_xyz = m_kart->getXYZ();
     m_orig_xyz = m_xyz;
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
-    m_timer     = m_kart->getKartProperties()->getExplosionTime();
+    m_timer = m_kart->getKartProperties()->getExplosionDuration();
 
     // Non-direct hits will be only affected half as much.
     if(!direct_hit) m_timer*=0.5f;
@@ -107,11 +107,8 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     // Set invulnerable time, and graphical effects
     float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
     m_kart->setInvulnerableTime(t);
-    if ( UserConfigParams::m_graphical_effects )
-    {
-        m_kart->showStarEffect(t);
-    }
-
+    m_kart->showStarEffect(t);
+    
     m_kart->getAttachment()->clear();
 
  };   // ExplosionAnimation

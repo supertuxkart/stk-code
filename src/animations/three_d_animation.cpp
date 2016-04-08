@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013  Joerg Henrichs
+//  Copyright (C) 2009-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -40,6 +40,7 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node, TrackObject* object) : Ani
 {
     m_object = object;
 
+    m_is_paused = false;
     m_crash_reset  = false;
     m_explode_kart = false;
     m_flatten_kart = false;
@@ -55,9 +56,9 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node, TrackObject* object) : Ani
                         object->getInitRotation() );
     m_hpr = object->getInitRotation();
 
-    assert(!isnan(m_hpr.getX()));
-    assert(!isnan(m_hpr.getY()));
-    assert(!isnan(m_hpr.getZ()));
+    assert(!std::isnan(m_hpr.getX()));
+    assert(!std::isnan(m_hpr.getY()));
+    assert(!std::isnan(m_hpr.getZ()));
 }   // ThreeDAnimation
 
 // ----------------------------------------------------------------------------
@@ -77,6 +78,9 @@ void ThreeDAnimation::update(float dt)
         Vec3 xyz   = m_object->getPosition();
         Vec3 scale = m_object->getScale();
 
+        //make the object think no time has passed to pause it's animation
+        if (m_is_paused)dt = 0;
+
         AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
         //m_node->setPosition(xyz.toIrrVector());
         //m_node->setScale(scale.toIrrVector());
@@ -90,9 +94,9 @@ void ThreeDAnimation::update(float dt)
         core::matrix4 m;
         m.makeIdentity();
         core::matrix4 mx;
-        assert(!isnan(m_hpr.getX()));
-        assert(!isnan(m_hpr.getY()));
-        assert(!isnan(m_hpr.getZ()));
+        assert(!std::isnan(m_hpr.getX()));
+        assert(!std::isnan(m_hpr.getY()));
+        assert(!std::isnan(m_hpr.getZ()));
         mx.setRotationDegrees(core::vector3df(m_hpr.getX(), 0, 0));
         core::matrix4 my;
         my.setRotationDegrees(core::vector3df(0, m_hpr.getY(), 0));
@@ -104,7 +108,7 @@ void ThreeDAnimation::update(float dt)
 
         if (m_object)
         {
-            m_object->move(xyz.toIrrVector(), hpr, scale.toIrrVector(), true);
+            m_object->move(xyz.toIrrVector(), hpr, scale.toIrrVector(), true, false);
         }
     }
 }   // update

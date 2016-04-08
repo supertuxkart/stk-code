@@ -1,19 +1,29 @@
-uniform sampler2D Albedo;
-
-#if __VERSION__ >= 130
-in vec2 uv;
-out vec4 FragColor;
+#ifdef Use_Bindless_Texture
+layout(bindless_sampler) uniform sampler2D Albedo;
+layout(bindless_sampler) uniform sampler2D SpecMap;
 #else
-varying vec2 uv;
-#define FragColor gl_FragColor
+uniform sampler2D Albedo;
+uniform sampler2D SpecMap;
 #endif
 
-vec3 getLightFactor(float specMapValue);
+in vec2 uv;
+in vec4 color;
+out vec4 FragColor;
+
+vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue);
 
 void main(void)
 {
-    vec4 color = texture(Albedo, uv);
-    if (color.a < 0.5) discard;
-    vec3 LightFactor = getLightFactor(1.);
-    FragColor = vec4(color.xyz * LightFactor, 1.);
+    vec4 col = texture(Albedo, uv);
+#ifdef Use_Bindless_Texture
+#ifdef SRGBBindlessFix
+    col.xyz = pow(col.xyz, vec3(2.2));
+#endif
+#endif
+    col.xyz *= pow(color.xyz, vec3(2.2));
+    if (col.a * color.a < 0.5) discard;
+    float specmap = texture(SpecMap, uv).g;
+    float emitmap = texture(SpecMap, uv).b;
+    
+    FragColor = vec4(getLightFactor(col.xyz, vec3(1.), specmap, emitmap), 1.);
 }

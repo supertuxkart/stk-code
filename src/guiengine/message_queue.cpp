@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014 Joerg Henrichs
+//  Copyright (C) 2014-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -52,6 +52,10 @@ public:
         m_message      = message;
         if(mt==MessageQueue::MT_ACHIEVEMENT)
             m_render_type = "achievement-message::neutral";
+        else if (mt==MessageQueue::MT_ERROR)
+            m_render_type = "error-message::neutral";
+        else if (mt==MessageQueue::MT_GENERIC)
+            m_render_type = "generic-message::neutral";
         else
             m_render_type = "friend-message::neutral";
     }   // Message
@@ -77,7 +81,7 @@ class CompareMessages
 public:
     /** Used to sort messages by priority in the priority queue. Achievement
      * messages (1) need to have a higher priority than friend messages
-     * (value 0). */
+     * (value 0), and errors (3) the highest priority. */
     bool operator() (const Message *a, const Message *b) const
     {
         return a->getMessageType() < b->getMessageType();
@@ -95,7 +99,7 @@ std::priority_queue<Message*, std::vector<Message*>,
 float        g_current_display_time = -1.0f;
 
 /** How long the current message should be displaed. */
-float        g_max_display_time     = -1.0f;
+float        g_max_display_time     = 5.0f;
 
 /** The label widget used to show the current message. */
 SkinWidgetContainer *g_container    = NULL;
@@ -122,6 +126,16 @@ void createLabel(const Message *message)
 }   // createLabel
 
 // ----------------------------------------------------------------------------
+/** Called when the screen resolution is changed to compute the new
+ *  position of the message. */
+void updatePosition()
+{
+    if (g_all_messages.empty()) return;
+    Message *last = g_all_messages.top();
+    createLabel(last);
+}   // updatePosition
+
+// ----------------------------------------------------------------------------
 /** Adds a message to the message queue.
  *  \param mt The MessageType of the message.
  *  \param message The actual message.
@@ -129,7 +143,7 @@ void createLabel(const Message *message)
 void add(MessageType mt, const irr::core::stringw &message)
 {
     Message *m = new Message(mt, message);
-    if(g_all_messages.size()==0)
+    if(g_all_messages.empty())
     {
         // Indicate that there is a new message, which should
         // which needs a new label etc. to be computed.
@@ -147,7 +161,7 @@ void add(MessageType mt, const irr::core::stringw &message)
  */
 void update(float dt)
 {
-    if(g_all_messages.size()==0) return;
+    if(g_all_messages.empty()) return;
 
     g_current_display_time += dt;
     if(g_current_display_time > g_max_display_time)
@@ -155,7 +169,7 @@ void update(float dt)
         Message *last = g_all_messages.top();
         g_all_messages.pop();
         delete last;
-        if(g_all_messages.size()==0) return;
+        if(g_all_messages.empty()) return;
         g_current_display_time = -1.0f;
     }
 

@@ -1,9 +1,9 @@
 
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013  Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2013  Eduardo Hernandez Munoz
-//  Copyright (C) 2010-2013  Joerg Henrichs
+//  Copyright (C) 2004-2015  Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015  Eduardo Hernandez Munoz
+//  Copyright (C) 2010-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,9 +20,30 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef HEADER_SKIDDING_AI_HPP
-#define HEADER_SKIDDING_AI__HPP
+#define HEADER_SKIDDING_AI_HPP
 
-#include "karts/controller/ai_base_controller.hpp"
+// Some debugging features for the AI. For example you can visualise the
+// point the AI is aiming at, or visualise the curve the AI is predicting.
+// It works best with just 1 AI kart, so set the number of karts
+// to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
+// Or use --profile-laps=99 and run just one AI. Using the debug camera
+// (top view) is useful, too
+
+#ifdef DEBUG
+   // Enable AI graphical debugging
+#  undef AI_DEBUG
+   // Shows left and right lines when using new findNonCrashing function
+#  undef AI_DEBUG_NEW_FIND_NON_CRASHING
+   // Show the predicted turn circles
+#  undef AI_DEBUG_CIRCLES
+   // Show the heading of the kart
+#  undef AI_DEBUG_KART_HEADING
+   // Shows line from kart to its aim point
+#  undef AI_DEBUG_KART_AIM
+#endif
+
+
+#include "karts/controller/ai_base_lap_controller.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/graph_node.hpp"
 #include "utils/random_generator.hpp"
@@ -73,7 +94,7 @@ the AI does the following steps:
     behaviour.
     The function handleSteering() then calls setSteering() to set the
     actually steering amount. The latter function also decides if skidding
-    should be done or not (by calling doSkid()).
+    should be done or not (by calling canSkid()).
   - decide if to try to collect or avoid items (handeItems).
     It considers all items on quads between the current quad of the kart
     and the quad the AI is aiming at (see handleSteering). If it finds
@@ -90,7 +111,7 @@ the AI does the following steps:
 
 \ingroup controller
 */
-class SkiddingAI : public AIBaseController
+class SkiddingAI : public AIBaseLapController
 {
 private:
 
@@ -124,10 +145,10 @@ private:
 
     /** The actual start delay used. */
     float m_start_delay;
-  
+
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
-  
+
     float m_time_since_stuck;
 
     /** Direction of crash: -1 = left, 1 = right, 0 = no crash. */
@@ -199,7 +220,7 @@ private:
     enum {PSA_DEFAULT, PSA_FIXED, PSA_NEW}
           m_point_selection_algorithm;
 
-#ifdef DEBUG
+#ifdef AI_DEBUG
     /** For skidding debugging: shows the estimated turn shape. */
     ShowCurve **m_curve;
 
@@ -249,7 +270,7 @@ private:
                               const Vec3 &end,
                               Vec3 *center,
                               float *radius);
-    virtual bool doSkid(float steer_fraction);
+    virtual bool canSkid(float steer_fraction);
     virtual void setSteering(float angle, float dt);
     void handleCurve();
 

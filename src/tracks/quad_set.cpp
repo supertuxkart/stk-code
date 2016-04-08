@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -59,7 +59,7 @@ void QuadSet::getPoint(const XMLNode *xml, const std::string &attribute_name,
 {
     std::string s;
     xml->get(attribute_name, &s);
-    int pos=s.find_first_of(":");
+    int pos=(int)s.find_first_of(":");
     if(pos>0)   // n:p specification
     {
         std::vector<std::string> l = StringUtils::split(s, ':');

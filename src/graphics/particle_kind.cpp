@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013  Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2011-2015  Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,8 +27,9 @@
 
 #include <stdexcept>
 
-ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,255,255),
-    m_max_start_color(255,255,255,255), m_name(file)
+ParticleKind::ParticleKind(const std::string &file) 
+            : m_min_start_color(255,255,255,255),
+              m_max_start_color(255,255,255,255), m_name(file)
 {
     // ---- Initial values to prevent readin uninitialized values
     m_max_size       = 0.5f;
@@ -52,12 +53,13 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_fade_away_end    = -1.0f;
     m_force_lost_to_gravity_time = 1000;
     m_emission_decay_rate = 0;
-    m_has_scale_affector = NULL;
+    m_has_scale_affector = false;
     m_scale_affector_factor_x = 0.0f;
     m_scale_affector_factor_y = 0.0f;
-    m_wind_speed     = 0;
-    m_flips          = false;
-
+    m_wind_speed = 0;
+    m_flips = false;
+    m_vertical_particles = false;
+    m_randomize_initial_y = false;
 
     // ----- Read XML file
 
@@ -80,6 +82,8 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
 
     std::string emitterShape = "point";
     xml->get("emitter", &emitterShape);
+
+    xml->get("randomize-initial-y", &m_randomize_initial_y);
 
     if (emitterShape == "point")
     {
@@ -236,6 +240,12 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     }
 
     // ------------------------------------------------------------------------
+
+    const XMLNode* orientation = xml->getNode("orientation");
+    if (orientation != NULL)
+    {
+        orientation->get("vertical", &m_vertical_particles);
+    }
 
     delete xml;
 }

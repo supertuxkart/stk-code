@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,8 +20,9 @@
 #include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/connect_to_server.hpp"
-#include "online/servers_manager.hpp"
+#include "network/protocols/request_connection.hpp"
+#include "network/servers_manager.hpp"
+#include "network/stk_host.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
@@ -36,22 +37,38 @@ using namespace irr::gui;
 using namespace Online;
 
 // -----------------------------------------------------------------------------
-
-ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id, bool from_server_creation)
-        : ModalDialog(0.8f,0.8f), m_server_id(server_id), m_host_id(host_id)
+/** Dialog constructor. 
+ *  \param server_id ID of the server of which to display the info.
+ *  \param host_id ID of the host.
+ *  \param from_server_creation: true if the dialog shows the data of this
+ *         server (i.e. while it is being created).
+ */
+ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id,
+                                   bool from_server_creation)
+                : ModalDialog(0.8f,0.8f), m_server_id(server_id)
+                , m_host_id(host_id)
 {
-    Log::info("ServerInfoDialog", "Server id is %d, Host id is %d", server_id, host_id);
+    Log::info("ServerInfoDialog", "Server id is %d, Host id is %d",
+               server_id, host_id);
     m_self_destroy = false;
     m_enter_lobby = false;
     m_from_server_creation = from_server_creation;
-    m_server_join_request = NULL;
 
     loadFromFile("online/server_info_dialog.stkgui");
 
-    m_name_widget = getWidget<LabelWidget>("name");
-    assert(m_name_widget != NULL);
+    GUIEngine::LabelWidget *name = getWidget<LabelWidget>("server_name");
+    assert(name);
     const Server * server = ServersManager::get()->getServerByID(m_server_id);
-    m_name_widget->setText(server->getName(),false);
+    name->setText(server->getName(),false);
+
+    core::stringw difficulty = race_manager->getDifficultyName(server->getDifficulty());
+    GUIEngine::LabelWidget *lbldifficulty = getWidget<LabelWidget>("server_difficulty");
+    lbldifficulty->setText(difficulty, false);
+
+    core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
+    GUIEngine::LabelWidget *gamemode = getWidget<LabelWidget>("server_game_mode");
+    gamemode->setText(mode, false);
+
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
     if (m_from_server_creation)
@@ -64,34 +81,32 @@ ServerInfoDialog::ServerInfoDialog(uint32_t server_id, uint32_t host_id, bool fr
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-}
+}   // ServerInfoDialog
 
 // -----------------------------------------------------------------------------
+
 ServerInfoDialog::~ServerInfoDialog()
 {
-    if (m_server_join_request)
-        delete m_server_join_request;
-    m_server_join_request = NULL;
-}
+}   // ~ServerInfoDialog
+
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
-    // FIXME - without this next line, it appears that m_server_join is completely unused.
-    //m_server_join_request = Online::CurrentUser::get()->requestServerJoin(m_server_id);
-    Online::ServersManager::get()->setJoinedServer(m_server_id);
-    ProtocolManager::getInstance()->requestStart(new ConnectToServer(m_server_id, m_host_id));
+    ServersManager::get()->setJoinedServer(m_server_id);
+
+    STKHost::create();
     ModalDialog::dismiss();
-    StateManager::get()->pushScreen(NetworkingLobby::getInstance());
-    //Online::CurrentUser::release();
-}
+    NetworkingLobby::getInstance()->push();
+}   // requestJoin
 
 // -----------------------------------------------------------------------------
-GUIEngine::EventPropagation ServerInfoDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation
+                 ServerInfoDialog::processEvent(const std::string& eventSource)
 {
-
     if (eventSource == m_options_widget->m_properties[PROP_ID])
     {
-        const std::string& selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        const std::string& selection =
+                 m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
@@ -104,19 +119,20 @@ GUIEngine::EventPropagation ServerInfoDialog::processEvent(const std::string& ev
         }
     }
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
 // -----------------------------------------------------------------------------
-
+/** When the player pressed enter, select 'join' as default.
+ */
 void ServerInfoDialog::onEnterPressedInternal()
 {
-
-    //If enter was pressed while none of the buttons was focused interpret as join event
+    // If enter was pressed while none of the buttons was focused interpret
+    // as join event
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;
     requestJoin();
-}
+}   // onEnterPressedInternal
 
 // -----------------------------------------------------------------------------
 
@@ -125,37 +141,11 @@ bool ServerInfoDialog::onEscapePressed()
     if (m_cancel_widget->isActivated())
         m_self_destroy = true;
     return false;
-}
+}   // onEscapePressed
 
 // -----------------------------------------------------------------------------
-
 void ServerInfoDialog::onUpdate(float dt)
 {
-    if(m_server_join_request != NULL)
-    {
-        if(m_server_join_request->isDone())
-        {
-            if(m_server_join_request->isSuccess())
-            {
-                m_enter_lobby = true;
-            }
-            else
-            {
-                sfx_manager->quickSound( "anvil" );
-                m_info_widget->setErrorColor();
-                m_info_widget->setText(m_server_join_request->getInfo(), false);
-            }
-            delete m_server_join_request;
-            m_server_join_request = NULL;
-        }
-        else
-        {
-            m_info_widget->setDefaultColor();
-            m_info_widget->setText(StringUtils::loadingDots(_("Joining server")),
-                                   false);
-        }
-    }
-
     //If we want to open the registration dialog, we need to close this one first
     if (m_enter_lobby) m_self_destroy = true;
 
@@ -165,8 +155,8 @@ void ServerInfoDialog::onUpdate(float dt)
         ModalDialog::dismiss();
         if (m_from_server_creation)
             StateManager::get()->popMenu();
-        if (m_enter_lobby)
-            StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+        else if (m_enter_lobby)
+            NetworkingLobby::getInstance()->push();
         return;
     }
-}
+}   // onUpdate

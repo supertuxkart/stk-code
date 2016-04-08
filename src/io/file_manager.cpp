@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2008-2013 Steve Baker, Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2008-2015 Steve Baker, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -38,6 +38,13 @@
 #include <iostream>
 #include <string>
 
+namespace irr {
+    namespace io
+    {
+        IFileSystem* createFileSystem();
+    }
+}
+
 // For mkdir
 #if !defined(WIN32)
 #  include <sys/stat.h>
@@ -45,10 +52,11 @@
 #  include <dirent.h>
 #  include <unistd.h>
 #else
+#  define WIN32_LEAN_AND_MEAN
 #  include <direct.h>
-#  include <Windows.h>
+#  include <windows.h>
 #  include <stdio.h>
-#  ifndef __CYGWIN__
+#  if !defined(__CYGWIN__ ) && !defined(__MINGW32__)
      /*Needed by the remove directory function */
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
 #    define S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
@@ -57,6 +65,7 @@
 
 
 std::vector<std::string> FileManager::m_root_dirs;
+std::string              FileManager::m_stdout_filename = "stdout.log";
 
 #ifdef __APPLE__
 // dynamic data path detection onmac
@@ -98,29 +107,29 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
 // ============================================================================
 FileManager* file_manager = 0;
 
-/** With irrlicht the constructor creates a NULL device. This is necessary to
- *  handle the Chicken/egg problem with irrlicht: access to the file system
- *  is given from the device, but we can't create the device before reading
- *  the user_config file (for resolution, fullscreen). So we create a dummy
- *  device here to begin with, which is then later (once the real device
- *  exists) changed in reInit().
- *
+/** The constructor of the file manager creates an irrlicht file system and
+ *  detects paths for the user config file and assets base directory (data).
+ *  A second initialisation is done later once (see init()), once the user
+ *  config file is read. This is necessary since part of discoverPaths 
+ *  depend on artist debug mode.
  */
 FileManager::FileManager()
 {
     m_subdir_name.resize(ASSET_COUNT);
     m_subdir_name[CHALLENGE  ] = "challenges";
-    m_subdir_name[FONT       ] = "fonts";
     m_subdir_name[GFX        ] = "gfx";
     m_subdir_name[GRANDPRIX  ] = "grandprix";
     m_subdir_name[GUI        ] = "gui";
+    m_subdir_name[LIBRARY    ] = "library";
     m_subdir_name[MODEL      ] = "models";
     m_subdir_name[MUSIC      ] = "music";
-    m_subdir_name[TRANSLATION] = "po";
-    m_subdir_name[TEXTURE    ] = "textures";
+    m_subdir_name[SCRIPT     ] = "tracks";
     m_subdir_name[SFX        ] = "sfx";
     m_subdir_name[SKIN       ] = "skins";
     m_subdir_name[SHADER     ] = "shaders";
+    m_subdir_name[TEXTURE    ] = "textures";
+    m_subdir_name[TTF        ] = "ttf";
+    m_subdir_name[TRANSLATION] = "po";
 #ifdef __APPLE__
     // irrLicht's createDevice method has a nasty habit of messing the CWD.
     // since the code above may rely on it, save it to be able to restore
@@ -133,10 +142,9 @@ FileManager::FileManager()
     chdir( buffer );
 #endif
 
-    m_file_system  = irr_driver->getDevice()->getFileSystem();
-    m_file_system->grab();
+    m_file_system = irr::io::createFileSystem();
 
-    irr::io::path exe_path;
+    std::string exe_path;
 
     // Search for the root directory
     // =============================
@@ -145,28 +153,31 @@ FileManager::FileManager()
     // This is esp. useful for Visual Studio, since it's not necessary
     // to define the working directory when debugging, it works automatically.
     std::string root_dir;
-    if(m_file_system->existFile(CommandLine::getExecName().c_str()))
-        exe_path = m_file_system->getFileDir(CommandLine::getExecName().c_str());
+    const std::string version = std::string("supertuxkart.") + STK_VERSION;
+    if (fileExists(CommandLine::getExecName()))
+    {
+        exe_path = StringUtils::getPath(CommandLine::getExecName());
+    }
     if(exe_path.size()==0 || exe_path[exe_path.size()-1]!='/')
         exe_path += "/";
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
-        root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/" ;
+        root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/data/" ;
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( root_dir ) ) { root_dir = root_dir + "data/"; }
 #endif
-    else if(m_file_system->existFile("data"))
+    else if(fileExists("data/", version))
         root_dir = "data/" ;
-    else if(m_file_system->existFile("../data"))
+    else if(fileExists("../data/", version))
         root_dir = "../data/" ;
-    else if(m_file_system->existFile("../../data"))
+    else if(fileExists("../../data/", version))
         root_dir = "../../data/" ;
     // Test for old style build environment, with executable in root of stk
-    else if(m_file_system->existFile(exe_path+"data"))
+    else if(fileExists(exe_path+"data/"+version))
         root_dir = (exe_path+"data/").c_str();
     // Check for windows cmake style: bld/Debug/bin/supertuxkart.exe
-    else if (m_file_system->existFile(exe_path + "../../../data"))
-        root_dir = (exe_path + "../../../data/").c_str();
-    else if (m_file_system->existFile(exe_path + "../data"))
+    else if (fileExists(exe_path + "../../../data/"+version))
+        root_dir = exe_path + "../../../data/";
+    else if (fileExists(exe_path + "../data/"+version))
     {
         root_dir = exe_path.c_str();
         root_dir += "../data/";
@@ -174,29 +185,46 @@ FileManager::FileManager()
     else
     {
 #ifdef SUPERTUXKART_DATADIR
-        root_dir = SUPERTUXKART_DATADIR;
-        if(root_dir.size()==0 || root_dir[root_dir.size()-1]!='/')
-            root_dir+='/';
-
+        root_dir = SUPERTUXKART_DATADIR"/data/";
 #else
         root_dir = "/usr/local/share/games/supertuxkart/";
 #endif
     }
 
+    if (!m_file_system->existFile((root_dir + version).c_str()))
+    {
+        Log::error("FileManager", "Could not file '%s'in any "
+                   "standard location (esp. ../data).", version.c_str());
+        Log::error("FileManager", 
+                   "Last location checked '%s'.", root_dir.c_str());
+        Log::fatal("FileManager", 
+                   "Set $SUPERTUXKART_DATADIR to point to the data directory.");
+        // fatal will exit the application
+    }
+
     addRootDirs(root_dir);
     if( fileExists(root_dir+"../../stk-assets"))
         addRootDirs(root_dir+"../../stk-assets");
+    if( fileExists(root_dir+"../../supertuxkart-assets"))
+        addRootDirs(root_dir+"../../supertuxkart-assets");
     if ( getenv ( "SUPERTUXKART_ROOT_PATH" ) != NULL )
         addRootDirs(getenv("SUPERTUXKART_ROOT_PATH"));
 
     checkAndCreateConfigDir();
     checkAndCreateAddonsDir();
     checkAndCreateScreenshotDir();
+    checkAndCreateReplayDir();
     checkAndCreateCachedTexturesDir();
     checkAndCreateGPDir();
 
     redirectOutput();
+}   // FileManager
 
+// ----------------------------------------------------------------------------
+/** Detects where the assets are stored.
+ */
+void FileManager::discoverPaths()
+{
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
     for(unsigned int i=0; i<m_root_dirs.size(); i++)
@@ -222,6 +250,16 @@ FileManager::FileManager()
             TrackManager::addTrackSearchDir(m_root_dirs[i]+"tracks/");
         if(fileExists(m_root_dirs[i]+"karts/"))
             KartPropertiesManager::addKartSearchDir(m_root_dirs[i]+"karts/");
+
+        // If artist debug mode is enabled, add
+        // work-in-progress tracks and karts
+        if (UserConfigParams::m_artist_debug_mode)
+        {
+            if(fileExists(m_root_dirs[i] + "wip-tracks/"))
+                TrackManager::addTrackSearchDir(m_root_dirs[i] + "wip-tracks/");
+            if(fileExists(m_root_dirs[i] + "wip-karts/"))
+                KartPropertiesManager::addKartSearchDir(m_root_dirs[i] + "wip-karts/");
+        }
         for(unsigned int j=ASSET_MIN; j<=ASSET_MAX; j++)
         {
             if(!dir_found[j] && fileExists(m_root_dirs[i]+m_subdir_name[j]))
@@ -248,36 +286,24 @@ FileManager::FileManager()
     if(was_error)
         Log::fatal("[FileManager]", "Not all assets found - aborting.");
 
-
-}  // FileManager
-
- //-----------------------------------------------------------------------------
-/** Remove the dummy file system (which is called from IrrDriver before
- *  creating the actual device.
- */
-void FileManager::dropFileSystem()
-{
-    m_file_system->drop();
-}   // dropFileSystem
+}  // discoverPaths
 
 //-----------------------------------------------------------------------------
-/** This function is used to re-initialise the file-manager after reading in
- *  the user configuration data.
-*/
-void FileManager::reInit()
+/** This function is used to initialise the file-manager after reading in
+ *  the user configuration data. Esp. discovering the paths of all assets
+ *  depends on the user config file (artist debug mode).
+ */
+void FileManager::init()
 {
-    m_file_system  = irr_driver->getDevice()->getFileSystem();
-    m_file_system->grab();
-
+    discoverPaths();
     // Note that we can't push the texture search path in the constructor
-    // since this also adds a file archive to te file system - and
-    // m_file_system is deleted (in irr_driver) after
+    // since this also adds a file archive to the file system - and
+    // m_file_system is deleted (in irr_driver)
     pushTextureSearchPath(m_subdir_name[TEXTURE]);
     if(fileExists(m_subdir_name[TEXTURE]+"deprecated/"))
         pushTextureSearchPath(m_subdir_name[TEXTURE]+"deprecated/");
 
     pushTextureSearchPath(m_subdir_name[GUI]);
-
 
     pushModelSearchPath  (m_subdir_name[MODEL]);
     pushMusicSearchPath  (m_subdir_name[MUSIC]);
@@ -290,7 +316,7 @@ void FileManager::reInit()
         for(int i=0;i<(int)dirs.size(); i++)
             pushMusicSearchPath(dirs[i]);
     }
-}   // reInit
+}   // init
 
 //-----------------------------------------------------------------------------
 FileManager::~FileManager()
@@ -350,6 +376,25 @@ FileManager::~FileManager()
     m_file_system = NULL;
 }   // ~FileManager
 
+// ----------------------------------------------------------------------------
+/** Returns true if the specified file exists.
+ */
+bool FileManager::fileExists(const std::string& path) const
+{
+#ifdef DEBUG
+    bool exists = m_file_system->existFile(path.c_str());
+    if(exists) return true;
+    // Now the original file was not found. Test if replacing \ with / helps:
+    std::string s = StringUtils::replace(path, "\\", "/");
+    exists = m_file_system->existFile(s.c_str());
+    if(exists)
+        Log::warn("FileManager", "File '%s' does not exists, but '%s' does!",
+        path.c_str(), s.c_str());
+    return exists;
+#else
+    return m_file_system->existFile(path.c_str());
+#endif
+}   // fileExists
 //-----------------------------------------------------------------------------
 /** Adds paths to the list of stk root directories.
  *  \param roots A ":" separated string of directories to add.
@@ -400,8 +445,11 @@ XMLNode *FileManager::createXMLTreeFromString(const std::string & content)
     try
     {
         char *b = new char[content.size()];
+        assert(b);
         memcpy(b, content.c_str(), content.size());
-        io::IReadFile * ireadfile = m_file_system->createMemoryReadFile(b, strlen(b), "tempfile", true);
+        io::IReadFile * ireadfile =
+            m_file_system->createMemoryReadFile(b, (int)content.size(),
+                                                "tempfile", true);
         io::IXMLReader * reader = m_file_system->createXMLReader(ireadfile);
         XMLNode* node = new XMLNode(reader);
         reader->drop();
@@ -595,6 +643,14 @@ std::string FileManager::getScreenshotDir() const
 }   // getScreenshotDir
 
 //-----------------------------------------------------------------------------
+/** Returns the directory in which replay file should be stored.
+ */
+std::string FileManager::getReplayDir() const
+{
+    return m_replay_dir;
+}   // getReplayDir
+
+//-----------------------------------------------------------------------------
 /** Returns the directory in which resized textures should be cached.
 */
 std::string FileManager::getCachedTexturesDir() const
@@ -717,10 +773,10 @@ void FileManager::checkAndCreateConfigDir()
 
         // Try to use the APPDATA directory to store config files and highscore
         // lists. If not defined, used the current directory.
-        if(getenv("APPDATA")!=NULL)
+        if (getenv("APPDATA") != NULL)
         {
             m_user_config_dir  = getenv("APPDATA");
-            if(!checkAndCreateDirectory(m_user_config_dir))
+            if (!checkAndCreateDirectory(m_user_config_dir))
             {
                 Log::error("[FileManager]", "Can't create config dir '%s"
                             ", falling back to '.'.", m_user_config_dir.c_str());
@@ -734,7 +790,7 @@ void FileManager::checkAndCreateConfigDir()
 
 #elif defined(__APPLE__)
 
-        if (getenv("HOME")!=NULL)
+        if (getenv("HOME") != NULL)
         {
             m_user_config_dir = getenv("HOME");
         }
@@ -754,8 +810,10 @@ void FileManager::checkAndCreateConfigDir()
 
         // Remaining unix variants. Use the new standards for config directory
         // i.e. either XDG_CONFIG_HOME or $HOME/.config
-        if (getenv("XDG_CONFIG_HOME")!=NULL){
+        if (getenv("XDG_CONFIG_HOME") !=NULL)
+        {
             m_user_config_dir = getenv("XDG_CONFIG_HOME");
+            checkAndCreateDirectory(m_user_config_dir);
         }
         else if (!getenv("HOME"))
         {
@@ -767,6 +825,8 @@ void FileManager::checkAndCreateConfigDir()
         else
         {
             m_user_config_dir  = getenv("HOME");
+            checkAndCreateDirectory(m_user_config_dir);
+
             m_user_config_dir += "/.config";
             if(!checkAndCreateDirectory(m_user_config_dir))
             {
@@ -786,7 +846,8 @@ void FileManager::checkAndCreateConfigDir()
     if(m_user_config_dir.size()>0 && *m_user_config_dir.rbegin()!='/')
         m_user_config_dir += "/";
 
-    if(!checkAndCreateDirectory(m_user_config_dir))
+    m_user_config_dir +="0.8.2/";
+    if(!checkAndCreateDirectoryP(m_user_config_dir))
     {
         Log::warn("FileManager", "Can not  create config dir '%s', "
                   "falling back to '.'.", m_user_config_dir.c_str());
@@ -803,7 +864,7 @@ void FileManager::checkAndCreateConfigDir()
 void FileManager::checkAndCreateAddonsDir()
 {
 #if defined(WIN32) || defined(__CYGWIN__)
-    m_addons_dir  = m_user_config_dir+"addons/";
+    m_addons_dir  = m_user_config_dir+"../addons/";
 #elif defined(__APPLE__)
     m_addons_dir  = getenv("HOME");
     m_addons_dir += "/Library/Application Support/SuperTuxKart/Addons/";
@@ -857,6 +918,32 @@ void FileManager::checkAndCreateScreenshotDir()
     }
 
 }   // checkAndCreateScreenshotDir
+
+// ----------------------------------------------------------------------------
+/** Creates the directories for replay recorded. This will set m_replay_dir
+ *  with the appropriate path.
+ */
+void FileManager::checkAndCreateReplayDir()
+{
+#if defined(WIN32) || defined(__CYGWIN__)
+    m_replay_dir = m_user_config_dir + "replay/";
+#elif defined(__APPLE__)
+    m_replay_dir  = getenv("HOME");
+    m_replay_dir += "/Library/Application Support/SuperTuxKart/replay/";
+#else
+    m_replay_dir = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart",
+                                          ".local/share", ".supertuxkart");
+    m_replay_dir += "replay/";
+#endif
+
+    if(!checkAndCreateDirectory(m_replay_dir))
+    {
+        Log::error("FileManager", "Can not create replay directory '%s', "
+                   "falling back to '.'.", m_replay_dir.c_str());
+        m_replay_dir = ".";
+    }
+
+}   // checkAndCreateReplayDir
 
 // ----------------------------------------------------------------------------
 /** Creates the directories for cached textures. This will set
@@ -995,6 +1082,15 @@ std::string FileManager::checkAndCreateLinuxDir(const char *env_name,
 #endif
 
 //-----------------------------------------------------------------------------
+/** Sets the name for the stdout log file.
+ *  \param filename Filename to use (relative to the user config dir).
+ */
+void FileManager::setStdoutName(const std::string& filename)
+{
+    m_stdout_filename = filename;
+}   // setStdoutName
+
+//-----------------------------------------------------------------------------
 /** Redirects output to go into files in the user's config directory
  *  instead of to the console. It keeps backup copies of previous stdout files
  *  (3 atm), which can help to diagnose problems caused by a previous crash.
@@ -1003,7 +1099,7 @@ void FileManager::redirectOutput()
 {
     // Do a simple log rotate: stdout.log.2 becomes stdout.log.3 etc
     const int NUM_BACKUPS=3;
-    std::string logoutfile = getUserConfigFile("stdout.log");
+    std::string logoutfile = getUserConfigFile(m_stdout_filename);
     for(int i=NUM_BACKUPS; i>1; i--)
     {
         std::ostringstream out_old;
@@ -1050,7 +1146,7 @@ std::string FileManager::getTextureCacheLocation(const std::string& filename)
         parent_dir = parent_dir.substr(0, parent_dir.size() - 1);
     parent_dir = StringUtils::getBasename(parent_dir);
 
-    std::string cache_subdir = UserConfigParams::m_high_definition_textures
+    std::string cache_subdir = (UserConfigParams::m_high_definition_textures & 0x01) == 0x01
                                ? "hd/"
                                : "resized/";
     std::string cached_file =
@@ -1254,7 +1350,12 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
 
     const int BUFFER_SIZE=32768;
     char *buffer = new char[BUFFER_SIZE];
-    if(!buffer) return false;
+    if(!buffer)
+    {
+        fclose(f_source);
+        fclose(f_dest);
+        return false;
+    }
     size_t n;
     while((n=fread(buffer, 1, BUFFER_SIZE, f_source))>0)
     {
@@ -1262,7 +1363,7 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
         {
             Log::error("FileManager", "Write error copying '%s' to '%s",
                         source.c_str(), dest.c_str());
-            delete buffer;
+            delete[] buffer;
             fclose(f_source);
             fclose(f_dest);
             return false;
@@ -1270,7 +1371,7 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
         }   // if fwrite()!=n
     }   // while
 
-    delete buffer;
+    delete[] buffer;
     fclose(f_source);
     fclose(f_dest);
     return true;

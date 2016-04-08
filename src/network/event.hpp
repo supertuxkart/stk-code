@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,9 +24,13 @@
 #ifndef EVENT_HPP
 #define EVENT_HPP
 
-#include "network/stk_peer.hpp"
 #include "network/network_string.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/types.hpp"
+
+#include "enet/enet.h"
+
+class STKPeer;
 
 /*!
  * \enum EVENT_TYPE
@@ -51,37 +55,53 @@ enum EVENT_TYPE
  */
 class Event
 {
-    public:
-        /*! \brief Constructor
-         *  \param event : The event that needs to be translated.
-         */
-        Event(ENetEvent* event);
-        /*! \brief Constructor
-         *  \param event : The event to copy.
-         */
-        Event(const Event& event);
-        /*! \brief Destructor
-         *  frees the memory of the ENetPacket.
-         */
+private:
+    LEAK_CHECK()
+
+    /** Copy of the data passed by the event. */
+    NetworkString *m_data;
+
+    /**  Type of the event. */
+    EVENT_TYPE m_type;
+
+    /** Pointer to the peer that triggered that event. */
+    STKPeer* m_peer;
+
+    /** Arrivial time of the event, for timeouts. */
+    double m_arrival_time;
+
+public:
+         Event(ENetEvent* event);
         ~Event();
 
-        /*! \brief Remove bytes at the beginning of data.
-         *  \param size : The number of bytes to remove.
-         */
-        void removeFront(int size);
+    // ------------------------------------------------------------------------
+    /** Returns the type of this event. */
+    EVENT_TYPE getType() const { return m_type; }
 
-        /*! \brief Get a copy of the data.
-         *  \return A copy of the message data. This is empty for events like
-         *  connection or disconnections.
-         */
-        NetworkString data() const { return m_data; }
+    // ------------------------------------------------------------------------
+    /** Returns the peer of this event. */
+    STKPeer* getPeer() const { return m_peer;  }
+    // ------------------------------------------------------------------------
+    /** \brief Get a const reference to the received data.
+     *  This is empty for events like connection or disconnections. 
+     */
+    const NetworkString& data() const { return *m_data; }
+    // ------------------------------------------------------------------------
+    /** \brief Get a non-const reference to the received data.
+     *  A copy of the message data. This is empty for events like
+     *  connection or disconnections. */
+    NetworkString& data() { return *m_data; }
+    // ------------------------------------------------------------------------
+    /** Determines if this event should be delivered synchronous or not.
+     *  Only messages can be delivered synchronous. */
+    bool isSynchronous() const { return m_type==EVENT_TYPE_MESSAGE &&
+                                        m_data->isSynchronous();     }
+    // ------------------------------------------------------------------------
+    /** Returns the arrival time of this event. */
+    double getArrivalTime() const { return m_arrival_time; }
 
-        EVENT_TYPE type;    //!< Type of the event.
-        STKPeer** peer;     //!< Pointer to the peer that triggered that event.
+    // ------------------------------------------------------------------------
 
-    private:
-        NetworkString m_data; //!< Copy of the data passed by the event.
-        ENetPacket* m_packet; //!< A pointer on the ENetPacket to be deleted.
-};
+};   // class Event
 
 #endif // EVENT_HPP

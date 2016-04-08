@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,6 +27,39 @@
 #include <ostream>
 #include <iostream>
 
+
+enum QueryPerf
+{
+    Q_SHADOWS_CASCADE0,
+    Q_SHADOWS_CASCADE1,
+    Q_SHADOWS_CASCADE2,
+    Q_SHADOWS_CASCADE3,
+    Q_SHADOW_POSTPROCESS,
+    Q_SOLID_PASS1,
+    Q_RSM,
+    Q_RH,
+    Q_GI,
+    Q_ENVMAP,
+    Q_SUN,
+    Q_POINTLIGHTS,
+    Q_SSAO,
+    Q_SOLID_PASS2,
+    Q_FOG,
+    Q_SKYBOX,
+    Q_GLOW,
+    Q_TRANSPARENT,
+    Q_PARTICLES,
+    Q_DISPLACEMENT,
+    Q_DOF,
+    Q_GODRAYS,
+    Q_BLOOM,
+    Q_TONEMAP,
+    Q_MOTIONBLUR,
+    Q_LIGHTNING,
+    Q_MLAA,
+    Q_GUI,
+    Q_LAST
+};
 
 class Profiler;
 extern Profiler profiler;
@@ -148,7 +181,9 @@ private:
 
     bool m_capture_report;
     bool m_first_capture_sweep;
+    bool m_first_gpu_capture_sweep;
     StringBuffer* m_capture_report_buffer;
+    StringBuffer* m_gpu_capture_report_buffer;
 
 public:
     Profiler();

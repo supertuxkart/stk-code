@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013-2013 SuperTuxKart-Team
+//  Copyright (C) 2013-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 #include "input/wiimote.hpp"
 
 #include "config/user_config.hpp"
+#include "input/gamepad_device.hpp"
 #include "input/device_manager.hpp"
 #include "utils/string_utils.hpp"
 
@@ -50,7 +51,7 @@ Wiimote::Wiimote(wiimote_t* wiimote_handle, int wiimote_id,
                                          /*num axes*/ 1,
                                          button_count,
                                          gamepad_config );
-    DeviceManager* device_manager = input_manager->getDeviceList();
+    DeviceManager* device_manager = input_manager->getDeviceManager();
     device_manager->addGamepad(m_gamepad_device);
 
 }   // Wiimote

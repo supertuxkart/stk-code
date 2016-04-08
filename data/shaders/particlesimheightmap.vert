@@ -9,6 +9,17 @@ uniform float track_x_len;
 uniform float track_z_len;
 uniform samplerBuffer heightmap;
 
+#if __VERSION__ >= 330
+layout (location = 4) in vec3 particle_position_initial;
+layout (location = 5) in float lifetime_initial;
+layout (location = 6) in vec3 particle_velocity_initial;
+layout (location = 7) in float size_initial;
+
+layout (location = 0) in vec3 particle_position;
+layout (location = 1) in float lifetime;
+layout (location = 2) in vec3 particle_velocity;
+layout (location = 3) in float size;
+#else
 in vec3 particle_position_initial;
 in float lifetime_initial;
 in vec3 particle_velocity_initial;
@@ -18,6 +29,7 @@ in vec3 particle_position;
 in float lifetime;
 in vec3 particle_velocity;
 in float size;
+#endif
 
 out vec3 new_particle_position;
 out float new_lifetime;

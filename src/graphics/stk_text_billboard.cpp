@@ -1,12 +1,29 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "graphics/stk_text_billboard.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stkbillboard.hpp"
-#include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stk_billboard.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
-
+#include "glwrap.hpp"
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 #include <ISceneManager.h>
@@ -20,7 +37,7 @@ STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
     irr::scene::ISceneManager* mgr, irr::s32 id,
     const irr::core::vector3df& position, const irr::core::vector3df& size) :
     STKMeshSceneNode(new scene::SMesh(),
-        parent, irr_driver->getSceneManager(), -1,
+        parent, irr_driver->getSceneManager(), -1, "text_billboard",
         position, core::vector3df(0.0f, 0.0f, 0.0f), size, false)
 {
     m_color_top = color_top;
@@ -29,7 +46,6 @@ STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
     createGLMeshes();
     Mesh->drop();
     //setAutomaticCulling(0);
-    setReloadEachFrame(true); // FIXME: should not need that!!
     updateAbsolutePosition();
 }
 
@@ -47,10 +63,11 @@ void STKTextBillboard::updateAbsolutePosition()
 
 scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFont* font)
 {
-    font->doDraw(text, core::rect<s32>(0, 0, 1000, 1000), video::SColor(255,255,255,255),
+    core::dimension2du size = font->getDimension(text.c_str());
+    font->doDraw(text, core::rect<s32>(0, 0, size.Width, size.Height), video::SColor(255,255,255,255),
         false, false, NULL, this);
 
-    const float scale = 0.018f;
+    const float scale = 0.03f;
 
     //scene::SMesh* mesh = new scene::SMesh();
     std::map<video::ITexture*, scene::SMeshBuffer*> buffers;
@@ -76,12 +93,12 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
 
     for (unsigned int i = 0; i < m_chars.size(); i++)
     {
-        core::vector3df char_pos(m_chars[i].m_destRect.UpperLeftCorner.X,
-            m_chars[i].m_destRect.UpperLeftCorner.Y, 0);
+        core::vector3df char_pos((float) m_chars[i].m_destRect.UpperLeftCorner.X,
+            (float) m_chars[i].m_destRect.UpperLeftCorner.Y, 0);
         char_pos *= scale;
 
-        core::vector3df char_pos2(m_chars[i].m_destRect.LowerRightCorner.X,
-            m_chars[i].m_destRect.LowerRightCorner.Y, 0);
+        core::vector3df char_pos2((float)m_chars[i].m_destRect.LowerRightCorner.X,
+            (float) m_chars[i].m_destRect.LowerRightCorner.Y, 0);
         char_pos2 *= scale;
 
         core::dimension2di char_size_i = m_chars[i].m_destRect.getSize();
@@ -93,7 +110,8 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
         {
             buffer = new scene::SMeshBuffer();
             buffer->getMaterial().setTexture(0, m_chars[i].m_texture);
-            buffer->getMaterial().MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+            buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            buffer->getMaterial().MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
             buffers[m_chars[i].m_texture] = buffer;
         }
         else
@@ -101,8 +119,8 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
             buffer = map_itr->second;
         }
 
-        float tex_width = m_chars[i].m_texture->getSize().Width;
-        float tex_height = m_chars[i].m_texture->getSize().Height;
+        float tex_width = (float) m_chars[i].m_texture->getSize().Width;
+        float tex_height = (float)m_chars[i].m_texture->getSize().Height;
 
 
         video::S3DVertex vertices[] =
@@ -148,25 +166,21 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
         map_itr->second->drop();
     }
 
-    getMaterial(0).MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+    getMaterial(0).MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
 
     return Mesh;
 }
 
-void STKTextBillboard::OnRegisterSceneNode()
+void STKTextBillboard::updateNoGL()
 {
-    if (IsVisible)
-    {
-        SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT);
+    scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
+    core::vector3df cam_pos = curr_cam->getPosition();
+    core::vector3df text_pos = this->getAbsolutePosition();
+    float angle = atan2(text_pos.X - cam_pos.X, text_pos.Z - cam_pos.Z);
+    this->setRotation(core::vector3df(0.0f, angle * 180.0f / M_PI, 0.0f));
+    updateAbsolutePosition();
 
-        scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
-        core::vector3df cam_pos = curr_cam->getPosition();
-        core::vector3df text_pos = this->getAbsolutePosition();
-        float angle = atan2(text_pos.X - cam_pos.X, text_pos.Z - cam_pos.Z);
-        this->setRotation(core::vector3df(0.0f, angle * 180.0f / M_PI, 0.0f));
-    }
-
-    ISceneNode::OnRegisterSceneNode();
+    STKMeshSceneNode::updateNoGL();
 }
 
 void STKTextBillboard::collectChar(video::ITexture* texture,

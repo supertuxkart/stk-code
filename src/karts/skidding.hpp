@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012-2013  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,7 +19,6 @@
 #ifndef HEADER_SKIDDING_HPP
 #define HEADER_SKIDDING_HPP
 
-#include "karts/skidding_properties.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
@@ -35,7 +34,7 @@ class ShowCurve;
 
 #undef SKID_DEBUG
 
-class Skidding : public SkiddingProperties
+class Skidding
 {
 public:
     LEAK_CHECK();
@@ -74,7 +73,6 @@ private:
     float m_jump_speed;
 
 public:
-    /** SKID_OLD: old skidding, will be removed. */
     /** SKID_NONE: Kart is currently not skidding.
      *  SKID_ACCUMULATE_LEFT: Kart is skidding to the left and accumulating
      *             for bonus.
@@ -83,9 +81,8 @@ public:
      *             and the kart was turning left.
      *  SKID_SHOW_GFX_RIGHT: Similar for turning right.
      *  SKID_BREAK: Skidding was stopped without bonus */
-    enum SkidState {SKID_OLD, SKID_NONE, SKID_ACCUMULATE_LEFT,
-                    SKID_ACCUMULATE_RIGHT, SKID_SHOW_GFX_LEFT,
-                    SKID_SHOW_GFX_RIGHT, SKID_BREAK} ;
+    enum SkidState { SKID_NONE, SKID_ACCUMULATE_LEFT, SKID_ACCUMULATE_RIGHT,
+                     SKID_SHOW_GFX_LEFT, SKID_SHOW_GFX_RIGHT, SKID_BREAK} ;
 
 private:
     /** The current skidding state. */
@@ -103,7 +100,7 @@ private:
                               float *bonus_force) const;
     void  updateSteering(float steer, float dt);
 public:
-         Skidding(Kart *kart, const SkiddingProperties *sp);
+         Skidding(Kart *kart);
         ~Skidding();
     void reset();
     void update(float dt, bool is_on_ground, float steer,

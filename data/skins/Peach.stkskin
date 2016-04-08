@@ -76,6 +76,14 @@ when the border that intersect at this corner are enabled.
       left_border="128" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
+<element type="error-message" image="peach/error.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="generic-message" image="peach/generic.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
 <element type="button" state="neutral" image="peach/glassbutton.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
@@ -250,5 +258,10 @@ when the border that intersect at this corner are enabled.
 
 <!-- Rating star image -->
 <element type="rating" state="neutral" image="peach/rating_star.png" />
+
+<!-- Font color -->
+<color type="font" state="top" a="255" r="255" g="128" b="0" />
+<color type="font" state="bottom" a="255" r="255" g="220" b="15" />
+<color type="font" state="normal" a="255" r="210" g="100" b="50" />
 
 </skin>

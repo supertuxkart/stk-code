@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Lauri Kasanen
+//  Copyright (C) 2013-2015 Lauri Kasanen
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/rtts.hpp"
-
+#include "central_settings.hpp"
 #include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
@@ -24,16 +24,14 @@
 #include "utils/log.hpp"
 #include <ISceneManager.h>
 
-static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type)
+static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type, unsigned mipmaplevel = 1)
 {
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(target, result);
-#if WIN32
-    if (irr_driver->getGLSLVersion() >= 420)
-        glTexStorage3D(target, 1, internalFormat, w, h, d);
+    if (CVS->isARBTextureStorageUsable())
+        glTexStorage3D(target, mipmaplevel, internalFormat, w, h, d);
     else
-#endif
         glTexImage3D(target, 0, internalFormat, w, h, d, 0, format, type, 0);
     return result;
 }
@@ -43,33 +41,11 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(GL_TEXTURE_2D, result);
-#if WIN32
-    if (irr_driver->getGLSLVersion() >= 420)
+    if (CVS->isARBTextureStorageUsable())
         glTexStorage2D(GL_TEXTURE_2D, mipmaplevel, internalFormat, res.Width, res.Height);
     else
-#endif
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
     return result;
-}
-
-static GLuint generateFBO(GLuint ColorAttachement)
-{
-    GLuint fbo;
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ColorAttachement, 0);
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
-    return fbo;
-}
-
-static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
-{
-    GLuint fbo = generateFBO(ColorAttachement);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DepthAttachement, 0);
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
-    return fbo;
 }
 
 RTT::RTT(size_t width, size_t height)
@@ -93,8 +69,6 @@ RTT::RTT(size_t width, size_t height)
     const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
     const dimension2du shadowsize2(shadowside / 4, shadowside / 4);
     const dimension2du shadowsize3(shadowside / 8, shadowside / 8);
-    const dimension2du warpvsize(1, 512);
-    const dimension2du warphsize(512, 1);
 
     unsigned linear_depth_mip_levels = int(ceilf(log2f( float(max_(res.Width, res.Height)) )));
 
@@ -115,6 +89,8 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
     RenderTargetTextures[RTT_SSAO] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_DIFFUSE] = generateRTT(res, GL_R11F_G11F_B10F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_SPECULAR] = generateRTT(res, GL_R11F_G11F_B10F, GL_BGR, GL_FLOAT);
 
     RenderTargetTextures[RTT_HALF1] = generateRTT(half, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_QUARTER1] = generateRTT(quarter, GL_RGBA16F, GL_BGRA, GL_FLOAT);
@@ -127,13 +103,18 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_HALF2_R] = generateRTT(half, GL_R16F, GL_RED, GL_FLOAT);
 
     RenderTargetTextures[RTT_BLOOM_1024] = generateRTT(shadowsize0, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_SCALAR_1024] = generateRTT(shadowsize0, GL_R32F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_BLOOM_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_TMP_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
+	RenderTargetTextures[RTT_LENS_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
+	
     RenderTargetTextures[RTT_BLOOM_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_TMP_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
+	RenderTargetTextures[RTT_LENS_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
+	
     RenderTargetTextures[RTT_BLOOM_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
-    RenderTargetTextures[RTT_LOG_LUMINANCE] = generateRTT(shadowsize0, GL_R16F, GL_RED, GL_FLOAT);
+	RenderTargetTextures[RTT_LENS_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
 
     std::vector<GLuint> somevector;
     somevector.push_back(RenderTargetTextures[RTT_SSAO]);
@@ -143,14 +124,17 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_NORMAL_AND_DEPTH]);
     FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
     somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_TMP1]);
-    somevector.push_back(RenderTargetTextures[RTT_TMP2]);
+    somevector.push_back(RenderTargetTextures[RTT_DIFFUSE]);
+    somevector.push_back(RenderTargetTextures[RTT_SPECULAR]);
     FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_COLOR]);
     FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
     somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_LOG_LUMINANCE]);
+    somevector.push_back(RenderTargetTextures[RTT_DIFFUSE]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_SPECULAR]);
     FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_MLAA_COLORS]);
@@ -179,9 +163,6 @@ RTT::RTT(size_t width, size_t height)
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_HALF1_R]);
     FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
-    // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
-    glClearColor(1., 1., 1., 1.);
-    glClear(GL_COLOR_BUFFER_BIT);
 
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_HALF2]);
@@ -208,35 +189,51 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_1024]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 1024, 1024));
     somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_SCALAR_1024]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 1024, 1024));
+    somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_512]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_512]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
+	somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_LENS_512]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
+
+
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_256]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_256]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
+	somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_LENS_256]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
+
+
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_128]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_128]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
+	somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_LENS_128]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
 
-    if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
+    if (CVS->isShadowEnabled())
     {
-        shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R8, GL_RED, GL_UNSIGNED_BYTE);
-        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+        shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, 4, GL_R32F, GL_RED, GL_FLOAT, 10);
+        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1);
 
         somevector.clear();
         somevector.push_back(shadowColorTex);
-        m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024, true);
+        m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, UserConfigParams::m_shadows_resolution, UserConfigParams::m_shadows_resolution, true);
     }
 
-    if (UserConfigParams::m_gi)
+    if (CVS->isGlobalIlluminationEnabled())
     {
         //Todo : use "normal" shadowtex
         RSM_Color = generateRTT(shadowsize0, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE);
@@ -258,6 +255,15 @@ RTT::RTT(size_t width, size_t height)
         somevector.push_back(RH_Blue);
         m_RH_FBO = new FrameBuffer(somevector, 32, 16, true);
     }
+
+    // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
+    getFBO(FBO_HALF1_R).bind();
+    glClearColor(1., 1., 1., 1.);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
+    glClearColor(.5, .5, .5, .5);
+    glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -265,13 +271,13 @@ RTT::~RTT()
 {
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
-    if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
+    if (CVS->isShadowEnabled())
     {
         delete m_shadow_FBO;
         glDeleteTextures(1, &shadowColorTex);
         glDeleteTextures(1, &shadowDepthTex);
     }
-    if (UserConfigParams::m_gi)
+    if (CVS->isGlobalIlluminationEnabled())
     {
         delete m_RH_FBO;
         delete m_RSM;
@@ -284,6 +290,13 @@ RTT::~RTT()
     }
 }
 
+void RTT::prepareRender(scene::ICameraSceneNode* camera)
+{
+    irr_driver->setRTT(this);
+    irr_driver->getSceneManager()->setActiveCamera(camera);
+
+}
+
 FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
 {
     irr_driver->setRTT(this);
@@ -291,15 +304,16 @@ FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
     std::vector<IrrDriver::GlowData> glows;
-    // TODO: put this outside of the rendering loop
-    irr_driver->generateDiffuseCoefficients();
-    irr_driver->computeCameraMatrix(camera, m_width, m_height);
-    unsigned plc = irr_driver->UpdateLightsInfo(camera, dt);
+    irr_driver->computeMatrixesAndCameras(camera, m_width, m_height);
+    unsigned plc = irr_driver->updateLightsInfo(camera, dt);
+    irr_driver->uploadLightingData();
     irr_driver->renderScene(camera, plc, glows, dt, false, true);
     FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
 
     // reset
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    glViewport(0, 0,
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height);
     irr_driver->setRTT(NULL);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

@@ -83,6 +83,8 @@ enet_protocol_dispatch_incoming_commands (ENetHost * host, ENetEvent * event)
            }
 
            return 1;
+        default:
+            break;
        }
     }
 
@@ -863,6 +865,8 @@ enet_protocol_handle_acknowledge (ENetHost * host, ENetEvent * event, ENetPeer *
            enet_list_empty (& peer -> sentReliableCommands))
          enet_peer_disconnect (peer, peer -> eventData);
        break;
+    default:
+        break;
     }
    
     return 0;

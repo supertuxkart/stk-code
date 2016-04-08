@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2013  Ingo Ruhnke <grumbel@gmx.de>
-//  Copyright (C) 2006-2013  Joerg Henrichs
+//  Copyright (C) 2004-2015  Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,11 +20,11 @@
 #include "race/grand_prix_data.hpp"
 
 #include "config/player_profile.hpp"
+#include "config/user_config.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
-#include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
@@ -40,12 +40,13 @@
 /** Loads a grand prix definition from a file.
  *  \param filename Name of the file to load.
  */
-GrandPrixData::GrandPrixData(const std::string& filename)
+GrandPrixData::GrandPrixData(const std::string& filename, enum GPGroupType group)
 {
-    m_filename = filename;
-    m_id       = StringUtils::getBasename(
-                                        StringUtils::removeExtension(filename));
+    setFilename(filename);
+    m_id       = StringUtils::getBasename(StringUtils::removeExtension(filename));
     m_editable = (filename.find(file_manager->getGPDir(), 0) == 0);
+    m_group    = group;
+
     reload();
 }   // GrandPrixData
 
@@ -57,7 +58,7 @@ GrandPrixData::GrandPrixData(const std::string& filename)
  *  \param new_tracks If true, new tracks are selected, otherwise existing
  *         tracks will not be changed (used to e.g. increase the number of
  *         tracks in an already existing random grand prix).
- * 
+ *
  */
 void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
                                    const std::string &track_group,
@@ -65,9 +66,11 @@ void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
                                    bool new_tracks)
 {
     m_filename = "Random GP - Not loaded from a file!";
-    m_id       = "random";
-    m_name     = "Random Grand Prix";
+    m_id       = getRandomGPID();
+    m_name     = getRandomGPName();
     m_editable = false;
+    m_group    = GP_NONE;
+    m_reverse_type = use_reverse;
 
     if(new_tracks)
     {
@@ -81,45 +84,76 @@ void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
 
     changeTrackNumber(number_of_tracks, track_group);
     changeReverse(use_reverse);
-}
+}   // createRandomGP
 
 // ----------------------------------------------------------------------------
+/** Either adds or removes tracks to get the requested numder of tracks in
+ *  a random GP.
+ *  \param number_of_tracks How many tracks should be in the random list.
+ *  \param track_group From which group to select the tracks.
+ */
 void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
                                       const std::string& track_group)
 {
     // The problem with the track groups is that "all" isn't a track group
     // TODO: Add "all" to the track groups and rewrite this more elegant
     std::vector<int> track_indices;
-    size_t available_tracks;
     if (track_group == "all")
     {
-        available_tracks = track_manager->getNumberOfTracks();
+        for(unsigned int i=0; i<track_manager->getNumberOfTracks(); i++)
+        {
+            const Track *track = track_manager->getTrack(i);
+            // Ignore no-racing tracks:
+            if(!track->isRaceTrack())
+                continue;
+
+            if (PlayerManager::getCurrentPlayer()->isLocked(track->getIdent()))
+                continue;
+
+            // Only add tracks that are not already picked.
+            if(std::find(m_tracks.begin(), m_tracks.end(), track->getIdent())==
+                m_tracks.end())
+                track_indices.push_back(i);
+        }
     }
     else
     {
         track_indices = track_manager->getTracksInGroup(track_group);
-        available_tracks = track_indices.size();
     }
-    assert(number_of_tracks <= available_tracks);
+    assert(number_of_tracks <= track_indices.size() + m_tracks.size());
 
     // add or remove the right number of tracks
     if (m_tracks.size() < number_of_tracks)
     {
         while (m_tracks.size() < number_of_tracks)
         {
-            int index = (track_group == "all") ?
-                         rand() % available_tracks :
-                         track_indices[rand() % available_tracks];
+            int index       = rand() % track_indices.size();
+            int track_index = track_indices[index];
 
-            const Track *track = track_manager->getTrack(index);
+            const Track *track = track_manager->getTrack(track_index);
             std::string id = track->getIdent();
-            // Avoid duplicate tracks
-            if (std::find(m_tracks.begin(), m_tracks.end(), id) != m_tracks.end())
+
+            if (PlayerManager::getCurrentPlayer()->isLocked(track->getIdent()))
                 continue;
 
-            m_tracks.push_back(id);
-            m_laps.push_back(track->getDefaultNumberOfLaps());
-            m_reversed.push_back(false); // This will be changed later in the code
+            bool is_already_added = false;
+            for (unsigned int i = 0; i < m_tracks.size(); i++)
+            {
+                if (m_tracks[i] == id)
+                {
+                    is_already_added = true;
+                    break;
+                }
+            }
+
+            if (!is_already_added)
+            {
+                m_tracks.push_back(id);
+                m_laps.push_back(track->getDefaultNumberOfLaps());
+                m_reversed.push_back(false); // This will be changed later in the code
+            }
+
+            track_indices.erase(track_indices.begin()+index);
         }
     }
     else if (m_tracks.size() > number_of_tracks)
@@ -134,7 +168,7 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
 
     assert(m_tracks.size() == m_laps.size()    );
     assert(m_laps.size()   == m_reversed.size());
-}
+}   // changeTrackNumber
 
 // ----------------------------------------------------------------------------
 /** Updates the GP data with newly decided reverse requirements.
@@ -142,17 +176,24 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
  */
 void GrandPrixData::changeReverse(const GrandPrixData::GPReverseType use_reverse)
 {
+    m_reverse_type = use_reverse;
     for (unsigned int i = 0; i < m_tracks.size(); i++)
     {
         if (use_reverse == GP_NO_REVERSE)
+        {
             m_reversed[i] = false;
+        }
+        else if (use_reverse == GP_ALL_REVERSE) // all reversed
+        {
+            m_reversed[i] = track_manager->getTrack(m_tracks[i])->reverseAvailable();
+        }
         else if (use_reverse == GP_RANDOM_REVERSE)
+        {
             if (track_manager->getTrack(m_tracks[i])->reverseAvailable())
                 m_reversed[i] = (rand() % 2 != 0);
             else
                 m_reversed[i] = false;
-        else // all reversed
-            m_reversed[i] = track_manager->getTrack(m_tracks[i])->reverseAvailable();
+        }
     }   // for i < m_tracks.size()
 }   // changeReverse
 
@@ -193,6 +234,15 @@ void GrandPrixData::setEditable(const bool editable)
 }   // setEditable
 
 // ----------------------------------------------------------------------------
+/** Sets the group of this grand prix.
+ *  \param editable New value.
+ */
+void GrandPrixData::setGroup(const enum GPGroupType group)
+{
+    m_group = group;
+}   // setGroup
+
+// ----------------------------------------------------------------------------
 /** Reloads grand prix from file.
  */
 void GrandPrixData::reload()
@@ -201,7 +251,7 @@ void GrandPrixData::reload()
     m_laps.clear();
     m_reversed.clear();
 
-    std::auto_ptr<XMLNode> root(file_manager->createXMLTree(m_filename));
+    std::unique_ptr<XMLNode> root(file_manager->createXMLTree(m_filename));
     if (root.get() == NULL)
     {
         Log::error("GrandPrixData",
@@ -231,10 +281,9 @@ void GrandPrixData::reload()
     const int amount = root->getNumNodes();
     if (amount == 0)
     {
-         Log::error("GrandPrixData",
-                    "Error while trying to read grandprix file '%s': "
-                    "There is no track defined", m_filename.c_str());
-        throw std::runtime_error("No track defined");
+         Log::warn("GrandPrixData",
+                   "Grandprix file '%s': There is no track defined",
+                   m_filename.c_str());
     }
 
     // Every iteration means parsing one track entry

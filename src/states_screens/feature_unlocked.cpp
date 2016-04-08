@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -51,7 +52,6 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
-const float ANIM_FROM = 3.0f;
 const float ANIM_TO = 7.0f;
 const int GIFT_EXIT_FROM = (int)ANIM_TO;
 const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
@@ -250,8 +250,8 @@ void FeatureUnlockedCutScene::addUnlockedPicture(irr::video::ITexture* picture,
 {
     if (picture == NULL)
     {
-        std::cerr << "[FeatureUnlockedCutScene::addUnlockedPicture] WARNING: unlockable has no picture : "
-                  << core::stringc(msg.c_str()).c_str() << "\n";
+        Log::warn("FeatureUnlockedCutScene::addUnlockedPicture", "Unlockable has no picture: %s",
+            core::stringc(msg.c_str()).c_str());
         picture = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,"main_help.png"));
 
     }
@@ -275,17 +275,20 @@ void FeatureUnlockedCutScene::addUnlockedPictures(std::vector<irr::video::ITextu
 void FeatureUnlockedCutScene::init()
 {
     m_global_time = 0.0f;
+    CutsceneWorld::setUseDuration(false);
 
     const int unlockedStuffCount = m_unlocked_stuff.size();
 
-    if (unlockedStuffCount == 0)  std::cerr << "There is nothing in the unlock chest!!!\n";
+    if (unlockedStuffCount == 0)
+        Log::error("FeatureUnlockedCutScene::init", "There is nothing in the unlock chest");
 
     m_all_kart_models.clearAndDeleteAll();
     for (int n=0; n<unlockedStuffCount; n++)
     {
         if (m_unlocked_stuff[n].m_unlock_model.size() > 0)
         {
-            m_unlocked_stuff[n].m_root_gift_node = irr_driver->addMesh( irr_driver->getMesh(m_unlocked_stuff[n].m_unlock_model) );
+            m_unlocked_stuff[n].m_root_gift_node = irr_driver->addMesh(
+                irr_driver->getMesh(m_unlocked_stuff[n].m_unlock_model), "unlocked_model");
             m_unlocked_stuff[n].m_scale = 0.7f;
             //m_unlocked_stuff[n].m_root_gift_node->setScale(core::vector3df(0.2f, 0.2f, 0.2f));
         }
@@ -297,8 +300,7 @@ void FeatureUnlockedCutScene::init()
             m_unlocked_stuff[n].m_root_gift_node = kart_model->attachModel(true, false);
             m_unlocked_stuff[n].m_scale = 5.0f;
             kart_model->setAnimation(KartModel::AF_DEFAULT);
-            float susp[4]={0,0,0,0};
-            kart_model->update(0.0f, 0.0f, 0.0f, susp, 0.0f);
+            kart_model->update(0.0f, 0.0f, 0.0f, 0.0f); // set model current frame to "center"
 
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked kart");
@@ -336,13 +338,15 @@ void FeatureUnlockedCutScene::init()
                                                    m_unlocked_stuff[n].m_w,
                                                    m_unlocked_stuff[n].m_h);
             m_unlocked_stuff[n].m_root_gift_node = irr_driver->getSceneManager()->addEmptySceneNode();
-            m_unlocked_stuff[n].m_side_1 = irr_driver->addMesh(mesh, m_unlocked_stuff[n].m_root_gift_node);
+            irr_driver->setAllMaterialFlags(mesh);
+            m_unlocked_stuff[n].m_side_1 = irr_driver->addMesh(mesh, "unlocked_picture", m_unlocked_stuff[n].m_root_gift_node);
             //mesh->drop();
 
             mesh = irr_driver->createTexturedQuadMesh(&m,
                 m_unlocked_stuff[n].m_w,
                 m_unlocked_stuff[n].m_h);
-            m_unlocked_stuff[n].m_side_2 = irr_driver->addMesh(mesh, m_unlocked_stuff[n].m_root_gift_node);
+            irr_driver->setAllMaterialFlags(mesh);
+            m_unlocked_stuff[n].m_side_2 = irr_driver->addMesh(mesh, "unlocked_picture",  m_unlocked_stuff[n].m_root_gift_node);
             m_unlocked_stuff[n].m_side_2->setRotation(core::vector3df(0.0f, 180.0f, 0.0f));
             //mesh->drop();
 #ifdef DEBUG
@@ -351,7 +355,7 @@ void FeatureUnlockedCutScene::init()
         }
         else
         {
-            std::cerr << "Malformed unlocked goody!!!\n";
+            Log::error("FeatureUnlockedCutScene::init", "Malformed unlocked goody");
         }
     }
 
@@ -403,8 +407,8 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
                 else if (n > 1) pos.X += 1.0f*dt*(n - 0.3f);
 
                 //else            pos.X += 6.2f*dt*float( int((n + 1)/2) );
-                //std::cout << "Object " << n << " moving by " <<
-                //  (n % 2 == 0 ? -4.0f : 4.0f)*float( n/2 + 1 ) << std::endl;
+                //Log::info("FeatureUnlockedCutScene", "Object %d moving by %f", n,
+                //    (n % 2 == 0 ? -4.0f : 4.0f)*float( n/2 + 1 ));
             }
             else
             {
@@ -430,16 +434,15 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
         if (!m_unlocked_stuff[n].m_pictures.empty())
         {
-            const int pictureCount = m_unlocked_stuff[n].m_pictures.size();
+            const int picture_count = (int)m_unlocked_stuff[n].m_pictures.size();
 
-            if (pictureCount > 1)
+            if (picture_count > 1)
             {
                 const int previousTextureID = m_unlocked_stuff[n].m_curr_image;
-                const int textureID = int(m_global_time/1.2f) % pictureCount;
+                const int textureID = int(m_global_time/1.2f) % picture_count;
 
                 if (textureID != previousTextureID)
                 {
-                    scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)m_unlocked_stuff[n].m_root_gift_node;
                     scene::IMesh* mesh = m_unlocked_stuff[n].m_side_1->getMesh();
 
                     assert(mesh->getMeshBufferCount() == 1);
@@ -469,7 +472,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
                     m_unlocked_stuff[n].m_curr_image = textureID;
                 }   // textureID != previousTextureID
-            }   // if pictureCount>1
+            }   // if picture_count>1
         }   // if !m_unlocked_stuff[n].m_pictures.empty()
 
         float scale = m_unlocked_stuff[n].m_scale;
@@ -516,7 +519,7 @@ void FeatureUnlockedCutScene::addUnlockedTrack(const Track* track)
 {
     if (track == NULL)
     {
-        std::cerr << "ERROR: Unlocked track does not exist???\n";
+        Log::error("FeatureUnlockedCutScene::addUnlockedTrack", "Unlocked track does not exist");
         return;
     }
 
@@ -531,25 +534,26 @@ void FeatureUnlockedCutScene::addUnlockedTrack(const Track* track)
 void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
 {
     std::vector<ITexture*> images;
+    core::stringw gpname;
     if (gp == NULL)
     {
-        std::cerr << "ERROR: Unlocked GP does not exist???\n";
+        Log::error("FeatureUnlockedCutScene::addUnlockedGP", "Unlocked GP does not exist");
         video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,"main_help.png"));
         images.push_back(WTF_image);
     }
     else
     {
         const std::vector<std::string> gptracks = gp->getTrackNames();
-        const int trackAmount = gptracks.size();
+        const int track_amount = (int)gptracks.size();
 
-        if (trackAmount == 0)
+        if (track_amount == 0)
         {
-            std::cerr << "ERROR: Unlocked GP is empty???\n";
+            Log::error("FeatureUnlockedCutScene::addUnlockedGP", "Unlocked GP is empty");
             video::ITexture* WTF_image = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI,"main_help.png"));
             images.push_back(WTF_image);
         }
 
-        for (int t=0; t<trackAmount; t++)
+        for (int t=0; t<track_amount; t++)
         {
             Track* track = track_manager->getTrack(gptracks[t]);
 
@@ -557,9 +561,9 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
                                                           : file_manager->getAsset(FileManager::GUI,"main_help.png"));
             images.push_back(tex);
         }
+        gpname = gp->getName();
     }
 
-    core::stringw gpname = gp->getName();
     addUnlockedPictures(images, 4.0f, 3.0f, _("You unlocked grand prix %0", gpname));
 }
 

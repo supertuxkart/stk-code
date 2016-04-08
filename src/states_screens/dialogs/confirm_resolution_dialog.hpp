@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@
 #define HEADER_CONFIRM_RES_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "utils/cpp2011.hpp"
 
 /**
  * \brief Dialog shown after a resolution switch sot he user may confirm if
@@ -28,6 +29,7 @@
  */
 class ConfirmResolutionDialog : public GUIEngine::ModalDialog
 {
+private:
     /** number of seconds left before resolution is considered unplayable */
     float m_remaining_time;
         
@@ -36,10 +38,11 @@ class ConfirmResolutionDialog : public GUIEngine::ModalDialog
 public:
 
     ConfirmResolutionDialog();
-    void onEnterPressedInternal();
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    void onEnterPressedInternal() OVERRIDE;
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
     
-    virtual void onUpdate(float dt);
+    virtual void onUpdate(float dt) OVERRIDE;
+    virtual bool onEscapePressed() OVERRIDE;
 };
   
 

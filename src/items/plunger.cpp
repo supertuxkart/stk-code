@@ -1,9 +1,9 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007-2013 Joerg Henrichs
+//  Copyright (C) 2007-2015 Joerg Henrichs
 //
 //  Physics improvements and linear intersection algorithm by
-//  Copyright (C) 2009-2013 David Mikos.
+//  Copyright (C) 2009-2015 David Mikos.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 
 #include "items/plunger.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
@@ -58,8 +59,6 @@ Plunger::Plunger(AbstractKart *kart)
 
     btTransform kart_transform = kart->getAlignedTransform();
     btMatrix3x3 kart_rotation = kart_transform.getBasis();
-    // The current forward vector is rotation*(0,0,1), or:
-    btVector3 forward(kart_rotation.getColumn(2));
 
     float heading =kart->getHeading();
     float pitch  = kart->getTerrainPitch(heading);
@@ -161,7 +160,7 @@ bool Plunger::updateAndDelete(float dt)
 bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 {
     if(isOwnerImmunity(kart)) return false;
-    
+
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
     if( m_reverse_mode || race_manager->isBattleMode() )
@@ -169,8 +168,8 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
         if(kart)
         {
             kart->blockViewWithPlunger();
-            if (kart->getController()->isPlayerController())
-                sfx_manager->quickSound("plunger");
+            if (kart->getController()->isLocalPlayerController())
+                SFXManager::get()->quickSound("plunger");
         }
 
         m_keep_alive = 0;
@@ -180,7 +179,7 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
     }
     else
     {
-        m_keep_alive = m_owner->getKartProperties()->getRubberBandDuration();
+        m_keep_alive = m_owner->getKartProperties()->getPlungerBandDuration();
 
         // Make this object invisible by placing it faaar down. Not that if this
         // objects is simply removed from the scene graph, it might be auto-deleted

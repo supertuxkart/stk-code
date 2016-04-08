@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2015 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -29,7 +29,6 @@
 
 namespace Online
 {
-
     class OnlineProfile;
 
 /** Class that manages all online profiles. Profiles are used for storing
@@ -71,9 +70,11 @@ private:
      *  loaded, to make sure they can be all stored). */
     unsigned int  m_max_cache_size;
 
-    void updateCacheBits(OnlineProfile * profile);
-    void addDirectToCache(OnlineProfile * profile);
-
+    void updateCacheBits(OnlineProfile *profile);
+    void addDirectToCache(OnlineProfile *profile);
+    void updateFriendFlagsInCache(const ProfilesMap &cache,
+                                  uint32_t profile_id);
+    void updateAllFriendFlags(const OnlineProfile *profile);
 public:
     /** Create the singleton instance. */
     static void create()
@@ -81,6 +82,7 @@ public:
         assert(!m_profile_manager);
         m_profile_manager = new ProfileManager();
     }   // create
+
     // ----------------------------------------------------------------
     /** Returns the singleton.
      *  \pre create has been called to create the singleton.
@@ -101,7 +103,7 @@ public:
     // ----------------------------------------------------------------
 
     void addToCache(OnlineProfile *profile);
-    void addPersistent(OnlineProfile *profile);
+    OnlineProfile* addPersistent(OnlineProfile *profile);
     void deleteFromPersistent(const uint32_t id);
     void clearPersistent();
     void moveToCache(const uint32_t id);
@@ -109,6 +111,7 @@ public:
     bool isInCache(const uint32_t id);
     bool inPersistent(const uint32_t id);
     OnlineProfile* getProfileByID(const uint32_t id);
+
     // ----------------------------------------------------------------
     /** Marks a given profile to be the currently visited one. This
      *  is used to mark the profiles that ave its data display (e.g.
@@ -117,15 +120,12 @@ public:
     {
         m_currently_visiting = getProfileByID(id);
     }   // setVisiting
+
     // ----------------------------------------------------------------
     /** \return the instance of the profile that's currently being
      *  visited */
     OnlineProfile* getVisitingProfile() { return m_currently_visiting; }
 
 };   // class CurrentUser
-
 } // namespace Online
-
-#endif
-
-/*EOF*/
+#endif // HEADER_ONLINE_PROFILE_MANAGER_HPP

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2013 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2015 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -81,7 +81,7 @@ public:
     void         setErrorState() { m_state.setAtomic(STATE_ERROR); }
     // ------------------------------------------------------------------------
     /** Returns the list of addons (installed and uninstalled). */
-    unsigned int getNumAddons() const { return m_addons_list.getData().size();}
+    unsigned int getNumAddons() const { return (unsigned int) m_addons_list.getData().size();}
     // ------------------------------------------------------------------------
     /** Returns the i-th addons. */
     const Addon& getAddon(unsigned int i) { return m_addons_list.getData()[i];}

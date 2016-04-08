@@ -1,89 +1,46 @@
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 #include "graphics/glwrap.hpp"
+
+
+#include "config/hardware_stats.hpp"
+#include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
+#include "graphics/shaders.hpp"
+#include "graphics/stk_mesh.hpp"
+#include "utils/profiler.hpp"
+#include "utils/cpp2011.hpp"
+
 #include <fstream>
 #include <string>
-#include "config/user_config.hpp"
-#include "utils/profiler.hpp"
-
-#ifdef _IRR_WINDOWS_API_
-#define IRR_OGL_LOAD_EXTENSION(X) wglGetProcAddress(reinterpret_cast<const char*>(X))
-PFNGLGENTRANSFORMFEEDBACKSPROC glGenTransformFeedbacks;
-PFNGLBINDTRANSFORMFEEDBACKPROC glBindTransformFeedback;
-PFNGLDRAWTRANSFORMFEEDBACKPROC glDrawTransformFeedback;
-PFNGLBEGINTRANSFORMFEEDBACKPROC glBeginTransformFeedback;
-PFNGLENDTRANSFORMFEEDBACKPROC glEndTransformFeedback;
-PFNGLTRANSFORMFEEDBACKVARYINGSPROC glTransformFeedbackVaryings;
-PFNGLBINDBUFFERBASEPROC glBindBufferBase;
-PFNGLGENBUFFERSPROC glGenBuffers;
-PFNGLBINDBUFFERPROC glBindBuffer;
-PFNGLBUFFERDATAPROC glBufferData;
-PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
-PFNGLCREATESHADERPROC glCreateShader;
-PFNGLCOMPILESHADERPROC glCompileShader;
-PFNGLSHADERSOURCEPROC glShaderSource;
-PFNGLCREATEPROGRAMPROC glCreateProgram;
-PFNGLATTACHSHADERPROC glAttachShader;
-PFNGLLINKPROGRAMPROC glLinkProgram;
-PFNGLUSEPROGRAMPROC glUseProgram;
-PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
-PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
-PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
-PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
-PFNGLUNIFORM1FPROC glUniform1f;
-PFNGLUNIFORM3FPROC glUniform3f;
-PFNGLDELETESHADERPROC glDeleteShader;
-PFNGLGETSHADERIVPROC glGetShaderiv;
-PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
-PFNGLACTIVETEXTUREPROC glActiveTexture;
-PFNGLUNIFORM2FPROC glUniform2f;
-PFNGLUNIFORM1IPROC glUniform1i;
-PFNGLUNIFORM3IPROC glUniform3i;
-PFNGLUNIFORM4IPROC glUniform4i;
-PFNGLUNIFORM1FVPROC glUniform1fv;
-PFNGLUNIFORM4FVPROC glUniform4fv;
-PFNGLGETPROGRAMIVPROC glGetProgramiv;
-PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
-PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
-PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
-PFNGLBLENDEQUATIONPROC glBlendEquation;
-PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
-PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
-PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex;
-PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced;
-PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC glDrawElementsInstancedBaseVertex;
-PFNGLDELETEBUFFERSPROC glDeleteBuffers;
-PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
-PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
-PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
-PFNGLTEXBUFFERPROC glTexBuffer;
-PFNGLBUFFERSUBDATAPROC glBufferSubData;
-PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
-PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
-PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
-PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
-PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
-PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
-PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
-PFNGLTEXIMAGE3DPROC glTexImage3D;
-PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
-PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
-PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample;
-PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer;
-PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
-PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
-PFNGLBLENDCOLORPROC glBlendColor;
-PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2D;
-PFNGLGETCOMPRESSEDTEXIMAGEPROC glGetCompressedTexImage;
-PFNGLTEXSTORAGE1DPROC glTexStorage1D;
-PFNGLTEXSTORAGE2DPROC glTexStorage2D;
-PFNGLTEXSTORAGE3DPROC glTexStorage3D;
-PFNGLBINDIMAGETEXTUREPROC glBindImageTexture;
-PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
-#endif
+#include <sstream>
 
 static bool is_gl_init = false;
 
+#if DEBUG
+bool GLContextDebugBit = true;
+#else
+bool GLContextDebugBit = false;
+#endif
+
+
 #ifdef DEBUG
-#ifdef WIN32
+#if !defined(__APPLE__)
 #define ARB_DEBUG_OUTPUT
 #endif
 #endif
@@ -96,9 +53,18 @@ CALLBACK
 debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
               const GLchar* msg, const void *userparam)
 {
+#ifdef GL_DEBUG_SEVERITY_NOTIFICATION
     // ignore minor notifications sent by some drivers (notably the nvidia one)
     if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
         return;
+#endif
+
+    // suppress minor performance warnings (emitted mostly by nvidia drivers)
+    if ((severity == GL_DEBUG_SEVERITY_MEDIUM_ARB || severity == GL_DEBUG_SEVERITY_LOW_ARB) &&
+        type == GL_DEBUG_TYPE_PERFORMANCE_ARB)
+    {
+        return;
+    }
 
     switch(source)
     {
@@ -156,7 +122,7 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
         Log::warn("GLWrap", "    Severity : LOW");
         break;
     }
-
+    
     if (msg)
         Log::warn("GLWrap", "    Message : %s", msg);
 }
@@ -167,624 +133,45 @@ void initGL()
     if (is_gl_init)
         return;
     is_gl_init = true;
-#ifdef _IRR_WINDOWS_API_
-    glGenTransformFeedbacks = (PFNGLGENTRANSFORMFEEDBACKSPROC)IRR_OGL_LOAD_EXTENSION("glGenTransformFeedbacks");
-    glBindTransformFeedback = (PFNGLBINDTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glBindTransformFeedback");
-    glDrawTransformFeedback = (PFNGLDRAWTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glDrawTransformFeedback");
-    glBeginTransformFeedback = (PFNGLBEGINTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glBeginTransformFeedback");
-    glEndTransformFeedback = (PFNGLENDTRANSFORMFEEDBACKPROC)IRR_OGL_LOAD_EXTENSION("glEndTransformFeedback");
-    glBindBufferBase = (PFNGLBINDBUFFERBASEPROC)IRR_OGL_LOAD_EXTENSION("glBindBufferBase");
-    glGenBuffers = (PFNGLGENBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glGenBuffers");
-    glBindBuffer = (PFNGLBINDBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBindBuffer");
-    glBufferData = (PFNGLBUFFERDATAPROC)IRR_OGL_LOAD_EXTENSION("glBufferData");
-    glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribPointer");
-    glCreateShader = (PFNGLCREATESHADERPROC)IRR_OGL_LOAD_EXTENSION("glCreateShader");
-    glCompileShader = (PFNGLCOMPILESHADERPROC)IRR_OGL_LOAD_EXTENSION("glCompileShader");
-    glShaderSource = (PFNGLSHADERSOURCEPROC)IRR_OGL_LOAD_EXTENSION("glShaderSource");
-    glCreateProgram = (PFNGLCREATEPROGRAMPROC)IRR_OGL_LOAD_EXTENSION("glCreateProgram");
-    glAttachShader = (PFNGLATTACHSHADERPROC)IRR_OGL_LOAD_EXTENSION("glAttachShader");
-    glLinkProgram = (PFNGLLINKPROGRAMPROC)IRR_OGL_LOAD_EXTENSION("glLinkProgram");
-    glUseProgram = (PFNGLUSEPROGRAMPROC)IRR_OGL_LOAD_EXTENSION("glUseProgram");
-    glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)IRR_OGL_LOAD_EXTENSION("glEnableVertexAttribArray");
-    glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glGetUniformLocation");
-    glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)IRR_OGL_LOAD_EXTENSION("glUniformMatrix4fv");
-    glUniform1f = (PFNGLUNIFORM1FPROC)IRR_OGL_LOAD_EXTENSION("glUniform1f");
-    glUniform3f = (PFNGLUNIFORM3FPROC)IRR_OGL_LOAD_EXTENSION("glUniform3f");
-    glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)IRR_OGL_LOAD_EXTENSION("glDisableVertexAttribArray");
-    glDeleteShader = (PFNGLDELETESHADERPROC)IRR_OGL_LOAD_EXTENSION("glDeleteShader");
-    glGetShaderiv = (PFNGLGETSHADERIVPROC)IRR_OGL_LOAD_EXTENSION("glGetShaderiv");
-    glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)IRR_OGL_LOAD_EXTENSION("glGetShaderInfoLog");
-    glActiveTexture = (PFNGLACTIVETEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glActiveTexture");
-    glUniform2f = (PFNGLUNIFORM2FPROC)IRR_OGL_LOAD_EXTENSION("glUniform2f");
-    glUniform4i = (PFNGLUNIFORM4IPROC)IRR_OGL_LOAD_EXTENSION("glUniform4i");
-    glUniform3i = (PFNGLUNIFORM3IPROC)IRR_OGL_LOAD_EXTENSION("glUniform3i");
-    glUniform1i = (PFNGLUNIFORM1IPROC)IRR_OGL_LOAD_EXTENSION("glUniform1i");
-    glGetProgramiv = (PFNGLGETPROGRAMIVPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramiv");
-    glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramInfoLog");
-    glTransformFeedbackVaryings = (PFNGLTRANSFORMFEEDBACKVARYINGSPROC)IRR_OGL_LOAD_EXTENSION("glTransformFeedbackVaryings");
-    glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glGetAttribLocation");
-    glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glBindAttribLocation");
-    glBlendEquation = (PFNGLBLENDEQUATIONPROC)IRR_OGL_LOAD_EXTENSION("glBlendEquation");
-    glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribDivisor");
-    glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawArraysInstanced");
-    glDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXPROC)IRR_OGL_LOAD_EXTENSION("glDrawElementsBaseVertex");
-    glDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawElementsInstanced");
-    glDrawElementsInstancedBaseVertex = (PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC)IRR_OGL_LOAD_EXTENSION("glDrawElementsInstancedBaseVertex");
-    glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteBuffers");
-    glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)IRR_OGL_LOAD_EXTENSION("glGenVertexArrays");
-    glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)IRR_OGL_LOAD_EXTENSION("glBindVertexArray");
-    glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteVertexArrays");
-    glTexBuffer = (PFNGLTEXBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glTexBuffer");
-    glUniform1fv = (PFNGLUNIFORM1FVPROC)IRR_OGL_LOAD_EXTENSION("glUniform1fv");
-    glUniform4fv = (PFNGLUNIFORM4FVPROC)IRR_OGL_LOAD_EXTENSION("glUniform4fv");
-    glBufferSubData = (PFNGLBUFFERSUBDATAPROC)IRR_OGL_LOAD_EXTENSION("glBufferSubData");
-    glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribIPointer");
-    glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glGenFramebuffers");
-    glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteFramebuffers");
-    glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBindFramebuffer");
-    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture2D");
-    glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture");
-    glTexImage3D = (PFNGLTEXIMAGE3DPROC)IRR_OGL_LOAD_EXTENSION("glTexImage3D");
-    glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)IRR_OGL_LOAD_EXTENSION("glGenerateMipmap");
-    glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)IRR_OGL_LOAD_EXTENSION("glCheckFramebufferStatus");
-    glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)IRR_OGL_LOAD_EXTENSION("glTexImage2DMultisample");
-    glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBlitFramebuffer");
-    glGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)IRR_OGL_LOAD_EXTENSION("glGetUniformBlockIndex");
-    glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)IRR_OGL_LOAD_EXTENSION("glUniformBlockBinding");
-    glBlendColor = (PFNGLBLENDCOLORPROC)IRR_OGL_LOAD_EXTENSION("glBlendColor");
-    glCompressedTexImage2D = (PFNGLCOMPRESSEDTEXIMAGE2DPROC)IRR_OGL_LOAD_EXTENSION("glCompressedTexImage2D");
-    glGetCompressedTexImage = (PFNGLGETCOMPRESSEDTEXIMAGEPROC)IRR_OGL_LOAD_EXTENSION("glGetCompressedTexImage");
-    glTexStorage1D = (PFNGLTEXSTORAGE1DPROC)IRR_OGL_LOAD_EXTENSION("glTexStorage1D");
-    glTexStorage2D = (PFNGLTEXSTORAGE2DPROC)IRR_OGL_LOAD_EXTENSION("glTexStorage2D");
-    glTexStorage3D = (PFNGLTEXSTORAGE3DPROC)IRR_OGL_LOAD_EXTENSION("glTexStorage3D");
-    glBindImageTexture = (PFNGLBINDIMAGETEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glBindImageTexture");
-    glDispatchCompute = (PFNGLDISPATCHCOMPUTEPROC)IRR_OGL_LOAD_EXTENSION("glDispatchCompute");
-#ifdef DEBUG
-    glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
+    // For Mesa extension reporting
+#ifndef WIN32
+    glewExperimental = GL_TRUE;
 #endif
-#endif
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
+        Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
 #ifdef ARB_DEBUG_OUTPUT
     if (glDebugMessageCallbackARB)
         glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
 #endif
 }
 
-static std::string LoadHeader()
-{
-    std::string result;
-    std::ifstream Stream(file_manager->getAsset("shaders/header.txt").c_str(), std::ios::in);
-
-    if (Stream.is_open())
-    {
-        std::string Line = "";
-        while (getline(Stream, Line))
-            result += "\n" + Line;
-        Stream.close();
-    }
-
-    return result;
-}
-
-// Mostly from shader tutorial
-GLuint LoadShader(const char * file, unsigned type)
-{
-    GLuint Id = glCreateShader(type);
-    char versionString[20];
-    sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
-    std::string Code = versionString;
-    std::ifstream Stream(file, std::ios::in);
-    Code += "//" + std::string(file) + "\n";
-    if (irr_driver->needUBOWorkaround())
-        Code += "#define UBO_DISABLED\n";
-    if (irr_driver->hasVSLayerExtension())
-        Code += "#define VSLayer\n";
-    Code += LoadHeader();
-    if (Stream.is_open())
-    {
-        std::string Line = "";
-        while (getline(Stream, Line))
-            Code += "\n" + Line;
-        Stream.close();
-    }
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
-    Log::info("GLWrap", "Compiling shader : %s", file);
-    char const * SourcePointer = Code.c_str();
-    int length = strlen(SourcePointer);
-    glShaderSource(Id, 1, &SourcePointer, &length);
-    glCompileShader(Id);
-
-    glGetShaderiv(Id, GL_COMPILE_STATUS, &Result);
-    if (Result == GL_FALSE)
-    {
-        Log::error("GLWrap", "Error in shader %s", file);
-        glGetShaderiv(Id, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        if(InfoLogLength<0)
-            InfoLogLength = 1024;
-        char *ErrorMessage = new char[InfoLogLength];
-        ErrorMessage[0]=0;
-        glGetShaderInfoLog(Id, InfoLogLength, NULL, ErrorMessage);
-        Log::error("GLWrap", ErrorMessage);
-        delete[] ErrorMessage;
-    }
-
-    glGetError();
-
-    return Id;
-}
-
-GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount)
-{
-    GLuint Program = glCreateProgram();
-    loadAndAttach(Program, GL_VERTEX_SHADER, vertex_file_path);
-    glTransformFeedbackVaryings(Program, varyingscount, varyings, GL_INTERLEAVED_ATTRIBS);
-    glLinkProgram(Program);
-
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
-    glGetProgramiv(Program, GL_LINK_STATUS, &Result);
-    if (Result == GL_FALSE)
-    {
-        glGetProgramiv(Program, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        char *ErrorMessage = new char[InfoLogLength];
-        glGetProgramInfoLog(Program, InfoLogLength, NULL, ErrorMessage);
-        Log::error("GLWrap", ErrorMessage);
-        delete[] ErrorMessage;
-    }
-
-    glGetError();
-
-    return Program;
-}
-
-GLuint getTextureGLuint(irr::video::ITexture *tex)
-{
-    return static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
-}
-
-GLuint getDepthTexture(irr::video::ITexture *tex)
-{
-    assert(tex->isRenderTarget());
-    return static_cast<irr::video::COpenGLFBOTexture*>(tex)->DepthBufferTexture;
-}
-
-std::set<irr::video::ITexture *> AlreadyTransformedTexture;
-void resetTextureTable()
-{
-    AlreadyTransformedTexture.clear();
-}
-
-void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
-{
-    if (AlreadyTransformedTexture.find(tex) != AlreadyTransformedTexture.end())
-        return;
-    AlreadyTransformedTexture.insert(tex);
-
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
-
-    std::string cached_file;
-    if (UserConfigParams::m_texture_compression)
-    {
-        // Try to retrieve the compressed texture in cache
-        std::string tex_name = irr_driver->getTextureName(tex);
-        if (!tex_name.empty()) {
-            cached_file = file_manager->getTextureCacheLocation(tex_name) + ".gltz";
-            if (!file_manager->fileIsNewer(tex_name, cached_file)) {
-                if (loadCompressedTexture(cached_file))
-                    return;
-            }
-        }
-    }
-
-    size_t w = tex->getSize().Width, h = tex->getSize().Height;
-    unsigned char *data = new unsigned char[w * h * 4];
-    memcpy(data, tex->lock(), w * h * 4);
-    tex->unlock();
-    unsigned internalFormat, Format;
-    if (tex->hasAlpha())
-        Format = GL_BGRA;
-    else
-        Format = GL_BGR;
-
-    if (premul_alpha)
-    {
-        for (unsigned i = 0; i < w * h; i++)
-        {
-            float alpha = data[4 * i + 3];
-            if (alpha > 0.)
-                alpha = pow(alpha / 255.f, 1.f / 2.2f);
-            data[4 * i    ] = (unsigned char)(data[4 * i    ] * alpha);
-            data[4 * i + 1] = (unsigned char)(data[4 * i + 1] * alpha);
-            data[4 * i + 2] = (unsigned char)(data[4 * i + 2] * alpha);
-        }
-    }
-
-    if (!UserConfigParams::m_texture_compression)
-    {
-        if (srgb)
-            internalFormat = (tex->hasAlpha()) ? GL_SRGB_ALPHA : GL_SRGB;
-        else
-            internalFormat = (tex->hasAlpha()) ? GL_RGBA : GL_RGB;
-    }
-    else
-    {
-        if (srgb)
-            internalFormat = (tex->hasAlpha()) ? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT : GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
-        else
-            internalFormat = (tex->hasAlpha()) ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-    }
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, Format, GL_UNSIGNED_BYTE, (GLvoid *)data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    delete[] data;
-
-    if (UserConfigParams::m_texture_compression && !cached_file.empty())
-    {
-        // Save the compressed texture in the cache for later use.
-        saveCompressedTexture(cached_file);
-    }
-}
-
-//-----------------------------------------------------------------------------
-/** Try to load a compressed texture from the given file name.
- *   Data in the specified file need to have a specific format. See the
- *   saveCompressedTexture() function for a description of the format.
- *   \return true if the loading succeeded, false otherwise.
- *   \see saveCompressedTexture
- */
-bool loadCompressedTexture(const std::string& compressed_tex)
-{
-    std::ifstream ifs(compressed_tex.c_str(), std::ios::in | std::ios::binary);
-    if (!ifs.is_open())
-        return false;
-
-    int internal_format;
-    int w, h;
-    int size = -1;
-    ifs.read((char*)&internal_format, sizeof(int));
-    ifs.read((char*)&w, sizeof(int));
-    ifs.read((char*)&h, sizeof(int));
-    ifs.read((char*)&size, sizeof(int));
-
-    if (ifs.fail() || size == -1)
-        return false;
-
-    char *data = new char[size];
-    ifs.read(data, size);
-    if (!ifs.fail())
-    {
-        glCompressedTexImage2D(GL_TEXTURE_2D, 0, internal_format,
-                               w, h, 0, size, (GLvoid*)data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        delete[] data;
-        ifs.close();
-        return true;
-    }
-    delete[] data;
-    return false;
-}
-
-//-----------------------------------------------------------------------------
-/** Try to save the last texture sent to glTexImage2D in a file of the given
- *   file name. This function should only be used for textures sent to
- *   glTexImage2D with a compressed internal format as argument.<br>
- *   \note The following format is used to save the compressed texture:<br>
- *         <internal-format><width><height><size><data> <br>
- *         The first four elements are integers and the last one is stored
- *         on \c size bytes.
- *   \see loadCompressedTexture
- */
-void saveCompressedTexture(const std::string& compressed_tex)
-{
-    int internal_format, width, height, size, compressionSuccessful;
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, (GLint *)&internal_format);
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, (GLint *)&width);
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, (GLint *)&height);
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED, (GLint *)&compressionSuccessful);
-    if (!compressionSuccessful)
-        return;
-    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_IMAGE_SIZE, (GLint *)&size);
-
-    char *data = new char[size];
-    glGetCompressedTexImage(GL_TEXTURE_2D, 0, (GLvoid*)data);
-    std::ofstream ofs(compressed_tex.c_str(), std::ios::out | std::ios::binary);
-    if (ofs.is_open())
-    {
-        ofs.write((char*)&internal_format, sizeof(int));
-        ofs.write((char*)&width, sizeof(int));
-        ofs.write((char*)&height, sizeof(int));
-        ofs.write((char*)&size, sizeof(int));
-        ofs.write(data, size);
-        ofs.close();
-    }
-    delete[] data;
-}
-
-static unsigned colorcount = 0;
-
-video::ITexture* getUnicolorTexture(video::SColor c)
-{
-    video::SColor tmp[4] = {
-        c, c, c, c
-    };
-    video::IImage *img = irr_driver->getVideoDriver()->createImageFromData(video::ECF_A8R8G8B8, core::dimension2d<u32>(2, 2), tmp);
-    img->grab();
-    std::string name("color");
-    name += colorcount++;
-    return irr_driver->getVideoDriver()->addTexture(name.c_str(), img);
-}
-
-void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF)
-{
-    glActiveTexture(GL_TEXTURE0 + TextureUnit);
-    glBindTexture(GL_TEXTURE_2D, TextureId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, MagFilter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, MinFilter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    int aniso = UserConfigParams::m_anisotropic;
-    if (aniso == 0) aniso = 1;
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, allowAF ? (float)aniso : 1.0f);
-
-    glGetError();
-}
-
-class VBOGatherer
-{
-    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_COUNT };
-    GLuint vbo[VTXTYPE_COUNT], ibo[VTXTYPE_COUNT], vao[VTXTYPE_COUNT];
-    std::vector<scene::IMeshBuffer *> storedCPUBuffer[VTXTYPE_COUNT];
-    void *vtx_mirror[VTXTYPE_COUNT], *idx_mirror[VTXTYPE_COUNT];
-    size_t vtx_cnt[VTXTYPE_COUNT], idx_cnt[VTXTYPE_COUNT];
-    std::map<scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
-
-    void regenerateBuffer(enum VTXTYPE);
-    void regenerateVAO(enum VTXTYPE);
-    size_t getVertexPitch(enum VTXTYPE) const;
-    VTXTYPE getVTXTYPE(video::E_VERTEX_TYPE type);
-    void append(scene::IMeshBuffer *, VBOGatherer::VTXTYPE tp);
-public:
-    VBOGatherer();
-    std::pair<unsigned, unsigned> getBase(scene::IMeshBuffer *);
-    unsigned getVBO(video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }
-    unsigned getVAO(video::E_VERTEX_TYPE type) { return vao[getVTXTYPE(type)]; }
-    ~VBOGatherer()
-    {
-        for (unsigned i = 0; i < VTXTYPE_COUNT; i++)
-        {
-            if (vbo[i])
-                glDeleteBuffers(1, &vbo[i]);
-            if (ibo[i])
-                glDeleteBuffers(1, &ibo[i]);
-            if (vao[i])
-                glDeleteVertexArrays(1, &vao[i]);
-        }
-    }
-};
-
-VBOGatherer::VBOGatherer()
-{
-    vao[0] = vao[1] = vao[2] = 0;
-    vbo[0] = vbo[1] = vbo[2] = 0;
-    ibo[0] = ibo[1] = ibo[2] = 0;
-    vtx_cnt[0] = vtx_cnt[1] = vtx_cnt[2] = 0;
-    idx_cnt[0] = idx_cnt[1] = idx_cnt[2] = 0;
-    vtx_mirror[0] = vtx_mirror[1] = vtx_mirror[2] = NULL;
-    idx_mirror[0] = idx_mirror[1] = idx_mirror[2] = NULL;
-}
-
-void VBOGatherer::regenerateBuffer(enum VTXTYPE tp)
-{
-    glBindVertexArray(0);
-    if (vbo[tp])
-        glDeleteBuffers(1, &vbo[tp]);
-    glGenBuffers(1, &vbo[tp]);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
-    glBufferData(GL_ARRAY_BUFFER, vtx_cnt[tp] * getVertexPitch(tp), vtx_mirror[tp], GL_STATIC_DRAW);
-
-    if (ibo[tp])
-        glDeleteBuffers(1, &ibo[tp]);
-    glGenBuffers(1, &ibo[tp]);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[tp]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u16)* idx_cnt[tp], idx_mirror[tp], GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-void VBOGatherer::regenerateVAO(enum VTXTYPE tp)
-{
-    if (vao[tp])
-        glDeleteVertexArrays(1, &vao[tp]);
-    glGenVertexArrays(1, &vao[tp]);
-    glBindVertexArray(vao[tp]);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
-    switch (tp)
-    {
-    case VTXTYPE_STANDARD:
-        // Position
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), 0);
-        // Normal
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)12);
-        // Color
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitch(tp), (GLvoid*)24);
-        // Texcoord
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)28);
-        break;
-    case VTXTYPE_TCOORD:
-        // Position
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), 0);
-        // Normal
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)12);
-        // Color
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitch(tp), (GLvoid*)24);
-        // Texcoord
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)28);
-        // SecondTexcoord
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)36);
-        break;
-    case VTXTYPE_TANGENT:
-        // Position
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), 0);
-        // Normal
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)12);
-        // Color
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitch(tp), (GLvoid*)24);
-        // Texcoord
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)28);
-        // Tangent
-        glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)36);
-        // Bitangent
-        glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, getVertexPitch(tp), (GLvoid*)48);
-        break;
-    }
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[tp]);
-    glBindVertexArray(0);
-}
-
-size_t VBOGatherer::getVertexPitch(enum VTXTYPE tp) const
-{
-    switch (tp)
-    {
-    case VTXTYPE_STANDARD:
-        return getVertexPitchFromType(video::EVT_STANDARD);
-    case VTXTYPE_TCOORD:
-        return getVertexPitchFromType(video::EVT_2TCOORDS);
-    case VTXTYPE_TANGENT:
-        return getVertexPitchFromType(video::EVT_TANGENTS);
-    default:
-        assert(0 && "Wrong vtxtype");
-        return -1;
-    }
-}
-
-VBOGatherer::VTXTYPE VBOGatherer::getVTXTYPE(video::E_VERTEX_TYPE type)
-{
-    switch (type)
-    {
-    case video::EVT_STANDARD:
-        return VTXTYPE_STANDARD;
-    case video::EVT_2TCOORDS:
-        return VTXTYPE_TCOORD;
-    case video::EVT_TANGENTS:
-        return VTXTYPE_TANGENT;
-    default:
-        assert(0 && "Wrong vtxtype");
-    }
-};
-
-void VBOGatherer::append(scene::IMeshBuffer *mb, VBOGatherer::VTXTYPE tp)
-{
-    size_t old_vtx_cnt = vtx_cnt[tp];
-    vtx_cnt[tp] += mb->getVertexCount();
-    vtx_mirror[tp] = realloc(vtx_mirror[tp], vtx_cnt[tp] * getVertexPitch(tp));
-    intptr_t dstptr = (intptr_t)vtx_mirror[tp] + (old_vtx_cnt * getVertexPitch(tp));
-    memcpy((void *)dstptr, mb->getVertices(), mb->getVertexCount() * getVertexPitch(tp));
-    mappedBaseVertex[tp][mb] = old_vtx_cnt;
-
-    size_t old_idx_cnt = idx_cnt[tp];
-    idx_cnt[tp] += mb->getIndexCount();
-    idx_mirror[tp] = realloc(idx_mirror[tp], idx_cnt[tp] * sizeof(u16));
-
-    dstptr = (intptr_t)idx_mirror[tp] + (old_idx_cnt * sizeof(u16));
-    memcpy((void *)dstptr, mb->getIndices(), mb->getIndexCount() * sizeof(u16));
-    mappedBaseIndex[tp][mb] = old_idx_cnt * sizeof(u16);
-}
-
-std::pair<unsigned, unsigned> VBOGatherer::getBase(scene::IMeshBuffer *mb)
-{
-    VTXTYPE tp = getVTXTYPE(mb->getVertexType());
-    if (mappedBaseVertex[tp].find(mb) == mappedBaseVertex[tp].end())
-    {
-        assert(mappedBaseIndex[tp].find(mb) == mappedBaseIndex[tp].end());
-        storedCPUBuffer[tp].push_back(mb);
-        append(mb, tp);
-        regenerateBuffer(tp);
-        regenerateVAO(tp);
-    }
-
-    std::map<scene::IMeshBuffer*, unsigned>::iterator It;
-    It = mappedBaseVertex[tp].find(mb);
-    assert(It != mappedBaseVertex[tp].end());
-    unsigned vtx = It->second;
-    It = mappedBaseIndex[tp].find(mb);
-    assert(It != mappedBaseIndex[tp].end());
-    return std::pair<unsigned, unsigned>(vtx, It->second);
-}
-
-static VBOGatherer *gatherersingleton = 0;
-
-std::pair<unsigned, unsigned> getVAOOffsetAndBase(scene::IMeshBuffer *mb)
-{
-    if (!gatherersingleton)
-        gatherersingleton = new VBOGatherer();
-    return gatherersingleton->getBase(mb);
-}
-
-unsigned getVBO(video::E_VERTEX_TYPE type)
-{
-    if (gatherersingleton)
-        return gatherersingleton->getVBO(type);
-    return 0;
-}
-
-unsigned getVAO(video::E_VERTEX_TYPE type)
-{
-    if (gatherersingleton)
-        return gatherersingleton->getVAO(type);
-    return 0;
-}
-
-void resetVAO()
-{
-    if (gatherersingleton)
-        delete gatherersingleton;
-    gatherersingleton = 0;
-}
-
-ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)
+ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
 {
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
-
+    if (!timer.canSubmitQuery) return;
 #ifdef GL_TIME_ELAPSED
-    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
     if (!timer.initialised)
     {
-        gl_driver->extGlGenQueries(1, &timer.query);
+        glGenQueries(1, &timer.query);
         timer.initialised = true;
     }
-    gl_driver->extGlBeginQuery(GL_TIME_ELAPSED, timer.query);
+    glBeginQuery(GL_TIME_ELAPSED, timer.query);
 #endif
 }
 ScopedGPUTimer::~ScopedGPUTimer()
 {
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
-    
+    if (!timer.canSubmitQuery) return;
 #ifdef GL_TIME_ELAPSED
-    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
-    gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
+    glEndQuery(GL_TIME_ELAPSED);
+    timer.canSubmitQuery = false;
 #endif
 }
 
-GPUTimer::GPUTimer() : initialised(false)
+GPUTimer::GPUTimer() : initialised(false), lastResult(0), canSubmitQuery(true)
 {
 }
 
@@ -793,15 +180,21 @@ unsigned GPUTimer::elapsedTimeus()
     if (!initialised)
         return 0;
     GLuint result;
-    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
-    gl_driver->extGlGetQueryObjectuiv(query, GL_QUERY_RESULT, &result);
+    glGetQueryObjectuiv(query, GL_QUERY_RESULT_AVAILABLE, &result);
+    if (result == GL_FALSE)
+        return lastResult;
+    glGetQueryObjectuiv(query, GL_QUERY_RESULT, &result);
+    lastResult = result / 1000;
+    canSubmitQuery = true;
     return result / 1000;
 }
 
 FrameBuffer::FrameBuffer() {}
 
-FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h, bool layered) :
-    RenderTargets(RTTs), DepthTexture(0), width(w), height(h)
+FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
+                         bool layered)
+           : fbolayer(0), RenderTargets(RTTs), DepthTexture(0), 
+             width(w), height(h)
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -819,8 +212,10 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h, bo
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
 }
 
-FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered) :
-    RenderTargets(RTTs), DepthTexture(DS), width(w), height(h)
+FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
+                         size_t h, bool layered) 
+           : fbolayer(0), RenderTargets(RTTs), DepthTexture(DS), width(w), 
+             height(h)
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -838,27 +233,41 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w, s
     }
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+    if (layered)
+        glGenFramebuffers(1, &fbolayer);
 }
 
 FrameBuffer::~FrameBuffer()
 {
     glDeleteFramebuffers(1, &fbo);
+    if (fbolayer)
+        glDeleteFramebuffers(1, &fbolayer);
 }
 
-void FrameBuffer::Bind()
+void FrameBuffer::bind() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glViewport(0, 0, width, height);
-    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver*)irr_driver->getDevice()->getVideoDriver();
+    glViewport(0, 0, (int)width, (int)height);
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    gl_driver->extGlDrawBuffers(RenderTargets.size(), bufs);
+    glDrawBuffers((int)RenderTargets.size(), bufs);
+}
+
+void FrameBuffer::bindLayer(unsigned i)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, fbolayer);
+    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, RenderTargets[0], 0, i);
+    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, DepthTexture, 0, i);
+    glViewport(0, 0, (int)width, (int)height);
+    GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
 void FrameBuffer::Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask, GLenum filter)
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, Src.fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst.fbo);
-    glBlitFramebuffer(0, 0, Src.width, Src.height, 0, 0, Dst.width, Dst.height, mask, filter);
+    glBlitFramebuffer(0, 0, (int)Src.width, (int)Src.height, 0, 0,
+                      (int)Dst.width, (int)Dst.height, mask, filter);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
@@ -867,7 +276,7 @@ void FrameBuffer::BlitToDefault(size_t x0, size_t y0, size_t x1, size_t y1)
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, width, height, x0, y0, x1, y1, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBlitFramebuffer(0, 0, (int)width, (int)height, (int)x0, (int)y0, (int)x1, (int)y1, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
@@ -876,7 +285,7 @@ void FrameBuffer::BlitToDefault(size_t x0, size_t y0, size_t x1, size_t y1)
 void draw3DLine(const core::vector3df& start,
                 const core::vector3df& end, irr::video::SColor color)
 {
-    if (!irr_driver->isGLSL()) {
+    if (!CVS->isGLSL()) {
         irr_driver->getVideoDriver()->draw3DLine(start, end, color);
         return;
     }
@@ -886,302 +295,428 @@ void draw3DLine(const core::vector3df& start,
         end.X, end.Y, end.Z
     };
 
-    glBindVertexArray(UtilShader::ColoredLine::vao);
-    glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
+    Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
+    line->bindVertexArray();
+    line->bindBuffer();
     glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * sizeof(float), vertex);
 
-    glUseProgram(UtilShader::ColoredLine::Program);
-    UtilShader::ColoredLine::setUniforms(color);
+    line->use();
+    line->setUniforms(color);
     glDrawArrays(GL_LINES, 0, 2);
 
     glGetError();
 }
 
-static void drawTexColoredQuad(const video::ITexture *texture, const video::SColor *col, float width, float height,
-                               float center_pos_x, float center_pos_y, float tex_center_pos_x, float tex_center_pos_y,
-                               float tex_width, float tex_height)
+bool hasGLExtension(const char* extension) 
 {
-    unsigned colors[] = {
-        col[0].getRed(), col[0].getGreen(), col[0].getBlue(), col[0].getAlpha(),
-        col[1].getRed(), col[1].getGreen(), col[1].getBlue(), col[1].getAlpha(),
-        col[2].getRed(), col[2].getGreen(), col[2].getBlue(), col[2].getAlpha(),
-        col[3].getRed(), col[3].getGreen(), col[3].getBlue(), col[3].getAlpha(),
-    };
-
-    glBindBuffer(GL_ARRAY_BUFFER, UIShader::ColoredTextureRectShader::colorvbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 16 * sizeof(unsigned), colors);
-
-    glUseProgram(UIShader::ColoredTextureRectShader::Program);
-    glBindVertexArray(UIShader::ColoredTextureRectShader::vao);
-
-    setTexture(0, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
-    UIShader::TextureRectShader::setUniforms(center_pos_x, center_pos_y, width, height, tex_center_pos_x, tex_center_pos_y, tex_width, tex_height, 0);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glGetError();
-}
-
-static
-void drawTexQuad(GLuint texture, float width, float height,
-                 float center_pos_x, float center_pos_y, float tex_center_pos_x, float tex_center_pos_y,
-                 float tex_width, float tex_height)
-{
-    glUseProgram(UIShader::TextureRectShader::Program);
-    glBindVertexArray(UIShader::TextureRectShader::vao);
-
-    setTexture(0, texture, GL_LINEAR, GL_LINEAR);
-    UIShader::TextureRectShader::setUniforms(center_pos_x, center_pos_y, width, height, tex_center_pos_x, tex_center_pos_y, tex_width, tex_height, 0);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glGetError();
-}
-
-static void
-getSize(unsigned texture_width, unsigned texture_height, bool textureisRTT,
-        const core::rect<s32>& destRect,
-        const core::rect<s32>& sourceRect,
-        float &width, float &height,
-        float &center_pos_x, float &center_pos_y,
-        float &tex_width, float &tex_height,
-        float &tex_center_pos_x, float &tex_center_pos_y
-    )
-{
-    core::dimension2d<u32> frame_size =
-        irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
-    const int screen_w = frame_size.Width;
-    const int screen_h = frame_size.Height;
-    center_pos_x = float(destRect.UpperLeftCorner.X + destRect.LowerRightCorner.X);
-    center_pos_x /= screen_w;
-    center_pos_x -= 1.;
-    center_pos_y = float(destRect.UpperLeftCorner.Y + destRect.LowerRightCorner.Y);
-    center_pos_y /= screen_h;
-    center_pos_y = float(1.f - center_pos_y);
-    width = float(destRect.LowerRightCorner.X - destRect.UpperLeftCorner.X);
-    width /= screen_w;
-    height = float(destRect.LowerRightCorner.Y - destRect.UpperLeftCorner.Y);
-    height /= screen_h;
-
-    tex_center_pos_x = float(sourceRect.UpperLeftCorner.X + sourceRect.LowerRightCorner.X);
-    tex_center_pos_x /= texture_width * 2.f;
-    tex_center_pos_y = float(sourceRect.UpperLeftCorner.Y + sourceRect.LowerRightCorner.Y);
-    tex_center_pos_y /= texture_height * 2.f;
-    tex_width = float(sourceRect.LowerRightCorner.X - sourceRect.UpperLeftCorner.X);
-    tex_width /= texture_width * 2.f;
-    tex_height = float(sourceRect.LowerRightCorner.Y - sourceRect.UpperLeftCorner.Y);
-    tex_height /= texture_height * 2.f;
-
-    if (textureisRTT)
-        tex_height = -tex_height;
-
-    const f32 invW = 1.f / static_cast<f32>(texture_width);
-    const f32 invH = 1.f / static_cast<f32>(texture_height);
-    const core::rect<f32> tcoords(
-        sourceRect.UpperLeftCorner.X * invW,
-        sourceRect.UpperLeftCorner.Y * invH,
-        sourceRect.LowerRightCorner.X * invW,
-        sourceRect.LowerRightCorner.Y *invH);
-}
-
-void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
-                 const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
-                 const video::SColor &colors, bool useAlphaChannelOfTexture)
-{
-    if (!irr_driver->isGLSL()) {
-        video::SColor duplicatedArray[4] = {
-            colors, colors, colors, colors
-        };
-        draw2DImage(texture, destRect, sourceRect, clipRect, duplicatedArray, useAlphaChannelOfTexture);
-        return;
-    }
-
-    float width, height,
-        center_pos_x, center_pos_y,
-        tex_width, tex_height,
-        tex_center_pos_x, tex_center_pos_y;
-
-    getSize(texture->getOriginalSize().Width, texture->getOriginalSize().Height, texture->isRenderTarget(),
-            destRect, sourceRect, width, height, center_pos_x, center_pos_y,
-            tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
-
-    if (useAlphaChannelOfTexture)
+    if (glGetStringi != NULL)
     {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GLint numExtensions = 0;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+        for (GLint i = 0; i < numExtensions; i++)
+        {
+            const char* foundExtension =
+                (const char*) glGetStringi(GL_EXTENSIONS, i);
+            if (foundExtension && strcmp(foundExtension, extension) == 0)
+            {
+                return true;
+            }
+        }
     }
     else
     {
-        glDisable(GL_BLEND);
+        const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
+        if (extensions && strstr(extensions, extension) != NULL)
+        {
+            return true;
+        }
     }
-    if (clipRect)
-    {
-        if (!clipRect->isValid())
-            return;
+    return false;
+}   // hasGLExtension
 
-        glEnable(GL_SCISSOR_TEST);
-        const core::dimension2d<u32>& renderTargetSize = irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
-        glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height - clipRect->LowerRightCorner.Y,
-                  clipRect->getWidth(), clipRect->getHeight());
-    }
-
-    glUseProgram(UIShader::UniformColoredTextureRectShader::Program);
-    glBindVertexArray(UIShader::UniformColoredTextureRectShader::vao);
-
-    setTexture(0, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
-    UIShader::UniformColoredTextureRectShader::setUniforms(center_pos_x, center_pos_y, width, height, tex_center_pos_x, tex_center_pos_y, tex_width, tex_height,colors, 0);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    if (clipRect)
-        glDisable(GL_SCISSOR_TEST);
-    glUseProgram(0);
-
-    glGetError();
-}
-
-void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
-    const core::rect<s32>& destRect,
-    const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
-    const video::SColor &colors, bool useAlphaChannelOfTexture)
+// ----------------------------------------------------------------------------
+/** Returns a space-separated list of all GL extensions. Used for hardware
+ *  reporting.
+ */
+const std::string getGLExtensions()
 {
-    if (useAlphaChannelOfTexture)
+    std::string result;
+    if (glGetStringi != NULL)
     {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-    float width, height,
-        center_pos_x, center_pos_y,
-        tex_width, tex_height,
-        tex_center_pos_x, tex_center_pos_y;
-
-    getSize(texture_w, texture_h, true,
-        destRect, sourceRect, width, height, center_pos_x, center_pos_y,
-        tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
-
-    glUseProgram(UIShader::UniformColoredTextureRectShader::Program);
-    glBindVertexArray(UIShader::UniformColoredTextureRectShader::vao);
-
-    setTexture(0, texture, GL_LINEAR, GL_LINEAR);
-    UIShader::UniformColoredTextureRectShader::setUniforms(center_pos_x, center_pos_y, width, height, tex_center_pos_x, tex_center_pos_y, tex_width, tex_height, colors, 0);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
-                 const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
-                 const video::SColor* const colors, bool useAlphaChannelOfTexture)
-{
-    if (!irr_driver->isGLSL())
-    {
-        irr_driver->getVideoDriver()->draw2DImage(texture, destRect, sourceRect, clipRect, colors, useAlphaChannelOfTexture);
-        return;
-    }
-
-    float width, height,
-        center_pos_x, center_pos_y,
-        tex_width, tex_height,
-        tex_center_pos_x, tex_center_pos_y;
-
-    getSize(texture->getOriginalSize().Width, texture->getOriginalSize().Height, texture->isRenderTarget(),
-            destRect, sourceRect, width, height, center_pos_x, center_pos_y,
-            tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
-
-    if (useAlphaChannelOfTexture)
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GLint num_extensions = 0;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
+        for (GLint i = 0; i < num_extensions; i++)
+        {
+            const char* extension = (const char*)glGetStringi(GL_EXTENSIONS, i);
+            if(result.size()>0)
+                result += " ";
+            result += extension;
+        }
     }
     else
     {
-        glDisable(GL_BLEND);
+        const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
+        result = extensions;
     }
-    if (clipRect)
-    {
-        if (!clipRect->isValid())
-            return;
 
-        glEnable(GL_SCISSOR_TEST);
-        const core::dimension2d<u32>& renderTargetSize = irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
-        glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height - clipRect->LowerRightCorner.Y,
-                  clipRect->getWidth(), clipRect->getHeight());
-    }
-    if (colors)
-        drawTexColoredQuad(texture, colors, width, height, center_pos_x, center_pos_y,
-                           tex_center_pos_x, tex_center_pos_y, tex_width, tex_height);
-    else
-        drawTexQuad(static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), width, height, center_pos_x, center_pos_y,
-                    tex_center_pos_x, tex_center_pos_y, tex_width, tex_height);
-    if (clipRect)
-        glDisable(GL_SCISSOR_TEST);
-    glUseProgram(0);
+    return result;
+}   // getGLExtensions
 
-    glGetError();
-}
-
-void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
-                          const core::rect<s32>* clip)
+// ----------------------------------------------------------------------------
+/** Adds GL limits to the json data structure.
+ *  (C) 2014-2015 Wildfire Games (0 A.D.), ported by Joerg Henrichs
+ */
+void getGLLimits(HardwareStats::Json *json)
 {
+    // Various macros to make the data assembly shorter.
+#define INTEGER(id)                               \
+    do {                                          \
+        GLint i = -1;                             \
+        glGetIntegerv(GL_##id, &i);               \
+        if (glGetError()==GL_NO_ERROR)            \
+            json->add("GL_"#id, i);               \
+    } while (false)
+#define INTEGER2(id)                              \
+    do {                                          \
+        GLint i[2] = { -1, -1 };                  \
+        glGetIntegerv(GL_##id, i);                \
+        if (glGetError()==GL_NO_ERROR) {          \
+            json->add("GL_"#id"[0]", i[0]);       \
+            json->add("GL_"#id"[1]", i[1]);       \
+        }                                         \
+    } while (false)
+#define FLOAT(id)                                 \
+    do {                                          \
+        GLfloat f = -1.0f;                        \
+        glGetFloatv(GL_##id, &f);                 \
+        if (glGetError()==GL_NO_ERROR)            \
+            json->add("GL_"#id, f);               \
+    } while (false)
+#define FLOAT2(id)                                \
+    do {                                          \
+        GLfloat f[2] = {-1.0f, -1.0f};            \
+        glGetFloatv(GL_##id,  f);                 \
+        if (glGetError()==GL_NO_ERROR)  {         \
+            json->add("GL_"#id"[0]", f[0]);       \
+            json->add("GL_"#id"[1]", f[1]);       \
+        }                                         \
+    } while (false)
+#define STRING(id)                                         \
+    do {                                                   \
+        const char* c = (const char*)glGetString(GL_##id); \
+        if(!c) c="";                                       \
+        json->add("GL_"#id, c);                            \
+    } while (false)
 
-    if (!irr_driver->isGLSL())
-    {
-        irr_driver->getVideoDriver()->draw2DRectangle(color, position, clip);
-        return;
-    }
 
-    core::dimension2d<u32> frame_size =
-        irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
-    const int screen_w = frame_size.Width;
-    const int screen_h = frame_size.Height;
-    float center_pos_x = float(position.UpperLeftCorner.X + position.LowerRightCorner.X);
-    center_pos_x /= screen_w;
-    center_pos_x -= 1;
-    float center_pos_y = float(position.UpperLeftCorner.Y + position.LowerRightCorner.Y);
-    center_pos_y /= screen_h;
-    center_pos_y = 1 - center_pos_y;
-    float width = float(position.LowerRightCorner.X - position.UpperLeftCorner.X);
-    width /= screen_w;
-    float height = float(position.LowerRightCorner.Y - position.UpperLeftCorner.Y);
-    height /= screen_h;
+    STRING(VERSION);
+    STRING(VENDOR);
+    STRING(RENDERER);
+    INTEGER(SUBPIXEL_BITS);
+    INTEGER(MAX_TEXTURE_SIZE);
+    INTEGER(MAX_CUBE_MAP_TEXTURE_SIZE);
+    INTEGER2(MAX_VIEWPORT_DIMS);
+    FLOAT2(ALIASED_POINT_SIZE_RANGE);
+    FLOAT2(ALIASED_LINE_WIDTH_RANGE);
+    INTEGER(SAMPLE_BUFFERS);
+    INTEGER(SAMPLES);
+    // TODO: compressed texture formats
+    INTEGER(RED_BITS);
+    INTEGER(GREEN_BITS);
+    INTEGER(BLUE_BITS);
+    INTEGER(ALPHA_BITS);
+    INTEGER(DEPTH_BITS);
+    INTEGER(STENCIL_BITS);
 
-    if (color.getAlpha() < 255)
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-    else
-    {
-        glDisable(GL_BLEND);
-    }
+    return;
 
-    if (clip)
-    {
-        if (!clip->isValid())
-            return;
+#ifdef NOT_DONE_YET
+#define QUERY(target, pname) do { \
+    GLint i = -1; \
+    pglGetQueryivARB(GL_##target, GL_##pname, &i); \
+    if (ogl_SquelchError(GL_INVALID_ENUM)) \
+    scriptInterface.SetProperty(settings, "GL_" #target ".GL_" #pname, errstr); \
+else \
+    scriptInterface.SetProperty(settings, "GL_" #target ".GL_" #pname, i); \
+        } while (false)
+#define VERTEXPROGRAM(id) do { \
+    GLint i = -1; \
+    pglGetProgramivARB(GL_VERTEX_PROGRAM_ARB, GL_##id, &i); \
+    if (ogl_SquelchError(GL_INVALID_ENUM)) \
+    scriptInterface.SetProperty(settings, "GL_VERTEX_PROGRAM_ARB.GL_" #id, errstr); \
+else \
+    scriptInterface.SetProperty(settings, "GL_VERTEX_PROGRAM_ARB.GL_" #id, i); \
+        } while (false)
+#define FRAGMENTPROGRAM(id) do { \
+    GLint i = -1; \
+    pglGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB, GL_##id, &i); \
+    if (ogl_SquelchError(GL_INVALID_ENUM)) \
+    scriptInterface.SetProperty(settings, "GL_FRAGMENT_PROGRAM_ARB.GL_" #id, errstr); \
+else \
+    scriptInterface.SetProperty(settings, "GL_FRAGMENT_PROGRAM_ARB.GL_" #id, i); \
+        } while (false)
+#define BOOL(id) INTEGER(id)
 
-        glEnable(GL_SCISSOR_TEST);
-        const core::dimension2d<u32>& renderTargetSize = irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
-        glScissor(clip->UpperLeftCorner.X, renderTargetSize.Height - clip->LowerRightCorner.Y,
-                  clip->getWidth(), clip->getHeight());
-    }
 
-    glUseProgram(UIShader::ColoredRectShader::Program);
-    glBindVertexArray(UIShader::ColoredRectShader::vao);
-    UIShader::ColoredRectShader::setUniforms(center_pos_x, center_pos_y, width, height, color);
+#if !CONFIG2_GLES
+        INTEGER(MAX_LIGHTS);
+        INTEGER(MAX_CLIP_PLANES);
+        // Skip MAX_COLOR_MATRIX_STACK_DEPTH (only in imaging subset)
+        INTEGER(MAX_MODELVIEW_STACK_DEPTH);
+        INTEGER(MAX_PROJECTION_STACK_DEPTH);
+        INTEGER(MAX_TEXTURE_STACK_DEPTH);
+#endif
+#if !CONFIG2_GLES
+        INTEGER(MAX_3D_TEXTURE_SIZE);
+#endif
+#if !CONFIG2_GLES
+        INTEGER(MAX_PIXEL_MAP_TABLE);
+        INTEGER(MAX_NAME_STACK_DEPTH);
+        INTEGER(MAX_LIST_NESTING);
+        INTEGER(MAX_EVAL_ORDER);
+#endif
+#if !CONFIG2_GLES
+        INTEGER(MAX_ATTRIB_STACK_DEPTH);
+        INTEGER(MAX_CLIENT_ATTRIB_STACK_DEPTH);
+        INTEGER(AUX_BUFFERS);
+        BOOL(RGBA_MODE);
+        BOOL(INDEX_MODE);
+        BOOL(DOUBLEBUFFER);
+        BOOL(STEREO);
+#endif
+#if !CONFIG2_GLES
+        FLOAT2(SMOOTH_POINT_SIZE_RANGE);
+        FLOAT(SMOOTH_POINT_SIZE_GRANULARITY);
+#endif
+#if !CONFIG2_GLES
+        FLOAT2(SMOOTH_LINE_WIDTH_RANGE);
+        FLOAT(SMOOTH_LINE_WIDTH_GRANULARITY);
+        // Skip MAX_CONVOLUTION_WIDTH, MAX_CONVOLUTION_HEIGHT (only in imaging subset)
+        INTEGER(MAX_ELEMENTS_INDICES);
+        INTEGER(MAX_ELEMENTS_VERTICES);
+        INTEGER(MAX_TEXTURE_UNITS);
+#endif
+#if !CONFIG2_GLES
+        INTEGER(INDEX_BITS);
+#endif
+#if !CONFIG2_GLES
+        INTEGER(ACCUM_RED_BITS);
+        INTEGER(ACCUM_GREEN_BITS);
+        INTEGER(ACCUM_BLUE_BITS);
+        INTEGER(ACCUM_ALPHA_BITS);
+#endif
+#if !CONFIG2_GLES
+        // Core OpenGL 2.0 (treated as extensions):
+        if (ogl_HaveExtension("GL_EXT_texture_lod_bias"))
+        {
+            FLOAT(MAX_TEXTURE_LOD_BIAS_EXT);
+        }
+        if (ogl_HaveExtension("GL_ARB_occlusion_query"))
+        {
+            QUERY(SAMPLES_PASSED, QUERY_COUNTER_BITS);
+        }
+        if (ogl_HaveExtension("GL_ARB_shading_language_100"))
+        {
+            STRING(SHADING_LANGUAGE_VERSION_ARB);
+        }
+        if (ogl_HaveExtension("GL_ARB_vertex_shader"))
+        {
+            INTEGER(MAX_VERTEX_ATTRIBS_ARB);
+            INTEGER(MAX_VERTEX_UNIFORM_COMPONENTS_ARB);
+            INTEGER(MAX_VARYING_FLOATS_ARB);
+            INTEGER(MAX_COMBINED_TEXTURE_IMAGE_UNITS_ARB);
+            INTEGER(MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB);
+        }
+        if (ogl_HaveExtension("GL_ARB_fragment_shader"))
+        {
+            INTEGER(MAX_FRAGMENT_UNIFORM_COMPONENTS_ARB);
+        }
+        if (ogl_HaveExtension("GL_ARB_vertex_shader") || ogl_HaveExtension("GL_ARB_fragment_shader") ||
+            ogl_HaveExtension("GL_ARB_vertex_program") || ogl_HaveExtension("GL_ARB_fragment_program"))
+        {
+            INTEGER(MAX_TEXTURE_IMAGE_UNITS_ARB);
+            INTEGER(MAX_TEXTURE_COORDS_ARB);
+        }
+        if (ogl_HaveExtension("GL_ARB_draw_buffers"))
+        {
+            INTEGER(MAX_DRAW_BUFFERS_ARB);
+        }
+        // Core OpenGL 3.0:
+        if (ogl_HaveExtension("GL_EXT_gpu_shader4"))
+        {
+            INTEGER(MIN_PROGRAM_TEXEL_OFFSET); // no _EXT version of these in glext.h
+            INTEGER(MAX_PROGRAM_TEXEL_OFFSET);
+        }
+        if (ogl_HaveExtension("GL_EXT_framebuffer_object"))
+        {
+            INTEGER(MAX_COLOR_ATTACHMENTS_EXT);
+            INTEGER(MAX_RENDERBUFFER_SIZE_EXT);
+        }
+        if (ogl_HaveExtension("GL_EXT_framebuffer_multisample"))
+        {
+            INTEGER(MAX_SAMPLES_EXT);
+        }
+        if (ogl_HaveExtension("GL_EXT_texture_array"))
+        {
+            INTEGER(MAX_ARRAY_TEXTURE_LAYERS_EXT);
+        }
+        if (ogl_HaveExtension("GL_EXT_transform_feedback"))
+        {
+            INTEGER(MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS_EXT);
+            INTEGER(MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS_EXT);
+            INTEGER(MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS_EXT);
+        }
+        // Other interesting extensions:
+        if (ogl_HaveExtension("GL_EXT_timer_query") || ogl_HaveExtension("GL_ARB_timer_query"))
+        {
+            QUERY(TIME_ELAPSED, QUERY_COUNTER_BITS);
+        }
+        if (ogl_HaveExtension("GL_ARB_timer_query"))
+        {
+            QUERY(TIMESTAMP, QUERY_COUNTER_BITS);
+        }
+        if (ogl_HaveExtension("GL_EXT_texture_filter_anisotropic"))
+        {
+            FLOAT(MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+        }
+        if (ogl_HaveExtension("GL_ARB_texture_rectangle"))
+        {
+            INTEGER(MAX_RECTANGLE_TEXTURE_SIZE_ARB);
+        }
+        if (ogl_HaveExtension("GL_ARB_vertex_program") || ogl_HaveExtension("GL_ARB_fragment_program"))
+        {
+            INTEGER(MAX_PROGRAM_MATRICES_ARB);
+            INTEGER(MAX_PROGRAM_MATRIX_STACK_DEPTH_ARB);
+        }
+        if (ogl_HaveExtension("GL_ARB_vertex_program"))
+        {
+            VERTEXPROGRAM(MAX_PROGRAM_ENV_PARAMETERS_ARB);
+            VERTEXPROGRAM(MAX_PROGRAM_LOCAL_PARAMETERS_ARB);
+            VERTEXPROGRAM(MAX_PROGRAM_INSTRUCTIONS_ARB);
+            VERTEXPROGRAM(MAX_PROGRAM_TEMPORARIES_ARB);
+            VERTEXPROGRAM(MAX_PROGRAM_PARAMETERS_ARB);
+            VERTEXPROGRAM(MAX_PROGRAM_ATTRIBS_ARB);
+            VERTEXPROGRAM(MAX_PROGRAM_ADDRESS_REGISTERS_ARB);
+            VERTEXPROGRAM(MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB);
+            VERTEXPROGRAM(MAX_PROGRAM_NATIVE_TEMPORARIES_ARB);
+            VERTEXPROGRAM(MAX_PROGRAM_NATIVE_PARAMETERS_ARB);
+            VERTEXPROGRAM(MAX_PROGRAM_NATIVE_ATTRIBS_ARB);
+            VERTEXPROGRAM(MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB);
+            if (ogl_HaveExtension("GL_ARB_fragment_program"))
+            {
+                // The spec seems to say these should be supported, but
+                // Mesa complains about them so let's not bother
+                /*
+                VERTEXPROGRAM(MAX_PROGRAM_ALU_INSTRUCTIONS_ARB);
+                VERTEXPROGRAM(MAX_PROGRAM_TEX_INSTRUCTIONS_ARB);
+                VERTEXPROGRAM(MAX_PROGRAM_TEX_INDIRECTIONS_ARB);
+                VERTEXPROGRAM(MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB);
+                VERTEXPROGRAM(MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB);
+                VERTEXPROGRAM(MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB);
+                */
+            }
+        }
+        if (ogl_HaveExtension("GL_ARB_fragment_program"))
+        {
+            FRAGMENTPROGRAM(MAX_PROGRAM_ENV_PARAMETERS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_LOCAL_PARAMETERS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_INSTRUCTIONS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_ALU_INSTRUCTIONS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_TEX_INSTRUCTIONS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_TEX_INDIRECTIONS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_TEMPORARIES_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_PARAMETERS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_ATTRIBS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_NATIVE_TEMPORARIES_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_NATIVE_PARAMETERS_ARB);
+            FRAGMENTPROGRAM(MAX_PROGRAM_NATIVE_ATTRIBS_ARB);
+            if (ogl_HaveExtension("GL_ARB_vertex_program"))
+            {
+                // The spec seems to say these should be supported, but
+                // Intel drivers on Windows complain about them so let's not bother
+                /*
+                FRAGMENTPROGRAM(MAX_PROGRAM_ADDRESS_REGISTERS_ARB);
+                FRAGMENTPROGRAM(MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB);
+                */
+            }
+        }
+        if (ogl_HaveExtension("GL_ARB_geometry_shader4"))
+        {
+            INTEGER(MAX_GEOMETRY_TEXTURE_IMAGE_UNITS_ARB);
+            INTEGER(MAX_GEOMETRY_OUTPUT_VERTICES_ARB);
+            INTEGER(MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS_ARB);
+            INTEGER(MAX_GEOMETRY_UNIFORM_COMPONENTS_ARB);
+            INTEGER(MAX_GEOMETRY_VARYING_COMPONENTS_ARB);
+            INTEGER(MAX_VERTEX_VARYING_COMPONENTS_ARB);
+        }
+#else // CONFIG2_GLES
+        // Core OpenGL ES 2.0:
+        STRING(SHADING_LANGUAGE_VERSION);
+        INTEGER(MAX_VERTEX_ATTRIBS);
+        INTEGER(MAX_VERTEX_UNIFORM_VECTORS);
+        INTEGER(MAX_VARYING_VECTORS);
+        INTEGER(MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+        INTEGER(MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+        INTEGER(MAX_FRAGMENT_UNIFORM_VECTORS);
+        INTEGER(MAX_TEXTURE_IMAGE_UNITS);
+        INTEGER(MAX_RENDERBUFFER_SIZE);
+#endif // CONFIG2_GLES
+#ifdef SDL_VIDEO_DRIVER_X11
+#define GLXQCR_INTEGER(id) do { \
+    unsigned int i = UINT_MAX; \
+    if (pglXQueryCurrentRendererIntegerMESA(id, &i)) \
+    scriptInterface.SetProperty(settings, #id, i); \
+        } while (false)
+#define GLXQCR_INTEGER2(id) do { \
+    unsigned int i[2] = { UINT_MAX, UINT_MAX }; \
+    if (pglXQueryCurrentRendererIntegerMESA(id, i)) { \
+    scriptInterface.SetProperty(settings, #id "[0]", i[0]); \
+    scriptInterface.SetProperty(settings, #id "[1]", i[1]); \
+    } \
+        } while (false)
+#define GLXQCR_INTEGER3(id) do { \
+    unsigned int i[3] = { UINT_MAX, UINT_MAX, UINT_MAX }; \
+    if (pglXQueryCurrentRendererIntegerMESA(id, i)) { \
+    scriptInterface.SetProperty(settings, #id "[0]", i[0]); \
+    scriptInterface.SetProperty(settings, #id "[1]", i[1]); \
+    scriptInterface.SetProperty(settings, #id "[2]", i[2]); \
+    } \
+        } while (false)
+#define GLXQCR_STRING(id) do { \
+    const char* str = pglXQueryCurrentRendererStringMESA(id); \
+    if (str) \
+    scriptInterface.SetProperty(settings, #id ".string", str); \
+        } while (false)
+        SDL_SysWMinfo wminfo;
+        SDL_VERSION(&wminfo.version);
+        if (SDL_GetWMInfo(&wminfo) && wminfo.subsystem == SDL_SYSWM_X11)
+        {
+            Display* dpy = wminfo.info.x11.gfxdisplay;
+            int scrnum = DefaultScreen(dpy);
+            const char* glxexts = glXQueryExtensionsString(dpy, scrnum);
+            scriptInterface.SetProperty(settings, "glx_extensions", glxexts);
+            if (strstr(glxexts, "GLX_MESA_query_renderer") && pglXQueryCurrentRendererIntegerMESA && pglXQueryCurrentRendererStringMESA)
+            {
+                GLXQCR_INTEGER(GLX_RENDERER_VENDOR_ID_MESA);
+                GLXQCR_INTEGER(GLX_RENDERER_DEVICE_ID_MESA);
+                GLXQCR_INTEGER3(GLX_RENDERER_VERSION_MESA);
+                GLXQCR_INTEGER(GLX_RENDERER_ACCELERATED_MESA);
+                GLXQCR_INTEGER(GLX_RENDERER_VIDEO_MEMORY_MESA);
+                GLXQCR_INTEGER(GLX_RENDERER_UNIFIED_MEMORY_ARCHITECTURE_MESA);
+                GLXQCR_INTEGER(GLX_RENDERER_PREFERRED_PROFILE_MESA);
+                GLXQCR_INTEGER2(GLX_RENDERER_OPENGL_CORE_PROFILE_VERSION_MESA);
+                GLXQCR_INTEGER2(GLX_RENDERER_OPENGL_COMPATIBILITY_PROFILE_VERSION_MESA);
+                GLXQCR_INTEGER2(GLX_RENDERER_OPENGL_ES_PROFILE_VERSION_MESA);
+                GLXQCR_INTEGER2(GLX_RENDERER_OPENGL_ES2_PROFILE_VERSION_MESA);
+                GLXQCR_STRING(GLX_RENDERER_VENDOR_ID_MESA);
+                GLXQCR_STRING(GLX_RENDERER_DEVICE_ID_MESA);
+            }
+        }
+#endif // SDL_VIDEO_DRIVER_X11
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    if (clip)
-        glDisable(GL_SCISSOR_TEST);
-    glUseProgram(0);
-
-    glGetError();
-}
+#endif  // ifdef XX
+}   // getGLLimits

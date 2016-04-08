@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -36,8 +36,7 @@ namespace GUIEngine
       * \brief A skill level widget.
       * \ingroup widgetsgroup
       */
-
-class SkillLevelWidget : public Widget
+    class SkillLevelWidget : public Widget
     {
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
@@ -54,6 +53,7 @@ class SkillLevelWidget : public Widget
         std::string m_label_name;
         
         int m_player_id;
+        bool m_display_text;
 
     public:
         
@@ -62,7 +62,7 @@ class SkillLevelWidget : public Widget
         LabelWidget* m_label;
         ProgressBarWidget* m_bar;
 
-        SkillLevelWidget(core::recti area, const int player_id, bool multiplayer,
+        SkillLevelWidget(core::recti area, const int player_id, bool multiplayer, bool display_text,
                          const int value = 0, const irr::core::stringw& label = "default");
 
         virtual ~SkillLevelWidget() {};
@@ -91,11 +91,13 @@ class SkillLevelWidget : public Widget
         void setLabel(const irr::core::stringw& label);
 
         /** Get the current label of the widget. */
-        const irr::core::stringw& getLabel()
+        const irr::core::stringw getLabel()
         {
             return m_label->getText();
         }
 
+        /** If the label should be displayed. */
+        void setDisplayText(bool display_text);
     };
 }
 

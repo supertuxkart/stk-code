@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2013 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,6 +26,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 #include "utils/translation.hpp"
+#include "utils/vs.hpp"
 
 #include <iostream>
 
@@ -49,7 +50,7 @@ NewsManager::~NewsManager()
 
 // ---------------------------------------------------------------------------
 /** This function initialises the data for the news manager. It starts a
- *  separate thread to execute downloadNews() - which (if necessary) downaloads
+ *  separate thread to execute downloadNews() - which (if necessary) downloads
  *  the news.xml file and updates the list of news messages. It also
  *  initialises the addons manager (which can trigger another download of
  *  news.xml).
@@ -57,28 +58,31 @@ NewsManager::~NewsManager()
  */
 void NewsManager::init(bool force_refresh)
 {
-    // The rest (which potentially involves downloading news.xml) is handled
-    // in a separate thread, so that the GUI remains responsive.
-
-    pthread_attr_t  attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    // Should be the default, but just in case:
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-    //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-
     m_force_refresh = force_refresh;
 
-    pthread_t thread_id;
-    int error = pthread_create(&thread_id, &attr,
-                                &NewsManager::downloadNews, this);
-    if(error)
+    // The rest (which potentially involves downloading news.xml) is handled
+    // in a separate thread, so that the GUI remains responsive. It is only
+    // started if internet access is enabled, else nothing is done in the
+    // thread anyway (and the addons menu is disabled as a result).
+    if(UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED)
     {
-        Log::warn("news", "Could not create thread, error=%d", error);
-        // In this case just execute the downloading code with this thread
-        downloadNews(this);
+        pthread_attr_t  attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+        // Should be the default, but just in case:
+        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+        //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+        pthread_t thread_id;
+        int error = pthread_create(&thread_id, &attr,
+            &NewsManager::downloadNews, this);
+        if (error)
+        {
+            Log::warn("news", "Could not create thread, error=%d", error);
+            // In this case just execute the downloading code with this thread
+            downloadNews(this);
+        }
+        pthread_attr_destroy(&attr);
     }
-    pthread_attr_destroy(&attr);
 
 }   //init
 
@@ -90,6 +94,7 @@ void NewsManager::init(bool force_refresh)
  */
 void* NewsManager::downloadNews(void *obj)
 {
+    VS::setThreadName("downloadNews");
     NewsManager *me = (NewsManager*)obj;
     me->clearErrorMessage();
 
@@ -138,6 +143,7 @@ void* NewsManager::downloadNews(void *obj)
 
         HTTPRequest *download_req = new HTTPRequest("news.xml");
         download_req->setAddonsURL("news.xml");
+
         // Initialise the online portion of the addons manager.
         if(UserConfigParams::logAddons())
             Log::info("addons", "Downloading news.");
@@ -150,10 +156,12 @@ void* NewsManager::downloadNews(void *obj)
             // that a redirect went wrong, or a wrong/incorrect
             // address somehow made its way into the config file.
             delete download_req;
+
             // We need a new object, since the state of the old
             // download request is now done.
             download_req = new HTTPRequest("news.xml");
             UserConfigParams::m_server_addons.revertToDefaults();
+
             // make sure the new server address is actually used
             download_req->setAddonsURL("news.xml");
             download_req->executeNow();
@@ -221,6 +229,24 @@ void NewsManager::checkRedirect(const XMLNode *xml)
         }
         UserConfigParams::m_server_addons = new_server;
     }
+
+    std::string hw_report_server;
+    if(xml->get("hw-report-server", &hw_report_server)==1 && hw_report_server.size()>0)
+    {
+        Log::info("hw report", "New server at '%s'.", hw_report_server.c_str());
+        UserConfigParams::m_server_hw_report = hw_report_server;
+    }
+
+    float polling;
+    if(xml->get("menu-polling-interval", &polling))
+    {
+        RequestManager::get()->setMenuPollingInterval(polling);
+    }
+    if(xml->get("game-polling-interval", &polling))
+    {
+        RequestManager::get()->setGamePollingInterval(polling);
+    }
+
 }   // checkRedirect
 
 // ----------------------------------------------------------------------------
@@ -434,7 +460,7 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
         // ==============================
         else if(cond[1]=="not" && cond[2]=="installed")
         {
-            // The addons_manager can not be access, since it's
+            // The addons_manager cannot be accessed, since it's
             // being initialised after the news manager. So a simple
             // test is made to see if the directory exists. It is
             // necessary to check for karts and tracks separately,
