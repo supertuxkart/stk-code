@@ -880,9 +880,9 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
     Vec3 center_line = node.getUpperCenter() - node.getLowerCenter();
     float angle_diff = kart->getVelocity().angle(center_line);
 
-    if (angle_diff > M_PI) 
+    if (angle_diff > M_PI)
         angle_diff -= 2*M_PI;
-    else if (angle_diff < -M_PI) 
+    else if (angle_diff < -M_PI)
         angle_diff += 2*M_PI;
 
     // Display a warning message if the kart is going back way (unless

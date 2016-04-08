@@ -2388,15 +2388,13 @@ const core::vector3df& Track::getSunRotation()
 bool Track::findGround(AbstractKart *kart)
 {
     btVector3 to(kart->getXYZ());
-    Vec3 quadNormal;
+    Vec3 quadNormal(0, 1, 0);;
     if (QuadGraph::get())
     {
-        unsigned int sector = ((LinearWorld*)World::getWorld())->getTrackSector(kart->getWorldKartId()).getCurrentGraphNode();
+        int sector = ((LinearWorld*)World::getWorld())->getTrackSector(kart->getWorldKartId()).getCurrentGraphNode();
         if (sector != QuadGraph::UNKNOWN_SECTOR)
             quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
     }
-    else 
-        quadNormal = Vec3(0, 1, 0);
 
     to = to + -1000.0f*quadNormal;
 
@@ -2434,9 +2432,7 @@ bool Track::findGround(AbstractKart *kart)
         return false;
     }
 
-
     btTransform t = kart->getBody()->getCenterOfMassTransform();
-    btQuaternion q = t.getRotation();
     // The computer offset is slightly too large, it should take
     // the default suspension rest instead of suspension rest (i.e. the
     // length of the suspension with the weight of the kart resting on
