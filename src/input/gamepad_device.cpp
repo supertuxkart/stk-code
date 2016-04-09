@@ -57,7 +57,8 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
         m_axis_ok[i] = false;
     }
 
-    for(int n=0; n<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; n++)
+    m_buttonPressed = new bool[button_count];
+    for(int n=0; n<button_count; n++)
         m_buttonPressed[n] = false;
 }   // GamePadDevice
 
@@ -66,6 +67,7 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
  */
 GamePadDevice::~GamePadDevice()
 {
+    delete[] m_buttonPressed;
     delete[] m_prev_axis_directions;
     delete[] m_prev_axis_value;
     delete[] m_axis_ok;
