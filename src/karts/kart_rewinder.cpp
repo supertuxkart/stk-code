@@ -62,7 +62,7 @@ int KartRewinder::getState(char **buffer) const
 }   // getState
 
 // ----------------------------------------------------------------------------
-/** Actuall rewind to the specified state. */
+/** Actually rewind to the specified state. */
 void KartRewinder::rewindToState(char *buffer)
 {
     btTransform t;

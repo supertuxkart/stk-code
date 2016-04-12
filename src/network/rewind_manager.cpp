@@ -54,7 +54,7 @@ RewindManager::RewindInfo::RewindInfo(Rewinder *rewinder, char *buffer,
                                       bool is_event, bool is_confirmed)
 {
     m_rewinder     = rewinder;
-    m_time         = RewindManager::get()->getCurrentTime();;
+    m_time         = RewindManager::get()->getCurrentTime();
     m_time_step    = RewindManager::get()->getCurrentTimeStep();
     m_local_physics_time = World::getWorld()->getPhysics()->getPhysicsWorld()->getLocalTime();
     m_buffer       = buffer;
@@ -290,7 +290,7 @@ void RewindManager::rewindTo(float rewind_time)
 
     if(!m_rewind_info[state]->isState())
     {
-        Log::error("RewindManager", "No state for rewind to %d, state %d.",
+        Log::error("RewindManager", "No state for rewind to %f, state %d.",
                    rewind_time, state);
         return;
     }

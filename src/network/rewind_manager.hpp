@@ -34,9 +34,9 @@
  *     on this client, which can save time in rewinding later).
  *  -  events for each rewindable object (for example any change in the kart
  *     controls, like steering, fire, ... are an event). While states can be
- *     discarded (especially unconfirmed ones), e.g. to save spave, events
+ *     discarded (especially unconfirmed ones), e.g. to save space, events
  *     will always be kept (in order to allow replaying).
- *  Each object that is to be rewinded an instance of Rewinder needs to be
+ *  For each object that is to be rewinded an instance of Rewinder needs to be
  *  declared (usually inside of the object it can rewind). This instance
  *  is automatically registered with the RewindManager.
  *  All states and events are stored in a RewindInfo object. All RewindInfo
