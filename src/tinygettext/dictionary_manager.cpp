@@ -1,5 +1,5 @@
 //  tinygettext - A gettext replacement that works directly on .po files
-//  Copyright (C) 2006 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,6 +17,8 @@
 
 #include "dictionary_manager.hpp"
 
+#include "utils/log.hpp"
+
 #include <memory>
 #include <assert.h>
 #include <stdlib.h>
@@ -24,13 +26,12 @@
 #include <fstream>
 #include <algorithm>
 
-#include "log_stream.hpp"
 #include "po_parser.hpp"
 #include "stk_file_system.hpp"
 
 namespace tinygettext {
 
-static bool has_suffix(const std::string& lhs, const std::string rhs)
+static bool has_suffix(const std::string& lhs, const std::string &rhs)
 {
   if (lhs.length() < rhs.length())
     return false;
@@ -121,7 +122,7 @@ DictionaryManager::get_dictionary(const Language& language)
     {
       std::vector<std::string> files = filesystem->open_directory(*p);
 
-      std::string best_filename;
+      std::string best_filename = "";
       int best_score = 0;
 
       for(std::vector<std::string>::iterator filename = files.begin(); filename != files.end(); filename++)
@@ -130,11 +131,12 @@ DictionaryManager::get_dictionary(const Language& language)
         if (has_suffix(*filename, ".po"))
         { // ignore anything that isn't a .po file
 
-            Language po_language = Language::from_env(convertFilename2Language(*filename));
+          Language po_language = Language::from_env(convertFilename2Language(*filename));
 
           if (!po_language)
           {
-            log_warning << *filename << ": warning: ignoring, unknown language" << std::endl;
+              Log::warn("tinygettext", "%s: warning: ignoring, unknown language",
+                         filename->c_str());
           }
           else
           {
@@ -154,10 +156,11 @@ DictionaryManager::get_dictionary(const Language& language)
         std::string pofile = *p + "/" + best_filename;
         try
         {
-          std::auto_ptr<std::istream> in = filesystem->open_file(pofile);
+          std::unique_ptr<std::istream> in = filesystem->open_file(pofile);
           if (!in.get())
           {
-            log_error << "error: failure opening: " << pofile << std::endl;
+              Log::error("tinygettext", "error: failure opening: '%s'.",
+                         pofile.c_str());
           }
           else
           {
@@ -166,8 +169,8 @@ DictionaryManager::get_dictionary(const Language& language)
         }
         catch(std::exception& e)
         {
-          log_error << "error: failure parsing: " << pofile << std::endl;
-          log_error << e.what() << "" << std::endl;
+          Log::error("tinygettext", "error: failure parsing: '%s'.", pofile.c_str());
+          Log::error("tinygettext", "%s", e.what());
         }
       }
     }
@@ -194,7 +197,12 @@ DictionaryManager::get_languages()
     {
       if (has_suffix(*file, ".po"))
       {
-        languages.insert(Language::from_env(file->substr(0, file->size()-3)));
+        Language po_language = Language::from_env(file->substr(0, file->size()-3));
+
+        if (po_language)
+        {
+          languages.insert(po_language);
+        }
       }
     }
   }
@@ -245,9 +253,9 @@ DictionaryManager::add_directory(const std::string& pathname)
 }
 
 void
-DictionaryManager::set_filesystem(std::auto_ptr<FileSystem> filesystem_)
+DictionaryManager::set_filesystem(std::unique_ptr<FileSystem> filesystem_)
 {
-  filesystem = filesystem_;
+  filesystem = std::move(filesystem_);
 }
 // ----------------------------------------------------------------------------
 /** This function converts a .po filename (e.g. zh_TW.po) into a language

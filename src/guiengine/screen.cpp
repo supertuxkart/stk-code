@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 #include "guiengine/screen.hpp"
 
 #include "io/file_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/layout_manager.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -94,6 +95,15 @@ void Screen::init()
 }   // init
 
 // -----------------------------------------------------------------------------
+/** Displays this screen bu pushing it onto the stack of screen
+ *  in the state manager. 
+ */
+void Screen::push()
+{
+    StateManager::get()->pushScreen(this);
+}   // push
+
+// -----------------------------------------------------------------------------
 /** Prepares removal of this screen. If necessary this will unpause the
  *  race (so this means that if you have several consecutive screens while
  *  the race is running the race will be unpaused and paused when switching
@@ -117,13 +127,8 @@ void Screen::loadFromFile()
 {
     assert(m_magic_number == 0xCAFEC001);
 
-    IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + m_filename).c_str() );
-    if (xml == NULL)
-    {
-        fprintf(stderr, "Cannot open file %s\n", m_filename.c_str());
-        assert(false);
-        return;
-    }
+    std::string path = file_manager->getAssetChecked(FileManager::GUI, m_filename, true);
+    IXMLReader* xml = file_manager->createXMLReader( path );
 
     parseScreenFileDiv(xml, m_widgets);
     m_loaded = true;
@@ -183,13 +188,13 @@ void Screen::addWidgets()
 
     addWidgetsRecursively( m_widgets );
 
-    //std::cout << "*****ScreenAddWidgets " << m_filename.c_str() << " : focusing the first widget*****\n";
+    //Log::info("Screen::AddWidgets", "%s: focusing the first widget",  m_filename.c_str());
 
     // select the first widget (for first players only; if other players need some focus the Screen must provide it).
     Widget* w = getFirstWidget();
-    //std::cout << "First widget is " << (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()) << std::endl;
+    //Log::info("Screen::AddWidgets", "First widget is %s", (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()));
     if (w != NULL) w->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
-    else           fprintf(stderr, "Couldn't select first widget, NULL was returned\n");
+    else           Log::warn("Screen::AddWidgets", "Couldn't select first widget, NULL was returned");
 }   // addWidgets
 
 // -----------------------------------------------------------------------------
@@ -211,9 +216,9 @@ void Screen::manualRemoveWidget(Widget* w)
 #ifdef DEBUG
     if(!m_widgets.contains(w))
     {
-        fprintf(stderr, "Widget '%d' not found in screen when removing.\n",
-                w->m_id);
-        fprintf(stderr, "This can be ignored, but is probably wrong.\n");
+        Log::info("Screen", "Widget '%d' not found in screen when removing.",
+                  w->m_id);
+        Log::info("Screen", "This can be ignored, but is probably wrong.");
     }
 #endif
     m_widgets.remove(w);
@@ -230,16 +235,14 @@ void Screen::manualRemoveWidget(Widget* w)
 /** \brief Implementing method from AbstractTopLevelContainer */
 int Screen::getWidth()
 {
-    core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-    return frame_size.Width;
+    return irr_driver->getActualScreenSize().Width;
 }
 
 // -----------------------------------------------------------------------------
 /** \brief Implementing method from AbstractTopLevelContainer */
 int Screen::getHeight()
 {
-    core::dimension2d<u32> frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
-    return frame_size.Height;
+    return irr_driver->getActualScreenSize().Height;
 }
 
 // -----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Erwin Coumans http://continuousphysics.com/Bullet/
+ * Copyright (C) 2005-2015 Erwin Coumans http://continuousphysics.com/Bullet/
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -37,9 +37,9 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
         }   // CloestWithNormal
         // --------------------------------------------------------------------
         /** Stores the index of the triangle hit. */
-		virtual	btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,
+        virtual    btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,
                                          bool normalInWorldSpace)
-		{
+        {
             // We don't always get a triangle index, sometimes (e.g. ray hits
             // other kart) we get shapePart=-1, or no localShapeInfo at all
             if(rayResult.m_localShapeInfo &&
@@ -48,7 +48,7 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
             return
                 btCollisionWorld::ClosestRayResultCallback::addSingleResult(rayResult,
                 normalInWorldSpace);
-		}
+        }
         // --------------------------------------------------------------------
         /** Returns the index of the triangle which was hit, or -1 if
          *  no triangle was hit. */
@@ -57,29 +57,33 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
     };   // CloestWithNormal
     // ========================================================================
 
-	ClosestWithNormal rayCallback(from,to);
+    ClosestWithNormal rayCallback(from,to);
 
-	m_dynamicsWorld->rayTest(from, to, rayCallback);
+    m_dynamicsWorld->rayTest(from, to, rayCallback);
 
-	if (rayCallback.hasHit())
-	{
-		btRigidBody* body = btRigidBody::upcast(rayCallback.m_collisionObject);
+    if (rayCallback.hasHit())
+    {
+        btRigidBody* body = btRigidBody::upcast(rayCallback.m_collisionObject);
         if (body && body->hasContactResponse())
-		{
-			result.m_hitPointInWorld = rayCallback.m_hitPointWorld;
-			result.m_hitNormalInWorld = rayCallback.m_hitNormalWorld;
-			result.m_hitNormalInWorld.normalize();
-			result.m_distFraction = rayCallback.m_closestHitFraction;
+        {
+            result.m_hitPointInWorld = rayCallback.m_hitPointWorld;
+            result.m_hitNormalInWorld = rayCallback.m_hitNormalWorld;
+            result.m_hitNormalInWorld.normalize();
+            result.m_distFraction = rayCallback.m_closestHitFraction;
+            result.m_triangle_index = -1;
             const TriangleMesh &tm =
                 World::getWorld()->getTrack()->getTriangleMesh();
             if(m_smooth_normals &&
                 rayCallback.getTriangleIndex()>-1)
             {
+#undef DEBUG_NORMALS
+#ifdef DEBUG_NORMALS
                 btVector3 n=result.m_hitNormalInWorld;
+#endif
+                result.m_triangle_index = rayCallback.getTriangleIndex();
                 result.m_hitNormalInWorld =
                     tm.getInterpolatedNormal(rayCallback.getTriangleIndex(),
                                              result.m_hitPointInWorld);
-#undef DEBUG_NORMALS
 #ifdef DEBUG_NORMALS
                 printf("old %f %f %f new %f %f %f\n",
                     n.getX(), n.getY(), n.getZ(),
@@ -89,8 +93,8 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
 #endif
             }
             return body;
-		}
-	}
-	return 0;
+        }
+    }
+    return 0;
 }
 

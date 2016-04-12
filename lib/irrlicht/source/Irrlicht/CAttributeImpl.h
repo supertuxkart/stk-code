@@ -1867,6 +1867,9 @@ public:
 // Attribute implemented for texture references
 class CTextureAttribute : public IAttribute
 {
+	// Explicitly hide base method
+	using IAttribute::setTexture;
+
 public:
 
 	CTextureAttribute(const char* name, video::ITexture* value, video::IVideoDriver* driver, const io::path& filename)
@@ -2025,7 +2028,7 @@ public:
 	{
 		u32 tmp;
 		sscanf(text, "0x%x", &tmp);
-		Value = (void *) tmp;
+		Value = reinterpret_cast<void *>(tmp);
 	}
 
 	virtual E_ATTRIBUTE_TYPE getType() const

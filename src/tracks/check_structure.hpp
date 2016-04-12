@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2010  Joerg Henrichs
+//  Copyright (C) 2009-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -64,7 +64,7 @@ public:
      *  enabling you to count the lap again.
      */
     enum CheckType {CT_NEW_LAP, CT_ACTIVATE, CT_TOGGLE, CT_CANNON,
-		            CT_GOAL, CT_AMBIENT_SPHERE};
+                    CT_GOAL, CT_AMBIENT_SPHERE};
 
 protected:
     /** Stores the previous position of all karts. This is needed to detect
@@ -98,7 +98,7 @@ private:
 
     enum ChangeState {CS_DEACTIVATE, CS_ACTIVATE, CS_TOGGLE};
 
-    void changeStatus(const std::vector<int> indices, int kart_index,
+    void changeStatus(const std::vector<int> &indices, int kart_index,
                       ChangeState change_state);
 
 public:

@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <items>
-  <bonus-box   model="gift-box.b3d"        lowmodel="gift-box-low.b3d"        />
-  <banana      model="banana.b3d"          lowmodel="banana-low.b3d"          />
-  <nitro-big   model="nitrotank-big.b3d"   lowmodel="nitrotank-big-low.b3d"   />
-  <nitro-small model="nitrotank-small.b3d" lowmodel="nitrotank-small-low.b3d" />
+  <bonus-box   model="gift-box.b3d"        lowmodel="gift-box-low.b3d"        glow="31 202 253"/>
+  <banana      model="banana.b3d"          lowmodel="banana-low.b3d"          glow="197 152 37"/>
+  <nitro-big   model="nitrotank-big.b3d"   lowmodel="nitrotank-big-low.b3d"   glow="0 70 158"/>
+  <nitro-small model="nitrotank-small.b3d" lowmodel="nitrotank-small-low.b3d" glow="0 70 158"/>
   <!-- While a bubble gum technically 
        isn't an item, it is internally 
        handled as one, so list it here    -->
-  <bubblegum   model="bubblegum.b3d"       lowmodel="bubblegum-low.b3d"       />
+  <bubblegum   model="bubblegum.b3d"       lowmodel="bubblegum-low.b3d"       glow="246 150 209"/>
   <bubblegum-nolok   model="bubblegum-nolok.b3d" lowmodel="bubblegum-nolok-low.b3d"/>
   <!-- <easter-egg  model="easter_egg.b3d"  /> -->
   <easter-egg  model="easter_egg.b3d"  />

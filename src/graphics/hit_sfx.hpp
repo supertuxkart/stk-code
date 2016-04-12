@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@
 #define HEADER_HIT_SFX_HPP
 
 #include "graphics/hit_effect.hpp"
+#include "utils/cpp2011.hpp"
 
 class SFXBase;
 
@@ -35,8 +36,8 @@ private:
 public:
          HitSFX(const Vec3& coord, const char* explosion_sound);
         ~HitSFX();
-    virtual bool updateAndDelete(float dt);
-    virtual void setPlayerKartHit();
+    virtual bool updateAndDelete(float dt) OVERRIDE;
+    virtual void setLocalPlayerKartHit() OVERRIDE;
 
 };   // HitSFX
 

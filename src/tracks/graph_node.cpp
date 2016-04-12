@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,6 +22,7 @@
 #include "io/xml_node.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
+#include "utils/log.hpp"
 
 // ----------------------------------------------------------------------------
 /** Constructor. Saves the quad index which belongs to this graph node.
@@ -30,10 +31,8 @@
 GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
 {
     if (quad_index >= QuadSet::get()->getNumberOfQuads())
-    {
-        fprintf(stderr, "[GraphNode] ERROR: No driveline found, or empty driveline");
-        abort();
-    }
+        Log::fatal("GraphNode", "No driveline found, or empty driveline.");
+
     m_quad_index          = quad_index;
     m_node_index          = node_index;
     m_distance_from_start = -1.0f;
@@ -130,10 +129,10 @@ void GraphNode::setupPathsToNode()
         gn.markAllSuccessorsToUse(i, &m_path_to_node);
     }
 #ifdef DEBUG
-    for(unsigned int i=0; i<m_path_to_node.size(); i++)
+    for(unsigned int i = 0; i < m_path_to_node.size(); ++i)
     {
-        if(m_path_to_node[i]==-1)
-            printf("[WARNING] No path to node %d found on graph node %d.\n",
+        if(m_path_to_node[i] == -1)
+            Log::warn("GraphNode", "No path to node %d found on graph node %d.",
                    i, m_node_index);
     }
 #endif

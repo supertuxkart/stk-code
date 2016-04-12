@@ -1,5 +1,7 @@
 //  SuperTuxKart - a fun racing game with go-kart
 //
+//  Copyright (C) 2012-2015  SuperTuxKart-Team
+//
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
 //  as published by the Free Software Foundation; either version 3
@@ -62,7 +64,7 @@ Stars::Stars(scene::ISceneNode* parentKart, core::vector3df center)
 
 Stars::~Stars()
 {
-    const int nodeAmount = m_nodes.size();
+    const int nodeAmount = (int) m_nodes.size();
     for (int n=0; n<nodeAmount; n++)
     {
         m_parent_kart_node->removeChild(m_nodes[n]);
@@ -77,8 +79,8 @@ void Stars::showFor(float time)
     m_remaining_time = time;
     m_fade_in_time   = 1.0f;
 
-    const int nodeAmount = m_nodes.size();
-    for (int n=0; n<nodeAmount; n++)
+    const int node_amount = (int)m_nodes.size();
+    for (int n=0; n<node_amount; n++)
     {
         m_nodes[n]->setVisible(true);
         ((scene::IBillboardSceneNode*)m_nodes[n])
@@ -109,16 +111,16 @@ void Stars::update(float delta_t)
     {
         m_enabled = false;
 
-        const int nodeAmount = m_nodes.size();
-        for (int n=0; n<nodeAmount; n++)
+        const int node_amount = (int)m_nodes.size();
+        for (int n=0; n<node_amount; n++)
         {
             m_nodes[n]->setVisible(false);
         }
         return;
     }
 
-    const int nodeAmount = m_nodes.size();
-    for (int n=0; n<nodeAmount; n++)
+    const int node_amount = (int)m_nodes.size();
+    for (int n=0; n<node_amount; n++)
     {
         // do one full rotation every 4 seconds (this "ranges" ranges
         // from 0 to 1)

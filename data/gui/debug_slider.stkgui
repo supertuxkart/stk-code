@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
+        <div proportion="1" width="100%" layout="horizontal-row">
+            <label id="Red" raw_text="Red" width="200"/>
+            <spacer width="25"/>
+            <gauge id="red_slider" min_value="0" max_value="100" proportion="1"/>
+        </div>
+
+        <div proportion="1" width="100%" layout="horizontal-row">
+            <label id="Green" raw_text="Green" width="200"/>
+            <spacer width="25"/>
+            <gauge id="green_slider" min_value="0" max_value="100" proportion="1"/>
+        </div>
+
+        <div proportion="1" width="100%" layout="horizontal-row">
+            <label id="Blue" raw_text="Blue" width="200"/>
+            <spacer width="25"/>
+            <gauge id="blue_slider" min_value="0" max_value="100" proportion="1"/>
+        </div>
+
+        <div proportion="1" width="100%" layout="horizontal-row">
+            <label id="SSAO radius" raw_text="SSAO Radius" width="200"/>
+            <spacer width="50"/>
+            <gauge id="ssao_radius" min_value="0" max_value="100" proportion="1" />
+        </div>
+
+        <div proportion="1" width="100%" layout="horizontal-row">
+            <label id="SSAO k" raw_text="SSAO K" width="200"/>
+            <spacer width="25"/>
+            <gauge id="ssao_k" min_value="0" max_value="100" proportion="1"/>
+        </div>
+
+        <div proportion="1" width="100%" layout="horizontal-row">
+            <label id="SSAO Sigma" raw_text="SSAO sigma" width="200"/>
+            <spacer width="50"/>
+            <gauge id="ssao_sigma" min_value="0" max_value="100" proportion="1"/>
+        </div>
+    </div>
+</stkgui>

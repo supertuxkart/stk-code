@@ -76,6 +76,11 @@ namespace scene
 			return Material;
 		}
 
+		virtual scene::E_PRIMITIVE_TYPE getPrimitiveType() const
+		{
+			return scene::EPT_TRIANGLES;
+		}
+
 		//! Get bounding box
 		virtual const core::aabbox3d<f32>& getBoundingBox() const
 		{

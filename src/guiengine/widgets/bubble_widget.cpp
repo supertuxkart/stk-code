@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "utils/translation.hpp"
+#include <algorithm>
 
 #include <IGUIStaticText.h>
 #include <IGUIElement.h>
@@ -52,11 +53,7 @@ void BubbleWidget::add()
                                                       false, true /* word wrap */, m_parent,
                                                       (m_focusable ? getNewID() : getNewNoFocusID()));
     irrwidget->setTextRestrainedInside(false);
-
-#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
-    irrwidget->setRightToLeft( translations->isRTLLanguage() );
-#endif
-
+    irrwidget->setRightToLeft(translations->isRTLText(message));
 
     m_element = irrwidget;
     replaceText();
@@ -77,7 +74,7 @@ void BubbleWidget::replaceText()
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
     if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
     else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
-    else if (translations->isRTLLanguage())             align = EGUIA_LOWERRIGHT;
+    else if (translations->isRTLText(message))          align = EGUIA_LOWERRIGHT;
 
     EGUI_ALIGNMENT valign = EGUIA_CENTER ; //TODO: make label v-align configurable through XML file?
 
@@ -93,7 +90,7 @@ void BubbleWidget::replaceText()
         m_expanded_size.LowerRightCorner.Y += additionalNeededSize/2 + 10;
 
         // reduce text to fit in the available space if it's too long
-        if (translations->isRTLLanguage())
+        if (translations->isRTLText(message))
         {
             while (text_height > m_shrinked_size.getHeight() && message.size() > 10)
             {
@@ -119,9 +116,11 @@ void BubbleWidget::replaceText()
 void BubbleWidget::setText(const irr::core::stringw &s)
 {
     Widget::setText(s);
-    //If add() has already been called (and thus m_element is set) we need to replace the text.
-    if(m_element != NULL){
+    if (m_element != NULL)
+    {
+        //If add() has already been called (and thus m_element is set) we need to replace the text.
         replaceText();
+        getIrrlichtElement<IGUIStaticText>()->setRightToLeft(translations->isRTLText(getText()));
     }
 }
 

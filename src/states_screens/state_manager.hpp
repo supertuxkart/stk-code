@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,13 +27,17 @@
 
 #include <string>
 
-#include "config/player.hpp"
+#include "config/player_profile.hpp"
 #include "guiengine/abstract_state_manager.hpp"
 #include "utils/ptr_vector.hpp"
 
 class AbstractKart;
 class InputDevice;
 struct Input;
+namespace Online
+{
+    class OnlineProfile;
+}
 
 namespace GUIEngine
 {
@@ -102,9 +106,9 @@ public:
         PlayerProfile* getProfile()
         {
 #ifdef DEBUG
-			assert(m_magic_number == 0xAC1EF1AE);
+            assert(m_magic_number == 0xAC1EF1AE);
 #endif
-			return m_player;
+            return m_player;
         }   // getProfile
 
         // --------------------------------------------------------------------
@@ -112,9 +116,9 @@ public:
         const PlayerProfile* getConstProfile() const
         {
 #ifdef DEBUG
-			assert(m_magic_number == 0xAC1EF1AE);
+            assert(m_magic_number == 0xAC1EF1AE);
 #endif
-			return m_player;
+            return m_player;
         }   // getConstProfile
 
         // --------------------------------------------------------------------
@@ -127,9 +131,9 @@ public:
         int getID() const
         {
 #ifdef DEBUG
-			assert(m_magic_number == 0xAC1EF1AE);
+            assert(m_magic_number == 0xAC1EF1AE);
 #endif
-			return m_id;
+            return m_id;
         }   // getID
         // --------------------------------------------------------------------
 
@@ -138,9 +142,9 @@ public:
         InputDevice* getDevice() const
         {
 #ifdef DEBUG
-			assert(m_magic_number == 0xAC1EF1AE);
+            assert(m_magic_number == 0xAC1EF1AE);
 #endif
-			return m_device;
+            return m_device;
         }   // getDevice
 
         // --------------------------------------------------------------------
@@ -151,9 +155,9 @@ public:
         void setKart(AbstractKart *kart)
         {
 #ifdef DEBUG
-			assert(m_magic_number == 0xAC1EF1AE);
+            assert(m_magic_number == 0xAC1EF1AE);
 #endif
-			m_kart = kart;
+            m_kart = kart;
         }   // setKart
 
         // --------------------------------------------------------------------
@@ -161,7 +165,7 @@ public:
         AbstractKart* getKart()
         {
 #ifdef DEBUG
-			assert(m_magic_number == 0xAC1EF1AE);
+            assert(m_magic_number == 0xAC1EF1AE);
 #endif
             return m_kart;
         }   // getKart
@@ -181,7 +185,7 @@ public:
     int createActivePlayer(PlayerProfile *profile, InputDevice *device);
     void removeActivePlayer(int id);
 
-    int activePlayerCount();
+    unsigned int activePlayerCount();
     void resetActivePlayers();
 
     /** \return whether to reduce FPS at the moment

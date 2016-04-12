@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Marianne Gagnon
-//  based on code Copyright (C) 2002-2010 Nikolaus Gebhardt
+//  Copyright (C) 2011-2015 Marianne Gagnon
+//  based on code Copyright 2002-2010 Nikolaus Gebhardt
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -71,6 +71,8 @@ private:
 
     PreviousVisibility m_previous_visibility;
 
+    u32 m_last_tick;
+
 public:
 
     LODNode(std::string group_name, scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id=-1);
@@ -80,6 +82,8 @@ public:
     virtual const core::aabbox3d<f32>& getBoundingBox() const { return Box; }
 
     int getLevel();
+
+    void updateVisibility(bool* shown = NULL);
 
     /*
     //! Returns a reference to the current relative transformation matrix.
@@ -112,8 +116,8 @@ public:
     std::vector<scene::ISceneNode*>& getAllNodes() { return m_nodes; }
 
     //! OnAnimate() is called just before rendering the whole scene.
-		/** This method will be called once per frame, independent
-		of whether the scene node is visible or not. */
+    /** This method will be called once per frame, independent
+        of whether the scene node is visible or not. */
     virtual void OnAnimate(u32 timeMs);
 
     virtual void OnRegisterSceneNode();

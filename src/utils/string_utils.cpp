@@ -1,7 +1,8 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>,
-//                     Ingo Ruhnke <grumbel@gmx.de>
+//
+//  Copyright (C) 2004-2015  Steve Baker <sjbaker1@airmail.net>,
+//  Copyright (C) 2004-2015  Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015  SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,19 +21,21 @@
 #include "utils/string_utils.hpp"
 
 #include "utils/log.hpp"
-
+#include "utils/time.hpp"
+#include "utils/utf8.h"
 #include "coreutil.h"
 
-#include <math.h>
 #include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdio>
 #include <cstring>
-#include <stdio.h>
+#include <cwchar>
 #include <exception>
-#include <assert.h>
 
 namespace StringUtils
 {
-    bool hasSuffix(const std::string& lhs, const std::string rhs)
+    bool hasSuffix(const std::string& lhs, const std::string &rhs)
     {
         if (lhs.length() < rhs.length())
             return false;
@@ -113,6 +116,24 @@ namespace StringUtils
     }   // getExtension
 
     //-------------------------------------------------------------------------
+    /** Checks if the input string is not empty. ( = has characters different
+     *  from a space).
+     */
+    bool notEmpty(const irr::core::stringw& input)
+    {
+        const int size = input.size();
+        int nonEmptyChars = 0;
+        for (int n=0; n<size; n++)
+        {
+            if (input[n] != L' ')
+            {
+                nonEmptyChars++;
+            }
+        }
+        return (nonEmptyChars > 0);
+    }   // getExtension
+
+    //-------------------------------------------------------------------------
     /** Returns a string converted to upper case.
      */
     std::string toUpperCase(const std::string& str)
@@ -147,14 +168,14 @@ namespace StringUtils
         try
         {
             std::string::size_type start=0;
-            while(start!=std::string::npos && start<s.size())
+            while(start < (unsigned int) s.size())
             {
                 std::string::size_type i=s.find(c, start);
                 if (i!=std::string::npos)
                 {
                     if (keepSplitChar)
                     {
-                        int from = start-1;
+                        int from = (int)start-1;
                         if (from < 0) from = 0;
 
                         result.push_back(std::string(s, from, i-from));
@@ -165,18 +186,18 @@ namespace StringUtils
                 }
                 else   // end of string reached
                 {
-                    if (keepSplitChar)
+                    if (keepSplitChar && start != 0)
                         result.push_back(std::string(s,start-1));
                     else
                         result.push_back(std::string(s,start));
-                    start = i;
+                    return result;
                 }
             }
             return result;
         }
         catch (std::exception& e)
         {
-            Log::error("StringUtils", 
+            Log::error("StringUtils",
                        "Error in split(std::string) : %s @ line %i : %s.",
                      __FILE__, __LINE__, e.what());
             Log::error("StringUtils", "Splitting '%s'.", s.c_str());
@@ -223,14 +244,13 @@ namespace StringUtils
                 }
                 else
                 {
-                    if (keepSplitChar)
+                    if (keepSplitChar && start != 0)
                         result.push_back( s.subString(start - 1,
                                                       s.size()-start + 1) );
                     else
                         result.push_back( s.subString(start, s.size()-start) );
 
                     return result;
-                    //start = i+1;
                 }
             }
             return result;
@@ -244,6 +264,18 @@ namespace StringUtils
             exit(1);
         }
     }   // split
+
+
+    std::vector<uint32_t> splitToUInt(const std::string& s, char c, bool keepSplitChar)
+    {
+        std::vector<std::string> parts = split(s, c, keepSplitChar);
+        std::vector<uint32_t> ints;
+        for(unsigned int i = 0; i < parts.size(); ++i)
+        {
+           ints.push_back(atoi(parts[i].c_str()));
+        }
+        return ints;
+    }
 
 
     // ------------------------------------------------------------------------
@@ -278,7 +310,7 @@ namespace StringUtils
             for(int i=(int)dirs.size()-1; i>=0; i--)
             {
                 if(dirs[i].size()>1) continue;
-                if(i==dirs.size()-1)    // last element
+                if(i==(int)dirs.size()-1)    // last element
                 {
                     dirs[i]+=":";      // turn "c" back into "c:"
                 }
@@ -294,7 +326,7 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            Log::fatal("StringUtils", 
+            Log::fatal("StringUtils",
                 "Fatal error in splitPath : %s @ line %i: '%s'.",
                         __FILE__, __LINE__, path.c_str());
             exit(1);
@@ -312,7 +344,7 @@ namespace StringUtils
 
             unsigned int insertValID = 0;
 
-            const unsigned int item_count = sv.size();
+            const unsigned int item_count = (int)sv.size();
             for (unsigned int i=0; i<item_count; i++)
             {
                 if(sv[i][0] != '%')
@@ -325,7 +357,7 @@ namespace StringUtils
                     {
                         if (insertValID >= all_vals.size())
                         {
-                            Log::warn("StringUtils", 
+                            Log::warn("StringUtils",
                                       "insertValues: "
                                       "Invalid number of arguments in '%s'.",
                                       s.c_str());
@@ -364,7 +396,7 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            Log::fatal("StringUtils", 
+            Log::fatal("StringUtils",
                        "Fatal error in insertValues(std::string) : %s @ "
                        "line %i: '%s'", __FILE__, __LINE__, s.c_str());
             exit(1);
@@ -384,7 +416,7 @@ namespace StringUtils
 
             irr::core::stringw new_string="";
 
-            const unsigned int size = sv.size();
+            const unsigned int size = (int)sv.size();
             for (unsigned int i=0; i<size; i++)
             {
                 if(sv[i][0] != '%')
@@ -488,12 +520,41 @@ namespace StringUtils
         // which admittedly only works for min < 100000 - which is about 68
         // days - good enough.
         char s[12];
-        sprintf ( s, "%02d:%02d:%02d", min,  sec,  hundredths) ;
+        sprintf(s, "%02d:%02d:%02d", min,  sec,  hundredths);
         return std::string(s);
     }   // timeToString
 
     // ------------------------------------------------------------------------
+    /** Shows a increasing number of dots.
+      * \param interval A float representing the time it takes to add a new dot
+      * \param max_dots The number of dots used. Defaults to 3.
+      */
+    irr::core::stringw loadingDots(float interval, int max_dots)
+    {
+        int nr_dots = int(floor(StkTime::getRealTime() / interval))
+                    % (max_dots + 1);
+        return irr::core::stringw((std::string(nr_dots, '.') +
+                                   std::string(max_dots - nr_dots, ' ')).c_str());
+    }   // loadingDots
 
+    // ------------------------------------------------------------------------
+    /** Returns the string given with loadingDots appended. A simple
+     *  convenience function to type less in calls.
+     *  \parameter s The string to which the loading dots are appended.
+     */
+    irr::core::stringw loadingDots(const wchar_t *s)
+    {
+        return irr::core::stringw(s) + loadingDots();
+    }   // loadingDots
+
+    // ------------------------------------------------------------------------
+    /** Replaces values in a string.
+     * \param other string in which to replace stuff
+     * \param from  pattern to remove from the string
+     * \param to    pattern to insert instead
+     * \return      a string with all occurrences of \c from replaced by
+     *              occurrences of \c to
+     */
     std::string replace(const std::string& other, const std::string& from,
                         const std::string& to)
     {
@@ -502,7 +563,7 @@ namespace StringUtils
 
         while (true)
         {
-            const int pos = wip.find(from);
+            const int pos = (int) wip.find(from);
             if (pos == -1)
             {
                 return wip;
@@ -513,11 +574,11 @@ namespace StringUtils
     }
 
     // ------------------------------------------------------------------------
-    /** Converts ASCII text with HTML entities (e.g. &xE9;) to unicode strings
+    /** Converts ASCII text with XML entities (e.g. &x00;) to unicode strings
      *  \param input The input string which should be decoded.
      *  \return A irrlicht wide string with unicode characters.
      */
-    irr::core::stringw decodeFromHtmlEntities(const std::string& input)
+    irr::core::stringw xmlDecode(const std::string& input)
     {
         irr::core::stringw output;
         std::string entity;
@@ -598,100 +659,126 @@ namespace StringUtils
         }
 
         return output;
-    }   // decodeFromHtmlEntities
+    }   // xmlDecode
 
     // ------------------------------------------------------------------------
-    /** Converts a unicode string to plain ASCII using html-like & codes.
+    /** Converts a unicode string to plain ASCII using XML entites (e.g. &x00;)
      *  \param s The input string which should be encoded.
      *  \return A std:;string with ASCII characters.
      */
-    std::string encodeToHtmlEntities(const irr::core::stringw &s)
+    std::string xmlEncode(const irr::core::stringw &s)
     {
         std::ostringstream output;
         for(unsigned int i=0; i<s.size(); i++)
         {
-            if(s[i]=='&')
-                output<<"&amp;";
+            if (s[i] >= 128 || s[i] == '&' || s[i] == '<' || s[i] == '>' || s[i] == '\"')
+            {
+                output << "&#x" << std::hex << std::uppercase << s[i] << ";";
+            }
             else
             {
-                if(s[i]<128)
-                {
-                    irr::c8 c=(char)(s[i]);
-                    output<<c;
-                }
-                else
-                {
-                    output <<"&#x" << std::hex <<std::uppercase<< s[i]<<";";
-                }
+                irr::c8 c = (char)(s[i]);
+                output << c;
             }
         }
         return output.str();
-    }   // encodeToHtmlEntities
+    }   // xmlEncode
 
     // ------------------------------------------------------------------------
 
-    unsigned int simpleHash(const char* input)
+    std::string wideToUtf8(const wchar_t* input)
     {
-         int hash = 0;
-         for (int n=0; input[n] != 0; n++)
-         {
-            hash += (hash << (hash & 0xF)) ^ input[n];
-         }
+        static std::vector<char> utf8line;
+        utf8line.clear();
 
-         return hash;
-    }
+        utf8::utf16to8(input, input + wcslen(input), back_inserter(utf8line));
+        utf8line.push_back(0);
+
+        return std::string(&utf8line[0]);
+    }   // wideToUtf8
+
+    // ------------------------------------------------------------------------
+    /** Converts the irrlicht wide string to an utf8-encoded std::string.
+     */
+    std::string wideToUtf8(const irr::core::stringw& input)
+    {
+        return wideToUtf8(input.c_str());
+    }   // wideToUtf8
+
+    // ------------------------------------------------------------------------
+    /** Converts the irrlicht wide string to an utf8-encoded std::string. */
+    irr::core::stringw utf8ToWide(const char* input)
+    {
+        static std::vector<wchar_t> utf16line;
+        utf16line.clear();
+
+        utf8::utf8to16(input, input + strlen(input), back_inserter(utf16line));
+        utf16line.push_back(0);
+
+        return irr::core::stringw(&utf16line[0]);
+    }   // utf8ToWide
+
+    // ------------------------------------------------------------------------
+    /** Converts a utf8-encoded std::string into an irrlicht wide string. */
+    irr::core::stringw utf8ToWide(const std::string &input)
+    {
+        return utf8ToWide(input.c_str());
+    }   // utf8ToWide
 
     // ------------------------------------------------------------------------
     /** Converts a version string (in the form of 'X.Y.Za-rcU' into an
-	    *  integer number.
-	    *  \param s The version string to convert.
-	    */
+     *  integer number.
+     *  \param s The version string to convert.
+     */
     int versionToInt(const std::string &version_string)
     {
-	    // Special case: SVN
-	    if(version_string=="SVN" || version_string=="svn")
-		    // SVN version will be version 99.99.99i-rcJ
-		    return 1000000*99
-				    +  10000*99
-				    +    100*99
-				    +     10* 9
-				    +         9;
+        // Special case: GIT
+        if(version_string=="GIT" || version_string=="git")
+        {
+            // GIT version will be version 99.99.99i-rcJ
+            return 1000000*99
+                    +  10000*99
+                    +    100*99
+                    +     10* 9
+                    +         9;
+        }
 
-	    std::string s=version_string;
-	    // To guarantee that a release gets a higher version number than
-	    // a release candidate, we assign a 'release_candidate' number
-	    // of 9 to versions which are not a RC. We assert that any RC
-	    // is less than 9 to guarantee the ordering.
-	    int release_candidate=9;
-	    if(s.length()>4 && sscanf(s.substr(s.length()-4, 4).c_str(), "-rc%d",
-			    &release_candidate)==1)
-	    {
-		    s = s.substr(0, s.length()-4);
-		    // Otherwise a RC can get a higher version number than
-		    // the corresponding release! If this should ever get
-		    // triggered, multiply all scaling factors above and
-		    // below by 10, to get two digits for RC numbers.
-		    assert(release_candidate<9);
-	    }
-	    int very_minor=0;
-	    if(s.length()>0 && s[s.size()-1]>='a' && s[s.size()-1]<='z')
-	    {
-		    very_minor = s[s.size()-1]-'a'+1;
-		    s = s.substr(0, s.size()-1);
-	    }
-	    std::vector<std::string> l = StringUtils::split(s, '.');
-	    while(l.size()<3)
-		    l.push_back("0");
-	    int version = 1000000*atoi(l[0].c_str())
-				    +   10000*atoi(l[1].c_str())
-				    +     100*atoi(l[2].c_str())
-				    +      10*very_minor
-				    +         release_candidate;
+        std::string s=version_string;
+        // To guarantee that a release gets a higher version number than
+        // a release candidate, we assign a 'release_candidate' number
+        // of 9 to versions which are not a RC. We assert that any RC
+        // is less than 9 to guarantee the ordering.
+        int release_candidate=9;
+        if(s.length()>4 && sscanf(s.substr(s.length()-4, 4).c_str(), "-rc%d",
+                &release_candidate)==1)
+        {
+            s = s.substr(0, s.length()-4);
+            // Otherwise a RC can get a higher version number than
+            // the corresponding release! If this should ever get
+            // triggered, multiply all scaling factors above and
+            // below by 10, to get two digits for RC numbers.
+            assert(release_candidate<9);
+        }
+        int very_minor=0;
+        if(s.length()>0 && s[s.size()-1]>='a' && s[s.size()-1]<='z')
+        {
+            very_minor = s[s.size()-1]-'a'+1;
+            s = s.substr(0, s.size()-1);
+        }
+        std::vector<std::string> l = StringUtils::split(s, '.');
+        while(l.size()<3)
+            l.push_back("0");
+        int version = 1000000*atoi(l[0].c_str())
+                    +   10000*atoi(l[1].c_str())
+                    +     100*atoi(l[2].c_str())
+                    +      10*very_minor
+                    +         release_candidate;
 
-	    if(version<=0)
-		    printf("Invalid version string '%s'.\n", s.c_str());
-	    return version;
+        if(version <= 0)
+            Log::error("StringUtils", "Invalid version string '%s'.", s.c_str());
+        return version;
     }   // versionToInt
+
 } // namespace StringUtils
 
 

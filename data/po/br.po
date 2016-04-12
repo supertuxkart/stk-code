@@ -1,0 +1,3795 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+# Alan Monfort <alan.monfort@free.fr>, 2015
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013
+# Gwenn M <tornoz@laposte.net>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: SuperTuxKart\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-09-26 00:20+1000\n"
+"PO-Revision-Date: 2015-10-11 10:29+0000\n"
+"Last-Translator: Alan Monfort <alan.monfort@free.fr>\n"
+"Language-Team: Breton (http://www.transifex.com/supertuxkart/supertuxkart/language/br/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: br\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. I18N: ./data/achievements.xml
+msgid "Christoffel Columbus"
+msgstr "Kristobal Kolombus"
+
+#. I18N: ./data/achievements.xml
+msgid "Play every official track at least once."
+msgstr "C'hoari gant pep loabr kefridiel ur wech da vihanañ."
+
+#. I18N: ./data/achievements.xml
+msgid "Strike!"
+msgstr "Strike !"
+
+#. I18N: ./data/achievements.xml
+msgid "Hit 10 karts with a bowling-ball."
+msgstr "Stekiñ 10 kart gant ur voul vowling."
+
+#. I18N: ./data/achievements.xml
+msgid "Arch Enemy"
+msgstr "Enebour gwashañ"
+
+#. I18N: ./data/achievements.xml
+msgid "Hit the same kart at least 5 times in one race."
+msgstr "Stokit an hevelep kart 5 gwech da vihanañ e-pad ur redadeg."
+
+#. I18N: ./data/achievements.xml
+msgid "Marathoner"
+msgstr "Maratonour"
+
+#. I18N: ./data/achievements.xml
+msgid "Make a race with 5 laps or more."
+msgstr "Ober ur redadeg gant 5 tro pe muioc'h."
+
+#. I18N: ./data/achievements.xml
+msgid "Skid-row"
+msgstr "Goueled"
+
+#. I18N: ./data/achievements.xml
+msgid "Make 5 skidding in a single lap."
+msgstr "Ober 5 rikladur e korf un dro hepken."
+
+#. I18N: ./data/achievements.xml
+msgid "Gold driver"
+msgstr "Bleiner alaouret "
+
+#. I18N: ./data/achievements.xml
+msgid "Win against at least 3 opponents in all single player modes."
+msgstr ""
+
+#. I18N: ./data/achievements.xml
+msgid "Powerup Love"
+msgstr "Galloud Karantez"
+
+#. I18N: ./data/achievements.xml
+msgid "Use 10 or more powerups in a race."
+msgstr "Gra gant 10 pe vuioc'h a c'halloudoù en ur redadeg."
+
+#. I18N: ./data/achievements.xml
+msgid "Unstoppable"
+msgstr "Anarsavadus"
+
+#. I18N: ./data/achievements.xml
+msgid "Win 5 single races in a row."
+msgstr "Gounit 5 redadeg eeun diouzh renk."
+
+#. I18N: ./data/achievements.xml
+msgid "Banana Lover"
+msgstr "Karour Bananez"
+
+#. I18N: ./data/achievements.xml
+msgid "Collect at least 5 bananas in one race."
+msgstr "Dastumit 5 bananezenn da vihanañ e-pad ur redadeg."
+
+#. I18N: ./data/achievements.xml
+msgid "It's secret"
+msgstr "Ur c'hevrin eo"
+
+#. I18N: ./data/achievements.xml
+msgid "Really ... a secret."
+msgstr "Ur c'hevrin... da vat."
+
+#. I18N: ./data/achievements.xml
+msgid "Mosquito Hunter"
+msgstr "Chaseour pikerezed"
+
+#. I18N: ./data/achievements.xml
+msgid ""
+"Take your opponents for mosquitos! With the swatter, squash at least 5 of "
+"them in a race."
+msgstr "Gwel da enebouion evel ma vije pikerezed ! Flastr 5 anezho da vihanañ gant al lopell."
+
+#. I18N: ./data/grandprix/1_penguinplayground.grandprix
+msgid "Penguin Playground"
+msgstr "Tachenn c'hoari ar mank"
+
+#. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
+msgid "Off the beaten track"
+msgstr "Er-maez eus an hentoù fraeet"
+
+#. I18N: ./data/grandprix/3_tothemoonandback.grandprix
+msgid "To the moon and back"
+msgstr "Betek al loar ha distreiñ"
+
+#. I18N: ./data/grandprix/4_atworldsend.grandprix
+msgid "At World's End"
+msgstr "E debenn ar bed"
+
+#. I18N: ./data/gui/addons_loading.stkgui
+#. I18N: Add-on screen action
+msgid "Install"
+msgstr "Staliañ"
+
+#. I18N: ./data/gui/addons_loading.stkgui
+#. I18N: Add-on screen action
+msgid "Uninstall"
+msgstr "Distaliañ"
+
+#. I18N: ./data/gui/addons_loading.stkgui
+#. I18N: Add-on screen action
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:216
+#: src/states_screens/dialogs/addons_loading.cpp:284
+msgid "Back"
+msgstr "Distro"
+
+#. I18N: ./data/gui/addons_screen.stkgui
+msgid "SuperTuxKart Addons"
+msgstr "Askouezhioù evit SuperTuxKart"
+
+#. I18N: ./data/gui/addons_screen.stkgui
+#. I18N: In addons screen, in the filtering bar, to enable a filter that will
+#. show only recently updated items
+msgid "Updated"
+msgstr "Hizivaet"
+
+#. I18N: ./data/gui/addons_screen.stkgui
+#. I18N: In addons screen, in the filtering bar, to enable a filter that will
+#. show only items with good rating
+msgid "Rating >="
+msgstr "Priziadur >="
+
+#. I18N: ./data/gui/addons_screen.stkgui
+#. I18N: In the addons screen
+msgid "Karts"
+msgstr "Kartoù"
+
+#. I18N: ./data/gui/addons_screen.stkgui
+#. I18N: In the addons screen
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+msgid "Tracks"
+msgstr "Loabroù"
+
+#. I18N: ./data/gui/addons_screen.stkgui
+#. I18N: In the addons screen
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: Section in arena tracks selection screen
+msgid "Arenas"
+msgstr "Arenaoù"
+
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: track group
+#: src/states_screens/grand_prix_editor_screen.cpp:325
+msgid "Standard"
+msgstr "Skoueriek"
+
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: track group
+#. I18N: arena group name
+#. I18N: track group name
+#. I18N: kart group name
+#. I18N: track group name
+#: src/states_screens/arenas_screen.cpp:83
+#: src/states_screens/easter_egg_screen.cpp:145
+#: src/states_screens/grand_prix_editor_screen.cpp:327
+#: src/states_screens/kart_selection.cpp:286
+#: src/states_screens/tracks_screen.cpp:155
+msgid "Add-Ons"
+msgstr "Askouezhioù"
+
+#. I18N: ./data/gui/arenas.stkgui
+#. I18N: track group
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: track group
+#. I18N: Time filters for add-ons
+#. I18N: name of the tab that will show arenas from all groups
+#. I18N: name of the tab that will show tracks from all groups
+#. I18N: if all kart animations are enabled
+#. I18N: name of the tab that will show tracks from all groups
+#: src/states_screens/addons_screen.cpp:49
+#: src/states_screens/arenas_screen.cpp:75
+#: src/states_screens/easter_egg_screen.cpp:137
+#: src/states_screens/edit_track_screen.cpp:147
+#: src/states_screens/gp_info_screen.cpp:76
+#: src/states_screens/grand_prix_editor_screen.cpp:324
+#: src/states_screens/kart_selection.cpp:278
+#: src/states_screens/options_screen_video.cpp:389
+#: src/states_screens/tracks_screen.cpp:145
+msgid "All"
+msgstr "An holl anezho"
+
+#. I18N: ./data/gui/challenges.stkgui
+#. I18N: Title for challenges screen
+msgid "Challenges - Trophy Room"
+msgstr "Daeoù - Sal ar c'hiboù"
+
+#. I18N: ./data/gui/confirm_dialog.stkgui
+#. I18N: In a 'are you sure?' dialog
+#: src/states_screens/edit_gp_screen.cpp:256
+msgid "Yes"
+msgstr "Ya"
+
+#. I18N: ./data/gui/confirm_dialog.stkgui
+#. I18N: In a 'are you sure?' dialog
+#. I18N: ./data/gui/confirm_resolution_dialog.stkgui
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: ./data/gui/enter_gp_name_dialog.stkgui
+#. I18N: In the 'add new grand prix' dialog
+#. I18N: ./data/gui/enter_player_name_dialog.stkgui
+#. I18N: In the 'add new player' dialog
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/dialogs/addons_loading.cpp:227
+#: src/states_screens/dialogs/add_device_dialog.cpp:128
+#: src/states_screens/user_screen.cpp:112
+msgid "Cancel"
+msgstr "Dilezel"
+
+#. I18N: ./data/gui/confirm_resolution_dialog.stkgui
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+msgid "Keep this resolution"
+msgstr "Mirout an diarunusted"
+
+#. I18N: ./data/gui/credits.stkgui
+#. I18N: Title in credits screen
+msgid "Credits"
+msgstr "Trugarez da"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+msgid "Graphics Settings"
+msgstr "Arventennoù ar c'hevregadoù"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Advanced pipeline (lights, etc.)"
+msgstr "Eoulsan kempleshoc'h (gouleier, h.a.)"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Shadows"
+msgstr "Skeudoù"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Image-based lighting"
+msgstr ""
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Bloom"
+msgstr "Bleuñv"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Light shaft (God rays)"
+msgstr "Bann goulou"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Ambient Occlusion"
+msgstr "Enkloz-luc'h tro-dro"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Global illumination"
+msgstr "Goulaouder hollek"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Glow (outlines)"
+msgstr "Skleur (trolinennoù)"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Anti-aliasing"
+msgstr "Lufrañ"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Motion blur"
+msgstr "Ruzed dre fiñval"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Depth of field"
+msgstr "Donder an noñv"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Weather Effects"
+msgstr "Efedoù hin"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Animated Scenery"
+msgstr "Gweledva blivet"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Texture compression"
+msgstr "Koazhadur ar wiadezh"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Use high definition textures"
+msgstr "Arverañ gwiadezhioù uhel o diarunusted"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Animated Characters"
+msgstr "Tudennoù blivet"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "Texture filtering"
+msgstr "Silañ gwiadezhioù"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+#. I18N: Video settings
+msgid "* Restart STK to apply new settings"
+msgstr "* Adloc'hañ STK da seveniñ an arventennoù nevez"
+
+#. I18N: ./data/gui/custom_video_settings.stkgui
+msgid "Apply"
+msgstr "Seveniñ"
+
+#. I18N: ./data/gui/easter_egg.stkgui
+#. I18N: Section in easter egg tracks selection screen
+#. I18N: ./data/gui/tracks.stkgui
+#. I18N: In the track selection screen
+msgid "All Tracks"
+msgstr "An holl loabroù"
+
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: In the edit track screen
+msgid "Number of laps:"
+msgstr "Niver a droioù :"
+
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: In the edit track screen
+msgid "Reverse:"
+msgstr "Tuginañ :"
+
+#. I18N: ./data/gui/edit_track.stkgui
+#. I18N: ./data/gui/enter_gp_name_dialog.stkgui
+#. I18N: In the 'add new grand prix' dialog
+#. I18N: ./data/gui/enter_player_name_dialog.stkgui
+#. I18N: In the 'add new player' dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/dialogs/message_dialog.cpp:123
+#: src/states_screens/dialogs/message_dialog.cpp:136
+msgid "OK"
+msgstr "Mat eo"
+
+#. I18N: ./data/gui/enter_gp_name_dialog.stkgui
+#. I18N: In the 'add new grand prix' dialog
+msgid "Please enter the name of the grand prix"
+msgstr "Mar plij, biziatait anv ar grand prix"
+
+#. I18N: ./data/gui/enter_player_name_dialog.stkgui
+#. I18N: In the 'add new player' dialog
+msgid "Enter the new player's name"
+msgstr "Enankañ anv ar c'hoarier nevez"
+
+#. I18N: ./data/gui/feature_unlocked.stkgui
+#. I18N: ./data/gui/grand_prix_lose.stkgui
+#. I18N: ./data/gui/grand_prix_win.stkgui
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+#. I18N: ./data/gui/tutorial_message_dialog.stkgui
+#. I18N: Button in tutorial
+#: src/states_screens/dialogs/gp_info_dialog.cpp:214
+#: src/states_screens/race_result_gui.cpp:186
+msgid "Continue"
+msgstr "Kenderc'hel"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Title in edit grand prix screen
+msgid "Edit Grand Prix"
+msgstr "Embann ar Grand Prix"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Move up"
+msgstr "Sevel"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Move down"
+msgstr "Diskenn"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Add"
+msgstr "Ouzhpennañ"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+msgid "Edit"
+msgstr "Embann"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Remove"
+msgstr "Dilemel"
+
+#. I18N: ./data/gui/gpedit.stkgui
+#. I18N: Menu item
+msgid "Save"
+msgstr "Enrollañ"
+
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Title in grand prix editor screen
+msgid "Grand Prix editor"
+msgstr "Embanner Grand Prix"
+
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+msgid "New"
+msgstr "Nevez"
+
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+msgid "Copy"
+msgstr "Eilañ"
+
+#. I18N: ./data/gui/gpeditor.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Rename"
+msgstr "Adenvel"
+
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+msgid "AI karts"
+msgstr "Kartoù Al"
+
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+msgid "Reverse"
+msgstr "Tuginañ"
+
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+msgid "Track group"
+msgstr "Strollad loabroù"
+
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Start Race"
+msgstr "Loc'hañ ar redadeg"
+
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#: src/states_screens/gp_info_screen.cpp:146
+msgid "Continue saved GP"
+msgstr "Kenderc'hel ar GP bet enrollet"
+
+#. I18N: ./data/gui/grand_prix_lose.stkgui
+#. I18N: ./data/gui/grand_prix_win.stkgui
+msgid "Save Grand Prix"
+msgstr "Enrollañ ar Grand Prix"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: ./data/gui/help4.stkgui
+msgid "SuperTuxKart Help"
+msgstr "Skoazell SuperTuxKart"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+msgid "General"
+msgstr "Hollek"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+msgid "Weapons"
+msgstr "Armoù"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+msgid "Game Modes"
+msgstr "Modoù c'hoari"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: Tab in help menu
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: Tab in help menu
+msgid "Multi­player"
+msgstr "Liesc'hoarier"
+
+#. I18N: ./data/gui/help1.stkgui
+msgid "Click here to play the tutorial"
+msgstr "Klik amañ da lenn ar c'helennskrid"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+msgid "Collect blue boxes. They will give you weapons or other powerups."
+msgstr "Dastum boestadoù glas. Ganto e teuy armoù ha galloudoù dit"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+#: ../stk-assets/tracks/tutorial/scripting.as:32
+#: ../stk-assets/tracks/tutorial/triggers.as:16
+msgid "Avoid bananas!"
+msgstr "Tremen e-bioù ar bananez !"
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+msgid ""
+"Collecting nitro allows you to get speed boosts whenever you wish by "
+"pressing the appropriate key. You can see your current level of nitro in the"
+" bar at the right of the game screen."
+msgstr "Dastum nitro a ro tro dit da gaout dreist-tizh pa 'z po c'hoant en ur bouezañ war ar stokell dereat. Diskouezet  eo da live nitro war ur varrenn a zo war tu dehou skramm ar c'hoari."
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: In the help menu
+msgid ""
+"If you see a button with a lock like this one, you need to complete a "
+"challenge to unlock it."
+msgstr "Mar gweli un afell gant ur c'hadranas evel hennezh e vo ret dit echuiñ an dae d'e zilemel."
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: in the help menu
+msgid "The 'skidding' key allows you to skid in sharp turns and get a boost."
+msgstr "Ar stokell 'Diflipañ' a ro tro dit da ziflipañ e kammdroioù lemm ha da wellat da dizh."
+
+#. I18N: ./data/gui/help1.stkgui
+#. I18N: in the help screen
+msgid "* Current key bindings can be seen/changed in menu Options"
+msgstr "* Kemmet/gwelet e vez ar berradennoù klavier el lañser Dibarzhioù"
+
+#. I18N: ./data/gui/help2.stkgui
+#. I18N: In the help menu
+msgid "To help you win, there are some powerups you can collect:"
+msgstr "Dastum galloudoù, aesoc'h e vo dit gounit :"
+
+#. I18N: ./data/gui/help2.stkgui
+msgid ""
+"BubbleGum - protect yourself with a shield, or use while looking back to "
+"leave a sticky pink puddle behind you."
+msgstr "Gom chaokat - en em warez gant ur skoed pe gra gantañ en ur gilsellout da leuskel ur boullenn roz ha pegus war da lerc'h."
+
+#. I18N: ./data/gui/help2.stkgui
+msgid ""
+"Cake - thrown at the closest rival, best on short ranges and long straights."
+msgstr "Gwastell - bannet ouzh ar c'hart tostañ, efedusoc'h a-dost gant un hentoù eeun."
+
+#. I18N: ./data/gui/help2.stkgui
+msgid ""
+"Plunger - throw straight to pull an opponent back, or throw while looking "
+"back to make one lose sight."
+msgstr "Mandoz - bannañ war-eeun da sachañ un enebour war-gil pe vannañ en ur gilsellout da zallañ an enebour."
+
+#. I18N: ./data/gui/help2.stkgui
+msgid ""
+"Bowling Ball - bounces off walls. If you are looking back, it will be thrown"
+" backwards."
+msgstr "Boul vowling - dazlammat a ra ouzh ar mogerioù. Mar kilselli e vo bannet war-gil."
+
+#. I18N: ./data/gui/help2.stkgui
+msgid "Parachute - slows down all karts in a better position."
+msgstr "Harz-lamm - gorrekaat a ra an holl gartoù dirazout."
+
+#. I18N: ./data/gui/help2.stkgui
+msgid ""
+"Swapper - gift boxes are transformed into bananas and vice versa for a short"
+" time."
+msgstr "Kevamsavell - boestadoù profoù a ya da vananezennoù hag ar c'hontrefed e-pad ur predig."
+
+#. I18N: ./data/gui/help2.stkgui
+msgid ""
+"Basket Ball - bounces after the leader, and might squash and slow down karts"
+" down on the way."
+msgstr "Basket Ball - dazlammat a ra war-lerc'h ar penn, ha marteze e flastro kartoù ha kartoù all vo daleet war an hent."
+
+#. I18N: ./data/gui/help2.stkgui
+msgid "Swatter - will squash karts close by, slowing them down."
+msgstr "Kelienouer - flastra a ray ar c'hartoù o tostañ d'o c'horrekaat."
+
+#. I18N: ./data/gui/help3.stkgui
+msgid "SuperTuxKart features several game modes"
+msgstr "SuperTuxKart a ginnig meur a vod c'hoari"
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+msgid ""
+"Regular Race: All blows allowed, so catch weapons and make clever use of "
+"them!"
+msgstr "Redadeg voutin : aotreet eo an holl walldaolioù, neuze tap armoù ha bez speredek ganto !"
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
+msgstr "A-enep an amzer : N'eus galloud ebet, pouezus eo da varregezh vleinañ hepken !"
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+msgid ""
+"Follow the leader: Run for second place, as the last kart will be "
+"disqualified every time the counter hits zero. Beware: going in front of the"
+" leader will get you eliminated too!"
+msgstr ""
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+msgid ""
+"3 Strikes Battle: Only in multiplayer games. Hit others with weapons until "
+"they lose all their lives."
+msgstr "Kad dre 3 lod : c'hoari liesc'hoarier nemetken. Sko ar re all gant armoù betek ma kollint o buhezioù holl."
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+msgid ""
+"Soccer: Only in multiplayer games. Use your kart to push the ball into the "
+"goal."
+msgstr "Mell droad : C'hoarioù liesc'hoarier nemetken. Gra gant da gart da voutañ ar vell e-barzh ar pal."
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+msgid "Egg hunt: Explore tracks to find all hidden eggs."
+msgstr "Kerc'hat vioù  : Ergerzh dre loabroù da gavout vioù kuzh."
+
+#. I18N: ./data/gui/help3.stkgui
+#. I18N: In the help menu
+msgid ""
+"* Most of these game modes can also be played in a Grand Prix fashion: "
+"instead of playing a single race, you play many in a row. The better you "
+"rank, the more points you get. In the end, the player with the most points "
+"wins the cup."
+msgstr "* C'hoariet e vez an darn vuiañ eus ar modoù c'hoari dre vod ur Grand Prix : e-lec'h c'hoari ur redadeg eeun e vez c'hoariet meur a hini diouzh renk. Gwell eo da renk, muioc'h a boentoù a dapi. Gant an hini a dapo ar muiañ a boentoù ez ay ar maout."
+
+#. I18N: ./data/gui/help4.stkgui
+msgid "SuperTuxKart can be played in multiplayer mode on the same computer"
+msgstr "C'hoariet e vez SuperTuxKart er mod liesc'hoarier gant an hevelep urzhiataer"
+
+#. I18N: ./data/gui/help4.stkgui
+msgid "(network play is not yet available)"
+msgstr "(N'eo ket hegerz ar rouedad c'hoari c'hoazh)"
+
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: In the help menu
+msgid ""
+"First, you will need several input devices (having multiple gamepads or "
+"joysticks is the best way to play with several people). Go in the input "
+"configuration screen and setup the gamepads. It is also possible to play on "
+"keyboard(s), however each player will need a different set of keys, and keep"
+" in mind that most keyboards are not appropriate for multiplayer gameplay "
+"because they do not support large number of keypresses."
+msgstr "Da gentañ e vo ret deoc'h kaout meur a zornell c'hoari (an doare gwellañ eo da c'hoari gant meur a zen). Kae betek skramm ar c'hefluniañ hag arventenn an dornelloù. C'hoariet e vez gant ar c'hlavier ivez. Ezhomm a vo strolladoù stokelloù disheñvel gant pep c'hoarier. Koulskoude ne vez ket ar c'hlavieroù an trobarzhelloù dereatañ evit c'hoari gant meur a zen rak ne c'houzañvont ket un niver re vras a bouezadennoù war ar stokelloù."
+
+#. I18N: ./data/gui/help4.stkgui
+#. I18N: In the help menu
+msgid ""
+"When input devices are configured, you are ready to play. Select the "
+"'multiplayer race' icon in the main menu. When it is time to choose a kart, "
+"each player can press on the 'fire' key of their gamepad or keyboard to join"
+" the game. Each player can use their input device to select their kart. The "
+"game continues when everyone selected their kart. Note that the mouse may "
+"not be used for this operation."
+msgstr "Ur wech kefluniet an dornelloù ez out prest da c'hoari. Diuz ar 'redadeg liesc'hoarier' diwar al lañser pennañ. Ur wech dibabet e gart e pouez pep c'hoarier war ar stokell 'Tan' eus e zornell da vont d'ar c'hoari. Graet e vez gant e zornell da ziuzañ e gart. Ne vez ket graet gant al logodenn evit ober an dra-se."
+
+#. I18N: ./data/gui/karts.stkgui
+#. I18N: In the kart selection (player setup) screen
+#. I18N: ./data/gui/karts_online.stkgui
+#. I18N: In the kart selection (player setup) screen
+msgid "Choose a Kart"
+msgstr "Dibab ur c'hart"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+msgid "Story Mode"
+msgstr "Mod an istor"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+msgid "Singleplayer"
+msgstr "C'hoarier en e unan"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+msgid "Multiplayer"
+msgstr "Liesc'hoarier"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/main_menu_screen.cpp:170
+#: src/states_screens/main_menu_screen.cpp:185
+#: src/states_screens/online_profile_friends.cpp:221
+msgid "Online"
+msgstr "Enlinenn"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: Main menu button
+msgid "Addons"
+msgstr "Askouezhioù"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+#. I18N: ./data/gui/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Options"
+msgstr "Dibarzhioù"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+#. I18N: ./data/gui/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Help"
+msgstr "Skoazell"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+#: src/states_screens/race_gui_overworld.cpp:462
+msgid "Tutorial"
+msgstr "Kelennskrid"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+#. I18N: ./data/gui/online/profile_achievements_tab.stkgui
+#. I18N: Section in the profile screen
+#: src/states_screens/online_profile_base.cpp:100
+msgid "Achievements"
+msgstr "Redadegoù echu"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+msgid "Grand Prix Editor"
+msgstr "Embanner Grand Prix"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+msgid "About"
+msgstr "Diwar-benn"
+
+#. I18N: ./data/gui/main.stkgui
+#. I18N: In the main screen
+msgid "Quit"
+msgstr "Kuitaat"
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+msgid "Password Change"
+msgstr "Kemm ar ger-tremen"
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+msgid "Current Password"
+msgstr "Ger-tremen bremanel"
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+msgid "New Password"
+msgstr "Ger-tremen nevez"
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Confirm"
+msgstr "Kadarnaat"
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+msgid "Submit"
+msgstr "Kas"
+
+#. I18N: ./data/gui/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+#. I18N: ./data/gui/online/notification_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/online/vote_dialog.stkgui
+#. I18N: Vote dialog
+msgid "Close"
+msgstr "Serriñ"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Server Creation"
+msgstr "Krouiñ un dafariad"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#. I18N: ./data/gui/online/lobby_settings.stkgui
+#. I18N: In the lobby settings screen
+msgid "Name of the server"
+msgstr "Anv an dafariad"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#. I18N: ./data/gui/online/lobby_settings.stkgui
+#. I18N: In the lobby settings screen
+msgid "Max. number of players"
+msgstr "Niver uc'hek a c'hoarierion"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+msgid "Create"
+msgstr "Krouiñ"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: ./data/gui/user_screen.stkgui
+#: src/states_screens/main_menu_screen.cpp:175
+#: src/states_screens/main_menu_screen.cpp:186
+msgid "Login"
+msgstr "Kennaskañ"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: Tab in login menu
+msgid "Sign In"
+msgstr "Emezellañ"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: Tab in login menu
+msgid "Sign In As Guest"
+msgstr "Emezellañ evel ostiz"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: Tab in login menu
+msgid "Register"
+msgstr "Marilhañ"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+msgid "Guest Log in"
+msgstr "Kennask un den pedet"
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+msgid ""
+"Logging in as a guest allows you to participate in online races, but it does"
+" not allow you to vote for addons, or collect any achievements while being "
+"online."
+msgstr "Mard oc'h kennasket evel un den pedet ho po an aotre da gemer perzh er redadegoù enlinenn. N'ho po ket ar gwir  da vouezhiañ evit an askouezhioù, avat pe zastum taolioù berzh ar redadegoù echu e-pad ma viot enlinenn."
+
+#. I18N: ./data/gui/online/guest_login.stkgui
+#. I18N: In the login dialog
+msgid "Log In"
+msgstr "Kennaskañ"
+
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In networking lobby
+msgid "Lobby"
+msgstr "Rakkambr"
+
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In the networking lobby
+msgid "Server name:"
+msgstr "Anv an dafariad :"
+
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In networking lobby
+msgid "actions"
+msgstr ""
+
+#. I18N: ./data/gui/online/lobby.stkgui
+#. I18N: In the networking lobby
+msgid "Exit"
+msgstr "Kuitaat"
+
+#. I18N: ./data/gui/online/lobby_settings.stkgui
+#. I18N: In the lobby settings screen
+msgid "Lobby Settings"
+msgstr "Arventennoù ar rakkambr"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Online Multiplayer"
+msgstr "Liesc'hoarierion enlinenn"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Quick Play"
+msgstr "C'hoari prim"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Find Server"
+msgstr "Kavout un dafariad"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Create Server"
+msgstr "Krouiñ un dafariad"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Profile"
+msgstr "Aelad"
+
+#. I18N: ./data/gui/online/main.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Log Out"
+msgstr "Digennaskañ"
+
+#. I18N: ./data/gui/online/notification_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "View"
+msgstr "Gwelout"
+
+#. I18N: ./data/gui/online/profile_achievements.stkgui
+#. I18N: ./data/gui/online/profile_achievements_tab.stkgui
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: ./data/gui/online/profile_overview.stkgui
+#. I18N: ./data/gui/online/profile_settings.stkgui
+msgid "..."
+msgstr "..."
+
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: Section in the profile screen
+#: src/states_screens/online_profile_base.cpp:99
+msgid "Friends"
+msgstr "Keneiled"
+
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: In the profile screen
+msgid "Look for more friends:"
+msgstr "Klask keneiled all :"
+
+#. I18N: ./data/gui/online/profile_friends.stkgui
+#. I18N: ./data/gui/online/user_search.stkgui
+msgid "Search"
+msgstr "Klask"
+
+#. I18N: ./data/gui/online/profile_overview.stkgui
+#. I18N: Section in the profile screen
+msgid "Overview"
+msgstr "Alberz"
+
+#. I18N: ./data/gui/online/profile_settings.stkgui
+#. I18N: Section in the profile screen
+#: src/states_screens/online_profile_base.cpp:101
+msgid "Account Settings"
+msgstr "Arventennoù ar gont"
+
+#. I18N: ./data/gui/online/profile_settings.stkgui
+#. I18N: In the online account settings screen
+msgid "Password:"
+msgstr "Ger-tremen :"
+
+#. I18N: ./data/gui/online/profile_settings.stkgui
+msgid "Change"
+msgstr "Kemmañ"
+
+#. I18N: ./data/gui/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+msgid "Account Recovery"
+msgstr "Atoradur ar gont"
+
+#. I18N: ./data/gui/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+msgid ""
+"You will receive an email with further instructions on how to reset your "
+"password. Please be patient and be sure to check your spam folder."
+msgstr "Ur postel a zegeremot gant titouroù ouzhpenn evit gouzout penaos adderaouekaat ho ker-tremen. Gortozit un tamm ha taolit ur sell ouzh ar pod lastez."
+
+#. I18N: ./data/gui/online/recovery_input.stkgui
+msgid ""
+"Fill in the username and email address you supplied at registration to be "
+"able to reset your password."
+msgstr "Leugnit an anv arveriad hag ar postel hoc'h eus roet e-pad ar marilhañ da vezañ gouest da adderaouekaat ho ker-tremen."
+
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+#: src/states_screens/online_profile_friends.cpp:72
+#: src/states_screens/online_user_search.cpp:74
+msgid "Username"
+msgstr "Anv arveriad"
+
+#. I18N: ./data/gui/online/recovery_input.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Email"
+msgstr "Postel"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Create User"
+msgstr "Krouiñ un arveriad"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "New Online Account"
+msgstr "Kont enlinenn nevez"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "Existing Online Account"
+msgstr "Kont enlinenn ez eus anezhi"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: Section in the register screen
+msgid "Offline Account"
+msgstr "Kont ezlinenn"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Local Name"
+msgstr "Anv lec'hel"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid "Online Username"
+msgstr "Anv arveriad enlinenn"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the registration dialog
+msgid "Password"
+msgstr "Ger-tremen"
+
+#. I18N: ./data/gui/online/register.stkgui
+#. I18N: In the registration dialog
+msgid ""
+"You can play without creating an online account by selecting an offline "
+"account. Though then you can not connect to friends, vote for addons etc. "
+"Please read our privacy statement at http://privacy.supertuxkart.net"
+msgstr "Gallout a rez c'hoari hep krouiñ ur gont enlinenn en ur ziuzañ ur gont ezlinenn. Koulskoude, n'hallez ket kennaskañ ouzh keneiled, mouezhiañ evit askouezhioù, h.a. Mar plij, lenn hon diskleriadenn war http://privacy.supertuxkart.net "
+
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+msgid "Terms and Agreement"
+msgstr "Termenoù hag Aotreoù"
+
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+msgid "I agree to the above terms and am 13 years or older. "
+msgstr "A-du on gant ar termenoù amañ a-us ha 13 bloaz tremenet ez on."
+
+#. I18N: ./data/gui/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Accept"
+msgstr "Asañtiñ"
+
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+msgid "Server Info"
+msgstr "Titouroù diwar-benn an dafariad"
+
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#: src/states_screens/online_profile_achievements.cpp:73
+#: src/states_screens/server_selection.cpp:91
+msgid "Name"
+msgstr "Anv"
+
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+msgid "Join"
+msgstr "Kevreañ"
+
+#. I18N: ./data/gui/online/server_selection.stkgui
+msgid "Server Selection"
+msgstr "Diuzad an dafariad"
+
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog' dialog
+msgid "User Info"
+msgstr "Titouroù an arveriad"
+
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Add Friend"
+msgstr "Ouzhpennañ ur c'heneil"
+
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Decline"
+msgstr "Nac'hañ"
+
+#. I18N: ./data/gui/online/user_search.stkgui
+msgid "User search"
+msgstr "Klask an arveriad"
+
+#. I18N: ./data/gui/online/vote_dialog.stkgui
+#. I18N: In the vote dialog
+msgid "Vote"
+msgstr "Mouezhiañ"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: ./data/gui/user_screen_tab.stkgui
+msgid "SuperTuxKart Options"
+msgstr "Dibarzhioù SuperTuxKart"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: Section in the settings menu
+#: src/states_screens/options_screen_input.cpp:140
+#: src/states_screens/options_screen_input2.cpp:86
+#: src/states_screens/options_screen_ui.cpp:119
+#: src/states_screens/options_screen_video.cpp:172
+#: src/states_screens/user_screen.cpp:637
+msgid "Audio"
+msgstr "Aodio"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: In the audio options screen
+msgid "Music"
+msgstr "Sonerezh"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: In the audio options screen
+#. I18N: in the graphical options tooltip;
+#. indicates a graphical feature is enabled
+#: src/states_screens/options_screen_video.cpp:384
+msgid "Enabled"
+msgstr "Gweredekaet"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: In the audio options screen
+msgid "Volume"
+msgstr "Tregern"
+
+#. I18N: ./data/gui/options_audio.stkgui
+#. I18N: In the audio options screen
+msgid "Sound Effects"
+msgstr "Efedoù son"
+
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: Section in the settings menu
+#: src/states_screens/options_screen_audio.cpp:68
+#: src/states_screens/options_screen_ui.cpp:121
+#: src/states_screens/options_screen_video.cpp:175
+#: src/states_screens/user_screen.cpp:639
+msgid "Controls"
+msgstr "Reolerezhioù"
+
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: In the input configuration screen
+#: src/states_screens/options_screen_input2.cpp:111
+msgid "Delete Configuration"
+msgstr "Diverkañ ar c'hefluniadur"
+
+#. I18N: ./data/gui/options_device.stkgui
+#. I18N: In the input configuration screen
+msgid "Back to device list"
+msgstr "Distreiñ d'ar roll trobarzhelloù"
+
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: In the input configuration screen
+msgid "Press enter or double-click on a device to configure it"
+msgstr "Pouez war Enankañ pe zaouglik war un drobarzhell d'he c'hefluniañ"
+
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: In the input configuration screen
+msgid "Add a device"
+msgstr "Ouzhpennañ un drobarzhell"
+
+#. I18N: ./data/gui/options_input.stkgui
+#. I18N: In the input configuration screen
+msgid ""
+"* Which config to use will be inferred from which 'Select' key is pressed to"
+" join the game."
+msgstr "* Ar c'hefluniadur da arverañ a vo despizet hervez ar stokell 'Diuzañ' pouezet warni da vont d'ar c'hoari."
+
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: Section in the settings menu
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: Section in the settings menu
+#: src/states_screens/options_screen_audio.cpp:67
+#: src/states_screens/options_screen_input.cpp:142
+#: src/states_screens/options_screen_input2.cpp:88
+#: src/states_screens/options_screen_ui.cpp:120
+#: src/states_screens/options_screen_video.cpp:174
+#: src/states_screens/server_selection.cpp:92
+msgid "Players"
+msgstr "C'hoarierion"
+
+#. I18N: ./data/gui/options_players.stkgui
+msgid "You are playing as"
+msgstr "Emaoc'h o c'hoari evel"
+
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: In the player configuration screen
+msgid "Press enter or double-click on a player to edit him/her"
+msgstr "Pouez war Enankañ pe zaouglik war ur c'hoarier d'e zaskemmañ"
+
+#. I18N: ./data/gui/options_players.stkgui
+#. I18N: In the player configuration screen
+msgid "Add Player"
+msgstr "Ouzhpennañ ur c'hoarier"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: Section in the settings menu
+#: src/states_screens/options_screen_audio.cpp:66
+#: src/states_screens/options_screen_input.cpp:141
+#: src/states_screens/options_screen_input2.cpp:87
+#: src/states_screens/options_screen_video.cpp:173
+#: src/states_screens/user_screen.cpp:638
+msgid "User Interface"
+msgstr "Ketal an arveriad"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Skin"
+msgstr "Neuz"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Display FPS"
+msgstr "Skrammañ FPS (Skeudennoù Dre Eilenn)"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Always show login screen"
+msgstr "Diskouez bepred ar skramm kennaskañ"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Send anonymous HW statistics"
+msgstr "Kas stadegoù dizanv a-fet periant"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Enable per-player handicaps"
+msgstr "Gweredekaat ad dilañsoù evit ar c'hoarierion"
+
+#. I18N: ./data/gui/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Connect to the Internet"
+msgstr "Kennaskañ ouzh Internet"
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: Section in the settings menu
+#: src/states_screens/options_screen_audio.cpp:65
+#: src/states_screens/options_screen_input.cpp:139
+#: src/states_screens/options_screen_input2.cpp:85
+#: src/states_screens/options_screen_ui.cpp:118
+#: src/states_screens/user_screen.cpp:636
+msgid "Graphics"
+msgstr "Kevregadoù"
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings
+msgid "Graphical Effects Level"
+msgstr "Live an efedoù kevregat"
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings
+msgid "Custom settings..."
+msgstr "Arventennoù personelaet..."
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings
+msgid "Vertical Sync (requires restart)"
+msgstr "Goubredañ a-serzh (ret e vo adloc'hañ)"
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings
+msgid "Resolution"
+msgstr "Diarunusted"
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings
+msgid "Fullscreen"
+msgstr "Skrammad a-bezh"
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings
+msgid "Remember window location"
+msgstr "Derc'hel soñj e lec'hiadur ar prenestr"
+
+#. I18N: ./data/gui/options_video.stkgui
+#. I18N: In the video settings
+msgid "Apply new resolution"
+msgstr "Seveniñ an diarunusted nevez"
+
+#. I18N: ./data/gui/overworld_dialog.stkgui
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+msgid "Paused"
+msgstr "Ehanet"
+
+#. I18N: ./data/gui/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
+msgid "Back to Game"
+msgstr "Distreiñ d'ar c'hoari"
+
+#. I18N: ./data/gui/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
+msgid "Select kart"
+msgstr "Diuzañ ur c'hart"
+
+#. I18N: ./data/gui/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
+msgid "Back to menu"
+msgstr "Distreiñ d'al lañser"
+
+#. I18N: ./data/gui/press_a_key_dialog.stkgui
+msgid "Press a key"
+msgstr "Pouezañ war ur stokell"
+
+#. I18N: ./data/gui/press_a_key_dialog.stkgui
+#. I18N: When configuring input
+msgid "Assign to ESC key"
+msgstr "Deverkañ d'ar stokell ACAP"
+
+#. I18N: ./data/gui/press_a_key_dialog.stkgui
+#. I18N: When configuring input
+msgid "Assign nothing"
+msgstr "Dezverkañ netra"
+
+#. I18N: ./data/gui/press_a_key_dialog.stkgui
+#. I18N: When configuring input
+msgid "Press ESC to cancel"
+msgstr "Pouez war ACHAP da zilezel"
+
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: ./data/gui/soccer_setup.stkgui
+msgid "Race Setup"
+msgstr "Arventennañ ar redadeg"
+
+#. I18N: ./data/gui/racesetup.stkgui
+msgid "Select a difficulty"
+msgstr "Diuzañ un diaester"
+
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
+msgid "Novice"
+msgstr "Deraouad"
+
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
+msgid "Intermediate"
+msgstr "Etre"
+
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
+msgid "Expert"
+msgstr "Mailh"
+
+#. I18N: ./data/gui/racesetup.stkgui
+#. I18N: Difficulty
+msgid "SuperTux"
+msgstr "SuperTuks"
+
+#. I18N: ./data/gui/racesetup.stkgui
+msgid "Select a game mode"
+msgstr "Diuzañ ur mod c'hoari"
+
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Back to Race"
+msgstr "Distreiñ d'ar redadeg"
+
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#: src/states_screens/race_result_gui.cpp:209
+msgid "Setup New Race"
+msgstr "Arventennañ ur redadeg nevez"
+
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Restart Race"
+msgstr "Adloc'hañ ar redadeg"
+
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Give Up Race"
+msgstr "Dilezel ar redadeg"
+
+#. I18N: ./data/gui/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Exit Race"
+msgstr "Kuitaat ar redadeg"
+
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Type of race, in a challenge
+msgid "Type:"
+msgstr "Rizh :"
+
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+msgid "Number of goals to win"
+msgstr "Niver a balioù evit gounit"
+
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+msgid "Maximum time (min.)"
+msgstr "Amzer uc'hek (mun.)"
+
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+msgid "Game type (Goals limit / Time limit)"
+msgstr "Rizh ar c'hoari (bevenn ar palioù / bevenn an amzer)"
+
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+msgid "Use left/right to choose your team and press fire"
+msgstr "Gra gant kleiz/dehou da zibab da skipailh ha leuskel tan"
+
+#. I18N: ./data/gui/soccer_setup.stkgui
+msgid "VS"
+msgstr "a-enep"
+
+#. I18N: ./data/gui/tracks.stkgui
+#. I18N: In the track selection screen
+#: src/states_screens/dialogs/select_challenge.cpp:145
+msgid "Grand Prix"
+msgstr "Grand Prix"
+
+#. I18N: ./data/gui/track_info.stkgui
+msgid "= Highscores ="
+msgstr "= Eriñvoù uhelañ ="
+
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: for empty highscores entries
+#: src/states_screens/track_info_screen.cpp:253
+msgid "(Empty)"
+msgstr "(Goullo)"
+
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Number of laps"
+msgstr "Niver a droioù"
+
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Number of AI karts"
+msgstr "Kartoù bleinet gant an urzhiataer"
+
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Drive in reverse"
+msgstr "Bleinañ dre an tu gin"
+
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Remember password"
+msgstr "Derc'hel soñj er ger-tremen"
+
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Add user"
+msgstr "Ouzhpennañ un arveriad"
+
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Delete"
+msgstr "Dilemel"
+
+#. I18N: ../stk-assets/tracks/battleisland/track.xml
+msgid "Battle Island"
+msgstr "Enezenn ar gad"
+
+#. I18N: ../stk-assets/tracks/cave/track.xml
+msgid "Cave X"
+msgstr "Cave X"
+
+#. I18N: ../stk-assets/tracks/city/track.xml
+msgid "Shiny Suburbs"
+msgstr "Banlevioù lugernus"
+
+#. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
+msgid "Cocoa Temple"
+msgstr "Templ Kokoa"
+
+#. I18N: ../stk-assets/tracks/farm/track.xml
+msgid "Bovine Barnyard"
+msgstr "Porzh-saout"
+
+#. I18N: ../stk-assets/tracks/fortmagma/track.xml
+msgid "Fort Magma"
+msgstr "Kreñvlec'h Magma"
+
+#. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
+msgid "Gran Paradiso Island"
+msgstr "Enezenn Gran Paradiso"
+
+#. I18N: ../stk-assets/tracks/greenvalley/track.xml
+msgid "Green Valley"
+msgstr "Traonienn c'hlas"
+
+#. I18N: ../stk-assets/tracks/hacienda/track.xml
+msgid "Hacienda"
+msgstr "Hacienda"
+
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+msgid "What's wrong, little hippies? Your great gnu leader is missing?"
+msgstr "Petra zo fall ganit, hipied kaezh ? Ho penn gnu a vankfe ?"
+
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+msgid "Oh yes, see, he's in my castle now and will be served for supper..."
+msgstr "O ya, sell, em c'hastell emañ bremañ ha debret e vo da goan..."
+
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+msgid "But I'm a fair creature, so I'll make you a deal."
+msgstr "Ur c'hrouadur a-feson ez on-me, neuze e kinnigan ur marc'had dit."
+
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+msgid "If you can beat me at racing, I will free the old codger."
+msgstr "Mar bez trec'h warnon e-pad ar redadeg e laoskin an den kozh."
+
+#. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
+#. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
+msgid ""
+" But you pathetic little twerps will never be able to beat me - King of the "
+"Karts!"
+msgstr " C'hwi, avat, paourkaezh penn skañv ne viot ket barrek d' a'm zrec'hiñ - Roue ar C'hartoù ac'hanon !"
+
+#. I18N: ../stk-assets/tracks/lighthouse/track.xml
+msgid "Around the lighthouse"
+msgstr "Tro dro d'an tour tan"
+
+#. I18N: ../stk-assets/tracks/mansion/track.xml
+msgid "Blackhill Mansion"
+msgstr "Annez an drogenn du"
+
+#. I18N: ../stk-assets/tracks/mines/track.xml
+msgid "Old Mine"
+msgstr "Mengleuz kozh"
+
+#. I18N: ../stk-assets/tracks/minigolf/track.xml
+msgid "Minigolf"
+msgstr "Golf bihan"
+
+#. I18N: ../stk-assets/tracks/olivermath/track.xml
+msgid "Oliver's Math Class"
+msgstr "Klas jedoniezh Oliver"
+
+#. I18N: ../stk-assets/tracks/sandtrack/track.xml
+msgid "Shifting Sands"
+msgstr "Bouktraezh"
+
+#. I18N: ../stk-assets/tracks/scotland/track.xml
+msgid "Nessie's pond"
+msgstr "Poull Nessie"
+
+#. I18N: ../stk-assets/tracks/snowmountain/track.xml
+msgid "Northern Resort"
+msgstr "Bod ar C'hreiznoz"
+
+#. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
+msgid "Snow Peak"
+msgstr "Menez gant erc'h"
+
+#. I18N: ../stk-assets/tracks/soccer_field/track.xml
+msgid "Soccer field"
+msgstr "Tachenn vell droad"
+
+#. I18N: ../stk-assets/tracks/stadium/track.xml
+msgid "The Stadium"
+msgstr "Ar Stadiom"
+
+#. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
+msgid "STK Enterprise"
+msgstr "Embregerezh STK"
+
+#. I18N: ../stk-assets/tracks/subsea/track.xml
+msgid "Subsea"
+msgstr "Dindan ar mor"
+
+#. I18N: ../stk-assets/tracks/temple/track.xml
+msgid "Temple"
+msgstr "Templ"
+
+#. I18N: ../stk-assets/tracks/xr591/track.xml
+msgid "XR591"
+msgstr "XR591"
+
+#. I18N: ../stk-assets/tracks/zengarden/track.xml
+msgid "Zen Garden"
+msgstr "Liorzh Zen"
+
+#. I18N: ../stk-assets/karts/nolok/kart.xml
+msgid "Nolok"
+msgstr "Nolok"
+
+#. I18N: ../stk-assets/karts/tux/kart.xml
+msgid "Tux"
+msgstr "Tuks"
+
+#. I18N: ../stk-assets/karts/xue/kart.xml
+msgid "Xue"
+msgstr "Ksue"
+
+#: src/achievements/achievement.cpp:209
+#, c-format
+msgid "Completed achievement \"%s\"."
+msgstr ""
+
+#: src/addons/addons_manager.cpp:97 src/addons/news_manager.cpp:315
+msgid "Can't access stkaddons server..."
+msgstr "N'haller ket tizhout dafariad stkaddons..."
+
+#: src/addons/news_manager.cpp:172
+#, c-format
+msgid "Error downloading news: '%s'."
+msgstr "Fazi e-pad ma oa o pellgargañ ar c'heleier : '%s'"
+
+#. I18N: number of laps to race in a challenge
+#: src/challenges/challenge_data.cpp:249
+#, c-format
+msgid "Laps : %i"
+msgstr "Troioù : %i"
+
+#: src/challenges/challenge_data.cpp:255
+msgid "Follow the leader"
+msgstr "Heuilh ar Penn !"
+
+#: src/challenges/challenge_data.cpp:491
+#, c-format
+msgid "New track '%s' now available"
+msgstr "Hegerz eo al loabr nevez '%s' bremañ"
+
+#: src/challenges/challenge_data.cpp:496
+#, c-format
+msgid "New game mode '%s' now available"
+msgstr "Hegerz eo ar mod c'hoari nevez '%s' bremañ"
+
+#: src/challenges/challenge_data.cpp:506
+#, c-format
+msgid "New Grand Prix '%s' now available"
+msgstr "Hegerz eo ar Grand Prix nevez '%s' bremañ"
+
+#: src/challenges/challenge_data.cpp:510
+#, c-format
+msgid "New difficulty '%s' now available"
+msgstr "Hegerz eo an diaester nevez '%s' bremañ"
+
+#: src/challenges/challenge_data.cpp:520
+#, c-format
+msgid "New kart '%s' now available"
+msgstr "Hegerz eo ar c'hart nevez '%s' bremañ"
+
+#: src/config/player_manager.cpp:91
+msgid "Currently not signed in"
+msgstr "N'eo ket kennasket bremañ"
+
+#. I18N: Name of first guest player (without number)
+#: src/config/player_manager.cpp:392
+msgid "Guest"
+msgstr "Kouviad"
+
+#. I18N: Name of further guest players, with a 1, 2, ... attached
+#: src/config/player_manager.cpp:397
+#, c-format
+msgid "Guest %d"
+msgstr "Ostiz %d"
+
+#: src/config/user_config.cpp:700
+msgid ""
+"Your config file was malformed, so it was deleted and a new one will be "
+"created."
+msgstr "Kempennet fall e oa da gefluniadur neuze eo bet diverket ha krouet e vo unan nevez."
+
+#: src/config/user_config.cpp:711
+msgid ""
+"Your config file was too old, so it was deleted and a new one will be "
+"created."
+msgstr "Re gozh e oa da restr kefluniañ neuze eo bet diverket ha krouet e vo unan nevez."
+
+#: src/graphics/irr_driver.cpp:1852
+#, c-format
+msgid "FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"
+msgstr ""
+
+#: src/graphics/irr_driver.cpp:1863
+#, c-format
+msgid "FPS: %d/%d/%d - %d KTris"
+msgstr ""
+
+#: src/guiengine/engine.cpp:1329
+msgid "Loading"
+msgstr "O kargañ"
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:85
+msgid "WEIGHT"
+msgstr "POUEZ"
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:89
+msgid "SPEED"
+msgstr "TIZH"
+
+#: src/guiengine/widgets/kart_stats_widget.cpp:93
+msgid "POWER"
+msgstr "GALLOUDEZH"
+
+#. I18N: 'handicapped' indicates that per-player handicaps are
+#. activated for this kart (i.e. it will drive slower)
+#: src/guiengine/widgets/player_kart_widget.cpp:361
+#, c-format
+msgid "%s (handicapped)"
+msgstr "%s (nammet)"
+
+#: src/guiengine/widgets/player_kart_widget.cpp:420
+#, c-format
+msgid "%s is ready"
+msgstr "Prest eo %s"
+
+#. I18N: Unbound key binding
+#: src/input/binding.cpp:90
+msgid "[none]"
+msgstr "[hini ebet]"
+
+#. I18N: input configuration screen: mouse button
+#: src/input/binding.cpp:114
+msgctxt "input_key"
+msgid "Left Mouse Button"
+msgstr "Afell gleiz al logodenn"
+
+#. I18N: input configuration screen: mouse button
+#: src/input/binding.cpp:116
+msgctxt "input_key"
+msgid "Right Mouse Button"
+msgstr "Afell dehou al logodenn"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:118
+msgctxt "input_key"
+msgid "Cancel"
+msgstr "Nullañ"
+
+#. I18N: input configuration screen: mouse button
+#: src/input/binding.cpp:120
+msgctxt "input_key"
+msgid "Middle Mouse Button"
+msgstr "Afell greiz al logodenn"
+
+#. I18N: input configuration screen: mouse button
+#: src/input/binding.cpp:122
+msgctxt "input_key"
+msgid "X1 Mouse Button"
+msgstr "Afell X1 al logodenn"
+
+#. I18N: input configuration screen: mouse button
+#: src/input/binding.cpp:124
+msgctxt "input_key"
+msgid "X2 Mouse Button"
+msgstr "Afell X2 al logodenn"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:126
+msgctxt "input_key"
+msgid "Backspace"
+msgstr "Kilesaouiñ"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:128
+msgctxt "input_key"
+msgid "Tab"
+msgstr "Taolennata"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:130
+msgctxt "input_key"
+msgid "Clear"
+msgstr "Skarzhañ"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:132
+msgctxt "input_key"
+msgid "Return"
+msgstr "Distreiñ"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:134
+msgctxt "input_key"
+msgid "Shift"
+msgstr "Pennlizherenn"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:136
+msgctxt "input_key"
+msgid "Control"
+msgstr "Reolerezh"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:138
+msgctxt "input_key"
+msgid "Alt/Menu"
+msgstr "Alt/Lañser"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:140
+msgctxt "input_key"
+msgid "Pause"
+msgstr "Ehan"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:142
+msgctxt "input_key"
+msgid "Caps Lock"
+msgstr "Prennañ ar pennlizherennoù"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:144
+msgctxt "input_key"
+msgid "Kana"
+msgstr "Kana"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:146
+msgctxt "input_key"
+msgid "Junja"
+msgstr "Junja"
+
+#. I18N: input configuration screen: keyboard key
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:149
+msgctxt "input_key"
+msgid "Final"
+msgstr "Diwezh"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:151
+msgctxt "input_key"
+msgid "Escape"
+msgstr "Achap"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:153
+msgctxt "input_key"
+msgid "Convert"
+msgstr "Amdreiñ"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:155
+msgctxt "input_key"
+msgid "Nonconvert"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:157
+msgctxt "input_key"
+msgid "Accept"
+msgstr "Asañtiñ"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:159
+msgctxt "input_key"
+msgid "Modechange"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:161
+msgctxt "input_key"
+msgid "Space"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:163
+msgctxt "input_key"
+msgid "Page Up"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:165
+msgctxt "input_key"
+msgid "Page Down"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:167
+msgctxt "input_key"
+msgid "End"
+msgstr "Dibenn"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:169
+msgctxt "input_key"
+msgid "Home"
+msgstr "Degemer"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:171
+msgctxt "input_key"
+msgid "Left"
+msgstr "Kleiz"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:173
+msgctxt "input_key"
+msgid "Up"
+msgstr "Sevel"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:175
+msgctxt "input_key"
+msgid "Right"
+msgstr "Dehoù"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:177
+msgctxt "input_key"
+msgid "Down"
+msgstr "Diskenn"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:179
+msgctxt "input_key"
+msgid "Select"
+msgstr "Diuzañ"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:181
+msgctxt "input_key"
+msgid "Print"
+msgstr "Moullañ"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:183
+msgctxt "input_key"
+msgid "Exec"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:185
+msgctxt "input_key"
+msgid "Print Screen"
+msgstr "Moullañ ar skramm"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:187
+msgctxt "input_key"
+msgid "Insert"
+msgstr "Enlakaat"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:189
+msgctxt "input_key"
+msgid "Delete"
+msgstr "Dilemel"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:191
+msgctxt "input_key"
+msgid "Help"
+msgstr "Skoazell"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:229
+msgctxt "input_key"
+msgid "Left Logo"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:231
+msgctxt "input_key"
+msgid "Right Logo"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:233
+msgctxt "input_key"
+msgid "Apps"
+msgstr "Arloadoù"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:235
+msgctxt "input_key"
+msgid "Sleep"
+msgstr "Kousket"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:237
+msgctxt "input_key"
+msgid "Numpad 0"
+msgstr "Nivdamer 0"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:239
+msgctxt "input_key"
+msgid "Numpad 1"
+msgstr "Nivdamer 1"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:241
+msgctxt "input_key"
+msgid "Numpad 2"
+msgstr "Nivdamer 2"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:243
+msgctxt "input_key"
+msgid "Numpad 3"
+msgstr "Nivdamer 3"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:245
+msgctxt "input_key"
+msgid "Numpad 4"
+msgstr "Nivdamer 4"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:247
+msgctxt "input_key"
+msgid "Numpad 5"
+msgstr "Nivdamer 5"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:249
+msgctxt "input_key"
+msgid "Numpad 6"
+msgstr "Nivdamer 6"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:251
+msgctxt "input_key"
+msgid "Numpad 7"
+msgstr "Nivdamer 7"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:253
+msgctxt "input_key"
+msgid "Numpad 8"
+msgstr "Nivdamer 8"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:255
+msgctxt "input_key"
+msgid "Numpad 9"
+msgstr "Nivdamer 9"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:259
+msgctxt "input_key"
+msgid "Separator"
+msgstr "Dispartier"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:261
+msgctxt "input_key"
+msgid "- (Subtract)"
+msgstr "- (Lemel)"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:263
+msgctxt "input_key"
+msgid "Decimal"
+msgstr "Dekvedenel"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:265
+msgctxt "input_key"
+msgid "/ (Divide)"
+msgstr "/ (Rannañ)"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:291
+msgctxt "input_key"
+msgid "Num Lock"
+msgstr "Prennañ an niverennoù"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:293
+msgctxt "input_key"
+msgid "Scroll Lock"
+msgstr "Prennañ an dibuniñ"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:295
+msgctxt "input_key"
+msgid "Left Shift"
+msgstr "Pennlizherenn a-gleiz"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:297
+msgctxt "input_key"
+msgid "Right Shift"
+msgstr "Pennlizherenn a-zehou"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:299
+msgctxt "input_key"
+msgid "Left Control"
+msgstr "Reolerezh a-gleiz"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:301
+msgctxt "input_key"
+msgid "Right Control"
+msgstr "Reolerezh a-zehou"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:303
+msgctxt "input_key"
+msgid "Left Menu"
+msgstr "Lañser a-gleiz"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:305
+msgctxt "input_key"
+msgid "Right Menu"
+msgstr "Lañser a-zehou"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:311
+msgctxt "input_key"
+msgid "Attn"
+msgstr "Evezh"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:313
+msgctxt "input_key"
+msgid "Crsel"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:315
+msgctxt "input_key"
+msgid "Exsel"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:317
+msgctxt "input_key"
+msgid "Ereof"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:319
+msgctxt "input_key"
+msgid "Play"
+msgstr "C'hoari"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:321
+msgctxt "input_key"
+msgid "Zoom"
+msgstr "Zoum"
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:323
+msgctxt "input_key"
+msgid "Pa1"
+msgstr ""
+
+#. I18N: input configuration screen: keyboard key
+#: src/input/binding.cpp:325
+msgctxt "input_key"
+msgid "Oem Clear"
+msgstr ""
+
+#. I18N: to appear in input configuration screen, for gamepad hats
+#: src/input/binding.cpp:334 src/input/binding.cpp:339
+#, c-format
+msgid "Gamepad hat %d"
+msgstr "Dornell c'hoari %d"
+
+#. I18N: to appear in input configuration screen, for gamepad axes
+#: src/input/binding.cpp:346
+#, c-format
+msgid "Axis %d %s"
+msgstr "Ahel %d %s"
+
+#. I18N: to appear in input configuration screen, for gamepad axes
+#: src/input/binding.cpp:353
+#, c-format
+msgid "Axis %d inverted"
+msgstr "Ahel %d tuginet"
+
+#. I18N: to appear in input configuration screen, for gamepad axes
+#: src/input/binding.cpp:358
+#, c-format
+msgid "Axis %d"
+msgstr "Ahel %d"
+
+#. I18N: to appear in input configuration screen, for gamepad buttons
+#: src/input/binding.cpp:366
+#, c-format
+msgid "Gamepad button %d"
+msgstr "Afell %d an dornell c'hoari"
+
+#. I18N: to appear in input configuration screen, for mouse (might not be used
+#. at all)
+#: src/input/binding.cpp:369
+#, c-format
+msgid "Mouse button %d"
+msgstr "Afell al logodenn %d"
+
+#. I18N: to appear in input configuration screen, for mouse (might not be used
+#. at all)
+#: src/input/binding.cpp:373
+#, c-format
+msgid "Mouse axis %d %s"
+msgstr "Ahel al logodenn %d %s"
+
+#. I18N: shown when config file is too old
+#: src/input/device_manager.cpp:500
+msgid "Please re-configure your key bindings."
+msgstr "Mar plij, adkeflugn da vlokadoù stokelloù"
+
+#: src/input/device_manager.cpp:501
+msgid "Your input config file is not compatible with this version of STK."
+msgstr "N'eo ket keverlec'h da restr kefluniañ an enankadoù gant an handelv-mañ eus STK."
+
+#. I18N: Name of the black button on xbox controller
+#: src/input/gamepad_config.cpp:167
+msgid "Black"
+msgstr "Du"
+
+#. I18N: Name of the white button on xbox controller
+#: src/input/gamepad_config.cpp:171
+msgid "White"
+msgstr "Gwenn"
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:179 src/input/gamepad_config.cpp:239
+msgid "Left trigger"
+msgstr "Draen kleiz"
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:181 src/input/gamepad_config.cpp:247
+msgid "Right thumb right"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:183 src/input/gamepad_config.cpp:249
+msgid "Right thumb left"
+msgstr "Bann goulou "
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:185 src/input/gamepad_config.cpp:243
+msgid "Right thumb down"
+msgstr "Biz meud dehou da ziskenn"
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:187 src/input/gamepad_config.cpp:245
+msgid "Right thumb up"
+msgstr ""
+
+#. I18N: name of buttons on gamepads
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:189 src/input/gamepad_config.cpp:241
+msgid "Right trigger"
+msgstr "Draen dehou"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:191 src/input/gamepad_config.cpp:255
+msgid "DPad right"
+msgstr "Afell groaz dehou"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:193 src/input/gamepad_config.cpp:257
+msgid "DPad left"
+msgstr "Afell groaz kleiz"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:195 src/input/gamepad_config.cpp:253
+msgid "DPad down"
+msgstr "Afell groaz diskenn"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:197 src/input/gamepad_config.cpp:251
+msgid "DPad up"
+msgstr "Afell groaz sevel"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:212
+msgid "Left bumper"
+msgstr "Distokell gleiz"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:214
+msgid "Right bumper"
+msgstr "Distokell dehou"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:218
+msgid "Start"
+msgstr "Loc'hañ"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:220
+msgid "Left thumb button"
+msgstr "Afell biz meud kleiz"
+
+#. I18N: name of buttons on gamepads
+#: src/input/gamepad_config.cpp:222
+msgid "Right thumb button"
+msgstr "Afell biz meud dehou"
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:231
+msgid "Left thumb right"
+msgstr "Dehou biz meud kleiz"
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:233
+msgid "Left thumb left"
+msgstr "Kleiz biz meud kleiz"
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:235
+msgid "Left thumb down"
+msgstr "Diskenn biz meud kleiz"
+
+#. I18N: name of stick on gamepads
+#: src/input/gamepad_config.cpp:237
+msgid "Left thumb up"
+msgstr "Sevel biz meud kleiz"
+
+#: src/input/input_manager.cpp:751
+#, c-format
+msgid "Ignoring '%s'. You needed to join earlier to play!"
+msgstr ""
+
+#: src/input/input_manager.cpp:781
+msgid "Only the Game Master may act at this point!"
+msgstr "Mestr ar c'hoari hepken zo gouest d'ober un dra bennak bremañ !"
+
+#: src/input/wiimote_manager.cpp:387
+msgid ""
+"Connect your wiimote to the Bluetooth manager, then click on Ok.Detailed "
+"instructions at supertuxkart.net/Wiimote"
+msgstr "Kennask da wiimote ouzh ardoer ar Bluetooth ha klik war Mat eo. Titouroù ouzhpenn e supertuxkart.net/Wiimote"
+
+#: src/input/wiimote_manager.cpp:390
+msgid ""
+"Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
+"mode, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
+msgstr "Pouez war an afell 1 + 2 a-gevred war da wiimote d'he lakaat e mod an dizoleiñ, neuze klik war OK. Titouroù ouzhpenn e supertuxkart.net/Wiimote"
+
+#: src/input/wiimote_manager.cpp:413
+#, c-format
+msgid "Found %d wiimote"
+msgid_plural "Found %d wiimotes"
+msgstr[0] "Kavet ez eus bet %d wiimote"
+msgstr[1] "Kavet ez eus bet %d wiimote"
+
+#: src/input/wiimote_manager.cpp:418
+msgid "Could not detect any wiimote :/"
+msgstr "N'haller ket dinoiñ ur wiimote :/"
+
+#: src/karts/controller/network_player_controller.cpp:281
+#: src/karts/controller/player_controller.cpp:356
+msgid "Penalty time!!"
+msgstr "Kastiz amzer !!"
+
+#: src/karts/controller/network_player_controller.cpp:283
+#: src/karts/controller/player_controller.cpp:358
+msgid "Don't accelerate before go"
+msgstr "Arabat herrekaat kent Kae"
+
+#: src/karts/kart.cpp:834 src/karts/kart.cpp:853
+msgid "You won the race!"
+msgstr "Aet eo ar maout ganit !"
+
+#: src/karts/kart.cpp:834
+msgid "You finished the race!"
+msgstr "Echuet ec'h eus ar redadeg !"
+
+#: src/main.cpp:1227
+msgid ""
+"SuperTuxKart may connect to a server to download add-ons and notify you of "
+"updates. We also collect anonymous hardware statistics to help with the "
+"development of STK. Please read our privacy policy at "
+"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
+"(To change this setting at a later time, go to options, select tab 'User "
+"Interface', and edit \"Connect to the Internet\" and \"Send anonymous HW "
+"statistics\")."
+msgstr "Gouest eo SuperTuxKart d'en em gennaskañ ouzh un dafariad da bellgargañ askouezhioù ha kas kemennoù deoc'h a-fet rebuzadurioù. Stadegoù dizanv a-zivout ar periant a zastumomp ivez da reiñ skoazell da ziorrenn STK. Lennit hor reolennoù a-fet buhez prevez, mar plij e http://privacy.supertuxkart.net. Ha fellout a ra deoc'h gweredekaat ar c'heweriuster-mañ ? (Da gemmañ an dibarzh-mañ, kit d'an dibarzhioù, diuzit an ivinell 'Ketal an arveriad' ha kemmit \"Kennaskañ ouzh an Internet\" ha \"Kas stadegoù dizanv a-fet periant\")."
+
+#: src/main.cpp:1399
+msgid ""
+"Your driver version is too old. Please install the latest video drivers."
+msgstr "Re gozh eo handelv ho stur. Stalhit ar sturioù video nevesañ, mar plij."
+
+#: src/main.cpp:1411
+msgid ""
+"Your OpenGL version appears to be too old. Please verify if an update for "
+"your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
+msgstr "Re gozh e hañval bezañ handelv hoc'h OpenGL. Klaskit kavout un hizivadenn evit ho stur video. OpenGL 3.1 pe nevesoc'h ho po ezhomm gant SuperTuxKart."
+
+#: src/modes/easter_egg_hunt.cpp:202
+#, c-format
+msgid "Eggs: %d / %d"
+msgstr "Vioù : %d /%d"
+
+#: src/modes/follow_the_leader.cpp:61 src/modes/follow_the_leader.cpp:293
+msgid "Leader"
+msgstr "Penn"
+
+#: src/modes/linear_world.cpp:284
+msgid "Final lap!"
+msgstr "Tro diwezhañ !"
+
+#: src/modes/linear_world.cpp:311
+#, c-format
+msgid "Lap %i"
+msgstr "Tro %i"
+
+#: src/modes/linear_world.cpp:366
+#, c-format
+msgctxt "fastest_lap"
+msgid "%s by %s"
+msgstr "%s gant %s"
+
+#: src/modes/linear_world.cpp:371
+msgid "New fastest lap"
+msgstr "Tro herrekañ nevez"
+
+#: src/modes/linear_world.cpp:890
+msgid "WRONG WAY!"
+msgstr "HENT FALL !"
+
+#: src/modes/world.cpp:1163
+msgid "You have been eliminated!"
+msgstr "Dilamet out bet !"
+
+#: src/modes/world.cpp:1166
+#, c-format
+msgid "'%s' has been eliminated."
+msgstr "Dilamet eo bet '%s'"
+
+#: src/online/online_player_profile.cpp:420
+#, c-format
+msgid "%s is now online."
+msgstr "Enlinenn eo %s bremañ."
+
+#: src/online/online_player_profile.cpp:424
+#, c-format
+msgid "%s and %s are now online."
+msgstr "Enlinenn eo %s ha %s bremañ."
+
+#: src/online/online_player_profile.cpp:429
+#, c-format
+msgid "%s, %s and %s are now online."
+msgstr "Enlinenn eo %s, %s ha %s bremañ."
+
+#. I18N: Only used for count > 3
+#: src/online/online_player_profile.cpp:435
+#, c-format
+msgid "%d friend is now online."
+msgid_plural "%d friends are now online."
+msgstr[0] "Bremañ ez eus %d c'heneil enlinenn."
+msgstr[1] "Bremañ ez eus %d a geneiled enlinenn."
+
+#: src/online/online_player_profile.cpp:472
+#, c-format
+msgid "You have %d new friend request!"
+msgid_plural "You have %d new friend requests!"
+msgstr[0] "%d goulenn a-berzh ur c'heneil nevez hoc'h eus !"
+msgstr[1] "%d a c'houlennoù a-berzh keneiled nevez hoc'h eus !"
+
+#: src/online/online_player_profile.cpp:478
+msgid "You have a new friend request!"
+msgstr "Ur goulenn hoc'h eus a-berzh ur c'heneil !"
+
+#: src/online/xml_request.cpp:83
+msgid ""
+"Unable to connect to the server. Check your internet connection or try again"
+" later."
+msgstr "N'haller ket kennaskañ ouzh an dafariad. Gwiriit ho kennask ouzh Internet pe glaskit diwezhatoc'h."
+
+#: src/race/grand_prix_data.hpp:171
+msgid "Random Grand Prix"
+msgstr "Grand Prix dargouezhek"
+
+#: src/race/highscore_manager.cpp:101
+msgid ""
+"The highscore file was too old,\n"
+"all highscores have been erased."
+msgstr "Re gozh e oa an eriñvoù uhelañ,\ndiverket int bet holl."
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:176
+msgid "Normal Race"
+msgstr "Redadeg reizh"
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:178
+msgid "Time Trial"
+msgstr "A-enep an amzer"
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:180
+msgid "Follow the Leader"
+msgstr "Kas da gar war-lerc'h ar Penn"
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:182
+msgid "3 Strikes Battle"
+msgstr "Kad dre 3 lod"
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:184
+msgid "Egg Hunt"
+msgstr "Kerc'hat vioù"
+
+#. I18N: Game mode
+#: src/race/race_manager.hpp:186
+msgid "Soccer"
+msgstr "Mell droad"
+
+#: src/states_screens/addons_screen.cpp:50
+msgid "1 week"
+msgstr "1 sizhun"
+
+#: src/states_screens/addons_screen.cpp:51
+msgid "2 weeks"
+msgstr "2 sizhun"
+
+#: src/states_screens/addons_screen.cpp:52
+msgid "1 month"
+msgstr "1 miz"
+
+#: src/states_screens/addons_screen.cpp:53
+msgid "3 months"
+msgstr "3 miz"
+
+#: src/states_screens/addons_screen.cpp:54
+msgid "6 months"
+msgstr "6 miz"
+
+#: src/states_screens/addons_screen.cpp:55
+msgid "9 months"
+msgstr "9 miz"
+
+#: src/states_screens/addons_screen.cpp:56
+msgid "1 year"
+msgstr "1 bloaz"
+
+#: src/states_screens/addons_screen.cpp:57
+msgid "2 years"
+msgstr "2 vloaz"
+
+#: src/states_screens/addons_screen.cpp:110
+msgid "Add-on name"
+msgstr "Anv an askouezh"
+
+#: src/states_screens/addons_screen.cpp:111
+msgid "Updated date"
+msgstr "Deiziad hizivaet"
+
+#. I18N: as in: The Old Island by Johannes Sjolund
+#: src/states_screens/addons_screen.cpp:304
+#, c-format
+msgctxt "addons"
+msgid "%s by %s"
+msgstr "%s gant %s"
+
+#: src/states_screens/addons_screen.cpp:435
+msgid "Please wait while addons are updated"
+msgstr "Gortoz, mar plij, e-pad m'emañ an askouezhioù o vezañ hizivaet"
+
+#: src/states_screens/addons_screen.cpp:512
+#: src/states_screens/main_menu_screen.cpp:553
+msgid ""
+"Sorry, an error occurred while contacting the add-ons website. Make sure you"
+" are connected to the Internet and that SuperTuxKart is not blocked by a "
+"firewall"
+msgstr "Digarez,, degouezhet ez eus ur fazi e-pad ma oa o kehentiñ gant lec'hienn an askouezhioù. Bez sur ez out kennasket ouzh internet ha n'eo ket gannet SuperTuxKart gant un danvoger"
+
+#. I18N: arena group name
+#. I18N: track group name
+#. I18N: kart group name
+#. I18N: track group name
+#: src/states_screens/arenas_screen.cpp:81
+#: src/states_screens/easter_egg_screen.cpp:143
+#: src/states_screens/kart_selection.cpp:284
+#: src/states_screens/tracks_screen.cpp:153
+msgid "standard"
+msgstr "skoueriek"
+
+#: src/states_screens/arenas_screen.cpp:237
+#: src/states_screens/arenas_screen.cpp:267
+#: src/states_screens/easter_egg_screen.cpp:225
+#: src/states_screens/easter_egg_screen.cpp:256
+#: src/states_screens/kart_selection.cpp:858
+#: src/states_screens/kart_selection.cpp:1452
+#: src/states_screens/race_setup_screen.cpp:214
+msgid "Locked : solve active challenges to gain access to more!"
+msgstr "Prennet :"
+
+#: src/states_screens/arenas_screen.cpp:277
+msgid "Random Arena"
+msgstr "Arena dargouezhek"
+
+#: src/states_screens/create_server_screen.cpp:60
+#, c-format
+msgid "%s's server"
+msgstr "Dafariad %s"
+
+#: src/states_screens/create_server_screen.cpp:117
+msgid "Creating server"
+msgstr "Krouadur un dafariad"
+
+#: src/states_screens/create_server_screen.cpp:132
+msgid "Name has to be between 4 and 30 characters long!"
+msgstr "Etre 4 ha 30 arouezenn e rank bezañ hirder un anv !"
+
+#: src/states_screens/create_server_screen.cpp:136
+msgid "The maxinum number of players has to be between 2 and 12."
+msgstr "An niver uc'hek a c'hoarierion a rank bezañ etre 2 ha 12."
+
+#: src/states_screens/credits.cpp:217
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\n  Alan https://launchpad.net/~alan-m.\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk"
+
+#: src/states_screens/dialogs/addons_loading.cpp:96
+msgid "Update"
+msgstr "Hizivaat"
+
+#: src/states_screens/dialogs/addons_loading.cpp:108
+#, c-format
+msgid "Version: %d"
+msgstr "Handelv : %d"
+
+#: src/states_screens/dialogs/addons_loading.cpp:139
+msgid "featured"
+msgstr "kinniget"
+
+#: src/states_screens/dialogs/addons_loading.cpp:165
+#, c-format
+msgid "%s MB"
+msgstr "%s Me"
+
+#: src/states_screens/dialogs/addons_loading.cpp:172
+#: src/states_screens/dialogs/addons_loading.cpp:176
+#, c-format
+msgid "%s KB"
+msgstr "%s Ke"
+
+#: src/states_screens/dialogs/addons_loading.cpp:177
+#, c-format
+msgid "Size: %s"
+msgstr "Ment: %s"
+
+#: src/states_screens/dialogs/addons_loading.cpp:279
+msgid "Sorry, downloading the add-on failed"
+msgstr "diflip war an tu Digarez, c'hwitadenn war pellgargañ an askouezhioù"
+
+#: src/states_screens/dialogs/addons_loading.cpp:360
+#, c-format
+msgid "Problems installing the addon '%s'."
+msgstr "Kudennoù e-pad ma oa o staliañ an askouezh '%s'."
+
+#: src/states_screens/dialogs/addons_loading.cpp:371
+#: src/states_screens/dialogs/addons_loading.cpp:408
+msgid "Try again"
+msgstr "Klask en-dro"
+
+#: src/states_screens/dialogs/addons_loading.cpp:397
+#, c-format
+msgid "Problems removing the addon '%s'."
+msgstr "Kudennoù e-pad ma oa o tilemel an askouezh '%s'."
+
+#: src/states_screens/dialogs/add_device_dialog.cpp:64
+msgid ""
+"To add a new Gamepad/Joystick device, simply start SuperTuxKart with it connected and it will appear in the list.\n"
+"\n"
+"To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to the computer. Remember that everyone still needs different keybindings in this case.)"
+msgstr "Evit ouzhpennañ dornelloù c'hoari nevez, loc'h SuperTuxKart gant da zornelloù kennasket ha war ar roll ez aint war-wel.\n\nEvit ouzhpennañ ur c'hefluniadur evit ar c'hlavier, gra gant an afell amañ dindan. KOULSKOUDE, arabat disoñjal ne vez ket gouzañvet kalz kenbouezadurioù ha ur c'hlavier n'eo ket a pep dereatañ evit ar mod liesc'hoarier. Meur a glavier a c'hall bezañ kennasket koulskoude. Blokadoù stokelloù disheñvel a vo ezhomm gant pep hini anezho)"
+
+#. I18N: In the 'add new input device' dialog
+#: src/states_screens/dialogs/add_device_dialog.cpp:90
+msgid "Add Wiimote"
+msgstr "Ouzhpennañ ur Wiimote"
+
+#. I18N: In the 'add new input device' dialog
+#: src/states_screens/dialogs/add_device_dialog.cpp:111
+msgid "Add Keyboard Configuration"
+msgstr "Ouzhpennañ kefluniadur ur c'havier"
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:134
+msgid "Current password invalid."
+msgstr "Didalvoud eo ar ger-tremen bremanel"
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:140
+#: src/states_screens/register_screen.cpp:288
+msgid "Password has to be between 8 and 30 characters long!"
+msgstr "Etre 8 ha 30 arouezenn e rank bezañ gant ar gerioù-tremen !"
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:147
+#: src/states_screens/register_screen.cpp:272
+msgid "Passwords don't match!"
+msgstr "Ne glot ket ar gerioù-tremen !"
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:210
+msgid "Password successfully changed."
+msgstr "Kemmet eo bet ar ger-tremen gant berzh."
+
+#: src/states_screens/dialogs/change_password_dialog.cpp:235
+#: src/states_screens/dialogs/recovery_dialog.cpp:209
+#: src/states_screens/register_screen.cpp:353
+msgid "Validating info"
+msgstr "Talvoudekadur an titouroù"
+
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:82
+#, c-format
+msgid "Confirm resolution within %i second"
+msgid_plural "Confirm resolution within %i seconds"
+msgstr[0] ""
+msgstr[1] ""
+
+#. I18N: in the graphical options tooltip;
+#. indicates a graphical feature is disabled
+#: src/states_screens/dialogs/custom_video_settings.cpp:62
+#: src/states_screens/dialogs/custom_video_settings.cpp:86
+#: src/states_screens/options_screen_video.cpp:387
+msgid "Disabled"
+msgstr "Diweredekaet"
+
+#. I18N: animations setting (only karts with human players are animated)
+#: src/states_screens/dialogs/custom_video_settings.cpp:64
+msgid "Human players only"
+msgstr "C'hoarion dud nemetken"
+
+#. I18N: animations setting (all karts are animated)
+#: src/states_screens/dialogs/custom_video_settings.cpp:66
+msgid "Enabled for all"
+msgstr "Gweredekaet evit an holl anezho"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:76
+msgid "Bilinear"
+msgstr "Uelinennek"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:77
+msgid "Trilinear"
+msgstr "Trilinennek"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:78
+msgid "Anisotropic x2"
+msgstr "Annebahelek x2"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:79
+msgid "Anisotropic x4"
+msgstr "Annebahelek x4"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:80
+msgid "Anisotropic x8"
+msgstr "Annebahelek x8"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:81
+msgid "Anisotropic x16"
+msgstr "Annebahelek x16"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:87
+msgid "low"
+msgstr "izel"
+
+#: src/states_screens/dialogs/custom_video_settings.cpp:88
+msgid "high"
+msgstr "uhel"
+
+#: src/states_screens/dialogs/enter_gp_name_dialog.cpp:125
+msgid "Name is empty."
+msgstr "Goullo eo an anv."
+
+#: src/states_screens/dialogs/enter_gp_name_dialog.cpp:132
+msgid "Another grand prix with this name already exists."
+msgstr "Ur grand prix all ez eus endeo gant an hevelep anv."
+
+#: src/states_screens/dialogs/enter_gp_name_dialog.cpp:137
+msgid "Name is too long."
+msgstr "Re hir eo an anv."
+
+#: src/states_screens/dialogs/gp_info_dialog.cpp:211
+msgid "Start Grand Prix"
+msgstr "Loc'hañ ar Grand Prix"
+
+#: src/states_screens/dialogs/message_dialog.cpp:129
+#: src/states_screens/edit_gp_screen.cpp:256
+msgid "No"
+msgstr "Ket"
+
+#: src/states_screens/dialogs/recovery_dialog.cpp:121
+msgid "Username and/or email address invalid."
+msgstr "Didalvoudek eo an anv arveriad pe/hag ar chomlec'h."
+
+#: src/states_screens/dialogs/registration_dialog.cpp:42
+#, c-format
+msgid ""
+"Please read the terms and conditions for SuperTuxKart at '%s'. You must "
+"agree to these terms in order to register an account for STK. By checking "
+"the box below, you are confirming that you understand these terms. If you "
+"have any questions or comments regarding these terms, one of the members of "
+"the development team would gladly assist you."
+msgstr ""
+
+#: src/states_screens/dialogs/select_challenge.cpp:53
+#, c-format
+msgid "Required Rank: %i"
+msgstr ""
+
+#: src/states_screens/dialogs/select_challenge.cpp:58
+#, c-format
+msgid "Required Time: %i"
+msgstr ""
+
+#: src/states_screens/dialogs/select_challenge.cpp:64
+#, c-format
+msgid "Required Nitro Points: %i"
+msgstr ""
+
+#: src/states_screens/dialogs/select_challenge.cpp:68
+#, c-format
+msgid "Number of AI Karts: %i"
+msgstr ""
+
+#: src/states_screens/dialogs/select_challenge.cpp:147
+msgid "Nitro challenge"
+msgstr "Dae an Nitro"
+
+#: src/states_screens/dialogs/server_info_dialog.cpp:58
+msgid "Server successfully created. You can now join it."
+msgstr "Krouet eo bet an dafariad gant berzh. Bremañ e c'hallit mont di."
+
+#: src/states_screens/dialogs/server_info_dialog.cpp:155
+msgid "Joining server"
+msgstr "An dafariad kevreañ"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:56
+msgid "Cancel Request"
+msgstr "Nullañ ar goulenn"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:154
+#: src/states_screens/dialogs/user_info_dialog.cpp:211
+msgid "Today"
+msgstr "Hiziv"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:158
+msgid "Friend request sent!"
+msgstr "Kaset eo bet goulenn ur c'heneil !"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:215
+msgid "Friend request accepted!"
+msgstr "Asantet eo bet goulenn ar c'heneil !"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:267
+msgid "Friend request declined!"
+msgstr "Nac'het eo bet goulenn ar c'heneil !"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:313
+msgid "Friend removed!"
+msgstr "Dilamet eo bet ar c'heneil !"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:364
+msgid "Friend request cancelled!"
+msgstr "Dilezet eo bet goulenn ar c'heneil !"
+
+#: src/states_screens/dialogs/user_info_dialog.cpp:474
+msgid "Processing"
+msgstr "O keweriañ"
+
+#: src/states_screens/dialogs/vote_dialog.cpp:171
+msgid "Fetching last vote"
+msgstr "O kerc'hat ar mouezhiañ diwezhañ"
+
+#: src/states_screens/dialogs/vote_dialog.cpp:190
+msgid "You can adapt your previous rating by clicking the stars beneath."
+msgstr "Daskemm ar feur lakaet a-raok en ur glikañ war ar steredennoù amañ dindan."
+
+#: src/states_screens/dialogs/vote_dialog.cpp:195
+msgid ""
+"You have not yet voted for this addon. Select your desired rating by "
+"clicking the stars beneath"
+msgstr "N'hoc'h eus ket mouezhiet evit an enlugellad-mañ c'hoazh. Diuzit ar feur a fell deoc'h en ur glikañ war ar steredennoù amañ dindan"
+
+#: src/states_screens/dialogs/vote_dialog.cpp:230
+msgid "Vote successful! You can now close the window."
+msgstr "Mouezhiaet gant berzh ! Serriñ ar prenestr a c'hallit bremañ."
+
+#: src/states_screens/dialogs/vote_dialog.cpp:247
+msgid "Performing vote"
+msgstr "O vouezhiañ"
+
+#: src/states_screens/easter_egg_screen.cpp:270
+#: src/states_screens/tracks_screen.cpp:299
+msgid "Random Track"
+msgstr "Loabr dargouezhek"
+
+#: src/states_screens/edit_gp_screen.cpp:66
+msgid "Track"
+msgstr "Loabr"
+
+#: src/states_screens/edit_gp_screen.cpp:67
+msgid "Laps"
+msgstr "Troioù"
+
+#: src/states_screens/edit_gp_screen.cpp:68
+msgid "Reversed"
+msgstr "Tuginet"
+
+#: src/states_screens/edit_gp_screen.cpp:123
+#: src/states_screens/grand_prix_editor_screen.cpp:109
+#, c-format
+msgid "Are you sure you want to remove '%s'?"
+msgstr "Ha fellout a ra deoc'h dilemel '%s' ?"
+
+#: src/states_screens/edit_gp_screen.cpp:140
+msgid "Do you want to save your changes?"
+msgstr "Ha fellout a ra deoc'h enrollañ ho kemmoù ?"
+
+#. I18N: Indicate that the grand prix is modified and not saved
+#: src/states_screens/edit_gp_screen.cpp:285
+#, c-format
+msgid "%s (+)"
+msgstr "%s (+)"
+
+#: src/states_screens/edit_gp_screen.cpp:324
+msgid "An error occurred while trying to save your grand prix."
+msgstr "C'hoarvezet ez eus bet ur fazi e-pad ma oa oc'h enrollañ ar grand prix."
+
+#: src/states_screens/edit_track_screen.cpp:237
+msgid "Select a track"
+msgstr "Diuzañ ul loabr"
+
+#: src/states_screens/feature_unlocked.cpp:199
+#, c-format
+msgid "You completed the easy challenge! Points earned on this level: %i/%i"
+msgstr "Echuet ec'h eus an dael aes ! Poentoù gounezet gant al live-mañ : %i%i"
+
+#: src/states_screens/feature_unlocked.cpp:203
+#, c-format
+msgid ""
+"You completed the intermediate challenge! Points earned on this level: %i/%i"
+msgstr "Echuet ec'h eus an dael etre ! Poentoù gounezet gant al live-mañ : %i%i"
+
+#: src/states_screens/feature_unlocked.cpp:207
+#, c-format
+msgid ""
+"You completed the difficult challenge! Points earned on this level: %i/%i"
+msgstr "Echuet ec'h eus an dael diaes ! Poentoù gounezet gant al live-mañ : %i%i"
+
+#: src/states_screens/feature_unlocked.cpp:492
+msgid "Challenge Completed"
+msgstr "Echuet eo bet an dae"
+
+#: src/states_screens/feature_unlocked.cpp:529
+msgid "You unlocked track %0"
+msgstr "Dibrennet ec'h eus al loabr %0"
+
+#: src/states_screens/feature_unlocked.cpp:567
+msgid "You unlocked grand prix %0"
+msgstr "Dibrennet ec'h eus ar Grand Prix %0"
+
+#: src/states_screens/gp_info_screen.cpp:74
+msgid "Default"
+msgstr "Dre ziouer"
+
+#. I18N: if no kart animations are enabled
+#: src/states_screens/gp_info_screen.cpp:75
+#: src/states_screens/options_screen_video.cpp:393
+msgid "None"
+msgstr "Tra ebet"
+
+#: src/states_screens/gp_info_screen.cpp:77
+msgid "Random"
+msgstr "Dargouezhek"
+
+#: src/states_screens/gp_info_screen.cpp:153
+#: src/states_screens/gp_info_screen.cpp:178
+msgid "Reload"
+msgstr "Adkargañ"
+
+#: src/states_screens/grand_prix_editor_screen.cpp:164
+msgid "Please select a Grand Prix"
+msgstr "Mar plij, diuzit ur Grand Prix"
+
+#: src/states_screens/grand_prix_editor_screen.cpp:326
+msgid "User defined"
+msgstr "Despizet eo bet an arveriad"
+
+#. I18N: when failing a GP
+#: src/states_screens/grand_prix_lose.cpp:150
+msgid "Better luck next time!"
+msgstr "Gwell e vo ar wech a zeu !"
+
+#: src/states_screens/grand_prix_win.cpp:125
+#: src/states_screens/race_result_gui.cpp:175
+msgid "You completed a challenge!"
+msgstr "Echuet ec'h eus un dae !"
+
+#: src/states_screens/grand_prix_win.cpp:280
+msgid "You completed the Grand Prix!"
+msgstr "Echuet ec'h eus ar Grand Prix !"
+
+#: src/states_screens/kart_selection.cpp:839
+#: src/states_screens/kart_selection.cpp:1470
+msgid "Random Kart"
+msgstr "Kart dargouezhek"
+
+#: src/states_screens/kart_selection.cpp:853
+msgid "Locked"
+msgstr "Prennet"
+
+#: src/states_screens/kart_selection.cpp:923
+msgid ""
+"Everyone:\n"
+"Press 'Select' now to join the game!"
+msgstr "Pep hini ac'hanoc'h :\nPouezit war 'Diuzañ' bremañ\nda gemer perzh er c'hoari !"
+
+#: src/states_screens/main_menu_screen.cpp:488
+msgid ""
+"You can not play online without internet access. If you want to play online,"
+" go to options, select  tab 'User Interface', and edit \"Connect to the "
+"Internet\"."
+msgstr "N'hallez ket c'hoari enlinenn hep ur c'hennask ouzh internet. Mar fell dit c'hoari enlinenn, kae d'an dibarzhioù, diuz an ivinell 'Ketal an arveriad' ha kemm \"Kennaskañ ouzh internet\"."
+
+#: src/states_screens/main_menu_screen.cpp:516
+msgid ""
+"You can not download addons without internet access. If you want to download"
+" addons, go to options, select  tab 'User Interface', and edit \"Connect to "
+"the Internet\"."
+msgstr "N'hallez ket pellgargañ askouezhioù hep ur c'hennask ouzh internet. Mar fell dit pellgargañ askouezhioù, kae d'an dibarzhioù, diuz an ivinell 'Ketal an arveriad' ha kemm \"Kennaskañ ouzh internet\"."
+
+#: src/states_screens/main_menu_screen.cpp:548
+msgid "The add-ons module is currently disabled in the Options screen"
+msgstr "Gweredekaet eo bet mollad an askouezhioù war skrammad an dibarzhioù"
+
+#: src/states_screens/main_menu_screen.cpp:560
+msgid "Please wait while the add-ons are loading"
+msgstr "Gortoz, mar plij, e-pad m'emañ an askouezhioù o vezañ karget"
+
+#: src/states_screens/online_profile_achievements.cpp:79
+msgid "Progress"
+msgstr "Araokadur"
+
+#: src/states_screens/online_profile_achievements.cpp:128
+#: src/states_screens/online_profile_achievements.cpp:168
+msgid "Fetching achievements"
+msgstr "O kerc'hat redadegoù echu"
+
+#: src/states_screens/online_profile_base.cpp:105
+#: src/states_screens/online_profile_base.cpp:115
+msgid "Your profile"
+msgstr "Hoc'h aelad"
+
+#: src/states_screens/online_profile_base.cpp:108
+#, c-format
+msgid "%s's profile"
+msgstr "Aelad %s"
+
+#: src/states_screens/online_profile_friends.cpp:75
+msgid "Since"
+msgstr "Abaoe"
+
+#: src/states_screens/online_profile_friends.cpp:76
+msgid "Status"
+msgstr "Stad"
+
+#: src/states_screens/online_profile_friends.cpp:95
+#: src/states_screens/online_profile_friends.cpp:246
+msgid "Fetching friends"
+msgstr "O kerc'hat keneiled"
+
+#: src/states_screens/online_profile_friends.cpp:217
+msgid "New Request"
+msgstr "Goulenn nevez"
+
+#: src/states_screens/online_profile_friends.cpp:218
+msgid "Pending"
+msgstr "War c'hortoz"
+
+#: src/states_screens/online_profile_friends.cpp:222
+msgid "Offline"
+msgstr "Ezlinenn"
+
+#: src/states_screens/online_screen.cpp:139
+#, c-format
+msgid "Logged in as: %s."
+msgstr "Kennasket evel : %s."
+
+#: src/states_screens/online_screen.cpp:155
+msgid "Logging in"
+msgstr "O kennaskañ"
+
+#: src/states_screens/online_screen.cpp:160
+msgid "Logging out"
+msgstr "O tikennaskañ"
+
+#: src/states_screens/online_user_search.cpp:208
+#: src/states_screens/online_user_search.cpp:288
+msgid "Searching"
+msgstr "O klask"
+
+#: src/states_screens/options_screen_input.cpp:97
+#, c-format
+msgid "Keyboard %i"
+msgstr "Klavier %i"
+
+#: src/states_screens/options_screen_input2.cpp:71
+msgid "Action"
+msgstr "Gwered"
+
+#: src/states_screens/options_screen_input2.cpp:72
+msgid "Key binding"
+msgstr "Berradennoù klavier"
+
+#. I18N: button to disable a gamepad configuration
+#: src/states_screens/options_screen_input2.cpp:96
+#: src/states_screens/options_screen_input2.cpp:575
+msgid "Disable Device"
+msgstr "Diweredekaat an drobarzhell"
+
+#. I18N: button to enable a gamepad configuration
+#: src/states_screens/options_screen_input2.cpp:98
+#: src/states_screens/options_screen_input2.cpp:576
+msgid "Enable Device"
+msgstr "Gweredekaat an drobarzhell"
+
+#. I18N: Key binding section
+#: src/states_screens/options_screen_input2.cpp:137
+msgid "Game Keys"
+msgstr "Stokelloù ar c'hoari"
+
+#. I18N: Key binding section
+#: src/states_screens/options_screen_input2.cpp:151
+msgid "Menu Keys"
+msgstr "Stokelloù evit al lañser"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:218
+msgid "Steer Left"
+msgstr "Diflip war an tu kleiz"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:221
+msgid "Steer Right"
+msgstr "Diflip war an tu dehou"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:224
+msgid "Accelerate"
+msgstr "Herrekaat"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:227
+msgid "Brake"
+msgstr "Starderez"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:230
+msgid "Fire"
+msgstr "Tan"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:233
+msgid "Nitro"
+msgstr "Nitro"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:236
+msgid "Skidding"
+msgstr "Diflipañ"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:239
+msgid "Look Back"
+msgstr "Kilsellout"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:242
+msgid "Rescue"
+msgstr "Sikour"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:245
+msgid "Pause Game"
+msgstr "Ehanañ ar c'hoari"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:250
+msgid "Up"
+msgstr "Sevel"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:253
+msgid "Down"
+msgstr "Diskenn"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:256
+msgid "Left"
+msgstr "Kleiz"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:259
+msgid "Right"
+msgstr "Dehoù"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:262
+msgid "Select"
+msgstr "Diuzañ"
+
+#. I18N: Key binding name
+#: src/states_screens/options_screen_input2.cpp:265
+msgid "Cancel/Back"
+msgstr "Dilezel/Distreiñ"
+
+#: src/states_screens/options_screen_input2.cpp:360
+msgid "* A blue item means a conflict with another configuration"
+msgstr "* Un ergorenn c'hlas a dalv d'ur c'henniñv gant ur c'hefluniadur all"
+
+#: src/states_screens/options_screen_input2.cpp:365
+msgid "* A red item means a conflict in the current configuration"
+msgstr "* Un elfenn ruz a dalv d'ur c'henniñv er c'hefluniadur bremanel"
+
+#: src/states_screens/options_screen_input2.cpp:467
+msgid ""
+"Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
+" all keys that contain a character that is different in upper-case will stop"
+" working."
+msgstr ""
+
+#. I18N: shown before deleting an input configuration
+#: src/states_screens/options_screen_input2.cpp:563
+msgid "Are you sure you want to permanently delete this configuration?"
+msgstr "Ha sur out e fell dit dilemel ar c'hefluniadur-mañ da vat ?"
+
+#: src/states_screens/options_screen_ui.cpp:155
+msgid ""
+"Players can select handicapped (more difficult) profiles on the kart "
+"selection screen"
+msgstr "Un aelad nammet (diaesoc'h) a vez diuzet gant ar c'hoarierion diwar skramm diuzañ ar c'hartoù"
+
+#. I18N: in the language choice, to select the same language as the OS
+#: src/states_screens/options_screen_ui.cpp:187
+msgid "System Language"
+msgstr "Yezh ar reizhiad"
+
+#. I18N: custom video settings
+#: src/states_screens/options_screen_video.cpp:366
+msgid "Custom"
+msgstr "Personelaet"
+
+#. I18N: if some kart animations are enabled
+#: src/states_screens/options_screen_video.cpp:391
+msgid "Me Only"
+msgstr "Me nemetken"
+
+#. I18N: in graphical options
+#. tooltip = tooltip + L"\n" + _("Pixel shaders: %s",
+#. UserConfigParams::m_pixel_shaders ? enabled : disabled);
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:399
+#, c-format
+msgid "Animated Scenery: %s"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:402
+#, c-format
+msgid "Weather Effects: %s"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:405
+#, c-format
+msgid "Animated Characters: %s"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:410
+#, c-format
+msgid "Dynamic lights: %s"
+msgstr "Gouleier dialuskel : %s"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:413
+#, c-format
+msgid "Motion blur: %s"
+msgstr "Ruzed dre fiñval : %s"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:416
+#, c-format
+msgid "Anti-aliasing: %s"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:419
+#, c-format
+msgid "Ambient occlusion: %s"
+msgstr ""
+
+#: src/states_screens/options_screen_video.cpp:423
+#, c-format
+msgid "Shadows: %s"
+msgstr "Skeudoù : %s"
+
+#: src/states_screens/options_screen_video.cpp:425
+#, c-format
+msgid "Shadows: %i"
+msgstr "Skeudoù : %i"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:428
+#, c-format
+msgid "Bloom: %s"
+msgstr "Bleuñv : %s"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:432
+#, c-format
+msgid "Glow (outlines): %s"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:436
+#, c-format
+msgid "Light shaft (God rays): %s"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:440
+#, c-format
+msgid "Depth of field: %s"
+msgstr "Donder an noñv : %s"
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:444
+#, c-format
+msgid "Global illumination: %s"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options_screen_video.cpp:448
+#, c-format
+msgid "Use high definition textures: %s"
+msgstr "Arverañ gwiadezhioù uhel o diarunusted : %s"
+
+#: src/states_screens/race_gui.cpp:313 src/states_screens/race_gui.cpp:315
+msgid "Challenge Failed"
+msgstr "C'hwitet eo bet an dae"
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/states_screens/race_gui_base.cpp:64
+msgid "Ready!"
+msgstr "Prientit !"
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/states_screens/race_gui_base.cpp:66
+msgid "Set!"
+msgstr "Evezh !"
+
+#. I18N: as in "ready, set, go", shown at the beginning of the race
+#: src/states_screens/race_gui_base.cpp:68
+msgid "Go!"
+msgstr "Kit !"
+
+#. I18N: Shown when a goal is scored
+#: src/states_screens/race_gui_base.cpp:70
+msgid "GOAL!"
+msgstr "PAL !"
+
+#. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
+#. "John Doe")
+#: src/states_screens/race_gui_base.cpp:536
+msgid "by"
+msgstr "gant"
+
+#: src/states_screens/race_gui_base.cpp:644
+msgid "Collect nitro!"
+msgstr "Dastum nitro !"
+
+#: src/states_screens/race_gui_base.cpp:646
+msgid "Follow the leader!"
+msgstr "Heuilh ar Penn !"
+
+#. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
+#: src/states_screens/race_gui_base.cpp:812
+#, c-format
+msgid "Top %i"
+msgstr "Top %i"
+
+#. I18N: Shown at the end of a race
+#: src/states_screens/race_gui_overworld.cpp:108
+msgid "Lap"
+msgstr "Tro"
+
+#: src/states_screens/race_gui_overworld.cpp:109
+msgid "Rank"
+msgstr "Renk"
+
+#: src/states_screens/race_gui_overworld.cpp:469
+msgid "Press fire to play the tutorial"
+msgstr "Pouez war Tan da lenn ar c'helennskrid"
+
+#: src/states_screens/race_gui_overworld.cpp:508
+msgid "Type: Grand Prix"
+msgstr "Rizh : Grand Prix"
+
+#: src/states_screens/race_gui_overworld.cpp:539
+msgid "Press fire to start the challenge"
+msgstr "Pouez war Tan da loc'hañ an dae"
+
+#: src/states_screens/race_result_gui.cpp:156
+msgid "Continue."
+msgstr "Kenderc'hel"
+
+#: src/states_screens/race_result_gui.cpp:159
+msgid "Quit the server."
+msgstr "Kuitaat an darafiad."
+
+#: src/states_screens/race_result_gui.cpp:176
+msgid "You completed challenges!"
+msgstr "Echuet ec'h eus daeoù !"
+
+#: src/states_screens/race_result_gui.cpp:189
+msgid "Abort Grand Prix"
+msgstr "Dilezel Grand Prix"
+
+#: src/states_screens/race_result_gui.cpp:199
+msgid "Restart"
+msgstr "Adloc'hañ"
+
+#: src/states_screens/race_result_gui.cpp:205
+msgid "Back to challenge selection"
+msgstr "Distreiñ da ziuzad an daeoù"
+
+#: src/states_screens/race_result_gui.cpp:211
+msgid "Back to the menu"
+msgstr "Distreiñ d'al lañser"
+
+#: src/states_screens/race_result_gui.cpp:354
+msgid "Do you really want to abort the Grand Prix?"
+msgstr "Ha fellout a ra deoc'h dilezel ar Grand Prix da vat ?"
+
+#: src/states_screens/race_result_gui.cpp:475
+#: src/states_screens/race_result_gui.cpp:840
+msgid "Eliminated"
+msgstr "Dilamet"
+
+#: src/states_screens/race_result_gui.cpp:983
+msgid "Red Team Wins"
+msgstr "Ar maout gant ar skipailh ruz"
+
+#: src/states_screens/race_result_gui.cpp:987
+msgid "Blue Team Wins"
+msgstr "Ar maout gant ar skipailh glas"
+
+#: src/states_screens/race_result_gui.cpp:992
+msgid "It's a draw"
+msgstr "Un dresadenn eo"
+
+#: src/states_screens/race_result_gui.cpp:1148
+#, c-format
+msgid "Track %i/%i"
+msgstr "Loabr %i%i"
+
+#: src/states_screens/race_result_gui.cpp:1232
+msgid "Grand Prix progress:"
+msgstr "Araokadur ar Grand Prix :"
+
+#: src/states_screens/race_result_gui.cpp:1270
+msgid "Highscores"
+msgstr "Eriñvoù uhelañ"
+
+#: src/states_screens/race_setup_screen.cpp:202
+msgid "All blows allowed, so catch weapons and make clever use of them!"
+msgstr "Aotreet eo an holl walldaolioù, neuze tap armoù ha bez speredek ganto !"
+
+#: src/states_screens/race_setup_screen.cpp:209
+msgid "Contains no powerups, so only your driving skills matter!"
+msgstr "N'eus galloud ebet, pouezus eo da varregezh vleinañ hepken"
+
+#. I18N: short definition for follow-the-leader game mode
+#: src/states_screens/race_setup_screen.cpp:222
+msgid "Keep up with the leader kart but don't overtake it!"
+msgstr "Chom tost ouzh ar penn, arabat mont dreistañ, avat !"
+
+#: src/states_screens/race_setup_screen.cpp:231
+msgid ""
+"Hit others with weapons until they lose all their lives (only in multiplayer"
+" games)."
+msgstr ""
+
+#: src/states_screens/race_setup_screen.cpp:240
+msgid ""
+"Push the ball to the opposite cage to score goals (only in multiplayer "
+"games)."
+msgstr ""
+
+#: src/states_screens/race_setup_screen.cpp:252
+msgid "Explore tracks to find all hidden eggs"
+msgstr "Ergerzh dre loabroù da gavout an holl vioù kuzh."
+
+#: src/states_screens/register_screen.cpp:217
+#: src/states_screens/register_screen.cpp:224
+#, c-format
+msgid "Could not create player '%s'."
+msgstr "N'haller ket krouiñ ar c'hoarier '%s'."
+
+#: src/states_screens/register_screen.cpp:276
+msgid "Emails don't match!"
+msgstr "Ne glot ket ar posteloù !"
+
+#: src/states_screens/register_screen.cpp:280
+msgid "Online username has to be between 3 and 30 characters long!"
+msgstr "Etre 3 ha 30 arouezenn e rank bezañ gant an anvioù arveriaded enlinenn !"
+
+#: src/states_screens/register_screen.cpp:284
+msgid "Online username must not start with a number!"
+msgstr "Un anv arveriad enlinenn n'hall ket kregiñ gant ur sifr !"
+
+#: src/states_screens/register_screen.cpp:292
+msgid "Email has to be between 5 and 254 characters long!"
+msgstr "Hirder ur postel a rank bezañ etre 5 ha 254 arouezenn !"
+
+#: src/states_screens/register_screen.cpp:298
+msgid "Email is invalid!"
+msgstr "Didalvoud eo ar postel"
+
+#: src/states_screens/register_screen.cpp:361
+msgid ""
+"You will receive an email with further instructions regarding account "
+"activation. Please be patient and be sure to check your spam folder."
+msgstr "Ur postel a zegeremot gant titouroù ouzhpenn evit gouzout penaos deraouekaat ho kont. Gortozit un tamm ha taolit ur sell ouzh ar pod lastez."
+
+#: src/states_screens/register_screen.cpp:401
+#: src/states_screens/user_screen.cpp:317
+msgid "Internet access is disabled, please enable it in the options"
+msgstr "Diweredekaet eo haeziñ ouzh Internet, gweredekait an haeziñ en dibarzhioù, mar plij"
+
+#: src/states_screens/server_selection.cpp:67
+#: src/states_screens/server_selection.cpp:210
+msgid "Fetching servers"
+msgstr "O kerc'hat dafariadoù"
+
+#. I18N: track group name
+#: src/states_screens/tracks_screen.cpp:151
+msgid "all"
+msgstr "an holl anezho"
+
+#: src/states_screens/tracks_screen.cpp:202
+msgid "Locked!"
+msgstr "Prennet !"
+
+#: src/states_screens/tracks_screen.cpp:285
+msgid "Locked: solve active challenges to gain access to more!"
+msgstr ""
+
+#. I18N: when showing who is the author of track '%s'
+#. I18N: (place %s where the name of the author should appear)
+#: src/states_screens/track_info_screen.cpp:107
+#, c-format
+msgid "Track by %s"
+msgstr "Loabr gant %s"
+
+#: src/states_screens/user_screen.cpp:111
+msgid "Exit game"
+msgstr "Kuitaat ar c'hoari"
+
+#: src/states_screens/user_screen.cpp:461
+msgid "You need to enter a password."
+msgstr "Ret eo deoc'h biziata ur ger-tremen."
+
+#: src/states_screens/user_screen.cpp:482
+#, c-format
+msgid "Logging out '%s'"
+msgstr "O tikennaskañ '%s'"
+
+#: src/states_screens/user_screen.cpp:483
+#, c-format
+msgid "Logging in '%s'"
+msgstr "O kennaskañ '%s'"
+
+#. I18N: In the player info dialog (when deleting)
+#: src/states_screens/user_screen.cpp:572
+#, c-format
+msgid "Do you really want to delete player '%s' ?"
+msgstr "Ha fellout a ra deoc'h dilemel ar c'hoarier '%s' ?"
+
+#. I18N: Do NOT literally translate this string!! Please enter Y as the
+#. translation if your language is a RTL (right-to-left) language,
+#. N (or nothing) otherwise
+#: src/utils/translation.cpp:341
+msgid "   Is this a RTL language?"
+msgstr "   N"
+
+#: ../stk-assets/tracks/overworld/scripting.as:15
+msgid "Complete all challenges to unlock the big door!"
+msgstr "Echuit an holl zaelioù da zibrennañ an nor vras !"
+
+#: ../stk-assets/tracks/overworld/scripting.as:63
+msgid ""
+"You need more points\n"
+"to enter this challenge!\n"
+"Check the minimap for\n"
+"available challenges."
+msgstr "Muioc'h a boentoù hoc'h eus ezhomm\nda vont d'an dael-mañ !\nTaolit ur sell ouzh ar gartenn vihan\nda gavout daeloù hegerz."
+
+#: ../stk-assets/tracks/tutorial/scripting.as:21
+#, c-format
+msgid "Accelerate with <%s>, and steer with <%s> and <%s>."
+msgstr "Herreka gant  <%s> ha stur gant <%s> ha <%s>."
+
+#: ../stk-assets/tracks/tutorial/scripting.as:37
+#: ../stk-assets/tracks/tutorial/triggers.as:38
+#, c-format
+msgid ""
+"Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
+msgstr "Dastum boestadoù profoù ha gra gant an arm gant <%s> da zistrujañ ar boestadoù-mañ !"
+
+#: ../stk-assets/tracks/tutorial/scripting.as:43
+#: ../stk-assets/tracks/tutorial/triggers.as:44
+#, c-format
+msgid ""
+"Press <%s> to look behind. Fire the weapon with <%s> while pressing <%s> to "
+"fire behind!"
+msgstr "Pouez war <%s> da gilsellout. Tenn gant an arm gant <%s> ha pouez war <%s> diouzh an dro da gildennañ !"
+
+#: ../stk-assets/tracks/tutorial/scripting.as:53
+#: ../stk-assets/tracks/tutorial/triggers.as:54
+#, c-format
+msgid "Use the nitro you collected by pressing <%s>!"
+msgstr "Arver an nitro bet tapet ganit dre bouezañ <%s>!"
+
+#: ../stk-assets/tracks/tutorial/scripting.as:58
+msgid "Collect nitro bottles (we will use them after the curve)."
+msgstr "Dastum boutailhadoù nitro (ganto e vo graet goude ar gammdro)"
+
+#: ../stk-assets/tracks/tutorial/scripting.as:63
+#, c-format
+msgid "Oops! When you're in trouble, press <%s> to be rescued."
+msgstr ""
+
+#: ../stk-assets/tracks/tutorial/scripting.as:69
+#: ../stk-assets/tracks/tutorial/triggers.as:70
+#, c-format
+msgid ""
+"Accelerate and press the <%s> key while turning to skid. Skidding for a "
+"short while can help you turn faster to take sharp turns."
+msgstr "Herreka ha pouez war ar stokell <%s> en ur dreiñ da ziflipañ. Aesoc'h e vo deoc'h treiñ buanoc'h dre ziflipañ un tammig da gemer kammdroioù lemm."
+
+#: ../stk-assets/tracks/tutorial/scripting.as:77
+#: ../stk-assets/tracks/tutorial/triggers.as:78
+msgid ""
+"Note that if you manage to skid for several seconds, you will receive a "
+"bonus speedup as a reward!"
+msgstr "Mard deui a-benn da ziflipañ e-pad un toulladig eilennoù e vi garedoned gant da dizh kreskaet !"
+
+#: ../stk-assets/tracks/tutorial/scripting.as:82
+#: ../stk-assets/tracks/tutorial/triggers.as:83
+msgid "You are now ready to race. Good luck!"
+msgstr "Prest out da gemer perzh er redadeg bremañ. Chañs vat !"
+
+#: ../stk-assets/tracks/tutorial/triggers.as:28
+#, c-format
+msgid "Accelerate with <%s> and steer with <%s> and <%s>"
+msgstr "Herreka gant  <%s> ha stur gant <%s> ha <%s>"
+
+#: ../stk-assets/tracks/tutorial/triggers.as:59
+msgid "Collect nitro bottles (we will use them after the curve)"
+msgstr "Dastum boutailhadoù nitro (ganto e vo graet goude ar gammdro)"
+
+#: ../stk-assets/tracks/tutorial/triggers.as:64
+#, c-format
+msgid "Oops! When you're in trouble, press <%s> to be rescued"
+msgstr "Hopala ! Mar teuy kudennoù ouzhit, pouez war  <%s> da vezañ sikouret"

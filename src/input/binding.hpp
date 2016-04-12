@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,17 +20,20 @@
 #ifndef BINDING_HPP
 #define BINDING_HPP
 
-#include <fstream>
 
-#include <irrString.h>
 #include "input/input.hpp"
 #include "utils/no_copy.hpp"
-#include <irrXML.h>
+
+#include "irrString.h"
+
+#include <fstream>
+
+class XMLNode;
 
 /**
   * \ingroup config
   */
-class Binding
+class Binding : public NoCopy
 {
 private:
     Input::InputType        m_type;
@@ -61,8 +64,8 @@ public:
     }   // set
 
     // ------------------------------------------------------------------------
-    void               serialize  (std::ofstream& stream) const;
-    bool               deserialize(irr::io::IrrXMLReader* xml);
+    void               save(std::ofstream& stream) const;
+    bool               load(const XMLNode *action);
     irr::core::stringw getAsString() const;
 };
 #endif

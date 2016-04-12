@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -47,12 +47,20 @@ void HelpScreen3::eventCallback(Widget* widget, const std::string& name, const i
 {
     if (name == "category")
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
+        
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if (selection == "page1") StateManager::get()->replaceTopMostScreen(HelpScreen1::getInstance());
-        else if (selection == "page2") StateManager::get()->replaceTopMostScreen(HelpScreen2::getInstance());
-        //else if(selection == "page3") StateManager::get()->replaceTopMostScreen(Help3Screen::getInstance());
-        else if(selection == "page4") StateManager::get()->replaceTopMostScreen(HelpScreen4::getInstance());
+        Screen *screen = NULL;
+        if (selection == "page1")
+            screen = HelpScreen1::getInstance();
+        else if (selection == "page2")
+            screen = HelpScreen2::getInstance();
+        //else if (selection == "page3")
+        //    screen = HelpScreen3::getInstance();
+        else if (selection == "page4")
+            screen = HelpScreen4::getInstance();
+        if(screen)
+            StateManager::get()->replaceTopMostScreen(screen);
     }
     else if (name == "back")
     {

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,15 +19,6 @@
 #ifndef HEADER_XML_NODE_HPP
 #define HEADER_XML_NODE_HPP
 
-#ifdef _MSC_VER
-  typedef __int32          int32_t;
-  typedef unsigned __int32 uint32_t;
-  typedef __int64          int64_t;
-  typedef unsigned __int64 uint64_t;
-#else
-#  include <stdint.h>
-#endif
-
 #include <string>
 #include <map>
 #include <vector>
@@ -43,6 +34,7 @@ using namespace irr;
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/time.hpp"
+#include "utils/types.hpp"
 
 class InterpolationArray;
 class Vec3;
@@ -78,10 +70,12 @@ public:
     const XMLNode     *getNode(const std::string &name) const;
     const void         getNodes(const std::string &s, std::vector<XMLNode*>& out) const;
     const XMLNode     *getNode(unsigned int i) const;
-    unsigned int       getNumNodes() const {return m_nodes.size(); }
+    unsigned int       getNumNodes() const {return (unsigned int) m_nodes.size(); }
     int get(const std::string &attribute, std::string *value) const;
     int get(const std::string &attribute, core::stringw *value) const;
+    int getAndDecode(const std::string &attribute, core::stringw *value) const;
     int get(const std::string &attribute, int32_t  *value) const;
+    int get(const std::string &attribute, uint16_t *value) const;
     int get(const std::string &attribute, uint32_t *value) const;
     int get(const std::string &attribute, int64_t  *value) const;
     int get(const std::string &attribute, float *value) const;

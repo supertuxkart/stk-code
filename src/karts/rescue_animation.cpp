@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,6 +18,8 @@
 
 #include "karts/rescue_animation.hpp"
 
+#include "graphics/callbacks.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/referee.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
@@ -37,7 +39,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
 {
     m_referee     = new Referee(*m_kart);
     m_kart->getNode()->addChild(m_referee->getSceneNode());
-    m_timer       = m_kart->getKartProperties()->getRescueTime();
+    m_timer       = m_kart->getKartProperties()->getRescueDuration();
     m_velocity    = m_kart->getKartProperties()->getRescueHeight() / m_timer;
     m_xyz         = m_kart->getXYZ();
 

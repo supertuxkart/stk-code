@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -33,8 +33,8 @@ namespace GUIEngine
     class CheckBoxWidget : public Widget
     {
         bool m_state;
-        EventPropagation transmitEvent(Widget* w, 
-                                       const std::string& originator, 
+        EventPropagation transmitEvent(Widget* w,
+                                       const std::string& originator,
                                        const int playerID);
         
     public:
@@ -57,7 +57,7 @@ namespace GUIEngine
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 10; }
-    };  
+    };
 }
 
 #endif

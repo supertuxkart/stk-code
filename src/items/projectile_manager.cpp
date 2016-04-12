@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,8 +26,7 @@
 #include "items/powerup_manager.hpp"
 #include "items/powerup.hpp"
 #include "items/rubber_ball.hpp"
-#include "network/network_manager.hpp"
-#include "network/race_state.hpp"
+#include "karts/abstract_kart.hpp"
 
 ProjectileManager *projectile_manager=0;
 
@@ -66,14 +65,7 @@ void ProjectileManager::cleanup()
 /** General projectile update call. */
 void ProjectileManager::update(float dt)
 {
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
-    {
-        updateClient(dt);
-    }
-    else
-    {
-        updateServer(dt);
-    }
+    updateServer(dt);
 
     HitEffects::iterator he = m_active_hit_effects.begin();
     while(he!=m_active_hit_effects.end())
@@ -100,23 +92,10 @@ void ProjectileManager::update(float dt)
 /** Updates all rockets on the server (or no networking). */
 void ProjectileManager::updateServer(float dt)
 {
-    // First update all projectiles on the track
-    if(network_manager->getMode()!=NetworkManager::NW_NONE)
-    {
-        race_state->setNumFlyables(m_active_projectiles.size());
-    }
-
     Projectiles::iterator p = m_active_projectiles.begin();
     while(p!=m_active_projectiles.end())
     {
         bool can_be_deleted = (*p)->updateAndDelete(dt);
-        if(network_manager->getMode()!=NetworkManager::NW_NONE)
-        {
-            race_state->setFlyableInfo(p-m_active_projectiles.begin(),
-                                       FlyableInfo((*p)->getXYZ(),
-                                                   (*p)->getRotation(),
-                                                   can_be_deleted)     );
-        }
         if(can_be_deleted)
         {
             HitEffect *he = (*p)->getHitEffect();
@@ -130,34 +109,15 @@ void ProjectileManager::updateServer(float dt)
         else
             p++;
     }   // while p!=m_active_projectiles.end()
+    
 }   // updateServer
 
 // -----------------------------------------------------------------------------
-/** Updates all rockets and hit effects on the client.
- *  updateClient takes the information in race_state and updates all rockets
- *  (i.e. position, hit effects etc)                                          */
-void ProjectileManager::updateClient(float dt)
-{
-    unsigned int num_projectiles = race_state->getNumFlyables();
-    if(num_projectiles != m_active_projectiles.size())
-        fprintf(stderr, "Warning: num_projectiles %d active %d\n",
-                num_projectiles, (int)m_active_projectiles.size());
-
-    unsigned int indx=0;
-    for(Projectiles::iterator i  = m_active_projectiles.begin();
-        i != m_active_projectiles.end();   ++i, ++indx)
-    {
-        const FlyableInfo &f = race_state->getFlyable(indx);
-        (*i)->updateFromServer(f, dt);
-        if(f.m_exploded)
-        {
-            (*i)->hit(NULL);
-        }
-    }   // for i in m_active_projectiles
-
-}   // updateClient
-// -----------------------------------------------------------------------------
-Flyable *ProjectileManager::newProjectile(AbstractKart *kart, Track* track,
+/** Creates a new projectile of the given type.
+ *  \param kart The kart which shoots the projectile.
+ *  \param type Type of projectile.
+ */
+Flyable *ProjectileManager::newProjectile(AbstractKart *kart,
                                           PowerupManager::PowerupType type)
 {
     Flyable *f;
@@ -173,3 +133,23 @@ Flyable *ProjectileManager::newProjectile(AbstractKart *kart, Track* track,
     m_active_projectiles.push_back(f);
     return f;
 }   // newProjectile
+
+// -----------------------------------------------------------------------------
+/** Returns true if a projectile is within the given distance of the specified
+ *  kart.
+ *  \param kart The kart for which the test is done.
+ *  \param radius Distance within which the projectile must be.
+*/
+bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
+                                         float radius)
+{
+    float r2 = radius*radius;
+
+    for(Projectiles::iterator i  = m_active_projectiles.begin();
+                              i != m_active_projectiles.end();   i++)
+    {
+        float dist2 = (*i)->getXYZ().distance2(kart->getXYZ());
+        if(dist2<r2) return true;
+    }
+    return false;
+}   // projectileIsClose

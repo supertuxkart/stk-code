@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,19 +24,12 @@
 #include <set>
 
 #include "tracks/graph_node.hpp"
+#include "tracks/graph_structure.hpp"
 #include "tracks/quad_set.hpp"
 #include "utils/aligned_array.hpp"
-#include "utils/no_copy.hpp"
-
-#include <dimension2d.h>
-namespace irr
-{
-    namespace scene { class ISceneNode; class IMesh; class IMeshBuffer; }
-    namespace video { class ITexture; }
-}
-using namespace irr;
 
 class CheckLine;
+class GraphStructure;
 
 /**
  *  \brief This class stores a graph of quads. It uses a 'simplified singleton'
@@ -48,7 +41,7 @@ class CheckLine;
  *  returns NULL in this case, and this is tested where necessary.
  * \ingroup tracks
   */
-class QuadGraph : public NoCopy
+class QuadGraph : public GraphStructure
 {
 
 private:
@@ -56,21 +49,9 @@ private:
 
     /** The actual graph data structure. */
     std::vector<GraphNode*>  m_all_nodes;
-    /** For debug mode only: the node of the debug mesh. */
-    scene::ISceneNode       *m_node;
-    /** For debug only: the mesh of the debug mesh. */
-    scene::IMesh            *m_mesh;
-    /** For debug only: the actual mesh buffer storing the quads. */
-    scene::IMeshBuffer      *m_mesh_buffer;
 
     /** The length of the first loop. */
     float                    m_lap_length;
-
-    /** The minimum coordinates of the quad graph. */
-    Vec3                     m_min_coord;
-
-    /** Scaling for mini map. */
-    float                    m_scaling;
 
     /** Stores the filename - just used for error messages. */
     std::string              m_quad_filename;
@@ -87,20 +68,32 @@ private:
     void addSuccessor(unsigned int from, unsigned int to);
     void load         (const std::string &filename);
     void computeDistanceFromStart(unsigned int start_node, float distance);
-    void createMesh(bool show_invisible=true,
-                    bool enable_transparency=false,
-                    const video::SColor *track_color=NULL,
-                    const video::SColor *lap_color=NULL);
     unsigned int getStartNode() const;
          QuadGraph     (const std::string &quad_file_name,
-                        const std::string graph_file_name,
+                        const std::string &graph_file_name,
                         const bool reverse);
         ~QuadGraph     ();
+
+    // ------------------------------------------------------------------------
+    virtual void set3DVerticesOfGraph(int i, video::S3DVertex *v,
+                                      const video::SColor &color) const
+                         { m_all_nodes[i]->getQuad().getVertices(v, color); }
+    // ------------------------------------------------------------------------
+    virtual void getGraphBoundingBox(Vec3 *min, Vec3 *max) const
+                                { QuadSet::get()->getBoundingBox(min, max); }
+    // ------------------------------------------------------------------------
+    virtual const bool isNodeInvisible(int n) const
+                          { return m_all_nodes[n]->getQuad().isInvisible(); }
+    // ------------------------------------------------------------------------
+    virtual const bool isNodeInvalid(int n) const
+                                                            { return false; }
+    // ------------------------------------------------------------------------
+    virtual const bool hasLapLine() const
+                                                            { return true;  }
+
 public:
     static const int UNKNOWN_SECTOR;
 
-    void         createDebugMesh();
-    void         cleanupDebugMesh();
     void         getSuccessors(int node_number,
                                std::vector<unsigned int>& succ,
                                bool for_ai=false) const;
@@ -118,24 +111,21 @@ public:
                                          float forwards_distance=1.5f,
                                          float sidewards_distance=1.5f,
                                          float upwards_distance=0.0f) const;
-    video::ITexture *makeMiniMap(const core::dimension2du &where,
-                                 const std::string &name,
-                                 const video::SColor &fill_color
-                                        =video::SColor(127, 255, 255, 255) );
-    void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
-    void         updateDistancesForAllSuccessors(unsigned int indx, float delta);
+    void         updateDistancesForAllSuccessors(unsigned int indx,
+                                                 float delta,
+                                                 unsigned int count);
     void         setupPaths();
     void         computeChecklineRequirements();
-// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------======
     /** Returns the one instance of this object. It is possible that there
      *  is no instance created (e.g. in battle mode, since it doesn't have
      *  a quad graph), so we don't assert that an instance exist, and we
      *  also don't create one if it doesn't exists. */
     static QuadGraph  *get() { return m_quad_graph; }
-    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------==
     /** Creates a QuadGraph instance. */
     static void create(const std::string &quad_file_name,
-                       const std::string graph_file_name,
+                       const std::string &graph_file_name,
                        const bool reverse)
     {
         assert(m_quad_graph==NULL);
@@ -143,7 +133,7 @@ public:
         // functions called from the constructor need it to be defined.
         new QuadGraph(quad_file_name, graph_file_name, reverse);
     }   // create
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Cleans up the quad graph. It is possible that this function is called
      *  even if no instance exists (e.g. in battle mode). So it is not an
      *  error if there is no instance. */
@@ -155,40 +145,39 @@ public:
             m_quad_graph = NULL;
         }
     }   // destroy
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the number of nodes in the graph. */
-    unsigned int getNumNodes() const { return m_all_nodes.size();         }
-    // ----------------------------------------------------------------------
+    virtual const unsigned int getNumNodes() const
+                         { return (unsigned int)m_all_nodes.size();}
+    // ------------------------------------------------------------------------
     /** Return the distance to the j-th successor of node n. */
     float        getDistanceToNext(int n, int j) const
                          { return m_all_nodes[n]->getDistanceToSuccessor(j);}
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the angle of the line between node n and its j-th.
      *  successor. */
     float        getAngleToNext(int n, int j) const
                          { return m_all_nodes[n]->getAngleToSuccessor(j);   }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the number of successors of a node n. */
     int          getNumberOfSuccessors(int n) const
                          { return m_all_nodes[n]->getNumberOfSuccessors();  }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
     const Quad&  getQuadOfNode(unsigned int j) const
           { return QuadSet::get()->getQuad(m_all_nodes[j]->getQuadIndex()); }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
     GraphNode&   getNode(unsigned int j) const{ return *m_all_nodes[j]; }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the distance from the start to the beginning of a quad. */
     float        getDistanceFromStart(int j) const
                            { return m_all_nodes[j]->getDistanceFromStart(); }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Returns the length of the main driveline. */
     float        getLapLength() const {return m_lap_length; }
-    // ----------------------------------------------------------------------
-    /** Returns true if the graph is to be reversed. */
+    // ------------------------------------------------------------------------
     bool         isReverse() const {return m_reverse; }
-
 };   // QuadGraph
 
 #endif

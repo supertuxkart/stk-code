@@ -42,18 +42,6 @@
 #include <hidsdi.h>
 #include <setupapi.h>
 
-#ifdef __MINGW32__
-/* this prototype is missing from the mingw headers so we must add it
-	or suffer linker errors. */
-#	ifdef __cplusplus
-extern "C" {
-#	endif
-	WINHIDSDI BOOL WINAPI HidD_SetOutputReport(HANDLE, PVOID, ULONG);
-#	ifdef __cplusplus
-}
-#	endif
-#endif
-
 int wiiuse_os_find(struct wiimote_t** wm, int max_wiimotes, int timeout) {
 	GUID device_id;
 	HANDLE dev;

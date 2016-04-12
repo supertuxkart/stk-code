@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -31,6 +31,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "utils/translation.hpp"
+#include "utils/log.hpp"
 
 using namespace GUIEngine;
 
@@ -62,13 +63,13 @@ void StateManager::deallocate()
 StateManager::ActivePlayer* StateManager::getActivePlayer(const int id)
 {
     ActivePlayer *returnPlayer = NULL;
-    if (id < m_active_players.size() && id >= 0)
+    if (id < (int)m_active_players.size() && id >= 0)
     {
         returnPlayer = m_active_players.get(id);
     }
     else
     {
-        fprintf(stderr, "getActivePlayer(): id out of bounds\n");
+        Log::error("StateManager", "getActivePlayer(): id %d out of bounds", id);
         assert(false);
         return NULL;
     }
@@ -100,7 +101,8 @@ void StateManager::updateActivePlayerIDs()
 
 // ----------------------------------------------------------------------------
 
-int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device)
+int StateManager::createActivePlayer(PlayerProfile *profile,
+                                     InputDevice *device)
 {
     ActivePlayer *p;
     int i;
@@ -123,7 +125,7 @@ void StateManager::removeActivePlayer(int id)
 
 // ----------------------------------------------------------------------------
 
-int StateManager::activePlayerCount()
+unsigned int StateManager::activePlayerCount()
 {
     return m_active_players.size();
 }   // activePlayerCount
@@ -167,7 +169,8 @@ void StateManager::escapePressed()
     // when another modal dialog is visible
     else if(ModalDialog::isADialogActive())
     {
-        ModalDialog::getCurrent()->escapePressed();
+        if(ModalDialog::getCurrent()->onEscapePressed())
+            ModalDialog::getCurrent()->dismiss();
     }
     // In-game
     else if(m_game_mode == GAME)
@@ -198,11 +201,11 @@ void StateManager::onGameStateChange(GameState new_state)
     {
         irr_driver->showPointer();
         input_manager->setMode(InputManager::MENU);
-        sfx_manager->positionListener( Vec3(0,0,0), Vec3(0,1,0) );
+        SFXManager::get()->positionListener( Vec3(0,0,0), Vec3(0,1,0), Vec3(0, 1, 0) );
 
         if (new_state == MENU)
         {
-            Screen* screen = GUIEngine::getCurrentScreen();
+            GUIEngine::Screen* screen = GUIEngine::getCurrentScreen();
             if (screen != NULL)
             {
                 music_manager->startMusic(

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@
 
 namespace irr
 {
-    namespace scene { class IMesh; }
+    namespace scene { class IMesh; class IMeshBuffer; }
 }
 using namespace irr;
 
@@ -33,6 +33,12 @@ using namespace irr;
 namespace MeshTools
 {
     void minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max);
+
+    bool isNormalMap(scene::IMeshBuffer* mb);
+
+    // Copied from irrlicht
+    scene::IMesh* createMeshWithTangents(scene::IMesh* mesh, bool(*predicate)(scene::IMeshBuffer*),
+        bool recalculateNormals = false, bool smooth = false, bool angleWeighted = false, bool calculateTangents = true);
 }   // MeshTools
 
 #endif

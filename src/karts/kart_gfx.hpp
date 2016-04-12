@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -29,6 +29,12 @@ class AbstractKart;
 class ParticleEmitter;
 class ParticleKind;
 class Vec3;
+
+namespace irr {
+    namespace scene {
+        class ISceneNode;
+    }
+}
 
 class KartGFX
 {
@@ -69,8 +75,18 @@ private:
     /** Used to alternate particle effects from the rear wheels. */
     int         m_wheel_toggle;
 
+    /** A light that's shown when the kart uses nitro. */
+    irr::scene::ISceneNode* m_nitro_light;
+
+    /** Light that is shown when the kart is skidding. */
+    irr::scene::ISceneNode* m_skidding_light_1;
+
+    /** A light that's shown on the second skid-level with another color. */
+    irr::scene::ISceneNode* m_skidding_light_2;
+
     void addEffect(KartGFXType type, const std::string &file_name,
-                   const Vec3 &position);
+                   const Vec3 &position, bool important);
+    void resizeBox(const KartGFXType type, float new_size);
 
 public:
          KartGFX(const AbstractKart *kart);
@@ -81,8 +97,15 @@ public:
     void setXYZ(const KartGFXType type, const Vec3 &xyz);
     void setCreationRateAbsolute(const KartGFXType type, float f);
     void setCreationRateRelative(const KartGFXType type, float f);
-    void resizeBox(const KartGFXType type, float speed, float dt);
     void updateTerrain(const ParticleKind *pk);
     void update(float dt);
+    void updateNitroGraphics(float f);
+    void updateSkidLight(unsigned int level);
+    void getGFXStatus(int* nitro, bool* zipper,
+                      int* skidding, bool* red_skidding) const;
+    void setGFXFromReplay(int nitro, bool zipper,
+                          int skidding, bool red_skidding);
+    void setGFXInvisible();
+
 };   // KartWGFX
 #endif

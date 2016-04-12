@@ -1,0 +1,269 @@
+<!--
+
+Ocean skin by Dakal and Marianne Gagnon, released under creative-commons BY-SA 3.0+
+Except background.jpg, by elisee
+Except stars, by s@f
+
+To make your own skin, I suggest simply duplicating this file and modifying it as needed.
+There are two types of images : some will be simply stretched as a whole, others will
+have non-stretchable borders (you cannot choose which one you must use, it's hardcoded
+for each element type; though, as you will see below, for all "advanced stretching" images
+you can easily fake "simple stretch")
+
+All elements will have at least 2 properties :
+        type="X"                                sets what you're skinning with this entry
+        image="skinDirectory/imageName.png"     sets which image is used for this element
+
+Most elements also support states :
+        state="neutral"
+        state="focused"
+        state="down"
+You can thus give different looks for different states.  Not all widgets support all states,
+see entries and comments below to know what's supported.
+Note that checkboxes are an exception and have the following styles :
+    "neutral+unchecked"
+    "neutral+checked"
+    "focused+unchecked"
+    "focused+checked"
+    "deactivated+unchecked"
+    "deactivated+checked"
+
+"Advanced stretching" images are split this way :
+
+     +----+--------------------+----+
+     |    |                    |    |
+     +----+--------------------+----+
+     |    |                    |    |
+     |    |                    |    |     
+     |    |                    |    |     
+     +----+--------------------+----+
+     |    |                    |    | 
+     +----+--------------------+----+
+     
+The center border will be stretched in all directions. The 4 corners will not stretch at all.
+Horizontal borders will stretch horizontally, verticallt borders will stretch vertically.
+Use properties left_border="X" right_border="X" top_border="X" bottom_border="X" to specify
+the size of each border in pixels (setting all borders to '0' makes the whole image scaled).
+
+In some cases, you may not want vertical stretching to occur (like if the left and right sides
+of the image must not be stretched vertically, e.g. for the spinner). In this case, pass
+parameter preserve_h_aspect_ratios="true" to make the left and right areas stretch by keeping
+their aspect ratio.
+
+Some components may fill the full inner area with stuff; others will only take a smaller
+area at the center. To adjust for this, there are properties "hborder_out_portion" and "vborder_out_portion"
+that take a float from 0 to 1, representing the percentage of each border that goes out of the widget's
+area (this might include stuff like shadows, etc.). The 'h' one is for horizontal borders,
+the 'v' one is for vertical borders.
+
+Finnally : the image is split, as shown above, into 9 areas. In osme cases, you may not want
+all areas to be rendered. Then you can pass parameter areas="body+left+right+top+bottom"
+and explicitely specify which parts you want to see. The 4 corner areas are only visible
+when the border that intersect at this corner are enabled.
+
+-->
+
+<skin name="Ocean" author="Dakal & Marianne Gagnon (Auria)">
+
+<!--  Stateless -->
+<element type="background" image="ocean/background.jpg" />
+
+<element type="achievement-message" image="ocean/achievement.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.3" vborder_out_portion="0"/>
+
+<element type="friend-message" image="ocean/friend.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="error-message" image="ocean/error.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="generic-message" image="ocean/generic.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="button" state="neutral" image="ocean/glassbutton.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="button" state="focused" image="ocean/glassbutton_focused.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="button" state="deactivated" image="ocean/glassbutton_deactivated.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
+<!-- TODO : buttons could support 'pressed' state -->
+
+<element type="textbubble" state="neutral" image="ocean/textbubble.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      hborder_out_portion="0.7" vborder_out_portion="0.3" />
+
+<element type="textbubble" state="focused" image="ocean/textbubble2.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      hborder_out_portion="0.7" vborder_out_portion="0.3" />
+      
+<element type="progress" state="fill" image="ocean/glasssgauge_fill.png"
+      left_border="20" right_border="20" top_border="0" bottom_border="0"
+      preserve_h_aspect_ratios="true" />
+
+<element type="progress" state="neutral" image="ocean/scrollbar_bg.png"
+      left_border="31" right_border="31" top_border="15" bottom_border="15"
+      preserve_h_aspect_ratios="true" />
+      
+      
+<element type="tab" state="neutral" image="ocean/glasstab.png"
+      left_border="75" right_border="75" top_border="0" bottom_border="15"
+      hborder_out_portion="0.2" />
+      
+<element type="tab" state="focused" image="ocean/glasstab_focus.png"
+      left_border="75" right_border="75" top_border="0" bottom_border="15"
+      hborder_out_portion="0.2" />
+
+<element type="tab" state="down" image="ocean/glasstab_down.png"
+      left_border="75" right_border="75" top_border="0" bottom_border="15"
+      hborder_out_portion="0.2" />
+
+<!-- Stateless -->
+<element type="squareFocusHalo" image="ocean/glass_square_focused.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+<element type="squareFocusHalo2" image="ocean/glass_square_focused2.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+<element type="squareFocusHalo3" image="ocean/glass_square_focused3.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+<element type="squareFocusHalo4" image="ocean/glass_square_focused4.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+      
+<!-- Stateless. No splitting into 9 areas is done; the image is just resized. -->
+<element type="selectionHalo" image="ocean/bubble.png"  />
+<element type="focusHalo" image="ocean/glass_iconhighlight_focus.png"  />
+
+<element type="spinner" state="neutral" image="ocean/glassspinner.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<element type="spinner" state="focused" image="ocean/glassspinner_focus.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<element type="spinner" state="deactivated" image="ocean/glassspinner_deactivated.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<!-- player name spinner color in multiplayer-->
+<element type="spinner1" state="neutral" image="ocean/glass_square1.png"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+<element type="spinner2" state="neutral" image="ocean/glass_square2.png"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+<element type="spinner3" state="neutral" image="ocean/glass_square3.png"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+<element type="spinner4" state="neutral" image="ocean/glass_square4.png"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+
+<!-- This one is a bit special. Only area(s) LEFT and/or RIGHT will be rendered. They will be overlaid
+     on top of the spinner's background -->
+<element type="spinner" state="down" image="ocean/glassspinner_down.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<!-- For checkboxes, no splitting into 9 areas is done; the image is just stretched -->
+<element type="checkbox" state="neutral+unchecked" image="ocean/glasscheckbox.png"/>
+<element type="checkbox" state="neutral+checked" image="ocean/glasscheckbox_checked.png"/>
+<element type="checkbox" state="focused+unchecked" image="ocean/glasscheckbox_focus.png"/>
+<element type="checkbox" state="focused+checked" image="ocean/glasscheckbox_checked_focus.png"/>
+<element type="checkbox" state="deactivated+unchecked" image="ocean/glasscheckbox_deactivated.png"/>
+<element type="checkbox" state="deactivated+checked" image="ocean/glasscheckbox_checked_deactivated.png"/>
+
+<!-- are always in neutral state for now. No splitting into 9 areas is done; the image is just stretched.
+     Note: the body of a guage is the same as for for spinners. -->
+<element type="gaugefill" image="ocean/glasssgauge_fill.png" />
+
+<!-- Lists are always in neutral state for now -->
+<element type="list" image="ocean/glass_section.png"
+    left_border="15" right_border="15" top_border="7" bottom_border="7"
+    hborder_out_portion="0.0" vborder_out_portion="0.0" />
+    
+<element type="listitem" state="focused" image="ocean/select.png"
+    left_border="0" right_border="0" top_border="0" bottom_border="0"
+    hborder_out_portion="0.0" vborder_out_portion="0.0" />
+    
+
+<!-- Scrollbars. Background and thumb have no state (always neutral state).
+     The buttons are the top and bottom arrows. Image must be top arrow, will
+     be mirrorred for bottom. Buttons can be in neutral or down state.
+     Advanced stretching is not used here.
+      -->
+<element type="scrollbar_background"          image="ocean/scrollbar_bg.png" />
+<element type="scrollbar_thumb"               image="ocean/scrollbar_thumb.png" />
+<element type="scrollbar_button"              image="ocean/scrollbar_btn.png" />
+<element type="scrollbar_button" state="down" image="ocean/scrollbar_btn_down.png" />
+
+<element type="left_arrow"  state="neutral" image="ocean/left_arrow.png" />
+<element type="right_arrow" state="neutral" image="ocean/right_arrow.png" />
+<element type="left_arrow"  state="focus"   image="ocean/left_arrow_focus.png" />
+<element type="right_arrow" state="focus"   image="ocean/right_arrow_focus.png" />
+
+<element type="list_header"  state="neutral" image="ocean/table_header.png" />
+<element type="list_sort_up" state="neutral" image="ocean/list_sort_up.png" />
+<element type="list_sort_down" state="neutral" image="ocean/list_sort_down.png" />
+<element type="list_header"  state="down"    image="ocean/table_header_down.png" />
+
+<!-- Stateless -->
+<element type="section" image="ocean/glass_section.png"
+      left_border="15" right_border="15" top_border="15" bottom_border="15"
+      hborder_out_portion="0.0" vborder_out_portion="0.0" />
+
+<!-- Stateless -->
+<element type="rounded_section" image="ocean/glass_rsection.png"
+      left_border="15" right_border="15" top_border="15" bottom_border="15"
+      hborder_out_portion="0.0" vborder_out_portion="0.0" />
+
+<!-- Stateless -->
+<element type="window" image="ocean/dialog.png"
+      left_border="7" right_border="7" top_border="50" bottom_border="50"
+      hborder_out_portion="1.0" vborder_out_portion="0.2" />
+
+<!-- Stateless -->
+<element type="tooltip" image="ocean/tooltip.png"
+    left_border="10" right_border="10" top_border="10" bottom_border="10"
+    hborder_out_portion="1.0" vborder_out_portion="1.0" />
+    
+<!--                   Colors                  -->
+<color type="text" state="neutral" r="0" g="0" b="0" />
+<color type="brighttext" state="neutral" r="28" g="176" b="255" />
+
+<!-- For highlighted items, e.g. in list -->
+<color type="text" state="focused" r="255" g="255" b="255" />
+
+<!-- Color used to fade out background when a dialog is shown -->
+<color type="dialog_background" state="neutral" a="120" r="0" g="0" b="0" />
+
+<!-- Text field color -->
+<color type="text_field" state="background" a="255" r="200" g="200" b="200" />
+<color type="text_field" state="background_focused" a="255" r="223" g="238" b="248" />
+<color type="text_field" state="background_deactivated" a="255" r="200" g="200" b="200" />
+<color type="text_field" state="neutral" a="255" r="138" g="138" b="138" />
+<color type="text_field" state="focused" a="255" r="42" g="169" b="211" />
+<color type="text_field" state="deactivated" a="255" r="138" g="138" b="138" />
+
+<!-- Rating star image -->
+<element type="rating" state="neutral" image="ocean/rating_star.png" />
+
+<!-- Font color -->
+<color type="font" state="top" a="255" r="100" g="200" b="220" />
+<color type="font" state="bottom" a="255" r="80" g="80" b="220" />
+<color type="font" state="normal" a="255" r="40" g="40" b="180" />
+
+</skin>

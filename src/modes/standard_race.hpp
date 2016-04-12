@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@ class StandardRace : public LinearWorld
 {
 protected:
     // clock events
-    virtual bool  isRaceOver();
+    virtual bool  isRaceOver() OVERRIDE;
 
 public:
                   StandardRace();

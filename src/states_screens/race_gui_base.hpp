@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -68,9 +68,6 @@ public:
     };   // KartIconDisplayInfo
 
 private:
-    /** Delight in seconds between lightnings. */
-    float m_lightning;
-
     /** True if unimportant messags (like item messages) should not
      *  be displayed. */
     bool  m_ignore_unimportant_messages;
@@ -127,10 +124,7 @@ private:
     Material        *m_music_icon;
 
     /** Translated strings 'ready', 'set', 'go'. */
-    core::stringw    m_string_ready, m_string_set, m_string_go;
-
-    /** Translated string 'Top %d' displayed every frame. */
-    core::stringw    m_string_top;
+    core::stringw    m_string_ready, m_string_set, m_string_go, m_string_goal;
 
     /** The position of the referee for all karts. */
     std::vector<Vec3> m_referee_pos;
@@ -170,10 +164,10 @@ protected:
     core::vector2df m_plunger_speed;
 
     /** The size of a single marker in pixels, must be a power of 2. */
-    int              m_marker_rendered_size;
+    //int              m_marker_rendered_size;
 
     /** A texture with all mini dots to be displayed in the minimap for all karts. */
-    video::ITexture *m_marker;
+    //video::ITexture *m_marker;
     video::ITexture *m_gauge_empty;
     /** Default texture for nitro gauge. */
     video::ITexture *m_gauge_full;
@@ -186,7 +180,7 @@ protected:
     Material         *m_icons_frame;
 
     void cleanupMessages(const float dt);
-    void createMarkerTexture();
+    //void createMarkerTexture();
     void createRegularPolygon(unsigned int n, float radius,
                               const core::vector2df &center,
                               const video::SColor &color,
@@ -198,7 +192,8 @@ protected:
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
     void drawGlobalMusicDescription();
-    void drawGlobalReadySetGo  ();
+    void drawGlobalReadySetGo();
+    void drawGlobalGoal();
     void drawPlungerInFace(const Camera *camera, float dt);
     /** Instructs the base gui to ignore unimportant messages (like
      *  item messages).
@@ -240,9 +235,6 @@ public:
                   getMiniMapSize() const = 0;
     // ------------------------------------------------------------------------
     virtual void clearAllMessages() { m_messages.clear(); }
-
-    /** Set the flag that a lightning should be shown. */
-    void doLightning() { m_lightning = 1.0f; }
 
     void drawGlobalPlayerIcons(int bottom_margin);
 

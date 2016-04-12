@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2006-2015 Patrick Ammann <pammann@aro.ch>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,8 +34,7 @@ public:
     virtual bool stopMusic   ()                            { return true; }
     virtual bool pauseMusic  ()                            { return true; }
     virtual bool resumeMusic ()                            { return true; }
-    virtual void volumeMusic (float gain)                  {}
-    virtual void updateFading(float percent)               {}
+    virtual void setVolume   (float volume)                {}
     virtual void updateFaster(float percent, float pitch)  {}
     virtual void update      ()                            {}
     virtual bool isPlaying   ()                            { return false; }

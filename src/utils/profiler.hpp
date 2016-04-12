@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,9 +23,48 @@
 #include <vector>
 #include <stack>
 #include <string>
+#include <streambuf>
+#include <ostream>
+#include <iostream>
+
+
+enum QueryPerf
+{
+    Q_SHADOWS_CASCADE0,
+    Q_SHADOWS_CASCADE1,
+    Q_SHADOWS_CASCADE2,
+    Q_SHADOWS_CASCADE3,
+    Q_SHADOW_POSTPROCESS,
+    Q_SOLID_PASS1,
+    Q_RSM,
+    Q_RH,
+    Q_GI,
+    Q_ENVMAP,
+    Q_SUN,
+    Q_POINTLIGHTS,
+    Q_SSAO,
+    Q_SOLID_PASS2,
+    Q_FOG,
+    Q_SKYBOX,
+    Q_GLOW,
+    Q_TRANSPARENT,
+    Q_PARTICLES,
+    Q_DISPLACEMENT,
+    Q_DOF,
+    Q_GODRAYS,
+    Q_BLOOM,
+    Q_TONEMAP,
+    Q_MOTIONBLUR,
+    Q_LIGHTNING,
+    Q_MLAA,
+    Q_GUI,
+    Q_LAST
+};
 
 class Profiler;
 extern Profiler profiler;
+
+double getTimeMilliseconds();
 
 #define ENABLE_PROFILER
 
@@ -49,6 +88,42 @@ extern Profiler profiler;
 #endif
 
 using namespace irr;
+
+/** For profiling reports, we need a custom strijng stream that writes to a large
+    pre-allocated buffer, to avoid allocating as much as possible durign profiling */
+template <typename char_type>
+struct ostreambuf : public std::basic_streambuf<char_type, std::char_traits<char_type> >
+{
+    ostreambuf(char_type* buffer, std::streamsize bufferLength)
+    {
+        // set the "put" pointer the start of the buffer and record it's length.
+        this->setp(buffer, buffer + bufferLength);
+    }
+};
+
+
+class StringBuffer
+{
+private:
+    char* m_buffer;
+    ostreambuf<char> ostreamBuffer;
+    std::ostream messageStream;
+
+public:
+
+    StringBuffer(unsigned int size) : m_buffer((char*)calloc(size, 1)), ostreamBuffer(m_buffer, size), messageStream(&ostreamBuffer)
+    {
+    }
+
+    ~StringBuffer()
+    {
+        free(m_buffer);
+    }
+
+    std::ostream& getStdStream() { return messageStream; }
+
+    char* getRawBuffer() { return m_buffer; }
+};
 
 /**
   * \brief class that allows run-time graphical profiling through the use of markers
@@ -77,8 +152,8 @@ private:
         }
     };
 
-    typedef	std::list<Marker>   MarkerList;
-    typedef	std::stack<Marker>  MarkerStack;
+    typedef    std::list<Marker>   MarkerList;
+    typedef    std::stack<Marker>  MarkerStack;
 
     struct ThreadInfo
     {
@@ -86,7 +161,7 @@ private:
         MarkerStack  markers_stack[2];
     };
 
-    typedef	std::vector<ThreadInfo>	ThreadInfoList;
+    typedef    std::vector<ThreadInfo>  ThreadInfoList;
 
     ThreadInfoList  m_thread_infos;
     int             m_write_id;
@@ -104,6 +179,12 @@ private:
 
     FreezeState     m_freeze_state;
 
+    bool m_capture_report;
+    bool m_first_capture_sweep;
+    bool m_first_gpu_capture_sweep;
+    StringBuffer* m_capture_report_buffer;
+    StringBuffer* m_gpu_capture_report_buffer;
+
 public:
     Profiler();
     virtual ~Profiler();
@@ -116,10 +197,17 @@ public:
 
     void    onClick(const core::vector2di& mouse_pos);
 
+    bool getCaptureReport() const { return m_capture_report; }
+    void setCaptureReport(bool captureReport);
+
+    bool isFrozen() const { return m_freeze_state == FROZEN; }
+
 protected:
     // TODO: detect on which thread this is called to support multithreading
     ThreadInfo& getThreadInfo() { return m_thread_infos[0]; }
     void        drawBackground();
+
+
 };
 
 #endif // PROFILER_HPP

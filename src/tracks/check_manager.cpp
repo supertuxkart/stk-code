@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009  Joerg Henrichs
+//  Copyright (C) 2009-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -59,12 +59,11 @@ void CheckManager::load(const XMLNode &node)
         }
         else if(type=="check-sphere")
         {
-            AmbientLightSphere *cs = new AmbientLightSphere(*check_node,
-                                                            i);
+            CheckSphere *cs = new CheckSphere(*check_node, i);
             m_all_checks.push_back(cs);
         }   // checksphere
         else
-            printf("Unknown check structure '%s' - ignored.\n", type.c_str());
+            Log::warn("CheckManager", "Unknown check structure '%s' - ignored.", type.c_str());
     }   // for i<node.getNumNodes
 
     // Now set all 'successors', i.e. check structures that need to get a
@@ -141,18 +140,16 @@ unsigned int CheckManager::getLapLineIndex() const
 
         if (dynamic_cast<CheckLap*>(c) != NULL) return i;
     }
-    fprintf(stderr,
-           "No check-lap structure found! This can cause incorrect kart\n");
-    fprintf(stderr,
-           "ranking when crossing the line, but can otherwise be ignored.\n");
+    Log::warn("CheckManager", "No check-lap structure found! This can cause incorrect kart");
+    Log::warn("CheckManager", "ranking when crossing the line, but can otherwise be ignored.");
     for (unsigned int i=0; i<getCheckStructureCount(); i++)
     {
         if(getCheckStructure(i)->getType()==CheckStructure::CT_NEW_LAP)
             return i;
     }
 
-    fprintf(stderr, "Error, no kind of lap line for track found, aborting.\n");
-    exit(-1);
+    Log::fatal("CheckManager", "Error, no kind of lap line for track found, aborting.");
+    return -1;
 }   // getLapLineIndex
 
 // ----------------------------------------------------------------------------
@@ -171,7 +168,7 @@ int CheckManager::getChecklineTriggering(const Vec3 &from,
         // FIXME: why is the lapline skipped?
         if (dynamic_cast<CheckLap*>(c) != NULL) continue;
 
-        if (c->isTriggered(from, to, 0 /* kart id */))
+        if (c->isTriggered(from, to, -1 /* kart id */))
             return i;
     }
     return -1;

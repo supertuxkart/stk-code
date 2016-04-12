@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -288,7 +288,7 @@ namespace GUIEngine
 
  \n
  \subsection prop2 PROP_TEXT
- <em> Name in XML files: </em> \c "text"
+ <em> Name in XML files: </em> \c "text" or "raw_text" ("text" is translated, "raw_text" is not)
 
  gives text (a label) to the widget where supported. Ribbon-grids give a
  special meaning to this parameter, see ribbon-grid docs above.
@@ -485,7 +485,15 @@ namespace GUIEngine
 
  Used on divs, indicate by how many pixels to pad contents
 
- 
+
+ \n
+ \subsection prop20 PROP_KEEP_SELECTION
+ <em> Name in XML files: </em> \c "keep_selection"
+
+ Used on lists, indicates that the list should keep showing the selected item
+ even when it doesn't have the focus
+
+
  \n
  <HR>
  \section code Using the engine in code
@@ -648,22 +656,27 @@ namespace GUIEngine
 
 #include "guiengine/engine.hpp"
 
-#include "io/file_manager.hpp"
-#include "graphics/irr_driver.hpp"
+#include "config/user_config.hpp"
+#include "graphics/2dutils.hpp"
 #include "input/input_manager.hpp"
+#include "io/file_manager.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/dialog_queue.hpp"
 #include "modes/demo_world.hpp"
+#include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
 
 #include <iostream>
 #include <assert.h>
 #include <irrlicht.h>
+#include "graphics/glwrap.hpp"
 
 using namespace irr::gui;
 using namespace irr::video;
@@ -675,11 +688,14 @@ namespace GUIEngine
     {
         IGUIEnvironment* g_env;
         Skin* g_skin = NULL;
-        ScalableFont* g_font;
-        ScalableFont* g_large_font;
-        ScalableFont* g_title_font;
-        ScalableFont* g_small_font;
-        ScalableFont* g_digit_font;
+        FTEnvironment* g_ft_env = NULL;
+        GlyphPageCreator* g_gp_creator = NULL;
+        ScalableFont *g_font;
+        ScalableFont *g_outline_font;
+        ScalableFont *g_large_font;
+        ScalableFont *g_title_font;
+        ScalableFont *g_small_font;
+        ScalableFont *g_digit_font;
 
         IrrlichtDevice* g_device;
         IVideoDriver* g_driver;
@@ -721,24 +737,10 @@ namespace GUIEngine
     std::vector<MenuMessage> gui_messages;
 
     // ------------------------------------------------------------------------
-    Screen* getScreenNamed(const char* name)
-    {
-        const int screenCount = g_loaded_screens.size();
-        for (int n=0; n<screenCount; n++)
-        {
-            if (g_loaded_screens[n].getName() == name)
-            {
-                return g_loaded_screens.get(n);
-            }
-        }
-        return NULL;
-    }   // getScreenNamed
-
-    // ------------------------------------------------------------------------
     void showMessage(const wchar_t* message, const float time)
     {
         // check for duplicates
-        const int count = gui_messages.size();
+        const int count = (int) gui_messages.size();
         for (int n=0; n<count; n++)
         {
             if (gui_messages[n].m_message == message) return;
@@ -750,16 +752,15 @@ namespace GUIEngine
     }   // showMessage
 
     // ------------------------------------------------------------------------
-    Widget* getFocusForPlayer(const int playerID)
+    Widget* getFocusForPlayer(const unsigned int playerID)
     {
-        assert(playerID >= 0);
         assert(playerID < MAX_PLAYER_COUNT);
 
         return g_focus_for_player[playerID];
     }   // getFocusForPlayer
 
     // ------------------------------------------------------------------------
-    void focusNothingForPlayer(const int playerID)
+    void focusNothingForPlayer(const unsigned int playerID)
     {
         Widget* focus = getFocusForPlayer(playerID);
         if (focus != NULL) focus->unsetFocusForPlayer(playerID);
@@ -768,10 +769,9 @@ namespace GUIEngine
     }   // focusNothingForPlayer
 
     // ------------------------------------------------------------------------
-    bool isFocusedForPlayer(const Widget* w, const int playerID)
+    bool isFocusedForPlayer(const Widget* w, const unsigned int playerID)
     {
         assert(w != NULL);
-        assert(playerID >= 0);
         assert(playerID < MAX_PLAYER_COUNT);
 
         // If no focus
@@ -799,13 +799,14 @@ namespace GUIEngine
     {
         return Private::small_font_height;
     }   // getSmallFontHeight
-
+ 
     // ------------------------------------------------------------------------
     int getLargeFontHeight()
-    {
+   {
+
         return Private::large_font_height;
     }   // getSmallFontHeight
-
+        
     // ------------------------------------------------------------------------
     void clear()
     {
@@ -830,13 +831,24 @@ namespace GUIEngine
         {
             // This code needs to go outside beginScene() / endScene() since
             // the model view widget will do off-screen rendering there
-            GUIEngine::Widget* widget;
-            for_in (widget, GUIEngine::needsUpdate)
+            for_var_in(GUIEngine::Widget*, widget, GUIEngine::needsUpdate)
             {
                 widget->update(dt);
             }
+            if (state == GUIEngine::MENU) DialogQueue::get()->update();
         }
 
+        // Hack : on the first frame, irrlicht processes all events that have been queued
+        // during the loading screen. So way until the second frame to start processing events.
+        // (Events queues during the loading screens are likely the user clicking on the
+        // frame to focus it, or similar, and should not be used as a game event)
+        static int frame = 0;
+        if (frame < 2)
+        {
+            frame++;
+            if (frame == 2)
+                GUIEngine::EventHandler::get()->startAcceptingEvents();
+        }
     }
     // ------------------------------------------------------------------------
 
@@ -905,6 +917,25 @@ namespace GUIEngine
     }   // addScreenToList
 
     // ------------------------------------------------------------------------
+
+    void removeScreen(const char* name)
+    {
+        const int screen_amount = g_loaded_screens.size();
+        for(int n=0; n<screen_amount; n++)
+        {
+            if (g_loaded_screens[n].getName() == name)
+            {
+                g_current_screen = g_loaded_screens.get(n);
+                g_current_screen->unload();
+                delete g_current_screen;
+                g_current_screen = NULL;
+                g_loaded_screens.remove(n);
+                break;
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
     void reshowCurrentScreen()
     {
         needsUpdate.clearWithoutDeleting();
@@ -923,7 +954,12 @@ namespace GUIEngine
         //if (g_skin != NULL) delete g_skin;
         g_skin = NULL;
 
-        for (int i=0; i<g_loaded_screens.size(); i++)
+        g_ft_env->~FTEnvironment();
+        g_ft_env = NULL;
+        g_gp_creator->~GlyphPageCreator();
+        g_gp_creator = NULL;
+
+        for (unsigned int i=0; i<g_loaded_screens.size(); i++)
         {
             g_loaded_screens[i].unload();
         }
@@ -942,12 +978,27 @@ namespace GUIEngine
         //delete g_small_font;
         g_small_font->drop();
         g_small_font = NULL;
+        g_large_font->drop();
+        g_large_font = NULL;
         g_digit_font->drop();
         g_digit_font = NULL;
+        g_outline_font->drop();
+        g_outline_font = NULL;
 
         // nothing else to delete for now AFAIK, irrlicht will automatically
         // kill everything along the device
     }   // cleanUp
+
+    // -----------------------------------------------------------------------
+     void cleanHollowCopyFont()
+    {
+        g_small_font->drop();
+        g_small_font = NULL;
+        g_large_font->drop();
+        g_large_font = NULL;
+        g_outline_font->drop();
+        g_outline_font = NULL;
+    }   // cleanHollowCopyFont
 
     // -----------------------------------------------------------------------
 
@@ -971,10 +1022,13 @@ namespace GUIEngine
         g_driver = driver_a;
         g_state_manager = state_manager;
 
-        for (int n=0; n<MAX_PLAYER_COUNT; n++)
+        for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
         {
             g_focus_for_player[n] = NULL;
         }
+
+        g_ft_env = new FTEnvironment();
+        g_gp_creator = new GlyphPageCreator();
 
         /*
          To make the g_font a little bit nicer, we load an external g_font
@@ -989,12 +1043,10 @@ namespace GUIEngine
             g_skin->drop(); // GUI env grabbed it
             assert(g_skin->getReferenceCount() == 1);
         }
-        catch (std::runtime_error& err)
+        catch (std::runtime_error& /*err*/)
         {
-            (void)err;   // avoid warning about unused variable
-            std::cerr <<
-                "ERROR, cannot load skin specified in user config. Falling "
-                "back to defaults.\n";
+            Log::error("Engine::init", "Cannot load skin specified in user config. "
+                "Falling back to defaults.");
             UserConfigParams::m_skin_file.revertToDefaults();
 
             try
@@ -1006,63 +1058,47 @@ namespace GUIEngine
             }
             catch (std::runtime_error& err)
             {
-                std::cerr << "FATAL, cannot load default GUI skin\n";
-                throw err;
+                (void)err;
+                Log::fatal("Engine::init", "Canot load default GUI skin");
             }
         }
 
-        // font size is resolution-dependent.
-        // normal text will range from 0.8, in 640x* resolutions (won't scale
-        // below that) to 1.0, in 1024x* resolutions, and linearly up
-        // normal text will range from 0.2, in 640x* resolutions (won't scale
-        // below that) to 0.4, in 1024x* resolutions, and linearly up
-        const int screen_width = irr_driver->getFrameSize().Width;
-        const float normal_text_scale =
-            0.7f + 0.2f*std::max(0, screen_width - 640)/564.0f;
-        const float title_text_scale =
-            0.2f + 0.2f*std::max(0, screen_width - 640)/564.0f;
-
-        ScalableFont* sfont =
-            new ScalableFont(g_env,
-                            file_manager->getFontFile("StkFont.xml").c_str());
-        sfont->setScale(normal_text_scale);
-        sfont->setKerningHeight(-5);
-        g_font = sfont;
-
-        ScalableFont* digit_font =
-            new ScalableFont(g_env,
-                             file_manager->getFontFile("BigDigitFont.xml").c_str());
-        digit_font->lazyLoadTexture(0); // make sure the texture is loaded for this one
+        ScalableFont* digit_font =new ScalableFont(g_env,T_DIGIT);
+        digit_font->setMonospaceDigits(true);
         g_digit_font = digit_font;
 
+        ScalableFont* sfont2 =new ScalableFont(g_env,T_BOLD);
+        sfont2->setKerningWidth(0);
+        // Because the fallback font is much smaller than the title font:
+        sfont2->m_fallback_font_scale = 2.0f;
+        sfont2->m_fallback_kerning_width = 0;
+
+        ScalableFont* sfont =new ScalableFont(g_env,T_NORMAL);
+        sfont->setKerningHeight(0);
+        sfont->setScale(1);
+        g_font = sfont;
         Private::font_height = g_font->getDimension( L"X" ).Height;
 
-
         ScalableFont* sfont_larger = sfont->getHollowCopy();
-        sfont_larger->setScale(normal_text_scale*1.4f);
-        sfont_larger->setKerningHeight(-5);
+        sfont_larger->setScale(1.4f);
+        sfont_larger->setKerningHeight(0);
         g_large_font = sfont_larger;
+
+        g_outline_font = sfont->getHollowCopy();
+        g_outline_font->m_black_border = true;
 
         Private::large_font_height = g_large_font->getDimension( L"X" ).Height;
 
         ScalableFont* sfont_smaller = sfont->getHollowCopy();
-        sfont_smaller->setScale(normal_text_scale*0.8f);
-        sfont_smaller->setKerningHeight(-5);
+        sfont_smaller->setScale(0.8f);
+        sfont_smaller->setKerningHeight(0);
         g_small_font = sfont_smaller;
 
         Private::small_font_height =
             g_small_font->getDimension( L"X" ).Height;
 
-
-        ScalableFont* sfont2 =
-            new ScalableFont(g_env,
-                          file_manager->getFontFile("title_font.xml").c_str());
         sfont2->m_fallback_font = sfont;
-        // Because the fallback font is much smaller than the title font:
-        sfont2->m_fallback_font_scale = 4.0f;
-        sfont2->m_fallback_kerning_width = 15;
-        sfont2->setScale(title_text_scale);
-        sfont2->setKerningWidth(-18);
+        sfont2->setScale(1);
         sfont2->m_black_border = true;
         g_title_font = sfont2;
         Private::title_font_height =
@@ -1081,6 +1117,32 @@ namespace GUIEngine
     }   // init
 
     // -----------------------------------------------------------------------
+    void reloadHollowCopyFont(irr::gui::ScalableFont* sfont)
+    {
+        //Base on the init function above
+        sfont->setScale(1);
+        sfont->setKerningHeight(0);
+        Private::font_height = sfont->getDimension( L"X" ).Height;
+
+        ScalableFont* sfont_larger = sfont->getHollowCopy();
+        sfont_larger->setScale(1.4f);
+        sfont_larger->setKerningHeight(0);
+        g_large_font = sfont_larger;
+
+        g_outline_font = sfont->getHollowCopy();
+        g_outline_font->m_black_border = true;
+
+        Private::large_font_height = g_large_font->getDimension( L"X" ).Height;
+
+        ScalableFont* sfont_smaller = sfont->getHollowCopy();
+        sfont_smaller->setScale(0.8f);
+        sfont_smaller->setKerningHeight(0);
+        g_small_font = sfont_smaller;
+
+        Private::small_font_height =  g_small_font->getDimension( L"X" ).Height;
+    }   // reloadHollowCopyFont
+
+    // -----------------------------------------------------------------------
     void reloadSkin()
     {
         assert(g_skin != NULL);
@@ -1094,10 +1156,9 @@ namespace GUIEngine
             // one so that the fallback skin is not dropped
             newSkin = new Skin(fallbackSkin);
         }
-        catch (std::runtime_error& err)
+        catch (std::runtime_error& /*err*/)
         {
-            (void)err;  // avoid warning about unused variable
-            std::cerr << "ERROR, cannot load newly specified skin!\n";
+            Log::error("Engine::reloadSkin", "Canot load newly specified skin");
             return;
         }
 
@@ -1154,7 +1215,7 @@ namespace GUIEngine
             if (ModalDialog::isADialogActive())
                 ModalDialog::getCurrent()->onUpdate(dt);
             else
-                getCurrentScreen()->onUpdate(elapsed_time, g_driver);
+                getCurrentScreen()->onUpdate(elapsed_time);
         }
         else
         {
@@ -1169,6 +1230,13 @@ namespace GUIEngine
             }
         }
 
+        MessageQueue::update(elapsed_time);
+
+        if (gamestate == INGAME_MENU && dynamic_cast<CutsceneWorld*>(World::getWorld()) != NULL)
+        {
+            RaceGUIBase* rg = World::getWorld()->getRaceGUI();
+            if (rg != NULL) rg->renderGlobal(elapsed_time);
+        }
 
         if (gamestate == MENU || gamestate == INGAME_MENU)
         {
@@ -1196,7 +1264,7 @@ namespace GUIEngine
                                 core::dimension2d<s32>(screen_size.Width,
                                                        text_height) );
 
-                    Private::g_driver->draw2DRectangle(SColor(255,252,248,230),
+                    GL32_draw2DRectangle(SColor(255,252,248,230),
                                                        msgRect);
                     Private::g_font->draw((*it).m_message.c_str(),
                                           msgRect,
@@ -1235,7 +1303,6 @@ namespace GUIEngine
     }   // render
 
     // -----------------------------------------------------------------------
-
     std::vector<irr::video::ITexture*> g_loading_icons;
 
     void renderLoading(bool clearIcons)
@@ -1244,8 +1311,14 @@ namespace GUIEngine
 
         g_skin->drawBgImage();
         ITexture* loading =
-            irr_driver->getTexture(file_manager->getGUIDir()+"loading.png");
+            irr_driver->getTexture(file_manager->getAsset(FileManager::GUI,
+                                                          "loading.png"));
 
+        if(!loading)
+        {
+            Log::fatal("Engine", "Can not find loading.png texture, aborting.");
+            exit(-1);
+        }
         const int texture_w = loading->getSize().Width;
         const int texture_h = loading->getSize().Height;
 
@@ -1263,7 +1336,7 @@ namespace GUIEngine
         const core::rect< s32 > source_area =
             core::rect< s32 >(0, 0, texture_w, texture_h);
 
-        GUIEngine::getDriver()->draw2DImage( loading, dest_area, source_area,
+        draw2DImage( loading, dest_area, source_area,
                                             0 /* no clipping */, 0,
                                             true /* alpha */);
 
@@ -1276,14 +1349,14 @@ namespace GUIEngine
                            SColor(255,255,255,255),
                            true/* center h */, false /* center v */ );
 
-        const int icon_count = g_loading_icons.size();
+        const int icon_count = (int)g_loading_icons.size();
         const int icon_size = (int)(screen_w / 16.0f);
         const int ICON_MARGIN = 6;
         int x = ICON_MARGIN;
         int y = screen_h - icon_size - ICON_MARGIN;
         for (int n=0; n<icon_count; n++)
         {
-            g_driver->draw2DImage(g_loading_icons[n],
+            draw2DImage(g_loading_icons[n],
                               core::rect<s32>(x, y, x+icon_size, y+icon_size),
                               core::rect<s32>(core::position2d<s32>(0, 0),
                                               g_loading_icons[n]->getSize()),
@@ -1315,8 +1388,8 @@ namespace GUIEngine
         }
         else
         {
-            std::cerr << "WARNING: GUIEngine::addLoadingIcon given "
-                         "NULL icon\n";
+            Log::warn("Engine::addLoadingIcon", "Given "
+                "NULL icon");
         }
     } // addLoadingIcon
 

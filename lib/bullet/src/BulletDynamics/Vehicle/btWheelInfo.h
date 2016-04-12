@@ -22,7 +22,7 @@ struct btWheelInfoConstructionInfo
 	btVector3	m_wheelDirectionCS;
 	btVector3	m_wheelAxleCS;
 	btScalar	m_suspensionRestLength;
-	btScalar	m_maxSuspensionTravelCm;
+	btScalar	m_maxSuspensionTravel;
 	btScalar	m_wheelRadius;
 	
 	btScalar		m_suspensionStiffness;
@@ -48,6 +48,7 @@ struct btWheelInfo
 		btVector3	m_wheelAxleWS; // axle in worldspace
 		bool		m_isInContact;
 		void*		m_groundObject; //could be general void* ptr
+        int         m_triangle_index; // if a triangle mesh was hit, the index of the triangle.
 	};
 
 	RaycastInfo	m_raycastInfo;
@@ -58,7 +59,7 @@ struct btWheelInfo
 	btVector3	m_wheelDirectionCS;//const
 	btVector3	m_wheelAxleCS; // const or modified by steering
 	btScalar	m_suspensionRestLength1;//const
-	btScalar	m_maxSuspensionTravelCm;
+	btScalar	m_maxSuspensionTravel;
 	btScalar getSuspensionRestLength() const;
 	btScalar	m_wheelsRadius;//const
 	btScalar	m_suspensionStiffness;//const
@@ -66,8 +67,6 @@ struct btWheelInfo
 	btScalar	m_wheelsDampingRelaxation;//const
 	btScalar	m_frictionSlip;
 	btScalar	m_steering;
-	btScalar	m_rotation;
-	btScalar	m_deltaRotation;
 	btScalar	m_rollInfluence;
 	btScalar	m_maxSuspensionForce;
 
@@ -77,6 +76,8 @@ struct btWheelInfo
 	
 	bool m_bIsFrontWheel;
 	
+    bool m_was_on_ground;
+
 	void*		m_clientInfo;//can be used to store pointer to sync transforms...
 
 	btWheelInfo(btWheelInfoConstructionInfo& ci)
@@ -84,7 +85,7 @@ struct btWheelInfo
 	{
 
 		m_suspensionRestLength1 = ci.m_suspensionRestLength;
-		m_maxSuspensionTravelCm = ci.m_maxSuspensionTravelCm;
+		m_maxSuspensionTravel   = ci.m_maxSuspensionTravel;
 
 		m_wheelsRadius = ci.m_wheelRadius;
 		m_suspensionStiffness = ci.m_suspensionStiffness;
@@ -96,13 +97,11 @@ struct btWheelInfo
 		m_frictionSlip = ci.m_frictionSlip;
 		m_steering = btScalar(0.);
 		m_engineForce = btScalar(0.);
-		m_rotation = btScalar(0.);
-		m_deltaRotation = btScalar(0.);
 		m_brake = btScalar(0.);
 		m_rollInfluence = btScalar(0.1);
 		m_bIsFrontWheel = ci.m_bIsFrontWheel;
 		m_maxSuspensionForce = ci.m_maxSuspensionForce;
-
+        m_was_on_ground = true;
 	}
 
 	void	updateWheel(const btRigidBody& chassis,RaycastInfo& raycastInfo);

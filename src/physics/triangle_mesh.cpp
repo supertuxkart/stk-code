@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -33,6 +33,7 @@
 TriangleMesh::TriangleMesh() : m_mesh()
 {
     m_body             = NULL;
+    m_free_body        = true;
     m_motion_state     = NULL;
     // FIXME: on VS in release mode this statement actually overwrites
     // part of the data of m_mesh, causing a crash later. Debugging
@@ -76,6 +77,11 @@ void TriangleMesh::addTriangle(const btVector3 &t1, const btVector3 &t2,
     m_normals.push_back( normal.angle(n3)>stk_config->m_smooth_angle_limit
                          ? normal : n3                                     );
     m_mesh.addTriangle(t1, t2, t3);
+
+    // Area of triangle ABC
+    btVector3 edge1 = t2 - t1;
+    btVector3 edge2 = t3 - t1;
+    m_p1p2p3.push_back(edge1.cross(edge2).length2());
 }   // addTriangle
 
 // -----------------------------------------------------------------------------
@@ -102,6 +108,7 @@ void TriangleMesh::createCollisionShape(bool create_collision_object, const char
         FILE *f = fopen(serialized_bhv, "rb");
         fseek(f, 0, SEEK_END);
         long pos = ftell(f);
+        assert(pos != -1L);
         fseek(f, 0, SEEK_SET);
 
         void* bytes = btAlignedAlloc(pos, 16);
@@ -111,7 +118,7 @@ void TriangleMesh::createCollisionShape(bool create_collision_object, const char
         btOptimizedBvh* bhv = btOptimizedBvh::deSerializeInPlace(bytes, pos, !IS_LITTLE_ENDIAN);
         if (bhv == NULL)
         {
-            fprintf(stderr, "[TriangleMesh] WARNING, failed to load serialized BHV\n");
+            Log::warn("TriangleMesh", "Failed to load serialized BHV");
             bhv_triangle_mesh = new btBvhTriangleMeshShape(&m_mesh, false /* useQuantizedAabbCompression */);
         }
         else
@@ -199,7 +206,8 @@ void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags,
  */
 void TriangleMesh::removeAll()
 {
-    if(m_body)
+    // Don't free the physical body if it was created outside this object.
+    if(m_body && m_free_body)
     {
         World::getWorld()->getPhysics()->removeBody(m_body);
         delete m_body;
@@ -225,24 +233,22 @@ void TriangleMesh::removeAll()
 btVector3 TriangleMesh::getInterpolatedNormal(unsigned int index,
                                               const btVector3 &position) const
 {
-    btVector3 p1, p2, p3;
+    btVector3 *p1, *p2, *p3;
     getTriangle(index, &p1, &p2, &p3);
-    btVector3 n1, n2, n3;
+    const btVector3 *n1, *n2, *n3;
     getNormals(index, &n1, &n2, &n3);
 
     // Compute the Barycentric coordinates of position inside  triangle
     // p1, p2, p3.
-    btVector3 edge1 = p2 - p1;
-    btVector3 edge2 = p3 - p1;
 
-    // Area of triangle ABC
-    btScalar p1p2p3 = edge1.cross(edge2).length2();
+    btScalar p1p2p3 = getP1P2P3(index);
 
     // Area of BCP
-    btScalar p2p3p = (p3 - p2).cross(position - p2).length2();
+    btScalar p2p3p = (*p3 - *p2).cross(position - *p2).length2();
 
     // Area of CAP
-    btScalar p3p1p = edge2.cross(position - p3).length2();
+    btVector3 edge2 = *p3 - *p1;
+    btScalar p3p1p = edge2.cross(position - *p3).length2();
     btScalar s = btSqrt(p2p3p / p1p2p3);
     btScalar t = btSqrt(p3p1p / p1p2p3);
     btScalar w = 1.0f - s - t;
@@ -263,22 +269,26 @@ btVector3 TriangleMesh::getInterpolatedNormal(unsigned int index,
     }
 #endif
 
-    return s*n1 + t*n2 + w*n3;
+    return s*(*n1) + t*(*n2) + w*(*n3);
 }   // getInterpolatedNormal
 
 // ----------------------------------------------------------------------------
 /** Casts a ray from 'from' to 'to'. If a triangle of this mesh was hit,
  *  xyz and material will be set.
- *  \param from/to The from and to position for the raycast/
+ *  \param from/to The from and to position for the raycast.
  *  \param xyz The position in world where the ray hit.
  *  \param material The material of the mesh that was hit.
  *  \param normal The intrapolated normal at that position.
+ *  \param interpolate_normal If true, the returned normal is the interpolated
+ *         based on the three normals of the triangle and the location of the
+ *         hit point (which is more compute intensive, but results in much
+ *         smoother results).
  *  \return True if a triangle was hit, false otherwise (and no output
  *          variable will be set.
  */
 bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
                            btVector3 *xyz, const Material **material,
-                           btVector3 *normal) const
+                           btVector3 *normal, bool interpolate_normal) const
 {
     if(!m_collision_shape)
     {
@@ -295,30 +305,33 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
     trans_to.setOrigin(to);
 
     btTransform world_trans;
-    world_trans.setIdentity();
+    // If there is a body, take the current transform from the body.
+    if(m_body)
+        world_trans = m_body->getWorldTransform();
+    else
+        world_trans.setIdentity();
 
     btCollisionWorld::ClosestRayResultCallback result(from, to);
 
-
+    /** A special ray result class that stores the index of the triangle
+     *  that was hit. */
     class MaterialRayResult : public btCollisionWorld::ClosestRayResultCallback
     {
     public:
-        const Material* m_material;
-        const TriangleMesh *m_this;
+        /** Stores the index of the triangle that was hit. */
+        int m_index;
         // --------------------------------------------------------------------
         MaterialRayResult(const btVector3 &p1, const btVector3 &p2,
                           const TriangleMesh *me)
                         : btCollisionWorld::ClosestRayResultCallback(p1,p2)
         {
-            m_material = NULL;
-            m_this     = me;
+            m_index = -1;;
         }   // MaterialRayResult
         // --------------------------------------------------------------------
         virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,
                                          bool normalInWorldSpace)
         {
-            m_material =
-                m_this->getMaterial(rayResult.m_localShapeInfo->m_triangleIndex);
+            m_index = rayResult.m_localShapeInfo->m_triangleIndex;
             return btCollisionWorld::ClosestRayResultCallback
                     ::addSingleResult(rayResult, normalInWorldSpace);
         }   // AddSingleResult
@@ -330,17 +343,26 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
     // If this is a rigid body, m_collision_object is NULL, and the
     // rigid body is the actual collision object.
     btCollisionWorld::rayTestSingle(trans_from, trans_to,
-                                    m_collision_object ? m_collision_object
-                                                       : m_body,
+                                    m_collision_object ? m_collision_object : m_body,
                                     m_collision_shape, world_trans,
                                     ray_callback);
+    // Get the index of the triangle hit
+    int index = ray_callback.m_index;
     if(ray_callback.hasHit())
     {
         *xyz      = ray_callback.m_hitPointWorld;
-        *material = ray_callback.m_material;
+        *material = m_triangleIndex2Material[index];
+
         if(normal)
         {
-            *normal   = ray_callback.m_hitNormalWorld;
+            // If requested interpolate the normal. I.e. instead of using
+            // the normal of the triangle interpolate the normal at the
+            // hit position based on the three normals of the triangle.
+            if(interpolate_normal)
+                *normal = getInterpolatedNormal(ray_callback.m_index,
+                                                ray_callback.m_hitPointWorld);
+            else
+                *normal = ray_callback.m_hitNormalWorld;
             normal->normalize();
         }
     }

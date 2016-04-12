@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin
+//  Copyright (C) 2010-2015 Lucas Baudin
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,18 +23,17 @@
 #include "addons/addons_manager.hpp"
 #include "guiengine/widgets.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/synchronised.hpp"
 
-class Request;
+namespace Online { class HTTPRequest; }
 
 /**
   * \ingroup states_screens
   */
 class AddonsLoading : public GUIEngine::ModalDialog
 {
-  virtual void escapePressed();
 private:
-    GUIEngine::LabelWidget       *m_state;
     GUIEngine::ProgressBarWidget *m_progress;
     GUIEngine::IconButtonWidget  *m_back_button;
     GUIEngine::IconButtonWidget  *m_install_button;
@@ -53,25 +52,24 @@ private:
 
     /** A pointer to the download request, which gives access
      *  to the progress of a download. */
-    Request *m_download_request;
+    Online::HTTPRequest *m_download_request;
 
 public:
-            AddonsLoading(const float percent_width, 
-                          const float percent_height,
-                          const std::string &addon_name);
-    
-           ~AddonsLoading();
-    virtual GUIEngine::EventPropagation processEvent(const std::string& event_source);
-    
-    virtual void beforeAddingWidgets();
-    
-    virtual void init();
+    AddonsLoading(const std::string &addon_name);
+
+   ~AddonsLoading();
+
+    virtual GUIEngine::EventPropagation processEvent(const std::string& event_source) OVERRIDE;
+    virtual void beforeAddingWidgets() OVERRIDE;
+    virtual void init() OVERRIDE;
     
     /** This function is called by the GUI, all the frame (or somthing like
      * that). It checks the flags (m_can_load_icon and
      *  and do the necessary.
      * */
-    void onUpdate(float delta);
+    void onUpdate(float delta) OVERRIDE;
+    void voteClicked();
+    virtual bool onEscapePressed() OVERRIDE;
     
 };   // AddonsLoading
 

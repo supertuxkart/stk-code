@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,11 +19,8 @@
 #ifndef HEADER_KART_MOTION_STATE_HPP
 #define HEADER_KART_MOTION_STATE_HPP
 
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
+#include <cmath>
+#include "utils/vs.hpp"
 
 #include "LinearMath/btMotionState.h"
 
@@ -66,13 +63,13 @@ public:
      */
     virtual void setWorldTransform(const btTransform &new_trans)
     {
-        assert(!isnan(new_trans.getOrigin().getX()));
-        assert(!isnan(new_trans.getOrigin().getY()));
-        assert(!isnan(new_trans.getOrigin().getZ()));
-        assert(!isnan(new_trans.getRotation().getX()));
-        assert(!isnan(new_trans.getRotation().getY()));
-        assert(!isnan(new_trans.getRotation().getZ()));
-        assert(!isnan(new_trans.getRotation().getW()));
+        assert(!std::isnan(new_trans.getOrigin().getX()));
+        assert(!std::isnan(new_trans.getOrigin().getY()));
+        assert(!std::isnan(new_trans.getOrigin().getZ()));
+        assert(!std::isnan(new_trans.getRotation().getX()));
+        assert(!std::isnan(new_trans.getRotation().getY()));
+        assert(!std::isnan(new_trans.getRotation().getZ()));
+        assert(!std::isnan(new_trans.getRotation().getW()));
         m_center_of_mass = new_trans;
     }   // setWorldTransform
 

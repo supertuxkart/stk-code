@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011  Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2011-2015  Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,13 +18,18 @@
 
 #include "graphics/particle_emitter.hpp"
 
+#include "graphics/central_settings.hpp"
+#include "graphics/gpu_particles.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/shaders.hpp"
+#include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/helpers.hpp"
 
 #include <SParticle.h>
 #include <IParticleAffector.h>
@@ -32,6 +37,8 @@
 #include <IParticleSystemSceneNode.h>
 #include <IParticleBoxEmitter.h>
 #include <ISceneManager.h>
+
+#include <algorithm>
 
 class FadeAwayAffector : public scene::IParticleAffector
 {
@@ -173,12 +180,118 @@ public:
     }
 };
 
+// ============================================================================
+
+class WindAffector : public scene::IParticleAffector
+{
+    /** (Squared) distance from camera at which a particle is completely faded out */
+    float m_speed;
+    float m_seed;
+
+public:
+    WindAffector(float speed): m_speed(speed)
+    {
+        m_seed = (float)((rand() % 1000) - 500);
+    }
+
+    // ------------------------------------------------------------------------
+
+    virtual void affect(u32 now, scene::SParticle* particlearray, u32 count)
+    {
+        const float time = irr_driver->getDevice()->getTimer()->getTime() / 10000.0f;
+        core::vector3df dir = irr_driver->getWind();
+        dir *= m_speed * std::min(noise2d(time, m_seed), -0.2f);
+
+        for (u32 n = 0; n < count; n++)
+        {
+            scene::SParticle& cur = particlearray[n];
+
+            cur.pos += dir;
+        }   // for n<count
+    }   // affect
+
+    // ------------------------------------------------------------------------
+
+    virtual scene::E_PARTICLE_AFFECTOR_TYPE getType() const
+    {
+        // FIXME: this method seems to make sense only for built-in affectors
+        return scene::EPAT_FADE_OUT;
+    }
+
+};   // WindAffector
+
+// ============================================================================
+
+class ScaleAffector : public scene::IParticleAffector
+{
+public:
+    ScaleAffector(const core::vector2df& scaleFactor = core::vector2df(1.0f, 1.0f)) : ScaleFactor(scaleFactor)
+    {
+    }
+
+    virtual void affect(u32 now, scene::SParticle *particlearray, u32 count)
+    {
+        for (u32 i = 0; i<count; i++)
+        {
+            const u32 maxdiff = particlearray[i].endTime - particlearray[i].startTime;
+            const u32 curdiff = now - particlearray[i].startTime;
+            const f32 timefraction = (f32)curdiff / maxdiff;
+            core::dimension2df destsize = particlearray[i].startSize * ScaleFactor;
+            particlearray[i].size = particlearray[i].startSize + (destsize - particlearray[i].startSize) * timefraction;
+        }
+    }
+
+    virtual scene::E_PARTICLE_AFFECTOR_TYPE getType() const
+    {
+        return scene::EPAT_SCALE;
+    }
+
+protected:
+    core::vector2df ScaleFactor;
+};
+
+// ============================================================================
+
+class ColorAffector : public scene::IParticleAffector
+{
+protected:
+    core::vector3df m_color_from;
+    core::vector3df m_color_to;
+
+public:
+    ColorAffector(const core::vector3df& colorFrom, const core::vector3df& colorTo) :
+        m_color_from(colorFrom), m_color_to(colorTo)
+    {
+    }
+
+    virtual void affect(u32 now, scene::SParticle *particlearray, u32 count)
+    {
+        for (u32 i = 0; i<count; i++)
+        {
+            const u32 maxdiff = particlearray[i].endTime - particlearray[i].startTime;
+            const u32 curdiff = now - particlearray[i].startTime;
+            const f32 timefraction = (f32)curdiff / maxdiff;
+            core::vector3df curr_color = m_color_from + (m_color_to - m_color_from)* timefraction;
+            particlearray[i].color = video::SColor(255, (int)curr_color.X, (int)curr_color.Y, (int)curr_color.Z);
+        }
+    }
+
+    virtual scene::E_PARTICLE_AFFECTOR_TYPE getType() const
+    {
+        return scene::EPAT_SCALE;
+    }
+
+};
+
+
 
 // ============================================================================
 
 ParticleEmitter::ParticleEmitter(const ParticleKind* type,
                                  const Vec3 &position,
-                                 scene::ISceneNode* parent)
+                                 scene::ISceneNode* parent,
+                                 bool randomize_initial_y,
+                                 bool important)
                : m_position(position)
 {
     assert(type != NULL);
@@ -188,6 +301,10 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
     m_particle_type       = NULL;
     m_parent              = parent;
     m_emission_decay_rate = 0;
+    m_is_glsl = CVS->isGLSL();
+    m_randomize_initial_y = randomize_initial_y;
+    m_important = important;
+
 
     setParticleType(type);
     assert(m_node != NULL);
@@ -218,7 +335,7 @@ void ParticleEmitter::update(float dt)
 
     // the emission direction does not automatically follow the orientation of
     // the node so fix that manually...
-    core::matrix4 	transform = m_node->getAbsoluteTransformation();
+    core::matrix4   transform = m_node->getAbsoluteTransformation();
     core::vector3df velocity(m_particle_type->getVelocityX(),
                              m_particle_type->getVelocityY(),
                              m_particle_type->getVelocityZ());
@@ -272,17 +389,28 @@ void ParticleEmitter::setCreationRateAbsolute(float f)
     m_min_rate = f;
     m_max_rate = f;
 
+#if 0
     // FIXME: to work around irrlicht bug, when an emitter is paused by setting the rate
     //        to 0 results in a massive emission when enabling it back. In irrlicht 1.8
     //        the node has a method called "clearParticles" that should be cleaner than this
+
     if (f <= 0.0f && m_node->getEmitter())
     {
-        m_node->setEmitter(NULL);
+        m_node->clearParticles();
     }
     else if (m_node->getEmitter() == NULL)
     {
         m_node->setEmitter(m_emitter);
     }
+#endif
+/*    if (f <= 0.0f)
+    {
+        m_node->setVisible(false);
+    }
+    else
+    {
+        m_node->setVisible(true);
+    }*/
 }   // setCreationRateAbsolute
 
 //-----------------------------------------------------------------------------
@@ -299,7 +427,7 @@ int ParticleEmitter::getCreationRate()
  */
 void ParticleEmitter::setPosition(const Vec3 &pos)
 {
-    m_node->setPosition(pos.toIrrVector());
+  m_node->setPosition(pos.toIrrVector());
 }   // setPosition
 
 //-----------------------------------------------------------------------------
@@ -325,7 +453,16 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         }
         else
         {
-            m_node = irr_driver->addParticleNode();
+            if (m_is_glsl)
+                m_node = ParticleSystemProxy::addParticleNode(m_is_glsl, type->randomizeInitialY());
+            else
+                m_node = irr_driver->addParticleNode();
+            
+            if (m_is_glsl)
+            {
+                bool additive = (type->getMaterial()->getShaderType() == Material::SHADERTYPE_ADDITIVE);
+                static_cast<ParticleSystemProxy *>(m_node)->setAlphaAdditive(additive);
+            }
         }
 
         if (m_parent != NULL)
@@ -375,10 +512,19 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             m_node->setMaterialTexture(0, material->getTexture());
 
             mat0.ZWriteEnable = !material->isTransparent(); // disable z-buffer writes if material is transparent
+
+            // fallback for old render engine
+            if (material->getShaderType() == Material::SHADERTYPE_ADDITIVE)
+                mat0.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+            else if (material->getShaderType() == Material::SHADERTYPE_ALPHA_BLEND)
+                mat0.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+            else if (material->getShaderType() == Material::SHADERTYPE_ALPHA_TEST)
+                mat0.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
         }
         else
         {
-            m_node->setMaterialTexture(0, irr_driver->getTexture((file_manager->getDataDir() + "gui/main_help.png").c_str()));
+            std::string help = file_manager->getAsset(FileManager::GUI, "main_help.png");
+            m_node->setMaterialTexture(0, irr_driver->getTexture(help));
         }
 
         // velocity in m/ms
@@ -392,7 +538,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             {
                 m_emitter = m_node->createPointEmitter(velocity,
                                                        type->getMinRate(),  type->getMaxRate(),
-                                                       type->getMinColor(), type->getMaxColor(),
+                                                       type->getMinColor(), type->getMinColor(),
                                                        lifeTimeMin, lifeTimeMax,
                                                        m_particle_type->getAngleSpread() /* angle */
                                                        );
@@ -408,7 +554,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                                      box_size_x,  box_size_y,  -0.6f - type->getBoxSizeZ()),
                                                      velocity,
                                                      type->getMinRate(),  type->getMaxRate(),
-                                                     type->getMinColor(), type->getMaxColor(),
+                                                     type->getMinColor(), type->getMinColor(),
                                                      lifeTimeMin, lifeTimeMax,
                                                      m_particle_type->getAngleSpread()
                                                      );
@@ -441,7 +587,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                         m_particle_type->getSphereRadius(),
                                                         velocity,
                                                         type->getMinRate(),  type->getMaxRate(),
-                                                        type->getMinColor(), type->getMaxColor(),
+                                                        type->getMinColor(), type->getMinColor(),
                                                         lifeTimeMin, lifeTimeMax,
                                                         m_particle_type->getAngleSpread()
                                                  );
@@ -449,7 +595,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             }
             default:
             {
-                fprintf(stderr, "[ParticleEmitter] Unknown shape\n");
+                Log::error("ParticleEmitter", "Unknown shape");
                 return;
             }
         }
@@ -488,15 +634,71 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             m_node->addAffector(faa);
             faa->drop();
         }
-        
+
         if (type->hasScaleAffector())
         {
-            core::dimension2df factor = core::dimension2df(type->getScaleAffectorFactorX(),
-                                                           type->getScaleAffectorFactorY());
-            scene::IParticleAffector* scale_affector =
-                m_node->createScaleParticleAffector(factor);
-            m_node->addAffector(scale_affector);
-            scale_affector->drop();
+            if (m_is_glsl)
+            {
+                static_cast<ParticleSystemProxy *>(m_node)->setIncreaseFactor(type->getScaleAffectorFactorX());
+            }
+            else
+            {
+                core::vector2df factor = core::vector2df(type->getScaleAffectorFactorX(),
+                    type->getScaleAffectorFactorY());
+                scene::IParticleAffector* scale_affector = new ScaleAffector(factor);
+                m_node->addAffector(scale_affector);
+                scale_affector->drop();
+            }
+        }
+
+        if (type->getMinColor() != type->getMaxColor())
+        {
+            if (m_is_glsl)
+            {
+                video::SColor color_from = type->getMinColor();
+                static_cast<ParticleSystemProxy *>(m_node)->setColorFrom(color_from.getRed() / 255.0f,
+                    color_from.getGreen() / 255.0f,
+                    color_from.getBlue() / 255.0f);
+
+                video::SColor color_to = type->getMaxColor();
+                static_cast<ParticleSystemProxy *>(m_node)->setColorTo(color_to.getRed() / 255.0f,
+                    color_to.getGreen() / 255.0f,
+                    color_to.getBlue() / 255.0f);
+            }
+            else
+            {
+                video::SColor color_from = type->getMinColor();
+                core::vector3df color_from_v =
+                    core::vector3df(float(color_from.getRed()),
+                                    float(color_from.getGreen()),
+                                    float(color_from.getBlue()));
+
+                video::SColor color_to = type->getMaxColor();
+                core::vector3df color_to_v = core::vector3df(float(color_to.getRed()),
+                                                             float(color_to.getGreen()),
+                                                             float(color_to.getBlue()));
+
+                ColorAffector* affector = new ColorAffector(color_from_v, color_to_v);
+                m_node->addAffector(affector);
+                affector->drop();
+            }
+        }
+
+        const float windspeed = type->getWindSpeed();
+        if (windspeed > 0.01f)
+        {
+            WindAffector *waf = new WindAffector(windspeed);
+            m_node->addAffector(waf);
+            waf->drop();
+
+            // TODO: wind affector for GLSL particles
+        }
+
+        const bool flips = type->getFlips();
+        if (flips)
+        {
+            if (m_is_glsl)
+                static_cast<ParticleSystemProxy *>(m_node)->setFlip();
         }
     }
 }   // setParticleType
@@ -505,9 +707,25 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
 
 void ParticleEmitter::addHeightMapAffector(Track* t)
 {
-    HeightMapCollisionAffector* hmca = new HeightMapCollisionAffector(t);
-    m_node->addAffector(hmca);
-    hmca->drop();
+    
+    if (m_is_glsl)
+    {
+        const Vec3* aabb_min;
+        const Vec3* aabb_max;
+        t->getAABB(&aabb_min, &aabb_max);
+        float track_x = aabb_min->getX();
+        float track_z = aabb_min->getZ();
+        const float track_x_len = aabb_max->getX() - aabb_min->getX();
+        const float track_z_len = aabb_max->getZ() - aabb_min->getZ();
+        static_cast<ParticleSystemProxy *>(m_node)->setHeightmap(t->buildHeightMap(),
+            track_x, track_z, track_x_len, track_z_len);
+    }
+    else
+    {
+        HeightMapCollisionAffector* hmca = new HeightMapCollisionAffector(t);
+        m_node->addAffector(hmca);
+        hmca->drop();
+    }
 }
 
 //-----------------------------------------------------------------------------

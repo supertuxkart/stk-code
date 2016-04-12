@@ -1,9 +1,9 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Joerg Henrichs
+//  Copyright (C) 2007-2015 Joerg Henrichs
 //
 //  Physics improvements and linear intersection algorithm by
-//  by David Mikos. Copyright (C) 2009.
+//  Copyright (C) 2009-2015 David Mikos.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -49,8 +49,6 @@ private:
 public:
                  Cake (AbstractKart *kart);
     static  void init     (const XMLNode &node, scene::IMesh *cake_model);
-    virtual const core::stringw
-                 getHitString(const AbstractKart *kart) const;
     virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
     // ------------------------------------------------------------------------
     virtual void hitTrack ()                      { hit(NULL);               }

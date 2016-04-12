@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Joerg Henrichs
+//  Copyright (C) 2013-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -32,7 +32,7 @@
 #  define VALIST char*
 #endif
 
-#if defined(_WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
+#if defined(_WIN32) && defined(_MSC_VER) && _MSC_VER < 1800
 #  define va_copy(dest, src) dest = src
 #endif
 
@@ -67,7 +67,7 @@ public:
     static void printMessage(int level, const char *component,
                              const char *format, VALIST va_list);
     // ------------------------------------------------------------------------
-    /** A simple macro to define the various log functions. 
+    /** A simple macro to define the various log functions.
      *  Note that an assert is added so that a debugger is triggered
      *  when debugging. */
 #define LOG(NAME, LEVEL)                                             \
@@ -109,6 +109,11 @@ public:
         m_min_log_level = (LogLevel)n;
     }    // setLogLevel
 
+    // ------------------------------------------------------------------------
+    /** Returns the log level. This is useful if some work is necessary to
+     *  preprate output strings, which might not be used at all (example:
+     *  replacing the cleartext password in an http request). */
+    static LogLevel getLogLevel() { return m_min_log_level;  }
     // ------------------------------------------------------------------------
     /** Disable coloring of log messages. */
     static void disableColor()

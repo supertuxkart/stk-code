@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,14 +23,17 @@
 #include <sstream>
 
 #include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
-#include "network/network_manager.hpp"
+#include "network/network_config.hpp"
+#include "network/race_event_manager.hpp"
 #include "tracks/quad_graph.hpp"
+#include "tracks/battle_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
@@ -39,7 +42,9 @@
 
 std::vector<scene::IMesh *> ItemManager::m_item_mesh;
 std::vector<scene::IMesh *> ItemManager::m_item_lowres_mesh;
+std::vector<video::SColorf> ItemManager::m_glow_color;
 ItemManager *               ItemManager::m_item_manager = NULL;
+
 
 //-----------------------------------------------------------------------------
 /** Creates one instance of the item manager. */
@@ -64,6 +69,9 @@ void ItemManager::destroy()
 void ItemManager::loadDefaultItemMeshes()
 {
     m_item_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
+    m_glow_color.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1,
+                        video::SColorf(255.0f, 255.0f, 255.0f) );
+
     m_item_lowres_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
 
     // A temporary mapping of items to names used in the XML file:
@@ -77,7 +85,7 @@ void ItemManager::loadDefaultItemMeshes()
     item_names[Item::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
     item_names[Item::ITEM_EASTER_EGG ] = "easter-egg";
 
-    const std::string file_name = file_manager->getDataFile("items.xml");
+    const std::string file_name = file_manager->getAsset("items.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
     for(unsigned int i=Item::ITEM_FIRST; i<=Item::ITEM_LAST; i++)
     {
@@ -91,12 +99,13 @@ void ItemManager::loadDefaultItemMeshes()
         scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);
         if(!node || model_filename.size()==0 || !mesh)
         {
-            fprintf(stderr, "Item model '%s' in items.xml could not be loaded "
-                            "- aborting", name.c_str());
+            Log::fatal("[ItemManager]", "Item model '%s' in items.xml could not be loaded "
+                        "- aborting", name.c_str());
             exit(-1);
         }
         mesh->grab();
         m_item_mesh[i]            = mesh;
+        node->get("glow", &(m_glow_color[i]));
 
         std::string lowres_model_filename;
         node->get("lowmodel", &lowres_model_filename);
@@ -200,9 +209,9 @@ void ItemManager::insertItem(Item *item)
     // Find where the item can be stored in the index list: either in a
     // previously deleted entry, otherwise at the end.
     int index = -1;
-    for(index=m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
+    for(index=(int)m_all_items.size()-1; index>=0 && m_all_items[index]; index--) {}
 
-    if(index==-1) index = m_all_items.size();
+    if(index==-1) index = (int)m_all_items.size();
 
     if(index<(int)m_all_items.size())
         m_all_items[index] = item;
@@ -278,8 +287,10 @@ Item* ItemManager::newItem(const Vec3& xyz, float distance,
 void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
 {
     assert(item);
-    if((item->getType() == Item::ITEM_BUBBLEGUM || item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
-    {// shielded karts can simply drive over bubble gums without any effect.
+    if( (item->getType() == Item::ITEM_BUBBLEGUM || 
+         item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
+    {
+        // shielded karts can simply drive over bubble gums without any effect.
         return;
     }
     item->collected(kart);
@@ -293,9 +304,6 @@ void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
  */
 void  ItemManager::checkItemHit(AbstractKart* kart)
 {
-    // Only do this on the server
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT) return;
-
     // We could use m_items_in_quads to to check for item hits: take the quad
     // of the graph node of the kart, and only check items in that quad. But
     // then we also need to check for any adjacent quads (since an item just
@@ -313,7 +321,17 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         // we pass the kart and the position separately.
         if((*i)->hitKart(kart->getXYZ(), kart))
         {
-            collectedItem(*i, kart);
+            // if we're not playing online, pick the item.
+            if (!RaceEventManager::getInstance()->isRunning())
+                collectedItem(*i, kart);
+            else if (NetworkConfig::get()->isServer())
+            {
+                // Only the server side detects item being collected
+                // A client does the collection upon receiving the 
+                // event from the server!
+                collectedItem(*i, kart);
+                RaceEventManager::getInstance()->collectedItem(*i, kart);
+            }
         }   // if hit
     }   // for m_all_items
 }   // checkItemHit
@@ -411,7 +429,7 @@ void ItemManager::deleteItem(Item *item)
         int sector = QuadGraph::UNKNOWN_SECTOR;
         QuadGraph::get()->findRoadSector(xyz, &sector);
         unsigned int indx = sector==QuadGraph::UNKNOWN_SECTOR
-                          ? m_items_in_quads->size()-1
+                          ? (unsigned int) m_items_in_quads->size()-1
                           : sector;
         AllItemTypes &items = (*m_items_in_quads)[indx];
         AllItemTypes::iterator it = std::find(items.begin(), items.end(),item);
@@ -457,3 +475,103 @@ void ItemManager::switchItems()
     m_switch_time = m_switch_time < 0 ? stk_config->m_item_switch_time : -1;
 
 }   // switchItems
+
+//-----------------------------------------------------------------------------
+bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
+{
+    if (!UserConfigParams::m_random_arena_item) return false;
+    if (!BattleGraph::get()) return false;
+
+    std::vector<int> used_location;
+    std::vector<int> invalid_location;
+    for (unsigned int i = 0; i < pos.size(); i++)
+    {
+        // Load all starting positions of arena, so no items will be near them
+        int node = BattleGraph::get()->pointToNode(/*cur_node*/-1,
+            Vec3(pos[i].getOrigin()), /*ignore_vertical*/true);
+        assert(node != -1);
+        used_location.push_back(node);
+        invalid_location.push_back(node);
+    }
+
+    RandomGenerator random;
+    const unsigned int MIN_DIST = sqrt(BattleGraph::get()->getNumNodes());
+    const unsigned int TOTAL_ITEM = MIN_DIST / 2;
+
+    Log::info("[ItemManager]","Creating %d random items for arena", TOTAL_ITEM);
+    for (unsigned int i = 0; i < TOTAL_ITEM; i++)
+    {
+        int chosen_node = -1;
+        const unsigned int total_node = BattleGraph::get()->getNumNodes();
+        while(true)
+        {
+            if (used_location.size() - pos.size() +
+                invalid_location.size() == total_node)
+            {
+                Log::warn("[ItemManager]","Can't place more random items! "
+                    "Use default item location.");
+                return false;
+            }
+
+            const int node = random.get(total_node);
+
+            // Check if tried
+            std::vector<int>::iterator it = std::find(invalid_location.begin(),
+                invalid_location.end(), node);
+            if (it != invalid_location.end())
+                continue;
+
+            // Check if near edge
+            if (BattleGraph::get()->isNearEdge(node))
+            {
+                invalid_location.push_back(node);
+                continue;
+            }
+            // Check if too close
+            bool found = true;
+            for (unsigned int j = 0; j < used_location.size(); j++)
+            {
+                if (!found) continue;
+                Vec3 d = BattleGraph::get()
+                    ->getPolyOfNode(used_location[j]).getCenter() -
+                    BattleGraph::get()->getPolyOfNode(node).getCenter();
+                found = d.length_2d() > MIN_DIST;
+            }
+            if (found)
+            {
+                chosen_node = node;
+                invalid_location.push_back(node);
+                break;
+            }
+            else
+                invalid_location.push_back(node);
+        }
+
+        assert(chosen_node != -1);
+        used_location.push_back(chosen_node);
+    }
+
+    for (unsigned int i = 0; i < pos.size(); i++)
+        used_location.erase(used_location.begin());
+
+    assert (used_location.size() == TOTAL_ITEM);
+
+    // Hard-coded ratio for now
+    const int BONUS_BOX = 4;
+    const int NITRO_BIG = 2;
+    const int NITRO_SMALL = 1;
+
+    for (unsigned int i = 0; i < TOTAL_ITEM; i++)
+    {
+        const int j = random.get(10);
+        Item::ItemType type = (j > BONUS_BOX ? Item::ITEM_BONUS_BOX :
+            j > NITRO_BIG ? Item::ITEM_NITRO_BIG :
+            j > NITRO_SMALL ? Item::ITEM_NITRO_SMALL : Item::ITEM_BANANA);
+        Vec3 loc = BattleGraph::get()
+            ->getPolyOfNode(used_location[i]).getCenter();
+        Item* item = newItem(type, loc, Vec3(0, 1, 0));
+        BattleGraph::get()->insertItems(item, used_location[i]);
+    }
+
+    return true;
+}   // randomItemsForArena

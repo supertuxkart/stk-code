@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,10 +26,12 @@
  * configuration file.
  */
 
+#include "network/remote_kart_info.hpp"
 #include "utils/no_copy.hpp"
 
 #include <vector>
 #include <string>
+#include <map>
 
 class KartProperties;
 class MusicInformation;
@@ -46,7 +48,8 @@ class STKConfig : public NoCopy
 {
 protected:
     /** Default kart properties. */
-    KartProperties  *m_default_kart_properties;
+    KartProperties *m_default_kart_properties;
+    std::map<std::string, KartProperties*> m_kart_properties;
 
 public:
     /** What to do if a kart already has a powerup when it hits a bonus box:
@@ -60,37 +63,24 @@ public:
           m_same_powerup_mode;
 
     static float UNDEFINED;
-    float m_anvil_weight;            /**<Additional kart weight if anvil is
-                                         attached.                           */
-    float m_anvil_speed_factor;      /**<Speed decrease when attached first. */
-    float m_parachute_friction;      /**<Increased parachute air friction.   */
-    float m_parachute_done_fraction; /**<Fraction of speed when lost will
-                                         detach parachute.                   */
-    float m_parachute_time;          /**<Time a parachute is active.         */
-    float m_parachute_time_other;    /**<Time a parachute attached to other
-                                         karts is active.                    */
-    float m_bomb_time;               /**<Time before a bomb explodes.        */
-    float m_bomb_time_increase;      /**<Time added to bomb timer when it's
-                                         passed on.                          */
-    float m_anvil_time;              /**<Time an anvil is active.            */
-    float m_item_switch_time;        /**< Time items will be switched.       */
-    int   m_bubblegum_counter;       /**< How many times bubble gums must be
-                                          driven over before they disappear. */
-    float m_bubblegum_shield_time;   /**<How long a bubble gum shield lasts. */
-    bool  m_shield_restrict_weapos;  /**<Wether weapon usage is punished. */
-    float m_explosion_impulse_objects;/**<Impulse of explosion on moving
-                                          objects, e.g. road cones, ...      */
-    float m_penalty_time;            /**< Penalty time when starting too
-                                          early.                             */
-    float m_delay_finish_time;       /**<Delay after a race finished before
-                                         the results are displayed.          */
-    float m_music_credit_time;       /**<Time the music credits are
-                                         displayed.                          */
-    int   m_max_karts;               /**<Maximum number of karts.            */
-    int   m_max_history;             /**<Maximum number of frames to save in
-                                         a history files.                    */
-    bool  m_smooth_normals;          /**< If normals for raycasts for wheels
-                                         should be interpolated.             */
+    float m_bomb_time;                 /**<Time before a bomb explodes.        */
+    float m_bomb_time_increase;        /**<Time added to bomb timer when it's
+                                           passed on.                          */
+    float m_item_switch_time;          /**< Time items will be switched.       */
+    int   m_bubblegum_counter;         /**< How many times bubble gums must be
+                                            driven over before they disappear. */
+    bool  m_shield_restrict_weapos;    /**<Wether weapon usage is punished. */
+    float m_explosion_impulse_objects; /**<Impulse of explosion on moving
+                                            objects, e.g. road cones, ...      */
+    float m_penalty_time;              /**< Penalty time when starting too
+                                            early.                             */
+    float m_delay_finish_time;         /**<Delay after a race finished before
+                                           the results are displayed.          */
+    float m_music_credit_time;         /**<Time the music credits are
+                                           displayed.                          */
+    int   m_max_karts;                 /**<Maximum number of karts.            */
+    bool  m_smooth_normals;            /**< If normals for raycasts for wheels
+                                           should be interpolated.             */
     /** If the angle between a normal on a vertex and the normal of the
      *  triangle are more than this value, the physics will use the normal
      *  of the triangle in smoothing normal. */
@@ -134,8 +124,10 @@ public:
     std::vector<int> m_score_increase;
 
     /** Filename of the title music to play.*/
-    MusicInformation
-         *m_title_music;
+    MusicInformation *m_title_music;
+
+    /** Maximum time of a replay. */
+    int m_replay_max_time;
 
     /** Minimum time between consecutive saved tranform events.  */
     float m_replay_dt;
@@ -147,6 +139,18 @@ public:
     /** A heading difference of more than that will trigger a new event to
      *  be generated. */
     float m_replay_delta_angle;
+
+    /** The field of view for 1, 2, 3, 4 player split screen. */
+    float m_camera_fov[4];
+
+    /** File names of the default fonts in STK. */
+    std::string m_font_default;
+    std::string m_font_default_fallback;
+    std::string m_font_cjk;
+    std::string m_font_ar;
+    std::string m_font_bold;
+    std::string m_font_bold_fallback;
+    std::string m_font_digit;
 
 private:
     /** True if stk_config has been loaded. This is necessary if the
@@ -168,6 +172,16 @@ public:
     /** Returns the default kart properties for each kart. */
     const KartProperties &
          getDefaultKartProperties() const {return *m_default_kart_properties; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the kart properties for a certain type of kart.
+     *  \throw out_of_range if there is no data for 'type'.
+     *  \param type Type of kart (e.g. heavy, medium, ...).
+     */
+    const KartProperties& getKartProperties(std::string type)
+    {
+        return *m_kart_properties.at(type); 
+    }   // getKartProperties
 }
 ;   // STKConfig
 

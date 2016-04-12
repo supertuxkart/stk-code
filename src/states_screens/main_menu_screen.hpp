@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,7 +20,8 @@
 
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine { class Widget; class ListWidget; }
+namespace GUIEngine { class Widget;       class ListWidget; 
+                      class ButtonWidget; class IconButtonWidget; }
 
 /**
   * \brief Handles the main menu
@@ -31,11 +32,23 @@ class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSinglet
 private:
     friend class GUIEngine::ScreenSingleton<MainMenuScreen>;
 
+    core::stringw m_online_string;
+
+    core::stringw m_login_string;
+
+    /** Keep the widget to avoid looking it up every frame. */
+    GUIEngine::IconButtonWidget* m_online;
+
+    /** Keep the widget to to the user name. */
+    GUIEngine::ButtonWidget *m_user_id;
+
     MainMenuScreen();
 
 public:
+    /** Temporary disable the online menu while it is being worked at. */
+    static bool m_enable_online;
 
-    virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
+    virtual void onUpdate(float delta) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

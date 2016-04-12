@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,7 +17,6 @@
 
 #include "states_screens/dialogs/add_device_dialog.hpp"
 
-#include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
@@ -25,10 +24,9 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_input.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 #include "input/wiimote_manager.hpp"
@@ -44,6 +42,8 @@ using namespace irr::core;
 
 AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
 {
+    doInit();
+
     ScalableFont* font = GUIEngine::getFont();
     const int textHeight = GUIEngine::getFontHeight();
     const int buttonHeight = textHeight + 10;
@@ -76,7 +76,7 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
                                               /*word wrap*/true,
                                               m_irrlicht_window);
     b->setTabStop(false);
-    b->setRightToLeft(translations->isRTLLanguage());
+    b->setRightToLeft(translations->isRTLText(msg));
     // because it looks like 'setRightToLeft' applies next time
     // setText is called only
     b->setText(msg.c_str());
@@ -165,8 +165,8 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
     }
     else if (eventSource == "addkeyboard")
     {
-        input_manager->getDeviceList()->addEmptyKeyboard();
-        input_manager->getDeviceList()->serialize();
+        input_manager->getDeviceManager()->addEmptyKeyboard();
+        input_manager->getDeviceManager()->save();
         ModalDialog::dismiss();
 
         ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();
@@ -178,7 +178,7 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
     {
         // Remove the previous modal dialog to avoid a warning
         GUIEngine::ModalDialog::dismiss();
-		if(wiimote_manager->askUserToConnectWiimotes() > 0)
+        if(wiimote_manager->askUserToConnectWiimotes() > 0)
             ((OptionsScreenInput*)GUIEngine::getCurrentScreen())->rebuildDeviceList();
 
         return GUIEngine::EVENT_BLOCK;

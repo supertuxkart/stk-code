@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010  Joerg Henrichs
+//  Copyright (C) 2010-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -55,6 +55,9 @@ private:
 
     /** Additional engine force, summed from all SpeedIncrease engine forces. */
     float m_add_engine_force;
+
+    /** If >0 then the minimum speed a kart should have (used for zippers). */
+    float m_min_speed;
 
     // ------------------------------------------------------------------------
     /** An internal class to store and handle speed increase related data. */
@@ -116,7 +119,7 @@ private:
          *  into account. */
         float m_current_fraction;
 
-        /** How long the effect should last. A -1.0f as value indicates 
+        /** How long the effect should last. A -1.0f as value indicates
          *  that this effect stays active till it is changed back. */
         float m_duration;
 
@@ -145,6 +148,7 @@ private:
      *  for each possible category. */
     SpeedIncrease  m_speed_increase[MS_INCREASE_MAX];
 
+
 public:
           MaxSpeed(AbstractKart *kart);
 
@@ -160,6 +164,12 @@ public:
     float getSpeedIncreaseTimeLeft(unsigned int category);
     void  update(float dt);
     void  reset();
+    // ------------------------------------------------------------------------
+    /** Sets the minimum speed a kart should have. This is used to guarantee
+     *  that e.g. zippers on ramps will always fast enough for the karts to
+     *  reach the other end. If set to a negative number, it will have
+     *  no effect. */
+    void setMinSpeed(float s) { m_min_speed = s; }
     // ------------------------------------------------------------------------
     /** Returns the current maximum speed for this kart. */
     float getCurrentMaxSpeed() const { return m_current_max_speed; }

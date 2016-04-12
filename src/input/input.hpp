@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007-2008 Robert Schuster <robertschuster@fsfe.org>
+//  Copyright (C) 2007-2015 Robert Schuster <robertschuster@fsfe.org>
+//  Copyright (C) 2012-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,13 +27,6 @@
 
 #include <string>
 #include <irrString.h>
-
-class Binding;
-
-const int DEADZONE_MOUSE       =  150;
-const int DEADZONE_MOUSE_SENSE =  200;
-const int DEADZONE_JOYSTICK    = 2000;
-const int MULTIPLIER_MOUSE     =  750;
 
 /**
   * \ingroup input
@@ -78,7 +72,7 @@ struct Input
 
     Input()
         : m_type(IT_NONE), m_device_id(0), m_button_id(0),
-          m_axis_direction(0), m_character(0)
+        m_axis_direction(0), m_axis_range(Input::AR_FULL), m_character(0)
     {
         // Nothing to do.
     }
@@ -108,7 +102,7 @@ struct Input
      */
     Input(InputType ntype, int deviceID , int btnID = 0, int axisDirection= 0)
         : m_type(ntype), m_device_id(deviceID), m_button_id(btnID),
-          m_axis_direction(axisDirection)
+          m_axis_direction(axisDirection), m_axis_range(Input::AR_FULL)
     {
         // Nothing to do.
     }

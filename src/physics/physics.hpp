@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -80,14 +80,14 @@ private:
         /** Tests if two collision pairs involve the same objects. This test
          *  is simplified (i.e. no test if p.b==a and p.a==b) since the
          *  elements are sorted. */
-        bool operator==(const CollisionPair p)
+        bool operator==(const CollisionPair &p)
         {
             return (p.m_up[0]==m_up[0] && p.m_up[1]==m_up[1]);
         }   // operator==
         // --------------------------------------------------------------------
         const UserPointer *getUserPointer(unsigned int n) const
         {
-            assert(n>=0 && n<=1);
+            assert(n<=1);
             return m_up[n];
         }   // getUserPointer
         // --------------------------------------------------------------------
@@ -162,8 +162,10 @@ public:
     /** Activates the next debug mode (or switches it off again).
      */
     void  nextDebugMode    () {m_debug_drawer->nextDebugMode(); }
+    void  setDebugMode(IrrDebugDrawer::DebugModeType mode) { m_debug_drawer->setDebugMode(mode); }
     /** Returns true if the debug drawer is enabled. */
     bool  isDebug() const     {return m_debug_drawer->debugEnabled(); }
+    IrrDebugDrawer* getDebugDrawer() { return m_debug_drawer; }
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
                                 btPersistentManifold** manifold,int numManifolds,
                                 btTypedConstraint** constraints,int numConstraints,

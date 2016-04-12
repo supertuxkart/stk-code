@@ -1,5 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,6 +21,7 @@
 
 
 #include "guiengine/widget.hpp"
+#include "utils/log.hpp"
 #include "utils/ptr_vector.hpp"
 
 #include <cstring> // for NULL
@@ -76,22 +78,19 @@ namespace GUIEngine
                 Widget*      getWidget(const int id);
 
         /** This function searches and returns a widget by name, cast as specified type,
-		 *  if that widget is found and the type is correct.
-		 *  \param name The name of the widget to find
-		 *  \return an object by name, casted to specified type, or NULL if
+         *  if that widget is found and the type is correct.
+         *  \param name The name of the widget to find
+         *  \return an object by name, casted to specified type, or NULL if
          *  not found/wrong type */
         template <typename T>
-		        T*           getWidget(const char* name)
+                T*           getWidget(const char* name)
         {
             Widget* out = getWidget(name);
             T* outCasted = dynamic_cast<T*>( out );
             if (out != NULL && outCasted == NULL)
-            {
-                fprintf(stderr, "Screen::getWidget : Widget '%s' of type '%s'"
-                        "cannot be casted to requested type '%s'!\n", name,
-                        typeid(*out).name(), typeid(T).name());
-                abort();
-            }
+                Log::fatal("Screen::getWidget", "Widget '%s' of type '%s'"
+                           "cannot be casted to requested type '%s'!\n", name,
+                           typeid(*out).name(), typeid(T).name());
             return outCasted;
         }
 

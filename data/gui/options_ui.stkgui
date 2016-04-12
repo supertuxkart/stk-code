@@ -1,63 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
 
-<div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+        <header text_align="center" width="80%" align="center" text="SuperTuxKart Options"/>
+        <spacer height="15" width="10"/>
 
-    <header text_align="center" width="80%" align="center" text="SuperTuxKart Options"/>
-    <spacer height="15" width="10"/>
-    
-    <tabs id="options_choice" height="10%" max_height="110" x="2%" width="98%" align="center">
-        <icon-button id="tab_video" width="128" height="128" icon="gui/options_video.png"/>
-        <icon-button id="tab_audio" width="128" height="128" icon="gui/options_audio.png"/>
-        <icon-button id="tab_ui" width="128" height="128" icon="gui/options_ui.png"
-                I18N="Section in the settings menu" text="User Interface"/>
-        <icon-button id="tab_players" width="128" height="128" icon="gui/options_players.png"/>
-        <icon-button id="tab_controls" width="128" height="128" icon="gui/options_input.png"/>
-    </tabs>
-    
-    <box proportion="1" width="100%" layout="vertical-row">
-        
-        <spacer height="5" width="10"/>
+        <tabs id="options_choice" height="10%" max_height="110" x="2%" width="98%" align="center">
+            <icon-button id="tab_video" width="128" height="128" icon="gui/options_video.png"/>
+            <icon-button id="tab_audio" width="128" height="128" icon="gui/options_audio.png"/>
+            <icon-button id="tab_ui" width="128" height="128" icon="gui/options_ui.png"
+                    I18N="Section in the settings menu" text="User Interface"/>
+            <icon-button id="tab_players" width="128" height="128" icon="gui/options_players.png"/>
+            <icon-button id="tab_controls" width="128" height="128" icon="gui/options_input.png"/>
+        </tabs>
 
-        <!-- ************ SKIN CHOICE ************ -->
-        <div layout="horizontal-row" width="100%" height="fit">
-            <label I18N="In the graphics settings" text="Skin" align="center"/>
-            <spacer width="20" height="20"/>
-            <spinner id="skinchoice" width="30%"/>
-        </div>
-        
-        <spacer width="20" height="18" />
-        
-        <div width="75%" height="fit" layout="horizontal-row" >
-            <checkbox id="showfps"/>
-            <spacer width="20" height="100%" />
-            <label height="100%" I18N="In the ui settings" text="Display FPS"/>
-        </div>
+        <box proportion="1" width="100%" layout="vertical-row">
 
-        <div width="75%" height="fit" layout="horizontal-row" >
-            <checkbox id="enable-internet"/>
-            <spacer width="20" height="100%" />
-            <label height="100%" I18N="In the ui settings" text="Allow STK to connect to the Internet"/>
-        </div>
+            <spacer height="5" width="10" />
 
-        <div width="75%" height="fit" layout="horizontal-row" >
-            <checkbox id="minimal-racegui"/>
-            <spacer width="20" height="100%" />
-            <label height="100%" I18N="In the ui settings" text="Minimal Race GUI"/>
-        </div>
+            <!-- ************ SKIN CHOICE ************ -->
+            <div layout="horizontal-row" width="100%" height="fit">
+                <label I18N="In the ui settings" text="Skin" align="center"/>
+                <spacer width="20" height="20"/>
+                <spinner id="skinchoice" width="30%"/>
+            </div>
 
-        <spacer height="18" width="4"/>
-        
-        <!-- ************ LANGUAGE CHOICE ************ -->
-        
-        <box proportion="1" width="75%" align="center" layout="vertical-row" padding="8">
-            <list id="language" x="0" y="0" width="100%" height="100%"/>
+            <spacer width="20" height="18" />
+
+            <div layout="horizontal-row" width="100%" height="fit">
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <checkbox id="showfps"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Display FPS"/>
+                </div>
+
+                <spacer height="4" width="10" />
+
+                <div layout="horizontal-row" proportion="1" height="fit">
+                    <checkbox id="show-login"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Always show login screen"/>
+                </div>
+            </div>
+
+            <spacer height="4" width="10" />
+
+            <div layout="horizontal-row" width="100%" height="fit">
+                <div layout="horizontal-row" proportion="1" height="fit">
+                    <checkbox id="enable-hw-report"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" id="label-hw-report" I18N="In the ui settings"
+                           text="Send anonymous HW statistics"/>
+                </div>
+
+                <spacer height="4" width="10" />
+
+                <div layout="horizontal-row" proportion="1" height="fit">
+                    <checkbox id="perPlayerDifficulty"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Enable per-player handicaps"/>
+                </div>
+            </div>
+
+            <spacer height="4" width="10" />
+
+            <div layout="horizontal-row" width="100%" height="fit">
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <checkbox id="enable-internet"/>
+                    <spacer width="20" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Connect to the Internet"/>
+                </div>
+
+                <spacer height="4" width="10" />
+
+                <!-- Nothing here yet -->
+            </div>
+
+            <spacer height="18" width="4"/>
+
+            <!-- ************ LANGUAGE CHOICE ************ -->
+
+            <box proportion="1" width="75%" align="center" layout="vertical-row" padding="8">
+                <list id="language" x="0" y="0" width="100%" height="100%"/>
+            </box>
+
+            <spacer height="18" width="4"/>
+
         </box>
-        
-        <spacer height="18" width="4"/>
+    </div>
 
-    </box>
-</div>
-
-<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
-
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 </stkgui>

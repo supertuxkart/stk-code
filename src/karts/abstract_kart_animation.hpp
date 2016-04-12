@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -41,8 +41,8 @@ private:
     /** Name of this animation, used for debug prints only. */
     std::string m_name;
 protected:
-	/** A pointer to the kart which is animated by this class. */
-	AbstractKart *m_kart;
+   /** A pointer to the kart which is animated by this class. */
+    AbstractKart *m_kart;
 
     /** Timer for the explosion. */
     float m_timer;

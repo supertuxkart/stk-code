@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 #include <sstream>
 
 #include "challenges/unlock_manager.hpp"
+#include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -28,13 +29,11 @@
 #include "race/grand_prix_data.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
+#include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 
 ChallengeData::ChallengeData(const std::string& filename)
-#ifndef WIN32
-                                                      throw(std::runtime_error)
-#endif
 {
     m_filename     = filename;
     m_mode         = CM_SINGLE_RACE;
@@ -44,6 +43,7 @@ ChallengeData::ChallengeData(const std::string& filename)
     m_gp_id        = "";
     m_version      = 0;
     m_num_trophies = 0;
+    m_is_ghost_replay = false;
 
     for (int d=0; d<RaceManager::DIFFICULTY_COUNT; d++)
     {
@@ -56,7 +56,7 @@ ChallengeData::ChallengeData(const std::string& filename)
 
     // we are using auto_ptr to make sure the XML node is released when leaving
     // the scope
-    std::auto_ptr<XMLNode> root(new XMLNode( filename ));
+    std::unique_ptr<XMLNode> root(new XMLNode( filename ));
 
     if(root.get() == NULL || root->getName()!="challenge")
     {
@@ -73,9 +73,9 @@ ChallengeData::ChallengeData(const std::string& filename)
     // is not supported anyway (id is needed for warning message)
     if(!unlock_manager->isSupportedVersion(*this))
     {
-        fprintf(stderr, "[ChallengeData] WARNING: challenge <%s> is older "
-                "or newer than this version of STK, will be ignored.\n",
-                filename.c_str());
+        Log::warn("ChallengeData", "Challenge <%s> is older "
+                  "or newer than this version of STK, will be ignored.\n",
+                  filename.c_str());
         return;
     }
 
@@ -178,6 +178,13 @@ ChallengeData::ChallengeData(const std::string& filename)
         if (!karts_node->get("number", &num_karts)) error("karts");
         m_num_karts[d] = num_karts;
 
+        std::string replay_file;
+        if (karts_node->get("replay_file", &replay_file))
+        {
+            m_is_ghost_replay = true;
+            m_replay_files[d] = replay_file;
+        }
+
         std::string ai_kart_ident;
         if (karts_node->get("aiIdent", &ai_kart_ident))
             m_ai_kart_ident[d] = ai_kart_ident;
@@ -191,9 +198,8 @@ ChallengeData::ChallengeData(const std::string& filename)
             }
             else
             {
-                fprintf(stderr,
-                        "[ChallengeData] WARNING: Unknown A superpower '%s'\n",
-                        superPower.c_str());
+                Log::warn("ChallengeData", "Unknown superpower '%s'",
+                          superPower.c_str());
             }
         }
 
@@ -241,19 +247,22 @@ ChallengeData::ChallengeData(const std::string& filename)
             setUnlocks(s, ChallengeData::UNLOCK_DIFFICULTY);
         else
         {
-            fprintf(stderr, "[ChallengeData] unknown unlock entry.\n");
-            fprintf(stderr,
-                    "Must be one of kart, track, gp, mode, difficulty.\n");
-            exit(-1);
+            Log::warn("ChallengeData", "Unknown unlock entry. Must be one of kart, track, gp, mode, difficulty.");
+            throw std::runtime_error("Unknown unlock entry");
         }
     }
 
     core::stringw description;
-    if (track_node != NULL)
+    if (track_node != NULL && m_minor!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
     {
         //I18N: number of laps to race in a challenge
         description += _("Laps : %i", m_num_laps);
         description += core::stringw(L"\n");
+    }
+    else if (track_node)
+    {
+        // Follow the leader mode:
+        description = _("Follow the leader");
     }
 
     m_challenge_description = description;
@@ -266,7 +275,7 @@ void ChallengeData::error(const char *id) const
     msg << "Undefined or incorrect value for '" << id
         << "' in challenge file '" << m_filename << "'.";
 
-    printf("ChallengeData : %s\n", msg.str().c_str());
+    Log::error("ChallengeData", "%s", msg.str().c_str());
 
     throw std::runtime_error(msg.str());
 }   // error
@@ -339,9 +348,9 @@ void ChallengeData::setUnlocks(const std::string &id, RewardType reward)
                                 kart_properties_manager->getKart(id);
                             if (prop == NULL)
                             {
-                                fprintf(stderr, "Challenge refers to kart %s, "
-                                        "which is unknown. Ignoring reward.\n",
-                                        id.c_str());
+                                Log::warn("ChallengeData", "Challenge refers to kart %s, "
+                                          "which is unknown. Ignoring reward.",
+                                          id.c_str());
                                 break;
                             }
                             irr::core::stringw user_name = prop->getName();
@@ -370,7 +379,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
         race_manager->setTrack(m_track_id);
         race_manager->setNumLaps(m_num_laps);
         race_manager->setNumKarts(m_num_karts[d]);
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
         race_manager->setCoinTarget(m_energy[d]);
         race_manager->setDifficulty(d);
 
@@ -382,11 +391,20 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
     else if(m_mode==CM_GRAND_PRIX)
     {
         race_manager->setMinorMode(m_minor);
-        const GrandPrixData *gp = grand_prix_manager->getGrandPrix(m_gp_id);
-        race_manager->setGrandPrix(*gp);
+        race_manager->setGrandPrix(*grand_prix_manager->getGrandPrix(m_gp_id));
         race_manager->setDifficulty(d);
         race_manager->setNumKarts(m_num_karts[d]);
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
+    }
+
+    if (m_is_ghost_replay)
+    {
+        const bool result = ReplayPlay::get()->addReplayFile(file_manager
+            ->getAsset(FileManager::CHALLENGE, m_replay_files[d]),
+            true/*custom_replay*/);
+        if (!result)
+            Log::fatal("ChallengeData", "Can't open replay for challenge!");
+        race_manager->setRaceGhostKarts(true);
     }
 
     if (m_ai_kart_ident[d] != "")
@@ -465,7 +483,7 @@ bool ChallengeData::isGPFulfilled() const
     // is no world objects to query at this stage.
     if (race_manager->getMajorMode()  != RaceManager::MAJOR_MODE_GRAND_PRIX  ||
         race_manager->getMinorMode()  != m_minor                             ||
-        race_manager->getGrandPrix()->getId() != m_gp_id                     ||
+        race_manager->getGrandPrix().getId() != m_gp_id                      ||
         race_manager->getNumberOfKarts() < (unsigned int)m_num_karts[d]      ||
         race_manager->getNumPlayers() > 1) return false;
 
@@ -490,8 +508,7 @@ const irr::core::stringw
             // shouldn't happen but let's avoid crashes as much as possible...
             if (track == NULL) return irr::core::stringw( L"????" );
 
-            return _("New track '%s' now available",
-                     core::stringw(track->getName()));
+            return _("New track '%s' now available", track->getName());
             break;
         }
         case UNLOCK_MODE:
@@ -520,8 +537,7 @@ const irr::core::stringw
             // shouldn't happen but let's avoid crashes as much as possible...
             if (kp == NULL) return irr::core::stringw( L"????" );
 
-            return _("New kart '%s' now available",
-                      core::stringw(kp->getName()));
+            return _("New kart '%s' now available", kp->getName());
         }
         default:
             assert(false);

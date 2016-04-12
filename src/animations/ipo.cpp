@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009  Joerg Henrichs
+//  Copyright (C) 2009-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,14 +19,12 @@
 #include "animations/ipo.hpp"
 
 #include "io/xml_node.hpp"
+#include "utils/vs.hpp"
+#include "utils/log.hpp"
 
 #include <string.h>
-
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
+#include <algorithm>
+#include <cmath>
 
 const std::string Ipo::m_all_channel_names[IPO_MAX] =
                 {"LocX", "LocY", "LocZ", "LocXYZ",
@@ -45,8 +43,8 @@ Ipo::IpoData::IpoData(const XMLNode &curve, float fps, bool reverse)
 {
     if(curve.getName()!="curve")
     {
-        fprintf(stderr, "Expected 'curve' for animation, got '%s' --> Ignored.\n",
-            curve.getName().c_str());
+        Log::warn("Animations", "Expected 'curve' for animation, got '%s' --> Ignored.",
+                  curve.getName().c_str());
         return;
     }
     std::string channel;
@@ -62,9 +60,9 @@ Ipo::IpoData::IpoData(const XMLNode &curve, float fps, bool reverse)
     }
     if(m_channel==IPO_MAX)
     {
-        fprintf(stderr, "Unknown animation channel: '%s' - aborting.\n",
+        Log::error("Animation", "Unknown animation channel: '%s' --> Ignored",
                 channel.c_str());
-        exit(-1);
+        return;
     }
 
     std::string interp;
@@ -79,10 +77,9 @@ Ipo::IpoData::IpoData(const XMLNode &curve, float fps, bool reverse)
     else if (extend=="const" ) m_extend = ET_CONST;
     else
     {
-        // FIXME: do we want an error message here?
         // For now extrap and cyclic_extrap do not work
-        fprintf(stderr, "Unsupported extend '%s' - defaulting to CONST.\n",
-                extend.c_str());
+        Log::warn("Animation", "Unsupported extend '%s' - defaulting to CONST.",
+                  extend.c_str());
         m_extend = ET_CONST;
     }
 
@@ -447,7 +444,7 @@ void Ipo::reset()
  */
 void Ipo::update(float time, Vec3 *xyz, Vec3 *hpr,Vec3 *scale)
 {
-    assert(!isnan(time));
+    assert(!std::isnan(time));
     switch(m_ipo_data->m_channel)
     {
     case Ipo::IPO_LOCX   : if(xyz)   xyz  ->setX(get(time, 0)); break;
@@ -481,7 +478,7 @@ void Ipo::update(float time, Vec3 *xyz, Vec3 *hpr,Vec3 *scale)
  */
 float Ipo::get(float time, unsigned int index) const
 {
-    assert(!isnan(time));
+    assert(!std::isnan(time));
 
     // Avoid crash in case that only one point is given for this IPO.
     if(m_next_n==0)
@@ -499,6 +496,6 @@ float Ipo::get(float time, unsigned int index) const
          time >=m_ipo_data->m_points[m_next_n].getW())
         m_next_n++;
     float rval = m_ipo_data->get(time, index, m_next_n-1);
-    assert(!isnan(rval));
+    assert(!std::isnan(rval));
     return rval;
 }   // get

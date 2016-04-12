@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -181,8 +181,7 @@ void Screen::parseScreenFileDiv(irr::io::IXMLReader* xml, PtrVector<Widget>& app
                 }
                 else
                 {
-                    std::cerr << "/!\\ Warning /!\\ : unknown tag found in STK GUI file  : '"
-                              << xml->getNodeName()  << "'" << std::endl;
+                    Log::warn("Screen::parseScreenFileDiv", "unknown tag found in STK GUI file '%s'", xml->getNodeName());
                     continue;
                 }
 
@@ -206,6 +205,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 READ_PROPERTY(y,              PROP_Y);
                 READ_PROPERTY(layout,         PROP_LAYOUT);
                 READ_PROPERTY(align,          PROP_ALIGN);
+                READ_PROPERTY(custom_ratio,   PROP_CUSTOM_RATIO);
 
                 READ_PROPERTY(icon,           PROP_ICON);
                 READ_PROPERTY(focus_icon,     PROP_FOCUS_ICON);
@@ -221,6 +221,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 READ_PROPERTY(max_rows,       PROP_MAX_ROWS);
                 READ_PROPERTY(wrap_around,    PROP_WRAP_AROUND);
                 READ_PROPERTY(padding,        PROP_DIV_PADDING);
+                READ_PROPERTY(keep_selection, PROP_KEEP_SELECTION);
 #undef READ_PROPERTY
 
                 const wchar_t* text = xml->getAttributeValue( L"text" );
@@ -228,7 +229,13 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 if (text != NULL)
                 {
                     widget.m_text = _(text);
-                    widget.m_is_text_rtl = (translations->isRTLLanguage() && widget.m_text != text);
+                }
+
+                const wchar_t* raw_text = xml->getAttributeValue(L"raw_text");
+
+                if (raw_text != NULL)
+                {
+                    widget.m_text = raw_text;
                 }
 
                 if (parent != NULL)

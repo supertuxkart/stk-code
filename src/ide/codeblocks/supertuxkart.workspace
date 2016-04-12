@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<CodeBlocks_workspace_file>
-	<Workspace title="supertuxkart workspace">
-		<Project filename="supertuxkart.cbp" />
-		<Project filename="../../../lib/irrlicht/source/Irrlicht/Irrlicht-gcc.cbp" />
-		<Project filename="bullet_lib.cbp" />
-		<Project filename="enet.cbp" active="1" />
-	</Workspace>
-</CodeBlocks_workspace_file>

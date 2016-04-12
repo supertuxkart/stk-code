@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+
+        <header align="center" width="80%" text="Create User" text_align="center"
+                I18N="In the registration dialog" />
+      <spacer height="15" width="10"/>
+      <tabs id="mode_tabs" height="10%" max_height="110" x="2%" width="98%" align="center">
+        <icon-button id="tab_new_online" width="128" height="128" icon="gui/main_network.png"
+                     I18N="Section in the register screen" text="New Online Account"/>
+        <icon-button id="tab_existing_online" width="128" height="128" icon="gui/main_network.png"
+                     I18N="Section in the register screen" text="Existing Online Account"/>
+        <icon-button id="tab_offline" width="128" height="128" icon="gui/options_players.png"
+                     I18N="Section in the register screen" text="Offline Account"/>
+      </tabs>
+
+      <box proportion="1" width="100%" height="100%" layout="vertical-row">
+            <div width="90%" align="center" layout="vertical-row" height="80%">
+                <div width="100%" height="12%" layout="horizontal-row" >
+                    <label   proportion="1" height="100%" text_align="left"
+                             I18N="In the registration dialog" text="Local Name"/>
+                    <textbox id="local_username" proportion="2" height="fit" I18N="In the registration dialog"/>
+                </div>
+
+                <div width="100%" height="12%" layout="horizontal-row" >
+                    <label   id="label_username" proportion="1" height="100%" text_align="left"
+                             I18N="In the registration dialog" text="Online Username"/>
+                    <textbox id="username" proportion="2" height="fit" I18N="In the registration dialog"/>
+                </div>
+
+                <div width="100%" height="12%" layout="horizontal-row" >
+                    <label   id="label_password" proportion="1" height="100%" text_align="left"
+                             I18N="In the registration dialog" text="Password"/>
+                    <textbox id="password" proportion="2" height="fit" I18N="In the registration dialog"/>
+                </div>
+
+                <div width="100%" height="12%" layout="horizontal-row" >
+                    <label   id="label_password_confirm" proportion="1" height="100%" text_align="left"
+                             I18N="In the registration dialog" text="Confirm"/>
+                    <textbox id="password_confirm" proportion="2" height="fit" I18N="In the registration dialog"/>
+                </div>
+
+                <div width="100%" height="12%" layout="horizontal-row" >
+                    <label   id="label_email" proportion="1" height="100%" text_align="left"
+                             I18N="In the registration dialog" text="Email"/>
+                    <textbox id="email" proportion="2" height="fit" I18N="In the registration dialog"/>
+                </div>
+<!--
+                <div width="100%" height="12%" layout="horizontal-row" >
+                    <label   id="label_email_confirm" proportion="1" height="100%" text_align="left"
+                             I18N="In the registration dialog" text="Confirm"/>
+                    <textbox id="email_confirm" proportion="2" height="fit" I18N="In the registration dialog"/>
+                </div>
+-->
+                <label id="info" height="20%" width="100%" align="center" text_align="center" word_wrap="true"
+                   I18N="In the registration dialog" 
+                       text="You can play without creating an online account by selecting an offline account. Though then you can not connect to friends, vote for addons etc. Please read our privacy statement at http://privacy.supertuxkart.net"/>
+            </div>
+
+            <buttonbar id="options" width="40%" height="15%" align="center">
+                <icon-button id="next" width="50%" height="90%" icon="gui/green_check.png"
+                    I18N="In the registration dialog" text="OK" label_location="none"/>
+                <icon-button id="cancel" width="50%" height="90%" icon="gui/main_quit.png"
+                    I18N="In the registration dialog"  text="Cancel" label_location="none"/>
+            </buttonbar>
+        </box>
+    </div>
+
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+</stkgui>

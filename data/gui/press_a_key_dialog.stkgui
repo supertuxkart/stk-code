@@ -1,15 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
+    <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
 
-<div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
+        <label id="title" width="100%" text_align="center" text="Press a key" proportion="1" />
 
-    <label id="title" width="100%" text_align="center" text="Press a key" proportion="1" />
+        <spacer height="25" width="10" />
 
-    <spacer height="25" width="10" />
+        <button id="assignEsc" I18N="When configuring input" text="Assign to ESC key" align="center"/>
+        <spacer height="10" width="10" />
+        <button id="assignNone"    I18N="When configuring input" text="Assign nothing" align="center"/>
+        <spacer height="10" width="10" />
+        <button id="cancel"    I18N="When configuring input" text="Press ESC to cancel" align="center"/>
 
-    <button id="assignEsc" I18N="When configuring input" text="Assign to ESC key" align="center"/>
-    <spacer height="10" width="10" />
-    <button id="cancel"    I18N="When configuring input" text="Press ESC to cancel" align="center"/>
-
-</div>
-
+    </div>
 </stkgui>

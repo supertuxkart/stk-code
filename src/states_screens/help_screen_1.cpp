@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,13 +18,15 @@
 #include "states_screens/help_screen_1.hpp"
 
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/help_screen_2.hpp"
 #include "states_screens/help_screen_3.hpp"
@@ -53,47 +55,54 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
 {
     if (name == "startTutorial")
     {
-        race_manager->setNumLocalPlayers(1);
+        race_manager->setNumPlayers(1);
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
         race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
         race_manager->setNumKarts( 1 );
         race_manager->setTrack( "tutorial" );
         race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
+        race_manager->setReverseTrack(false);
 
         // Use keyboard 0 by default (FIXME: let player choose?)
-        InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+        InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
 
         // Create player and associate player with keyboard
-        StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+        StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
                                                 device);
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
         {
-            fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
-                    UserConfigParams::m_default_kart.c_str());
+            Log::warn("HelpScreen1", "Cannot find kart '%s', will revert to default",
+                      UserConfigParams::m_default_kart.c_str());
             UserConfigParams::m_default_kart.revertToDefaults();
         }
-        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
         // ASSIGN should make sure that only input from assigned devices
         // is read.
-        input_manager->getDeviceList()->setAssignMode(ASSIGN);
-        input_manager->getDeviceList()
+        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+        input_manager->getDeviceManager()
             ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
         StateManager::get()->enterGameState();
-        network_manager->setupPlayerKartInfo();
+        race_manager->setupPlayerKartInfo();
         race_manager->startNew(false);
     }
     else if (name == "category")
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        //if (selection == "page1") StateManager::get()->replaceTopMostScreen(Help1Screen::getInstance());
-        //else
-        if (selection == "page2") StateManager::get()->replaceTopMostScreen(HelpScreen2::getInstance());
-        else if (selection == "page3") StateManager::get()->replaceTopMostScreen(HelpScreen3::getInstance());
-        else if (selection == "page4") StateManager::get()->replaceTopMostScreen(HelpScreen4::getInstance());
+        Screen *screen = NULL;
+        //if (selection == "page1")
+        //    screen = HelpScreen1::getInstance();
+        if (selection == "page2")
+            screen = HelpScreen2::getInstance();
+        else if (selection == "page3")
+            screen = HelpScreen3::getInstance();
+        else if (selection == "page4")
+            screen = HelpScreen4::getInstance();
+        if(screen)
+            StateManager::get()->replaceTopMostScreen(screen);
     }
     else if (name == "back")
     {
@@ -107,16 +116,10 @@ void HelpScreen1::init()
 {
     Screen::init();
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
-	ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
+    ButtonWidget* tutorial = getWidget<ButtonWidget>("startTutorial");
 
-	if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-	{
-		tutorial->setDeactivated();
-	}
-	else
-	{
-		tutorial->setActivated();
-	}
+    tutorial->setActive(StateManager::get()->getGameState() != 
+                                                       GUIEngine::INGAME_MENU);
 
     if (w != NULL)  w->select( "page1", PLAYER_ID_GAME_MASTER );
 }   //init

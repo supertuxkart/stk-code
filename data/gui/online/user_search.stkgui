@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
+    <div x="1%" y="0%" width="98%" height="99%" layout="vertical-row" >
+        <header text_align="center" height="fit" text="User search" align="center"/>
+
+        <spacer width="10" height="10"/>
+
+        <div height="fit" width="100%" layout="horizontal-row" align="center">
+            <textbox id="search_box" height="fit" proportion="1"/>
+            <spacer width="10" height="10"/>
+            <button id="search_button" height="100%" width="fit" text="Search" />
+        </div>
+
+        <spacer width="10" height="10"/>
+
+        <box proportion="1" width="100%" align="center" layout="vertical-row" padding="6">
+            <list id="user_list" x="0" y="0" width="100%" height="100%"/>
+        </box>
+    </div>
+</stkgui>

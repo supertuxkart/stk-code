@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -40,7 +40,9 @@ namespace GUIEngine
     {
         MENU,
         GAME,
-        INGAME_MENU
+        INGAME_MENU,
+        /** Dummy GameState e. g. for parameters. */
+        CURRENT
     };   // GameState
 
     /**
@@ -82,7 +84,7 @@ namespace GUIEngine
           * without displaying the second-topmost menu of the stack
           * in-between)
           */
-        void replaceTopMostScreen(Screen* screen);
+        void replaceTopMostScreen(Screen* screen, GUIEngine::GameState gameState = GUIEngine::CURRENT);
 
         /**
           * \brief removes the menu at the top of the screens stack
@@ -165,6 +167,10 @@ namespace GUIEngine
 
         virtual void onTopMostScreenChanged() = 0;
 
+        // --------------------------------------------------------------------
+        /** Returns the number of screens on the stack. Is used to decide
+         *  if exiting a screen would cause STK to end or not. */
+        unsigned int getMenuStackSize() const { return m_menu_stack.size(); }
     };   // Class AbstractStateManager
 
 }   // GUIEngine

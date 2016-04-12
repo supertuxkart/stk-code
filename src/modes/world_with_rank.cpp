@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 #include "karts/kart_properties.hpp"
 #include "race/history.hpp"
 #include "tracks/track.hpp"
+#include "utils/log.hpp"
 
 #include <iostream>
 
@@ -36,6 +37,8 @@ void WorldWithRank::init()
     m_position_used.resize(m_karts.size());
     m_position_setting_initialised = false;
 #endif
+    stk_config->getAllScores(&m_score_for_position, getNumKarts());
+
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -85,22 +88,22 @@ bool WorldWithRank::setKartPosition(unsigned int kart_id,
     assert(m_position_setting_initialised);
     if(m_position_used[position-1])
     {
-        std::cerr << "== TWO KARTS ARE BEING GIVEN THE SAME POSITION!! ==\n";
+        Log::error("[WorldWithRank]", "== TWO KARTS ARE BEING GIVEN THE SAME POSITION!! ==");
         for (unsigned int j=0; j < m_position_index.size(); j++)
         {
             if (!m_position_used[j])
             {
-                std::cout << "    No kart is yet set at position " << j+1
-                          << std::endl;
+                Log::warn("WorldWithRank]", "No kart is yet set at position %u", j+1);
             }
             else
             {
-                std::cout << "    Kart " << m_position_index[j]
-                          << " is at position " << j << std::endl;
+                Log::warn("WorldWithRank]", "Kart %u is at position %u",
+                            m_position_index[j], j);
             }
         }
-        std::cout << "Kart " << kart_id << " is being given position "
-                  << position << ", but this position is already taken\n";
+        Log::warn("WorldWithRank]", "Kart %u is being given position %u,"
+                    "but this position is already taken",
+                    kart_id, position);
         return false;
     }
     m_position_used[position-1] = true;
@@ -131,35 +134,54 @@ unsigned int WorldWithRank::getNumberOfRescuePositions() const
     return getTrack()->getNumberOfStartPositions();
 }   // getNumberOfRescuePositions
 
-// ----------------------------------------------------------------------------
-/** Finds the starting position which is closest to the kart.
- *  \param kart The kart for which a rescue position needs to be determined.
- */ 
+//-----------------------------------------------------------------------------
+/** Determines the rescue position for a kart. The rescue position is the
+ *  start position which is has the biggest accumulated distance to all other
+ *  karts, and which has no other kart very close. The latter avoids dropping
+ *  a kart on top of another kart. This is the method used 
+ *  \param kart The kart that is going to be rescued.
+ *  \returns The index of the start position to which the rescued kart
+ *           should be moved to.
+ */
+
 unsigned int WorldWithRank::getRescuePositionIndex(AbstractKart *kart)
 {
-    // find closest point to drop kart on
-    const int start_spots_amount = getNumberOfRescuePositions();
+    const int start_spots_amount = getTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
 
-    int closest_id = -1;
-    float closest_distance = 999999999.0f;
+    float largest_accumulated_distance_found = -1;
+    int   furthest_id_found                  = -1;
 
-    for (int n=0; n<start_spots_amount; n++)
+    for(int n=0; n<start_spots_amount; n++)
     {
-        const btTransform &s = getTrack()->getStartTransform(n);
-        const Vec3 &v = s.getOrigin();
+        const btTransform &s = getStartTransform(n);
+        const Vec3 &v=s.getOrigin();
+        float accumulated_distance = .0f;
+        bool spawn_point_clear = true;
 
-        float abs_distance = (v - kart->getXYZ()).length();
-
-        if (abs_distance < closest_distance)
+        for(unsigned int k=0; k<getCurrentNumKarts(); k++)
         {
-            closest_distance = abs_distance;
-            closest_id = n;
+            if(kart->getWorldKartId()==k) continue;
+            float abs_distance2 = (getKart(k)->getXYZ()-v).length2_2d();
+            const float CLEAR_SPAWN_RANGE2 = 5*5;
+            if( abs_distance2 < CLEAR_SPAWN_RANGE2)
+            {
+                spawn_point_clear = false;
+                break;
+            }
+            accumulated_distance += sqrt(abs_distance2);
+        }
+
+        if(accumulated_distance > largest_accumulated_distance_found &&
+            spawn_point_clear)
+        {
+            furthest_id_found = n;
+            largest_accumulated_distance_found = accumulated_distance;
         }
     }
 
-    assert(closest_id != -1);
-    return closest_id;
+    assert(furthest_id_found != -1);
+    return furthest_id_found;
 }   // getRescuePositionIndex
 
 // ----------------------------------------------------------------------------
@@ -172,3 +194,13 @@ btTransform WorldWithRank::getRescueTransform(unsigned int rescue_pos) const
     return getTrack()->getStartTransform(rescue_pos);
 }   // getRescueTransform
 
+//-----------------------------------------------------------------------------
+/** Returns the number of points for a kart at a specified position.
+ *  \param p Position (starting with 1).
+ */
+int WorldWithRank::getScoreForPosition(int p)
+{
+    assert(p-1 >= 0);
+    assert(p - 1 <(int) m_score_for_position.size());
+    return m_score_for_position[p - 1];
+}   // getScoreForPosition

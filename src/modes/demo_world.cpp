@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,10 +18,12 @@
 
 #include "modes/demo_world.hpp"
 
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "input/device_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "input/input_manager.hpp"
-#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -48,8 +50,8 @@ DemoWorld::DemoWorld()
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
     race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
     race_manager->setNumKarts(m_num_karts);
-    race_manager->setNumLocalPlayers(1);
-    race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+    race_manager->setNumPlayers(1);
+    race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
 }   // DemoWorld
 
@@ -120,7 +122,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
             && m_demo_tracks.size() > 0)
     {
         if(!track)
-            printf("Invalid demo track identifier '%s'.\n",
+            Log::warn("[DemoWorld]", "Invalid demo track identifier '%s'.",
                    m_demo_tracks[0].c_str());
         m_demo_tracks.erase(m_demo_tracks.begin());
         track = track_manager->getTrack(m_demo_tracks[0]);
@@ -130,26 +132,26 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     // be filled up with all the tracks.
     if(m_demo_tracks.size()==0)
     {
-        printf("No valid tracks found, no demo started.\n");
+        Log::warn("[DemoWorld]", "No valid tracks found, no demo started.");
         return false;
     }
 
     StateManager::get()->enterGameState();
-    race_manager->setNumLocalPlayers(1);
+    race_manager->setNumPlayers(1);
     InputDevice *device;
 
     // Use keyboard 0 by default in --no-start-screen
-    device = input_manager->getDeviceList()->getKeyboard(0);
+    device = input_manager->getDeviceManager()->getKeyboard(0);
     StateManager::get()->createActivePlayer(
-        UserConfigParams::m_all_players.get(0), device );
+                           PlayerManager::get()->getPlayer(0), device);
     // ASSIGN should make sure that only input from assigned devices
     // is read.
-    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+    input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
     m_do_demo = true;
     race_manager->setNumKarts(m_num_karts);
-    race_manager->setLocalKartInfo(0, "tux");
-    network_manager->setupPlayerKartInfo();
+    race_manager->setPlayerKart(0, "tux");
+    race_manager->setupPlayerKartInfo();
     race_manager->startSingleRace(m_demo_tracks[0], m_num_laps, false);
     m_demo_tracks.push_back(m_demo_tracks[0]);
     m_demo_tracks.erase(m_demo_tracks.begin());

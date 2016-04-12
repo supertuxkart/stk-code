@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+        <header id="title" text_align="center" width="80%" align="center" text="..."/>
+
+        <spacer height="25" width="10"/>
+
+        <tabs id="profile_tabs" height="10%" max_height="110" x="2%" width="98%" align="center">
+            <icon-button id="tab_servers" width="128" height="128" icon="gui/main_network.png" I18N="Section in the profile screen" text="Servers"/>
+            <icon-button id="tab_achievements" width="128" height="128" icon="gui/gp_copy.png"/>
+            <icon-button id="tab_friends" width="128" height="128" icon="gui/options_players.png" />
+            <icon-button id="tab_settings" width="128" height="128" icon="gui/main_options.png" />
+        </tabs>
+
+        <box proportion="1" width="100%" layout="vertical-row">
+            <div x="1%" y="2%" width="98%" height="96%" layout="vertical-row" >
+                
+                <spacer height="5%" width="25"/>
+                
+                <box width="100%" proportion="1" padding="10" layout="vertical-row">
+                    <bright width="100%" text="Local Networking" align="center" text_align="left" />
+
+                    <buttonbar id="lan" proportion="2" width="90%" align="center">
+                        <icon-button id="find_lan_server" width="128" height="128"
+                                     icon="gui/online/menu_find_server.png" focus_icon="gui/online/menu_find_server_hover.png"
+                                     I18N="In the online multiplayer screen" text="Find Server"/>
+                        <icon-button id="create_lan_server" width="128" height="128"
+                                     icon="gui/online/menu_create_server.png" focus_icon="gui/online/menu_create_server_hover.png"
+                                     I18N="In the online multiplayer screen" text="Create Server"/>
+                                     <!--
+                        <icon-button id="manage_user" width="128" height="128"
+                                     icon="gui/options_players.png"
+                                     I18N="In the online multiplayer screen" text="Users"/>
+                                     -->
+                    </buttonbar>
+                </box>
+
+                <spacer height="5%" width="25"/>
+
+                <box width="100%" proportion="1" padding="10" layout="vertical-row">
+                    <bright width="100%" text="Global Networking" align="center" text_align="left" />
+
+                    <buttonbar id="wan" proportion="2" width="90%" align="center">
+                        <icon-button id="find_wan_server" width="128" height="128"
+                                     icon="gui/online/menu_find_server.png" focus_icon="gui/online/menu_find_server_hover.png"
+                                     I18N="In the online multiplayer screen" text="Find Server"/>
+                        <icon-button id="create_wan_server" width="128" height="128"
+                                     icon="gui/online/menu_create_server.png" focus_icon="gui/online/menu_create_server_hover.png"
+                                     I18N="In the online multiplayer screen" text="Create Server"/>
+                        <icon-button id="quick_wan_play" width="128" height="128"
+                                     icon="gui/online/menu_quick_play.png" focus_icon="gui/online/menu_quick_play_hover.png"
+                                     I18N="In the online multiplayer screen" text="Quick Play"/>
+                    </buttonbar>
+                </box>
+
+            </div>
+        </box>
+    </div>
+</stkgui>

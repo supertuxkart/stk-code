@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Marianne Gagnon
-//  based on code Copyright (C) 2002-2010 Nikolaus Gebhardt
+//  Copyright (C) 2011-2015 Marianne Gagnon
+//  based on code Copyright 2002-2010 Nikolaus Gebhardt
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 #include <IMeshSceneNode.h>
 
 PerCameraNode::PerCameraNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
-                             scene::ICameraSceneNode* camera, scene::IMesh* mesh)
+                             scene::ICameraSceneNode* camera, scene::ISceneNode *node)
     : IDummyTransformationSceneNode(parent, mgr, id)
 {
 #ifdef DEBUG
@@ -33,7 +33,10 @@ PerCameraNode::PerCameraNode(scene::ISceneNode* parent, scene::ISceneManager* mg
 #endif
 
     m_camera = camera;
-    m_child = mgr->addMeshSceneNode(mesh, this);
+
+    node->setParent(this);
+    m_child = node;
+
     //m_child = mgr->addCubeSceneNode(0.5f, this, -1, core::vector3df(0,0,0), core::vector3df(0,0,0), core::vector3df(3.0f,0.2f,3.0f));
     //RelativeTransformationMatrix.setTranslation( core::vector3df(-0.5,-1,3) );
 

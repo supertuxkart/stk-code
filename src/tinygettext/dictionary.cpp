@@ -1,5 +1,5 @@
 //  tinygettext - A gettext replacement that works directly on .po files
-//  Copyright (C) 2006 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,8 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <assert.h>
-#include "log_stream.hpp"
 #include "dictionary.hpp"
+
+#include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 namespace tinygettext {
 
@@ -62,10 +65,10 @@ std::string
 Dictionary::translate_plural(const Entries& dict, const std::string& msgid, const std::string& msgid_plural, int count)
 {
   Entries::const_iterator i = dict.find(msgid);
-  const std::vector<std::string>& msgstrs = i->second;
 
   if (i != dict.end())
   {
+    const std::vector<std::string>& msgstrs = i->second;
     unsigned int n = 0;
     n = plural_forms.get_plural(count);
     assert(/*n >= 0 &&*/ n < msgstrs.size());
@@ -168,8 +171,9 @@ Dictionary::add_translation(const std::string& msgid, const std::string& msgstr)
   }
   else
   {
-    log_warning << "collision in add_translation: '"
-                << msgid << "' -> '" << msgstr << "' vs '" << vec[0] << "'" << std::endl;
+    Log::warn("tinygettext",
+              "Collision in add translation: '%s' -> '%s' vs '%s'.",
+              msgid.c_str(), msgstr.c_str(), vec[0].c_str());
     vec[0] = msgstr;
   }
 }
@@ -186,7 +190,9 @@ Dictionary::add_translation(const std::string& msgctxt,
   }
   else
   {
-    log_warning << "collision in add_translation(\"" << msgctxt << "\", \"" << msgid << "\", \"" << msgid_plural << "\")" << std::endl;
+      Log::warn("tinygettext",
+          "collision in add_translation(\"%s\", \"%s\", \"%s\")",
+          msgctxt.c_str(), msgid.c_str(), msgid_plural.c_str());
     vec = msgstrs;
   }
 }
@@ -201,9 +207,40 @@ Dictionary::add_translation(const std::string& msgctxt, const std::string& msgid
   }
   else
   {
-    log_warning << "collision in add_translation(\"" << msgctxt << "\", \"" << msgid << "\")" << std::endl;
+    Log::warn("tinygettext", "collision in add_translation(\"%s\", \"%s\")",
+              msgctxt.c_str(), msgid.c_str());
     vec[0] = msgstr;
   }
+}
+
+std::set<wchar_t> Dictionary::get_all_used_chars()
+{
+    std::set<wchar_t> UsedChars;
+    for (Entries::const_iterator i = entries.begin(); i != entries.end(); ++i)
+    {
+        const std::vector<std::string>& msgstrs = i->second;
+        for (unsigned int k = 0; k < msgstrs.size(); k++)
+        {
+            irr::core::stringw ws = translations->fribidize((StringUtils::utf8ToWide(msgstrs[k])).c_str());
+                for (unsigned int l = 0; l < ws.size(); ++l)
+                    UsedChars.insert(ws[l]);
+        }
+    }
+
+    for (CtxtEntries::const_iterator i = ctxt_entries.begin(); i != ctxt_entries.end(); ++i)
+    {
+        for (Entries::const_iterator j = i->second.begin(); j != i->second.end(); ++j)
+        {
+            const std::vector<std::string>& msgstrs = j->second;
+            for (unsigned int k = 0; k < msgstrs.size(); k++)
+            {
+                irr::core::stringw ws = translations->fribidize((StringUtils::utf8ToWide(msgstrs[k])).c_str());
+                for (unsigned int l = 0; l < ws.size(); ++l)
+                    UsedChars.insert(ws[l]);
+            }
+        }
+    }
+    return UsedChars;
 }
 
 } // namespace tinygettext

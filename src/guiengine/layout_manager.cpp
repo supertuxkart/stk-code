@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,9 +21,6 @@
 
 #include <IGUIFont.h>
 #include <ITexture.h>
-using namespace irr;
-using namespace gui;
-using namespace video;
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/abstract_top_level_container.hpp"
@@ -33,12 +30,12 @@ using namespace video;
 #include "io/file_manager.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/vs.hpp"
 
+using namespace irr;
+using namespace gui;
+using namespace video;
 using namespace GUIEngine;
-
-#ifndef round
-# define round(x)  (floor(x+0.5f))
-#endif
 
 /** Like atoi, but on error prints an error message to stderr */
 int atoi_p(const char* val)
@@ -50,7 +47,7 @@ int atoi_p(const char* val)
     }
     else
     {
-        fprintf(stderr, "[LayoutManager] WARNING: Invalid value '%s' found in XML file where integer was expected\n", val);
+        Log::warn("LayoutManager", "Invalid value '%s' found in XML file where integer was expected.", val);
         return 0;
     }
 }
@@ -59,12 +56,8 @@ int atoi_p(const char* val)
 
 bool LayoutManager::convertToCoord(std::string& x, int* absolute /* out */, int* percentage /* out */)
 {
-    bool is_number;
-    int i;
-    std::istringstream myStream(x);
-    is_number = (myStream >> i)!=0;
-
-    if(!is_number) return false;
+    int i = 0;
+    if (!StringUtils::fromString<int>(x, i /* out */)) return false;
 
     if( x[x.size()-1] == '%' ) // percentage
     {
@@ -158,8 +151,9 @@ void LayoutManager::readCoords(Widget* self)
 
     if (self->m_properties[PROP_ICON].size() > 0)
     {
-        ITexture* texture = irr_driver->getTexture((file_manager->getDataDir() + "/" +
-                                                    self->m_properties[PROP_ICON]).c_str());
+        // PROP_ICON includes paths (e.g. gui/logo.png)
+        ITexture* texture = irr_driver->getTexture(file_manager->getAsset(
+                                                    self->m_properties[PROP_ICON]));
 
         if (texture != NULL)
         {
@@ -212,7 +206,7 @@ void LayoutManager::readCoords(Widget* self)
         int child_max_width = -1, child_max_height = -1;
         int total_width = 0, total_height = 0;
 
-        for (int child=0; child<self->m_children.size(); child++)
+        for (unsigned int child=0; child<self->m_children.size(); child++)
         {
             if (self->m_children[child].m_absolute_w > -1)
             {
@@ -243,6 +237,18 @@ void LayoutManager::readCoords(Widget* self)
                     }
                 }
             }
+        }
+
+        //Add padding to <box> elements
+        if (self->getType() == WTYPE_DIV && self->m_show_bounding_box)
+        {
+            int padding = 15;
+            if (self->m_properties[PROP_DIV_PADDING].length() > 0)
+                padding = atoi(self->m_properties[PROP_DIV_PADDING].c_str());
+            child_max_height += padding * 2;
+            total_height += padding * 2;
+            total_width += padding * 2;
+            child_max_width += padding * 2;
         }
 
         if (self->m_properties[PROP_WIDTH] == "fit")
@@ -330,10 +336,10 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
     else if (self->m_relative_y > -1)         self->m_y = (int)(parent_y + parent_h*self->m_relative_y/100);
 
     if (self->m_absolute_w > -1)      self->m_w = self->m_absolute_w;
-    else if (self->m_relative_w > -1) self->m_w = (int)round(parent_w*self->m_relative_w/100.0);
+    else if (self->m_relative_w > -1) self->m_w = (int)roundf(parent_w*self->m_relative_w/100.0f);
 
     if (self->m_absolute_h > -1)      self->m_h = self->m_absolute_h;
-    else if (self->m_relative_h > -1) self->m_h = (int)round(parent_h*self->m_relative_h/100.0);
+    else if (self->m_relative_h > -1) self->m_h = (int)roundf(parent_h*self->m_relative_h/100.0f);
 
     // ---- can't make widget bigger than parent
     if (self->m_h > (int)parent_h)
@@ -426,7 +432,7 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
             horizontal = false;
         else
         {
-            std::cerr << "Unknown layout name : " << layout_name.c_str() << std::endl;
+            Log::error("LayoutManager::doCalculateLayout", "Unknown layout name: %s", layout_name.c_str());
             break;
         }
 
@@ -467,7 +473,7 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
 
         if (left_space < 0)
         {
-            fprintf(stderr, "[LayoutManager] WARNING: statically sized widgets took all the place!!\n");
+            Log::warn("LayoutManager", "Statically sized widgets took all the place!!");
             left_space = 0;
         }
 
@@ -481,11 +487,9 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                 int proportion = 1;
                 std::istringstream myStream(prop);
                 if (!(myStream >> proportion))
-                {
-                    std::cerr << "/!\\ Warning /!\\ : proportion  '" << prop.c_str()
-                              << "' is not a number for widget " << widgets[n].m_properties[PROP_ID].c_str()
-                              << std::endl;
-                }
+                    Log::warn("LayoutManager::doCalculateLayout",
+                        "Proportion '%s' is not a number for widget %s", prop.c_str(),
+                        widgets[n].m_properties[PROP_ID].c_str());
 
                 const float fraction = (float)proportion/(float)total_proportion;
 
@@ -528,9 +532,9 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                     }
                     else
                     {
-                        std::cerr  << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
-                                   <<  "' is unknown (widget '" << widgets[n].m_properties[PROP_ID].c_str()
-                                   << "', in a horiozntal-row layout)\n";
+                        Log::warn("LayoutManager::doCalculateLayout",
+                            "Alignment '%s' is unknown (widget '%s', in a horiozntal-row layout)",
+                            align.c_str(), widgets[n].m_properties[PROP_ID].c_str());
                     }
 
                     widgets[n].m_w = (int)(left_space*fraction);
@@ -542,9 +546,9 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
 
                     if (widgets[n].m_w <= 0)
                     {
-                        fprintf(stderr, "WARNING: widget '%s' has a width of %i (left_space = %i, "
-                                "fraction = %f, max_width = %s)\n", widgets[n].m_properties[PROP_ID].c_str(),
-                                widgets[n].m_w, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
+                        Log::warn("LayoutManager", "Widget '%s' has a width of %i (left_space = %i, "
+                                  "fraction = %f, max_width = %s)", widgets[n].m_properties[PROP_ID].c_str(),
+                                  widgets[n].m_w, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
                         widgets[n].m_w = 1;
                     }
 
@@ -562,9 +566,9 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
 
                     if (widgets[n].m_h <= 0)
                     {
-                        fprintf(stderr, "WARNING: widget '%s' has a height of %i (left_space = %i, "
-                                "fraction = %f, max_width = %s)\n", widgets[n].m_properties[PROP_ID].c_str(),
-                                widgets[n].m_h, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
+                        Log::warn("LayoutManager", "Widget '%s' has a height of %i (left_space = %i, "
+                                  "fraction = %f, max_width = %s)\n", widgets[n].m_properties[PROP_ID].c_str(),
+                                  widgets[n].m_h, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
                         widgets[n].m_h = 1;
                     }
 
@@ -603,9 +607,9 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                     }
                     else
                     {
-                        std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
-                                  <<  "' is unknown (widget '" << widgets[n].m_properties[PROP_ID].c_str()
-                                  << "', in a vertical-row layout)\n";
+                        Log::warn("LayoutManager::doCalculateLayout",
+                            "Alignment '%s' is unknown (widget '%s', in a vertical-row layout)",
+                            align.c_str(), widgets[n].m_properties[PROP_ID].c_str());
                     }
                     widgets[n].m_y = y;
 
@@ -657,9 +661,9 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                     }
                     else
                     {
-                        std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
-                                  << "' is unknown in widget " << widgets[n].m_properties[PROP_ID].c_str()
-                                  << std::endl;
+                        Log::warn("LayoutManager::doCalculateLayout",
+                            "Alignment '%s' is unknown in widget '%s'",
+                            align.c_str(), widgets[n].m_properties[PROP_ID].c_str());
                     }
 
                     x += widgets[n].m_w;
@@ -703,8 +707,9 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
                     }
                     else
                     {
-                        std::cerr << "/!\\ Warning /!\\ : alignment  '" << align.c_str()
-                                  << "' is unknown in widget " << widgets[n].m_properties[PROP_ID].c_str() << std::endl;
+                        Log::warn("LayoutManager::doCalculateLayout",
+                            "Alignment '%s' is unknown in widget '%s'",
+                            align.c_str(), widgets[n].m_properties[PROP_ID].c_str());
                     }
                     widgets[n].m_y = y;
 

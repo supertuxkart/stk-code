@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,14 +15,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "guiengine/CGUISpriteBank.h"
-#include "guiengine/engine.hpp"
 #include "guiengine/widgets/list_widget.hpp"
+
+#include "guiengine/CGUISpriteBank.hpp"
+#include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 
 #include <IGUIElement.h>
+#include <IGUISkin.h>
 #include <IGUIEnvironment.h>
-#include <IGUIListBox.h>
+#include <IGUIFontBitmap.h>
 
 #include <sstream>
 
@@ -38,7 +40,10 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_icons = NULL;
     m_listener = NULL;
     m_selected_column = NULL;
-    m_sort_desc = true;
+    m_sort_desc = false;
+    m_sort_default = true;
+    m_sort_col = 0;
+    m_sortable = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -50,7 +55,7 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons, int size)
 
     if (m_use_icons)
     {
-        IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+        CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
         assert(list != NULL);
 
         list->setSpriteBank(m_icons);
@@ -80,8 +85,8 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons, int size)
 
 }
 
-// -----------------------------------------------------------------------------
 
+// -----------------------------------------------------------------------------
 void ListWidget::add()
 {
     const int header_height = GUIEngine::getFontHeight() + 15;
@@ -89,11 +94,32 @@ void ListWidget::add()
     rect<s32> widget_size = (m_header.size() > 0 ? rect<s32>(m_x, m_y + header_height, m_x + m_w, m_y + m_h) :
                                                    rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h) );
 
-    IGUIListBox* list = GUIEngine::getGUIEnv()->addListBox (widget_size, m_parent, getNewID());
-    list->setAutoScrollEnabled(false);
+    IGUISkin * current_skin = GUIEngine::getGUIEnv()->getSkin();
+    IGUIFont * current_font = GUIEngine::getGUIEnv()->getBuiltInFont();
+    CGUISTKListBox * list_box = new CGUISTKListBox(
+        GUIEngine::getGUIEnv(),
+        m_parent ? m_parent : GUIEngine::getGUIEnv()->getRootGUIElement(),
+        getNewID(),
+        widget_size,
+        true,
+        true,
+        false);
 
-    m_element = list;
-    m_element->setTabOrder( list->getID() );
+    if (current_skin && current_skin->getSpriteBank())
+    {
+            list_box->setSpriteBank(current_skin->getSpriteBank());
+    }
+    else if (current_font && current_font->getType() == EGFT_BITMAP)
+    {
+            list_box->setSpriteBank( ((IGUIFontBitmap*)current_font)->getSpriteBank());
+    }
+
+    list_box->drop();
+
+    list_box->setAutoScrollEnabled(false);
+
+    m_element = list_box;
+    m_element->setTabOrder( list_box->getID() );
 
     if (m_header.size() > 0)
     {
@@ -149,94 +175,138 @@ void ListWidget::clear()
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
 
-    IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
 
     list->clear();
-    m_items.clear();
 }
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::addItem(const std::string& internalName,
-                         const irr::core::stringw& name, const int icon)
+void ListWidget::addItem(   const std::string& internal_name,
+                            const irr::core::stringw &name,
+                            const int icon,
+                            bool center)
+{
+    // May only be called AFTER this widget has been add()ed
+    assert(m_element != NULL);
+
+    ListCell cell(name, icon, 1, center);
+    ListItem newItem;
+    newItem.m_internal_name = internal_name;
+    newItem.m_contents.push_back(cell);
+
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
+    assert(list != NULL);
+
+    u32 itemID = list->addItem( newItem );
+    if (m_use_icons)
+    {
+        list->setItemOverrideColor( itemID, gui::EGUI_LBC_ICON, video::SColor(255,255,255,255) );
+        list->setItemOverrideColor( itemID, gui::EGUI_LBC_ICON_HIGHLIGHT, video::SColor(255,255,255,255) );
+    }
+    newItem.m_current_id = itemID;
+}
+
+// -----------------------------------------------------------------------------
+
+void ListWidget::addItem(const std::string& internal_name,
+                         const std::vector<ListCell>& contents)
 {
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
 
     ListItem newItem;
-    newItem.m_label = name;
-    newItem.m_internal_name = internalName;
+    newItem.m_internal_name = internal_name;
+    for (unsigned int i = 0; i < contents.size(); i++)
+    {
+        newItem.m_contents.push_back(contents[i]);
+    }
 
-    IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
 
-    if (m_use_icons && icon != -1)
+    u32 itemID = list->addItem( newItem );
+    if (m_use_icons)
     {
-        u32 itemID = list->addItem( name.c_str(), icon );
         list->setItemOverrideColor( itemID, gui::EGUI_LBC_ICON, video::SColor(255,255,255,255) );
         list->setItemOverrideColor( itemID, gui::EGUI_LBC_ICON_HIGHLIGHT, video::SColor(255,255,255,255) );
-        newItem.m_current_id = itemID;
     }
-    else
-    {
-        newItem.m_current_id = list->addItem( name.c_str() );
-    }
-    m_items.push_back(newItem);
+    newItem.m_current_id = itemID;
 }
 
 // -----------------------------------------------------------------------------
-
-void ListWidget::renameItem(const int itemID, const irr::core::stringw newName, const int icon)
+void ListWidget::renameCell(const int row_index, const int col_index, 
+                            const irr::core::stringw &newName, const int icon)
 {
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
 
-    IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
 
-    m_items[itemID].m_label = newName;
-    list->setItem(itemID, newName.c_str(), icon);
+    list->setCell(row_index, col_index, newName.c_str(), icon);
 
-    list->setItemOverrideColor( itemID, EGUI_LBC_TEXT          , video::SColor(255,0,0,0) );
-    list->setItemOverrideColor( itemID, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,255,255) );
+    list->setItemOverrideColor( row_index, EGUI_LBC_TEXT          , video::SColor(255,0,0,0) );
+    list->setItemOverrideColor( row_index, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,255,255) );
+}
+
+// -----------------------------------------------------------------------------
+void ListWidget::renameItem(const int row_index,
+                            const irr::core::stringw &newName, const int icon)
+{
+    renameCell(row_index, 0, newName, icon);
+}
+
+// -----------------------------------------------------------------------------
+void ListWidget::renameItem(const std::string &internal_name, 
+                            const irr::core::stringw &newName, const int icon)
+{
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
+    assert(list != NULL);
+    renameCell(list->getRowByInternalName(internal_name), 0, newName, icon);
 }
 
 // -----------------------------------------------------------------------------
 
 std::string ListWidget::getSelectionInternalName()
 {
-    if (getSelectionID() == -1) return "";
-    return m_items[ getSelectionID() ].m_internal_name;
 
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
+    assert(list != NULL);
+    int selectionID = getSelectionID();
+    if (selectionID == -1 || selectionID >= (int)list->getItemCount())
+        return "";
+    const CGUISTKListBox::ListItem& item = list->getItem(selectionID);
+    return item.m_internal_name;
 }
 
 // -----------------------------------------------------------------------------
-
-irr::core::stringw ListWidget::getSelectionLabel() const
+irr::core::stringw ListWidget::getSelectionLabel(const int cell) const
 {
-    const IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+    const CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
-    return list->getListItem( list->getSelected() );
+    return list->getCellText( list->getSelected(), cell);
 }
 
 // -----------------------------------------------------------------------------
 
 void ListWidget::selectItemWithLabel(const irr::core::stringw& name)
 {
-    IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
-    return list->setSelected( name.c_str() );
+    return list->setSelectedByCellText( name.c_str() );
 }
 
 // -----------------------------------------------------------------------------
 
 void ListWidget::unfocused(const int playerID, Widget* new_focus)
 {
-    IGUIListBox* list = getIrrlichtElement<IGUIListBox>();
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
 
     // remove selection when leaving list
-    if (list != NULL) list->setSelected(-1);
+    if (list != NULL && m_properties[PROP_KEEP_SELECTION] != "true")
+        list->setSelected(-1);
 }
 
 // -----------------------------------------------------------------------------
@@ -246,7 +316,7 @@ int ListWidget::getSelectionID() const
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
 
-    return getIrrlichtElement<IGUIListBox>()->getSelected();
+    return getIrrlichtElement<CGUISTKListBox>()->getSelected();
 }
 
 // -----------------------------------------------------------------------------
@@ -256,7 +326,7 @@ void ListWidget::setSelectionID(const int index)
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
 
-    IGUIListBox* irritem = getIrrlichtElement<IGUIListBox>();
+    CGUISTKListBox* irritem = getIrrlichtElement<CGUISTKListBox>();
 
     // auto-scroll to item when selecting something, don't auto-scroll when selecting nothing
     if (index != -1)
@@ -279,8 +349,7 @@ int ListWidget::getItemCount() const
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
 
-    const int count = getIrrlichtElement<IGUIListBox>()->getItemCount();
-    assert((int)m_items.size() == count);
+    const int count = getIrrlichtElement<CGUISTKListBox>()->getItemCount();
 
     return count;
 }
@@ -290,29 +359,16 @@ int ListWidget::getItemCount() const
 void ListWidget::elementRemoved()
 {
     Widget::elementRemoved();
-    m_items.clear();
 
-    for (int n=0; n<m_header_elements.size(); n++)
+    for (unsigned int n=0; n<m_header_elements.size(); n++)
     {
         m_header_elements[n].elementRemoved();
         m_children.remove( m_header_elements.get(n) );
     }
     m_header_elements.clearAndDeleteAll();
     m_selected_column = NULL;
-}
-
-// -----------------------------------------------------------------------------
-
-int ListWidget::getItemID(const std::string internalName) const
-{
-    const int count = m_items.size();
-
-    for (int i=0; i<count; i++)
-    {
-        if (m_items[i].m_internal_name == internalName) return i;
-    }
-
-    return -1;
+    m_sort_desc = false;
+    m_sort_default = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -322,7 +378,7 @@ void ListWidget::markItemRed(const int id, bool red)
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
 
-    IGUIListBox* irritem = getIrrlichtElement<IGUIListBox>();
+    CGUISTKListBox* irritem = getIrrlichtElement<CGUISTKListBox>();
 
     if (red)
     {
@@ -343,7 +399,7 @@ void ListWidget::markItemBlue(const int id, bool blue)
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
 
-    IGUIListBox* irritem = getIrrlichtElement<IGUIListBox>();
+    CGUISTKListBox* irritem = getIrrlichtElement<CGUISTKListBox>();
 
     if (blue)
     {
@@ -368,12 +424,24 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
 
     if (originator.find(m_properties[PROP_ID] + "_column_") != std::string::npos)
     {
-        int col = originator[ (m_properties[PROP_ID] + "_column_").size() ] - '0';
+        if (!m_sortable) return EVENT_BLOCK;
 
-        m_selected_column = m_header_elements.get(col);
+        if (m_sort_col != originator[(m_properties[PROP_ID] + "_column_").size()] - '0')
+        {
+            m_sort_desc = false;
+            m_sort_default = false;
+        }
+        else
+        {
+            if (!m_sort_default) m_sort_desc = !m_sort_desc;
+            m_sort_default = !m_sort_desc && !m_sort_default;
+        }
+
+        m_sort_col = originator[(m_properties[PROP_ID] + "_column_").size()] - '0';
+        m_selected_column = m_header_elements.get(m_sort_col);
 
         /** \brief Allows sort icon to change depending on sort order **/
-        m_sort_desc = !m_sort_desc;
+
         /*
         for (int n=0; n<m_header_elements.size(); n++)
         {
@@ -382,10 +450,18 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
         m_header_elements[col].getIrrlichtElement<IGUIButton>()->setPressed(true);
         */
 
-        if (m_listener) m_listener->onColumnClicked(col);
+        if (m_listener) m_listener->onColumnClicked(m_sort_col);
 
         return EVENT_BLOCK;
     }
 
     return EVENT_LET;
+}
+
+// -----------------------------------------------------------------------------
+int ListWidget::getItemID(const std::string &internalName) const
+{
+    const CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
+    assert(list != NULL);
+    return list->getRowByInternalName(internalName);
 }

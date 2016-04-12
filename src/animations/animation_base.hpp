@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009  Joerg Henrichs
+//  Copyright (C) 2009-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -47,14 +47,8 @@ private:
     *  one time only (which might get triggered more than once). */
     enum AnimTimeType { ATT_CYCLIC, ATT_CYCLIC_ONCE } m_anim_type;
 
-    /** True if the animation is currently playing. */
-    bool  m_playing;
-
     /** The current time used in the IPOs. */
     float m_current_time;
-
-    /** For cyclic animations: duration of the cycle. */
-    float m_cycle_length;
 
     /** The inital position of this object. */
     Vec3 m_initial_xyz;
@@ -66,9 +60,13 @@ protected:
     /** All IPOs for this animation. */
     PtrVector<Ipo>  m_all_ipos;
 
+    /** True if the animation is currently playing. */
+    bool  m_playing;
+    
 public:
                  AnimationBase(const XMLNode &node);
                  AnimationBase(Ipo *ipo);
+    virtual      ~AnimationBase() {}
     virtual void update(float dt, Vec3 *xyz=NULL, Vec3 *hpr=NULL,
                                   Vec3 *scale=NULL);
     /** This needs to be implemented by the inheriting classes. It is called
@@ -89,8 +87,7 @@ public:
     {
         float duration = -1;
 
-        const Ipo* currIpo;
-        for_in (currIpo, m_all_ipos)
+        for (const Ipo* currIpo : m_all_ipos)
         {
             duration = std::max(duration, currIpo->getEndTime());
         }

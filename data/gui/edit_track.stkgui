@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="1%" width="96%" height="98%" layout="vertical-row" padding="10">
+
+        <header id="selected_track" width="80%" height="30"
+            I18N="No neeed to translate this, it will be overwritten by the track name"
+            text="" align="center" text_align="center" />
+
+        <spacer height="20" />
+
+        <!-- Track selection -->
+        <box width="100%" height="60%" layout="vertical-row">
+            <ribbon_grid id="tracks" proportion="1" width="100%" height="100%" square_items="true"
+                label_location="each" align="center" child_width="240" child_height="160" />
+        </box>
+
+        <!-- Populated dynamically at runtime -->
+        <tabs width="100%" height="30" id="trackgroups"> </tabs>
+
+        <spacer height="50" />
+
+        <!-- Laps and reverse -->
+        <div width="100%" height="100" layout="horizontal-row" align="center">
+
+            <spacer proportion="1" />
+
+            <label id="laps_label" text_align="left"
+                I18N="In the edit track screen" text="Number of laps:" />
+            <spacer width="20" />
+            <spinner id="laps" proportion="1" width="100" min_value="1"
+                max_value="99" wrap_around="false" />
+
+            <spacer proportion="1" />
+
+            <label id="reverse_label" text_align="left"
+                I18N="In the edit track screen" text="Reverse:" />
+            <spacer width="20" />
+            <checkbox id="reverse" />
+
+            <spacer proportion="1" />
+        </div>
+
+        <!-- Dialog buttons -->
+        <div width="100%" height="60" layout="horizontal-row">
+            <spacer proportion="2" />
+            <button id="ok" text="OK" proportion="1" />
+            <spacer proportion="1" />
+            <button id="cancel" text="Cancel" proportion="1" />
+            <spacer proportion="2" />
+        </div>
+
+    </div>
+</stkgui>

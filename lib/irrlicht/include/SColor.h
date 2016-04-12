@@ -31,6 +31,12 @@ namespace video
 		//! Default 32 bit color format. 8 bits are used for every component: red, green, blue and alpha.
 		ECF_A8R8G8B8,
 
+		//! The normalized non-float formats from the _rg extension
+		ECF_R8,
+		ECF_R8G8,
+		ECF_R16,
+		ECF_R16G16,
+
 		/** Floating Point formats. The following formats may only be used for render target textures. */
 
 		//! 16 bit floating point format using 16 bits for the red channel.

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,11 +34,7 @@ using namespace gui;
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
-
-
-#ifndef round
-# define round(x)  (floor(x+0.5f))
-#endif
+#include "utils/vs.hpp"
 
 namespace GUIEngine
 {
@@ -80,7 +76,6 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_supports_multiplayer  = false;
     m_is_bounding_box_round = false;
     m_has_tooltip           = false;
-    m_is_text_rtl           = false;
 
     m_absolute_x = m_absolute_y = m_absolute_w = m_absolute_h = -1;
     m_relative_x = m_relative_y = m_relative_w = m_relative_h = -1;
@@ -90,7 +85,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_tab_down_root = -1;
     m_tab_up_root = -1;
 
-    for (int n=0; n<MAX_PLAYER_COUNT; n++)
+    for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_player_focus[n] = false;
         m_selected[n] = false;
@@ -98,6 +93,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
 
     m_reserved_id     = -1;
     m_deactivated     = false;
+    m_is_visible      = true;
     m_badges          = 0;
 
     // set a default value, derivates can override this as they wish
@@ -111,7 +107,7 @@ Widget::~Widget()
     assert(m_magic_number == 0xCAFEC001);
 
     // If any player focused this widget, unset that focus
-    for (int n=0; n<MAX_PLAYER_COUNT; n++)
+    for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         if (m_player_focus[n])
         {
@@ -137,9 +133,10 @@ void Widget::elementRemoved()
     assert(m_magic_number == 0xCAFEC001);
 
     m_element = NULL;
+    m_is_visible = true;
 
     // If any player focused this widget, unset that focus
-    for (int n=0; n<MAX_PLAYER_COUNT; n++)
+    for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         if (m_player_focus[n])
         {
@@ -151,29 +148,15 @@ void Widget::elementRemoved()
 
 // -----------------------------------------------------------------------------
 
-void Widget::setActivated()
+void Widget::setActive(bool active)
 {
     // even if this one is already active, do it anyway on purpose, maybe the
     // children widgets need to be updated
-    m_deactivated = false;
+    m_deactivated = !active;
     const int count = m_children.size();
     for (int n=0; n<count; n++)
     {
-        m_children[n].setActivated();
-    }
-}
-
-// -----------------------------------------------------------------------------
-
-void Widget::setDeactivated()
-{
-    // even if this one is already inactive, do it anyway on purpose, maybe the
-    // children widgets need to be updated
-    m_deactivated = true;
-    const int count = m_children.size();
-    for (int n=0; n<count; n++)
-    {
-        m_children[n].setDeactivated();
+        m_children[n].setActive(active);
     }
 }
 
@@ -257,10 +240,11 @@ void Widget::setFocusForPlayer(const int playerID)
     assert(m_magic_number == 0xCAFEC001);
 
     // Unset focus flag on previous widget that had focus
-    if (GUIEngine::getFocusForPlayer(playerID) != NULL)
+    Widget* previous_focus = GUIEngine::getFocusForPlayer(playerID);
+    if (previous_focus != NULL)
     {
-        GUIEngine::getFocusForPlayer(playerID)->unfocused(playerID, this);
-        GUIEngine::getFocusForPlayer(playerID)->m_player_focus[playerID] = false;
+        previous_focus->unfocused(playerID, this);
+        previous_focus->m_player_focus[playerID] = false;
     }
 
     m_player_focus[playerID] = true;
@@ -268,6 +252,10 @@ void Widget::setFocusForPlayer(const int playerID)
 
     // Callback
     this->focused(playerID);
+
+    Screen* screen = GUIEngine::getCurrentScreen();
+    if(screen)
+        screen->onFocusChanged(previous_focus, this, playerID);
 }
 
 // -----------------------------------------------------------------------------
@@ -319,7 +307,20 @@ void Widget::setParent(IGUIElement* parent)
 
 bool Widget::isVisible() const
 {
-    return m_element && m_element->isVisible();
+    if (m_element != NULL)
+    {
+        assert(m_element->isVisible() == m_is_visible);
+    }
+    return m_is_visible;
+}
+
+// -----------------------------------------------------------------------------
+
+bool Widget::isActivated() const
+{
+    if (isVisible())
+        return !m_deactivated;
+    return false;
 }
 
 // -----------------------------------------------------------------------------
@@ -330,7 +331,7 @@ void Widget::setVisible(bool visible)
     {
         m_element->setVisible(visible);
     }
-    m_deactivated = !visible;
+    m_is_visible = visible;
 
     const int childrenCount = m_children.size();
     for (int n=0; n<childrenCount; n++)
@@ -349,4 +350,3 @@ void Widget::moveIrrlichtElement()
                                                          irr::core::dimension2di(m_w, m_h) ) );
     }
 }
-

@@ -22,7 +22,7 @@
 #include "karts/controller/kart_control.hpp"
 
 #include "network/rewinder.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 
 class AbstractKart;
 

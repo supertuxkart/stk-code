@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,7 +26,9 @@
   */
 
 #include <vector>
+#include <stdexcept>
 
+#include "graphics/weather.hpp"
 #include "modes/world_status.hpp"
 #include "race/highscores.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -42,10 +44,21 @@ class PhysicalObject;
 class Physics;
 class Track;
 
+namespace Scripting
+{
+    class ScriptEngine;
+}
+
 namespace irr
 {
     namespace scene { class ISceneNode; }
 }
+
+class AbortWorldUpdateException : public std::runtime_error
+{
+public:
+    AbortWorldUpdateException() : std::runtime_error("race abort") { };
+};
 
 /**
  *  \brief base class for all game modes
@@ -84,6 +97,7 @@ protected:
     RandomGenerator           m_random;
 
     Physics*      m_physics;
+    bool          m_force_disable_fog;
     AbstractKart* m_fastest_kart;
     /** Number of eliminated karts. */
     int         m_eliminated_karts;
@@ -101,9 +115,7 @@ protected:
     */
     bool        m_use_highscores;
 
-    void  updateHighscores  (int* best_highscore_rank, int* best_finish_time,
-                             std::string* highscore_who,
-                             StateManager::ActivePlayer** best_player);
+    void  updateHighscores  (int* best_highscore_rank);
     void  resetAllKarts     ();
     void  eliminateKart     (int kart_number, bool notifyOfElimination=true);
     Controller*
@@ -111,9 +123,13 @@ protected:
 
     virtual AbstractKart *createKart(const std::string &kart_ident, int index,
                              int local_player_id, int global_player_id,
-                             RaceManager::KartType type);
+                             RaceManager::KartType type,
+                             PerPlayerDifficulty difficulty);
     /** Pointer to the track. The track is managed by world. */
     Track* m_track;
+
+    /**Pointer to scripting engine  */
+    Scripting::ScriptEngine* m_script_engine;
 
     /** Pointer to the race GUI. The race GUI is handled by world. */
     RaceGUIBase *m_race_gui;
@@ -152,13 +168,19 @@ protected:
      */
     bool m_self_destruct;
 
-    virtual void  onGo();
+    /** Set when the world is online and counts network players. */
+    bool m_is_network_world;
+    
+    /** Used to show weather graphical effects. */
+    Weather* m_weather;
+
+
+    virtual void  onGo() OVERRIDE;
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool  isRaceOver() = 0;
     virtual void  update(float dt);
     virtual void  createRaceGUI();
             void  updateTrack(float dt);
-    void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
     /** Used for AI karts that are still racing when all player kart finished.
      *  Generally it should estimate the arrival time for those karts, but as
@@ -197,9 +219,9 @@ public:
       * this method in child classes to provide it. */
     virtual const std::string& getIdent() const = 0;
     // ------------------------------------------------------------------------
-    /** Returns the number of rescue positions on a given track and game 
+    /** Returns the number of rescue positions on a given track and game
      *  mode. */
-    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE = 0;
+    virtual unsigned int getNumberOfRescuePositions() const = 0;
     // ------------------------------------------------------------------------
     /** Determines the rescue position index of the specified kart. */
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) = 0;
@@ -207,7 +229,7 @@ public:
     /** Returns the bullet transformation for the specified rescue index. */
     virtual btTransform getRescueTransform(unsigned int index) const = 0;
     // ------------------------------------------------------------------------
-    void moveKartAfterRescue(AbstractKart* kart);
+    virtual void moveKartAfterRescue(AbstractKart* kart);
     // ------------------------------------------------------------------------
     /** Called when it is needed to know whether this kind of race involves
      *  counting laps. */
@@ -270,17 +292,21 @@ public:
                                     PhysicalObject *object);
     AbstractKart*   getPlayerKart(unsigned int player) const;
     AbstractKart*   getLocalPlayerKart(unsigned int n) const;
+    virtual const btTransform &getStartTransform(int index);
     // ------------------------------------------------------------------------
     /** Returns a pointer to the race gui. */
     RaceGUIBase    *getRaceGUI() const { return m_race_gui;}
     // ------------------------------------------------------------------------
     /** Returns the number of karts in the race. */
-    unsigned int    getNumKarts() const { return m_karts.size(); }
+    unsigned int    getNumKarts() const { return (unsigned int) m_karts.size(); }
     // ------------------------------------------------------------------------
     /** Returns the kart with a given world id. */
     AbstractKart       *getKart(int kartId) const {
                         assert(kartId >= 0 && kartId < int(m_karts.size()));
                         return m_karts[kartId];                              }
+    // ------------------------------------------------------------------------
+    /** Returns all karts. */
+    const KartList & getKarts() const { return m_karts; }
     // ------------------------------------------------------------------------
     /** Returns the number of currently active (i.e.non-elikminated) karts. */
     unsigned int    getCurrentNumKarts() const { return (int)m_karts.size() -
@@ -295,6 +321,14 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a pointer to the track. */
     Track          *getTrack() const { return m_track; }
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the Scripting Engine. */
+    Scripting::ScriptEngine   *getScriptEngine() 
+                               const { return m_script_engine; }
+    //-------------------------------------------------------------------------
+    bool            isFogEnabled() const;
+    // ------------------------------------------------------------------------
+    void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */
@@ -312,6 +346,8 @@ public:
     {
         m_clear_color       = color;
     }
+    /** Override track fog value to force disabled */
+    void forceFogDisabled(bool v) { m_force_disable_fog = v; }
     // ------------------------------------------------------------------------
     /** Override if you want to know when a kart presses fire */
     virtual void onFirePressed(Controller* who) {}
@@ -324,6 +360,13 @@ public:
     // ------------------------------------------------------------------------
     virtual void escapePressed();
 
+    /** Set the network mode (true if networked) */
+    void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
+
+    bool isNetworkWorld() const { return m_is_network_world; }
+    
+    /** Returns a pointer to the weather. */
+    Weather* getWeather() {return m_weather;}
 };   // World
 
 #endif

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -42,8 +42,7 @@ private:
           RB_TO_KART,            /**< Rubber band is attached to a kart hit. */
           RB_TO_TRACK}           /**< Rubber band is attached to track.      */
                         m_attached_state;
-    /** True if plunger was fired backwards. */
-    bool                m_is_backward;
+
     /** If rubber band is attached to track, the coordinates. */
     Vec3                m_hit_position;
     /** The plunger the rubber band is attached to. */

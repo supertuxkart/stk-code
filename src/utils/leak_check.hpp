@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2012 Marianne Gagnon, Joerg Henrichs
+//  Copyright (C) 2011-2015 Marianne Gagnon, Joerg Henrichs
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,21 +20,32 @@
 #ifndef HEADER_LEAK_CHECK_HPP
 #define HEADER_LEAK_CHECK_HPP
 
-#include "utils/log.hpp"
-
-#include <stdio.h>
 
 #ifdef DEBUG
+
+#include "utils/log.hpp"
+
+#ifdef WIN32
+#  include <string>
+#  include <vector>
+#endif
 
 namespace MemoryLeaks
 {
 
     class AllocatedObject
     {
+#if defined(__APPLE__)
         /** Keep stack information if available (OSX only). */
         char **m_stack;
         /** Keeps stacksize information if available (OSX only). */
         int    m_stack_size;
+#elif defined(WIN32)
+        /** Keep the stack information the way it is returned by windows,
+         *  a flat string, which will be split when printing it. */
+        std::string m_stack;
+#endif
+
     public:
         AllocatedObject();
         virtual ~AllocatedObject();
@@ -50,19 +61,24 @@ namespace MemoryLeaks
 
 }   // namespace MemoryLeaks
 
-#define LEAK_CHECK() \
-class LeakCheck : public MemoryLeaks::AllocatedObject\
-{  public:\
-virtual void print() const\
-{ \
-    Log::error("LeakCheck", "Undeleted object at %s : %i\n",  __FILE__, __LINE__); \
-} \
-virtual ~LeakCheck() {} \
-}; \
-LeakCheck leack_check_instance;
+#define LEAK_CHECK()                                                 \
+class LeakCheck : public MemoryLeaks::AllocatedObject                \
+{                                                                    \
+public:                                                              \
+    virtual void print() const                                       \
+    {                                                                \
+        Log::error("LeakCheck", "Undeleted object at %s : %i",       \
+                    __FILE__, __LINE__);                             \
+        AllocatedObject::print();                                    \
+    }                                                                \
+    virtual ~LeakCheck() {}                                          \
+};                                                                   \
+                                                                     \
+LeakCheck m_leack_check_instance;
 
 
 #else
+// No debugging
 #define LEAK_CHECK()
 #endif
 

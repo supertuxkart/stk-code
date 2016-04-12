@@ -1,6 +1,7 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2006 Steve Baker <sjbaker1@airmail.net>
+//
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -42,9 +43,6 @@ public:
         INGAME,
         INPUT_SENSE_KEYBOARD,
         INPUT_SENSE_GAMEPAD,
-        //INPUT_SENSE_PREFER_AXIS,
-        //INPUT_SENSE_PREFER_BUTTON,
-        //LOWLEVEL,
         BOOTSTRAP
     };
 
@@ -68,11 +66,14 @@ private:
     * values exceed the deadzone value the input is reported to the game. This
     * makes the mouse behave like an analog axis on a gamepad/joystick.
     */
-    int    m_mouse_val_x, m_mouse_val_y;
+    int m_mouse_val_x, m_mouse_val_y;
 
-    void   dispatchInput(Input::InputType, int deviceID, int btnID, Input::AxisDirection direction, int value);
+    void   dispatchInput(Input::InputType, int deviceID, int btnID,
+                         Input::AxisDirection direction, int value,
+                         bool shift_mask = false);
     void   handleStaticAction(int id0, int value);
-    void   inputSensing(Input::InputType type, int deviceID, int btnID, Input::AxisDirection axisDirection,  int value);
+    void   inputSensing(Input::InputType type, int deviceID, int btnID,
+                        Input::AxisDirection axisDirection,  int value);
 public:
            InputManager();
           ~InputManager();
@@ -81,21 +82,24 @@ public:
     //void   input();
     GUIEngine::EventPropagation   input(const irr::SEvent& event);
 
-    DeviceManager* getDeviceList() { return m_device_manager; }
+    DeviceManager* getDeviceManager() { return m_device_manager; }
 
     void   setMode(InputDriverMode);
     bool   isInMode(InputDriverMode);
     InputDriverMode getMode() { return m_mode; }
 
-    /** When this mode is enabled, only the master player will be able to play with menus (only works in 'assign' mode) */
+    /** When this mode is enabled, only the master player will be able to play
+     *  with menus (only works in 'assign' mode) */
     void   setMasterPlayerOnly(bool enabled);
 
-    /** Returns whether only the master player should be allowed to perform changes in menus */
+    /** Returns whether only the master player should be allowed to perform
+     *  changes in menus. */
     bool    masterPlayerOnly() const;
 
     void   update(float dt);
 
-    /** Returns the ID of the player that plays with the keyboard, or -1 if none */
+    /** Returns the ID of the player that plays with the keyboard,
+     *  or -1 if none. */
     int    getPlayerKeyboardID() const;
 };
 

@@ -16,6 +16,8 @@
 #include "COSOperator.h"
 #include "dimension2d.h"
 #include "IGUISpriteBank.h"
+#include <mmsystem.h>
+#include <regstr.h>
 #include <winuser.h>
 #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 #ifdef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
@@ -31,6 +33,9 @@
 #endif
 #endif
 #endif
+
+#include <imm.h>
+#pragma comment(lib, "imm32.lib")
 
 namespace irr
 {
@@ -359,6 +364,65 @@ void pollJoysticks()
 #endif // _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 }
 
+/** This function is ported from SDL and released under zlip:
+ *  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+ */
+void setJoystickName(int index, const JOYCAPS &caps, SJoystickInfo *joystick)
+{
+    // As a default use the name given in the joystick structure
+    // - though that is always the same name, independent of joystick :(
+    joystick->Name              = caps.szPname;
+    joystick->HasGenericName = true;
+
+    core::stringc key = core::stringc(REGSTR_PATH_JOYCONFIG)+"\\"+caps.szRegKey
+                      + "\\"+REGSTR_KEY_JOYCURR;
+    HKEY hTopKey = HKEY_LOCAL_MACHINE;
+    HKEY hKey;
+    long regresult = RegOpenKeyExA(hTopKey, key.c_str(), 0, KEY_READ, &hKey);
+    if (regresult != ERROR_SUCCESS)
+    {
+        hTopKey = HKEY_CURRENT_USER;
+        regresult = RegOpenKeyExA(hTopKey, key.c_str(), 0, KEY_READ, &hKey);
+    }
+    if (regresult != ERROR_SUCCESS) return;
+
+    /* find the registry key name for the joystick's properties */
+    char regname[256];
+    DWORD regsize = sizeof(regname);
+    core::stringc regvalue = core::stringc("Joystick")+core::stringc(index+1)
+                           + REGSTR_VAL_JOYOEMNAME;
+    regresult = RegQueryValueExA(hKey, regvalue.c_str(), 0, 0,
+                                 (LPBYTE)regname, &regsize);
+    RegCloseKey(hKey);
+    if (regresult != ERROR_SUCCESS) return;
+
+    /* open that registry key */
+    core::stringc regkey = core::stringc(REGSTR_PATH_JOYOEM)+"\\"+regname;
+    regresult = RegOpenKeyExA(hTopKey, regkey.c_str(), 0, KEY_READ, &hKey);
+    if (regresult != ERROR_SUCCESS) return;
+
+    /* find the size for the OEM name text */
+    regsize = sizeof(regvalue);
+    regresult = RegQueryValueExA(hKey, REGSTR_VAL_JOYOEMNAME, 0, 0,
+                                 NULL, &regsize);
+    if (regresult == ERROR_SUCCESS)
+    {
+        char *name;
+        /* allocate enough memory for the OEM name text ... */
+        name = new char[regsize];
+        if (name)
+        {
+            /* ... and read it from the registry */
+            regresult = RegQueryValueExA(hKey, REGSTR_VAL_JOYOEMNAME, 0, 0,
+                                         (LPBYTE)name, &regsize            );
+            joystick->Name = name;
+            joystick->HasGenericName = false;
+        }   // if name
+    }    // if SUCCESS
+    RegCloseKey(hKey);
+}
+
+
 bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo)
 {
 #if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
@@ -407,11 +471,10 @@ bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo)
 		{
 			activeJoystick.Index = joystick;
 			ActiveJoysticks.push_back(activeJoystick);
-
 			returnInfo.Joystick = (u8)joystick;
 			returnInfo.Axes = activeJoystick.Caps.wNumAxes;
 			returnInfo.Buttons = activeJoystick.Caps.wNumButtons;
-			returnInfo.Name = activeJoystick.Caps.szPname;
+			setJoystickName(joystick, activeJoystick.Caps, &returnInfo);
 			returnInfo.PovHat = ((activeJoystick.Caps.wCaps & JOYCAPS_HASPOV) == JOYCAPS_HASPOV)
 								? SJoystickInfo::POV_HAT_PRESENT : SJoystickInfo::POV_HAT_ABSENT;
 
@@ -632,6 +695,28 @@ irr::CIrrDeviceWin32* getDeviceFromHWnd(HWND hWnd)
 }
 
 
+namespace irr
+{
+	void updateICPos(void* hWnd, s32 x, s32 y, s32 height)
+	{
+		COMPOSITIONFORM cf;
+		HWND hwnd = (HWND)hWnd;
+		HIMC hIMC = ImmGetContext(hwnd);
+
+		if(hIMC)
+		{
+			cf.dwStyle = CFS_POINT;
+			cf.ptCurrentPos.x = x;
+			cf.ptCurrentPos.y = y - height;
+
+			ImmSetCompositionWindow(hIMC, &cf);
+
+			ImmReleaseContext(hwnd, hIMC);
+		}
+	}
+} // end of namespace irr
+
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	#ifndef WM_MOUSEWHEEL
@@ -742,6 +827,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
+
+		if (m->irrMessage == irr::EMIE_LMOUSE_PRESSED_DOWN || m->irrMessage == irr::EMIE_LMOUSE_LEFT_UP)
+		{
+			event.EventType = irr::EET_IMPUT_METHOD_EVENT;
+			event.InputMethodEvent.Event = irr::EIME_CHANGE_POS;
+			event.InputMethodEvent.Handle = hWnd;
+
+			if (dev)
+				dev->postEventFromUser(event);
+		}
 		return 0;
 	}
 
@@ -757,6 +852,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_ERASEBKGND:
 		return 0;
+
+	case WM_IME_CHAR:
+		{
+			event.EventType = irr::EET_IMPUT_METHOD_EVENT;
+			event.InputMethodEvent.Event = irr::EIME_CHAR_INPUT;
+			event.InputMethodEvent.Handle = hWnd;
+
+			event.KeyInput.Char = 0;
+			event.KeyInput.Key = irr::KEY_OEM_CLEAR;
+			event.KeyInput.Shift = 0;
+			event.KeyInput.Control = 0;
+
+			char bits[2] = { (char)((wParam & 0xff00) >> 8), (char)(wParam & 0xff) };
+			if (bits[0] == 0)
+				event.InputMethodEvent.Char = (wchar_t)wParam;
+			else
+				MultiByteToWideChar(CP_OEMCP, MB_PRECOMPOSED, bits, 2, &event.InputMethodEvent.Char, 1);
+
+			dev = getDeviceFromHWnd(hWnd);
+			if (dev)
+				dev->postEventFromUser(event);
+
+			return	0;
+		}
 
 	case WM_SYSKEYDOWN:
 	case WM_SYSKEYUP:
@@ -822,6 +941,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (dev)
 				dev->postEventFromUser(event);
 
+			event.EventType = irr::EET_IMPUT_METHOD_EVENT;
+			event.InputMethodEvent.Event = irr::EIME_CHANGE_POS;
+			event.InputMethodEvent.Handle = hWnd;
+
+			if (dev)
+				dev->postEventFromUser(event);
+
 			if (message == WM_SYSKEYDOWN || message == WM_SYSKEYUP)
 				return DefWindowProc(hWnd, message, wParam, lParam);
 			else
@@ -872,6 +998,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				dev->switchToFullScreen();
 			}
 		}
+		event.EventType = irr::EET_IMPUT_METHOD_EVENT;
+		event.InputMethodEvent.Event = irr::EIME_CHANGE_POS;
+		event.InputMethodEvent.Handle = hWnd;
+
+		if (dev)
+			dev->postEventFromUser(event);
 		break;
 
 	case WM_USER:
@@ -1055,6 +1187,9 @@ CIrrDeviceWin32::CIrrDeviceWin32(const SIrrlichtCreationParameters& params)
 
 	// inform driver about the window size etc.
 	resizeIfNecessary();
+
+	// for reset the position of composition window
+	updateICPos(HWnd, 0, 0, 0);
 }
 
 
@@ -1521,6 +1656,20 @@ void CIrrDeviceWin32::getWindowsVersion(core::stringc& out)
 				else
 					out.append("Microsoft Windows Server 2008 R2 ");
 			}
+			else if (osvi.dwMinorVersion == 2)
+			{
+				if (osvi.wProductType == VER_NT_WORKSTATION)
+					out.append("Microsoft Windows 8 ");
+				else
+					out.append("Microsoft Windows Server 2012 ");
+			}
+			else if (osvi.dwMinorVersion == 3)
+			{
+				if (osvi.wProductType == VER_NT_WORKSTATION)
+					out.append("Microsoft Windows 8.1 ");
+				else
+					out.append("Microsoft Windows Server 2012 R2 ");
+			}
 		}
 
 		if (bOsVersionInfoEx)
@@ -1795,6 +1944,8 @@ void CIrrDeviceWin32::handleSystemMessages()
 	{
 		// No message translation because we don't use WM_CHAR and it would conflict with our
 		// deadkey handling.
+
+		TranslateMessage(&msg);
 
 		if (ExternalWindow && msg.hwnd == HWnd)
 			WndProc(HWnd, msg.message, msg.wParam, msg.lParam);

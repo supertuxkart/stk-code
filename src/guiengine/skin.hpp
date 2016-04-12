@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -132,7 +132,6 @@ using namespace irr;
  */
 namespace GUIEngine
 {
-
     /**
       * In order to avoid calculating render information every frame, it's
       * stored in a SkinWidgetContainer for each widget (or each widget part
@@ -269,14 +268,9 @@ namespace GUIEngine
 
 
         video::ITexture* bg_image;
-
-
         std::vector<Widget*> m_tooltips;
         std::vector<bool> m_tooltip_at_mouse;
 
-#ifdef USE_PER_LINE_BACKGROUND
-    public:
-#endif
         LEAK_CHECK()
 
         void drawBoxFromStretchableTexture(SkinWidgetContainer* w,
@@ -323,12 +317,12 @@ namespace GUIEngine
 
         void drawTooltip(Widget* widget, bool atMouse);
 
+
     public:
 
         // dirty way to have dialogs that zoom in
         bool m_dialog;
         float m_dialog_size;
-
         /**
           * \brief load a skin from the file specified in the user configuration file
           * \throw std::runtime_error if file cannot be read
@@ -385,6 +379,11 @@ namespace GUIEngine
                                            const core::rect< s32 > &rect,
                                            const core::rect< s32 > *clip,
                                            core::rect<s32>* checkClientArea=0);
+
+        virtual void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
+            const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+            const video::SColor* const colors, bool useAlphaChannelOfTexture);
+
         virtual void drawIcon (gui::IGUIElement *element,
                                gui::EGUI_DEFAULT_ICON icon,
                                const core::position2di position,
@@ -395,10 +394,11 @@ namespace GUIEngine
         virtual const wchar_t*
                              getDefaultText(gui::EGUI_DEFAULT_TEXT text) const;
         virtual gui::IGUIFont* getFont(gui::EGUI_DEFAULT_FONT which=
-                                                     gui::EGDF_DEFAULT) const ;
-        virtual u32  getIcon (gui::EGUI_DEFAULT_ICON icon) const ;
-        virtual s32  getSize (gui::EGUI_DEFAULT_SIZE size) const ;
-        virtual gui::IGUISpriteBank *  getSpriteBank () const ;
+                                                     gui::EGDF_DEFAULT) const;
+        virtual u32  getIcon (gui::EGUI_DEFAULT_ICON icon) const;
+        virtual s32  getSize (gui::EGUI_DEFAULT_SIZE size) const;
+        const BoxRenderParams& getBoxRenderParams(const std::string &type);
+        virtual gui::IGUISpriteBank *  getSpriteBank () const;
         virtual void setColor (gui::EGUI_DEFAULT_COLOR which,
                                   video::SColor newColor);
         virtual void setDefaultText (gui::EGUI_DEFAULT_TEXT which,
@@ -410,6 +410,8 @@ namespace GUIEngine
         virtual void setSpriteBank (gui::IGUISpriteBank *bank);
 
         void drawTooltips();
+        void drawMessage(SkinWidgetContainer* w, const core::recti &dest,
+                         const std::string &type);
 
         video::ITexture* getImage(const char* name);
 

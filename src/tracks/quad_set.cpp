@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -59,7 +59,7 @@ void QuadSet::getPoint(const XMLNode *xml, const std::string &attribute_name,
 {
     std::string s;
     xml->get(attribute_name, &s);
-    int pos=s.find_first_of(":");
+    int pos=(int)s.find_first_of(":");
     if(pos>0)   // n:p specification
     {
         std::vector<std::string> l = StringUtils::split(s, ':');
@@ -85,7 +85,8 @@ void QuadSet::init(const std::string &filename)
     XMLNode *xml = file_manager->createXMLTree(filename);
     if(!xml || xml->getName()!="quads")
     {
-        fprintf(stderr, "[QuadSet::load] ERROR : QuadSet '%s' not found.\n", filename.c_str());
+        Log::error("[QuadSet::load] ERROR : QuadSet '%s' not found.", filename.c_str());
+        delete xml;
         return;
     }
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
@@ -93,7 +94,7 @@ void QuadSet::init(const std::string &filename)
         const XMLNode *xml_node = xml->getNode(i);
         if(xml_node->getName()!="quad")
         {
-            printf("[QuadSet::load] WARNING: Unsupported node type '%s' found in '%s' - ignored.\n",
+            Log::warn("[QuadSet::load] WARNING: Unsupported node type '%s' found in '%s' - ignored.",
                    xml_node->getName().c_str(), filename.c_str());
             continue;
         }

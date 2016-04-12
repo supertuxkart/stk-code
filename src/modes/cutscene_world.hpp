@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -45,17 +45,16 @@ class CutsceneWorld : public World
     double m_duration;
     bool m_aborted;
 
+    float m_fade_duration;
+
+    // TODO find a better way than static
+    static bool s_use_duration;
+
     /** monkey tricks to get the animations in sync with irrlicht. we reset the time
      *  after all is loaded and it's running withotu delays
      */
     bool m_second_reset;
     double m_time_at_second_reset;
-
-    void abortCutscene()
-    {
-        if (m_time < m_duration - 2.0f) m_duration = m_time + 2.0f;
-        m_aborted = true;
-    }
 
     std::vector<std::string> m_parts;
 
@@ -80,7 +79,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool raceHasLaps() OVERRIDE { return false; }
     // ------------------------------------------------------------------------
-    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE 
+    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE
     {
         return 0;
     }   // getNumberOfRescuePositions
@@ -107,6 +106,14 @@ public:
     };
     // ------------------------------------------------------------------------
     virtual void escapePressed() OVERRIDE { abortCutscene(); }
+    // ------------------------------------------------------------------------
+    static void setUseDuration(bool use_duration) { s_use_duration = use_duration; }
+    // ------------------------------------------------------------------------
+    void abortCutscene()
+    {
+        if (m_time < m_duration - m_fade_duration) m_duration = m_time + m_fade_duration;
+        m_aborted = true;
+    }
 
 };   // CutsceneWorld
 

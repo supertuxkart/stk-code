@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
 
 #include "physics/physical_object.hpp"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -37,47 +38,75 @@ using namespace irr;
 
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
+#include <ITexture.h>
+
+/** Creates a physical Settings object with the given type, radius and mass.
+ */
+PhysicalObject::Settings::Settings(BodyTypes type, float radius, float mass)
+{
+    init();
+    m_body_type  = type;
+    m_mass       = mass;
+    m_radius     = radius;
+}   // Settings
 
 // ----------------------------------------------------------------------------
+/** Reads the physical settings values from a given XML node.
+ */
+PhysicalObject::Settings::Settings(const XMLNode &xml_node)
+{
+    init();
+    std::string shape;
+    xml_node.get("id",      &m_id          );
+    xml_node.get("mass",    &m_mass        );
+    xml_node.get("radius",  &m_radius      );
+    xml_node.get("shape",   &shape         );
+    xml_node.get("reset",   &m_crash_reset );
+    xml_node.get("explode", &m_knock_kart  );
+    xml_node.get("flatten", &m_flatten_kart);
+    xml_node.get("on-kart-collision", &m_on_kart_collision);
+    xml_node.get("on-item-collision", &m_on_item_collision);
+    m_reset_when_too_low =
+        xml_node.get("reset-when-below", &m_reset_height) == 1;
 
+    m_body_type = MP_NONE;
+    if     (shape=="cone"  ||
+            shape=="coneY"    ) m_body_type = MP_CONE_Y;
+    else if(shape=="coneX"    ) m_body_type = MP_CONE_X;
+    else if(shape=="coneZ"    ) m_body_type = MP_CONE_Z;
+    else if(shape=="cylinder"||
+            shape=="cylinderY") m_body_type = MP_CYLINDER_Y;
+    else if(shape=="cylinderX") m_body_type = MP_CYLINDER_X;
+    else if(shape=="cylinderZ") m_body_type = MP_CYLINDER_Z;
+    else if(shape=="box"      ) m_body_type = MP_BOX;
+    else if(shape=="sphere"   ) m_body_type = MP_SPHERE;
+    else if(shape=="exact"    ) m_body_type = MP_EXACT;
+
+    else
+        Log::error("PhysicalObject", "Unknown shape type : %s.",
+                   shape.c_str());
+}   // Settings(XMLNode)
+
+// ----------------------------------------------------------------------------
+/** Initialises a Settings object.
+ */
+void PhysicalObject::Settings::init()
+{
+    m_body_type          = PhysicalObject::MP_NONE;
+    m_crash_reset        = false;
+    m_knock_kart         = false;
+    m_mass               = 0.0f;
+    m_radius             = -1.0f;
+    m_reset_when_too_low = false;
+    m_flatten_kart       = false;
+}   // Settings
+
+// ============================================================================
 PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
                                         const XMLNode &xml_node,
                                         TrackObject* object)
 {
-    PhysicalObject::Settings settings;
-
-    settings.reset_height = 0;
-    settings.mass         = 1;
-    settings.radius       = -1;
-    settings.crash_reset  = false;
-    settings.knock_kart   = false;
-
-    std::string shape;
-    xml_node.get("mass",    &settings.mass       );
-    xml_node.get("radius",  &settings.radius     );
-    xml_node.get("shape",   &shape               );
-    xml_node.get("reset",   &settings.crash_reset);
-    xml_node.get("explode", &settings.knock_kart );
-
-    settings.reset_when_too_low =
-        xml_node.get("reset-when-below", &settings.reset_height) == 1;
-
-    settings.body_type = MP_NONE;
-    if     (shape=="cone"  ||
-            shape=="coneY"    ) settings.body_type = MP_CONE_Y;
-    else if(shape=="coneX"    ) settings.body_type = MP_CONE_X;
-    else if(shape=="coneZ"    ) settings.body_type = MP_CONE_Z;
-    else if(shape=="cylinder"||
-            shape=="cylinderY") settings.body_type = MP_CYLINDER_Y;
-    else if(shape=="cylinderX") settings.body_type = MP_CYLINDER_X;
-    else if(shape=="cylinderZ") settings.body_type = MP_CYLINDER_Z;
-
-    else if(shape=="box"    ) settings.body_type = MP_BOX;
-    else if(shape=="sphere" ) settings.body_type = MP_SPHERE;
-    else if(shape=="exact")   settings.body_type = MP_EXACT;
-
-    else fprintf(stderr, "Unknown shape type : %s\n", shape.c_str());
-
+    PhysicalObject::Settings settings(xml_node);
     return new PhysicalObject(is_dynamic, settings, object);
 }   // fromXML
 
@@ -96,21 +125,27 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_radius             = -1;
     m_crash_reset        = false;
     m_explode_kart       = false;
+    m_flatten_kart       = false;
     m_triangle_mesh      = NULL;
 
     m_object = object;
 
-    m_init_xyz   = object->getPosition();
+    m_init_xyz = object->getAbsoluteCenterPosition();
     m_init_hpr   = object->getRotation();
     m_init_scale = object->getScale();
 
-    m_mass = settings.mass;
-    m_radius = settings.radius;
-    m_body_type = settings.body_type;
-    m_crash_reset = settings.crash_reset;
-    m_explode_kart = settings.knock_kart;
-    m_reset_when_too_low = settings.reset_when_too_low;
-    m_reset_height = settings.reset_height;
+    m_id                 = settings.m_id;
+    m_mass               = settings.m_mass;
+    m_radius             = settings.m_radius;
+    m_body_type          = settings.m_body_type;
+    m_crash_reset        = settings.m_crash_reset;
+    m_explode_kart       = settings.m_knock_kart;
+    m_flatten_kart       = settings.m_flatten_kart;
+    m_reset_when_too_low = settings.m_reset_when_too_low;
+    m_reset_height       = settings.m_reset_height;
+    m_on_kart_collision  = settings.m_on_kart_collision;
+    m_on_item_collision  = settings.m_on_item_collision;
+    m_body_added = false;
 
     m_init_pos.setIdentity();
     Vec3 radHpr(m_init_hpr);
@@ -160,9 +195,7 @@ void PhysicalObject::move(const Vec3& xyz, const core::vector3df& hpr)
     irr::core::quaternion tempQuat(mat);
     q = btQuaternion(tempQuat.X, tempQuat.Y, tempQuat.Z, tempQuat.W);
 
-
-    Vec3 p(xyz);
-    btTransform trans(q,p);
+    btTransform trans(q, xyz-quatRotate(q,m_graphical_offset));
     m_motion_state->setWorldTransform(trans);
 }   // move
 
@@ -212,19 +245,23 @@ void PhysicalObject::init()
         }
         else
         {
-            fprintf(stderr, "[PhysicalObject] Unknown node type\n");
-            max = 1.0f;
-            min = 0.0f;
-            assert(false);
+            Log::fatal("PhysicalObject", "Unknown node type");
         }
     }
     else
     {
-        fprintf(stderr, "[PhysicalObject] Unknown node type\n");
-        max = 1.0f;
-        min = 0.0f;
-        assert(false);
+        Log::fatal("PhysicalObject", "Unknown node type");
     }
+
+    Vec3 parent_scale(1.0f, 1.0f, 1.0f);
+    if (m_object->getParentLibrary() != NULL)
+    {
+        parent_scale = m_object->getParentLibrary()->getScale();
+    }
+
+    max = max * (Vec3(m_init_scale) * parent_scale);
+    min = min * (Vec3(m_init_scale) * parent_scale);
+
     Vec3 extend = max-min;
     // Adjust the mesth of the graphical object so that its center is where it
     // is in bullet (usually at (0,0,0)). It can be changed in the case clause
@@ -288,7 +325,7 @@ void PhysicalObject::init()
     }
     case MP_EXACT:
     {
-        TriangleMesh* triangle_mesh = new TriangleMesh();
+        extend.setY(0);
 
         // In case of readonly materials we have to get the material from
         // the mesh, otherwise from the node. This is esp. important for
@@ -324,6 +361,8 @@ void PhysicalObject::init()
                 return;
         }   // switch node->getType()
 
+        std::unique_ptr<TriangleMesh> triangle_mesh(new TriangleMesh());
+
         for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
         {
             scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
@@ -348,7 +387,6 @@ void PhysicalObject::init()
             video::ITexture* t=irrMaterial.getTexture(0);
 
             const Material* material=0;
-            TriangleMesh *tmesh = triangle_mesh;
             if(t)
             {
                 std::string image =
@@ -377,10 +415,10 @@ void PhysicalObject::init()
                         vertices[k]=v;
                         normals[k]=mbVertices[indx].Normal;
                     }   // for k
-                    if(tmesh) tmesh->addTriangle(vertices[0], vertices[1],
-                                                 vertices[2], normals[0],
-                                                 normals[1],  normals[2],
-                                                 material                 );
+                    triangle_mesh->addTriangle(vertices[0], vertices[1],
+                                               vertices[2], normals[0],
+                                               normals[1],  normals[2],
+                                               material                 );
                 }   // for j
             }
             else
@@ -399,10 +437,10 @@ void PhysicalObject::init()
                             vertices[k]=v;
                             normals[k]=mbVertices[indx].Normal;
                         }   // for k
-                        if(tmesh) tmesh->addTriangle(vertices[0], vertices[1],
-                                                     vertices[2], normals[0],
-                                                     normals[1],  normals[2],
-                                                     material                 );
+                        triangle_mesh->addTriangle(vertices[0], vertices[1],
+                                                   vertices[2], normals[0],
+                                                   normals[1],  normals[2],
+                                                   material                 );
                     }   // for j
 
                 }
@@ -411,13 +449,14 @@ void PhysicalObject::init()
         }   // for i<getMeshBufferCount
         triangle_mesh->createCollisionShape();
         m_shape = &triangle_mesh->getCollisionShape();
-        m_triangle_mesh = triangle_mesh;
-
+        m_triangle_mesh = triangle_mesh.release();
+        m_init_pos.setOrigin(m_init_pos.getOrigin() + m_graphical_offset);
+        // m_graphical_offset = Vec3(0,0,0);
         break;
     }
     case MP_NONE:
     default:
-        fprintf(stderr, "WARNING: Uninitialised moving shape\n");
+        Log::warn("PhysicalObject", "Uninitialised moving shape");
         // intended fall-through
     case MP_BOX:
     {
@@ -429,11 +468,40 @@ void PhysicalObject::init()
     // 2. Create the rigid object
     // --------------------------
     // m_init_pos is the point on the track - add the offset
-    m_init_pos.setOrigin(m_init_pos.getOrigin() +
-                         btVector3(0,extend.getY()*0.5f, 0));
+    if (m_is_dynamic)
+    {
+        m_init_pos.setOrigin(m_init_pos.getOrigin() +
+            btVector3(0, extend.getY()*0.5f, 0));
+    }
+
+
+    // If this object has a parent, apply the parent's rotation
+    if (m_object->getParentLibrary() != NULL)
+    {
+        core::vector3df parent_rot_hpr = m_object->getParentLibrary()->getInitRotation();
+        core::matrix4 parent_rot_matrix;
+        parent_rot_matrix.setRotationDegrees(parent_rot_hpr);
+
+        btQuaternion child_rot_quat = m_init_pos.getRotation();
+        core::matrix4 child_rot_matrix;
+        Vec3 axis = child_rot_quat.getAxis();
+        child_rot_matrix.setRotationAxisRadians(child_rot_quat.getAngle(), axis.toIrrVector());
+
+        irr::core::quaternion tempQuat(parent_rot_matrix * child_rot_matrix);
+        btQuaternion q(tempQuat.X, tempQuat.Y, tempQuat.Z, tempQuat.W);
+
+        m_init_pos.setRotation(q);
+    }
+
     m_motion_state = new btDefaultMotionState(m_init_pos);
-    btVector3 inertia;
-    m_shape->calculateLocalInertia(m_mass, inertia);
+    btVector3 inertia(1,1,1);
+    if (m_body_type != MP_EXACT)
+        m_shape->calculateLocalInertia(m_mass, inertia);
+    else
+    {
+        if (m_mass == 0)
+            inertia.setValue(0, 0, 0);
+    }
     btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
                                                   m_shape, inertia);
 
@@ -451,7 +519,9 @@ void PhysicalObject::init()
     }
 
     World::getWorld()->getPhysics()->addBody(m_body);
-
+    m_body_added = true;
+    if(m_triangle_mesh)
+        m_triangle_mesh->setBody(m_body);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -478,11 +548,39 @@ void PhysicalObject::update(float dt)
     hpr.setHPR(t.getRotation());
     //m_node->setRotation(hpr.toIrrHPR());
 
-    core::vector3df scale(1,1,1);
     m_object->move(xyz.toIrrVector(), hpr.toIrrVector()*RAD_TO_DEGREE,
-                   scale, false);
-    return;
+                   m_init_scale, false, true /* isAbsoluteCoord */);
 }   // update
+
+// ----------------------------------------------------------------------------
+/** Does a raycast against this physical object. The physical object must
+ *  have an 'exact' shape, i.e. be a triangle mesh (for other physical objects
+ *  no material information would be available).
+ *  \param from/to The from and to position for the raycast.
+ *  \param xyz The position in world where the ray hit.
+ *  \param material The material of the mesh that was hit.
+ *  \param normal The intrapolated normal at that position.
+ *  \param interpolate_normal If true, the returned normal is the interpolated
+ *         based on the three normals of the triangle and the location of the
+ *         hit point (which is more compute intensive, but results in much
+ *         smoother results).
+ *  \return True if a triangle was hit, false otherwise (and no output
+ *          variable will be set.
+ */
+bool PhysicalObject::castRay(const btVector3 &from, const btVector3 &to, 
+                             btVector3 *hit_point, const Material **material, 
+                             btVector3 *normal, bool interpolate_normal) const
+{
+    if(m_body_type!=MP_EXACT)
+    {
+        Log::warn("PhysicalObject", "Can only raycast against 'exact' meshes.");
+        return false;
+    }
+    bool result = m_triangle_mesh->castRay(from, to, hit_point, 
+                                           material, normal, 
+                                           interpolate_normal);
+    return result;
+}   // castRay
 
 // ----------------------------------------------------------------------------
 void PhysicalObject::reset()
@@ -523,6 +621,65 @@ void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit)
     m_body->activate();
 
 }   // handleExplosion
+
+// ----------------------------------------------------------------------------
+/** Returns true if this object is a soccer ball.
+ */
+bool PhysicalObject::isSoccerBall() const
+{
+    return m_object->isSoccerBall();
+}   // is SoccerBall
+
+// ----------------------------------------------------------------------------
+/** Sets interaction type for object*/
+void PhysicalObject::setInteraction(std::string interaction){
+    if ( interaction == "flatten") m_flatten_kart = true;
+    if ( interaction == "reset") m_crash_reset = true;
+    if ( interaction == "explode") m_explode_kart = true;
+    if ( interaction == "none" )
+    {
+        m_flatten_kart = false;
+        m_crash_reset = false;
+        m_explode_kart = false;
+    }
+}   // set interaction
+
+// ----------------------------------------------------------------------------
+/** Remove body from physics dynamic world interaction type for object*/
+void PhysicalObject::removeBody()
+{
+    if (m_body_added)
+    {
+        World::getWorld()->getPhysics()->removeBody(m_body);
+        m_body_added = false;
+    }
+}   // Remove body
+
+// ----------------------------------------------------------------------------
+/** Add body to physics dynamic world */
+void PhysicalObject::addBody()
+{
+    if (!m_body_added)
+    {
+        m_body_added = true;
+        World::getWorld()->getPhysics()->addBody(m_body);
+    }
+}   // Add body
+
+// ----------------------------------------------------------------------------
+/** Called when a physical object hits the track. Atm only used to push a
+ *  soccer ball away from the edge of the field.
+ *  \param m Material which was hit.
+ *  \param normal Normal of the track at the hit point.
+ */
+void PhysicalObject::hit(const Material *m, const Vec3 &normal)
+{
+    if(isSoccerBall() && m != NULL &&
+       m->getCollisionReaction() == Material::PUSH_SOCCER_BALL)
+    {
+        m_body->applyCentralImpulse(normal * m_mass * 5.0f);
+    }
+}   // hit
 
 // ----------------------------------------------------------------------------
 /* EOF */

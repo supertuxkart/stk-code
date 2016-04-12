@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -36,7 +36,7 @@ class XMLNode;
 class CheckCannon : public CheckLine
 {
 private:
-	/** The target point the kart will fly to. */
+    /** The target point the kart will fly to. */
     core::line3df   m_target;
 
     /** Stores the cannon curve data. */

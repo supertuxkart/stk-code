@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011-2012 Marianne Gagnon, Joerg Henrichs
+//  Copyright (C) 2011-2015 Marianne Gagnon, Joerg Henrichs
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,20 +18,26 @@
 
 #include "utils/leak_check.hpp"
 
+#include "utils/crash_reporting.hpp"
 #include "utils/log.hpp"
-#include "utils/synchronised.hpp"
 #include "utils/ptr_vector.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/synchronised.hpp"
 
 #ifdef DEBUG
 
 /** Switch this to 1 to get the backtrace of the leaks (slows down execution a little)
-    Atm only implemented for OSX */
-#define GET_STACK_TRACE 0
+ *  Atm only implemented for OSX and windows. */
+#undef GET_STACK_TRACE
+
+Synchronised<int> m_lock_stacktrace;
 
 
-#if (GET_STACK_TRACE == 1) && defined(__APPLE__)
-#  include <Availability.h>
-#  include <execinfo.h>
+#ifdef GET_STACK_TRACE
+#  ifdef __APPLE__
+#    include <Availability.h>
+#    include <execinfo.h>
+#  endif
 #endif
 
 #include <iostream>
@@ -46,14 +52,18 @@ namespace MemoryLeaks
     // ------------------------------------------------------------------------
     AllocatedObject::AllocatedObject()
     {
-#if (GET_STACK_TRACE == 1) && defined(__APPLE__)
+#ifdef GET_STACK_TRACE
+#  if defined(__APPLE__)
         const int max_size = 32;
         void* callstack[max_size];
         m_stack_size = backtrace(callstack, max_size);
 
         m_stack = backtrace_symbols(callstack, m_stack_size);
-#else
-        m_stack = NULL;
+#  elif defined(WIN32)
+        m_lock_stacktrace.lock();
+        CrashReporting::getCallStack(m_stack);
+        m_lock_stacktrace.unlock();
+#  endif
 #endif
         addObject(this);
     }   // AllocatedObject
@@ -68,19 +78,24 @@ namespace MemoryLeaks
      */
     void AllocatedObject::print() const
     {
-        //m_object->print();
-
-        if (m_stack == NULL)
+#ifdef GET_STACK_TRACE
+#  if defined(__APPLE__)
+        for (int i = 0; i < m_stack_size; ++i)
         {
-            printf("    (No stack information available)\n");
+            Log::error("LeakCheck", "    %s\n", m_stack[i]);
         }
-        else
+#  elif defined(WIN32)
+        std::vector<std::string> calls = StringUtils::split(m_stack, '\n');
+        // Ignore the first 4 entries, which are: empty, getCallStack(),
+        // AllocatedObject(),LeakCheck()
+        for (unsigned int i = 4; i < calls.size(); ++i)
         {
-            for (int i = 0; i < m_stack_size; ++i)
-            {
-                printf("    %s\n", m_stack[i]);
-            }
+            Log::error("LeakCheck", "    %s", calls[i].c_str());
         }
+#  endif
+#else
+        printf("    (No stack information available)\n");
+#endif
 
     }   // print
 

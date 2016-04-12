@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -111,7 +111,7 @@ PowerupManager::PowerupType
  */
 void PowerupManager::loadAllPowerups()
 {
-    const std::string file_name = file_manager->getDataFile("powerup.xml");
+    const std::string file_name = file_manager->getAsset("powerup.xml");
     XMLNode *root               = file_manager->createXMLTree(file_name);
     for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
@@ -125,8 +125,8 @@ void PowerupManager::loadAllPowerups()
             LoadPowerup(type, *node);
         else
         {
-            printf("Can't find item '%s' from powerup.xml, entry %d/\n",
-                    name.c_str(), i+1);
+            Log::fatal("[PowerupManager]", "Can't find item '%s' from powerup.xml, entry %d/",
+                        name.c_str(), i+1);
             exit(-1);
         }
     }
@@ -136,6 +136,7 @@ void PowerupManager::loadAllPowerups()
     loadWeights(*root, "end33",   POSITION_END33      );
     loadWeights(*root, "last" ,   POSITION_LAST       );
     loadWeights(*root, "battle" , POSITION_BATTLE_MODE);
+    loadWeights(*root, "soccer" , POSITION_SOCCER_MODE);
     loadWeights(*root, "tuto",    POSITION_TUTORIAL_MODE);
 
     delete root;
@@ -157,7 +158,7 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
 #ifdef DEBUG
     if (icon_file.size() == 0)
     {
-        fprintf(stderr, "Cannot load powerup %i, no 'icon' attribute under XML node\n", type);
+        Log::debug("[PowerupManager]", "Cannot load powerup %i, no 'icon' attribute under XML node", type);
         assert(false);
     }
 #endif
@@ -174,7 +175,7 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
     node.get("model", &model);
     if(model.size()>0)
     {
-        std::string full_path = file_manager->getModelFile(model);
+        std::string full_path = file_manager->getAsset(FileManager::MODEL,model);
         m_all_meshes[type] = irr_driver->getMesh(full_path);
         if(!m_all_meshes[type])
         {
@@ -221,8 +222,9 @@ void PowerupManager::loadWeights(const XMLNode &root,
 
     if(!node || s=="" || s_multi=="")
     {
-        printf("No weights found for class '%s' - probabilities will be incorrect.\n",
-               class_name.c_str());
+        Log::error("[PowerupManager]", "No weights found for class '%s'"
+                    " - probabilities will be incorrect.",
+                    class_name.c_str());
         return;
     }
 
@@ -245,9 +247,9 @@ void PowerupManager::loadWeights(const XMLNode &root,
 
     if(weight_list.size()!=2*(int)POWERUP_LAST)
     {
-        printf("Incorrect number of weights found in class '%s':\n",
+        Log::error("[PowerupManager]", "Incorrect number of weights found in class '%s':",
                class_name.c_str());
-        printf("%d instead of %d - probabilities will be incorrect.\n",
+        Log::error("[PowerupManager]", "%d instead of %d - probabilities will be incorrect.",
                (int)weight_list.size(), (int)POWERUP_LAST);
         return;
     }
@@ -272,7 +274,8 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
 {
     m_position_to_class.clear();
     // In battle mode no positions exist, so use only position 1
-    unsigned int end_position = (race_manager->isBattleMode()) ? 1 : num_karts;
+    unsigned int end_position = (race_manager->isBattleMode() ||
+        race_manager->isSoccerMode()) ? 1 : num_karts;
     for(unsigned int position =1; position <= end_position; position++)
     {
         // Set up the mapping of position to position class:
@@ -298,7 +301,7 @@ void PowerupManager::updateWeightsForRace(unsigned int num_karts)
             if(w!=0 && num_karts > 4 &&
                  (type==POWERUP_PARACHUTE || type==POWERUP_SWITCH) )
             {
-                w = w / (num_karts-4);
+                w = w / (num_karts/4);
                 if(w==0) w=1;
             }
             for(unsigned int j=0; j<w; j++)
@@ -321,6 +324,7 @@ PowerupManager::PositionClass
                                                      unsigned int position)
 {
     if(race_manager->isBattleMode()) return POSITION_BATTLE_MODE;
+    if(race_manager->isSoccerMode()) return POSITION_SOCCER_MODE;
     if(race_manager->isTutorialMode()) return POSITION_TUTORIAL_MODE;
     if(position==1)         return POSITION_FIRST;
     if(position==num_karts) return POSITION_LAST;
@@ -353,6 +357,7 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
     // Positions start with 1, while the index starts with 0 - so subtract 1
     PositionClass pos_class =
         (race_manager->isBattleMode() ? POSITION_BATTLE_MODE :
+         race_manager->isSoccerMode() ? POSITION_SOCCER_MODE :
          (race_manager->isTutorialMode() ? POSITION_TUTORIAL_MODE :
                                      m_position_to_class[pos-1]));
 

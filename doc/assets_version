@@ -1,0 +1,9 @@
+This file keeps track of which svn assets version is used for which stk release.
+Atm there is no mechanism in place to verify this.
+
+stk release       svn version of assets
+---------------------------------------
+0.8.2-beta2 needs r15985
+0.9         needs r16279
+0.9.1-rc1   needs r16470
+0.9.1       needs r16503

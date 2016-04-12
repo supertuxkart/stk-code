@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,17 +25,20 @@
  * \brief Dialog that allows the player to select custom video settings
  * \ingroup states_screens
  */
-class CustomVideoSettingsialog : public GUIEngine::ModalDialog
+class CustomVideoSettingsDialog : public GUIEngine::ModalDialog
 {
     
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    CustomVideoSettingsialog(const float percentWidth, const float percentHeight);
-    ~CustomVideoSettingsialog();
+    CustomVideoSettingsDialog(const float percentWidth, const float percentHeight);
+    ~CustomVideoSettingsDialog();
 
     virtual void beforeAddingWidgets();
+
+    /** Updates the activation state of the advaced pipeline checkboxes. */
+    void updateActivation();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     

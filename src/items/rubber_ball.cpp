@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,8 @@
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/stk_config.hpp"
+#include "config/user_config.hpp"
+#include "io/xml_node.hpp"
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -79,13 +81,17 @@ RubberBall::RubberBall(AbstractKart *kart)
     m_height_timer       = 0.0f;
     m_interval           = m_st_interval;
     m_current_max_height = m_max_height;
-    m_ping_sfx           = sfx_manager->createSoundSource("ball_bounce");
+    m_ping_sfx           = SFXManager::get()->createSoundSource("ball_bounce");
     // Just init the previoux coordinates with some value that's not getXYZ()
     m_previous_xyz       = m_owner->getXYZ();
     m_previous_height    = 2.0f;  //
     // A negative value indicates that the timer is not active
     m_delete_timer       = -1.0f;
     m_tunnel_count       = 0;
+
+    LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
+    // FIXME: what does the rubber ball do in case of battle mode??
+    if(!world) return;
 
     computeTarget();
 
@@ -101,9 +107,9 @@ RubberBall::RubberBall(AbstractKart *kart)
  */
 RubberBall::~RubberBall()
 {
-    if(m_ping_sfx->getStatus()==SFXManager::SFX_PLAYING)
+    if(m_ping_sfx->getStatus()==SFXBase::SFX_PLAYING)
         m_ping_sfx->stop();
-    sfx_manager->deleteSFX(m_ping_sfx);
+    m_ping_sfx->deleteSFX();
 }   // ~RubberBall
 
 // ----------------------------------------------------------------------------
@@ -141,8 +147,6 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
 void RubberBall::computeTarget()
 {
     LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
-    // FIXME: what does the rubber ball do in case of battle mode??
-    if(!world) return;
 
     for(unsigned int p = race_manager->getFinishedKarts()+1;
                      p < world->getNumKarts()+1; p++)
@@ -155,7 +159,7 @@ void RubberBall::computeTarget()
             if(m_target==m_owner && m_delete_timer < 0)
             {
 #ifdef PRINT_BALL_REMOVE_INFO
-                Log::debug("RubberBall",
+                Log::debug("[RubberBall]",
                            "ball %d removed because owner is target.", m_id);
 #endif
                 m_delete_timer = m_st_delete_time;
@@ -168,7 +172,7 @@ void RubberBall::computeTarget()
     // aim at the owner (the ball is unlikely to hit it), and
     // this will trigger the usage of the delete time in updateAndDelete
 #ifdef PRINT_BALL_REMOVE_INFO
-    Log::debug("RubberBall" "ball %d removed because no more active target.",
+    Log::debug("[RubberBall]" "ball %d removed because no more active target.",
                m_id);
 #endif
     m_delete_timer = m_st_delete_time;
@@ -190,13 +194,11 @@ unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index,
 {
     int succ = 0;
     LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
-    // FIXME: what does the rubber ball do in case of battle mode??
-    if(lin_world)
-    {
-        unsigned int sect =
-            lin_world->getSectorForKart(m_target);
-        succ = QuadGraph::get()->getNode(node_index).getSuccessorToReach(sect);
-    }
+
+    unsigned int sect =
+        lin_world->getSectorForKart(m_target);
+    succ = QuadGraph::get()->getNode(node_index).getSuccessorToReach(sect);
+
     if(dist)
         *dist += QuadGraph::get()->getNode(node_index)
                 .getDistanceToSuccessor(succ);
@@ -222,7 +224,7 @@ void RubberBall::getNextControlPoint()
 
     int next = getSuccessorToHitTarget(m_last_aimed_graph_node, &dist);
     float d = QuadGraph::get()->getDistanceFromStart(next)-f;
-    while(d<m_st_min_interpolation_distance && d>0)
+    while(d<m_st_min_interpolation_distance && d>=0)
     {
         next = getSuccessorToHitTarget(next, &dist);
         d = QuadGraph::get()->getDistanceFromStart(next)-f;
@@ -294,34 +296,16 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
 }   // init
 
 // ----------------------------------------------------------------------------
-/** Picks a random message to be displayed when a kart is hit by the
- *  rubber ball.
- *  \param The kart that was hit (ignored here).
- *  \returns The string to display.
- */
-const core::stringw RubberBall::getHitString(const AbstractKart *kart) const
-{
-    const int COUNT = 2;
-    RandomGenerator r;
-    switch (r.get(COUNT))
-    {
-        //I18N: shown when a player is hit by a rubber ball. %1 is the
-        // attacker, %0 is the victim.
-        case 0: return _LTR("%s is being bounced around.");
-        //I18N: shown when a player is hit by a rubber ball. %1 is the
-        // attacker, %0 is the victim.
-        case 1: return _LTR("Fetch the ball, %0!");
-        default:assert(false); return L"";   // avoid compiler warning
-    }
-}   // getHitString
-
-// ----------------------------------------------------------------------------
 /** Updates the rubber ball.
  *  \param dt Time step size.
  *  \returns True if the rubber ball should be removed.
  */
 bool RubberBall::updateAndDelete(float dt)
 {
+    LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
+    // FIXME: what does the rubber ball do in case of battle mode??
+    if(!world) return true;
+
     if(m_delete_timer>0)
     {
         m_delete_timer -= dt;
@@ -329,7 +313,7 @@ bool RubberBall::updateAndDelete(float dt)
         {
             hit(NULL);
 #ifdef PRINT_BALL_REMOVE_INFO
-            Log::debug("RubberBall", "ball %d deleted.", m_id);
+            Log::debug("[RubberBall]", "ball %d deleted.", m_id);
 #endif
             return true;
         }
@@ -372,7 +356,7 @@ bool RubberBall::updateAndDelete(float dt)
     float new_y     = getHoT()+height;
 
     if(UserConfigParams::logFlyable())
-        printf("ball %d: %f %f %f height %f new_y %f gethot %f ",
+        Log::debug("[RubberBall]", "ball %d: %f %f %f height %f new_y %f gethot %f ",
                 m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, new_y, getHoT());
 
     // No need to check for terrain height if the ball is low to the ground
@@ -422,9 +406,11 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
     // at it directly, stop interpolating, instead fly straight
     // towards it.
     Vec3 diff = m_target->getXYZ()-getXYZ();
-    if(diff.length()==0)
-        printf("diff=0\n");
-    *next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
+    // Avoid potential division by zero
+    if(diff.length2()==0)
+        *next_xyz = getXYZ();
+    else
+        *next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
 
     Vec3 old_vec = getXYZ()-m_previous_xyz;
     Vec3 new_vec = *next_xyz - getXYZ();
@@ -449,9 +435,9 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
         next_xyz->setZ(getXYZ().getZ() + old_2d.Y*dt*m_speed);
     }   // if fabsf(angle) > m_st_target_angle_max*dt
 
-    assert(!isnan((*next_xyz)[0]));
-    assert(!isnan((*next_xyz)[1]));
-    assert(!isnan((*next_xyz)[2]));
+    assert(!std::isnan((*next_xyz)[0]));
+    assert(!std::isnan((*next_xyz)[1]));
+    assert(!std::isnan((*next_xyz)[2]));
 }   // moveTowardsTarget
 
 // ----------------------------------------------------------------------------
@@ -488,9 +474,9 @@ void RubberBall::interpolate(Vec3 *next_xyz, float dt)
                       + (-  m_control_points[0] +  m_control_points[2])*m_t
                       +   2*m_control_points[1]                              );
                       
-    assert(!isnan((*next_xyz)[0]));
-    assert(!isnan((*next_xyz)[1]));
-    assert(!isnan((*next_xyz)[2]));
+    assert(!std::isnan((*next_xyz)[0]));
+    assert(!std::isnan((*next_xyz)[1]));
+    assert(!std::isnan((*next_xyz)[2]));
 }   // interpolate
 
 // ----------------------------------------------------------------------------
@@ -518,7 +504,7 @@ bool RubberBall::checkTunneling()
         if(m_tunnel_count > 3)
         {
 #ifdef PRINT_BALL_REMOVE_INFO
-            Log::debug("RubberBall",
+            Log::debug("[RubberBall]",
                        "Ball %d nearly tunneled at %f %f %f -> %f %f %f",
                         m_id, m_previous_xyz.getX(),m_previous_xyz.getY(),
                         m_previous_xyz.getZ(),
@@ -555,9 +541,9 @@ float RubberBall::updateHeight()
     if(m_height_timer>m_interval)
     {
         m_height_timer -= m_interval;
-        if(m_ping_sfx->getStatus()!=SFXManager::SFX_PLAYING)
+        if(m_ping_sfx->getStatus()!=SFXBase::SFX_PLAYING)
         {
-            m_ping_sfx->position(getXYZ());
+            m_ping_sfx->setPosition(getXYZ());
             m_ping_sfx->play();
         }
 
@@ -572,7 +558,7 @@ float RubberBall::updateHeight()
             if(m_current_max_height>m_max_height)
                 m_current_max_height = m_max_height;
             m_interval           = m_current_max_height / 10.0f;
-	        // Avoid too small hops and esp. a division by zero
+            // Avoid too small hops and esp. a division by zero
             if(m_interval<0.01f)
                 m_interval = 0.1f;
         }
@@ -631,7 +617,6 @@ float RubberBall::getMaxTerrainHeight(const Vec3 &vertical_offset) const
 void RubberBall::updateDistanceToTarget()
 {
     const LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
-    if(!world) return;   // FIXME battle mode
 
     float target_distance =
         world->getDistanceDownTrackForKart(m_target->getWorldKartId());
@@ -643,7 +628,7 @@ void RubberBall::updateDistanceToTarget()
         m_distance_to_target += world->getTrack()->getTrackLength();
     }
     if(UserConfigParams::logFlyable())
-        printf("ball %d: target %f %f %f distance_2_target %f",
+        Log::debug("[RubberBall]", "ball %d: target %f %f %f distance_2_target %f",
         m_id, m_target->getXYZ().getX(),m_target->getXYZ().getY(),
         m_target->getXYZ().getZ(),m_distance_to_target
         );
@@ -673,7 +658,7 @@ void RubberBall::updateDistanceToTarget()
         {
             m_delete_timer = m_st_delete_time;
 #ifdef PRINT_BALL_REMOVE_INFO
-            Log::debug("RubberBall", "ball %d lost target (overtook?).",
+            Log::debug("[RubberBall]", "ball %d lost target (overtook?).",
                         m_id);
 #endif
 
@@ -706,7 +691,7 @@ bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
 {
 #ifdef PRINT_BALL_REMOVE_INFO
     if(kart)
-        Log::debug("RuberBall", "ball %d hit kart.", m_id);
+        Log::debug("[RuberBall]", "ball %d hit kart.", m_id);
 #endif
     if(kart && kart!=m_target)
     {
@@ -723,17 +708,9 @@ bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
     bool was_real_hit = Flyable::hit(kart, object);
     if(was_real_hit)
     {
-        /*if(kart && kart->isShielded() && kart->getShieldTime() > stk_config->m_bubblegum_shield_time )
-        {   //remove twice the default shield time
-            kart->decreaseShieldTime(stk_config->m_bubblegum_shield_time * 2);
-            Log::verbose("rubber_ball", "Decreasing shield 1! \n");
-        }
-        else */if(kart && kart->isShielded())
+        if(kart && kart->isShielded())
         {
-            kart->decreaseShieldTime(stk_config->m_bubblegum_shield_time);
-            //kart->getAttachment()->update(0.0f);
-            //kart->setSquash(m_st_squash_duration, m_st_squash_slowdown);
-            Log::verbose("rubber_ball", "Decreasing shield 2! \n");
+            kart->decreaseShieldTime();
         }
         else
             explode(kart, object);

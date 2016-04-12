@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012 Marianne Gagnon
+//  Copyright (C) 2012-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,9 +25,8 @@
 #include <irrString.h>
 using namespace irr;
 
-#include "config/player.hpp"
 #include "states_screens/race_gui_base.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 
 class AbstractKart;
 class InputMap;
@@ -53,8 +52,8 @@ public:
     void setFadeLevel(float level) { m_fade_level = level; }
     void setSubtitle(const core::stringw& subtitle) { m_subtitle = subtitle; }
 
-    virtual void renderGlobal(float dt);
-    virtual void renderPlayerView(const AbstractKart *kart);
+    virtual void renderGlobal(float dt) OVERRIDE;
+    virtual void renderPlayerView(const Camera *camera, float dt) OVERRIDE {}
 
     virtual const core::dimension2du getMiniMapSize() const OVERRIDE
     {

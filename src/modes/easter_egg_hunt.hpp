@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
 #ifndef EASTER_EGG_HUNT_HPP
 #define EASTER_EGG_HUNT_HPP
 
-#include "modes/world_with_rank.hpp"
+#include "modes/linear_world.hpp"
 #include "states_screens/race_gui_base.hpp"
 
 #include <string>
@@ -31,7 +31,7 @@ class AbstractKart;
  * \brief An implementation of World to provide an easter egg hunt like mode
  * \ingroup modes
  */
-class EasterEggHunt: public WorldWithRank
+class EasterEggHunt: public LinearWorld
 {
 private:
     /** Keeps track of how many eggs each kart has found. */
@@ -46,24 +46,28 @@ public:
              EasterEggHunt();
     virtual ~EasterEggHunt();
 
-    virtual void init();
+    virtual void init() OVERRIDE;
 
-    virtual bool isRaceOver();
+    virtual bool isRaceOver() OVERRIDE;
 
     // overriding World methods
-    virtual void reset();
+    virtual void reset() OVERRIDE;
 
-    virtual bool raceHasLaps(){ return false; }
+    virtual bool raceHasLaps() OVERRIDE { return false; }
 
-    virtual const std::string& getIdent() const;
-
-    virtual void update(float dt);
+    virtual const std::string& getIdent() const OVERRIDE;
+    virtual void terminateRace() OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
     virtual void getKartsDisplayInfo(
-                          std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
+                          std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
 
     void updateKartRanks();
     void collectedEasterEgg(const AbstractKart *kart);
     void readData(const std::string &filename);
+
+    virtual void checkForWrongDirection(unsigned int i, float dt) OVERRIDE;
+    virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
+
 };   // EasterEggHunt
 
 

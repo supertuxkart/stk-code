@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -35,8 +35,6 @@ class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSin
 {
     OptionsScreenVideo();
     bool m_inited;
-
-    std::vector<std::string> m_skins;
 
     void updateTooltip();
 

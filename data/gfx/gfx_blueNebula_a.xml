@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<particles emitter="sphere" radius="20.5">
+
+    <spreading angle="120"      />
+    
+    <velocity  x="0.002"
+               y="0.000"
+               z="0.000"         />
+    
+    <material  file="stktex_nebulaCloud_a.png"  />
+    
+    <!-- Amount of particles emitted per second -->
+    <rate      min="1"
+               max="2"         />
+    
+    <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
+    <lifetime  min="20000"
+               max="30000"         />
+    
+    <!-- Size of the particles -->
+   <size min="20.5"
+         max="45.0"
+         x-increase-factor="1.6"
+         y-increase-factor="1.6" />    
+    
+    <color     min="0 0 0"
+               max="255 255 255" />
+
+    <fadeout   time="5000" />
+
+
+</particles>

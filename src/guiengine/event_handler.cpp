@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,11 +17,8 @@
 
 #include "guiengine/event_handler.hpp"
 
-#include <iostream>
-
-#include <IGUIEnvironment.h>
-#include <IGUIListBox.h>
-
+#include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/abstract_state_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -33,7 +30,14 @@
 #include "modes/demo_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/debug.hpp"
 #include "utils/profiler.hpp"
+
+
+#include <IGUIEnvironment.h>
+#include <IGUIListBox.h>
+
+#include <iostream>
 
 using GUIEngine::EventHandler;
 using GUIEngine::EventPropagation;
@@ -44,6 +48,7 @@ using namespace irr::gui;
 
 EventHandler::EventHandler()
 {
+    m_accept_events = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -56,6 +61,11 @@ EventHandler::~EventHandler()
 
 bool EventHandler::OnEvent (const SEvent &event)
 {
+    if (!m_accept_events && event.EventType != EET_LOG_TEXT_EVENT) return true;
+
+    if(!Debug::onEvent(event))
+        return false;
+    
     // TO DEBUG HATS (when you don't actually have a hat)
     /*
     if (event.EventType == EET_KEY_INPUT_EVENT)
@@ -149,8 +159,12 @@ bool EventHandler::OnEvent (const SEvent &event)
              event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
         // Remember the mouse position
-        m_mouse_pos.X = event.MouseInput.X;
-        m_mouse_pos.Y = event.MouseInput.Y;
+        if (event.EventType == EET_MOUSE_INPUT_EVENT &&
+            event.MouseInput.Event == EMIE_MOUSE_MOVED)
+        {
+            m_mouse_pos.X = event.MouseInput.X;
+            m_mouse_pos.Y = event.MouseInput.Y;
+        }
 
         // Notify the profiler of mouse events
         if(UserConfigParams::m_profiler_enabled &&
@@ -167,9 +181,25 @@ bool EventHandler::OnEvent (const SEvent &event)
             World::getWorld()->onMouseClick(event.MouseInput.X, event.MouseInput.Y);
         }
 
+        if (UserConfigParams::m_keyboard_debug)
+        {
+            Log::verbose("keyboard", "char %d key %d ctrl %d down %d shift %d",
+                event.KeyInput.Char, event.KeyInput.Key,
+                event.KeyInput.Control, event.KeyInput.PressedDown, 
+                event.KeyInput.Shift);
+        }
         // FIXME? it may be a bit unclean that all input events go trough
         // the gui module
         const EventPropagation blockPropagation = input_manager->input(event);
+
+        if (event.EventType == EET_KEY_INPUT_EVENT &&
+            event.KeyInput.Key == irr::KEY_TAB)
+        {
+            // block all tab events, if we let them go, irrlicht will try
+            // to apply its own focus code
+            return true; // EVENT_BLOCK
+        }
+
         return blockPropagation == EVENT_BLOCK;
     }
     else if (event.EventType == EET_LOG_TEXT_EVENT)
@@ -185,18 +215,22 @@ bool EventHandler::OnEvent (const SEvent &event)
             // mode ignore this error message, but leave it in for debugging.
             if(std::string(event.LogEvent.Text)=="Unsupported texture format")
 #ifdef DEBUG
-                printf("The following message will not be printed in release mode:\n");
+                Log::info("EventHandler", "The following message will not be printed in release mode");
 #else
             return true; // EVENT_BLOCK
 #endif
-
+            const std::string &error_info = irr_driver->getTextureErrorMessage();
             if (event.LogEvent.Level == irr::ELL_WARNING)
             {
-                printf("[Irrlicht Warning] %s\n", event.LogEvent.Text);
+                if(error_info.size()>0)
+                    Log::warn("EventHandler", error_info.c_str());
+                Log::warn("Irrlicht", event.LogEvent.Text);
             }
             else if (event.LogEvent.Level == irr::ELL_ERROR)
             {
-                printf("[Irrlicht Error] %s\n", event.LogEvent.Text);
+                if(error_info.size()>0)
+                    Log::error("EventHandler", error_info.c_str());
+                Log::error("Irrlicht", event.LogEvent.Text);
             }
         }
         return true;
@@ -287,12 +321,12 @@ void EventHandler::processGUIAction(const PlayerAction action,
 
         case PA_ACCEL:
         case PA_MENU_UP:
-            navigateUp(playerID, type, pressedDown);
+            navigate(playerID, type, pressedDown, true);
             break;
 
         case PA_BRAKE:
         case PA_MENU_DOWN:
-            navigateDown(playerID, type, pressedDown);
+            navigate(playerID, type, pressedDown, false);
             break;
 
         case PA_RESCUE:
@@ -346,10 +380,14 @@ const bool NAVIGATION_DEBUG = false;
 #pragma mark Private methods
 #endif
 
-void EventHandler::navigateUp(const int playerID, Input::InputType type, const bool pressedDown)
+/**
+ * Focus the next widget either downwards or upwards.
+ *
+ * \param reverse True means navigating up, false means down.
+ */
+void EventHandler::navigate(const int playerID, Input::InputType type, const bool pressedDown, const bool reverse)
 {
-    //std::cout << "Naviagte up!\n";
-    IGUIElement *el = NULL/*, *first=NULL*/, *closest=NULL;
+    IGUIElement *el = NULL, *closest = NULL;
 
     if (type == Input::IT_STICKBUTTON && !pressedDown)
         return;
@@ -360,19 +398,22 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         el = w->getIrrlichtElement();
     }
 
-
     // list widgets are a bit special, because up/down keys are also used
     // to navigate between various list items, not only to navigate between
     // components
     if (w != NULL && w->m_type == WTYPE_LIST)
     {
-        ListWidget* list = (ListWidget*)w;
+        ListWidget* list = (ListWidget*) w;
 
-        const bool stay_within_list = list->getSelectionID() > 0;
+        const bool stay_within_list = reverse ? list->getSelectionID() > 0 :
+            list->getSelectionID() < list->getItemCount() - 1;
 
         if (stay_within_list)
         {
-            list->setSelectionID(list->getSelectionID()-1);
+            if (reverse)
+                list->setSelectionID(list->getSelectionID() - 1);
+            else
+                list->setSelectionID(list->getSelectionID() + 1);
             return;
         }
         else
@@ -381,16 +422,15 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
         }
     }
 
-    if (w != NULL && w->m_tab_up_root != -1)
+    if (w != NULL && ((reverse && w->m_tab_up_root != -1) || (!reverse && w->m_tab_down_root != -1)))
     {
-        Widget* up = GUIEngine::getWidget( w->m_tab_up_root );
-        assert( up != NULL );
-
-        el = up->getIrrlichtElement();
+        Widget* next = GUIEngine::getWidget(reverse ? w->m_tab_up_root : w->m_tab_down_root);
+        assert(next != NULL);
+        el = next->getIrrlichtElement();
 
         if (el == NULL)
         {
-            std::cerr << "WARNING : m_tab_down_root is set to an ID for which I can't find the widget\n";
+            Log::warn("EventHandler::navigate", "m_tab_down/up_root is set to an ID for which I can't find the widget");
             return;
         }
     }
@@ -406,190 +446,69 @@ void EventHandler::navigateUp(const int playerID, Input::InputType type, const b
     // find closest widget
     if (el != NULL && el->getTabGroup() != NULL)
     {
-        // if the current widget is e.g. 15, search for widget 14, 13, 12, ... (up to 10 IDs may be missing)
-        for (int n=1; n<10 && !found; n++)
+        // Up: if the current widget is e.g. 15, search for widget 14, 13, 12, ... (up to 10 IDs may be missing)
+        // Down: if the current widget is e.g. 5, search for widget 6, 7, 8, 9, ..., 15 (up to 10 IDs may be missing)
+        for (int n = 1; n < 10 && !found; n++)
         {
-            closest = GUIEngine::getGUIEnv()->getRootGUIElement()->getElementFromId(el->getTabOrder() - n, true);
+            closest = GUIEngine::getGUIEnv()->getRootGUIElement()->getElementFromId(el->getTabOrder() + (reverse ? -n : n), true);
 
             if (closest != NULL && Widget::isFocusableId(closest->getID()))
             {
-                if (NAVIGATION_DEBUG) std::cout << "Navigating up to " << closest->getID() << std::endl;
                 Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
 
                 if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
 
                 // if a dialog is shown, restrict to items in the dialog
                 if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(closestWidget))
-                {
                     continue;
+
+                if (NAVIGATION_DEBUG)
+                {
+                    Log::info("EventHandler", "Navigating %s to %d", (reverse ? "up" : "down"), closest->getID());
                 }
 
-                // when focusing a list by going up, select the last item of the list
-                assert (closestWidget != NULL);
+                assert(closestWidget != NULL);
+
+                if (!closestWidget->isVisible() || !closestWidget->isActivated())
+                    continue;
 
                 closestWidget->setFocusForPlayer(playerID);
 
+                // another list exception : when entering a list by going down, select the first item
+                // when focusing a list by going up, select the last item of the list
                 if (closestWidget->m_type == WTYPE_LIST)
                 {
-                    IGUIListBox* list = (IGUIListBox*)(closestWidget->m_element);
+                    ListWidget* list = (ListWidget*) closestWidget;
                     assert(list != NULL);
-
-                    list->setSelected( list->getItemCount()-1 );
-                    return;
+                    list->setSelectionID(reverse ? list->getItemCount() - 1 : 0);
                 }
                 found = true;
-
             }
         } // end for
-
     }
 
     if (!found)
     {
         if (NAVIGATION_DEBUG)
-        {
-            std::cout << "EventHandler::navigateUp : wrap around, selecting the last widget\n";
-        }
+            Log::info( "EventHandler::navigate", "Wrap around");
 
-        // select the last widget
-        Widget* lastWidget = NULL;
+        // select the last/first widget
+        Widget* wrapWidget = NULL;
 
         if (ModalDialog::isADialogActive())
         {
-            lastWidget = ModalDialog::getCurrent()->getLastWidget();
+            wrapWidget = reverse ? ModalDialog::getCurrent()->getLastWidget() :
+                ModalDialog::getCurrent()->getFirstWidget();
         }
         else
         {
             Screen* screen = GUIEngine::getCurrentScreen();
             if (screen == NULL) return;
-            lastWidget = screen->getLastWidget();
+            wrapWidget = reverse ? screen->getLastWidget() :
+                screen->getFirstWidget();
         }
 
-        if (lastWidget != NULL) lastWidget->setFocusForPlayer(playerID);
-    }
-}
-
-// -----------------------------------------------------------------------------
-
-void EventHandler::navigateDown(const int playerID, Input::InputType type, const bool pressedDown)
-{
-    //std::cout << "Naviagte down!\n";
-
-    IGUIElement *el = NULL, *closest = NULL;
-
-    if (type == Input::IT_STICKBUTTON && !pressedDown)
-        return;
-
-    Widget* w = GUIEngine::getFocusForPlayer(playerID);
-    if (w != NULL)
-    {
-        el = w->getIrrlichtElement();
-    }
-    //std::cout << "!!! Player " << playerID << " navigating down of " << w->m_element->getID() << std::endl;
-
-    // list widgets are a bit special, because up/down keys are also used
-    // to navigate between various list items, not only to navigate between
-    // components
-    if (w != NULL && w->m_type == WTYPE_LIST)
-    {
-        ListWidget* list = (ListWidget*)w;
-
-        const bool stay_within_list = list->getSelectionID() < list->getItemCount()-1;
-
-        if (stay_within_list)
-        {
-            list->setSelectionID(list->getSelectionID()+1);
-            return;
-        }
-        else
-        {
-            list->setSelectionID(-1);
-        }
-    }
-
-    if (w != NULL && w->m_tab_down_root != -1)
-    {
-        Widget* down = GUIEngine::getWidget( w->m_tab_down_root );
-        assert(down != NULL);
-        el = down->getIrrlichtElement();
-
-        if (el == NULL)
-        {
-            std::cerr << "WARNING : m_tab_down_root is set to an ID for which I can't find the widget\n";
-            return;
-        }
-    }
-
-    // don't allow navigating to any widget when a dialog is shown; only navigate to widgets in the dialog
-    if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyIrrChild(el))
-    {
-        el = NULL;
-    }
-
-    bool found = false;
-
-    if (el != NULL && el->getTabGroup() != NULL)
-    {
-        // if the current widget is e.g. 5, search for widget 6, 7, 8, 9, ..., 15 (up to 10 IDs may be missing)
-        for (int n=1; n<10 && !found; n++)
-        {
-            closest = GUIEngine::getGUIEnv()->getRootGUIElement()->getElementFromId(el->getTabOrder() + n, true);
-
-            if (closest != NULL && Widget::isFocusableId(closest->getID()))
-            {
-
-                Widget* closestWidget = GUIEngine::getWidget( closest->getID() );
-                if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
-
-                // if a dialog is shown, restrict to items in the dialog
-                if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(closestWidget))
-                {
-                    continue;
-                }
-
-                if (NAVIGATION_DEBUG)
-                {
-                    std::cout << "Navigating down to " << closestWidget->getID() << "\n";
-                }
-
-                assert( closestWidget != NULL );
-                closestWidget->setFocusForPlayer(playerID);
-
-                // another list exception : when entering a list, select the first item
-                if (closestWidget->m_type == WTYPE_LIST)
-                {
-                    IGUIListBox* list = (IGUIListBox*)(closestWidget->m_element);
-                    assert(list != NULL);
-
-                    list->setSelected(0);
-                }
-
-                found = true;
-            }
-        } // end for
-    }
-
-    if (!found)
-    {
-
-        if (NAVIGATION_DEBUG) std::cout << "Navigating down : wrap around\n";
-
-        // select the first widget
-        Widget* firstWidget = NULL;
-
-        if (ModalDialog::isADialogActive())
-        {
-            //std::cout <<  "w = ModalDialog::getCurrent()->getFirstWidget();\n";
-            firstWidget = ModalDialog::getCurrent()->getFirstWidget();
-        }
-        else
-        {
-            Screen* screen = GUIEngine::getCurrentScreen();
-            if (screen == NULL) return;
-            firstWidget = screen->getFirstWidget();
-        }
-
-        if (firstWidget != NULL)  firstWidget->setFocusForPlayer(playerID);
+        if (wrapWidget != NULL)  wrapWidget->setFocusForPlayer(playerID);
     }
 }
 
@@ -613,7 +532,7 @@ void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name,
 
 EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
 {
-    if (w->m_deactivated) return EVENT_BLOCK;
+    if (!w->isActivated()) return EVENT_BLOCK;
 
     Widget* parent = w->m_event_handler;
     
@@ -626,7 +545,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
         if (w->m_event_handler == NULL) return EVENT_LET;
     }
 
-    //std::cout << "**** widget activated : " << w->m_properties[PROP_ID].c_str() << " ****" << std::endl;
+    //Log::info("EventHandler", "Widget activated: %s", w->m_properties[PROP_ID].c_str());
 
     if (w->m_event_handler != NULL)
     {
@@ -640,7 +559,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
             parent = parent->m_event_handler;
         }
 
-        if (parent->m_deactivated) return EVENT_BLOCK;
+        if (!parent->isActivated()) return EVENT_BLOCK;
 
         /* notify the found event event handler, and also notify the main callback if the
          parent event handler says so */
@@ -681,12 +600,13 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
             {
                 Widget* w = GUIEngine::getWidget(id);
                 if (w == NULL) break;
-
-                if (w->m_deactivated)
+                if (!w->isActivated())
                 {
                     GUIEngine::getCurrentScreen()->onDisabledItemClicked(w->m_properties[PROP_ID].c_str());
                     return EVENT_BLOCK;
                 }
+
+                w->onClick();
 
                 // These events are only triggered by mouse (or so I hope)
                 // The player that owns the mouser receives "game master" priviledges
@@ -704,7 +624,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
 
                 if (w == NULL) break;
 
-                if (!w->m_focusable) return GUIEngine::EVENT_BLOCK;
+                if (!w->isFocusable() || !w->isActivated()) return GUIEngine::EVENT_BLOCK;
 
                 // When a modal dialog is shown, don't select widgets out of the dialog
                 if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(w))
@@ -733,7 +653,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                     if (playerID == -1) break;
                     if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
 
-                    if (ribbon->mouseHovered(w, playerID) == EVENT_LET) sendEventToUser(ribbon, ribbon->m_properties[PROP_ID], playerID);
+                    ribbon->mouseHovered(w, playerID);
                     if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w, playerID);
                     ribbon->setFocusForPlayer(playerID);
                 }

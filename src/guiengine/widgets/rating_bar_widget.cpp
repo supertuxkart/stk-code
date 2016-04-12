@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,13 +16,16 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "guiengine/engine.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/rating_bar_widget.hpp"
 #include "utils/string_utils.hpp"
-#include <string.h>
+#include "utils/vs.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIElement.h>
 #include <IGUIButton.h>
+#include <cmath>
+#include <string.h>
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -31,16 +34,21 @@ using namespace irr;
 // -----------------------------------------------------------------------------
 RatingBarWidget::RatingBarWidget() : Widget(WTYPE_RATINGBAR)
 {
-    m_rating = 0;
-    m_star_number = 0;
+    m_allow_voting = false;
+    m_rating = 0.0f;
+    m_hover_rating = 0.0f;
+    m_stars = 3;
+    m_steps = 3;
+    m_hovering = false;
+    for(int i = 0; i < m_stars; i++)
+        m_star_values.push_back(0);
 }
 
 // -----------------------------------------------------------------------------
 void RatingBarWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    const irr::core::recti widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewNoFocusID(), NULL, L"");
-
     m_id = m_element->getID();
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
@@ -48,38 +56,67 @@ void RatingBarWidget::add()
 
 // -----------------------------------------------------------------------------
 /** Get the current step of the star
- * 
+ *
  * \param index     The index of the star.
- * \param max_step  The number of different steps that a star can display. Two 
- *                   step are obligatory: full and empty.
  * \return The current step of the star.
  */
-int RatingBarWidget::getStepOfStar(int index, int max_step)
+int RatingBarWidget::getStepsOfStar(int index)
 {
-    assert(index >= 0 && index < m_star_number); // Index must be between 0 and m_star_number - 1.
-    assert(max_step >= 2); // The maximun number of step must be superior or equals to 2.
+    assert(index >= 0 && index < m_stars); // Index must be between 0 and m_star_number - 1.
 
-    if (m_rating < index)
+    return m_star_values[index];
+} // getStepOfStar
+
+
+
+void RatingBarWidget::setStepValues(float float_rating)
+{
+    for (int star = 0; star < m_stars; star++)
     {
-        return 0;
-    }
-    else if (m_rating > index + 1)
-    {
-        return max_step - 1;
-    }
-    else
-    {
-        float step_size = 1 / (float)(max_step - 1);
-        
-        for (int i = 0; i < max_step; i++)
+        if (float_rating < star)
+            m_star_values[star] = 0;
+        else if (float_rating > star + 1)
+            m_star_values[star] = m_steps-1;
+        else
         {
-            if (m_rating > index + step_size * (i - 0.5)
-                && m_rating < index + step_size * (i + 0.5))
-                return i;
+            m_star_values[star] =(int)roundf((float_rating * (m_steps-1)) - (star*(m_steps-1)));
         }
     }
-    
-    return 0;
-    // TODO: Assert or throws a exception, what type?
-} // getStepOfStar
+}
+
+// -----------------------------------------------------------------------------
+
+void RatingBarWidget::setRating(float rating)
+{
+    m_rating = rating;
+    setStepValues(m_rating);
+}
+
+// -----------------------------------------------------------------------------
+
+void RatingBarWidget::setStepValuesByMouse(const core::position2di & mouse_position, const core::recti & stars_rect)
+{
+    if(m_allow_voting){
+        if(stars_rect.isPointInside(mouse_position))
+        {
+            m_hovering = true;
+            float exact_hover = (float)(mouse_position.X - stars_rect.UpperLeftCorner.X) / (float)stars_rect.getWidth() * (float)m_stars;
+            m_hover_rating = roundf(exact_hover * (m_steps-1)) / (m_steps-1);
+            setStepValues(m_hover_rating);
+        }
+        else if(m_hovering)
+        {
+            setStepValues(m_rating);
+            m_hovering = false;
+        }
+    }
+}
+
+void RatingBarWidget::onClick()
+{
+    if(m_allow_voting)
+        m_rating = m_hover_rating;
+}
+
+
 

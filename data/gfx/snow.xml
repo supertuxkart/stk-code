@@ -1,32 +1,35 @@
 <?xml version="1.0"?>
 
 <!-- For sky particles, the size of the box is ignored -->
-<particles emitter="box">
+<particles emitter="box" randomize-initial-y="true">
 
     <spreading angle="3"           />
     
-    <velocity  x="0.0"
+    <velocity  x="-0.005"
                y="-0.01"
-               z="0.0"             />
+               z="-0.005"             />
     
-    <material  file="snowflake.png"/>
+    <material  file="snowflake.png" clampu="Y" clampv="Y" />
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="400"
-               max="500"           />
+    <rate      min="1000"
+               max="1000"           />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="9000"
-               max="9000"          />
+    <lifetime  min="8500"
+               max="9500"          />
     
     <!-- Size of the particles -->
-    <size      min="0.40"
-               max="0.60"          />
+    <size      min="0.10"
+               max="0.30"          />
     
-    <color     min="255 255 255"
+    <color     min="40 40 255"
                max="255 255 255"   />
     
     <!-- How much time in milliseconds before the particle is fully faded out  -->
     <fadeout   time="100"          />
+
+    <wind      speed="0.16"
+               flips="Y"           />
 
 </particles>

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,7 +19,10 @@
 #ifndef HEADER_REFEREE_HPP
 #define HEADER_REFEREE_HPP
 
-#include "irrlicht.h"
+#include <ISceneNode.h>
+#include <IAnimatedMeshSceneNode.h>
+#include <ISceneManager.h>
+#include <IMeshManipulator.h>
 using namespace irr;
 
 #include "utils/vec3.hpp"
@@ -75,6 +78,8 @@ private:
 
     /** The scene node for an instance of the referee. */
     scene::IAnimatedMeshSceneNode *m_scene_node;
+
+    scene::ISceneNode* m_light;
 
 public:
                 Referee();

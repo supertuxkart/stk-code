@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,13 +18,15 @@
 
 #include "guiengine/abstract_state_manager.hpp"
 
-#include <vector>
-#include <iostream>
-
+#include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
+
+#include <vector>
+#include <iostream>
+
 
 using namespace GUIEngine;
 
@@ -91,8 +93,8 @@ void AbstractStateManager::pushMenu(std::string name)
 
     if (UserConfigParams::logGUI())
     {
-        std::cout << "[AbstractStateManager::pushMenu] switching to screen "
-                  << name.c_str() << std::endl;
+        Log::info("AbstractStateManager::pushMenu", "Switching to screen %s",
+            name.c_str());
     }
 
     // Send tear-down event to previous menu
@@ -123,8 +125,8 @@ void AbstractStateManager::pushScreen(Screen* screen)
 
     if (UserConfigParams::logGUI())
     {
-        std::cout << "[AbstractStateManager::pushScreen] switching to screen "
-                  << screen->getName().c_str() << std::endl;
+        Log::info("AbstractStateManager::pushScreen", "Switching to screen %s",
+            screen->getName().c_str());
     }
 
     if (!screen->isLoaded()) screen->loadFromFile();
@@ -132,13 +134,16 @@ void AbstractStateManager::pushScreen(Screen* screen)
     screen->init();
 
     onTopMostScreenChanged();
-}   // pushScreen
+}   // pushScreen%
 
 // ----------------------------------------------------------------------------
 
-void AbstractStateManager::replaceTopMostScreen(Screen* screen)
+void AbstractStateManager::replaceTopMostScreen(Screen* screen, GUIEngine::GameState gameState)
 {
-    assert(m_game_mode != GAME);
+    if (gameState == GUIEngine::CURRENT)
+        gameState = getGameState();
+
+    //assert(m_game_mode != GAME);
     // you need to close any dialog before calling this
     assert(!ModalDialog::isADialogActive());
 
@@ -147,16 +152,18 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
 
     if (UserConfigParams::logGUI())
     {
-        std::cout << "[AbstractStateManager::replaceTopmostScreen] "
-                     "switching to screen " << name.c_str() << std::endl;
+        Log::info("AbstractStateManager::replaceTopMostScreen", "Switching to screen %s",
+            name.c_str());
     }
 
     assert(m_menu_stack.size() > 0);
 
     // Send tear-down event to previous menu
-    getCurrentScreen()->tearDown();
+    if (getCurrentScreen() != NULL)
+        getCurrentScreen()->tearDown();
 
     m_menu_stack[m_menu_stack.size()-1] = name;
+    setGameState(gameState);
     switchToScreen(name.c_str());
 
     // Send init event to new menu
@@ -208,8 +215,8 @@ void AbstractStateManager::popMenu()
 
     if (UserConfigParams::logGUI())
     {
-        std::cout << "[AbstractStateManager::popMenu] switching to screen "
-                  << m_menu_stack[m_menu_stack.size()-1].c_str() << std::endl;
+        Log::info("AbstractStateManager::popMenu", "Switching to screen %s",
+            m_menu_stack[m_menu_stack.size()-1].c_str());
     }
 
     if (m_menu_stack[m_menu_stack.size()-1] == RACE_STATE_NAME)
@@ -240,10 +247,8 @@ void AbstractStateManager::resetAndGoToScreen(Screen* screen)
     std::string name = screen->getName();
 
     if (UserConfigParams::logGUI())
-    {
-        std::cout << "[AbstractStateManager::resetAndGoToScreen] "
-                     "switching to screen " << name.c_str() << std::endl;
-    }
+        Log::info("AbstractStateManager::resetAndGoToScreen", "Switching to screen %s",
+            name.c_str());
 
     if (m_game_mode != GAME) getCurrentScreen()->tearDown();
     m_menu_stack.clear();

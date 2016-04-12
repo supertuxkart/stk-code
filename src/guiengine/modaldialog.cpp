@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,6 +26,7 @@
 #include "utils/log.hpp"
 
 #include <IGUIEnvironment.h>
+#include <IGUIButton.h>
 
 using namespace irr;
 using namespace core;
@@ -51,20 +52,21 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
                          ModalDialogLocation location)
 {
     m_dialog_location = location;
-    doInit(percentWidth, percentHeight);
-}
+    m_init            = false;
+    m_fade_background = true;
+    m_percent_width   = percentWidth;
+    m_percent_height  = percentHeight;
+    m_irrlicht_window = NULL;
+}   // ModalDialog
 
 // ----------------------------------------------------------------------------
 
 void ModalDialog::loadFromFile(const char* xmlFile)
 {
-    IXMLReader* xml = file_manager->createXMLReader( (file_manager->getGUIDir() + xmlFile).c_str() );
-    if (xml == NULL)
-    {
-        fprintf(stderr, "Cannot open file %s\n", xmlFile);
-        assert(false);
-        return;
-    }
+    doInit();
+    std::string path = file_manager->getAssetChecked(FileManager::GUI,xmlFile,
+                                                     true);
+    IXMLReader* xml = file_manager->createXMLReader(path);
 
     Screen::parseScreenFileDiv(xml, m_widgets, m_irrlicht_window);
     delete xml;
@@ -78,19 +80,22 @@ void ModalDialog::loadFromFile(const char* xmlFile)
     addWidgetsRecursively(m_widgets);
 
     init();
-}
+}   // loadFromFile
 
 // ----------------------------------------------------------------------------
 
-void ModalDialog::doInit(const float percentWidth, const float percentHeight)
+void ModalDialog::doInit()
 {
+    if(m_init) return;
+    m_init = true;
     pointer_was_shown = irr_driver->isPointerShown();
     irr_driver->showPointer();
 
-    const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+    const core::dimension2d<u32>& frame_size =
+        GUIEngine::getDriver()->getCurrentRenderTargetSize();
 
-    const int w = (int)(frame_size.Width*percentWidth);
-    const int h = (int)(frame_size.Height*percentHeight);
+    const int w = (int)(frame_size.Width* m_percent_width);
+    const int h = (int)(frame_size.Height* m_percent_height);
 
     assert(frame_size.Width > 0);
     assert(frame_size.Height > 0);
@@ -123,18 +128,22 @@ void ModalDialog::doInit(const float percentWidth, const float percentHeight)
     if (modalWindow != NULL)
     {
         delete modalWindow;
-        Log::warn("GUIEngine", "Showing a modal dialog while the previous one is still open. Destroying the previous dialog.");
+        Log::warn("GUIEngine", "Showing a modal dialog while the previous one "
+                  "is still open. Destroying the previous dialog.");
     }
     modalWindow = this;
 
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, true /* modal */);
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area,
+                                                          true /* modal */);
+    m_irrlicht_window->setDrawTitlebar(false);
+    m_irrlicht_window->getCloseButton()->setVisible(false);
 
     GUIEngine::getSkin()->m_dialog = true;
     GUIEngine::getSkin()->m_dialog_size = 0.0f;
 
     m_previous_mode=input_manager->getMode();
     input_manager->setMode(InputManager::MENU);
-}
+}   // doInit
 
 // ----------------------------------------------------------------------------
 
@@ -163,12 +172,14 @@ ModalDialog::~ModalDialog()
     // to the deleted widgets will be gone, but some widgets
     // may want to perform additional cleanup at this time
     elementsWereDeleted();
-}
+}   // ~ModalDialog
 
 // ----------------------------------------------------------------------------
 
 void ModalDialog::clearWindow()
 {
+    assert(m_irrlicht_window != NULL);
+
     Widget* w;
     for_in (w, m_widgets)
     {
@@ -179,7 +190,7 @@ void ModalDialog::clearWindow()
 
     m_irrlicht_window->remove();
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow( m_area, true /* modal */ );
-}
+}   // clearWindow
 
 // ----------------------------------------------------------------------------
 
@@ -187,34 +198,36 @@ void ModalDialog::dismiss()
 {
     if(modalWindow != NULL) delete modalWindow;
     modalWindow = NULL;
-}
+    if(GUIEngine::getCurrentScreen() != NULL)
+        GUIEngine::getCurrentScreen()->onDialogClose();
+}   // dismiss
 
 // ----------------------------------------------------------------------------
 
 void ModalDialog::onEnterPressed()
 {
     if(modalWindow != NULL) modalWindow->onEnterPressedInternal();
-}
+}   // onEnterPressed
 
 // ----------------------------------------------------------------------------
 
 bool ModalDialog::isADialogActive()
 {
     return modalWindow != NULL;
-}
+}   // isADialogActive
 
 // ----------------------------------------------------------------------------
 
 ModalDialog* ModalDialog::getCurrent()
 {
     return modalWindow;
-}
+}   // getCurrent
 
 // ----------------------------------------------------------------------------
 
 void ModalDialog::onEnterPressedInternal()
 {
-}
+}   // onEnterPressedInternal
 
 // ----------------------------------------------------------------------------
 

@@ -22,6 +22,7 @@
 #define GLX_GLXEXT_LEGACY 1
 #include <GL/glx.h>
 #ifdef _IRR_OPENGL_USE_EXTPOINTER_
+#define GLX_GLXEXT_PROTOTYPES
 #include "glxext.h"
 #endif
 #endif
@@ -149,7 +150,14 @@ namespace irr
 
 		void initXAtoms();
 
-		bool switchToFullscreen(bool reset=false);
+		bool restoreResolution();
+		bool changeResolution();
+
+#ifdef _IRR_COMPILE_WITH_X11_
+		bool createInputContext();
+		void destroyInputContext();
+		EKEY_CODE getKeyCode(XEvent &event);
+#endif
 
 		//! Implementation of the linux cursor control
 		class CCursorControl : public gui::ICursorControl
@@ -388,13 +396,17 @@ namespace irr
 		XSetWindowAttributes attributes;
 		XSizeHints* StdHints;
 		XImage* SoftwareImage;
+		XIM XInputMethod;
+		XIC XInputContext;
 		mutable core::stringc Clipboard;
 		#ifdef _IRR_LINUX_X11_VIDMODE_
 		XF86VidModeModeInfo oldVideoMode;
 		#endif
 		#ifdef _IRR_LINUX_X11_RANDR_
-		SizeID oldRandrMode;
-		Rotation oldRandrRotation;
+		RROutput output_id;
+		RRMode old_mode;
+		int crtc_x;
+		int crtc_y;
 		#endif
 		#ifdef _IRR_COMPILE_WITH_OPENGL_
 		GLXWindow glxWin;

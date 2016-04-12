@@ -4,8 +4,8 @@ Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -16,13 +16,7 @@ subject to the following restrictions:
 #ifndef BT_COLLISION_OBJECT_H
 #define BT_COLLISION_OBJECT_H
 
-#if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
-#  undef isnan
-#  define isnan _isnan
-#  define isinf(x) (!_finite(x))
-#else
-#  include <math.h>
-#endif
+#include <cmath>
 
 #include "LinearMath/btTransform.h"
 
@@ -51,7 +45,7 @@ typedef btAlignedObjectArray<class btCollisionObject*> btCollisionObjectArray;
 #endif
 
 
-/// btCollisionObject can be used to manage collision detection objects. 
+/// btCollisionObject can be used to manage collision detection objects.
 /// btCollisionObject maintains all information that is needed for a collision detection: Shape, Transform and AABB proxy.
 /// They can be added to the btCollisionWorld.
 ATTRIBUTE_ALIGNED16(class)	btCollisionObject
@@ -64,20 +58,20 @@ protected:
 	///m_interpolationWorldTransform is used for CCD and interpolation
 	///it can be either previous or future (predicted) transform
 	btTransform	m_interpolationWorldTransform;
-	//those two are experimental: just added for bullet time effect, so you can still apply impulses (directly modifying velocities) 
+	//those two are experimental: just added for bullet time effect, so you can still apply impulses (directly modifying velocities)
 	//without destroying the continuous interpolated motion (which uses this interpolation velocities)
 	btVector3	m_interpolationLinearVelocity;
 	btVector3	m_interpolationAngularVelocity;
-	
+
 	btVector3	m_anisotropicFriction;
 	int			m_hasAnisotropicFriction;
-	btScalar	m_contactProcessingThreshold;	
+	btScalar	m_contactProcessingThreshold;
 
 	btBroadphaseProxy*		m_broadphaseHandle;
 	btCollisionShape*		m_collisionShape;
 	///m_extensionPointer is used by some internal low-level Bullet extensions.
 	void*					m_extensionPointer;
-	
+
 	///m_rootCollisionShape is temporarily used to store the original collision shape
 	///The m_collisionShape might be temporarily replaced by a child collision shape during collision detection purposes
 	///If it is NULL, the m_collisionShape is not temporarily replaced.
@@ -102,14 +96,14 @@ protected:
 	void*			m_userObjectPointer;
 
 	///time of impact calculation
-	btScalar		m_hitFraction; 
-	
+	btScalar		m_hitFraction;
+
 	///Swept sphere radius (0.0 by default), see btConvexConvexAlgorithm::
 	btScalar		m_ccdSweptSphereRadius;
 
 	/// Don't do continuous collision detection if the motion (in one step) is less then m_ccdMotionThreshold
 	btScalar		m_ccdMotionThreshold;
-	
+
 	/// If some object should have elaborate collision filtering by sub-classes
 	int			m_checkCollideWith;
 
@@ -194,7 +188,7 @@ public:
 		return (m_collisionFlags & CF_NO_CONTACT_RESPONSE)==0;
 	}
 
-	
+
 	btCollisionObject();
 
 	virtual ~btCollisionObject();
@@ -232,7 +226,7 @@ public:
 		m_collisionShape = collisionShape;
 	}
 
-	///Avoid using this internal API call, the extension pointer is used by some Bullet extensions. 
+	///Avoid using this internal API call, the extension pointer is used by some Bullet extensions.
 	///If you need to store your own user pointer, use 'setUserPointer/getUserPointer' instead.
 	void*		internalGetExtensionPointer() const
 	{
@@ -246,7 +240,7 @@ public:
 	}
 
 	SIMD_FORCE_INLINE	int	getActivationState() const { return m_activationState1;}
-	
+
 	void setActivationState(int newState);
 
 	void	setDeactivationTime(btScalar time)
@@ -302,12 +296,12 @@ public:
 
 	void	setWorldTransform(const btTransform& worldTrans)
 	{
-        btAssert(!isnan(worldTrans.getOrigin().getX()));
-        btAssert(!isnan(worldTrans.getOrigin().getY()));
-        btAssert(!isnan(worldTrans.getOrigin().getZ()));
-        btAssert(!isinf(worldTrans.getOrigin().getX()));
-        btAssert(!isinf(worldTrans.getOrigin().getY()));
-        btAssert(!isinf(worldTrans.getOrigin().getZ()));
+        btAssert(!std::isnan(worldTrans.getOrigin().getX()));
+        btAssert(!std::isnan(worldTrans.getOrigin().getY()));
+        btAssert(!std::isnan(worldTrans.getOrigin().getZ()));
+        btAssert(!std::isinf(worldTrans.getOrigin().getX()));
+        btAssert(!std::isinf(worldTrans.getOrigin().getY()));
+        btAssert(!std::isinf(worldTrans.getOrigin().getZ()));
 		m_worldTransform = worldTrans;
 	}
 
@@ -385,7 +379,7 @@ public:
 
 	SIMD_FORCE_INLINE btScalar			getHitFraction() const
 	{
-		return m_hitFraction; 
+		return m_hitFraction;
 	}
 
 	void	setHitFraction(btScalar hitFraction)
@@ -393,7 +387,7 @@ public:
 		m_hitFraction = hitFraction;
 	}
 
-	
+
 	SIMD_FORCE_INLINE int	getCollisionFlags() const
 	{
 		return m_collisionFlags;
@@ -403,7 +397,7 @@ public:
 	{
 		m_collisionFlags = flags;
 	}
-	
+
 	///Swept sphere radius (0.0 by default), see btConvexConvexAlgorithm::
 	btScalar			getCcdSweptSphereRadius() const
 	{
@@ -439,7 +433,7 @@ public:
 	{
 		return m_userObjectPointer;
 	}
-	
+
 	///users can point to their objects, userPointer is not used by Bullet
 	void	setUserPointer(void* userPointer)
 	{
@@ -477,11 +471,11 @@ struct	btCollisionObjectDoubleData
 	btVector3DoubleData		m_interpolationLinearVelocity;
 	btVector3DoubleData		m_interpolationAngularVelocity;
 	btVector3DoubleData		m_anisotropicFriction;
-	double					m_contactProcessingThreshold;	
+	double					m_contactProcessingThreshold;
 	double					m_deactivationTime;
 	double					m_friction;
 	double					m_restitution;
-	double					m_hitFraction; 
+	double					m_hitFraction;
 	double					m_ccdSweptSphereRadius;
 	double					m_ccdMotionThreshold;
 
@@ -509,11 +503,11 @@ struct	btCollisionObjectFloatData
 	btVector3FloatData		m_interpolationLinearVelocity;
 	btVector3FloatData		m_interpolationAngularVelocity;
 	btVector3FloatData		m_anisotropicFriction;
-	float					m_contactProcessingThreshold;	
+	float					m_contactProcessingThreshold;
 	float					m_deactivationTime;
 	float					m_friction;
 	float					m_restitution;
-	float					m_hitFraction; 
+	float					m_hitFraction;
 	float					m_ccdSweptSphereRadius;
 	float					m_ccdMotionThreshold;
 

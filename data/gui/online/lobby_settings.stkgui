@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
+        <header text_align="center" width="80%" align="center" I18N="In the lobby settings screen" text="Lobby Settings"/>
+        <spacer height="15" width="10"/>
+        <box proportion="4" width="90%" layout="vertical-row" align="center">
+            <div width="90%" align="center" layout="vertical-row" height="fit" >
+                <div width="100%" height="fit" layout="horizontal-row" >
+                    <label proportion="1" text_align="left" I18N="In the lobby settings screen" text="Name of the server"/>
+                    <textbox proportion="2" id="name" I18N="In the lobby settings screen"/>
+                </div>
+
+                <spacer height="20" width="20"/>
+
+                <div width="100%" height="fit" layout="horizontal-row" >
+                    <label proportion="1" text_align="left" I18N="In the lobby settings screen" text="Max. number of players"/>
+                    <gauge id="max_players" proportion="2" min_value="2" max_value="12"/>
+                </div>
+            </div>
+        </box>
+
+        <spacer width="10" height="7%"/>
+
+        <bottombar x="2%" width="96%" height="10%" layout="horizontal-row">
+
+        </bottombar>
+
+    </div>
+
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+</stkgui>

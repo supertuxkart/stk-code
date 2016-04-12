@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tracks/quad.hpp"
+#include "utils/log.hpp"
 
 #include <algorithm>
 #include <S3DVertex.h>
@@ -31,10 +32,10 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
      if(p1.sideOfLine2D(p0, p2)>0 ||
          p3.sideOfLine2D(p0, p2)<0)
      {
-         printf("Warning: quad has wrong orientation: p0=%f %f %f p1=%f %f %f\n",
-                p0.getX(), p0.getY(), p0.getZ(),p1.getX(), p1.getY(), p1.getZ());
-         printf("The quad will be swapped, nevertheless test for correctness -\n");
-         printf("quads must be counter-clockwise oriented.\n");
+         Log::warn("Quad", "Quad has wrong orientation: p0=%f %f %f p1=%f %f %f",
+                   p0.getX(), p0.getY(), p0.getZ(),p1.getX(), p1.getY(), p1.getZ());
+         Log::warn("Quad", "The quad will be swapped, nevertheless test for correctness -");
+         Log::warn("Quad", "quads must be counter-clockwise oriented.");
          m_p[0]=p1; m_p[1]=p0; m_p[2]=p3; m_p[3]=p2;
      }
      else

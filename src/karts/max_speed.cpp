@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010  Joerg Henrichs
+//  Copyright (C) 2010-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -51,6 +51,8 @@ MaxSpeed::MaxSpeed(AbstractKart *kart)
     // Initialise m_add_engine_force since it might be queried before
     // update() is called.
     m_add_engine_force  = 0;
+    // This can be used if command line option -N is used
+    m_current_max_speed = 0;
 }   // MaxSpeed
 
 // ----------------------------------------------------------------------------
@@ -60,7 +62,9 @@ MaxSpeed::MaxSpeed(AbstractKart *kart)
  */
 void MaxSpeed::reset()
 {
-    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed();
+    m_current_max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
+    m_min_speed         = -1.0f;
+
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
     {
         SpeedDecrease sd;
@@ -122,7 +126,12 @@ void MaxSpeed::instantSpeedIncrease(unsigned int category,
     // changes to any slow downs since dt=0
     update(0);
     float speed = std::min(m_kart->getSpeed()+ speed_boost,
-                           MaxSpeed::getCurrentMaxSpeed() );
+                           getCurrentMaxSpeed() );
+
+    // If there is a min_speed defined, make sure that the kart is still
+    // fast enough (otherwise e.g. on easy difficulty even with zipper
+    // the speed might be too low for certain jumps).
+    if(speed < m_min_speed) speed = m_min_speed;
 
     m_kart->getVehicle()->instantSpeedIncreaseTo(speed);
 
@@ -228,12 +237,12 @@ void MaxSpeed::update(float dt)
     {
         SpeedDecrease &slowdown = m_speed_decrease[i];
         slowdown.update(dt);
-        slowdown_factor = std::min(slowdown_factor, 
+        slowdown_factor = std::min(slowdown_factor,
                                    slowdown.getSlowdownFraction());
     }
 
     m_add_engine_force  = 0;
-    m_current_max_speed = m_kart->getKartProperties()->getMaxSpeed();
+    m_current_max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
 
     // Then add the speed increase from each category
     // ----------------------------------------------
@@ -248,7 +257,11 @@ void MaxSpeed::update(float dt)
 
     // Then cap the current speed of the kart
     // --------------------------------------
-    if ( m_kart->getSpeed()>m_current_max_speed && m_kart->isOnGround() )
+    if(m_min_speed > 0 && m_kart->getSpeed() < m_min_speed)
+    {
+        m_kart->getVehicle()->instantSpeedIncreaseTo(m_min_speed);
+    }
+    else if ( m_kart->getSpeed()>m_current_max_speed && m_kart->isOnGround() )
         m_kart->getVehicle()->capSpeed(m_current_max_speed);
 
 }   // update

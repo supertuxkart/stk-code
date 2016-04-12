@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,7 +26,6 @@ namespace irr
     namespace scene { class IMesh; }
 }
 
-#include "audio/sfx_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "utils/no_copy.hpp"
 
@@ -53,7 +52,6 @@ private:
      *  being shown or have a sfx playing. */
     HitEffects       m_active_hit_effects;
 
-    void             updateClient(float dt);
     void             updateServer(float dt);
 public:
                      ProjectileManager() {}
@@ -61,10 +59,12 @@ public:
     void             loadData         ();
     void             cleanup          ();
     void             update           (float dt);
-    Flyable*         newProjectile    (AbstractKart *kart, Track* track,
+    Flyable*         newProjectile    (AbstractKart *kart,
                                        PowerupManager::PowerupType type);
     void             Deactivate       (Flyable *p) {}
     void             removeTextures   ();
+    bool             projectileIsClose(const AbstractKart * const kart,
+                                       float radius);
     // ------------------------------------------------------------------------
     /** Adds a special hit effect to be shown.
      *  \param hit_effect The hit effect to be added. */

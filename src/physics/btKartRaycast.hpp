@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Erwin Coumans http://continuousphysics.com/Bullet/
+ * Copyright (C) 2005-2015 Erwin Coumans http://continuousphysics.com/Bullet/
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -23,17 +23,17 @@ class btDynamicsWorld;
 class btKartRaycaster : public btVehicleRaycaster
 {
 private:
-	btDynamicsWorld*	m_dynamicsWorld;
+    btDynamicsWorld*    m_dynamicsWorld;
     /** True if the normals should be smoothed. Not all tracks support this,
     *  so this flag is set depending on track when constructing this object. */
     bool                m_smooth_normals;
 public:
-	btKartRaycaster(btDynamicsWorld* world, bool smooth_normals=false)
-		:m_dynamicsWorld(world), m_smooth_normals(smooth_normals)
-	{
-	}
+    btKartRaycaster(btDynamicsWorld* world, bool smooth_normals=false)
+        :m_dynamicsWorld(world), m_smooth_normals(smooth_normals)
+    {
+    }
 
-	virtual void* castRay(const btVector3& from,const btVector3& to,
+    virtual void* castRay(const btVector3& from,const btVector3& to,
                           btVehicleRaycasterResult& result);
 
 };

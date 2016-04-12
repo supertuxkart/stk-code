@@ -1,9 +1,9 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Joerg Henrichs
+//  Copyright (C) 2007-2015 Joerg Henrichs
 //
 //  Physics improvements and linear intersection algorithm by
-//  by David Mikos. Copyright (C) 2009.
+//  Copyright (C) 2009-2015 David Mikos.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 
 #include "items/plunger.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
@@ -33,8 +34,6 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
-
-#include "utils/log.hpp" //TODO: remove after debugging is done
 
 // -----------------------------------------------------------------------------
 Plunger::Plunger(AbstractKart *kart)
@@ -58,8 +57,6 @@ Plunger::Plunger(AbstractKart *kart)
 
     btTransform kart_transform = kart->getAlignedTransform();
     btMatrix3x3 kart_rotation = kart_transform.getBasis();
-    // The current forward vector is rotation*(0,0,1), or:
-    btVector3 forward(kart_rotation.getColumn(2));
 
     float heading =kart->getHeading();
     float pitch  = kart->getTerrainPitch(heading);
@@ -119,25 +116,6 @@ void Plunger::init(const XMLNode &node, scene::IMesh *plunger_model)
 }   // init
 
 // ----------------------------------------------------------------------------
-/** Picks a random message to be displayed when a kart is hit by a plunger.
- *  \param The kart that was hit (ignored here).
- *  \returns The string to display.
- */
-const core::stringw Plunger::getHitString(const AbstractKart *kart) const
-{
-    const int PLUNGER_IN_FACE_STRINGS_AMOUNT = 2;
-    RandomGenerator r;
-    switch (r.get(PLUNGER_IN_FACE_STRINGS_AMOUNT))
-    {
-        //I18N: shown when a player receives a plunger in his face
-        case 0: return _LTR("%0 gets a fancy mask from %1");
-        //I18N: shown when a player receives a plunger in his face
-        case 1: return _LTR("%1 merges %0's face with a plunger");
-        default:assert(false); return L"";   // avoid compiler warning
-    }
-}   // getHitString
-
-// ----------------------------------------------------------------------------
 /** Updates the bowling ball ineach frame. If this function returns true, the
  *  object will be removed by the projectile manager.
  *  \param dt Time step size.
@@ -180,16 +158,6 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 {
     if(isOwnerImmunity(kart)) return false;
 
-    /*if(kart && kart->isShielded())
-    {
-        //kart->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
-        Log::verbose("Plunger", "Almost Decreasing shield! \n");
-
-        return false; //Not sure if a shield hit is a real hit.
-    }*/
-    RaceGUIBase* gui = World::getWorld()->getRaceGUI();
-    irr::core::stringw hit_message;
-
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
     if( m_reverse_mode || race_manager->isBattleMode() )
@@ -197,15 +165,8 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
         if(kart)
         {
             kart->blockViewWithPlunger();
-            if (kart->getController()->isPlayerController())
-                sfx_manager->quickSound("plunger");
-
-            hit_message += StringUtils::insertValues(getHitString(kart),
-                                                     core::stringw(kart->getName()),
-                                                     core::stringw(m_owner->getName())
-                                                    ).c_str();
-            gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
-                            video::SColor(255, 255, 255, 255), false);
+            if (kart->getController()->isLocalPlayerController())
+                SFXManager::get()->quickSound("plunger");
         }
 
         m_keep_alive = 0;
@@ -215,7 +176,7 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
     }
     else
     {
-        m_keep_alive = m_owner->getKartProperties()->getRubberBandDuration();
+        m_keep_alive = m_owner->getKartProperties()->getPlungerBandDuration();
 
         // Make this object invisible by placing it faaar down. Not that if this
         // objects is simply removed from the scene graph, it might be auto-deleted

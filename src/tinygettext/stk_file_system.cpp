@@ -1,5 +1,5 @@
 //  tinygettext - A gettext replacement that works directly on .po files
-//  Copyright (C) 2009 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2009-2015 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -35,7 +35,7 @@ StkFileSystem::open_directory(const std::string& pathname)
 {
   std::set<std::string> result;
 
-  file_manager->listFiles(result, pathname, /*is_full_path*/true);
+  file_manager->listFiles(result, pathname);
   std::vector<std::string> files;
   for(std::set<std::string>::iterator i=result.begin(); i!=result.end(); i++)
   {
@@ -44,10 +44,10 @@ StkFileSystem::open_directory(const std::string& pathname)
   return files;
 }
 
-std::auto_ptr<std::istream>
+std::unique_ptr<std::istream>
 StkFileSystem::open_file(const std::string& filename)
 {
-  return std::auto_ptr<std::istream>(new std::ifstream(filename.c_str()));
+  return std::unique_ptr<std::istream>(new std::ifstream(filename.c_str()));
 }
 
 } // namespace tinygettext

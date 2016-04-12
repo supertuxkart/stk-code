@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Joerg Henrichs
+//  Copyright (C) 2009-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -41,7 +41,7 @@ XMLNode::XMLNode(const std::string &filename)
     m_file_name = filename;
 
     io::IXMLReader *xml = file_manager->createXMLReader(filename);
-
+    
     if (xml == NULL)
     {
         throw std::runtime_error("Cannot find file "+filename);
@@ -56,8 +56,8 @@ XMLNode::XMLNode(const std::string &filename)
             {
                 if(!is_first_element)
                 {
-                    fprintf(stderr,
-                            "More than one root element in '%s' - ignored.\n",
+                    Log::warn("[XMLNode]",
+                                "More than one root element in '%s' - ignored.",
                             filename.c_str());
                 }
                 readXML(xml);
@@ -174,7 +174,7 @@ const void XMLNode::getNodes(const std::string &s, std::vector<XMLNode*>& out) c
 */
 int XMLNode::get(const std::string &attribute, std::string *value) const
 {
-    if(m_attributes.size()==0) return 0;
+    if(m_attributes.empty()) return 0;
     std::map<std::string, core::stringw>::const_iterator o;
     o = m_attributes.find(attribute);
     if(o==m_attributes.end()) return 0;
@@ -184,11 +184,22 @@ int XMLNode::get(const std::string &attribute, std::string *value) const
 // ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, core::stringw *value) const
 {
-    if(m_attributes.size()==0) return 0;
+    if(m_attributes.empty()) return 0;
     std::map<std::string, core::stringw>::const_iterator o;
     o = m_attributes.find(attribute);
     if(o==m_attributes.end()) return 0;
     *value = o->second;
+    return 1;
+}   // get
+// ----------------------------------------------------------------------------
+int XMLNode::getAndDecode(const std::string &attribute, core::stringw *value) const
+{
+    if (m_attributes.empty()) return 0;
+    std::map<std::string, core::stringw>::const_iterator o;
+    o = m_attributes.find(attribute);
+    if (o == m_attributes.end()) return 0;
+    std::string raw_value = core::stringc(o->second).c_str();
+    *value = StringUtils::xmlDecode(raw_value);
     return 1;
 }   // get
 // ----------------------------------------------------------------------------
@@ -223,8 +234,8 @@ int XMLNode::get(const std::string &attribute, Vec3 *value) const
     std::vector<std::string> v = StringUtils::split(s,' ');
     if (v.size() != 3)
     {
-        fprintf(stderr, "[XMLNode] WARNING: Expected 3 floating-point values, but found '%s' in file %s\n",
-                s.c_str(), m_file_name.c_str());
+        Log::warn("[XMLNode]", "WARNING: Expected 3 floating-point values, but found '%s' in file %s",
+                    s.c_str(), m_file_name.c_str());
         return 0;
     }
 
@@ -240,8 +251,8 @@ int XMLNode::get(const std::string &attribute, Vec3 *value) const
     }
     else
     {
-        fprintf(stderr, "[XMLNode] WARNING: Expected 3 floating-point values, but found '%s' in file %s\n",
-                s.c_str(), m_file_name.c_str());
+        Log::warn("[XMLNode]", "WARNING: Expected 3 floating-point values, but found '%s' in file %s",
+                    s.c_str(), m_file_name.c_str());
         return 0;
     }
 
@@ -279,11 +290,22 @@ int XMLNode::get(const std::string &attribute, video::SColorf *color) const
     if(!get(attribute, &s)) return 0;
 
     std::vector<std::string> v = StringUtils::split(s,' ');
-    if(v.size()!=4) return 0;
-    color->set((float)atof(v[3].c_str()),  // set takes ARGB, but we use RGBA
-               (float)atof(v[0].c_str()),
-               (float)atof(v[1].c_str()),
-               (float)atof(v[2].c_str()));
+    if(v.size()==3)
+    {
+        color->set((float)atof(v[0].c_str())/255.0f,
+                   (float)atof(v[1].c_str())/255.0f,
+                   (float)atof(v[2].c_str())/255.0f);
+    }
+    else if(v.size()==4)
+    {
+        color->set((float)atof(v[3].c_str())/255.0f,  // set takes ARGB, but we use RGBA
+                   (float)atof(v[0].c_str())/255.0f,
+                   (float)atof(v[1].c_str())/255.0f,
+                   (float)atof(v[2].c_str())/255.0f);
+    }
+    else
+        return 0;
+
     return 1;
 }   // get(SColor)
 // ----------------------------------------------------------------------------
@@ -294,8 +316,8 @@ int XMLNode::get(const std::string &attribute, int32_t *value) const
 
     if (!StringUtils::parseString<int>(s, value))
     {
-        fprintf(stderr, "[XMLNode] WARNING: Expected int but found '%s' for attribute '%s' of node '%s' in file %s\n",
-                s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+        Log::warn("[XMLNode]", "WARNING: Expected int but found '%s' for attribute '%s' of node '%s' in file %s",
+                    s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
         return 0;
     }
 
@@ -310,14 +332,30 @@ int XMLNode::get(const std::string &attribute, int64_t *value) const
 
     if (!StringUtils::parseString<int64_t>(s, value))
     {
-        fprintf(stderr, "[XMLNode] WARNING: Expected int but found '%s' for attribute '%s' of node '%s' in file %s\n",
-                s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+        Log::warn("[XMLNode]", "WARNING: Expected int but found '%s' for attribute '%s' of node '%s' in file %s",
+                    s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
         return 0;
     }
 
     return 1;
 }   // get(int64_t)
 
+
+// ----------------------------------------------------------------------------
+int XMLNode::get(const std::string &attribute, uint16_t *value) const
+{
+    std::string s;
+    if(!get(attribute, &s)) return 0;
+
+    if (!StringUtils::parseString<uint16_t>(s, value))
+    {
+        Log::warn("[XMLNode]", "WARNING: Expected uint but found '%s' for attribute '%s' of node '%s' in file %s",
+                    s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+        return 0;
+    }
+
+    return 1;
+}   // get(uint32_t)
 
 // ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, uint32_t *value) const
@@ -327,8 +365,8 @@ int XMLNode::get(const std::string &attribute, uint32_t *value) const
 
     if (!StringUtils::parseString<unsigned int>(s, value))
     {
-        fprintf(stderr, "[XMLNode] WARNING: Expected uint but found '%s' for attribute '%s' of node '%s' in file %s\n",
-                s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+        Log::warn("[XMLNode]", "WARNING: Expected uint but found '%s' for attribute '%s' of node '%s' in file %s",
+                    s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
         return 0;
     }
 
@@ -343,8 +381,8 @@ int XMLNode::get(const std::string &attribute, float *value) const
 
     if (!StringUtils::parseString<float>(s, value))
     {
-        fprintf(stderr, "[XMLNode] WARNING: Expected float but found '%s' for attribute '%s' of node '%s' in file %s\n",
-                s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+        Log::warn("[XMLNode]", "WARNING: Expected float but found '%s' for attribute '%s' of node '%s' in file %s",
+                    s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
         return 0;
     }
 
@@ -377,7 +415,7 @@ int XMLNode::get(const std::string &attribute,
     if(!get(attribute, &s)) return 0;
 
     *value = StringUtils::split(s,' ');
-    return value->size();
+    return (int) value->size();
 }   // get(vector<string>)
 
 // ----------------------------------------------------------------------------
@@ -396,20 +434,20 @@ int XMLNode::get(const std::string &attribute,
     std::vector<std::string> v = StringUtils::split(s,' ');
     value->clear();
 
-    const unsigned int count = v.size();
+    const unsigned int count = (unsigned int)v.size();
     for (unsigned int i=0; i<count; i++)
     {
         float curr;
         if (!StringUtils::parseString<float>(v[i], &curr))
         {
-            fprintf(stderr, "[XMLNode] WARNING: Expected float but found '%s' for attribute '%s' of node '%s' in file %s\n",
-                    v[i].c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+            Log::warn("[XMLNode]", "WARNING: Expected float but found '%s' for attribute '%s' of node '%s' in file %s",
+                        v[i].c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
             return 0;
         }
 
         value->push_back(curr);
     }
-    return value->size();
+    return (int) value->size();
 }   // get(vector<float>)
 
 // ----------------------------------------------------------------------------
@@ -427,20 +465,20 @@ int XMLNode::get(const std::string &attribute, std::vector<int> *value) const
     std::vector<std::string> v = StringUtils::split(s,' ');
     value->clear();
 
-    const unsigned int count = v.size();
+    const unsigned int count = (unsigned int)v.size();
     for (unsigned int i=0; i<count; i++)
     {
         int val;
         if (!StringUtils::parseString<int>(v[i], &val))
         {
-            fprintf(stderr, "[XMLNode] WARNING: Expected int but found '%s' for attribute '%s' of node '%s'\n",
-                    v[i].c_str(), attribute.c_str(), m_name.c_str());
+            Log::warn("[XMLNode]", "WARNING: Expected int but found '%s' for attribute '%s' of node '%s'",
+                        v[i].c_str(), attribute.c_str(), m_name.c_str());
             return 0;
         }
 
         value->push_back(val);
     }
-    return value->size();
+    return (int) value->size();
 }   // get(vector<int>)
 
 // ----------------------------------------------------------------------------
@@ -463,22 +501,22 @@ int XMLNode::get(const std::string &attribute, InterpolationArray *value) const
         std::vector<std::string> pair = StringUtils::split(pairs[i],':');
         if(pair.size()!=2)
         {
-            printf("Incorrect interpolation pair '%s' in '%s'.\n",
-                   pairs[i].c_str(), attribute.c_str());
-            printf("Must be x:y.\n");
+            Log::fatal("[XMLNode]", "Incorrect interpolation pair '%s' in '%s'.",
+                        pairs[i].c_str(), attribute.c_str());
+            Log::fatal("[XMLNode]", "Must be x:y.");
             exit(-1);
         }
         float x;
         if(!StringUtils::fromString(pair[0], x))
         {
-            printf("Incorrect x in pair '%s' of '%s'.\n",
+            Log::fatal("[XMLNode]", "Incorrect x in pair '%s' of '%s'.",
                    pairs[i].c_str(), attribute.c_str());
             exit(-1);
         }
         float y;
         if(!StringUtils::fromString(pair[1], y))
         {
-            printf("Incorrect y in pair '%s' in '%s'.\n",
+            Log::fatal("[XMLNode]", "Incorrect y in pair '%s' in '%s'.",
                   pair[1].c_str(), attribute.c_str());
             exit(-1);
         }
@@ -502,7 +540,6 @@ int XMLNode::get(core::vector3df *value) const
 {
     float f;
     int bits=0;
-    core::vector3df result = *value;
     if(get("x", &f)) { value->X = f; bits |= 1; }
     if(get("h", &f)) { value->X = f; bits |= 1; }
     if(get("y", &f)) { value->Y = f; bits |= 2; }
@@ -524,7 +561,6 @@ int XMLNode::getXYZ(core::vector3df *value) const
 {
     float f;
     int bits=0;
-    core::vector3df result = *value;
     if(get("x", &f)) { value->X = f; bits |= 1; }
     if(get("y", &f)) { value->Y = f; bits |= 2; }
     if(get("z", &f)) { value->Z = f; bits |= 4; }
@@ -543,7 +579,6 @@ int XMLNode::getXYZ(Vec3 *value) const
 {
     float f;
     int bits=0;
-    Vec3 result = *value;
     if(get("x", &f)) { value->setX(f); bits |= 1; }
     if(get("y", &f)) { value->setY(f); bits |= 2; }
     if(get("z", &f)) { value->setZ(f); bits |= 4; }
@@ -562,7 +597,6 @@ int XMLNode::getHPR(core::vector3df *value) const
 {
     float f;
     int bits=0;
-    core::vector3df result = *value;
     if(get("h", &f)) { value->X = f; bits |= 1; }
     if(get("p", &f)) { value->Y = f; bits |= 2; }
     if(get("r", &f)) { value->Z = f; bits |= 4; }
@@ -581,7 +615,6 @@ int XMLNode::getHPR(Vec3 *value) const
 {
     float f;
     int bits=0;
-    Vec3 result = *value;
     if(get("h", &f)) { value->setX(f); bits |= 1; }
     if(get("p", &f)) { value->setY(f); bits |= 2; }
     if(get("r", &f)) { value->setZ(f); bits |= 4; }

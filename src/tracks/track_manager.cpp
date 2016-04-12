@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,16 +18,16 @@
 
 #include "tracks/track_manager.hpp"
 
-#include <stdio.h>
-#include <stdexcept>
-#include <algorithm>
-#include <sstream>
-#include <iostream>
-
-#include "audio/music_manager.hpp"
 #include "config/stk_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"
+
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <stdio.h>
 
 TrackManager* track_manager = 0;
 std::vector<std::string>  TrackManager::m_track_search_path;
@@ -56,6 +56,19 @@ void TrackManager::addTrackSearchDir(const std::string &dir)
 {
     m_track_search_path.push_back(dir);
 }   // addTrackDir
+
+//-----------------------------------------------------------------------------
+/** Returns the number of racing tracks. Those are tracks that are not 
+ *  internal (like cut scenes), arenas, or soccer fields.
+ */
+int TrackManager::getNumberOfRaceTracks() const
+{
+    int n=0;
+    for(unsigned int i=0; i<m_tracks.size(); i++)
+        if(m_tracks[i]->isRaceTrack())
+            n++;
+    return n;
+}   // getNumberOfRaceTracks
 
 //-----------------------------------------------------------------------------
 /** Get TrackData by the track identifier.
@@ -98,9 +111,8 @@ void TrackManager::setUnavailableTracks(const std::vector<std::string> &tracks)
         if (std::find(tracks.begin(), tracks.end(), id)==tracks.end())
         {
             m_track_avail[i-m_tracks.begin()] = false;
-            fprintf(stderr,
-                    "Track '%s' not available on all clients, disabled.\n",
-                    id.c_str());
+            Log::warn("TrackManager", "Track '%s' not available on all clients, disabled.",
+                      id.c_str());
         }   // if id not in tracks
     }   // for all available tracks in track manager
 
@@ -145,7 +157,7 @@ void TrackManager::loadTrackList()
         // Then see if a subdir of this dir contains tracks
         // ------------------------------------------------
         std::set<std::string> dirs;
-        file_manager->listFiles(dirs, dir, /*is_full_path*/ true);
+        file_manager->listFiles(dirs, dir);
         for(std::set<std::string>::iterator subdir = dirs.begin();
             subdir != dirs.end(); subdir++)
         {
@@ -174,7 +186,7 @@ bool TrackManager::loadTrack(const std::string& dirname)
     }
     catch (std::exception& e)
     {
-        fprintf(stderr, "[TrackManager] ERROR: Cannot load track <%s> : %s\n",
+        Log::error("TrackManager", "Cannot load track <%s> : %s\n",
                 dirname.c_str(), e.what());
         return false;
     }
@@ -182,12 +194,12 @@ bool TrackManager::loadTrack(const std::string& dirname)
     if (track->getVersion()<stk_config->m_min_track_version ||
         track->getVersion()>stk_config->m_max_track_version)
     {
-        fprintf(stderr, "[TrackManager] Warning: track '%s' is not supported "
+        Log::warn("TrackManager", "Track '%s' is not supported "
                         "by this binary, ignored. (Track is version %i, this "
-                        "executable supports from %i to %i)\n",
-                track->getIdent().c_str(), track->getVersion(),
-                stk_config->m_min_track_version,
-                stk_config->m_max_track_version);
+                        "executable supports from %i to %i).",
+                  track->getIdent().c_str(), track->getVersion(),
+                  stk_config->m_min_track_version,
+                  stk_config->m_max_track_version);
         delete track;
         return false;
     }
@@ -195,6 +207,12 @@ bool TrackManager::loadTrack(const std::string& dirname)
     m_tracks.push_back(track);
     m_track_avail.push_back(true);
     updateGroups(track);
+
+    // Populate the texture cache with track screenshots
+    // (internal tracks like end cutscene don't have screenshots)
+    if (!track->isInternal())
+        irr_driver->getTexture(track->getScreenshotFile());
+
     return true;
 }   // loadTrack
 
@@ -206,22 +224,15 @@ void TrackManager::removeTrack(const std::string &ident)
 {
     Track *track = getTrack(ident);
     if (track == NULL)
-    {
-        fprintf(stderr, "[TrackManager] ERROR: There is no track named '%s'!!\n", ident.c_str());
-        assert(false);
-        return;
-    }
+        Log::fatal("TrackManager", "There is no track named '%s'!!", ident.c_str());
 
     if (track->isInternal()) return;
 
     std::vector<Track*>::iterator it = std::find(m_tracks.begin(),
                                                  m_tracks.end(), track);
     if (it == m_tracks.end())
-    {
-        fprintf(stderr, "[TrackManager] INTERNAL ERROR: Cannot find track '%s' in map!!\n", ident.c_str());
-        assert(false);
-        return;
-    }
+        Log::fatal("TrackManager", "Cannot find track '%s' in map!!", ident.c_str());
+
     int index = it - m_tracks.begin();
 
     // Remove the track from all groups it belongs to
@@ -299,14 +310,14 @@ void TrackManager::updateGroups(const Track* track)
              (track->isSoccer() ? m_soccer_arena_group_names :
                m_track_group_names));
 
-    const unsigned int groups_amount = new_groups.size();
+    const unsigned int groups_amount = (unsigned int)new_groups.size();
     for(unsigned int i=0; i<groups_amount; i++)
     {
         bool group_exists = group_2_indices.find(new_groups[i])
                                                       != group_2_indices.end();
         if(!group_exists)
             group_names.push_back(new_groups[i]);
-        group_2_indices[new_groups[i]].push_back(m_tracks.size()-1);
+        group_2_indices[new_groups[i]].push_back((int)m_tracks.size()-1);
     }
 }   // updateGroups
 

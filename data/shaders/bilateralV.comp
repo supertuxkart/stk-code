@@ -1,0 +1,53 @@
+// From http://http.developer.nvidia.com/GPUGems3/gpugems3_ch40.html
+
+uniform sampler2D source;
+uniform sampler2D depth;
+uniform vec2 pixel;
+uniform layout(r16f) volatile restrict writeonly image2D dest;
+uniform float sigma = 5.;
+
+layout (local_size_x = 8, local_size_y = 8) in;
+
+shared float local_src[8][8 + 2 * 8];
+shared float local_depth[8][8 + 2 * 8];
+
+void main()
+{
+    int x = int(gl_LocalInvocationID.x), y = int(gl_LocalInvocationID.y);
+    ivec2 iuv = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
+    vec2 uv_m = (iuv - ivec2(0, 8)) * pixel;
+    vec2 uv = iuv * pixel;
+    vec2 uv_p = (iuv + ivec2(0, 8)) * pixel;
+
+    local_src[x][y] = texture(source, uv_m).x;
+    local_depth[x][y] = texture(depth, uv_m).x;
+    local_src[x][y + 8] = texture(source, uv).x;
+    local_depth[x][y + 8] = texture(depth, uv).x;
+    local_src[x][y + 16] = texture(source, uv_p).x;
+    local_depth[x][y + 16] = texture(depth, uv_p).x;
+
+    barrier();
+
+    float g0, g1, g2;
+    g0 = 1.0 / (sqrt(2.0 * 3.14) * sigma);
+    g1 = exp(-0.5 / (sigma * sigma));
+    g2 = g1 * g1;
+    float sum = local_src[x][y + 8] * g0;
+    float pixel_depth = local_depth[x][y + 8];
+    g0 *= g1;
+    g1 *= g2;
+    float tmp_weight, total_weight = g0;
+    for (int j = 1; j < 8; j++) {
+        tmp_weight = max(0.0, 1.0 - .001 * abs(local_depth[x][y + 8 + j] - pixel_depth));
+        sum += local_src[x][y + 8 + j] * g0 * tmp_weight;
+        total_weight += g0 * tmp_weight;
+        tmp_weight = max(0.0, 1.0 - .001 * abs(local_depth[x][y + 8 - j] - pixel_depth));
+        sum += local_src[x][y + 8 - j] * g0 * tmp_weight;
+        total_weight += g0 * tmp_weight;
+        g0 *= g1;
+        g1 *= g2;
+
+    }
+    imageStore(dest, iuv, vec4(sum / total_weight));
+}
+

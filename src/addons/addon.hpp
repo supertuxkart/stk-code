@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2015 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -99,7 +99,7 @@ private:
      *  in the addons.xml file. */
     bool        m_still_exists;
     /** Date when the addon was added. */
-    Time::TimeType m_date;
+    StkTime::TimeType m_date;
     /** A description of this addon. */
     core::stringw m_description;
     /** The URL of the icon (relative to the server) */
@@ -115,7 +115,7 @@ private:
     /** Compressed size of the addon package. */
     int         m_size;
     /** Rating for thsi addon package. */
-    float       m_rating;
+    mutable float       m_rating;
     /** Minimum version addon is included with. */
     std::string m_min_include_ver;
     /** Maximum version addon is included with. */
@@ -127,9 +127,10 @@ private:
     static SortOrder m_sort_order;
 
 public:
-         Addon() {};
          /** Initialises the object from an XML node. */
          Addon(const XMLNode &xml);
+
+    void deleteInvalidIconFile();
     // ------------------------------------------------------------------------
     /** Sets the sort order used in the comparison function. It is static, so
      *  that each instance can access the sort order. */
@@ -151,6 +152,9 @@ public:
     /** Returns the rating of an addon. */
     const float getRating() const {return m_rating; }
     // ------------------------------------------------------------------------
+    /** Sets the rating of an addon. */
+    void setRating(const float rating) const {m_rating = rating; }
+    // ------------------------------------------------------------------------
     /** Returns the type of the addon. */
     const std::string& getType() const { return m_type; }
     // ------------------------------------------------------------------------
@@ -161,14 +165,14 @@ public:
     const std::string& getIconURL() const { return m_icon_url; }
     // ------------------------------------------------------------------------
     /** Returns the name of the icon (i.e. the basename of the url). */
-    const std::string getIconBasename() const { return m_icon_basename; }
+    const std::string& getIconBasename() const { return m_icon_basename; }
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
     const core::stringw& getDescription() const { return m_description; }
     // ------------------------------------------------------------------------
     /** Returns the date (in seconds since epoch) when the addon was
      *  uploaded. */
-    Time::TimeType getDate() const { return m_date; }
+    StkTime::TimeType getDate() const { return m_date; }
     // ------------------------------------------------------------------------
     /** Returns a user readable date as a string. */
     std::string getDateAsString() const;
@@ -293,33 +297,6 @@ public:
         // Fix compiler warning.
         return true;
     }   // operator<
-
-    // ------------------------------------------------------------------------
-    /** Compares two addons according to the sort order currently defined.
-     *  Comparison is done for sorting in descending order.
-     *  \param a The addon to compare this addon to.
-     */
-    bool operator>(const Addon &a) const
-    {
-        switch(m_sort_order)
-        {
-            case SO_DEFAULT:
-                if(testStatus(AS_FEATURED) &&
-                    !a.testStatus(AS_FEATURED))  return true;
-                if(!testStatus(AS_FEATURED) &&
-                    a.testStatus(AS_FEATURED))  return false;
-            // Otherwise fall through to name comparison!
-            case SO_NAME:
-                // m_id is the lower case name
-                return m_id > a.m_id;
-                break;
-            case SO_DATE:
-                return m_date < a.m_date;
-                break;
-        }   // switch
-        // Fix compiler warning.
-        return true;
-    }   // operator>
 
 };   // Addon
 

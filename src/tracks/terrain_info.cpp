@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Joerg Henrichs
+//  Copyright (C) 2007-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,13 +18,15 @@
 
 #include "tracks/terrain_info.hpp"
 
-#include <math.h>
-
 #include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
+
+#include <math.h>
 
 /** Constructor to initialise terrain data.
  */
@@ -41,20 +43,55 @@ TerrainInfo::TerrainInfo()
 TerrainInfo::TerrainInfo(const Vec3 &pos)
 {
     // initialise HoT
+    m_last_material = NULL;
+    m_material = NULL;
     update(pos);
 }   // TerrainInfo
+
 //-----------------------------------------------------------------------------
 /** Update the terrain information based on the latest position.
  *  \param Position from which to start the rayast from.
  */
-void TerrainInfo::update(const Vec3& pos)
+void TerrainInfo::update(const Vec3 &from)
 {
     m_last_material = m_material;
-    btVector3 to(pos);
-    to.setY(-100000.f);
+    btVector3 to(from);
+    to.setY(-10000.0f);
 
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
-    tm.castRay(pos, to, &m_hit_point, &m_material, &m_normal);
+    tm.castRay(from, to, &m_hit_point, &m_material, &m_normal,
+               /*interpolate*/false);
+    // Now also raycast against all track objects (that are driveable).
+    World::getWorld()->getTrack()->getTrackObjectManager()
+                     ->castRay(from, to, &m_hit_point, &m_material,
+                               &m_normal, /*interpolate*/false);
+}   // update
+
+//-----------------------------------------------------------------------------
+/** Update the terrain information based on the latest position.
+ *  \param tran The transform ov the kart
+ *  \param from World coordinates from which to start the raycast.
+ */
+void TerrainInfo::update(const btMatrix3x3 &rotation, const Vec3 &from)
+{
+    m_last_material = m_material;
+    // Save the origin for debug drawing
+    m_origin_ray    = from;
+
+    // Compute the 'to' vector by rotating a long 'down' vectory by the
+    // kart rotation, and adding the start point to it.
+    btVector3 to(0, -10000.0f, 0);
+    to = from + rotation*to;
+
+    const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+    tm.castRay(from, to, &m_hit_point, &m_material, &m_normal,
+               /*interpolate*/true);
+    // Now also raycast against all track objects (that are driveable). If
+    // there should be a closer result (than the one against the main track 
+    // mesh), its data will be returned.
+    World::getWorld()->getTrack()->getTrackObjectManager()
+                     ->castRay(from, to, &m_hit_point, &m_material,
+                               &m_normal, /*interpolate*/true);
 }   // update
 
 // -----------------------------------------------------------------------------

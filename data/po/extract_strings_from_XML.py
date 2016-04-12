@@ -5,7 +5,7 @@ import codecs
 f = open('./data/po/gui_strings.h', 'w')
 f.write( codecs.BOM_UTF8 )
 
-def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
+def traverse(file, node, isChallenge, isGP, isKart, isTrack, isAchievements, level=0):
   
     for e in node.childNodes:
         if e.localName == None:
@@ -27,7 +27,7 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
                
                f.write( line.encode( "utf-8" ) )
         
-        if isChallenge or isGP or isKart or isTrack:
+        if isChallenge or isGP or isKart or isTrack or isAchievements:
            if isTrack and e.hasAttribute("internal") and e.getAttribute("internal") == "Y": continue
            if e.hasAttribute("name") and len(e.getAttribute("name")) > 0:
                #print "Label=", e.getAttribute("name"), " Comment=", comment
@@ -62,7 +62,7 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, level=0):
 
         # don't recurse in children nodes for karts, they can contain sounds, etc. that should not be translated
         if not isKart:
-            traverse(file, e, isChallenge, isGP, isKart, isTrack, level+1)
+            traverse(file, e, isChallenge, isGP, isKart, isTrack, isAchievements, level+1)
       
 filenames = sys.argv[1:]
 for file in filenames:
@@ -72,6 +72,7 @@ for file in filenames:
     isGP = False
     isKart = False
     isTrack = False
+    isAchievements = False
     
     if file.endswith(".challenge"):
         isChallenge = True
@@ -81,6 +82,8 @@ for file in filenames:
         isKart = True
     if file.endswith("track.xml"):
         isTrack = True
+    if file.endswith("achievements.xml"):
+        isAchievements = True
         
     try:
         doc = xml.dom.minidom.parse(file)
@@ -89,5 +92,5 @@ for file in filenames:
         print "/!\\ Expat doesn't like ", file, "! Error=", type(ex), " (", ex.args, ")"
         print "============================================"
 
-    traverse(file, doc, isChallenge, isGP, isKart, isTrack)
+    traverse(file, doc, isChallenge, isGP, isKart, isTrack, isAchievements)
     

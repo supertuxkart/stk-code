@@ -1,0 +1,157 @@
+Graphics GSOC XML additions
+===========================
+
+This document will list in depth all new XML values added during the graphics GSOC, for use 
+by the blender exporter scripts.
+
+Glow colors
+-----------
+
+The glow colors for nitro bottles and boxes are settable in stk_config.xml.
+They are three-value RGB colors.
+
+Example: <glow-colors nitro="0 0 255" box="255 0 0" />
+
+
+Particle wind
+-------------
+
+Particles may be affected by wind. This is used with the snow particles.
+
+Flips is a boolean controlling whether each particle will spin about its own two axis.
+It is only applicable to symmetric textures, such as snow flakes.
+
+Speed is a float in no real units.
+
+Example: <wind speed="0.16" flips="Y" />
+
+
+Forced bloom objects
+--------------------
+
+Any object may be marked as forced bloom. This will include the object in the bloom pass 
+regardless of its brightness.
+
+Example: forcedbloom="Y" inside the <object> tag, in scene.xml.
+
+Forced bloom objects may optionally include a multiplier, ranging from 0.5 to 10:
+bloompower="2.5"
+
+
+Glowing objects
+---------------
+
+Any object may be marked as glowing. The glow is a RGB value.
+
+Example: glow="0 255 0" inside the <object> tag, in scene.xml.
+
+
+Caustics
+--------
+
+A material effect, ie GE_CAUSTICS, to mark a texture as receiving caustics. To be used
+for the ocean floor, puddle floor, etc.
+
+Example: graphics-effect="caustics" in materials.xml.
+
+
+Refractions/reflections
+-----------------------
+
+A per-object boolean flag, typically set for subsea windows or the ocean surface. 
+
+Example: displacing="Y" in the <object> tag in scene.xml.
+
+
+
+	Per-track tags
+	--------------
+
+These are all specified inside track.xml, among the track's author, music, etc.
+
+Cloud shadows
+-------------
+
+Boolean whether to have the sun blocked by cloud shadows, moving with the wind.
+Disabled by default.
+
+The effect is completely fake, doesn't correspond to any real or simulated clouds, but 
+nobody's checking, so it looks nice.
+
+Example: clouds="Y" inside the <track> tag.
+
+
+Bloom
+-----
+
+Boolean whether to enable global bloom for this track. Enabled by default.
+
+Example: bloom="Y" inside the <track> tag.
+
+
+Bloom threshold
+---------------
+
+Float that specifies the minimum luminance needed for a pixel to participate in the bloom.
+The default is 0.75.
+
+Example: bloom-threshold="0.75"
+
+
+Lens flare
+----------
+
+Boolean that specifies whether a lens flare is shown when the player looks at the sun.
+The strength and angle depend on the relation of the camera to the sun. Disabled by default.
+
+Example: lens-flare="Y"
+
+
+Dynamic shadows
+---------------
+
+Boolean on whether this track should use dynamic shadows. Enabled by default.
+
+If disabled, the fallback fake kart shadows will be used.
+
+Example: shadows="N"
+
+
+God rays
+--------
+
+Boolean on rendering god rays when the player looks at the sun. Disabled by default.
+
+Example: god-rays="Y"
+
+
+Displacement speed
+------------------
+
+Float on the relative speed of any displacing objects in this level. Default 1.0.
+2.0 = double speed, 0.5 = half speed, etc.
+
+Example: displacement-speed="1.5"
+
+
+Caustics speed
+--------------
+
+Float on the relative speed of any caustics objects in this level. Default 1.0.
+2.0 = double speed, 0.5 = half speed, etc.
+
+Example: caustics-speed="1.5"
+
+
+Fog
+---
+
+The density tag was removed (it was unused anyway).
+The max, height start, and height end tags were added.
+
+fog-max: float capping the amount of fog to apply, default 1.0.
+fog-start-height: minimum height of fog, default 0.0.
+fog-end-height: maximum height of fog, default 100.0.
+
+The fog scales smoothly according to both the height, and the distance from
+camera.

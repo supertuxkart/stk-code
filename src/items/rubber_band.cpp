@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,8 +20,10 @@
 
 #include <IMeshSceneNode.h>
 
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -32,29 +34,7 @@
 #include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
 
-#include "utils/log.hpp" //TODO: remove after debugging is done
-
 #include <IMesh.h>
-
-const wchar_t* getPlungerString()
-{
-    const int PLUNGER_STRINGS_AMOUNT = 3;
-
-    RandomGenerator r;
-    const int id = r.get(PLUNGER_STRINGS_AMOUNT);
-
-    switch (id)
-    {
-        //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-        case 0: return _LTR("%0 bites %1's bait");
-        //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-        case 1: return _LTR("%1 latches onto %0 for a free ride");
-        //I18N: shown when hit by plunger. %0 is the victim, %1 is the attacker
-        case 2: return _LTR("%1 tests a tractor beam on %0");
-        default: assert(false); return L"";  // avoid warning about no return value
-    }
-}
-
 
 /** RubberBand constructor. It creates a simple quad and attaches it to the
  *  root(!) of the graph. It's easier this way to get the right coordinates
@@ -67,7 +47,7 @@ const wchar_t* getPlungerString()
 RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
           : m_plunger(plunger), m_owner(kart)
 {
-    video::SColor color(77, 179, 0, 0);
+    const video::SColor color(77, 179, 0, 0);
     video::SMaterial m;
     m.AmbientColor    = color;
     m.DiffuseColor    = color;
@@ -78,8 +58,25 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
     m_attached_state = RB_TO_PLUNGER;
     assert(m_buffer->getVertexType()==video::EVT_STANDARD);
 
+    // Set the vertex colors properly, as the new pipeline doesn't use the old light values
+    u32 i;
+    scene::IMeshBuffer * const mb = m_mesh->getMeshBuffer(0);
+    video::S3DVertex * const verts = (video::S3DVertex *) mb->getVertices();
+    const u32 max = mb->getVertexCount();
+    for (i = 0; i < max; i++)
+    {
+        verts[i].Color = color;
+    }
+
+    // Color
+    mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+    // Gloss
+    mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     updatePosition();
-    m_node = irr_driver->addMesh(m_mesh);
+    m_node = irr_driver->addMesh(m_mesh, "rubberband");
+    irr_driver->applyObjectPassShader(m_node);
+    if (STKMeshSceneNode *stkm = dynamic_cast<STKMeshSceneNode *>(m_node))
+        stkm->setReloadEachFrame(true);
 #ifdef DEBUG
     std::string debug_name = m_owner->getIdent()+" (rubber-band)";
     m_node->setName(debug_name.c_str());
@@ -137,7 +134,9 @@ void RubberBand::updatePosition()
  */
 void RubberBand::update(float dt)
 {
-    if(m_owner->isEliminated() || m_owner->isShielded())
+    const KartProperties *kp = m_owner->getKartProperties();
+
+    if(m_owner->isEliminated())
     {
         // Rubber band snaps
         m_plunger->hit(NULL);
@@ -152,7 +151,7 @@ void RubberBand::update(float dt)
     // Check for rubber band snapping
     // ------------------------------
     float l = (m_end_position-k).length2();
-    float max_len = m_owner->getKartProperties()->getRubberBandMaxLength();
+    float max_len = kp->getPlungerBandMaxLength();
     if(l>max_len*max_len)
     {
         // Rubber band snaps
@@ -165,7 +164,7 @@ void RubberBand::update(float dt)
     // ----------------------------
     if(m_attached_state!=RB_TO_PLUNGER)
     {
-        float force = m_owner->getKartProperties()->getRubberBandForce();
+        float force = kp->getPlungerBandForce();
         Vec3 diff   = m_end_position-k;
 
         // detach rubber band if kart gets very close to hit point
@@ -181,10 +180,10 @@ void RubberBand::update(float dt)
         diff.normalize();   // diff can't be zero here
         m_owner->getBody()->applyCentralForce(diff*force);
         m_owner->increaseMaxSpeed(MaxSpeed::MS_INCREASE_RUBBER,
-            m_owner->getKartProperties()->getRubberBandSpeedIncrease(),
+            kp->getPlungerBandSpeedIncrease(),
             /*engine_force*/ 0.0f,
             /*duration*/0.1f,
-            m_owner->getKartProperties()->getRubberBandFadeOutTime());
+            kp->getPlungerBandFadeOutTime());
         if(m_attached_state==RB_TO_KART)
             m_hit_kart->getBody()->applyCentralForce(diff*(-force));
     }
@@ -247,24 +246,14 @@ void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
     {
         if(kart_hit->isShielded())
         {
-            kart_hit->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
+            kart_hit->decreaseShieldTime();
             m_plunger->setKeepAlive(0.0f);
-            Log::verbose("rubber_band", "Decreasing shield! \n");
 
             return;
         }
 
         m_hit_kart       = kart_hit;
         m_attached_state = RB_TO_KART;
-
-        RaceGUIBase* gui = World::getWorld()->getRaceGUI();
-        irr::core::stringw hit_message;
-        hit_message += StringUtils::insertValues(getPlungerString(),
-                                                 core::stringw(kart_hit->getName()),
-                                                 core::stringw(m_owner->getName())
-                                                ).c_str();
-        gui->addMessage(translations->fribidize(hit_message), NULL, 3.0f,
-                        video::SColor(255, 255, 255, 255), false);
         return;
     }
 

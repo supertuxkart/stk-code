@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Erwin Coumans http://continuousphysics.com/Bullet/
+ * Copyright (C) 2005-2015 Erwin Coumans http://continuousphysics.com/Bullet/
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -37,7 +37,7 @@ public:
             :m_suspensionStiffness(btScalar(5.88)),
              m_suspensionCompression(btScalar(0.83)),
              m_suspensionDamping(btScalar(0.88)),
-             m_maxSuspensionTravelCm(btScalar(500.)),
+             m_maxSuspensionTravel(btScalar(5.)),
              m_frictionSlip(btScalar(10.5)),
              m_maxSuspensionForce(btScalar(6000.))
         {
@@ -46,7 +46,7 @@ public:
         btScalar    m_suspensionStiffness;
         btScalar    m_suspensionCompression;
         btScalar    m_suspensionDamping;
-        btScalar    m_maxSuspensionTravelCm;
+        btScalar    m_maxSuspensionTravel;
         btScalar    m_frictionSlip;
         btScalar    m_maxSuspensionForce;
 
@@ -122,6 +122,17 @@ private:
      *  properties. */
     Kart               *m_kart;
 
+    /** A visual rotation applied to the kart (for skidding).
+     *  The physics use this to provide proper wheel contact points
+     *  for skid marks. */
+    float m_visual_rotation;
+
+    /** True if the visual wheels touch the ground. */
+    bool m_visual_wheels_touch_ground;
+
+    /** Contact point of the visual wheel position. */
+    btAlignedObjectArray<btVector3> m_visual_contact_point;
+
     btAlignedObjectArray<btWheelInfo> m_wheelInfo;
 
     void     defaultInit();
@@ -142,7 +153,7 @@ public:
     void               reset();
     void               debugDraw(btIDebugDraw* debugDrawer);
     const btTransform& getChassisWorldTransform() const;
-    btScalar           rayCast(btWheelInfo& wheel);
+    btScalar           rayCast(unsigned int index);
     virtual void       updateVehicle(btScalar step);
     void               resetSuspension();
     btScalar           getSteeringValue(int wheel) const;
@@ -169,7 +180,23 @@ public:
     void               setSliding(bool active);
     void               instantSpeedIncreaseTo(float speed);
     void               capSpeed(float max_speed);
-
+    void               updateAllWheelPositions();
+    // ------------------------------------------------------------------------
+    /** Returns true if both rear visual wheels touch the ground. */
+    bool visualWheelsTouchGround() const
+    {
+        return m_visual_wheels_touch_ground;
+    }   // visualWheelsTouchGround
+    // ------------------------------------------------------------------------
+    /** Returns the contact point of a visual wheel.
+     *  \param n Index of the wheel, must be 2 or 3 since only the two rear
+     *           wheels define the visual position
+     */
+    const btVector3&   getVisualContactPoint(int n) const
+    {
+        assert(n>=2 && n<=3);
+        return m_visual_contact_point[n];
+    }   // getVisualContactPoint
     // ------------------------------------------------------------------------
     /** btActionInterface interface. */
     virtual void updateAction(btCollisionWorld* collisionWorld,
@@ -229,6 +256,14 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the time an additional impulse is activated. */
     float getCentralImpulseTime() const { return m_time_additional_impulse; }
+    // ------------------------------------------------------------------------
+    /** Sets a visual rotation to be applied, which the physics use to provide
+     *  the location where the graphical wheels touch the ground (for
+     *  skidmarks). */
+    void setVisualRotation(float angle)
+    {
+        m_visual_rotation = angle;
+    }   // setVisualRotation
     // ------------------------------------------------------------------------
     /** Sets a rotation that is applied over a certain amount of time (to avoid
      *  a too rapid changes in the kart).

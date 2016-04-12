@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -111,7 +111,7 @@ protected:
       */
     AlignedArray<KartInfo> m_kart_info;
 
-    virtual void  checkForWrongDirection(unsigned int i);
+    virtual void  checkForWrongDirection(unsigned int i, float dt);
     void          updateRacePosition();
     virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
 
@@ -160,7 +160,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of laps a kart has completed.
      *  \param kart_index World index of the kart. */
-    int getKartLaps(unsigned int kart_index) const
+    int getKartLaps(unsigned int kart_index) const OVERRIDE
     {
         assert(kart_index < m_kart_info.size());
         return m_kart_info[kart_index].m_race_lap;
@@ -173,7 +173,13 @@ public:
     {
         return m_kart_info[kart_index].m_track_sector;
     }   // getTrackSector
-
+    // ------------------------------------------------------------------------
+    void setLastTriggeredCheckline(unsigned int kart_index, int index)
+    {
+        if (m_kart_info.size() == 0)
+            return;
+        m_kart_info[kart_index].m_track_sector.setLastTriggeredCheckline(index);
+    }
     // ------------------------------------------------------------------------
     /** Returns how far the kart has driven so far (i.e.
      *  number-of-laps-finished times track-length plus distance-on-track.

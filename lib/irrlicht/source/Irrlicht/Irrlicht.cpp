@@ -4,7 +4,7 @@
 
 #include "IrrCompileConfig.h"
 
-static const char* const copyright = "Irrlicht Engine (c) 2002-2012 Nikolaus Gebhardt";
+//static const char* const copyright = "Irrlicht Engine (c) 2002-2012 Nikolaus Gebhardt";
 
 #ifdef _IRR_WINDOWS_
 	#include <windows.h>
@@ -48,7 +48,8 @@ namespace irr
 	IRRLICHT_API IrrlichtDevice* IRRCALLCONV createDevice(video::E_DRIVER_TYPE driverType,
 			const core::dimension2d<u32>& windowSize,
 			u32 bits, bool fullscreen,
-			bool stencilbuffer, bool vsync, IEventReceiver* res)
+			bool stencilbuffer, bool vsync, IEventReceiver* res,
+            io::IFileSystem *file_system)
 	{
 		SIrrlichtCreationParameters p;
 		p.DriverType = driverType;
@@ -58,6 +59,7 @@ namespace irr
 		p.Stencilbuffer = stencilbuffer;
 		p.Vsync = vsync;
 		p.EventReceiver = res;
+        p.FileSystem = file_system;
 
 		return createDeviceEx(p);
 	}
@@ -127,7 +129,7 @@ namespace video
 } // end namespace irr
 
 
-#if defined(_IRR_WINDOWS_API_)
+#if defined(_IRR_WINDOWS_API_) && !defined(_IRR_STATIC_LIB_)
 
 BOOL APIENTRY DllMain( HANDLE hModule,
                        DWORD  ul_reason_for_call,

@@ -1,5 +1,5 @@
 //  tinygettext - A gettext replacement that works directly on .po files
-//  Copyright (C) 2009 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2009-2015 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,14 +22,15 @@
 #include <string>
 #include <istream>
 #include <string.h>
+#include <sstream>
 #include <map>
 #include <stdlib.h>
 
 #include "language.hpp"
-#include "log_stream.hpp"
-#include "iconv.hpp"
 #include "dictionary.hpp"
 #include "plural_forms.hpp"
+
+#include "utils/log.hpp"
 
 namespace tinygettext {
 
@@ -65,14 +66,15 @@ POParser::~POParser()
 void
 POParser::warning(const std::string& msg)
 {
-  log_warning << filename << ":" << line_number << ": warning: " << msg << ": " << current_line << std::endl;
-  //log_warning << "Line: " << current_line << std::endl;
+    Log::warn("tinygettext", "%s line %d %s: \"%s\"",
+        filename.c_str(), line_number, msg.c_str(), current_line.c_str());
 }
 
 void
 POParser::error(const std::string& msg)
 {
-  log_error << filename << ":" << line_number << ": error: " << msg  << ": " << current_line << std::endl;
+    Log::error("tinygettext", "%s line %d %s: \"%s\"",
+        filename.c_str(), line_number, msg.c_str(), current_line.c_str());
 
   // Try to recover from an error by searching for start of another entry
   do
@@ -207,7 +209,7 @@ next:
         if (pedantic)
           warning("leading whitespace before string");
 
-      get_string_line(out, i);
+      get_string_line(out, (unsigned int) i);
       goto next;
     }
     else if (isspace(current_line[i]))
@@ -223,7 +225,7 @@ next:
   return out.str();
 }
 
-static bool has_prefix(const std::string& lhs, const std::string rhs)
+static bool has_prefix(const std::string& lhs, const std::string &rhs)
 {
   if (lhs.length() < rhs.length())
     return false;
@@ -245,7 +247,7 @@ POParser::parse_header(const std::string& header)
       if (has_prefix(line, "Content-Type:"))
       {
         // from_charset = line.substr(len);
-        unsigned int len = strlen("Content-Type: text/plain; charset=");
+        unsigned int len = (unsigned int) strlen("Content-Type: text/plain; charset=");
         if (line.compare(0, len, "Content-Type: text/plain; charset=") == 0)
         {
           from_charset = line.substr(len);
@@ -336,9 +338,9 @@ POParser::parse()
   // skip UTF-8 intro that some text editors produce
   // see http://en.wikipedia.org/wiki/Byte-order_mark
   if (current_line.size() >= 3 &&
-      current_line[0] == static_cast<unsigned char>(0xef) &&
-      current_line[1] == static_cast<unsigned char>(0xbb) &&
-      current_line[2] == static_cast<unsigned char>(0xbf))
+      current_line[0] == static_cast<char>(0xef) &&
+      current_line[1] == static_cast<char>(0xbb) &&
+      current_line[2] == static_cast<char>(0xbf))
   {
     current_line = current_line.substr(3);
   }
@@ -382,7 +384,7 @@ POParser::parse()
         {
           std::string msgid_plural = get_string(12);
           std::vector<std::string> msgstr_num;
-	  bool saw_nonempty_msgstr = false;
+          bool saw_nonempty_msgstr = false;
 
         next:
           if (is_empty_line())
@@ -395,10 +397,10 @@ POParser::parse()
                    isdigit(current_line[7]) && current_line[8] == ']')
           {
             unsigned int number = static_cast<unsigned int>(current_line[7] - '0');
-	    std::string msgstr = get_string(9);
+            std::string msgstr = get_string(9);
 
-	    if(!msgstr.empty())
-	      saw_nonempty_msgstr = true;
+            if(!msgstr.empty())
+              saw_nonempty_msgstr = true;
 
             if (number >= msgstr_num.size())
               msgstr_num.resize(number+1);
@@ -414,38 +416,38 @@ POParser::parse()
           if (!is_empty_line())
             error("expected 'msgstr[N]' or empty line");
 
-	  if (saw_nonempty_msgstr)
-	  {
-	    if (use_fuzzy || !fuzzy)
+          if (saw_nonempty_msgstr)
+          {
+            if (use_fuzzy || !fuzzy)
             {
-	      if (!dict.get_plural_forms())
-	      {
-		warning("msgstr[N] seen, but no Plural-Forms given");
-	      }
-	      else
-	      {
-		if (msgstr_num.size() != dict.get_plural_forms().get_nplural())
-		{
-		  warning("msgstr[N] count doesn't match Plural-Forms.nplural");
-		}
-	      }
+              if (!dict.get_plural_forms())
+              {
+                warning("msgstr[N] seen, but no Plural-Forms given");
+              }
+              else
+              {
+                if (msgstr_num.size() != dict.get_plural_forms().get_nplural())
+                {
+                  warning("msgstr[N] count doesn't match Plural-Forms.nplural");
+                }
+              }
 
-	      if (has_msgctxt)
-		dict.add_translation(msgctxt, msgid, msgid_plural, msgstr_num);
-	      else
-		dict.add_translation(msgid, msgid_plural, msgstr_num);
-	    }
+              if (has_msgctxt)
+                dict.add_translation(msgctxt, msgid, msgid_plural, msgstr_num);
+              else
+                dict.add_translation(msgid, msgid_plural, msgstr_num);
+            }
 
-	    if (0)
-	    {
-	      std::cout << (fuzzy?"fuzzy":"not-fuzzy") << std::endl;
-	      std::cout << "msgid \"" << msgid << "\"" << std::endl;
-	      std::cout << "msgid_plural \"" << msgid_plural << "\"" << std::endl;
-	      for(std::vector<std::string>::size_type i = 0; i < msgstr_num.size(); ++i)
-		std::cout << "msgstr[" << i << "] \"" << msgstr_num[i] /*conv.convert(msgstr_num[i])*/ << "\"" << std::endl;
-	      std::cout << std::endl;
-	    }
-	  }
+            if (0)
+            {
+              std::cout << (fuzzy?"fuzzy":"not-fuzzy") << std::endl;
+              std::cout << "msgid \"" << msgid << "\"" << std::endl;
+              std::cout << "msgid_plural \"" << msgid_plural << "\"" << std::endl;
+              for(std::vector<std::string>::size_type i = 0; i < msgstr_num.size(); ++i)
+                std::cout << "msgstr[" << i << "] \"" << msgstr_num[i] /*conv.convert(msgstr_num[i])*/ << "\"" << std::endl;
+              std::cout << std::endl;
+            }
+          }
         }
         else if (prefix("msgstr"))
         {

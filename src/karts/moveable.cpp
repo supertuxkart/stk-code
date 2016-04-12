@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,6 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <math.h>
 #include "karts/moveable.hpp"
 
 #include "graphics/irr_driver.hpp"
@@ -104,17 +105,19 @@ void Moveable::flyUp()
 {
     m_body->setGravity(btVector3(0.0, 8.0, 0.0));
     m_body->applyCentralImpulse(btVector3(0.0, 100.0, 0.0));
-}
+}   // flyUp
 
+// ----------------------------------------------------------------------------
 void Moveable::flyDown()
 {
     m_body->applyCentralImpulse(btVector3(0.0, -100.0, 0.0));
-}
+}   // flyDown
 
+// ----------------------------------------------------------------------------
 void Moveable::stopFlying()
 {
     m_body->setGravity(btVector3(0.0, -World::getWorld()->getTrack()->getGravity(), 0.0));
-}
+}   // stopFlying
 
 //-----------------------------------------------------------------------------
 /** Updates the current position and rotation from the corresponding physics

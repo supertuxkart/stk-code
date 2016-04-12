@@ -1,5 +1,6 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
+//
+//  Copyright (C) 2012-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,4 +29,4 @@ static const char* endianness_test_ptr = (const char*)&endianness_test;
 // in little-endian, byte 0 will be 0. in big endian, byte 0 will be 1
 const bool IS_LITTLE_ENDIAN = (endianness_test_ptr[0] == 0);
 
-const char STK_VERSION[] = "svn";
+const char STK_VERSION[] = "git";

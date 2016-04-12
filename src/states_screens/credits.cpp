@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
 #include "states_screens/credits.hpp"
 
 #include <fstream>
+#include <algorithm>
 
 #include "irrString.h"
 using irr::core::stringw;
@@ -84,7 +85,7 @@ bool CreditsScreen::getWideLine(std::ifstream& file, core::stringw* out)
 {
     if (!file.good())
     {
-        fprintf(stderr, "getWideLine : File is not good!\n");
+        Log::error("CreditsScreen", "getWideLine: File is not good!");
         return false;
     }
     wchar_t wide_char;
@@ -140,14 +141,14 @@ void CreditsScreen::loadedFromFile()
 
     m_throttle_FPS = false;
 
-    std::string creditsfile = file_manager->getDataDir() + "/CREDITS";
+    std::string creditsfile = file_manager->getAsset("CREDITS");
 
-    std::ifstream file( creditsfile.c_str() ) ;
+    std::ifstream file( creditsfile.c_str(), std::ios::binary ) ;
 
     if (file.fail() || !file.is_open() || file.eof())
     {
-        fprintf(stderr, "\n/!\\ Failed to open file at '%s'\n\n",
-                creditsfile.c_str());
+        Log::error("CreditsScreen", "Failed to open file at '%s'.",
+                   creditsfile.c_str());
         return;
     }
 
@@ -159,18 +160,24 @@ void CreditsScreen::loadedFromFile()
 
     if (file.fail() || !file.is_open() || file.eof())
     {
-        fprintf(stderr,
-                "\n/!\\ Failed to read file at '%s', unexpected EOF\n\n",
-                creditsfile.c_str());
-        assert(false);
+        Log::error("CreditsScreen", "Failed to read file at '%s', unexpected EOF.",
+                   creditsfile.c_str());
         return;
     }
 
     int lineCount = 0;
-
+#undef DEBUG_TRANSLATIONS    // Enable to only see the translator credits
+#ifdef DEBUG_TRANSLATIONS
+        int my_counter = 0;
+#endif
     // let's assume the file is encoded as UTF-16
     while (getWideLine( file, &line ))
     {
+#ifdef DEBUG_TRANSLATIONS
+        if (my_counter > 0)
+            break;
+        my_counter++;
+#endif
         stringc cversion = line.c_str();
         //printf("CREDITS line : %s\n", cversion.c_str());
 
@@ -202,14 +209,13 @@ void CreditsScreen::loadedFromFile()
 
     if (lineCount == 0)
     {
-        fprintf(stderr,
-                "\n/!\\ Could not read anything from CREDITS file!\n\n");
-        assert(false);
+        Log::error("CreditsScreen", "Could not read anything from CREDITS file!");
         return;
     }
 
 
     irr::core::stringw translators_credits = _("translator-credits");
+    const int MAX_PER_SCREEN = 6;
 
     if (translators_credits != L"translator-credits")
     {
@@ -217,13 +223,13 @@ void CreditsScreen::loadedFromFile()
             StringUtils::split(translators_credits, '\n');
 
         m_sections.push_back( new CreditsSection("Translations"));
-        for(unsigned int i = 1; i < translator.size(); i = i + 4)
+        for(unsigned int i = 1; i < translator.size(); i = i + MAX_PER_SCREEN)
         {
             line = stringw(translations->getCurrentLanguageName().c_str());
             CreditsEntry entry(line);
             getCurrentSection()->addEntry( entry );
 
-            for(unsigned int j = 0; i + j < translator.size() && j < 6; j ++)
+            for(unsigned int j = 0; i + j < translator.size() && j < MAX_PER_SCREEN; j ++)
             {
                 getCurrentSection()->addSubEntry(translator[i + j]);
             }
@@ -272,7 +278,7 @@ void CreditsScreen::reset()
 
 // ----------------------------------------------------------------------------
 
-void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
+void CreditsScreen::onUpdate(float elapsed_time)
 {
     // multiply by 0.8 to slow it down a bit as a whole
     time_before_next_step -= elapsed_time*0.8f;
@@ -353,7 +359,7 @@ void CreditsScreen::onUpdate(float elapsed_time, irr::video::IVideoDriver*)
             color, false /* center h */, true /* center v */, NULL,
             true /* ignore RTL */                                   );
 
-        const int subamount = m_sections[m_curr_section]
+        const int subamount = (int)m_sections[m_curr_section]
                              .m_entries[m_curr_element].m_subentries.size();
         int suby = m_y + m_h/3;
         const int inc = subamount == 0 ? m_h/8

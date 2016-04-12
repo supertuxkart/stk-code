@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin
+//  Copyright (C) 2010-2015 Lucas Baudin
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -75,7 +75,7 @@ bool extract_zip(const std::string &from, const std::string &to)
     for(unsigned int i=0; i<zip_file_list->getFileCount(); i++)
     {
         const std::string current_file=zip_file_list->getFileName(i).c_str();
-        printf("[addons] Unzipping file '%s'.\n", current_file.c_str());
+        Log::info("addons", "Unzipping file '%s'.", current_file.c_str());
         if(zip_file_list->isDirectory(i)) continue;
         if(current_file[0]=='.') continue;
         const std::string base = StringUtils::getBasename(current_file);
@@ -84,8 +84,7 @@ bool extract_zip(const std::string &from, const std::string &to)
             zip_archive->createAndOpenFile(current_file.c_str());
         if(!src_file)
         {
-            printf("[addons] Can't read file '%s'.\n", current_file.c_str());
-            printf("[addons] This is ignored, but the addon might not work.\n");
+            Log::warn("addons", "Can't read file '%s'. This is ignored, but the addon might not work", current_file.c_str());
             error = true;
             continue;
         }
@@ -94,19 +93,16 @@ bool extract_zip(const std::string &from, const std::string &to)
             file_system->createAndWriteFile((to+"/"+base).c_str());
         if(dst_file == NULL)
         {
-            printf("[addons] Couldn't create the file '%s'.\n",
-                    (to+"/"+current_file).c_str());
-            printf("[addons] The directory might not exist.\n");
-            printf("[addons] This is ignored, but the addon might not work.\n");
+            Log::warn("addons", "Couldn't create the file '%s'. The directory might not exist. This is ignored, but the addon might not work.",
+                      (to+"/"+current_file).c_str());
             error = true;
             continue;
         }
 
         if (IFileSystem_copyFileToFile(dst_file, src_file) < 0)
         {
-            printf("[addons] Could not copy '%s' from archive '%s'.\n",
-                   current_file.c_str(), from.c_str());
-            printf("[addons] This is ignored, but the addon might not work.\n");
+            Log::warn("addons", "Could not copy '%s' from archive '%s'. This is ignored, but the addon might not work.",
+                      current_file.c_str(), from.c_str());
             error = true;
         }
         dst_file->drop();

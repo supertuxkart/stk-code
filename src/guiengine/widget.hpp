@@ -1,5 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -59,19 +60,23 @@ namespace GUIEngine
     enum BadgeType
     {
         /** display a lock on the widget, to mean a certain game feature is locked */
-        LOCKED_BADGE = 1,
+        LOCKED_BADGE   = 1,
         /** display a green check on a widget, useful e.g. to display confirmation */
-        OK_BADGE     = 2,
+        OK_BADGE       = 2,
         /** display a red mark badge on the widget, useful e.g. to warn of an invalid choice */
-        BAD_BADGE    = 4,
+        BAD_BADGE      = 4,
         /** display a trophy badge on the widget, useful e.g. for challenges */
-        TROPHY_BADGE = 8,
+        TROPHY_BADGE   = 8,
         /** A gamepad icon */
-        GAMEPAD_BADGE = 16,
+        GAMEPAD_BADGE  = 16,
         /** A keyboard icon */
         KEYBOARD_BADGE = 32,
-        /** An hourglass badge to indocate loading */
-        LOADING_BADGE = 64
+        /** An hourglass badge to indicate loading */
+        LOADING_BADGE  = 64,
+        /** A zipper badge to indicate that this player receives a boost */
+        ZIPPER_BADGE   = 128,
+        /** A anchor badge to indicate that this player receives a handicap */
+        ANCHOR_BADGE   = 256
     };
 
 
@@ -102,7 +107,9 @@ namespace GUIEngine
         PROP_LABELS_LOCATION,
         PROP_MAX_ROWS,
         PROP_WRAP_AROUND,
-        PROP_DIV_PADDING
+        PROP_DIV_PADDING,
+        PROP_KEEP_SELECTION,
+        PROP_CUSTOM_RATIO,
     };
 
     bool isWithinATextBox();
@@ -148,9 +155,6 @@ namespace GUIEngine
         /** PROP_TEXT is a special case : since it can be translated it can't
          *  go in the map above, which uses narrow strings */
         irr::core::stringw m_text;
-
-        /** Whether the text in m_text is right-to-left */
-        bool m_is_text_rtl;
 
         /** When true, this widget shall use a bigger and more colourful font */
         bool m_title_font;
@@ -234,8 +238,11 @@ namespace GUIEngine
         /** A bitmask of which badges to show, if any; choices are *_BADGE, defined above */
         int m_badges;
 
-        /** A simple flag that can be raised to hide this widget */
+        /** A simple flag that can be raised to deactivate this widget */
         bool m_deactivated;
+
+        /** A flag to indicate whether this widget should be visible or not. */
+        bool m_is_visible;
 
         /** Set to false if widget is something that should not receive focus */
         bool m_focusable;
@@ -315,13 +322,15 @@ namespace GUIEngine
         /**
          * \brief Sets the widget (and its children, if any) visible or not.
          * Note that setting a widget invisible implicitely calls setDeactivated(), and setting
-         * it visible implicitely calls setActivated(). If you mix visiblity and (de)activated calls,
+         * it visible implicitely calls setActive(true). If you mix visiblity and (de)activated calls,
          * undefined behavior may ensue (like invisible but clickable buttons).
          */
         void setVisible(bool visible);
 
         /** Returns if the element is visible. */
         bool isVisible() const;
+
+        bool isActivated() const;
 
         /**
          * Call to resize/move the widget. Not all widgets can resize gracefully.
@@ -343,12 +352,11 @@ namespace GUIEngine
          * \{
          */
 
-        /** \brief undos setDeactivated() */
-        virtual void setActivated();
-
-        /** \brief greys out the widget, making it not clickable for the user */
-        virtual void setDeactivated();
-
+        /** \brief Sets an widget to be either activated or deactivated 
+         *  (i.e. greyed out)
+         *  \param active Active (true) or deactive (false). Defaults to 
+         *         true. */
+        virtual void setActive(bool active=true);
 
         /**
           * \}
@@ -645,6 +653,9 @@ namespace GUIEngine
          */
 
         bool ok() const { return (m_magic_number == 0xCAFEC001); }
+
+        /** Gets called when the widget is active and got clicked. (Only works for button widgets for now.) */
+        virtual void onClick()  { }
     };
 
 

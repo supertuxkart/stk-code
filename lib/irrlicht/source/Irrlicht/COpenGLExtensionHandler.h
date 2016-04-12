@@ -30,7 +30,7 @@
 	#endif
 
 #elif defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
-	#include "CIrrDeviceMacOSX.h"
+	#include "MacOSX/CIrrDeviceMacOSX.h"
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
 		#define GL_GLEXT_LEGACY 1
 	#endif
@@ -49,6 +49,7 @@
 	#define NO_SDL_GLEXT
 	#include <SDL/SDL_video.h>
 	#include <SDL/SDL_opengl.h>
+        typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
 	#include "glext.h"
 #else
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
@@ -61,9 +62,10 @@
 	#include <GL/gl.h>
 	#include <GL/glx.h>
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
-	#include "glext.h"
+        typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
+	#include <GL/glext.h>
 	#undef GLX_ARB_get_proc_address // avoid problems with local glxext.h
-	#include "glxext.h"
+	#include <GL/glxext.h>
 	#endif
 #endif
 
@@ -562,8 +564,8 @@ class COpenGLExtensionHandler
 		IRR_ARB_fragment_shader,
 		IRR_ARB_framebuffer_object,
 		IRR_ARB_framebuffer_sRGB,
-		IRR_ARB_geometry_shader4,
 		IRR_ARB_get_program_binary,
+		IRR_ARB_geometry_shader4,
 		IRR_ARB_gpu_shader5,
 		IRR_ARB_gpu_shader_fp64,
 		IRR_ARB_half_float_pixel,
@@ -930,6 +932,8 @@ class COpenGLExtensionHandler
 	//! queries the features of the driver, returns true if feature is available
 	bool queryOpenGLFeature(EOpenGLFeatures feature) const
 	{
+	  if (COpenGLExtensionHandler::IRR_EXT_packed_depth_stencil)
+		 return true;
 		return FeatureAvailable[feature];
 	}
 
@@ -2387,7 +2391,11 @@ inline void COpenGLExtensionHandler::extGlProgramParameteri(GLhandleARB program,
 #elif defined(GL_ARB_geometry_shader4)
 	glProgramParameteriARB(program, pname, value);
 #elif defined(GL_EXT_geometry_shader4)
+    #ifdef __clang__
+    glProgramParameteriEXT((long)program, pname, value);
+    #else
 	glProgramParameteriEXT((long GLuint)program, pname, value);
+    #endif
 #elif defined(GL_NV_geometry_program4) || defined(GL_NV_geometry_shader4)
 	glProgramParameteriNV(program, pname, value);
 #else

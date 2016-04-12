@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -38,6 +38,7 @@ AIProperties::AIProperties(RaceManager::Difficulty difficulty)
     m_skidding_threshold         = UNDEFINED;
     m_min_start_delay            = UNDEFINED;
     m_max_start_delay            = UNDEFINED;
+    m_shield_incoming_radius     = UNDEFINED;
     m_false_start_probability    = UNDEFINED;
     m_make_use_of_slipstream     = false;
     m_collect_avoid_items        = false;
@@ -68,6 +69,7 @@ void AIProperties::load(const XMLNode *ai_node)
     ai_node->get("collect-avoid-items",       &m_collect_avoid_items       );
     ai_node->get("handle-bomb",               &m_handle_bomb               );
     ai_node->get("skidding-threshold",        &m_skidding_threshold        );
+    ai_node->get("shield-incoming-radius",    &m_shield_incoming_radius    );
     ai_node->get("false-start-probability",   &m_false_start_probability   );
     ai_node->get("min-start-delay",           &m_min_start_delay           );
     ai_node->get("max-start-delay",           &m_max_start_delay           );
@@ -83,7 +85,7 @@ void AIProperties::load(const XMLNode *ai_node)
     else
     {
         Log::fatal("AIProperties",
-                "Incorrect nitro-usage '%s' in AI '%s'.\n",s.c_str(),
+                "Incorrect nitro-usage '%s' in AI '%s'.",s.c_str(),
                 m_ident.c_str());
     }
     // We actually need the square of the distance later
@@ -100,7 +102,7 @@ void AIProperties::checkAllSet(const std::string &filename) const
 {
 #define CHECK_NEG(  a,str_a) if(a<=UNDEFINED) {                     \
         Log::fatal("AIProperties","Missing default value for"       \
-                    " '%s' in '%s' 'for AI '%s'.\n",                \
+                    " '%s' in '%s' 'for AI '%s'.",                \
                     str_a, filename.c_str(), m_ident.c_str());      \
     }
     CHECK_NEG(m_max_item_angle,            "max-item-angle"            );
@@ -109,23 +111,24 @@ void AIProperties::checkAllSet(const std::string &filename) const
     CHECK_NEG(m_bad_item_closeness_2,      "bad-item-closeness"        );
     CHECK_NEG(m_straight_length_for_zipper,"straight-length-for-zipper");
     CHECK_NEG(m_skidding_threshold,        "skidding-threshold"        );
+    CHECK_NEG(m_shield_incoming_radius,    "shield-incoming-radius"    );
     CHECK_NEG(m_false_start_probability,   "false-start-probability"   );
     CHECK_NEG(m_min_start_delay,           "min-start-delay"           );
     CHECK_NEG(m_max_start_delay,           "max-start-delay"           );
 
     if(m_skid_probability.size()==0)
     {
-        Log::fatal("AIProperties", "No skid probability defined.\n");
+        Log::fatal("AIProperties", "No skid probability defined.");
     }
 
     if(m_speed_cap.size()==0)
     {
-        Log::fatal("AIProperties", "No speed cap defined.\n");
+        Log::fatal("AIProperties", "No speed cap defined.");
     }
 
     if(m_collect_item_probability.size()==0)
     {
-        Log::fatal("AIProperties", "No collect-item-probability defined.\n");
+        Log::fatal("AIProperties", "No collect-item-probability defined.");
     }
 
 }   // checkAllSet

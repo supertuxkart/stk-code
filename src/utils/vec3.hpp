@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -51,7 +51,7 @@ public:
     inline Vec3(const btVector3& a)        : btVector3(a)                {}
     // ------------------------------------------------------------------------
     /** Empty constructor. */
-    inline Vec3()                          : btVector3()                 {}
+    inline Vec3()                          : btVector3(0, 0, 0)          {}
     // ------------------------------------------------------------------------
     /** Creates a 3d vector from three scalars. */
     inline Vec3(float x, float y, float z) : btVector3(x,y,z)            {}
@@ -168,6 +168,14 @@ public:
     Vec3  operator-(const Vec3& v1) const {return (Vec3)(*(btVector3*)this
                                                          -(btVector3)v1); }
     // ------------------------------------------------------------------------
+    /** Computes this = this - v1. On VS this special version is needed,
+     *  since otherwise Vec3-btVector3 is ont unique (could be cast to
+     *  btVector3-btVector3, or convert btVector3 to Vec3()). */
+    Vec3 operator-(const btVector3 v1) const
+    {
+        return *(btVector3*)this - v1;
+    }
+    // ------------------------------------------------------------------------
     /** Helper functions to treat this vec3 as a 2d vector. This returns the
      *  square of the length of the first 2 dimensions. */
     float length2_2d() const     { return m_floats[0]*m_floats[0]
@@ -177,8 +185,8 @@ public:
      *  used as a 2d vector. */
     // ------------------------------------------------------------------------
     /** Returns the length of the vector using only the x/z coordinates. */
-    float length_2d() const {return sqrt(  m_floats[0]*m_floats[0]
-                                         + m_floats[2]*m_floats[2]);}
+    float length_2d() const {return sqrtf(  m_floats[0]*m_floats[0]
+                                          + m_floats[2]*m_floats[2]);}
     // ------------------------------------------------------------------------
     /** Sets this = max(this, a) componentwise.
      *  \param Vector to compare with. */

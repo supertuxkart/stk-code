@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,16 +16,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <SKeyMap.h>
 #include "input/binding.hpp"
+#include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 #include "utils/log.hpp"
 
-/** Convert thjis binding to XML attributes. The full XML node is actually
+#include <SKeyMap.h>
+
+/** Convert this binding to XML attributes. The full XML node is actually
  *  written by device_config, so we only have to add the attributes here.
  */
-void Binding::serialize(std::ofstream& stream) const
+void Binding::save(std::ofstream& stream) const
 {
     stream << "id=\""        << m_id        << "\" "
            << "event=\""     << m_type      << "\" "
@@ -37,54 +39,42 @@ void Binding::serialize(std::ofstream& stream) const
         stream << "direction=\"" << m_dir    << "\" ";
         stream << "range=\""     << m_range    << "\" ";
     }
-}   // serialize
+}   // save
 
 // ----------------------------------------------------------------------------
-bool Binding::deserialize(irr::io::IrrXMLReader* xml)
+bool Binding::load(const XMLNode *action)
 {
-    const char *id_string       = xml->getAttributeValue("id");
-    const char *event_string    = xml->getAttributeValue("event");
-    const char *dir_string      = xml->getAttributeValue("direction");
-    const char *range_string    = xml->getAttributeValue("range");
-    const char *character       = xml->getAttributeValue("character");
-
-    // Proceed only if neccesary tags were found
-    if ((id_string == NULL) ||  (event_string == NULL))
+    int n;
+    if(!action->get("id", &m_id) || !action->get("event", &n)  )
     {
-        printf("No id-string or event-string given - ignored.\n");
+        Log::warn("Binding", "No id-string or event-string given - ignored.");
         return false;
     }
+    m_type = (Input::InputType)n;
 
-    // Convert strings to string tags to integer types
-    m_type = (Input::InputType)atoi(event_string);
-    m_id   = atoi(id_string);
-    m_character = character ? atoi(character) : 0;
+    m_character = 0;
+    // XMLNode only supports stringw, not wchar_t*
+    core::stringw s;
+    action->get("character", &s);
+    if(s.size()>0)
+        m_character = s[0];
 
     // If the action is not a stick motion (button or key)
     if (m_type == Input::IT_STICKMOTION)
     {
-        // If the action is a stick motion & a direction is defined
-        if (dir_string == NULL)
+        if(!action->get("direction", &n))
         {
-            printf("WARNING: IT_STICKMOTION without direction, ignoring.\n");
+            Log::warn("Binding", "IT_STICKMOTION without direction, ignoring.");
             return false;
         }
-        
-        // If the action is a stick motion & a range is defined
-        if (range_string == NULL)
-        {
-            m_range = Input::AR_HALF;
-        }
-        else
-        {
-            m_range = (Input::AxisRange)atoi(range_string);
-        }
-   
-        m_dir   = (Input::AxisDirection)atoi(dir_string);
+        m_dir = (Input::AxisDirection)n;
+
+        if(!action->get("range", &n)) m_range = Input::AR_HALF;
+        else                          m_range = (Input::AxisRange)n;
 
     }   // if m_type!=stickmotion
     return true;
-}   // deserialize
+}   // load
 
 // ----------------------------------------------------------------------------
 /** Returns a string representing this binding, which can be displayed on the
@@ -120,49 +110,90 @@ irr::core::stringw Binding::getAsString() const
             case 221: s="]";  break;
             case 222: s="'";  break;
 #endif
-            case irr::KEY_LBUTTON    : s = "left mouse button";  break;
-            case irr::KEY_RBUTTON    : s = "right mouse button"; break;
-            case irr::KEY_CANCEL     : s = "cancel"; break;
-            case irr::KEY_MBUTTON    : s = "middle mouse button"; break;
-            case irr::KEY_XBUTTON1   : s = "X1 mouse button"; break;
-            case irr::KEY_XBUTTON2   : s = "X2 mouse button"; break;
-            case irr::KEY_BACK       : s = "backspace"; break;
-            case irr::KEY_TAB        : s = "tab"; break;
-            case irr::KEY_CLEAR      : s = "clear"; break;
-            case irr::KEY_RETURN     : s = "return"; break;
-            case irr::KEY_SHIFT      : s = "shift"; break;
-            case irr::KEY_CONTROL    : s = "control"; break;
-            case irr::KEY_MENU       : s = "alt/menu"; break;
-            case irr::KEY_PAUSE      : s = "pause"; break;
-            case irr::KEY_CAPITAL    : s = "caps lock"; break;
-            case irr::KEY_KANA       : s = "kana"; break;
-            case irr::KEY_JUNJA      : s = "junja"; break;
-            case irr::KEY_FINAL      : s = "final"; break;
-            case irr::KEY_ESCAPE     : s = "escape"; break;
-            case irr::KEY_CONVERT    : s = "convert"; break;
-            case irr::KEY_NONCONVERT : s = "nonconvert"; break;
-            case irr::KEY_ACCEPT     : s = "accept"; break;
-            case irr::KEY_MODECHANGE : s = "modechange"; break;
-            case irr::KEY_SPACE      : s = "space"; break;
-            case irr::KEY_PRIOR      : s = "page up"; break;
-            case irr::KEY_NEXT       : s = "page down"; break;
-            case irr::KEY_END        : s = "end"; break;
-            case irr::KEY_HOME       : s = "home"; break;
-            case irr::KEY_LEFT       : s = "left"; break;
-            case irr::KEY_UP         : s = "up"; break;
-            case irr::KEY_RIGHT      : s = "right"; break;
-            case irr::KEY_DOWN       : s = "down"; break;
-            case irr::KEY_SELECT     : s = "select"; break;
-            case irr::KEY_PRINT      : s = "print"; break;
-            case irr::KEY_EXECUT     : s = "exec"; break;
-            case irr::KEY_SNAPSHOT   : s = "print screen"; break;
-            case irr::KEY_INSERT     : s = "insert"; break;
-            case irr::KEY_DELETE     : s = "delete"; break;
-            case irr::KEY_HELP       : s = "help"; break;
+             //I18N: input configuration screen: mouse button
+            case irr::KEY_LBUTTON    : s = _C("input_key", "Left Mouse Button");  break;
+             //I18N: input configuration screen: mouse button
+            case irr::KEY_RBUTTON    : s = _C("input_key", "Right Mouse Button"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_CANCEL     : s = _C("input_key", "Cancel"); break;
+             //I18N: input configuration screen: mouse button
+            case irr::KEY_MBUTTON    : s = _C("input_key", "Middle Mouse Button"); break;
+             //I18N: input configuration screen: mouse button
+            case irr::KEY_XBUTTON1   : s = _C("input_key", "X1 Mouse Button"); break;
+             //I18N: input configuration screen: mouse button
+            case irr::KEY_XBUTTON2   : s = _C("input_key", "X2 Mouse Button"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_BACK       : s = _C("input_key", "Backspace"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_TAB        : s = _C("input_key", "Tab"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_CLEAR      : s = _C("input_key", "Clear"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_RETURN     : s = _C("input_key", "Return"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_SHIFT      : s = _C("input_key", "Shift"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_CONTROL    : s = _C("input_key", "Control"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_MENU       : s = _C("input_key", "Alt/Menu"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_PAUSE      : s = _C("input_key", "Pause"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_CAPITAL    : s = _C("input_key", "Caps Lock"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_KANA       : s = _C("input_key", "Kana"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_JUNJA      : s = _C("input_key", "Junja"); break;
+             //I18N: input configuration screen: keyboard key
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_FINAL      : s = _C("input_key", "Final"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_ESCAPE     : s = _C("input_key", "Escape"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_CONVERT    : s = _C("input_key", "Convert"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NONCONVERT : s = _C("input_key", "Nonconvert"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_ACCEPT     : s = _C("input_key", "Accept"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_MODECHANGE : s = _C("input_key", "Modechange"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_SPACE      : s = _C("input_key", "Space"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_PRIOR      : s = _C("input_key", "Page Up"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NEXT       : s = _C("input_key", "Page Down"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_END        : s = _C("input_key", "End"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_HOME       : s = _C("input_key", "Home"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_LEFT       : s = _C("input_key", "Left"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_UP         : s = _C("input_key", "Up"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_RIGHT      : s = _C("input_key", "Right"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_DOWN       : s = _C("input_key", "Down"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_SELECT     : s = _C("input_key", "Select"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_PRINT      : s = _C("input_key", "Print"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_EXECUT     : s = _C("input_key", "Exec"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_SNAPSHOT   : s = _C("input_key", "Print Screen"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_INSERT     : s = _C("input_key", "Insert"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_DELETE     : s = _C("input_key", "Delete"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_HELP       : s = _C("input_key", "Help"); break;
             case irr::KEY_KEY_0      : s = "0"; break;
             case irr::KEY_KEY_1      : s = "1"; break;
             case irr::KEY_KEY_2      : s = "2"; break;
             case irr::KEY_KEY_3      : s = "3"; break;
+            case irr::KEY_KEY_4      : s = "4"; break;
             case irr::KEY_KEY_5      : s = "5"; break;
             case irr::KEY_KEY_6      : s = "6"; break;
             case irr::KEY_KEY_7      : s = "7"; break;
@@ -194,26 +225,44 @@ irr::core::stringw Binding::getAsString() const
             case irr::KEY_KEY_X      : s = "X"; break;
             case irr::KEY_KEY_Y      : s = "Y"; break;
             case irr::KEY_KEY_Z      : s = "Z"; break;
-            case irr::KEY_LWIN       : s = "Left Logo"; break;
-            case irr::KEY_RWIN       : s = "Right Logo"; break;
-            case irr::KEY_APPS       : s = "apps"; break;
-            case irr::KEY_SLEEP      : s = "sleep"; break;
-            case irr::KEY_NUMPAD0    : s = "numpad 0"; break;
-            case irr::KEY_NUMPAD1    : s = "numpad 1"; break;
-            case irr::KEY_NUMPAD2    : s = "numpad 2"; break;
-            case irr::KEY_NUMPAD3    : s = "numpad 3"; break;
-            case irr::KEY_NUMPAD4    : s = "numpad 4"; break;
-            case irr::KEY_NUMPAD5    : s = "numpad 5"; break;
-            case irr::KEY_NUMPAD6    : s = "numpad 6"; break;
-            case irr::KEY_NUMPAD7    : s = "numpad 7"; break;
-            case irr::KEY_NUMPAD8    : s = "numpad 8"; break;
-            case irr::KEY_NUMPAD9    : s = "numpad 9"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_LWIN       : s = _C("input_key", "Left Logo"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_RWIN       : s = _C("input_key", "Right Logo"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_APPS       : s = _C("input_key", "Apps"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_SLEEP      : s = _C("input_key", "Sleep"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NUMPAD0    : s = _C("input_key", "Numpad 0"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NUMPAD1    : s = _C("input_key", "Numpad 1"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NUMPAD2    : s = _C("input_key", "Numpad 2"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NUMPAD3    : s = _C("input_key", "Numpad 3"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NUMPAD4    : s = _C("input_key", "Numpad 4"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NUMPAD5    : s = _C("input_key", "Numpad 5"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NUMPAD6    : s = _C("input_key", "Numpad 6"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NUMPAD7    : s = _C("input_key", "Numpad 7"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NUMPAD8    : s = _C("input_key", "Numpad 8"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NUMPAD9    : s = _C("input_key", "Numpad 9"); break;
             case irr::KEY_MULTIPLY   : s = "*"; break;
             case irr::KEY_ADD        : s = "+"; break;
-            case irr::KEY_SEPARATOR  : s = "separator"; break;
-            case irr::KEY_SUBTRACT   : s = "- (subtract)"; break;
-            case irr::KEY_DECIMAL    : s = "decimal"; break;
-            case irr::KEY_DIVIDE     : s = "/ (divide)"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_SEPARATOR  : s = _C("input_key", "Separator"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_SUBTRACT   : s = _C("input_key", "- (Subtract)"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_DECIMAL    : s = _C("input_key", "Decimal"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_DIVIDE     : s = _C("input_key", "/ (Divide)"); break;
             case irr::KEY_F1         : s = "F1"; break;
             case irr::KEY_F2         : s = "F2"; break;
             case irr::KEY_F3         : s = "F3"; break;
@@ -238,26 +287,42 @@ irr::core::stringw Binding::getAsString() const
             case irr::KEY_F22        : s = "F22"; break;
             case irr::KEY_F23        : s = "F23"; break;
             case irr::KEY_F24        : s = "F24"; break;
-            case irr::KEY_NUMLOCK    : s = "num lock"; break;
-            case irr::KEY_SCROLL     : s = "scroll lock"; break;
-            case irr::KEY_LSHIFT     : s = "left shift"; break;
-            case irr::KEY_RSHIFT     : s = "right shift"; break;
-            case irr::KEY_LCONTROL   : s = "left control"; break;
-            case irr::KEY_RCONTROL   : s = "right control"; break;
-            case irr::KEY_LMENU      : s = "left menu"; break;
-            case irr::KEY_RMENU      : s = "right menu"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_NUMLOCK    : s = _C("input_key", "Num Lock"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_SCROLL     : s = _C("input_key", "Scroll Lock"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_LSHIFT     : s = _C("input_key", "Left Shift"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_RSHIFT     : s = _C("input_key", "Right Shift"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_LCONTROL   : s = _C("input_key", "Left Control"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_RCONTROL   : s = _C("input_key", "Right Control"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_LMENU      : s = _C("input_key", "Left Menu"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_RMENU      : s = _C("input_key", "Right Menu"); break;
             case irr::KEY_PLUS       : s = "+"; break;
             case irr::KEY_COMMA      : s = ","; break;
             case irr::KEY_MINUS      : s = "-"; break;
             case irr::KEY_PERIOD     : s = "."; break;
-            case irr::KEY_ATTN       : s = "attn"; break;
-            case irr::KEY_CRSEL      : s = "crsel"; break;
-            case irr::KEY_EXSEL      : s = "exsel"; break;
-            case irr::KEY_EREOF      : s = "ereof"; break;
-            case irr::KEY_PLAY       : s = "play"; break;
-            case irr::KEY_ZOOM       : s = "zoom"; break;
-            case irr::KEY_PA1        : s = "pa1"; break;
-            case irr::KEY_OEM_CLEAR  : s = "oem clear"; break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_ATTN       : s = _C("input_key", "Attn"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_CRSEL      : s = _C("input_key", "Crsel"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_EXSEL      : s = _C("input_key", "Exsel"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_EREOF      : s = _C("input_key", "Ereof"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_PLAY       : s = _C("input_key", "Play"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_ZOOM       : s = _C("input_key", "Zoom"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_PA1        : s = _C("input_key", "Pa1"); break;
+             //I18N: input configuration screen: keyboard key
+            case irr::KEY_OEM_CLEAR  : s = _C("input_key", "Oem Clear"); break;
         }
 
             break;
@@ -275,13 +340,23 @@ irr::core::stringw Binding::getAsString() const
             }
             else
             {
-                //I18N: to appear in input configuration screen, for gamepad axes
                 if (m_range == Input::AR_HALF)
+                {
+                    //I18N: to appear in input configuration screen, for gamepad axes
                     s = _("Axis %d %s", m_id, (m_dir == Input::AD_NEGATIVE) ? L"-" : L"+");
+                }
                 else
                 {
-                    irr::core::stringw inv = _("inverted");
-                    s = _("Axis %d %s", m_id, (m_dir == Input::AD_NEGATIVE) ? inv : L"");
+                    if(m_dir == Input::AD_NEGATIVE)
+                    {
+                        //I18N: to appear in input configuration screen, for gamepad axes
+                        s = _("Axis %d inverted", m_id);
+                    }
+                    else
+                    {
+                        //I18N: to appear in input configuration screen, for gamepad axes
+                        s = _("Axis %d", m_id);
+                    }
                 }
 
             }

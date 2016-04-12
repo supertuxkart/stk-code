@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<achievements>
+  <achievement id="1" check-type="all-at-least" reset-type="never"
+               name="Christoffel Columbus" description="Play every official track at least once." >
+      <city goal="1"/>
+      <cocoa_temple goal="1"/>
+      <farm goal="1"/>
+      <fortmagma goal="1"/>
+      <gran_paradiso_island goal="1"/>
+      <greenvalley goal="1"/>
+      <hacienda goal="1"/>
+      <lighthouse goal="1"/>
+      <mansion goal="1"/>
+      <mines goal="1"/>
+      <minigolf goal="1"/>
+      <olivermath goal="1"/>
+      <sandtrack goal="1"/>
+      <scotland goal="1"/>
+      <snowmountain goal="1"/>
+      <snowtuxpeak goal="1"/>
+      <stk_enterprise goal="1"/>
+      <subsea goal="1"/>
+      <xr591 goal="1"/>
+      <zengarden goal="1"/>      
+  </achievement>
+  <achievement id="2" check-type="all-at-least" reset-type="never"
+               name="Strike!" description="Hit 10 karts with a bowling-ball.">
+    <ball goal="10"/>
+  </achievement>
+  <achievement id="3" check-type="one-at-least" reset-type="race"
+               name="Arch Enemy" description="Hit the same kart at least 5 times in one race.">
+    <hit goal="5"/>
+  </achievement>
+  <achievement id="4" check-type="all-at-least" reset-type="race"
+               name="Marathoner" description="Make a race with 5 laps or more.">
+    <laps goal="5"/>
+  </achievement>
+  <achievement id="5" check-type="all-at-least" reset-type="lap"
+               name="Skid-row" description="Make 5 skidding in a single lap.">
+    <skidding goal="5"/>
+  </achievement>
+  <achievement id="6" check-type="all-at-least" reset-type="never"
+               name="Gold driver" description="Win against at least 3 opponents in all single player modes.">
+    <standard goal="1"/>
+    <std_timetrial goal="1"/>
+    <follow_leader goal="1"/>
+    <opponents goal="3"/>
+  </achievement>
+  <achievement id="7" check-type="all-at-least" reset-type="race"
+               name="Powerup Love" description="Use 10 or more powerups in a race.">
+    <poweruplover goal="10"/>
+  </achievement>
+  <achievement id="8" check-type="all-at-least" reset-type="never"
+               name="Unstoppable" description="Win 5 single races in a row.">
+    <wins goal="5"/>
+  </achievement>
+  <achievement id="9" check-type="all-at-least" reset-type="race"
+               name="Banana Lover" description="Collect at least 5 bananas in one race.">
+    <banana goal="5"/>
+  </achievement>
+  <achievement id="10" secret="yes" check-type="all-at-least" reset-type="race"
+               name="It's secret" description="Really ... a secret.">
+  </achievement>
+  <achievement id="11" check-type="all-at-least" reset-type="race"
+               name="Mosquito Hunter" description="Take your opponents for mosquitos! With the swatter, squash at least 5 of them in a race.">
+    <swatter goal="5"/>
+  </achievement>
+</achievements>

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@
 
 #include "animations/animation_base.hpp"
 #include "animations/ipo.hpp"
+#include "config/user_config.hpp"
 #include "graphics/show_curve.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
@@ -35,12 +36,8 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
            : CheckLine(node, index)
 {
     core::vector3df p1, p2;
-    if(!node.get("target-p1", &p1) ||
-       !node.get("target-p2", &p2)    )
-    {
-        printf("CheckCannon has no target line specified.\n");
-        exit(-1);
-    }
+    if(!node.get("target-p1", &p1) || !node.get("target-p2", &p2))
+        Log::fatal("CheckCannon", "No target line specified.");
     m_target.setLine(p1, p2);
     m_curve = new Ipo(*(node.getNode("curve")),
                       /*fps*/25,

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,39 +21,31 @@
 
 #include "guiengine/screen.hpp"
 #include "karts/kart_model.hpp"
+#include "states_screens/grand_prix_cutscene.hpp"
 
 #include <vector>
 #include <string>
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; class IMeshSceneNode; } }
 class KartProperties;
+class TrackObject;
 
 /**
   * \brief Screen shown at the end of a Grand Prix
   * \ingroup states_screens
   */
-class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<GrandPrixLose>
+class GrandPrixLose :
+    public GrandPrixCutscene,
+    public GUIEngine::ScreenSingleton<GrandPrixLose>
 {
     friend class GUIEngine::ScreenSingleton<GrandPrixLose>;
 
-    GrandPrixLose();
-
-    /** sky angle, 0-360 */
-    float m_sky_angle;
+    GrandPrixLose(): GrandPrixCutscene("grand_prix_lose.stkgui") {};
 
     /** Global evolution of time */
     float m_global_time;
 
-    irr::scene::IMeshSceneNode* m_garage;
-
-    irr::scene::IAnimatedMeshSceneNode* m_garage_door;
-
-    irr::scene::ISceneNode* m_kart_node[4];
-
-    irr::scene::ISceneNode* m_sky;
-    irr::scene::ICameraSceneNode* m_camera;
-
-    irr::scene::ILightSceneNode* m_light;
+    TrackObject* m_kart_node[4];
 
     /** A copy of the kart model for each kart used. */
     std::vector<KartModel*> m_all_kart_models;
@@ -62,36 +54,15 @@ class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
 
     float m_kart_x, m_kart_y, m_kart_z;
 
-    float m_camera_x, m_camera_y, m_camera_z;
-    float m_camera_target_x, m_camera_target_z;
-
-    MusicInformation* m_music;
-
-    //irr::core::recti m_viewport[4];
-
 public:
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() OVERRIDE;
-
-    /** \brief implement optional callback from parent class GUIEngine::Screen */
-    void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
+    // implement callbacks from parent class GUIEngine::Screen
     void init() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    void tearDown() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name,
-                       const int playerID) OVERRIDE;
-
+    void loadedFromFile() OVERRIDE;
+    void onCutsceneEnd() OVERRIDE;
+    void onUpdate(float dt) OVERRIDE;
     /** \brief set which karts lost this GP */
     void setKarts(std::vector<std::string> ident);
-
-    virtual MusicInformation* getMusic() const OVERRIDE { return m_music; }
-
+    MusicInformation* getInGameMenuMusic() const OVERRIDE;
 };
 
 #endif

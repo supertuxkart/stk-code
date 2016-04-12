@@ -1,6 +1,6 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Marianne Gagnon
-//  based on code Copyright (C) 2002-2010 Nikolaus Gebhardt
+//  Copyright (C) 2011-2015 Marianne Gagnon
+//  based on code Copyright 2002-2010 Nikolaus Gebhardt
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -54,7 +54,7 @@ private:
 public:
 
     PerCameraNode(scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
-                  scene::ICameraSceneNode* camera, scene::IMesh* mesh);
+                  scene::ICameraSceneNode* camera, scene::ISceneNode* node);
     virtual     ~PerCameraNode();
 
     //! returns the axis aligned bounding box of this node

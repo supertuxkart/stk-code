@@ -1,0 +1,21 @@
+Graphics debug views
+====================
+
+There are some graphics debug views, to be used both by artists when developing,
+and by users when reporting bugs.
+
+These should be available in normal (non-artist) mode
+to enable easier bug reports (go there, press this key, screenshot)
+without requiring editing the UTF-32 config files (which is inconvenient, most editors
+do not support that weird encoding).
+
+They don't give gameplay advantages like the item keys, so there should be little harm
+leaving them available. Accidental keypresses ought to be minimized by their location.
+
+Home	- wireframe view
+End 	- mipmap visualization (is a texture too high or low resolution, red = too high)
+Del	- normal view
+PgDown	- SSAO view
+PgUp	- light view
+Ins	- shadow view
+ScrlLock - displacement view

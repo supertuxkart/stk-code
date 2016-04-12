@@ -1,28 +1,51 @@
 # CMakeLists.txt for Irrlicht in STK
+find_package(PNG REQUIRED)
+find_package(JPEG REQUIRED)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/
-                    ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/jpeglib
-                    ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/libpng
-                    ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/zlib
-                    ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/bzip2)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
+                    "${JPEG_INCLUDE_DIR}"
+                    "${PNG_INCLUDE_DIRS}"
+                    "${ZLIB_INCLUDE_DIR}"
+                    "${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
+
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIR})
 
 if(APPLE)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/MacOSX ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/MacOSX" "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch x86_64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -F/Library/Frameworks")
 endif()
 
 add_definitions(-DNDEBUG=1 -DIRRLICHT_EXPORTS=1 -DPNG_THREAD_UNSAFE_OK -DPNG_NO_MMX_CODE -DPNG_NO_MNG_FEATURES)
 if(MSVC)
   add_definitions(/D_IRR_STATIC_LIB_)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" /MTd)
+  add_definitions(/D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
+elseif(MINGW)
+  add_definitions(-D_IRR_STATIC_LIB_)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions -fno-rtti -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
-  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions -fno-rtti -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
+  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -I/usr/X11R6/include")
+  set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -I/usr/X11R6/include")
+  if(CMAKE_COMPILER_IS_GNUCC)
+	  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -fexpensive-optimizations")
+  endif()
+  if(CMAKE_COMPILER_IS_GNUCXX)
+	  set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -fexpensive-optimizations")
+  endif()
+endif()
+
+# Xrandr
+if(UNIX AND USE_XRANDR)
+    add_definitions(-DNO_IRR_LINUX_X11_VIDMODE_)
+    add_definitions(-D_IRR_LINUX_X11_RANDR_)
+endif()
+
+if(CYGWIN)
+    add_definitions(-DNO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 endif()
 
 set(IRRLICHT_SOURCES
-source/Irrlicht/CTRStencilShadow.cpp
 source/Irrlicht/CGUIListBox.cpp
 source/Irrlicht/CZBuffer.cpp
 source/Irrlicht/CGUIModalScreen.cpp
@@ -32,133 +55,73 @@ source/Irrlicht/CVideoModeList.cpp
 source/Irrlicht/CDefaultGUIElementFactory.cpp
 source/Irrlicht/CCubeSceneNode.cpp
 source/Irrlicht/CGUIMeshViewer.cpp
-source/Irrlicht/CBSPMeshFileLoader.cpp
 source/Irrlicht/CParticleSphereEmitter.cpp
-source/Irrlicht/CTRFlatWire.cpp
 source/Irrlicht/CParticleAnimatedMeshSceneNodeEmitter.cpp
 source/Irrlicht/CGUITabControl.cpp
-source/Irrlicht/IBurningShader.cpp
-source/Irrlicht/CSoftwareTexture.cpp
-source/Irrlicht/CTRFlat.cpp
-source/Irrlicht/CD3D9NormalMapRenderer.cpp
 source/Irrlicht/CGUIToolBar.cpp
 source/Irrlicht/CTerrainTriangleSelector.cpp
 source/Irrlicht/CFileSystem.cpp
 source/Irrlicht/CTerrainSceneNode.cpp
-source/Irrlicht/CTRTextureFlat.cpp
 source/Irrlicht/os.cpp
 source/Irrlicht/CFPSCounter.cpp
 source/Irrlicht/CGUIContextMenu.cpp
 source/Irrlicht/CImageWriterJPG.cpp
-source/Irrlicht/CAnimatedMeshMD2.cpp
-source/Irrlicht/CTRTextureGouraudNoZ2.cpp
 source/Irrlicht/CZipReader.cpp
-source/Irrlicht/CTRTextureLightMap2_M4.cpp
 source/Irrlicht/CImageLoaderPNG.cpp
 source/Irrlicht/CImageLoaderBMP.cpp
-source/Irrlicht/CIrrDeviceWinCE.cpp
-source/Irrlicht/CVolumeLightSceneNode.cpp
 source/Irrlicht/CDefaultSceneNodeAnimatorFactory.cpp
 source/Irrlicht/CSkyDomeSceneNode.cpp
 source/Irrlicht/CGUIFileOpenDialog.cpp
-source/Irrlicht/CTRGouraudAlphaNoZ2.cpp
 source/Irrlicht/CGUISpriteBank.cpp
 source/Irrlicht/CParticleFadeOutAffector.cpp
 source/Irrlicht/CGUIMenu.cpp
-source/Irrlicht/CCgMaterialRenderer.cpp
-source/Irrlicht/CMD2MeshFileLoader.cpp
-source/Irrlicht/CImageWriterPSD.cpp
-source/Irrlicht/CD3D9ParallaxMapRenderer.cpp
-source/Irrlicht/CLWOMeshFileLoader.cpp
 source/Irrlicht/CSphereSceneNode.cpp
-source/Irrlicht/CLMTSMeshFileLoader.cpp
-source/Irrlicht/CImageWriterTGA.cpp
 source/Irrlicht/CImageWriterPNG.cpp
 source/Irrlicht/CSceneNodeAnimatorFollowSpline.cpp
 source/Irrlicht/CGUIMessageBox.cpp
 source/Irrlicht/CParticleGravityAffector.cpp
 source/Irrlicht/CGUISkin.cpp
 source/Irrlicht/CBoneSceneNode.cpp
-source/Irrlicht/CSoftwareTexture2.cpp
-source/Irrlicht/CD3D8ParallaxMapRenderer.cpp
-source/Irrlicht/CTRTextureLightMap2_M1.cpp
-source/Irrlicht/CNPKReader.cpp
-source/Irrlicht/CIrrMeshFileLoader.cpp
 source/Irrlicht/COpenGLSLMaterialRenderer.cpp
 source/Irrlicht/CParticleRotationAffector.cpp
-source/Irrlicht/CAnimatedMeshHalfLife.cpp
-source/Irrlicht/CD3D9HLSLMaterialRenderer.cpp
-source/Irrlicht/CDepthBuffer.cpp
-source/Irrlicht/CImageLoaderPSD.cpp
-source/Irrlicht/CTRNormalMap.cpp
 source/Irrlicht/CTriangleBBSelector.cpp
-source/Irrlicht/CAnimatedMeshMD3.cpp
 source/Irrlicht/CGUIComboBox.cpp
 source/Irrlicht/CSceneNodeAnimatorTexture.cpp
-source/Irrlicht/CColladaMeshWriter.cpp
 source/Irrlicht/COpenGLTexture.cpp
-source/Irrlicht/COgreMeshFileLoader.cpp
 source/Irrlicht/COctreeSceneNode.cpp
 source/Irrlicht/CWaterSurfaceSceneNode.cpp
-source/Irrlicht/CQuake3ShaderSceneNode.cpp
-source/Irrlicht/CWADReader.cpp
 source/Irrlicht/CParticleAttractionAffector.cpp
 source/Irrlicht/CMeshSceneNode.cpp
-source/Irrlicht/CCSMLoader.cpp
-source/Irrlicht/COBJMeshWriter.cpp
 source/Irrlicht/CGUIScrollBar.cpp
 source/Irrlicht/CAttributes.cpp
-source/Irrlicht/CTRTextureGouraudAdd.cpp
 source/Irrlicht/CGUIStaticText.cpp
 source/Irrlicht/CSceneNodeAnimatorCollisionResponse.cpp
 source/Irrlicht/CGUIFont.cpp
-source/Irrlicht/CBurningShader_Raster_Reference.cpp
-source/Irrlicht/CD3D8ShaderMaterialRenderer.cpp
 source/Irrlicht/CTriangleSelector.cpp
-source/Irrlicht/CTRTextureDetailMap2.cpp
 source/Irrlicht/CParticlePointEmitter.cpp
-source/Irrlicht/CD3D9Driver.cpp
-source/Irrlicht/CTRTextureGouraudAlphaNoZ.cpp
 source/Irrlicht/CTextSceneNode.cpp
-source/Irrlicht/CD3D9CgMaterialRenderer.cpp
-source/Irrlicht/COpenGLCgMaterialRenderer.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
-source/Irrlicht/CD3D9ShaderMaterialRenderer.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
-source/Irrlicht/CQ3LevelMesh.cpp
-source/Irrlicht/CTRTextureLightMap2_M2.cpp
-source/Irrlicht/CDMFLoader.cpp
-source/Irrlicht/CImageWriterPCX.cpp
 source/Irrlicht/CGUIInOutFader.cpp
 source/Irrlicht/CGUITreeView.cpp
 source/Irrlicht/CAnimatedMeshSceneNode.cpp
 source/Irrlicht/CGUICheckBox.cpp
 source/Irrlicht/CGUIWindow.cpp
-source/Irrlicht/CTRTextureWire2.cpp
-source/Irrlicht/CPLYMeshFileLoader.cpp
 source/Irrlicht/CSceneNodeAnimatorCameraMaya.cpp
 source/Irrlicht/CSceneNodeAnimatorFlyCircle.cpp
 source/Irrlicht/CColorConverter.cpp
 source/Irrlicht/CMeshCache.cpp
-source/Irrlicht/CTRTextureGouraudWire.cpp
 source/Irrlicht/CIrrDeviceFB.cpp
 source/Irrlicht/CMemoryFile.cpp
-source/Irrlicht/CImageWriterPPM.cpp
-source/Irrlicht/CSTLMeshFileLoader.cpp
 source/Irrlicht/CMountPointReader.cpp
 source/Irrlicht/CBillboardSceneNode.cpp
-source/Irrlicht/CMS3DMeshFileLoader.cpp
 source/Irrlicht/CGUIImageList.cpp
-source/Irrlicht/CTRGouraud.cpp
-source/Irrlicht/CTRTextureGouraudAlpha.cpp
 source/Irrlicht/CSceneCollisionManager.cpp
 source/Irrlicht/CIrrDeviceWin32.cpp
-source/Irrlicht/CSceneLoaderIrr.cpp
 source/Irrlicht/CEmptySceneNode.cpp
 source/Irrlicht/CParticleBoxEmitter.cpp
 source/Irrlicht/CParticleSystemSceneNode.cpp
 source/Irrlicht/CIrrDeviceConsole.cpp
-source/Irrlicht/CPakReader.cpp
 source/Irrlicht/CImage.cpp
 source/Irrlicht/CTarReader.cpp
 source/Irrlicht/CGUIButton.cpp
@@ -167,117 +130,67 @@ source/Irrlicht/CGUIEditBox.cpp
 source/Irrlicht/CLogger.cpp
 source/Irrlicht/CMeshManipulator.cpp
 source/Irrlicht/CLightSceneNode.cpp
-source/Irrlicht/CTRTextureLightMapGouraud2_M4.cpp
-source/Irrlicht/CImageLoaderDDS.cpp
 source/Irrlicht/CSkyBoxSceneNode.cpp
 source/Irrlicht/CWriteFile.cpp
-source/Irrlicht/CSTLMeshWriter.cpp
 source/Irrlicht/COctreeTriangleSelector.cpp
-source/Irrlicht/CSMFMeshFileLoader.cpp
 source/Irrlicht/CFileList.cpp
-source/Irrlicht/CXMeshFileLoader.cpp
-source/Irrlicht/CImageLoaderPCX.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
-source/Irrlicht/CTRTextureGouraudNoZ.cpp
 source/Irrlicht/COSOperator.cpp
 source/Irrlicht/CImageLoaderJPG.cpp
-source/Irrlicht/CTRGouraudWire.cpp
-source/Irrlicht/CMD3MeshFileLoader.cpp
-source/Irrlicht/CIrrMeshWriter.cpp
 source/Irrlicht/COpenGLExtensionHandler.cpp
-source/Irrlicht/CImageLoaderWAL.cpp
 source/Irrlicht/CXMLWriter.cpp
-source/Irrlicht/COCTLoader.cpp
-source/Irrlicht/COBJMeshFileLoader.cpp
 source/Irrlicht/CSceneNodeAnimatorCameraFPS.cpp
-source/Irrlicht/CD3D8Texture.cpp
-source/Irrlicht/CImageLoaderPPM.cpp
-source/Irrlicht/CTRTextureLightMap2_Add.cpp
-source/Irrlicht/CMY3DMeshFileLoader.cpp
-source/Irrlicht/CTRGouraud2.cpp
 source/Irrlicht/CGUIColorSelectDialog.cpp
 source/Irrlicht/CSceneManager.cpp
 source/Irrlicht/Irrlicht.cpp
 source/Irrlicht/COpenGLShaderMaterialRenderer.cpp
-source/Irrlicht/CImageLoaderTGA.cpp
-source/Irrlicht/CTRTextureGouraud2.cpp
 source/Irrlicht/COpenGLDriver.cpp
 source/Irrlicht/CSceneNodeAnimatorFlyStraight.cpp
 source/Irrlicht/irrXML.cpp
-source/Irrlicht/CImageLoaderRGB.cpp
-source/Irrlicht/CSoftwareDriver2.cpp
-source/Irrlicht/CSoftwareDriver.cpp
-source/Irrlicht/CD3D8Driver.cpp
-source/Irrlicht/CD3D9Texture.cpp
-source/Irrlicht/CTRTextureBlend.cpp
 source/Irrlicht/CSkinnedMesh.cpp
-source/Irrlicht/CTRGouraudAlpha2.cpp
 source/Irrlicht/CXMLReader.cpp
 source/Irrlicht/CDummyTransformationSceneNode.cpp
-source/Irrlicht/CTRTextureGouraudVertexAlpha2.cpp
-source/Irrlicht/C3DSMeshFileLoader.cpp
-source/Irrlicht/CD3D8NormalMapRenderer.cpp
 source/Irrlicht/CGUITable.cpp
 source/Irrlicht/CB3DMeshFileLoader.cpp
 source/Irrlicht/CGeometryCreator.cpp
 source/Irrlicht/CNullDriver.cpp
 source/Irrlicht/CCameraSceneNode.cpp
-source/Irrlicht/CTRTextureGouraudAdd2.cpp
 source/Irrlicht/CGUISpinBox.cpp
-source/Irrlicht/CTRTextureGouraudAddNoZ2.cpp
 source/Irrlicht/CReadFile.cpp
-source/Irrlicht/CColladaFileLoader.cpp
 source/Irrlicht/CParticleRingEmitter.cpp
 source/Irrlicht/CMetaTriangleSelector.cpp
-source/Irrlicht/CShadowVolumeSceneNode.cpp
 source/Irrlicht/CDefaultSceneNodeFactory.cpp
 source/Irrlicht/CGUIImage.cpp
 source/Irrlicht/CGUIEnvironment.cpp
 source/Irrlicht/CParticleScaleAffector.cpp
 source/Irrlicht/CSceneNodeAnimatorDelete.cpp
-source/Irrlicht/CPLYMeshWriter.cpp
 source/Irrlicht/CImageWriterBMP.cpp
-source/Irrlicht/CTRTextureGouraud.cpp
 source/Irrlicht/CParticleMeshEmitter.cpp
 source/Irrlicht/CSceneNodeAnimatorRotation.cpp
-source/Irrlicht/COpenGLNormalMapRenderer.cpp
-source/Irrlicht/CTRTextureFlatWire.cpp
 source/Irrlicht/glext.h
 source/Irrlicht/CB3DMeshFileLoader.h
 source/Irrlicht/CIrrDeviceLinux.h
 source/Irrlicht/CMeshCache.h
 source/Irrlicht/CAttributes.h
-source/Irrlicht/CMS3DMeshFileLoader.h
 source/Irrlicht/CParticleMeshEmitter.h
-source/Irrlicht/CImageWriterPPM.h
 source/Irrlicht/CParticlePointEmitter.h
 source/Irrlicht/CParticleRotationAffector.h
 source/Irrlicht/CMountPointReader.h
 source/Irrlicht/CIrrDeviceConsole.h
 source/Irrlicht/CTerrainSceneNode.h
 source/Irrlicht/CSceneNodeAnimatorCollisionResponse.h
-source/Irrlicht/CImageLoaderWAL.h
-source/Irrlicht/CIrrMeshFileLoader.h
-source/Irrlicht/CSceneLoaderIrr.h
 source/Irrlicht/CImageLoaderBMP.h
 source/Irrlicht/CSkinnedMesh.h
 source/Irrlicht/COpenGLParallaxMapRenderer.h
-source/Irrlicht/CLWOMeshFileLoader.h
 source/Irrlicht/CParticleRingEmitter.h
 source/Irrlicht/COpenGLShaderMaterialRenderer.h
-source/Irrlicht/CImageWriterTGA.h
-source/Irrlicht/CD3D8MaterialRenderer.h
 source/Irrlicht/CImageLoaderPNG.h
 source/Irrlicht/COctreeTriangleSelector.h
 source/Irrlicht/COpenGLTexture.h
 source/Irrlicht/Octree.h
 source/Irrlicht/os.h
-source/Irrlicht/CD3D9MaterialRenderer.h
 source/Irrlicht/CDefaultGUIElementFactory.h
-source/Irrlicht/CAnimatedMeshHalfLife.h
 source/Irrlicht/CSceneNodeAnimatorFlyCircle.h
-source/Irrlicht/CD3D9ShaderMaterialRenderer.h
-source/Irrlicht/CBSPMeshFileLoader.h
 source/Irrlicht/CTriangleBBSelector.h
 source/Irrlicht/S2DVertex.h
 source/Irrlicht/CDefaultSceneNodeAnimatorFactory.h
@@ -287,69 +200,41 @@ source/Irrlicht/CGUITable.h
 source/Irrlicht/CGUIColorSelectDialog.h
 source/Irrlicht/CCubeSceneNode.h
 source/Irrlicht/resource.h
-source/Irrlicht/COpenGLNormalMapRenderer.h
 source/Irrlicht/CSceneNodeAnimatorCameraMaya.h
 source/Irrlicht/SoftwareDriver2_helper.h
 source/Irrlicht/CGUIWindow.h
-source/Irrlicht/CMD2MeshFileLoader.h
 source/Irrlicht/dmfsupport.h
-source/Irrlicht/CSTLMeshFileLoader.h
 source/Irrlicht/CGUICheckBox.h
 source/Irrlicht/CMeshManipulator.h
-source/Irrlicht/CSoftware2MaterialRenderer.h
-source/Irrlicht/CD3D9HLSLMaterialRenderer.h
-source/Irrlicht/CSoftwareDriver.h
 source/Irrlicht/IImagePresenter.h
 source/Irrlicht/CGUIMeshViewer.h
 source/Irrlicht/CMeshSceneNode.h
 source/Irrlicht/CGUIImage.h
-source/Irrlicht/CD3D8Driver.h
 source/Irrlicht/CCameraSceneNode.h
 source/Irrlicht/IZBuffer.h
 source/Irrlicht/CAnimatedMeshSceneNode.h
 source/Irrlicht/CGUIStaticText.h
 source/Irrlicht/wglext.h
 source/Irrlicht/CTimer.h
-source/Irrlicht/CCSMLoader.h
-source/Irrlicht/CWADReader.h
-source/Irrlicht/CColladaMeshWriter.h
 source/Irrlicht/CSceneNodeAnimatorCameraFPS.h
 source/Irrlicht/CParticleFadeOutAffector.h
 source/Irrlicht/COpenGLSLMaterialRenderer.h
 source/Irrlicht/CParticleAttractionAffector.h
-source/Irrlicht/CMY3DMeshFileLoader.h
 source/Irrlicht/MacOSX/AppDelegate.h
 source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h
 source/Irrlicht/MacOSX/OSXClipboard.h
 source/Irrlicht/CSceneManager.h
-source/Irrlicht/CImageLoaderPSD.h
 source/Irrlicht/COpenGLDriver.h
 source/Irrlicht/CGUIComboBox.h
-source/Irrlicht/CPLYMeshFileLoader.h
-source/Irrlicht/CVolumeLightSceneNode.h
-source/Irrlicht/CSoftwareDriver2.h
 source/Irrlicht/CSceneCollisionManager.h
 source/Irrlicht/ISceneNodeAnimatorFinishing.h
-source/Irrlicht/aesGladman/pwd2key.h
-source/Irrlicht/aesGladman/sha2.h
-source/Irrlicht/aesGladman/hmac.h
-source/Irrlicht/aesGladman/fileenc.h
-source/Irrlicht/aesGladman/aes.h
-source/Irrlicht/aesGladman/sha1.h
-source/Irrlicht/aesGladman/prng.h
-source/Irrlicht/aesGladman/aesopt.h
-source/Irrlicht/COBJMeshWriter.h
 source/Irrlicht/CGUITabControl.h
 source/Irrlicht/CSphereSceneNode.h
-source/Irrlicht/CSoftwareTexture2.h
 source/Irrlicht/CIrrDeviceStub.h
 source/Irrlicht/CDummyTransformationSceneNode.h
 source/Irrlicht/CParticleBoxEmitter.h
-source/Irrlicht/CShadowVolumeSceneNode.h
 source/Irrlicht/COctreeSceneNode.h
 source/Irrlicht/CReadFile.h
-source/Irrlicht/CMY3DHelper.h
-source/Irrlicht/CImageLoaderDDS.h
 source/Irrlicht/COSOperator.h
 source/Irrlicht/CLightSceneNode.h
 source/Irrlicht/CParticleSphereEmitter.h
@@ -359,61 +244,35 @@ source/Irrlicht/CIrrDeviceWin32.h
 source/Irrlicht/CGUIEditBox.h
 source/Irrlicht/CGUISpriteBank.h
 source/Irrlicht/CSceneNodeAnimatorFlyStraight.h
-source/Irrlicht/COCTLoader.h
 source/Irrlicht/COpenGLExtensionHandler.h
-source/Irrlicht/CImageWriterPSD.h
 source/Irrlicht/CGUIScrollBar.h
-source/Irrlicht/CImageLoaderPCX.h
 source/Irrlicht/CTriangleSelector.h
 source/Irrlicht/CParticleGravityAffector.h
 source/Irrlicht/CGUIModalScreen.h
 source/Irrlicht/CDefaultSceneNodeFactory.h
-source/Irrlicht/CIrrDeviceWinCE.h
-source/Irrlicht/CImageLoaderPPM.h
 source/Irrlicht/CXMLReaderImpl.h
 source/Irrlicht/COpenGLMaterialRenderer.h
 source/Irrlicht/CVideoModeList.h
 source/Irrlicht/CParticleAnimatedMeshSceneNodeEmitter.h
-source/Irrlicht/C3DSMeshFileLoader.h
-source/Irrlicht/CImageLoaderTGA.h
 source/Irrlicht/CColorConverter.h
 source/Irrlicht/CWaterSurfaceSceneNode.h
 source/Irrlicht/SoftwareDriver2_compile_config.h
 source/Irrlicht/CSceneNodeAnimatorTexture.h
 source/Irrlicht/CXMLReader.h
-source/Irrlicht/CD3D9Driver.h
-source/Irrlicht/CColladaFileLoader.h
 source/Irrlicht/CEmptySceneNode.h
-source/Irrlicht/CCgMaterialRenderer.h
 source/Irrlicht/CParticleSystemSceneNode.h
 source/Irrlicht/CImageWriterPNG.h
 source/Irrlicht/CParticleScaleAffector.h
-source/Irrlicht/CImageWriterPCX.h
-source/Irrlicht/CD3D9Texture.h
-source/Irrlicht/CD3D9NormalMapRenderer.h
-source/Irrlicht/CLogger.h
-source/Irrlicht/CMD3MeshFileLoader.h
 source/Irrlicht/CImageLoaderJPG.h
 source/Irrlicht/CBillboardSceneNode.h
-source/Irrlicht/CD3D8ParallaxMapRenderer.h
-source/Irrlicht/CD3D8ShaderMaterialRenderer.h
 source/Irrlicht/CIrrDeviceSDL.h
 source/Irrlicht/CSkyDomeSceneNode.h
-source/Irrlicht/CPLYMeshWriter.h
-source/Irrlicht/CDepthBuffer.h
 source/Irrlicht/CGUIInOutFader.h
-source/Irrlicht/CD3D9CgMaterialRenderer.h
 source/Irrlicht/CGUIFont.h
 source/Irrlicht/CGUIImageList.h
-source/Irrlicht/CAnimatedMeshMD2.h
-source/Irrlicht/CIrrMeshWriter.h
-source/Irrlicht/COBJMeshFileLoader.h
 source/Irrlicht/CFileSystem.h
-source/Irrlicht/CQ3LevelMesh.h
 source/Irrlicht/CSceneNodeAnimatorRotation.h
 source/Irrlicht/CGUISkin.h
-source/Irrlicht/CNPKReader.h
-source/Irrlicht/IDepthBuffer.h
 source/Irrlicht/S4DVertex.h
 source/Irrlicht/CGUIMenu.h
 source/Irrlicht/CBlit.h
@@ -421,47 +280,30 @@ source/Irrlicht/CZipReader.h
 source/Irrlicht/CGUIToolBar.h
 source/Irrlicht/CImageWriterJPG.h
 source/Irrlicht/IAttribute.h
-source/Irrlicht/CDMFLoader.h
 source/Irrlicht/CNullDriver.h
-source/Irrlicht/CImageLoaderRGB.h
 source/Irrlicht/CWriteFile.h
-source/Irrlicht/CLMTSMeshFileLoader.h
 source/Irrlicht/CSceneNodeAnimatorFollowSpline.h
-source/Irrlicht/IBurningShader.h
-source/Irrlicht/CQuake3ShaderSceneNode.h
 source/Irrlicht/glxext.h
 source/Irrlicht/CMetaTriangleSelector.h
-source/Irrlicht/CSoftwareTexture.h
 source/Irrlicht/CTarReader.h
-source/Irrlicht/CD3D8NormalMapRenderer.h
 source/Irrlicht/CXMLWriter.h
 source/Irrlicht/CParticleCylinderEmitter.h
 source/Irrlicht/ITriangleRenderer.h
 source/Irrlicht/CSceneNodeAnimatorDelete.h
-source/Irrlicht/CSTLMeshWriter.h
 source/Irrlicht/CIrrDeviceFB.h
 source/Irrlicht/CGUIEnvironment.h
 source/Irrlicht/CTerrainTriangleSelector.h
-source/Irrlicht/CSMFMeshFileLoader.h
 source/Irrlicht/CAttributeImpl.h
-source/Irrlicht/COgreMeshFileLoader.h
-source/Irrlicht/CD3D8Texture.h
-source/Irrlicht/CAnimatedMeshMD3.h
 source/Irrlicht/CGeometryCreator.h
 source/Irrlicht/CSkyBoxSceneNode.h
 source/Irrlicht/CImageWriterBMP.h
-source/Irrlicht/CD3D9ParallaxMapRenderer.h
 source/Irrlicht/BuiltInFont.h
 source/Irrlicht/CMemoryFile.h
 source/Irrlicht/CFPSCounter.h
-source/Irrlicht/CXMeshFileLoader.h
 source/Irrlicht/CGUITreeView.h
 source/Irrlicht/CGUIContextMenu.h
-source/Irrlicht/CTRTextureGouraud.h
 source/Irrlicht/CFileList.h
-source/Irrlicht/CPakReader.h
 source/Irrlicht/CLimitReadFile.h
-source/Irrlicht/COpenGLCgMaterialRenderer.h
 source/Irrlicht/CGUISpinBox.h
 source/Irrlicht/CGUIButton.h
 source/Irrlicht/CGUIListBox.h
@@ -476,7 +318,6 @@ include/EMessageBoxFlags.h
 include/IParticleSphereEmitter.h
 include/IParticleFadeOutAffector.h
 include/IGeometryCreator.h
-include/IVolumeLightSceneNode.h
 include/IGUIEnvironment.h
 include/irrunpack.h
 include/IParticleRingEmitter.h
@@ -508,7 +349,6 @@ include/ITimer.h
 include/IImage.h
 include/position2d.h
 include/IGUIToolbar.h
-include/IColladaMeshWriter.h
 include/IGUISpinBox.h
 include/IGUITabControl.h
 include/IBillboardTextSceneNode.h
@@ -553,7 +393,6 @@ include/IParticleMeshEmitter.h
 include/IGUIColorSelectDialog.h
 include/IGUIImage.h
 include/IGUIListBox.h
-include/IQ3LevelMesh.h
 include/vector2d.h
 include/CIndexBuffer.h
 include/IAnimatedMesh.h
@@ -577,14 +416,12 @@ include/ITriangleSelector.h
 include/coreutil.h
 include/SMeshBufferTangents.h
 include/ILightSceneNode.h
-include/IAnimatedMeshMD3.h
 include/dimension2d.h
 include/ISceneCollisionManager.h
 include/heapsort.h
 include/IGUIComboBox.h
 include/Keycodes.h
 include/SParticle.h
-include/IQ3Shader.h
 include/EDriverTypes.h
 include/IFileSystem.h
 include/SMesh.h
@@ -602,7 +439,6 @@ include/IMeshManipulator.h
 include/CVertexBuffer.h
 include/SSharedMeshBuffer.h
 include/vector3d.h
-include/IShadowVolumeSceneNode.h
 include/ISceneNodeAnimatorCameraFPS.h
 include/IGUIMeshViewer.h
 include/triangle3d.h
@@ -625,7 +461,6 @@ include/IGUITable.h
 include/IGUIButton.h
 include/EMaterialFlags.h
 include/EDeviceTypes.h
-include/IAnimatedMeshMD2.h
 include/IGUIWindow.h
 include/EAttributes.h
 include/S3DVertex.h
@@ -650,108 +485,6 @@ include/IGUIFileOpenDialog.h
 include/IBoneSceneNode.h
 include/IShaderConstantSetCallBack.h
 include/ITexture.h
-
-
-source/Irrlicht/zlib/infback.c
-source/Irrlicht/zlib/deflate.c
-source/Irrlicht/zlib/zutil.c
-source/Irrlicht/zlib/crc32.c
-source/Irrlicht/zlib/gzread.c
-source/Irrlicht/zlib/inffast.c
-source/Irrlicht/zlib/uncompr.c
-source/Irrlicht/zlib/inftrees.c
-source/Irrlicht/zlib/inflate.c
-source/Irrlicht/zlib/compress.c
-source/Irrlicht/zlib/adler32.c
-source/Irrlicht/zlib/gzwrite.c
-source/Irrlicht/zlib/trees.c
-source/Irrlicht/zlib/gzlib.c
-source/Irrlicht/zlib/gzclose.c
-source/Irrlicht/zlib/inffixed.h
-source/Irrlicht/zlib/inffast.h
-source/Irrlicht/zlib/zconf.h
-source/Irrlicht/zlib/zutil.h
-source/Irrlicht/zlib/inftrees.h
-source/Irrlicht/zlib/deflate.h
-source/Irrlicht/zlib/zlib.h
-source/Irrlicht/zlib/inflate.h
-source/Irrlicht/zlib/trees.h
-source/Irrlicht/zlib/gzguts.h
-source/Irrlicht/zlib/crc32.h
-
-
-source/Irrlicht/jpeglib/jaricom.c
-source/Irrlicht/jpeglib/jcapimin.c
-source/Irrlicht/jpeglib/jcapistd.c
-source/Irrlicht/jpeglib/jcarith.c
-source/Irrlicht/jpeglib/jccoefct.c
-source/Irrlicht/jpeglib/jccolor.c
-source/Irrlicht/jpeglib/jcdctmgr.c
-source/Irrlicht/jpeglib/jchuff.c
-source/Irrlicht/jpeglib/jcinit.c
-source/Irrlicht/jpeglib/jcmainct.c
-source/Irrlicht/jpeglib/jcmarker.c
-source/Irrlicht/jpeglib/jcmaster.c
-source/Irrlicht/jpeglib/jcomapi.c
-source/Irrlicht/jpeglib/jcparam.c
-source/Irrlicht/jpeglib/jcprepct.c
-source/Irrlicht/jpeglib/jcsample.c
-source/Irrlicht/jpeglib/jctrans.c
-source/Irrlicht/jpeglib/jdapimin.c
-source/Irrlicht/jpeglib/jdapistd.c
-source/Irrlicht/jpeglib/jdarith.c
-source/Irrlicht/jpeglib/jdatadst.c
-source/Irrlicht/jpeglib/jdatasrc.c
-source/Irrlicht/jpeglib/jdcoefct.c
-source/Irrlicht/jpeglib/jdcolor.c
-source/Irrlicht/jpeglib/jddctmgr.c
-source/Irrlicht/jpeglib/jdhuff.c
-source/Irrlicht/jpeglib/jdinput.c
-source/Irrlicht/jpeglib/jdmainct.c
-source/Irrlicht/jpeglib/jdmarker.c
-source/Irrlicht/jpeglib/jdmaster.c
-source/Irrlicht/jpeglib/jdmerge.c
-source/Irrlicht/jpeglib/jdpostct.c
-source/Irrlicht/jpeglib/jdsample.c
-source/Irrlicht/jpeglib/jdtrans.c
-source/Irrlicht/jpeglib/jerror.c
-source/Irrlicht/jpeglib/jfdctflt.c
-source/Irrlicht/jpeglib/jfdctfst.c
-source/Irrlicht/jpeglib/jfdctint.c
-source/Irrlicht/jpeglib/jidctflt.c
-source/Irrlicht/jpeglib/jidctfst.c
-source/Irrlicht/jpeglib/jidctint.c
-source/Irrlicht/jpeglib/jmemmgr.c
-source/Irrlicht/jpeglib/jmemnobs.c
-source/Irrlicht/jpeglib/jquant1.c
-source/Irrlicht/jpeglib/jquant2.c
-source/Irrlicht/jpeglib/jutils.c
-
-
-source/Irrlicht/libpng/pngwutil.c
-source/Irrlicht/libpng/pngget.c
-source/Irrlicht/libpng/pngrtran.c
-source/Irrlicht/libpng/pngrutil.c
-source/Irrlicht/libpng/pngerror.c
-source/Irrlicht/libpng/pngset.c
-source/Irrlicht/libpng/pngtest.c
-source/Irrlicht/libpng/pngmem.c
-source/Irrlicht/libpng/pngpread.c
-source/Irrlicht/libpng/png.c
-source/Irrlicht/libpng/pngread.c
-source/Irrlicht/libpng/pngwio.c
-source/Irrlicht/libpng/pngtrans.c
-source/Irrlicht/libpng/pngwrite.c
-source/Irrlicht/libpng/pngwtran.c
-source/Irrlicht/libpng/example.c
-source/Irrlicht/libpng/pngrio.c
-source/Irrlicht/libpng/png.h
-source/Irrlicht/libpng/pngdebug.h
-source/Irrlicht/libpng/pngconf.h
-source/Irrlicht/libpng/pngpriv.h
-source/Irrlicht/libpng/pnginfo.h
-source/Irrlicht/libpng/pnglibconf.h
-source/Irrlicht/libpng/pngstruct.h
 )
 
 if(APPLE)
@@ -760,19 +493,23 @@ if(APPLE)
         source/Irrlicht/MacOSX/AppDelegate.mm
         source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm
         source/Irrlicht/MacOSX/OSXClipboard.mm)
-    
+
     #list(APPEND CMAKE_C_SOURCE_FILE_EXTENSIONS mm)
     #set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS cpp)
-    
+
     set_source_files_properties(source/Irrlicht/MacOSX/AppDelegate.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
     set_source_files_properties(source/Irrlicht/MacOSX/AppDelegate.mm PROPERTIES LANGUAGE C)
-    
+
     set_source_files_properties(source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
     set_source_files_properties(source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm PROPERTIES LANGUAGE C)
-    
+
     set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3 -fno-rtti")
     set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES LANGUAGE C)
 endif()
 
-add_library(stkirrlicht ${IRRLICHT_SOURCES})
+add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
+target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY} ${ZLIB_LIBRARY})
 
+if(WIN32)
+    target_link_libraries(stkirrlicht imm32)
+endif()

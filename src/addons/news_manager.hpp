@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,6 +25,7 @@
 #include <irrString.h>
 using namespace irr;
 
+#include "utils/can_be_deleted.hpp"
 #include "utils/synchronised.hpp"
 
 class XMLNode;
@@ -32,9 +33,11 @@ class XMLNode;
 /**
   * \ingroup addonsgroup
   */
-class NewsManager
+class NewsManager : public CanBeDeleted
 {
 private:
+    static NewsManager *m_news_manager;
+
     // A wrapper class to store news message together with
     // a message id and a display count.
     class NewsMessage
@@ -87,28 +90,53 @@ private:
 
     /** A high priority error message that is shown instead of
      *  any news message (usually indicating connection problems). */
-    core::stringw    m_error_message;
+    Synchronised<core::stringw>    m_error_message;
+
+    /** True when all .xml files should be re-downloaded. */
+    bool m_force_refresh;
 
     void          checkRedirect(const XMLNode *xml);
     void          updateNews(const XMLNode *xml,
                              const std::string &filename);
     bool          conditionFulfilled(const std::string &cond);
+    static void*  downloadNews(void *obj);
+    NewsManager();
+    ~NewsManager();
 
 public:
-                  NewsManager();
-                 ~NewsManager();
+    /** Singleton: if necessary create and get the news managers */
+    static NewsManager* get()
+    {
+        if(!m_news_manager)
+            m_news_manager = new NewsManager();
+        return m_news_manager;
+    }   // get
+    // ------------------------------------------------------------------------
+    static void deallocate()
+    {
+        if(m_news_manager)
+        {
+            delete m_news_manager;
+            m_news_manager = NULL;
+        }
+    }   // deallocate
+    // ------------------------------------------------------------------------
     const core::stringw
                   getNextNewsMessage();
     const core::stringw
                   getImportantMessage();
-    void          init();
+    void          init(bool force_refresh);
     void          addNewsMessage(const core::stringw &s);
 
+    // ------------------------------------------------------------------------
     /** Sets an error message that is displayed instead of any news message. */
-    void          setErrorMessage(const core::stringw &s) { m_error_message=s;}
+    void          setErrorMessage(const core::stringw &s)
+    {
+        m_error_message.setAtomic(s);
+    }   // setErrorMessage
     // ------------------------------------------------------------------------
     /** Clears the error message. */
-    void          clearErrorMessage() {m_error_message=""; }
+    void          clearErrorMessage() {m_error_message.setAtomic(""); }
     // ------------------------------------------------------------------------
 };   // NewsManager
 

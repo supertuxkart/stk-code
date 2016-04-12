@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008 Joerg Henrichs
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,10 +21,8 @@
 
 #include <map>
 
-#include "config/user_config.hpp"
-
 #include "challenges/challenge_data.hpp"
-#include "challenges/game_slot.hpp"
+#include "challenges/story_mode_status.hpp"
 
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
@@ -43,54 +41,29 @@ class UnlockManager : public NoCopy
 private:
     SFXBase    *m_locked_sound;
 
-    void       load              ();
-
     typedef std::map<std::string, ChallengeData*> AllChallengesType;
     AllChallengesType             m_all_challenges;
 
-    std::map<std::string, GameSlot*> m_game_slots;
-
     void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
-
-    /** ID of the active player */
-    std::string m_current_game_slot;
-
-    friend class GameSlot;
 
 public:
                UnlockManager     ();
               ~UnlockManager     ();
     void       addOrFreeChallenge(ChallengeData *c);
     void       addChallenge      (const std::string& filename);
-    void       save              ();
-    bool       createSlotsIfNeeded();
-    bool       deleteSlotsIfNeeded();
 
-    const ChallengeData *getChallenge      (const std::string& id);
+    const ChallengeData *getChallengeData(const std::string& id);
 
     bool       isSupportedVersion(const ChallengeData &challenge);
 
     /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
     void       playLockSound() const;
 
-    const std::string& getCurrentSlotID() const { return m_current_game_slot; }
-
-    GameSlot*  getCurrentSlot()
-    {
-        assert(m_game_slots.find(m_current_game_slot) != m_game_slots.end());
-        return m_game_slots[m_current_game_slot];
-    }
-
-    /** \param slotid name of the player */
-    void       setCurrentSlot(std::string slotid) { m_current_game_slot = slotid; }
-
     void       findWhatWasUnlocked(int pointsBefore, int pointsNow,
                                    std::vector<std::string>& tracks,
                                    std::vector<std::string>& gps);
 
-    PlayerProfile* getCurrentPlayer();
-
-    void updateActiveChallengeList();
+    StoryModeStatus *createStoryModeStatus(const XMLNode *node=NULL);
 
 };   // UnlockManager
 

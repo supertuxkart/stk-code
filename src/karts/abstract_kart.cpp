@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012  Joerg Henrichs
+//  Copyright (C) 2012-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,13 +34,24 @@
  */
 AbstractKart::AbstractKart(const std::string& ident,
                            int world_kart_id, int position,
-                           const btTransform& init_transform)
+                           const btTransform& init_transform,
+                           PerPlayerDifficulty difficulty,
+                           video::E_RENDER_TYPE rt)
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;
-    m_kart_properties = kart_properties_manager->getKart(ident);
+    m_kart_properties.reset(new KartProperties());
+    const KartProperties* kp = kart_properties_manager->getKart(ident);
+    if (kp == NULL)
+    {
+        Log::warn("Abstract_Kart", "Unknown kart %s, fallback to tux",
+            ident.c_str());
+        kp = kart_properties_manager->getKart(std::string("tux"));
+    }
+    m_kart_properties->copyForPlayer(kp);
+    m_difficulty = difficulty;
     m_kart_animation  = NULL;
-    assert(m_kart_properties != NULL);
+    assert(m_kart_properties);
 
     // We have to take a copy of the kart model, since otherwise
     // the animations will be mixed up (i.e. different instances of
@@ -49,12 +60,12 @@ AbstractKart::AbstractKart(const std::string& ident,
     // released when the kart is deleted, but since the original
     // kart_model is stored in the kart_properties all the time,
     // there is no risk of a mesh being deleted to early.
-    m_kart_model  = m_kart_properties->getKartModelCopy();
+    m_kart_model  = m_kart_properties->getKartModelCopy(rt);
     m_kart_width  = m_kart_model->getWidth();
     m_kart_height = m_kart_model->getHeight();
     m_kart_length = m_kart_model->getLength();
+    m_kart_highest_point = m_kart_model->getHighestPoint();
     m_wheel_graphics_position = m_kart_model->getWheelsGraphicsPosition();
-    m_nitro_emitter_position = m_kart_model->getNitroEmittersPositon();
 }   // AbstractKart
 
 // ----------------------------------------------------------------------------
@@ -78,7 +89,7 @@ void AbstractKart::reset()
 
 // ----------------------------------------------------------------------------
 /** Returns a name to be displayed for this kart. */
-const wchar_t* AbstractKart::getName() const
+core::stringw AbstractKart::getName() const
 {
     return m_kart_properties->getName();
 }   // getName;
@@ -111,7 +122,7 @@ void AbstractKart::setKartAnimation(AbstractKartAnimation *ka)
                           ka->getName().c_str());
         else   Log::debug("Abstract_Kart", "Setting kart animation to NULL.");
         if(m_kart_animation) Log::info("Abstract_Kart", "Current kart"
-                                       "animation is '%s'.\n",
+                                       "animation is '%s'.",
                                         m_kart_animation->getName().c_str());
         else   Log::debug("Abstract_Kart", "Current kart animation is NULL.");
     }
@@ -122,3 +133,13 @@ void AbstractKart::setKartAnimation(AbstractKartAnimation *ka)
     assert( (ka!=NULL) ^ (m_kart_animation!=NULL) );
     m_kart_animation = ka;
 }   // setKartAnimation
+
+// ----------------------------------------------------------------------------
+/** Moves the current physical transform into this kart's position.
+ */
+void AbstractKart::kartIsInRestNow()
+{
+    // Update the kart transforms with the newly computed position
+    // after all karts are reset
+    setTrans(getBody()->getWorldTransform());
+}   // kartIsInRest

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Damien Morel <divdams@free.fr>
+//  Copyright (C) 2007-2015 Damien Morel <divdams@free.fr>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -51,7 +51,6 @@ public:
     virtual ~MusicOggStream();
 
     virtual void update();
-    virtual void updateFading(float percent);
     virtual void updateFaster(float percent, float max_pitch);
 
     virtual bool load(const std::string& filename);
@@ -60,7 +59,7 @@ public:
     virtual bool stopMusic();
     virtual bool pauseMusic();
     virtual bool resumeMusic();
-    virtual void volumeMusic (float gain);
+    virtual void setVolume(float volume);
     virtual bool isPlaying();
 
 protected:
@@ -85,7 +84,9 @@ private:
     ALenum nb_channels;
 
     bool m_pausedMusic;
-    static const int m_buffer_size = 11025*4;//one full second of audio at 44100 samples per second
+
+    //one full second of audio at 44100 samples per second
+    static const int m_buffer_size = 11025*4;
 };
 
 #endif

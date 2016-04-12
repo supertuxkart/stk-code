@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,56 +27,94 @@
 
 using namespace GUIEngine;
 
-// ------------------------------------------------------------------------------------------------------
-
-MessageDialog::MessageDialog(irr::core::stringw msg, MessageDialogType type, IConfirmDialogListener* listener, bool own_listener) :
-    ModalDialog(0.6f, 0.6f)
+// ----------------------------------------------------------------------------
+/** Complete constructor, which allows setting of listener, type etc.
+ *  \param msg The text to be shown in the dialog.
+ *  \param type The type of dialog (OK, confirm, ok/cancel, ...).
+ *  \param listener An optional listener object.
+ *  \param own_listener If true the dialog will free the listener.
+ *  \param from_queue If the object is placed into the DialogQueue. If so,
+ *         loadFromFile() is not called (it will be called when the dialog
+ *         is finally being removed from the queue and shown).
+ */
+MessageDialog::MessageDialog(const irr::core::stringw &msg,
+                             MessageDialogType type,
+                             IConfirmDialogListener* listener,
+                             bool own_listener, bool from_queue,
+                             float width, float height)
+             : ModalDialog(width, height)
 {
-    doInit(msg, type, listener, own_listener);
+    m_msg          = msg;
+    m_type         = type;
+    m_listener     = listener;
+    m_own_listener = own_listener;
+    doInit(from_queue);
+}   // MessageDialog(stringw, type, listener, own_listener)
+
+// ----------------------------------------------------------------------------
+/** Simple constructor for a notification message (i.e. only OK button shown).
+ *  \param msg The message to show.
+ *  \param from_queue If the object is placed into the DialogQueue. If so,
+ *         loadFromFile() is not called (it will be called when the dialog
+ *         is finally being removed from the queue and shown).
+ */
+MessageDialog::MessageDialog(const irr::core::stringw &msg, bool from_queue)
+             : ModalDialog(0.6f, 0.6f)
+{
+    m_msg          = msg;
+    m_type         = MessageDialog::MESSAGE_DIALOG_OK;
+    m_listener     = NULL;
+    m_own_listener = false;
+    if (!from_queue) doInit(false);
+}   // MessageDialog(stringw)
+
+// ----------------------------------------------------------------------------
+/** Called from the DialogQueue, used to load the actual xml file and init
+ *  the dialog.
+ */
+void MessageDialog::load()
+{
+    doInit(false);
 }
 
-// ------------------------------------------------------------------------------------------------------
-
-MessageDialog::MessageDialog(irr::core::stringw msg) :
-    ModalDialog(0.6f, 0.6f)
-{
-    doInit(msg, MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
-}
-
-// ------------------------------------------------------------------------------------------------------
-
-MessageDialog::~MessageDialog()
-{
-    if (m_own_listener) delete m_listener; m_listener = NULL;
-
-    if (StateManager::get()->getGameState() == GUIEngine::GAME)
-    {
-        World::getWorld()->scheduleUnpause();
-    }
-}
-
-// ------------------------------------------------------------------------------------------------------
-
-void MessageDialog::doInit(irr::core::stringw msg, MessageDialogType type,
-                           IConfirmDialogListener* listener, bool own_listener)
+// ----------------------------------------------------------------------------
+/** If necessary schedules a pause, and loads the xml file if necessary.
+ *  \param from_queue If the dialog is queued, do not load the xml file,
+ *         this will be done later in the case of a queued dialog.
+ */
+void MessageDialog::doInit(bool from_queue)
 {
     if (StateManager::get()->getGameState() == GUIEngine::GAME)
     {
         World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
     }
 
+    if (!from_queue)
+        loadFromFile("confirm_dialog.stkgui");
+}   // doInit
 
-    loadFromFile("confirm_dialog.stkgui");
+// ----------------------------------------------------------------------------
 
-    m_listener = listener;
-    m_own_listener = own_listener;
+MessageDialog::~MessageDialog()
+{
+    if (m_own_listener) delete m_listener; 
+    m_listener = NULL;
 
+    if (StateManager::get()->getGameState() == GUIEngine::GAME)
+    {
+        World::getWorld()->scheduleUnpause();
+    }
+}   // ~MessageDialog
+
+// ----------------------------------------------------------------------------
+void MessageDialog::loadedFromFile()
+{
     LabelWidget* message = getWidget<LabelWidget>("title");
-    message->setText( msg.c_str(), false );
+    message->setText( m_msg, false );
 
     // If the dialog is a simple 'OK' dialog, then hide the "Yes" button and
     // change "Cancel" to "OK"
-    if (type == MessageDialog::MESSAGE_DIALOG_OK)
+    if (m_type == MessageDialog::MESSAGE_DIALOG_OK)
     {
         ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
         yesbtn->setVisible(false);
@@ -85,16 +123,27 @@ void MessageDialog::doInit(irr::core::stringw msg, MessageDialogType type,
         cancelbtn->setText(_("OK"));
         cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
+    else if (m_type == MessageDialog::MESSAGE_DIALOG_YESNO)
+    {
+        ButtonWidget* cancelbtn = getWidget<ButtonWidget>("cancel");
+        cancelbtn->setText(_("No"));
+
+    }
+    else if (m_type == MessageDialog::MESSAGE_DIALOG_OK_CANCEL)
+    {
+        // In case of a OK_CANCEL dialog, change the text from 'Yes' to 'Ok'
+        ButtonWidget* yesbtn = getWidget<ButtonWidget>("confirm");
+        yesbtn->setText(_("OK"));
+    }
 }
 
-
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void MessageDialog::onEnterPressedInternal()
 {
 }
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& eventSource)
 {
@@ -129,7 +178,7 @@ GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& event
     return GUIEngine::EVENT_LET;
 }
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void MessageDialog::onUpdate(float dt)
 {

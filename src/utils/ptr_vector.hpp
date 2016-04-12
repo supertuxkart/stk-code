@@ -1,18 +1,21 @@
-/*
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
+//  SuperTuxKart - a fun racing game with go-kart
+//
+//  Copyright (C) 2009-2015 Marianne Gagnon
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License along
- with this program; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 
 /*
  *  I made this class to work like a regular vector, except that
@@ -94,9 +97,9 @@ public:
     }   // get
 
     // ------------------------------------------------------------------------
-    int size() const
+    unsigned int size() const
     {
-        return m_contents_vector.size();
+        return (int) m_contents_vector.size();
     }   // size
 
     // ------------------------------------------------------------------------
@@ -218,6 +221,26 @@ public:
 
     }   // remove
 
+    typename AlignedArray<TYPE*>::iterator begin()
+    {
+        return m_contents_vector.begin();
+    }
+
+    typename AlignedArray<TYPE*>::iterator end()
+    {
+        return m_contents_vector.end();
+    }
+
+    typename AlignedArray<TYPE*>::const_iterator begin() const
+    {
+        return m_contents_vector.begin();
+    }
+
+    typename AlignedArray<TYPE*>::const_iterator end() const
+    {
+        return m_contents_vector.end();
+    }
+
     // ------------------------------------------------------------------------
     /**
     * \brief Removes and deletes the given object.
@@ -274,7 +297,7 @@ public:
         {
             for(int j=(int)start; j<(int)m_contents_vector.size()-1; j++)
              {
-                 if(*(m_contents_vector[j])>*(m_contents_vector[j+1])) continue;
+                 if(*(m_contents_vector[j+1])<*(m_contents_vector[j])) continue;
                  // Now search the proper place for m_contents_vector[j+1]
                  // in the sorted section contentsVectot[start:j]
                  TYPE* t=m_contents_vector[j+1];
@@ -283,19 +306,25 @@ public:
                  {
                      m_contents_vector[i] = m_contents_vector[i-1];
                      i--;
-                 } while (i>start && *t>*(m_contents_vector[i-1]));
+                 } while (i>start && *(m_contents_vector[i-1]) <*t);
                  m_contents_vector[i]=t;
              }
          }
     }   // insertionSort
 
+    bool empty() const
+    {
+        return m_contents_vector.empty();
+    }
 
 };   // class ptrVector
 
 
-#define for_in( VAR, VECTOR ) for (int _foreach_i = 0; \
+#define for_in( VAR, VECTOR ) for (unsigned int _foreach_i = 0; \
            VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL),\
            _foreach_i < VECTOR.size(); _foreach_i++)
-
+#define for_var_in( TYPE, VAR, VECTOR ) TYPE VAR; for (unsigned int _foreach_i = 0; \
+    VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL), \
+    _foreach_i < VECTOR.size(); _foreach_i++)
 
 #endif

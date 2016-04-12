@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011  Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2011-2015  Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -23,11 +23,13 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 
 #include <stdexcept>
 
-ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,255,255),
-    m_max_start_color(255,255,255,255), m_name(file)
+ParticleKind::ParticleKind(const std::string &file) 
+            : m_min_start_color(255,255,255,255),
+              m_max_start_color(255,255,255,255), m_name(file)
 {
     // ---- Initial values to prevent readin uninitialized values
     m_max_size       = 0.5f;
@@ -51,10 +53,13 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     m_fade_away_end    = -1.0f;
     m_force_lost_to_gravity_time = 1000;
     m_emission_decay_rate = 0;
-    m_has_scale_affector = NULL;
+    m_has_scale_affector = false;
     m_scale_affector_factor_x = 0.0f;
     m_scale_affector_factor_y = 0.0f;
-
+    m_wind_speed = 0;
+    m_flips = false;
+    m_vertical_particles = false;
+    m_randomize_initial_y = false;
 
     // ----- Read XML file
 
@@ -78,6 +83,8 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     std::string emitterShape = "point";
     xml->get("emitter", &emitterShape);
 
+    xml->get("randomize-initial-y", &m_randomize_initial_y);
+
     if (emitterShape == "point")
     {
         m_shape = EMITTER_POINT;
@@ -98,7 +105,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     }
     else
     {
-        fprintf(stderr, "[ParticleKind] <particles> main node has unknown value for attribute 'emitter'\n");
+        Log::warn("ParticleKind", "<particles> main node has unknown value for attribute 'emitter'.");
         m_shape = EMITTER_POINT;
     }
 
@@ -162,12 +169,16 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     {
         size->get("min", &m_min_size);
         size->get("max", &m_max_size);
+
+        bool has_x = size->get("x-increase-factor", &m_scale_affector_factor_x) == 1;
+        bool has_y = size->get("y-increase-factor", &m_scale_affector_factor_y) == 1;
+        m_has_scale_affector = (has_x || has_y);
     }
     
-    bool has_x = size->get("x-increase-factor", &m_scale_affector_factor_x)==1;
-    bool has_y = size->get("y-increase-factor", &m_scale_affector_factor_y)==1;
-    m_has_scale_affector = (has_x || has_y);
-
+    else
+    {
+        m_has_scale_affector = false;
+    }
     //std::cout << "m_particle_size = " << m_particle_size << "\n";
     //std::cout << "m_min_size = " << m_min_size << "\n";
     //std::cout << "m_max_size = " << m_max_size << "\n";
@@ -219,8 +230,22 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         m_material_file = material_manager->getLatestMaterial()->getTexFname();
     }
 
+    // ------------------------------------------------------------------------
+
+    const XMLNode* wind = xml->getNode("wind");
+    if (wind != NULL)
+    {
+        wind->get("speed", &m_wind_speed);
+        wind->get("flips", &m_flips);
+    }
 
     // ------------------------------------------------------------------------
+
+    const XMLNode* orientation = xml->getNode("orientation");
+    if (orientation != NULL)
+    {
+        orientation->get("vertical", &m_vertical_particles);
+    }
 
     delete xml;
 }
@@ -240,8 +265,8 @@ Material* ParticleKind::getMaterial() const
     }
     else
     {
-        fprintf(stderr, "[ParticleKind] WARNING: particle image '%s' does not appear in the list of "
-                "currently known materials\n", m_material_file.c_str());
+        Log::warn("ParticleKind", "Particle image '%s' does not appear in the list of "
+                  "currently known materials.", m_material_file.c_str());
         return NULL;
     }
 }

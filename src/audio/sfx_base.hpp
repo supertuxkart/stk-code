@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Patrick Ammann <pammann@aro.ch>
-//  Copyright (C) 2008 Joerg Henrichs, Patrick Ammann
+//  Copyright (C) 2006-2015 Patrick Ammann <pammann@aro.ch>
+//  Copyright (C) 2008-2015 Joerg Henrichs, Patrick Ammann
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -42,27 +42,50 @@ class Vec3;
 class SFXBase : public NoCopy
 {
 public:
-    virtual           ~SFXBase()                       {}
+    /** Status of a sound effect. */
+    enum SFXStatus
+    {
+        SFX_UNKNOWN = -1, SFX_STOPPED = 0, SFX_PAUSED = 1, SFX_PLAYING = 2,
+        SFX_NOT_INITIALISED = 3
+    };
+
+    virtual           ~SFXBase()  {}
 
     /** Late creation, if SFX was initially disabled */
-    virtual bool       init() = 0;
+    virtual bool       init()                               = 0;
+    virtual bool       isLooped()                           = 0;
+    virtual void       updatePlayingSFX(float dt)           = 0;
+    virtual void       setPosition(const Vec3 &p)           = 0;
+    virtual void       reallySetPosition(const Vec3 &p)     = 0;
+    virtual void       setSpeedPosition(float factor, 
+                                        const Vec3 &p)      = 0;
+    virtual void       reallySetSpeedPosition(float f, 
+                                              const Vec3 &p)= 0;
+    virtual void       setLoop(bool status)                 = 0;
+    virtual void       reallySetLoop(bool status)           = 0;
+    virtual void       play()                               = 0;
+    virtual void       reallyPlayNow()                      = 0;
+    virtual void       play(const Vec3 &xyz)                = 0;
+    virtual void       reallyPlayNow(const Vec3 &xyz)       = 0;
+    virtual void       stop()                               = 0;
+    virtual void       reallyStopNow()                      = 0;
+    virtual void       pause()                              = 0;
+    virtual void       reallyPauseNow()                     = 0;
+    virtual void       resume()                             = 0;
+    virtual void       reallyResumeNow()                    = 0;
+    virtual void       deleteSFX()                          = 0;
+    virtual void       setSpeed(float factor)               = 0;
+    virtual void       reallySetSpeed(float factor)         = 0;
+    virtual void       setVolume(float gain)                = 0;
+    virtual void       reallySetVolume(float gain)          = 0;
+    virtual void       setMasterVolume(float gain)          = 0;
+    virtual void       reallySetMasterVolumeNow(float gain) = 0;
+    virtual void       onSoundEnabledBack()                 = 0;
+    virtual void       setRolloff(float rolloff)            = 0;
+    virtual const SFXBuffer* getBuffer() const              = 0;
+    virtual SFXStatus  getStatus()                          = 0;
 
-    virtual void       position(const Vec3 &position) = 0;
-    virtual void       setLoop(bool status)      = 0;
-    virtual void       play()                    = 0;
-    virtual void       stop()                    = 0;
-    virtual void       pause()                   = 0;
-    virtual void       resume()                  = 0;
-    virtual void       speed(float factor)       = 0;
-    virtual void       volume(float gain)        = 0;
-    virtual SFXManager::SFXStatus
-                       getStatus()               = 0;
-    virtual void       onSoundEnabledBack()      = 0;
-    virtual void       setRolloff(float rolloff) = 0;
-
-    virtual const SFXBuffer* getBuffer() const = 0;
-
-};   // SfxBase
+};   // SFXBase
 
 
 #endif // HEADER_SFX_HPP

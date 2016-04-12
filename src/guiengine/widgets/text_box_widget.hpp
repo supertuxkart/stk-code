@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -35,7 +35,7 @@ namespace GUIEngine
         virtual void onTextUpdated() = 0;
     };
     
-    /** \brief A text field widget. 
+    /** \brief A text field widget.
       * \ingroup widgetsgroup
       */
     class TextBoxWidget : public Widget
@@ -68,8 +68,12 @@ namespace GUIEngine
         void clearListeners();
         
         irr::core::stringw getText() const;
+        void setPasswordBox(bool passwordBox, wchar_t passwordChar = L'*');
         
         virtual void elementRemoved();
+
+        /** Override method from base class Widget */
+        virtual void setActive(bool active=true);
     };
 }
 

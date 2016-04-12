@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -32,7 +33,7 @@ class Vec3;
 class SFXBase;
 class ParticleEmitter;
 
-const float explosion_time = 1.5f;
+const float explosion_time = 2.0f;
 
 /**
   * \ingroup graphics
@@ -41,6 +42,7 @@ class Explosion : public HitSFX
 {
 private:
     float            m_remaining_time;
+    int              m_emission_frames;
     ParticleEmitter* m_emitter;
 
 public:

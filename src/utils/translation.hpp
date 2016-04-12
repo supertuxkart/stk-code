@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,15 +20,21 @@
 #define TRANSLATION_HPP
 
 #include <irrString.h>
-#include <vector>
+#include <map>
 #include <string>
+#include <utility>
+#include <vector>
+
 #include "utils/string_utils.hpp"
 
-#  include "tinygettext/tinygettext.hpp"
+#include "tinygettext/tinygettext.hpp"
 
 #  define _(String, ...)        (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__)))
 #undef _C
+#undef _P
 #  define _C(Ctx, String, ...)  (translations->fribidize(StringUtils::insertValues(translations->w_gettext(String, Ctx), ##__VA_ARGS__)))
+#  define _P(Singular, Plural, Num, ...) (translations->fribidize(StringUtils::insertValues(translations->w_ngettext(Singular, Plural, Num), Num, ##__VA_ARGS__)))
+#  define _CP(Ctx, Singular, Plural, Num, ...) (translations->fribidize(StringUtils::insertValues(translations->w_ngettext(Singular, Plural, Num, Ctx), Num, ##__VA_ARGS__)))
 #  define _LTR(String, ...)     (StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__))
 #  define gettext_noop(String)  (String)
 #  define N_(String)            (gettext_noop (String))
@@ -43,24 +49,44 @@ private:
     tinygettext::DictionaryManager m_dictionary_manager;
     tinygettext::Dictionary        m_dictionary;
 
-    irr::core::stringw m_converted_string;
+    /** A map that saves all fribidized strings: Original string, fribidized string */
+    std::map<const irr::core::stringw, const irr::core::stringw> m_fribidized_strings;
     bool m_rtl;
 
+    std::map<std::string, std::string> m_localized_name;
+
     std::string m_current_language_name;
+    std::string m_current_language_name_code;
 
 public:
                        Translations();
+                      ~Translations();
 
     const wchar_t     *w_gettext(const wchar_t* original, const char* context=NULL);
     const wchar_t     *w_gettext(const char* original, const char* context=NULL);
+
+    const wchar_t     *w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context=NULL);
+    const wchar_t     *w_ngettext(const char* singular, const char* plural, int num, const char* context=NULL);
 
     bool               isRTLLanguage() const;
     const wchar_t*     fribidize(const wchar_t* in_ptr);
     const wchar_t*     fribidize(const irr::core::stringw &str) { return fribidize(str.c_str()); }
 
+    bool               isRTLText(const wchar_t* in_ptr);
+    bool               isRTLText(const irr::core::stringw &str) { return isRTLText(str.c_str()); }
+
     const std::vector<std::string>* getLanguageList() const;
 
-    std::string        getCurrentLanguageName();
+    std::set<wchar_t>        getCurrentAllChar();
+
+    std::string              getCurrentLanguageName();
+
+    std::string              getCurrentLanguageNameCode();
+
+    const std::string&       getLocalizedName(const std::string& str) const;
+
+private:
+    irr::core::stringw fribidizeLine(const irr::core::stringw &str);
 };   // Translations
 
 

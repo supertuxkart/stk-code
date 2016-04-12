@@ -1,7 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="2%" y="5%" width="100%" height="95%" layout="vertical-row" id="div">
-        <roundedbox id="result-table" width="90%" proportion="1" align="center">
-            <!-- Contents is added programatically -->
+        <roundedbox width="90%" proportion="1" align="center">
+            <div id="result-table" width="96%" height="96%" x="2%" y="2%">
+                <!-- Contents is added programatically -->
+            </div>
         </roundedbox>
         <spacer height="10" width="96%"/>
         <!-- The actual button texts will vary depending on what type of race

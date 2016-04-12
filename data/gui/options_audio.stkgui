@@ -1,70 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-
-<div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
-
-    <header text_align="center" width="80%" align="center" text="SuperTuxKart Options"/>
-    <spacer height="15" width="10"/>
-    
-    <tabs id="options_choice" height="10%" max_height="110" x="2%" width="98%"" align="center">
-        <icon-button id="tab_video" width="128" height="128" icon="gui/options_video.png"/>
-        <icon-button id="tab_audio" width="128" height="128" icon="gui/options_audio.png"
-                I18N="Section in the settings menu" text="Audio"/>
-        <icon-button id="tab_ui" width="128" height="128" icon="gui/options_ui.png"/>
-        <icon-button id="tab_players" width="128" height="128" icon="gui/options_players.png"/>
-        <icon-button id="tab_controls" width="128" height="128" icon="gui/options_input.png"/>
-    </tabs>
-    
-    <box proportion="1" width="100%" layout="vertical-row">
-        
-        <spacer height="5" width="10"/>
-        
-        <!-- ******** Music ******** -->
-        <label width="100%" I18N="Section in the audio/video settings submenu" text="Music"/>
-        
-        <div width="75%" height="fit" layout="horizontal-row" >
-            <label proportion="1" height="100%" text_align="right" I18N="Next to checkbox in settings menu" text="Enabled"/>
-            
-            <div proportion="1" height="fit" layout="horizontal-row" >
-                <spacer width="40" height="100%" />
-                <!-- FIXME: don't hardcode height -->
-                <checkbox id="music_enabled" width="40" height="40"/>
-            </div>
-        </div>
-        <div width="75%" height="fit" layout="horizontal-row" >
-            <label proportion="1" height="100%" text_align="right" I18N="Music volume in options" text="Volume"/>
-            <div proportion="1" height="fit" layout="horizontal-row" >
-                <spacer width="40" height="100%" />
-                <gauge id="music_volume" proportion="1" min_value="1" max_value="10"/>
-            </div>
-        </div>
-        
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row">
+        <header text_align="center" width="80%" align="center" text="SuperTuxKart Options"/>
         <spacer height="15" width="10"/>
-        
-        <!-- ******** SFX ******** -->
-        <label width="100%" I18N="Section in audio/video settings submenu" text="Sound Effects"/>
-                    
-        <div width="75%" height="fit" layout="horizontal-row" >
-            <label proportion="1" height="100%" text_align="right" I18N="Next to checkbox in settings menu" text="Enabled"/>
-            <div proportion="1" height="fit" layout="horizontal-row" >
-                <spacer width="40" height="100%" />
-                <!-- FIXME: don't hardcode height -->
-                <checkbox id="sfx_enabled" width="40" height="40"/>
-            </div>
-        </div>
-        <div width="75%" height="fit" layout="horizontal-row" >
-            <label proportion="1" height="100%" text_align="right" I18N="Sound volume in options" text="Volume"/>
-            <div proportion="1" height="fit" layout="horizontal-row" >
-                <spacer width="40" height="100%" />
-                <gauge id="sfx_volume" proportion="1" min_value="1" max_value="10"/>
-            </div>
-        </div>
-        
-        
-        <spacer height="20" width="10"/>
-        
-    </box>
-</div>
 
-<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+        <tabs id="options_choice" height="10%" max_height="110" x="2%" width="98%" align="center">
+            <icon-button id="tab_video" width="128" height="128" icon="gui/options_video.png"/>
+            <icon-button id="tab_audio" width="128" height="128" icon="gui/options_audio.png"
+                    I18N="Section in the settings menu" text="Audio"/>
+            <icon-button id="tab_ui" width="128" height="128" icon="gui/options_ui.png"/>
+            <icon-button id="tab_players" width="128" height="128" icon="gui/options_players.png"/>
+            <icon-button id="tab_controls" width="128" height="128" icon="gui/options_input.png"/>
+        </tabs>
 
+        <box proportion="1" width="100%" layout="vertical-row">
+
+            <spacer height="5" width="10"/>
+
+            <!-- ******** Music ******** -->
+            <label width="100%" I18N="In the audio options screen" text="Music"/>
+
+            <div width="75%" height="fit" layout="horizontal-row" >
+                <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Enabled"/>
+
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <spacer width="40" height="100%" />
+                    <!-- FIXME: don't hardcode height -->
+                    <checkbox id="music_enabled" width="40" height="40"/>
+                </div>
+            </div>
+            <div width="75%" height="fit" layout="horizontal-row" >
+                <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Volume"/>
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <spacer width="40" height="100%" />
+                    <gauge id="music_volume" proportion="1" min_value="1" max_value="10"/>
+                </div>
+            </div>
+
+            <spacer height="15" width="10"/>
+
+            <!-- ******** SFX ******** -->
+            <label width="100%" I18N="In the audio options screen" text="Sound Effects"/>
+
+            <div width="75%" height="fit" layout="horizontal-row" >
+                <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Enabled"/>
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <spacer width="40" height="100%" />
+                    <!-- FIXME: don't hardcode height -->
+                    <checkbox id="sfx_enabled" width="40" height="40"/>
+                </div>
+            </div>
+            <div width="75%" height="fit" layout="horizontal-row" >
+                <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Volume"/>
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <spacer width="40" height="100%" />
+                    <gauge id="sfx_volume" proportion="1" min_value="1" max_value="10"/>
+                </div>
+            </div>
+
+            <spacer height="20" width="10"/>
+
+        </box>
+    </div>
+
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 </stkgui>

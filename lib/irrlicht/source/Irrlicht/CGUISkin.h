@@ -224,6 +224,10 @@ namespace gui
 		//! scripting languages, editors, debuggers or xml deserialization purposes.
 		virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options=0);
 
+        virtual void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
+            const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+            const video::SColor* const colors, bool useAlphaChannelOfTexture);
+
 	private:
 
 		video::SColor Colors[EGDC_COUNT];

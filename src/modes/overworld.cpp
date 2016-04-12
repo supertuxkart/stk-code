@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,23 +15,28 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "modes/overworld.hpp"
+
 #include "audio/music_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
+#include "input/keyboard_device.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/rescue_animation.hpp"
-#include "modes/overworld.hpp"
+#include "physics/btKart.hpp"
 #include "physics/physics.hpp"
-#include "network/network_manager.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
-#include "states_screens/kart_selection.hpp"
+#include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/race_gui_overworld.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_object_manager.hpp"
 
 //-----------------------------------------------------------------------------
 OverWorld::OverWorld() : WorldWithRank()
@@ -51,8 +56,7 @@ OverWorld::~OverWorld()
 /** Function to simplify the start process */
 void OverWorld::enterOverWorld()
 {
-
-    race_manager->setNumLocalPlayers(1);
+    race_manager->setNumPlayers(1);
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);
     race_manager->setNumKarts( 1 );
@@ -60,36 +64,36 @@ void OverWorld::enterOverWorld()
     race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
 
     // Use keyboard 0 by default (FIXME: let player choose?)
-    InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
+    InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
 
     // Create player and associate player with keyboard
-    StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+    StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
                                             device);
 
     if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
     {
-        Log::warn("overworld", "cannot find kart '%s', "
-                  "will revert to default\n",
+        Log::warn("[overworld]", "cannot find kart '%s', "
+                  "will revert to default",
                   UserConfigParams::m_default_kart.c_str());
 
         UserConfigParams::m_default_kart.revertToDefaults();
     }
-    race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+    race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
 
     // ASSIGN should make sure that only input from assigned devices
     // is read.
-    input_manager->getDeviceList()->setAssignMode(ASSIGN);
-    input_manager->getDeviceList()
+    input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+    input_manager->getDeviceManager()
         ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
     StateManager::get()->enterGameState();
-    network_manager->setupPlayerKartInfo();
+    race_manager->setupPlayerKartInfo();
     race_manager->startNew(false);
     if(race_manager->haveKartLastPositionOnOverworld()){
-			OverWorld *ow = (OverWorld*)World::getWorld();
-			ow->getKart(0)->setXYZ(race_manager->getKartLastPositionOnOverworld());
-			ow->moveKartAfterRescue(ow->getKart(0));
-		}
+            OverWorld *ow = (OverWorld*)World::getWorld();
+            ow->getKart(0)->setXYZ(race_manager->getKartLastPositionOnOverworld());
+            ow->moveKartAfterRescue(ow->getKart(0));
+        }
     irr_driver->showPointer(); // User should be able to click on the minimap
 
 }   // enterOverWorld
@@ -110,13 +114,13 @@ void OverWorld::update(float dt)
         // so we have to start music 'manually', since we skip all phases.
         World::getWorld()->getTrack()->startMusic();
 
-        if (music_manager->getCurrentMusic() != NULL &&
-            UserConfigParams::m_music)
-            music_manager->getCurrentMusic()->startMusic();
+        if (UserConfigParams::m_music)
+            music_manager->startMusic();
         m_karts[0]->startEngineSFX();
     }
     WorldWithRank::update(dt);
-    const unsigned int kart_amount  = m_karts.size();
+    WorldWithRank::updateTrack(dt);
+    const unsigned int kart_amount  = (unsigned int)m_karts.size();
 
     // isn't it cool, on the overworld nitro is free!
     for(unsigned int n=0; n<kart_amount; n++)
@@ -124,17 +128,68 @@ void OverWorld::update(float dt)
         m_karts[n]->setEnergy(100.0f);
     }
 
+    /*
+    TrackObjectManager* tom = getTrack()->getTrackObjectManager();
+    PtrVector<TrackObject>& objects = tom->getObjects();
+    for(unsigned int i=0; i<objects.size(); i++)
+    {
+        TrackObject* obj = objects.get(i);
+        if(!obj->isGarage())
+            continue;
+
+        float m_distance = obj->getDistance();
+        Vec3 m_garage_pos = obj->getPosition();
+        Vec3 m_kart_pos = getKart(0)->getXYZ();
+
+        if ((m_garage_pos-m_kart_pos).length_2d() > m_distance)
+        {
+            obj->reset();
+        }
+    }
+    */
+
     if (m_return_to_garage)
     {
         m_return_to_garage = false;
-        delayedSelfDestruct();
-        race_manager->exitRace(false);
-        KartSelectionScreen* s = KartSelectionScreen::getInstance();
+        race_manager->exitRace();
+        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
         s->setMultiplayer(false);
         s->setFromOverworld(true);
         StateManager::get()->resetAndGoToScreen(s);
+        throw AbortWorldUpdateException();
     }
 }   // update
+
+// ----------------------------------------------------------------------------
+/** Finds the starting position which is closest to the kart.
+ *  \param kart The kart for which a rescue position needs to be determined.
+ */
+unsigned int OverWorld::getRescuePositionIndex(AbstractKart *kart)
+{
+    // find closest point to drop kart on
+    const int start_spots_amount = getNumberOfRescuePositions();
+    assert(start_spots_amount > 0);
+
+    int closest_id = -1;
+    float closest_distance = 999999999.0f;
+
+    for (int n=0; n<start_spots_amount; n++)
+    {
+        const btTransform &s = getStartTransform(n);
+        const Vec3 &v = s.getOrigin();
+
+        float abs_distance = (v - kart->getXYZ()).length();
+
+        if (abs_distance < closest_distance)
+        {
+            closest_distance = abs_distance;
+            closest_id = n;
+        }
+    }
+
+    assert(closest_id != -1);
+    return closest_id;
+}   // getRescuePositionIndex
 
 //-----------------------------------------------------------------------------
 /** This function is not used in the overworld race gui.
@@ -144,15 +199,6 @@ void OverWorld::getKartsDisplayInfo(
 {
     assert(false);
 }   // getKartsDisplayInfo
-
-//-----------------------------------------------------------------------------
-/** Override the base class method to change behavior. We don't want wrong
- *  direction messages in the overworld since there is no direction there.
- *  \param i Kart id.
- */
-void OverWorld::checkForWrongDirection(unsigned int i)
-{
-}   // checkForWrongDirection
 
 //-----------------------------------------------------------------------------
 
@@ -178,10 +224,6 @@ void OverWorld::onFirePressed(Controller* who)
 
     for (unsigned int n=0; n<challenges.size(); n++)
     {
-        if ( challenges[n].isForceFieldSet() &&
-             challenges[n].getForceField().m_is_locked )
-            continue;
-
         if ( (kart_xyz - Vec3(challenges[n].m_position)).length2_2d()
               < CHALLENGE_DISTANCE_SQUARED)
         {
@@ -192,9 +234,22 @@ void OverWorld::onFirePressed(Controller* who)
             }
             else
             {
-                race_manager->setKartLastPositionOnOverworld(kart_xyz);
-                new SelectChallengeDialog(0.8f, 0.8f,
-                                          challenges[n].m_challenge_id);
+                const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
+                if (challenge == NULL)
+                {
+                    Log::error("track", "Cannot find challenge named '%s'\n",
+                        challenges[n].m_challenge_id.c_str());
+                    continue;
+                }
+
+                const unsigned int val = challenge->getNumTrophies();
+                bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+                if (unlocked)
+                {
+                    race_manager->setKartLastPositionOnOverworld(kart_xyz);
+                    new SelectChallengeDialog(0.8f, 0.8f,
+                        challenges[n].m_challenge_id);
+                }
             }
         } // end if
     } // end for
@@ -218,6 +273,7 @@ void OverWorld::onMouseClick(int x, int y)
         // be the location of the challenge bubble.
         AbstractKart* kart = getKart(0);
         kart->setXYZ(challenge->m_position);
+        kart->getVehicle()->capSpeed(0);
 
         unsigned int index   = getRescuePositionIndex(kart);
         btTransform s        = getRescueTransform(index);

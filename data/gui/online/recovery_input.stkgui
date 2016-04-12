@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="5%" width="96%" height="90%" layout="vertical-row" >
+        <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"
+            I18N="In the recovery dialog" text="Account Recovery"/>
+
+        <spacer height="20" width="50"/>
+
+        <label id="message" proportion="2" width="90%" align="center" text_align="left" word_wrap="true"
+            text="Fill in the username and email address you supplied at registration to be able to reset your password."/>
+
+        <spacer height="40" width="50"/>
+
+        <div width="80%" align="center" layout="vertical-row" height="fit">
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the recovery dialog" text="Username"/>
+                <textbox proportion="2" id="username" I18N="In the recovery dialog"/>
+            </div>
+
+            <spacer height="20" width="20"/>
+
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" text_align="left" I18N="In the recovery dialog" text="Email"/>
+                <textbox proportion="2" id="email" I18N="In the recovery dialog"/>
+            </div>
+
+        </div>
+
+        <spacer height="20" width="50"/>
+
+        <label id="info" proportion="1" width="90%" align="center" text_align="center" word_wrap="true"
+           I18N="In the recovery dialog" text=""/>
+
+        <spacer height="20" width="50"/>
+
+        <buttonbar id="options" width="25%" proportion="1" align="center">
+            <icon-button id="submit" width="64" height="64" icon="gui/green_check.png"
+                I18N="In the recovery dialog" text="Submit" label_location="none"/>
+            <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
+                I18N="In the recovery dialog"  text="Cancel" label_location="none"/>
+        </buttonbar>
+    </div>
+</stkgui>

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -55,10 +55,14 @@ namespace GUIEngine
      */
     class EventHandler : public irr::IEventReceiver
     {
+        /** This variable is used to ignore events during the initial load screen, so that
+            a player cannot trigger an action by clicking on the window during loading screen
+            for example */
+        bool m_accept_events;
+        
         EventPropagation onGUIEvent(const irr::SEvent& event);
         EventPropagation onWidgetActivated(Widget* w, const int playerID);
-        void navigateUp(const int playerID, Input::InputType type, const bool pressedDown);
-        void navigateDown(const int playerID, Input::InputType type, const bool pressedDown);
+        void navigate(const int playerID, Input::InputType type, const bool pressedDown, const bool reverse);
 
         /** \brief          send an event to the GUI module user's event callback
           * \param widget   the widget that triggerred this event
@@ -97,6 +101,8 @@ namespace GUIEngine
         /** singleton access */
         static EventHandler* get();
         static void deallocate();
+        
+        void startAcceptingEvents() { m_accept_events = true; }
     };
 
 }

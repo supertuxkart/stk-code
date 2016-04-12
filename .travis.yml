@@ -1,0 +1,58 @@
+# Travis-CI configuration file for SuperTuxKart
+#
+# Configuration manual:
+# http://docs.travis-ci.com/user/build-configuration/
+#
+sudo: false
+language: cpp
+compiler:
+  - gcc
+  - clang
+
+matrix:
+  fast_finish: true
+
+env:
+  matrix:
+    - BUILD_TYPE="Debug"
+    - BUILD_TYPE="Release"
+
+addons:
+  apt:
+    packages:
+    - build-essential
+    - libogg-dev
+    - libvorbis-dev
+    - libopenal-dev
+    - libxxf86vm-dev
+    - libcurl4-openssl-dev
+    - libfribidi-dev
+    - libbluetooth-dev
+    - libgl1-mesa-dev
+    - libglu1-mesa-dev
+    - libglew-dev
+    - cmake
+
+before_script:
+  - export THREADS=$((`nproc` + 1))
+  - echo "THREADS = $THREADS"
+  - free -mt
+
+script:
+  - mkdir "build"
+  - cd "build"
+  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCHECK_ASSETS=off
+  - make VERBOSE=1 -j $THREADS
+
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#supertuxkart"
+    skip_join: false
+    use_notice: true
+    template:
+      #- "[%{commit}: %{author}] %{message}"
+      #- "%{build_url}"
+      - "[%{repository}#%{branch} @%{commit}] %{author}): %{message}"
+      - "Diff: %{compare_url}"
+      - "Build: %{build_url}"

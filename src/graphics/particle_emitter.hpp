@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011  Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2011-2015  Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -47,6 +47,8 @@ class ParticleEmitter : public NoCopy
 {
 private:
 
+    bool                             m_is_glsl;
+
     /** Irrlicht's particle systems. */
     scene::IParticleSystemSceneNode *m_node;
 
@@ -72,6 +74,9 @@ private:
     /** The irrlicht emitter contains this info, but as an int. We want it as a float */
     float m_min_rate, m_max_rate;
 
+    bool m_randomize_initial_y;
+
+    bool m_important;
 
 public:
 
@@ -79,7 +84,9 @@ public:
 
     ParticleEmitter             (const ParticleKind* type,
                                  const Vec3 &position,
-                                 scene::ISceneNode* parent = NULL);
+                                 scene::ISceneNode* parent = NULL,
+                                 bool randomize_initial_y =  false,
+                                 bool important = false);
     virtual     ~ParticleEmitter();
     virtual void update         (float dt);
     void         setCreationRateAbsolute(float fraction);
@@ -102,6 +109,8 @@ public:
     void         unsetNode() { m_node = NULL; }
 
     void         addHeightMapAffector(Track* t);
+
+    bool         randomizeInitialY() const { return m_randomize_initial_y; }
 };
 #endif
 

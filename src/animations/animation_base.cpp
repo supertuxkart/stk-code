@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009  Joerg Henrichs
+//  Copyright (C) 2009-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,14 +21,10 @@
 #include "animations/ipo.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "utils/vs.hpp"
 
 #include <algorithm>
-
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
+#include <cmath>
 
 
 AnimationBase::AnimationBase(const XMLNode &node)
@@ -37,6 +33,8 @@ AnimationBase::AnimationBase(const XMLNode &node)
     node.get("fps", &fps);
     for(unsigned int i=0; i<node.getNumNodes(); i++)
     {
+        if (node.getNode(i)->getName() == "animated-texture")
+            continue;
         Ipo *ipo = new Ipo(*node.getNode(i), fps);
         m_all_ipos.push_back(ipo);
     }
@@ -69,8 +67,7 @@ AnimationBase::AnimationBase(Ipo *ipo)
 void AnimationBase::setInitialTransform(const Vec3 &xyz,
                                         const Vec3 &hpr)
 {
-    Ipo* curr;
-    for_in (curr, m_all_ipos)
+    for_var_in(Ipo*, curr, m_all_ipos)
     {
         curr->setInitialTransform(xyz, hpr);
     }
@@ -82,8 +79,7 @@ void AnimationBase::setInitialTransform(const Vec3 &xyz,
 void AnimationBase::reset()
 {
     m_current_time = 0;
-    Ipo* curr;
-    for_in (curr, m_all_ipos)
+    for_var_in(Ipo*, curr, m_all_ipos)
     {
         curr->reset();
     }
@@ -97,16 +93,15 @@ void AnimationBase::reset()
  */
 void AnimationBase::update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
 {
-    assert(!isnan(m_current_time));
+    assert(!std::isnan(m_current_time));
 
     // Don't do anything if the animation is disabled
     if(!m_playing) return;
     m_current_time += dt;
 
-    assert(!isnan(m_current_time));
+    assert(!std::isnan(m_current_time));
 
-    Ipo* curr;
-    for_in (curr, m_all_ipos)
+    for_var_in (Ipo*, curr, m_all_ipos)
     {
         curr->update(m_current_time, xyz, hpr, scale);
     }

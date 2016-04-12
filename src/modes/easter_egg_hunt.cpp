@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
  */
-EasterEggHunt::EasterEggHunt() : WorldWithRank()
+EasterEggHunt::EasterEggHunt() : LinearWorld()
 {
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = true;
@@ -36,13 +36,13 @@ EasterEggHunt::EasterEggHunt() : WorldWithRank()
  */
 void EasterEggHunt::init()
 {
-    WorldWithRank::init();
+    LinearWorld::init();
     m_display_rank = false;
 
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
     {
-        fprintf(stderr, "No AI exists for this game mode\n");
+        Log::error("EasterEggHunt]", "No AI exists for this game mode");
         exit(1);
     }
 
@@ -70,7 +70,7 @@ void EasterEggHunt::readData(const std::string &filename)
 
     if(easter->getName()!="EasterEggHunt")
     {
-        printf("Can't load easter egg file '%s' - no EasterEggHunt element.",
+        Log::error("[EasterEggHunt]", "Can't load easter egg file '%s' - no EasterEggHunt element.",
                 filename.c_str());
         delete easter;
         return;
@@ -121,7 +121,7 @@ void EasterEggHunt::readData(const std::string &filename)
         const XMLNode *egg = data->getNode(i);
         if(egg->getName()!="easter-egg")
         {
-            printf("Unknown node '%s' in easter egg level '%s' - ignored.\n",
+            Log::warn("[EasterEggHunt]", "Unknown node '%s' in easter egg level '%s' - ignored.",
                    egg->getName().c_str(),
                    race_manager->getDifficultyAsString(act_difficulty).c_str());
             continue;
@@ -160,8 +160,8 @@ void EasterEggHunt::collectedEasterEgg(const AbstractKart *kart)
  */
 void EasterEggHunt::update(float dt)
 {
-    WorldWithRank::update(dt);
-    WorldWithRank::updateTrack(dt);
+    LinearWorld::update(dt);
+    LinearWorld::updateTrack(dt);
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -181,7 +181,7 @@ bool EasterEggHunt::isRaceOver()
  */
 void EasterEggHunt::reset()
 {
-    WorldWithRank::reset();
+    LinearWorld::reset();
 
     for(unsigned int i=0; i<m_eggs_collected.size(); i++)
         m_eggs_collected[i] = 0;
@@ -199,10 +199,32 @@ void EasterEggHunt::getKartsDisplayInfo(
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         //I18n: number of collected eggs / overall number of eggs
-        rank_info.m_text = StringUtils::insertValues(_("Eggs: %d / %d"),
-                                                    m_eggs_collected[i],
-                                                    m_number_of_eggs);
+        rank_info.m_text = _("Eggs: %d / %d", m_eggs_collected[i],
+                                              m_number_of_eggs);
         rank_info.m_color = video::SColor(255, 255, 255, 255);
     }
 }   // getKartDisplayInfo
+//-----------------------------------------------------------------------------
+/** Override the base class method to change behavior. We don't want wrong
+ *  direction messages in the easter egg mode since there is no direction there.
+ *  \param i Kart id.
+ */
+void EasterEggHunt::checkForWrongDirection(unsigned int i, float dt)
+{
+}   // checkForWrongDirection
 
+//-----------------------------------------------------------------------------
+
+void EasterEggHunt::terminateRace()
+{
+    m_karts[0]->getControls().reset();
+    WorldWithRank::terminateRace();
+}
+//-----------------------------------------------------------------------------
+/** In Easter Egg mode the finish time is just the time the race is over,
+ *  since there are no AI karts.
+ */
+float EasterEggHunt::estimateFinishTimeForKart(AbstractKart* kart)
+{
+    return getTime();
+}   // estimateFinishTimeForKart

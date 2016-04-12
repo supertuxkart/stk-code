@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,13 +21,17 @@
 
 #include "btBulletDynamicsCommon.h"
 
+#include <SColor.h>
 #include "utils/vec3.hpp"
+#include <map>
+#include <vector>
 
 /**
   * \ingroup physics
   */
 class IrrDebugDrawer : public btIDebugDraw
 {
+public:
     /** The drawing mode to use:
      *  If bit 0 is set, draw the bullet collision shape of karts
      *  If bit 1 is set, don't draw the kart graphics
@@ -37,6 +41,11 @@ class IrrDebugDrawer : public btIDebugDraw
                                     DM_NO_KARTS_GRAPHICS = 0x02
                                   };
     DebugModeType   m_debug_mode;
+
+    std::map<video::SColor, std::vector<float> > m_lines;
+
+    Vec3 m_camera_pos;
+
 protected:
     virtual void    setDebugMode(int debug_mode) {}
     /** Callback for bullet: if debug drawing should be done or not.
@@ -63,6 +72,10 @@ public:
     /** Returns true if debug mode is enabled. */
     bool            debugEnabled() const         {return m_debug_mode!=0;}
     void            nextDebugMode();
+    void            setDebugMode(DebugModeType mode);
+
+    void            beginNextFrame();
+    const std::map<video::SColor, std::vector<float> >& getLines() const { return m_lines; }
 };   // IrrDebugDrawer
 
 #endif

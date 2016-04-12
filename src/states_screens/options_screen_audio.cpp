@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -27,10 +28,10 @@
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/options_screen_input.hpp"
-#include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/user_screen.hpp"
 #include "utils/translation.hpp"
 
 #include <iostream>
@@ -58,7 +59,8 @@ void OptionsScreenAudio::init()
 {
     Screen::init();
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL)  ribbon->select( "tab_audio", PLAYER_ID_GAME_MASTER );
+    assert(ribbon != NULL);
+    ribbon->select( "tab_audio", PLAYER_ID_GAME_MASTER );
 
     ribbon->getRibbonChildren()[0].setTooltip( _("Graphics") );
     ribbon->getRibbonChildren()[2].setTooltip( _("User Interface") );
@@ -69,7 +71,7 @@ void OptionsScreenAudio::init()
     SpinnerWidget* gauge = this->getWidget<SpinnerWidget>("sfx_volume");
     assert(gauge != NULL);
 
-    gauge->setValue( (int)(sfx_manager->getMasterSFXVolume()*10.0f) );
+    gauge->setValue( (int)(SFXManager::get()->getMasterSFXVolume()*10.0f) );
 
 
     gauge = this->getWidget<SpinnerWidget>("music_volume");
@@ -102,13 +104,21 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
 {
     if (name == "options_choice")
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
-        else if (selection == "tab_video") StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
-        else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
-        else if (selection == "tab_controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
-        else if (selection == "tab_ui") StateManager::get()->replaceTopMostScreen(OptionsScreenUI::getInstance());
+        Screen *screen = NULL;
+        //if (selection == "tab_audio")
+        //    screen = OptionsScreenAudio::getInstance();
+        if (selection == "tab_video")
+            screen = OptionsScreenVideo::getInstance();
+        else if (selection == "tab_players")
+            screen = TabbedUserScreen::getInstance();
+        else if (selection == "tab_controls")
+            screen = OptionsScreenInput::getInstance();
+        else if (selection == "tab_ui")
+            screen = OptionsScreenUI::getInstance();
+        if(screen)
+            StateManager::get()->replaceTopMostScreen(screen);
     }
     else if(name == "back")
     {
@@ -128,10 +138,10 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
         assert(w != NULL);
 
-        if (sample_sound == NULL) sample_sound = sfx_manager->createSoundSource( "pre_start_race" );
-        sample_sound->volume(1);
+        if (sample_sound == NULL) sample_sound = SFXManager::get()->createSoundSource( "pre_start_race" );
+        sample_sound->setVolume(1);
 
-        sfx_manager->setMasterSFXVolume( w->getValue()/10.0f );
+        SFXManager::get()->setMasterSFXVolume( w->getValue()/10.0f );
         UserConfigParams::m_sfx_volume = w->getValue()/10.0f;
 
         // play a sample sound to show the user what this volume is like
@@ -142,23 +152,23 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
 
         UserConfigParams::m_music = w->getState();
-        std::cout << "music state is now " << (bool)UserConfigParams::m_music << std::endl;
+        Log::info("OptionsScreenAudio", "Music is now %s", ((bool) UserConfigParams::m_music) ? "on" : "off");
 
         if(w->getState() == false)
             music_manager->stopMusic();
         else
-            music_manager->startMusic(music_manager->getCurrentMusic());
+            music_manager->startMusic();
     }
     else if(name == "sfx_enabled")
     {
         CheckBoxWidget* w = dynamic_cast<CheckBoxWidget*>(widget);
 
         UserConfigParams::m_sfx = w->getState();
-        sfx_manager->soundToggled(UserConfigParams::m_sfx);
+        SFXManager::get()->toggleSound(UserConfigParams::m_sfx);
 
         if (UserConfigParams::m_sfx)
         {
-            sfx_manager->quickSound("horn");
+            SFXManager::get()->quickSound("horn");
         }
     }
 }   // eventCallback

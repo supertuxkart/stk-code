@@ -1,6 +1,6 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006
+//
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,38 +16,49 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <string>
+#ifndef KART_SELECTION_INCLUDED
+#define KART_SELECTION_INCLUDED
+
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
+#include "guiengine/widgets/player_kart_widget.hpp"
 #include "states_screens/state_manager.hpp"
 
 namespace GUIEngine
 {
     class Widget;
     class BubbleWidget;
+    enum EventPropagation;
 }
+namespace Online
+{
+    class User;
+    class OnlineProfile;
+}
+
 class InputDevice;
-class PlayerKartWidget;
 class KartHoverListener;
+
+extern int g_root_id;
 
 /**
   * \brief screen where players can choose their kart
   * \ingroup states_screens
   */
-class KartSelectionScreen : public GUIEngine::Screen,
-                         public GUIEngine::ScreenSingleton<KartSelectionScreen>
+class KartSelectionScreen : public GUIEngine::Screen
 {
     friend class KartHoverListener;
     friend class PlayerNameSpinner;
     friend class FocusDispatcher;
-
+protected:
     /** Contains the custom widget shown for every player. (ref only since
      *  we're adding them to a Screen, and the Screen will take ownership
      *  of these widgets)
      */
-    PtrVector<PlayerKartWidget, REF> m_kart_widgets;
+    PtrVector<GUIEngine::PlayerKartWidget, REF> m_kart_widgets;
 
     friend class GUIEngine::ScreenSingleton<KartSelectionScreen>;
-    friend class PlayerKartWidget;
+    friend class GUIEngine::PlayerKartWidget;
 
     bool m_multiplayer;
 
@@ -56,18 +67,19 @@ class KartSelectionScreen : public GUIEngine::Screen,
 
     bool m_go_to_overworld_next;
 
-
-    KartSelectionScreen();
+    bool m_must_delete_on_back; //!< To delete the screen if back is pressed
 
     /** Stores whether any player confirmed their choice; then, some things
       * are "frozen", for instance the selected kart group tab
       */
     bool m_game_master_confirmed;
 
-    PlayerKartWidget* m_removed_widget;
+    GUIEngine::PlayerKartWidget* m_removed_widget;
 
     /** Message shown in multiplayer mode */
     GUIEngine::BubbleWidget* m_multiplayer_message;
+
+    KartSelectionScreen(const char* filename);
 
     /** Called when all players selected their kart */
     void allPlayersDone();
@@ -90,9 +102,28 @@ class KartSelectionScreen : public GUIEngine::Screen,
     /** Fill the ribbon with the karts from the currently selected group */
     void setKartsFromCurrentGroup();
 
-    void playerConfirm(const int playerID);
+    virtual void playerConfirm(const int playerID);
 
+    void updateKartStats(uint8_t widget_id,
+                         const std::string& selection);
+
+    /** updates model of a kart widget, to have the good selection when the
+     *  user validates */
+    void updateKartWidgetModel(int widget_id,
+                const std::string& selection,
+                const irr::core::stringw& selectionText);
+
+    /** Adds a message to the screen which indicates that players must press fire to join. */
+    void addMultiplayerMessage();
+
+    /** Remove the multiplayer message. */
+    void removeMultiplayerMessage();
+
+    /** Stores a pointer to the current selection screen */
+    static KartSelectionScreen* m_instance_ptr;
 public:
+    /** Returns the current instance */
+    static KartSelectionScreen* getRunningInstance();
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
@@ -106,7 +137,7 @@ public:
 
     /** \brief Called when a player hits 'fire'/'select' on his device to
      *  join the game */
-    bool playerJoin(InputDevice* device, bool firstPlayer);
+    bool joinPlayer(InputDevice* device);
 
     /**
       * \brief Called when a player hits 'rescue'/'cancel' on his device
@@ -128,7 +159,7 @@ public:
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
+    virtual void onUpdate(float dt) OVERRIDE;
 
     /** \brief implement optional callback from parent
      *  class GUIEngine::Screen */
@@ -139,3 +170,59 @@ public:
     virtual bool onEscapePressed() OVERRIDE;
 
 };   // KartSelectionScreen
+
+//!----------------------------------------------------------------------------
+//! FocusDispatcher :
+/** Currently, navigation for multiple players at the same time is implemented
+    in a somewhat clunky way. An invisible "dispatcher" widget is added above
+    kart icons. When a player moves up, he focuses the dispatcher, which in
+    turn moves the selection to the appropriate spinner. "tabbing roots" are
+    used to make navigation back down possible. (FIXME: maybe find a cleaner
+    way?) */
+class FocusDispatcher : public GUIEngine::Widget
+{
+protected:
+    KartSelectionScreen* m_parent;
+    int m_reserved_id;
+
+    bool m_is_initialised;
+
+public:
+
+    LEAK_CHECK()
+
+    // ------------------------------------------------------------------------
+    FocusDispatcher(KartSelectionScreen* parent);
+    // ------------------------------------------------------------------------
+    void setRootID(const int reservedID);
+
+    // ------------------------------------------------------------------------
+    virtual void add();
+
+    // ------------------------------------------------------------------------
+
+    virtual GUIEngine::EventPropagation focused(const int playerID);
+};   // FocusDispatcher
+
+//!----------------------------------------------------------------------------
+//! KartHoverListener :
+class KartHoverListener : public GUIEngine::DynamicRibbonHoverListener
+{
+    KartSelectionScreen* m_parent;
+public:
+    unsigned int m_magic_number;
+
+    KartHoverListener(KartSelectionScreen* parent);
+
+    // ------------------------------------------------------------------------
+    virtual ~KartHoverListener();
+
+    // ------------------------------------------------------------------------
+    void onSelectionChanged(GUIEngine::DynamicRibbonWidget* theWidget,
+                            const std::string& selectionID,
+                            const irr::core::stringw& selectionText,
+                            const int playerID);
+};   // KartHoverListener
+
+#endif
+

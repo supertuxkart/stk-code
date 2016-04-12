@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,7 +26,6 @@
 #include <irrString.h>
 using namespace irr;
 
-#include "config/player.hpp"
 #include "states_screens/race_gui_base.hpp"
 
 class AbstractKart;
@@ -45,24 +44,15 @@ private:
     Material        *m_speed_meter_icon;
     Material        *m_speed_bar_icon;
 
-    /** Translated string 'lap' displayed every frame. */
-    core::stringw    m_string_lap;
-
-    /** Translated string 'rank' displayed every frame. */
-    core::stringw    m_string_rank;
-
     // Minimap related variables
     // -------------------------
-    /** The mini map of the track. */
-    video::ITexture *m_mini_map;
-
     /** The size of a single marker on the screen for AI karts,
      *  need not be a power of 2. */
-    int              m_marker_ai_size;
+    int              m_minimap_ai_size;
 
     /** The size of a single marker on the screen or player karts,
      *  need not be a power of 2. */
-    int              m_marker_player_size;
+    int              m_minimap_player_size;
 
     /** The width of the rendered mini map in pixels, must be a power of 2. */
     int              m_map_rendered_width;
@@ -82,36 +72,54 @@ private:
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
 
-    /** Maximum string length of 'rank', 'lap', '99/99'. Used to position
-     *  the rank/lap text correctly close to the right border. */
-    int              m_rank_lap_width;
+    /** Maximum lap display length (either 9/9  or 99/99). */
+    int              m_lap_width;
 
     /** Maximum string length for the timer */
     int              m_timer_width;
 
+    /** Height of the digit font. */
+    int              m_font_height;
 
-    bool             m_is_tutorial;
+    /** Animation state: none, getting smaller (old value),
+     *  getting bigger (new number). */
+    enum AnimationState {AS_NONE, AS_SMALLER, AS_BIGGER};
+    std::vector<AnimationState> m_animation_states;
+
+    /** How long the rank animation has been shown. */
+    std::vector<float> m_rank_animation_duration;
+
+    /** Stores the previous rank for each kart. Used for the rank animation. */
+    std::vector<int> m_last_ranks;
+
+    bool m_is_tutorial;
 
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
-    void drawSpeedAndEnergy    (const AbstractKart* kart,
+    void drawSpeedEnergyRank   (const AbstractKart* kart,
+                                const core::recti &viewport,
+                                const core::vector2df &scaling, float dt);
+    void drawLap               (const AbstractKart* kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
-    void drawRankLap           (const AbstractKart* kart,
-                                const core::recti &viewport);
+    void drawRank              (const AbstractKart *kart,
+                                const core::vector2df &offset,
+                                float min_ratio, int meter_width,
+                                int meter_height, float dt);
 
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
     void drawGlobalTimer       ();
-	void drawScores();
+    void drawScores();
 
 
 public:
 
          RaceGUI();
         ~RaceGUI();
+    virtual void reset();
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const Camera *camera, float dt);
 

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,8 +17,9 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/referee.hpp"
-
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/light.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "karts/abstract_kart.hpp"
 #include "io/file_manager.hpp"
@@ -36,7 +37,6 @@ Vec3                  Referee::m_st_start_offset       = Vec3(-2, 2, 2);
 Vec3                  Referee::m_st_start_rotation     = Vec3(0, 180, 0);
 Vec3                  Referee::m_st_scale              = Vec3(1, 1, 1);
 scene::IAnimatedMesh *Referee::m_st_referee_mesh       = NULL;
-video::ITexture      *Referee::m_st_traffic_lights[3]  = {NULL, NULL, NULL};
 
 // ----------------------------------------------------------------------------
 /** Loads the static mesh.
@@ -44,11 +44,8 @@ video::ITexture      *Referee::m_st_traffic_lights[3]  = {NULL, NULL, NULL};
 void Referee::init()
 {
     assert(!m_st_referee_mesh);
-    const std::string filename=file_manager->getModelFile("referee.xml");
-    if(filename=="")
-    {
-        Log::fatal("referee", "Can't find referee.xml, aborting.");
-    }
+    const std::string filename=file_manager->getAssetChecked(FileManager::MODEL,
+                                                             "referee.xml", true);
     XMLNode *node = file_manager->createXMLTree(filename);
     if(!node)
     {
@@ -63,7 +60,8 @@ void Referee::init()
     node->get("model", &model_filename);
 
     m_st_referee_mesh = irr_driver->getAnimatedMesh(
-                     file_manager->getModelFile(model_filename) );
+                                 file_manager->getAsset(FileManager::MODEL,
+                                                        model_filename)      );
     if(!m_st_referee_mesh)
     {
         Log::fatal("referee", "Can't find referee model '%s', aborting.",
@@ -95,38 +93,16 @@ void Referee::init()
                         * RAD_TO_DEGREE;
     m_st_start_rotation.setY(m_st_start_rotation.getY()+angle_to_kart);
 
-    std::vector<std::string> colors;
-    node->get("colors", &colors);
-
-    if(colors.size()>3)
-        Log::warn("referee", "Too many colors for referee defined, "
-                             "only first three will be used.");
-    if(colors.size()<3)
-    {
-        Log::fatal("referee",
-                   "Not enough colors for referee defined, aborting.");
-    }
-    for(unsigned int i=0; i<3; i++)
-    {
-        std::string full_path = file_manager->getTextureFile(colors[i]);
-        if(full_path.size()==0)
-        {
-            Log::fatal("referee",
-                       "Can't find texture '%s' for referee, aborting.",
-                       colors[i].c_str());
-        }
-        m_st_traffic_lights[i] = irr_driver->getTexture(full_path);
-    }
-
-
     for(unsigned int i=0; i<m_st_referee_mesh->getMeshBufferCount(); i++)
     {
         scene::IMeshBuffer *mb = m_st_referee_mesh->getMeshBuffer(i);
         video::SMaterial &irrMaterial = mb->getMaterial();
         video::ITexture* t=irrMaterial.getTexture(0);
+        if(!t) continue;
+
         std::string name=StringUtils::getBasename(t->getName()
                                                   .getInternalName().c_str());
-        if(name==colors[0] || name==colors[1] ||name==colors[2] )
+        if (name == "traffic_light.png")
         {
             m_st_traffic_buffer = i;
             break;
@@ -163,7 +139,7 @@ Referee::Referee()
     // mesh. ATM it doesn't make any difference, but if we ever should
     // decide to use more than one referee model at startup we only
     // have to change the textures once, and all models will be in synch.
-    m_scene_node = irr_driver->addAnimatedMesh(NULL);
+    m_scene_node = irr_driver->addAnimatedMesh(NULL, "referee");
     m_scene_node->setReadOnlyMaterials(true);
     m_scene_node->setMesh(m_st_referee_mesh);
     m_scene_node->grab();
@@ -171,6 +147,18 @@ Referee::Referee()
     m_scene_node->setScale(m_st_scale.toIrrVector());
     m_scene_node->setFrameLoop(m_st_first_start_frame,
                                m_st_last_start_frame);
+
+    irr_driver->applyObjectPassShader(m_scene_node);
+
+    if (CVS->isGLSL() && CVS->isDefferedEnabled())
+    {
+        m_light = irr_driver->addLight(core::vector3df(0.0f, 0.0f, 0.6f), 0.7f, 2.0f,
+            0.7f /* r */, 0.0 /* g */, 0.0f /* b */, false /* sun */, m_scene_node);
+    }
+    else
+    {
+        m_light = NULL;
+    }
 }   // Referee
 
 // ----------------------------------------------------------------------------
@@ -187,7 +175,7 @@ Referee::Referee(const AbstractKart &kart)
     // mesh. ATM it doesn't make any difference, but if we ever should
     // decide to use more than one referee model at startup we only
     // have to change the textures once, and all models will be in synch.
-    m_scene_node = irr_driver->addAnimatedMesh(NULL);
+    m_scene_node = irr_driver->addAnimatedMesh(NULL, "referee");
     m_scene_node->setReadOnlyMaterials(true);
     m_scene_node->setMesh(m_st_referee_mesh);
     m_scene_node->grab();
@@ -195,6 +183,8 @@ Referee::Referee(const AbstractKart &kart)
     m_scene_node->setPosition(core::vector3df(0, kart.getKartHeight() + 0.4f, 0));
     m_scene_node->setFrameLoop(m_st_first_rescue_frame,
                                m_st_last_rescue_frame);
+
+    irr_driver->applyObjectPassShader(m_scene_node);
 }   // Referee
 
 // ----------------------------------------------------------------------------
@@ -215,6 +205,9 @@ void Referee::attachToSceneNode()
     if(!m_scene_node->getParent())
         m_scene_node->setParent(irr_driver->getSceneManager()
                                           ->getRootSceneNode());
+
+    if (m_light != NULL)
+        m_light->setVisible(true);
 }   // attachToSceneNode
 
 // ----------------------------------------------------------------------------
@@ -226,6 +219,8 @@ void Referee::removeFromSceneGraph()
 {
     if(isAttached())
         irr_driver->removeNode(m_scene_node);
+    if (m_light != NULL)
+        m_light->setVisible(false);
 }   // removeFromSceneGraph
 
 // ----------------------------------------------------------------------------
@@ -235,9 +230,31 @@ void Referee::removeFromSceneGraph()
  */
 void Referee::selectReadySetGo(int rsg)
 {
-    if(m_st_traffic_buffer<0) return;
-    video::SMaterial &m = m_scene_node->getMesh()->getMeshBuffer(m_st_traffic_buffer)->getMaterial();
-    m.setTexture(0, m_st_traffic_lights[rsg]);
+    if (m_st_traffic_buffer < 0)
+        return;
+    video::SMaterial &m = m_scene_node->getMaterial(m_st_traffic_buffer); // m_scene_node->getMesh()->getMeshBuffer(m_st_traffic_buffer)->getMaterial();
+
+    //if (irr_driver->isGLSL() && UserConfigParams::m_dynamic_lights)
+    //    m.MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+
+    core::matrix4* matrix = &m.getTextureMatrix(0);
+    matrix->setTextureTranslate(0.0f, rsg*0.333f);
+
+    if (m_light != NULL)
+    {
+        if (rsg == 0)
+        {
+            ((LightNode*)m_light)->setColor(0.6f, 0.0f, 0.0f);
+        }
+        else if (rsg == 1)
+        {
+            ((LightNode*)m_light)->setColor(0.7f, 0.23f, 0.0f);
+        }
+        else if (rsg == 2)
+        {
+            ((LightNode*)m_light)->setColor(0.0f, 0.6f, 0.0f);
+        }
+    }
 
     // disable lighting, we need to see the traffic light even if facing away
     // from the sun

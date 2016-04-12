@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2008  Joerg Henrichs
+//  Copyright (C) 2008-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <stdlib.h>
 
 /** A random number generator. Each objects that needs a random number uses
     its own number random generator. They are all seeded with number provided

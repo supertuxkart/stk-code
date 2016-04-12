@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012 Joerg Henrichs
+//  Copyright (C) 2012-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,12 +19,13 @@
 #include "karts/explosion_animation.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "graphics/callbacks.hpp"
+#include "graphics/camera.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
-#include "utils/log.hpp" //TODO: remove after debugging is done
 
 /** A static create function that does only create an explosion if
  *  the explosion happens to be close enough to affect the kart.
@@ -38,16 +39,17 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
                                                bool direct_hit)
 {
     if(kart->isInvulnerable()) return NULL;
-    /*else if(kart->isShielded() && !direct_hit) //How can I test this code ??
-    {
-        kart->decreaseShieldTime(0.0f); //Decreasing the shield time by the default value.
-        Log::verbose("ExlosionAnimation", "Decreasing shield \n");
-        return NULL;
-    }*/
+
     float r = kart->getKartProperties()->getExplosionRadius();
 
     // Ignore explosion that are too far away.
     if(!direct_hit && pos.distance2(kart->getXYZ())>r*r) return NULL;
+
+    if(kart->isShielded())
+    {
+        kart->decreaseShieldTime();
+        return NULL;
+    }
 
     return new ExplosionAnimation(kart, pos, direct_hit);
 }   // create
@@ -61,8 +63,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
     if(kart->isInvulnerable()) return NULL;
     else if(kart->isShielded())
     {
-        kart->decreaseShieldTime(0.0f) ; //decreasing the shieldtime by the default amount
-        Log::verbose("ExplosionAnimation", "Decreasing shield 2\n");
+        kart->decreaseShieldTime();
         return NULL;
     }
     return new ExplosionAnimation(kart, kart->getXYZ(), /*direct hit*/true);
@@ -77,7 +78,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     m_xyz = m_kart->getXYZ();
     m_orig_y = m_xyz.getY();
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
-    m_timer     = m_kart->getKartProperties()->getExplosionTime();
+    m_timer = m_kart->getKartProperties()->getExplosionDuration();
 
     // Non-direct hits will be only affected half as much.
     if(!direct_hit) m_timer*=0.5f;
@@ -106,11 +107,8 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     // Set invulnerable time, and graphical effects
     float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
     m_kart->setInvulnerableTime(t);
-    if ( UserConfigParams::m_graphical_effects )
-    {
-        m_kart->showStarEffect(t);
-    }
-
+    m_kart->showStarEffect(t);
+    
     m_kart->getAttachment()->clear();
 
  };   // ExplosionAnimation

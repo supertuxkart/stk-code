@@ -1,8 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2010 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2010 Eduardo Hernandez Munoz
-//  Copyright (C) 2010      Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Eduardo Hernandez Munoz
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@
 #ifndef HEADER_END_CONTROLLER_HPP
 #define HEADER_END_CONTROLLER_HPP
 
-#include "karts/controller/ai_base_controller.hpp"
+#include "karts/controller/ai_base_lap_controller.hpp"
 
 class Camera;
 class LinearWorld;
@@ -40,11 +40,11 @@ namespace irr
 /**
   * \ingroup controller
   */
-class EndController : public AIBaseController
+class EndController : public AIBaseLapController
 {
 private:
     /** Stores the type of the previous controller. This is necessary so that
-     *  after the end of race ths kart (and its results) can still be 
+     *  after the end of race ths kart (and its results) can still be
      *  identified to be from a player kart. */
     bool  m_was_player_controller;
 
@@ -66,7 +66,7 @@ private:
     /** Stores a pointer to the original controller. */
     Controller *m_previous_controller;
 
-    /** For debugging purpose: a sphere indicating where the AI 
+    /** For debugging purpose: a sphere indicating where the AI
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
 
@@ -74,25 +74,46 @@ private:
      *that can be done, and end up setting their respective m_controls
      *variable.
      */
-    void         handleSteering(float dt);
-    void         handleRescue(const float DELTA);
+    void          handleSteering(float dt);
+    void          handleRescue(const float DELTA);
 
-    void         checkCrashes(const int STEPS, const Vec3& pos);
-    void         findNonCrashingPoint(Vec3 *result);
-    int          calcSteps();
+    void          checkCrashes(const int STEPS, const Vec3& pos);
+    void          findNonCrashingPoint(Vec3 *result);
+    int           calcSteps();
+    virtual bool  canSkid(float steer_fraction) { return false; }
 public:
-                 EndController(AbstractKart *kart, 
-                               StateManager::ActivePlayer* player, 
+                 EndController(AbstractKart *kart,
                                Controller *prev_controller);
                 ~EndController();
     virtual void update      (float delta) ;
     virtual void reset       ();
-    /** Returns if the original controller of the kart was a player 
+    virtual void action      (PlayerAction action, int value);
+    virtual void newLap      (int lap);
+    // ------------------------------------------------------------------------
+    virtual bool canGetAchievements() const
+    {
+        return m_previous_controller->canGetAchievements();
+    }   // canGetAchievements
+    // ------------------------------------------------------------------------
+    /** Returns if the original controller of the kart was a player
      *  controller. This way e.g. highscores can still be assigned
      *  to the right player. */
-    virtual bool isPlayerController () const {return m_player!=NULL;}
-    virtual void  action             (PlayerAction action, int value);
-    virtual void  newLap             (int lap);
+    virtual bool isPlayerController () const
+    {
+        return m_previous_controller->isPlayerController();
+    }   // isPlayerController
+    // ------------------------------------------------------------------------
+    /** Returns if the original controller of the kart was a local player
+    *  controller. This way e.g. highscores can still be assigned
+    *  to the right player. */
+    virtual bool isLocalPlayerController () const
+    {
+        return m_previous_controller->isLocalPlayerController();
+    }   // isLocalPlayerController
+    // ------------------------------------------------------------------------
+    /** Returns the name of the previous controller (which has the right
+     *  player name associated). */
+    core::stringw getName() const { return m_previous_controller->getName(); }
 
 };   // EndKart
 

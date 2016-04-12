@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,9 +19,8 @@
 #ifndef HEADER_TUTORIAL_DIALOG_HPP
 #define HEADER_TUTORIAL_DIALOG_HPP
 
-#include "config/player.hpp"
 #include "guiengine/modaldialog.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 
 /**
@@ -45,7 +44,7 @@ public:
     virtual void onUpdate(float dt) OVERRIDE;
 
     
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
 };
 
 

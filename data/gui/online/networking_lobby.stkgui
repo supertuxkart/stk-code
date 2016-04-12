@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
+        <header text_align="center" width="80%" align="center" I18N="In networking lobby" text="Lobby"/>
+        <spacer height="15" width="10"/>
+        <div proportion="1" x="2%" width="96%" layout="vertical-row">
+            <div width="100%" proportion="2" layout="horizontal-row">
+                <box id="info" proportion="2" height="100%" layout="vertical-row">
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <label proportion="1" text_align="left" I18N="In the networking lobby" text="Server name:"/>
+                        <label proportion="2" text_align="left" id="server_name" text=""/>
+                    </div>
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <label proportion="1" text_align="left" I18N="In the networking lobby" text="Difficulty:"/>
+                        <label proportion="2" text_align="left" id="server_difficulty" text=""/>
+                    </div>
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <label proportion="1" text_align="left" I18N="In the networking lobby" text="Game mode:"/>
+                        <label proportion="2" text_align="left" id="server_game_mode" text=""/>
+                    </div>
+                </box>
+                <spacer width="20" height="20"/>
+                <box proportion="1" height="100%" layout="vertical-row">
+                    <list id="players" width="100%" height="100%"/>
+                </box>
+            </div>
+
+            <spacer width="20" height="20"/>
+
+            <div width="100%" proportion="1" layout="horizontal-row">
+                <box proportion="2" height="100%" layout="vertical-row">
+                    <list id="chat" width="100%" height="100%"/>
+                </box>
+                <spacer width="20" height="20"/>
+                <box id="actions" proportion="1" height="100%" layout="vertical-row">
+<!--                    <label I18N="In networking lobby" word_wrap="true" text="actions" align="center" text-align="center"/>
+-->
+                  <icon-button id="start" width="64" height="64" icon="gui/green_check.png" align="center"
+                      I18N="In the network lobby" text="Start Race"/>
+
+                </box>
+            </div>
+        </div>
+
+        <spacer width="10" height="7%"/>
+
+        <bottombar x="2%" width="96%" height="10%" layout="horizontal-row">
+            <label text_align="left" align="center" height="100%" id="online_status" proportion="1" text=""/>
+
+            <spacer width="10" height="10" />
+
+            <buttonbar id="menu_bottomrow" x="0" y="0" width="20%" height="100%" align="center">
+                <icon-button id="exit" width="64" height="64" icon="gui/main_quit.png"  extend_label="50"
+                             I18N="In the networking lobby" text="Exit" label_location="hover"/>
+            </buttonbar>
+        </bottombar>
+    </div>
+
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+</stkgui>

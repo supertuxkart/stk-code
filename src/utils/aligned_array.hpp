@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 // btAlignedObjectArray to enable bullet SSE optimisations.
 // On the other hand, std::vector gives much better debugging features.
 // So SSE is disabled in bullet on windows debug
-#if !defined(DEBUG) && (WIN32)
+#if !defined(DEBUG) && defined(WIN32)
 #  undef USE_ALIGNED
 #else
 #  undef  USE_ALIGNED

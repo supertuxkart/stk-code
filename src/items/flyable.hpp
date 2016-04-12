@@ -1,9 +1,9 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Joerg Henrichs
+//  Copyright (C) 2007-2015 Joerg Henrichs
 //
 //  Linear item-kart intersection function written by
-//  by David Mikos. Copyright (C) 2009.
+//  Copyright (C) 2009-2015 David Mikos.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,7 +34,6 @@ using namespace irr;
 #include "tracks/terrain_info.hpp"
 
 class AbstractKart;
-class FlyableInfo;
 class HitEffect;
 class PhysicalObject;
 class XMLNode;
@@ -47,10 +46,6 @@ class Flyable : public Moveable, public TerrainInfo
 public:
 private:
     bool              m_has_hit_something;
-    /** This flag is used to avoid that a rocket explodes mode than once.
-     *  It can happen that more than one collision between a rocket and
-     *  a track or kart is reported by the physics.                        */
-    bool              m_exploded;
 
     /** If this flag is set, the up velocity of the kart will not be
      *  adjusted in case that the objects is too high or too low above the
@@ -167,9 +162,7 @@ public:
     static void  init        (const XMLNode &node, scene::IMesh *model,
                               PowerupManager::PowerupType type);
     virtual bool              updateAndDelete(float);
-    virtual const core::stringw getHitString(const AbstractKart *kart) const = 0;
     virtual HitEffect*        getHitEffect() const;
-    void                      updateFromServer(const FlyableInfo &f, float dt);
     bool                      isOwnerImmunity(const AbstractKart *kart_hit) const;
     virtual bool              hit(AbstractKart* kart, PhysicalObject* obj=NULL);
     void                      explode(AbstractKart* kart, PhysicalObject* obj=NULL,
@@ -208,6 +201,8 @@ public:
      *  call, or if the inheriting object will update TerrainInfo itself
      *  (or perhaps not at all if it is not needed). */
     void setDoTerrainInfo(bool d) { m_do_terrain_info = d; }
+    // ------------------------------------------------------------------------
+    unsigned int getOwnerId();
 };   // Flyable
 
 #endif

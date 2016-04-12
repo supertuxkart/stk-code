@@ -1,8 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2007 Eduardo Hernandez Munoz
-//  Copyright (C) 2008-2012 Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Eduardo Hernandez Munoz
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,28 +19,18 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-//The AI debugging works best with just 1 AI kart, so set the number of karts
-//to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
-#ifdef DEBUG
-   // Enable AI graphical debugging
-#  undef AI_DEBUG
-   // Shows left and right lines when using new findNonCrashing function
-#  undef AI_DEBUG_NEW_FIND_NON_CRASHING
-   // Show the predicted turn circles
-#  undef AI_DEBUG_CIRCLES
-   // Show the heading of the kart
-#  undef AI_DEBUG_KART_HEADING
-   // Shows line from kart to its aim point
-#  undef AI_DEBUG_KART_AIM
-#endif
-
 #include "karts/controller/skidding_ai.hpp"
 
 #ifdef AI_DEBUG
+#  include "graphics/glwrap.hpp"
 #  include "graphics/irr_driver.hpp"
 #endif
 #include "graphics/show_curve.hpp"
 #include "graphics/slip_stream.hpp"
+#include "items/attachment.hpp"
+#include "items/item_manager.hpp"
+#include "items/powerup.hpp"
+#include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/controller/ai_properties.hpp"
@@ -48,37 +38,28 @@
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
-#include "karts/skidding_properties.hpp"
-#include "items/attachment.hpp"
-#include "items/item_manager.hpp"
-#include "items/powerup.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/profile_world.hpp"
-#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
+#include "utils/vs.hpp"
 
 #ifdef AI_DEBUG
 #  include "irrlicht.h"
    using namespace irr;
 #endif
 
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
-
+#include <cmath>
 #include <cstdlib>
 #include <ctime>
 #include <cstdio>
 #include <iostream>
 
 SkiddingAI::SkiddingAI(AbstractKart *kart)
-                   : AIBaseController(kart)
+                   : AIBaseLapController(kart)
 {
     reset();
     // Determine if this AI has superpowers, which happens e.g.
@@ -114,6 +95,8 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
                                      i==2 ? 128 : 0);
         m_debug_sphere[i] = irr_driver->addSphere(1.0f, col_debug);
         m_debug_sphere[i]->setVisible(false);
+        m_debug_sphere[i]->setMaterialTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+        m_debug_sphere[i]->setMaterialTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
     m_debug_sphere[m_point_selection_algorithm]->setVisible(true);
     m_item_sphere  = irr_driver->addSphere(1.0f);
@@ -170,7 +153,7 @@ SkiddingAI::~SkiddingAI()
     {
         delete m_curve[i];
     }
-    delete m_curve;
+    delete [] m_curve;
 #endif
 }   // ~SkiddingAI
 
@@ -195,19 +178,19 @@ void SkiddingAI::reset()
     m_skid_probability_state     = SKID_PROBAB_NOT_YET;
     m_last_item_random           = NULL;
 
-    AIBaseController::reset();
+    AIBaseLapController::reset();
     m_track_node               = QuadGraph::UNKNOWN_SECTOR;
     QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
     if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
     {
         Log::error("SkiddingAI",
                 "Invalid starting position for '%s' - not on track"
-                " - can be ignored.\n",
+                " - can be ignored.",
                 m_kart->getIdent().c_str());
         m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
     }
 
-	AIBaseController::reset();
+    AIBaseLapController::reset();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -281,10 +264,21 @@ void SkiddingAI::update(float dt)
             }
 
             // also give him some free nitro
-            if (m_kart->getPosition() > 1)
-                m_kart->setEnergy(m_kart->getEnergy() + 7);
-            else
-                m_kart->setEnergy(m_kart->getEnergy() + 4);
+            if (race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM)
+            {
+                if (m_kart->getPosition() > 1)
+                    m_kart->setEnergy(m_kart->getEnergy() + 2);
+                else
+                    m_kart->setEnergy(m_kart->getEnergy() + 1);
+            }
+            else if (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
+                race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST)
+            {
+                if (m_kart->getPosition() > 1)
+                    m_kart->setEnergy(m_kart->getEnergy() + 7);
+                else
+                    m_kart->setEnergy(m_kart->getEnergy() + 4);
+            }
         }
     }
 
@@ -297,25 +291,18 @@ void SkiddingAI::update(float dt)
     return;
 #endif
 
-    // The client does not do any AI computations.
-    if(network_manager->getMode()==NetworkManager::NW_CLIENT)
-    {
-        AIBaseController::update(dt);
-        return;
-    }
-
     // If the kart needs to be rescued, do it now (and nothing else)
     if(isStuck() && !m_kart->getKartAnimation())
     {
         new RescueAnimation(m_kart);
-        AIBaseController::update(dt);
+        AIBaseLapController::update(dt);
         return;
     }
 
     if( m_world->isStartPhase() )
     {
         handleRaceStart();
-        AIBaseController::update(dt);
+        AIBaseLapController::update(dt);
         return;
     }
 
@@ -346,7 +333,8 @@ void SkiddingAI::update(float dt)
 
             // If we are faster, try to predict the point where we will hit
             // the other kart
-            if(m_kart_ahead->getSpeed() < m_kart->getSpeed())
+            if((m_kart_ahead->getSpeed() < m_kart->getSpeed()) &&
+                !m_kart_ahead->isGhostKart())
             {
                 float time_till_hit = m_distance_ahead
                                     / (m_kart->getSpeed()-m_kart_ahead->getSpeed());
@@ -390,7 +378,7 @@ void SkiddingAI::update(float dt)
     }
 
     /*And obviously general kart stuff*/
-    AIBaseController::update(dt);
+    AIBaseLapController::update(dt);
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -412,7 +400,7 @@ void SkiddingAI::handleBraking()
     {
 #ifdef DEBUG
     if(m_ai_debug)
-        Log::debug("SkiddingAI", "braking: %s ahead of leader.\n",
+        Log::debug("SkiddingAI", "braking: %s ahead of leader.",
                m_kart->getIdent().c_str());
 #endif
 
@@ -432,7 +420,7 @@ void SkiddingAI::handleBraking()
     {
 #ifdef DEBUG
         if(m_ai_debug)
-            Log::debug("SkiddingAI", "%s not aligned with track.\n",
+            Log::debug("SkiddingAI", "%s not aligned with track.",
                    m_kart->getIdent().c_str());
 #endif
         m_controls->m_brake = true;
@@ -442,8 +430,7 @@ void SkiddingAI::handleBraking()
        m_current_track_direction==GraphNode::DIR_RIGHT   )
     {
         float max_turn_speed =
-            m_kart->getKartProperties()
-                   ->getSpeedForTurnRadius(m_current_curve_radius);
+            m_kart->getSpeedForTurnRadius(m_current_curve_radius);
 
         if(m_kart->getSpeed() > 1.5f*max_turn_speed  &&
             m_kart->getSpeed()>MIN_SPEED             &&
@@ -485,8 +472,8 @@ void SkiddingAI::handleSteering(float dt)
      *finite state machine.
      */
     //Reaction to being outside of the road
-	float side_dist =
-		m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() );
+    float side_dist =
+        m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() );
 
     if( fabsf(side_dist)  >
        0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )
@@ -497,7 +484,7 @@ void SkiddingAI::handleSteering(float dt)
 #ifdef AI_DEBUG
         m_debug_sphere[0]->setPosition(QuadGraph::get()->getQuadOfNode(next)
                        .getCenter().toIrrVector());
-        Log::debug("skidding_ai","-Outside of road: steer to center point.\n");
+        Log::debug("skidding_ai","-Outside of road: steer to center point.");
 #endif
     }
     //If we are going to crash against a kart, avoid it if it doesn't
@@ -533,7 +520,7 @@ void SkiddingAI::handleSteering(float dt)
 #ifdef AI_DEBUG
         Log::debug("skidding_ai",  "- Velocity vector crashes with kart "
                    "and doesn't crashes with road : steer 90 "
-                   "degrees away from kart.\n");
+                   "degrees away from kart.");
 #endif
 
     }
@@ -712,7 +699,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
         }
 
         if(m_ai_debug)
-            Log::debug("SkiddingAI", "%s unselects item.\n",
+            Log::debug("SkiddingAI", "%s unselects item.",
                         m_kart->getIdent().c_str());
         // Otherwise remove the pre-selected item (and start
         // looking for a new item).
@@ -782,7 +769,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                                            .toIrrVector());
 #endif
                 if(m_ai_debug)
-                    Log::debug("SkiddingAI", "%s selects item type '%d'.\n",
+                    Log::debug("SkiddingAI", "%s selects item type '%d'.",
                            m_kart->getIdent().c_str(),
                            item_to_collect->getType());
                 m_item_to_collect = item_to_collect;
@@ -806,7 +793,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
 #endif
                     if(m_ai_debug)
                         Log::debug("SkiddingAI",
-                               "%s adjusts to hit type %d angle %f.\n",
+                               "%s adjusts to hit type %d angle %f.",
                                m_kart->getIdent().c_str(),
                                item_to_collect->getType(), angle);
                 }
@@ -814,7 +801,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
                 {
                     if(m_ai_debug)
                         Log::debug("SkiddingAI",
-                               "%s won't hit '%d', angle %f.\n",
+                               "%s won't hit '%d', angle %f.",
                                m_kart->getIdent().c_str(),
                                item_to_collect->getType(), angle);
                 }
@@ -862,8 +849,7 @@ bool SkiddingAI::handleSelectedItem(float kart_aim_angle, Vec3 *aim_point)
     // If the item is unavailable or has been switched into a bad item
     // stop aiming for it.
     if(m_item_to_collect->getDisableTime()>0 ||
-        m_item_to_collect->getType() == Item::ITEM_BANANA ||
-        m_item_to_collect->getType() == Item::ITEM_BANANA   )
+        m_item_to_collect->getType() == Item::ITEM_BANANA )
         return false;
 
     const Vec3 &xyz = m_item_to_collect->getXYZ();
@@ -1045,6 +1031,8 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
                                std::vector<const Item *> *items_to_avoid,
                                std::vector<const Item *> *items_to_collect)
 {
+    const KartProperties *kp = m_kart->getKartProperties();
+
     // Ignore items that are currently disabled
     if(item->getDisableTime()>0) return;
 
@@ -1065,18 +1053,16 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
         // Positive items: try to collect
         case Item::ITEM_NITRO_BIG:
             // Only collect nitro, if it can actually be stored.
-            if(m_kart->getEnergy() +
-                    m_kart->getKartProperties()->getNitroBigContainer()
-                  > m_kart->getKartProperties()->getNitroMax())
+            if (m_kart->getEnergy() + kp->getNitroBigContainer()
+                > kp->getNitroMax())
                   return;
             // fall through: if we have enough space to store a big
             // container, we can also store a small container, and
             // finally fall through to the bonus box code.
-        case Item::ITEM_NITRO_SMALL: avoid = false; break;
+        case Item::ITEM_NITRO_SMALL: avoid = false;
             // Only collect nitro, if it can actually be stored.
-            if (m_kart->getEnergy() +
-                    m_kart->getKartProperties()->getNitroSmallContainer()
-                  > m_kart->getKartProperties()->getNitroMax())
+            if (m_kart->getEnergy() + kp->getNitroSmallContainer()
+                > kp->getNitroMax())
                   return;
         case Item::ITEM_BONUS_BOX:
             break;
@@ -1106,7 +1092,7 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
         // be if the kart would need to turn sharper, therefore stops
         // skidding, and will get the bonus speed.
         bool high_speed = (m_kart->getCurrentMaxSpeed() >
-                             m_kart->getKartProperties()->getMaxSpeed() ) ||
+                           kp->getEngineMaxSpeed() ) ||
                           m_kart->getSkidding()->getSkidBonusReady();
         float max_angle = high_speed
                         ? m_ai_properties->m_max_item_angle_high_speed
@@ -1130,7 +1116,7 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
     // This list is usually very short, so use a simple bubble sort
     list->push_back(item);
     int i;
-    for(i=list->size()-2; i>=0; i--)
+    for(i=(int)list->size()-2; i>=0; i--)
     {
         float d = ((*list)[i]->getXYZ() - m_kart->getXYZ()).length2_2d();
         if(d<=new_distance)
@@ -1165,15 +1151,19 @@ void SkiddingAI::handleItems(const float dt)
 
     if (m_superpower == RaceManager::SUPERPOWER_NOLOK_BOSS)
     {
-        m_controls->m_look_back = (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_BOWLING);
+        m_controls->m_look_back = (m_kart->getPowerup()->getType() ==
+                                   PowerupManager::POWERUP_BOWLING    );
 
         if( m_time_since_last_shot > 3.0f )
         {
-            m_controls->m_fire = true;
+            m_controls->m_fire      = true;
             if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_SWATTER)
                 m_time_since_last_shot = 3.0f;
             else
-                m_time_since_last_shot = (rand() % 1000) / 1000.0f * 3.0f - 2.0f; // to make things less predictable :)
+            {
+                // to make things less predictable :)
+                m_time_since_last_shot = (rand() % 1000) / 1000.0f * 3.0f - 2.0f;
+            }
         }
         else
         {
@@ -1201,48 +1191,96 @@ void SkiddingAI::handleItems(const float dt)
     switch( m_kart->getPowerup()->getType() )
     {
     case PowerupManager::POWERUP_BUBBLEGUM:
-        // Avoid dropping all bubble gums one after another
-        if( m_time_since_last_shot < 3.0f) break;
+        {
+            Attachment::AttachmentType type = m_kart->getAttachment()->getType();
+            // Don't use shield when we have a swatter.
+            if( type == Attachment::ATTACH_SWATTER       ||
+                type == Attachment::ATTACH_NOLOKS_SWATTER  )
+                break;
 
-        // Either use the bubble gum after 10 seconds, or if the next kart
-        // behind is 'close' but not too close (too close likely means that the
-        // kart is not behind but more to the side of this kart and so won't
-        // be hit by the bubble gum anyway). Should we check the speed of the
-        // kart as well? I.e. only drop if the kart behind is faster? Otoh
-        // this approach helps preventing an overtaken kart to overtake us
-        // again.
-        m_controls->m_look_back = true; //handle traditinal usage as bubble gum
-        m_controls->m_fire = (m_distance_behind < 15.0f &&
-                              m_distance_behind > 3.0f    );//TODO: is this criteria sufficient to hit another kart with a high probability
+            // Check if a flyable (cake, ...) is close. If so, use bubblegum
+            // as shield
+            if( !m_kart->isShielded() &&
+                projectile_manager->projectileIsClose(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius) )
+            {
+                m_controls->m_fire      = true;
+                m_controls->m_look_back = false;
+                break;
+            }
 
-        m_controls->m_look_back = false;
-        //Do not use a shield, when you still have a swatter
-        if (m_kart->getAttachment()->getType() == Attachment::ATTACH_SWATTER  || m_kart->getAttachment()->getType() == Attachment::ATTACH_NOLOKS_SWATTER)
-            break;
-        //else there are no objections not to use a shield
-        m_controls->m_fire = true;
+            // Avoid dropping all bubble gums one after another
+            if( m_time_since_last_shot < 3.0f) break;
 
-        break;   // POWERUP_BUBBLEGUM
+            // Use bubblegum if the next kart  behind is 'close' but not too close
+            // (too close likely means that the kart is not behind but more to the
+            // side of this kart and so won't be hit by the bubble gum anyway).
+            // Should we check the speed of the kart as well? I.e. only drop if
+            // the kart behind is faster? Otoh this approach helps preventing an
+            // overtaken kart to overtake us again.
+            if(m_distance_behind < 15.0f && m_distance_behind > 3.0f    )
+            {
+                m_controls->m_fire      = true;
+                m_controls->m_look_back = true;
+                break;
+            }
 
-    // All the thrown/fired items might be improved by considering the angle
-    // towards m_kart_ahead.
+            // If this kart is in its last lap, drop bubble gums at every
+            // opportunity, since this kart won't envounter them anymore.
+            LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
+            if(m_time_since_last_shot > 3.0f &&
+                lin_world &&
+                lin_world->getKartLaps(m_kart->getWorldKartId())
+                                   == race_manager->getNumLaps()-1)
+            {
+                m_controls->m_fire      = true;
+                m_controls->m_look_back = true;
+                break;
+            }
+            break;   // POWERUP_BUBBLEGUM
+        }
     case PowerupManager::POWERUP_CAKE:
         {
-            // Do not destroy your own shield
-            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
+            // if the kart has a shield, do not break it by using a cake.
+            if(m_kart->getShieldTime() > min_bubble_time)
                 break;
             // Leave some time between shots
             if(m_time_since_last_shot<3.0f) break;
-            //TODO: do not fire if the kart is driving too slow
 
-            // Since cakes can be fired all around, just use a sane distance
-            // with a bit of extra for backwards, as enemy will go towards cake
-            bool fire_backwards = (m_kart_behind && m_kart_ahead &&
-                                   m_distance_behind < m_distance_ahead) ||
-                                  !m_kart_ahead;
+            // Do not fire if the kart is driving too slow
+            bool kart_behind_is_slow =
+                (m_kart_behind && m_kart_behind->getSpeed() < m_kart->getSpeed());
+            bool kart_ahead_is_slow =
+                (m_kart_ahead && m_kart_ahead->getSpeed() < m_kart->getSpeed());
+            // Consider firing backwards if there is no kart ahead or it is
+            // slower. Also, if the kart behind is closer and not slower than
+            // this kart.
+            bool fire_backwards = !m_kart_ahead ||
+                                  (m_kart_behind                             &&
+                                    (m_distance_behind < m_distance_ahead ||
+                                     kart_ahead_is_slow                    ) &&
+                                    !kart_behind_is_slow
+                                  );
+
+            // Don't fire at a kart that is slower than us. Reason is that
+            // we can either save the cake for later since we will overtake
+            // the kart anyway, or that this might force the kart ahead to
+            // use its nitro/zipper (and then we will shoot since then the
+            // kart is faster).
+            if ((fire_backwards && kart_behind_is_slow) ||
+                (!fire_backwards && kart_ahead_is_slow)    )
+                break;
+
+            // Don't fire if the kart we are aiming at is invulnerable.
+            if ((fire_backwards  && m_kart_behind && m_kart_behind->isInvulnerable()) ||
+                (!fire_backwards && m_kart_ahead && m_kart_ahead->isInvulnerable())    )
+                return;
+
             float distance = fire_backwards ? m_distance_behind
                                             : m_distance_ahead;
-            m_controls->m_fire = (fire_backwards && distance < 25.0f)  ||
+            // Since cakes can be fired all around, just use a sane distance
+            // with a bit of extra for backwards, as enemy will go towards cake
+            m_controls->m_fire = (fire_backwards && distance < 25.0f) ||
                                  (!fire_backwards && distance < 20.0f);
             if(m_controls->m_fire)
                 m_controls->m_look_back = fire_backwards;
@@ -1251,13 +1289,29 @@ void SkiddingAI::handleItems(const float dt)
 
     case PowerupManager::POWERUP_BOWLING:
         {
-            // Do not destroy your own shield
-            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
+            // if the kart has a shield, do not break it by using a bowling ball.
+            if(m_kart->getShieldTime() > min_bubble_time)
                 break;
             // Leave more time between bowling balls, since they are
             // slower, so it should take longer to hit something which
             // can result in changing our target.
             if(m_time_since_last_shot < 5.0f) break;
+            // Consider angle towards karts
+            bool straight_behind = false;
+            bool straight_ahead = false;
+            if (m_kart_behind)
+            {
+                posData behind_pos = {0};
+                checkPosition(m_kart_behind->getXYZ(), &behind_pos);
+                if (behind_pos.angle < 0.2f) straight_behind = true;
+            }
+            if (m_kart_ahead)
+            {
+                posData ahead_pos = {0};
+                checkPosition(m_kart_ahead->getXYZ(), &ahead_pos);
+                if (ahead_pos.angle < 0.2f) straight_ahead = true;
+            }
+
             // Bowling balls are slower, so only fire on closer karts - but when
             // firing backwards, the kart can be further away, since the ball
             // acts a bit like a mine (and the kart is racing towards it, too)
@@ -1268,7 +1322,8 @@ void SkiddingAI::handleItems(const float dt)
                                             : m_distance_ahead;
             m_controls->m_fire = ( (fire_backwards && distance < 30.0f)  ||
                                    (!fire_backwards && distance <10.0f)    ) &&
-                                m_time_since_last_shot > 3.0f;
+                                m_time_since_last_shot > 3.0f &&
+                                (straight_behind || straight_ahead);
             if(m_controls->m_fire)
                 m_controls->m_look_back = fire_backwards;
             break;
@@ -1281,8 +1336,8 @@ void SkiddingAI::handleItems(const float dt)
 
     case PowerupManager::POWERUP_PLUNGER:
         {
-            // Do not destroy your own shield
-            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
+            // if the kart has a shield, do not break it by using a plunger.
+            if(m_kart->getShieldTime() > min_bubble_time)
                 break;
 
             // Leave more time after a plunger, since it will take some
@@ -1314,13 +1369,13 @@ void SkiddingAI::handleItems(const float dt)
 
     case PowerupManager::POWERUP_PARACHUTE:
         // Wait one second more than a previous parachute
-        if(m_time_since_last_shot > stk_config->m_parachute_time_other+1.0f)
+        if(m_time_since_last_shot > m_kart->getKartProperties()->getParachuteDurationOther() + 1.0f)
             m_controls->m_fire = true;
         break;   // POWERUP_PARACHUTE
 
     case PowerupManager::POWERUP_ANVIL:
         // Wait one second more than a previous anvil
-        if(m_time_since_last_shot < stk_config->m_anvil_time+1.0f) break;
+        if(m_time_since_last_shot < m_kart->getKartProperties()->getAnvilDuration() + 1.0f) break;
 
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
@@ -1337,7 +1392,7 @@ void SkiddingAI::handleItems(const float dt)
     case PowerupManager::POWERUP_SWATTER:
         {
             // Squared distance for which the swatter works
-            float d2 = m_kart->getKartProperties()->getSwatterDistance2();
+            float d2 = m_kart->getKartProperties()->getSwatterDistance();
             // if the kart has a shield, do not break it by using a swatter.
             if(m_kart->getShieldTime() > min_bubble_time)
                 break;
@@ -1355,8 +1410,8 @@ void SkiddingAI::handleItems(const float dt)
             break;
         }
     case PowerupManager::POWERUP_RUBBERBALL:
-        // Do not destroy your own shield
-        if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
+        // if the kart has a shield, do not break it by using a swatter.
+        if(m_kart->getShieldTime() > min_bubble_time)
             break;
         // Perhaps some more sophisticated algorithm might be useful.
         // For now: fire if there is a kart ahead (which means that
@@ -1365,7 +1420,7 @@ void SkiddingAI::handleItems(const float dt)
         break;
     default:
         Log::error("SkiddingAI",
-                "Invalid or unhandled powerup '%d' in default AI.\n",
+                "Invalid or unhandled powerup '%d' in default AI.",
                 m_kart->getPowerup()->getType());
         assert(false);
     }
@@ -1686,7 +1741,7 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
     if(steps<1 || steps>1000)
     {
         Log::warn("SkiddingAI",
-            "Incorrect STEPS=%d. kart_length %f velocity %f\n",
+            "Incorrect STEPS=%d. kart_length %f velocity %f",
             steps, m_kart_length, m_kart->getVelocityLC().getZ());
         steps=1000;
     }
@@ -1703,12 +1758,13 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
             {
                 const AbstractKart* kart = m_world->getKart(j);
                 // Ignore eliminated karts
-                if(kart==m_kart||kart->isEliminated()) continue;
+                if(kart==m_kart||kart->isEliminated()||kart->isGhostKart()) continue;
                 const AbstractKart *other_kart = m_world->getKart(j);
                 // Ignore karts ahead that are faster than this kart.
                 if(m_kart->getVelocityLC().getZ() < other_kart->getVelocityLC().getZ())
                     continue;
-                Vec3 other_kart_xyz = other_kart->getXYZ() + other_kart->getVelocity()*(i*dt);
+                Vec3 other_kart_xyz = other_kart->getXYZ()
+                                    + other_kart->getVelocity()*(i*dt);
                 float kart_distance = (step_coord - other_kart_xyz).length_2d();
 
                 if( kart_distance < m_kart_length)
@@ -1789,7 +1845,7 @@ void SkiddingAI::findNonCrashingPointNew(Vec3 *result, int *last_node)
     m_curve[CURVE_RIGHT]->addPoint(q[RIGHT_END_POINT]+eps1);
     m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps1);
 #endif
-#ifdef AI_DEBUG_KART_HEADING
+#if defined(AI_DEBUG_KART_HEADING) || defined(AI_DEBUG_NEW_FIND_NON_CRASHING)
     const Vec3 eps(0,0.5f,0);
     m_curve[CURVE_KART]->clear();
     m_curve[CURVE_KART]->addPoint(m_kart->getXYZ()+eps);
@@ -2111,9 +2167,9 @@ void SkiddingAI::handleCurve()
 
     determineTurnRadius(xyz, tangent, last_xyz,
                         &m_curve_center, &m_current_curve_radius);
-    assert(!isnan(m_curve_center.getX()));
-    assert(!isnan(m_curve_center.getY()));
-    assert(!isnan(m_curve_center.getZ()));
+    assert(!std::isnan(m_curve_center.getX()));
+    assert(!std::isnan(m_curve_center.getY()));
+    assert(!std::isnan(m_curve_center.getZ()));
 
 #undef ADJUST_TURN_RADIUS_TO_AVOID_CRASH_INTO_TRACK
 #ifdef ADJUST_TURN_RADIUS_TO_AVOID_CRASH_INTO_TRACK
@@ -2152,10 +2208,10 @@ void SkiddingAI::handleCurve()
 /** Determines if the kart should skid. The base implementation enables
  *  skidding
  *  \param steer_fraction The steering fraction as computed by the
- *          AIBaseController.
+ *          AIBaseLapController.
  *  \return True if the kart should skid.
  */
-bool SkiddingAI::doSkid(float steer_fraction)
+bool SkiddingAI::canSkid(float steer_fraction)
 {
     if(fabsf(steer_fraction)>1.5f)
     {
@@ -2168,7 +2224,7 @@ bool SkiddingAI::doSkid(float steer_fraction)
             if(m_ai_debug)
             {
                 if(fabsf(steer_fraction)>=2.5f)
-                    Log::debug("SkiddingAI", "%s stops skidding (%f).\n",
+                    Log::debug("SkiddingAI", "%s stops skidding (%f).",
                            m_kart->getIdent().c_str(), steer_fraction);
             }
 #endif
@@ -2188,7 +2244,7 @@ bool SkiddingAI::doSkid(float steer_fraction)
 #ifdef DEBUG
         if(m_controls->m_skid && m_ai_debug)
         {
-            Log::debug("SkiddingAI", "%s stops skidding on straight.\n",
+            Log::debug("SkiddingAI", "%s stops skidding on straight.",
                 m_kart->getIdent().c_str());
         }
 #endif
@@ -2218,14 +2274,13 @@ bool SkiddingAI::doSkid(float steer_fraction)
     // the actual path is adjusted during the turn. So apply an
     // experimentally found factor in to get better estimates.
     duration *= 1.5f;
-    const Skidding *skidding = m_kart->getSkidding();
 
     // If the remaining estimated time for skidding is too short, stop
     // it. This code will mostly trigger the bonus at the end of a skid.
     if(m_controls->m_skid && duration < 1.0f)
     {
         if(m_ai_debug)
-            Log::debug("SkiddingAI", "'%s' too short, stop skid.\n",
+            Log::debug("SkiddingAI", "'%s' too short, stop skid.",
                     m_kart->getIdent().c_str());
         return false;
     }
@@ -2241,18 +2296,18 @@ bool SkiddingAI::doSkid(float steer_fraction)
 #ifdef DEBUG
             if(m_controls->m_skid && m_ai_debug)
                 Log::debug("SkiddingAI",
-                        "%s skidding against track direction.\n",
+                        "%s skidding against track direction.",
                         m_kart->getIdent().c_str());
 #endif
             return false;
         }
     // If there is a skidding bonus, try to get it.
-    else if(skidding->getNumberOfBonusTimes()>0 &&
-            skidding->getTimeTillBonus(0) < duration)
+    else if (m_kart->getKartProperties()->getSkidBonusSpeed().size() > 0 &&
+             m_kart->getKartProperties()->getSkidTimeTillBonus()[0] < duration)
     {
 #ifdef DEBUG
         if(!m_controls->m_skid && m_ai_debug)
-            Log::debug("SkiddingAI", "%s start skid, duration %f.\n",
+            Log::debug("SkiddingAI", "%s start skid, duration %f.",
                         m_kart->getIdent().c_str(), duration);
 #endif
         return true;
@@ -2261,11 +2316,11 @@ bool SkiddingAI::doSkid(float steer_fraction)
 
 #ifdef DEBUG
         if(m_controls->m_skid && m_ai_debug)
-            Log::debug("SkiddingAI", "%s has no reasons to skid anymore.\n",
+            Log::debug("SkiddingAI", "%s has no reasons to skid anymore.",
                    m_kart->getIdent().c_str());
 #endif
     return false;
-}   // doSkid
+}   // canSkid
 
 //-----------------------------------------------------------------------------
 /** Converts the steering angle to a lr steering in the range of -1 to 1.
@@ -2287,7 +2342,7 @@ void SkiddingAI::setSteering(float angle, float dt)
     // Use a simple finite state machine to make sure to randomly decide
     // whether to skid or not only once per skid section. See docs for
     // m_skid_probability_state for more details.
-    if(!doSkid(steer_fraction))
+    if(!canSkid(steer_fraction))
     {
         m_skid_probability_state = SKID_PROBAB_NOT_YET;
         m_controls->m_skid       = KartControl::SC_NONE;
@@ -2340,7 +2395,7 @@ void SkiddingAI::setSteering(float angle, float dt)
         m_controls->m_skid = KartControl::SC_NONE;
 #ifdef DEBUG
         if(m_ai_debug)
-            Log::info("SkiddingAI", "'%s' wrong steering, stop skid.\n",
+            Log::info("SkiddingAI", "'%s' wrong steering, stop skid.",
                     m_kart->getIdent().c_str());
 #endif
     }
@@ -2355,7 +2410,7 @@ void SkiddingAI::setSteering(float angle, float dt)
         {
 #ifdef DEBUG
             if(m_ai_debug)
-                Log::info("SkiddingAI", "%s steering too much (%f).\n",
+                Log::info("SkiddingAI", "%s steering too much (%f).",
                        m_kart->getIdent().c_str(), steer_fraction);
 #endif
             m_controls->m_skid = KartControl::SC_NONE;

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,11 +21,18 @@
 
 #include <pthread.h>
 
-template<typename TYPE>
+class ISynchronised
+{
+public :
+    virtual ~ISynchronised() {}
+    virtual void lock() const = 0 ;
+    virtual void unlock() const = 0;
+};
 
 /** A variable that is automatically synchronised using pthreads mutex.
  */
-class Synchronised
+template<typename TYPE>
+class Synchronised : public ISynchronised
 {
 private:
     /** The mutex to protect this variable with. */
@@ -35,7 +42,7 @@ private:
 public:
     // ------------------------------------------------------------------------
     /** Initialise the data and the mutex with default constructors. */
-    Synchronised() : m_data(TYPE())
+    Synchronised() : m_data()
     {
         pthread_mutex_init(&m_mutex, NULL);
     }   // Synchronised()
@@ -111,6 +118,22 @@ private:
     // Make sure that no actual copying is taking place
     // ------------------------------------------------------------------------
     void operator=(const Synchronised<TYPE>& v) {}
+};
+
+#define MutexLocker(x) MutexLockerHelper __dummy(x);
+
+class MutexLockerHelper
+{
+    const ISynchronised * m_synchronised;
+public:
+    MutexLockerHelper(const ISynchronised & synchronised){
+        m_synchronised = &synchronised;
+        m_synchronised->lock();
+    }
+
+    ~MutexLockerHelper(){
+        m_synchronised->unlock();
+    }
 };
 
 

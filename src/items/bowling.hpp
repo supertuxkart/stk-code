@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2007 Joerg Henrichs, Marianne Gagnon
+//  Copyright (C) 2007-2015 Joerg Henrichs, Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -29,6 +29,7 @@ using namespace irr;
 #include "items/flyable.hpp"
 
 class XMLNode;
+class SFXBase;
 
 /**
   * \ingroup items
@@ -45,11 +46,14 @@ private:
      *  kart was hit. */
     bool m_has_hit_kart;
 
+    /** A sound effect for rolling ball. */
+    SFXBase     *m_roll_sfx;
+
 public:
-    Bowling(AbstractKart* kart);
+             Bowling(AbstractKart* kart);
+    virtual ~Bowling();
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual bool updateAndDelete(float dt);
-    virtual const core::stringw getHitString(const AbstractKart *kart) const;
     virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL);
     virtual HitEffect *getHitEffect() const;
 

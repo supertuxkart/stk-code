@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,6 +34,7 @@ namespace GUIEngine
       */
     class LabelWidget : public Widget
     {
+        bool               m_bright;
         bool               m_has_color;
         irr::video::SColor m_color;
 
@@ -42,7 +43,10 @@ namespace GUIEngine
         
         /** Current scroll offset. */
         float              m_scroll_offset;
-        
+
+        // Hide overloaded methods
+        using Widget::setText;
+
     public:
         
         LEAK_CHECK()
@@ -58,14 +62,12 @@ namespace GUIEngine
         
         /** \brief Callback from base class Widget */
         virtual void add();
-                
-        /** Sets the color of the widget. 
+
+        /** Sets the color of the widget.
          *  \param color The color to use for this widget. */
-        void     setColor(const irr::video::SColor& color)
-        {
-            m_color     = color;
-            m_has_color = true;
-        }   // setColor
+        void     setColor(const irr::video::SColor& color);
+        void     setErrorColor();
+        void     setDefaultColor();
         
         /** \brief Callback from base class Widget */
         virtual void update(float dt);
@@ -87,11 +89,11 @@ namespace GUIEngine
         virtual void setText(const wchar_t *text, bool expandAsNeeded);
         
         /** Overloaded function which takes a stringw. */
-        virtual void setText(const irr::core::stringw &s, bool expandAsNeeded) 
+        virtual void setText(const irr::core::stringw &s, bool expandAsNeeded)
         {
-            setText(s.c_str(), expandAsNeeded); 
+            setText(s.c_str(), expandAsNeeded);
         }
-        
+
         // --------------------------------------------------------------------
         
         /** Sets horizontal scroll speed. */
@@ -99,7 +101,7 @@ namespace GUIEngine
         
         // --------------------------------------------------------------------
         
-        /** 
+        /**
           * \brief Check if the current has been fully scrolled
           * \return true if the text has completely scrolled off
           * \pre May only be called after this widget has been add()ed

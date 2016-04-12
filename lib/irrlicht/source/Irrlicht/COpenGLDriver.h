@@ -25,10 +25,6 @@ namespace irr
 #include "COpenGLExtensionHandler.h"
 #include "COpenGLTexture.h"
 
-#ifdef _IRR_COMPILE_WITH_CG_
-#include "Cg/cg.h"
-#endif
-
 namespace irr
 {
 
@@ -159,6 +155,8 @@ namespace video
 				SColor color,
 				bool useAlphaChannelOfTexture);
 
+		// Import draw2DImage method from base class
+		using CNullDriver::draw2DImage;
 		//! draws an 2d image, using a color (if color is other then Color(255,255,255,255)) and the alpha channel of the texture if wanted.
 		virtual void draw2DImage(const video::ITexture* texture, const core::position2d<s32>& destPos,
 			const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect = 0,
@@ -408,10 +406,8 @@ namespace video
 		//! Get ZBuffer bits.
 		GLenum getZBufferBits() const;
 
-		//! Get Cg context
-		#ifdef _IRR_COMPILE_WITH_CG_
-		const CGcontext& getCgContext();
-		#endif
+		//! sets the needed renderstates
+		void setRenderStates3DMode();
 
 	private:
 
@@ -437,9 +433,6 @@ namespace video
 
 		//! get native wrap mode value
 		GLint getTextureWrapMode(const u8 clamp);
-
-		//! sets the needed renderstates
-		void setRenderStates3DMode();
 
 		//! sets the needed renderstates
 		void setRenderStates2DMode(bool alpha, bool texture, bool alphaChannel);
@@ -599,9 +592,6 @@ namespace video
 		#endif
 		#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
 			CIrrDeviceSDL *SDLDevice;
-		#endif
-		#ifdef _IRR_COMPILE_WITH_CG_
-		CGcontext CgContext;
 		#endif
 
 		E_DEVICE_TYPE DeviceType;

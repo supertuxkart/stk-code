@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2011 Joerg Henrichs
+//  Copyright (C) 2011-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -49,8 +49,16 @@ private:
     enum    {SWATTER_AIMING, SWATTER_TO_TARGET, SWATTER_FROM_TARGET}
                     m_animation_phase;
 
+    /** True if the swatter will be discarded now. */
+    bool               m_discard_now;
+
+    /** Require for the sfx to complete. */
+    float              m_discard_timeout;
+
     /** The kart the swatter is aiming at. */
     Moveable          *m_target;
+
+    AbstractKart      *m_closest_kart;
 
     SFXBase           *m_swat_sound;
 
@@ -66,8 +74,6 @@ private:
 
     /** For some reason the built-in animation system doesn't work correctly here?? */
     float              m_swat_bomb_frame;
-
-    const core::stringw getHitString(const AbstractKart *kart) const;
 
 public:
              Swatter(AbstractKart *kart, bool was_bomb,

@@ -13,6 +13,7 @@
 namespace irr
 {
 	class IEventReceiver;
+    namespace io{ class IFileSystem; }
 
 	//! Structure for holding Irrlicht Device creation parameters.
 	/** This structure is used in the createDeviceEx() function. */
@@ -35,7 +36,8 @@ namespace irr
 			IgnoreInput(false),
 			Stereobuffer(false),
 			HighPrecisionFPU(false),
-			EventReceiver(0),
+			EventReceiver(NULL),
+            FileSystem(NULL),
 			WindowId(0),
 #ifdef _DEBUG
 			LoggingLevel(ELL_DEBUG),
@@ -45,6 +47,7 @@ namespace irr
 			DisplayAdapter(0),
 			DriverMultithreaded(false),
 			UsePerformanceTimer(true),
+            ForceLegacyDevice(false),
 			SDK_version_do_not_use(IRRLICHT_SDK_VERSION)
 		{
 		}
@@ -71,11 +74,13 @@ namespace irr
 			Stereobuffer = other.Stereobuffer;
 			HighPrecisionFPU = other.HighPrecisionFPU;
 			EventReceiver = other.EventReceiver;
+            FileSystem = other.FileSystem;
 			WindowId = other.WindowId;
 			LoggingLevel = other.LoggingLevel;
 			DriverMultithreaded = other.DriverMultithreaded;
 			DisplayAdapter = other.DisplayAdapter;
 			UsePerformanceTimer = other.UsePerformanceTimer;
+            ForceLegacyDevice = other.ForceLegacyDevice;
 			return *this;
 		}
 
@@ -205,6 +210,9 @@ namespace irr
 		//! A user created event receiver.
 		IEventReceiver* EventReceiver;
 
+        //! A pointer to an existing file system to be used.
+        io::IFileSystem *FileSystem;
+
 		//! Window Id.
 		/** If this is set to a value other than 0, the Irrlicht Engine
 		will be created in an already existing window. For windows, set
@@ -282,6 +290,11 @@ namespace irr
 		problems with speed stepping and other techniques.
 		*/
 		bool UsePerformanceTimer;
+
+        //! For opengl: forces a opengl 2.1 context, even if an 
+        /** opengl 3 context is available.
+        */
+        bool ForceLegacyDevice;
 
 		//! Don't use or change this parameter.
 		/** Always set it to IRRLICHT_SDK_VERSION, which is done by default.

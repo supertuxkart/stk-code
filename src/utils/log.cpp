@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Joerg Henrichs
+//  Copyright (C) 2013-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,6 +28,7 @@
 #endif
 
 #ifdef WIN32
+#  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 #endif
 
@@ -56,6 +57,7 @@ void Log::setTerminalColor(LogLevel level)
     char color;
     switch(level)
     {
+    default:
     case LL_VERBOSE: color = TERM_BLACK     << 4 | TERM_LIGHTGRAY; break;
     case LL_DEBUG:   color = TERM_BLACK     << 4 | TERM_LIGHTGRAY; break;
     case LL_INFO:    color = TERM_BLACK     << 4 | TERM_LIGHTGRAY; break;
@@ -67,9 +69,9 @@ void Log::setTerminalColor(LogLevel level)
 #else
     enum TermAttr
     {
-        TERM_RESET = 0,	// "normal" mode
+        TERM_RESET = 0, // "normal" mode
         TERM_BRIGHT = 1,// more luminosity for the foreground
-        TERM_DIM = 2,	// less luminosity for the foreground
+        TERM_DIM = 2,   // less luminosity for the foreground
     };
 
     enum TermColor
@@ -153,7 +155,7 @@ void Log::printMessage(int level, const char *component, const char *format,
     }
     __android_log_vprint(alp, "SuperTuxKart", format, args);
 #else
-    static const char *names[] = {"verbose", "debug  ", "info   ",
+    static const char *names[] = {"debug", "verbose  ", "info   ",
                                   "warn   ", "error  ", "fatal  "};
 
     // Using a va_list twice produces undefined results, ie crash.
@@ -163,9 +165,13 @@ void Log::printMessage(int level, const char *component, const char *format,
     {
         va_copy(copy, args);
     }
+#if defined(_MSC_FULL_VER) && defined(_DEBUG)
+    VALIST copy2;
+    va_copy(copy2, args);
+#endif
 
     // If we don't have a console file, write to stdout and hope for the best
-    if(!m_file_stdout ||
+    if(!m_file_stdout || level >= LL_WARN ||
         UserConfigParams::m_log_errors_to_console) // log to console & file
     {
         VALIST out;
@@ -178,6 +184,21 @@ void Log::printMessage(int level, const char *component, const char *format,
 
         va_end(out);
     }
+
+#if defined(_MSC_FULL_VER) && defined(_DEBUG)
+    static char szBuff[2048];
+    vsnprintf(szBuff, sizeof(szBuff), format, copy2);
+
+    OutputDebugString("[");
+    OutputDebugString(names[level]);
+    OutputDebugString("] ");
+    OutputDebugString(component);
+    OutputDebugString(": ");
+    OutputDebugString(szBuff);
+    OutputDebugString("\r\n");
+#endif
+
+
     if(m_file_stdout)
     {
         fprintf (m_file_stdout, "[%s] %s: ", names[level], component);
@@ -185,6 +206,25 @@ void Log::printMessage(int level, const char *component, const char *format,
         fprintf (m_file_stdout, "\n");
         va_end(copy);
     }
+
+#ifdef WIN32
+    if (level >= LL_FATAL)
+    {
+        std::string message;
+
+        char tmp[2048];
+        sprintf(tmp, "[%s] %s: ", names[level], component);
+        message += tmp;
+
+        VALIST out;
+        va_copy(out, args);
+        vsprintf(tmp, format, out);
+        message += tmp;
+        va_end(out);
+
+        MessageBoxA(NULL, message.c_str(), "SuperTuxKart - Fatal error", MB_OK);
+    }
+#endif
 
 #endif
 }   // printMessage

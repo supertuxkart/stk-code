@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Lucas Baudin, Joerg Henrichs
+//  Copyright (C) 2010-2015 Lucas Baudin, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -39,8 +39,6 @@ private:
     Synchronised<std::vector<Addon> >  m_addons_list;
     /** Full filename of the addons_installed.xml file. */
     std::string                        m_file_installed;
-    std::string                        m_type;
-    int                                m_download_state;
 
     /** List of loaded icons. */
     std::vector<std::string> m_icon_list;
@@ -60,13 +58,15 @@ private:
 public:
                  AddonsManager();
                 ~AddonsManager();
-    void         initOnline(const XMLNode *xml);
+    void         init(const XMLNode *xml, bool force_refresh);
+    void         initAddons(const XMLNode *xml);
     void         checkInstalledAddons();
     const Addon* getAddon(const std::string &id) const;
     int          getAddonIndex(const std::string &id) const;
     bool         install(const Addon &addon);
     bool         uninstall(const Addon &addon);
     void         reInit();
+    bool         anyAddonsInstalled() const;
     // ------------------------------------------------------------------------
     /** Returns true if the list of online addons has been downloaded. This is
      *  used to grey out the 'addons' entry till a network connections could be
@@ -81,7 +81,7 @@ public:
     void         setErrorState() { m_state.setAtomic(STATE_ERROR); }
     // ------------------------------------------------------------------------
     /** Returns the list of addons (installed and uninstalled). */
-    unsigned int getNumAddons() const { return m_addons_list.getData().size();}
+    unsigned int getNumAddons() const { return (unsigned int) m_addons_list.getData().size();}
     // ------------------------------------------------------------------------
     /** Returns the i-th addons. */
     const Addon& getAddon(unsigned int i) { return m_addons_list.getData()[i];}

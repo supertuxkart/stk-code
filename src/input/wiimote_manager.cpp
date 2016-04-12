@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2012 SuperTuxKart-Team
+//  Copyright (C) 2012-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,16 +17,20 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef ENABLE_WIIUSE
+#define WCONST
 
 #include "input/wiimote_manager.hpp"
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "gamepad_device.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/wiimote.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/time.hpp"
 #include "utils/translation.hpp"
+#include "utils/vs.hpp"
 
 #include "wiiuse.h"
 
@@ -60,33 +64,108 @@ WiimoteManager::~WiimoteManager()
  */
 void WiimoteManager::launchDetection(int timeout)
 {
+  // It's only needed on systems with bluez, because wiiuse_find does not find alredy connected wiimotes
+#ifdef WIIUSE_BLUEZ
+    //Cleans up the config and the disconnected wiimotes
+    int number_previous_wiimotes = 0;
+    wiimote_t** previous_wiimotes = (wiimote_t**) malloc(sizeof(struct wiimote_t*) * MAX_WIIMOTES);
+    memset(previous_wiimotes,0,sizeof(struct wiimote_t*) * MAX_WIIMOTES);
+    for (unsigned int i = 0; i < m_wiimotes.size(); i++)
+    {
+      if (WIIMOTE_IS_CONNECTED(m_all_wiimote_handles[i]))
+      {
+        previous_wiimotes[i]=m_all_wiimote_handles[i];
+        m_all_wiimote_handles[i] = NULL;
+        number_previous_wiimotes++;
+      }
+    }
+
+    //To prevent segmentation fault, have to delete NULLs
+    wiimote_t** deletable_wiimotes = (wiimote_t**) malloc(sizeof(struct wiimote_t*) * (m_wiimotes.size()-number_previous_wiimotes));
+    memset(deletable_wiimotes,0,sizeof(struct wiimote_t*) * (m_wiimotes.size()-number_previous_wiimotes));
+    int number_deletables = 0;
+    for (unsigned int i = 0; i < m_wiimotes.size(); i++)
+    {
+      if (m_all_wiimote_handles[i] != NULL)
+      {
+        deletable_wiimotes[number_deletables++] = m_all_wiimote_handles[i];
+      }
+    }
+    m_all_wiimote_handles = wiiuse_init(MAX_WIIMOTES);
+    wiiuse_cleanup(deletable_wiimotes, number_deletables);
+
+#endif
+
     // Stop WiiUse, remove wiimotes, gamepads, gamepad configs.
     cleanup();
 
-    m_all_wiimote_handles =  wiiuse_init(MAX_WIIMOTES);
+    m_all_wiimote_handles = wiiuse_init(MAX_WIIMOTES);
 
     // Detect wiimotes
     int nb_found_wiimotes = wiiuse_find(m_all_wiimote_handles, MAX_WIIMOTES, timeout);
 
+#ifndef WIIUSE_BLUEZ
     // Couldn't find any wiimote?
     if(nb_found_wiimotes == 0)
         return;
+#endif
+
+#ifdef WIIUSE_BLUEZ
+    // Couldn't find any wiimote?
+    if(nb_found_wiimotes + number_previous_wiimotes == 0)
+        return;
+#endif
 
     // Try to connect to all found wiimotes
     int nb_wiimotes = wiiuse_connect(m_all_wiimote_handles, nb_found_wiimotes);
 
+#ifndef WIIUSE_BLUEZ
     // Couldn't connect to any wiimote?
     if(nb_wiimotes == 0)
         return;
+#endif
+
+#ifdef WIIUSE_BLUEZ
+    // Couldn't connect to any wiimote?
+    if(nb_wiimotes + number_previous_wiimotes == 0)
+        return;
+
+    //Merges previous and new wiimote's list
+    int number_merged_wiimotes = 0;
+    for (int i = 0; i < number_previous_wiimotes && i + nb_wiimotes < MAX_WIIMOTES; i++)
+    {
+      m_all_wiimote_handles[i+nb_wiimotes] = previous_wiimotes[i];
+      previous_wiimotes[i] = NULL;
+      m_all_wiimote_handles[i]->unid = nb_wiimotes+i+1;
+      number_merged_wiimotes++;
+    }
+    nb_wiimotes += number_merged_wiimotes;
+
+    //To prevent segmentation fault, have to delete NULLs
+    number_deletables = 0;
+    number_deletables = 0;
+    deletable_wiimotes = (wiimote_t**) malloc(sizeof(struct wiimote_t*) * (number_previous_wiimotes-number_merged_wiimotes));
+    memset(deletable_wiimotes,0,sizeof(struct wiimote_t*) * (number_previous_wiimotes-number_merged_wiimotes));
+    for (int i = 0; i < number_previous_wiimotes; i++)
+    {
+      if (previous_wiimotes[i] != NULL)
+      {
+        deletable_wiimotes[number_deletables++] = previous_wiimotes[i];
+      }
+    }
+    // Cleans up wiimotes which ones didn't fit in limit
+    wiiuse_cleanup(deletable_wiimotes, number_deletables);
+
+#endif
 
     // ---------------------------------------------------
     // Create or find a GamepadConfig for all wiimotes
-    DeviceManager* device_manager = input_manager->getDeviceList();
+    DeviceManager* device_manager = input_manager->getDeviceManager();
     GamepadConfig* gamepad_config = NULL;
 
     device_manager->getConfigForGamepad(WIIMOTE_START_IRR_ID, "Wiimote",
                                         &gamepad_config);
-    int num_buttons = (int)( log((float)WIIMOTE_BUTTON_ALL) / log(2.0f))+1;
+    int num_buttons = (int)( log((float)WIIMOTE_BUTTON_ALL) / log((float)2.0f))+1;
     gamepad_config->setNumberOfButtons(num_buttons);
     gamepad_config->setNumberOfAxis(1);
 
@@ -110,7 +189,7 @@ void WiimoteManager::launchDetection(int timeout)
         wiiuse_rumble(wiimote_handle, 1);
     }
 
-    irr_driver->getDevice()->sleep(200);
+    StkTime::sleep(200);
 
     for(unsigned int i=0 ; i < m_wiimotes.size(); i++)
     {
@@ -135,7 +214,7 @@ void WiimoteManager::launchDetection(int timeout)
  */
 int getButton(int n)
 {
-    return (int)(log((float)n)/log(2.0f));
+    return (int)(log((float)n)/log((float)2.0f));
 }   // getButton
 
 // ----------------------------------------------------------------------------
@@ -168,7 +247,7 @@ void WiimoteManager::cleanup()
 {
     if(m_wiimotes.size() > 0)
     {
-        DeviceManager* device_manager = input_manager->getDeviceList();
+        DeviceManager* device_manager = input_manager->getDeviceManager();
 
         GamePadDevice* first_gamepad_device =
                      device_manager->getGamePadFromIrrID(WIIMOTE_START_IRR_ID);
@@ -284,7 +363,7 @@ void WiimoteManager::threadFunc()
             }
         }
 
-        irr_driver->getDevice()->sleep(1);  // 'cause come on, the whole CPU is not ours :)
+        StkTime::sleep(1);  // 'cause come on, the whole CPU is not ours :)
     } // end while
 }   // threadFunc
 
@@ -295,6 +374,7 @@ void WiimoteManager::threadFunc()
  */
 void* WiimoteManager::threadFuncWrapper(void *data)
 {
+    VS::setThreadName("WiimoteManager");
     ((WiimoteManager*)data)->threadFunc();
     return NULL;
 }   // threadFuncWrapper
@@ -304,13 +384,19 @@ void* WiimoteManager::threadFuncWrapper(void *data)
  */
 int WiimoteManager::askUserToConnectWiimotes()
 {
-	new MessageDialog(
-		_("Press the buttons 1+2 simultaneously on your wiimote to put "
-		  "it in discovery mode, then click on OK."),
-		MessageDialog::MESSAGE_DIALOG_CONFIRM,
-		new WiimoteDialogListener(), true);
+    new MessageDialog(
+#ifdef WIN32
+        _("Connect your wiimote to the Bluetooth manager, then click on Ok."
+                  "Detailed instructions at supertuxkart.net/Wiimote"),
+#else
+        _("Press the buttons 1+2 simultaneously on your wiimote to put "
+          "it in discovery mode, then click on Ok."
+                  "Detailed instructions at supertuxkart.net/Wiimote"),
+#endif
+        MessageDialog::MESSAGE_DIALOG_OK_CANCEL,
+        new WiimoteDialogListener(), true);
 
-	return getNumberOfWiimotes();
+    return getNumberOfWiimotes();
 }   // askUserToConnectWiimotes
 
 // ============================================================================
@@ -319,23 +405,19 @@ int WiimoteManager::askUserToConnectWiimotes()
  */
 void WiimoteManager::WiimoteDialogListener::onConfirm()
 {
-	GUIEngine::ModalDialog::dismiss();
+    GUIEngine::ModalDialog::dismiss();
 
-	wiimote_manager->launchDetection(5);
+    wiimote_manager->launchDetection(5);
 
-	int nb_wiimotes = wiimote_manager->getNumberOfWiimotes();
-	if(nb_wiimotes > 0)
-	{
-		core::stringw msg = StringUtils::insertValues(
-			_("Found %d wiimote(s)"),
-			core::stringw(nb_wiimotes));
-
-		new MessageDialog( msg );
-
-	}
-	else
-	{
-		new MessageDialog( _("Could not detect any wiimote :/") );
-	}
+    int nb_wiimotes = wiimote_manager->getNumberOfWiimotes();
+    if(nb_wiimotes > 0)
+    {
+        new MessageDialog(_P("Found %d wiimote", "Found %d wiimotes",
+                             nb_wiimotes));
+    }
+    else
+    {
+        new MessageDialog( _("Could not detect any wiimote :/") );
+    }
 }   // WiimoteDialogListeneronConfirm
 #endif // ENABLE_WIIUSE

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
 #include <map>
 #include <string>
 #include <typeinfo>
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 
 #include <irrString.h>
 #include <IXMLReader.h>
@@ -61,6 +61,7 @@ namespace GUIEngine
     template<typename SCREEN>
     class ScreenSingleton
     {
+    protected:
         static SCREEN* singleton;
 
     public:
@@ -227,6 +228,10 @@ namespace GUIEngine
           */
         virtual void init();
 
+        /** Displays this screen bu pushing it onto the stack of screen 
+         *  in the state manager. */
+        void push();
+
         /**
           * \brief Callback invoked before leaving this menu.
           *
@@ -259,7 +264,7 @@ namespace GUIEngine
         /**
          * \brief optional callback you can override to be notified at every frame.
          */
-        virtual void onUpdate(float dt, irr::video::IVideoDriver*) { };
+        virtual void onUpdate(float dt) { };
 
         /**
          * \return which music to play at this screen
@@ -302,8 +307,26 @@ namespace GUIEngine
                                  int axisDir,
                                  int value) {}
 
+        /** Callback that gets called when a dialog is closed.
+         *  Can be used to set focus for instance.
+         */
+        virtual void onDialogClose() {}
+
+        /** Callback called when focus changes */
+        virtual void onFocusChanged(Widget* previous, Widget* focus, int playerID) {}
     };
 
+    class CutsceneScreen : public Screen
+    {
+    public:
+        CutsceneScreen(const char* name) : Screen(name, false)
+        {
+            setNeeds3D(true);
+            m_throttle_FPS = false;
+        }
+
+        virtual void onCutsceneEnd() = 0;
+    };
 }
 
 #endif

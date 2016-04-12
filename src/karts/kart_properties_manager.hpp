@@ -1,6 +1,7 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2006 Ingo Ruhnke <grumbel@gmx.de>
+//
+//  Copyright (C) 2004-2015 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,13 +22,16 @@
 
 #include "utils/ptr_vector.hpp"
 #include <map>
+#include <memory>
 
 #include "network/remote_kart_info.hpp"
 #include "utils/no_copy.hpp"
 
 #define ALL_KART_GROUPS_ID  "all"
 
+class AbstractCharacteristic;
 class KartProperties;
+class XMLNode;
 
 /**
   * \ingroup karts
@@ -57,6 +61,11 @@ private:
      *  all clients or not. */
     std::vector<bool>        m_kart_available;
 
+    std::unique_ptr<AbstractCharacteristic>                         m_base_characteristic;
+    std::map<std::string, std::unique_ptr<AbstractCharacteristic> > m_difficulty_characteristics;
+    std::map<std::string, std::unique_ptr<AbstractCharacteristic> > m_kart_type_characteristics;
+    std::map<std::string, std::unique_ptr<AbstractCharacteristic> > m_player_characteristics;
+
 protected:
 
     typedef PtrVector<KartProperties> KartPropertiesVector;
@@ -73,10 +82,10 @@ public:
     int                      getKartByGroup(const std::string& group,
                                            int i) const;
 
+    void                     loadCharacteristics    (const XMLNode *root);
     bool                     loadKart               (const std::string &dir);
     void                     loadAllKarts           (bool loading_icon = true);
     void                     unloadAllKarts         ();
-    void                     reLoadAllKarts         ();
     void                     removeKart(const std::string &id);
     const std::vector<int>   getKartsInGroup        (const std::string& g);
     bool                     kartAvailable(int kartid);
@@ -87,6 +96,19 @@ public:
     void                     getRandomKartList(int count,
                                            RemoteKartInfoList& existing_karts,
                                            std::vector<std::string> *ai_list);
+    void                     setHatMeshName(const std::string &hat_name);
+    // ------------------------------------------------------------------------
+    /** Get the characteristic that holds the base values. */
+    const AbstractCharacteristic* getBaseCharacteristic() const { return m_base_characteristic.get(); }
+    // ------------------------------------------------------------------------
+    /** Get a characteristic that holds the values for a certain difficulty. */
+    const AbstractCharacteristic* getDifficultyCharacteristic(const std::string &type) const;
+    // ------------------------------------------------------------------------
+    /** Get a characteristic that holds the values for a kart type. */
+    const AbstractCharacteristic* getKartTypeCharacteristic(const std::string &type) const;
+    // ------------------------------------------------------------------------
+    /** Get a characteristic that holds the values for a player difficulty. */
+    const AbstractCharacteristic* getPlayerCharacteristic(const std::string &type) const;
     // ------------------------------------------------------------------------
     /** Returns a list of all groups. */
     const std::vector<std::string>& getAllGroups() const {return m_all_groups;}
@@ -98,7 +120,7 @@ public:
     void removeLastSelectedKart() { m_selected_karts.pop_back(); }
     // ------------------------------------------------------------------------
     /** Returns the number of selected karts (used in networking only). */
-    int getNumSelectedKarts() const { return m_selected_karts.size(); }
+    int getNumSelectedKarts() const { return (int) m_selected_karts.size(); }
     // ------------------------------------------------------------------------
     /** Sets a kartid to be selected (used in networking only). */
     void selectKart(int kartid) { m_selected_karts.push_back(kartid); }

@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2004-2015 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,7 +21,7 @@
 
 #include <assert.h>
 
-#include "audio/music_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -29,7 +30,11 @@
 #include "input/wiimote_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-#include "network/network_manager.hpp"
+#include "network/network_config.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/race_event_manager.hpp"
+#include "network/stk_host.hpp"
+#include "online/request_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
@@ -37,11 +42,11 @@
 MainLoop* main_loop = 0;
 
 MainLoop::MainLoop() :
-m_abort(false),
-m_frame_count(0)
+m_abort(false)
 {
     m_curr_time = 0;
     m_prev_time = 0;
+    m_throttle_fps = true;
 }  // MainLoop
 
 //-----------------------------------------------------------------------------
@@ -64,6 +69,24 @@ float MainLoop::getLimitedDt()
     {
         m_curr_time = device->getTimer()->getRealTime();
         dt = (float)(m_curr_time - m_prev_time);
+        const World* const world = World::getWorld();
+        if (UserConfigParams::m_fps_debug && world)
+        {
+            const LinearWorld *lw = dynamic_cast<const LinearWorld*>(world);
+            if (lw)
+            {
+                Log::verbose("fps", "time %f distance %f dt %f fps %f",
+                             lw->getTime(),
+                             lw->getDistanceDownTrackForKart(0),
+                             dt*0.001f, 1000.0f / dt);
+            }
+            else
+            {
+                Log::verbose("fps", "time %f dt %f fps %f",
+                             world->getTime(), dt*0.001f, 1000.0f / dt);
+            }
+
+        }
 
         // don't allow the game to run slower than a certain amount.
         // when the computer can't keep it up, slow down the shown time instead
@@ -73,14 +96,16 @@ float MainLoop::getLimitedDt()
         // Throttle fps if more than maximum, which can reduce
         // the noise the fan on a graphics card makes.
         // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
-        const int max_fps = (StateManager::get()->throttleFPS() ? 35 : UserConfigParams::m_max_fps);
+        const int max_fps = (StateManager::get()->throttleFPS() ? 30 : UserConfigParams::m_max_fps);
         const int current_fps = (int)(1000.0f/dt);
-        if( current_fps > max_fps && !ProfileWorld::isNoGraphics())
+        if (m_throttle_fps && current_fps > max_fps && !ProfileWorld::isProfileMode())
         {
             int wait_time = 1000/max_fps - 1000/current_fps;
             if(wait_time < 1) wait_time = 1;
 
-            irr_driver->getDevice()->sleep(wait_time);
+            PROFILER_PUSH_CPU_MARKER("Throttle framerate", 0, 0, 0);
+            StkTime::sleep(wait_time);
+            PROFILER_POP_CPU_MARKER();
         }
         else break;
     }
@@ -94,22 +119,13 @@ float MainLoop::getLimitedDt()
  */
 void MainLoop::updateRace(float dt)
 {
-    // Server: Send the current position and previous controls to all clients
-    // Client: send current controls to server
-    // But don't do this if the race is in finish phase (otherwise
-    // messages can be mixed up in the race manager)
-    if(!World::getWorld()->isFinishPhase())
-        network_manager->sendUpdates();
     if(ProfileWorld::isProfileMode()) dt=1.0f/60.0f;
 
-    // Again, only receive updates if the race isn't over - once the
-    // race results are displayed (i.e. game is in finish phase)
-    // messages must be handled by the normal update of the network
-    // manager
-    if(!World::getWorld()->isFinishPhase())
-        network_manager->receiveUpdates();
-
-    World::getWorld()->updateWorld(dt);
+    // The race event manager will update world in case of an online race
+    if (RaceEventManager::getInstance<RaceEventManager>()->isRunning())
+        RaceEventManager::getInstance<RaceEventManager>()->update(dt);
+    else
+        World::getWorld()->updateWorld(dt);
 }   // updateRace
 
 //-----------------------------------------------------------------------------
@@ -193,14 +209,11 @@ void MainLoop::run()
         m_prev_time = m_curr_time;
         float dt   = getLimitedDt();
 
-        network_manager->update(dt);
-
         if (World::getWorld())  // race is active if world exists
         {
-            // Busy wait if race_manager is active (i.e. creating of world is done)
-            // till all clients have reached this state.
-            if (network_manager->getState()==NetworkManager::NS_READY_SET_GO_BARRIER) continue;
+            PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
             updateRace(dt);
+            PROFILER_POP_CPU_MARKER();
         }   // if race is active
 
         // We need to check again because update_race may have requested
@@ -210,28 +223,56 @@ void MainLoop::run()
         // enabled.
         if (!m_abort && !ProfileWorld::isNoGraphics())
         {
-            PROFILER_PUSH_CPU_MARKER("Music manager update", 0x7F, 0x00, 0x00);
-            music_manager->update(dt);
-            PROFILER_POP_CPU_MARKER();
-
-            PROFILER_PUSH_CPU_MARKER("Input manager update", 0x00, 0x7F, 0x00);
+            PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
             input_manager->update(dt);
-            PROFILER_POP_CPU_MARKER();
 
             #ifdef ENABLE_WIIUSE
                 wiimote_manager->update();
             #endif
-            PROFILER_PUSH_CPU_MARKER("Update GUI widgets", 0x7F, 0x7F, 0x00);
+            
             GUIEngine::update(dt);
             PROFILER_POP_CPU_MARKER();
 
             PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
             irr_driver->update(dt);
             PROFILER_POP_CPU_MARKER();
+
+            // Update sfx and music after graphics, so that graphics code
+            // can use as many threads as possible without interfering
+            // with audia
+            PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
+            SFXManager::get()->update();
+            PROFILER_POP_CPU_MARKER();
+
+            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
+            if (STKHost::existHost())
+            {
+                if (STKHost::get()->requestedShutdown())
+                    STKHost::get()->shutdown();
+                else
+                    ProtocolManager::getInstance()->update(dt);
+            }
+            PROFILER_POP_CPU_MARKER();
+
+            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
+            Online::RequestManager::get()->update(dt);
+            PROFILER_POP_CPU_MARKER();
         }
-        PROFILER_SYNC_FRAME();
+        else if (!m_abort && ProfileWorld::isNoGraphics())
+        {
+            PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
+            if(NetworkConfig::get()->isNetworking())
+                ProtocolManager::getInstance()->update(dt);
+            PROFILER_POP_CPU_MARKER();
+
+            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
+            Online::RequestManager::get()->update(dt);
+            PROFILER_POP_CPU_MARKER();
+        }
+
         PROFILER_POP_CPU_MARKER();
-    }  // while !m_exit
+        PROFILER_SYNC_FRAME();
+    }  // while !m_abort
 
 }   // run
 

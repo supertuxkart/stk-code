@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<particles emitter="box" box_x="0.5" box_y="0.5" box_z="0.5">
+
+    <spreading angle="45"      />
+    
+    <velocity  x="0.000"
+               y="0.005"
+               z="0.000"         />
+    
+    <material  file="gfx_bubble_a.png"  />
+    
+    <!-- Amount of particles emitted per second -->
+    <rate      min="3"
+               max="6"         />
+    
+    <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
+    <lifetime  min="3000"
+               max="6000"         />
+    
+    <!-- Size of the particles -->
+   <size min="1.1"
+         max="1.5"
+         x-increase-factor="1.6"
+         y-increase-factor="1.6" />    
+    
+    <color     min="0 0 0"
+               max="255 255 255" />
+
+    <fadeout   time="5000" />
+
+
+</particles>

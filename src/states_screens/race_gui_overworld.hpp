@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Joerg Henrichs, SuperTuxKart-Team, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -27,7 +27,6 @@
 #include <irrString.h>
 using namespace irr;
 
-#include "config/player.hpp"
 #include "states_screens/race_gui_base.hpp"
 
 class AbstractKart;
@@ -63,9 +62,6 @@ private:
 
     // Minimap related variables
     // -------------------------
-    /** The mini map of the track. */
-    video::ITexture *m_mini_map;
-
     video::ITexture *m_trophy1;
     video::ITexture *m_trophy2;
     video::ITexture *m_trophy3;
@@ -76,11 +72,11 @@ private:
 
     /** The size of a single marker on the screen for AI karts,
      *  need not be a power of 2. */
-    int              m_marker_challenge_size;
+    int              m_minimap_challenge_size;
 
     /** The size of a single marker on the screen or player karts,
      *  need not be a power of 2. */
-    int              m_marker_player_size;
+    int              m_minimap_player_size;
 
     /** The width of the rendered mini map in pixels, must be a power of 2. */
     int              m_map_rendered_width;

@@ -1,9 +1,9 @@
 
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2005 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2007 Eduardo Hernandez Munoz
-//  Copyright (C) 2010      Joerg Henrichs
+//  Copyright (C) 2004-2015  Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015  Eduardo Hernandez Munoz
+//  Copyright (C) 2010-2015  Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,9 +20,30 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef HEADER_SKIDDING_AI_HPP
-#define HEADER_SKIDDING_AI__HPP
+#define HEADER_SKIDDING_AI_HPP
 
-#include "karts/controller/ai_base_controller.hpp"
+// Some debugging features for the AI. For example you can visualise the
+// point the AI is aiming at, or visualise the curve the AI is predicting.
+// It works best with just 1 AI kart, so set the number of karts
+// to 2 in main.cpp with quickstart and run supertuxkart with the arg -N.
+// Or use --profile-laps=99 and run just one AI. Using the debug camera
+// (top view) is useful, too
+
+#ifdef DEBUG
+   // Enable AI graphical debugging
+#  undef AI_DEBUG
+   // Shows left and right lines when using new findNonCrashing function
+#  undef AI_DEBUG_NEW_FIND_NON_CRASHING
+   // Show the predicted turn circles
+#  undef AI_DEBUG_CIRCLES
+   // Show the heading of the kart
+#  undef AI_DEBUG_KART_HEADING
+   // Shows line from kart to its aim point
+#  undef AI_DEBUG_KART_AIM
+#endif
+
+
+#include "karts/controller/ai_base_lap_controller.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/graph_node.hpp"
 #include "utils/random_generator.hpp"
@@ -40,7 +61,7 @@ namespace irr
     }
 }
 
-/** 
+/**
 \brief This is the actual racing AI.
 
 The main entry point, called once per frame for each AI, is update().
@@ -49,7 +70,7 @@ the AI does the following steps:
 - compute nearest karts (one ahead and one behind)
 - check if the kart is about to crash with another kart or the
   track. This is done by simply testing a certain number of timesteps
-  ahead and estimating the future position of any kart by using 
+  ahead and estimating the future position of any kart by using
   current_position  + velocity * time
   (so turns are not taken into account). It also checks if the kart
   would be outside the quad graph, which indicates a 'collision with
@@ -73,7 +94,7 @@ the AI does the following steps:
     behaviour.
     The function handleSteering() then calls setSteering() to set the
     actually steering amount. The latter function also decides if skidding
-    should be done or not (by calling doSkid()).
+    should be done or not (by calling canSkid()).
   - decide if to try to collect or avoid items (handeItems).
     It considers all items on quads between the current quad of the kart
     and the quad the AI is aiming at (see handleSteering). If it finds
@@ -90,7 +111,7 @@ the AI does the following steps:
 
 \ingroup controller
 */
-class SkiddingAI : public AIBaseController
+class SkiddingAI : public AIBaseLapController
 {
 private:
 
@@ -104,7 +125,7 @@ private:
         void clear() {m_road = false; m_kart = -1;}
     } m_crashes;
 
-    RaceManager::AISuperPower m_superpower;    
+    RaceManager::AISuperPower m_superpower;
 
     /*General purpose variables*/
 
@@ -123,15 +144,15 @@ private:
     float m_distance_behind;
 
     /** The actual start delay used. */
-    float m_start_delay; 
-  
+    float m_start_delay;
+
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
-  
+
     float m_time_since_stuck;
 
     /** Direction of crash: -1 = left, 1 = right, 0 = no crash. */
-    int m_start_kart_crash_direction; 
+    int m_start_kart_crash_direction;
 
     /** The direction of the track where the kart is on atm. */
     GraphNode::DirectionType m_current_track_direction;
@@ -140,7 +161,7 @@ private:
      *  when being on a straigt section. */
     float m_current_curve_radius;
 
-    /** Stores the center of the curve (if the kart is in a curve, 
+    /** Stores the center of the curve (if the kart is in a curve,
      *  otherwise undefined). */
     Vec3  m_curve_center;
 
@@ -185,12 +206,12 @@ private:
 
     /** \brief Determines the algorithm to use to select the point-to-aim-for
      *  There are three different Point Selection Algorithms:
-     *  1. findNonCrashingPoint() is the default (which is actually slightly 
-     *     buggy, but so far best one after handling of 90 degree turns was 
+     *  1. findNonCrashingPoint() is the default (which is actually slightly
+     *     buggy, but so far best one after handling of 90 degree turns was
      *     added).
      *  2. findNonCrashingPointFixed() which fixes the bugs of the default
      *     algorithm.
-     *  3. findNonCrashingPointNew() A newly designed algorithm, which is 
+     *  3. findNonCrashingPointNew() A newly designed algorithm, which is
      *     faster than the standard one, but does not give as good results
      *     as the 'buggy' one.
      *
@@ -199,15 +220,15 @@ private:
     enum {PSA_DEFAULT, PSA_FIXED, PSA_NEW}
           m_point_selection_algorithm;
 
-#ifdef DEBUG
+#ifdef AI_DEBUG
     /** For skidding debugging: shows the estimated turn shape. */
     ShowCurve **m_curve;
 
-    /** For debugging purpose: a sphere indicating where the AI 
+    /** For debugging purpose: a sphere indicating where the AI
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere[4];
 
-    /** For item debugging: set to the item that is selected to 
+    /** For item debugging: set to the item that is selected to
      *  be collected. */
     irr::scene::ISceneNode *m_item_sphere;
 #endif
@@ -226,15 +247,15 @@ private:
     void  handleBraking();
     void  handleNitroAndZipper();
     void  computeNearestKarts();
-    void  handleItemCollectionAndAvoidance(Vec3 *aim_point, 
+    void  handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                            int last_node);
     bool  handleSelectedItem(float kart_aim_angle, Vec3 *aim_point);
     bool  steerToAvoid(const std::vector<const Item *> &items_to_avoid,
                        const core::line2df &line_to_target,
                        Vec3 *aim_point);
-    bool  hitBadItemWhenAimAt(const Item *item, 
+    bool  hitBadItemWhenAimAt(const Item *item,
                               const std::vector<const Item *> &items_to_avoid);
-    void  evaluateItems(const Item *item, float kart_aim_angle, 
+    void  evaluateItems(const Item *item, float kart_aim_angle,
                         std::vector<const Item *> *items_to_avoid,
                         std::vector<const Item *> *items_to_collect);
 
@@ -249,7 +270,7 @@ private:
                               const Vec3 &end,
                               Vec3 *center,
                               float *radius);
-    virtual bool doSkid(float steer_fraction);
+    virtual bool canSkid(float steer_fraction);
     virtual void setSteering(float angle, float dt);
     void handleCurve();
 

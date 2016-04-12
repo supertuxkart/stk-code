@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,22 +18,22 @@
 
 #include "race/highscores.hpp"
 
+#include "io/utf_writer.hpp"
+#include "io/xml_node.hpp"
+#include "race/race_manager.hpp"
+
 #include <stdexcept>
 #include <fstream>
 
-#include "io/xml_node.hpp"
-#include "io/xml_writer.hpp"
-#include "race/race_manager.hpp"
-
 // -----------------------------------------------------------------------------
-Highscores::Highscores(const HighscoreType highscore_type,
+Highscores::Highscores(const HighscoreType &highscore_type,
                        int num_karts,
-                       const RaceManager::Difficulty difficulty,
-                       const std::string trackName,
+                       const RaceManager::Difficulty &difficulty,
+                       const std::string &track_name,
                        const int number_of_laps,
                        const bool reverse)
 {
-    m_track           = trackName;
+    m_track           = track_name;
     m_highscore_type  = highscore_type;
     m_number_of_karts = num_karts;
     m_difficulty      = difficulty;
@@ -105,7 +105,7 @@ void Highscores::readEntry(const XMLNode &node)
  *  resulting in empty entries here.
  *  \param writer The file stream to write the data to.
  */
-void Highscores::writeEntry(XMLWriter &writer)
+void Highscores::writeEntry(UTFWriter &writer)
 {
     // Only
     bool one_is_set = false;
@@ -135,10 +135,10 @@ void Highscores::writeEntry(XMLWriter &writer)
 }   // writeEntry
 
 // -----------------------------------------------------------------------------
-int Highscores::matches(HighscoreType highscore_type,
-                            int num_karts, RaceManager::Difficulty difficulty,
-                            const std::string track, const int number_of_laps,
-                            const bool reverse)
+int Highscores::matches(const HighscoreType &highscore_type,
+                        int num_karts, const RaceManager::Difficulty &difficulty,
+                        const std::string &track, const int number_of_laps,
+                        const bool reverse)
 {
     return (m_highscore_type  == highscore_type   &&
             m_track           == track            &&
@@ -212,10 +212,10 @@ void Highscores::getEntry(int number, std::string &kart_name,
 {
     if(number<0 || number>getNumberEntries())
     {
-        fprintf(stderr, "Error, accessing undefined highscore entry:\n");
-        fprintf(stderr,"number %d, but %d entries are defined\n",number,
-                getNumberEntries());
-        fprintf(stderr, "This error can be ignored, but no highscores are available\n");
+        Log::warn("Highscores", "Accessing undefined highscore entry:");
+        Log::warn("Highscores", "Number %d, but %d entries are defined.", number,
+                  getNumberEntries());
+        Log::warn("Highscores", "This error can be ignored, but no highscores are available.");
         return;
     }
     kart_name = m_kart_name[number];

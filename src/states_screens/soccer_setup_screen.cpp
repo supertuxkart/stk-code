@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Lionel Fuentes
+//  Copyright (C) 2013-2015 Lionel Fuentes
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,19 +17,23 @@
 
 #include "states_screens/soccer_setup_screen.hpp"
 
-#include "input/device_manager.hpp"
-#include "input/input_manager.hpp"
-#include "states_screens/state_manager.hpp"
-#include "states_screens/arenas_screen.hpp"
+#include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
+#include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/kart_properties_manager.hpp"
-#include "karts/kart_properties.hpp"
 #include "karts/kart_model.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "states_screens/arenas_screen.hpp"
+#include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( SoccerSetupScreen );
@@ -50,44 +54,76 @@ void SoccerSetupScreen::loadedFromFile()
 {
 }
 
-// -----------------------------------------------------------------------------
-void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
+// ----------------------------------------------------------------------------
+void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
+                                      const int playerID)
 {
+    if(m_schedule_continue)
+        return;
+
     if(name == "continue")
     {
-        StateManager::get()->pushScreen( ArenasScreen::getInstance() );
-		race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
+        int nb_players = (int)m_kart_view_info.size();
+
+        if(!areAllKartsConfirmed())
+        {
+            for(int i=0 ; i < nb_players ; i++)
+            {
+                if (!m_kart_view_info[i].confirmed)
+                {
+                    m_kart_view_info[i].confirmed = true;
+                    m_kart_view_info[i].view->setRotateTo( KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED );
+                    m_kart_view_info[i].view->setBadge(OK_BADGE);
+                }
+            }
+            SFXManager::get()->quickSound( "wee" );
+            m_schedule_continue = true;
+        }
+        else
+        {
+            m_schedule_continue = true;
+        }
+
+        if(getWidget<SpinnerWidget>("goalamount")->isActivated())
+            race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
+        else
+            race_manager->setTimeTarget((float)getWidget<SpinnerWidget>("timeamount")->getValue()*60);
+
+        input_manager->setMasterPlayerOnly(true);
     }
     else if (name == "back")
     {
         StateManager::get()->escapePressed();
     }
-}
+    else if(name == "time_enabled")
+    {
+        CheckBoxWidget* timeEnabled = dynamic_cast<CheckBoxWidget*>(widget);
+        bool timed = timeEnabled->getState();
+        UserConfigParams::m_soccer_use_time_limit = timed;
+        getWidget<SpinnerWidget>("goalamount")->setActive(!timed);
+        getWidget<SpinnerWidget>("timeamount")->setActive(timed);
+    }
+}   // eventCallback
 
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::beforeAddingWidget()
 {
     Widget* central_div = getWidget<Widget>("central_div");
 
-    // Compute some dimensions
-    const core::dimension2d<u32>    vs_size = GUIEngine::getTitleFont()->getDimension( L"VS" );
-    const int vs_width = (int)vs_size.Width;
-    const int vs_height = (int)vs_size.Height;
-    const int center_x = central_div->m_x + central_div->m_w/2;
-    const int center_y = central_div->m_y + central_div->m_h/2;
+    // Add red/blue team icon above the karts
+    IconButtonWidget*    red = getWidget<IconButtonWidget>("red_team");
+    IconButtonWidget*    blue = getWidget<IconButtonWidget>("blue_team");
+    red->m_x = central_div->m_x + central_div->m_w/4;
+    red->m_y = central_div->m_y + red->m_h;
 
-    // Add "VS" label at the center of the rounded box
-    LabelWidget*    label_vs = getWidget<LabelWidget>("vs");
-    label_vs->m_x = center_x - vs_width/2;
-    label_vs->m_y = center_y - vs_height/2;
-    label_vs->m_w = vs_width;
-    label_vs->m_h = vs_height;
+    blue->m_x = central_div->m_x + (central_div->m_w/4)*3;
+    blue->m_y = central_div->m_y + blue->m_h;
 
     // Add the 3D views for the karts
-    int nb_players = race_manager->getNumLocalPlayers();
+    int nb_players = race_manager->getNumPlayers();
     for(int i=0 ; i < nb_players ; i++)
     {
-        const RemoteKartInfo&   kart_info   = race_manager->getLocalKartInfo(i);
+        const RemoteKartInfo&   kart_info   = race_manager->getKartInfo(i);
         const std::string&      kart_name   = kart_info.getKartName();
 
         const KartProperties*   props       = kart_properties_manager->getKart(kart_name);
@@ -123,38 +159,64 @@ void SoccerSetupScreen::beforeAddingWidget()
         KartViewInfo    info;
         info.view            = kart_view;
         info.confirmed       = false;
-        info.local_player_id = i;
-        info.team            = i&1 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED;
+        int single_team      = UserConfigParams::m_soccer_default_team;
+        info.team            = nb_players == 1 ? (SoccerTeam)single_team :
+                               (i&1 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
         m_kart_view_info.push_back(info);
+        race_manager->setKartSoccerTeam(i, info.team);
     }
 
     // Update layout
     updateKartViewsLayout();
-}
+}   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::init()
 {
+    m_schedule_continue = false;
+
     Screen::init();
 
-    // TODO: remember in config.xml the last number of goals
+    if (UserConfigParams::m_num_goals <= 0)
+        UserConfigParams::m_num_goals = 3;
+
+    if (UserConfigParams::m_soccer_time_limit <= 0)
+        UserConfigParams::m_soccer_time_limit = 3;
+
     SpinnerWidget*  goalamount = getWidget<SpinnerWidget>("goalamount");
-    goalamount->setValue(3);
+    goalamount->setValue(UserConfigParams::m_num_goals);
+    goalamount->setActive(!UserConfigParams::m_soccer_use_time_limit);
+
+    SpinnerWidget* timeAmount = getWidget<SpinnerWidget>("timeamount");
+    timeAmount->setValue(UserConfigParams::m_soccer_time_limit);
+    timeAmount->setActive(UserConfigParams::m_soccer_use_time_limit);
+
+    CheckBoxWidget* timeEnabled = getWidget<CheckBoxWidget>("time_enabled");
+    timeEnabled->setState(UserConfigParams::m_soccer_use_time_limit);
 
     // Set focus on "continue"
-    ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
+    ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
     bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    bt_continue->setDeactivated();
 
     // We need players to be able to choose their teams
-    input_manager->getDeviceList()->setAssignMode(ASSIGN);
     input_manager->setMasterPlayerOnly(false);
-}
+
+    // This flag will cause that a 'fire' event will be mapped to 'select' (if
+    // 'fire' is not assigned to a GUI event). This is done to support the old
+    // way of player joining by pressing 'fire' instead of 'select'.
+    input_manager->getDeviceManager()->mapFireToSelect(true);
+}   // init
 
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::tearDown()
 {
     Widget* central_div = getWidget<Widget>("central_div");
+
+    // Reset the 'map fire to select' option of the device manager
+    input_manager->getDeviceManager()->mapFireToSelect(false);
+
+    UserConfigParams::m_num_goals = getWidget<SpinnerWidget>("goalamount")->getValue();
+    UserConfigParams::m_soccer_time_limit = getWidget<SpinnerWidget>("timeamount")->getValue();
 
     // Remove all ModelViewWidgets we created manually
     PtrVector<Widget>&  children = central_div->getChildren();
@@ -166,57 +228,101 @@ void SoccerSetupScreen::tearDown()
     m_kart_view_info.clear();
 
     Screen::tearDown();
-}
+}   // tearDown
 
 // -----------------------------------------------------------------------------
-GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction action,
-                                                               int deviceID,
-                                                               const unsigned int value,
-                                                               Input::InputType type,
-                                                               int playerId)
+GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action,
+                                                             int deviceID,
+                                                             const unsigned int value,
+                                                             Input::InputType type,
+                                                             int playerId)
 {
+    if(m_schedule_continue)
+        return EVENT_BLOCK;
+
+    ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
+    BubbleWidget* bubble = getWidget<BubbleWidget>("lblLeftRight");
     GUIEngine::EventPropagation result = EVENT_LET;
     SoccerTeam  team_switch = SOCCER_TEAM_NONE;
-    int nb_players = m_kart_view_info.size();
+    int nb_players = (int)m_kart_view_info.size();
 
     switch(action)
     {
     case PA_MENU_LEFT:
-        team_switch = SOCCER_TEAM_RED;
+        if ((bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
+            bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)) &&
+            m_kart_view_info[playerId].confirmed == false)
+        {
+            team_switch = SOCCER_TEAM_RED;
+
+            for(int i=0 ; i < nb_players ; i++)
+            {
+                m_kart_view_info[i].view->unsetBadge(BAD_BADGE);
+            }
+        }
         break;
     case PA_MENU_RIGHT:
-        team_switch = SOCCER_TEAM_BLUE;
+        if ((bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
+            bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)) &&
+            m_kart_view_info[playerId].confirmed == false)
+        {
+            team_switch = SOCCER_TEAM_BLUE;
+
+            for(int i=0 ; i < nb_players ; i++)
+            {
+                m_kart_view_info[i].view->unsetBadge(BAD_BADGE);
+            }
+        }
+        break;
+    case PA_MENU_UP:
+        if (playerId != PLAYER_ID_GAME_MASTER)
+            return EVENT_BLOCK;
+        break;
+    case PA_MENU_DOWN:
+        if (playerId != PLAYER_ID_GAME_MASTER)
+            return EVENT_BLOCK;
         break;
     case PA_MENU_SELECT:
     {
-        // Confirm team selection
-        for(int i=0 ; i < nb_players ; i++)
+        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
+            areAllKartsConfirmed())
         {
-            if(m_kart_view_info[i].local_player_id == playerId)
-            {
-                m_kart_view_info[i].confirmed = true;
-                m_kart_view_info[i].view->setRotateTo( KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED );
-                result = EVENT_BLOCK;
-                break;
-            }
+            return result;
         }
-        break;
+
+        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+            m_kart_view_info[playerId].confirmed)
+        {
+            return EVENT_BLOCK;
+        }
+
+        // Confirm team selection
+        m_kart_view_info[playerId].confirmed = true;
+        m_kart_view_info[playerId].view->setRotateTo( KART_CONFIRMATION_TARGET_ANGLE, KART_CONFIRMATION_ROTATION_SPEED );
+        m_kart_view_info[playerId].view->setBadge(OK_BADGE);
+        m_kart_view_info[playerId].view->unsetBadge(BAD_BADGE);
+        SFXManager::get()->quickSound( "wee" );
+        return EVENT_BLOCK;
     }
     case PA_MENU_CANCEL:
     {
+        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+            playerId == PLAYER_ID_GAME_MASTER)
+        {
+            return result;
+        }
+
         // Un-confirm team selection
-        // TODO: shouldn't trigger quitting the screen...
+        m_kart_view_info[playerId].confirmed = false;
+        m_kart_view_info[playerId].view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
+        m_kart_view_info[playerId].view->unsetBadge(OK_BADGE);
+
         for(int i=0 ; i < nb_players ; i++)
         {
-            if(m_kart_view_info[i].local_player_id == playerId)
-            {
-                m_kart_view_info[i].confirmed = false;
-                m_kart_view_info[i].view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
-                result = EVENT_BLOCK;
-                break;
-            }
+            m_kart_view_info[i].view->unsetBadge(BAD_BADGE);
         }
-        break;
+
+        return EVENT_BLOCK;
     }
     default:
         break;
@@ -224,43 +330,38 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
 
     if(team_switch != SOCCER_TEAM_NONE) // A player wants to change his team?
     {
-        // Find the corresponding kart view, update its team and update the layout
-        for(int i=0 ; i < nb_players ; i++)
-        {
-            if(m_kart_view_info[i].local_player_id == playerId)
-            {
-                // Player has already confirmed -> can't change
-                if(m_kart_view_info[i].confirmed)
-                    break;
-                m_kart_view_info[i].team = team_switch;
-                updateKartViewsLayout();
-                result = EVENT_BLOCK;
-                break;
-            }
-        }
+        if (nb_players == 1)
+            UserConfigParams::m_soccer_default_team = (int)team_switch;
+        race_manager->setKartSoccerTeam(playerId, team_switch);
+        m_kart_view_info[playerId].team = team_switch;
+        updateKartViewsLayout();
     }
-
-    // Update "continue" button state
-    ButtonWidget*   bt_continue = getWidget<ButtonWidget>("continue");
-    if(areAllKartsConfirmed())
-    {
-        bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        bt_continue->setActivated();
-
-        for(int i=0 ; i < nb_players ; i++)
-            race_manager->setLocalKartSoccerTeam(m_kart_view_info[i].local_player_id,
-                                                 m_kart_view_info[i].team);
-    }
-    else
-        bt_continue->setDeactivated();
 
     return result;
-}
+}   // filterActions
 
+// -----------------------------------------------------------------------------
+void SoccerSetupScreen::onUpdate(float delta)
+{
+    int nb_players = (int)m_kart_view_info.size();
+
+    if(m_schedule_continue)
+    {
+        for(int i=0 ; i < nb_players ; i++)
+        {
+            if (m_kart_view_info[i].view->isRotating() == true)
+                return;
+        }
+        m_schedule_continue = false;
+        ArenasScreen::getInstance()->push();
+    }
+}   // onUpdate
+
+// ----------------------------------------------------------------------------
 bool SoccerSetupScreen::areAllKartsConfirmed() const
 {
     bool all_confirmed = true;
-    int nb_players = m_kart_view_info.size();
+    int nb_players = (int)m_kart_view_info.size();
     for(int i=0 ; i < nb_players ; i++)
     {
         if(!m_kart_view_info[i].confirmed)
@@ -270,23 +371,35 @@ bool SoccerSetupScreen::areAllKartsConfirmed() const
         }
     }
     return all_confirmed;
+}   // areAllKartsConfirmed
+
+// -----------------------------------------------------------------------------
+int SoccerSetupScreen::getNumConfirmedKarts()
+{
+    int confirmed_karts = 0;
+    int nb_players = (int)m_kart_view_info.size();
+    for(int i=0 ; i < nb_players ; i++)
+    {
+        if(m_kart_view_info[i].confirmed == true)
+            confirmed_karts++;
+    }
+    return confirmed_karts;
 }
 
+// -----------------------------------------------------------------------------
 void SoccerSetupScreen::updateKartViewsLayout()
 {
     Widget* central_div = getWidget<Widget>("central_div");
 
     // Compute/get some dimensions
-    LabelWidget*    label_vs = getWidget<LabelWidget>("vs");
-    const int vs_width = label_vs->m_w;
     const int nb_columns = 2;   // two karts maximum per column
-    const int kart_area_width = (central_div->m_w - vs_width) / 2; // size of one half of the screen
+    const int kart_area_width = (central_div->m_w) / 2; // size of one half of the screen
     const int kart_view_size = kart_area_width/nb_columns;  // Size (width and height) of a kart view
     const int center_x = central_div->m_x + central_div->m_w/2;
     const int center_y = central_div->m_y + central_div->m_h/2;
 
     // Count the number of karts per team
-    int nb_players = m_kart_view_info.size();
+    int nb_players = (int)m_kart_view_info.size();
     int nb_karts_per_team[2] = {0,0};
     for(int i=0 ; i < nb_players ; i++)
         nb_karts_per_team[m_kart_view_info[i].team]++;
@@ -298,8 +411,8 @@ void SoccerSetupScreen::updateKartViewsLayout()
     const int start_y[2] = {center_y - nb_rows_per_team[0] * kart_view_size / 2,
                             center_y - nb_rows_per_team[1] * kart_view_size / 2};
     // - center of each half-screen
-    const int center_x_per_team[2] = {  ( central_div->m_x                  + (center_x - vs_width) ) / 2,
-                                        ( central_div->m_x+central_div->m_w + (center_x + vs_width) ) / 2,
+    const int center_x_per_team[2] = {  ( central_div->m_x                  + center_x ) / 2,
+                                        ( central_div->m_x+central_div->m_w + center_x ) / 2,
                                      };
 
     // Update the layout of the 3D views for the karts
@@ -315,7 +428,7 @@ void SoccerSetupScreen::updateKartViewsLayout()
 
         const int cur_col = cur_kart_per_team[team] % nb_columns;
         int nb_karts_in_this_row = (nb_karts_per_team[team] - cur_row*nb_columns) % nb_columns;
-        if(nb_karts_in_this_row == 0)
+        if(nb_karts_in_this_row == 0 || nb_karts_per_team[team] > 1)
             nb_karts_in_this_row = nb_columns;  // TODO: not sure of the computation here...
         const int pos_x = center_x_per_team[team] + cur_col*kart_view_size - nb_karts_in_this_row*kart_view_size/2;
         cur_kart_per_team[team]++;
@@ -323,4 +436,4 @@ void SoccerSetupScreen::updateKartViewsLayout()
         // Move the view
         view_info.view->move(pos_x, pos_y, kart_view_size, kart_view_size);
     }
-}
+}   // updateKartViewsLayout

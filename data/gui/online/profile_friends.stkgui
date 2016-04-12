@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+
+        <header id="title" text_align="center" width="80%" align="center" text="..."/>
+
+        <spacer height="25" width="10"/>
+
+        <tabs id="profile_tabs" height="10%" max_height="110" x="2%" width="98%" align="center">
+            <icon-button id="tab_servers" width="128" height="128" icon="gui/main_network.png"/>
+            <icon-button id="tab_achievements" width="128" height="128" icon="gui/gp_copy.png"/>
+            <icon-button id="tab_friends" width="128" height="128" icon="gui/options_players.png"
+                I18N="Section in the profile screen" text="Friends"/>
+            <icon-button id="tab_settings" width="128" height="128" icon="gui/main_options.png"/>
+        </tabs>
+
+        <box proportion="1" width="100%" layout="vertical-row" padding="6">
+            <list id="friends_list" x="0" y="0" width="100%" height="100%"/>
+        </box>
+
+        <div id="search_div" height="fit" width="100%" layout="vertical-row">
+            <spacer width="10" height="10"/>
+            <box height="fit" width="100%" layout="vertical-row">
+                <label text_align="left" I18N="In the profile screen" text="Look for more friends:"/>
+                <spacer width="10" height="10"/>
+                <div height="fit" width="100%" layout="horizontal-row" align="center">
+                    <textbox id="search_box" proportion="1"/>
+                    <spacer width="10" height="100%"/>
+                    <button id="search_button" height="100%" width="fit" text="Search" />
+                </div>
+            </box>
+        </div>
+    </div>
+</stkgui>

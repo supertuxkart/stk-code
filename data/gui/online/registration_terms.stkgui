@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="4%" width="96%" height="92%" layout="vertical-row" >
+        <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"
+            I18N="In the registration dialog" text="Terms and Agreement"/>
+
+        <spacer height="25" width="50"/>
+
+        <box proportion="5" width="90%" align="center" layout="vertical-row" padding="8">
+            <label word_wrap="true" id="terms" x="0" y="0" width="100%" height="100%"/>
+        </box>
+
+        <div align="center" width="fit" height="fit" layout="horizontal-row" >
+            <label text_align="center" align="center" I18N="In the registration dialog" word_wrap="true"
+                text="I agree to the above terms and am 13 years or older. "/>
+        </div>
+
+        <spacer height="20" width="50"/>
+
+        <label id="info" proportion="1" width="90%" align="center" text_align="center" word_wrap="true"
+            I18N="In the registration dialog" text=""/>
+
+        <spacer height="20" width="50"/>
+
+        <buttonbar id="options" width="45%" height="14%" align="center">
+            <icon-button id="accept" width="64" height="64" icon="gui/green_check.png"
+                I18N="In the registration dialog" text="Accept" label_location="bottom"/>
+            <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
+                I18N="In the registration dialog" text="Cancel" label_location="bottom"/>
+        </buttonbar>
+    </div>
+</stkgui>

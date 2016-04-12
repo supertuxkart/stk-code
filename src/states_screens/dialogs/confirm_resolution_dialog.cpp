@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -64,13 +64,24 @@ void ConfirmResolutionDialog::onUpdate(float dt)
 
 }
 
+// ----------------------------------------------------------------------------
+
+bool ConfirmResolutionDialog::onEscapePressed()
+{
+    ModalDialog::dismiss();
+    irr_driver->cancelResChange();
+    return true;
+}   // escapePressed
+
 // ------------------------------------------------------------------------------------------------------
 
 void ConfirmResolutionDialog::updateMessage()
 {
     //I18N: In the 'confirm resolution' dialog, that's shown when switching resoluton
-    stringw msg = _("Confirm resolution within %i seconds", (int)m_remaining_time);
-    //std::cout << stringc(msg.c_str()).c_str() << std::endl;
+
+    stringw msg = _P("Confirm resolution within %i second",
+        "Confirm resolution within %i seconds",
+        (int)m_remaining_time);
 
     LabelWidget* countdown_message = getWidget<LabelWidget>("title");
     countdown_message->setText( msg.c_str(), false );

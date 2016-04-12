@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@
 #include "audio/music_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -43,6 +44,7 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
             stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
     m_use_highscores   = false;  // disable high scores
     setClockMode(WorldStatus::CLOCK_COUNTDOWN, m_leader_intervals[0]);
+    m_is_over_delay = 5.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -51,9 +53,13 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
  */
 void FollowTheLeaderRace::init()
 {
+    m_last_eliminated_time = 0;
     LinearWorld::init();
+    // WorldWithRank determines the score based on getNumKarts(), but since
+    // we ignore the leader, the points need to be based on number of karts -1
+    stk_config->getAllScores(&m_score_for_position, getNumKarts() - 1);
     getKart(0)->setOnScreenText(_("Leader"));
-}
+}    // init
 
 #if 0
 #pragma mark -
@@ -77,13 +83,41 @@ void FollowTheLeaderRace::reset()
             stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
     WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
                               m_leader_intervals[0]);
+                              
+    m_is_over_delay = 2.0f;
 }   // reset
+
+//-----------------------------------------------------------------------------
+/** Returns the number of points for a kart at a specified position.
+ *  \param p Position (starting with 1).
+ */
+int FollowTheLeaderRace::getScoreForPosition(int p)
+{
+    // Kart 0 (the leader) does not get any points
+    if (p == 1) return 0;
+
+    assert(p-2 >= 0);
+    assert(p - 2 <(int) m_score_for_position.size());
+    return m_score_for_position[p - 2];
+}   // getScoreForPosition
+
+//-----------------------------------------------------------------------------
+const btTransform &FollowTheLeaderRace::getStartTransform(int index)
+{
+    if (index == 0)   // Leader start position
+        return m_track->getStartTransform(index);
+
+    // Otherwise the karts will start at the rear starting positions
+    int start_index = stk_config->m_max_karts
+                    - race_manager->getNumberOfKarts() + index;
+    return m_track->getStartTransform(start_index);
+}   // getStartTransform
 
 //-----------------------------------------------------------------------------
 /** Returns the original time at which the countdown timer started. This is
  *  used by the race_gui to display the music credits in FTL mode correctly.
  */
-float FollowTheLeaderRace::getClockStartTime()
+float FollowTheLeaderRace::getClockStartTime() const
 {
     return m_leader_intervals[0];
 }   // getClockStartTime
@@ -93,6 +127,7 @@ float FollowTheLeaderRace::getClockStartTime()
  */
 void FollowTheLeaderRace::countdownReachedZero()
 {
+    m_last_eliminated_time += m_leader_intervals[0];
     if(m_leader_intervals.size()>1)
         m_leader_intervals.erase(m_leader_intervals.begin());
     WorldStatus::setTime(m_leader_intervals[0]);
@@ -104,19 +139,19 @@ void FollowTheLeaderRace::countdownReachedZero()
     AbstractKart *kart = getKartAtPosition(position_to_remove);
     if(!kart || kart->isEliminated())
     {
-        fprintf(stderr,"Problem with removing leader: position %d not found\n",
+        Log::error("[FTL]", "Problem with removing leader: position %d not found",
                 position_to_remove);
         for(unsigned int i=0; i<m_karts.size(); i++)
         {
-            fprintf(stderr,"kart %d: eliminated %d position %d\n",
-                    i,m_karts[i]->isEliminated(), m_karts[i]->getPosition());
+            Log::error("[FTL]", "kart %u: eliminated %d position %d",
+                    i, m_karts[i]->isEliminated(), m_karts[i]->getPosition());
         }   // for i
     }  //
     else
     {
         if(UserConfigParams::m_ftl_debug)
         {
-            printf("[ftl] Eliminiating kart '%s' at position %d.\n",
+            Log::debug("[FTL", "Eliminiating kart '%s' at position %d.",
                 kart->getIdent().c_str(), position_to_remove);
         }
         eliminateKart(kart->getWorldKartId());
@@ -141,19 +176,22 @@ void FollowTheLeaderRace::countdownReachedZero()
             updateRacePosition();
         }
         // Time doesn't make any sense in FTL (and it is not displayed)
-        kart->finishedRace(-1.0f);
+        kart->finishedRace(m_last_eliminated_time);
 
         // Move any camera for this kart to the leader, facing backwards,
         // so that the eliminated player has something to watch.
-        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+        if (race_manager->getNumPlayers() > 1)
         {
-            Camera *camera = Camera::getCamera(i);
-            if(camera->getKart()==kart)
+            for(unsigned int i=0; i<Camera::getNumCameras(); i++)
             {
-                camera->setMode(Camera::CM_LEADER_MODE);
-                camera->setKart(getKart(0));
-            }
-        }   // for i<number of cameras
+                Camera *camera = Camera::getCamera(i);
+                if(camera->getKart()==kart)
+                {
+                    camera->setMode(Camera::CM_LEADER_MODE);
+                    camera->setKart(getKart(0));
+                }
+            }   // for i<number of cameras
+        }
     }   // if kart to eliminate exists
 
     // almost over, use fast music
@@ -161,43 +199,6 @@ void FollowTheLeaderRace::countdownReachedZero()
     {
         music_manager->switchToFastMusic();
     }
-
-    if (isRaceOver())
-    {
-        // Handle special FTL situation: the leader is kart number 3 when
-        // the last kart gets eliminated. In this case kart on position 1
-        // is eliminated, and the kart formerly on position 2 is on
-        // position 1, the leader now position 2. In this case the kart
-        // on position 1 would get more points for this victory. So if
-        // this is the case, change the position
-        if(m_karts[0]->getPosition()!=1)
-        {
-            // Adjust the position of all still driving karts that
-            // are ahead of the leader by +1, and move the leader
-            // to position 1.
-            for (unsigned int i=1; i<m_karts.size(); i++)
-            {
-                if(!m_karts[i]->hasFinishedRace() &&
-                    !m_karts[i]->isEliminated()   &&
-                    m_karts[i]->getPosition()<m_karts[0]->getPosition())
-                {
-                        m_karts[i]->setPosition(m_karts[i]->getPosition()+1);
-                }
-            }
-            m_karts[0]->setPosition(1);
-        }
-
-        // Mark all still racing karts to be finished.
-        for (unsigned int n=0; n<m_karts.size(); n++)
-        {
-            if (!m_karts[n]->isEliminated() &&
-                !m_karts[n]->hasFinishedRace())
-            {
-                m_karts[n]->finishedRace(getTime());
-            }
-        }
-    }
-    // End of race is detected from World::updateWorld()
 
 }   // countdownReachedZero
 
@@ -207,8 +208,71 @@ void FollowTheLeaderRace::countdownReachedZero()
  */
 bool FollowTheLeaderRace::isRaceOver()
 {
-    return getCurrentNumKarts()==2 || getCurrentNumPlayers()==0;
+    bool is_over = (getCurrentNumKarts()==2 || getCurrentNumPlayers()==0);
+    if (is_over)
+    {
+        if (m_is_over_delay < 0.0f)
+        {
+            return true;
+        }
+        else
+        {
+            m_is_over_delay -= GUIEngine::getLatestDt();
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
 }   // isRaceOver
+
+//-----------------------------------------------------------------------------
+/** Called at the end of a race. Updates highscores, pauses the game, and
+ *  informs the unlock manager about the finished race. This function must
+ *  be called after all other stats were updated from the different game
+ *  modes.
+ */
+void FollowTheLeaderRace::terminateRace()
+{
+    int pos_leader = m_karts[0]->getPosition();
+
+    // Handle special FTL situations: the leader is kart number 3 when
+    // the last kart gets eliminated. In this case kart on position 1
+    // is eliminated, and the kart formerly on position 2 is on
+    // position 1, the leader now position 2, but the point distribution
+    // depends on the 'first' (non-leader) kart to be on position 2.
+    // That situation can also occur during the delay after eliminating
+    // the last kart before the race result is shown (when the leader
+    // is overtaken during that time). To avoid this problem, adjust the
+    // position of any kart that is ahead of the leader.
+    beginSetKartPositions();
+    for (unsigned int i = 0; i < getNumKarts(); i++)
+    {
+        if (!m_karts[i]->hasFinishedRace() && !m_karts[i]->isEliminated() &&
+            m_karts[i]->getPosition() < pos_leader)
+        {
+            setKartPosition(i, m_karts[i]->getPosition() + 1);
+        }
+    }   // i < number of karts
+    setKartPosition(/*kart id*/0, /*position*/1);
+    endSetKartPositions();
+
+    // Mark all still racing karts to be finished.
+    for (int i = m_karts.size(); i>0; i--)
+    {
+        AbstractKart *kart = getKartAtPosition(i);
+        if (kart->isEliminated() || kart->hasFinishedRace())
+            continue;
+        m_last_eliminated_time += m_leader_intervals[0];
+        if (m_leader_intervals.size() > 1)
+            m_leader_intervals.erase(m_leader_intervals.begin());
+        kart->finishedRace(m_last_eliminated_time);
+    }
+
+
+    World::terminateRace();
+}   // terminateRace
 
 //-----------------------------------------------------------------------------
 /** Returns the internal identifier for this kind of race.

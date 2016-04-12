@@ -52,7 +52,7 @@ namespace scene
 		virtual void animateMesh(f32 frame, f32 blend);
 
 		//! Preforms a software skin on this mesh based of joint positions
-		virtual void skinMesh();
+		virtual void skinMesh(f32 strength=1.f);
 
 		//! returns amount of mesh buffers.
 		virtual u32 getMeshBufferCount() const;
@@ -159,7 +159,7 @@ namespace scene
 		void addJoints(core::array<IBoneSceneNode*> &jointChildSceneNodes,
 				IAnimatedMeshSceneNode* node,
 				ISceneManager* smgr);
-
+        CSkinnedMesh *clone();
 private:
 		void checkForAnimation();
 
@@ -176,7 +176,7 @@ private:
 
 		void calculateGlobalMatrices(SJoint *Joint,SJoint *ParentJoint);
 
-		void skinJoint(SJoint *Joint, SJoint *ParentJoint);
+		void skinJoint(SJoint *Joint, SJoint *ParentJoint, f32 strength=1.f);
 
 		void calculateTangents(core::vector3df& normal,
 			core::vector3df& tangent, core::vector3df& binormal,

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,15 +18,15 @@
 #include "modes/world_status.hpp"
 
 #include "audio/music_manager.hpp"
-#include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "audio/sfx_manager.hpp"
 #include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
-#include "network/network_manager.hpp"
 
 #include <irrlicht.h>
 
@@ -35,16 +35,16 @@ WorldStatus::WorldStatus()
 {
     m_clock_mode        = CLOCK_CHRONO;
 
-    m_prestart_sound    = sfx_manager->createSoundSource("pre_start_race");
-    m_start_sound       = sfx_manager->createSoundSource("start_race");
-    m_track_intro_sound = sfx_manager->createSoundSource("track_intro");
-
-    music_manager->stopMusic();
+    m_prestart_sound    = SFXManager::get()->createSoundSource("pre_start_race");
+    m_start_sound       = SFXManager::get()->createSoundSource("start_race");
+    m_track_intro_sound = SFXManager::get()->createSoundSource("track_intro");
 
     m_play_racestart_sounds = true;
 
     IrrlichtDevice *device = irr_driver->getDevice();
-    if (device->getTimer()->isStopped()) device->getTimer()->start();
+
+    if (device->getTimer()->isStopped())
+        device->getTimer()->start();
 }   // WorldStatus
 
 //-----------------------------------------------------------------------------
@@ -56,13 +56,31 @@ void WorldStatus::reset()
     m_auxiliary_timer = 0.0f;
     // Using SETUP_PHASE will play the track into sfx first, and has no
     // other side effects.
-    m_phase          = UserConfigParams::m_race_now ? RACE_PHASE : SETUP_PHASE;
+    m_phase           = UserConfigParams::m_race_now ? MUSIC_PHASE : SETUP_PHASE;
+
+    // Parts of the initialisation-phase are skipped so do it here
+    if (UserConfigParams::m_race_now)
+    {
+        // Setup music and sound
+        if (World::getWorld()->getWeather() != NULL)
+            World::getWorld()->getWeather()->playSound();
+
+        // Start engines
+        for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
+            World::getWorld()->getKart(i)->startEngineSFX();
+    }
+
     m_previous_phase  = UNDEFINED_PHASE;
     // Just in case that the game is reset during the intro phase
     m_track_intro_sound->stop();
 
     IrrlichtDevice *device = irr_driver->getDevice();
-    if (device->getTimer()->isStopped()) device->getTimer()->start();
+
+    if (device->getTimer()->isStopped())
+        device->getTimer()->start();
+
+    // Set the right music
+    World::getWorld()->getTrack()->startMusic();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -70,11 +88,13 @@ void WorldStatus::reset()
  */
 WorldStatus::~WorldStatus()
 {
-    sfx_manager->deleteSFX(m_prestart_sound);
-    sfx_manager->deleteSFX(m_start_sound);
-    sfx_manager->deleteSFX(m_track_intro_sound);
+    m_prestart_sound->deleteSFX();
+    m_start_sound->deleteSFX();
+    m_track_intro_sound->deleteSFX();
     IrrlichtDevice *device = irr_driver->getDevice();
-    if (device->getTimer()->isStopped())  device->getTimer()->start();
+
+    if (device->getTimer()->isStopped())
+        device->getTimer()->start();
 }   // ~WorldStatus
 
 //-----------------------------------------------------------------------------
@@ -96,14 +116,12 @@ void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
 void WorldStatus::enterRaceOverState()
 {
     // Don't enter race over if it's already race over
-    if(    m_phase == DELAY_FINISH_PHASE
-        || m_phase == RESULT_DISPLAY_PHASE
-        || m_phase == FINISH_PHASE          )
+    if (m_phase == DELAY_FINISH_PHASE || m_phase == RESULT_DISPLAY_PHASE ||
+        m_phase == FINISH_PHASE)
         return;
 
     m_phase = DELAY_FINISH_PHASE;
     m_auxiliary_timer = 0.0f;
-
 }   // enterRaceOverState
 
 //-----------------------------------------------------------------------------
@@ -112,8 +130,6 @@ void WorldStatus::enterRaceOverState()
  */
 void WorldStatus::terminateRace()
 {
-    if(network_manager->getMode()==NetworkManager::NW_SERVER)
-        network_manager->sendRaceResults();
 }   // terminateRace
 
 //-----------------------------------------------------------------------------
@@ -122,7 +138,7 @@ void WorldStatus::terminateRace()
  */
 void WorldStatus::update(const float dt)
 {
-    switch(m_phase)
+    switch (m_phase)
     {
         // Note: setup phase must be a separate phase, since the race_manager
         // checks the phase when updating the camera: in the very first time
@@ -132,71 +148,113 @@ void WorldStatus::update(const float dt)
         case SETUP_PHASE:
             m_auxiliary_timer = 0.0f;
             m_phase = TRACK_INTRO_PHASE;
-            if (UserConfigParams::m_music && m_play_racestart_sounds)
+            
+            if (m_play_racestart_sounds)
             {
                 m_track_intro_sound->play();
             }
+
+            if (World::getWorld()->getWeather() != NULL)
+            {
+                World::getWorld()->getWeather()->playSound();
+            }
+
             return;
         case TRACK_INTRO_PHASE:
             m_auxiliary_timer += dt;
+
+            if (UserConfigParams::m_artist_debug_mode &&
+                race_manager->getNumberOfKarts() == 1 &&
+                race_manager->getTrackName() != "tutorial")
+            {
+                m_auxiliary_timer += dt * 6;
+            }
+
             // Work around a bug that occurred on linux once:
-            // the sfx_manager kept on reporting that it is playing,
+            // the SFXManager::get() kept on reporting that it is playing,
             // while it was not - so STK would never reach the ready
             // ... phase. Since the sound effect is about 3 seconds
             // long, we use the aux timer to force the next phase
             // after 3.5 seconds.
-            if(m_track_intro_sound->getStatus()==SFXManager::SFX_PLAYING
-	            && m_auxiliary_timer<3.5f)
+            if (m_track_intro_sound->getStatus() == SFXBase::SFX_PLAYING &&
+                m_auxiliary_timer < 3.5f)
                 return;
+
+            // Wait before ready phase if sounds are disabled
+            if (!UserConfigParams::m_sfx && m_auxiliary_timer < 3.0f)
+                return;
+
             m_auxiliary_timer = 0.0f;
-            if (m_play_racestart_sounds) m_prestart_sound->play();
+
+            if (m_play_racestart_sounds)
+                m_prestart_sound->play();
+
             m_phase = READY_PHASE;
-            for(unsigned int i=0; i<World::getWorld()->getNumKarts(); i++)
+            
+            for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
+            {
                 World::getWorld()->getKart(i)->startEngineSFX();
+            }
 
             break;
         case READY_PHASE:
-            if(m_auxiliary_timer>1.0)
+            if (m_auxiliary_timer > 1.0)
             {
-                if (m_play_racestart_sounds) m_prestart_sound->play();
-                m_phase=SET_PHASE;
+                if (m_play_racestart_sounds)
+                {
+                    m_prestart_sound->play();
+                }
+
+                m_phase = SET_PHASE;
             }
+
             m_auxiliary_timer += dt;
 
             // In artist debug mode, when without opponents, skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
                 race_manager->getNumberOfKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
+            {
                 m_auxiliary_timer += dt*6;
+            }
+
             return;
-        case SET_PHASE  :
-            if(m_auxiliary_timer>2.0)
+        case SET_PHASE:
+            if (m_auxiliary_timer > 2.0)
             {
                 // set phase is over, go to the next one
-                m_phase=GO_PHASE;
-                if (m_play_racestart_sounds) m_start_sound->play();
-
-                World::getWorld()->getTrack()->startMusic();
+                m_phase = GO_PHASE;
+                if (m_play_racestart_sounds)
+                {
+                    m_start_sound->play();
+                }
 
                 // event
                 onGo();
             }
+
             m_auxiliary_timer += dt;
 
             // In artist debug mode, when without opponents, skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
                 race_manager->getNumberOfKarts() == 1  &&
                 race_manager->getTrackName() != "tutorial")
+            {
                 m_auxiliary_timer += dt*6;
+            }
+
             return;
         case GO_PHASE  :
 
-            if (m_auxiliary_timer>2.5f && music_manager->getCurrentMusic())
-                music_manager->startMusic(music_manager->getCurrentMusic());
-
-            if(m_auxiliary_timer>3.0f)    // how long to display the 'go' message
+            if (m_auxiliary_timer>2.5f && music_manager->getCurrentMusic() &&
+                !music_manager->getCurrentMusic()->isPlaying())
             {
-                m_phase=MUSIC_PHASE;
+                music_manager->startMusic();
+            }
+
+            if (m_auxiliary_timer > 3.0f)    // how long to display the 'go' message
+            {
+                m_phase = MUSIC_PHASE;
             }
 
             m_auxiliary_timer += dt;
@@ -205,41 +263,57 @@ void WorldStatus::update(const float dt)
             if (UserConfigParams::m_artist_debug_mode &&
                 race_manager->getNumberOfKarts() == 1  &&
                 race_manager->getTrackName() != "tutorial")
+            {
                 m_auxiliary_timer += dt*6;
+            }
+
             break;
         case MUSIC_PHASE:
+            // Start the music here when starting fast
+            if (UserConfigParams::m_race_now)
+            {
+                music_manager->startMusic();
+                UserConfigParams::m_race_now = false;
+            }
             // how long to display the 'music' message
-            if(m_auxiliary_timer>stk_config->m_music_credit_time)
-                m_phase=RACE_PHASE;
+            if (m_auxiliary_timer>stk_config->m_music_credit_time)
+            {
+                m_phase = RACE_PHASE;
+            }
+
             m_auxiliary_timer += dt;
             break;
         case RACE_PHASE:
             // Nothing to do for race phase, switch to delay finish phase
             // happens when
             break;
-        case DELAY_FINISH_PHASE :
+        case DELAY_FINISH_PHASE:
         {
             m_auxiliary_timer += dt;
 
             // Change to next phase if delay is over
-            if(m_auxiliary_timer > stk_config->m_delay_finish_time)
+            if (m_auxiliary_timer > stk_config->m_delay_finish_time)
             {
                 m_phase = RESULT_DISPLAY_PHASE;
                 terminateRace();
             }
+
             break;
         }
-        case RESULT_DISPLAY_PHASE :
+        case RESULT_DISPLAY_PHASE:
         {
             break;
         }
         case FINISH_PHASE:
             // Nothing to do here.
             break;
+        case GOAL_PHASE:
+            // Nothing to do here as well.
+
         default: break;
     }
 
-    switch(m_clock_mode)
+    switch (m_clock_mode)
     {
         case CLOCK_CHRONO:
             m_time += dt;
@@ -280,11 +354,14 @@ void WorldStatus::setTime(const float time)
  */
 void WorldStatus::pause(Phase phase)
 {
-    assert(m_previous_phase==UNDEFINED_PHASE);
+    assert(m_previous_phase == UNDEFINED_PHASE);
+
     m_previous_phase = m_phase;
     m_phase          = phase;
     IrrlichtDevice *device = irr_driver->getDevice();
-    if (!device->getTimer()->isStopped())  device->getTimer()->stop();
+
+    if (!device->getTimer()->isStopped())
+        device->getTimer()->stop();
 }   // pause
 
 //-----------------------------------------------------------------------------
@@ -297,5 +374,7 @@ void WorldStatus::unpause()
     // in pause to detect incorrect pause/unpause sequences.
     m_previous_phase = UNDEFINED_PHASE;
     IrrlichtDevice *device = irr_driver->getDevice();
-    if (device->getTimer()->isStopped()) device->getTimer()->start();
+
+    if (device->getTimer()->isStopped())
+        device->getTimer()->start();
 }   // unpause

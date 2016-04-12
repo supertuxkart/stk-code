@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
+
+        <header id="name" height="5%" width="80%" align="center" text_align="center"/>
+
+        <spacer width="1" height="5%"/>
+
+        <box width="100%" height="40%" padding="10" layout="horizontal-row">
+            <spacer width="10" height="100%"/>
+            <!-- Left pane -->
+            <div width="45%" height="100%" align="center" layout="vertical-row">
+                <icon-button proportion="1" width="100%" height="100%" id="screenshot" custom_ratio="1.33333"/>
+            </div>
+
+            <spacer width="5%" height="100%"/>
+
+            <!-- Right pane -->
+            <div width="45%" height="95%" align="center" layout="vertical-row">
+                <list id="tracks" width="100%" height="100%"/>
+            </div>
+
+        </box>
+        <spacer width="1" height="5%"/>
+        <box width="100%" height="28%" padding="20" layout="vertical-row">
+            <div width="100%" height="20%" layout="horizontal-row" >
+                <label   id="ai-text"         width="50%" I18N="In the grand prix info screen" text="AI karts" text_align="right"/>
+                <spacer width="30"/>
+                <spinner id="ai-spinner"      width="30%" min_value="1" max_value="20" align="center" wrap_around="true" />
+            </div>
+            <spacer height="5%" />
+            <div width="100%" height="20%" layout="horizontal-row" >
+                <label   id="reverse-text"    width="50%" I18N="In the grand prix info screen" text="Reverse" text_align="right"/>
+                <spacer width="30"/>
+                <spinner id="reverse-spinner" width="30%" align="center" wrap_around="true" />
+            </div>
+            <spacer height="5%" />
+            <div width="100%" height="20%" layout="horizontal-row">
+                <label   id="track-text"      width="50%" I18N="In the grand prix info screen" text="Tracks" text_align="right"/>
+                <spacer width="30"/>
+                <spinner id="track-spinner"   width="30%" min_value="1" max_value="20" align="center" wrap_around="true" />
+            </div>
+            <spacer height="5%" />
+            <div width="100%" height="20%" layout="horizontal-row" >
+                <label   id="group-text"      width="50%" I18N="In the grand prix info screen" text="Track group" text_align="right"/>
+                <spacer width="30"/>
+                <spinner id="group-spinner"   width="30%" align="center" wrap_around="true" />
+            </div>
+        </box>
+        <spacer height="2%"/>
+        <buttonbar id="buttons" height="15%" width="100%" align="center">
+
+            <icon-button id="start" width="64" height="64" icon="gui/green_check.png"
+                    I18N="In the grand prix info screen" text="Start Race"/>
+
+            <icon-button id="continue" width="64" height="64" icon="gui/green_check.png"
+                    I18N="In the grand prix info screen" text="Continue saved GP"/>
+        </buttonbar>
+
+    </div>
+</stkgui>

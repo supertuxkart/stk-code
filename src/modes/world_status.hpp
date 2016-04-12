@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 SuperTuxKart-Team
+//  Copyright (C) 2004-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 #ifndef HEADER_WORLD_STATUS_HPP
 #define HEADER_WORLD_STATUS_HPP
 
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 
 class SFXBase;
 
@@ -77,7 +77,10 @@ public:
         IN_GAME_MENU_PHASE,
 
         // Undefined, used in asserts to catch incorrect states.
-        UNDEFINED_PHASE
+        UNDEFINED_PHASE,
+
+        //Goal scored phase
+        GOAL_PHASE
     };
 protected:
     /** Sound to play at the beginning of a race, during which a

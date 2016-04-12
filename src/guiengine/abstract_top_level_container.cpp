@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
+#include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -28,10 +29,10 @@
 
 using namespace GUIEngine;
 
+using namespace irr;
 using namespace core;
 using namespace gui;
 using namespace io;
-using namespace irr;
 using namespace scene;
 using namespace video;
 
@@ -71,18 +72,16 @@ void AbstractTopLevelContainer::addWidgetsRecursively(
                 widgets[n].getType() != WTYPE_ICON_BUTTON &&
                 widgets[n].getType() != WTYPE_SPACER)
             {
-                std::cerr << "/!\\ Warning /!\\ : widget "
-                          << widgets[n].m_properties[PROP_ID].c_str()
-                          << " of type " << widgets[n].getType()
-                          << " has no dimensions" << std::endl;
+                Log::warn("AbstractTopLevelContainer::addWidgetsRecursively",
+                    "Widget %s of type %d has no dimensions",
+                    widgets[n].m_properties[PROP_ID].c_str(), widgets[n].getType());
             }
 
             if (widgets[n].m_x == -1 || widgets[n].m_y == -1)
             {
-                std::cerr << "/!\\ Warning /!\\ : widget "
-                          << widgets[n].m_properties[PROP_ID].c_str()
-                          << " of type " << widgets[n].getType()
-                          << " has no position" << std::endl;
+                Log::warn("AbstractTopLevelContainer::addWidgetsRecursively",
+                    "Widget %s of type %d has no position",
+                    widgets[n].m_properties[PROP_ID].c_str(), widgets[n].getType());
             }
 
             widgets[n].add();
@@ -196,10 +195,8 @@ Widget* AbstractTopLevelContainer::getWidget(const int id,
 
         if (widget.searchInsideMe() && widget.getChildren().size() > 0)
         {
-            // std::cout << "widget = <"
-            //           << widget.m_properties[PROP_ID].c_str()
-            //           << ">  widget.m_children.size()="
-            // << widget.m_children.size() << std::endl;
+            //Log::info("AbstractTopLevelContainer", "widget = <%s> widget.m_children.size() = ",
+            //    widget.m_properties[PROP_ID].c_str(), widget.m_children.size());
             Widget* el = getWidget(id, &(widget.m_children));
             if(el != NULL) return el;
         }
@@ -219,7 +216,7 @@ Widget* AbstractTopLevelContainer::getFirstWidget(
     if (m_first_widget != NULL) return m_first_widget;
     if (within_vector == NULL) within_vector = &m_widgets;
 
-    for (int i = 0; i < within_vector->size(); i++)
+    for (unsigned int i = 0; i < within_vector->size(); i++)
     {
         if (!within_vector->get(i)->m_focusable) continue;
 

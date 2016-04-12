@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,14 +19,18 @@
 #ifndef HEADER_ITEMMANAGER_HPP
 #define HEADER_ITEMMANAGER_HPP
 
+#include "LinearMath/btTransform.h"
+
+#include "items/item.hpp"
+#include "utils/aligned_array.hpp"
+#include "utils/no_copy.hpp"
+
+#include <SColor.h>
 
 #include <assert.h>
 #include <map>
 #include <string>
 #include <vector>
-
-#include "items/item.hpp"
-#include "utils/no_copy.hpp"
 
 class Kart;
 
@@ -39,6 +43,9 @@ class ItemManager : public NoCopy
 private:
     /** Stores all item models. */
     static std::vector<scene::IMesh *> m_item_mesh;
+
+    /** Stores the glow color for all items. */
+    static std::vector<video::SColorf> m_glow_color;
 
     /** Stores all low-resolution item models. */
     static std::vector<scene::IMesh *> m_item_lowres_mesh;
@@ -54,7 +61,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the mesh for a certain item. */
     static scene::IMesh* getItemModel(Item::ItemType type)
-                                      {return m_item_mesh[type];}
+                                      { return m_item_mesh[type]; }
+    // ------------------------------------------------------------------------
+    /** Returns the glow color for an item. */
+    static video::SColorf& getGlowColor(Item::ItemType type)
+                                      { return m_glow_color[type]; }
     // ------------------------------------------------------------------------
     /** Return an instance of the item manager (it does not automatically
      *  create one, call create for that). */
@@ -102,8 +113,10 @@ public:
                                     int add_info=-1);
     void           switchItems     ();
     // ------------------------------------------------------------------------
+    bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
+    // ------------------------------------------------------------------------
     /** Returns the number of items. */
-    unsigned int   getNumberOfItems() const { return m_all_items.size(); }
+    unsigned int   getNumberOfItems() const { return (unsigned int) m_all_items.size(); }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the n-th item. */
     const Item*   getItem(unsigned int n) const { return m_all_items[n]; };

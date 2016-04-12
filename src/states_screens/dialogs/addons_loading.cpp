@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2010 Marianne Gagnon, Joerg Henrichs
+//  Copyright (C) 2009-2015 Marianne Gagnon, Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,8 +21,7 @@
 #include <pthread.h>
 
 #include "addons/addons_manager.hpp"
-#include "addons/inetwork_http.hpp"
-#include "addons/request.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -31,23 +30,25 @@
 #include "io/file_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/vote_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
+using namespace Online;
 using namespace irr::gui;
 
 // ----------------------------------------------------------------------------
 /** Creates a modal dialog with given percentage of screen width and height
 */
 
-AddonsLoading::AddonsLoading(const float w, const float h,
-                             const std::string &id)
-             : ModalDialog(w, h)
+AddonsLoading::AddonsLoading(const std::string &id)
+             : ModalDialog(0.8f, 0.8f),
+               m_addon(*(addons_manager->getAddon(id)) )
 {
-    m_addon            = *(addons_manager->getAddon(id));
+    
     m_icon_shown       = false;
     m_download_request = NULL;
 
@@ -92,7 +93,7 @@ void AddonsLoading::beforeAddingWidgets()
          * and  not in error state
          */
         if (m_addon.needsUpdate() && !addons_manager->wasError()
-            && UserConfigParams::m_internet_status==INetworkHttp::IPERM_ALLOWED)
+            && UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED)
             getWidget<IconButtonWidget> ("install")->setLabel( _("Update") );
         else
             r->removeChildNamed("install");
@@ -129,10 +130,11 @@ void AddonsLoading::beforeAddingWidgets()
         else if(m_addon.testStatus(Addon::AS_RC))
             l.push_back("RC");
 
-        if(m_addon.testStatus(Addon::AS_BAD_DIM))
-            l.push_back("bad-texture");
-        if(!m_addon.testStatus(Addon::AS_DFSG))
-            l.push_back("non-DFSG");
+        // Don't displat those for now, they're more confusing than helpful for the average player
+        //if(m_addon.testStatus(Addon::AS_BAD_DIM))
+        //    l.push_back("bad-texture");
+        //if(!m_addon.testStatus(Addon::AS_DFSG))
+        //    l.push_back("non-DFSG");
     }
     if(m_addon.testStatus(Addon::AS_FEATURED))
         l.push_back(_("featured"));
@@ -161,18 +163,18 @@ void AddonsLoading::beforeAddingWidgets()
         float f = ((int)(n/1024.0f/1024.0f*10.0f+0.5f))/10.0f;
         char s[32];
         sprintf(s, "%.1f", f);
-        unit=_("%s MB", s);
+        unit = _LTR("%s MB", s);
     }
     else if(n>1024)
     {
         float f = ((int)(n/1024.0f*10.0f+0.5f))/10.0f;
         char s[32];
         sprintf(s, "%.1f", f);
-        unit=_("%s KB", s);
+        unit = _LTR("%s KB", s);
     }
     else
         // Anything smaller just let it be 1 KB
-        unit=_("%s KB", 1);
+        unit = _LTR("%s KB", 1);
     core::stringw size = _("Size: %s", unit.c_str());
     getWidget<LabelWidget>("size")->setText(size, false);
 }   // AddonsLoading
@@ -189,16 +191,16 @@ void AddonsLoading::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-void AddonsLoading::escapePressed()
+bool AddonsLoading::onEscapePressed()
 {
     stopDownload();
     ModalDialog::dismiss();
-}   // escapePressed
+    return true;
+}   // onEscapePressed
 
 // ----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation
-                    AddonsLoading::processEvent(const std::string& event_source)
+GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event_source)
 {
     GUIEngine::RibbonWidget* actions_ribbon =
             getWidget<GUIEngine::RibbonWidget>("actions");
@@ -236,9 +238,32 @@ GUIEngine::EventPropagation
             doUninstall();
             return GUIEngine::EVENT_BLOCK;
         }
+        else if (selection == "vote")
+        {
+            voteClicked();
+            return GUIEngine::EVENT_BLOCK;
+        }
+    }
+    else if (event_source == "rating")
+    {
+        voteClicked();
+        return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
+
+// ----------------------------------------------------------------------------
+void AddonsLoading::voteClicked()
+{
+    if (PlayerManager::isCurrentLoggedIn())
+    {
+        // We need to keep a copy of the addon id, since dismiss() will
+        // delete this object (and the copy of the addon).
+        std::string addon_id = m_addon.getId();
+        dismiss();
+        new VoteDialog(addon_id);
+    }
+}   // voteClicked
 
 // ----------------------------------------------------------------------------
 void AddonsLoading::onUpdate(float delta)
@@ -255,7 +280,7 @@ void AddonsLoading::onUpdate(float delta)
             new MessageDialog( _("Sorry, downloading the add-on failed"));
             return;
         }
-        else if(progress>=1.0f)
+        else if(m_download_request->isDone())
         {
             m_back_button->setLabel(_("Back"));
             // No sense to update state text, since it all
@@ -271,6 +296,13 @@ void AddonsLoading::onUpdate(float delta)
         const std::string icon = "icons/"+m_addon.getIconBasename();
         m_icon->setImage( file_manager->getAddonsFile(icon).c_str(),
                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE  );
+        // Check if there was an error displaying the icon. If so, the icon
+        // file is (likely) corrupt, and the file needs to be downloaded again.
+        std::string s = m_icon->getTexture()->getName().getPath().c_str();
+        if(StringUtils::getBasename(s)!=StringUtils::getBasename(icon))
+        {
+            m_addon.deleteInvalidIconFile();
+        }
         m_icon_shown = true;
     }
 }   // onUpdate
@@ -281,12 +313,13 @@ void AddonsLoading::onUpdate(float delta)
  **/
 void AddonsLoading::startDownload()
 {
-    std::string file   = m_addon.getZipFileName();
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
-    m_download_request = INetworkHttp::get()->downloadFileAsynchron(file, save,
-                                                       /*priority*/5,
-                                                       /*manage memory*/false);
+    m_download_request = new Online::HTTPRequest(save, /*manage mem*/false,
+                                                 /*priority*/5);
+    m_download_request->setURL(m_addon.getZipFileName());
+    m_download_request->queue();
+
 }   // startDownload
 
 // ----------------------------------------------------------------------------
@@ -299,12 +332,15 @@ void AddonsLoading::stopDownload()
     // (and not uninstalling an installed one):
     if(m_download_request)
     {
-        // In case of a cancel we can't free the memory, since
-        // network_http will potentially update the request. So in
-        // order to avoid a memory leak, we let network_http free
-        // the request.
+        // In case of a cancel we can't free the memory, since the 
+        // request manager thread is potentially working on this request. So 
+        // in order to avoid a memory leak, we let the request manager
+        // free the data. This is thread safe since freeing the data is done
+        // when the request manager handles the result queue - and this is
+        // done by the main thread (i.e. this thread).
         m_download_request->setManageMemory(true);
         m_download_request->cancel();
+        m_download_request = NULL;
     };
 }   // startDownload
 
@@ -316,15 +352,13 @@ void AddonsLoading::doInstall()
 {
     delete m_download_request;
     m_download_request = NULL;
-    bool error=false;
 
     assert(!m_addon.isInstalled() || m_addon.needsUpdate());
-    error = !addons_manager->install(m_addon);
+    bool error = !addons_manager->install(m_addon);
     if(error)
     {
-        core::stringw msg = StringUtils::insertValues(
-            _("Problems installing the addon '%s'."),
-            core::stringw(m_addon.getName().c_str()));
+        const core::stringw &name = m_addon.getName();
+        core::stringw msg = _("Problems installing the addon '%s'.", name);
         getWidget<BubbleWidget>("description")->setText(msg.c_str());
     }
 
@@ -354,17 +388,14 @@ void AddonsLoading::doUninstall()
 {
     delete m_download_request;
     m_download_request = NULL;
-    bool error=false;
-
-    error = !addons_manager->uninstall(m_addon);
+    bool error = !addons_manager->uninstall(m_addon);
     if(error)
     {
-        printf("[addons]Directory '%s' can not be removed.\n",
-               m_addon.getDataDir().c_str());
-        printf("[addons]Please remove this directory manually.\n");
-        core::stringw msg = StringUtils::insertValues(
-                                                      _("Problems removing the addon '%s'."),
-                                                      core::stringw(m_addon.getName().c_str()));
+        Log::warn("Addons", "Directory '%s' can not be removed.",
+                  m_addon.getDataDir().c_str());
+        Log::warn("Addons", "Please remove this directory manually.");
+        const core::stringw &name = m_addon.getName();
+        core::stringw msg = _("Problems removing the addon '%s'.", name);
         getWidget<BubbleWidget>("description")->setText(msg.c_str());
     }
 
@@ -374,8 +405,8 @@ void AddonsLoading::doUninstall()
 
         RibbonWidget* r = getWidget<RibbonWidget>("actions");
         r->setVisible(true);
-
-        m_install_button->setLabel(_("Try again"));
+        IconButtonWidget *u = getWidget<IconButtonWidget> ("uninstall" );
+        u->setLabel(_("Try again"));
     }
     else
     {

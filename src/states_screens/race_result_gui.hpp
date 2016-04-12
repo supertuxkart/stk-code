@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Joerg Henrichs
+//  Copyright (C) 2010-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,14 +19,15 @@
 #ifndef HEADER_RACE_RESULT_GUI_HPP
 #define HEADER_RACE_RESULT_GUI_HPP
 
+
+#include "guiengine/screen.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "states_screens/state_manager.hpp"
 
 #include <assert.h>
 #include <vector>
 
-#include "guiengine/screen.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
-#include "states_screens/state_manager.hpp"
 
 namespace irr
 {
@@ -36,6 +37,7 @@ namespace irr
     }
 }
 
+class MusicInformation;
 class SFXBase;
 
 /**
@@ -80,8 +82,6 @@ private:
         float            m_y_pos;
         /** True if kart is a player kart. */
         bool             m_is_player_kart;
-        /** Only if m_is_player_kart is true */
-        const StateManager::ActivePlayer* m_player;
         /** The radius to use when sorting the entries. Positive values
             will rotate downwards, negatives are upwards. */
         float            m_radius;
@@ -101,13 +101,9 @@ private:
         video::ITexture *m_kart_icon;
         /** The times of all karts in the right order. */
         core::stringw    m_finish_time_string;
-#ifdef USE_PER_LINE_BACKGROUND
-        /** For the background bar behind each line. */
-        GUIEngine::SkinWidgetContainer m_widget_container;
-        /** The parameter for rendering the background box. */
-        GUIEngine::BoxRenderParams     m_box_params;
-#endif
     };   // Rowinfo
+
+    /** The team icons. */
 
     std::vector<RowInfo>       m_all_row_infos;
 
@@ -156,9 +152,6 @@ private:
     /** The overall width of the table. */
     unsigned int               m_table_width;
 
-    /** GP Progress text */
-    unsigned int               m_gp_progress_x;
-
     /** The font to use. */
     gui::ScalableFont         *m_font;
 
@@ -169,21 +162,25 @@ private:
     /** The previous monospace state of the font. */
     bool                       m_was_monospace;
 
-    SFXBase*                   m_finish_sound;
+    /** Sound effect at end of race. */
+    SFXBase                   *m_finish_sound;
 
-    /** For highscores */
-    std::string m_highscore_who;
-
-    /** For highscores */
-    StateManager::ActivePlayer* m_highscore_player;
+    /** Music to be played after race ended. */
+    MusicInformation          *m_race_over_music;
 
     /** For highscores */
     int m_highscore_rank;
 
-    /** For highscores */
-    int m_highscore_time;
-
     unsigned int m_width_all_points;
+
+    int m_max_tracks;
+    int m_start_track;
+    int m_end_track;
+    int m_sshot_height;
+
+    PtrVector<GUIEngine::Widget, HOLD>  m_gp_progress_widgets;
+
+    static const int SSHOT_SEPARATION = 10;
 
     void displayOneEntry(unsigned int x, unsigned int y,
                          unsigned int n, bool display_points);
@@ -191,16 +188,22 @@ private:
     void determineGPLayout();
     void enableAllButtons();
     void enableGPProgress();
+    void addGPProgressWidget(GUIEngine::Widget* widget);
     void displayGPProgress();
     void cleanupGPProgress();
     void displayHighScores();
+    void displaySoccerResults();
+    void displayScreenShots();
+
+    int  getFontHeight () const;
+
 public:
 
                  RaceResultGUI();
-    virtual void renderGlobal(float dt);
+    virtual void renderGlobal(float dt) OVERRIDE;
 
     /** \brief Implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() {};
+    virtual void loadedFromFile() OVERRIDE {};
 
     virtual void init() OVERRIDE;
     virtual void tearDown() OVERRIDE;
@@ -210,18 +213,19 @@ public:
                                Input::InputType type, int playerId) OVERRIDE;
     void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                        const int playerID) OVERRIDE;
+    void backToLobby();
 
 
     friend class GUIEngine::ScreenSingleton<RaceResultGUI>;
 
     /** Should not be called anymore.  */
-    const core::dimension2du getMiniMapSize() const
+    const core::dimension2du getMiniMapSize() const OVERRIDE
                   { assert(false); return core::dimension2du(0, 0); }
 
     /** No kart specific view needs to be rendered in the result gui. */
-    virtual void renderPlayerView(const AbstractKart *kart) {}
+    virtual void renderPlayerView(const Camera *camera, float dt) OVERRIDE {}
 
-    virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
+    virtual void onUpdate(float dt) OVERRIDE;
 
     /** No more messages need to be displayed, but the function might still be
      *  called (e.g. 'new lap' message if the end controller is used for more
@@ -232,10 +236,8 @@ public:
                             float time,
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
-                            bool important=true) { }
-
-    /** Should not be called anymore. */
-    virtual void clearAllMessages() {assert(false); }
+                            bool important=true,
+                            bool big_font=false) OVERRIDE { }
 
     void nextPhase();
 
@@ -249,10 +251,9 @@ public:
       * \param rank Highscore rank (first highscore, second highscore, etc.). This is not the race rank
       * \param time Finish time in seconds
       */
-    void setHighscore(const std::string &kart,
-                      StateManager::ActivePlayer* player, int rank, int time);
+    void setHighscore(int rank);
 
-    virtual void onConfirm();
+    virtual void onConfirm() OVERRIDE;
 };   // RaceResultGUI
 
 #endif

@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -36,7 +36,7 @@ class ChallengeData;
   * \brief Screen shown when a feature has been unlocked
   * \ingroup states_screens
  */
-class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>
+class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>
 {
     friend class GUIEngine::ScreenSingleton<FeatureUnlockedCutScene>;
 
@@ -59,6 +59,11 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
 
         /** Contains whatever is in the chest */
         scene::ISceneNode* m_root_gift_node;
+
+        scene::IMeshSceneNode* m_side_1;
+        scene::IMeshSceneNode* m_side_2;
+
+        float m_scale;
 
         irr::core::stringw m_unlock_message;
 
@@ -91,31 +96,14 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
     /** To store the copy of the KartModel for each unlocked kart. */
     PtrVector<KartModel> m_all_kart_models;
 
-    /** sky angle, 0-360 */
-    float m_sky_angle;
-
     /** Global evolution of time */
-    double m_global_time;
+    float m_global_time;
 
     /** Key position from origin (where the chest is) */
     float m_key_pos;
 
     /** Angle of the key (from 0 to 1, simply traces progression) */
     float m_key_angle;
-
-    /** The scene node for the sky box. */
-    irr::scene::ISceneNode             *m_sky;
-
-    /** The scene node for the camera. */
-    irr::scene::ICameraSceneNode       *m_camera;
-
-    /** The scene node for the animated mesh. */
-    irr::scene::IAnimatedMeshSceneNode *m_chest;
-
-    /** The scene node for the light. */
-    irr::scene::ILightSceneNode* m_light;
-
-    //#define USE_IRRLICHT_BUG_WORKAROUND
 
 #ifdef USE_IRRLICHT_BUG_WORKAROUND
     scene::IMeshSceneNode *m_avoid_irrlicht_bug;
@@ -125,8 +113,10 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
 
 public:
 
+    virtual void onCutsceneEnd() OVERRIDE;
+
     /** \brief implement optional callback from parent class GUIEngine::Screen */
-    void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
+    void onUpdate(float dt) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

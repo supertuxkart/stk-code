@@ -1,8 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2010 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2010 Eduardo Hernandez Munoz
-//  Copyright (C) 2008-2010 Joerg Henrichs
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 Eduardo Hernandez Munoz
+//  Copyright (C) 2008-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -43,7 +43,6 @@
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/linear_world.hpp"
-#include "network/network_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "tracks/quad_graph.hpp"
@@ -51,14 +50,15 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
-EndController::EndController(AbstractKart *kart, StateManager::ActivePlayer *player,
+EndController::EndController(AbstractKart *kart,
                              Controller *prev_controller)
-             : AIBaseController(kart, player)
+             : AIBaseLapController(kart)
 {
     m_previous_controller = prev_controller;
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+       race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
-        // Overwrite the random selected default path from AIBaseController
+        // Overwrite the random selected default path from AIBaseLapController
         // with a path that always picks the first branch (i.e. it follows
         // the main driveline).
         std::vector<unsigned int> next;
@@ -124,14 +124,15 @@ EndController::~EndController()
 //-----------------------------------------------------------------------------
 void EndController::reset()
 {
-    AIBaseController::reset();
+    AIBaseLapController::reset();
 
     m_crash_time       = 0.0f;
     m_time_since_stuck = 0.0f;
 
     m_track_node       = QuadGraph::UNKNOWN_SECTOR;
     // In battle mode there is no quad graph, so nothing to do in this case
-    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
+       race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
 
@@ -178,10 +179,12 @@ void EndController::update(float dt)
     m_controls->m_brake     = false;
     m_controls->m_accel     = 1.0f;
 
-    AIBaseController::update(dt);
+    AIBaseLapController::update(dt);
 
     // In case of battle mode: don't do anything
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES)
+    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+       race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER  ||
+       race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG)
     {
         m_controls->m_accel = 0.0f;
         // Brake while we are still driving forwards (if we keep
@@ -191,9 +194,7 @@ void EndController::update(float dt)
     }
     /*Get information that is needed by more than 1 of the handling funcs*/
     //Detect if we are going to crash with the track and/or kart
-    int steps = 0;
-
-    steps = calcSteps();
+    calcSteps();
 
     /*Response handling functions*/
     handleSteering(dt);
@@ -215,7 +216,7 @@ void EndController::handleSteering(float dt)
         const int next = m_next_node_index[m_track_node];
         target_point = QuadGraph::get()->getQuadOfNode(next).getCenter();
 #ifdef AI_DEBUG
-        Log::debug("end_controller.cpp", "- Outside of road: steer to center point.\n");
+        Log::debug("end_controller.cpp", "- Outside of road: steer to center point.");
 #endif
     }
     else

@@ -1,5 +1,5 @@
 //  tinygettext - A gettext replacement that works directly on .po files
-//  Copyright (C) 2006 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015 Ingo Ruhnke <grumbel@gmx.de>
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,9 +17,12 @@
 
 #include "language.hpp"
 
+#include "utils/string_utils.hpp"
+
 #include <map>
 #include <assert.h>
 #include <vector>
+#include <algorithm>
 
 namespace tinygettext {
 
@@ -212,7 +215,7 @@ static const LanguageSpec languages[] = {
   { "pl", "PL", 0, "Polish (Poland)"             },
   { "ps", 0,    0, "Pashto"                      },
   { "pt", 0,    0, "Portuguese"                  },
-  { "pt", "BR", 0, "Brazilian"                   },
+  { "pt", "BR", 0, "Portuguese (Brazil)"         },
   { "pt", "PT", 0, "Portuguese (Portugal)"       },
   { "qu", 0,    0, "Quechua"                     },
   { "rm", 0,    0, "Rhaeto-Romance"              },
@@ -429,7 +432,9 @@ Language::from_env(const std::string& env)
 
   if (ln != std::string::npos && ln+1 < env.size()) // _
   {
-    country = env.substr(ln+1, (std::min(dt, at) == std::string::npos) ? std::string::npos : std::min(dt, at) - (ln+1));
+    country = env.substr(ln+1, (std::min(dt, at) == std::string::npos) 
+                            ? std::string::npos : std::min(dt, at) - (ln+1));
+    country = StringUtils::toUpperCase(country);
   }
 
   if (dt != std::string::npos && dt+1 < env.size()) // .

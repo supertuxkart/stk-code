@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 
-#include "guiengine/widgets/CGUIEditBox.h"
+#include "guiengine/widgets/CGUIEditBox.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
 
@@ -58,7 +58,7 @@ public:
 
         if (event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)
         {
-            for (int n=0; n<m_listeners.size(); n++)
+            for (unsigned int n=0; n<m_listeners.size(); n++)
             {
                 m_listeners[n].onTextUpdated();
             }
@@ -94,6 +94,9 @@ void TextBoxWidget::add()
                                   (m_parent ? m_parent : GUIEngine::getGUIEnv()->getRootGUIElement()),
                                   getNewID(), widget_size);
 
+    if (m_deactivated)
+        m_element->setEnabled(false);
+
     //m_element = GUIEngine::getGUIEnv()->addEditBox(text.c_str(), widget_size,
     //                                               true /* border */, m_parent, getNewID());
     m_id = m_element->getID();
@@ -124,6 +127,15 @@ stringw TextBoxWidget::getText() const
     assert(textCtrl != NULL);
 
     return stringw(textCtrl->getText());
+}
+
+// -----------------------------------------------------------------------------
+
+void TextBoxWidget::setPasswordBox(bool passwordBox, wchar_t passwordChar)
+{
+    IGUIEditBox* textCtrl =  Widget::getIrrlichtElement<IGUIEditBox>();
+    assert(textCtrl != NULL);
+    textCtrl->setPasswordBox(passwordBox, passwordChar);
 }
 
 // -----------------------------------------------------------------------------
@@ -159,3 +171,19 @@ void TextBoxWidget::elementRemoved()
     m_element->drop();
     Widget::elementRemoved();
 }
+
+// -----------------------------------------------------------------------------
+
+void TextBoxWidget::setActive(bool active)
+{
+    Widget::setActive(active);
+
+    if (m_element != NULL)
+    {
+        IGUIEditBox* textCtrl = Widget::getIrrlichtElement<IGUIEditBox>();
+        assert(textCtrl != NULL);
+        textCtrl->setEnabled(active);
+    }
+}   // setActive
+
+// -----------------------------------------------------------------------------

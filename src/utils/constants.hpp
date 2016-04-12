@@ -1,6 +1,7 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2012-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -46,7 +47,7 @@
 #define DEGREE_TO_RAD      (M_PI/180.0f)
 #define RAD_TO_DEGREE      (180.0f/M_PI)
 
-const int MAX_PLAYER_COUNT = 4;
+const unsigned int MAX_PLAYER_COUNT = 4;
 
 extern const bool IS_LITTLE_ENDIAN;
 

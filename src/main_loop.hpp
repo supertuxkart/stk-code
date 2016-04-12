@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2004-2015 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -28,8 +29,8 @@ class MainLoop
 {
 private:
     bool m_abort;
+    bool m_throttle_fps;
 
-    int      m_frame_count;
     Uint32   m_curr_time;
     Uint32   m_prev_time;
     float    getLimitedDt();
@@ -39,6 +40,10 @@ public:
         ~MainLoop();
     void run();
     void abort();
+    void setThrottleFPS(bool throttle) { m_throttle_fps = throttle; }
+    // ------------------------------------------------------------------------
+    /** Returns true if STK is to be stoppe. */
+    bool isAborted() const { return m_abort; }
 };   // MainLoop
 
 extern MainLoop* main_loop;

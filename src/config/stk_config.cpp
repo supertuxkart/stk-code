@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 Joerg Henrichs
+//  Copyright (C) 2006-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -39,6 +39,7 @@ float STKConfig::UNDEFINED = -99.9f;
 STKConfig::STKConfig()
 {
     m_has_been_loaded         = false;
+    m_title_music             = NULL;
     m_default_kart_properties = new KartProperties();
 }   // STKConfig
 //-----------------------------------------------------------------------------
@@ -46,7 +47,16 @@ STKConfig::~STKConfig()
 {
     if(m_title_music)
         delete m_title_music;
-    delete m_default_kart_properties;
+
+    if(m_default_kart_properties)
+        delete m_default_kart_properties;
+
+    for(std::map<std::string, KartProperties*>::iterator it = m_kart_properties.begin();
+            it != m_kart_properties.end(); ++it)
+    {
+        if (it->second)
+            delete it->second;
+    }
 }   // ~STKConfig
 
 //-----------------------------------------------------------------------------
@@ -108,19 +118,9 @@ void STKConfig::load(const std::string &filename)
     }
 
     CHECK_NEG(m_max_karts,                 "<karts max=..."             );
-    CHECK_NEG(m_parachute_friction,        "parachute-friction"         );
-    CHECK_NEG(m_parachute_done_fraction,   "parachute-done-fraction"    );
-    CHECK_NEG(m_parachute_time,            "parachute-time"             );
-    CHECK_NEG(m_parachute_time_other,      "parachute-time-other"       );
-    CHECK_NEG(m_bomb_time,                 "bomb-time"                  );
-    CHECK_NEG(m_bomb_time_increase,        "bomb-time-increase"         );
-    CHECK_NEG(m_anvil_time,                "anvil-time"                 );
-    CHECK_NEG(m_anvil_weight,              "anvil-weight"               );
     CHECK_NEG(m_item_switch_time,          "item-switch-time"           );
     CHECK_NEG(m_bubblegum_counter,         "bubblegum disappear counter");
-    CHECK_NEG(m_bubblegum_shield_time,     "bubblegum shield-time"      );
     CHECK_NEG(m_explosion_impulse_objects, "explosion-impulse-objects"  );
-    CHECK_NEG(m_max_history,               "max-history"                );
     CHECK_NEG(m_max_skidmarks,             "max-skidmarks"              );
     CHECK_NEG(m_min_kart_version,          "<kart-version min...>"      );
     CHECK_NEG(m_max_kart_version,          "<kart-version max=...>"     );
@@ -133,6 +133,7 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_leader_time_per_kart,      "leader time-per-kart"       );
     CHECK_NEG(m_penalty_time,              "penalty-time"               );
     CHECK_NEG(m_max_display_news,          "max-display-news"           );
+    CHECK_NEG(m_replay_max_time,           "replay max-time"            );
     CHECK_NEG(m_replay_delta_angle,        "replay delta-angle"         );
     CHECK_NEG(m_replay_delta_pos2,         "replay delta-position"      );
     CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
@@ -150,26 +151,22 @@ void STKConfig::load(const std::string &filename)
  */
 void STKConfig::init_defaults()
 {
-    m_anvil_weight               = m_parachute_friction        =
-        m_parachute_time         = m_parachute_done_fraction   =
-        m_parachute_time_other   = m_anvil_speed_factor        =
-        m_bomb_time              = m_bomb_time_increase        =
-        m_anvil_time             = m_music_credit_time         =
+    m_bomb_time                  = m_bomb_time_increase        =
+        m_explosion_impulse_objects = m_music_credit_time      =
         m_delay_finish_time      = m_skid_fadeout_time         =
         m_near_ground            = m_item_switch_time          =
-        m_smooth_angle_limit     =
-        m_penalty_time           = m_explosion_impulse_objects = UNDEFINED;
+        m_smooth_angle_limit     = m_penalty_time              =
+        UNDEFINED;
     m_bubblegum_counter          = -100;
-    m_bubblegum_shield_time      = -100;
     m_shield_restrict_weapos     = false;
     m_max_karts                  = -100;
-    m_max_history                = -100;
     m_max_skidmarks              = -100;
     m_min_kart_version           = -100;
     m_max_kart_version           = -100;
     m_min_track_version          = -100;
     m_max_track_version          = -100;
     m_max_display_news           = -100;
+    m_replay_max_time            = -100;
     m_replay_delta_angle         = -100;
     m_replay_delta_pos2          = -100;
     m_replay_dt                  = -100;
@@ -261,20 +258,24 @@ void STKConfig::getAllData(const XMLNode * root)
         steer_node->get("camera-follow-skid",   &m_camera_follow_skid        );
     }
 
+    if (const XMLNode *camera = root->getNode("camera"))
+    {
+        camera->get("fov-1", &m_camera_fov[0]);
+        camera->get("fov-2", &m_camera_fov[1]);
+        camera->get("fov-3", &m_camera_fov[2]);
+        camera->get("fov-4", &m_camera_fov[3]);
+    }
+
     if (const XMLNode *music_node = root->getNode("music"))
     {
         std::string title_music;
         music_node->get("title", &title_music);
         assert(title_music.size() > 0);
-
-        m_title_music = MusicInformation::create(file_manager->getDataDir()
-                                                 + "/music/" + title_music  );
+        title_music = file_manager->getAsset(FileManager::MUSIC, title_music);
+        m_title_music = MusicInformation::create(title_music);
         if(!m_title_music)
             Log::error("StkConfig", "Cannot load title music : %s", title_music.c_str());
     }
-
-    if(const XMLNode *history_node = root->getNode("history"))
-        history_node->get("max-frames", &m_max_history);
 
     if(const XMLNode *skidmarks_node = root->getNode("skid-marks"))
     {
@@ -291,21 +292,6 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *credits_node= root->getNode("credits"))
         credits_node->get("music", &m_music_credit_time);
 
-
-    if(const XMLNode *anvil_node= root->getNode("anvil"))
-    {
-        anvil_node->get("weight",       &m_anvil_weight      );
-        anvil_node->get("speed-factor", &m_anvil_speed_factor);
-        anvil_node->get("time",         &m_anvil_time        );
-    }
-
-    if(const XMLNode *parachute_node= root->getNode("parachute"))
-    {
-        parachute_node->get("friction",      &m_parachute_friction     );
-        parachute_node->get("time",          &m_parachute_time         );
-        parachute_node->get("time-other",    &m_parachute_time_other   );
-        parachute_node->get("done-fraction", &m_parachute_done_fraction);
-    }
 
     if(const XMLNode *bomb_node= root->getNode("bomb"))
     {
@@ -339,7 +325,6 @@ void STKConfig::getAllData(const XMLNode * root)
     if(const XMLNode *bubblegum_node= root->getNode("bubblegum"))
     {
         bubblegum_node->get("disappear-counter", &m_bubblegum_counter     );
-        bubblegum_node->get("shield-time",       &m_bubblegum_shield_time );
         bubblegum_node->get("restrict-weapons",  &m_shield_restrict_weapos);
     }
 
@@ -361,7 +346,21 @@ void STKConfig::getAllData(const XMLNode * root)
         replay_node->get("delta-angle", &m_replay_delta_angle);
         replay_node->get("delta-pos",   &m_replay_delta_pos2 );
         replay_node->get("delta-t",     &m_replay_dt         );
+        replay_node->get("max-time",    &m_replay_max_time   );
+
     }
+
+    if(const XMLNode *font_node = root->getNode("font"))
+    {
+        font_node->get("default",          &m_font_default         );
+        font_node->get("default_fallback", &m_font_default_fallback);
+        font_node->get("cjk",              &m_font_cjk             );
+        font_node->get("ar",               &m_font_ar              );
+        font_node->get("bold",             &m_font_bold            );
+        font_node->get("bold_fallback",    &m_font_bold_fallback   );
+        font_node->get("digit",            &m_font_digit           );
+    }
+
     // Get the default KartProperties
     // ------------------------------
     const XMLNode *node = root -> getNode("general-kart-defaults");
@@ -372,7 +371,15 @@ void STKConfig::getAllData(const XMLNode * root)
         throw std::runtime_error(msg.str());
     }
     m_default_kart_properties->getAllData(node);
+    const XMLNode *child_node = node->getNode("kart-type");
 
+    for (unsigned int i = 0; i < child_node->getNumNodes(); ++i)
+    {
+        const XMLNode* type = child_node->getNode(i);
+        m_kart_properties[type->getName()] = new KartProperties();
+        m_kart_properties[type->getName()]->copyFrom(m_default_kart_properties);
+        m_kart_properties[type->getName()]->getAllData(type);
+    }
 }   // getAllData
 
 // ----------------------------------------------------------------------------

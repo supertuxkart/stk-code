@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006 SuperTuxKart-Team
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -53,9 +53,6 @@ private:
     /** List of all soccer arena groups. */
     Group2Indices                            m_soccer_arena_groups;
 
-    /** List of all groups (for both normal tracks and arenas) */
-    //std::vector<std::string>                 m_all_group_names;
-
     /** List of the names of all groups containing tracks */
     std::vector<std::string>                 m_track_group_names;
 
@@ -85,6 +82,7 @@ public:
     void  removeTrack(const std::string &ident);
     bool  loadTrack(const std::string& dirname);
     void  removeAllCachedData();
+    int   getNumberOfRaceTracks() const;
     Track* getTrack(const std::string& ident) const;
     // ------------------------------------------------------------------------
     /** Sets a list of track as being unavailable (e.g. in network mode the

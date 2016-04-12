@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2004-2015 Ingo Ruhnke <grumbel@gmx.de>
+//  Copyright (C) 2013-2015 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -79,15 +80,20 @@ private:
 
         video::SColor   m_start_color;
 
+        /** Vector marking the start of the skidmarks (located between left and right wheel) */
+        Vec3 m_center_start;
+
     public:
             SkidMarkQuads (const Vec3 &left, const Vec3 &right,
                            video::SMaterial *material, float z_offset,
                            video::SColor* custom_color = NULL);
         void add          (const Vec3 &left,
-                           const Vec3 &right);
+                           const Vec3 &right,
+                           float distance);
         void fade         (float f);
         /** Returns the aabb of this skid mark quads. */
         const core::aabbox3df &getAABB() { return m_aabb; }
+        const Vec3& getCenterStart() const { return m_center_start; }
     };  // SkidMarkQuads
 
     // ------------------------------------------------------------------------
@@ -102,7 +108,7 @@ private:
     static float                  m_avoid_z_fighting;
 
 public:
-         SkidMarks(const AbstractKart& kart, float width=0.2f);
+         SkidMarks(const AbstractKart& kart, float width=0.32f);
         ~SkidMarks();
     void update (float dt, bool force_skid_marks=false,
                  video::SColor* custom_color = NULL);

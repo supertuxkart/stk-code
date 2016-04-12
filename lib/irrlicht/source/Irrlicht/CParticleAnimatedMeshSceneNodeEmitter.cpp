@@ -5,6 +5,7 @@
 #include "CParticleAnimatedMeshSceneNodeEmitter.h"
 #include "IAnimatedMeshSceneNode.h"
 #include "IMesh.h"
+#include "IMeshBuffer.h"
 #include "os.h"
 
 namespace irr
@@ -27,7 +28,7 @@ CParticleAnimatedMeshSceneNodeEmitter::CParticleAnimatedMeshSceneNodeEmitter(
 	MinStartColor(minStartColor), MaxStartColor(maxStartColor),
 	MinLifeTime(lifeTimeMin), MaxLifeTime(lifeTimeMax),
 	MaxStartSize(maxStartSize), MinStartSize(minStartSize),
-	Time(0), Emitted(0), MaxAngleDegrees(maxAngleDegrees),
+	Time(0), MaxAngleDegrees(maxAngleDegrees),
 	EveryMeshVertex(everyMeshVertex), UseNormalDirection(useNormalDirection)
 {
 	#ifdef _DEBUG

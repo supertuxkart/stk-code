@@ -214,7 +214,7 @@ public:
 	//! Returns type of the scene node
 	virtual ESCENE_NODE_TYPE getType() const { return ESNT_PARTICLE_SYSTEM; }
 
-private:
+protected:
 
 	void reallocateBuffers();
 

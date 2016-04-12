@@ -1,6 +1,7 @@
-//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004 Steve Baker <sjbaker1@airmail.net>
+//
+//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,9 +19,6 @@
 
 #include "items/item.hpp"
 
-#include <IMeshSceneNode.h>
-#include <ISceneManager.h>
-
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "karts/abstract_kart.hpp"
@@ -30,6 +28,9 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/vec3.hpp"
+
+#include <IMeshSceneNode.h>
+#include <ISceneManager.h>
 
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, scene::IMesh* lowres_mesh)
@@ -47,12 +48,15 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     LODNode* lodnode    = new LODNode("item",
                                       irr_driver->getSceneManager()->getRootSceneNode(),
                                       irr_driver->getSceneManager());
-    scene::IMeshSceneNode* meshnode = irr_driver->addMesh(mesh);
+    scene::IMeshSceneNode* meshnode = 
+        irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
 
     if (lowres_mesh != NULL)
     {
         lodnode->add(35, meshnode, true);
-        scene::IMeshSceneNode* meshnode = irr_driver->addMesh(lowres_mesh);
+        scene::IMeshSceneNode* meshnode = 
+            irr_driver->addMesh(lowres_mesh, 
+                                StringUtils::insertValues("item_lo_%i", (int)type));
         lodnode->add(100, meshnode, true);
     }
     else
@@ -110,8 +114,7 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     m_deactive_time     = 0;
     m_time_till_return  = 0.0f;  // not strictly necessary, see isCollected()
     m_emitter           = NULL;
-    m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER) &&
-                          (type!=ITEM_EASTER_EGG);
+    m_rotate            = (type!=ITEM_BUBBLEGUM) && (type!=ITEM_TRIGGER);
     switch(m_type)
     {
     case ITEM_BUBBLEGUM:
@@ -186,7 +189,10 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
     {
         node = m_node->getAllNodes()[1];
         ((scene::IMeshSceneNode*)node)->setMesh(lowmesh);
+        irr_driver->applyObjectPassShader(m_node->getAllNodes()[1]);
     }
+
+    irr_driver->applyObjectPassShader(m_node->getAllNodes()[0]);
 
     World::getWorld()->getTrack()->adjustForFog(m_node);
 }   // switchTo
@@ -368,7 +374,7 @@ void Item::collected(const AbstractKart *kart, float t)
 
     if (m_listener != NULL)
     {
-        m_listener->onTriggerItemApproached(this);
+        m_listener->onTriggerItemApproached();
     }
 
     if (dynamic_cast<ThreeStrikesBattle*>(World::getWorld()) != NULL)

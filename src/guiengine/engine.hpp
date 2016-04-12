@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 Marianne Gagnon
+//  Copyright (C) 2010-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -39,6 +39,9 @@ namespace irr
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include "guiengine/ft_environment.hpp"
+#include "guiengine/glyph_page_creator.hpp"
+
 /**
  * \ingroup guiengine
  * \brief Contains all GUI engine related classes and functions
@@ -57,21 +60,21 @@ namespace GUIEngine
       *       needs, so we use ours. (i.e. always call these functions are never those
       *       in IGUIEnvironment)
       */
-    Widget* getFocusForPlayer(const int playerID);
+    Widget* getFocusForPlayer(const unsigned int playerID);
 
     /** \brief Focuses nothing for given player (removes any selection for this player).
       * \note Do NOT use irrLicht's GUI focus facilities; it's too limited for our
       *       needs, so we use ours. (i.e. always call these functions are never those
       *       in IGUIEnvironment)
       */
-    void focusNothingForPlayer(const int playerID);
+    void focusNothingForPlayer(const unsigned int playerID);
 
     /** \brief Returns whether given the widget is currently focused by given player.
       * \note  Do NOT use irrLicht's GUI focus facilities; it's too limited for our
       *        needs, so we use ours. (i.e. always call these functions are never those
       *        in IGUIEnvironment)
       */
-    bool isFocusedForPlayer(const Widget*w, const int playerID);
+    bool isFocusedForPlayer(const Widget*w, const unsigned int playerID);
 
     /**
       * In an attempt to make getters as fast as possible, by possibly still allowing inlining
@@ -81,8 +84,11 @@ namespace GUIEngine
     {
         extern irr::gui::IGUIEnvironment* g_env;
         extern Skin* g_skin;
+        extern FTEnvironment*  g_ft_env;
+        extern GlyphPageCreator*  g_gp_creator;
         extern irr::gui::ScalableFont* g_small_font;
         extern irr::gui::ScalableFont* g_font;
+        extern irr::gui::ScalableFont* g_outline_font;
         extern irr::gui::ScalableFont* g_large_font;
         extern irr::gui::ScalableFont* g_title_font;
         extern irr::gui::ScalableFont* g_digit_font;
@@ -136,6 +142,8 @@ namespace GUIEngine
       */
     inline irr::gui::ScalableFont*    getFont()          { return Private::g_font;           }
 
+    inline irr::gui::ScalableFont*    getOutlineFont()   { return Private::g_outline_font;   }
+
     /**
       * \return the "large" font (useful for text)
       */
@@ -169,6 +177,18 @@ namespace GUIEngine
       */
     inline Skin*                      getSkin()          { return Private::g_skin;           }
 
+    /**
+      * \pre GUIEngine::init must have been called first
+      * \return       the freetype and library with face
+      */
+    inline FTEnvironment*             getFreetype()      { return Private::g_ft_env;         }
+
+    /**
+      * \pre GUIEngine::init must have been called first
+      * \return       the glyph page creator, useful to create a glyph page from individual char
+      */
+    inline GlyphPageCreator*          getGlyphPageCreator() { return Private::g_gp_creator;  }
+
     Screen*                           getScreenNamed(const char* name);
 
     /** \return the height of the title font in pixels */
@@ -195,6 +215,8 @@ namespace GUIEngine
 
     /** \brief Add a screen to the list of screens known by the gui engine */
     void  addScreenToList(Screen* screen);
+    /** \brief Remove a screen from the list of screens known by the gui engine */
+    void  removeScreen(const char* name);
 
     /** \brief Low-level mean to change current screen.
       * \note Do not use directly. Use a state manager instead to get higher-level functionnality.
@@ -242,6 +264,12 @@ namespace GUIEngine
       * \brief call when skin in user config was updated
       */
     void reloadSkin();
+
+    /**
+      * \brief call when translation in user config was updated for freetype rendering STK
+      */
+    void cleanHollowCopyFont();
+    void reloadHollowCopyFont(irr::gui::ScalableFont*);
 }
 
 #endif

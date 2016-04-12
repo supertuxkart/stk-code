@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010 SuperTuxKart-Team
+//  Copyright (C) 2010-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,10 +19,12 @@
 #ifndef HEADER_SAVED_GRAND_PRIX_HPP
 #define HEADER_SAVED_GRAND_PRIX_HPP
 
-#include <string>
 #include "config/user_config.hpp"
 #include "race/race_manager.hpp"
 #include "utils/ptr_vector.hpp"
+
+#include <algorithm>
+#include <string>
 
 class RaceManager;
 
@@ -60,10 +62,13 @@ protected:
      * WARNING : m_savedgp_group has to be declared before the other userconfigparams!
      */
     GroupUserConfigParam        m_savedgp_group;
-    StringUserConfigParam       m_player_id;
+    IntUserConfigParam          m_player_id;
 
     /** Identifier of this GP. */
     StringUserConfigParam       m_gp_id;
+    
+    /** Race type at which this GP was run. */
+    IntUserConfigParam          m_race_type;
 
     /** Difficulty at which this GP was run. */
     IntUserConfigParam          m_difficulty;
@@ -74,6 +79,9 @@ protected:
     /** Index of the next to run track. */
     IntUserConfigParam          m_next_track;
 
+    /** GPReverseType of the GP as int */
+    IntUserConfigParam          m_reverse_type;
+
     PtrVector<SavedGPKart> m_karts;
 
 public:
@@ -81,11 +89,13 @@ public:
     /**
       * Constructor to create a new entry.
       */
-    SavedGrandPrix(const std::string &player_id,
+    SavedGrandPrix(unsigned int player_id,
                    const std::string &gp_id,
+                   RaceManager::MinorRaceModeType race_type,
                    RaceManager::Difficulty difficulty,
                    int player_karts,
                    int last_track,
+                   int reverse_type,
                    const std::vector<RaceManager::KartStatus> &kart_list);
 
     /**
@@ -98,11 +108,15 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the player id for this saved GP. */
-    const std::string getPlayerID() const { return m_player_id; }
+    unsigned int getPlayerID() const { return m_player_id; }
 
     // ------------------------------------------------------------------------
     /** Returns the grand prix id. */
     std::string getGPID() const { return m_gp_id; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the race type of this GP. */
+    int getRaceType() const { return m_race_type; }
 
     // ------------------------------------------------------------------------
     /** Returns the difficulty of this GP. */
@@ -121,6 +135,10 @@ public:
     int getNextTrack() const { return m_next_track; }
 
     // ------------------------------------------------------------------------
+    /** Returns the reverse Type. */
+    int getReverseType() const { return m_reverse_type; }
+
+    // ------------------------------------------------------------------------
     /** Sets the index of the last track finished. */
     void setNextTrack(int next_track) { m_next_track = next_track; }
 
@@ -135,28 +153,24 @@ public:
 
     // ------------------------------------------------------------------------
     /** Finds the right SavedGrandPrix given the specified data, or
-     *  NULL if no matching GP was found.
-     */
-    static SavedGrandPrix* getSavedGP(const std::string &player,
-                                const std::string &gpid,
-                                int difficulty, int total_karts,
-                                int player_karts)
+     *  NULL if no matching GP was found. */
+    static SavedGrandPrix* getSavedGP(unsigned int player,
+                                      const std::string &gpid,
+                                      RaceManager::MinorRaceModeType race_type,
+                                      const unsigned int number_of_players)
     {
-        for (int n=0; n<UserConfigParams::m_saved_grand_prix_list.size(); n++)
+        for (unsigned int n=0; n<UserConfigParams::m_saved_grand_prix_list.size(); n++)
         {
             SavedGrandPrix* gp = &UserConfigParams::m_saved_grand_prix_list[n];
-            if ((gp->getGPID()       == gpid) &&
-                (gp->getPlayerID()    ==  player) &&
-                (gp->getDifficulty()  == difficulty) &&
-                (gp->getTotalKarts()  == total_karts) &&
-                (gp->getPlayerKarts() == player_karts)){
+            if (gp->getGPID()        == gpid   &&
+                gp->getRaceType()    == race_type &&
+                gp->getPlayerID()    == player &&
+                gp->getPlayerKarts() == (int)number_of_players)
                 return gp;
-            }   // if
-        }   // for n
+        }
         return NULL;
     }   // getSavedGP
     // ------------------------------------------------------------------------
-
 };   // class SavedGrandPrix
 
 #endif

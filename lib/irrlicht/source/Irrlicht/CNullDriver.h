@@ -64,6 +64,9 @@ namespace video
 		//! Get attributes of the actual video driver
 		const io::IAttributes& getDriverAttributes() const;
 
+        //! Non-const version (with a different name to avoid involuntary mistakes). */
+        virtual io::IAttributes& getNonConstDriverAttributes();
+
 		//! sets transformation
 		virtual void setTransform(E_TRANSFORMATION_STATE state, const core::matrix4& mat);
 
@@ -93,6 +96,8 @@ namespace video
 
 		//! Returns amount of textures currently loaded
 		virtual u32 getTextureCount() const;
+
+		virtual u32 indiceToPrimitiveCount(scene::E_PRIMITIVE_TYPE pType, u32 count) const;
 
 		//! Renames a texture
 		virtual void renameTexture(ITexture* texture, const io::path& newName);

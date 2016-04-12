@@ -7,8 +7,6 @@
 #include "ISceneManager.h"
 #include "S3DVertex.h"
 #include "os.h"
-#include "CShadowVolumeSceneNode.h"
-#include "IAnimatedMeshMD3.h"
 #include "CSkinnedMesh.h"
 #include "IDummyTransformationSceneNode.h"
 #include "IBoneSceneNode.h"
@@ -17,6 +15,7 @@
 #include "IMeshCache.h"
 #include "IAnimatedMesh.h"
 #include "quaternion.h"
+#include "IFileSystem.h"
 
 
 namespace irr
@@ -33,11 +32,11 @@ CAnimatedMeshSceneNode::CAnimatedMeshSceneNode(IAnimatedMesh* mesh,
 		const core::vector3df& scale)
 : IAnimatedMeshSceneNode(parent, mgr, id, position, rotation, scale), Mesh(0),
 	StartFrame(0), EndFrame(0), FramesPerSecond(0.025f),
-	CurrentFrameNr(0.f), LastTimeMs(0),
+	CurrentFrameNr(0.f), AnimationStrength(1.f), LastTimeMs(0),
 	TransitionTime(0), Transiting(0.f), TransitingBlend(0.f),
 	JointMode(EJUOR_NONE), JointsUsed(false),
 	Looping(true), ReadOnlyMaterials(false), RenderFromIdentity(false),
-	LoopCallBack(0), PassCount(0), Shadow(0), MD3Special(0)
+	LoopCallBack(0), PassCount(0)
 {
 	#ifdef _DEBUG
 	setDebugName("CAnimatedMeshSceneNode");
@@ -50,14 +49,8 @@ CAnimatedMeshSceneNode::CAnimatedMeshSceneNode(IAnimatedMesh* mesh,
 //! destructor
 CAnimatedMeshSceneNode::~CAnimatedMeshSceneNode()
 {
-	if (MD3Special)
-		MD3Special->drop();
-
 	if (Mesh)
 		Mesh->drop();
-
-	if (Shadow)
-		Shadow->drop();
 
 	if (LoopCallBack)
 		LoopCallBack->drop();
@@ -94,7 +87,7 @@ void CAnimatedMeshSceneNode::buildFrameNr(u32 timeMs)
 		}
 	}
 
-	if ((StartFrame==EndFrame))
+	if (StartFrame == EndFrame)
 	{
 		CurrentFrameNr = (f32)StartFrame; //Support for non animated meshes
 	}
@@ -210,7 +203,7 @@ IMesh * CAnimatedMeshSceneNode::getMeshForCurrentFrame()
 			skinnedMesh->animateMesh(getFrameNr(), 1.0f);
 
 		// Update the skinned mesh for the current joint transforms.
-		skinnedMesh->skinMesh();
+		skinnedMesh->skinMesh(AnimationStrength);
 
 		if (JointMode == EJUOR_READ)//read from mesh
 		{
@@ -289,9 +282,6 @@ void CAnimatedMeshSceneNode::render()
 	}
 
 	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
-
-	if (Shadow && PassCount==1)
-		Shadow->updateShadowVolumes();
 
 	// for debug purposes only:
 
@@ -407,40 +397,6 @@ void CAnimatedMeshSceneNode::render()
 					}
 				}
 			}
-
-			// show tag for quake3 models
-			if (Mesh->getMeshType() == EAMT_MD3)
-			{
-				IAnimatedMesh * arrow =
-					SceneManager->addArrowMesh (
-							"__tag_show",
-							0xFF0000FF, 0xFF000088,
-							4, 8, 5.f, 4.f, 0.5f,
-							1.f);
-				if (!arrow)
-				{
-					arrow = SceneManager->getMesh ( "__tag_show" );
-				}
-				IMesh *arrowMesh = arrow->getMesh(0);
-
-				core::matrix4 matr;
-
-				SMD3QuaternionTagList *taglist = ((IAnimatedMeshMD3*)Mesh)->getTagList(
-						(s32)getFrameNr(), 255,
-						getStartFrame(), getEndFrame());
-				if (taglist)
-				{
-					for ( u32 ts = 0; ts != taglist->size(); ++ts )
-					{
-						(*taglist)[ts].setto(matr);
-
-						driver->setTransform(video::ETS_WORLD, matr );
-
-						for ( u32 a = 0; a != arrowMesh->getMeshBufferCount(); ++a )
-							driver->drawMeshBuffer(arrowMesh->getMeshBuffer(a));
-					}
-				}
-			}
 		}
 
 		// show mesh
@@ -516,6 +472,21 @@ f32 CAnimatedMeshSceneNode::getAnimationSpeed() const
 }
 
 
+//! Sets the animation strength (how important the animation is)
+/** \param strength: The importance of the animation: 1.f keeps the original animation, 0.f is no animation. */
+void CAnimatedMeshSceneNode::setAnimationStrength(f32 strength)
+{
+	AnimationStrength = strength;
+}
+
+//! Gets the animation strength (how important the animation is)
+/** \return The importance of the animation: 1.f keeps the original animation, 0.f is no animation. */
+f32 CAnimatedMeshSceneNode::getAnimationStrength() const
+{
+	return AnimationStrength;
+}
+
+
 //! returns the axis aligned bounding box of this node
 const core::aabbox3d<f32>& CAnimatedMeshSceneNode::getBoundingBox() const
 {
@@ -545,23 +516,6 @@ u32 CAnimatedMeshSceneNode::getMaterialCount() const
 }
 
 
-//! Creates shadow volume scene node as child of this node
-//! and returns a pointer to it.
-IShadowVolumeSceneNode* CAnimatedMeshSceneNode::addShadowVolumeSceneNode(
-		const IMesh* shadowMesh, s32 id, bool zfailmethod, f32 infinity)
-{
-	if (!SceneManager->getVideoDriver()->queryFeature(video::EVDF_STENCIL_BUFFER))
-		return 0;
-
-	if (!shadowMesh)
-		shadowMesh = Mesh; // if null is given, use the mesh of node
-
-	if (Shadow)
-		Shadow->drop();
-
-	Shadow = new CShadowVolumeSceneNode(shadowMesh, this, SceneManager, id,  zfailmethod, infinity);
-	return Shadow;
-}
 
 //! Returns a pointer to a child node, which has the same transformation as
 //! the corresponding joint, if the mesh in this scene node is a skinned mesh.
@@ -666,12 +620,6 @@ ISceneNode* CAnimatedMeshSceneNode::getXJointNode(const c8* jointName)
 //! or to remove attached childs.
 bool CAnimatedMeshSceneNode::removeChild(ISceneNode* child)
 {
-	if (child && Shadow == child)
-	{
-		Shadow->drop();
-		Shadow = 0;
-	}
-
 	if (ISceneNode::removeChild(child))
 	{
 		if (JointsUsed) //stop weird bugs caused while changing parents as the joints are being created
@@ -690,42 +638,6 @@ bool CAnimatedMeshSceneNode::removeChild(ISceneNode* child)
 
 	return false;
 }
-
-
-//! Starts a MD2 animation.
-bool CAnimatedMeshSceneNode::setMD2Animation(EMD2_ANIMATION_TYPE anim)
-{
-	if (!Mesh || Mesh->getMeshType() != EAMT_MD2)
-		return false;
-
-	IAnimatedMeshMD2* md = (IAnimatedMeshMD2*)Mesh;
-
-	s32 begin, end, speed;
-	md->getFrameLoop(anim, begin, end, speed);
-
-	setAnimationSpeed( f32(speed) );
-	setFrameLoop(begin, end);
-	return true;
-}
-
-
-//! Starts a special MD2 animation.
-bool CAnimatedMeshSceneNode::setMD2Animation(const c8* animationName)
-{
-	if (!Mesh || Mesh->getMeshType() != EAMT_MD2)
-		return false;
-
-	IAnimatedMeshMD2* md = (IAnimatedMeshMD2*)Mesh;
-
-	s32 begin, end, speed;
-	if (!md->getFrameLoop(animationName, begin, end, speed))
-		return false;
-
-	setAnimationSpeed( (f32)speed );
-	setFrameLoop(begin, end);
-	return true;
-}
-
 
 //! Sets looping mode which is on by default. If set to false,
 //! animations will not be looped.
@@ -868,51 +780,10 @@ void CAnimatedMeshSceneNode::setMesh(IAnimatedMesh* mesh)
 	setFrameLoop(0, Mesh->getFrameCount());
 }
 
-
-// returns the absolute transformation for a special MD3 Tag if the mesh is a md3 mesh,
-// or the absolutetransformation if it's a normal scenenode
-const SMD3QuaternionTag* CAnimatedMeshSceneNode::getMD3TagTransformation(const core::stringc& tagname)
-{
-	return MD3Special ? MD3Special->AbsoluteTagList.get(tagname) : 0;
-}
-
-
 //! updates the absolute position based on the relative and the parents position
 void CAnimatedMeshSceneNode::updateAbsolutePosition()
 {
 	IAnimatedMeshSceneNode::updateAbsolutePosition();
-
-	if (!Mesh || Mesh->getMeshType() != EAMT_MD3)
-		return;
-
-	SMD3QuaternionTagList *taglist;
-	taglist = ( (IAnimatedMeshMD3*) Mesh )->getTagList ( (s32)getFrameNr(),255,getStartFrame (),getEndFrame () );
-	if (taglist)
-	{
-		if (!MD3Special)
-		{
-			MD3Special = new SMD3Special();
-		}
-
-		SMD3QuaternionTag parent ( MD3Special->Tagname );
-		if (Parent && Parent->getType() == ESNT_ANIMATED_MESH)
-		{
-			const SMD3QuaternionTag * p = ((IAnimatedMeshSceneNode*) Parent)->getMD3TagTransformation
-									( MD3Special->Tagname );
-
-			if (p)
-				parent = *p;
-		}
-
-		SMD3QuaternionTag relative( RelativeTranslation, RelativeRotation );
-
-		MD3Special->AbsoluteTagList.set_used ( taglist->size () );
-		for ( u32 i=0; i!= taglist->size (); ++i )
-		{
-			MD3Special->AbsoluteTagList[i].position = parent.position + (*taglist)[i].position + relative.position;
-			MD3Special->AbsoluteTagList[i].rotation = parent.rotation * (*taglist)[i].rotation * relative.rotation;
-		}
-	}
 }
 
 //! Set the joint update mode (0-unused, 1-get joints only, 2-set joints only, 3-move and set)
@@ -1114,12 +985,9 @@ ISceneNode* CAnimatedMeshSceneNode::clone(ISceneNode* newParent, ISceneManager* 
 	newNode->ReadOnlyMaterials = ReadOnlyMaterials;
 	newNode->LoopCallBack = LoopCallBack;
 	newNode->PassCount = PassCount;
-	newNode->Shadow = Shadow;
-	newNode->Shadow->grab();
 	newNode->JointChildSceneNodes = JointChildSceneNodes;
 	newNode->PretransitingSave = PretransitingSave;
 	newNode->RenderFromIdentity = RenderFromIdentity;
-	newNode->MD3Special = MD3Special;
 
 	return newNode;
 }

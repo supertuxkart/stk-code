@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -17,32 +17,38 @@
 
 #include "states_screens/options_screen_ui.hpp"
 
-#include "addons/inetwork_http.hpp"
-#include "audio/music_manager.hpp"
+#include "addons/news_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "config/hardware_stats.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "online/request_manager.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
-#include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/user_screen.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 
 using namespace GUIEngine;
+using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( OptionsScreenUI );
 
@@ -68,12 +74,12 @@ void OptionsScreenUI::loadedFromFile()
     skinSelector->clearLabels();
 
     std::set<std::string> skinFiles;
-    file_manager->listFiles(skinFiles /* out */, file_manager->getGUIDir() + "skins",
-                            true /* is full path */, true /* make full path */ );
+    file_manager->listFiles(skinFiles /* out */, file_manager->getAsset(FileManager::SKIN,""),
+                            true /* make full path */ );
 
     for (std::set<std::string>::iterator it = skinFiles.begin(); it != skinFiles.end(); it++)
     {
-        if ( (*it).find(".stkskin") != std::string::npos )
+        if(StringUtils::getExtension(*it)=="stkskin")
         {
             m_skins.push_back( *it );
         }
@@ -81,21 +87,21 @@ void OptionsScreenUI::loadedFromFile()
 
     if (m_skins.size() == 0)
     {
-        std::cerr << "WARNING: could not find a single skin, make sure that "
-                     "the data files are correctly installed\n";
-        skinSelector->setDeactivated();
+        Log::warn("OptionsScreenUI", "Could not find a single skin, make sure that "
+                                     "the data files are correctly installed");
+        skinSelector->setActive(false);
         return;
     }
 
-    const int skinCount = m_skins.size();
-    for (int n=0; n<skinCount; n++)
+    const int skin_count = (int)m_skins.size();
+    for (int n=0; n<skin_count; n++)
     {
         const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
         const std::string skinName = StringUtils::removeExtension( skinFileName );
         skinSelector->addLabel( core::stringw(skinName.c_str()) );
     }
     skinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skinCount-1);
+    skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skin_count-1);
 
 
 }   // loadedFromFile
@@ -106,7 +112,8 @@ void OptionsScreenUI::init()
 {
     Screen::init();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
-    if (ribbon != NULL)  ribbon->select( "tab_ui", PLAYER_ID_GAME_MASTER );
+    assert(ribbon != NULL);
+    ribbon->select( "tab_ui", PLAYER_ID_GAME_MASTER );
 
     ribbon->getRibbonChildren()[0].setTooltip( _("Graphics") );
     ribbon->getRibbonChildren()[1].setTooltip( _("Audio") );
@@ -124,19 +131,36 @@ void OptionsScreenUI::init()
     CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
     assert( news != NULL );
     news->setState( UserConfigParams::m_internet_status
-                                            ==INetworkHttp::IPERM_ALLOWED );
-    CheckBoxWidget* min_gui = getWidget<CheckBoxWidget>("minimal-racegui");
-    assert( min_gui != NULL );
-    min_gui->setState( UserConfigParams::m_minimal_race_gui);
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-        min_gui->setDeactivated();
-    else
-        min_gui->setActivated();
+                                     ==RequestManager::IPERM_ALLOWED );
+    CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
+    assert( stats != NULL );
+    LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
+    assert( stats_label );
+            stats->setState(UserConfigParams::m_hw_report_enable);
 
+    if(news->getState())
+    {
+        stats_label->setVisible(true);
+        stats->setVisible(true);
+        stats->setState(UserConfigParams::m_hw_report_enable);
+    }
+    else
+    {
+        stats_label->setVisible(false);
+        stats->setVisible(false);
+    }
+    CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
+    assert( difficulty != NULL );
+    difficulty->setState( UserConfigParams::m_per_player_difficulty );
+    difficulty->setTooltip(_("In multiplayer mode, players can select handicapped (more difficult) profiles on the kart selection screen"));
+
+    CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
+    assert( show_login!= NULL );
+    show_login->setState( UserConfigParams::m_always_show_login_screen);
 
     // --- select the right skin in the spinner
     bool currSkinFound = false;
-    const int skinCount = m_skins.size();
+    const int skinCount = (int) m_skins.size();
     for (int n=0; n<skinCount; n++)
     {
         const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
@@ -150,7 +174,8 @@ void OptionsScreenUI::init()
     }
     if (!currSkinFound)
     {
-        std::cerr << "WARNING: couldn't find current skin in the list of skins!!\n";
+        Log::warn("OptionsScreenUI",
+                  "Couldn't find current skin in the list of skins!");
         skinSelector->setValue(0);
         GUIEngine::reloadSkin();
     }
@@ -162,27 +187,34 @@ void OptionsScreenUI::init()
     list_widget->addItem("system", _("System Language"));
 
     const std::vector<std::string>* lang_list = translations->getLanguageList();
-    const int amount = lang_list->size();
+    const int amount = (int)lang_list->size();
+
+    // The names need to be sorted alphabetically. Store the 2-letter
+    // language names in a mapping, to be able to get them from the
+    // user visible full name.
+    std::vector<core::stringw> nice_lang_list;
+    std::map<core::stringw, std::string> nice_name_2_id;
     for (int n=0; n<amount; n++)
     {
         std::string code_name = (*lang_list)[n];
-        std::string nice_name = tinygettext::Language::from_name(code_name.c_str()).get_name();
-        list_widget->addItem(code_name, core::stringw(code_name.c_str()) + " (" +
-                             nice_name.c_str() + ")");
+        std::string s_name = translations->getLocalizedName(code_name) +
+         " (" + tinygettext::Language::from_name(code_name).get_language() + ")";
+        core::stringw nice_name = translations->fribidize(StringUtils::utf8ToWide(s_name));
+        nice_lang_list.push_back(nice_name);
+        nice_name_2_id[nice_name] = code_name;
+    }
+    std::sort(nice_lang_list.begin(), nice_lang_list.end());
+    for(unsigned int i=0; i<nice_lang_list.size(); i++)
+    {
+        list_widget->addItem(nice_name_2_id[nice_lang_list[i]],
+                              nice_lang_list[i]);
     }
 
     list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );
 
     // Forbid changing language while in-game, since this crashes (changing the language involves
     // tearing down and rebuilding the menu stack. not good when in-game)
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-    {
-        list_widget->setDeactivated();
-    }
-    else
-    {
-        list_widget->setActivated();
-    }
+    list_widget->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
 
 }   // init
 
@@ -192,12 +224,21 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 {
     if (name == "options_choice")
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
-        else if (selection == "tab_video") StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
-        else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
-        else if (selection == "tab_controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
+        Screen *screen = NULL;
+        if (selection == "tab_audio")
+            screen = OptionsScreenAudio::getInstance();
+        else if (selection == "tab_video")
+            screen = OptionsScreenVideo::getInstance();
+        else if (selection == "tab_players")
+            screen = TabbedUserScreen::getInstance();
+        else if (selection == "tab_controls")
+            screen = OptionsScreenInput::getInstance();
+        //else if (selection == "tab_ui")
+        //    screen = OptionsScreenUI::getInstance();
+        if(screen)
+            StateManager::get()->replaceTopMostScreen(screen);
     }
     else if(name == "back")
     {
@@ -220,28 +261,48 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     }
     else if (name=="enable-internet")
     {
-        CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
-        assert( news != NULL );
-        if(INetworkHttp::get())
-        {
-            INetworkHttp::get()->stopNetworkThread();
-            INetworkHttp::destroy();
-        }
+        CheckBoxWidget* internet = getWidget<CheckBoxWidget>("enable-internet");
+        assert( internet != NULL );
         UserConfigParams::m_internet_status =
-            news->getState() ? INetworkHttp::IPERM_ALLOWED
-                             : INetworkHttp::IPERM_NOT_ALLOWED;
-        INetworkHttp::create();
-        // Note that the network thread must be started after the assignment
-        // to network_http (since the thread might use network_http, otherwise
-        // a race condition can be introduced resulting in a crash).
-        INetworkHttp::get()->startNetworkThread();
+            internet->getState() ? RequestManager::IPERM_ALLOWED
+                                 : RequestManager::IPERM_NOT_ALLOWED;
+        // If internet gets enabled, re-initialise the addon manager (which
+        // happens in a separate thread) so that news.xml etc can be
+        // downloaded if necessary.
+        CheckBoxWidget *stats = getWidget<CheckBoxWidget>("enable-hw-report");
+        LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
+        if(internet->getState())
+        {
+            NewsManager::get()->init(false);
+            stats->setVisible(true);
+            stats_label->setVisible(true);
+            stats->setState(UserConfigParams::m_hw_report_enable);
+        }
+        else
+        {
+            stats->setVisible(false);
+            stats_label->setVisible(false);
+        }
+
     }
-    else if (name=="minimal-racegui")
+    else if (name=="enable-hw-report")
     {
-        CheckBoxWidget* min_gui = getWidget<CheckBoxWidget>("minimal-racegui");
-        assert( min_gui != NULL );
-        UserConfigParams::m_minimal_race_gui =
-            !UserConfigParams::m_minimal_race_gui;
+        CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
+        UserConfigParams::m_hw_report_enable = stats->getState();
+        if(stats->getState())
+            HardwareStats::reportHardwareStats();
+    }
+    else if (name=="show-login")
+    {
+        CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
+        assert( show_login != NULL );
+        UserConfigParams::m_always_show_login_screen = show_login->getState();
+    }
+    else if (name=="perPlayerDifficulty")
+    {
+        CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
+        assert( difficulty != NULL );
+        UserConfigParams::m_per_player_difficulty = difficulty->getState();
     }
     else if (name == "language")
     {
@@ -269,6 +330,13 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         }
 
         translations = new Translations();
+
+        //Reload fonts for new translation
+        GUIEngine::cleanHollowCopyFont();
+        GUIEngine::getTitleFont()->recreateFromLanguage();
+        GUIEngine::getFont()->recreateFromLanguage();
+        GUIEngine::reloadHollowCopyFont(GUIEngine::getFont());
+
         GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
 
         GUIEngine::getFont()->updateRTL();
@@ -278,7 +346,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         UserConfigParams::m_language = selection.c_str();
         user_config->saveConfig();
 
-        GUIEngine::getStateManager()->pushScreen(OptionsScreenUI::getInstance());
+        OptionsScreenUI::getInstance()->push();
     }
 
 }   // eventCallback
