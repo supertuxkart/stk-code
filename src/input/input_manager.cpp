@@ -274,8 +274,7 @@ void InputManager::handleStaticAction(int key, int value)
             if (value ==0 )
                 irr_driver->requestScreenshot();
             break;
-            /*
-        case KEY_F1:
+        case KEY_F11:
             if(value && shift_is_pressed && world && RewindManager::isEnabled())
             {
                 printf("Enter rewind time:");
@@ -287,6 +286,9 @@ void InputManager::handleStaticAction(int key, int value)
                 Log::info("Rewind", "Rewinding from %f to %f", 
                           world->getTime(), world->getTime()-t);
             }
+            break;
+
+            /*
             else if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
