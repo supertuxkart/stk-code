@@ -182,6 +182,27 @@ void BaseUserScreen::tearDown()
 }   // tearDown
 
 // ----------------------------------------------------------------------------
+
+EventPropagation BaseUserScreen::filterActions(PlayerAction action,
+    int deviceID,
+    const unsigned int value,
+    Input::InputType type,
+    int playerId)
+{
+    if (action == PA_MENU_SELECT)
+    {
+        if ((m_username_tb != NULL && m_username_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+            || (m_password_tb != NULL && m_password_tb->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)))
+        {
+            login();
+        }
+        return EVENT_BLOCK;
+    }
+
+    return EVENT_LET;
+}
+
+// ----------------------------------------------------------------------------
 /** Called when a user is selected. It updates the online checkbox and
  *  entry fields.
  */
