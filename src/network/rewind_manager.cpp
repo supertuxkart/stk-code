@@ -18,6 +18,7 @@
 
 #include "network/rewind_manager.hpp"
 
+#include "graphics/irr_driver.hpp"
 #include "modes/world.hpp"
 #include "network/rewinder.hpp"
 #include "physics/physics.hpp"
@@ -319,21 +320,23 @@ void RewindManager::rewindTo(float rewind_time)
     // Rewind to the required state
     // ----------------------------
     float exact_rewind_time = m_rewind_info[state]->getTime();
-    World::getWorld()->getPhysics()->getPhysicsWorld()->setLocalTime(m_rewind_info[state]->getLocalPhysicsTime());
+    float local_physics_time = m_rewind_info[state]->getLocalPhysicsTime();
+    World *world = World::getWorld();
+    world->getPhysics()->getPhysicsWorld()->setLocalTime(local_physics_time);
 
     // Rewind all objects (and also all state) that happen at the
     // current time. 
-    // TODO: this assumes atm that all rewinder have a initial state
+    // TODO: this assumes atm that all rewinder have an initial state
     // for 'current_time'!!!
 
     // Store the time to which we have to replay to
-    float current_time = World::getWorld()->getTime();
+    float current_time = world->getTime();
 
-    World::getWorld()->setTime(exact_rewind_time);
+    world->setTime(exact_rewind_time);
 
     // Now go forward through the saved states, and
     // replay taking the events into account.
-    while( World::getWorld()->getTime() < current_time &&
+    while( world->getTime() < current_time &&
           state < (int)m_rewind_info.size()                 )
     {
 
@@ -341,7 +344,7 @@ void RewindManager::rewindTo(float rewind_time)
 
         // Now set all events and confirmed states
         while(state < (int)m_rewind_info.size() &&
-            m_rewind_info[state]->getTime()<=World::getWorld()->getTime()+0.001f)
+            m_rewind_info[state]->getTime()<=world->getTime()+0.001f)
         {
             if(m_rewind_info[state]->isEvent() ||
                m_rewind_info[state]->isConfirmed() )
@@ -350,7 +353,7 @@ void RewindManager::rewindTo(float rewind_time)
             }
             state++;
         }
-        World::getWorld()->updateWorld(dt);
+        world->updateWorld(dt);
 #define SHOW_ROLLBACK
 #ifdef SHOW_ROLLBACK
         irr_driver->update(dt);
