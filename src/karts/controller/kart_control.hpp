@@ -102,14 +102,7 @@ public:
     }   // setFromMemory
 
     // ------------------------------------------------------------------------
-    void uncompress(char *c)
-    {
-        m_steer = ((float*)c)[0];
-        m_accel = ((float*)c)[1];
-        setButtonsCompressed(c[8]);
-    }   // uncompress
-    // ------------------------------------------------------------------------
-    /** Compresses all buttons into a single integer value. */
+    /** Compresses all buttons into a single byte. */
     char getButtonsCompressed() const
     {
         return  (m_brake     ?  1 : 0)
@@ -120,7 +113,7 @@ public:
               + (m_skid<<5);             // m_skid is in {0,1,2,3}
     }   // getButtonsCompressed
     // ------------------------------------------------------------------------
-    /** Sets the buttons from a compressed representation.
+    /** Sets the buttons from a compressed (1 byte) representation.
      *  /param c Character containing the compressed representation.
      */
     void setButtonsCompressed(char c)
