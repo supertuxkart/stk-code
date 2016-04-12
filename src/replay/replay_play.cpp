@@ -271,9 +271,9 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line)
             pi.m_suspension_length[2] = w3;
             pi.m_suspension_length[3] = w4;
             kre.m_nitro_usage = nitro;
-            kre.m_zipper_usage = (bool)zipper;
+            kre.m_zipper_usage = zipper!=0;
             kre.m_skidding_state = skidding;
-            kre.m_red_skidding = (bool)red_skidding;
+            kre.m_red_skidding = red_skidding!=0;
             kre.m_jumping = jumping != 0;
             m_ghost_karts[kart_num].addReplayEvent(time,
                 btTransform(q, xyz), pi, kre);
