@@ -664,7 +664,9 @@ namespace GUIEngine
 #include "font/regular_face.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#ifndef SERVER_ONLY
 #include "graphics/2dutils.hpp"
+#endif
 #include "graphics/irr_driver.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"

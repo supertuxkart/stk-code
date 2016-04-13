@@ -249,10 +249,12 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     else
         m_minimap_icon = NULL;
 
+#ifndef SERVER_ONLY
     if (m_minimap_icon == NULL)
     {
         m_minimap_icon = getUnicolorTexture(m_color);
     }
+#endif
 
     // Only load the model if the .kart file has the appropriate version,
     // otherwise warnings are printed.

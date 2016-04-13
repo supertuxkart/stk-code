@@ -1958,7 +1958,9 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     else if (type == WTYPE_MODEL_VIEW)
     {
         ModelViewWidget* mvw = dynamic_cast<ModelViewWidget*>(widget);
+#ifndef SERVER_ONLY
         mvw->drawRTTScene(rect);
+#endif
     }
     else if (type == WTYPE_ICON_BUTTON)
     {

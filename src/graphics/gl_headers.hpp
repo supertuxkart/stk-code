@@ -18,6 +18,8 @@
 #ifndef GL_HEADER_HPP
 #define GL_HEADER_HPP
 
+#ifndef SERVER_ONLY
+
 #define GLEW_STATIC
 
 extern "C" {
@@ -79,5 +81,12 @@ struct DrawElementsIndirectCommand{
     GLuint baseVertex;
     GLuint baseInstance;
 };
+#else
+  typedef unsigned int GLuint;
+  typedef unsigned int GLsync;
+  typedef unsigned int GLenum;
+
+#endif   // server only
 
 #endif
+

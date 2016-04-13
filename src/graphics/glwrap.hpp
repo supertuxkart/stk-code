@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #ifndef GLWRAP_HEADER_H
 #define GLWRAP_HEADER_H
 
@@ -152,3 +154,6 @@ const std::string getGLExtensions();
 void getGLLimits(HardwareStats::Json *json);
 
 #endif
+
+#endif   // supertuxkart
+

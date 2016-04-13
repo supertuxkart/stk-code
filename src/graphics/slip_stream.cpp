@@ -99,8 +99,10 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
         }
         video::SMaterial &mat = buffer->getMaterial();
         // Meshes need a texture, otherwise stk crashes.
+#ifndef SERVER_ONLY
         video::ITexture *red_texture = getUnicolorTexture(red);
         mat.setTexture(0, red_texture);
+#endif
 
         buffer->recalculateBoundingBox();
         m_mesh->setBoundingBox(buffer->getBoundingBox());

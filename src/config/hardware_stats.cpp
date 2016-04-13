@@ -335,8 +335,10 @@ void reportHardwareStats()
     if(nr_procs>0)
         json.add("cpu_numprocs", nr_procs);
 
+#ifndef SERVER_ONLY
     json.add("GL_EXTENSIONS", getGLExtensions());
     getGLLimits(&json);
+#endif
     json.finish();
 
     // ------------------------------------------------------------------------

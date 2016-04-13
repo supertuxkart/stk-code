@@ -17,11 +17,13 @@
 
 #include "profiler.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/2dutils.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/engine.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "io/file_manager.hpp"
 #include "utils/vs.hpp"
 
 #include <assert.h>
@@ -372,7 +374,9 @@ void Profiler::draw()
     unsigned int gpu_timers[Q_LAST];
     for (unsigned i = 0; i < Q_LAST; i++)
     {
+#ifndef SERVER_ONLY
         gpu_timers[i] = irr_driver->getGPUTimer(i).elapsedTimeus();
+#endif
         total += gpu_timers[i];
     }
     

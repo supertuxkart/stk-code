@@ -19,6 +19,8 @@
 // Not really a scene manager yet but hold algorithm that
 // rework scene manager output
 
+#ifndef SERVER_ONLY
+
 #ifndef HEADER_STKSCENEMANAGER_HPP
 #define HEADER_STKSCENEMANAGER_HPP
 
@@ -31,3 +33,5 @@ void addEdge(const irr::core::vector3df &P0, const irr::core::vector3df &P1);
 bool isCulledPrecise(const irr::scene::ICameraSceneNode *cam, const irr::scene::ISceneNode *node);
 
 #endif
+
+#endif   // supertuxkart

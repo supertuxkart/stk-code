@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/stk_billboard.hpp"
 
 #include "graphics/irr_driver.hpp"
@@ -118,3 +120,6 @@ void STKBillboard::render()
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
 }   // render
+
+#endif   // !SERVER_ONLY
+

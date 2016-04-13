@@ -328,6 +328,7 @@ void recalculateTangents(scene::IMesh* mesh, bool recalculate_normals, bool smoo
     }
 }
 
+#ifndef SERVER_ONLY
 bool MeshTools::isNormalMap(scene::IMeshBuffer* mb)
 {
     if (!CVS->isGLSL())
@@ -335,6 +336,7 @@ bool MeshTools::isNormalMap(scene::IMeshBuffer* mb)
     return (mb->getMaterial().MaterialType == Shaders::getShader(ES_NORMAL_MAP) &&
             mb->getVertexType() != video::EVT_TANGENTS);
 }
+#endif
 
 // Copied from irrlicht
 scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,

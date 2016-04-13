@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/vao_manager.hpp"
 
 #include "graphics/central_settings.hpp"
@@ -343,3 +345,5 @@ std::pair<unsigned, unsigned> VAOManager::getBase(scene::IMeshBuffer *mb, Render
     assert(It != mappedBaseIndex[tp].end());
     return std::pair<unsigned, unsigned>(vtx, It->second);
 }
+
+#endif   // !SERVER_ONLY
