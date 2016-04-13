@@ -58,23 +58,9 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     m_camera        = irr_driver->addCameraSceneNode();
     m_previous_pv_matrix = core::matrix4();
 
-#ifdef DEBUG
-    if (kart != NULL)
-        m_camera->setName(core::stringc("Camera for ") + kart->getKartProperties()->getName());
-    else
-        m_camera->setName("Camera");
-#endif
-
     setupCamera();
-    if (kart != NULL)
-    {
-        m_distance = kart->getKartProperties()->getCameraDistance();
-        setKart(kart);
-    }
-    else
-    {
-        m_distance = 1000.0f;
-    }
+    setKart(kart);
+    m_distance = kart ? kart->getKartProperties()->getCameraDistance() : 1000.0f;
     m_ambient_light = World::getWorld()->getTrack()->getDefaultAmbientColor();
 
     // TODO: Put these values into a config file
@@ -168,11 +154,9 @@ void Camera::setKart(AbstractKart *new_kart)
 {
     m_kart = new_kart;
 #ifdef DEBUG
-    if(new_kart)
-    {
-        std::string name = new_kart->getIdent()+"'s camera";
-        getCameraSceneNode()->setName(name.c_str() );
-    }
+    std::string name = new_kart ? new_kart->getIdent()+"'s camera"
+                                : "Unattached camera";
+    getCameraSceneNode()->setName(name.c_str());
 #endif
 
 }   // setKart
