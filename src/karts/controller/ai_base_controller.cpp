@@ -20,6 +20,7 @@
 #include "karts/controller/ai_base_controller.hpp"
 
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/ai_properties.hpp"
@@ -65,7 +66,7 @@ void AIBaseController::update(float dt)
 void AIBaseController::setControllerName(const std::string &name)
 {
 #ifdef DEBUG
-    if(m_ai_debug && !UserConfigParams::m_camera_debug)
+    if(m_ai_debug && !Camera::isDebug())
         m_kart->setOnScreenText(core::stringw(name.c_str()).c_str());
 #endif
     Controller::setControllerName(name);

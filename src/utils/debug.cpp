@@ -440,27 +440,27 @@ bool handleContextMenuAction(s32 cmdID)
     }
     else if (cmdID == DEBUG_GUI_CAM_TOP)
     {
-        UserConfigParams::m_camera_debug = 1;
+        Camera::setDebugMode(Camera::CM_DEBUG_TOP_OF_KART);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_WHEEL)
     {
-        UserConfigParams::m_camera_debug = 2;
+        Camera::setDebugMode(Camera::CM_DEBUG_GROUND);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_BEHIND_KART)
     {
-        UserConfigParams::m_camera_debug = 4;
+        Camera::setDebugMode(Camera::CM_DEBUG_BEHIND_KART);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_SIDE_OF_KART)
     {
-        UserConfigParams::m_camera_debug = 5;
+        Camera::setDebugMode(Camera::CM_DEBUG_SIDE_OF_KART);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_FREE)
     {
-        UserConfigParams::m_camera_debug = 3;
+        Camera::setDebugMode(Camera::CM_DEBUG_FPS);
         irr_driver->getDevice()->getCursorControl()->setVisible(false);
         // Reset camera rotation
         Camera *cam = Camera::getActiveCamera();
@@ -469,7 +469,7 @@ bool handleContextMenuAction(s32 cmdID)
     }
     else if (cmdID == DEBUG_GUI_CAM_NORMAL)
     {
-        UserConfigParams::m_camera_debug = 0;
+        Camera::setDebugMode(Camera::CM_DEBUG_NONE);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_SMOOTH)

@@ -150,6 +150,7 @@
 #include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
@@ -763,11 +764,11 @@ int handleCmdLine()
     if(UserConfigParams::m_artist_debug_mode)
     {
        if(CommandLine::has("--camera-wheel-debug"))
-           UserConfigParams::m_camera_debug=2;
+           Camera::setDebugMode(Camera::CM_DEBUG_GROUND);
         if(CommandLine::has("--camera-debug"))
-            UserConfigParams::m_camera_debug=1;
+            Camera::setDebugMode(Camera::CM_DEBUG_TOP_OF_KART);
         if(CommandLine::has("--camera-kart-debug"))
-            UserConfigParams::m_camera_debug=4;
+            Camera::setDebugMode(Camera::CM_DEBUG_BEHIND_KART);
         if(CommandLine::has("--physics-debug"))
             UserConfigParams::m_physics_debug=1;
         if(CommandLine::has("--check-debug"))
