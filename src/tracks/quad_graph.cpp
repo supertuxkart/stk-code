@@ -631,16 +631,20 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
     getNode(sector).getDistances(xyz, dst);
 }   // spatialToTrack
 
+//-----------------------------------------------------------------------------
 void QuadGraph::spatialToTrackUnrolled(Vec3 *dst, const Vec3& xyz,
-    const int parent_sector, const int unroll_qd_idx, const int fork_number) const
+                                       const int parent_sector,
+                                       const int unroll_qd_idx,
+                                       const int fork_number) const
 {
     if (parent_sector == UNKNOWN_SECTOR)
     {
-        Log::warn("Quad Graph", "UNKNOWN_SECTOR in spatialToTrack().");
+        Log::warn("Quad Graph", "UNKNOWN_SECTOR in spatialToTrackUnrolled().");
         return;
     }
-    getNode(parent_sector).getDistancesUnrolled(xyz, fork_number, unroll_qd_idx, dst);
-}
+    getNode(parent_sector).getDistancesUnrolled(xyz, fork_number,
+        unroll_qd_idx, dst);
+}   // spatialToTrackUnrolled
 
 //-----------------------------------------------------------------------------
 /** findRoadSector returns in which sector on the road the position

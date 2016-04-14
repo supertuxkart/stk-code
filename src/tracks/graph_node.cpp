@@ -283,10 +283,9 @@ void GraphNode::buildUnrolledQuads(unsigned int unroll_quad_count)
 {
     m_unrolled_quads.clear();
 
-    
     unsigned int numberOfForks = 1;
     GraphNode* currentNode = this;
-    for (int i = 0; i < unroll_quad_count+1; i++)
+    for (unsigned i = 0; i < unroll_quad_count+1; i++)
     {
         unsigned int successorCount = currentNode->getNumberOfSuccessors();
         if (successorCount >= 2) 
@@ -303,7 +302,7 @@ void GraphNode::buildUnrolledQuads(unsigned int unroll_quad_count)
 
     m_unrolled_quads.resize(numberOfForks);
 
-    for (int i = 0; i < numberOfForks; i++)
+    for (unsigned i = 0; i < numberOfForks; i++)
     {
         Quad thisQuad = getQuad();
         m_unrolled_quads[i].push_back(thisQuad);

@@ -195,7 +195,7 @@ public:
                        { return getNode(node).getUnrolledQuad(fork_number,quad_number); }
     // ----------------------------------------------------------------------
     /** Returns the number of forward quads that are unrolled for each quad **/
-    int          getNumberOfUnrolledQuads() const { return m_unroll_quad_count; }
+    unsigned int getNumberOfUnrolledQuads() const { return m_unroll_quad_count; }
 
 };   // QuadGraph
 
