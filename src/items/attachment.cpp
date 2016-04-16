@@ -285,7 +285,12 @@ void Attachment::hitBanana(Item *item, int new_attachment)
         m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
 
         if(new_attachment==-1)
-            new_attachment = m_random.get(3);
+        {
+            if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+                new_attachment = m_random.get(2);
+            else
+                new_attachment = m_random.get(3);
+        }
     }   // switch
 
     if (add_a_new_item)
@@ -301,12 +306,6 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
             break ;
         case 1:
-            set( ATTACH_BOMB, stk_config->m_bomb_time+leftover_time);
-
-            // if ( m_kart == m_kart[0] )
-            //   sound -> playSfx ( SOUND_SHOOMF ) ;
-            break ;
-        case 2:
             set(ATTACH_ANVIL, kp->getAnvilDuration() + leftover_time);
             // if ( m_kart == m_kart[0] )
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
@@ -314,6 +313,12 @@ void Attachment::hitBanana(Item *item, int new_attachment)
             // handled in Kart::updatePhysics
             m_kart->adjustSpeed(kp->getAnvilSpeedFactor());
             m_kart->updateWeight();
+            break ;
+        case 2:
+            set( ATTACH_BOMB, stk_config->m_bomb_time+leftover_time);
+
+            // if ( m_kart == m_kart[0] )
+            //   sound -> playSfx ( SOUND_SHOOMF ) ;
             break ;
         }   // switch
     }
