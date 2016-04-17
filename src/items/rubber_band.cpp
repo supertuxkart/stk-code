@@ -78,12 +78,14 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
 #endif
     updatePosition();
     m_node = irr_driver->addMesh(m_mesh, "rubberband");
+#ifndef SERVER_ONLY
     irr_driver->applyObjectPassShader(m_node);
     if (STKMeshSceneNode *stkm = dynamic_cast<STKMeshSceneNode *>(m_node))
         stkm->setReloadEachFrame(true);
 #ifdef DEBUG
     std::string debug_name = m_owner->getIdent()+" (rubber-band)";
     m_node->setName(debug_name.c_str());
+#endif
 #endif
 
 }   // RubberBand

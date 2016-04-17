@@ -264,6 +264,9 @@ const std::string& getOSVersion()
  */
 void reportHardwareStats()
 {
+#ifdef SERVER_ONLY
+    return;
+#else
     if(!UserConfigParams::m_hw_report_enable)
         return;
 
@@ -393,7 +396,7 @@ void reportHardwareStats()
     request->setURL((std::string)UserConfigParams::m_server_hw_report+"/upload/v1/");
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
     request->queue();
-
+#endif   // !SERVER_ONLY
 }   // reportHardwareStats
 
 }   // namespace HardwareStats

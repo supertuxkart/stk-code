@@ -287,5 +287,8 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     node->drop();
 
     node->updateAbsolutePosition();
+#ifndef SERVER_ONLY
     irr_driver->applyObjectPassShader(node);
+#endif
 }
+

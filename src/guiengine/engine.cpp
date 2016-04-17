@@ -1123,6 +1123,7 @@ namespace GUIEngine
 
     void render(float elapsed_time)
     {
+#ifndef SERVER_ONLY
         GUIEngine::dt = elapsed_time;
 
         // Not yet initialized, or already cleaned up
@@ -1247,7 +1248,7 @@ namespace GUIEngine
             DemoWorld::resetIdleTime();
         }
 
-
+#endif
     }   // render
 
     // -----------------------------------------------------------------------

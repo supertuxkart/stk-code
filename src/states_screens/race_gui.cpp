@@ -92,7 +92,7 @@ RaceGUI::RaceGUI()
     else if (UserConfigParams::m_multitouch_enabled)
     {
         m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
-        m_map_bottom = irr_driver->getActualScreenSize().Height * 0.55f;
+        m_map_bottom = int(irr_driver->getActualScreenSize().Height * 0.55f);
     }
 
     m_is_tutorial = (race_manager->getTrackName() == "tutorial");
@@ -168,6 +168,7 @@ void RaceGUI::reset()
  */
 void RaceGUI::renderGlobal(float dt)
 {
+#ifndef SERVER_ONLY
     RaceGUIBase::renderGlobal(dt);
     cleanupMessages(dt);
 
@@ -216,6 +217,7 @@ void RaceGUI::renderGlobal(float dt)
 
     if (!m_is_tutorial)               drawGlobalPlayerIcons(m_map_height);
     if(world->getTrack()->isSoccer()) drawScores();
+#endif
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
@@ -263,6 +265,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
  */
 void RaceGUI::drawScores()
 {
+#ifndef SERVER_ONLY
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     int offset_y = 5;
     int offset_x = 5;
@@ -304,6 +307,7 @@ void RaceGUI::drawScores()
             NULL,NULL,true);
         offset_x += position.LowerRightCorner.X + 30;
     }
+#endif
 }   // drawScores
 
 //-----------------------------------------------------------------------------
@@ -448,6 +452,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                               const core::recti &viewport,
                               const core::vector2df &scaling)
 {
+#ifndef SERVER_ONLY
     float min_ratio        = std::min(scaling.X, scaling.Y);
     const int GAUGEWIDTH   = 78;
     int gauge_width        = (int)(GAUGEWIDTH*min_ratio);
@@ -642,7 +647,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
 
     }
-
+#endif
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
@@ -742,6 +747,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                  const core::vector2df &scaling,
                                  float dt)
 {
+#ifndef SERVER_ONLY
     float min_ratio         = std::min(scaling.X, scaling.Y);
     const int SPEEDWIDTH   = 128;
     int meter_width        = (int)(SPEEDWIDTH*min_ratio);
@@ -848,7 +854,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
     irr_driver->getVideoDriver()->setMaterial(m);
     draw2DVertexPrimitiveList(m_speed_bar_icon->getTexture(), vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
-
+#endif
 }   // drawSpeedEnergyRank
 
 //-----------------------------------------------------------------------------
@@ -916,26 +922,26 @@ void RaceGUI::initMultitouchSteering()
     const float small_ratio = 0.6f;
 
     device->addButton(BUTTON_STEERING,
-                      0.5f * margin, h - 0.5f * margin - btn2_size,
-                      btn2_size, btn2_size);
+                      int(0.5f * margin), int(h - 0.5f * margin - btn2_size),
+                      int(btn2_size), int(btn2_size));
     device->addButton(BUTTON_ESCAPE,
-                      top_margin, small_ratio * margin,
-                      small_ratio * btn_size, small_ratio * btn_size);
+                      top_margin, int(small_ratio * margin),
+                      int(small_ratio * btn_size), int(small_ratio * btn_size));
     device->addButton(BUTTON_RESCUE,
-                      top_margin + small_ratio * col_size, small_ratio * margin,
-                      small_ratio * btn_size, small_ratio * btn_size);
+                      int(top_margin + small_ratio * col_size), int(small_ratio * margin),
+                      int(small_ratio * btn_size), int(small_ratio * btn_size));
     device->addButton(BUTTON_NITRO,
                       w - 1 * col_size, h - 2 * col_size,
-                      btn_size, btn_size);
+                      int(btn_size), int(btn_size));
     device->addButton(BUTTON_SKIDDING,
                       w - 1 * col_size, h - 1 * col_size,
-                      btn_size, btn_size);
+                      int(btn_size), int(btn_size));
     device->addButton(BUTTON_FIRE,
                       w - 2 * col_size,  h - 2 * col_size,
-                      btn_size, btn_size);
+                      int(btn_size), int(btn_size));
     device->addButton(BUTTON_LOOK_BACKWARDS,
                       w - 2 * col_size, h - 1 * col_size,
-                      btn_size, btn_size);
+                      int(btn_size), int(btn_size));
 
 } // initMultitouchSteering
 
@@ -949,6 +955,7 @@ void RaceGUI::drawMultitouchSteering(const AbstractKart* kart,
                                      const core::recti &viewport,
                                      const core::vector2df &scaling)
 {
+#ifndef SERVER_ONLY
     MultitouchDevice* device = input_manager->getDeviceManager()->
                                                         getMultitouchDevice();
 
@@ -1046,4 +1053,5 @@ void RaceGUI::drawMultitouchSteering(const AbstractKart* kart,
             }
         }
     }
+#endif
 } // drawMultitouchSteering

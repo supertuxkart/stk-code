@@ -882,6 +882,7 @@ core::position2di CGUIEditBox::calculateICPos()
 //! draws the element and its children
 void CGUIEditBox::draw()
 {
+#ifndef SERVER_ONLY
     if (!IsVisible)
         return;
 
@@ -1083,6 +1084,7 @@ void CGUIEditBox::draw()
 
     // draw children
     IGUIElement::draw();
+#endif
 }
 
 

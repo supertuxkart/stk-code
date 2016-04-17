@@ -268,6 +268,7 @@ void Profiler::synchronizeFrame()
 /// Draw the markers
 void Profiler::draw()
 {
+#ifndef SERVER_ONLY
     PROFILER_PUSH_CPU_MARKER("ProfilerDraw", 0xFF, 0xFF, 0x00);
     video::IVideoDriver*    driver = irr_driver->getVideoDriver();
     std::stack<Marker>      hovered_markers;
@@ -470,6 +471,7 @@ void Profiler::draw()
     }
 
     PROFILER_POP_CPU_MARKER();
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -510,6 +512,7 @@ void Profiler::onClick(const core::vector2di& mouse_pos)
 /// Helper to draw a white background
 void Profiler::drawBackground()
 {
+#ifndef SERVER_ONLY
     video::IVideoDriver*            driver = irr_driver->getVideoDriver();
     const core::dimension2d<u32>&   screen_size = driver->getScreenSize();
 
@@ -520,4 +523,5 @@ void Profiler::drawBackground()
 
     video::SColor   color(0x88, 0xFF, 0xFF, 0xFF);
     GL32_draw2DRectangle(color, background_rect);
+#endif
 }

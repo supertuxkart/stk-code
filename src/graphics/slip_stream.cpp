@@ -51,10 +51,12 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     scene::IMeshBuffer* buffer = m_mesh->getMeshBuffer(0);
     material->setMaterialProperties(&buffer->getMaterial(), buffer);
 
+#ifndef SERVER_ONLY
     STKMeshSceneNode* stk_node = dynamic_cast<STKMeshSceneNode*>(m_node);
     if (stk_node != NULL)
         stk_node->setReloadEachFrame(true);
     m_mesh->drop();
+#endif
 
 #ifdef DEBUG
     std::string debug_name = m_kart->getIdent()+" (slip-stream)";
@@ -233,7 +235,9 @@ void SlipStream::createMesh(Material* material)
     }   // for j<num_circles-1
 
     material->setMaterialProperties(&buffer->getMaterial(), buffer);
+#ifndef SERVER_ONLY
     if (!CVS->isGLSL())
+#endif
     {
         buffer->Material.setFlag(video::EMF_BACK_FACE_CULLING, false);
         buffer->Material.setFlag(video::EMF_COLOR_MATERIAL, true);

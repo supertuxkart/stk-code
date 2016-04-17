@@ -185,6 +185,7 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
 
     scene::ISceneNode* node = m_node->getAllNodes()[0];
     ((scene::IMeshSceneNode*)node)->setMesh(mesh);
+#ifndef SERVER_ONLY
     if (lowmesh != NULL)
     {
         node = m_node->getAllNodes()[1];
@@ -195,6 +196,7 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
     irr_driver->applyObjectPassShader(m_node->getAllNodes()[0]);
 
     World::getWorld()->getTrack()->adjustForFog(m_node);
+#endif
 }   // switchTo
 
 //-----------------------------------------------------------------------------

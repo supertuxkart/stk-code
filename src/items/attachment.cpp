@@ -182,7 +182,7 @@ void Attachment::set(AttachmentType type, float time,
         }
     }
     m_node->setVisible(true);
-
+#ifndef SERVER_ONLY
     irr_driver->applyObjectPassShader(m_node);
 
     // Save event about the new attachment
@@ -193,6 +193,7 @@ void Attachment::set(AttachmentType type, float time,
         saveState(buffer);
         rwm->addEvent(this, buffer);
     }
+#endif
 }   // set
 
 // -----------------------------------------------------------------------------

@@ -41,9 +41,11 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char 
     m_remaining_time  = burst_time;
     m_emission_frames = 0;
 
+#ifndef SERVER_ONLY
     ParticleKindManager* pkm = ParticleKindManager::get();
     ParticleKind* particles = pkm->getParticles(particle_file);
     m_emitter = new ParticleEmitter(particles, coord,  NULL);
+#endif
 }   // Explosion
 
 //-----------------------------------------------------------------------------

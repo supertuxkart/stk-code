@@ -357,6 +357,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                                         irr_driver->getSceneManager()->getRootSceneNode(),
                                         irr_driver->getSceneManager()                    );
 
+#ifndef SERVER_ONLY
 
         node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh",
                NULL/*parent*/, getRenderInfo());
@@ -365,7 +366,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             node->setAutomaticCulling(scene::EAC_OFF);
         else
             node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
-
+#endif
         if (always_animated)
         {
             // give a huge LOD distance for the player's kart. the reason is that it should
@@ -409,7 +410,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             if(!m_speed_weighted_objects[i].m_node) continue;
             m_speed_weighted_objects[i].m_node->setParent(lod_node);
         }
-
+#ifndef SERVER_ONLY
         // Enable rim lighting for the kart
         irr_driver->applyObjectPassShader(lod_node, true);
         std::vector<scene::ISceneNode*> &lodnodes = lod_node->getAllNodes();
@@ -418,6 +419,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
         {
             irr_driver->applyObjectPassShader(lodnodes[i], true);
         }
+#endif
     }
     else
     {
@@ -428,12 +430,13 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                            : 0;
 
         scene::IMesh* main_frame = m_mesh;
+#ifndef SERVER_ONLY
         if (!CVS->isGLSL())
         {
             main_frame = m_mesh->getMesh(straight_frame);
             main_frame->setHardwareMappingHint(scene::EHM_STATIC);
         }
-
+#endif
         std::string debug_name;
 
 #ifdef DEBUG
@@ -510,12 +513,13 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         return false;
     }
 
+#ifndef SERVER_ONLY
     scene::ISkinnedMesh* sm = dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
     if (sm)
     {
         MeshTools::createSkinnedMeshWithTangents(sm, &MeshTools::isNormalMap);
     }
-
+#endif
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
 
@@ -564,7 +568,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         // Grab all textures. This is done for the master only, so
         // the destructor will only free the textures if a master
         // copy is freed.
-
+#ifndef SERVER_ONLY
         scene::ISkinnedMesh* sm =
             dynamic_cast<scene::ISkinnedMesh*>(obj.m_model);
         if (sm)
@@ -573,7 +577,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
                 &MeshTools::isNormalMap);
         }
         irr_driver->grabAllTextures(obj.m_model);
-
+#endif
         // Update min/max
         Vec3 obj_min, obj_max;
         MeshTools::minMax3D(obj.m_model, &obj_min, &obj_max);
@@ -614,8 +618,10 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         std::string full_wheel =
             kart_properties.getKartDir()+m_wheel_filename[i];
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
+#ifndef SERVER_ONLY
         m_wheel_model[i] = MeshTools::createMeshWithTangents(m_wheel_model[i],
-            &MeshTools::isNormalMap);
+                                                      &MeshTools::isNormalMap);
+#endif
         // Grab all textures. This is done for the master only, so
         // the destructor will only free the textures if a master
         // copy is freed.

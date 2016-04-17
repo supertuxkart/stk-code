@@ -527,6 +527,7 @@ void FontWithFace::render(const core::stringw& text,
                           FontSettings* font_settings,
                           FontCharCollector* char_collector)
 {
+#ifndef SERVER_ONLY
     const bool black_border = font_settings ?
         font_settings->useBlackBorder() : false;
     const bool rtl = font_settings ? font_settings->isRTL() : false;
@@ -778,4 +779,5 @@ void FontWithFace::render(const core::stringw& text,
             }
         }
     }
+#endif
 }   // render
