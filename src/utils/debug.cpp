@@ -19,7 +19,8 @@
 #include "debug.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera_debug.hpp"
+#include "graphics/camera_fps.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/shaders.hpp"
@@ -440,47 +441,58 @@ bool handleContextMenuAction(s32 cmdID)
     }
     else if (cmdID == DEBUG_GUI_CAM_TOP)
     {
-        Camera::setDebugMode(Camera::CM_DEBUG_TOP_OF_KART);
+        CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_WHEEL)
     {
-        Camera::setDebugMode(Camera::CM_DEBUG_GROUND);
+        CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_BEHIND_KART)
     {
-        Camera::setDebugMode(Camera::CM_DEBUG_BEHIND_KART);
+        CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_SIDE_OF_KART)
     {
-        Camera::setDebugMode(Camera::CM_DEBUG_SIDE_OF_KART);
+        CameraDebug::setDebugType(CameraDebug::CM_DEBUG_SIDE_OF_KART);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_FREE)
     {
-        Camera::setDebugMode(Camera::CM_DEBUG_FPS);
+        Camera *camera = Camera::getActiveCamera();
+        Camera::changeCamera(camera->getIndex(), Camera::CM_TYPE_FPS);
         irr_driver->getDevice()->getCursorControl()->setVisible(false);
         // Reset camera rotation
-        Camera *cam = Camera::getActiveCamera();
-        cam->setDirection(vector3df(0, 0, 1));
-        cam->setUpVector(vector3df(0, 1, 0));
+        CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+        if(cam)
+        {
+            cam->setDirection(vector3df(0, 0, 1));
+            cam->setUpVector(vector3df(0, 1, 0));
+        }
     }
     else if (cmdID == DEBUG_GUI_CAM_NORMAL)
     {
-        Camera::setDebugMode(Camera::CM_DEBUG_NONE);
+        Camera *camera = Camera::getActiveCamera();
+        Camera::changeCamera(camera->getIndex(), Camera::CM_TYPE_NORMAL);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_SMOOTH)
     {
-        Camera *cam = Camera::getActiveCamera();
-        cam->setSmoothMovement(!cam->getSmoothMovement());
+        CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+        if(cam)
+        {
+            cam->setSmoothMovement(!cam->getSmoothMovement());
+        }
     }
     else if (cmdID == DEBUG_GUI_CAM_ATTACH)
     {
-        Camera *cam = Camera::getActiveCamera();
-        cam->setAttachedFpsCam(!cam->getAttachedFpsCam());
+        CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+        if(cam)
+        {
+            cam->setAttachedFpsCam(!cam->getAttachedFpsCam());
+        }
     }
     else if (cmdID == DEBUG_VIEW_KART_ONE)
     {

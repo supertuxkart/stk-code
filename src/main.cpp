@@ -151,6 +151,7 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/camera_debug.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
@@ -761,14 +762,23 @@ int handleCmdLine()
     if (CommandLine::has("--fps-debug"))
         UserConfigParams::m_fps_debug = true;
 
-    if(UserConfigParams::m_artist_debug_mode)
+    if (UserConfigParams::m_artist_debug_mode)
     {
-       if(CommandLine::has("--camera-wheel-debug"))
-           Camera::setDebugMode(Camera::CM_DEBUG_GROUND);
+        if (CommandLine::has("--camera-wheel-debug"))
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
+        }
         if(CommandLine::has("--camera-debug"))
-            Camera::setDebugMode(Camera::CM_DEBUG_TOP_OF_KART);
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
+        }
         if(CommandLine::has("--camera-kart-debug"))
-            Camera::setDebugMode(Camera::CM_DEBUG_BEHIND_KART);
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
+        }
         if(CommandLine::has("--physics-debug"))
             UserConfigParams::m_physics_debug=1;
         if(CommandLine::has("--check-debug"))

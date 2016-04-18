@@ -35,11 +35,7 @@
 
 #include <vector>
 
-namespace irr
-{
-    namespace scene { class ICameraSceneNode; }
-}
-using namespace irr;
+#include "ICameraSceneNode.h"
 
 class AbstractKart;
 
@@ -55,36 +51,33 @@ public:
         CM_CLOSEUP,           //!< Closer to kart
         CM_REVERSE,           //!< Looking backwards
         CM_LEADER_MODE,       //!< for deleted player karts in follow the leader
-        CM_FINAL,             //!< Final camera
         CM_SIMPLE_REPLAY,
         CM_FALLING
     };   // Mode
 
-    enum DebugMode {
-        CM_DEBUG_NONE,
-        CM_DEBUG_TOP_OF_KART, //!< Camera hovering over kart
-        CM_DEBUG_GROUND,      //!< Camera at ground level, wheel debugging
-        CM_DEBUG_FPS,         //!< FPS Camera
-        CM_DEBUG_BEHIND_KART, //!< Camera straight behind kart
-        CM_DEBUG_SIDE_OF_KART,//!< Camera to the right of the kart
-    };   // DebugMode
+    enum CameraType {
+        CM_TYPE_NORMAL,
+        CM_TYPE_DEBUG,         //!< A debug camera.
+        CM_TYPE_FPS,           //!< FPS Camera
+        CM_TYPE_END            //!< End camera
+    };   // CameraType
 
 
 private:
     static Camera* s_active_camera;
 
-    /** Special debug camera: 0: normal camera;   1: being high over the kart;
-    2: on ground level; 3: free first person camera; 
-    4: straight behind kart */
-    static DebugMode m_debug_mode;
-
-    /** The camera scene node. */
-    scene::ICameraSceneNode *m_camera;
     /** The project-view matrix of the previous frame, used for the blur shader. */
     core::matrix4 m_previous_pv_matrix;
 
     /** Camera's mode. */
     Mode            m_mode;
+
+    /** The type of the camera. */
+    CameraType      m_type;
+
+    /** The default type for any newly created camera. Used to store command
+     *  line parameters. */
+    static CameraType m_default_type;
 
     /** The index of this camera which is the index of the kart it is
      *  attached to. */
@@ -92,24 +85,6 @@ private:
 
     /** Current ambient light for this camera. */
     video::SColor   m_ambient_light;
-
-    /** Distance between the camera and the kart. */
-    float           m_distance;
-
-    /** The speed at which the camera changes position. */
-    float           m_position_speed;
-
-    /** The speed at which the camera target changes position. */
-    float           m_target_speed;
-
-    /** Factor of the effects of steering in camera aim. */
-    float           m_rotation_range;
-
-    /** The kart that the camera follows. It can't be const,
-     *  since in profile mode the camera might change its owner.
-     *  May be NULL (example: cutscene camera)
-     */
-    AbstractKart   *m_kart;
 
     /** A pointer to the original kart the camera was pointing at when it
      *  was created. Used when restarting a race (since the camera might
@@ -128,136 +103,55 @@ private:
     /** Aspect ratio for camera. */
     float           m_aspect;
 
-    /** Smooth acceleration with the first person camera. */
-    bool m_smooth;
-
-    /** Attache the first person camera to a kart.
-        That means moving the kart also moves the camera. */
-    bool m_attached;
-
-    /** The speed at which the up-vector rotates, only used for the first person camera. */
-    float m_angular_velocity;
-
-    /** Target angular velocity. Used for smooth movement in fps perpective. */
-    float m_target_angular_velocity;
-
-    /** Maximum velocity for fps camera. */
-    float m_max_velocity;
-
-    /** Linear velocity of the camera, used for end and first person camera.
-        It's stored relative to the camera direction for the first person view. */
-    core::vector3df m_lin_velocity;
-
-    /** Velocity of the target of the camera, used for end and first person camera. */
-    core::vector3df m_target_velocity;
-
-    /** The target direction for the camera, only used for the first person camera. */
-    core::vector3df m_target_direction;
-
-    /** The speed at which the direction changes, only used for the first person camera. */
-    core::vector3df m_direction_velocity;
-
-    /** The up vector the camera should have, only used for the first person camera. */
-    core::vector3df m_target_up_vector;
-
-    /** Save the local position if the first person camera is attached to the kart. */
-    core::vector3df m_local_position;
-
-    /** Save the local direction if the first person camera is attached to the kart. */
-    core::vector3df m_local_direction;
-
-    /** Save the local up vector if the first person camera is attached to the kart. */
-    core::vector3df m_local_up;
 
     /** List of all cameras. */
     static std::vector<Camera*> m_all_cameras;
 
-    /** A class that stores information about the different end cameras
-     *  which can be specified in the scene.xml file. */
-    class EndCameraInformation
-    {
-    public:
-        /** The camera type:
-            EC_STATIC_FOLLOW_KART A static camera that always points at the
-                                  kart.
-            EC_AHEAD_OF_KART      A camera that flies ahead of the kart
-                                  always pointing at the kart.
-        */
-        typedef enum {EC_STATIC_FOLLOW_KART,
-                      EC_AHEAD_OF_KART} EndCameraType;
-        EndCameraType m_type;
-
-        /** Position of the end camera. */
-        Vec3    m_position;
-
-        /** Distance to kart by which this camera is activated. */
-        float   m_distance2;
-
-        /** Reads end camera information from XML. Returns false if an
-         *  error occurred.
-         *  \param node XML Node with the end camera information. */
-        bool    readXML(const XMLNode &node)
-        {
-            std::string s;
-            node.get("type", &s);
-            if(s=="static_follow_kart")
-                m_type = EC_STATIC_FOLLOW_KART;
-            else if(s=="ahead_of_kart")
-                m_type = EC_AHEAD_OF_KART;
-            else
-            {
-                Log::warn("Camera", "Invalid camera type '%s' - camera is ignored.",
-                          s.c_str());
-                return false;
-            }
-            node.get("xyz", &m_position);
-            node.get("distance", &m_distance2);
-            // Store the squared value
-            m_distance2 *= m_distance2;
-            return true;
-        }   // readXML
-        // --------------------------------------------------------------------
-        /** Returns true if the specified position is close enough to this
-         *  camera, so that this camera should become the next end camera.
-         *  \param xyz Position to test for distance.
-         *  \returns True if xyz is close enough to this camera.
-         */
-        bool    isReached(const Vec3 &xyz)
-                { return (xyz-m_position).length2() < m_distance2; }
-    };   // EndCameraInformation
-    // ------------------------------------------------------------------------
-
-    /** List of all end camera information. This information is shared
-     *  between all cameras, so it's static. */
-    static AlignedArray<EndCameraInformation> m_end_cameras;
-
-    /** Index of the current end camera. */
-    unsigned int m_current_end_camera;
-
-    /** The next end camera to be activated. */
-    unsigned int  m_next_end_camera;
-
     void setupCamera();
-    void smoothMoveCamera(float dt);
-    void handleEndCamera(float dt);
-    void getCameraSettings(float *above_kart, float *cam_angle,
-                           float *side_way, float *distance,
-                           bool *smoothing);
-    void positionCamera(float dt, float above_kart, float cam_angle,
-                        float side_way, float distance, float smoothing);
 
-         Camera(int camera_index, AbstractKart* kart);
-        ~Camera();
+protected:
+    /** The camera scene node. */
+    scene::ICameraSceneNode *m_camera;
+
+    /** The kart that the camera follows. It can't be const,
+    *  since in profile mode the camera might change its owner.
+    *  May be NULL (example: cutscene camera)
+    */
+    AbstractKart   *m_kart;
+
+    static Camera* createCamera(unsigned int index, CameraType type,
+                               AbstractKart* kart);
+
+             Camera(int camera_index, AbstractKart* kart);
+    virtual ~Camera();
 public:
     LEAK_CHECK()
 
-    /** Returns the number of cameras used. */
-    static unsigned int getNumCameras() { return (unsigned int)m_all_cameras.size(); }
+    // ========================================================================
+    // Static functions
+    static Camera* createCamera(AbstractKart* kart);
+    static void changeCamera(unsigned int camera_index, CameraType type);
 
+    // ------------------------------------------------------------------------
+    /** Sets the default type for each camera that will be created. Used for
+     *  command line parameters to select a debug etc camera. */
+    static void setDefaultCameraType(CameraType type) { m_default_type = type;}
+    // ------------------------------------------------------------------------
+    /** Returns the default type for each camera that will be created. Used 
+     *  for command line parameters to select a debug etc camera. */
+    static CameraType getDefaultCameraType() { return m_default_type;}
+    // ------------------------------------------------------------------------
+    /** Returns the number of cameras used. */
+    static unsigned int getNumCameras()
+    {
+        return (unsigned int)m_all_cameras.size(); 
+    }   // getNumCameras
     // ------------------------------------------------------------------------
     /** Returns a camera. */
     static Camera *getCamera(unsigned int n) { return m_all_cameras[n]; }
-
+    // ------------------------------------------------------------------------
+    /** Returns the currently active camera. */
+    static Camera* getActiveCamera() { return s_active_camera; }
     // ------------------------------------------------------------------------
     /** Remove all cameras. */
     static void removeAllCameras()
@@ -267,37 +161,21 @@ public:
         m_all_cameras.clear();
     }   // removeAllCameras
 
-    // ------------------------------------------------------------------------
-    /** Creates a camera and adds it to the list of all cameras. Also the
-     *  camera index (which determines which viewport to use in split screen)
-     *  is set.
-     */
-    static Camera* createCamera(AbstractKart* kart)
-    {
-        Camera *c = new Camera((int)m_all_cameras.size(), kart);
-        m_all_cameras.push_back(c);
-        return c;
-    }   // createCamera
-    // ------------------------------------------------------------------------
-
-    static void readEndCamera(const XMLNode &root);
-    static void clearEndCameras();
-    // ------------------------------------------------------------------------
-    static void setDebugMode(DebugMode debug_mode) { m_debug_mode = debug_mode;}
-    // ------------------------------------------------------------------------
-    static bool isDebug() { return m_debug_mode != CM_DEBUG_NONE; }
-    // ------------------------------------------------------------------------
-    static bool isFPS() { return m_debug_mode == CM_DEBUG_FPS; }
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     void setMode(Mode mode);    /** Set the camera to the given mode */
     Mode getMode();
-    void reset();
-    void setInitialTransform();
-    void activate(bool alsoActivateInIrrlicht=true);
-    void update(float dt);
     void setKart(AbstractKart *new_kart);
-
+    virtual void reset();
+    virtual void setInitialTransform();
+    virtual void activate(bool alsoActivateInIrrlicht=true);
+    virtual void update(float dt);
+    // ------------------------------------------------------------------------
+    /** Returns the type of this camera. */
+    CameraType getType() { return m_type; }
+    // ------------------------------------------------------------------------
+    /** Sets the field of view for the irrlicht camera. */
+    void setFoV() { m_camera->setFOV(m_fov); }
     // ------------------------------------------------------------------------
     /** Returns the camera index (or player kart index, which is the same). */
     int  getIndex() const  {return m_index;}
@@ -318,66 +196,6 @@ public:
     AbstractKart* getKart() { return m_kart; }
 
     // ------------------------------------------------------------------------
-    /** Applies mouse movement to the first person camera. */
-    void applyMouseMovement (float x, float y);
-
-    // ------------------------------------------------------------------------
-    /** Sets if the first person camera should be moved smooth. */
-    void setSmoothMovement (bool value) { m_smooth = value; }
-
-    // ------------------------------------------------------------------------
-    /** If the first person camera should be moved smooth. */
-    bool getSmoothMovement () { return m_smooth; }
-
-    // ------------------------------------------------------------------------
-    /** Sets if the first person camera should be moved with the kart. */
-    void setAttachedFpsCam (bool value) { m_attached = value; }
-
-    // ------------------------------------------------------------------------
-    /** If the first person camera should be moved with the kart. */
-    bool getAttachedFpsCam () { return m_attached; }
-
-    // ------------------------------------------------------------------------
-    /** Sets the angular velocity for this camera. */
-    void setMaximumVelocity (float vel) { m_max_velocity = vel; }
-
-    // ------------------------------------------------------------------------
-    /** Returns the current angular velocity. */
-    float getMaximumVelocity () { return m_max_velocity; }
-
-    // ------------------------------------------------------------------------
-    /** Sets the vector, the first person camera should look at. */
-    void setDirection (core::vector3df target) { m_target_direction = target; }
-
-    // ------------------------------------------------------------------------
-    /** Gets the vector, the first person camera should look at. */
-    const core::vector3df &getDirection () { return m_target_direction; }
-
-    // ------------------------------------------------------------------------
-    /** Sets the up vector, the first person camera should use. */
-    void setUpVector (core::vector3df target) { m_target_up_vector = target; }
-
-    // ------------------------------------------------------------------------
-    /** Gets the up vector, the first person camera should use. */
-    const core::vector3df &getUpVector () { return m_target_up_vector; }
-
-    // ------------------------------------------------------------------------
-    /** Sets the angular velocity for this camera. */
-    void setAngularVelocity (float vel);
-
-    // ------------------------------------------------------------------------
-    /** Returns the current target angular velocity. */
-    float getAngularVelocity ();
-
-    // ------------------------------------------------------------------------
-    /** Sets the linear velocity for this camera. */
-    void setLinearVelocity (core::vector3df vel);
-
-    // ------------------------------------------------------------------------
-    /** Returns the current linear velocity. */
-    const core::vector3df &getLinearVelocity ();
-
-    // ------------------------------------------------------------------------
     /** Sets the ambient light for this camera. */
     void setAmbientLight(const video::SColor &color) { m_ambient_light=color; }
 
@@ -396,9 +214,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the camera scene node. */
     scene::ICameraSceneNode *getCameraSceneNode() { return m_camera; }
-
     // ------------------------------------------------------------------------
-    static Camera* getActiveCamera() { return s_active_camera; }
+    /** Returs the absolute position of the camera. */
+    Vec3 getXYZ() { return Vec3(m_camera->getPosition()); }
 } ;
 
 #endif
