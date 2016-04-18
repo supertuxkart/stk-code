@@ -97,9 +97,19 @@ void Camera::changeCamera(unsigned int camera_index, CameraType type)
     // Replace the previous camera
     m_all_cameras[camera_index] = new_camera;
     if(s_active_camera == old_camera)
-        s_active_camera == new_camera;
+        s_active_camera = new_camera;
     delete old_camera;
 }   // changeCamera
+
+// ----------------------------------------------------------------------------
+void Camera::resetAllCameras()
+{
+    for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
+    {
+        changeCamera(i, m_default_type);
+        getCamera(i)->reset();
+    }
+}   // resetAllCameras
 
 // ----------------------------------------------------------------------------
 Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)

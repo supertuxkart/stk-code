@@ -119,7 +119,6 @@ void CameraDebug::update(float dt)
         m_camera->setTarget(xyz);
         m_camera->setPosition(offset.toIrrVector());
     }
-    // Update the first person camera
     // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.
     else if (dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation()))
@@ -132,7 +131,8 @@ void CameraDebug::update(float dt)
         // above the kart).
         // Note: this code is replicated from smoothMoveCamera so that
         // the camera keeps on pointing to the same spot.
-        core::vector3df current_target = (m_kart->getXYZ().toIrrVector()+core::vector3df(0, above_kart, 0));
+        core::vector3df current_target = (m_kart->getXYZ().toIrrVector()
+                                         +core::vector3df(0, above_kart, 0));
         m_camera->setTarget(current_target);
     }
     else

@@ -40,13 +40,26 @@
 class AbstractKart;
 
 /**
-  * \brief Handles the game camera
+  * \brief This is the base class for all cameras. It also includes some
+  *  static functios to keep track of all cameras (e.g. a static function to
+  *  create a camera, get a camera with a specified index).
   * \ingroup graphics
   */
 class Camera : public NoCopy
 {
 public:
-    enum Mode {
+    /** The different camera types that can be used. */
+    enum CameraType
+    {
+        CM_TYPE_NORMAL,
+        CM_TYPE_DEBUG,         //!< A debug camera.
+        CM_TYPE_FPS,           //!< FPS Camera
+        CM_TYPE_END            //!< End camera
+    };   // CameraType
+
+    /* Only used for the normal camera. */
+    enum Mode
+    {
         CM_NORMAL,            //!< Normal camera mode
         CM_CLOSEUP,           //!< Closer to kart
         CM_REVERSE,           //!< Looking backwards
@@ -54,13 +67,6 @@ public:
         CM_SIMPLE_REPLAY,
         CM_FALLING
     };   // Mode
-
-    enum CameraType {
-        CM_TYPE_NORMAL,
-        CM_TYPE_DEBUG,         //!< A debug camera.
-        CM_TYPE_FPS,           //!< FPS Camera
-        CM_TYPE_END            //!< End camera
-    };   // CameraType
 
 
 private:
@@ -124,12 +130,14 @@ protected:
 
              Camera(int camera_index, AbstractKart* kart);
     virtual ~Camera();
+    virtual void reset();
 public:
     LEAK_CHECK()
 
     // ========================================================================
     // Static functions
     static Camera* createCamera(AbstractKart* kart);
+    static void resetAllCameras();
     static void changeCamera(unsigned int camera_index, CameraType type);
 
     // ------------------------------------------------------------------------
@@ -166,7 +174,6 @@ public:
     void setMode(Mode mode);    /** Set the camera to the given mode */
     Mode getMode();
     void setKart(AbstractKart *new_kart);
-    virtual void reset();
     virtual void setInitialTransform();
     virtual void activate(bool alsoActivateInIrrlicht=true);
     virtual void update(float dt);
@@ -217,7 +224,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returs the absolute position of the camera. */
     Vec3 getXYZ() { return Vec3(m_camera->getPosition()); }
-} ;
+};   // class Camera
 
 #endif
 

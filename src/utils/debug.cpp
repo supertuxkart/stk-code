@@ -442,21 +442,25 @@ bool handleContextMenuAction(s32 cmdID)
     else if (cmdID == DEBUG_GUI_CAM_TOP)
     {
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
+        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_WHEEL)
     {
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
+        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_BEHIND_KART)
     {
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
+        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_SIDE_OF_KART)
     {
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_SIDE_OF_KART);
+        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
     }
     else if (cmdID == DEBUG_GUI_CAM_FREE)
