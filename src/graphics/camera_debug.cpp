@@ -52,8 +52,7 @@ CameraDebug::~CameraDebug()
  *  \param distance Distance from kart.
  */
 void CameraDebug::getCameraSettings(float *above_kart, float *cam_angle,
-                                    float *sideway, float *distance,
-                                    bool *smoothing)
+                                    float *sideway, float *distance    )
 {
     const KartProperties *kp = getKart()->getKartProperties();
 
@@ -66,7 +65,6 @@ void CameraDebug::getCameraSettings(float *above_kart, float *cam_angle,
     *sideway = -m_rotation_range*dampened_steer*0.5f;
     *above_kart = 0;
     *cam_angle  = 0;
-    *smoothing = true;
     
     switch(m_default_debug_Type)
     {
@@ -99,7 +97,6 @@ void CameraDebug::update(float dt)
                            ? 27.0f : 1.0f);
 
     float above_kart, cam_angle, side_way, distance;
-    bool  smoothing;
 
     // The following settings give a debug camera which shows the track from
     // high above the kart straight down.
@@ -123,7 +120,7 @@ void CameraDebug::update(float dt)
     // but keep it target on the kart.
     else if (dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation()))
     {
-        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing);
+        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance);
         // The camera target needs to be 'smooth moved', otherwise
         // there will be a noticable jump in the first frame
 
@@ -137,8 +134,8 @@ void CameraDebug::update(float dt)
     }
     else
     {
-        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing);
-        positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing);
+        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance);
+        positionCamera(dt, above_kart, cam_angle, side_way, distance);
     }
 }   // update
 
@@ -150,8 +147,7 @@ void CameraDebug::update(float dt)
  *  \param distance Distance from kart.
 */
 void CameraDebug::positionCamera(float dt, float above_kart, float cam_angle,
-                                 float side_way, float distance,
-                                 float smoothing)
+                                 float side_way, float distance              )
 {
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getXYZ();

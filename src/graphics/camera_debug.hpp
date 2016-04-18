@@ -45,10 +45,9 @@ private:
     static CameraDebugType m_default_debug_Type;
 
     void getCameraSettings(float *above_kart, float *cam_angle,
-                           float *side_way, float *distance,
-                           bool *smoothing);
+                           float *side_way, float *distance    );
     void positionCamera(float dt, float above_kart, float cam_angle,
-                        float side_way, float distance, float smoothing);
+                        float side_way, float distance);
 
     friend class Camera;
              CameraDebug(int camera_index, AbstractKart* kart);
