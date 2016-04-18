@@ -40,11 +40,13 @@ ModelViewWidget::ModelViewWidget() :
 IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false)
 {
     m_frame_buffer = NULL;
+    m_texture = NULL;
     m_rtt_main_node = NULL;
     m_camera = NULL;
     m_light = NULL;
     m_type = WTYPE_MODEL_VIEW;
     m_rtt_provider = NULL;
+    m_old_rtt_provider = NULL;
     m_rotation_mode = ROTATE_OFF;
     
     // so that the base class doesn't complain there is no icon defined
@@ -59,6 +61,10 @@ ModelViewWidget::~ModelViewWidget()
     
     delete m_rtt_provider;
     m_rtt_provider = NULL;
+    
+    delete m_old_rtt_provider;
+    m_old_rtt_provider = NULL;
+    m_texture = NULL;
 }
 // -----------------------------------------------------------------------------
 void ModelViewWidget::add()
@@ -107,6 +113,10 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
     m_model_location.push_back(location);
     m_model_scale.push_back(scale);
     m_model_frames.push_back(frame);
+    
+    delete m_old_rtt_provider;
+    m_old_rtt_provider = NULL;
+    m_texture = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -159,29 +169,43 @@ void ModelViewWidget::update(float delta)
         if (fabsf(angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
     
-    if (!CVS->isGLSL())
-        return;
-    
-    if (m_rtt_provider == NULL)
+    if (CVS->isGLSL())
     {
-        std::string name = "model view ";
-        name += m_properties[PROP_ID].c_str();
+        if (m_rtt_provider == NULL)
+        {
+            m_rtt_provider = new RTT(512, 512);
+        }
         
-        m_rtt_provider = new RTT(512, 512);
-    }
+        if (m_rtt_main_node == NULL)
+        {
+            setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
+        }
+        
+        m_rtt_main_node->setRotation(core::vector3df(0.0f, angle, 0.0f));
+        
+        m_rtt_main_node->setVisible(true);
     
-    if (m_rtt_main_node == NULL)
+        m_frame_buffer = m_rtt_provider->render(m_camera, GUIEngine::getLatestDt());
+    
+        m_rtt_main_node->setVisible(false);
+    }
+    else
     {
-        setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
+        if (m_old_rtt_provider == NULL)
+        {
+            std::string name = "model view ";
+            name += m_properties[PROP_ID].c_str();
+            m_old_rtt_provider = new IrrDriver::RTTProvider(core::dimension2d<u32>(512, 512), name, false);
+            m_old_rtt_provider->setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
+        }
+        
+        m_texture = m_old_rtt_provider->renderToTexture(angle);
+        
+        if (m_texture == NULL)
+        {
+            m_rtt_unsupported = true;
+        }
     }
-    
-    m_rtt_main_node->setRotation(core::vector3df(0.0f, angle, 0.0f));
-    
-    m_rtt_main_node->setVisible(true);
-
-    m_frame_buffer = m_rtt_provider->render(m_camera, GUIEngine::getLatestDt());
-
-    m_rtt_main_node->setVisible(false);
 }
 
 void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
@@ -310,6 +334,11 @@ void ModelViewWidget::elementRemoved()
 {
     delete m_rtt_provider;
     m_rtt_provider = NULL;
+    
+    delete m_old_rtt_provider;
+    m_old_rtt_provider = NULL;
+    m_texture = NULL;
+    
     IconButtonWidget::elementRemoved();
 }
 
@@ -317,4 +346,8 @@ void ModelViewWidget::clearRttProvider()
 {
     delete m_rtt_provider;
     m_rtt_provider = NULL;
+    
+    delete m_old_rtt_provider;
+    m_old_rtt_provider = NULL;
+    m_texture = NULL;
 }
