@@ -272,11 +272,11 @@ void Attachment::hitBanana(Item *item, int new_attachment)
     case ATTACH_ANVIL:
         // if the kart already has an anvil, attach a new anvil,
         // and increase the overall time
-        new_attachment = 2;
+        new_attachment = 1;
         leftover_time  = m_time_left;
         break;
     case ATTACH_PARACHUTE:
-        new_attachment = 2;
+        new_attachment = 0;
         leftover_time  = m_time_left;
         break;
     default:
