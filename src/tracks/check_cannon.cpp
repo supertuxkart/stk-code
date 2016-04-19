@@ -42,8 +42,7 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
     m_curve = new Ipo(*(node.getNode("curve")),
                       /*fps*/25,
                       /*reverse*/race_manager->getReverseTrack());
-#ifndef SERVER_ONLY
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(SERVER_ONLY)
     if(UserConfigParams::m_track_debug)
     {
         m_show_curve = new ShowCurve(0.5f, 0.5f);
@@ -51,8 +50,7 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
         for(unsigned int i=0; i<p.size(); i++)
             m_show_curve->addPoint(p[i]);
     }
-#endif   // DEBUG
-#endif   // SERVER_ONLY
+#endif   // DEBUG AND !SERVER_ONLY
 }   // CheckCannon
 
 // ----------------------------------------------------------------------------
@@ -62,11 +60,9 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
 CheckCannon::~CheckCannon()
 {
     delete m_curve;
-#ifndef SERVER_ONLY
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(SERVER_ONLY)
     if(UserConfigParams::m_track_debug)
         delete m_show_curve;
-#endif
 #endif
 }   // ~CheckCannon
 

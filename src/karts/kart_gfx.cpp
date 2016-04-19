@@ -55,6 +55,7 @@ KartGFX::KartGFX(const AbstractKart *kart)
     m_nitro_light = irr_driver->addLight(location, /*force*/ 0.4f,
                                          /*radius*/5.0f, 0.0f, 0.4f, 1.0f,
                                          false, node);
+#ifndef SERVER_ONLY
     m_nitro_light->setVisible(false);
 #ifdef DEBUG
     m_nitro_light->setName( ("nitro emitter (" + m_kart->getIdent()
@@ -79,6 +80,7 @@ KartGFX::KartGFX(const AbstractKart *kart)
     m_skidding_light_2->setVisible(false);
     m_skidding_light_2->setName( ("skidding emitter 2 (" + m_kart->getIdent() 
                                                          + ")").c_str() );
+#endif
 
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
@@ -419,8 +421,10 @@ void KartGFX::updateNitroGraphics(float nitro_frac)
  */
 void KartGFX::updateSkidLight(unsigned int level)
 {
+#ifndef SERVER_ONLY
     m_skidding_light_1->setVisible(level == 1);
     m_skidding_light_2->setVisible(level > 1);
+#endif
 }   // updateSkidLight
 
 // ----------------------------------------------------------------------------
@@ -520,7 +524,9 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
 // ----------------------------------------------------------------------------
 void KartGFX::setGFXInvisible()
 {
+#ifndef SERVER_ONLY
     m_nitro_light->setVisible(false);
     m_skidding_light_1->setVisible(false);
     m_skidding_light_2->setVisible(false);
+#endif
 }   // setGFXInvisible

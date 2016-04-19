@@ -214,7 +214,11 @@ void Kart::init(RaceManager::KartType type)
     }
 
 
+#ifdef SERVER_ONLY
+    bool animations = false;  // server never animates
+#else
     bool animations = true;
+#endif
     const int anims = UserConfigParams::m_show_steering_animations;
     if (anims == ANIMS_NONE)
     {
