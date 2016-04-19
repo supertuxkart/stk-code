@@ -66,7 +66,7 @@ void AIBaseController::update(float dt)
 void AIBaseController::setControllerName(const std::string &name)
 {
 #ifdef DEBUG
-    if(m_ai_debug && Camera::getActiveCamera()->getType()==Camera::CM_NORMAL)
+    if(m_ai_debug && Camera::getActiveCamera()->getType()==Camera::CM_TYPE_NORMAL)
         m_kart->setOnScreenText(core::stringw(name.c_str()).c_str());
 #endif
     Controller::setControllerName(name);
