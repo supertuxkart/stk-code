@@ -246,11 +246,6 @@ void Camera::setMode(Mode mode)
         m_camera->setTarget(m_camera->getPosition());
     }
 
-    if(mode==CM_TYPE_END)
-    {
-        printf("");
-    }   // mode==CM_FINAL
-
     m_mode = mode;
 }   // setMode
 
