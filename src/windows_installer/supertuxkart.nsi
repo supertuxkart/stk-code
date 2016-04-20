@@ -38,8 +38,8 @@
   BrandingText "SuperTuxKart Installer"
 
   ;Set the icon
-  !define MUI_ICON "SuperTuxKart\install.ico"
-  !define MUI_UNICON "SuperTuxKart\uninstall.ico"
+  !define MUI_ICON "install.ico"
+  !define MUI_UNICON "uninstall.ico"
   !define MUI_HEADERIMAGE	
   !define MUI_WELCOMEFINISHPAGE_BITMAP "stk_installer.bmp"
   !define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
@@ -68,14 +68,14 @@
 Function validate_dir
   IfFileExists $INSTDIR\data\*.* 0 return
     IfFileExists $INSTDIR\Uninstall.exe 0 dont_uninstall
-      MessageBox MB_YESNO "You can't install SuperTuxKart 0.8.2 in an existing directory. Do you wish to run the uninstaller in $INSTDIR?"  IDNO dont_uninstall
+      MessageBox MB_YESNO "You can't install SuperTuxKart in an existing directory. Do you wish to run the uninstaller in $INSTDIR?"  IDNO dont_uninstall
 	; -?=$INSTDIR makes sure that this installer waits for the uninstaller
 	; to finish. The uninstaller (and directory) are not removed, but the
 	; uninstaller will be overwritten by our installer anyway.
         ExecWait '"$INSTDIR\Uninstall.exe" _?=$INSTDIR'
         goto return
     dont_uninstall:
-      MessageBox MB_OK "You can't install SuperTuxKart 0.8.2 in an existing directory. Please select a new directory."
+      MessageBox MB_OK "You can't install SuperTuxKart in an existing directory. Please select a new directory."
       abort
   return:
 FunctionEnd
@@ -84,7 +84,7 @@ FunctionEnd
 
   ;Installer pages
   !insertmacro MUI_PAGE_WELCOME
-  !insertmacro MUI_PAGE_LICENSE "SuperTuxKart\License.txt"
+  !insertmacro MUI_PAGE_LICENSE "..\..\COPYING"
 
   !define MUI_PAGE_CUSTOMFUNCTION_LEAVE validate_dir
   !insertmacro MUI_PAGE_DIRECTORY
@@ -119,9 +119,18 @@ FunctionEnd
 Section "Main Section" SecMain
 
   SetOutPath "$INSTDIR"
+  ; files in root dir
+  File /r ..\..\..\build\bin\release\*.*
+  File *.ico 
+  ; prereqs
+  SetOutPath "$INSTDIR\prerequisities"
+  File /r prerequisites\*.*
+  ; data + assets
+  SetOutPath "$INSTDIR\data\"
+  File /r /x .svn /x wip-* ..\..\..\stk-assets\*.*
+  File /r /x *.sh ..\..\data\*.*
 
-  ; Adds all SuperTuxKart files
-  File /r supertuxkart\*.*
+  
 
   ;Store installation folder
   WriteRegStr HKCU "Software\SuperTuxKart" "" $INSTDIR
@@ -135,19 +144,19 @@ Section "Main Section" SecMain
     SetShellVarContext all
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\uninstall.ico"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\supertuxkart.ico"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart_editor.lnk" "$INSTDIR\supertuxkart_editor.exe" "" "$INSTDIR\supertuxkart_editor.ico"
-    ShellLink::SetShortCutShowMode $SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart.lnk 0
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\SuperTuxKart.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\icon.ico"
+    ;CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart_editor.lnk" "$INSTDIR\supertuxkart_editor.exe" "" "$INSTDIR\supertuxkart_editor.ico"
+    ShellLink::SetShortCutShowMode $SMPROGRAMS\$STARTMENU_FOLDER\SuperTuxKart.lnk 0
 
   !insertmacro MUI_STARTMENU_WRITE_END
 
 SectionEnd
 
 Section -Prerequisites
-  SetOutPath $INSTDIR\Prerequisites
+  ;SetOutPath $INSTDIR\Prerequisites
   MessageBox MB_YESNO "Install Microsoft VC++ runtime libraries?" /SD IDYES IDNO endVC
     File "prerequisites\vcredist_x86.exe"
-    ExecWait "$INSTDIR\prerequisites\vcredist_x86.exe"
+    ExecWait "$INSTDIR\prerequisites\vcredist_x86.exe /q"
     Goto endVC
   endVC:
   MessageBox MB_YESNO "Install OpenAL sound libraries?" /SD IDYES IDNO endOA
@@ -162,35 +171,7 @@ SectionEnd
 Section "Uninstall"redist
 
   ;Removes all the supertuxkart data files
-  RMDir /r /REBOOTOK $INSTDIR\data
-  RMDir /r /REBOOTOK $INSTDIR\Prerequisites
-
-  DELETE /REBOOTOK "$INSTDIR\glew32.dll"
-  DELETE /REBOOTOK "$INSTDIR\install.ico"
-  DELETE /REBOOTOK "$INSTDIR\Irrlicht.dll"
-  DELETE /REBOOTOK "$INSTDIR\libcurl.dll"
-  DELETE /REBOOTOK "$INSTDIR\libeay32.dll"
-  DELETE /REBOOTOK "$INSTDIR\libidn-11.dll"
-  DELETE /REBOOTOK "$INSTDIR\License.txt"
-  DELETE /REBOOTOK "$INSTDIR\ogg.dll"
-  DELETE /REBOOTOK "$INSTDIR\OpenAL32.dll"
-  DELETE /REBOOTOK "$INSTDIR\physfs.dll"
-  DELETE /REBOOTOK "$INSTDIR\pthreadVC2.dll"
-  DELETE /REBOOTOK "$INSTDIR\ssleay32.dll"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart.exe"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart.ico"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart.icon"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart.ilk"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart.pdb"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart_editor.exe"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart_editor.ico"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart_editor.pdb"
-  DELETE /REBOOTOK "$INSTDIR\uninstall.ico"
-  DELETE /REBOOTOK "$INSTDIR\vorbis.dll"
-  DELETE /REBOOTOK "$INSTDIR\zlib.dll"
-  DELETE /REBOOTOK "$INSTDIR\zlib1.dll"
-
-  Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
+  RMDir /r /REBOOTOK $INSTDIR\*.*
   RMDir "$INSTDIR"
 
   SetShellVarContext all
@@ -219,4 +200,3 @@ Section "Uninstall"redist
   DeleteRegKey /ifempty HKCU "Software\SuperTuxKart"
 
 SectionEnd
-
