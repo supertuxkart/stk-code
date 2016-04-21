@@ -154,7 +154,15 @@ Section "Main Section" SecMain
 
   File ${EXEC_PATH}
 
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\bld\RelWithDebInfo
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\bld\Release
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\bld\RelWithDebInfo
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\bld\Release
 
+  !ifdef ${EDITOR_PATH}
+      File ${EDITOR_PATH}\stk-editor.exe ${EDITOR_PATH}\stk-editor.pdb
+  !endif
+ 
   File *.ico 
   ; prereqs
   SetOutPath "$INSTDIR\prerequisites"
