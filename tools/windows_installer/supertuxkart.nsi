@@ -156,7 +156,7 @@ Section "Main Section" SecMain
   File ${EXEC_PATH}
   File *.ico 
   ; prereqs
-  SetOutPath "$INSTDIR\prerequisities"
+  SetOutPath "$INSTDIR\prerequisites"
   File /r prerequisites\*.*
   ; data + assets
   SetOutPath "$INSTDIR\data\"
