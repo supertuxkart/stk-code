@@ -152,8 +152,9 @@ Section "Main Section" SecMain
   ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\RelWithDebInfo\*.*
   ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\Release\*.*
 
-
   File ${EXEC_PATH}
+
+
   File *.ico 
   ; prereqs
   SetOutPath "$INSTDIR\prerequisites"
@@ -163,7 +164,7 @@ Section "Main Section" SecMain
   File /r /x .svn /x wip-* ..\..\..\stk-assets\*.*
   File /r /x *.sh ..\..\data\*.*
 
-  
+    
 
   ;Store installation folder
   WriteRegStr HKCU "Software\SuperTuxKart" "" $INSTDIR
@@ -204,7 +205,39 @@ SectionEnd
 Section "Uninstall"redist
 
   ;Removes all the supertuxkart data files
-  RMDir /r /REBOOTOK $INSTDIR\*.*
+  ; DO NOT USE RMDIR ... $INSTDIR\*.*  - if someone should e.g.
+  ; install supertuxkart in c:\Program Files  (note: no subdirectory)
+  ; this could remove all files in Program Files!!!!!!!!!!!!!!!!!!!
+
+  RMDir /r /REBOOTOK $INSTDIR\data
+  RMDir /r /REBOOTOK $INSTDIR\prerequisites
+
+  DELETE /REBOOTOK "$INSTDIR\glew32.dll"
+  DELETE /REBOOTOK "$INSTDIR\install.ico"
+  DELETE /REBOOTOK "$INSTDIR\Irrlicht.dll"
+  DELETE /REBOOTOK "$INSTDIR\libcurl.dll"
+  DELETE /REBOOTOK "$INSTDIR\libeay32.dll"
+  DELETE /REBOOTOK "$INSTDIR\libidn-11.dll"
+  DELETE /REBOOTOK "$INSTDIR\License.txt"
+  DELETE /REBOOTOK "$INSTDIR\ogg.dll"
+  DELETE /REBOOTOK "$INSTDIR\OpenAL32.dll"
+  DELETE /REBOOTOK "$INSTDIR\physfs.dll"
+  DELETE /REBOOTOK "$INSTDIR\pthreadVC2.dll"
+  DELETE /REBOOTOK "$INSTDIR\ssleay32.dll"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart.exe"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart.ico"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart.icon"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart.ilk"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart.pdb"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart_editor.exe"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart_editor.ico"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart_editor.pdb"
+  DELETE /REBOOTOK "$INSTDIR\uninstall.ico"
+  DELETE /REBOOTOK "$INSTDIR\vorbis.dll"
+  DELETE /REBOOTOK "$INSTDIR\zlib.dll"
+  DELETE /REBOOTOK "$INSTDIR\zlib1.dll"
+
+  Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
   RMDir "$INSTDIR"
 
   SetShellVarContext all
