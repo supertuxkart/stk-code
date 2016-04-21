@@ -1,1 +1,1 @@
-100 ICON "@PROJECT_SOURCE_DIR@/src/windows_installer/icon.ico"
+100 ICON "@PROJECT_SOURCE_DIR@/tools/windows_installer/icon.ico"

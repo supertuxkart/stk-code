@@ -258,7 +258,7 @@ endif()
 add_definitions(-DHAVE_OGGVORBIS)
 
 if(WIN32)
-    configure_file("${STK_SOURCE_DIR}/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
+    configure_file("${STK_SOURCE_DIR}/../tools/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
 endif()
 
 # Provides list of source and header files (STK_SOURCES and STK_HEADERS)
