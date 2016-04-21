@@ -112,6 +112,28 @@ FunctionEnd
 
   !insertmacro MUI_LANGUAGE "English"
 
+
+; ---------------------------------------------------------------------------
+; based on http://nsis.sourceforge.net/Check_if_a_file_exists_at_compile_time
+; Sets the variable _VAR_NAME to _FILE_NAME if _VAR_NAME is not defined yet
+; and _FILE_NAME exists:
+!macro !setIfUndefinedAndExists _VAR_NAME _FILE_NAME
+    !ifndef ${_VAR_NAME}
+	!tempfile _TEMPFILE
+	!ifdef NSIS_WIN32_MAKENSIS
+		; Windows - cmd.exe
+		!system 'if exist "${_FILE_NAME}" echo !define ${_VAR_NAME} "${_FILE_NAME}" > "${_TEMPFILE}"'
+	!else
+		; Posix - sh
+		!system 'if [ -e "${_FILE_NAME}" ]; then echo "!define ${_VAR_NAME} ${_FILE_NAME}" > "${_TEMPFILE}"; fi'
+	!endif
+	!include '${_TEMPFILE}'
+	!delfile '${_TEMPFILE}'
+	!undef _TEMPFILE
+   !endif
+!macroend
+!define !setIfUndefinedAndExists "!insertmacro !setIfUndefinedAndExists"
+
 ;--------------------------------
 
 ;Installer Sections
@@ -120,7 +142,18 @@ Section "Main Section" SecMain
 
   SetOutPath "$INSTDIR"
   ; files in root dir
-  File /r ..\..\..\build\bin\release\*.*
+
+  ; Try to find the binary directory in a list of 'typical' names:
+  ; The first found directory is used
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\bld\bin\RelWithDebInfo\*.*
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\bld\bin\Release\*.*
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\build\bin\RelWithDebInfo\*.*
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\build\bin\Release\*.*
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\RelWithDebInfo\*.*
+  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\Release\*.*
+
+
+  File ${EXEC_PATH}
   File *.ico 
   ; prereqs
   SetOutPath "$INSTDIR\prerequisities"
