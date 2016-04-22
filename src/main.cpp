@@ -801,6 +801,9 @@ int handleCmdLine()
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;
 
+    if(CommandLine::has("--start-console"))
+        STKHost::m_enable_console = true;
+
     if(CommandLine::has("--login", &s) )
     {
         login = s.c_str();
