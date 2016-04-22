@@ -40,7 +40,6 @@ ReplayPlay *ReplayPlay::m_replay_play = NULL;
 ReplayPlay::ReplayPlay()
 {
     m_current_replay_file = 0;
-    m_custom_replay_file = false;
 }   // ReplayPlay
 
 //-----------------------------------------------------------------------------
@@ -64,6 +63,22 @@ void ReplayPlay::reset()
 void ReplayPlay::loadAllReplayFile()
 {
     m_replay_file_list.clear();
+
+    // Load stock replay first
+    std::set<std::string> pre_record;
+    file_manager->listFiles(pre_record, file_manager
+        ->getAssetDirectory(FileManager::REPLAY), /*is_full_path*/ true);
+    for (std::set<std::string>::iterator i  = pre_record.begin();
+                                         i != pre_record.end(); ++i)
+    {
+        if (!addReplayFile(*i, /*custom_replay*/ true))
+        {
+            // Skip invalid replay file
+            continue;
+        }
+    }
+
+    // Now user recorded replay
     std::set<std::string> files;
     file_manager->listFiles(files, file_manager->getReplayDir(),
         /*is_full_path*/ false);
@@ -77,13 +92,12 @@ void ReplayPlay::loadAllReplayFile()
             continue;
         }
     }
+
 }   // loadAllReplayFile
 
 //-----------------------------------------------------------------------------
 bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay)
 {
-    // custom_replay is true when full path of filename is given
-    m_custom_replay_file = custom_replay;
 
     char s[1024], s1[1024];
     if (StringUtils::getExtension(fn) != "replay") return false;
@@ -92,6 +106,8 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay)
     if (fd == NULL) return false;
     ReplayData rd;
 
+    // custom_replay is true when full path of filename is given
+    rd.m_custom_replay_file = custom_replay;
     rd.m_filename = fn;
 
     fgets(s, 1023, fd);
@@ -196,7 +212,8 @@ void ReplayPlay::load()
     m_ghost_karts.clearAndDeleteAll();
     char s[1024];
 
-    FILE *fd = openReplayFile(/*writeable*/false, m_custom_replay_file);
+    FILE *fd = openReplayFile(/*writeable*/false,
+        m_replay_file_list.at(m_current_replay_file).m_custom_replay_file);
     if(!fd)
     {
         Log::error("Replay", "Can't read '%s', ghost replay disabled.",
