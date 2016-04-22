@@ -119,8 +119,6 @@ float MainLoop::getLimitedDt()
  */
 void MainLoop::updateRace(float dt)
 {
-    if(ProfileWorld::isProfileMode()) dt=1.0f/60.0f;
-
     // The race event manager will update world in case of an online race
     if (RaceEventManager::getInstance<RaceEventManager>()->isRunning())
         RaceEventManager::getInstance<RaceEventManager>()->update(dt);
