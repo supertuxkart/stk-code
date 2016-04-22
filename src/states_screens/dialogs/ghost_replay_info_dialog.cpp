@@ -81,7 +81,7 @@ GUIEngine::EventPropagation
 
         if(selection == "start")
         {
-            bool reverse = m_rd.m_reverse; 
+            bool reverse = m_rd.m_reverse;
             std::string track_name = m_rd.m_track_name;
             int laps = m_rd.m_laps;
             int replay_id = m_replay_id;
