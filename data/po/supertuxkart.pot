@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-22 18:56-0400\n"
+"POT-Creation-Date: 2016-04-22 20:28-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -369,6 +369,8 @@ msgstr ""
 #. I18N: Section in easter egg tracks selection screen
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: In the track selection screen
+#. I18N: ./data/gui/tracks_and_gp.stkgui
+#. I18N: In the track and grand prix selection screen
 msgid "All Tracks"
 msgstr ""
 
@@ -456,6 +458,18 @@ msgid "Continue"
 msgstr ""
 
 #. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
+#. I18N: Ghost replay info action
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Record the race for ghost replay"
+msgstr ""
+
+#. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
+#. I18N: Ghost replay info action
+msgid "Watch replay only"
+msgstr ""
+
+#. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -467,7 +481,18 @@ msgid "Start Race"
 msgstr ""
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
 msgid "Ghost Replay Selection"
+msgstr ""
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Only show replays matching the current difficulty"
+msgstr ""
+
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Record ghost replay"
 msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
@@ -1587,8 +1612,8 @@ msgstr ""
 msgid "Blue Team"
 msgstr ""
 
-#. I18N: ./data/gui/tracks.stkgui
-#. I18N: In the track selection screen
+#. I18N: ./data/gui/tracks_and_gp.stkgui
+#. I18N: In the track and grand prix selection screen
 #: src/states_screens/dialogs/select_challenge.cpp:147
 msgid "Grand Prix"
 msgstr ""
@@ -1613,17 +1638,6 @@ msgstr ""
 msgid "Number of AI karts"
 msgstr ""
 
-#. I18N: ./data/gui/track_info.stkgui
-#. I18N: In the track info screen
-#: src/states_screens/track_info_screen.cpp:214
-msgid "Drive in reverse"
-msgstr ""
-
-#. I18N: ./data/gui/track_info.stkgui
-#. I18N: In the track info screen
-msgid "Record the race for ghost replay"
-msgstr ""
-
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
@@ -1643,6 +1657,10 @@ msgstr ""
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Delete"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/abyss/track.xml
+msgid "Antediluvian Abyss"
 msgstr ""
 
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
@@ -1754,10 +1772,6 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
-msgstr ""
-
-#. I18N: ../stk-assets/tracks/subsea/track.xml
-msgid "Subsea"
 msgstr ""
 
 #. I18N: ../stk-assets/tracks/temple/track.xml
@@ -3826,6 +3840,11 @@ msgstr ""
 #: src/states_screens/track_info_screen.cpp:120
 #, c-format
 msgid "Max players supported: %d"
+msgstr ""
+
+#. I18N: In the track info screen
+#: src/states_screens/track_info_screen.cpp:214
+msgid "Drive in reverse"
 msgstr ""
 
 #. I18N: In the track info screen
