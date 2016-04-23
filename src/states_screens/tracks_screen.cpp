@@ -192,7 +192,7 @@ void TracksScreen::buildTrackList()
     if (!(curr_group_name == DEFAULT_GROUP_NAME ||
         curr_group_name == ALL_TRACK_GROUPS_ID) && m_offical_track)
     {
-        tracks_widget->setText(_("Only Offical track is supported."));
+        tracks_widget->setText(_("Only official tracks are supported."));
         tracks_widget->updateItemDisplay();
         return;
     }
