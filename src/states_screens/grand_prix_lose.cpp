@@ -52,6 +52,7 @@
 using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
+using namespace GUIEngine;
 
 const float DURATION = 15.0f;
 
