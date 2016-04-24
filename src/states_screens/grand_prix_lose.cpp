@@ -112,6 +112,8 @@ void GrandPrixLose::init()
 
     m_phase = 1;
     m_global_time = 0.0f;
+
+    getWidget<ButtonWidget>("continue")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // -------------------------------------------------------------------------------------
