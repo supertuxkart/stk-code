@@ -16,6 +16,7 @@ First, make sure that you have the following packages installed:
   * OpenAL (recommended: openal-soft-devel)
   * Ogg    (libogg-dev)
   * Vorbis (libvorbis-dev)
+  * Freetype (libfreetype6-dev)
   * libcurl (libcurl-devel)
   * libbluetooth (bluez-devel)
   * libpng (libpng-devel)
@@ -26,7 +27,7 @@ Ubuntu command:
 
 ```
 sudo apt-get install autoconf automake build-essential cmake libogg-dev libvorbis-dev libopenal-dev libxxf86vm-dev \
-libgl1-mesa-dev libglu1-mesa-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev libxrandr-dev
+libgl1-mesa-dev libglu1-mesa-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev libxrandr-dev libfreetype6-dev
 ```
   
 Unpack the files from the tarball like this:
