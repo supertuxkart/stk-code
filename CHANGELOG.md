@@ -1,4 +1,16 @@
-## SupertTuxKart 0.9.1
+## SuperTuxKart 0.9.2
+* Ghost replay races by Benau
+* Battle mode AI by Benau
+* Soccer mode AI by Benau
+* New subsea track by samuncle
+* TTF font rendering by Benau
+* Kart properties refactor by Flakebi
+* Scripting work under the hood
+* Work on the track editor by mhp
+* Tweak to challenges
+* Bugfixes
+
+## SuperTuxKart 0.9.1
 * Many bug fixes
 * Started to use scripting in tracks
 * Significant audio performance improvements

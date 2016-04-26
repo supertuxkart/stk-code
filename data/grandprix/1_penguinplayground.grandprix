@@ -4,7 +4,7 @@
     <track id="sandtrack"    laps="3" reverse="false" />
     <track id="farm"         laps="3" reverse="false" />
     <track id="olivermath"   laps="4" reverse="false" />
-    <track id="subsea"       laps="2" reverse="false" />
+    <track id="abyss"        laps="3" reverse="false" />
     <track id="scotland"     laps="3" reverse="false" /> 
  
 </supertuxkart_grand_prix>

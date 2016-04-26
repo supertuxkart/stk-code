@@ -55,6 +55,7 @@ public:
         std::string              m_track_name;
         std::vector<std::string> m_kart_list;
         bool                     m_reverse;
+        bool                     m_custom_replay_file;
         unsigned int             m_difficulty;
         unsigned int             m_laps;
         float                    m_min_time;
@@ -92,8 +93,6 @@ private:
     static SortOrder         m_sort_order;
 
     unsigned int             m_current_replay_file;
-
-    bool                     m_custom_replay_file;
 
     std::vector<ReplayData>  m_replay_file_list;
 

@@ -52,6 +52,7 @@
 using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
+using namespace GUIEngine;
 
 const float DURATION = 15.0f;
 
@@ -112,6 +113,8 @@ void GrandPrixLose::init()
 
     m_phase = 1;
     m_global_time = 0.0f;
+
+    getWidget<ButtonWidget>("continue")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // -------------------------------------------------------------------------------------

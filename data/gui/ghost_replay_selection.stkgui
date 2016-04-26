@@ -12,7 +12,15 @@
             <list id="replay_list" x="0" y="0" width="100%" height="100%"/>
         </box>
 
-        <spacer width="100%" height="2%" />
-        <button x="1%" id="record-ghost" I18N="In the ghost replay selection screen" text="Record ghost replay" />
+        <div width="99%" align="center" layout="vertical-row" height="fit">
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <checkbox width="fit" id="replay_difficulty_toggle" text_align="left"/>
+                <spacer width="10"/>
+                <label proportion="1" height="100%" text_align="left" I18N="In the ghost replay selection screen" text="Only show replays matching the current difficulty"/>
+            </div>
+        </div>
+        <spacer width="100%" height="1%" />
+        <button x="1%" id="record-ghost" I18N="In the ghost replay selection screen" text="Record ghost replay"/>
+
     </div>
 </stkgui>

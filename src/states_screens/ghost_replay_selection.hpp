@@ -21,6 +21,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 
 namespace GUIEngine { class Widget; }
@@ -41,9 +42,12 @@ private:
     GhostReplaySelection();
     ~GhostReplaySelection();
 
-    GUIEngine::ListWidget* m_replay_list_widget;
-    std::string            m_file_to_be_deleted;
-    bool                   m_sort_desc;
+    GUIEngine::ListWidget*     m_replay_list_widget;
+    GUIEngine::CheckBoxWidget* m_replay_difficulty_toggle_widget;
+    RaceManager::Difficulty    m_cur_difficulty;
+    std::string                m_file_to_be_deleted;
+    bool                       m_same_difficulty;
+    bool                       m_sort_desc;
 
 public:
 
