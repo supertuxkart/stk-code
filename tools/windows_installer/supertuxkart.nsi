@@ -6,8 +6,7 @@
 ; which should be called "supertuxkart" and then copy the
 ; GPL in the supertuxkart directory to 'license.txt'.
 ; Next to supertuxkart create a subdirectory called 'prerequisites'
-; and copy the VC++ (vcredist_x86.exe) and OpenAL (oalinst.exe) 
-; redistributables.
+; and copy the VC++ (vcredist_x86.exe) redistributables.
 ; You will then need to make an icon, you can use:
 ; http://tools.dynamicdrive.com/favicon/ to convert a png to an icon.
 ; Once you have made an icon put it in the supertuxkart dir and call it
@@ -201,11 +200,6 @@ Section -Prerequisites
     ExecWait "$INSTDIR\prerequisites\vcredist_x86.exe /q"
     Goto endVC
   endVC:
-  MessageBox MB_YESNO "Install OpenAL sound libraries?" /SD IDYES IDNO endOA
-    File "prerequisites\oalinst.exe"
-    ExecWait "$INSTDIR\prerequisites\oalinst.exe"
-    Goto endOA
-  endOA:
 SectionEnd
 ;--------------------------------
 ;Uninstaller Section
