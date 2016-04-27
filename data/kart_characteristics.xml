@@ -187,7 +187,7 @@
             max: maximum leaning (i.e. when steering as much as possible at highest
                 speed), in degrees.
             speed: Speed with which the leaning changes (in degree/second). -->
-        <lean max="8.6" speed="5.0" />
+        <lean max="6.6" speed="15.0" />
 
 
         <!-- ********** Items ********** -->
