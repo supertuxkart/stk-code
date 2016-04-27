@@ -157,9 +157,12 @@ Section "Main Section" SecMain
   ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\bld\Release
   ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\bld\RelWithDebInfo
   ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\bld\Release
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\bld\RelWithDebInfo
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\bld\Release
 
-  !ifdef ${EDITOR_PATH}
-      File ${EDITOR_PATH}\stk-editor.exe ${EDITOR_PATH}\stk-editor.pdb
+  !ifdef EDITOR_PATH
+      File ${EDITOR_PATH}\supertuxkart-editor.exe ${EDITOR_PATH}\supertuxkart-editor.pdb
+      File ${EDITOR_PATH}\..\..\supertuxkart-editor.ico
   !endif
  
   File *.ico 
@@ -186,7 +189,7 @@ Section "Main Section" SecMain
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\uninstall.ico"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\SuperTuxKart.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\icon.ico"
-    ;CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart_editor.lnk" "$INSTDIR\supertuxkart_editor.exe" "" "$INSTDIR\supertuxkart_editor.ico"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart-editor.lnk" "$INSTDIR\supertuxkart-editor.exe" "" "$INSTDIR\supertuxkart-editor.ico"
     ShellLink::SetShortCutShowMode $SMPROGRAMS\$STARTMENU_FOLDER\SuperTuxKart.lnk 0
 
   !insertmacro MUI_STARTMENU_WRITE_END
@@ -233,11 +236,12 @@ Section "Uninstall"redist
   DELETE /REBOOTOK "$INSTDIR\supertuxkart.icon"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart.ilk"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart.pdb"
-  DELETE /REBOOTOK "$INSTDIR\stk-editor.exe"
-  DELETE /REBOOTOK "$INSTDIR\stk-editor.ico"
-  DELETE /REBOOTOK "$INSTDIR\stk-editor.pdb"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.exe"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.ico"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.pdb"
   DELETE /REBOOTOK "$INSTDIR\uninstall.ico"
   DELETE /REBOOTOK "$INSTDIR\vorbis.dll"
+  DELETE /REBOOTOK "$INSTDIR\wrap_oal.dll"
   DELETE /REBOOTOK "$INSTDIR\zlib.dll"
   DELETE /REBOOTOK "$INSTDIR\zlib.ilk"
   DELETE /REBOOTOK "$INSTDIR\zlib.pdb"
@@ -253,7 +257,7 @@ Section "Uninstall"redist
 
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart.lnk"
-  Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart_editor.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart-editor.lnk"
 
   ;Delete empty start menu parent diretories
   StrCpy $MUI_TEMP "$SMPROGRAMS\$MUI_TEMP"
