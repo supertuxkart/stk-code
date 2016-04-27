@@ -2745,12 +2745,12 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
-    float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
+    float lean_height = tan(m_current_lean) * getKartWidth()*0.5f;
 
     Vec3 center_shift(0, 0, 0);
 
     center_shift.setY(m_skidding->getGraphicalJumpOffset()
-                      + lean_height
+                      + fabsf(lean_height)
                       +m_graphical_y_offset);
     center_shift = getTrans().getBasis() * center_shift;
 
@@ -2760,7 +2760,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     // m_speed*dt is the distance the kart has moved, which determines
     // how much the wheels need to rotate.
-    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed);
+    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed, lean_height);
 
     // Determine the shadow position from the terrain Y position. This
     // leaves the shadow on the ground even if the kart is jumping because

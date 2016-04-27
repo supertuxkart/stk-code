@@ -689,7 +689,7 @@ void KartModel::reset()
             m_wheel_node[i]->setRotation(rotation);
         }
     }
-    update(0.0f, 0.0f, 0.0f, 0.0f);
+    update(0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 
     // Stop any animations currently being played.
     setAnimation(KartModel::AF_DEFAULT);
@@ -833,10 +833,12 @@ void KartModel::setDefaultSuspension()
  *  \param suspension Suspension height for all four wheels.
  *  \param speed The speed of the kart in meters/sec, used for the
  *         speed-weighted objects' animations
+ *  \param current_lean_angle How much the kart is leaning (positive meaning
+ *         left side down)
  *  \param gt_replay_index The index to get replay data, used by ghost kart
  */
 void KartModel::update(float dt, float distance, float steer, float speed,
-                       int gt_replay_index)
+                       float current_lean_angle, int gt_replay_index)
 {
     core::vector3df wheel_steer(0, steer*30.0f, 0);
 
@@ -866,13 +868,27 @@ void KartModel::update(float dt, float distance, float steer, float speed,
         else
         {
             suspension_length = m_kart->getVehicle()->getWheelInfo(i).
-                m_raycastInfo.m_suspensionLength;
+                                m_raycastInfo.m_suspensionLength;
         }
 
         // Check documentation of Kart::updateGraphics for the following line
         pos.Y +=   m_default_physics_suspension[i]
                  - suspension_length
                  - m_kart_lowest_point;
+
+        // Adjust the wheel position for lean: the lean can cause the 'leaned
+        // to' side to be partly in the ground - which looks ok (like the tyres
+        // being compressed), but the other side will be in the air. To avoid
+        // this, increase the position of the wheels on the side that are
+        // higher in the ground so that the wheel still touch the ground.
+        if(current_lean_angle > 0 && (i&1) == 0)   // i&1 == 0: left side
+        {
+            pos.Y -= current_lean_angle;
+        }
+        else if (current_lean_angle < 0 && (i&1) == 1)   // i&1 == 1: right side
+        {
+            pos.Y += current_lean_angle;
+        }
         m_wheel_node[i]->setPosition(pos);
 
         // Now calculate the new rotation: (old + change) mod 360
