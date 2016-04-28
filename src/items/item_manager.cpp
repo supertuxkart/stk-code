@@ -495,7 +495,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
     }
 
     RandomGenerator random;
-    const unsigned int MIN_DIST = sqrt(BattleGraph::get()->getNumNodes());
+    const unsigned int MIN_DIST = int(sqrt(BattleGraph::get()->getNumNodes()));
     const unsigned int TOTAL_ITEM = MIN_DIST / 2;
 
     Log::info("[ItemManager]","Creating %d random items for arena", TOTAL_ITEM);
