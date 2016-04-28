@@ -335,6 +335,14 @@ void RaceGUI::drawGlobalTimer()
  */
 void RaceGUI::drawGlobalMiniMap()
 {
+#ifdef DEBUG
+    // Battle map not loaded in debug mode with a single kart due to slowness
+    if(race_manager->getNumberOfKarts()==1 &&
+        ( World::getWorld()->getTrack()->isArena() ||
+          World::getWorld()->getTrack()->isSoccer()   )  )
+        return;
+#endif
+
     World *world = World::getWorld();
     // draw a map when arena has a navigation mesh.
     if ((world->getTrack()->isArena() || world->getTrack()->isSoccer()) &&
