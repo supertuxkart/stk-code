@@ -671,14 +671,6 @@ void Track::startMusic() const
  */
 void Track::loadBattleGraph()
 {
-#ifdef DEBUG
-    // This must be a testing race with just one player. Do not load the
-    // battle graph since it can be VERY slow in debug mode - temple
-    // needs in the order of minutes.
-    if(race_manager->getNumberOfKarts()==1)
-        return;
-#endif
-
     BattleGraph::create(m_root+"navmesh.xml");
 
     if(BattleGraph::get()->getNumNodes()==0)
@@ -1878,16 +1870,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     delete root;
 
-#ifdef DEBUG
-    // Don't use battle graph in debug mode with a single kart (i.e. testing
-    // only). Loading can be VERY slow.
-    if(race_manager->getNumberOfKarts()>1)
-#endif
-    {
-        if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh &&
-            !arena_random_item_created )
+    if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh && !arena_random_item_created)
         BattleGraph::get()->findItemsOnGraphNodes();
-    }
 
     if (UserConfigParams::m_track_debug &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&

@@ -453,18 +453,10 @@ void ThreeStrikesBattle::updateKartNodes()
     {
         if (m_karts[i]->isEliminated()) continue;
 
-#ifdef DEBUG
-        // Battle map not loaded in debug mode with a single kart
-        // since the graph creation is very expensive.
-        if(race_manager->getNumberOfKarts()>1)
-#endif
-        {
-            m_kart_info[i].m_on_node = BattleGraph::get()
-                                     ->pointToNode(m_kart_info[i].m_on_node,
-                                                   m_karts[i]->getXYZ(),
-                                                   false/*ignore_vertical*/);
-        } 
-    }   // for i < n
+        m_kart_info[i].m_on_node = BattleGraph::get()
+            ->pointToNode(m_kart_info[i].m_on_node,
+                          m_karts[i]->getXYZ(), false/*ignore_vertical*/);
+    }
 }
 
 //-----------------------------------------------------------------------------
