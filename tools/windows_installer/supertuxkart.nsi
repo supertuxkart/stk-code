@@ -153,12 +153,20 @@ Section "Main Section" SecMain
 
   File ${EXEC_PATH}
 
+  ; Check various options for the editor. Note that us devs mostly use 'bld',
+  ; but documented is the name 'build'
   ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\bld\RelWithDebInfo
   ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\bld\Release
   ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\bld\RelWithDebInfo
   ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\bld\Release
   ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\bld\RelWithDebInfo
   ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\bld\Release
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\build\RelWithDebInfo
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\build\Release
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\build\RelWithDebInfo
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\build\Release
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\build\RelWithDebInfo
+  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\build\Release
 
   !ifdef EDITOR_PATH
       File ${EDITOR_PATH}\supertuxkart-editor.exe ${EDITOR_PATH}\supertuxkart-editor.pdb
