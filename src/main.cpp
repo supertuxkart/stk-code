@@ -717,6 +717,12 @@ int handleCmdLinePreliminary()
     if (CommandLine::has("--easter", &n))
         UserConfigParams::m_easter_ear_mode = n;
 
+    // Useful for debugging: the temple navmesh needs 12 minutes in debug
+    // mode to compute the distance matrix!!
+    if(CommandLine::has("--dont-load-navmesh"))
+        Track::m_dont_load_navmesh = true;
+
+
     return 0;
 }   // handleCmdLinePreliminary
 
@@ -752,7 +758,7 @@ int handleCmdLine()
     if(CommandLine::has("--ftl-debug"))
         UserConfigParams::m_ftl_debug = true;
     if(CommandLine::has("--slipstream-debug"))
-            UserConfigParams::m_slipstream_debug=true;
+        UserConfigParams::m_slipstream_debug = true;
     if(CommandLine::has("--rendering-debug"))
         UserConfigParams::m_rendering_debug=true;
     if(CommandLine::has("--ai-debug"))

@@ -396,6 +396,11 @@ public:
     bool reverseAvailable() const { return m_reverse_available; }
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
 
+    /** Flag to avoid loading navmeshes (useful to speedup debugging: e.g.
+     *  the temple navmesh distance matric computation takes around 12
+     *  minutes(!) in debug mode to be computed. */
+    static bool        m_dont_load_navmesh;
+
     static const float NOHIT;
 
                        Track             (const std::string &filename);

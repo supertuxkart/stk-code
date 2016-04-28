@@ -82,7 +82,8 @@
 using namespace irr;
 
 
-const float Track::NOHIT           = -99999.9f;
+const float Track::NOHIT               = -99999.9f;
+bool        Track::m_dont_load_navmesh = false;
 
 // ----------------------------------------------------------------------------
 Track::Track(const std::string &filename)
@@ -588,9 +589,9 @@ void Track::loadTrackInfo()
         delete easter;
     }
 
-    if(file_manager->fileExists(m_root+"navmesh.xml"))
+    if(file_manager->fileExists(m_root+"navmesh.xml") && !m_dont_load_navmesh)
         m_has_navmesh = true;
-    else if(m_is_arena || m_is_soccer)
+    else if ( (m_is_arena || m_is_soccer) && !m_dont_load_navmesh)
     {
         Log::warn("Track", "NavMesh is not found for arena %s, "
                   "disable AI for it.\n", m_name.c_str());
