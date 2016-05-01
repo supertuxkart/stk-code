@@ -60,6 +60,13 @@ MaterialManager::~MaterialManager()
         delete m_materials[i];
     }
     m_materials.clear();
+
+    for (std::map<video::E_MATERIAL_TYPE, Material*> ::iterator it =
+         m_default_materials.begin(); it != m_default_materials.end(); it++)
+    {
+        delete it->second;
+    }
+    m_default_materials.clear();
 }   // ~MaterialManager
 
 //-----------------------------------------------------------------------------

@@ -600,11 +600,17 @@ void ArenaAI::handleArenaItems(const float dt)
                 type == Attachment::ATTACH_NOLOKS_SWATTER)
                 break;
 
-            // Check if a flyable (cake, ...) is close. If so, use bubblegum
+            // Check if a flyable (cake, ...) is close or a kart nearby
+            // has a swatter attachment. If so, use bubblegum
             // as shield
-            if (!m_kart->isShielded() &&
+            if ((!m_kart->isShielded() &&
                 projectile_manager->projectileIsClose(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius))
+                                    m_ai_properties->m_shield_incoming_radius)) ||
+               (m_closest_kart_pos_data.distance < 15.0f &&
+               ((m_closest_kart->getAttachment()->
+                getType() == Attachment::ATTACH_SWATTER) ||
+               (m_closest_kart->getAttachment()->
+                getType() == Attachment::ATTACH_NOLOKS_SWATTER))))
             {
                 m_controls->m_fire      = true;
                 m_controls->m_look_back = false;
