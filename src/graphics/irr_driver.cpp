@@ -1139,7 +1139,8 @@ scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
     m.EmissiveColor   = color;
     m.BackfaceCulling = false;
     m.MaterialType    = video::EMT_SOLID;
-    m.setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+    //m.setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+    m.setTexture(0, getUnicolorTexture(color));
     m.setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
 
     if (CVS->isGLSL())
