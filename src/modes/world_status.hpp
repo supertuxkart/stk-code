@@ -114,6 +114,8 @@ private:
      */
     float           m_auxiliary_timer;
 
+    bool            m_engines_started;
+    void            startEngines();
 public:
              WorldStatus();
     virtual ~WorldStatus();
