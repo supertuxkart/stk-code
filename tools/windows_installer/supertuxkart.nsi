@@ -197,7 +197,7 @@ Section "Main Section" SecMain
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\uninstall.ico"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\SuperTuxKart.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\icon.ico"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart-editor.lnk" "$INSTDIR\supertuxkart-editor.exe" "" "$INSTDIR\supertuxkart-editor.ico"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart-editor (beta).lnk" "$INSTDIR\supertuxkart-editor.exe" "" "$INSTDIR\supertuxkart-editor.ico"
     ShellLink::SetShortCutShowMode $SMPROGRAMS\$STARTMENU_FOLDER\SuperTuxKart.lnk 0
 
   !insertmacro MUI_STARTMENU_WRITE_END
