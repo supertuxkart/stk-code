@@ -1314,6 +1314,12 @@ void SkiddingAI::handleItems(const float dt)
             bool fire_backwards = (m_kart_behind && m_kart_ahead &&
                                    m_distance_behind < m_distance_ahead) ||
                                   !m_kart_ahead;
+
+            // Don't fire if the kart we are aiming at is invulnerable.
+            if ((fire_backwards  && m_kart_behind && m_kart_behind->isInvulnerable()) ||
+                (!fire_backwards && m_kart_ahead && m_kart_ahead->isInvulnerable())    )
+                return;
+
             float distance = fire_backwards ? m_distance_behind
                                             : m_distance_ahead;
             m_controls->m_fire = ( (fire_backwards && distance < 30.0f)  ||
