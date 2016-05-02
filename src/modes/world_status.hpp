@@ -97,7 +97,8 @@ protected:
     double          m_time;
     ClockType       m_clock_mode;
 
-    bool            m_play_racestart_sounds;
+    bool            m_play_track_intro_sound;
+    bool            m_play_ready_set_go_sounds;
 
 private:
     Phase           m_phase;

@@ -39,7 +39,8 @@ WorldStatus::WorldStatus()
     m_start_sound       = SFXManager::get()->createSoundSource("start_race");
     m_track_intro_sound = SFXManager::get()->createSoundSource("track_intro");
 
-    m_play_racestart_sounds = true;
+    m_play_track_intro_sound = UserConfigParams::m_music;
+    m_play_ready_set_go_sounds = true;
 
     IrrlichtDevice *device = irr_driver->getDevice();
 
@@ -149,7 +150,7 @@ void WorldStatus::update(const float dt)
             m_auxiliary_timer = 0.0f;
             m_phase = TRACK_INTRO_PHASE;
             
-            if (m_play_racestart_sounds)
+            if (m_play_track_intro_sound)
             {
                 m_track_intro_sound->play();
             }
@@ -186,7 +187,7 @@ void WorldStatus::update(const float dt)
 
             m_auxiliary_timer = 0.0f;
 
-            if (m_play_racestart_sounds)
+            if (m_play_ready_set_go_sounds)
                 m_prestart_sound->play();
 
             m_phase = READY_PHASE;
@@ -200,7 +201,7 @@ void WorldStatus::update(const float dt)
         case READY_PHASE:
             if (m_auxiliary_timer > 1.0)
             {
-                if (m_play_racestart_sounds)
+                if (m_play_ready_set_go_sounds)
                 {
                     m_prestart_sound->play();
                 }
@@ -224,7 +225,7 @@ void WorldStatus::update(const float dt)
             {
                 // set phase is over, go to the next one
                 m_phase = GO_PHASE;
-                if (m_play_racestart_sounds)
+                if (m_play_ready_set_go_sounds)
                 {
                     m_start_sound->play();
                 }
