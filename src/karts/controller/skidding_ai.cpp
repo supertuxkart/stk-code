@@ -99,7 +99,7 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
         m_debug_sphere[i]->setMaterialTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
     m_debug_sphere[m_point_selection_algorithm]->setVisible(true);
-    m_item_sphere  = irr_driver->addSphere(1.0f);
+    m_item_sphere  = irr_driver->addSphere(1.0f, video::SColor(255, 0, 255, 0));
 
 #define CURVE_PREDICT1   0
 #define CURVE_KART       1
@@ -659,8 +659,9 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
 
     // 2) If the kart is aiming for an item, but (suddenly) detects
     //    some close-by items to avoid (e.g. behind the item, which was too
-    //    far away to be considered earlier), the kart cancels collecting
-    //    the item if this could cause the item-to-avoid to be collected.
+    //    far away to be considered earlier, or because the item was switched
+    //    to a bad item), the kart cancels collecting the item if this could
+    //    cause the item-to-avoid to be collected.
     // --------------------------------------------------------------------
     if(m_item_to_collect && items_to_avoid.size()>0)
     {
@@ -846,10 +847,10 @@ bool SkiddingAI::hitBadItemWhenAimAt(const Item *item,
  */
 bool SkiddingAI::handleSelectedItem(float kart_aim_angle, Vec3 *aim_point)
 {
-    // If the item is unavailable or has been switched into a bad item
-    // stop aiming for it.
-    if(m_item_to_collect->getDisableTime()>0 ||
-        m_item_to_collect->getType() == Item::ITEM_BANANA )
+    // If the item is unavailable keep on testing. It is not necessary
+    // to test if an item has turned bad, this was tested before this
+    // function is called.
+    if(m_item_to_collect->getDisableTime()>0)
         return false;
 
     const Vec3 &xyz = m_item_to_collect->getXYZ();
@@ -865,10 +866,6 @@ bool SkiddingAI::handleSelectedItem(float kart_aim_angle, Vec3 *aim_point)
     else
     {
         // Keep on aiming for last selected item
-#ifdef AI_DEBUG
-        m_item_sphere->setVisible(true);
-        m_item_sphere->setPosition(m_item_to_collect->getXYZ().toIrrVector());
-#endif
         *aim_point = m_item_to_collect->getXYZ();
     }
     return true;
@@ -1056,14 +1053,13 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
             if (m_kart->getEnergy() + kp->getNitroBigContainer()
                 > kp->getNitroMax())
                   return;
-            // fall through: if we have enough space to store a big
-            // container, we can also store a small container, and
-            // finally fall through to the bonus box code.
-        case Item::ITEM_NITRO_SMALL: avoid = false;
+            break;
+        case Item::ITEM_NITRO_SMALL:
             // Only collect nitro, if it can actually be stored.
             if (m_kart->getEnergy() + kp->getNitroSmallContainer()
                 > kp->getNitroMax())
                   return;
+            break;
         case Item::ITEM_BONUS_BOX:
             break;
         case Item::ITEM_TRIGGER: return; break;
