@@ -531,6 +531,9 @@ void cmdLineHelp()
     // "       --history=n        Replay history file 'history.dat' using:\n"
     // "                            n=1: recorded positions\n"
     // "                            n=2: recorded key strokes\n"
+    // "       --test-ai=n        Use the test-ai for every n-th AI kart.\n"
+    // "                          (so n=1 means all Ais will be the test ai)\n"
+    // "                             
     "       --server=name      Start a server (not a playing client).\n"
     "       --lan-server=name  Start a LAN server (not a playing client).\n"
     "       --server-password= Sets a password for a server (both client&server).\n"
@@ -763,6 +766,8 @@ int handleCmdLine()
         UserConfigParams::m_rendering_debug=true;
     if(CommandLine::has("--ai-debug"))
         AIBaseController::enableDebug();
+    if(CommandLine::has("--test-ai", &n))
+        AIBaseController::setTestAI(n);
     if (CommandLine::has("--fps-debug"))
         UserConfigParams::m_fps_debug = true;
 

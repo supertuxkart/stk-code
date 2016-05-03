@@ -31,6 +31,7 @@
 #include <assert.h>
 
 bool AIBaseController::m_ai_debug = false;
+int  AIBaseController::m_test_ai  = 0;
 
 AIBaseController::AIBaseController(AbstractKart *kart)
                 : Controller(kart)

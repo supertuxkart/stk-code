@@ -57,6 +57,13 @@ protected:
 
     static bool m_ai_debug;
 
+    /** Stores the '--test-ai=n' command line parameter:
+     *  It indicates which fraction of the AIs are going to
+     *  be the test AI: 1 means only to use the TestAI,
+     *  2 means every second AI will be test etc. Used
+     *  for AI testing only. */
+    static int m_test_ai;
+
     /** Position info structure of targets. */
     struct posData {bool behind; bool on_side; float angle; float distance;};
 
@@ -79,6 +86,8 @@ public:
     virtual bool disableSlipstreamBonus() const;
     virtual void crashed(const Material *m);
     static  void enableDebug() {m_ai_debug = true; }
+    static  void setTestAI(int n) {m_test_ai = n; }
+    static  int  getTestAI() { return m_test_ai; }
     virtual void crashed(const AbstractKart *k) {};
     virtual void handleZipper(bool play_sound) {};
     virtual void finishedRace(float time) {};

@@ -61,6 +61,12 @@ MainLoop::~MainLoop()
  */
 float MainLoop::getLimitedDt()
 {
+    // In profile mode without graphics, run with a fixed dt of 1/60
+    if (ProfileWorld::isProfileMode() && ProfileWorld::isNoGraphics())
+    {
+        return 1.0f/60.0f;
+    }
+
     IrrlichtDevice* device = irr_driver->getDevice();
     m_prev_time = m_curr_time;
 

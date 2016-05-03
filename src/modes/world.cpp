@@ -36,6 +36,7 @@
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
+#include "karts/controller/test_ai.hpp"
 #include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -384,7 +385,12 @@ Controller* World::loadAIController(AbstractKart *kart)
     switch(turn)
     {
         case 0:
-            controller = new SkiddingAI(kart);
+            // If requested, start the test ai
+            if( (AIBaseController::getTestAI()!=0                       ) && 
+                ( (kart->getWorldKartId()+1) % AIBaseController::getTestAI() )==0)
+                controller = new TestAI(kart);
+            else
+                controller = new SkiddingAI(kart);
             break;
         case 1:
             controller = new BattleAI(kart);

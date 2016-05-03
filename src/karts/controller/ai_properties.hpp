@@ -46,6 +46,7 @@ protected:
     friend class AIBaseLapController;
     friend class SkiddingAI;
     friend class ArenaAI;
+    friend class TestAI;
 
     /** Used to check that all values are defined in the xml file. */
     static float UNDEFINED;
