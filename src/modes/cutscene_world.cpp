@@ -58,7 +58,8 @@ CutsceneWorld::CutsceneWorld() : World()
     m_aborted = false;
     WorldStatus::setClockMode(CLOCK_NONE);
     m_use_highscores = false;
-    m_play_racestart_sounds = false;
+    m_play_track_intro_sound = false;
+    m_play_ready_set_go_sounds = false;
     m_fade_duration = 1.0f;
 }   // CutsceneWorld
 

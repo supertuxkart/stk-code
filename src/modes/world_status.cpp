@@ -31,6 +31,21 @@
 #include <irrlicht.h>
 
 //-----------------------------------------------------------------------------
+/** Starts the kart engines.
+ */
+void WorldStatus::startEngines()
+{
+    if (m_engines_started)
+        return;
+
+    m_engines_started = true;
+    for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
+    {
+        World::getWorld()->getKart(i)->startEngineSFX();
+    }
+}
+
+//-----------------------------------------------------------------------------
 WorldStatus::WorldStatus()
 {
     m_clock_mode        = CLOCK_CHRONO;
@@ -39,7 +54,8 @@ WorldStatus::WorldStatus()
     m_start_sound       = SFXManager::get()->createSoundSource("start_race");
     m_track_intro_sound = SFXManager::get()->createSoundSource("track_intro");
 
-    m_play_racestart_sounds = true;
+    m_play_track_intro_sound = UserConfigParams::m_music;
+    m_play_ready_set_go_sounds = true;
 
     IrrlichtDevice *device = irr_driver->getDevice();
 
@@ -54,6 +70,9 @@ void WorldStatus::reset()
 {
     m_time            = 0.0f;
     m_auxiliary_timer = 0.0f;
+    
+    m_engines_started = false;
+    
     // Using SETUP_PHASE will play the track into sfx first, and has no
     // other side effects.
     m_phase           = UserConfigParams::m_race_now ? MUSIC_PHASE : SETUP_PHASE;
@@ -149,7 +168,7 @@ void WorldStatus::update(const float dt)
             m_auxiliary_timer = 0.0f;
             m_phase = TRACK_INTRO_PHASE;
             
-            if (m_play_racestart_sounds)
+            if (m_play_track_intro_sound)
             {
                 m_track_intro_sound->play();
             }
@@ -183,24 +202,28 @@ void WorldStatus::update(const float dt)
             // Wait before ready phase if sounds are disabled
             if (!UserConfigParams::m_sfx && m_auxiliary_timer < 3.0f)
                 return;
+            
+            if (!m_play_track_intro_sound)
+            {
+                startEngines();
+                if (m_auxiliary_timer < 3.0f)
+                    return;
+            }
 
             m_auxiliary_timer = 0.0f;
 
-            if (m_play_racestart_sounds)
+            if (m_play_ready_set_go_sounds)
                 m_prestart_sound->play();
 
             m_phase = READY_PHASE;
             
-            for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
-            {
-                World::getWorld()->getKart(i)->startEngineSFX();
-            }
+            startEngines();
 
             break;
         case READY_PHASE:
             if (m_auxiliary_timer > 1.0)
             {
-                if (m_play_racestart_sounds)
+                if (m_play_ready_set_go_sounds)
                 {
                     m_prestart_sound->play();
                 }
@@ -224,7 +247,7 @@ void WorldStatus::update(const float dt)
             {
                 // set phase is over, go to the next one
                 m_phase = GO_PHASE;
-                if (m_play_racestart_sounds)
+                if (m_play_ready_set_go_sounds)
                 {
                     m_start_sound->play();
                 }
