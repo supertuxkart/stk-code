@@ -346,7 +346,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
         gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
         core::rect<s32> pos(x2+nSize, y1, x2+nSize+nSize, y1+nSize);
         font->setScale(1.5f);
-        font->draw(StringUtils::toWString(many_powerups)+L"x",
+        font->draw(core::stringw(L"x")+StringUtils::toWString(many_powerups),
             pos, video::SColor(255, 255, 255, 255));
         font->setScale(1.0f);
     }
