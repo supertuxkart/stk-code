@@ -1581,9 +1581,47 @@ void TestAI::handleRescue(const float dt)
 void TestAI::handleNitroAndZipper()
 {
     m_controls->m_nitro = false;
+
+    // The next line prevents usage of nitro on long straights, where the kart
+    // is already fast.
+
     // If we are already very fast, save nitro.
-    if(m_kart->getSpeed() > 0.95f*m_kart->getCurrentMaxSpeed())
-        return;
+    //if(m_kart->getSpeed() > 0.95f*m_kart->getCurrentMaxSpeed())
+    //    return;
+
+    // This works well for some tracks (math, lighthouse
+    // sandtrack), but worse in others (zen, xr591). The good result
+    // is caused by long straights in which the AI will now use zippers,
+    // but in the other tracks the high speed causes karts to crash in
+    // tight corners. In some cases it would need a reasonable large 'lookahead'
+    // to know that at a certain spot a zipper or skidding should not be used
+    // (e.g. in xr591, left at the fork - new AI will nearly always fell of the
+    // track after the curve). Here the summarised results of 10 laps runs with 
+    // 4 old against 4 new AIs in time trail mode. The 'gain' is the sum of all
+    // (star_positions-end_positions). So a gain of -10 means that basically
+    // the new AI fell from start positions 2,4,6,8 to end positions 6,7,8,9.
+    // On the other hand, +10 means the new AI took positions 1,2,3,4. 
+    // name                gain     Time              Skid  Resc Rsc  Brake Expl Exp Itm Ban SNitLNit Bub Off Energy
+    // xr591               -10      504.279           204.70 0.00  15  4011 0.00   0   0  26 135   0   0  4881 0.00
+    // zengarden           -10      287.496           141.81 0.00  13  2489 0.00   0   0   7   2   0   0  5683 0.00
+    // cocoa_temple         -6      511.008           170.67 0.00  17  3112 0.00   0   0   5  77  10   0  5405 0.00
+    // mansion              -5      358.171           130.34 0.00  38  8077 0.00   0   0  28 100   0   0 13050 1.00
+    // farm                 -4      332.542            60.61 0.00   1   390 0.00   0   0  44 118  15   0   547 2.74
+    // mines                -4      488.225           233.00 0.00  30  1785 0.00   2   0   6 153   0   0  7661 0.00
+    // snowmountain         -4      430.525           160.22 0.00   4   681 0.00   0   0   5 104  30   0  1842 0.00
+    // city                 -3      491.625            60.69 0.00   3  1143 0.00   0   0   9 119  31   0  1075 0.69
+    // greenvalley          -2      652.688            60.41 0.00  22  4292 0.00   0   0  19 133  48   0  7610 1.89
+    // snowtuxpeak           0      405.667           163.87 0.00   6  1420 0.00   0   0   7  28   0   0  7984 0.00
+    // stk_enterprise        2      576.479           104.78 0.00   5  2549 0.00   0   0   7 250   5   0  6293 0.00
+    // fortmagma             3      432.117           179.53 0.00  14  3244 0.00   2   0   0  89   0   0 13091 0.00
+    // scotland              3      444.075           255.65 0.00   3   308 0.00   0   0   0 133   0   0  1353 0.00
+    // abyss                 7      480.771           226.85 0.00   1   163 0.00   0   0   2   2   0   0  2684 0.00
+    // hacienda              7      442.142           188.21 0.00   4   863 0.00   0   0   0 145   0   0  2731 0.00
+    // gran_paradiso_island  9      508.292           247.99 0.00   2  1277 0.00   0   0   5 103   0   0  2179 0.00
+    // lighthouse           10      316.346           194.38 0.00   0  1192 0.00   0   0   0  69   0   0  3062 0.00
+    // olivermath           10          188            83.93 0.00   1  2498 0.00   0   0   0  54   0   0  2072 1.00
+    // sandtrack            10      489.963            64.18 0.00   3  1009 0.00   0   0   1 135   0   0  1407 0.00
+
     // Don't use nitro when the AI has a plunger in the face!
     if(m_kart->getBlockedByPlungerTime()>0) return;
 
