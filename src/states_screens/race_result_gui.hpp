@@ -21,6 +21,7 @@
 
 
 #include "guiengine/screen.hpp"
+#include "modes/world.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/state_manager.hpp"
@@ -196,6 +197,8 @@ private:
     void displayScreenShots();
 
     int  getFontHeight () const;
+    
+    irr::core::stringw getKartNameForResult(const AbstractKart *kart, World *world);
 
 public:
 
