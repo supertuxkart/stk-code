@@ -171,6 +171,7 @@
 #include "karts/controller/ai_base_lap_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
@@ -474,7 +475,8 @@ void setupRaceStart()
     else
     {
         // Set up race manager appropriately
-        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
+        if (race_manager->getNumPlayers() > 0)
+            race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
     }
 
     // ASSIGN should make sure that only input from assigned devices
@@ -931,6 +933,17 @@ int handleCmdLine()
             race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
         }
     }   // --track
+
+    // used only for debugging/testing
+    if (CommandLine::has("--cutscene", &s))
+    {
+        race_manager->setTrack(s);
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts(0);
+        race_manager->setNumPlayers(0);
+        race_manager->setNumLaps(999);
+    } // --cutscene
 
     if(CommandLine::has("--gp", &s))
     {
