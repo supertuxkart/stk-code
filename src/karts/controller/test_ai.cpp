@@ -1508,7 +1508,8 @@ void TestAI::handleAcceleration( const float dt)
 
     // FIXME: This test appears to be incorrect, since at this stage
     // m_brake has not been reset from the previous frame, which can
-    // cause too long slow downs
+    // cause too long slow downs. On the other hand removing it appears
+    // to decrease performance in some narrower tracks
     if( m_controls->m_brake )
     {
         m_controls->m_accel = 0.0f;
