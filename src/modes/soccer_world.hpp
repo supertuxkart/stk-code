@@ -108,6 +108,10 @@ private:
     /** Get number of teammates in a team, used by starting position assign. */
     int getTeamNum(SoccerTeam team) const;
 
+    /** Profiling usage */
+    int m_frame_count;
+    int m_start_time;
+
 public:
 
     SoccerWorld();
@@ -130,6 +134,8 @@ public:
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE {}
 
     virtual bool raceHasLaps() OVERRIDE { return false; }
+
+    virtual void enterRaceOverState() OVERRIDE;
 
     virtual const std::string& getIdent() const OVERRIDE;
 

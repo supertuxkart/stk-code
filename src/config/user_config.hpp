@@ -527,6 +527,9 @@ namespace UserConfigParams
     /** True if fps should be printed each frame. */
     PARAM_PREFIX bool m_fps_debug PARAM_DEFAULT(false);
 
+    /** True if arena (battle/soccer) ai profiling. */
+    PARAM_PREFIX bool m_arena_ai_stats PARAM_DEFAULT(false);
+
     /** True if slipstream debugging is activated. */
     PARAM_PREFIX bool m_slipstream_debug  PARAM_DEFAULT( false );
 

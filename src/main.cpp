@@ -772,6 +772,39 @@ int handleCmdLine()
         AIBaseController::setTestAI(n);
     if (CommandLine::has("--fps-debug"))
         UserConfigParams::m_fps_debug = true;
+    if(CommandLine::has("--soccer-ai-stats"))
+    {
+        UserConfigParams::m_arena_ai_stats=true;
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
+        std::vector<std::string> l;
+        for (int i = 0; i < 8; i++)
+            l.push_back("tux");
+        race_manager->setDefaultAIKartList(l);
+        race_manager->setNumKarts(8);
+        race_manager->setMaxGoal(30);
+        race_manager->setTrack("soccer_field");
+        race_manager->setDifficulty(RaceManager::Difficulty(3));
+        UserConfigParams::m_no_start_screen = true;
+        UserConfigParams::m_race_now = true;
+        UserConfigParams::m_sfx = false;
+        UserConfigParams::m_music = false;
+    }
+    if(CommandLine::has("--battle-ai-stats"))
+    {
+        UserConfigParams::m_arena_ai_stats=true;
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+        std::vector<std::string> l;
+        for (int i = 0; i < 8; i++)
+            l.push_back("tux");
+        race_manager->setDefaultAIKartList(l);
+        race_manager->setTrack("temple");
+        race_manager->setNumKarts(8);
+        race_manager->setDifficulty(RaceManager::Difficulty(3));
+        UserConfigParams::m_no_start_screen = true;
+        UserConfigParams::m_race_now = true;
+        UserConfigParams::m_sfx = false;
+        UserConfigParams::m_music = false;
+    }
 
     if(UserConfigParams::m_artist_debug_mode)
     {

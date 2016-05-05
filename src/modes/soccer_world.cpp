@@ -17,8 +17,10 @@
 
 #include "modes/soccer_world.hpp"
 
+#include "main_loop.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "karts/abstract_kart.hpp"
@@ -53,6 +55,8 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
         WorldStatus::setClockMode(CLOCK_CHRONO);
     }
 
+    m_frame_count = 0;
+    m_start_time = irr_driver->getRealTime();
     m_use_highscores = false;
 }   // SoccerWorld
 
@@ -183,6 +187,8 @@ void SoccerWorld::update(float dt)
             }
         }
     }
+    if (UserConfigParams::m_arena_ai_stats)
+        m_frame_count++;
 
 }   // update
 
@@ -642,3 +648,38 @@ void SoccerWorld::resetBall()
     m_ball->reset();
     m_ball->getPhysicalObject()->reset();
 }   // resetBall
+
+//-----------------------------------------------------------------------------
+void SoccerWorld::enterRaceOverState()
+{
+    if (UserConfigParams::m_arena_ai_stats)
+    {
+        float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
+        Log::verbose("Soccer AI profiling", "Number of frames: %d, Average FPS: %f",
+            m_frame_count, (float)m_frame_count/runtime);
+        Log::verbose("Soccer AI profiling", "Time for a team to have 30 goals: %f",
+            runtime);
+
+        // Own goal rate
+        int red_own_goal = 0;
+        int blue_own_goal = 0;
+        for (unsigned i = 0; i < m_red_scorers.size(); i++)
+        {
+            if (!m_red_scorers[i].m_correct_goal)
+                red_own_goal++;
+        }
+        for (unsigned i = 0; i < m_blue_scorers.size(); i++)
+        {
+            if (!m_blue_scorers[i].m_correct_goal)
+                blue_own_goal++;
+        }
+
+        Log::verbose("Soccer AI profiling", "Own goal rate: red %d\%, blue %d\%",
+            int(red_own_goal * 100 / m_red_scorers.size()),
+            int(blue_own_goal * 100 / m_blue_scorers.size()));
+        delete this;
+        main_loop->abort();
+    }
+    else
+        WorldStatus::enterRaceOverState();
+}   // enterRaceOverState
