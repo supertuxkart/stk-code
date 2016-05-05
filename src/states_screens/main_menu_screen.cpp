@@ -496,7 +496,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         if (PlayerManager::getCurrentOnlineId())
         {
             ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
-            OnlineProfileServers::getInstance()->push();
+            //OnlineProfileServers::getInstance()->push();
+            TabOnlineProfileAchievements::getInstance()->push();
         }
         else
         {

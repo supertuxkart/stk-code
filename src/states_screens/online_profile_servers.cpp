@@ -64,8 +64,8 @@ void OnlineProfileServers::loadedFromFile()
 void OnlineProfileServers::init()
 {
     OnlineProfileBase::init();
-    m_profile_tabs->select( m_servers_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
-    m_servers_tab->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    //m_profile_tabs->select( m_servers_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
+    //m_servers_tab->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     // OnlineScreen::getInstance()->push();
 }   // init
 

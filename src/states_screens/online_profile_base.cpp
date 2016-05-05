@@ -42,7 +42,7 @@ using namespace Online;
 OnlineProfileBase::OnlineProfileBase(const std::string &filename) 
                  : Screen(filename.c_str())
 {
-    m_servers_tab = NULL;
+    //m_servers_tab = NULL;
     m_friends_tab = NULL;
     m_achievements_tab = NULL;
     m_settings_tab = NULL;
@@ -63,8 +63,8 @@ void OnlineProfileBase::loadedFromFile()
         m_friends_tab = (IconButtonWidget *)m_profile_tabs->findWidgetNamed("tab_friends");
         assert(m_friends_tab != NULL);
 
-        m_servers_tab = (IconButtonWidget *)m_profile_tabs->findWidgetNamed("tab_servers");
-        assert(m_servers_tab != NULL);
+        //m_servers_tab = (IconButtonWidget *)m_profile_tabs->findWidgetNamed("tab_servers");
+        //assert(m_servers_tab != NULL);
 
         m_achievements_tab = (IconButtonWidget*)m_profile_tabs->findWidgetNamed("tab_achievements");
         assert(m_profile_tabs == NULL || m_achievements_tab != NULL);
@@ -107,7 +107,7 @@ void OnlineProfileBase::init()
 
     if (m_profile_tabs)
     {
-        m_servers_tab->setTooltip(_("Servers"));
+        //m_servers_tab->setTooltip(_("Servers"));
         m_friends_tab->setTooltip(_("Friends"));
         m_achievements_tab->setTooltip(_("Achievements"));
         m_settings_tab->setTooltip(_("Account Settings"));
@@ -159,8 +159,8 @@ void OnlineProfileBase::eventCallback(Widget* widget, const std::string& name,
             sm->replaceTopMostScreen(TabOnlineProfileAchievements::getInstance());
         else if (selection == m_settings_tab->m_properties[PROP_ID])
             sm->replaceTopMostScreen(OnlineProfileSettings::getInstance());
-        else if (selection == m_servers_tab->m_properties[PROP_ID])
-            sm->replaceTopMostScreen(OnlineProfileServers::getInstance());
+        //else if (selection == m_servers_tab->m_properties[PROP_ID])
+        //    sm->replaceTopMostScreen(OnlineProfileServers::getInstance());
     }
     else if (name == "back")
     {
