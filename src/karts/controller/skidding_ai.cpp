@@ -494,12 +494,12 @@ void SkiddingAI::handleSteering(float dt)
         //-1 = left, 1 = right, 0 = no crash.
         if( m_start_kart_crash_direction == 1 )
         {
-            steer_angle = steerToAngle(next, -M_PI*0.5f );
+            steer_angle = steerToAngle(next, M_PI*0.5f );
             m_start_kart_crash_direction = 0;
         }
         else if(m_start_kart_crash_direction == -1)
         {
-            steer_angle = steerToAngle(next, M_PI*0.5f);
+            steer_angle = steerToAngle(next, -M_PI*0.5f);
             m_start_kart_crash_direction = 0;
         }
         else
@@ -507,12 +507,12 @@ void SkiddingAI::handleSteering(float dt)
             if(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ) >
                m_world->getDistanceToCenterForKart( m_crashes.m_kart ))
             {
-                steer_angle = steerToAngle(next, -M_PI*0.5f );
+                steer_angle = steerToAngle(next, M_PI*0.5f );
                 m_start_kart_crash_direction = 1;
             }
             else
             {
-                steer_angle = steerToAngle(next, M_PI*0.5f );
+                steer_angle = steerToAngle(next, -M_PI*0.5f );
                 m_start_kart_crash_direction = -1;
             }
         }
