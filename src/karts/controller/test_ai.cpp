@@ -1506,13 +1506,14 @@ void TestAI::handleAcceleration( const float dt)
         return;
     }
 
-    // This test appears to be incorrect, since at this stage
-    // m_brake has not been reset from the previous frame
-    //if( m_controls->m_brake )
-    //{
-    //    m_controls->m_accel = 0.0f;
-    //   return;
-    //}
+    // FIXME: This test appears to be incorrect, since at this stage
+    // m_brake has not been reset from the previous frame, which can
+    // cause too long slow downs
+    if( m_controls->m_brake )
+    {
+        m_controls->m_accel = 0.0f;
+        return;
+    }
 
     if(m_kart->getBlockedByPlungerTime()>0)
     {
@@ -1586,9 +1587,10 @@ void TestAI::handleNitroAndZipper()
     // is already fast.
 
     // If we are already very fast, save nitro.
-    //if(m_kart->getSpeed() > 0.95f*m_kart->getCurrentMaxSpeed())
-    //    return;
-
+    if(m_kart->getSpeed() > 0.95f*m_kart->getCurrentMaxSpeed())
+        return;
+    // About the above: removing this line might enable the AI to better use
+    // nitro and zippers .
     // This works well for some tracks (math, lighthouse
     // sandtrack), but worse in others (zen, xr591). The good result
     // is caused by long straights in which the AI will now use zippers,
@@ -2387,7 +2389,7 @@ void TestAI::setSteering(float angle, float dt)
     if(!canSkid(steer_fraction))
     {
         m_skid_probability_state = SKID_PROBAB_NOT_YET;
-        m_controls->m_skid       = KartControl::SC_NONE;
+        m_controls->m_skid           = KartControl::SC_NONE;
     }
     else
     {
