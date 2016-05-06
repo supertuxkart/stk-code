@@ -35,6 +35,8 @@
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/controller/end_controller.hpp"
+#include "karts/controller/local_player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
@@ -494,13 +496,23 @@ void RaceResultGUI::backToLobby()
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
 
             // Identify Human player, if so display real name other than kart name
-            const int rm_id = kart->getWorldKartId() -
-                (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
 
-            if (rm_id >= 0 && !race_manager->isWatchingReplay())
-                ri->m_kart_name = race_manager->getKartInfo(rm_id).getPlayerName();
+            const EndController *ec = 
+                dynamic_cast<const EndController*>(kart->getController());
+            // If the race was given up, there is no end controller for the
+            // players, so this case needs to be handled separately
+            if(ec && ec->isLocalPlayerController())
+                ri->m_kart_name = ec->getName();
             else
-                ri->m_kart_name = translations->fribidize(kart->getName());
+            {
+                const PlayerController *pc = 
+                    dynamic_cast<const PlayerController*>(kart->getController());
+                // Check if the kart is a player controller to get the real name
+                if(pc)
+                    ri->m_kart_name = pc->getName();
+                else
+                    ri->m_kart_name = translations->fribidize(kart->getName());
+            }
 
             video::ITexture *icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
