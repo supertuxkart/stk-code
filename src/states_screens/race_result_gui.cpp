@@ -1102,6 +1102,7 @@ void RaceResultGUI::backToLobby()
             if (own_goal)
             {
                 result_text.append(" ");
+                //I18N: indicates a player that scored in their own goal in result screen
                 result_text.append(_("(Own Goal)"));
             }
 
