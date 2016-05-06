@@ -493,14 +493,7 @@ void RaceResultGUI::backToLobby()
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
 
-            // Identify Human player, if so display real name other than kart name
-            const int rm_id = kart->getWorldKartId() -
-                (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
-
-            if (rm_id >= 0 && !race_manager->isWatchingReplay())
-                ri->m_kart_name = race_manager->getKartInfo(rm_id).getPlayerName();
-            else
-                ri->m_kart_name = translations->fribidize(kart->getName());
+            ri->m_kart_name = getKartNameForResult(kart, rank_world);
 
             video::ITexture *icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -866,13 +859,7 @@ void RaceResultGUI::backToLobby()
             ri->m_kart_icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
 
-            const int rm_id = kart_id -
-                (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
-
-            if (rm_id >= 0 && !race_manager->isWatchingReplay())
-                ri->m_kart_name = race_manager->getKartInfo(rm_id).getPlayerName();
-            else
-                ri->m_kart_name = translations->fribidize(kart->getName());
+            ri->m_kart_name = getKartNameForResult(kart, World::getWorld());
 
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
 
@@ -1447,3 +1434,32 @@ void RaceResultGUI::backToLobby()
         assert(m_font != NULL);
         return m_font->getDimension(L"A").Height; //Could be any capital letter
     }
+    
+    // ----------------------------------------------------------------------------
+    irr::core::stringw RaceResultGUI::getKartNameForResult(const AbstractKart *kart, World *world)
+    {
+        // Identify human player, if so display real name other than kart name
+        if (race_manager->isWatchingReplay() ||
+            (kart->getType() != RaceManager::KT_PLAYER &&
+            kart->getType() != RaceManager::KT_NETWORK_PLAYER))
+        {
+            return translations->fribidize(kart->getName());
+        }
+        
+        // Find out, how many non-human player karts started in front of this kart
+        unsigned int num_ai_karts = 0;
+        for (unsigned int i = 0; i < kart->getWorldKartId(); i++)
+        {
+            const AbstractKart *kart_i = world->getKart(i);
+            if (kart_i->getType() != RaceManager::KT_PLAYER &&
+                kart_i->getType() != RaceManager::KT_NETWORK_PLAYER)
+            {
+                num_ai_karts++;
+            }
+        }
+
+        // The index of the human player's kart (among human players only)
+        const int rm_id = kart->getWorldKartId() - num_ai_karts;
+        return race_manager->getKartInfo(rm_id).getPlayerName();
+    }
+
