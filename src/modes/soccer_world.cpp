@@ -54,6 +54,8 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
     }
 
     m_use_highscores = false;
+    m_red_ai = 0;
+    m_blue_ai = 0;
 }   // SoccerWorld
 
 //-----------------------------------------------------------------------------
@@ -355,22 +357,10 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
 
     if (kart_type == RaceManager::KT_AI)
     {
-        if (race_manager->getNumPlayers() == 1)
-        {
-            // Make AI even when single player choose a different team
-            if (race_manager->getKartInfo(0).getSoccerTeam() == SOCCER_TEAM_RED)
-            {
-                team = (index % 2 == 0 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
-            }
-            else
-            {
-                team = (index % 2 == 0 ? SOCCER_TEAM_RED : SOCCER_TEAM_BLUE);
-            }
-        }
+        if (index < m_red_ai)
+            team = SOCCER_TEAM_RED;
         else
-        {
-            team = (index % 2 == 0 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
-        }
+            team = SOCCER_TEAM_BLUE;
         m_kart_team_map[index] = team;
     }
     else
@@ -642,3 +632,44 @@ void SoccerWorld::resetBall()
     m_ball->reset();
     m_ball->getPhysicalObject()->reset();
 }   // resetBall
+
+//-----------------------------------------------------------------------------
+void SoccerWorld::setAITeam()
+{
+    const int total_player = race_manager->getNumPlayers();
+    const int total_karts = race_manager->getNumberOfKarts();
+
+    // No AI
+    if ((total_karts - total_player) == 0) return;
+
+    int red_player = 0;
+    int blue_player = 0;
+    for (int i = 0; i < total_player; i++)
+    {
+        SoccerTeam team = race_manager->getKartInfo(i).getSoccerTeam();
+        assert(team != SOCCER_TEAM_NONE);
+        team == SOCCER_TEAM_BLUE ? blue_player++ : red_player++;
+    }
+
+    int avaliable_ai = total_karts - red_player - blue_player;
+    while (avaliable_ai > 0)
+    {
+        if ((m_red_ai + red_player) > (m_blue_ai + blue_player))
+        {
+            m_blue_ai++;
+            avaliable_ai--;
+        }
+        else if ((m_blue_ai + blue_player) > (m_red_ai + red_player))
+        {
+            m_red_ai++;
+            avaliable_ai--;
+        }
+        else if ((m_blue_ai + blue_player) == (m_red_ai + red_player))
+        {
+            blue_player > red_player ? m_red_ai++ : m_blue_ai++;
+            avaliable_ai--;
+        }
+    }
+    Log::debug("SoccerWorld","blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
+
+}   // setAITeam
