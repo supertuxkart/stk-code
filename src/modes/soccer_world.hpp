@@ -91,6 +91,9 @@ private:
     int m_red_defender;
     int m_blue_defender;
 
+    int m_red_ai;
+    int m_blue_ai;
+
     /** Set the team for the karts */
     void initKartList();
     /** Function to init the locations of two goals on the polygon map */
@@ -177,6 +180,8 @@ public:
     {
         return (team == SOCCER_TEAM_BLUE ? m_blue_defender : m_red_defender);
     }
+    // ------------------------------------------------------------------------
+    void setAITeam();
 
 };   // SoccerWorld
 

@@ -49,6 +49,7 @@ SoccerAI::SoccerAI(AbstractKart *kart)
 #endif
     m_world = dynamic_cast<SoccerWorld*>(World::getWorld());
     m_track = m_world->getTrack();
+    m_cur_team = m_world->getKartTeam(m_kart->getWorldKartId());
 
     // Don't call our own setControllerName, since this will add a
     // billboard showing 'AIBaseController' to the kart.
@@ -75,25 +76,6 @@ void SoccerAI::reset()
     AIBaseController::reset();
 
     m_saving_ball = false;
-    if (race_manager->getNumPlayers() == 1)
-    {
-        // Same handle in SoccerWorld::createKart
-        if (race_manager->getKartInfo(0).getSoccerTeam() == SOCCER_TEAM_RED)
-        {
-            m_cur_team = (m_kart->getWorldKartId() % 2 == 0 ?
-               SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
-        }
-        else
-        {
-            m_cur_team = (m_kart->getWorldKartId() % 2 == 0 ?
-               SOCCER_TEAM_RED : SOCCER_TEAM_BLUE);
-        }
-    }
-    else
-    {
-        m_cur_team = (m_kart->getWorldKartId() % 2 == 0 ?
-            SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
-    }
 }   // reset
 
 //-----------------------------------------------------------------------------
