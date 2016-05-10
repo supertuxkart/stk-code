@@ -44,7 +44,6 @@ DEFINE_SCREEN_SINGLETON( NetworkKartSelectionScreen );
 NetworkKartSelectionScreen::NetworkKartSelectionScreen()
                           : KartSelectionScreen("karts_online.stkgui")
 {
-    KartSelectionScreen::m_instance_ptr = this;
 }   // NetworkKartSelectionScreen
 
 // ----------------------------------------------------------------------------
