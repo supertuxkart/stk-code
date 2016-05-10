@@ -8,28 +8,28 @@
   <summary>A racing game</summary>
   <description>
     <p>
-      SuperTuxKart is a fun 3D kart racing game.
-      You can play with up to 4 friends on one PC, racing against each other or
-      just try to beat the computer.
+      Supertuxkart is a free 3D kart racing game, with a focus on having fun over
+      realism. You can play with up to 4 friends on one PC, racing against each
+      other, or try to beat the computer in single-player mode.
     </p>
     <p>
       See the great lighthouse or drive through the sand and visit the pyramids.
-      Race underground or in space, watching the stars passing by.
-      Have some rest under the palms on the beach (watching the other karts
-      overtaking you :) ).
-      But don't eat the bananas! Watch for bowling balls, plungers, bubble gum
-      and cakes thrown by opponents.
+      Race underground or in space, watching the stars pass by. Or rest under the
+      palm trees on the beach, watching the other karts overtake you. But don't eat
+      the bananas! Watch for bowling balls, plungers, bubble gum and cakes thrown by
+      your opponents.
     </p>
     <p>
-      You can do a single race against other karts, compete in one of several
-      Grand Prix, try to beat the high score in time trials on your own, play
-      battle mode against your friends, and more!
+      You can do a single race against other karts, compete in one of several Grand
+      Prix, try to beat the high score in time trials on your own, play battle mode
+      against the computer or your friends, and more!
     </p>
   </description>
   <url type="homepage">http://supertuxkart.sourceforge.net/</url>
   <screenshots>
-    <screenshot type="default">http://supertuxkart.sourceforge.net/persistent/images/4/4d/SuperTuxKart_0.8_screenshot.jpg</screenshot>
-    <screenshot>http://supertuxkart.sourceforge.net/persistent/images/1/1f/SuperTuxKart_0.8_screenshot4.jpg</screenshot>
+    <screenshot type="default">http://supertuxkart.sourceforge.net/persistent/images/4/4e/Supertuxkart-0.9-screenshot-2.jpg</screenshot>
+    <screenshot>http://supertuxkart.sourceforge.net/persistent/images/a/a9/Supertuxkart-0.9-screenshot-1.jpg</screenshot>
+    <screenshot>http://supertuxkart.sourceforge.net/persistent/images/6/63/Supertuxkart-0.9-screenshot-3.jpg</screenshot>
   </screenshots>
   <updatecontact>supertuxkart-devel@lists.sourceforge.net</updatecontact>
 </application>

@@ -65,7 +65,7 @@ protected:
     static int m_test_ai;
 
     /** Position info structure of targets. */
-    struct posData {bool behind; bool on_side; float angle; float distance;};
+    struct posData {bool behind; bool lhs; float angle; float distance;};
 
     void         setControllerName(const std::string &name);
     float        steerToPoint(const Vec3 &point);

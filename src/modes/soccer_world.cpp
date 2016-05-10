@@ -30,7 +30,6 @@
 #include "karts/controller/soccer_ai.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
-#include "tracks/check_goal.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -54,6 +53,8 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
     }
 
     m_use_highscores = false;
+    m_red_ai = 0;
+    m_blue_ai = 0;
 }   // SoccerWorld
 
 //-----------------------------------------------------------------------------
@@ -76,8 +77,11 @@ void SoccerWorld::init()
     m_display_rank = false;
     m_goal_timer = 0.0f;
     m_ball_hitter = -1;
+    m_red_check_goal = NULL;
+    m_blue_check_goal = NULL;
     m_goal_target = race_manager->getMaxGoal();
     m_goal_sound = SFXManager::get()->createSoundSource("goal_scored");
+    initGoal();
 
 }   // init
 
@@ -129,8 +133,7 @@ void SoccerWorld::reset()
     }
 
     initKartList();
-    resetAllNodes();
-    initGoalNodes();
+    resetAllPosition();
     resetBall();
 
 }   // reset
@@ -355,22 +358,10 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
 
     if (kart_type == RaceManager::KT_AI)
     {
-        if (race_manager->getNumPlayers() == 1)
-        {
-            // Make AI even when single player choose a different team
-            if (race_manager->getKartInfo(0).getSoccerTeam() == SOCCER_TEAM_RED)
-            {
-                team = (index % 2 == 0 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
-            }
-            else
-            {
-                team = (index % 2 == 0 ? SOCCER_TEAM_RED : SOCCER_TEAM_BLUE);
-            }
-        }
+        if (index < m_red_ai)
+            team = SOCCER_TEAM_RED;
         else
-        {
-            team = (index % 2 == 0 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
-        }
+            team = SOCCER_TEAM_BLUE;
         m_kart_team_map[index] = team;
     }
     else
@@ -484,9 +475,7 @@ void SoccerWorld::updateBallPosition(float dt)
 }   // updateBallPosition
 
 //-----------------------------------------------------------------------------
-/** Localize two goals on the navigation mesh.
- */
-void SoccerWorld::initGoalNodes()
+void SoccerWorld::initGoal()
 {
     if (!m_track->hasNavMesh()) return;
 
@@ -500,20 +489,18 @@ void SoccerWorld::initGoalNodes()
         {
             if (goal->getTeam())
             {
-                m_blue_goal_node = BattleGraph::get()->pointToNode(m_blue_goal_node,
-                                   goal->convertTo3DCenter(), true/*ignore_vertical*/);
+                m_blue_check_goal = goal;
             }
             else
             {
-                m_red_goal_node  = BattleGraph::get()->pointToNode(m_red_goal_node,
-                                   goal->convertTo3DCenter(), true/*ignore_vertical*/);
+                m_red_check_goal = goal;
             }
         }
     }
-}   // initGoalNodes
+}   // initGoal
 
 //-----------------------------------------------------------------------------
-void SoccerWorld::resetAllNodes()
+void SoccerWorld::resetAllPosition()
 {
     m_kart_on_node.clear();
     m_kart_on_node.resize(m_karts.size());
@@ -521,9 +508,7 @@ void SoccerWorld::resetAllNodes()
         m_kart_on_node[n] = BattleGraph::UNKNOWN_POLY;
     m_ball_on_node = BattleGraph::UNKNOWN_POLY;
     m_ball_position = Vec3(0, 0, 0);
-    m_red_goal_node = BattleGraph::UNKNOWN_POLY;
-    m_blue_goal_node = BattleGraph::UNKNOWN_POLY;
-}   // resetAllNodes
+}   // resetAllPosition
 //-----------------------------------------------------------------------------
 SoccerTeam SoccerWorld::getKartTeam(unsigned int kart_id) const
 {
@@ -571,9 +556,8 @@ void SoccerWorld::updateDefenders()
             getKartTeam(m_karts[i]->getWorldKartId()) != SOCCER_TEAM_RED)
             continue;
 
-        Vec3 d = NavMesh::get()->getNavPoly(this
-            ->getGoalNode(SOCCER_TEAM_RED)).getCenter()
-            - m_karts[i]->getXYZ();
+        Vec3 d = this->getGoalLocation(SOCCER_TEAM_RED,
+            CheckGoal::POINT_CENTER) - m_karts[i]->getXYZ();
 
         if (d.length_2d() <= distance)
         {
@@ -593,9 +577,8 @@ void SoccerWorld::updateDefenders()
             getKartTeam(m_karts[i]->getWorldKartId()) != SOCCER_TEAM_BLUE)
             continue;
 
-        Vec3 d = NavMesh::get()->getNavPoly(this
-            ->getGoalNode(SOCCER_TEAM_BLUE)).getCenter()
-            - m_karts[i]->getXYZ();
+        Vec3 d = this->getGoalLocation(SOCCER_TEAM_BLUE,
+            CheckGoal::POINT_CENTER) - m_karts[i]->getXYZ();
 
         if (d.length_2d() <= distance)
         {
@@ -642,3 +625,52 @@ void SoccerWorld::resetBall()
     m_ball->reset();
     m_ball->getPhysicalObject()->reset();
 }   // resetBall
+
+//-----------------------------------------------------------------------------
+void SoccerWorld::setAITeam()
+{
+    const int total_player = race_manager->getNumPlayers();
+    const int total_karts = race_manager->getNumberOfKarts();
+
+    // No AI
+    if ((total_karts - total_player) == 0) return;
+
+    int red_player = 0;
+    int blue_player = 0;
+    for (int i = 0; i < total_player; i++)
+    {
+        SoccerTeam team = race_manager->getKartInfo(i).getSoccerTeam();
+        assert(team != SOCCER_TEAM_NONE);
+        team == SOCCER_TEAM_BLUE ? blue_player++ : red_player++;
+    }
+
+    int available_ai = total_karts - red_player - blue_player;
+    while (available_ai > 0)
+    {
+        if ((m_red_ai + red_player) > (m_blue_ai + blue_player))
+        {
+            m_blue_ai++;
+            available_ai--;
+        }
+        else if ((m_blue_ai + blue_player) > (m_red_ai + red_player))
+        {
+            m_red_ai++;
+            available_ai--;
+        }
+        else if ((m_blue_ai + blue_player) == (m_red_ai + red_player))
+        {
+            blue_player > red_player ? m_red_ai++ : m_blue_ai++;
+            available_ai--;
+        }
+    }
+    Log::debug("SoccerWorld","blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
+
+}   // setAITeam
+
+//-----------------------------------------------------------------------------
+const Vec3& SoccerWorld::getGoalLocation(SoccerTeam team,
+                                         CheckGoal::PointLocation point) const
+{
+    return (team == SOCCER_TEAM_BLUE ? m_blue_check_goal->getPoint(point) :
+        m_red_check_goal->getPoint(point));
+}   // getGoalLocation
