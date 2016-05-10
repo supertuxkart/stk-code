@@ -120,6 +120,7 @@ private:
     virtual bool isWaiting() const = 0;
     virtual void findClosestKart(bool use_difficulty) = 0;
     virtual void findTarget() = 0;
+    virtual bool forceBraking() { return false; }
 public:
                  ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};

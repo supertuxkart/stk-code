@@ -22,6 +22,7 @@
 #include "modes/world_with_rank.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "karts/abstract_kart.hpp"
+#include "tracks/check_goal.hpp"
 
 #include <IMesh.h>
 #include <string>
@@ -85,8 +86,9 @@ private:
     std::vector<int> m_kart_on_node;
     int m_ball_on_node;
     Vec3 m_ball_position;
-    int m_red_goal_node;
-    int m_blue_goal_node;
+
+    CheckGoal* m_red_check_goal;
+    CheckGoal* m_blue_check_goal;
 
     int m_red_defender;
     int m_blue_defender;
@@ -96,14 +98,14 @@ private:
 
     /** Set the team for the karts */
     void initKartList();
-    /** Function to init the locations of two goals on the polygon map */
-    void initGoalNodes();
+    /** Function to save check goal for the getting of coordinate */
+    void initGoal();
     /** Function to update the locations of all karts on the polygon map */
     void updateKartNodes();
     /** Function to update the location the ball on the polygon map */
     void updateBallPosition(float dt);
     /** Clean up */
-    void resetAllNodes();
+    void resetAllPosition();
     /** Reset the ball to original starting position. */
     void resetBall();
     /** Function to update the AI which is the closest to its goal to defend. */
@@ -169,11 +171,6 @@ public:
     const Vec3& getBallPosition() const
                                           {  return m_ball_position;         }
     // ------------------------------------------------------------------------
-    const int getGoalNode(SoccerTeam team) const
-    {
-        return (team == SOCCER_TEAM_BLUE ? m_blue_goal_node : m_red_goal_node);
-    }
-    // ------------------------------------------------------------------------
     bool isCorrectGoal(unsigned int kart_id, bool first_goal) const;
     // ------------------------------------------------------------------------
     const int getDefender(SoccerTeam team) const
@@ -182,6 +179,10 @@ public:
     }
     // ------------------------------------------------------------------------
     void setAITeam();
+    // ------------------------------------------------------------------------
+    const Vec3& getGoalLocation(SoccerTeam team,
+                                CheckGoal::PointLocation point) const;
+    // ------------------------------------------------------------------------
 
 };   // SoccerWorld
 
