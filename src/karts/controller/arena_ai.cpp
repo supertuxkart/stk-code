@@ -243,7 +243,7 @@ void ArenaAI::handleArenaSteering(const float dt)
 #endif
         if (m_cur_kart_pos_data.behind)
         {
-            m_adjusting_side = m_cur_kart_pos_data.on_side;
+            m_adjusting_side = m_cur_kart_pos_data.lhs;
             m_is_uturn = true;
         }
         else
@@ -278,7 +278,7 @@ void ArenaAI::handleArenaSteering(const float dt)
 #endif
         if (m_cur_kart_pos_data.behind)
         {
-            m_adjusting_side = m_cur_kart_pos_data.on_side;
+            m_adjusting_side = m_cur_kart_pos_data.lhs;
             m_is_uturn = true;
         }
         else
@@ -318,7 +318,7 @@ void ArenaAI::handleArenaBanana()
             {
                 // Check whether it's straight ahead towards a banana
                 // If so, adjust target point
-                banana_lc = (banana_pos.on_side ? banana_lc + Vec3 (2, 0, 0) :
+                banana_lc = (banana_pos.lhs ? banana_lc + Vec3 (2, 0, 0) :
                     banana_lc - Vec3 (2, 0, 0));
                 m_target_point = m_kart->getTrans()(banana_lc);
                 m_target_node  = BattleGraph::get()
@@ -490,15 +490,21 @@ void ArenaAI::stringPull(const Vec3& start_pos, const Vec3& end_pos)
  */
 void ArenaAI::handleArenaBraking()
 {
-    m_controls->m_brake = false;
-
-    if (getCurrentNode() == BattleGraph::UNKNOWN_POLY ||
-        m_target_node    == BattleGraph::UNKNOWN_POLY) return;
-
     // A kart will not brake when the speed is already slower than this
     // value. This prevents a kart from going too slow (or even backwards)
     // in tight curves.
     const float MIN_SPEED = 5.0f;
+
+    if (forceBraking() && m_kart->getSpeed() > MIN_SPEED)
+    {
+        // Brake now
+        return;
+    }
+
+    m_controls->m_brake = false;
+
+    if (getCurrentNode() == BattleGraph::UNKNOWN_POLY ||
+        m_target_node    == BattleGraph::UNKNOWN_POLY) return;
 
     float current_curve_radius = determineTurnRadius(m_kart->getXYZ(),
         m_path_corners[0], (m_path_corners.size() >= 2 ? m_path_corners[1] :

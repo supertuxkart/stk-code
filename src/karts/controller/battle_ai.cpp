@@ -161,12 +161,12 @@ void BattleAI::findTarget()
     }
 }   // findTarget
 
-// ------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int BattleAI::getCurrentNode() const
 {
     return m_world->getKartNode(m_kart->getWorldKartId());
 }   // getCurrentNode
-// ------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool BattleAI::isWaiting() const
 {
     return m_world->isStartPhase();
