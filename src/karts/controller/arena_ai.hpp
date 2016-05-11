@@ -56,6 +56,7 @@ protected:
     /** For debugging purpose: a sphere indicating where the AI
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
+    irr::scene::ISceneNode *m_debug_sphere_next;
 
     /** The node(poly) at which the target point lies in. */
     int m_target_node;
@@ -104,7 +105,8 @@ private:
     float m_time_since_uturn;
 
     void         checkIfStuck(const float dt);
-    float        determineTurnRadius(std::vector<Vec3>& points);
+    float        determineTurnRadius(const Vec3& p1, const Vec3& p2,
+                                     const Vec3& p3);
     void         findPortals(int start, int end);
     void         handleArenaAcceleration(const float dt);
     void         handleArenaBanana();
@@ -118,6 +120,7 @@ private:
     virtual bool isWaiting() const = 0;
     virtual void findClosestKart(bool use_difficulty) = 0;
     virtual void findTarget() = 0;
+    virtual bool forceBraking() { return false; }
 public:
                  ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};

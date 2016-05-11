@@ -42,6 +42,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
+#include "modes/soccer_world.hpp"
 #include "network/network_config.hpp"
 #include "physics/btKart.hpp"
 #include "physics/physics.hpp"
@@ -190,6 +191,11 @@ void World::init()
         for (unsigned int k = 0; k < gk; k++)
             m_karts.push_back(ReplayPlay::get()->getGhostKart(k));
     }
+
+    // Assign team of AIs for soccer mode before createKart
+    SoccerWorld* sw = dynamic_cast<SoccerWorld*>(this);
+    if (sw)
+        sw->setAITeam();
 
     for(unsigned int i=0; i<num_karts; i++)
     {

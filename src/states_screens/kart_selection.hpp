@@ -36,6 +36,7 @@ namespace Online
     class OnlineProfile;
 }
 
+class FocusDispatcher;
 class InputDevice;
 class KartHoverListener;
 
@@ -78,6 +79,8 @@ protected:
 
     /** Message shown in multiplayer mode */
     GUIEngine::BubbleWidget* m_multiplayer_message;
+
+    FocusDispatcher  *m_dispatcher;
 
     KartSelectionScreen(const char* filename);
 

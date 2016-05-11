@@ -35,6 +35,8 @@
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/controller/end_controller.hpp"
+#include "karts/controller/local_player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
@@ -384,10 +386,6 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
-        // FIXME: why is this call necessary here? tearDown should be
-        // automatically called when the screen is left. Note that the
-        // NetworkKartSelectionScreen::getInstance()->tearDown(); caused #1347
-        KartSelectionScreen::getRunningInstance()->tearDown();
         Screen* newStack[] = { MainMenuScreen::getInstance(),
                               RaceSetupScreen::getInstance(),
                               NULL };
@@ -401,11 +399,6 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
-        // FIXME: why is this call necessary here? tearDown should be
-        // automatically called when the screen is left. Note that the
-        // NetworkKartSelectionScreen::getInstance()->tearDown(); caused #1347
-        //if (KartSelectionScreen::getRunningInstance() != NULL)
-        //    KartSelectionScreen::getRunningInstance()->tearDown();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
         if (race_manager->raceWasStartedFromOverworld())
@@ -492,15 +485,7 @@ void RaceResultGUI::backToLobby()
             // Save a pointer to the current row_info entry
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
-
-            // Identify Human player, if so display real name other than kart name
-            const int rm_id = kart->getWorldKartId() -
-                (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
-
-            if (rm_id >= 0 && !race_manager->isWatchingReplay())
-                ri->m_kart_name = race_manager->getKartInfo(rm_id).getPlayerName();
-            else
-                ri->m_kart_name = translations->fribidize(kart->getName());
+            ri->m_kart_name = getKartDisplayName(kart);
 
             video::ITexture *icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -865,16 +850,8 @@ void RaceResultGUI::backToLobby()
             RowInfo *ri = &(m_all_row_infos[rank]);
             ri->m_kart_icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
-
-            const int rm_id = kart_id -
-                (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
-
-            if (rm_id >= 0 && !race_manager->isWatchingReplay())
-                ri->m_kart_name = race_manager->getKartInfo(rm_id).getPlayerName();
-            else
-                ri->m_kart_name = translations->fribidize(kart->getName());
-
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
+            ri->m_kart_name = getKartDisplayName(kart);
 
             // In FTL karts do have a time, which is shown even when the kart
             // is eliminated
@@ -924,6 +901,29 @@ void RaceResultGUI::backToLobby()
             ri->m_new_overall_points = p;
         }   // i < num_karts
     }   // determineGPLayout
+
+    //-----------------------------------------------------------------------------
+    /** Returns a string to display next to a kart. For a player that's the name
+     *  of the player, for an AI kart it's the name of the driver. 
+     */
+    core::stringw RaceResultGUI::getKartDisplayName(const AbstractKart *kart) const
+    {
+        const EndController *ec = 
+            dynamic_cast<const EndController*>(kart->getController());
+        // If the race was given up, there is no end controller for the
+        // players, so this case needs to be handled separately
+        if(ec && ec->isLocalPlayerController())
+            return ec->getName();
+        else
+        {
+            // No end controller, check explicitely for a player controller
+            const PlayerController *pc = 
+                dynamic_cast<const PlayerController*>(kart->getController());
+            // Check if the kart is a player controller to get the real name
+            if(pc) return pc->getName();
+        }
+        return translations->fribidize(kart->getName());
+    }   // getKartDisplayName
 
     //-----------------------------------------------------------------------------
     /** Displays the race results for a single kart.
@@ -1102,6 +1102,7 @@ void RaceResultGUI::backToLobby()
             if (own_goal)
             {
                 result_text.append(" ");
+                //I18N: indicates a player that scored in their own goal in result screen
                 result_text.append(_("(Own Goal)"));
             }
 

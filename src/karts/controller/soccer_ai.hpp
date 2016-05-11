@@ -36,14 +36,17 @@ private:
 
     SoccerTeam m_cur_team;
     bool m_saving_ball;
+    bool m_force_brake;
 
     Vec3 correctBallPosition(const Vec3&);
+    bool isLikelyToGoal(SoccerTeam team) const;
 
     virtual void findClosestKart(bool use_difficulty);
     virtual void findTarget();
     virtual int  getCurrentNode() const;
     virtual bool isWaiting() const;
     virtual bool canSkid(float steer_fraction) { return m_saving_ball; }
+    virtual bool forceBraking() OVERRIDE       { return m_force_brake; }
 public:
                  SoccerAI(AbstractKart *kart);
                 ~SoccerAI();
