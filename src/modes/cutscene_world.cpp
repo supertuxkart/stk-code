@@ -301,12 +301,6 @@ void CutsceneWorld::update(float dt)
             rot2.setPitch(rot2.getPitch() + 90.0f);
             m_camera->setRotation(rot2.toIrrVector());
 
-            // irrlicht's "setRotation" only moves the lookat point but does not affect
-            // the up vector, so "roll" is lost in setRotation. Apply roll manually
-            irr::core::matrix4 affector;
-            affector.setRotationDegrees(core::vector3df(0.0f, 0.0f, rot2.z()));
-            m_camera->setViewMatrixAffector(affector);
-
             SFXManager::get()->positionListener(m_camera->getAbsolutePosition(),
                                           m_camera->getTarget() -
                                             m_camera->getAbsolutePosition(),
