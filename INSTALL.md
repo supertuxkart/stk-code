@@ -26,7 +26,7 @@ First, make sure that you have the following packages installed:
 Ubuntu command:
 
 ```
-sudo apt-get install autoconf automake build-essential cmake libogg-dev libvorbis-dev libopenal-dev libgl1-mesa-dev libglu1-mesa-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev libxrandr-dev libfreetype6-dev libpng12-dev pkgconf libjpeg-dev
+sudo apt-get install autoconf automake build-essential cmake libogg-dev libvorbis-dev libopenal-dev libglu1-mesa-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev libxrandr-dev libfreetype6-dev libpng12-dev pkgconf libjpeg-dev
 ```
   
 Unpack the files from the tarball like this:
