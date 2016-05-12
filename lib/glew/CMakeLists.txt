@@ -16,3 +16,4 @@ add_library(glew STATIC
 )
 
 add_definitions(-DGLEW_STATIC)
+add_definitions(-DGLEW_NO_GLU)
