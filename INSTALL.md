@@ -1,6 +1,7 @@
 # SuperTuxKart Installation Instructions
 
-Note: If you obtained this source code from Github, you also need to download the game assets from Sourceforge using SVN.
+Note: If you obtained this source code from Github, you also need to download 
+the game assets from Sourceforge using SVN.
 
 `svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets stk-assets`
 
@@ -26,7 +27,10 @@ First, make sure that you have the following packages installed:
 Ubuntu command:
 
 ```
-sudo apt-get install build-essential cmake libogg-dev libvorbis-dev libopenal-dev libglu1-mesa-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev libxrandr-dev libfreetype6-dev libpng12-dev pkgconf libjpeg-dev
+sudo apt-get install build-essential cmake libbluetooth-dev \
+libcurl4-gnutls-dev libfreetype6-dev libfribidi-dev libgl1-mesa-dev \
+libjpeg-dev libogg-dev libopenal-dev libpng-dev libvorbis-dev libxrandr-dev \
+mesa-common-dev pkg-config zlib1g-dev
 ```
   
 Unpack the files from the tarball like this:
