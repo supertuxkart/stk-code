@@ -114,8 +114,6 @@ void SoccerWorld::reset()
     }
     else WorldStatus::setClockMode(CLOCK_CHRONO);
 
-    m_red_goal = 0;
-    m_blue_goal = 0;
     m_red_scorers.clear();
     m_red_score_times.clear();
     m_blue_scorers.clear();
@@ -194,10 +192,6 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     if (isRaceOver() || isStartPhase())
         return;
 
-    // Notice: true first_goal means it's blue goal being shoot,
-    // so red team can score
-    (first_goal ? m_red_goal++ : m_blue_goal++);
-
     setPhase(WorldStatus::GOAL_PHASE);
     m_goal_sound->play();
     if (m_ball_hitter != -1)
@@ -220,6 +214,8 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 
         if (first_goal)
         {
+            // Notice: true first_goal means it's blue goal being shoot,
+            // so red team can score
             m_red_scorers.push_back(sd);
             if (race_manager->hasTimeTarget())
             {
