@@ -33,6 +33,10 @@ using namespace irr;
 using namespace std;
 #endif
 
+#ifdef BALL_AIM_DEBUG
+#include "graphics/camera.hpp"
+#endif
+
 SoccerAI::SoccerAI(AbstractKart *kart)
         : ArenaAI(kart)
 {
@@ -47,9 +51,21 @@ SoccerAI::SoccerAI(AbstractKart *kart)
     m_debug_sphere_next = irr_driver->addSphere(1.0f, col_debug_next);
     m_debug_sphere_next->setVisible(true);
 #endif
+
+#ifdef BALL_AIM_DEBUG
+    video::SColor red(128, 128, 0, 0);
+    video::SColor blue(128, 0, 0, 128);
+    m_red_sphere = irr_driver->addSphere(1.0f, red);
+    m_red_sphere->setVisible(true);
+    m_blue_sphere = irr_driver->addSphere(1.0f, blue);
+    m_blue_sphere->setVisible(true);
+#endif
+
     m_world = dynamic_cast<SoccerWorld*>(World::getWorld());
     m_track = m_world->getTrack();
     m_cur_team = m_world->getKartTeam(m_kart->getWorldKartId());
+    m_opp_team = (m_cur_team == SOCCER_TEAM_BLUE ?
+        SOCCER_TEAM_RED : SOCCER_TEAM_BLUE);
 
     // Don't call our own setControllerName, since this will add a
     // billboard showing 'AIBaseController' to the kart.
@@ -65,6 +81,12 @@ SoccerAI::~SoccerAI()
     irr_driver->removeNode(m_debug_sphere);
     irr_driver->removeNode(m_debug_sphere_next);
 #endif
+
+#ifdef BALL_AIM_DEBUG
+    irr_driver->removeNode(m_red_sphere);
+    irr_driver->removeNode(m_blue_sphere);
+#endif
+
 }   //  ~SoccerAI
 
 //-----------------------------------------------------------------------------
@@ -75,14 +97,19 @@ void SoccerAI::reset()
     ArenaAI::reset();
     AIBaseController::reset();
 
-    m_saving_ball = false;
+    m_overtake_ball = false;
     m_force_brake = false;
 }   // reset
 
 //-----------------------------------------------------------------------------
 void SoccerAI::update(float dt)
 {
-    m_saving_ball = false;
+#ifdef BALL_AIM_DEBUG
+    Vec3 red = m_world->getBallAimPosition(SOCCER_TEAM_RED);
+    Vec3 blue = m_world->getBallAimPosition(SOCCER_TEAM_BLUE);
+    m_red_sphere->setPosition(red.toIrrVector());
+    m_blue_sphere->setPosition(blue.toIrrVector());
+#endif
     m_force_brake = false;
 
     if (World::getWorld()->getPhase() == World::GOAL_PHASE)
@@ -135,132 +162,82 @@ void SoccerAI::findClosestKart(bool use_difficulty)
 //-----------------------------------------------------------------------------
 void SoccerAI::findTarget()
 {
-    // Check whether any defense is needed
-    if ((m_world->getBallPosition() - m_world->getGoalLocation(m_cur_team,
-        CheckGoal::POINT_CENTER)).length_2d() < 50.0f &&
-        m_world->getDefender(m_cur_team) == (signed)m_kart->getWorldKartId())
+    // Check if this AI kart is the one who will chase the ball
+    if (m_world->getBallChaser(m_cur_team) == (signed)m_kart->getWorldKartId())
     {
-        m_target_node = m_world->getBallNode();
-        m_target_point = correctBallPosition(m_world->getBallPosition());
+        m_target_point = determineBallAimingPosition();
+        m_target_node  = m_world->getBallNode();
         return;
     }
 
-    // Find a suitable target to drive to, either ball or powerup
-    if ((m_world->getBallPosition() - m_kart->getXYZ()).length_2d() > 20.0f &&
-        (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING &&
-         m_kart->getAttachment()->getType() != Attachment::ATTACH_SWATTER))
+    // Otherwise do the same as in battle mode, attack other karts
+    if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING &&
+        m_kart->getAttachment()->getType() != Attachment::ATTACH_SWATTER)
+    {
         collectItemInArena(&m_target_point , &m_target_node);
+    }
+    else if (m_world->getAttacker(m_cur_team) == (signed)m_kart
+        ->getWorldKartId())
+    {
+        // This AI will attack the other team ball chaser
+        int id = m_world->getBallChaser(m_cur_team == SOCCER_TEAM_BLUE ?
+            SOCCER_TEAM_RED : SOCCER_TEAM_BLUE);
+        m_target_point = m_world->getKart(id)->getXYZ();
+        m_target_node  = m_world->getKartNode(id);
+    }
     else
     {
-        m_target_node = m_world->getBallNode();
-        m_target_point = correctBallPosition(m_world->getBallPosition());
+        m_target_point = m_closest_kart_point;
+        m_target_node  = m_closest_kart_node;
     }
 
 }   // findTarget
 
 //-----------------------------------------------------------------------------
-Vec3 SoccerAI::correctBallPosition(const Vec3& orig_pos)
+Vec3 SoccerAI::determineBallAimingPosition()
 {
-    // Notice: Build with AI_DEBUG and change camera target to an AI kart,
-    // to debug or see how AI steer with the ball
+#ifdef BALL_AIM_DEBUG
+    // Choose your favourite team to watch
+    if (m_world->getKartTeam(m_kart->getWorldKartId()) == SOCCER_TEAM_BLUE)
+    {
+        Camera *cam = Camera::getActiveCamera();
+        cam->setMode(Camera::CM_NORMAL);
+        cam->setKart(m_kart);
+    }
+#endif
+
+    const Vec3& ball_aim_pos = m_world->getBallAimPosition(m_opp_team);
+    const Vec3& orig_pos = m_world->getBallPosition();
     posData ball_pos = {0};
+    posData aim_pos = {0};
     Vec3 ball_lc;
-    checkPosition(orig_pos, &ball_pos, &ball_lc);
+    Vec3 aim_lc;
+    checkPosition(orig_pos, &ball_pos);
+    checkPosition(orig_pos, &aim_pos, &aim_lc);
 
-    // Too far / behind from the ball,
+    // Too far from the ball,
     // use path finding from arena ai to get close
-    if (!(ball_pos.distance < 3.0f) || ball_pos.behind) return orig_pos;
+    if (ball_pos.distance > 6.0f) return ball_aim_pos;
 
-    // Save the opposite team
-    SoccerTeam opp_team = (m_cur_team == SOCCER_TEAM_BLUE ?
-        SOCCER_TEAM_RED : SOCCER_TEAM_BLUE);
+    const Vec3 dist_to_aim_point = m_kart->getFrontXYZ() - ball_aim_pos;
 
     // Prevent lost control when steering with ball
     const bool need_braking = ball_pos.angle > 0.1f &&
-        m_kart->getSpeed() > 9.0f && ball_pos.distance <2.5f;
+        m_kart->getSpeed() > 9.0f && ball_pos.distance < 3.0f;
 
-    // Goal / own goal detection first, as different aiming method will be used
-    const bool likely_to_goal =
-        ball_pos.angle < 0.2f && isLikelyToGoal(opp_team);
-    if (likely_to_goal)
-    {
-        if (need_braking)
-        {
-            m_controls->m_brake = true;
-            m_force_brake = true;
-            // Prevent keep pushing by aiming a nearer point
-            return m_kart->getTrans()(ball_lc - Vec3(0, 0, 1));
-        }
-        // Keep pushing the ball straight to the goal
-        return orig_pos;
-    }
-
-    const bool likely_to_own_goal =
-        ball_pos.angle < 0.2f && isLikelyToGoal(m_cur_team);
-    if (likely_to_own_goal)
-    {
-        // It's getting likely to own goal, apply more
-        // offset for skidding, to save the ball from behind
-        // scored.
-        if (m_cur_difficulty == RaceManager::DIFFICULTY_HARD ||
-            m_cur_difficulty == RaceManager::DIFFICULTY_BEST)
-            m_saving_ball = true;
-        return m_kart->getTrans()(ball_pos.lhs ?
-            ball_lc - Vec3(2, 0, 0) + Vec3(0, 0, 2) :
-            ball_lc + Vec3(2, 0, 2));
-    }
-
-    // Now try to make the ball face towards the goal
-    // Aim at upper/lower left/right corner of ball depends on location
-    posData goal_pos = {0};
-    checkPosition(m_world->getGoalLocation(opp_team, CheckGoal::POINT_CENTER),
-        &goal_pos);
-    Vec3 corrected_pos;
-    if (ball_pos.lhs && goal_pos.lhs)
-    {
-        corrected_pos = ball_lc + Vec3(1, 0, 1);
-    }
-    else if (!ball_pos.lhs && !goal_pos.lhs)
-    {
-        corrected_pos = ball_lc - Vec3(1, 0, 0) + Vec3(0, 0, 1);
-    }
-    else if (!ball_pos.lhs && goal_pos.lhs)
-    {
-        corrected_pos = ball_lc + Vec3(1, 0, 0) - Vec3(0, 0, 1);
-    }
-    else
-    {
-        corrected_pos = ball_lc - Vec3(1, 0, 1);
-    }
     if (need_braking)
     {
         m_controls->m_brake = true;
         m_force_brake = true;
     }
-    return m_kart->getTrans()(corrected_pos);
+    if (dist_to_aim_point.length_2d() < 0.4f)
+    {
+        //Log::info("","%f",dist_to_aim_point.length_2d());
+        return m_world->getBallTrans()(Vec3(0, 0, 1));
+    }
+    return ball_aim_pos;
+}   // determineBallAimingPosition
 
-}   // correctBallPosition
-
-//-----------------------------------------------------------------------------
-bool SoccerAI::isLikelyToGoal(SoccerTeam team) const
-{
-    // Use local coordinate for easy compare
-    Vec3 first_pos;
-    Vec3 last_pos;
-    checkPosition(m_world->getGoalLocation(team, CheckGoal::POINT_FIRST),
-        NULL, &first_pos);
-    checkPosition(m_world->getGoalLocation(team, CheckGoal::POINT_LAST),
-        NULL, &last_pos);
-
-    // If the kart lies between the first and last pos, and faces
-    // in front of them, than it's likely to goal
-    if ((first_pos.z() > 0.0f && last_pos.z() > 0.0f) &&
-        ((first_pos.x() < 0.0f && last_pos.x() > 0.0f) ||
-        (last_pos.x() < 0.0f && first_pos.x() > 0.0f)))
-        return true;
-
-    return false;
-}   // isLikelyToGoal
 //-----------------------------------------------------------------------------
 int SoccerAI::getCurrentNode() const
 {
