@@ -82,9 +82,8 @@ private:
         float m_red_goal_slope;
         float m_blue_goal_slope;
 
-        // These rotation objects only takes the ball heading into account,
+        // The transform only takes the ball heading into account,
         // ie no hpr of ball which allowing setting aim point easier
-        btQuaternion m_quat;
         btTransform m_trans;
 
         // Two goals
@@ -109,8 +108,7 @@ private:
             m_blue_goal_3 = Vec3(0, 0, 0);
             m_red_goal_slope = 1.0f;
             m_blue_goal_slope = 1.0f;
-            m_quat = btQuaternion(0, 0, 0, 1);
-            m_trans = btTransform(m_quat, Vec3(0, 0, 0));
+            m_trans = btTransform(btQuaternion(0, 0, 0, 1), Vec3(0, 0, 0));
         }   // reset
 
         const btTransform& getTrans() const
@@ -142,24 +140,24 @@ private:
 
         void updateBallAndGoal(const Vec3& ball_pos, float heading)
         {
-            m_quat = btQuaternion(Vec3(0, 1, 0), -heading);
+            btQuaternion quat(Vec3(0, 1, 0), -heading);
             m_trans = btTransform(btQuaternion(Vec3(0, 1, 0), heading),
                 ball_pos);
 
             // Red goal
-            m_red_goal_1 = quatRotate(m_quat, m_red_check_goal
+            m_red_goal_1 = quatRotate(quat, m_red_check_goal
                 ->getPoint(CheckGoal::POINT_FIRST) - ball_pos);
-            m_red_goal_2 = quatRotate(m_quat, m_red_check_goal
+            m_red_goal_2 = quatRotate(quat, m_red_check_goal
                 ->getPoint(CheckGoal::POINT_CENTER) - ball_pos);
-            m_red_goal_3 = quatRotate(m_quat, m_red_check_goal
+            m_red_goal_3 = quatRotate(quat, m_red_check_goal
                 ->getPoint(CheckGoal::POINT_LAST) - ball_pos);
 
             // Blue goal
-            m_blue_goal_1 = quatRotate(m_quat, m_blue_check_goal
+            m_blue_goal_1 = quatRotate(quat, m_blue_check_goal
                 ->getPoint(CheckGoal::POINT_FIRST) - ball_pos);
-            m_blue_goal_2 = quatRotate(m_quat, m_blue_check_goal
+            m_blue_goal_2 = quatRotate(quat, m_blue_check_goal
                 ->getPoint(CheckGoal::POINT_CENTER) - ball_pos);
-            m_blue_goal_3 = quatRotate(m_quat, m_blue_check_goal
+            m_blue_goal_3 = quatRotate(quat, m_blue_check_goal
                 ->getPoint(CheckGoal::POINT_LAST) - ball_pos);
 
             // Update the slope:
