@@ -262,8 +262,6 @@ private:
     int m_ball_hitter;
 
     /** Goals data of each team scored */
-    int m_red_goal;
-    int m_blue_goal;
     std::vector<ScorerData> m_red_scorers;
     std::vector<float> m_red_score_times;
     std::vector<ScorerData> m_blue_scorers;
@@ -331,7 +329,10 @@ public:
     SoccerTeam getKartTeam(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
     int getScore(SoccerTeam team) const
-             { return (team == SOCCER_TEAM_BLUE ? m_blue_goal : m_red_goal); }
+    {
+        return (team == SOCCER_TEAM_BLUE ? m_blue_scorers.size() :
+            m_red_scorers.size());
+    }
     // ------------------------------------------------------------------------
     const std::vector<ScorerData>& getScorers(SoccerTeam team) const
        { return (team == SOCCER_TEAM_BLUE ? m_blue_scorers : m_red_scorers); }
