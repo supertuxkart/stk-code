@@ -77,7 +77,9 @@ protected:
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
     bool         isStuck() const { return m_stuck; }
-    void         checkPosition(const Vec3&, posData*, Vec3* lc = NULL) const;
+    void         checkPosition(const Vec3&, posData*,
+                               Vec3* lc = NULL,
+                               bool use_front_xyz = false) const;
 
 public:
              AIBaseController(AbstractKart *kart);

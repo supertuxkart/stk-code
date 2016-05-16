@@ -76,7 +76,10 @@ void ArenaAI::update(float dt)
 
     // Don't do anything if there is currently a kart animations shown.
     if (m_kart->getKartAnimation())
+    {
+        resetAfterStop();
         return;
+    }
 
     if (isWaiting())
     {
@@ -101,6 +104,7 @@ void ArenaAI::update(float dt)
 
     if (m_is_uturn)
     {
+        resetAfterStop();
         handleArenaUTurn(dt);
     }
     else
@@ -202,6 +206,7 @@ bool ArenaAI::handleArenaUnstuck(const float dt)
 {
     if (!m_is_stuck || m_is_uturn) return false;
 
+    resetAfterStop();
     setSteering(0.0f, dt);
 
     if (fabsf(m_kart->getSpeed()) >
@@ -263,7 +268,8 @@ void ArenaAI::handleArenaSteering(const float dt)
 
         checkPosition(m_target_point, &m_cur_kart_pos_data);
 #ifdef AI_DEBUG
-        if (m_path_corners.size() > 2)
+        m_debug_sphere->setPosition(m_path_corners[0].toIrrVector());
+        /*if (m_path_corners.size() > 2)
         {
             m_debug_sphere->setVisible(true);
             m_debug_sphere_next->setVisible(true);
@@ -274,7 +280,7 @@ void ArenaAI::handleArenaSteering(const float dt)
         {
             m_debug_sphere->setVisible(false);
             m_debug_sphere_next->setVisible(false);
-        }
+        }*/
 #endif
         if (m_cur_kart_pos_data.behind)
         {
