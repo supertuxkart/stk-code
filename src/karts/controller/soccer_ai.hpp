@@ -57,6 +57,7 @@ private:
 
     virtual void findClosestKart(bool use_difficulty);
     virtual void findTarget();
+    virtual void resetAfterStop() OVERRIDE  { m_overtake_ball = false; }
     virtual int  getCurrentNode() const;
     virtual bool isWaiting() const;
     virtual bool canSkid(float steer_fraction) { return false;         }

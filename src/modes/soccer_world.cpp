@@ -97,7 +97,7 @@ void SoccerWorld::init()
     if (!m_ball)
         Log::fatal("SoccerWorld","Ball is missing in soccer field, abort.");
 
-    m_bgd.init();
+    m_bgd.init(m_ball->getPhysicalObject()->getRadius());
 
 }   // init
 
@@ -423,9 +423,8 @@ void SoccerWorld::updateBallPosition(float dt)
 {
     if (isRaceOver()) return;
 
-    if (!(m_ball->getPhysicalObject()->getBody()
-        ->getLinearVelocity().x() == 0.0f || m_ball->getPhysicalObject()
-        ->getBody()->getLinearVelocity().z() == 0.0f))
+    if (!(m_ball_body->getLinearVelocity().x() == 0.0f ||
+        m_ball_body->getLinearVelocity().z() == 0.0f))
     {
         // Only update heading if the ball is moving
         m_ball_heading = atan2f(m_ball_body->getLinearVelocity().getX(),

@@ -56,9 +56,9 @@ SoccerAI::SoccerAI(AbstractKart *kart)
     video::SColor red(128, 128, 0, 0);
     video::SColor blue(128, 0, 0, 128);
     m_red_sphere = irr_driver->addSphere(1.0f, red);
-    m_red_sphere->setVisible(true);
+    m_red_sphere->setVisible(false);
     m_blue_sphere = irr_driver->addSphere(1.0f, blue);
-    m_blue_sphere->setVisible(true);
+    m_blue_sphere->setVisible(false);
 #endif
 
     m_world = dynamic_cast<SoccerWorld*>(World::getWorld());
@@ -114,6 +114,7 @@ void SoccerAI::update(float dt)
 
     if (World::getWorld()->getPhase() == World::GOAL_PHASE)
     {
+        resetAfterStop();
         m_controls->m_brake = false;
         m_controls->m_accel = 0.0f;
         AIBaseController::update(dt);
@@ -170,7 +171,10 @@ void SoccerAI::findTarget()
         return;
     }
 
-    // Otherwise do the same as in battle mode, attack other karts
+    // Always reset this flag,
+    // in case the ball chaser lost the ball somehow
+    m_overtake_ball = false;
+
     if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING &&
         m_kart->getAttachment()->getType() != Attachment::ATTACH_SWATTER)
     {
@@ -212,30 +216,80 @@ Vec3 SoccerAI::determineBallAimingPosition()
     posData aim_pos = {0};
     Vec3 ball_lc;
     Vec3 aim_lc;
-    checkPosition(orig_pos, &ball_pos);
-    checkPosition(orig_pos, &aim_pos, &aim_lc);
+    checkPosition(orig_pos, &ball_pos, &ball_lc, true/*use_front_xyz*/);
+    checkPosition(ball_aim_pos, &aim_pos, &aim_lc, true/*use_front_xyz*/);
 
     // Too far from the ball,
     // use path finding from arena ai to get close
-    if (ball_pos.distance > 6.0f) return ball_aim_pos;
+    // ie no extra braking is needed
+    if (aim_pos.distance > 6.0f) return ball_aim_pos;
 
-    const Vec3 dist_to_aim_point = m_kart->getFrontXYZ() - ball_aim_pos;
-
-    // Prevent lost control when steering with ball
-    const bool need_braking = ball_pos.angle > 0.1f &&
-        m_kart->getSpeed() > 9.0f && ball_pos.distance < 3.0f;
-
-    if (need_braking)
+    if (m_overtake_ball)
     {
-        m_controls->m_brake = true;
-        m_force_brake = true;
+        // Check if the kart passed the ball already,
+        // If so aim the front side of ball
+        if (ball_pos.behind)
+        {
+            const Vec3& front_pos =
+                m_world->getBallAimPosition(m_opp_team, true/*reverse*/);
+            Vec3 d = front_pos - m_kart->getFrontXYZ();
+            if (d.length_2d() < (m_world->getBallDiameter() / 2))
+            {
+                // Almost arrive, reset
+                m_overtake_ball = false;
+            }
+            return front_pos;
+        }
+        else
+        {
+            // Otherwise aim left/right depends on the side of ball
+            if (ball_pos.lhs)
+            {
+                return m_world->getBallTrans()
+                    (Vec3(m_world->getBallDiameter(), 0, 0));
+            }
+            else
+            {
+                return m_world->getBallTrans()
+                    (Vec3(-m_world->getBallDiameter(), 0, 0));
+            }
+        }
     }
-    if (dist_to_aim_point.length_2d() < 0.4f)
+    else
     {
-        //Log::info("","%f",dist_to_aim_point.length_2d());
-        return m_world->getBallTrans()(Vec3(0, 0, 1));
+        // Check whether the aim point is non-reachable
+        // ie the ball is in front of the kart, which the aim position
+        // is behind the ball, in an almost straight line
+        // If so m_overtake_ball is true
+        if (aim_lc.z() > 0 && aim_lc.z() > ball_lc.z() &&
+            ball_pos.angle < 0.6f && aim_pos.angle < 0.2f)
+        {
+            m_overtake_ball = true;
+        }
+
+        // Otherwise use the aim position calculated by soccer world
+        // Prevent lost control when steering with ball
+        const bool need_braking = ball_pos.angle > 0.15f &&
+            m_kart->getSpeed() > 9.0f &&
+            ball_pos.distance < m_world->getBallDiameter();
+
+        if (need_braking)
+        {
+            m_controls->m_brake = true;
+            m_force_brake = true;
+        }
+        if (aim_pos.behind && aim_pos.distance <
+            (m_world->getBallDiameter() / 2))
+        {
+            // Reached aim point, aim forward
+            return m_world->getBallAimPosition(m_opp_team, true/*reverse*/);
+        }
+        return ball_aim_pos;
     }
+
+    // Make compiler happy
     return ball_aim_pos;
+
 }   // determineBallAimingPosition
 
 //-----------------------------------------------------------------------------

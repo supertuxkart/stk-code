@@ -78,6 +78,9 @@ private:
     {
     // These data are used by AI to determine ball aiming angle
     private:
+        // Radius of the ball
+        float m_radius;
+
         // Slope of the line from ball to the center point of goals
         float m_red_goal_slope;
         float m_blue_goal_slope;
@@ -116,8 +119,16 @@ private:
             return m_trans;
         }   // getTrans
 
-        void init()
+        float getDiameter() const
         {
+            return m_radius * 2;
+        }   // getTrans
+
+        void init(float ball_radius)
+        {
+            m_radius = ball_radius;
+            assert(m_radius > 0.0f);
+
             // Save two goals
             unsigned int n = CheckManager::get()->getCheckStructureCount();
             for (unsigned int i = 0; i < n; i++)
@@ -191,7 +202,7 @@ private:
             return false;
         }   // isApproachingGoal
 
-        Vec3 getAimPosition(SoccerTeam team) const
+        Vec3 getAimPosition(SoccerTeam team, bool reverse) const
         {
             // If it's likely to goal already, aim the ball straight behind
             // should do the job
@@ -202,16 +213,17 @@ private:
             // This is done by using Pythagorean Theorem and solving the
             // equation from ball to goal center (y = (m_***_goal_slope) x)
 
-            // We aim 1 unit behind the ball (easier to solve),
-            // so 1 = sqrt (x2 + y2) and than x = sqrt (1 - y2)
+            // We aim behind the ball from the center of the ball to its
+            // diameter, so 2*m_radius = sqrt (x2 + y2),
+            // which is next x = sqrt (2*m_radius - y2)
             // And than we have x = y / m(m_***_goal_slope)
             // After put that in the slope equation, we have
-            // y = sqrt(m2 / (1+m2))
+            // y = sqrt(2*m_radius*m2 / (1+m2))
             float x = 0.0f;
             float y = 0.0f;
             if (team == SOCCER_TEAM_BLUE)
             {
-                y = sqrt((m_blue_goal_slope * m_blue_goal_slope) /
+                y = sqrt((m_blue_goal_slope * m_blue_goal_slope * m_radius*2) /
                     (1 + (m_blue_goal_slope * m_blue_goal_slope)));
                 if (m_blue_goal_2.x() == 0.0f ||
                     (m_blue_goal_2.x() > 0.0f && m_blue_goal_2.z() > 0.0f) ||
@@ -224,7 +236,7 @@ private:
             }
             else
             {
-                y = sqrt((m_red_goal_slope * m_red_goal_slope) /
+                y = sqrt((m_red_goal_slope * m_red_goal_slope * m_radius*2) /
                     (1 + (m_red_goal_slope * m_red_goal_slope)));
                 if (m_red_goal_2.x() == 0.0f ||
                     (m_red_goal_2.x() > 0.0f && m_red_goal_2.z() > 0.0f) ||
@@ -237,7 +249,8 @@ private:
             assert (!std::isnan(x));
             assert (!std::isnan(y));
             // Return the world coordinates
-            return m_trans(Vec3(x, 0, y));
+            return (reverse ? m_trans(Vec3(-x, 0, -y)) :
+                m_trans(Vec3(x, 0, y)));
         }   // getAimPosition
 
     };   // BallGoalData
@@ -344,29 +357,28 @@ public:
     }
     // ------------------------------------------------------------------------
     int getKartNode(unsigned int kart_id) const
-                                          {  return m_kart_on_node[kart_id]; }
+                                           { return m_kart_on_node[kart_id]; }
     // ------------------------------------------------------------------------
     int getBallNode() const
-                                          {  return m_ball_on_node;          }
+                                                    { return m_ball_on_node; }
     // ------------------------------------------------------------------------
     const Vec3& getBallPosition() const
         { return (Vec3&)m_ball_body->getCenterOfMassTransform().getOrigin(); }
     // ------------------------------------------------------------------------
     float getBallHeading() const
-                                          {  return m_ball_heading;          }
+                                                    { return m_ball_heading; }
+    // ------------------------------------------------------------------------
+    float getBallDiameter() const
+                                               { return m_bgd.getDiameter(); }
     // ------------------------------------------------------------------------
     bool ballApproachingGoal(SoccerTeam team) const
-    {
-        return m_bgd.isApproachingGoal(team);
-    }
+                                     { return m_bgd.isApproachingGoal(team); }
     // ------------------------------------------------------------------------
-    Vec3 getBallAimPosition(SoccerTeam team) const
-    {
-        return m_bgd.getAimPosition(team);
-    }
+    Vec3 getBallAimPosition(SoccerTeam team, bool reverse = false) const
+                               { return m_bgd.getAimPosition(team, reverse); }
     // ------------------------------------------------------------------------
     const btTransform& getBallTrans() const
-                                          {  return m_bgd.getTrans();        }
+                                                  { return m_bgd.getTrans(); }
     // ------------------------------------------------------------------------
     bool isCorrectGoal(unsigned int kart_id, bool first_goal) const;
     // ------------------------------------------------------------------------

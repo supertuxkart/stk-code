@@ -283,13 +283,13 @@ void AIBaseController::crashed(const Material *m)
 }   // crashed(Material)
 
 //-----------------------------------------------------------------------------
-void AIBaseController::checkPosition(const Vec3 &point,
-                                     posData *pos_data,
-                                     Vec3 *lc) const
+void AIBaseController::checkPosition(const Vec3 &point, posData *pos_data,
+                                     Vec3 *lc, bool use_front_xyz) const
 {
     // Convert to local coordinates from the point of view of current kart
     btQuaternion q(btVector3(0, 1, 0), -m_kart->getHeading());
-    Vec3 p = point - m_kart->getXYZ();
+    Vec3 p = point -
+        (use_front_xyz ? m_kart->getFrontXYZ() : m_kart->getXYZ());
     Vec3 local_coordinates = quatRotate(q, p);
 
     // Save local coordinates for later use if needed
