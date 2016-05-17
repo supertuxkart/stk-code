@@ -332,7 +332,6 @@ private:
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
     int                              m_coin_target;
-    bool                             m_has_time_target;
     float                            m_time_target;
     int                              m_goal_target;
 
@@ -417,9 +416,13 @@ public:
     void computeRandomKartList();
 
     // ------------------------------------------------------------------------
-    bool hasTimeTarget() const { return m_has_time_target; }
+    bool hasTimeTarget() const { return m_time_target > 0.0f; }
     // ------------------------------------------------------------------------
-    void setMaxGoal(int maxGoal){ m_goal_target = maxGoal; }
+    void setMaxGoal(int max_goal)
+    {
+        m_time_target = 0.0f;
+        m_goal_target = max_goal;
+    }   // setMaxGoal
     // ------------------------------------------------------------------------
     int getMaxGoal(){ return m_goal_target; }
     // ------------------------------------------------------------------------
@@ -458,9 +461,8 @@ public:
     void setMajorMode(MajorRaceModeType mode) { m_major_mode = mode; }
     // ------------------------------------------------------------------------
     void setMinorMode(MinorRaceModeType mode)
-    { 
+    {
         m_minor_mode = mode;
-        m_has_time_target = false;
     }   // setMinorMode
     // ------------------------------------------------------------------------
     void setNumKarts(int num)
@@ -470,10 +472,10 @@ public:
         m_ai_superpower = SUPERPOWER_NONE;
     }   // setNumKarts
     // ------------------------------------------------------------------------
-    void setTimeTarget(float num)
+    void setTimeTarget(float time)
     {
-        m_has_time_target = true;
-        m_time_target = num;
+        m_goal_target = 0;
+        m_time_target = time;
     }   // setTimeTarget
     // ------------------------------------------------------------------------
     const RemoteKartInfo& getKartInfo(unsigned int n) const
@@ -495,7 +497,7 @@ public:
     MinorRaceModeType getMinorMode() const { return m_minor_mode; }
     // ------------------------------------------------------------------------
     unsigned int getNumPlayers() const 
-    { 
+    {
         return (unsigned int) m_player_karts.size(); 
     }   // getNumPlayers
     // ------------------------------------------------------------------------
