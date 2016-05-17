@@ -23,7 +23,9 @@
 #include <IMeshSceneNode.h>
 
 #include "config/user_config.hpp"
+#include "io/xml_node.hpp"
 #include "items/item_manager.hpp"
+#include "race/race_manager.hpp"
 #include "tracks/navmesh.hpp"
 #include "utils/log.hpp"
 
@@ -33,7 +35,8 @@ BattleGraph * BattleGraph::m_battle_graph = NULL;
 /** Constructor, Creates a navmesh, builds a graph from the navmesh and
 *    then runs shortest path algorithm to find and store paths to be used
 *    by the AI. */
-BattleGraph::BattleGraph(const std::string &navmesh_file_name)
+BattleGraph::BattleGraph(const std::string &navmesh_file_name,
+                         const XMLNode& node)
 {
     m_items_on_graph.clear();
 
@@ -41,6 +44,9 @@ BattleGraph::BattleGraph(const std::string &navmesh_file_name)
     m_navmesh_file = navmesh_file_name;
     buildGraph(NavMesh::get());
     computeFloydWarshall();
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        loadGoalNodes(node);
+
 } // BattleGraph
 
 // -----------------------------------------------------------------------------
@@ -122,7 +128,6 @@ void BattleGraph::computeFloydWarshall()
 }    // computeFloydWarshall
 
 // -----------------------------------------------------------------------------
-
 /** Maps items on battle graph */
 void BattleGraph::findItemsOnGraphNodes()
 {
@@ -152,7 +157,6 @@ void BattleGraph::findItemsOnGraphNodes()
 }    // findItemsOnGraphNodes
 
 // -----------------------------------------------------------------------------
-
 int BattleGraph::pointToNode(const int cur_node,
                              const Vec3& cur_point,
                              bool ignore_vertical) const
@@ -215,10 +219,64 @@ int BattleGraph::pointToNode(const int cur_node,
 }    // pointToNode
 
 // -----------------------------------------------------------------------------
-
 const int BattleGraph::getNextShortestPathPoly(int i, int j) const
 {
     if (i == BattleGraph::UNKNOWN_POLY || j == BattleGraph::UNKNOWN_POLY)
         return BattleGraph::UNKNOWN_POLY;
     return m_parent_poly[j][i];
 }    // getNextShortestPathPoly
+
+// -----------------------------------------------------------------------------
+const bool BattleGraph::differentNodeColor(int n, NodeColor* c) const
+{
+    std::set<int>::iterator it;
+    it = m_red_node.find(n);
+    if (it != m_red_node.end())
+    {
+        *c = COLOR_RED;
+        return true;
+    }
+
+    it = m_blue_node.find(n);
+    if (it != m_blue_node.end())
+    {
+        *c = COLOR_BLUE;
+        return true;
+    }
+    return false;
+}    // differentNodeColor
+
+// -----------------------------------------------------------------------------
+void BattleGraph::loadGoalNodes(const XMLNode& node)
+{
+    m_red_node.clear();
+    m_blue_node.clear();
+
+    const XMLNode *check_node = node.getNode("checks");
+    for (unsigned int i = 0; i < check_node->getNumNodes(); i++)
+    {
+        const XMLNode *goal = check_node->getNode(i);
+        if (goal->getName() =="goal")
+        {
+            Vec3 p1, p2;
+            bool first_goal = false;
+            goal->get("first_goal", &first_goal);
+            goal->get("p1", &p1);
+            goal->get("p2", &p2);
+
+            int first = pointToNode(/*cur_node*/-1, p1, true);
+            int last = pointToNode(/*cur_node*/-1, p2, true);
+
+            first_goal ? m_blue_node.insert(first) : m_red_node.insert(first);
+            first_goal ? m_blue_node.insert(last) : m_red_node.insert(last);
+            while (first != last)
+            {
+                // Find all the nodes which connect the two points of
+                // goal, notice: only work if it's a straight line
+                first = getNextShortestPathPoly(first, last);
+                first_goal ? m_blue_node.insert(first) :
+                    m_red_node.insert(first);
+            }
+        }
+    }
+}    // loadGoalNodes

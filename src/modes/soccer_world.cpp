@@ -57,7 +57,7 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
 }   // SoccerWorld
 
 //-----------------------------------------------------------------------------
-/** The destructor frees al data structures.
+/** The destructor frees all data structures.
  */
 SoccerWorld::~SoccerWorld()
 {
