@@ -381,7 +381,7 @@ private:
 
     void loadTrackInfo();
     void loadQuadGraph(unsigned int mode_id, const bool reverse);
-    void loadBattleGraph();
+    void loadBattleGraph(const XMLNode &node);
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
     void loadMinimap();
