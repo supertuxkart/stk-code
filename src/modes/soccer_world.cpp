@@ -41,10 +41,10 @@
  */
 SoccerWorld::SoccerWorld() : WorldWithRank()
 {
-    if(race_manager->hasTimeTarget())
+    if (race_manager->hasTimeTarget())
     {
-        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, race_manager->getTimeTarget());
-        m_count_down_reached_zero = false;
+        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
+            race_manager->getTimeTarget());
     }
     else
     {
@@ -107,13 +107,17 @@ void SoccerWorld::init()
 void SoccerWorld::reset()
 {
     WorldWithRank::reset();
-    if(race_manager->hasTimeTarget())
+    if (race_manager->hasTimeTarget())
     {
-        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN, race_manager->getTimeTarget());
-        m_count_down_reached_zero = false;
+        WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
+            race_manager->getTimeTarget());
     }
-    else WorldStatus::setClockMode(CLOCK_CHRONO);
+    else
+    {
+        WorldStatus::setClockMode(CLOCK_CHRONO);
+    }
 
+    m_count_down_reached_zero = false;
     m_red_scorers.clear();
     m_red_score_times.clear();
     m_blue_scorers.clear();
