@@ -5,6 +5,7 @@
   <card is="Intel(R) HD Graphics 3000" os="windows"                disable="FramebufferSRGBWorking"/>
   <card contains="Intel"          os="osx"                         disable="GI"/>
   <card contains="Intel"          os="linux"    version="<11.2"    disable="ComputeShader"/>
+  <card contains="Intel"          os="linux"    version="<11.2"    disable="GeometryShader"/>
   <card contains="Intel"          os="linux"    version="<16.0"    disable="FramebufferSRGBCapable"/>
   <card contains="Intel"          os="linux"    version="<11.2"    disable="TextureCompressionS3TC"/>
   <card contains="Intel"          os="windows"                     disable="TextureCompressionS3TC"/>
@@ -15,11 +16,11 @@
   <card contains="NVIDIA"                                          disable="ShaderAtomicCounters"/>
   <card contains="Mesa"           os="linux"    version="<10.3"    disable="BufferStorage"/>
   <card contains="Mesa"           os="linux"    version="<10.3"    disable="DriverRecentEnough"/>
-  <card contains="Mesa"           os="linux"    version="<10.6"    disable="GeometryShader4"/>
+  <card contains="Mesa"           os="linux"    version="<11.2"    disable="GeometryShader"/>
   <card contains="Mesa"           os="linux"    version="<11.2"    disable="TextureCompressionS3TC"/>
   <card contains="Gallium"        os="linux"    version="<10.3"    disable="BufferStorage"/>
   <card contains="Gallium"        os="linux"    version="<10.3"    disable="DriverRecentEnough"/>
-  <card contains="Gallium"        os="linux"    version="<10.6"    disable="GeometryShader4"/>
+  <card contains="Gallium"        os="linux"    version="<11.2"    disable="GeometryShader"/>
   <card contains="Gallium"        os="linux"    version="<11.2"    disable="TextureCompressionS3TC"/>
   <!-- On osx radeon appears to have different version numbers, e.g.
        1.32.20 -->

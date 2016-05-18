@@ -154,10 +154,10 @@ void CentralVideoSettings::init()
             hasUBO = true;
             Log::info("GLDriver", "ARB Uniform Buffer Object Present");
         }
-        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GEOMETRY_SHADER4) &&
-            hasGLExtension("GL_ARB_geometry_shader4")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GEOMETRY_SHADER) &&
+            (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 2))) {
             hasGS = true;
-            Log::info("GLDriver", "ARB Geometry Shader 4 Present");
+            Log::info("GLDriver", "Geometry Shaders Present");
         }
 
         // Only unset the high def textures if they are set as default. If the
