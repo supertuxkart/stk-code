@@ -317,9 +317,11 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
         n = 1;
     }
 
-    int nSize = (int)(64.0f*std::min(scaling.X, scaling.Y));
+    float scale = (float)(std::min(scaling.X, scaling.Y));
 
-    int itemSpacing = (int)(std::min(scaling.X, scaling.Y)*30);
+    int nSize = (int)(64.0f * scale);
+
+    int itemSpacing = (int)(scale * 30);
 
     int x1 = viewport.UpperLeftCorner.X  + viewport.getWidth()/2
            - (n * itemSpacing)/2;
@@ -345,7 +347,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
     {
         gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
         core::rect<s32> pos(x2+nSize, y1, x2+nSize+nSize, y1+nSize);
-        font->setScale(1.5f);
+        font->setScale(scale);
         font->draw(core::stringw(L"x")+StringUtils::toWString(many_powerups),
             pos, video::SColor(255, 255, 255, 255));
         font->setScale(1.0f);
