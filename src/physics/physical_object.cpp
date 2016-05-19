@@ -57,13 +57,14 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
 {
     init();
     std::string shape;
-    xml_node.get("id",      &m_id          );
-    xml_node.get("mass",    &m_mass        );
-    xml_node.get("radius",  &m_radius      );
-    xml_node.get("shape",   &shape         );
-    xml_node.get("reset",   &m_crash_reset );
-    xml_node.get("explode", &m_knock_kart  );
-    xml_node.get("flatten", &m_flatten_kart);
+    xml_node.get("id",                &m_id               );
+    xml_node.get("mass",              &m_mass             );
+    xml_node.get("radius",            &m_radius           );
+    xml_node.get("restitution",       &m_restitution      );
+    xml_node.get("shape",             &shape              );
+    xml_node.get("reset",             &m_crash_reset      );
+    xml_node.get("explode",           &m_knock_kart       );
+    xml_node.get("flatten",           &m_flatten_kart     );
     xml_node.get("on-kart-collision", &m_on_kart_collision);
     xml_node.get("on-item-collision", &m_on_item_collision);
     m_reset_when_too_low =
@@ -97,6 +98,7 @@ void PhysicalObject::Settings::init()
     m_knock_kart         = false;
     m_mass               = 0.0f;
     m_radius             = -1.0f;
+    m_restitution        = 0.0f;
     m_reset_when_too_low = false;
     m_flatten_kart       = false;
 }   // Settings
@@ -159,6 +161,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_is_dynamic = is_dynamic;
 
     init();
+    m_body->setRestitution(settings.m_restitution);
 }   // PhysicalObject
 
 // ----------------------------------------------------------------------------
@@ -471,7 +474,7 @@ void PhysicalObject::init()
     if (m_is_dynamic)
     {
         m_init_pos.setOrigin(m_init_pos.getOrigin() +
-            btVector3(0, extend.getY()*0.5f, 0));
+                             btVector3(0, extend.getY()*0.5f, 0));
     }
 
 
