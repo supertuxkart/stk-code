@@ -55,6 +55,8 @@ public:
         float                     m_radius;
         /** Shape of the object. */
         PhysicalObject::BodyTypes m_body_type;
+        /** Restitution of the physical object. */
+        float                     m_restitution;
         /** Trigger a reset in karts touching it? */
         bool                      m_crash_reset;
         /** Knock the kart around. */

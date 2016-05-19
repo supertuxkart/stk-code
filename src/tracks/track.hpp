@@ -57,11 +57,11 @@ class MusicInformation;
 class ParticleEmitter;
 class ParticleKind;
 class PhysicalObject;
+class TrackObject;
 class TrackObjectManager;
 class TriangleMesh;
 class World;
 class XMLNode;
-class TrackObject;
 
 namespace Scripting
 {
