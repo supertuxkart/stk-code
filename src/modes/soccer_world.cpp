@@ -155,15 +155,15 @@ const std::string& SoccerWorld::getIdent() const
  */
 void SoccerWorld::update(float dt)
 {
-    WorldWithRank::update(dt);
-    WorldWithRank::updateTrack(dt);
-
     updateBallPosition(dt);
     if (m_track->hasNavMesh())
     {
         updateKartNodes();
         updateAIData();
     }
+
+    WorldWithRank::update(dt);
+    WorldWithRank::updateTrack(dt);
 
     if (getPhase() == World::GOAL_PHASE)
     {
@@ -589,7 +589,14 @@ void SoccerWorld::setAITeam()
     for (int i = 0; i < total_player; i++)
     {
         SoccerTeam team = race_manager->getKartInfo(i).getSoccerTeam();
-        assert(team != SOCCER_TEAM_NONE);
+
+        // Happen in profiling mode
+        if (team == SOCCER_TEAM_NONE);
+        {
+            race_manager->setKartSoccerTeam(i, SOCCER_TEAM_BLUE);
+            team = SOCCER_TEAM_BLUE;
+        }
+
         team == SOCCER_TEAM_BLUE ? blue_player++ : red_player++;
     }
 
