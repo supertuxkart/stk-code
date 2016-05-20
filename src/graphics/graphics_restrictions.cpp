@@ -56,6 +56,7 @@ namespace GraphicsRestrictions
             "BindlessTexture",
             "TextureCompressionS3TC",
             "AMDVertexShaderLayer",
+            "ExplicitAttribLocation",
             "DriverRecentEnough",
             "HighDefinitionTextures",
             "AdvancedPipeline",
