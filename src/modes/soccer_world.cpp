@@ -427,8 +427,7 @@ void SoccerWorld::updateBallPosition(float dt)
 {
     if (isRaceOver()) return;
 
-    if (!(m_ball_body->getLinearVelocity().x() == 0.0f ||
-        m_ball_body->getLinearVelocity().z() == 0.0f))
+    if (!ballNotMoving())
     {
         // Only update heading if the ball is moving
         m_ball_heading = atan2f(m_ball_body->getLinearVelocity().getX(),

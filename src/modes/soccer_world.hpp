@@ -114,15 +114,10 @@ private:
             m_trans = btTransform(btQuaternion(0, 0, 0, 1), Vec3(0, 0, 0));
         }   // reset
 
-        const btTransform& getTrans() const
-        {
-            return m_trans;
-        }   // getTrans
-
         float getDiameter() const
         {
             return m_radius * 2;
-        }   // getTrans
+        }   // getDiameter
 
         void init(float ball_radius)
         {
@@ -365,6 +360,12 @@ public:
     const Vec3& getBallPosition() const
         { return (Vec3&)m_ball_body->getCenterOfMassTransform().getOrigin(); }
     // ------------------------------------------------------------------------
+    bool ballNotMoving() const
+    {
+        return (m_ball_body->getLinearVelocity().x() == 0.0f ||
+            m_ball_body->getLinearVelocity().z() == 0.0f);
+    }
+    // ------------------------------------------------------------------------
     float getBallHeading() const
                                                     { return m_ball_heading; }
     // ------------------------------------------------------------------------
@@ -376,9 +377,6 @@ public:
     // ------------------------------------------------------------------------
     Vec3 getBallAimPosition(SoccerTeam team, bool reverse = false) const
                                { return m_bgd.getAimPosition(team, reverse); }
-    // ------------------------------------------------------------------------
-    const btTransform& getBallTrans() const
-                                                  { return m_bgd.getTrans(); }
     // ------------------------------------------------------------------------
     bool isCorrectGoal(unsigned int kart_id, bool first_goal) const;
     // ------------------------------------------------------------------------

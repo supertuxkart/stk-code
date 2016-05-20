@@ -52,16 +52,24 @@ private:
      */
     bool m_overtake_ball;
     bool m_force_brake;
+    bool m_steer_with_ball;
 
     Vec3 determineBallAimingPosition();
+    bool determineOvertakePosition(const Vec3& ball_lc,
+                                   const posData& ball_pos, Vec3* overtake_wc);
 
     virtual void findClosestKart(bool use_difficulty);
     virtual void findTarget();
-    virtual void resetAfterStop() OVERRIDE  { m_overtake_ball = false; }
+    virtual void resetAfterStop() OVERRIDE    { m_overtake_ball = false; }
     virtual int  getCurrentNode() const;
     virtual bool isWaiting() const;
-    virtual bool canSkid(float steer_fraction) { return false;         }
-    virtual bool forceBraking() OVERRIDE       { return m_force_brake; }
+    virtual bool canSkid(float steer_fraction)           { return false; }
+    virtual bool forceBraking() OVERRIDE         { return m_force_brake; }
+    virtual bool directDrive() OVERRIDE
+    {
+        return m_avoid_eating_banana || m_overtake_ball || m_steer_with_ball;
+    }
+
 public:
                  SoccerAI(AbstractKart *kart);
                 ~SoccerAI();

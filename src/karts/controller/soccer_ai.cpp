@@ -99,6 +99,8 @@ void SoccerAI::reset()
 
     m_overtake_ball = false;
     m_force_brake = false;
+    m_steer_with_ball = false;
+
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -111,6 +113,7 @@ void SoccerAI::update(float dt)
     m_blue_sphere->setPosition(blue.toIrrVector());
 #endif
     m_force_brake = false;
+    m_steer_with_ball = false;
 
     if (World::getWorld()->getPhase() == World::GOAL_PHASE)
     {
@@ -212,6 +215,7 @@ Vec3 SoccerAI::determineBallAimingPosition()
 
     const Vec3& ball_aim_pos = m_world->getBallAimPosition(m_opp_team);
     const Vec3& orig_pos = m_world->getBallPosition();
+    const float ball_diameter = m_world->getBallDiameter();
     posData ball_pos = {0};
     posData aim_pos = {0};
     Vec3 ball_lc;
@@ -222,66 +226,53 @@ Vec3 SoccerAI::determineBallAimingPosition()
     // Too far from the ball,
     // use path finding from arena ai to get close
     // ie no extra braking is needed
-    if (aim_pos.distance > 6.0f) return ball_aim_pos;
+    if (aim_pos.distance > 10.0f) return ball_aim_pos;
 
     if (m_overtake_ball)
     {
-        // Check if the kart passed the ball already,
-        // If so aim the front side of ball
-        if (ball_pos.behind)
+        Vec3 overtake_wc;
+        const bool can_overtake = determineOvertakePosition(ball_lc, ball_pos,
+            &overtake_wc);
+        if (!can_overtake)
         {
-            const Vec3& front_pos =
-                m_world->getBallAimPosition(m_opp_team, true/*reverse*/);
-            Vec3 d = front_pos - m_kart->getFrontXYZ();
-            if (d.length_2d() < (m_world->getBallDiameter() / 2))
-            {
-                // Almost arrive, reset
-                m_overtake_ball = false;
-            }
-            return front_pos;
+            m_overtake_ball = false;
+            return ball_aim_pos;
         }
         else
-        {
-            // Otherwise aim left/right depends on the side of ball
-            if (ball_pos.lhs)
-            {
-                return m_world->getBallTrans()
-                    (Vec3(m_world->getBallDiameter(), 0, 0));
-            }
-            else
-            {
-                return m_world->getBallTrans()
-                    (Vec3(-m_world->getBallDiameter(), 0, 0));
-            }
-        }
+            return overtake_wc;
     }
     else
     {
         // Check whether the aim point is non-reachable
         // ie the ball is in front of the kart, which the aim position
-        // is behind the ball, in an almost straight line
-        // If so m_overtake_ball is true
-        if (aim_lc.z() > 0 && aim_lc.z() > ball_lc.z() &&
-            ball_pos.angle < 0.6f && aim_pos.angle < 0.2f)
+        // is behind the ball , if so m_overtake_ball is true
+        if (aim_lc.z() > 0 && aim_lc.z() > ball_lc.z())
         {
-            m_overtake_ball = true;
+            const bool can_overtake = determineOvertakePosition(ball_lc,
+                ball_pos, NULL);
+            if (can_overtake)
+            {
+                m_overtake_ball = true;
+            }
+            else
+            {
+                // Stop a while to wait for overtaking, prevent own goal too
+                // Only do that if the ball is moving
+                if (!m_world->ballNotMoving())
+                    m_force_brake = true;
+                return ball_aim_pos;
+            }
         }
 
         // Otherwise use the aim position calculated by soccer world
         // Prevent lost control when steering with ball
-        const bool need_braking = ball_pos.angle > 0.15f &&
-            m_kart->getSpeed() > 9.0f &&
-            ball_pos.distance < m_world->getBallDiameter();
+        m_force_brake = ball_pos.angle > 0.15f &&
+            m_kart->getSpeed() > 9.0f && ball_pos.distance < ball_diameter;
 
-        if (need_braking)
-        {
-            m_controls->m_brake = true;
-            m_force_brake = true;
-        }
-        if (aim_pos.behind && aim_pos.distance <
-            (m_world->getBallDiameter() / 2))
+        if (aim_pos.behind && aim_pos.distance < (ball_diameter / 2))
         {
             // Reached aim point, aim forward
+            m_steer_with_ball = true;
             return m_world->getBallAimPosition(m_opp_team, true/*reverse*/);
         }
         return ball_aim_pos;
@@ -291,6 +282,102 @@ Vec3 SoccerAI::determineBallAimingPosition()
     return ball_aim_pos;
 
 }   // determineBallAimingPosition
+
+//-----------------------------------------------------------------------------
+bool SoccerAI::determineOvertakePosition(const Vec3& ball_lc,
+                                         const posData& ball_pos,
+                                         Vec3* overtake_wc)
+{
+    // This done by drawing a circle using the center of ball local coordinates
+    // and the distance / 2 from kart to ball center as radius (which allows more
+    // offset for overtaking), then find tangent line from kart (0, 0, 0) to the
+    // circle. The intercept point will be used as overtake position
+
+    // No overtake if ball is behind
+    if (ball_lc.z() < 0.0f) return false;
+
+    // Circle equation: (x-a)2 + (y-b)2 = r2
+    const float r2 = (ball_pos.distance / 2) * (ball_pos.distance / 2);
+
+    // No overtake if sqrtf(r2) / 2 < ball radius,
+    // which will likely push to ball forward
+    if ((sqrtf(r2) / 2) < (m_world->getBallDiameter() / 2))
+    {
+        return false;
+    }
+
+    const float a = ball_lc.x();
+    const float b = ball_lc.z();
+
+    // Check first if the kart is lies inside the circle, if so no tangent
+    // can be drawn ( so can't overtake), minus 0.1 as epslion
+    const float test_radius_2 = ((a * a) + (b * b)) - 0.1f;
+    if (test_radius_2 < r2)
+    {
+        return false;
+    }
+
+    // Otherwise calculate the tangent
+    // As all are local coordinates, so center is 0,0 which is y = mx for the
+    // tangent equation, and the m (slope) can be calculated by puting y = mx
+    // into the general form of circle equation x2 + y2 + Dx + Ey + F = 0
+    // This means:  x2 + m2x2 + Dx + Emx + F = 0
+    //                 (1+m2)x2 + (D+Em)x +F = 0
+    // As only one root for it, so discriminant b2 - 4ac = 0
+    // So:              (D+Em)2 - 4(1+m2)(F) = 0
+    //           D2 + 2DEm +E2m2 - 4F - 4m2F = 0
+    //      (E2 - 4F)m2 + (2DE)m + (D2 - 4F) = 0
+    // Now solve the above quadratic equation using
+    // x = -b (+/-) sqrt(b2 - 4ac) / 2a
+    const float d = -2 * a;
+    const float e = -2 * b;
+    const float f = (d * d / 4) + (e * e / 4) - r2;
+    const float discriminant = (2 * 2 * d * d * e * e) -
+        (4 * ((e * e) - (4 * f)) * ((d * d) - (4 * f)));
+
+    assert(discriminant > 0.0f);
+    const float slope_1 = (-(2 * d * e) + sqrtf(discriminant)) /
+        (2 * ((e * e) - (4 * f)));
+    const float slope_2 = (-(2 * d * e) - sqrtf(discriminant)) /
+        (2 * ((e * e) - (4 * f)));
+
+    assert(!std::isnan(slope_1));
+    assert(!std::isnan(slope_2));
+
+    // Calculate two intercept points, as we already put y=mx into circle
+    // equation and know that only one root for each slope, so x can be
+    // calculated easily with -b / 2a
+    // From (1+m2)x2 + (D+Em)x +F = 0:
+    const float x1 = -(d + (e * slope_1)) / (2 * (1 + (slope_1 * slope_1)));
+    const float x2 = -(d + (e * slope_2)) / (2 * (1 + (slope_2 * slope_2)));
+
+    // Use the closest point to aim
+    float x = std::min(fabsf(x1), fabsf(x2));
+    float y = 0.0f;
+    if (-x == x1)
+    {
+        // x was negative
+        x = -x;
+        y = slope_1 * x;
+    }
+    else if (x == x1)
+    {
+        y = slope_1 * x;
+    }
+    else if (-x == x2)
+    {
+        x = -x;
+        y = slope_2 * x;
+    }
+    else
+    {
+        y = slope_2 * x;
+    }
+
+    if (overtake_wc)
+        *overtake_wc = m_kart->getTrans()(Vec3(x, 0, y));
+    return true;
+}   // determineOvertakePosition
 
 //-----------------------------------------------------------------------------
 int SoccerAI::getCurrentNode() const
