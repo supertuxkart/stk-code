@@ -670,9 +670,9 @@ void Track::startMusic() const
 /** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
  *  they are connected to each other. Input file name is hardcoded for now
  */
-void Track::loadBattleGraph()
+void Track::loadBattleGraph(const XMLNode &node)
 {
-    BattleGraph::create(m_root+"navmesh.xml");
+    BattleGraph::create(m_root+"navmesh.xml", node);
 
     if(BattleGraph::get()->getNumNodes()==0)
     {
@@ -1635,25 +1635,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         (void)e;
     }
 
-    // Load the graph only now: this function is called from world, after
-    // the race gui was created. The race gui is needed since it stores
-    // the information about the size of the texture to render the mini
-    // map to.
-    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
-    else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
-        loadBattleGraph();
-
-    ItemManager::create();
-
-    // Set the default start positions. Node that later the default
-    // positions can still be overwritten.
-    float forwards_distance  = 1.5f;
-    float sidewards_distance = 3.0f;
-    float upwards_distance   = 0.1f;
-    int   karts_per_row      = 2;
-
-
     // Start building the scene graph
+    // Soccer field with navmesh requires it
+    // for two goal line to be drawn them in minimap
     std::string path = m_root + m_all_modes[mode_id].m_scene;
     XMLNode *root    = file_manager->createXMLTree(path);
 
@@ -1666,6 +1650,23 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
            <<"', aborting.";
         throw std::runtime_error(msg.str());
     }
+
+    // Load the graph only now: this function is called from world, after
+    // the race gui was created. The race gui is needed since it stores
+    // the information about the size of the texture to render the mini
+    // map to.
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+    else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
+        loadBattleGraph(*root);
+
+    ItemManager::create();
+
+    // Set the default start positions. Node that later the default
+    // positions can still be overwritten.
+    float forwards_distance  = 1.5f;
+    float sidewards_distance = 3.0f;
+    float upwards_distance   = 0.1f;
+    int   karts_per_row      = 2;
 
     const XMLNode *default_start = root->getNode("default-start");
     if (default_start)

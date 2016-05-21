@@ -397,10 +397,10 @@ void RaceGUI::drawGlobalMiniMap()
             irr_driver->getTexture(FileManager::GUI, "soccer_ball_normal.png");
 
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
-        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_ai_size>>2)),
-                                 lower_y   -(int)(draw_at.getY()+(m_minimap_ai_size>>2)),
-                                 m_map_left+(int)(draw_at.getX()+(m_minimap_ai_size>>2)),
-                                 lower_y   -(int)(draw_at.getY()-(m_minimap_ai_size>>2)));
+        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/2.5f)),
+                                 lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.5f)),
+                                 m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/2.5f)),
+                                 lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.5f)));
         draw2DImage(icon, position, source, NULL, NULL, true);
     }
 

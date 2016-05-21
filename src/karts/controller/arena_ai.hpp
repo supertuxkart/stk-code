@@ -56,12 +56,16 @@ protected:
     /** For debugging purpose: a sphere indicating where the AI
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
+    irr::scene::ISceneNode *m_debug_sphere_next;
 
     /** The node(poly) at which the target point lies in. */
     int m_target_node;
 
     /** The target point. */
     Vec3 m_target_point;
+
+    /** For directDrive() to work */
+    bool m_avoid_eating_banana;
 
     void         collectItemInArena(Vec3*, int*) const;
 private:
@@ -104,7 +108,8 @@ private:
     float m_time_since_uturn;
 
     void         checkIfStuck(const float dt);
-    float        determineTurnRadius(std::vector<Vec3>& points);
+    float        determineTurnRadius(const Vec3& p1, const Vec3& p2,
+                                     const Vec3& p3);
     void         findPortals(int start, int end);
     void         handleArenaAcceleration(const float dt);
     void         handleArenaBanana();
@@ -116,8 +121,11 @@ private:
     void         stringPull(const Vec3&, const Vec3&);
     virtual int  getCurrentNode() const = 0;
     virtual bool isWaiting() const = 0;
+    virtual void resetAfterStop() {};
     virtual void findClosestKart(bool use_difficulty) = 0;
     virtual void findTarget() = 0;
+    virtual bool forceBraking()                 { return false; }
+    virtual bool directDrive()  { return m_avoid_eating_banana; }
 public:
                  ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};

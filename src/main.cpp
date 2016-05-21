@@ -552,6 +552,8 @@ void cmdLineHelp()
     "       --root=DIR         Path to add to the list of STK root directories.\n"
     "                          You can specify more than one by separating them\n"
     "                          with colons (:).\n"
+    "       --cutscene=NAME    Launch the specified track as a cutscene.\n"
+    "                          This is for internal debugging use only.\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
     "http://supertuxkart.sourceforge.net\n\n",

@@ -65,7 +65,7 @@ protected:
     static int m_test_ai;
 
     /** Position info structure of targets. */
-    struct posData {bool behind; bool on_side; float angle; float distance;};
+    struct posData {bool behind; bool lhs; float angle; float distance;};
 
     void         setControllerName(const std::string &name);
     float        steerToPoint(const Vec3 &point);
@@ -77,7 +77,9 @@ protected:
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
     bool         isStuck() const { return m_stuck; }
-    void         checkPosition(const Vec3&, posData*, Vec3* lc = NULL) const;
+    void         checkPosition(const Vec3&, posData*,
+                               Vec3* lc = NULL,
+                               bool use_front_xyz = false) const;
 
 public:
              AIBaseController(AbstractKart *kart);

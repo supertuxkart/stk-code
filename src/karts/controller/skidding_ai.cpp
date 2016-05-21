@@ -140,8 +140,7 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
 }   // SkiddingAI
 
 //-----------------------------------------------------------------------------
-/** The destructor deletes the shared TrackInfo objects if no more SkiddingAI
- *  instances are around.
+/** Destructor, mostly to clean up debug data structures.
  */
 SkiddingAI::~SkiddingAI()
 {
@@ -183,10 +182,10 @@ void SkiddingAI::reset()
     QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
     if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
     {
-        Log::error("SkiddingAI",
-                "Invalid starting position for '%s' - not on track"
-                " - can be ignored.",
-                m_kart->getIdent().c_str());
+        Log::error(getControllerName().c_str(),
+                   "Invalid starting position for '%s' - not on track"
+                   " - can be ignored.",
+                   m_kart->getIdent().c_str());
         m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
     }
 
@@ -400,8 +399,8 @@ void SkiddingAI::handleBraking()
     {
 #ifdef DEBUG
     if(m_ai_debug)
-        Log::debug("SkiddingAI", "braking: %s ahead of leader.",
-               m_kart->getIdent().c_str());
+        Log::debug(getControllerName().c_str(), "braking: %s ahead of leader.",
+                   m_kart->getIdent().c_str());
 #endif
 
         m_controls->m_brake = true;
@@ -420,8 +419,9 @@ void SkiddingAI::handleBraking()
     {
 #ifdef DEBUG
         if(m_ai_debug)
-            Log::debug("SkiddingAI", "%s not aligned with track.",
-                   m_kart->getIdent().c_str());
+            Log::debug(getControllerName().c_str(),
+                       "%s not aligned with track.",
+                       m_kart->getIdent().c_str());
 #endif
         m_controls->m_brake = true;
         return;
@@ -439,11 +439,11 @@ void SkiddingAI::handleBraking()
             m_controls->m_brake = true;
 #ifdef DEBUG
             if(m_ai_debug)
-                Log::debug("SkiddingAI",
-                       "speed %f too tight curve: radius %f ",
-                       m_kart->getSpeed(),
-                       m_kart->getIdent().c_str(),
-                       m_current_curve_radius);
+                Log::debug(getControllerName().c_str(),
+                           "speed %f too tight curve: radius %f ",
+                           m_kart->getSpeed(),
+                           m_kart->getIdent().c_str(),
+                           m_current_curve_radius);
 #endif
         }
         return;
@@ -484,7 +484,8 @@ void SkiddingAI::handleSteering(float dt)
 #ifdef AI_DEBUG
         m_debug_sphere[0]->setPosition(QuadGraph::get()->getQuadOfNode(next)
                        .getCenter().toIrrVector());
-        Log::debug("skidding_ai","-Outside of road: steer to center point.");
+        Log::debug(getControllerName().c_str(),
+                   "Outside of road: steer to center point.");
 #endif
     }
     //If we are going to crash against a kart, avoid it if it doesn't
@@ -494,12 +495,12 @@ void SkiddingAI::handleSteering(float dt)
         //-1 = left, 1 = right, 0 = no crash.
         if( m_start_kart_crash_direction == 1 )
         {
-            steer_angle = steerToAngle(next, -M_PI*0.5f );
+            steer_angle = steerToAngle(next, M_PI*0.5f );
             m_start_kart_crash_direction = 0;
         }
         else if(m_start_kart_crash_direction == -1)
         {
-            steer_angle = steerToAngle(next, M_PI*0.5f);
+            steer_angle = steerToAngle(next, -M_PI*0.5f);
             m_start_kart_crash_direction = 0;
         }
         else
@@ -507,18 +508,19 @@ void SkiddingAI::handleSteering(float dt)
             if(m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() ) >
                m_world->getDistanceToCenterForKart( m_crashes.m_kart ))
             {
-                steer_angle = steerToAngle(next, -M_PI*0.5f );
+                steer_angle = steerToAngle(next, M_PI*0.5f );
                 m_start_kart_crash_direction = 1;
             }
             else
             {
-                steer_angle = steerToAngle(next, M_PI*0.5f );
+                steer_angle = steerToAngle(next, -M_PI*0.5f );
                 m_start_kart_crash_direction = -1;
             }
         }
 
 #ifdef AI_DEBUG
-        Log::debug("skidding_ai",  "- Velocity vector crashes with kart "
+        Log::debug(getControllerName().c_str(),
+                   "Velocity vector crashes with kart "
                    "and doesn't crashes with road : steer 90 "
                    "degrees away from kart.");
 #endif
@@ -700,8 +702,8 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
         }
 
         if(m_ai_debug)
-            Log::debug("SkiddingAI", "%s unselects item.",
-                        m_kart->getIdent().c_str());
+            Log::debug(getControllerName().c_str(), "%s unselects item.",
+                       m_kart->getIdent().c_str());
         // Otherwise remove the pre-selected item (and start
         // looking for a new item).
         m_item_to_collect = NULL;
@@ -770,9 +772,10 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                                            .toIrrVector());
 #endif
                 if(m_ai_debug)
-                    Log::debug("SkiddingAI", "%s selects item type '%d'.",
-                           m_kart->getIdent().c_str(),
-                           item_to_collect->getType());
+                    Log::debug(getControllerName().c_str(),
+                               "%s selects item type '%d'.",
+                               m_kart->getIdent().c_str(),
+                               item_to_collect->getType());
                 m_item_to_collect = item_to_collect;
             }
             else
@@ -793,18 +796,18 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                                                .toIrrVector());
 #endif
                     if(m_ai_debug)
-                        Log::debug("SkiddingAI",
-                               "%s adjusts to hit type %d angle %f.",
-                               m_kart->getIdent().c_str(),
-                               item_to_collect->getType(), angle);
+                        Log::debug(getControllerName().c_str(),
+                                   "%s adjusts to hit type %d angle %f.",
+                                   m_kart->getIdent().c_str(),
+                                   item_to_collect->getType(), angle);
                 }
                 else
                 {
                     if(m_ai_debug)
-                        Log::debug("SkiddingAI",
-                               "%s won't hit '%d', angle %f.",
-                               m_kart->getIdent().c_str(),
-                               item_to_collect->getType(), angle);
+                        Log::debug(getControllerName().c_str(),
+                                   "%s won't hit '%d', angle %f.",
+                                   m_kart->getIdent().c_str(),
+                                   item_to_collect->getType(), angle);
                 }
             }   // kart will not hit item
         }   // does hit hit bad item
@@ -1421,9 +1424,9 @@ void SkiddingAI::handleItems(const float dt)
         m_controls->m_fire = m_kart_ahead != NULL;
         break;
     default:
-        Log::error("SkiddingAI",
-                "Invalid or unhandled powerup '%d' in default AI.",
-                m_kart->getPowerup()->getType());
+        Log::error(getControllerName().c_str(),
+                   "Invalid or unhandled powerup '%d' in default AI.",
+                   m_kart->getPowerup()->getType());
         assert(false);
     }
     if(m_controls->m_fire)  m_time_since_last_shot = 0.0f;
@@ -1717,7 +1720,7 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
         slip->isSlipstreamReady() &&
         slip->getSlipstreamTarget())
     {
-        //Log::debug("skidding_ai", "%s overtaking %s\n",
+        //Log::debug(getControllerName().c_str(), "%s overtaking %s",
         //           m_kart->getIdent().c_str(),
         //           m_kart->getSlipstreamKart()->getIdent().c_str());
         // FIXME: we might define a minimum distance, and if the target kart
@@ -1742,9 +1745,9 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
     int current_node = m_track_node;
     if(steps<1 || steps>1000)
     {
-        Log::warn("SkiddingAI",
-            "Incorrect STEPS=%d. kart_length %f velocity %f",
-            steps, m_kart_length, m_kart->getVelocityLC().getZ());
+        Log::warn(getControllerName().c_str(),
+                  "Incorrect STEPS=%d. kart_length %f velocity %f",
+                  steps, m_kart_length, m_kart->getVelocityLC().getZ());
         steps=1000;
     }
     for(int i = 1; steps > i; ++i)
@@ -2226,8 +2229,9 @@ bool SkiddingAI::canSkid(float steer_fraction)
             if(m_ai_debug)
             {
                 if(fabsf(steer_fraction)>=2.5f)
-                    Log::debug("SkiddingAI", "%s stops skidding (%f).",
-                           m_kart->getIdent().c_str(), steer_fraction);
+                    Log::debug(getControllerName().c_str(),
+                               "%s stops skidding (%f).",
+                               m_kart->getIdent().c_str(), steer_fraction);
             }
 #endif
             // If the current turn is not sharp enough, delay releasing
@@ -2246,8 +2250,9 @@ bool SkiddingAI::canSkid(float steer_fraction)
 #ifdef DEBUG
         if(m_controls->m_skid && m_ai_debug)
         {
-            Log::debug("SkiddingAI", "%s stops skidding on straight.",
-                m_kart->getIdent().c_str());
+            Log::debug(getControllerName().c_str(),
+                       "%s stops skidding on straight.",
+                       m_kart->getIdent().c_str());
         }
 #endif
         return false;
@@ -2282,8 +2287,9 @@ bool SkiddingAI::canSkid(float steer_fraction)
     if(m_controls->m_skid && duration < 1.0f)
     {
         if(m_ai_debug)
-            Log::debug("SkiddingAI", "'%s' too short, stop skid.",
-                    m_kart->getIdent().c_str());
+            Log::debug(getControllerName().c_str(),
+                       "'%s' too short, stop skid.",
+                       m_kart->getIdent().c_str());
         return false;
     }
     // Test if the AI is trying to skid against track direction. This
@@ -2297,9 +2303,9 @@ bool SkiddingAI::canSkid(float steer_fraction)
         {
 #ifdef DEBUG
             if(m_controls->m_skid && m_ai_debug)
-                Log::debug("SkiddingAI",
-                        "%s skidding against track direction.",
-                        m_kart->getIdent().c_str());
+                Log::debug(getControllerName().c_str(),
+                           "%s skidding against track direction.",
+                           m_kart->getIdent().c_str());
 #endif
             return false;
         }
@@ -2309,8 +2315,9 @@ bool SkiddingAI::canSkid(float steer_fraction)
     {
 #ifdef DEBUG
         if(!m_controls->m_skid && m_ai_debug)
-            Log::debug("SkiddingAI", "%s start skid, duration %f.",
-                        m_kart->getIdent().c_str(), duration);
+            Log::debug(getControllerName().c_str(),
+                       "%s start skid, duration %f.",
+                       m_kart->getIdent().c_str(), duration);
 #endif
         return true;
 
@@ -2318,8 +2325,9 @@ bool SkiddingAI::canSkid(float steer_fraction)
 
 #ifdef DEBUG
         if(m_controls->m_skid && m_ai_debug)
-            Log::debug("SkiddingAI", "%s has no reasons to skid anymore.",
-                   m_kart->getIdent().c_str());
+            Log::debug(getControllerName().c_str(),
+                       "%s has no reasons to skid anymore.",
+                       m_kart->getIdent().c_str());
 #endif
     return false;
 }   // canSkid
@@ -2364,9 +2372,10 @@ void SkiddingAI::setSteering(float angle, float dt)
                                      : SKID_PROBAB_NO_SKID;
 #undef PRINT_SKID_STATS
 #ifdef PRINT_SKID_STATS
-            Log::info("SkiddingAI", "%s distance %f prob %d skidding %s\n",
-                   m_kart->getIdent().c_str(), distance, prob,
-                   sc= ? "no" : sc==KartControl::SC_LEFT ? "left" : "right");
+            Log::info(getControllerName().c_str(),
+                      "%s distance %f prob %d skidding %s",
+                      m_kart->getIdent().c_str(), distance, prob,
+                      sc= ? "no" : sc==KartControl::SC_LEFT ? "left" : "right");
 #endif
         }
         m_controls->m_skid = m_skid_probability_state == SKID_PROBAB_SKID
@@ -2397,8 +2406,9 @@ void SkiddingAI::setSteering(float angle, float dt)
         m_controls->m_skid = KartControl::SC_NONE;
 #ifdef DEBUG
         if(m_ai_debug)
-            Log::info("SkiddingAI", "'%s' wrong steering, stop skid.",
-                    m_kart->getIdent().c_str());
+            Log::info(getControllerName().c_str(),
+                      "'%s' wrong steering, stop skid.",
+                      m_kart->getIdent().c_str());
 #endif
     }
 
@@ -2412,8 +2422,9 @@ void SkiddingAI::setSteering(float angle, float dt)
         {
 #ifdef DEBUG
             if(m_ai_debug)
-                Log::info("SkiddingAI", "%s steering too much (%f).",
-                       m_kart->getIdent().c_str(), steer_fraction);
+                Log::info(getControllerName().c_str(),
+                          "%s steering too much (%f).",
+                          m_kart->getIdent().c_str(), steer_fraction);
 #endif
             m_controls->m_skid = KartControl::SC_NONE;
         }
