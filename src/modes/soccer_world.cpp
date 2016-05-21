@@ -591,7 +591,7 @@ void SoccerWorld::setAITeam()
         SoccerTeam team = race_manager->getKartInfo(i).getSoccerTeam();
 
         // Happen in profiling mode
-        if (team == SOCCER_TEAM_NONE);
+        if (team == SOCCER_TEAM_NONE)
         {
             race_manager->setKartSoccerTeam(i, SOCCER_TEAM_BLUE);
             team = SOCCER_TEAM_BLUE;
