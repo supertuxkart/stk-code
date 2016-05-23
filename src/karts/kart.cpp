@@ -2208,19 +2208,15 @@ void Kart::updatePhysics(float dt)
 
     updateEngineSFX();
 #ifdef XX
-    Log::info("Kart","forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f"
-       ,m_vehicle->m_forwardImpulse[0]
-       ,m_vehicle->m_forwardImpulse[1]
-       ,m_vehicle->m_forwardImpulse[2]
-       ,m_vehicle->m_forwardImpulse[3]
-       ,m_vehicle->m_sideImpulse[0]
-       ,m_vehicle->m_sideImpulse[1]
-       ,m_vehicle->m_sideImpulse[2]
-       ,m_vehicle->m_sideImpulse[3]
+    Log::info("Kart","angVel %f %f %f heading %f suspension %f %f %f %f"
        ,m_body->getAngularVelocity().getX()
        ,m_body->getAngularVelocity().getY()
        ,m_body->getAngularVelocity().getZ()
        ,getHeading()
+       ,m_vehicle->getWheelInfo(0).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(1).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(2).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(3).m_raycastInfo.m_suspensionLength
        );
 #endif
 
