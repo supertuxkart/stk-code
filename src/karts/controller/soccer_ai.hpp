@@ -55,8 +55,10 @@ private:
     bool m_steer_with_ball;
 
     Vec3 determineBallAimingPosition();
-    bool determineOvertakePosition(const Vec3& ball_lc,
-                                   const posData& ball_pos, Vec3* overtake_wc);
+    bool isOvertakable(const Vec3& ball_lc, const posData& ball_pos);
+    bool determineOvertakePosition(const Vec3& ball_lc, const Vec3& aim_lc,
+                                   const posData& ball_pos, Vec3* overtake_lc);
+    float rotateSlope(float old_slope, bool rotate_up);
 
     virtual void findClosestKart(bool use_difficulty);
     virtual void findTarget();
