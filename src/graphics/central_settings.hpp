@@ -35,6 +35,7 @@ private:
     bool hasTextureView;
     bool hasBindlessTexture;
     bool hasUBO;
+    bool hasExplicitAttribLocation;
     bool hasGS;
     bool hasTextureCompression;
     bool hasAtomics;
@@ -60,7 +61,7 @@ public:
     bool isARBUniformBufferObjectUsable() const;
     bool isEXTTextureCompressionS3TCUsable() const;
     bool isARBTextureViewUsable() const;
-    bool isARBGeometryShader4Usable() const;
+    bool isARBGeometryShadersUsable() const;
     bool isARBTextureStorageUsable() const;
     bool isAMDVertexShaderLayerUsable() const;
     bool isARBComputeShaderUsable() const;
@@ -73,6 +74,7 @@ public:
     bool isARBShaderStorageBufferObjectUsable() const;
     bool isARBImageLoadStoreUsable() const;
     bool isARBMultiDrawIndirectUsable() const;
+    bool isARBExplicitAttribLocationUsable() const;
 
 
     // Are all required extensions available for feature support
