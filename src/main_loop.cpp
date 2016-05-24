@@ -62,7 +62,8 @@ MainLoop::~MainLoop()
 float MainLoop::getLimitedDt()
 {
     // In profile mode without graphics, run with a fixed dt of 1/60
-    if (ProfileWorld::isProfileMode() && ProfileWorld::isNoGraphics())
+    if ((ProfileWorld::isProfileMode() && ProfileWorld::isNoGraphics()) ||
+        UserConfigParams::m_arena_ai_stats)
     {
         return 1.0f/60.0f;
     }

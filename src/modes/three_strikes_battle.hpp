@@ -74,6 +74,12 @@ private:
     /** Function to update the locations of all karts on the polygon map */
     void updateKartNodes();
 
+    /** Profiling usage */
+    int m_total_rescue;
+    int m_frame_count;
+    int m_start_time;
+    int m_total_hit;
+
 public:
 
     /** Used to show a nice graph when battle is over */
@@ -108,10 +114,12 @@ public:
     virtual void update(float dt);
 
     virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node);
+    virtual void enterRaceOverState() OVERRIDE;
 
     int getKartNode(unsigned int kart_id) const;
 
     void updateKartRanks();
+    void increaseRescueCount() { m_total_rescue++; }
 };   // ThreeStrikesBattles
 
 

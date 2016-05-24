@@ -50,6 +50,7 @@ void ArenaAI::reset()
     m_cur_kart_pos_data = {0};
     m_is_stuck = false;
     m_is_uturn = false;
+    m_avoid_eating_banana = false;
     m_target_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
@@ -76,7 +77,10 @@ void ArenaAI::update(float dt)
 
     // Don't do anything if there is currently a kart animations shown.
     if (m_kart->getKartAnimation())
+    {
+        resetAfterStop();
         return;
+    }
 
     if (isWaiting())
     {
@@ -101,6 +105,7 @@ void ArenaAI::update(float dt)
 
     if (m_is_uturn)
     {
+        resetAfterStop();
         handleArenaUTurn(dt);
     }
     else
@@ -155,6 +160,7 @@ void ArenaAI::checkIfStuck(const float dt)
  */
 void ArenaAI::handleArenaAcceleration(const float dt)
 {
+
     if (m_controls->m_brake)
     {
         m_controls->m_accel = 0.0f;
@@ -202,6 +208,7 @@ bool ArenaAI::handleArenaUnstuck(const float dt)
 {
     if (!m_is_stuck || m_is_uturn) return false;
 
+    resetAfterStop();
     setSteering(0.0f, dt);
 
     if (fabsf(m_kart->getSpeed()) >
@@ -234,9 +241,10 @@ void ArenaAI::handleArenaSteering(const float dt)
     if (current_node == BattleGraph::UNKNOWN_POLY ||
         m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
-    if (m_target_node == current_node)
+    if (m_target_node == current_node || directDrive())
     {
         // Very close to the item, steer directly
+        m_path_corners.clear();
         checkPosition(m_target_point, &m_cur_kart_pos_data);
 #ifdef AI_DEBUG
         m_debug_sphere->setPosition(m_target_point.toIrrVector());
@@ -263,7 +271,8 @@ void ArenaAI::handleArenaSteering(const float dt)
 
         checkPosition(m_target_point, &m_cur_kart_pos_data);
 #ifdef AI_DEBUG
-        if (m_path_corners.size() > 2)
+        m_debug_sphere->setPosition(m_path_corners[0].toIrrVector());
+        /*if (m_path_corners.size() > 2)
         {
             m_debug_sphere->setVisible(true);
             m_debug_sphere_next->setVisible(true);
@@ -274,7 +283,7 @@ void ArenaAI::handleArenaSteering(const float dt)
         {
             m_debug_sphere->setVisible(false);
             m_debug_sphere_next->setVisible(false);
-        }
+        }*/
 #endif
         if (m_cur_kart_pos_data.behind)
         {
@@ -300,6 +309,8 @@ void ArenaAI::handleArenaSteering(const float dt)
 //-----------------------------------------------------------------------------
 void ArenaAI::handleArenaBanana()
 {
+    m_avoid_eating_banana = false;
+
     if (m_is_uturn) return;
 
     const std::vector< std::pair<const Item*, int> >& item_list =
@@ -321,10 +332,7 @@ void ArenaAI::handleArenaBanana()
                 banana_lc = (banana_pos.lhs ? banana_lc + Vec3 (2, 0, 0) :
                     banana_lc - Vec3 (2, 0, 0));
                 m_target_point = m_kart->getTrans()(banana_lc);
-                m_target_node  = BattleGraph::get()
-                    ->pointToNode(getCurrentNode(), m_target_point,
-                    false/*ignore_vertical*/);
-
+                m_avoid_eating_banana = true;
                 // Handle one banana only
                 break;
             }
@@ -498,6 +506,7 @@ void ArenaAI::handleArenaBraking()
     if (forceBraking() && m_kart->getSpeed() > MIN_SPEED)
     {
         // Brake now
+        m_controls->m_brake = true;
         return;
     }
 
@@ -505,6 +514,8 @@ void ArenaAI::handleArenaBraking()
 
     if (getCurrentNode() == BattleGraph::UNKNOWN_POLY ||
         m_target_node    == BattleGraph::UNKNOWN_POLY) return;
+
+    if (m_path_corners.empty()) return;
 
     float current_curve_radius = determineTurnRadius(m_kart->getXYZ(),
         m_path_corners[0], (m_path_corners.size() >= 2 ? m_path_corners[1] :

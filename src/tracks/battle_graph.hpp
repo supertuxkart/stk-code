@@ -19,9 +19,9 @@
 #ifndef HEADER_BATTLE_GRAPH_HPP
 #define HEADER_BATTLE_GRAPH_HPP
 
-#include <vector>
 #include <string>
 #include <set>
+#include <vector>
 
 #include "tracks/graph_structure.hpp"
 #include "tracks/navmesh.hpp"
@@ -30,6 +30,7 @@ class GraphStructure;
 class Item;
 class ItemManager;
 class Navmesh;
+class XMLNode;
 
 /**
 * \ingroup tracks
@@ -57,10 +58,14 @@ private:
 
     std::vector< std::pair<const Item*, int> > m_items_on_graph;
 
+    std::set<int> m_red_node;
+    std::set<int> m_blue_node;
+
     void buildGraph(NavMesh*);
     void computeFloydWarshall();
+    void loadGoalNodes(const XMLNode& node);
 
-    BattleGraph(const std::string &navmesh_file_name);
+    BattleGraph(const std::string &navmesh_file_name, const XMLNode& node);
     ~BattleGraph(void);
 
     // ------------------------------------------------------------------------
@@ -79,6 +84,8 @@ private:
     // ------------------------------------------------------------------------
     virtual const bool hasLapLine() const
                                                             { return false; }
+    // ------------------------------------------------------------------------
+    virtual const bool differentNodeColor(int n, NodeColor* c) const;
 
 public:
     static const int UNKNOWN_POLY;
@@ -88,10 +95,11 @@ public:
     // ----------------------------------------------------------------------
     /** Asserts that no BattleGraph instance exists. Then
     *    creates a BattleGraph instance. */
-    static void create(const std::string &navmesh_file_name)
+    static void create(const std::string &navmesh_file_name,
+                       const XMLNode& node)
     {
         assert(m_battle_graph==NULL);
-        m_battle_graph = new BattleGraph(navmesh_file_name);
+        m_battle_graph = new BattleGraph(navmesh_file_name, node);
 
     } // create
     // ----------------------------------------------------------------------

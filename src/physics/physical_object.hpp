@@ -213,6 +213,8 @@ public:
     /** Add body to dynamic world */
     void addBody();
     // ------------------------------------------------------------------------
+    float getRadius() const { return m_radius; }
+    // ------------------------------------------------------------------------
     const std::string& getOnKartCollisionFunction() const { return m_on_kart_collision; }
     // ------------------------------------------------------------------------
     const std::string& getOnItemCollisionFunction() const { return m_on_item_collision; }
