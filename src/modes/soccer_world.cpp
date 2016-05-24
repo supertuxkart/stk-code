@@ -142,6 +142,10 @@ void SoccerWorld::reset()
     resetAllPosition();
     m_ball->reset();
     m_bgd.reset();
+    // Make the player kart in profiling mode up
+    // ie make this kart less likely to affect gaming result
+    if (UserConfigParams::m_arena_ai_stats)
+        getKart(8)->flyUp();
 
 }   // reset
 
@@ -188,6 +192,8 @@ void SoccerWorld::update(float dt)
                 // Reset all karts
                 for (unsigned int i = 0; i < m_karts.size(); i++)
                     moveKartAfterRescue(m_karts[i]);
+                if (UserConfigParams::m_arena_ai_stats)
+                    getKart(8)->flyUp();
             }
         }
     }
@@ -456,6 +462,8 @@ void SoccerWorld::updateBallPosition(float dt)
                 m_ball->reset();
                 for (unsigned int i = 0; i < m_karts.size(); i++)
                     moveKartAfterRescue(m_karts[i]);
+                if (UserConfigParams::m_arena_ai_stats)
+                    getKart(8)->flyUp();
             }
         }
         else
@@ -509,6 +517,10 @@ void SoccerWorld::updateAIData()
 
     for (unsigned int i = 0; i < m_karts.size(); ++i)
     {
+        if (UserConfigParams::m_arena_ai_stats &&
+            m_karts[i]->getController()->isPlayerController())
+            continue;
+
         if (getKartTeam(m_karts[i]->getWorldKartId()) == SOCCER_TEAM_RED)
         {
             Vec3 rd = m_karts[i]->getXYZ() - getBallPosition();
@@ -593,23 +605,36 @@ void SoccerWorld::enterRaceOverState()
         Log::verbose("Soccer AI profiling", "Time for a team to have 30 goals: %f",
             runtime);
 
-        // Own goal rate
+        // Goal calculation
         int red_own_goal = 0;
         int blue_own_goal = 0;
         for (unsigned i = 0; i < m_red_scorers.size(); i++)
         {
+            // Notice: if a team has own goal, the score will end up in the
+            // opposite team
             if (!m_red_scorers[i].m_correct_goal)
-                red_own_goal++;
+                blue_own_goal++;
         }
         for (unsigned i = 0; i < m_blue_scorers.size(); i++)
         {
             if (!m_blue_scorers[i].m_correct_goal)
-                blue_own_goal++;
+                red_own_goal++;
         }
 
-        Log::verbose("Soccer AI profiling", "Own goal rate: red %d\%, blue %d\%",
-            int(red_own_goal * 100 / m_red_scorers.size()),
-            int(blue_own_goal * 100 / m_blue_scorers.size()));
+        int red_goal = ((m_red_scorers.size() - blue_own_goal) >= 0 ?
+            m_red_scorers.size() - blue_own_goal : 0);
+        int blue_goal = ((m_blue_scorers.size() - red_own_goal) >= 0 ?
+            m_blue_scorers.size() - red_own_goal : 0);
+
+        Log::verbose("Soccer AI profiling", "Red goal: %d, Red own goal: %d,"
+            "Blue goal: %d, Blue own goal: %d", red_goal, red_own_goal,
+            blue_goal, blue_own_goal);
+
+        if (getScore(SOCCER_TEAM_BLUE) >= m_goal_target)
+            Log::verbose("Soccer AI profiling", "Blue team wins");
+        else
+            Log::verbose("Soccer AI profiling", "Red team wins");
+
         delete this;
         main_loop->abort();
     }
@@ -637,6 +662,7 @@ void SoccerWorld::setAITeam()
         {
             race_manager->setKartSoccerTeam(i, SOCCER_TEAM_BLUE);
             team = SOCCER_TEAM_BLUE;
+            continue;
         }
 
         team == SOCCER_TEAM_BLUE ? blue_player++ : red_player++;
