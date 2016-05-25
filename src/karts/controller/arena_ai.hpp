@@ -64,6 +64,9 @@ protected:
     /** The target point. */
     Vec3 m_target_point;
 
+    /** For directDrive() to work */
+    bool m_avoid_eating_banana;
+
     void         collectItemInArena(Vec3*, int*) const;
 private:
     /** Used by handleArenaUTurn, it tells whether to do left or right
@@ -118,9 +121,11 @@ private:
     void         stringPull(const Vec3&, const Vec3&);
     virtual int  getCurrentNode() const = 0;
     virtual bool isWaiting() const = 0;
+    virtual void resetAfterStop() {};
     virtual void findClosestKart(bool use_difficulty) = 0;
     virtual void findTarget() = 0;
-    virtual bool forceBraking() { return false; }
+    virtual bool forceBraking()                 { return false; }
+    virtual bool directDrive()  { return m_avoid_eating_banana; }
 public:
                  ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};

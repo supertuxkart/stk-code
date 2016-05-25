@@ -55,8 +55,7 @@ void CheckGoal::update(float dt)
 
     if (world)
     {
-        const Vec3 &xyz = world->getBallPosition();
-        if (isTriggered(m_previous_ball_position, xyz, -1))
+        if (isTriggered(m_previous_ball_position, world->getBallPosition(), -1))
         {
             if (UserConfigParams::m_check_debug)
             {
@@ -65,7 +64,7 @@ void CheckGoal::update(float dt)
             }
             trigger(0);
         }
-        m_previous_ball_position = xyz;
+        m_previous_ball_position = world->getBallPosition();
     }
 }   // update
 
@@ -108,8 +107,7 @@ void CheckGoal::reset(const Track &track)
 
     if (world)
     {
-        const Vec3 &xyz = world->getBallPosition();
-        m_previous_ball_position = xyz;
+        m_previous_ball_position = world->getBallPosition();
     }
 
 }   // reset
