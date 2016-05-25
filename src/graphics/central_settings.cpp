@@ -160,11 +160,19 @@ void CentralVideoSettings::init()
             hasExplicitAttribLocation = true;
             Log::info("GLDriver", "ARB Explicit Attrib Location Present");
         }
+        #if defined(__linux__)
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GEOMETRY_SHADER) &&
             (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 2))) {
             hasGS = true;
             Log::info("GLDriver", "Geometry Shaders Present");
         }
+        #else
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GEOMETRY_SHADER) &&
+            hasGLExtension("GL_ARB_geometry_shader4")) {
+            hasGS = true;
+            Log::info("GLDriver", "ARB Geometry Shader 4 Present");
+        }
+        #endif
 
         // Only unset the high def textures if they are set as default. If the
         // user has enabled them (bit 1 set), then leave them enabled.
