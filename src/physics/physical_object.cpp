@@ -60,7 +60,14 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
     xml_node.get("id",                &m_id               );
     xml_node.get("mass",              &m_mass             );
     xml_node.get("radius",            &m_radius           );
+    xml_node.get("height",            &m_height           );
+    xml_node.get("friction",          &m_friction         );
     xml_node.get("restitution",       &m_restitution      );
+    xml_node.get("linear-factor",     &m_linear_factor    );
+    xml_node.get("angular-factor",    &m_angular_factor   );
+    xml_node.get("linear-damping",    &m_linear_damping   );
+    xml_node.get("angular-damping",   &m_angular_damping  );
+
     xml_node.get("shape",             &shape              );
     xml_node.get("reset",             &m_crash_reset      );
     xml_node.get("explode",           &m_knock_kart       );
@@ -98,7 +105,13 @@ void PhysicalObject::Settings::init()
     m_knock_kart         = false;
     m_mass               = 0.0f;
     m_radius             = -1.0f;
+    m_height             = -1.0f;
+    m_friction           = 0.5f;   // default bullet value
     m_restitution        = 0.0f;
+    m_linear_factor      = Vec3(1.0f, 1.0f, 1.0f);
+    m_angular_factor     = Vec3(1.0f, 1.0f, 1.0f); 
+    m_linear_damping     = 0.0f;
+    m_angular_damping    = 0.0f;
     m_reset_when_too_low = false;
     m_flatten_kart       = false;
 }   // Settings
@@ -130,11 +143,10 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_flatten_kart       = false;
     m_triangle_mesh      = NULL;
 
-    m_object = object;
-
-    m_init_xyz = object->getAbsoluteCenterPosition();
-    m_init_hpr   = object->getRotation();
-    m_init_scale = object->getScale();
+    m_object             = object;
+    m_init_xyz           = object->getAbsoluteCenterPosition();
+    m_init_hpr           = object->getRotation();
+    m_init_scale         = object->getScale();
 
     m_id                 = settings.m_id;
     m_mass               = settings.m_mass;
@@ -160,8 +172,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
 
     m_is_dynamic = is_dynamic;
 
-    init();
-    m_body->setRestitution(settings.m_restitution);
+    init(settings);
 }   // PhysicalObject
 
 // ----------------------------------------------------------------------------
@@ -205,7 +216,7 @@ void PhysicalObject::move(const Vec3& xyz, const core::vector3df& hpr)
 // ----------------------------------------------------------------------------
 /** Additional initialisation after loading of the model is finished.
  */
-void PhysicalObject::init()
+void PhysicalObject::init(const PhysicalObject::Settings& settings)
 {
     // 1. Determine size of the object
     // -------------------------------
@@ -296,6 +307,8 @@ void PhysicalObject::init()
     }
     case MP_CYLINDER_Y:
     {
+        if(settings.m_height > 0)
+            extend.setY(settings.m_height);
         if (m_radius < 0) m_radius = 0.5f*extend.length_2d();
         m_shape = new btCylinderShape(0.5f*extend);
         break;
@@ -513,6 +526,12 @@ void PhysicalObject::init()
     m_body = new btRigidBody(info);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);
+
+    m_body->setFriction(settings.m_friction);
+    m_body->setRestitution(settings.m_restitution);
+    m_body->setLinearFactor(settings.m_linear_factor);
+    m_body->setAngularFactor(settings.m_angular_factor);
+    m_body->setDamping(settings.m_linear_damping,settings.m_angular_damping);
 
     if (!m_is_dynamic)
     {
