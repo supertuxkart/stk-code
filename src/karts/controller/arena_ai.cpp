@@ -241,7 +241,7 @@ void ArenaAI::handleArenaSteering(const float dt)
     if (current_node == BattleGraph::UNKNOWN_POLY ||
         m_target_node == BattleGraph::UNKNOWN_POLY) return;
 
-    if (m_target_node == current_node || directDrive())
+    if (m_target_node == current_node || ignorePathFinding())
     {
         // Very close to the item, steer directly
         m_path_corners.clear();

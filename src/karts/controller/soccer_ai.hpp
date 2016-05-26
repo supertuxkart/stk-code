@@ -52,13 +52,14 @@ private:
      */
     bool m_overtake_ball;
     bool m_force_brake;
-    bool m_steer_with_ball;
+    bool m_chasing_ball;
 
     Vec3 determineBallAimingPosition();
-    bool isOvertakable(const Vec3& ball_lc, const posData& ball_pos);
+    bool isOvertakable(const Vec3& ball_lc);
     bool determineOvertakePosition(const Vec3& ball_lc, const Vec3& aim_lc,
-                                   const posData& ball_pos, Vec3* overtake_lc);
+                                   Vec3* overtake_lc);
     float rotateSlope(float old_slope, bool rotate_up);
+    float findAngleFrom3Edges(float a, float b, float c);
 
     virtual void findClosestKart(bool use_difficulty);
     virtual void findTarget();
@@ -67,9 +68,9 @@ private:
     virtual bool isWaiting() const;
     virtual bool canSkid(float steer_fraction)           { return false; }
     virtual bool forceBraking() OVERRIDE         { return m_force_brake; }
-    virtual bool directDrive() OVERRIDE
+    virtual bool ignorePathFinding() OVERRIDE
     {
-        return m_avoid_eating_banana || m_overtake_ball || m_steer_with_ball;
+        return m_avoid_eating_banana || m_overtake_ball || m_chasing_ball;
     }
 
 public:
