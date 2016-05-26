@@ -64,7 +64,7 @@ protected:
     /** The target point. */
     Vec3 m_target_point;
 
-    /** For directDrive() to work */
+    /** For ignorePathFinding() to work */
     bool m_avoid_eating_banana;
 
     void         collectItemInArena(Vec3*, int*) const;
@@ -125,7 +125,7 @@ private:
     virtual void findClosestKart(bool use_difficulty) = 0;
     virtual void findTarget() = 0;
     virtual bool forceBraking()                 { return false; }
-    virtual bool directDrive()  { return m_avoid_eating_banana; }
+    virtual bool ignorePathFinding()  { return m_avoid_eating_banana; }
 public:
                  ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};

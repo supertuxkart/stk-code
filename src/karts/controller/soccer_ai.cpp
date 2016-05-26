@@ -56,9 +56,9 @@ SoccerAI::SoccerAI(AbstractKart *kart)
     video::SColor red(128, 128, 0, 0);
     video::SColor blue(128, 0, 0, 128);
     m_red_sphere = irr_driver->addSphere(1.0f, red);
-    m_red_sphere->setVisible(false);
+    m_red_sphere->setVisible(true);
     m_blue_sphere = irr_driver->addSphere(1.0f, blue);
-    m_blue_sphere->setVisible(false);
+    m_blue_sphere->setVisible(true);
 #endif
 
     m_world = dynamic_cast<SoccerWorld*>(World::getWorld());
@@ -99,7 +99,7 @@ void SoccerAI::reset()
 
     m_overtake_ball = false;
     m_force_brake = false;
-    m_steer_with_ball = false;
+    m_chasing_ball = false;
 
 }   // reset
 
@@ -113,9 +113,9 @@ void SoccerAI::update(float dt)
     m_blue_sphere->setPosition(blue.toIrrVector());
 #endif
     m_force_brake = false;
-    m_steer_with_ball = false;
+    m_chasing_ball = false;
 
-    if (World::getWorld()->getPhase() == World::GOAL_PHASE)
+    if (m_world->getPhase() == World::GOAL_PHASE)
     {
         resetAfterStop();
         m_controls->m_brake = false;
@@ -187,8 +187,7 @@ void SoccerAI::findTarget()
         ->getWorldKartId())
     {
         // This AI will attack the other team ball chaser
-        int id = m_world->getBallChaser(m_cur_team == SOCCER_TEAM_BLUE ?
-            SOCCER_TEAM_RED : SOCCER_TEAM_BLUE);
+        int id = m_world->getBallChaser(m_opp_team);
         m_target_point = m_world->getKart(id)->getXYZ();
         m_target_node  = m_world->getKartNode(id);
     }
@@ -215,24 +214,22 @@ Vec3 SoccerAI::determineBallAimingPosition()
 
     const Vec3& ball_aim_pos = m_world->getBallAimPosition(m_opp_team);
     const Vec3& orig_pos = m_world->getBallPosition();
-    const float ball_diameter = m_world->getBallDiameter();
-    posData ball_pos = {0};
-    posData aim_pos = {0};
+
     Vec3 ball_lc;
     Vec3 aim_lc;
-    checkPosition(orig_pos, &ball_pos, &ball_lc, true/*use_front_xyz*/);
-    checkPosition(ball_aim_pos, &aim_pos, &aim_lc, true/*use_front_xyz*/);
+    checkPosition(orig_pos, NULL, &ball_lc, true/*use_front_xyz*/);
+    checkPosition(ball_aim_pos, NULL, &aim_lc, true/*use_front_xyz*/);
 
     // Too far from the ball,
     // use path finding from arena ai to get close
     // ie no extra braking is needed
-    if (aim_pos.distance > 10.0f) return ball_aim_pos;
+    if (aim_lc.length_2d() > 10.0f) return ball_aim_pos;
 
     if (m_overtake_ball)
     {
         Vec3 overtake_lc;
         const bool can_overtake = determineOvertakePosition(ball_lc, aim_lc,
-            ball_pos, &overtake_lc);
+            &overtake_lc);
         if (!can_overtake)
         {
             m_overtake_ball = false;
@@ -248,7 +245,7 @@ Vec3 SoccerAI::determineBallAimingPosition()
         // is behind the ball , if so m_overtake_ball is true
         if (aim_lc.z() > 0 && aim_lc.z() > ball_lc.z())
         {
-            if (isOvertakable(ball_lc, ball_pos))
+            if (isOvertakable(ball_lc))
             {
                 m_overtake_ball = true;
                 return ball_aim_pos;
@@ -263,33 +260,58 @@ Vec3 SoccerAI::determineBallAimingPosition()
             }
         }
 
-        // Otherwise use the aim position calculated by soccer world
-        // Prevent lost control when steering with ball
-        m_force_brake = ball_pos.angle > 0.15f &&
-            m_kart->getSpeed() > 9.0f && ball_pos.distance < ball_diameter;
-
-        if (aim_pos.behind && aim_pos.distance < (ball_diameter / 2))
+        m_chasing_ball = true;
+        // Check if reached aim point, which is behind aiming position and
+        // in front of the ball, if so use another aiming method
+        if (aim_lc.z() < 0 && ball_lc.z() > 0)
         {
-            // Reached aim point, aim forward
-            m_steer_with_ball = true;
+            // Find the angle between the ball to kart and the aim position
+            // to kart, if it's not almost 180 or 0 degree, we need to
+            // apply brake
+            const float c = sqrtf(pow(ball_lc.z() - aim_lc.z(), 2) +
+                 pow(ball_lc.x() - aim_lc.x(), 2));
+            const float angle = findAngleFrom3Edges(aim_lc.length_2d(),
+                ball_lc.length_2d(), c);
+
+            if (angle > 1 && angle < 179)
+            {
+                m_force_brake = true;
+            }
+
+            // Return the behind version of aim position, allow pushing to
+            // ball towards the it
             return m_world->getBallAimPosition(m_opp_team, true/*reverse*/);
         }
-        return ball_aim_pos;
     }
 
-    // Make compiler happy
+    // Otherwise keep steering until reach aim position
     return ball_aim_pos;
 
 }   // determineBallAimingPosition
 
 //-----------------------------------------------------------------------------
-bool SoccerAI::isOvertakable(const Vec3& ball_lc, const posData& ball_pos)
+float SoccerAI::findAngleFrom3Edges(float a, float b, float c)
+{
+    // Cosine forumla : c2 = a2 + b2 - 2ab cos C
+    float test_value = (c * c) - (a * a) - (b * b) / (-(2 * a * b));
+    // Prevent error
+    if (test_value < -1)
+        test_value = -1;
+    else if (test_value > 1)
+        test_value = 1;
+
+    return acosf(test_value) * RAD_TO_DEGREE;
+
+}   // find3PointsAngle
+
+//-----------------------------------------------------------------------------
+bool SoccerAI::isOvertakable(const Vec3& ball_lc)
 {
     // No overtake if ball is behind
     if (ball_lc.z() < 0.0f) return false;
 
     // Circle equation: (x-a)2 + (y-b)2 = r2
-    const float r2 = (ball_pos.distance / 2) * (ball_pos.distance / 2);
+    const float r2 = (ball_lc.length_2d() / 2) * (ball_lc.length_2d() / 2);
     const float a = ball_lc.x();
     const float b = ball_lc.z();
 
@@ -307,16 +329,15 @@ bool SoccerAI::isOvertakable(const Vec3& ball_lc, const posData& ball_pos)
 //-----------------------------------------------------------------------------
 bool SoccerAI::determineOvertakePosition(const Vec3& ball_lc,
                                          const Vec3& aim_lc,
-                                         const posData& ball_pos,
                                          Vec3* overtake_lc)
 {
     // This done by drawing a circle using the center of ball local coordinates
-    // and the distance / 2 from kart to ball center as radius (which allows more
-    // offset for overtaking), then find tangent line from kart (0, 0, 0) to the
-    // circle. The intercept point will be used as overtake position
+    // and the distance / 2 from kart to ball center as radius (which allows
+    // more offset for overtaking), then find tangent line from kart (0, 0, 0)
+    // to the circle. The intercept point will be used as overtake position
 
     // Check if overtakable at current location
-    if (!isOvertakable(ball_lc, ball_pos)) return false;
+    if (!isOvertakable(ball_lc)) return false;
 
     // Otherwise calculate the tangent
     // As all are local coordinates, so center is 0,0 which is y = mx for the
@@ -332,7 +353,7 @@ bool SoccerAI::determineOvertakePosition(const Vec3& ball_lc,
     // x = -b (+/-) sqrt(b2 - 4ac) / 2a
 
     // Circle equation: (x-a)2 + (y-b)2 = r2
-    const float r = ball_pos.distance / 2;
+    const float r = ball_lc.length_2d() / 2;
     const float r2 = r * r;
     const float a = ball_lc.x();
     const float b = ball_lc.z();
