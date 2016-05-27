@@ -42,6 +42,8 @@ ArenaAI::ArenaAI(AbstractKart *kart)
 void ArenaAI::reset()
 {
     m_target_node = BattleGraph::UNKNOWN_POLY;
+    m_current_forward_node = BattleGraph::UNKNOWN_POLY;
+    m_current_forward_point = Vec3(0, 0, 0);
     m_adjusting_side = false;
     m_closest_kart = NULL;
     m_closest_kart_node = BattleGraph::UNKNOWN_POLY;
@@ -57,8 +59,7 @@ void ArenaAI::reset()
     m_time_since_reversing = 0.0f;
     m_time_since_uturn = 0.0f;
     m_on_node.clear();
-    m_path_corners.clear();
-    m_portals.clear();
+    m_aiming_points.clear();
 
     m_cur_difficulty = race_manager->getDifficulty();
     AIBaseController::reset();
@@ -118,6 +119,108 @@ void ArenaAI::update(float dt)
     AIBaseController::update(dt);
 
 }   // update
+
+//-----------------------------------------------------------------------------
+bool ArenaAI::getAimingPoints()
+{
+    m_current_forward_point =
+        m_kart->getTrans()(Vec3(0, 0, m_kart->getKartLength()));
+    m_current_forward_node = BattleGraph::get()->pointToNode
+        (m_current_forward_node, m_current_forward_point,
+        false/*ignore_vertical*/);
+
+    if (m_current_forward_node == BattleGraph::UNKNOWN_POLY ||
+        m_current_forward_node == m_target_node)
+        m_current_forward_node = getCurrentNode();
+
+    int first = m_current_forward_node;
+    int last = m_target_node;
+
+    if (first == BattleGraph::UNKNOWN_POLY ||
+        last == BattleGraph::UNKNOWN_POLY)
+        return false;
+
+    if (m_current_forward_node == m_target_node)
+    {
+        m_aiming_points.push_back(BattleGraph::get()
+            ->getPolyOfNode(first).getCenter());
+        m_aiming_points.push_back(m_target_point);
+        return true;
+    }
+
+    m_aiming_points.push_back(BattleGraph::get()
+        ->getPolyOfNode(first).getCenter());
+    const int next_node = BattleGraph::get()
+        ->getNextShortestPathPoly(first, last);
+    assert(next_node != BattleGraph::UNKNOWN_POLY);
+
+    m_aiming_points.push_back(BattleGraph::get()
+        ->getPolyOfNode(next_node).getCenter());
+
+    return true;
+}   // getAimingPoints
+
+//-----------------------------------------------------------------------------
+/** This function sets the steering.
+ *  \param dt Time step size.
+ */
+void ArenaAI::handleArenaSteering(const float dt)
+{
+    const int current_node = getCurrentNode();
+
+    if (current_node == BattleGraph::UNKNOWN_POLY ||
+        m_target_node == BattleGraph::UNKNOWN_POLY) return;
+
+    m_aiming_points.clear();
+    const bool found_points = getAimingPoints();
+    if (ignorePathFinding())
+    {
+        // Steer directly
+        checkPosition(m_target_point, &m_cur_kart_pos_data);
+#ifdef AI_DEBUG
+        m_debug_sphere->setPosition(m_target_point.toIrrVector());
+#endif
+        if (m_cur_kart_pos_data.behind)
+        {
+            m_adjusting_side = m_cur_kart_pos_data.lhs;
+            m_is_uturn = true;
+        }
+        else
+        {
+            float target_angle = steerToPoint(m_target_point);
+            setSteering(target_angle, dt);
+        }
+        return;
+    }
+    else if (found_points)
+    {
+        m_target_point = m_aiming_points[1];
+        checkPosition(m_target_point, &m_cur_kart_pos_data);
+#ifdef AI_DEBUG
+        m_debug_sphere->setVisible(true);
+        m_debug_sphere_next->setVisible(true);
+        m_debug_sphere->setPosition(m_aiming_points[0].toIrrVector());
+        m_debug_sphere_next->setPosition(m_aiming_points[1].toIrrVector());
+#endif
+        if (m_cur_kart_pos_data.behind)
+        {
+            m_adjusting_side = m_cur_kart_pos_data.lhs;
+            m_is_uturn = true;
+        }
+        else
+        {
+            float target_angle = steerToPoint(m_target_point);
+            setSteering(target_angle, dt);
+        }
+        return;
+    }
+    else
+    {
+        // Do nothing (go straight) if no targets found
+        setSteering(0.0f, dt);
+        return;
+    }
+}   // handleSteering
 
 //-----------------------------------------------------------------------------
 void ArenaAI::checkIfStuck(const float dt)
@@ -231,82 +334,6 @@ bool ArenaAI::handleArenaUnstuck(const float dt)
 }   // handleArenaUnstuck
 
 //-----------------------------------------------------------------------------
-/** This function sets the steering.
- *  \param dt Time step size.
- */
-void ArenaAI::handleArenaSteering(const float dt)
-{
-    const int current_node = getCurrentNode();
-
-    if (current_node == BattleGraph::UNKNOWN_POLY ||
-        m_target_node == BattleGraph::UNKNOWN_POLY) return;
-
-    if (m_target_node == current_node || ignorePathFinding())
-    {
-        // Very close to the item, steer directly
-        m_path_corners.clear();
-        checkPosition(m_target_point, &m_cur_kart_pos_data);
-#ifdef AI_DEBUG
-        m_debug_sphere->setPosition(m_target_point.toIrrVector());
-#endif
-        if (m_cur_kart_pos_data.behind)
-        {
-            m_adjusting_side = m_cur_kart_pos_data.lhs;
-            m_is_uturn = true;
-        }
-        else
-        {
-            float target_angle = steerToPoint(m_target_point);
-            setSteering(target_angle, dt);
-        }
-        return;
-    }
-
-    else if (m_target_node != current_node)
-    {
-        findPortals(current_node, m_target_node);
-        stringPull(m_kart->getXYZ(), m_target_point);
-        if (m_path_corners.size() > 0)
-            m_target_point = m_path_corners[0];
-
-        checkPosition(m_target_point, &m_cur_kart_pos_data);
-#ifdef AI_DEBUG
-        m_debug_sphere->setPosition(m_path_corners[0].toIrrVector());
-        /*if (m_path_corners.size() > 2)
-        {
-            m_debug_sphere->setVisible(true);
-            m_debug_sphere_next->setVisible(true);
-            m_debug_sphere->setPosition(m_path_corners[1].toIrrVector());
-            m_debug_sphere_next->setPosition(m_path_corners[2].toIrrVector());
-        }
-        else
-        {
-            m_debug_sphere->setVisible(false);
-            m_debug_sphere_next->setVisible(false);
-        }*/
-#endif
-        if (m_cur_kart_pos_data.behind)
-        {
-            m_adjusting_side = m_cur_kart_pos_data.lhs;
-            m_is_uturn = true;
-        }
-        else
-        {
-            float target_angle = steerToPoint(m_target_point);
-            setSteering(target_angle, dt);
-        }
-        return;
-    }
-
-    else
-    {
-        // Do nothing (go straight) if no targets found
-        setSteering(0.0f, dt);
-        return;
-    }
-}   // handleSteering
-
-//-----------------------------------------------------------------------------
 void ArenaAI::handleArenaBanana()
 {
     m_avoid_eating_banana = false;
@@ -342,155 +369,6 @@ void ArenaAI::handleArenaBanana()
 }   // handleArenaBanana
 
 //-----------------------------------------------------------------------------
-/** This function finds the polyon edges(portals) that the AI will cross before
- *  reaching its destination. We start from the current polygon and call
- *  BattleGraph::getNextShortestPathPoly() to find the next polygon on the shortest
- *  path to the destination. Then find the common edge between the current
- *  poly and the next poly, store it and step through the channel.
- *
- *       1----2----3            In this case, the portals are:
- *       |strt|    |            (2,5) (4,5) (10,7) (10,9) (11,12)
- *       6----5----4
- *            |    |
- *            7----10----11----14
- *            |    |     | end |
- *            8----9-----12----13
- *
- *  \param start The start node(polygon) of the channel.
- *  \param end The end node(polygon) of the channel.
- */
-void ArenaAI::findPortals(int start, int end)
-{
-    int this_node = start;
-
-    // We can't use NULL because NULL==0 which is a valid node, so we initialize
-    // with a value that is always invalid.
-    int next_node = -999;
-
-    m_portals.clear();
-
-    while (next_node != end && this_node != -1 && next_node != -1 && this_node != end)
-    {
-        next_node = BattleGraph::get()->getNextShortestPathPoly(this_node, end);
-        if (next_node == BattleGraph::UNKNOWN_POLY || next_node == -999) return;
-
-        std::vector<int> this_node_verts =
-                         NavMesh::get()->getNavPoly(this_node).getVerticesIndex();
-        std::vector<int> next_node_verts=
-                         NavMesh::get()->getNavPoly(next_node).getVerticesIndex();
-
-        // this_node_verts and next_node_verts hold vertices of polygons in CCW order
-        // We reverse next_node_verts so it becomes easy to compare edges in the next step
-        std::reverse(next_node_verts.begin(),next_node_verts.end());
-
-        Vec3 portalLeft, portalRight;
-        //bool flag = 0;
-        for (unsigned int n_i = 0; n_i < next_node_verts.size(); n_i++)
-        {
-            for (unsigned int t_i = 0; t_i < this_node_verts.size(); t_i++)
-            {
-                if ((next_node_verts[n_i] == this_node_verts[t_i]) &&
-                    (next_node_verts[(n_i+1)%next_node_verts.size()] ==
-                     this_node_verts[(t_i+1)%this_node_verts.size()]))
-                {
-                     portalLeft = NavMesh::get()->
-                         getVertex(this_node_verts[(t_i+1)%this_node_verts.size()]);
-
-                     portalRight = NavMesh::get()->getVertex(this_node_verts[t_i]);
-                }
-            }
-        }
-        m_portals.push_back(std::make_pair(portalLeft, portalRight));
-        // for debugging:
-        //m_debug_sphere->setPosition((portalLeft).toIrrVector());
-        this_node = next_node;
-    }
-}   // findPortals
-
-//-----------------------------------------------------------------------------
-/** This function implements the funnel algorithm for finding shortest paths
- *  through a polygon channel. This means that we should move from corner to
- *  corner to move on the most straight and shortest path to the destination.
- *  This can be visualized as pulling a string from the end point to the start.
- *  The string will bend at the corners, and this algorithm will find those
- *  corners using portals from findPortals(). The AI will aim at the first
- *  corner and the rest can be used for estimating the curve (braking).
- *
- *       1----2----3            In this case, the corners are:
- *       |strt|    |            <5,10,end>
- *       6----5----4
- *            |    |
- *            7----10----11----14
- *            |    |     | end |
- *            8----9-----12----13
- *
- *  \param start_pos The start position (usually the AI's current position).
- *  \param end_pos The end position (m_target_point).
- */
-void ArenaAI::stringPull(const Vec3& start_pos, const Vec3& end_pos)
-{
-    Vec3 funnel_apex = start_pos;
-    Vec3 funnel_left = m_portals[0].first;
-    Vec3 funnel_right = m_portals[0].second;
-    unsigned int apex_index=0, fun_left_index=0, fun_right_index=0;
-    m_portals.push_back(std::make_pair(end_pos, end_pos));
-    m_path_corners.clear();
-    const float eps=0.0001f;
-
-    for (unsigned int i = 0; i < m_portals.size(); i++)
-    {
-        Vec3 portal_left = m_portals[i].first;
-        Vec3 portal_right = m_portals[i].second;
-
-        //Compute for left edge
-        if ((funnel_left == funnel_apex) ||
-             portal_left.sideOfLine2D(funnel_apex, funnel_left) <= -eps)
-        {
-            funnel_left = 0.98f*portal_left + 0.02f*portal_right;
-            //funnel_left = portal_left;
-            fun_left_index = i;
-
-            if (portal_left.sideOfLine2D(funnel_apex, funnel_right) < -eps)
-            {
-                funnel_apex = funnel_right;
-                apex_index = fun_right_index;
-                m_path_corners.push_back(funnel_apex);
-
-                funnel_left = funnel_apex;
-                funnel_right = funnel_apex;
-                i = apex_index;
-                continue;
-            }
-        }
-
-        //Compute for right edge
-        if ((funnel_right == funnel_apex) ||
-             portal_right.sideOfLine2D(funnel_apex, funnel_right) >= eps)
-        {
-            funnel_right = 0.98f*portal_right + 0.02f*portal_left;
-            //funnel_right = portal_right;
-            fun_right_index = i;
-
-            if (portal_right.sideOfLine2D(funnel_apex, funnel_left) > eps)
-            {
-                funnel_apex = funnel_left;
-                apex_index = fun_left_index;
-                m_path_corners.push_back(funnel_apex);
-
-                funnel_left = funnel_apex;
-                funnel_right = funnel_apex;
-                i = apex_index;
-                continue;
-            }
-        }
-
-    }
-
-    //Push end_pos to m_path_corners so if no corners, we aim at target
-    m_path_corners.push_back(end_pos);
-}   // stringPull
-
-//-----------------------------------------------------------------------------
 /** This function handles braking. It calls determineTurnRadius() to find out
  *  the curve radius. Depending on the turn radius, it finds out the maximum
  *  speed. If the current speed is greater than the max speed and a set minimum
@@ -515,16 +393,16 @@ void ArenaAI::handleArenaBraking()
     if (getCurrentNode() == BattleGraph::UNKNOWN_POLY ||
         m_target_node    == BattleGraph::UNKNOWN_POLY) return;
 
-    if (m_path_corners.empty()) return;
+    if (m_aiming_points.empty()) return;
 
     float current_curve_radius = determineTurnRadius(m_kart->getXYZ(),
-        m_path_corners[0], (m_path_corners.size() >= 2 ? m_path_corners[1] :
-        m_path_corners[0]));
+        m_aiming_points[0], m_aiming_points[1]);
 
     float max_turn_speed = m_kart->getSpeedForTurnRadius(current_curve_radius);
 
     if (m_kart->getSpeed() > max_turn_speed &&
-        m_kart->getSpeed() > MIN_SPEED)
+        m_kart->getSpeed() > MIN_SPEED &&
+        fabsf(m_controls->m_steer) > 0.3f)
     {
         m_controls->m_brake = true;
     }
@@ -534,8 +412,8 @@ void ArenaAI::handleArenaBraking()
 //-----------------------------------------------------------------------------
 /** The turn radius is determined by fitting a parabola to 3 points: current
  *  location of AI, first corner and the second corner. Once the constants are
- *  computed, a formula is used to find the radius of curvature at the kart's
- *  current location.
+ *  computed, a formula is used to find the radius of curvature at the vertex
+ *  of the parabola.
  */
 float ArenaAI::determineTurnRadius(const Vec3& p1, const Vec3& p2,
                                    const Vec3& p3)
@@ -549,23 +427,26 @@ float ArenaAI::determineTurnRadius(const Vec3& p1, const Vec3& p2,
     // Avoid nan, this will happen if three values of coordinates x are too
     // close together, ie a straight line, return a large radius
     // so no braking is needed
-    if (fabsf(denominator) < eps) return 25.0f;
+    if (fabsf(denominator) < eps) return 40.0f;
 
 	const float a = (p3.x() * (p2.z() - p1.z()) +
 	                 p2.x() * (p1.z() - p3.z()) +
 	                 p1.x() * (p3.z() - p2.z())) / denominator;
 
     // Should not happen, otherwise y=c which is a straight line
-    if (fabsf(a) < eps) return 25.0f;
+    if (fabsf(a) < eps) return 40.0f;
 
 	const float b = (p3.x() * p3.x() * (p1.z() - p2.z()) +
 	                 p2.x() * p2.x() * (p3.z() - p1.z()) +
 	                 p1.x() * p1.x() * (p2.z() - p3.z())) / denominator;
 
+    // Vertex: -b / 2a
+    const float vertex_x = -b / (2 * a);
+
     // Differentiate the function, so y=ax2+bx+c will become y=2ax+b for dy_dx,
     // y=2a for d2y_dx2
-    // Use the p1 (current location of AI) as x
-    const float dy_dx = 2 * a * p1.x() + b;
+    // Use the vertex of the parabola as x
+    const float dy_dx = 2 * a * vertex_x + b;
     const float d2y_dx2 = 2 * a;
 
     // Calculate the radius of curvature at current location of AI
@@ -573,7 +454,7 @@ float ArenaAI::determineTurnRadius(const Vec3& p1, const Vec3& p2,
     assert(!std::isnan(radius));
 
     // Avoid returning too large radius
-    return (radius > 25.0f ? 25.0f : radius);
+    return (radius > 40.0f ? 40.0f : radius);
 }   // determineTurnRadius
 
 //-----------------------------------------------------------------------------
@@ -765,14 +646,15 @@ void ArenaAI::collectItemInArena(Vec3* aim_point, int* target_node) const
              m_kart->getKartProperties()->getNitroSmallContainer()))
                 continue; // Ignore nitro when already has some
 
-        Vec3 d = item->getXYZ() - m_kart->getXYZ();
-        if (d.length_2d() <= distance               &&
+        float test_distance = BattleGraph::get()
+            ->getDistance(item_list[i].second, getCurrentNode());
+        if (test_distance <= distance               &&
            (item->getType() == Item::ITEM_BONUS_BOX ||
             item->getType() == Item::ITEM_NITRO_BIG ||
             item->getType() == Item::ITEM_NITRO_SMALL))
         {
             closest_item_num = i;
-            distance = d.length_2d();
+            distance = test_distance;
         }
     }
 

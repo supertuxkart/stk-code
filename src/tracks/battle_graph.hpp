@@ -120,6 +120,15 @@ public:
                                          { return m_distance_matrix.size(); }
 
     // ----------------------------------------------------------------------
+    /** Returns the distance between any two nodes */
+    float getDistance(int from, int to) const
+    {
+        if (from == BattleGraph::UNKNOWN_POLY ||
+            to == BattleGraph::UNKNOWN_POLY)
+            return 0.0f;
+        return m_distance_matrix[from][to];
+    }
+    // ------------------------------------------------------------------------
     /** Returns the NavPoly corresponding to the i-th node of the BattleGraph */
     const NavPoly&    getPolyOfNode(int i) const
                                     { return NavMesh::get()->getNavPoly(i); }
