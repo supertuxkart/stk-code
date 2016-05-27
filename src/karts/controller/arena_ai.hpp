@@ -64,6 +64,9 @@ protected:
     /** The target point. */
     Vec3 m_target_point;
 
+    int m_current_forward_node;
+    Vec3 m_current_forward_point;
+
     /** For ignorePathFinding() to work */
     bool m_avoid_eating_banana;
 
@@ -85,15 +88,9 @@ private:
 
     /** Holds the unique node ai has driven through, useful to tell if AI is
      *  stuck by determine the size of this set. */
-    std::set <int> m_on_node;
+    std::set<int> m_on_node;
 
-    /** Holds the corner points computed using the funnel algorithm that the AI
-     *  will eventaully move through. See stringPull(). */
-    std::vector<Vec3> m_path_corners;
-
-    /** Holds the set of portals that the kart will cross when moving through
-     *  polygon channel. See findPortals(). */
-    std::vector<std::pair<Vec3,Vec3> > m_portals;
+    std::vector<Vec3> m_aiming_points;
 
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
@@ -110,7 +107,6 @@ private:
     void         checkIfStuck(const float dt);
     float        determineTurnRadius(const Vec3& p1, const Vec3& p2,
                                      const Vec3& p3);
-    void         findPortals(int start, int end);
     void         handleArenaAcceleration(const float dt);
     void         handleArenaBanana();
     void         handleArenaBraking();
@@ -118,7 +114,7 @@ private:
     void         handleArenaSteering(const float dt);
     void         handleArenaUTurn(const float dt);
     bool         handleArenaUnstuck(const float dt);
-    void         stringPull(const Vec3&, const Vec3&);
+    bool         getAimingPoints();
     virtual int  getCurrentNode() const = 0;
     virtual bool isWaiting() const = 0;
     virtual void resetAfterStop() {};

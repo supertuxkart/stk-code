@@ -532,10 +532,9 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
             for (unsigned int j = 0; j < used_location.size(); j++)
             {
                 if (!found) continue;
-                Vec3 d = BattleGraph::get()
-                    ->getPolyOfNode(used_location[j]).getCenter() -
-                    BattleGraph::get()->getPolyOfNode(node).getCenter();
-                found = d.length_2d() > MIN_DIST;
+                float test_distance = BattleGraph::get()
+                    ->getDistance(used_location[j], node);
+                found = test_distance > MIN_DIST;
             }
             if (found)
             {

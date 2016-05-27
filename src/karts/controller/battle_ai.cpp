@@ -25,6 +25,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "modes/three_strikes_battle.hpp"
+#include "tracks/battle_graph.hpp"
 
 #ifdef AI_DEBUG
 #include "irrlicht.h"
@@ -118,10 +119,11 @@ void BattleAI::findClosestKart(bool use_difficulty)
                 continue;
         }
 
-        Vec3 d = kart->getXYZ() - m_kart->getXYZ();
-        if (d.length_2d() <= distance)
+        float test_distance = BattleGraph::get()->getDistance(m_world
+            ->getKartNode(kart->getWorldKartId()), getCurrentNode());
+        if (test_distance <= distance)
         {
-            distance = d.length_2d();
+            distance = test_distance;
             closest_kart_num = i;
         }
     }
@@ -134,6 +136,7 @@ void BattleAI::findClosestKart(bool use_difficulty)
     {
         m_closest_kart = m_world->getKart(closest_kart_num);
         checkPosition(m_closest_kart_point, &m_closest_kart_pos_data);
+        m_closest_kart_pos_data.distance = distance;
 
         // Do a mini-skid to closest kart only when firing target,
         // not straight ahead, not too far, in front of it
