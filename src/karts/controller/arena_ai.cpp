@@ -29,6 +29,15 @@
 #include "tracks/battle_graph.hpp"
 #include "utils/log.hpp"
 
+int ArenaAI::m_test_node_for_banana = BattleGraph::UNKNOWN_POLY;
+
+bool isNodeWithBanana(const std::pair<const Item*, int>& item_pair)
+{
+    return item_pair.second == ArenaAI::m_test_node_for_banana &&
+        item_pair.first->getType() == Item::ITEM_BANANA &&
+        !item_pair.first->wasCollected();
+}
+
 ArenaAI::ArenaAI(AbstractKart *kart)
        : AIBaseController(kart)
 {
@@ -52,14 +61,16 @@ void ArenaAI::reset()
     m_cur_kart_pos_data = {0};
     m_is_stuck = false;
     m_is_uturn = false;
-    m_avoid_eating_banana = false;
     m_target_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
     m_time_since_reversing = 0.0f;
     m_time_since_uturn = 0.0f;
+    m_turn_radius = 0.0f;
+    m_turn_angle = 0.0f;
     m_on_node.clear();
     m_aiming_points.clear();
+    m_aiming_nodes.clear();
 
     m_cur_difficulty = race_manager->getDifficulty();
     AIBaseController::reset();
@@ -96,11 +107,10 @@ void ArenaAI::update(float dt)
     findClosestKart(true);
     findTarget();
     handleArenaItems(dt);
-    handleArenaBanana();
 
-    if (m_kart->getSpeed() > 15.0f && m_cur_kart_pos_data.angle < 0.2f)
+    if (m_kart->getSpeed() > 15.0f && m_turn_angle < 20)
     {
-        // Only use nitro when target is straight
+        // Only use nitro when turn angle is big (180 - angle)
         m_controls->m_nitro = true;
     }
 
@@ -121,44 +131,57 @@ void ArenaAI::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-bool ArenaAI::getAimingPoints()
+bool ArenaAI::updateAimingPosition()
 {
+    // Notice: we use the point ahead of kart to determine next node,
+    // to compensate the time difference between steering
     m_current_forward_point =
         m_kart->getTrans()(Vec3(0, 0, m_kart->getKartLength()));
     m_current_forward_node = BattleGraph::get()->pointToNode
         (m_current_forward_node, m_current_forward_point,
         false/*ignore_vertical*/);
 
-    if (m_current_forward_node == BattleGraph::UNKNOWN_POLY ||
-        m_current_forward_node == m_target_node)
-        m_current_forward_node = getCurrentNode();
+    // Use current node if forward node is unknown, or near the target
+    const int forward = (m_current_forward_node == BattleGraph::UNKNOWN_POLY ||
+        m_current_forward_node == m_target_node ||
+        getCurrentNode() == m_target_node ? getCurrentNode() :
+        m_current_forward_node);
 
-    int first = m_current_forward_node;
-    int last = m_target_node;
-
-    if (first == BattleGraph::UNKNOWN_POLY ||
-        last == BattleGraph::UNKNOWN_POLY)
+    if (forward == BattleGraph::UNKNOWN_POLY ||
+        m_target_node == BattleGraph::UNKNOWN_POLY)
         return false;
 
-    if (m_current_forward_node == m_target_node)
+    if (forward == m_target_node)
     {
         m_aiming_points.push_back(BattleGraph::get()
-            ->getPolyOfNode(first).getCenter());
+            ->getPolyOfNode(forward).getCenter());
         m_aiming_points.push_back(m_target_point);
+
+        m_aiming_nodes.insert(forward);
+        m_aiming_nodes.insert(getCurrentNode());
         return true;
     }
 
-    m_aiming_points.push_back(BattleGraph::get()
-        ->getPolyOfNode(first).getCenter());
     const int next_node = BattleGraph::get()
-        ->getNextShortestPathPoly(first, last);
-    assert(next_node != BattleGraph::UNKNOWN_POLY);
+        ->getNextShortestPathPoly(forward, m_target_node);
+    if (next_node == BattleGraph::UNKNOWN_POLY)
+    {
+        Log::error("ArenaAI", "Next node is unknown, did you forget to link"
+                   "adjacent face in navmesh?");
+        return false;
+    }
 
+    m_aiming_points.push_back(BattleGraph::get()
+        ->getPolyOfNode(forward).getCenter());
     m_aiming_points.push_back(BattleGraph::get()
         ->getPolyOfNode(next_node).getCenter());
 
+    m_aiming_nodes.insert(forward);
+    m_aiming_nodes.insert(next_node);
+    m_aiming_nodes.insert(getCurrentNode());
+
     return true;
-}   // getAimingPoints
+}   // updateAimingPosition
 
 //-----------------------------------------------------------------------------
 /** This function sets the steering.
@@ -169,10 +192,14 @@ void ArenaAI::handleArenaSteering(const float dt)
     const int current_node = getCurrentNode();
 
     if (current_node == BattleGraph::UNKNOWN_POLY ||
-        m_target_node == BattleGraph::UNKNOWN_POLY) return;
+        m_target_node == BattleGraph::UNKNOWN_POLY)
+    {
+        return;
+    }
 
     m_aiming_points.clear();
-    const bool found_points = getAimingPoints();
+    m_aiming_nodes.clear();
+    const bool found_position = updateAimingPosition();
     if (ignorePathFinding())
     {
         // Steer directly
@@ -192,8 +219,12 @@ void ArenaAI::handleArenaSteering(const float dt)
         }
         return;
     }
-    else if (found_points)
+    else if (found_position)
     {
+        updateBananaLocation();
+        assert(m_aiming_points.size() == 2);
+        updateTurnRadius(m_kart->getXYZ(), m_aiming_points[0],
+            m_aiming_points[1]);
         m_target_point = m_aiming_points[1];
         checkPosition(m_target_point, &m_cur_kart_pos_data);
 #ifdef AI_DEBUG
@@ -283,7 +314,7 @@ void ArenaAI::handleArenaUTurn(const float dt)
 
     if (fabsf(m_kart->getSpeed()) >
         (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
-        && m_kart->getSpeed() < 0)    // Try to emulate reverse like human players
+        && m_kart->getSpeed() < 0) // Try to emulate reverse like human players
         m_controls->m_accel = -0.06f;
     else
         m_controls->m_accel = -5.0f;
@@ -334,43 +365,49 @@ bool ArenaAI::handleArenaUnstuck(const float dt)
 }   // handleArenaUnstuck
 
 //-----------------------------------------------------------------------------
-void ArenaAI::handleArenaBanana()
+void ArenaAI::updateBananaLocation()
 {
-    m_avoid_eating_banana = false;
-
-    if (m_is_uturn) return;
-
-    const std::vector< std::pair<const Item*, int> >& item_list =
+    std::vector<std::pair<const Item*, int>>& item_list =
         BattleGraph::get()->getItemList();
-    const unsigned int items_count = item_list.size();
-    for (unsigned int i = 0; i < items_count; ++i)
+
+    std::set<int>::iterator node = m_aiming_nodes.begin();
+    while (node != m_aiming_nodes.end())
     {
-        const Item* item = item_list[i].first;
-        if (item->getType() == Item::ITEM_BANANA && !item->wasCollected())
+        m_test_node_for_banana = *node;
+        std::vector<std::pair<const Item*, int>>::iterator it =
+            std::find_if(item_list.begin(), item_list.end(), isNodeWithBanana);
+
+        if (it != item_list.end())
         {
+            Vec3 banana_lc;
             posData banana_pos = {0};
-            Vec3 banana_lc(0, 0, 0);
-            checkPosition(item->getXYZ(), &banana_pos, &banana_lc);
-            if (banana_pos.angle < 0.2f && banana_pos.distance < 7.5f &&
-               !banana_pos.behind)
+            checkPosition(it->first->getXYZ(), &banana_pos, &banana_lc,
+                true/*use_front_xyz*/);
+
+            // If satisfy the below condition, AI should not eat banana
+            if (banana_pos.behind || banana_pos.angle > 0.3f)
             {
-                // Check whether it's straight ahead towards a banana
-                // If so, adjust target point
-                banana_lc = (banana_pos.lhs ? banana_lc + Vec3 (2, 0, 0) :
-                    banana_lc - Vec3 (2, 0, 0));
-                m_target_point = m_kart->getTrans()(banana_lc);
-                m_avoid_eating_banana = true;
-                // Handle one banana only
-                break;
+                node++;
+                continue;
             }
+
+            const float dist = banana_lc.length() * 2;
+            banana_lc = (banana_lc.x() < 0 ? banana_lc + Vec3(dist, 0, 0) :
+                        banana_lc - Vec3(dist, 0, 0));
+            // If the node AI will pass has a banana, adjust the aim position
+            m_aiming_points[1] = m_kart->getTrans()(banana_lc);
+
+            // Handle one banana only
+            return;
         }
+        node++;
     }
 
-}   // handleArenaBanana
+}   // updateBananaLocation
 
 //-----------------------------------------------------------------------------
-/** This function handles braking. It calls determineTurnRadius() to find out
- *  the curve radius. Depending on the turn radius, it finds out the maximum
+/** This function handles braking. It used the turn radius found by
+ *  updateTurnRadius(). Depending on the turn radius, it finds out the maximum
  *  speed. If the current speed is greater than the max speed and a set minimum
  *  speed, brakes are applied.
  */
@@ -395,14 +432,11 @@ void ArenaAI::handleArenaBraking()
 
     if (m_aiming_points.empty()) return;
 
-    float current_curve_radius = determineTurnRadius(m_kart->getXYZ(),
-        m_aiming_points[0], m_aiming_points[1]);
+    const float max_turn_speed = m_kart->getSpeedForTurnRadius(m_turn_radius);
 
-    float max_turn_speed = m_kart->getSpeedForTurnRadius(current_curve_radius);
-
-    if (m_kart->getSpeed() > max_turn_speed &&
-        m_kart->getSpeed() > MIN_SPEED &&
-        fabsf(m_controls->m_steer) > 0.3f)
+    if (m_kart->getSpeed() > 1.25f * max_turn_speed &&
+        fabsf(m_controls->m_steer) > 0.95f &&
+        m_kart->getSpeed() > MIN_SPEED)
     {
         m_controls->m_brake = true;
     }
@@ -410,52 +444,53 @@ void ArenaAI::handleArenaBraking()
 }   // handleArenaBraking
 
 //-----------------------------------------------------------------------------
-/** The turn radius is determined by fitting a parabola to 3 points: current
- *  location of AI, first corner and the second corner. Once the constants are
- *  computed, a formula is used to find the radius of curvature at the vertex
- *  of the parabola.
- */
-float ArenaAI::determineTurnRadius(const Vec3& p1, const Vec3& p2,
-                                   const Vec3& p3)
+void ArenaAI::updateTurnRadius(const Vec3& p1, const Vec3& p2,
+                               const Vec3& p3)
 {
-    // The parabola function is as following: y=ax2+bx+c
-    // No need to calculate c as after differentiating c will be zero
-    const float eps = 0.01f;
-    const float denominator = (p1.x() - p2.x()) * (p1.x() - p3.x()) *
-                              (p2.x() - p3.x());
+    // First use cosine formula to find out the angle made by the distance
+    // between kart (point one) to point two and point two between point three
+    const float a = (p1 - p2).length();
+    const float b = (p2 - p3).length();
+    const float c = (p1 - p3).length();
+    const float angle = 180 - findAngleFrom3Edges(a, b, c);
 
-    // Avoid nan, this will happen if three values of coordinates x are too
-    // close together, ie a straight line, return a large radius
-    // so no braking is needed
-    if (fabsf(denominator) < eps) return 40.0f;
+    // Only calculate radius if not almost straight line
+    if (angle > 1 && angle < 179)
+    {
+        // Now find out the arc length ratio it has from the angle, so if the
+        // angle is 90 degree, it can be deduced by (pi / 2) (90 degree)
+        // over 2 * pi, which is 1 over 4. Notice: it is inversely proportional
+        // to the ratio, so the higher the angle (non-hard turn) the calculated
+        // ratio should be smaller (ie less part of the total circumference)
+        // Then we do 180 - angle from above, which is c (distance from kart to
+        // aiming point) = around 1 / 4 of the total circumference,
+        // then the turn radius = c / (1 / 4) / pi / 2
+        m_turn_radius = (a + b) / ((angle * DEGREE_TO_RAD) / (2 * M_PI)) /
+            M_PI / 2;
+    }
+    else
+    {
+        // Return large radius so no braking is needed otherwise
+        m_turn_radius = 45.0f;
+    }
+    m_turn_angle = angle;
 
-	const float a = (p3.x() * (p2.z() - p1.z()) +
-	                 p2.x() * (p1.z() - p3.z()) +
-	                 p1.x() * (p3.z() - p2.z())) / denominator;
+}   // updateTurnRadius
 
-    // Should not happen, otherwise y=c which is a straight line
-    if (fabsf(a) < eps) return 40.0f;
+//-----------------------------------------------------------------------------
+float ArenaAI::findAngleFrom3Edges(float a, float b, float c)
+{
+    // Cosine forumla : c2 = a2 + b2 - 2ab cos C
+    float test_value = ((c * c) - (a * a) - (b * b)) / (-(2 * a * b));
+    // Prevent error
+    if (test_value < -1)
+        test_value = -1;
+    else if (test_value > 1)
+        test_value = 1;
 
-	const float b = (p3.x() * p3.x() * (p1.z() - p2.z()) +
-	                 p2.x() * p2.x() * (p3.z() - p1.z()) +
-	                 p1.x() * p1.x() * (p2.z() - p3.z())) / denominator;
+    return acosf(test_value) * RAD_TO_DEGREE;
 
-    // Vertex: -b / 2a
-    const float vertex_x = -b / (2 * a);
-
-    // Differentiate the function, so y=ax2+bx+c will become y=2ax+b for dy_dx,
-    // y=2a for d2y_dx2
-    // Use the vertex of the parabola as x
-    const float dy_dx = 2 * a * vertex_x + b;
-    const float d2y_dx2 = 2 * a;
-
-    // Calculate the radius of curvature at current location of AI
-    const float radius = pow(1 + pow(dy_dx, 2), 1.5f) / fabsf(d2y_dx2);
-    assert(!std::isnan(radius));
-
-    // Avoid returning too large radius
-    return (radius > 40.0f ? 40.0f : radius);
-}   // determineTurnRadius
+}   // findAngleFrom3Edges
 
 //-----------------------------------------------------------------------------
 void ArenaAI::handleArenaItems(const float dt)

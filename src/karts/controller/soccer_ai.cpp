@@ -212,6 +212,7 @@ Vec3 SoccerAI::determineBallAimingPosition()
     }
 #endif
 
+    m_chasing_ball = true;
     const Vec3& ball_aim_pos = m_world->getBallAimPosition(m_opp_team);
     const Vec3& orig_pos = m_world->getBallPosition();
 
@@ -260,7 +261,6 @@ Vec3 SoccerAI::determineBallAimingPosition()
             }
         }
 
-        m_chasing_ball = true;
         // Check if reached aim point, which is behind aiming position and
         // in front of the ball, if so use another aiming method
         if (aim_lc.z() < 0 && ball_lc.z() > 0)
@@ -288,21 +288,6 @@ Vec3 SoccerAI::determineBallAimingPosition()
     return ball_aim_pos;
 
 }   // determineBallAimingPosition
-
-//-----------------------------------------------------------------------------
-float SoccerAI::findAngleFrom3Edges(float a, float b, float c)
-{
-    // Cosine forumla : c2 = a2 + b2 - 2ab cos C
-    float test_value = (c * c) - (a * a) - (b * b) / (-(2 * a * b));
-    // Prevent error
-    if (test_value < -1)
-        test_value = -1;
-    else if (test_value > 1)
-        test_value = 1;
-
-    return acosf(test_value) * RAD_TO_DEGREE;
-
-}   // find3PointsAngle
 
 //-----------------------------------------------------------------------------
 bool SoccerAI::isOvertakable(const Vec3& ball_lc)
