@@ -59,7 +59,6 @@ private:
     bool determineOvertakePosition(const Vec3& ball_lc, const Vec3& aim_lc,
                                    Vec3* overtake_lc);
     float rotateSlope(float old_slope, bool rotate_up);
-    float findAngleFrom3Edges(float a, float b, float c);
 
     virtual void findClosestKart(bool use_difficulty);
     virtual void findTarget();
@@ -69,10 +68,7 @@ private:
     virtual bool canSkid(float steer_fraction)           { return false; }
     virtual bool forceBraking() OVERRIDE         { return m_force_brake; }
     virtual bool ignorePathFinding() OVERRIDE
-    {
-        return m_avoid_eating_banana || m_overtake_ball || m_chasing_ball;
-    }
-
+                                                { return m_chasing_ball; }
 public:
                  SoccerAI(AbstractKart *kart);
                 ~SoccerAI();

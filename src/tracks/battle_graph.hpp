@@ -143,7 +143,7 @@ public:
      *    which is the next node on the path from i to j (undirected graph) */
     const int         getNextShortestPathPoly(int i, int j) const;
 
-    const std::vector < std::pair<const Item*, int> >& getItemList()
+    std::vector<std::pair<const Item*, int>>& getItemList()
                                                  { return m_items_on_graph; }
     // ------------------------------------------------------------------------
     void              insertItems(Item* item, int polygon)

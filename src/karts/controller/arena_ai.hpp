@@ -64,13 +64,8 @@ protected:
     /** The target point. */
     Vec3 m_target_point;
 
-    int m_current_forward_node;
-    Vec3 m_current_forward_point;
-
-    /** For ignorePathFinding() to work */
-    bool m_avoid_eating_banana;
-
-    void         collectItemInArena(Vec3*, int*) const;
+    void  collectItemInArena(Vec3*, int*) const;
+    float findAngleFrom3Edges(float a, float b, float c);
 private:
     /** Used by handleArenaUTurn, it tells whether to do left or right
      *  turning when steering is overridden. */
@@ -90,8 +85,6 @@ private:
      *  stuck by determine the size of this set. */
     std::set<int> m_on_node;
 
-    std::vector<Vec3> m_aiming_points;
-
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
 
@@ -104,25 +97,35 @@ private:
     /** This is a timer that counts down when the kart is doing u-turn. */
     float m_time_since_uturn;
 
+    float m_turn_radius;
+    float m_turn_angle;
+
+    Vec3 m_current_forward_point;
+    int m_current_forward_node;
+
+    std::set<int> m_aiming_nodes;
+    std::vector<Vec3> m_aiming_points;
+
     void         checkIfStuck(const float dt);
-    float        determineTurnRadius(const Vec3& p1, const Vec3& p2,
-                                     const Vec3& p3);
     void         handleArenaAcceleration(const float dt);
-    void         handleArenaBanana();
     void         handleArenaBraking();
     void         handleArenaItems(const float dt);
     void         handleArenaSteering(const float dt);
     void         handleArenaUTurn(const float dt);
     bool         handleArenaUnstuck(const float dt);
-    bool         getAimingPoints();
+    bool         updateAimingPosition();
+    void         updateBananaLocation();
+    void         updateTurnRadius(const Vec3& p1, const Vec3& p2,
+                                  const Vec3& p3);
     virtual int  getCurrentNode() const = 0;
     virtual bool isWaiting() const = 0;
     virtual void resetAfterStop() {};
     virtual void findClosestKart(bool use_difficulty) = 0;
     virtual void findTarget() = 0;
-    virtual bool forceBraking()                 { return false; }
-    virtual bool ignorePathFinding()  { return m_avoid_eating_banana; }
+    virtual bool forceBraking() { return false; }
+    virtual bool ignorePathFinding() { return false; }
 public:
+    static int   m_test_node_for_banana;
                  ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};
     virtual void update      (float delta);
