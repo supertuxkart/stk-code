@@ -64,6 +64,8 @@ protected:
     /** The target point. */
     Vec3 m_target_point;
 
+    bool m_avoiding_banana;
+
     void  collectItemInArena(Vec3*, int*) const;
     float findAngleFrom3Edges(float a, float b, float c);
 private:
@@ -122,7 +124,7 @@ private:
     virtual void resetAfterStop() {};
     virtual void findClosestKart(bool use_difficulty) = 0;
     virtual void findTarget() = 0;
-    virtual bool forceBraking() { return false; }
+    virtual bool forceBraking() { return m_avoiding_banana; }
     virtual bool ignorePathFinding() { return false; }
 public:
     static int   m_test_node_for_banana;
