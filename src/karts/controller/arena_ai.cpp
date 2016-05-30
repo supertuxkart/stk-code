@@ -458,16 +458,21 @@ void ArenaAI::updateTurnRadius(const Vec3& p1, const Vec3& p2,
     // Only calculate radius if not almost straight line
     if (angle > 1 && angle < 179)
     {
-        // Now find out the arc length ratio it has from the angle, so if the
-        // angle is 90 degree, it can be deduced by (pi / 2) (90 degree)
-        // over 2 * pi, which is 1 over 4. Notice: it is inversely proportional
-        // to the ratio, so the higher the angle (non-hard turn) the calculated
-        // ratio should be smaller (ie less part of the total circumference)
-        // Then we do 180 - angle from above, which is c (distance from kart to
-        // aiming point) = around 1 / 4 of the total circumference,
-        // then the turn radius = c / (1 / 4) / pi / 2
-        m_turn_radius = (a + b) / ((angle * DEGREE_TO_RAD) / (2 * M_PI)) /
-            M_PI / 2;
+        //     angle
+        //      ^
+        //  a /   \ b
+        //   /     \
+        //  \90   90/
+        //   \     /
+        //    \   /
+        //     \ /
+        //      |
+        // Try to estimate the turn radius with the help of a kite-like
+        // polygon as shown, find out the lowest angle which is
+        // (4 - 2) * 180  - 90 - 90 - angle (180 - angle from above)
+        // Then we use this value as the angle of a sector of circle,
+        // a + b as the arc length, then the radius can be calculated easily
+        m_turn_radius = ((a + b) / (angle / 360)) / M_PI / 2;
     }
     else
     {
