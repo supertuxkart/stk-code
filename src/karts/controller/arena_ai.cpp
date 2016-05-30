@@ -61,6 +61,7 @@ void ArenaAI::reset()
     m_cur_kart_pos_data = {0};
     m_is_stuck = false;
     m_is_uturn = false;
+    m_avoiding_banana = false;
     m_target_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
@@ -86,6 +87,7 @@ void ArenaAI::update(float dt)
     // This is used to enable firing an item backwards.
     m_controls->m_look_back = false;
     m_controls->m_nitro     = false;
+    m_avoiding_banana = false;
 
     // Don't do anything if there is currently a kart animations shown.
     if (m_kart->getKartAnimation())
@@ -380,23 +382,22 @@ void ArenaAI::updateBananaLocation()
         if (it != item_list.end())
         {
             Vec3 banana_lc;
-            posData banana_pos = {0};
-            checkPosition(it->first->getXYZ(), &banana_pos, &banana_lc,
+            checkPosition(it->first->getXYZ(), NULL, &banana_lc,
                 true/*use_front_xyz*/);
 
-            // If satisfy the below condition, AI should not eat banana
-            if (banana_pos.behind || banana_pos.angle > 0.3f)
+            // If satisfy the below condition, AI should not eat banana:
+            // banana_lc.z() < 0.0f, behind the kart
+            if (banana_lc.z() < 0.0f)
             {
                 node++;
                 continue;
             }
 
-            const float dist = banana_lc.length() * 2;
-            banana_lc = (banana_lc.x() < 0 ? banana_lc + Vec3(dist, 0, 0) :
-                        banana_lc - Vec3(dist, 0, 0));
             // If the node AI will pass has a banana, adjust the aim position
+            banana_lc = (banana_lc.x() < 0 ? banana_lc + Vec3(5, 0, 0) :
+                        banana_lc - Vec3(5, 0, 0));
             m_aiming_points[1] = m_kart->getTrans()(banana_lc);
-
+            m_avoiding_banana = true;
             // Handle one banana only
             return;
         }

@@ -310,6 +310,6 @@ void AIBaseController::checkPosition(const Vec3 &point, posData *pos_data,
 
     pos_data->angle = atan2(fabsf(local_coordinates.getX()),
         fabsf(local_coordinates.getZ()));
-    pos_data->distance = p.length_2d();
+    pos_data->distance = p.length();
 
 }   //  checkPosition

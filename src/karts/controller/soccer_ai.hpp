@@ -66,7 +66,8 @@ private:
     virtual int  getCurrentNode() const;
     virtual bool isWaiting() const;
     virtual bool canSkid(float steer_fraction)           { return false; }
-    virtual bool forceBraking() OVERRIDE         { return m_force_brake; }
+    virtual bool forceBraking() OVERRIDE
+                            { return m_avoiding_banana || m_force_brake; }
     virtual bool ignorePathFinding() OVERRIDE
                                                 { return m_chasing_ball; }
 public:
