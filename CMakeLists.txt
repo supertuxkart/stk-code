@@ -365,6 +365,11 @@ if(UNIX AND NOT APPLE)
     endif()
 endif()
 
+# FreeBSD does not search in /usr/local/lib, but at least Freetype is installed there :(
+if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/lib")
+endif()
+
 if(APPLE)
     # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
     # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :

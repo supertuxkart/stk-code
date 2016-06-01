@@ -2310,7 +2310,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             // or moving backwards
             if(m_speed > 0.0f)
             {   // Still going forward while braking
-                applyEngineForce(0.f);
+                applyEngineForce(-engine_power*2.5f);
                 m_brake_time += dt;
                 // Apply the brakes - include the time dependent brake increase
                 float f = 1 + m_brake_time
