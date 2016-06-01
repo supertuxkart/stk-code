@@ -29,6 +29,8 @@
 #include "tracks/navmesh.hpp"
 #include "utils/log.hpp"
 
+#include <queue>
+
 const int BattleGraph::UNKNOWN_POLY  = -1;
 BattleGraph * BattleGraph::m_battle_graph = NULL;
 
@@ -43,7 +45,21 @@ BattleGraph::BattleGraph(const std::string &navmesh_file_name,
     NavMesh::create(navmesh_file_name);
     m_navmesh_file = navmesh_file_name;
     buildGraph(NavMesh::get());
+    double s = StkTime::getRealTime();
+    for(unsigned int i=0; i < NavMesh::get()->getNumberOfPolys(); i++)
+        computeDijkstra(i);
+    double e = StkTime::getRealTime();
+    Log::error("dijkstra:","Time %lf", e-s);
+    for(unsigned int i=0; i<m_distance_matrix[2].size(); i++)
+        Log::error("dijkstra", "%d %f ", i, m_distance_matrix[2][i]);
+    buildGraph(NavMesh::get());
+    s = StkTime::getRealTime();
     computeFloydWarshall();
+    e = StkTime::getRealTime();
+    Log::error("floyd warshall", "Time %lf", e-s);
+    for(unsigned int i=0; i<m_distance_matrix[2].size(); i++)
+        Log::error("floyd", "%d %f ", i, m_distance_matrix[2][i]);
+
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         loadGoalNodes(node);
 
@@ -71,7 +87,7 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
     for(unsigned int i=0; i<n_polys; i++)
     {
         NavPoly currentPoly = navmesh->getNavPoly(i);
-        std::vector<int> adjacents = navmesh->getAdjacentPolys(i);
+        const std::vector<int> &adjacents = navmesh->getAdjacentPolys(i);
         for(unsigned int j=0; j<adjacents.size(); j++)
         {
             Vec3 adjacentPolyCenter = navmesh->getCenterOfPoly(adjacents[j]);
@@ -85,6 +101,93 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
     }
 
 }    // buildGraph
+
+// -----------------------------------------------------------------------------
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <climits>
+
+void BattleGraph::computeDijkstra(int source)
+{
+    // Stores the distance (float) to 'source' from a specified node (int)
+    typedef std::pair<int, float> IndDistPair;
+
+    IndDistPair begin(source, 0.0f);
+    class Shortest
+    {
+    public:
+        bool operator()(const IndDistPair &p1, const IndDistPair &p2)
+        {
+            return p1.second > p2.second;
+        }
+    };
+    std::priority_queue<IndDistPair, std::vector<IndDistPair>, Shortest> queue;
+    queue.push(begin);
+    const unsigned int n=getNumNodes();
+    std::vector<bool> visited;
+    visited.resize(n, false);
+    NavMesh *navmesh = NavMesh::get();
+    while(!queue.empty())
+    {
+        // Get element with shortest path
+        IndDistPair current = queue.top();
+        queue.pop();
+        int cur_index = current.first;
+        if(visited[cur_index]) continue;
+        visited[cur_index] = true;
+        const NavPoly &current_poly = navmesh->getNavPoly(cur_index);
+        const std::vector<int> &adjacents = current_poly.getAdjacents();
+        for(unsigned int j=0; j<adjacents.size(); j++)
+        {
+            int adjacent = adjacents[j];
+            // Distance already computed, can be ignored
+            if(visited[adjacent]) continue;
+
+            float new_dist = current.second + m_distance_matrix[cur_index][adjacent];
+            if(new_dist < m_distance_matrix[source][adjacent])
+                m_distance_matrix[source][adjacent] = new_dist;
+            IndDistPair pair(adjacent, new_dist);
+            queue.push(pair);
+        }
+    }
+    return;
+
+    using namespace std;
+#define INF INT_MAX //Infinity
+    const int sz=10001; //Maximum possible number of vertices. Preallocating space for DataStructures accordingly
+    vector<pair<int,int> > a[sz]; //Adjacency list
+    int dis[sz]; //Stores shortest distance
+    bool vis[sz]={0}; //Determines whether the node has been visited or not
+
+    for (int i = 0; i < sz; i++) //Set initial distances to Infinity
+        dis[i] = INF;
+
+    //Custom Comparator for Determining priority for priority queue (shortest edge comes first)
+    class prioritize {
+    public: bool operator ()(pair<int, int>&p1, pair<int, int>&p2)
+    {
+        return p1.second > p2.second;
+    }
+    };
+
+    //Priority queue to store vertex,weight pairs
+    priority_queue<pair<int, int>, vector<pair<int, int> >, prioritize> pq;
+    pq.push(make_pair(source, dis[source] = 0)); //Pushing the source with distance from itself as 0
+    while (!pq.empty())
+    {
+        pair<int, int> curr = pq.top(); //Current vertex. The shortest distance for this has been found
+        pq.pop();
+        int cv = curr.first, cw = curr.second; //'cw' the final shortest distance for this vertex
+        if (vis[cv]) //If the vertex is already visited, no point in exploring adjacent vertices
+            continue;
+        vis[cv] = true;
+        for (int i = 0; i < a[cv].size(); i++) //Iterating through all adjacent vertices
+            if (!vis[a[cv][i].first] && a[cv][i].second + cw < dis[a[cv][i].first]) //If this node is not visited and the current parent node distance+distance from there to this node is shorted than the initial distace set to this node, update it
+                pq.push(make_pair(a[cv][i].first, (dis[a[cv][i].first] = a[cv][i].second + cw))); //Set the new distance and add to priority queue
+    }
+
+}   // computeDijkstra
 
 // -----------------------------------------------------------------------------
 /** computeFloydWarshall() computes the shortest distance between any two nodes.

@@ -86,6 +86,7 @@ private:
                                                             { return false; }
     // ------------------------------------------------------------------------
     virtual const bool differentNodeColor(int n, NodeColor* c) const;
+    void BattleGraph::computeDijkstra(int n);
 
 public:
     static const int UNKNOWN_POLY;
