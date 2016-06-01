@@ -202,7 +202,7 @@ private:
             // If it's likely to goal already, aim the ball straight behind
             // should do the job
             if (isApproachingGoal(team))
-                return m_trans(Vec3(0, 0, -m_radius*2));
+                return m_trans(Vec3(0, 0, reverse ? m_radius*2 : -m_radius*2));
 
             // Otherwise do the below:
             // This is done by using Pythagorean Theorem and solving the

@@ -212,7 +212,6 @@ Vec3 SoccerAI::determineBallAimingPosition()
     }
 #endif
 
-    m_chasing_ball = true;
     const Vec3& ball_aim_pos = m_world->getBallAimPosition(m_opp_team);
     const Vec3& orig_pos = m_world->getBallPosition();
 
@@ -261,23 +260,11 @@ Vec3 SoccerAI::determineBallAimingPosition()
             }
         }
 
+        m_chasing_ball = true;
         // Check if reached aim point, which is behind aiming position and
         // in front of the ball, if so use another aiming method
         if (aim_lc.z() < 0 && ball_lc.z() > 0)
         {
-            // Find the angle between the ball to kart and the aim position
-            // to kart, if it's not almost 180 or 0 degree, we need to
-            // apply brake
-            const float c = sqrtf(pow(ball_lc.z() - aim_lc.z(), 2) +
-                 pow(ball_lc.x() - aim_lc.x(), 2));
-            const float angle = findAngleFrom3Edges(aim_lc.length_2d(),
-                ball_lc.length_2d(), c);
-
-            if (angle > 1 && angle < 179)
-            {
-                m_force_brake = true;
-            }
-
             // Return the behind version of aim position, allow pushing to
             // ball towards the it
             return m_world->getBallAimPosition(m_opp_team, true/*reverse*/);

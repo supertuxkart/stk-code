@@ -69,7 +69,7 @@ private:
     virtual bool forceBraking() OVERRIDE
                             { return m_avoiding_banana || m_force_brake; }
     virtual bool ignorePathFinding() OVERRIDE
-                                                { return m_chasing_ball; }
+                            { return  m_overtake_ball || m_chasing_ball; }
 public:
                  SoccerAI(AbstractKart *kart);
                 ~SoccerAI();
