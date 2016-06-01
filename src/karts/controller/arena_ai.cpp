@@ -461,8 +461,8 @@ void ArenaAI::updateTurnRadius(const Vec3& p1, const Vec3& p2,
         //     angle
         //      ^
         //  a /   \ b
-        //   /     \
-        //  \90   90/
+        // 90/\   /\90
+        //  \ /   \ /
         //   \     /
         //    \   /
         //     \ /
