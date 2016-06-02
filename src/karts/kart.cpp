@@ -1151,6 +1151,10 @@ void Kart::eliminate()
     }
 
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
+    m_kart_gfx->setGFXInvisible();
+    if (m_engine_sound)
+        m_engine_sound->stop();
+
     m_eliminated = true;
 
     m_node->setVisible(false);
