@@ -68,6 +68,7 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
 # Build glew library
+add_definitions(-DGLEW_NO_GLU)
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
 include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
 
