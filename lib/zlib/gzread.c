@@ -1,5 +1,5 @@
 /* gzread.c -- zlib functions for reading gzip files
- * Copyright (C) 2004, 2005, 2010, 2011, 2012 Mark Adler
+ * Copyright (C) 2004, 2005, 2010, 2011, 2012, 2013 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -27,11 +27,7 @@ local int gz_load(state, buf, len, have)
 
     *have = 0;
     do {
-#ifdef _WIN32
-        ret = _read(state->fd, buf + *have, len - *have);
-#else
         ret = read(state->fd, buf + *have, len - *have);
-#endif
         if (ret <= 0)
             break;
         *have += ret;
@@ -62,7 +58,8 @@ local int gz_avail(state)
         return -1;
     if (state->eof == 0) {
         if (strm->avail_in) {       /* copy what's there to the start */
-            unsigned char *p = state->in, *q = strm->next_in;
+            unsigned char *p = state->in;
+            unsigned const char *q = strm->next_in;
             unsigned n = strm->avail_in;
             do {
                 *p++ = *q++;
@@ -94,8 +91,8 @@ local int gz_look(state)
     /* allocate read buffers and inflate memory */
     if (state->size == 0) {
         /* allocate buffers */
-        state->in = malloc(state->want);
-        state->out = malloc(state->want << 1);
+        state->in = (unsigned char *)malloc(state->want);
+        state->out = (unsigned char *)malloc(state->want << 1);
         if (state->in == NULL || state->out == NULL) {
             if (state->out != NULL)
                 free(state->out);
@@ -356,14 +353,14 @@ int ZEXPORT gzread(file, buf, len)
 
         /* large len -- read directly into user buffer */
         else if (state->how == COPY) {      /* read directly */
-            if (gz_load(state, buf, len, &n) == -1)
+            if (gz_load(state, (unsigned char *)buf, len, &n) == -1)
                 return -1;
         }
 
         /* large len -- decompress directly into user buffer */
         else {  /* state->how == GZIP */
             strm->avail_out = len;
-            strm->next_out = buf;
+            strm->next_out = (unsigned char *)buf;
             if (gz_decomp(state) == -1)
                 return -1;
             n = state->x.have;
@@ -382,7 +379,11 @@ int ZEXPORT gzread(file, buf, len)
 }
 
 /* -- see zlib.h -- */
-#undef gzgetc
+#ifdef Z_PREFIX_SET
+#  undef z_gzgetc
+#else
+#  undef gzgetc
+#endif
 int ZEXPORT gzgetc(file)
     gzFile file;
 {
@@ -522,7 +523,7 @@ char * ZEXPORT gzgets(file, buf, len)
 
         /* look for end-of-line in current output buffer */
         n = state->x.have > left ? left : state->x.have;
-        eol = memchr(state->x.next, '\n', n);
+        eol = (unsigned char *)memchr(state->x.next, '\n', n);
         if (eol != NULL)
             n = (unsigned)(eol - state->x.next) + 1;
 
@@ -587,11 +588,7 @@ int ZEXPORT gzclose_r(file)
     err = state->err == Z_BUF_ERROR ? Z_BUF_ERROR : Z_OK;
     gz_error(state, Z_OK, NULL);
     free(state->path);
-#ifdef _WIN32
-    ret = _close(state->fd);
-#else
     ret = close(state->fd);
-#endif
     free(state);
     return ret ? Z_ERRNO : err;
 }

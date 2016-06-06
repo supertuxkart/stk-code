@@ -1,5 +1,5 @@
 /* zutil.h -- internal interface and configuration of the compression library
- * Copyright (C) 1995-2012 Jean-loup Gailly.
+ * Copyright (C) 1995-2013 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -44,13 +44,13 @@ typedef unsigned short ush;
 typedef ush FAR ushf;
 typedef unsigned long  ulg;
 
-extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
+extern z_const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 /* (size given to avoid silly warnings with Visual C++) */
 
 #define ERR_MSG(err) z_errmsg[Z_NEED_DICT-(err)]
 
 #define ERR_RETURN(strm,err) \
-  return (strm->msg = (char*)ERR_MSG(err), (err))
+  return (strm->msg = ERR_MSG(err), (err))
 /* To be used only when the state is known to be valid */
 
         /* common constants */
@@ -83,17 +83,17 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #if defined(MSDOS) || (defined(WINDOWS) && !defined(WIN32))
 #  define OS_CODE  0x00
 #  ifndef Z_SOLO
-#  if defined(__TURBOC__) || defined(__BORLANDC__)
-#    if (__STDC__ == 1) && (defined(__LARGE__) || defined(__COMPACT__))
-       /* Allow compilation with ANSI keywords only enabled */
-       void _Cdecl farfree( void *block );
-       void *_Cdecl farmalloc( unsigned long nbytes );
-#    else
-#      include <alloc.h>
+#    if defined(__TURBOC__) || defined(__BORLANDC__)
+#      if (__STDC__ == 1) && (defined(__LARGE__) || defined(__COMPACT__))
+         /* Allow compilation with ANSI keywords only enabled */
+         void _Cdecl farfree( void *block );
+         void *_Cdecl farmalloc( unsigned long nbytes );
+#      else
+#        include <alloc.h>
+#      endif
+#    else /* MSC or DJGPP */
+#      include <malloc.h>
 #    endif
-#  else /* MSC or DJGPP */
-#    include <malloc.h>
-#  endif
 #  endif
 #endif
 
@@ -121,13 +121,13 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #if defined(MACOS) || defined(TARGET_OS_MAC)
 #  define OS_CODE  0x07
 #  ifndef Z_SOLO
-#  if defined(__MWERKS__) && __dest_os != __be_os && __dest_os != __win32_os
-#    include <unix.h> /* for fdopen */
-#  else
-#    ifndef fdopen
-#      define fdopen(fd,mode) NULL /* No fdopen() */
+#    if defined(__MWERKS__) && __dest_os != __be_os && __dest_os != __win32_os
+#      include <unix.h> /* for fdopen */
+#    else
+#      ifndef fdopen
+#        define fdopen(fd,mode) NULL /* No fdopen() */
+#      endif
 #    endif
-#  endif
 #  endif
 #endif
 
@@ -168,7 +168,8 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 #endif
 
 /* provide prototypes for these when building zlib without LFS */
-#if !defined(_WIN32) && (!defined(_LARGEFILE64_SOURCE) || _LFS64_LARGEFILE-0 == 0)
+#if !defined(_WIN32) && \
+    (!defined(_LARGEFILE64_SOURCE) || _LFS64_LARGEFILE-0 == 0)
     ZEXTERN uLong ZEXPORT adler32_combine64 OF((uLong, uLong, z_off_t));
     ZEXTERN uLong ZEXPORT crc32_combine64 OF((uLong, uLong, z_off_t));
 #endif
@@ -236,7 +237,7 @@ extern const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 
 #ifndef Z_SOLO
    voidpf ZLIB_INTERNAL zcalloc OF((voidpf opaque, unsigned items,
-                        unsigned size));
+                                    unsigned size));
    void ZLIB_INTERNAL zcfree  OF((voidpf opaque, voidpf ptr));
 #endif
 
