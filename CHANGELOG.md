@@ -10,6 +10,7 @@
 * Scripting work under the hood
 * Work on the track editor by mhp
 * Tweak to challenges
+* New farm track song by 0zone0ne and Krobonil
 * Bugfixes
 
 ## SuperTuxKart 0.9.1
