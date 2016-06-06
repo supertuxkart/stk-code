@@ -13,8 +13,6 @@ lib/zlib/libz.so.1.2.8
 lib/zlib/cmake_install.cmake
 lib/zlib/Makefile.in
 lib/zlib/Makefile
-lib/zlib/
-lib/zlib/
 
 .config/
 supertuxkart-64
