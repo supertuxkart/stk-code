@@ -597,6 +597,8 @@ unsigned int SoccerWorld::getRescuePositionIndex(AbstractKart *kart)
 //-----------------------------------------------------------------------------
 void SoccerWorld::enterRaceOverState()
 {
+    WorldWithRank::enterRaceOverState();
+
     if (UserConfigParams::m_arena_ai_stats)
     {
         float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
@@ -638,8 +640,7 @@ void SoccerWorld::enterRaceOverState()
         delete this;
         main_loop->abort();
     }
-    else
-        WorldStatus::enterRaceOverState();
+
 }   // enterRaceOverState
 
 //-----------------------------------------------------------------------------
