@@ -3985,3 +3985,7 @@ msgstr "Събирай бутилки с азот (ще ги използвам�
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Опа! Когато си загазил, натисни <%s>, за да се спасиш"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nЛюбомир Василев, 2015-2016\nЛюбомир Василев, 2016"

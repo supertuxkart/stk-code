@@ -2900,7 +2900,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Arief Setiadi Wibowo https://launchpad.net/~q-thrynx\n  Aziz Rahmad https://launchpad.net/~azayrahmad\n  Dawid Gan https://launchpad.net/~deveee\n  Ega Zulfikar https://launchpad.net/~ega-bulb\n  Icho Y. Chandra https://launchpad.net/~project-zero\n  Muhammad Radifar https://launchpad.net/~m-radifar05\n  STK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\nArief Setiadi Wibowo https://launchpad.net/~q-thrynx\nAziz Rahmad https://launchpad.net/~azayrahmad\nDawid Gan https://launchpad.net/~deveee\nEga Zulfikar https://launchpad.net/~ega-bulb\nIcho Y. Chandra https://launchpad.net/~project-zero\nMuhammad Radifar https://launchpad.net/~m-radifar05\nSTK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

@@ -2907,7 +2907,7 @@ msgstr "A játékosok legnagyobb számának 2 és 12 között kell lennie."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Balint https://launchpad.net/~lbekefi\n  Gyönki Bendegúz https://launchpad.net/~gyonkibendeguz\n  Jacob https://launchpad.net/~jacob11\n  Jf. Tasz https://launchpad.net/~jftatsz\n  Molditz György https://launchpad.net/~molditz\n  Papp Bence https://launchpad.net/~sclegnrbs\n  STK-team https://launchpad.net/~stk\n  Úr Balázs https://launchpad.net/~urbalazs"
+msgstr "Launchpad Contributions:\nBalint https://launchpad.net/~lbekefi\nBalázs Úr, 2016\nBangó Máté, 2016\nGyönki Bendegúz https://launchpad.net/~gyonkibendeguz\nJacob https://launchpad.net/~jacob11\nJf. Tasz https://launchpad.net/~jftatsz\nMolditz György https://launchpad.net/~molditz\nPapp Bence https://launchpad.net/~sclegnrbs\nSTK-team https://launchpad.net/~stk\nViktor Busanszki, 2015\nÚr Balázs https://launchpad.net/~urbalazs"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

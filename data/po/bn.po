@@ -2904,7 +2904,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Mahay Alam Khan https://launchpad.net/~mahayalamkhan"
+msgstr "Launchpad Contributions:\nMahay Alam Khan https://launchpad.net/~mahayalamkhan\nMahay Alam Khan, 2012"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

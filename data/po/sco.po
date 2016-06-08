@@ -2904,7 +2904,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Marco Cafolla https://launchpad.net/~cobradabest"
+msgstr "Launchpad Contributions:\nMarco Cafolla https://launchpad.net/~cobradabest"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

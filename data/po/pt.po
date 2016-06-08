@@ -2905,7 +2905,7 @@ msgstr "O número máximo de jogadores tem de ser entre 2 e 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Auria https://launchpad.net/~auria-mg\n  Dawid Gan https://launchpad.net/~deveee\n  Bruno Ramalhete  https://launchpad.net/~bram-512\n  Douglas Moura https://launchpad.net/~araujodemoura\n  Evandro P. Alves https://launchpad.net/~evandro-pa\n  Fátima de Menezes Dantas https://launchpad.net/~fatima-menezes19\n  João Frade / 100 NOME https://launchpad.net/~100nome-portugal\n  Ricardo Conde https://launchpad.net/~turotulco\n  STK-team https://launchpad.net/~stk\n  Sérgio Marques https://launchpad.net/~sergio+marques"
+msgstr "Launchpad Contributions:\nAuria https://launchpad.net/~auria-mg\nBruno Ramalhete  https://launchpad.net/~bram-512\nBruno Ramalhete, 2015\nDawid Gan https://launchpad.net/~deveee\nDouglas Moura https://launchpad.net/~araujodemoura\nEvandro P. Alves https://launchpad.net/~evandro-pa\nFátima de Menezes Dantas https://launchpad.net/~fatima-menezes19\nJoão Frade / 100 NOME https://launchpad.net/~100nome-portugal\nRicardo Conde https://launchpad.net/~turotulco\nSTK-team https://launchpad.net/~stk\nSérgio Marques https://launchpad.net/~sergio+marques"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

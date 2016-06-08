@@ -2904,7 +2904,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Benedikt Scheving-Thorsteinsson https://launchpad.net/~nammi-namm\n  Olafur Skorrdal https://launchpad.net/~skorrdal\n  STK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\nBenedikt Scheving-Thorsteinsson https://launchpad.net/~nammi-namm\nOlafur Skorrdal https://launchpad.net/~skorrdal\nSTK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

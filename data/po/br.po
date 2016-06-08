@@ -2907,7 +2907,7 @@ msgstr "An niver uc'hek a c'hoarierion a rank bezañ etre 2 ha 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Alan https://launchpad.net/~alan-m.\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\nAlan https://launchpad.net/~alan-m.\nAlan Monfort, 2015-2016\nDawid Gan https://launchpad.net/~deveee\nGwenn M, 2015\nPierre Morvan, 2016\nSTK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

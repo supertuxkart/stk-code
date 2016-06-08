@@ -2908,7 +2908,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Davor Buday https://launchpad.net/~davor-buday-gmail\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk\n  dboki89 https://launchpad.net/~dboki89\n  student4 https://launchpad.net/~iputnik-msn"
+msgstr "Launchpad Contributions:\nDavor Buday https://launchpad.net/~davor-buday-gmail\nDawid Gan https://launchpad.net/~deveee\ndboki89 https://launchpad.net/~dboki89\nIvan Putnik, 2010\nSTK-team https://launchpad.net/~stk\nstudent4 https://launchpad.net/~iputnik-msn"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

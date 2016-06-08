@@ -3985,3 +3985,7 @@ msgstr "Collige nitrorum lagoenas (post flexum viae utimur)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Si in periculo sis, prem <%s> ut voces auxilium."
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nAlisa P, 2016\nAndré Lippok, 2016\nSupernova 888, 2016"

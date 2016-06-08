@@ -2900,7 +2900,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Umidjon Almasov https://launchpad.net/~kdemon"
+msgstr "Launchpad Contributions:\nUmidjon Almasov https://launchpad.net/~kdemon"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

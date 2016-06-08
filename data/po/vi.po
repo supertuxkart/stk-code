@@ -2900,7 +2900,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Huynh Yen Loc https://launchpad.net/~nightgaunt13\n  STK-team https://launchpad.net/~stk\n  Vo Xuan Tien https://launchpad.net/~tienvx2008gs\n  Võ Xuân Tiến https://launchpad.net/~vo-ngan-90\n  Zombifier https://launchpad.net/~duckhoi1234"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nHuynh Yen Loc https://launchpad.net/~nightgaunt13\nSTK-team https://launchpad.net/~stk\nVo Xuan Tien https://launchpad.net/~tienvx2008gs\nVõ Xuân Tiến https://launchpad.net/~vo-ngan-90\nZombifier https://launchpad.net/~duckhoi1234"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

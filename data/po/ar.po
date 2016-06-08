@@ -4005,3 +4005,7 @@ msgstr "اجمع قنّينات النّيترو (سنستخدمها بعد ال
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "آخ! أنت في ورطة، اضغط <%s> لتُنقذ"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nBenamara Mohamed, 2015\nصفا الفليج, 2015"

@@ -2904,7 +2904,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Andi Chandler https://launchpad.net/~bing\n  Michael Torpey https://launchpad.net/~mctorpey\n  STK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\nAndi Chandler https://launchpad.net/~bing\nMichael Torpey https://launchpad.net/~mctorpey\nSTK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

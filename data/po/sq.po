@@ -2904,7 +2904,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Arianit Kukaj https://launchpad.net/~arking\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk"
+msgstr "Launchpad Contributions:\nArianit Kukaj https://launchpad.net/~arking\nDawid Gan https://launchpad.net/~deveee\nSTK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

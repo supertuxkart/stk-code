@@ -2901,7 +2901,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dynamicwork https://launchpad.net/~dynamicwork\n  JJ https://launchpad.net/~jjemin1\n  Tae-Wong SEO https://launchpad.net/~seotaewong40"
+msgstr "Launchpad Contributions:\nDynamicwork https://launchpad.net/~dynamicwork\nJJ https://launchpad.net/~jjemin1\nRoland Kim, 2015\nTae-Wong SEO https://launchpad.net/~seotaewong40"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

@@ -2905,7 +2905,7 @@ msgstr "El nombre màxim de jugadors ha d'estar entre 2 i 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Aljullu https://launchpad.net/~aljullu\n  Dawid Gan https://launchpad.net/~deveee\n  Marc Coll Carrillo https://launchpad.net/~marc-coll-carrillo\n  STK-team https://launchpad.net/~stk\n  Tae-Wong SEO https://launchpad.net/~seotaewong40\n  VPablo https://launchpad.net/~villumar"
+msgstr "Launchpad Contributions:\nAljullu https://launchpad.net/~aljullu\nDawid Gan https://launchpad.net/~deveee\nMarc Coll Carrillo https://launchpad.net/~marc-coll-carrillo\nMarc Coll Carrillo, 2012\nMarc Coll Carrillo, 2015-2016\nSTK-team https://launchpad.net/~stk\nTae-Wong SEO https://launchpad.net/~seotaewong40\nVPablo https://launchpad.net/~villumar"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

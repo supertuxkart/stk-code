@@ -2911,7 +2911,7 @@ msgstr "Maksymalna ilość graczy musi mieścić się w zakresie od 2 do 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Auria https://launchpad.net/~auria-mg\n  Bill https://launchpad.net/~cges30901\n  Dawid Gan https://launchpad.net/~deveee\n  Kuba Polankowski https://launchpad.net/~tux4-b\n  Kuba Polankowski https://launchpad.net/~tux4-wp\n  Patryk Wychowaniec https://launchpad.net/~p98\n  STK-team https://launchpad.net/~stk\n  Twojwujaszek https://launchpad.net/~twojwujaszek-gmail"
+msgstr "Launchpad Contributions:\nAuria https://launchpad.net/~auria-mg\nBill https://launchpad.net/~cges30901\nDawid Gan https://launchpad.net/~deveee\nDeve, 2015\nDeve, 2016\nJakub Wojtkowiak, 2016\nKuba Polankowski https://launchpad.net/~tux4-b\nKuba Polankowski https://launchpad.net/~tux4-wp\nPatryk Wychowaniec https://launchpad.net/~p98\nPatryk Wychowaniec, 2015-2016\nSTK-team https://launchpad.net/~stk\nTwojwujaszek https://launchpad.net/~twojwujaszek-gmail"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

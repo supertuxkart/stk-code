@@ -2907,7 +2907,7 @@ msgstr "Ο μεγιστος αριθμός παικτών πρέπει να εί
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Konstantinos Thermos https://launchpad.net/~subdee\n  Nefeli Stylla https://launchpad.net/~nefeli-st\n  STK-team https://launchpad.net/~stk\n  Vangelis Skarmoutsos https://launchpad.net/~skarmoutsosv\n  Yannis Kaskamanidis https://launchpad.net/~ttnfy17\n  tzem https://launchpad.net/~athmakrigiannis"
+msgstr "Launchpad Contributions:\nDawid Gan https://launchpad.net/~deveee\nGrigoris Pavlakis, 2016\nKonstantinos Thermos https://launchpad.net/~subdee\nNefeli Stylla https://launchpad.net/~nefeli-st\nSTK-team https://launchpad.net/~stk\ntzem https://launchpad.net/~athmakrigiannis\nVangelis Skarmoutsos https://launchpad.net/~skarmoutsosv\nVangelis Skarmoutsos, 2015-2016\nWasilis Mandratzis-Walz, 2015\nYannis Kaskamanidis https://launchpad.net/~ttnfy17"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

@@ -2908,7 +2908,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Kenan Dervišević https://launchpad.net/~kenan3008"
+msgstr "Launchpad Contributions:\nKenan Dervišević https://launchpad.net/~kenan3008"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

@@ -3988,3 +3988,7 @@ msgstr "Savāc nitro pudeles (mēs tās izmantosim pēc līkuma)"
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Ak vai! Kad tu esi ķezā, nospied <%s>, lai tiktu izglābts!"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nLauris Lemhens, 2015-2016"

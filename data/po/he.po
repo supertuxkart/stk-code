@@ -2907,7 +2907,7 @@ msgstr "המספר המירבי של שחקנים חייב להיות בין 2 �
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Asael https://launchpad.net/~asaelr\n  Auria https://launchpad.net/~auria-mg\n  Ddorda https://launchpad.net/~ddorda\n  GenghisKhan https://launchpad.net/~genghiskhan\n  Jorge Mariano https://launchpad.net/~jmariano\n  Leo Juszkiewicz https://launchpad.net/~juszr\n  Reuma Mordechai https://launchpad.net/~reumamordechai\n  STK-team https://launchpad.net/~stk\n  Shai Shapira https://launchpad.net/~shayshap\n  Shimi Chen https://launchpad.net/~shimi-chen\n  Yaron https://launchpad.net/~sh-yaron"
+msgstr "Launchpad Contributions:\nAsael https://launchpad.net/~asaelr\nAuria https://launchpad.net/~auria-mg\nCapri, 2015\nDdorda https://launchpad.net/~ddorda\nGenghisKhan https://launchpad.net/~genghiskhan\nGenghisKhan, 2015-2016\nJorge Mariano https://launchpad.net/~jmariano\nLeo Juszkiewicz https://launchpad.net/~juszr\nReuma Mordechai https://launchpad.net/~reumamordechai\nShai Shapira https://launchpad.net/~shayshap\nShimi Chen https://launchpad.net/~shimi-chen\nSTK-team https://launchpad.net/~stk\nYaron https://launchpad.net/~sh-yaron\nYs, 2015"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

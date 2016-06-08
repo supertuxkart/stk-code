@@ -2907,7 +2907,7 @@ msgstr "O número máximo de xogadores debe estar entre 2 e 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Adrián Chaves Fernández https://launchpad.net/~gallaecio\n  Auria https://launchpad.net/~auria-mg\n  Miguel Anxo Bouzada https://launchpad.net/~mbouzada\n  Trutxo64 https://launchpad.net/~celestino-freire"
+msgstr "Launchpad Contributions:\nAdrián Chaves Fernández https://launchpad.net/~gallaecio\nAdrián Chaves Fernández, 2010\nAdrián Chaves Fernández, 2010,2015\nAdrián Chaves Fernández, 2010-2011,2013\nAdrián Chaves Fernández, 2015-2016\nAuria https://launchpad.net/~auria-mg\nMiguel Anxo Bouzada https://launchpad.net/~mbouzada\nTrutxo64 https://launchpad.net/~celestino-freire"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"

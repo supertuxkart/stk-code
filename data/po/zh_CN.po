@@ -2903,7 +2903,7 @@ msgstr "最大玩家数须为 2 到 12 个！"
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  STK-team https://launchpad.net/~stk\n  Sizhuang Liu https://launchpad.net/~lsz\n  Xhacker Liu https://launchpad.net/~xhacker\n  acme_pjz https://launchpad.net/~acme-pjz\n  jin https://launchpad.net/~zhangj\n  lks https://launchpad.net/~lks\n  luojie-dune https://launchpad.net/~luojie-dune\n  sohey https://launchpad.net/~sohey33"
+msgstr "Launchpad Contributions:\nacme_pjz https://launchpad.net/~acme-pjz\nBen Au, 2015\nBenau, 2015-2016\nBenau, 2016\nDawid Gan https://launchpad.net/~deveee\njin https://launchpad.net/~zhangj\nJin Zhang, 2015\nlks https://launchpad.net/~lks\nluojie-dune https://launchpad.net/~luojie-dune\nSizhuang Liu https://launchpad.net/~lsz\nsohey https://launchpad.net/~sohey33\nSTK-team https://launchpad.net/~stk\nXhacker Liu https://launchpad.net/~xhacker"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
