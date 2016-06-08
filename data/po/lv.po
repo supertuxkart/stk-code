@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Lauris Lemhens <kulduris@gmail.com>, 2015
+# Lauris Lemhens <kulduris@gmail.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-26 00:20+1000\n"
-"PO-Revision-Date: 2015-09-26 09:35+0000\n"
+"POT-Creation-Date: 2016-05-30 18:52-0400\n"
+"PO-Revision-Date: 2016-06-07 23:50+0000\n"
 "Last-Translator: Auria <auria.mg@gmail.com>\n"
 "Language-Team: Latvian (http://www.transifex.com/supertuxkart/supertuxkart/language/lv/)\n"
 "MIME-Version: 1.0\n"
@@ -64,7 +64,7 @@ msgstr "Zelta braucējs"
 
 #. I18N: ./data/achievements.xml
 msgid "Win against at least 3 opponents in all single player modes."
-msgstr ""
+msgstr "Uzvari vismaz 3 pretiniekus vienspēlētāja režīmā."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -136,9 +136,11 @@ msgstr "Noņemt"
 
 #. I18N: ./data/gui/addons_loading.stkgui
 #. I18N: Add-on screen action
+#. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
+#. I18N: Ghost replay info action
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:216
-#: src/states_screens/dialogs/addons_loading.cpp:284
+#: src/states_screens/dialogs/addons_loading.cpp:285
 msgid "Back"
 msgstr "Atpakaļ"
 
@@ -197,7 +199,7 @@ msgstr "Standarta "
 #: src/states_screens/easter_egg_screen.cpp:145
 #: src/states_screens/grand_prix_editor_screen.cpp:327
 #: src/states_screens/kart_selection.cpp:286
-#: src/states_screens/tracks_screen.cpp:155
+#: src/states_screens/tracks_and_gp_screen.cpp:148
 msgid "Add-Ons"
 msgstr "Papildinājumi"
 
@@ -218,18 +220,15 @@ msgstr "Papildinājumi"
 #: src/states_screens/grand_prix_editor_screen.cpp:324
 #: src/states_screens/kart_selection.cpp:278
 #: src/states_screens/options_screen_video.cpp:389
-#: src/states_screens/tracks_screen.cpp:145
+#: src/states_screens/tracks_and_gp_screen.cpp:138
+#: src/states_screens/tracks_screen.cpp:142
 msgid "All"
 msgstr "Viss"
 
-#. I18N: ./data/gui/challenges.stkgui
-#. I18N: Title for challenges screen
-msgid "Challenges - Trophy Room"
-msgstr ""
-
 #. I18N: ./data/gui/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: src/states_screens/edit_gp_screen.cpp:256
+#: src/states_screens/edit_gp_screen.cpp:257
+#: src/states_screens/ghost_replay_selection.cpp:116
 msgid "Yes"
 msgstr "Jā"
 
@@ -241,8 +240,6 @@ msgstr "Jā"
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: ./data/gui/enter_gp_name_dialog.stkgui
 #. I18N: In the 'add new grand prix' dialog
-#. I18N: ./data/gui/enter_player_name_dialog.stkgui
-#. I18N: In the 'add new player' dialog
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 #. I18N: ./data/gui/online/recovery_input.stkgui
@@ -257,7 +254,7 @@ msgstr "Jā"
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/addons_loading.cpp:227
+#: src/states_screens/dialogs/addons_loading.cpp:228
 #: src/states_screens/dialogs/add_device_dialog.cpp:128
 #: src/states_screens/user_screen.cpp:112
 msgid "Cancel"
@@ -376,8 +373,53 @@ msgstr "Pielietot"
 #. I18N: Section in easter egg tracks selection screen
 #. I18N: ./data/gui/tracks.stkgui
 #. I18N: In the track selection screen
+#. I18N: ./data/gui/tracks_and_gp.stkgui
+#. I18N: In the track and grand prix selection screen
 msgid "All Tracks"
 msgstr "Visas trases"
+
+#. I18N: ./data/gui/edit_gp.stkgui
+#. I18N: Title in edit grand prix screen
+msgid "Edit Grand Prix"
+msgstr "Rediģēt Grand Prix"
+
+#. I18N: ./data/gui/edit_gp.stkgui
+#. I18N: Menu item
+msgid "Move up"
+msgstr "Uz augšu"
+
+#. I18N: ./data/gui/edit_gp.stkgui
+#. I18N: Menu item
+msgid "Move down"
+msgstr "Uz leju"
+
+#. I18N: ./data/gui/edit_gp.stkgui
+#. I18N: Menu item
+msgid "Add"
+msgstr "Pievienot"
+
+#. I18N: ./data/gui/edit_gp.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/grand_prix_editor.stkgui
+#. I18N: Menu item
+msgid "Edit"
+msgstr "Rediģēt"
+
+#. I18N: ./data/gui/edit_gp.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
+#. I18N: Ghost replay info action
+#. I18N: ./data/gui/grand_prix_editor.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Remove"
+msgstr "Noņemt"
+
+#. I18N: ./data/gui/edit_gp.stkgui
+#. I18N: Menu item
+msgid "Save"
+msgstr "Saglabāt"
 
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: In the edit track screen
@@ -392,8 +434,6 @@ msgstr "Atgriezt:"
 #. I18N: ./data/gui/edit_track.stkgui
 #. I18N: ./data/gui/enter_gp_name_dialog.stkgui
 #. I18N: In the 'add new grand prix' dialog
-#. I18N: ./data/gui/enter_player_name_dialog.stkgui
-#. I18N: In the 'add new player' dialog
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
 #. I18N: ./data/gui/user_screen.stkgui
@@ -410,11 +450,6 @@ msgstr "Labi"
 msgid "Please enter the name of the grand prix"
 msgstr "Lūdzu, ievadi Grand Prix nosaukumu"
 
-#. I18N: ./data/gui/enter_player_name_dialog.stkgui
-#. I18N: In the 'add new player' dialog
-msgid "Enter the new player's name"
-msgstr "Ievadi jaunā spēlētāja vārdu"
-
 #. I18N: ./data/gui/feature_unlocked.stkgui
 #. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/grand_prix_win.stkgui
@@ -422,75 +457,47 @@ msgstr "Ievadi jaunā spēlētāja vārdu"
 #. I18N: In soccer setup screen
 #. I18N: ./data/gui/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
-#: src/states_screens/dialogs/gp_info_dialog.cpp:214
-#: src/states_screens/race_result_gui.cpp:186
+#: src/states_screens/race_result_gui.cpp:205
 msgid "Continue"
 msgstr "Turpināt"
 
-#. I18N: ./data/gui/gpedit.stkgui
-#. I18N: Title in edit grand prix screen
-msgid "Edit Grand Prix"
-msgstr "Rediģēt Grand Prix"
+#. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
+#. I18N: Ghost replay info action
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Record the race for ghost replay"
+msgstr ""
 
-#. I18N: ./data/gui/gpedit.stkgui
-#. I18N: Menu item
-msgid "Move up"
-msgstr "Uz augšu"
+#. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
+#. I18N: Ghost replay info action
+msgid "Watch replay only"
+msgstr ""
 
-#. I18N: ./data/gui/gpedit.stkgui
-#. I18N: Menu item
-msgid "Move down"
-msgstr "Uz leju"
+#. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
+#. I18N: Ghost replay info screen action
+#. I18N: ./data/gui/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/online/networking_lobby.stkgui
+#. I18N: In the network lobby
+#. I18N: ./data/gui/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Start Race"
+msgstr "Sākt sacīkstes"
 
-#. I18N: ./data/gui/gpedit.stkgui
-#. I18N: Menu item
-msgid "Add"
-msgstr "Pievienot"
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Ghost Replay Selection"
+msgstr ""
 
-#. I18N: ./data/gui/gpedit.stkgui
-#. I18N: Menu item
-#. I18N: ./data/gui/gpeditor.stkgui
-#. I18N: Menu item
-msgid "Edit"
-msgstr "Rediģēt"
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Only show replays matching the current difficulty"
+msgstr ""
 
-#. I18N: ./data/gui/gpedit.stkgui
-#. I18N: Menu item
-#. I18N: ./data/gui/gpeditor.stkgui
-#. I18N: Menu item
-#. I18N: ./data/gui/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-msgid "Remove"
-msgstr "Noņemt"
-
-#. I18N: ./data/gui/gpedit.stkgui
-#. I18N: Menu item
-msgid "Save"
-msgstr "Saglabāt"
-
-#. I18N: ./data/gui/gpeditor.stkgui
-#. I18N: Title in grand prix editor screen
-msgid "Grand Prix editor"
-msgstr "Grand Prix redaktors"
-
-#. I18N: ./data/gui/gpeditor.stkgui
-#. I18N: Menu item
-msgid "New"
-msgstr "Jauns"
-
-#. I18N: ./data/gui/gpeditor.stkgui
-#. I18N: Menu item
-msgid "Copy"
-msgstr "Kopēt"
-
-#. I18N: ./data/gui/gpeditor.stkgui
-#. I18N: Menu item
-#. I18N: ./data/gui/user_screen.stkgui
-#. I18N: In the user screen
-#. I18N: ./data/gui/user_screen_tab.stkgui
-#. I18N: In the user screen
-msgid "Rename"
-msgstr "Pārdēvēt"
+#. I18N: ./data/gui/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
+msgid "Record ghost replay"
+msgstr ""
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -499,6 +506,7 @@ msgstr "MI kartingi"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#: src/states_screens/ghost_replay_selection.cpp:79
 msgid "Reverse"
 msgstr "Atgriezt"
 
@@ -509,16 +517,33 @@ msgstr "Trases grupējums"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#. I18N: ./data/gui/track_info.stkgui
-#. I18N: In the track info screen
-msgid "Start Race"
-msgstr "Sākt sacīkstes"
-
-#. I18N: ./data/gui/gp_info.stkgui
-#. I18N: In the grand prix info screen
-#: src/states_screens/gp_info_screen.cpp:146
+#: src/states_screens/gp_info_screen.cpp:147
 msgid "Continue saved GP"
 msgstr "Turpināt saglabāto GP"
+
+#. I18N: ./data/gui/grand_prix_editor.stkgui
+#. I18N: Title in grand prix editor screen
+msgid "Grand Prix editor"
+msgstr "Grand Prix redaktors"
+
+#. I18N: ./data/gui/grand_prix_editor.stkgui
+#. I18N: Menu item
+msgid "New"
+msgstr "Jauns"
+
+#. I18N: ./data/gui/grand_prix_editor.stkgui
+#. I18N: Menu item
+msgid "Copy"
+msgstr "Kopēt"
+
+#. I18N: ./data/gui/grand_prix_editor.stkgui
+#. I18N: Menu item
+#. I18N: ./data/gui/user_screen.stkgui
+#. I18N: In the user screen
+#. I18N: ./data/gui/user_screen_tab.stkgui
+#. I18N: In the user screen
+msgid "Rename"
+msgstr "Pārdēvēt"
 
 #. I18N: ./data/gui/grand_prix_lose.stkgui
 #. I18N: ./data/gui/grand_prix_win.stkgui
@@ -573,8 +598,8 @@ msgstr "Spēles režīmi"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
-msgid "Multi­player"
-msgstr "Daudzspēlētāju"
+msgid "Multi-player"
+msgstr ""
 
 #. I18N: ./data/gui/help1.stkgui
 msgid "Click here to play the tutorial"
@@ -678,7 +703,9 @@ msgstr "Regulāras sacīkstes: Visi triecieni atļauti, tāpēc ķer ieročus un
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
+msgid ""
+"Time Trial: Contains no powerups, so only your driving skills matter! This "
+"mode allows you to record the race for replaying."
 msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
@@ -692,16 +719,13 @@ msgstr ""
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
 msgid ""
-"3 Strikes Battle: Only in multiplayer games. Hit others with weapons until "
-"they lose all their lives."
-msgstr "3 Konfliktu Cīņas: Tikai daudzspēlētāju spēlēs. Trāpi citiem ar ieročiem, līdz viņi zaudē visas savas dzīvības."
+"3 Strikes Battle: Hit others with weapons until they lose all their lives."
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
-msgid ""
-"Soccer: Only in multiplayer games. Use your kart to push the ball into the "
-"goal."
-msgstr "Futbols: Tikai daudzspēlētāju spēlēs. Izmanto savu kartu, lai iegrūstu bumbu vārtos."
+msgid "Soccer: Use your kart to push the ball into the goal."
+msgstr ""
 
 #. I18N: ./data/gui/help3.stkgui
 #. I18N: In the help menu
@@ -754,39 +778,38 @@ msgstr ""
 msgid "Choose a Kart"
 msgstr "Izvēlēties kartu"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Story Mode"
 msgstr "Stāsta režīms"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Singleplayer"
 msgstr "Vienspēlētāju"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Multiplayer"
 msgstr "Daudzspēlētāju"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: Main menu button
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/main_menu_screen.cpp:170
-#: src/states_screens/main_menu_screen.cpp:185
-#: src/states_screens/online_profile_friends.cpp:221
+#: src/states_screens/main_menu_screen.cpp:78
+#: src/states_screens/online_profile_friends.cpp:222
 msgid "Online"
 msgstr "Tiešsaistē"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Addons"
 msgstr "Papildinājumi"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: In the main screen
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
@@ -795,7 +818,7 @@ msgstr "Papildinājumi"
 msgid "Options"
 msgstr "Iespējas"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: In the main screen
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
@@ -804,31 +827,31 @@ msgstr "Iespējas"
 msgid "Help"
 msgstr "Palīdzība"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: In the main screen
 #: src/states_screens/race_gui_overworld.cpp:462
 msgid "Tutorial"
 msgstr "Apmācība"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: In the main screen
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:100
+#: src/states_screens/online_profile_base.cpp:112
 msgid "Achievements"
 msgstr "Sasniegumi"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: In the main screen
 msgid "Grand Prix Editor"
 msgstr "Grand Prix redaktors"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: In the main screen
 msgid "About"
 msgstr "Par"
 
-#. I18N: ./data/gui/main.stkgui
+#. I18N: ./data/gui/main_menu.stkgui
 #. I18N: In the main screen
 msgid "Quit"
 msgstr "Iziet"
@@ -898,13 +921,86 @@ msgstr "Maksimālais spēlētāju skaits"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
+msgid "Password (optional)"
+msgstr ""
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#: src/states_screens/ghost_replay_selection.cpp:80
+#: src/states_screens/server_selection.cpp:104
+msgid "Difficulty"
+msgstr ""
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/race_setup.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:544
+#: src/states_screens/ghost_replay_selection.cpp:120
+msgid "Novice"
+msgstr "Iesācējs"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/race_setup.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:545
+#: src/states_screens/ghost_replay_selection.cpp:120
+msgid "Intermediate"
+msgstr "Starpposma"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/race_setup.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:546
+#: src/states_screens/ghost_replay_selection.cpp:119
+msgid "Expert"
+msgstr "Eksperts"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:547
+#: src/states_screens/ghost_replay_selection.cpp:118
+msgid "SuperTux"
+msgstr "SuperTux"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
+#: src/states_screens/server_selection.cpp:105
+msgid "Game mode"
+msgstr ""
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/race/race_manager.hpp:175
+msgid "Normal Race"
+msgstr "Parastas sacīkstes"
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/race/race_manager.hpp:177
+msgid "Time Trial"
+msgstr ""
+
+#. I18N: ./data/gui/online/create_server.stkgui
+#. I18N: In the server creation screen
 msgid "Create"
 msgstr "Izveidot"
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
-#: src/states_screens/main_menu_screen.cpp:175
-#: src/states_screens/main_menu_screen.cpp:186
+#: src/states_screens/main_menu_screen.cpp:79
 msgid "Login"
 msgstr "Logins"
 
@@ -941,60 +1037,41 @@ msgstr "Ielogojoties kā viesiem, ļauj tev piedalīties tiešsaistes sacīkstē
 msgid "Log In"
 msgstr "Ielogoties"
 
-#. I18N: ./data/gui/online/lobby.stkgui
-#. I18N: In networking lobby
-msgid "Lobby"
-msgstr "Vestibils"
-
-#. I18N: ./data/gui/online/lobby.stkgui
-#. I18N: In the networking lobby
-msgid "Server name:"
-msgstr ""
-
-#. I18N: ./data/gui/online/lobby.stkgui
-#. I18N: In networking lobby
-msgid "actions"
-msgstr "darbības"
-
-#. I18N: ./data/gui/online/lobby.stkgui
-#. I18N: In the networking lobby
-msgid "Exit"
-msgstr "Iziet"
-
 #. I18N: ./data/gui/online/lobby_settings.stkgui
 #. I18N: In the lobby settings screen
 msgid "Lobby Settings"
 msgstr "Vestibila iestatījumi"
 
-#. I18N: ./data/gui/online/main.stkgui
-#. I18N: In the online multiplayer screen
-msgid "Online Multiplayer"
-msgstr "Tiešsaistes daudzspēlētāju"
+#. I18N: ./data/gui/online/networking_lobby.stkgui
+#. I18N: In networking lobby
+msgid "Lobby"
+msgstr "Vestibils"
 
-#. I18N: ./data/gui/online/main.stkgui
-#. I18N: In the online multiplayer screen
-msgid "Quick Play"
-msgstr "Ātrā spēle"
+#. I18N: ./data/gui/online/networking_lobby.stkgui
+#. I18N: In the networking lobby
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the networking lobby
+msgid "Server name:"
+msgstr "Servera nosaukums:"
 
-#. I18N: ./data/gui/online/main.stkgui
-#. I18N: In the online multiplayer screen
-msgid "Find Server"
-msgstr "Atrast serveri"
+#. I18N: ./data/gui/online/networking_lobby.stkgui
+#. I18N: In the networking lobby
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the networking lobby
+msgid "Difficulty:"
+msgstr "Grūtības pakāpe:"
 
-#. I18N: ./data/gui/online/main.stkgui
-#. I18N: In the online multiplayer screen
-msgid "Create Server"
-msgstr "Izveidot serveri"
+#. I18N: ./data/gui/online/networking_lobby.stkgui
+#. I18N: In the networking lobby
+#. I18N: ./data/gui/online/server_info_dialog.stkgui
+#. I18N: In the networking lobby
+msgid "Game mode:"
+msgstr "Spēles režīms:"
 
-#. I18N: ./data/gui/online/main.stkgui
-#. I18N: In the online multiplayer screen
-msgid "Profile"
-msgstr "Profils"
-
-#. I18N: ./data/gui/online/main.stkgui
-#. I18N: In the online multiplayer screen
-msgid "Log Out"
-msgstr "Izlogoties"
+#. I18N: ./data/gui/online/networking_lobby.stkgui
+#. I18N: In the networking lobby
+msgid "Exit"
+msgstr "Iziet"
 
 #. I18N: ./data/gui/online/notification_dialog.stkgui
 #. I18N: User info dialog
@@ -1007,13 +1084,14 @@ msgstr "Skats"
 #. I18N: ./data/gui/online/profile_achievements_tab.stkgui
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: ./data/gui/online/profile_overview.stkgui
+#. I18N: ./data/gui/online/profile_servers.stkgui
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "..."
 msgstr "..."
 
 #. I18N: ./data/gui/online/profile_friends.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:99
+#: src/states_screens/online_profile_base.cpp:111
 msgid "Friends"
 msgstr "Draugi"
 
@@ -1032,16 +1110,46 @@ msgstr "Meklēt"
 msgid "Overview"
 msgstr "Pārskats"
 
+#. I18N: ./data/gui/online/profile_servers.stkgui
+#. I18N: Section in the profile screen
+#: src/states_screens/online_profile_base.cpp:110
+msgid "Servers"
+msgstr "Serveri"
+
+#. I18N: ./data/gui/online/profile_servers.stkgui
+msgid "Local Networking"
+msgstr "Vietējā tīklošana"
+
+#. I18N: ./data/gui/online/profile_servers.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Find Server"
+msgstr "Atrast serveri"
+
+#. I18N: ./data/gui/online/profile_servers.stkgui
+#. I18N: In the online multiplayer screen
+#: src/states_screens/create_server_screen.cpp:83
+msgid "Create Server"
+msgstr "Izveidot serveri"
+
+#. I18N: ./data/gui/online/profile_servers.stkgui
+msgid "Global Networking"
+msgstr "Globālā tīklošana"
+
+#. I18N: ./data/gui/online/profile_servers.stkgui
+#. I18N: In the online multiplayer screen
+msgid "Quick Play"
+msgstr "Ātrā spēle"
+
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online_profile_base.cpp:101
+#: src/states_screens/online_profile_base.cpp:113
 msgid "Account Settings"
 msgstr "Konta iestatījumi"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 msgid "Password:"
-msgstr ""
+msgstr "Parole:"
 
 #. I18N: ./data/gui/online/profile_settings.stkgui
 msgid "Change"
@@ -1074,7 +1182,7 @@ msgstr "Aizpildi lietotājvārdu un epastu, kuru iesniedzi reģistrācijā, lai 
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
 #: src/states_screens/online_profile_friends.cpp:72
-#: src/states_screens/online_user_search.cpp:74
+#: src/states_screens/online_user_search.cpp:73
 msgid "Username"
 msgstr "Lietotājvārds"
 
@@ -1130,7 +1238,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at http://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Tu vari spēlēt bez tiešsaistes konta izveides, izvēloties bezsaistes kontu. Lai gan tad tu vairs nevarēsi sazināties ar draugiem, balsot par spraudņiem, utt. Lūdzu, izlasi mūsu paziņojumu par konfidencialitāti šeit: http://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -1156,15 +1264,6 @@ msgstr "Servera informācija"
 
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
-#. I18N: ./data/gui/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-#: src/states_screens/online_profile_achievements.cpp:73
-#: src/states_screens/server_selection.cpp:91
-msgid "Name"
-msgstr "Nosaukums"
-
-#. I18N: ./data/gui/online/server_info_dialog.stkgui
-#. I18N: In the server info dialog
 msgid "Join"
 msgstr "Ieiet"
 
@@ -1176,6 +1275,13 @@ msgstr "Servera izvēle"
 #. I18N: User info dialog' dialog
 msgid "User Info"
 msgstr "Lietotāja informācija"
+
+#. I18N: ./data/gui/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#: src/states_screens/online_profile_achievements.cpp:73
+#: src/states_screens/server_selection.cpp:102
+msgid "Name"
+msgstr "Nosaukums"
 
 #. I18N: ./data/gui/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -1196,6 +1302,11 @@ msgstr "Lietotāju meklēšana"
 msgid "Vote"
 msgstr "Balsot"
 
+#. I18N: ./data/gui/online/waiting_for_others.stkgui
+#. I18N: Networking screen
+msgid "Waiting for the others..."
+msgstr "Gaida pārējos:"
+
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: ./data/gui/options_input.stkgui
@@ -1208,11 +1319,11 @@ msgstr "SuperTuxKart opcijas"
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: Section in the settings menu
+#: src/states_screens/options_screen_device.cpp:86
 #: src/states_screens/options_screen_input.cpp:140
-#: src/states_screens/options_screen_input2.cpp:86
 #: src/states_screens/options_screen_ui.cpp:119
 #: src/states_screens/options_screen_video.cpp:172
-#: src/states_screens/user_screen.cpp:637
+#: src/states_screens/user_screen.cpp:660
 msgid "Audio"
 msgstr "Audio"
 
@@ -1246,13 +1357,13 @@ msgstr "Skaņu efekti"
 #: src/states_screens/options_screen_audio.cpp:68
 #: src/states_screens/options_screen_ui.cpp:121
 #: src/states_screens/options_screen_video.cpp:175
-#: src/states_screens/user_screen.cpp:639
+#: src/states_screens/user_screen.cpp:662
 msgid "Controls"
 msgstr "Vadības"
 
 #. I18N: ./data/gui/options_device.stkgui
 #. I18N: In the input configuration screen
-#: src/states_screens/options_screen_input2.cpp:111
+#: src/states_screens/options_screen_device.cpp:111
 msgid "Delete Configuration"
 msgstr "Dzēst konfigurāciju"
 
@@ -1282,12 +1393,13 @@ msgstr "Kuru konfigurāciju izmantot, noteiks tas, kurš 'Izvēlēties' taustiņ
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
+#: src/states_screens/ghost_replay_selection.cpp:78
 #: src/states_screens/options_screen_audio.cpp:67
+#: src/states_screens/options_screen_device.cpp:88
 #: src/states_screens/options_screen_input.cpp:142
-#: src/states_screens/options_screen_input2.cpp:88
 #: src/states_screens/options_screen_ui.cpp:120
 #: src/states_screens/options_screen_video.cpp:174
-#: src/states_screens/server_selection.cpp:92
+#: src/states_screens/server_selection.cpp:103
 msgid "Players"
 msgstr "Spēlētāji"
 
@@ -1308,17 +1420,17 @@ msgstr "Pievienot spēlētāju"
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: Section in the settings menu
 #: src/states_screens/options_screen_audio.cpp:66
+#: src/states_screens/options_screen_device.cpp:87
 #: src/states_screens/options_screen_input.cpp:141
-#: src/states_screens/options_screen_input2.cpp:87
 #: src/states_screens/options_screen_video.cpp:173
-#: src/states_screens/user_screen.cpp:638
+#: src/states_screens/user_screen.cpp:661
 msgid "User Interface"
 msgstr "Lietotāja interfeiss"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Skin"
-msgstr ""
+msgstr "Izskats"
 
 #. I18N: ./data/gui/options_ui.stkgui
 #. I18N: In the ui settings
@@ -1348,10 +1460,10 @@ msgstr "Pievienoties internetam"
 #. I18N: ./data/gui/options_video.stkgui
 #. I18N: Section in the settings menu
 #: src/states_screens/options_screen_audio.cpp:65
+#: src/states_screens/options_screen_device.cpp:85
 #: src/states_screens/options_screen_input.cpp:139
-#: src/states_screens/options_screen_input2.cpp:85
 #: src/states_screens/options_screen_ui.cpp:118
-#: src/states_screens/user_screen.cpp:636
+#: src/states_screens/user_screen.cpp:659
 msgid "Graphics"
 msgstr "Grafika"
 
@@ -1429,46 +1541,6 @@ msgstr "Neko nepiešķirt"
 msgid "Press ESC to cancel"
 msgstr "Nospied ESC, lai atceltu"
 
-#. I18N: ./data/gui/racesetup.stkgui
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: ./data/gui/soccer_setup.stkgui
-msgid "Race Setup"
-msgstr "Sacīkšu iestatījumi"
-
-#. I18N: ./data/gui/racesetup.stkgui
-msgid "Select a difficulty"
-msgstr "Izvēlēties grūtības pakāpi"
-
-#. I18N: ./data/gui/racesetup.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
-msgid "Novice"
-msgstr "Iesācējs"
-
-#. I18N: ./data/gui/racesetup.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
-msgid "Intermediate"
-msgstr "Starpposma"
-
-#. I18N: ./data/gui/racesetup.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/select_challenge.stkgui
-#. I18N: Difficulty
-msgid "Expert"
-msgstr "Eksperts"
-
-#. I18N: ./data/gui/racesetup.stkgui
-#. I18N: Difficulty
-msgid "SuperTux"
-msgstr "SuperTux"
-
-#. I18N: ./data/gui/racesetup.stkgui
-msgid "Select a game mode"
-msgstr "Izvēlēties spēles režīmu"
-
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Back to Race"
@@ -1476,7 +1548,7 @@ msgstr "Atpakaļ uz sacīkstēm"
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:209
+#: src/states_screens/race_result_gui.cpp:228
 msgid "Setup New Race"
 msgstr "Uzstādīt jaunas sacīkstes"
 
@@ -1494,6 +1566,20 @@ msgstr "Padoties"
 #. I18N: Race paused button
 msgid "Exit Race"
 msgstr "Iziet no sacīkstēm"
+
+#. I18N: ./data/gui/race_setup.stkgui
+#. I18N: ./data/gui/select_challenge.stkgui
+#. I18N: ./data/gui/soccer_setup.stkgui
+msgid "Race Setup"
+msgstr "Sacīkšu iestatījumi"
+
+#. I18N: ./data/gui/race_setup.stkgui
+msgid "Select a difficulty"
+msgstr "Izvēlēties grūtības pakāpi"
+
+#. I18N: ./data/gui/race_setup.stkgui
+msgid "Select a game mode"
+msgstr "Izvēlēties spēles režīmu"
 
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Type of race, in a challenge
@@ -1521,12 +1607,18 @@ msgid "Use left/right to choose your team and press fire"
 msgstr "Izmanto pogu 'pa kreisi'/'pa labi', lai izvēlētos savu komandu un spied 'šaut'"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
-msgid "VS"
-msgstr "pret"
+#. I18N: In soccer setup screen
+msgid "Red Team"
+msgstr ""
 
-#. I18N: ./data/gui/tracks.stkgui
-#. I18N: In the track selection screen
-#: src/states_screens/dialogs/select_challenge.cpp:145
+#. I18N: ./data/gui/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+msgid "Blue Team"
+msgstr ""
+
+#. I18N: ./data/gui/tracks_and_gp.stkgui
+#. I18N: In the track and grand prix selection screen
+#: src/states_screens/dialogs/select_challenge.cpp:147
 msgid "Grand Prix"
 msgstr "Grand Prix"
 
@@ -1536,7 +1628,7 @@ msgstr "= Labākie rezultāti ="
 
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:253
+#: src/states_screens/track_info_screen.cpp:322
 msgid "(Empty)"
 msgstr "(Tukšs)"
 
@@ -1549,11 +1641,6 @@ msgstr "Apļu skaits"
 #. I18N: In the track info screen
 msgid "Number of AI karts"
 msgstr "MI kartu skaits"
-
-#. I18N: ./data/gui/track_info.stkgui
-#. I18N: In the track info screen
-msgid "Drive in reverse"
-msgstr "Braukt atpakaļgaitā"
 
 #. I18N: ./data/gui/user_screen.stkgui
 #. I18N: In the user screen
@@ -1575,6 +1662,10 @@ msgstr "Pievienot lietotāju"
 #. I18N: In the user screen
 msgid "Delete"
 msgstr "Dzēst"
+
+#. I18N: ../stk-assets/tracks/abyss/track.xml
+msgid "Antediluvian Abyss"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
@@ -1611,6 +1702,10 @@ msgstr "Zaļā Ieleja"
 #. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
 msgstr "Asjenda"
+
+#. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
+msgid "Icy Soccer Field"
+msgstr ""
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -1687,13 +1782,13 @@ msgstr "Stadions"
 msgid "STK Enterprise"
 msgstr "STK uzņēmums"
 
-#. I18N: ../stk-assets/tracks/subsea/track.xml
-msgid "Subsea"
-msgstr "Zemūdens"
-
 #. I18N: ../stk-assets/tracks/temple/track.xml
 msgid "Temple"
 msgstr "Templis"
+
+#. I18N: ../stk-assets/tracks/volcano_island/track.xml
+msgid "Volcan Island"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
@@ -1703,13 +1798,73 @@ msgstr "XR591"
 msgid "Zen Garden"
 msgstr "Zen dārzs"
 
+#. I18N: ../stk-assets/karts/adiumy/kart.xml
+msgid "Adiumy"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/amanda/kart.xml
+msgid "Amanda"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/beastie/kart.xml
+msgid "Beastie"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/elephpant/kart.xml
+msgid "Elephpant"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/emule/kart.xml
+msgid "Emule"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/gavroche/kart.xml
+msgid "Gavroche"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/gnu/kart.xml
+msgid "Gnu"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/hexley/kart.xml
+msgid "Hexley"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/konqi/kart.xml
+msgid "Konqi"
+msgstr ""
+
 #. I18N: ../stk-assets/karts/nolok/kart.xml
 msgid "Nolok"
 msgstr "Noloks"
 
+#. I18N: ../stk-assets/karts/pidgin/kart.xml
+msgid "Pidgin"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/puffy/kart.xml
+msgid "Puffy"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
+msgid "Sara the Racer"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
+msgid "Sara the Wizard"
+msgstr ""
+
+#. I18N: ../stk-assets/karts/suzanne/kart.xml
+msgid "Suzanne"
+msgstr ""
+
 #. I18N: ../stk-assets/karts/tux/kart.xml
 msgid "Tux"
 msgstr "Tukss"
+
+#. I18N: ../stk-assets/karts/wilber/kart.xml
+msgid "Wilber"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
@@ -1720,46 +1875,46 @@ msgstr "Zū"
 msgid "Completed achievement \"%s\"."
 msgstr "Pabeigts sasniegums \"%s\"."
 
-#: src/addons/addons_manager.cpp:97 src/addons/news_manager.cpp:315
+#: src/addons/addons_manager.cpp:97 src/addons/news_manager.cpp:317
 msgid "Can't access stkaddons server..."
 msgstr "Nevar piekļūt stk paplašinājumu serverim..."
 
-#: src/addons/news_manager.cpp:172
+#: src/addons/news_manager.cpp:174
 #, c-format
 msgid "Error downloading news: '%s'."
 msgstr "Kļūda lejuplādējot jaunumus: '%s'."
 
 #. I18N: number of laps to race in a challenge
-#: src/challenges/challenge_data.cpp:249
+#: src/challenges/challenge_data.cpp:259
 #, c-format
 msgid "Laps : %i"
 msgstr "Apļi : %i"
 
-#: src/challenges/challenge_data.cpp:255
+#: src/challenges/challenge_data.cpp:265
 msgid "Follow the leader"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:491
+#: src/challenges/challenge_data.cpp:511
 #, c-format
 msgid "New track '%s' now available"
 msgstr "Jauna trase '%s' tagad ir pieejama"
 
-#: src/challenges/challenge_data.cpp:496
+#: src/challenges/challenge_data.cpp:516
 #, c-format
 msgid "New game mode '%s' now available"
 msgstr "Jauns spēļu režīms '%s' tagad ir pieejams"
 
-#: src/challenges/challenge_data.cpp:506
+#: src/challenges/challenge_data.cpp:526
 #, c-format
 msgid "New Grand Prix '%s' now available"
 msgstr "Jauni Grand Prix '%s' tagad ir pieejami"
 
-#: src/challenges/challenge_data.cpp:510
+#: src/challenges/challenge_data.cpp:530
 #, c-format
 msgid "New difficulty '%s' now available"
 msgstr "Jauna sarežģītības pakāpe '%s' tagad ir pieejama"
 
-#: src/challenges/challenge_data.cpp:520
+#: src/challenges/challenge_data.cpp:540
 #, c-format
 msgid "New kart '%s' now available"
 msgstr "Jauns karts '%s' tagad ir pieejams"
@@ -1791,29 +1946,29 @@ msgid ""
 "created."
 msgstr "Tavs konfigurāciju fails bija pārāk vecs, tāpēc tas tika izdzēsts, un jauns tiks izveidots."
 
-#: src/graphics/irr_driver.cpp:1852
+#: src/graphics/irr_driver.cpp:1896
 #, c-format
 msgid "FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"
 msgstr "Rāmju skaits sekundē: %d/%d/%d - Poligonu skaits: %d Solīds, %d Ēnas - Gaismas distance: %d"
 
-#: src/graphics/irr_driver.cpp:1863
+#: src/graphics/irr_driver.cpp:1907
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris"
 msgstr "Rāmju skaits sekundē: %d/%d/%d - %d KTris"
 
-#: src/guiengine/engine.cpp:1329
+#: src/guiengine/engine.cpp:1346
 msgid "Loading"
 msgstr "Lādē"
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:85
+#: src/guiengine/widgets/kart_stats_widget.cpp:89
 msgid "WEIGHT"
 msgstr "SVARS"
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:89
+#: src/guiengine/widgets/kart_stats_widget.cpp:94
 msgid "SPEED"
 msgstr "ĀTRUMS"
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:93
+#: src/guiengine/widgets/kart_stats_widget.cpp:98
 msgid "POWER"
 msgstr "JAUDA"
 
@@ -2437,28 +2592,28 @@ msgstr "Kreisais īkšķis lejup"
 msgid "Left thumb up"
 msgstr "Kreisais īkšķis augšup"
 
-#: src/input/input_manager.cpp:751
+#: src/input/input_manager.cpp:776
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr ""
 
-#: src/input/input_manager.cpp:781
+#: src/input/input_manager.cpp:806
 msgid "Only the Game Master may act at this point!"
 msgstr "Pašlaik var rīkoties tikai spēles kapteinis!"
 
-#: src/input/wiimote_manager.cpp:387
+#: src/input/wiimote_manager.cpp:389
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok.Detailed "
 "instructions at supertuxkart.net/Wiimote"
 msgstr "Pievieno savu wiimote Bluetooth menedžerim, tad apstiprini. Detalizētas instrukcijas atrodamas supertuxkart.net/Wiimote"
 
-#: src/input/wiimote_manager.cpp:390
+#: src/input/wiimote_manager.cpp:392
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
 msgstr ""
 
-#: src/input/wiimote_manager.cpp:413
+#: src/input/wiimote_manager.cpp:415
 #, c-format
 msgid "Found %d wiimote"
 msgid_plural "Found %d wiimotes"
@@ -2466,29 +2621,27 @@ msgstr[0] "Atrasti %d wiimote"
 msgstr[1] "Atrasts %d wiimote"
 msgstr[2] "Atrasti %d wiimote"
 
-#: src/input/wiimote_manager.cpp:418
+#: src/input/wiimote_manager.cpp:420
 msgid "Could not detect any wiimote :/"
 msgstr "Nespēja atrast wiimote :/"
 
-#: src/karts/controller/network_player_controller.cpp:281
-#: src/karts/controller/player_controller.cpp:356
+#: src/karts/controller/local_player_controller.cpp:204
 msgid "Penalty time!!"
 msgstr "Soda laiks!!"
 
-#: src/karts/controller/network_player_controller.cpp:283
-#: src/karts/controller/player_controller.cpp:358
+#: src/karts/controller/local_player_controller.cpp:206
 msgid "Don't accelerate before go"
 msgstr "Nesāc braukt pirms starta"
 
-#: src/karts/kart.cpp:834 src/karts/kart.cpp:853
+#: src/karts/kart.cpp:867 src/karts/kart.cpp:872
 msgid "You won the race!"
 msgstr "Tu uzvarēji sacīkstes!"
 
-#: src/karts/kart.cpp:834
+#: src/karts/kart.cpp:872
 msgid "You finished the race!"
 msgstr "Tu pabeidzi sacīkstes!"
 
-#: src/main.cpp:1227
+#: src/main.cpp:1296
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -2499,12 +2652,12 @@ msgid ""
 "statistics\")."
 msgstr ""
 
-#: src/main.cpp:1399
+#: src/main.cpp:1446
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Tava draivera versija ir pārāk veca. Lūdzu, ieinstalē jaunāko video draiveri."
 
-#: src/main.cpp:1411
+#: src/main.cpp:1458
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
 "your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
@@ -2542,14 +2695,22 @@ msgstr "Apļa laika rekords"
 msgid "WRONG WAY!"
 msgstr "NEPAREIZS VIRZIENS!"
 
-#: src/modes/world.cpp:1163
+#: src/modes/world.cpp:1208
 msgid "You have been eliminated!"
 msgstr "Tu tiki izslēgts!"
 
-#: src/modes/world.cpp:1166
+#: src/modes/world.cpp:1211
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s' tika likvidēts."
+
+#: src/network/protocols/server_lobby_room_protocol.cpp:237
+msgid "Failed to register server"
+msgstr ""
+
+#: src/network/servers_manager.cpp:195
+msgid "No LAN server detected"
+msgstr ""
 
 #: src/online/online_player_profile.cpp:420
 #, c-format
@@ -2604,34 +2765,33 @@ msgid ""
 msgstr "Labāko rezultātu fails bija pārāk vecs,\nvisi labākie rezultāti tika izdzēsti."
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:176
-msgid "Normal Race"
-msgstr "Parastas sacīkstes"
-
-#. I18N: Game mode
-#: src/race/race_manager.hpp:178
-msgid "Time Trial"
-msgstr ""
-
-#. I18N: Game mode
-#: src/race/race_manager.hpp:180
+#: src/race/race_manager.hpp:179
 msgid "Follow the Leader"
 msgstr "Seko Līderim"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:182
+#: src/race/race_manager.hpp:181
 msgid "3 Strikes Battle"
 msgstr "3 Konfliktu Cīņas"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:184
+#: src/race/race_manager.hpp:183
 msgid "Egg Hunt"
 msgstr "Olu Medības"
 
 #. I18N: Game mode
-#: src/race/race_manager.hpp:186
+#: src/race/race_manager.hpp:185
 msgid "Soccer"
 msgstr "Futbols"
+
+#: src/replay/replay_recorder.cpp:182
+msgid "Incomplete replay file will not be saved."
+msgstr ""
+
+#: src/replay/replay_recorder.cpp:218
+#, c-format
+msgid "Replay saved in \"%s\"."
+msgstr ""
 
 #: src/states_screens/addons_screen.cpp:50
 msgid "1 week"
@@ -2699,38 +2859,50 @@ msgstr "Atvaino, radās kļūda dibinot sakarus ar papildinājumu tīmekļa lapu
 #: src/states_screens/arenas_screen.cpp:81
 #: src/states_screens/easter_egg_screen.cpp:143
 #: src/states_screens/kart_selection.cpp:284
-#: src/states_screens/tracks_screen.cpp:153
+#: src/states_screens/tracks_and_gp_screen.cpp:146
 msgid "standard"
 msgstr "standarts"
 
-#: src/states_screens/arenas_screen.cpp:237
-#: src/states_screens/arenas_screen.cpp:267
+#: src/states_screens/arenas_screen.cpp:275
+#: src/states_screens/arenas_screen.cpp:327
 #: src/states_screens/easter_egg_screen.cpp:225
 #: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:858
-#: src/states_screens/kart_selection.cpp:1452
-#: src/states_screens/race_setup_screen.cpp:214
+#: src/states_screens/kart_selection.cpp:864
+#: src/states_screens/kart_selection.cpp:1450
+#: src/states_screens/race_setup_screen.cpp:99
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Aizslēgts : pabeidz aktīvos izaicinājumus, lai gūtu pieeju vēl citām!"
 
-#: src/states_screens/arenas_screen.cpp:277
+#: src/states_screens/arenas_screen.cpp:339
 msgid "Random Arena"
 msgstr "Nejauši izvēlēta arēna"
 
-#: src/states_screens/create_server_screen.cpp:60
+#: src/states_screens/arenas_screen.cpp:343
+#, c-format
+msgid "%d arena unavailable in single player."
+msgid_plural "%d arenas unavailable in single player."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: src/states_screens/create_server_screen.cpp:82
+msgid "Create LAN Server"
+msgstr ""
+
+#: src/states_screens/create_server_screen.cpp:87
 #, c-format
 msgid "%s's server"
 msgstr "Spēlētāja %s serveris"
 
-#: src/states_screens/create_server_screen.cpp:117
+#: src/states_screens/create_server_screen.cpp:154
 msgid "Creating server"
 msgstr "Veido serveri"
 
-#: src/states_screens/create_server_screen.cpp:132
+#: src/states_screens/create_server_screen.cpp:181
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "Nosaukumam jābūt garumā no 4 līdz 30 rakstzīmēm!"
 
-#: src/states_screens/create_server_screen.cpp:136
+#: src/states_screens/create_server_screen.cpp:188
 msgid "The maxinum number of players has to be between 2 and 12."
 msgstr "Maksimālajam spēlētāju skaitam jābūt no 2 līdz 12."
 
@@ -2738,50 +2910,50 @@ msgstr "Maksimālajam spēlētāju skaitam jābūt no 2 līdz 12."
 msgid "translator-credits"
 msgstr "tulkotāja titri"
 
-#: src/states_screens/dialogs/addons_loading.cpp:96
+#: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
 msgstr "Atjaunināt"
 
-#: src/states_screens/dialogs/addons_loading.cpp:108
+#: src/states_screens/dialogs/addons_loading.cpp:109
 #, c-format
 msgid "Version: %d"
 msgstr "Versija: %d"
 
-#: src/states_screens/dialogs/addons_loading.cpp:139
+#: src/states_screens/dialogs/addons_loading.cpp:140
 msgid "featured"
 msgstr ""
 
-#: src/states_screens/dialogs/addons_loading.cpp:165
+#: src/states_screens/dialogs/addons_loading.cpp:166
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/states_screens/dialogs/addons_loading.cpp:172
-#: src/states_screens/dialogs/addons_loading.cpp:176
+#: src/states_screens/dialogs/addons_loading.cpp:173
+#: src/states_screens/dialogs/addons_loading.cpp:177
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: src/states_screens/dialogs/addons_loading.cpp:177
+#: src/states_screens/dialogs/addons_loading.cpp:178
 #, c-format
 msgid "Size: %s"
 msgstr "Izmērs: %s"
 
-#: src/states_screens/dialogs/addons_loading.cpp:279
+#: src/states_screens/dialogs/addons_loading.cpp:280
 msgid "Sorry, downloading the add-on failed"
 msgstr "Atvaino, nesanāca lejupielādēt papildinājumu"
 
-#: src/states_screens/dialogs/addons_loading.cpp:360
+#: src/states_screens/dialogs/addons_loading.cpp:361
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr "Problēmas instalējot papildinājumu '%s'."
 
-#: src/states_screens/dialogs/addons_loading.cpp:371
-#: src/states_screens/dialogs/addons_loading.cpp:408
+#: src/states_screens/dialogs/addons_loading.cpp:372
+#: src/states_screens/dialogs/addons_loading.cpp:409
 msgid "Try again"
 msgstr "Mēģini vēlreiz"
 
-#: src/states_screens/dialogs/addons_loading.cpp:397
+#: src/states_screens/dialogs/addons_loading.cpp:398
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "Problēmas noņemot papildinājumu '%s'."
@@ -2808,12 +2980,12 @@ msgid "Current password invalid."
 msgstr "Pašreizējā parole ir nepareiza."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:140
-#: src/states_screens/register_screen.cpp:288
+#: src/states_screens/register_screen.cpp:289
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "Parolei jābūt 8 līdz 30 rakstzīmju garai!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:147
-#: src/states_screens/register_screen.cpp:272
+#: src/states_screens/register_screen.cpp:273
 msgid "Passwords don't match!"
 msgstr "Paroles nesakrīt!"
 
@@ -2823,7 +2995,7 @@ msgstr "Parole tikusi veiksmīgi nomainīta!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:235
 #: src/states_screens/dialogs/recovery_dialog.cpp:209
-#: src/states_screens/register_screen.cpp:353
+#: src/states_screens/register_screen.cpp:354
 msgid "Validating info"
 msgstr "Apstiprina informāciju"
 
@@ -2899,12 +3071,9 @@ msgstr "Cits Grand Prix jau ir ar šādu nosaukumu."
 msgid "Name is too long."
 msgstr "Nosaukums ir pārāk garš."
 
-#: src/states_screens/dialogs/gp_info_dialog.cpp:211
-msgid "Start Grand Prix"
-msgstr "Sākt Grand Prix"
-
 #: src/states_screens/dialogs/message_dialog.cpp:129
-#: src/states_screens/edit_gp_screen.cpp:256
+#: src/states_screens/edit_gp_screen.cpp:257
+#: src/states_screens/ghost_replay_selection.cpp:116
 msgid "No"
 msgstr "Nē"
 
@@ -2913,46 +3082,41 @@ msgid "Username and/or email address invalid."
 msgstr "Lietotājvārds un/vai epasts nav derīgs."
 
 #: src/states_screens/dialogs/registration_dialog.cpp:42
-#, c-format
-msgid ""
-"Please read the terms and conditions for SuperTuxKart at '%s'. You must "
-"agree to these terms in order to register an account for STK. By checking "
-"the box below, you are confirming that you understand these terms. If you "
-"have any questions or comments regarding these terms, one of the members of "
-"the development team would gladly assist you."
+msgid "Please read the terms and conditions "
 msgstr ""
 
-#: src/states_screens/dialogs/select_challenge.cpp:53
+#: src/states_screens/dialogs/select_challenge.cpp:52
 #, c-format
 msgid "Required Rank: %i"
 msgstr ""
 
-#: src/states_screens/dialogs/select_challenge.cpp:58
+#: src/states_screens/dialogs/select_challenge.cpp:57
 #, c-format
 msgid "Required Time: %i"
 msgstr ""
 
-#: src/states_screens/dialogs/select_challenge.cpp:64
+#: src/states_screens/dialogs/select_challenge.cpp:63
 #, c-format
 msgid "Required Nitro Points: %i"
 msgstr ""
 
-#: src/states_screens/dialogs/select_challenge.cpp:68
+#: src/states_screens/dialogs/select_challenge.cpp:69
 #, c-format
 msgid "Number of AI Karts: %i"
 msgstr ""
 
-#: src/states_screens/dialogs/select_challenge.cpp:147
+#: src/states_screens/dialogs/select_challenge.cpp:149
 msgid "Nitro challenge"
 msgstr "Nitro izaicinājums"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:58
+#: src/states_screens/dialogs/select_challenge.cpp:151
+#: src/states_screens/race_setup_screen.cpp:136
+msgid "Ghost replay race"
+msgstr ""
+
+#: src/states_screens/dialogs/server_info_dialog.cpp:75
 msgid "Server successfully created. You can now join it."
 msgstr "Serveris veiksmīgi izveidots. Tagad tu tam vari pievienoties."
-
-#: src/states_screens/dialogs/server_info_dialog.cpp:155
-msgid "Joining server"
-msgstr "Iet serverī"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:56
 msgid "Cancel Request"
@@ -3010,15 +3174,18 @@ msgid "Performing vote"
 msgstr "Tiek veikts balsojums"
 
 #: src/states_screens/easter_egg_screen.cpp:270
-#: src/states_screens/tracks_screen.cpp:299
+#: src/states_screens/tracks_and_gp_screen.cpp:292
+#: src/states_screens/tracks_screen.cpp:242
 msgid "Random Track"
 msgstr "Nejauši izvēlēta trase"
 
 #: src/states_screens/edit_gp_screen.cpp:66
+#: src/states_screens/ghost_replay_selection.cpp:77
 msgid "Track"
 msgstr "Trase"
 
 #: src/states_screens/edit_gp_screen.cpp:67
+#: src/states_screens/ghost_replay_selection.cpp:81
 msgid "Laps"
 msgstr "Apļi"
 
@@ -3026,23 +3193,24 @@ msgstr "Apļi"
 msgid "Reversed"
 msgstr "Atgriezts"
 
-#: src/states_screens/edit_gp_screen.cpp:123
+#: src/states_screens/edit_gp_screen.cpp:124
+#: src/states_screens/ghost_replay_selection.cpp:174
 #: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
 msgstr "Vai tiešām vēlies izdzēst '%s'?"
 
-#: src/states_screens/edit_gp_screen.cpp:140
+#: src/states_screens/edit_gp_screen.cpp:141
 msgid "Do you want to save your changes?"
 msgstr "Vai vēlies saglabāt izmaiņas?"
 
 #. I18N: Indicate that the grand prix is modified and not saved
-#: src/states_screens/edit_gp_screen.cpp:285
+#: src/states_screens/edit_gp_screen.cpp:286
 #, c-format
 msgid "%s (+)"
 msgstr ""
 
-#: src/states_screens/edit_gp_screen.cpp:324
+#: src/states_screens/edit_gp_screen.cpp:325
 msgid "An error occurred while trying to save your grand prix."
 msgstr "Radās kļūda, mēģinot saglabāt tavu Grand Prix."
 
@@ -3079,6 +3247,10 @@ msgstr "Tu atslēdzi trasi %0"
 msgid "You unlocked grand prix %0"
 msgstr "Tu atslēdzi grand prix %0"
 
+#: src/states_screens/ghost_replay_selection.cpp:82
+msgid "Finish Time"
+msgstr ""
+
 #: src/states_screens/gp_info_screen.cpp:74
 msgid "Default"
 msgstr "Noklusētie"
@@ -3093,8 +3265,8 @@ msgstr "Nav"
 msgid "Random"
 msgstr "Nejauši izvēlēts"
 
-#: src/states_screens/gp_info_screen.cpp:153
-#: src/states_screens/gp_info_screen.cpp:178
+#: src/states_screens/gp_info_screen.cpp:154
+#: src/states_screens/gp_info_screen.cpp:179
 msgid "Reload"
 msgstr "Pārlādēt"
 
@@ -3107,35 +3279,35 @@ msgid "User defined"
 msgstr "Lietotāja definēts"
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:150
+#: src/states_screens/grand_prix_lose.cpp:153
 msgid "Better luck next time!"
 msgstr "Paveiksies nākamreiz!"
 
-#: src/states_screens/grand_prix_win.cpp:125
-#: src/states_screens/race_result_gui.cpp:175
+#: src/states_screens/grand_prix_win.cpp:126
+#: src/states_screens/race_result_gui.cpp:194
 msgid "You completed a challenge!"
 msgstr "Tu pabeidzi izaicinājumu!"
 
-#: src/states_screens/grand_prix_win.cpp:280
+#: src/states_screens/grand_prix_win.cpp:283
 msgid "You completed the Grand Prix!"
 msgstr "Tu pabeidzi Grand Prix!"
 
-#: src/states_screens/kart_selection.cpp:839
-#: src/states_screens/kart_selection.cpp:1470
+#: src/states_screens/kart_selection.cpp:845
+#: src/states_screens/kart_selection.cpp:1468
 msgid "Random Kart"
 msgstr "Nejauši izvēlēts karts"
 
-#: src/states_screens/kart_selection.cpp:853
+#: src/states_screens/kart_selection.cpp:859
 msgid "Locked"
 msgstr "Aizslēgts"
 
-#: src/states_screens/kart_selection.cpp:923
+#: src/states_screens/kart_selection.cpp:929
 msgid ""
 "Everyone:\n"
-"Press 'Select' now to join the game!"
-msgstr "Visi:\nSpiediet 'Izvēlēties' tagad, lai pievienotos spēlei!"
+"Press the 'Select' button to join the game"
+msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:488
+#: src/states_screens/main_menu_screen.cpp:492
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
@@ -3161,17 +3333,17 @@ msgstr "Lūdzu, uzgaidi, kamēr papildinājumi lādējas"
 msgid "Progress"
 msgstr "Progress"
 
-#: src/states_screens/online_profile_achievements.cpp:128
-#: src/states_screens/online_profile_achievements.cpp:168
+#: src/states_screens/online_profile_achievements.cpp:131
+#: src/states_screens/online_profile_achievements.cpp:171
 msgid "Fetching achievements"
 msgstr "Ielādē sasniegumus"
 
-#: src/states_screens/online_profile_base.cpp:105
-#: src/states_screens/online_profile_base.cpp:115
+#: src/states_screens/online_profile_base.cpp:117
+#: src/states_screens/online_profile_base.cpp:127
 msgid "Your profile"
 msgstr "Tavs profils"
 
-#: src/states_screens/online_profile_base.cpp:108
+#: src/states_screens/online_profile_base.cpp:120
 #, c-format
 msgid "%s's profile"
 msgstr "Spēlētāja %s profils"
@@ -3184,165 +3356,147 @@ msgstr "Kopš"
 msgid "Status"
 msgstr "Statuss"
 
-#: src/states_screens/online_profile_friends.cpp:95
-#: src/states_screens/online_profile_friends.cpp:246
+#: src/states_screens/online_profile_friends.cpp:96
+#: src/states_screens/online_profile_friends.cpp:247
 msgid "Fetching friends"
 msgstr "Ielādē draugus"
 
-#: src/states_screens/online_profile_friends.cpp:217
+#: src/states_screens/online_profile_friends.cpp:218
 msgid "New Request"
 msgstr "Jauns pieprasījums"
 
-#: src/states_screens/online_profile_friends.cpp:218
+#: src/states_screens/online_profile_friends.cpp:219
 msgid "Pending"
 msgstr "Gaida"
 
-#: src/states_screens/online_profile_friends.cpp:222
+#: src/states_screens/online_profile_friends.cpp:223
 msgid "Offline"
 msgstr "Bezsaistē"
 
-#: src/states_screens/online_screen.cpp:139
-#, c-format
-msgid "Logged in as: %s."
-msgstr "Ielogojies kā: %s."
-
-#: src/states_screens/online_screen.cpp:155
-msgid "Logging in"
-msgstr "Ielogojas"
-
-#: src/states_screens/online_screen.cpp:160
-msgid "Logging out"
-msgstr "Izlogojas"
-
-#: src/states_screens/online_user_search.cpp:208
-#: src/states_screens/online_user_search.cpp:288
+#: src/states_screens/online_user_search.cpp:207
+#: src/states_screens/online_user_search.cpp:271
 msgid "Searching"
 msgstr "Meklē"
 
-#: src/states_screens/options_screen_input.cpp:97
-#, c-format
-msgid "Keyboard %i"
-msgstr "Klaviatūra %i"
-
-#: src/states_screens/options_screen_input2.cpp:71
+#: src/states_screens/options_screen_device.cpp:71
 msgid "Action"
 msgstr "Darbība"
 
-#: src/states_screens/options_screen_input2.cpp:72
+#: src/states_screens/options_screen_device.cpp:72
 msgid "Key binding"
 msgstr "Taustiņu iesējums"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options_screen_input2.cpp:96
-#: src/states_screens/options_screen_input2.cpp:575
+#: src/states_screens/options_screen_device.cpp:96
+#: src/states_screens/options_screen_device.cpp:575
 msgid "Disable Device"
 msgstr "Atslēgt ierīci"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options_screen_input2.cpp:98
-#: src/states_screens/options_screen_input2.cpp:576
+#: src/states_screens/options_screen_device.cpp:98
+#: src/states_screens/options_screen_device.cpp:576
 msgid "Enable Device"
 msgstr "Iespējot ierīci"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_input2.cpp:137
+#: src/states_screens/options_screen_device.cpp:137
 msgid "Game Keys"
 msgstr "Spēles taustiņi"
 
 #. I18N: Key binding section
-#: src/states_screens/options_screen_input2.cpp:151
+#: src/states_screens/options_screen_device.cpp:151
 msgid "Menu Keys"
 msgstr "Izvēlnes taustiņi"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:218
+#: src/states_screens/options_screen_device.cpp:218
 msgid "Steer Left"
 msgstr "Stūrēt pa kreisi"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:221
+#: src/states_screens/options_screen_device.cpp:221
 msgid "Steer Right"
 msgstr "Stūrēt pa labi"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:224
+#: src/states_screens/options_screen_device.cpp:224
 msgid "Accelerate"
 msgstr "Paātrināt"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:227
+#: src/states_screens/options_screen_device.cpp:227
 msgid "Brake"
 msgstr "Bremzēt"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:230
+#: src/states_screens/options_screen_device.cpp:230
 msgid "Fire"
 msgstr "Šaut"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:233
+#: src/states_screens/options_screen_device.cpp:233
 msgid "Nitro"
 msgstr "Nitro"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:236
+#: src/states_screens/options_screen_device.cpp:236
 msgid "Skidding"
 msgstr "Buksēt"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:239
+#: src/states_screens/options_screen_device.cpp:239
 msgid "Look Back"
 msgstr "Atskatīties"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:242
+#: src/states_screens/options_screen_device.cpp:242
 msgid "Rescue"
 msgstr "Izglābt"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:245
+#: src/states_screens/options_screen_device.cpp:245
 msgid "Pause Game"
 msgstr "Pauzēt spēli"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:250
+#: src/states_screens/options_screen_device.cpp:250
 msgid "Up"
 msgstr "Augšup"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:253
+#: src/states_screens/options_screen_device.cpp:253
 msgid "Down"
 msgstr "Lejup"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:256
+#: src/states_screens/options_screen_device.cpp:256
 msgid "Left"
 msgstr "Pa kreisi"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:259
+#: src/states_screens/options_screen_device.cpp:259
 msgid "Right"
 msgstr "Pa labi"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:262
+#: src/states_screens/options_screen_device.cpp:262
 msgid "Select"
 msgstr "Izvēlēties"
 
 #. I18N: Key binding name
-#: src/states_screens/options_screen_input2.cpp:265
+#: src/states_screens/options_screen_device.cpp:265
 msgid "Cancel/Back"
 msgstr "Atcelt/Atpakaļ"
 
-#: src/states_screens/options_screen_input2.cpp:360
+#: src/states_screens/options_screen_device.cpp:360
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* Zils priekšmets nozīme konfliktu ar citu konfigurāciju"
 
-#: src/states_screens/options_screen_input2.cpp:365
+#: src/states_screens/options_screen_device.cpp:365
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* Sarkans priekšmets nozīmē konfliktu pašreizējā konfigurācijā"
 
-#: src/states_screens/options_screen_input2.cpp:467
+#: src/states_screens/options_screen_device.cpp:467
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -3350,15 +3504,20 @@ msgid ""
 msgstr ""
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options_screen_input2.cpp:563
+#: src/states_screens/options_screen_device.cpp:563
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Vai tiešām vēlies izdzēst šo konfigurāciju?"
 
+#: src/states_screens/options_screen_input.cpp:97
+#, c-format
+msgid "Keyboard %i"
+msgstr "Klaviatūra %i"
+
 #: src/states_screens/options_screen_ui.cpp:155
 msgid ""
-"Players can select handicapped (more difficult) profiles on the kart "
-"selection screen"
-msgstr "Spēlētāji var izvēlēties profilus ar handikapu (grūtākus) kartu izvēles logā"
+"In multiplayer mode, players can select handicapped (more difficult) "
+"profiles on the kart selection screen"
+msgstr ""
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options_screen_ui.cpp:187
@@ -3466,46 +3625,46 @@ msgstr ""
 msgid "Use high definition textures: %s"
 msgstr ""
 
-#: src/states_screens/race_gui.cpp:313 src/states_screens/race_gui.cpp:315
+#: src/states_screens/race_gui.cpp:306 src/states_screens/race_gui.cpp:308
 msgid "Challenge Failed"
 msgstr "Izaicinājums neizdevās"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:64
+#: src/states_screens/race_gui_base.cpp:65
 msgid "Ready!"
 msgstr "Uzmanību!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:66
+#: src/states_screens/race_gui_base.cpp:67
 msgid "Set!"
 msgstr "Gatavību!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:68
+#: src/states_screens/race_gui_base.cpp:69
 msgid "Go!"
 msgstr "Aiziet!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:70
+#: src/states_screens/race_gui_base.cpp:71
 msgid "GOAL!"
 msgstr "VĀRTI!"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:536
+#: src/states_screens/race_gui_base.cpp:504
 msgid "by"
 msgstr "-"
 
-#: src/states_screens/race_gui_base.cpp:644
+#: src/states_screens/race_gui_base.cpp:612
 msgid "Collect nitro!"
 msgstr "Savāc nitro!"
 
-#: src/states_screens/race_gui_base.cpp:646
+#: src/states_screens/race_gui_base.cpp:614
 msgid "Follow the leader!"
 msgstr "Seko līderim!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:812
+#: src/states_screens/race_gui_base.cpp:780
 #, c-format
 msgid "Top %i"
 msgstr "Tops %i"
@@ -3531,187 +3690,221 @@ msgstr "Veids: Grand Prix"
 msgid "Press fire to start the challenge"
 msgstr "Spied 'šaut', lai sāktu izaicinājumu"
 
-#: src/states_screens/race_result_gui.cpp:156
+#: src/states_screens/race_result_gui.cpp:175
 msgid "Continue."
 msgstr "Turpināt."
 
-#: src/states_screens/race_result_gui.cpp:159
+#: src/states_screens/race_result_gui.cpp:178
 msgid "Quit the server."
 msgstr "Iziet no servera."
 
-#: src/states_screens/race_result_gui.cpp:176
+#: src/states_screens/race_result_gui.cpp:195
 msgid "You completed challenges!"
 msgstr "Tu pabeidzi izaicinājumus!"
 
-#: src/states_screens/race_result_gui.cpp:189
+#: src/states_screens/race_result_gui.cpp:208
 msgid "Abort Grand Prix"
 msgstr "Par Grand Prix"
 
-#: src/states_screens/race_result_gui.cpp:199
+#: src/states_screens/race_result_gui.cpp:218
 msgid "Restart"
 msgstr "Pārstartēt"
 
-#: src/states_screens/race_result_gui.cpp:205
+#: src/states_screens/race_result_gui.cpp:224
 msgid "Back to challenge selection"
 msgstr "Atpakaļ uz izaicinājumu izvēli"
 
-#: src/states_screens/race_result_gui.cpp:211
+#: src/states_screens/race_result_gui.cpp:230
 msgid "Back to the menu"
 msgstr "Atpakaļ uz izvēlni"
 
-#: src/states_screens/race_result_gui.cpp:354
+#: src/states_screens/race_result_gui.cpp:373
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "Vai tiešām vēlies pamest šo Grand Prix?"
 
-#: src/states_screens/race_result_gui.cpp:475
-#: src/states_screens/race_result_gui.cpp:840
+#: src/states_screens/race_result_gui.cpp:498
+#: src/states_screens/race_result_gui.cpp:861
 msgid "Eliminated"
 msgstr "Likvidēts"
 
-#: src/states_screens/race_result_gui.cpp:983
+#: src/states_screens/race_result_gui.cpp:1028
 msgid "Red Team Wins"
 msgstr "Sarkanā komanda uzvar!"
 
-#: src/states_screens/race_result_gui.cpp:987
+#: src/states_screens/race_result_gui.cpp:1032
 msgid "Blue Team Wins"
 msgstr "Uzvar zilā komanda"
 
-#: src/states_screens/race_result_gui.cpp:992
+#: src/states_screens/race_result_gui.cpp:1037
 msgid "It's a draw"
 msgstr "Neizšķirts"
 
-#: src/states_screens/race_result_gui.cpp:1148
+#. I18N: indicates a player that scored in their own goal in result screen
+#: src/states_screens/race_result_gui.cpp:1106
+#: src/states_screens/race_result_gui.cpp:1154
+msgid "(Own Goal)"
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:1219
 #, c-format
 msgid "Track %i/%i"
 msgstr "Trase %i %i"
 
-#: src/states_screens/race_result_gui.cpp:1232
+#: src/states_screens/race_result_gui.cpp:1303
 msgid "Grand Prix progress:"
 msgstr "Grand Prix progress:"
 
-#: src/states_screens/race_result_gui.cpp:1270
+#: src/states_screens/race_result_gui.cpp:1341
 msgid "Highscores"
 msgstr "Labākie rezultāti"
 
-#: src/states_screens/race_setup_screen.cpp:202
+#: src/states_screens/race_setup_screen.cpp:87
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr "Visi triecieni atļauti, tāpēc ķer ieročus un izmanto tos lietderīgi!"
 
-#: src/states_screens/race_setup_screen.cpp:209
+#: src/states_screens/race_setup_screen.cpp:94
 msgid "Contains no powerups, so only your driving skills matter!"
 msgstr "Nesatur papildiespējas  - viss atkarīgs no tavām braukšanas prasmēm."
 
 #. I18N: short definition for follow-the-leader game mode
-#: src/states_screens/race_setup_screen.cpp:222
+#: src/states_screens/race_setup_screen.cpp:107
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "Turi līdzi līderim, bet neapdzen viņu!"
 
-#: src/states_screens/race_setup_screen.cpp:231
-msgid ""
-"Hit others with weapons until they lose all their lives (only in multiplayer"
-" games)."
+#: src/states_screens/race_setup_screen.cpp:114
+msgid "Hit others with weapons until they lose all their lives."
 msgstr ""
 
-#: src/states_screens/race_setup_screen.cpp:240
-msgid ""
-"Push the ball to the opposite cage to score goals (only in multiplayer "
-"games)."
+#: src/states_screens/race_setup_screen.cpp:119
+msgid "Push the ball to the opposite cage to score goals."
 msgstr ""
 
-#: src/states_screens/race_setup_screen.cpp:252
+#: src/states_screens/race_setup_screen.cpp:129
 msgid "Explore tracks to find all hidden eggs"
 msgstr "Izlūko trases, lai atrastu visas paslēptās olas"
 
-#: src/states_screens/register_screen.cpp:217
-#: src/states_screens/register_screen.cpp:224
+#: src/states_screens/race_setup_screen.cpp:137
+msgid "Race against ghost karts and try to beat them!"
+msgstr ""
+
+#: src/states_screens/register_screen.cpp:218
+#: src/states_screens/register_screen.cpp:225
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "Nevarēja izveidot spēlētāju '%s'."
 
-#: src/states_screens/register_screen.cpp:276
+#: src/states_screens/register_screen.cpp:277
 msgid "Emails don't match!"
 msgstr "Epasti nesakrīt!"
 
-#: src/states_screens/register_screen.cpp:280
+#: src/states_screens/register_screen.cpp:281
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "Tiešsaistes lietotājvārdam jābūt no 3 līdz 30 rakstzīmju garam!"
 
-#: src/states_screens/register_screen.cpp:284
+#: src/states_screens/register_screen.cpp:285
 msgid "Online username must not start with a number!"
 msgstr "Tiešsaistes lietotājvārds nedrīkst sākties ar ciparu!"
 
-#: src/states_screens/register_screen.cpp:292
+#: src/states_screens/register_screen.cpp:293
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr ""
 
-#: src/states_screens/register_screen.cpp:298
+#: src/states_screens/register_screen.cpp:299
 msgid "Email is invalid!"
 msgstr "Epasts ir nederīgs!"
 
-#: src/states_screens/register_screen.cpp:361
+#: src/states_screens/register_screen.cpp:362
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "Tu saņemsi epasta ziņojumu ar turpmākajām instrukcijām saistībā ar konta aktivizēšanu. Lūdzu, esi pacietīgs un katram gadījumam pārbaudi savu mēstuļu mapi."
 
-#: src/states_screens/register_screen.cpp:401
-#: src/states_screens/user_screen.cpp:317
+#: src/states_screens/register_screen.cpp:402
+#: src/states_screens/user_screen.cpp:338
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Interneta piekļuve ir atslēgta, lūdzu, ieslēdz to opcijās"
 
-#: src/states_screens/server_selection.cpp:67
-#: src/states_screens/server_selection.cpp:210
+#: src/states_screens/server_selection.cpp:79
+#: src/states_screens/server_selection.cpp:248
 msgid "Fetching servers"
 msgstr "Ielādē serverus"
 
 #. I18N: track group name
-#: src/states_screens/tracks_screen.cpp:151
+#: src/states_screens/tracks_and_gp_screen.cpp:144
 msgid "all"
 msgstr "visi"
 
-#: src/states_screens/tracks_screen.cpp:202
+#: src/states_screens/tracks_and_gp_screen.cpp:195
 msgid "Locked!"
 msgstr "Aizslēgts!"
 
-#: src/states_screens/tracks_screen.cpp:285
+#: src/states_screens/tracks_and_gp_screen.cpp:278
+#: src/states_screens/tracks_screen.cpp:228
 msgid "Locked: solve active challenges to gain access to more!"
+msgstr ""
+
+#: src/states_screens/tracks_screen.cpp:195
+msgid "Only official tracks are supported."
 msgstr ""
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
-#: src/states_screens/track_info_screen.cpp:107
+#: src/states_screens/track_info_screen.cpp:112
 #, c-format
 msgid "Track by %s"
 msgstr "Trases autors - %s"
+
+#. I18N: the max players supported by an arena.
+#: src/states_screens/track_info_screen.cpp:120
+#, c-format
+msgid "Max players supported: %d"
+msgstr ""
+
+#. I18N: In the track info screen
+#: src/states_screens/track_info_screen.cpp:214
+msgid "Drive in reverse"
+msgstr "Braukt atpakaļgaitā"
+
+#. I18N: In the track info screen
+#: src/states_screens/track_info_screen.cpp:219
+msgid "Random item location"
+msgstr ""
 
 #: src/states_screens/user_screen.cpp:111
 msgid "Exit game"
 msgstr "Iziet no spēlēs"
 
-#: src/states_screens/user_screen.cpp:461
+#: src/states_screens/user_screen.cpp:484
 msgid "You need to enter a password."
 msgstr "Tev vajag ievadīt paroli."
 
-#: src/states_screens/user_screen.cpp:482
+#: src/states_screens/user_screen.cpp:505
 #, c-format
 msgid "Logging out '%s'"
 msgstr "Izlogo '%s'"
 
-#: src/states_screens/user_screen.cpp:483
+#: src/states_screens/user_screen.cpp:506
 #, c-format
 msgid "Logging in '%s'"
 msgstr "Ielogo '%s'"
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/user_screen.cpp:572
+#: src/states_screens/user_screen.cpp:595
 #, c-format
 msgid "Do you really want to delete player '%s' ?"
 msgstr "Vai tiešām vēlies izdzēst spēlētāju '%s' ?"
 
+#. I18N: Format for dates (%d = day, %m = month, %Y = year). See
+#. http://www.cplusplus.com/reference/ctime/strftime/ for more info about date
+#. formats.
+#: src/utils/time.cpp:50
+msgid "%d/%m/%Y"
+msgstr ""
+
 #. I18N: Do NOT literally translate this string!! Please enter Y as the
 #. translation if your language is a RTL (right-to-left) language,
 #. N (or nothing) otherwise
-#: src/utils/translation.cpp:341
+#: src/utils/translation.cpp:376
 msgid "   Is this a RTL language?"
 msgstr "Vai šī ir RTL valoda?"
 
