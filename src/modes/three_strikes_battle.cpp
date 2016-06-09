@@ -535,6 +535,8 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::enterRaceOverState()
 {
+    WorldWithRank::enterRaceOverState();
+
     if (UserConfigParams::m_arena_ai_stats)
     {
         float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
@@ -545,7 +547,5 @@ void ThreeStrikesBattle::enterRaceOverState()
         delete this;
         main_loop->abort();
     }
-    else
-        WorldStatus::enterRaceOverState();
-}   // enterRaceOverState
 
+}   // enterRaceOverState
