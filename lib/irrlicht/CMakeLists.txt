@@ -1,10 +1,12 @@
 # CMakeLists.txt for Irrlicht in STK
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
+find_package(X11 REQUIRED)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                     "${JPEG_INCLUDE_DIR}"
                     "${PNG_INCLUDE_DIRS}"
+                    "${X11_INCLUDE_DIR}"
                     "${ZLIB_INCLUDE_DIR}"
                     "${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
 
@@ -25,8 +27,8 @@ elseif(MINGW)
   add_definitions(-D_IRR_STATIC_LIB_)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
 else()
-  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -I/usr/X11R6/include")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -I/usr/X11R6/include")
+  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing")
   if(CMAKE_COMPILER_IS_GNUCC)
 	  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -fexpensive-optimizations")
   endif()
