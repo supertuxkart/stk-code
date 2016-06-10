@@ -302,7 +302,6 @@ private:
 
     /** Profiling usage */
     int m_frame_count;
-    int m_start_time;
 
 public:
 

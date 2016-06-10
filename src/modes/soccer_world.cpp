@@ -54,7 +54,6 @@ SoccerWorld::SoccerWorld() : WorldWithRank()
     }
 
     m_frame_count = 0;
-    m_start_time = irr_driver->getRealTime();
     m_use_highscores = false;
     m_red_ai = 0;
     m_blue_ai = 0;
@@ -601,11 +600,8 @@ void SoccerWorld::enterRaceOverState()
 
     if (UserConfigParams::m_arena_ai_stats)
     {
-        float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
-        Log::verbose("Soccer AI profiling", "Number of frames: %d, Average FPS: %f",
-            m_frame_count, (float)m_frame_count/runtime);
-        Log::verbose("Soccer AI profiling", "Time for a team to have 30 goals: %f",
-            runtime);
+        Log::verbose("Soccer AI profiling", "Frames elapsed for a team to win"
+            "with 30 goals: %d", m_frame_count);
 
         // Goal calculation
         int red_own_goal = 0;
