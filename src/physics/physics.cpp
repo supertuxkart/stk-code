@@ -560,7 +560,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             else if(upB->is(UserPointer::UP_PHYSICAL_OBJECT))
             {
                 std::vector<int> used;
-                for(unsigned int i=0; i< contact_manifold->getNumContacts(); i++)
+                for(int i=0; i< contact_manifold->getNumContacts(); i++)
                 {
                     int n = contact_manifold->getContactPoint(i).m_index0;
                     // Make sure to call the callback function only once
@@ -656,7 +656,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             else if(upB->is(UserPointer::UP_TRACK))
             {
                 std::vector<int> used;
-                for(unsigned int i=0; i< contact_manifold->getNumContacts(); i++)
+                for(int i=0; i< contact_manifold->getNumContacts(); i++)
                 {
                     int n = contact_manifold->getContactPoint(i).m_index1;
                     // Make sure to call the callback function only once
