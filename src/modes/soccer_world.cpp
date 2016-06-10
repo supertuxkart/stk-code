@@ -601,7 +601,7 @@ void SoccerWorld::enterRaceOverState()
     if (UserConfigParams::m_arena_ai_stats)
     {
         Log::verbose("Soccer AI profiling", "Frames elapsed for a team to win"
-            "with 30 goals: %d", m_frame_count);
+            " with 30 goals: %d", m_frame_count);
 
         // Goal calculation
         int red_own_goal = 0;
