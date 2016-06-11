@@ -302,6 +302,7 @@ private:
 
     /** Profiling usage */
     int m_frame_count;
+    std::vector<int> m_goal_frame;
 
 public:
 

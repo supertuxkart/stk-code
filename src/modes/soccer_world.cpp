@@ -37,6 +37,7 @@
 #include "utils/constants.hpp"
 
 #include <IMeshSceneNode.h>
+#include <numeric>
 #include <string>
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
@@ -211,6 +212,13 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     m_goal_sound->play();
     if (m_ball_hitter != -1)
     {
+        if (UserConfigParams::m_arena_ai_stats)
+        {
+            const int elapsed_frame = m_goal_frame.empty() ? 0 :
+                std::accumulate(m_goal_frame.begin(), m_goal_frame.end(), 0);
+            m_goal_frame.push_back(m_frame_count - elapsed_frame);
+        }
+
         ScorerData sd;
         sd.m_id = m_ball_hitter;
         sd.m_correct_goal = isCorrectGoal(m_ball_hitter, first_goal);
@@ -600,8 +608,37 @@ void SoccerWorld::enterRaceOverState()
 
     if (UserConfigParams::m_arena_ai_stats)
     {
-        Log::verbose("Soccer AI profiling", "Frames elapsed for a team to win"
-            " with 30 goals: %d", m_frame_count);
+        Log::verbose("Soccer AI profiling", "Total frames elapsed for a team"
+            " to win with 30 goals: %d", m_frame_count);
+
+        // Goal time statistics
+        std::sort(m_goal_frame.begin(), m_goal_frame.end());
+
+        const int mean = std::accumulate(m_goal_frame.begin(),
+            m_goal_frame.end(), 0) / m_goal_frame.size();
+
+        // Prevent overflow if there is a large frame in vector
+        double squared_sum = 0;
+        for (const int &i : m_goal_frame)
+            squared_sum = squared_sum + (double(i - mean) * double(i - mean));
+
+        // Use sample st. deviation (n−1) as the profiling can't be run forever
+        const int stdev = int(sqrt(squared_sum / (m_goal_frame.size() - 1)));
+
+        int median = 0;
+        if (m_goal_frame.size() % 2 == 0)
+        {
+            median = (m_goal_frame[m_goal_frame.size() / 2 - 1] +
+                m_goal_frame[m_goal_frame.size() / 2]) / 2;
+        }
+        else
+        {
+            median = m_goal_frame[m_goal_frame.size() / 2];
+        }
+
+        Log::verbose("Soccer AI profiling", "Frames elapsed for each goal:"
+            " min: %d max: %d mean: %d median: %d standard deviation: %d",
+            m_goal_frame.front(), m_goal_frame.back(), mean, median, stdev);
 
         // Goal calculation
         int red_own_goal = 0;
