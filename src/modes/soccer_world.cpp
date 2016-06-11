@@ -656,9 +656,9 @@ void SoccerWorld::enterRaceOverState()
                 red_own_goal++;
         }
 
-        int red_goal = ((m_red_scorers.size() - blue_own_goal) >= 0 ?
+        int red_goal = ((int(m_red_scorers.size()) - blue_own_goal) >= 0 ?
             m_red_scorers.size() - blue_own_goal : 0);
-        int blue_goal = ((m_blue_scorers.size() - red_own_goal) >= 0 ?
+        int blue_goal = ((int(m_blue_scorers.size()) - red_own_goal) >= 0 ?
             m_blue_scorers.size() - red_own_goal : 0);
 
         Log::verbose("Soccer AI profiling", "Red goal: %d, Red own goal: %d,"
