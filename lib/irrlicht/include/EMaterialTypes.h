@@ -10,7 +10,7 @@ namespace irr
 namespace video
 {
 
-	//! Flag for mesh (mainly karts in STK) to use specific render type
+	//! Flag for mesh buffer (mainly karts in STK) to use specific render type
 	enum E_RENDER_TYPE
 	{
 		ERT_DEFAULT	= 0,

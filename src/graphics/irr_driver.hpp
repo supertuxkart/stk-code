@@ -354,7 +354,8 @@ public:
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
     scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig,
-                                           video::E_RENDER_TYPE rt);
+                                           video::E_RENDER_TYPE rt,
+                                           const std::vector<int>& effective_buffer = std::vector<int>());
     video::ITexture      *applyMask(video::ITexture* texture,
                                     const std::string& mask_path);
     void displayFPS();

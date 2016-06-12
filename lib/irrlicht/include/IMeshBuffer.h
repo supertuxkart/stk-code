@@ -39,6 +39,9 @@ namespace scene
 	class IMeshBuffer : public virtual IReferenceCounted
 	{
 	public:
+		IMeshBuffer() : m_rt(video::ERT_DEFAULT) {}
+
+		virtual ~IMeshBuffer() {}
 
 		//! Get the material of this meshbuffer
 		/** \return Material of this buffer. */
@@ -147,6 +150,15 @@ namespace scene
 		//! Get the currently used ID for identification of changes.
 		/** This shouldn't be used for anything outside the VideoDriver. */
 		virtual u32 getChangedID_Index() const = 0;
+
+		//! Set the mesh buffer to use a specific render type (mainly karts in STK)
+		/** \param t New render type for the mesh. */
+		void setRenderType(video::E_RENDER_TYPE t) const { m_rt = t; }
+
+		//! Get the specific render type of the mesh buffer (mainly karts in STK)
+		video::E_RENDER_TYPE getRenderType() const { return m_rt; }
+	private:
+		mutable video::E_RENDER_TYPE m_rt;
 	};
 
 } // end namespace scene

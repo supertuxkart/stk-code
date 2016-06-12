@@ -126,7 +126,7 @@ void STKAnimatedMesh::updateNoGL()
                 TransparentMaterial TranspMat = getTransparentMaterialFromType(type, MaterialTypeParam, material);
                 TransparentMesh[TranspMat].push_back(&mesh);
             }
-            else if (m->getRenderType() == video::ERT_TRANSPARENT)
+            else if (mb->getRenderType() == video::ERT_TRANSPARENT)
             {
                 TransparentMesh[TM_ADDITIVE].push_back(&mesh);
             }

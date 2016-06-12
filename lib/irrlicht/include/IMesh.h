@@ -5,15 +5,18 @@
 #ifndef __I_MESH_H_INCLUDED__
 #define __I_MESH_H_INCLUDED__
 
+#include "IMeshBuffer.h"
 #include "IReferenceCounted.h"
 #include "SMaterial.h"
 #include "EHardwareBufferFlags.h"
+
+#include <algorithm>
+#include <vector>
 
 namespace irr
 {
 namespace scene
 {
-	class IMeshBuffer;
 
 	//! Class which holds the geometry of an object.
 	/** An IMesh is nothing more than a collection of some mesh buffers
@@ -23,7 +26,7 @@ namespace scene
 	class IMesh : public virtual IReferenceCounted
 	{
 	public:
-		IMesh() : m_rt(video::ERT_DEFAULT) {}
+		IMesh() : m_custom_render_type(false) {}
 
 		virtual ~IMesh() {}
 
@@ -70,14 +73,29 @@ namespace scene
 		on the GPU in the next render cycle. */
 		virtual void setDirty(E_BUFFER_TYPE buffer=EBT_VERTEX_AND_INDEX) = 0;
 
-		//! Set the mesh to use a specific render type (mainly karts in STK)
-		/** \param t New render type for the mesh. */
-		void setRenderType(video::E_RENDER_TYPE t) { m_rt = t; }
+		//! True if this mesh has specific render type (mainly karts in STK)
+		bool hasCustomRenderType() const { return m_custom_render_type; }
 
-		//! Get the specific render type for the mesh (mainly karts in STK)
-		video::E_RENDER_TYPE getRenderType() const { return m_rt; }
+		//! Set whether this mesh is having a specific render type (mainly karts in STK)
+		void setCustomRenderType(bool has_custom) { m_custom_render_type = has_custom; }
+
+		//! Set the mesh to use a specific render type (mainly karts in STK)
+		/** \param t New render type for the mesh.
+		\param effective_buffer Mesh buffer numbers which are effected by new render type,
+		if not given all mesh buffers are affected. */
+		void setMeshRenderType(video::E_RENDER_TYPE t, const std::vector<int>& effective_buffer = std::vector<int>())
+		{
+			if (t == video::ERT_DEFAULT) return;
+			setCustomRenderType(true);
+			for (int i = 0; i < int(getMeshBufferCount()); i++)
+			{
+				if (!effective_buffer.empty() && std::find(effective_buffer.begin(), effective_buffer.end(), i) == effective_buffer.end())
+					continue;
+				getMeshBuffer(i)->setRenderType(t);
+			}
+		}
 	private:
-		video::E_RENDER_TYPE m_rt;
+		bool m_custom_render_type;
 	};
 
 } // end namespace scene

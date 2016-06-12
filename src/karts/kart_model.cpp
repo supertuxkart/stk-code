@@ -231,8 +231,7 @@ KartModel::~KartModel()
             if (m_wheel_model[i])
             {
                 // m_wheel_model[i] can be NULL
-                if (m_wheel_model[i]
-                    ->getRenderType() == video::ERT_TRANSPARENT)
+                if (m_wheel_model[i]->hasCustomRenderType())
                 {
                     m_wheel_model[i]->drop();
                 }
@@ -254,8 +253,7 @@ KartModel::~KartModel()
             assert(!m_is_master);
 
             // Drop the cloned model if created
-            if (m_speed_weighted_objects[i].m_model
-                ->getRenderType() != video::ERT_DEFAULT)
+            if (m_speed_weighted_objects[i].m_model->hasCustomRenderType())
             {
                 m_speed_weighted_objects[i].m_model->drop();
             }
@@ -333,7 +331,7 @@ KartModel* KartModel::makeCopy(video::E_RENDER_TYPE rt)
         {
             // Only clone the mesh if transparence is used
             scene::SMesh* clone = mani->createMeshCopy(m_wheel_model[i]);
-            clone->setRenderType(rt);
+            clone->setMeshRenderType(rt);
             km->m_wheel_model[i] = dynamic_cast<scene::IMesh*>(clone);
         }
         else

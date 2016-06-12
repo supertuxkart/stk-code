@@ -1014,7 +1014,8 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
  *          need it anymore.
  */
 scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig,
-                                                  video::E_RENDER_TYPE rt)
+                                                  video::E_RENDER_TYPE rt,
+                                                  const std::vector<int>& effective_buffer)
 {
     using namespace scene;
     CSkinnedMesh *mesh = dynamic_cast<CSkinnedMesh*>(orig);
@@ -1025,7 +1026,7 @@ scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig,
     }
 
     scene::IAnimatedMesh* out = mesh->clone();
-    out->setRenderType(rt);
+    out->setMeshRenderType(rt, effective_buffer);
     return out;
 }   // copyAnimatedMesh
 
