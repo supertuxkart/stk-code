@@ -111,7 +111,7 @@ void PhysicalObject::Settings::init()
     m_linear_factor      = Vec3(1.0f, 1.0f, 1.0f);
     m_angular_factor     = Vec3(1.0f, 1.0f, 1.0f); 
     m_linear_damping     = 0.0f;
-    m_angular_damping    = 0.0f;
+    m_angular_damping    = 0.5f;
     m_reset_when_too_low = false;
     m_flatten_kart       = false;
 }   // Settings
