@@ -829,6 +829,28 @@ void RaceResultGUI::backToLobby()
             m_animation_state == RR_RACE_RESULT)
         {
             displayHighScores();
+            video::SColor white = video::SColor(255, 255, 255, 255);
+            // display lap count
+            if (race_manager->getNumLaps() < 9000 && !isSoccerWorld) {
+              std::string lapString = "Laps: " + StringUtils::toString(race_manager->getNumLaps());
+              GUIEngine::getFont()->draw(_(lapString.c_str()),
+                  core::recti((int)(UserConfigParams::m_width*0.65f),
+                  m_top + 500, 0, 0), white, false, false, nullptr, true);
+            }
+            // display difficulty
+            core::stringw difficultyString = StringUtils::toWString("Difficulty: ")
+                + race_manager->getDifficultyName(race_manager->getDifficulty());
+            GUIEngine::getFont()->draw(_(difficultyString.c_str()),
+                core::recti((int)(UserConfigParams::m_width*0.65f),
+                m_top + 550, 0, 0), white, false, false, nullptr, true);
+            // show fastest lap
+            float bestLapTime = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
+            if (bestLapTime > 0 && bestLapTime < 9000) {
+              std::string bestLapString = "Best lap time: " + StringUtils::timeToString(bestLapTime);
+              GUIEngine::getFont()->draw(_(bestLapString.c_str()),
+                  core::recti((int)(UserConfigParams::m_width*0.65f),
+                  m_top + 600, 0, 0), white, false, false, nullptr, true);
+            }
         }
     }   // renderGlobal
 
@@ -904,11 +926,11 @@ void RaceResultGUI::backToLobby()
 
     //-----------------------------------------------------------------------------
     /** Returns a string to display next to a kart. For a player that's the name
-     *  of the player, for an AI kart it's the name of the driver. 
+     *  of the player, for an AI kart it's the name of the driver.
      */
     core::stringw RaceResultGUI::getKartDisplayName(const AbstractKart *kart) const
     {
-        const EndController *ec = 
+        const EndController *ec =
             dynamic_cast<const EndController*>(kart->getController());
         // If the race was given up, there is no end controller for the
         // players, so this case needs to be handled separately
@@ -917,7 +939,7 @@ void RaceResultGUI::backToLobby()
         else
         {
             // No end controller, check explicitely for a player controller
-            const PlayerController *pc = 
+            const PlayerController *pc =
                 dynamic_cast<const PlayerController*>(kart->getController());
             // Check if the kart is a player controller to get the real name
             if(pc) return pc->getName();
