@@ -151,7 +151,7 @@ Section "Main Section" SecMain
   ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\RelWithDebInfo\*.*
   ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\Release\*.*
 
-  File ${EXEC_PATH}
+  File /x *.ilk ${EXEC_PATH}
 
   ; Check various options for the editor. Note that us devs mostly use 'bld',
   ; but documented is the name 'build'
@@ -242,7 +242,6 @@ Section "Uninstall"redist
   DELETE /REBOOTOK "$INSTDIR\supertuxkart.exe"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart.ico"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart.icon"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart.ilk"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart.pdb"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.exe"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.ico"
@@ -251,7 +250,6 @@ Section "Uninstall"redist
   DELETE /REBOOTOK "$INSTDIR\vorbis.dll"
   DELETE /REBOOTOK "$INSTDIR\wrap_oal.dll"
   DELETE /REBOOTOK "$INSTDIR\zlib.dll"
-  DELETE /REBOOTOK "$INSTDIR\zlib.ilk"
   DELETE /REBOOTOK "$INSTDIR\zlib.pdb"
   DELETE /REBOOTOK "$INSTDIR\zlib1.dll"
 
@@ -265,7 +263,7 @@ Section "Uninstall"redist
 
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart.lnk"
-  Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart-editor.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart-editor (beta).lnk"
 
   ;Delete empty start menu parent diretories
   StrCpy $MUI_TEMP "$SMPROGRAMS\$MUI_TEMP"
