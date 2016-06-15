@@ -191,7 +191,7 @@ private:
     void addGPProgressWidget(GUIEngine::Widget* widget);
     void displayGPProgress();
     void cleanupGPProgress();
-    void displayHighScores();
+    void displayPostRaceInfo();
     void displaySoccerResults();
     void displayScreenShots();
     irr::core::stringw getKartDisplayName(const AbstractKart *kart) const;

@@ -828,7 +828,7 @@ void RaceResultGUI::backToLobby()
         if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
             m_animation_state == RR_RACE_RESULT)
         {
-            displayHighScores();
+            displayPostRaceInfo();
         }
     }   // renderGlobal
 
@@ -1322,7 +1322,7 @@ void RaceResultGUI::backToLobby()
     }   // cleanupGPProgress
 
     // ----------------------------------------------------------------------------
-    void RaceResultGUI::displayHighScores()
+    void RaceResultGUI::displayPostRaceInfo()
     {
         // This happens in demo world
         if (!World::getWorld())
@@ -1414,10 +1414,10 @@ void RaceResultGUI::backToLobby()
             }
         }
 
-        // display lap count
         if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER
             && race_manager->getMinorMode() != RaceManager::MINOR_MODE_EASTER_EGG)
         {
+            // display lap count
             if (race_manager->getNumLaps() < 9000)
             {
                 core::stringw laps = _("Laps: %i", race_manager->getNumLaps());
