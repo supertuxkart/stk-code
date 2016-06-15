@@ -829,28 +829,6 @@ void RaceResultGUI::backToLobby()
             m_animation_state == RR_RACE_RESULT)
         {
             displayHighScores();
-            video::SColor white = video::SColor(255, 255, 255, 255);
-            // display lap count
-            if (race_manager->getNumLaps() < 9000 && !isSoccerWorld) {
-              std::string lapString = "Laps: " + StringUtils::toString(race_manager->getNumLaps());
-              GUIEngine::getFont()->draw(_(lapString.c_str()),
-                  core::recti((int)(UserConfigParams::m_width*0.65f),
-                  m_top + 500, 0, 0), white, false, false, nullptr, true);
-            }
-            // display difficulty
-            core::stringw difficultyString = StringUtils::toWString("Difficulty: ")
-                + race_manager->getDifficultyName(race_manager->getDifficulty());
-            GUIEngine::getFont()->draw(_(difficultyString.c_str()),
-                core::recti((int)(UserConfigParams::m_width*0.65f),
-                m_top + 550, 0, 0), white, false, false, nullptr, true);
-            // show fastest lap
-            float bestLapTime = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
-            if (bestLapTime > 0 && bestLapTime < 9000) {
-              std::string bestLapString = "Best lap time: " + StringUtils::timeToString(bestLapTime);
-              GUIEngine::getFont()->draw(_(bestLapString.c_str()),
-                  core::recti((int)(UserConfigParams::m_width*0.65f),
-                  m_top + 600, 0, 0), white, false, false, nullptr, true);
-            }
         }
     }   // renderGlobal
 
@@ -1351,14 +1329,17 @@ void RaceResultGUI::backToLobby()
             return;
 
         Highscores* scores = World::getWorld()->getHighscores();
+
+        video::SColor white_color = video::SColor(255, 255, 255, 255);
+
+        int x = (int)(UserConfigParams::m_width*0.65f);
+        int y = m_top;
+
+        int current_y = y;
+
         // In some case for exemple FTL they will be no highscores
         if (scores != NULL)
         {
-            video::SColor white_color = video::SColor(255, 255, 255, 255);
-
-            int x = (int)(UserConfigParams::m_width*0.65f);
-            int y = m_top;
-
             // First draw title
             GUIEngine::getFont()->draw(_("Highscores"),
                 core::recti(x, y, 0, 0),
@@ -1391,7 +1372,7 @@ void RaceResultGUI::backToLobby()
                 }
 
                 int current_x = x;
-                int current_y = y + (int)((i + 1) * m_distance_between_rows * 1.5f);
+                current_y = y + (int)((i + 1) * m_distance_between_rows * 1.5f);
 
                 const KartProperties* prop = kart_properties_manager->getKart(kart_name);
                 if (prop != NULL)
@@ -1430,6 +1411,36 @@ void RaceResultGUI::backToLobby()
                     core::recti(current_x, current_y, current_x + 100, current_y + 10),
                     text_color,
                     false, false, NULL, true /* ignoreRTL */);
+            }
+        }
+
+        // display lap count
+        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER
+            && race_manager->getMinorMode() != RaceManager::MINOR_MODE_EASTER_EGG)
+        {
+            if (race_manager->getNumLaps() < 9000)
+            {
+                core::stringw laps = _("Laps: %i", race_manager->getNumLaps());
+                current_y += m_distance_between_rows * 0.8f * 2;
+                GUIEngine::getFont()->draw(laps, core::recti(x, current_y, 0, 0),
+                    white_color, false, false, nullptr, true);
+            }
+            // display difficulty
+            core::stringw difficulty_string = _("Difficulty: %s",
+                race_manager->getDifficultyName(race_manager->getDifficulty()));
+            current_y += m_distance_between_rows * 0.8f;
+            GUIEngine::getFont()->draw(difficulty_string, core::recti(x, current_y, 0, 0),
+                white_color, false, false, nullptr, true);
+            // show fastest lap
+            float best_lap_time = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
+            if (best_lap_time > 0 && best_lap_time < 9000)
+            {
+                core::stringw best_lap_string = _("Best lap time: %s",
+                    StringUtils::timeToString(best_lap_time).c_str());
+                current_y += m_distance_between_rows * 0.8f;
+                GUIEngine::getFont()->draw(best_lap_string,
+                    core::recti(x, current_y, 0, 0), white_color, false, false,
+                    nullptr, true);
             }
         }
     }
