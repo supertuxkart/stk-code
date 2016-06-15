@@ -1432,9 +1432,9 @@ void RaceResultGUI::backToLobby()
             GUIEngine::getFont()->draw(difficulty_string, core::recti(x, current_y, 0, 0),
                 white_color, false, false, nullptr, true);
             // show fastest lap
-            float best_lap_time = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
             if (race_manager->modeHasLaps())
             {
+                float best_lap_time = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
                 core::stringw best_lap_string = _("Best lap time: %s",
                     StringUtils::timeToString(best_lap_time).c_str());
                 current_y += m_distance_between_rows * 0.8f;
