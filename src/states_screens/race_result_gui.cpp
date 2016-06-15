@@ -1414,11 +1414,10 @@ void RaceResultGUI::backToLobby()
             }
         }
 
-        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER
-            && race_manager->getMinorMode() != RaceManager::MINOR_MODE_EASTER_EGG)
+        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
         {
             // display lap count
-            if (race_manager->getNumLaps() < 9000)
+            if (race_manager->modeHasLaps())
             {
                 core::stringw laps = _("Laps: %i", race_manager->getNumLaps());
                 current_y += m_distance_between_rows * 0.8f * 2;
@@ -1426,14 +1425,15 @@ void RaceResultGUI::backToLobby()
                     white_color, false, false, nullptr, true);
             }
             // display difficulty
-            core::stringw difficulty_string = _("Difficulty: %s",
-                race_manager->getDifficultyName(race_manager->getDifficulty()));
+            const core::stringw& difficulty_name =
+                race_manager->getDifficultyName(race_manager->getDifficulty());
+            core::stringw difficulty_string = _("Difficulty: %s", difficulty_name);
             current_y += m_distance_between_rows * 0.8f;
             GUIEngine::getFont()->draw(difficulty_string, core::recti(x, current_y, 0, 0),
                 white_color, false, false, nullptr, true);
             // show fastest lap
             float best_lap_time = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
-            if (best_lap_time > 0 && best_lap_time < 9000)
+            if (race_manager->modeHasLaps())
             {
                 core::stringw best_lap_string = _("Best lap time: %s",
                     StringUtils::timeToString(best_lap_time).c_str());
