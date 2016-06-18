@@ -24,6 +24,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/central_settings.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -1960,7 +1961,7 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
         ModelViewWidget* mvw = dynamic_cast<ModelViewWidget*>(widget);
         mvw->drawRTTScene(rect);
     }
-    else if (type == WTYPE_ICON_BUTTON || type == WTYPE_MODEL_VIEW)
+    else if (type == WTYPE_ICON_BUTTON)
     {
         drawIconButton(rect, widget, pressed, focused);
     }

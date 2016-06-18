@@ -45,6 +45,7 @@ static const std::string IDENT_FTL      ("FOLLOW_LEADER"   );
 static const std::string IDENT_STRIKES  ("BATTLE_3_STRIKES");
 static const std::string IDENT_EASTER   ("EASTER_EGG_HUNT" );
 static const std::string IDENT_SOCCER   ("SOCCER"          );
+static const std::string IDENT_GHOST    ("GHOST"           );
 static const std::string IDENT_OVERWORLD("OVERWORLD"       );
 static const std::string IDENT_CUTSCENE ("CUTSCENE"        );
 
@@ -331,7 +332,6 @@ private:
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
     int                              m_coin_target;
-    bool                             m_has_time_target;
     float                            m_time_target;
     int                              m_goal_target;
 
@@ -350,6 +350,11 @@ private:
     /** Determines if saved GP should be continued or not*/
     bool m_continue_saved_gp;
 
+    bool m_is_recording_race;
+
+    bool m_has_ghost_karts;
+
+    bool m_watching_replay;
 public:
          RaceManager();
         ~RaceManager();
@@ -403,6 +408,7 @@ public:
     void saveGP();
     void startSingleRace(const std::string &track_ident, const int num_laps,
                           bool from_overworld);
+    void startWatchingReplay(const std::string &track_ident, const int num_laps);
     void setupPlayerKartInfo();
     void kartFinishedRace(const AbstractKart* kart, float time);
     void setNumPlayers(int players, int local_players=-1);
@@ -410,9 +416,13 @@ public:
     void computeRandomKartList();
 
     // ------------------------------------------------------------------------
-    bool hasTimeTarget() const { return m_has_time_target; }
+    bool hasTimeTarget() const { return m_time_target > 0.0f; }
     // ------------------------------------------------------------------------
-    void setMaxGoal(int maxGoal){ m_goal_target = maxGoal; }
+    void setMaxGoal(int max_goal)
+    {
+        m_time_target = 0.0f;
+        m_goal_target = max_goal;
+    }   // setMaxGoal
     // ------------------------------------------------------------------------
     int getMaxGoal(){ return m_goal_target; }
     // ------------------------------------------------------------------------
@@ -451,9 +461,8 @@ public:
     void setMajorMode(MajorRaceModeType mode) { m_major_mode = mode; }
     // ------------------------------------------------------------------------
     void setMinorMode(MinorRaceModeType mode)
-    { 
+    {
         m_minor_mode = mode;
-        m_has_time_target = false;
     }   // setMinorMode
     // ------------------------------------------------------------------------
     void setNumKarts(int num)
@@ -463,10 +472,10 @@ public:
         m_ai_superpower = SUPERPOWER_NONE;
     }   // setNumKarts
     // ------------------------------------------------------------------------
-    void setTimeTarget(float num)
+    void setTimeTarget(float time)
     {
-        m_has_time_target = true;
-        m_time_target = num;
+        m_goal_target = 0;
+        m_time_target = time;
     }   // setTimeTarget
     // ------------------------------------------------------------------------
     const RemoteKartInfo& getKartInfo(unsigned int n) const
@@ -488,7 +497,7 @@ public:
     MinorRaceModeType getMinorMode() const { return m_minor_mode; }
     // ------------------------------------------------------------------------
     unsigned int getNumPlayers() const 
-    { 
+    {
         return (unsigned int) m_player_karts.size(); 
     }   // getNumPlayers
     // ------------------------------------------------------------------------
@@ -525,6 +534,21 @@ public:
         }
         return "";
     }   // getDifficultyAsString
+
+    // ------------------------------------------------------------------------
+    /** Returns the specified difficulty as a string. */
+    core::stringw getDifficultyName(Difficulty diff) const
+    {
+        switch (diff)
+        {
+        case RaceManager::DIFFICULTY_EASY:   return _("Novice");   break;
+        case RaceManager::DIFFICULTY_MEDIUM: return _("Intermediate"); break;
+        case RaceManager::DIFFICULTY_HARD:   return _("Expert");   break;
+        case RaceManager::DIFFICULTY_BEST:   return _("SuperTux");   break;
+        default:  assert(false);
+        }
+        return "";
+    }   // getDifficultyName
     // ------------------------------------------------------------------------
     const std::string& getTrackName() const { return m_tracks[m_track_number];}
     // ------------------------------------------------------------------------
@@ -697,6 +721,36 @@ public:
     {
         return m_kart_last_position_on_overworld;
     }   // getKartLastPositionOnOverworld
+    // ------------------------------------------------------------------------
+    void setRecordRace(bool record)
+    {
+        m_is_recording_race = record;
+    }   // setRecordRace
+    // ------------------------------------------------------------------------
+    void setRaceGhostKarts(bool ghost)
+    {
+        m_has_ghost_karts = ghost;
+    }   // setRaceGhostKarts
+    // ------------------------------------------------------------------------
+    void setWatchingReplay(bool watch)
+    {
+        m_watching_replay = watch;
+    }   // setWatchingReplay
+    // ------------------------------------------------------------------------
+    bool isRecordingRace() const
+    {
+        return m_is_recording_race;
+    }   // isRecordingRace
+    // ------------------------------------------------------------------------
+    bool hasGhostKarts() const
+    {
+        return m_has_ghost_karts;
+    }   // hasGhostKarts
+    // ------------------------------------------------------------------------
+    bool isWatchingReplay() const
+    {
+        return m_watching_replay;
+    }   // isWatchingReplay
 
 };   // RaceManager
 

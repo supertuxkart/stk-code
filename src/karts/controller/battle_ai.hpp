@@ -44,8 +44,7 @@ private:
     virtual bool isWaiting() const;
     virtual bool canSkid(float steer_fraction) { return m_mini_skid; }
 public:
-                 BattleAI(AbstractKart *kart,
-                          StateManager::ActivePlayer *player = NULL);
+                 BattleAI(AbstractKart *kart);
                 ~BattleAI();
     virtual void update      (float delta);
     virtual void reset       ();

@@ -91,10 +91,8 @@ void GL1RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
 {    
     irr::core::rect<s32> source_rect(irr::core::position2di(0, 0),
                                       m_render_target_texture->getSize());
-    irr_driver->getVideoDriver()->draw2DImage(m_render_target_texture,
-                                              dest_rect, source_rect,
-                                              clip_rect, &colors,
-                                              use_alpha_channel_of_texture);
+    ::draw2DImage(m_render_target_texture, dest_rect, source_rect,
+                  clip_rect, colors, use_alpha_channel_of_texture);
 }
 
 //-----------------------------------------------------------------------------

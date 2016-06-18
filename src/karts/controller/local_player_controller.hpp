@@ -37,6 +37,9 @@ class LocalPlayerController : public PlayerController
 {
 private:
 
+    /** Stores the active player data structure. */
+    StateManager::ActivePlayer *m_player;
+
     bool           m_sound_schedule;
 
     /** The camera attached to the kart for this controller. The camera
@@ -64,10 +67,16 @@ public:
     virtual void reset             () OVERRIDE;
     virtual void finishedRace      (float time) OVERRIDE;
     virtual void resetInputState   () OVERRIDE;
+    virtual bool canGetAchievements() const OVERRIDE;
+
     // ------------------------------------------------------------------------
     virtual bool isPlayerController() const OVERRIDE {return true;}
     // ------------------------------------------------------------------------
     virtual bool isLocalPlayerController() const OVERRIDE {return true;}
+    // ------------------------------------------------------------------------
+    /** Returns the name of the player profile. */
+    core::stringw getName() const OVERRIDE { return m_player->getProfile()->getName(); }
+
 
 };   // LocalPlayerController
 

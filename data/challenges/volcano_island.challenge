@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<challenge version="2">
+    <track id="volcano_island" laps="2"/>
+    <mode major="single" minor="quickrace"/>
+    <requirements trophies="15"/>
+    
+    <hard>
+        <karts number="5"/>
+        <requirements position="1"/>
+    </hard>
+    <medium>
+        <karts number="4"/>
+        <requirements position="1"/>
+    </medium>
+    <easy>
+        <karts number="4"/>
+        <requirements position="1"/>
+    </easy>
+</challenge>

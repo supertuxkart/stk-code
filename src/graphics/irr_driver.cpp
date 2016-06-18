@@ -984,7 +984,8 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
  *  \return Newly created skinned mesh. You should call drop() when you don't
  *          need it anymore.
  */
-scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
+scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig,
+                                                  video::E_RENDER_TYPE rt)
 {
     using namespace scene;
     CSkinnedMesh *mesh = dynamic_cast<CSkinnedMesh*>(orig);
@@ -993,7 +994,10 @@ scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
         Log::error("copyAnimatedMesh", "Given mesh was not a skinned mesh.");
         return NULL;
     }
-    return mesh->clone();
+
+    scene::IAnimatedMesh* out = mesh->clone();
+    out->setRenderType(rt);
+    return out;
 }   // copyAnimatedMesh
 
 // ----------------------------------------------------------------------------
@@ -1106,7 +1110,8 @@ scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
     m.EmissiveColor   = color;
     m.BackfaceCulling = false;
     m.MaterialType    = video::EMT_SOLID;
-    m.setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+    //m.setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+    m.setTexture(0, getUnicolorTexture(color));
     m.setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
 
     if (CVS->isGLSL())

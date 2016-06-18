@@ -56,6 +56,7 @@ static const char* GPU_Phase[Q_LAST] =
     "Bloom",
     "Tonemap",
     "Motion Blur",
+    "Lightning",
     "MLAA",
     "GUI",
 };

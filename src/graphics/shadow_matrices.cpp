@@ -17,6 +17,7 @@
 
 #include "graphics/shadow_matrices.hpp"
 
+#include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/post_processing.hpp"

@@ -23,12 +23,14 @@
 #ifndef PROTOCOL_HPP
 #define PROTOCOL_HPP
 
-#include "network/network_string.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
+#include <stddef.h>
+
 class Event;
+class NetworkString;
 class STKPeer;
 
 
@@ -39,15 +41,16 @@ class STKPeer;
  */
 enum ProtocolType
 {
-    PROTOCOL_NONE              = 0,  //!< No protocol type assigned.
-    PROTOCOL_CONNECTION        = 1,  //!< Protocol that deals with client-server connection.
-    PROTOCOL_LOBBY_ROOM        = 2,  //!< Protocol that is used during the lobby room phase.
-    PROTOCOL_START_GAME        = 3,  //!< Protocol used when starting the game.
-    PROTOCOL_SYNCHRONIZATION   = 4,  //!<Protocol used to synchronize clocks.
-    PROTOCOL_KART_UPDATE       = 5,  //!< Protocol to update karts position, rotation etc...
-    PROTOCOL_GAME_EVENTS       = 6,  //!< Protocol to communicate the game events.
-    PROTOCOL_CONTROLLER_EVENTS = 7,  //!< Protocol to transfer controller modifications
-    PROTOCOL_SILENT            = 0xffff  //!< Used for protocols that do not subscribe to any network event.
+    PROTOCOL_NONE              = 0x00,  //!< No protocol type assigned.
+    PROTOCOL_CONNECTION        = 0x01,  //!< Protocol that deals with client-server connection.
+    PROTOCOL_LOBBY_ROOM        = 0x02,  //!< Protocol that is used during the lobby room phase.
+    PROTOCOL_START_GAME        = 0x03,  //!< Protocol used when starting the game.
+    PROTOCOL_SYNCHRONIZATION   = 0x04,  //!<Protocol used to synchronize clocks.
+    PROTOCOL_KART_UPDATE       = 0x05,  //!< Protocol to update karts position, rotation etc...
+    PROTOCOL_GAME_EVENTS       = 0x06,  //!< Protocol to communicate the game events.
+    PROTOCOL_CONTROLLER_EVENTS = 0x07,  //!< Protocol to transfer controller modifications
+    PROTOCOL_SYNCHRONOUS       = 0x80,  //!< Flag, indicates synchronous delivery
+    PROTOCOL_SILENT            = 0xff   //!< Used for protocols that do not subscribe to any network event.
 };   // ProtocolType
 
 // ----------------------------------------------------------------------------
@@ -102,6 +105,11 @@ protected:
     /** The unique id of the protocol. */
     uint32_t        m_id;
 
+    /** True if this protocol should receive connection events. */
+    bool m_handle_connections;
+
+    /** TRue if this protocol should recceiver disconnection events. */
+    bool m_handle_disconnections;
 public:
              Protocol(ProtocolType type, CallbackObject* callback_object=NULL);
     virtual ~Protocol();
@@ -113,25 +121,24 @@ public:
 
     /** \brief Called by the protocol listener, synchronously with the main
      *  loop. Must be re-defined.*/
-    virtual void update() = 0;
+    virtual void update(float dt) = 0;
 
     /** \brief Called by the protocol listener as often as possible.
      *  Must be re-defined. */
     virtual void asynchronousUpdate() = 0;
 
     /// functions to check incoming data easily
-    bool checkDataSizeAndToken(Event* event, int minimum_size);
-    bool isByteCorrect(Event* event, int byte_nb, int value);
-    void sendMessageToPeersChangingToken(NetworkString prefix,
-                                         NetworkString message);
-    void sendMessage(const NetworkString& message,
-                     bool reliable = true);
-    void sendMessage(STKPeer* peer, const NetworkString& message,
-                     bool reliable = true);
+    NetworkString* getNetworkString(int capacity=16);
+    bool checkDataSize(Event* event, unsigned int minimum_size);
+    void sendMessageToPeersChangingToken(NetworkString *message,
+                                         bool reliable = true);
+    void sendToServer(NetworkString *message,
+                      bool reliable = true);
     void requestStart();
     void requestPause();
     void requestUnpause();
     void requestTerminate();
+    void findAndTerminateProtocol(ProtocolType type);
 
     // ------------------------------------------------------------------------
     /** \brief Called when the protocol is paused (by an other entity or by
@@ -176,7 +183,18 @@ public:
     /** \brief Method to get a protocol's type.
      *  \return The protocol type. */
     ProtocolType getProtocolType() const { return m_type; }
-
+    // ------------------------------------------------------------------------
+    /** Sets if this protocol should receive connection events. */
+    void setHandleConnections(bool b) { m_handle_connections = b; }
+    // ------------------------------------------------------------------------
+    /** Sets if this protocol should receive disconnection events. */
+    void setHandleDisconnections(bool b) { m_handle_disconnections = b; }
+    // ------------------------------------------------------------------------
+    /** Return true if this protocol should be informed about connects. */
+    virtual bool handleConnects() const { return m_handle_connections; }
+    // ------------------------------------------------------------------------
+    /** Return true if this protocol should be informed about disconnects. */
+    virtual bool handleDisconnects() const { return m_handle_disconnections; }
 
 };   // class Protocol
 

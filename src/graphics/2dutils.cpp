@@ -377,7 +377,8 @@ void draw2DImage(const video::ITexture* texture,
                  const core::rect<s32>& sourceRect,
                  const core::rect<s32>* clip_rect,
                  const video::SColor* const colors,
-                 bool use_alpha_channel_of_texture)
+                 bool use_alpha_channel_of_texture,
+                 bool draw_translucently)
 {
     if (!CVS->isGLSL())
     {
@@ -395,7 +396,12 @@ void draw2DImage(const video::ITexture* texture,
             center_pos_x, center_pos_y, tex_width, tex_height,
             tex_center_pos_x, tex_center_pos_y);
 
-    if (use_alpha_channel_of_texture)
+    if (draw_translucently)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    }
+    else if (use_alpha_channel_of_texture)
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

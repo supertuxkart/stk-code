@@ -232,13 +232,14 @@ private:
 public:
                   KartModel(bool is_master);
                  ~KartModel();
-    KartModel*    makeCopy();
+    KartModel*    makeCopy(video::E_RENDER_TYPE rt);
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
     void          setDefaultSuspension();
-    void          update(float dt, float distance, float steer,
-                         float speed);
+    void          update(float dt, float distance, float steer, float speed,
+                         float current_lean_angle,
+                         int gt_replay_index = -1);
     void          finishedRace();
     scene::ISceneNode*
                   attachModel(bool animatedModels, bool always_animated);

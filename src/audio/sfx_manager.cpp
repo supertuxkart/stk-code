@@ -414,6 +414,7 @@ void* SFXManager::mainLoop(void *obj)
         delete me->m_sfx_commands.getData().front();
         me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
     }
+    me->m_sfx_commands.unlock();
     return NULL;
 }   // mainLoop
 

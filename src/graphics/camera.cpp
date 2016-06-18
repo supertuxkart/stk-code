@@ -19,7 +19,7 @@
 
 #include "graphics/camera.hpp"
 
-#include <math.h>
+#include <cmath>
 
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
@@ -45,6 +45,7 @@ AlignedArray<Camera::EndCameraInformation> Camera::m_end_cameras;
 std::vector<Camera*>                       Camera::m_all_cameras;
 
 Camera* Camera::s_active_camera = NULL;
+Camera::DebugMode Camera::m_debug_mode = Camera::CM_DEBUG_NONE;
 
 // ============================================================================
 Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
@@ -57,23 +58,9 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     m_camera        = irr_driver->addCameraSceneNode();
     m_previous_pv_matrix = core::matrix4();
 
-#ifdef DEBUG
-    if (kart != NULL)
-        m_camera->setName(core::stringc("Camera for ") + kart->getKartProperties()->getName());
-    else
-        m_camera->setName("Camera");
-#endif
-
     setupCamera();
-    if (kart != NULL)
-    {
-        m_distance = kart->getKartProperties()->getCameraDistance();
-        setKart(kart);
-    }
-    else
-    {
-        m_distance = 1000.0f;
-    }
+    setKart(kart);
+    m_distance = kart ? kart->getKartProperties()->getCameraDistance() : 1000.0f;
     m_ambient_light = World::getWorld()->getTrack()->getDefaultAmbientColor();
 
     // TODO: Put these values into a config file
@@ -167,11 +154,9 @@ void Camera::setKart(AbstractKart *new_kart)
 {
     m_kart = new_kart;
 #ifdef DEBUG
-    if(new_kart)
-    {
-        std::string name = new_kart->getIdent()+"'s camera";
-        getCameraSceneNode()->setName(name.c_str() );
-    }
+    std::string name = new_kart ? new_kart->getIdent()+"'s camera"
+                                : "Unattached camera";
+    getCameraSceneNode()->setName(name.c_str());
 #endif
 
 }   // setKart
@@ -353,9 +338,9 @@ void Camera::setInitialTransform()
     m_camera->setRotation( core::vector3df( 0.0f, 0.0f, 0.0f ) );
     m_camera->setFOV(m_fov);
 
-    assert(!isnan(m_camera->getPosition().X));
-    assert(!isnan(m_camera->getPosition().Y));
-    assert(!isnan(m_camera->getPosition().Z));
+    assert(!std::isnan(m_camera->getPosition().X));
+    assert(!std::isnan(m_camera->getPosition().Y));
+    assert(!std::isnan(m_camera->getPosition().Z));
 }   // setInitialTransform
 
 //-----------------------------------------------------------------------------
@@ -429,9 +414,9 @@ void Camera::smoothMoveCamera(float dt)
         m_camera->setPosition(current_position);
     m_camera->setTarget(current_target);//set new target
 
-    assert(!isnan(m_camera->getPosition().X));
-    assert(!isnan(m_camera->getPosition().Y));
-    assert(!isnan(m_camera->getPosition().Z));
+    assert(!std::isnan(m_camera->getPosition().X));
+    assert(!std::isnan(m_camera->getPosition().Y));
+    assert(!std::isnan(m_camera->getPosition().Z));
 
 }   // smoothMoveCamera
 
@@ -453,13 +438,13 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
     case CM_NORMAL:
     case CM_FALLING:
         {
-            if(UserConfigParams::m_camera_debug==2)
+            if(m_debug_mode==CM_DEBUG_GROUND)
             {
                 *above_kart = 0;
                 *cam_angle  = 0;
                 *distance   = -m_kart->getKartModel()->getLength()-1.0f;
             }
-            else if(UserConfigParams::m_camera_debug==4)
+            else if(m_debug_mode==CM_DEBUG_BEHIND_KART)
             {
                 *above_kart = 0;
                 *cam_angle  = 0;
@@ -548,20 +533,20 @@ void Camera::update(float dt)
     float above_kart, cam_angle, side_way, distance;
     bool  smoothing;
 
+    // To view inside tunnels in top mode, increase near value
+    m_camera->setNearValue(m_debug_mode==CM_DEBUG_TOP_OF_KART ? 27.0f : 1.0f);
+
     // The following settings give a debug camera which shows the track from
     // high above the kart straight down.
-    if (UserConfigParams::m_camera_debug==1)
+    if (m_debug_mode==CM_DEBUG_TOP_OF_KART)
     {
         core::vector3df xyz = m_kart->getXYZ().toIrrVector();
         m_camera->setTarget(xyz);
         xyz.Y = xyz.Y+55;
         xyz.Z -= 5.0f;
         m_camera->setPosition(xyz);
-        // To view inside tunnels (FIXME 27>15 why??? makes no sense
-        // - the kart should not be visible, but it works)
-        m_camera->setNearValue(27.0);
     }
-    else if (UserConfigParams::m_camera_debug==5)
+    else if (m_debug_mode==CM_DEBUG_SIDE_OF_KART)
     {
         core::vector3df xyz = m_kart->getXYZ().toIrrVector();
         Vec3 offset(3, 0, 0);
@@ -570,7 +555,7 @@ void Camera::update(float dt)
         m_camera->setPosition(offset.toIrrVector());
     }
     // Update the first person camera
-    else if (UserConfigParams::m_camera_debug == 3)
+    else if (m_debug_mode == CM_DEBUG_FPS)
     {
         vector3df direction(m_camera->getTarget() - m_camera->getPosition());
         vector3df up(m_camera->getUpVector());
@@ -729,7 +714,7 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
 {
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getXYZ();
-    if(UserConfigParams::m_camera_debug==2)
+    if(m_debug_mode==CM_DEBUG_GROUND)
     {
         const btWheelInfo &w = m_kart->getVehicle()->getWheelInfo(2);
         wanted_target.setY(w.m_raycastInfo.m_contactPointWS.getY());
@@ -749,7 +734,7 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
         btQuaternion q(m_kart->getSkidding()->getVisualSkidRotation(), 0, 0);
         t.setBasis(t.getBasis() * btMatrix3x3(q));
     }
-    if (UserConfigParams::m_camera_debug == 2)
+    if (m_debug_mode == CM_DEBUG_GROUND)
     {
         wanted_position = t(relative_position);
         // Make sure that the Y position is a the same height as the wheel.
@@ -758,7 +743,7 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
     else
         wanted_position = t(relative_position);
 
-    if (smoothing && UserConfigParams::m_camera_debug==0)
+    if (smoothing && !isDebug())
     {
         smoothMoveCamera(dt);
     }

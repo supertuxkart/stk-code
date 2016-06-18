@@ -18,17 +18,22 @@
 
 #include "network/network_player_profile.hpp"
 
+#include "network/stk_host.hpp"
 #include "online/online_player_profile.hpp"
 
 /** Constructor. 
  *  \param global_player_id A unique number assigned from the server to this
  *         player (though it might not be the index in the peer list).
  *  \param name Name of this player.
+ *  \param global_player_id Global id of this player.
+ *  \param host_id The id of the host the player is connected from.
  */
-NetworkPlayerProfile::NetworkPlayerProfile(int global_player_id,
-                                           const irr::core::stringw &name)
+NetworkPlayerProfile::NetworkPlayerProfile(const irr::core::stringw &name,
+                                           int global_player_id,
+                                           int host_id                     )
 {
     m_global_player_id      = global_player_id;
+    m_host_id               = host_id;
     m_kart_name             = "";
     m_world_kart_id         = 0;
     m_per_player_difficulty = PLAYER_DIFFICULTY_NORMAL;
@@ -39,3 +44,12 @@ NetworkPlayerProfile::NetworkPlayerProfile(int global_player_id,
 NetworkPlayerProfile::~NetworkPlayerProfile()
 {
 }   // ~NetworkPlayerProfile
+// ----------------------------------------------------------------------------
+/** Returns true if this player is local, i.e. running on this computer. This
+ *  is done by comparing the host id of this player with the host id of this
+ *  computer.
+ */
+bool NetworkPlayerProfile::isLocalPlayer() const
+{
+    return m_host_id == STKHost::get()->getMyHostId();
+}   // isLocalPlayer

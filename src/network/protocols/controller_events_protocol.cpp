@@ -25,7 +25,6 @@
 #include "network/network_player_profile.hpp"
 #include "network/game_setup.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -45,132 +44,56 @@ ControllerEventsProtocol::~ControllerEventsProtocol()
 }   // ~ControllerEventsProtocol
 
 //-----------------------------------------------------------------------------
-/** Sets up the mapping of KartController and STKPeer.
- */
-void ControllerEventsProtocol::setup()
-{
-    m_self_controller_index = 0;
-    std::vector<AbstractKart*> karts = World::getWorld()->getKarts();
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-    for (unsigned int i = 0; i < karts.size(); i++)
-    {
-        if (karts[i]->getIdent() == NetworkWorld::getInstance()->getSelfKart())
-        {
-            Log::info("ControllerEventsProtocol", "My id is %d", i);
-            m_self_controller_index = i;
-        }
-        STKPeer* peer = NULL;
-        if (NetworkConfig::get()->isServer())
-        {
-            for (unsigned int j = 0; j < peers.size(); j++)
-            {
-                if (peers[j]->getPlayerProfile()->getKartName() 
-                    == karts[i]->getIdent())
-                {
-                    peer = peers[j];
-                }
-                Log::info("ControllerEventsProtocol", "Compared %s and %s",
-                          peers[j]->getPlayerProfile()->getKartName().c_str(),
-                          karts[i]->getIdent().c_str());
-            }   // for j in peers
-        }
-        else   // isClient
-        {
-            if (peers.size() > 0)
-                peer = peers[0];
-        }
-        if (peer == NULL)
-        {
-            Log::error("ControllerEventsProtocol",
-                       "Could not find the peer corresponding to the kart.");
-        }
-        m_controllers.push_back(
-            std::pair<Controller*, STKPeer*>(karts[i]->getController(), peer));
-    }
-}   // setup
-
-//-----------------------------------------------------------------------------
 
 bool ControllerEventsProtocol::notifyEventAsynchronous(Event* event)
 {
-    if (event->getType() != EVENT_TYPE_MESSAGE)
-        return true;
+    if(!checkDataSize(event, 13)) return true;
 
-    const NetworkString &data = event->data();
-    if (data.size() < 17)
-    {
-        Log::error("ControllerEventsProtocol",
-                   "The data supplied was not complete. Size was %d.",
-                    data.size());
-        return true;
-    }
-    uint32_t token = data.gui32();
-    NetworkString pure_message = data;
-    pure_message.removeFront(4);
-    if (token != event->getPeer()->getClientServerToken())
-    {
-        Log::error("ControllerEventsProtocol", "Bad token from peer.");
-        return true;
-    }
-    NetworkString ns = pure_message;
+    NetworkString &data = event->data();
+    float time = data.getFloat();
 
-    ns.removeFront(4);
     uint8_t client_index = -1;
-    while (ns.size() >= 9)
+    while (data.size() >= 9)
     {
-        uint8_t controller_index = ns.gui8();
-        client_index = controller_index;
-        uint8_t serialized_1 = ns.gui8(1);
-        PlayerAction action  = (PlayerAction)(ns.gui8(4));
-        int action_value = ns.gui32(5);
+        uint8_t kart_id = data.getUInt8();
+        if (kart_id >=World::getWorld()->getNumKarts())
+        {
+            Log::warn("ControllerEventProtocol", "No valid kart id (%s).",
+                      kart_id);
+            continue;
+        }
+        uint8_t serialized_1   = data.getUInt8();
+        uint8_t serialized_2   = data.getUInt8();
+        uint8_t serialized_3   = data.getUInt8();
+        PlayerAction action    = (PlayerAction)(data.getUInt8());
+        int action_value       = data.getUInt32();
+        Log::info("ControllerEventsProtocol", "KartID %d action %d value %d",
+                  kart_id, action, action_value);
+        Controller *controller = World::getWorld()->getKart(kart_id)
+                                                  ->getController();
+        KartControl *controls  = controller->getControls();
+        controls->m_brake      = (serialized_1 & 0x40)!=0;
+        controls->m_nitro      = (serialized_1 & 0x20)!=0;
+        controls->m_rescue     = (serialized_1 & 0x10)!=0;
+        controls->m_fire       = (serialized_1 & 0x08)!=0;
+        controls->m_look_back  = (serialized_1 & 0x04)!=0;
+        controls->m_skid       = KartControl::SkidControl(serialized_1 & 0x03);
 
-        KartControl* controls   = m_controllers[controller_index].first
-                                                               ->getControls();
-        controls->m_brake       = (serialized_1 & 0x40)!=0;
-        controls->m_nitro       = (serialized_1 & 0x20)!=0;
-        controls->m_rescue      = (serialized_1 & 0x10)!=0;
-        controls->m_fire        = (serialized_1 & 0x08)!=0;
-        controls->m_look_back   = (serialized_1 & 0x04)!=0;
-        controls->m_skid        = KartControl::SkidControl(serialized_1 & 0x03);
-
-        m_controllers[controller_index].first->action(action, action_value);
-        ns.removeFront(9);
-        //Log::info("ControllerEventProtocol", "Registered one action.");
+        controller->action(action, action_value);
     }
-    if (ns.size() > 0 && ns.size() != 9)
+    if (data.size() > 0 )
     {
         Log::warn("ControllerEventProtocol",
-                  "The data seems corrupted. Remains %d", ns.size());
-        return true;
-    }
-    if (client_index < 0)
-    {
-        Log::warn("ControllerEventProtocol", "Couldn't have a client id.");
-        return true;
+                  "The data seems corrupted. Remains %d", data.size());
     }
     if (NetworkConfig::get()->isServer())
     {
-        // notify everybody of the event :
-        for (unsigned int i = 0; i < m_controllers.size(); i++)
-        {
-            if (i == client_index) // don't send that message to the sender
-                continue;
-            NetworkString ns2(4+pure_message.size());
-            ns2.ai32(m_controllers[i].second->getClientServerToken());
-            ns2 += pure_message;
-            ProtocolManager::getInstance()
-                           ->sendMessage(this, m_controllers[i].second, ns2,
-                                         false);
-        }
-    }
+        // Send update to all clients except the original sender.
+        STKHost::get()->sendPacketExcept(event->getPeer(), 
+                                         &data, false);
+    }   // if server
     return true;
 }   // notifyEventAsynchronous
-
-//-----------------------------------------------------------------------------
-
-void ControllerEventsProtocol::update()
-{
-}   // update
 
 //-----------------------------------------------------------------------------
 /** Called from the local kart controller when an action (like steering,
@@ -201,14 +124,13 @@ void ControllerEventsProtocol::controllerAction(Controller* controller,
     uint8_t serialized_2 = (uint8_t)(controls->m_accel*255.0);
     uint8_t serialized_3 = (uint8_t)(controls->m_steer*127.0);
 
-    NetworkString ns(17);
-    ns.ai32(m_controllers[m_self_controller_index].second
-                                                    ->getClientServerToken());
-    ns.af(World::getWorld()->getTime());
-    ns.ai8(m_self_controller_index);
-    ns.ai8(serialized_1).ai8(serialized_2).ai8(serialized_3);
-    ns.ai8((uint8_t)(action)).ai32(value);
+    NetworkString *ns = getNetworkString(13);
+    ns->addFloat(World::getWorld()->getTime());
+    ns->addUInt8(controller->getKart()->getWorldKartId());
+    ns->addUInt8(serialized_1).addUInt8(serialized_2).addUInt8(serialized_3);
+    ns->addUInt8((uint8_t)(action)).addUInt32(value);
+    sendToServer(ns, false); // send message to server
+    delete ns;
 
     Log::info("ControllerEventsProtocol", "Action %d value %d", action, value);
-    sendMessage(ns, false); // send message to server
 }   // controllerAction

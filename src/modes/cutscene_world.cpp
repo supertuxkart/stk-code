@@ -58,7 +58,8 @@ CutsceneWorld::CutsceneWorld() : World()
     m_aborted = false;
     WorldStatus::setClockMode(CLOCK_NONE);
     m_use_highscores = false;
-    m_play_racestart_sounds = false;
+    m_play_track_intro_sound = false;
+    m_play_ready_set_go_sounds = false;
     m_fade_duration = 1.0f;
 }   // CutsceneWorld
 
@@ -299,6 +300,11 @@ void CutsceneWorld::update(float dt)
             Vec3 rot2(rot);
             rot2.setPitch(rot2.getPitch() + 90.0f);
             m_camera->setRotation(rot2.toIrrVector());
+
+            irr::core::vector3df up(0.0f, 0.0f, 1.0f);
+            irr::core::matrix4 matrix = anchorNode->getAbsoluteTransformation();
+            matrix.rotateVect(up);
+            m_camera->setUpVector(up);
 
             SFXManager::get()->positionListener(m_camera->getAbsolutePosition(),
                                           m_camera->getTarget() -

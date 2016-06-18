@@ -2,6 +2,8 @@
 #define START_GAME_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
+#include "utils/cpp2011.hpp"
+
 #include <map>
 
 class GameSetup;
@@ -21,7 +23,7 @@ private:
     STATE m_state;
 
     /** Keeps the state for all clients. */
-    std::map<NetworkPlayerProfile*, STATE> m_player_states;
+    std::map<uint8_t, STATE> m_player_states;
 
     /** Stores a handy pointer to the game setup structure. */
     GameSetup* m_game_setup;
@@ -32,15 +34,17 @@ private:
 
     bool m_ready;
 
+    void startRace();
+
 public:
              StartGameProtocol(GameSetup* game_setup);
     virtual ~StartGameProtocol();
 
     virtual bool notifyEventAsynchronous(Event* event);
-    virtual void setup();
-    virtual void update();
+    virtual void setup() OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
     void ready();
-    virtual void asynchronousUpdate() {}
+    virtual void asynchronousUpdate() OVERRIDE {}
 
 };   // class StartGameProtocol
 

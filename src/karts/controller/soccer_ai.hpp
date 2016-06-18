@@ -21,9 +21,13 @@
 
 #include "karts/controller/arena_ai.hpp"
 
+#undef BALL_AIM_DEBUG
+#ifdef BALL_AIM_DEBUG
+#include "graphics/irr_driver.hpp"
+#endif
+
 class SoccerWorld;
 class Vec3;
-class Item;
 
 /** The actual soccer AI.
  * \ingroup controller
@@ -31,22 +35,43 @@ class Item;
 class SoccerAI : public ArenaAI
 {
 private:
+
+#ifdef BALL_AIM_DEBUG
+    irr::scene::ISceneNode *m_red_sphere;
+    irr::scene::ISceneNode *m_blue_sphere;
+#endif
+
     /** Keep a pointer to world. */
     SoccerWorld *m_world;
 
     SoccerTeam m_cur_team;
-    bool m_saving_ball;
+    SoccerTeam m_opp_team;
 
-    Vec3 correctBallPosition(const Vec3&);
+    /** Define which way to handle to ball, either steer with it,
+     *  or overtake it (Denfense).
+     */
+    bool m_overtake_ball;
+    bool m_force_brake;
+    bool m_chasing_ball;
+
+    Vec3 determineBallAimingPosition();
+    bool isOvertakable(const Vec3& ball_lc);
+    bool determineOvertakePosition(const Vec3& ball_lc, const Vec3& aim_lc,
+                                   Vec3* overtake_lc);
+    float rotateSlope(float old_slope, bool rotate_up);
 
     virtual void findClosestKart(bool use_difficulty);
     virtual void findTarget();
+    virtual void resetAfterStop() OVERRIDE    { m_overtake_ball = false; }
     virtual int  getCurrentNode() const;
     virtual bool isWaiting() const;
-    virtual bool canSkid(float steer_fraction) { return m_saving_ball; }
+    virtual bool canSkid(float steer_fraction)           { return false; }
+    virtual bool forceBraking() OVERRIDE
+                            { return m_avoiding_banana || m_force_brake; }
+    virtual bool ignorePathFinding() OVERRIDE
+                            { return  m_overtake_ball || m_chasing_ball; }
 public:
-                 SoccerAI(AbstractKart *kart,
-                          StateManager::ActivePlayer *player = NULL);
+                 SoccerAI(AbstractKart *kart);
                 ~SoccerAI();
     virtual void update      (float delta);
     virtual void reset       ();

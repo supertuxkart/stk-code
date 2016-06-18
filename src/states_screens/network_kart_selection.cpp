@@ -33,6 +33,7 @@
 #include "states_screens/server_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
+#include "states_screens/waiting_for_others.hpp"
 
 static const char ID_LOCKED[] = "locked/";
 
@@ -43,7 +44,6 @@ DEFINE_SCREEN_SINGLETON( NetworkKartSelectionScreen );
 NetworkKartSelectionScreen::NetworkKartSelectionScreen()
                           : KartSelectionScreen("karts_online.stkgui")
 {
-    KartSelectionScreen::m_instance_ptr = this;
 }   // NetworkKartSelectionScreen
 
 // ----------------------------------------------------------------------------
@@ -67,8 +67,6 @@ void NetworkKartSelectionScreen::init()
     // change the back button image (because it makes the game quit)
     IconButtonWidget* back_button = getWidget<IconButtonWidget>("back");
     back_button->setImage("gui/main_quit.png");
-
-    m_multiplayer = false;
 
     // add a widget for each player except self (already exists):
     GameSetup* setup = STKHost::get()->getGameSetup();
@@ -95,6 +93,7 @@ void NetworkKartSelectionScreen::init()
     // FIXME: atm only adds the local master, split screen supports
     // needs to be added
     int player_id = game_setup->getLocalMasterID();
+    m_id_mapping.clear();
     m_id_mapping.insert(m_id_mapping.begin(), player_id);
 
     const int amount = m_kart_widgets.size();
@@ -136,7 +135,16 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
     {
         ClientLobbyRoomProtocol* protocol = static_cast<ClientLobbyRoomProtocol*>(
                 ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
-        protocol->requestKartSelection(selection);
+        // FIXME SPLITSCREEN: we need to supply the global player id of the 
+        // player selecting the kart here. For now ... just vote the same kart
+        // for each local player.
+        std::vector<NetworkPlayerProfile*> players =
+            STKHost::get()->getMyPlayerProfiles();
+        for(unsigned int i=0; i<players.size(); i++)
+        {
+            protocol->requestKartSelection(players[i]->getGlobalPlayerId(),
+                                           selection);
+        }
     }
 }   // playerConfirm
 
@@ -168,19 +176,30 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
     // to the server.
     if(STKHost::get()->isAuthorisedToControl())
     {
-        // FIXME: for now we submit a vote from the authorised user
-        // for the various modes based on the settings in the race manager. 
-        // This needs more/better gui elements (and some should be set when
-        // defining the server).
         Protocol* protocol = ProtocolManager::getInstance()
                            ->getProtocol(PROTOCOL_LOBBY_ROOM);
         ClientLobbyRoomProtocol* clrp =
                            static_cast<ClientLobbyRoomProtocol*>(protocol);
-        clrp->voteMajor(race_manager->getMajorMode());
-        clrp->voteMinor(race_manager->getMinorMode());
-        clrp->voteReversed(race_manager->getReverseTrack());
-        clrp->voteRaceCount(1);
+
+        // FIXME: for now we submit a vote from the authorised user
+        // for the various modes based on the settings in the race manager. 
+        // This needs more/better gui elements (and some should be set when
+        // defining the server).
+        std::vector<NetworkPlayerProfile*> players =
+                                         STKHost::get()->getMyPlayerProfiles();
+        for(unsigned int i=0; i<players.size(); i++)
+        {
+            uint8_t id = players[i]->getGlobalPlayerId();
+            clrp->voteMajor(id, race_manager->getMajorMode());
+            clrp->voteMinor(id, race_manager->getMinorMode());
+            clrp->voteReversed(id, race_manager->getReverseTrack());
+            clrp->voteRaceCount(id, 1);
+            clrp->voteLaps(id, 3);
+        }
+        //WaitingForOthersScreen::getInstance()->push();
+        //return;
     }
+    TracksScreen::getInstance()->setOfficalTrack(true);
     TracksScreen::getInstance()->push();
 }   // playerSelected
 

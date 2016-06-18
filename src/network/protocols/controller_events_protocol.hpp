@@ -22,24 +22,22 @@
 #include "network/protocol.hpp"
 
 #include "input/input.hpp"
+#include "utils/cpp2011.hpp"
 
 class Controller;
 class STKPeer;
 
 class ControllerEventsProtocol : public Protocol
 {
-protected:
-    std::vector<std::pair<Controller*, STKPeer*> > m_controllers;
-    uint32_t m_self_controller_index;
 
 public:
-    ControllerEventsProtocol();
+             ControllerEventsProtocol();
     virtual ~ControllerEventsProtocol();
 
-    virtual bool notifyEventAsynchronous(Event* event);
-    virtual void setup();
-    virtual void update();
-    virtual void asynchronousUpdate() {}
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
+    virtual void update(float dt) OVERRIDE {};
+    virtual void setup() OVERRIDE {};
+    virtual void asynchronousUpdate() OVERRIDE {}
 
     void controllerAction(Controller* controller, PlayerAction action,
                           int value);

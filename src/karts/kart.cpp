@@ -58,7 +58,7 @@
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
+#include "network/race_event_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
 #include "physics/physics.hpp"
@@ -84,12 +84,6 @@
 #  pragma warning(disable:4355)
 #endif
 
-#if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
-#  define isnan _isnan
-#else
-#  include <math.h>
-#endif
-
 /** The kart constructor.
  *  \param ident  The identifier for the kart model to use.
  *  \param position The position (or rank) for this kart (between 1 and
@@ -98,9 +92,10 @@
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
-            PerPlayerDifficulty difficulty)
+            PerPlayerDifficulty difficulty,
+            video::E_RENDER_TYPE rt)
      : AbstractKart(ident, world_kart_id, position, init_transform,
-             difficulty)
+             difficulty, rt)
 
 #if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  pragma warning(1:4355)
@@ -824,14 +819,34 @@ float Kart::getMaxSteerAngle(float speed) const
  *         world->getTime()), or the estimated time in case that all
  *         player kart have finished the race and all AI karts get
  *         an estimated finish time set.
+ *  \param from_server In a network game, only the server can notify
+ *         about a kart finishing a race. This parameter is to distinguish
+ *         between a local detection (which is ignored on clients in a
+ *         network game), and a server notification.
  */
-void Kart::finishedRace(float time)
+void Kart::finishedRace(float time, bool from_server)
 {
     // m_finished_race can be true if e.g. an AI kart was set to finish
     // because the race was over (i.e. estimating the finish time). If
     // this kart then crosses the finish line (with the end controller)
     // it would trigger a race end again.
     if(m_finished_race) return;
+
+/*    if(!from_server)
+    {
+        if(NetworkConfig::get()->isServer())
+        {
+            RaceEventManager::getInstance()->kartFinishedRace(this, time);
+        }   // isServer
+
+        // Ignore local detection of a kart finishing a race in a 
+        // network game.
+        else if(NetworkConfig::get()->isClient())
+        {
+            return;
+        }
+    }   // !from_server
+*/
     m_finished_race = true;
     m_finish_time   = time;
     m_controller->finishedRace(time);
@@ -869,10 +884,12 @@ void Kart::finishedRace(float time)
     {
         // Save for music handling in race result gui
         setRaceResult();
-        setController(new EndController(this, m_controller->getPlayer(),
-                                        m_controller));
+        if(!isGhostKart())
+        {
+            setController(new EndController(this, m_controller));
+        }
         // Skip animation if this kart is eliminated
-        if (m_eliminated) return;
+        if (m_eliminated || isGhostKart()) return;
 
         m_kart_model->setAnimation(m_race_result ?
             KartModel::AF_WIN_START : KartModel::AF_LOSE_START);
@@ -1016,20 +1033,20 @@ float Kart::getStartupBoost() const
 float Kart::getActualWheelForce()
 {
     float add_force = m_max_speed->getCurrentAdditionalEngineForce();
-    assert(!isnan(add_force));
+    assert(!std::isnan(add_force));
     const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
     for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
         if(m_speed <= m_kart_properties->getEngineMaxSpeed() * gear_ratio[i])
         {
-            assert(!isnan(m_kart_properties->getEnginePower()));
-            assert(!isnan(m_kart_properties->getGearPowerIncrease()[i]));
+            assert(!std::isnan(m_kart_properties->getEnginePower()));
+            assert(!std::isnan(m_kart_properties->getGearPowerIncrease()[i]));
             return m_kart_properties->getEnginePower()
                  * m_kart_properties->getGearPowerIncrease()[i]
                  + add_force;
         }
     }
-    assert(!isnan(m_kart_properties->getEnginePower()));
+    assert(!std::isnan(m_kart_properties->getEnginePower()));
     return m_kart_properties->getEnginePower() + add_force * 2;
 
 }   // getActualWheelForce
@@ -1134,6 +1151,10 @@ void Kart::eliminate()
     }
 
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
+    m_kart_gfx->setGFXInvisible();
+    if (m_engine_sound)
+        m_engine_sound->stop();
+
     m_eliminated = true;
 
     m_node->setVisible(false);
@@ -1394,7 +1415,7 @@ void Kart::update(float dt)
     // Check if any item was hit.
     // check it if we're not in a network world, or if we're on the server
     // (when network mode is on)
-    if (!NetworkWorld::getInstance()->isRunning() ||
+    if (!RaceEventManager::getInstance()->isRunning() ||
         NetworkConfig::get()->isServer())
         ItemManager::get()->checkItemHit(this);
 
@@ -2191,19 +2212,15 @@ void Kart::updatePhysics(float dt)
 
     updateEngineSFX();
 #ifdef XX
-    Log::info("Kart","forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f"
-       ,m_vehicle->m_forwardImpulse[0]
-       ,m_vehicle->m_forwardImpulse[1]
-       ,m_vehicle->m_forwardImpulse[2]
-       ,m_vehicle->m_forwardImpulse[3]
-       ,m_vehicle->m_sideImpulse[0]
-       ,m_vehicle->m_sideImpulse[1]
-       ,m_vehicle->m_sideImpulse[2]
-       ,m_vehicle->m_sideImpulse[3]
+    Log::info("Kart","angVel %f %f %f heading %f suspension %f %f %f %f"
        ,m_body->getAngularVelocity().getX()
        ,m_body->getAngularVelocity().getY()
        ,m_body->getAngularVelocity().getZ()
        ,getHeading()
+       ,m_vehicle->getWheelInfo(0).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(1).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(2).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(3).m_raycastInfo.m_suspensionLength
        );
 #endif
 
@@ -2233,7 +2250,7 @@ void Kart::updateEngineSFX()
         if (f>1.0f) f=1.0f;
 
         float gears = 3.0f * fmod(f, 0.333334f);
-        assert(!isnan(f));
+        assert(!std::isnan(f));
         m_engine_sound->setSpeedPosition(0.6f + (f + gears) * 0.35f, getXYZ());
     }
     else
@@ -2297,7 +2314,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             // or moving backwards
             if(m_speed > 0.0f)
             {   // Still going forward while braking
-                applyEngineForce(0.f);
+                applyEngineForce(-engine_power*2.5f);
                 m_brake_time += dt;
                 // Apply the brakes - include the time dependent brake increase
                 float f = 1 + m_brake_time
@@ -2328,8 +2345,8 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         {
             m_brake_time = 0;
             // lift the foot from throttle, brakes with 10% engine_power
-            assert(!isnan(m_controls.m_accel));
-            assert(!isnan(engine_power));
+            assert(!std::isnan(m_controls.m_accel));
+            assert(!std::isnan(engine_power));
             applyEngineForce(-m_controls.m_accel*engine_power*0.1f);
 
             // If not giving power (forward or reverse gear), and speed is low
@@ -2504,7 +2521,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
  */
 void Kart::applyEngineForce(float force)
 {
-    assert(!isnan(force));
+    assert(!std::isnan(force));
     // Split power to simulate a 4WD 40-60, other values possible
     // FWD or RWD is a matter of putting a 0 and 1 in the right place
     float frontForce = force*0.4f;
@@ -2728,12 +2745,12 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
-    float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
+    float lean_height = tan(m_current_lean) * getKartWidth()*0.5f;
 
     Vec3 center_shift(0, 0, 0);
 
     center_shift.setY(m_skidding->getGraphicalJumpOffset()
-                      + lean_height
+                      + fabsf(lean_height)
                       +m_graphical_y_offset);
     center_shift = getTrans().getBasis() * center_shift;
 
@@ -2743,7 +2760,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     // m_speed*dt is the distance the kart has moved, which determines
     // how much the wheels need to rotate.
-    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed);
+    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed, lean_height);
 
     // Determine the shadow position from the terrain Y position. This
     // leaves the shadow on the ground even if the kart is jumping because

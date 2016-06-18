@@ -21,6 +21,7 @@
 
 #include "network/protocol.hpp"
 #include "network/transport_address.hpp"
+#include "utils/cpp2011.hpp"
 
 namespace Online { class XMLRequest; }
 
@@ -37,19 +38,19 @@ public:
              GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object);
     virtual ~GetPeerAddress();
 
-    virtual void setup();
-    virtual void asynchronousUpdate();
+    virtual void setup() OVERRIDE;
+    virtual void asynchronousUpdate() OVERRIDE;
     void setPeerID(uint32_t m_peer_id);
 
     // ------------------------------------------------------------------------
     /** Returns the address found. */
     const TransportAddress &getAddress() const { return m_address;  }
     // ------------------------------------------------------------------------
-    virtual void update() {}
+    virtual void update(float dt) OVERRIDE {}
     // ------------------------------------------------------------------------
-    virtual bool notifyEvent(Event* event) { return true; }
+    virtual bool notifyEvent(Event* event) OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    virtual bool notifyEventAsynchronous(Event* event) { return true; }
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE { return true; }
 
 };   // class GetPeerAddress
 

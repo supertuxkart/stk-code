@@ -29,6 +29,8 @@
  */
 Event::Event(ENetEvent* event)
 {
+    m_arrival_time = (double)StkTime::getTimeSinceEpoch();
+
     switch (event->type)
     {
     case ENET_EVENT_TYPE_CONNECT:
@@ -46,21 +48,28 @@ Event::Event(ENetEvent* event)
     }
     if (m_type == EVENT_TYPE_MESSAGE)
     {
-        m_data = NetworkString(std::string((char*)(event->packet->data),
-                               event->packet->dataLength-1));
+        m_data = new NetworkString(event->packet->data, 
+                                      event->packet->dataLength);
     }
+    else
+        m_data = NULL;
 
-    m_packet = NULL;
     if (event->packet)
     {
-        m_packet = event->packet;
         // we got all we need, just remove the data.
-        enet_packet_destroy(m_packet);
+        enet_packet_destroy(event->packet);
     }
-    m_packet = NULL;
 
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     m_peer = STKHost::get()->getPeer(event->peer);
+    if(m_type == EVENT_TYPE_MESSAGE && m_peer->isClientServerTokenSet() &&
+        m_data->getToken()!=m_peer->getClientServerToken() )
+    {
+        Log::error("Event", "Received event with invalid token!");
+        Log::error("Event", "HostID %d Token %d message token %d",
+            m_peer->getHostId(), m_peer->getClientServerToken(),
+            m_data->getToken());
+        Log::error("Event", m_data->getLogMessage().c_str());
+    }
 }   // Event(ENetEvent)
 
 // ----------------------------------------------------------------------------
@@ -71,15 +80,6 @@ Event::~Event()
     // Do not delete m_peer, it's a pointer to the enet data structure
     // which is persistent.
     m_peer = NULL;
-    m_packet = NULL;
+    delete m_data;
 }   // ~Event
-
-// ----------------------------------------------------------------------------
-/** \brief Remove bytes at the beginning of data.
- *  \param size : The number of bytes to remove.
- */
-void Event::removeFront(int size)
-{
-    m_data.removeFront(size);
-}   // removeFront
 

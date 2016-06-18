@@ -55,6 +55,7 @@
 using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
+using namespace GUIEngine;
 
 const float KARTS_X = -0.95f;
 const float KARTS_DELTA_X = 1.9f;
@@ -62,7 +63,7 @@ const float KARTS_DELTA_Y = -0.55f;
 const float KARTS_INITIAL_Z = -10.0f;
 const float KARTS_DEST_Z = -1.8f;
 const float INITIAL_Y = 0.0f;
-const float INITIAL_PODIUM_Y = -1.27f;
+const float INITIAL_PODIUM_Y = -1.33f;
 const float PODIUM_HEIGHT[3] = { 0.650f, 1.0f, 0.30f };
 
 DEFINE_SCREEN_SINGLETON( GrandPrixWin );
@@ -172,6 +173,7 @@ void GrandPrixWin::init()
     m_phase = 1;
 
     SFXManager::get()->quickSound("gp_end");
+    getWidget<ButtonWidget>("continue")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // -------------------------------------------------------------------------------------
@@ -231,6 +233,7 @@ void GrandPrixWin::onUpdate(float dt)
                     m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false, true);
 
                     core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
+                    podium_pos.Y = INITIAL_PODIUM_Y;
                     core::vector3df podium_rot(0, m_kart_rotation[k], 0);
                     m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false, true);
 
@@ -340,6 +343,13 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
             else if (meshPresentation->getModelFile() == "gpwin_podium3.b3d")
                 m_podium_steps[2] = currObj;
         }
+    }
+
+    for (int k=0; k<3; k++)
+    {
+        core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
+        podium_pos.Y = INITIAL_PODIUM_Y;
+        m_podium_steps[k]->move(podium_pos, core::vector3df(0, 0, 0), core::vector3df(1.0f, 1.0f, 1.0f), false, true);
     }
 
     assert(m_podium_steps[0] != NULL);

@@ -2,34 +2,38 @@
 #define KART_UPDATE_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/vec3.hpp"
+
 #include "LinearMath/btQuaternion.h"
 
-#include <list>
+#include <vector>
 #include "pthread.h"
 
 class AbstractKart;
 
 class KartUpdateProtocol : public Protocol
 {
-    public:
-        KartUpdateProtocol();
-        virtual ~KartUpdateProtocol();
+private:
 
-        virtual bool notifyEventAsynchronous(Event* event);
-        virtual void setup();
-        virtual void update();
-        virtual void asynchronousUpdate() {};
+    /** Stores the last updated position for a kart. */
+    std::vector<Vec3> m_next_positions;
 
-    protected:
-        std::vector<AbstractKart*> m_karts;
-        uint32_t m_self_kart_index;
+    /** Stores the last updated rotation for a kart. */
+    std::vector<btQuaternion> m_next_quaternions;
 
-        std::list<Vec3> m_next_positions;
-        std::list<btQuaternion> m_next_quaternions;
-        std::list<uint32_t> m_karts_ids;
+    /** True if a new update for the kart positions was received. */
+    bool m_was_updated;
 
-        pthread_mutex_t m_positions_updates_mutex;
-};
+public:
+             KartUpdateProtocol();
+    virtual ~KartUpdateProtocol();
+
+    virtual bool notifyEvent(Event* event) OVERRIDE;
+    virtual void setup() OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
+    virtual void asynchronousUpdate() OVERRIDE {};
+
+};   // KartUpdateProtocol
 
 #endif // KART_UPDATE_PROTOCOL_HPP

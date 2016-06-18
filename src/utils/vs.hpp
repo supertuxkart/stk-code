@@ -26,7 +26,6 @@
 #if defined(WIN32) && defined(_MSC_VER) && _MSC_VER < 1800
 #  include <math.h>
 
-#  define isnan _isnan
 #  define roundf(x) (floorf(x + 0.5f))
 #  define round(x)  (floorf(x + 0.5))
 #endif

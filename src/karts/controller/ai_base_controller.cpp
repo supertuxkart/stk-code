@@ -20,6 +20,7 @@
 #include "karts/controller/ai_base_controller.hpp"
 
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/ai_properties.hpp"
@@ -30,10 +31,10 @@
 #include <assert.h>
 
 bool AIBaseController::m_ai_debug = false;
+int  AIBaseController::m_test_ai  = 0;
 
-AIBaseController::AIBaseController(AbstractKart *kart,
-                                   StateManager::ActivePlayer *player)
-                : Controller(kart, player)
+AIBaseController::AIBaseController(AbstractKart *kart)
+                : Controller(kart)
 {
     m_kart          = kart;
     m_kart_length   = m_kart->getKartLength();
@@ -66,7 +67,7 @@ void AIBaseController::update(float dt)
 void AIBaseController::setControllerName(const std::string &name)
 {
 #ifdef DEBUG
-    if(m_ai_debug && !UserConfigParams::m_camera_debug)
+    if(m_ai_debug && !Camera::isDebug())
         m_kart->setOnScreenText(core::stringw(name.c_str()).c_str());
 #endif
     Controller::setControllerName(name);
@@ -282,23 +283,24 @@ void AIBaseController::crashed(const Material *m)
 }   // crashed(Material)
 
 //-----------------------------------------------------------------------------
-void AIBaseController::checkPosition(const Vec3 &point,
-                                     posData *pos_data,
-                                     Vec3 *lc) const
+void AIBaseController::checkPosition(const Vec3 &point, posData *pos_data,
+                                     Vec3 *lc, bool use_front_xyz) const
 {
     // Convert to local coordinates from the point of view of current kart
     btQuaternion q(btVector3(0, 1, 0), -m_kart->getHeading());
-    Vec3 p  = point - m_kart->getXYZ();
+    Vec3 p = point -
+        (use_front_xyz ? m_kart->getFrontXYZ() : m_kart->getXYZ());
     Vec3 local_coordinates = quatRotate(q, p);
 
     // Save local coordinates for later use if needed
     if (lc) *lc = local_coordinates;
 
-    // on_side: tell whether it's left or right hand side
+    if (pos_data == NULL) return;
+    // lhs: tell whether it's left or right hand side
     if (local_coordinates.getX() < 0)
-        pos_data->on_side = true;
+        pos_data->lhs = true;
     else
-        pos_data->on_side = false;
+        pos_data->lhs = false;
 
     // behind: tell whether it's behind or not
     if (local_coordinates.getZ() < 0)
@@ -308,6 +310,6 @@ void AIBaseController::checkPosition(const Vec3 &point,
 
     pos_data->angle = atan2(fabsf(local_coordinates.getX()),
         fabsf(local_coordinates.getZ()));
-    pos_data->distance = p.length_2d();
+    pos_data->distance = p.length();
 
 }   //  checkPosition

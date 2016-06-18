@@ -54,10 +54,10 @@ public:
              ConnectToPeer(const TransportAddress &address);
     virtual ~ConnectToPeer();
 
-    virtual bool notifyEventAsynchronous(Event* event);
-    virtual void setup();
-    virtual void update() {}
-    virtual void asynchronousUpdate();
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
+    virtual void setup() OVERRIDE;
+    virtual void update(float dt) OVERRIDE {}
+    virtual void asynchronousUpdate() OVERRIDE;
     virtual void callback(Protocol *protocol) OVERRIDE;
 };   // class ConnectToPeer
 

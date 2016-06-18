@@ -235,7 +235,18 @@ void IndirectDrawPolicy::drawNormals(const DrawCalls& draw_calls) const
 void IndirectDrawPolicy::drawGlow(const DrawCalls& draw_calls,
                                   const std::vector<GlowData>& glows) const
 {
-    draw_calls.drawIndirectGlow();
+    //to draw Glow with indirect commands, we also need GL_ARB_explicit_attrib_location extension
+    //TODO: find something better than the "if" here?
+    if(CVS->isARBExplicitAttribLocationUsable())
+    {
+        draw_calls.drawIndirectGlow();
+    }
+    else
+    {
+        for (u32 i = 0; i < glows.size(); i++)
+            glows[i].node->render();
+    }
+        
 }
 
 // ----------------------------------------------------------------------------

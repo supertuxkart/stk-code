@@ -3,9 +3,9 @@
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
     <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
-        <header id="name" height="5%" width="80%" align="center" text_align="center"/>
+        <header id="name" height="7%" width="80%" align="center" text_align="center"/>
 
-        <spacer width="1" height="5%"/>
+        <spacer width="1" height="1%"/>
 
         <box width="100%" height="40%" padding="10" layout="horizontal-row">
             <!-- Left pane -->
@@ -49,8 +49,8 @@
             </div>
 
         </box>
-        <spacer width="1" height="5%"/>
-        <box width="100%" height="25%" padding="15" layout="vertical-row">
+        <spacer width="1" height="1%"/>
+        <box width="100%" height="33%" padding="15" layout="vertical-row">
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label id="lap-text" proportion="1" I18N="In the track info screen" text="Number of laps" text_align="right"/>
                 <spacer width="40"/>
@@ -70,17 +70,26 @@
             </div>
             <spacer height="10"/>
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label id="reverse-text" proportion="1" I18N="In the track info screen" text="Drive in reverse" text_align="right"/>
+                <label id="option-text" proportion="1" I18N="In the track info screen" text_align="right"/>
                 <spacer width="40"/>
                 <div proportion="1" height="fit" layout="horizontal-row">
                     <div width="50%" height="fit" text-align="center" layout="vertical-row" >
-                        <checkbox id="reverse" align="center"/>
+                        <checkbox id="option" align="center"/>
                     </div>
                 </div>
             </div>
-            <spacer width="1" height="2%"/>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label id="record-race-text" proportion="1" I18N="In the track info screen" text="Record the race for ghost replay" text_align="right"/>
+                <spacer width="40"/>
+                <div proportion="1" height="fit" layout="horizontal-row">
+                    <div width="50%" height="fit" text-align="center" layout="vertical-row" >
+                        <checkbox id="record" align="center"/>
+                    </div>
+                </div>
+            </div>
+            <spacer width="1" height="1%"/>
         </box>
-        <spacer width="1" height="5%"/>
+        <spacer width="1" height="1%"/>
         <buttonbar id="buttons" height="15%" width="100%" align="center">
             <icon-button id="start" width="64" height="64" icon="gui/green_check.png"
                     I18N="In the track info screen" text="Start Race"/>

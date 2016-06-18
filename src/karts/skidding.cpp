@@ -23,7 +23,6 @@
 #endif
 #include "achievements/achievement_info.hpp"
 #include "config/player_manager.hpp"
-#include "karts/ghost_kart.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_properties.hpp"
@@ -82,7 +81,7 @@ void Skidding::reset()
     
     btVector3 rot(0, 0, 0);
     // Only access the vehicle if the kart is not a ghost
-    if (dynamic_cast<GhostKart*>(m_kart)==NULL)
+    if (!m_kart->isGhostKart())
         m_kart->getVehicle()->setTimedRotation(0, rot);
 }   // reset
 
@@ -416,10 +415,10 @@ void Skidding::update(float dt, bool is_on_ground,
                                              bonus_force, bonus_time,
                                              /*fade-out-time*/ 1.0f);
                     
-                    StateManager::ActivePlayer *c = m_kart->getController()->getPlayer();
-                    if (c && c->getConstProfile() == PlayerManager::getCurrentPlayer())
+                    if (m_kart->getController()->canGetAchievements())
                     {
-                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_SKIDDING, "skidding");
+                        PlayerManager::increaseAchievement(
+                                AchievementInfo::ACHIEVE_SKIDDING, "skidding");
                     }
                 }
                 else {

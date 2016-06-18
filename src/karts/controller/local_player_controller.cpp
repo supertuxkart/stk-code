@@ -20,6 +20,7 @@
 #include "karts/controller/local_player_controller.hpp"
 
 #include "audio/sfx_base.hpp"
+#include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
@@ -36,7 +37,7 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/network_world.hpp"
+#include "network/race_event_manager.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "utils/constants.hpp"
@@ -52,8 +53,12 @@
  */
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player)
-                     : PlayerController(kart, player)
+                     : PlayerController(kart)
 {
+    m_player = player;
+    if(player)
+        player->setKart(kart);
+
     // Keep a pointer to the camera to remove the need to search for
     // the right camera once per frame later.
     m_camera       = Camera::createCamera(kart);
@@ -116,9 +121,9 @@ void LocalPlayerController::action(PlayerAction action, int value)
     // If this is a client, send the action to the server
     if (World::getWorld()->isNetworkWorld()      && 
         NetworkConfig::get()->isClient()         &&
-        NetworkWorld::getInstance()->isRunning()    )
+        RaceEventManager::getInstance()->isRunning()    )
     {
-        NetworkWorld::getInstance()->controllerAction(this, action, value);
+        RaceEventManager::getInstance()->controllerAction(this, action, value);
     }
 
 }   // action
@@ -309,3 +314,15 @@ void LocalPlayerController::collectedItem(const Item &item, int add_info,
         }
     }
 }   // collectedItem
+
+// ----------------------------------------------------------------------------
+/** Returns true if the player of this controller can collect achievements.
+ *  At the moment only the current player can collect them.
+ *  TODO: check this, possible all local players should be able to
+ *        collect achievements - synching to online account will happen
+ *        next time the account gets online.
+ */
+bool LocalPlayerController::canGetAchievements() const 
+{
+    return m_player->getConstProfile() == PlayerManager::getCurrentPlayer();
+}   // canGetAchievements

@@ -28,6 +28,8 @@
 
 #include <enet/enet.h>
 
+#include <vector>
+
 class NetworkPlayerProfile;
 class NetworkString;
 class TransportAddress;
@@ -42,19 +44,23 @@ protected:
     /** Pointer to the corresponding ENet peer data structure. */
     ENetPeer* m_enet_peer;
 
-    NetworkPlayerProfile* m_player_profile;
-
     /** The token of this client. */
     uint32_t m_client_server_token;
 
     /** True if the token for this peer has been set. */
     bool m_token_set;
 
+    /** Host id of this peer. */
+    int m_host_id;
+
+    /** True if this peer is authorised to control a server. */
+    bool m_is_authorised;
 public:
              STKPeer(ENetPeer *enet_peer);
     virtual ~STKPeer();
 
-    virtual void sendPacket(const NetworkString& data, bool reliable = true);
+    virtual void sendPacket(NetworkString *data,
+                            bool reliable = true);
     void disconnect();
     bool isConnected() const;
     bool exists() const;
@@ -62,7 +68,7 @@ public:
     uint16_t getPort() const;
     bool isSamePeer(const STKPeer* peer) const;
     bool isSamePeer(const ENetPeer* peer) const;
-
+    std::vector<NetworkPlayerProfile*> getAllPlayerProfiles();
     // ------------------------------------------------------------------------
     /** Sets the token for this client. */
     void setClientServerToken(const uint32_t& token)
@@ -73,23 +79,27 @@ public:
     // ------------------------------------------------------------------------
     void unsetClientServerToken() { m_token_set = false; }
     // ------------------------------------------------------------------------
-    void setPlayerProfile(NetworkPlayerProfile* profile)
-    {
-        m_player_profile = profile; 
-    }   // setPlayerProfile
-    // ------------------------------------------------------------------------
-    /** Returns the player profile of this peer. */
-    NetworkPlayerProfile* getPlayerProfile() 
-    {
-        return m_player_profile;
-    }   // getPlayerProfile
-    // ------------------------------------------------------------------------
     /** Returns the token of this client. */
     uint32_t getClientServerToken() const { return m_client_server_token; }
     // ------------------------------------------------------------------------
     /** Returns if the token for this client is known. */
     bool isClientServerTokenSet() const { return m_token_set; }
-
+    // ------------------------------------------------------------------------
+    /** Sets the host if of this peer. */
+    void setHostId(int host_id) { m_host_id = host_id; }
+    // ------------------------------------------------------------------------
+    /** Returns the host id of this peer. */
+    int getHostId() const { return m_host_id; }
+    // ------------------------------------------------------------------------
+    /** Sets if this peer is authorised to control the server. */
+    void setAuthorised(bool authorised) { m_is_authorised = authorised; }
+    // ------------------------------------------------------------------------
+    /** Returns if this peer is authorised to control the server. The server
+     *  uses this to check if a peer is allowed certain commands; and a client
+     *  uses this function (in which case this peer is actually the server
+     *  peer) to see if this client is allowed certain command (i.e. to
+     *  display additional GUI elements). */
+    bool isAuthorised() const { return m_is_authorised; }
 };   // STKPeer
 
 #endif // STK_PEER_HPP

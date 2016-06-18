@@ -48,8 +48,8 @@ class GrandPrixEditorScreen :
     void showEditScreen(GrandPrixData* gp);
     void enableButtons();
 
-    void onNewGPWithName(const irr::core::stringw& newName);
-    void onConfirm();
+    void onNewGPWithName(const irr::core::stringw& newName) OVERRIDE;
+    void onConfirm() OVERRIDE;
 
     static const core::stringw getGroupName(enum GrandPrixData::GPGroupType group);
 

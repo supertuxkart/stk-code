@@ -35,7 +35,7 @@ protected:
     void saveGPButton();
 
     /** implement callback from INewGPListener */
-    void onNewGPWithName(const irr::core::stringw& name);
+    void onNewGPWithName(const irr::core::stringw& name) OVERRIDE;
 
     // implement callbacks from parent class GUIEngine::Screen
     void eventCallback(GUIEngine::Widget* widget,

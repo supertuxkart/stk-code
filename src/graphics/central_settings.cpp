@@ -46,6 +46,7 @@ void CentralVideoSettings::init()
     hasMultiDrawIndirect = false;
     hasTextureCompression = false;
     hasUBO = false;
+    hasExplicitAttribLocation = false;
     hasGS = false;
 
     m_GI_has_artifact = false;
@@ -154,10 +155,15 @@ void CentralVideoSettings::init()
             hasUBO = true;
             Log::info("GLDriver", "ARB Uniform Buffer Object Present");
         }
-        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GEOMETRY_SHADER4) &&
-            hasGLExtension("GL_ARB_geometry_shader4")) {
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXPLICIT_ATTRIB_LOCATION) &&
+            hasGLExtension("GL_ARB_explicit_attrib_location")) {
+            hasExplicitAttribLocation = true;
+            Log::info("GLDriver", "ARB Explicit Attrib Location Present");
+        }
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GEOMETRY_SHADER) &&
+            (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 2))) {
             hasGS = true;
-            Log::info("GLDriver", "ARB Geometry Shader 4 Present");
+            Log::info("GLDriver", "Geometry Shaders Present");
         }
 
         // Only unset the high def textures if they are set as default. If the
@@ -229,7 +235,7 @@ bool CentralVideoSettings::needsSRGBCapableVisualWorkaround() const
     return m_need_srgb_visual_workaround;
 }
 
-bool CentralVideoSettings::isARBGeometryShader4Usable() const
+bool CentralVideoSettings::isARBGeometryShadersUsable() const
 {
     return hasGS;
 }
@@ -237,6 +243,11 @@ bool CentralVideoSettings::isARBGeometryShader4Usable() const
 bool CentralVideoSettings::isARBUniformBufferObjectUsable() const
 {
     return hasUBO;
+}
+
+bool CentralVideoSettings::isARBExplicitAttribLocationUsable() const
+{
+    return hasExplicitAttribLocation;
 }
 
 bool CentralVideoSettings::isEXTTextureCompressionS3TCUsable() const
@@ -311,12 +322,12 @@ bool CentralVideoSettings::isARBMultiDrawIndirectUsable() const
 
 bool CentralVideoSettings::supportsShadows() const
 {
-    return isARBGeometryShader4Usable() && isARBUniformBufferObjectUsable();
+    return isARBGeometryShadersUsable() && isARBUniformBufferObjectUsable() && isARBExplicitAttribLocationUsable();
 }
 
 bool CentralVideoSettings::supportsGlobalIllumination() const
 {
-    return isARBGeometryShader4Usable() && isARBUniformBufferObjectUsable() && !m_GI_has_artifact;
+    return isARBGeometryShadersUsable() && isARBUniformBufferObjectUsable() && isARBExplicitAttribLocationUsable() && !m_GI_has_artifact;
 }
 
 bool CentralVideoSettings::supportsIndirectInstancingRendering() const

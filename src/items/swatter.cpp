@@ -302,13 +302,11 @@ void Swatter::squashThingsAround()
     m_closest_kart->setSquash(kp->getSwatterSquashDuration(),
         kp->getSwatterSquashSlowdown());
 
-    //Handle achievement if the swatter is used by the current player
-    const StateManager::ActivePlayer *const ap = m_kart->getController()
-        ->getPlayer();
-    if (ap && ap->getConstProfile() == PlayerManager::getCurrentPlayer())
+    // Handle achievement if the swatter is used by the current player
+    if (m_kart->getController()->canGetAchievements())
     {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MOSQUITO,
-            "swatter", 1);
+                                           "swatter", 1);
     }
 
     if (m_closest_kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
@@ -320,7 +318,11 @@ void Swatter::squashThingsAround()
         projectile_manager->addHitEffect(he);
         ExplosionAnimation::create(m_closest_kart);
     }   // if kart has bomb attached
-    World::getWorld()->kartHit(m_closest_kart->getWorldKartId());
+    if (m_closest_kart->isSquashed())
+    {
+        // The kart may not be squashed if it was protected by a bubblegum shield
+        World::getWorld()->kartHit(m_closest_kart->getWorldKartId());
+    }
 
     // TODO: squash items
 }   // squashThingsAround

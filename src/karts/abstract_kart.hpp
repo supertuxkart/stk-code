@@ -19,6 +19,7 @@
 #ifndef HEADER_ABSTRACT_KART_HPP
 #define HEADER_ABSTRACT_KART_HPP
 
+#include <EMaterialTypes.h>
 #include <memory>
 
 #include "items/powerup_manager.hpp"
@@ -40,12 +41,14 @@ class btKart;
 class btQuaternion;
 class Controller;
 class Item;
+class KartGFX;
 class KartModel;
 class KartProperties;
 class Material;
 class Powerup;
 class Skidding;
 class SlipStream;
+class TerrainInfo;
 
 /** An abstract interface for the actual karts. Some functions are actually
  *  implemented here in order to allow inlining.
@@ -96,7 +99,8 @@ public:
                    AbstractKart(const std::string& ident,
                                 int world_kart_id,
                                 int position, const btTransform& init_transform,
-                                PerPlayerDifficulty difficulty);
+                                PerPlayerDifficulty difficulty,
+                                video::E_RENDER_TYPE rt);
     virtual       ~AbstractKart();
     virtual core::stringw getName() const;
     virtual void   reset();
@@ -247,7 +251,7 @@ public:
     /** Marks this kart to be eliminated. */
     virtual void eliminate() = 0;
     // ------------------------------------------------------------------------
-    virtual void finishedRace(float time) = 0;
+    virtual void finishedRace(float time, bool from_server=false) = 0;
     // ------------------------------------------------------------------------
     /** Returns the finished time for a kart. */
     virtual float getFinishTime() const = 0;
@@ -375,6 +379,9 @@ public:
     /** Returns the current powerup. */
     virtual Powerup *getPowerup() = 0;
     // ------------------------------------------------------------------------
+    /** Returns a points to this kart's graphical effects. */
+    virtual KartGFX* getKartGFX() = 0;
+    // ------------------------------------------------------------------------
     virtual void setPowerup (PowerupManager::PowerupType t, int n) = 0;
     // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
@@ -421,6 +428,9 @@ public:
     /** Shows the star effect for a certain time. */
     virtual void showStarEffect(float t) = 0;
     // ------------------------------------------------------------------------
+    /** Returns the terrain info oject. */
+    virtual const TerrainInfo *getTerrainInfo() const = 0;
+    // ------------------------------------------------------------------------
     /** Called when the kart crashes against another kart.
      *  \param k The kart that was hit.
      *  \param update_attachments If true the attachment of this kart and the
@@ -450,6 +460,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is a ghost (replay) kart. */
+    virtual bool isGhostKart() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is jumping. */
+    virtual bool isJumping() const = 0;
 
 };   // AbstractKart
 

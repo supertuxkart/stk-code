@@ -100,6 +100,9 @@ private:
     // ------------------------------------------------------------------------
     virtual const bool hasLapLine() const
                                                             { return true;  }
+    // ------------------------------------------------------------------------
+    virtual const bool differentNodeColor(int n, NodeColor* c) const
+                                                            { return false; }
 
 public:
     static const int UNKNOWN_SECTOR;

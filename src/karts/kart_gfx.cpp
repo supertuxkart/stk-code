@@ -391,3 +391,102 @@ void KartGFX::updateSkidLight(unsigned int level)
     m_skidding_light_1->setVisible(level == 1);
     m_skidding_light_2->setVisible(level > 1);
 }   // updateSkidLight
+
+// ----------------------------------------------------------------------------
+void KartGFX::getGFXStatus(int* nitro, bool* zipper,
+                           int* skidding, bool* red_skidding) const
+{
+    int n = 0;
+    bool z = false;
+    int s = 0;
+    bool r = false;
+
+    if (m_all_emitters[KGFX_NITRO1])
+    {
+        n = m_all_emitters[KGFX_NITRO1]->getCreationRate();
+    }
+
+    if (m_all_emitters[KGFX_ZIPPER])
+    {
+        z = m_all_emitters[KGFX_ZIPPER]->getCreationRate() > 0;
+    }
+
+    if (m_all_emitters[KGFX_SKIDL])
+    {
+        s = m_all_emitters[KGFX_SKIDL]->getCreationRate();
+        r = m_skidding_light_2->isVisible();
+    }
+
+    *nitro = n;
+    *zipper = z;
+    *skidding = s;
+    *red_skidding = r;
+
+}   // getGFXStatus
+
+// ----------------------------------------------------------------------------
+void KartGFX::setGFXFromReplay(int nitro, bool zipper,
+                               int skidding, bool red_skidding)
+{
+    if (nitro > 0)
+    {
+        setCreationRateAbsolute(KartGFX::KGFX_NITRO1,      (float)nitro);
+        setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      (float)nitro);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, (float)nitro);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, (float)nitro);
+        m_nitro_light->setVisible(true);
+    }
+    else if (m_nitro_light->isVisible() && nitro == 0)
+    {
+        setCreationRateAbsolute(KartGFX::KGFX_NITRO1,      0.0f);
+        setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      0.0f);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0.0f);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0.0f);
+        m_nitro_light->setVisible(false);
+    }
+
+    if (zipper)
+        setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 800.0f);
+
+    if (skidding > 0)
+    {
+        if (!m_skidding_light_1->isVisible() && !red_skidding)
+        {
+            if (m_all_emitters[KGFX_SKID1L])
+                m_all_emitters[KGFX_SKID1L]->setParticleType(m_skid_kind1);
+            if (m_all_emitters[KGFX_SKID1R])
+                m_all_emitters[KGFX_SKID1R]->setParticleType(m_skid_kind1);
+
+            m_skidding_light_1->setVisible(true);
+            m_skidding_light_2->setVisible(false);
+        }
+        if (!m_skidding_light_2->isVisible() && red_skidding)
+        {
+            if (m_all_emitters[KGFX_SKID1L])
+                m_all_emitters[KGFX_SKID1L]->setParticleType(m_skid_kind2);
+            if (m_all_emitters[KGFX_SKID1R])
+                m_all_emitters[KGFX_SKID1R]->setParticleType(m_skid_kind2);
+
+            m_skidding_light_1->setVisible(false);
+            m_skidding_light_2->setVisible(true);
+        }
+        setCreationRateAbsolute(KartGFX::KGFX_SKIDL, (float)skidding);
+        setCreationRateAbsolute(KartGFX::KGFX_SKIDR, (float)skidding);
+    }
+    else if ((m_skidding_light_1->isVisible() ||
+        m_skidding_light_2->isVisible()) && skidding == 0)
+    {
+        setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0.0f);
+        setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0.0f);
+        m_skidding_light_1->setVisible(false);
+        m_skidding_light_2->setVisible(false);
+    }
+}   // setGFXFromReplay
+
+// ----------------------------------------------------------------------------
+void KartGFX::setGFXInvisible()
+{
+    m_nitro_light->setVisible(false);
+    m_skidding_light_1->setVisible(false);
+    m_skidding_light_2->setVisible(false);
+}   // setGFXInvisible

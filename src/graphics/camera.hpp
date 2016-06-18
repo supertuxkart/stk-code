@@ -51,17 +51,32 @@ class Camera : public NoCopy
 {
 public:
     enum Mode {
-        CM_NORMAL,        //!< Normal camera mode
-        CM_CLOSEUP,       //!< Closer to kart
-        CM_REVERSE,       //!< Looking backwards
-        CM_LEADER_MODE,   //!< for deleted player karts in follow the leader
-        CM_FINAL,         //!< Final camera
+        CM_NORMAL,            //!< Normal camera mode
+        CM_CLOSEUP,           //!< Closer to kart
+        CM_REVERSE,           //!< Looking backwards
+        CM_LEADER_MODE,       //!< for deleted player karts in follow the leader
+        CM_FINAL,             //!< Final camera
         CM_SIMPLE_REPLAY,
         CM_FALLING
-    };
+    };   // Mode
+
+    enum DebugMode {
+        CM_DEBUG_NONE,
+        CM_DEBUG_TOP_OF_KART, //!< Camera hovering over kart
+        CM_DEBUG_GROUND,      //!< Camera at ground level, wheel debugging
+        CM_DEBUG_FPS,         //!< FPS Camera
+        CM_DEBUG_BEHIND_KART, //!< Camera straight behind kart
+        CM_DEBUG_SIDE_OF_KART,//!< Camera to the right of the kart
+    };   // DebugMode
+
 
 private:
     static Camera* s_active_camera;
+
+    /** Special debug camera: 0: normal camera;   1: being high over the kart;
+    2: on ground level; 3: free first person camera; 
+    4: straight behind kart */
+    static DebugMode m_debug_mode;
 
     /** The camera scene node. */
     scene::ICameraSceneNode *m_camera;
@@ -267,16 +282,25 @@ public:
 
     static void readEndCamera(const XMLNode &root);
     static void clearEndCameras();
-    void setMode           (Mode mode_);    /** Set the camera to the given mode */
+    // ------------------------------------------------------------------------
+    static void setDebugMode(DebugMode debug_mode) { m_debug_mode = debug_mode;}
+    // ------------------------------------------------------------------------
+    static bool isDebug() { return m_debug_mode != CM_DEBUG_NONE; }
+    // ------------------------------------------------------------------------
+    static bool isFPS() { return m_debug_mode == CM_DEBUG_FPS; }
+    // ------------------------------------------------------------------------
+
+    void setMode(Mode mode);    /** Set the camera to the given mode */
     Mode getMode();
-    /** Returns the camera index (or player kart index, which is the same). */
-    int  getIndex() const  {return m_index;}
-    void reset             ();
+    void reset();
     void setInitialTransform();
     void activate(bool alsoActivateInIrrlicht=true);
-    void update            (float dt);
+    void update(float dt);
     void setKart(AbstractKart *new_kart);
 
+    // ------------------------------------------------------------------------
+    /** Returns the camera index (or player kart index, which is the same). */
+    int  getIndex() const  {return m_index;}
     // ------------------------------------------------------------------------
     /** Returns the project-view matrix of the previous frame. */
     core::matrix4 getPreviousPVMatrix() const { return m_previous_pv_matrix; }

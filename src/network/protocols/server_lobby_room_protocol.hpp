@@ -13,10 +13,12 @@ private:
     enum
     {
         NONE,
-        GETTING_PUBLIC_ADDRESS,
-        ACCEPTING_CLIENTS,
-        SELECTING_KARTS,
-        DONE,
+        GETTING_PUBLIC_ADDRESS,   // Waiting to receive its public ip address
+        ACCEPTING_CLIENTS,        // In lobby, accepting clients
+        SELECTING,                // kart, track, ... selection started
+        RACING,                   // racing
+        RESULT_DISPLAY,           // Show result screen
+        DONE,                     // shutting down server
         EXITING
     } m_state;
 
@@ -25,10 +27,15 @@ private:
 
     Protocol *m_current_protocol;
     bool m_selection_enabled;
-    bool m_in_race;
+
+    /** Counts how many players are ready to go on. */
+    int m_player_ready_counter;
+
+    /** Timeout counter for showing the result screen. */
+    float m_timeout;
 
     // connection management
-    void kartDisconnected(Event* event);
+    void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
     // kart selection
     void kartSelectionRequested(Event* event);
@@ -39,16 +46,17 @@ private:
     void playerTrackVote(Event* event);
     void playerReversedVote(Event* event);
     void playerLapsVote(Event* event);
+    void playerFinishedResult(Event *event);
     void registerServer();
 
 public:
              ServerLobbyRoomProtocol();
     virtual ~ServerLobbyRoomProtocol();
 
-    virtual bool notifyEventAsynchronous(Event* event);
-    virtual void setup();
-    virtual void update();
-    virtual void asynchronousUpdate() {};
+    virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
+    virtual void setup() OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
+    virtual void asynchronousUpdate() OVERRIDE {};
 
     void startGame();
     void startSelection(const Event *event=NULL);

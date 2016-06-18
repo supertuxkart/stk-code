@@ -174,89 +174,97 @@ void InputManager::handleStaticAction(int key, int value)
         // Moving the first person camera
         case KEY_KEY_W:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.Z = value ? cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            if (world && UserConfigParams::m_artist_debug_mode &&
+                Camera::isFPS()                                   )
+            {
+                Camera *cam = Camera::getActiveCamera();
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Z = value ? cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         case KEY_KEY_S:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.Z = value ? -cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            if (world && UserConfigParams::m_artist_debug_mode && 
+                Camera::isFPS()                                   )
+            {
+                Camera *cam = Camera::getActiveCamera();
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Z = value ? -cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         case KEY_KEY_D:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.X = value ? -cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            if (world && !UserConfigParams::m_artist_debug_mode &&
+                Camera::isFPS()                                     )
+            {
+                Camera *cam = Camera::getActiveCamera();
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.X = value ? -cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         case KEY_KEY_A:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.X = value ? cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            if (world && UserConfigParams::m_artist_debug_mode &&
+                Camera::isFPS()                                   )
+            {
+                Camera *cam = Camera::getActiveCamera();
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.X = value ? cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         case KEY_KEY_R:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.Y = value ? cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            if (world && UserConfigParams::m_artist_debug_mode &&
+                Camera::isFPS()                                   )
+            {
+                Camera *cam = Camera::getActiveCamera();
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Y = value ? cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         case KEY_KEY_F:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *cam = Camera::getActiveCamera();
-            core::vector3df vel(cam->getLinearVelocity());
-            vel.Y = value ? -cam->getMaximumVelocity() : 0;
-            cam->setLinearVelocity(vel);
+            if (world && UserConfigParams::m_artist_debug_mode &&
+                Camera::isFPS()                                   )
+            {
+                Camera *cam = Camera::getActiveCamera();
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Y = value ? -cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
             break;
         }
         // Rotating the first person camera
         case KEY_KEY_Q:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *active_cam = Camera::getActiveCamera();
-            active_cam->setAngularVelocity(value ?
-                UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
+            if (world && UserConfigParams::m_artist_debug_mode &&
+                Camera::isFPS()                                   )
+            {
+                Camera *active_cam = Camera::getActiveCamera();
+                active_cam->setAngularVelocity(value ?
+                    UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
+            }
             break;
         }
         case KEY_KEY_E:
         {
-            if (!world || !UserConfigParams::m_artist_debug_mode ||
-                UserConfigParams::m_camera_debug != 3) break;
-
-            Camera *active_cam = Camera::getActiveCamera();
-            active_cam->setAngularVelocity(value ?
-                -UserConfigParams::m_fpscam_max_angular_velocity : 0);
+            if (world && UserConfigParams::m_artist_debug_mode &&
+                Camera::isFPS()                                   )
+            {
+                Camera *active_cam = Camera::getActiveCamera();
+                active_cam->setAngularVelocity(value ?
+                    -UserConfigParams::m_fpscam_max_angular_velocity : 0);
+            }
             break;
         }
 
@@ -367,8 +375,8 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F10:
             if(world && value)
             {
-                if(control_is_pressed && ReplayRecorder::get())
-                    ReplayRecorder::get()->Save();
+                if(control_is_pressed)
+                    ReplayRecorder::get()->save();
                 else
                     history->Save();
             }
@@ -710,7 +718,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
         // ... when in-game
         if (StateManager::get()->getGameState() == GUIEngine::GAME &&
-             !GUIEngine::ModalDialog::isADialogActive()                  )
+             !GUIEngine::ModalDialog::isADialogActive()            &&
+             !race_manager->isWatchingReplay() )
         {
             if (player == NULL)
             {
@@ -730,6 +739,12 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
             Controller* controller = pk->getController();
             if (controller != NULL) controller->action(action, abs(value));
+        }
+        else if (race_manager->isWatchingReplay())
+        {
+            // Get the first ghost kart
+            World::getWorld()->getKart(0)
+                ->getController()->action(action, abs(value));
         }
         // ... when in menus
         else
@@ -994,7 +1009,7 @@ EventPropagation InputManager::input(const SEvent& event)
 
         if (type == EMIE_MOUSE_MOVED)
         {
-            if (UserConfigParams::m_camera_debug == 3)
+            if (Camera::isFPS())
             {
                 Camera *cam = Camera::getActiveCamera();
                 // Center of the screen
@@ -1049,7 +1064,7 @@ EventPropagation InputManager::input(const SEvent& event)
         }
         else if (type == EMIE_MOUSE_WHEEL)
         {
-            if (UserConfigParams::m_camera_debug == 3)
+            if (Camera::isFPS())
             {
                 // Use scrolling to change the maximum speed
                 // Only test if it's more or less than 0 as it seems to be not

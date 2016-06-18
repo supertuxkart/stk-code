@@ -38,11 +38,9 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
-PlayerController::PlayerController(AbstractKart *kart,
-                                   StateManager::ActivePlayer *player)
-                : Controller(kart, player)
+PlayerController::PlayerController(AbstractKart *kart)
+                : Controller(kart)
 {
-    assert(player != NULL);
     m_penalty_time = 0.0f;
 }   // PlayerController
 

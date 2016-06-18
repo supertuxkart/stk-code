@@ -682,15 +682,15 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) con
     }
     if (speed > m_sfx_max_speed)
     {
-        assert(!isnan(m_sfx_max_speed));
+        assert(!std::isnan(m_sfx_max_speed));
         sfx->setSpeed(m_sfx_max_pitch);
         return;
     }
 
-    assert(!isnan(speed));
+    assert(!std::isnan(speed));
 
     float f = m_sfx_pitch_per_speed*(speed-m_sfx_min_speed) + m_sfx_min_pitch;
-    assert(!isnan(f));
+    assert(!std::isnan(f));
     sfx->setSpeed(f);
 }   // setSFXSpeed
 
@@ -965,6 +965,21 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->ColorMaterial = video::ECM_NONE; // Override one above
     }
 #endif
+
+
+    if (race_manager->getReverseTrack() &&
+        m_mirror_axis_when_reverse != ' ')
+    {
+        irr::video::S3DVertex* mbVertices = (video::S3DVertex*)mb->getVertices();
+        for (unsigned int i = 0; i < mb->getVertexCount(); i++)
+        {
+            core::vector2df &tc = mb->getTCoords(i);
+            if (m_mirror_axis_when_reverse == 'V')
+                tc.Y = 1 - tc.Y;
+            else
+                tc.X = 1 - tc.X;
+        }
+    }   // reverse track and texture needs mirroring
 
 } // setMaterialProperties
 

@@ -22,11 +22,11 @@
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "modes/demo_world.hpp"
 #include "network/network_config.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
@@ -69,7 +69,6 @@ void CreateServerScreen::loadedFromFile()
     assert(m_create_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
-
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -91,6 +90,17 @@ void CreateServerScreen::init()
                              : PlayerManager::getCurrentOnlineUserName()
                              )
                           );
+
+
+    // -- Difficulty
+    RibbonWidget* difficulty = getWidget<RibbonWidget>("difficulty");
+    assert(difficulty != NULL);
+    difficulty->setSelection(UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER);
+
+    // -- Game modes
+    RibbonWidget* gamemode = getWidget<RibbonWidget>("gamemode");
+    assert(gamemode != NULL);
+    gamemode->setSelection(0, PLAYER_ID_GAME_MASTER);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -138,7 +148,7 @@ void CreateServerScreen::onUpdate(float delta)
 
     // Otherwise wait till we get an answer from the server:
     // -----------------------------------------------------
-    if(!STKHost::get()->isRegistered())
+    if(!STKHost::get()->isRegistered() && !NetworkConfig::get()->isLAN())
     {
         m_info_widget->setDefaultColor();
         m_info_widget->setText(StringUtils::loadingDots(_("Creating server")),
@@ -161,6 +171,10 @@ void CreateServerScreen::createServer()
     const irr::core::stringw name = m_name_widget->getText().trim();
     const int max_players = m_max_players_widget->getValue();
     m_info_widget->setErrorColor();
+
+    RibbonWidget* difficulty_widget = getWidget<RibbonWidget>("difficulty");
+    RibbonWidget* gamemode_widget = getWidget<RibbonWidget>("gamemode");
+
     if (name.size() < 4 || name.size() > 30)
     {
         m_info_widget->setText(
@@ -196,9 +210,20 @@ void CreateServerScreen::createServer()
     // FIXME: Add the following fields to the create server screen
     // FIXME: Long term we might add a 'vote' option (e.g. GP vs single race,
     // and normal vs FTL vs time trial could be voted about).
-    race_manager->setDifficulty(RaceManager::convertDifficulty("hard"));
+    std::string difficulty = difficulty_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    race_manager->setDifficulty(RaceManager::convertDifficulty(difficulty));
     race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
-    race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+
+    std::string game_mode = gamemode_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    if (game_mode == "timetrial")
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+    else
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+
+    core::stringw password_w = getWidget<TextBoxWidget>("password")->getText();
+    std::string password(core::stringc(password_w.c_str()).c_str());
+    NetworkConfig::get()->setPassword(password);
+
     race_manager->setReverseTrack(false);
     STKHost::create();
 

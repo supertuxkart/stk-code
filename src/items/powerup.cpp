@@ -174,9 +174,8 @@ void Powerup::use()
     const KartProperties *kp = m_owner->getKartProperties();
 
     // The player gets an achievement point for using a powerup
-    StateManager::ActivePlayer * player = m_owner->getController()->getPlayer();
-    if (m_type != PowerupManager::POWERUP_NOTHING &&
-        player != NULL && player->getConstProfile() == PlayerManager::getCurrentPlayer())
+    if (m_type != PowerupManager::POWERUP_NOTHING      &&
+        m_owner->getController()->canGetAchievements()    )
     {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER, "poweruplover");
     }
@@ -295,7 +294,7 @@ void Powerup::use()
         for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
         {
             AbstractKart *kart=world->getKart(i);
-            if(kart->isEliminated()) continue;
+            if(kart->isEliminated() || kart->isInvulnerable()) continue;
             if(kart == m_owner) continue;
             if(kart->getPosition() == 1)
             {
@@ -329,7 +328,7 @@ void Powerup::use()
             for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
             {
                 AbstractKart *kart=world->getKart(i);
-                if(kart->isEliminated() || kart== m_owner) continue;
+                if(kart->isEliminated() || kart== m_owner || kart->isInvulnerable()) continue;
                 if(kart->isShielded())
                 {
                     kart->decreaseShieldTime();

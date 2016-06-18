@@ -112,14 +112,14 @@ namespace Scripting
                 scene::ISceneManager* sm = irr_driver->getSceneManager();
                 scene::ISceneNode* sn =
                     sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
-                    wtext.c_str(),
-                    NULL,
-                    core::dimension2df(textsize.Width / 35.0f,
-                    textsize.Height / 35.0f),
-                    xyz,
-                    -1, // id
-                    GUIEngine::getSkin()->getColor("font::bottom"),
-                    GUIEngine::getSkin()->getColor("font::top"));
+                        wtext.c_str(),
+                        NULL,
+                        core::dimension2df(textsize.Width / 35.0f,
+                            textsize.Height / 35.0f),
+                        xyz,
+                        -1, // id
+                        GUIEngine::getSkin()->getColor("font::bottom"),
+                        GUIEngine::getSkin()->getColor("font::top"));
                 World::getWorld()->getTrack()->addNode(sn);
             }
         }
@@ -143,6 +143,11 @@ namespace Scripting
         int getNumLocalPlayers()
         {
             return race_manager->getNumLocalPlayers();
+        }
+
+        bool isTrackReverse()
+        {
+            return race_manager->getReverseTrack();
         }
 
         void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)
@@ -377,6 +382,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)", asFUNCTION(setFog), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("int getNumberOfKarts()", asFUNCTION(getNumberOfKarts), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("int getNumLocalPlayers()", asFUNCTION(getNumLocalPlayers), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("bool isReverse()", asFUNCTION(isTrackReverse), asCALL_CDECL); assert(r >= 0);
 
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", asMETHOD(::TrackObject, setEnabled), asCALL_THISCALL); assert(r >= 0);

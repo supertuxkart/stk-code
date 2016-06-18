@@ -23,8 +23,10 @@
 #define STK_HOST_HPP
 
 #include "network/network.hpp"
+#include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/servers_manager.hpp"
+#include "network/stk_peer.hpp"
 #include "network/transport_address.hpp"
 #include "utils/synchronised.hpp"
 
@@ -40,7 +42,6 @@
 
 class GameSetup;
 class NetworkConsole;
-class STKPeer;
 
 class STKHost
 {
@@ -74,6 +75,12 @@ private:
     /** The list of peers connected to this instance. */
     std::vector<STKPeer*> m_peers;
 
+    /** Next unique host id. It is increased whenever a new peer is added (see
+     *  getPeer()), but not decreased whena host (=peer) disconnects. This
+     *  results in a unique host id for each host, even when a host should
+     *  disconnect and then reconnect. */
+    int m_next_unique_host_id;
+
     /** Host id of this host. */
     uint8_t m_host_id;
 
@@ -105,6 +112,10 @@ private:
     void handleLANRequests();
 
 public:
+    /** If a network console should be started. Note that the console can cause
+    *  a crash in release mode on windows (see #1529). */
+    static bool m_enable_console;
+
 
     /** Creates the STKHost. It takes all confifguration parameters from
      *  NetworkConfig. This STKHost can either be a client or a server.
@@ -139,9 +150,8 @@ public:
     void requestShutdown();
     void shutdown();
 
-    void sendMessage(const NetworkString& data, bool reliable = true);
     void sendPacketExcept(STKPeer* peer,
-                          const NetworkString& data,
+                          NetworkString *data,
                           bool reliable = true);
     void        setupClient(int peer_count, int channel_limit,
                             uint32_t max_incoming_bandwidth,
@@ -152,11 +162,11 @@ public:
     void        removePeer(const STKPeer* peer);
     bool        isConnectedTo(const TransportAddress& peer_address);
     STKPeer    *getPeer(ENetPeer *enet_peer);
+    std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
     int         mustStopListening();
     uint16_t    getPort() const;
     void        setErrorMessage(const irr::core::stringw &message);
     bool        isAuthorisedToControl() const;
-    bool        isAuthorisedToControl(const STKPeer *peer) const;
     const irr::core::stringw& 
                 getErrorMessage() const;
 
@@ -176,17 +186,10 @@ public:
     }   // receiveRawPacket
 
     // --------------------------------------------------------------------
-    void broadcastPacket(const NetworkString& data,
-                         bool reliable = true)
-    {
-        m_network->broadcastPacket(data, reliable);
-    }   // broadcastPacket
-
-    // --------------------------------------------------------------------
-    void sendRawPacket(uint8_t* data, int length,
+    void sendRawPacket(const BareNetworkString &buffer,
                        const TransportAddress& dst)
     {
-        m_network->sendRawPacket(data, length, dst);
+        m_network->sendRawPacket(buffer, dst);
     }  // sendRawPacket
 
     // --------------------------------------------------------------------
@@ -200,6 +203,13 @@ public:
     // --------------------------------------------------------------------
     /** Returns a const reference to the list of peers. */
     const std::vector<STKPeer*> &getPeers() { return m_peers; }
+    // --------------------------------------------------------------------
+    /** Returns the next (unique) host id. */
+    unsigned int getNextHostId() const
+    {
+        assert(m_next_unique_host_id >= 0);
+        return m_next_unique_host_id;
+    }
     // --------------------------------------------------------------------
     /** Returns the number of currently connected peers. */
     unsigned int getPeerCount() { return (int)m_peers.size(); }
@@ -222,6 +232,12 @@ public:
     /** Returns the host id of this host. */
     uint8_t getMyHostId() const { return m_host_id; }
     // --------------------------------------------------------------------
+    /** Sends a message from a client to the server. */
+    void sendToServer(NetworkString *data, bool reliable = true)
+    {
+        assert(NetworkConfig::get()->isClient());
+        m_peers[0]->sendPacket(data, reliable);
+    }   // sendToServer
 };   // class STKHost
 
 #endif // STK_HOST_HPP

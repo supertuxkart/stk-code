@@ -52,8 +52,8 @@ public:
     void setFadeLevel(float level) { m_fade_level = level; }
     void setSubtitle(const core::stringw& subtitle) { m_subtitle = subtitle; }
 
-    virtual void renderGlobal(float dt);
-    virtual void renderPlayerView(const Camera *camera, float dt){}
+    virtual void renderGlobal(float dt) OVERRIDE;
+    virtual void renderPlayerView(const Camera *camera, float dt) OVERRIDE {}
 
     virtual const core::dimension2du getMiniMapSize() const OVERRIDE
     {

@@ -234,17 +234,8 @@ uint8_t RaceVote::getLapsVote(uint8_t track_number) const
 
 RaceConfig::RaceConfig()
 {
-    setMaxPlayerCount(NetworkConfig::get()->getMaxPlayers());
+    m_max_players = NetworkConfig::get()->getMaxPlayers();
 }   // RaceConfig
-
-//-----------------------------------------------------------------------------
-/** Sets the maximum number of players.
- */
-void RaceConfig::setMaxPlayerCount(uint8_t count)
-{
-    m_max_players = count;
-    m_votes.resize(m_max_players);
-}   // setMaxPlayerCount
 
 //-----------------------------------------------------------------------------
 void RaceConfig::setPlayerMajorVote(uint8_t player_id, uint32_t major)
@@ -389,7 +380,7 @@ void RaceConfig::computeNextTrack()
                     tracks_histogram[m_votes[i].getTrackVote()] = 1;
                 }
             }
-            else if (m_votes[i].hasVotedReversed())
+            if (m_votes[i].hasVotedReversed())
             {
                 try // reversed
                 {
@@ -400,7 +391,7 @@ void RaceConfig::computeNextTrack()
                     reversed_histogram[m_votes[i].getReversedVote()] = 1;
                 }
             }
-            else if (m_votes[i].hasVotedLaps())
+            if (m_votes[i].hasVotedLaps())
             {
                 try // laps
                 {
@@ -451,10 +442,11 @@ int RaceConfig::getNumTrackVotes() const
 {
     int count = 0;
 
-    for (unsigned int i = 0; i < m_max_players; i++)
+    for (auto entry : m_votes)
     {
-        if (m_votes[i].hasVotedTrack())
-            count ++;
+        if (entry.second.hasVotedTrack())
+            count++;
     }
+
     return count;
 }   // getNumTrackVotes

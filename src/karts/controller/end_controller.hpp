@@ -82,18 +82,38 @@ private:
     int           calcSteps();
     virtual bool  canSkid(float steer_fraction) { return false; }
 public:
-                  EndController(AbstractKart *kart,
-                                StateManager::ActivePlayer* player,
-                                Controller *prev_controller);
-                 ~EndController();
-    virtual void  update      (float delta) ;
-    virtual void  reset       ();
+                 EndController(AbstractKart *kart,
+                               Controller *prev_controller);
+                ~EndController();
+    virtual void update      (float delta) ;
+    virtual void reset       ();
+    virtual void action      (PlayerAction action, int value);
+    virtual void newLap      (int lap);
+    // ------------------------------------------------------------------------
+    virtual bool canGetAchievements() const
+    {
+        return m_previous_controller->canGetAchievements();
+    }   // canGetAchievements
+    // ------------------------------------------------------------------------
     /** Returns if the original controller of the kart was a player
      *  controller. This way e.g. highscores can still be assigned
      *  to the right player. */
-    virtual bool  isPlayerController () const { return getPlayer() != NULL; }
-    virtual void  action             (PlayerAction action, int value);
-    virtual void  newLap             (int lap);
+    virtual bool isPlayerController () const
+    {
+        return m_previous_controller->isPlayerController();
+    }   // isPlayerController
+    // ------------------------------------------------------------------------
+    /** Returns if the original controller of the kart was a local player
+    *  controller. This way e.g. highscores can still be assigned
+    *  to the right player. */
+    virtual bool isLocalPlayerController () const
+    {
+        return m_previous_controller->isLocalPlayerController();
+    }   // isLocalPlayerController
+    // ------------------------------------------------------------------------
+    /** Returns the name of the previous controller (which has the right
+     *  player name associated). */
+    core::stringw getName() const { return m_previous_controller->getName(); }
 
 };   // EndKart
 

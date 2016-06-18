@@ -52,7 +52,7 @@ GameSetup::~GameSetup()
 void GameSetup::addPlayer(NetworkPlayerProfile* profile)
 {
     m_players.push_back(profile);
-    Log::info("GameSetup", "New player in the game setup. Race id : %d.",
+    Log::info("GameSetup", "New player in the game setup. Player id : %d.",
               profile->getGlobalPlayerId());
 }   // addPlayer
 
@@ -194,6 +194,25 @@ const NetworkPlayerProfile* GameSetup::getProfile(const std::string &kart_name)
     }
     return NULL;
 }   // getProfile(kart_name)
+
+//-----------------------------------------------------------------------------
+/** Returns the list of all player profiles from a specified host. Note that
+ *  this function is somewhat expensive (it loops over all network profiles
+ *  to find the ones with the specified host id).
+ *  \param host_id The host id which players should be collected.
+ *  \return List of NetworkPlayerProfile pointers/
+ */
+std::vector<NetworkPlayerProfile*> GameSetup::getAllPlayersOnHost(uint8_t host_id)
+{
+    std::vector<NetworkPlayerProfile*> result;
+
+    for (unsigned int i = 0; i < m_players.size(); i++)
+    {
+        if (m_players[i]->getHostId() == host_id)
+            result.push_back(m_players[i]);
+    }
+    return result;
+}   // getAllPlayersOnHost
 
 //-----------------------------------------------------------------------------
 

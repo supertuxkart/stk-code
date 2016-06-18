@@ -100,6 +100,7 @@ namespace GUIEngine
             const std::vector<int>& model_frames);
 
         void drawRTTScene(const irr::core::rect<s32>& dest_rect) const;
+
     };
     
 }

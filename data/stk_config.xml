@@ -396,13 +396,6 @@
          post-skid-rotate-factor="1"
          reduce-turn-min="0.2" reduce-turn-max="0.8"/>
 
-     <!-- Leaning related parameters, i.e. slightly leaning the karts when
-          driving a fast curve.
-          max: maximum leaning (i.e. when steering as much as possible at highest
-               speed), in degrees.
-          sped: Speed with which the leaning changes (in degree/second). -->
-     <lean    max="8.6"  speed="5.0" />
-
      <kart-type>
          <light />
          <medium />

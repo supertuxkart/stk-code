@@ -63,4 +63,3 @@ bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode
     return false;
 }
 
-

@@ -47,7 +47,7 @@ script:
 notifications:
   irc:
     channels:
-      - "irc.freenode.org#stk"
+      - "irc.freenode.org#supertuxkart"
     skip_join: false
     use_notice: true
     template:

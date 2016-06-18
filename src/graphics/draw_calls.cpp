@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/draw_calls.hpp"
+#include "config/user_config.hpp"
 #include "graphics/draw_tools.hpp"
 #include "graphics/gpu_particles.hpp"
 #include "graphics/lod_node.hpp"
@@ -766,7 +767,8 @@ void DrawCalls::multidrawReflectiveShadowMaps(const core::matrix4 &rsm_matrix) c
 // ----------------------------------------------------------------------------
  /** Render glowing objects.
  * Require at least OpenGL 4.0
- * or GL_ARB_base_instance and GL_ARB_draw_indirect extensions)
+ * or GL_ARB_base_instance, GL_ARB_draw_indirect
+ *    and GL_ARB_explicit_attrib_location extensions
  */
 void DrawCalls::drawIndirectGlow() const
 {

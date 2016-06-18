@@ -40,7 +40,7 @@ void main(void)
     float bl = 0.0;
     float m = log2(r) + 6 + log2(invSamples);
 
-    float theta = 2. * 3.14 * tau * .5 * invSamples + phi;
+    float theta = mod(2. * 3.14 * tau * .5 * invSamples + phi, 6.283185307179586);
     vec2 rotations = vec2(cos(theta), sin(theta)) * screen;
     vec2 offset = vec2(cos(invSamples), sin(invSamples));
 

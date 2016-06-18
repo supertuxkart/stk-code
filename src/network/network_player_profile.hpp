@@ -57,9 +57,10 @@ private:
     /** Per player difficulty. */
     PerPlayerDifficulty m_per_player_difficulty;
 public:
-         NetworkPlayerProfile(int global_player_id,
-                              const irr::core::stringw &name);
+         NetworkPlayerProfile(const irr::core::stringw &name,
+                              int global_player_id, int host_id);
         ~NetworkPlayerProfile();
+    bool isLocalPlayer() const;
 
     // ------------------------------------------------------------------------
     /** Sets the global player id of this player. */
@@ -67,9 +68,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the global ID of this player in this race. */
     int getGlobalPlayerId() const { return m_global_player_id; }
-    // ------------------------------------------------------------------------
-    /** Sets the host id of this player. */
-    void setHostId(int host_id) { m_host_id = host_id; }
     // ------------------------------------------------------------------------
     /** Returns the host id of this player. */
     uint8_t getHostId() const { return m_host_id; }

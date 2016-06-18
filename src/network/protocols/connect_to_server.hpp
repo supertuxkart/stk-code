@@ -61,9 +61,9 @@ public:
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
-    virtual void asynchronousUpdate();
-    virtual void callback(Protocol *protocol);
-    virtual void update() OVERRIDE {}
+    virtual void asynchronousUpdate() OVERRIDE;
+    virtual void callback(Protocol *protocol) OVERRIDE;
+    virtual void update(float dt) OVERRIDE {}
     void setServerAddress(const TransportAddress &address);
 };   // class ConnectToServer
 

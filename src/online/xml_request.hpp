@@ -42,11 +42,12 @@ namespace Online
         /** On a successful download contains the converted XML tree. */
         XMLNode *m_xml_data;
 
-        /** Additional info contained the downloaded data (or an error
-         *  message if a problem occurred). */
-        irr::core::stringw m_info;
-
     protected:
+
+		/** Additional info contained the downloaded data (or an error
+		*  message if a problem occurred). */
+		irr::core::stringw m_info;
+
         /** True if the request was successful executed on the server. */
         bool m_success;
 

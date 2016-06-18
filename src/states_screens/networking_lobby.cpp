@@ -23,6 +23,7 @@
 #include <iostream>
 
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -35,9 +36,9 @@
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/translation.hpp"
@@ -47,11 +48,22 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 
+/** This is the lobby screen that is shown on all clients, but not on the
+ *  server. It shows currently connected clients, and allows the 'master'
+ *  client (i.e. the stk instance that created the server) to control the
+ *  server. This especially means that it can initialise the actual start
+ *  of the racing.
+ *  This class is responsible for creating the ActivePlayers data structure
+ *  for all local players (the ActivePlayer maps device to player, i.e.
+ *  controls which device is used by which player). Note that a server
+ *  does not create an instance of this class and will create the ActivePlayer
+ *  data structure in the StartGameProtocol.
+ */
 // ----------------------------------------------------------------------------
-
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
-    m_server = NULL;
+    m_server      = NULL;
+    m_player_list = NULL;
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------
@@ -66,6 +78,12 @@ void NetworkingLobby::loadedFromFile()
 
     m_server_name_widget = getWidget<LabelWidget>("server_name");
     assert(m_server_name_widget != NULL);
+
+    m_server_difficulty = getWidget<LabelWidget>("server_difficulty");
+    assert(m_server_difficulty != NULL);
+
+    m_server_game_mode = getWidget<LabelWidget>("server_game_mode");
+    assert(m_server_game_mode != NULL);
 
     m_online_status_widget = getWidget<LabelWidget>("online_status");
     assert(m_online_status_widget != NULL);
@@ -88,27 +106,46 @@ void NetworkingLobby::beforeAddingWidget()
 
 } // beforeAddingWidget
 
-
-
 // ----------------------------------------------------------------------------
+/** This function is a callback from the parent class, and is called each time
+ *  this screen is shown to initialise the screen. This class is responsible
+ *  for creating the active players and binding them to the right device.
+ */
 void NetworkingLobby::init()
 {
     Screen::init();
     setInitialFocus();
     m_server = ServersManager::get()->getJoinedServer();
-    if(m_server)
+    if (m_server)
+    {
         m_server_name_widget->setText(m_server->getName(), false);
 
-    m_start_button->setVisible(STKHost::get()->isAuthorisedToControl());
+        core::stringw difficulty = race_manager->getDifficultyName(m_server->getDifficulty());
+        m_server_difficulty->setText(difficulty, false);
 
+        core::stringw mode = RaceManager::getNameOf(m_server->getRaceMinorMode());
+        m_server_game_mode->setText(mode, false);
+    }
+
+    if(!NetworkConfig::get()->isServer())
+        m_start_button->setVisible(STKHost::get()->isAuthorisedToControl());
+
+    // For now create the active player and bind it to the right
+    // input device.
+    InputDevice *device = input_manager->getDeviceManager()->getLatestUsedDevice();
+    PlayerProfile* profile = PlayerManager::getCurrentPlayer();
+    StateManager::get()->createActivePlayer(profile, device);
 }   // init
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
 {
     // FIXME Network looby should be closed when stkhost is shut down
-    m_start_button->setVisible(STKHost::existHost() &&
-                               STKHost::get()->isAuthorisedToControl());
+    if(NetworkConfig::get()->isClient())
+    {
+        m_start_button->setVisible(STKHost::existHost() &&
+                                   STKHost::get()->isAuthorisedToControl());
+    }
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -124,11 +161,20 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
 
     if(name==m_start_button->m_properties[PROP_ID])
     {
-        // Send a message to the server to start
-        NetworkString start;
-        start.addUInt8(PROTOCOL_LOBBY_ROOM)
-             .addUInt8(LobbyRoomProtocol::LE_REQUEST_BEGIN);
-        STKHost::get()->sendMessage(start, true);
+        if(NetworkConfig::get()->isServer())
+        {
+            ServerLobbyRoomProtocol* slrp = static_cast<ServerLobbyRoomProtocol*>(
+                ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
+            if (slrp)
+                slrp->startSelection();
+        }
+        else // client
+        {
+            // Send a message to the server to start
+            NetworkString start(PROTOCOL_LOBBY_ROOM);
+            start.addUInt8(LobbyRoomProtocol::LE_REQUEST_BEGIN);
+            STKHost::get()->sendToServer(&start, true);
+        }
     }
 
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
@@ -180,8 +226,11 @@ void NetworkingLobby::onDialogClose()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::addPlayer(NetworkPlayerProfile *profile)
 {
-    m_player_list->addItem(StringUtils::toString(profile->getGlobalPlayerId()),
-                           profile->getName());
+    // In GUI-less server this function will be called without proper
+    // initialisation
+    if(m_player_list)
+        m_player_list->addItem(StringUtils::toString(profile->getGlobalPlayerId()),
+                               profile->getName());
 }  // addPlayer
 
 // ----------------------------------------------------------------------------

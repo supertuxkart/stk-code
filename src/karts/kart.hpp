@@ -64,6 +64,17 @@ class TerrainInfo;
 class Kart : public AbstractKart
 {
     friend class Skidding;
+protected:
+    /** Offset of the graphical kart chassis from the physical chassis. */
+    float m_graphical_y_offset;
+
+    /** The coordinates of the front of the kart, used to determine when a
+     *  new lap is triggered. */
+    Vec3 m_xyz_front;
+
+    /** Is time flying activated */
+    bool m_is_jumping;
+
 private:
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed *m_max_speed;
@@ -101,13 +112,6 @@ private:
 
     /** Current race position (1-num_karts). */
     int m_race_position;
-
-    /** The coordinates of the front of the kart, used to determine when a
-     *  new lap is triggered. */
-    Vec3 m_xyz_front;
-
-    /** Offset of the graphical kart chassis from the physical chassis. */
-    float m_graphical_y_offset;
 
     /** True if the kart wins, false otherwise. */
     bool m_race_result;
@@ -169,9 +173,6 @@ private:
     // Graphical effects
     // -----------------
 
-    /** Is time flying activated */
-    bool             m_is_jumping;
-
     /** The shadow of a kart. */
     Shadow          *m_shadow;
 
@@ -230,7 +231,8 @@ private:
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
-                        PerPlayerDifficulty difficulty);
+                        PerPlayerDifficulty difficulty,
+                        video::E_RENDER_TYPE rt = video::ERT_DEFAULT);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();
@@ -271,8 +273,8 @@ public:
     virtual void   crashed          (const Material *m, const Vec3 &normal);
     virtual float  getHoT           () const;
     virtual void   update           (float dt);
-    virtual void   finishedRace(float time);
-    virtual void   setPosition(int p);
+    virtual void   finishedRace     (float time, bool from_server=false);
+    virtual void   setPosition      (int p);
     virtual void   beep             ();
     virtual void   showZipperFire   ();
     virtual float  getCurrentMaxSpeed() const;
@@ -296,7 +298,7 @@ public:
     virtual int getNumPowerup() const;
     // ------------------------------------------------------------------------
     /** Returns a points to this kart's graphical effects. */
-    KartGFX*       getKartGFX()                   { return m_kart_gfx;        }
+    virtual KartGFX* getKartGFX()               { return m_kart_gfx;         }
     // ------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
     virtual float  getEnergy           () const { return m_collected_energy; }
@@ -430,7 +432,7 @@ public:
     virtual void showStarEffect(float t);
     // ------------------------------------------------------------------------
     /** Returns the terrain info oject. */
-    TerrainInfo *getTerrainInfo() { return m_terrain_info; }
+    virtual const TerrainInfo *getTerrainInfo() const { return m_terrain_info; }
     // ------------------------------------------------------------------------
     virtual void setOnScreenText(const wchar_t *text);
     // ------------------------------------------------------------------------
@@ -447,6 +449,12 @@ public:
     // ------------------------------------------------------------------------
     /** Set this kart race result. */
     void setRaceResult();
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is a ghost (replay) kart. */
+    virtual bool isGhostKart() const { return false;  }
+    // ------------------------------------------------------------------------
+    /** Returns whether this kart is jumping. */
+    virtual bool isJumping() const { return m_is_jumping; };
 
 };   // Kart
 

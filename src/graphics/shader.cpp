@@ -83,6 +83,9 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
     
     if (CVS->isAMDVertexShaderLayerUsable())
         code << "#extension GL_AMD_vertex_shader_layer : enable\n";
+        
+    if (CVS->isARBExplicitAttribLocationUsable())
+        code << "#extension GL_ARB_explicit_attrib_location : enable\n";
     
     if (CVS->isAZDOEnabled())
     {

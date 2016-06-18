@@ -36,11 +36,14 @@
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
+#include "karts/controller/test_ai.hpp"
 #include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
+#include "modes/soccer_world.hpp"
+#include "network/network_config.hpp"
 #include "physics/btKart.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -146,6 +149,9 @@ void World::init()
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
     m_num_players         = 0;
+    unsigned int gk       = 0;
+    if (race_manager->hasGhostKarts())
+        gk = ReplayPlay::get()->getNumGhostKart();
 
     // Create the race gui before anything else is attached to the scene node
     // (which happens when the track is loaded). This allows the race gui to
@@ -179,8 +185,21 @@ void World::init()
     // karts can be positioned properly on (and not in) the tracks.
     m_track->loadTrackModel(race_manager->getReverseTrack());
 
+    if (gk > 0)
+    {
+        ReplayPlay::get()->load();
+        for (unsigned int k = 0; k < gk; k++)
+            m_karts.push_back(ReplayPlay::get()->getGhostKart(k));
+    }
+
+    // Assign team of AIs for soccer mode before createKart
+    SoccerWorld* sw = dynamic_cast<SoccerWorld*>(this);
+    if (sw)
+        sw->setAITeam();
+
     for(unsigned int i=0; i<num_karts; i++)
     {
+        if (race_manager->getKartType(i) == RaceManager::KT_GHOST) continue;
         std::string kart_ident = history->replayHistory()
                                ? history->getKartIdent(i)
                                : race_manager->getKartIdent(i);
@@ -201,11 +220,8 @@ void World::init()
     // Must be called after all karts are created
     m_race_gui->init();
 
-    if(ReplayPlay::get())
-        ReplayPlay::get()->Load();
-
     powerup_manager->updateWeightsForRace(num_karts);
-    
+
     if (UserConfigParams::m_weather_effects)
     {
         m_weather = new Weather(m_track->getWeatherLightning(),
@@ -249,7 +265,7 @@ void World::reset()
         Camera::getCamera(i)->reset();
     }
 
-    if(ReplayPlay::get())
+    if(race_manager->hasGhostKarts())
         ReplayPlay::get()->reset();
 
     resetAllKarts();
@@ -271,7 +287,19 @@ void World::reset()
     race_manager->reset();
     // Make sure to overwrite the data from the previous race.
     if(!history->replayHistory()) history->initRecording();
-    if(ReplayRecorder::get()) ReplayRecorder::get()->init();
+    if(race_manager->isRecordingRace())
+    {
+        Log::info("World", "Start Recording race.");
+        ReplayRecorder::get()->init();
+    }
+    if((NetworkConfig::get()->isServer() && !ProfileWorld::isNoGraphics()) ||
+        race_manager->isWatchingReplay())
+    {
+        // In case that the server is running with gui or watching replay,
+        // create a camera and attach it to the first kart.
+        Camera::createCamera(World::getWorld()->getKart(0));
+
+    }
 
     // Reset all data structures that depend on number of karts.
     irr_driver->reset();
@@ -302,8 +330,12 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
                                 RaceManager::KartType kart_type,
                                 PerPlayerDifficulty difficulty)
 {
+    unsigned int gk = 0;
+    if (race_manager->hasGhostKarts())
+        gk = ReplayPlay::get()->getNumGhostKart();
+
     int position           = index+1;
-    btTransform init_pos   = getStartTransform(index);
+    btTransform init_pos   = getStartTransform(index - gk);
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
                                       difficulty);
     new_kart->init(race_manager->getKartType(index));
@@ -316,8 +348,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
-        controller = new NetworkPlayerController(new_kart,
-                        StateManager::get()->getActivePlayer(local_player_id));
+        controller = new NetworkPlayerController(new_kart);
         m_num_players++;
         break;
     case RaceManager::KT_AI:
@@ -360,7 +391,12 @@ Controller* World::loadAIController(AbstractKart *kart)
     switch(turn)
     {
         case 0:
-            controller = new SkiddingAI(kart);
+            // If requested, start the test ai
+            if( (AIBaseController::getTestAI()!=0                       ) && 
+                ( (kart->getWorldKartId()+1) % AIBaseController::getTestAI() )==0)
+                controller = new TestAI(kart);
+            else
+                controller = new SkiddingAI(kart);
             break;
         case 1:
             controller = new BattleAI(kart);
@@ -381,16 +417,6 @@ Controller* World::loadAIController(AbstractKart *kart)
 World::~World()
 {
     irr_driver->onUnloadWorld();
-
-    if(ReplayPlay::get())
-    {
-        // Destroy the old replay object, which also stored the ghost
-        // karts, and create a new one (which means that in further
-        // races the usage of ghosts will still be enabled).
-        ReplayPlay::destroy();
-        ReplayPlay::create();
-    }
-
 
     // In case that a race is aborted (e.g. track not found) m_track is 0.
     if(m_track)
@@ -416,9 +442,29 @@ World::~World()
         delete m_weather;
 
     for ( unsigned int i = 0 ; i < m_karts.size() ; i++ )
+    {
+        // Let ReplayPlay destroy the ghost karts
+        if (m_karts[i]->isGhostKart()) continue;
         delete m_karts[i];
+    }
 
+    if(race_manager->hasGhostKarts() || race_manager->isRecordingRace())
+    {
+        // Destroy the old replay object, which also stored the ghost
+        // karts, and create a new one (which means that in further
+        // races the usage of ghosts will still be enabled).
+        // It can allow auto recreation of ghost replay file lists
+        // when next time visit the ghost replay selection screen.
+        ReplayPlay::destroy();
+        ReplayPlay::create();
+    }
     m_karts.clear();
+    if(race_manager->isRecordingRace())
+        ReplayRecorder::get()->reset();
+    race_manager->setRaceGhostKarts(false);
+    race_manager->setRecordRace(false);
+    race_manager->setWatchingReplay(false);
+
     Camera::removeAllCameras();
 
     projectile_manager->cleanup();
@@ -447,6 +493,7 @@ void World::onGo()
     // from sliding downhill)
     for(unsigned int i=0; i<m_karts.size(); i++)
     {
+        if (m_karts[i]->isGhostKart()) continue;
         m_karts[i]->getVehicle()->setAllBrakes(0);
     }
 }   // onGo
@@ -477,13 +524,10 @@ void World::terminateRace()
     // Update highscores, and retrieve the best highscore if relevant
     // to show it in the GUI
     int best_highscore_rank = -1;
-    int best_finish_time = -1;
     std::string highscore_who = "";
-    StateManager::ActivePlayer* best_player = NULL;
     if (!this->isNetworkWorld())
     {
-        updateHighscores(&best_highscore_rank, &best_finish_time, &highscore_who,
-                     &best_player);
+        updateHighscores(&best_highscore_rank);
     }
 
     // Check achievements
@@ -509,8 +553,7 @@ void World::terminateRace()
         for(unsigned int i = 0; i < kart_amount; i++)
         {
             // Retrieve the current player
-            StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
-            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
+            if (m_karts[i]->getController()->canGetAchievements())
             {
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == winner_position && kart_amount > opponents )
@@ -534,8 +577,7 @@ void World::terminateRace()
         for(unsigned int i = 0; i < kart_amount; i++)
         {
             // Retrieve the current player
-            StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
-            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
+            if (m_karts[i]->getController()->canGetAchievements())
             {
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == 1 )
@@ -568,8 +610,7 @@ void World::terminateRace()
 
     if (best_highscore_rank > 0)
     {
-        results->setHighscore(highscore_who, best_player, best_highscore_rank,
-                              best_finish_time);
+        results->setHighscore(best_highscore_rank);
     }
     else
     {
@@ -593,12 +634,13 @@ void World::resetAllKarts()
     getPhysics()->getPhysicsWorld()->resetLocalTime();
 
     // If track checking is requested, check all rescue positions if
-    // they are heigh enough.
+    // they are high enough.
     if(UserConfigParams::m_track_debug)
     {
         // Loop over all karts, in case that some karts are dfferent
         for(unsigned int kart_id=0; kart_id<(unsigned int)m_karts.size(); kart_id++)
         {
+            if (m_karts[kart_id]->isGhostKart()) continue;
             for(unsigned int rescue_pos=0;
                 rescue_pos<getNumberOfRescuePositions();
                 rescue_pos++)
@@ -626,6 +668,7 @@ void World::resetAllKarts()
     //that at least one of its wheel will be on the surface of the track
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
+        if ((*i)->isGhostKart()) continue;
         Vec3 xyz = (*i)->getXYZ();
         //start projection from top of kart
         Vec3 up_offset(0, 0.5f * ((*i)->getKartHeight()), 0);
@@ -674,6 +717,7 @@ void World::resetAllKarts()
         all_finished=true;
         for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
         {
+            if ((*i)->isGhostKart()) continue;
             if(!(*i)->isInRest())
             {
                 Vec3            normal;
@@ -952,8 +996,7 @@ void World::update(float dt)
 
     PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
     history->update(dt);
-    if(ReplayRecorder::get()) ReplayRecorder::get()->update(dt);
-    if(ReplayPlay::get()) ReplayPlay::get()->update(dt);
+    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
     if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
     if (m_script_engine) m_script_engine->update(dt);
@@ -1043,12 +1086,9 @@ Highscores* World::getHighscores() const
  *  score, if so it notifies the HighscoreManager so the new score is added
  *  and saved.
  */
-void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
-                             std::string* highscore_who,
-                             StateManager::ActivePlayer** best_player)
+void World::updateHighscores(int* best_highscore_rank)
 {
     *best_highscore_rank = -1;
-    *best_player = NULL;
 
     if(!m_use_highscores) return;
 
@@ -1100,14 +1140,11 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
 
         Highscores* highscores = getHighscores();
 
-        LocalPlayerController *controller = 
-                                  (LocalPlayerController*)(k->getController());
-
         int highscore_rank = 0;
-        if (controller->getPlayer()->getProfile() != NULL) // if we have the player profile here
-            highscore_rank = highscores->addData(k->getIdent(),
-                              controller->getPlayer()->getProfile()->getName(),
-                                                 k->getFinishTime());
+        // The player is a local player, so there is a name:
+        highscore_rank = highscores->addData(k->getIdent(),
+                                             k->getController()->getName(),
+                                             k->getFinishTime()    );
 
         if (highscore_rank > 0)
         {
@@ -1115,9 +1152,6 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
                 highscore_rank < *best_highscore_rank)
             {
                 *best_highscore_rank = highscore_rank;
-                *best_finish_time = (int)(k->getFinishTime());
-                *best_player = controller->getPlayer();
-                *highscore_who = k->getIdent();
             }
 
             highscore_manager->saveHighscores();
@@ -1162,6 +1196,7 @@ AbstractKart *World::getLocalPlayerKart(unsigned int n) const
 void World::eliminateKart(int kart_id, bool notify_of_elimination)
 {
     AbstractKart *kart = m_karts[kart_id];
+    if (kart->isGhostKart()) return;
 
     // Display a message about the eliminated kart in the race guia
     if (notify_of_elimination)

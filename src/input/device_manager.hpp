@@ -158,8 +158,21 @@ public:
     bool initialize();
     void save();
 
-    StateManager::ActivePlayer* getSinglePlayer()       { return m_single_player; }
-    void setSinglePlayer(StateManager::ActivePlayer* p) { m_single_player = p;    }
+    // ------------------------------------------------------------------------
+    /** Returns the active player if there is only a single local player. It
+     *  returns NULL if multiplayer is active. */
+    StateManager::ActivePlayer* getSinglePlayer()  { return m_single_player; }
+    // ------------------------------------------------------------------------
+    /** Sets the ActivePlayer if there is only a single local player. p must
+     *  be NULL in case of splitscreen. A single player will receive events
+     *  from all connected devices. This allows for example a single player
+     *  to select a kart with the keyboard, but then use a gamepad for
+     *  the actual racing. In splitscreen each player will only receive
+     *  events from the device used to connect in the kart selection screen. */
+    void setSinglePlayer(StateManager::ActivePlayer* p)
+    {
+        m_single_player = p; 
+    }   // setSinglePlayer
     // ------------------------------------------------------------------------
     /** Sets or reset the 'map fire to select' option.
      */

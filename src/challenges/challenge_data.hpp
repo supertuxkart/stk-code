@@ -86,6 +86,7 @@ private:
     int                            m_position[RaceManager::DIFFICULTY_COUNT];
     int                            m_num_karts[RaceManager::DIFFICULTY_COUNT];
     std::string                    m_ai_kart_ident[RaceManager::DIFFICULTY_COUNT];
+    std::string                    m_replay_files[RaceManager::DIFFICULTY_COUNT];
     float                          m_time[RaceManager::DIFFICULTY_COUNT];
     int                            m_energy[RaceManager::DIFFICULTY_COUNT];
     RaceManager::AISuperPower      m_ai_superpower[RaceManager::DIFFICULTY_COUNT];
@@ -94,6 +95,7 @@ private:
     std::string                    m_filename;
     /** Version number of the challenge. */
     int                            m_version;
+    bool                           m_is_ghost_replay;
 
     void setUnlocks(const std::string &id,
                     ChallengeData::RewardType reward);
@@ -181,6 +183,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if this challenge is a grand prix. */
     bool isSingleRace() const { return m_mode == CM_SINGLE_RACE; }
+    // ------------------------------------------------------------------------
+    /** Returns if this challenge is using ghost replay. */
+    bool isGhostReplay() const { return m_is_ghost_replay; }
     // ------------------------------------------------------------------------
     /** Returns the challenge mode of this challenge. */
     ChallengeModeType getMode() const { return m_mode; }

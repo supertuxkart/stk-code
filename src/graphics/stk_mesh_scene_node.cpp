@@ -173,7 +173,14 @@ void STKMeshSceneNode::updateNoGL()
 
             GLMesh &mesh = GLmeshes[i];
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
-            if (rnd->isTransparent())
+            if (Mesh->getRenderType() == video::ERT_TRANSPARENT)
+            {
+                if (!immediate_draw)
+                    TransparentMesh[TM_ADDITIVE].push_back(&mesh);
+                else
+                    additive = true;
+            }
+            else if (rnd->isTransparent())
             {
                 TransparentMaterial TranspMat = getTransparentMaterialFromType(type, MaterialTypeParam, material);
                 if (!immediate_draw)

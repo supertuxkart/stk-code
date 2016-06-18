@@ -53,6 +53,8 @@ private:
     GUIEngine::IconButtonWidget * m_exit_widget;
     GUIEngine::IconButtonWidget *m_start_button;
     GUIEngine::ListWidget *m_player_list;
+    GUIEngine::LabelWidget* m_server_difficulty;
+    GUIEngine::LabelWidget* m_server_game_mode;
 
     /** \brief Sets which widget has to be focused. Depends on the user state. */
     void setInitialFocus();

@@ -19,7 +19,6 @@
 #define HEADER_AI_BASE_LAP_CONTROLLER_HPP
 
 #include "karts/controller/ai_base_controller.hpp"
-#include "states_screens/state_manager.hpp"
 
 class AIProperties;
 class LinearWorld;
@@ -68,8 +67,7 @@ protected:
     virtual void raceFinished() {};
 
 public:
-             AIBaseLapController(AbstractKart *kart,
-                                 StateManager::ActivePlayer *player=NULL);
+             AIBaseLapController(AbstractKart *kart);
     virtual ~AIBaseLapController() {};
     virtual void reset();
 };   // AIBaseLapController

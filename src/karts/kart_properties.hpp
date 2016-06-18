@@ -243,8 +243,9 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns a pointer to the KartModel object. */
-    KartModel*    getKartModelCopy   () const
-                                            {return m_kart_model->makeCopy(); }
+    KartModel*    getKartModelCopy
+                (video::E_RENDER_TYPE rt = video::ERT_DEFAULT) const
+                                          {return m_kart_model->makeCopy(rt); }
 
     // ------------------------------------------------------------------------
     /** Returns a pointer to the main KartModel object. This copy

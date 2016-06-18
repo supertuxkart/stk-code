@@ -103,6 +103,9 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
     m_model_location.push_back(location);
     m_model_scale.push_back(scale);
     m_model_frames.push_back(frame);
+    
+    if (!CVS->isGLSL())
+        m_render_target = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -165,12 +168,12 @@ void ModelViewWidget::update(float delta)
     if (m_rtt_main_node == NULL)
     {
         setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
-    }
-    
+    }    
+
     m_rtt_main_node->setRotation(core::vector3df(0.0f, angle, 0.0f));
     
     m_rtt_main_node->setVisible(true);
-
+  
     m_render_target->renderToTexture(m_camera, GUIEngine::getLatestDt());
 
     m_rtt_main_node->setVisible(false);
@@ -300,6 +303,7 @@ bool ModelViewWidget::isRotating()
 void ModelViewWidget::elementRemoved()
 {
     m_render_target = NULL;
+
     IconButtonWidget::elementRemoved();
 }
 
@@ -310,6 +314,7 @@ void ModelViewWidget::clearRttProvider()
 
 void ModelViewWidget::drawRTTScene(const irr::core::rect<s32>& dest_rect) const
 {
-    m_render_target->draw2DImage(dest_rect, NULL, video::SColor(255, 255, 255, 255), true);
+    if(m_render_target != NULL)
+        m_render_target->draw2DImage(dest_rect, NULL, video::SColor(255, 255, 255, 255), true);
 }
 

@@ -82,7 +82,8 @@
 using namespace irr;
 
 
-const float Track::NOHIT           = -99999.9f;
+const float Track::NOHIT               = -99999.9f;
+bool        Track::m_dont_load_navmesh = false;
 
 // ----------------------------------------------------------------------------
 Track::Track(const std::string &filename)
@@ -481,6 +482,7 @@ void Track::loadTrackInfo()
 
     if(!root || root->getName()!="track")
     {
+        delete root;
         std::ostringstream o;
         o<<"Can't load track '"<<m_filename<<"', no track element.";
         throw std::runtime_error(o.str());
@@ -575,9 +577,9 @@ void Track::loadTrackInfo()
         delete easter;
     }
 
-    if(file_manager->fileExists(m_root+"navmesh.xml"))
+    if(file_manager->fileExists(m_root+"navmesh.xml") && !m_dont_load_navmesh)
         m_has_navmesh = true;
-    else if(m_is_arena || m_is_soccer)
+    else if ( (m_is_arena || m_is_soccer) && !m_dont_load_navmesh)
     {
         Log::warn("Track", "NavMesh is not found for arena %s, "
                   "disable AI for it.\n", m_name.c_str());
@@ -656,9 +658,9 @@ void Track::startMusic() const
 /** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
  *  they are connected to each other. Input file name is hardcoded for now
  */
-void Track::loadBattleGraph()
+void Track::loadBattleGraph(const XMLNode &node)
 {
-    BattleGraph::create(m_root+"navmesh.xml");
+    BattleGraph::create(m_root+"navmesh.xml", node);
 
     if(BattleGraph::get()->getNumNodes()==0)
     {
@@ -917,18 +919,6 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         if (mb->getVertexType() == video::EVT_STANDARD)
         {
             irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
-            if (race_manager->getReverseTrack() &&
-                material->getMirrorAxisInReverse() != ' ')
-            {
-                for (unsigned int i = 0; i < mb->getVertexCount(); i++)
-                {
-                    core::vector2df &tc = mb->getTCoords(i);
-                    if (material->getMirrorAxisInReverse() == 'V')
-                        tc.Y = 1 - tc.Y;
-                    else
-                        tc.X = 1 - tc.X;
-                }
-            }   // reverse track and texture needs mirroring
             for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
             {
                 for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
@@ -1623,25 +1613,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         (void)e;
     }
 
-    // Load the graph only now: this function is called from world, after
-    // the race gui was created. The race gui is needed since it stores
-    // the information about the size of the texture to render the mini
-    // map to.
-    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
-    else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
-        loadBattleGraph();
-
-    ItemManager::create();
-
-    // Set the default start positions. Node that later the default
-    // positions can still be overwritten.
-    float forwards_distance  = 1.5f;
-    float sidewards_distance = 3.0f;
-    float upwards_distance   = 0.1f;
-    int   karts_per_row      = 2;
-
-
     // Start building the scene graph
+    // Soccer field with navmesh requires it
+    // for two goal line to be drawn them in minimap
     std::string path = m_root + m_all_modes[mode_id].m_scene;
     XMLNode *root    = file_manager->createXMLTree(path);
 
@@ -1654,6 +1628,23 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
            <<"', aborting.";
         throw std::runtime_error(msg.str());
     }
+
+    // Load the graph only now: this function is called from world, after
+    // the race gui was created. The race gui is needed since it stores
+    // the information about the size of the texture to render the mini
+    // map to.
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+    else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
+        loadBattleGraph(*root);
+
+    ItemManager::create();
+
+    // Set the default start positions. Node that later the default
+    // positions can still be overwritten.
+    float forwards_distance  = 1.5f;
+    float sidewards_distance = 3.0f;
+    float upwards_distance   = 0.1f;
+    int   karts_per_row      = 2;
 
     const XMLNode *default_start = root->getNode("default-start");
     if (default_start)
@@ -1738,7 +1729,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // It's important to execute this BEFORE the code that creates the skycube,
     // otherwise the skycube node could be modified to have fog enabled, which
     // we don't want
-    if (m_use_fog && !UserConfigParams::m_camera_debug && !CVS->isGLSL())
+    if (m_use_fog && !Camera::isDebug() && !CVS->isGLSL())
     {
         /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
            and end do not matter */
@@ -1837,22 +1828,27 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     createPhysicsModel(main_track_count);
 
+    const bool arena_random_item_created =
+        ItemManager::get()->randomItemsForArena(m_start_transforms);
 
-    for (unsigned int i=0; i<root->getNumNodes(); i++)
+    if (!arena_random_item_created)
     {
-        const XMLNode *node = root->getNode(i);
-        const std::string &name = node->getName();
-        if (name=="banana"      || name=="item"      ||
-            name=="small-nitro" || name=="big-nitro" ||
-            name=="easter-egg"                           )
+        for (unsigned int i=0; i<root->getNumNodes(); i++)
         {
-            itemCommand(node);
-        }
-    }   // for i<root->getNumNodes()
+            const XMLNode *node = root->getNode(i);
+            const std::string &name = node->getName();
+            if (name=="banana"      || name=="item"      ||
+                name=="small-nitro" || name=="big-nitro" ||
+                name=="easter-egg"                           )
+            {
+                itemCommand(node);
+            }
+        }   // for i<root->getNumNodes()
+    }
 
     delete root;
 
-    if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
+    if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh && !arena_random_item_created)
         BattleGraph::get()->findItemsOnGraphNodes();
 
     if (UserConfigParams::m_track_debug &&

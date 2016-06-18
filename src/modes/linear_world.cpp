@@ -178,9 +178,10 @@ void LinearWorld::update(float dt)
         // in the position of the kart (e.g. while falling the kart
         // might get too close to another part of the track, shortly
         // jump to position one, then on reset fall back to last)
-        if (!kart_info.getTrackSector()->isOnRoad() &&
+        if ((!kart_info.getTrackSector()->isOnRoad() &&
             (!kart->getMaterial() ||
-              kart->getMaterial()->isDriveReset())     )
+              kart->getMaterial()->isDriveReset()))  &&
+             !kart->isGhostKart())
             continue;
         kart_info.getTrackSector()->update(kart->getFrontXYZ());
         kart_info.m_overall_distance = kart_info.m_race_lap
@@ -247,9 +248,8 @@ void LinearWorld::newLap(unsigned int kart_index)
     AbstractKart *kart  = m_karts[kart_index];
 
     // Reset reset-after-lap achievements
-    StateManager::ActivePlayer *c = kart->getController()->getPlayer();
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
-    if (c && c->getConstProfile() == p)
+    if (kart->getController()->canGetAchievements())
     {
         p->getAchievementsStatus()->onLapEnd();
     }
