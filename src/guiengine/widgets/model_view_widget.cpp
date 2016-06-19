@@ -246,10 +246,23 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         }
     }
     
+    
     irr_driver->setAmbientLight(video::SColor(255, 35, 35, 35));
     
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
-    m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
+    
+    if(!CVS->isGLSL())
+    {
+        scene::ILightSceneNode* light = irr_driver->getSceneManager()
+            ->addLightSceneNode(NULL, spot_pos, video::SColorf(1.0f,1.0f,1.0f),
+                                1600 /* radius */);
+        light->setLightType(video::ELT_SPOT);
+        light->setRotation((core::vector3df(0, 10, 0) - spot_pos).getHorizontalAngle());
+        light->updateAbsolutePosition();
+        m_light = light;
+    } else {
+        m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
+    }
     
     m_rtt_main_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
     m_rtt_main_node->setMaterialFlag(video::EMF_LIGHTING, true);
