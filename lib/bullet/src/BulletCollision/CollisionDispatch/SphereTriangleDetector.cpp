@@ -152,8 +152,9 @@ bool SphereTriangleDetector::collide(const btVector3& sphereCenter,btVector3 &po
 			if (distanceSqr>SIMD_EPSILON)
 			{
 				btScalar distance = btSqrt(distanceSqr);
-				resultNormal = contactToCentre;
-				resultNormal.normalize();
+				//resultNormal = contactToCentre;
+				//resultNormal.normalize();
+                resultNormal = normal;
 				point = contactPoint;
 				depth = -(radius-distance);
 			} else
