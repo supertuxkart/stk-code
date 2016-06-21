@@ -72,8 +72,8 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
 # Build the ENet UDP network library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
-include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
+find_package(ENet REQUIRED)
+include_directories(${ENet_INCLUDE_DIRS})
 
 # Build glew library
 if(NOT USE_GLES2)
@@ -360,7 +360,7 @@ target_link_libraries(supertuxkart
     bulletdynamics
     bulletcollision
     bulletmath
-    enet
+    ${ENet_LIBRARIES}
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
