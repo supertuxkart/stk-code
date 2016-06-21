@@ -494,6 +494,7 @@ void ParticleSystemProxy::simulate()
     glDrawArrays(GL_POINTS, 0, m_count);
     glEndTransformFeedback();
     glBindVertexArray(0);
+    glActiveTexture(GL_TEXTURE0);
 
     glDisable(GL_RASTERIZER_DISCARD);
 #ifdef DEBUG_PARTICLES

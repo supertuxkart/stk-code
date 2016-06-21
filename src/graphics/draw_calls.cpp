@@ -577,6 +577,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
 // ----------------------------------------------------------------------------
 void DrawCalls::renderImmediateDrawList() const
 {
+    glActiveTexture(GL_TEXTURE0);
     for(auto node: m_immediate_draw_list)
         node->render();
 }
@@ -584,6 +585,7 @@ void DrawCalls::renderImmediateDrawList() const
 // ----------------------------------------------------------------------------
 void DrawCalls::renderBillboardList() const
 {
+    glActiveTexture(GL_TEXTURE0);
     for(auto billboard: m_billboard_list)
         billboard->render();
 }
@@ -591,6 +593,7 @@ void DrawCalls::renderBillboardList() const
 // ----------------------------------------------------------------------------
 void DrawCalls::renderParticlesList() const
 {
+    glActiveTexture(GL_TEXTURE0);
     for(auto particles: m_particles_list)
         particles->render();
 }
