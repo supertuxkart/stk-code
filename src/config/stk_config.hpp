@@ -143,6 +143,8 @@ public:
     /** The field of view for 1, 2, 3, 4 player split screen. */
     float m_camera_fov[4];
 
+    float m_cutscene_fov;
+
     /** File names of the default fonts in STK. */
     std::string m_font_default;
     std::string m_font_default_fallback;
