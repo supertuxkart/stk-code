@@ -1055,7 +1055,7 @@ void PostProcessing::renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB,
                                    const core::matrix4 &rh_matrix,
                                    const core::vector3df &rh_extend)
 {
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
     glEnable(GL_PROGRAM_POINT_SIZE);
     RHDebug::getInstance()->use();
     glActiveTexture(GL_TEXTURE0 + RHDebug::getInstance()->m_tu_shr);
@@ -1661,8 +1661,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     if (!CVS->isARBUniformBufferObjectUsable())
         return in_fbo;
 
-#ifndef ANDROID
+#if !defined(ANDROID)
     glEnable(GL_FRAMEBUFFER_SRGB);
+#endif
     irr_driver->getFBO(FBO_MLAA_COLORS).bind();
     renderPassThrough(in_fbo->getRTT()[0],
                       irr_driver->getFBO(FBO_MLAA_COLORS).getWidth(),
@@ -1676,6 +1677,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         applyMLAA();
         PROFILER_POP_CPU_MARKER();
     }
+#if !defined(ANDROID)
     glDisable(GL_FRAMEBUFFER_SRGB);
 #endif
 

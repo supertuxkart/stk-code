@@ -344,7 +344,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
                       getUnicolorTexture(video::SColor(255, 127, 127, 127));
     }
     compressTexture(mesh.textures[i], is_srgb);
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[i])
@@ -425,7 +425,7 @@ void initTexturesTransparent(GLMesh &mesh)
         return;
     }
     compressTexture(mesh.textures[0], true);
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[0])

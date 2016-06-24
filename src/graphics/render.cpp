@@ -189,7 +189,7 @@ void IrrDriver::renderGLSL(float dt)
         if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && m_spherical_harmonics->has6Textures())
             irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
-#ifndef ANDROID
+#if !defined(ANDROID)
         if (!CVS->isDefferedEnabled())
             glEnable(GL_FRAMEBUFFER_SRGB);
 #endif
@@ -284,14 +284,14 @@ void IrrDriver::renderGLSL(float dt)
             }
             else
             {
-#ifndef ANDROID
+#if !defined(ANDROID)
                 glEnable(GL_FRAMEBUFFER_SRGB);
 #endif
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 if (CVS->isDefferedEnabled())
                     camera->activate();
                 m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
-#ifndef ANDROID
+#if !defined(ANDROID)
                 glDisable(GL_FRAMEBUFFER_SRGB);
 #endif
             }
@@ -406,7 +406,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     else
     {
         // We need a cleared depth buffer for some effect (eg particles depth blending)
-#ifndef ANDROID
+#if !defined(ANDROID)
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
             glDisable(GL_FRAMEBUFFER_SRGB);
 #endif
@@ -419,7 +419,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
                    vp.LowerRightCorner.X - vp.UpperLeftCorner.X,
                    vp.LowerRightCorner.Y - vp.UpperLeftCorner.Y);
         glClear(GL_DEPTH_BUFFER_BIT);
-#ifndef ANDROID
+#if !defined(ANDROID)
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
             glEnable(GL_FRAMEBUFFER_SRGB);
 #endif
@@ -545,7 +545,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     }
     if (!CVS->isDefferedEnabled() && !forceRTT)
     {
-#ifndef ANDROID
+#if !defined(ANDROID)
         glDisable(GL_FRAMEBUFFER_SRGB);
 #endif
         glDisable(GL_DEPTH_TEST);
@@ -696,7 +696,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
         {
             if (GlowPassCmd::getInstance()->Size)
             {
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
                 glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
                     (const void*)(GlowPassCmd::getInstance()->Offset * sizeof(DrawElementsIndirectCommand)),
                     (int)GlowPassCmd::getInstance()->Size,

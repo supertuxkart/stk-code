@@ -247,7 +247,7 @@ class RadianceHintsConstructionShader
 public:
     RadianceHintsConstructionShader()
     {
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
         if (CVS->isAMDVertexShaderLayerUsable())
         {
             loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
@@ -278,7 +278,7 @@ class NVWorkaroundRadianceHintsConstructionShader
 public:
     NVWorkaroundRadianceHintsConstructionShader()
     {
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
         loadProgram(OBJECT,GL_VERTEX_SHADER,"slicedscreenquad_nvworkaround.vert",
                            GL_GEOMETRY_SHADER, "rhpassthrough.geom",
                            GL_FRAGMENT_SHADER, "rh.frag");

@@ -170,39 +170,47 @@ void MainLoop::run()
     IrrlichtDevice* device = irr_driver->getDevice();
 
     m_curr_time = device->getTimer()->getRealTime();
+    
+    #if defined(ANDROID_DEVICE)
 	auto sensorManager = ASensorManager_getInstance();
 	auto accelerometerSensor = ASensorManager_getDefaultSensor(sensorManager,
-            ASENSOR_TYPE_ACCELEROMETER);
+                                                    ASENSOR_TYPE_ACCELEROMETER);
     auto sensorEventQueue = ASensorManager_createEventQueue(sensorManager,
-           ((android_app*)global_android_app)->looper, LOOPER_ID_USER, NULL, NULL);
-	ASensorEventQueue_enableSensor(sensorEventQueue,
-			accelerometerSensor);
+                                    ((android_app*)global_android_app)->looper, 
+                                    LOOPER_ID_USER, NULL, NULL);
+	ASensorEventQueue_enableSensor(sensorEventQueue, accelerometerSensor);
 	// We'd like to get 60 events per second (in us).
-	ASensorEventQueue_setEventRate(sensorEventQueue,
-			accelerometerSensor, (1000L/1)*1000);
+	ASensorEventQueue_setEventRate(sensorEventQueue, accelerometerSensor, 
+                                   (1000L/1)*1000);
+    #endif
+    
     while(!m_abort)
     {
+        #if defined(ANDROID_DEVICE)
         int ident;
         int events;
         struct android_poll_source* source;
-        while ((ident=ALooper_pollAll(0, NULL, &events,
-                (void**)&source)) >= 0) {
-            
+        while ((ident = ALooper_pollAll(0, NULL, &events,
+                (void**)&source)) >= 0) 
+        {
 			// Process this event.
-            if (source != NULL) {
+            if (source != NULL) 
+            {
                 source->process((android_app*)global_android_app, source);
             }
 
-
             // If a sensor has data, process it now.
-            if (ident == LOOPER_ID_USER) {
-                if (accelerometerSensor != NULL) {
+            if (ident == LOOPER_ID_USER) 
+            {
+                if (accelerometerSensor != NULL) 
+                {
                     ASensorEvent event;
                     while (ASensorEventQueue_getEvents(sensorEventQueue,
-                            &event, 1) > 0) {
+                           &event, 1) > 0) 
+                    {
                         LOGI("accelerometer: x=%f y=%f z=%f",
-                                event.acceleration.x, event.acceleration.y,
-                                event.acceleration.z);
+                             event.acceleration.x, event.acceleration.y,
+                             event.acceleration.z);
 						post_key(1, event.acceleration.z < 0);
 						post_key(0, event.acceleration.z > 4);
 						post_key(3, event.acceleration.y > 2);
@@ -212,6 +220,7 @@ void MainLoop::run()
             }
 
         }
+        #endif
         PROFILER_PUSH_CPU_MARKER("Main loop", 0xFF, 0x00, 0xF7);
 
         m_prev_time = m_curr_time;

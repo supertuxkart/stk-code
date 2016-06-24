@@ -47,6 +47,7 @@ class LightspaceBoundingBoxShader
 public:
     LightspaceBoundingBoxShader() 
     {
+#if !defined(ANDROID) && !defined(USE_GLES2)
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "Lightspaceboundingbox.comp",
                             GL_COMPUTE_SHADER, "utils/getPosFromUVDepth.frag");
         assignSamplerNames(0, "depth", ST_NEAREST_FILTERED);
@@ -54,7 +55,6 @@ public:
         GLuint block_idx = 
             glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK, 
                                       "BoundingBoxes");
-#ifndef ANDROID
         glShaderStorageBlockBinding(m_program, block_idx, 2);
 #endif
     }   // LightspaceBoundingBoxShader
@@ -67,12 +67,12 @@ class ShadowMatricesGenerationShader
 public:
     ShadowMatricesGenerationShader()
     {
+#if !defined(ANDROID) && !defined(USE_GLES2)
         loadProgram(OBJECT,  GL_COMPUTE_SHADER, "shadowmatrixgeneration.comp");
         assignUniforms("SunCamMatrix");
         GLuint block_idx = 
             glGetProgramResourceIndex(m_program, 
                                       GL_SHADER_STORAGE_BLOCK, "BoundingBoxes");
-#ifndef ANDROID
         glShaderStorageBlockBinding(m_program, block_idx, 2);
         block_idx = 
             glGetProgramResourceIndex(m_program, GL_SHADER_STORAGE_BLOCK,

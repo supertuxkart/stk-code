@@ -75,7 +75,7 @@
 
 #if (IRRLICHT_VERSION_MAJOR < 1 || IRRLICHT_VERSION_MINOR < 7 || \
     _IRR_MATERIAL_MAX_TEXTURES_ < 8 || !defined(_IRR_COMPILE_WITH_OPENGL_) || \
-    !defined(_IRR_COMPILE_WITH_B3D_LOADER_)) && !defined(ANDROID)
+    !defined(_IRR_COMPILE_WITH_B3D_LOADER_)) && !defined(ANDROID) && !defined(USE_GLES2)
 #error "Building against an incompatible Irrlicht. Distros, \
 please use the included version."
 #endif
@@ -456,10 +456,12 @@ void IrrDriver::initDevice()
 
             if(m_device)
                 break;
-#ifndef ANDROID_DEVICE
+#if !defined(ANDROID_DEVICE) && !defined(USE_GLES2)
             params.DriverType    = video::EDT_OPENGL;
 #else
             params.DriverType    = video::EDT_OGLES2;
+#endif
+#if defined(ANDROID_DEVICE)
 			params.PrivateData = global_android_app;
 #endif
             params.Stencilbuffer = false;
@@ -507,9 +509,12 @@ void IrrDriver::initDevice()
         {
             UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
             UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
-
-#ifndef ANDROID_DEVICE
+#if !defined(ANDROID_DEVICE)
+#if defined(USE_GLES2)
+            m_device = createDevice(video::EDT_OGLES2,
+#else
             m_device = createDevice(video::EDT_OPENGL,
+#endif
                         core::dimension2du(UserConfigParams::m_width,
                                            UserConfigParams::m_height ),
                                     32, //bits per pixel

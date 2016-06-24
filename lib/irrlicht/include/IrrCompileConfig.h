@@ -106,8 +106,10 @@
 #endif
 #endif
 
+#if defined(ANDROID)
 #define _IRR_ANDROID_PLATFORM_
 #define _IRR_POSIX_API_
+#endif
 
 #if defined(_IRR_ANDROID_PLATFORM_)
 #define _IRR_COMPILE_WITH_ANDROID_DEVICE_
@@ -236,7 +238,7 @@ define out. */
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 #define IRR_OGLES2_SHADER_PATH "media/Shaders/"
 #else
-#define IRR_OGLES2_SHADER_PATH "../../media/Shaders/"
+#define IRR_OGLES2_SHADER_PATH "data/shaders/irrlicht/"
 #endif
 #endif
 

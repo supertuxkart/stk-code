@@ -18,13 +18,15 @@
 #ifdef _IRR_COMPILE_WITH_X11_
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
-#include <GL/gl.h>
-#define GLX_GLXEXT_LEGACY 1
-#include <GL/glx.h>
-#ifdef _IRR_OPENGL_USE_EXTPOINTER_
-#define GLX_GLXEXT_PROTOTYPES
-#include "glxext.h"
+#include <GLES3/gl3.h>
 #endif
+
+
+//#define COMPILE_WITH_EGL
+
+#ifdef COMPILE_WITH_EGL
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
 #endif
 
 #include <X11/Xlib.h>
@@ -408,10 +410,17 @@ namespace irr
 		int crtc_x;
 		int crtc_y;
 		#endif
-		#ifdef _IRR_COMPILE_WITH_OPENGL_
+#ifdef COMPILE_WITH_GLX
 		GLXWindow glxWin;
-		GLXContext Context;
-		#endif
+		GLXContext glxContext;
+#endif
+#ifdef COMPILE_WITH_EGL
+	public:
+		EGLDisplay eglDisplay;
+		EGLContext eglContext;
+		EGLSurface eglSurface;
+	private:
+#endif
 #endif
 		u32 Width, Height;
 		bool WindowHasFocus;

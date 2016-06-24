@@ -305,7 +305,7 @@ void STKMeshSceneNode::render()
             size_t count = mesh.IndexCount;
 
             compressTexture(mesh.textures[0], true);
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
             if (CVS->isAZDOEnabled())
             {
                 if (!mesh.TextureHandles[0])
@@ -350,7 +350,7 @@ void STKMeshSceneNode::render()
             GLenum itype = mesh.IndexType;
             size_t count = mesh.IndexCount;
 
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
             if (CVS->isAZDOEnabled())
             {
                 GLuint64 DiffuseHandle =
@@ -462,7 +462,7 @@ void STKMeshSceneNode::render()
                         tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
                     if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])
@@ -502,7 +502,7 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
                     if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])

@@ -186,6 +186,7 @@ void Skybox::generateCubeMapFromTextures()
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
 #ifndef ANDROID
+#if !defined(USE_GLES2)
         if (CVS->isTextureCompressionEnabled())
         {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
@@ -193,6 +194,7 @@ void Skybox::generateCubeMapFromTextures()
                          GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
         }
         else
+#endif
         {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                          GL_SRGB_ALPHA, size, size, 0, GL_BGRA,
@@ -321,7 +323,7 @@ Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
 {
     m_skybox_textures = skybox_textures;
     
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif
 

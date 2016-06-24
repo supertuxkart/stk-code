@@ -21,7 +21,7 @@
 #define GLEW_STATIC
 
 extern "C" {
-#ifndef ANDROID_DEVICE
+#if !defined(ANDROID_DEVICE) && !defined(USE_GLES2)
 #   include <GL/glew.h>
 #endif
 }
@@ -40,10 +40,11 @@ extern "C" {
 #    ifndef GL_TEXTURE_SWIZZLE_RGBA
 #        define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
 #    endif
-#elif defined(ANDROID_DEVICE)
+#elif defined(ANDROID_DEVICE) || defined(USE_GLES2)
 #    include <GLES3/gl3.h>
 #    include <GLES3/gl31.h>
 #    include <GLES3/gl3ext.h>
+#    include <GLES2/gl2ext.h>
 #    define glVertexAttribDivisorARB glVertexAttribDivisor
 #elif defined(WIN32)
 #    define WIN32_LEAN_AND_MEAN
@@ -53,6 +54,30 @@ extern "C" {
 #define DEBUG_OUTPUT_DECLARED
 #    include <GL/gl.h>
 #    include <GL/glext.h>
+#endif
+
+#if defined(ANDROID) || defined(USE_GLES2)
+#define GL_BGRA 0x80E1
+#define GL_BGR 0x80E0
+#endif
+
+#if defined(USE_GLES2)
+#define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
+#define GL_TEXTURE_BUFFER GL_TEXTURE_BUFFER_EXT
+#define GL_FRAMEBUFFER_SRGB GL_FRAMEBUFFER_SRGB_EXT
+#define GL_SRGB_ALPHA GL_SRGB_ALPHA_EXT
+
+extern PFNGLUNIFORMHANDLEUI64NVPROC pglUniformHandleui64NV;
+extern PFNGLDRAWELEMENTSBASEVERTEXOESPROC pglDrawElementsBaseVertexOES;
+extern PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR;
+extern PFNGLTEXBUFFEROESPROC pglTexBufferOES;
+extern PFNGLTEXTUREVIEWOESPROC pglTextureViewOES;
+
+#define glUniformHandleui64ARB pglUniformHandleui64NV
+#define glDrawElementsBaseVertex pglDrawElementsBaseVertexOES
+#define glDebugMessageCallbackARB pglDebugMessageCallbackKHR
+#define glTexBuffer pglTexBufferOES
+#define glTextureView pglTextureViewOES
 #endif
 
 struct DrawElementsIndirectCommand{

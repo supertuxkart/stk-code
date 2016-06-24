@@ -30,6 +30,17 @@
 #include <string>
 #include <sstream>
 
+#if defined(USE_GLES2)
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+
+PFNGLUNIFORMHANDLEUI64NVPROC pglUniformHandleui64NV = 0;
+PFNGLDRAWELEMENTSBASEVERTEXOESPROC pglDrawElementsBaseVertexOES = 0;
+PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR = 0;
+PFNGLTEXBUFFEROESPROC pglTexBufferOES = 0;
+PFNGLTEXTUREVIEWOESPROC pglTextureViewOES = 0;
+#endif
+
 #ifndef GL_DEBUG_SEVERITY_HIGH_ARB
     // Extension: ARB_debug_output
     #define GL_DEBUG_SEVERITY_HIGH_ARB       0x9146
@@ -177,7 +188,7 @@ void initGL()
         return;
     is_gl_init = true;
     // For Mesa extension reporting
-#ifndef ANDROID_DEVICE
+#if !defined(ANDROID_DEVICE) && !defined(USE_GLES2)
 #ifndef WIN32
     glewExperimental = GL_TRUE;
 #endif
@@ -185,9 +196,22 @@ void initGL()
     if (GLEW_OK != err)
         Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
 #endif
+
+#if defined(USE_GLES2)
+    glUniformHandleui64ARB = (PFNGLUNIFORMHANDLEUI64NVPROC)eglGetProcAddress("pglUniformHandleui64NV");
+    glDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXOESPROC)eglGetProcAddress("glDrawElementsBaseVertexOES");
+    glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKKHRPROC)eglGetProcAddress("glDebugMessageCallbackKHR");
+    glTexBuffer = (PFNGLTEXBUFFEROESPROC)eglGetProcAddress("glTexBufferOES");
+    glTextureView = (PFNGLTEXTUREVIEWOESPROC)eglGetProcAddress("glTextureViewOES");
+#endif
+
 #ifdef ARB_DEBUG_OUTPUT
+#if !defined(USE_GLES2)
     if (glDebugMessageCallbackARB)
         glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
+#else
+        glDebugMessageCallbackARB((GLDEBUGPROCKHR)debugCallback, NULL);
+#endif
 #endif
 }
 
@@ -243,19 +267,19 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
     if (layered)
     {
         for (unsigned i = 0; i < RTTs.size(); i++)
             glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, RTTs[i], 0);
     }
     else
-    {
 #endif
+    {
         for (unsigned i = 0; i < RTTs.size(); i++)
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
-#ifndef ANDROID
     }
+#ifndef ANDROID
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
 #endif
@@ -268,7 +292,7 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(USE_GLES2)
     if (layered)
     {
         for (unsigned i = 0; i < RTTs.size(); i++)
@@ -276,13 +300,13 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, DS, 0);
     }
     else
-    {
 #endif
+    {
         for (unsigned i = 0; i < RTTs.size(); i++)
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DS, 0);
-#ifndef ANDROID
     }
+#ifndef ANDROID
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
     if (layered)

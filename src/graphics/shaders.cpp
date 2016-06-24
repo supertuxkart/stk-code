@@ -178,7 +178,9 @@ GLuint loadShader(const char * file, unsigned type)
 {
     GLuint Id = glCreateShader(type);
     char versionString[20];
+#if !defined(ANDROID) && !defined(USE_GLES2)
     sprintf(versionString, "#version %d\n", CVS->getGLSLVersion());
+#endif
     std::string Code = versionString;
     if (CVS->isAMDVertexShaderLayerUsable())
         Code += "#extension GL_AMD_vertex_shader_layer : enable\n";

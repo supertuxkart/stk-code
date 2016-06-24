@@ -63,6 +63,8 @@ namespace irr
 		extern bool useCoreContext;
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
+		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
+			video::SExposedVideoData& data, io::IFileSystem* io);
 	}
 } // end namespace irr
 
@@ -85,10 +87,16 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 #ifdef _IRR_COMPILE_WITH_X11_
 	display(0), visual(0), screennr(0), window(0), StdHints(0), SoftwareImage(0),
 	XInputMethod(0), XInputContext(0),
-#ifdef _IRR_COMPILE_WITH_OPENGL_
+#ifdef COMPILE_WITH_GLX
 	glxWin(0),
-	Context(0),
+	glxContext(0),
 #endif
+#ifdef COMPILE_WITH_EGL
+	eglDisplay(0),
+	eglContext(0),
+	eglSurface(0),
+#endif
+
 #endif
 	Width(param.WindowSize.Width), Height(param.WindowSize.Height),
 	WindowHasFocus(false), WindowMinimized(false),
@@ -178,8 +186,8 @@ CIrrDeviceLinux::~CIrrDeviceLinux()
 
 	if (display)
 	{
-		#ifdef _IRR_COMPILE_WITH_OPENGL_
-		if (Context)
+		#ifdef COMPILE_WITH_GLX
+		if (glxContext)
 		{
 			if (glxWin)
 			{
@@ -191,11 +199,11 @@ CIrrDeviceLinux::~CIrrDeviceLinux()
 				if (!glXMakeCurrent(display, None, NULL))
 					os::Printer::log("Could not release glx context.", ELL_WARNING);
 			}
-			glXDestroyContext(display, Context);
+			glXDestroyContext(display, glxContext);
 			if (glxWin)
 				glXDestroyWindow(display, glxWin);
 		}
-		#endif // #ifdef _IRR_COMPILE_WITH_OPENGL_
+		#endif // #ifdef COMPILE_WITH_GLX
 
 		if (SoftwareImage)
 			XDestroyImage(SoftwareImage);
@@ -204,10 +212,10 @@ CIrrDeviceLinux::~CIrrDeviceLinux()
 		{
 			XDestroyWindow(display,window);
 		}
-		
+
 		// Reset fullscreen resolution change
-		restoreResolution();		
-		
+		restoreResolution();
+
 		if (!ExternalWindow)
 		{
 			XCloseDisplay(display);
@@ -267,14 +275,14 @@ bool CIrrDeviceLinux::restoreResolution()
 			return false;
 
 		XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
-		if (!output || !output->crtc || output->connection == RR_Disconnected) 
+		if (!output || !output->crtc || output->connection == RR_Disconnected)
 		{
 			XRRFreeOutputInfo(output);
 			return false;
 		}
 
 		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
-		if (!crtc) 
+		if (!crtc)
 		{
 			XRRFreeOutputInfo(output);
 			return false;
@@ -382,7 +390,7 @@ bool CIrrDeviceLinux::changeResolution()
 			XRRFreeScreenResources(res);
 			break;
 		}
-		
+
 		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
 		if (!crtc)
 		{
@@ -402,12 +410,12 @@ bool CIrrDeviceLinux::changeResolution()
 			if (crtc->rotation & (XRANDR_ROTATION_LEFT|XRANDR_ROTATION_RIGHT))
 			{
 				size = core::dimension2d<u32>(mode->height, mode->width);
-			} 
-			else 
+			}
+			else
 			{
 				size = core::dimension2d<u32>(mode->width, mode->height);
 			}
-			
+
 			if (bestMode == -1 && mode->id == output->modes[0])
 			{
 				mode0_size = size;
@@ -455,7 +463,7 @@ bool CIrrDeviceLinux::changeResolution()
 		Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime,
 									crtc->x, crtc->y, output->modes[bestMode],
 									crtc->rotation, &output_id, 1);
-		
+
 		if (s == Success)
 			UseXRandR = true;
 
@@ -464,7 +472,7 @@ bool CIrrDeviceLinux::changeResolution()
 		XRRFreeScreenResources(res);
 		break;
 	}
-	
+
 	if (UseXRandR == false)
 	{
 		os::Printer::log("Could not get video output. Try to run in windowed mode.", ELL_WARNING);
@@ -506,6 +514,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 }
 #endif
 
+#ifdef COMPILE_WITH_GLX
 static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, bool force_legacy_context)
 {
 	GLXContext Context;
@@ -558,7 +567,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
 	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
-  
+
     if(!force_legacy_context)
     {
         // create core 4.3 context
@@ -566,7 +575,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
         Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
         if (!XErrorSignaled)
             return Context;
-        
+
         XErrorSignaled = false;
         // create core 3.3 context
         os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
@@ -590,6 +599,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
+#endif
 
 bool CIrrDeviceLinux::createWindow()
 {
@@ -612,8 +622,37 @@ bool CIrrDeviceLinux::createWindow()
 
 	changeResolution();
 
-#ifdef _IRR_COMPILE_WITH_OPENGL_
+#ifdef COMPILE_WITH_EGL
+	eglDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 
+	if(!eglInitialize(eglDisplay, NULL, NULL))
+	{
+		printf("EGLInit error %d\n", eglGetError());
+	}
+
+	int attrib[] = {
+		EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+		EGL_RED_SIZE, 4,
+		EGL_GREEN_SIZE, 4,
+		EGL_BLUE_SIZE, 4,
+		EGL_ALPHA_SIZE, CreationParams.WithAlphaChannel?1:0,
+		EGL_DEPTH_SIZE, CreationParams.ZBufferBits, //10,11
+		EGL_NONE
+	};
+	EGLConfig conf;
+	int size;
+	if (!eglChooseConfig(eglDisplay, attrib, 0, 0, &size))
+	{
+		printf("EGL Config count error %x\n", eglGetError());
+	}
+	printf("size is %d\n", size);
+	if (!eglChooseConfig(eglDisplay, attrib, &conf, 1, &size))
+	{
+		printf("EGL Config error %x\n", eglGetError());
+	}
+#endif
+
+#ifdef COMPILE_WITH_GLX
 	GLXFBConfig glxFBConfig;
 	int major, minor;
 	bool isAvailableGLX=false;
@@ -837,7 +876,7 @@ bool CIrrDeviceLinux::createWindow()
 	// don't use the XVisual with OpenGL, because it ignores all requested
 	// properties of the CreationParams
 	else if (!visual)
-#endif // _IRR_COMPILE_WITH_OPENGL_
+#endif // COMPILE_WITH_GLX
 
 	// create visual with standard X methods
 	{
@@ -910,7 +949,36 @@ bool CIrrDeviceLinux::createWindow()
 		Atom wmDelete;
 		wmDelete = XInternAtom(display, wmDeleteWindow, True);
 		XSetWMProtocols(display, window, &wmDelete, 1);
-
+#ifdef COMPILE_WITH_EGL
+		eglSurface = eglCreateWindowSurface(eglDisplay, conf, window, NULL);
+		if (eglSurface == EGL_NO_SURFACE )
+		{
+			printf("EGL NO SURFACE %x\n", eglGetError());
+		}
+		
+		//~ if (!eglBindAPI(EGL_OPENGL_API))
+		if (!eglBindAPI(EGL_OPENGL_ES_API))
+		{
+			printf("EGL bind api %x\n", eglGetError());
+		}
+		int egl_context_attrib[] =
+		{
+			EGL_CONTEXT_MAJOR_VERSION_KHR, 3,
+			//~ EGL_CONTEXT_MINOR_VERSION_KHR, 3,
+			EGL_CONTEXT_MINOR_VERSION_KHR, 0,
+			EGL_NONE
+		};
+		
+		eglContext = eglCreateContext(eglDisplay, conf, EGL_NO_CONTEXT, egl_context_attrib);
+		if (eglContext == EGL_NO_CONTEXT)
+		{
+									printf("EGL Context %x\n", eglGetError());
+		}
+		if (!eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext))
+		{
+						printf("EGL Make current %x\n", eglGetError());
+		}
+#endif
 		if (CreationParams.Fullscreen)
 		{
 			if (netWM)
@@ -937,11 +1005,11 @@ bool CIrrDeviceLinux::createWindow()
 				xev.xclient.format = 32;
 				xev.xclient.data.l[0] = 1;
 				xev.xclient.data.l[1] = WMFullscreenAtom;
-				XSendEvent(display, RootWindow(display, visual->screen), false, 
+				XSendEvent(display, RootWindow(display, visual->screen), false,
 							SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 
 				XFlush(display);
-				
+
 				// Wait until window state is already changed to fullscreen
 				bool fullscreen = false;
 				for (int i = 0; i < 500; i++)
@@ -952,36 +1020,36 @@ bool CIrrDeviceLinux::createWindow()
 					unsigned char* data = NULL;
 
 					int s = XGetWindowProperty(display, window, WMStateAtom,
-											0l, 1024, False, XA_ATOM, &type, 
-											&format,  &numItems, &bytesAfter, 
+											0l, 1024, False, XA_ATOM, &type,
+											&format,  &numItems, &bytesAfter,
 											&data);
 
-					if (s == Success) 
+					if (s == Success)
 					{
 						Atom* atoms = (Atom*)data;
-						
-						for (unsigned int i = 0; i < numItems; ++i) 
+
+						for (unsigned int i = 0; i < numItems; ++i)
 						{
-							if (atoms[i] == WMFullscreenAtom) 
+							if (atoms[i] == WMFullscreenAtom)
 							{
 								fullscreen = true;
 								break;
 							}
 						}
 					}
-						
+
 					XFree(data);
-					
+
 					if (fullscreen == true)
 						break;
-					
+
 					usleep(1000);
 				}
-					
+
 				if (!fullscreen)
 				{
 					os::Printer::log("Warning! Got timeout while checking fullscreen sate", ELL_WARNING);
-				}        
+				}
 			}
 			else
 			{
@@ -1021,10 +1089,10 @@ bool CIrrDeviceLinux::createWindow()
 	// Currently broken in X, see Bug ID 2795321
 	// XkbSetDetectableAutoRepeat(display, True, &AutorepeatSupport);
 
-#ifdef _IRR_COMPILE_WITH_OPENGL_
+#ifdef COMPILE_WITH_GLX
 
 	// connect glx context to window
-	Context=0;
+	glxContext=0;
 	if (isAvailableGLX && CreationParams.DriverType==video::EDT_OPENGL)
 	{
 	if (UseGLXWindow)
@@ -1032,13 +1100,13 @@ bool CIrrDeviceLinux::createWindow()
 		glxWin=glXCreateWindow(display,glxFBConfig,window,NULL);
 		if (glxWin)
 		{
-			Context = getMeAGLContext(display, glxFBConfig, CreationParams.ForceLegacyDevice);
-			if (Context)
+			glxContext = getMeAGLContext(display, glxFBConfig);
+			if (glxContext)
 			{
-				if (!glXMakeContextCurrent(display, glxWin, glxWin, Context))
+				if (!glXMakeContextCurrent(display, glxWin, glxWin, glxContext))
 				{
 					os::Printer::log("Could not make context current.", ELL_WARNING);
-					glXDestroyContext(display, Context);
+					glXDestroyContext(display, glxContext);
 				}
 			}
 			else
@@ -1053,13 +1121,13 @@ bool CIrrDeviceLinux::createWindow()
 	}
 	else
 	{
-		Context = glXCreateContext(display, visual, NULL, True);
-		if (Context)
+		glxContext = glXCreateContext(display, visual, NULL, True);
+		if (glxContext)
 		{
-			if (!glXMakeCurrent(display, window, Context))
+			if (!glXMakeCurrent(display, window, glxContext))
 			{
 				os::Printer::log("Could not make context current.", ELL_WARNING);
-				glXDestroyContext(display, Context);
+				glXDestroyContext(display, glxContext);
 			}
 		}
 		else
@@ -1068,7 +1136,7 @@ bool CIrrDeviceLinux::createWindow()
 		}
 	}
 	}
-#endif // _IRR_COMPILE_WITH_OPENGL_
+#endif // COMPILE_WITH_GLX
 
 	Window tmp;
 	u32 borderWidth;
@@ -1109,6 +1177,7 @@ bool CIrrDeviceLinux::createWindow()
 //! create the driver
 void CIrrDeviceLinux::createDriver()
 {
+	bool tmp = false;
 	switch(CreationParams.DriverType)
 	{
 #ifdef _IRR_COMPILE_WITH_X11_
@@ -1130,14 +1199,25 @@ void CIrrDeviceLinux::createDriver()
 		break;
 
 	case video::EDT_OPENGL:
-		#ifdef _IRR_COMPILE_WITH_OPENGL_
-		if (Context)
+#ifdef COMPILE_WITH_GLX
+		tmp |= (glxContext != 0);
+#endif
+#ifdef COMPILE_WITH_EGL
+		tmp |= (eglContext != 0);
+#endif
+		if (tmp)
 			VideoDriver = video::createOpenGLDriver(CreationParams, FileSystem, this);
-		#else
-		os::Printer::log("No OpenGL support compiled in.", ELL_ERROR);
-		#endif
 		break;
-
+		
+	case video::EDT_OGLES2:
+	{
+		video::SExposedVideoData data;
+		data.OpenGLLinux.X11Window = window;
+		data.OpenGLLinux.X11Display = display;
+		VideoDriver = video::createOGLES2Driver(CreationParams, data, FileSystem);
+		break;
+	}
+		
 	case video::EDT_DIRECT3D8:
 	case video::EDT_DIRECT3D9:
 		os::Printer::log("This driver is not available in Linux. Try OpenGL or Software renderer.",
@@ -1809,7 +1889,7 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 			#ifdef _IRR_LINUX_X11_RANDR_
 			output_id = BadRROutput;
 			old_mode = BadRRMode;
-			
+
 			while (XRRQueryExtension(display, &eventbase, &errorbase))
 			{
 				XRROutputInfo* output = NULL;
@@ -1819,52 +1899,52 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 				XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 				if (!res)
 					break;
-				
+
 				RROutput primary_id = XRRGetOutputPrimary(display, DefaultRootWindow(display));
-		
-				for (int i = 0; i < res->noutput; i++) 
+
+				for (int i = 0; i < res->noutput; i++)
 				{
 					XRROutputInfo* output_tmp = XRRGetOutputInfo(display, res, res->outputs[i]);
-					if (!output_tmp || !output_tmp->crtc || output_tmp->connection == RR_Disconnected) 
+					if (!output_tmp || !output_tmp->crtc || output_tmp->connection == RR_Disconnected)
 					{
 						XRRFreeOutputInfo(output_tmp);
 						continue;
 					}
-		
+
 					XRRCrtcInfo* crtc_tmp = XRRGetCrtcInfo(display, res, output_tmp->crtc);
-					if (!crtc_tmp) 
+					if (!crtc_tmp)
 					{
 						XRRFreeOutputInfo(output_tmp);
 						continue;
 					}
-					
+
 					if (res->outputs[i] == primary_id ||
 						output_id == BadRROutput || crtc_tmp->x < crtc->x ||
 						(crtc_tmp->x == crtc->x && crtc_tmp->y < crtc->y))
 					{
 						XRRFreeCrtcInfo(crtc);
-						XRRFreeOutputInfo(output);		
-						
+						XRRFreeOutputInfo(output);
+
 						output = output_tmp;
-						crtc = crtc_tmp;					
+						crtc = crtc_tmp;
 						output_id = res->outputs[i];
 					}
 					else
 					{
 						XRRFreeCrtcInfo(crtc_tmp);
-						XRRFreeOutputInfo(output_tmp);			
+						XRRFreeOutputInfo(output_tmp);
 					}
-					
+
 					if (res->outputs[i] == primary_id)
 						break;
 				}
-				
+
 				if (output_id == BadRROutput)
 				{
 					os::Printer::log("Could not get video output.", ELL_WARNING);
 					break;
 				}
-				
+
 				crtc_x = crtc->x;
 				crtc_y = crtc->y;
 
@@ -1876,14 +1956,14 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					if (crtc->rotation & (XRANDR_ROTATION_LEFT|XRANDR_ROTATION_RIGHT))
 					{
 						size = core::dimension2d<u32>(mode->height, mode->width);
-					} 
-					else 
+					}
+					else
 					{
 						size = core::dimension2d<u32>(mode->width, mode->height);
 					}
 
 					for (int j = 0; j < output->nmode; j++)
-					{            
+					{
 						if (mode->id == output->modes[j])
 						{
 							VideoModeList.addMode(size, defaultDepth);
@@ -1897,15 +1977,15 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 						VideoModeList.setDesktop(defaultDepth, size);
 					}
 				}
-				
+
 				XRRFreeCrtcInfo(crtc);
 				XRRFreeOutputInfo(output);
-				XRRFreeScreenResources(res);						
+				XRRFreeScreenResources(res);
 				break;
 			}
 			#endif
 		}
-	
+
 		if (display && temporaryDisplay)
 		{
 			XCloseDisplay(display);
@@ -2201,6 +2281,7 @@ bool CIrrDeviceLinux::activateJoysticks(core::array<SJoystickInfo> & joystickInf
 
 		ActiveJoysticks.push_back(info);
 
+		returnInfo.HasGenericName = false;
 		returnInfo.Joystick = joystick;
 		returnInfo.PovHat = SJoystickInfo::POV_HAT_UNKNOWN;
 		returnInfo.Axes = info.axes;
@@ -2286,7 +2367,7 @@ void CIrrDeviceLinux::pollJoysticks()
 
 		// Send an irrlicht joystick event once per ::run() even if no new data were received.
 		(void)postEventFromUser(info.persistentData);
-		
+
 #ifdef _IRR_COMPILE_WITH_X11_
 		if (event_received)
 		{
@@ -2394,12 +2475,12 @@ bool CIrrDeviceLinux::getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &bright
 const c8* CIrrDeviceLinux::getTextFromClipboard() const
 {
 #if defined(_IRR_COMPILE_WITH_X11_)
-	if (X_ATOM_CLIPBOARD == None) 
+	if (X_ATOM_CLIPBOARD == None)
 	{
 		os::Printer::log("Couldn't access X clipboard", ELL_WARNING);
 		return 0;
 	}
-	
+
 	Window ownerWindow = XGetSelectionOwner(display, X_ATOM_CLIPBOARD);
 	if (ownerWindow == window)
 	{
@@ -2413,38 +2494,38 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 
 	Atom selection = XInternAtom(display, "IRR_SELECTION", False);
 	XConvertSelection(display, X_ATOM_CLIPBOARD, XA_STRING, selection, window, CurrentTime);
-	
+
 	const int SELECTION_RETRIES = 500;
 	int i = 0;
 	for (i = 0; i < SELECTION_RETRIES; i++)
 	{
 		XEvent xevent;
 		bool res = XCheckTypedWindowEvent(display, window, SelectionNotify, &xevent);
-		
-		if (res && xevent.xselection.selection == X_ATOM_CLIPBOARD) 
+
+		if (res && xevent.xselection.selection == X_ATOM_CLIPBOARD)
 			break;
 
 		usleep(1000);
 	}
-	
+
 	if (i == SELECTION_RETRIES)
 	{
 		os::Printer::log("Timed out waiting for SelectionNotify event", ELL_WARNING);
 		return 0;
 	}
-	
+
 	Atom type;
 	int format;
 	unsigned long numItems, dummy;
 	unsigned char *data;
 
-	int result = XGetWindowProperty(display, window, selection, 0, INT_MAX/4, 
-									False, AnyPropertyType, &type, &format, 
+	int result = XGetWindowProperty(display, window, selection, 0, INT_MAX/4,
+									False, AnyPropertyType, &type, &format,
 									&numItems, &dummy, &data);
 
 	if (result == Success)
 		Clipboard = (irr::c8*)data;
-		
+
 	XFree (data);
 	return Clipboard.c_str();
 #else
