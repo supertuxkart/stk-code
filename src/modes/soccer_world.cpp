@@ -22,6 +22,7 @@
 #include "audio/sfx_base.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart.hpp"
@@ -303,6 +304,9 @@ void SoccerWorld::countdownReachedZero()
 //-----------------------------------------------------------------------------
 void SoccerWorld::initKartList()
 {
+    // Color of karts can be changed using shaders
+    if (CVS->isGLSL()) return;
+
     const unsigned int kart_amount = (unsigned int)m_karts.size();
 
     //Loading the indicator textures
