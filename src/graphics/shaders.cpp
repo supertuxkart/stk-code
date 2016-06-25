@@ -181,6 +181,10 @@ GLuint loadShader(const char * file, unsigned type)
 #if !defined(ANDROID) && !defined(USE_GLES2)
     sprintf(versionString, "#version %d\n", CVS->getGLSLVersion());
 #endif
+#if defined(USE_GLES2)
+    if (CVS->isGLSL())
+        sprintf(versionString, "#version 300 es\n");
+#endif
     std::string Code = versionString;
     if (CVS->isAMDVertexShaderLayerUsable())
         Code += "#extension GL_AMD_vertex_shader_layer : enable\n";
@@ -247,45 +251,51 @@ void Shaders::loadShaders()
     // Save previous shaders (used in case some shaders don't compile)
     int saved_shaders[ES_COUNT];
     memcpy(saved_shaders, m_shaders, sizeof(m_shaders));
+    
+#if !defined(ANDROID) && !defined(USE_GLES2)
+    std::string name = "pass";
+#else
+    std::string name = "pass_gles";
+#endif
 
     // Ok, go
-    m_shaders[ES_NORMAL_MAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-    m_shaders[ES_NORMAL_MAP_LIGHTMAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_NORMAL_MAP] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
+    m_shaders[ES_NORMAL_MAP_LIGHTMAP] = glsl_noinput(dir + name + "vert", dir + name + "frag");
 
-    m_shaders[ES_SKYBOX] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_SKYBOX] = glslmat(dir + name + "vert", dir + name + "frag",
                                    m_callbacks[ES_SKYBOX], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-    m_shaders[ES_SPLATTING] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_SPLATTING] = glsl_noinput(dir + name + "vert", dir + name + "frag");
 
-    m_shaders[ES_WATER] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_WATER] = glslmat(dir + name + "vert", dir + name + "frag",
                                   m_callbacks[ES_WATER], EMT_TRANSPARENT_ALPHA_CHANNEL);
-    m_shaders[ES_WATER_SURFACE] = glsl(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_WATER_SURFACE] = glsl(dir + name + "vert", dir + name + "frag",
                                        m_callbacks[ES_WATER]);
 
-    m_shaders[ES_SPHERE_MAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_SPHERE_MAP] = glsl_noinput(dir + name + "vert", dir + name + "frag");
 
-    m_shaders[ES_GRASS] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_GRASS] = glslmat(dir + name + "vert", dir + name + "frag",
                                   m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL);
-    m_shaders[ES_GRASS_REF] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_GRASS_REF] = glslmat(dir + name + "vert", dir + name + "frag",
                                       m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
 
-    m_shaders[ES_MOTIONBLUR] = glsl(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_MOTIONBLUR] = glsl(dir + name + "vert", dir + name + "frag",
                                     m_callbacks[ES_MOTIONBLUR]);
 
-    m_shaders[ES_GAUSSIAN3H] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_GAUSSIAN3H] = glslmat(dir + name + "vert", dir + name + "frag",
                                        m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-    m_shaders[ES_GAUSSIAN3V] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_GAUSSIAN3V] = glslmat(dir + name + "vert", dir + name + "frag",
                                        m_callbacks[ES_GAUSSIAN3V], EMT_SOLID);
 
-    m_shaders[ES_MIPVIZ] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_MIPVIZ] = glslmat(dir + name + "vert", dir + name + "frag",
                                    m_callbacks[ES_MIPVIZ], EMT_SOLID);
 
-    m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-    m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-    m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-    m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + name + "vert", dir + name + "frag");
+    m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + name + "vert", dir + name + "frag");
+    m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + name + "vert", dir + name + "frag");
+    m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + name + "vert", dir + name + "frag");
 
-    m_shaders[ES_DISPLACE] = glslmat(dir + "pass.vert", dir + "pass.frag",
+    m_shaders[ES_DISPLACE] = glslmat(dir + name + "vert", dir + name + "frag",
         m_callbacks[ES_DISPLACE], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
     // Check that all successfully loaded

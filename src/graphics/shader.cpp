@@ -67,6 +67,10 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
 #if !defined(ANDROID) && !defined(USE_GLES2)
     code << "#version " << CVS->getGLSLVersion()<<"\n";
 #endif
+#if defined(USE_GLES2)
+    if (CVS->isGLSL())
+        code << "#version 300 es\n";
+#endif
 
     // Some drivers report that the compute shaders extension is available,
     // but they report only OpenGL 3.x version, and thus these extensions

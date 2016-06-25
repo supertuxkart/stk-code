@@ -71,8 +71,8 @@ void CentralVideoSettings::init()
 #if !defined(ANDROID) && !defined(USE_GLES2)
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1))
            && !UserConfigParams::m_force_legacy_device;
-#else
-    m_glsl = false;
+#elif !defined(ANDROID)
+    m_glsl = m_gl_major_version >= 3 && !UserConfigParams::m_force_legacy_device;
 #endif
     if (!ProfileWorld::isNoGraphics())
         initGL();
