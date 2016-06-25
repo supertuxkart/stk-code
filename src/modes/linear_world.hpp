@@ -188,6 +188,12 @@ public:
     {
         return m_kart_info[kart_index].m_overall_distance;
     }   // getOverallDistance
+
+    /** Returns time for the fastest laps */
+    float getFastestLap() const
+    {
+        return m_fastest_lap;
+    }
 };   // LinearWorld
 
 #endif
