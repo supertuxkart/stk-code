@@ -98,7 +98,7 @@ void RaceResultGUI::init()
     }
 
     m_finish_sound = SFXManager::get()->quickSound(
-        human_win ? "gp_end" : "race_finish");
+        human_win ? "race_finish_victory" : "race_finish");
 
     //std::string path = (human_win ? Different result music too later
     //    file_manager->getAsset(FileManager::MUSIC, "race_summary.music") :
