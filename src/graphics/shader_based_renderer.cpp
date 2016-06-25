@@ -153,7 +153,7 @@ void ShaderBasedRenderer::addItemsInGlowingList()
         dat.b = c.getBlue();
 
         STKMeshSceneNode *stk_node = static_cast<STKMeshSceneNode *>(node);
-        stk_node->setGlowColors(irr::video::SColor(0, (unsigned) (dat.b * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.r * 255.f)));
+        stk_node->setGlowColors(irr::video::SColor(0, (unsigned) (dat.r * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.b * 255.f)));
 
         m_glowing.push_back(dat);
     }    
@@ -753,7 +753,7 @@ void ShaderBasedRenderer::addGlowingNode(scene::ISceneNode *n, float r, float g,
     dat.b = b;
     
     STKMeshSceneNode *node = static_cast<STKMeshSceneNode *>(n);
-    node->setGlowColors(irr::video::SColor(0, (unsigned) (dat.b * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.r * 255.f)));
+    node->setGlowColors(irr::video::SColor(0, (unsigned) (dat.r * 255.f), (unsigned)(dat.g * 255.f), (unsigned)(dat.b * 255.f)));
     
     m_glowing.push_back(dat);
     m_nb_static_glowing++;
