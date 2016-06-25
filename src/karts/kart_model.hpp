@@ -328,6 +328,8 @@ public:
     scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
     // ------------------------------------------------------------------------
     core::vector3df getHatOffset() { return m_hat_offset; }
+    // ------------------------------------------------------------------------
+    std::vector<int> getColorizableParts(scene::IAnimatedMesh* m);
 
 };   // KartModel
 #endif

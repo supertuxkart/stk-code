@@ -130,6 +130,14 @@ void STKAnimatedMesh::updateNoGL()
             {
                 TransparentMesh[TM_ADDITIVE].push_back(&mesh);
             }
+            else if (mb->getRenderType() == video::ERT_RED)
+            {
+                MeshSolidMaterial[Material::SHADERTYPE_SOLID_RED].push_back(&mesh);
+            }
+            else if (mb->getRenderType() == video::ERT_BLUE)
+            {
+                MeshSolidMaterial[Material::SHADERTYPE_SOLID_BLUE].push_back(&mesh);
+            }
             else
             {
                 Material::ShaderType MatType = material->getShaderType();// getMeshMaterialFromType(type, mb->getVertexType(), material);

@@ -188,6 +188,16 @@ void STKMeshSceneNode::updateNoGL()
                 else
                     additive = (TranspMat == TM_ADDITIVE);
             }
+            else if (mb->getRenderType() == video::ERT_RED)
+            {
+                if (!immediate_draw)
+                    MeshSolidMaterial[Material::SHADERTYPE_SOLID_RED].push_back(&mesh);
+            }
+            else if (mb->getRenderType() == video::ERT_BLUE)
+            {
+                if (!immediate_draw)
+                    MeshSolidMaterial[Material::SHADERTYPE_SOLID_BLUE].push_back(&mesh);
+            }
             else
             {
                 assert(!isDisplacement);

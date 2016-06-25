@@ -331,6 +331,12 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                         case Material::SHADERTYPE_SOLID:
                             ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                             break;
+                        case Material::SHADERTYPE_SOLID_RED:
+                            ListMatRed::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                            break;
+                        case Material::SHADERTYPE_SOLID_BLUE:
+                            ListMatBlue::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                            break;
                         case Material::SHADERTYPE_ALPHA_TEST:
                             ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                             break;
@@ -355,6 +361,12 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                     {
                     case Material::SHADERTYPE_SOLID:
                         ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_SOLID_RED:
+                        ListMatRed::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_SOLID_BLUE:
+                        ListMatBlue::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
                         ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
@@ -416,6 +428,12 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                     case Material::SHADERTYPE_SOLID:
                         ListMatDefault::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
+                    case Material::SHADERTYPE_SOLID_RED:
+                        ListMatRed::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_SOLID_BLUE:
+                        ListMatBlue::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
                     case Material::SHADERTYPE_ALPHA_TEST:
                         ListMatAlphaRef::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
@@ -474,6 +492,12 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                     {
                     case Material::SHADERTYPE_SOLID:
                         ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_SOLID_RED:
+                        ListMatRed::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        break;
+                    case Material::SHADERTYPE_SOLID_BLUE:
+                        ListMatBlue::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
                         ListMatAlphaRef::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
@@ -573,6 +597,8 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     ListDisplacement::getInstance()->clear();
 
     ListMatDefault::getInstance()->clear();
+    ListMatRed::getInstance()->clear();
+    ListMatBlue::getInstance()->clear();
     ListMatAlphaRef::getInstance()->clear();
     ListMatSphereMap::getInstance()->clear();
     ListMatDetails::getInstance()->clear();
@@ -674,6 +700,8 @@ PROFILER_POP_CPU_MARKER();
         enableOpenMP = 0;
 
     ListInstancedMatDefault::getInstance()->clear();
+    ListInstancedMatRed::getInstance()->clear();
+    ListInstancedMatBlue::getInstance()->clear();
     ListInstancedMatAlphaRef::getInstance()->clear();
     ListInstancedMatGrass::getInstance()->clear();
     ListInstancedMatNormalMap::getInstance()->clear();
@@ -703,6 +731,14 @@ PROFILER_POP_CPU_MARKER();
             SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID] = current_cmd;
             FillInstances(MeshForSolidPass[Material::SHADERTYPE_SOLID], ListInstancedMatDefault::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID];
+            // Red Material
+            SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_RED] = current_cmd;
+            FillInstances(MeshForSolidPass[Material::SHADERTYPE_SOLID_RED], ListInstancedMatRed::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
+            SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID_RED] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_RED];
+            // Blue Material
+            SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_BLUE] = current_cmd;
+            FillInstances(MeshForSolidPass[Material::SHADERTYPE_SOLID_BLUE], ListInstancedMatBlue::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);
+            SolidPassCmd::getInstance()->Size[Material::SHADERTYPE_SOLID_BLUE] = current_cmd - SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID_BLUE];
             // Alpha Ref
             SolidPassCmd::getInstance()->Offset[Material::SHADERTYPE_ALPHA_TEST] = current_cmd;
             FillInstances(MeshForSolidPass[Material::SHADERTYPE_ALPHA_TEST], ListInstancedMatAlphaRef::getInstance()->SolidPass, InstanceBufferDualTex, CmdBuffer, offset, current_cmd, SolidPoly);

@@ -81,15 +81,15 @@ namespace scene
 
 		//! Set the mesh to use a specific render type (mainly karts in STK)
 		/** \param t New render type for the mesh.
-		\param effective_buffer Mesh buffer numbers which are effected by new render type,
+		\param affected_buffers Mesh buffer numbers which are effected by new render type,
 		if not given all mesh buffers are affected. */
-		void setMeshRenderType(video::E_RENDER_TYPE t, const std::vector<int>& effective_buffer = std::vector<int>())
+		void setMeshRenderType(video::E_RENDER_TYPE t, const std::vector<int>& affected_buffers = std::vector<int>())
 		{
 			if (t == video::ERT_DEFAULT) return;
 			setCustomRenderType(true);
 			for (int i = 0; i < int(getMeshBufferCount()); i++)
 			{
-				if (!effective_buffer.empty() && std::find(effective_buffer.begin(), effective_buffer.end(), i) == effective_buffer.end())
+				if (!affected_buffers.empty() && std::find(affected_buffers.begin(), affected_buffers.end(), i) == affected_buffers.end())
 					continue;
 				getMeshBuffer(i)->setRenderType(t);
 			}

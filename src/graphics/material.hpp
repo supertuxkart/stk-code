@@ -47,6 +47,8 @@ public:
     enum ShaderType
     {
         SHADERTYPE_SOLID,
+        SHADERTYPE_SOLID_RED,
+        SHADERTYPE_SOLID_BLUE,
         SHADERTYPE_ALPHA_TEST,
         SHADERTYPE_ALPHA_BLEND,
         SHADERTYPE_ADDITIVE,
@@ -175,6 +177,9 @@ private:
     /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
     bool             m_disable_z_write;
 
+    /** True if this material can be colorized (like red/blue in team game). */
+    bool             m_colorizable;
+
     /** Some textures need to be pre-multiplied, some divided to give
      *  the intended effect. */
     //enum             {ADJ_NONE, ADJ_PREMUL, ADJ_DIV}
@@ -282,6 +287,10 @@ public:
     /** Returns if this material should trigger a rescue if a kart
      *  is driving on it. */
     bool  isDriveReset       () const { return m_drive_reset;        }
+    // ------------------------------------------------------------------------
+    /** Returns if this material can be colorized (like red/blue in team game).
+     */
+    bool  isColorizable      () const { return m_colorizable;        }
     // ------------------------------------------------------------------------
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */

@@ -140,6 +140,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     node->get("slowdown-time",    &m_slowdown_time     );
     node->get("backface-culling", &m_backface_culling  );
     node->get("disable-z-write",  &m_disable_z_write   );
+    node->get("colorizable",      &m_colorizable       );
     node->get("fog",              &m_fog               );
 
     node->get("mask",             &m_mask              );
@@ -434,6 +435,7 @@ void Material::init()
     m_mirror_axis_when_reverse  = ' ';
     m_collision_reaction        = NORMAL;
     m_disable_z_write           = false;
+    m_colorizable               = false;
     m_water_shader_speed_1      = 6.6667f;
     m_water_shader_speed_2      = 4.0f;
     m_fog                       = true;

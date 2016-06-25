@@ -123,7 +123,25 @@ class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4,
 {};
 
 // ----------------------------------------------------------------------------
+class ListMatRed : public MeshList<ListMatRed, GLMesh *, core::matrix4,
+                                      core::matrix4, core::matrix4>
+{};
+
+// ----------------------------------------------------------------------------
+class ListMatBlue : public MeshList<ListMatBlue, GLMesh *, core::matrix4,
+                                      core::matrix4, core::matrix4>
+{};
+
+// ----------------------------------------------------------------------------
 class ListInstancedMatDefault : public InstancedMeshList<ListInstancedMatDefault>
+{};
+
+// ----------------------------------------------------------------------------
+class ListInstancedMatRed : public InstancedMeshList<ListInstancedMatRed>
+{};
+
+// ----------------------------------------------------------------------------
+class ListInstancedMatBlue : public InstancedMeshList<ListInstancedMatBlue>
 {};
 
 // ----------------------------------------------------------------------------

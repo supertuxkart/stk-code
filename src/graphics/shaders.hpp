@@ -151,6 +151,22 @@ public:
     };   // ObjectPass2Shader
 
     // ========================================================================
+    class ObjectPass2ShaderRed : public TextureShader < ObjectPass2ShaderRed, 5,
+                                                 core::matrix4, core::matrix4 >
+    {
+    public:
+        ObjectPass2ShaderRed();
+    };   // ObjectPass2ShaderRed
+
+    // ========================================================================
+    class ObjectPass2ShaderBlue : public TextureShader < ObjectPass2ShaderBlue, 5,
+                                                 core::matrix4, core::matrix4 >
+    {
+    public:
+        ObjectPass2ShaderBlue();
+    };   // ObjectPass2ShaderBlue
+
+    // ========================================================================
 
 
 };   // class Shaders
