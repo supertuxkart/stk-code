@@ -133,13 +133,18 @@ public:
 // ============================================================================
 class InstancedObjectPass2Shader : public TextureShader<InstancedObjectPass2Shader, 5>
 {
+private:
+    GLint m_color_change_location;
+
 public:
     InstancedObjectPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
                             GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                            GL_FRAGMENT_SHADER, "utils/rgb_conversion.frag",
                             GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
+        m_color_change_location = glGetUniformLocation(m_program, "color_change");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -147,47 +152,12 @@ public:
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedObjectPass2Shader
+
+    void setHueSaturation(float hue, float saturation) const
+    {
+        glUniform2f(m_color_change_location, hue, saturation);
+    }   // setHueSaturation
 };   // InstancedObjectPass2Shader
-
-// ============================================================================
-class InstancedObjectPass2ShaderRed : public TextureShader<InstancedObjectPass2ShaderRed, 5>
-{
-public:
-    InstancedObjectPass2ShaderRed()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-                            GL_FRAGMENT_SHADER, "utils/rgb_conversion.frag",
-                            GL_FRAGMENT_SHADER, "instanced_object_pass2_red.frag");
-        assignUniforms();
-        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
-                           1, "SpecularMap", ST_NEAREST_FILTERED,
-                           2, "SSAO", ST_BILINEAR_FILTERED,
-                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }   // InstancedObjectPass2ShaderRed
-};   // InstancedObjectPass2ShaderRed
-
-// ============================================================================
-class InstancedObjectPass2ShaderBlue : public TextureShader<InstancedObjectPass2ShaderBlue, 5>
-{
-public:
-    InstancedObjectPass2ShaderBlue()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-                            GL_FRAGMENT_SHADER, "utils/rgb_conversion.frag",
-                            GL_FRAGMENT_SHADER, "instanced_object_pass2_blue.frag");
-        assignUniforms();
-        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
-                           1, "SpecularMap", ST_NEAREST_FILTERED,
-                           2, "SSAO", ST_BILINEAR_FILTERED,
-                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-    }   // InstancedObjectPass2ShaderBlue
-};   // InstancedObjectPass2ShaderBlue
 
 // ============================================================================
 class InstancedObjectRefPass2Shader : public TextureShader<InstancedObjectRefPass2Shader, 5>
@@ -581,66 +551,6 @@ const STK::Tuple<size_t, size_t> DefaultMaterial::SecondPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
 const STK::Tuple<> DefaultMaterial::ShadowTextures;
 const STK::Tuple<size_t> DefaultMaterial::RSMTextures = STK::Tuple<size_t>(0);
-
-// ============================================================================
-struct RedMaterial
-{
-    typedef InstancedObjectPass1Shader InstancedFirstPassShader;
-    typedef InstancedObjectPass2ShaderRed InstancedSecondPassShader;
-    typedef InstancedShadowShader InstancedShadowPassShader;
-    typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatRed InstancedList;
-    typedef Shaders::ObjectPass1Shader FirstPassShader;
-    typedef Shaders::ObjectPass2ShaderRed SecondPassShader;
-    typedef ShadowShader ShadowPassShader;
-    typedef CRSMShader RSMShader;
-    typedef ListMatRed List;
-    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum Material::ShaderType MaterialType
-                                               = Material::SHADERTYPE_SOLID_RED;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
-    static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
-};   // struct RedMaterial
-
-const STK::Tuple<size_t> RedMaterial::FirstPassTextures
-    = STK::Tuple<size_t>(1);
-const STK::Tuple<size_t, size_t> RedMaterial::SecondPassTextures
-    = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<> RedMaterial::ShadowTextures;
-const STK::Tuple<size_t> RedMaterial::RSMTextures = STK::Tuple<size_t>(0);
-
-// ============================================================================
-struct BlueMaterial
-{
-    typedef InstancedObjectPass1Shader InstancedFirstPassShader;
-    typedef InstancedObjectPass2ShaderBlue InstancedSecondPassShader;
-    typedef InstancedShadowShader InstancedShadowPassShader;
-    typedef CInstancedRSMShader InstancedRSMShader;
-    typedef ListInstancedMatBlue InstancedList;
-    typedef Shaders::ObjectPass1Shader FirstPassShader;
-    typedef Shaders::ObjectPass2ShaderBlue SecondPassShader;
-    typedef ShadowShader ShadowPassShader;
-    typedef CRSMShader RSMShader;
-    typedef ListMatBlue List;
-    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum Material::ShaderType MaterialType
-                                               = Material::SHADERTYPE_SOLID_BLUE;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
-    static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t> SecondPassTextures;
-    static const STK::Tuple<> ShadowTextures;
-    static const STK::Tuple<size_t> RSMTextures;
-};   // struct BlueMaterial
-
-const STK::Tuple<size_t> BlueMaterial::FirstPassTextures
-    = STK::Tuple<size_t>(1);
-const STK::Tuple<size_t, size_t> BlueMaterial::SecondPassTextures
-    = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<> BlueMaterial::ShadowTextures;
-const STK::Tuple<size_t> BlueMaterial::RSMTextures = STK::Tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
 struct AlphaRef
@@ -1087,6 +997,26 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
     GLenum itype = mesh->IndexType;
     size_t count = mesh->IndexCount;
 
+    const Shaders::ObjectPass2Shader* op2s = dynamic_cast<const Shaders::ObjectPass2Shader*>
+        (Shader);
+    if (op2s)
+    {
+        const video::E_RENDER_TYPE rt = mesh->mb->getRenderType();
+        if (rt == video::ERT_RED)
+        {
+            op2s->setHueSaturation(0.7f, 0.7f);
+        }
+        else if (rt == video::ERT_BLUE)
+        {
+            op2s->setHueSaturation(0.1f, 0.5f);
+        }
+        else
+        {
+            // Reset if not using custom render type
+            op2s->setHueSaturation(-1, -1);
+        }
+    }
+
     Shader->setUniforms(Args...);
     glDrawElementsBaseVertex(ptype, (int)count, itype,
                              (GLvoid *)mesh->vaoOffset,
@@ -1287,8 +1217,6 @@ void IrrDriver::renderSolidFirstPass()
             ImmediateDrawList::getInstance()->at(i)->render();
 
         renderMeshes1stPass<DefaultMaterial, 2, 1>();
-        renderMeshes1stPass<RedMaterial, 2, 1>();
-        renderMeshes1stPass<BlueMaterial, 2, 1>();
         renderMeshes1stPass<SplattingMat, 2, 1>();
         renderMeshes1stPass<UnlitMat, 3, 2, 1>();
         renderMeshes1stPass<AlphaRef, 3, 2, 1>();
@@ -1300,8 +1228,6 @@ void IrrDriver::renderSolidFirstPass()
         if (CVS->isAZDOEnabled())
         {
             multidraw1stPass<DefaultMaterial>();
-            multidraw1stPass<RedMaterial>();
-            multidraw1stPass<BlueMaterial>();
             multidraw1stPass<AlphaRef>();
             multidraw1stPass<SphereMap>();
             multidraw1stPass<UnlitMat>();
@@ -1313,8 +1239,6 @@ void IrrDriver::renderSolidFirstPass()
         else if (CVS->supportsIndirectInstancingRendering())
         {
             renderInstancedMeshes1stPass<DefaultMaterial>();
-            renderInstancedMeshes1stPass<RedMaterial>();
-            renderInstancedMeshes1stPass<BlueMaterial>();
             renderInstancedMeshes1stPass<AlphaRef>();
             renderInstancedMeshes1stPass<UnlitMat>();
             renderInstancedMeshes1stPass<SphereMap>();
@@ -1372,12 +1296,32 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
     T::InstancedSecondPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                 T::Instance));
+    InstancedObjectPass2Shader* iop2s = dynamic_cast<InstancedObjectPass2Shader*>
+        (T::InstancedSecondPassShader::getInstance());
     for (unsigned i = 0; i < meshes.size(); i++)
     {
         GLMesh *mesh = meshes[i];
         TexExpander<typename T::InstancedSecondPassShader>::template
             ExpandTex(*mesh, T::SecondPassTextures, Prefilled_tex[0],
                       Prefilled_tex[1], Prefilled_tex[2]);
+        if (iop2s)
+        {
+            const video::E_RENDER_TYPE rt = mesh->mb->getRenderType();
+            if (rt == video::ERT_RED)
+            {
+                iop2s->setHueSaturation(0.7f, 0.7f);
+            }
+            else if (rt == video::ERT_BLUE)
+            {
+                iop2s->setHueSaturation(0.1f, 0.5f);
+            }
+            else
+            {
+                // Reset if not using custom render type
+                iop2s->setHueSaturation(-1, -1);
+            }
+        }
+
         T::InstancedSecondPassShader::getInstance()->setUniforms(args...);
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
            (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i)
@@ -1457,8 +1401,6 @@ void IrrDriver::renderSolidSecondPass()
                                  m_rtts->getRenderTarget(RTT_HALF1_R));
 
         renderMeshes2ndPass<DefaultMaterial, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<RedMaterial, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<BlueMaterial, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<AlphaRef, 3, 1 >(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<UnlitMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<SplattingMat, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
@@ -1470,8 +1412,6 @@ void IrrDriver::renderSolidSecondPass()
         if (CVS->isAZDOEnabled())
         {
             multidraw2ndPass<DefaultMaterial>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
-            multidraw2ndPass<RedMaterial>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
-            multidraw2ndPass<BlueMaterial>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
             multidraw2ndPass<AlphaRef>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
             multidraw2ndPass<SphereMap>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
             multidraw2ndPass<UnlitMat>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
@@ -1502,8 +1442,6 @@ void IrrDriver::renderSolidSecondPass()
         else if (CVS->supportsIndirectInstancingRendering())
         {
             renderInstancedMeshes2ndPass<DefaultMaterial>(DiffSpecSSAOTex);
-            renderInstancedMeshes2ndPass<RedMaterial>(DiffSpecSSAOTex);
-            renderInstancedMeshes2ndPass<BlueMaterial>(DiffSpecSSAOTex);
             renderInstancedMeshes2ndPass<AlphaRef>(DiffSpecSSAOTex);
             renderInstancedMeshes2ndPass<UnlitMat>(DiffSpecSSAOTex);
             renderInstancedMeshes2ndPass<SphereMap>(DiffSpecSSAOTex);
@@ -1571,8 +1509,6 @@ void IrrDriver::renderNormalsVisualisation()
 {
     if (CVS->isAZDOEnabled()) {
         renderMultiMeshNormals<DefaultMaterial>();
-        renderMultiMeshNormals<RedMaterial>();
-        renderMultiMeshNormals<BlueMaterial>();
         renderMultiMeshNormals<AlphaRef>();
         renderMultiMeshNormals<UnlitMat>();
         renderMultiMeshNormals<SphereMap>();
@@ -1582,8 +1518,6 @@ void IrrDriver::renderNormalsVisualisation()
     else if (CVS->supportsIndirectInstancingRendering())
     {
         renderInstancedMeshNormals<DefaultMaterial>();
-        renderInstancedMeshNormals<RedMaterial>();
-        renderInstancedMeshNormals<BlueMaterial>();
         renderInstancedMeshNormals<AlphaRef>();
         renderInstancedMeshNormals<UnlitMat>();
         renderInstancedMeshNormals<SphereMap>();
@@ -1893,8 +1827,6 @@ void IrrDriver::renderShadows()
         ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS_CASCADE0 + cascade));
 
         renderShadow<DefaultMaterial, 1>(cascade);
-        renderShadow<RedMaterial, 1>(cascade);
-        renderShadow<BlueMaterial, 1>(cascade);
         renderShadow<SphereMap, 1>(cascade);
         renderShadow<DetailMat, 1>(cascade);
         renderShadow<SplattingMat, 1>(cascade);
@@ -1909,8 +1841,6 @@ void IrrDriver::renderShadows()
         if (CVS->isAZDOEnabled())
         {
             multidrawShadow<DefaultMaterial>(cascade);
-            multidrawShadow<RedMaterial>(cascade);
-            multidrawShadow<BlueMaterial>(cascade);
             multidrawShadow<DetailMat>(cascade);
             multidrawShadow<NormalMat>(cascade);
             multidrawShadow<AlphaRef>(cascade);
@@ -1920,8 +1850,6 @@ void IrrDriver::renderShadows()
         else if (CVS->supportsIndirectInstancingRendering())
         {
             renderInstancedShadow<DefaultMaterial>(cascade);
-            renderInstancedShadow<RedMaterial>(cascade);
-            renderInstancedShadow<BlueMaterial>(cascade);
             renderInstancedShadow<DetailMat>(cascade);
             renderInstancedShadow<AlphaRef>(cascade);
             renderInstancedShadow<UnlitMat>(cascade);
@@ -2054,8 +1982,6 @@ void IrrDriver::renderRSM()
 
     const core::matrix4 &rsm_matrix = getShadowMatrices()->getRSMMatrix();
     drawRSM<DefaultMaterial, 3, 1>(rsm_matrix);
-    drawRSM<RedMaterial, 3, 1>(rsm_matrix);
-    drawRSM<BlueMaterial, 3, 1>(rsm_matrix);
     drawRSM<AlphaRef, 3, 1>(rsm_matrix);
     drawRSM<NormalMat, 3, 1>(rsm_matrix);
     drawRSM<UnlitMat, 3, 1>(rsm_matrix);
@@ -2069,8 +1995,6 @@ void IrrDriver::renderRSM()
     if (CVS->isAZDOEnabled())
     {
         multidrawRSM<DefaultMaterial>(rsm_matrix);
-        multidrawRSM<RedMaterial>(rsm_matrix);
-        multidrawRSM<BlueMaterial>(rsm_matrix);
         multidrawRSM<NormalMat>(rsm_matrix);
         multidrawRSM<AlphaRef>(rsm_matrix);
         multidrawRSM<UnlitMat>(rsm_matrix);
@@ -2079,8 +2003,6 @@ void IrrDriver::renderRSM()
     else if (CVS->supportsIndirectInstancingRendering())
     {
         renderRSMShadow<DefaultMaterial>(rsm_matrix);
-        renderRSMShadow<RedMaterial>(rsm_matrix);
-        renderRSMShadow<BlueMaterial>(rsm_matrix);
         renderRSMShadow<AlphaRef>(rsm_matrix);
         renderRSMShadow<UnlitMat>(rsm_matrix);
         renderRSMShadow<NormalMat>(rsm_matrix);

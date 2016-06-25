@@ -132,11 +132,11 @@ void STKAnimatedMesh::updateNoGL()
             }
             else if (mb->getRenderType() == video::ERT_RED)
             {
-                MeshSolidMaterial[Material::SHADERTYPE_SOLID_RED].push_back(&mesh);
+                MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);
             }
             else if (mb->getRenderType() == video::ERT_BLUE)
             {
-                MeshSolidMaterial[Material::SHADERTYPE_SOLID_BLUE].push_back(&mesh);
+                MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);
             }
             else
             {

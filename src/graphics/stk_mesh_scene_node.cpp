@@ -191,12 +191,12 @@ void STKMeshSceneNode::updateNoGL()
             else if (mb->getRenderType() == video::ERT_RED)
             {
                 if (!immediate_draw)
-                    MeshSolidMaterial[Material::SHADERTYPE_SOLID_RED].push_back(&mesh);
+                    MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);
             }
             else if (mb->getRenderType() == video::ERT_BLUE)
             {
                 if (!immediate_draw)
-                    MeshSolidMaterial[Material::SHADERTYPE_SOLID_BLUE].push_back(&mesh);
+                    MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);
             }
             else
             {

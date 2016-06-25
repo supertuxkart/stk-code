@@ -340,7 +340,9 @@ Shaders::ObjectPass2Shader::ObjectPass2Shader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                        GL_FRAGMENT_SHADER, "utils/rgb_conversion.frag",
                         GL_FRAGMENT_SHADER, "object_pass2.frag");
+    m_color_change_location = glGetUniformLocation(m_program, "color_change");
     assignUniforms("ModelMatrix", "TextureMatrix");
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                        1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -348,38 +350,6 @@ Shaders::ObjectPass2Shader::ObjectPass2Shader()
                        3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                        4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // ObjectPass2Shader
-
-// ============================================================================
-// Solid Lit pass shaders (red version)
-Shaders::ObjectPass2ShaderRed::ObjectPass2ShaderRed()
-{
-    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                        GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-                        GL_FRAGMENT_SHADER, "utils/rgb_conversion.frag",
-                        GL_FRAGMENT_SHADER, "object_pass2_red.frag");
-    assignUniforms("ModelMatrix", "TextureMatrix");
-    assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
-                       1, "SpecularMap", ST_NEAREST_FILTERED,
-                       2, "SSAO", ST_BILINEAR_FILTERED,
-                       3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                       4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-}   // ObjectPass2ShaderRed
-
-// ============================================================================
-// Solid Lit pass shaders (blue version)
-Shaders::ObjectPass2ShaderBlue::ObjectPass2ShaderBlue()
-{
-    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                        GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-                        GL_FRAGMENT_SHADER, "utils/rgb_conversion.frag",
-                        GL_FRAGMENT_SHADER, "object_pass2_blue.frag");
-    assignUniforms("ModelMatrix", "TextureMatrix");
-    assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
-                       1, "SpecularMap", ST_NEAREST_FILTERED,
-                       2, "SSAO", ST_BILINEAR_FILTERED,
-                       3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                       4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-}   // ObjectPass2ShaderBlue
 
 // ============================================================================
 Shaders::TransparentShader::TransparentShader()

@@ -146,25 +146,15 @@ public:
     class ObjectPass2Shader : public TextureShader < ObjectPass2Shader, 5,
                                                  core::matrix4, core::matrix4 >
     {
+    private:
+        GLint m_color_change_location;
     public:
         ObjectPass2Shader();
+        void setHueSaturation(float hue, float saturation) const
+        {
+            glUniform2f(m_color_change_location, hue, saturation);
+        }   // setHueSaturation
     };   // ObjectPass2Shader
-
-    // ========================================================================
-    class ObjectPass2ShaderRed : public TextureShader < ObjectPass2ShaderRed, 5,
-                                                 core::matrix4, core::matrix4 >
-    {
-    public:
-        ObjectPass2ShaderRed();
-    };   // ObjectPass2ShaderRed
-
-    // ========================================================================
-    class ObjectPass2ShaderBlue : public TextureShader < ObjectPass2ShaderBlue, 5,
-                                                 core::matrix4, core::matrix4 >
-    {
-    public:
-        ObjectPass2ShaderBlue();
-    };   // ObjectPass2ShaderBlue
 
     // ========================================================================
 
