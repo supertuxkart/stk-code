@@ -280,8 +280,8 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h,
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
     }
 #ifndef ANDROID
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+    //~ GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    //~ assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
 #endif
 }
 
@@ -307,8 +307,8 @@ FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w,
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DS, 0);
     }
 #ifndef ANDROID
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+    //~ GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    //~ assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
     if (layered)
         glGenFramebuffers(1, &fbolayer);
 #endif
