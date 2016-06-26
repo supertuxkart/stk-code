@@ -340,7 +340,6 @@ void Shaders::check(const int num)
 Shaders::ObjectPass1Shader::ObjectPass1Shader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                        GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                         GL_FRAGMENT_SHADER, "object_pass1.frag");
     assignUniforms("ModelMatrix", "InverseModelMatrix");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -351,7 +350,6 @@ Shaders::ObjectPass1Shader::ObjectPass1Shader()
 Shaders::ObjectPass2Shader::ObjectPass2Shader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                        GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                         GL_FRAGMENT_SHADER, "object_pass2.frag");
     assignUniforms("ModelMatrix", "TextureMatrix");
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,

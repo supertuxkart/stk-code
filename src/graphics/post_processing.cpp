@@ -397,8 +397,6 @@ public:
     ToneMapShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/getRGBfromCIEXxy.frag",
-                            GL_FRAGMENT_SHADER, "utils/getCIEXYZ.frag",
                             GL_FRAGMENT_SHADER, "tonemap.frag");
         assignUniforms("vignette_weight");
         assignSamplerNames(0, "text", ST_NEAREST_FILTERED);

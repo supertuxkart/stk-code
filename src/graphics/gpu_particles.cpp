@@ -63,7 +63,6 @@ public:
     {
         loadProgram(PARTICLES_RENDERING,
                     GL_VERTEX_SHADER,   "particle.vert",
-                    GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                     GL_FRAGMENT_SHADER, "particle.frag");
 
         assignUniforms("color_from", "color_to");

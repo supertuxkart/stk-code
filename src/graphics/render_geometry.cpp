@@ -119,7 +119,6 @@ public:
     ObjectRefPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "objectref_pass2.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -283,8 +282,6 @@ public:
     SphereMapShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                             GL_FRAGMENT_SHADER, "objectpass_spheremap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -320,7 +317,6 @@ public:
     SplattingShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "splatting.frag");
         assignUniforms("ModelMatrix");
 
@@ -343,7 +339,6 @@ public:
     ObjectRefPass1Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -360,7 +355,6 @@ public:
     NormalMapShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                             GL_FRAGMENT_SHADER, "normalmap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
         assignSamplerNames(1, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -650,7 +644,6 @@ public:
     GrassPass1Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "grass_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "windDir");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -744,7 +737,6 @@ public:
     GrassPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "grass_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "grass_pass2.frag");
         assignUniforms("ModelMatrix", "windDir");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -784,7 +776,6 @@ public:
     DetailedObjectPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "detailed_object_pass2.frag");
         assignUniforms("ModelMatrix");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
