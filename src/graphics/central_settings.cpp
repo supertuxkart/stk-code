@@ -33,7 +33,7 @@ void CentralVideoSettings::init()
     // Parse extensions
     hasVSLayer = false;
     hasBaseInstance = false;
-    hasBuffserStorage = false;
+    hasBufferStorage = false;
     hasDrawIndirect = false;
     hasComputeShaders = false;
     hasArraysOfArrays = false;
@@ -87,7 +87,7 @@ void CentralVideoSettings::init()
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BUFFER_STORAGE) &&
             hasGLExtension("GL_ARB_buffer_storage")  )
         {
-            hasBuffserStorage = true;
+            hasBufferStorage = true;
             Log::info("GLDriver", "ARB Buffer Storage Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BASE_INSTANCE) &&
@@ -272,7 +272,7 @@ bool CentralVideoSettings::isAMDVertexShaderLayerUsable() const
 
 bool CentralVideoSettings::isARBBufferStorageUsable() const
 {
-    return hasBuffserStorage;
+    return hasBufferStorage;
 }
 
 bool CentralVideoSettings::isARBComputeShaderUsable() const
@@ -312,7 +312,7 @@ bool CentralVideoSettings::isARBShaderStorageBufferObjectUsable() const
 
 bool CentralVideoSettings::isARBImageLoadStoreUsable() const
 {
-    return hasComputeShaders;
+    return hasImageLoadStore;
 }
 
 bool CentralVideoSettings::isARBMultiDrawIndirectUsable() const
