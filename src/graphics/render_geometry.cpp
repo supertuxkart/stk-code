@@ -1004,16 +1004,16 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
         const video::E_RENDER_TYPE rt = mesh->mb->getRenderType();
         if (rt == video::ERT_RED)
         {
-            op2s->setHueSaturation(0.7f, 0.7f);
+            op2s->setHueSaturation(0.69f, 0.97f);
         }
         else if (rt == video::ERT_BLUE)
         {
-            op2s->setHueSaturation(0.1f, 0.5f);
+            op2s->setHueSaturation(0.01f, 0.97f);
         }
         else
         {
             // Reset if not using custom render type
-            op2s->setHueSaturation(-1, -1);
+            op2s->setHueSaturation(0.0f, 0.0f);
         }
     }
 
@@ -1309,16 +1309,16 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
             const video::E_RENDER_TYPE rt = mesh->mb->getRenderType();
             if (rt == video::ERT_RED)
             {
-                iop2s->setHueSaturation(0.7f, 0.7f);
+                iop2s->setHueSaturation(0.69f, 0.97f);
             }
             else if (rt == video::ERT_BLUE)
             {
-                iop2s->setHueSaturation(0.1f, 0.5f);
+                iop2s->setHueSaturation(0.01f, 0.97f);
             }
             else
             {
                 // Reset if not using custom render type
-                iop2s->setHueSaturation(-1, -1);
+                iop2s->setHueSaturation(0.0f, 0.0f);
             }
         }
 
