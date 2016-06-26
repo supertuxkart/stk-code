@@ -27,7 +27,7 @@ void main(void)
     vec4 col = texture(Albedo, uv);
 #endif
 
-    if (color_change.x > 0)
+    if (color_change.x > 0.0)
     {
         vec3 new_color = hsvToRgb(vec3(color_change.x, color_change.y, rgbToValue(col.rgb)));
         col = vec4(new_color.b, new_color.g, new_color.r, col.a);
