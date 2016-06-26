@@ -114,11 +114,58 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
     {
         std::string Line = "";
         while (getline(stream, Line))
-            code << "\n" << Line;
+        {
+            const std::string stk_include = "#stk_include";
+            int pos = Line.find(stk_include);
+            if (pos != std::string::npos)
+            {
+                int pos = Line.find("\"");
+                if (pos == std::string::npos)
+                {
+                    Log::error("shader", "Invalid #stk_include line: '%s'.", Line.c_str());
+                    continue;
+                }
+                
+                std::string filename = Line.substr(pos+1);
+                
+                pos = filename.find("\"");
+                if (pos == std::string::npos)
+                {
+                    Log::error("shader", "Invalid #stk_include line: '%s'.", Line.c_str());
+                    continue;
+                }
+                
+                filename = filename.substr(0, pos);
+                
+                printf("%s\n", filename.c_str());
+                
+                std::ifstream include_stream(file_manager->getShader(filename), std::ios::in);
+                if (!include_stream.is_open())
+                {
+                    Log::error("shader", "Couldn't open included shader: '%s'.", filename.c_str());
+                    continue;
+                }
+                
+                std::string include_line = "";
+                while (getline(include_stream, include_line))
+                {
+                    code << "\n" << include_line;
+                }
+                
+                include_stream.close();
+            }
+            else
+            {
+                code << "\n" << Line;
+            }
+        }
+        
         stream.close();
     }
     else
+    {
         Log::error("shader", "Can not open '%s'.", file.c_str());
+    }
 
     Log::info("shader", "Compiling shader : %s", file.c_str());
     const std::string &source  = code.str();
