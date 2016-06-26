@@ -116,10 +116,10 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
         while (getline(stream, Line))
         {
             const std::string stk_include = "#stk_include";
-            int pos = Line.find(stk_include);
+            std::size_t pos = Line.find(stk_include);
             if (pos != std::string::npos)
             {
-                int pos = Line.find("\"");
+                std::size_t pos = Line.find("\"");
                 if (pos == std::string::npos)
                 {
                     Log::error("shader", "Invalid #stk_include line: '%s'.", Line.c_str());
@@ -136,8 +136,6 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
                 }
                 
                 filename = filename.substr(0, pos);
-                
-                printf("%s\n", filename.c_str());
                 
                 std::ifstream include_stream(file_manager->getShader(filename), std::ios::in);
                 if (!include_stream.is_open())
