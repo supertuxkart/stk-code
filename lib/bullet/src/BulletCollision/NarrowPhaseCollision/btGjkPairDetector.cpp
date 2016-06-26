@@ -20,7 +20,6 @@ subject to the following restrictions:
 #include "BulletCollision/CollisionDispatch/btManifoldResult.h"
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
 #include "BulletCollision/CollisionShapes/btTriangleShape.h"
-#include "BulletDynamics/Dynamics/btRigidBody.h"
 
 
 
@@ -456,15 +455,15 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
         if(mani)
         {
             // Find the triangle:
-            const btCollisionObject *b = mani->getBody0Internal();
-            const btTriangleShape *tri = dynamic_cast<const btTriangleShape*>(b->getCollisionShape());
+            const btCollisionObject *co = mani->getBody0Internal();
+            const btTriangleShape *tri = dynamic_cast<const btTriangleShape*>(co->getCollisionShape());
             if(!tri)
             {
-                b   = mani->getBody1Internal();
-                tri = dynamic_cast<const btTriangleShape*>(b->getCollisionShape());
+                co  = mani->getBody1Internal();
+                tri = dynamic_cast<const btTriangleShape*>(co->getCollisionShape());
             }
-            // If we have a triangle and it is static (mass=0), recompute the normal
-            if(tri && btRigidBody::upcast(b)->getInvMass()==0)
+            // If we have a triangle and it is static, recompute the normal
+            if(tri && co->isStaticOrKinematicObject())
             {
                 normalInB = (tri->m_vertices1[1]-tri->m_vertices1[0])
                       .cross(tri->m_vertices1[2]-tri->m_vertices1[0]);
