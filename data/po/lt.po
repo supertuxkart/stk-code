@@ -6,14 +6,14 @@
 # Algimantas Margevičius <margevicius.algimantas@gmail.com>, 2011
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # Jonas Kriaučiūnas <jonukas@gmail.com>, 2015
-# Mantas Kriaučiūnas <mantas@akl.lt>, 2015
+# Mantas Kriaučiūnas <mantas@akl.lt>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-30 18:52-0400\n"
-"PO-Revision-Date: 2016-06-07 23:50+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2016-06-22 17:41+0000\n"
+"Last-Translator: Mantas Kriaučiūnas <mantas@akl.lt>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/supertuxkart/supertuxkart/language/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -79,7 +79,7 @@ msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Unstoppable"
-msgstr ""
+msgstr "Nesustabdomas"
 
 #. I18N: ./data/achievements.xml
 msgid "Win 5 single races in a row."
@@ -591,7 +591,7 @@ msgstr "Ginklai"
 #. I18N: ./data/gui/help4.stkgui
 #. I18N: Tab in help menu
 msgid "Game Modes"
-msgstr "Žaidimo režimai"
+msgstr "Žaidimo būdai"
 
 #. I18N: ./data/gui/help1.stkgui
 #. I18N: Tab in help menu
@@ -691,7 +691,7 @@ msgstr ""
 
 #. I18N: ./data/gui/help2.stkgui
 msgid "Swatter - will squash karts close by, slowing them down."
-msgstr "Tauškutis - sudaužys šalia esančius kartus, taip sulėtindamas juos."
+msgstr "Tauškutis - suplos šalia esančius kartus, taip sulėtindamas juos."
 
 #. I18N: ./data/gui/help3.stkgui
 msgid "SuperTuxKart features several game modes"
@@ -925,14 +925,14 @@ msgstr ""
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Password (optional)"
-msgstr ""
+msgstr "Slaptažodis (neprivalomas)"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: In the server creation screen
 #: src/states_screens/ghost_replay_selection.cpp:80
 #: src/states_screens/server_selection.cpp:104
 msgid "Difficulty"
-msgstr ""
+msgstr "Sudėtingumas"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Difficulty
@@ -980,7 +980,7 @@ msgstr ""
 #. I18N: In the server creation screen
 #: src/states_screens/server_selection.cpp:105
 msgid "Game mode"
-msgstr ""
+msgstr "Žaidimo būdas"
 
 #. I18N: ./data/gui/online/create_server.stkgui
 #. I18N: Multiplayer game mode
@@ -1062,14 +1062,14 @@ msgstr ""
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the networking lobby
 msgid "Difficulty:"
-msgstr ""
+msgstr "Sudėtingumas:"
 
 #. I18N: ./data/gui/online/networking_lobby.stkgui
 #. I18N: In the networking lobby
 #. I18N: ./data/gui/online/server_info_dialog.stkgui
 #. I18N: In the networking lobby
 msgid "Game mode:"
-msgstr ""
+msgstr "Žaidimo būdas:"
 
 #. I18N: ./data/gui/online/networking_lobby.stkgui
 #. I18N: In the networking lobby
@@ -1204,17 +1204,17 @@ msgstr "Sukurti naudotoją"
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "New Online Account"
-msgstr ""
+msgstr "Registruoti naudotoją internete"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Existing Online Account"
-msgstr ""
+msgstr "Anksčiau užregistruotas naudotojas"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Offline Account"
-msgstr ""
+msgstr "Žaisti be registracijos"
 
 #. I18N: ./data/gui/online/register.stkgui
 #. I18N: In the registration dialog
@@ -1251,7 +1251,7 @@ msgstr ""
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 msgid "I agree to the above terms and am 13 years or older. "
-msgstr ""
+msgstr "Aš sutinku su taisyklėmis bei esu 13 metų ar vyresnis."
 
 #. I18N: ./data/gui/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -1303,12 +1303,12 @@ msgstr ""
 #. I18N: ./data/gui/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
 msgid "Vote"
-msgstr ""
+msgstr "Balsuoti"
 
 #. I18N: ./data/gui/online/waiting_for_others.stkgui
 #. I18N: Networking screen
 msgid "Waiting for the others..."
-msgstr ""
+msgstr "Laukiame kitų..."
 
 #. I18N: ./data/gui/options_audio.stkgui
 #. I18N: ./data/gui/options_device.stkgui
@@ -1518,7 +1518,7 @@ msgstr "Grįžti į lenktynes"
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 msgid "Select kart"
-msgstr ""
+msgstr "Pasirinkite automobilį"
 
 #. I18N: ./data/gui/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
@@ -1607,17 +1607,17 @@ msgstr ""
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Use left/right to choose your team and press fire"
-msgstr ""
+msgstr "Naudokite klavišus kairėn ar dešinėn komandos pasirinkimui, tada paspauskite šaudymo mygtuką"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Red Team"
-msgstr ""
+msgstr "Raudonoji komanda"
 
 #. I18N: ./data/gui/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Blue Team"
-msgstr ""
+msgstr "Mėlynoji komanda"
 
 #. I18N: ./data/gui/tracks_and_gp.stkgui
 #. I18N: In the track and grand prix selection screen
@@ -1775,7 +1775,7 @@ msgstr "Snow Peak"
 
 #. I18N: ../stk-assets/tracks/soccer_field/track.xml
 msgid "Soccer field"
-msgstr ""
+msgstr "Futbolo aikštė"
 
 #. I18N: ../stk-assets/tracks/stadium/track.xml
 msgid "The Stadium"
@@ -1787,7 +1787,7 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/temple/track.xml
 msgid "Temple"
-msgstr ""
+msgstr "Šventykla"
 
 #. I18N: ../stk-assets/tracks/volcano_island/track.xml
 msgid "Volcan Island"
@@ -2056,13 +2056,13 @@ msgstr ""
 #: src/input/binding.cpp:134
 msgctxt "input_key"
 msgid "Shift"
-msgstr ""
+msgstr "Shift (Lyg2)"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:136
 msgctxt "input_key"
 msgid "Control"
-msgstr ""
+msgstr "Ctrl (Vald)"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:138
@@ -2135,7 +2135,7 @@ msgstr ""
 #: src/input/binding.cpp:161
 msgctxt "input_key"
 msgid "Space"
-msgstr ""
+msgstr "Tarpas"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:163
@@ -2225,7 +2225,7 @@ msgstr ""
 #: src/input/binding.cpp:191
 msgctxt "input_key"
 msgid "Help"
-msgstr ""
+msgstr "Pagalba (help)"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:229
@@ -2351,25 +2351,25 @@ msgstr ""
 #: src/input/binding.cpp:295
 msgctxt "input_key"
 msgid "Left Shift"
-msgstr ""
+msgstr "Kairysis Shift (Lyg2)"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:297
 msgctxt "input_key"
 msgid "Right Shift"
-msgstr ""
+msgstr "Dešinysis Shift (Lyg2)"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:299
 msgctxt "input_key"
 msgid "Left Control"
-msgstr ""
+msgstr "Kairysis Ctrl (Vald)"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:301
 msgctxt "input_key"
 msgid "Right Control"
-msgstr ""
+msgstr "Dešinysis Ctrl (Vald)"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:303
@@ -2492,7 +2492,7 @@ msgstr "Juodasis"
 #. I18N: Name of the white button on xbox controller
 #: src/input/gamepad_config.cpp:171
 msgid "White"
-msgstr ""
+msgstr "Baltasis"
 
 #. I18N: name of buttons on gamepads
 #. I18N: name of stick on gamepads
@@ -2664,7 +2664,7 @@ msgstr "Vaizdo valdyklės (drivers) jūsų sistemoje yra per senos. Prašome įd
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
 "your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
-msgstr ""
+msgstr "Vaizdo posistemės OpenGL versija jūsų sistemoje yra per sena. Pabandykite įdiegti naujesnes vaizdo valdykles arba atnaujinkite operacinę sistemą ar vaizdo posistemę.\nSuperTuxKart reikia OpenGL 3.1 arba naujesnės."
 
 #: src/modes/easter_egg_hunt.cpp:202
 #, c-format
@@ -2785,7 +2785,7 @@ msgstr "Rask paslėptus kiaušus"
 #. I18N: Game mode
 #: src/race/race_manager.hpp:185
 msgid "Soccer"
-msgstr ""
+msgstr "Futbolas"
 
 #: src/replay/replay_recorder.cpp:182
 msgid "Incomplete replay file will not be saved."
@@ -2911,7 +2911,7 @@ msgstr ""
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAlgimantas Margevičius https://launchpad.net/~gymka\nAlgimantas Margevičius, 2011\nJonas Kriaučiūnas, 2015\nMantas Kriaučiūnas https://launchpad.net/~mantas\nMantas Kriaučiūnas, 2015\nSTK-team https://launchpad.net/~stk"
+msgstr "Mantas Kriaučiūnas https://launchpad.net/~mantas\nAlgimantas Margevičius https://launchpad.net/~gymka\nJonas Kriaučiūnas <jonukas@gmail.com>"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
@@ -3008,9 +3008,9 @@ msgstr ""
 #, c-format
 msgid "Confirm resolution within %i second"
 msgid_plural "Confirm resolution within %i seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Patvirtinkite naują raišką per %i sekundę"
+msgstr[1] "Patvirtinkite naują raišką per %i sekundes"
+msgstr[2] "Patvirtinkite naują raišką per %i sek."
 
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
@@ -3991,3 +3991,7 @@ msgstr "Rinkite ypatingo „nitro“ kuro butelius (juos panaudosite už posūki
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued"
 msgstr "Oi! Jei atsidūrėte neišvažiuojamoje vietoje - spauskite <%s> ir būsite išgelbėtas"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nAlgimantas Margevičius, 2011\nJonas Kriaučiūnas, 2015\nMantas Kriaučiūnas, 2015-2016"

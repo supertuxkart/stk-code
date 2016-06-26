@@ -12,8 +12,8 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-30 18:52-0400\n"
-"PO-Revision-Date: 2016-06-07 23:50+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"PO-Revision-Date: 2016-06-18 09:13+0000\n"
+"Last-Translator: ToMáš Marný\n"
 "Language-Team: Czech (http://www.transifex.com/supertuxkart/supertuxkart/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -469,12 +469,12 @@ msgstr "Pokračovat"
 #. I18N: ./data/gui/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Record the race for ghost replay"
-msgstr "Nahrát závod pro zpětné přehrání s duchem"
+msgstr "Nahrát závod pro opakovačku s duchem"
 
 #. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
 msgid "Watch replay only"
-msgstr "Pouze zhlédnout zpětné přehrání"
+msgstr "Pouze zhlédnout opakovačku"
 
 #. I18N: ./data/gui/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
@@ -490,17 +490,17 @@ msgstr "Start závodu"
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Ghost Replay Selection"
-msgstr ""
+msgstr "Výběr opakovačky s duchem"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current difficulty"
-msgstr ""
+msgstr "Zobrazovat pouze opakovačky odpovídající aktuální obtížnosti"
 
 #. I18N: ./data/gui/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Record ghost replay"
-msgstr "Nahrát zpětné přehrání s duchem"
+msgstr "Nahrát pro opakovačku s duchem"
 
 #. I18N: ./data/gui/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -1668,7 +1668,7 @@ msgstr "Odstranit"
 
 #. I18N: ../stk-assets/tracks/abyss/track.xml
 msgid "Antediluvian Abyss"
-msgstr ""
+msgstr "Předpotopní propast"
 
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
@@ -1708,7 +1708,7 @@ msgstr "Hacienda"
 
 #. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
-msgstr ""
+msgstr "Ledové fotbalové hřiště"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -1791,7 +1791,7 @@ msgstr "Chrám"
 
 #. I18N: ../stk-assets/tracks/volcano_island/track.xml
 msgid "Volcan Island"
-msgstr ""
+msgstr "Sopečný ostrov"
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
@@ -2789,12 +2789,12 @@ msgstr "Fotbal"
 
 #: src/replay/replay_recorder.cpp:182
 msgid "Incomplete replay file will not be saved."
-msgstr ""
+msgstr "Neúplný soubor s opakovačkou nebude uložen."
 
 #: src/replay/replay_recorder.cpp:218
 #, c-format
 msgid "Replay saved in \"%s\"."
-msgstr ""
+msgstr "Opakovačka uložena do \"%s\"."
 
 #: src/states_screens/addons_screen.cpp:50
 msgid "1 week"
@@ -2911,7 +2911,7 @@ msgstr "Je třeba, aby hráči museli být nejméně 2 a nejvíce 12."
 
 #: src/states_screens/credits.cpp:217
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAri Green https://launchpad.net/~ariyoyah\nDavid Kolibáč https://launchpad.net/~david-kolibac\nDawid Gan https://launchpad.net/~deveee\ndonny https://launchpad.net/~michal-donat\ndtfjgk https://launchpad.net/~dtfjgk-deactivatedaccount\nFrantišek Zatloukal https://launchpad.net/~zatloukal-frantisek\nH0ff1 https://launchpad.net/~stefhoff\nJakub Talich https://launchpad.net/~jakub.talich-deactivatedaccount\nJakub Vaněk, 2015-2016\nJan Srb https://launchpad.net/~j-srb\nJirka Folta https://launchpad.net/~pholta-cz\nLukáš Machyán https://launchpad.net/~phobulos\nMichal Kundrát https://launchpad.net/~dreit\nMightyPork https://launchpad.net/~mighty-pork\nOndřej Holý https://launchpad.net/~ondrej-holy\nPavel Borecki, 2015\nPetr Wudi https://launchpad.net/~petr-wudi\nSTK-team https://launchpad.net/~stk\nTadeáš Pařík https://launchpad.net/~pariktadeas\nToMáš Marný, 2015\nToMáš Marný, 2015-2016\nTomáš Velecký https://launchpad.net/~elektron112"
+msgstr "Launchpad Contributions:\nAri Green https://launchpad.net/~ariyoyah\nDavid Kolibáč https://launchpad.net/~david-kolibac\nDawid Gan https://launchpad.net/~deveee\ndonny https://launchpad.net/~michal-donat\ndtfjgk https://launchpad.net/~dtfjgk-deactivatedaccount\nFrantišek Zatloukal https://launchpad.net/~zatloukal-frantisek\nH0ff1 https://launchpad.net/~stefhoff\nJakub Talich https://launchpad.net/~jakub.talich-deactivatedaccount\nJakub Vaněk, 2015-2016\nJakub Vaněk, 2015-2016\nJan Srb https://launchpad.net/~j-srb\nJirka Folta https://launchpad.net/~pholta-cz\nLukáš Machyán https://launchpad.net/~phobulos\nMichal Kundrát https://launchpad.net/~dreit\nMightyPork https://launchpad.net/~mighty-pork\nOndřej Holý https://launchpad.net/~ondrej-holy\nPavel Borecki, 2015\nPavel Borecki, 2015\nPetr Wudi https://launchpad.net/~petr-wudi\nSTK-team https://launchpad.net/~stk\nTadeáš Pařík https://launchpad.net/~pariktadeas\nToMáš Marný, 2015\nToMáš Marný, 2015\nToMáš Marný, 2015-2016\nToMáš Marný, 2015-2016\nTomáš Velecký https://launchpad.net/~elektron112"
 
 #: src/states_screens/dialogs/addons_loading.cpp:97
 msgid "Update"
@@ -3115,7 +3115,7 @@ msgstr "Nitro výzva"
 #: src/states_screens/dialogs/select_challenge.cpp:151
 #: src/states_screens/race_setup_screen.cpp:136
 msgid "Ghost replay race"
-msgstr ""
+msgstr "Opakovaný závod s duchem"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:75
 msgid "Server successfully created. You can now join it."
@@ -3308,7 +3308,7 @@ msgstr "Zamčeno"
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
-msgstr ""
+msgstr "Všichni:\nZmáčkněte klávesu 'Vybrat' pro připojení se do hry"
 
 #: src/states_screens/main_menu_screen.cpp:492
 msgid ""
@@ -3871,7 +3871,7 @@ msgstr "Jet pozpátku"
 #. I18N: In the track info screen
 #: src/states_screens/track_info_screen.cpp:219
 msgid "Random item location"
-msgstr ""
+msgstr "Náhodně rozmístěné položky"
 
 #: src/states_screens/user_screen.cpp:111
 msgid "Exit game"
