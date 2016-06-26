@@ -260,42 +260,42 @@ void Shaders::loadShaders()
 
     // Ok, go
     m_shaders[ES_NORMAL_MAP] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
-    m_shaders[ES_NORMAL_MAP_LIGHTMAP] = glsl_noinput(dir + name + "vert", dir + name + "frag");
+    m_shaders[ES_NORMAL_MAP_LIGHTMAP] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
 
-    m_shaders[ES_SKYBOX] = glslmat(dir + name + "vert", dir + name + "frag",
+    m_shaders[ES_SKYBOX] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                    m_callbacks[ES_SKYBOX], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-    m_shaders[ES_SPLATTING] = glsl_noinput(dir + name + "vert", dir + name + "frag");
+    m_shaders[ES_SPLATTING] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
 
-    m_shaders[ES_WATER] = glslmat(dir + name + "vert", dir + name + "frag",
+    m_shaders[ES_WATER] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                   m_callbacks[ES_WATER], EMT_TRANSPARENT_ALPHA_CHANNEL);
-    m_shaders[ES_WATER_SURFACE] = glsl(dir + name + "vert", dir + name + "frag",
+    m_shaders[ES_WATER_SURFACE] = glsl(dir + name + ".vert", dir + name + ".frag",
                                        m_callbacks[ES_WATER]);
 
-    m_shaders[ES_SPHERE_MAP] = glsl_noinput(dir + name + "vert", dir + name + "frag");
+    m_shaders[ES_SPHERE_MAP] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
 
-    m_shaders[ES_GRASS] = glslmat(dir + name + "vert", dir + name + "frag",
+    m_shaders[ES_GRASS] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                   m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL);
-    m_shaders[ES_GRASS_REF] = glslmat(dir + name + "vert", dir + name + "frag",
+    m_shaders[ES_GRASS_REF] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                       m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
 
-    m_shaders[ES_MOTIONBLUR] = glsl(dir + name + "vert", dir + name + "frag",
+    m_shaders[ES_MOTIONBLUR] = glsl(dir + name + ".vert", dir + name + ".frag",
                                     m_callbacks[ES_MOTIONBLUR]);
 
-    m_shaders[ES_GAUSSIAN3H] = glslmat(dir + name + "vert", dir + name + "frag",
+    m_shaders[ES_GAUSSIAN3H] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                        m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-    m_shaders[ES_GAUSSIAN3V] = glslmat(dir + name + "vert", dir + name + "frag",
+    m_shaders[ES_GAUSSIAN3V] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                        m_callbacks[ES_GAUSSIAN3V], EMT_SOLID);
 
-    m_shaders[ES_MIPVIZ] = glslmat(dir + name + "vert", dir + name + "frag",
+    m_shaders[ES_MIPVIZ] = glslmat(dir + name + ".vert", dir + name + ".frag",
                                    m_callbacks[ES_MIPVIZ], EMT_SOLID);
 
-    m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + name + "vert", dir + name + "frag");
-    m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + name + "vert", dir + name + "frag");
-    m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + name + "vert", dir + name + "frag");
-    m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + name + "vert", dir + name + "frag");
+    m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
+    m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
+    m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
+    m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + name + ".vert", dir + name + ".frag");
 
-    m_shaders[ES_DISPLACE] = glslmat(dir + name + "vert", dir + name + "frag",
+    m_shaders[ES_DISPLACE] = glslmat(dir + name + ".vert", dir + name + ".frag",
         m_callbacks[ES_DISPLACE], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
     // Check that all successfully loaded
