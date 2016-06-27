@@ -150,10 +150,11 @@ public:
         GLint m_color_change_location;
     public:
         ObjectPass2Shader();
-        void setHueSaturation(float hue, float saturation) const
+        virtual bool changeHue(float hue = 0.0f) const OVERRIDE
         {
-            glUniform2f(m_color_change_location, hue, saturation);
-        }   // setHueSaturation
+            glUniform1f(m_color_change_location, hue);
+            return true;
+        }   // changeHue
     };   // ObjectPass2Shader
 
     // ========================================================================

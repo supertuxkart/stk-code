@@ -8,14 +8,14 @@ flat in sampler2D handle;
 flat in sampler2D secondhandle;
 #endif
 
-uniform vec2 color_change;
+uniform float color_change;
 
 in vec2 uv;
 in vec4 color;
 out vec4 FragColor;
 
 vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue);
-float rgbToValue(vec3 c);
+vec3 rgbToHsv(vec3 c);
 vec3 hsvToRgb(vec3 c);
 
 void main(void)
@@ -33,10 +33,12 @@ void main(void)
     float emitmap = texture(SpecMap, uv).b;
 #endif
 
-    if (color_change.x > 0.0)
+    if (color_change > 0.0)
     {
-        vec3 new_color = hsvToRgb(vec3(color_change.x, color_change.y, rgbToValue(col.rgb)));
-        col = vec4(new_color.b, new_color.g, new_color.r, col.a);
+        vec3 old_hsv = rgbToHsv(col.rgb);
+        old_hsv.y = max(old_hsv.y, 0.93);
+        vec3 new_color = hsvToRgb(vec3(color_change, old_hsv.y, old_hsv.z));
+        col = vec4(new_color.r, new_color.g, new_color.b, col.a);
     }
 
     col.xyz *= pow(color.xyz, vec3(2.2));

@@ -153,10 +153,11 @@ public:
                            4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedObjectPass2Shader
 
-    void setHueSaturation(float hue, float saturation) const
+    virtual bool changeHue(float hue = 0.0f) const OVERRIDE
     {
-        glUniform2f(m_color_change_location, hue, saturation);
-    }   // setHueSaturation
+        glUniform1f(m_color_change_location, hue);
+        return true;
+    }   // changeHue
 };   // InstancedObjectPass2Shader
 
 // ============================================================================
@@ -997,23 +998,17 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
     GLenum itype = mesh->IndexType;
     size_t count = mesh->IndexCount;
 
-    const Shaders::ObjectPass2Shader* op2s = dynamic_cast<const Shaders::ObjectPass2Shader*>
-        (Shader);
-    if (op2s)
+    const video::E_RENDER_TYPE rt = mesh->mb->getRenderType();
+    const bool need_change_hue = (rt != video::ERT_DEFAULT);
+    if (need_change_hue)
     {
-        const video::E_RENDER_TYPE rt = mesh->mb->getRenderType();
         if (rt == video::ERT_RED)
         {
-            op2s->setHueSaturation(0.69f, 0.97f);
+            Shader->changeHue(1.0f);
         }
         else if (rt == video::ERT_BLUE)
         {
-            op2s->setHueSaturation(0.01f, 0.97f);
-        }
-        else
-        {
-            // Reset if not using custom render type
-            op2s->setHueSaturation(0.0f, 0.0f);
+            Shader->changeHue(0.66f);
         }
     }
 
@@ -1021,6 +1016,13 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
     glDrawElementsBaseVertex(ptype, (int)count, itype,
                              (GLvoid *)mesh->vaoOffset,
                              (int)mesh->vaoBaseVertex);
+
+    if (need_change_hue)
+    {
+        // Reset after changing
+        Shader->changeHue();
+    }
+
 }   // draw
 
 // ----------------------------------------------------------------------------
@@ -1302,47 +1304,31 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
         TexExpander<typename T::InstancedSecondPassShader>::template
             ExpandTex(*mesh, T::SecondPassTextures, Prefilled_tex[0],
                       Prefilled_tex[1], Prefilled_tex[2]);
-        T::InstancedSecondPassShader::getInstance()->setUniforms(args...);
-        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
-           (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i)
-           * sizeof(DrawElementsIndirectCommand)));
-    }
-}   // renderInstancedMeshes2ndPass
-
-// ----------------------------------------------------------------------------
-template<>
-void renderInstancedMeshes2ndPass<DefaultMaterial>(const std::vector<GLuint> &Prefilled_tex)
-{
-    std::vector<GLMesh *> &meshes = DefaultMaterial::InstancedList::getInstance()->SolidPass;
-    DefaultMaterial::InstancedSecondPassShader::getInstance()->use();
-    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(DefaultMaterial::VertexType,
-                                                                DefaultMaterial::Instance));
-    for (unsigned i = 0; i < meshes.size(); i++)
-    {
-        GLMesh *mesh = meshes[i];
-        TexExpander<DefaultMaterial::InstancedSecondPassShader>::template
-            ExpandTex(*mesh, DefaultMaterial::SecondPassTextures, Prefilled_tex[0],
-                      Prefilled_tex[1], Prefilled_tex[2]);
 
         const video::E_RENDER_TYPE rt = mesh->mb->getRenderType();
-        if (rt == video::ERT_RED)
+        const bool need_change_hue = (rt != video::ERT_DEFAULT);
+        if (need_change_hue)
         {
-            DefaultMaterial::InstancedSecondPassShader::getInstance()->setHueSaturation(0.69f, 0.97f);
-        }
-        else if (rt == video::ERT_BLUE)
-        {
-            DefaultMaterial::InstancedSecondPassShader::getInstance()->setHueSaturation(0.01f, 0.97f);
-        }
-        else
-        {
-            // Reset if not using custom render type
-            DefaultMaterial::InstancedSecondPassShader::getInstance()->setHueSaturation(0.0f, 0.0f);
+            if (rt == video::ERT_RED)
+            {
+                T::InstancedSecondPassShader::getInstance()->changeHue(1.0f);
+            }
+            else if (rt == video::ERT_BLUE)
+            {
+                T::InstancedSecondPassShader::getInstance()->changeHue(0.66f);
+            }
         }
 
-        DefaultMaterial::InstancedSecondPassShader::getInstance()->setUniforms();
+        T::InstancedSecondPassShader::getInstance()->setUniforms(args...);
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
-           (const void*)((SolidPassCmd::getInstance()->Offset[DefaultMaterial::MaterialType] + i)
+           (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i)
            * sizeof(DrawElementsIndirectCommand)));
+
+        if (need_change_hue)
+        {
+            // Reset after changing
+            T::InstancedSecondPassShader::getInstance()->changeHue();
+        }
     }
 }   // renderInstancedMeshes2ndPass
 
