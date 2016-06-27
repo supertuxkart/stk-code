@@ -1296,35 +1296,52 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
     T::InstancedSecondPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                 T::Instance));
-    InstancedObjectPass2Shader* iop2s = dynamic_cast<InstancedObjectPass2Shader*>
-        (T::InstancedSecondPassShader::getInstance());
     for (unsigned i = 0; i < meshes.size(); i++)
     {
         GLMesh *mesh = meshes[i];
         TexExpander<typename T::InstancedSecondPassShader>::template
             ExpandTex(*mesh, T::SecondPassTextures, Prefilled_tex[0],
                       Prefilled_tex[1], Prefilled_tex[2]);
-        if (iop2s)
+        T::InstancedSecondPassShader::getInstance()->setUniforms(args...);
+        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
+           (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i)
+           * sizeof(DrawElementsIndirectCommand)));
+    }
+}   // renderInstancedMeshes2ndPass
+
+// ----------------------------------------------------------------------------
+template<>
+void renderInstancedMeshes2ndPass<DefaultMaterial>(const std::vector<GLuint> &Prefilled_tex)
+{
+    std::vector<GLMesh *> &meshes = DefaultMaterial::InstancedList::getInstance()->SolidPass;
+    DefaultMaterial::InstancedSecondPassShader::getInstance()->use();
+    glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(DefaultMaterial::VertexType,
+                                                                DefaultMaterial::Instance));
+    for (unsigned i = 0; i < meshes.size(); i++)
+    {
+        GLMesh *mesh = meshes[i];
+        TexExpander<DefaultMaterial::InstancedSecondPassShader>::template
+            ExpandTex(*mesh, DefaultMaterial::SecondPassTextures, Prefilled_tex[0],
+                      Prefilled_tex[1], Prefilled_tex[2]);
+
+        const video::E_RENDER_TYPE rt = mesh->mb->getRenderType();
+        if (rt == video::ERT_RED)
         {
-            const video::E_RENDER_TYPE rt = mesh->mb->getRenderType();
-            if (rt == video::ERT_RED)
-            {
-                iop2s->setHueSaturation(0.69f, 0.97f);
-            }
-            else if (rt == video::ERT_BLUE)
-            {
-                iop2s->setHueSaturation(0.01f, 0.97f);
-            }
-            else
-            {
-                // Reset if not using custom render type
-                iop2s->setHueSaturation(0.0f, 0.0f);
-            }
+            DefaultMaterial::InstancedSecondPassShader::getInstance()->setHueSaturation(0.69f, 0.97f);
+        }
+        else if (rt == video::ERT_BLUE)
+        {
+            DefaultMaterial::InstancedSecondPassShader::getInstance()->setHueSaturation(0.01f, 0.97f);
+        }
+        else
+        {
+            // Reset if not using custom render type
+            DefaultMaterial::InstancedSecondPassShader::getInstance()->setHueSaturation(0.0f, 0.0f);
         }
 
-        T::InstancedSecondPassShader::getInstance()->setUniforms(args...);
+        DefaultMaterial::InstancedSecondPassShader::getInstance()->setUniforms();
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
-           (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i)
+           (const void*)((SolidPassCmd::getInstance()->Offset[DefaultMaterial::MaterialType] + i)
            * sizeof(DrawElementsIndirectCommand)));
     }
 }   // renderInstancedMeshes2ndPass
