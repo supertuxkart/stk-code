@@ -203,6 +203,9 @@ int ShaderBase::loadTFBProgram(const std::string &shader_name,
 {
     m_program = glCreateProgram();
     loadAndAttachShader(GL_VERTEX_SHADER, shader_name);
+#ifdef USE_GLES2
+    loadAndAttachShader(GL_FRAGMENT_SHADER, "tfb_dummy.frag");
+#endif
     if (CVS->getGLSLVersion() < 330)
         setAttribute(PARTICLES_SIM);
 
