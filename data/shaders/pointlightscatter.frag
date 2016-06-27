@@ -28,14 +28,14 @@ void main()
     vec3 closestpoint = - eyedir * (dot(-eyedir, light_pos) - radius);
     if (closestpoint.z < 1.) closestpoint = vec3(0.);
 
-    float stepsize = length(farthestpoint - closestpoint) / 16;
+    float stepsize = length(farthestpoint - closestpoint) / 16.;
     vec3 fog = vec3(0.);
     vec3 xpos = farthestpoint;
 
     for (int i = 0; i < 16; i++)
     {
         float d = distance(light_pos, xpos);
-        float l = (16 - i) * stepsize;
+        float l = (16. - float(i)) * stepsize;
         float att = energy * 20. / (1. + d * d);
         att *= max((radius - d) / radius, 0.);
         fog += density * light_col * att * exp(- density * d) * exp(- density * l) * stepsize;
