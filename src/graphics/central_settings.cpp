@@ -83,38 +83,32 @@ void CentralVideoSettings::init()
         std::string card((char*)(glGetString(GL_RENDERER)));
         GraphicsRestrictions::init(driver, card);
 
+#if !defined(ANDROID) && !defined(USE_GLES2)        
         if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
             hasVSLayer = true;
             Log::info("GLDriver", "AMD Vertex Shader Layer Present");
         }
-
-        #if !defined(USE_GLES2)
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BUFFER_STORAGE) &&
             hasGLExtension("GL_ARB_buffer_storage")  )
         {
             hasBuffserStorage = true;
             Log::info("GLDriver", "ARB Buffer Storage Present");
         }
-        #endif
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BASE_INSTANCE) &&
             hasGLExtension("GL_ARB_base_instance")) {
             hasBaseInstance = true;
             Log::info("GLDriver", "ARB Base Instance Present");
         }
-        #if !defined(USE_GLES2)
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_DRAW_INDIRECT) &&
             hasGLExtension("GL_ARB_draw_indirect")) {
             hasDrawIndirect = true;
             Log::info("GLDriver", "ARB Draw Indirect Present");
         }
-        #endif
-        #if !defined(USE_GLES2)
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_COMPUTE_SHADER) &&
             hasGLExtension("GL_ARB_compute_shader")) {
             hasComputeShaders = true;
             Log::info("GLDriver", "ARB Compute Shader Present");
         }
-        #endif
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_ARRAYS_OF_ARRAYS) &&
             hasGLExtension("GL_ARB_arrays_of_arrays")) {
             hasArraysOfArrays = true;
@@ -155,25 +149,21 @@ void CentralVideoSettings::init()
             hasMultiDrawIndirect = true;
             Log::info("GLDriver", "ARB Multi Draw Indirect Present");
         }
-        #if !defined(USE_GLES2)
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXT_TEXTURE_COMPRESSION_S3TC) &&
             hasGLExtension("GL_EXT_texture_compression_s3tc")) {
             hasTextureCompression = true;
             Log::info("GLDriver", "EXT Texture Compression S3TC Present");
         }
-        #endif
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_UNIFORM_BUFFER_OBJECT) &&
             hasGLExtension("GL_ARB_uniform_buffer_object")) {
             hasUBO = true;
             Log::info("GLDriver", "ARB Uniform Buffer Object Present");
         }
-        #if !defined(USE_GLES2)
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GEOMETRY_SHADER4) &&
             hasGLExtension("GL_ARB_geometry_shader4")) {
             hasGS = true;
             Log::info("GLDriver", "ARB Geometry Shader 4 Present");
         }
-        #endif
 
         // Only unset the high def textures if they are set as default. If the
         // user has enabled them (bit 1 set), then leave them enabled.
@@ -203,7 +193,6 @@ void CentralVideoSettings::init()
         }
 
         // Check if visual is sRGB-capable
-#if !defined(ANDROID) && !defined(USE_GLES2)
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_CAPABLE) &&
             m_glsl == true)
         {
@@ -211,6 +200,19 @@ void CentralVideoSettings::init()
             glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT,
                               GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
             m_need_srgb_visual_workaround = (param != GL_SRGB);
+        }
+#endif
+
+#if defined(USE_GLES2)
+        if (m_glsl == true)
+        {
+            hasArraysOfArrays = true;
+            hasTextureStorage = true;
+            hasTextureView = true;
+            hasBindlessTexture = true;
+            hasImageLoadStore = true;
+            hasAtomics = true;
+            hasSSBO = true;
         }
 #endif
     }
