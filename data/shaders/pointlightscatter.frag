@@ -9,7 +9,7 @@ flat in float radius;
 
 out vec4 Fog;
 
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+#stk_include "utils/getPosFromUVDepth.frag"
 
 void main()
 {

@@ -9,10 +9,10 @@ flat in float radius;
 out vec4 Diff;
 out vec4 Spec;
 
-vec3 DecodeNormal(vec2 n);
-vec3 SpecularBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
-vec3 DiffuseBRDF(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+#stk_include "utils/decodeNormal.frag"
+#stk_include "utils/SpecularBRDF.frag"
+#stk_include "utils/DiffuseBRDF.frag"
+#stk_include "utils/getPosFromUVDepth.frag"
 
 void main()
 {

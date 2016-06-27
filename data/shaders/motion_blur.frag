@@ -42,7 +42,7 @@ out vec4 FragColor;
 // Number of samples used for blurring
 #define NB_SAMPLES 8
 
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+#stk_include "utils/getPosFromUVDepth.frag"
 
 void main()
 {

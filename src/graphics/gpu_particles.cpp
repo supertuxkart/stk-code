@@ -81,7 +81,6 @@ public:
     {
         loadProgram(PARTICLES_RENDERING,
                     GL_VERTEX_SHADER,   "flipparticle.vert",
-                    GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                     GL_FRAGMENT_SHADER, "particle.frag");
         assignUniforms();
         assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -148,7 +147,7 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 
     m_color_from[0] = m_color_from[1] = m_color_from[2] = 1.0;
     m_color_to[0] = m_color_to[1] = m_color_to[2] = 1.0;
-    
+
     // We set these later but avoid coverity report them
     heighmapbuffer = 0;
     heightmaptexture = 0;
@@ -264,7 +263,7 @@ void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePoin
         ParticleParams[i].PositionZ = 0;
         // Initial lifetime is >1
         InitialValues[i].Lifetime = 2.;
-        
+
         memcpy(&(InitialValues[i].PositionX), &(ParticleParams[i].PositionX), 3 * sizeof(float));
 
         generateLifetimeSizeDirection(emitter, ParticleParams[i].Lifetime, ParticleParams[i].Size,
@@ -474,12 +473,12 @@ void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initia
 }
 
 void ParticleSystemProxy::simulate()
-{    
+{
 #ifndef ANDROID
     int timediff = int(GUIEngine::getLatestDt() * 1000.f);
     int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
     core::matrix4 matrix = getAbsoluteTransformation();
-    
+
     glEnable(GL_RASTERIZER_DISCARD);
     if (has_height_map)
     {
@@ -494,7 +493,7 @@ void ParticleSystemProxy::simulate()
         PointEmitterShader::getInstance()->setUniforms(m_previous_frame_matrix, matrix, timediff, active_count, size_increase_factor);
     }
     m_previous_frame_matrix = matrix;
-    
+
     glBindVertexArray(current_simulation_vao);
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 

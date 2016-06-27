@@ -147,7 +147,7 @@ public:
 
 // ============================================================================
 class ComputeGaussian6HBlurShader : public TextureShader<ComputeGaussian6HBlurShader, 1,
-                                                  core::vector2df, 
+                                                  core::vector2df,
                                                   std::vector<float> >
 {
 public:
@@ -282,7 +282,7 @@ public:
 };   // Gaussian17TapVShader
 
 // ============================================================================
-class ComputeGaussian17TapVShader : public TextureShader<ComputeGaussian17TapVShader, 2, 
+class ComputeGaussian17TapVShader : public TextureShader<ComputeGaussian17TapVShader, 2,
                                                   core::vector2df>
 {
 public:
@@ -298,7 +298,7 @@ public:
         assignTextureUnit(m_dest_tu, "dest");
     }   // ComputeGaussian17TapVShader
     // ------------------------------------------------------------------------
-    void render(const FrameBuffer &auxiliary, const FrameBuffer &fb, 
+    void render(const FrameBuffer &auxiliary, const FrameBuffer &fb,
                 int width, int height)
     {
         use();
@@ -320,8 +320,6 @@ public:
     BloomShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/getCIEXYZ.frag",
-                            GL_FRAGMENT_SHADER, "utils/getRGBfromCIEXxy.frag",
                             GL_FRAGMENT_SHADER, "bloom.frag");
         assignUniforms();
         assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
@@ -440,10 +438,6 @@ public:
     IBLShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-                            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
-                            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
                             GL_FRAGMENT_SHADER, "IBL.frag");
         assignUniforms();
         assignSamplerNames(0, "ntex",  ST_NEAREST_FILTERED,
@@ -459,10 +453,6 @@ public:
     DegradedIBLShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-                            GL_FRAGMENT_SHADER, "utils/DiffuseIBL.frag",
-                            GL_FRAGMENT_SHADER, "utils/SpecularIBL.frag",
                             GL_FRAGMENT_SHADER, "degraded_ibl.frag");
         assignUniforms();
         assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED);
@@ -483,13 +473,13 @@ public:
         m_tu_shr = 0;
         m_tu_shg = 1;
         m_tu_shb = 2;
-        assignTextureUnit(m_tu_shr, "SHR",  m_tu_shg, "SHG", 
+        assignTextureUnit(m_tu_shr, "SHR",  m_tu_shg, "SHG",
                           m_tu_shb, "SHB");
     }   // RHDebug
 };   // RHDebug
 
 // ============================================================================
-class GlobalIlluminationReconstructionShader 
+class GlobalIlluminationReconstructionShader
     : public TextureShader<GlobalIlluminationReconstructionShader, 5,
                            core::matrix4, core::matrix4, core::vector3df >
 {
@@ -497,8 +487,6 @@ public:
     GlobalIlluminationReconstructionShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                             GL_FRAGMENT_SHADER, "gi.frag");
 
         assignUniforms("rh_matrix", "inv_rh_matrix", "extents");
@@ -627,8 +615,6 @@ public:
     SSAOShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                             GL_FRAGMENT_SHADER, "ssao.frag");
 
         assignUniforms("radius", "k", "sigma");
@@ -656,7 +642,6 @@ public:
     MotionBlurShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                             GL_FRAGMENT_SHADER, "motion_blur.frag");
         assignUniforms("previous_viewproj", "center", "boost_amount",
                         "mask_radius");
@@ -716,7 +701,7 @@ public:
 };   // GodRayShader
 
 // ============================================================================
-class MLAAColorEdgeDetectionSHader 
+class MLAAColorEdgeDetectionSHader
     : public TextureShader<MLAAColorEdgeDetectionSHader, 1, core::vector2df>
 {
 public:
@@ -793,11 +778,6 @@ public:
     SunLightShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
-                            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-                            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
                             GL_FRAGMENT_SHADER, "sunlight.frag");
 
         assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
@@ -819,7 +799,7 @@ public:
 };   // SunLightShader
 
 // ============================================================================
-class LightningShader : public TextureShader<LightningShader, 1, 
+class LightningShader : public TextureShader<LightningShader, 1,
                                              core::vector3df>
 {
 public:
@@ -885,7 +865,7 @@ void PostProcessing::reset()
     m_center.resize(n);
     m_direction.resize(n);
 
-    MotionBlurProvider * const cb = 
+    MotionBlurProvider * const cb =
         (MotionBlurProvider *) Shaders::getCallback(ES_MOTIONBLUR);
 
     for(unsigned int i=0; i<n; i++)
@@ -945,7 +925,7 @@ void PostProcessing::reset()
 // ----------------------------------------------------------------------------
 void PostProcessing::setMotionBlurCenterY(const u32 num, const float y)
 {
-    MotionBlurProvider * const cb = 
+    MotionBlurProvider * const cb =
         (MotionBlurProvider *) Shaders::getCallback(ES_MOTIONBLUR);
 
     const float tex_height =
@@ -1108,10 +1088,10 @@ static std::vector<float> getGaussianWeight(float sigma, size_t count)
 }   // getGaussianWeight
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo, 
+void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
                                          const FrameBuffer &auxiliary)
 {
-    assert(in_fbo.getWidth() == auxiliary.getWidth() && 
+    assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width  = 1.0f / in_fbo.getWidth();
     float inv_height = 1.0f / in_fbo.getHeight();
@@ -1143,13 +1123,13 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
         // Used as temp
         irr_driver->getFBO(FBO_SCALAR_1024).bind();
         Gaussian6VBlurShader::getInstance()
-            ->render(layer_tex, UserConfigParams::m_shadows_resolution, 
+            ->render(layer_tex, UserConfigParams::m_shadows_resolution,
                      UserConfigParams::m_shadows_resolution, sigma_v);
 
         in_fbo.bindLayer(layer);
         Gaussian6HBlurShader::getInstance()
             ->render(irr_driver->getFBO(FBO_SCALAR_1024),
-                     UserConfigParams::m_shadows_resolution, 
+                     UserConfigParams::m_shadows_resolution,
                      UserConfigParams::m_shadows_resolution, sigma_h);
     }
     else
@@ -1170,7 +1150,7 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
                           (int)UserConfigParams::m_shadows_resolution / 8 + 1, 1);
 
         const std::vector<float> &weightsH = getGaussianWeight(sigma_h, 7);
-        glMemoryBarrier(  GL_TEXTURE_FETCH_BARRIER_BIT 
+        glMemoryBarrier(  GL_TEXTURE_FETCH_BARRIER_BIT
                         | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         ComputeShadowBlurHShader::getInstance()->use();
         ComputeShadowBlurHShader::getInstance()
@@ -1194,7 +1174,7 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
                                          const FrameBuffer &auxiliary, float sigma_v,
                                          float sigma_h)
 {
-    assert(in_fbo.getWidth() == auxiliary.getWidth() && 
+    assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width = 1.0f / in_fbo.getWidth();
     float inv_height = 1.0f / in_fbo.getHeight();
@@ -1224,11 +1204,11 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
                             GL_WRITE_ONLY, GL_RGBA16F);
         ComputeGaussian6VBlurShader::getInstance()
             ->setUniforms(core::vector2df(inv_width, inv_height), weightsV);
-        glDispatchCompute((int)in_fbo.getWidth() / 8 + 1, 
+        glDispatchCompute((int)in_fbo.getWidth() / 8 + 1,
                           (int)in_fbo.getHeight() / 8 + 1, 1);
 
         const std::vector<float> &weightsH = getGaussianWeight(sigma_h, 7);
-        glMemoryBarrier(  GL_TEXTURE_FETCH_BARRIER_BIT 
+        glMemoryBarrier(  GL_TEXTURE_FETCH_BARRIER_BIT
                         | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         ComputeGaussian6HBlurShader::getInstance()->use();
         ComputeGaussian6HBlurShader::getInstance()
@@ -1299,7 +1279,7 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
         else
         {
             ComputeGaussian17TapVShader::getInstance()->render(auxiliary,
-                                                               in_fbo, 
+                                                               in_fbo,
                                                                in_fbo.getWidth(),
                                                                in_fbo.getHeight());
         }
@@ -1432,9 +1412,9 @@ void PostProcessing::renderLightning(core::vector3df intensity)
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
     glBlendEquation(GL_FUNC_ADD);
-       
+
     LightningShader::getInstance()->render(intensity);
-    
+
     glDisable(GL_BLEND);
 }
 
@@ -1513,9 +1493,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
             trans.transformVect(ndc, pos);
 
-            const float texh = 
+            const float texh =
                 m_vertices[0].v1.TCoords.Y - m_vertices[0].v0.TCoords.Y;
-            const float texw = 
+            const float texw =
                 m_vertices[0].v3.TCoords.X - m_vertices[0].v0.TCoords.X;
 
             const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f) * texw;
@@ -1564,7 +1544,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
             // Downsample
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512),
-                              irr_driver->getFBO(FBO_BLOOM_256), 
+                              irr_driver->getFBO(FBO_BLOOM_256),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
             FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256),
                               irr_driver->getFBO(FBO_BLOOM_128),
@@ -1572,7 +1552,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
 			// Copy for lens flare
 			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_512),
-                              irr_driver->getFBO(FBO_LENS_512), 
+                              irr_driver->getFBO(FBO_LENS_512),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_256),
                               irr_driver->getFBO(FBO_LENS_256),
@@ -1580,7 +1560,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 			FrameBuffer::Blit(irr_driver->getFBO(FBO_BLOOM_128),
                               irr_driver->getFBO(FBO_LENS_128),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-			
+
 
             // Blur
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512),
@@ -1590,20 +1570,20 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128),
                                 irr_driver->getFBO(FBO_TMP_128), 1., 1.);
 
-            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_512), 
+            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_512),
                                  irr_driver->getFBO(FBO_TMP_512));
             renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_256),
                                  irr_driver->getFBO(FBO_TMP_256));
-            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_128), 
+            renderHorizontalBlur(irr_driver->getFBO(FBO_LENS_128),
                                  irr_driver->getFBO(FBO_TMP_128));
-            
+
 
             // Additively blend on top of tmp1
             in_fbo->bind();
             glEnable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
-            
+
             BloomBlendShader::getInstance()->render();
             LensBlendShader::getInstance()->render();
 
@@ -1627,7 +1607,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
-        MotionBlurProvider * const cb = 
+        MotionBlurProvider * const cb =
             (MotionBlurProvider *)Shaders::getCallback(ES_MOTIONBLUR);
 
         if (isRace && UserConfigParams::m_motionblur && World::getWorld() &&
@@ -1638,7 +1618,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         }
         PROFILER_POP_CPU_MARKER();
     }
-    
+
     // Handle lightning rendering
     {
         PROFILER_PUSH_CPU_MARKER("- Lightning", 0xFF, 0x00, 0x00);
@@ -1646,7 +1626,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         if (World::getWorld() != NULL)
         {
             Weather* m_weather = World::getWorld()->getWeather();
-            
+
             if (m_weather != NULL && m_weather->shouldLightning())
             {
                 renderLightning(m_weather->getIntensity());
