@@ -38,8 +38,6 @@
 #include "graphics/stk_text_billboard.hpp"
 #include "graphics/stars.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "karts/abstract_characteristic.hpp"
-#include "karts/cached_characteristic.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/rescue_animation.hpp"
@@ -215,12 +213,7 @@ void Kart::init(RaceManager::KartType type)
     m_kart_gfx = new KartGFX(this);
     m_skidding = new Skidding(this);
     // Create the stars effect
-    m_stars_effect =
-        new Stars(getNode(),
-                  core::vector3df(0.0f,
-                                  getKartModel()->getModel()
-                                        ->getBoundingBox().MaxEdge.Y,
-                                  0.0f)                               );
+    m_stars_effect = new Stars(this);
 
     reset();
 }   // init
