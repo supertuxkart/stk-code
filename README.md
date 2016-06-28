@@ -30,10 +30,12 @@ Hope you enjoy the game.
 7. Right click on the supertuxkart project in the solution explorer, and select "Set as StartUp Project".
 8. Select Build->Build Solution (or press F7) to compile.
 
+See <https://supertuxkart.net/How_to_build_the_Windows_version> for more information.
+
 Compilation with cygwin is not officially supported, but this has been done (check with the forum for details).
 
 ### Mac OS X
-The latest information about compilation on Mac are on our wiki: <https://supertuxkart.net/Building_and_packaging_on_OSX>
+The latest information about compilation on Mac are at our site: <https://supertuxkart.net/Building_and_packaging_on_OSX>
 
 ### UNIX
 See [`INSTALL.md`](INSTALL.md) for details.
