@@ -56,6 +56,9 @@ struct GLMesh
     video::E_VERTEX_TYPE VAOType;
     uint64_t TextureHandles[6];
     scene::IMeshBuffer *mb;
+    float m_custom_hue;
+    float m_custom_min_saturation;
+    bool m_transparent;
 #ifdef DEBUG
     std::string debug_name;
 #endif
@@ -63,7 +66,8 @@ struct GLMesh
 
 // ----------------------------------------------------------------------------
 GLMesh               allocateMeshBuffer(scene::IMeshBuffer* mb,
-                                        const std::string& debug_name);
+                                        const std::string& debug_name,
+                                        const CustomRenderInfo& cri);
 void                 fillLocalBuffer(GLMesh &, scene::IMeshBuffer* mb);
 video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride);
 GLuint               createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type);

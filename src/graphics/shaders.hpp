@@ -150,11 +150,11 @@ public:
         GLint m_color_change_location;
     public:
         ObjectPass2Shader();
-        virtual bool changeHue(float hue = 0.0f) const OVERRIDE
+        virtual bool changeableColor(float hue = 0.0f, float min_sat = 0.0f) const OVERRIDE
         {
-            glUniform1f(m_color_change_location, hue);
+            glUniform2f(m_color_change_location, hue, min_sat);
             return true;
-        }   // changeHue
+        }   // changeableColor
     };   // ObjectPass2Shader
 
     // ========================================================================

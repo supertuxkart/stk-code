@@ -52,7 +52,6 @@
 #include "items/projectile_manager.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/abstract_kart_animation.hpp"
-#include "karts/kart_model.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
@@ -93,9 +92,9 @@
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
             PerPlayerDifficulty difficulty,
-            video::E_RENDER_TYPE rt)
+            KartModel::KartRenderType krt)
      : AbstractKart(ident, world_kart_id, position, init_transform,
-             difficulty, rt)
+             difficulty, krt)
 
 #if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  pragma warning(1:4355)

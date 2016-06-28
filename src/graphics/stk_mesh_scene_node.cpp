@@ -33,7 +33,7 @@
 
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
-
+#include <algorithm>
 
 // ============================================================================
 class ColorizeShader : public Shader<ColorizeShader, core::matrix4, 
@@ -54,7 +54,7 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     irr::s32 id, const std::string& debug_name,
     const irr::core::vector3df& position,
     const irr::core::vector3df& rotation,
-    const irr::core::vector3df& scale, bool createGLMeshes) :
+    const irr::core::vector3df& scale, bool createGLMeshes, const CustomRenderInfo& cri) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
     isDisplacement = false;
@@ -65,7 +65,7 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     m_debug_name = debug_name;
 
     if (createGLMeshes)
-        this->createGLMeshes();
+        this->createGLMeshes(cri);
 }
 
 void STKMeshSceneNode::setReloadEachFrame(bool val)
@@ -75,12 +75,18 @@ void STKMeshSceneNode::setReloadEachFrame(bool val)
         immediate_draw = true;
 }
 
-void STKMeshSceneNode::createGLMeshes()
+void STKMeshSceneNode::createGLMeshes(const CustomRenderInfo& cri)
 {
     for (u32 i = 0; i<Mesh->getMeshBufferCount(); ++i)
     {
         scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-        GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name));
+
+        const bool affected = cri.m_affected_parts.empty() ||
+            std::find(cri.m_affected_parts.begin(),
+            cri.m_affected_parts.end(), i) != cri.m_affected_parts.end();
+
+        GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
+            affected ? cri : CustomRenderInfo()/*default info if not affected*/));
     }
     isMaterialInitialized = false;
     isGLInitialized = false;
@@ -173,7 +179,7 @@ void STKMeshSceneNode::updateNoGL()
 
             GLMesh &mesh = GLmeshes[i];
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
-            if (mb->getRenderType() == video::ERT_TRANSPARENT)
+            if (mesh.m_transparent)
             {
                 if (!immediate_draw)
                     TransparentMesh[TM_ADDITIVE].push_back(&mesh);
@@ -188,12 +194,7 @@ void STKMeshSceneNode::updateNoGL()
                 else
                     additive = (TranspMat == TM_ADDITIVE);
             }
-            else if (mb->getRenderType() == video::ERT_RED)
-            {
-                if (!immediate_draw)
-                    MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);
-            }
-            else if (mb->getRenderType() == video::ERT_BLUE)
+            else if (mesh.m_custom_hue > 0.0f)
             {
                 if (!immediate_draw)
                     MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);

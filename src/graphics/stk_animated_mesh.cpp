@@ -31,6 +31,7 @@
 #include <IMaterialRenderer.h>
 #include <ISceneManager.h>
 #include <ISkinnedMesh.h>
+#include <algorithm>
 
 using namespace irr;
 
@@ -38,11 +39,12 @@ STKAnimatedMesh::STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::IS
 irr::scene::ISceneManager* mgr, s32 id, const std::string& debug_name,
 const core::vector3df& position,
 const core::vector3df& rotation,
-const core::vector3df& scale) :
+const core::vector3df& scale, const CustomRenderInfo& cri) :
     CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
     isGLInitialized = false;
     isMaterialInitialized = false;
+    m_cri = cri;
 #ifdef DEBUG
     m_debug_name = debug_name;
 #endif
@@ -100,7 +102,13 @@ void STKAnimatedMesh::updateNoGL()
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-            GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name));
+
+            const bool affected = m_cri.m_affected_parts.empty() ||
+                std::find(m_cri.m_affected_parts.begin(),
+                m_cri.m_affected_parts.end(), i) != m_cri.m_affected_parts.end();
+
+            GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
+                affected ? m_cri : CustomRenderInfo()/*default info if not affected*/));
         }
 
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
@@ -126,15 +134,11 @@ void STKAnimatedMesh::updateNoGL()
                 TransparentMaterial TranspMat = getTransparentMaterialFromType(type, MaterialTypeParam, material);
                 TransparentMesh[TranspMat].push_back(&mesh);
             }
-            else if (mb->getRenderType() == video::ERT_TRANSPARENT)
+            else if (mesh.m_transparent)
             {
                 TransparentMesh[TM_ADDITIVE].push_back(&mesh);
             }
-            else if (mb->getRenderType() == video::ERT_RED)
-            {
-                MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);
-            }
-            else if (mb->getRenderType() == video::ERT_BLUE)
+            else if (mesh.m_custom_hue > 0.0f)
             {
                 MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);
             }

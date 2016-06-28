@@ -25,7 +25,6 @@
 #include "graphics/2dutils.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/light.hpp"
-#include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/per_camera_node.hpp"
 #include "graphics/post_processing.hpp"
@@ -1013,9 +1012,7 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
  *  \return Newly created skinned mesh. You should call drop() when you don't
  *          need it anymore.
  */
-scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig,
-                                                  video::E_RENDER_TYPE rt,
-                                                  const std::vector<int>& affected_buffers)
+scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
 {
     using namespace scene;
     CSkinnedMesh *mesh = dynamic_cast<CSkinnedMesh*>(orig);
@@ -1026,7 +1023,6 @@ scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig,
     }
 
     scene::IAnimatedMesh* out = mesh->clone();
-    out->setMeshRenderType(rt, affected_buffers);
     return out;
 }   // copyAnimatedMesh
 
@@ -1172,7 +1168,8 @@ scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter
  */
 scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                           const std::string& debug_name,
-                                          scene::ISceneNode *parent)
+                                          scene::ISceneNode *parent,
+                                          const CustomRenderInfo& cri)
 {
     if (!CVS->isGLSL())
         return m_scene_manager->addMeshSceneNode(mesh, parent);
@@ -1182,7 +1179,11 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
 
     scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, 
                                                        m_scene_manager, -1,
-                                                       debug_name);
+                                                       debug_name,
+                                                       core::vector3df(0, 0, 0),
+                                                       core::vector3df(0, 0, 0),
+                                                       core::vector3df(1.0f, 1.0f, 1.0f),
+                                                       true, cri);
     node->drop();
 
     return node;
@@ -1364,7 +1365,8 @@ void IrrDriver::removeTexture(video::ITexture *t)
  *  \param mesh The animated mesh to add.
  */
 scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh,
-    const std::string& debug_name, scene::ISceneNode* parent)
+    const std::string& debug_name, scene::ISceneNode* parent,
+    const CustomRenderInfo& cri)
 {
     if (!CVS->isGLSL())
     {
@@ -1379,7 +1381,7 @@ scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *
         parent = m_scene_manager->getRootSceneNode();
     scene::IAnimatedMeshSceneNode* node =
         new STKAnimatedMesh(mesh, parent, m_scene_manager, -1, debug_name,
-        core::vector3df(0, 0, 0), core::vector3df(0, 0, 0), core::vector3df(1, 1, 1));
+        core::vector3df(0, 0, 0), core::vector3df(0, 0, 0), core::vector3df(1, 1, 1), cri);
     node->drop();
     return node;
 }   // addAnimatedMesh

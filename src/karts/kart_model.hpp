@@ -115,6 +115,15 @@ public:
             AF_SPEED_WEIGHTED_END,          // End of speed-weighted animation
             AF_END=AF_SPEED_WEIGHTED_END,   // Last animation frame
             AF_COUNT};             // Number of entries here
+
+    enum KartRenderType
+    {
+        KRT_DEFAULT,
+        KRT_RED,
+        KRT_BLUE,
+        KRT_TRANSPARENT,
+    };
+
 private:
     /** Which frame number starts/end which animation. */
     int m_animation_frame[AF_COUNT];
@@ -229,10 +238,12 @@ private:
     /** Pointer to the kart object belonging to this kart model. */
     AbstractKart* m_kart;
 
+    KartRenderType m_krt;
+
 public:
                   KartModel(bool is_master);
                  ~KartModel();
-    KartModel*    makeCopy(video::E_RENDER_TYPE rt);
+    KartModel*    makeCopy(KartRenderType krt);
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
@@ -328,8 +339,6 @@ public:
     scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
     // ------------------------------------------------------------------------
     core::vector3df getHatOffset() { return m_hat_offset; }
-    // ------------------------------------------------------------------------
-    std::vector<int> getColorizableParts(scene::IAnimatedMesh* m);
 
 };   // KartModel
 #endif

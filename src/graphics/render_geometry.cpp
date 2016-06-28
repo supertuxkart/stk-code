@@ -153,11 +153,11 @@ public:
                            4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedObjectPass2Shader
 
-    virtual bool changeHue(float hue = 0.0f) const OVERRIDE
+    virtual bool changeableColor(float hue = 0.0f, float min_sat = 0.0f) const OVERRIDE
     {
-        glUniform1f(m_color_change_location, hue);
+        glUniform2f(m_color_change_location, hue, min_sat);
         return true;
-    }   // changeHue
+    }   // changeableColor
 };   // InstancedObjectPass2Shader
 
 // ============================================================================
@@ -998,18 +998,11 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
     GLenum itype = mesh->IndexType;
     size_t count = mesh->IndexCount;
 
-    const video::E_RENDER_TYPE rt = mesh->mb->getRenderType();
-    const bool need_change_hue = (rt != video::ERT_DEFAULT);
+    const bool need_change_hue = (mesh->m_custom_hue > 0.0f);
     if (need_change_hue)
     {
-        if (rt == video::ERT_RED)
-        {
-            Shader->changeHue(1.0f);
-        }
-        else if (rt == video::ERT_BLUE)
-        {
-            Shader->changeHue(0.66f);
-        }
+        Shader->changeableColor(mesh->m_custom_hue,
+            mesh->m_custom_min_saturation);
     }
 
     Shader->setUniforms(Args...);
@@ -1020,7 +1013,7 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
     if (need_change_hue)
     {
         // Reset after changing
-        Shader->changeHue();
+        Shader->changeableColor();
     }
 
 }   // draw
@@ -1305,18 +1298,11 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
             ExpandTex(*mesh, T::SecondPassTextures, Prefilled_tex[0],
                       Prefilled_tex[1], Prefilled_tex[2]);
 
-        const video::E_RENDER_TYPE rt = mesh->mb->getRenderType();
-        const bool need_change_hue = (rt != video::ERT_DEFAULT);
+        const bool need_change_hue = (mesh->m_custom_hue > 0.0f);
         if (need_change_hue)
         {
-            if (rt == video::ERT_RED)
-            {
-                T::InstancedSecondPassShader::getInstance()->changeHue(1.0f);
-            }
-            else if (rt == video::ERT_BLUE)
-            {
-                T::InstancedSecondPassShader::getInstance()->changeHue(0.66f);
-            }
+            T::InstancedSecondPassShader::getInstance()->changeableColor
+                (mesh->m_custom_hue, mesh->m_custom_min_saturation);
         }
 
         T::InstancedSecondPassShader::getInstance()->setUniforms(args...);
@@ -1327,7 +1313,7 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
         if (need_change_hue)
         {
             // Reset after changing
-            T::InstancedSecondPassShader::getInstance()->changeHue();
+            T::InstancedSecondPassShader::getInstance()->changeableColor();
         }
     }
 }   // renderInstancedMeshes2ndPass

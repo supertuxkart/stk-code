@@ -19,7 +19,6 @@
 #include "karts/ghost_kart.hpp"
 #include "karts/controller/ghost_controller.hpp"
 #include "karts/kart_gfx.hpp"
-#include "karts/kart_model.hpp"
 #include "modes/world.hpp"
 
 #include "LinearMath/btQuaternion.h"
@@ -28,7 +27,7 @@ GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
                      int position)
           : Kart(ident, world_kart_id,
                  position, btTransform(btQuaternion(0, 0, 0, 1)),
-                 PLAYER_DIFFICULTY_NORMAL, video::ERT_TRANSPARENT)
+                 PLAYER_DIFFICULTY_NORMAL, KartModel::KRT_TRANSPARENT)
 {
 }   // GhostKart
 

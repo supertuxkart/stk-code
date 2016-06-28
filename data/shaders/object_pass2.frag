@@ -6,7 +6,7 @@ uniform sampler2D Albedo;
 uniform sampler2D SpecMap;
 #endif
 
-uniform float color_change;
+uniform vec2 color_change;
 
 in vec2 uv;
 in vec4 color;
@@ -27,11 +27,11 @@ void main(void)
     vec4 col = texture(Albedo, uv);
 #endif
 
-    if (color_change > 0.0)
+    if (color_change.x > 0.0)
     {
         vec3 old_hsv = rgbToHsv(col.rgb);
-        old_hsv.y = max(old_hsv.y, 0.93);
-        vec3 new_color = hsvToRgb(vec3(color_change, old_hsv.y, old_hsv.z));
+        old_hsv.y = max(old_hsv.y, color_change.y);
+        vec3 new_color = hsvToRgb(vec3(color_change.x, old_hsv.y, old_hsv.z));
         col = vec4(new_color.r, new_color.g, new_color.b, col.a);
     }
 

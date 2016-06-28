@@ -33,7 +33,7 @@ protected:
 
     // Misc passes shaders (glow, displace...)
     void drawGlow(const GLMesh &mesh);
-    void createGLMeshes();
+    void createGLMeshes(const CustomRenderInfo& cri = CustomRenderInfo());
     void cleanGLMeshes();
     void setFirstTimeMaterial();
     void updatevbo();
@@ -54,7 +54,8 @@ public:
         const irr::core::vector3df& position = irr::core::vector3df(0, 0, 0),
         const irr::core::vector3df& rotation = irr::core::vector3df(0, 0, 0),
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f),
-        bool createGLMeshes = true);
+        bool createGLMeshes = true,
+        const CustomRenderInfo& cri = CustomRenderInfo());
     virtual void render();
     virtual void setMesh(irr::scene::IMesh* mesh);
     virtual void OnRegisterSceneNode();

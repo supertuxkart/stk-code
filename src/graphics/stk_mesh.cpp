@@ -163,9 +163,13 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
 }   // createVAO
 
 // ----------------------------------------------------------------------------
-GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name)
+GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name,
+                          const CustomRenderInfo& cri)
 {
     GLMesh result = {};
+    result.m_custom_hue = cri.m_custom_hue;
+    result.m_custom_min_saturation = cri.m_custom_min_saturation;
+    result.m_transparent = cri.m_transparent;
     if (!mb)
         return result;
     result.mb = mb;

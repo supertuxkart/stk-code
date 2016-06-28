@@ -5,18 +5,15 @@
 #ifndef __I_MESH_H_INCLUDED__
 #define __I_MESH_H_INCLUDED__
 
-#include "IMeshBuffer.h"
 #include "IReferenceCounted.h"
 #include "SMaterial.h"
 #include "EHardwareBufferFlags.h"
-
-#include <algorithm>
-#include <vector>
 
 namespace irr
 {
 namespace scene
 {
+	class IMeshBuffer;
 
 	//! Class which holds the geometry of an object.
 	/** An IMesh is nothing more than a collection of some mesh buffers
@@ -26,9 +23,6 @@ namespace scene
 	class IMesh : public virtual IReferenceCounted
 	{
 	public:
-		IMesh() : m_custom_render_type(false) {}
-
-		virtual ~IMesh() {}
 
 		//! Get the amount of mesh buffers.
 		/** \return Amount of mesh buffers (IMeshBuffer) in this mesh. */
@@ -72,30 +66,6 @@ namespace scene
 		indices have changed. Otherwise, changes won't be updated
 		on the GPU in the next render cycle. */
 		virtual void setDirty(E_BUFFER_TYPE buffer=EBT_VERTEX_AND_INDEX) = 0;
-
-		//! True if this mesh has specific render type (mainly karts in STK)
-		bool hasCustomRenderType() const { return m_custom_render_type; }
-
-		//! Set whether this mesh is having a specific render type (mainly karts in STK)
-		void setCustomRenderType(bool has_custom) { m_custom_render_type = has_custom; }
-
-		//! Set the mesh to use a specific render type (mainly karts in STK)
-		/** \param t New render type for the mesh.
-		\param affected_buffers Mesh buffer numbers which are effected by new render type,
-		if not given all mesh buffers are affected. */
-		void setMeshRenderType(video::E_RENDER_TYPE t, const std::vector<int>& affected_buffers = std::vector<int>())
-		{
-			if (t == video::ERT_DEFAULT) return;
-			setCustomRenderType(true);
-			for (int i = 0; i < int(getMeshBufferCount()); i++)
-			{
-				if (!affected_buffers.empty() && std::find(affected_buffers.begin(), affected_buffers.end(), i) == affected_buffers.end())
-					continue;
-				getMeshBuffer(i)->setRenderType(t);
-			}
-		}
-	private:
-		bool m_custom_render_type;
 	};
 
 } // end namespace scene

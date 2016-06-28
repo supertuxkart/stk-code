@@ -242,12 +242,12 @@ public:
             glDeleteSamplers(1, &m_sampler_ids[i]);
     }   // ~TextureShader
 
-    /** Override this class and return true if a shader can set different hue.
+    /** Override this class and return true if a shader has changeable color.
      */
-    virtual bool changeHue(float hue = 0.0f) const
+    virtual bool changeableColor(float hue = 0.0f, float min_sat = 0.0f) const
     {
         return false;
-    }   // changeHue
+    }   // changeableColor
 
 };   // class TextureShader
 

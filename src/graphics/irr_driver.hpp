@@ -37,6 +37,8 @@
 #include "IrrlichtDevice.h"
 #include "ISkinnedMesh.h"
 #include "graphics/gl_headers.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/skybox.hpp"
 #include "graphics/sphericalHarmonics.hpp"
 #include "graphics/wind.hpp"
@@ -175,6 +177,54 @@ enum TypeRTT
     RTT_LENS_128,
 
     RTT_COUNT
+};
+
+struct CustomRenderInfo
+{
+    float m_custom_hue;
+
+    float m_custom_min_saturation;
+
+    bool m_transparent;
+
+    std::vector<int> m_affected_parts;
+
+    std::vector<int> getColorizableParts(scene::IMesh* m)
+    {
+        std::vector<int> colorizable_parts;
+        for (int i = 0; i < int(m->getMeshBufferCount()); ++i)
+        {
+            scene::IMeshBuffer* mb = m->getMeshBuffer(i);
+            Material* material = material_manager->getMaterialFor(mb
+                ->getMaterial().getTexture(0), mb);
+            if (material->isColorizable())
+            colorizable_parts.push_back(i);
+        }
+        return colorizable_parts;
+    }
+
+    CustomRenderInfo()
+    {
+        m_custom_hue = 0.0f;
+        m_custom_min_saturation = 0.0f;
+        m_transparent = false;
+    }
+    CustomRenderInfo(float custom_hue, float custom_min_saturation,
+                     bool transparent, scene::IMesh* m = NULL)
+    {
+        m_custom_hue = custom_hue;
+        m_custom_min_saturation = custom_min_saturation;
+        m_transparent = transparent;
+        if (m)
+            m_affected_parts = getColorizableParts(m);
+    }
+    CustomRenderInfo(const CustomRenderInfo& cri)
+    {
+        m_custom_hue = cri.m_custom_hue;
+        m_custom_min_saturation = cri.m_custom_min_saturation;
+        m_transparent = cri.m_transparent;
+    }
+
 };
 
 /**
@@ -353,9 +403,7 @@ public:
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
-    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig,
-                                           video::E_RENDER_TYPE rt,
-                                           const std::vector<int>& affected_buffers = std::vector<int>());
+    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig);
     video::ITexture      *applyMask(video::ITexture* texture,
                                     const std::string& mask_path);
     void displayFPS();
@@ -388,7 +436,8 @@ public:
                  const video::SColor &color=video::SColor(128, 255, 255, 255));
     scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
                                   const std::string& debug_name,
-                                  scene::ISceneNode *parent=NULL);
+                                  scene::ISceneNode *parent=NULL,
+                                  const CustomRenderInfo& cri = CustomRenderInfo());
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);
@@ -408,7 +457,10 @@ public:
     void                  removeMeshFromCache(scene::IMesh *mesh);
     void                  removeTexture(video::ITexture *t);
     scene::IAnimatedMeshSceneNode
-        *addAnimatedMesh(scene::IAnimatedMesh *mesh, const std::string& debug_name, scene::ISceneNode* parent = NULL);
+        *addAnimatedMesh(scene::IAnimatedMesh *mesh,
+                         const std::string& debug_name,
+                         scene::ISceneNode* parent = NULL,
+                         const CustomRenderInfo& cri = CustomRenderInfo());
     scene::ICameraSceneNode
                          *addCameraSceneNode();
     Camera               *addCamera(unsigned int index, AbstractKart *kart);

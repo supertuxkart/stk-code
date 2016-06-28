@@ -19,10 +19,10 @@
 #ifndef HEADER_ABSTRACT_KART_HPP
 #define HEADER_ABSTRACT_KART_HPP
 
-#include <EMaterialTypes.h>
 #include <memory>
 
 #include "items/powerup_manager.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/moveable.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "race/race_manager.hpp"
@@ -100,7 +100,7 @@ public:
                                 int world_kart_id,
                                 int position, const btTransform& init_transform,
                                 PerPlayerDifficulty difficulty,
-                                video::E_RENDER_TYPE rt);
+                                KartModel::KartRenderType krt);
     virtual       ~AbstractKart();
     virtual core::stringw getName() const;
     virtual void   reset();
