@@ -25,7 +25,7 @@
 #include "glwrap.hpp"
 #include "utils/cpp2011.hpp"
 
-#if defined(ANDROID) || defined(USE_GLES2)
+#if defined(USE_GLES2)
 #   define _IRR_COMPILE_WITH_OGLES2_
 #   include "../../lib/irrlicht/source/Irrlicht/COGLES2Texture.h"
 #else
@@ -184,7 +184,7 @@ static void drawTexColoredQuad(const video::ITexture *texture,
     ColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(ColoredTextureRectShader::getInstance()->m_vao);
 
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     const irr::video::COpenGLTexture *t = 
                        static_cast<const irr::video::COpenGLTexture*>(texture);
 #else
@@ -322,7 +322,7 @@ void draw2DImage(const video::ITexture* texture,
     UniformColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(SharedGPUObjects::getUI_VAO());
 
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     const video::COpenGLTexture *c_texture = 
         static_cast<const video::COpenGLTexture*>(texture);
 #else
@@ -439,7 +439,7 @@ void draw2DImage(const video::ITexture* texture,
     }
     else
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         const video::COpenGLTexture *c_texture = 
                             static_cast<const video::COpenGLTexture*>(texture);
 #else

@@ -37,7 +37,7 @@ public:
     DrawElementsIndirectCommand *Ptr;
     CommandBuffer()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         glGenBuffers(1, &drawindirectcmd);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
         if (CVS->supportsAsyncInstanceUpload())

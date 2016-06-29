@@ -101,12 +101,10 @@ public:
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
 
-#ifndef ANDROID
         glVertexAttribDivisorARB(attrib_Position, 1);
         glVertexAttribDivisorARB(attrib_Energy, 1);
         glVertexAttribDivisorARB(attrib_Color, 1);
         glVertexAttribDivisorARB(attrib_Radius, 1);
-#endif
     }   // PointLightShader
 };   // PointLightShader
 
@@ -152,12 +150,10 @@ public:
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
 
-#ifndef ANDROID
         glVertexAttribDivisorARB(attrib_Position, 1);
         glVertexAttribDivisorARB(attrib_Energy, 1);
         glVertexAttribDivisorARB(attrib_Color, 1);
         glVertexAttribDivisorARB(attrib_Radius, 1);
-#endif
     }   // PointLightScatterShader
 };
 
@@ -232,7 +228,7 @@ class RadianceHintsConstructionShader
 public:
     RadianceHintsConstructionShader()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         if (CVS->isAMDVertexShaderLayerUsable())
         {
             loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
@@ -263,7 +259,7 @@ class NVWorkaroundRadianceHintsConstructionShader
 public:
     NVWorkaroundRadianceHintsConstructionShader()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         loadProgram(OBJECT,GL_VERTEX_SHADER,"slicedscreenquad_nvworkaround.vert",
                            GL_GEOMETRY_SHADER, "rhpassthrough.geom",
                            GL_FRAGMENT_SHADER, "rh.frag");

@@ -447,11 +447,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps",
                        &m_video_group, "Maximum fps, should be at least 60") );
     PARAM_PREFIX BoolUserConfigParam        m_force_legacy_device
-#ifndef ANDROID
         PARAM_DEFAULT(BoolUserConfigParam(false, "force_legacy_device",
-#else
-        PARAM_DEFAULT(BoolUserConfigParam(true, "force_legacy_device",
-#endif
         &m_video_group, "Force OpenGL 2 context, even if OpenGL 3 is available."));
 
     PARAM_PREFIX BoolUserConfigParam        m_texture_compression

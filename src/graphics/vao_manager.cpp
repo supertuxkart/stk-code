@@ -39,7 +39,7 @@ VAOManager::VAOManager()
     {
         glGenBuffers(1, &instance_vbo[i]);
         glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[i]);
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         if (CVS->supportsAsyncInstanceUpload())
         {
             glBufferStorage(GL_ARRAY_BUFFER, 10000 * sizeof(InstanceDataDualTex), 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
@@ -90,7 +90,7 @@ resizeBufferIfNecessary(size_t &lastIndex, size_t newLastIndex, size_t bufferSiz
         GLuint newVBO;
         glGenBuffers(1, &newVBO);
         glBindBuffer(type, newVBO);
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         if (CVS->supportsAsyncInstanceUpload())
         {
             glBufferStorage(type, bufferSize *stride, 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
@@ -293,7 +293,7 @@ void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
     size_t old_idx_cnt = last_index[tp];
 
     regenerateBuffer(tp, old_vtx_cnt + mb->getVertexCount(), old_idx_cnt + mb->getIndexCount());
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     if (CVS->supportsAsyncInstanceUpload())
     {
         void *tmp = (char*)VBOPtr[tp] + old_vtx_cnt * getVertexPitch(tp);
@@ -305,7 +305,7 @@ void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
         glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
         glBufferSubData(GL_ARRAY_BUFFER, old_vtx_cnt * getVertexPitch(tp), mb->getVertexCount() * getVertexPitch(tp), mb->getVertices());
     }
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     if (CVS->supportsAsyncInstanceUpload())
     {
         void *tmp = (char*)IBOPtr[tp] + old_idx_cnt * sizeof(u16);

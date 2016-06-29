@@ -127,9 +127,7 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
     ColorizeShader::getInstance()->setUniforms(AbsoluteTransformation, video::SColorf(glowcolor.getRed() / 255.f, glowcolor.getGreen() / 255.f, glowcolor.getBlue() / 255.f));
-#ifndef ANDROID
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
-#endif
 }
 
 void STKMeshSceneNode::updatevbo()
@@ -305,7 +303,7 @@ void STKMeshSceneNode::render()
             size_t count = mesh.IndexCount;
 
             compressTexture(mesh.textures[0], true);
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
             if (CVS->isAZDOEnabled())
             {
                 if (!mesh.TextureHandles[0])
@@ -350,7 +348,7 @@ void STKMeshSceneNode::render()
             GLenum itype = mesh.IndexType;
             size_t count = mesh.IndexCount;
 
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
             if (CVS->isAZDOEnabled())
             {
                 GLuint64 DiffuseHandle =
@@ -462,7 +460,7 @@ void STKMeshSceneNode::render()
                         tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
                     if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])
@@ -502,7 +500,7 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
                     if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])

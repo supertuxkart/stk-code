@@ -171,7 +171,7 @@ void MainLoop::run()
 
     m_curr_time = device->getTimer()->getRealTime();
     
-    #if defined(ANDROID_DEVICE)
+    #if defined(ANDROID)
 	auto sensorManager = ASensorManager_getInstance();
 	auto accelerometerSensor = ASensorManager_getDefaultSensor(sensorManager,
                                                     ASENSOR_TYPE_ACCELEROMETER);
@@ -186,7 +186,7 @@ void MainLoop::run()
     
     while(!m_abort)
     {
-        #if defined(ANDROID_DEVICE)
+        #if defined(ANDROID)
         int ident;
         int events;
         struct android_poll_source* source;

@@ -21,7 +21,7 @@
 #define GLEW_STATIC
 
 extern "C" {
-#if !defined(ANDROID_DEVICE) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
 #   include <GL/glew.h>
 #endif
 }
@@ -40,7 +40,7 @@ extern "C" {
 #    ifndef GL_TEXTURE_SWIZZLE_RGBA
 #        define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
 #    endif
-#elif defined(ANDROID_DEVICE) || defined(USE_GLES2)
+#elif defined(USE_GLES2)
 #    include <GLES3/gl3.h>
 #    include <GLES3/gl3ext.h>
 #    include <GLES2/gl2ext.h>
@@ -55,12 +55,10 @@ extern "C" {
 #    include <GL/glext.h>
 #endif
 
-#if defined(ANDROID) || defined(USE_GLES2)
+#if defined(USE_GLES2)
 #define GL_BGRA 0x80E1
 #define GL_BGR 0x80E0
-#endif
 
-#if defined(USE_GLES2)
 #define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
 #define GL_TEXTURE_BUFFER GL_TEXTURE_BUFFER_EXT
 #define GL_FRAMEBUFFER_SRGB GL_FRAMEBUFFER_SRGB_EXT

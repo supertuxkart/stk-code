@@ -68,10 +68,10 @@ void CentralVideoSettings::init()
         Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
         Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
     }
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1))
            && !UserConfigParams::m_force_legacy_device;
-#elif !defined(ANDROID)
+#else
     m_glsl = m_gl_major_version >= 3 && !UserConfigParams::m_force_legacy_device;
 #endif
     if (!ProfileWorld::isNoGraphics())
@@ -83,7 +83,7 @@ void CentralVideoSettings::init()
         std::string card((char*)(glGetString(GL_RENDERER)));
         GraphicsRestrictions::init(driver, card);
 
-#if !defined(ANDROID) && !defined(USE_GLES2)        
+#if !defined(USE_GLES2)        
         if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
             hasVSLayer = true;
             Log::info("GLDriver", "AMD Vertex Shader Layer Present");

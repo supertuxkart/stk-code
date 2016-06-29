@@ -75,7 +75,7 @@
 
 #if (IRRLICHT_VERSION_MAJOR < 1 || IRRLICHT_VERSION_MINOR < 7 || \
     _IRR_MATERIAL_MAX_TEXTURES_ < 8 || !defined(_IRR_COMPILE_WITH_OPENGL_) || \
-    !defined(_IRR_COMPILE_WITH_B3D_LOADER_)) && !defined(ANDROID) && !defined(USE_GLES2)
+    !defined(_IRR_COMPILE_WITH_B3D_LOADER_))
 #error "Building against an incompatible Irrlicht. Distros, \
 please use the included version."
 #endif
@@ -456,12 +456,12 @@ void IrrDriver::initDevice()
 
             if(m_device)
                 break;
-#if !defined(ANDROID_DEVICE) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
             params.DriverType    = video::EDT_OPENGL;
 #else
             params.DriverType    = video::EDT_OGLES2;
 #endif
-#if defined(ANDROID_DEVICE)
+#if defined(ANDROID)
 			params.PrivateData = global_android_app;
 #endif
             params.Stencilbuffer = false;
@@ -509,7 +509,6 @@ void IrrDriver::initDevice()
         {
             UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
             UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
-#if !defined(ANDROID_DEVICE)
 #if defined(USE_GLES2)
             m_device = createDevice(video::EDT_OGLES2,
 #else
@@ -524,15 +523,6 @@ void IrrDriver::initDevice()
                                     this,   // event receiver
                                     file_manager->getFileSystem()
                                     );
-#else
-			struct irr::SIrrlichtCreationParameters p;
-			p.DriverType = video::EDT_OGLES2;
-			// The android app object is needed by the irrlicht device.
-			p.PrivateData = global_android_app;
-			p.WindowSize = core::dimension2d<u32>(1280,800);
-
-            m_device = createDeviceEx(p);
-#endif
             if (m_device)
             {
                 Log::verbose("irr_driver", "An invalid resolution was set in "

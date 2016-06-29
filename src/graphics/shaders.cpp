@@ -178,10 +178,9 @@ GLuint loadShader(const char * file, unsigned type)
 {
     GLuint Id = glCreateShader(type);
     char versionString[20];
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     sprintf(versionString, "#version %d\n", CVS->getGLSLVersion());
-#endif
-#if defined(USE_GLES2)
+#else
     if (CVS->isGLSL())
         sprintf(versionString, "#version 300 es\n");
 #endif
@@ -252,7 +251,7 @@ void Shaders::loadShaders()
     int saved_shaders[ES_COUNT];
     memcpy(saved_shaders, m_shaders, sizeof(m_shaders));
     
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     std::string name = "pass";
 #else
     std::string name = "pass_gles";

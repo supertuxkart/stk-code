@@ -23,7 +23,7 @@
 #include <cstdio>
 #include <stdio.h>
 
-#ifdef ANDROID_DEVICE
+#ifdef ANDROID
 #  include <android/log.h>
 #endif
 
@@ -136,7 +136,7 @@ void Log::printMessage(int level, const char *component, const char *format,
 
     if(level<m_min_log_level) return;
 
-#ifdef ANDROID_DEVICE
+#ifdef ANDROID
     android_LogPriority alp;
     switch (level)
     {

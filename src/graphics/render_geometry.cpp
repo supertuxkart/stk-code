@@ -165,7 +165,7 @@ class ShadowShader : public TextureShader<ShadowShader, 0, int, core::matrix4>
 public:
     ShadowShader()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
@@ -191,7 +191,7 @@ class InstancedShadowShader : public TextureShader<InstancedShadowShader, 0, int
 public:
     InstancedShadowShader()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         // Geometry shader needed
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
@@ -404,7 +404,7 @@ class RefShadowShader : public TextureShader<RefShadowShader, 1,
 public:
     RefShadowShader()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
@@ -432,7 +432,7 @@ class InstancedRefShadowShader : public TextureShader<InstancedRefShadowShader,
 public:
     InstancedRefShadowShader()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
@@ -489,7 +489,7 @@ class NormalVisualizer : public Shader<NormalVisualizer, video::SColor>
 public:
     NormalVisualizer()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)          //?????
+#if !defined(USE_GLES2)
         loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_GEOMETRY_SHADER, "normal_visualizer.geom",
                             GL_FRAGMENT_SHADER, "coloredquad.frag");
@@ -655,7 +655,7 @@ class GrassShadowShader : public TextureShader<GrassShadowShader, 1, int, core::
 public:
     GrassShadowShader()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
@@ -683,7 +683,7 @@ class InstancedGrassShadowShader : public TextureShader<InstancedGrassShadowShad
 public:
     InstancedGrassShadowShader()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
@@ -1111,7 +1111,7 @@ void renderMeshes1stPass()
 template<typename T, typename...Args>
 void renderInstancedMeshes1stPass(Args...args)
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
     T::InstancedFirstPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
@@ -1139,7 +1139,7 @@ void renderInstancedMeshes1stPass(Args...args)
 template<typename T, typename...Args>
 void multidraw1stPass(Args...args)
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     T::InstancedFirstPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     if (SolidPassCmd::getInstance()->Size[T::MaterialType])
@@ -1160,7 +1160,7 @@ void IrrDriver::renderSolidFirstPass()
 {
     windDir = getWindDir();
 
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     if (CVS->supportsIndirectInstancingRendering())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
 #endif
@@ -1181,7 +1181,7 @@ void IrrDriver::renderSolidFirstPass()
         renderMeshes1stPass<SphereMap, 2, 1>();
         renderMeshes1stPass<DetailMat, 2, 1>();
 
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         if (CVS->isAZDOEnabled())
         {
             multidraw1stPass<DefaultMaterial>();
@@ -1250,7 +1250,7 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
 template<typename T, typename...Args>
 void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args...args)
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
     T::InstancedSecondPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
@@ -1273,7 +1273,7 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
 template<typename T, typename...Args>
 void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     T::InstancedSecondPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                 T::Instance));
@@ -1302,7 +1302,7 @@ void IrrDriver::renderSolidSecondPass()
 
     uint64_t DiffuseHandle = 0, SpecularHandle = 0, SSAOHandle = 0, DepthHandle = 0;
 
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         DiffuseHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_DIFFUSE),
@@ -1327,7 +1327,7 @@ void IrrDriver::renderSolidSecondPass()
     }
 #endif
 
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     if (CVS->supportsIndirectInstancingRendering())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER,
                     SolidPassCmd::getInstance()->drawindirectcmd);
@@ -1355,7 +1355,7 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<GrassMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<NormalMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
 
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         if (CVS->isAZDOEnabled())
         {
             multidraw2ndPass<DefaultMaterial>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
@@ -1424,7 +1424,7 @@ void IrrDriver::renderSolidSecondPass()
 template<typename T>
 static void renderInstancedMeshNormals()
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
     NormalVisualizer::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
@@ -1442,7 +1442,7 @@ static void renderInstancedMeshNormals()
 template<typename T>
 static void renderMultiMeshNormals()
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     NormalVisualizer::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     if (SolidPassCmd::getInstance()->Size[T::MaterialType])
@@ -1459,7 +1459,7 @@ static void renderMultiMeshNormals()
 // ----------------------------------------------------------------------------
 void IrrDriver::renderNormalsVisualisation()
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled()) {
         renderMultiMeshNormals<DefaultMaterial>();
         renderMultiMeshNormals<AlphaRef>();
@@ -1716,7 +1716,7 @@ void renderShadow(unsigned cascade)
 template<typename T, typename...Args>
 void renderInstancedShadow(unsigned cascade, Args ...args)
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     T::InstancedShadowPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                           InstanceTypeShadow));
@@ -1740,7 +1740,7 @@ void renderInstancedShadow(unsigned cascade, Args ...args)
 template<typename T, typename...Args>
 static void multidrawShadow(unsigned i, Args ...args)
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     T::InstancedShadowPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                            InstanceTypeShadow));
@@ -1759,7 +1759,7 @@ static void multidrawShadow(unsigned i, Args ...args)
 // ----------------------------------------------------------------------------
 void IrrDriver::renderShadows()
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -1894,7 +1894,7 @@ void drawRSM(const core::matrix4 & rsm_matrix)
 template<typename T, typename...Args>
 void renderRSMShadow(Args ...args)
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     T::InstancedRSMShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, InstanceTypeRSM));
     auto t = T::InstancedList::getInstance()->RSM;
@@ -1916,7 +1916,7 @@ void renderRSMShadow(Args ...args)
 template<typename T, typename... Args>
 void multidrawRSM(Args...args)
 {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     T::InstancedRSMShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                InstanceTypeRSM));
@@ -1949,7 +1949,7 @@ void IrrDriver::renderRSM()
     drawRSM<DetailMat, 3, 1>(rsm_matrix);
     drawRSM<SplattingMat, 1>(rsm_matrix);
 
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     if (CVS->supportsIndirectInstancingRendering())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER,
                      RSMPassCmd::getInstance()->drawindirectcmd);

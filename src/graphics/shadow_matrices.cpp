@@ -47,7 +47,7 @@ class LightspaceBoundingBoxShader
 public:
     LightspaceBoundingBoxShader()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "Lightspaceboundingbox.comp");
         assignSamplerNames(0, "depth", ST_NEAREST_FILTERED);
         assignUniforms("SunCamMatrix", "split0", "split1", "split2", "splitmax");
@@ -66,7 +66,7 @@ class ShadowMatricesGenerationShader
 public:
     ShadowMatricesGenerationShader()
     {
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
         loadProgram(OBJECT,  GL_COMPUTE_SHADER, "shadowmatrixgeneration.comp");
         assignUniforms("SunCamMatrix");
         GLuint block_idx =
@@ -222,7 +222,7 @@ core::matrix4 ShadowMatrices::getTighestFitOrthoProj(const core::matrix4 &transf
 void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
                                                                      unsigned int height)
 {
-#if !defined(USE_GLES2) && !defined(ANDROID)
+#if !defined(USE_GLES2)
     struct CascadeBoundingBox
     {
         int xmin;

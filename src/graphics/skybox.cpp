@@ -185,7 +185,7 @@ void Skybox::generateCubeMapFromTextures()
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
-#if !defined(USE_GLES2) && !defined(ANDROID)
+#if !defined(USE_GLES2)
         GLint internal_format = CVS->isTextureCompressionEnabled() ?
                                     GL_COMPRESSED_SRGB_ALPHA : GL_SRGB_ALPHA;
 #else
@@ -208,7 +208,6 @@ void Skybox::generateCubeMapFromTextures()
 // ----------------------------------------------------------------------------
 void Skybox::generateSpecularCubemap()
 {
-#ifndef ANDROID
     glGenTextures(1, &m_specular_probe);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_specular_probe);
     size_t cubemap_size = 256;
@@ -304,7 +303,6 @@ void Skybox::generateSpecularCubemap()
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);
-#endif
 }   // generateSpecularCubemap
 
 
@@ -323,7 +321,7 @@ Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
 {
     m_skybox_textures = skybox_textures;
 
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif
 

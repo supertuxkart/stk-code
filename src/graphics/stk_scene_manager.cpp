@@ -692,7 +692,7 @@ PROFILER_POP_CPU_MARKER();
             size_t offset = 0, current_cmd = 0;
             if (!CVS->supportsAsyncInstanceUpload())
             {
-#if !defined(USE_GLES2) && !defined(ANDROID)
+#if !defined(USE_GLES2)
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeDualTex));
                 InstanceBufferDualTex = (InstanceDataDualTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
@@ -742,7 +742,7 @@ PROFILER_POP_CPU_MARKER();
 
             if (!CVS->supportsAsyncInstanceUpload())
             {
-#if !defined(USE_GLES2) && !defined(ANDROID)
+#if !defined(USE_GLES2)
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 #endif
@@ -754,7 +754,7 @@ PROFILER_POP_CPU_MARKER();
 
             if (!CVS->supportsAsyncInstanceUpload())
             {
-#if !defined(USE_GLES2) && !defined(ANDROID)
+#if !defined(USE_GLES2)
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeGlow));
                 GlowInstanceBuffer = (GlowInstanceData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
@@ -780,7 +780,7 @@ PROFILER_POP_CPU_MARKER();
 
             if (!CVS->supportsAsyncInstanceUpload())
             {
-#if !defined(USE_GLES2) && !defined(ANDROID)
+#if !defined(USE_GLES2)
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 #endif
@@ -793,7 +793,7 @@ PROFILER_POP_CPU_MARKER();
             size_t offset = 0, current_cmd = 0;
             if (!CVS->supportsAsyncInstanceUpload())
             {
-#if !defined(USE_GLES2) && !defined(ANDROID)
+#if !defined(USE_GLES2)
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeShadow));
                 ShadowInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, ShadowPassCmd::getInstance()->drawindirectcmd);
@@ -820,7 +820,7 @@ PROFILER_POP_CPU_MARKER();
             }
             if (!CVS->supportsAsyncInstanceUpload())
             {
-#if !defined(USE_GLES2) && !defined(ANDROID)
+#if !defined(USE_GLES2)
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 #endif
@@ -832,7 +832,7 @@ PROFILER_POP_CPU_MARKER();
             size_t offset = 0, current_cmd = 0;
             if (!CVS->supportsAsyncInstanceUpload())
             {
-#if !defined(USE_GLES2) && !defined(ANDROID)
+#if !defined(USE_GLES2)
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeRSM));
                 RSMInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, RSMPassCmd::getInstance()->drawindirectcmd);
@@ -863,7 +863,7 @@ PROFILER_POP_CPU_MARKER();
 
             if (!CVS->supportsAsyncInstanceUpload())
             {
-#if !defined(USE_GLES2) && !defined(ANDROID)
+#if !defined(USE_GLES2)
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 #endif
@@ -874,7 +874,7 @@ PROFILER_POP_CPU_MARKER();
     poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += SolidPoly;
     poly_count[SHADOW_PASS] += ShadowPoly;
 
-#if !defined(ANDROID) && !defined(USE_GLES2)
+#if !defined(USE_GLES2)
     if (CVS->supportsAsyncInstanceUpload())
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 #endif

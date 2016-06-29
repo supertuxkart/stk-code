@@ -55,9 +55,7 @@ void TextureShaderBase::bindTextureNearest(GLuint texture_unit, GLuint tex)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-#ifndef ANDROID
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
-#endif
 
 }   // bindTextureNearest
 
@@ -73,9 +71,7 @@ void TextureShaderBase::bindTextureTrilinearAnisotropic(GLuint tex_unit, GLuint 
 
     int aniso = UserConfigParams::m_anisotropic;
     if (aniso == 0) aniso = 1;
-#ifndef ANDROID
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
-#endif
 }   // bindTextureTrilinearAnisotropic
 
 // ----------------------------------------------------------------------------
@@ -90,10 +86,8 @@ void TextureShaderBase::bindCubemapTrilinear(unsigned tex_unit, unsigned tex)
 
     int aniso = UserConfigParams::m_anisotropic;
     if (aniso == 0) aniso = 1;
-#ifndef ANDROID
     glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT,
                     (float)aniso);
-#endif
 }   // bindCubemapTrilinear
 
 // ----------------------------------------------------------------------------
@@ -106,9 +100,7 @@ void TextureShaderBase::bindTextureNearestClamped(GLuint texture_unit,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-#ifndef ANDROID
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
-#endif
 }   // bindTextureNearestClamped
 
 // ----------------------------------------------------------------------------
@@ -122,9 +114,7 @@ void TextureShaderBase::bindTextureBilinear(GLuint texture_unit, GLuint tex)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-#ifndef ANDROID
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
-#endif
 }   // bindTextureBilinear
 
 // ----------------------------------------------------------------------------
@@ -136,9 +126,7 @@ void TextureShaderBase::bindTextureBilinearClamped(GLuint tex_unit, GLuint tex)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-#ifndef ANDROID
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
-#endif
 }   // bindTextureBilinearClamped
 
 // ----------------------------------------------------------------------------
@@ -150,9 +138,7 @@ void TextureShaderBase::bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex_id)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-#ifndef ANDROID
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
-#endif
 }   // bindTextureSemiTrilinear
 
 // ----------------------------------------------------------------------------
@@ -181,9 +167,7 @@ void TextureShaderBase::bindTrilinearClampedArrayTexture(unsigned tex_unit,
 
     int aniso = UserConfigParams::m_anisotropic;
     if (aniso == 0) aniso = 1;
-#ifndef ANDROID
     glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
-#endif
 }   // bindTrilinearClampedArrayTexture
 
 // ----------------------------------------------------------------------------
@@ -195,9 +179,7 @@ void TextureShaderBase::bindTextureVolume(unsigned tex_unit, unsigned tex_id)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-#ifndef ANDROID
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
-#endif
 }   // bindTextureVolume
 
 // ----------------------------------------------------------------------------
@@ -229,9 +211,7 @@ GLuint TextureShaderBase::createSamplers(SamplerTypeNew sampler_type)
         glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-#ifndef ANDROID
         glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
-#endif
         return createNearestSampler();
     }
     case ST_BILINEAR_CLAMPED_FILTERED:
@@ -254,9 +234,7 @@ GLuint TextureShaderBase::createNearestSampler()
     glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
-#ifndef ANDROID
     glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
-#endif
     return id;
 #endif
 }   // createNearestSampler
@@ -274,9 +252,7 @@ GLuint TextureShaderBase::createTrilinearSampler()
 
     int aniso = UserConfigParams::m_anisotropic;
     if (aniso == 0) aniso = 1;
-#ifndef ANDROID
     glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
-#endif
     return id;
 #endif
 }   // createTrilinearSampler
