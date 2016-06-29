@@ -185,22 +185,19 @@ void Skybox::generateCubeMapFromTextures()
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
-#ifndef ANDROID
-#if !defined(USE_GLES2)
-        if (CVS->isTextureCompressionEnabled())
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
-                         GL_COMPRESSED_SRGB_ALPHA, size, size, 0, GL_BGRA,
-                         GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
-        }
-        else
+#if !defined(USE_GLES2) && !defined(ANDROID)
+        GLint internal_format = CVS->isTextureCompressionEnabled() ?
+                                    GL_COMPRESSED_SRGB_ALPHA : GL_SRGB_ALPHA;
+#else
+        // The GL_SRGB_ALPHA_EXT and GL_SRGB8_ALPHA8 formats are available in
+        // OpenGL ES, but they produce black texture for some reason.
+        // The basic GL_RGBA format works fine though.
+        GLint internal_format = GL_RGBA;
 #endif
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
-                         GL_SRGB_ALPHA, size, size, 0, GL_BGRA,
-                         GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
-        }
-#endif
+
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+                     internal_format, size, size, 0, GL_BGRA,
+                     GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     for (unsigned i = 0; i < 6; i++)
