@@ -76,11 +76,13 @@ public:
     GLuint m_dest_tu;
     ComputeShadowBlurVShader()
     {
+#if !defined(USE_GLES2) && !defined(ANDROID)
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowV.comp");
         m_dest_tu = 1;
         assignUniforms("pixel", "weights");
         assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
+#endif
     }   // ComputeShadowBlurVShader
 
 };   // ComputeShadowBlurVShader
@@ -137,11 +139,13 @@ public:
     GLuint m_dest_tu;
     ComputeGaussian6VBlurShader()
     {
+#if !defined(USE_GLES2) && !defined(ANDROID)
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6v.comp");
         m_dest_tu = 1;
         assignUniforms("pixel", "weights");
         assignSamplerNames(0, "source", ST_BILINEAR_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
+#endif
     }   // ComputeGaussian6VBlurShader
 };   // ComputeGaussian6VBlurShader
 
@@ -154,11 +158,13 @@ public:
     GLuint m_dest_tu;
     ComputeGaussian6HBlurShader()
     {
+#if !defined(USE_GLES2) && !defined(ANDROID)
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6h.comp");
         m_dest_tu = 1;
         assignUniforms("pixel", "weights");
         assignSamplerNames(0, "source",  ST_BILINEAR_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
+#endif
     }   // ComputeGaussian6HBlurShader
 };   // ComputeGaussian6HBlurShader
 
@@ -171,11 +177,13 @@ public:
     GLuint m_dest_tu;
     ComputeShadowBlurHShader()
     {
+#if !defined(USE_GLES2) && !defined(ANDROID)
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowH.comp");
         m_dest_tu = 1;
         assignUniforms("pixel", "weights");
         assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
+#endif
     }   // ComputeShadowBlurHShader
 };   // ComputeShadowBlurHShader
 
@@ -234,17 +242,20 @@ public:
     GLuint m_dest_tu;
     ComputeGaussian17TapHShader()
     {
+#if !defined(USE_GLES2) && !defined(ANDROID)
         loadProgram(OBJECT,  GL_COMPUTE_SHADER, "bilateralH.comp");
         m_dest_tu = 2;
         assignUniforms("pixel");
         assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED,
                            1, "depth", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
+#endif
     }   // ComputeGaussian17TapHShader
     // ------------------------------------------------------------------------
     void render(const FrameBuffer &fb, const FrameBuffer &auxiliary,
                 int width, int height)
     {
+#if !defined(USE_GLES2) && !defined(ANDROID)
         use();
         glBindSampler(m_dest_tu, 0);
         setTextureUnits(fb.getRTT()[0],
@@ -253,6 +264,7 @@ public:
                            0, GL_WRITE_ONLY, GL_R16F);
         setUniforms(core::vector2df(1.0f/width, 1.0f/height));
         glDispatchCompute((int)width / 8 + 1, (int)height / 8 + 1, 1);
+#endif
     }   // render
 };   // ComputeGaussian17TapHShader
 
@@ -290,17 +302,20 @@ public:
 
     ComputeGaussian17TapVShader()
     {
+#if !defined(USE_GLES2) && !defined(ANDROID)
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "bilateralV.comp");
         m_dest_tu = 2;
         assignUniforms("pixel");
         assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED,
                            1, "depth", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
+#endif
     }   // ComputeGaussian17TapVShader
     // ------------------------------------------------------------------------
     void render(const FrameBuffer &auxiliary, const FrameBuffer &fb,
                 int width, int height)
     {
+#if !defined(USE_GLES2) && !defined(ANDROID)
         use();
         glBindSampler(m_dest_tu, 0);
         setTextureUnits(auxiliary.getRTT()[0],
@@ -310,6 +325,7 @@ public:
         setUniforms(core::vector2df(1.0f/width, 1.0f/height));
         glDispatchCompute((int)fb.getWidth()  / 8 + 1,
                           (int)fb.getHeight() / 8 + 1, 1);
+#endif
     }   // render
 };   // ComputeGaussian17TapVShader
 
@@ -1114,10 +1130,8 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
 {
     GLuint layer_tex;
     glGenTextures(1, &layer_tex);
-#ifndef ANDROID_DEVICE
     glTextureView(layer_tex, GL_TEXTURE_2D, in_fbo.getRTT()[0],
                   GL_R32F, 0, 1, layer, 1);
-#endif
     if (!CVS->supportsComputeShadersFiltering())
     {
         // Used as temp
@@ -1132,6 +1146,7 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
                      UserConfigParams::m_shadows_resolution,
                      UserConfigParams::m_shadows_resolution, sigma_h);
     }
+#if !defined(USE_GLES2) && !defined(ANDROID)
     else
     {
         const std::vector<float> &weightsV = getGaussianWeight(sigma_v, 7);
@@ -1166,6 +1181,7 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
                           (int)UserConfigParams::m_shadows_resolution / 8 + 1, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     }
+#endif
     glDeleteTextures(1, &layer_tex);
 }   // renderGaussian6BlurLayer
 
@@ -1191,6 +1207,7 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
         Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
                                                    in_fbo.getHeight(), sigma_h);
     }
+#if !defined(USE_GLES2) && !defined(ANDROID)
     else
     {
         const std::vector<float> &weightsV = getGaussianWeight(sigma_v, 7);
@@ -1223,6 +1240,7 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
                           (int)in_fbo.getHeight() / 8 + 1, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     }
+#endif
 
 }   // renderGaussian6Blur
 
@@ -1248,8 +1266,12 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
+           
+#if !defined(USE_GLES2) && !defined(ANDROID)
     if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
+#endif
+
     {
         if (!CVS->supportsComputeShadersFiltering())
         {
@@ -1266,8 +1288,12 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
                                                                in_fbo.getHeight());
         }
     }
+    
+#if !defined(USE_GLES2) && !defined(ANDROID)
     if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+#endif
+        
     {
         if (!CVS->supportsComputeShadersFiltering())
         {
@@ -1284,8 +1310,11 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
                                                                in_fbo.getHeight());
         }
     }
+    
+#if !defined(USE_GLES2) && !defined(ANDROID)
     if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
+#endif
 }   // renderGaussian17TapBlur
 
 // ----------------------------------------------------------------------------

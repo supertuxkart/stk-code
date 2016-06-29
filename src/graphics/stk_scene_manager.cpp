@@ -692,10 +692,12 @@ PROFILER_POP_CPU_MARKER();
             size_t offset = 0, current_cmd = 0;
             if (!CVS->supportsAsyncInstanceUpload())
             {
+#if !defined(USE_GLES2) && !defined(ANDROID)
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeDualTex));
                 InstanceBufferDualTex = (InstanceDataDualTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
                 CmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+#endif
             }
 
 
@@ -740,8 +742,10 @@ PROFILER_POP_CPU_MARKER();
 
             if (!CVS->supportsAsyncInstanceUpload())
             {
+#if !defined(USE_GLES2) && !defined(ANDROID)
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
+#endif
             }
         }
 #pragma omp section
@@ -750,10 +754,12 @@ PROFILER_POP_CPU_MARKER();
 
             if (!CVS->supportsAsyncInstanceUpload())
             {
+#if !defined(USE_GLES2) && !defined(ANDROID)
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeGlow));
                 GlowInstanceBuffer = (GlowInstanceData*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
                 GlowCmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+#endif
             }
 
             // Glow
@@ -774,8 +780,10 @@ PROFILER_POP_CPU_MARKER();
 
             if (!CVS->supportsAsyncInstanceUpload())
             {
+#if !defined(USE_GLES2) && !defined(ANDROID)
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
+#endif
             }
         }
 #pragma omp section
@@ -785,10 +793,12 @@ PROFILER_POP_CPU_MARKER();
             size_t offset = 0, current_cmd = 0;
             if (!CVS->supportsAsyncInstanceUpload())
             {
+#if !defined(USE_GLES2) && !defined(ANDROID)
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeShadow));
                 ShadowInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, ShadowPassCmd::getInstance()->drawindirectcmd);
                 ShadowCmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+#endif
             }
 
             for (unsigned i = 0; i < 4; i++)
@@ -810,8 +820,10 @@ PROFILER_POP_CPU_MARKER();
             }
             if (!CVS->supportsAsyncInstanceUpload())
             {
+#if !defined(USE_GLES2) && !defined(ANDROID)
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
+#endif
             }
         }
 #pragma omp section
@@ -820,10 +832,12 @@ PROFILER_POP_CPU_MARKER();
             size_t offset = 0, current_cmd = 0;
             if (!CVS->supportsAsyncInstanceUpload())
             {
+#if !defined(USE_GLES2) && !defined(ANDROID)
                 glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getInstanceBuffer(InstanceTypeRSM));
                 RSMInstanceBuffer = (InstanceDataSingleTex*)glMapBufferRange(GL_ARRAY_BUFFER, 0, 10000 * sizeof(InstanceDataDualTex), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, RSMPassCmd::getInstance()->drawindirectcmd);
                 RSMCmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+#endif
             }
 
             // Default Material
@@ -849,8 +863,10 @@ PROFILER_POP_CPU_MARKER();
 
             if (!CVS->supportsAsyncInstanceUpload())
             {
+#if !defined(USE_GLES2) && !defined(ANDROID)
                 glUnmapBuffer(GL_ARRAY_BUFFER);
                 glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
+#endif
             }
         }
     }

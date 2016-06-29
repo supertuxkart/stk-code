@@ -222,6 +222,7 @@ core::matrix4 ShadowMatrices::getTighestFitOrthoProj(const core::matrix4 &transf
 void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
                                                                      unsigned int height)
 {
+#if !defined(USE_GLES2) && !defined(ANDROID)
     struct CascadeBoundingBox
     {
         int xmin;
@@ -284,6 +285,7 @@ void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned in
                  SharedGPUObjects::getViewProjectionMatricesUBO());
     glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0,
                         80 * sizeof(float), 4 * 16 * sizeof(float));
+#endif
 }   // updateSplitAndLightcoordRangeFromComputeShaders
 
 // ----------------------------------------------------------------------------

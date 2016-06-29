@@ -37,11 +37,9 @@ public:
     DrawElementsIndirectCommand *Ptr;
     CommandBuffer()
     {
+#if !defined(ANDROID) && !defined(USE_GLES2)
         glGenBuffers(1, &drawindirectcmd);
-#if !defined(ANDROID) && !defined(USE_GLES2)
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
-#endif
-#if !defined(ANDROID) && !defined(USE_GLES2)
         if (CVS->supportsAsyncInstanceUpload())
         {
             glBufferStorage(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
@@ -49,9 +47,7 @@ public:
         }
         else
         {
-#endif
             glBufferData(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_STREAM_DRAW);
-#if !defined(ANDROID) && !defined(USE_GLES2)
         }
 #endif
     }

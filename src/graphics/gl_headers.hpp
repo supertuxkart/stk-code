@@ -42,7 +42,6 @@ extern "C" {
 #    endif
 #elif defined(ANDROID_DEVICE) || defined(USE_GLES2)
 #    include <GLES3/gl3.h>
-#    include <GLES3/gl31.h>
 #    include <GLES3/gl3ext.h>
 #    include <GLES2/gl2ext.h>
 #    define glVertexAttribDivisorARB glVertexAttribDivisor

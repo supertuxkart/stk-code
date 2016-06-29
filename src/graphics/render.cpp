@@ -687,6 +687,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
 
     if (CVS->supportsIndirectInstancingRendering())
     {
+#if !defined(ANDROID) && !defined(USE_GLES2)
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
         InstancedColorizeShader::getInstance()->use();
 
@@ -695,12 +696,10 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
         {
             if (GlowPassCmd::getInstance()->Size)
             {
-#if !defined(ANDROID) && !defined(USE_GLES2)
                 glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
                     (const void*)(GlowPassCmd::getInstance()->Offset * sizeof(DrawElementsIndirectCommand)),
                     (int)GlowPassCmd::getInstance()->Size,
                     sizeof(DrawElementsIndirectCommand));
-#endif
             }
         }
         else
@@ -708,6 +707,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
             for (unsigned i = 0; i < ListInstancedGlow::getInstance()->size(); i++)
                 glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((GlowPassCmd::getInstance()->Offset + i) * sizeof(DrawElementsIndirectCommand)));
         }
+#endif
     }
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);

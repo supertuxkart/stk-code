@@ -72,6 +72,7 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
         code << "#version 300 es\n";
 #endif
 
+#if !defined(USE_GLES2) && !defined(ANDROID)
     // Some drivers report that the compute shaders extension is available,
     // but they report only OpenGL 3.x version, and thus these extensions
     // must be enabled manually. Otherwise the shaders compilation will fail
@@ -86,6 +87,7 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
         if (CVS->isARBArraysOfArraysUsable())
             code << "#extension GL_ARB_arrays_of_arrays : enable\n";
     }
+#endif
     
     if (CVS->isAMDVertexShaderLayerUsable())
         code << "#extension GL_AMD_vertex_shader_layer : enable\n";
