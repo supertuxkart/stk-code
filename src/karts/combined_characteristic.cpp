@@ -21,6 +21,8 @@
 #include "io/file_manager.hpp"
 #include "karts/xml_characteristic.hpp"
 
+#include <assert.h>
+
 void CombinedCharacteristic::addCharacteristic(
     const AbstractCharacteristic *characteristic)
 {
