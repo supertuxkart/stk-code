@@ -89,6 +89,17 @@ public:
             std::find(m_colorizable_parts.begin(), m_colorizable_parts.end(),
             mesh_buffer_index) != m_colorizable_parts.end();
     }
+    // ------------------------------------------------------------------------
+    void setKartModelRenderInfo(KartRenderType krt)
+    {
+        setHue(krt == RenderInfo::KRT_BLUE ? 0.66f :
+            krt == RenderInfo::KRT_RED ? 1.0f : 0.0f);
+
+        setMinSaturation(krt == RenderInfo::KRT_BLUE ||
+            krt == RenderInfo::KRT_RED ? 0.93f : 0.0f);
+
+        setTransparent(krt == RenderInfo::KRT_TRANSPARENT ? true : false);
+    }
 
 };   // RenderInfo
 

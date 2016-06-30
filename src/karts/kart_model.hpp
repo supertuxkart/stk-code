@@ -335,18 +335,6 @@ public:
     // ------------------------------------------------------------------------
     core::vector3df getHatOffset() { return m_hat_offset; }
     // ------------------------------------------------------------------------
-    void setKartModelRenderInfo(RenderInfo::KartRenderType krt)
-    {
-        m_render_info.setHue
-            (krt == RenderInfo::KRT_BLUE ? 0.66f :
-            m_krt == RenderInfo::KRT_RED ? 1.0f : 0.0f);
-        m_render_info.setMinSaturation
-            (krt == RenderInfo::KRT_BLUE ||
-            m_krt == RenderInfo::KRT_RED ? 0.93f : 0.0f);
-        m_render_info.setTransparent
-            (krt == RenderInfo::KRT_TRANSPARENT ? true : false);
-    }
-    // ------------------------------------------------------------------------
     RenderInfo* getRenderInfo()                      { return &m_render_info; }
 
 };   // KartModel

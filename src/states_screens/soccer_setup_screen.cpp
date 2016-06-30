@@ -131,37 +131,69 @@ void SoccerSetupScreen::beforeAddingWidget()
 
         // Add the view
         ModelViewWidget*    kart_view = new ModelViewWidget();
+        // These values will be overriden by updateKartViewsLayout() anyway
         kart_view->m_x = 0;
         kart_view->m_y = 0;
         kart_view->m_w = 200;
-        kart_view->m_h = 200;   // these values will be overriden by updateKartViewsLayout() anyway
+        kart_view->m_h = 200;
         kart_view->clearModels();
 
-        // Add the kart model
+        // Record info about it for further update
+        KartViewInfo info;
+
+        int single_team  = UserConfigParams::m_soccer_default_team;
+        info.team = (nb_players == 1 ? (SoccerTeam)single_team :
+            (i&1 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED));
+
+        // addModel requires loading the RenderInfo first
+        kart_view->getRenderInfo().setKartModelRenderInfo(info.team == SOCCER_TEAM_BLUE ?
+            RenderInfo::KRT_BLUE : RenderInfo::KRT_RED);
+        kart_view->getRenderInfo().setColorizableParts(kart_model.getModel());
+
+        // Add the kart model (including wheels and speed weight objects)
         kart_view->addModel( kart_model.getModel(), Vec3(0,0,0),
                                 Vec3(35.0f, 35.0f, 35.0f),
                                 kart_model.getBaseFrame() );
-        kart_view->addModel( kart_model.getWheelModel(0),
-                                kart_model.getWheelGraphicsPosition(0) );
-        kart_view->addModel( kart_model.getWheelModel(1),
-                                kart_model.getWheelGraphicsPosition(1) );
-        kart_view->addModel( kart_model.getWheelModel(2),
-                                kart_model.getWheelGraphicsPosition(2) );
-        kart_view->addModel( kart_model.getWheelModel(3),
-                                kart_model.getWheelGraphicsPosition(3) );
-        kart_view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
 
+        kart_view->addModel( kart_model.getWheelModel(0),
+                                kart_model.getWheelGraphicsPosition(0),
+                                Vec3(1, 1, 1), /*scale*/
+                                -1, /*frame*/
+                                true /*all_parts_colorized*/);
+
+        kart_view->addModel( kart_model.getWheelModel(1),
+                                kart_model.getWheelGraphicsPosition(1),
+                                Vec3(1, 1, 1), /*scale*/
+                                -1, /*frame*/
+                                true /*all_parts_colorized*/);
+        kart_view->addModel( kart_model.getWheelModel(2),
+                                kart_model.getWheelGraphicsPosition(2),
+                                Vec3(1, 1, 1), /*scale*/
+                                -1, /*frame*/
+                                true /*all_parts_colorized*/);
+
+        kart_view->addModel( kart_model.getWheelModel(3),
+                                kart_model.getWheelGraphicsPosition(3),
+                                Vec3(1, 1, 1), /*scale*/
+                                -1, /*frame*/
+                                true /*all_parts_colorized*/);
+
+        for (size_t i = 0; i < kart_model.getSpeedWeightedObjectsCount(); i++)
+        {
+            const SpeedWeightedObject& obj = kart_model.getSpeedWeightedObject((int)i);
+            kart_view->addModel(obj.m_model, obj.m_position,
+                                Vec3(1, 1, 1), /*scale*/
+                                -1, /*frame*/
+                                true /*all_parts_colorized*/);
+        }
+
+        kart_view->setRotateContinuously( KART_CONTINUOUS_ROTATION_SPEED );
         kart_view->update(0);
 
         central_div->getChildren().push_back(kart_view);
 
-        // Record info about it for further update
-        KartViewInfo    info;
-        info.view            = kart_view;
-        info.confirmed       = false;
-        int single_team      = UserConfigParams::m_soccer_default_team;
-        info.team            = nb_players == 1 ? (SoccerTeam)single_team :
-                               (i&1 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED);
+        info.view  = kart_view;
+        info.confirmed  = false;
         m_kart_view_info.push_back(info);
         race_manager->setKartSoccerTeam(i, info.team);
     }
@@ -421,6 +453,11 @@ void SoccerSetupScreen::updateKartViewsLayout()
     {
         const KartViewInfo& view_info = m_kart_view_info[i];
         const SoccerTeam    team = view_info.team;
+
+        // Change the kart color
+        m_kart_view_info[i].view->getRenderInfo().setKartModelRenderInfo
+            (view_info.team == SOCCER_TEAM_BLUE ?
+            RenderInfo::KRT_BLUE : RenderInfo::KRT_RED);
 
         // Compute the position
         const int cur_row = cur_kart_per_team[team] / nb_columns;

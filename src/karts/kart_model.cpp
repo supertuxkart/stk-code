@@ -27,8 +27,6 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
-#include "graphics/material.hpp"
-#include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -359,7 +357,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
     assert(!m_is_master);
 
     scene::ISceneNode* node = NULL;
-    setKartModelRenderInfo(m_krt);
+    m_render_info.setKartModelRenderInfo(m_krt);
 
     if (animated_models)
     {
