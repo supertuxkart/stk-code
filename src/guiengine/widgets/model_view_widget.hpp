@@ -50,7 +50,7 @@ namespace GUIEngine
         AlignedArray<Vec3> m_model_location;
         AlignedArray<Vec3> m_model_scale;
         std::vector<int> m_model_frames;
-        std::vector<int> m_model_render_info_affected;
+        std::vector<bool> m_model_render_info_affected;
 
         RTT* m_rtt_provider;
         IrrDriver::RTTProvider* m_old_rtt_provider;
