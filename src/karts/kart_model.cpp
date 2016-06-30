@@ -136,13 +136,13 @@ KartModel::KartModel(bool is_master)
     m_wheel_filename[3] = "";
     m_speed_weighted_objects.clear();
     m_animated_node     = NULL;
-    m_mesh              = NULL;
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
         m_animation_frame[i]=-1;
     m_animation_speed   = 25;
     m_current_animation = AF_DEFAULT;
     m_play_non_loop     = false;
-    m_krt               = KRT_DEFAULT;
+    m_krt               = RenderInfo::KRT_DEFAULT;
+    m_render_info       = RenderInfo();
 }   // KartModel
 
 // ----------------------------------------------------------------------------
@@ -246,7 +246,7 @@ KartModel::~KartModel()
             assert(!m_is_master);
 
             // Drop the cloned transparent model if created
-            if (m_krt == KRT_TRANSPARENT)
+            if (m_krt == RenderInfo::KRT_TRANSPARENT)
             {
                 m_speed_weighted_objects[i].m_model->drop();
             }
@@ -289,7 +289,7 @@ KartModel::~KartModel()
  *  It is also marked not to be a master copy, so attachModel can be called
  *  for this instance.
  */
-KartModel* KartModel::makeCopy(KartModel::KartRenderType krt)
+KartModel* KartModel::makeCopy(RenderInfo::KartRenderType krt)
 {
     // Make sure that we are copying from a master objects, and
     // that there is indeed no animated node defined here ...
@@ -310,6 +310,7 @@ KartModel* KartModel::makeCopy(KartModel::KartRenderType krt)
     km->m_hat_offset        = m_hat_offset;
     km->m_hat_name          = m_hat_name;
     km->m_krt               = krt;
+    km->m_render_info       = m_render_info;
 
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
     km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
@@ -334,7 +335,7 @@ KartModel* KartModel::makeCopy(KartModel::KartRenderType krt)
         // Master should not have any speed weighted nodes.
         assert(!m_speed_weighted_objects[i].m_node);
         km->m_speed_weighted_objects[i] = m_speed_weighted_objects[i];
-        if (krt == KRT_TRANSPARENT)
+        if (krt == RenderInfo::KRT_TRANSPARENT)
         {
             // Only clone the mesh if transparent type is used, see #2445
             km->m_speed_weighted_objects[i].m_model = irr_driver
@@ -358,11 +359,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
     assert(!m_is_master);
 
     scene::ISceneNode* node = NULL;
-    CustomRenderInfo kart_cri = CustomRenderInfo
-        (m_krt == KRT_BLUE ? 0.66f : m_krt == KRT_RED ? 1.0f : 0.0f, /*m_custom_hue*/
-        m_krt == KRT_BLUE || m_krt == KRT_RED ? 0.93f : 0, /*m_custom_min_saturation*/
-        m_krt == KRT_TRANSPARENT ? true : false, /*m_transparent*/
-        m_krt == KRT_BLUE || m_krt == KRT_RED ? m_mesh : NULL); /*To get m_affected_parts*/
+    setKartModelRenderInfo(m_krt);
 
     if (animated_models)
     {
@@ -371,7 +368,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                                         irr_driver->getSceneManager()                    );
 
 
-        node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh", NULL/*parent*/, kart_cri);
+        node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh",
+               NULL/*parent*/, getRenderInfo());
         // as animated mesh are not cheap to render use frustum box culling
         if (CVS->isGLSL())
             node->setAutomaticCulling(scene::EAC_OFF);
@@ -448,7 +446,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
        debug_name = m_model_filename + " (kart-model)";
 #endif
 
-        node = irr_driver->addMesh(main_frame, debug_name, NULL /*parent*/, kart_cri);
+        node = irr_driver->addMesh(main_frame, debug_name,
+               NULL /*parent*/, getRenderInfo());
 
 #ifdef DEBUG
         node->setName(debug_name.c_str());
@@ -458,11 +457,9 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
         // Attach the wheels
         for(unsigned int i=0; i<4; i++)
         {
-            // Use the kart custom render info, but discard affected parts
-            // So all wheels are affected by the info
-            CustomRenderInfo wheel_cri = CustomRenderInfo(kart_cri);
             if(!m_wheel_model[i]) continue;
-            m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], "wheel", node, wheel_cri);
+            m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], "wheel",
+                              node, getRenderInfo());
             Vec3 wheel_min, wheel_max;
             MeshTools::minMax3D(m_wheel_model[i], &wheel_min, &wheel_max);
             m_wheel_graphics_radius[i] = 0.5f*(wheel_max.getY() - wheel_min.getY());
@@ -483,10 +480,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             obj.m_node = NULL;
             if(obj.m_model)
             {
-                // Same for wheels above
-                CustomRenderInfo swo_cri = CustomRenderInfo(kart_cri);
                 obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, 
-                                                         "speedweighted", node, swo_cri);
+                             "speedweighted", node, getRenderInfo());
                 obj.m_node->grab();
 
                 obj.m_node->setFrameLoop(m_animation_frame[AF_SPEED_WEIGHTED_START],
@@ -525,6 +520,9 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     Vec3 kart_min, kart_max;
     MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]),
                         &kart_min, &kart_max);
+
+    // Enable colorization for karts later when attachModel
+    m_render_info.setColorizableParts(m_mesh);
 
 #undef MOVE_KART_MESHES
 #ifdef MOVE_KART_MESHES

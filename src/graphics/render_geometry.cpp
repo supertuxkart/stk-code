@@ -23,6 +23,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include "graphics/stk_scene_manager.hpp"
@@ -998,11 +999,13 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
     GLenum itype = mesh->IndexType;
     size_t count = mesh->IndexCount;
 
-    const bool need_change_hue = (mesh->m_custom_hue > 0.0f);
+    const bool support_change_hue = (mesh->m_render_info != NULL);
+    const bool need_change_hue = (support_change_hue &&
+        mesh->m_render_info->getHue() > 0.0f);
     if (need_change_hue)
     {
-        Shader->changeableColor(mesh->m_custom_hue,
-            mesh->m_custom_min_saturation);
+        Shader->changeableColor(mesh->m_render_info->getHue(),
+            mesh->m_render_info->getMinSaturation());
     }
 
     Shader->setUniforms(Args...);
@@ -1298,11 +1301,14 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
             ExpandTex(*mesh, T::SecondPassTextures, Prefilled_tex[0],
                       Prefilled_tex[1], Prefilled_tex[2]);
 
-        const bool need_change_hue = (mesh->m_custom_hue > 0.0f);
+        const bool support_change_hue = (mesh->m_render_info != NULL);
+        const bool need_change_hue =
+            (support_change_hue && mesh->m_render_info->getHue() > 0.0f);
         if (need_change_hue)
         {
             T::InstancedSecondPassShader::getInstance()->changeableColor
-                (mesh->m_custom_hue, mesh->m_custom_min_saturation);
+                (mesh->m_render_info->getHue(),
+                mesh->m_render_info->getMinSaturation());
         }
 
         T::InstancedSecondPassShader::getInstance()->setUniforms(args...);

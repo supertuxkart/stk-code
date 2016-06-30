@@ -244,7 +244,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a pointer to the KartModel object. */
     KartModel*    getKartModelCopy
-                (KartModel::KartRenderType krt = KartModel::KRT_DEFAULT) const
+               (RenderInfo::KartRenderType krt = RenderInfo::KRT_DEFAULT) const
                                          {return m_kart_model->makeCopy(krt); }
 
     // ------------------------------------------------------------------------

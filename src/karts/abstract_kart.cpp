@@ -35,7 +35,7 @@ AbstractKart::AbstractKart(const std::string& ident,
                            int world_kart_id, int position,
                            const btTransform& init_transform,
                            PerPlayerDifficulty difficulty,
-                           KartModel::KartRenderType krt)
+                           RenderInfo::KartRenderType krt)
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;

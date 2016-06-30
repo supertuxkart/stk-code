@@ -31,6 +31,7 @@
 #include <vector>
 
 class Material;
+class RenderInfo;
 
 enum TransparentMaterial
 {
@@ -56,9 +57,7 @@ struct GLMesh
     video::E_VERTEX_TYPE VAOType;
     uint64_t TextureHandles[6];
     scene::IMeshBuffer *mb;
-    float m_custom_hue;
-    float m_custom_min_saturation;
-    bool m_transparent;
+    RenderInfo* m_render_info;
 #ifdef DEBUG
     std::string debug_name;
 #endif
@@ -67,7 +66,7 @@ struct GLMesh
 // ----------------------------------------------------------------------------
 GLMesh               allocateMeshBuffer(scene::IMeshBuffer* mb,
                                         const std::string& debug_name,
-                                        const CustomRenderInfo& cri);
+                                        RenderInfo* render_info);
 void                 fillLocalBuffer(GLMesh &, scene::IMeshBuffer* mb);
 video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride);
 GLuint               createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type);

@@ -25,6 +25,8 @@
 #include <IAnimatedMesh.h>
 #include <irrTypes.h>
 
+class RenderInfo;
+
 class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode, public STKMeshCommon
 {
 protected:
@@ -41,14 +43,14 @@ public:
      const irr::core::vector3df& position = irr::core::vector3df(0,0,0),
      const irr::core::vector3df& rotation = irr::core::vector3df(0,0,0),
      const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f),
-     const CustomRenderInfo& cri = CustomRenderInfo());
+     RenderInfo* render_info = NULL);
   ~STKAnimatedMesh();
 
   virtual void render();
   virtual void setMesh(irr::scene::IAnimatedMesh* mesh);
   virtual bool glow() const { return false; }
 private:
-    CustomRenderInfo m_cri;
+    RenderInfo* m_mesh_render_info;
 };
 
 #endif // STKANIMATEDMESH_HPP

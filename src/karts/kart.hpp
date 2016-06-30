@@ -232,7 +232,7 @@ public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
                         PerPlayerDifficulty difficulty,
-                        KartModel::KartRenderType krt = KartModel::KRT_DEFAULT);
+                        RenderInfo::KartRenderType krt = RenderInfo::KRT_DEFAULT);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();

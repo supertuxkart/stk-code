@@ -23,6 +23,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/shaders.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
@@ -164,12 +165,10 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
 
 // ----------------------------------------------------------------------------
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name,
-                          const CustomRenderInfo& cri)
+                          RenderInfo* render_info)
 {
     GLMesh result = {};
-    result.m_custom_hue = cri.m_custom_hue;
-    result.m_custom_min_saturation = cri.m_custom_min_saturation;
-    result.m_transparent = cri.m_transparent;
+    result.m_render_info = render_info;
     if (!mb)
         return result;
     result.mb = mb;

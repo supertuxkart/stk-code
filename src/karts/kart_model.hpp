@@ -30,6 +30,7 @@ namespace irr
 }
 using namespace irr;
 
+#include "graphics/render_info.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
@@ -115,14 +116,6 @@ public:
             AF_SPEED_WEIGHTED_END,          // End of speed-weighted animation
             AF_END=AF_SPEED_WEIGHTED_END,   // Last animation frame
             AF_COUNT};             // Number of entries here
-
-    enum KartRenderType
-    {
-        KRT_DEFAULT,
-        KRT_RED,
-        KRT_BLUE,
-        KRT_TRANSPARENT,
-    };
 
 private:
     /** Which frame number starts/end which animation. */
@@ -238,12 +231,14 @@ private:
     /** Pointer to the kart object belonging to this kart model. */
     AbstractKart* m_kart;
 
-    KartRenderType m_krt;
+    RenderInfo::KartRenderType m_krt;
+
+    RenderInfo m_render_info;
 
 public:
                   KartModel(bool is_master);
                  ~KartModel();
-    KartModel*    makeCopy(KartRenderType krt);
+    KartModel*    makeCopy(RenderInfo::KartRenderType krt);
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
@@ -339,6 +334,20 @@ public:
     scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
     // ------------------------------------------------------------------------
     core::vector3df getHatOffset() { return m_hat_offset; }
+    // ------------------------------------------------------------------------
+    void setKartModelRenderInfo(RenderInfo::KartRenderType krt)
+    {
+        m_render_info.setHue
+            (krt == RenderInfo::KRT_BLUE ? 0.66f :
+            m_krt == RenderInfo::KRT_RED ? 1.0f : 0.0f);
+        m_render_info.setMinSaturation
+            (krt == RenderInfo::KRT_BLUE ||
+            m_krt == RenderInfo::KRT_RED ? 0.93f : 0.0f);
+        m_render_info.setTransparent
+            (krt == RenderInfo::KRT_TRANSPARENT ? true : false);
+    }
+    // ------------------------------------------------------------------------
+    RenderInfo* getRenderInfo()                      { return &m_render_info; }
 
 };   // KartModel
 #endif

@@ -24,6 +24,7 @@
 #include "io/file_manager.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
@@ -393,7 +394,7 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
 
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
             difficulty, team == SOCCER_TEAM_BLUE ?
-            KartModel::KRT_BLUE : KartModel::KRT_RED);
+            RenderInfo::KRT_BLUE : RenderInfo::KRT_RED);
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
 

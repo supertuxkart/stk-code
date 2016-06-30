@@ -21,8 +21,9 @@
 #include "central_settings.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_animated_mesh.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/render_info.hpp"
+#include "graphics/stk_animated_mesh.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
@@ -31,7 +32,6 @@
 #include <IMaterialRenderer.h>
 #include <ISceneManager.h>
 #include <ISkinnedMesh.h>
-#include <algorithm>
 
 using namespace irr;
 
@@ -39,12 +39,12 @@ STKAnimatedMesh::STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::IS
 irr::scene::ISceneManager* mgr, s32 id, const std::string& debug_name,
 const core::vector3df& position,
 const core::vector3df& rotation,
-const core::vector3df& scale, const CustomRenderInfo& cri) :
+const core::vector3df& scale, RenderInfo* render_info) :
     CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
     isGLInitialized = false;
     isMaterialInitialized = false;
-    m_cri = cri;
+    m_mesh_render_info = render_info;
 #ifdef DEBUG
     m_debug_name = debug_name;
 #endif
@@ -102,13 +102,15 @@ void STKAnimatedMesh::updateNoGL()
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-
-            const bool affected = m_cri.m_affected_parts.empty() ||
-                std::find(m_cri.m_affected_parts.begin(),
-                m_cri.m_affected_parts.end(), i) != m_cri.m_affected_parts.end();
+            bool affected = false;
+            if (mb && m_mesh_render_info)
+            {
+                // Test if material is affected by hue change     
+                affected = m_mesh_render_info->isColorizable(i);
+            }
 
             GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
-                affected ? m_cri : CustomRenderInfo()/*default info if not affected*/));
+                affected ? m_mesh_render_info : NULL));
         }
 
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
@@ -134,12 +136,15 @@ void STKAnimatedMesh::updateNoGL()
                 TransparentMaterial TranspMat = getTransparentMaterialFromType(type, MaterialTypeParam, material);
                 TransparentMesh[TranspMat].push_back(&mesh);
             }
-            else if (mesh.m_transparent)
+            else if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent())
             {
                 TransparentMesh[TM_ADDITIVE].push_back(&mesh);
             }
-            else if (mesh.m_custom_hue > 0.0f)
+            else if (mesh.m_render_info != NULL)
             {
+                // For now, put all meshes that support custom render info into
+                // solid (default) material first, this allowing changing fewer
+                // shaders
                 MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);
             }
             else
