@@ -146,9 +146,12 @@ void SoccerSetupScreen::beforeAddingWidget()
             (i&1 ? SOCCER_TEAM_BLUE : SOCCER_TEAM_RED));
 
         // addModel requires loading the RenderInfo first
-        kart_view->getRenderInfo().setKartModelRenderInfo(info.team == SOCCER_TEAM_BLUE ?
+        kart_view->getModelViewRenderInfo().setRenderInfo
+            (kart_model.getRenderInfo());
+
+        kart_view->getModelViewRenderInfo().setKartModelRenderInfo
+            (info.team == SOCCER_TEAM_BLUE ?
             RenderInfo::KRT_BLUE : RenderInfo::KRT_RED);
-        kart_view->getRenderInfo().setColorizableParts(kart_model.getModel());
 
         // Add the kart model (including wheels and speed weight objects)
         kart_view->addModel( kart_model.getModel(), Vec3(0,0,0),
@@ -288,7 +291,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             team_switch = SOCCER_TEAM_RED;
 
             // Change the kart color
-            m_kart_view_info[playerId].view->getRenderInfo()
+            m_kart_view_info[playerId].view->getModelViewRenderInfo()
                 .setKartModelRenderInfo(RenderInfo::KRT_RED);
 
             for(int i=0 ; i < nb_players ; i++)
@@ -305,7 +308,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             team_switch = SOCCER_TEAM_BLUE;
 
             // Change the kart color
-            m_kart_view_info[playerId].view->getRenderInfo()
+            m_kart_view_info[playerId].view->getModelViewRenderInfo()
                 .setKartModelRenderInfo(RenderInfo::KRT_BLUE);
 
             for(int i=0 ; i < nb_players ; i++)

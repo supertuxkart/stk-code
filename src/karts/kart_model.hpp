@@ -336,6 +336,8 @@ public:
     core::vector3df getHatOffset() { return m_hat_offset; }
     // ------------------------------------------------------------------------
     RenderInfo* getRenderInfo()                      { return &m_render_info; }
+    // ------------------------------------------------------------------------
+    const RenderInfo* getRenderInfo() const          { return &m_render_info; }
 
 };   // KartModel
 #endif

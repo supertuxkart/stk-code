@@ -105,9 +105,9 @@ namespace GUIEngine
 
         void setupRTTScene();
 
-        FrameBuffer* getFrameBuffer() { return m_frame_buffer; }
-        video::ITexture* getTexture() { return m_texture; }
-        RenderInfo& getRenderInfo() { return m_render_info; }
+        FrameBuffer* getFrameBuffer()       { return m_frame_buffer; }
+        video::ITexture* getTexture()            { return m_texture; }
+        RenderInfo& getModelViewRenderInfo() { return m_render_info; }
     };
 
 }

@@ -25,6 +25,7 @@
 #include "graphics/2dutils.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/light.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/per_camera_node.hpp"
 #include "graphics/post_processing.hpp"

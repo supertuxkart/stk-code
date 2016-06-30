@@ -19,12 +19,13 @@
 #ifndef HEADER_RENDER_INFO_HPP
 #define HEADER_RENDER_INFO_HPP
 
-#include "graphics/material.hpp"
-#include "graphics/material_manager.hpp"
-
-#include <ISceneManager.h>
 #include <algorithm>
 #include <vector>
+
+namespace irr
+{
+    namespace scene { class IMesh; }
+}
 
 /**
   * \ingroup graphics
@@ -51,24 +52,11 @@ private:
 
 public:
     RenderInfo(float hue = 0.0f, float min_saturation = 0.0f,
-               bool transparent = false)
-    {
-        m_hue = hue;
-        m_min_saturation = min_saturation;
-        m_transparent = transparent;
-    }
+               bool transparent = false);
     // ------------------------------------------------------------------------
-    void setColorizableParts(irr::scene::IMesh* m)
-    {
-        for (int i = 0; i < int(m->getMeshBufferCount()); i++)
-        {
-            scene::IMeshBuffer* mb = m->getMeshBuffer(i);
-            Material* material = material_manager->getMaterialFor(mb
-                ->getMaterial().getTexture(0), mb);
-            if (material->isColorizable())
-                m_colorizable_parts.push_back(i);
-        }
-    }
+    ~RenderInfo() {}
+    // ------------------------------------------------------------------------
+    void setColorizableParts(irr::scene::IMesh* m);
     // ------------------------------------------------------------------------
     void setHue(float hue)                                    { m_hue = hue; }
     // ------------------------------------------------------------------------
@@ -100,6 +88,8 @@ public:
 
         setTransparent(krt == RenderInfo::KRT_TRANSPARENT ? true : false);
     }
+    // ------------------------------------------------------------------------
+    void setRenderInfo(const RenderInfo* other)            { *this = *other; }
 
 };   // RenderInfo
 
