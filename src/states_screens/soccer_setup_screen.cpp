@@ -287,6 +287,10 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         {
             team_switch = SOCCER_TEAM_RED;
 
+            // Change the kart color
+            m_kart_view_info[playerId].view->getRenderInfo()
+                .setKartModelRenderInfo(RenderInfo::KRT_RED);
+
             for(int i=0 ; i < nb_players ; i++)
             {
                 m_kart_view_info[i].view->unsetBadge(BAD_BADGE);
@@ -299,6 +303,10 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             m_kart_view_info[playerId].confirmed == false)
         {
             team_switch = SOCCER_TEAM_BLUE;
+
+            // Change the kart color
+            m_kart_view_info[playerId].view->getRenderInfo()
+                .setKartModelRenderInfo(RenderInfo::KRT_BLUE);
 
             for(int i=0 ; i < nb_players ; i++)
             {
@@ -453,11 +461,6 @@ void SoccerSetupScreen::updateKartViewsLayout()
     {
         const KartViewInfo& view_info = m_kart_view_info[i];
         const SoccerTeam    team = view_info.team;
-
-        // Change the kart color
-        m_kart_view_info[i].view->getRenderInfo().setKartModelRenderInfo
-            (view_info.team == SOCCER_TEAM_BLUE ?
-            RenderInfo::KRT_BLUE : RenderInfo::KRT_RED);
 
         // Compute the position
         const int cur_row = cur_kart_per_team[team] / nb_columns;
