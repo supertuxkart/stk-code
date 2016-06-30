@@ -43,7 +43,7 @@ public:
      const irr::core::vector3df& position = irr::core::vector3df(0,0,0),
      const irr::core::vector3df& rotation = irr::core::vector3df(0,0,0),
      const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f),
-     RenderInfo* render_info = NULL);
+     RenderInfo* render_info = NULL, bool all_parts_colorized = false);
   ~STKAnimatedMesh();
 
   virtual void render();
@@ -51,6 +51,7 @@ public:
   virtual bool glow() const { return false; }
 private:
     RenderInfo* m_mesh_render_info;
+    bool m_all_parts_colorized;
 };
 
 #endif // STKANIMATEDMESH_HPP

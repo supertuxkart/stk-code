@@ -459,7 +459,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
         {
             if(!m_wheel_model[i]) continue;
             m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], "wheel",
-                              node, getRenderInfo());
+                              node, getRenderInfo(), true/*all_parts_colorized*/);
             Vec3 wheel_min, wheel_max;
             MeshTools::minMax3D(m_wheel_model[i], &wheel_min, &wheel_max);
             m_wheel_graphics_radius[i] = 0.5f*(wheel_max.getY() - wheel_min.getY());
@@ -481,7 +481,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             if(obj.m_model)
             {
                 obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, 
-                             "speedweighted", node, getRenderInfo());
+                             "speedweighted", node, getRenderInfo(),
+                             true/*all_parts_colorized*/);
                 obj.m_node->grab();
 
                 obj.m_node->setFrameLoop(m_animation_frame[AF_SPEED_WEIGHTED_START],

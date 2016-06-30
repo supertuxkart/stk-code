@@ -54,7 +54,7 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     irr::s32 id, const std::string& debug_name,
     const irr::core::vector3df& position,
     const irr::core::vector3df& rotation,
-    const irr::core::vector3df& scale, bool createGLMeshes, RenderInfo* render_info) :
+    const irr::core::vector3df& scale, bool createGLMeshes, RenderInfo* render_info, bool all_parts_colorized) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
     isDisplacement = false;
@@ -65,7 +65,7 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     m_debug_name = debug_name;
 
     if (createGLMeshes)
-        this->createGLMeshes(render_info);
+        this->createGLMeshes(render_info, all_parts_colorized);
 }
 
 void STKMeshSceneNode::setReloadEachFrame(bool val)
@@ -75,20 +75,20 @@ void STKMeshSceneNode::setReloadEachFrame(bool val)
         immediate_draw = true;
 }
 
-void STKMeshSceneNode::createGLMeshes(RenderInfo* render_info)
+void STKMeshSceneNode::createGLMeshes(RenderInfo* render_info, bool all_parts_colorized)
 {
     for (u32 i = 0; i<Mesh->getMeshBufferCount(); ++i)
     {
         scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
         bool affected = false;
-        if (mb && render_info)
+        if (!all_parts_colorized && mb && render_info)
         {
             // Test if material is affected by hue change     
             affected = render_info->isColorizable(i);
         }
 
         GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
-            affected ? render_info : NULL));
+            affected || all_parts_colorized ? render_info : NULL));
     }
     isMaterialInitialized = false;
     isGLInitialized = false;

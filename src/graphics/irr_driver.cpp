@@ -1170,7 +1170,8 @@ scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter
 scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                           const std::string& debug_name,
                                           scene::ISceneNode *parent,
-                                          RenderInfo* render_info)
+                                          RenderInfo* render_info,
+                                          bool all_parts_colorized)
 {
     if (!CVS->isGLSL())
         return m_scene_manager->addMeshSceneNode(mesh, parent);
@@ -1184,7 +1185,8 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                                        core::vector3df(0, 0, 0),
                                                        core::vector3df(0, 0, 0),
                                                        core::vector3df(1.0f, 1.0f, 1.0f),
-                                                       true, render_info);
+                                                       true, render_info,
+                                                       all_parts_colorized);
     node->drop();
 
     return node;
@@ -1367,7 +1369,7 @@ void IrrDriver::removeTexture(video::ITexture *t)
  */
 scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh,
     const std::string& debug_name, scene::ISceneNode* parent,
-    RenderInfo* render_info)
+    RenderInfo* render_info, bool all_parts_colorized)
 {
     if (!CVS->isGLSL())
     {
@@ -1383,7 +1385,7 @@ scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *
     scene::IAnimatedMeshSceneNode* node =
         new STKAnimatedMesh(mesh, parent, m_scene_manager, -1, debug_name,
         core::vector3df(0, 0, 0), core::vector3df(0, 0, 0),
-        core::vector3df(1, 1, 1), render_info);
+        core::vector3df(1, 1, 1), render_info, all_parts_colorized);
     node->drop();
     return node;
 }   // addAnimatedMesh

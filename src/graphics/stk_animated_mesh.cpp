@@ -39,12 +39,13 @@ STKAnimatedMesh::STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::IS
 irr::scene::ISceneManager* mgr, s32 id, const std::string& debug_name,
 const core::vector3df& position,
 const core::vector3df& rotation,
-const core::vector3df& scale, RenderInfo* render_info) :
+const core::vector3df& scale, RenderInfo* render_info, bool all_parts_colorized) :
     CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
     isGLInitialized = false;
     isMaterialInitialized = false;
     m_mesh_render_info = render_info;
+    m_all_parts_colorized = all_parts_colorized;
 #ifdef DEBUG
     m_debug_name = debug_name;
 #endif
@@ -103,14 +104,14 @@ void STKAnimatedMesh::updateNoGL()
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
             bool affected = false;
-            if (mb && m_mesh_render_info)
+            if (!m_all_parts_colorized && mb && m_mesh_render_info)
             {
                 // Test if material is affected by hue change     
                 affected = m_mesh_render_info->isColorizable(i);
             }
 
             GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
-                affected ? m_mesh_render_info : NULL));
+                affected || m_all_parts_colorized ? m_mesh_render_info : NULL));
         }
 
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)

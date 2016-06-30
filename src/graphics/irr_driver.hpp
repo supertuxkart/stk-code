@@ -388,7 +388,8 @@ public:
     scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
                                   const std::string& debug_name,
                                   scene::ISceneNode *parent = NULL,
-                                  RenderInfo* render_info = NULL);
+                                  RenderInfo* render_info = NULL,
+                                  bool all_parts_colorized = false);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);
@@ -411,7 +412,8 @@ public:
         *addAnimatedMesh(scene::IAnimatedMesh *mesh,
                          const std::string& debug_name,
                          scene::ISceneNode* parent = NULL,
-                         RenderInfo* render_info = NULL);
+                         RenderInfo* render_info = NULL,
+                         bool all_parts_colorized = false);
     scene::ICameraSceneNode
                          *addCameraSceneNode();
     Camera               *addCamera(unsigned int index, AbstractKart *kart);
