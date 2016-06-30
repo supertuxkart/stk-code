@@ -24,9 +24,11 @@
 class CombinedCharacteristic : public AbstractCharacteristic
 {
 private:
-    std::vector<const AbstractCharacteristic*> m_childs;
+    std::vector<const AbstractCharacteristic*> m_children;
 
 public:
+    static void unitTesting();
+
     void addCharacteristic(const AbstractCharacteristic *characteristic);
 
     virtual void process(CharacteristicType type, Value value, bool *is_set) const;

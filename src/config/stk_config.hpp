@@ -180,9 +180,9 @@ public:
      *  \throw out_of_range if there is no data for 'type'.
      *  \param type Type of kart (e.g. heavy, medium, ...).
      */
-    const KartProperties& getKartProperties(std::string type)
+    const KartProperties& getKartProperties(const std::string &type)
     {
-        return *m_kart_properties.at(type); 
+        return *m_kart_properties.at(type);
     }   // getKartProperties
 }
 ;   // STKConfig

@@ -38,8 +38,6 @@
 #include "graphics/stk_text_billboard.hpp"
 #include "graphics/stars.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "karts/abstract_characteristic.hpp"
-#include "karts/cached_characteristic.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/rescue_animation.hpp"
@@ -181,27 +179,18 @@ void Kart::init(RaceManager::KartType type)
     // In multiplayer mode, sounds are NOT positional
     if (race_manager->getNumLocalPlayers() > 1)
     {
+        float factor = 1.0f / race_manager->getNumberOfKarts();
+        // players have louder sounds than AIs
         if (type == RaceManager::KT_PLAYER)
-        {
-            // players have louder sounds than AIs
-            const float factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
-            m_goo_sound->setVolume( 1.0f / factor );
-            m_skid_sound->setVolume( 1.0f / factor );
-            m_crash_sound->setVolume( 1.0f / factor );
-            m_boing_sound->setVolume( 1.0f / factor );
-            m_beep_sound->setVolume( 1.0f / factor );
-            m_nitro_sound->setVolume( 1.0f / factor );
-        }
-        else
-        {
-            m_goo_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_skid_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_crash_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_beep_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_boing_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_nitro_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-        }
-    }
+            factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
+
+        m_goo_sound->setVolume(factor);
+        m_skid_sound->setVolume(factor);
+        m_crash_sound->setVolume(factor);
+        m_boing_sound->setVolume(factor);
+        m_beep_sound->setVolume(factor);
+        m_nitro_sound->setVolume(factor);
+    }   // if getNumLocalPlayers > 1
 
     if(!m_engine_sound)
     {
@@ -224,12 +213,7 @@ void Kart::init(RaceManager::KartType type)
     m_kart_gfx = new KartGFX(this);
     m_skidding = new Skidding(this);
     // Create the stars effect
-    m_stars_effect =
-        new Stars(getNode(),
-                  core::vector3df(0.0f,
-                                  getKartModel()->getModel()
-                                        ->getBoundingBox().MaxEdge.Y,
-                                  0.0f)                               );
+    m_stars_effect = new Stars(this);
 
     reset();
 }   // init
