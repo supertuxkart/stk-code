@@ -23,6 +23,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
 #include "graphics/shaders.hpp"
 #include "modes/world.hpp"
@@ -168,11 +169,17 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name,
                           RenderInfo* render_info)
 {
     GLMesh result = {};
-    result.m_render_info = render_info;
+    result.m_material = NULL;
+    result.m_render_info = NULL;
     if (!mb)
         return result;
     result.mb = mb;
-
+    if (render_info != NULL)
+    {
+        result.m_render_info = render_info;
+        result.m_material = material_manager->getMaterialFor(mb
+            ->getMaterial().getTexture(0), mb);
+    }
 #ifdef DEBUG
     result.debug_name = debug_name;
 #endif

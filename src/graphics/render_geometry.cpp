@@ -999,13 +999,14 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
     GLenum itype = mesh->IndexType;
     size_t count = mesh->IndexCount;
 
-    const bool support_change_hue = (mesh->m_render_info != NULL);
+    const bool support_change_hue = (mesh->m_render_info != NULL &&
+        mesh->m_material != NULL);
     const bool need_change_hue = (support_change_hue &&
         mesh->m_render_info->getHue() > 0.0f);
     if (need_change_hue)
     {
         Shader->changeableColor(mesh->m_render_info->getHue(),
-            mesh->m_render_info->getMinSaturation());
+            mesh->m_material->getColorizedFactor());
     }
 
     Shader->setUniforms(Args...);
@@ -1301,14 +1302,15 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
             ExpandTex(*mesh, T::SecondPassTextures, Prefilled_tex[0],
                       Prefilled_tex[1], Prefilled_tex[2]);
 
-        const bool support_change_hue = (mesh->m_render_info != NULL);
+        const bool support_change_hue = (mesh->m_render_info != NULL &&
+            mesh->m_material != NULL);
         const bool need_change_hue =
             (support_change_hue && mesh->m_render_info->getHue() > 0.0f);
         if (need_change_hue)
         {
             T::InstancedSecondPassShader::getInstance()->changeableColor
                 (mesh->m_render_info->getHue(),
-                mesh->m_render_info->getMinSaturation());
+                mesh->m_material->getColorizedFactor());
         }
 
         T::InstancedSecondPassShader::getInstance()->setUniforms(args...);

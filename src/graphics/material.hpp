@@ -178,6 +178,9 @@ private:
     /** True if this material can be colorized (like red/blue in team game). */
     bool             m_colorizable;
 
+    /** Minimum resulting saturation when colorized (from 0 to 1) */
+    float            m_colorized_factor;
+
     /** Some textures need to be pre-multiplied, some divided to give
      *  the intended effect. */
     //enum             {ADJ_NONE, ADJ_PREMUL, ADJ_DIV}
@@ -289,6 +292,10 @@ public:
     /** Returns if this material can be colorized (like red/blue in team game).
      */
     bool  isColorizable      () const { return m_colorizable;        }
+    // ------------------------------------------------------------------------
+    /** Returns the minimum resulting saturation when colorized.
+     */
+    float getColorizedFactor () const { return m_colorized_factor;   }
     // ------------------------------------------------------------------------
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */

@@ -24,10 +24,9 @@
 #include <ISceneManager.h>
 
 // ----------------------------------------------------------------------------
-RenderInfo::RenderInfo(float hue, float min_saturation, bool transparent)
+RenderInfo::RenderInfo(float hue, bool transparent)
 {
     m_hue = hue;
-    m_min_saturation = min_saturation;
     m_transparent = transparent;
 }   // RenderInfo
 

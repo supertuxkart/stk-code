@@ -30,7 +30,6 @@
 
 #include <vector>
 
-class Material;
 class RenderInfo;
 
 enum TransparentMaterial
@@ -58,6 +57,7 @@ struct GLMesh
     uint64_t TextureHandles[6];
     scene::IMeshBuffer *mb;
     RenderInfo* m_render_info;
+    Material* m_material;
 #ifdef DEBUG
     std::string debug_name;
 #endif

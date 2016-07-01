@@ -141,6 +141,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     node->get("backface-culling", &m_backface_culling  );
     node->get("disable-z-write",  &m_disable_z_write   );
     node->get("colorizable",      &m_colorizable       );
+    node->get("colorized-factor", &m_colorized_factor  );
     node->get("fog",              &m_fog               );
 
     node->get("mask",             &m_mask              );
@@ -436,6 +437,7 @@ void Material::init()
     m_collision_reaction        = NORMAL;
     m_disable_z_write           = false;
     m_colorizable               = false;
+    m_colorized_factor          = 0.93f;
     m_water_shader_speed_1      = 6.6667f;
     m_water_shader_speed_2      = 4.0f;
     m_fog                       = true;

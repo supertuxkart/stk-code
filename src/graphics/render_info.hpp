@@ -44,15 +44,12 @@ public:
 private:
     float m_hue;
 
-    float m_min_saturation;
-
     bool m_transparent;
 
     std::vector<int> m_colorizable_parts;
 
 public:
-    RenderInfo(float hue = 0.0f, float min_saturation = 0.0f,
-               bool transparent = false);
+    RenderInfo(float hue = 0.0f, bool transparent = false);
     // ------------------------------------------------------------------------
     ~RenderInfo() {}
     // ------------------------------------------------------------------------
@@ -60,14 +57,9 @@ public:
     // ------------------------------------------------------------------------
     void setHue(float hue)                                    { m_hue = hue; }
     // ------------------------------------------------------------------------
-    void setMinSaturation(float min_saturation)
-                                        { m_min_saturation = min_saturation; }
-    // ------------------------------------------------------------------------
     void setTransparent(bool transparent)     { m_transparent = transparent; }
     // ------------------------------------------------------------------------
     float getHue() const                                     { return m_hue; }
-    // ------------------------------------------------------------------------
-    float getMinSaturation() const                { return m_min_saturation; }
     // ------------------------------------------------------------------------
     bool isTransparent() const                       { return m_transparent; }
     // ------------------------------------------------------------------------
@@ -82,9 +74,6 @@ public:
     {
         setHue(krt == RenderInfo::KRT_BLUE ? 0.66f :
             krt == RenderInfo::KRT_RED ? 1.0f : 0.0f);
-
-        setMinSaturation(krt == RenderInfo::KRT_BLUE ||
-            krt == RenderInfo::KRT_RED ? 0.93f : 0.0f);
 
         setTransparent(krt == RenderInfo::KRT_TRANSPARENT ? true : false);
     }
