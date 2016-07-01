@@ -21,7 +21,7 @@
 
 // ----------------------------------------------------------------------------
 template<typename T, int ...List>
-void renderMeshes1stPass(const DrawCalls& draw_calls)
+void renderMeshes1stPass()
 {
     auto &meshes = T::List::getInstance()->SolidPass;
     T::FirstPassShader::getInstance()->use();
@@ -137,14 +137,14 @@ void drawRSM(const core::matrix4 & rsm_matrix)
 // ----------------------------------------------------------------------------
 void GL3DrawPolicy::drawSolidFirstPass(const DrawCalls& draw_calls) const
 {
-    renderMeshes1stPass<DefaultMaterial, 2, 1>(draw_calls);
-    renderMeshes1stPass<SplattingMat, 2, 1>(draw_calls);
-    renderMeshes1stPass<UnlitMat, 3, 2, 1>(draw_calls);
-    renderMeshes1stPass<AlphaRef, 3, 2, 1>(draw_calls);
-    renderMeshes1stPass<GrassMat, 3, 2, 1>(draw_calls);
-    renderMeshes1stPass<NormalMat, 2, 1>(draw_calls);
-    renderMeshes1stPass<SphereMap, 2, 1>(draw_calls);
-    renderMeshes1stPass<DetailMat, 2, 1>(draw_calls);
+    renderMeshes1stPass<DefaultMaterial, 2, 1>();
+    renderMeshes1stPass<SplattingMat, 2, 1>();
+    renderMeshes1stPass<UnlitMat, 3, 2, 1>();
+    renderMeshes1stPass<AlphaRef, 3, 2, 1>();
+    renderMeshes1stPass<GrassMat, 3, 2, 1>();
+    renderMeshes1stPass<NormalMat, 2, 1>();
+    renderMeshes1stPass<SphereMap, 2, 1>();
+    renderMeshes1stPass<DetailMat, 2, 1>();
 }
 
 // ----------------------------------------------------------------------------
@@ -202,10 +202,10 @@ void IndirectDrawPolicy::drawSolidFirstPass(const DrawCalls& draw_calls) const
 {
     //TODO: find a way to add TextureMarix in instanced shaders,
     //and remove these four lines
-    renderMeshes1stPass<DefaultMaterial, 2, 1>(draw_calls);
-    renderMeshes1stPass<SplattingMat, 2, 1>(draw_calls);
-    renderMeshes1stPass<UnlitMat, 3, 2, 1>(draw_calls);
-    renderMeshes1stPass<AlphaRef, 3, 2, 1>(draw_calls);
+    renderMeshes1stPass<DefaultMaterial, 2, 1>();
+    renderMeshes1stPass<SplattingMat, 2, 1>();
+    renderMeshes1stPass<UnlitMat, 3, 2, 1>();
+    renderMeshes1stPass<AlphaRef, 3, 2, 1>();
     
     draw_calls.drawIndirectSolidFirstPass();
 }
@@ -263,10 +263,10 @@ void MultidrawPolicy::drawSolidFirstPass(const DrawCalls& draw_calls) const
 {
     //TODO: find a way to add TextureMarix in instanced shaders,
     //and remove these four lines
-    renderMeshes1stPass<DefaultMaterial, 2, 1>(draw_calls);
-    renderMeshes1stPass<SplattingMat, 2, 1>(draw_calls);
-    renderMeshes1stPass<UnlitMat, 3, 2, 1>(draw_calls);
-    renderMeshes1stPass<AlphaRef, 3, 2, 1>(draw_calls);
+    renderMeshes1stPass<DefaultMaterial, 2, 1>();
+    renderMeshes1stPass<SplattingMat, 2, 1>();
+    renderMeshes1stPass<UnlitMat, 3, 2, 1>();
+    renderMeshes1stPass<AlphaRef, 3, 2, 1>();
     
     draw_calls.multidrawSolidFirstPass();
 }

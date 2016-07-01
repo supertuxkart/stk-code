@@ -43,10 +43,10 @@ private:
     MeshMap m_glow_pass_mesh;
 
     /** meshes data in VRAM */
-    SolidCommandBuffer                    m_solid_cmd_buffer;
-    ShadowCommandBuffer                   m_shadow_cmd_buffer;
-    ReflectiveShadowMapCommandBuffer      m_reflective_shadow_map_cmd_buffer;
-    GlowCommandBuffer                     m_glow_cmd_buffer;
+    SolidCommandBuffer                   *m_solid_cmd_buffer                 = NULL;
+    ShadowCommandBuffer                  *m_shadow_cmd_buffer                = NULL;
+    ReflectiveShadowMapCommandBuffer     *m_reflective_shadow_map_cmd_buffer = NULL;
+    GlowCommandBuffer                    *m_glow_cmd_buffer                  = NULL;
     
     void clearLists();
 
@@ -71,6 +71,9 @@ private:
                             bool drawRSM);
     
 public:
+    DrawCalls();
+    ~DrawCalls();
+
     void prepareDrawCalls(ShadowMatrices& shadow_matrices,
                           irr::scene::ICameraSceneNode *camnode,
                           unsigned &solid_poly_count,
