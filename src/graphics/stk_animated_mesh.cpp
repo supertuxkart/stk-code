@@ -106,12 +106,13 @@ void STKAnimatedMesh::updateNoGL()
             bool affected = false;
             if (!m_all_parts_colorized && mb && m_mesh_render_info)
             {
-                // Test if material is affected by hue change     
+                // Test if material is affected by hue change
                 affected = m_mesh_render_info->isColorizable(i);
             }
 
             GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
-                affected || m_all_parts_colorized ? m_mesh_render_info : NULL));
+                affected || m_all_parts_colorized || (m_mesh_render_info
+                && m_mesh_render_info->isTransparent()) ? m_mesh_render_info : NULL));
         }
 
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)

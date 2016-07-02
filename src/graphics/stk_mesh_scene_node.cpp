@@ -88,7 +88,8 @@ void STKMeshSceneNode::createGLMeshes(RenderInfo* render_info, bool all_parts_co
         }
 
         GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
-            affected || all_parts_colorized ? render_info : NULL));
+            affected || all_parts_colorized || (render_info &&
+            render_info->isTransparent()) ? render_info : NULL));
     }
     isMaterialInitialized = false;
     isGLInitialized = false;
