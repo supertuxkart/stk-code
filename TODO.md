@@ -27,4 +27,4 @@ Thanks in advance!
 -- The SuperTuxKart Team
 
 
-For details, see <http://supertuxkart.sourceforge.net/Get_involved>
+For details, see <http://supertuxkart.net/Community>
