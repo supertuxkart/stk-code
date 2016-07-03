@@ -1006,7 +1006,7 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
     if (need_change_hue)
     {
         Shader->changeableColor(mesh->m_render_info->getHue(),
-            mesh->m_material->getColorizedFactor());
+            mesh->m_material->getColorizationFactor());
     }
 
     Shader->setUniforms(Args...);
@@ -1310,7 +1310,7 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
         {
             T::InstancedSecondPassShader::getInstance()->changeableColor
                 (mesh->m_render_info->getHue(),
-                mesh->m_material->getColorizedFactor());
+                mesh->m_material->getColorizationFactor());
         }
 
         T::InstancedSecondPassShader::getInstance()->setUniforms(args...);

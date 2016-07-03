@@ -179,7 +179,7 @@ private:
     bool             m_colorizable;
 
     /** Minimum resulting saturation when colorized (from 0 to 1) */
-    float            m_colorized_factor;
+    float            m_colorization_factor;
 
     /** Some textures need to be pre-multiplied, some divided to give
      *  the intended effect. */
@@ -295,7 +295,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the minimum resulting saturation when colorized.
      */
-    float getColorizedFactor () const { return m_colorized_factor;   }
+    float getColorizationFactor () const { return m_colorization_factor;   }
     // ------------------------------------------------------------------------
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */
