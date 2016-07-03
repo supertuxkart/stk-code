@@ -437,7 +437,7 @@ void Material::init()
     m_collision_reaction        = NORMAL;
     m_disable_z_write           = false;
     m_colorizable               = false;
-    m_colorization_factor       = 0.93f;
+    m_colorization_factor       = 0.0f;
     m_water_shader_speed_1      = 6.6667f;
     m_water_shader_speed_2      = 4.0f;
     m_fog                       = true;
