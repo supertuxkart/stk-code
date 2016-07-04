@@ -1,6 +1,25 @@
+#ifdef GL_ES
 uniform mat4 ModelMatrix;
 uniform mat4 InverseModelMatrix;
 uniform mat4 TextureMatrix;
+#else
+uniform mat4 ModelMatrix =
+    mat4(1., 0., 0., 0.,
+         0., 1., 0., 0.,
+         0., 0., 1., 0.,
+         0., 0., 0., 1.);
+uniform mat4 InverseModelMatrix =
+    mat4(1., 0., 0., 0.,
+         0., 1., 0., 0.,
+         0., 0., 1., 0.,
+         0., 0., 0., 1.);
+
+uniform mat4 TextureMatrix =
+    mat4(1., 0., 0., 0.,
+         0., 1., 0., 0.,
+         0., 0., 1., 0.,
+         0., 0., 0., 1.);
+#endif
 
 #if __VERSION__ >= 330
 layout(location = 0) in vec3 Position;
@@ -30,33 +49,15 @@ out vec4 color;
 
 void main(void)
 {
-    mat4 DefaultMatrix = mat4(1., 0., 0., 0.,
-                              0., 1., 0., 0.,
-                              0., 0., 1., 0.,
-                              0., 0., 0., 1.);
-
-    mat4 ModelMatrixCurr = ModelMatrix;
-    mat4 InverseModelMatrixCurr = InverseModelMatrix;
-    mat4 TextureMatrixCurr = TextureMatrix;
-
-    if (ModelMatrixCurr == mat4(0.0))
-        ModelMatrixCurr = DefaultMatrix;
-
-    if (InverseModelMatrixCurr == mat4(0.0))
-        InverseModelMatrixCurr = DefaultMatrix;
-
-    if (TextureMatrixCurr == mat4(0.0))
-        TextureMatrixCurr = DefaultMatrix;
-
     color = Color.zyxw;
-    mat4 ModelViewProjectionMatrix = ProjectionMatrix * ViewMatrix * ModelMatrixCurr;
-    mat4 TransposeInverseModelView = transpose(InverseModelMatrixCurr * InverseViewMatrix);
+    mat4 ModelViewProjectionMatrix = ProjectionMatrix * ViewMatrix * ModelMatrix;
+    mat4 TransposeInverseModelView = transpose(InverseModelMatrix * InverseViewMatrix);
     gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
     // Keep orthogonality
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
     // Keep direction
-    tangent = (ViewMatrix * ModelMatrixCurr * vec4(Tangent, 0.)).xyz;
-    bitangent = (ViewMatrix * ModelMatrixCurr * vec4(Bitangent, 0.)).xyz;
-    uv = (TextureMatrixCurr * vec4(Texcoord, 1., 1.)).xy;
+    tangent = (ViewMatrix * ModelMatrix * vec4(Tangent, 0.)).xyz;
+    bitangent = (ViewMatrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
+    uv = (TextureMatrix * vec4(Texcoord, 1., 1.)).xy;
     uv_bis = SecondTexcoord;
 }
