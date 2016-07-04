@@ -283,8 +283,8 @@ void Skybox::generateSpecularCubemap()
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
                                    m_specular_probe, level);
-            //~ GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-            //~ assert(status == GL_FRAMEBUFFER_COMPLETE);
+            GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+            assert(status == GL_FRAMEBUFFER_COMPLETE);
 
             SpecularIBLGenerator::getInstance()->setTextureUnits(m_cube_map);
             SpecularIBLGenerator::getInstance()->setUniforms(M[face],
