@@ -582,6 +582,9 @@ struct SEvent
 		struct SJoystickEvent JoystickEvent;
 		struct SLogEvent LogEvent;
 		struct SUserEvent UserEvent;
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+		struct SInputMethodEvent InputMethodEvent;
+#endif
 	};
 
 };
