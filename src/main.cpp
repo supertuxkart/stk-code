@@ -466,7 +466,7 @@ void setupRaceStart()
         Log::warn("main", "Kart '%s' is unknown so will use the "
             "default kart.",
             UserConfigParams::m_default_kart.c_str());
-        race_manager->setPlayerKart(0, 
+        race_manager->setPlayerKart(0,
                            UserConfigParams::m_default_kart.getDefaultValue());
     }
     else
@@ -784,7 +784,7 @@ int handleCmdLine()
         NetworkConfig::get()->setIsWAN();
         STKHost::create();
         Log::info("main", "Creating a WAN server '%s'.", s.c_str());
-    } 
+    }
     if (CommandLine::has("--lan-server", &s))
     {
         NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
@@ -792,7 +792,7 @@ int handleCmdLine()
         NetworkConfig::get()->setIsLAN();
         STKHost::create();
         Log::info("main", "Creating a LAN server '%s'.", s.c_str());
-    }   
+    }
     if (CommandLine::has("--server-password", &s))
     {
         NetworkConfig::get()->setPassword(s);
@@ -1404,9 +1404,15 @@ int main(int argc, char *argv[] )
         {
             if (UserConfigParams::m_old_driver_popup)
             {
+                #ifdef USE_GLES2
+                irr::core::stringw version = "OpenGL ES 3.0";
+                #else
+                irr::core::stringw version = "OpenGL 3.1";
+                #endif
                 MessageDialog *dialog =
                     new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
-                    "if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."),
+                    "if an update for your video driver is available. SuperTuxKart requires %s or better.",
+                    version),
                     /*from queue*/ true);
                 GUIEngine::DialogQueue::get()->pushDialog(dialog);
             }
