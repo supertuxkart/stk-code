@@ -1,17 +1,20 @@
 # CMakeLists.txt for Irrlicht in STK
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
-find_package(X11 REQUIRED)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                     "${JPEG_INCLUDE_DIR}"
                     "${PNG_INCLUDE_DIRS}"
-                    "${X11_INCLUDE_DIR}"
                     "${ZLIB_INCLUDE_DIR}"
                     "${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
+
+if (UNIX)
+    find_package(X11 REQUIRED)
+    include_directories(${X11_INCLUDE_DIR})
+endif()
 
 if(APPLE)
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/MacOSX" "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht")
