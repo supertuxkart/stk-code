@@ -242,7 +242,7 @@ void COGLES2Texture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 	// make sure we don't change the internal format of existing matrices
 	if (!newTexture)
 		InternalFormat=oldInternalFormat;
-        
+
     Driver->setActiveTexture(0, this);
 	Driver->getBridgeCalls()->setTexture(0);
 
@@ -278,7 +278,7 @@ void COGLES2Texture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 			// enable bilinear mipmap filter
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            
+
             StatesCache.BilinearFilter = true;
             StatesCache.TrilinearFilter = false;
             StatesCache.MipMapStatus = true;
@@ -292,7 +292,7 @@ void COGLES2Texture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 			// enable bilinear filter without mipmaps
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            
+
             StatesCache.BilinearFilter = true;
             StatesCache.TrilinearFilter = false;
             StatesCache.MipMapStatus = false;
@@ -564,18 +564,18 @@ COGLES2FBOTexture::COGLES2FBOTexture(const core::dimension2d<u32>& size,
 
 	// generate color texture
 	glGenTextures(1, &TextureName);
-    
+
     Driver->setActiveTexture(0, this);
 	Driver->getBridgeCalls()->setTexture(0);
-    
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    
-	StatesCache.BilinearFilter = true;        
+
+	StatesCache.BilinearFilter = true;
     StatesCache.WrapU = ETC_CLAMP_TO_EDGE;
     StatesCache.WrapV = ETC_CLAMP_TO_EDGE;
-            
+
 	glTexImage2D(GL_TEXTURE_2D, 0, InternalFormat, ImageSize.Width, ImageSize.Height, 0, PixelFormat, PixelType, 0);
 
 #ifdef _DEBUG
@@ -711,6 +711,7 @@ bool COGLES2FBODepthTexture::attach(ITexture* renderTex)
 		return false;
 	}
 	rtt->DepthTexture=this;
+	rtt->DepthBufferTexture = DepthRenderBuffer;
 	grab(); // grab the depth buffer, not the RTT
 	rtt->unbindRTT();
 	return true;

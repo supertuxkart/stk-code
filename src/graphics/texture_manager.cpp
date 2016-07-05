@@ -45,7 +45,7 @@ GLuint getDepthTexture(irr::video::ITexture *tex)
 {
     assert(tex->isRenderTarget());
 #if defined(USE_GLES2)
-    return 1; //static_cast<irr::video::COGLES2FBODepthTexture*>(tex)->DepthRenderBuffer;
+    return static_cast<irr::video::COGLES2FBOTexture*>(tex)->DepthBufferTexture;
 #else
     return static_cast<irr::video::COpenGLFBOTexture*>(tex)->DepthBufferTexture;
 #endif
