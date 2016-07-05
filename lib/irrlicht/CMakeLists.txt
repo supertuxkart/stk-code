@@ -11,7 +11,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
     find_package(X11 REQUIRED)
     include_directories(${X11_INCLUDE_DIR})
 endif()
