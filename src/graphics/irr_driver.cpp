@@ -474,6 +474,8 @@ void IrrDriver::initDevice()
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
             params.HandleSRGB    = true;
+            params.ShadersPath   = (file_manager->getShadersDir() + 
+                                                           "irrlicht/").c_str();
             
             /*
             switch ((int)UserConfigParams::m_antialiasing)

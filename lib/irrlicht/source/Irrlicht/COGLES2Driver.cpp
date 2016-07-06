@@ -54,6 +54,7 @@ namespace video
 		, ViewRenderbuffer(0)
 		, ViewDepthRenderbuffer(0)
 #endif
+		, Params(params)
 	{
 #ifdef _DEBUG
 		setDebugName("COGLES2Driver");
@@ -435,12 +436,16 @@ namespace video
 		// Load shaders from files (in future shaders will be merged with source code).
 
 		// Fixed pipeline.
+		
+		core::stringc shaders_path = IRR_OGLES2_SHADER_PATH;
+		if (Params.ShadersPath.size() > 0)
+			shaders_path = Params.ShadersPath;		
 
-		core::stringc FPVSPath = IRR_OGLES2_SHADER_PATH;
+		core::stringc FPVSPath = shaders_path;
 		FPVSPath += "COGLES2FixedPipeline.vsh";
 		os::Printer::log(FPVSPath.c_str());
 
-		core::stringc FPFSPath = IRR_OGLES2_SHADER_PATH;
+		core::stringc FPFSPath = shaders_path;
 		FPFSPath += "COGLES2FixedPipeline.fsh";
 
 		io::IReadFile* FPVSFile = FileSystem->createAndOpenFile(FPVSPath);
@@ -479,10 +484,10 @@ namespace video
 
 		// Normal Mapping.
 
-		core::stringc NMVSPath = IRR_OGLES2_SHADER_PATH;
+		core::stringc NMVSPath = shaders_path;
 		NMVSPath += "COGLES2NormalMap.vsh";
 
-		core::stringc NMFSPath = IRR_OGLES2_SHADER_PATH;
+		core::stringc NMFSPath = shaders_path;
 		NMFSPath += "COGLES2NormalMap.fsh";
 
 		io::IReadFile* NMVSFile = FileSystem->createAndOpenFile(NMVSPath);
@@ -521,10 +526,10 @@ namespace video
 
 		// Parallax Mapping.
 
-		core::stringc PMVSPath = IRR_OGLES2_SHADER_PATH;
+		core::stringc PMVSPath = shaders_path;
 		PMVSPath += "COGLES2ParallaxMap.vsh";
 
-		core::stringc PMFSPath = IRR_OGLES2_SHADER_PATH;
+		core::stringc PMFSPath = shaders_path;
 		PMFSPath += "COGLES2ParallaxMap.fsh";
 
 		io::IReadFile* PMVSFile = FileSystem->createAndOpenFile(FPVSPath);
@@ -593,10 +598,10 @@ namespace video
 
 		// Create 2D material renderer.
 
-		core::stringc R2DVSPath = IRR_OGLES2_SHADER_PATH;
+		core::stringc R2DVSPath = shaders_path;
 		R2DVSPath += "COGLES2Renderer2D.vsh";
 
-		core::stringc R2DFSPath = IRR_OGLES2_SHADER_PATH;
+		core::stringc R2DFSPath = shaders_path;
 		R2DFSPath += "COGLES2Renderer2D.fsh";
 
 		io::IReadFile* R2DVSFile = FileSystem->createAndOpenFile(R2DVSPath);

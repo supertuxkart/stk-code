@@ -180,6 +180,11 @@ public:
         return getAsset(SHADER, name);
 
     }   // getShader
+    
+    std::string getShadersDir() const
+    {
+        return m_subdir_name[SHADER];
+    }
 };   // FileManager
 
 extern FileManager* file_manager;

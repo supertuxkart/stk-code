@@ -9,6 +9,7 @@
 #include "EDeviceTypes.h"
 #include "dimension2d.h"
 #include "ILogger.h"
+#include "irrString.h"
 
 namespace irr
 {
@@ -48,6 +49,7 @@ namespace irr
 			DriverMultithreaded(false),
 			UsePerformanceTimer(true),
             ForceLegacyDevice(false),
+            ShadersPath(""),
 			SDK_version_do_not_use(IRRLICHT_SDK_VERSION)
 		{
 		}
@@ -81,6 +83,7 @@ namespace irr
 			DisplayAdapter = other.DisplayAdapter;
 			UsePerformanceTimer = other.UsePerformanceTimer;
             ForceLegacyDevice = other.ForceLegacyDevice;
+            ShadersPath = other.ShadersPath;
 			PrivateData = other.PrivateData;
 			return *this;
 		}
@@ -296,6 +299,11 @@ namespace irr
         /** opengl 3 context is available.
         */
         bool ForceLegacyDevice;
+        
+        //! Specifies custom path for shaders directory.
+        /** Allows to overwrite IRR_OGLES2_SHADER_PATH constant
+        */
+        core::stringc ShadersPath;
 
 		//! Don't use or change this parameter.
 		/** Always set it to IRRLICHT_SDK_VERSION, which is done by default.

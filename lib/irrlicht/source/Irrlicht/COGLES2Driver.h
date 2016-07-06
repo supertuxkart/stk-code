@@ -478,6 +478,8 @@ namespace video
 		void* EglSurface;
 		void* EglContext;
 #endif
+
+		SIrrlichtCreationParameters Params;
 	};
 
     //! This bridge between Irlicht pseudo OpenGL calls
