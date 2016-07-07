@@ -58,21 +58,11 @@ extern "C" {
 #if defined(USE_GLES2)
 #define GL_BGRA 0x80E1
 #define GL_BGR 0x80E0
-
+#define GL_FRAMEBUFFER_SRGB 0x8DB9
 #define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
-#define GL_TEXTURE_BUFFER GL_TEXTURE_BUFFER_EXT
-#define GL_FRAMEBUFFER_SRGB GL_FRAMEBUFFER_SRGB_EXT
-#define GL_SRGB_ALPHA GL_SRGB_ALPHA_EXT
 
-extern PFNGLUNIFORMHANDLEUI64NVPROC pglUniformHandleui64NV;
 extern PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR;
-extern PFNGLTEXBUFFEROESPROC pglTexBufferOES;
-extern PFNGLTEXTUREVIEWOESPROC pglTextureViewOES;
-
-#define glUniformHandleui64ARB pglUniformHandleui64NV
 #define glDebugMessageCallbackARB pglDebugMessageCallbackKHR
-#define glTexBuffer pglTexBufferOES
-#define glTextureView pglTextureViewOES
 #endif
 
 struct DrawElementsIndirectCommand{

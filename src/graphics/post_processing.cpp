@@ -1128,6 +1128,7 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
                                               size_t layer, float sigma_h,
                                               float sigma_v)
 {
+#if !defined(USE_GLES2)
     GLuint layer_tex;
     glGenTextures(1, &layer_tex);
     glTextureView(layer_tex, GL_TEXTURE_2D, in_fbo.getRTT()[0],
@@ -1146,7 +1147,6 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
                      UserConfigParams::m_shadows_resolution,
                      UserConfigParams::m_shadows_resolution, sigma_h);
     }
-#if !defined(USE_GLES2)
     else
     {
         const std::vector<float> &weightsV = getGaussianWeight(sigma_v, 7);
@@ -1181,8 +1181,8 @@ void PostProcessing::renderGaussian6BlurLayer(FrameBuffer &in_fbo,
                           (int)UserConfigParams::m_shadows_resolution / 8 + 1, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     }
-#endif
     glDeleteTextures(1, &layer_tex);
+#endif
 }   // renderGaussian6BlurLayer
 
 // ----------------------------------------------------------------------------

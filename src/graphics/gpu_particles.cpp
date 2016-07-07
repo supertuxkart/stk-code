@@ -475,10 +475,12 @@ void ParticleSystemProxy::simulate()
     glEnable(GL_RASTERIZER_DISCARD);
     if (has_height_map)
     {
+#if !defined(USE_GLES2)
         HeightmapSimulationShader::getInstance()->use();
         glActiveTexture(GL_TEXTURE0 + HeightmapSimulationShader::getInstance()->m_TU_heightmap);
         glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
         HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
+#endif        
     }
     else
     {

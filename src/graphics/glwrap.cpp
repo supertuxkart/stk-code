@@ -34,10 +34,7 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
-PFNGLUNIFORMHANDLEUI64NVPROC pglUniformHandleui64NV = 0;
 PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR = 0;
-PFNGLTEXBUFFEROESPROC pglTexBufferOES = 0;
-PFNGLTEXTUREVIEWOESPROC pglTextureViewOES = 0;
 #endif
 
 #ifndef GL_DEBUG_SEVERITY_HIGH_ARB
@@ -197,15 +194,12 @@ void initGL()
 #endif
 
 #if defined(USE_GLES2)
-    glUniformHandleui64ARB = (PFNGLUNIFORMHANDLEUI64NVPROC)eglGetProcAddress("pglUniformHandleui64NV");
     glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKKHRPROC)eglGetProcAddress("glDebugMessageCallbackKHR");
-    glTexBuffer = (PFNGLTEXBUFFEROESPROC)eglGetProcAddress("glTexBufferOES");
-    glTextureView = (PFNGLTEXTUREVIEWOESPROC)eglGetProcAddress("glTextureViewOES");
 #endif
 
 #ifdef ARB_DEBUG_OUTPUT
-#if !defined(USE_GLES2)
     if (glDebugMessageCallbackARB)
+#if !defined(USE_GLES2)
         glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
 #else
         glDebugMessageCallbackARB((GLDEBUGPROCKHR)debugCallback, NULL);

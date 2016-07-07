@@ -220,9 +220,8 @@ void Skybox::generateSpecularCubemap()
 
     if (!CVS->isDefferedEnabled())
         return;
-#if defined(USE_GLES2)
-    return;
-#endif
+
+#if !defined(USE_GLES2)
 
     GLuint fbo;
     glGenFramebuffers(1, &fbo);
@@ -303,6 +302,7 @@ void Skybox::generateSpecularCubemap()
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);
+#endif
 }   // generateSpecularCubemap
 
 

@@ -215,8 +215,10 @@ public:
     template<int N, typename... HandlesId>
     void setTextureHandlesImpl(uint64_t handle, HandlesId... args)
     {
+#if !defined(USE_GLES2)
         if (handle)
             glUniformHandleui64ARB(m_texture_location[N], handle);
+#endif
         setTextureHandlesImpl<N + 1>(args...);
     }   // setTextureHandlesImpl
 
