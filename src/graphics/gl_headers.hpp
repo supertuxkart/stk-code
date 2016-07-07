@@ -65,13 +65,11 @@ extern "C" {
 #define GL_SRGB_ALPHA GL_SRGB_ALPHA_EXT
 
 extern PFNGLUNIFORMHANDLEUI64NVPROC pglUniformHandleui64NV;
-extern PFNGLDRAWELEMENTSBASEVERTEXOESPROC pglDrawElementsBaseVertexOES;
 extern PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR;
 extern PFNGLTEXBUFFEROESPROC pglTexBufferOES;
 extern PFNGLTEXTUREVIEWOESPROC pglTextureViewOES;
 
 #define glUniformHandleui64ARB pglUniformHandleui64NV
-#define glDrawElementsBaseVertex pglDrawElementsBaseVertexOES
 #define glDebugMessageCallbackARB pglDebugMessageCallbackKHR
 #define glTexBuffer pglTexBufferOES
 #define glTextureView pglTextureViewOES

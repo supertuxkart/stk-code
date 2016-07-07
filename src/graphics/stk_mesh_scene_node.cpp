@@ -127,7 +127,9 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
     ColorizeShader::getInstance()->setUniforms(AbsoluteTransformation, video::SColorf(glowcolor.getRed() / 255.f, glowcolor.getGreen() / 255.f, glowcolor.getBlue() / 255.f));
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
+    glDrawRangeElements(ptype, (int)mesh.vaoBaseVertex, 
+                        (int)mesh.vaoBaseVertex + count - 1,
+                        count, itype, (GLvoid *)mesh.vaoOffset);
 }
 
 void STKMeshSceneNode::updatevbo()

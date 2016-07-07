@@ -35,7 +35,6 @@
 #include <EGL/eglext.h>
 
 PFNGLUNIFORMHANDLEUI64NVPROC pglUniformHandleui64NV = 0;
-PFNGLDRAWELEMENTSBASEVERTEXOESPROC pglDrawElementsBaseVertexOES = 0;
 PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR = 0;
 PFNGLTEXBUFFEROESPROC pglTexBufferOES = 0;
 PFNGLTEXTUREVIEWOESPROC pglTextureViewOES = 0;
@@ -199,7 +198,6 @@ void initGL()
 
 #if defined(USE_GLES2)
     glUniformHandleui64ARB = (PFNGLUNIFORMHANDLEUI64NVPROC)eglGetProcAddress("pglUniformHandleui64NV");
-    glDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXOESPROC)eglGetProcAddress("glDrawElementsBaseVertexOES");
     glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKKHRPROC)eglGetProcAddress("glDebugMessageCallbackKHR");
     glTexBuffer = (PFNGLTEXBUFFEROESPROC)eglGetProcAddress("glTexBufferOES");
     glTextureView = (PFNGLTEXTUREVIEWOESPROC)eglGetProcAddress("glTextureViewOES");
