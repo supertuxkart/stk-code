@@ -74,7 +74,9 @@
  */
 
 #if (IRRLICHT_VERSION_MAJOR < 1 || IRRLICHT_VERSION_MINOR < 7 || \
-    _IRR_MATERIAL_MAX_TEXTURES_ < 8 || !defined(_IRR_COMPILE_WITH_OPENGL_) || \
+    _IRR_MATERIAL_MAX_TEXTURES_ < 8 || \
+    (!defined(_IRR_COMPILE_WITH_OPENGL_) && \
+     !defined(_IRR_COMPILE_WITH_OGLES2_)) || \
     !defined(_IRR_COMPILE_WITH_B3D_LOADER_))
 #error "Building against an incompatible Irrlicht. Distros, \
 please use the included version."
