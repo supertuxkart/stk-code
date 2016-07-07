@@ -21,6 +21,8 @@
 
 #include "karts/abstract_characteristic.hpp"
 
+#include <assert.h>
+
 class CombinedCharacteristic : public AbstractCharacteristic
 {
 private:
@@ -32,6 +34,10 @@ public:
     void addCharacteristic(const AbstractCharacteristic *characteristic);
 
     virtual void process(CharacteristicType type, Value value, bool *is_set) const;
+    virtual void copyFrom(const AbstractCharacteristic *other)
+    {
+        assert(false);
+    }
 };
 
 #endif

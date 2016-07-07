@@ -227,6 +227,7 @@ public:
 public:
     AbstractCharacteristic();
     virtual ~AbstractCharacteristic() {}
+    virtual void copyFrom(const AbstractCharacteristic *other) = 0;
 
     /**
      * The process function is the core of this characteristics system.

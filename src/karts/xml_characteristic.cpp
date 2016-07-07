@@ -32,6 +32,17 @@ XmlCharacteristic::XmlCharacteristic(const XMLNode *node) :
 }   // XmlCharacteristic constructor
 
 // ----------------------------------------------------------------------------
+/** Copies the characteristics from the specified other characteristic class
+ *  into this class.
+ */
+void XmlCharacteristic::copyFrom(const AbstractCharacteristic *other)
+{
+    const XmlCharacteristic *xc = dynamic_cast<const XmlCharacteristic*>(other);
+    assert(xc!=NULL);
+    m_values = xc->m_values;
+}   // operator=
+
+// ----------------------------------------------------------------------------
 /** process will execute the operation that is specified in the saved string.
  *  The format of the operations is specified in kart_characteristics.xml.
  */
