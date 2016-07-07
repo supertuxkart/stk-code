@@ -269,6 +269,7 @@ RTT::RTT(size_t width, size_t height)
 
 RTT::~RTT()
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);    
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
     if (CVS->isShadowEnabled())

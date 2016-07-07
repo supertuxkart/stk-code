@@ -55,8 +55,13 @@ void ShaderBasedRenderer::setRTTDimensions(size_t width, size_t height)
             m_rtts = new RTT(width, height);
         }
         else
-        {
+        {    
             //same dimensions; we don't need to create a new RTT
+            //just clear FBO_COMBINED_DIFFUSE_SPECULAR
+            m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
+            glClearColor(.5, .5, .5, .5);
+            glClear(GL_COLOR_BUFFER_BIT);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             return;
         }
     }
