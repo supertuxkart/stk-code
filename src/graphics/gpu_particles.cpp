@@ -182,6 +182,7 @@ void ParticleSystemProxy::setFlip()
 void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &hm,
     float f1, float f2, float f3, float f4)
 {
+#if !defined(USE_GLES2)
     track_x = f1, track_z = f2, track_x_len = f3, track_z_len = f4;
 
     unsigned width  = (unsigned)hm.size();
@@ -204,6 +205,7 @@ void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &h
     glBindBuffer(GL_TEXTURE_BUFFER, 0);
 
     delete[] hm_array;
+#endif
 }
 
 static
