@@ -24,6 +24,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "tracks/track.hpp"
 #include "modes/world.hpp"
@@ -33,7 +34,6 @@
 
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
-
 
 // ============================================================================
 class ColorizeShader : public Shader<ColorizeShader, core::matrix4, 
@@ -54,7 +54,7 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     irr::s32 id, const std::string& debug_name,
     const irr::core::vector3df& position,
     const irr::core::vector3df& rotation,
-    const irr::core::vector3df& scale, bool createGLMeshes) :
+    const irr::core::vector3df& scale, bool createGLMeshes, RenderInfo* render_info, bool all_parts_colorized) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
     isDisplacement = false;
@@ -65,7 +65,7 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     m_debug_name = debug_name;
 
     if (createGLMeshes)
-        this->createGLMeshes();
+        this->createGLMeshes(render_info, all_parts_colorized);
 }
 
 void STKMeshSceneNode::setReloadEachFrame(bool val)
@@ -75,12 +75,21 @@ void STKMeshSceneNode::setReloadEachFrame(bool val)
         immediate_draw = true;
 }
 
-void STKMeshSceneNode::createGLMeshes()
+void STKMeshSceneNode::createGLMeshes(RenderInfo* render_info, bool all_parts_colorized)
 {
     for (u32 i = 0; i<Mesh->getMeshBufferCount(); ++i)
     {
         scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-        GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name));
+        bool affected = false;
+        if (!all_parts_colorized && mb && render_info)
+        {
+            // Test if material is affected by hue change     
+            affected = render_info->isColorizable(i);
+        }
+
+        GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
+            affected || all_parts_colorized || (render_info &&
+            render_info->isTransparent()) ? render_info : NULL));
     }
     isMaterialInitialized = false;
     isGLInitialized = false;
@@ -173,7 +182,7 @@ void STKMeshSceneNode::updateNoGL()
 
             GLMesh &mesh = GLmeshes[i];
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
-            if (Mesh->getRenderType() == video::ERT_TRANSPARENT)
+            if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent())
             {
                 if (!immediate_draw)
                     TransparentMesh[TM_ADDITIVE].push_back(&mesh);
@@ -187,6 +196,14 @@ void STKMeshSceneNode::updateNoGL()
                     TransparentMesh[TranspMat].push_back(&mesh);
                 else
                     additive = (TranspMat == TM_ADDITIVE);
+            }
+            else if (mesh.m_render_info != NULL)
+            {
+                // For now, put all meshes that support custom render info into
+                // solid (default) material first, this allowing changing fewer
+                // shaders
+                if (!immediate_draw)
+                    MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);
             }
             else
             {

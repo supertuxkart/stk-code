@@ -18,6 +18,7 @@
 #ifndef HEADER_SOCCER_SETUP_SCREEN_HPP
 #define HEADER_SOCCER_SETUP_SCREEN_HPP
 
+#include "graphics/render_info.hpp"
 #include "guiengine/screen.hpp"
 #include "network/remote_kart_info.hpp"
 
@@ -38,8 +39,9 @@ class SoccerSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSing
         GUIEngine::ModelViewWidget* view;
         bool                        confirmed;
         SoccerTeam                  team;
+        RenderInfo                  render_info;
 
-        KartViewInfo() : view(NULL), confirmed(false), team(SOCCER_TEAM_NONE) {}
+        KartViewInfo() : view(), confirmed(false), team(SOCCER_TEAM_NONE) {}
     };
 
     AlignedArray<KartViewInfo>  m_kart_view_info;

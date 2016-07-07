@@ -11,6 +11,11 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
+if (UNIX AND NOT APPLE)
+    find_package(X11 REQUIRED)
+    include_directories(${X11_INCLUDE_DIR})
+endif()
+
 if(APPLE)
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/MacOSX" "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch x86_64")
@@ -25,8 +30,8 @@ elseif(MINGW)
   add_definitions(-D_IRR_STATIC_LIB_)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
 else()
-  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -I/usr/X11R6/include")
-  set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -I/usr/X11R6/include")
+  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing")
   if(CMAKE_COMPILER_IS_GNUCC)
 	  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -fexpensive-optimizations")
   endif()

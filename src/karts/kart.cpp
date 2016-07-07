@@ -91,9 +91,9 @@
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
             PerPlayerDifficulty difficulty,
-            video::E_RENDER_TYPE rt)
+            RenderInfo::KartRenderType krt)
      : AbstractKart(ident, world_kart_id, position, init_transform,
-             difficulty, rt)
+             difficulty, krt)
 
 #if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  pragma warning(1:4355)

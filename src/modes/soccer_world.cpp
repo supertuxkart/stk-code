@@ -22,7 +22,9 @@
 #include "audio/sfx_base.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
@@ -303,6 +305,9 @@ void SoccerWorld::countdownReachedZero()
 //-----------------------------------------------------------------------------
 void SoccerWorld::initKartList()
 {
+    // Color of karts can be changed using shaders
+    if (CVS->isGLSL()) return;
+
     const unsigned int kart_amount = (unsigned int)m_karts.size();
 
     //Loading the indicator textures
@@ -388,9 +393,8 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
 
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
-              difficulty);
-            //difficulty, team == SOCCER_TEAM_BLUE ?
-            //video::ERT_BLUE : video::ERT_RED);
+            difficulty, team == SOCCER_TEAM_BLUE ?
+            RenderInfo::KRT_BLUE : RenderInfo::KRT_RED);
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
 

@@ -23,6 +23,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include "graphics/stk_scene_manager.hpp"
@@ -133,13 +134,18 @@ public:
 // ============================================================================
 class InstancedObjectPass2Shader : public TextureShader<InstancedObjectPass2Shader, 5>
 {
+private:
+    GLint m_color_change_location;
+
 public:
     InstancedObjectPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
                             GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+                            GL_FRAGMENT_SHADER, "utils/rgb_conversion.frag",
                             GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
+        m_color_change_location = glGetUniformLocation(m_program, "color_change");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -147,6 +153,12 @@ public:
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedObjectPass2Shader
+
+    virtual bool changeableColor(float hue = 0.0f, float min_sat = 0.0f) const OVERRIDE
+    {
+        glUniform2f(m_color_change_location, hue, min_sat);
+        return true;
+    }   // changeableColor
 };   // InstancedObjectPass2Shader
 
 // ============================================================================
@@ -987,10 +999,27 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
     GLenum itype = mesh->IndexType;
     size_t count = mesh->IndexCount;
 
+    const bool support_change_hue = (mesh->m_render_info != NULL &&
+        mesh->m_material != NULL);
+    const bool need_change_hue = (support_change_hue &&
+        mesh->m_render_info->getHue() > 0.0f);
+    if (need_change_hue)
+    {
+        Shader->changeableColor(mesh->m_render_info->getHue(),
+            mesh->m_material->getColorizationFactor());
+    }
+
     Shader->setUniforms(Args...);
     glDrawElementsBaseVertex(ptype, (int)count, itype,
                              (GLvoid *)mesh->vaoOffset,
                              (int)mesh->vaoBaseVertex);
+
+    if (need_change_hue)
+    {
+        // Reset after changing
+        Shader->changeableColor();
+    }
+
 }   // draw
 
 // ----------------------------------------------------------------------------
@@ -1272,10 +1301,28 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
         TexExpander<typename T::InstancedSecondPassShader>::template
             ExpandTex(*mesh, T::SecondPassTextures, Prefilled_tex[0],
                       Prefilled_tex[1], Prefilled_tex[2]);
+
+        const bool support_change_hue = (mesh->m_render_info != NULL &&
+            mesh->m_material != NULL);
+        const bool need_change_hue =
+            (support_change_hue && mesh->m_render_info->getHue() > 0.0f);
+        if (need_change_hue)
+        {
+            T::InstancedSecondPassShader::getInstance()->changeableColor
+                (mesh->m_render_info->getHue(),
+                mesh->m_material->getColorizationFactor());
+        }
+
         T::InstancedSecondPassShader::getInstance()->setUniforms(args...);
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
            (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i)
            * sizeof(DrawElementsIndirectCommand)));
+
+        if (need_change_hue)
+        {
+            // Reset after changing
+            T::InstancedSecondPassShader::getInstance()->changeableColor();
+        }
     }
 }   // renderInstancedMeshes2ndPass
 
