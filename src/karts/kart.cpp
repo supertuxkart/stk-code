@@ -1990,9 +1990,9 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
  */
 void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 {
-    if(World::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
+    if(World::getWorld()->getTimeSinceStart()-m_time_last_crash < 0.5f) return;
 
-    m_time_last_crash = World::getWorld()->getTime();
+    m_time_last_crash = World::getWorld()->getTimeSinceStart();
     // After a collision disable the engine for a short time so that karts
     // can 'bounce back' a bit (without this the engine force will prevent
     // karts from bouncing back, they will instead stuck towards the obstable).

@@ -114,15 +114,6 @@ const btTransform &FollowTheLeaderRace::getStartTransform(int index)
 }   // getStartTransform
 
 //-----------------------------------------------------------------------------
-/** Returns the original time at which the countdown timer started. This is
- *  used by the race_gui to display the music credits in FTL mode correctly.
- */
-float FollowTheLeaderRace::getClockStartTime() const
-{
-    return m_leader_intervals[0];
-}   // getClockStartTime
-
-//-----------------------------------------------------------------------------
 /** Called when a kart must be eliminated.
  */
 void FollowTheLeaderRace::countdownReachedZero()

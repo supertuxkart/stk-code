@@ -70,7 +70,8 @@ void WorldStatus::reset()
 {
     m_time            = 0.0f;
     m_auxiliary_timer = 0.0f;
-    
+    m_count_up_timer  = 0.0f;
+
     m_engines_started = false;
     
     // Using SETUP_PHASE will play the track into sfx first, and has no
@@ -340,16 +341,19 @@ void WorldStatus::update(const float dt)
     {
         case CLOCK_CHRONO:
             m_time += dt;
+            m_count_up_timer += dt;
             break;
         case CLOCK_COUNTDOWN:
             // stop countdown when race is over
             if (m_phase == RESULT_DISPLAY_PHASE || m_phase == FINISH_PHASE)
             {
                 m_time = 0.0f;
+                m_count_up_timer = 0.0f;
                 break;
             }
 
             m_time -= dt;
+            m_count_up_timer += dt;
 
             if(m_time <= 0.0)
             {

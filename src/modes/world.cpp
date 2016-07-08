@@ -461,6 +461,7 @@ World::~World()
     race_manager->setRaceGhostKarts(false);
     race_manager->setRecordRace(false);
     race_manager->setWatchingReplay(false);
+    race_manager->setTimeTarget(0.0f);
 
     Camera::removeAllCameras();
 

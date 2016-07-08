@@ -41,7 +41,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/rescue_animation.hpp"
-#include "modes/follow_the_leader.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -457,15 +457,7 @@ void RaceGUIBase::drawGlobalMusicDescription()
 
     gui::IGUIFont*       font = GUIEngine::getFont();
 
-    float race_time = World::getWorld()->getTime();
-    // In the modes that the clock counts backwards, convert the
-    // countdown time to time since start:
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
-        race_time = ((FollowTheLeaderRace*)World::getWorld())->getClockStartTime()
-                  - race_time;
-    else if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER &&
-             race_manager->hasTimeTarget())
-        race_time = race_manager->getTimeTarget() - World::getWorld()->getTime();
+    float race_time = World::getWorld()->getTimeSinceStart();
 
     // ---- Manage pulsing effect
     // 3.0 is the duration of ready/set (TODO: don't hardcode)
