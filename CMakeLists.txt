@@ -19,7 +19,10 @@ option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace the online profile GUI in the main menu with the network multiplayer GUI" OFF)
-option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
+
+if (UNIX AND NOT APPLE)
+    option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+endif()
 
 if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
