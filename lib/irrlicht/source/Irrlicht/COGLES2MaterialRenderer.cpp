@@ -38,7 +38,7 @@ COGLES2MaterialRenderer::COGLES2MaterialRenderer(COGLES2Driver* driver,
 	#endif
 
 	if (baseMaterial == EMT_TRANSPARENT_VERTEX_ALPHA || baseMaterial == EMT_TRANSPARENT_ALPHA_CHANNEL ||
-		baseMaterial == EMT_TRANSPARENT_ALPHA_CHANNEL_REF || baseMaterial == EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA ||
+		/*baseMaterial == EMT_TRANSPARENT_ALPHA_CHANNEL_REF || */baseMaterial == EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA ||
 		baseMaterial == EMT_PARALLAX_MAP_TRANSPARENT_VERTEX_ALPHA)
 	{
 		Alpha = true;
@@ -66,7 +66,7 @@ COGLES2MaterialRenderer::COGLES2MaterialRenderer(COGLES2Driver* driver,
 : Driver(driver), CallBack(callback), Program(0), Alpha(false), Blending(false), FixedBlending(false), UserData(userData)
 {
 	if (baseMaterial == EMT_TRANSPARENT_VERTEX_ALPHA || baseMaterial == EMT_TRANSPARENT_ALPHA_CHANNEL ||
-		baseMaterial == EMT_TRANSPARENT_ALPHA_CHANNEL_REF || baseMaterial == EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA ||
+		/*baseMaterial == EMT_TRANSPARENT_ALPHA_CHANNEL_REF || */baseMaterial == EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA ||
 		baseMaterial == EMT_PARALLAX_MAP_TRANSPARENT_VERTEX_ALPHA)
 	{
 		Alpha = true;
