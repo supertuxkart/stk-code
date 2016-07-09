@@ -23,13 +23,7 @@ void main()
 #ifdef Use_Bindless_Texture
     diffusecolor.xyz = pow(diffusecolor.xyz, vec3(2.2));
 #endif
-
-#ifndef GL_ES
     diffusecolor.xyz *= pow(color.xyz, vec3(2.2));
-#else
-    diffusecolor.xyz *= pow(color.xyz, vec3(1.0 / 2.2));
-#endif
-
     diffusecolor.a *= color.a;
     vec3 tmp = vec3(gl_FragCoord.xy / screen, gl_FragCoord.z);
     tmp = 2. * tmp - 1.;
