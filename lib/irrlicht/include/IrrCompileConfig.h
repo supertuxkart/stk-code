@@ -100,7 +100,6 @@
 #if defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 #define _IRR_IPHONE_PLATFORM_
 #define _IRR_COMPILE_WITH_IPHONE_DEVICE_
-#define _IRR_COMPILE_WITH_OGLES1_
 #define _IRR_COMPILE_WITH_OGLES2_
 #else
 #define _IRR_COMPILE_WITH_OSX_DEVICE_
@@ -114,7 +113,6 @@
 
 #if defined(_IRR_ANDROID_PLATFORM_)
 #define _IRR_COMPILE_WITH_ANDROID_DEVICE_
-#define _IRR_COMPILE_WITH_OGLES1_
 #define _IRR_COMPILE_WITH_OGLES2_
 #define _IRR_COMPILE_ANDROID_ASSET_READER_
 #endif
@@ -181,18 +179,6 @@ define out. */
 #undef _IRR_COMPILE_WITH_OPENGL_
 #endif
 
-//! Define _IRR_COMPILE_WITH_OGLES1_ to compile the Irrlicht engine with OpenGL-ES 1.x.
-/** If you do not wish the engine to be compiled with OpenGL-ES 1.x, comment
- this define out.
- You should only use this define if you really need the OpenGL-ES driver, and
- it should be usually the only HW accelerated one. OpenGL is currently disabled
- if using this driver, to avoid problems with the ogl-es emulators.
- */
-// #define _IRR_COMPILE_WITH_OGLES1_
-#ifdef NO_IRR_COMPILE_WITH_OGLES1_
-#undef _IRR_COMPILE_WITH_OGLES1_
-#endif
-
 //! Define _IRR_COMPILE_WITH_OGLES2_ to compile the Irrlicht engine with OpenGL-ES 2.x.
 /** If you do not wish the engine to be compiled with OpenGL-ES 2.x, comment
  this define out.
@@ -229,17 +215,6 @@ define out. */
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 #if !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_SOLARIS_PLATFORM_)
 #define _IRR_OPENGL_USE_EXTPOINTER_
-#endif
-#endif
-
-//! Define _IRR_OGLES1_USE_EXTPOINTER_ if the OpenGL-ES 1.x driver should use extensions via function pointers.
-/** This should usually be enabled, but also depends on the specific
- architecture. You can simply uncomment the define and recompile.
- The iPhone does not have extension pointers, so disable it there always.
- */
-#ifdef _IRR_COMPILE_WITH_OGLES1_
-#if !defined(_IRR_IPHONE_PLATFORM_)
-#define _IRR_OGLES1_USE_EXTPOINTER_
 #endif
 #endif
 

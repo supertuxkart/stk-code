@@ -133,9 +133,6 @@ source/Irrlicht/COGLES2NormalMapRenderer.cpp
 source/Irrlicht/COGLES2ParallaxMapRenderer.cpp
 source/Irrlicht/COGLES2Renderer2D.cpp
 source/Irrlicht/COGLES2Texture.cpp
-source/Irrlicht/COGLESDriver.cpp
-source/Irrlicht/COGLESExtensionHandler.cpp
-source/Irrlicht/COGLESTexture.cpp
 source/Irrlicht/COpenGLDriver.cpp
 source/Irrlicht/COpenGLExtensionHandler.cpp
 source/Irrlicht/COpenGLParallaxMapRenderer.cpp
@@ -271,10 +268,6 @@ source/Irrlicht/COGLES2NormalMapRenderer.h
 source/Irrlicht/COGLES2ParallaxMapRenderer.h
 source/Irrlicht/COGLES2Renderer2D.h
 source/Irrlicht/COGLES2Texture.h
-source/Irrlicht/COGLESDriver.h
-source/Irrlicht/COGLESExtensionHandler.h
-source/Irrlicht/COGLESMaterialRenderer.h
-source/Irrlicht/COGLESTexture.h
 source/Irrlicht/COpenGLDriver.h
 source/Irrlicht/COpenGLExtensionHandler.h
 source/Irrlicht/COpenGLMaterialRenderer.h
