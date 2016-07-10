@@ -18,6 +18,7 @@
 #include "graphics/2dutils.hpp"
 #include "graphics/render_target.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/shader_based_renderer.hpp"
 
 
@@ -104,10 +105,17 @@ GL3RenderTarget::GL3RenderTarget(const irr::core::dimension2du &dimension,
     
     glGenTextures(1, &m_texture_id);
     glBindTexture(GL_TEXTURE_2D, m_texture_id);
-    if (CVS->isARBTextureStorageUsable())
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_SRGB8_ALPHA8, dimension.Width, dimension.Height);
+    
+    // Workaround a bug with srgb fbo on sandy bridge windows
+    if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, dimension.Width, dimension.Height, 0, GL_BGRA, GL_FLOAT, 0);    
     else
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, dimension.Width, dimension.Height, 0, GL_BGR, GL_UNSIGNED_BYTE, 0);    
+    {
+        if (CVS->isARBTextureStorageUsable())
+            glTexStorage2D(GL_TEXTURE_2D, 1, GL_SRGB8_ALPHA8, dimension.Width, dimension.Height);
+        else
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, dimension.Width, dimension.Height, 0, GL_BGR, GL_UNSIGNED_BYTE, 0);
+    }
     
     std::vector<GLuint> somevector;
     somevector.push_back(m_texture_id);

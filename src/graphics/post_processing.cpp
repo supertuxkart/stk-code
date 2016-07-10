@@ -21,6 +21,7 @@
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
 #include "graphics/render_target.hpp"
@@ -1398,7 +1399,15 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
                                     GL3RenderTarget *specified_render_target)
 {
     FrameBuffer *in_fbo = &rtts->getFBO(FBO_COLORS);
-    FrameBuffer *out_fbo = &rtts->getFBO(FBO_TMP1_WITH_DS);
+    FrameBuffer *out_fbo;
+
+    // Workaround a bug with srgb fbo on sandy bridge windows
+    if ((GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+        &&(specified_render_target != NULL))
+        out_fbo = specified_render_target->getFrameBuffer();
+    else
+        out_fbo = &rtts->getFBO(FBO_TMP1_WITH_DS);
+    
     // Each effect uses these as named, and sets them up for the next effect.
     // This allows chaining effects where some may be disabled.
 
@@ -1549,7 +1558,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     }
 
     // Workaround a bug with srgb fbo on sandy bridge windows
-    if (!CVS->isARBUniformBufferObjectUsable())
+    if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
         return in_fbo;
 
     glEnable(GL_FRAMEBUFFER_SRGB);
@@ -1560,8 +1569,8 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     
     out_fbo->bind();
     renderPassThrough(in_fbo->getRTT()[0],
-                                         out_fbo->getWidth(),
-                                         out_fbo->getHeight());
+                      out_fbo->getWidth(),
+                      out_fbo->getHeight());
     
 
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
