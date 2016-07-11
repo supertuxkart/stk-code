@@ -458,10 +458,10 @@ void IrrDriver::initDevice()
 
             if(m_device)
                 break;
-#if !defined(USE_GLES2)
-            params.DriverType    = video::EDT_OPENGL;
-#else
+#if defined(USE_GLES2)
             params.DriverType    = video::EDT_OGLES2;
+#else
+            params.DriverType    = video::EDT_OPENGL;
 #endif
 #if defined(ANDROID)
 			params.PrivateData = global_android_app;

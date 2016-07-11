@@ -1108,11 +1108,11 @@ void renderMeshes1stPass()
     }
 }   // renderMeshes1stPass
 
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<typename T, typename...Args>
 void renderInstancedMeshes1stPass(Args...args)
 {
-#if !defined(USE_GLES2)
     std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
     T::InstancedFirstPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
@@ -1133,14 +1133,12 @@ void renderInstancedMeshes1stPass(Args...args)
         T::InstancedFirstPassShader::getInstance()->setUniforms(args...);
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
     }
-#endif
 }   // renderInstancedMeshes1stPass
 
 // ----------------------------------------------------------------------------
 template<typename T, typename...Args>
 void multidraw1stPass(Args...args)
 {
-#if !defined(USE_GLES2)
     T::InstancedFirstPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     if (SolidPassCmd::getInstance()->Size[T::MaterialType])
@@ -1151,8 +1149,8 @@ void multidraw1stPass(Args...args)
             (int)SolidPassCmd::getInstance()->Size[T::MaterialType],
             sizeof(DrawElementsIndirectCommand));
     }
-#endif
 }   // multidraw1stPass
+#endif
 
 static core::vector3df windDir;
 
@@ -1247,11 +1245,11 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
     }
 }   // renderMeshes2ndPass
 
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<typename T, typename...Args>
 void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args...args)
 {
-#if !defined(USE_GLES2)
     std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
     T::InstancedSecondPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
@@ -1267,14 +1265,12 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
            (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i)
            * sizeof(DrawElementsIndirectCommand)));
     }
-#endif
 }   // renderInstancedMeshes2ndPass
 
 // ----------------------------------------------------------------------------
 template<typename T, typename...Args>
 void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
 {
-#if !defined(USE_GLES2)
     T::InstancedSecondPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                 T::Instance));
@@ -1291,8 +1287,8 @@ void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
             (int)SolidPassCmd::getInstance()->Size[T::MaterialType],
             (int)sizeof(DrawElementsIndirectCommand));
     }
-#endif
 }   // multidraw2ndPass
+#endif
 
 // ----------------------------------------------------------------------------
 void IrrDriver::renderSolidSecondPass()
@@ -1326,9 +1322,7 @@ void IrrDriver::renderSolidSecondPass()
         if (!glIsTextureHandleResidentARB(DepthHandle))
             glMakeTextureHandleResidentARB(DepthHandle);
     }
-#endif
 
-#if !defined(USE_GLES2)
     if (CVS->supportsIndirectInstancingRendering())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER,
                     SolidPassCmd::getInstance()->drawindirectcmd);
@@ -1421,11 +1415,11 @@ void IrrDriver::renderSolidSecondPass()
     }
 }   // renderSolidSecondPass
 
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<typename T>
 static void renderInstancedMeshNormals()
 {
-#if !defined(USE_GLES2)
     std::vector<GLMesh *> &meshes = T::InstancedList::getInstance()->SolidPass;
     NormalVisualizer::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
@@ -1436,14 +1430,12 @@ static void renderInstancedMeshNormals()
              (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i)
              * sizeof(DrawElementsIndirectCommand)));
     }
-#endif
 }   // renderInstancedMeshNormals
 
 // ----------------------------------------------------------------------------
 template<typename T>
 static void renderMultiMeshNormals()
 {
-#if !defined(USE_GLES2)
     NormalVisualizer::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, T::Instance));
     if (SolidPassCmd::getInstance()->Size[T::MaterialType])
@@ -1454,8 +1446,8 @@ static void renderMultiMeshNormals()
             (int)SolidPassCmd::getInstance()->Size[T::MaterialType],
             (int)sizeof(DrawElementsIndirectCommand));
     }
-#endif
 }   // renderMultiMeshNormals
+#endif
 
 // ----------------------------------------------------------------------------
 void IrrDriver::renderNormalsVisualisation()
@@ -1655,6 +1647,7 @@ void IrrDriver::renderTransparent()
     glDisable(GL_STENCIL_TEST);
 }   // renderTransparent
 
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<typename T, typename...uniforms>
 void drawShadow(const T *Shader, unsigned cascade, const GLMesh *mesh, uniforms... Args)
@@ -1720,7 +1713,6 @@ void renderShadow(unsigned cascade)
 template<typename T, typename...Args>
 void renderInstancedShadow(unsigned cascade, Args ...args)
 {
-#if !defined(USE_GLES2)
     T::InstancedShadowPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                           InstanceTypeShadow));
@@ -1737,14 +1729,12 @@ void renderInstancedShadow(unsigned cascade, Args ...args)
                                (const void*)((tmp)
                                * sizeof(DrawElementsIndirectCommand)));
     }   // for i
-#endif
 }   // renderInstancedShadow
 
 // ----------------------------------------------------------------------------
 template<typename T, typename...Args>
 static void multidrawShadow(unsigned i, Args ...args)
 {
-#if !defined(USE_GLES2)
     T::InstancedShadowPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                            InstanceTypeShadow));
@@ -1757,8 +1747,8 @@ static void multidrawShadow(unsigned i, Args ...args)
             (int)ShadowPassCmd::getInstance()->Size[i][T::MaterialType],
             sizeof(DrawElementsIndirectCommand));
     }
-#endif
 }   // multidrawShadow
+#endif
 
 // ----------------------------------------------------------------------------
 void IrrDriver::renderShadows()
@@ -1843,7 +1833,7 @@ void IrrDriver::renderShadows()
 }   // renderShadows
 
 
-
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<int...List>
 struct rsm_custom_unroll_args;
@@ -1898,7 +1888,6 @@ void drawRSM(const core::matrix4 & rsm_matrix)
 template<typename T, typename...Args>
 void renderRSMShadow(Args ...args)
 {
-#if !defined(USE_GLES2)
     T::InstancedRSMShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType, InstanceTypeRSM));
     auto t = T::InstancedList::getInstance()->RSM;
@@ -1913,14 +1902,12 @@ void renderRSMShadow(Args ...args)
            (const void*)((RSMPassCmd::getInstance()->Offset[T::MaterialType] + i)
            * sizeof(DrawElementsIndirectCommand)));
     }
-#endif
 }   // renderRSMShadow
 
 // ----------------------------------------------------------------------------
 template<typename T, typename... Args>
 void multidrawRSM(Args...args)
 {
-#if !defined(USE_GLES2)
     T::InstancedRSMShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                InstanceTypeRSM));
@@ -1933,12 +1920,13 @@ void multidrawRSM(Args...args)
             (int)RSMPassCmd::getInstance()->Size[T::MaterialType],
             sizeof(DrawElementsIndirectCommand));
     }
-#endif
 }   // multidrawRSM
+#endif
 
 // ----------------------------------------------------------------------------
 void IrrDriver::renderRSM()
 {
+#if !defined(USE_GLES2)
     if (getShadowMatrices()->isRSMMapAvail())
         return;
     ScopedGPUTimer Timer(getGPUTimer(Q_RSM));
@@ -1953,7 +1941,6 @@ void IrrDriver::renderRSM()
     drawRSM<DetailMat, 3, 1>(rsm_matrix);
     drawRSM<SplattingMat, 1>(rsm_matrix);
 
-#if !defined(USE_GLES2)
     if (CVS->supportsIndirectInstancingRendering())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER,
                      RSMPassCmd::getInstance()->drawindirectcmd);
@@ -1974,7 +1961,7 @@ void IrrDriver::renderRSM()
         renderRSMShadow<NormalMat>(rsm_matrix);
         renderRSMShadow<DetailMat>(rsm_matrix);
     }
-#endif
 
     getShadowMatrices()->setRSMMapAvail(true);
+#endif
 }   // renderRSM

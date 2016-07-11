@@ -201,9 +201,7 @@ void CentralVideoSettings::init()
                               GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
             m_need_srgb_visual_workaround = (param != GL_SRGB);
         }
-#endif
-
-#if defined(USE_GLES2)
+#else
         if (m_glsl == true)
         {
             hasArraysOfArrays = true;

@@ -130,6 +130,7 @@ public:
     }   // render
 };   // Gaussian3VBlurShader
 
+#if !defined(USE_GLES2)
 // ============================================================================
 class ComputeGaussian6VBlurShader : public TextureShader<ComputeGaussian6VBlurShader, 1,
                                                   core::vector2df,
@@ -139,13 +140,11 @@ public:
     GLuint m_dest_tu;
     ComputeGaussian6VBlurShader()
     {
-#if !defined(USE_GLES2)
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6v.comp");
         m_dest_tu = 1;
         assignUniforms("pixel", "weights");
         assignSamplerNames(0, "source", ST_BILINEAR_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
-#endif
     }   // ComputeGaussian6VBlurShader
 };   // ComputeGaussian6VBlurShader
 
@@ -158,13 +157,11 @@ public:
     GLuint m_dest_tu;
     ComputeGaussian6HBlurShader()
     {
-#if !defined(USE_GLES2)
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6h.comp");
         m_dest_tu = 1;
         assignUniforms("pixel", "weights");
         assignSamplerNames(0, "source",  ST_BILINEAR_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
-#endif
     }   // ComputeGaussian6HBlurShader
 };   // ComputeGaussian6HBlurShader
 
@@ -177,15 +174,14 @@ public:
     GLuint m_dest_tu;
     ComputeShadowBlurHShader()
     {
-#if !defined(USE_GLES2)
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowH.comp");
         m_dest_tu = 1;
         assignUniforms("pixel", "weights");
         assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
-#endif
     }   // ComputeShadowBlurHShader
 };   // ComputeShadowBlurHShader
+#endif
 
 // ============================================================================
 class Gaussian6HBlurShader : public TextureShader<Gaussian6HBlurShader, 1,
@@ -316,6 +312,7 @@ public:
                 int width, int height)
     {
 #if !defined(USE_GLES2)
+
         use();
         glBindSampler(m_dest_tu, 0);
         setTextureUnits(auxiliary.getRTT()[0],

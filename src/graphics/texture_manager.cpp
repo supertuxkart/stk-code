@@ -105,16 +105,14 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
         }
     }
 
+#if !defined(USE_GLES2)
     if (!CVS->isTextureCompressionEnabled())
     {
-#if !defined(USE_GLES2)
         if (srgb)
             internalFormat = (tex->hasAlpha()) ? GL_SRGB_ALPHA : GL_SRGB;
         else
-#endif
             internalFormat = (tex->hasAlpha()) ? GL_RGBA : GL_RGB;
     }
-#if !defined(USE_GLES2)
     else
     {
         if (srgb)
@@ -122,6 +120,8 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
         else
             internalFormat = (tex->hasAlpha()) ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
     }
+#else
+    internalFormat = (tex->hasAlpha()) ? GL_RGBA : GL_RGB;
 #endif
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, Format, GL_UNSIGNED_BYTE, (GLvoid *)data);
     glGenerateMipmap(GL_TEXTURE_2D);

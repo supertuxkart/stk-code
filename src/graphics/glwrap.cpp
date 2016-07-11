@@ -191,9 +191,7 @@ void initGL()
     GLenum err = glewInit();
     if (GLEW_OK != err)
         Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
-#endif
-
-#if defined(USE_GLES2)
+#else
     glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKKHRPROC)eglGetProcAddress("glDebugMessageCallbackKHR");
 #endif
 

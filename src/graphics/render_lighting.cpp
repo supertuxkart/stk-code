@@ -220,6 +220,7 @@ public:
     }   // render
 };   // ShadowedSunLightShaderESM
 
+#if !defined(USE_GLES2)
 // ============================================================================
 class RadianceHintsConstructionShader
     : public TextureShader<RadianceHintsConstructionShader, 3, core::matrix4,
@@ -228,7 +229,6 @@ class RadianceHintsConstructionShader
 public:
     RadianceHintsConstructionShader()
     {
-#if !defined(USE_GLES2)
         if (CVS->isAMDVertexShaderLayerUsable())
         {
             loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
@@ -245,7 +245,6 @@ public:
         assignSamplerNames(0, "ctex", ST_BILINEAR_FILTERED,
                            1, "ntex", ST_BILINEAR_FILTERED,
                            2, "dtex", ST_BILINEAR_FILTERED);
-#endif
     }   // RadianceHintsConstructionShader
 };   // RadianceHintsConstructionShader
 
@@ -259,7 +258,6 @@ class NVWorkaroundRadianceHintsConstructionShader
 public:
     NVWorkaroundRadianceHintsConstructionShader()
     {
-#if !defined(USE_GLES2)
         loadProgram(OBJECT,GL_VERTEX_SHADER,"slicedscreenquad_nvworkaround.vert",
                            GL_GEOMETRY_SHADER, "rhpassthrough.geom",
                            GL_FRAGMENT_SHADER, "rh.frag");
@@ -269,9 +267,9 @@ public:
         assignSamplerNames(0, "ctex", ST_BILINEAR_FILTERED,
                            1, "ntex", ST_BILINEAR_FILTERED,
                            2, "dtex", ST_BILINEAR_FILTERED);
-#endif
     }   // NVWorkaroundRadianceHintsConstructionShader
 };   // NVWorkaroundRadianceHintsConstructionShader
+#endif
 
 // ============================================================================
 class FogShader : public TextureShader<FogShader, 1, float, core::vector3df>
@@ -426,6 +424,7 @@ void IrrDriver::uploadLightingData()
 void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 {
     //RH
+#if !defined(USE_GLES2)
     if (CVS->isGlobalIlluminationEnabled() && hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
@@ -467,6 +466,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
             glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
         }
     }
+#endif
     getShadowMatrices()->updateSunOrthoMatrices();
     m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
     glClear(GL_COLOR_BUFFER_BIT);
