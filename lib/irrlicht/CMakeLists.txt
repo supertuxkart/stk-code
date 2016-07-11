@@ -53,8 +53,6 @@ endif()
 
 
 set(IRRLICHT_SOURCES
-source/Irrlicht/CAndroidAssetFileArchive.cpp
-source/Irrlicht/CAndroidAssetReader.cpp
 source/Irrlicht/CAnimatedMeshSceneNode.cpp
 source/Irrlicht/CAttributes.cpp
 source/Irrlicht/CB3DMeshFileLoader.cpp
@@ -106,7 +104,6 @@ source/Irrlicht/CImageLoaderPNG.cpp
 source/Irrlicht/CImageWriterBMP.cpp
 source/Irrlicht/CImageWriterJPG.cpp
 source/Irrlicht/CImageWriterPNG.cpp
-source/Irrlicht/CIrrDeviceAndroid.cpp
 source/Irrlicht/CIrrDeviceConsole.cpp
 source/Irrlicht/CIrrDeviceFB.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
@@ -186,8 +183,6 @@ source/Irrlicht/Irrlicht.cpp
 source/Irrlicht/irrXML.cpp
 source/Irrlicht/os.cpp
 source/Irrlicht/BuiltInFont.h
-source/Irrlicht/CAndroidAssetFileArchive.h
-source/Irrlicht/CAndroidAssetReader.h
 source/Irrlicht/CAnimatedMeshSceneNode.h
 source/Irrlicht/CAttributeImpl.h
 source/Irrlicht/CAttributes.h
@@ -241,7 +236,6 @@ source/Irrlicht/CImageLoaderPNG.h
 source/Irrlicht/CImageWriterBMP.h
 source/Irrlicht/CImageWriterJPG.h
 source/Irrlicht/CImageWriterPNG.h
-source/Irrlicht/CIrrDeviceAndroid.h
 source/Irrlicht/CIrrDeviceConsole.h
 source/Irrlicht/CIrrDeviceFB.h
 source/Irrlicht/CIrrDeviceLinux.h
