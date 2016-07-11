@@ -411,11 +411,11 @@
   which leads to crash with STK), but the fonts are to blame, what's the point of not
   using industry standard nowadays...
   -->
-  <font default="Ubuntu-R.ttf"
+  <font default="Cantarell-Regular.otf"
         default_fallback="FreeSans.ttf"
         cjk="wqy-microhei.ttf"
         ar="NotoNaskhArabicUI-Bold.ttf"
-        bold="Ubuntu-B.ttf"
+        bold="Cantarell-Bold.otf"
         bold_fallback="FreeSansBold.ttf"
         digit="SigmarOne.otf" />
 
