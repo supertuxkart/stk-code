@@ -35,12 +35,20 @@
 AbstractKart::AbstractKart(const std::string& ident,
                            int world_kart_id, int position,
                            const btTransform& init_transform,
-                           PerPlayerDifficulty difficulty)
+                           PerPlayerDifficulty difficulty,
+                           video::E_RENDER_TYPE rt)
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;
     m_kart_properties.reset(new KartProperties());
-    m_kart_properties->copyForPlayer(kart_properties_manager->getKart(ident));
+    const KartProperties* kp = kart_properties_manager->getKart(ident);
+    if (kp == NULL)
+    {
+        Log::warn("Abstract_Kart", "Unknown kart %s, fallback to tux",
+            ident.c_str());
+        kp = kart_properties_manager->getKart(std::string("tux"));
+    }
+    m_kart_properties->copyForPlayer(kp);
     m_difficulty = difficulty;
     m_kart_animation  = NULL;
     assert(m_kart_properties);
@@ -52,7 +60,7 @@ AbstractKart::AbstractKart(const std::string& ident,
     // released when the kart is deleted, but since the original
     // kart_model is stored in the kart_properties all the time,
     // there is no risk of a mesh being deleted to early.
-    m_kart_model  = m_kart_properties->getKartModelCopy();
+    m_kart_model  = m_kart_properties->getKartModelCopy(rt);
     m_kart_width  = m_kart_model->getWidth();
     m_kart_height = m_kart_model->getHeight();
     m_kart_length = m_kart_model->getLength();

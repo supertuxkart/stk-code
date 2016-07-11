@@ -50,6 +50,7 @@ ConnectToServer::ConnectToServer() : Protocol(PROTOCOL_CONNECTION)
     m_host_id    = 0;
     m_quick_join = true;
     m_server_address.clear();
+    setHandleConnections(true);
 }   // ConnectToServer()
 
 // ----------------------------------------------------------------------------
@@ -65,7 +66,7 @@ ConnectToServer::ConnectToServer(uint32_t server_id, uint32_t host_id)
     m_quick_join = false;
     const Server *server = ServersManager::get()->getServerByID(server_id);
     m_server_address.copy(server->getAddress());
-
+    setHandleConnections(true);
 }   // ConnectToServer(server, host)
 
 // ----------------------------------------------------------------------------
@@ -182,7 +183,8 @@ void ConnectToServer::asynchronousUpdate()
                     return;
                 }
                 if (m_server_address.getIP() 
-                      == NetworkConfig::get()->getMyAddress().getIP())
+                      == NetworkConfig::get()->getMyAddress().getIP() ||
+                      NetworkConfig::get()->isLAN())
                 {
                     // We're in the same lan (same public ip address).
                     // The state will change to CONNECTING
@@ -377,10 +379,19 @@ void ConnectToServer::handleSameLAN()
     const int LEN=256;
     char buffer[LEN];
     int len = host->receiveRawPacket(buffer, LEN, &sender, 2000);
+    if(len<0)
+    {
+        Log::warn("ConnectToServer",
+                  "Received invalid server information message.");
+        return;
+    }
 
+    BareNetworkString message(buffer, len);
+    std::string received;
+    message.decodeString(&received);
     host->startListening(); // start listening again
-    const char data[] = "aloha_stk\0";
-    if (strcmp(data, buffer) == 0)
+    std::string aloha("aloha_stk");
+    if (received==aloha)
     {
         Log::info("ConnectToServer", "LAN Server found : %s",
                    sender.toString().c_str());

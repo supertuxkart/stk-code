@@ -23,8 +23,10 @@
 #define STK_HOST_HPP
 
 #include "network/network.hpp"
+#include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/servers_manager.hpp"
+#include "network/stk_peer.hpp"
 #include "network/transport_address.hpp"
 #include "utils/synchronised.hpp"
 
@@ -40,7 +42,6 @@
 
 class GameSetup;
 class NetworkConsole;
-class STKPeer;
 
 class STKHost
 {
@@ -111,6 +112,10 @@ private:
     void handleLANRequests();
 
 public:
+    /** If a network console should be started. Note that the console can cause
+    *  a crash in release mode on windows (see #1529). */
+    static bool m_enable_console;
+
 
     /** Creates the STKHost. It takes all confifguration parameters from
      *  NetworkConfig. This STKHost can either be a client or a server.
@@ -145,9 +150,8 @@ public:
     void requestShutdown();
     void shutdown();
 
-    void sendMessage(const NetworkString& data, bool reliable = true);
     void sendPacketExcept(STKPeer* peer,
-                          const NetworkString& data,
+                          NetworkString *data,
                           bool reliable = true);
     void        setupClient(int peer_count, int channel_limit,
                             uint32_t max_incoming_bandwidth,
@@ -158,6 +162,7 @@ public:
     void        removePeer(const STKPeer* peer);
     bool        isConnectedTo(const TransportAddress& peer_address);
     STKPeer    *getPeer(ENetPeer *enet_peer);
+    std::vector<NetworkPlayerProfile*> getMyPlayerProfiles();
     int         mustStopListening();
     uint16_t    getPort() const;
     void        setErrorMessage(const irr::core::stringw &message);
@@ -181,17 +186,10 @@ public:
     }   // receiveRawPacket
 
     // --------------------------------------------------------------------
-    void broadcastPacket(const NetworkString& data,
-                         bool reliable = true)
-    {
-        m_network->broadcastPacket(data, reliable);
-    }   // broadcastPacket
-
-    // --------------------------------------------------------------------
-    void sendRawPacket(uint8_t* data, int length,
+    void sendRawPacket(const BareNetworkString &buffer,
                        const TransportAddress& dst)
     {
-        m_network->sendRawPacket(data, length, dst);
+        m_network->sendRawPacket(buffer, dst);
     }  // sendRawPacket
 
     // --------------------------------------------------------------------
@@ -234,6 +232,12 @@ public:
     /** Returns the host id of this host. */
     uint8_t getMyHostId() const { return m_host_id; }
     // --------------------------------------------------------------------
+    /** Sends a message from a client to the server. */
+    void sendToServer(NetworkString *data, bool reliable = true)
+    {
+        assert(NetworkConfig::get()->isClient());
+        m_peers[0]->sendPacket(data, reliable);
+    }   // sendToServer
 };   // class STKHost
 
 #endif // STK_HOST_HPP

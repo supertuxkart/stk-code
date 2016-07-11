@@ -21,6 +21,7 @@
 #include <sstream>
 
 #include "challenges/unlock_manager.hpp"
+#include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -28,6 +29,7 @@
 #include "race/grand_prix_data.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
+#include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 
@@ -41,6 +43,7 @@ ChallengeData::ChallengeData(const std::string& filename)
     m_gp_id        = "";
     m_version      = 0;
     m_num_trophies = 0;
+    m_is_ghost_replay = false;
 
     for (int d=0; d<RaceManager::DIFFICULTY_COUNT; d++)
     {
@@ -174,6 +177,13 @@ ChallengeData::ChallengeData(const std::string& filename)
         int num_karts = -1;
         if (!karts_node->get("number", &num_karts)) error("karts");
         m_num_karts[d] = num_karts;
+
+        std::string replay_file;
+        if (karts_node->get("replay_file", &replay_file))
+        {
+            m_is_ghost_replay = true;
+            m_replay_files[d] = replay_file;
+        }
 
         std::string ai_kart_ident;
         if (karts_node->get("aiIdent", &ai_kart_ident))
@@ -385,6 +395,16 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
         race_manager->setDifficulty(d);
         race_manager->setNumKarts(m_num_karts[d]);
         race_manager->setNumPlayers(1);
+    }
+
+    if (m_is_ghost_replay)
+    {
+        const bool result = ReplayPlay::get()->addReplayFile(file_manager
+            ->getAsset(FileManager::CHALLENGE, m_replay_files[d]),
+            true/*custom_replay*/);
+        if (!result)
+            Log::fatal("ChallengeData", "Can't open replay for challenge!");
+        race_manager->setRaceGhostKarts(true);
     }
 
     if (m_ai_kart_ident[d] != "")

@@ -302,6 +302,7 @@ void Skybox::generateSpecularCubemap()
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);
+    glActiveTexture(GL_TEXTURE0);
 #endif
 }   // generateSpecularCubemap
 

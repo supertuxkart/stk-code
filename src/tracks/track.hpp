@@ -57,11 +57,11 @@ class MusicInformation;
 class ParticleEmitter;
 class ParticleKind;
 class PhysicalObject;
+class TrackObject;
 class TrackObjectManager;
 class TriangleMesh;
 class World;
 class XMLNode;
-class TrackObject;
 
 namespace Scripting
 {
@@ -381,7 +381,7 @@ private:
 
     void loadTrackInfo();
     void loadQuadGraph(unsigned int mode_id, const bool reverse);
-    void loadBattleGraph();
+    void loadBattleGraph(const XMLNode &node);
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
     void loadMinimap();
@@ -395,6 +395,11 @@ public:
 
     bool reverseAvailable() const { return m_reverse_available; }
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
+
+    /** Flag to avoid loading navmeshes (useful to speedup debugging: e.g.
+     *  the temple navmesh distance matric computation takes around 12
+     *  minutes(!) in debug mode to be computed. */
+    static bool        m_dont_load_navmesh;
 
     static const float NOHIT;
 

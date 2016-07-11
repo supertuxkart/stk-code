@@ -954,9 +954,9 @@ namespace GUIEngine
         //if (g_skin != NULL) delete g_skin;
         g_skin = NULL;
 
-        g_ft_env->~FTEnvironment();
+        delete g_ft_env;
         g_ft_env = NULL;
-        g_gp_creator->~GlyphPageCreator();
+        delete g_gp_creator;
         g_gp_creator = NULL;
 
         for (unsigned int i=0; i<g_loaded_screens.size(); i++)

@@ -152,8 +152,12 @@ void GraphStructure::createMesh(bool show_invisible,
             c.setBlue((i%2) ? 0 : 255);
         }
 
+        NodeColor nc = COLOR_RED;
+        const bool different_color = differentNodeColor(count, &nc);
         // Transfer the 4 points of the current quad to the list of vertices
-        set3DVerticesOfGraph(count, new_v+4*i, c);
+        set3DVerticesOfGraph(count, new_v+4*i, (different_color ?
+            (nc == COLOR_RED ? video::SColor(255, 255, 0, 0) :
+            video::SColor(255, 0, 0, 255)) : c));
 
         // Set up the indices for the triangles
         // (note, afaik with opengl we could use quads directly, but the code

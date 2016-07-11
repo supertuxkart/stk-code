@@ -93,7 +93,7 @@ namespace Scripting
         FILE *f = fopen(script_path.c_str(), "rb");
         if (f == NULL)
         {
-            Log::debug("Scripting", "File does not exist : {0}", script_path.c_str());
+            Log::debug("Scripting", "File does not exist : %s", script_path.c_str());
             return "";
         }
 

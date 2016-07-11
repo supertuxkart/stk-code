@@ -42,9 +42,13 @@ ConnectToPeer::ConnectToPeer(uint32_t peer_id)  : Protocol(PROTOCOL_CONNECTION)
     m_state            = NONE;
     m_current_protocol = NULL;
     m_is_lan           = false;
+    setHandleConnections(true);
 }   // ConnectToPeer(peer_id)
 
 // ----------------------------------------------------------------------------
+/** Constructor for a LAN connection.
+ *  \param address The address to connect to.
+ */
 ConnectToPeer::ConnectToPeer(const TransportAddress &address)
              : Protocol(PROTOCOL_CONNECTION)
 {
@@ -54,6 +58,7 @@ ConnectToPeer::ConnectToPeer(const TransportAddress &address)
     m_state            = RECEIVED_PEER_ADDRESS;
     m_current_protocol = NULL;
     m_is_lan           = true;
+    setHandleConnections(true);
 }   // ConnectToPeers(TransportAddress)
 
 // ----------------------------------------------------------------------------
@@ -141,14 +146,14 @@ void ConnectToPeer::asynchronousUpdate()
             else
                 broadcast_address.copy(m_peer_address);
 
-            char data[] = "aloha_stk\0";
-            STKHost::get()->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
+            BareNetworkString aloha(std::string("aloha_stk"));
+            STKHost::get()->sendRawPacket(aloha, broadcast_address);
             Log::info("ConnectToPeer", "Broadcast aloha sent.");
             StkTime::sleep(1);
 
             broadcast_address.setIP(0x7f000001); // 127.0.0.1 (localhost)
             broadcast_address.setPort(m_peer_address.getPort());
-            STKHost::get()->sendRawPacket((uint8_t*)(data), 10, broadcast_address);
+            STKHost::get()->sendRawPacket(aloha, broadcast_address);
             Log::info("ConnectToPeer", "Broadcast aloha to self.");
             m_state = CONNECTING;
             break;

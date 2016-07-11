@@ -152,9 +152,9 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
         {
             Network *broadcast = new Network(1, 1, 0, 0);
 
-            NetworkString s(std::string("stk-server"));
+            BareNetworkString s(std::string("stk-server"));
             TransportAddress broadcast_address(-1, 2757);
-            broadcast->sendRawPacket(s.getBytes(), s.size(), broadcast_address);
+            broadcast->sendRawPacket(s, broadcast_address);
 
             Log::info("ServersManager", "Sent broadcast message.");
 
@@ -170,23 +170,29 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                 int len = broadcast->receiveRawPacket(buffer, LEN, &sender, 1);
                 if(len>0)
                 {
-                    NetworkString s(buffer, len);
+                    BareNetworkString s(buffer, len);
                     irr::core::stringw name;
-                    // name_len is the number of bytes read
-                    uint8_t bytes_read = s.decodeStringW(0, &name);
-                    uint8_t max_players = s.getUInt8(bytes_read  );
-                    uint8_t players     = s.getUInt8(bytes_read+1);
-                    uint32_t my_ip      = s.getUInt32(bytes_read+2);
-                    uint32_t my_port    = s.getUInt16(bytes_read+6);
-                    ServersManager::get()
-                          ->addServer(new Server(name, /*lan*/true,
-                                                 max_players, players, 
-                                                 sender)               );
+                    // bytes_read is the number of bytes read
+                    uint8_t bytes_read  = s.decodeStringW(&name);
+                    uint8_t max_players = s.getUInt8();
+                    uint8_t players     = s.getUInt8();
+                    uint32_t my_ip      = s.getUInt32();
+                    uint16_t my_port    = s.getUInt16();
+                    uint16_t mode       = s.getUInt16();
+                    uint8_t difficulty  = s.getUInt8();
+                    Server* server = new Server(name, /*lan*/true,
+                        max_players, players, sender);
+                    server->setDifficulty((RaceManager::Difficulty)difficulty);
+                    server->setRaceMinorMode((RaceManager::MinorRaceModeType)mode);
+                    ServersManager::get()->addServer(server);
+
                     TransportAddress me(my_ip, my_port);
                     NetworkConfig::get()->setMyAddress(me);
                     m_success = true;
                 }   // if received_data
             }    // while still waiting
+			if (!m_success)
+				m_info = _("No LAN server detected");
         }   // operation
         // --------------------------------------------------------------------
         /** This function is necessary, otherwise the XML- and HTTP-Request

@@ -286,8 +286,8 @@ private:
     bool                 m_boundingboxesviz;
     /** Performance stats */
     unsigned             m_last_light_bucket_distance;
-    unsigned             object_count[PASS_COUNT];
-    unsigned             poly_count[PASS_COUNT];
+    unsigned             m_object_count[PASS_COUNT];
+    unsigned             m_poly_count[PASS_COUNT];
     u32                  m_renderpass;
     class STKMeshSceneNode *m_sun_interposer;
     core::vector3df m_sun_direction;
@@ -353,7 +353,8 @@ public:
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
-    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig);
+    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig,
+                                           video::E_RENDER_TYPE rt);
     video::ITexture      *applyMask(video::ITexture* texture,
                                     const std::string& mask_path);
     void displayFPS();

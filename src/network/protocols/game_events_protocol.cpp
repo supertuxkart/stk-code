@@ -44,13 +44,12 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         Log::warn("GameEventsProtocol", "Too short message.");
         return true;
     }
-    if ( event->getPeer()->getClientServerToken() != data.gui32())
+    if ( event->getPeer()->getClientServerToken() != data.getUInt32())
     {
         Log::warn("GameEventsProtocol", "Bad token.");
         return true;
     }
-    int8_t type = data.gui8(4);
-    data.removeFront(5);
+    int8_t type = data.getUInt8();
     switch (type)
     {
         case GE_ITEM_COLLECTED:
@@ -65,16 +64,6 @@ bool GameEventsProtocol::notifyEvent(Event* event)
 }   // notifyEvent
 
 // ----------------------------------------------------------------------------
-void GameEventsProtocol::setup()
-{
-}   // setup
-
-// ----------------------------------------------------------------------------
-void GameEventsProtocol::update()
-{
-}   // update
-
-// ----------------------------------------------------------------------------
 /** Called on the server when an item is collected.
  */
 void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
@@ -85,8 +74,8 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     for (unsigned int i = 0; i < peers.size(); i++)
     {
-        NetworkString ns(11);
-        ns.ai32(peers[i]->getClientServerToken());
+        NetworkString *ns = getNetworkString(7);
+        ns->setSynchronous(true);
         // Item picked : send item id, powerup type and kart race id
         uint8_t powerup = 0;
         if (item->getType() == Item::ITEM_BANANA)
@@ -95,11 +84,10 @@ void GameEventsProtocol::collectedItem(Item* item, AbstractKart* kart)
             powerup = (((int)(kart->getPowerup()->getType()) << 4) & 0xf0) 
                            + (kart->getPowerup()->getNum()         & 0x0f);
 
-        ns.ai8(GE_ITEM_COLLECTED).ai32(item->getItemId()).ai8(powerup)
-          .ai8(kart->getWorldKartId());
-        ProtocolManager::getInstance()->sendMessage(this, peers[i], ns,
-                                                    /*reliable*/true,
-                                                    /*synchronous*/true);
+        ns->addUInt8(GE_ITEM_COLLECTED).addUInt32(item->getItemId())
+           .addUInt8(powerup).addUInt8(kart->getWorldKartId());
+        peers[i]->sendPacket(ns, /*reliable*/true);
+        delete ns;
         Log::info("GameEventsProtocol",
                   "Notified a peer that a kart collected item %d.",
                   (int)(kart->getPowerup()->getType()));
@@ -115,9 +103,9 @@ void GameEventsProtocol::collectedItem(const NetworkString &data)
     {
             Log::warn("GameEventsProtocol", "Too short message.");
         }
-        uint32_t item_id = data.gui32();
-        uint8_t powerup_type = data.gui8(4);
-        uint8_t kart_id = data.gui8(5);
+        uint32_t item_id = data.getUInt32();
+        uint8_t powerup_type = data.getUInt8();
+        uint8_t kart_id = data.getUInt8();
         // now set the kart powerup
         AbstractKart* kart = World::getWorld()->getKart(kart_id);
         ItemManager::get()->collectedItem(ItemManager::get()->getItem(item_id),
@@ -134,19 +122,12 @@ void GameEventsProtocol::collectedItem(const NetworkString &data)
  */
 void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
 {
-    NetworkString ns(20);
-
-    const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
-    for (unsigned int i = 0; i < peers.size(); i++)
-    {
-        ns.addUInt32(peers[i]->getClientServerToken())
-          .addUInt8(GE_KART_FINISHED_RACE)
-          .addUInt8(kart->getWorldKartId()).addFloat(time);
-
-        ProtocolManager::getInstance()->sendMessage(this, peers[i], ns,
-                                                    /*reliable*/true,
-                                                    /*synchronous*/true);
-    }   // for i in peers
+    NetworkString *ns = getNetworkString(20);
+    ns->setSynchronous(true);
+    ns->addUInt8(GE_KART_FINISHED_RACE).addUInt8(kart->getWorldKartId())
+       .addFloat(time);
+    sendMessageToPeersChangingToken(ns, /*reliable*/true);
+    delete ns;
 }   // kartFinishedRace
 
 // ----------------------------------------------------------------------------
@@ -156,8 +137,8 @@ void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
  */
 void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
 {
-    uint8_t kart_id = ns.getUInt8(0);
-    float time      = ns.getFloat(1);
+    uint8_t kart_id = ns.getUInt8();
+    float time      = ns.getFloat();
     World::getWorld()->getKart(kart_id)->finishedRace(time,
                                                       /*from_server*/true);
 }   // kartFinishedRace

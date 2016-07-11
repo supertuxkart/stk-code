@@ -25,14 +25,13 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/stk_host.hpp"
-#include "race/grand_prix_data.hpp"
-#include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
-#include "states_screens/gp_info_screen.hpp"
+#include "states_screens/waiting_for_others.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -95,8 +94,16 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                                    ->getProtocol(PROTOCOL_LOBBY_ROOM);
                 ClientLobbyRoomProtocol* clrp =
                               static_cast<ClientLobbyRoomProtocol*>(protocol);
-                clrp->voteTrack(selection);
-
+                // FIXME SPLITSCREEN: we need to supply the global player id of the
+                // player selecting the track here. For now ... just vote the same
+                // track for each local player.
+                std::vector<NetworkPlayerProfile*> players =
+                                         STKHost::get()->getMyPlayerProfiles();
+                for(unsigned int i=0; i<players.size(); i++)
+                {
+                    clrp->voteTrack(players[i]->getGlobalPlayerId(),selection);
+                }
+                WaitingForOthersScreen::getInstance()->push();
             }
             else
             {
@@ -106,31 +113,6 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         }   // if clicked_track
 
     }   // name=="tracks"
-    else if (name == "gps")
-    {
-        DynamicRibbonWidget* gps_widget = dynamic_cast<DynamicRibbonWidget*>(widget);
-        const std::string &selection =
-                       gps_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-
-        if (selection == "locked" && race_manager->getNumLocalPlayers()==1)
-        {
-            unlock_manager->playLockSound();
-        }
-        else
-        {
-            if(STKHost::existHost())
-            {
-                Log::warn("TracksScreen",
-                          "FIXME: for now do not select a grand prix.");
-            }
-            else
-            {
-                GPInfoScreen *gpis = GPInfoScreen::getInstance();
-                gpis->setGP(selection);
-                gpis->push();
-            }
-        }
-    }
     else if (name == "trackgroups")
     {
         RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
@@ -160,15 +142,6 @@ void TracksScreen::beforeAddingWidget()
         tabs->addTextChild( _("All"), ALL_TRACK_GROUPS_ID );
     }
 
-    // Make group names being picked up by gettext
-#define FOR_GETTEXT_ONLY(x)
-    //I18N: track group name
-    FOR_GETTEXT_ONLY( _("all") )
-    //I18N: track group name
-    FOR_GETTEXT_ONLY( _("standard") )
-    //I18N: track group name
-    FOR_GETTEXT_ONLY( _("Add-Ons") )
-
     // add behind the other categories
     for (int n=0; n<group_amount; n++)
         tabs->addTextChild( _(groups[n].c_str()), groups[n] );
@@ -181,63 +154,8 @@ void TracksScreen::beforeAddingWidget()
 
 void TracksScreen::init()
 {
-    DynamicRibbonWidget* gps_widget    = getWidget<DynamicRibbonWidget>("gps");
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
-
-    // Reset GP list everytime (accounts for locking changes, etc.)
-    gps_widget->clearItems();
-    gps_widget->setMaxLabelLength(30);
-
-    // Ensure that no GP and no track is NULL
-    grand_prix_manager->checkConsistency();
-
-    // Build GP list
-    const int gpAmount = grand_prix_manager->getNumberOfGrandPrix();
-    for (int n=0; n<gpAmount; n++)
-    {
-        const GrandPrixData* gp = grand_prix_manager->getGrandPrix(n);
-        const std::vector<std::string> tracks = gp->getTrackNames(true);
-
-        //Skip epmpty GPs
-        if (gp->getNumberOfTracks()==0)
-            continue;
-
-        std::vector<std::string> screenshots;
-        for (unsigned int t=0; t<tracks.size(); t++)
-        {
-            const Track* curr = track_manager->getTrack(tracks[t]);
-            screenshots.push_back(curr->getScreenshotFile());
-        }
-        assert(screenshots.size() > 0);
-
-        if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()) && 
-            race_manager->getNumLocalPlayers() == 1)
-        {
-            gps_widget->addAnimatedItem(_("Locked!"), "locked",
-                                        screenshots, 1.5f,
-                                        LOCKED_BADGE | TROPHY_BADGE,
-                                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-        }
-        else
-        {
-            gps_widget->addAnimatedItem(translations->fribidize(gp->getName()),
-                                        gp->getId(), screenshots, 1.5f,
-                                        TROPHY_BADGE,
-                                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-        }
-    }
-
-    // Random GP
-    std::vector<std::string> screenshots;
-    screenshots.push_back(file_manager->getAsset(FileManager::GUI, "main_help.png"));
-    gps_widget->addAnimatedItem(translations->fribidize(GrandPrixData::getRandomGPName()),
-                                GrandPrixData::getRandomGPID(),
-                                screenshots, 1.5f, 0,
-                                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-
-    gps_widget->updateItemDisplay();
-
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->select(UserConfigParams::m_last_used_track_group, PLAYER_ID_GAME_MASTER);
@@ -257,7 +175,7 @@ void TracksScreen::init()
 }   // init
 
 // -----------------------------------------------------------------------------
-/** Rebuild the list of tracks and GPs. This need to be recomputed e.g. to
+/** Rebuild the list of tracks. This need to be recomputed e.g. to
  *  take unlocked tracks into account.
  */
 void TracksScreen::buildTrackList()
@@ -271,6 +189,14 @@ void TracksScreen::buildTrackList()
 
     const std::string& curr_group_name = tabs->getSelectionIDString(0);
 
+    if (!(curr_group_name == DEFAULT_GROUP_NAME ||
+        curr_group_name == ALL_TRACK_GROUPS_ID) && m_offical_track)
+    {
+        tracks_widget->setText(_("Only official tracks are supported."));
+        tracks_widget->updateItemDisplay();
+        return;
+    }
+
     const int track_amount = (int)track_manager->getNumberOfTracks();
 
     // First build a list of all tracks to be displayed
@@ -283,18 +209,20 @@ void TracksScreen::buildTrackList()
             && !curr->hasEasterEggs())
             continue;
         if (curr->isArena() || curr->isSoccer()||curr->isInternal()) continue;
+        if (m_offical_track && !curr->isInGroup(DEFAULT_GROUP_NAME)) continue;
         if (curr_group_name != ALL_TRACK_GROUPS_ID &&
             !curr->isInGroup(curr_group_name)) continue;
 
         tracks.push_back(curr);
     }   // for n<track_amount
 
+	bool is_network = (STKHost::existHost());
     tracks.insertionSort();
     for (unsigned int i = 0; i < tracks.size(); i++)
     {
         Track *curr = tracks.get(i);
         if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()) &&
-            race_manager->getNumLocalPlayers() == 1)
+            race_manager->getNumLocalPlayers() == 1 && !is_network)
         {
             tracks_widget->addItem(
                 _("Locked: solve active challenges to gain access to more!"),
@@ -329,16 +257,5 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
     // so it's safe to use 'PLAYER_ID_GAME_MASTER'
     tracks_widget->setSelection(trackName, PLAYER_ID_GAME_MASTER, true);
 }   // setFocusOnTrack
-
-// -----------------------------------------------------------------------------
-
-void TracksScreen::setFocusOnGP(const std::string& gpName)
-{
-    DynamicRibbonWidget* gps_widget = getWidget<DynamicRibbonWidget>("gps");
-
-    // only the game master can select tracks/GPs,
-    // so it's safe to use 'PLAYER_ID_GAME_MASTER'
-    gps_widget->setSelection(gpName, PLAYER_ID_GAME_MASTER, true);
-}   // setFocusOnGP
 
 // -----------------------------------------------------------------------------

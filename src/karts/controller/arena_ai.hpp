@@ -28,12 +28,6 @@
 #include "graphics/irr_driver.hpp"
 #endif
 
-#if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
-#define isnan _isnan
-#else
-#include <math.h>
-#endif
-
 class Vec3;
 
 namespace irr
@@ -62,6 +56,7 @@ protected:
     /** For debugging purpose: a sphere indicating where the AI
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
+    irr::scene::ISceneNode *m_debug_sphere_next;
 
     /** The node(poly) at which the target point lies in. */
     int m_target_node;
@@ -69,7 +64,10 @@ protected:
     /** The target point. */
     Vec3 m_target_point;
 
-    void         collectItemInArena(Vec3*, int*) const;
+    bool m_avoiding_banana;
+
+    void  collectItemInArena(Vec3*, int*) const;
+    float findAngleFrom3Edges(float a, float b, float c);
 private:
     /** Used by handleArenaUTurn, it tells whether to do left or right
      *  turning when steering is overridden. */
@@ -87,15 +85,7 @@ private:
 
     /** Holds the unique node ai has driven through, useful to tell if AI is
      *  stuck by determine the size of this set. */
-    std::set <int> m_on_node;
-
-    /** Holds the corner points computed using the funnel algorithm that the AI
-     *  will eventaully move through. See stringPull(). */
-    std::vector<Vec3> m_path_corners;
-
-    /** Holds the set of portals that the kart will cross when moving through
-     *  polygon channel. See findPortals(). */
-    std::vector<std::pair<Vec3,Vec3> > m_portals;
+    std::set<int> m_on_node;
 
     /** Time an item has been collected and not used. */
     float m_time_since_last_shot;
@@ -109,22 +99,35 @@ private:
     /** This is a timer that counts down when the kart is doing u-turn. */
     float m_time_since_uturn;
 
+    float m_turn_radius;
+    float m_turn_angle;
+
+    Vec3 m_current_forward_point;
+    int m_current_forward_node;
+
+    std::set<int> m_aiming_nodes;
+    std::vector<Vec3> m_aiming_points;
+
     void         checkIfStuck(const float dt);
-    float        determineTurnRadius(std::vector<Vec3>& points);
-    void         findPortals(int start, int end);
     void         handleArenaAcceleration(const float dt);
-    void         handleArenaBanana();
     void         handleArenaBraking();
     void         handleArenaItems(const float dt);
     void         handleArenaSteering(const float dt);
     void         handleArenaUTurn(const float dt);
     bool         handleArenaUnstuck(const float dt);
-    void         stringPull(const Vec3&, const Vec3&);
+    bool         updateAimingPosition();
+    void         updateBananaLocation();
+    void         updateTurnRadius(const Vec3& p1, const Vec3& p2,
+                                  const Vec3& p3);
     virtual int  getCurrentNode() const = 0;
     virtual bool isWaiting() const = 0;
+    virtual void resetAfterStop() {};
     virtual void findClosestKart(bool use_difficulty) = 0;
     virtual void findTarget() = 0;
+    virtual bool forceBraking() { return m_avoiding_banana; }
+    virtual bool ignorePathFinding() { return false; }
 public:
+    static int   m_test_node_for_banana;
                  ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};
     virtual void update      (float delta);

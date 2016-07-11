@@ -966,6 +966,21 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
 #endif
 
+
+    if (race_manager->getReverseTrack() &&
+        m_mirror_axis_when_reverse != ' ')
+    {
+        irr::video::S3DVertex* mbVertices = (video::S3DVertex*)mb->getVertices();
+        for (unsigned int i = 0; i < mb->getVertexCount(); i++)
+        {
+            core::vector2df &tc = mb->getTCoords(i);
+            if (m_mirror_axis_when_reverse == 'V')
+                tc.Y = 1 - tc.Y;
+            else
+                tc.X = 1 - tc.X;
+        }
+    }   // reverse track and texture needs mirroring
+
 } // setMaterialProperties
 
 //-----------------------------------------------------------------------------

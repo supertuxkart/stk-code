@@ -20,6 +20,7 @@
 
 #include "main_loop.hpp"
 #include "network/network_config.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
@@ -101,49 +102,67 @@ void* NetworkConsole::mainLoop(void* data)
             Protocol* protocol =
                 ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM);
             ClientLobbyRoomProtocol* clrp = static_cast<ClientLobbyRoomProtocol*>(protocol);
-            clrp->requestKartSelection(str2);
+            std::vector<NetworkPlayerProfile*> players =
+                                         STKHost::get()->getMyPlayerProfiles();
+            // For now send a vote for each local player
+            for(unsigned int i=0; i<players.size(); i++)
+            {
+                clrp->requestKartSelection(players[i]->getGlobalPlayerId(),
+                                           str2);
+            }   // for i in players
         }
         else if (str == "vote" && NetworkConfig::get()->isClient())
         {
             std::cout << "Vote for ? (track/laps/reversed/major/minor/race#) :";
             std::string str2;
             getline(std::cin, str2);
-            Protocol* protocol = ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM);
-            ClientLobbyRoomProtocol* clrp = static_cast<ClientLobbyRoomProtocol*>(protocol);
+            Protocol* protocol = ProtocolManager::getInstance()
+                               ->getProtocol(PROTOCOL_LOBBY_ROOM);
+            ClientLobbyRoomProtocol* clrp = 
+                static_cast<ClientLobbyRoomProtocol*>(protocol);
+            std::vector<NetworkPlayerProfile*> players =
+                                     STKHost::get()->getMyPlayerProfiles();
             if (str2 == "track")
             {
                 std::cin >> str2;
-                clrp->voteTrack(str2);
+                // For now send a vote for each local player
+                for(unsigned int i=0; i<players.size(); i++)
+                    clrp->voteTrack(i, str2);
             }
             else if (str2 == "laps")
             {
                 int cnt;
                 std::cin >> cnt;
-                clrp->voteLaps(cnt);
+                for(unsigned int i=0; i<players.size(); i++)
+                    clrp->voteLaps(i, cnt);
             }
             else if (str2 == "reversed")
             {
                 bool cnt;
                 std::cin >> cnt;
-                clrp->voteReversed(cnt);
+                for(unsigned int i=0; i<players.size(); i++)
+                    clrp->voteReversed(i, cnt);
             }
             else if (str2 == "major")
             {
                 int cnt;
                 std::cin >> cnt;
-                clrp->voteMajor(cnt);
+                for(unsigned int i=0; i<players.size(); i++)
+                    clrp->voteMajor(i, cnt);
             }
             else if (str2 == "minor")
             {
                 int cnt;
                 std::cin >> cnt;
-                clrp->voteMinor(cnt);
+                for(unsigned int i=0; i<players.size(); i++)
+                    clrp->voteMinor(i, cnt);
             }
             else if (str2 == "race#")
             {
                 int cnt;
                 std::cin >> cnt;
-                clrp->voteRaceCount(cnt);
+                for(unsigned int i=0; i<players.size(); i++)
+                    clrp->voteRaceCount(i, cnt);
             }
             std::cout << "\n";
         }
@@ -175,9 +194,3 @@ void NetworkConsole::kickAllPlayers()
         peers[i]->disconnect();
     }
 }   // kickAllPlayers
-
-// ----------------------------------------------------------------------------
-void NetworkConsole::sendPacket(const NetworkString& data, bool reliable)
-{
-    m_localhost->broadcastPacket(data, reliable);
-}   // sendPacket

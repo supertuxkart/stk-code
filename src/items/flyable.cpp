@@ -317,7 +317,14 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
                * (dx * cosf(target_kart_heading) -
                   dz * sinf(target_kart_heading)   );
 
-    float fire_th = (dx*dist - dz * sqrtf(dx*dx + dz*dz - dist*dist))
+    float f = dx*dx + dz*dz - dist*dist;
+    // Avoid negative square root
+    if(f>0)
+        f = sqrtf(f);
+    else
+        f = 0.0f;
+
+    float fire_th = (dx*dist - dz * f)
                   / (dx*dx + dz*dz);
     if(fire_th>1)
         fire_th = 1.0f;
@@ -480,6 +487,7 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
                 ->getKartTeam(m_owner->getWorldKartId()))
             continue;
         }
+        if (kart->isGhostKart()) continue;
 
         // If no secondary hits should be done, only hit the
         // direct hit kart.

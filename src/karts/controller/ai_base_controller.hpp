@@ -57,20 +57,29 @@ protected:
 
     static bool m_ai_debug;
 
+    /** Stores the '--test-ai=n' command line parameter:
+     *  It indicates which fraction of the AIs are going to
+     *  be the test AI: 1 means only to use the TestAI,
+     *  2 means every second AI will be test etc. Used
+     *  for AI testing only. */
+    static int m_test_ai;
+
     /** Position info structure of targets. */
-    struct posData {bool behind; bool on_side; float angle; float distance;};
+    struct posData {bool behind; bool lhs; float angle; float distance;};
 
     void         setControllerName(const std::string &name);
     float        steerToPoint(const Vec3 &point);
     float        normalizeAngle(float angle);
-    virtual void update      (float delta) ;
+    virtual void update      (float delta);
     virtual void setSteering   (float angle, float dt);
     virtual bool canSkid(float steer_fraction) = 0;
     // ------------------------------------------------------------------------
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
     bool         isStuck() const { return m_stuck; }
-    void         checkPosition(const Vec3&, posData*, Vec3* lc = NULL) const;
+    void         checkPosition(const Vec3&, posData*,
+                               Vec3* lc = NULL,
+                               bool use_front_xyz = false) const;
 
 public:
              AIBaseController(AbstractKart *kart);
@@ -79,6 +88,8 @@ public:
     virtual bool disableSlipstreamBonus() const;
     virtual void crashed(const Material *m);
     static  void enableDebug() {m_ai_debug = true; }
+    static  void setTestAI(int n) {m_test_ai = n; }
+    static  int  getTestAI() { return m_test_ai; }
     virtual void crashed(const AbstractKart *k) {};
     virtual void handleZipper(bool play_sound) {};
     virtual void finishedRace(float time) {};

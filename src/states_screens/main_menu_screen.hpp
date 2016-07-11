@@ -32,6 +32,10 @@ class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSinglet
 private:
     friend class GUIEngine::ScreenSingleton<MainMenuScreen>;
 
+    core::stringw m_online_string;
+
+    core::stringw m_login_string;
+
     /** Keep the widget to avoid looking it up every frame. */
     GUIEngine::IconButtonWidget* m_online;
 

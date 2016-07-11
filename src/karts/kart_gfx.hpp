@@ -101,6 +101,11 @@ public:
     void update(float dt);
     void updateNitroGraphics(float f);
     void updateSkidLight(unsigned int level);
+    void getGFXStatus(int* nitro, bool* zipper,
+                      int* skidding, bool* red_skidding) const;
+    void setGFXFromReplay(int nitro, bool zipper,
+                          int skidding, bool red_skidding);
+    void setGFXInvisible();
 
 };   // KartWGFX
 #endif

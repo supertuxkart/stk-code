@@ -27,7 +27,6 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/edit_gp_screen.hpp"
 #include "states_screens/dialogs/enter_gp_name_dialog.hpp"
-#include "states_screens/dialogs/gp_info_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"

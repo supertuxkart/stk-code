@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include "utils/types.hpp"
 
 /** Stores the name of a track, number of laps, and reverse driving.
@@ -99,7 +100,6 @@ private:
 public:
     RaceConfig();
 
-    void setMaxPlayerCount(uint8_t count);
     void setPlayerMajorVote(uint8_t player_id, uint32_t major);
     void setPlayerRaceCountVote(uint8_t player_id, uint8_t count);
     void setPlayerMinorVote(uint8_t player_id, uint32_t minor);
@@ -117,13 +117,18 @@ public:
     bool getLapCount() const;
     int getNumTrackVotes() const;
 
-    protected:
+    const RaceVote& getRaceVote(int global_player_id) { return m_votes[global_player_id]; }
+    int getMaxPlayers() const { return m_max_players; }
+
+protected:
     std::vector<TrackInfo> m_tracks;
     int m_minor_mode;
     int m_major_mode;
     unsigned int m_races_count;
 
-    std::vector<RaceVote> m_votes;
+    /** Key: globalPlayerID */
+    std::map<int, RaceVote> m_votes;
+
     uint8_t m_max_players;
 };   // class RaceConfig
 

@@ -65,6 +65,7 @@ public:
     bool isLocalMaster(uint8_t player_id);
     const NetworkPlayerProfile* getProfile(uint8_t id);
     const NetworkPlayerProfile* getProfile(const std::string &kart_name);
+    std::vector<NetworkPlayerProfile*> getAllPlayersOnHost(uint8_t host_id);
 
     /*! \brief Used to know if a kart is available.
      *  \param kart_name : Name of the kart to check.
@@ -91,7 +92,7 @@ public:
     // ------------------------------------------------------------------------
     /** \brief Get the players that are in the game
     *  \return A vector containing pointers on the players profiles. */
-    const std::vector<NetworkPlayerProfile*>& getPlayers()
+    const std::vector<NetworkPlayerProfile*>& getPlayers() const
     {
         return m_players;
     }   // getPlayers

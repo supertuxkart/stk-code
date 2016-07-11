@@ -673,7 +673,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
             node->render();
     }
 
-    if (CVS->supportsIndirectInstancingRendering())
+    if (CVS->supportsIndirectInstancingRendering() && CVS->isARBExplicitAttribLocationUsable())
     {
 #if !defined(USE_GLES2)
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);

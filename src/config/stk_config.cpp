@@ -177,6 +177,7 @@ void STKConfig::init_defaults()
     m_ai_acceleration            = 1.0f;
     m_disable_steer_while_unskid = false;
     m_camera_follow_skid         = false;
+    m_cutscene_fov               = 0.61f;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -264,6 +265,7 @@ void STKConfig::getAllData(const XMLNode * root)
         camera->get("fov-2", &m_camera_fov[1]);
         camera->get("fov-3", &m_camera_fov[2]);
         camera->get("fov-4", &m_camera_fov[3]);
+        camera->get("cutscene-fov", &m_cutscene_fov);
     }
 
     if (const XMLNode *music_node = root->getNode("music"))

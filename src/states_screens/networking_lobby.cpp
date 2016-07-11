@@ -36,6 +36,7 @@
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
@@ -61,7 +62,8 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
 // ----------------------------------------------------------------------------
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
-    m_server = NULL;
+    m_server      = NULL;
+    m_player_list = NULL;
 }   // NetworkingLobby
 
 // ----------------------------------------------------------------------------
@@ -76,6 +78,12 @@ void NetworkingLobby::loadedFromFile()
 
     m_server_name_widget = getWidget<LabelWidget>("server_name");
     assert(m_server_name_widget != NULL);
+
+    m_server_difficulty = getWidget<LabelWidget>("server_difficulty");
+    assert(m_server_difficulty != NULL);
+
+    m_server_game_mode = getWidget<LabelWidget>("server_game_mode");
+    assert(m_server_game_mode != NULL);
 
     m_online_status_widget = getWidget<LabelWidget>("online_status");
     assert(m_online_status_widget != NULL);
@@ -108,9 +116,19 @@ void NetworkingLobby::init()
     Screen::init();
     setInitialFocus();
     m_server = ServersManager::get()->getJoinedServer();
-    if(m_server)
+    if (m_server)
+    {
         m_server_name_widget->setText(m_server->getName(), false);
-    m_start_button->setVisible(STKHost::get()->isAuthorisedToControl());
+
+        core::stringw difficulty = race_manager->getDifficultyName(m_server->getDifficulty());
+        m_server_difficulty->setText(difficulty, false);
+
+        core::stringw mode = RaceManager::getNameOf(m_server->getRaceMinorMode());
+        m_server_game_mode->setText(mode, false);
+    }
+
+    if(!NetworkConfig::get()->isServer())
+        m_start_button->setVisible(STKHost::get()->isAuthorisedToControl());
 
     // For now create the active player and bind it to the right
     // input device.
@@ -123,8 +141,11 @@ void NetworkingLobby::init()
 void NetworkingLobby::onUpdate(float delta)
 {
     // FIXME Network looby should be closed when stkhost is shut down
-    m_start_button->setVisible(STKHost::existHost() &&
-                               STKHost::get()->isAuthorisedToControl());
+    if(NetworkConfig::get()->isClient())
+    {
+        m_start_button->setVisible(STKHost::existHost() &&
+                                   STKHost::get()->isAuthorisedToControl());
+    }
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -140,11 +161,20 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
 
     if(name==m_start_button->m_properties[PROP_ID])
     {
-        // Send a message to the server to start
-        NetworkString start;
-        start.addUInt8(PROTOCOL_LOBBY_ROOM)
-             .addUInt8(LobbyRoomProtocol::LE_REQUEST_BEGIN);
-        STKHost::get()->sendMessage(start, true);
+        if(NetworkConfig::get()->isServer())
+        {
+            ServerLobbyRoomProtocol* slrp = static_cast<ServerLobbyRoomProtocol*>(
+                ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
+            if (slrp)
+                slrp->startSelection();
+        }
+        else // client
+        {
+            // Send a message to the server to start
+            NetworkString start(PROTOCOL_LOBBY_ROOM);
+            start.addUInt8(LobbyRoomProtocol::LE_REQUEST_BEGIN);
+            STKHost::get()->sendToServer(&start, true);
+        }
     }
 
     RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
@@ -196,8 +226,11 @@ void NetworkingLobby::onDialogClose()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::addPlayer(NetworkPlayerProfile *profile)
 {
-    m_player_list->addItem(StringUtils::toString(profile->getGlobalPlayerId()),
-                           profile->getName());
+    // In GUI-less server this function will be called without proper
+    // initialisation
+    if(m_player_list)
+        m_player_list->addItem(StringUtils::toString(profile->getGlobalPlayerId()),
+                               profile->getName());
 }  // addPlayer
 
 // ----------------------------------------------------------------------------

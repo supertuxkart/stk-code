@@ -18,7 +18,6 @@
 #ifndef HEADER_SHADERS_HPP
 #define HEADER_SHADERS_HPP
 
-#include "config/user_config.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/texture_shader.hpp"

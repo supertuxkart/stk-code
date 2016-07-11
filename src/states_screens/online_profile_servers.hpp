@@ -52,6 +52,8 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
-};
+    virtual bool onEscapePressed() OVERRIDE;
+
+};   // class OnlineProfileServers
 
 #endif

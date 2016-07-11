@@ -370,6 +370,9 @@ void RibbonWidget::add()
     m_element->setTabOrder(id);
     m_element->setTabGroup(false);
     updateSelection();
+
+    if (!m_is_visible)
+        setVisible(false);
 }   // add
 
 // ----------------------------------------------------------------------------

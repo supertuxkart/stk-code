@@ -14,7 +14,6 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
 #include "network/stk_host.hpp"
-#include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/kart_selection.hpp"
@@ -30,7 +29,7 @@ StartGameProtocol::StartGameProtocol(GameSetup* game_setup)
                                                     m_game_setup->getPlayers();
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        m_player_states[ players[i] ] = LOADING;
+        m_player_states[ players[i]->getGlobalPlayerId() ] = LOADING;
     }
     m_ready_count = 0;
 }   // StartGameProtocol
@@ -90,7 +89,8 @@ void StartGameProtocol::setup()
         // players get the first ActivePlayers assigned (which have the 
         // corresponding device associated with it).
         RemoteKartInfo rki(is_local ? local_player_id
-                                    : i-local_player_id+STKHost::get()->getGameSetup()->getNumLocalPlayers(),
+                                    : i-local_player_id
+                                     +STKHost::get()->getGameSetup()->getNumLocalPlayers(),
                            profile->getKartName(),
                            profile->getName(),
                            profile->getHostId(),
@@ -123,43 +123,19 @@ void StartGameProtocol::setup()
 // ----------------------------------------------------------------------------
 bool StartGameProtocol::notifyEventAsynchronous(Event* event)
 {
+    if(!checkDataSize(event, 1)) return true;
+
     const NetworkString &data = event->data();
-    if (data.size() < 5)
-    {
-        Log::error("StartGameProtocol", "Too short message.");
-        return true;
-    }
-    uint32_t token = data.gui32();
-    uint8_t ready = data.gui8(4);
-    STKPeer* peer = event->getPeer();
-    if (peer->getClientServerToken() != token)
-    {
-        Log::error("StartGameProtocol", "Bad token received.");
-        return true;
-    }
+    uint8_t player_id = data.getUInt8();
+    uint8_t ready     = data.getUInt8();
     if (NetworkConfig::get()->isServer() && ready) // on server, player is ready
     {
         Log::info("StartGameProtocol", "One of the players is ready.");
-        m_player_states[peer->getPlayerProfile()] = READY;
+        m_player_states[player_id] = READY;
         m_ready_count++;
         if (m_ready_count == m_game_setup->getPlayerCount())
         {
-            // everybody ready, synchronize
-            Protocol *p = ProtocolManager::getInstance()
-                        ->getProtocol(PROTOCOL_SYNCHRONIZATION);
-            SynchronizationProtocol* protocol = 
-                                static_cast<SynchronizationProtocol*>(p);
-            if (protocol)
-            {
-                protocol->startCountdown(5000); // 5 seconds countdown
-                Log::info("StartGameProtocol",
-                          "All players ready, starting countdown.");
-                m_ready = true;
-                return true;
-            }
-            else
-                Log::error("StartGameProtocol",
-                          "The Synchronization protocol hasn't been started.");
+            startRace();
         }   // if m_ready_count == number of players
     }
     else // on the client, we shouldn't even receive messages.
@@ -170,7 +146,31 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 // ----------------------------------------------------------------------------
-void StartGameProtocol::update()
+/** Starts the race by starting the SynchronizationProtocol.
+ */
+void StartGameProtocol::startRace()
+{
+    // everybody ready, synchronize
+    Protocol *p = ProtocolManager::getInstance()
+               ->getProtocol(PROTOCOL_SYNCHRONIZATION);
+    SynchronizationProtocol* protocol = 
+                             static_cast<SynchronizationProtocol*>(p);
+    if (protocol)
+    {
+        protocol->startCountdown(5000); // 5 seconds countdown
+        Log::info("StartGameProtocol",
+                  "All players ready, starting countdown.");
+        m_ready = true;
+    }
+    else
+    {
+        Log::error("StartGameProtocol",
+                   "The Synchronization protocol hasn't been started.");
+    }
+}   // startRace
+
+// ----------------------------------------------------------------------------
+void StartGameProtocol::update(float dt)
 {
     switch(m_state)
     {
@@ -219,10 +219,18 @@ void StartGameProtocol::ready()
     if (NetworkConfig::get()->isClient())
     {
         assert(STKHost::get()->getPeerCount() == 1);
-        NetworkString ns(5);
-        ns.ai32(STKHost::get()->getPeers()[0]->getClientServerToken()).ai8(1);
-        Log::info("StartGameProtocol", "Player ready, notifying server.");
-        sendMessage(ns, true);
+        std::vector<NetworkPlayerProfile*> players =
+                                         STKHost::get()->getMyPlayerProfiles();
+        for(unsigned int i=0; i<players.size(); i++)
+        {
+            NetworkString *ns = getNetworkString(2);
+            // 1 indicates: client is ready
+            ns->addUInt8(players[i]->getGlobalPlayerId()).addUInt8(1);
+            Log::info("StartGameProtocol", "Player %d ready, notifying server.",
+                       players[i]->getGlobalPlayerId());
+            sendToServer(ns, /*reliable*/true);
+            delete ns;
+        }
         m_state = READY;
         m_ready = true;
         return;

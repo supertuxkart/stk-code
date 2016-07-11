@@ -51,10 +51,25 @@ public:
         std::string               m_id;
         /** Mass of the object. */
         float                     m_mass;
-        /** Radius of the object. */
+        /** Radius of the object, to overwrite the graphical dimension. */
         float                     m_radius;
+        /** Height of an object, to overwrite the graphical dimension. */
+        float                     m_height;
         /** Shape of the object. */
         PhysicalObject::BodyTypes m_body_type;
+        /** Restitution of the physical object. */
+        float                     m_restitution;
+        /** Friction for this object. */
+        float                     m_friction;
+        /** Bullet's linear factor. */
+        Vec3                      m_linear_factor;
+        /** Bullet angular factor. */
+        Vec3                      m_angular_factor;
+        /** Bullet's linear damping factor. */
+        float                     m_linear_damping;
+        /** Bullet's angular damping factor. */
+        float                     m_angular_damping;
+
         /** Trigger a reset in karts touching it? */
         bool                      m_crash_reset;
         /** Knock the kart around. */
@@ -177,7 +192,7 @@ public:
     virtual void reset          ();
     virtual void handleExplosion(const Vec3& pos, bool directHit);
     void         update         (float dt);
-    void         init           ();
+    void         init           (const Settings &settings);
     void         move           (const Vec3& xyz, const core::vector3df& hpr);
     void         hit            (const Material *m, const Vec3 &normal);
     bool         isSoccerBall   () const;
@@ -210,6 +225,8 @@ public:
     // ------------------------------------------------------------------------
     /** Add body to dynamic world */
     void addBody();
+    // ------------------------------------------------------------------------
+    float getRadius() const { return m_radius; }
     // ------------------------------------------------------------------------
     const std::string& getOnKartCollisionFunction() const { return m_on_kart_collision; }
     // ------------------------------------------------------------------------

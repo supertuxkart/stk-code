@@ -51,6 +51,7 @@ namespace GUIEngine
         std::vector<int> m_model_frames;
         
         RTT* m_rtt_provider;
+        IrrDriver::RTTProvider* m_old_rtt_provider;
         
         float angle;
         
@@ -63,6 +64,7 @@ namespace GUIEngine
         scene::ISceneNode          *m_light;
 
         FrameBuffer                *m_frame_buffer;
+        video::ITexture            *m_texture;
 
     public:
         
@@ -102,6 +104,7 @@ namespace GUIEngine
             const std::vector<int>& model_frames);
 
         FrameBuffer* getFrameBuffer() { return m_frame_buffer; }
+        video::ITexture* getTexture() { return m_texture; }
     };
     
 }

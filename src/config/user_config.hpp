@@ -515,19 +515,20 @@ namespace UserConfigParams
     /** If track debugging is enabled. */
     PARAM_PREFIX int m_track_debug PARAM_DEFAULT( false );
 
+    /** If random number of items is used in an arena. */
+    PARAM_PREFIX bool m_random_arena_item PARAM_DEFAULT( false );
+
     /** True if check structures should be debugged. */
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
-
-    /** Special debug camera: 0: normal camera;   1: being high over the kart;
-                              2: on ground level; 3: free first person camera; 
-                              4: straight behind kart */
-    PARAM_PREFIX int m_camera_debug PARAM_DEFAULT( false );
 
     /** True if physics debugging should be enabled. */
     PARAM_PREFIX bool m_physics_debug PARAM_DEFAULT( false );
 
     /** True if fps should be printed each frame. */
     PARAM_PREFIX bool m_fps_debug PARAM_DEFAULT(false);
+
+    /** True if arena (battle/soccer) ai profiling. */
+    PARAM_PREFIX bool m_arena_ai_stats PARAM_DEFAULT(false);
 
     /** True if slipstream debugging is activated. */
     PARAM_PREFIX bool m_slipstream_debug  PARAM_DEFAULT( false );
@@ -593,9 +594,9 @@ namespace UserConfigParams
                             "stun.voxgratia.org",
                             "stun.xten.com") );
 
-    PARAM_PREFIX StringUserConfigParam m_packets_log_filename
-            PARAM_DEFAULT( StringUserConfigParam("packets_log.txt", "packets_log_filename",
-                                                 "Where to log received and sent packets.") );
+    PARAM_PREFIX BoolUserConfigParam m_log_packets
+            PARAM_DEFAULT( BoolUserConfigParam(false, "log-network-packets",
+                                                 "If all network packets should be logged") );
 
     // ---- Graphic Quality
     PARAM_PREFIX GroupUserConfigParam        m_graphics_quality

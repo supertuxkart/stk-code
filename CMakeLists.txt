@@ -43,6 +43,7 @@ endif()
 if(UNIX AND NOT APPLE)
     option(USE_XRANDR "Use xrandr instead of vidmode" ON)
     option(USE_ASAN   "Build with Leak/Address sanitizer" OFF)
+    option(USE_LIBBFD "Use libbfd for crash reporting and leak check" OFF)
 endif()
 
 set(STK_SOURCE_DIR "src")
@@ -77,6 +78,7 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
 # Build glew library
 if(NOT USE_GLES2)
+    add_definitions(-DGLEW_NO_GLU)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
     include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
 endif()
@@ -127,8 +129,8 @@ endif()
 include_directories(${STK_SOURCE_DIR})
 
 if(APPLE)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch x86_64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -F/Library/Frameworks")
 elseif(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")   # Enable multi-processor compilation (faster)
 endif()
@@ -222,6 +224,17 @@ if(UNIX AND NOT APPLE)
         find_library(IRRLICHT_XF86VM_LIBRARY Xxf86vm)
         mark_as_advanced(IRRLICHT_XF86VM_LIBRARY)
     endif()
+
+    if(USE_LIBBFD)
+        find_package(Libbfd)
+        if(LIBBFD_FOUND)
+            add_definitions(-DENABLE_LIBBFD)
+            include_directories(${LIBBFD_INCLUDE_DIRS})
+        else()
+            set(USE_LIBBFD OFF CACHE BOOL "Use libbfd for crash reporting and leak check" FORCE)
+            message(WARNING "Libbfd not found, disable integrated stack trace.")
+        endif()
+    endif()
 endif()
 
 # Set some compiler options
@@ -270,7 +283,7 @@ endif()
 add_definitions(-DHAVE_OGGVORBIS)
 
 if(WIN32)
-    configure_file("${STK_SOURCE_DIR}/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
+    configure_file("${STK_SOURCE_DIR}/../tools/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
 endif()
 
 # Provides list of source and header files (STK_SOURCES and STK_HEADERS)
@@ -375,10 +388,18 @@ if(UNIX AND NOT APPLE)
     else()
         target_link_libraries(supertuxkart ${IRRLICHT_XF86VM_LIBRARY})
     endif()
+    if(USE_LIBBFD)
+        target_link_libraries(supertuxkart ${LIBBFD_LIBRARIES})
+    endif()
     if(USE_ASAN)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
         target_link_libraries(supertuxkart "-fsanitize=address")
     endif()
+endif()
+
+# FreeBSD does not search in /usr/local/lib, but at least Freetype is installed there :(
+if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/lib")
 endif()
 
 if(APPLE)
@@ -386,7 +407,7 @@ if(APPLE)
     # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
     # the mac I use to make STK releases does have other installs of vorbis/ogg/etc. which aren't compatible with STK, so letting
     # CMake pick the library it wants essentially means I can't build.
-    set_target_properties(supertuxkart PROPERTIES LINK_FLAGS "-arch i386 -F/Library/Frameworks -framework OpenAL -framework Ogg -framework Vorbis")
+    set_target_properties(supertuxkart PROPERTIES LINK_FLAGS "-arch x86_64 -F/Library/Frameworks -framework OpenAL -framework Ogg -framework Vorbis")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/Library/Frameworks/OpenAL.framework/Versions/A/Headers")
 endif()
 

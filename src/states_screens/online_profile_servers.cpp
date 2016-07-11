@@ -115,7 +115,6 @@ void OnlineProfileServers::eventCallback(Widget* widget, const std::string& name
         }
     }
 
-
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
@@ -137,6 +136,11 @@ void OnlineProfileServers::doQuickPlay()
 
     // select first one
     const Server *server = ServersManager::get()->getQuickPlay();
+    if(!server)
+    {
+        Log::error("OnlineProfileServers", "Can not find quick play server.");
+        return;
+    }
 
     // do a join request
     XMLRequest *join_request = new RequestConnection::ServerJoinRequest();
@@ -163,8 +167,15 @@ void OnlineProfileServers::doQuickPlay()
     {
         SFXManager::get()->quickSound("anvil");
     }
-
 }   // doQuickPlay
 
 // ----------------------------------------------------------------------------
+/** Also called when pressing the back button. It resets the flags to indicate
+ *  a networked game.
+ */
+bool OnlineProfileServers::onEscapePressed()
+{
+    NetworkConfig::get()->unsetNetworking();
+    return OnlineProfileBase::onEscapePressed();
+}   // onEscapePressed
 

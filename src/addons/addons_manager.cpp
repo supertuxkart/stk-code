@@ -55,6 +55,11 @@ AddonsManager* addons_manager = 0;
 AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
                                  m_state(STATE_INIT)
 {
+    // Clean .part file which may be left behind
+    std::string addons_part = file_manager->getAddonsFile("addons.xml.part");
+    if (file_manager->fileExists(addons_part))
+        file_manager->removeFile(addons_part);
+
     m_file_installed = file_manager->getAddonsFile("addons_installed.xml");
 
     // Load the addons list (even if internet is disabled)
@@ -90,6 +95,8 @@ void AddonsManager::init(const XMLNode *xml,
     StkTime::TimeType mtime(0);
     const XMLNode *include = xml->getNode("include");
     std::string filename=file_manager->getAddonsFile("addons.xml");
+    // Prevent downloading when .part file created, which is already downloaded
+    std::string filename_part=file_manager->getAddonsFile("addons.xml.part");
     if(!include)
     {
         file_manager->removeFile(filename);
@@ -110,7 +117,8 @@ void AddonsManager::init(const XMLNode *xml,
         ( mtime > UserConfigParams::m_addons_last_updated +frequency ||
           force_refresh                                              ||
           !file_manager->fileExists(filename)                          )
-       && UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED;
+       && UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED
+       && !file_manager->fileExists(filename_part);
     
     if (download)
     {

@@ -421,8 +421,7 @@ void initTexturesTransparent(GLMesh &mesh)
 {
     if (!mesh.textures[0])
     {
-        Log::fatal("STKMesh", "Missing texture for material transparent");
-        return;
+        mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
     }
     compressTexture(mesh.textures[0], true);
 #if !defined(USE_GLES2)

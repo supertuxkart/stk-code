@@ -99,8 +99,10 @@ void ServerSelection::loadedFromFile()
 void ServerSelection::beforeAddingWidget()
 {
     m_server_list_widget->clearColumns();
-    m_server_list_widget->addColumn( _("Name"), 3 );
+    m_server_list_widget->addColumn( _("Name"), 2 );
     m_server_list_widget->addColumn( _("Players"), 1);
+    m_server_list_widget->addColumn(_("Difficulty"), 1);
+    m_server_list_widget->addColumn(_("Game mode"), 1);
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -125,7 +127,7 @@ void ServerSelection::init()
  */
 void ServerSelection::loadList()
 {
-    m_server_list_widget->clear();
+	m_server_list_widget->clear();
     ServersManager *manager = ServersManager::get();
     manager->sort(m_sort_desc);
     for(int i=0; i <  manager->getNumServers(); i++)
@@ -138,6 +140,13 @@ void ServerSelection::loadList()
         std::vector<GUIEngine::ListWidget::ListCell> row;
         row.push_back(GUIEngine::ListWidget::ListCell(server->getName(),-1,3));
         row.push_back(GUIEngine::ListWidget::ListCell(num_players,-1,1,true));
+
+        core::stringw difficulty = race_manager->getDifficultyName(server->getDifficulty());
+        row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 1, true));
+
+        core::stringw mode = RaceManager::getNameOf(server->getRaceMinorMode());
+        row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 1, true));
+
         m_server_list_widget->addItem("server", row);
     }
 }   // loadList
@@ -206,12 +215,20 @@ void ServerSelection::onUpdate(float dt)
     {
         if (m_refresh_request->isSuccess())
         {
+            int selection = m_server_list_widget->getSelectionID();
+            std::string selection_str = m_server_list_widget->getSelectionInternalName();
+
             loadList();
+
+            // restore previous selection
+            if (selection != -1 && selection_str != "spacer" && selection_str != "loading")
+                m_server_list_widget->setSelectionID(selection);
         }
         else
         {
             SFXManager::get()->quickSound("anvil");
             new MessageDialog(m_refresh_request->getInfo());
+            m_server_list_widget->clear();
         }
         delete m_refresh_request;
         m_refresh_request = NULL;
@@ -219,7 +236,19 @@ void ServerSelection::onUpdate(float dt)
     }
     else
     {
-        m_server_list_widget->renameItem("loading",
-                              StringUtils::loadingDots(_("Fetching servers")));
+        int selection = m_server_list_widget->getSelectionID();
+        std::string selection_str = m_server_list_widget->getSelectionInternalName();
+
+        m_server_list_widget->clear();
+
+        ServersManager *manager = ServersManager::get();
+        loadList();
+        m_server_list_widget->addItem("spacer", L"");
+        m_server_list_widget->addItem("loading",
+        StringUtils::loadingDots(_("Fetching servers")));
+
+        // restore previous selection
+        if (selection != -1 && selection_str != "spacer" && selection_str != "loading")
+            m_server_list_widget->setSelectionID(selection);
     }
 }   // onUpdate

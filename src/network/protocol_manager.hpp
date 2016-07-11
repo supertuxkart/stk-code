@@ -79,28 +79,6 @@ public:
 };   // class ProtocolRequest;
 
 // ============================================================================
-/** \struct ProtocolRequest
- *  \brief Used to pass the event to protocols that need it
- */
-struct EventProcessingInfo
-{
-    /** The event to process. */
-    Event* m_event;
-
-    /** Arrival time of the event. Used to time out events that are not
-     *  handled in time (e.g. because the receiving protocol is not running).*/
-    double m_arrival_time;
-
-    /** The list of protocol ids to which this event can be
-     *  sent to. */
-    std::vector<unsigned int> m_protocols_ids;
-
-    /** Indicates if this received message must be handled synchronously or
-     *  asynchronously. */
-    bool m_is_synchronous;
-};   // EventProcessingInfo
-
-// ============================================================================
 /** \class ProtocolManager
  *  \brief Manages the protocols at runtime.
  *
@@ -125,7 +103,7 @@ private:
 
     /** Contains the network events to pass asynchronously to protocols
      *  (i.e. from the separate ProtocolManager thread). */
-    Synchronised<std::vector<EventProcessingInfo> > m_events_to_process;
+    Synchronised<std::vector<Event*> > m_events_to_process;
 
     /** Contains the requests to start/pause etc... protocols. */
     Synchronised< std::vector<ProtocolRequest> > m_requests;
@@ -151,7 +129,7 @@ private:
     virtual     ~ProtocolManager();
     static void* mainLoop(void *data);
     uint32_t     getNextProtocolId();
-    bool         sendEvent(EventProcessingInfo* event, bool synchronous);
+    bool         sendEvent(Event* event);
 
     virtual void startProtocol(Protocol *protocol);
     virtual void terminateProtocol(Protocol *protocol);
@@ -162,22 +140,11 @@ private:
 public:
     virtual void      abort();
     virtual void      propagateEvent(Event* event);
-    virtual void      sendMessage(Protocol* sender,
-                                  const NetworkString& message,
-                                  bool reliable = true,
-                                  bool send_synchronously = false);
-    virtual void      sendMessage(Protocol* sender, STKPeer* peer,
-                                  const NetworkString& message,
-                                  bool reliable = true,
-                                  bool send_synchronously = false);
-    virtual void      sendMessageExcept(Protocol* sender, STKPeer* peer,
-                                        const NetworkString& message,
-                                        bool reliable = true);
     virtual uint32_t  requestStart(Protocol* protocol);
     virtual void      requestPause(Protocol* protocol);
     virtual void      requestUnpause(Protocol* protocol);
     virtual void      requestTerminate(Protocol* protocol);
-    virtual void      update();
+    virtual void      update(float dt);
     virtual Protocol* getProtocol(uint32_t id);
     virtual Protocol* getProtocol(ProtocolType type);
 };   // class ProtocolManager

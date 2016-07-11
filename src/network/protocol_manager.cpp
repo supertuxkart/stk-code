@@ -80,7 +80,7 @@ void ProtocolManager::abort()
 
     m_events_to_process.lock();
     for (unsigned int i = 0; i < m_events_to_process.getData().size() ; i++)
-        delete m_events_to_process.getData()[i].m_event;
+        delete m_events_to_process.getData()[i];
     m_events_to_process.getData().clear();
     m_events_to_process.unlock();
     
@@ -103,118 +103,10 @@ void ProtocolManager::abort()
 void ProtocolManager::propagateEvent(Event* event)
 {
     m_events_to_process.lock();
-
-    // register protocols that will receive this event
-    ProtocolType searched_protocol = PROTOCOL_NONE;
-    if (event->getType() == EVENT_TYPE_MESSAGE)
-    {
-        if (event->data().size() > 0)
-        {
-            searched_protocol = (ProtocolType)(event->data()[0]);
-            event->removeFront(1);
-        }
-        else
-        {
-            Log::warn("ProtocolManager", "Not enough data.");
-        }
-    }
-    else if (event->getType() == EVENT_TYPE_CONNECTED)
-    {
-        searched_protocol = PROTOCOL_CONNECTION;
-    }
-    Log::verbose("ProtocolManager", "Received event for protocols of type %d",
-                  searched_protocol);
-
-    bool is_synchronous = false;
-    if(searched_protocol & PROTOCOL_SYNCHRONOUS)
-    {
-        is_synchronous = true;
-        // Reset synchronous flag to restore original protocol id
-        searched_protocol = ProtocolType(searched_protocol & 
-                                         ~PROTOCOL_SYNCHRONOUS  );
-    }
-    std::vector<unsigned int> protocols_ids;
-    m_protocols.lock();
-    for (unsigned int i = 0; i < m_protocols.getData().size() ; i++)
-    {
-        const Protocol *p = m_protocols.getData()[i];
-        // Pass data to protocols even when paused
-        if (p->getProtocolType() == searched_protocol ||
-            event->getType() == EVENT_TYPE_DISCONNECTED)
-        {
-            protocols_ids.push_back(p->getId());
-        }
-    }    // for i in m_protocols
-    m_protocols.unlock();
-
-    // no protocol was aimed, show the msg to debug
-    if (searched_protocol == PROTOCOL_NONE)
-    {
-        Log::debug("ProtocolManager", "NO PROTOCOL : Message is \"%s\"",
-                    event->data().std_string().c_str());
-    }
-
-    if (protocols_ids.size() != 0)
-    {
-        EventProcessingInfo epi;
-        epi.m_arrival_time   = (double)StkTime::getTimeSinceEpoch();
-        epi.m_is_synchronous = is_synchronous;
-        epi.m_event          = event;
-        epi.m_protocols_ids  = protocols_ids;
-        // Add the event to the queue. After the event is handled
-        // its memory will be freed.
-        m_events_to_process.getData().push_back(epi); 
-    }
-    else
-    {
-        Log::warn("ProtocolManager",
-                  "Received an event for %d that has no destination protocol.",
-                  searched_protocol);
-        // Free the memory for the vent
-        delete event;
-    }
+    m_events_to_process.getData().push_back(event); 
     m_events_to_process.unlock();
+    return;
 }   // propagateEvent
-
-// ----------------------------------------------------------------------------
-void ProtocolManager::sendMessage(Protocol* sender, const NetworkString& message,
-                                  bool reliable, bool send_synchronously)
-{
-    NetworkString new_message(1+message.size());
-    ProtocolType type = sender->getProtocolType();
-    // Set flag if the message must be handled synchronously on arrivat
-    if(send_synchronously)
-        type = ProtocolType(type | PROTOCOL_SYNCHRONOUS);
-    new_message.ai8(type); // add one byte to add protocol type
-    new_message += message;
-    STKHost::get()->sendMessage(new_message, reliable);
-}   // sendMessage
-
-// ----------------------------------------------------------------------------
-void ProtocolManager::sendMessage(Protocol* sender, STKPeer* peer,
-                                  const NetworkString& message, bool reliable,
-                                  bool send_synchronously)
-{
-    NetworkString new_message(1+message.size());
-    ProtocolType type = sender->getProtocolType();
-    // Set flag if the message must be handled synchronously on arrivat
-    if(send_synchronously)
-        type = ProtocolType(type | PROTOCOL_SYNCHRONOUS);
-    new_message.ai8(type); // add one byte to add protocol type
-    new_message += message;
-    peer->sendPacket(new_message, reliable);
-}   // sendMessage
-
-// ----------------------------------------------------------------------------
-void ProtocolManager::sendMessageExcept(Protocol* sender, STKPeer* peer,
-                                        const NetworkString& message,
-                                        bool reliable)
-{
-    NetworkString new_message(1+message.size());
-    new_message.ai8(sender->getProtocolType()); // add one byte to add protocol type
-    new_message += message;
-    STKHost::get()->sendPacketExcept(peer, new_message, reliable);
-}   // sendMessageExcept
 
 // ----------------------------------------------------------------------------
 /** \brief Asks the manager to start a protocol.
@@ -379,31 +271,41 @@ void ProtocolManager::terminateProtocol(Protocol *protocol)
 // ----------------------------------------------------------------------------
 /** Sends the event to the corresponding protocol.
  */
-bool ProtocolManager::sendEvent(EventProcessingInfo* event, bool synchronous)
+bool ProtocolManager::sendEvent(Event* event)
 {
-    unsigned int index = 0;
-    while(index < event->m_protocols_ids.size())
+    m_protocols.lock();
+    int count=0;
+    for(unsigned int i=0; i<m_protocols.getData().size(); i++)
     {
-        Protocol *p = getProtocol(event->m_protocols_ids[index]);
-        if(!p) 
+        Protocol *p = m_protocols.getData()[i];
+        bool is_right_protocol = false;
+        switch(event->getType())
         {
-            index++;
-            continue;
-        }
-        bool result = synchronous ? p->notifyEvent(event->m_event)
-                                  : p->notifyEventAsynchronous(event->m_event);
-        if (result)
-        {
-            event->m_protocols_ids.erase(event->m_protocols_ids.begin()+index);
-        }
-        else  // !result
-            index++;
-    }
+        case EVENT_TYPE_MESSAGE:
+            is_right_protocol = event->data().getProtocolType()==p->getProtocolType();
+            break;
+        case EVENT_TYPE_DISCONNECTED:
+            is_right_protocol = p->handleDisconnects();
+            break;
+        case EVENT_TYPE_CONNECTED:
+            is_right_protocol = p->handleConnects(); 
+            break;
+        }   // switch event->getType()
 
-    if (event->m_protocols_ids.size() == 0 || 
-        (StkTime::getTimeSinceEpoch()-event->m_arrival_time) >= TIME_TO_KEEP_EVENTS)
+        if( is_right_protocol)  
+        {
+            count ++;
+            event->isSynchronous() ? p->notifyEvent(event)
+                                   : p->notifyEventAsynchronous(event);
+        }
+    }   // for i in protocols
+
+    m_protocols.unlock();
+
+    if (count>0 || StkTime::getTimeSinceEpoch()-event->getArrivalTime()
+                    >= TIME_TO_KEEP_EVENTS                                  )
     {
-        delete event->m_event;
+        delete event;
         return true;
     }
     return false;
@@ -413,13 +315,13 @@ bool ProtocolManager::sendEvent(EventProcessingInfo* event, bool synchronous)
 /** \brief Updates the manager.
  *
  *  This function processes the events queue, notifies the concerned
- *  protocols that they have events to process. Then ask all protocols
- *  to update themselves. Finally processes stored requests about
+ *  protocols that they have events to process. Then asks all protocols
+ *  to update themselves. Finally it processes stored requests about
  *  starting, stoping, pausing etc... protocols.
- *  This function is called by the main loop.
+ *  This function is called by the main thread (i.e. from main_loop).
  *  This function IS FPS-dependant.
  */
-void ProtocolManager::update()
+void ProtocolManager::update(float dt)
 {
     // before updating, notify protocols that they have received events
     m_events_to_process.lock();
@@ -428,8 +330,8 @@ void ProtocolManager::update()
     for (int i = 0; i < size; i++)
     {
         // Don't handle asynchronous events here.
-        if(!m_events_to_process.getData()[i+offset].m_is_synchronous) continue;
-        bool result = sendEvent(&m_events_to_process.getData()[i+offset], true);
+        if(!m_events_to_process.getData()[i+offset]->isSynchronous()) continue;
+        bool result = sendEvent(m_events_to_process.getData()[i+offset]);
         if (result)
         {
             m_events_to_process.getData()
@@ -444,7 +346,7 @@ void ProtocolManager::update()
     for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
     {
         if (m_protocols.getData()[i]->getState() == PROTOCOL_STATE_RUNNING)
-            m_protocols.getData()[i]->update();
+            m_protocols.getData()[i]->update(dt);
     }
     m_protocols.unlock();
 }   // update
@@ -455,7 +357,7 @@ void ProtocolManager::update()
  *  protocols that they have events to process. Then ask all protocols
  *  to update themselves. Finally processes stored requests about
  *  starting, stoping, pausing etc... protocols.
- *  This function is called in a thread.
+ *  This function is called in a separate thread running in this instance.
  *  This function IS NOT FPS-dependant.
  */
 void ProtocolManager::asynchronousUpdate()
@@ -467,8 +369,8 @@ void ProtocolManager::asynchronousUpdate()
     for (int i = 0; i < size; i++)
     {
         // Don't handle synchronous events here.
-        if(m_events_to_process.getData()[i+offset].m_is_synchronous) continue;
-        bool result = sendEvent(&m_events_to_process.getData()[i+offset], false);
+        if(m_events_to_process.getData()[i+offset]->isSynchronous()) continue;
+        bool result = sendEvent(m_events_to_process.getData()[i+offset]);
         if (result)
         {
             m_events_to_process.getData()

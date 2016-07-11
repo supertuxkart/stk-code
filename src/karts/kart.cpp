@@ -92,9 +92,10 @@
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
-            PerPlayerDifficulty difficulty)
+            PerPlayerDifficulty difficulty,
+            video::E_RENDER_TYPE rt)
      : AbstractKart(ident, world_kart_id, position, init_transform,
-             difficulty)
+             difficulty, rt)
 
 #if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  pragma warning(1:4355)
@@ -883,9 +884,12 @@ void Kart::finishedRace(float time, bool from_server)
     {
         // Save for music handling in race result gui
         setRaceResult();
-        setController(new EndController(this, m_controller));
+        if(!isGhostKart())
+        {
+            setController(new EndController(this, m_controller));
+        }
         // Skip animation if this kart is eliminated
-        if (m_eliminated) return;
+        if (m_eliminated || isGhostKart()) return;
 
         m_kart_model->setAnimation(m_race_result ?
             KartModel::AF_WIN_START : KartModel::AF_LOSE_START);
@@ -1147,6 +1151,10 @@ void Kart::eliminate()
     }
 
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
+    m_kart_gfx->setGFXInvisible();
+    if (m_engine_sound)
+        m_engine_sound->stop();
+
     m_eliminated = true;
 
     m_node->setVisible(false);
@@ -2204,19 +2212,15 @@ void Kart::updatePhysics(float dt)
 
     updateEngineSFX();
 #ifdef XX
-    Log::info("Kart","forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f"
-       ,m_vehicle->m_forwardImpulse[0]
-       ,m_vehicle->m_forwardImpulse[1]
-       ,m_vehicle->m_forwardImpulse[2]
-       ,m_vehicle->m_forwardImpulse[3]
-       ,m_vehicle->m_sideImpulse[0]
-       ,m_vehicle->m_sideImpulse[1]
-       ,m_vehicle->m_sideImpulse[2]
-       ,m_vehicle->m_sideImpulse[3]
+    Log::info("Kart","angVel %f %f %f heading %f suspension %f %f %f %f"
        ,m_body->getAngularVelocity().getX()
        ,m_body->getAngularVelocity().getY()
        ,m_body->getAngularVelocity().getZ()
        ,getHeading()
+       ,m_vehicle->getWheelInfo(0).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(1).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(2).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(3).m_raycastInfo.m_suspensionLength
        );
 #endif
 
@@ -2310,7 +2314,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             // or moving backwards
             if(m_speed > 0.0f)
             {   // Still going forward while braking
-                applyEngineForce(0.f);
+                applyEngineForce(-engine_power*2.5f);
                 m_brake_time += dt;
                 // Apply the brakes - include the time dependent brake increase
                 float f = 1 + m_brake_time
@@ -2741,22 +2745,22 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
-    float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
+    float lean_height = tan(m_current_lean) * getKartWidth()*0.5f;
 
     Vec3 center_shift(0, 0, 0);
 
     center_shift.setY(m_skidding->getGraphicalJumpOffset()
-                      + lean_height
+                      + fabsf(lean_height)
                       +m_graphical_y_offset);
     center_shift = getTrans().getBasis() * center_shift;
 
     float heading = m_skidding->getVisualSkidRotation();
     Moveable::updateGraphics(dt, center_shift,
-                             btQuaternion(heading, 0, m_current_lean));
+                             btQuaternion(heading, 0, -m_current_lean));
 
     // m_speed*dt is the distance the kart has moved, which determines
     // how much the wheels need to rotate.
-    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed);
+    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed, lean_height);
 
     // Determine the shadow position from the terrain Y position. This
     // leaves the shadow on the ground even if the kart is jumping because
