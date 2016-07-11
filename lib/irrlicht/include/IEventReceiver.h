@@ -173,7 +173,7 @@ namespace irr
 		EIME_CHANGE_POS,
 
 		EIME_FORCE_32_BIT = 0x7fffffff
-	}
+	};
 #endif
     
     //! Enumeration for all touch input events
