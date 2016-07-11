@@ -7,11 +7,15 @@ uniform sampler2D SpecMap;
 flat in sampler2D handle;
 flat in sampler2D secondhandle;
 #endif
+
+uniform vec2 color_change;
+
 in vec2 uv;
 in vec4 color;
 out vec4 FragColor;
 
 #stk_include "utils/getLightFactor.frag"
+#stk_include "utils/rgb_conversion.frag"
 
 void main(void)
 {
@@ -27,6 +31,15 @@ void main(void)
     float specmap = texture(SpecMap, uv).g;
     float emitmap = texture(SpecMap, uv).b;
 #endif
+
+    if (color_change.x > 0.0)
+    {
+        vec3 old_hsv = rgbToHsv(col.rgb);
+        old_hsv.y = max(old_hsv.y, color_change.y);
+        vec3 new_color = hsvToRgb(vec3(color_change.x, old_hsv.y, old_hsv.z));
+        col = vec4(new_color.r, new_color.g, new_color.b, col.a);
+    }
+
     col.xyz *= pow(color.xyz, vec3(2.2));
 
     FragColor = vec4(getLightFactor(col.xyz, vec3(1.), specmap, emitmap) , 1.);

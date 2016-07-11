@@ -175,6 +175,12 @@ private:
     /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
     bool             m_disable_z_write;
 
+    /** True if this material can be colorized (like red/blue in team game). */
+    bool             m_colorizable;
+
+    /** Minimum resulting saturation when colorized (from 0 to 1) */
+    float            m_colorization_factor;
+
     /** Some textures need to be pre-multiplied, some divided to give
      *  the intended effect. */
     //enum             {ADJ_NONE, ADJ_PREMUL, ADJ_DIV}
@@ -282,6 +288,14 @@ public:
     /** Returns if this material should trigger a rescue if a kart
      *  is driving on it. */
     bool  isDriveReset       () const { return m_drive_reset;        }
+    // ------------------------------------------------------------------------
+    /** Returns if this material can be colorized (like red/blue in team game).
+     */
+    bool  isColorizable      () const { return m_colorizable;        }
+    // ------------------------------------------------------------------------
+    /** Returns the minimum resulting saturation when colorized.
+     */
+    float getColorizationFactor () const { return m_colorization_factor;   }
     // ------------------------------------------------------------------------
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */

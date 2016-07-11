@@ -134,12 +134,13 @@ KartModel::KartModel(bool is_master)
     m_wheel_filename[3] = "";
     m_speed_weighted_objects.clear();
     m_animated_node     = NULL;
-    m_mesh              = NULL;
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
         m_animation_frame[i]=-1;
     m_animation_speed   = 25;
     m_current_animation = AF_DEFAULT;
     m_play_non_loop     = false;
+    m_krt               = RenderInfo::KRT_DEFAULT;
+    m_render_info       = RenderInfo();
 }   // KartModel
 
 // ----------------------------------------------------------------------------
@@ -226,17 +227,6 @@ KartModel::~KartModel()
         {
             // Master KartModels should never have a wheel attached.
             assert(!m_is_master);
-
-            // Drop the cloned transparent mesh wheel if created
-            if (m_wheel_model[i])
-            {
-                // m_wheel_model[i] can be NULL
-                if (m_wheel_model[i]
-                    ->getRenderType() == video::ERT_TRANSPARENT)
-                {
-                    m_wheel_model[i]->drop();
-                }
-            }
             m_wheel_node[i]->drop();
         }
         if(m_is_master && m_wheel_model[i])
@@ -253,9 +243,8 @@ KartModel::~KartModel()
             // Master KartModels should never have a speed weighted object attached.
             assert(!m_is_master);
 
-            // Drop the cloned model if created
-            if (m_speed_weighted_objects[i].m_model
-                ->getRenderType() != video::ERT_DEFAULT)
+            // Drop the cloned transparent model if created
+            if (m_krt == RenderInfo::KRT_TRANSPARENT)
             {
                 m_speed_weighted_objects[i].m_model->drop();
             }
@@ -298,7 +287,7 @@ KartModel::~KartModel()
  *  It is also marked not to be a master copy, so attachModel can be called
  *  for this instance.
  */
-KartModel* KartModel::makeCopy(video::E_RENDER_TYPE rt)
+KartModel* KartModel::makeCopy(RenderInfo::KartRenderType krt)
 {
     // Make sure that we are copying from a master objects, and
     // that there is indeed no animated node defined here ...
@@ -311,34 +300,25 @@ KartModel* KartModel::makeCopy(video::E_RENDER_TYPE rt)
     km->m_kart_height       = m_kart_height;
     km->m_kart_highest_point= m_kart_highest_point;
     km->m_kart_lowest_point = m_kart_lowest_point;
-    km->m_mesh              = irr_driver->copyAnimatedMesh(m_mesh, rt);
+    km->m_mesh              = irr_driver->copyAnimatedMesh(m_mesh);
     km->m_model_filename    = m_model_filename;
     km->m_animation_speed   = m_animation_speed;
     km->m_current_animation = AF_DEFAULT;
     km->m_animated_node     = NULL;
     km->m_hat_offset        = m_hat_offset;
     km->m_hat_name          = m_hat_name;
-    
+    km->m_krt               = krt;
+    km->m_render_info       = m_render_info;
+
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
     km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
     km->m_has_nitro_emitter = m_has_nitro_emitter;
 
-    scene::IMeshManipulator *mani =
-        irr_driver->getVideoDriver()->getMeshManipulator();
     for(unsigned int i=0; i<4; i++)
     {
         // Master should not have any wheel nodes.
         assert(!m_wheel_node[i]);
-        if (m_wheel_model[i] && rt == video::ERT_TRANSPARENT)
-        {
-            // Only clone the mesh if transparence is used
-            scene::SMesh* clone = mani->createMeshCopy(m_wheel_model[i]);
-            clone->setRenderType(rt);
-            km->m_wheel_model[i] = dynamic_cast<scene::IMesh*>(clone);
-        }
-        else
-            km->m_wheel_model[i] = m_wheel_model[i];
-
+        km->m_wheel_model[i]                = m_wheel_model[i];
         km->m_wheel_filename[i]             = m_wheel_filename[i];
         km->m_wheel_graphics_position[i]    = m_wheel_graphics_position[i];
         km->m_wheel_graphics_radius[i]      = m_wheel_graphics_radius[i];
@@ -346,18 +326,18 @@ KartModel* KartModel::makeCopy(video::E_RENDER_TYPE rt)
         km->m_max_suspension[i]             = m_max_suspension[i];
         km->m_dampen_suspension_amplitude[i]= m_dampen_suspension_amplitude[i];
     }
-    
+
     km->m_speed_weighted_objects.resize(m_speed_weighted_objects.size());
     for(size_t i=0; i<m_speed_weighted_objects.size(); i++)
     {
         // Master should not have any speed weighted nodes.
         assert(!m_speed_weighted_objects[i].m_node);
         km->m_speed_weighted_objects[i] = m_speed_weighted_objects[i];
-        if (rt != video::ERT_DEFAULT)
+        if (krt == RenderInfo::KRT_TRANSPARENT)
         {
-            // Only clone the mesh if default type is not used
+            // Only clone the mesh if transparent type is used, see #2445
             km->m_speed_weighted_objects[i].m_model = irr_driver
-                ->copyAnimatedMesh(m_speed_weighted_objects[i].m_model, rt);
+                ->copyAnimatedMesh(m_speed_weighted_objects[i].m_model);
         }
     }
 
@@ -376,7 +356,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
 {
     assert(!m_is_master);
 
-    scene::ISceneNode* node;
+    scene::ISceneNode* node = NULL;
+    m_render_info.setKartModelRenderInfo(m_krt);
 
     if (animated_models)
     {
@@ -385,7 +366,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                                         irr_driver->getSceneManager()                    );
 
 
-        node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh");
+        node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh",
+               NULL/*parent*/, getRenderInfo());
         // as animated mesh are not cheap to render use frustum box culling
         if (CVS->isGLSL())
             node->setAutomaticCulling(scene::EAC_OFF);
@@ -462,7 +444,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
        debug_name = m_model_filename + " (kart-model)";
 #endif
 
-        node = irr_driver->addMesh(main_frame, debug_name);
+        node = irr_driver->addMesh(main_frame, debug_name,
+               NULL /*parent*/, getRenderInfo());
 
 #ifdef DEBUG
         node->setName(debug_name.c_str());
@@ -473,7 +456,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
         for(unsigned int i=0; i<4; i++)
         {
             if(!m_wheel_model[i]) continue;
-            m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], "wheel", node);
+            m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], "wheel",
+                              node, getRenderInfo(), true/*all_parts_colorized*/);
             Vec3 wheel_min, wheel_max;
             MeshTools::minMax3D(m_wheel_model[i], &wheel_min, &wheel_max);
             m_wheel_graphics_radius[i] = 0.5f*(wheel_max.getY() - wheel_min.getY());
@@ -495,7 +479,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             if(obj.m_model)
             {
                 obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, 
-                                                         "speedweighted", node);
+                             "speedweighted", node, getRenderInfo(),
+                             true/*all_parts_colorized*/);
                 obj.m_node->grab();
 
                 obj.m_node->setFrameLoop(m_animation_frame[AF_SPEED_WEIGHTED_START],
@@ -534,6 +519,9 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     Vec3 kart_min, kart_max;
     MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]),
                         &kart_min, &kart_max);
+
+    // Enable colorization for karts later when attachModel
+    m_render_info.setColorizableParts(m_mesh);
 
 #undef MOVE_KART_MESHES
 #ifdef MOVE_KART_MESHES
@@ -984,6 +972,7 @@ void KartModel::update(float dt, float distance, float steer, float speed,
 
     m_animated_node->setCurrentFrame(frame);
 }   // update
+
 //-----------------------------------------------------------------------------
 void KartModel::attachHat()
 {
@@ -1018,4 +1007,4 @@ void KartModel::attachHat()
             m_hat_node->setRotation(inv.getRotationDegrees());
         }   // if bone
     }   // if(m_hat_name)
-}
+}   // attachHat

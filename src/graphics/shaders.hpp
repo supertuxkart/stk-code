@@ -146,8 +146,15 @@ public:
     class ObjectPass2Shader : public TextureShader < ObjectPass2Shader, 5,
                                                  core::matrix4, core::matrix4 >
     {
+    private:
+        GLint m_color_change_location;
     public:
         ObjectPass2Shader();
+        virtual bool changeableColor(float hue = 0.0f, float min_sat = 0.0f) const OVERRIDE
+        {
+            glUniform2f(m_color_change_location, hue, min_sat);
+            return true;
+        }   // changeableColor
     };   // ObjectPass2Shader
 
     // ========================================================================

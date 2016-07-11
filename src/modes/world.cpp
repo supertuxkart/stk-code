@@ -260,10 +260,7 @@ void World::reset()
         (*i)->reset();
     }
 
-    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
-    {
-        Camera::getCamera(i)->reset();
-    }
+    Camera::resetAllCameras();
 
     if(race_manager->hasGhostKarts())
         ReplayPlay::get()->reset();

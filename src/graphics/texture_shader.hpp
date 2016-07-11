@@ -21,6 +21,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/shader.hpp"
+#include "utils/cpp2011.hpp"
 
 #include <assert.h>
 #include <functional>
@@ -243,6 +244,12 @@ public:
             glDeleteSamplers(1, &m_sampler_ids[i]);
     }   // ~TextureShader
 
+    /** Override this class and return true if a shader has changeable color.
+     */
+    virtual bool changeableColor(float hue = 0.0f, float min_sat = 0.0f) const
+    {
+        return false;
+    }   // changeableColor
 
 };   // class TextureShader
 

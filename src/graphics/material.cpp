@@ -133,20 +133,22 @@ Material::Material(const XMLNode *node, bool deprecated)
     // force the reset flag in this case.
     if(m_falling_effect)
         m_drive_reset=true;
-    node->get("surface",          &m_surface           );
-    node->get("ignore",           &m_ignore            );
+    node->get("surface",             &m_surface            );
+    node->get("ignore",              &m_ignore             );
 
-    node->get("max-speed",        &m_max_speed_fraction);
-    node->get("slowdown-time",    &m_slowdown_time     );
-    node->get("backface-culling", &m_backface_culling  );
-    node->get("disable-z-write",  &m_disable_z_write   );
-    node->get("fog",              &m_fog               );
+    node->get("max-speed",           &m_max_speed_fraction );
+    node->get("slowdown-time",       &m_slowdown_time      );
+    node->get("backface-culling",    &m_backface_culling   );
+    node->get("disable-z-write",     &m_disable_z_write    );
+    node->get("colorizable",         &m_colorizable        );
+    node->get("colorization-factor", &m_colorization_factor);
+    node->get("fog",                 &m_fog                );
 
-    node->get("mask",             &m_mask              );
-    node->get("gloss-map",        &m_gloss_map         );
-    node->get("water-splash",     &m_water_splash      );
-    node->get("jump",             &m_is_jump_texture   );
-    node->get("has-gravity",      &m_has_gravity       );
+    node->get("mask",                &m_mask               );
+    node->get("gloss-map",           &m_gloss_map          );
+    node->get("water-splash",        &m_water_splash       );
+    node->get("jump",                &m_is_jump_texture    );
+    node->get("has-gravity",         &m_has_gravity        );
 
     if (m_collision_reaction != NORMAL)
     {
@@ -434,6 +436,8 @@ void Material::init()
     m_mirror_axis_when_reverse  = ' ';
     m_collision_reaction        = NORMAL;
     m_disable_z_write           = false;
+    m_colorizable               = false;
+    m_colorization_factor       = 0.0f;
     m_water_shader_speed_1      = 6.6667f;
     m_water_shader_speed_2      = 4.0f;
     m_fog                       = true;

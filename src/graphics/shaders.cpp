@@ -350,6 +350,7 @@ Shaders::ObjectPass2Shader::ObjectPass2Shader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "object_pass2.frag");
+    m_color_change_location = glGetUniformLocation(m_program, "color_change");
     assignUniforms("ModelMatrix", "TextureMatrix");
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                        1, "SpecularMap", ST_NEAREST_FILTERED,

@@ -151,6 +151,7 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/camera_debug.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
@@ -168,6 +169,7 @@
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/combined_characteristic.hpp"
 #include "karts/controller/ai_base_lap_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -910,14 +912,23 @@ int handleCmdLine()
         UserConfigParams::m_music = false;
     }
 
-    if(UserConfigParams::m_artist_debug_mode)
+    if (UserConfigParams::m_artist_debug_mode)
     {
-       if(CommandLine::has("--camera-wheel-debug"))
-           Camera::setDebugMode(Camera::CM_DEBUG_GROUND);
+        if (CommandLine::has("--camera-wheel-debug"))
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
+        }
         if(CommandLine::has("--camera-debug"))
-            Camera::setDebugMode(Camera::CM_DEBUG_TOP_OF_KART);
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
+        }
         if(CommandLine::has("--camera-kart-debug"))
-            Camera::setDebugMode(Camera::CM_DEBUG_BEHIND_KART);
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
+        }
         if(CommandLine::has("--physics-debug"))
             UserConfigParams::m_physics_debug=1;
         if(CommandLine::has("--check-debug"))
@@ -1863,6 +1874,11 @@ void runUnitTests()
     assert( isEasterMode(22, 3, 2016, 5));
     assert(!isEasterMode(21, 3, 2016, 5));
     UserConfigParams::m_easter_ear_mode = saved_easter_mode;
+
+
+    Log::info("UnitTest", " - Kart characteristics");
+    CombinedCharacteristic::unitTesting();
+
     Log::info("UnitTest", "=====================");
     Log::info("UnitTest", "Testing successful   ");
     Log::info("UnitTest", "=====================");
