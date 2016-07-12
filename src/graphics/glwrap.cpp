@@ -34,7 +34,6 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
-PFNGLDRAWELEMENTSBASEVERTEXOESPROC pglDrawElementsBaseVertexOES = 0;
 PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR = 0;
 #endif
 
@@ -193,7 +192,6 @@ void initGL()
     if (GLEW_OK != err)
         Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
 #else
-    glDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXOESPROC)eglGetProcAddress("glDrawElementsBaseVertexOES");
     glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKKHRPROC)eglGetProcAddress("glDebugMessageCallbackKHR");
 #endif
 

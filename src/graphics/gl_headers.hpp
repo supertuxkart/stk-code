@@ -62,9 +62,17 @@ extern "C" {
 #define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
 
 extern PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR;
-extern PFNGLDRAWELEMENTSBASEVERTEXOESPROC pglDrawElementsBaseVertexOES;
-#define glDrawElementsBaseVertex pglDrawElementsBaseVertexOES
 #define glDebugMessageCallbackARB pglDebugMessageCallbackKHR
+
+// The glDrawElementsBaseVertex is available only in OpenGL ES 3.2. At this
+// stage the 'basevertex' argument is always equal to 0 because features that
+// use it are disabled in OpenGL ES renderer. We can simply use glDrawElements
+// instead.
+inline void glDrawElementsBaseVertex(GLenum mode, GLsizei count, GLenum type,
+                                     GLvoid *indices, GLint basevertex)
+{
+    glDrawElements(mode, count, type, indices);
+}
 #endif
 
 struct DrawElementsIndirectCommand{
