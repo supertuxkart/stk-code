@@ -61,6 +61,7 @@ CutsceneWorld::CutsceneWorld() : World()
     m_play_track_intro_sound = false;
     m_play_ready_set_go_sounds = false;
     m_fade_duration = 1.0f;
+    m_camera = NULL;
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------

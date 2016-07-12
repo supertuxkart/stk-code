@@ -115,6 +115,7 @@ void Camera::resetAllCameras()
 Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
 {
     m_mode          = CM_NORMAL;
+    m_type          = CameraType::CM_TYPE_NORMAL;
     m_index         = camera_index;
     m_original_kart = kart;
     m_camera        = irr_driver->addCameraSceneNode();
