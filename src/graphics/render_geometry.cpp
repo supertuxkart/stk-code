@@ -989,9 +989,9 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
     }
 
     Shader->setUniforms(Args...);
-    glDrawRangeElements(ptype, (int)mesh->vaoBaseVertex, 
-                        (int)mesh->vaoBaseVertex + count - 1,
-                        count, itype, (GLvoid *)mesh->vaoOffset);
+    glDrawElementsBaseVertex(ptype, (int)count, itype,
+                             (GLvoid *)mesh->vaoOffset,
+                             (int)mesh->vaoBaseVertex);
 
     if (need_change_hue)
     {
@@ -1645,9 +1645,8 @@ void IrrDriver::renderTransparent()
 
         DisplaceMaskShader::getInstance()->use();
         DisplaceMaskShader::getInstance()->setUniforms(AbsoluteTransformation);
-        glDrawRangeElements(ptype, (int)mesh.vaoBaseVertex, 
-                            (int)mesh.vaoBaseVertex + count - 1,
-                            count, itype, (GLvoid *)mesh.vaoOffset);
+        glDrawElementsBaseVertex(ptype, (int)count, itype,
+                                 (GLvoid *)mesh.vaoOffset, (int)mesh.vaoBaseVertex);
     }
 
     irr_driver->getFBO(FBO_DISPLACE).bind();
@@ -1678,9 +1677,8 @@ void IrrDriver::renderTransparent()
             core::vector2df(cb->getDirX(), cb->getDirY()),
             core::vector2df(cb->getDir2X(), cb->getDir2Y()));
 
-        glDrawRangeElements(ptype, (int)mesh.vaoBaseVertex, 
-                            (int)mesh.vaoBaseVertex + count - 1,
-                            count, itype, (GLvoid *)mesh.vaoOffset);
+        glDrawElementsBaseVertex(ptype, (int)count, itype, (GLvoid *)mesh.vaoOffset,
+                                 (int)mesh.vaoBaseVertex);
     }
 
     irr_driver->getFBO(FBO_COLORS).bind();
@@ -1702,9 +1700,8 @@ void drawShadow(const T *Shader, unsigned cascade, const GLMesh *mesh, uniforms.
     size_t count = mesh->IndexCount;
 
     Shader->setUniforms(cascade, Args...);
-    glDrawRangeElements(ptype, (int)mesh->vaoBaseVertex, 
-                        (int)mesh->vaoBaseVertex + count - 1,
-                        count, itype, (GLvoid *)mesh->vaoOffset);
+    glDrawElementsBaseVertex(ptype, (int)count, itype,
+                             (GLvoid *)mesh->vaoOffset, (int)mesh->vaoBaseVertex);
 }   // drawShadow
 
 // ----------------------------------------------------------------------------

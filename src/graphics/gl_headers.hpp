@@ -62,6 +62,8 @@ extern "C" {
 #define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
 
 extern PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR;
+extern PFNGLDRAWELEMENTSBASEVERTEXOESPROC pglDrawElementsBaseVertexOES;
+#define glDrawElementsBaseVertex pglDrawElementsBaseVertexOES
 #define glDebugMessageCallbackARB pglDebugMessageCallbackKHR
 #endif
 
