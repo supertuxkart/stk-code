@@ -199,6 +199,8 @@ void ShaderBasedRenderer::updateLightsInfo(scene::ICameraSceneNode * const camno
  */
 void ShaderBasedRenderer::uploadLightingData() const
 {
+    assert(CVS->isARBUniformBufferObjectUsable());
+    
     float Lighting[36];
     
     core::vector3df sun_direction = irr_driver->getSunDirection();
@@ -266,9 +268,12 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                                       float dt,
                                       bool hasShadow,
                                       bool forceRTT)
-{    
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
-    glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
+{
+    if(CVS->isARBUniformBufferObjectUsable())
+    {
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
+        glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
+    }
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
@@ -832,7 +837,8 @@ void ShaderBasedRenderer::render(float dt)
         PROFILER_PUSH_CPU_MARKER("UBO upload", 0x0, 0xFF, 0x0);
         computeMatrixesAndCameras(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         m_shadow_matrices.updateSunOrthoMatrices();
-        uploadLightingData();
+        if(CVS->isARBUniformBufferObjectUsable())
+            uploadLightingData();
         PROFILER_POP_CPU_MARKER();
         renderScene(camnode, dt, track->hasShadows(), false); 
         
@@ -855,14 +861,17 @@ void ShaderBasedRenderer::render(float dt)
         
     }  // for i<world->getNumKarts()
     
-    // Use full screen size
-    float tmp[2];
-    tmp[0] = float(irr_driver->getActualScreenSize().Width);
-    tmp[1] = float(irr_driver->getActualScreenSize().Height);
-    glBindBuffer(GL_UNIFORM_BUFFER, 
-                 SharedGPUObjects::getViewProjectionMatricesUBO());
-    glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float),
-                    2 * sizeof(float), tmp);
+    if(CVS->isARBUniformBufferObjectUsable())
+    {
+        // Use full screen size
+        float tmp[2];
+        tmp[0] = float(irr_driver->getActualScreenSize().Width);
+        tmp[1] = float(irr_driver->getActualScreenSize().Height);
+        glBindBuffer(GL_UNIFORM_BUFFER, 
+                     SharedGPUObjects::getViewProjectionMatricesUBO());
+        glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float),
+                        2 * sizeof(float), tmp);
+    }
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -936,7 +945,9 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
 
     computeMatrixesAndCameras(camera, width, height);
     updateLightsInfo(camera, dt);
-    uploadLightingData();
+    if(CVS->isARBUniformBufferObjectUsable())
+        uploadLightingData();
+    
     renderScene(camera, dt, false, true);
     m_post_processing->render(camera, false, m_rtts, render_target);    
 
