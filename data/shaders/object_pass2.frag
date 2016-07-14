@@ -12,9 +12,8 @@ in vec2 uv;
 in vec4 color;
 out vec4 FragColor;
 
-vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue);
-vec3 rgbToHsv(vec3 c);
-vec3 hsvToRgb(vec3 c);
+#stk_include "utils/getLightFactor.frag"
+#stk_include "utils/rgb_conversion.frag"
 
 void main(void)
 {

@@ -39,7 +39,7 @@ void main(void)
         if (gl_VertexID < level)
         {
             float dt_from_last_frame = fract(updated_lifetime) * lifetime_initial;
-            float coeff = dt_from_last_frame / dt;
+            float coeff = dt_from_last_frame / float(dt);
             
             vec4 previous_frame_position = previous_frame_sourcematrix * vec4(particle_position_initial, 1.0);
             vec4 current_frame_position  = sourcematrix * vec4(particle_position_initial, 1.0);
@@ -66,7 +66,7 @@ void main(void)
         else
         {
             new_lifetime = fract(updated_lifetime);
-            new_size = 0;
+            new_size = 0.0;
         }
     }
     else
@@ -74,7 +74,7 @@ void main(void)
         new_particle_position = particle_position + particle_velocity.xyz * float(dt);
         new_particle_velocity = particle_velocity;
         new_lifetime = updated_lifetime;
-        new_size = (size == 0) ? 0. : mix(size_initial, size_initial * size_increase_factor, updated_lifetime);
+        new_size = (size == 0.0) ? 0. : mix(size_initial, size_initial * size_increase_factor, updated_lifetime);
     }
     gl_Position = vec4(0.);
 }

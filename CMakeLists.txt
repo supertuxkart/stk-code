@@ -20,6 +20,10 @@ option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace the online profile GUI in the main menu with the network multiplayer GUI" OFF)
 
+if (UNIX AND NOT APPLE)
+    option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+endif()
+
 if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
     # on the installation of the Windows DDK (Driver Developer Kit),
@@ -60,6 +64,10 @@ if(WIN32)
     add_definitions(-D_IRR_STATIC_LIB_)
 endif()
 
+if(USE_GLES2)
+    add_definitions(-DUSE_GLES2)
+endif()
+
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
@@ -69,9 +77,11 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
 # Build glew library
-add_definitions(-DGLEW_NO_GLU)
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
-include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+if(NOT USE_GLES2)
+    add_definitions(-DGLEW_NO_GLU)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+endif()
 
 if((WIN32 AND NOT MINGW) OR APPLE)
     if (NOT APPLE)
@@ -196,8 +206,10 @@ if (OPENMP_FOUND)
 endif()
 
 # OpenGL
-find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
+if(NOT USE_GLES2)
+    find_package(OpenGL REQUIRED)
+    include_directories(${OPENGL_INCLUDE_DIR})
+endif()
 
 if(UNIX AND NOT APPLE)
     find_package(X11 REQUIRED)
@@ -355,15 +367,19 @@ target_link_libraries(supertuxkart
     bulletcollision
     bulletmath
     enet
-    glew
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
-    ${OPENGL_LIBRARIES}
     ${FREETYPE_LIBRARIES}
     )
+
+if(NOT USE_GLES2)
+    target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew)
+else()
+    target_link_libraries(supertuxkart EGL GLESv2)
+endif()
 
 if(UNIX AND NOT APPLE)
     target_link_libraries(supertuxkart ${X11_LIBRARIES})

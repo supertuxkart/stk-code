@@ -66,21 +66,17 @@ public:
     PointLightShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "pointlight.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
-                            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                             GL_FRAGMENT_SHADER, "pointlight.frag");
 
         assignUniforms();
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED, 
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED);
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, 
+        glBufferData(GL_ARRAY_BUFFER,
                      LightBaseClass::MAXLIGHT * sizeof(LightBaseClass::PointLightInfo),
                      0, GL_DYNAMIC_DRAW);
 
@@ -90,7 +86,7 @@ public:
         GLuint attrib_Radius = glGetAttribLocation(m_program, "Radius");
 
         glEnableVertexAttribArray(attrib_Position);
-        glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE, 
+        glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE,
                               sizeof(LightBaseClass::PointLightInfo), 0);
         glEnableVertexAttribArray(attrib_Energy);
         glVertexAttribPointer(attrib_Energy, 1, GL_FLOAT, GL_FALSE,
@@ -101,7 +97,7 @@ public:
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(4 * sizeof(float)));
         glEnableVertexAttribArray(attrib_Radius);
-        glVertexAttribPointer(attrib_Radius, 1, GL_FLOAT, GL_FALSE, 
+        glVertexAttribPointer(attrib_Radius, 1, GL_FLOAT, GL_FALSE,
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
 
@@ -123,7 +119,6 @@ public:
     PointLightScatterShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "pointlight.vert",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                             GL_FRAGMENT_SHADER, "pointlightscatter.frag");
 
         assignUniforms("density", "fogcol");
@@ -171,11 +166,6 @@ public:
     ShadowedSunLightShaderPCF()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
-                            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-                            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
                             GL_FRAGMENT_SHADER, "sunlightshadow.frag");
 
         // Use 8 to circumvent a catalyst bug when binding sampler
@@ -193,7 +183,7 @@ public:
        drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
                             ShadowMatrices::m_shadow_split[2],
                             ShadowMatrices::m_shadow_split[3],
-                            ShadowMatrices::m_shadow_split[4], 
+                            ShadowMatrices::m_shadow_split[4],
                             float(UserConfigParams::m_shadows_resolution)   );
 
     }    // render
@@ -205,21 +195,16 @@ class ShadowedSunLightShaderESM : public TextureShader<ShadowedSunLightShaderESM
                                                        float>
 {
 public:
-    ShadowedSunLightShaderESM() 
+    ShadowedSunLightShaderESM()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/decodeNormal.frag",
-                            GL_FRAGMENT_SHADER, "utils/SpecularBRDF.frag",
-                            GL_FRAGMENT_SHADER, "utils/DiffuseBRDF.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
-                            GL_FRAGMENT_SHADER, "utils/SunMRP.frag",
                             GL_FRAGMENT_SHADER, "sunlightshadowesm.frag");
 
         // Use 8 to circumvent a catalyst bug when binding sampler
         assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED,
                            8, "shadowtex", ST_TRILINEAR_CLAMPED_ARRAY2D);
-            
+
         assignUniforms("split0", "split1", "split2", "splitmax");
     }   // ShadowedSunLightShaderESM
     // ------------------------------------------------------------------------
@@ -235,9 +220,10 @@ public:
     }   // render
 };   // ShadowedSunLightShaderESM
 
+#if !defined(USE_GLES2)
 // ============================================================================
 class RadianceHintsConstructionShader
-    : public TextureShader<RadianceHintsConstructionShader, 3, core::matrix4, 
+    : public TextureShader<RadianceHintsConstructionShader, 3, core::matrix4,
                           core::matrix4, core::vector3df, video::SColorf>
 {
 public:
@@ -283,6 +269,7 @@ public:
                            2, "dtex", ST_BILINEAR_FILTERED);
     }   // NVWorkaroundRadianceHintsConstructionShader
 };   // NVWorkaroundRadianceHintsConstructionShader
+#endif
 
 // ============================================================================
 class FogShader : public TextureShader<FogShader, 1, float, core::vector3df>
@@ -291,7 +278,6 @@ public:
     FogShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                             GL_FRAGMENT_SHADER, "fog.frag");
         assignUniforms("density", "col");
         assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
@@ -317,7 +303,7 @@ static void renderPointLights(unsigned count)
     PointLightShader::getInstance()->use();
     glBindVertexArray(PointLightShader::getInstance()->vao);
     glBindBuffer(GL_ARRAY_BUFFER, PointLightShader::getInstance()->vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 
+    glBufferSubData(GL_ARRAY_BUFFER, 0,
                      count * sizeof(LightBaseClass::PointLightInfo),
                      m_point_lights_info);
 
@@ -347,7 +333,7 @@ unsigned IrrDriver::updateLightsInfo(scene::ICameraSceneNode * const camnode,
             m_lights[i]->render();
             continue;
         }
-        const core::vector3df &lightpos = 
+        const core::vector3df &lightpos =
                                  (m_lights[i]->getAbsolutePosition() - campos);
         unsigned idx = (unsigned)(lightpos.getLength() / 10);
         if (idx > 14)
@@ -387,7 +373,7 @@ unsigned IrrDriver::updateLightsInfo(scene::ICameraSceneNode * const camnode,
                 m_point_lights_info[lightnum].posY = pos.Y;
                 m_point_lights_info[lightnum].posZ = pos.Z;
 
-                m_point_lights_info[lightnum].energy = 
+                m_point_lights_info[lightnum].energy =
                                               light_node->getEffectiveEnergy();
 
                 const core::vector3df &col = light_node->getColor();
@@ -438,6 +424,7 @@ void IrrDriver::uploadLightingData()
 void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 {
     //RH
+#if !defined(USE_GLES2)
     if (CVS->isGlobalIlluminationEnabled() && hasShadow)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
@@ -455,7 +442,7 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
             for (unsigned i = 0; i < 32; i++)
             {
                 NVWorkaroundRadianceHintsConstructionShader::getInstance()
-                    ->setUniforms(getShadowMatrices()->getRSMMatrix(), 
+                    ->setUniforms(getShadowMatrices()->getRSMMatrix(),
                                   getShadowMatrices()->getRHMatrix(),
                                   getShadowMatrices()->getRHExtend(), i,
                                   irr_driver->getSunColor());
@@ -473,12 +460,13 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
             );
             RadianceHintsConstructionShader::getInstance()
                 ->setUniforms(getShadowMatrices()->getRSMMatrix(),
-                              getShadowMatrices()->getRHMatrix(), 
+                              getShadowMatrices()->getRHMatrix(),
                               getShadowMatrices()->getRHExtend(),
                               irr_driver->getSunColor());
             glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
         }
     }
+#endif
     getShadowMatrices()->updateSunOrthoMatrices();
     m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
     glClear(GL_COLOR_BUFFER_BIT);
@@ -500,10 +488,10 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
         {
             m_post_processing->renderEnvMap(m_skybox->getSpecularProbe());
         }
-        else 
+        else
         {
             m_post_processing->renderEnvMap(0);
-        }           
+        }
     }
 
     // Render sunlight if and only if track supports shadow
@@ -545,9 +533,9 @@ void IrrDriver::renderSSAO()
     m_post_processing->renderSSAO();
     // Blur it to reduce noise.
     FrameBuffer::Blit(m_rtts->getFBO(FBO_SSAO),
-                      m_rtts->getFBO(FBO_HALF1_R), 
+                      m_rtts->getFBO(FBO_HALF1_R),
                       GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    m_post_processing->renderGaussian17TapBlur(irr_driver->getFBO(FBO_HALF1_R), 
+    m_post_processing->renderGaussian17TapBlur(irr_driver->getFBO(FBO_HALF1_R),
                                                irr_driver->getFBO(FBO_HALF2_R));
 
 }   // renderSSAO

@@ -684,6 +684,8 @@ PROFILER_POP_CPU_MARKER();
 
     if (!CVS->supportsIndirectInstancingRendering())
         return;
+        
+#if !defined(USE_GLES2)
 
     InstanceDataDualTex *InstanceBufferDualTex;
     InstanceDataThreeTex *InstanceBufferThreeTex;
@@ -898,4 +900,5 @@ PROFILER_POP_CPU_MARKER();
 
     if (CVS->supportsAsyncInstanceUpload())
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
+#endif
 }

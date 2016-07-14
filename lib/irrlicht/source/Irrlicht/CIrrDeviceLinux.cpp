@@ -63,6 +63,8 @@ namespace irr
 		extern bool useCoreContext;
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
+		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
+			video::SExposedVideoData& data, io::IFileSystem* io);
 	}
 } // end namespace irr
 
@@ -506,6 +508,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 }
 #endif
 
+#ifdef _IRR_COMPILE_WITH_OPENGL_
 static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, bool force_legacy_context)
 {
 	GLXContext Context;
@@ -590,6 +593,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
+#endif
 
 bool CIrrDeviceLinux::createWindow()
 {
@@ -1137,6 +1141,19 @@ void CIrrDeviceLinux::createDriver()
 		os::Printer::log("No OpenGL support compiled in.", ELL_ERROR);
 		#endif
 		break;
+
+	case video::EDT_OGLES2:
+	{
+		#ifdef _IRR_COMPILE_WITH_OGLES2_
+		video::SExposedVideoData data;
+		data.OpenGLLinux.X11Window = window;
+		data.OpenGLLinux.X11Display = display;
+		VideoDriver = video::createOGLES2Driver(CreationParams, data, FileSystem);
+		#else
+		os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
+		#endif
+		break;
+	}
 
 	case video::EDT_DIRECT3D8:
 	case video::EDT_DIRECT3D9:

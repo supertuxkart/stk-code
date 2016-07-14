@@ -20,7 +20,13 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 
+#if defined(USE_GLES2)
+#define _IRR_COMPILE_WITH_OGLES2_
+#include "../../lib/irrlicht/source/Irrlicht/COGLES2Texture.h"
+#else
 #include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
+#endif
+
 
 #include <fstream>
 #include <sstream>
@@ -28,13 +34,21 @@
 
 GLuint getTextureGLuint(irr::video::ITexture *tex)
 {
+#if defined(USE_GLES2)
+    return static_cast<irr::video::COGLES2Texture*>(tex)->getOpenGLTextureName();
+#else
     return static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
+#endif
 }
 
 GLuint getDepthTexture(irr::video::ITexture *tex)
 {
     assert(tex->isRenderTarget());
+#if defined(USE_GLES2)
+    return static_cast<irr::video::COGLES2FBOTexture*>(tex)->DepthBufferTexture;
+#else
     return static_cast<irr::video::COpenGLFBOTexture*>(tex)->DepthBufferTexture;
+#endif
 }
 
 static std::set<irr::video::ITexture *> AlreadyTransformedTexture;
@@ -91,6 +105,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
         }
     }
 
+#if !defined(USE_GLES2)
     if (!CVS->isTextureCompressionEnabled())
     {
         if (srgb)
@@ -105,6 +120,9 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
         else
             internalFormat = (tex->hasAlpha()) ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
     }
+#else
+    internalFormat = (tex->hasAlpha()) ? GL_RGBA : GL_RGB;
+#endif
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, Format, GL_UNSIGNED_BYTE, (GLvoid *)data);
     glGenerateMipmap(GL_TEXTURE_2D);
     delete[] data;
@@ -167,6 +185,7 @@ bool loadCompressedTexture(const std::string& compressed_tex)
 */
 void saveCompressedTexture(const std::string& compressed_tex)
 {
+#if !defined(USE_GLES2)
     int internal_format, width, height, size, compressionSuccessful;
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, (GLint *)&internal_format);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, (GLint *)&width);
@@ -189,6 +208,7 @@ void saveCompressedTexture(const std::string& compressed_tex)
         ofs.close();
     }
     delete[] data;
+#endif
 }
 
 video::ITexture* getUnicolorTexture(const video::SColor &c)
