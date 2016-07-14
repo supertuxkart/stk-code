@@ -30,55 +30,38 @@
 #include <string>
 #include <sstream>
 
+#ifdef DEBUG
+#if !defined(__APPLE__) && !defined(ANDROID)
+#define ARB_DEBUG_OUTPUT
+#endif
+#endif
+
 #if defined(USE_GLES2)
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
-PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR = 0;
-#endif
+#ifdef ARB_DEBUG_OUTPUT
+#define GL_DEBUG_SEVERITY_HIGH_ARB            GL_DEBUG_SEVERITY_HIGH_KHR
+#define GL_DEBUG_SEVERITY_LOW_ARB             GL_DEBUG_SEVERITY_LOW_KHR
+#define GL_DEBUG_SEVERITY_MEDIUM_ARB          GL_DEBUG_SEVERITY_MEDIUM_KHR
+#define GL_DEBUG_SOURCE_API_ARB               GL_DEBUG_SOURCE_API_KHR
+#define GL_DEBUG_SOURCE_APPLICATION_ARB       GL_DEBUG_SOURCE_APPLICATION_KHR
+#define GL_DEBUG_SOURCE_OTHER_ARB             GL_DEBUG_SOURCE_OTHER_KHR
+#define GL_DEBUG_SOURCE_SHADER_COMPILER_ARB   GL_DEBUG_SOURCE_SHADER_COMPILER_KHR
+#define GL_DEBUG_SOURCE_THIRD_PARTY_ARB       GL_DEBUG_SOURCE_THIRD_PARTY_KHR
+#define GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB     GL_DEBUG_SOURCE_WINDOW_SYSTEM_KHR
+#define GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_KHR
+#define GL_DEBUG_TYPE_ERROR_ARB               GL_DEBUG_TYPE_ERROR_KHR
+#define GL_DEBUG_TYPE_OTHER_ARB               GL_DEBUG_TYPE_OTHER_KHR
+#define GL_DEBUG_TYPE_PERFORMANCE_ARB         GL_DEBUG_TYPE_PERFORMANCE_KHR
+#define GL_DEBUG_TYPE_PORTABILITY_ARB         GL_DEBUG_TYPE_PORTABILITY_KHR
+#define GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB  GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_KHR
 
-#ifndef GL_DEBUG_SEVERITY_HIGH_ARB
-    // Extension: ARB_debug_output
-    #define GL_DEBUG_SEVERITY_HIGH_ARB       0x9146
-    #define GL_DEBUG_SEVERITY_LOW_ARB        0x9148
-    #define GL_DEBUG_SEVERITY_MEDIUM_ARB     0x9147
-    #define GL_DEBUG_SOURCE_API_ARB          0x8246
-    #define GL_DEBUG_SOURCE_APPLICATION_ARB  0x824A
-    #define GL_DEBUG_SOURCE_OTHER_ARB        0x824B
-    #define GL_DEBUG_SOURCE_SHADER_COMPILER_ARB 0x8248
-    #define GL_DEBUG_SOURCE_THIRD_PARTY_ARB  0x8249
-    #define GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB 0x8247
-    #define GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB 0x824D
-    #define GL_DEBUG_TYPE_ERROR_ARB          0x824C
-    #define GL_DEBUG_TYPE_OTHER_ARB          0x8251
-    #define GL_DEBUG_TYPE_PERFORMANCE_ARB    0x8250
-    #define GL_DEBUG_TYPE_PORTABILITY_ARB    0x824F
-    #define GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB 0x824E
+#define GLDEBUGPROCARB GLDEBUGPROCKHR
+PFNGLDEBUGMESSAGECALLBACKKHRPROC pglDebugMessageCallbackKHR;
+#define glDebugMessageCallbackARB pglDebugMessageCallbackKHR
 #endif
-
-#ifndef GL_DEBUG_SEVERITY_HIGH
-    // Extension: KHR_debug
-    #define GL_DEBUG_SEVERITY_HIGH           0x9146
-    #define GL_DEBUG_SEVERITY_LOW            0x9148
-    #define GL_DEBUG_SEVERITY_MEDIUM         0x9147
-    #define GL_DEBUG_SEVERITY_NOTIFICATION   0x826B
-    #define GL_DEBUG_SOURCE_API              0x8246
-    #define GL_DEBUG_SOURCE_APPLICATION      0x824A
-    #define GL_DEBUG_SOURCE_OTHER            0x824B
-    #define GL_DEBUG_SOURCE_SHADER_COMPILER  0x8248
-    #define GL_DEBUG_SOURCE_THIRD_PARTY      0x8249
-    #define GL_DEBUG_SOURCE_WINDOW_SYSTEM    0x8247
-    #define GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR 0x824D
-    #define GL_DEBUG_TYPE_ERROR              0x824C
-    #define GL_DEBUG_TYPE_MARKER             0x8268
-    #define GL_DEBUG_TYPE_OTHER              0x8251
-    #define GL_DEBUG_TYPE_PERFORMANCE        0x8250
-    #define GL_DEBUG_TYPE_POP_GROUP          0x826A
-    #define GL_DEBUG_TYPE_PORTABILITY        0x824F
-    #define GL_DEBUG_TYPE_PUSH_GROUP         0x8269
-    #define GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR 0x824E
 #endif
-
 
 static bool is_gl_init = false;
 
@@ -86,13 +69,6 @@ static bool is_gl_init = false;
 bool GLContextDebugBit = true;
 #else
 bool GLContextDebugBit = false;
-#endif
-
-
-#ifdef DEBUG
-#if !defined(__APPLE__)
-#define ARB_DEBUG_OUTPUT
-#endif
 #endif
 
 #ifdef ARB_DEBUG_OUTPUT
@@ -192,16 +168,14 @@ void initGL()
     if (GLEW_OK != err)
         Log::fatal("GLEW", "Glew initialisation failed with error %s", glewGetErrorString(err));
 #else
+#ifdef ARB_DEBUG_OUTPUT
     glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKKHRPROC)eglGetProcAddress("glDebugMessageCallbackKHR");
+#endif
 #endif
 
 #ifdef ARB_DEBUG_OUTPUT
     if (glDebugMessageCallbackARB)
-#if !defined(USE_GLES2)
         glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
-#else
-        glDebugMessageCallbackARB((GLDEBUGPROCKHR)debugCallback, NULL);
-#endif
 #endif
 }
 
