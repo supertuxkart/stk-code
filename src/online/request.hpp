@@ -29,9 +29,7 @@
 #ifdef WIN32
 #  include <winsock2.h>
 #endif
-#ifndef NO_CURL
-#  include <curl/curl.h>
-#endif
+#include <curl/curl.h>
 #include <assert.h>
 #include <string>
 

@@ -66,7 +66,6 @@ void NewsManager::init(bool force_refresh)
 {
     m_force_refresh = force_refresh;
 
-#ifndef ANDROID
     // The rest (which potentially involves downloading news.xml) is handled
     // in a separate thread, so that the GUI remains responsive. It is only
     // started if internet access is enabled, else nothing is done in the
@@ -90,7 +89,6 @@ void NewsManager::init(bool force_refresh)
         }
         pthread_attr_destroy(&attr);
     }
-#endif
 
 }   //init
 

@@ -28,9 +28,7 @@
 #ifdef WIN32
 #  include <winsock2.h>
 #endif
-#ifndef NO_CURL
-#  include <curl/curl.h>
-#endif
+#include <curl/curl.h>
 #include <assert.h>
 #include <string>
 
@@ -64,13 +62,11 @@ namespace Online
          *  instead of being kept in in memory. Otherwise this is "". */
         std::string m_filename;
 
-#ifndef NO_CURL
         /** Pointer to the curl data structure for this request. */
         CURL *m_curl_session;
 
         /** curl return code. */
         CURLcode m_curl_code;
-#endif
 
         /** String to store the received data in. */
         std::string m_string_buffer;
@@ -101,11 +97,7 @@ namespace Online
 
         // ------------------------------------------------------------------------
         /** Returns true if there was an error downloading the file. */
-#ifndef NO_CURL
         bool hadDownloadError() const { return m_curl_code != CURLE_OK; }
-#else
-        bool hadDownloadError() const { return true; }
-#endif
 
         // ------------------------------------------------------------------------
         /** Returns the curl error message if an error has occurred.
@@ -114,11 +106,7 @@ namespace Online
         const char* getDownloadErrorMessage() const
         {
             assert(hadDownloadError());
-#ifndef NO_CURL
             return curl_easy_strerror(m_curl_code);
-#else
-			return "cURL not available";
-#endif
         }   // getDownloadErrorMessage
 
         // ------------------------------------------------------------------------
@@ -156,7 +144,6 @@ namespace Online
         template <typename T>
         void addParameter(const std::string &name, const T& value)
         {
-#ifndef NO_CURL
             assert(isPreparing());
             std::string s = StringUtils::toString(value);
 
@@ -165,7 +152,6 @@ namespace Online
             m_parameters.append(std::string(s1) + "=" + s2 + "&");
             curl_free(s1);
             curl_free(s2);
-#endif
         }   // addParameter
 
         // --------------------------------------------------------------------

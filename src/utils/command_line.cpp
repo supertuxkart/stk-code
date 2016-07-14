@@ -31,13 +31,9 @@ std::string               CommandLine::m_exec_name="";
  */
 void CommandLine::init(unsigned int argc, char *argv[])
 {
-#ifdef ANDROID
-	m_exec_name = "";
-#else
     m_exec_name = argv[0];
     for(unsigned int i=1; i<argc; i++)
         m_argv.push_back(argv[i]);
-#endif
 }   // CommandLine
 
 // ----------------------------------------------------------------------------

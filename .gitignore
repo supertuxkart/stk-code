@@ -52,8 +52,3 @@ packets_log.txt
 history.dat
 README.dependencies
 xx
-
-android/android-ndk-r10e
-android/jni/jpeglib
-android/jni/freetype
-android/jni/ifaddrs

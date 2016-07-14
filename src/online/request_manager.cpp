@@ -72,9 +72,7 @@ namespace Online
         m_menu_polling_interval = 60;  // Default polling: every 60 seconds.
         m_game_polling_interval = 60;  // same for game polling
         m_time_since_poll       = m_menu_polling_interval;
-#ifndef NO_CURL
         curl_global_init(CURL_GLOBAL_DEFAULT);
-#endif
         pthread_cond_init(&m_cond_request, NULL);
         m_abort.setAtomic(false);
     }   // RequestManager
@@ -87,9 +85,7 @@ namespace Online
         delete m_thread_id.getData();
         m_thread_id.unlock();
         pthread_cond_destroy(&m_cond_request);
-#ifndef NO_CURL
         curl_global_cleanup();
-#endif
     }   // ~RequestManager
 
     // ------------------------------------------------------------------------
@@ -104,7 +100,6 @@ namespace Online
      */
     void RequestManager::startNetworkThread()
     {
-#ifndef NO_CURL
         pthread_attr_t  attr;
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
@@ -135,7 +130,6 @@ namespace Online
         {
             PlayerManager::resumeSavedSession();
         }
-#endif
     }   // startNetworkThread
 
     // ------------------------------------------------------------------------
@@ -146,7 +140,6 @@ namespace Online
      */
     void RequestManager::stopNetworkThread()
     {
-#ifndef NO_CURL
         // This will queue a sign-out or client-quit request
         PlayerManager::onSTKQuit();
 
@@ -166,7 +159,6 @@ namespace Online
         // be executed (before the quit request is executed, which causes this
         // thread to exit).
         m_abort.setAtomic(true);
-#endif
     }   // stopNetworkThread
 
     // ------------------------------------------------------------------------
@@ -194,7 +186,6 @@ namespace Online
      */
     void *RequestManager::mainLoop(void *obj)
     {
-#ifndef NO_CURL
         VS::setThreadName("RequestManager");
         RequestManager *me = (RequestManager*) obj;
 
@@ -251,7 +242,6 @@ namespace Online
         pthread_exit(NULL);
 
         return 0;
-#endif
     }   // mainLoop
 
     // ------------------------------------------------------------------------

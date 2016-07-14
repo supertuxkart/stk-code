@@ -97,9 +97,6 @@ using namespace irr;
 /** singleton */
 IrrDriver *irr_driver = NULL;
 
-#ifdef ANDROID
-extern void* global_android_app;
-#endif
 
 GPUTimer          m_perf_query[Q_LAST];
 
@@ -120,23 +117,13 @@ IrrDriver::IrrDriver()
     m_shadow_matrices     = NULL;
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
-#ifdef ANDROID
-	struct irr::SIrrlichtCreationParameters p;
-	p.DriverType = video::EDT_NULL;
-	// The android app object is needed by the irrlicht device.
-	p.PrivateData = global_android_app;
-	p.WindowSize = core::dimension2d<u32>(1280,800);
-
-	m_device = createDeviceEx(p);
-#else
-    m_device              = irr::createDevice(video::EDT_NULL,
+    m_device              = createDevice(video::EDT_NULL,
                                          irr::core::dimension2d<u32>(640, 480),
                                          /*bits*/16U, /**fullscreen*/ false,
                                          /*stencilBuffer*/ false,
                                          /*vsync*/false,
                                          /*event receiver*/ NULL,
                                          file_manager->getFileSystem());
-#endif
     m_request_screenshot = false;
     m_rtts                = NULL;
     m_post_processing     = NULL;
@@ -458,15 +445,10 @@ void IrrDriver::initDevice()
                 Log::verbose("irr_driver", "Trying to create device with "
                              "%i bits\n", bits);
 
-            if(m_device)
-                break;
 #if defined(USE_GLES2)
             params.DriverType    = video::EDT_OGLES2;
 #else
             params.DriverType    = video::EDT_OPENGL;
-#endif
-#if defined(ANDROID)
-			params.PrivateData = global_android_app;
 #endif
             params.Stencilbuffer = false;
             params.Bits          = bits;
@@ -502,7 +484,7 @@ void IrrDriver::initDevice()
                            (int)UserConfigParams::m_antialiasing);
             }
             */
-            m_device = irr::createDeviceEx(params);
+            m_device = createDeviceEx(params);
 
             if(m_device)
                 break;
@@ -572,10 +554,6 @@ void IrrDriver::initDevice()
     m_sync = 0;
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
-#ifdef ANDROID // resolution is not configurable, and we can not predict it before creating the driver, so let's set the width/height now to avoid glitches
-	UserConfigParams::m_width  = m_actual_screen_size.Width;
-	UserConfigParams::m_height = m_actual_screen_size.Height;
-#endif
 
     m_spherical_harmonics = new SphericalHarmonics(m_scene_manager->getAmbientLight().toSColor());
 

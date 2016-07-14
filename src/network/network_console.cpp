@@ -43,22 +43,18 @@ NetworkConsole::NetworkConsole()
 // ----------------------------------------------------------------------------
 NetworkConsole::~NetworkConsole()
 {
-#ifndef ANDROID
     if (m_thread_keyboard)
         pthread_cancel(*m_thread_keyboard);//, SIGKILL);
-#endif
 }
 
 // ----------------------------------------------------------------------------
 void NetworkConsole::run()
 {
-#ifndef ANDROID
     // listen keyboard console input
     m_thread_keyboard = new pthread_t;
     pthread_create(m_thread_keyboard, NULL, mainLoop, this);
 
     Log::info("NetworkConsole", "Ready.");
-#endif
 }   // run
 
 // ----------------------------------------------------------------------------

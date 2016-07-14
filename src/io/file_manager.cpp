@@ -206,8 +206,6 @@ FileManager::FileManager()
     addRootDirs(root_dir);
     if( fileExists(root_dir+"../../stk-assets"))
         addRootDirs(root_dir+"../../stk-assets");
-    if( fileExists(root_dir+"/stk-assets"))
-        addRootDirs(root_dir+"/stk-assets");
     if( fileExists(root_dir+"../../supertuxkart-assets"))
         addRootDirs(root_dir+"../../supertuxkart-assets");
     if ( getenv ( "SUPERTUXKART_ROOT_PATH" ) != NULL )
