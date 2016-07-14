@@ -19,6 +19,8 @@
 #ifndef HEADER_RENDER_INFO_HPP
 #define HEADER_RENDER_INFO_HPP
 
+#include "utils/leak_check.hpp"
+
 #include <algorithm>
 #include <vector>
 
@@ -49,6 +51,8 @@ private:
     std::vector<int> m_colorizable_parts;
 
 public:
+    LEAK_CHECK();
+    // ------------------------------------------------------------------------
     RenderInfo(float hue = 0.0f, bool transparent = false);
     // ------------------------------------------------------------------------
     ~RenderInfo() {}

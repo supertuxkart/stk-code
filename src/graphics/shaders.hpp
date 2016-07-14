@@ -143,7 +143,7 @@ public:
     };   // ObjectPass1Shader
 
     // ========================================================================
-    class ObjectPass2Shader : public TextureShader < ObjectPass2Shader, 5,
+    class ObjectPass2Shader : public TextureShader < ObjectPass2Shader, 6,
                                                  core::matrix4, core::matrix4 >
     {
     private:

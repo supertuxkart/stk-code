@@ -20,6 +20,7 @@
 
 #include "animations/three_d_animation.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -42,9 +43,9 @@
  */
 TrackObject::TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent,
                          ModelDefinitionLoader& model_def_loader,
-                         TrackObject* parent_library)
+                         TrackObject* parent_library, RenderInfo* ri)
 {
-    init(xml_node, parent, model_def_loader, parent_library);
+    init(xml_node, parent, model_def_loader, parent_library, ri);
 }   // TrackObject
 
 // ----------------------------------------------------------------------------
@@ -93,7 +94,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
  */
 void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                        ModelDefinitionLoader& model_def_loader,
-                       TrackObject* parent_library)
+                       TrackObject* parent_library, RenderInfo* ri)
 {
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
@@ -183,7 +184,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         {
             m_type = "lod";
             TrackObjectPresentationLOD* lod_node =
-                new TrackObjectPresentationLOD(xml_node, parent, model_def_loader);
+                new TrackObjectPresentationLOD(xml_node, parent, model_def_loader, ri);
             m_presentation = lod_node;
 
             LODNode* node = (LODNode*)lod_node->getNode();
@@ -207,7 +208,8 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
             m_type = "mesh";
             m_presentation = new TrackObjectPresentationMesh(xml_node,
                                                              m_enabled,
-                                                             parent);
+                                                             parent,
+                                                             ri);
             scene::ISceneNode* node = ((TrackObjectPresentationMesh *)m_presentation)->getNode();
             if (type == "movable" && parent != NULL)
             {

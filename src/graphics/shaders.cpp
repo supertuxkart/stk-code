@@ -348,7 +348,8 @@ Shaders::ObjectPass2Shader::ObjectPass2Shader()
                        1, "SpecularMap", ST_NEAREST_FILTERED,
                        2, "SSAO", ST_BILINEAR_FILTERED,
                        3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                       4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+                       4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                       5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // ObjectPass2Shader
 
 // ============================================================================

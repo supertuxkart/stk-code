@@ -132,7 +132,7 @@ public:
 };   // ObjectRefPass2Shader
 
 // ============================================================================
-class InstancedObjectPass2Shader : public TextureShader<InstancedObjectPass2Shader, 5>
+class InstancedObjectPass2Shader : public TextureShader<InstancedObjectPass2Shader, 6>
 {
 private:
     GLint m_color_change_location;
@@ -151,7 +151,8 @@ public:
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedObjectPass2Shader
 
     virtual bool changeableColor(float hue = 0.0f, float min_sat = 0.0f) const OVERRIDE
@@ -542,15 +543,15 @@ struct DefaultMaterial
                                                = Material::SHADERTYPE_SOLID;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const STK::Tuple<size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t> SecondPassTextures;
+    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;
     static const STK::Tuple<size_t> RSMTextures;
 };   // struct DefaultMaterial
 
 const STK::Tuple<size_t> DefaultMaterial::FirstPassTextures
     = STK::Tuple<size_t>(1);
-const STK::Tuple<size_t, size_t> DefaultMaterial::SecondPassTextures
-    = STK::Tuple<size_t, size_t>(0, 1);
+const STK::Tuple<size_t, size_t, size_t> DefaultMaterial::SecondPassTextures
+    = STK::Tuple<size_t, size_t, size_t>(0, 1, 7);
 const STK::Tuple<> DefaultMaterial::ShadowTextures;
 const STK::Tuple<size_t> DefaultMaterial::RSMTextures = STK::Tuple<size_t>(0);
 
@@ -866,7 +867,7 @@ struct NormalMat
                                           = Material::SHADERTYPE_NORMAL_MAP;
     static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t> SecondPassTextures;
+    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;
     static const STK::Tuple<size_t> RSMTextures;
 };   // NormalMat
@@ -874,8 +875,8 @@ struct NormalMat
 // ----------------------------------------------------------------------------
 const STK::Tuple<size_t, size_t> NormalMat::FirstPassTextures
     = STK::Tuple<size_t, size_t>(2, 1);
-const STK::Tuple<size_t, size_t> NormalMat::SecondPassTextures 
-    = STK::Tuple<size_t, size_t>(0, 1);
+const STK::Tuple<size_t, size_t, size_t> NormalMat::SecondPassTextures
+    = STK::Tuple<size_t, size_t, size_t>(0, 1, 7);
 const STK::Tuple<> NormalMat::ShadowTextures;
 const STK::Tuple<size_t> NormalMat::RSMTextures = STK::Tuple<size_t>(0);
 

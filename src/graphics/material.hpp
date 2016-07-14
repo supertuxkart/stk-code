@@ -233,6 +233,8 @@ private:
     
     std::string      m_mask;
 
+    std::string      m_colorization_mask;
+
     /** If m_splatting is true, indicates the first splatting texture */
     std::string      m_splatting_texture_1;
 

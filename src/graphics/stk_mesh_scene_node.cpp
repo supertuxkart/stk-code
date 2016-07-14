@@ -197,14 +197,6 @@ void STKMeshSceneNode::updateNoGL()
                 else
                     additive = (TranspMat == TM_ADDITIVE);
             }
-            else if (mesh.m_render_info != NULL)
-            {
-                // For now, put all meshes that support custom render info into
-                // solid (default) material first, this allowing changing fewer
-                // shaders
-                if (!immediate_draw)
-                    MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);
-            }
             else
             {
                 assert(!isDisplacement);
@@ -397,15 +389,25 @@ void STKMeshSceneNode::render()
                                 Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+
                 if (!mesh.TextureHandles[1])
                     mesh.TextureHandles[1] =
                     glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[1]),
                                 Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[1]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[1]);
+
+                if (!mesh.TextureHandles[2])
+                    mesh.TextureHandles[2] =
+                    glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[7]),
+                                Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+                if (!glIsTextureHandleResidentARB(mesh.TextureHandles[2]))
+                    glMakeTextureHandleResidentARB(mesh.TextureHandles[2]);
+
                 Shaders::ObjectPass2Shader::getInstance()
                     ->setTextureHandles(DiffuseHandle, SpecularHandle, SSAOHandle,
-                                        mesh.TextureHandles[0], mesh.TextureHandles[1]);
+                                        mesh.TextureHandles[0], mesh.TextureHandles[1],
+                                        mesh.TextureHandles[2]);
             }
             else
                 Shaders::ObjectPass2Shader::getInstance()->setTextureUnits(
@@ -413,7 +415,8 @@ void STKMeshSceneNode::render()
                 irr_driver->getRenderTargetTexture(RTT_SPECULAR),
                 irr_driver->getRenderTargetTexture(RTT_HALF1_R),
                 getTextureGLuint(mesh.textures[0]),
-                getTextureGLuint(mesh.textures[1]));
+                getTextureGLuint(mesh.textures[1]),
+                getTextureGLuint(mesh.textures[7]));
             Shaders::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation,
                                                                    mesh.TextureMatrix);
             assert(mesh.vao);

@@ -56,7 +56,7 @@ void ModelDefinitionLoader::addModelDefinition(const XMLNode* xml)
 
 // ----------------------------------------------------------------------------
 
-LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISceneNode* parent)
+LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISceneNode* parent, RenderInfo* ri)
 {
     scene::ISceneManager* sm = irr_driver->getSceneManager();
 
@@ -88,7 +88,8 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                 //cache.push_back(a_mesh);
                 irr_driver->grabAllTextures(a_mesh);
                 m_track->addCachedMesh(a_mesh);
-                scene::IAnimatedMeshSceneNode* scene_node = irr_driver->addAnimatedMesh(a_mesh, group[m].m_model_file);
+                scene::IAnimatedMeshSceneNode* scene_node = irr_driver
+                    ->addAnimatedMesh(a_mesh, group[m].m_model_file, NULL, ri);
 
                 m_track->handleAnimatedTextures(scene_node, *group[m].m_xml);
 
@@ -111,7 +112,8 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                 //cache.push_back(a_mesh);
                 irr_driver->grabAllTextures(a_mesh);
                 m_track->addCachedMesh(a_mesh);
-                scene::IMeshSceneNode* scene_node = irr_driver->addMesh(a_mesh, group[m].m_model_file);
+                scene::IMeshSceneNode* scene_node = irr_driver
+                    ->addMesh(a_mesh, group[m].m_model_file, NULL, ri);
 
                 m_track->handleAnimatedTextures(scene_node, *group[m].m_xml);
 

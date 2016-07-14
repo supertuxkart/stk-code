@@ -142,13 +142,6 @@ void STKAnimatedMesh::updateNoGL()
             {
                 TransparentMesh[TM_ADDITIVE].push_back(&mesh);
             }
-            else if (mesh.m_render_info != NULL)
-            {
-                // For now, put all meshes that support custom render info into
-                // solid (default) material first, this allowing changing fewer
-                // shaders
-                MeshSolidMaterial[Material::SHADERTYPE_SOLID].push_back(&mesh);
-            }
             else
             {
                 Material::ShaderType MatType = material->getShaderType();// getMeshMaterialFromType(type, mb->getVertexType(), material);
