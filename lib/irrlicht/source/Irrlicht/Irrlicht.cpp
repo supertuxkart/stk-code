@@ -42,6 +42,11 @@
 #include "CIrrDeviceConsole.h"
 #endif
 
+#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
+#include "CIrrDeviceAndroid.h"
+#include <android/log.h>
+#endif
+
 namespace irr
 {
 	//! stub for calling createDeviceEx
@@ -97,6 +102,14 @@ namespace irr
 #ifdef _IRR_COMPILE_WITH_FB_DEVICE_
 		if (params.DeviceType == EIDT_FRAMEBUFFER || (!dev && params.DeviceType == EIDT_BEST))
 			dev = new CIrrDeviceFB(params);
+#endif
+
+#ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
+__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "%s %d", __FILE__, __LINE__);
+	   if (params.DeviceType == EIDT_ANDROID || (!dev && params.DeviceType == EIDT_BEST)) {
+__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "%s %d", __FILE__, __LINE__);
+		   dev = new CIrrDeviceAndroid(params);
+	   }
 #endif
 
 #ifdef _IRR_COMPILE_WITH_CONSOLE_DEVICE_

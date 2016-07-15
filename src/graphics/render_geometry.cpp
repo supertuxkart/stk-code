@@ -84,9 +84,7 @@ class InstancedObjectPass1Shader : public TextureShader<InstancedObjectPass1Shad
 public:
     InstancedObjectPass1Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
 
         assignUniforms();
@@ -100,9 +98,7 @@ class InstancedObjectRefPass1Shader : public TextureShader<InstancedObjectRefPas
 public:
     InstancedObjectRefPass1Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
 
         assignUniforms();
@@ -120,7 +116,6 @@ public:
     ObjectRefPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "objectref_pass2.frag");
         assignUniforms("ModelMatrix", "TextureMatrix");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -140,10 +135,7 @@ private:
 public:
     InstancedObjectPass2Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-                            GL_FRAGMENT_SHADER, "utils/rgb_conversion.frag",
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
         m_color_change_location = glGetUniformLocation(m_program, "color_change");
         assignUniforms();
@@ -168,9 +160,7 @@ class InstancedObjectRefPass2Shader : public TextureShader<InstancedObjectRefPas
 public:
     InstancedObjectRefPass2Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -187,6 +177,7 @@ class ShadowShader : public TextureShader<ShadowShader, 0, int, core::matrix4>
 public:
     ShadowShader()
     {
+#if !defined(USE_GLES2)
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
@@ -202,6 +193,7 @@ public:
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
         assignUniforms("layer", "ModelMatrix");
+#endif
     }   // ShadowShader
 };   // ShadowShader
 
@@ -211,29 +203,30 @@ class InstancedShadowShader : public TextureShader<InstancedShadowShader, 0, int
 public:
     InstancedShadowShader()
     {
+#if !defined(USE_GLES2)
+        // Geometry shader needed
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                                GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedshadow.vert",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                                GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedshadow.vert",
                                 GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
         assignUniforms("layer");
+#endif
     }   // InstancedShadowShader
 
 };   // InstancedShadowShader
 
 // ============================================================================
-class CRSMShader : public TextureShader<CRSMShader, 1, core::matrix4, core::matrix4, 
+class CRSMShader : public TextureShader<CRSMShader, 1, core::matrix4, core::matrix4,
                                  core::matrix4>
 {
 public:
@@ -274,8 +267,7 @@ class CInstancedRSMShader : public TextureShader<CInstancedRSMShader, 1, core::m
 public:
     CInstancedRSMShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_rsm.vert",
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_rsm.vert",
                             GL_FRAGMENT_SHADER, "instanced_rsm.frag");
 
         assignUniforms("RSMMatrix");
@@ -291,8 +283,6 @@ public:
     SphereMapShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-                            GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                             GL_FRAGMENT_SHADER, "objectpass_spheremap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -308,10 +298,8 @@ class InstancedSphereMapShader : public TextureShader<InstancedSphereMapShader, 
 public:
     InstancedSphereMapShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+        loadProgram(OBJECT,
                     GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                    GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
-                    GL_FRAGMENT_SHADER, "utils/getPosFromUVDepth.frag",
                     GL_FRAGMENT_SHADER, "instanced_objectpass_spheremap.frag");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -328,7 +316,6 @@ public:
     SplattingShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "splatting.frag");
         assignUniforms("ModelMatrix");
 
@@ -351,7 +338,6 @@ public:
     ObjectRefPass1Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -361,14 +347,13 @@ public:
 
 
 // ============================================================================
-class NormalMapShader : public TextureShader<NormalMapShader, 2, core::matrix4, 
+class NormalMapShader : public TextureShader<NormalMapShader, 2, core::matrix4,
                                       core::matrix4>
 {
 public:
     NormalMapShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                             GL_FRAGMENT_SHADER, "normalmap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
         assignSamplerNames(1, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -383,9 +368,7 @@ class InstancedNormalMapShader : public TextureShader<InstancedNormalMapShader, 
 public:
     InstancedNormalMapShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_FRAGMENT_SHADER, "instanced_normalmap.frag");
         assignUniforms();
         assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -394,7 +377,7 @@ public:
 };   // InstancedNormalMapShader
 
 // ============================================================================
-class ObjectUnlitShader : public TextureShader<ObjectUnlitShader, 4, core::matrix4, 
+class ObjectUnlitShader : public TextureShader<ObjectUnlitShader, 4, core::matrix4,
                                         core::matrix4>
 {
 public:
@@ -416,8 +399,7 @@ class InstancedObjectUnlitShader : public TextureShader<InstancedObjectUnlitShad
 public:
     InstancedObjectUnlitShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_FRAGMENT_SHADER, "instanced_object_unlit.frag");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -428,12 +410,13 @@ public:
 };   // InstancedObjectUnlitShader
 
 // ============================================================================
-class RefShadowShader : public TextureShader<RefShadowShader, 1, 
+class RefShadowShader : public TextureShader<RefShadowShader, 1,
                                              int, core::matrix4>
 {
 public:
     RefShadowShader()
     {
+#if !defined(USE_GLES2)
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
@@ -450,6 +433,7 @@ public:
         }
         assignUniforms("layer", "ModelMatrix");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+#endif
     }   // RefShadowShader
 };   // RefShadowShader
 
@@ -460,24 +444,24 @@ class InstancedRefShadowShader : public TextureShader<InstancedRefShadowShader,
 public:
     InstancedRefShadowShader()
     {
+#if !defined(USE_GLES2)
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT,GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                               GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanciedshadow.vert",
                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            loadProgram(OBJECT,GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                               GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanciedshadow.vert",
                                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         assignUniforms("layer");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+#endif
     }   // InstancedRefShadowShader
 };   // InstancedRefShadowShader
 
@@ -504,7 +488,7 @@ public:
                             GL_FRAGMENT_SHADER, "displace.frag");
         assignUniforms("ModelMatrix", "dir", "dir2");
 
-        assignSamplerNames(0, "displacement_tex", ST_BILINEAR_FILTERED, 
+        assignSamplerNames(0, "displacement_tex", ST_BILINEAR_FILTERED,
                            1, "color_tex", ST_BILINEAR_FILTERED,
                            2, "mask_tex", ST_BILINEAR_FILTERED,
                            3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -517,11 +501,12 @@ class NormalVisualizer : public Shader<NormalVisualizer, video::SColor>
 public:
     NormalVisualizer()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_object_pass.vert",
+#if !defined(USE_GLES2)
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_GEOMETRY_SHADER, "normal_visualizer.geom",
                             GL_FRAGMENT_SHADER, "coloredquad.frag");
         assignUniforms("color");
+#endif
     }   // NormalVisualizer
 };   // NormalVisualizer
 
@@ -580,7 +565,7 @@ struct AlphaRef
 // ----------------------------------------------------------------------------
 const STK::Tuple<size_t, size_t> AlphaRef::FirstPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<size_t, size_t> AlphaRef::SecondPassTextures 
+const STK::Tuple<size_t, size_t> AlphaRef::SecondPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
 const STK::Tuple<size_t> AlphaRef::ShadowTextures = STK::Tuple<size_t>(0);
 const STK::Tuple<size_t> AlphaRef::RSMTextures = STK::Tuple<size_t>(0);
@@ -599,7 +584,7 @@ struct SphereMap
     typedef CRSMShader RSMShader;
     typedef ListMatSphereMap List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum Material::ShaderType MaterialType 
+    static const enum Material::ShaderType MaterialType
                                           = Material::SHADERTYPE_SPHERE_MAP;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const STK::Tuple<size_t> FirstPassTextures;
@@ -652,7 +637,6 @@ public:
     GrassPass1Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "grass_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
                             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "windDir");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -668,9 +652,7 @@ class InstancedGrassPass1Shader : public TextureShader<InstancedGrassPass1Shader
 public:
     InstancedGrassPass1Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_grass.vert",
-                            GL_FRAGMENT_SHADER, "utils/encode_normal.frag",
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_grass.vert",
                             GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
         assignUniforms("windDir");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -685,6 +667,7 @@ class GrassShadowShader : public TextureShader<GrassShadowShader, 1, int, core::
 public:
     GrassShadowShader()
     {
+#if !defined(USE_GLES2)
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
@@ -701,35 +684,36 @@ public:
         }
         assignUniforms("layer", "ModelMatrix", "windDir");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+#endif
     }   // GrassShadowShader
 };   // GrassShadowShader
 
 // ============================================================================
-class InstancedGrassShadowShader : public TextureShader<InstancedGrassShadowShader, 1, 
+class InstancedGrassShadowShader : public TextureShader<InstancedGrassShadowShader, 1,
                                                  int, core::vector3df>
 {
 public:
     InstancedGrassShadowShader()
     {
+#if !defined(USE_GLES2)
         // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                                GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                                GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
                                 GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
 
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
         assignUniforms("layer", "windDir");
+#endif
     }   // InstancedGrassShadowShader
 };   // InstancedGrassShadowShader
 
@@ -742,7 +726,6 @@ public:
     GrassPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "grass_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "grass_pass2.frag");
         assignUniforms("ModelMatrix", "windDir");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -760,9 +743,7 @@ class InstancedGrassPass2Shader : public TextureShader<InstancedGrassPass2Shader
 public:
     InstancedGrassPass2Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER, "instanced_grass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_grass.vert",
                             GL_FRAGMENT_SHADER, "instanced_grass_pass2.frag");
         assignUniforms("windDir", "SunDir");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -782,7 +763,6 @@ public:
     DetailedObjectPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                            GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                             GL_FRAGMENT_SHADER, "detailed_object_pass2.frag");
         assignUniforms("ModelMatrix");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -800,9 +780,8 @@ class InstancedDetailedObjectPass2Shader : public TextureShader<InstancedDetaile
 public:
     InstancedDetailedObjectPass2Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "utils/getworldmatrix.vert",
+        loadProgram(OBJECT,
                    GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                   GL_FRAGMENT_SHADER, "utils/getLightFactor.frag",
                    GL_FRAGMENT_SHADER, "instanced_detailed_object_pass2.frag");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -832,7 +811,7 @@ struct GrassMat
     typedef CRSMShader RSMShader;
     typedef ListMatGrass List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
-    static const enum Material::ShaderType MaterialType 
+    static const enum Material::ShaderType MaterialType
         = Material::SHADERTYPE_VEGETATION;
     static const enum InstanceType Instance = InstanceTypeDualTex;
     static const STK::Tuple<size_t, size_t> FirstPassTextures;
@@ -842,9 +821,9 @@ struct GrassMat
 };   // GrassMat
 
 // ----------------------------------------------------------------------------
-const STK::Tuple<size_t, size_t> GrassMat::FirstPassTextures 
+const STK::Tuple<size_t, size_t> GrassMat::FirstPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<size_t, size_t> GrassMat::SecondPassTextures 
+const STK::Tuple<size_t, size_t> GrassMat::SecondPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
 const STK::Tuple<size_t> GrassMat::ShadowTextures = STK::Tuple<size_t>(0);
 const STK::Tuple<size_t> GrassMat::RSMTextures = STK::Tuple<size_t>(0);
@@ -928,8 +907,8 @@ struct SplattingMat
 // ----------------------------------------------------------------------------
 
 const STK::Tuple<size_t> SplattingMat::FirstPassTextures = STK::Tuple<size_t>(6);
-const STK::Tuple<size_t, size_t, size_t, size_t, size_t> 
-          SplattingMat::SecondPassTextures 
+const STK::Tuple<size_t, size_t, size_t, size_t, size_t>
+          SplattingMat::SecondPassTextures
               = STK::Tuple<size_t, size_t, size_t, size_t, size_t>(1, 2, 3, 4, 5);
 const STK::Tuple<> SplattingMat::ShadowTextures;
 const STK::Tuple<size_t, size_t, size_t, size_t, size_t> SplattingMat::RSMTextures
@@ -1020,7 +999,6 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
         // Reset after changing
         Shader->changeableColor();
     }
-
 }   // draw
 
 // ----------------------------------------------------------------------------
@@ -1059,7 +1037,7 @@ struct TexExpander_impl
     {
         size_t idx = STK::tuple_get<sizeof...(TupleArgs) - N>(TexSwizzle);
         TexExpander_impl<T, N - 1>::template
-            ExpandTex(mesh, TexSwizzle, 
+            ExpandTex(mesh, TexSwizzle,
                       args..., getTextureGLuint(mesh.textures[idx]));
     }   // ExpandTex
 };   // TexExpander_impl
@@ -1094,11 +1072,11 @@ template<typename T, int N>
 struct HandleExpander_impl
 {
     template<typename...TupleArgs, typename... Args>
-    static void Expand(uint64_t *TextureHandles, 
+    static void Expand(uint64_t *TextureHandles,
                        const STK::Tuple<TupleArgs...> &TexSwizzle, Args... args)
     {
         size_t idx = STK::tuple_get<sizeof...(TupleArgs)-N>(TexSwizzle);
-        HandleExpander_impl<T, N - 1>::template 
+        HandleExpander_impl<T, N - 1>::template
             Expand(TextureHandles, TexSwizzle, args..., TextureHandles[idx]);
     }   // Expand
 };   // HandleExpander_impl
@@ -1157,6 +1135,7 @@ void renderMeshes1stPass()
     }
 }   // renderMeshes1stPass
 
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<typename T, typename...Args>
 void renderInstancedMeshes1stPass(Args...args)
@@ -1171,7 +1150,7 @@ void renderInstancedMeshes1stPass(Args...args)
 #ifdef DEBUG
         if (mesh->VAOType != T::VertexType)
         {
-            Log::error("RenderGeometry", "Wrong instanced vertex format (hint : %s)", 
+            Log::error("RenderGeometry", "Wrong instanced vertex format (hint : %s)",
                 mesh->textures[0]->getName().getPath().c_str());
             continue;
         }
@@ -1198,6 +1177,7 @@ void multidraw1stPass(Args...args)
             sizeof(DrawElementsIndirectCommand));
     }
 }   // multidraw1stPass
+#endif
 
 static core::vector3df windDir;
 
@@ -1206,8 +1186,10 @@ void IrrDriver::renderSolidFirstPass()
 {
     windDir = getWindDir();
 
+#if !defined(USE_GLES2)
     if (CVS->supportsIndirectInstancingRendering())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, SolidPassCmd::getInstance()->drawindirectcmd);
+#endif
 
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS1));
@@ -1225,6 +1207,7 @@ void IrrDriver::renderSolidFirstPass()
         renderMeshes1stPass<SphereMap, 2, 1>();
         renderMeshes1stPass<DetailMat, 2, 1>();
 
+#if !defined(USE_GLES2)
         if (CVS->isAZDOEnabled())
         {
             multidraw1stPass<DefaultMaterial>();
@@ -1246,6 +1229,7 @@ void IrrDriver::renderSolidFirstPass()
             renderInstancedMeshes1stPass<DetailMat>();
             renderInstancedMeshes1stPass<NormalMat>();
         }
+#endif
     }
 }   // renderSolidFirstPass
 
@@ -1268,26 +1252,27 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
         {
 #ifdef DEBUG
             Log::error("Materials", "Wrong vertex Type associed to pass 2 "
-                                    "(hint texture : %s)", 
+                                    "(hint texture : %s)",
                        mesh.textures[0]->getName().getPath().c_str());
 #endif
             continue;
         }
 
         if (CVS->isAZDOEnabled())
-            HandleExpander<typename T::SecondPassShader>::template 
-                Expand(mesh.TextureHandles, T::SecondPassTextures, 
+            HandleExpander<typename T::SecondPassShader>::template
+                Expand(mesh.TextureHandles, T::SecondPassTextures,
                        Prefilled_Handle[0], Prefilled_Handle[1],
                        Prefilled_Handle[2]);
         else
-            TexExpander<typename T::SecondPassShader>::template 
-                ExpandTex(mesh, T::SecondPassTextures, Prefilled_Tex[0], 
+            TexExpander<typename T::SecondPassShader>::template
+                ExpandTex(mesh, T::SecondPassTextures, Prefilled_Tex[0],
                           Prefilled_Tex[1], Prefilled_Tex[2]);
-        custom_unroll_args<List...>::template 
+        custom_unroll_args<List...>::template
             exec(T::SecondPassShader::getInstance(), meshes.at(i));
     }
 }   // renderMeshes2ndPass
 
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<typename T, typename...Args>
 void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args...args)
@@ -1315,7 +1300,7 @@ void renderInstancedMeshes2ndPass(const std::vector<GLuint> &Prefilled_tex, Args
         }
 
         T::InstancedSecondPassShader::getInstance()->setUniforms(args...);
-        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
+        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
            (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i)
            * sizeof(DrawElementsIndirectCommand)));
 
@@ -1342,12 +1327,13 @@ void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
                    Handles[2]);
         T::InstancedSecondPassShader::getInstance()->setUniforms(args...);
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
-            (const void*)(SolidPassCmd::getInstance()->Offset[T::MaterialType] 
+            (const void*)(SolidPassCmd::getInstance()->Offset[T::MaterialType]
              * sizeof(DrawElementsIndirectCommand)),
             (int)SolidPassCmd::getInstance()->Size[T::MaterialType],
             (int)sizeof(DrawElementsIndirectCommand));
     }
 }   // multidraw2ndPass
+#endif
 
 // ----------------------------------------------------------------------------
 void IrrDriver::renderSolidSecondPass()
@@ -1358,6 +1344,7 @@ void IrrDriver::renderSolidSecondPass()
 
     uint64_t DiffuseHandle = 0, SpecularHandle = 0, SSAOHandle = 0, DepthHandle = 0;
 
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         DiffuseHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_DIFFUSE),
@@ -1384,6 +1371,7 @@ void IrrDriver::renderSolidSecondPass()
     if (CVS->supportsIndirectInstancingRendering())
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER,
                     SolidPassCmd::getInstance()->drawindirectcmd);
+#endif
 
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS2));
@@ -1393,8 +1381,8 @@ void IrrDriver::renderSolidSecondPass()
         for (unsigned i = 0; i < ImmediateDrawList::getInstance()->size(); i++)
             ImmediateDrawList::getInstance()->at(i)->render();
 
-        std::vector<GLuint> DiffSpecSSAOTex = 
-            createVector<GLuint>(m_rtts->getRenderTarget(RTT_DIFFUSE), 
+        std::vector<GLuint> DiffSpecSSAOTex =
+            createVector<GLuint>(m_rtts->getRenderTarget(RTT_DIFFUSE),
                                  m_rtts->getRenderTarget(RTT_SPECULAR),
                                  m_rtts->getRenderTarget(RTT_HALF1_R));
 
@@ -1407,6 +1395,7 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<GrassMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<NormalMat, 3, 1>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
 
+#if !defined(USE_GLES2)
         if (CVS->isAZDOEnabled())
         {
             multidraw2ndPass<DefaultMaterial>(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0, 0));
@@ -1467,9 +1456,11 @@ void IrrDriver::renderSolidSecondPass()
                 }
             }
         }
+#endif
     }
 }   // renderSolidSecondPass
 
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<typename T>
 static void renderInstancedMeshNormals()
@@ -1480,8 +1471,8 @@ static void renderInstancedMeshNormals()
     for (unsigned i = 0; i < meshes.size(); i++)
     {
         NormalVisualizer::getInstance()->setUniforms(video::SColor(255, 0, 255, 0));
-        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
-             (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i) 
+        glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
+             (const void*)((SolidPassCmd::getInstance()->Offset[T::MaterialType] + i)
              * sizeof(DrawElementsIndirectCommand)));
     }
 }   // renderInstancedMeshNormals
@@ -1501,10 +1492,12 @@ static void renderMultiMeshNormals()
             (int)sizeof(DrawElementsIndirectCommand));
     }
 }   // renderMultiMeshNormals
+#endif
 
 // ----------------------------------------------------------------------------
 void IrrDriver::renderNormalsVisualisation()
 {
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled()) {
         renderMultiMeshNormals<DefaultMaterial>();
         renderMultiMeshNormals<AlphaRef>();
@@ -1522,12 +1515,13 @@ void IrrDriver::renderNormalsVisualisation()
         renderInstancedMeshNormals<DetailMat>();
         renderInstancedMeshNormals<NormalMat>();
     }
+#endif
 }   // renderNormalsVisualisation
 
 // ----------------------------------------------------------------------------
-template<typename Shader, enum video::E_VERTEX_TYPE VertexType, int...List, 
+template<typename Shader, enum video::E_VERTEX_TYPE VertexType, int...List,
          typename... TupleType>
-void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits, 
+void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
                           std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     Shader::getInstance()->use();
@@ -1561,7 +1555,6 @@ static video::ITexture *displaceTex = 0;
 // ----------------------------------------------------------------------------
 void IrrDriver::renderTransparent()
 {
-
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
@@ -1584,9 +1577,9 @@ void IrrDriver::renderTransparent()
                              TexUnits(RenderGeometry::TexUnit(0, true)),
                               ListBlendTransparentFog::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
-        renderTransparenPass<Shaders::TransparentFogShader, 
+        renderTransparenPass<Shaders::TransparentFogShader,
                              video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(
-                             TexUnits(RenderGeometry::TexUnit(0, true)), 
+                             TexUnits(RenderGeometry::TexUnit(0, true)),
                                        ListAdditiveTransparentFog::getInstance());
     }
     else
@@ -1662,7 +1655,7 @@ void IrrDriver::renderTransparent()
         displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
-        const GLMesh &mesh = 
+        const GLMesh &mesh =
             *(STK::tuple_get<0>(ListDisplacement::getInstance()->at(i)));
         if (!CVS->isARBBaseInstanceUsable())
             glBindVertexArray(mesh.vao);
@@ -1692,12 +1685,12 @@ void IrrDriver::renderTransparent()
     irr_driver->getFBO(FBO_COLORS).bind();
     glStencilFunc(GL_EQUAL, 1, 0xFF);
     m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_DISPLACE),
-                                         irr_driver->getFBO(FBO_COLORS).getWidth(), 
+                                         irr_driver->getFBO(FBO_COLORS).getWidth(),
                                          irr_driver->getFBO(FBO_COLORS).getHeight());
     glDisable(GL_STENCIL_TEST);
-
 }   // renderTransparent
 
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<typename T, typename...uniforms>
 void drawShadow(const T *Shader, unsigned cascade, const GLMesh *mesh, uniforms... Args)
@@ -1770,15 +1763,14 @@ void renderInstancedShadow(unsigned cascade, Args ...args)
     {
         GLMesh *mesh = t[i];
 
-        TexExpander<typename T::InstancedShadowPassShader>::template 
+        TexExpander<typename T::InstancedShadowPassShader>::template
                                        ExpandTex(*mesh, T::ShadowTextures);
         T::InstancedShadowPassShader::getInstance()->setUniforms(cascade, args...);
         size_t tmp = ShadowPassCmd::getInstance()->Offset[cascade][T::MaterialType] + i;
         glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
-                               (const void*)((tmp) 
+                               (const void*)((tmp)
                                * sizeof(DrawElementsIndirectCommand)));
     }   // for i
-
 }   // renderInstancedShadow
 
 // ----------------------------------------------------------------------------
@@ -1791,17 +1783,19 @@ static void multidrawShadow(unsigned i, Args ...args)
     if (ShadowPassCmd::getInstance()->Size[i][T::MaterialType])
     {
         T::InstancedShadowPassShader::getInstance()->setUniforms(i, args...);
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 
-            (const void*)(ShadowPassCmd::getInstance()->Offset[i][T::MaterialType] 
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
+            (const void*)(ShadowPassCmd::getInstance()->Offset[i][T::MaterialType]
             * sizeof(DrawElementsIndirectCommand)),
-            (int)ShadowPassCmd::getInstance()->Size[i][T::MaterialType], 
+            (int)ShadowPassCmd::getInstance()->Size[i][T::MaterialType],
             sizeof(DrawElementsIndirectCommand));
     }
 }   // multidrawShadow
+#endif
 
 // ----------------------------------------------------------------------------
 void IrrDriver::renderShadows()
 {
+#if !defined(USE_GLES2)
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -1864,7 +1858,7 @@ void IrrDriver::renderShadows()
 
         if (CVS->isARBTextureViewUsable())
         {
-            const std::pair<float, float>* shadow_scales 
+            const std::pair<float, float>* shadow_scales
                 = getShadowMatrices()->getShadowScales();
 
             for (unsigned i = 0; i < 2; i++)
@@ -1877,10 +1871,11 @@ void IrrDriver::renderShadows()
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_rtts->getShadowFBO().getRTT()[0]);
         glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
     }
+#endif
 }   // renderShadows
 
 
-
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<int...List>
 struct rsm_custom_unroll_args;
@@ -1889,7 +1884,7 @@ template<>
 struct rsm_custom_unroll_args<>
 {
     template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const core::matrix4 &rsm_matrix, 
+    static void exec(const core::matrix4 &rsm_matrix,
                       const STK::Tuple<TupleTypes...> &t, Args... args)
     {
         draw<T>(T::getInstance(), STK::tuple_get<0>(t), rsm_matrix, args...);
@@ -1904,7 +1899,7 @@ struct rsm_custom_unroll_args<N, List...>
     static void exec(const core::matrix4 &rsm_matrix,
                      const STK::Tuple<TupleTypes...> &t, Args... args)
     {
-        rsm_custom_unroll_args<List...>::template 
+        rsm_custom_unroll_args<List...>::template
             exec<T>(rsm_matrix, t, STK::tuple_get<N>(t), args...);
     }
 };   // rsm_custom_unroll_args
@@ -1962,16 +1957,18 @@ void multidrawRSM(Args...args)
     {
         T::InstancedRSMShader::getInstance()->setUniforms(args...);
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
-            (const void*)(RSMPassCmd::getInstance()->Offset[T::MaterialType] 
+            (const void*)(RSMPassCmd::getInstance()->Offset[T::MaterialType]
                * sizeof(DrawElementsIndirectCommand)),
             (int)RSMPassCmd::getInstance()->Size[T::MaterialType],
             sizeof(DrawElementsIndirectCommand));
     }
 }   // multidrawRSM
+#endif
 
 // ----------------------------------------------------------------------------
 void IrrDriver::renderRSM()
 {
+#if !defined(USE_GLES2)
     if (getShadowMatrices()->isRSMMapAvail())
         return;
     ScopedGPUTimer Timer(getGPUTimer(Q_RSM));
@@ -2006,5 +2003,7 @@ void IrrDriver::renderRSM()
         renderRSMShadow<NormalMat>(rsm_matrix);
         renderRSMShadow<DetailMat>(rsm_matrix);
     }
+
     getShadowMatrices()->setRSMMapAvail(true);
+#endif
 }   // renderRSM

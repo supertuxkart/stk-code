@@ -12,8 +12,7 @@ layout(location = 12) in vec4 GlowColor;
 
 flat out vec4 glowColor;
 
-mat4 getWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
-mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
+#stk_include "utils/getworldmatrix.vert"
 
 void main(void)
 {

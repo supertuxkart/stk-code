@@ -1567,9 +1567,15 @@ int main(int argc, char *argv[] )
         {
             if (UserConfigParams::m_old_driver_popup)
             {
+                #ifdef USE_GLES2
+                irr::core::stringw version = "OpenGL ES 3.0";
+                #else
+                irr::core::stringw version = "OpenGL 3.1";
+                #endif
                 MessageDialog *dialog =
                     new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
-                    "if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."),
+                    "if an update for your video driver is available. SuperTuxKart requires %s or better.",
+                    version),
                     /*from queue*/ true);
                 GUIEngine::DialogQueue::get()->pushDialog(dialog);
             }

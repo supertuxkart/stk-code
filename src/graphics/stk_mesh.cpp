@@ -354,6 +354,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
                       getUnicolorTexture(video::SColor(255, 127, 127, 127));
     }
     compressTexture(mesh.textures[i], is_srgb);
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[i])
@@ -365,6 +366,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
             glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
     }
+#endif
 }   // setTexture
 
 // ----------------------------------------------------------------------------
@@ -432,6 +434,7 @@ void initTexturesTransparent(GLMesh &mesh)
         mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
     }
     compressTexture(mesh.textures[0], true);
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[0])
@@ -443,4 +446,5 @@ void initTexturesTransparent(GLMesh &mesh)
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
     }
+#endif
 }   // initTexturesTransparent

@@ -74,9 +74,11 @@
  * Should help prevent distros building against an incompatible library.
  */
 
-#if IRRLICHT_VERSION_MAJOR < 1 || IRRLICHT_VERSION_MINOR < 7 || \
-    _IRR_MATERIAL_MAX_TEXTURES_ < 8 || !defined(_IRR_COMPILE_WITH_OPENGL_) || \
-    !defined(_IRR_COMPILE_WITH_B3D_LOADER_)
+#if (IRRLICHT_VERSION_MAJOR < 1 || IRRLICHT_VERSION_MINOR < 7 || \
+    _IRR_MATERIAL_MAX_TEXTURES_ < 8 || \
+    (!defined(_IRR_COMPILE_WITH_OPENGL_) && \
+     !defined(_IRR_COMPILE_WITH_OGLES2_)) || \
+    !defined(_IRR_COMPILE_WITH_B3D_LOADER_))
 #error "Building against an incompatible Irrlicht. Distros, \
 please use the included version."
 #endif
@@ -94,6 +96,7 @@ using namespace irr;
 
 /** singleton */
 IrrDriver *irr_driver = NULL;
+
 
 GPUTimer          m_perf_query[Q_LAST];
 
@@ -442,7 +445,11 @@ void IrrDriver::initDevice()
                 Log::verbose("irr_driver", "Trying to create device with "
                              "%i bits\n", bits);
 
+#if defined(USE_GLES2)
+            params.DriverType    = video::EDT_OGLES2;
+#else
             params.DriverType    = video::EDT_OPENGL;
+#endif
             params.Stencilbuffer = false;
             params.Bits          = bits;
             params.EventReceiver = this;
@@ -453,6 +460,8 @@ void IrrDriver::initDevice()
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
             params.HandleSRGB    = true;
+            params.ShadersPath   = (file_manager->getShadersDir() + 
+                                                           "irrlicht/").c_str();
             
             /*
             switch ((int)UserConfigParams::m_antialiasing)
@@ -488,8 +497,11 @@ void IrrDriver::initDevice()
         {
             UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
             UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
-
+#if defined(USE_GLES2)
+            m_device = createDevice(video::EDT_OGLES2,
+#else
             m_device = createDevice(video::EDT_OPENGL,
+#endif
                         core::dimension2du(UserConfigParams::m_width,
                                            UserConfigParams::m_height ),
                                     32, //bits per pixel

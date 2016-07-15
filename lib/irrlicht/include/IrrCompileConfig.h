@@ -24,6 +24,8 @@
 //! _IRR_LINUX_PLATFORM_ for Linux (it is defined here if no other os is defined)
 //! _IRR_SOLARIS_PLATFORM_ for Solaris
 //! _IRR_OSX_PLATFORM_ for Apple systems running OSX
+//! _IRR_IPHONE_PLATFORM_ for Apple devices running iOS
+//! _IRR_ANDROID_PLATFORM_ for devices running Android
 //! _IRR_POSIX_API_ for Posix compatible systems
 //! Note: PLATFORM defines the OS specific layer, API can group several platforms
 
@@ -93,11 +95,29 @@
 #if !defined(MACOSX)
 #define MACOSX // legacy support
 #endif
-#define _IRR_OSX_PLATFORM_
+#define _IRR_OSX_PLATFORM_ // we only support OSX on these systems
+
+#if defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
+#define _IRR_IPHONE_PLATFORM_
+#define _IRR_COMPILE_WITH_IPHONE_DEVICE_
+#define _IRR_COMPILE_WITH_OGLES2_
+#else
 #define _IRR_COMPILE_WITH_OSX_DEVICE_
 #endif
+#endif
 
-#if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_)
+#if defined(ANDROID)
+#define _IRR_ANDROID_PLATFORM_
+#define _IRR_POSIX_API_
+#endif
+
+#if defined(_IRR_ANDROID_PLATFORM_)
+#define _IRR_COMPILE_WITH_ANDROID_DEVICE_
+#define _IRR_COMPILE_WITH_OGLES2_
+#define _IRR_COMPILE_ANDROID_ASSET_READER_
+#endif
+
+#if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
 #ifndef _IRR_SOLARIS_PLATFORM_
 #if !defined(__linux__) && !defined(__FreeBSD__)
 #define _IRR_LINUX_PLATFORM_
@@ -152,9 +172,32 @@ If not defined, Windows Multimedia library is used, which offers also broad supp
 //! Define _IRR_COMPILE_WITH_OPENGL_ to compile the Irrlicht engine with OpenGL.
 /** If you do not wish the engine to be compiled with OpenGL, comment this
 define out. */
+#if !defined(_IRR_IPHONE_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
 #define _IRR_COMPILE_WITH_OPENGL_
+#endif
 #ifdef NO_IRR_COMPILE_WITH_OPENGL_
 #undef _IRR_COMPILE_WITH_OPENGL_
+#endif
+
+//! Define _IRR_COMPILE_WITH_OGLES2_ to compile the Irrlicht engine with OpenGL-ES 2.x.
+/** If you do not wish the engine to be compiled with OpenGL-ES 2.x, comment
+ this define out.
+ You should only use this define if you really need the OpenGL-ES driver, and
+ it should be usually the only HW accelerated one. OpenGL is currently disabled
+ if using this driver, to avoid problems with the ogl-es emulators.
+ */
+// #define _IRR_COMPILE_WITH_OGLES2_
+#ifdef NO_IRR_COMPILE_WITH_OGLES2_
+#undef _IRR_COMPILE_WITH_OGLES2_
+#endif
+#ifndef IRR_OGLES2_SHADER_PATH
+#ifdef _IRR_COMPILE_WITH_IPHONE_DEVICE_
+#define IRR_OGLES2_SHADER_PATH ""
+#elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
+#define IRR_OGLES2_SHADER_PATH "media/Shaders/"
+#else
+#define IRR_OGLES2_SHADER_PATH "data/shaders/irrlicht/"
+#endif
 #endif
 
 //! Define _IRR_COMPILE_WITH_X11_ to compile the Irrlicht engine with X11 support.
@@ -169,8 +212,20 @@ define out. */
 //! Define _IRR_OPENGL_USE_EXTPOINTER_ if the OpenGL renderer should use OpenGL extensions via function pointers.
 /** On some systems there is no support for the dynamic extension of OpenGL
 	via function pointers such that this has to be undef'ed. */
+#ifdef _IRR_COMPILE_WITH_OPENGL_
 #if !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_SOLARIS_PLATFORM_)
 #define _IRR_OPENGL_USE_EXTPOINTER_
+#endif
+#endif
+
+//! Define _IRR_OGLES2_USE_EXTPOINTER_ if the OpenGL-ES 2.x driver should use extensions via function pointers.
+/** This should usually be enabled, but also depends on the specific
+ architecture. You can simply uncomment the define and recompile.
+ */
+#ifdef _IRR_COMPILE_WITH_OGLES2_
+#if !defined(_IRR_IPHONE_PLATFORM_)
+#define _IRR_OGLES2_USE_EXTPOINTER_
+#endif
 #endif
 
 //! On some Linux systems the XF86 vidmode extension or X11 RandR are missing. Use these flags
