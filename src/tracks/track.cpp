@@ -780,6 +780,8 @@ void Track::createPhysicsModel(unsigned int main_track_count)
             irr_driver->grabAllTextures(mesh);
             // Gloss
             mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            // Colorization mask
+            mb->getMaterial().setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
         }
         else
             irr_driver->removeNode(m_static_physics_only_nodes[i]);

@@ -690,9 +690,11 @@ void IrrDriver::createSunInterposer()
         scene::IMeshBuffer *mb = sphere->getMeshBuffer(i);
         if (!mb)
             continue;
-        mb->getMaterial().setTexture(0, 
+        mb->getMaterial().setTexture(0,
                         getUnicolorTexture(video::SColor(255, 255, 255, 255)));
         mb->getMaterial().setTexture(1,
+                                getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        mb->getMaterial().setTexture(7,
                                 getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
     m_sun_interposer = new STKMeshSceneNode(sphere, 
@@ -1153,6 +1155,7 @@ scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
     //m.setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
     m.setTexture(0, getUnicolorTexture(color));
     m.setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m.setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
 
     if (CVS->isGLSL())
     {

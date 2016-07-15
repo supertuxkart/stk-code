@@ -523,7 +523,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
                         &kart_min, &kart_max);
 
     // Test if kart model support colorization
-    for (int i = 0; i < int(m_mesh->getMeshBufferCount()); i++)
+    for (u32 i = 0; i < m_mesh->getMeshBufferCount(); i++)
     {
         scene::IMeshBuffer* mb = m_mesh->getMeshBuffer(i);
         Material* material = material_manager->getMaterialFor(mb

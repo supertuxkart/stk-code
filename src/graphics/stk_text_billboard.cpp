@@ -111,6 +111,7 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
             buffer = new scene::SMeshBuffer();
             buffer->getMaterial().setTexture(0, m_chars[i].m_texture);
             buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            buffer->getMaterial().setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
             buffer->getMaterial().MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
             buffers[m_chars[i].m_texture] = buffer;
         }
