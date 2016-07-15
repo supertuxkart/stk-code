@@ -21,9 +21,6 @@
 
 #include "utils/leak_check.hpp"
 
-#include <algorithm>
-#include <vector>
-
 namespace irr
 {
     namespace scene { class IMesh; }
@@ -48,16 +45,12 @@ private:
 
     bool m_transparent;
 
-    std::vector<int> m_colorizable_parts;
-
 public:
     LEAK_CHECK();
     // ------------------------------------------------------------------------
     RenderInfo(float hue = 0.0f, bool transparent = false);
     // ------------------------------------------------------------------------
     ~RenderInfo() {}
-    // ------------------------------------------------------------------------
-    void setColorizableParts(irr::scene::IMesh* m);
     // ------------------------------------------------------------------------
     void setHue(float hue)                                    { m_hue = hue; }
     // ------------------------------------------------------------------------
@@ -66,13 +59,6 @@ public:
     float getHue() const                                     { return m_hue; }
     // ------------------------------------------------------------------------
     bool isTransparent() const                       { return m_transparent; }
-    // ------------------------------------------------------------------------
-    bool isColorizable(int mesh_buffer_index) const
-    {
-        return m_colorizable_parts.empty() ||
-            std::find(m_colorizable_parts.begin(), m_colorizable_parts.end(),
-            mesh_buffer_index) != m_colorizable_parts.end();
-    }
     // ------------------------------------------------------------------------
     void setKartModelRenderInfo(KartRenderType krt)
     {

@@ -29,16 +29,3 @@ RenderInfo::RenderInfo(float hue, bool transparent)
     m_hue = hue;
     m_transparent = transparent;
 }   // RenderInfo
-
-// ----------------------------------------------------------------------------
-void RenderInfo::setColorizableParts(irr::scene::IMesh* m)
-{
-    for (int i = 0; i < int(m->getMeshBufferCount()); i++)
-    {
-        scene::IMeshBuffer* mb = m->getMeshBuffer(i);
-        Material* material = material_manager->getMaterialFor(mb
-            ->getMaterial().getTexture(0), mb);
-        if (material->isColorizable())
-            m_colorizable_parts.push_back(i);
-    }
-}   // setColorizableParts

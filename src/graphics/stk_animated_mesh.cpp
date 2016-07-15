@@ -107,7 +107,10 @@ void STKAnimatedMesh::updateNoGL()
             if (!m_all_parts_colorized && mb && m_mesh_render_info)
             {
                 // Test if material is affected by hue change
-                affected = m_mesh_render_info->isColorizable(i);
+                Material* m = material_manager->getMaterialFor(mb
+                    ->getMaterial().getTexture(0), mb);
+                if (m->isColorizable())
+                    affected = true;
             }
 
             GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,

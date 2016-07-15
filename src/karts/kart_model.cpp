@@ -27,6 +27,8 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -140,7 +142,7 @@ KartModel::KartModel(bool is_master)
     m_current_animation = AF_DEFAULT;
     m_play_non_loop     = false;
     m_krt               = RenderInfo::KRT_DEFAULT;
-    m_render_info       = RenderInfo();
+    m_support_colorization = false;
 }   // KartModel
 
 // ----------------------------------------------------------------------------
@@ -294,21 +296,21 @@ KartModel* KartModel::makeCopy(RenderInfo::KartRenderType krt)
     // just in case.
     assert(m_is_master);
     assert(!m_animated_node);
-    KartModel *km           = new KartModel(/*is master*/ false);
-    km->m_kart_width        = m_kart_width;
-    km->m_kart_length       = m_kart_length;
-    km->m_kart_height       = m_kart_height;
-    km->m_kart_highest_point= m_kart_highest_point;
-    km->m_kart_lowest_point = m_kart_lowest_point;
-    km->m_mesh              = irr_driver->copyAnimatedMesh(m_mesh);
-    km->m_model_filename    = m_model_filename;
-    km->m_animation_speed   = m_animation_speed;
-    km->m_current_animation = AF_DEFAULT;
-    km->m_animated_node     = NULL;
-    km->m_hat_offset        = m_hat_offset;
-    km->m_hat_name          = m_hat_name;
-    km->m_krt               = krt;
-    km->m_render_info       = m_render_info;
+    KartModel *km              = new KartModel(/*is master*/ false);
+    km->m_kart_width           = m_kart_width;
+    km->m_kart_length          = m_kart_length;
+    km->m_kart_height          = m_kart_height;
+    km->m_kart_highest_point   = m_kart_highest_point;
+    km->m_kart_lowest_point    = m_kart_lowest_point;
+    km->m_mesh                 = irr_driver->copyAnimatedMesh(m_mesh);
+    km->m_model_filename       = m_model_filename;
+    km->m_animation_speed      = m_animation_speed;
+    km->m_current_animation    = AF_DEFAULT;
+    km->m_animated_node        = NULL;
+    km->m_hat_offset           = m_hat_offset;
+    km->m_hat_name             = m_hat_name;
+    km->m_krt                  = krt;
+    km->m_support_colorization = m_support_colorization;
 
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
     km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
@@ -520,8 +522,15 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]),
                         &kart_min, &kart_max);
 
-    // Enable colorization for karts later when attachModel
-    m_render_info.setColorizableParts(m_mesh);
+    // Test if kart model support colorization
+    for (int i = 0; i < int(m_mesh->getMeshBufferCount()); i++)
+    {
+        scene::IMeshBuffer* mb = m_mesh->getMeshBuffer(i);
+        Material* material = material_manager->getMaterialFor(mb
+            ->getMaterial().getTexture(0), mb);
+        m_support_colorization =
+            m_support_colorization || material->isColorizable();
+    }
 
 #undef MOVE_KART_MESHES
 #ifdef MOVE_KART_MESHES

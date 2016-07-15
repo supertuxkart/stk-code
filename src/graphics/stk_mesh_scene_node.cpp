@@ -83,8 +83,11 @@ void STKMeshSceneNode::createGLMeshes(RenderInfo* render_info, bool all_parts_co
         bool affected = false;
         if (!all_parts_colorized && mb && render_info)
         {
-            // Test if material is affected by hue change     
-            affected = render_info->isColorizable(i);
+            // Test if material is affected by hue change
+            Material* m = material_manager->getMaterialFor(mb
+                ->getMaterial().getTexture(0), mb);
+            if (m->isColorizable())
+                affected = true;
         }
 
         GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,

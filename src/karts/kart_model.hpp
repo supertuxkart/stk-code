@@ -235,6 +235,8 @@ private:
 
     RenderInfo m_render_info;
 
+    bool m_support_colorization;
+
 public:
                   KartModel(bool is_master);
                  ~KartModel();
@@ -335,9 +337,19 @@ public:
     // ------------------------------------------------------------------------
     core::vector3df getHatOffset() { return m_hat_offset; }
     // ------------------------------------------------------------------------
-    RenderInfo* getRenderInfo()                      { return &m_render_info; }
+    RenderInfo* getRenderInfo()
+    {
+        return m_support_colorization || m_krt == RenderInfo::KRT_TRANSPARENT ?
+            &m_render_info : NULL;
+    }
     // ------------------------------------------------------------------------
-    const RenderInfo* getRenderInfo() const          { return &m_render_info; }
+    const RenderInfo* getRenderInfo() const
+    {
+        return m_support_colorization || m_krt == RenderInfo::KRT_TRANSPARENT ?
+            &m_render_info : NULL;
+    }
+    // ------------------------------------------------------------------------
+    bool supportColorization() const         { return m_support_colorization; }
 
 };   // KartModel
 #endif

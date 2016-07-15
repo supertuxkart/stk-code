@@ -305,9 +305,6 @@ void SoccerWorld::countdownReachedZero()
 //-----------------------------------------------------------------------------
 void SoccerWorld::initKartList()
 {
-    // Color of karts can be changed using shaders
-    if (CVS->isGLSL()) return;
-
     const unsigned int kart_amount = (unsigned int)m_karts.size();
 
     //Loading the indicator textures
@@ -317,10 +314,15 @@ void SoccerWorld::initKartList()
             irr_driver->getTexture(FileManager::GUI, "soccer_player_blue.png");
 
     //Assigning indicators
-    for(unsigned int i=0; i<kart_amount; i++)
+    for(unsigned int i = 0; i < kart_amount; i++)
     {
-        scene::ISceneNode *arrow_node;
-        float arrow_pos_height = m_karts[i]->getKartModel()->getHeight()+0.5f;
+        scene::ISceneNode *arrow_node = NULL;
+
+        KartModel* km = m_karts[i]->getKartModel();
+        // Color of karts can be changed using shaders if the model supports
+        if (km->supportColorization() && CVS->isGLSL()) continue;
+
+        float arrow_pos_height = km->getHeight() + 0.5f;
         SoccerTeam team = getKartTeam(i);
 
         arrow_node = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,
