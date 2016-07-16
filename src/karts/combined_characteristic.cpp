@@ -88,5 +88,6 @@ void CombinedCharacteristic::unitTesting()
     // Note: no operator precedence supported, so (1+2*3) / 3 = 3
     assert( cc->getStabilityRollInfluence()        ==  3.0f );
     assert( cc->getStabilityChassisLinearDamping() ==  7.0f );
+    delete cc;
 
 }   // unitTesting
