@@ -419,4 +419,8 @@
         bold_fallback="FreeSansBold.ttf"
         digit="SigmarOne.otf" />
 
+  <fonts-list regular-faces="Cantarell-Regular.otf FreeSans.ttf NotoSansCJK-Regular.ttc NotoNaskhArabicUI-Bold.ttf"
+              bold-faces="Cantarell-Bold.otf FreeSansBold.ttf NotoSansCJK-Bold.ttc"
+              digit-faces="SigmarOne.otf" />
+
 </config>

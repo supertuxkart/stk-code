@@ -153,6 +153,10 @@ public:
     std::string m_font_bold;
     std::string m_font_bold_fallback;
     std::string m_font_digit;
+    /** Lists of TTF files used in STK. */
+    std::vector<std::string> m_regular_faces;
+    std::vector<std::string> m_bold_faces;
+    std::vector<std::string> m_digit_faces;
 
 private:
     /** True if stk_config has been loaded. This is necessary if the

@@ -22,7 +22,6 @@
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/scalable_font.hpp"
 #include "glwrap.hpp"
 #include <SMesh.h>
 #include <SMeshBuffer.h>
@@ -31,7 +30,7 @@
 
 using namespace irr;
 
-STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
+STKTextBillboard::STKTextBillboard(core::stringw text, FontWithFace* font,
     const video::SColor& color_top, const video::SColor& color_bottom,
     irr::scene::ISceneNode* parent,
     irr::scene::ISceneManager* mgr, irr::s32 id,
@@ -61,11 +60,11 @@ void STKTextBillboard::updateAbsolutePosition()
         AbsoluteTransformation = getRelativeTransformation();
 }
 
-scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFont* font)
+scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, FontWithFace* font)
 {
     core::dimension2du size = font->getDimension(text.c_str());
-    font->doDraw(text, core::rect<s32>(0, 0, size.Width, size.Height), video::SColor(255,255,255,255),
-        false, false, NULL, this);
+    font->render(text, core::rect<s32>(0, 0, size.Width, size.Height), video::SColor(255,255,255,255),
+        false, false, NULL, NULL, this);
 
     const float scale = 0.03f;
 

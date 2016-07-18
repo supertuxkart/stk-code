@@ -150,6 +150,7 @@
 #include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "font/font_manager.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/camera_debug.hpp"
 #include "graphics/central_settings.hpp"
@@ -1297,6 +1298,8 @@ void initRest()
         exit(0);
     }
 
+    font_manager = new FontManager();
+    font_manager->loadFonts();
     GUIEngine::init(device, driver, StateManager::get());
 
     // This only initialises the non-network part of the addons manager. The
@@ -1767,6 +1770,7 @@ static void cleanSuperTuxKart()
     if(unlock_manager)          delete unlock_manager;
     Online::ProfileManager::destroy();
     GUIEngine::DialogQueue::deallocate();
+    if(font_manager)            delete font_manager;
 
     // Now finish shutting down objects which a separate thread. The
     // RequestManager has been signaled to shut down as early as possible,

@@ -19,7 +19,7 @@
 #define STK_TEXT_BILLBOARD_HPP
 
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "guiengine/scalable_font.hpp"
+#include "font/font_with_face.hpp"
 #include "utils/cpp2011.hpp"
 
 #include "../lib/irrlicht/source/Irrlicht/CBillboardSceneNode.h"
@@ -57,16 +57,16 @@ public:
     }
 };
 
-class STKTextBillboard : public STKMeshSceneNode, irr::gui::FontCharCollector
+class STKTextBillboard : public STKMeshSceneNode, FontWithFace::FontCharCollector
 {
     std::vector<STKTextBillboardChar> m_chars;
     irr::video::SColor m_color_top;
     irr::video::SColor m_color_bottom;
 
-    irr::scene::IMesh* getTextMesh(irr::core::stringw text, gui::ScalableFont* font);
+    irr::scene::IMesh* getTextMesh(irr::core::stringw text, FontWithFace* font);
 
 public:
-    STKTextBillboard(irr::core::stringw text, irr::gui::ScalableFont* font,
+    STKTextBillboard(irr::core::stringw text, FontWithFace* font,
         const irr::video::SColor& color_top,
         const irr::video::SColor& color_bottom,
         irr::scene::ISceneNode* parent,

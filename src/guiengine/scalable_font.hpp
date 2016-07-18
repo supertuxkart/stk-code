@@ -26,6 +26,9 @@
 #include <string>
 #include <set>
 
+class FontSettings;
+class FontWithFace;
+
 namespace irr
 {
 
@@ -71,6 +74,11 @@ public:
     float         m_fallback_font_scale;
     int           m_fallback_kerning_width;
 
+    ScalableFont(FontWithFace* face);
+    FontWithFace* m_face;
+    FontSettings* m_font_settings;
+    FontSettings* getFontSettings()         { return m_font_settings; }
+    const FontSettings* getFontSettings()  const       { return m_font_settings; }
     ScalableFont(IGUIEnvironment* env, GUIEngine::TTFLoadingType type);
     virtual ~ScalableFont();
 

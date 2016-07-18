@@ -331,12 +331,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
         translations = new Translations();
 
-        //Reload fonts for new translation
-        GUIEngine::cleanHollowCopyFont();
-        GUIEngine::getTitleFont()->recreateFromLanguage();
-        GUIEngine::getFont()->recreateFromLanguage();
-        GUIEngine::reloadHollowCopyFont(GUIEngine::getFont());
-
+        // Reload fonts for new translation
         GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
 
         GUIEngine::getFont()->updateRTL();

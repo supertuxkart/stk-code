@@ -18,6 +18,9 @@
 
 #include "guiengine/scalable_font.hpp"
 
+#include "font/font_manager.hpp"
+#include "font/font_with_face.hpp"
+#include "font/regular_face.hpp"
 #include "graphics/2dutils.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
@@ -37,11 +40,19 @@ namespace gui
 {
 
 // ----------------------------------------------------------------------------
+ScalableFont::ScalableFont(FontWithFace* face): m_video_driver(0), m_spritebank(0),
+              m_max_height(0), m_global_kerning_width(0), m_global_kerning_height(0)
+{
+    m_face = face;
+    m_font_settings = new FontSettings();
+}
 
+// ----------------------------------------------------------------------------
 ScalableFont::ScalableFont(IGUIEnvironment *env, TTFLoadingType type)
             : m_video_driver(0), m_spritebank(0), m_gui_env(env),
               m_max_height(0), m_global_kerning_width(0), m_global_kerning_height(0)
 {
+    m_font_settings = new FontSettings();
 #ifdef _DEBUG
     setDebugName("ScalableFont");
 #endif
@@ -86,19 +97,14 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, TTFLoadingType type)
 
 ScalableFont::~ScalableFont()
 {
-    if (!m_is_hollow_copy)
-    {
-        if (m_video_driver)
-            m_video_driver->drop();
-        if (m_spritebank)
-            m_spritebank->drop();
-    }
+    delete m_font_settings;
 }
 
 // ----------------------------------------------------------------------------
 
 bool ScalableFont::loadTTF()
 {
+
     if (!m_spritebank)
     {
         Log::error("ScalableFont::loadTTF", "SpriteBank is NULL!!");
@@ -186,7 +192,13 @@ bool ScalableFont::loadTTF()
             t = curr_face->glyph->metrics.height >> 6;
             height.push_back(t);
             if (t > curr_maxheight)
+            {
+                if (t > 20)
+                {
+                
+                }
                 curr_maxheight = t;
+            }
 
             // Store horizontal padding (bearingX).
             s32 curr_bearingx = curr_face->glyph->metrics.horiBearingX >> 6;
@@ -688,7 +700,8 @@ void ScalableFont::setInvisibleCharacters( const wchar_t *s )
 
 core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 {
-    GUIEngine::GlyphPageCreator* gp_creator = GUIEngine::getGlyphPageCreator();
+    return m_face->getDimension(text, m_font_settings);
+/*    GUIEngine::GlyphPageCreator* gp_creator = GUIEngine::getGlyphPageCreator();
 
     if (m_type == T_NORMAL || T_BOLD) //lazy load char
     {
@@ -746,7 +759,7 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 
     //Log::info("ScalableFont", "After: %d, %d", dim.Width, dim.Height);
 
-    return dim;
+    return dim;*/
 }
 
 // ----------------------------------------------------------------------------
@@ -782,279 +795,7 @@ void ScalableFont::doDraw(const core::stringw& text,
                           const core::rect<s32>* clip,
                           FontCharCollector* charCollector)
 {
-    if (!m_video_driver) return;
-
-    GUIEngine::GlyphPageCreator* gp_creator = GUIEngine::getGlyphPageCreator();
-
-    if (m_shadow)
-    {
-        m_shadow = false; // avoid infinite recursion
-
-        core::rect<s32> shadowpos = position;
-        shadowpos.LowerRightCorner.X += 2;
-        shadowpos.LowerRightCorner.Y += 2;
-
-        draw(text, shadowpos, m_shadow_color, hcenter, vcenter, clip);
-
-        m_shadow = true; // set back
-    }
-
-    core::position2d<s32> offset = position.UpperLeftCorner;
-    core::dimension2d<s32> text_dimension;
-
-    if (m_rtl || hcenter || vcenter || clip)
-    {
-        text_dimension = getDimension(text.c_str());
-
-        if (hcenter)    offset.X += (position.getWidth() - text_dimension.Width) / 2;
-        else if (m_rtl) offset.X += (position.getWidth() - text_dimension.Width);
-
-        if (vcenter)    offset.Y += (position.getHeight() - text_dimension.Height) / 2;
-        if (clip)
-        {
-            core::rect<s32> clippedRect(offset, text_dimension);
-            clippedRect.clipAgainst(*clip);
-            if (!clippedRect.isValid()) return;
-        }
-    }
-
-    // ---- collect character locations
-    const unsigned int text_size = text.size();
-    core::array<s32>               indices(text_size);
-    core::array<core::position2di> offsets(text_size);
-    std::vector<bool>              fallback(text_size);
-
-    if (m_type == T_NORMAL || T_BOLD) //lazy load char, have to do this again
-    {                                 //because some text isn't drawn with getDimension
-        for (u32 i = 0; i < text_size; i++)
-        {
-            wchar_t c = text[i];
-            if (c == L'\r' ||  c == L'\n' || c == L' ' || c < 32) continue;
-            if (!GUIEngine::getFont()->hasThisChar(c))
-                gp_creator->insertChar(c);
-
-            if (charCollector != NULL && m_type == T_NORMAL && m_spritebank->getSprites()
-                [GUIEngine::getFont()->getSpriteNoFromChar(&c)].Frames[0].textureNumber
-                == m_spritebank->getTextureCount() - 1) //Prevent overwriting texture used by billboard text
-            {
-                 Log::debug("ScalableFont::doDraw",
-                            "Character used by billboard text is in the last "
-                            "glyph page of normal font. Create a new glyph "
-                            "page for new characters inserted later to prevent "
-                            "it from being removed.");
-                 GUIEngine::getFont()->forceNewPage();
-            }
-        }
-
-        if (gp_creator->getNewChar().size() > 0 && !m_is_hollow_copy && m_scale == 1)
-        {
-            Log::debug("ScalableFont::doDraw",
-                       "New character(s) %s discoverd, perform lazy loading",
-                       StringUtils::wideToUtf8(gp_creator->getNewChar()).c_str());
-
-            if (!GUIEngine::getFont()->lazyLoadChar())
-                Log::error("ScalableFont::lazyLoadChar",
-                           "Can't insert new char into glyph pages.");
-        }
-    }
-
-    for (u32 i = 0; i < text_size; i++)
-    {
-        wchar_t c = text[i];
-
-        if (c == L'\r' ||          // Windows breaks
-            c == L'\n'    )        // Unix breaks
-        {
-            if(c==L'\r' && text[i+1]==L'\n') c = text[++i];
-            offset.Y += (int)(m_max_height*m_scale);
-            offset.X  = position.UpperLeftCorner.X;
-            if (hcenter)
-                offset.X += (position.getWidth() - text_dimension.Width) >> 1;
-            continue;
-        }   // if lineBreak
-
-        bool use_fallback_font = false;
-        const SFontArea &area  = getAreaFromCharacter(c, &use_fallback_font);
-        fallback[i]            = use_fallback_font;
-        if (charCollector == NULL)
-        {
-            //Try to use ceil to make offset calculate correctly when m_scale is smaller than 1
-            s32 glyph_offset_x = (s32)((float) area.bearingx*
-                                 (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
-            s32 glyph_offset_y = (s32)ceil((float) area.offsety*
-                                 (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
-            offset.X += glyph_offset_x;
-            offset.Y += s32(glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0)); //Additional offset for digit text
-            offsets.push_back(offset);
-            offset.X -= glyph_offset_x;
-            offset.Y -= s32(glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0));
-        }
-        else //Billboard text specific
-        {
-            s32 glyph_offset_x = (s32)ceil((float) area.bearingx*
-                                 (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
-            s32 glyph_offset_y = (s32)ceil((float) area.offsety_bt*
-                                 (fallback[i] ? m_scale*m_fallback_font_scale : m_scale));
-            offset.X += glyph_offset_x;
-            offset.Y += s32(glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0)); //Additional offset for digit text
-            offsets.push_back(offset);
-            offset.X -= glyph_offset_x;
-            offset.Y -= s32(glyph_offset_y + floor(m_type == T_DIGIT ? 20*m_scale : 0));
-        }
-        // Invisible character. add something to the array anyway so that
-        // indices from the various arrays remain in sync
-        indices.push_back(m_invisible.findFirst(c) < 0  ? area.spriteno : -1);
-        offset.X += getCharWidth(area, fallback[i]);
-    }   // for i<text_size
-
-    // ---- do the actual rendering
-    const int indiceAmount                    = indices.size();
-    core::array< SGUISprite >& sprites        = m_spritebank->getSprites();
-    core::array< core::rect<s32> >& positions = m_spritebank->getPositions();
-    core::array< SGUISprite >* fallback_sprites;
-    core::array< core::rect<s32> >* fallback_positions;
-    if (m_fallback_font != NULL)
-    {
-        fallback_sprites   = &m_fallback_font->m_spritebank->getSprites();
-        fallback_positions = &m_fallback_font->m_spritebank->getPositions();
-    }
-    else
-    {
-        fallback_sprites   = NULL;
-        fallback_positions = NULL;
-    }
-
-    const int spriteAmount      = sprites.size();
-
-    if (m_black_border && charCollector == NULL)
-    { //Draw black border first, to make it behind the real character
-      //which make script language display better
-        video::SColor black(color.getAlpha(),0,0,0);
-        for (int n = 0; n < indiceAmount; n++)
-        {
-            const int spriteID = indices[n];
-            if (!fallback[n] && (spriteID < 0 || spriteID >= spriteAmount)) continue;
-            if (indices[n] == -1) continue;
-
-            const int texID = (fallback[n] ?
-                               (*fallback_sprites)[spriteID].Frames[0].textureNumber :
-                               sprites[spriteID].Frames[0].textureNumber);
-
-            core::rect<s32> source = (fallback[n] ?
-                                      (*fallback_positions)[(*fallback_sprites)[spriteID].Frames[0].rectNumber] :
-                                      positions[sprites[spriteID].Frames[0].rectNumber]);
-
-            core::dimension2d<s32> size = source.getSize();
-
-            float scale = (fallback[n] ? m_scale*m_fallback_font_scale : m_scale);
-            size.Width  = (int)(size.Width  * scale);
-            size.Height = (int)(size.Height * scale);
-
-            core::rect<s32> dest(offsets[n], size);
-
-            video::ITexture* texture = (fallback[n] ?
-                                        m_fallback_font->m_spritebank->getTexture(texID) :
-                                        m_spritebank->getTexture(texID) );
-
-            for (int x_delta = -2; x_delta <= 2; x_delta++)
-            {
-                for (int y_delta = -2; y_delta <= 2; y_delta++)
-                {
-                    if (x_delta == 0 || y_delta == 0) continue;
-                    draw2DImage(texture,
-                                dest + core::position2d<s32>(x_delta, y_delta),
-                                source,
-                                clip,
-                                black, true);
-                }
-            }
-        }
-    }
-
-    for (int n = 0; n < indiceAmount; n++)
-    {
-        const int spriteID = indices[n];
-        if (!fallback[n] && (spriteID < 0 || spriteID >= spriteAmount)) continue;
-        if (indices[n] == -1) continue;
-
-        //assert(sprites[spriteID].Frames.size() > 0);
-
-        const int texID = (fallback[n] ?
-                           (*fallback_sprites)[spriteID].Frames[0].textureNumber :
-                           sprites[spriteID].Frames[0].textureNumber);
-
-        core::rect<s32> source = (fallback[n] ?
-                                  (*fallback_positions)[(*fallback_sprites)[spriteID].Frames[0].rectNumber] :
-                                  positions[sprites[spriteID].Frames[0].rectNumber]);
-
-        core::dimension2d<s32> size = source.getSize();
-
-        float scale = (fallback[n] ? m_scale*m_fallback_font_scale : m_scale);
-        size.Width  = (int)(size.Width  * scale);
-        size.Height = (int)(size.Height * scale);
-
-        core::rect<s32> dest(offsets[n], size);
-
-        video::ITexture* texture = (fallback[n] ?
-                                    m_fallback_font->m_spritebank->getTexture(texID) :
-                                    m_spritebank->getTexture(texID) );
-
-        /*
-        if (fallback[n])
-        {
-            Log::info("ScalableFont", "Using fallback font %s; source area is %d, %d; size %d, %d; dest = %d, %d",
-                core::stringc(texture->getName()).c_str(), source.UpperLeftCorner.X, source.UpperLeftCorner.Y,
-                source.getWidth(), source.getHeight(), offsets[n].X, offsets[n].Y);
-        }
-        */
-#ifdef FONT_DEBUG
-        GL32_draw2DRectangle(video::SColor(255, 255,0,0), dest,clip);
-#endif
-
-        if (fallback[n] || m_type == T_BOLD)
-        {
-            video::SColor top = GUIEngine::getSkin()->getColor("font::top");
-            video::SColor bottom = GUIEngine::getSkin()->getColor("font::bottom");
-            top.setAlpha(color.getAlpha());
-            bottom.setAlpha(color.getAlpha());
-
-            video::SColor title_colors[] = {top, bottom, top, bottom};
-            if (charCollector != NULL)
-            {
-                charCollector->collectChar(texture,
-                    dest,
-                    source,
-                    title_colors);
-            }
-            else
-            {
-                draw2DImage(texture,
-                    dest,
-                    source,
-                    clip,
-                    title_colors, true);
-            }
-        }
-        else
-        {
-            if (charCollector != NULL)
-            {
-                video::SColor colors[] = { color, color, color, color };
-                charCollector->collectChar(texture,
-                    dest,
-                    source,
-                    colors);
-            }
-            else
-            {
-                draw2DImage(texture,
-                    dest,
-                    source,
-                    clip,
-                    color, true);
-            }
-        }
-    }
+    m_face->render(text,position,color,hcenter,vcenter,clip,m_font_settings,NULL);
 }
 
 // ----------------------------------------------------------------------------

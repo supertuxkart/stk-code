@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "font/regular_face.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -46,8 +47,7 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_supports_multiplayer = true;
     m_scrolling_enabled    = true;
     m_animated_contents    = false;
-    // Don't initialize m_font here to make lazy loading characters work
-    m_font                 = NULL;
+    m_font                 = new ScalableFont(font_manager->getFont<RegularFace>());
 
     // by default, set all players to have no selection in this ribbon
     for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
@@ -64,6 +64,7 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
 DynamicRibbonWidget::~DynamicRibbonWidget()
 {
     m_font->drop();
+    m_font = NULL;
     if (m_animated_contents)
     {
         GUIEngine::needsUpdate.remove(this);
@@ -386,12 +387,11 @@ void DynamicRibbonWidget::buildInternalStructure()
         ribbon->m_properties[PROP_ID] = name.str();
         ribbon->m_event_handler = this;
 
-        m_font = GUIEngine::getFont()->getHollowCopy();
-
         // calculate font size
         if (m_col_amount > 0)
         {
-            m_font->setScale(GUIEngine::getFont()->getScale() *
+            m_font->getFontSettings()->setScale(GUIEngine::getFont()
+                ->getFontSettings()->getScale() *
                 getFontScale((ribbon->m_w / m_col_amount) - 30));
         }
 

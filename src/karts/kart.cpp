@@ -25,6 +25,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "font/regular_face.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
@@ -2802,17 +2803,12 @@ btQuaternion Kart::getVisualRotation() const
  */
 void Kart::setOnScreenText(const wchar_t *text)
 {
-    core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(text);
-
-    // FIXME: Titlefont is the only font guaranteed to be loaded if STK
-    // is started without splash screen (since "Loading" is shown even in this
-    // case). A smaller font would be better
+    RegularFace* regular_face = font_manager->getFont<RegularFace>();
+    core::dimension2d<u32> textsize = regular_face->getDimension(text);
 
     if (CVS->isGLSL())
     {
-        gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont()
-                                                       : GUIEngine::getTitleFont();
-        new STKTextBillboard(text, font,
+        new STKTextBillboard(text, regular_face,
             GUIEngine::getSkin()->getColor("font::bottom"),
             GUIEngine::getSkin()->getColor("font::top"),
             getNode(), irr_driver->getSceneManager(), -1,
