@@ -18,7 +18,6 @@
 
 #include "guiengine/scalable_font.hpp"
 
-#include "font/font_manager.hpp"
 #include "font/font_with_face.hpp"
 #include "utils/translation.hpp"
 
@@ -109,6 +108,20 @@ s32 ScalableFont::getCharacterFromPos(const wchar_t* text, s32 pixel_x) const
 {
     return m_face->getCharacterFromPos(text, pixel_x, m_font_settings);
 }   // getCharacterFromPos
+
+// ----------------------------------------------------------------------------
+IGUISpriteBank* ScalableFont::getSpriteBank() const
+{
+    return m_face->getSpriteBank();
+}   // getSpriteBank
+
+// ------------------------------------------------------------------------
+u32 ScalableFont::getSpriteNoFromChar(const wchar_t *c) const
+{
+    const FontWithFace::FontArea& area =
+        m_face->getAreaFromCharacter(*c, NULL/*fallback_font*/);
+    return area.spriteno;
+}   // getSpriteNoFromChar
 
 } // end namespace gui
 } // end namespace irr

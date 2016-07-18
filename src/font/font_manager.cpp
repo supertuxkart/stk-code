@@ -21,7 +21,6 @@
 #include "font/bold_face.hpp"
 #include "font/digit_face.hpp"
 #include "font/regular_face.hpp"
-#include "utils/leak_check.hpp"
 
 FontManager *font_manager = NULL;
 // ----------------------------------------------------------------------------
@@ -60,5 +59,3 @@ void FontManager::checkFTError(FT_Error err, const std::string& desc) const
         Log::error("FontManager", "Something wrong when %s!", desc.c_str());
     }
 }   // checkFTError
-
-// ----------------------------------------------------------------------------

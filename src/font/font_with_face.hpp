@@ -41,6 +41,17 @@ public:
                                  const video::SColor* const colors) = 0;
     };
 
+    struct FontArea
+    {
+        FontArea() : advance_x(0), bearing_x(0) ,offset_y(0), offset_y_bt(0),
+                     spriteno(0) {}
+        int advance_x;
+        int bearing_x;
+        int offset_y;
+        int offset_y_bt;
+        int spriteno;
+    };
+
 protected:
     std::vector<FT_Face> m_faces;
 
@@ -82,17 +93,6 @@ protected:
     void setFallbackFontScale(float scale)   { m_fallback_font_scale = scale; }
 
 private:
-    struct FontArea
-    {
-        FontArea() : advance_x(0), bearing_x(0) ,offset_y(0), offset_y_bt(0),
-                     spriteno(0) {}
-        int advance_x;
-        int bearing_x;
-        int offset_y;
-        int offset_y_bt;
-        int spriteno;
-    };
-
     struct GlyphInfo
     {
         unsigned int font_number;
@@ -179,8 +179,6 @@ private:
     // ------------------------------------------------------------------------
     unsigned int getDPI() const;
     // ------------------------------------------------------------------------
-    gui::IGUISpriteBank* getSpriteBank() const         { return m_spritebank; }
-    // ------------------------------------------------------------------------
     void addLazyLoadChar(wchar_t c)            { m_new_char_holder.insert(c); }
     // ------------------------------------------------------------------------
     void insertGlyph(wchar_t c, const GlyphInfo& gi);
@@ -196,10 +194,6 @@ private:
     virtual std::vector<std::string> getFacesList() const = 0;
     // ------------------------------------------------------------------------
     virtual unsigned int getVerticalDrawOffset() const            { return 0; }
-    // ------------------------------------------------------------------------
-    const FontArea& getAreaFromCharacter(const wchar_t c,
-                                         bool* fallback_font) const;
-    // ------------------------------------------------------------------------
 
 public:
     LEAK_CHECK();
@@ -221,7 +215,7 @@ public:
     void render(const core::stringw& text, const core::rect<s32>& position,
                 const video::SColor& color, bool hcenter, bool vcenter,
                 const core::rect<s32>* clip,
-                FontSettings* font_settings = NULL,
+                FontSettings* font_settings,
                 FontCharCollector* char_collector = NULL);
     // ------------------------------------------------------------------------
     /** Write the current glyph page in png inside current running directory.
@@ -234,6 +228,11 @@ public:
      *  Useful in gdb without parameter.
      */
     void dumpGlyphPage();
+    // ------------------------------------------------------------------------
+    gui::IGUISpriteBank* getSpriteBank() const         { return m_spritebank; }
+    // ------------------------------------------------------------------------
+    const FontArea& getAreaFromCharacter(const wchar_t c,
+                                         bool* fallback_font) const;
 
 };   // FontWithFace
 

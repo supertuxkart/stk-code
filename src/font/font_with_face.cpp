@@ -435,7 +435,7 @@ void FontWithFace::render(const core::stringw& text,
         shadowpos.LowerRightCorner.X += 2;
         shadowpos.LowerRightCorner.Y += 2;
         render(text, shadowpos, font_settings->getShadowColor(), hcenter,
-            vcenter, clip);
+            vcenter, clip, font_settings);
 
         // Set back
         font_settings->setShadow(true);

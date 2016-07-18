@@ -80,6 +80,12 @@ public:
     /** Returns the type of this font */
     virtual EGUI_FONT_TYPE getType() const              { return EGFT_BITMAP; }
     // ------------------------------------------------------------------------
+    /** gets the sprite bank */
+    virtual IGUISpriteBank* getSpriteBank() const;
+    // ------------------------------------------------------------------------
+    /** returns the sprite number from a given character */
+    virtual u32 getSpriteNoFromChar(const wchar_t *c) const;
+    // ------------------------------------------------------------------------
     // Below is not used:
     /** set an Pixel Offset on Drawing ( scale position on width ) */
     virtual void setKerningWidth (s32 kerning) {}
@@ -92,12 +98,6 @@ public:
                                                                   { return 0; }
     // ------------------------------------------------------------------------
     virtual s32 getKerningHeight() const                          { return 0; }
-    // ------------------------------------------------------------------------
-    /** gets the sprite bank */
-    virtual IGUISpriteBank* getSpriteBank() const              { return NULL; }
-    // ------------------------------------------------------------------------
-    /** returns the sprite number from a given character */
-    virtual u32 getSpriteNoFromChar(const wchar_t *c) const       { return 0; }
     // ------------------------------------------------------------------------
     virtual void setInvisibleCharacters( const wchar_t *s ) {}
 

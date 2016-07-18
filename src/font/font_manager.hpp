@@ -68,6 +68,7 @@ public:
     void loadFonts();
     // ------------------------------------------------------------------------
     FT_Library getFTLibrary() const                    { return m_ft_library; }
+
 };   // FontManager
 
 extern FontManager *font_manager;
