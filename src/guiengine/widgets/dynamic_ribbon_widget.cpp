@@ -390,8 +390,7 @@ void DynamicRibbonWidget::buildInternalStructure()
         // calculate font size
         if (m_col_amount > 0)
         {
-            m_font->getFontSettings()->setScale(GUIEngine::getFont()
-                ->getFontSettings()->getScale() *
+            m_font->setScale(GUIEngine::getFont()->getScale() *
                 getFontScale((ribbon->m_w / m_col_amount) - 30));
         }
 

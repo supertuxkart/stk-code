@@ -658,6 +658,7 @@ namespace GUIEngine
 
 #include "config/user_config.hpp"
 #include "font/bold_face.hpp"
+#include "font/digit_face.hpp"
 #include "font/regular_face.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
@@ -690,8 +691,6 @@ namespace GUIEngine
     {
         IGUIEnvironment* g_env;
         Skin* g_skin = NULL;
-        FTEnvironment* g_ft_env = NULL;
-        GlyphPageCreator* g_gp_creator = NULL;
         ScalableFont *g_font;
         ScalableFont *g_outline_font;
         ScalableFont *g_large_font;
@@ -956,11 +955,6 @@ namespace GUIEngine
         //if (g_skin != NULL) delete g_skin;
         g_skin = NULL;
 
-        //delete g_ft_env;
-        //g_ft_env = NULL;
-        //delete g_gp_creator;
-        //g_gp_creator = NULL;
-
         for (unsigned int i=0; i<g_loaded_screens.size(); i++)
         {
             g_loaded_screens[i].unload();
@@ -992,12 +986,6 @@ namespace GUIEngine
     }   // cleanUp
 
     // -----------------------------------------------------------------------
-     void cleanHollowCopyFont()
-    {
-
-    }   // cleanHollowCopyFont
-
-    // -----------------------------------------------------------------------
 
     /**
       * To be called after cleanup().
@@ -1023,9 +1011,6 @@ namespace GUIEngine
         {
             g_focus_for_player[n] = NULL;
         }
-
-        //g_ft_env = new FTEnvironment();
-        //g_gp_creator = new GlyphPageCreator();
 
         /*
          To make the g_font a little bit nicer, we load an external g_font
@@ -1062,8 +1047,9 @@ namespace GUIEngine
 
         RegularFace* regular = font_manager->getFont<RegularFace>();
         BoldFace* bold = font_manager->getFont<BoldFace>();
+        DigitFace* digit = font_manager->getFont<DigitFace>();
 
-        ScalableFont* digit_font = new ScalableFont(regular);
+        ScalableFont* digit_font = new ScalableFont(digit);
         g_digit_font = digit_font;
 
         ScalableFont* sfont = new ScalableFont(regular);
@@ -1098,11 +1084,6 @@ namespace GUIEngine
         renderLoading();
         g_device->getVideoDriver()->endScene();
     }   // init
-
-    // -----------------------------------------------------------------------
-    void reloadHollowCopyFont(irr::gui::ScalableFont* sfont)
-    {
-    }   // reloadHollowCopyFont
 
     // -----------------------------------------------------------------------
     void reloadSkin()

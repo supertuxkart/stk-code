@@ -20,6 +20,7 @@
 
 #include "font/bold_face.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
 #include "utils/string_utils.hpp"
@@ -44,6 +45,11 @@ FontWithFace::~FontWithFace()
     m_page = NULL;
     m_spritebank->drop();
     m_spritebank = NULL;
+
+    for (unsigned int i = 0; i < m_faces.size(); i++)
+    {
+        font_manager->checkFTError(FT_Done_Face(m_faces[i]), "removing face");
+    }
 
 }   // ~FontWithFace
 
@@ -504,7 +510,7 @@ void FontWithFace::render(const core::stringw& text,
         else
         {
             // Prevent overwriting texture used by billboard text when
-            // using lazying loading characters
+            // using lazy loading characters
             if (supportLazyLoadChar() && fallback[i])
             {
                 const int cur_texno = m_fallback_font->getSpriteBank()
@@ -515,7 +521,7 @@ void FontWithFace::render(const core::stringw& text,
                     m_fallback_font->createNewGlyphPage();
                 }
             }
-            else
+            else if (supportLazyLoadChar())
             {
                 const int cur_texno = m_spritebank
                     ->getSprites()[area.spriteno].Frames[0].textureNumber;

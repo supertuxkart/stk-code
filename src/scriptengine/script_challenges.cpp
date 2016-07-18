@@ -22,7 +22,6 @@
 #include "challenges/unlock_manager.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_text_billboard.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "modes/world.hpp"

@@ -16,36 +16,38 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_REGULAR_FACE_HPP
-#define HEADER_REGULAR_FACE_HPP
+#ifndef HEADER_DIGIT_FACE_HPP
+#define HEADER_DIGIT_FACE_HPP
 
 #include "font/font_with_face.hpp"
 
-class RegularFace : public FontWithFace
+class DigitFace : public FontWithFace
 {
 private:
     virtual std::vector<std::string> getFacesList() const OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual bool supportLazyLoadChar() const OVERRIDE          { return true; }
+    virtual bool supportLazyLoadChar() const OVERRIDE         { return false; }
     // ------------------------------------------------------------------------
-    virtual unsigned int getGlyphPageSize() const OVERRIDE      { return 512; }
+    virtual unsigned int getGlyphPageSize() const OVERRIDE      { return 256; }
     // ------------------------------------------------------------------------
     virtual float getScalingFactorOne() const OVERRIDE         { return 0.7f; }
     // ------------------------------------------------------------------------
-    virtual unsigned int getScalingFactorTwo() const OVERRIDE    { return 27; }
+    virtual unsigned int getScalingFactorTwo() const OVERRIDE    { return 40; }
+    // ------------------------------------------------------------------------
+    virtual unsigned int getVerticalDrawOffset() const OVERRIDE  { return 20; }
 
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
-    RegularFace();
+    DigitFace();
     // ------------------------------------------------------------------------
-    virtual ~RegularFace() {}
+    virtual ~DigitFace() {}
     // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void reset() OVERRIDE;
 
-};   // RegularFace
+};   // DigitFace
 
 #endif
 /* EOF */

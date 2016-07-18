@@ -21,9 +21,7 @@
 
 #include "font/font_manager.hpp"
 #include "font/font_settings.hpp"
-#include "graphics/irr_driver.hpp"
 #include "utils/cpp2011.hpp"
-#include "utils/leak_check.hpp"
 
 #include <algorithm>
 #include <map>
@@ -46,11 +44,42 @@ public:
 protected:
     std::vector<FT_Face> m_faces;
 
-    int m_font_max_height;
+    int                  m_font_max_height;
 
-    int m_glyph_max_height;
- 
-    unsigned int getDPI() const;
+    int                  m_glyph_max_height;
+
+    // ------------------------------------------------------------------------
+    void insertCharacters(const wchar_t* in_ptr, bool first_load = false)
+    {
+        if (!supportLazyLoadChar() && !first_load) return;
+
+        for (const wchar_t* p = in_ptr; *p; ++p)
+        {
+            if (*p == L'\r' ||  *p == L'\n' || *p < (wchar_t)32)
+                continue;
+            if (!loadedChar(*p))
+            {
+                loadGlyphInfo(*p);
+                if (supportChar(*p))
+                    addLazyLoadChar(*p);
+                else if (m_fallback_font != NULL)
+                {
+                    if (!m_fallback_font->loadedChar(*p))
+                    {
+                        m_fallback_font->loadGlyphInfo(*p);
+                        if (m_fallback_font->supportChar(*p))
+                            m_fallback_font->addLazyLoadChar(*p);
+                    }
+                }
+            }
+        }
+    }
+    // ------------------------------------------------------------------------
+    void updateCharactersList();
+    // ------------------------------------------------------------------------
+    void setFallbackFont(FontWithFace* face)        { m_fallback_font = face; }
+    // ------------------------------------------------------------------------
+    void setFallbackFontScale(float scale)   { m_fallback_font_scale = scale; }
 
 private:
     struct FontArea
@@ -75,24 +104,23 @@ private:
         }
     };
 
-    FontWithFace*           m_fallback_font;
-    float                   m_fallback_font_scale;
+    FontWithFace*                m_fallback_font;
+    float                        m_fallback_font_scale;
 
     /** A temporary holder stored new char to be inserted.
       */
-    std::set<wchar_t>        m_new_char_holder;
+    std::set<wchar_t>            m_new_char_holder;
 
-    gui::IGUISpriteBank*          m_spritebank;
+    gui::IGUISpriteBank*         m_spritebank;
 
     /** A full glyph page for this font.
       */
-    video::IImage*                  m_page;
+    video::IImage*               m_page;
 
-    unsigned int             m_temp_height;
-    unsigned int             m_used_width;
-    unsigned int             m_used_height;
+    unsigned int                 m_temp_height;
+    unsigned int                 m_used_width;
+    unsigned int                 m_used_height;
 
-    //std::vector<FontArea>   m_areas;
     std::map<wchar_t, FontArea>  m_character_area_map;
     std::map<wchar_t, GlyphInfo> m_character_glyph_info_map;
 
@@ -104,33 +132,6 @@ private:
         else
             return (int)(area.advance_x * scale);
     }
-
-public:
-    LEAK_CHECK();
-    // ------------------------------------------------------------------------
-    FontWithFace(const std::string& name);
-    // ------------------------------------------------------------------------
-    virtual ~FontWithFace();
-    // ------------------------------------------------------------------------
-    virtual void init();
-    // ------------------------------------------------------------------------
-    virtual void reset();
-    // ------------------------------------------------------------------------
-    void addLazyLoadChar(wchar_t c)            { m_new_char_holder.insert(c); }
-    // ------------------------------------------------------------------------
-    void updateCharactersList();
-    // ------------------------------------------------------------------------
-    void insertGlyph(wchar_t c, const GlyphInfo& gi);
-    // ------------------------------------------------------------------------
-    virtual bool supportLazyLoadChar() const = 0;
-    // ------------------------------------------------------------------------
-    virtual unsigned int getGlyphPageSize() const = 0;
-    // ------------------------------------------------------------------------
-    virtual float getScalingFactorOne() const = 0;
-    // ------------------------------------------------------------------------
-    virtual unsigned int getScalingFactorTwo() const = 0;
-    // ------------------------------------------------------------------------
-    virtual std::vector<std::string> getFacesList() const = 0;
     // ------------------------------------------------------------------------
     bool loadedChar(wchar_t c) const
     {
@@ -174,34 +175,42 @@ public:
         m_character_glyph_info_map[c] = GlyphInfo(font_number, glyph_index);
     }
     // ------------------------------------------------------------------------
-    void insertCharacters(const wchar_t* in_ptr)
-    {
-        if (!supportLazyLoadChar()) return;
-
-        for (const wchar_t* p = in_ptr; *p; ++p)
-        {
-            if (*p == L'\r' ||  *p == L'\n' || *p < (wchar_t)32)
-                continue;
-            if (!loadedChar(*p))
-            {
-                loadGlyphInfo(*p);
-                if (supportChar(*p))
-                    addLazyLoadChar(*p);
-                else if (m_fallback_font != NULL)
-                {
-                    if (!m_fallback_font->loadedChar(*p))
-                    {
-                        m_fallback_font->loadGlyphInfo(*p);
-                        if (m_fallback_font->supportChar(*p))
-                            m_fallback_font->addLazyLoadChar(*p);
-                    }
-                }
-            }
-        }
-    }
+    void createNewGlyphPage();
+    // ------------------------------------------------------------------------
+    unsigned int getDPI() const;
+    // ------------------------------------------------------------------------
+    gui::IGUISpriteBank* getSpriteBank() const         { return m_spritebank; }
+    // ------------------------------------------------------------------------
+    void addLazyLoadChar(wchar_t c)            { m_new_char_holder.insert(c); }
+    // ------------------------------------------------------------------------
+    void insertGlyph(wchar_t c, const GlyphInfo& gi);
+    // ------------------------------------------------------------------------
+    virtual bool supportLazyLoadChar() const = 0;
+    // ------------------------------------------------------------------------
+    virtual unsigned int getGlyphPageSize() const = 0;
+    // ------------------------------------------------------------------------
+    virtual float getScalingFactorOne() const = 0;
+    // ------------------------------------------------------------------------
+    virtual unsigned int getScalingFactorTwo() const = 0;
+    // ------------------------------------------------------------------------
+    virtual std::vector<std::string> getFacesList() const = 0;
+    // ------------------------------------------------------------------------
+    virtual unsigned int getVerticalDrawOffset() const            { return 0; }
     // ------------------------------------------------------------------------
     const FontArea& getAreaFromCharacter(const wchar_t c,
                                          bool* fallback_font) const;
+    // ------------------------------------------------------------------------
+
+public:
+    LEAK_CHECK();
+    // ------------------------------------------------------------------------
+    FontWithFace(const std::string& name);
+    // ------------------------------------------------------------------------
+    virtual ~FontWithFace();
+    // ------------------------------------------------------------------------
+    virtual void init();
+    // ------------------------------------------------------------------------
+    virtual void reset();
     // ------------------------------------------------------------------------
     core::dimension2d<u32> getDimension(const wchar_t* text,
                                   FontSettings* font_settings = NULL);
@@ -215,17 +224,9 @@ public:
                 FontSettings* font_settings = NULL,
                 FontCharCollector* char_collector = NULL);
     // ------------------------------------------------------------------------
-    gui::IGUISpriteBank* getSpriteBank() const         { return m_spritebank; }
-    // ------------------------------------------------------------------------
-    void createNewGlyphPage();
-    // ------------------------------------------------------------------------
-    void setFallbackFont(FontWithFace* face)        { m_fallback_font = face; }
-    // ------------------------------------------------------------------------
-    void setFallbackFontScale(float scale)   { m_fallback_font_scale = scale; }
-    // ------------------------------------------------------------------------
     /** Write the current glyph page in png inside current running directory.
      *  Mainly for debug use.
-     *  \param fn The file name.
+     *  \param name The file name.
      */
     void dumpGlyphPage(const std::string& name);
     // ------------------------------------------------------------------------

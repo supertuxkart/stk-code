@@ -34,11 +34,12 @@ class FontWithFace;
 class FontManager : public NoCopy
 {
 private:
-    FT_Library m_ft_library;
-
     PtrVector<FontWithFace> m_fonts;
+
+    FT_Library              m_ft_library;
+
 public:
-    LEAK_CHECK();
+    LEAK_CHECK()
     // ------------------------------------------------------------------------
     FontManager();
     // ------------------------------------------------------------------------

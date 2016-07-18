@@ -38,7 +38,7 @@ private:
 
     video::SColor m_shadow_color;
 public:
-    LEAK_CHECK();
+    LEAK_CHECK()
     // ------------------------------------------------------------------------
     FontSettings(bool black_border = false, bool rtl = false,
                  float scale = 1.0f, bool shadow = false,

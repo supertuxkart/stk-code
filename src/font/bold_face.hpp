@@ -23,8 +23,19 @@
 
 class BoldFace : public FontWithFace
 {
+private:
+    virtual std::vector<std::string> getFacesList() const OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool supportLazyLoadChar() const OVERRIDE          { return true; }
+    // ------------------------------------------------------------------------
+    virtual unsigned int getGlyphPageSize() const OVERRIDE     { return 1024; }
+    // ------------------------------------------------------------------------
+    virtual float getScalingFactorOne() const OVERRIDE         { return 0.2f; }
+    // ------------------------------------------------------------------------
+    virtual unsigned int getScalingFactorTwo() const OVERRIDE   { return 120; }
+
 public:
-    LEAK_CHECK();
+    LEAK_CHECK()
     // ------------------------------------------------------------------------
     BoldFace();
     // ------------------------------------------------------------------------
@@ -33,18 +44,8 @@ public:
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void reset() OVERRIDE;
-    // ------------------------------------------------------------------------
-    virtual std::vector<std::string> getFacesList() const;
-    // ------------------------------------------------------------------------
-    virtual bool supportLazyLoadChar() const                   { return true; }
-    // ------------------------------------------------------------------------
-    virtual unsigned int getGlyphPageSize() const              { return 1024; }
-    // ------------------------------------------------------------------------
-    virtual float getScalingFactorOne() const                  { return 0.2f; }
-    // ------------------------------------------------------------------------
-    virtual unsigned int getScalingFactorTwo() const            { return 120; }
 
-};   // FontWithFace
+};   // BoldFace
 
 #endif
 /* EOF */

@@ -18,6 +18,7 @@
 #include "graphics/irr_driver.hpp"
 
 #include "config/user_config.hpp"
+#include "font/font_manager.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
@@ -847,6 +848,8 @@ void IrrDriver::applyResolutionSettings()
     Referee::cleanup();
     ParticleKindManager::get()->cleanup();
     delete input_manager;
+    delete font_manager;
+    font_manager = NULL;
     GUIEngine::clear();
     GUIEngine::cleanUp();
 
@@ -875,6 +878,8 @@ void IrrDriver::applyResolutionSettings()
     }
     initDevice();
 
+    font_manager = new FontManager();
+    font_manager->loadFonts();
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
 
