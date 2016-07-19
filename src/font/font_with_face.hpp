@@ -192,8 +192,6 @@ private:
     virtual unsigned int getScalingFactorTwo() const = 0;
     // ------------------------------------------------------------------------
     virtual std::vector<std::string> getFacesList() const = 0;
-    // ------------------------------------------------------------------------
-    virtual unsigned int getVerticalDrawOffset() const            { return 0; }
 
 public:
     LEAK_CHECK();

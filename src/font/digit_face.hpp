@@ -33,8 +33,6 @@ private:
     virtual float getScalingFactorOne() const OVERRIDE         { return 0.7f; }
     // ------------------------------------------------------------------------
     virtual unsigned int getScalingFactorTwo() const OVERRIDE    { return 40; }
-    // ------------------------------------------------------------------------
-    virtual unsigned int getVerticalDrawOffset() const OVERRIDE  { return 20; }
 
 public:
     LEAK_CHECK()
