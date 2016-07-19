@@ -1057,7 +1057,7 @@ namespace GUIEngine
         Private::font_height = g_font->getDimension( L"X" ).Height;
 
         ScalableFont* sfont_larger = new ScalableFont(regular);
-        sfont_larger->getFontSettings()->setScale(1.4f);
+        sfont_larger->setScale(1.4f);
         g_large_font = sfont_larger;
         Private::large_font_height = g_large_font->getDimension( L"X" ).Height;
 
@@ -1065,7 +1065,7 @@ namespace GUIEngine
         g_outline_font->getFontSettings()->setBlackBorder(true);
 
         ScalableFont* sfont_smaller = new ScalableFont(regular);
-        sfont_smaller->getFontSettings()->setScale(0.8f);
+        sfont_smaller->setScale(0.8f);
         g_small_font = sfont_smaller;
         Private::small_font_height = g_small_font->getDimension( L"X" ).Height;
 

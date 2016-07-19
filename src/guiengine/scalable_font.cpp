@@ -29,7 +29,8 @@ namespace gui
 ScalableFont::ScalableFont(FontWithFace* face)
 {
     m_face = face;
-    m_font_settings = new FontSettings();
+    m_font_settings = new FontSettings(false/*black_border*/,
+        translations->isRTLLanguage());
 }   // ScalableFont
 
 // ----------------------------------------------------------------------------

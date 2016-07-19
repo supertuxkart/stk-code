@@ -47,7 +47,7 @@ public:
     // ------------------------------------------------------------------------
     FontSettings* getFontSettings()                 { return m_font_settings; }
     // ------------------------------------------------------------------------
-    const FontSettings* getFontSettings()  const    { return m_font_settings; }
+    const FontSettings* getFontSettings() const     { return m_font_settings; }
     // ------------------------------------------------------------------------
     void setScale(float scale);
     // ------------------------------------------------------------------------

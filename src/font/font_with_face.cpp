@@ -452,7 +452,7 @@ void FontWithFace::render(const core::stringw& text,
 
     if (rtl || hcenter || vcenter || clip)
     {
-        text_dimension = getDimension(text.c_str());
+        text_dimension = getDimension(text.c_str(), font_settings);
 
         if (hcenter)
             offset.X += (position.getWidth() - text_dimension.Width) / 2;

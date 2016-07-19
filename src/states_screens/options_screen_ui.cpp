@@ -341,6 +341,8 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         GUIEngine::getFont()->updateRTL();
         GUIEngine::getTitleFont()->updateRTL();
         GUIEngine::getSmallFont()->updateRTL();
+        GUIEngine::getLargeFont()->updateRTL();
+        GUIEngine::getOutlineFont()->updateRTL();
 
         UserConfigParams::m_language = selection.c_str();
         user_config->saveConfig();
