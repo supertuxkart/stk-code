@@ -36,7 +36,7 @@ public:
     {
     public:
         virtual void collectChar(video::ITexture* texture,
-                                 const core::rect<s32>& destRect,
+                                 const core::rect<float>& destRect,
                                  const core::rect<s32>& sourceRect,
                                  const video::SColor* const colors) = 0;
     };
@@ -125,12 +125,12 @@ private:
     std::map<wchar_t, GlyphInfo> m_character_glyph_info_map;
 
     // ------------------------------------------------------------------------
-    int getCharWidth(const FontArea& area, bool fallback, float scale) const
+    float getCharWidth(const FontArea& area, bool fallback, float scale) const
     {
         if (fallback)
-            return (int)(area.advance_x * m_fallback_font_scale * scale);
+            return area.advance_x * m_fallback_font_scale;
         else
-            return (int)(area.advance_x * scale);
+            return area.advance_x * scale;
     }
     // ------------------------------------------------------------------------
     bool loadedChar(wchar_t c) const

@@ -31,12 +31,12 @@ class STKTextBillboardChar
 {
 public:
     irr::video::ITexture* m_texture;
-    irr::core::rect<irr::s32> m_destRect;
+    irr::core::rect<float> m_destRect;
     irr::core::rect<irr::s32> m_sourceRect;
     //irr::video::SColor m_colors[4];
 
     STKTextBillboardChar(irr::video::ITexture* texture,
-        const irr::core::rect<irr::s32>& destRect,
+        const irr::core::rect<float>& destRect,
         const irr::core::rect<irr::s32>& sourceRect,
         const irr::video::SColor* const colors)
     {
@@ -82,7 +82,7 @@ public:
     }
 
     virtual void collectChar(irr::video::ITexture* texture,
-        const irr::core::rect<irr::s32>& destRect,
+        const irr::core::rect<float>& destRect,
         const irr::core::rect<irr::s32>& sourceRect,
         const irr::video::SColor* const colors) OVERRIDE;
 

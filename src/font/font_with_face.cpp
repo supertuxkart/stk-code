@@ -275,12 +275,15 @@ void FontWithFace::dumpGlyphPage(const std::string& name)
 {
     for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
     {
-        video::IImage* image = irr_driver->getVideoDriver()
-            ->createImageFromData (m_spritebank->getTexture(i)
-            ->getColorFormat(), m_spritebank->getTexture(i)->getSize(),
-            m_spritebank->getTexture(i)->lock(), false/*copy mem*/);
+        video::ITexture* tex = m_spritebank->getTexture(i);
+        core::dimension2d<u32> size = tex->getSize();
+        video::ECOLOR_FORMAT col_format = tex->getColorFormat();
+        void* data = tex->lock();
 
-       m_spritebank->getTexture(i)->unlock();
+        video::IImage* image = irr_driver->getVideoDriver()
+            ->createImageFromData(col_format, size, data, false/*copy mem*/);
+
+       tex->unlock();
        irr_driver->getVideoDriver()->writeImageToFile(image, std::string
            (name + "_" + StringUtils::toString(i) + ".png").c_str());
        image->drop();
@@ -353,8 +356,8 @@ core::dimension2d<u32> FontWithFace::getDimension(const wchar_t* text,
     updateCharactersList();
 
     assert(m_character_area_map.size() > 0);
-    core::dimension2d<u32> dim(0, 0);
-    core::dimension2d<u32> this_line(0, (int)(m_font_max_height * scale));
+    core::dimension2d<float> dim(0.0f, 0.0f);
+    core::dimension2d<float> this_line(0.0f, m_font_max_height * scale);
 
     for (const wchar_t* p = text; *p; ++p)
     {
@@ -380,10 +383,11 @@ core::dimension2d<u32> FontWithFace::getDimension(const wchar_t* text,
     if (dim.Width < this_line.Width)
         dim.Width = this_line.Width;
 
-    dim.Width  = (int)(dim.Width + 0.9f); // round up
-    dim.Height = (int)(dim.Height + 0.9f);
+    core::dimension2d<u32> ret_dim(0, 0);
+    ret_dim.Width  = (u32)(dim.Width + 0.9f); // round up
+    ret_dim.Height = (u32)(dim.Height + 0.9f);
 
-    return dim;
+    return ret_dim;
 }   // getDimension
                                   
 // ----------------------------------------------------------------------------
@@ -391,17 +395,18 @@ int FontWithFace::getCharacterFromPos(const wchar_t* text, int pixel_x,
                                       FontSettings* font_settings) const
 {
     const float scale = font_settings ? font_settings->getScale() : 1.0f;
-    int x = 0;
+    float x = 0;
     int idx = 0;
 
     while (text[idx])
     {
         bool use_fallback_font = false;
-        const FontArea &a  = getAreaFromCharacter(text[idx], &use_fallback_font);
+        const FontArea &a  = getAreaFromCharacter(text[idx],
+            &use_fallback_font);
 
         x += getCharWidth(a, use_fallback_font, scale);
 
-        if (x >= pixel_x)
+        if (x >= float(pixel_x))
             return idx;
 
         ++idx;
@@ -441,7 +446,8 @@ void FontWithFace::render(const core::stringw& text,
         font_settings->setShadow(true);
     }
 
-    core::position2d<s32> offset = position.UpperLeftCorner;
+    core::position2d<float> offset(float(position.UpperLeftCorner.X),
+        float(position.UpperLeftCorner.Y));
     core::dimension2d<s32> text_dimension;
 
     if (rtl || hcenter || vcenter || clip)
@@ -457,7 +463,8 @@ void FontWithFace::render(const core::stringw& text,
             offset.Y += (position.getHeight() - text_dimension.Height) / 2;
         if (clip)
         {
-            core::rect<s32> clippedRect(offset, text_dimension);
+            core::rect<s32> clippedRect(core::position2d<s32>
+                (s32(offset.X), s32(offset.Y)), text_dimension);
             clippedRect.clipAgainst(*clip);
             if (!clippedRect.isValid()) return;
         }
@@ -465,9 +472,9 @@ void FontWithFace::render(const core::stringw& text,
 
     // Collect character locations
     const unsigned int text_size = text.size();
-    core::array<s32>               indices(text_size);
-    core::array<core::position2di> offsets(text_size);
-    std::vector<bool>              fallback(text_size);
+    core::array<s32> indices(text_size);
+    core::array<core::position2d<float>> offsets(text_size);
+    std::vector<bool> fallback(text_size);
 
     // Test again if lazy load char is needed,
     // as some text isn't drawn with getDimension
@@ -483,7 +490,7 @@ void FontWithFace::render(const core::stringw& text,
         {
             if (c==L'\r' && text[i+1]==L'\n')
                 c = text[++i];
-            offset.Y += (int)(m_font_max_height * scale);
+            offset.Y += m_font_max_height * scale;
             offset.X  = position.UpperLeftCorner.X;
             if (hcenter)
                 offset.X += (position.getWidth() - text_dimension.Width) >> 1;
@@ -495,12 +502,10 @@ void FontWithFace::render(const core::stringw& text,
         fallback[i]            = use_fallback_font;
         if (char_collector == NULL)
         {
-            // Try to use ceil to make offset calculate correctly when scale
-            // is smaller than 1
-            s32 glyph_offset_x = (s32)ceil((float) area.bearing_x *
-                (fallback[i] ? m_fallback_font_scale : scale));
-            s32 glyph_offset_y = (s32)ceil((float) area.offset_y *
-                (fallback[i] ? m_fallback_font_scale : scale));
+            float glyph_offset_x = area.bearing_x *
+                (fallback[i] ? m_fallback_font_scale : scale);
+            float glyph_offset_y = area.offset_y *
+                (fallback[i] ? m_fallback_font_scale : scale);
             offset.X += glyph_offset_x;
             offset.Y += glyph_offset_y;
             offsets.push_back(offset);
@@ -532,10 +537,10 @@ void FontWithFace::render(const core::stringw& text,
             }
 
             // Billboard text specific, use offset_y_bt instead
-            s32 glyph_offset_x = (s32)ceil((float) area.bearing_x *
-                (fallback[i] ? m_fallback_font_scale : scale));
-            s32 glyph_offset_y = (s32)ceil((float) area.offset_y_bt *
-                (fallback[i] ? m_fallback_font_scale : scale));
+            float glyph_offset_x = area.bearing_x *
+                (fallback[i] ? m_fallback_font_scale : scale);
+            float glyph_offset_y = area.offset_y_bt *
+                (fallback[i] ? m_fallback_font_scale : scale);
             offset.X += glyph_offset_x;
             offset.Y += glyph_offset_y;
             offsets.push_back(offset);
@@ -586,13 +591,13 @@ void FontWithFace::render(const core::stringw& text,
                 [(*fallback_sprites)[sprite_id].Frames[0].rectNumber] :
                 positions[sprites[sprite_id].Frames[0].rectNumber]);
 
-            core::dimension2d<s32> size = source.getSize();
+            core::dimension2d<float> size(0.0f, 0.0f);
 
             float cur_scale = (fallback[n] ? m_fallback_font_scale : scale);
-            size.Width  = (int)(size.Width  * cur_scale);
-            size.Height = (int)(size.Height * cur_scale);
+            size.Width  = source.getSize().Width  * cur_scale;
+            size.Height = source.getSize().Height * cur_scale;
 
-            core::rect<s32> dest(offsets[n], size);
+            core::rect<float> dest(offsets[n], size);
 
             video::ITexture* texture = (fallback[n] ?
                 m_fallback_font->m_spritebank->getTexture(tex_id) :
@@ -603,8 +608,9 @@ void FontWithFace::render(const core::stringw& text,
                 for (int y_delta = -2; y_delta <= 2; y_delta++)
                 {
                     if (x_delta == 0 || y_delta == 0) continue;
-                    draw2DImage(texture, dest + core::position2d<s32>
-                        (x_delta, y_delta), source, clip, black, true);
+                    draw2DImage(texture, dest + core::position2d<float>
+                        (float(x_delta), float(y_delta)), source, clip,
+                        black, true);
                 }
             }
         }
@@ -625,13 +631,13 @@ void FontWithFace::render(const core::stringw& text,
             (*fallback_positions)[(*fallback_sprites)[sprite_id].Frames[0]
             .rectNumber] : positions[sprites[sprite_id].Frames[0].rectNumber]);
 
-        core::dimension2d<s32> size = source.getSize();
+        core::dimension2d<float> size(0.0f, 0.0f);
 
         float cur_scale = (fallback[n] ? m_fallback_font_scale : scale);
-        size.Width  = (int)(size.Width  * cur_scale);
-        size.Height = (int)(size.Height * cur_scale);
+        size.Width  = source.getSize().Width  * cur_scale;
+        size.Height = source.getSize().Height * cur_scale;
 
-        core::rect<s32> dest(offsets[n], size);
+        core::rect<float> dest(offsets[n], size);
 
         video::ITexture* texture = (fallback[n] ?
             m_fallback_font->m_spritebank->getTexture(tex_id) :
