@@ -66,7 +66,7 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, FontWithFace* fo
     font->render(text, core::rect<s32>(0, 0, size.Width, size.Height), video::SColor(255,255,255,255),
         false, false, NULL, NULL, this);
 
-    const float scale = 0.03f;
+    const float scale = 0.02f;
 
     //scene::SMesh* mesh = new scene::SMesh();
     std::map<video::ITexture*, scene::SMeshBuffer*> buffers;

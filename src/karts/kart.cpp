@@ -25,7 +25,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "font/regular_face.hpp"
+#include "font/bold_face.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
@@ -2803,12 +2803,12 @@ btQuaternion Kart::getVisualRotation() const
  */
 void Kart::setOnScreenText(const wchar_t *text)
 {
-    RegularFace* regular_face = font_manager->getFont<RegularFace>();
-    core::dimension2d<u32> textsize = regular_face->getDimension(text);
+    BoldFace* bold_face = font_manager->getFont<BoldFace>();
+    core::dimension2d<u32> textsize = bold_face->getDimension(text);
 
     if (CVS->isGLSL())
     {
-        new STKTextBillboard(text, regular_face,
+        new STKTextBillboard(text, bold_face,
             GUIEngine::getSkin()->getColor("font::bottom"),
             GUIEngine::getSkin()->getColor("font::top"),
             getNode(), irr_driver->getSceneManager(), -1,
