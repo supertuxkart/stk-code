@@ -125,8 +125,10 @@ void KartProperties::copyForPlayer(const KartProperties *source)
     // So all pointer variables need to be separately allocated and assigned.
     if (source->m_characteristic)
     {
+        // Remove the shared reference by creating a new pointer
         m_characteristic.reset(new XmlCharacteristic());
-        *m_characteristic = *source->m_characteristic;
+        m_characteristic->copyFrom(source->getCharacteristic());
+
         // Combine the characteristics for this object. We can't copy it because
         // this object has other pointers (to m_characteristic).
         combineCharacteristics();

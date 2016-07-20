@@ -23,6 +23,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/graphics_restrictions.hpp"
 
+
 CentralVideoSettings *CVS = new CentralVideoSettings();
 
 void CentralVideoSettings::init()
@@ -68,8 +69,12 @@ void CentralVideoSettings::init()
         Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
         Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
     }
+#if !defined(USE_GLES2)
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1))
            && !UserConfigParams::m_force_legacy_device;
+#else
+    m_glsl = m_gl_major_version >= 3 && !UserConfigParams::m_force_legacy_device;
+#endif
     if (!ProfileWorld::isNoGraphics())
         initGL();
 
@@ -79,11 +84,11 @@ void CentralVideoSettings::init()
         std::string card((char*)(glGetString(GL_RENDERER)));
         GraphicsRestrictions::init(driver, card);
 
+#if !defined(USE_GLES2)        
         if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
             hasVSLayer = true;
             Log::info("GLDriver", "AMD Vertex Shader Layer Present");
         }
-
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BUFFER_STORAGE) &&
             hasGLExtension("GL_ARB_buffer_storage")  )
         {
@@ -202,6 +207,18 @@ void CentralVideoSettings::init()
                               GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &param);
             m_need_srgb_visual_workaround = (param != GL_SRGB);
         }
+#else
+        if (m_glsl == true)
+        {
+            hasArraysOfArrays = true;
+            hasTextureStorage = true;
+            hasTextureView = true;
+            hasBindlessTexture = true;
+            hasImageLoadStore = true;
+            hasAtomics = true;
+            hasSSBO = true;
+        }
+#endif
     }
 }
 

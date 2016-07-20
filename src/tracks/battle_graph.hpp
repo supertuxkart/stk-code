@@ -121,6 +121,15 @@ public:
                                          { return m_distance_matrix.size(); }
 
     // ----------------------------------------------------------------------
+    /** Returns the distance between any two nodes */
+    float getDistance(int from, int to) const
+    {
+        if (from == BattleGraph::UNKNOWN_POLY ||
+            to == BattleGraph::UNKNOWN_POLY)
+            return 0.0f;
+        return m_distance_matrix[from][to];
+    }
+    // ------------------------------------------------------------------------
     /** Returns the NavPoly corresponding to the i-th node of the BattleGraph */
     const NavPoly&    getPolyOfNode(int i) const
                                     { return NavMesh::get()->getNavPoly(i); }
@@ -135,7 +144,7 @@ public:
      *    which is the next node on the path from i to j (undirected graph) */
     const int         getNextShortestPathPoly(int i, int j) const;
 
-    const std::vector < std::pair<const Item*, int> >& getItemList()
+    std::vector<std::pair<const Item*, int>>& getItemList()
                                                  { return m_items_on_graph; }
     // ------------------------------------------------------------------------
     void              insertItems(Item* item, int polygon)

@@ -98,7 +98,7 @@ void RaceResultGUI::init()
     }
 
     m_finish_sound = SFXManager::get()->quickSound(
-        human_win ? "gp_end" : "race_finish");
+        human_win ? "race_finish_victory" : "race_finish");
 
     //std::string path = (human_win ? Different result music too later
     //    file_manager->getAsset(FileManager::MUSIC, "race_summary.music") :
@@ -143,7 +143,7 @@ void RaceResultGUI::init()
 void RaceResultGUI::tearDown()
 {
     Screen::tearDown();
-    m_font->setMonospaceDigits(m_was_monospace);
+    //m_font->setMonospaceDigits(m_was_monospace);
 
     if (m_finish_sound != NULL &&
         m_finish_sound->getStatus() == SFXBase::SFX_PLAYING)
@@ -455,8 +455,8 @@ void RaceResultGUI::backToLobby()
 
         m_font = GUIEngine::getFont();
         assert(m_font);
-        m_was_monospace = m_font->getMonospaceDigits();
-        m_font->setMonospaceDigits(true);
+        //m_was_monospace = m_font->getMonospaceDigits();
+        //m_font->setMonospaceDigits(true);
         WorldWithRank *rank_world = (WorldWithRank*)World::getWorld();
 
         unsigned int first_position = 1;
@@ -556,14 +556,14 @@ void RaceResultGUI::backToLobby()
 
         // Determine width of new points column
 
-        m_font->setMonospaceDigits(true);
+        //m_font->setMonospaceDigits(true);
         core::dimension2du r_new_p = m_font->getDimension(L"+99");
 
         m_width_new_points = r_new_p.Width;
 
         // Determine width of overall points column
         core::dimension2du r_all_p = m_font->getDimension(L"999");
-        m_font->setMonospaceDigits(false);
+        //m_font->setMonospaceDigits(false);
 
         m_width_all_points = r_all_p.Width;
 
@@ -828,7 +828,7 @@ void RaceResultGUI::backToLobby()
         if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
             m_animation_state == RR_RACE_RESULT)
         {
-            displayHighScores();
+            displayPostRaceInfo();
         }
     }   // renderGlobal
 
@@ -904,11 +904,11 @@ void RaceResultGUI::backToLobby()
 
     //-----------------------------------------------------------------------------
     /** Returns a string to display next to a kart. For a player that's the name
-     *  of the player, for an AI kart it's the name of the driver. 
+     *  of the player, for an AI kart it's the name of the driver.
      */
     core::stringw RaceResultGUI::getKartDisplayName(const AbstractKart *kart) const
     {
-        const EndController *ec = 
+        const EndController *ec =
             dynamic_cast<const EndController*>(kart->getController());
         // If the race was given up, there is no end controller for the
         // players, so this case needs to be handled separately
@@ -917,7 +917,7 @@ void RaceResultGUI::backToLobby()
         else
         {
             // No end controller, check explicitely for a player controller
-            const PlayerController *pc = 
+            const PlayerController *pc =
                 dynamic_cast<const PlayerController*>(kart->getController());
             // Check if the kart is a player controller to get the real name
             if(pc) return pc->getName();
@@ -1322,21 +1322,24 @@ void RaceResultGUI::backToLobby()
     }   // cleanupGPProgress
 
     // ----------------------------------------------------------------------------
-    void RaceResultGUI::displayHighScores()
+    void RaceResultGUI::displayPostRaceInfo()
     {
         // This happens in demo world
         if (!World::getWorld())
             return;
 
         Highscores* scores = World::getWorld()->getHighscores();
+
+        video::SColor white_color = video::SColor(255, 255, 255, 255);
+
+        int x = (int)(UserConfigParams::m_width*0.65f);
+        int y = m_top;
+
+        int current_y = y;
+
         // In some case for exemple FTL they will be no highscores
         if (scores != NULL)
         {
-            video::SColor white_color = video::SColor(255, 255, 255, 255);
-
-            int x = (int)(UserConfigParams::m_width*0.65f);
-            int y = m_top;
-
             // First draw title
             GUIEngine::getFont()->draw(_("Highscores"),
                 core::recti(x, y, 0, 0),
@@ -1369,7 +1372,7 @@ void RaceResultGUI::backToLobby()
                 }
 
                 int current_x = x;
-                int current_y = y + (int)((i + 1) * m_distance_between_rows * 1.5f);
+                current_y = y + (int)((i + 1) * m_distance_between_rows * 1.5f);
 
                 const KartProperties* prop = kart_properties_manager->getKart(kart_name);
                 if (prop != NULL)
@@ -1408,6 +1411,36 @@ void RaceResultGUI::backToLobby()
                     core::recti(current_x, current_y, current_x + 100, current_y + 10),
                     text_color,
                     false, false, NULL, true /* ignoreRTL */);
+            }
+        }
+
+        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
+        {
+            // display lap count
+            if (race_manager->modeHasLaps())
+            {
+                core::stringw laps = _("Laps: %i", race_manager->getNumLaps());
+                current_y += m_distance_between_rows * 0.8f * 2;
+                GUIEngine::getFont()->draw(laps, core::recti(x, current_y, 0, 0),
+                    white_color, false, false, nullptr, true);
+            }
+            // display difficulty
+            const core::stringw& difficulty_name =
+                race_manager->getDifficultyName(race_manager->getDifficulty());
+            core::stringw difficulty_string = _("Difficulty: %s", difficulty_name);
+            current_y += m_distance_between_rows * 0.8f;
+            GUIEngine::getFont()->draw(difficulty_string, core::recti(x, current_y, 0, 0),
+                white_color, false, false, nullptr, true);
+            // show fastest lap
+            if (race_manager->modeHasLaps())
+            {
+                float best_lap_time = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
+                core::stringw best_lap_string = _("Best lap time: %s",
+                    StringUtils::timeToString(best_lap_time).c_str());
+                current_y += m_distance_between_rows * 0.8f;
+                GUIEngine::getFont()->draw(best_lap_string,
+                    core::recti(x, current_y, 0, 0), white_color, false, false,
+                    nullptr, true);
             }
         }
     }

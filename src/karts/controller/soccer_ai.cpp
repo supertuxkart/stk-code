@@ -265,19 +265,6 @@ Vec3 SoccerAI::determineBallAimingPosition()
         // in front of the ball, if so use another aiming method
         if (aim_lc.z() < 0 && ball_lc.z() > 0)
         {
-            // Find the angle between the ball to kart and the aim position
-            // to kart, if it's not almost 180 or 0 degree, we need to
-            // apply brake
-            const float c = sqrtf(pow(ball_lc.z() - aim_lc.z(), 2) +
-                 pow(ball_lc.x() - aim_lc.x(), 2));
-            const float angle = findAngleFrom3Edges(aim_lc.length_2d(),
-                ball_lc.length_2d(), c);
-
-            if (angle > 1 && angle < 179)
-            {
-                m_force_brake = true;
-            }
-
             // Return the behind version of aim position, allow pushing to
             // ball towards the it
             return m_world->getBallAimPosition(m_opp_team, true/*reverse*/);
@@ -288,21 +275,6 @@ Vec3 SoccerAI::determineBallAimingPosition()
     return ball_aim_pos;
 
 }   // determineBallAimingPosition
-
-//-----------------------------------------------------------------------------
-float SoccerAI::findAngleFrom3Edges(float a, float b, float c)
-{
-    // Cosine forumla : c2 = a2 + b2 - 2ab cos C
-    float test_value = (c * c) - (a * a) - (b * b) / (-(2 * a * b));
-    // Prevent error
-    if (test_value < -1)
-        test_value = -1;
-    else if (test_value > 1)
-        test_value = 1;
-
-    return acosf(test_value) * RAD_TO_DEGREE;
-
-}   // find3PointsAngle
 
 //-----------------------------------------------------------------------------
 bool SoccerAI::isOvertakable(const Vec3& ball_lc)

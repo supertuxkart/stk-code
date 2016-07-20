@@ -25,6 +25,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "font/bold_face.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
@@ -38,8 +39,6 @@
 #include "graphics/stk_text_billboard.hpp"
 #include "graphics/stars.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "karts/abstract_characteristic.hpp"
-#include "karts/cached_characteristic.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/rescue_animation.hpp"
@@ -93,9 +92,9 @@
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
             PerPlayerDifficulty difficulty,
-            video::E_RENDER_TYPE rt)
+            RenderInfo::KartRenderType krt)
      : AbstractKart(ident, world_kart_id, position, init_transform,
-             difficulty, rt)
+             difficulty, krt)
 
 #if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  pragma warning(1:4355)
@@ -181,27 +180,18 @@ void Kart::init(RaceManager::KartType type)
     // In multiplayer mode, sounds are NOT positional
     if (race_manager->getNumLocalPlayers() > 1)
     {
+        float factor = 1.0f / race_manager->getNumberOfKarts();
+        // players have louder sounds than AIs
         if (type == RaceManager::KT_PLAYER)
-        {
-            // players have louder sounds than AIs
-            const float factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
-            m_goo_sound->setVolume( 1.0f / factor );
-            m_skid_sound->setVolume( 1.0f / factor );
-            m_crash_sound->setVolume( 1.0f / factor );
-            m_boing_sound->setVolume( 1.0f / factor );
-            m_beep_sound->setVolume( 1.0f / factor );
-            m_nitro_sound->setVolume( 1.0f / factor );
-        }
-        else
-        {
-            m_goo_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_skid_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_crash_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_beep_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_boing_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_nitro_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-        }
-    }
+            factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
+
+        m_goo_sound->setVolume(factor);
+        m_skid_sound->setVolume(factor);
+        m_crash_sound->setVolume(factor);
+        m_boing_sound->setVolume(factor);
+        m_beep_sound->setVolume(factor);
+        m_nitro_sound->setVolume(factor);
+    }   // if getNumLocalPlayers > 1
 
     if(!m_engine_sound)
     {
@@ -224,12 +214,7 @@ void Kart::init(RaceManager::KartType type)
     m_kart_gfx = new KartGFX(this);
     m_skidding = new Skidding(this);
     // Create the stars effect
-    m_stars_effect =
-        new Stars(getNode(),
-                  core::vector3df(0.0f,
-                                  getKartModel()->getModel()
-                                        ->getBoundingBox().MaxEdge.Y,
-                                  0.0f)                               );
+    m_stars_effect = new Stars(this);
 
     reset();
 }   // init
@@ -1151,6 +1136,10 @@ void Kart::eliminate()
     }
 
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
+    m_kart_gfx->setGFXInvisible();
+    if (m_engine_sound)
+        m_engine_sound->stop();
+
     m_eliminated = true;
 
     m_node->setVisible(false);
@@ -2752,7 +2741,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     float heading = m_skidding->getVisualSkidRotation();
     Moveable::updateGraphics(dt, center_shift,
-                             btQuaternion(heading, 0, m_current_lean));
+                             btQuaternion(heading, 0, -m_current_lean));
 
     // m_speed*dt is the distance the kart has moved, which determines
     // how much the wheels need to rotate.
@@ -2814,17 +2803,12 @@ btQuaternion Kart::getVisualRotation() const
  */
 void Kart::setOnScreenText(const wchar_t *text)
 {
-    core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(text);
-
-    // FIXME: Titlefont is the only font guaranteed to be loaded if STK
-    // is started without splash screen (since "Loading" is shown even in this
-    // case). A smaller font would be better
+    BoldFace* bold_face = font_manager->getFont<BoldFace>();
+    core::dimension2d<u32> textsize = bold_face->getDimension(text);
 
     if (CVS->isGLSL())
     {
-        gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont()
-                                                       : GUIEngine::getTitleFont();
-        new STKTextBillboard(text, font,
+        new STKTextBillboard(text, bold_face,
             GUIEngine::getSkin()->getColor("font::bottom"),
             GUIEngine::getSkin()->getColor("font::top"),
             getNode(), irr_driver->getSceneManager(), -1,

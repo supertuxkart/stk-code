@@ -37,6 +37,7 @@ public:
     virtual void process(CharacteristicType type, Value value, bool *is_set) const;
 
     void load(const XMLNode *node);
+    virtual void copyFrom(const AbstractCharacteristic *other);
 
 private:
     static void processFloat(const std::string &processor, float *value, bool *is_set);

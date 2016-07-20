@@ -133,20 +133,23 @@ Material::Material(const XMLNode *node, bool deprecated)
     // force the reset flag in this case.
     if(m_falling_effect)
         m_drive_reset=true;
-    node->get("surface",          &m_surface           );
-    node->get("ignore",           &m_ignore            );
+    node->get("surface",             &m_surface            );
+    node->get("ignore",              &m_ignore             );
 
-    node->get("max-speed",        &m_max_speed_fraction);
-    node->get("slowdown-time",    &m_slowdown_time     );
-    node->get("backface-culling", &m_backface_culling  );
-    node->get("disable-z-write",  &m_disable_z_write   );
-    node->get("fog",              &m_fog               );
+    node->get("max-speed",           &m_max_speed_fraction );
+    node->get("slowdown-time",       &m_slowdown_time      );
+    node->get("backface-culling",    &m_backface_culling   );
+    node->get("disable-z-write",     &m_disable_z_write    );
+    node->get("colorizable",         &m_colorizable        );
+    node->get("colorization-factor", &m_colorization_factor);
+    node->get("fog",                 &m_fog                );
 
-    node->get("mask",             &m_mask              );
-    node->get("gloss-map",        &m_gloss_map         );
-    node->get("water-splash",     &m_water_splash      );
-    node->get("jump",             &m_is_jump_texture   );
-    node->get("has-gravity",      &m_has_gravity       );
+    node->get("mask",                &m_mask               );
+    node->get("colorization-mask",   &m_colorization_mask  );
+    node->get("gloss-map",           &m_gloss_map          );
+    node->get("water-splash",        &m_water_splash       );
+    node->get("jump",                &m_is_jump_texture    );
+    node->get("has-gravity",         &m_has_gravity        );
 
     if (m_collision_reaction != NORMAL)
     {
@@ -434,6 +437,9 @@ void Material::init()
     m_mirror_axis_when_reverse  = ' ';
     m_collision_reaction        = NORMAL;
     m_disable_z_write           = false;
+    m_colorizable               = false;
+    m_colorization_factor       = 0.0f;
+    m_colorization_mask         = "";
     m_water_shader_speed_1      = 6.6667f;
     m_water_shader_speed_2      = 4.0f;
     m_fog                       = true;
@@ -720,6 +726,18 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         {
             glossytex = getUnicolorTexture(SColor(0, 0, 0, 0));
         }
+
+        if (!m->getTexture(7))
+        {
+            // Only set colorization mask if not set
+            ITexture *colorization_mask_tex = getUnicolorTexture(SColor(0, 0, 0, 0));
+            if (m_colorization_mask.size() > 0)
+            {
+                colorization_mask_tex = irr_driver->getTexture(m_colorization_mask);
+            }
+            m->setTexture(7, colorization_mask_tex);
+        }
+
         switch (m_shader_type)
         {
         case SHADERTYPE_SOLID_UNLIT:
@@ -970,7 +988,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     if (race_manager->getReverseTrack() &&
         m_mirror_axis_when_reverse != ' ')
     {
-        irr::video::S3DVertex* mbVertices = (video::S3DVertex*)mb->getVertices();
+        //irr::video::S3DVertex* mbVertices = (video::S3DVertex*)mb->getVertices();
         for (unsigned int i = 0; i < mb->getVertexCount(); i++)
         {
             core::vector2df &tc = mb->getTCoords(i);

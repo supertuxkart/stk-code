@@ -58,6 +58,9 @@ private:
 
     float                    m_gain;
 
+    float                    m_normal_loop_start;
+    float                    m_fast_loop_start;
+
     /** Either time for fading faster music in, or time to change pitch. */
     float                    m_faster_time;
     /** Maximum pitch for faster music. */

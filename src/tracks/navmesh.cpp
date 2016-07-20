@@ -46,6 +46,7 @@ NavMesh::NavMesh(const std::string &filename)
     if(xml->getName()!="navmesh")
     {
         Log::error("NavMesh", "NavMesh is invalid. \n");
+        delete xml;	
         return;
     }
 

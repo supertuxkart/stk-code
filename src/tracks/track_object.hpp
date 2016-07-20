@@ -34,6 +34,7 @@
 class XMLNode;
 class ThreeDAnimation;
 class ModelDefinitionLoader;
+class RenderInfo;
 
 /**
  * \ingroup tracks
@@ -98,13 +99,14 @@ protected:
 
     void init(const XMLNode &xml_node, scene::ISceneNode* parent,
         ModelDefinitionLoader& model_def_loader,
-        TrackObject* parent_library);
+        TrackObject* parent_library, RenderInfo* ri);
 
 public:
                  TrackObject(const XMLNode &xml_node,
                              scene::ISceneNode* parent,
                              ModelDefinitionLoader& model_def_loader,
-                             TrackObject* parent_library);
+                             TrackObject* parent_library,
+                             RenderInfo* ri);
 
                  TrackObject(const core::vector3df& xyz,
                              const core::vector3df& hpr,

@@ -150,7 +150,9 @@
 #include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "font/font_manager.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/camera_debug.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
@@ -168,6 +170,7 @@
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/combined_characteristic.hpp"
 #include "karts/controller/ai_base_lap_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -469,7 +472,7 @@ void setupRaceStart()
         Log::warn("main", "Kart '%s' is unknown so will use the "
             "default kart.",
             UserConfigParams::m_default_kart.c_str());
-        race_manager->setPlayerKart(0, 
+        race_manager->setPlayerKart(0,
                            UserConfigParams::m_default_kart.getDefaultValue());
     }
     else
@@ -535,7 +538,7 @@ void cmdLineHelp()
     // "                            n=2: recorded key strokes\n"
     // "       --test-ai=n        Use the test-ai for every n-th AI kart.\n"
     // "                          (so n=1 means all Ais will be the test ai)\n"
-    // "                             
+    // "
     "       --server=name      Start a server (not a playing client).\n"
     "       --lan-server=name  Start a LAN server (not a playing client).\n"
     "       --server-password= Sets a password for a server (both client&server).\n"
@@ -554,6 +557,38 @@ void cmdLineHelp()
     "                          with colons (:).\n"
     "       --cutscene=NAME    Launch the specified track as a cutscene.\n"
     "                          This is for internal debugging use only.\n"
+    "       --enable-glow      Enable glow effect.\n"
+    "       --disable-glow     Disable glow effect.\n"
+    "       --enable-bloom     Enable bloom graphical effect.\n"
+    "       --disable-bloom    Disable bloom graphical effect.\n"
+    "       --enable-light-shaft Enable light shafts (God rays).\n"
+    "       --disable-light-shaft Disable light shafts (God rays).\n"
+    "       --enable-dof       Enable depth of field.\n"
+    "       --disable-dof      Disable depth of field.\n"
+    "       --enable-gi        Enable global illumination.\n"
+    "       --disable-gi       Disable global illumination.\n"
+    "       --enable-gfx       Enable animated scenery.\n"
+    "       --disable-gfx      Disable animated scenery.\n"
+    "       --enable-motion-blur Enable motion blur.\n"
+    "       --disable-motion-blur Disable motion blur.\n"
+    "       --enable-mlaa      Enable anti-aliasing.\n"
+    "       --disable-mlaa     Disable anti-aliasing.\n"
+    "       --enable-texture-compression Enable texture compression.\n"
+    "       --disable-texture-compression Disable texture compression.\n"
+    "       --enable-ssao      Enable screen space ambient occlusion.\n"
+    "       --disable-ssao     Disable screen space ambient occlusion.\n"
+    "       --enable-ibl       Enable image based lighting.\n"
+    "       --disable-ibl      Disable image based lighting.\n"
+    "       --enable-hd-textures Enable high definition textures.\n"
+    "       --disable-hd-textures Disable high definition textures.\n"
+    "       --enable-dynamic-lights Enable advanced pipline graphical options.\n"
+    "       --disable-dynamic-lights Disable advanced pipline graphical options.\n"
+    "       --enable-trilinear Enable trilinear texture filtering.\n"
+    "       --disable-trilinear Use bilinear texture filtering.\n"
+    "       --anisotropic=n    Anisotropic filtering quality (0 to disable).\n"
+    "                          Takes precedence over trilinear or bilinear\n"
+    "                          texture filtering.\n"
+    "       --shadows=n        Set shadow quality (0 to disable shadows).\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
     "http://supertuxkart.sourceforge.net\n\n",
@@ -705,6 +740,72 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--windowed") || CommandLine::has("-w"))
         UserConfigParams::m_fullscreen = false;
 
+    // toggle graphical options
+    if (CommandLine::has("--enable-glow"))
+        UserConfigParams::m_glow = true;
+    else if (CommandLine::has("--disable-glow"))
+        UserConfigParams::m_glow = false;
+    if (CommandLine::has("--enable-bloom"))
+        UserConfigParams::m_bloom = true;
+    else if (CommandLine::has("--disable-bloom"))
+        UserConfigParams::m_bloom = false;
+    if (CommandLine::has("--enable-light-shaft"))
+        UserConfigParams::m_light_shaft = true;
+    else if (CommandLine::has("--disable-light-shaft"))
+        UserConfigParams::m_light_shaft = false;
+    if (CommandLine::has("--enable-dynamic-lights"))
+        UserConfigParams::m_dynamic_lights = true;
+    else if (CommandLine::has("--disable-dynamic-lights"))
+        UserConfigParams::m_dynamic_lights = false;
+    // depth of field
+    if (CommandLine::has("--enable-dof"))
+        UserConfigParams::m_dof = true;
+    else if (CommandLine::has("--disable-dof"))
+        UserConfigParams::m_dof = false;
+    // global illumination
+    if (CommandLine::has("--enable-gi"))
+        UserConfigParams::m_gi = true;
+    else if (CommandLine::has("--disable-gi"))
+        UserConfigParams::m_gi = false;
+    // animated scenery
+    if (CommandLine::has("--enable-gfx"))
+        UserConfigParams::m_graphical_effects = true;
+    else if (CommandLine::has("--disable-gfx"))
+        UserConfigParams::m_graphical_effects = false;
+    if (CommandLine::has("--enable-motion-blur"))
+        UserConfigParams::m_motionblur = true;
+    else if (CommandLine::has("--disable-motion-blur"))
+        UserConfigParams::m_motionblur = false;
+    // anti-aliasing
+    if (CommandLine::has("--enable-mlaa"))
+        UserConfigParams::m_mlaa = true;
+    else if (CommandLine::has("--disable-mlaa"))
+        UserConfigParams::m_mlaa = false;
+    if (CommandLine::has("--enable-texture-compression"))
+        UserConfigParams::m_texture_compression = true;
+    else if (CommandLine::has("--disable-texture-compression"))
+        UserConfigParams::m_texture_compression = false;
+    // screen space ambient occluison
+    if (CommandLine::has("--enable-ssao"))
+        UserConfigParams::m_ssao = true;
+    else if (CommandLine::has("--disable-ssao"))
+        UserConfigParams::m_ssao = false;
+    // image based lighting
+    if (CommandLine::has("--enable-ibl"))
+        UserConfigParams::m_degraded_IBL = false;
+    else if (CommandLine::has("--disable-ibl"))
+        UserConfigParams::m_degraded_IBL = true;
+    // high definition textures user choice
+    if (CommandLine::has("--enable-hd-textures"))
+        UserConfigParams::m_high_definition_textures =  2 | 1;
+    else if (CommandLine::has("--disable-hd-textures"))
+        UserConfigParams::m_high_definition_textures = 2;
+    if (CommandLine::has("--enable-trilinear"))
+        UserConfigParams::m_trilinear = true;
+    else if (CommandLine::has("--disable-trilinear"))
+        UserConfigParams::m_trilinear = false;
+
+
     // Enable loading grand prix from local directory
     if(CommandLine::has("--add-gp-dir", &s))
     {
@@ -723,6 +824,10 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_xmas_mode = n;
     if (CommandLine::has("--easter", &n))
         UserConfigParams::m_easter_ear_mode = n;
+    if (CommandLine::has("--shadows", &n))
+        UserConfigParams::m_shadows_resolution = n;
+    if (CommandLine::has("--anisotropic", &n))
+        UserConfigParams::m_anisotropic = n;
 
     // Useful for debugging: the temple navmesh needs 12 minutes in debug
     // mode to compute the distance matrix!!
@@ -808,14 +913,23 @@ int handleCmdLine()
         UserConfigParams::m_music = false;
     }
 
-    if(UserConfigParams::m_artist_debug_mode)
+    if (UserConfigParams::m_artist_debug_mode)
     {
-       if(CommandLine::has("--camera-wheel-debug"))
-           Camera::setDebugMode(Camera::CM_DEBUG_GROUND);
+        if (CommandLine::has("--camera-wheel-debug"))
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
+        }
         if(CommandLine::has("--camera-debug"))
-            Camera::setDebugMode(Camera::CM_DEBUG_TOP_OF_KART);
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
+        }
         if(CommandLine::has("--camera-kart-debug"))
-            Camera::setDebugMode(Camera::CM_DEBUG_BEHIND_KART);
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
+        }
         if(CommandLine::has("--physics-debug"))
             UserConfigParams::m_physics_debug=1;
         if(CommandLine::has("--check-debug"))
@@ -832,7 +946,7 @@ int handleCmdLine()
         NetworkConfig::get()->setIsWAN();
         STKHost::create();
         Log::info("main", "Creating a WAN server '%s'.", s.c_str());
-    } 
+    }
     if (CommandLine::has("--lan-server", &s))
     {
         NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
@@ -840,7 +954,7 @@ int handleCmdLine()
         NetworkConfig::get()->setIsLAN();
         STKHost::create();
         Log::info("main", "Creating a LAN server '%s'.", s.c_str());
-    }   
+    }
     if (CommandLine::has("--server-password", &s))
     {
         NetworkConfig::get()->setPassword(s);
@@ -1184,6 +1298,8 @@ void initRest()
         exit(0);
     }
 
+    font_manager = new FontManager();
+    font_manager->loadFonts();
     GUIEngine::init(device, driver, StateManager::get());
 
     // This only initialises the non-network part of the addons manager. The
@@ -1454,9 +1570,15 @@ int main(int argc, char *argv[] )
         {
             if (UserConfigParams::m_old_driver_popup)
             {
+                #ifdef USE_GLES2
+                irr::core::stringw version = "OpenGL ES 3.0";
+                #else
+                irr::core::stringw version = "OpenGL 3.1";
+                #endif
                 MessageDialog *dialog =
                     new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
-                    "if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."),
+                    "if an update for your video driver is available. SuperTuxKart requires %s or better.",
+                    version),
                     /*from queue*/ true);
                 GUIEngine::DialogQueue::get()->pushDialog(dialog);
             }
@@ -1648,6 +1770,7 @@ static void cleanSuperTuxKart()
     if(unlock_manager)          delete unlock_manager;
     Online::ProfileManager::destroy();
     GUIEngine::DialogQueue::deallocate();
+    if(font_manager)            delete font_manager;
 
     // Now finish shutting down objects which a separate thread. The
     // RequestManager has been signaled to shut down as early as possible,
@@ -1755,6 +1878,11 @@ void runUnitTests()
     assert( isEasterMode(22, 3, 2016, 5));
     assert(!isEasterMode(21, 3, 2016, 5));
     UserConfigParams::m_easter_ear_mode = saved_easter_mode;
+
+
+    Log::info("UnitTest", " - Kart characteristics");
+    CombinedCharacteristic::unitTesting();
+
     Log::info("UnitTest", "=====================");
     Log::info("UnitTest", "Testing successful   ");
     Log::info("UnitTest", "=====================");

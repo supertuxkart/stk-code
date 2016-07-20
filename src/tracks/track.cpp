@@ -26,7 +26,7 @@
 #include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera_end.hpp"
 #include "graphics/CBatchingMesh.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
@@ -38,7 +38,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/stk_text_billboard.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -779,6 +779,8 @@ void Track::createPhysicsModel(unsigned int main_track_count)
             irr_driver->grabAllTextures(mesh);
             // Gloss
             mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            // Colorization mask
+            mb->getMaterial().setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
         }
         else
             irr_driver->removeNode(m_static_physics_only_nodes[i]);
@@ -1220,7 +1222,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
         if (lod_instance)
         {
-            LODNode* node = lodLoader.instanciateAsLOD(n, NULL);
+            LODNode* node = lodLoader.instanciateAsLOD(n, NULL, NULL);
             if (node != NULL)
             {
                 node->setPosition(xyz);
@@ -1595,7 +1597,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 #endif
     }
 
-    Camera::clearEndCameras();
+    CameraEnd::clearEndCameras();
     m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
 
@@ -1737,7 +1739,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
     }
 
-    loadObjects(root, path, model_def_loader, true, NULL, NULL);
+    loadObjects(root, path, model_def_loader, true, NULL, NULL, NULL);
 
     model_def_loader.cleanLibraryNodesAfterLoad();
 
@@ -1751,7 +1753,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // It's important to execute this BEFORE the code that creates the skycube,
     // otherwise the skycube node could be modified to have fog enabled, which
     // we don't want
-    if (m_use_fog && !Camera::isDebug() && !CVS->isGLSL())
+    if (m_use_fog && Camera::getDefaultCameraType()!=Camera::CM_TYPE_DEBUG && 
+        !CVS->isGLSL())
     {
         /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
            and end do not matter */
@@ -1926,7 +1929,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
 void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& model_def_loader,
                         bool create_lod_definitions, scene::ISceneNode* parent,
-                        TrackObject* parent_library)
+                        TrackObject* parent_library, RenderInfo* ri)
 {
     unsigned int start_position_counter = 0;
 
@@ -1940,7 +1943,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         if (name == "track" || name == "default-start") continue;
         if (name == "object" || name == "library")
         {
-            m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
+            m_track_object_manager->add(*node, parent, model_def_loader, parent_library, ri);
         }
         else if (name == "water")
         {
@@ -1984,7 +1987,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         {
             if (UserConfigParams::m_graphical_effects)
             {
-                m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
+                m_track_object_manager->add(*node, parent, model_def_loader, parent_library, NULL);
             }
         }
         else if (name == "sky-dome" || name == "sky-box" || name == "sky-color")
@@ -1993,11 +1996,11 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "end-cameras")
         {
-            Camera::readEndCamera(*node);
+            CameraEnd::readEndCamera(*node);
         }
         else if (name == "light")
         {
-            m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
+            m_track_object_manager->add(*node, parent, model_def_loader, parent_library, NULL);
         }
         else if (name == "weather")
         {

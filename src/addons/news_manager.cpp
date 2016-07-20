@@ -40,6 +40,12 @@ NewsManager::NewsManager() : m_news(std::vector<NewsMessage>())
     m_current_news_message = -1;
     m_error_message.setAtomic("");
     m_force_refresh = false;
+
+    // Clean .part file which may be left behind
+    std::string news_part = file_manager->getAddonsFile("news.xml.part");
+    if (file_manager->fileExists(news_part))
+        file_manager->removeFile(news_part);
+
     init(false);
 }   // NewsManage
 
@@ -99,6 +105,8 @@ void* NewsManager::downloadNews(void *obj)
     me->clearErrorMessage();
 
     std::string xml_file = file_manager->getAddonsFile("news.xml");
+    // Prevent downloading when .part file created, which is already downloaded
+    std::string xml_file_part = file_manager->getAddonsFile("news.xml.part");
     bool news_exists = file_manager->fileExists(xml_file);
 
     // The news message must be updated if either it has never been updated,
@@ -111,8 +119,8 @@ void* NewsManager::downloadNews(void *obj)
                         < StkTime::getTimeSinceEpoch()          ||
                       me->m_force_refresh                       ||
                       !news_exists                                    )
-         && UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED;
-
+         && UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED
+         && !file_manager->fileExists(xml_file_part);
     const XMLNode *xml = NULL;
 
     if(!download && news_exists)

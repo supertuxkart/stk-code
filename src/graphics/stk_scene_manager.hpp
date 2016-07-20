@@ -37,6 +37,7 @@ public:
     DrawElementsIndirectCommand *Ptr;
     CommandBuffer()
     {
+#if !defined(USE_GLES2)
         glGenBuffers(1, &drawindirectcmd);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
         if (CVS->supportsAsyncInstanceUpload())
@@ -48,6 +49,7 @@ public:
         {
             glBufferData(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_STREAM_DRAW);
         }
+#endif
     }
 };
 

@@ -6,7 +6,7 @@ the game assets from Sourceforge using SVN.
 `svn checkout https://svn.code.sf.net/p/supertuxkart/code/stk-assets stk-assets`
 
 Place the `stk-assets` folder next to the source root `stk-code` folder.
-See <http://supertuxkart.sourceforge.net/Source_control> for more information
+See <https://supertuxkart.net/Source_control> for more information
 
 
 ## Building STK on Linux
@@ -75,8 +75,8 @@ location, specify `CMAKE_INSTALL_PREFIX` when running cmake, e.g.:
 
   
 ## Building STK on OS X
-See <http://supertuxkart.sourceforge.net/Building_and_packaging_on_OSX>
+See <https://supertuxkart.net/Building_and_packaging_on_OSX>
 
 
 ## Building STK on Windows
-See <http://supertuxkart.sourceforge.net/How_to_build_the_Windows_version>
+See <https://supertuxkart.net/How_to_build_the_Windows_version>

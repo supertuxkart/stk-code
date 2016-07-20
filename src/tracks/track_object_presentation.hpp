@@ -37,6 +37,7 @@ class ParticleEmitter;
 class PhysicalObject;
 class ThreeDAnimation;
 class ModelDefinitionLoader;
+class RenderInfo;
 class STKInstancedSceneNode;
 class XMLNode;
 class TrackObject;
@@ -184,6 +185,7 @@ public:
 class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNode
 {
     TrackObject* m_parent;
+    RenderInfo* m_render_info;
 public:
     TrackObjectPresentationLibraryNode(TrackObject* parent,
         const XMLNode& xml_node,
@@ -203,7 +205,8 @@ public:
 
     TrackObjectPresentationLOD(const XMLNode& xml_node,
                                scene::ISceneNode* parent,
-                               ModelDefinitionLoader& model_def_loader);
+                               ModelDefinitionLoader& model_def_loader,
+                               RenderInfo* ri);
     virtual ~TrackObjectPresentationLOD();
 };
 
@@ -232,11 +235,14 @@ private:
 
     std::string             m_model_file;
 
+    RenderInfo* m_render_info;
+
     void init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled);
 
 public:
     TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled,
-                                scene::ISceneNode* parent);
+                                scene::ISceneNode* parent,
+                                RenderInfo* render_info);
 
     TrackObjectPresentationMesh(const std::string& model_file,
                                 const core::vector3df& xyz,

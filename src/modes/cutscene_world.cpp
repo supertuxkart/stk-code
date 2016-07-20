@@ -61,6 +61,7 @@ CutsceneWorld::CutsceneWorld() : World()
     m_play_track_intro_sound = false;
     m_play_ready_set_go_sounds = false;
     m_fade_duration = 1.0f;
+    m_camera = NULL;
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------
@@ -80,7 +81,7 @@ void CutsceneWorld::init()
 
     Camera* stk_cam = Camera::createCamera(NULL);
     m_camera = stk_cam->getCameraSceneNode();
-    m_camera->setFOV(0.61f);
+    m_camera->setFOV(stk_config->m_cutscene_fov);
     m_camera->bindTargetAndRotation(true); // no "look-at"
 
     // --- Build list of sounds to play at certain frames

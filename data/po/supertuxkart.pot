@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-23 09:00-0400\n"
+"POT-Creation-Date: 2016-05-30 18:52-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -196,7 +196,7 @@ msgstr ""
 #: src/states_screens/arenas_screen.cpp:83
 #: src/states_screens/easter_egg_screen.cpp:145
 #: src/states_screens/grand_prix_editor_screen.cpp:327
-#: src/states_screens/kart_selection.cpp:287
+#: src/states_screens/kart_selection.cpp:286
 #: src/states_screens/tracks_and_gp_screen.cpp:148
 msgid "Add-Ons"
 msgstr ""
@@ -216,7 +216,7 @@ msgstr ""
 #: src/states_screens/edit_track_screen.cpp:147
 #: src/states_screens/gp_info_screen.cpp:76
 #: src/states_screens/grand_prix_editor_screen.cpp:324
-#: src/states_screens/kart_selection.cpp:279
+#: src/states_screens/kart_selection.cpp:278
 #: src/states_screens/options_screen_video.cpp:389
 #: src/states_screens/tracks_and_gp_screen.cpp:138
 #: src/states_screens/tracks_screen.cpp:142
@@ -453,7 +453,7 @@ msgstr ""
 #. I18N: In soccer setup screen
 #. I18N: ./data/gui/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
-#: src/states_screens/race_result_gui.cpp:203
+#: src/states_screens/race_result_gui.cpp:205
 msgid "Continue"
 msgstr ""
 
@@ -795,7 +795,7 @@ msgstr ""
 #. I18N: In the user screen
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/main_menu_screen.cpp:77
+#: src/states_screens/main_menu_screen.cpp:78
 #: src/states_screens/online_profile_friends.cpp:222
 msgid "Online"
 msgstr ""
@@ -933,7 +933,7 @@ msgstr ""
 #. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:542
+#: src/race/race_manager.hpp:544
 #: src/states_screens/ghost_replay_selection.cpp:120
 msgid "Novice"
 msgstr ""
@@ -944,7 +944,7 @@ msgstr ""
 #. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:543
+#: src/race/race_manager.hpp:545
 #: src/states_screens/ghost_replay_selection.cpp:120
 msgid "Intermediate"
 msgstr ""
@@ -955,7 +955,7 @@ msgstr ""
 #. I18N: Difficulty
 #. I18N: ./data/gui/select_challenge.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:544
+#: src/race/race_manager.hpp:546
 #: src/states_screens/ghost_replay_selection.cpp:119
 msgid "Expert"
 msgstr ""
@@ -964,7 +964,7 @@ msgstr ""
 #. I18N: Difficulty
 #. I18N: ./data/gui/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.hpp:545
+#: src/race/race_manager.hpp:547
 #: src/states_screens/ghost_replay_selection.cpp:118
 msgid "SuperTux"
 msgstr ""
@@ -996,7 +996,7 @@ msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
-#: src/states_screens/main_menu_screen.cpp:78
+#: src/states_screens/main_menu_screen.cpp:79
 msgid "Login"
 msgstr ""
 
@@ -1544,7 +1544,7 @@ msgstr ""
 
 #. I18N: ./data/gui/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:226
+#: src/states_screens/race_result_gui.cpp:228
 msgid "Setup New Race"
 msgstr ""
 
@@ -1699,6 +1699,10 @@ msgstr ""
 msgid "Hacienda"
 msgstr ""
 
+#. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
+msgid "Icy Soccer Field"
+msgstr ""
+
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
@@ -1776,6 +1780,10 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/temple/track.xml
 msgid "Temple"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/volcano_island/track.xml
+msgid "Volcan Island"
 msgstr ""
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
@@ -1934,12 +1942,12 @@ msgid ""
 "created."
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:1895
+#: src/graphics/irr_driver.cpp:1896
 #, c-format
 msgid "FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:1906
+#: src/graphics/irr_driver.cpp:1907
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris"
 msgstr ""
@@ -2626,7 +2634,7 @@ msgstr ""
 msgid "You finished the race!"
 msgstr ""
 
-#: src/main.cpp:1234
+#: src/main.cpp:1296
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -2636,12 +2644,12 @@ msgid ""
 "edit \"Connect to the Internet\" and \"Send anonymous HW statistics\")."
 msgstr ""
 
-#: src/main.cpp:1384
+#: src/main.cpp:1446
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr ""
 
-#: src/main.cpp:1396
+#: src/main.cpp:1458
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
 "your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
@@ -2679,11 +2687,11 @@ msgstr ""
 msgid "WRONG WAY!"
 msgstr ""
 
-#: src/modes/world.cpp:1196
+#: src/modes/world.cpp:1208
 msgid "You have been eliminated!"
 msgstr ""
 
-#: src/modes/world.cpp:1199
+#: src/modes/world.cpp:1211
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr ""
@@ -2827,7 +2835,7 @@ msgid "Please wait while addons are updated"
 msgstr ""
 
 #: src/states_screens/addons_screen.cpp:512
-#: src/states_screens/main_menu_screen.cpp:550
+#: src/states_screens/main_menu_screen.cpp:553
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you "
 "are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -2840,7 +2848,7 @@ msgstr ""
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:81
 #: src/states_screens/easter_egg_screen.cpp:143
-#: src/states_screens/kart_selection.cpp:285
+#: src/states_screens/kart_selection.cpp:284
 #: src/states_screens/tracks_and_gp_screen.cpp:146
 msgid "standard"
 msgstr ""
@@ -3263,16 +3271,16 @@ msgid "User defined"
 msgstr ""
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:150
+#: src/states_screens/grand_prix_lose.cpp:153
 msgid "Better luck next time!"
 msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:125
-#: src/states_screens/race_result_gui.cpp:192
+#: src/states_screens/grand_prix_win.cpp:126
+#: src/states_screens/race_result_gui.cpp:194
 msgid "You completed a challenge!"
 msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:281
+#: src/states_screens/grand_prix_win.cpp:283
 msgid "You completed the Grand Prix!"
 msgstr ""
 
@@ -3291,25 +3299,25 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:489
+#: src/states_screens/main_menu_screen.cpp:492
 msgid ""
 "You can not play online without internet access. If you want to play online, "
 "go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:513
+#: src/states_screens/main_menu_screen.cpp:516
 msgid ""
 "You can not download addons without internet access. If you want to download "
 "addons, go to options, select  tab 'User Interface', and edit \"Connect to "
 "the Internet\"."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:545
+#: src/states_screens/main_menu_screen.cpp:548
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:557
+#: src/states_screens/main_menu_screen.cpp:560
 msgid "Please wait while the add-ons are loading"
 msgstr ""
 
@@ -3634,20 +3642,20 @@ msgid "GOAL!"
 msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/race_gui_base.cpp:502
+#: src/states_screens/race_gui_base.cpp:504
 msgid "by"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:610
+#: src/states_screens/race_gui_base.cpp:612
 msgid "Collect nitro!"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:612
+#: src/states_screens/race_gui_base.cpp:614
 msgid "Follow the leader!"
 msgstr ""
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:778
+#: src/states_screens/race_gui_base.cpp:780
 #, c-format
 msgid "Top %i"
 msgstr ""
@@ -3673,40 +3681,40 @@ msgstr ""
 msgid "Press fire to start the challenge"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:173
+#: src/states_screens/race_result_gui.cpp:175
 msgid "Continue."
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:176
+#: src/states_screens/race_result_gui.cpp:178
 msgid "Quit the server."
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:193
+#: src/states_screens/race_result_gui.cpp:195
 msgid "You completed challenges!"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:206
+#: src/states_screens/race_result_gui.cpp:208
 msgid "Abort Grand Prix"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:216
+#: src/states_screens/race_result_gui.cpp:218
 msgid "Restart"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:222
+#: src/states_screens/race_result_gui.cpp:224
 msgid "Back to challenge selection"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:228
+#: src/states_screens/race_result_gui.cpp:230
 msgid "Back to the menu"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:371
+#: src/states_screens/race_result_gui.cpp:373
 msgid "Do you really want to abort the Grand Prix?"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:513
-#: src/states_screens/race_result_gui.cpp:884
+#: src/states_screens/race_result_gui.cpp:498
+#: src/states_screens/race_result_gui.cpp:861
 msgid "Eliminated"
 msgstr ""
 
@@ -3722,21 +3730,22 @@ msgstr ""
 msgid "It's a draw"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1105
-#: src/states_screens/race_result_gui.cpp:1153
+#. I18N: indicates a player that scored in their own goal in result screen
+#: src/states_screens/race_result_gui.cpp:1106
+#: src/states_screens/race_result_gui.cpp:1154
 msgid "(Own Goal)"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1218
+#: src/states_screens/race_result_gui.cpp:1219
 #, c-format
 msgid "Track %i/%i"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1302
+#: src/states_screens/race_result_gui.cpp:1303
 msgid "Grand Prix progress:"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1340
+#: src/states_screens/race_result_gui.cpp:1341
 msgid "Highscores"
 msgstr ""
 

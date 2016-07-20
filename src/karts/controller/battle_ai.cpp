@@ -119,9 +119,9 @@ void BattleAI::findClosestKart(bool use_difficulty)
         }
 
         Vec3 d = kart->getXYZ() - m_kart->getXYZ();
-        if (d.length_2d() <= distance)
+        if (d.length() <= distance)
         {
-            distance = d.length_2d();
+            distance = d.length();
             closest_kart_num = i;
         }
     }

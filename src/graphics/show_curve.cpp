@@ -67,6 +67,7 @@ void ShowCurve::addEmptyMesh()
     m_buffer          = m_mesh->getMeshBuffer(0);
     m_buffer->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
     m_buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m_buffer->getMaterial().setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
 
     assert(m_buffer->getVertexType()==video::EVT_STANDARD);
 }   // addEmptyMesh

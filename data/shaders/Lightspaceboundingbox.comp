@@ -22,7 +22,7 @@ layout (std430) buffer BoundingBoxes
     CascadeBoundingBox BB[4];
 };
 
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+#stk_include "utils/getPosFromUVDepth.frag"
 
 shared int xmin[4];
 shared int xmax[4];

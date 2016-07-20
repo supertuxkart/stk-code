@@ -14,7 +14,7 @@ in vec3 nor;
 in vec2 uv;
 out vec4 FragColor;
 
-vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue);
+#stk_include "utils/getLightFactor.frag"
 
 void main(void)
 {

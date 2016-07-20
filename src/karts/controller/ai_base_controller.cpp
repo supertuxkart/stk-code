@@ -67,7 +67,7 @@ void AIBaseController::update(float dt)
 void AIBaseController::setControllerName(const std::string &name)
 {
 #ifdef DEBUG
-    if(m_ai_debug && !Camera::isDebug())
+    if(m_ai_debug && Camera::getActiveCamera()->getType()==Camera::CM_TYPE_NORMAL)
         m_kart->setOnScreenText(core::stringw(name.c_str()).c_str());
 #endif
     Controller::setControllerName(name);
@@ -310,6 +310,6 @@ void AIBaseController::checkPosition(const Vec3 &point, posData *pos_data,
 
     pos_data->angle = atan2(fabsf(local_coordinates.getX()),
         fabsf(local_coordinates.getZ()));
-    pos_data->distance = p.length_2d();
+    pos_data->distance = p.length();
 
 }   //  checkPosition

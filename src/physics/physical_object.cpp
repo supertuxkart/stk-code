@@ -111,7 +111,8 @@ void PhysicalObject::Settings::init()
     m_linear_factor      = Vec3(1.0f, 1.0f, 1.0f);
     m_angular_factor     = Vec3(1.0f, 1.0f, 1.0f); 
     m_linear_damping     = 0.0f;
-    m_angular_damping    = 0.0f;
+    // Make sure that the cones stop rolling by defining angular friction != 0.
+    m_angular_damping    = 0.5f;
     m_reset_when_too_low = false;
     m_flatten_kart       = false;
 }   // Settings
@@ -521,8 +522,6 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
     btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
                                                   m_shape, inertia);
 
-    // Make sure that the cones stop rolling by defining angular friction != 0.
-    info.m_angularDamping = 0.5f;
     m_body = new btRigidBody(info);
     m_user_pointer.set(this);
     m_body->setUserPointer(&m_user_pointer);

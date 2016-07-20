@@ -26,8 +26,7 @@
 
 #ifdef DEBUG
 
-/** Switch this to 1 to get the backtrace of the leaks (slows down execution a little)
- *  Atm only implemented for OSX and windows. */
+/** Define this to get the backtrace of the leaks (slows down execution a little) */
 #undef GET_STACK_TRACE
 
 Synchronised<int> m_lock_stacktrace;
@@ -59,7 +58,7 @@ namespace MemoryLeaks
         m_stack_size = backtrace(callstack, max_size);
 
         m_stack = backtrace_symbols(callstack, m_stack_size);
-#  elif defined(WIN32)
+#  elif defined(WIN32) || ENABLE_LIBBFD
         m_lock_stacktrace.lock();
         CrashReporting::getCallStack(m_stack);
         m_lock_stacktrace.unlock();
@@ -79,7 +78,14 @@ namespace MemoryLeaks
     void AllocatedObject::print() const
     {
 #ifdef GET_STACK_TRACE
-#  if defined(__APPLE__)
+#  if defined ENABLE_LIBBFD
+        std::vector<std::string> calls = StringUtils::split(m_stack, '\n');
+        // Ignore the first 3 entries
+        for (unsigned int i = 3; i < calls.size(); ++i)
+        {
+            Log::error("LeakCheck", "    %s", calls[i].c_str());
+        }
+#  elif defined(__APPLE__)
         for (int i = 0; i < m_stack_size; ++i)
         {
             Log::error("LeakCheck", "    %s\n", m_stack[i]);

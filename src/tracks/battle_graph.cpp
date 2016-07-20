@@ -90,12 +90,10 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
         const std::vector<int> &adjacents = navmesh->getAdjacentPolys(i);
         for(unsigned int j=0; j<adjacents.size(); j++)
         {
-            Vec3 adjacentPolyCenter = navmesh->getCenterOfPoly(adjacents[j]);
-            float distance = Vec3(adjacentPolyCenter - currentPoly.getCenter()).length_2d();
-
+            Vec3 diff = navmesh->getCenterOfPoly(adjacents[j]) - currentPoly.getCenter();
+            float distance = diff.length();
             m_distance_matrix[i][adjacents[j]] = distance;
             //m_distance_matrix[adjacents[j]][i] = distance;
-
         }
         m_distance_matrix[i][i] = 0.0f;
     }
