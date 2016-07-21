@@ -411,8 +411,7 @@
   which leads to crash with STK), but the fonts are to blame, what's the point of not
   using industry standard nowadays...
   -->
-  <fonts-list regular-faces="Cantarell-Regular.otf FreeSans.ttf wqy-microhei.ttf NotoNaskhArabicUI-Bold.ttf"
-              bold-faces="Cantarell-Bold.otf FreeSansBold.ttf"
-              digit-faces="SigmarOne.otf" />
+  <fonts-list normal-ttf="Cantarell-Regular.otf FreeSans.ttf wqy-microhei.ttf NotoNaskhArabicUI-Bold.ttf"
+              digit-ttf="SigmarOne.otf" />
 
 </config>

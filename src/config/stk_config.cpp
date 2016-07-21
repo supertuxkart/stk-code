@@ -182,9 +182,8 @@ void STKConfig::init_defaults()
     m_score_increase.clear();
     m_leader_intervals.clear();
     m_switch_items.clear();
-    m_regular_faces.clear();
-    m_bold_faces.clear();
-    m_digit_faces.clear();
+    m_normal_ttf.clear();
+    m_digit_ttf.clear();
 }   // init_defaults
 
 //-----------------------------------------------------------------------------
@@ -368,9 +367,8 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *fonts_list = root->getNode("fonts-list"))
     {
-        fonts_list->get("regular-faces", &m_regular_faces);
-        fonts_list->get("bold-faces",    &m_bold_faces   );
-        fonts_list->get("digit-faces",   &m_digit_faces  );
+        fonts_list->get("normal-ttf", &m_normal_ttf);
+        fonts_list->get("digit-ttf",  &m_digit_ttf );
     }
 
     // Get the default KartProperties

@@ -21,11 +21,11 @@
 
 #include "font/font_with_face.hpp"
 
+class FaceTTF;
+
 class RegularFace : public FontWithFace
 {
 private:
-    virtual std::vector<std::string> getFacesList() const OVERRIDE;
-    // ------------------------------------------------------------------------
     virtual bool supportLazyLoadChar() const OVERRIDE          { return true; }
     // ------------------------------------------------------------------------
     virtual unsigned int getGlyphPageSize() const OVERRIDE      { return 512; }
@@ -37,7 +37,7 @@ private:
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
-    RegularFace();
+    RegularFace(FaceTTF* ttf);
     // ------------------------------------------------------------------------
     virtual ~RegularFace() {}
     // ------------------------------------------------------------------------

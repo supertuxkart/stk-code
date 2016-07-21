@@ -29,6 +29,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+class FaceTTF;
 class FontWithFace;
 
 class FontManager : public NoCopy
@@ -37,6 +38,10 @@ private:
     PtrVector<FontWithFace> m_fonts;
 
     FT_Library              m_ft_library;
+
+    FaceTTF*                m_normal_ttf;
+
+    FaceTTF*                m_digit_ttf;
 
 public:
     LEAK_CHECK()
