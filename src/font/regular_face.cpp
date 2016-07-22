@@ -16,12 +16,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "font/face_ttf.hpp"
+
 #include "font/regular_face.hpp"
 
-#include "config/stk_config.hpp"
-
 // ----------------------------------------------------------------------------
-RegularFace::RegularFace() : FontWithFace("RegularFace")
+RegularFace::RegularFace(FaceTTF* ttf) : FontWithFace("RegularFace", ttf)
 {
 }   // RegularFace
 
@@ -48,9 +48,3 @@ void RegularFace::reset()
     insertCharacters(preload_chars.c_str());
     updateCharactersList();
 }   // reset
-
-// ----------------------------------------------------------------------------
-std::vector<std::string> RegularFace::getFacesList() const
-{
-    return stk_config->m_regular_faces;
-}   // getFacesList

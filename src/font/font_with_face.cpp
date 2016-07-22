@@ -19,14 +19,17 @@
 #include "font/font_with_face.hpp"
 
 #include "font/bold_face.hpp"
+#include "font/face_ttf.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
 #include "utils/string_utils.hpp"
 
+#include <freetype/ftoutln.h>
+
 // ----------------------------------------------------------------------------
-FontWithFace::FontWithFace(const std::string& name)
+FontWithFace::FontWithFace(const std::string& name, FaceTTF* ttf)
 {
     m_spritebank = irr_driver->getGUI()->addEmptySpriteBank(name.c_str());
 
@@ -36,6 +39,7 @@ FontWithFace::FontWithFace(const std::string& name)
     m_fallback_font = NULL;
     m_fallback_font_scale = 1.0f;
     m_glyph_max_height = 0;
+    m_face_ttf = ttf;
 
 }   // FontWithFace
 // ----------------------------------------------------------------------------
@@ -46,33 +50,24 @@ FontWithFace::~FontWithFace()
     m_spritebank->drop();
     m_spritebank = NULL;
 
-    for (unsigned int i = 0; i < m_faces.size(); i++)
-    {
-        font_manager->checkFTError(FT_Done_Face(m_faces[i]), "removing face");
-    }
+    // To be deleted by font_manager
+    m_face_ttf = NULL;
 
 }   // ~FontWithFace
 
 // ----------------------------------------------------------------------------
 void FontWithFace::init()
 {
+    setDPI();
     m_page = irr_driver->getVideoDriver()->createImage(video::ECF_A8R8G8B8,
         core::dimension2du(getGlyphPageSize(), getGlyphPageSize()));
 
-    for (const std::string& font : getFacesList())
-    {
-        FT_Face face = NULL;
-        font_manager->checkFTError(FT_New_Face(font_manager->getFTLibrary(),
-            (file_manager->getAssetChecked(FileManager::TTF,
-            font.c_str(), true)).c_str(), 0, &face), "loading fonts");
-        font_manager->checkFTError(FT_Set_Pixel_Sizes(face, 0, getDPI()),
-        "setting DPI");
-        m_faces.push_back(face);
-    }
-
     // Get the max height for this face
-    assert(m_faces.size() > 0);
-    FT_Face cur_face = m_faces[0];
+    assert(m_face_ttf->getTotalFaces() > 0);
+    FT_Face cur_face = m_face_ttf->getFace(0);
+    font_manager->checkFTError(FT_Set_Pixel_Sizes(cur_face, 0, getDPI()),
+        "setting DPI");
+
     for (int i = 32; i < 128; i++)
     {
         // Test all basic latin characters
@@ -97,6 +92,20 @@ void FontWithFace::reset()
     m_spritebank->clear();
     createNewGlyphPage();
 }   // reset
+
+// ----------------------------------------------------------------------------
+void FontWithFace::loadGlyphInfo(wchar_t c)
+{
+    unsigned int font_number = 0;
+    unsigned int glyph_index = 0;
+    while (font_number < m_face_ttf->getTotalFaces())
+    {
+        glyph_index = FT_Get_Char_Index(m_face_ttf->getFace(font_number), c);
+        if (glyph_index > 0) break;
+        font_number++;
+    }
+    m_character_glyph_info_map[c] = GlyphInfo(font_number, glyph_index);
+}   // loadGlyphInfo
 
 // ----------------------------------------------------------------------------
 void FontWithFace::createNewGlyphPage()
@@ -124,13 +133,26 @@ void FontWithFace::createNewGlyphPage()
 void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 {
     assert(gi.glyph_index > 0);
-    assert(gi.font_number < m_faces.size());
-    FT_Face cur_face = m_faces[gi.font_number];
+    assert(gi.font_number < m_face_ttf->getTotalFaces());
+    FT_Face cur_face = m_face_ttf->getFace(gi.font_number);
     FT_GlyphSlot slot = cur_face->glyph;
 
+    // Faces may be shared across regular and bold,
+    // so reset dpi each time
+    font_manager->checkFTError(FT_Set_Pixel_Sizes(cur_face, 0, getDPI()),
+        "setting DPI");
+
     font_manager->checkFTError(FT_Load_Glyph(cur_face, gi.glyph_index,
-        FT_LOAD_DEFAULT | FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL),
-        "loading a glyph");
+        FT_LOAD_DEFAULT), "loading a glyph");
+
+    if (dynamic_cast<BoldFace*>(this))
+    {
+        // Embolden the outline of the glyph
+        FT_Outline_Embolden(&(slot->outline), getDPI() * 2);
+    }
+
+    font_manager->checkFTError(FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL),
+        "render a glyph to bitmap");
 
     // Convert to an anti-aliased bitmap
     FT_Bitmap bits = slot->bitmap;
@@ -297,7 +319,7 @@ void FontWithFace::dumpGlyphPage()
 }   // dumpGlyphPage
 
 // ----------------------------------------------------------------------------
-unsigned int FontWithFace::getDPI() const
+void FontWithFace::setDPI()
 {
     // Get face dpi:
     // Font size is resolution-dependent.
@@ -315,10 +337,10 @@ unsigned int FontWithFace::getDPI() const
     if (screen_width < 900 || screen_height < 700)
         scale = std::min(scale, 0.05f);
 
-    return unsigned((getScalingFactorOne() + 0.2f * scale) *
+    m_face_dpi = unsigned((getScalingFactorOne() + 0.2f * scale) *
         getScalingFactorTwo());
 
-}   // getDPI
+}   // setDPI
 
 // ----------------------------------------------------------------------------
 const FontWithFace::FontArea&

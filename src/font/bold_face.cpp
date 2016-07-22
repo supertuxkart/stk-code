@@ -18,11 +18,10 @@
 
 #include "font/bold_face.hpp"
 
-#include "config/stk_config.hpp"
-#include "font/regular_face.hpp"
+#include "font/face_ttf.hpp"
 
 // ----------------------------------------------------------------------------
-BoldFace::BoldFace() : FontWithFace("BoldFace")
+BoldFace::BoldFace(FaceTTF* ttf) : FontWithFace("BoldFace", ttf)
 {
 }   // BoldFace
 
@@ -32,8 +31,10 @@ void BoldFace::init()
     FontWithFace::init();
     // Reserve some space for characters added later
     m_font_max_height = m_glyph_max_height + 20;
+
+    /* Use FT_Outline_Embolden for now, no more fallback font
     setFallbackFont(font_manager->getFont<RegularFace>());
-    setFallbackFontScale(2.0f);
+    setFallbackFontScale(2.0f);*/
 
 }   // init
 // ----------------------------------------------------------------------------
@@ -51,9 +52,3 @@ void BoldFace::reset()
     insertCharacters(preload_chars.c_str());
     updateCharactersList();
 }   // reset
-
-// ----------------------------------------------------------------------------
-std::vector<std::string> BoldFace::getFacesList() const
-{
-    return stk_config->m_bold_faces;
-}   // getFacesList

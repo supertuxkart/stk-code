@@ -16,37 +16,34 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "font/digit_face.hpp"
-
 #include "font/face_ttf.hpp"
 
-// ----------------------------------------------------------------------------
-DigitFace::DigitFace(FaceTTF* ttf) : FontWithFace("DigitFace", ttf)
-{
-}   // DigitFace
+#include "io/file_manager.hpp"
 
 // ----------------------------------------------------------------------------
-void DigitFace::init()
+FaceTTF::FaceTTF(const std::vector<std::string>& ttf_list)
 {
-    FontWithFace::init();
-
-    m_font_max_height = m_glyph_max_height + 10;
-
-}   // init
-// ----------------------------------------------------------------------------
-void DigitFace::reset()
-{
-    FontWithFace::reset();
-
-    core::stringw preload_chars;
-    for (int i = 32; i < 64; i++)
+    for (const std::string& font : ttf_list)
     {
-        // No lazy loading for digit font, include the least characters
-        preload_chars.append((wchar_t)i);
+        FT_Face face = NULL;
+        font_manager->checkFTError(FT_New_Face(font_manager->getFTLibrary(),
+            (file_manager->getAssetChecked(FileManager::TTF,
+            font.c_str(), true)).c_str(), 0, &face), "loading fonts");
+        m_faces.push_back(face);
     }
-    // Used when displaying multiple items, e.g. 6x
-    preload_chars.append((wchar_t)120);
+}   // FaceTTF
 
-    insertCharacters(preload_chars.c_str(), true/*first_load*/);
-    updateCharactersList();
-}   // reset
+// ----------------------------------------------------------------------------
+FaceTTF::~FaceTTF()
+{
+    for (unsigned int i = 0; i < m_faces.size(); i++)
+    {
+        font_manager->checkFTError(FT_Done_Face(m_faces[i]), "removing face");
+    }
+}   // ~FaceTTF
+// ----------------------------------------------------------------------------
+FT_Face FaceTTF::getFace(unsigned int i) const
+{
+    assert(i < m_faces.size());
+    return m_faces[i];
+}   // getFace

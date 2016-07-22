@@ -16,36 +16,28 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_DIGIT_FACE_HPP
-#define HEADER_DIGIT_FACE_HPP
+#ifndef HEADER_FACE_TTF_HPP
+#define HEADER_FACE_TTF_HPP
 
-#include "font/font_with_face.hpp"
+#include "font/font_manager.hpp"
 
-class FaceTTF;
-
-class DigitFace : public FontWithFace
+class FaceTTF : public NoCopy
 {
 private:
-    virtual bool supportLazyLoadChar() const OVERRIDE         { return false; }
-    // ------------------------------------------------------------------------
-    virtual unsigned int getGlyphPageSize() const OVERRIDE      { return 256; }
-    // ------------------------------------------------------------------------
-    virtual float getScalingFactorOne() const OVERRIDE         { return 0.7f; }
-    // ------------------------------------------------------------------------
-    virtual unsigned int getScalingFactorTwo() const OVERRIDE    { return 40; }
+    std::vector<FT_Face> m_faces;
 
 public:
-    LEAK_CHECK()
+    LEAK_CHECK();
     // ------------------------------------------------------------------------
-    DigitFace(FaceTTF* ttf);
+    FaceTTF(const std::vector<std::string>& ttf_list);
     // ------------------------------------------------------------------------
-    virtual ~DigitFace() {}
+    ~FaceTTF();
     // ------------------------------------------------------------------------
-    virtual void init() OVERRIDE;
+    FT_Face getFace(unsigned int i) const;
     // ------------------------------------------------------------------------
-    virtual void reset() OVERRIDE;
+    unsigned int getTotalFaces() const               { return m_faces.size(); }
 
-};   // DigitFace
+};   // FaceTTF
 
 #endif
 /* EOF */

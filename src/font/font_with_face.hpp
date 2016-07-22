@@ -29,6 +29,8 @@
 
 const int BEARING = 64;
 
+class FaceTTF;
+
 class FontWithFace : public NoCopy
 {
 public:
@@ -53,8 +55,6 @@ public:
     };
 
 protected:
-    std::vector<FT_Face> m_faces;
-
     int                  m_font_max_height;
 
     int                  m_glyph_max_height;
@@ -104,6 +104,8 @@ private:
         }
     };
 
+    FaceTTF*                     m_face_ttf;
+
     FontWithFace*                m_fallback_font;
     float                        m_fallback_font_scale;
 
@@ -120,6 +122,7 @@ private:
     unsigned int                 m_temp_height;
     unsigned int                 m_used_width;
     unsigned int                 m_used_height;
+    unsigned int                 m_face_dpi;
 
     std::map<wchar_t, FontArea>  m_character_area_map;
     std::map<wchar_t, GlyphInfo> m_character_glyph_info_map;
@@ -162,26 +165,15 @@ private:
         return false;
     }
     // ------------------------------------------------------------------------
-    void loadGlyphInfo(wchar_t c)
-    {
-        unsigned int font_number = 0;
-        unsigned int glyph_index = 0;   
-        while (font_number < m_faces.size())
-        {
-            glyph_index = FT_Get_Char_Index(m_faces[font_number], c);
-            if (glyph_index > 0) break;
-            font_number++;
-        }
-        m_character_glyph_info_map[c] = GlyphInfo(font_number, glyph_index);
-    }
+    void loadGlyphInfo(wchar_t c);
     // ------------------------------------------------------------------------
     void createNewGlyphPage();
-    // ------------------------------------------------------------------------
-    unsigned int getDPI() const;
     // ------------------------------------------------------------------------
     void addLazyLoadChar(wchar_t c)            { m_new_char_holder.insert(c); }
     // ------------------------------------------------------------------------
     void insertGlyph(wchar_t c, const GlyphInfo& gi);
+    // ------------------------------------------------------------------------
+    void setDPI();
     // ------------------------------------------------------------------------
     virtual bool supportLazyLoadChar() const = 0;
     // ------------------------------------------------------------------------
@@ -190,13 +182,11 @@ private:
     virtual float getScalingFactorOne() const = 0;
     // ------------------------------------------------------------------------
     virtual unsigned int getScalingFactorTwo() const = 0;
-    // ------------------------------------------------------------------------
-    virtual std::vector<std::string> getFacesList() const = 0;
 
 public:
     LEAK_CHECK();
     // ------------------------------------------------------------------------
-    FontWithFace(const std::string& name);
+    FontWithFace(const std::string& name, FaceTTF* ttf);
     // ------------------------------------------------------------------------
     virtual ~FontWithFace();
     // ------------------------------------------------------------------------
@@ -231,6 +221,8 @@ public:
     // ------------------------------------------------------------------------
     const FontArea& getAreaFromCharacter(const wchar_t c,
                                          bool* fallback_font) const;
+    // ------------------------------------------------------------------------
+    unsigned int getDPI() const                          { return m_face_dpi; }
 
 };   // FontWithFace
 
