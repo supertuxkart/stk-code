@@ -23,10 +23,13 @@
 #include <IMeshSceneNode.h>
 
 #include "config/user_config.hpp"
+#include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/navmesh.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 
 #include <queue>
@@ -38,29 +41,19 @@ BattleGraph * BattleGraph::m_battle_graph = NULL;
 *    then runs shortest path algorithm to find and store paths to be used
 *    by the AI. */
 BattleGraph::BattleGraph(const std::string &navmesh_file_name,
-                         const XMLNode& node)
+                         const XMLNode *node)
 {
     m_items_on_graph.clear();
 
     NavMesh::create(navmesh_file_name);
     m_navmesh_file = navmesh_file_name;
     buildGraph(NavMesh::get());
-    double s = StkTime::getRealTime();
+
+    // Compute shortest distance from all nodes
     for(unsigned int i=0; i < NavMesh::get()->getNumberOfPolys(); i++)
         computeDijkstra(i);
-    double e = StkTime::getRealTime();
-    Log::error("dijkstra:","Time %lf", e-s);
-    for(unsigned int i=0; i<m_distance_matrix[2].size(); i++)
-        Log::error("dijkstra", "%d %f ", i, m_distance_matrix[2][i]);
-    buildGraph(NavMesh::get());
-    s = StkTime::getRealTime();
-    computeFloydWarshall();
-    e = StkTime::getRealTime();
-    Log::error("floyd warshall", "Time %lf", e-s);
-    for(unsigned int i=0; i<m_distance_matrix[2].size(); i++)
-        Log::error("floyd", "%d %f ", i, m_distance_matrix[2][i]);
 
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    if (node && race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         loadGoalNodes(node);
 
 } // BattleGraph
@@ -76,21 +69,23 @@ BattleGraph::~BattleGraph(void)
     GraphStructure::destroyRTT();
 } // ~BattleGraph
 
-// -----------------------------------------------------------------------------
-/** Builds a graph from an existing NavMesh. The graph is stored as an adjacency
-*    matrix. */
+// ----------------------------------------------------------------------------
+/** Builds a graph from an existing NavMesh. The graph is stored as an
+ *  adjacency matrix. */
 void BattleGraph::buildGraph(NavMesh* navmesh)
 {
     unsigned int n_polys = navmesh->getNumberOfPolys();
 
-    m_distance_matrix = std::vector< std::vector<float> > (n_polys, std::vector<float>(n_polys, 9999.9f));
+    m_distance_matrix = std::vector< std::vector<float> >
+                               (n_polys, std::vector<float>(n_polys, 9999.9f));
     for(unsigned int i=0; i<n_polys; i++)
     {
         NavPoly currentPoly = navmesh->getNavPoly(i);
         const std::vector<int> &adjacents = navmesh->getAdjacentPolys(i);
         for(unsigned int j=0; j<adjacents.size(); j++)
         {
-            Vec3 diff = navmesh->getCenterOfPoly(adjacents[j]) - currentPoly.getCenter();
+            Vec3 diff = navmesh->getCenterOfPoly(adjacents[j]) 
+                      - currentPoly.getCenter();
             float distance = diff.length();
             m_distance_matrix[i][adjacents[j]] = distance;
             //m_distance_matrix[adjacents[j]][i] = distance;
@@ -98,20 +93,36 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
         m_distance_matrix[i][i] = 0.0f;
     }
 
+    // Allocate and initialise the previous node data structure:
+    unsigned int n = getNumNodes();
+    m_parent_poly = std::vector< std::vector<int> >
+        (n, std::vector<int>(n, BattleGraph::UNKNOWN_POLY));
+    for(unsigned int i=0; i<n; i++)
+    {
+        for(unsigned int j=0; j<n; j++)
+        {
+            if(i == j || m_distance_matrix[i][j]>=9899.9f)
+                m_parent_poly[i][j]=-1;
+            else
+                m_parent_poly[i][j] = i;
+        }   // for j
+    }   // for i
+
 }    // buildGraph
 
-// -----------------------------------------------------------------------------
-#include <iostream>
-#include <queue>
-#include <vector>
-#include <climits>
-
+// ----------------------------------------------------------------------------
+/** Dijkstra shortest path computation. It computes the shortest distance from
+ *  the specified node 'source' to all other nodes. At the end of the 
+ *  computation, m_distance_matrix[i][j] stores the shortest path distance from
+ *  source to j and m_parent_poly[source][j] stores the last vertex visited on
+ *  the shortest path from i to j before visiting j. Suppose the shortest path
+ *  from i to j is i->......->k->j  then m_parent_poly[i][j] = k
+ */
 void BattleGraph::computeDijkstra(int source)
 {
     // Stores the distance (float) to 'source' from a specified node (int)
     typedef std::pair<int, float> IndDistPair;
 
-    IndDistPair begin(source, 0.0f);
     class Shortest
     {
     public:
@@ -121,6 +132,7 @@ void BattleGraph::computeDijkstra(int source)
         }
     };
     std::priority_queue<IndDistPair, std::vector<IndDistPair>, Shortest> queue;
+    IndDistPair begin(source, 0.0f);
     queue.push(begin);
     const unsigned int n=getNumNodes();
     std::vector<bool> visited;
@@ -144,55 +156,25 @@ void BattleGraph::computeDijkstra(int source)
 
             float new_dist = current.second + m_distance_matrix[cur_index][adjacent];
             if(new_dist < m_distance_matrix[source][adjacent])
+            {
                 m_distance_matrix[source][adjacent] = new_dist;
+                m_parent_poly[source][adjacent] = cur_index;
+            }
             IndDistPair pair(adjacent, new_dist);
             queue.push(pair);
         }
     }
-    return;
-
-    using namespace std;
-#define INF INT_MAX //Infinity
-    const int sz=10001; //Maximum possible number of vertices. Preallocating space for DataStructures accordingly
-    vector<pair<int,int> > a[sz]; //Adjacency list
-    int dis[sz]; //Stores shortest distance
-    bool vis[sz]={0}; //Determines whether the node has been visited or not
-
-    for (int i = 0; i < sz; i++) //Set initial distances to Infinity
-        dis[i] = INF;
-
-    //Custom Comparator for Determining priority for priority queue (shortest edge comes first)
-    class prioritize {
-    public: bool operator ()(pair<int, int>&p1, pair<int, int>&p2)
-    {
-        return p1.second > p2.second;
-    }
-    };
-
-    //Priority queue to store vertex,weight pairs
-    priority_queue<pair<int, int>, vector<pair<int, int> >, prioritize> pq;
-    pq.push(make_pair(source, dis[source] = 0)); //Pushing the source with distance from itself as 0
-    while (!pq.empty())
-    {
-        pair<int, int> curr = pq.top(); //Current vertex. The shortest distance for this has been found
-        pq.pop();
-        int cv = curr.first, cw = curr.second; //'cw' the final shortest distance for this vertex
-        if (vis[cv]) //If the vertex is already visited, no point in exploring adjacent vertices
-            continue;
-        vis[cv] = true;
-        for (int i = 0; i < a[cv].size(); i++) //Iterating through all adjacent vertices
-            if (!vis[a[cv][i].first] && a[cv][i].second + cw < dis[a[cv][i].first]) //If this node is not visited and the current parent node distance+distance from there to this node is shorted than the initial distace set to this node, update it
-                pq.push(make_pair(a[cv][i].first, (dis[a[cv][i].first] = a[cv][i].second + cw))); //Set the new distance and add to priority queue
-    }
-
 }   // computeDijkstra
 
-// -----------------------------------------------------------------------------
-/** computeFloydWarshall() computes the shortest distance between any two nodes.
- *  At the end of the computation, m_distance_matrix[i][j] stores the shortest path
- *  distance from i to j and m_parent_poly[i][j] stores the last vertex visited on the
- *  shortest path from i to j before visiting j. Suppose the shortest path from i to j is
- *  i->......->k->j  then m_parent_poly[i][j] = k
+// ----------------------------------------------------------------------------
+/** THIS FUNCTION IS ONLY USED FOR UNIT-TESTING, to verify that the new
+ *  Dijkstra algorithm gives the same results.
+ *  computeFloydWarshall() computes the shortest distance between any two 
+ *  nodes. At the end of the computation, m_distance_matrix[i][j] stores the
+ *  shortest path distance from i to j and m_parent_poly[i][j] stores the last
+ *  vertex visited on the shortest path from i to j before visiting j. Suppose
+ *  the shortest path from i to j is i->......->k->j  then 
+ *  m_parent_poly[i][j] = k
  */
 void BattleGraph::computeFloydWarshall()
 {
@@ -348,12 +330,12 @@ const bool BattleGraph::differentNodeColor(int n, NodeColor* c) const
 }    // differentNodeColor
 
 // -----------------------------------------------------------------------------
-void BattleGraph::loadGoalNodes(const XMLNode& node)
+void BattleGraph::loadGoalNodes(const XMLNode *node)
 {
     m_red_node.clear();
     m_blue_node.clear();
 
-    const XMLNode *check_node = node.getNode("checks");
+    const XMLNode *check_node = node->getNode("checks");
     for (unsigned int i = 0; i < check_node->getNumNodes(); i++)
     {
         const XMLNode *goal = check_node->getNode(i);
@@ -381,3 +363,55 @@ void BattleGraph::loadGoalNodes(const XMLNode& node)
         }
     }
 }    // loadGoalNodes
+
+// ============================================================================
+/** Unit testing for battle graph distance and parent node computation. 
+ *  Instead of using hand-tuned test cases we use the tested, verified and
+ *  easier to understand Floyd-Warshall algorithm to compute the distances,
+ *  and check if the (significanty faster) Dijkstra algorithm gives the same
+ *  results. For now we use the cave mesh as test case.
+ */
+void BattleGraph::unitTesting()
+{
+    Track *track = track_manager->getTrack("cave");
+    std::string navmesh_file_name=track->getTrackFile("navmesh.xml");
+
+    double s = StkTime::getRealTime();
+    BattleGraph *bg = new BattleGraph(navmesh_file_name);
+    double e = StkTime::getRealTime();
+    Log::error("Time", "Dijkstra       %lf", e-s);
+
+    // Save the Dijkstra results
+    std::vector< std::vector< float > > distance_matrix = bg->m_distance_matrix;
+    std::vector< std::vector< int > > parent_poly = bg->m_parent_poly;
+    bg->buildGraph(NavMesh::get());
+
+    // Now compute results with Floyd-Warshall
+    s = StkTime::getRealTime();
+    bg->computeFloydWarshall();
+    e = StkTime::getRealTime();
+    Log::error("Time", "Floyd-Warshall %lf", e-s);
+
+    int error_count = 0;
+    for(unsigned int i=0; i<bg->m_distance_matrix.size(); i++)
+    {
+        for(unsigned int j=0; j<bg->m_distance_matrix[i].size(); j++)
+        {
+            if(bg->m_distance_matrix[i][j] - distance_matrix[i][j] > 0.001f)
+            {
+                Log::error("BattleGraph",
+                           "Incorrect distance %d, %d: Dijkstra: %f F.W.: %f",
+                           i, j, distance_matrix[i][j], bg->m_distance_matrix[i][j]);
+                error_count++;
+            }    // if distance is too different
+
+            if(bg->m_parent_poly[i][j] != parent_poly[i][j])
+            {
+                Log::error("BattleGraph",
+                           "Incorrect parent %d, %d: Dijkstra: %d F.W.: %d",
+                           i, j, parent_poly[i][j], bg->m_parent_poly[i][j]);
+                error_count++;
+            }
+        }   // for j
+    }   // for i
+}   // unitTesting
