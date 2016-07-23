@@ -1602,11 +1602,6 @@ void IrrDriver::renderTransparent()
         return;
 
     // Render displacement nodes
-    irr_driver->getFBO(FBO_TMP1_WITH_DS).bind();
-    glClear(GL_COLOR_BUFFER_BIT);
-    irr_driver->getFBO(FBO_DISPLACE).bind();
-    glClear(GL_COLOR_BUFFER_BIT);
-
     DisplaceProvider * const cb =
         (DisplaceProvider *)Shaders::getCallback(ES_DISPLACE);
     cb->update();
@@ -1623,7 +1618,11 @@ void IrrDriver::renderTransparent()
         glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_2TCOORDS));
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
-    irr_driver->getFBO(FBO_TMP1_WITH_DS).bind();
+    if (ListDisplacement::getInstance()->size() > 0)
+    {
+        irr_driver->getFBO(FBO_TMP1_WITH_DS).bind();
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh =
@@ -1650,7 +1649,11 @@ void IrrDriver::renderTransparent()
                                  (GLvoid *)mesh.vaoOffset, (int)mesh.vaoBaseVertex);
     }
 
-    irr_driver->getFBO(FBO_DISPLACE).bind();
+    if (ListDisplacement::getInstance()->size() > 0)
+    {
+        irr_driver->getFBO(FBO_DISPLACE).bind();
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
     if (!displaceTex)
         displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)

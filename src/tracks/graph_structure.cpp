@@ -18,9 +18,10 @@
 
 #include "tracks/graph_structure.hpp"
 
-#include <IMesh.h>
 #include <ICameraSceneNode.h>
+#include <IMesh.h>
 #include <IMeshSceneNode.h>
+#include <ISceneManager.h>
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/glwrap.hpp"

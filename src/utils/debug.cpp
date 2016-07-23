@@ -19,6 +19,9 @@
 #include "debug.hpp"
 
 #include "config/user_config.hpp"
+#include "font/bold_face.hpp"
+#include "font/digit_face.hpp"
+#include "font/regular_face.hpp"
 #include "graphics/camera_debug.hpp"
 #include "graphics/camera_fps.hpp"
 #include "graphics/irr_driver.hpp"
@@ -78,6 +81,8 @@ enum DebugMenuCommand
     DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ,
     DEBUG_PROFILER,
     DEBUG_PROFILER_GENERATE_REPORT,
+    DEBUG_FONT_DUMP_GLYPH_PAGE,
+    DEBUG_FONT_RELOAD,
     DEBUG_FPS,
     DEBUG_SAVE_REPLAY,
     DEBUG_SAVE_HISTORY,
@@ -336,6 +341,15 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_THROTTLE_FPS:
         main_loop->setThrottleFPS(false);
+        break;
+    case DEBUG_FONT_DUMP_GLYPH_PAGE:
+        font_manager->getFont<BoldFace>()->dumpGlyphPage("bold");
+        font_manager->getFont<DigitFace>()->dumpGlyphPage("digit");
+        font_manager->getFont<RegularFace>()->dumpGlyphPage("regular");
+    case DEBUG_FONT_RELOAD:
+        font_manager->getFont<BoldFace>()->reset();
+        font_manager->getFont<DigitFace>()->reset();
+        font_manager->getFont<RegularFace>()->reset();
         break;
     case DEBUG_FPS:
         UserConfigParams::m_display_fps =
@@ -606,7 +620,7 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     }
     case DEBUG_SCRIPT_CONSOLE:
-        ScriptingConsole* console = new ScriptingConsole();
+        new ScriptingConsole();
         break;
     }   // switch
     return false;
@@ -695,6 +709,11 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"To kart six", DEBUG_VIEW_KART_SIX);
             sub->addItem(L"To kart seven", DEBUG_VIEW_KART_SEVEN);
             sub->addItem(L"To kart eight", DEBUG_VIEW_KART_EIGHT);
+
+            mnu->addItem(L"Font >",-1,true, true);
+            sub = mnu->getSubMenu(5);
+            sub->addItem(L"Dump glyph pages of fonts", DEBUG_FONT_DUMP_GLYPH_PAGE);
+            sub->addItem(L"Reload all fonts", DEBUG_FONT_RELOAD);
 
             mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 

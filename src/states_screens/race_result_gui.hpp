@@ -160,7 +160,7 @@ private:
     bool                       m_gp_position_was_changed;
 
     /** The previous monospace state of the font. */
-    bool                       m_was_monospace;
+    //bool                       m_was_monospace;
 
     /** Sound effect at end of race. */
     SFXBase                   *m_finish_sound;

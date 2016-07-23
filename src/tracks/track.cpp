@@ -38,7 +38,6 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/stk_text_billboard.hpp"
 #include "graphics/render_info.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
