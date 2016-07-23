@@ -657,8 +657,7 @@ PROFILER_POP_CPU_MARKER();
     while (reason != GL_ALREADY_SIGNALED)
     {
         if (reason == GL_WAIT_FAILED) break;
-        StkTime::sleep(1);
-        reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
+        reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 1000000);
     }
     glDeleteSync(m_sync);
     PROFILER_POP_CPU_MARKER();
