@@ -145,10 +145,11 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     font_manager->checkFTError(FT_Load_Glyph(cur_face, gi.glyph_index,
         FT_LOAD_DEFAULT), "loading a glyph");
 
-    if (dynamic_cast<BoldFace*>(this))
+    if (dynamic_cast<BoldFace*>(this) != NULL)
     {
         // Embolden the outline of the glyph
-        FT_Outline_Embolden(&(slot->outline), getDPI() * 2);
+        font_manager->checkFTError(FT_Outline_Embolden(&(slot->outline),
+            getDPI() * 2), "embolden a glyph");
     }
 
     font_manager->checkFTError(FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL),
@@ -321,7 +322,7 @@ void FontWithFace::dumpGlyphPage()
 // ----------------------------------------------------------------------------
 void FontWithFace::setDPI()
 {
-    // Get face dpi:
+    // Set face dpi:
     // Font size is resolution-dependent.
     // Normal text will range from 0.8, in 640x* resolutions (won't scale
     // below that) to 1.0, in 1024x* resolutions, and linearly up
@@ -445,7 +446,7 @@ void FontWithFace::render(const core::stringw& text,
                           FontSettings* font_settings,
                           FontCharCollector* char_collector)
 {
-    const bool is_bold_face = dynamic_cast<BoldFace*>(this);
+    const bool is_bold_face = (dynamic_cast<BoldFace*>(this) != NULL);
     const bool black_border = font_settings ?
         font_settings->useBlackBorder() : false;
     const bool rtl = font_settings ? font_settings->isRTL() : false;
@@ -513,7 +514,7 @@ void FontWithFace::render(const core::stringw& text,
             if (c==L'\r' && text[i+1]==L'\n')
                 c = text[++i];
             offset.Y += m_font_max_height * scale;
-            offset.X  = position.UpperLeftCorner.X;
+            offset.X  = float(position.UpperLeftCorner.X);
             if (hcenter)
                 offset.X += (position.getWidth() - text_dimension.Width) >> 1;
             continue;
