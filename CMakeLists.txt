@@ -178,7 +178,11 @@ else()
 endif()
 
 # Freetype
-find_package(Freetype)
+if (APPLE OR WIN32)
+    find_package(FreetypeAppleWin32)
+else()
+    find_package(Freetype)
+endif()
 if(FREETYPE_FOUND)
     include_directories(${FREETYPE_INCLUDE_DIRS})
 else()

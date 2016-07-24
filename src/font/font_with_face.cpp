@@ -26,7 +26,7 @@
 #include "guiengine/skin.hpp"
 #include "utils/string_utils.hpp"
 
-#include <freetype/ftoutln.h>
+#include <ftoutln.h>
 
 // ----------------------------------------------------------------------------
 FontWithFace::FontWithFace(const std::string& name, FaceTTF* ttf)
