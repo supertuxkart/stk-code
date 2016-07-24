@@ -354,17 +354,6 @@ void STKConfig::getAllData(const XMLNode * root)
 
     }
 
-    if(const XMLNode *font_node = root->getNode("font"))
-    {
-        font_node->get("default",          &m_font_default         );
-        font_node->get("default_fallback", &m_font_default_fallback);
-        font_node->get("cjk",              &m_font_cjk             );
-        font_node->get("ar",               &m_font_ar              );
-        font_node->get("bold",             &m_font_bold            );
-        font_node->get("bold_fallback",    &m_font_bold_fallback   );
-        font_node->get("digit",            &m_font_digit           );
-    }
-
     if (const XMLNode *fonts_list = root->getNode("fonts-list"))
     {
         fonts_list->get("normal-ttf", &m_normal_ttf);

@@ -592,7 +592,7 @@ void cmdLineHelp()
     "       --shadows=n        Set shadow quality (0 to disable shadows).\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
-    "http://supertuxkart.sourceforge.net\n\n",
+    "http://supertuxkart.net\n\n",
     CommandLine::getExecName().c_str()
     );
 }   // cmdLineHelp

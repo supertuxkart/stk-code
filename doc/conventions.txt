@@ -12,7 +12,7 @@ Coding style
 ============
 
 The coding style used in Super Tux Kart can be found at
-http://supertuxkart.sourceforge.net/Coding_Style
+http://supertuxkart.net/Coding_Style
 
 
 Documentation line length

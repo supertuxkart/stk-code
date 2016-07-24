@@ -145,14 +145,6 @@ public:
 
     float m_cutscene_fov;
 
-    /** File names of the default fonts in STK. */
-    std::string m_font_default;
-    std::string m_font_default_fallback;
-    std::string m_font_cjk;
-    std::string m_font_ar;
-    std::string m_font_bold;
-    std::string m_font_bold_fallback;
-    std::string m_font_digit;
     /** Lists of TTF files used in STK. */
     std::vector<std::string> m_normal_ttf;
     std::vector<std::string> m_digit_ttf;
