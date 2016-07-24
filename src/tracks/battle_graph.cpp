@@ -405,13 +405,55 @@ void BattleGraph::unitTesting()
                 error_count++;
             }    // if distance is too different
 
+            // Unortunately it happens frequently that there are different
+            // shortest path with the same length. And Dijkstra might find
+            // a different path then Floyd-Warshall. So the test for parent
+            // polygon often results in false positives, so it is disabled,
+            // but I leave the code in place in case it is useful for some
+            // debugging in the feature
+#undef TEST_PARENT_POLY_EVEN_THOUGH_MANY_FALSE_POSITIVES
+#ifdef TEST_PARENT_POLY_EVEN_THOUGH_MANY_FALSE_POSITIVES
             if(bg->m_parent_poly[i][j] != parent_poly[i][j])
             {
-                Log::error("BattleGraph",
-                           "Incorrect parent %d, %d: Dijkstra: %d F.W.: %d",
-                           i, j, parent_poly[i][j], bg->m_parent_poly[i][j]);
                 error_count++;
-            }
+                std::vector<int> dijkstra_path = getPathFromTo(i, j, parent_poly);
+                std::vector<int> floyd_path = getPathFromTo(i, j, bg->m_parent_poly);
+                if(dijkstra_path.size()!=floyd_path.size())
+                {
+                    Log::error("BattleGraph",
+                               "Incorrect path length %d, %d: Dijkstra: %d F.W.: %d",
+                               i, j, parent_poly[i][j], bg->m_parent_poly[i][j]);
+                    continue;
+                }
+                Log::error("BattleGraph", "Path problems from %d to %d:",
+                           i, j);
+                for (unsigned k = 0; k < dijkstra_path.size(); k++)
+                {
+                    if(dijkstra_path[k]!=floyd_path[k])
+                        Log::error("BattleGraph", "%d/%d dijkstra: %d floyd %d",
+                            k, dijkstra_path.size(), dijkstra_path[k],
+                            floyd_path[k]);
+                }    // for k<dijkstra_path.size()
+
+            }   // if dijkstra parent_poly != floyd parent poly
+#endif 
         }   // for j
     }   // for i
 }   // unitTesting
+
+// ----------------------------------------------------------------------------
+/** Determines the full path from 'from' to 'to' and returns it in a 
+ *  std::vector (in reverse order). Used only for unit testing.
+ */
+std::vector<int> BattleGraph::getPathFromTo(int from, int to, 
+                           const std::vector< std::vector< int > > parent_poly)
+{
+    std::vector<int> path;
+    path.push_back(to);
+    while(from!=to)
+    {
+        to = parent_poly[from][to];
+        path.push_back(to);
+    }
+    return path;
+}   // getPathFromTo

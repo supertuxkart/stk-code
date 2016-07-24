@@ -87,6 +87,8 @@ private:
     // ------------------------------------------------------------------------
     virtual const bool differentNodeColor(int n, NodeColor* c) const;
     void computeDijkstra(int n);
+    static std::vector<int> getPathFromTo(int from, int to, 
+                          const std::vector< std::vector< int > > parent_poly);
 
 public:
     static const int UNKNOWN_POLY;
