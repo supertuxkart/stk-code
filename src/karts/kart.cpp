@@ -1000,7 +1000,7 @@ void Kart::collectedItem(Item *item, int add_info)
  */
 float Kart::getStartupBoost() const
 {
-    float t = World::getWorld()->getTime();
+    float t = World::getWorld()->getTimeSinceStart();
     std::vector<float> startup_times = m_kart_properties->getStartupTime();
     for (unsigned int i = 0; i < startup_times.size(); i++)
     {
