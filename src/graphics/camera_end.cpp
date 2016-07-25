@@ -27,7 +27,7 @@
 AlignedArray<CameraEnd::EndCameraInformation> CameraEnd::m_end_cameras;
 // ============================================================================
 CameraEnd::CameraEnd(int camera_index, AbstractKart* kart) 
-         : CameraNormal(camera_index, kart)
+         : CameraNormal(Camera::CM_TYPE_END, camera_index, kart)
 {
     reset();
     if(m_end_cameras.size()>0)

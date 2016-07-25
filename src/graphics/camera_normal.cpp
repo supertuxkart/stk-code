@@ -28,8 +28,17 @@
 #include "tracks/track.hpp"
 
 // ============================================================================
-CameraNormal::CameraNormal(int camera_index, AbstractKart* kart) 
-            : Camera(camera_index, kart)
+/** Constructor for the normal camera. This is the only camera constructor
+ *  except for the base class that takes a camera type as parameter. This is
+ *  because debug and end camera use the normal camera as their base class.
+ *  \param type The type of the camera that is created (can be CM_TYPE_END
+ *         or CM_TYPE_DEBUG).
+ *  \param camera_index Index of this camera.
+ *  \param Kart Pointer to the kart for which this camera is used.
+ */
+CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index, 
+                           AbstractKart* kart) 
+            : Camera(type, camera_index, kart)
 {
     m_distance = kart ? kart->getKartProperties()->getCameraDistance() : 1000.0f;
     m_ambient_light = World::getWorld()->getTrack()->getDefaultAmbientColor();

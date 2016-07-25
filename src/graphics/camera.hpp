@@ -126,9 +126,9 @@ protected:
     AbstractKart   *m_kart;
 
     static Camera* createCamera(unsigned int index, CameraType type,
-                               AbstractKart* kart);
+                                AbstractKart* kart);
 
-             Camera(int camera_index, AbstractKart* kart);
+             Camera(CameraType type, int camera_index, AbstractKart* kart);
     virtual ~Camera();
     virtual void reset();
 public:

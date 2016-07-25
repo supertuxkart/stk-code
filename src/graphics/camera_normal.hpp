@@ -61,7 +61,8 @@ private:
     friend class Camera;
     friend class CameraDebug;
     friend class CameraEnd;
-             CameraNormal(int camera_index, AbstractKart* kart);
+             CameraNormal(Camera::CameraType type, int camera_index,
+                          AbstractKart* kart);
     virtual ~CameraNormal() {}
 public:
     bool isDebug() { return false; }

@@ -73,7 +73,8 @@ Camera* Camera::createCamera(unsigned int index, CameraType type,
     Camera *camera = NULL;
     switch (type)
     {
-    case CM_TYPE_NORMAL: camera = new CameraNormal(index, kart); break;
+    case CM_TYPE_NORMAL: camera = new CameraNormal(CM_TYPE_NORMAL, index, kart);
+                                                                 break;
     case CM_TYPE_DEBUG:  camera = new CameraDebug (index, kart); break;
     case CM_TYPE_FPS:    camera = new CameraFPS   (index, kart); break;
     case CM_TYPE_END:    camera = new CameraEnd   (index, kart); break;
@@ -112,10 +113,11 @@ void Camera::resetAllCameras()
 }   // resetAllCameras
 
 // ----------------------------------------------------------------------------
-Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
+Camera::Camera(CameraType type, int camera_index, AbstractKart* kart) 
+      : m_kart(NULL)
 {
     m_mode          = CM_NORMAL;
-    m_type          = CameraType::CM_TYPE_NORMAL;
+    m_type          = type;
     m_index         = camera_index;
     m_original_kart = kart;
     m_camera        = irr_driver->addCameraSceneNode();
