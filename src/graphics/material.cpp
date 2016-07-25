@@ -19,8 +19,9 @@
 
 #include "graphics/material.hpp"
 
-#include <stdexcept>
+#include <cmath>
 #include <iostream>
+#include <stdexcept>
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_buffer.hpp"
