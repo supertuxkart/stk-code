@@ -381,7 +381,7 @@ public:
             //TODO: next 10 lines are duplicated in draw_tools.hpp (see CustomUnrollArgs::drawMesh)
             //TODO: find a way to remove duplicated code
             const bool support_change_hue = (mesh->m_render_info != NULL &&
-            mesh->m_material != NULL);
+                mesh->m_material != NULL);
             const bool need_change_hue =
                 (support_change_hue && mesh->m_render_info->getHue() > 0.0f);
             if (need_change_hue)
@@ -394,6 +394,12 @@ public:
             glDrawElementsIndirect(GL_TRIANGLES,
                                    GL_UNSIGNED_SHORT,
                                    (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
+                                   
+            if (need_change_hue)
+            {
+                // Reset after changing
+                T::InstancedSecondPassShader::getInstance()->changeableColor();
+            }
         }
     } //drawIndirectSecondPass
 
