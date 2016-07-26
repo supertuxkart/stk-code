@@ -57,6 +57,7 @@ class MusicInformation;
 class ParticleEmitter;
 class ParticleKind;
 class PhysicalObject;
+class RenderInfo;
 class TrackObject;
 class TrackObjectManager;
 class TriangleMesh;
@@ -451,7 +452,8 @@ public:
     // ------------------------------------------------------------------------
     void loadObjects(const XMLNode* root, const std::string& path,
         ModelDefinitionLoader& lod_loader, bool create_lod_definitions,
-        scene::ISceneNode* parent, TrackObject* parent_library);
+        scene::ISceneNode* parent, TrackObject* parent_library,
+        RenderInfo* ri);
     // ------------------------------------------------------------------------
     bool               isSoccer             () const { return m_is_soccer; }
     // ------------------------------------------------------------------------

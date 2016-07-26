@@ -75,6 +75,7 @@ void expandHandlesSecondPass<GrassMat>(const std::vector<uint64_t> &handles)
                handles[0], handles[1], handles[2], handles[3]);
 }
 
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 template<int N>
 void CommandBuffer<N>::clearMeshes()
@@ -133,7 +134,7 @@ SolidCommandBuffer::SolidCommandBuffer(): CommandBuffer()
 }
 
 // ----------------------------------------------------------------------------
-void SolidCommandBuffer::fill(MeshMap *mesh_map)
+void SolidCommandBuffer::fill(SolidPassMeshMap *mesh_map)
 {
     clearMeshes();
     
@@ -147,17 +148,15 @@ void SolidCommandBuffer::fill(MeshMap *mesh_map)
                           Material::SHADERTYPE_SPHERE_MAP,
                           Material::SHADERTYPE_VEGETATION);
                           
-    fillInstanceData<InstanceDataDualTex>(mesh_map,
-                                          dual_tex_material_list,
-                                          InstanceTypeDualTex);
+    fillInstanceData<InstanceDataDualTex, SolidPassMeshMap>
+        (mesh_map, dual_tex_material_list, InstanceTypeDualTex);
     
     std::vector<int> three_tex_material_list =
         createVector<int>(Material::SHADERTYPE_DETAIL_MAP,
                           Material::SHADERTYPE_NORMAL_MAP);
                           
-    fillInstanceData<InstanceDataThreeTex>(mesh_map,
-                                           three_tex_material_list,
-                                           InstanceTypeThreeTex);
+    fillInstanceData<InstanceDataThreeTex, SolidPassMeshMap>
+        (mesh_map, three_tex_material_list, InstanceTypeThreeTex);
         
     
     if (!CVS->supportsAsyncInstanceUpload())
@@ -170,7 +169,7 @@ ShadowCommandBuffer::ShadowCommandBuffer(): CommandBuffer()
 }
 
 // ----------------------------------------------------------------------------
-void ShadowCommandBuffer::fill(MeshMap *mesh_map)
+void ShadowCommandBuffer::fill(OtherMeshMap *mesh_map)
 {
     clearMeshes();
     
@@ -198,7 +197,8 @@ void ShadowCommandBuffer::fill(MeshMap *mesh_map)
                                            + Material::SHADERTYPE_SPLATTING);
     }
     
-    fillInstanceData<InstanceDataSingleTex>(mesh_map, shadow_tex_material_list, InstanceTypeShadow);
+    fillInstanceData<InstanceDataSingleTex, OtherMeshMap>
+        (mesh_map, shadow_tex_material_list, InstanceTypeShadow);
     
     if (!CVS->supportsAsyncInstanceUpload())
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
@@ -211,7 +211,7 @@ ReflectiveShadowMapCommandBuffer::ReflectiveShadowMapCommandBuffer()
 }
 
 // ----------------------------------------------------------------------------
-void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
+void ReflectiveShadowMapCommandBuffer::fill(OtherMeshMap *mesh_map)
 {
     clearMeshes();
     
@@ -225,9 +225,8 @@ void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
                           Material::SHADERTYPE_DETAIL_MAP,
                           Material::SHADERTYPE_NORMAL_MAP);
                           
-    fillInstanceData<InstanceDataSingleTex>(mesh_map,
-                                            rsm_material_list,
-                                            InstanceTypeRSM);
+    fillInstanceData<InstanceDataSingleTex, OtherMeshMap>
+        (mesh_map, rsm_material_list, InstanceTypeRSM);
 
     if (!CVS->supportsAsyncInstanceUpload())
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
@@ -240,17 +239,17 @@ GlowCommandBuffer::GlowCommandBuffer()
 }
 
 // ----------------------------------------------------------------------------
-void GlowCommandBuffer::fill(MeshMap *mesh_map)
+void GlowCommandBuffer::fill(OtherMeshMap *mesh_map)
 {
     clearMeshes();
     
     if(!CVS->supportsAsyncInstanceUpload())
         mapIndirectBuffer();
     
-    fillInstanceData<GlowInstanceData>(mesh_map,
-                                          createVector<int>(0),
-                                          InstanceTypeGlow);
+    fillInstanceData<GlowInstanceData, OtherMeshMap>
+        (mesh_map, createVector<int>(0), InstanceTypeGlow);
     if (!CVS->supportsAsyncInstanceUpload())
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
     
 } //GlowCommandBuffer::fill
+#endif // !defined(USE_GLES2)

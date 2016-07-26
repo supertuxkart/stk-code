@@ -135,15 +135,6 @@ namespace irr
 			return ReferenceCounter;
 		}
 
-        //! Sets the reference count.
-        /** Use with extreme caution, since using it incorrectly results in memory
-        corruption or memory leaks. This method is only implemented for 'hollow'
-        copies of ScalableFont (an STK extention). */
-        void setReferenceCount(s32 n)
-        {
-            ReferenceCounter = n;
-        }
-
 		//! Returns the debug name of the object.
 		/** The Debugname may only be set and changed by the object
 		itself. This method should only be used in Debug mode.

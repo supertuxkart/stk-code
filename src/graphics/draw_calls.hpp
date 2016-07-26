@@ -37,16 +37,18 @@ private:
     std::vector<ParticleSystemProxy *>    m_particles_list;
             
     /** meshes to draw */
-    MeshMap m_solid_pass_mesh            [    Material::SHADERTYPE_COUNT];
-    MeshMap m_shadow_pass_mesh           [4 * Material::SHADERTYPE_COUNT];
-    MeshMap m_reflective_shadow_map_mesh [    Material::SHADERTYPE_COUNT];
-    MeshMap m_glow_pass_mesh;
+    SolidPassMeshMap m_solid_pass_mesh        [    Material::SHADERTYPE_COUNT];
+    OtherMeshMap m_shadow_pass_mesh           [4 * Material::SHADERTYPE_COUNT];
+    OtherMeshMap m_reflective_shadow_map_mesh [    Material::SHADERTYPE_COUNT];
+    OtherMeshMap m_glow_pass_mesh;
 
+#if !defined(USE_GLES2)
     /** meshes data in VRAM */
     SolidCommandBuffer                   *m_solid_cmd_buffer                 = NULL;
     ShadowCommandBuffer                  *m_shadow_cmd_buffer                = NULL;
     ReflectiveShadowMapCommandBuffer     *m_reflective_shadow_map_cmd_buffer = NULL;
     GlowCommandBuffer                    *m_glow_cmd_buffer                  = NULL;
+#endif // !defined(USE_GLES2)
     
     void clearLists();
 

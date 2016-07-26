@@ -45,10 +45,10 @@ IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, 
     m_type = WTYPE_MODEL_VIEW;
     m_render_target = NULL;
     m_rotation_mode = ROTATE_OFF;
-    
+
     // so that the base class doesn't complain there is no icon defined
     m_properties[PROP_ICON]="gui/main_help.png";
-    
+
     m_rtt_unsupported = false;
 }
 // -----------------------------------------------------------------------------
@@ -61,18 +61,18 @@ void ModelViewWidget::add()
 {
     // so that the base class doesn't complain there is no icon defined
     m_properties[PROP_ICON]="gui/main_help.png";
-    
+
     IconButtonWidget::add();
-    
+
     /*
      FIXME: remove this unclean thing, I think irrlicht provides this feature:
      virtual void IGUIElement::OnPostRender (u32 timeMs)
      \brief animate the element and its children.
      */
     GUIEngine::needsUpdate.push_back(this);
-    
+
     angle = 0;
-    
+
 }   // add
 
 // -----------------------------------------------------------------------------
@@ -82,11 +82,12 @@ void ModelViewWidget::clearModels()
     m_model_location.clear();
     m_model_scale.clear();
     m_model_frames.clear();
-    
+    m_model_render_info_affected.clear();
+
     if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
     if (m_light != NULL) m_light->remove();
     if (m_camera != NULL) m_camera->remove();
-    
+
     m_rtt_main_node = NULL;
     m_camera = NULL;
     m_light = NULL;
@@ -95,14 +96,16 @@ void ModelViewWidget::clearModels()
 // -----------------------------------------------------------------------------
 
 void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
-                               const Vec3& scale, const int frame)
+                               const Vec3& scale, const int frame,
+                               bool all_parts_colorized)
 {
     if(!mesh) return;
-    
+
     m_models.push_back(mesh);
     m_model_location.push_back(location);
     m_model_scale.push_back(scale);
     m_model_frames.push_back(frame);
+    m_model_render_info_affected.push_back(all_parts_colorized);
     
     if (!CVS->isGLSL())
         m_render_target = NULL;
@@ -112,7 +115,7 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
 void ModelViewWidget::update(float delta)
 {
     if (m_rtt_unsupported) return;
-    
+
     if (m_rotation_mode == ROTATE_CONTINUOUSLY)
     {
         angle += delta*m_rotation_speed;
@@ -124,10 +127,10 @@ void ModelViewWidget::update(float delta)
         // (taking wrap-arounds into account)
         const int angle_distance_from_end  = (int)(360 - angle);
         const int target_distance_from_end = (int)(360 - angle);
-        
+
         int distance_with_positive_rotation;
         int distance_with_negative_rotation;
-        
+
         if (angle < m_rotation_target)
         {
             distance_with_positive_rotation = (int)(m_rotation_target - angle);
@@ -138,11 +141,11 @@ void ModelViewWidget::update(float delta)
             distance_with_positive_rotation = (int)(angle_distance_from_end + m_rotation_target);
             distance_with_negative_rotation = (int)(angle - m_rotation_target);
         }
-        
+
         //Log::info("ModelViewWidget", "distance_with_positive_rotation = %d; "
         //    "distance_with_negative_rotation = %d; angle = %f", distance_with_positive_rotation,
         //    distance_with_negative_rotation, angle);
-        
+
         if (distance_with_positive_rotation < distance_with_negative_rotation)
         {
             angle += m_rotation_speed * delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
@@ -153,7 +156,7 @@ void ModelViewWidget::update(float delta)
         }
         if (angle > 360) angle -= 360;
         if (angle < 0) angle += 360;
-        
+
         // stop rotating when target reached
         if (fabsf(angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
@@ -167,7 +170,7 @@ void ModelViewWidget::update(float delta)
     
     if (m_rtt_main_node == NULL)
     {
-        setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
+        setupRTTScene();
     }    
 
     m_rtt_main_node->setRotation(core::vector3df(0.0f, angle, 0.0f));
@@ -179,76 +182,77 @@ void ModelViewWidget::update(float delta)
     m_rtt_main_node->setVisible(false);
 }
 
-void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
-                                    AlignedArray<Vec3>& mesh_location,
-                                    AlignedArray<Vec3>& mesh_scale,
-                                    const std::vector<int>& model_frames)
+void ModelViewWidget::setupRTTScene()
 {
     irr_driver->suppressSkyBox();
-    
+
     if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
     if (m_light != NULL) m_light->remove();
     if (m_camera != NULL) m_camera->remove();
-    
+
     m_rtt_main_node = NULL;
     m_camera = NULL;
     m_light = NULL;
-    
+
     irr_driver->clearLights();
-    
-    if (model_frames[0] == -1)
+
+    if (m_model_frames[0] == -1)
     {
-        scene::ISceneNode* node = irr_driver->addMesh(mesh.get(0), "rtt_mesh", NULL);
-        node->setPosition(mesh_location[0].toIrrVector());
-        node->setScale(mesh_scale[0].toIrrVector());
+        scene::ISceneNode* node = irr_driver->addMesh(m_models.get(0), "rtt_mesh",
+            NULL, &m_render_info, m_model_render_info_affected[0]);
+        node->setPosition(m_model_location[0].toIrrVector());
+        node->setScale(m_model_scale[0].toIrrVector());
         node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
         m_rtt_main_node = node;
     }
     else
     {
         scene::IAnimatedMeshSceneNode* node =
-        irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)mesh.get(0), "rtt_mesh", NULL);
-        node->setPosition(mesh_location[0].toIrrVector());
-        node->setFrameLoop(model_frames[0], model_frames[0]);
+        irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_models.get(0), "rtt_mesh",
+            NULL, &m_render_info, m_model_render_info_affected[0]);
+        node->setPosition(m_model_location[0].toIrrVector());
+        node->setFrameLoop(m_model_frames[0], m_model_frames[0]);
         node->setAnimationSpeed(0);
-        node->setScale(mesh_scale[0].toIrrVector());
+        node->setScale(m_model_scale[0].toIrrVector());
         node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
-        
         m_rtt_main_node = node;
     }
-    
+
     assert(m_rtt_main_node != NULL);
-    assert(mesh.size() == mesh_location.size());
-    assert(mesh.size() == model_frames.size());
-    
-    const int mesh_amount = mesh.size();
+    assert(m_models.size() == m_model_location.size());
+    assert(m_models.size() == m_model_frames.size());
+    assert(m_models.size() == m_model_scale.size());
+    assert(m_models.size() == m_model_render_info_affected.size());
+
+    const int mesh_amount = m_models.size();
     for (int n = 1; n<mesh_amount; n++)
     {
-        if (model_frames[n] == -1)
+        if (m_model_frames[n] == -1)
         {
             scene::ISceneNode* node =
-            irr_driver->addMesh(mesh.get(n), "rtt_node", m_rtt_main_node);
-            node->setPosition(mesh_location[n].toIrrVector());
+            irr_driver->addMesh(m_models.get(n), "rtt_node", m_rtt_main_node,
+                &m_render_info, m_model_render_info_affected[n]);
+            node->setPosition(m_model_location[n].toIrrVector());
             node->updateAbsolutePosition();
-            node->setScale(mesh_scale[n].toIrrVector());
+            node->setScale(m_model_scale[n].toIrrVector());
         }
         else
         {
             scene::IAnimatedMeshSceneNode* node =
-            irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)mesh.get(n),
-                                        "modelviewrtt", m_rtt_main_node);
-            node->setPosition(mesh_location[n].toIrrVector());
-            node->setFrameLoop(model_frames[n], model_frames[n]);
+            irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_models.get(n),
+                "modelviewrtt", m_rtt_main_node, &m_render_info,
+                m_model_render_info_affected[n]);
+            node->setPosition(m_model_location[n].toIrrVector());
+            node->setFrameLoop(m_model_frames[n], m_model_frames[n]);
             node->setAnimationSpeed(0);
             node->updateAbsolutePosition();
-            node->setScale(mesh_scale[n].toIrrVector());
-            //Log::info("ModelViewWidget", "Set frame %d", model_frames[n]);
+            node->setScale(m_model_scale[n].toIrrVector());
+            //Log::info("ModelViewWidget", "Set frame %d", m_model_frames[n]);
         }
     }
-    
-    
+
     irr_driver->setAmbientLight(video::SColor(255, 35, 35, 35));
-    
+
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
     
     if(!CVS->isGLSL())
@@ -263,27 +267,27 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     } else {
         m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
     }
-    
+
     m_rtt_main_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
     m_rtt_main_node->setMaterialFlag(video::EMF_LIGHTING, true);
-    
+
     const int materials = m_rtt_main_node->getMaterialCount();
     for (int n = 0; n<materials; n++)
     {
         m_rtt_main_node->getMaterial(n).setFlag(video::EMF_LIGHTING, true);
-        
+
         // set size of specular highlights
         m_rtt_main_node->getMaterial(n).Shininess = 100.0f;
         m_rtt_main_node->getMaterial(n).SpecularColor.set(255, 50, 50, 50);
         m_rtt_main_node->getMaterial(n).DiffuseColor.set(255, 150, 150, 150);
-        
+
         m_rtt_main_node->getMaterial(n).setFlag(video::EMF_GOURAUD_SHADING,
                                                 true);
     }
-    
+
     m_camera = irr_driver->getSceneManager()->addCameraSceneNode();
     m_camera->setAspectRatio(1.0f);
-    
+
     m_camera->setPosition(core::vector3df(0.0, 20.0f, 70.0f));
     m_camera->setUpVector(core::vector3df(0.0, 1.0, 0.0));
     m_camera->setTarget(core::vector3df(0, 10, 0.0f));
@@ -316,7 +320,6 @@ bool ModelViewWidget::isRotating()
 void ModelViewWidget::elementRemoved()
 {
     m_render_target = NULL;
-
     IconButtonWidget::elementRemoved();
 }
 

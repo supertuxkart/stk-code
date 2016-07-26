@@ -24,7 +24,6 @@
 #include "karts/controller/player_controller.hpp"
 
 class AbstractKart;
-class Camera;
 class Player;
 class SFXBase;
 
@@ -42,9 +41,10 @@ private:
 
     bool           m_sound_schedule;
 
-    /** The camera attached to the kart for this controller. The camera
-     *  object is managed in the Camera class, so no need to free it. */
-    Camera        *m_camera;
+
+    /** The index of the camera attached to the kart for this controller. The
+     *  camera object is managed in the Camera class, so no need to free it. */
+    int  m_camera_index;
 
     SFXBase       *m_bzzt_sound;
     SFXBase       *m_wee_sound;

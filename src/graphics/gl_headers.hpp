@@ -21,7 +21,9 @@
 #define GLEW_STATIC
 
 extern "C" {
-#include <GL/glew.h>
+#if !defined(USE_GLES2)
+#   include <GL/glew.h>
+#endif
 }
 #include <cinttypes>
 
@@ -38,8 +40,11 @@ extern "C" {
 #    ifndef GL_TEXTURE_SWIZZLE_RGBA
 #        define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
 #    endif
-#elif defined(ANDROID)
-#    include <GLES/gl.h>
+#elif defined(USE_GLES2)
+#    include <GLES3/gl3.h>
+#    include <GLES3/gl3ext.h>
+#    include <GLES2/gl2ext.h>
+#    define glVertexAttribDivisorARB glVertexAttribDivisor
 #elif defined(WIN32)
 #    define WIN32_LEAN_AND_MEAN
 #    include <windows.h>
@@ -48,6 +53,23 @@ extern "C" {
 #define DEBUG_OUTPUT_DECLARED
 #    include <GL/gl.h>
 #    include <GL/glext.h>
+#endif
+
+#if defined(USE_GLES2)
+#define GL_BGRA 0x80E1
+#define GL_BGR 0x80E0
+#define GL_FRAMEBUFFER_SRGB 0x8DB9
+#define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
+
+// The glDrawElementsBaseVertex is available only in OpenGL ES 3.2. At this
+// stage the 'basevertex' argument is always equal to 0 because features that
+// use it are disabled in OpenGL ES renderer. We can simply use glDrawElements
+// instead.
+inline void glDrawElementsBaseVertex(GLenum mode, GLsizei count, GLenum type,
+                                     GLvoid *indices, GLint basevertex)
+{
+    glDrawElements(mode, count, type, indices);
+}
 #endif
 
 struct DrawElementsIndirectCommand{

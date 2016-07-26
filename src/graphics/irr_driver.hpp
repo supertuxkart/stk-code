@@ -60,6 +60,7 @@ using namespace irr;
 
 struct GlowData;
 class RTT;
+class RenderInfo;
 class FrameBuffer;
 class ShadowImportanceProvider;
 class AbstractKart;
@@ -214,8 +215,7 @@ public:
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
-    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig,
-                                           video::E_RENDER_TYPE rt);
+    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig);
     video::ITexture      *applyMask(video::ITexture* texture,
                                     const std::string& mask_path);
     void displayFPS();
@@ -249,7 +249,9 @@ public:
                  const video::SColor &color=video::SColor(128, 255, 255, 255));
     scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
                                   const std::string& debug_name,
-                                  scene::ISceneNode *parent=NULL);
+                                  scene::ISceneNode *parent = NULL,
+                                  RenderInfo* render_info = NULL,
+                                  bool all_parts_colorized = false);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);
@@ -269,7 +271,11 @@ public:
     void                  removeMeshFromCache(scene::IMesh *mesh);
     void                  removeTexture(video::ITexture *t);
     scene::IAnimatedMeshSceneNode
-        *addAnimatedMesh(scene::IAnimatedMesh *mesh, const std::string& debug_name, scene::ISceneNode* parent = NULL);
+        *addAnimatedMesh(scene::IAnimatedMesh *mesh,
+                         const std::string& debug_name,
+                         scene::ISceneNode* parent = NULL,
+                         RenderInfo* render_info = NULL,
+                         bool all_parts_colorized = false);
     scene::ICameraSceneNode
                          *addCameraSceneNode();
     Camera               *addCamera(unsigned int index, AbstractKart *kart);

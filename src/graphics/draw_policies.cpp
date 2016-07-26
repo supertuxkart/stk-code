@@ -235,12 +235,14 @@ void IndirectDrawPolicy::drawNormals(const DrawCalls& draw_calls) const
 void IndirectDrawPolicy::drawGlow(const DrawCalls& draw_calls,
                                   const std::vector<GlowData>& glows) const
 {
+#if !defined(USE_GLES2)
     //to draw Glow with indirect commands, we also need GL_ARB_explicit_attrib_location extension
     //TODO: add a way to render glow without explicit attrib
     if(CVS->isARBExplicitAttribLocationUsable())
     {
         draw_calls.drawIndirectGlow();
     }
+#endif // !defined(USE_GLES2)
 }
 
 // ----------------------------------------------------------------------------
@@ -290,7 +292,9 @@ void MultidrawPolicy::drawSolidSecondPass (const DrawCalls& draw_calls,
 void MultidrawPolicy::drawGlow(const DrawCalls& draw_calls,
                                const std::vector<GlowData>& glows) const
 {
+#if !defined(USE_GLES2)
     draw_calls.multidrawGlow();
+#endif
 }
 
 // ----------------------------------------------------------------------------

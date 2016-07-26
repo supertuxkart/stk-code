@@ -19,15 +19,15 @@
 
 const STK::Tuple<size_t> DefaultMaterial::FirstPassTextures
     = STK::Tuple<size_t>(1);
-const STK::Tuple<size_t, size_t> DefaultMaterial::SecondPassTextures
-    = STK::Tuple<size_t, size_t>(0, 1);
+const STK::Tuple<size_t, size_t, size_t> DefaultMaterial::SecondPassTextures
+    = STK::Tuple<size_t, size_t, size_t>(0, 1, 7);
 const STK::Tuple<> DefaultMaterial::ShadowTextures;
 const STK::Tuple<size_t> DefaultMaterial::RSMTextures = STK::Tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
 const STK::Tuple<size_t, size_t> AlphaRef::FirstPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<size_t, size_t> AlphaRef::SecondPassTextures 
+const STK::Tuple<size_t, size_t> AlphaRef::SecondPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
 const STK::Tuple<size_t> AlphaRef::ShadowTextures = STK::Tuple<size_t>(0);
 const STK::Tuple<size_t> AlphaRef::RSMTextures = STK::Tuple<size_t>(0);
@@ -46,9 +46,9 @@ const STK::Tuple<size_t> UnlitMat::ShadowTextures = STK::Tuple<size_t>(0);
 const STK::Tuple<size_t> UnlitMat::RSMTextures = STK::Tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
-const STK::Tuple<size_t, size_t> GrassMat::FirstPassTextures 
+const STK::Tuple<size_t, size_t> GrassMat::FirstPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<size_t, size_t> GrassMat::SecondPassTextures 
+const STK::Tuple<size_t, size_t> GrassMat::SecondPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
 const STK::Tuple<size_t> GrassMat::ShadowTextures = STK::Tuple<size_t>(0);
 const STK::Tuple<size_t> GrassMat::RSMTextures = STK::Tuple<size_t>(0);
@@ -56,8 +56,8 @@ const STK::Tuple<size_t> GrassMat::RSMTextures = STK::Tuple<size_t>(0);
 // ----------------------------------------------------------------------------
 const STK::Tuple<size_t, size_t> NormalMat::FirstPassTextures
     = STK::Tuple<size_t, size_t>(2, 1);
-const STK::Tuple<size_t, size_t> NormalMat::SecondPassTextures 
-    = STK::Tuple<size_t, size_t>(0, 1);
+const STK::Tuple<size_t, size_t, size_t> NormalMat::SecondPassTextures
+    = STK::Tuple<size_t, size_t, size_t>(0, 1, 7);
 const STK::Tuple<> NormalMat::ShadowTextures;
 const STK::Tuple<size_t> NormalMat::RSMTextures = STK::Tuple<size_t>(0);
 
@@ -70,8 +70,8 @@ const STK::Tuple<size_t> DetailMat::RSMTextures = STK::Tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
 const STK::Tuple<size_t> SplattingMat::FirstPassTextures = STK::Tuple<size_t>(6);
-const STK::Tuple<size_t, size_t, size_t, size_t, size_t> 
-          SplattingMat::SecondPassTextures 
+const STK::Tuple<size_t, size_t, size_t, size_t, size_t>
+          SplattingMat::SecondPassTextures
               = STK::Tuple<size_t, size_t, size_t, size_t, size_t>(1, 2, 3, 4, 5);
 const STK::Tuple<> SplattingMat::ShadowTextures;
 const STK::Tuple<size_t, size_t, size_t, size_t, size_t> SplattingMat::RSMTextures

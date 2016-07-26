@@ -22,7 +22,9 @@
 #include "audio/sfx_base.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
@@ -312,10 +314,15 @@ void SoccerWorld::initKartList()
             irr_driver->getTexture(FileManager::GUI, "soccer_player_blue.png");
 
     //Assigning indicators
-    for(unsigned int i=0; i<kart_amount; i++)
+    for(unsigned int i = 0; i < kart_amount; i++)
     {
-        scene::ISceneNode *arrow_node;
-        float arrow_pos_height = m_karts[i]->getKartModel()->getHeight()+0.5f;
+        scene::ISceneNode *arrow_node = NULL;
+
+        KartModel* km = m_karts[i]->getKartModel();
+        // Color of karts can be changed using shaders if the model supports
+        if (km->supportColorization() && CVS->isGLSL()) continue;
+
+        float arrow_pos_height = km->getHeight() + 0.5f;
         SoccerTeam team = getKartTeam(i);
 
         arrow_node = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,
@@ -388,9 +395,8 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
 
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
-              difficulty);
-            //difficulty, team == SOCCER_TEAM_BLUE ?
-            //video::ERT_BLUE : video::ERT_RED);
+            difficulty, team == SOCCER_TEAM_BLUE ?
+            RenderInfo::KRT_BLUE : RenderInfo::KRT_RED);
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
 

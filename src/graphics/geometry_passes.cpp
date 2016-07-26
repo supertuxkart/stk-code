@@ -125,6 +125,7 @@ namespace RenderGeometry
 
 using namespace RenderGeometry;
 
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 void AbstractGeometryPasses::prepareShadowRendering(const FrameBuffer& shadow_framebuffer) const
 {
@@ -172,6 +173,7 @@ void AbstractGeometryPasses::shadowPostProcessing(const ShadowMatrices& shadow_m
     glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_framebuffer.getRTT()[0]);
     glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }
+#endif // !defined(USE_GLES2)
 
 AbstractGeometryPasses::AbstractGeometryPasses()
 {
@@ -283,11 +285,6 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
         return;
 
     // Render displacement nodes
-    tmp_framebuffer.bind();
-    glClear(GL_COLOR_BUFFER_BIT);
-    displace_framebuffer.bind();
-    glClear(GL_COLOR_BUFFER_BIT);
-
     DisplaceProvider * const cb =
         (DisplaceProvider *)Shaders::getCallback(ES_DISPLACE);
     cb->update();
@@ -304,7 +301,11 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
         glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_2TCOORDS));
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
-    tmp_framebuffer.bind();
+    if (ListDisplacement::getInstance()->size() > 0)
+    {
+        tmp_framebuffer.bind();
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh =
@@ -331,7 +332,11 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
                                  (GLvoid *)mesh.vaoOffset, (int)mesh.vaoBaseVertex);
     }
 
-    displace_framebuffer.bind();
+    if (ListDisplacement::getInstance()->size() > 0)
+    {
+        displace_framebuffer.bind();
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
     for (unsigned i = 0; i < ListDisplacement::getInstance()->size(); i++)
     {
         const GLMesh &mesh = 
@@ -364,7 +369,7 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
     colors_framebuffer.bind();
     glStencilFunc(GL_EQUAL, 1, 0xFF);
     post_processing->renderPassThrough(displace_framebuffer.getRTT()[0],
-                                       colors_framebuffer.getWidth(), 
+                                       colors_framebuffer.getWidth(),
                                        colors_framebuffer.getHeight());
     glDisable(GL_STENCIL_TEST);
 

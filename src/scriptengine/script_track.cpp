@@ -19,6 +19,7 @@
 #include "script_track.hpp"
 
 #include "animations/three_d_animation.hpp"
+#include "font/digit_face.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/stk_text_billboard.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -88,17 +89,14 @@ namespace Scripting
         void createTextBillboard(std::string* text, SimpleVec3* location)
         {
             core::stringw wtext = StringUtils::utf8ToWide(*text);
-            core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()
-                ->getDimension(wtext.c_str());
-
-            assert(GUIEngine::getHighresDigitFont() != NULL);
+            DigitFace* digit_face = font_manager->getFont<DigitFace>();
+            core::dimension2d<u32> textsize = digit_face->getDimension(wtext.c_str());
 
             core::vector3df xyz(location->getX(), location->getY(), location->getZ());
 
             if (CVS->isGLSL())
             {
-                gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-                STKTextBillboard* tb = new STKTextBillboard(wtext.c_str(), font,
+                STKTextBillboard* tb = new STKTextBillboard(wtext.c_str(), digit_face,
                     GUIEngine::getSkin()->getColor("font::bottom"),
                     GUIEngine::getSkin()->getColor("font::top"),
                     irr_driver->getSceneManager()->getRootSceneNode(),
@@ -109,6 +107,7 @@ namespace Scripting
             }
             else
             {
+                assert(GUIEngine::getHighresDigitFont() != NULL);
                 scene::ISceneManager* sm = irr_driver->getSceneManager();
                 scene::ISceneNode* sn =
                     sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),

@@ -388,6 +388,8 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
         case EET_JOYSTICK_INPUT_EVENT:
         case EGUIET_FORCE_32_BIT:
             break;
+        default:
+            break;
         }
     }
 

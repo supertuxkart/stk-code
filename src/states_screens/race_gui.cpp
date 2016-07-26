@@ -312,7 +312,7 @@ void RaceGUI::drawGlobalTimer()
         }
     }
 
-    core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right, 10,
+    core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right, 30,
                         irr_driver->getActualScreenSize().Width                  , 50);
 
     // special case : when 3 players play, use available 4th space for such things
@@ -823,7 +823,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     if (lap < 0 ) return;
 
     core::recti pos;
-    pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y;
+    pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y + m_font_height;
     // If the time display in the top right is in this viewport,
     // move the lap/rank display down a little bit so that it is
     // displayed under the time.

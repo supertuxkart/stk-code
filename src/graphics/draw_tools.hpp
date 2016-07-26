@@ -20,6 +20,7 @@
 
 #include "graphics/shader.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "graphics/texture_manager.hpp"
 
@@ -63,12 +64,33 @@ struct CustomUnrollArgs<>
     {
         irr_driver->IncreaseObjectCount(); //TODO: move somewhere else
         GLMesh *mesh = STK::tuple_get<0>(t);
+        
+        //shadow_custom_unroll_args, rsm_custom_unroll_args and custom_unroll_args
+        // have been merged in order to avoid duplicated code.
+        // don't need to call change color things for shadows and rsm
+        //TODO: don't call next 10 lines for shadow/rsm shaders?
+        const bool support_change_hue = (mesh->m_render_info != NULL &&
+            mesh->m_material != NULL);
+        const bool need_change_hue = (support_change_hue &&
+            mesh->m_render_info->getHue() > 0.0f);
+        if (need_change_hue)
+        {
+            S::getInstance()->changeableColor(mesh->m_render_info->getHue(),
+                mesh->m_material->getColorizationFactor());
+        }            
+        
         S::getInstance()->setUniforms(args...);
         glDrawElementsBaseVertex(mesh->PrimitiveType,
                                 (int)mesh->IndexCount,
                                 mesh->IndexType,
                                 (GLvoid *)mesh->vaoOffset,
                                 (int)mesh->vaoBaseVertex);
+                                
+        if (need_change_hue)
+        {
+            // Reset after changing
+            S::getInstance()->changeableColor();
+        }
     }   // drawMesh
 };   // CustomUnrollArgs
 
@@ -86,7 +108,7 @@ struct TexExpanderImpl
     {
         size_t idx = STK::tuple_get<sizeof...(TupleArgs) - N>(tex_swizzle);
         TexExpanderImpl<T, N - 1>::template expandTex( mesh,
-                                                       tex_swizzle, 
+                                                       tex_swizzle,
                                                        args...,
                                                        getTextureGLuint(mesh.textures[idx]));
     }   // ExpandTex

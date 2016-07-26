@@ -283,7 +283,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     m_poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += solid_poly_count;
     m_poly_count[SHADOW_PASS] += shadow_poly_count;
     PROFILER_POP_CPU_MARKER();
-    
+
+#if !defined(USE_GLES2)    
     // Shadows
     {
         // To avoid wrong culling, use the largest view possible
@@ -312,8 +313,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
             }
         }
         irr_driver->getSceneManager()->setActiveCamera(camnode);
-
     }
+#endif // !defined(USE_GLES2)
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
     glDepthMask(GL_TRUE);
@@ -457,7 +458,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         glDisable(GL_BLEND);
         m_rtts->getFBO(FBO_COLORS).bind();
         m_post_processing->renderRHDebug(m_rtts->getRadianceHintFrameBuffer().getRTT()[0],
-                                         m_rtts->getRadianceHintFrameBuffer().getRTT()[1], 
+                                         m_rtts->getRadianceHintFrameBuffer().getRTT()[1],
                                          m_rtts->getRadianceHintFrameBuffer().getRTT()[2],
                                          m_shadow_matrices.getRHMatrix(),
                                          m_shadow_matrices.getRHExtend());
@@ -867,7 +868,7 @@ void ShaderBasedRenderer::render(float dt)
         float tmp[2];
         tmp[0] = float(irr_driver->getActualScreenSize().Width);
         tmp[1] = float(irr_driver->getActualScreenSize().Height);
-        glBindBuffer(GL_UNIFORM_BUFFER, 
+        glBindBuffer(GL_UNIFORM_BUFFER,
                      SharedGPUObjects::getViewProjectionMatricesUBO());
         glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float),
                         2 * sizeof(float), tmp);

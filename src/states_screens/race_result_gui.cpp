@@ -98,7 +98,7 @@ void RaceResultGUI::init()
     }
 
     m_finish_sound = SFXManager::get()->quickSound(
-        human_win ? "gp_end" : "race_finish");
+        human_win ? "race_finish_victory" : "race_finish");
 
     //std::string path = (human_win ? Different result music too later
     //    file_manager->getAsset(FileManager::MUSIC, "race_summary.music") :
@@ -143,7 +143,7 @@ void RaceResultGUI::init()
 void RaceResultGUI::tearDown()
 {
     Screen::tearDown();
-    m_font->setMonospaceDigits(m_was_monospace);
+    //m_font->setMonospaceDigits(m_was_monospace);
 
     if (m_finish_sound != NULL &&
         m_finish_sound->getStatus() == SFXBase::SFX_PLAYING)
@@ -455,8 +455,8 @@ void RaceResultGUI::backToLobby()
 
         m_font = GUIEngine::getFont();
         assert(m_font);
-        m_was_monospace = m_font->getMonospaceDigits();
-        m_font->setMonospaceDigits(true);
+        //m_was_monospace = m_font->getMonospaceDigits();
+        //m_font->setMonospaceDigits(true);
         WorldWithRank *rank_world = (WorldWithRank*)World::getWorld();
 
         unsigned int first_position = 1;
@@ -556,14 +556,14 @@ void RaceResultGUI::backToLobby()
 
         // Determine width of new points column
 
-        m_font->setMonospaceDigits(true);
+        //m_font->setMonospaceDigits(true);
         core::dimension2du r_new_p = m_font->getDimension(L"+99");
 
         m_width_new_points = r_new_p.Width;
 
         // Determine width of overall points column
         core::dimension2du r_all_p = m_font->getDimension(L"999");
-        m_font->setMonospaceDigits(false);
+        //m_font->setMonospaceDigits(false);
 
         m_width_all_points = r_all_p.Width;
 

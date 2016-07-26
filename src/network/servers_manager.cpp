@@ -191,8 +191,10 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     m_success = true;
                 }   // if received_data
             }    // while still waiting
-			if (!m_success)
-				m_info = _("No LAN server detected");
+
+            delete broadcast;
+            if (!m_success)
+                m_info = _("No LAN server detected");
         }   // operation
         // --------------------------------------------------------------------
         /** This function is necessary, otherwise the XML- and HTTP-Request

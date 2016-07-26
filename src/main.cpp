@@ -150,7 +150,9 @@
 #include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "font/font_manager.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/camera_debug.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
@@ -168,6 +170,7 @@
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
+#include "karts/combined_characteristic.hpp"
 #include "karts/controller/ai_base_lap_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -910,14 +913,23 @@ int handleCmdLine()
         UserConfigParams::m_music = false;
     }
 
-    if(UserConfigParams::m_artist_debug_mode)
+    if (UserConfigParams::m_artist_debug_mode)
     {
-       if(CommandLine::has("--camera-wheel-debug"))
-           Camera::setDebugMode(Camera::CM_DEBUG_GROUND);
+        if (CommandLine::has("--camera-wheel-debug"))
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
+        }
         if(CommandLine::has("--camera-debug"))
-            Camera::setDebugMode(Camera::CM_DEBUG_TOP_OF_KART);
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
+        }
         if(CommandLine::has("--camera-kart-debug"))
-            Camera::setDebugMode(Camera::CM_DEBUG_BEHIND_KART);
+        {
+            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
+        }
         if(CommandLine::has("--physics-debug"))
             UserConfigParams::m_physics_debug=1;
         if(CommandLine::has("--check-debug"))
@@ -1286,6 +1298,8 @@ void initRest()
         exit(0);
     }
 
+    font_manager = new FontManager();
+    font_manager->loadFonts();
     GUIEngine::init(device, driver, StateManager::get());
 
     // This only initialises the non-network part of the addons manager. The
@@ -1556,9 +1570,15 @@ int main(int argc, char *argv[] )
         {
             if (UserConfigParams::m_old_driver_popup)
             {
+                #ifdef USE_GLES2
+                irr::core::stringw version = "OpenGL ES 3.0";
+                #else
+                irr::core::stringw version = "OpenGL 3.1";
+                #endif
                 MessageDialog *dialog =
                     new MessageDialog(_("Your OpenGL version appears to be too old. Please verify "
-                    "if an update for your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."),
+                    "if an update for your video driver is available. SuperTuxKart requires %s or better.",
+                    version),
                     /*from queue*/ true);
                 GUIEngine::DialogQueue::get()->pushDialog(dialog);
             }
@@ -1750,6 +1770,7 @@ static void cleanSuperTuxKart()
     if(unlock_manager)          delete unlock_manager;
     Online::ProfileManager::destroy();
     GUIEngine::DialogQueue::deallocate();
+    if(font_manager)            delete font_manager;
 
     // Now finish shutting down objects which a separate thread. The
     // RequestManager has been signaled to shut down as early as possible,
@@ -1857,6 +1878,11 @@ void runUnitTests()
     assert( isEasterMode(22, 3, 2016, 5));
     assert(!isEasterMode(21, 3, 2016, 5));
     UserConfigParams::m_easter_ear_mode = saved_easter_mode;
+
+
+    Log::info("UnitTest", " - Kart characteristics");
+    CombinedCharacteristic::unitTesting();
+
     Log::info("UnitTest", "=====================");
     Log::info("UnitTest", "Testing successful   ");
     Log::info("UnitTest", "=====================");

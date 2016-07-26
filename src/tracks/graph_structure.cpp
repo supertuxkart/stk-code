@@ -18,9 +18,10 @@
 
 #include "tracks/graph_structure.hpp"
 
-#include <IMesh.h>
 #include <ICameraSceneNode.h>
+#include <IMesh.h>
 #include <IMeshSceneNode.h>
+#include <ISceneManager.h>
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/glwrap.hpp"
@@ -96,6 +97,7 @@ void GraphStructure::createMesh(bool show_invisible,
         m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     m.setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
     m.setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m.setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     m_mesh             = irr_driver->createQuadMesh(&m);
     m_mesh_buffer      = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);

@@ -22,6 +22,7 @@
 #include "animations/three_d_animation.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/render_info.hpp"
 #include "io/xml_node.hpp"
 #include "physics/physical_object.hpp"
 #include "tracks/track_object.hpp"
@@ -45,11 +46,11 @@ TrackObjectManager::~TrackObjectManager()
  */
 void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
                              ModelDefinitionLoader& model_def_loader,
-                             TrackObject* parent_library)
+                             TrackObject* parent_library, RenderInfo* ri)
 {
     try
     {
-        TrackObject *obj = new TrackObject(xml_node, parent, model_def_loader, parent_library);
+        TrackObject *obj = new TrackObject(xml_node, parent, model_def_loader, parent_library, ri);
         m_all_objects.push_back(obj);
         if(obj->isDriveable())
             m_driveable_objects.push_back(obj);

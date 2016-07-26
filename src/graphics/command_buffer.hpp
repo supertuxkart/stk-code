@@ -22,11 +22,36 @@
 #include "graphics/gl_headers.hpp"
 #include "graphics/material.hpp"
 #include "graphics/materials.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/vao_manager.hpp"
 #include <irrlicht.h>
 #include <array>
+#include <functional>
 #include <unordered_map>
+
+
+class MeshRenderInfoHash
+{
+public:
+    size_t operator() (const std::pair<scene::IMeshBuffer*, RenderInfo*> &p) const
+    {
+        return (std::hash<scene::IMeshBuffer*>()(p.first) ^
+            (std::hash<RenderInfo*>()(p.second) << 1));
+    }
+};
+
+struct MeshRenderInfoEquals : std::binary_function
+    <const std::pair<scene::IMeshBuffer*, RenderInfo*>&,
+     const std::pair<scene::IMeshBuffer*, RenderInfo*>&, bool>
+{
+    result_type operator() (first_argument_type lhs,
+                            second_argument_type rhs) const
+    {
+        return (lhs.first == rhs.first) &&
+            (lhs.second == rhs.second);
+    }
+};
 
 struct InstanceList
 {
@@ -34,7 +59,10 @@ struct InstanceList
     std::vector<irr::scene::ISceneNode*> m_scene_nodes;
 };
 
-typedef std::unordered_map <irr::scene::IMeshBuffer *, InstanceList > MeshMap;
+typedef std::unordered_map <std::pair<scene::IMeshBuffer*, RenderInfo*>, InstanceList,
+                            MeshRenderInfoHash, MeshRenderInfoEquals> SolidPassMeshMap;
+                            
+typedef std::unordered_map <irr::scene::IMeshBuffer *, InstanceList > OtherMeshMap;
 
 // ----------------------------------------------------------------------------
 /** Fill origin, orientation and scale attributes
@@ -143,6 +171,8 @@ void expandHandlesSecondPass(const std::vector<uint64_t> &handles)
 template<>
 void expandHandlesSecondPass<GrassMat>(const std::vector<uint64_t> &handles);
 
+
+#if !defined(USE_GLES2)
 // ----------------------------------------------------------------------------
 /**
  *  \class CommandBuffer
@@ -152,6 +182,7 @@ void expandHandlesSecondPass<GrassMat>(const std::vector<uint64_t> &handles);
 template<int N>
 class CommandBuffer
 {
+
 protected:
     GLuint m_draw_indirect_cmd_id;
     DrawElementsIndirectCommand *m_draw_indirect_cmd;
@@ -173,7 +204,7 @@ protected:
      *  \param mesh_map List of meshes
      *  \param[in,out] instance_buffer Meshes data (position, orientation, textures, etc)
      */
-    template<typename T>
+    template<typename T, typename MeshMap>
     void fillMaterial(int material_id,
                       MeshMap *mesh_map,
                       T *instance_buffer)
@@ -202,7 +233,7 @@ protected:
      *  \param instance_type The type of material
      * 
      */
-    template<typename InstanceData>
+    template<typename InstanceData, typename MeshMap>
     void fillInstanceData(MeshMap *mesh_map,
                           const std::vector<int> &material_list,
                           InstanceType instance_type)
@@ -260,7 +291,7 @@ class SolidCommandBuffer: public CommandBuffer<static_cast<int>(Material::SHADER
 {
 public:
     SolidCommandBuffer();
-    void fill(MeshMap *mesh_map);
+    void fill(SolidPassMeshMap *mesh_map);
     
     // ----------------------------------------------------------------------------
     /** First rendering pass; draw all meshes associated with the same material
@@ -346,6 +377,20 @@ public:
         {
             GLMesh *mesh = m_meshes[T::MaterialType][i];
             expandTexSecondPass<T>(*mesh, prefilled_tex);
+            
+            //TODO: next 10 lines are duplicated in draw_tools.hpp (see CustomUnrollArgs::drawMesh)
+            //TODO: find a way to remove duplicated code
+            const bool support_change_hue = (mesh->m_render_info != NULL &&
+            mesh->m_material != NULL);
+            const bool need_change_hue =
+                (support_change_hue && mesh->m_render_info->getHue() > 0.0f);
+            if (need_change_hue)
+            {
+                T::InstancedSecondPassShader::getInstance()->changeableColor
+                    (mesh->m_render_info->getHue(),
+                     mesh->m_material->getColorizationFactor());
+            }
+            
             glDrawElementsIndirect(GL_TRIANGLES,
                                    GL_UNSIGNED_SHORT,
                                    (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
@@ -441,7 +486,7 @@ class ShadowCommandBuffer: public CommandBuffer<4*static_cast<int>(Material::SHA
 {
 public:
     ShadowCommandBuffer();
-    void fill(MeshMap *mesh_map);
+    void fill(OtherMeshMap *mesh_map);
     
     // ----------------------------------------------------------------------------
     /** Draw shadowmaps for meshes with the same material
@@ -515,7 +560,7 @@ class ReflectiveShadowMapCommandBuffer: public CommandBuffer<static_cast<int>(Ma
 {
 public:
     ReflectiveShadowMapCommandBuffer();
-    void fill(MeshMap *mesh_map);
+    void fill(OtherMeshMap *mesh_map);
     
     // ----------------------------------------------------------------------------
     /** Draw reflective shadow map for meshes with the same material
@@ -583,8 +628,7 @@ class InstancedColorizeShader : public Shader<InstancedColorizeShader>
 public:
     InstancedColorizeShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER,   "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER,   "glow_object.vert",
+        loadProgram(OBJECT, GL_VERTEX_SHADER,   "glow_object.vert",
                             GL_FRAGMENT_SHADER, "glow_object.frag");
         assignUniforms();
     }   // InstancedColorizeShader
@@ -599,7 +643,7 @@ class GlowCommandBuffer: public CommandBuffer<1>
 {
 public:
     GlowCommandBuffer();
-    void fill(MeshMap *mesh_map);
+    void fill(OtherMeshMap *mesh_map);
 
     // ----------------------------------------------------------------------------
     /** Draw glowing meshes.
@@ -639,5 +683,5 @@ public:
         }
     } // multidraw
 };
-
+#endif // !defined(USE_GLES2)
 #endif //HEADER_COMMAND_BUFFER_HPP

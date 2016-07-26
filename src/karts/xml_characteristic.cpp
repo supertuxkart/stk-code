@@ -32,6 +32,17 @@ XmlCharacteristic::XmlCharacteristic(const XMLNode *node) :
 }   // XmlCharacteristic constructor
 
 // ----------------------------------------------------------------------------
+/** Copies the characteristics from the specified other characteristic class
+ *  into this class.
+ */
+void XmlCharacteristic::copyFrom(const AbstractCharacteristic *other)
+{
+    const XmlCharacteristic *xc = dynamic_cast<const XmlCharacteristic*>(other);
+    assert(xc!=NULL);
+    m_values = xc->m_values;
+}   // operator=
+
+// ----------------------------------------------------------------------------
 /** process will execute the operation that is specified in the saved string.
  *  The format of the operations is specified in kart_characteristics.xml.
  */
@@ -212,8 +223,9 @@ void XmlCharacteristic::processFloat(const std::string &processor, float *value,
     std::size_t pos2;
     while ((pos2 = processor.find_first_of(operators, pos)) != std::string::npos)
     {
-        parts.push_back(processor.substr(pos, pos2));
-        operations.push_back(processor.substr(pos2, pos2 + 1));
+        std::string s = processor.substr(pos, pos2);
+        parts.push_back(processor.substr(pos, pos2-pos));
+        operations.push_back(processor.substr(pos2, 1));
         pos = pos2 + 1;
     }
     parts.push_back(processor.substr(pos));
@@ -224,15 +236,15 @@ void XmlCharacteristic::processFloat(const std::string &processor, float *value,
     // If nothing preceeds the first operator, insert x
     if (parts[index].empty())
     {
-        if (!*is_set)
+        // - is a special case: We don't take e.g. "-5" as relative, it
+        // describes a negative number. So 
+        if (!*is_set && operations[index] == "-")
+            *value = 0;
+        else if (!*is_set)
         {
             Log::error("XmlCharacteristic::processFloat", "x is unknown");
             return;
         }
-        // - is a special case: We don't take e.g. "-5" as relative, it
-        // describes a negative number
-        else if (operations[index] == "-")
-            *value = 0;
         else
             *value = x;
     }

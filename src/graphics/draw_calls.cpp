@@ -182,8 +182,9 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
 
                     if (Mat != Material::SHADERTYPE_SPLATTING && mesh->TextureMatrix.isIdentity())
                     {
-                        m_solid_pass_mesh[Mat][mesh->mb].m_mesh = mesh;
-                        m_solid_pass_mesh[Mat][mesh->mb].m_scene_nodes.emplace_back(Node);
+                        std::pair<scene::IMeshBuffer*, RenderInfo*> meshRenderInfo(mesh->mb, mesh->m_render_info);
+                        m_solid_pass_mesh[Mat][meshRenderInfo].m_mesh = mesh;
+                        m_solid_pass_mesh[Mat][meshRenderInfo].m_scene_nodes.emplace_back(Node);
                     }
                     else
                     {
@@ -458,6 +459,7 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
 // ----------------------------------------------------------------------------
 DrawCalls::DrawCalls()
 {
+#if !defined(USE_GLES2)
     if(CVS->supportsIndirectInstancingRendering())
     {
         m_solid_cmd_buffer                 = new SolidCommandBuffer();
@@ -465,14 +467,17 @@ DrawCalls::DrawCalls()
         m_reflective_shadow_map_cmd_buffer = new ReflectiveShadowMapCommandBuffer();
         m_glow_cmd_buffer                  = new GlowCommandBuffer();        
     }
+#endif // !defined(USE_GLES2)
 } //DrawCalls
 
 DrawCalls::~DrawCalls()
 {
+#if !defined(USE_GLES2)
     delete m_solid_cmd_buffer;
     delete m_shadow_cmd_buffer;
     delete m_reflective_shadow_map_cmd_buffer;
     delete m_glow_cmd_buffer;
+#endif // !defined(USE_GLES2)
 } //~DrawCalls
 
 
@@ -560,6 +565,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     if (!CVS->supportsIndirectInstancingRendering())
         return;
 
+#if !defined(USE_GLES2)
     int enableOpenMP = 0;
     
     if (CVS->supportsAsyncInstanceUpload())
@@ -594,6 +600,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
     
     if (CVS->supportsAsyncInstanceUpload())
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
+#endif // !defined(USE_GLES2)
 }
 
 // ----------------------------------------------------------------------------
@@ -619,6 +626,8 @@ void DrawCalls::renderParticlesList() const
     for(auto particles: m_particles_list)
         particles->render();
 }
+
+#if !defined(USE_GLES2)
 
 // ----------------------------------------------------------------------------
  /** Render the solid first pass (depth and normals)
@@ -810,3 +819,4 @@ void DrawCalls::multidrawGlow() const
     m_glow_cmd_buffer->bind();
     m_glow_cmd_buffer->multidraw();
 }
+#endif // !defined(USE_GLES2)
