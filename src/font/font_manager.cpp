@@ -52,17 +52,21 @@ void FontManager::loadFonts()
     m_digit_ttf = new FaceTTF(stk_config->m_digit_ttf);
 
     // Now load fonts with settings of ttf file
+    unsigned int font_loaded = 0;
     RegularFace* regular = new RegularFace(m_normal_ttf);
     regular->init();
     m_fonts.push_back(regular);
+    m_font_type_map[std::type_index(typeid(RegularFace))] = font_loaded++;
 
     BoldFace* bold = new BoldFace(m_normal_ttf);
     bold->init();
     m_fonts.push_back(bold);
+    m_font_type_map[std::type_index(typeid(BoldFace))] = font_loaded++;
 
     DigitFace* digit = new DigitFace(m_digit_ttf);
     digit->init();
     m_fonts.push_back(digit);
+    m_font_type_map[std::type_index(typeid(DigitFace))] = font_loaded++;
 }   // loadFonts
 
 // ----------------------------------------------------------------------------
