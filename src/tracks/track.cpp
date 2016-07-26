@@ -660,7 +660,7 @@ void Track::startMusic() const
  */
 void Track::loadBattleGraph(const XMLNode &node)
 {
-    BattleGraph::create(m_root+"navmesh.xml", node);
+    BattleGraph::create(m_root+"navmesh.xml", &node);
 
     if(BattleGraph::get()->getNumNodes()==0)
     {

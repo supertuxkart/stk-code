@@ -194,6 +194,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "tracks/battle_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/command_line.hpp"
@@ -591,7 +592,7 @@ void cmdLineHelp()
     "       --shadows=n        Set shadow quality (0 to disable shadows).\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
-    "http://supertuxkart.sourceforge.net\n\n",
+    "http://supertuxkart.net\n\n",
     CommandLine::getExecName().c_str()
     );
 }   // cmdLineHelp
@@ -1843,12 +1844,12 @@ void runUnitTests()
 {
     Log::info("UnitTest", "Starting unit testing");
     Log::info("UnitTest", "=====================");
-    Log::info("UnitTest", "- GraphicsRestrictions");
+    Log::info("UnitTest", "GraphicsRestrictions");
     GraphicsRestrictions::unitTesting();
-    Log::info("UnitTest", " - NetworkString");
+    Log::info("UnitTest", "NetworkString");
     NetworkString::unitTesting();
 
-    Log::info("UnitTest", " - Easter detection");
+    Log::info("UnitTest", "Easter detection");
     // Test easter mode: in 2015 Easter is 5th of April - check with 0 days
     // before and after
     int saved_easter_mode = UserConfigParams::m_easter_ear_mode;
@@ -1880,8 +1881,11 @@ void runUnitTests()
     UserConfigParams::m_easter_ear_mode = saved_easter_mode;
 
 
-    Log::info("UnitTest", " - Kart characteristics");
+    Log::info("UnitTest", "Kart characteristics");
     CombinedCharacteristic::unitTesting();
+
+    Log::info("UnitTest", "Battle Graph");
+    BattleGraph::unitTesting();
 
     Log::info("UnitTest", "=====================");
     Log::info("UnitTest", "Testing successful   ");

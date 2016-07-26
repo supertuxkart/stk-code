@@ -114,6 +114,8 @@ private:
      */
     float           m_auxiliary_timer;
 
+    float           m_count_up_timer;
+
     bool            m_engines_started;
     void            startEngines();
 public:
@@ -171,6 +173,10 @@ public:
     // ------------------------------------------------------------------------
     /** Called when the race actually starts. */
     virtual void onGo() {};
+
+    // ------------------------------------------------------------------------
+    /** Get the time since start regardless of which way the clock counts */
+    float getTimeSinceStart() const { return m_count_up_timer; }
 
 };   // WorldStatus
 

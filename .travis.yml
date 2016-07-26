@@ -21,17 +21,21 @@ addons:
   apt:
     packages:
     - build-essential
-    - libogg-dev
-    - libvorbis-dev
-    - libopenal-dev
-    - libxxf86vm-dev
-    - libcurl4-openssl-dev
-    - libfribidi-dev
-    - libbluetooth-dev
-    - libgl1-mesa-dev
-    - libglu1-mesa-dev
-    - libglew-dev
     - cmake
+    - libbluetooth-dev
+    - libcurl4-gnutls-dev
+    - libfreetype6-dev
+    - libfribidi-dev
+    - libgl1-mesa-dev
+    - libjpeg-dev
+    - libogg-dev
+    - libopenal-dev
+    - libpng-dev
+    - libvorbis-dev
+    - libxrandr-dev
+    - mesa-common-dev
+    - pkg-config
+    - zlib1g-dev
 
 before_script:
   - export THREADS=$((`nproc` + 1))

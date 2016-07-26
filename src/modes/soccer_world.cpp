@@ -34,6 +34,7 @@
 #include "karts/controller/soccer_ai.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/battle_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"

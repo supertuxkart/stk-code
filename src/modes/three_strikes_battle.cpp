@@ -17,9 +17,6 @@
 
 #include "modes/three_strikes_battle.hpp"
 
-#include <string>
-#include <IMeshSceneNode.h>
-
 #include "main_loop.hpp"
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
@@ -31,9 +28,13 @@
 #include "karts/kart_properties.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/battle_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
+
+#include <string>
+#include <IMeshSceneNode.h>
 
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
