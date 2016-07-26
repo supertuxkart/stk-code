@@ -25,6 +25,8 @@
 #include "utils/ptr_vector.hpp"
 
 #include <string>
+#include <typeindex>
+#include <unordered_map>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -35,13 +37,15 @@ class FontWithFace;
 class FontManager : public NoCopy
 {
 private:
-    PtrVector<FontWithFace> m_fonts;
+    PtrVector<FontWithFace>                  m_fonts;
 
-    FT_Library              m_ft_library;
+    FT_Library                               m_ft_library;
 
-    FaceTTF*                m_normal_ttf;
+    FaceTTF*                                 m_normal_ttf;
 
-    FaceTTF*                m_digit_ttf;
+    FaceTTF*                                 m_digit_ttf;
+
+    std::unordered_map<std::type_index, int> m_font_type_map;
 
 public:
     LEAK_CHECK()
@@ -53,11 +57,11 @@ public:
     template <typename T> T* getFont()
     {
         T* out = NULL;
-        for (unsigned int i = 0; i < m_fonts.size(); i++)
+        const unsigned int n = m_font_type_map[std::type_index(typeid(T))];
+        out = dynamic_cast<T*>(m_fonts.get(n));
+        if (out != NULL)
         {
-            out = dynamic_cast<T*>(m_fonts.get(i));
-            if (out != NULL)
-                return out;
+            return out;
         }
         Log::fatal("FontManager", "Can't get a font!");
         return out;
