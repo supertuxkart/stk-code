@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2015 SuperTuxKart-Team
+//  Copyright (C) 2006-2016 SuperTuxKart-Team
 //  Modelled after Supertux's configfile.cpp
 //
 //  This program is free software; you can redistribute it and/or
@@ -683,8 +683,8 @@ bool UserConfig::loadConfig()
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "stkconfig")
     {
-        Log::error("UserConfig",
-                   "Could not read user config file '%s'.", filename.c_str());
+        Log::info("UserConfig",
+                   "Could not read user config file '%s'.  A new file will be created.", filename.c_str());
         if(root) delete root;
         // Create a default config file - just in case that stk crashes later
         // there is a config file that can be modified (to e.g. disable
