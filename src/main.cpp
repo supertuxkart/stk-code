@@ -1887,6 +1887,9 @@ void runUnitTests()
     Log::info("UnitTest", "Battle Graph");
     BattleGraph::unitTesting();
 
+    Log::info("UnitTest", "Fonts for translation");
+    font_manager->unitTesting();
+
     Log::info("UnitTest", "=====================");
     Log::info("UnitTest", "Testing successful   ");
     Log::info("UnitTest", "=====================");
