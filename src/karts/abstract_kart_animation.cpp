@@ -20,6 +20,7 @@
 
 #include "graphics/slip_stream.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
@@ -55,6 +56,12 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
         // A time of 0 reset the squashing
         kart->setSquash(0.0f, 0.0f);
     }
+
+    // Reset the wheels (and any other animation played for that kart)
+    // This avoid the effect that some wheels might be way below the kart
+    // which is very obvious in the rescue animation.
+    m_kart->getKartModel()->resetVisualWheelPosition();
+
 }   // AbstractKartAnimation
 
 // ----------------------------------------------------------------------------

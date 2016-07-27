@@ -249,6 +249,7 @@ public:
                          float current_lean_angle,
                          int gt_replay_index = -1);
     void          finishedRace();
+    void          resetVisualWheelPosition();
     scene::ISceneNode*
                   attachModel(bool animatedModels, bool always_animated);
     // ------------------------------------------------------------------------

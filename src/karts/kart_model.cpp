@@ -983,6 +983,20 @@ void KartModel::update(float dt, float distance, float steer, float speed,
 }   // update
 
 //-----------------------------------------------------------------------------
+/** Called when a kart is rescued to reset all visual wheels to their default
+ *  position to avoid that some wheels look too far away from the kart (which
+ *  is not that visible while a kart is driving).
+ */
+void KartModel::resetVisualWheelPosition()
+{
+    for(unsigned int i=0; i<4; i++)
+    {
+        m_kart->getVehicle()->getWheelInfo(i).m_raycastInfo.m_suspensionLength =
+            m_default_physics_suspension[i];
+    }   // for i < 4
+}   // resetVisualSuspension
+
+//-----------------------------------------------------------------------------
 void KartModel::attachHat()
 {
     m_hat_node = NULL;
