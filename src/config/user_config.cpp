@@ -1,7 +1,7 @@
 //
-//  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2006-2016 SuperTuxKart-Team
-//  Modelled after Supertux's configfile.cpp
+//  SuperTuxKart - A racing game
+//  Copyright (C) 2006-2016 SuperTuxKart Team
+//  Modeled after Supertux's configfile.cpp
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
