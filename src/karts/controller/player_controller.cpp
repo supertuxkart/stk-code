@@ -276,15 +276,15 @@ void PlayerController::update(float dt)
     {
         if(World::getWorld()->getPhase() != WorldStatus::GO_PHASE)
         {
-           // Only rev while tapping m_accel, once the player lets go we start cooling down.
+            // Only rev while tapping m_accel, once the player lets go we start cooling down.
             // TODO: Floating point arithmetic is a big no-no.
             // Temporarily use penalty time for rev accumulator to save some space in class object.
             if(m_controls->m_accel) m_penalty_time += 1.0f;
             //else m_penalty_time -= dt; // Always called >.>;
             
-            // Burn out, happens when accel was tapped to many times. TODO: Play a burnout sound.
+            // Burn out, happens when accel was tapped too many times. TODO: Play a burnout sound.
             if(m_penalty_time >= 10.0f) m_penalty_time = 0.0f;
-            else if(m_penalty_time >= 5.0f && m_rev_sound) m_rev_sound->play(); // Plays a rev sound.
+            //else if(m_penalty_time >= 5.0f && m_rev_sound) m_rev_sound->play(); // Plays a rev sound.
                 
         } // if GO_PHASE
         
