@@ -2110,7 +2110,7 @@ void Kart::updatePhysics(float dt)
     {
         m_has_started = true;
         float f       = getStartupBoost();
-        if(f >= 0.9f)   m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 100*f);
+        if(f >= 0.0f)   m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 100*f);
         m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
                                           0.9f*f, f,
                                           /*engine_force*/200.0f,
