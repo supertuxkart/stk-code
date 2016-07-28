@@ -23,6 +23,8 @@
 #include "font/digit_face.hpp"
 #include "font/face_ttf.hpp"
 #include "font/regular_face.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 FontManager *font_manager = NULL;
 // ----------------------------------------------------------------------------
@@ -77,3 +79,56 @@ void FontManager::checkFTError(FT_Error err, const std::string& desc) const
         Log::error("FontManager", "Something wrong when %s!", desc.c_str());
     }
 }   // checkFTError
+
+// ----------------------------------------------------------------------------
+void FontManager::unitTesting()
+{
+    std::vector<std::string> list = *(translations->getLanguageList());
+    const int cur_log_level = Log::getLogLevel();
+    for (const std::string& lang : list)
+    {
+        // Hide gettext warning
+        Log::setLogLevel(5);
+        delete translations;
+#ifdef WIN32
+        std::string s=std::string("LANGUAGE=") + lang.c_str();
+        _putenv(s.c_str());
+#else
+        setenv("LANGUAGE", lang.c_str(), 1);
+#endif
+        translations = new Translations();
+        Log::setLogLevel(cur_log_level);
+        std::set<wchar_t> used_chars = translations->getCurrentAllChar();
+        for (const wchar_t& c : used_chars)
+        {
+            // Skip non-printing characters
+            if (c < 32) continue;
+
+            unsigned int font_number = 0;
+            unsigned int glyph_index = 0;
+            while (font_number < m_normal_ttf->getTotalFaces())
+            {
+                glyph_index =
+                    FT_Get_Char_Index(m_normal_ttf->getFace(font_number), c);
+                if (glyph_index > 0) break;
+                font_number++;
+            }
+            if (glyph_index > 0)
+            {
+                Log::debug("UnitTest", "Character %s in language %s"
+                    " use face %s",
+                    StringUtils::wideToUtf8(core::stringw(&c, 1)).c_str(),
+                    lang.c_str(),
+                    m_normal_ttf->getFace(font_number)->family_name);
+            }
+            else
+            {
+                Log::warn("UnitTest", "Character %s in language %s"
+                    " is not supported by all fonts!",
+                    StringUtils::wideToUtf8(core::stringw(&c, 1)).c_str(),
+                    lang.c_str());
+            }
+        }
+    }
+
+}   // unitTesting
