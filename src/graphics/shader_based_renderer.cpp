@@ -935,6 +935,9 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
                                           irr::scene::ICameraSceneNode* camera,
                                           float dt)
 {
+    resetObjectCount();
+    resetPolyCount();
+    
     irr::core::dimension2du texture_size = render_target->getTextureSize();
     
     size_t width  = texture_size.Width ;
