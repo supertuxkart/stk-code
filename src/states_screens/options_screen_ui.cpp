@@ -285,9 +285,9 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         {
             stats->setVisible(false);
             stats_label->setVisible(false);
-			PlayerProfile* profile = PlayerManager::getCurrentPlayer();
-			if (profile != NULL && profile->isLoggedIn())
-				profile->requestSignOut();
+            PlayerProfile* profile = PlayerManager::getCurrentPlayer();
+            if (profile != NULL && profile->isLoggedIn())
+                profile->requestSignOut();
         }
     }
     else if (name=="enable-hw-report")
