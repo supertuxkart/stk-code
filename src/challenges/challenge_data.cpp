@@ -256,7 +256,7 @@ ChallengeData::ChallengeData(const std::string& filename)
     if (track_node != NULL && m_minor!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
     {
         //I18N: number of laps to race in a challenge
-        description += _("Laps : %i", m_num_laps);
+        description += _("Laps: %i", m_num_laps);
         description += core::stringw(L"\n");
     }
     else if (track_node)
