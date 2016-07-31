@@ -21,6 +21,7 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/hardware_stats.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "font/bold_face.hpp"
 #include "font/regular_face.hpp"
@@ -284,8 +285,10 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         {
             stats->setVisible(false);
             stats_label->setVisible(false);
+            PlayerProfile* profile = PlayerManager::getCurrentPlayer();
+            if (profile != NULL && profile->isLoggedIn())
+                profile->requestSignOut();
         }
-
     }
     else if (name=="enable-hw-report")
     {

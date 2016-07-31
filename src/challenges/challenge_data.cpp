@@ -251,22 +251,29 @@ ChallengeData::ChallengeData(const std::string& filename)
             throw std::runtime_error("Unknown unlock entry");
         }
     }
-
-    core::stringw description;
-    if (track_node != NULL && m_minor!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
-    {
-        //I18N: number of laps to race in a challenge
-        description += _("Laps : %i", m_num_laps);
-        description += core::stringw(L"\n");
-    }
-    else if (track_node)
-    {
-        // Follow the leader mode:
-        description = _("Follow the leader");
-    }
-
-    m_challenge_description = description;
 }   // ChallengeData
+
+// ----------------------------------------------------------------------------
+
+const irr::core::stringw ChallengeData::getChallengeDescription() const
+{
+    core::stringw description;
+    if (!m_track_id.empty())
+    {
+        if (m_minor != RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            //I18N: number of laps to race in a challenge
+            description += _("Laps: %i", m_num_laps);
+            description += core::stringw(L"\n");
+        }
+        else
+        {
+            // Follow the leader mode:
+            description = _("Follow the leader");
+        }
+    }
+    return description;
+}   // getChallengeDescription
 
 // ----------------------------------------------------------------------------
 void ChallengeData::error(const char *id) const
