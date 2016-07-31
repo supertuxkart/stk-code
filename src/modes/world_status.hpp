@@ -97,7 +97,8 @@ protected:
     double          m_time;
     ClockType       m_clock_mode;
 
-    bool            m_play_racestart_sounds;
+    bool            m_play_track_intro_sound;
+    bool            m_play_ready_set_go_sounds;
 
 private:
     Phase           m_phase;
@@ -113,6 +114,10 @@ private:
      */
     float           m_auxiliary_timer;
 
+    float           m_count_up_timer;
+
+    bool            m_engines_started;
+    void            startEngines();
 public:
              WorldStatus();
     virtual ~WorldStatus();
@@ -168,6 +173,10 @@ public:
     // ------------------------------------------------------------------------
     /** Called when the race actually starts. */
     virtual void onGo() {};
+
+    // ------------------------------------------------------------------------
+    /** Get the time since start regardless of which way the clock counts */
+    float getTimeSinceStart() const { return m_count_up_timer; }
 
 };   // WorldStatus
 

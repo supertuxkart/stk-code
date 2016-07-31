@@ -30,6 +30,7 @@ namespace irr
 }
 using namespace irr;
 
+#include "graphics/render_info.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
@@ -115,6 +116,7 @@ public:
             AF_SPEED_WEIGHTED_END,          // End of speed-weighted animation
             AF_END=AF_SPEED_WEIGHTED_END,   // Last animation frame
             AF_COUNT};             // Number of entries here
+
 private:
     /** Which frame number starts/end which animation. */
     int m_animation_frame[AF_COUNT];
@@ -229,17 +231,25 @@ private:
     /** Pointer to the kart object belonging to this kart model. */
     AbstractKart* m_kart;
 
+    RenderInfo::KartRenderType m_krt;
+
+    RenderInfo m_render_info;
+
+    bool m_support_colorization;
+
 public:
                   KartModel(bool is_master);
                  ~KartModel();
-    KartModel*    makeCopy(video::E_RENDER_TYPE rt);
+    KartModel*    makeCopy(RenderInfo::KartRenderType krt);
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
     void          setDefaultSuspension();
     void          update(float dt, float distance, float steer, float speed,
+                         float current_lean_angle,
                          int gt_replay_index = -1);
     void          finishedRace();
+    void          resetVisualWheelPosition();
     scene::ISceneNode*
                   attachModel(bool animatedModels, bool always_animated);
     // ------------------------------------------------------------------------
@@ -327,6 +337,20 @@ public:
     scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
     // ------------------------------------------------------------------------
     core::vector3df getHatOffset() { return m_hat_offset; }
+    // ------------------------------------------------------------------------
+    RenderInfo* getRenderInfo()
+    {
+        return m_support_colorization || m_krt == RenderInfo::KRT_TRANSPARENT ?
+            &m_render_info : NULL;
+    }
+    // ------------------------------------------------------------------------
+    const RenderInfo* getRenderInfo() const
+    {
+        return m_support_colorization || m_krt == RenderInfo::KRT_TRANSPARENT ?
+            &m_render_info : NULL;
+    }
+    // ------------------------------------------------------------------------
+    bool supportColorization() const         { return m_support_colorization; }
 
 };   // KartModel
 #endif

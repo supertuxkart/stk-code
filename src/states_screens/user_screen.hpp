@@ -23,7 +23,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
-
+#include "input/input.hpp"
 namespace GUIEngine
 {
     class CheckBoxWidget;
@@ -125,6 +125,12 @@ public:
     void loginError(const irr::core::stringw &error_message);
     void logoutSuccessful();
     void logoutError(const irr::core::stringw &error_message);
+
+    virtual GUIEngine::EventPropagation filterActions(PlayerAction action,
+        int deviceID,
+        const unsigned int value,
+        Input::InputType type,
+        int playerId) OVERRIDE;
 };   // class BaseUserScreen
 
 // ============================================================================

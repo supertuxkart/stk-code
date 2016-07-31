@@ -64,8 +64,14 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
     GLuint id = glCreateShader(type);
     
     std::ostringstream code;
+#if !defined(USE_GLES2)
     code << "#version " << CVS->getGLSLVersion()<<"\n";
+#else
+    if (CVS->isGLSL())
+        code << "#version 300 es\n";
+#endif
 
+#if !defined(USE_GLES2)
     // Some drivers report that the compute shaders extension is available,
     // but they report only OpenGL 3.x version, and thus these extensions
     // must be enabled manually. Otherwise the shaders compilation will fail
@@ -80,9 +86,13 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
         if (CVS->isARBArraysOfArraysUsable())
             code << "#extension GL_ARB_arrays_of_arrays : enable\n";
     }
+#endif
     
     if (CVS->isAMDVertexShaderLayerUsable())
         code << "#extension GL_AMD_vertex_shader_layer : enable\n";
+        
+    if (CVS->isARBExplicitAttribLocationUsable())
+        code << "#extension GL_ARB_explicit_attrib_location : enable\n";
     
     if (CVS->isAZDOEnabled())
     {
@@ -108,11 +118,56 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
     {
         std::string Line = "";
         while (getline(stream, Line))
-            code << "\n" << Line;
+        {
+            const std::string stk_include = "#stk_include";
+            std::size_t pos = Line.find(stk_include);
+            if (pos != std::string::npos)
+            {
+                std::size_t pos = Line.find("\"");
+                if (pos == std::string::npos)
+                {
+                    Log::error("shader", "Invalid #stk_include line: '%s'.", Line.c_str());
+                    continue;
+                }
+                
+                std::string filename = Line.substr(pos+1);
+                
+                pos = filename.find("\"");
+                if (pos == std::string::npos)
+                {
+                    Log::error("shader", "Invalid #stk_include line: '%s'.", Line.c_str());
+                    continue;
+                }
+                
+                filename = filename.substr(0, pos);
+                
+                std::ifstream include_stream(file_manager->getShader(filename), std::ios::in);
+                if (!include_stream.is_open())
+                {
+                    Log::error("shader", "Couldn't open included shader: '%s'.", filename.c_str());
+                    continue;
+                }
+                
+                std::string include_line = "";
+                while (getline(include_stream, include_line))
+                {
+                    code << "\n" << include_line;
+                }
+                
+                include_stream.close();
+            }
+            else
+            {
+                code << "\n" << Line;
+            }
+        }
+        
         stream.close();
     }
     else
+    {
         Log::error("shader", "Can not open '%s'.", file.c_str());
+    }
 
     Log::info("shader", "Compiling shader : %s", file.c_str());
     const std::string &source  = code.str();
@@ -152,6 +207,9 @@ int ShaderBase::loadTFBProgram(const std::string &shader_name,
 {
     m_program = glCreateProgram();
     loadAndAttachShader(GL_VERTEX_SHADER, shader_name);
+#ifdef USE_GLES2
+    loadAndAttachShader(GL_FRAGMENT_SHADER, "tfb_dummy.frag");
+#endif
     if (CVS->getGLSLVersion() < 330)
         setAttribute(PARTICLES_SIM);
 

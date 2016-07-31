@@ -57,6 +57,8 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     {
         ThreeStrikesBattle *world=(ThreeStrikesBattle*)World::getWorld();
         world->kartHit(m_kart->getWorldKartId());
+        if (UserConfigParams::m_arena_ai_stats)
+            world->increaseRescueCount();
     }
 };   // RescueAnimation
 
@@ -83,7 +85,7 @@ RescueAnimation::~RescueAnimation()
         {
             Camera *camera = Camera::getCamera(i);
             if(camera && camera->getKart()==m_kart &&
-                camera->getMode() != Camera::CM_FINAL)
+                camera->getType() != Camera::CM_TYPE_END)
                 camera->setMode(Camera::CM_NORMAL);
         }
     }

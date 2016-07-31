@@ -55,6 +55,7 @@
 using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
+using namespace GUIEngine;
 
 const float KARTS_X = -0.95f;
 const float KARTS_DELTA_X = 1.9f;
@@ -172,6 +173,7 @@ void GrandPrixWin::init()
     m_phase = 1;
 
     SFXManager::get()->quickSound("gp_end");
+    getWidget<ButtonWidget>("continue")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // -------------------------------------------------------------------------------------

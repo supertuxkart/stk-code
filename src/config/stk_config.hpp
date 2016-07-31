@@ -143,14 +143,11 @@ public:
     /** The field of view for 1, 2, 3, 4 player split screen. */
     float m_camera_fov[4];
 
-    /** File names of the default fonts in STK. */
-    std::string m_font_default;
-    std::string m_font_default_fallback;
-    std::string m_font_cjk;
-    std::string m_font_ar;
-    std::string m_font_bold;
-    std::string m_font_bold_fallback;
-    std::string m_font_digit;
+    float m_cutscene_fov;
+
+    /** Lists of TTF files used in STK. */
+    std::vector<std::string> m_normal_ttf;
+    std::vector<std::string> m_digit_ttf;
 
 private:
     /** True if stk_config has been loaded. This is necessary if the
@@ -178,9 +175,9 @@ public:
      *  \throw out_of_range if there is no data for 'type'.
      *  \param type Type of kart (e.g. heavy, medium, ...).
      */
-    const KartProperties& getKartProperties(std::string type)
+    const KartProperties& getKartProperties(const std::string &type)
     {
-        return *m_kart_properties.at(type); 
+        return *m_kart_properties.at(type);
     }   // getKartProperties
 }
 ;   // STKConfig

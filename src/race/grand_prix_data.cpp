@@ -329,7 +329,7 @@ void GrandPrixData::reload()
             throw std::runtime_error("Missing track id");
         }
 
-        if (number_of_laps < 1)
+        if (number_of_laps < 1 && !UserConfigParams::m_artist_debug_mode)
         {
             Log::error("GrandPrixData",
                        "Track '%s' in the Grand Prix file '%s' should be raced "

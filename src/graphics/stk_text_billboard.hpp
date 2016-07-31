@@ -19,7 +19,7 @@
 #define STK_TEXT_BILLBOARD_HPP
 
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "guiengine/scalable_font.hpp"
+#include "font/font_with_face.hpp"
 #include "utils/cpp2011.hpp"
 
 #include "../lib/irrlicht/source/Irrlicht/CBillboardSceneNode.h"
@@ -31,12 +31,12 @@ class STKTextBillboardChar
 {
 public:
     irr::video::ITexture* m_texture;
-    irr::core::rect<irr::s32> m_destRect;
+    irr::core::rect<float> m_destRect;
     irr::core::rect<irr::s32> m_sourceRect;
     //irr::video::SColor m_colors[4];
 
     STKTextBillboardChar(irr::video::ITexture* texture,
-        const irr::core::rect<irr::s32>& destRect,
+        const irr::core::rect<float>& destRect,
         const irr::core::rect<irr::s32>& sourceRect,
         const irr::video::SColor* const colors)
     {
@@ -57,16 +57,16 @@ public:
     }
 };
 
-class STKTextBillboard : public STKMeshSceneNode, irr::gui::FontCharCollector
+class STKTextBillboard : public STKMeshSceneNode, FontWithFace::FontCharCollector
 {
     std::vector<STKTextBillboardChar> m_chars;
     irr::video::SColor m_color_top;
     irr::video::SColor m_color_bottom;
 
-    irr::scene::IMesh* getTextMesh(irr::core::stringw text, gui::ScalableFont* font);
+    irr::scene::IMesh* getTextMesh(irr::core::stringw text, FontWithFace* font);
 
 public:
-    STKTextBillboard(irr::core::stringw text, irr::gui::ScalableFont* font,
+    STKTextBillboard(irr::core::stringw text, FontWithFace* font,
         const irr::video::SColor& color_top,
         const irr::video::SColor& color_bottom,
         irr::scene::ISceneNode* parent,
@@ -82,7 +82,7 @@ public:
     }
 
     virtual void collectChar(irr::video::ITexture* texture,
-        const irr::core::rect<irr::s32>& destRect,
+        const irr::core::rect<float>& destRect,
         const irr::core::rect<irr::s32>& sourceRect,
         const irr::video::SColor* const colors) OVERRIDE;
 

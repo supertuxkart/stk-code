@@ -490,6 +490,7 @@ bool DeviceManager::load()
     if(input->getName()!="input")
     {
         Log::warn("DeviceManager", "Invalid input.xml file - no input node.");
+        delete input;
         return false;
     }
 
@@ -500,6 +501,7 @@ bool DeviceManager::load()
         GUIEngine::showMessage(_("Please re-configure your key bindings."));
         GUIEngine::showMessage(_("Your input config file is not compatible "
                                  "with this version of STK."));
+        delete input;
         return false;
     }
 

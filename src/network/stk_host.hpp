@@ -112,6 +112,10 @@ private:
     void handleLANRequests();
 
 public:
+    /** If a network console should be started. Note that the console can cause
+    *  a crash in release mode on windows (see #1529). */
+    static bool m_enable_console;
+
 
     /** Creates the STKHost. It takes all confifguration parameters from
      *  NetworkConfig. This STKHost can either be a client or a server.

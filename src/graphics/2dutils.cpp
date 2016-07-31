@@ -25,7 +25,12 @@
 #include "glwrap.hpp"
 #include "utils/cpp2011.hpp"
 
-#include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
+#if defined(USE_GLES2)
+#   define _IRR_COMPILE_WITH_OGLES2_
+#   include "../../lib/irrlicht/source/Irrlicht/COGLES2Texture.h"
+#else
+#   include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
+#endif
 
 
 // ============================================================================
@@ -179,8 +184,13 @@ static void drawTexColoredQuad(const video::ITexture *texture,
     ColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(ColoredTextureRectShader::getInstance()->m_vao);
 
+#if !defined(USE_GLES2)
     const irr::video::COpenGLTexture *t = 
                        static_cast<const irr::video::COpenGLTexture*>(texture);
+#else
+    const irr::video::COGLES2Texture *t = 
+                       static_cast<const irr::video::COGLES2Texture*>(texture);
+#endif
     ColoredTextureRectShader::getInstance()
         ->setTextureUnits(t->getOpenGLTextureName());
     ColoredTextureRectShader::getInstance()
@@ -264,7 +274,50 @@ static void getSize(unsigned texture_width, unsigned texture_height,
 }   // getSize
 
 // ----------------------------------------------------------------------------
-void draw2DImage(const video::ITexture* texture, 
+static void getSize(unsigned texture_width, unsigned texture_height,
+                    bool textureisRTT, const core::rect<float>& destRect,
+                    const core::rect<s32>& sourceRect,
+                    float &width, float &height,
+                    float &center_pos_x, float &center_pos_y,
+                    float &tex_width, float &tex_height,
+                    float &tex_center_pos_x, float &tex_center_pos_y   )
+{
+    core::dimension2d<u32> frame_size = irr_driver->getActualScreenSize();
+    const int screen_w = frame_size.Width;
+    const int screen_h =  frame_size.Height;
+    center_pos_x = destRect.UpperLeftCorner.X + destRect.LowerRightCorner.X;
+    center_pos_x /= screen_w;
+    center_pos_x -= 1.;
+    center_pos_y = destRect.UpperLeftCorner.Y + destRect.LowerRightCorner.Y;
+    center_pos_y /= screen_h;
+    center_pos_y = float(1.f - center_pos_y);
+    width = destRect.LowerRightCorner.X - destRect.UpperLeftCorner.X;
+    width /= screen_w;
+    height = destRect.LowerRightCorner.Y - destRect.UpperLeftCorner.Y;
+    height /= screen_h;
+
+    tex_center_pos_x = float(sourceRect.UpperLeftCorner.X + sourceRect.LowerRightCorner.X);
+    tex_center_pos_x /= texture_width * 2.f;
+    tex_center_pos_y = float(sourceRect.UpperLeftCorner.Y + sourceRect.LowerRightCorner.Y);
+    tex_center_pos_y /= texture_height * 2.f;
+    tex_width = float(sourceRect.LowerRightCorner.X - sourceRect.UpperLeftCorner.X);
+    tex_width /= texture_width * 2.f;
+    tex_height = float(sourceRect.LowerRightCorner.Y - sourceRect.UpperLeftCorner.Y);
+    tex_height /= texture_height * 2.f;
+
+    if (textureisRTT)
+        tex_height = -tex_height;
+
+    const f32 invW = 1.f / static_cast<f32>(texture_width);
+    const f32 invH = 1.f / static_cast<f32>(texture_height);
+    const core::rect<f32> tcoords(sourceRect.UpperLeftCorner.X  * invW,
+                                  sourceRect.UpperLeftCorner.Y  * invH,
+                                  sourceRect.LowerRightCorner.X * invW,
+                                  sourceRect.LowerRightCorner.Y * invH);
+}   // getSize
+
+// ----------------------------------------------------------------------------
+void draw2DImage(const video::ITexture* texture,
                  const core::rect<s32>& destRect,
                  const core::rect<s32>& sourceRect,
                  const core::rect<s32>* clip_rect,
@@ -281,7 +334,90 @@ void draw2DImage(const video::ITexture* texture,
     float width, height, center_pos_x, center_pos_y;
     float tex_width, tex_height, tex_center_pos_x, tex_center_pos_y;
 
-    getSize(texture->getSize().Width, texture->getSize().Height, 
+    getSize(texture->getSize().Width, texture->getSize().Height,
+            texture->isRenderTarget(), destRect, sourceRect, width, height,
+            center_pos_x, center_pos_y, tex_width, tex_height,
+            tex_center_pos_x, tex_center_pos_y);
+
+    if (use_alpha_channel_of_texture)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+        glDisable(GL_BLEND);
+    }
+
+    if (clip_rect)
+    {
+        if (!clip_rect->isValid())
+            return;
+
+        glEnable(GL_SCISSOR_TEST);
+        const core::dimension2d<u32>& render_target_size =
+                           irr_driver->getActualScreenSize();
+        glScissor(clip_rect->UpperLeftCorner.X,
+                  render_target_size.Height - clip_rect->LowerRightCorner.Y,
+                  clip_rect->getWidth(), clip_rect->getHeight());
+    }
+
+    UniformColoredTextureRectShader::getInstance()->use();
+    glBindVertexArray(SharedGPUObjects::getUI_VAO());
+
+#if !defined(USE_GLES2)
+    const video::COpenGLTexture *c_texture =
+        static_cast<const video::COpenGLTexture*>(texture);
+#else
+    const video::COGLES2Texture *c_texture =
+        static_cast<const video::COGLES2Texture*>(texture);
+#endif
+    UniformColoredTextureRectShader::getInstance()
+        ->setTextureUnits(c_texture->getOpenGLTextureName());
+
+    UniformColoredTextureRectShader::getInstance()
+        ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
+                      core::vector2df(width, height),
+                      core::vector2df(tex_center_pos_x, tex_center_pos_y),
+                      core::vector2df(tex_width, tex_height),
+                      colors);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    if (clip_rect)
+        glDisable(GL_SCISSOR_TEST);
+    glUseProgram(0);
+
+    glGetError();
+}   // draw2DImage
+
+// ----------------------------------------------------------------------------
+void draw2DImage(const video::ITexture* texture,
+                 const core::rect<float>& destRect,
+                 const core::rect<s32>& sourceRect,
+                 const core::rect<s32>* clip_rect,
+                 const video::SColor &colors,
+                 bool use_alpha_channel_of_texture)
+{
+    if (!CVS->isGLSL())
+    {
+        core::rect<irr::s32> dest_rect
+            (irr::s32(destRect.UpperLeftCorner.X),
+            irr::s32(destRect.UpperLeftCorner.Y),
+            irr::s32(destRect.LowerRightCorner.X),
+            irr::s32(destRect.LowerRightCorner.Y));
+
+        video::SColor duplicatedArray[4] = { colors, colors, colors, colors };
+        draw2DImage(texture, dest_rect, sourceRect, clip_rect, duplicatedArray,
+                    use_alpha_channel_of_texture);
+        return;
+    }
+
+    float width, height, center_pos_x, center_pos_y;
+    float tex_width, tex_height, tex_center_pos_x, tex_center_pos_y;
+
+    getSize(texture->getSize().Width, texture->getSize().Height,
             texture->isRenderTarget(), destRect, sourceRect, width, height,
             center_pos_x, center_pos_y, tex_width, tex_height,
             tex_center_pos_x, tex_center_pos_y);
@@ -304,7 +440,7 @@ void draw2DImage(const video::ITexture* texture,
         glEnable(GL_SCISSOR_TEST);
         const core::dimension2d<u32>& render_target_size = 
                            irr_driver->getActualScreenSize();
-        glScissor(clip_rect->UpperLeftCorner.X, 
+        glScissor(clip_rect->UpperLeftCorner.X,
                   render_target_size.Height - clip_rect->LowerRightCorner.Y,
                   clip_rect->getWidth(), clip_rect->getHeight());
     }
@@ -312,8 +448,13 @@ void draw2DImage(const video::ITexture* texture,
     UniformColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(SharedGPUObjects::getUI_VAO());
 
-    const video::COpenGLTexture *c_texture = 
+#if !defined(USE_GLES2)
+    const video::COpenGLTexture *c_texture =
         static_cast<const video::COpenGLTexture*>(texture);
+#else
+    const video::COGLES2Texture *c_texture =
+        static_cast<const video::COGLES2Texture*>(texture);
+#endif
     UniformColoredTextureRectShader::getInstance()
         ->setTextureUnits(c_texture->getOpenGLTextureName());
 
@@ -372,7 +513,7 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
 }   // draw2DImageFromRTT
 
 // ----------------------------------------------------------------------------
-void draw2DImage(const video::ITexture* texture, 
+void draw2DImage(const video::ITexture* texture,
                  const core::rect<s32>& destRect,
                  const core::rect<s32>& sourceRect,
                  const core::rect<s32>* clip_rect,
@@ -430,8 +571,96 @@ void draw2DImage(const video::ITexture* texture,
     }
     else
     {
+#if !defined(USE_GLES2)
         const video::COpenGLTexture *c_texture = 
                             static_cast<const video::COpenGLTexture*>(texture);
+#else
+        const video::COGLES2Texture *c_texture = 
+                            static_cast<const video::COGLES2Texture*>(texture);
+#endif
+        drawTexQuad(c_texture->getOpenGLTextureName(), width, height,
+                    center_pos_x, center_pos_y, tex_center_pos_x,
+                    tex_center_pos_y, tex_width, tex_height);
+    }
+    if (clip_rect)
+        glDisable(GL_SCISSOR_TEST);
+    glUseProgram(0);
+
+    glGetError();
+}   // draw2DImage
+
+// ----------------------------------------------------------------------------
+void draw2DImage(const video::ITexture* texture,
+                 const core::rect<float>& destRect,
+                 const core::rect<s32>& sourceRect,
+                 const core::rect<s32>* clip_rect,
+                 const video::SColor* const colors,
+                 bool use_alpha_channel_of_texture,
+                 bool draw_translucently)
+{
+    if (!CVS->isGLSL())
+    {
+        core::rect<irr::s32> dest_rect
+            (irr::s32(destRect.UpperLeftCorner.X),
+            irr::s32(destRect.UpperLeftCorner.Y),
+            irr::s32(destRect.LowerRightCorner.X),
+            irr::s32(destRect.LowerRightCorner.Y));
+
+        irr_driver->getVideoDriver()->draw2DImage(texture, dest_rect, sourceRect,
+                                                  clip_rect, colors,
+                                                  use_alpha_channel_of_texture);
+        return;
+    }
+
+    float width, height, center_pos_x, center_pos_y, tex_width, tex_height;
+    float tex_center_pos_x, tex_center_pos_y;
+
+    getSize(texture->getSize().Width, texture->getSize().Height,
+            texture->isRenderTarget(), destRect, sourceRect, width, height,
+            center_pos_x, center_pos_y, tex_width, tex_height,
+            tex_center_pos_x, tex_center_pos_y);
+
+    if (draw_translucently)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    }
+    else if (use_alpha_channel_of_texture)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+        glDisable(GL_BLEND);
+    }
+    if (clip_rect)
+    {
+        if (!clip_rect->isValid())
+            return;
+
+        glEnable(GL_SCISSOR_TEST);
+        const core::dimension2d<u32>& render_target_size =
+                            irr_driver->getActualScreenSize();
+        glScissor(clip_rect->UpperLeftCorner.X,
+                  render_target_size.Height - clip_rect->LowerRightCorner.Y,
+                  clip_rect->getWidth(), clip_rect->getHeight());
+    }
+    if (colors)
+    {
+        drawTexColoredQuad(texture, colors, width, height, center_pos_x,
+                           center_pos_y, tex_center_pos_x, tex_center_pos_y,
+                           tex_width, tex_height);
+    }
+    else
+    {
+#if !defined(USE_GLES2)
+        const video::COpenGLTexture *c_texture =
+                            static_cast<const video::COpenGLTexture*>(texture);
+#else
+        const video::COGLES2Texture *c_texture =
+                            static_cast<const video::COGLES2Texture*>(texture);
+#endif
         drawTexQuad(c_texture->getOpenGLTextureName(), width, height,
                     center_pos_x, center_pos_y, tex_center_pos_x,
                     tex_center_pos_y, tex_width, tex_height);

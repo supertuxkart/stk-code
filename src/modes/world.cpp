@@ -36,11 +36,13 @@
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
+#include "karts/controller/test_ai.hpp"
 #include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
+#include "modes/soccer_world.hpp"
 #include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
@@ -193,6 +195,11 @@ void World::init()
             m_karts.push_back(ReplayPlay::get()->getGhostKart(k));
     }
 
+    // Assign team of AIs for soccer mode before createKart
+    SoccerWorld* sw = dynamic_cast<SoccerWorld*>(this);
+    if (sw)
+        sw->setAITeam();
+
     for(unsigned int i=0; i<num_karts; i++)
     {
         if (race_manager->getKartType(i) == RaceManager::KT_GHOST) continue;
@@ -258,10 +265,7 @@ void World::reset()
         (*i)->reset();
     }
 
-    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
-    {
-        Camera::getCamera(i)->reset();
-    }
+    Camera::resetAllCameras();
 
     if(race_manager->hasGhostKarts())
         ReplayPlay::get()->reset();
@@ -389,7 +393,12 @@ Controller* World::loadAIController(AbstractKart *kart)
     switch(turn)
     {
         case 0:
-            controller = new SkiddingAI(kart);
+            // If requested, start the test ai
+            if( (AIBaseController::getTestAI()!=0                       ) && 
+                ( (kart->getWorldKartId()+1) % AIBaseController::getTestAI() )==0)
+                controller = new TestAI(kart);
+            else
+                controller = new SkiddingAI(kart);
             break;
         case 1:
             controller = new BattleAI(kart);
@@ -459,6 +468,7 @@ World::~World()
     race_manager->setRaceGhostKarts(false);
     race_manager->setRecordRace(false);
     race_manager->setWatchingReplay(false);
+    race_manager->setTimeTarget(0.0f);
 
     Camera::removeAllCameras();
 

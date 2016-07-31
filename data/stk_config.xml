@@ -118,7 +118,7 @@
   <!-- The field od views for 1-4 player split screen. fov-3 is
        actually not used (since 3 player split screen uses the
        same layout as 4 player split screen) -->
-  <camera fov-1="80" fov-2="65" fov-3="50" fov-4="75" />
+  <camera fov-1="80" fov-2="65" fov-3="50" fov-4="75" cutscene-fov="0.61" />
 
   <!-- disable-while-unskid: Disable steering when stop skidding during
            the time it takes to adjust the physical body with the graphics.
@@ -396,13 +396,6 @@
          post-skid-rotate-factor="1"
          reduce-turn-min="0.2" reduce-turn-max="0.8"/>
 
-     <!-- Leaning related parameters, i.e. slightly leaning the karts when
-          driving a fast curve.
-          max: maximum leaning (i.e. when steering as much as possible at highest
-               speed), in degrees.
-          sped: Speed with which the leaning changes (in degree/second). -->
-     <lean    max="8.6"  speed="5.0" />
-
      <kart-type>
          <light />
          <medium />
@@ -418,12 +411,7 @@
   which leads to crash with STK), but the fonts are to blame, what's the point of not
   using industry standard nowadays...
   -->
-  <font default="Ubuntu-R.ttf"
-        default_fallback="FreeSans.ttf"
-        cjk="wqy-microhei.ttf"
-        ar="NotoNaskhArabicUI-Bold.ttf"
-        bold="Ubuntu-B.ttf"
-        bold_fallback="FreeSansBold.ttf"
-        digit="SigmarOne.otf" />
+  <fonts-list normal-ttf="Cantarell-Regular.otf FreeSans.ttf wqy-microhei.ttf NotoNaskhArabicUI-Bold.ttf"
+              digit-ttf="SigmarOne.otf" />
 
 </config>

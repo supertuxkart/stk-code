@@ -35,7 +35,7 @@ namespace GraphicsRestrictions
     enum GraphicsRestrictionsType 
     {
         GR_UNIFORM_BUFFER_OBJECT,
-        GR_GEOMETRY_SHADER4,
+        GR_GEOMETRY_SHADER,
         GR_DRAW_INDIRECT,
         GR_TEXTURE_VIEW,
         GR_TEXTURE_STORAGE,
@@ -50,6 +50,7 @@ namespace GraphicsRestrictions
         GR_BINDLESS_TEXTURE,
         GR_EXT_TEXTURE_COMPRESSION_S3TC,
         GR_AMD_VERTEX_SHADER_LAYER,
+        GR_EXPLICIT_ATTRIB_LOCATION,
         GR_DRIVER_RECENT_ENOUGH,
         GR_HIGHDEFINITION_TEXTURES,
         GR_ADVANCED_PIPELINE,

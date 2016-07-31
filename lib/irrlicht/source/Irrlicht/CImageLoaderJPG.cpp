@@ -66,7 +66,7 @@ void CImageLoaderJPG::init_source (j_decompress_ptr cinfo)
 boolean CImageLoaderJPG::fill_input_buffer (j_decompress_ptr cinfo)
 {
 	// DO NOTHING
-	return 1;
+	return TRUE;
 }
 
 

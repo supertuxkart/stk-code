@@ -407,7 +407,7 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
         {
             new_powerup = powerup_manager->getRandomPowerup(position, &n);
             if(new_powerup != PowerupManager::POWERUP_RUBBERBALL ||
-                ( World::getWorld()->getTime() - powerup_manager->getBallCollectTime()) >
+                ( World::getWorld()->getTimeSinceStart() - powerup_manager->getBallCollectTime()) >
                   RubberBall::getTimeBetweenRubberBalls() )
                 break;
         }

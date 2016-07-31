@@ -26,7 +26,7 @@
 #include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera_end.hpp"
 #include "graphics/CBatchingMesh.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
@@ -38,7 +38,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/stk_text_billboard.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -82,7 +82,8 @@
 using namespace irr;
 
 
-const float Track::NOHIT           = -99999.9f;
+const float Track::NOHIT               = -99999.9f;
+bool        Track::m_dont_load_navmesh = false;
 
 // ----------------------------------------------------------------------------
 Track::Track(const std::string &filename)
@@ -588,9 +589,9 @@ void Track::loadTrackInfo()
         delete easter;
     }
 
-    if(file_manager->fileExists(m_root+"navmesh.xml"))
+    if(file_manager->fileExists(m_root+"navmesh.xml") && !m_dont_load_navmesh)
         m_has_navmesh = true;
-    else if(m_is_arena || m_is_soccer)
+    else if ( (m_is_arena || m_is_soccer) && !m_dont_load_navmesh)
     {
         Log::warn("Track", "NavMesh is not found for arena %s, "
                   "disable AI for it.\n", m_name.c_str());
@@ -669,9 +670,9 @@ void Track::startMusic() const
 /** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
  *  they are connected to each other. Input file name is hardcoded for now
  */
-void Track::loadBattleGraph()
+void Track::loadBattleGraph(const XMLNode &node)
 {
-    BattleGraph::create(m_root+"navmesh.xml");
+    BattleGraph::create(m_root+"navmesh.xml", &node);
 
     if(BattleGraph::get()->getNumNodes()==0)
     {
@@ -778,6 +779,8 @@ void Track::createPhysicsModel(unsigned int main_track_count)
             irr_driver->grabAllTextures(mesh);
             // Gloss
             mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            // Colorization mask
+            mb->getMaterial().setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
         }
         else
             irr_driver->removeNode(m_static_physics_only_nodes[i]);
@@ -930,18 +933,6 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         if (mb->getVertexType() == video::EVT_STANDARD)
         {
             irr::video::S3DVertex* mbVertices=(video::S3DVertex*)mb->getVertices();
-            if (race_manager->getReverseTrack() &&
-                material->getMirrorAxisInReverse() != ' ')
-            {
-                for (unsigned int i = 0; i < mb->getVertexCount(); i++)
-                {
-                    core::vector2df &tc = mb->getTCoords(i);
-                    if (material->getMirrorAxisInReverse() == 'V')
-                        tc.Y = 1 - tc.Y;
-                    else
-                        tc.X = 1 - tc.X;
-                }
-            }   // reverse track and texture needs mirroring
             for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
             {
                 for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
@@ -1231,7 +1222,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
         if (lod_instance)
         {
-            LODNode* node = lodLoader.instanciateAsLOD(n, NULL);
+            LODNode* node = lodLoader.instanciateAsLOD(n, NULL, NULL);
             if (node != NULL)
             {
                 node->setPosition(xyz);
@@ -1606,7 +1597,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 #endif
     }
 
-    Camera::clearEndCameras();
+    CameraEnd::clearEndCameras();
     m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
 
@@ -1646,25 +1637,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         (void)e;
     }
 
-    // Load the graph only now: this function is called from world, after
-    // the race gui was created. The race gui is needed since it stores
-    // the information about the size of the texture to render the mini
-    // map to.
-    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
-    else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
-        loadBattleGraph();
-
-    ItemManager::create();
-
-    // Set the default start positions. Node that later the default
-    // positions can still be overwritten.
-    float forwards_distance  = 1.5f;
-    float sidewards_distance = 3.0f;
-    float upwards_distance   = 0.1f;
-    int   karts_per_row      = 2;
-
-
     // Start building the scene graph
+    // Soccer field with navmesh requires it
+    // for two goal line to be drawn them in minimap
     std::string path = m_root + m_all_modes[mode_id].m_scene;
     XMLNode *root    = file_manager->createXMLTree(path);
 
@@ -1677,6 +1652,23 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
            <<"', aborting.";
         throw std::runtime_error(msg.str());
     }
+
+    // Load the graph only now: this function is called from world, after
+    // the race gui was created. The race gui is needed since it stores
+    // the information about the size of the texture to render the mini
+    // map to.
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+    else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
+        loadBattleGraph(*root);
+
+    ItemManager::create();
+
+    // Set the default start positions. Node that later the default
+    // positions can still be overwritten.
+    float forwards_distance  = 1.5f;
+    float sidewards_distance = 3.0f;
+    float upwards_distance   = 0.1f;
+    int   karts_per_row      = 2;
 
     const XMLNode *default_start = root->getNode("default-start");
     if (default_start)
@@ -1747,7 +1739,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
     }
 
-    loadObjects(root, path, model_def_loader, true, NULL, NULL);
+    loadObjects(root, path, model_def_loader, true, NULL, NULL, NULL);
 
     model_def_loader.cleanLibraryNodesAfterLoad();
 
@@ -1761,7 +1753,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // It's important to execute this BEFORE the code that creates the skycube,
     // otherwise the skycube node could be modified to have fog enabled, which
     // we don't want
-    if (m_use_fog && !UserConfigParams::m_camera_debug && !CVS->isGLSL())
+    if (m_use_fog && Camera::getDefaultCameraType()!=Camera::CM_TYPE_DEBUG && 
+        !CVS->isGLSL())
     {
         /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
            and end do not matter */
@@ -1936,7 +1929,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
 void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& model_def_loader,
                         bool create_lod_definitions, scene::ISceneNode* parent,
-                        TrackObject* parent_library)
+                        TrackObject* parent_library, RenderInfo* ri)
 {
     unsigned int start_position_counter = 0;
 
@@ -1950,7 +1943,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         if (name == "track" || name == "default-start") continue;
         if (name == "object" || name == "library")
         {
-            m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
+            m_track_object_manager->add(*node, parent, model_def_loader, parent_library, ri);
         }
         else if (name == "water")
         {
@@ -1994,7 +1987,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         {
             if (UserConfigParams::m_graphical_effects)
             {
-                m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
+                m_track_object_manager->add(*node, parent, model_def_loader, parent_library, NULL);
             }
         }
         else if (name == "sky-dome" || name == "sky-box" || name == "sky-color")
@@ -2003,11 +1996,11 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "end-cameras")
         {
-            Camera::readEndCamera(*node);
+            CameraEnd::readEndCamera(*node);
         }
         else if (name == "light")
         {
-            m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
+            m_track_object_manager->add(*node, parent, model_def_loader, parent_library, NULL);
         }
         else if (name == "weather")
         {

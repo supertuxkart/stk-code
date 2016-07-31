@@ -521,16 +521,14 @@ namespace UserConfigParams
     /** True if check structures should be debugged. */
     PARAM_PREFIX bool m_check_debug PARAM_DEFAULT( false );
 
-    /** Special debug camera: 0: normal camera;   1: being high over the kart;
-                              2: on ground level; 3: free first person camera; 
-                              4: straight behind kart */
-    PARAM_PREFIX int m_camera_debug PARAM_DEFAULT( false );
-
     /** True if physics debugging should be enabled. */
     PARAM_PREFIX bool m_physics_debug PARAM_DEFAULT( false );
 
     /** True if fps should be printed each frame. */
     PARAM_PREFIX bool m_fps_debug PARAM_DEFAULT(false);
+
+    /** True if arena (battle/soccer) ai profiling. */
+    PARAM_PREFIX bool m_arena_ai_stats PARAM_DEFAULT(false);
 
     /** True if slipstream debugging is activated. */
     PARAM_PREFIX bool m_slipstream_debug  PARAM_DEFAULT( false );

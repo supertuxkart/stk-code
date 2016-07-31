@@ -23,6 +23,8 @@
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/shaders.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
@@ -163,13 +165,21 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
 }   // createVAO
 
 // ----------------------------------------------------------------------------
-GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name)
+GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name,
+                          RenderInfo* render_info)
 {
     GLMesh result = {};
+    result.m_material = NULL;
+    result.m_render_info = NULL;
     if (!mb)
         return result;
     result.mb = mb;
-
+    if (render_info != NULL)
+    {
+        result.m_render_info = render_info;
+        result.m_material = material_manager->getMaterialFor(mb
+            ->getMaterial().getTexture(0), mb);
+    }
 #ifdef DEBUG
     result.debug_name = debug_name;
 #endif
@@ -344,6 +354,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
                       getUnicolorTexture(video::SColor(255, 127, 127, 127));
     }
     compressTexture(mesh.textures[i], is_srgb);
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[i])
@@ -355,6 +366,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
             glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
     }
+#endif
 }   // setTexture
 
 // ----------------------------------------------------------------------------
@@ -419,10 +431,10 @@ void initTexturesTransparent(GLMesh &mesh)
 {
     if (!mesh.textures[0])
     {
-        Log::fatal("STKMesh", "Missing texture for material transparent");
-        return;
+        mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
     }
     compressTexture(mesh.textures[0], true);
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[0])
@@ -434,4 +446,5 @@ void initTexturesTransparent(GLMesh &mesh)
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
     }
+#endif
 }   // initTexturesTransparent

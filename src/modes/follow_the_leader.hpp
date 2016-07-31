@@ -49,7 +49,6 @@ public:
     virtual void reset() OVERRIDE;
     virtual const std::string& getIdent() const OVERRIDE;
     virtual const btTransform &getStartTransform(int index) OVERRIDE;
-    virtual float getClockStartTime() const;
     virtual void getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     virtual void init() OVERRIDE;

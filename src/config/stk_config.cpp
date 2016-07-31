@@ -177,10 +177,13 @@ void STKConfig::init_defaults()
     m_ai_acceleration            = 1.0f;
     m_disable_steer_while_unskid = false;
     m_camera_follow_skid         = false;
+    m_cutscene_fov               = 0.61f;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
     m_switch_items.clear();
+    m_normal_ttf.clear();
+    m_digit_ttf.clear();
 }   // init_defaults
 
 //-----------------------------------------------------------------------------
@@ -264,6 +267,7 @@ void STKConfig::getAllData(const XMLNode * root)
         camera->get("fov-2", &m_camera_fov[1]);
         camera->get("fov-3", &m_camera_fov[2]);
         camera->get("fov-4", &m_camera_fov[3]);
+        camera->get("cutscene-fov", &m_cutscene_fov);
     }
 
     if (const XMLNode *music_node = root->getNode("music"))
@@ -350,15 +354,10 @@ void STKConfig::getAllData(const XMLNode * root)
 
     }
 
-    if(const XMLNode *font_node = root->getNode("font"))
+    if (const XMLNode *fonts_list = root->getNode("fonts-list"))
     {
-        font_node->get("default",          &m_font_default         );
-        font_node->get("default_fallback", &m_font_default_fallback);
-        font_node->get("cjk",              &m_font_cjk             );
-        font_node->get("ar",               &m_font_ar              );
-        font_node->get("bold",             &m_font_bold            );
-        font_node->get("bold_fallback",    &m_font_bold_fallback   );
-        font_node->get("digit",            &m_font_digit           );
+        fonts_list->get("normal-ttf", &m_normal_ttf);
+        fonts_list->get("digit-ttf",  &m_digit_ttf );
     }
 
     // Get the default KartProperties

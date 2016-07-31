@@ -22,7 +22,6 @@
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/scalable_font.hpp"
 #include "glwrap.hpp"
 #include <SMesh.h>
 #include <SMeshBuffer.h>
@@ -31,7 +30,7 @@
 
 using namespace irr;
 
-STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
+STKTextBillboard::STKTextBillboard(core::stringw text, FontWithFace* font,
     const video::SColor& color_top, const video::SColor& color_bottom,
     irr::scene::ISceneNode* parent,
     irr::scene::ISceneManager* mgr, irr::s32 id,
@@ -61,28 +60,28 @@ void STKTextBillboard::updateAbsolutePosition()
         AbsoluteTransformation = getRelativeTransformation();
 }
 
-scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFont* font)
+scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, FontWithFace* font)
 {
     core::dimension2du size = font->getDimension(text.c_str());
-    font->doDraw(text, core::rect<s32>(0, 0, size.Width, size.Height), video::SColor(255,255,255,255),
-        false, false, NULL, this);
+    font->render(text, core::rect<s32>(0, 0, size.Width, size.Height), video::SColor(255,255,255,255),
+        false, false, NULL, NULL, this);
 
-    const float scale = 0.03f;
+    const float scale = 0.02f;
 
     //scene::SMesh* mesh = new scene::SMesh();
     std::map<video::ITexture*, scene::SMeshBuffer*> buffers;
 
-    int max_x = 0;
-    int min_y = 0;
-    int max_y = 0;
+    float max_x = 0;
+    float min_y = 0;
+    float max_y = 0;
     for (unsigned int i = 0; i < m_chars.size(); i++)
     {
-        int char_x = m_chars[i].m_destRect.LowerRightCorner.X;
+        float char_x = m_chars[i].m_destRect.LowerRightCorner.X;
         if (char_x > max_x)
             max_x = char_x;
 
-        int char_min_y = m_chars[i].m_destRect.UpperLeftCorner.Y;
-        int char_max_y = m_chars[i].m_destRect.LowerRightCorner.Y;
+        float char_min_y = m_chars[i].m_destRect.UpperLeftCorner.Y;
+        float char_max_y = m_chars[i].m_destRect.LowerRightCorner.Y;
         if (char_min_y < min_y)
             min_y = char_min_y;
         if (char_max_y > min_y)
@@ -93,16 +92,16 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
 
     for (unsigned int i = 0; i < m_chars.size(); i++)
     {
-        core::vector3df char_pos((float) m_chars[i].m_destRect.UpperLeftCorner.X,
-            (float) m_chars[i].m_destRect.UpperLeftCorner.Y, 0);
+        core::vector3df char_pos(m_chars[i].m_destRect.UpperLeftCorner.X,
+            m_chars[i].m_destRect.UpperLeftCorner.Y, 0);
         char_pos *= scale;
 
-        core::vector3df char_pos2((float)m_chars[i].m_destRect.LowerRightCorner.X,
-            (float) m_chars[i].m_destRect.LowerRightCorner.Y, 0);
+        core::vector3df char_pos2(m_chars[i].m_destRect.LowerRightCorner.X,
+            m_chars[i].m_destRect.LowerRightCorner.Y, 0);
         char_pos2 *= scale;
 
-        core::dimension2di char_size_i = m_chars[i].m_destRect.getSize();
-        core::dimension2df char_size(char_size_i.Width*scale, char_size_i.Height*scale);
+        //core::dimension2di char_size_i = m_chars[i].m_destRect.getSize();
+        //core::dimension2df char_size(char_size_i.Width*scale, char_size_i.Height*scale);
 
         std::map<video::ITexture*, scene::SMeshBuffer*>::iterator map_itr = buffers.find(m_chars[i].m_texture);
         scene::SMeshBuffer* buffer;
@@ -111,6 +110,7 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
             buffer = new scene::SMeshBuffer();
             buffer->getMaterial().setTexture(0, m_chars[i].m_texture);
             buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            buffer->getMaterial().setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
             buffer->getMaterial().MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
             buffers[m_chars[i].m_texture] = buffer;
         }
@@ -184,7 +184,7 @@ void STKTextBillboard::updateNoGL()
 }
 
 void STKTextBillboard::collectChar(video::ITexture* texture,
-    const core::rect<s32>& destRect,
+    const core::rect<float>& destRect,
     const core::rect<s32>& sourceRect,
     const video::SColor* const colors)
 {

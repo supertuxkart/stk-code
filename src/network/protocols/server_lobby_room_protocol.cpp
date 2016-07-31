@@ -33,7 +33,7 @@
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
-#include "states_screens//networking_lobby.hpp"
+#include "states_screens/networking_lobby.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/waiting_for_others.hpp"
 #include "utils/log.hpp"
