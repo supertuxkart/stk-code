@@ -87,7 +87,7 @@ private:
 
     // ========================================================================
     /** Used to store rewind information for a given time for all rewind 
-    *  instances. 
+     *  instances. 
      *  Rewind information can either be a state (for example a kart would 
      *  have position, rotation, linear and angular velocity, ... as state),
      *  or an event (for a kart that would be pressing or releasing of a key).

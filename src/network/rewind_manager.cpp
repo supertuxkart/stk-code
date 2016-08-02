@@ -159,7 +159,7 @@ void RewindManager::insertRewindInfo(RewindInfo *ri)
         return;
 
     }
-    else   // is a states
+    else   // is a state
     {
         // If there are several infos for the same time t,
         // a state must be inserted first
@@ -175,12 +175,13 @@ void RewindManager::insertRewindInfo(RewindInfo *ri)
         m_rewind_info.insert(insert_point,ri);
         return;
     }
-}   // insertRewindData
+}   // insertRewindInfo
 
 // ----------------------------------------------------------------------------
 /** Returns the first (i.e. lowest) index i in m_rewind_info which fulfills 
- *  time(i) < target_time <= time(i+1)
- *  This is used to determine the starting point from which to rewind.
+ *  time(i) < target_time <= time(i+1) and is a state. This is the state
+ *  from which a rewind can start - all states for the karts will be well
+ *  defined.
  *  \param time Time for which an index is searched.
  *  \return Index in m_rewind_info after which to add rewind data.
  */
@@ -188,32 +189,45 @@ unsigned int RewindManager::findFirstIndex(float target_time) const
 {
     // For now do a linear search, even though m_rewind_info is sorted
     // I would expect that most insertions will be towards the (very)
-    // end of the list. Note that after finding an entry in a binary
-    // search, you stil have to do a linear search to find the last
-    // entry with the same time in order to minimise the later 
-    // necessary memory move.
+    // end of the list, since rewinds should be for short periods of time. 
+    // Note that after finding an entry in a binary search, you still
+    // have to do a linear search to find the last entry with the same
+    // time in order to minimise the later necessary memory move.
 
     // Gather some statistics about search for now:
 #ifdef REWIND_SEARCH_STATS
     m_count_of_searches++;
 #endif
     int index = m_rewind_info.size()-1;
+    int index_last_state = -1;
     while(index>=0)
     {
 #ifdef REWIND_SEARCH_STATS
         m_count_of_comparisons++;
 #endif
-        if(m_rewind_info[index]->getTime()<target_time &&
-            !m_rewind_info[index]->isTime()               )
-            return index;
+        if(m_rewind_info[index]->isState())
+        {
+            if(m_rewind_info[index]->getTime()<target_time)
+            {
+                return index;
+            }
+            index_last_state = index;
+        }
         index--;
     }
 
-    // For now just exit here
-    Log::fatal("RewindManager",
-               "Inserting before first state at %f, insert at %f.",
-               m_rewind_info[0]->getTime(), target_time);
-    return 0;  // avoid compiler warning
+    if(index_last_state<0)
+    {
+        Log::fatal("RewindManager",
+                   "Can't find any state when rewinding to %f - aborting.",
+                   target_time);
+    }
+
+    // Otherwise use the last found state - not much we can do in this case.
+    Log::error("RewindManager",
+               "Can't find state to rewind to for time %f, using %f.",
+               target_time, m_rewind_info[index_last_state]->getTime());
+    return index_last_state;  // avoid compiler warning
 }   // findFirstIndex
 
 // ----------------------------------------------------------------------------
@@ -244,6 +258,8 @@ void RewindManager::saveStates()
     float time = World::getWorld()->getTime();
     if(time - m_last_saved_state < m_state_frequency)
     {
+        // No full state necessary, add a dummy entry for the time
+        // which increases replay precision (same time step size)
         RewindInfo *ri = new RewindInfo();
         insertRewindInfo(ri);
         return;
