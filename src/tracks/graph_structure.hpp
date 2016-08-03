@@ -82,7 +82,6 @@ private:
                                       const video::SColor &color) const = 0;
     virtual void getGraphBoundingBox(Vec3 *min, Vec3 *max) const = 0;
     virtual const bool isNodeInvisible(int n) const = 0;
-    virtual const bool isNodeInvalid(int n) const = 0;
     virtual const bool hasLapLine() const = 0;
     virtual const bool differentNodeColor(int n, NodeColor* c) const = 0;
 

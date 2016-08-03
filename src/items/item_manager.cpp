@@ -567,7 +567,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
             j > NITRO_BIG ? Item::ITEM_NITRO_BIG :
             j > NITRO_SMALL ? Item::ITEM_NITRO_SMALL : Item::ITEM_BANANA);
         Vec3 loc = BattleGraph::get()
-            ->getPolyOfNode(used_location[i]).getCenter();
+            ->getQuadOfNode(used_location[i]).getCenter();
         Item* item = newItem(type, loc, Vec3(0, 1, 0));
         BattleGraph::get()->insertItems(item, used_location[i]);
     }
