@@ -25,6 +25,8 @@
 #include <assert.h>
 #include <vector>
 
+class RewindInfo;
+
 /** \ingroup network
  *  This class manages rewinding. It keeps track of:
  *  -  states for each rewindable object (for example a kart would have
@@ -84,113 +86,6 @@ private:
 
     /** A list of all objects that can be rewound. */
     AllRewinder m_all_rewinder;
-
-    // ========================================================================
-    /** Used to store rewind information for a given time for all rewind 
-     *  instances. 
-     *  Rewind information can either be a state (for example a kart would 
-     *  have position, rotation, linear and angular velocity, ... as state),
-     *  or an event (for a kart that would be pressing or releasing of a key).
-     *  State changes and events can be delivered in different frequencies,
-     *  and might be released (to save memory) differently: A state can be
-     *  reproduced from a previous state by replaying the simulation taking
-     *  all events into account.
-     */
-    class RewindInfo
-    {
-    private:
-        /** The different information types that can be saved. */
-        enum RewindInfoType {RIT_TIME, RIT_STATE, RIT_EVENT};
-
-        /** Pointer to the buffer which stores all states. */
-        char *m_buffer; 
-
-        /** Time when this state was taken. */
-        float m_time;
-
-        /** Time step size. */
-        float m_time_step;
-
-        /** The 'left over' time from the physics. */
-        float m_local_physics_time;
-
-        /** Type of this information. */
-        RewindInfoType m_type;
-
-        /** A confirmed event is one that was sent from the server. When
-         *  rewinding we have to start with a confirmed state for each 
-         *  object.  */
-        bool m_is_confirmed;
-
-        /** The Rewinder instance for which this data is. */
-        Rewinder *m_rewinder;
-    public:
-        RewindInfo(Rewinder *rewinder, char *buffer, 
-                   bool is_event, bool is_confirmed);
-        // --------------------------------------------------------------------
-        RewindInfo();
-        // --------------------------------------------------------------------
-        ~RewindInfo()
-        {
-            delete m_buffer;
-        }   // ~RewindInfo
-        // --------------------------------------------------------------------
-        /** Returns a pointer to the state buffer. */
-        char *getBuffer() const { return m_buffer; }
-        // --------------------------------------------------------------------
-        /** Returns the time at which this rewind state was saved. */
-        float getTime() const { return m_time; }
-        // --------------------------------------------------------------------
-        /** Time step size. */
-        float getTimeStep() const { return m_time_step; }
-        // --------------------------------------------------------------------
-        bool isEvent() const { return m_type==RIT_EVENT; }
-        // --------------------------------------------------------------------
-        bool isTime() const { return m_type==RIT_TIME; }
-        // --------------------------------------------------------------------
-        bool isState() const { return m_type==RIT_STATE; }
-        // --------------------------------------------------------------------
-        /** Returns if this state is confirmed. */
-        bool isConfirmed() const { return m_is_confirmed; }
-        // --------------------------------------------------------------------
-        /** Returns the left-over physics time. */
-        float getLocalPhysicsTime() const { return m_local_physics_time; }
-        // --------------------------------------------------------------------
-        /** Called when going back in time to undo any rewind information. 
-         *  It calls either undoEvent or undoState in the rewinder. */
-        void undo()
-        {
-            if(m_type==RIT_EVENT)
-                m_rewinder->undoEvent(m_buffer);
-            else if(m_type==RIT_STATE)
-                m_rewinder->undoState(m_buffer);
-            // time evnet can be ignored.
-        }   // undoEvent
-        // --------------------------------------------------------------------
-        /** Rewinds to this state. This is called while going forwards in time
-         *  again to reach current time. If the info is a state, it will 
-         *  call rewindToState(char *) if the state is a confirmed state, or
-         *  rewindReplace(char*) in order to discard the old stored data,
-         *  and replace it with the new state at that time. In case of an 
-         *  event, rewindEvent(char*) is called.
-         */
-        void rewind()
-        {
-            if(m_type==RIT_EVENT)
-                m_rewinder->rewindToEvent(m_buffer);
-            else if(m_type==RIT_STATE)
-            {
-                if(m_is_confirmed)
-                    m_rewinder->rewindToState(m_buffer);
-                else
-                {
-                    // TODO
-                    // Handle replacing of stored states.
-                }
-            }   // time information can be ignored
-        }   // rewind
-    };   // RewindInfo
-    // ========================================================================
 
     /** Pointer to all saved states. */
     typedef std::vector<RewindInfo*> AllRewindInfo;
