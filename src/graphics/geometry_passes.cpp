@@ -185,6 +185,7 @@ void AbstractGeometryPasses::setFirstPassRenderTargets(const std::vector<GLuint>
 {    
     m_prefilled_textures = prefilled_textures;
 
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         m_textures_handles.clear();
@@ -197,7 +198,8 @@ void AbstractGeometryPasses::setFirstPassRenderTargets(const std::vector<GLuint>
                 glMakeTextureHandleResidentARB(handle);
             m_textures_handles.push_back(handle);
         }
-    }    
+    }
+#endif // !defined(USE_GLES2)
 }
 
 // ----------------------------------------------------------------------------

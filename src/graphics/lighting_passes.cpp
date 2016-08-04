@@ -554,6 +554,7 @@ void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_mat
                                                 GLuint depth_stencil_texture)
 {
     //Radiance hints
+#if !defined(USE_GLES2)
     ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
     glDisable(GL_BLEND);
     radiance_hint_framebuffer.bind();
@@ -592,7 +593,8 @@ void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_mat
                           irr_driver->getSunColor());
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
     }
-    
+#endif //!defined(USE_GLES2)
+
     //Global illumination
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
