@@ -172,7 +172,7 @@ public:
     void reset();
     void saveStates();
     void rewindTo(float target_time);
-    void addEvent(Rewinder *rewinder, char *buffer);
+    void addEvent(Rewinder *rewinder, BareNetworkString *buffer);
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 

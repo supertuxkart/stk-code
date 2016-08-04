@@ -38,8 +38,8 @@ RewindInfoTime::RewindInfoTime(float time)
 }   // RewindInfoTime
 
 // ============================================================================
-RewindInfoState::RewindInfoState(float time, Rewinder *rewinder, char *buffer,
-                                 bool is_confirmed)
+RewindInfoState::RewindInfoState(float time, Rewinder *rewinder, 
+                                 BareNetworkString *buffer, bool is_confirmed)
     : RewindInfoRewinder(time, rewinder, buffer, is_confirmed)
 {
     m_local_physics_time = World::getWorld()->getPhysics()->getPhysicsWorld()
@@ -47,8 +47,8 @@ RewindInfoState::RewindInfoState(float time, Rewinder *rewinder, char *buffer,
 }   // RewindInfoState
 
 // ============================================================================
-RewindInfoEvent::RewindInfoEvent(float time, Rewinder *rewinder, char *buffer,
-                                 bool is_confirmed)
+RewindInfoEvent::RewindInfoEvent(float time, Rewinder *rewinder,
+                                 BareNetworkString *buffer, bool is_confirmed)
     : RewindInfoRewinder(time, rewinder, buffer, is_confirmed)
 {
 }   // RewindInfoEvent

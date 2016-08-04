@@ -138,6 +138,9 @@ public:
     }   // BareNetworkString
 
     // ------------------------------------------------------------------------
+    /** Allows to read a buffer from the beginning again. */
+    void reset() { m_current_offset = 0; }
+    // ------------------------------------------------------------------------
     BareNetworkString& encodeString(const std::string &value);
     BareNetworkString& encodeString(const irr::core::stringw &value);
     int decodeString(std::string *out) const;

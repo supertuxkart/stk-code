@@ -19,6 +19,8 @@
 #ifndef HEADER_REWINDER_HPP
 #define HEADER_REWINDER_HPP
 
+class BareNetworkString;
+
 class Rewinder
 {
 private:
@@ -32,31 +34,31 @@ public:
      *  \param[out] buffer The address of the memory buffer with the state.
      *  \return Size of the buffer, or -1 in case of an error.
      */
-    virtual int getState(char **buffer) const  = 0;
+    virtual BareNetworkString* getState() const  = 0;
 
     /** Called when an event needs to be undone. This is called while going
      *  backwards for rewinding - all stored events will get an 'undo' call.
      *  A dummy implementation is provided which just ignores this.
      */
-    virtual void undoEvent(char *buffer) = 0;
+    virtual void undoEvent(BareNetworkString *buffer) = 0;
 
     /** Called when an event needs to be replayed. This is called during 
      *  rewind, i.e. when going forward in time again.
      */
-    virtual void rewindToEvent(char *buffer) = 0;
+    virtual void rewindToEvent(BareNetworkString *buffer) = 0;
 
     /** Called when a state needs to be replayed. This is called during 
      *  rewind, i.e. when going forward in time again, and only for confirmed
      *  states.
      */
-    virtual void rewindToState(char *buffer) = 0;
+    virtual void rewindToState(BareNetworkString *buffer) = 0;
 
    /** Undo the effects of the given state, but do not rewind to that 
     *  state (which is done by rewindTo). This is called while going
     *  backwards for rewinding - all stored events will get an 'undo' call.
     *  Provided here a dummy implementation that just ignores the state.
     */
-   virtual void undoState(char *p) = 0;
+   virtual void undoState(BareNetworkString *buffer) = 0;
 
    // -------------------------------------------------------------------------
    /** True if this rewinder can be destroyed. Karts can not be destroyed,

@@ -18,8 +18,10 @@
 
 #include "karts/kart_rewinder.hpp"
 #include "karts/abstract_kart.hpp"
+#include "items/attachment.hpp"
 #include "modes/world.hpp"
 #include "network/rewind_manager.hpp"
+#include "network/network_string.hpp"
 #include "utils/vec3.hpp"
 
 #include <string.h>
@@ -37,44 +39,49 @@ KartRewinder::KartRewinder(AbstractKart *kart) : Rewinder(/*can_be_destroyed*/ f
  *  \param[out] buffer  Address of the memory buffer.
  *  \returns    Size of allocated memory, or -1 in case of an error.
  */
-int KartRewinder::getState(char **buffer) const
+BareNetworkString* KartRewinder::getState() const
 {
     const int MEMSIZE = 13*sizeof(float) + 9;
 
-    *buffer = new char[MEMSIZE];
-    float* p = (float*)*buffer;
-    if(!buffer)
-    {
-        Log::error("KartRewinder", "Can not allocate %d bytes.", MEMSIZE);
-        return -1;
-    }
-
+    BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
     const btRigidBody *body = m_kart->getBody();
 
     const btTransform &t = body->getWorldTransform();
+    buffer->add(t.getOrigin());
     btQuaternion q = t.getRotation();
-    memcpy(p+ 0, t.getOrigin(), 3*sizeof(float));
-    memcpy(p+ 3, &q, 4*sizeof(float));
-    memcpy(p+ 7, body->getLinearVelocity(), 3*sizeof(float));
-    memcpy(p+10, body->getAngularVelocity(), 3*sizeof(float));
-    m_kart->getControls().copyToMemory((char*)(p+13));
-    return MEMSIZE;
+    buffer->add(q);
+    buffer->add(body->getLinearVelocity());
+    buffer->add(body->getAngularVelocity());
+
+    // Attachment
+    Attachment::AttachmentType atype = m_kart->getAttachment()->getType();
+    //buffer->addUInt8(uint8_t(atype));
+    if(atype!=Attachment::ATTACH_NOTHING)
+    {
+        //buffer->addFloat(m_kart->getAttachment()->getTimeLeft());
+    }
+
+    // Steering information
+    m_kart->getControls().copyToBuffer(buffer);
+
+    return buffer;
 }   // getState
 
 // ----------------------------------------------------------------------------
 /** Actually rewind to the specified state. */
-void KartRewinder::rewindToState(char *buffer)
+void KartRewinder::rewindToState(BareNetworkString *buffer)
 {
+    buffer->reset();   // make sure the buffer is read from the beginning
     btTransform t;
-    float *p = (float*)buffer;
-    t.setOrigin(*(btVector3*)p);
-    t.setRotation(*(btQuaternion*)(p+3));
+    t.setOrigin(buffer->getVec3());
+    t.setRotation(buffer->getQuat());
     btRigidBody *body = m_kart->getBody();
     body->proceedToTransform(t);
-    body->setLinearVelocity(*(btVector3*)(p+7));
-    body->setAngularVelocity(*(btVector3*)(p+10));
 
-    m_kart->getControls().setFromMemory((char*)(p+13));
+    body->setLinearVelocity(buffer->getVec3());
+    body->setAngularVelocity(buffer->getVec3());
+
+    m_kart->getControls().setFromBuffer(buffer);
 
     return;
 }   // rewindToState
@@ -85,21 +92,22 @@ void KartRewinder::rewindToState(char *buffer)
  */
 void KartRewinder::update()
 {
-    if(m_kart->getControls() == m_previous_control)
+    if(m_kart->getControls() == m_previous_control ||
+        RewindManager::get()->isRewinding())
         return;
     m_previous_control = m_kart->getControls();
 
-    char *buffer = new char[m_previous_control.getLength()];
-    m_previous_control.copyToMemory(buffer);
+    BareNetworkString *buffer = new BareNetworkString(m_previous_control.getLength());
+    m_previous_control.copyToBuffer(buffer);
 
     // The rewind manager will free the memory once it's not needed anymore
     RewindManager::get()->addEvent(this, buffer);
 }   // update
 
 // ----------------------------------------------------------------------------
-void KartRewinder::rewindToEvent(char *p)
+void KartRewinder::rewindToEvent(BareNetworkString *buffer)
 {
-    m_kart->getControls().setFromMemory(p);
+    m_kart->getControls().setFromBuffer(buffer);
 };   // rewindToEvent
 
 

@@ -19,25 +19,30 @@
 #ifndef HEADER_REWIND_INFO_HPP
 #define HEADER_REWIND_INFO_HPP
 
+#include "network/network_string.hpp"
 #include "network/rewinder.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
 #include <assert.h>
 #include <vector>
 
-    /** Used to store rewind information for a given time for all rewind
-     *  instances.
-     *  Rewind information can either be a state (for example a kart would
-     *  have position, rotation, linear and angular velocity, ... as state),
-     *  or an event (for a kart that would be pressing or releasing of a key).
-     *  State changes and events can be delivered in different frequencies,
-     *  and might be released (to save memory) differently: A state can be
-     *  reproduced from a previous state by replaying the simulation taking
-     *  all events into account.
-     */
+/** Used to store rewind information for a given time for all rewind
+ *  instances.
+ *  Rewind information can either be a state (for example a kart would
+ *  have position, rotation, linear and angular velocity, ... as state),
+ *  or an event (for a kart that would be pressing or releasing of a key).
+ *  State changes and events can be delivered in different frequencies,
+ *  and might be released (to save memory) differently: A state can be
+ *  reproduced from a previous state by replaying the simulation taking
+ *  all events into account.
+ */
+
 class RewindInfo
 {
 private:
+    LEAK_CHECK();
+
     /** Time when this state was taken. */
     float m_time;
 
@@ -77,30 +82,35 @@ public:
 };   // RewindInfo
 
 // ============================================================================
-/** A rewind info abstract class that keeps track of a rewinder object.
+/** A rewind info abstract class that keeps track of a rewinder object, and
+ *  has a BareNetworkString buffer which is used to store a state or event.
  */
 class RewindInfoRewinder : public RewindInfo
 {
+private:
+    /** Pointer to the buffer which stores all states. */
+    BareNetworkString *m_buffer;
+
 protected:
     /** The Rewinder instance for which this data is. */
     Rewinder *m_rewinder;
 
-    /** Pointer to the buffer which stores all states. */
-    char *m_buffer;
-
 public:
-    RewindInfoRewinder(float time, Rewinder *rewinder, char *buffer,
-                       bool is_confirmed)
+    RewindInfoRewinder(float time, Rewinder *rewinder,
+                       BareNetworkString *buffer, bool is_confirmed)
         : RewindInfo(time, is_confirmed)
     {
         m_rewinder = rewinder;
         m_buffer = buffer;
     }   // RewindInfoRewinder
     // ------------------------------------------------------------------------
-    ~RewindInfoRewinder()
+    virtual ~RewindInfoRewinder()
     {
+        delete m_buffer;
     }   // ~RewindInfoRewinder
-
+    // ------------------------------------------------------------------------
+    /** Returns a pointer to the state buffer. */
+    BareNetworkString *getBuffer() const { return m_buffer; }
 };   // RewindInfoRewinder
 
 // ============================================================================
@@ -131,16 +141,13 @@ private:
     float m_local_physics_time;
 
 public:
-             RewindInfoState(float time, Rewinder *rewinder, char *buffer,
-                             bool is_confirmed);
+             RewindInfoState(float time, Rewinder *rewinder, 
+                             BareNetworkString *buffer, bool is_confirmed);
     virtual ~RewindInfoState() {};
 
     // ------------------------------------------------------------------------
     /** Returns the left-over physics time. */
     float getLocalPhysicsTime() const { return m_local_physics_time; }
-    // ------------------------------------------------------------------------
-    /** Returns a pointer to the state buffer. */
-    char *getBuffer() const { return m_buffer; }
     // ------------------------------------------------------------------------
     virtual bool isState() const { return true; }
     // ------------------------------------------------------------------------
@@ -148,16 +155,16 @@ public:
      *  It calls undoState in the rewinder. */
     virtual void undo()
     {
-        m_rewinder->undoState(m_buffer);
+        m_rewinder->undoState(getBuffer());
     }   // undoEvent
     // ------------------------------------------------------------------------
     /** Rewinds to this state. This is called while going forwards in time
-     *  again to reach current time. It will call rewindToState(char *)
+     *  again to reach current time. It will call rewindToState().
      *  if the state is a confirmed state. */
     virtual void rewind()
     {
         if (isConfirmed())
-            m_rewinder->rewindToState(m_buffer);
+            m_rewinder->rewindToState(getBuffer());
         else
         {
             // TODO
@@ -170,13 +177,10 @@ public:
 class RewindInfoEvent : public RewindInfoRewinder
 {
 public:
-             RewindInfoEvent(float time, Rewinder *rewinder, char *buffer,
-                             bool is_confirmed);
+             RewindInfoEvent(float time, Rewinder *rewinder,
+                             BareNetworkString *buffer, bool is_confirmed);
     virtual ~RewindInfoEvent() {}
 
-    // ------------------------------------------------------------------------
-    /** Returns a pointer to the state buffer. */
-    char *getBuffer() const { return m_buffer; }
     // ------------------------------------------------------------------------
     virtual bool isEvent() const { return true; }
     // ------------------------------------------------------------------------
@@ -184,15 +188,15 @@ public:
     *  It calls undoEvent in the rewinder. */
     virtual void undo()
     {
-        m_rewinder->undoEvent(m_buffer);
+        m_rewinder->undoEvent(getBuffer());
     }   // undo
     // ------------------------------------------------------------------------
     /** This is called while going forwards in time again to reach current
-     *  time. Calls rewindEvent(char*).
+     *  time. Calls rewindEvent().
      */
     virtual void rewind()
     {
-        m_rewinder->rewindToEvent(m_buffer);
+        m_rewinder->rewindToEvent(getBuffer());
     }   // rewind
 };   // class RewindIndoEvent
 

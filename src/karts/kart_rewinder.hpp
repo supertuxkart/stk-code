@@ -25,6 +25,7 @@
 #include "utils/cpp2011.hpp"
 
 class AbstractKart;
+class BareNetworkString;
 
 class KartRewinder : public Rewinder
 {
@@ -37,17 +38,17 @@ private:
 public:
 	             KartRewinder(AbstractKart *kart);
    virtual      ~KartRewinder() {};
-   virtual int   getState(char **buffer) const;
-   virtual void  rewindToState(char *p) OVERRIDE;
-   virtual void  rewindToEvent(char *p) OVERRIDE;
+   virtual BareNetworkString* getState() const;
+   virtual void  rewindToState(BareNetworkString *p) OVERRIDE;
+   virtual void  rewindToEvent(BareNetworkString *p) OVERRIDE;
 
    // -------------------------------------------------------------------------
-   virtual void  undoState(char *p) OVERRIDE
+   virtual void  undoState(BareNetworkString *p) OVERRIDE
    {
    };   // undoState
 
    // -------------------------------------------------------------------------
-   virtual void  undoEvent(char *p) OVERRIDE
+   virtual void  undoEvent(BareNetworkString *p) OVERRIDE
    {
    };   // undoEvent
 

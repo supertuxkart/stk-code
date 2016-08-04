@@ -19,6 +19,7 @@
 #ifndef HEADER_KART_CONTROL_HPP
 #define HEADER_KART_CONTROL_HPP
 
+#include "network/network_string.hpp"
 
 #include <string.h>
 
@@ -85,20 +86,20 @@ public:
     static int getLength() { return 9; }
     // ------------------------------------------------------------------------
     /** Copies the important data from this objects into a memory buffer. */
-    void copyToMemory(char *buffer)
+    void copyToBuffer(BareNetworkString *buffer)
     {
-        memcpy(buffer,               &m_steer, sizeof(float));
-        memcpy(buffer+sizeof(float), &m_accel, sizeof(float));
-        buffer[2*sizeof(float)] = getButtonsCompressed();
-    }   // copyToMemory
+        buffer->add(m_steer);
+        buffer->add(m_accel);
+        buffer->addChar(getButtonsCompressed());
+    }   // copyToBuffer
 
     // ------------------------------------------------------------------------
     /** Restores this object from a previously saved memory  buffer. */
-    void setFromMemory(char *buffer)
+    void setFromBuffer(BareNetworkString *buffer)
     {
-        memcpy(&m_steer,     buffer                , sizeof(float));
-        memcpy(&m_accel,     buffer+  sizeof(float), sizeof(float));
-        setButtonsCompressed(buffer[2*sizeof(float)]              );
+        m_steer = buffer->getFloat();
+        m_accel = buffer->getFloat();
+        setButtonsCompressed(buffer->getUInt8());
     }   // setFromMemory
 
     // ------------------------------------------------------------------------

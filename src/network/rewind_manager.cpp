@@ -20,6 +20,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "modes/world.hpp"
+#include "network/network_string.hpp"
 #include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
 #include "physics/physics.hpp"
@@ -64,6 +65,7 @@ RewindManager::~RewindManager()
     for(unsigned int i=0; i<m_rewind_info.size(); i++)
     {
         delete m_rewind_info[i];
+        m_rewind_info[i] = NULL;
     }
     m_rewind_info.clear();
 }   // ~RewindManager
@@ -208,7 +210,7 @@ unsigned int RewindManager::findFirstIndex(float target_time) const
  *  \param time Time at which the event was recorded.
  *  \param buffer Pointer to the event data. 
  */
-void RewindManager::addEvent(Rewinder *rewinder, char *buffer)
+void RewindManager::addEvent(Rewinder *rewinder, BareNetworkString *buffer)
 {
     if(m_is_rewinding) return;
     RewindInfo *ri = new RewindInfoEvent(getCurrentTime(), rewinder,
@@ -240,17 +242,18 @@ void RewindManager::saveStates()
     // For now always create a snapshot.
     for(unsigned int i=0; i<m_all_rewinder.size(); i++)
     {
-        char *p;
-        int size = m_all_rewinder[i]->getState(&p);
-        if(size>=0)
+        BareNetworkString *buffer = m_all_rewinder[i]->getState();
+        if(buffer && buffer->size()>=0)
         {
-            m_overall_state_size += size;
+            m_overall_state_size += buffer->size();
             RewindInfo *ri = new RewindInfoState(getCurrentTime(),
-                                                 m_all_rewinder[i], p,
+                                                 m_all_rewinder[i], buffer,
                                                  /*is_confirmed*/true);
             assert(ri);
             insertRewindInfo(ri);
         }   // size >= 0
+        else
+            delete buffer;   // NULL or 0 byte buffer
     }
 
     Log::verbose("RewindManager", "%f allocated %ld bytes search %d/%d=%f",
@@ -367,7 +370,7 @@ float RewindManager::determineTimeStepSize(int next_state, float end_time)
 {
     // If there is a next state (which is known to have a different time)
     // use the time difference to determine the time step size.
-    if(next_state < m_rewind_info.size())
+    if(next_state < (int)m_rewind_info.size())
         return m_rewind_info[next_state]->getTime() - World::getWorld()->getTime();
 
     // Otherwise, i.e. we are rewinding the last state/event, take the
