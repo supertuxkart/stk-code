@@ -228,6 +228,12 @@ public:
     }   // operator+=
 
     // ------------------------------------------------------------------------
+    /** Adds a floating point number */
+    BareNetworkString& add(float f)
+    {
+        return addFloat(f);
+    }   // add
+        // ------------------------------------------------------------------------
     /** Adds the xyz components of a Vec3 to the string. */
     BareNetworkString& add(const Vec3 &xyz)
     {
