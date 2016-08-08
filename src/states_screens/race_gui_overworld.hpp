@@ -101,6 +101,11 @@ private:
 
     int              m_trophy_points_width;
 
+    /** The latest challenge approached by the kart */
+    const ChallengeData* m_active_challenge;
+
+    core::stringw    m_challenge_description;
+
     /** The current challenge over which the mouse is hovering. */
     const OverworldChallenge *m_current_challenge;
 

@@ -188,6 +188,7 @@ void TriangleMesh::createPhysicalBody(btCollisionObject::CollisionFlags flags,
     m_motion_state = new btDefaultMotionState(startTransform);
     btRigidBody::btRigidBodyConstructionInfo info(0.0f, m_motion_state,
                                                   m_collision_shape);
+    info.m_restitution = 0.8f;
     m_body=new btRigidBody(info);
     World::getWorld()->getPhysics()->addBody(m_body);
 
