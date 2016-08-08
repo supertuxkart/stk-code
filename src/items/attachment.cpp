@@ -217,6 +217,9 @@ void Attachment::clear()
 }   // clear
 
 // -----------------------------------------------------------------------------
+/** Saves the attachment state. Called as part of the kart saving its state.
+ *  \param buffer The kart rewinder's state buffer.
+ */
 void Attachment::saveState(BareNetworkString *buffer)
 {
     // We use bit 7 to indicate if a previous owner is defined for a bomb
@@ -235,6 +238,9 @@ void Attachment::saveState(BareNetworkString *buffer)
 }   // saveState
 
 // -----------------------------------------------------------------------------
+/** Called from the kart rewinder when resetting to a certain state.
+ *  \param buffer The kart rewinder's buffer with the attachment state next.
+ */
 void Attachment::rewindTo(BareNetworkString *buffer)
 {
     uint8_t type = buffer->getUInt8();
