@@ -528,21 +528,21 @@ void ArenaAI::handleArenaItems(const float dt)
         {
             Attachment::AttachmentType type = m_kart->getAttachment()->getType();
             // Don't use shield when we have a swatter.
-            if (type == Attachment::ATTACH_SWATTER       ||
-                type == Attachment::ATTACH_NOLOKS_SWATTER)
+            if (type == Attachment::ATTACH_SWATTER)
                 break;
 
             // Check if a flyable (cake, ...) is close or a kart nearby
             // has a swatter attachment. If so, use bubblegum
             // as shield
-            if ((!m_kart->isShielded() &&
-                projectile_manager->projectileIsClose(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius)) ||
-               (m_closest_kart_pos_data.distance < 15.0f &&
-               ((m_closest_kart->getAttachment()->
-                getType() == Attachment::ATTACH_SWATTER) ||
-               (m_closest_kart->getAttachment()->
-                getType() == Attachment::ATTACH_NOLOKS_SWATTER))))
+            if ( (!m_kart->isShielded() &&
+                  projectile_manager->projectileIsClose(m_kart,
+                                      m_ai_properties->m_shield_incoming_radius) 
+                 ) ||
+                 (m_closest_kart_pos_data.distance < 15.0f &&
+                  m_closest_kart->getAttachment()->getType() == 
+                        Attachment::ATTACH_SWATTER                
+                 )
+               )
             {
                 m_controls->m_fire      = true;
                 m_controls->m_look_back = false;

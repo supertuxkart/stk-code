@@ -106,7 +106,7 @@ void Attachment::set(AttachmentType type, float time,
 {
     bool was_bomb = (m_type == ATTACH_BOMB);
     scene::ISceneNode* bomb_scene_node = NULL;
-    if (was_bomb && type == ATTACH_SWATTER) //What about  ATTACH_NOLOKS_SWATTER ??
+    if (was_bomb && type == ATTACH_SWATTER)
     {
         // let's keep the bomb node, and create a new one for
         // the new attachment
@@ -495,8 +495,12 @@ void Attachment::update(float dt)
     case ATTACH_MAX:
         break;
     case ATTACH_SWATTER:
-    case ATTACH_NOLOKS_SWATTER:
         // Everything is done in the plugin.
+        break;
+    case ATTACH_NOLOKS_SWATTER:
+        // Should never be called, this symbols is only used as an index for
+        // the model, Nolok's attachment type is ATTACH_SWATTER
+        assert(false);
         break;
     case ATTACH_BOMB:
 

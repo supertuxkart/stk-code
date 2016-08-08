@@ -1193,8 +1193,7 @@ void SkiddingAI::handleItems(const float dt)
         {
             Attachment::AttachmentType type = m_kart->getAttachment()->getType();
             // Don't use shield when we have a swatter.
-            if( type == Attachment::ATTACH_SWATTER       ||
-                type == Attachment::ATTACH_NOLOKS_SWATTER  )
+            if( type == Attachment::ATTACH_SWATTER)
                 break;
 
             // Check if a flyable (cake, ...) is close. If so, use bubblegum
