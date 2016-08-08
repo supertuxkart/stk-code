@@ -26,10 +26,8 @@
 #include "tracks/graph_structure.hpp"
 #include "tracks/navmesh.hpp"
 
-class GraphStructure;
 class Item;
 class ItemManager;
-class Navmesh;
 class XMLNode;
 
 /**
@@ -53,6 +51,8 @@ private:
     /** The matrix that is used to store computed shortest paths */
     std::vector< std::vector< int > > m_parent_poly;
 
+    std::vector< std::vector< int > > m_nearby_quads;
+
     /** Stores the name of the file containing the NavMesh data */
     std::string              m_navmesh_file;
 
@@ -64,23 +64,19 @@ private:
     void buildGraph(NavMesh*);
     void computeFloydWarshall();
     void loadGoalNodes(const XMLNode *node);
+    void sortNearbyQuad();
 
     BattleGraph(const std::string &navmesh_file_name, const XMLNode *node=NULL);
     ~BattleGraph(void);
 
     // ------------------------------------------------------------------------
     virtual void set3DVerticesOfGraph(int i, video::S3DVertex *v,
-                                      const video::SColor &color) const
-                                { NavMesh::get()->setVertices(i, v, color); }
+                                      const video::SColor &color) const;
     // ------------------------------------------------------------------------
     virtual void getGraphBoundingBox(Vec3 *min, Vec3 *max) const
                                 { NavMesh::get()->getBoundingBox(min, max); }
     // ------------------------------------------------------------------------
-    virtual const bool isNodeInvisible(int n) const
-                                                            { return false; }
-    // ------------------------------------------------------------------------
-    virtual const bool isNodeInvalid(int n) const
-     { return (NavMesh::get()->getNavPoly(n).getVerticesIndex()).size()!=4; }
+    virtual const bool isNodeInvisible(int n) const;
     // ------------------------------------------------------------------------
     virtual const bool hasLapLine() const
                                                             { return false; }
@@ -94,15 +90,16 @@ public:
     static const int UNKNOWN_POLY;
 
     void              findItemsOnGraphNodes();
+    // ----------------------------------------------------------------------
     int               pointToNode(const int cur_node,
                                   const Vec3& cur_point,
                                   bool ignore_vertical) const;
+    // ------------------------------------------------------------------------
     static void unitTesting();
-
-
+    // ------------------------------------------------------------------------
     /** Returns the one instance of this object. */
     static BattleGraph *get() { return m_battle_graph; }
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Asserts that no BattleGraph instance exists. Then
     *    creates a BattleGraph instance. */
     static void create(const std::string &navmesh_file_name,
@@ -110,9 +107,8 @@ public:
     {
         assert(m_battle_graph==NULL);
         m_battle_graph = new BattleGraph(navmesh_file_name, node);
-
     } // create
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Cleans up the BattleGraph instance if it exists */
     static void destroy()
     {
@@ -122,14 +118,13 @@ public:
             m_battle_graph = NULL;
         }
     } // destroy
-
-    // ----------------------------------------------------------------------
-    /** Returns the number of nodes in the BattleGraph (equal to the number of
-    *    polygons in the NavMesh */
+    // ------------------------------------------------------------------------
+    /** Returns the number of nodes in the BattleGraph (equal to the number
+     *  of quads in the NavMesh
+     */
     virtual const unsigned int getNumNodes() const
-                                         { return m_distance_matrix.size(); }
-
-    // ----------------------------------------------------------------------
+                               { return NavMesh::get()->getNumberOfQuads(); }
+    // ------------------------------------------------------------------------
     /** Returns the distance between any two nodes */
     float getDistance(int from, int to) const
     {
@@ -139,25 +134,32 @@ public:
         return m_distance_matrix[from][to];
     }
     // ------------------------------------------------------------------------
-    /** Returns the NavPoly corresponding to the i-th node of the BattleGraph */
-    const NavPoly&    getPolyOfNode(int i) const
-                                    { return NavMesh::get()->getNavPoly(i); }
-
-    // ------------------------------------------------------------------------
-    /** Returns true if the NavPoly lies near the edge. */
-    bool              isNearEdge(int i) const
-                   { return NavMesh::get()->getNavPoly(i).isPolyNearEdge(); }
-    // ------------------------------------------------------------------------
     /** Returns the next polygon on the shortest path from i to j.
-     *    Note: m_parent_poly[j][i] contains the parent of i on path from j to i,
-     *    which is the next node on the path from i to j (undirected graph) */
-    const int         getNextShortestPathPoly(int i, int j) const;
-
+     *  Note: m_parent_poly[j][i] contains the parent of i on path from j to i,
+     *  which is the next node on the path from i to j (undirected graph)
+     */
+    int getNextShortestPathPoly(int i, int j) const
+    {
+        if (i == BattleGraph::UNKNOWN_POLY || j == BattleGraph::UNKNOWN_POLY)
+            return BattleGraph::UNKNOWN_POLY;
+        return m_parent_poly[j][i];
+    }
+    // ------------------------------------------------------------------------
     std::vector<std::pair<const Item*, int>>& getItemList()
                                                  { return m_items_on_graph; }
     // ------------------------------------------------------------------------
     void              insertItems(Item* item, int polygon)
                { m_items_on_graph.push_back(std::make_pair(item, polygon)); }
+    // ------------------------------------------------------------------------
+    /** Returns the quad that belongs to a node. */
+    const Quad& getQuadOfNode(unsigned int n) const
+                                       { return NavMesh::get()->getQuad(n); }
+    // ------------------------------------------------------------------------
+    /** Returns true if the quad lies near the edge, which means it doesn't
+     *  have 4 adjacent quads.
+     */
+    bool isNearEdge(unsigned int n) const
+                  { return NavMesh::get()->getAdjacentQuads(n).size() != 4; }
     // ------------------------------------------------------------------------
 };    //BattleGraph
 
