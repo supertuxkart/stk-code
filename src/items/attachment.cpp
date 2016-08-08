@@ -239,24 +239,36 @@ void Attachment::rewindTo(BareNetworkString *buffer)
 {
     uint8_t type = buffer->getUInt8();
     AttachmentType new_type = AttachmentType(type & 0x7f);   // mask out bit 7
+
+    // If there is no attachment, clear the attachment if necessary and exit
     if(new_type==ATTACH_NOTHING)
     {
-        clear();
+        if(m_type!=new_type) clear();
+        return;
+    }
+
+    float time_left = buffer->getFloat();
+
+    // Attaching an object can be expensive (loading new models, ...)
+    // so avoid doing this if there is no change in attachment type
+    if(new_type == m_type)
+    {
+        setTimeLeft(time_left);
+        return;
+    }
+
+    // Now it is a new attachment:
+
+    if (type == (ATTACH_BOMB | 0x80))   // we have previous owner information
+    {
+        uint8_t kart_id = buffer->getUInt8();
+        m_previous_owner = World::getWorld()->getKart(kart_id);
     }
     else
     {
-        float time_left = buffer->getFloat();
-        if(type== (ATTACH_BOMB | 0x80) )
-        {
-            uint8_t kart_id = buffer->getUInt8();
-            m_previous_owner = World::getWorld()->getKart(kart_id);
-        }
-        else
-        {
-            m_previous_owner = NULL;
-        }
-        set(new_type, time_left, m_previous_owner);
-    }   // if something is attached
+        m_previous_owner = NULL;
+    }
+    set(new_type, time_left, m_previous_owner);
 }   // rewindTo
 
 // -----------------------------------------------------------------------------
