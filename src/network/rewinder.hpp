@@ -34,7 +34,7 @@ public:
      *  \param[out] buffer The address of the memory buffer with the state.
      *  \return Size of the buffer, or -1 in case of an error.
      */
-    virtual BareNetworkString* getState() const  = 0;
+    virtual BareNetworkString* saveState() const  = 0;
 
     /** Called when an event needs to be undone. This is called while going
      *  backwards for rewinding - all stored events will get an 'undo' call.

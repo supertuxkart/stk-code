@@ -39,13 +39,15 @@ KartRewinder::KartRewinder(AbstractKart *kart) : Rewinder(/*can_be_destroyed*/ f
  *  \param[out] buffer  Address of the memory buffer.
  *  \returns    Size of allocated memory, or -1 in case of an error.
  */
-BareNetworkString* KartRewinder::getState() const
+BareNetworkString* KartRewinder::saveState() const
 {
     const int MEMSIZE = 13*sizeof(float) + 9;
 
     BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
     const btRigidBody *body = m_kart->getBody();
 
+    // 1) Physics values: transform and velocities
+    // -------------------------------------------
     const btTransform &t = body->getWorldTransform();
     buffer->add(t.getOrigin());
     btQuaternion q = t.getRotation();
@@ -53,35 +55,39 @@ BareNetworkString* KartRewinder::getState() const
     buffer->add(body->getLinearVelocity());
     buffer->add(body->getAngularVelocity());
 
-    // Attachment
-    Attachment::AttachmentType atype = m_kart->getAttachment()->getType();
-    //buffer->addUInt8(uint8_t(atype));
-    if(atype!=Attachment::ATTACH_NOTHING)
-    {
-        //buffer->addFloat(m_kart->getAttachment()->getTimeLeft());
-    }
-
-    // Steering information
+    // 2) Steering and other player controls
+    // -------------------------------------
     m_kart->getControls().copyToBuffer(buffer);
 
+    // 3) Attachment
+    // -------------
+    m_kart->getAttachment()->saveState(buffer);
     return buffer;
-}   // getState
+}   // saveState
 
 // ----------------------------------------------------------------------------
 /** Actually rewind to the specified state. */
 void KartRewinder::rewindToState(BareNetworkString *buffer)
 {
     buffer->reset();   // make sure the buffer is read from the beginning
+
+    // 1) Physics values: transform and velocities
+    // -------------------------------------------
     btTransform t;
     t.setOrigin(buffer->getVec3());
     t.setRotation(buffer->getQuat());
     btRigidBody *body = m_kart->getBody();
     body->proceedToTransform(t);
-
     body->setLinearVelocity(buffer->getVec3());
     body->setAngularVelocity(buffer->getVec3());
 
+    // 2) Steering and other controls
+    // ------------------------------
     m_kart->getControls().setFromBuffer(buffer);
+
+    // 3) Attachment
+    // -------------
+    m_kart->getAttachment()->rewindTo(buffer);
 
     return;
 }   // rewindToState

@@ -28,6 +28,7 @@
 using namespace irr;
 
 class AbstractKart;
+class BareNetworkString;
 class Item;
 class SFXBase;
 
@@ -111,6 +112,8 @@ public:
     void  handleCollisionWithKart(AbstractKart *other);
     void  set (AttachmentType type, float time,
                AbstractKart *previous_kart=NULL);
+    void rewindTo(BareNetworkString *buffer);
+    void saveState(BareNetworkString *buffer);
 
     // ------------------------------------------------------------------------
     /** Sets the type of the attachment, but keeps the old time left value. */

@@ -38,7 +38,7 @@ private:
 public:
 	             KartRewinder(AbstractKart *kart);
    virtual      ~KartRewinder() {};
-   virtual BareNetworkString* getState() const;
+   virtual BareNetworkString* saveState() const;
    virtual void  rewindToState(BareNetworkString *p) OVERRIDE;
    virtual void  rewindToEvent(BareNetworkString *p) OVERRIDE;
 

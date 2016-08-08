@@ -242,7 +242,7 @@ void RewindManager::saveStates()
     // For now always create a snapshot.
     for(unsigned int i=0; i<m_all_rewinder.size(); i++)
     {
-        BareNetworkString *buffer = m_all_rewinder[i]->getState();
+        BareNetworkString *buffer = m_all_rewinder[i]->saveState();
         if(buffer && buffer->size()>=0)
         {
             m_overall_state_size += buffer->size();

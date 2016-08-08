@@ -217,6 +217,49 @@ void Attachment::clear()
 }   // clear
 
 // -----------------------------------------------------------------------------
+void Attachment::saveState(BareNetworkString *buffer)
+{
+    // We use bit 7 to indicate if a previous owner is defined for a bomb
+    assert(ATTACH_MAX<=127);
+    uint8_t type = m_type | (( (m_type==ATTACH_BOMB) && (m_previous_owner!=NULL) )
+                             ? 0x80 : 0 );
+    buffer->addUInt8(type);
+    if(m_type!=ATTACH_NOTHING)
+    {
+        buffer->addFloat(m_time_left);
+        if(m_type==ATTACH_BOMB && m_previous_owner)
+            buffer->addUInt8(m_previous_owner->getWorldKartId());
+        // m_initial_speed is not saved, on restore state it will
+        // be set to the kart speed, which has already been restored
+    }
+}   // saveState
+
+// -----------------------------------------------------------------------------
+void Attachment::rewindTo(BareNetworkString *buffer)
+{
+    uint8_t type = buffer->getUInt8();
+    AttachmentType new_type = AttachmentType(type & 0x7f);   // mask out bit 7
+    if(new_type==ATTACH_NOTHING)
+    {
+        clear();
+    }
+    else
+    {
+        float time_left = buffer->getFloat();
+        if(type== (ATTACH_BOMB | 0x80) )
+        {
+            uint8_t kart_id = buffer->getUInt8();
+            m_previous_owner = World::getWorld()->getKart(kart_id);
+        }
+        else
+        {
+            m_previous_owner = NULL;
+        }
+        set(new_type, time_left, m_previous_owner);
+    }   // if something is attached
+}   // rewindTo
+
+// -----------------------------------------------------------------------------
 /** Randomly selects the new attachment. For a server process, the
 *   attachment can be passed into this function.
 *  \param item The item that was collected.
