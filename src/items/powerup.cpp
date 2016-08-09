@@ -43,8 +43,8 @@
  */
 Powerup::Powerup(AbstractKart* kart)
 {
-    m_owner               = kart;
-    m_sound_use           = NULL;
+    m_kart      = kart;
+    m_sound_use = NULL;
     reset();
 }   // Powerup
 
@@ -192,14 +192,14 @@ Material *Powerup::getIcon() const
  */
 void  Powerup::adjustSound()
 {
-    m_sound_use->setPosition(m_owner->getXYZ());
+    m_sound_use->setPosition(m_kart->getXYZ());
     // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
     // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
     if (race_manager->getNumLocalPlayers() > 1)
     {
         // player karts played at full volume; AI karts much dimmer
 
-        if (m_owner->getController()->isLocalPlayerController())
+        if (m_kart->getController()->isLocalPlayerController())
         {
             m_sound_use->setVolume( 1.0f );
         }
@@ -216,11 +216,11 @@ void  Powerup::adjustSound()
  */
 void Powerup::use()
 {
-    const KartProperties *kp = m_owner->getKartProperties();
+    const KartProperties *kp = m_kart->getKartProperties();
 
     // The player gets an achievement point for using a powerup
     if (m_type != PowerupManager::POWERUP_NOTHING      &&
-        m_owner->getController()->canGetAchievements()    )
+        m_kart->getController()->canGetAchievements()    )
     {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER, "poweruplover");
     }
@@ -229,7 +229,7 @@ void Powerup::use()
     if (m_type != PowerupManager::POWERUP_NOTHING &&
         m_type != PowerupManager::POWERUP_SWATTER &&
         m_type != PowerupManager::POWERUP_ZIPPER)
-        m_owner->playCustomSFX(SFXManager::CUSTOM_SHOOT);
+        m_kart->playCustomSFX(SFXManager::CUSTOM_SHOOT);
 
     // FIXME - for some collectibles, set() is never called
     if(m_sound_use == NULL)
@@ -244,12 +244,12 @@ void Powerup::use()
     switch (m_type)
     {
     case PowerupManager::POWERUP_ZIPPER:
-        m_owner->handleZipper(NULL, true);
+        m_kart->handleZipper(NULL, true);
         break ;
     case PowerupManager::POWERUP_SWITCH:
         {
             ItemManager::get()->switchItems();
-            m_sound_use->setPosition(m_owner->getXYZ());
+            m_sound_use->setPosition(m_kart->getXYZ());
             m_sound_use->play();
             break;
         }
@@ -258,26 +258,26 @@ void Powerup::use()
     case PowerupManager::POWERUP_BOWLING:
     case PowerupManager::POWERUP_PLUNGER:
         if(stk_config->m_shield_restrict_weapos)
-            m_owner->setShieldTime(0.0f); // make weapon usage destroy the shield
+            m_kart->setShieldTime(0.0f); // make weapon usage destroy the shield
         Powerup::adjustSound();
         m_sound_use->play();
 
-        projectile_manager->newProjectile(m_owner, m_type);
+        projectile_manager->newProjectile(m_kart, m_type);
         break ;
 
     case PowerupManager::POWERUP_SWATTER:
-        m_owner->getAttachment()
+        m_kart->getAttachment()
                 ->set(Attachment::ATTACH_SWATTER, kp->getSwatterDuration());
         break;
 
     case PowerupManager::POWERUP_BUBBLEGUM:
         // use the bubble gum the traditional way, if the kart is looking back
-        if (m_owner->getControls().m_look_back)
+        if (m_kart->getControls().m_look_back)
         {
             Vec3 hit_point;
             Vec3 normal;
             const Material* material_hit;
-            Vec3 pos = m_owner->getXYZ();
+            Vec3 pos = m_kart->getXYZ();
             Vec3 to=pos+Vec3(0, -10000, 0);
             world->getTrack()->getTriangleMesh().castRay(pos, to, &hit_point,
                                                      &material_hit, &normal);
@@ -292,35 +292,35 @@ void Powerup::use()
 
             pos.setY(hit_point.getY()-0.05f);
 
-            ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_owner);
+            ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_kart);
         }
         else // if the kart is looking forward, use the bubblegum as a shield
         {
 
-            if(!m_owner->isShielded()) //if the previous shield had been used up.
+            if(!m_kart->isShielded()) //if the previous shield had been used up.
             {
-                if (m_owner->getIdent() == "nolok")
+                if (m_kart->getIdent() == "nolok")
                 {
-                    m_owner->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                    m_kart->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
                                                   kp->getBubblegumShieldDuration());
                 }
                 else
                 {
-                    m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                    m_kart->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
                                                   kp->getBubblegumShieldDuration());
                 }
             }
             else // using a bubble gum while still having a shield
             {
-                if (m_owner->getIdent() == "nolok")
+                if (m_kart->getIdent() == "nolok")
                 {
-                    m_owner->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                                  kp->getBubblegumShieldDuration() + m_owner->getShieldTime());
+                    m_kart->getAttachment()->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+                                                  kp->getBubblegumShieldDuration() + m_kart->getShieldTime());
                 }
                 else
                 {
-                    m_owner->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                                  kp->getBubblegumShieldDuration() + m_owner->getShieldTime());
+                    m_kart->getAttachment()->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                                                  kp->getBubblegumShieldDuration() + m_kart->getShieldTime());
                 }
             }
 
@@ -340,7 +340,7 @@ void Powerup::use()
         {
             AbstractKart *kart=world->getKart(i);
             if(kart->isEliminated() || kart->isInvulnerable()) continue;
-            if(kart == m_owner) continue;
+            if(kart == m_kart) continue;
             if(kart->getPosition() == 1)
             {
                 kart->getAttachment()->set(Attachment::ATTACH_ANVIL,
@@ -355,7 +355,7 @@ void Powerup::use()
                 if(kart->getController()->isLocalPlayerController())
                     m_sound_use->setPosition(kart->getXYZ());
                 else
-                    m_sound_use->setPosition(m_owner->getXYZ());
+                    m_sound_use->setPosition(m_kart->getXYZ());
 
                 m_sound_use->play();
                 break;
@@ -373,13 +373,13 @@ void Powerup::use()
             for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
             {
                 AbstractKart *kart=world->getKart(i);
-                if(kart->isEliminated() || kart== m_owner || kart->isInvulnerable()) continue;
+                if(kart->isEliminated() || kart== m_kart || kart->isInvulnerable()) continue;
                 if(kart->isShielded())
                 {
                     kart->decreaseShieldTime();
                     continue;
                 }
-                if(m_owner->getPosition() > kart->getPosition())
+                if(m_kart->getPosition() > kart->getPosition())
                 {
                     kart->getAttachment()->set(Attachment::ATTACH_PARACHUTE,
                                                kp->getParachuteDurationOther());
@@ -393,8 +393,8 @@ void Powerup::use()
             // or the kart "throwing" the anvil? Ideally it should be both.
             // Meanwhile, don't play it near AI karts since they obviously
             // don't hear anything
-            if(m_owner->getController()->isLocalPlayerController())
-                m_sound_use->setPosition(m_owner->getXYZ());
+            if(m_kart->getController()->isLocalPlayerController())
+                m_sound_use->setPosition(m_kart->getXYZ());
             else if(player_kart)
                 m_sound_use->setPosition(player_kart->getXYZ());
             m_sound_use->play();
@@ -403,8 +403,8 @@ void Powerup::use()
 
     case PowerupManager::POWERUP_NOTHING:
         {
-            if(!m_owner->getKartAnimation())
-                m_owner->beep();
+            if(!m_kart->getKartAnimation())
+                m_kart->beep();
         }
         break;
     default : break;
@@ -434,7 +434,7 @@ void Powerup::hitBonusBox(const Item &item, int add_info)
 {
     // Position can be -1 in case of a battle mode (which doesn't have
     // positions), but this case is properly handled in getRandomPowerup.
-    int position = m_owner->getPosition();
+    int position = m_kart->getPosition();
 
     unsigned int n=1;
     PowerupManager::PowerupType new_powerup;

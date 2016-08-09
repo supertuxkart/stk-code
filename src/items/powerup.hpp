@@ -49,7 +49,7 @@ private:
     int                         m_number;
 
     /** The owner (kart) of this powerup. */
-    AbstractKart*               m_owner;
+    AbstractKart*               m_kart;
 
 public:
                     Powerup      (AbstractKart* kart_);

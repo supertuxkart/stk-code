@@ -28,7 +28,7 @@
 
 #include "LinearMath/btTransform.h"
 
-#include "items/powerup.hpp"
+#include "items/powerup_manager.hpp"    // For PowerupType
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "utils/no_copy.hpp"

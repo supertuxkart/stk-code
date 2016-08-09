@@ -43,6 +43,7 @@
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
+#include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart_animation.hpp"
