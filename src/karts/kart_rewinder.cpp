@@ -141,6 +141,7 @@ void KartRewinder::update()
 // ----------------------------------------------------------------------------
 void KartRewinder::rewindToEvent(BareNetworkString *buffer)
 {
+    buffer->reset();
     uint8_t type = buffer->getUInt8();
     if(type & EVENT_CONTROL)
         m_kart->getControls().setFromBuffer(buffer);
