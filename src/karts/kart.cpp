@@ -231,9 +231,8 @@ void Kart::init(RaceManager::KartType type)
     // Create the stars effect
     m_stars_effect = new Stars(this);
 
+    m_rewinder = new KartRewinder(this);
     reset();
-
-	m_rewinder = new KartRewinder(this);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -411,6 +410,9 @@ void Kart::reset()
     // m_controller is not yet defined, so this has to be tested here.
     if(m_controller)
         m_controller->reset();
+
+    // Must be called after the controls are reset
+    m_rewinder->reset();
 
     // 3 strikes mode can hide the wheels
     scene::ISceneNode** wheels = getKartModel()->getWheelNodes();

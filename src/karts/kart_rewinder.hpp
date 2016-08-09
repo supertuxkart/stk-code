@@ -19,6 +19,7 @@
 #ifndef HEADER_KART_REWINDER_HPP
 #define HEADER_KART_REWINDER_HPP
 
+#include "items/attachment.hpp"
 #include "karts/controller/kart_control.hpp"
 
 #include "network/rewinder.hpp"
@@ -33,12 +34,22 @@ private:
 	/** Pointer to the original kart object. */
 	AbstractKart *m_kart;
     
+    /** The previous kart controls, used to detect if a new event 
+     *  needs to be created. */
     KartControl  m_previous_control;
 
+    /** The previous attachment type, used to detect if a new event
+     *  needs to be created. */
+    Attachment::AttachmentType m_previous_attachment;
+
+    // Flags to indicate the different event types
+    enum { EVENT_CONTROL = 0x01,
+           EVENT_ATTACH  = 0x02 };
 public:
 	             KartRewinder(AbstractKart *kart);
    virtual      ~KartRewinder() {};
    virtual BareNetworkString* saveState() const;
+   void          reset();
    virtual void  rewindToState(BareNetworkString *p) OVERRIDE;
    virtual void  rewindToEvent(BareNetworkString *p) OVERRIDE;
 
