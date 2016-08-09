@@ -38,7 +38,6 @@ public:
 
     /** Called when an event needs to be undone. This is called while going
      *  backwards for rewinding - all stored events will get an 'undo' call.
-     *  A dummy implementation is provided which just ignores this.
      */
     virtual void undoEvent(BareNetworkString *buffer) = 0;
 
@@ -56,7 +55,6 @@ public:
    /** Undo the effects of the given state, but do not rewind to that 
     *  state (which is done by rewindTo). This is called while going
     *  backwards for rewinding - all stored events will get an 'undo' call.
-    *  Provided here a dummy implementation that just ignores the state.
     */
    virtual void undoState(BareNetworkString *buffer) = 0;
 
