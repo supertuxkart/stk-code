@@ -19,6 +19,7 @@
 #include "karts/kart_rewinder.hpp"
 #include "karts/abstract_kart.hpp"
 #include "items/attachment.hpp"
+#include "items/powerup.hpp"
 #include "modes/world.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/network_string.hpp"
@@ -50,7 +51,7 @@ void KartRewinder::reset()
  */
 BareNetworkString* KartRewinder::saveState() const
 {
-    const int MEMSIZE = 13*sizeof(float) + 9;
+    const int MEMSIZE = 13*sizeof(float) + 9+2;
 
     BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
     const btRigidBody *body = m_kart->getBody();
@@ -71,6 +72,10 @@ BareNetworkString* KartRewinder::saveState() const
     // 3) Attachment
     // -------------
     m_kart->getAttachment()->saveState(buffer);
+
+    // 4) Powerup
+    // ----------
+    m_kart->getPowerup()->saveState(buffer);
     return buffer;
 }   // saveState
 
@@ -98,6 +103,9 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     // -------------
     m_kart->getAttachment()->rewindTo(buffer);
 
+    // 4) Powerup
+    // ----------
+    m_kart->getPowerup()->rewindTo(buffer);
     return;
 }   // rewindToState
 

@@ -70,6 +70,45 @@ void Powerup::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+/** Save the powerup state. Called from the kart rewinder when saving the kart
+ *  state or when a new powerup even is saved.
+ *  \param buffer The buffer into which to save the state.
+ */
+void Powerup::saveState(BareNetworkString *buffer)
+{
+    buffer->addUInt8(uint8_t(m_type));
+    if(m_type!=PowerupManager::POWERUP_NOTHING)
+    {
+        buffer->addUInt8(m_number);   // number is <=255
+    }
+}   // saveState
+
+//-----------------------------------------------------------------------------
+/** Restore a powerup state. Called from the kart rewinder when restoring a
+ *  state.
+ *  \param buffer Buffer with the state of this powerup object.
+ */
+void Powerup::rewindTo(BareNetworkString *buffer)
+{
+    PowerupManager::PowerupType new_type = 
+        PowerupManager::PowerupType(buffer->getUInt8());
+    int n=0;
+    if(new_type==PowerupManager::POWERUP_NOTHING)
+    {
+        set(new_type, 0);
+        return;
+    }
+    n = buffer->getUInt8();
+    if(m_type == new_type)
+        m_number = n;
+    else
+    {
+        m_number = 0;
+        set(new_type, n);
+    }
+}   // rewindTo
+
+//-----------------------------------------------------------------------------
 /** Sets the collected items. The number of items is increased if the same
  *  item is currently collected, otherwise replaces the existing item. It also
  *  sets item specific sounds.
@@ -81,9 +120,15 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
     if (m_type==type)
     {
         m_number+=n;
+        // Limit to 255 (save space in network state saving)
+        if(m_number>255) m_number = 255;
         return;
     }
     m_type=type;
+
+    // Limit to 255 (save space in network state saving)
+    if(n>255) n = 255;
+
     m_number=n;
 
     if(m_sound_use != NULL)
