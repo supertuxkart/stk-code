@@ -491,6 +491,10 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_old_driver_popup
         PARAM_DEFAULT(BoolUserConfigParam(true, "old_driver_popup",
         &m_video_group, "Determines if popup message about too old drivers should be displayed."));
+    PARAM_PREFIX FloatUserConfigParam       m_scale_rtts_factor
+        PARAM_DEFAULT(FloatUserConfigParam(1.0f, "m_scale_rtts_factor",
+        &m_video_group, "Allows to increase performance by setting lower RTTs "
+                        "resolution. Value should be smaller or equal to 1.0"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */

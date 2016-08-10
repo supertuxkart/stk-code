@@ -216,8 +216,10 @@ GPUTimer &IrrDriver::getGPUTimer(unsigned i)
 void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
                                           size_t width, size_t height)
 {
-    m_current_screen_size = core::vector2df(float(width), float(height));
-    m_shadow_matrices->computeMatrixesAndCameras(camnode, width, height);
+    float w = width * UserConfigParams::m_scale_rtts_factor;
+    float h = height * UserConfigParams::m_scale_rtts_factor;
+    m_current_screen_size = core::vector2df(w, h);
+    m_shadow_matrices->computeMatrixesAndCameras(camnode, w, h);
 }   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
