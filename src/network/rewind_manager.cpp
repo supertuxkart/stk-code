@@ -210,11 +210,17 @@ unsigned int RewindManager::findFirstIndex(float target_time) const
  *  \param time Time at which the event was recorded.
  *  \param buffer Pointer to the event data. 
  */
-void RewindManager::addEvent(Rewinder *rewinder, BareNetworkString *buffer)
+void RewindManager::addEvent(EventRewinder *event_rewinder,
+                             BareNetworkString *buffer)
 {
-    if(m_is_rewinding) return;
-    RewindInfo *ri = new RewindInfoEvent(getCurrentTime(), rewinder,
-                                         buffer, /*is_confirmed*/true   );
+    if(m_is_rewinding) 
+    {
+        delete buffer;
+        Log::error("RewindManager", "Adding event when rewinding");
+        return;
+    }
+    RewindInfo *ri = new RewindInfoEvent(getCurrentTime(), event_rewinder,
+                                         buffer, /*is confirmed*/true);
     insertRewindInfo(ri);
 }   // addEvent
 

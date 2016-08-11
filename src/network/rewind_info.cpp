@@ -47,9 +47,11 @@ RewindInfoState::RewindInfoState(float time, Rewinder *rewinder,
 }   // RewindInfoState
 
 // ============================================================================
-RewindInfoEvent::RewindInfoEvent(float time, Rewinder *rewinder,
+RewindInfoEvent::RewindInfoEvent(float time, EventRewinder *event_rewinder,
                                  BareNetworkString *buffer, bool is_confirmed)
-    : RewindInfoRewinder(time, rewinder, buffer, is_confirmed)
+    : RewindInfo(time, is_confirmed)
 {
+    m_event_rewinder = event_rewinder;
+    m_buffer         = buffer;
 }   // RewindInfoEvent
 

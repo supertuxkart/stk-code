@@ -19,6 +19,7 @@
 #ifndef HEADER_REWIND_INFO_HPP
 #define HEADER_REWIND_INFO_HPP
 
+#include "network/event_rewinder.hpp"
 #include "network/network_string.hpp"
 #include "network/rewinder.hpp"
 #include "utils/leak_check.hpp"
@@ -156,7 +157,7 @@ public:
     virtual void undo()
     {
         m_rewinder->undoState(getBuffer());
-    }   // undoEvent
+    }   // undo
     // ------------------------------------------------------------------------
     /** Rewinds to this state. This is called while going forwards in time
      *  again to reach current time. It will call rewindToState().
@@ -174,10 +175,16 @@ public:
 };   // class RewindInfoState
 
 // ============================================================================
-class RewindInfoEvent : public RewindInfoRewinder
+class RewindInfoEvent : public RewindInfo
 {
+private:
+    /** Pointer to the event rewinder responsible for this event. */
+    EventRewinder *m_event_rewinder;
+
+    /** Buffer with the event data. */
+    BareNetworkString *m_buffer;
 public:
-             RewindInfoEvent(float time, Rewinder *rewinder,
+             RewindInfoEvent(float time, EventRewinder *event_rewinder,
                              BareNetworkString *buffer, bool is_confirmed);
     virtual ~RewindInfoEvent() {}
 
@@ -185,10 +192,10 @@ public:
     virtual bool isEvent() const { return true; }
     // ------------------------------------------------------------------------
     /** Called when going back in time to undo any rewind information.
-    *  It calls undoEvent in the rewinder. */
+     *  It calls undoEvent in the rewinder. */
     virtual void undo()
     {
-        m_rewinder->undoEvent(getBuffer());
+        m_event_rewinder->undo(m_buffer);
     }   // undo
     // ------------------------------------------------------------------------
     /** This is called while going forwards in time again to reach current
@@ -196,8 +203,13 @@ public:
      */
     virtual void rewind()
     {
-        m_rewinder->rewindToEvent(getBuffer());
+        // Make sure to reset the buffer so we read from the beginning
+        m_buffer->reset();
+        m_event_rewinder->rewind(getBuffer());
     }   // rewind
+    // ------------------------------------------------------------------------
+    /** Returns the buffer with the event information in it. */
+    BareNetworkString *getBuffer() { return m_buffer; }
 };   // class RewindIndoEvent
 
 #endif

@@ -26,6 +26,7 @@
 #include <vector>
 
 class RewindInfo;
+class EventRewinder;
 
 /** \ingroup network
  *  This class manages rewinding. It keeps track of:
@@ -172,7 +173,7 @@ public:
     void reset();
     void saveStates();
     void rewindTo(float target_time);
-    void addEvent(Rewinder *rewinder, BareNetworkString *buffer);
+    void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer);
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 

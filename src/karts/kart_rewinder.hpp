@@ -19,7 +19,6 @@
 #ifndef HEADER_KART_REWINDER_HPP
 #define HEADER_KART_REWINDER_HPP
 
-#include "items/attachment.hpp"
 #include "karts/controller/kart_control.hpp"
 
 #include "network/rewinder.hpp"
@@ -37,10 +36,6 @@ private:
     /** The previous kart controls, used to detect if a new event 
      *  needs to be created. */
     KartControl  m_previous_control;
-
-    /** The previous attachment type, used to detect if a new event
-     *  needs to be created. */
-    Attachment::AttachmentType m_previous_attachment;
 
     // Flags to indicate the different event types
     enum { EVENT_CONTROL = 0x01,

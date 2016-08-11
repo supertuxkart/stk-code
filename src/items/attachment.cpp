@@ -36,6 +36,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -45,6 +46,7 @@
 /** Initialises the attachment each kart has.
  */
 Attachment::Attachment(AbstractKart* kart)
+          : EventRewinder()
 {
     m_type                 = ATTACH_NOTHING;
     m_time_left            = 0.0;
@@ -182,6 +184,15 @@ void Attachment::set(AttachmentType type, float time,
     m_node->setVisible(true);
 
     irr_driver->applyObjectPassShader(m_node);
+
+    // Save event about the new attachment
+    RewindManager *rwm = RewindManager::get();
+    if(rwm->isEnabled() && !rwm->isRewinding())
+    {
+        BareNetworkString *buffer = new BareNetworkString(2);
+        saveState(buffer);
+        rwm->addEvent(this, buffer);
+    }
 }   // set
 
 // -----------------------------------------------------------------------------
@@ -276,6 +287,15 @@ void Attachment::rewindTo(BareNetworkString *buffer)
     }
     set(new_type, time_left, m_previous_owner);
 }   // rewindTo
+// -----------------------------------------------------------------------------
+/** Called when going forwards in time during a rewind. 
+ *  \param buffer Buffer with the rewind information.
+ */
+void Attachment::rewind(BareNetworkString *buffer)
+{
+    // Event has same info as a state, so re-use the restore function
+    rewindTo(buffer);
+}   // rewind
 
 // -----------------------------------------------------------------------------
 /** Randomly selects the new attachment. For a server process, the

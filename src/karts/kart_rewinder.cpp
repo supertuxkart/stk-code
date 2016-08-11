@@ -37,7 +37,6 @@ KartRewinder::KartRewinder(AbstractKart *kart) : Rewinder(/*can_be_destroyed*/ f
  */
 void KartRewinder::reset()
 {
-    m_previous_attachment = m_kart->getAttachment()->getType();
     m_previous_control    = m_kart->getControls();
 }   // reset
 
@@ -120,10 +119,7 @@ void KartRewinder::update()
 
     // Check if an event has happened that needs to be recorded
     bool control_event = !(m_kart->getControls()   == m_previous_control);
-    bool attach_event  = m_kart->getAttachment()->getType() 
-                         != m_previous_attachment;
-    uint8_t type = (control_event ? EVENT_CONTROL : 0) |
-                   (attach_event  ? EVENT_ATTACH  : 0) ;
+    uint8_t type = (control_event ? EVENT_CONTROL : 0);
     if(type == 0)
         return;   // no event
 
@@ -136,14 +132,8 @@ void KartRewinder::update()
         m_previous_control = m_kart->getControls();
         m_previous_control.copyToBuffer(buffer);
     }
-    if(attach_event)
-    {
-        m_kart->getAttachment()->saveState(buffer);
-        m_previous_attachment = m_kart->getAttachment()->getType();
-
-    }
     // The rewind manager will free the memory once it's not needed anymore
-    RewindManager::get()->addEvent(this, buffer);
+    //XXXXXXXXXXXXXXX RewindManager::get()->addEvent(this, buffer);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -153,8 +143,6 @@ void KartRewinder::rewindToEvent(BareNetworkString *buffer)
     uint8_t type = buffer->getUInt8();
     if(type & EVENT_CONTROL)
         m_kart->getControls().setFromBuffer(buffer);
-    if(type & EVENT_ATTACH)
-        m_kart->getAttachment()->rewindTo(buffer);
 };   // rewindToEvent
 
 

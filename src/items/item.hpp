@@ -25,11 +25,6 @@
   * Defines the various collectibles and weapons of STK.
   */
 
-namespace irr
-{
-    namespace scene { class IMesh; class ISceneNode; }
-}
-using namespace irr;
 
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
@@ -38,8 +33,14 @@ using namespace irr;
 #include <line2d.h>
 
 class AbstractKart;
-class LODNode;
 class Item;
+class LODNode;
+
+namespace irr
+{
+    namespace scene { class IMesh; class ISceneNode; }
+}
+using namespace irr;
 
 // -----------------------------------------------------------------------------
 
