@@ -47,7 +47,7 @@ if(USE_GLES2)
 endif()
 
 # Xrandr
-if(UNIX AND USE_XRANDR)
+if(UNIX AND NOT APPLE)
     add_definitions(-DNO_IRR_LINUX_X11_VIDMODE_)
     add_definitions(-D_IRR_LINUX_X11_RANDR_)
 endif()
