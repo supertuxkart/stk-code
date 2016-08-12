@@ -18,7 +18,6 @@
 
 #include "font/bold_face.hpp"
 
-#include "config/user_config.hpp"
 #include "font/face_ttf.hpp"
 
 // ----------------------------------------------------------------------------
