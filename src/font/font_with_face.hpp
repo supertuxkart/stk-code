@@ -109,14 +109,12 @@ private:
     FontWithFace*                m_fallback_font;
     float                        m_fallback_font_scale;
 
-    /** A temporary holder stored new char to be inserted.
-      */
+    /** A temporary holder stored new char to be inserted. */
     std::set<wchar_t>            m_new_char_holder;
 
     gui::IGUISpriteBank*         m_spritebank;
 
-    /** A full glyph page for this font.
-      */
+    /** A full glyph page for this font. */
     video::IImage*               m_page;
 
     unsigned int                 m_temp_height;
