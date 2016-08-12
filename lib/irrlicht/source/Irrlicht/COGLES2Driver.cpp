@@ -1314,7 +1314,7 @@ namespace video
 
 		// texcoords need to be flipped horizontally for RTTs
 		const bool isRTT = texture->isRenderTarget();
-		const core::dimension2d<u32>& ss = texture->getOriginalSize();
+		const core::dimension2d<u32>& ss = texture->getSize();
 		const f32 invW = 1.f / static_cast<f32>(ss.Width);
 		const f32 invH = 1.f / static_cast<f32>(ss.Height);
 		const core::rect<f32> tcoords(
@@ -1443,10 +1443,10 @@ namespace video
 			// now draw it.
 
 			core::rect<f32> tcoords;
-			tcoords.UpperLeftCorner.X = (((f32)sourcePos.X)) / texture->getOriginalSize().Width ;
-			tcoords.UpperLeftCorner.Y = (((f32)sourcePos.Y)) / texture->getOriginalSize().Height;
-			tcoords.LowerRightCorner.X = tcoords.UpperLeftCorner.X + ((f32)(sourceSize.Width) / texture->getOriginalSize().Width);
-			tcoords.LowerRightCorner.Y = tcoords.UpperLeftCorner.Y + ((f32)(sourceSize.Height) / texture->getOriginalSize().Height);
+			tcoords.UpperLeftCorner.X = (((f32)sourcePos.X)) / texture->getSize().Width ;
+			tcoords.UpperLeftCorner.Y = (((f32)sourcePos.Y)) / texture->getSize().Height;
+			tcoords.LowerRightCorner.X = tcoords.UpperLeftCorner.X + ((f32)(sourceSize.Width) / texture->getSize().Width);
+			tcoords.LowerRightCorner.Y = tcoords.UpperLeftCorner.Y + ((f32)(sourceSize.Height) / texture->getSize().Height);
 
 			const core::rect<s32> poss(targetPos, sourceSize);
 
@@ -1496,7 +1496,7 @@ namespace video
 
 		// texcoords need to be flipped horizontally for RTTs
 		const bool isRTT = texture->isRenderTarget();
-		const core::dimension2du& ss = texture->getOriginalSize();
+		const core::dimension2du& ss = texture->getSize();
 		const f32 invW = 1.f / static_cast<f32>(ss.Width);
 		const f32 invH = 1.f / static_cast<f32>(ss.Height);
 		const core::rect<f32> tcoords(
@@ -1573,7 +1573,7 @@ namespace video
 					clipRect->getWidth(), clipRect->getHeight());
 		}
 
-		const core::dimension2du& ss = texture->getOriginalSize();
+		const core::dimension2du& ss = texture->getSize();
 		core::position2d<s32> targetPos(pos);
 		// texcoords need to be flipped horizontally for RTTs
 		const bool isRTT = texture->isRenderTarget();
