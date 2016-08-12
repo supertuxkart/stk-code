@@ -18,6 +18,7 @@
 
 #include "font/bold_face.hpp"
 
+#include "config/user_config.hpp"
 #include "font/face_ttf.hpp"
 
 // ----------------------------------------------------------------------------
@@ -37,6 +38,7 @@ void BoldFace::init()
     setFallbackFontScale(2.0f);*/
 
 }   // init
+
 // ----------------------------------------------------------------------------
 void BoldFace::reset()
 {
@@ -52,3 +54,17 @@ void BoldFace::reset()
     insertCharacters(preload_chars.c_str());
     updateCharactersList();
 }   // reset
+
+// ----------------------------------------------------------------------------
+unsigned int BoldFace::getGlyphPageSize() const
+{
+    // If players somehow disable "Use high definition textures", irrlicht will
+    // set the max texture size to 512x512, which means it will resize all
+    // large texture, but it doesn't suitable for font texture, as the
+    // rectangle in spritebank depends on the original texture size, so we test
+    // if m_high_definition_textures is enabled here
+    if ((UserConfigParams::m_high_definition_textures & 0x01) == 0)
+        return 512;
+
+    return 1024;
+}   // getGlyphPageSize

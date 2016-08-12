@@ -306,11 +306,11 @@ void FontWithFace::dumpGlyphPage(const std::string& name)
         video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(col_format, size, data, false/*copy mem*/);
 
-       tex->unlock();
-       irr_driver->getVideoDriver()->writeImageToFile(image, std::string
-           (name + "_" + StringUtils::toString(i) + ".png").c_str());
-       image->drop();
-   }
+        tex->unlock();
+        irr_driver->getVideoDriver()->writeImageToFile(image, std::string
+            (name + "_" + StringUtils::toString(i) + ".png").c_str());
+        image->drop();
+    }
 }   // dumpGlyphPage
 
 // ----------------------------------------------------------------------------

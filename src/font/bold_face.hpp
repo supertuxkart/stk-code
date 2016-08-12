@@ -28,7 +28,7 @@ class BoldFace : public FontWithFace
 private:
     virtual bool supportLazyLoadChar() const OVERRIDE          { return true; }
     // ------------------------------------------------------------------------
-    virtual unsigned int getGlyphPageSize() const OVERRIDE     { return 1024; }
+    virtual unsigned int getGlyphPageSize() const OVERRIDE;
     // ------------------------------------------------------------------------
     virtual float getScalingFactorOne() const OVERRIDE         { return 0.2f; }
     // ------------------------------------------------------------------------

@@ -33,6 +33,7 @@ void DigitFace::init()
     m_font_max_height = m_glyph_max_height + 10;
 
 }   // init
+
 // ----------------------------------------------------------------------------
 void DigitFace::reset()
 {
