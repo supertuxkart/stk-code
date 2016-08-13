@@ -5,15 +5,15 @@
 
         <spacer height="25" width="10" />
 
-        <div layout="horizontal-row" width="fit" height="fit" align="center">
+        <ribbon id="buttons" height="30%" width="30%" align="center">
 
-            <button id="confirm" I18N="In a 'are you sure?' dialog" text="Yes" align="center"/>
+            <icon-button id="confirm" icon="gui/green_check.png" I18N="In a 'are you sure?' dialog"
+                text="Yes" align="center"/>
 
-            <spacer height="15" width="10" />
+            <icon-button id="cancel" icon="gui/remove.png" I18N="In a 'are you sure?' dialog"
+                text="Cancel" align="center"/>
 
-            <button id="cancel" I18N="In a 'are you sure?' dialog" text="Cancel" align="center"/>
-
-	</div>
+        </ribbon>
 
         <spacer height="10" width="10" />
     </div>

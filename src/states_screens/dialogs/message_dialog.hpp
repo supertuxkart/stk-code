@@ -30,7 +30,7 @@
 class MessageDialog : public GUIEngine::ModalDialog
 {
 public:
-    
+
     /**
      * \brief Listener interface to get notified of whether the user chose to confirm or cancel
      * \ingroup states_screens
@@ -38,24 +38,24 @@ public:
     class IConfirmDialogListener
     {
     public:
-        
+
         LEAK_CHECK()
-        
+
         IConfirmDialogListener() {}
         virtual ~IConfirmDialogListener() {}
-        
+
         /** \brief Implement to be notified of dialog confirmed.
           * \note  The dialog is not closed automatically, close it in the callback if this
           *        behavior is desired.
           */
         virtual void onConfirm() { ModalDialog::dismiss(); };
-        
+
         /** \brief Implement to be notified of dialog cancelled.
           * \note  The default implementation is to close the modal dialog, but you may override
           *        this method to change the behavior.
           */
         virtual void onCancel() { ModalDialog::dismiss(); };
-        
+
         /**
           * \brief Optional callback
           */
@@ -64,13 +64,14 @@ public:
 
     enum MessageDialogType { MESSAGE_DIALOG_OK, MESSAGE_DIALOG_CONFIRM,
                              MESSAGE_DIALOG_OK_CANCEL, MESSAGE_DIALOG_YESNO };
-    
+
     MessageDialogType m_type;
 
 private:
-    
+
     IConfirmDialogListener* m_listener;
     bool m_own_listener;
+    bool m_cancel_selected;// should be assigned every time onUpdate is called
     irr::core::stringw m_msg;
     void doInit(bool from_queue);
 
@@ -85,15 +86,15 @@ public:
     MessageDialog(const irr::core::stringw &msg, MessageDialogType type,
                   IConfirmDialogListener* listener, bool delete_listener,
                   bool from_queue = false, float width = 0.6f, float height = 0.6f);
-    
+
     /**
       * Variant of MessageDialog where cancelling is not possible (i.e. just shows a message box with OK)
       * \param msg Message to display in the dialog
       */
     MessageDialog(const irr::core::stringw &msg, bool from_queue = false);
-    
+
     ~MessageDialog();
-    
+
     virtual void onEnterPressedInternal() OVERRIDE;
     virtual void onUpdate(float dt) OVERRIDE;
     virtual void load() OVERRIDE;
