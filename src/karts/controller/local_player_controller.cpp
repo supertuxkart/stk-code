@@ -147,7 +147,8 @@ void LocalPlayerController::steer(float dt, int steer_val)
     
     if(UserConfigParams::m_gamepad_debug)
     {
-        Log::debug("LocalPlayerController", "  set to: %f\n", m_controls->m_steer);
+        Log::debug("LocalPlayerController", "  set to: %f\n",
+                   m_controls->getSteer());
     }
 }   // steer
 
@@ -170,7 +171,7 @@ void LocalPlayerController::update(float dt)
     Camera *camera = Camera::getCamera(m_camera_index);
     if (camera->getType() != Camera::CM_TYPE_END)
     {
-        if (m_controls->m_look_back || (UserConfigParams::m_reverse_look_threshold > 0 &&
+        if (m_controls->getLookBack() || (UserConfigParams::m_reverse_look_threshold > 0 &&
             m_kart->getSpeed() < -UserConfigParams::m_reverse_look_threshold))
         {
             camera->setMode(Camera::CM_REVERSE);

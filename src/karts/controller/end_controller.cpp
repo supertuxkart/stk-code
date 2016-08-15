@@ -174,10 +174,10 @@ void EndController::action(PlayerAction action, int value)
 void EndController::update(float dt)
 {
     // This is used to enable firing an item backwards.
-    m_controls->m_look_back = false;
-    m_controls->m_nitro     = false;
-    m_controls->m_brake     = false;
-    m_controls->m_accel     = 1.0f;
+    m_controls->setLookBack(false);
+    m_controls->setNitro(false);
+    m_controls->setBrake(false);
+    m_controls->setAccel(1.0f);
 
     AIBaseLapController::update(dt);
 
@@ -186,10 +186,10 @@ void EndController::update(float dt)
        race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER  ||
        race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG)
     {
-        m_controls->m_accel = 0.0f;
+        m_controls->setAccel(0.0f);
         // Brake while we are still driving forwards (if we keep
         // on braking, the kart will reverse otherwise)
-        m_controls->m_brake = m_kart->getSpeed()>0;
+        m_controls->setBrake(m_kart->getSpeed()>0);
         return;
     }
     /*Get information that is needed by more than 1 of the handling funcs*/

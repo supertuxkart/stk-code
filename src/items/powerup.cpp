@@ -272,7 +272,7 @@ void Powerup::use()
 
     case PowerupManager::POWERUP_BUBBLEGUM:
         // use the bubble gum the traditional way, if the kart is looking back
-        if (m_kart->getControls().m_look_back)
+        if (m_kart->getControls().getLookBack())
         {
             Vec3 hit_point;
             Vec3 normal;

@@ -602,7 +602,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
 
         video::SMaterial m;
-        if(kart->getControls().m_nitro || kart->isOnMinNitroTime())
+        if(kart->getControls().getNitro() || kart->isOnMinNitroTime())
             m.setTexture(0, m_gauge_full_bright);
         else
             m.setTexture(0, m_gauge_full);

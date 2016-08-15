@@ -208,8 +208,8 @@ void History::Save()
         for(int k=0; k<num_karts; k++)
         {
             fprintf(fd, "%f %f %d  %f %f %f  %f %f %f %f\n",
-                    m_all_controls[index+k].m_steer,
-                    m_all_controls[index+k].m_accel,
+                    m_all_controls[index+k].getSteer(),
+                    m_all_controls[index+k].getAccel(),
                     m_all_controls[index+k].getButtonsCompressed(),
                     m_all_xyz[index+k].getX(), m_all_xyz[index+k].getY(),
                     m_all_xyz[index+k].getZ(),
@@ -321,14 +321,14 @@ void History::Load()
             unsigned int index = num_karts * i+k;
             fgets(s, 1023, fd);
             int buttonsCompressed;
-            float x,y,z,rx,ry,rz,rw;
+            float x,y,z,rx,ry,rz,rw, steer, accel;
             sscanf(s, "%f %f %d  %f %f %f  %f %f %f %f\n",
-                    &m_all_controls[index].m_steer,
-                    &m_all_controls[index].m_accel,
-                    &buttonsCompressed,
+                    &steer, &accel, &buttonsCompressed,
                     &x, &y, &z,
                     &rx, &ry, &rz, &rw
                     );
+            m_all_controls[index].setSteer(steer);
+            m_all_controls[index].setAccel(accel);
             m_all_xyz[index]       = Vec3(x,y,z);
             m_all_rotations[index] = btQuaternion(rx,ry,rz,rw);
             m_all_controls[index].setButtonsCompressed(char(buttonsCompressed));

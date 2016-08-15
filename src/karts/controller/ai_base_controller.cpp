@@ -186,11 +186,11 @@ void AIBaseController::setSteering(float angle, float dt)
 {
     float steer_fraction = angle / m_kart->getMaxSteerAngle();
     if(!canSkid(steer_fraction))
-        m_controls->m_skid = KartControl::SC_NONE;
+        m_controls->setSkidControl(KartControl::SC_NONE);
     else
-        m_controls->m_skid = steer_fraction > 0 ? KartControl::SC_RIGHT
-                                                : KartControl::SC_LEFT;
-    float old_steer      = m_controls->m_steer;
+        m_controls->setSkidControl(steer_fraction > 0 ? KartControl::SC_RIGHT
+                                                      : KartControl::SC_LEFT );
+    float old_steer      = m_controls->getSteer();
 
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
     else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
@@ -205,13 +205,13 @@ void AIBaseController::setSteering(float angle, float dt)
     float max_steer_change = dt/m_ai_properties->m_time_full_steer;
     if(old_steer < steer_fraction)
     {
-        m_controls->m_steer = (old_steer+max_steer_change > steer_fraction)
-                           ? steer_fraction : old_steer+max_steer_change;
+        m_controls->setSteer(( old_steer+max_steer_change > steer_fraction)
+                             ? steer_fraction : old_steer+max_steer_change);
     }
     else
     {
-        m_controls->m_steer = (old_steer-max_steer_change < steer_fraction)
-                           ? steer_fraction : old_steer-max_steer_change;
+        m_controls->setSteer( (old_steer-max_steer_change < steer_fraction)
+                               ? steer_fraction : old_steer-max_steer_change );
     }
 }   // setSteering
 

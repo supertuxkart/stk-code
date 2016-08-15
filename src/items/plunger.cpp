@@ -46,7 +46,7 @@ Plunger::Plunger(AbstractKart *kart)
     float plunger_speed = 2 * m_speed;
 
     // if the kart is looking backwards, release from the back
-    m_reverse_mode = kart->getControls().m_look_back;
+    m_reverse_mode = kart->getControls().getLookBack();
 
     // find closest kart in front of the current one
     const AbstractKart *closest_kart=0;

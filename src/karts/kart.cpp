@@ -1277,9 +1277,9 @@ void Kart::update(float dt)
     updatePhysics(dt);
     PROFILER_POP_CPU_MARKER();
 
-    if(!m_controls.m_fire) m_fire_clicked = 0;
+    if(!m_controls.getFire()) m_fire_clicked = 0;
 
-    if(m_controls.m_fire && !m_fire_clicked && !m_kart_animation)
+    if(m_controls.getFire() && !m_fire_clicked && !m_kart_animation)
     {
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
@@ -1791,7 +1791,7 @@ void Kart::handleZipper(const Material *material, bool play_sound)
         engine_force       = m_kart_properties->getZipperForce();
     }
     // Ignore a zipper that's activated while braking
-    if(m_controls.m_brake || m_speed<0) return;
+    if(m_controls.getBrake() || m_speed<0) return;
 
     m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
                                      max_speed_increase, speed_gain,
@@ -1807,7 +1807,7 @@ void Kart::handleZipper(const Material *material, bool play_sound)
  */
 void Kart::updateNitro(float dt)
 {
-    if (m_controls.m_nitro && m_min_nitro_time <= 0.0f)
+    if (m_controls.getNitro() && m_min_nitro_time <= 0.0f)
     {
         m_min_nitro_time = m_kart_properties->getNitroMinConsumptionTime();
     }
@@ -1817,11 +1817,11 @@ void Kart::updateNitro(float dt)
 
         // when pressing the key, don't allow the min time to go under zero.
         // If it went under zero, it would be reset
-        if (m_controls.m_nitro && m_min_nitro_time <= 0.0f)
+        if (m_controls.getNitro() && m_min_nitro_time <= 0.0f)
             m_min_nitro_time = 0.1f;
     }
 
-    bool increase_speed = (m_controls.m_nitro && isOnGround());
+    bool increase_speed = (m_controls.getNitro() && isOnGround());
     if (!increase_speed && m_min_nitro_time <= 0.0f)
     {
         if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
@@ -2132,7 +2132,7 @@ void Kart::updatePhysics(float dt)
     // Check if accel is pressed for the first time. The actual timing
     // is done in getStartupBoost - it returns 0 if the start was actually
     // too slow to qualify for a boost.
-    if(!m_has_started && m_controls.m_accel)
+    if(!m_has_started && m_controls.getAccel())
     {
         m_has_started = true;
         float f       = getStartupBoost();
@@ -2155,8 +2155,8 @@ void Kart::updatePhysics(float dt)
     if (m_flying)
         updateFlying();
 
-    m_skidding->update(dt, isOnGround(), m_controls.m_steer,
-                       m_controls.m_skid);
+    m_skidding->update(dt, isOnGround(), m_controls.getSteer(),
+                       m_controls.getSkidControl());
     m_vehicle->setVisualRotation(m_skidding->getVisualSkidRotation());
     if(( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
          m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
@@ -2296,7 +2296,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         m_body->applyTorque(btVector3(0.0, m_bubblegum_torque, 0.0));
     }
 
-    if(m_controls.m_accel)   // accelerating
+    if(m_controls.getAccel())   // accelerating
     {
         // For a short time after a collision disable the engine,
         // so that the karts can bounce back a bit from the obstacle.
@@ -2309,11 +2309,11 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             engine_power *= 5.0f;
 
         // Lose some traction when skidding, to balance the advantage
-        if (m_controls.m_skid &&
+        if (m_controls.getSkidControl() &&
             m_kart_properties->getSkidVisualTime() == 0)
             engine_power *= 0.5f;
 
-        applyEngineForce(engine_power*m_controls.m_accel);
+        applyEngineForce(engine_power*m_controls.getAccel());
 
         // Either all or no brake is set, so test only one to avoid
         // resetting all brakes most of the time.
@@ -2324,7 +2324,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
     }
     else
     {   // not accelerating
-        if(m_controls.m_brake)
+        if(m_controls.getBrake())
         {   // check if the player is currently only slowing down
             // or moving backwards
             if(m_speed > 0.0f)
@@ -2360,9 +2360,9 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         {
             m_brake_time = 0;
             // lift the foot from throttle, brakes with 10% engine_power
-            assert(!std::isnan(m_controls.m_accel));
+            assert(!std::isnan(m_controls.getAccel()));
             assert(!std::isnan(engine_power));
-            applyEngineForce(-m_controls.m_accel*engine_power*0.1f);
+            applyEngineForce(-m_controls.getAccel()*engine_power*0.1f);
 
             // If not giving power (forward or reverse gear), and speed is low
             // we are "parking" the kart, so in battle mode we can ambush people
@@ -2431,7 +2431,7 @@ void Kart::updateFlying()
 {
     m_body->setLinearVelocity(m_body->getLinearVelocity() * 0.99f);
 
-    if (m_controls.m_accel)
+    if (m_controls.getAccel())
     {
         btVector3 velocity = m_body->getLinearVelocity();
         if (velocity.length() < 25)
@@ -2441,7 +2441,7 @@ void Kart::updateFlying()
                 100.0f*cos(orientation)));
         }
     }
-    else if (m_controls.m_brake)
+    else if (m_controls.getBrake())
     {
         btVector3 velocity = m_body->getLinearVelocity();
         if (velocity.length() > -15)
@@ -2452,9 +2452,9 @@ void Kart::updateFlying()
         }
     }
 
-    if (m_controls.m_steer != 0.0f)
+    if (m_controls.getSteer()!= 0.0f)
     {
-        m_body->applyTorque(btVector3(0.0, m_controls.m_steer * 3500.0f, 0.0));
+        m_body->applyTorque(btVector3(0.0, m_controls.getSteer()*3500.0f, 0.0));
     }
 
     // dampen any roll while flying, makes the kart hard to control
@@ -2690,7 +2690,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // depending on speed)
     // --------------------------------------------------------
     float nitro_frac = 0;
-    if ( (m_controls.m_nitro || m_min_nitro_time > 0.0f) &&
+    if ( (m_controls.getNitro() || m_min_nitro_time > 0.0f) &&
          isOnGround() &&  m_collected_energy > 0            )
     {
         // fabs(speed) is important, otherwise the negative number will

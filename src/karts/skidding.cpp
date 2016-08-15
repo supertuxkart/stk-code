@@ -77,7 +77,7 @@ void Skidding::reset()
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
     m_kart->getKartGFX()->updateSkidLight(0);
-    m_kart->getControls().m_skid = KartControl::SC_NONE;
+    m_kart->getControls().setSkidControl(KartControl::SC_NONE);
     
     btVector3 rot(0, 0, 0);
     // Only access the vehicle if the kart is not a ghost

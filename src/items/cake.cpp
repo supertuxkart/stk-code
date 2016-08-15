@@ -61,7 +61,7 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
     float pitch = kart->getTerrainPitch(heading);
 
     // Find closest kart in front of the current one
-    const bool  backwards = kart->getControls().m_look_back;
+    const bool  backwards = kart->getControls().getLookBack();
     const AbstractKart *closest_kart=NULL;
     Vec3        direction;
     float       kart_dist_squared;

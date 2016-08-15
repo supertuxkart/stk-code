@@ -29,6 +29,12 @@
 class KartControl
 {
 public:
+    /** The skidding control state: SC_NONE: not pressed;
+     *  SC_NO_DIRECTION: pressed, but no steering;
+     *  SC_LEFT/RIGHT: pressed in the specified direction. */
+    enum  SkidControl {SC_NONE, SC_NO_DIRECTION, SC_LEFT, SC_RIGHT};
+
+private:
     /** The current steering value in [-1, 1]. */
     float m_steer;
     /** Acceleration, in [0, 1]. */
@@ -37,17 +43,15 @@ public:
     bool  m_brake;
     /** True if the kart activates nitro. */
     bool  m_nitro;
-    /** The skidding control state: SC_NONE: not pressed;
-        SC_NO_DIRECTION: pressed, but no steering;
-        SC_LEFT/RIGHT: pressed in the specified direction. */
-    enum  SkidControl {SC_NONE, SC_NO_DIRECTION, SC_LEFT, SC_RIGHT}
-          m_skid;
+    /** Skidding control state. */
+    SkidControl m_skid;
     /** True if rescue is selected. */
     bool  m_rescue;
     /** True if fire is selected. */
     bool  m_fire;
     /** True if the kart looks (and shoots) backwards. */
     bool  m_look_back;
+public:
 
     KartControl()
     {
@@ -126,6 +130,58 @@ public:
         m_look_back = (c & 16) != 0;
         m_skid      = (SkidControl)((c & 96) >> 5);
     }   // setButtonsCompressed
+    // ------------------------------------------------------------------------
+    /** Returns the current steering value. */
+    float getSteer() const { return m_steer; }
+    // ------------------------------------------------------------------------
+    /** Sets the current steering value. */
+    void setSteer(float f) { m_steer = f; }
+    // ------------------------------------------------------------------------
+    /** Returns current acceleration. */
+    float getAccel() const { return m_accel; }
+    // ------------------------------------------------------------------------
+    /** Sets the acceleration. */
+    void setAccel(float f) { m_accel = f; }
+    // ------------------------------------------------------------------------
+    /** Returns if the kart is braking. */
+    bool getBrake() const { return m_brake; }
+    // ------------------------------------------------------------------------
+    /** Sets if the kart is braking. */
+    void setBrake(bool b) { m_brake = b; }
+    // ------------------------------------------------------------------------
+    /** Returns if the kart activates nitro. */
+    bool  getNitro() const { return m_nitro; }
+    // ------------------------------------------------------------------------
+    /** Sets if the kart activates nitro. */
+    void setNitro(bool b) { m_nitro = b; }
+    // ------------------------------------------------------------------------
+    /** Returns the skidding control state: SC_NONE: not pressed;
+     *  SC_NO_DIRECTION: pressed, but no steering;
+     *  SC_LEFT/RIGHT: pressed in the specified direction. */
+    SkidControl getSkidControl() const { return m_skid; }
+    // ------------------------------------------------------------------------
+    /** Sets the skid control for this kart. */
+    void setSkidControl(SkidControl sc) { m_skid = sc; }
+    // ------------------------------------------------------------------------
+    /** Returns true if the kart triggered rescue. */
+    bool getRescue() const { return m_rescue; }
+    // ------------------------------------------------------------------------
+    /** Returns if this kart wants to get rescued. */
+    void setRescue(bool b) { m_rescue = b; }
+    // ------------------------------------------------------------------------
+    /** Returns if fire is selected. */
+    bool getFire() const { return m_fire; }
+    // ------------------------------------------------------------------------
+    /** Sets if the kart wants to fire. */
+    void setFire(bool b) { m_fire = b; }
+    // ------------------------------------------------------------------------
+    /** Returns if the kart wants to look back (which also implies that it
+     *  will fire backwards. */
+    bool getLookBack() const { return m_look_back; }
+    // ------------------------------------------------------------------------
+    /** Sets if the kart wants to look (and therefore also fires) backwards. */
+    void setLookBack(bool b) { m_look_back = b; }
+
 };
 
 #endif

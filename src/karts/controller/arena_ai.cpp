@@ -86,8 +86,8 @@ void ArenaAI::reset()
 void ArenaAI::update(float dt)
 {
     // This is used to enable firing an item backwards.
-    m_controls->m_look_back = false;
-    m_controls->m_nitro     = false;
+    m_controls->setLookBack(false);
+    m_controls->setNitro(false);
     m_avoiding_banana = false;
 
     // Don't do anything if there is currently a kart animations shown.
@@ -114,7 +114,7 @@ void ArenaAI::update(float dt)
     if (m_kart->getSpeed() > 15.0f && m_turn_angle < 20)
     {
         // Only use nitro when turn angle is big (180 - angle)
-        m_controls->m_nitro = true;
+        m_controls->setNitro(true);
     }
 
     if (m_is_uturn)
@@ -298,15 +298,15 @@ void ArenaAI::checkIfStuck(const float dt)
 void ArenaAI::handleArenaAcceleration(const float dt)
 {
 
-    if (m_controls->m_brake)
+    if (m_controls->getBrake())
     {
-        m_controls->m_accel = 0.0f;
+        m_controls->setAccel(0.0f);
         return;
     }
 
     const float handicap =
         (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 0.7f : 1.0f);
-    m_controls->m_accel = stk_config->m_ai_acceleration * handicap;
+    m_controls->setAccel(stk_config->m_ai_acceleration * handicap);
 
 }   // handleArenaAcceleration
 
@@ -318,9 +318,9 @@ void ArenaAI::handleArenaUTurn(const float dt)
     if (fabsf(m_kart->getSpeed()) >
         (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
         && m_kart->getSpeed() < 0) // Try to emulate reverse like human players
-        m_controls->m_accel = -0.06f;
+        m_controls->setAccel(-0.06f);
     else
-        m_controls->m_accel = -5.0f;
+        m_controls->setAccel(-5.0f);
 
     if (m_time_since_uturn >=
         (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 2.0f : 1.5f))
@@ -351,9 +351,9 @@ bool ArenaAI::handleArenaUnstuck(const float dt)
     if (fabsf(m_kart->getSpeed()) >
         (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
         && m_kart->getSpeed() < 0)
-        m_controls->m_accel = -0.06f;
+        m_controls->setAccel(-0.06f);
     else
-        m_controls->m_accel = -4.0f;
+        m_controls->setAccel(-4.0f);
 
     m_time_since_reversing += dt;
 
@@ -423,11 +423,11 @@ void ArenaAI::handleArenaBraking()
     if (forceBraking() && m_kart->getSpeed() > MIN_SPEED)
     {
         // Brake now
-        m_controls->m_brake = true;
+        m_controls->setBrake(true);
         return;
     }
 
-    m_controls->m_brake = false;
+    m_controls->setBrake(false);
 
     if (getCurrentNode() == BattleGraph::UNKNOWN_POLY ||
         m_target_node    == BattleGraph::UNKNOWN_POLY) return;
@@ -437,10 +437,10 @@ void ArenaAI::handleArenaBraking()
     const float max_turn_speed = m_kart->getSpeedForTurnRadius(m_turn_radius);
 
     if (m_kart->getSpeed() > 1.25f * max_turn_speed &&
-        fabsf(m_controls->m_steer) > 0.95f &&
+        fabsf(m_controls->getSteer()) > 0.95f &&
         m_kart->getSpeed() > MIN_SPEED)
     {
-        m_controls->m_brake = true;
+        m_controls->setBrake(true);
     }
 
 }   // handleArenaBraking
@@ -502,7 +502,7 @@ float ArenaAI::findAngleFrom3Edges(float a, float b, float c)
 //-----------------------------------------------------------------------------
 void ArenaAI::handleArenaItems(const float dt)
 {
-    m_controls->m_fire = false;
+    m_controls->setFire(false);
     if (m_kart->getKartAnimation() ||
         m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING)
         return;
@@ -544,8 +544,8 @@ void ArenaAI::handleArenaItems(const float dt)
                  )
                )
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = false;
+                m_controls->setFire(true);
+                m_controls->setLookBack(false);
                 break;
             }
 
@@ -558,8 +558,8 @@ void ArenaAI::handleArenaItems(const float dt)
                 m_closest_kart_pos_data.distance > 3.0f) ||
                 m_time_since_last_shot > 15.0f)
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = true;
+                m_controls->setFire(true);
+                m_controls->setLookBack(true);
                 break;
             }
 
@@ -577,8 +577,8 @@ void ArenaAI::handleArenaItems(const float dt)
             if (m_closest_kart_pos_data.distance < 25.0f &&
                 !m_closest_kart->isInvulnerable())
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = fire_behind;
+                m_controls->setFire(true);
+                m_controls->setLookBack(fire_behind);
                 break;
             }
 
@@ -598,8 +598,8 @@ void ArenaAI::handleArenaItems(const float dt)
                 (difficulty || perfect_aim) &&
                 !m_closest_kart->isInvulnerable())
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = fire_behind;
+                m_controls->setFire(true);
+                m_controls->setLookBack(fire_behind);
                 break;
             }
 
@@ -618,8 +618,8 @@ void ArenaAI::handleArenaItems(const float dt)
                  m_closest_kart_pos_data.distance < d2 &&
                  m_closest_kart->getSpeed() < m_kart->getSpeed())
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = false;
+                m_controls->setFire(true);
+                m_controls->setLookBack(false);
                 break;
             }
             break;
@@ -633,7 +633,7 @@ void ArenaAI::handleArenaItems(const float dt)
         break;   // POWERUP_PLUNGER
 
     case PowerupManager::POWERUP_SWITCH: // Don't handle switch
-        m_controls->m_fire = true;       // (use it no matter what) for now
+        m_controls->setFire(true);       // (use it no matter what) for now
         break;   // POWERUP_SWITCH
 
     case PowerupManager::POWERUP_PARACHUTE:
@@ -651,7 +651,7 @@ void ArenaAI::handleArenaItems(const float dt)
                 m_kart->getPowerup()->getType());
         assert(false);
     }
-    if (m_controls->m_fire)
+    if (m_controls->getFire())
         m_time_since_last_shot  = 0.0f;
 }   // handleArenaItems
 
