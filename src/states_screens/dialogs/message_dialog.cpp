@@ -17,9 +17,6 @@
 
 #include "states_screens/dialogs/message_dialog.hpp"
 
-#include "guiengine/engine.hpp"
-#include "guiengine/screen.hpp"
-#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "modes/world.hpp"
@@ -136,9 +133,7 @@ void MessageDialog::loadedFromFile()
         // In case of a OK_CANCEL dialog, change the text from 'Yes' to 'Ok'
         IconButtonWidget* yesbtn = getWidget<IconButtonWidget>("confirm");
         yesbtn->setText(_("OK"));
-        yesbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
-    ribbon->setSelection(0, PLAYER_ID_GAME_MASTER);
 }
 
 // ----------------------------------------------------------------------------
@@ -152,10 +147,8 @@ void MessageDialog::onEnterPressedInternal()
 GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& eventSource)
 {
     RibbonWidget* ribbon = getWidget<RibbonWidget>(eventSource.c_str());
-
-    // m_cancel_selected makes it so that the the dialog closes when the user presses
-    // enter and not just when the user navigates to a button with the arrow keys
-    if (ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER) == "cancel" && m_cancel_selected)
+    
+    if (ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER) == "cancel")
     {
         if (m_listener == NULL)
         {
@@ -168,7 +161,7 @@ GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& event
 
         return GUIEngine::EVENT_BLOCK;
     }
-    else if (ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER) == "confirm" && !m_cancel_selected)
+    else if (ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER) == "confirm")
     {
         if (m_listener == NULL)
         {
@@ -181,8 +174,6 @@ GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& event
 
         return GUIEngine::EVENT_BLOCK;
     }
-
-    m_cancel_selected = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER) == "cancel";
 
     return GUIEngine::EVENT_LET;
 }

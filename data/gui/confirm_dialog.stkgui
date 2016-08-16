@@ -5,7 +5,7 @@
 
         <spacer height="25" width="10" />
 
-        <ribbon id="buttons" height="30%" width="30%" align="center">
+        <buttonbar id="buttons" height="30%" width="30%" align="center">
 
             <icon-button id="confirm" icon="gui/green_check.png" I18N="In a 'are you sure?' dialog"
                 text="Yes" align="center"/>
@@ -13,7 +13,7 @@
             <icon-button id="cancel" icon="gui/remove.png" I18N="In a 'are you sure?' dialog"
                 text="Cancel" align="center"/>
 
-        </ribbon>
+        </buttonbar>
 
         <spacer height="10" width="10" />
     </div>
