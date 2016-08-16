@@ -195,6 +195,7 @@ public:
      *  It calls undoEvent in the rewinder. */
     virtual void undo()
     {
+        m_buffer->reset();
         m_event_rewinder->undo(m_buffer);
     }   // undo
     // ------------------------------------------------------------------------
@@ -205,7 +206,7 @@ public:
     {
         // Make sure to reset the buffer so we read from the beginning
         m_buffer->reset();
-        m_event_rewinder->rewind(getBuffer());
+        m_event_rewinder->rewind(m_buffer);
     }   // rewind
     // ------------------------------------------------------------------------
     /** Returns the buffer with the event information in it. */

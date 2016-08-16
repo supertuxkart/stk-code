@@ -37,7 +37,6 @@ KartRewinder::KartRewinder(AbstractKart *kart) : Rewinder(/*can_be_destroyed*/ f
  */
 void KartRewinder::reset()
 {
-    m_previous_control    = m_kart->getControls();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -114,35 +113,11 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
  */
 void KartRewinder::update()
 {
-    // Don't store events from a rewind
-    if(RewindManager::get()->isRewinding()) return;
-
-    // Check if an event has happened that needs to be recorded
-    bool control_event = !(m_kart->getControls()   == m_previous_control);
-    uint8_t type = (control_event ? EVENT_CONTROL : 0);
-    if(type == 0)
-        return;   // no event
-
-    // Likely it is only a single event, so limit initial memory allocation
-    BareNetworkString *buffer = 
-                      new BareNetworkString(m_previous_control.getLength());
-    buffer->addUInt8(type);
-    if(control_event)
-    {
-        m_previous_control = m_kart->getControls();
-        m_previous_control.copyToBuffer(buffer);
-    }
-    // The rewind manager will free the memory once it's not needed anymore
-    //XXXXXXXXXXXXXXX RewindManager::get()->addEvent(this, buffer);
 }   // update
 
 // ----------------------------------------------------------------------------
 void KartRewinder::rewindToEvent(BareNetworkString *buffer)
 {
-    buffer->reset();
-    uint8_t type = buffer->getUInt8();
-    if(type & EVENT_CONTROL)
-        m_kart->getControls().setFromBuffer(buffer);
 };   // rewindToEvent
 
 

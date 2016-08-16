@@ -19,8 +19,6 @@
 #ifndef HEADER_KART_REWINDER_HPP
 #define HEADER_KART_REWINDER_HPP
 
-#include "karts/controller/kart_control.hpp"
-
 #include "network/rewinder.hpp"
 #include "utils/cpp2011.hpp"
 
@@ -33,10 +31,6 @@ private:
 	/** Pointer to the original kart object. */
 	AbstractKart *m_kart;
     
-    /** The previous kart controls, used to detect if a new event 
-     *  needs to be created. */
-    KartControl  m_previous_control;
-
     // Flags to indicate the different event types
     enum { EVENT_CONTROL = 0x01,
            EVENT_ATTACH  = 0x02 };
