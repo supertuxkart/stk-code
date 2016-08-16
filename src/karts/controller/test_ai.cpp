@@ -291,8 +291,8 @@ void SkiddingAI::update(float dt)
     // or slipstreaming.
 #undef AI_DOES_NOT_MOVE_FOR_DEBUGGING
 #ifdef AI_DOES_NOT_MOVE_FOR_DEBUGGING
-    m_controls->m_accel     = 0;
-    m_controls->m_steer     = 0;
+    m_controls->setAccel(0);
+    m_controls->setSteer(0);
     return;
 #endif
 

@@ -1185,8 +1185,8 @@ void Kart::update(float dt)
         getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
         getVelocity().length(),
         m_max_speed->getCurrentMaxSpeed(),
-        getControls().m_steer,
-        getControls().m_accel);
+        getControls().getSteer(),
+        getControls().getAccel());
 #endif
 
     // update star effect (call will do nothing if stars are not activated)
@@ -2791,7 +2791,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     }
 #ifdef XX
     // cheap wheelie effect
-    if (m_controls.m_nitro)
+    if (m_controls.getNitro())
     {
         m_node->updateAbsolutePosition();
         m_kart_model->getWheelNodes()[0]->updateAbsolutePosition();
