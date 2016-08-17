@@ -21,6 +21,8 @@
 
 #include "utils/leak_check.hpp"
 
+#include <vector>
+
 namespace irr
 {
     namespace scene { class IMesh; }
@@ -41,9 +43,11 @@ public:
     };
 
 private:
-    float m_hue;
+    float m_static_hue;
 
     bool m_transparent;
+
+    std::vector<float> m_dynamic_hue;
 
 public:
     LEAK_CHECK();
@@ -52,11 +56,11 @@ public:
     // ------------------------------------------------------------------------
     ~RenderInfo() {}
     // ------------------------------------------------------------------------
-    void setHue(float hue)                                    { m_hue = hue; }
+    void setHue(float hue)                             { m_static_hue = hue; }
     // ------------------------------------------------------------------------
     void setTransparent(bool transparent)     { m_transparent = transparent; }
     // ------------------------------------------------------------------------
-    float getHue() const                                     { return m_hue; }
+    float getHue() const                              { return m_static_hue; }
     // ------------------------------------------------------------------------
     bool isTransparent() const                       { return m_transparent; }
     // ------------------------------------------------------------------------
@@ -68,7 +72,20 @@ public:
         setTransparent(krt == RenderInfo::KRT_TRANSPARENT ? true : false);
     }
     // ------------------------------------------------------------------------
-    void setRenderInfo(const RenderInfo* other)            { *this = *other; }
+    /** Returns true if this render info is static. ie affect all material
+      * using the same hue. (like the kart colorization in soccer game)
+      */
+    bool isStatic() const                    { return m_dynamic_hue.empty(); }
+    // ------------------------------------------------------------------------
+    unsigned int getNumberOfHue() const       { return m_dynamic_hue.size(); }
+    // ------------------------------------------------------------------------
+    float getDynamicHue(unsigned int hue) const
+    {
+        assert(hue < m_dynamic_hue.size());
+        return m_dynamic_hue[hue];
+    }
+    // ------------------------------------------------------------------------
+    void setDynamicHue(irr::scene::IMesh* mesh);
 
 };   // RenderInfo
 

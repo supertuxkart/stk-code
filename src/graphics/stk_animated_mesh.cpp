@@ -100,22 +100,44 @@ void STKAnimatedMesh::updateNoGL()
     if (!isMaterialInitialized)
     {
         video::IVideoDriver* driver = SceneManager->getVideoDriver();
-        for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
+        const u32 mb_count = m->getMeshBufferCount();
+        for (u32 i = 0; i < mb_count; ++i)
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
             bool affected = false;
-            if (!m_all_parts_colorized && mb && m_mesh_render_info)
+            RenderInfo* cur_ri = m_mesh_render_info;
+            if (!m_all_parts_colorized && mb && cur_ri)
             {
-                // Test if material is affected by hue change
-                Material* m = material_manager->getMaterialFor(mb
-                    ->getMaterial().getTexture(0), mb);
-                if (m->isColorizable())
-                    affected = true;
+                if (m_mesh_render_info && !m_mesh_render_info->isStatic())
+                {
+                    // Convert to static render info for each mesh buffer
+                    assert(m_mesh_render_info->getNumberOfHue() == mb_count);
+                    const float hue = m_mesh_render_info->getDynamicHue(i);
+                    if (hue > 0.0f)
+                    {
+                        cur_ri = new RenderInfo(hue);
+                        m_static_render_info.push_back(cur_ri);
+                        affected = true;
+                    }
+                    else
+                    {
+                        cur_ri = NULL;
+                    }
+                }
+                else
+                {
+                    // Test if material is affected by static hue change
+                    Material* m = material_manager->getMaterialFor(mb
+                        ->getMaterial().getTexture(0), mb);
+                    if (m->isColorizable())
+                        affected = true;
+                }
             }
 
+            assert(cur_ri ? cur_ri->isStatic() : true);
             GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
-                affected || m_all_parts_colorized || (m_mesh_render_info
-                && m_mesh_render_info->isTransparent()) ? m_mesh_render_info : NULL));
+                affected || m_all_parts_colorized || (cur_ri
+                && cur_ri->isTransparent()) ? cur_ri : NULL));
         }
 
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)

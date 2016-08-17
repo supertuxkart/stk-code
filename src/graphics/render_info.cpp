@@ -26,6 +26,19 @@
 // ----------------------------------------------------------------------------
 RenderInfo::RenderInfo(float hue, bool transparent)
 {
-    m_hue = hue;
+    m_static_hue = hue;
     m_transparent = transparent;
 }   // RenderInfo
+
+// ----------------------------------------------------------------------------
+void RenderInfo::setDynamicHue(irr::scene::IMesh* mesh)
+{
+    unsigned int n = mesh->getMeshBufferCount();
+    for (unsigned int i = 0; i < n; i++)
+    {
+        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+        Material* m = material_manager->getMaterialFor(mb
+            ->getMaterial().getTexture(0), mb);
+        m_dynamic_hue.push_back(m->getRandomHue());
+    }
+}   // setDynamicHue
