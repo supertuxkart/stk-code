@@ -50,111 +50,119 @@ void KartControl::rewind(BareNetworkString *buffer)
 /** Sets the current steering value. */
 void KartControl::setSteer(float f)
 {
+    float old_steer = m_steer;
+    m_steer         = f;
     RewindManager *re = RewindManager::get();
-    if (re->isEnabled() && !re->isRewinding() && m_steer != f)
+    if (re->isEnabled() && !re->isRewinding() && old_steer != m_steer)
     {
         // Save full status
         BareNetworkString *buffer = new BareNetworkString(getLength());
         copyToBuffer(buffer);
         RewindManager::get()->addEvent(this, buffer);
     }
-    m_steer = f;
 }   // setSteer
 
 // ----------------------------------------------------------------------------
 /** Sets the acceleration. */
 void KartControl::setAccel(float f)
 {
+    float old_accel = m_steer;
+    m_accel         = f; 
     RewindManager *re = RewindManager::get();
-    if (re->isEnabled() && !re->isRewinding() && m_accel != f)
+    if (re->isEnabled() && !re->isRewinding() && old_accel != m_accel)
     {
         BareNetworkString *buffer = new BareNetworkString(getLength());
         copyToBuffer(buffer);
         RewindManager::get()->addEvent(this, buffer);
     }
-    m_accel = f; 
 }   // setAccel
 
 // ----------------------------------------------------------------------------
 /** Sets if the kart is braking. */
 void KartControl::setBrake(bool b)
 {
+    bool old_brake = m_brake;
+    m_brake        = b;
     RewindManager *re = RewindManager::get();
-    if (re->isEnabled() && !re->isRewinding() && m_brake != b)
+    if (re->isEnabled() && !re->isRewinding() && old_brake != m_brake)
     {
         // Only store the buttons in this case
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
         RewindManager::get()->addEvent(this, buffer);
     }
-    m_brake = b; 
 }   // setBrake
 // ----------------------------------------------------------------------------
 /** Sets if the kart activates nitro. */
 void KartControl::setNitro(bool b)
 {
+    bool old_nitro = m_nitro;
+    m_nitro        = b;
     RewindManager *re = RewindManager::get();
-    if (re->isEnabled() && !re->isRewinding() && m_nitro != b)
+    if (re->isEnabled() && !re->isRewinding() && old_nitro != m_nitro)
     {
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
         RewindManager::get()->addEvent(this, buffer);
     }
-    m_nitro = b; 
 }   // setNitro
 
 // ----------------------------------------------------------------------------
 /** Sets the skid control for this kart. */
 void KartControl::setSkidControl(SkidControl sc)
 {
+    bool old_skid = m_skid;
+    m_skid        = sc;
     RewindManager *re = RewindManager::get();
-    if (re->isEnabled() && !re->isRewinding() && m_skid != sc)
+    if (re->isEnabled() && !re->isRewinding() && old_skid != m_skid)
     {
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
         RewindManager::get()->addEvent(this, buffer);
     }
-    m_skid = sc; 
 }   // seSkidControl
 
 // ----------------------------------------------------------------------------
 /** Returns if this kart wants to get rescued. */
 void KartControl::setRescue(bool b)
 { 
+    bool old_rescue = m_rescue;
+    m_rescue        = b;
     RewindManager *re = RewindManager::get();
-    if (re->isEnabled() && !re->isRewinding() && m_rescue != b)
+    if (re->isEnabled() && !re->isRewinding() && old_rescue != m_rescue)
     {
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
         RewindManager::get()->addEvent(this, buffer);
     }
-    m_rescue = b; 
 }   // setRescue
 
 // ----------------------------------------------------------------------------
 /** Sets if the kart wants to fire. */
 void KartControl::setFire(bool b)
 { 
+    bool old_fire = m_fire;
+    m_fire        = b; 
     RewindManager *re = RewindManager::get();
-    if (re->isEnabled() && !re->isRewinding() && m_fire != b)
+    if (re->isEnabled() && !re->isRewinding() && old_fire != m_fire)
     {
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
         RewindManager::get()->addEvent(this, buffer);
     }
-    m_fire = b; 
 }   // setFire
 
 // ----------------------------------------------------------------------------
 /** Sets if the kart wants to look (and therefore also fires) backwards. */
 void KartControl::setLookBack(bool b)
 {
+    bool old_look = m_look_back;
+    m_look_back   = b;
     RewindManager *re = RewindManager::get();
-    if (re->isEnabled() && !re->isRewinding() && m_look_back != b)
+    if (re->isEnabled() && !re->isRewinding() && old_look != m_look_back)
     {
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
         RewindManager::get()->addEvent(this, buffer);
     }
-    m_look_back = b; 
 }   // setLookBack
