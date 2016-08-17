@@ -21,6 +21,7 @@
 
 #include "utils/leak_check.hpp"
 
+#include <assert.h>
 #include <vector>
 
 namespace irr
