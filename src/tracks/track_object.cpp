@@ -185,16 +185,20 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         // Colorization settings
         std::string model_name;
         xml_node.get("model", &model_name);
-        scene::IMesh* mesh = irr_driver->getMesh(model_name);
-
         bool colorizable = false;
-        unsigned int n = mesh->getMeshBufferCount();
-        for (unsigned int i = 0; i < n; i++)
+        scene::IMesh* mesh = NULL;
+        if (model_name.size() > 0)
         {
-            scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-            Material* m = material_manager->getMaterialFor(mb
-                ->getMaterial().getTexture(0), mb);
-            colorizable = colorizable || m->isColorizable();
+            mesh = irr_driver->getMesh(model_name);
+            assert(mesh != NULL);
+            unsigned int n = mesh->getMeshBufferCount();
+            for (unsigned int i = 0; i < n; i++)
+            {
+                scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+                Material* m = material_manager->getMaterialFor(mb
+                    ->getMaterial().getTexture(0), mb);
+                colorizable = colorizable || m->isColorizable();
+            }
         }
 
         // If at least one material is colorizable, add RenderInfo for it
