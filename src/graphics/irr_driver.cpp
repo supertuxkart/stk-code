@@ -528,20 +528,40 @@ void IrrDriver::initDevice()
     }
     
     CVS->init();
+    
+    bool recreate_device = false;
+    
+    // Some drivers are able to create OpenGL 3.1 context, but shader-based
+    // pipeline doesn't work for them. For example some radeon drivers 
+    // support only GLSL 1.3 and it causes STK to crash. We should force to use
+    // fixed pipeline in this case.
+    if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
+    {
+        Log::warn("irr_driver", "Driver doesn't support shader-based pipeline. "
+                                "Re-creating device to workaround the issue.");
+
+        params.ForceLegacyDevice = true;
+        recreate_device = true;        
+    }
                     
     // This is the ugly hack for intel driver on linux, which doesn't
     // use sRGB-capable visual, even if we request it. This causes
     // the screen to be darker than expected. It affects mesa 10.6 and newer. 
     // Though we are able to force to use the proper format on mesa side by 
     // setting WithAlphaChannel parameter.
-    if (!ProfileWorld::isNoGraphics() && CVS->needsSRGBCapableVisualWorkaround())
+    else if (CVS->needsSRGBCapableVisualWorkaround())
     {
         Log::warn("irr_driver", "Created visual is not sRGB-capable. "
                                 "Re-creating device to workaround the issue.");
-        m_device->closeDevice();
-        m_device->drop();
 
         params.WithAlphaChannel = true;
+        recreate_device = true;
+    }
+    
+    if (!ProfileWorld::isNoGraphics() && recreate_device)
+    {
+        m_device->closeDevice();
+        m_device->drop();  
         
         m_device = createDeviceEx(params);
         
@@ -549,6 +569,8 @@ void IrrDriver::initDevice()
         {
             Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
         }
+        
+        CVS->init();
     }
 
     m_scene_manager = m_device->getSceneManager();

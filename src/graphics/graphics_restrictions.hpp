@@ -57,6 +57,7 @@ namespace GraphicsRestrictions
         GR_FRAMEBUFFER_SRGB_WORKING,
         GR_FRAMEBUFFER_SRGB_CAPABLE,
         GR_GI,
+        GR_FORCE_LEGACY_DEVICE,
         GR_COUNT  /** MUST be last entry. */
     } ;
 
