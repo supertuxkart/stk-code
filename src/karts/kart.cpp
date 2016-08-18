@@ -33,6 +33,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
@@ -91,8 +92,7 @@
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
-            PerPlayerDifficulty difficulty,
-            RenderInfo::KartRenderType krt)
+            PerPlayerDifficulty difficulty, KartRenderType krt)
      : AbstractKart(ident, world_kart_id, position, init_transform,
              difficulty, krt)
 

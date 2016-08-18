@@ -22,7 +22,6 @@
 #include <memory>
 
 #include "items/powerup_manager.hpp"
-#include "graphics/render_info.hpp"
 #include "karts/moveable.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "race/race_manager.hpp"
@@ -49,6 +48,8 @@ class Powerup;
 class Skidding;
 class SlipStream;
 class TerrainInfo;
+
+enum KartRenderType: unsigned int;
 
 /** An abstract interface for the actual karts. Some functions are actually
  *  implemented here in order to allow inlining.
@@ -100,7 +101,7 @@ public:
                                 int world_kart_id,
                                 int position, const btTransform& init_transform,
                                 PerPlayerDifficulty difficulty,
-                                RenderInfo::KartRenderType krt);
+                                KartRenderType krt);
     virtual       ~AbstractKart();
     virtual core::stringw getName() const;
     virtual void   reset();

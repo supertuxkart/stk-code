@@ -30,13 +30,15 @@ namespace irr
 }
 using namespace irr;
 
-#include "graphics/render_info.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
 class AbstractKart;
 class KartProperties;
+class RenderInfo;
 class XMLNode;
+
+enum KartRenderType: unsigned int;
 
 /** A speed-weighted object is an object whose characteristics are influenced by the kart's speed */
 struct SpeedWeightedObject
@@ -231,16 +233,16 @@ private:
     /** Pointer to the kart object belonging to this kart model. */
     AbstractKart* m_kart;
 
-    RenderInfo::KartRenderType m_krt;
+    KartRenderType m_krt;
 
-    RenderInfo m_render_info;
+    RenderInfo* m_render_info;
 
     bool m_support_colorization;
 
 public:
                   KartModel(bool is_master);
                  ~KartModel();
-    KartModel*    makeCopy(RenderInfo::KartRenderType krt);
+    KartModel*    makeCopy(KartRenderType krt);
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
@@ -338,17 +340,7 @@ public:
     // ------------------------------------------------------------------------
     core::vector3df getHatOffset() { return m_hat_offset; }
     // ------------------------------------------------------------------------
-    RenderInfo* getRenderInfo()
-    {
-        return m_support_colorization || m_krt == RenderInfo::KRT_TRANSPARENT ?
-            &m_render_info : NULL;
-    }
-    // ------------------------------------------------------------------------
-    const RenderInfo* getRenderInfo() const
-    {
-        return m_support_colorization || m_krt == RenderInfo::KRT_TRANSPARENT ?
-            &m_render_info : NULL;
-    }
+    RenderInfo* getRenderInfo();
     // ------------------------------------------------------------------------
     bool supportColorization() const         { return m_support_colorization; }
 

@@ -20,6 +20,7 @@
 #define HEADER_RENDER_INFO_HPP
 
 #include "utils/leak_check.hpp"
+#include "utils/no_copy.hpp"
 
 #include <assert.h>
 #include <vector>
@@ -29,20 +30,19 @@ namespace irr
     namespace scene { class IMesh; }
 }
 
+enum KartRenderType: unsigned int
+{
+    KRT_DEFAULT,
+    KRT_RED,
+    KRT_BLUE,
+    KRT_TRANSPARENT,
+};
+
 /**
   * \ingroup graphics
   */
-class RenderInfo
+class RenderInfo : public NoCopy
 {
-public:
-    enum KartRenderType
-    {
-        KRT_DEFAULT,
-        KRT_RED,
-        KRT_BLUE,
-        KRT_TRANSPARENT,
-    };
-
 private:
     float m_static_hue;
 
@@ -67,10 +67,8 @@ public:
     // ------------------------------------------------------------------------
     void setKartModelRenderInfo(KartRenderType krt)
     {
-        setHue(krt == RenderInfo::KRT_BLUE ? 0.66f :
-            krt == RenderInfo::KRT_RED ? 1.0f : 0.0f);
-
-        setTransparent(krt == RenderInfo::KRT_TRANSPARENT ? true : false);
+        setHue(krt == KRT_BLUE ? 0.66f : krt == KRT_RED ? 1.0f : 0.0f);
+        setTransparent(krt == KRT_TRANSPARENT ? true : false);
     }
     // ------------------------------------------------------------------------
     /** Returns true if this render info is static. ie affect all material

@@ -30,6 +30,7 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
@@ -116,6 +117,7 @@ KartModel::KartModel(bool is_master)
     m_hat_name   = "";
     m_hat_node   = NULL;
     m_hat_offset = core::vector3df(0,0,0);
+    m_render_info = NULL;
 
     for(unsigned int i=0; i<4; i++)
     {
@@ -141,7 +143,7 @@ KartModel::KartModel(bool is_master)
     m_animation_speed   = 25;
     m_current_animation = AF_DEFAULT;
     m_play_non_loop     = false;
-    m_krt               = RenderInfo::KRT_DEFAULT;
+    m_krt               = KRT_DEFAULT;
     m_support_colorization = false;
 }   // KartModel
 
@@ -246,7 +248,7 @@ KartModel::~KartModel()
             assert(!m_is_master);
 
             // Drop the cloned transparent model if created
-            if (m_krt == RenderInfo::KRT_TRANSPARENT)
+            if (m_krt == KRT_TRANSPARENT)
             {
                 m_speed_weighted_objects[i].m_model->drop();
             }
@@ -275,6 +277,8 @@ KartModel::~KartModel()
             }
         }
     }
+
+    delete m_render_info;
 #ifdef DEBUG
 #if SKELETON_DEBUG
     irr_driver->clearDebugMeshes();
@@ -289,12 +293,13 @@ KartModel::~KartModel()
  *  It is also marked not to be a master copy, so attachModel can be called
  *  for this instance.
  */
-KartModel* KartModel::makeCopy(RenderInfo::KartRenderType krt)
+KartModel* KartModel::makeCopy(KartRenderType krt)
 {
     // Make sure that we are copying from a master objects, and
     // that there is indeed no animated node defined here ...
     // just in case.
     assert(m_is_master);
+    assert(m_render_info == NULL);
     assert(!m_animated_node);
     KartModel *km              = new KartModel(/*is master*/ false);
     km->m_kart_width           = m_kart_width;
@@ -311,6 +316,8 @@ KartModel* KartModel::makeCopy(RenderInfo::KartRenderType krt)
     km->m_hat_name             = m_hat_name;
     km->m_krt                  = krt;
     km->m_support_colorization = m_support_colorization;
+    km->m_render_info          = new RenderInfo();
+    km->m_render_info->setKartModelRenderInfo(krt);
 
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
     km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
@@ -335,7 +342,7 @@ KartModel* KartModel::makeCopy(RenderInfo::KartRenderType krt)
         // Master should not have any speed weighted nodes.
         assert(!m_speed_weighted_objects[i].m_node);
         km->m_speed_weighted_objects[i] = m_speed_weighted_objects[i];
-        if (krt == RenderInfo::KRT_TRANSPARENT)
+        if (krt == KRT_TRANSPARENT)
         {
             // Only clone the mesh if transparent type is used, see #2445
             km->m_speed_weighted_objects[i].m_model = irr_driver
@@ -359,7 +366,6 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
     assert(!m_is_master);
 
     scene::ISceneNode* node = NULL;
-    m_render_info.setKartModelRenderInfo(m_krt);
 
     if (animated_models)
     {
@@ -1031,3 +1037,10 @@ void KartModel::attachHat()
         }   // if bone
     }   // if(m_hat_name)
 }   // attachHat
+
+//-----------------------------------------------------------------------------
+RenderInfo* KartModel::getRenderInfo()
+{
+    return m_support_colorization || m_krt == KRT_TRANSPARENT ?
+        m_render_info : NULL;
+}   // getRenderInfo

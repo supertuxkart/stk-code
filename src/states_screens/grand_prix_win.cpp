@@ -23,6 +23,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -304,7 +305,7 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         const KartProperties* kp = kart_properties_manager->getKart(idents[i]);
         if (kp == NULL) continue;
 
-        KartModel* kart_model = kp->getKartModelCopy();
+        KartModel* kart_model = kp->getKartModelCopy(KRT_DEFAULT);
         m_all_kart_models.push_back(kart_model);
         scene::ISceneNode* kart_main_node = kart_model->attachModel(false, false);
 
