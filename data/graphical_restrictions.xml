@@ -3,6 +3,7 @@
   <card is="Intel(R) HD Graphics 3000" os="windows"                disable="UniformBufferObject"/>
   <card is="Intel(R) HD Graphics 3000" os="windows"                disable="AdvancedPipeline"/>
   <card is="Intel(R) HD Graphics 3000" os="windows"                disable="FramebufferSRGBWorking"/>
+  <card is="Intel(R) HD Graphics"      os="windows"                disable="ForceLegacyDevice"/>
   <card contains="Intel"          os="osx"                         disable="GI"/>
   <card contains="Intel"          os="linux"    version="<11.2"    disable="ComputeShader"/>
   <card contains="Intel"          os="linux"    version="<11.2"    disable="GeometryShader"/>
@@ -27,5 +28,5 @@
   <card contains="Radeon"         os="linux"    version="<14.300"  disable="DriverRecentEnough"/>
   <card contains="Radeon"         os="windows"  version="<14.300"  disable="DriverRecentEnough"/>
   <card contains="ATI"            os="windows"  version="<14.300"  disable="DriverRecentEnough"/>
+  <card contains="ATI"            os="windows"  version="<3.1.8787" disable="ForceLegacyDevice"/>
 </graphical-restrictions>
-
