@@ -27,6 +27,7 @@
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
 #include "tracks/battle_graph.hpp"
+#include "tracks/quad.hpp"
 #include "utils/log.hpp"
 
 int ArenaAI::m_test_node_for_banana = BattleGraph::UNKNOWN_POLY;
@@ -156,7 +157,7 @@ bool ArenaAI::updateAimingPosition()
     if (forward == m_target_node)
     {
         m_aiming_points.push_back(BattleGraph::get()
-            ->getPolyOfNode(forward).getCenter());
+            ->getQuadOfNode(forward).getCenter());
         m_aiming_points.push_back(m_target_point);
 
         m_aiming_nodes.insert(forward);
@@ -174,9 +175,9 @@ bool ArenaAI::updateAimingPosition()
     }
 
     m_aiming_points.push_back(BattleGraph::get()
-        ->getPolyOfNode(forward).getCenter());
+        ->getQuadOfNode(forward).getCenter());
     m_aiming_points.push_back(BattleGraph::get()
-        ->getPolyOfNode(next_node).getCenter());
+        ->getQuadOfNode(next_node).getCenter());
 
     m_aiming_nodes.insert(forward);
     m_aiming_nodes.insert(next_node);

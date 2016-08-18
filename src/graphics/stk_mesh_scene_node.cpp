@@ -77,22 +77,44 @@ void STKMeshSceneNode::setReloadEachFrame(bool val)
 
 void STKMeshSceneNode::createGLMeshes(RenderInfo* render_info, bool all_parts_colorized)
 {
-    for (u32 i = 0; i<Mesh->getMeshBufferCount(); ++i)
+    const u32 mb_count = Mesh->getMeshBufferCount();
+    for (u32 i = 0; i < mb_count; ++i)
     {
         scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
         bool affected = false;
+        RenderInfo* cur_ri = render_info;
         if (!all_parts_colorized && mb && render_info)
         {
-            // Test if material is affected by hue change
-            Material* m = material_manager->getMaterialFor(mb
-                ->getMaterial().getTexture(0), mb);
-            if (m->isColorizable())
-                affected = true;
+            if (render_info && !render_info->isStatic())
+            {
+                // Convert to static render info for each mesh buffer
+                assert(render_info->getNumberOfHue() == mb_count);
+                const float hue = render_info->getDynamicHue(i);
+                if (hue > 0.0f)
+                {
+                    cur_ri = new RenderInfo(hue);
+                    m_static_render_info.push_back(cur_ri);
+                    affected = true;
+                }
+                else
+                {
+                    cur_ri = NULL;
+                }
+            }
+            else
+            {
+                // Test if material is affected by static hue change
+                Material* m = material_manager->getMaterialFor(mb
+                    ->getMaterial().getTexture(0), mb);
+                if (m->isColorizable())
+                    affected = true;
+            }
         }
 
+        assert(cur_ri ? cur_ri->isStatic() : true);
         GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
-            affected || all_parts_colorized || (render_info &&
-            render_info->isTransparent()) ? render_info : NULL));
+            affected || all_parts_colorized || (cur_ri &&
+            cur_ri->isTransparent()) ? cur_ri : NULL));
     }
     isMaterialInitialized = false;
     isGLInitialized = false;

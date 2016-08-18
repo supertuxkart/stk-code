@@ -24,6 +24,7 @@
 #include "font/regular_face.hpp"
 #include "graphics/camera_debug.hpp"
 #include "graphics/camera_fps.hpp"
+#include "karts/explosion_animation.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/shaders.hpp"
@@ -99,6 +100,7 @@ enum DebugMenuCommand
     DEBUG_ATTACHMENT_PARACHUTE,
     DEBUG_ATTACHMENT_BOMB,
     DEBUG_ATTACHMENT_ANVIL,
+    DEBUG_ATTACHMENT_EXPLOSION,
     DEBUG_GUI_TOGGLE,
     DEBUG_GUI_HIDE_KARTS,
     DEBUG_GUI_CAM_FREE,
@@ -409,6 +411,13 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_ATTACHMENT_PARACHUTE:
         addAttachment(Attachment::ATTACH_PARACHUTE);
         break;
+    case DEBUG_ATTACHMENT_EXPLOSION:
+        for (unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+        {
+            AbstractKart* kart = world->getLocalPlayerKart(i);
+            ExplosionAnimation::create(kart, kart->getXYZ(), true);
+        }
+        break;
     case DEBUG_GUI_TOGGLE:
     {
         if (!world) return false;
@@ -685,6 +694,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Bomb", DEBUG_ATTACHMENT_BOMB);
             sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
             sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
+            sub->addItem(L"Explosion", DEBUG_ATTACHMENT_EXPLOSION);
 
             mnu->addItem(L"GUI >",-1,true, true);
             sub = mnu->getSubMenu(3);

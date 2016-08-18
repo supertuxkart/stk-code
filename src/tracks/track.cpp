@@ -38,8 +38,6 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/render_info.hpp"
-#include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
@@ -1717,7 +1715,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
     }
 
-    loadObjects(root, path, model_def_loader, true, NULL, NULL, NULL);
+    loadObjects(root, path, model_def_loader, true, NULL, NULL);
 
     model_def_loader.cleanLibraryNodesAfterLoad();
 
@@ -1905,7 +1903,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
 void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& model_def_loader,
                         bool create_lod_definitions, scene::ISceneNode* parent,
-                        TrackObject* parent_library, RenderInfo* ri)
+                        TrackObject* parent_library)
 {
     unsigned int start_position_counter = 0;
 
@@ -1919,7 +1917,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         if (name == "track" || name == "default-start") continue;
         if (name == "object" || name == "library")
         {
-            m_track_object_manager->add(*node, parent, model_def_loader, parent_library, ri);
+            m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }
         else if (name == "water")
         {
@@ -1963,7 +1961,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         {
             if (UserConfigParams::m_graphical_effects)
             {
-                m_track_object_manager->add(*node, parent, model_def_loader, parent_library, NULL);
+                m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
             }
         }
         else if (name == "sky-dome" || name == "sky-box" || name == "sky-color")
@@ -1976,7 +1974,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         }
         else if (name == "light")
         {
-            m_track_object_manager->add(*node, parent, model_def_loader, parent_library, NULL);
+            m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }
         else if (name == "weather")
         {

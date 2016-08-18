@@ -37,6 +37,7 @@ void BoldFace::init()
     setFallbackFontScale(2.0f);*/
 
 }   // init
+
 // ----------------------------------------------------------------------------
 void BoldFace::reset()
 {

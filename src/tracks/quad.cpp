@@ -88,7 +88,7 @@ void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
 }   // setVertices
 
 // ----------------------------------------------------------------------------
-bool Quad::pointInQuad(const Vec3& p) const
+bool Quad::pointInQuad(const Vec3& p, bool ignore_vertical) const
 {
     // In case that a kart can validly run too high over one driveline
     // and it should not be considered to be on that driveline. Example:
@@ -98,17 +98,21 @@ bool Quad::pointInQuad(const Vec3& p) const
     // is taken into account, too. to simplify this test we only compare
     // with the minimum height of the quad (and not with the actual
     // height of the quad at the point where the kart is).
-    if(p.getY() - m_max_height > 5.0f ||
-       p.getY() - m_min_height < -1.0f    )
+    if(!ignore_vertical                &&
+       (p.getY() - m_max_height > 5.0f ||
+       p.getY() - m_min_height < -1.0f   ))
        return false;
 
     // If a point is exactly on the line of two quads (e.g. between points
     // 0,1 on one quad, and 3,2 of the previous quad), assign this point
     // to be on the 'later' quad, i.e. on the line between points 0 and 1.
-    if(p.sideOfLine2D(m_p[0], m_p[2])<0) {
+    if(p.sideOfLine2D(m_p[0], m_p[2])<0)
+    {
         return p.sideOfLine2D(m_p[0], m_p[1]) >= 0.0 &&
                p.sideOfLine2D(m_p[1], m_p[2]) >= 0.0;
-    } else {
+    }
+    else
+    {
         return p.sideOfLine2D(m_p[2], m_p[3]) >  0.0 &&
                p.sideOfLine2D(m_p[3], m_p[0]) >= 0.0;
     }

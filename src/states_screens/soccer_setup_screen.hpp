@@ -18,7 +18,6 @@
 #ifndef HEADER_SOCCER_SETUP_SCREEN_HPP
 #define HEADER_SOCCER_SETUP_SCREEN_HPP
 
-#include "graphics/render_info.hpp"
 #include "guiengine/screen.hpp"
 #include "network/remote_kart_info.hpp"
 
@@ -41,7 +40,6 @@ class SoccerSetupScreen : public GUIEngine::Screen,
         bool                        confirmed;
         bool                        support_colorization;
         SoccerTeam                  team;
-        RenderInfo                  render_info;
 
         KartViewInfo() : view(), confirmed(false), support_colorization(false),
                          team(SOCCER_TEAM_NONE) {}

@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2015 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2016 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2016 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -33,6 +33,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
@@ -91,8 +92,7 @@
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
-            PerPlayerDifficulty difficulty,
-            RenderInfo::KartRenderType krt)
+            PerPlayerDifficulty difficulty, KartRenderType krt)
      : AbstractKart(ident, world_kart_id, position, init_transform,
              difficulty, krt)
 
@@ -2110,6 +2110,7 @@ void Kart::updatePhysics(float dt)
     {
         m_has_started = true;
         float f       = getStartupBoost();
+        if(f >= 0.0f)   m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 100*f);
         m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
                                           0.9f*f, f,
                                           /*engine_force*/200.0f,

@@ -108,6 +108,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_string_lap      = _("Lap");
     m_string_rank     = _("Rank");
 
+    m_active_challenge = NULL;
 
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
@@ -512,7 +513,13 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
             pos.UpperLeftCorner.Y += GUIEngine::getTitleFontHeight();
             pos.LowerRightCorner.Y = irr_driver->getActualScreenSize().Height;
-            GUIEngine::getFont()->draw(challenge->getChallengeDescription().c_str(),
+
+            if (m_active_challenge != challenge)
+            {
+                m_active_challenge = challenge;
+                m_challenge_description = challenge->getChallengeDescription();
+            }
+            GUIEngine::getFont()->draw(m_challenge_description,
                                        pos, video::SColor(255,255,255,255),
                                        false, false /* vcenter */, NULL);
 

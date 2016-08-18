@@ -28,10 +28,12 @@
 #include "items/item_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/navmesh.hpp"
+#include "tracks/quad.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 
+#include <algorithm>
 #include <queue>
 
 const int BattleGraph::UNKNOWN_POLY  = -1;
@@ -50,9 +52,10 @@ BattleGraph::BattleGraph(const std::string &navmesh_file_name,
     buildGraph(NavMesh::get());
 
     // Compute shortest distance from all nodes
-    for(unsigned int i=0; i < NavMesh::get()->getNumberOfPolys(); i++)
+    for(unsigned int i=0; i < NavMesh::get()->getNumberOfQuads(); i++)
         computeDijkstra(i);
 
+    sortNearbyQuad();
     if (node && race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         loadGoalNodes(node);
 
@@ -73,35 +76,32 @@ BattleGraph::~BattleGraph(void)
  *  adjacency matrix. */
 void BattleGraph::buildGraph(NavMesh* navmesh)
 {
-    unsigned int n_polys = navmesh->getNumberOfPolys();
+    const unsigned int n_quads = navmesh->getNumberOfQuads();
 
-    m_distance_matrix = std::vector< std::vector<float> >
-                               (n_polys, std::vector<float>(n_polys, 9999.9f));
-    for(unsigned int i=0; i<n_polys; i++)
+    m_distance_matrix = std::vector<std::vector<float>>
+        (n_quads, std::vector<float>(n_quads, 9999.9f));
+    for(unsigned int i = 0; i < n_quads; i++)
     {
-        NavPoly currentPoly = navmesh->getNavPoly(i);
-        const std::vector<int> &adjacents = navmesh->getAdjacentPolys(i);
-        for(unsigned int j=0; j<adjacents.size(); j++)
+        const Quad& cur_quad = navmesh->getQuad(i);
+        for (const int& adjacent : navmesh->getAdjacentQuads(i))
         {
-            Vec3 diff = navmesh->getCenterOfPoly(adjacents[j]) 
-                      - currentPoly.getCenter();
+            Vec3 diff = navmesh->getQuad(adjacent).getCenter()
+                      - cur_quad.getCenter();
             float distance = diff.length();
-            m_distance_matrix[i][adjacents[j]] = distance;
-            //m_distance_matrix[adjacents[j]][i] = distance;
+            m_distance_matrix[i][adjacent] = distance;
         }
         m_distance_matrix[i][i] = 0.0f;
     }
 
     // Allocate and initialise the previous node data structure:
-    unsigned int n = getNumNodes();
-    m_parent_poly = std::vector< std::vector<int> >
-        (n, std::vector<int>(n, BattleGraph::UNKNOWN_POLY));
-    for(unsigned int i=0; i<n; i++)
+    m_parent_poly = std::vector<std::vector<int>>
+        (n_quads, std::vector<int>(n_quads, BattleGraph::UNKNOWN_POLY));
+    for (unsigned int i = 0; i < n_quads; i++)
     {
-        for(unsigned int j=0; j<n; j++)
+        for (unsigned int j = 0; j < n_quads; j++)
         {
-            if(i == j || m_distance_matrix[i][j]>=9899.9f)
-                m_parent_poly[i][j]=-1;
+            if(i == j || m_distance_matrix[i][j] >= 9899.9f)
+                m_parent_poly[i][j] = -1;
             else
                 m_parent_poly[i][j] = i;
         }   // for j
@@ -145,11 +145,9 @@ void BattleGraph::computeDijkstra(int source)
         int cur_index = current.first;
         if(visited[cur_index]) continue;
         visited[cur_index] = true;
-        const NavPoly &current_poly = navmesh->getNavPoly(cur_index);
-        const std::vector<int> &adjacents = current_poly.getAdjacents();
-        for(unsigned int j=0; j<adjacents.size(); j++)
+
+        for (const int& adjacent : navmesh->getAdjacentQuads(cur_index))
         {
-            int adjacent = adjacents[j];
             // Distance already computed, can be ignored
             if(visited[adjacent]) continue;
 
@@ -224,7 +222,7 @@ void BattleGraph::findItemsOnGraphNodes()
 
         for (unsigned int j = 0; j < this->getNumNodes(); ++j)
         {
-            if (NavMesh::get()->getNavPoly(j).pointInPoly(xyz, false))
+            if (getQuadOfNode(j).pointInQuad(xyz, false))
                 polygon = j;
         }
 
@@ -243,70 +241,50 @@ int BattleGraph::pointToNode(const int cur_node,
                              const Vec3& cur_point,
                              bool ignore_vertical) const
 {
-    int final_node = BattleGraph::UNKNOWN_POLY;
-
     if (cur_node == BattleGraph::UNKNOWN_POLY)
     {
         // Try all nodes in the battle graph
-        bool found = false;
-        unsigned int node = 0;
-        while (!found && node < this->getNumNodes())
+        for (unsigned int node = 0; node < this->getNumNodes(); node++)
         {
-            const NavPoly& p_all = this->getPolyOfNode(node);
-            if (p_all.pointInPoly(cur_point, ignore_vertical))
+            const Quad& quad = this->getQuadOfNode(node);
+            if (quad.pointInQuad(cur_point, ignore_vertical))
             {
-                final_node = node;
-                found = true;
+                return node;
             }
-            node++;
         }
     }
     else
     {
         // Check if the point is still on the same node
-        const NavPoly& p_cur = this->getPolyOfNode(cur_node);
-        if (p_cur.pointInPoly(cur_point, ignore_vertical)) return cur_node;
+        const Quad& cur_quad = this->getQuadOfNode(cur_node);
+        if (cur_quad.pointInQuad(cur_point, ignore_vertical)) return cur_node;
 
-        // If not then check all adjacent polys
-        const std::vector<int>& adjacents = NavMesh::get()
-            ->getAdjacentPolys(cur_node);
-
-        bool found = false;
-        unsigned int num = 0;
-        while (!found && num < adjacents.size())
+        // If not then check all nearby quads (8 quads)
+        // Skip the same node
+        assert(cur_node == m_nearby_quads[cur_node][0]);
+        for (unsigned int i = 1; i < m_nearby_quads[0].size(); i++)
         {
-            const NavPoly& p_temp = this->getPolyOfNode(adjacents[num]);
-            if (p_temp.pointInPoly(cur_point, ignore_vertical))
+            const int test_node = m_nearby_quads[cur_node][i];
+            const Quad& quad = this->getQuadOfNode(test_node);
+            if (quad.pointInQuad(cur_point, ignore_vertical))
             {
-                final_node = adjacents[num];
-                found = true;
+                return test_node;
             }
-            num++;
         }
 
-        // Current node is still unkown
-        if (final_node == BattleGraph::UNKNOWN_POLY)
-        {
-            // Calculated distance from saved node to current position,
-            // if it's close enough than use the saved node anyway, it
-            // may happen when the kart stays on the edge of obstacles
-            const NavPoly& p = this->getPolyOfNode(cur_node);
-            const float dist = (p.getCenter() - cur_point).length_2d();
+        // Current node is still unkown:
+        // Calculated distance from saved node to current position,
+        // if it's close enough than use the saved node anyway, it
+        // may happen when the kart stays on the edge of obstacles
+        Vec3 diff = (cur_quad.getCenter() - cur_point);
+        float dist = diff.length();
 
-            if (dist < 3.0f)
-                final_node = cur_node;
-        }
+        if (dist < 3.0f)
+            return cur_node;
     }
-    return final_node;
-}    // pointToNode
 
-// -----------------------------------------------------------------------------
-const int BattleGraph::getNextShortestPathPoly(int i, int j) const
-{
-    if (i == BattleGraph::UNKNOWN_POLY || j == BattleGraph::UNKNOWN_POLY)
-        return BattleGraph::UNKNOWN_POLY;
-    return m_parent_poly[j][i];
-}    // getNextShortestPathPoly
+    return BattleGraph::UNKNOWN_POLY;
+}    // pointToNode
 
 // -----------------------------------------------------------------------------
 const bool BattleGraph::differentNodeColor(int n, NodeColor* c) const
@@ -456,3 +434,39 @@ std::vector<int> BattleGraph::getPathFromTo(int from, int to,
     }
     return path;
 }   // getPathFromTo
+
+// ----------------------------------------------------------------------------
+void BattleGraph::sortNearbyQuad()
+{
+    // Only try the nearby 8 quads
+    const unsigned int n = 8;
+    m_nearby_quads = std::vector< std::vector<int> >
+        (this->getNumNodes(), std::vector<int>(n, BattleGraph::UNKNOWN_POLY));
+
+    for (unsigned int i = 0; i < this->getNumNodes(); i++)
+    {
+        // Get the distance to all nodes at i
+        std::vector<float> dist = m_distance_matrix[i];
+        for (unsigned int j = 0; j < n; j++)
+        {
+            std::vector<float>::iterator it =
+                std::min_element(dist.begin(), dist.end());
+            const int pos = it - dist.begin();
+            m_nearby_quads[i][j] = pos;
+            dist[pos] = 999999.0f;
+        }
+    }
+}   // sortNearbyQuad
+
+// ----------------------------------------------------------------------------
+void BattleGraph::set3DVerticesOfGraph(int i, video::S3DVertex *v,
+                          const video::SColor &color) const
+{
+    NavMesh::get()->getQuad(i).getVertices(v, color);
+}   // set3DVerticesOfGraph
+
+// ----------------------------------------------------------------------------
+const bool BattleGraph::isNodeInvisible(int n) const
+{
+    return NavMesh::get()->getQuad(n).isInvisible();
+}   // isNodeInvisible

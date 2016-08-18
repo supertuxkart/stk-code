@@ -39,7 +39,6 @@ namespace irr
 using namespace irr;
 
 class CheckLine;
-class GraphStructure;
 
 /**
  *  \brief This class stores a graph of quads. It uses a 'simplified singleton'
@@ -94,9 +93,6 @@ private:
     // ------------------------------------------------------------------------
     virtual const bool isNodeInvisible(int n) const
                           { return m_all_nodes[n]->getQuad().isInvisible(); }
-    // ------------------------------------------------------------------------
-    virtual const bool isNodeInvalid(int n) const
-                                                            { return false; }
     // ------------------------------------------------------------------------
     virtual const bool hasLapLine() const
                                                             { return true;  }

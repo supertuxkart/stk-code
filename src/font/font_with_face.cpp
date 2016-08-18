@@ -116,6 +116,13 @@ void FontWithFace::createNewGlyphPage()
     m_used_width = 0;
     m_used_height = 0;
 
+    // Font textures can not be resized (besides the impact on quality in
+    // this case, the rectangles in spritebank would become wrong).
+    core::dimension2du old_max_size = irr_driver->getVideoDriver()
+        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+    irr_driver->getVideoDriver()->getNonConstDriverAttributes()
+        .setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(0, 0));
+
     video::ITexture* page_texture = irr_driver->getVideoDriver()
         ->addTexture("Glyph_page", m_page);
     m_spritebank->addTexture(NULL);
@@ -126,6 +133,9 @@ void FontWithFace::createNewGlyphPage()
     // reference, so they can be removed or updated on-the-fly
     irr_driver->getVideoDriver()->removeTexture(page_texture);
     assert(page_texture->getReferenceCount() == 1);
+
+    irr_driver->getVideoDriver()->getNonConstDriverAttributes()
+        .setAttribute("MAX_TEXTURE_SIZE", old_max_size);
 
 }   // createNewGlyphPage
 
@@ -172,12 +182,21 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     {
         // Current glyph page is full:
         // Save the old glyph page
+        core::dimension2du old_max_size = irr_driver->getVideoDriver()
+            ->getDriverAttributes().getAttributeAsDimension2d
+            ("MAX_TEXTURE_SIZE");
+        irr_driver->getVideoDriver()->getNonConstDriverAttributes()
+            .setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(0, 0));
         video::ITexture* page_texture = irr_driver->getVideoDriver()
             ->addTexture("Glyph_page", m_page);
+
         m_spritebank->setTexture(m_spritebank->getTextureCount() - 1,
             page_texture);
         irr_driver->getVideoDriver()->removeTexture(page_texture);
         assert(page_texture->getReferenceCount() == 1);
+
+        irr_driver->getVideoDriver()->getNonConstDriverAttributes()
+            .setAttribute("MAX_TEXTURE_SIZE", old_max_size);
 
         // Clear and add a new one
         createNewGlyphPage();
@@ -283,6 +302,11 @@ void FontWithFace::updateCharactersList()
     m_new_char_holder.clear();
 
     // Update last glyph page
+    core::dimension2du old_max_size = irr_driver->getVideoDriver()
+        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+    irr_driver->getVideoDriver()->getNonConstDriverAttributes()
+        .setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(0, 0));
+
     video::ITexture* page_texture = irr_driver->getVideoDriver()
         ->addTexture("Glyph_page", m_page);
     m_spritebank->setTexture(m_spritebank->getTextureCount() - 1,
@@ -290,6 +314,9 @@ void FontWithFace::updateCharactersList()
 
     irr_driver->getVideoDriver()->removeTexture(page_texture);
     assert(page_texture->getReferenceCount() == 1);
+
+    irr_driver->getVideoDriver()->getNonConstDriverAttributes()
+        .setAttribute("MAX_TEXTURE_SIZE", old_max_size);
 
 }   // updateCharactersList
 
@@ -306,11 +333,11 @@ void FontWithFace::dumpGlyphPage(const std::string& name)
         video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(col_format, size, data, false/*copy mem*/);
 
-       tex->unlock();
-       irr_driver->getVideoDriver()->writeImageToFile(image, std::string
-           (name + "_" + StringUtils::toString(i) + ".png").c_str());
-       image->drop();
-   }
+        tex->unlock();
+        irr_driver->getVideoDriver()->writeImageToFile(image, std::string
+            (name + "_" + StringUtils::toString(i) + ".png").c_str());
+        image->drop();
+    }
 }   // dumpGlyphPage
 
 // ----------------------------------------------------------------------------

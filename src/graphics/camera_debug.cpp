@@ -32,7 +32,7 @@ CameraDebug::CameraDebugType CameraDebug::m_default_debug_Type =
 
 // ============================================================================
 CameraDebug::CameraDebug(int camera_index, AbstractKart* kart)
-           : CameraNormal(camera_index, kart)
+           : CameraNormal(Camera::CM_TYPE_DEBUG, camera_index, kart)
 {
     reset();
 }   // Camera

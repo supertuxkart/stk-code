@@ -30,7 +30,7 @@ using namespace irr;
 
 // ============================================================================
 CameraFPS::CameraFPS(int camera_index, AbstractKart* kart)
-         : Camera(camera_index, kart)
+         : Camera(Camera::CM_TYPE_FPS, camera_index, kart)
 {
     m_attached      = false;
 

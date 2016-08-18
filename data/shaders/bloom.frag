@@ -1,4 +1,5 @@
 uniform sampler2D tex;
+uniform float scale;
 
 out vec4 FragColor;
 
@@ -7,7 +8,7 @@ out vec4 FragColor;
 
 void main()
 {
-    vec2 uv = gl_FragCoord.xy / 512.;
+    vec2 uv = gl_FragCoord.xy / (512. * scale);
     vec3 col = texture(tex, uv).xyz;
     vec3 Yxy = getCIEYxy(col);
     vec3 WhiteYxy = getCIEYxy(vec3(1.));

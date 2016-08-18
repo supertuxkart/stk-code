@@ -231,8 +231,11 @@ void ShaderBasedRenderer::uploadLightingData() const
 void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
                                                     size_t width, size_t height)
 {
-    m_current_screen_size = core::vector2df(float(width), float(height));
-    m_shadow_matrices.computeMatrixesAndCameras(camnode, width, height, m_rtts->getDepthStencilTexture());
+    
+    float w = width * UserConfigParams::m_scale_rtts_factor;
+    float h = height * UserConfigParams::m_scale_rtts_factor;
+    m_current_screen_size = core::vector2df(w, h);
+    m_shadow_matrices.computeMatrixesAndCameras(camnode, w, h, m_rtts->getDepthStencilTexture());
 }   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
@@ -628,6 +631,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
         glEnable(GL_FRAMEBUFFER_SRGB);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         camera->activate();
+        glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
         m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         glDisable(GL_FRAMEBUFFER_SRGB);
     }

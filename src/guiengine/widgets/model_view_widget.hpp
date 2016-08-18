@@ -23,11 +23,12 @@
 #include <IMesh.h>
 
 #include "graphics/irr_driver.hpp"
-#include "graphics/render_info.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
+
+class RenderInfo;
 
 namespace GUIEngine
 {
@@ -64,7 +65,7 @@ namespace GUIEngine
 
         scene::ISceneNode          *m_light;
 
-        RenderInfo                 m_render_info;
+        RenderInfo                 *m_render_info;
 
     public:
 
@@ -103,7 +104,7 @@ namespace GUIEngine
 
         void drawRTTScene(const irr::core::rect<s32>& dest_rect) const;
 
-        RenderInfo& getModelViewRenderInfo() { return m_render_info; }
+        RenderInfo* getModelViewRenderInfo() { return m_render_info; }
     };
 
 }

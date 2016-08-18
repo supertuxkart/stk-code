@@ -1005,9 +1005,9 @@ EventPropagation InputManager::input(const SEvent& event)
             if (cam)
             {
                 // Center of the screen
-                core::vector2df screen_size = irr_driver->getCurrentScreenSize();
-                int mid_x = (int) screen_size.X / 2;
-                int mid_y = (int) screen_size.Y / 2;
+                core::dimension2du screen_size = irr_driver->getActualScreenSize();
+                int mid_x = (int) screen_size.Width / 2;
+                int mid_y = (int) screen_size.Height / 2;
                 // Relative mouse movement
                 int diff_x = event.MouseInput.X - m_mouse_val_x;
                 int diff_y = event.MouseInput.Y - m_mouse_val_y;

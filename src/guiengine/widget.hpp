@@ -332,6 +332,8 @@ namespace GUIEngine
 
         bool isActivated() const;
 
+        virtual EventPropagation onActivationInput(const int playerID) { return EVENT_LET; }
+
         /**
          * Call to resize/move the widget. Not all widgets can resize gracefully.
          */

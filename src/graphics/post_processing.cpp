@@ -333,21 +333,21 @@ public:
 };   // ComputeGaussian17TapVShader
 
 // ============================================================================
-class BloomShader : public TextureShader<BloomShader, 1>
+class BloomShader : public TextureShader<BloomShader, 1, float>
 {
 public:
     BloomShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "bloom.frag");
-        assignUniforms();
+        assignUniforms("scale");
         assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
     }   // BloomShader
     // ------------------------------------------------------------------------
     void render(GLuint in)
     {
         BloomShader::getInstance()->setTextureUnits(in);
-        drawFullScreenEffect();
+        drawFullScreenEffect(UserConfigParams::m_scale_rtts_factor);
     }   // render
 };   // BloomShader
 

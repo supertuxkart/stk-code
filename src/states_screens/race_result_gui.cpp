@@ -1420,7 +1420,7 @@ void RaceResultGUI::backToLobby()
             if (race_manager->modeHasLaps())
             {
                 core::stringw laps = _("Laps: %i", race_manager->getNumLaps());
-                current_y += m_distance_between_rows * 0.8f * 2;
+                current_y += int(m_distance_between_rows * 0.8f * 2);
                 GUIEngine::getFont()->draw(laps, core::recti(x, current_y, 0, 0),
                     white_color, false, false, nullptr, true);
             }
@@ -1428,7 +1428,7 @@ void RaceResultGUI::backToLobby()
             const core::stringw& difficulty_name =
                 race_manager->getDifficultyName(race_manager->getDifficulty());
             core::stringw difficulty_string = _("Difficulty: %s", difficulty_name);
-            current_y += m_distance_between_rows * 0.8f;
+            current_y += int(m_distance_between_rows * 0.8f);
             GUIEngine::getFont()->draw(difficulty_string, core::recti(x, current_y, 0, 0),
                 white_color, false, false, nullptr, true);
             // show fastest lap
@@ -1437,7 +1437,7 @@ void RaceResultGUI::backToLobby()
                 float best_lap_time = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
                 core::stringw best_lap_string = _("Best lap time: %s",
                     StringUtils::timeToString(best_lap_time).c_str());
-                current_y += m_distance_between_rows * 0.8f;
+                current_y += int(m_distance_between_rows * 0.8f);
                 GUIEngine::getFont()->draw(best_lap_string,
                     core::recti(x, current_y, 0, 0), white_color, false, false,
                     nullptr, true);

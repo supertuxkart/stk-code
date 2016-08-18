@@ -32,6 +32,7 @@ class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode, public STKMes
 protected:
     bool isMaterialInitialized;
     bool isGLInitialized;
+    PtrVector<RenderInfo> m_static_render_info;
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix;
     void cleanGLMeshes();

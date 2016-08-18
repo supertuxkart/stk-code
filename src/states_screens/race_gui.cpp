@@ -356,6 +356,7 @@ void RaceGUI::drawGlobalMiniMap()
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
+        draw_at *= UserConfigParams::m_scale_rtts_factor;
 
         video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
 
@@ -376,6 +377,7 @@ void RaceGUI::drawGlobalMiniMap()
     {
         Vec3 draw_at;
         world->getTrack()->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
+        draw_at *= UserConfigParams::m_scale_rtts_factor;
         video::ITexture* icon =
             irr_driver->getTexture(FileManager::GUI, "soccer_ball_normal.png");
 
