@@ -283,75 +283,81 @@ void RewindManager::rewindTo(float rewind_time)
 
     // First find the state to which we need to rewind
     // ------------------------------------------------
-    int state_index = findFirstIndex(rewind_time);
+    int index = findFirstIndex(rewind_time);
 
-    if(!m_rewind_info[state_index]->isState())
+    if(!m_rewind_info[index]->isState())
     {
         Log::error("RewindManager", "No state for rewind to %f, state %d.",
-                   rewind_time, state_index);
+                   rewind_time, index);
         return;
     }
 
-    // Then undo the states that are skipped
-    // -------------------------------------
-    for(int i=m_rewind_info.size()-1; i>(int)state_index; i--)
+    // Then undo the rewind infos going backwards in time
+    // --------------------------------------------------
+    for(int i=m_rewind_info.size()-1; i>=(int)index; i--)
     {
         m_rewind_info[i]->undo();
+
+        // Now all states after the time we rewind to are not confirmed
+        // anymore. They need to be rewritten when going forward during
+        // the rewind.
+        if(m_rewind_info[i]->isState() && 
+            m_rewind_info[i]->getTime() > m_rewind_info[index]->getTime() )
+            m_rewind_info[i]->setConfirmed(false);
     }   // for i>state
 
 
-    // TODO: we need some logic here to handle that confirmed states are not
-    // necessarily the same for each rewinder. So if we rewind to t, one
-    // rewinder forces us to go back to t1 (latest state saved before t),
-    // another one to t2. 
-    // So we have to detect the latest time t_min < t for which each 
-    // rewinder has a confirmed state. Then we rewind from t_min. But if we 
-    // find another confirmed state for a rewinder at time t1 (t_min<t1<t), 
-    // we have to overwrite the current state of the rewinder with that at
-    // time t1. 
-    // Also care needs to be taken with events: e.g. either we make steering
-    // information (for kars) part of the state, or we have to go even further
-    // back in time (before t_min) to find what state steering was in at time
-    // t_min.
-
-    // Rewind to the required state
+    // Rewind the required state(s)
     // ----------------------------
-
-    RewindInfoState *state =
-        dynamic_cast<RewindInfoState*>(m_rewind_info[state_index]);
-    float exact_rewind_time = state->getTime();
-    float local_physics_time = state->getLocalPhysicsTime();
     World *world = World::getWorld();
-    world->getPhysics()->getPhysicsWorld()->setLocalTime(local_physics_time);
-
-    // Rewind all objects (and also all state) that happen at the
-    // current time. 
-    // TODO: this assumes atm that all rewinder have an initial state
-    // for 'current_time'!!!
-
-    // Store the time to which we have to replay to
     float current_time = world->getTime();
 
+    // Get the (first) full state to which we have to rewind
+    RewindInfoState *state =
+                    dynamic_cast<RewindInfoState*>(m_rewind_info[index]);
+
+    // Store the time to which we have to replay to
+    float exact_rewind_time = state->getTime();
+
+    // Now start the rewind with the full state:
     world->setTime(exact_rewind_time);
+    float local_physics_time = state->getLocalPhysicsTime();
+    world->getPhysics()->getPhysicsWorld()->setLocalTime(local_physics_time);
 
-    // Now go forward through the saved states, and
-    // replay taking the events into account.
-    while( world->getTime() < current_time &&
-          state_index < (int)m_rewind_info.size()                 )
+    // Restore all states from the current time - the full state of a race
+    // will be potentially stored in several state objects. State can be NULL
+    // if the next event is not a state
+    while(state && state->getTime()==exact_rewind_time)
     {
+        state->rewind();
+        index++;
+        if(index>=m_rewind_info.size()) break;
+        state = dynamic_cast<RewindInfoState*>(m_rewind_info[index]);
+    }
 
-        // Now set all events and confirmed states
-        while(state_index < (int)m_rewind_info.size() &&
-            m_rewind_info[state_index]->getTime()<=world->getTime()+0.001f)
+    // Now go forward through the list of rewind infos:
+    // ------------------------------------------------
+    while( world->getTime() < current_time &&
+          index < (int)m_rewind_info.size()                 )
+    {
+        // Now handle all states and events at the current time before
+        // updating the world:
+        while(index < (int)m_rewind_info.size() &&
+              m_rewind_info[index]->getTime()<=world->getTime()+0.001f)
         {
-            if(m_rewind_info[state_index]->isEvent() ||
-               m_rewind_info[state_index]->isConfirmed() )
+            if(m_rewind_info[index]->isState())
             {
-                m_rewind_info[state_index]->rewind();
+                // TOOD: replace the old state with a new state. 
+                // For now just set it to confirmed
+                m_rewind_info[index]->setConfirmed(true);
             }
-            state_index++;
+            else if(m_rewind_info[index]->isEvent())
+            {
+                m_rewind_info[index]->rewind();
+            }
+            index++;
         }
-        float dt = determineTimeStepSize(state_index, current_time);
+        float dt = determineTimeStepSize(index, current_time);
         world->updateWorld(dt);
 #define SHOW_ROLLBACK
 #ifdef SHOW_ROLLBACK

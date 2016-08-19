@@ -68,6 +68,9 @@ public:
     /** Returns the time at which this rewind state was saved. */
     float getTime() const { return m_time; }
     // ------------------------------------------------------------------------
+    /** Sets if this RewindInfo is confirmed or not. */
+    void setConfirmed(bool b) { m_is_confirmed = b; }
+    // ------------------------------------------------------------------------
     /** Returns if this state is confirmed. */
     bool isConfirmed() const { return m_is_confirmed; }
     // ------------------------------------------------------------------------
