@@ -28,5 +28,5 @@
   <card contains="Radeon"         os="linux"    version="<14.300"  disable="DriverRecentEnough"/>
   <card contains="Radeon"         os="windows"  version="<14.300"  disable="DriverRecentEnough"/>
   <card contains="ATI"            os="windows"  version="<14.300"  disable="DriverRecentEnough"/>
-  <card contains="ATI"            os="windows"  version="<3.1.8787" disable="ForceLegacyDevice"/>
+  <card contains="ATI"            os="windows"  version="<=3.1.8787" disable="ForceLegacyDevice"/>
 </graphical-restrictions>
