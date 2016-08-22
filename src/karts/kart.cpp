@@ -1177,14 +1177,11 @@ void Kart::update(float dt)
 #ifdef DEBUG_TO_COMPARE_KART_PHYSICS
     // This information is useful when comparing kart physics, e.g. to
     // see top speed, acceleration (i.e. time to top speed) etc.
-    Log::verbose("physics", "%s t %f xyz %f %f %f %f v %f %f %f %f maxv %f s %f a %f",
+    Log::verbose("physics", "%s t %f %f xyz %f %f %f v %f %f %f s %f a %f",
         getIdent().c_str(),
-        World::getWorld()->getTime(),
+        World::getWorld()->getTime(), dt,
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
-        getXYZ().length(),
         getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
-        getVelocity().length(),
-        m_max_speed->getCurrentMaxSpeed(),
         getControls().getSteer(),
         getControls().getAccel());
 #endif
