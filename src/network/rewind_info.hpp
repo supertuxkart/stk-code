@@ -189,7 +189,10 @@ private:
 public:
              RewindInfoEvent(float time, EventRewinder *event_rewinder,
                              BareNetworkString *buffer, bool is_confirmed);
-    virtual ~RewindInfoEvent() {}
+    virtual ~RewindInfoEvent()
+    {
+        delete m_buffer;
+    }   // ~RewindInfoEvent
 
     // ------------------------------------------------------------------------
     virtual bool isEvent() const { return true; }
