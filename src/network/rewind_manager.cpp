@@ -283,7 +283,7 @@ void RewindManager::rewindTo(float rewind_time)
 
     // First find the state to which we need to rewind
     // ------------------------------------------------
-    int index = findFirstIndex(rewind_time);
+    unsigned int index = findFirstIndex(rewind_time);
 
     if(!m_rewind_info[index]->isState())
     {
