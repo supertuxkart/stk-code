@@ -111,7 +111,7 @@ void KartControl::setNitro(bool b)
 /** Sets the skid control for this kart. */
 void KartControl::setSkidControl(SkidControl sc)
 {
-    bool old_skid = m_skid;
+    SkidControl old_skid = m_skid;
     m_skid        = sc;
     RewindManager *re = RewindManager::get();
     if (re->isEnabled() && !re->isRewinding() && old_skid != m_skid)
