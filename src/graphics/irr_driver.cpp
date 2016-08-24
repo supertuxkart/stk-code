@@ -1600,7 +1600,7 @@ std::string IrrDriver::getSmallerTexture(const std::string& filename)
         {
             core::dimension2d<u32> dim = img->getDimension();
             core::dimension2d<u32> new_dim; // Dimension of the cached texture
-            const int scale_factor = 2;
+            const unsigned scale_factor = 2;
             // Resize the texture only if it can be done properly
             if (dim.Width < scale_factor || dim.Height < scale_factor)
                 new_dim = dim;
