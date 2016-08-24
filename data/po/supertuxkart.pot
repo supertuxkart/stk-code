@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-23 19:52-0400\n"
+"POT-Creation-Date: 2016-08-23 20:00-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -996,7 +996,8 @@ msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
-#: src/states_screens/main_menu_screen.cpp:79
+#. I18N: Used as a verb, appears on the main menu (login button)
+#: src/states_screens/main_menu_screen.cpp:80
 msgid "Login"
 msgstr ""
 
@@ -2843,7 +2844,7 @@ msgid "Please wait while addons are updated"
 msgstr ""
 
 #: src/states_screens/addons_screen.cpp:551
-#: src/states_screens/main_menu_screen.cpp:553
+#: src/states_screens/main_menu_screen.cpp:554
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you "
 "are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3307,25 +3308,25 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:492
+#: src/states_screens/main_menu_screen.cpp:493
 msgid ""
 "You can not play online without internet access. If you want to play online, "
 "go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:516
+#: src/states_screens/main_menu_screen.cpp:517
 msgid ""
 "You can not download addons without internet access. If you want to download "
 "addons, go to options, select  tab 'User Interface', and edit \"Connect to "
 "the Internet\"."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:548
+#: src/states_screens/main_menu_screen.cpp:549
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:560
+#: src/states_screens/main_menu_screen.cpp:561
 msgid "Please wait while the add-ons are loading"
 msgstr ""
 
