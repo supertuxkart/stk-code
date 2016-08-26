@@ -63,6 +63,7 @@ namespace GraphicsRestrictions
             "FramebufferSRGBWorking",
             "FramebufferSRGBCapable",
             "GI",
+            "ForceLegacyDevice"
         };
     }   // namespace Private
     using namespace Private;

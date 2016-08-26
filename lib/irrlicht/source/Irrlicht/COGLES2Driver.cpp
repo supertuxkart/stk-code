@@ -123,13 +123,6 @@ namespace video
 			EGL_NONE, 0
 #endif
 		};
-		EGLint contextAttrib[] =
-		{
-#ifdef EGL_VERSION_1_3
-			EGL_CONTEXT_CLIENT_VERSION, 2,
-#endif
-			EGL_NONE, 0
-		};
 
 		EGLConfig config;
 		EGLint num_configs;
@@ -242,11 +235,41 @@ namespace video
 			eglBindAPI(EGL_OPENGL_ES_API);
 #endif
 		os::Printer::log("Creating EglContext...");
-		EglContext = eglCreateContext(EglDisplay, config, EGL_NO_CONTEXT, contextAttrib);
+		EglContext = EGL_NO_CONTEXT;
+		
+		if (!Params.ForceLegacyDevice)
+		{
+			os::Printer::log("Trying to create Context for OpenGL-ES3.");
+			
+			EGLint contextAttrib[] =
+			{
+				#ifdef EGL_VERSION_1_3
+				EGL_CONTEXT_CLIENT_VERSION, 3,
+				#endif
+				EGL_NONE, 0
+			};
+			
+			EglContext = eglCreateContext(EglDisplay, config, EGL_NO_CONTEXT, contextAttrib);
+		}
+		
 		if (EGL_NO_CONTEXT == EglContext)
 		{
-			os::Printer::log("FAILED\n");
-			os::Printer::log("Could not create Context for OpenGL-ES2 display.");
+			os::Printer::log("Trying to create Context for OpenGL-ES2.");
+			
+			EGLint contextAttrib[] =
+			{
+				#ifdef EGL_VERSION_1_3
+				EGL_CONTEXT_CLIENT_VERSION, 2,
+				#endif
+				EGL_NONE, 0
+			};
+			
+			EglContext = eglCreateContext(EglDisplay, config, EGL_NO_CONTEXT, contextAttrib);
+			if (EGL_NO_CONTEXT == EglContext)
+			{
+				os::Printer::log("FAILED\n");
+				os::Printer::log("Could not create Context for OpenGL-ES2 display.");
+			}
 		}
 
 		eglMakeCurrent(EglDisplay, EglSurface, EglSurface, EglContext);

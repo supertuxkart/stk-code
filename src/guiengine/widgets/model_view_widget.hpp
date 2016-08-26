@@ -23,11 +23,12 @@
 #include <IMesh.h>
 
 #include "graphics/irr_driver.hpp"
-#include "graphics/render_info.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
+
+class RenderInfo;
 
 namespace GUIEngine
 {
@@ -68,7 +69,7 @@ namespace GUIEngine
         FrameBuffer                *m_frame_buffer;
         video::ITexture            *m_texture;
 
-        RenderInfo                 m_render_info;
+        RenderInfo                 *m_render_info;
 
     public:
 
@@ -107,7 +108,7 @@ namespace GUIEngine
 
         FrameBuffer* getFrameBuffer()       { return m_frame_buffer; }
         video::ITexture* getTexture()            { return m_texture; }
-        RenderInfo& getModelViewRenderInfo() { return m_render_info; }
+        RenderInfo* getModelViewRenderInfo() { return m_render_info; }
     };
 
 }

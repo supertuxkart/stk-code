@@ -244,7 +244,7 @@ RTT::RTT(size_t width, size_t height)
         somevector.clear();
         somevector.push_back(RSM_Color);
         somevector.push_back(RSM_Normal);
-        m_RSM = new FrameBuffer(somevector, RSM_Depth, 1024, 1024, true);
+        m_RSM = new FrameBuffer(somevector, RSM_Depth, shadowsize0.Width, shadowsize0.Height, true);
 
         RH_Red = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);
         RH_Green = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);

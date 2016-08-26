@@ -177,13 +177,8 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     ModelDefinitionLoader& model_def_loader)
     : TrackObjectPresentationSceneNode(xml_node)
 {
-    m_render_info = NULL;
     std::string name;
     xml_node.get("name", &name);
-    float custom_hue = 0.0f;
-    xml_node.get("hue", &custom_hue);
-    if (custom_hue > 0.0f)
-        m_render_info = new RenderInfo(custom_hue, false);
 
     m_node = irr_driver->getSceneManager()->addEmptySceneNode();
 #ifdef DEBUG
@@ -273,7 +268,7 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
 
     assert(libroot != NULL);
     World::getWorld()->getTrack()->loadObjects(libroot, lib_path, model_def_loader,
-        create_lod_definitions, m_node, parent, m_render_info);
+        create_lod_definitions, m_node, parent);
     m_parent = parent;
 }   // TrackObjectPresentationLibraryNode
 
@@ -281,8 +276,6 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
 TrackObjectPresentationLibraryNode::~TrackObjectPresentationLibraryNode()
 {
     irr_driver->removeNode(m_node);
-    delete m_render_info;
-    m_render_info = NULL;
 }   // TrackObjectPresentationLibraryNode
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationLibraryNode::move(const core::vector3df& xyz, const core::vector3df& hpr,

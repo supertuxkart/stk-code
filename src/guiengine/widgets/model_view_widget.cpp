@@ -17,6 +17,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "graphics/irr_driver.hpp"
@@ -48,6 +49,7 @@ IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, 
     m_rtt_provider = NULL;
     m_old_rtt_provider = NULL;
     m_rotation_mode = ROTATE_OFF;
+    m_render_info = new RenderInfo();
 
     // so that the base class doesn't complain there is no icon defined
     m_properties[PROP_ICON]="gui/main_help.png";
@@ -65,6 +67,8 @@ ModelViewWidget::~ModelViewWidget()
     delete m_old_rtt_provider;
     m_old_rtt_provider = NULL;
     m_texture = NULL;
+
+    delete m_render_info;
 }
 // -----------------------------------------------------------------------------
 void ModelViewWidget::add()
@@ -228,7 +232,7 @@ void ModelViewWidget::setupRTTScene()
     if (m_model_frames[0] == -1)
     {
         scene::ISceneNode* node = irr_driver->addMesh(m_models.get(0), "rtt_mesh",
-            NULL, &m_render_info, m_model_render_info_affected[0]);
+            NULL, m_render_info, m_model_render_info_affected[0]);
         node->setPosition(m_model_location[0].toIrrVector());
         node->setScale(m_model_scale[0].toIrrVector());
         node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
@@ -238,7 +242,7 @@ void ModelViewWidget::setupRTTScene()
     {
         scene::IAnimatedMeshSceneNode* node =
         irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_models.get(0), "rtt_mesh",
-            NULL, &m_render_info, m_model_render_info_affected[0]);
+            NULL, m_render_info, m_model_render_info_affected[0]);
         node->setPosition(m_model_location[0].toIrrVector());
         node->setFrameLoop(m_model_frames[0], m_model_frames[0]);
         node->setAnimationSpeed(0);
@@ -260,7 +264,7 @@ void ModelViewWidget::setupRTTScene()
         {
             scene::ISceneNode* node =
             irr_driver->addMesh(m_models.get(n), "rtt_node", m_rtt_main_node,
-                &m_render_info, m_model_render_info_affected[n]);
+                m_render_info, m_model_render_info_affected[n]);
             node->setPosition(m_model_location[n].toIrrVector());
             node->updateAbsolutePosition();
             node->setScale(m_model_scale[n].toIrrVector());
@@ -269,7 +273,7 @@ void ModelViewWidget::setupRTTScene()
         {
             scene::IAnimatedMeshSceneNode* node =
             irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_models.get(n),
-                "modelviewrtt", m_rtt_main_node, &m_render_info,
+                "modelviewrtt", m_rtt_main_node, m_render_info,
                 m_model_render_info_affected[n]);
             node->setPosition(m_model_location[n].toIrrVector());
             node->setFrameLoop(m_model_frames[n], m_model_frames[n]);

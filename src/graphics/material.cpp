@@ -143,6 +143,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     node->get("disable-z-write",     &m_disable_z_write    );
     node->get("colorizable",         &m_colorizable        );
     node->get("colorization-factor", &m_colorization_factor);
+    node->get("hue-settings",        &m_hue_settings       );
     node->get("fog",                 &m_fog                );
 
     node->get("mask",                &m_mask               );

@@ -19,6 +19,7 @@
 
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
@@ -149,9 +150,8 @@ void SoccerSetupScreen::beforeAddingWidget()
         info.support_colorization = kart_model.supportColorization();
         if (info.support_colorization)
         {
-            kart_view->getModelViewRenderInfo().setKartModelRenderInfo
-                (info.team == SOCCER_TEAM_BLUE ?
-                RenderInfo::KRT_BLUE : RenderInfo::KRT_RED);
+            kart_view->getModelViewRenderInfo()->setKartModelRenderInfo
+                (info.team == SOCCER_TEAM_BLUE ? KRT_BLUE : KRT_RED);
         }
 
         // Add the kart model (including wheels and speed weight objects)
@@ -295,7 +295,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             if (m_kart_view_info[playerId].support_colorization)
             {
                 m_kart_view_info[playerId].view->getModelViewRenderInfo()
-                    .setKartModelRenderInfo(RenderInfo::KRT_RED);
+                    ->setKartModelRenderInfo(KRT_RED);
             }
 
             for(int i=0 ; i < nb_players ; i++)
@@ -315,7 +315,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             if (m_kart_view_info[playerId].support_colorization)
             {
                 m_kart_view_info[playerId].view->getModelViewRenderInfo()
-                    .setKartModelRenderInfo(RenderInfo::KRT_BLUE);
+                    ->setKartModelRenderInfo(KRT_BLUE);
             }
 
             for(int i=0 ; i < nb_players ; i++)

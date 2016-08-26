@@ -25,6 +25,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -295,7 +296,7 @@ void FeatureUnlockedCutScene::init()
         else if (m_unlocked_stuff[n].m_unlocked_kart != NULL)
         {
             KartModel *kart_model =
-                m_unlocked_stuff[n].m_unlocked_kart->getKartModelCopy();
+                m_unlocked_stuff[n].m_unlocked_kart->getKartModelCopy(KRT_DEFAULT);
             m_all_kart_models.push_back(kart_model);
             m_unlocked_stuff[n].m_root_gift_node = kart_model->attachModel(true, false);
             m_unlocked_stuff[n].m_scale = 5.0f;

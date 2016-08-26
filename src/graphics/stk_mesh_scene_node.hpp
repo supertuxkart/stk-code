@@ -28,6 +28,7 @@ class RenderInfo;
 class STKMeshSceneNode : public irr::scene::CMeshSceneNode, public STKMeshCommon
 {
 protected:
+    PtrVector<RenderInfo> m_static_render_info;
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix;
     core::vector3df windDir;

@@ -19,6 +19,7 @@
 
 #include "karts/abstract_kart.hpp"
 
+#include "graphics/render_info.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_properties.hpp"
@@ -34,8 +35,7 @@
 AbstractKart::AbstractKart(const std::string& ident,
                            int world_kart_id, int position,
                            const btTransform& init_transform,
-                           PerPlayerDifficulty difficulty,
-                           RenderInfo::KartRenderType krt)
+                           PerPlayerDifficulty difficulty, KartRenderType krt)
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;
