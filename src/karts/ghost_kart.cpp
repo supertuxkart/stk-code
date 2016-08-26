@@ -20,6 +20,7 @@
 #include "karts/controller/ghost_controller.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
+#include "graphics/render_info.hpp"
 #include "modes/world.hpp"
 
 #include "LinearMath/btQuaternion.h"
@@ -28,7 +29,7 @@ GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
                      int position)
           : Kart(ident, world_kart_id,
                  position, btTransform(btQuaternion(0, 0, 0, 1)),
-                 PLAYER_DIFFICULTY_NORMAL, video::ERT_TRANSPARENT)
+                 PLAYER_DIFFICULTY_NORMAL, KRT_TRANSPARENT)
 {
 }   // GhostKart
 
@@ -112,8 +113,10 @@ void GhostKart::update(float dt)
     center_shift = getTrans().getBasis() * center_shift;
 
     Moveable::updateGraphics(dt, center_shift, btQuaternion(0, 0, 0, 1));
+    Moveable::updatePosition();
     getKartModel()->update(dt, dt*(m_all_physic_info[idx].m_speed),
-        m_all_physic_info[idx].m_steer, m_all_physic_info[idx].m_speed, idx);
+        m_all_physic_info[idx].m_steer, m_all_physic_info[idx].m_speed,
+        /*lean*/0.0f, idx);
 
     getKartGFX()->setGFXFromReplay(m_all_replay_events[idx].m_nitro_usage,
         m_all_replay_events[idx].m_zipper_usage,

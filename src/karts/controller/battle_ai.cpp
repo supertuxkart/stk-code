@@ -41,8 +41,11 @@ BattleAI::BattleAI(AbstractKart *kart)
 
 #ifdef AI_DEBUG
     video::SColor col_debug(128, 128, 0, 0);
+    video::SColor col_debug_next(128, 0, 128, 128);
     m_debug_sphere = irr_driver->addSphere(1.0f, col_debug);
     m_debug_sphere->setVisible(true);
+    m_debug_sphere_next = irr_driver->addSphere(1.0f, col_debug_next);
+    m_debug_sphere_next->setVisible(true);
 #endif
     m_world = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
     m_track = m_world->getTrack();
@@ -59,6 +62,7 @@ BattleAI::~BattleAI()
 {
 #ifdef AI_DEBUG
     irr_driver->removeNode(m_debug_sphere);
+    irr_driver->removeNode(m_debug_sphere_next);
 #endif
 }   //  ~BattleAI
 
@@ -115,9 +119,9 @@ void BattleAI::findClosestKart(bool use_difficulty)
         }
 
         Vec3 d = kart->getXYZ() - m_kart->getXYZ();
-        if (d.length_2d() <= distance)
+        if (d.length() <= distance)
         {
-            distance = d.length_2d();
+            distance = d.length();
             closest_kart_num = i;
         }
     }
@@ -157,12 +161,12 @@ void BattleAI::findTarget()
     }
 }   // findTarget
 
-// ------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int BattleAI::getCurrentNode() const
 {
     return m_world->getKartNode(m_kart->getWorldKartId());
 }   // getCurrentNode
-// ------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool BattleAI::isWaiting() const
 {
     return m_world->isStartPhase();

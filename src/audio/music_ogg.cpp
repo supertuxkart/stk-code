@@ -32,13 +32,14 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
-MusicOggStream::MusicOggStream()
+MusicOggStream::MusicOggStream(float loop_start)
 {
     //m_oggStream= NULL;
     m_soundBuffers[0] = m_soundBuffers[1]= 0;
     m_soundSource     = -1;
     m_pausedMusic     = true;
     m_playing         = false;
+    m_loop_start      = loop_start;
 }   // MusicOggStream
 
 //-----------------------------------------------------------------------------
@@ -289,8 +290,8 @@ void MusicOggStream::update()
         active = streamIntoBuffer(buffer);
         if(!active)
         {
-            // no more data. Seek to beginning (causes the sound to loop)
-            ov_time_seek(&m_oggStream, 0);
+            // no more data. Seek to loop start (causes the sound to loop)
+            ov_time_seek(&m_oggStream, m_loop_start);
             active = streamIntoBuffer(buffer);//now there really should be data
         }
 

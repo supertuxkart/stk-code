@@ -24,6 +24,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "tracks/track.hpp"
 #include "modes/world.hpp"
@@ -33,7 +34,6 @@
 
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
-
 
 // ============================================================================
 class ColorizeShader : public Shader<ColorizeShader, core::matrix4, 
@@ -54,7 +54,7 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     irr::s32 id, const std::string& debug_name,
     const irr::core::vector3df& position,
     const irr::core::vector3df& rotation,
-    const irr::core::vector3df& scale, bool createGLMeshes) :
+    const irr::core::vector3df& scale, bool createGLMeshes, RenderInfo* render_info, bool all_parts_colorized) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
     isDisplacement = false;
@@ -65,7 +65,7 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     m_debug_name = debug_name;
 
     if (createGLMeshes)
-        this->createGLMeshes();
+        this->createGLMeshes(render_info, all_parts_colorized);
 }
 
 void STKMeshSceneNode::setReloadEachFrame(bool val)
@@ -75,12 +75,46 @@ void STKMeshSceneNode::setReloadEachFrame(bool val)
         immediate_draw = true;
 }
 
-void STKMeshSceneNode::createGLMeshes()
+void STKMeshSceneNode::createGLMeshes(RenderInfo* render_info, bool all_parts_colorized)
 {
-    for (u32 i = 0; i<Mesh->getMeshBufferCount(); ++i)
+    const u32 mb_count = Mesh->getMeshBufferCount();
+    for (u32 i = 0; i < mb_count; ++i)
     {
         scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-        GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name));
+        bool affected = false;
+        RenderInfo* cur_ri = render_info;
+        if (!all_parts_colorized && mb && render_info)
+        {
+            if (render_info && !render_info->isStatic())
+            {
+                // Convert to static render info for each mesh buffer
+                assert(render_info->getNumberOfHue() == mb_count);
+                const float hue = render_info->getDynamicHue(i);
+                if (hue > 0.0f)
+                {
+                    cur_ri = new RenderInfo(hue);
+                    m_static_render_info.push_back(cur_ri);
+                    affected = true;
+                }
+                else
+                {
+                    cur_ri = NULL;
+                }
+            }
+            else
+            {
+                // Test if material is affected by static hue change
+                Material* m = material_manager->getMaterialFor(mb
+                    ->getMaterial().getTexture(0), mb);
+                if (m->isColorizable())
+                    affected = true;
+            }
+        }
+
+        assert(cur_ri ? cur_ri->isStatic() : true);
+        GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
+            affected || all_parts_colorized || (cur_ri &&
+            cur_ri->isTransparent()) ? cur_ri : NULL));
     }
     isMaterialInitialized = false;
     isGLInitialized = false;
@@ -173,7 +207,7 @@ void STKMeshSceneNode::updateNoGL()
 
             GLMesh &mesh = GLmeshes[i];
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
-            if (Mesh->getRenderType() == video::ERT_TRANSPARENT)
+            if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent())
             {
                 if (!immediate_draw)
                     TransparentMesh[TM_ADDITIVE].push_back(&mesh);
@@ -310,6 +344,7 @@ void STKMeshSceneNode::render()
             size_t count = mesh.IndexCount;
 
             compressTexture(mesh.textures[0], true);
+#if !defined(USE_GLES2)
             if (CVS->isAZDOEnabled())
             {
                 if (!mesh.TextureHandles[0])
@@ -324,6 +359,7 @@ void STKMeshSceneNode::render()
                 Shaders::ObjectPass1Shader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
             }
             else
+#endif
                 Shaders::ObjectPass1Shader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]));
             Shaders::ObjectPass1Shader::getInstance()->setUniforms(AbsoluteTransformation, invmodel);
             assert(mesh.vao);
@@ -353,6 +389,7 @@ void STKMeshSceneNode::render()
             GLenum itype = mesh.IndexType;
             size_t count = mesh.IndexCount;
 
+#if !defined(USE_GLES2)
             if (CVS->isAZDOEnabled())
             {
                 GLuint64 DiffuseHandle =
@@ -380,23 +417,35 @@ void STKMeshSceneNode::render()
                                 Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+
                 if (!mesh.TextureHandles[1])
                     mesh.TextureHandles[1] =
                     glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[1]),
                                 Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[1]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[1]);
+
+                if (!mesh.TextureHandles[2])
+                    mesh.TextureHandles[2] =
+                    glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[7]),
+                                Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+                if (!glIsTextureHandleResidentARB(mesh.TextureHandles[2]))
+                    glMakeTextureHandleResidentARB(mesh.TextureHandles[2]);
+
                 Shaders::ObjectPass2Shader::getInstance()
                     ->setTextureHandles(DiffuseHandle, SpecularHandle, SSAOHandle,
-                                        mesh.TextureHandles[0], mesh.TextureHandles[1]);
+                                        mesh.TextureHandles[0], mesh.TextureHandles[1],
+                                        mesh.TextureHandles[2]);
             }
             else
+#endif
                 Shaders::ObjectPass2Shader::getInstance()->setTextureUnits(
                 irr_driver->getRenderTargetTexture(RTT_DIFFUSE),
                 irr_driver->getRenderTargetTexture(RTT_SPECULAR),
                 irr_driver->getRenderTargetTexture(RTT_HALF1_R),
                 getTextureGLuint(mesh.textures[0]),
-                getTextureGLuint(mesh.textures[1]));
+                getTextureGLuint(mesh.textures[1]),
+                getTextureGLuint(mesh.textures[7]));
             Shaders::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation,
                                                                    mesh.TextureMatrix);
             assert(mesh.vao);
@@ -463,6 +512,7 @@ void STKMeshSceneNode::render()
                         tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
+#if !defined(USE_GLES2)
                     if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])
@@ -475,6 +525,7 @@ void STKMeshSceneNode::render()
                                     ->setTextureHandles(mesh.TextureHandles[0]);
                     }
                     else
+#endif
                     {
                         Shaders::TransparentFogShader::getInstance()
                             ->setTextureUnits(getTextureGLuint(mesh.textures[0]));
@@ -501,6 +552,7 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
+#if !defined(USE_GLES2)
                     if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])
@@ -512,6 +564,7 @@ void STKMeshSceneNode::render()
                         Shaders::TransparentShader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
                     }
                     else
+#endif
                         Shaders::TransparentShader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]));
 
                     Shaders::TransparentShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);

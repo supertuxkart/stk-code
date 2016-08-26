@@ -127,7 +127,7 @@ ExplosionAnimation::~ExplosionAnimation()
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
             Camera *camera = Camera::getCamera(i);
-            if(camera->getMode() != Camera::CM_FINAL)
+            if(camera->getType() != Camera::CM_TYPE_END)
                 camera->setMode(Camera::CM_NORMAL);
         }
     }

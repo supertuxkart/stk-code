@@ -19,7 +19,6 @@
 #ifndef HEADER_ABSTRACT_KART_HPP
 #define HEADER_ABSTRACT_KART_HPP
 
-#include <EMaterialTypes.h>
 #include <memory>
 
 #include "items/powerup_manager.hpp"
@@ -49,6 +48,8 @@ class Powerup;
 class Skidding;
 class SlipStream;
 class TerrainInfo;
+
+enum KartRenderType: unsigned int;
 
 /** An abstract interface for the actual karts. Some functions are actually
  *  implemented here in order to allow inlining.
@@ -100,7 +101,7 @@ public:
                                 int world_kart_id,
                                 int position, const btTransform& init_transform,
                                 PerPlayerDifficulty difficulty,
-                                video::E_RENDER_TYPE rt);
+                                KartRenderType krt);
     virtual       ~AbstractKart();
     virtual core::stringw getName() const;
     virtual void   reset();

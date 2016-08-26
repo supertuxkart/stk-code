@@ -39,10 +39,15 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id)
 
     LabelWidget *name = getWidget<LabelWidget>("name");
     assert(name);
-    name->setText(stringw((m_rd.m_filename).c_str()), false);
+    name->setText(stringw((m_rd.m_custom_replay_file ? StringUtils::getBasename
+        (m_rd.m_filename) : m_rd.m_filename).c_str()), false);
 
     m_back_widget = getWidget<IconButtonWidget>("back");
     m_back_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+
+    // Non-deletable for custom (standard) replay file
+    getWidget<IconButtonWidget>("remove")->setActive(!m_rd.m_custom_replay_file);
+
     m_action_widget = getWidget<RibbonWidget>("actions");
     m_record_widget = getWidget<CheckBoxWidget>("record-race");
     m_watch_widget = getWidget<CheckBoxWidget>("watch-only");
@@ -76,8 +81,8 @@ GUIEngine::EventPropagation
 
         if(selection == "start")
         {
-            bool reverse = m_rd.m_reverse; 
-            std::string track_name = m_rd.m_track_name; 
+            bool reverse = m_rd.m_reverse;
+            std::string track_name = m_rd.m_track_name;
             int laps = m_rd.m_laps;
             int replay_id = m_replay_id;
 

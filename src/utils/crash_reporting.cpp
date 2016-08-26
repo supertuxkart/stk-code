@@ -320,19 +320,201 @@
         }
     }   // end namespace CrashReporting
 
-#else
+#elif ENABLE_LIBBFD
     // --------------------- Unix version -----------------------
+    /* Derived from addr2line.c from binutils
+
+    addr2line.c -- convert addresses to line number and function name
+    Copyright (C) 1997-2015 Free Software Foundation, Inc.
+    Contributed by Ulrich Lauther <Ulrich.Lauther@mchp.siemens.de>
+
+    This file is part of GNU Binutils.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3, or (at your option)
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, 51 Franklin Street - Fifth Floor, Boston,
+    MA 02110-1301, USA.  */
+
+    #define PACKAGE 1
+    #define PACKAGE_VERSION 1
+    #include <signal.h>
+    #include <execinfo.h>
+    #include <bfd.h>
+
+    #include "string_utils.hpp"
+
     namespace CrashReporting
     {
+        // BFD of current running STK binary, only can be useful
+        // if compiled with debug symbols
+        static bfd *m_stk_bfd = NULL;
+
+        // Symbol table
+        static asymbol **m_syms = NULL;
+
+        // Address in BFD to find file names or function name
+        static bfd_vma m_adress = 0;
+
+        static const char *m_file_name = NULL;
+        static const char *m_function_name = NULL;
+        static unsigned int m_line = 0;
+        static int m_found = 0;
+
+        // Look for an address in a section.  This is called via
+        // bfd_map_over_sections.
+        void findAddressInSection(bfd* input, asection *section,
+                                  void *data ATTRIBUTE_UNUSED)
+        {
+            bfd_vma vma = 0;
+            bfd_size_type size = 0;
+
+            if (m_found)
+                return;
+
+            if ((bfd_get_section_flags(m_stk_bfd, section) & SEC_ALLOC) == 0)
+                return;
+
+            vma = bfd_get_section_vma(m_stk_bfd, section);
+            if (m_adress < vma)
+                return;
+
+            size = bfd_section_size(m_stk_bfd, section);
+            if (m_adress >= vma + size)
+                return;
+
+            m_found = bfd_find_nearest_line(m_stk_bfd, section, m_syms,
+                m_adress - vma, &m_file_name, &m_function_name, &m_line);
+        }
+
+        void signalHandler(int signal_no)
+        {
+            if (m_stk_bfd == NULL)
+            {
+                Log::warn("CrashReporting", "Failed loading or missing BFD of "
+                          "STK binary, no backtrace available when reporting");
+                exit(0);
+            }
+
+            Log::error("CrashReporting", "STK has crashed! Backtrace info:");
+            std::string stack;
+            getCallStack(stack);
+
+            std::vector<std::string> each = StringUtils::split(stack, '\n');
+            for (unsigned int i = 3; i < each.size(); i++)
+            {
+                // Skip 3 stacks which are crash_reporting doing
+                Log::error("CrashReporting", "%s", each[i].c_str());
+            }
+            exit(0);
+        }
+
+        void loadSTKBFD()
+        {
+            const char* path = realpath("/proc/self/exe", NULL);
+            m_stk_bfd = bfd_openr(path, NULL);
+            free((void*)path);
+
+            if (m_stk_bfd == NULL)
+            {
+                return;
+            }
+
+            if (bfd_check_format(m_stk_bfd, bfd_archive))
+            {
+                m_stk_bfd = NULL;
+                return;
+            }
+
+            if (!bfd_check_format(m_stk_bfd, bfd_object))
+            {
+                m_stk_bfd = NULL;
+                return;
+            }
+
+            // Read in the symbol table.
+            unsigned int size = 0;
+            long symcount = 0;
+
+            if ((bfd_get_file_flags(m_stk_bfd) & HAS_SYMS) == 0)
+            {
+                m_stk_bfd = NULL;
+                return;
+            }
+
+            symcount = bfd_read_minisymbols(m_stk_bfd, false, (void**)&m_syms,
+                &size);
+            if (symcount == 0)
+            {
+                symcount = bfd_read_minisymbols(m_stk_bfd, true/* dynamic*/,
+                    (void**)&m_syms, &size);
+            }
+
+            if (symcount < 0)
+            {
+                m_stk_bfd = NULL;
+                m_syms = NULL;
+                return;
+            }
+        }
+
         void installHandlers()
         {
-            // TODO!
+            loadSTKBFD();
+            struct sigaction sa = {0};
+            sa.sa_handler = &signalHandler;
+            sigemptyset(&sa.sa_mask);
+            sa.sa_flags = SA_RESTART;
+            sigaction(SIGSEGV, &sa, NULL);
+            sigaction(SIGUSR1, &sa, NULL);
         }
 
         void getCallStack(std::string& callstack)
         {
-            // TODO!
+            if (m_stk_bfd == NULL) return;
+
+            void *trace[16];
+            int i, trace_size = 0;
+            trace_size = backtrace(trace, 16);
+            for (i = 0; i < trace_size; i++)
+            {
+                m_adress = (bfd_vma)(trace[i]);
+                m_found = 0;
+                m_file_name = NULL;
+                m_function_name = NULL;
+                m_line = 0;
+
+                bfd_map_over_sections(m_stk_bfd, findAddressInSection, NULL);
+                if (m_found && m_file_name != NULL)
+                {
+                    callstack = callstack + m_file_name + ":" +
+                        StringUtils::toString(m_line) + "\n";
+                }
+                else if (m_function_name != NULL)
+                {
+                    callstack = callstack + m_function_name + "\n";
+                }
+                else
+                    callstack = callstack + "No symbol found" + "\n";
+            }
         }
+    }   // end namespace CrashReporting
+
+#else
+
+    namespace CrashReporting
+    {
+        void installHandlers() {}
+        void getCallStack(std::string& callstack) {}
     }   // end namespace CrashReporting
 
 #endif

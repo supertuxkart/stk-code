@@ -20,6 +20,9 @@
 
 #include "animations/three_d_animation.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
+#include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -67,6 +70,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_animator        = NULL;
     m_physical_object = NULL;
     m_parent_library  = NULL;
+    m_render_info     = NULL;
     m_interaction     = interaction;
     m_presentation    = presentation;
     m_is_driveable    = false;
@@ -98,6 +102,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
     m_init_scale = core::vector3df(1,1,1);
+    m_render_info = NULL;
     m_enabled    = true;
     m_initially_visible = false;
     m_presentation = NULL;
@@ -177,13 +182,41 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     }
     else
     {
+        // Colorization settings
+        std::string model_name;
+        xml_node.get("model", &model_name);
+        bool colorizable = false;
+        scene::IMesh* mesh = NULL;
+        if (model_name.size() > 0)
+        {
+            mesh = irr_driver->getMesh(model_name);
+            if (mesh != NULL)
+            {
+                unsigned int n = mesh->getMeshBufferCount();
+                for (unsigned int i = 0; i < n; i++)
+                {
+                    scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+                    Material* m = material_manager->getMaterialFor(mb
+                        ->getMaterial().getTexture(0), mb);
+                    colorizable = colorizable || m->isColorizable();
+                }
+            }
+        }
+
+        // If at least one material is colorizable, add RenderInfo for it
+        if (colorizable)
+        {
+            m_render_info = new RenderInfo();
+            m_render_info->setDynamicHue(mesh);
+        }
+
         scene::ISceneNode *glownode = NULL;
         bool is_movable = false;
         if (lod_instance)
         {
             m_type = "lod";
             TrackObjectPresentationLOD* lod_node =
-                new TrackObjectPresentationLOD(xml_node, parent, model_def_loader);
+                new TrackObjectPresentationLOD(xml_node, parent, model_def_loader, m_render_info);
             m_presentation = lod_node;
 
             LODNode* node = (LODNode*)lod_node->getNode();
@@ -207,7 +240,8 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
             m_type = "mesh";
             m_presentation = new TrackObjectPresentationMesh(xml_node,
                                                              m_enabled,
-                                                             parent);
+                                                             parent,
+                                                             m_render_info);
             scene::ISceneNode* node = ((TrackObjectPresentationMesh *)m_presentation)->getNode();
             if (type == "movable" && parent != NULL)
             {
@@ -354,6 +388,7 @@ TrackObject::~TrackObject()
     delete m_presentation;
     delete m_animator;
     delete m_physical_object;
+    delete m_render_info;
 }   // ~TrackObject
 
 // ----------------------------------------------------------------------------

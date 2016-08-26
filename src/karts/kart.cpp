@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2015 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
+//  Copyright (C) 2004-2016 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2016 SuperTuxKart-Team, Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,6 +25,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "font/bold_face.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
@@ -32,14 +33,13 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
 #include "graphics/stk_text_billboard.hpp"
 #include "graphics/stars.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "karts/abstract_characteristic.hpp"
-#include "karts/cached_characteristic.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/rescue_animation.hpp"
@@ -92,10 +92,9 @@
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
-            PerPlayerDifficulty difficulty,
-            video::E_RENDER_TYPE rt)
+            PerPlayerDifficulty difficulty, KartRenderType krt)
      : AbstractKart(ident, world_kart_id, position, init_transform,
-             difficulty, rt)
+             difficulty, krt)
 
 #if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  pragma warning(1:4355)
@@ -181,27 +180,18 @@ void Kart::init(RaceManager::KartType type)
     // In multiplayer mode, sounds are NOT positional
     if (race_manager->getNumLocalPlayers() > 1)
     {
+        float factor = 1.0f / race_manager->getNumberOfKarts();
+        // players have louder sounds than AIs
         if (type == RaceManager::KT_PLAYER)
-        {
-            // players have louder sounds than AIs
-            const float factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
-            m_goo_sound->setVolume( 1.0f / factor );
-            m_skid_sound->setVolume( 1.0f / factor );
-            m_crash_sound->setVolume( 1.0f / factor );
-            m_boing_sound->setVolume( 1.0f / factor );
-            m_beep_sound->setVolume( 1.0f / factor );
-            m_nitro_sound->setVolume( 1.0f / factor );
-        }
-        else
-        {
-            m_goo_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_skid_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_crash_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_beep_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_boing_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-            m_nitro_sound->setVolume( 1.0f / race_manager->getNumberOfKarts() );
-        }
-    }
+            factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
+
+        m_goo_sound->setVolume(factor);
+        m_skid_sound->setVolume(factor);
+        m_crash_sound->setVolume(factor);
+        m_boing_sound->setVolume(factor);
+        m_beep_sound->setVolume(factor);
+        m_nitro_sound->setVolume(factor);
+    }   // if getNumLocalPlayers > 1
 
     if(!m_engine_sound)
     {
@@ -224,12 +214,7 @@ void Kart::init(RaceManager::KartType type)
     m_kart_gfx = new KartGFX(this);
     m_skidding = new Skidding(this);
     // Create the stars effect
-    m_stars_effect =
-        new Stars(getNode(),
-                  core::vector3df(0.0f,
-                                  getKartModel()->getModel()
-                                        ->getBoundingBox().MaxEdge.Y,
-                                  0.0f)                               );
+    m_stars_effect = new Stars(this);
 
     reset();
 }   // init
@@ -1021,7 +1006,7 @@ void Kart::collectedItem(Item *item, int add_info)
  */
 float Kart::getStartupBoost() const
 {
-    float t = World::getWorld()->getTime();
+    float t = World::getWorld()->getTimeSinceStart();
     std::vector<float> startup_times = m_kart_properties->getStartupTime();
     for (unsigned int i = 0; i < startup_times.size(); i++)
     {
@@ -1156,6 +1141,10 @@ void Kart::eliminate()
     }
 
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
+    m_kart_gfx->setGFXInvisible();
+    if (m_engine_sound)
+        m_engine_sound->stop();
+
     m_eliminated = true;
 
     m_node->setVisible(false);
@@ -2028,9 +2017,9 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
  */
 void Kart::playCrashSFX(const Material* m, AbstractKart *k)
 {
-    if(World::getWorld()->getTime()-m_time_last_crash < 0.5f) return;
+    if(World::getWorld()->getTimeSinceStart()-m_time_last_crash < 0.5f) return;
 
-    m_time_last_crash = World::getWorld()->getTime();
+    m_time_last_crash = World::getWorld()->getTimeSinceStart();
     // After a collision disable the engine for a short time so that karts
     // can 'bounce back' a bit (without this the engine force will prevent
     // karts from bouncing back, they will instead stuck towards the obstable).
@@ -2147,6 +2136,7 @@ void Kart::updatePhysics(float dt)
     {
         m_has_started = true;
         float f       = getStartupBoost();
+        if(f >= 0.0f)   m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 100*f);
         m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
                                           0.9f*f, f,
                                           /*engine_force*/200.0f,
@@ -2260,19 +2250,15 @@ void Kart::updatePhysics(float dt)
 
     updateEngineSFX();
 #ifdef XX
-    Log::info("Kart","forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f"
-       ,m_vehicle->m_forwardImpulse[0]
-       ,m_vehicle->m_forwardImpulse[1]
-       ,m_vehicle->m_forwardImpulse[2]
-       ,m_vehicle->m_forwardImpulse[3]
-       ,m_vehicle->m_sideImpulse[0]
-       ,m_vehicle->m_sideImpulse[1]
-       ,m_vehicle->m_sideImpulse[2]
-       ,m_vehicle->m_sideImpulse[3]
+    Log::info("Kart","angVel %f %f %f heading %f suspension %f %f %f %f"
        ,m_body->getAngularVelocity().getX()
        ,m_body->getAngularVelocity().getY()
        ,m_body->getAngularVelocity().getZ()
        ,getHeading()
+       ,m_vehicle->getWheelInfo(0).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(1).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(2).m_raycastInfo.m_suspensionLength
+       ,m_vehicle->getWheelInfo(3).m_raycastInfo.m_suspensionLength
        );
 #endif
 
@@ -2366,7 +2352,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             // or moving backwards
             if(m_speed > 0.0f)
             {   // Still going forward while braking
-                applyEngineForce(0.f);
+                applyEngineForce(-engine_power*2.5f);
                 m_brake_time += dt;
                 // Apply the brakes - include the time dependent brake increase
                 float f = 1 + m_brake_time
@@ -2808,22 +2794,22 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
-    float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
+    float lean_height = tan(m_current_lean) * getKartWidth()*0.5f;
 
     Vec3 center_shift(0, 0, 0);
 
     center_shift.setY(m_skidding->getGraphicalJumpOffset()
-                      + lean_height
+                      + fabsf(lean_height)
                       +m_graphical_y_offset);
     center_shift = getTrans().getBasis() * center_shift;
 
     float heading = m_skidding->getVisualSkidRotation();
     Moveable::updateGraphics(dt, center_shift,
-                             btQuaternion(heading, 0, m_current_lean));
+                             btQuaternion(heading, 0, -m_current_lean));
 
     // m_speed*dt is the distance the kart has moved, which determines
     // how much the wheels need to rotate.
-    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed);
+    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed, lean_height);
 
     // Determine the shadow position from the terrain Y position. This
     // leaves the shadow on the ground even if the kart is jumping because
@@ -2881,17 +2867,12 @@ btQuaternion Kart::getVisualRotation() const
  */
 void Kart::setOnScreenText(const wchar_t *text)
 {
-    core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(text);
-
-    // FIXME: Titlefont is the only font guaranteed to be loaded if STK
-    // is started without splash screen (since "Loading" is shown even in this
-    // case). A smaller font would be better
+    BoldFace* bold_face = font_manager->getFont<BoldFace>();
+    core::dimension2d<u32> textsize = bold_face->getDimension(text);
 
     if (CVS->isGLSL())
     {
-        gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont()
-                                                       : GUIEngine::getTitleFont();
-        new STKTextBillboard(text, font,
+        new STKTextBillboard(text, bold_face,
             GUIEngine::getSkin()->getColor("font::bottom"),
             GUIEngine::getSkin()->getColor("font::top"),
             getNode(), irr_driver->getSceneManager(), -1,

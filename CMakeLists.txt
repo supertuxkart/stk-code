@@ -20,6 +20,10 @@ option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace the online profile GUI in the main menu with the network multiplayer GUI" OFF)
 
+if (UNIX AND NOT APPLE)
+    option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+endif()
+
 if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
     # on the installation of the Windows DDK (Driver Developer Kit),
@@ -37,8 +41,8 @@ else()
 endif()
 
 if(UNIX AND NOT APPLE)
-    option(USE_XRANDR "Use xrandr instead of vidmode" ON)
     option(USE_ASAN   "Build with Leak/Address sanitizer" OFF)
+    option(USE_LIBBFD "Use libbfd for crash reporting and leak check" OFF)
 endif()
 
 set(STK_SOURCE_DIR "src")
@@ -59,6 +63,10 @@ if(WIN32)
     add_definitions(-D_IRR_STATIC_LIB_)
 endif()
 
+if(USE_GLES2)
+    add_definitions(-DUSE_GLES2)
+endif()
+
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
@@ -68,8 +76,11 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
 # Build glew library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
-include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+if(NOT USE_GLES2)
+    add_definitions(-DGLEW_NO_GLU)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
+endif()
 
 if((WIN32 AND NOT MINGW) OR APPLE)
     if (NOT APPLE)
@@ -194,21 +205,29 @@ if (OPENMP_FOUND)
 endif()
 
 # OpenGL
-find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
+if(NOT USE_GLES2)
+    find_package(OpenGL REQUIRED)
+    include_directories(${OPENGL_INCLUDE_DIR})
+endif()
 
 if(UNIX AND NOT APPLE)
     find_package(X11 REQUIRED)
     include_directories(${X11_INCLUDE_DIR})
 
-    if(USE_XRANDR)
-        find_package(Xrandr REQUIRED)
-        if(NOT XRANDR_FOUND)
-            message(FATAL_ERROR "XRANDR not found.")
+    find_package(Xrandr REQUIRED)
+    if(NOT XRANDR_FOUND)
+        message(FATAL_ERROR "XRANDR not found.")
+    endif()
+
+    if(USE_LIBBFD)
+        find_package(Libbfd)
+        if(LIBBFD_FOUND)
+            add_definitions(-DENABLE_LIBBFD)
+            include_directories(${LIBBFD_INCLUDE_DIRS})
+        else()
+            set(USE_LIBBFD OFF CACHE BOOL "Use libbfd for crash reporting and leak check" FORCE)
+            message(WARNING "Libbfd not found, disable integrated stack trace.")
         endif()
-    else()
-        find_library(IRRLICHT_XF86VM_LIBRARY Xxf86vm)
-        mark_as_advanced(IRRLICHT_XF86VM_LIBRARY)
     endif()
 endif()
 
@@ -258,7 +277,7 @@ endif()
 add_definitions(-DHAVE_OGGVORBIS)
 
 if(WIN32)
-    configure_file("${STK_SOURCE_DIR}/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
+    configure_file("${STK_SOURCE_DIR}/../tools/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
 endif()
 
 # Provides list of source and header files (STK_SOURCES and STK_HEADERS)
@@ -342,27 +361,34 @@ target_link_libraries(supertuxkart
     bulletcollision
     bulletmath
     enet
-    glew
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
-    ${OPENGL_LIBRARIES}
     ${FREETYPE_LIBRARIES}
     )
 
+if(NOT USE_GLES2)
+    target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew)
+else()
+    target_link_libraries(supertuxkart EGL GLESv2)
+endif()
+
 if(UNIX AND NOT APPLE)
-    target_link_libraries(supertuxkart ${X11_LIBRARIES})
-    if(USE_XRANDR)
-        target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
-    else()
-        target_link_libraries(supertuxkart ${IRRLICHT_XF86VM_LIBRARY})
+    target_link_libraries(supertuxkart ${X11_LIBRARIES} ${XRANDR_LIBRARIES})
+    if(USE_LIBBFD)
+        target_link_libraries(supertuxkart ${LIBBFD_LIBRARIES})
     endif()
     if(USE_ASAN)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
         target_link_libraries(supertuxkart "-fsanitize=address")
     endif()
+endif()
+
+# FreeBSD does not search in /usr/local/lib, but at least Freetype is installed there :(
+if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/lib")
 endif()
 
 if(APPLE)

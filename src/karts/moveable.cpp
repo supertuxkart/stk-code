@@ -128,9 +128,20 @@ void Moveable::update(float dt)
 {
     if(m_body->getInvMass()!=0)
         m_motion_state->getWorldTransform(m_transform);
-    m_velocityLC  = getVelocity()*m_transform.getBasis();
-    Vec3 forw_vec = m_transform.getBasis().getColumn(2);
-    m_heading     = atan2f(forw_vec.getX(), forw_vec.getZ());
+    m_velocityLC = getVelocity()*m_transform.getBasis();
+    updatePosition();
+
+    updateGraphics(dt, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
+}   // update
+
+//-----------------------------------------------------------------------------
+/** Updates the current position and rotation. This function is also called
+ *  by ghost karts for getHeading() to work.
+ */
+void Moveable::updatePosition()
+{
+    Vec3 forw_vec = m_transform.getBasis().getColumn(0);
+    m_heading     = -atan2f(forw_vec.getZ(), forw_vec.getX());
 
     // The pitch in hpr is in between -pi and pi. But for the camera it
     // must be restricted to -pi/2 and pi/2 - so recompute it by restricting
@@ -138,9 +149,7 @@ void Moveable::update(float dt)
     Vec3 up       = getTrans().getBasis().getColumn(1);
     m_pitch       = atan2(up.getZ(), fabsf(up.getY()));
     m_roll        = atan2(up.getX(), up.getY());
-
-    updateGraphics(dt, Vec3(0,0,0), btQuaternion(0, 0, 0, 1));
-}   // update
+}   // updatePosition
 
 //-----------------------------------------------------------------------------
 /** Creates the bullet rigid body for this moveable.

@@ -48,7 +48,7 @@ public:
      *  The last entry ASSET_COUNT specifies the number of entries. */
     enum AssetType {ASSET_MIN,
                     CHALLENGE=ASSET_MIN,
-                    GFX, GRANDPRIX, GUI, LIBRARY, MODEL, MUSIC,
+                    GFX, GRANDPRIX, GUI, LIBRARY, MODEL, MUSIC, REPLAY,
                     SCRIPT, SFX, SHADER, SKIN, TEXTURE, TTF,
                     TRANSLATION, ASSET_MAX = TRANSLATION,
                     ASSET_COUNT};
@@ -138,7 +138,13 @@ public:
                                 bool abort_on_error=false) const;
     std::string getAsset(AssetType type, const std::string &name) const;
     std::string getAsset(const std::string &name) const;
-
+    // ------------------------------------------------------------------------
+    /** Returns the directory of an asset. */
+    std::string getAssetDirectory(AssetType type) const
+    {
+        return m_subdir_name[type];
+    }
+    // ------------------------------------------------------------------------
     std::string searchMusic(const std::string& file_name) const;
     std::string searchTexture(const std::string& fname) const;
     std::string getUserConfigFile(const std::string& fname) const;
@@ -188,6 +194,11 @@ public:
         return getAsset(SHADER, name);
 
     }   // getShader
+    
+    std::string getShadersDir() const
+    {
+        return m_subdir_name[SHADER];
+    }
 };   // FileManager
 
 extern FileManager* file_manager;

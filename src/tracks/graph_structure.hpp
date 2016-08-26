@@ -46,6 +46,13 @@ class GraphStructure : public NoCopy
 {
 protected:
 
+    /** Used by soccer field with navmesh to draw goal line. */
+    enum NodeColor
+    {
+        COLOR_BLUE,
+        COLOR_RED
+    };
+
     void                    cleanupDebugMesh();
     void                    destroyRTT();
 
@@ -75,8 +82,8 @@ private:
                                       const video::SColor &color) const = 0;
     virtual void getGraphBoundingBox(Vec3 *min, Vec3 *max) const = 0;
     virtual const bool isNodeInvisible(int n) const = 0;
-    virtual const bool isNodeInvalid(int n) const = 0;
     virtual const bool hasLapLine() const = 0;
+    virtual const bool differentNodeColor(int n, NodeColor* c) const = 0;
 
 public:
              GraphStructure();

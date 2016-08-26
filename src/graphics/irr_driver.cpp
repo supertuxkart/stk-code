@@ -18,6 +18,7 @@
 #include "graphics/irr_driver.hpp"
 
 #include "config/user_config.hpp"
+#include "font/font_manager.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
@@ -30,6 +31,7 @@
 #include "graphics/per_camera_node.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include "graphics/stk_animated_mesh.hpp"
@@ -73,9 +75,11 @@
  * Should help prevent distros building against an incompatible library.
  */
 
-#if IRRLICHT_VERSION_MAJOR < 1 || IRRLICHT_VERSION_MINOR < 7 || \
-    _IRR_MATERIAL_MAX_TEXTURES_ < 8 || !defined(_IRR_COMPILE_WITH_OPENGL_) || \
-    !defined(_IRR_COMPILE_WITH_B3D_LOADER_)
+#if (IRRLICHT_VERSION_MAJOR < 1 || IRRLICHT_VERSION_MINOR < 7 || \
+    _IRR_MATERIAL_MAX_TEXTURES_ < 8 || \
+    (!defined(_IRR_COMPILE_WITH_OPENGL_) && \
+     !defined(_IRR_COMPILE_WITH_OGLES2_)) || \
+    !defined(_IRR_COMPILE_WITH_B3D_LOADER_))
 #error "Building against an incompatible Irrlicht. Distros, \
 please use the included version."
 #endif
@@ -93,6 +97,7 @@ using namespace irr;
 
 /** singleton */
 IrrDriver *irr_driver = NULL;
+
 
 GPUTimer          m_perf_query[Q_LAST];
 
@@ -211,8 +216,10 @@ GPUTimer &IrrDriver::getGPUTimer(unsigned i)
 void IrrDriver::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
                                           size_t width, size_t height)
 {
-    m_current_screen_size = core::vector2df(float(width), float(height));
-    m_shadow_matrices->computeMatrixesAndCameras(camnode, width, height);
+    float w = width * UserConfigParams::m_scale_rtts_factor;
+    float h = height * UserConfigParams::m_scale_rtts_factor;
+    m_current_screen_size = core::vector2df(w, h);
+    m_shadow_matrices->computeMatrixesAndCameras(camnode, w, h);
 }   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
@@ -441,7 +448,11 @@ void IrrDriver::initDevice()
                 Log::verbose("irr_driver", "Trying to create device with "
                              "%i bits\n", bits);
 
+#if defined(USE_GLES2)
+            params.DriverType    = video::EDT_OGLES2;
+#else
             params.DriverType    = video::EDT_OPENGL;
+#endif
             params.Stencilbuffer = false;
             params.Bits          = bits;
             params.EventReceiver = this;
@@ -452,6 +463,8 @@ void IrrDriver::initDevice()
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
             params.HandleSRGB    = true;
+            params.ShadersPath   = (file_manager->getShadersDir() + 
+                                                           "irrlicht/").c_str();
             
             /*
             switch ((int)UserConfigParams::m_antialiasing)
@@ -487,8 +500,11 @@ void IrrDriver::initDevice()
         {
             UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
             UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
-
+#if defined(USE_GLES2)
+            m_device = createDevice(video::EDT_OGLES2,
+#else
             m_device = createDevice(video::EDT_OPENGL,
+#endif
                         core::dimension2du(UserConfigParams::m_width,
                                            UserConfigParams::m_height ),
                                     32, //bits per pixel
@@ -512,20 +528,40 @@ void IrrDriver::initDevice()
     }
     
     CVS->init();
+    
+    bool recreate_device = false;
+    
+    // Some drivers are able to create OpenGL 3.1 context, but shader-based
+    // pipeline doesn't work for them. For example some radeon drivers 
+    // support only GLSL 1.3 and it causes STK to crash. We should force to use
+    // fixed pipeline in this case.
+    if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
+    {
+        Log::warn("irr_driver", "Driver doesn't support shader-based pipeline. "
+                                "Re-creating device to workaround the issue.");
+
+        params.ForceLegacyDevice = true;
+        recreate_device = true;        
+    }
                     
     // This is the ugly hack for intel driver on linux, which doesn't
     // use sRGB-capable visual, even if we request it. This causes
     // the screen to be darker than expected. It affects mesa 10.6 and newer. 
     // Though we are able to force to use the proper format on mesa side by 
     // setting WithAlphaChannel parameter.
-    if (!ProfileWorld::isNoGraphics() && CVS->needsSRGBCapableVisualWorkaround())
+    else if (CVS->needsSRGBCapableVisualWorkaround())
     {
         Log::warn("irr_driver", "Created visual is not sRGB-capable. "
                                 "Re-creating device to workaround the issue.");
-        m_device->closeDevice();
-        m_device->drop();
 
         params.WithAlphaChannel = true;
+        recreate_device = true;
+    }
+    
+    if (!ProfileWorld::isNoGraphics() && recreate_device)
+    {
+        m_device->closeDevice();
+        m_device->drop();  
         
         m_device = createDeviceEx(params);
         
@@ -533,6 +569,8 @@ void IrrDriver::initDevice()
         {
             Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
         }
+        
+        CVS->init();
     }
 
     m_scene_manager = m_device->getSceneManager();
@@ -657,7 +695,9 @@ void IrrDriver::setMaxTextureSize()
     if( (UserConfigParams::m_high_definition_textures & 0x01) == 0)
     {
         io::IAttributes &att = m_video_driver->getNonConstDriverAttributes();
-        att.setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(512, 512));
+        att.setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(
+                                        UserConfigParams::m_max_texture_size, 
+                                        UserConfigParams::m_max_texture_size));
     }
 }   // setMaxTextureSize
 
@@ -677,9 +717,11 @@ void IrrDriver::createSunInterposer()
         scene::IMeshBuffer *mb = sphere->getMeshBuffer(i);
         if (!mb)
             continue;
-        mb->getMaterial().setTexture(0, 
+        mb->getMaterial().setTexture(0,
                         getUnicolorTexture(video::SColor(255, 255, 255, 255)));
         mb->getMaterial().setTexture(1,
+                                getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        mb->getMaterial().setTexture(7,
                                 getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
     m_sun_interposer = new STKMeshSceneNode(sphere, 
@@ -832,6 +874,8 @@ void IrrDriver::applyResolutionSettings()
     Referee::cleanup();
     ParticleKindManager::get()->cleanup();
     delete input_manager;
+    delete font_manager;
+    font_manager = NULL;
     GUIEngine::clear();
     GUIEngine::cleanUp();
 
@@ -860,6 +904,8 @@ void IrrDriver::applyResolutionSettings()
     }
     initDevice();
 
+    font_manager = new FontManager();
+    font_manager->loadFonts();
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
 
@@ -1013,8 +1059,7 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
  *  \return Newly created skinned mesh. You should call drop() when you don't
  *          need it anymore.
  */
-scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig,
-                                                  video::E_RENDER_TYPE rt)
+scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
 {
     using namespace scene;
     CSkinnedMesh *mesh = dynamic_cast<CSkinnedMesh*>(orig);
@@ -1025,7 +1070,6 @@ scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig,
     }
 
     scene::IAnimatedMesh* out = mesh->clone();
-    out->setRenderType(rt);
     return out;
 }   // copyAnimatedMesh
 
@@ -1139,8 +1183,10 @@ scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
     m.EmissiveColor   = color;
     m.BackfaceCulling = false;
     m.MaterialType    = video::EMT_SOLID;
-    m.setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+    //m.setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+    m.setTexture(0, getUnicolorTexture(color));
     m.setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m.setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
 
     if (CVS->isGLSL())
     {
@@ -1170,7 +1216,9 @@ scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter
  */
 scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                           const std::string& debug_name,
-                                          scene::ISceneNode *parent)
+                                          scene::ISceneNode *parent,
+                                          RenderInfo* render_info,
+                                          bool all_parts_colorized)
 {
     if (!CVS->isGLSL())
         return m_scene_manager->addMeshSceneNode(mesh, parent);
@@ -1180,7 +1228,12 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
 
     scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, 
                                                        m_scene_manager, -1,
-                                                       debug_name);
+                                                       debug_name,
+                                                       core::vector3df(0, 0, 0),
+                                                       core::vector3df(0, 0, 0),
+                                                       core::vector3df(1.0f, 1.0f, 1.0f),
+                                                       true, render_info,
+                                                       all_parts_colorized);
     node->drop();
 
     return node;
@@ -1362,7 +1415,8 @@ void IrrDriver::removeTexture(video::ITexture *t)
  *  \param mesh The animated mesh to add.
  */
 scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh,
-    const std::string& debug_name, scene::ISceneNode* parent)
+    const std::string& debug_name, scene::ISceneNode* parent,
+    RenderInfo* render_info, bool all_parts_colorized)
 {
     if (!CVS->isGLSL())
     {
@@ -1377,7 +1431,8 @@ scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *
         parent = m_scene_manager->getRootSceneNode();
     scene::IAnimatedMeshSceneNode* node =
         new STKAnimatedMesh(mesh, parent, m_scene_manager, -1, debug_name,
-        core::vector3df(0, 0, 0), core::vector3df(0, 0, 0), core::vector3df(1, 1, 1));
+        core::vector3df(0, 0, 0), core::vector3df(0, 0, 0),
+        core::vector3df(1, 1, 1), render_info, all_parts_colorized);
     node->drop();
     return node;
 }   // addAnimatedMesh

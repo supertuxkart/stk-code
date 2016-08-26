@@ -47,6 +47,8 @@ void NetworkString::unitTesting()
     s.addUInt16(12345);
     s.addFloat(1.2345f);
 
+    // Since this string was not received, we need to skip the type and token explicitly.
+    s.skip(5);
     assert(s.getUInt16() == 12345);
     float f = s.getFloat();
     assert(f==1.2345f);

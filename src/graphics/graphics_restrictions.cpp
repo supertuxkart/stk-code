@@ -41,7 +41,7 @@ namespace GraphicsRestrictions
 
         const char *m_names_of_restrictions[] = {
             "UniformBufferObject",
-            "GeometryShader4",
+            "GeometryShader",
             "DrawIndirect",
             "TextureView",
             "TextureStorage",
@@ -56,12 +56,14 @@ namespace GraphicsRestrictions
             "BindlessTexture",
             "TextureCompressionS3TC",
             "AMDVertexShaderLayer",
+            "ExplicitAttribLocation",
             "DriverRecentEnough",
             "HighDefinitionTextures",
             "AdvancedPipeline",
             "FramebufferSRGBWorking",
             "FramebufferSRGBCapable",
             "GI",
+            "ForceLegacyDevice"
         };
     }   // namespace Private
     using namespace Private;
@@ -139,12 +141,16 @@ public:
             std::vector<std::string> l = StringUtils::split(driver, ' ');
             if (l.size() > 2)
             {
-                // driver can be: "1.4 (3.0 Mesa 10.1.0)" --> l[3] must be used
-                if (l[2] != "Mesa")
-                    convertVersionString(l[2]);
-                else
-                    convertVersionString(l[3]);
-                return;
+                // driver can be: "1.4 (3.0 Mesa 10.1.0)" -->
+                // we use value next to "Mesa" word.
+                for (unsigned int i = 0; i < l.size(); i++)
+                {
+                    if (l[i] == "Mesa" && i < l.size() - 1)
+                    {
+                        convertVersionString(l[i+1]);
+                        return;
+                    }
+                }
             }
         }
 
@@ -273,7 +279,7 @@ private:
     std::string m_card_name;
 
     /** Operators to test version numbers with. */
-    enum {VERSION_IGNORE, VERSION_EQUAL, VERSION_LESS, 
+    enum {VERSION_IGNORE, VERSION_EQUAL, VERSION_LESS,
           VERSION_LESS_EQUAL}  m_version_test;
 
     /** Driver version for which this rule applies. */
@@ -356,7 +362,7 @@ public:
         case CARD_IS:
             if(card!=m_card_name) return false;
             break;
-        case CARD_CONTAINS: 
+        case CARD_CONTAINS:
             if(card.find(m_card_name)==std::string::npos)
                 return false;
             break;
@@ -412,7 +418,7 @@ void unitTesting()
     assert(Version("10.3") <=  Version("10.3.2"));
     assert(!(Version("10.3.2") <  Version("10.3")));
     assert(!(Version("10.3.2") <= Version("10.3")));
-    assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1", 
+    assert(Version("3.3 NVIDIA-10.0.19 310.90.10.05b1",
                    "NVIDIA GeForce GTX 680MX OpenGL Engine")
            == Version("310.90.10.5")                                    );
 
@@ -423,7 +429,7 @@ void unitTesting()
     assert(Version("3.1 (Core Profile) Mesa 10.3.0",
                   "Mesa DRI Mobile Intel\u00ae GM45 Express Chipset")
            == Version("10.3.0")                                         );
-    assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel", 
+    assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel",
                    "Gallium 0.4 on NVC1")
            == Version("10.5.0")                                         );
     assert(Version("3.3 (Core Profile) Mesa 10.5.0-devel",
@@ -441,7 +447,7 @@ void unitTesting()
     assert(Version("4.0.10188 Core Profile Context",
                    "ATI Radeon HD 5400 Series")
         == Version("4.0.10188"));
-    assert(Version("4.1 ATI-1.24.38", "AMD Radeon HD 6970M OpenGL Engine") 
+    assert(Version("4.1 ATI-1.24.38", "AMD Radeon HD 6970M OpenGL Engine")
         == Version("1.24.38"));
 
 }   // unitTesting

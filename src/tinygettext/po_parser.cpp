@@ -338,9 +338,9 @@ POParser::parse()
   // skip UTF-8 intro that some text editors produce
   // see http://en.wikipedia.org/wiki/Byte-order_mark
   if (current_line.size() >= 3 &&
-      current_line[0] == static_cast<char>(0xef) &&
-      current_line[1] == static_cast<char>(0xbb) &&
-      current_line[2] == static_cast<char>(0xbf))
+      current_line[0] == static_cast<unsigned char>(0xef) &&
+      current_line[1] == static_cast<unsigned char>(0xbb) &&
+      current_line[2] == static_cast<unsigned char>(0xbf))
   {
     current_line = current_line.substr(3);
   }

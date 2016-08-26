@@ -116,7 +116,7 @@ void RaceSetupScreen::init()
 
     irr::core::stringw name5 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
-    name5 += _("Push the ball to the opposite cage to score goals.");
+    name5 += _("Push the ball into the opposite cage to score goals.");
     w2->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
 
 #define ENABLE_EASTER_EGG_MODE

@@ -18,15 +18,17 @@
 
 #include "tracks/graph_structure.hpp"
 
-#include <IMesh.h>
 #include <ICameraSceneNode.h>
+#include <IMesh.h>
 #include <IMeshSceneNode.h>
+#include <ISceneManager.h>
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/rtts.hpp"
 #include "modes/world.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/log.hpp"
 
 // -----------------------------------------------------------------------------
@@ -107,6 +109,7 @@ void GraphStructure::createMesh(bool show_invisible,
         m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     m.setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
     m.setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m.setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     m_mesh             = irr_driver->createQuadMesh(&m);
     m_mesh_buffer      = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);
@@ -138,12 +141,6 @@ void GraphStructure::createMesh(bool show_invisible,
         // Ignore invisible quads
         if (!show_invisible && isNodeInvisible(count))
             continue;
-        else if (isNodeInvalid(count))
-        {
-            // There should not be a node which isn't made of 4 vertices
-            Log::warn("Graph Structure", "There is an invalid node!");
-            continue;
-        }
 
         // Swap the colours from red to blue and back
         if (!track_color)
@@ -152,8 +149,12 @@ void GraphStructure::createMesh(bool show_invisible,
             c.setBlue((i%2) ? 0 : 255);
         }
 
+        NodeColor nc = COLOR_RED;
+        const bool different_color = differentNodeColor(count, &nc);
         // Transfer the 4 points of the current quad to the list of vertices
-        set3DVerticesOfGraph(count, new_v+4*i, c);
+        set3DVerticesOfGraph(count, new_v+4*i, (different_color ?
+            (nc == COLOR_RED ? video::SColor(255, 255, 0, 0) :
+            video::SColor(255, 0, 0, 255)) : c));
 
         // Set up the indices for the triangles
         // (note, afaik with opengl we could use quads directly, but the code
@@ -242,6 +243,9 @@ void GraphStructure::makeMiniMap(const core::dimension2du &dimension,
                             video::ITexture** oldRttMinimap,
                             FrameBuffer** newRttMinimap)
 {
+    // Skip minimap when profiling
+    if (ProfileWorld::isNoGraphics()) return;
+
     const video::SColor oldClearColor = World::getWorld()->getClearColor();
     World::getWorld()->setClearbackBufferColor(video::SColor(0, 255, 255, 255));
     World::getWorld()->forceFogDisabled(true);

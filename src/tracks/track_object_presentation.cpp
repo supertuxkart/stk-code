@@ -31,6 +31,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -297,10 +298,11 @@ void TrackObjectPresentationLibraryNode::move(const core::vector3df& xyz, const 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
                                        scene::ISceneNode* parent,
-                                       ModelDefinitionLoader& model_def_loader)
+                                       ModelDefinitionLoader& model_def_loader,
+                                       RenderInfo* ri)
                           : TrackObjectPresentationSceneNode(xml_node)
 {
-    m_node = model_def_loader.instanciateAsLOD(&xml_node, parent);
+    m_node = model_def_loader.instanciateAsLOD(&xml_node, parent, ri);
     if (m_node == NULL) throw std::runtime_error("Cannot load LOD node");
     m_node->setPosition(m_init_xyz);
     m_node->setRotation(m_init_hpr);
@@ -318,7 +320,8 @@ TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
 TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                                                      const XMLNode& xml_node,
                                                      bool enabled,
-                                                     scene::ISceneNode* parent)
+                                                     scene::ISceneNode* parent,
+                                                     RenderInfo* render_info)
                            : TrackObjectPresentationSceneNode(xml_node)
 {
     m_is_looped  = false;
@@ -329,6 +332,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     std::string model_name;
     xml_node.get("model",   &model_name  );
 
+    m_render_info = render_info;
     m_model_file = model_name;
     m_is_in_skybox = false;
     std::string render_pass;
@@ -380,6 +384,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_mesh         = NULL;
     m_node         = NULL;
     m_mesh         = model;
+    m_render_info  = NULL;
     init(NULL, NULL, true);
 }   // TrackObjectPresentationMesh
 
@@ -395,6 +400,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_mesh         = NULL;
     m_node         = NULL;
     m_is_in_skybox = false;
+    m_render_info  = NULL;
     bool animated  = (UserConfigParams::m_graphical_effects ||
                       World::getWorld()->getIdent() == IDENT_CUTSCENE);
 
@@ -447,7 +453,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         {
             // Animated
             //m_node = irr_driver->getSceneManager()->addEmptySceneNode();
-            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
+            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
             enabled = false;
             m_force_always_hidden = true;
             m_frame_start = 0;
@@ -456,7 +462,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         else
         {
             // Static
-            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
+            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
             enabled = false;
             m_force_always_hidden = true;
             m_frame_start = 0;
@@ -482,7 +488,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
     {
         scene::IAnimatedMeshSceneNode *node =
             irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh,
-                                        m_model_file, parent);
+                                        m_model_file, parent, m_render_info);
         m_node = node;
 
         m_frame_start = node->getStartFrame();
@@ -503,7 +509,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         if (xml_node)
             xml_node->get("displacing", &displacing);
 
-        m_node = irr_driver->addMesh(m_mesh, m_model_file, parent);
+        m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
 
         STKMeshSceneNode* stkmesh = dynamic_cast<STKMeshSceneNode*>(m_node);
         if (displacing && stkmesh != NULL)

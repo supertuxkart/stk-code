@@ -45,6 +45,8 @@ class CombinedCharacteristic;
 class Material;
 class XMLNode;
 
+enum KartRenderType: unsigned int;
+
 /**
  *  \brief This class stores the properties of a kart.
  *  This includes size, name, identifier, physical properties etc.
@@ -242,10 +244,12 @@ public:
     video::ITexture *getMinimapIcon  () const {return m_minimap_icon;         }
 
     // ------------------------------------------------------------------------
-    /** Returns a pointer to the KartModel object. */
-    KartModel*    getKartModelCopy
-                (video::E_RENDER_TYPE rt = video::ERT_DEFAULT) const
-                                          {return m_kart_model->makeCopy(rt); }
+    /** Returns a pointer to the KartModel object.
+     *  \param krt The KartRenderType, like default, red, blue or transparent.
+     *  see the RenderInfo include for details
+     */
+    KartModel*    getKartModelCopy(KartRenderType krt) const
+                                         {return m_kart_model->makeCopy(krt); }
 
     // ------------------------------------------------------------------------
     /** Returns a pointer to the main KartModel object. This copy

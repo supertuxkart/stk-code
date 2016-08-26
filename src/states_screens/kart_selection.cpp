@@ -148,8 +148,6 @@ EventPropagation FocusDispatcher::focused(const int player_id)
     return GUIEngine::EVENT_LET;
 }   // focused
 
-static FocusDispatcher  *g_dispatcher = NULL;
-
 #if 0
 #pragma mark -
 #pragma mark KartHoverListener
@@ -229,6 +227,7 @@ bool sameKart(const PlayerKartWidget& player1, const PlayerKartWidget& player2)
 
 KartSelectionScreen::KartSelectionScreen(const char* filename) : Screen(filename)
 {
+    m_dispatcher           = NULL;
     m_removed_widget       = NULL;
     m_multiplayer_message  = NULL;
     m_from_overworld       = false;
@@ -246,8 +245,8 @@ KartSelectionScreen* KartSelectionScreen::getRunningInstance()
 
 void KartSelectionScreen::loadedFromFile()
 {
-    g_dispatcher          = new FocusDispatcher(this);
-    m_first_widget        = g_dispatcher;
+    m_dispatcher          = new FocusDispatcher(this);
+    m_first_widget        = m_dispatcher;
     m_game_master_confirmed    = false;
     m_multiplayer_message = NULL;
     // Dynamically add tabs
@@ -305,6 +304,7 @@ void KartSelectionScreen::beforeAddingWidget()
 
 void KartSelectionScreen::init()
 {
+    m_instance_ptr = this;
     Screen::init();
     m_must_delete_on_back = false;
 
@@ -318,17 +318,17 @@ void KartSelectionScreen::init()
 
     // FIXME : The reserved id value is -1 when we switch from KSS to NKSS and vice-versa
 
-    g_dispatcher->setRootID(placeholder->m_reserved_id);
+    m_dispatcher->setRootID(placeholder->m_reserved_id);
 
     g_root_id = placeholder->m_reserved_id;
-    if (!m_widgets.contains(g_dispatcher))
+    if (!m_widgets.contains(m_dispatcher))
     {
-        m_widgets.push_back(g_dispatcher);
+        m_widgets.push_back(m_dispatcher);
 
         // this is only needed if the dispatcher wasn't already in
         // the list of widgets. If it already was, it was added along
         // other widgets.
-        g_dispatcher->add();
+        m_dispatcher->add();
     }
 
     m_game_master_confirmed = false;
@@ -426,7 +426,7 @@ void KartSelectionScreen::tearDown()
 void KartSelectionScreen::unloaded()
 {
     // these pointer is no more valid (have been deleted along other widgets)
-    g_dispatcher = NULL;
+    m_dispatcher = NULL;
 }
 
 // ----------------------------------------------------------------------------
@@ -439,7 +439,7 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device)
         Log::info("KartSelectionScreen",  "joinPlayer() invoked");
     if (!m_multiplayer && !first_player) return false;
 
-    assert (g_dispatcher != NULL);
+    assert (m_dispatcher != NULL);
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)

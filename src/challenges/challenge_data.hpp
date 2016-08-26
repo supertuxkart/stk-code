@@ -110,8 +110,6 @@ private:
     /** Number of trophies required to access this challenge */
     int m_num_trophies;
 
-    irr::core::stringw m_challenge_description;
-
 public:
                  ChallengeData(const std::string& filename);
 
@@ -195,10 +193,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the description of this challenge.
      */
-    const irr::core::stringw& getChallengeDescription() const
-    {
-        return m_challenge_description;
-    }   // getChallengeDescription
+    const irr::core::stringw getChallengeDescription() const;
 
     // ------------------------------------------------------------------------
     /** Returns the minimum position the player must have in order to win.

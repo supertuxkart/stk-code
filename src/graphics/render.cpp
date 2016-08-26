@@ -51,8 +51,7 @@ class InstancedColorizeShader : public Shader<InstancedColorizeShader>
 public:
     InstancedColorizeShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER,   "utils/getworldmatrix.vert",
-                            GL_VERTEX_SHADER,   "glow_object.vert",
+        loadProgram(OBJECT, GL_VERTEX_SHADER,   "glow_object.vert",
                             GL_FRAGMENT_SHADER, "glow_object.frag");
         assignUniforms();
     }   // InstancedColorizeShader
@@ -286,6 +285,7 @@ void IrrDriver::renderGLSL(float dt)
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 if (CVS->isDefferedEnabled())
                     camera->activate();
+                glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
                 m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
                 glDisable(GL_FRAMEBUFFER_SRGB);
             }
@@ -300,7 +300,7 @@ void IrrDriver::renderGLSL(float dt)
     float tmp[2];
     tmp[0] = float(m_actual_screen_size.Width);
     tmp[1] = float(m_actual_screen_size.Height);
-    glBindBuffer(GL_UNIFORM_BUFFER, 
+    glBindBuffer(GL_UNIFORM_BUFFER,
                  SharedGPUObjects::getViewProjectionMatricesUBO());
     glBufferSubData(GL_UNIFORM_BUFFER, (16 * 9) * sizeof(float),
                     2 * sizeof(float), tmp);
@@ -491,7 +491,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         glDisable(GL_BLEND);
         m_rtts->getFBO(FBO_COLORS).bind();
         m_post_processing->renderRHDebug(m_rtts->getRH().getRTT()[0],
-                                         m_rtts->getRH().getRTT()[1], 
+                                         m_rtts->getRH().getRTT()[1],
                                          m_rtts->getRH().getRTT()[2],
                                          getShadowMatrices()->getRHMatrix(),
                                          getShadowMatrices()->getRHExtend());
@@ -674,8 +674,9 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
             node->render();
     }
 
-    if (CVS->supportsIndirectInstancingRendering())
+    if (CVS->supportsIndirectInstancingRendering() && CVS->isARBExplicitAttribLocationUsable())
     {
+#if !defined(USE_GLES2)
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, GlowPassCmd::getInstance()->drawindirectcmd);
         InstancedColorizeShader::getInstance()->use();
 
@@ -695,6 +696,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
             for (unsigned i = 0; i < ListInstancedGlow::getInstance()->size(); i++)
                 glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)((GlowPassCmd::getInstance()->Offset + i) * sizeof(DrawElementsIndirectCommand)));
         }
+#endif
     }
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);

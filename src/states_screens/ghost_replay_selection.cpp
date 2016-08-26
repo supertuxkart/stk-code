@@ -62,6 +62,10 @@ void GhostReplaySelection::loadedFromFile()
     m_replay_list_widget = getWidget<GUIEngine::ListWidget>("replay_list");
     assert(m_replay_list_widget != NULL);
     m_replay_list_widget->setColumnListener(this);
+    m_replay_difficulty_toggle_widget =
+        getWidget<GUIEngine::CheckBoxWidget>("replay_difficulty_toggle");
+    m_replay_difficulty_toggle_widget->setState(true);
+    m_same_difficulty = m_replay_difficulty_toggle_widget->getState();
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -82,6 +86,7 @@ void GhostReplaySelection::beforeAddingWidget()
 void GhostReplaySelection::init()
 {
     Screen::init();
+    m_cur_difficulty = race_manager->getDifficulty();
     refresh(/*forced_update*/false);
 }   // init
 
@@ -96,6 +101,10 @@ void GhostReplaySelection::loadList()
     for (unsigned int i = 0; i < ReplayPlay::get()->getNumReplayFile() ; i++)
     {
         const ReplayPlay::ReplayData& rd = ReplayPlay::get()->getReplayData(i);
+
+        if (m_same_difficulty && m_cur_difficulty !=
+            (RaceManager::Difficulty)rd.m_difficulty)
+            continue;
 
         std::vector<GUIEngine::ListWidget::ListCell> row;
         Track* t = track_manager->getTrack(rd.m_track_name);
@@ -113,7 +122,7 @@ void GhostReplaySelection::loadList()
             (StringUtils::toWString(rd.m_laps), -1, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell
             (StringUtils::toWString(rd.m_min_time) + L"s", -1, 1, true));
-        m_replay_list_widget->addItem("replay", row);
+        m_replay_list_widget->addItem(StringUtils::toString(i), row);
     }
 }   // loadList
 
@@ -132,11 +141,13 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
     }
     else if (name == m_replay_list_widget->m_properties[GUIEngine::PROP_ID])
     {
-        int selected_index = m_replay_list_widget->getSelectionID();
+        int selected_index = -1;
+        const bool success = StringUtils::fromString(m_replay_list_widget
+            ->getSelectionInternalName(), selected_index);
         // This can happen e.g. when the list is empty and the user
         // clicks somewhere.
         if (selected_index >= (signed)ReplayPlay::get()->getNumReplayFile() ||
-            selected_index < 0)
+            selected_index < 0 || !success)
         {
             return;
         }
@@ -147,6 +158,11 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
         race_manager->setRecordRace(true);
         TracksScreen::getInstance()->setOfficalTrack(false);
         TracksScreen::getInstance()->push();
+    }
+    else if (name == "replay_difficulty_toggle")
+    {
+        m_same_difficulty = m_replay_difficulty_toggle_widget->getState();
+        refresh(/*forced_update*/false);
     }
 
 }   // eventCallback

@@ -21,8 +21,9 @@
 #include "central_settings.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_animated_mesh.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/render_info.hpp"
+#include "graphics/stk_animated_mesh.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
@@ -38,11 +39,13 @@ STKAnimatedMesh::STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::IS
 irr::scene::ISceneManager* mgr, s32 id, const std::string& debug_name,
 const core::vector3df& position,
 const core::vector3df& rotation,
-const core::vector3df& scale) :
+const core::vector3df& scale, RenderInfo* render_info, bool all_parts_colorized) :
     CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
     isGLInitialized = false;
     isMaterialInitialized = false;
+    m_mesh_render_info = render_info;
+    m_all_parts_colorized = all_parts_colorized;
 #ifdef DEBUG
     m_debug_name = debug_name;
 #endif
@@ -97,10 +100,44 @@ void STKAnimatedMesh::updateNoGL()
     if (!isMaterialInitialized)
     {
         video::IVideoDriver* driver = SceneManager->getVideoDriver();
-        for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
+        const u32 mb_count = m->getMeshBufferCount();
+        for (u32 i = 0; i < mb_count; ++i)
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-            GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name));
+            bool affected = false;
+            RenderInfo* cur_ri = m_mesh_render_info;
+            if (!m_all_parts_colorized && mb && cur_ri)
+            {
+                if (m_mesh_render_info && !m_mesh_render_info->isStatic())
+                {
+                    // Convert to static render info for each mesh buffer
+                    assert(m_mesh_render_info->getNumberOfHue() == mb_count);
+                    const float hue = m_mesh_render_info->getDynamicHue(i);
+                    if (hue > 0.0f)
+                    {
+                        cur_ri = new RenderInfo(hue);
+                        m_static_render_info.push_back(cur_ri);
+                        affected = true;
+                    }
+                    else
+                    {
+                        cur_ri = NULL;
+                    }
+                }
+                else
+                {
+                    // Test if material is affected by static hue change
+                    Material* m = material_manager->getMaterialFor(mb
+                        ->getMaterial().getTexture(0), mb);
+                    if (m->isColorizable())
+                        affected = true;
+                }
+            }
+
+            assert(cur_ri ? cur_ri->isStatic() : true);
+            GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
+                affected || m_all_parts_colorized || (cur_ri
+                && cur_ri->isTransparent()) ? cur_ri : NULL));
         }
 
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
@@ -126,7 +163,7 @@ void STKAnimatedMesh::updateNoGL()
                 TransparentMaterial TranspMat = getTransparentMaterialFromType(type, MaterialTypeParam, material);
                 TransparentMesh[TranspMat].push_back(&mesh);
             }
-            else if (m->getRenderType() == video::ERT_TRANSPARENT)
+            else if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent())
             {
                 TransparentMesh[TM_ADDITIVE].push_back(&mesh);
             }

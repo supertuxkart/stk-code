@@ -58,13 +58,15 @@ RTT::RTT(size_t width, size_t height)
     m_RH_FBO = NULL;
     using namespace video;
     using namespace core;
-
-    const dimension2du res(width, height);
+    
+    dimension2du res(width * UserConfigParams::m_scale_rtts_factor, 
+                     height * UserConfigParams::m_scale_rtts_factor);
+    
     const dimension2du half = res/2;
     const dimension2du quarter = res/4;
     const dimension2du eighth = res/8;
 
-    const u16 shadowside = 1024;
+    const u16 shadowside = 1024 * UserConfigParams::m_scale_rtts_factor;
     const dimension2du shadowsize0(shadowside, shadowside);
     const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
     const dimension2du shadowsize2(shadowside / 4, shadowside / 4);
@@ -118,7 +120,6 @@ RTT::RTT(size_t width, size_t height)
 
     std::vector<GLuint> somevector;
     somevector.push_back(RenderTargetTextures[RTT_SSAO]);
-
     FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_NORMAL_AND_DEPTH]);
@@ -158,12 +159,12 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_LINEAR_DEPTH]);
     FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
     somevector.clear();
+    
     somevector.push_back(RenderTargetTextures[RTT_HALF1]);
     FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_HALF1_R]);
     FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
-
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_HALF2]);
     FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
@@ -186,42 +187,42 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_DISPLACE]);
     FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
     somevector.clear();
+    
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_1024]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 1024, 1024));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize0.Width, shadowsize0.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_SCALAR_1024]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 1024, 1024));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize0.Width, shadowsize0.Height));
     somevector.clear();
+    
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_512]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_512]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
 	somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_LENS_512]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
-
-
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize1.Width, shadowsize1.Height));
     somevector.clear();
+    
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_256]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_256]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
 	somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_LENS_256]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
-
-
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize2.Width, shadowsize2.Height));
     somevector.clear();
+    
     somevector.push_back(RenderTargetTextures[RTT_BLOOM_128]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP_128]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
 	somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_LENS_128]);
-    FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
+    FrameBuffers.push_back(new FrameBuffer(somevector, shadowsize3.Width, shadowsize3.Height));
 
     if (CVS->isShadowEnabled())
     {
@@ -243,7 +244,7 @@ RTT::RTT(size_t width, size_t height)
         somevector.clear();
         somevector.push_back(RSM_Color);
         somevector.push_back(RSM_Normal);
-        m_RSM = new FrameBuffer(somevector, RSM_Depth, 1024, 1024, true);
+        m_RSM = new FrameBuffer(somevector, RSM_Depth, shadowsize0.Width, shadowsize0.Height, true);
 
         RH_Red = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);
         RH_Green = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);

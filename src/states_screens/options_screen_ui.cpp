@@ -21,7 +21,10 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "config/hardware_stats.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "font/bold_face.hpp"
+#include "font/regular_face.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -282,8 +285,10 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         {
             stats->setVisible(false);
             stats_label->setVisible(false);
+            PlayerProfile* profile = PlayerManager::getCurrentPlayer();
+            if (profile != NULL && profile->isLoggedIn())
+                profile->requestSignOut();
         }
-
     }
     else if (name=="enable-hw-report")
     {
@@ -331,17 +336,16 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
         translations = new Translations();
 
-        //Reload fonts for new translation
-        GUIEngine::cleanHollowCopyFont();
-        GUIEngine::getTitleFont()->recreateFromLanguage();
-        GUIEngine::getFont()->recreateFromLanguage();
-        GUIEngine::reloadHollowCopyFont(GUIEngine::getFont());
-
+        // Reload fonts for new translation
         GUIEngine::getStateManager()->hardResetAndGoToScreen<MainMenuScreen>();
 
+        font_manager->getFont<BoldFace>()->reset();
+        font_manager->getFont<RegularFace>()->reset();
         GUIEngine::getFont()->updateRTL();
         GUIEngine::getTitleFont()->updateRTL();
         GUIEngine::getSmallFont()->updateRTL();
+        GUIEngine::getLargeFont()->updateRTL();
+        GUIEngine::getOutlineFont()->updateRTL();
 
         UserConfigParams::m_language = selection.c_str();
         user_config->saveConfig();

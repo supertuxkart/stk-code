@@ -37,6 +37,7 @@
 #include "modes/cutscene_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/demo_world.hpp"
+#include "network/network_config.hpp"
 #include "online/request_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
@@ -75,6 +76,7 @@ bool MainMenuScreen::m_enable_online = false;
 MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 {
     m_online_string = _("Online");
+    //I18N: Used as a verb, appears on the main menu (login button)
     m_login_string = _("Login");
 }   // MainMenuScreen
 
@@ -385,7 +387,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 #endif
     if (selection == "new")
     {
-        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance(); //FIXME : that was for tests
+        NetworkConfig::get()->unsetNetworking();
+        KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
         s->setMultiplayer(false);
         s->setFromOverworld(false);
         s->push();
@@ -393,6 +396,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     else if (selection == "multiplayer")
     {
         KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
+        NetworkConfig::get()->unsetNetworking();
         s->setMultiplayer(true);
         s->setFromOverworld(false);
         s->push();

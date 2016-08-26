@@ -46,19 +46,20 @@
 #include <pthread.h>
 #include <signal.h>
 
-STKHost *STKHost::m_stk_host = NULL;
+STKHost *STKHost::m_stk_host       = NULL;
+bool     STKHost::m_enable_console = true;
 
 void STKHost::create()
 {
     assert(m_stk_host == NULL);
-    if(NetworkConfig::get()->isServer())
+    if (NetworkConfig::get()->isServer())
         m_stk_host = new STKHost(NetworkConfig::get()->getServerName());
     else
     {
         Server *server = ServersManager::get()->getJoinedServer();
         m_stk_host = new STKHost(server->getServerId(), 0);
     }
-   if(!m_stk_host->m_network)
+    if (!m_stk_host->m_network)
     {
         delete m_stk_host;
         m_stk_host = NULL;
@@ -294,18 +295,20 @@ void STKHost::init()
     // ============================
     if (enet_initialize() != 0)
     {
-        Log::error("NetworkConsole", "Could not initialize enet.");
+        Log::error("STKHost", "Could not initialize enet.");
         return;
     }
 
-    Log::info("NetworkConsole", "Host initialized.");
+    Log::info("STKHost", "Host initialized.");
     Network::openLog();  // Open packet log file
     ProtocolManager::getInstance<ProtocolManager>();
 
     // Optional: start the network console
-    m_network_console = new NetworkConsole();
-    m_network_console->run();
- 
+    if(m_enable_console)
+    {
+        m_network_console = new NetworkConsole();
+        m_network_console->run();
+    } 
 }  // STKHost
 
 // ----------------------------------------------------------------------------

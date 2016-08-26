@@ -33,6 +33,18 @@ namespace irr
 		/** Like mouse events, keyboard events are created by the device and passed to
 		IrrlichtDevice::postEventFromUser. They take the same path as mouse events. */
 		EET_KEY_INPUT_EVENT,
+        
+        //! A multi touch event.
+		EET_MULTI_TOUCH_EVENT,
+        
+        //! A accelerometer event.
+        EET_ACCELEROMETER_EVENT,
+        
+        //! A gyroscope event.
+        EET_GYROSCOPE_EVENT,
+        
+        //! A device motion event.
+        EET_DEVICE_MOTION_EVENT,
 
 		//! A joystick (joypad, gamepad) input event.
 		/** Joystick events are created by polling all connected joysticks once per
@@ -163,6 +175,25 @@ namespace irr
 		EIME_FORCE_32_BIT = 0x7fffffff
 	};
 #endif
+    
+    //! Enumeration for all touch input events
+	enum EMULTI_TOUCH_INPUT_EVENT
+	{
+		//! Max multi touch count
+		NUMBER_OF_MULTI_TOUCHES = 10,
+        
+		//! Touch was pressed down.
+		EMTIE_PRESSED_DOWN = 0,
+        
+		//! Touch was left up.
+		EMTIE_LEFT_UP,
+        
+		//! The touch changed its position.
+		EMTIE_MOVED,
+        
+		//! No real event. Just for convenience to get number of events
+		EMTIE_COUNT
+	};
 
 	namespace gui
 	{
@@ -352,6 +383,97 @@ struct SEvent
 		//! True if ctrl was also pressed
 		bool Control:1;
 	};
+    
+    //! Any kind of multi touch event.
+	struct SMultiTouchInput
+	{
+		//! A helper function to check if a button is pressed.
+		u32 touchedCount() const
+		{
+			u32 count = 0;
+            
+			for (u16 i = 0; i < NUMBER_OF_MULTI_TOUCHES; ++i)
+            {
+				if (Touched[i])
+                    count++;
+			}
+            
+			return count;
+		}
+        
+        //! Reset variables.
+		void clear()
+		{
+			for (u16 i = 0; i < NUMBER_OF_MULTI_TOUCHES; ++i)
+            {
+				Touched[i] = 0;
+				X[i] = 0;
+				Y[i] = 0;
+				PrevX[i] = 0;
+				PrevY[i] = 0;
+			}
+		}
+        
+        // Status of simple touch.
+        u8 Touched[NUMBER_OF_MULTI_TOUCHES];
+        
+        // X position of simple touch.
+		s32 X[NUMBER_OF_MULTI_TOUCHES];
+        
+        // Y position of simple touch.
+		s32 Y[NUMBER_OF_MULTI_TOUCHES];
+        
+        // Previous X position of simple touch.
+		s32 PrevX[NUMBER_OF_MULTI_TOUCHES];
+        
+        // Previous Y position of simple touch.
+		s32 PrevY[NUMBER_OF_MULTI_TOUCHES];
+        
+		//! Type of multi touch event
+		EMULTI_TOUCH_INPUT_EVENT Event;
+	};
+    
+    //! Any kind of accelerometer event.
+	struct SAccelerometerEvent
+	{
+        
+        // X acceleration.
+		f64 X;
+        
+        // Y acceleration.
+		f64 Y;
+        
+        // Z acceleration.
+		f64 Z;
+	};
+    
+    //! Any kind of gyroscope event.
+	struct SGyroscopeEvent
+	{
+        
+        // X rotation.
+		f64 X;
+        
+        // Y rotation.
+		f64 Y;
+        
+        // Z rotation.
+		f64 Z;
+	};
+    
+    //! Any kind of device motion event.
+	struct SDeviceMotionEvent
+	{
+        
+        // X angle - roll.
+		f64 X;
+        
+        // Y angle - pitch.
+		f64 Y;
+        
+        // Z angle - yaw.
+		f64 Z;
+	};
 
 	//! A joystick event.
 	/** Unlike other events, joystick events represent the result of polling
@@ -412,7 +534,6 @@ struct SEvent
 		}
 	};
 
-
 	//! Any kind of log event.
 	struct SLogEvent
 	{
@@ -447,12 +568,17 @@ struct SEvent
 	};
 #endif
 
+
 	EEVENT_TYPE EventType;
 	union
 	{
 		struct SGUIEvent GUIEvent;
 		struct SMouseInput MouseInput;
 		struct SKeyInput KeyInput;
+        struct SMultiTouchInput MultiTouchInput;
+        struct SAccelerometerEvent AccelerometerEvent;
+        struct SGyroscopeEvent GyroscopeEvent;
+        struct SDeviceMotionEvent DeviceMotionEvent;
 		struct SJoystickEvent JoystickEvent;
 		struct SLogEvent LogEvent;
 		struct SUserEvent UserEvent;

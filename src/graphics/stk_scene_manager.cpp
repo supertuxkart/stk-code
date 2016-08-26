@@ -22,6 +22,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/render_info.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include "graphics/stk_animated_mesh.hpp"
 #include "graphics/stk_mesh.hpp"
@@ -155,6 +156,42 @@ FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > Instan
     PolyCount += (InstanceBufferOffset - InitialOffset) * mesh->IndexCount / 3;
 }
 
+class MeshRenderInfoHash
+{
+public:
+    size_t operator() (const std::pair<scene::IMeshBuffer*, RenderInfo*> &p) const
+    {
+        return (std::hash<scene::IMeshBuffer*>()(p.first) ^
+            (std::hash<RenderInfo*>()(p.second) << 1));
+    }
+};
+
+struct MeshRenderInfoEquals : std::binary_function
+    <const std::pair<scene::IMeshBuffer*, RenderInfo*>&,
+     const std::pair<scene::IMeshBuffer*, RenderInfo*>&, bool>
+{
+    result_type operator() (first_argument_type lhs,
+                            second_argument_type rhs) const
+    {
+        return (lhs.first == rhs.first) &&
+            (lhs.second == rhs.second);
+    }
+};
+
+template<typename T>
+static
+void FillInstances(const std::unordered_map<std::pair<scene::IMeshBuffer*, RenderInfo*>, std::vector<std::pair<GLMesh *, scene::ISceneNode*> >, MeshRenderInfoHash, MeshRenderInfoEquals> &GatheredGLMesh, std::vector<GLMesh *> &InstancedList,
+    T *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &Polycount)
+{
+    auto It = GatheredGLMesh.begin(), E = GatheredGLMesh.end();
+    for (; It != E; ++It)
+    {
+        FillInstances_impl<T>(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, Polycount);
+        if (!CVS->isAZDOEnabled())
+            InstancedList.push_back(It->second.front().first);
+    }
+}
+
 template<typename T>
 static
 void FillInstances(const std::unordered_map<scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > &GatheredGLMesh, std::vector<GLMesh *> &InstancedList,
@@ -169,7 +206,8 @@ void FillInstances(const std::unordered_map<scene::IMeshBuffer *, std::vector<st
     }
 }
 
-static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForSolidPass[Material::SHADERTYPE_COUNT], MeshForShadowPass[Material::SHADERTYPE_COUNT][4], MeshForRSM[Material::SHADERTYPE_COUNT];
+static std::unordered_map <std::pair<scene::IMeshBuffer*, RenderInfo*>, std::vector<std::pair<GLMesh *, scene::ISceneNode*> >, MeshRenderInfoHash, MeshRenderInfoEquals> MeshForSolidPass[Material::SHADERTYPE_COUNT];
+static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForShadowPass[Material::SHADERTYPE_COUNT][4], MeshForRSM[Material::SHADERTYPE_COUNT];
 static std::unordered_map <scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > MeshForGlowPass;
 static std::vector <STKMeshCommon *> DeferredUpdate;
 
@@ -321,7 +359,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                         MeshForGlowPass[mesh->mb].emplace_back(mesh, Node);
 
                     if (Mat != Material::SHADERTYPE_SPLATTING && mesh->TextureMatrix.isIdentity())
-                        MeshForSolidPass[Mat][mesh->mb].emplace_back(mesh, Node);
+                        MeshForSolidPass[Mat][std::pair<scene::IMeshBuffer*, RenderInfo*>(mesh->mb, mesh->m_render_info)].emplace_back(mesh, Node);
                     else
                     {
                         core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
@@ -616,11 +654,13 @@ PROFILER_POP_CPU_MARKER();
     PROFILER_PUSH_CPU_MARKER("- Sync Stall", 0xFF, 0x0, 0x0);
     GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
 
-    while (reason != GL_ALREADY_SIGNALED)
+    if (reason != GL_ALREADY_SIGNALED)
     {
-        if (reason == GL_WAIT_FAILED) break;
-        StkTime::sleep(1);
-        reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
+        do
+        {
+            reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 1000000);
+        } 
+        while (reason == GL_TIMEOUT_EXPIRED);
     }
     glDeleteSync(m_sync);
     PROFILER_POP_CPU_MARKER();
@@ -646,6 +686,8 @@ PROFILER_POP_CPU_MARKER();
 
     if (!CVS->supportsIndirectInstancingRendering())
         return;
+        
+#if !defined(USE_GLES2)
 
     InstanceDataDualTex *InstanceBufferDualTex;
     InstanceDataThreeTex *InstanceBufferThreeTex;
@@ -860,4 +902,5 @@ PROFILER_POP_CPU_MARKER();
 
     if (CVS->supportsAsyncInstanceUpload())
         glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
+#endif
 }

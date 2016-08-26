@@ -23,6 +23,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -52,6 +53,7 @@
 using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
+using namespace GUIEngine;
 
 const float DURATION = 15.0f;
 
@@ -112,6 +114,8 @@ void GrandPrixLose::init()
 
     m_phase = 1;
     m_global_time = 0.0f;
+
+    getWidget<ButtonWidget>("continue")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // -------------------------------------------------------------------------------------
@@ -178,7 +182,7 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
         const KartProperties* kart = kart_properties_manager->getKart(ident_arg[n]);
         if (kart != NULL)
         {
-            KartModel* kart_model = kart->getKartModelCopy();
+            KartModel* kart_model = kart->getKartModelCopy(KRT_DEFAULT);
             m_all_kart_models.push_back(kart_model);
             scene::ISceneNode* kart_main_node = kart_model->attachModel(false, false);
 

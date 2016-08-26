@@ -21,6 +21,7 @@
 #define HEADER_MATERIAL_HPP
 
 #include "utils/no_copy.hpp"
+#include "utils/random_generator.hpp"
 
 #include <assert.h>
 #include <map>
@@ -175,6 +176,18 @@ private:
     /** Set to true to disable writing to the Z buffer. Usually to be used with alpha blending */
     bool             m_disable_z_write;
 
+    /** True if this material can be colorized (like red/blue in team game). */
+    bool             m_colorizable;
+
+    /** Minimum resulting saturation when colorized (from 0 to 1) */
+    float            m_colorization_factor;
+
+    /** List of hue pre-defined for colorization (from 0 to 1) */
+    std::vector<float> m_hue_settings;
+
+    /** Random generator for getting pre-defined hue */
+    RandomGenerator m_random_hue;
+
     /** Some textures need to be pre-multiplied, some divided to give
      *  the intended effect. */
     //enum             {ADJ_NONE, ADJ_PREMUL, ADJ_DIV}
@@ -226,6 +239,8 @@ private:
     float            m_zipper_engine_force;
     
     std::string      m_mask;
+
+    std::string      m_colorization_mask;
 
     /** If m_splatting is true, indicates the first splatting texture */
     std::string      m_splatting_texture_1;
@@ -282,6 +297,25 @@ public:
     /** Returns if this material should trigger a rescue if a kart
      *  is driving on it. */
     bool  isDriveReset       () const { return m_drive_reset;        }
+    // ------------------------------------------------------------------------
+    /** Returns if this material can be colorized.
+     */
+    bool  isColorizable      () const { return m_colorizable;        }
+    // ------------------------------------------------------------------------
+    /** Returns the minimum resulting saturation when colorized.
+     */
+    float getColorizationFactor () const { return m_colorization_factor;   }
+    // ------------------------------------------------------------------------
+    /** Returns a random hue when colorized.
+     */
+    float getRandomHue()
+    {
+        if (m_hue_settings.empty())
+            return 0.0f;
+        const unsigned int hue = m_random_hue.get(m_hue_settings.size());
+        assert(hue < m_hue_settings.size());
+        return m_hue_settings[hue];
+    }
     // ------------------------------------------------------------------------
     /** Returns if this material should trigger a rescue if a kart
      *  crashes against it. */

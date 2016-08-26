@@ -37,12 +37,12 @@ CheckGoal::CheckGoal(const XMLNode &node,  unsigned int index)
     m_first_goal = false;
     node.get("first_goal", &m_first_goal);
 
-    Vec3 p1, p2;
-    node.get("p1", &p1);
-    node.get("p2", &p2);
+    node.get("p1", &m_p1);
+    node.get("p2", &m_p3);
 
-    m_line.setLine( core::vector2df(p1.getX(), p1.getZ()),
-                    core::vector2df(p2.getX(), p2.getZ()) );
+    m_line.setLine( core::vector2df(m_p1.getX(), m_p1.getZ()),
+                    core::vector2df(m_p3.getX(), m_p3.getZ()) );
+    m_p2 = (m_p1 + m_p3) / 2;
 }   // CheckGoal
 
 // ----------------------------------------------------------------------------
@@ -55,8 +55,7 @@ void CheckGoal::update(float dt)
 
     if (world)
     {
-        const Vec3 &xyz = world->getBallPosition();
-        if (isTriggered(m_previous_ball_position, xyz, -1))
+        if (isTriggered(m_previous_ball_position, world->getBallPosition(), -1))
         {
             if (UserConfigParams::m_check_debug)
             {
@@ -65,7 +64,7 @@ void CheckGoal::update(float dt)
             }
             trigger(0);
         }
-        m_previous_ball_position = xyz;
+        m_previous_ball_position = world->getBallPosition();
     }
 }   // update
 
@@ -108,16 +107,7 @@ void CheckGoal::reset(const Track &track)
 
     if (world)
     {
-        const Vec3 &xyz = world->getBallPosition();
-        m_previous_ball_position = xyz;
+        m_previous_ball_position = world->getBallPosition();
     }
 
 }   // reset
-
-// ----------------------------------------------------------------------------
-Vec3 CheckGoal::convertTo3DCenter() const
-{
-    float x = m_line.getMiddle().X;
-    float y = m_line.getMiddle().Y;
-    return Vec3(x, 0, y);
-}

@@ -90,7 +90,7 @@ void GetPublicAddress::createStunRequest()
     m_transaction_host = new Network(1, 1, 0, 0);
 
     // Assemble the message for the stun server
-    BareNetworkString s(21);
+    BareNetworkString s(20);
 
     // bytes 0-1: the type of the message
     // bytes 2-3: message length added to header (attributes)
@@ -105,8 +105,6 @@ void GetPublicAddress::createStunRequest()
         s.addUInt8(random_byte);
         m_stun_tansaction_id[i] = random_byte;
     }
-    s.addChar(0);
-
 
     m_transaction_host->sendRawPacket(s,
                                       TransportAddress(m_stun_server_ip,
@@ -140,7 +138,7 @@ std::string GetPublicAddress::parseStunResponse()
         return "STUN response contains no data at all";
 
     // Convert to network string.
-    NetworkString datas((uint8_t*)buffer, len);
+    BareNetworkString datas(buffer, len);
 
     // check that the stun response is a response, contains the magic cookie
     // and the transaction ID

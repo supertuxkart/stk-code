@@ -19,6 +19,7 @@
 #include "script_track.hpp"
 
 #include "animations/three_d_animation.hpp"
+#include "font/digit_face.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/stk_text_billboard.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -88,17 +89,14 @@ namespace Scripting
         void createTextBillboard(std::string* text, SimpleVec3* location)
         {
             core::stringw wtext = StringUtils::utf8ToWide(*text);
-            core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()
-                ->getDimension(wtext.c_str());
-
-            assert(GUIEngine::getHighresDigitFont() != NULL);
+            DigitFace* digit_face = font_manager->getFont<DigitFace>();
+            core::dimension2d<u32> textsize = digit_face->getDimension(wtext.c_str());
 
             core::vector3df xyz(location->getX(), location->getY(), location->getZ());
 
             if (CVS->isGLSL())
             {
-                gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-                STKTextBillboard* tb = new STKTextBillboard(wtext.c_str(), font,
+                STKTextBillboard* tb = new STKTextBillboard(wtext.c_str(), digit_face,
                     GUIEngine::getSkin()->getColor("font::bottom"),
                     GUIEngine::getSkin()->getColor("font::top"),
                     irr_driver->getSceneManager()->getRootSceneNode(),
@@ -109,17 +107,18 @@ namespace Scripting
             }
             else
             {
+                assert(GUIEngine::getHighresDigitFont() != NULL);
                 scene::ISceneManager* sm = irr_driver->getSceneManager();
                 scene::ISceneNode* sn =
                     sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
-                    wtext.c_str(),
-                    NULL,
-                    core::dimension2df(textsize.Width / 35.0f,
-                    textsize.Height / 35.0f),
-                    xyz,
-                    -1, // id
-                    GUIEngine::getSkin()->getColor("font::bottom"),
-                    GUIEngine::getSkin()->getColor("font::top"));
+                        wtext.c_str(),
+                        NULL,
+                        core::dimension2df(textsize.Width / 35.0f,
+                            textsize.Height / 35.0f),
+                        xyz,
+                        -1, // id
+                        GUIEngine::getSkin()->getColor("font::bottom"),
+                        GUIEngine::getSkin()->getColor("font::top"));
                 World::getWorld()->getTrack()->addNode(sn);
             }
         }
@@ -143,6 +142,11 @@ namespace Scripting
         int getNumLocalPlayers()
         {
             return race_manager->getNumLocalPlayers();
+        }
+
+        bool isTrackReverse()
+        {
+            return race_manager->getReverseTrack();
         }
 
         void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)
@@ -377,6 +381,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)", asFUNCTION(setFog), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("int getNumberOfKarts()", asFUNCTION(getNumberOfKarts), asCALL_CDECL); assert(r >= 0);
             r = engine->RegisterGlobalFunction("int getNumLocalPlayers()", asFUNCTION(getNumLocalPlayers), asCALL_CDECL); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("bool isReverse()", asFUNCTION(isTrackReverse), asCALL_CDECL); assert(r >= 0);
 
             // TrackObject
             r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", asMETHOD(::TrackObject, setEnabled), asCALL_THISCALL); assert(r >= 0);

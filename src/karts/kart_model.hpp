@@ -35,7 +35,10 @@ using namespace irr;
 
 class AbstractKart;
 class KartProperties;
+class RenderInfo;
 class XMLNode;
+
+enum KartRenderType: unsigned int;
 
 /** A speed-weighted object is an object whose characteristics are influenced by the kart's speed */
 struct SpeedWeightedObject
@@ -115,6 +118,7 @@ public:
             AF_SPEED_WEIGHTED_END,          // End of speed-weighted animation
             AF_END=AF_SPEED_WEIGHTED_END,   // Last animation frame
             AF_COUNT};             // Number of entries here
+
 private:
     /** Which frame number starts/end which animation. */
     int m_animation_frame[AF_COUNT];
@@ -229,17 +233,25 @@ private:
     /** Pointer to the kart object belonging to this kart model. */
     AbstractKart* m_kart;
 
+    KartRenderType m_krt;
+
+    RenderInfo* m_render_info;
+
+    bool m_support_colorization;
+
 public:
                   KartModel(bool is_master);
                  ~KartModel();
-    KartModel*    makeCopy(video::E_RENDER_TYPE rt);
+    KartModel*    makeCopy(KartRenderType krt);
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
     void          setDefaultSuspension();
     void          update(float dt, float distance, float steer, float speed,
+                         float current_lean_angle,
                          int gt_replay_index = -1);
     void          finishedRace();
+    void          resetVisualWheelPosition();
     scene::ISceneNode*
                   attachModel(bool animatedModels, bool always_animated);
     // ------------------------------------------------------------------------
@@ -327,6 +339,10 @@ public:
     scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
     // ------------------------------------------------------------------------
     core::vector3df getHatOffset() { return m_hat_offset; }
+    // ------------------------------------------------------------------------
+    RenderInfo* getRenderInfo();
+    // ------------------------------------------------------------------------
+    bool supportColorization() const         { return m_support_colorization; }
 
 };   // KartModel
 #endif

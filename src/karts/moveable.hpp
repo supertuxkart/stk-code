@@ -118,6 +118,7 @@ public:
     const btTransform
                  &getTrans() const {return m_transform;}
     void          setTrans(const btTransform& t);
+    void          updatePosition();
 }
 ;   // class Moveable
 

@@ -24,6 +24,7 @@
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -192,6 +193,8 @@ namespace GUIEngine
         void removeChildNamed(const char* name);
         
         PtrVector<Widget>& getRibbonChildren() { return m_children; }
+
+        virtual EventPropagation onActivationInput(const int playerID) OVERRIDE;
     };
 
 }

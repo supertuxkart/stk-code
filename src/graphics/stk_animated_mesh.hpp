@@ -25,11 +25,14 @@
 #include <IAnimatedMesh.h>
 #include <irrTypes.h>
 
+class RenderInfo;
+
 class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode, public STKMeshCommon
 {
 protected:
     bool isMaterialInitialized;
     bool isGLInitialized;
+    PtrVector<RenderInfo> m_static_render_info;
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix;
     void cleanGLMeshes();
@@ -40,12 +43,16 @@ public:
      irr::scene::ISceneManager* mgr, irr::s32 id, const std::string& debug_name,
      const irr::core::vector3df& position = irr::core::vector3df(0,0,0),
      const irr::core::vector3df& rotation = irr::core::vector3df(0,0,0),
-     const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
+     const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f),
+     RenderInfo* render_info = NULL, bool all_parts_colorized = false);
   ~STKAnimatedMesh();
 
   virtual void render();
   virtual void setMesh(irr::scene::IAnimatedMesh* mesh);
   virtual bool glow() const { return false; }
+private:
+    RenderInfo* m_mesh_render_info;
+    bool m_all_parts_colorized;
 };
 
 #endif // STKANIMATEDMESH_HPP

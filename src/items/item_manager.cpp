@@ -495,7 +495,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
     }
 
     RandomGenerator random;
-    const unsigned int MIN_DIST = sqrt(BattleGraph::get()->getNumNodes());
+    const unsigned int MIN_DIST = int(sqrt(BattleGraph::get()->getNumNodes()));
     const unsigned int TOTAL_ITEM = MIN_DIST / 2;
 
     Log::info("[ItemManager]","Creating %d random items for arena", TOTAL_ITEM);
@@ -532,10 +532,9 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
             for (unsigned int j = 0; j < used_location.size(); j++)
             {
                 if (!found) continue;
-                Vec3 d = BattleGraph::get()
-                    ->getPolyOfNode(used_location[j]).getCenter() -
-                    BattleGraph::get()->getPolyOfNode(node).getCenter();
-                found = d.length_2d() > MIN_DIST;
+                float test_distance = BattleGraph::get()
+                    ->getDistance(used_location[j], node);
+                found = test_distance > MIN_DIST;
             }
             if (found)
             {
@@ -568,7 +567,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
             j > NITRO_BIG ? Item::ITEM_NITRO_BIG :
             j > NITRO_SMALL ? Item::ITEM_NITRO_SMALL : Item::ITEM_BANANA);
         Vec3 loc = BattleGraph::get()
-            ->getPolyOfNode(used_location[i]).getCenter();
+            ->getQuadOfNode(used_location[i]).getCenter();
         Item* item = newItem(type, loc, Vec3(0, 1, 0));
         BattleGraph::get()->insertItems(item, used_location[i]);
     }

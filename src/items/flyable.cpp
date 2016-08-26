@@ -334,7 +334,7 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
     float time;
     if (t1 >= 0 && t1<t2) time = t1;
     else time = t2;
-    
+
     //createPhysics offset
     time -= forw_offset / item_XZ_speed;
 

@@ -123,6 +123,7 @@ FileManager::FileManager()
     m_subdir_name[LIBRARY    ] = "library";
     m_subdir_name[MODEL      ] = "models";
     m_subdir_name[MUSIC      ] = "music";
+    m_subdir_name[REPLAY     ] = "replay";
     m_subdir_name[SCRIPT     ] = "tracks";
     m_subdir_name[SFX        ] = "sfx";
     m_subdir_name[SKIN       ] = "skins";

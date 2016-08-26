@@ -10,9 +10,8 @@ flat in sampler2D handle;
 in vec3 nor;
 out vec4 FragColor;
 
-
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
-vec3 getLightFactor(vec3 diffuseMatColor, vec3 specularMatColor, float specMapValue, float emitMapValue);
+#stk_include "utils/getPosFromUVDepth.frag"
+#stk_include "utils/getLightFactor.frag"
 
 void main() {
     vec3 texc = gl_FragCoord.xyz / vec3(screen, 1.);

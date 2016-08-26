@@ -69,11 +69,10 @@ Bowling::Bowling(AbstractKart *kart)
         quadNormal = btVector3(.0f, 1.0f, .0f);
 
     createPhysics(y_offset, btVector3(0.0f, 0.0f, m_speed*2),
-                    new btSphereShape(0.5f*m_extend.getY()),
-                    1.0f /*restitution*/,
-                    -70.0f*quadNormal /*gravity*/,
-                    true /*rotates*/);
-
+                  new btSphereShape(0.5f*m_extend.getY()),
+                  0.8f /*restitution*/,
+                  -70.0f*quadNormal /*gravity*/,
+                  true /*rotates*/);
     // Even if the ball is fired backwards, m_speed must be positive,
     // otherwise the ball can start to vibrate when energy is added.
     m_speed = fabsf(m_speed);
