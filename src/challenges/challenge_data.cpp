@@ -516,7 +516,6 @@ const irr::core::stringw
             if (track == NULL) return irr::core::stringw( L"????" );
 
             return _("New track '%s' now available", track->getName());
-            break;
         }
         case UNLOCK_MODE:
         {

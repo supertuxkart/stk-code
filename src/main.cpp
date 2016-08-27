@@ -429,7 +429,6 @@ bool isEasterMode(int day, int month, int year, int before_after_days)
         }
         return (month > easter_start_month || (month == easter_start_month && day >= easter_start_day)) &&
                (month < easter_end_month   || (month == easter_end_month   && day <= easter_end_day));
-        break;
     }
     case 1:  return true;  break;
     default: return false; break;

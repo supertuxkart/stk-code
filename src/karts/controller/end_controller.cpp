@@ -260,26 +260,24 @@ void EndController::handleRescue(const float DELTA)
 void EndController::findNonCrashingPoint(Vec3 *result)
 {
     unsigned int sector = m_next_node_index[m_track_node];
-    int target_sector;
 
     Vec3 direction;
     Vec3 step_track_coord;
     float distance;
-    int steps;
 
     //We exit from the function when we have found a solution
     while( 1 )
     {
         //target_sector is the sector at the longest distance that we can drive
         //to without crashing with the track.
-        target_sector = m_next_node_index[sector];
+        int target_sector = m_next_node_index[sector];
 
         //direction is a vector from our kart to the sectors we are testing
         direction = DriveGraph::get()->getNode(target_sector)->getCenter()
                   - m_kart->getXYZ();
 
         float len=direction.length();
-        steps = int( len / m_kart_length );
+        int steps = int( len / m_kart_length );
         if( steps < 3 ) steps = 3;
 
         //Protection against having vel_normal with nan values

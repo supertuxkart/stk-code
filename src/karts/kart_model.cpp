@@ -926,11 +926,10 @@ void KartModel::update(float dt, float distance, float steer, float speed,
     m_kart->getKartProperties()->getSpeedWeightedObjectProperties().value_name
 
             // Animation strength
-            float strength = 1.0f;
             const float strength_factor = GET_VALUE(obj, m_strength_factor);
             if (strength_factor >= 0.0f)
             {
-                strength = speed * strength_factor;
+                float strength = speed * strength_factor;
                 btClamp<float>(strength, 0.0f, 1.0f);
             }
 
