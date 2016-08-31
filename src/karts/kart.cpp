@@ -2174,6 +2174,13 @@ void Kart::updatePhysics(float dt)
 
     updateSliding();
 
+    // Cap speed if necessary
+    const Material *m = getMaterial();
+
+    float min_speed =  m && m->isZipper() ? m->getZipperMinSpeed() : -1.0f;
+    m_max_speed->setMinSpeed(min_speed);
+    m_max_speed->update(dt);
+
     // Compute the speed of the kart.
     m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
 
@@ -2186,13 +2193,6 @@ void Kart::updatePhysics(float dt)
 
     if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
         m_speed *= -1.f;
-
-    // Cap speed if necessary
-    const Material *m = getMaterial();
-
-    float min_speed =  m && m->isZipper() ? m->getZipperMinSpeed() : -1.0f;
-    m_max_speed->setMinSpeed(min_speed);
-    m_max_speed->update(dt);
 
     // To avoid tunneling (which can happen on long falls), clamp the
     // velocity in Y direction. Tunneling can happen if the Y velocity
