@@ -363,6 +363,7 @@ void RewindManager::rewindTo(float rewind_time)
 #ifdef SHOW_ROLLBACK
         irr_driver->update(dt);
 #endif
+        world->updateTime(dt);
 
     }
     m_is_rewinding = false;

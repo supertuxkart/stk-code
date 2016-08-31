@@ -974,7 +974,7 @@ void World::scheduleTutorial()
 {
     m_schedule_exit_race = true;
     m_schedule_tutorial = true;
-}
+}   // scheduleTutorial
 
 //-----------------------------------------------------------------------------
 /** Updates the physics, all karts, the track, and projectile manager.
@@ -999,22 +999,14 @@ void World::update(float dt)
     }
 #endif
 
-    PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
-    history->update(dt);
-    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
-    if(history->replayHistory()) dt=history->getNextDelta();
-    RewindManager::get()->setCurrentTime(World::getWorld()->getTime(), dt);
-    RewindManager::get()->saveStates();
     WorldStatus::update(dt);
-    if (m_script_engine) m_script_engine->update(dt);
-    PROFILER_POP_CPU_MARKER();
-
-    if (!history->dontDoPhysics())
-    {
-        m_physics->update(dt);
-    }
+    RewindManager::get()->saveStates();
 
     PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);
+
+    // Update all the karts. This in turn will also update the controller,
+    // which causes all AI steering commands set. So in the following 
+    // physics update the new steering is taken into account.
     const int kart_amount = (int)m_karts.size();
     for (int i = 0 ; i < kart_amount; ++i)
     {
@@ -1029,6 +1021,18 @@ void World::update(float dt)
         Camera::getCamera(i)->update(dt);
     }
     PROFILER_POP_CPU_MARKER();
+
+    PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
+    history->update(dt);
+    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
+    if(history->replayHistory()) dt=history->getNextDelta();
+    if (m_script_engine) m_script_engine->update(dt);
+    PROFILER_POP_CPU_MARKER();
+
+    if (!history->dontDoPhysics())
+    {
+        m_physics->update(dt);
+    }
 
     PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
     if (UserConfigParams::m_graphical_effects && m_weather)
@@ -1047,6 +1051,17 @@ void World::update(float dt)
     assert(m_magic_number == 0xB01D6543);
 #endif
 }   // update
+
+// ----------------------------------------------------------------------------
+/** Compute the new time, and set this new time to be used in the rewind
+ *  manager.
+ *  \param dt Time step size.
+ */
+void World::updateTime(const float dt)
+{
+    WorldStatus::updateTime(dt);
+    RewindManager::get()->setCurrentTime(getTime(), dt);
+}   // updateTime
 
 // ----------------------------------------------------------------------------
 /** Only updates the track. The order in which the various parts of STK are

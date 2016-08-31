@@ -122,13 +122,14 @@ public:
              WorldStatus();
     virtual ~WorldStatus();
 
-    void     reset();
-    void     update(const float dt);
-    void     setTime(const float time);
+    virtual void reset();
+    virtual void updateTime(const float dt);
+    virtual void update(float dt);
     virtual void pause(Phase phase);
     virtual void unpause();
     virtual void enterRaceOverState();
     virtual void terminateRace();
+    void         setTime(const float time);
 
     // ------------------------------------------------------------------------
     // Note: GO_PHASE is both: start phase and race phase

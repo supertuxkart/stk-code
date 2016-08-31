@@ -1174,18 +1174,6 @@ void Kart::eliminate()
  */
 void Kart::update(float dt)
 {
-#ifdef DEBUG_TO_COMPARE_KART_PHYSICS
-    // This information is useful when comparing kart physics, e.g. to
-    // see top speed, acceleration (i.e. time to top speed) etc.
-    Log::verbose("physics", "%s t %f %f xyz %f %f %f v %f %f %f s %f a %f",
-        getIdent().c_str(),
-        World::getWorld()->getTime(), dt,
-        getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
-        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
-        getControls().getSteer(),
-        getControls().getAccel());
-#endif
-
     // update star effect (call will do nothing if stars are not activated)
     m_stars_effect->update(dt);
 
@@ -1222,6 +1210,19 @@ void Kart::update(float dt)
 
     if(!history->replayHistory() && !RewindManager::get()->isRewinding())
         m_controller->update(dt);
+
+#undef DEBUG_TO_COMPARE_KART_PHYSICS
+#ifdef DEBUG_TO_COMPARE_KART_PHYSICS
+    // This information is useful when comparing kart physics, e.g. to
+    // see top speed, acceleration (i.e. time to top speed) etc.
+    Log::verbose("physics", "%s t %f %f xyz %f %f %f v %f %f %f s %f a %f",
+        getIdent().c_str(),
+        World::getWorld()->getTime(), dt,
+        getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
+        getControls().getSteer(),
+        getControls().getAccel());
+#endif
 
     // if its view is blocked by plunger, decrease remaining time
     if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= dt;

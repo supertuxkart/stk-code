@@ -178,7 +178,7 @@ protected:
     virtual void  onGo() OVERRIDE;
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool  isRaceOver() = 0;
-    virtual void  update(float dt);
+    virtual void  update(float dt) OVERRIDE;
     virtual void  createRaceGUI();
             void  updateTrack(float dt);
     // ------------------------------------------------------------------------
@@ -252,9 +252,10 @@ public:
     // =================
     virtual void    init();
     virtual void    terminateRace() OVERRIDE;
-    virtual void    reset();
+    virtual void    reset() OVERRIDE;
     virtual void    pause(Phase phase) OVERRIDE;
     virtual void    unpause() OVERRIDE;
+    virtual void    updateTime(const float dt) OVERRIDE;
     virtual void    getDefaultCollectibles(int *collectible_type,
                                            int *amount );
     virtual void    endRaceEarly() { return; }
