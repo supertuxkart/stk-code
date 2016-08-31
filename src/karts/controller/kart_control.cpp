@@ -66,7 +66,7 @@ void KartControl::setSteer(float f)
 /** Sets the acceleration. */
 void KartControl::setAccel(float f)
 {
-    float old_accel = m_steer;
+    float old_accel = m_accel;
     m_accel         = f; 
     RewindManager *re = RewindManager::get();
     if (re->isEnabled() && !re->isRewinding() && old_accel != m_accel)
