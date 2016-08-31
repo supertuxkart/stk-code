@@ -31,7 +31,6 @@
 
 #include <irrlicht.h>
 
-#include <stdio.h>
 #include <stdexcept>
 #include <sstream>
 #include <sys/stat.h>
@@ -51,6 +50,7 @@ namespace irr {
 #  include <sys/types.h>
 #  include <dirent.h>
 #  include <unistd.h>
+#  include <fcntl.h>
 #else
 #  define WIN32_LEAN_AND_MEAN
 #  include <direct.h>
@@ -212,6 +212,8 @@ FileManager::FileManager()
         addRootDirs(getenv("SUPERTUXKART_ROOT_PATH"));
 
     checkAndCreateConfigDir();
+    checkSharedDir();
+    checkPidFile();
     checkAndCreateAddonsDir();
     checkAndCreateScreenshotDir();
     checkAndCreateReplayDir();
@@ -233,6 +235,8 @@ void FileManager::discoverPaths()
                    m_root_dirs[i].c_str());
     Log::info("[FileManager]", "User directory is '%s'.",
               m_user_config_dir.c_str());
+    Log::info("[FileManager]", "Shared directory is '%s'.",
+              m_shared_dir.c_str());
     Log::info("[FileManager]", "Addons files will be stored in '%s'.",
                m_addons_dir.c_str());
     Log::info("[FileManager]", "Screenshots will be stored in '%s'.",
@@ -857,6 +861,96 @@ void FileManager::checkAndCreateConfigDir()
     return;
 }   // checkAndCreateConfigDir
 
+void FileManager::checkSharedDir()
+{
+    m_shared_dir=STK_SHARED_DIR;
+    if (*m_shared_dir.rbegin() != '/')
+        m_shared_dir += '/';
+    if (m_file_system->existFile(io::path(m_shared_dir.c_str())))
+        return;
+
+    m_shared_dir = m_user_config_dir;
+    // checkSharedDir
+}
+
+void FileManager::checkPidFile()
+{
+    m_pid_file=STK_SHARED_DIR;
+    if (*m_pid_file.rbegin() != '/')
+        m_pid_file += '/';
+    m_pid_file += ".supertuxkart";
+    // checkPidFile
+}
+
+bool FileManager::createPidFile()
+{
+   std::stringstream ss;
+   const char *buf;
+#if defined(WIN32) || defined(__CYGWIN__)
+   ss << GetCurrentProcessId();
+   buf = ss.str().c_str();
+   pidFile = CreateFile(m_pid_file.c_str(), GENERIC_WRITE, 0, NULL,
+                        CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+   if (pidFile == INVALID_HANDLE_VALUE)
+   {
+      Log::fatal("FileManager", 
+                 std::string("cannot create " + m_pid_file).c_str());
+      return false;
+   }
+   WriteFile(pidFile, buf, strlen(buf), NULL, NULL);
+   FlushFileBuffers(pidFile);
+#else
+   ss << getpid();
+   buf = ss.str().c_str();
+   pidFile = fopen(m_pid_file.c_str(), "w"); 
+   if (pidFile == NULL)
+   {
+      Log::error("FileManager", 
+                 std::string("cannot create " + m_pid_file).c_str());
+      return false;
+   }
+   struct flock f;
+   int fd = fileno(pidFile);
+   f.l_type = F_WRLCK;
+   f.l_whence = SEEK_SET;
+   f.l_start = f.l_len = 0;
+   fcntl(fd, F_GETLK, &f);
+   if (f.l_type == F_WRLCK)
+   {
+      Log::error("FileManager", "existing pid file");
+      fclose(pidFile);
+      return false;
+   }
+   f.l_type = F_WRLCK;
+   fcntl(fd, F_SETLKW, &f);
+   fwrite(buf, 1, strlen(buf), pidFile);
+   fflush(pidFile);
+#endif
+   return true;
+   // createPidFile
+}
+
+void FileManager::removePidFile()
+{
+   if (pidFile != NULL)
+   {
+#if defined(WIN32) || defined(__CYGWIN__)
+	   CloseHandle(pidFile);
+	   _unlink(m_pid_file.c_str());
+#else
+       struct flock f;
+       int fd = fileno(pidFile);
+       f.l_whence = SEEK_SET;
+       f.l_start = f.l_len = 0;
+       f.l_type = F_UNLCK;
+       fcntl(fd, F_SETLKW, &f);
+       fclose(pidFile);
+       unlink(m_pid_file.c_str());
+#endif
+   }
+   // removePidFile
+}
+
 // ----------------------------------------------------------------------------
 /** Creates the directories for the addons data. This will set m_addons_dir
  *  with the appropriate path, and also create the subdirectories in this
@@ -1180,6 +1274,15 @@ std::string FileManager::getUserConfigFile(const std::string &fname) const
 {
     return m_user_config_dir+fname;
 }   // getUserConfigFile
+
+//-----------------------------------------------------------------------------
+/** Returns the full path of the shared directory.
+ */
+std::string FileManager::getSharedConfigFile(const std::string &fname) const
+{
+    return m_shared_dir+fname;
+    // getSharedConfigFile
+}
 
 //-----------------------------------------------------------------------------
 /** Returns the full path of a music file by searching all music search paths.

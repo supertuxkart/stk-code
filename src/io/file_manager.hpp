@@ -29,6 +29,8 @@
 #include <vector>
 #include <set>
 
+#include <stdio.h>
+
 #include <irrString.h>
 #include <IFileSystem.h>
 namespace irr { class IrrlichtDevice; }
@@ -62,6 +64,12 @@ private:
 
     /** Directory where user config files are stored. */
     std::string       m_user_config_dir;
+
+    /** Directory where shared files are stored. */
+    std::string       m_shared_dir;
+
+    /** Path where the "pid" file is stored. */
+    std::string	      m_pid_file;
 
     /** Directory where addons are stored. */
     std::string       m_addons_dir;
@@ -97,6 +105,8 @@ private:
     bool              checkAndCreateDirectory(const std::string &path);
     io::path          createAbsoluteFilename(const std::string &f);
     void              checkAndCreateConfigDir();
+    void              checkSharedDir();
+    void	      checkPidFile();
     bool              isDirectory(const std::string &path) const;
     void              checkAndCreateAddonsDir();
     void              checkAndCreateScreenshotDir();
@@ -109,6 +119,12 @@ private:
                                              const char *dir_name,
                                              const char *fallback1,
                                              const char *fallback2=NULL);
+#endif
+
+#if defined(WIN32) || defined(__CYGWIN__)
+    HANDLE            pidFile;
+#else
+    FILE	      *pidFile;
 #endif
 
 public:
@@ -148,6 +164,8 @@ public:
     std::string searchMusic(const std::string& file_name) const;
     std::string searchTexture(const std::string& fname) const;
     std::string getUserConfigFile(const std::string& fname) const;
+    std::string getSharedConfigFile(const std::string& fname) const;
+    std::string getPidFile(void) const;
     bool        fileExists(const std::string& path) const;
     // ------------------------------------------------------------------------
     /** Convenience function to save some typing in the 
@@ -171,6 +189,8 @@ public:
     void       popModelSearchPath();
     void       popMusicSearchPath();
     void       redirectOutput();
+    bool       createPidFile();
+    void       removePidFile();
 
     bool       fileIsNewer(const std::string& f1, const std::string& f2) const;
 

@@ -36,9 +36,16 @@ endif()
 
 if(MINGW OR CYGWIN)
     option(USE_WIIUSE "Support for wiimote input devices" OFF)
+    if (NOT STK_SHARED_DIR)
+        set(STK_SHARED_DIR "${CMAKE_INSTALL_PREFIX}/supertuxkart/")
+    endif()
 else()
     option(USE_WIIUSE "Support for wiimote input devices" ON)
+    if (NOT STK_SHARED_DIR)
+        set(STK_SHARED_DIR "/var/games/supertuxkart/")
+    endif()
 endif()
+add_definitions(-DSTK_SHARED_DIR=\"${STK_SHARED_DIR}\")
 
 if(UNIX AND NOT APPLE)
     option(USE_ASAN   "Build with Leak/Address sanitizer" OFF)
@@ -494,6 +501,11 @@ install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32/app
 install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
 install(FILES data/supertuxkart.appdata.xml DESTINATION share/appdata)
+install(DIRECTORY DESTINATION ${STK_SHARED_DIR})
+
+if (UNIX)
+   install(CODE "execute_process(COMMAND \"chmod 777 ${STK_SHARED_DIR}\")")
+endif()
 
 if(MINGW)
     install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION ${STK_INSTALL_BINARY_DIR}
