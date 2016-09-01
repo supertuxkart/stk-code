@@ -1,36 +1,27 @@
-/* Attributes */
-
-attribute vec3 inVertexPosition;
-attribute vec3 inVertexNormal;
-attribute vec4 inVertexColor;
-attribute vec2 inTexCoord0;
-attribute vec2 inTexCoord1;
-
-/* Uniforms */
-
-uniform int uMaterialType;
-
+in vec3 inVertexPosition;
+in vec4 inVertexColor;
+in vec2 inTexCoord0;
+in vec2 inTexCoord1;
 uniform mat4 uMvpMatrix;
-
 uniform mat4 uTextureMatrix0;
 uniform mat4 uTextureMatrix1;
-
-/* Varyings */
-
-varying vec2 varTexCoord0;
-varying vec2 varTexCoord1;
-varying vec4 varVertexColor;
-varying float varEyeDist;
-
-void main(void)
+out vec2 varTexCoord0;
+out vec2 varTexCoord1;
+out vec4 varVertexColor;
+void main ()
 {
-	gl_Position = uMvpMatrix * vec4(inVertexPosition,1.0);
-	
-	vec4 TexCoord0 = vec4(inTexCoord0.x, inTexCoord0.y, 0.0, 0.0);
-	varTexCoord0 = vec4(uTextureMatrix0 * TexCoord0).xy;
-	
-	vec4 TexCoord1 = vec4(inTexCoord1.x, inTexCoord1.y, 0.0, 0.0);
-	varTexCoord1 = vec4(uTextureMatrix1 * TexCoord1).xy;
-	
-	varVertexColor = inVertexColor.zyxw;
+  vec4 tmpvar_1;
+  tmpvar_1.w = 1.0;
+  tmpvar_1.xyz = inVertexPosition;
+  gl_Position = (uMvpMatrix * tmpvar_1);
+  vec4 tmpvar_2;
+  tmpvar_2.zw = vec2(0.0, 0.0);
+  tmpvar_2.xy = inTexCoord0;
+  varTexCoord0 = (uTextureMatrix0 * tmpvar_2).xy;
+  vec4 tmpvar_3;
+  tmpvar_3.zw = vec2(0.0, 0.0);
+  tmpvar_3.xy = inTexCoord1;
+  varTexCoord1 = (uTextureMatrix1 * tmpvar_3).xy;
+  varVertexColor = inVertexColor.zyxw;
 }
+
