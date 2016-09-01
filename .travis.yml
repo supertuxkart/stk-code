@@ -62,4 +62,4 @@ notifications:
       - "Build: %{build_url}"
 
 deploy:
-	skip_cleanup: true
+  skip_cleanup: true
