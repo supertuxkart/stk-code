@@ -60,3 +60,6 @@ notifications:
       - "[%{repository}#%{branch} @%{commit}] %{author}): %{message}"
       - "Diff: %{compare_url}"
       - "Build: %{build_url}"
+
+deploy:
+	skip_cleanup: true
