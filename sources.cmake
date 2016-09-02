@@ -9,5 +9,5 @@ else()
     file(GLOB_RECURSE STK_SHADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "data/shaders/*")
     MESSAGE("-- NOT using optimized GLSL shaders. To optimize the shader run tools/optimize_shaders.sh")
 endif()
-    
+
 file(GLOB_RECURSE STK_RESOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${PROJECT_BINARY_DIR}/tmp/*.rc")

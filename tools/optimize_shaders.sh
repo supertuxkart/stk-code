@@ -6,7 +6,8 @@ cp -R data/shaders data/shaders_optimized # Copy shaders to data/shaders_optimiz
 cd data/shaders_optimized
 
 find . -type f -name "*.vert" -exec sed -i '1i  #version 140' {} \;
-find . -type f -name "*.vert" -exec glslopt -v {} {} \;
+glslopt -v coloredquad.vert coloredquad.vert
+
 find . -type f -name "*.vert" -exec sed -i '/#version 140/d' {} \;
 
 sed -i '1s/^/#version 140\n/' ./pass.vert # To fix the crash
