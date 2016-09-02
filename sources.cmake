@@ -2,7 +2,7 @@
 # This will then trigger a new cmake run automatically. 
 file(GLOB_RECURSE STK_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.hpp")
 file(GLOB_RECURSE STK_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp")
-if(EXISTS "data/shaders_optimized/" AND IS_DIRECTORY "data/shaders_optimized/")
+if(EXISTS "../data/shaders_optimized/" AND IS_DIRECTORY "../data/shaders_optimized/")
     file(GLOB_RECURSE STK_SHADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "data/shaders_optimized/*")
     MESSAGE("-- Using optimized GLSL shaders")
 else()
