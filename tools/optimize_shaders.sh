@@ -9,5 +9,5 @@ find . -type f -name "*.vert" -exec sed -i '1i  #version 140' {} \;
 find . -type f -name "*.vert" -exec glslopt -v {} {} \;
 find . -type f -name "*.vert" -exec sed -i '/#version 140/d' {} \;
 
-echo "version #140" >> ./pass.vert # To fix the crash
+sed -i '1s/^/#version 140\n/' ./pass.vert # To fix the crash
 
