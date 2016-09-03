@@ -40,6 +40,9 @@ The latest information about compilation on Mac are at our site: <https://supert
 ### UNIX
 See [`INSTALL.md`](INSTALL.md) for details.
 
+### Shader optimization
+For improving shader performance and reducing package size see [`OPTIMIZATION.md`](OPTIMIZATION.md) for details.
+
 ## License
 This software is released under the GNU General Public License (GPL) which can be found in the file [`COPYING`](/COPYING) in the same directory as this file. Information about the licenses for artwork are contained in `data/licenses`.
 
