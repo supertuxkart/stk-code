@@ -21,6 +21,7 @@ data/textures
 data/tracks
 data/wip-tracks
 data/.svn
+data/shaders_optimized
 
 # Ignore doxygen output
 src/html
