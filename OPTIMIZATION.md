@@ -9,5 +9,6 @@ It improved my FPS by **+10** on a Radeon HD 7640G.
 Run `tools/optimize_shaders.sh` in the STK directory and it will optimize most of the shaders.Ignore any errors in the ouput since cannot optimize all shaders it gives errors for them
 
 ## Optimizing shaders in STK on Windows 10 with Windows Linux Subsystem
-NOTE : This method is untested
+NOTE : This method is untested.
+
 Microsoft's latest build of Windows 10 contains an Ubuntu subsystem which can run command line applications.Try running `tools/optimize_shaders.sh` in the STK directory using the Ubuntu subsystem and report any errors you get
