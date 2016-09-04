@@ -78,15 +78,11 @@ void GraphStructure::createDebugMesh()
     createMesh(/*show_invisible*/true,
                /*enable_transparency*/true);
 
-    // Now colour the quads red/blue/red ...
-    video::SColor     c( 128, 255, 0, 0);
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();
     for (unsigned int i = 0; i < m_mesh_buffer->getVertexCount(); i++)
     {
-        // Swap the colours from red to blue and back
-        c.setRed ((i%2) ? 255 : 0);
-        c.setBlue((i%2) ? 0 : 255);
-        v[i].Color = c;
+        // Swap the alpha and back
+        v[i].Color.setAlpha((i%2) ? 64 : 255);
     }
     m_node = irr_driver->addMesh(m_mesh, "track-debug-mesh");
 #ifdef DEBUG
@@ -154,7 +150,9 @@ void GraphStructure::createMesh(bool show_invisible,
         // Transfer the 4 points of the current quad to the list of vertices
         set3DVerticesOfGraph(count, new_v+4*i, (different_color ?
             (nc == COLOR_RED ? video::SColor(255, 255, 0, 0) :
-            video::SColor(255, 0, 0, 255)) : c));
+            nc == COLOR_GREEN ? video::SColor(255, 0, 255, 0) :
+            nc == COLOR_BLUE ? video::SColor(255, 0, 0, 255) :
+            video::SColor(255, 255, 255, 0)) : c));
 
         // Set up the indices for the triangles
         // (note, afaik with opengl we could use quads directly, but the code

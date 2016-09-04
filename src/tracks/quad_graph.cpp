@@ -908,3 +908,17 @@ float QuadGraph::getDistanceFromStart(int j) const
 {
     return m_all_nodes[j]->getDistanceFromStart();
 }   // getDistanceFromStart
+
+//-----------------------------------------------------------------------------
+const bool QuadGraph::differentNodeColor(int n, NodeColor* c) const
+{
+    if (UserConfigParams::m_track_debug)
+    {
+        if (dynamic_cast<Node3D*>(m_all_nodes[n]) != NULL)
+            *c = COLOR_GREEN;
+        else
+            *c = COLOR_YELLOW;
+        return true;
+    }
+    return false;
+}   // differentNodeColor

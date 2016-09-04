@@ -46,11 +46,14 @@ class GraphStructure : public NoCopy
 {
 protected:
 
-    /** Used by soccer field with navmesh to draw goal line. */
+    /** Used by soccer field with navmesh to draw goal line,
+     *  or to determine 2d/3d nodes in driveline graph. */
     enum NodeColor
     {
         COLOR_BLUE,
-        COLOR_RED
+        COLOR_GREEN,
+        COLOR_RED,
+        COLOR_YELLOW
     };
 
     void                    cleanupDebugMesh();
