@@ -118,7 +118,7 @@ public:
                AbstractKart *previous_kart=NULL);
     virtual void rewind(BareNetworkString *buffer);
     void rewindTo(BareNetworkString *buffer);
-    void saveState(BareNetworkString *buffer);
+    void saveState(BareNetworkString *buffer) const;
 
     // ------------------------------------------------------------------------
     /** Sets the type of the attachment, but keeps the old time left value. */

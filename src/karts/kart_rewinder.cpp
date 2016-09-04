@@ -27,9 +27,14 @@
 
 #include <string.h>
 
-KartRewinder::KartRewinder(AbstractKart *kart) : Rewinder(/*can_be_destroyed*/ false)
+KartRewinder::KartRewinder(const std::string& ident,unsigned int world_kart_id,
+                           int position, const btTransform& init_transform,
+                           PerPlayerDifficulty difficulty,
+                           RenderInfo::KartRenderType krt)
+            : Rewinder(/*can_be_destroyed*/ false)
+            , Kart(ident, world_kart_id, position, init_transform, difficulty,
+                   krt)
 {
-    m_kart = kart;
 }   // KartRewinder
 
 // ----------------------------------------------------------------------------
@@ -37,6 +42,8 @@ KartRewinder::KartRewinder(AbstractKart *kart) : Rewinder(/*can_be_destroyed*/ f
  */
 void KartRewinder::reset()
 {
+    Kart::reset();
+    Rewinder::reset();
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -52,7 +59,7 @@ BareNetworkString* KartRewinder::saveState() const
     const int MEMSIZE = 13*sizeof(float) + 9+2;
 
     BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
-    const btRigidBody *body = m_kart->getBody();
+    const btRigidBody *body = getBody();
 
     // 1) Physics values: transform and velocities
     // -------------------------------------------
@@ -65,15 +72,15 @@ BareNetworkString* KartRewinder::saveState() const
 
     // 2) Steering and other player controls
     // -------------------------------------
-    m_kart->getControls().copyToBuffer(buffer);
+    getControls().copyToBuffer(buffer);
 
     // 3) Attachment
     // -------------
-    m_kart->getAttachment()->saveState(buffer);
+    getAttachment()->saveState(buffer);
 
     // 4) Powerup
     // ----------
-    m_kart->getPowerup()->saveState(buffer);
+    getPowerup()->saveState(buffer);
     return buffer;
 }   // saveState
 
@@ -88,22 +95,22 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     btTransform t;
     t.setOrigin(buffer->getVec3());
     t.setRotation(buffer->getQuat());
-    btRigidBody *body = m_kart->getBody();
+    btRigidBody *body = getBody();
     body->proceedToTransform(t);
     body->setLinearVelocity(buffer->getVec3());
     body->setAngularVelocity(buffer->getVec3());
 
     // 2) Steering and other controls
     // ------------------------------
-    m_kart->getControls().setFromBuffer(buffer);
+    getControls().setFromBuffer(buffer);
 
     // 3) Attachment
     // -------------
-    m_kart->getAttachment()->rewindTo(buffer);
+    getAttachment()->rewindTo(buffer);
 
     // 4) Powerup
     // ----------
-    m_kart->getPowerup()->rewindTo(buffer);
+    getPowerup()->rewindTo(buffer);
     return;
 }   // rewindToState
 
@@ -111,8 +118,9 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
 /** Called once a frame. It will add a new kart control event to the rewind
  *  manager if any control values have changed.
  */
-void KartRewinder::update()
+void KartRewinder::update(float dt)
 {
+    Kart::update(dt);
 }   // update
 
 // ----------------------------------------------------------------------------

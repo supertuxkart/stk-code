@@ -59,6 +59,9 @@ public:
    virtual void undoState(BareNetworkString *buffer) = 0;
 
    // -------------------------------------------------------------------------
+   /** Nothing to do here. */
+   virtual void reset() {};
+   // -------------------------------------------------------------------------
    /** True if this rewinder can be destroyed. Karts can not be destroyed,
     *  cakes can. This is used by the RewindManager in reset. */
    bool canBeDestroyed() const { return m_can_be_destroyed; }

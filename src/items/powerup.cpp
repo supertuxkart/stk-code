@@ -74,7 +74,7 @@ void Powerup::reset()
  *  state or when a new powerup even is saved.
  *  \param buffer The buffer into which to save the state.
  */
-void Powerup::saveState(BareNetworkString *buffer)
+void Powerup::saveState(BareNetworkString *buffer) const
 {
     buffer->addUInt8(uint8_t(m_type));
     if(m_type!=PowerupManager::POWERUP_NOTHING)

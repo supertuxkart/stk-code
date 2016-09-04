@@ -40,6 +40,7 @@
 #include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/kart_rewinder.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/soccer_world.hpp"
@@ -338,8 +339,12 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
 
     int position           = index+1;
     btTransform init_pos   = getStartTransform(index - gk);
-    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
-                                      difficulty);
+    AbstractKart *new_kart;
+    if (RewindManager::get()->isEnabled())
+        new_kart = new KartRewinder(kart_ident, index, position, init_pos,
+                                    difficulty);
+    else
+        new_kart = new Kart(kart_ident, index, position, init_pos, difficulty);
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)

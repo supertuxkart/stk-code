@@ -19,28 +19,33 @@
 #ifndef HEADER_KART_REWINDER_HPP
 #define HEADER_KART_REWINDER_HPP
 
+#include "karts/kart.hpp"
 #include "network/rewinder.hpp"
 #include "utils/cpp2011.hpp"
 
 class AbstractKart;
 class BareNetworkString;
 
-class KartRewinder : public Rewinder
+class KartRewinder : public Rewinder, public Kart
 {
 private:
-	/** Pointer to the original kart object. */
-	AbstractKart *m_kart;
     
     // Flags to indicate the different event types
     enum { EVENT_CONTROL = 0x01,
            EVENT_ATTACH  = 0x02 };
 public:
-	             KartRewinder(AbstractKart *kart);
+	             KartRewinder(const std::string& ident,
+                              unsigned int world_kart_id,
+                              int position, const btTransform& init_transform,
+                              PerPlayerDifficulty difficulty,
+                              RenderInfo::KartRenderType krt =
+                                                      RenderInfo::KRT_DEFAULT);
    virtual      ~KartRewinder() {};
    virtual BareNetworkString* saveState() const;
    void          reset();
    virtual void  rewindToState(BareNetworkString *p) OVERRIDE;
    virtual void  rewindToEvent(BareNetworkString *p) OVERRIDE;
+   virtual void  update(float dt);
 
    // -------------------------------------------------------------------------
    virtual void  undoState(BareNetworkString *p) OVERRIDE
@@ -54,8 +59,7 @@ public:
 
    // -------------------------------------------------------------------------
 
-   void update();
-
+   
 
 };   // Rewinder
 #endif

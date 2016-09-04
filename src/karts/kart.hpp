@@ -76,7 +76,7 @@ protected:
     /** Is time flying activated */
     bool m_is_jumping;
 
-private:
+protected:
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed *m_max_speed;
 
@@ -198,9 +198,6 @@ private:
      *  > 0 the number it contains is the time left before removing plunger. */
     float         m_view_blocked_by_plunger;
     float         m_speed;
-
-	/** The rewinder object for network play. */
-	KartRewinder *m_rewinder;
 
     std::vector<SFXBase*> m_custom_sounds;
     SFXBase      *m_beep_sound;

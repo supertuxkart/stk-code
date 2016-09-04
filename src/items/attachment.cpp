@@ -231,7 +231,7 @@ void Attachment::clear()
 /** Saves the attachment state. Called as part of the kart saving its state.
  *  \param buffer The kart rewinder's state buffer.
  */
-void Attachment::saveState(BareNetworkString *buffer)
+void Attachment::saveState(BareNetworkString *buffer) const
 {
     // We use bit 7 to indicate if a previous owner is defined for a bomb
     assert(ATTACH_MAX<=127);
