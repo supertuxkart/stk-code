@@ -100,7 +100,7 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     body->proceedToTransform(t);
     body->setLinearVelocity(buffer->getVec3());
     body->setAngularVelocity(buffer->getVec3());
-    m_has_started = buffer->getUInt8();   // necessary for startup speed boost
+    m_has_started = buffer->getUInt8()!=0;   // necessary for startup speed boost
 
     // 2) Steering and other controls
     // ------------------------------
