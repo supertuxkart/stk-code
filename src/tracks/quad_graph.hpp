@@ -23,12 +23,13 @@
 #include <string>
 #include <set>
 
-#include "tracks/graph_node.hpp"
 #include "tracks/graph_structure.hpp"
-#include "tracks/quad_set.hpp"
 #include "utils/aligned_array.hpp"
 
-class CheckLine;
+#include "LinearMath/btTransform.h"
+
+class GraphNode;
+class XMLNode;
 
 /**
  *  \brief This class stores a graph of quads. It uses a 'simplified singleton'
@@ -46,6 +47,10 @@ class QuadGraph : public GraphStructure
 private:
     static QuadGraph        *m_quad_graph;
 
+    /** The 2d bounding box, used for hashing. */
+    Vec3                     m_min;
+    Vec3                     m_max;
+
     /** The actual graph data structure. */
     std::vector<GraphNode*>  m_all_nodes;
 
@@ -58,9 +63,6 @@ private:
     /** Wether the graph should be reverted or not */
     bool                     m_reverse;
 
-    /** Number of unrolled quads to compute per quad */
-    unsigned int             m_unroll_quad_count;
-
     void setDefaultSuccessors();
     void computeChecklineRequirements(GraphNode* node, int latest_checkline);
     void computeDirectionData();
@@ -68,7 +70,9 @@ private:
     float normalizeAngle(float f);
 
     void addSuccessor(unsigned int from, unsigned int to);
-    void load         (const std::string &filename);
+    void load(const std::string &quad_file_name, const std::string &filename);
+    void getPoint(const XMLNode *xml, const std::string &attribute_name,
+                  Vec3 *result) const;
     void computeDistanceFromStart(unsigned int start_node, float distance);
     unsigned int getStartNode() const;
                  QuadGraph(const std::string &quad_file_name,
@@ -78,14 +82,12 @@ private:
 
     // ------------------------------------------------------------------------
     virtual void set3DVerticesOfGraph(int i, video::S3DVertex *v,
-                                      const video::SColor &color) const
-                         { m_all_nodes[i]->getQuad().getVertices(v, color); }
+                                      const video::SColor &color) const;
     // ------------------------------------------------------------------------
     virtual void getGraphBoundingBox(Vec3 *min, Vec3 *max) const
-                                { QuadSet::get()->getBoundingBox(min, max); }
+                                              { *min = m_min; *max = m_max; }
     // ------------------------------------------------------------------------
-    virtual const bool isNodeInvisible(int n) const
-                          { return m_all_nodes[n]->getQuad().isInvisible(); }
+    virtual const bool isNodeInvisible(int n) const;
     // ------------------------------------------------------------------------
     virtual const bool hasLapLine() const
                                                             { return true;  }
@@ -101,12 +103,6 @@ public:
                                bool for_ai=false) const;
     void         spatialToTrack(Vec3 *dst, const Vec3& xyz,
                                 const int sector)               const;
-    void         spatialToTrackUnrolled(Vec3 *dst, 
-                                        const Vec3& xyz,
-                                        const int parent_sector, 
-                                        const int unroll_qd_idx,
-                                        const int fork_number)   const;
-
     void         findRoadSector(const Vec3& XYZ, int *sector,
                             std::vector<int> *all_sectors=NULL) const;
     int          findOutOfRoadSector(const Vec3& xyz,
@@ -124,13 +120,13 @@ public:
                                                  unsigned int count);
     void         setupPaths();
     void         computeChecklineRequirements();
-// ----------------------------------------------------------------------======
+    // ------------------------------------------------------------------------
     /** Returns the one instance of this object. It is possible that there
      *  is no instance created (e.g. in battle mode, since it doesn't have
      *  a quad graph), so we don't assert that an instance exist, and we
      *  also don't create one if it doesn't exists. */
     static QuadGraph  *get() { return m_quad_graph; }
-    // ----------------------------------------------------------------------==
+    // ------------------------------------------------------------------------
     /** Creates a QuadGraph instance. */
     static void create(const std::string &quad_file_name,
                        const std::string &graph_file_name,
@@ -156,45 +152,28 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of nodes in the graph. */
     virtual const unsigned int getNumNodes() const
-                         { return (unsigned int)m_all_nodes.size();}
+                                                 { return m_all_nodes.size(); }
     // ------------------------------------------------------------------------
     /** Return the distance to the j-th successor of node n. */
-    float        getDistanceToNext(int n, int j) const
-                         { return m_all_nodes[n]->getDistanceToSuccessor(j);}
+    float        getDistanceToNext(int n, int j) const;
     // ------------------------------------------------------------------------
     /** Returns the angle of the line between node n and its j-th.
      *  successor. */
-    float        getAngleToNext(int n, int j) const
-                         { return m_all_nodes[n]->getAngleToSuccessor(j);   }
+    float        getAngleToNext(int n, int j) const;
     // ------------------------------------------------------------------------
     /** Returns the number of successors of a node n. */
-    int          getNumberOfSuccessors(int n) const
-                         { return m_all_nodes[n]->getNumberOfSuccessors();  }
+    int          getNumberOfSuccessors(int n) const;
     // ------------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
-    const Quad&  getQuadOfNode(unsigned int j) const
-          { return QuadSet::get()->getQuad(m_all_nodes[j]->getQuadIndex()); }
-    // ------------------------------------------------------------------------
-    /** Returns the quad that belongs to a graph node. */
-    GraphNode&   getNode(unsigned int j) const{ return *m_all_nodes[j]; }
+    GraphNode&   getNode(unsigned int j) const      { return *m_all_nodes[j]; }
     // ------------------------------------------------------------------------
     /** Returns the distance from the start to the beginning of a quad. */
-    float        getDistanceFromStart(int j) const
-                           { return m_all_nodes[j]->getDistanceFromStart(); }
+    float        getDistanceFromStart(int j) const;
     // ------------------------------------------------------------------------
     /** Returns the length of the main driveline. */
-    float        getLapLength() const {return m_lap_length; }
+    float        getLapLength() const                  { return m_lap_length; }
     // ------------------------------------------------------------------------
-    bool         isReverse() const {return m_reverse; }
-    // ----------------------------------------------------------------------
-    /** Returns a unrolled quad of a node. */
-    const Quad&  getUnrolledQuadOfNode(unsigned int node, 
-                                       unsigned int fork_number, 
-                                       unsigned int quad_number)
-                       { return getNode(node).getUnrolledQuad(fork_number,quad_number); }
-    // ----------------------------------------------------------------------
-    /** Returns the number of forward quads that are unrolled for each quad **/
-    unsigned int getNumberOfUnrolledQuads() const { return m_unroll_quad_count; }
+    bool         isReverse() const                        { return m_reverse; }
 
 };   // QuadGraph
 

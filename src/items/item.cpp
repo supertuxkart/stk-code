@@ -25,6 +25,8 @@
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
+#include "tracks/graph_node.hpp"
+#include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/vec3.hpp"

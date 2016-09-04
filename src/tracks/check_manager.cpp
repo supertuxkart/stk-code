@@ -28,7 +28,8 @@
 #include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
 #include "tracks/check_structure.hpp"
-#include "tracks/track.hpp"
+#include "tracks/quad_graph.hpp"
+#include "utils/log.hpp"
 
 CheckManager *CheckManager::m_check_manager = NULL;
 

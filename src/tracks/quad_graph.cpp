@@ -35,13 +35,47 @@
 #include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
 #include "tracks/check_manager.hpp"
-#include "tracks/quad_set.hpp"
+#include "tracks/node_2d.hpp"
+#include "tracks/node_3d.hpp"
 #include "tracks/track.hpp"
 #include "graphics/glwrap.hpp"
 
 const int QuadGraph::UNKNOWN_SECTOR  = -1;
 QuadGraph *QuadGraph::m_quad_graph = NULL;
 
+/** Factory method to dynamic create 2d / 3d node */
+GraphNode* createNode(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
+                      const Vec3 &p3, unsigned int node_index,
+                      bool invisible, bool ai_ignore)
+{
+    // Find the normal of this node by computing the normal of two triangles
+    // and taking their average.
+    core::triangle3df tri1(p0.toIrrVector(), p1.toIrrVector(),
+        p2.toIrrVector());
+    core::triangle3df tri2(p0.toIrrVector(), p2.toIrrVector(),
+        p3.toIrrVector());
+    Vec3 normal1 = tri1.getNormal();
+    Vec3 normal2 = tri2.getNormal();
+    Vec3 normal = -0.5f * (normal1 + normal2);
+    normal.normalize();
+
+    // Use the angle between the normal and an up vector to choose 3d/2d node
+    const float angle = normal.angle(Vec3(0, 1, 0));
+    if (angle > 0.5f)
+    {
+        Log::debug("TrackNode", "3d node created, normal: %f, %f, %f",
+            normal.x(), normal.y(), normal.z());
+        return new Node3D(p0, p1, p2, p3, normal, node_index, invisible,
+            ai_ignore);
+    }
+
+    Log::debug("TrackNode", "2d node created, normal: %f, %f, %f",
+        normal.x(), normal.y(), normal.z());
+    return new Node2D(p0, p1, p2, p3, normal, node_index, invisible,
+        ai_ignore);
+}   // createNode
+
+// ----------------------------------------------------------------------------
 /** Constructor, loads the graph information for a given set of quads
  *  from a graph file.
  *  \param quad_file_name Name of the file of all quads
@@ -52,20 +86,17 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
                      const bool reverse) : m_reverse(reverse)
 {
     m_lap_length           = 0;
-    m_unroll_quad_count    = 6;
-    QuadSet::create();
-    QuadSet::get()->init(quad_file_name);
     m_quad_filename        = quad_file_name;
     m_quad_graph           = this;
-    load(graph_file_name);
+    load(quad_file_name, graph_file_name);
 }   // QuadGraph
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Destructor, removes all nodes of the graph. */
 QuadGraph::~QuadGraph()
 {
-    QuadSet::destroy();
-    for(unsigned int i=0; i<m_all_nodes.size(); i++) {
+    for(unsigned int i=0; i<m_all_nodes.size(); i++)
+    {
         delete m_all_nodes[i];
     }
     if(UserConfigParams::m_track_debug)
@@ -73,31 +104,98 @@ QuadGraph::~QuadGraph()
     GraphStructure::destroyRTT();
 }   // ~QuadGraph
 
-// -----------------------------------------------------------------------------
-
-void QuadGraph::addSuccessor(unsigned int from, unsigned int to) {
+// ----------------------------------------------------------------------------
+void QuadGraph::addSuccessor(unsigned int from, unsigned int to)
+{
     if(m_reverse)
         m_all_nodes[to]->addSuccessor(from);
     else
         m_all_nodes[from]->addSuccessor(to);
+
 }   // addSuccessor
 
-// -----------------------------------------------------------------------------
-/** Loads a quad graph from a file.
- *  \param filename Name of the file to load.
- */
-void QuadGraph::load(const std::string &filename)
+// ----------------------------------------------------------------------------
+/** This function interprets a point specification as an attribute in the
+    xml quad file. It understands two different specifications:
+    p1="n:p"      : get point p from square n (n, p integers)
+    p1="p1,p2,p3" : make a 3d point out of these 3 floating point values
+*/
+void QuadGraph::getPoint(const XMLNode *xml, const std::string &attribute_name,
+                         Vec3* result) const
 {
+    std::string s;
+    xml->get(attribute_name, &s);
+    int pos=(int)s.find_first_of(":");
+    if(pos>0)   // n:p specification
+    {
+        std::vector<std::string> l = StringUtils::split(s, ':');
+        int n=atoi(l[0].c_str());
+        int p=atoi(l[1].c_str());
+        *result=(*m_all_nodes[n])[p];
+    }
+    else
+    {
+        xml->get(attribute_name, result);
+    }
+
+}   // getPoint
+
+// ----------------------------------------------------------------------------
+/** Loads a quad graph from a file.
+ *  \param filename Name of the quad file to load.
+ *  \param filename Name of the graph file to load.
+ */
+void QuadGraph::load(const std::string &quad_file_name,
+                     const std::string &filename)
+{
+    XMLNode *quad = file_manager->createXMLTree(quad_file_name);
+    if (!quad || quad->getName() != "quads")
+    {
+        Log::error("Quad Graph : Quad xml '%s' not found.", filename.c_str());
+        delete quad;
+        return;
+    }
+
+    m_min = Vec3( 99999,  99999,  99999);
+    m_max = Vec3(-99999, -99999, -99999);
+    // Each quad is part of the graph exactly once now.
+    for(unsigned int i=0; i<quad->getNumNodes(); i++)
+    {
+        const XMLNode *xml_node = quad->getNode(i);
+        if(xml_node->getName()!="quad")
+        {
+            Log::warn("Quad Graph: Unsupported node type '%s' found in '%s' - ignored.",
+                   xml_node->getName().c_str(), filename.c_str());
+            continue;
+        }
+
+        // Note that it's not easy to do the reading of the parameters here
+        // in quad, since the specification in the xml can contain references
+        // to previous points. E.g.:
+        // <quad p0="40:3" p1="40:2" p2="25.396030 0.770338 64.796539" ...
+        Vec3 p0, p1, p2, p3;
+        getPoint(xml_node, "p0", &p0);
+        getPoint(xml_node, "p1", &p1);
+        getPoint(xml_node, "p2", &p2);
+        getPoint(xml_node, "p3", &p3);
+        bool invisible=false;
+        xml_node->get("invisible", &invisible);
+        bool ai_ignore=false;
+        xml_node->get("ai-ignore", &ai_ignore);
+        GraphNode* node =
+            createNode(p0, p1, p2, p3, m_all_nodes.size(), invisible, ai_ignore);
+        m_max.max(p0);m_max.max(p1);m_max.max(p2);m_max.max(p3);
+        m_min.min(p0);m_min.min(p1);m_min.min(p2);m_min.min(p3);
+        m_all_nodes.push_back(node);
+    }
+    delete quad;
+
     const XMLNode *xml = file_manager->createXMLTree(filename);
 
     if(!xml)
     {
         // No graph file exist, assume a default loop X -> X+1
-        // i.e. each quad is part of the graph exactly once.
-        // First create an empty graph node for each quad:
-        for(unsigned int i=0; i<QuadSet::get()->getNumberOfQuads(); i++)
-            m_all_nodes.push_back(new GraphNode(i, (unsigned int) m_all_nodes.size()));
-        // Then set the default loop:
+        // Set the default loop:
         setDefaultSuccessors();
         computeDirectionData();
 
@@ -120,29 +218,13 @@ void QuadGraph::load(const std::string &filename)
     for(unsigned int node_index=0; node_index<xml->getNumNodes(); node_index++)
     {
         const XMLNode *xml_node = xml->getNode(node_index);
-        // First graph node definitions:
-        // -----------------------------
+        // Load the definition of edges between the graph nodes:
+        // -----------------------------------------------------
         if(xml_node->getName()=="node-list")
         {
-            // A list of quads is connected to a list of graph nodes:
-            unsigned int from, to;
-            xml_node->get("from-quad", &from);
-            xml_node->get("to-quad", &to);
-            for(unsigned int i=from; i<=to; i++)
-            {
-                m_all_nodes.push_back(new GraphNode(i, (unsigned int) m_all_nodes.size()));
-            }
+            // Each quad is part of the graph exactly once now.
+            continue;
         }
-        else if(xml_node->getName()=="node")
-        {
-            // A single quad is connected to a single graph node.
-            unsigned int id;
-            xml_node->get("quad", &id);
-            m_all_nodes.push_back(new GraphNode(id, (unsigned int) m_all_nodes.size()));
-        }
-
-        // Then the definition of edges between the graph nodes:
-        // -----------------------------------------------------
         else if(xml_node->getName()=="edge-loop")
         {
             // A closed loop:
@@ -202,11 +284,6 @@ void QuadGraph::load(const std::string &filename)
             m_lap_length = l;
     }
 
-    // Build unrolled quads
-    for (unsigned int i = 0; i < m_all_nodes.size(); i++)
-    {
-        m_all_nodes[i]->buildUnrolledQuads(m_unroll_quad_count);
-    }
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -439,7 +516,7 @@ void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
         if(current_distance<new_distance)
         {
             float delta = new_distance - current_distance;
-            updateDistancesForAllSuccessors(gn->getQuadIndex(), delta, 0);
+            updateDistancesForAllSuccessors(gn->getNodeIndex(), delta, 0);
         }
         return;
     }
@@ -456,7 +533,7 @@ void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
         if(gn_next->getDistanceFromStart()==0)
             continue;
 
-        computeDistanceFromStart(gn_next->getQuadIndex(),
+        computeDistanceFromStart(gn_next->getNodeIndex(),
                                  new_distance + gn->getDistanceToSuccessor(i));
     }   // for i
 }   // computeDistanceFromStart
@@ -632,21 +709,6 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
 }   // spatialToTrack
 
 //-----------------------------------------------------------------------------
-void QuadGraph::spatialToTrackUnrolled(Vec3 *dst, const Vec3& xyz,
-                                       const int parent_sector,
-                                       const int unroll_qd_idx,
-                                       const int fork_number) const
-{
-    if (parent_sector == UNKNOWN_SECTOR)
-    {
-        Log::warn("Quad Graph", "UNKNOWN_SECTOR in spatialToTrackUnrolled().");
-        return;
-    }
-    getNode(parent_sector).getDistancesUnrolled(xyz, fork_number,
-        unroll_qd_idx, dst);
-}   // spatialToTrackUnrolled
-
-//-----------------------------------------------------------------------------
 /** findRoadSector returns in which sector on the road the position
  *  xyz is. If xyz is not on top of the road, it sets UNKNOWN_SECTOR as sector.
  *
@@ -663,7 +725,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
 {
     // Most likely the kart will still be on the sector it was before,
     // so this simple case is tested first.
-    if(*sector!=UNKNOWN_SECTOR && getQuadOfNode(*sector).pointInQuad3D(xyz) )
+    if(*sector!=UNKNOWN_SECTOR && getNode(*sector).pointInside(xyz) )
     {
         return;
     }   // if still on same quad
@@ -671,9 +733,6 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
     // Now we search through all graph nodes, starting with
     // the current one
     int indx       = *sector;
-    // This was used to check the vertical distance of kart from sector
-    // but because now karts are checked in a 3D space, this is not required
-    //float min_dist = 999999.9f;
 
     // If a current sector is given, and max_lookahead is specify, only test
     // the next max_lookahead graph nodes instead of testing the whole graph.
@@ -694,13 +753,9 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
             indx = (*all_sectors)[i];
         else
             indx = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
-        const Quad &q = getQuadOfNode(indx);
-        float dist    = xyz.getY() - q.getMinHeight();
-        // While negative distances are unlikely, we allow some small negative
-        // numbers in case that the kart is partly in the track.
-        if(q.pointInQuad3D(xyz))// && dist < min_dist && dist>-1.0f)
+        const GraphNode &gn = getNode(indx);
+        if(gn.pointInside(xyz))
         {
-            //min_dist = dist;
             *sector  = indx;
         }
     }   // for i<m_all_nodes.size()
@@ -788,8 +843,8 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
             float dist_2 = m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
             if(dist_2<min_dist_2)
             {
-                const Quad &q = getQuadOfNode(next_sector);
-                float dist    = xyz.getY() - q.getMinHeight();
+                const GraphNode &gn = getNode(next_sector);
+                float dist    = xyz.getY() - gn.getMinHeight();
                 // While negative distances are unlikely, we allow some small
                 // negative numbers in case that the kart is partly in the
                 // track. Only do the height test in phase==0, in phase==1
@@ -809,7 +864,44 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
 
     if(min_sector==UNKNOWN_SECTOR )
     {
-        Log::info("Quad Grap", "unknown sector found.");
+        Log::info("Quad Graph", "unknown sector found.");
     }
     return min_sector;
 }   // findOutOfRoadSector
+
+//-----------------------------------------------------------------------------
+void QuadGraph::set3DVerticesOfGraph(int i, video::S3DVertex *v,
+                                     const video::SColor &color) const
+{
+    m_all_nodes[i]->getVertices(v, color);
+}   // set3DVerticesOfGraph
+
+//-----------------------------------------------------------------------------
+const bool QuadGraph::isNodeInvisible(int n) const
+{
+    return m_all_nodes[n]->isInvisible();
+}   // isNodeInvisible
+
+//-----------------------------------------------------------------------------
+float QuadGraph::getDistanceToNext(int n, int j) const
+{
+    return m_all_nodes[n]->getDistanceToSuccessor(j);
+}   // getDistanceToNext
+
+//-----------------------------------------------------------------------------
+float QuadGraph::getAngleToNext(int n, int j) const
+{
+    return m_all_nodes[n]->getAngleToSuccessor(j);
+}   // getAngleToNext
+
+//-----------------------------------------------------------------------------
+int QuadGraph::getNumberOfSuccessors(int n) const
+{
+    return m_all_nodes[n]->getNumberOfSuccessors();
+}   // getNumberOfSuccessors
+
+//-----------------------------------------------------------------------------
+float QuadGraph::getDistanceFromStart(int j) const
+{
+    return m_all_nodes[j]->getDistanceFromStart();
+}   // getDistanceFromStart

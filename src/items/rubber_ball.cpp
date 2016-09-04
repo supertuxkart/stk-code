@@ -29,6 +29,8 @@
 #include "modes/linear_world.hpp"
 #include "physics/btKart.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "tracks/graph_node.hpp"
+#include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 
 #include "utils/log.hpp" //TODO: remove after debugging is done
@@ -97,7 +99,8 @@ RubberBall::RubberBall(AbstractKart *kart)
 
     // initialises the current graph node
     TrackSector::update(getXYZ());
-    Vec3 normal = QuadGraph::get()->getQuadOfNode(getCurrentGraphNode()).getNormal();
+    const Vec3& normal =
+        QuadGraph::get()->getNode(getCurrentGraphNode()).getNormal();
     TerrainInfo::update(getXYZ(), -normal);
     initializeControlPoints(m_owner->getXYZ());
 
@@ -133,7 +136,7 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
     // left or right when firing the ball off track.
     getNextControlPoint();
     m_control_points[2]     =
-        QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node).getCenter();
+        QuadGraph::get()->getNode(m_last_aimed_graph_node).getCenter();
 
     // This updates m_last_aimed_graph_node, and sets m_control_points[3]
     getNextControlPoint();
@@ -234,7 +237,7 @@ void RubberBall::getNextControlPoint()
     m_last_aimed_graph_node = next;
     m_length_cp_2_3         = dist;
     const Quad &quad        =
-        QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node);
+        QuadGraph::get()->getNode(m_last_aimed_graph_node);
     m_control_points[3]     = quad.getCenter();
 }   // getNextControlPoint
 

@@ -1,3 +1,4 @@
+
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009-2015 Joerg Henrichs
@@ -223,7 +224,7 @@ void BattleGraph::findItemsOnGraphNodes()
 
         for (unsigned int j = 0; j < this->getNumNodes(); ++j)
         {
-            if (getQuadOfNode(j).pointInQuad(xyz, false))
+            if (getQuadOfNode(j).pointInside(xyz, false))
                 polygon = j;
         }
 
@@ -248,7 +249,7 @@ int BattleGraph::pointToNode(const int cur_node,
         for (unsigned int node = 0; node < this->getNumNodes(); node++)
         {
             const Quad& quad = this->getQuadOfNode(node);
-            if (quad.pointInQuad(cur_point, ignore_vertical))
+            if (quad.pointInside(cur_point, ignore_vertical))
             {
                 return node;
             }
@@ -258,7 +259,7 @@ int BattleGraph::pointToNode(const int cur_node,
     {
         // Check if the point is still on the same node
         const Quad& cur_quad = this->getQuadOfNode(cur_node);
-        if (cur_quad.pointInQuad(cur_point, ignore_vertical)) return cur_node;
+        if (cur_quad.pointInside(cur_point, ignore_vertical)) return cur_node;
 
         // If not then check all nearby quads (8 quads)
         // Skip the same node
@@ -267,7 +268,7 @@ int BattleGraph::pointToNode(const int cur_node,
         {
             const int test_node = m_nearby_quads[cur_node][i];
             const Quad& quad = this->getQuadOfNode(test_node);
-            if (quad.pointInQuad(cur_point, ignore_vertical))
+            if (quad.pointInside(cur_point, ignore_vertical))
             {
                 return test_node;
             }
@@ -465,9 +466,3 @@ void BattleGraph::set3DVerticesOfGraph(int i, video::S3DVertex *v,
 {
     NavMesh::get()->getQuad(i).getVertices(v, color);
 }   // set3DVerticesOfGraph
-
-// ----------------------------------------------------------------------------
-const bool BattleGraph::isNodeInvisible(int n) const
-{
-    return NavMesh::get()->getQuad(n).isInvisible();
-}   // isNodeInvisible

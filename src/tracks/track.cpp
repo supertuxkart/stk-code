@@ -32,6 +32,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/moving_texture.hpp"
@@ -54,10 +55,10 @@
 #include "tracks/bezier_curve.hpp"
 #include "tracks/battle_graph.hpp"
 #include "tracks/check_manager.hpp"
+#include "tracks/graph_node.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/quad_graph.hpp"
-#include "tracks/quad_set.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
@@ -2291,8 +2292,8 @@ void Track::itemCommand(const XMLNode *node)
         // If a valid road_sector is not found
         if (road_sector == QuadGraph::UNKNOWN_SECTOR)
             road_sector = QuadGraph::get()->findOutOfRoadSector(xyz, road_sector);
-        Vec3 quadnormal = QuadGraph::get()->getQuadOfNode(road_sector).getNormal();
-        
+        const Vec3& quadnormal = QuadGraph::get()->getNode(road_sector).getNormal();
+
         const Material *m;
         Vec3 hit_point;
         m_track_mesh->castRay(loc, loc + -1.0f*quadnormal, &hit_point, &m, &normal);
@@ -2384,7 +2385,7 @@ bool Track::findGround(AbstractKart *kart)
     {
         int sector = ((LinearWorld*)World::getWorld())->getTrackSector(kart->getWorldKartId()).getCurrentGraphNode();
         if (sector != QuadGraph::UNKNOWN_SECTOR)
-            quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
+            quadNormal = QuadGraph::get()->getNode(sector).getNormal();
     }
 
     to = to + -1000.0f*quadNormal;
@@ -2436,3 +2437,7 @@ bool Track::findGround(AbstractKart *kart)
 
     return true;
 }   // findGround
+
+
+float  Track::getTrackLength() const {return QuadGraph::get()->getLapLength();}
+float  Track::getAngle(int n) const { return QuadGraph::get()->getAngleToNext(n, 0);  }

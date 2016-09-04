@@ -457,7 +457,7 @@ void SlipStream::update(float dt)
         }
         // Real test: if in slipstream quad of other kart
         if(m_target_kart->getSlipstream()->m_slipstream_quad
-                                         ->pointInQuad(m_kart->getXYZ()))
+                                         ->pointInside(m_kart->getXYZ()))
         {
             is_sstreaming     = true;
             break;

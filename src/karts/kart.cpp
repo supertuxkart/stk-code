@@ -64,6 +64,8 @@
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "tracks/terrain_info.hpp"
+#include "tracks/quad_graph.hpp"
+#include "tracks/graph_node.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
@@ -1292,7 +1294,7 @@ void Kart::update(float dt)
     if (QuadGraph::get())
     {
         sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
-        quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
+        quadNormal = QuadGraph::get()->getNode(sector).getNormal();
         btQuaternion q = getTrans().getRotation();
         float roll = quadNormal.angle((Vec3(0, 1, 0).rotate(q.getAxis(), q.getAngle())));
 
@@ -1374,7 +1376,7 @@ void Kart::update(float dt)
         // We do this for now because dist_to_sector is not defined 
         float dist_to_sector;
         if (QuadGraph::get())
-            dist_to_sector = getXYZ().distance(QuadGraph::get()->getQuadOfNode(sector).getCenter());
+            dist_to_sector = getXYZ().distance(QuadGraph::get()->getNode(sector).getCenter());
         else
             dist_to_sector = 0;
         
@@ -2421,7 +2423,7 @@ void Kart::updateSliding()
         if (QuadGraph::get())
         {
             int sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
-            Vec3 quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
+            Vec3 quadNormal = QuadGraph::get()->getNode(sector).getNormal();
             Vec3 kart_up = m.getColumn(1);
             distanceFromUp = kart_up.dot(quadNormal);
         }

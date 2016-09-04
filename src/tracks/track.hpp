@@ -26,31 +26,31 @@
   * objects.
   */
 
+#include <SColor.h>
 #include <string>
 #include <vector>
 
 namespace irr
 {
-    namespace video { class ITexture; class SColor;       }
-    namespace scene { class IMesh; class ILightSceneNode; }
+    namespace video { class ITexture;       }
+    namespace scene { class IMesh; class ILightSceneNode; class ISceneNode; }
 }
 using namespace irr;
 class ModelDefinitionLoader;
 
 #include "LinearMath/btTransform.h"
 
-#include "graphics/material.hpp"
-#include "items/item.hpp"
 #include "scriptengine/script_engine.hpp"
-#include "tracks/quad_graph.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/translation.hpp"
 #include "utils/vec3.hpp"
 #include "utils/ptr_vector.hpp"
 
+class AbstractKart;
 class AnimationManager;
 class BezierCurve;
 class CheckManager;
+class FrameBuffer;
 class MovingTexture;
 class MusicInformation;
 class ParticleEmitter;
@@ -473,8 +473,7 @@ public:
     int                getVersion        () const {return m_version;          }
     // ------------------------------------------------------------------------
     /** Returns the length of the main driveline. */
-    float              getTrackLength    () const
-                                     {return QuadGraph::get()->getLapLength();}
+    float              getTrackLength    () const;
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this track (the directory name). */
     const std::string& getIdent          () const {return m_ident;            }
@@ -511,8 +510,7 @@ public:
      *  in the direction of the default way on the track.
      *  \param n Number of the quad for which the angle is asked.
      */
-    float              getAngle(int n) const
-                            { return QuadGraph::get()->getAngleToNext(n, 0);  }
+    float              getAngle(int n) const;
     // ------------------------------------------------------------------------
     /** Returns the 2d coordinates of a point when drawn on the mini map
      *  texture.

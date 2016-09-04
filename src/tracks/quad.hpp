@@ -20,9 +20,10 @@
 #define HEADER_QUAD_HPP
 
 #include <SColor.h>
-#include "utils/vec3.hpp"
 
-#include <array>
+#include "utils/leak_check.hpp"
+#include "utils/no_copy.hpp"
+#include "utils/vec3.hpp"
 
 namespace irr
 {
@@ -35,9 +36,9 @@ class btTransform;
 /**
   * \ingroup tracks
   */
-class Quad
+class Quad : public NoCopy
 {
-private:
+protected:
     /** The four points of a quad. */
     Vec3 m_p[4];
 
@@ -45,8 +46,7 @@ private:
      *  This saves some computations at runtime. */
     Vec3 m_center;
 
-    Vec3 m_normal;
-
+private:
     /** The minimum height of the quad, used in case that several quads
      *  are on top of each other when determining the sector a kart is on. */
     float m_min_height;
@@ -55,47 +55,28 @@ private:
      *  to distinguish between quads which are on top of each other. */
     float m_max_height;
 
-    /** Set to true if this quad should not be shown in the minimap. */
-    bool  m_invisible;
-
-    /** Set if this quad should not be used by the AI. */
-    bool  m_ai_ignore;
-
-    /** For each quad, construct a 3D box to check if a point lies inside it. */
-    Vec3 m_box_faces[6][4];
-
-    /** Find the normal of this quad */
-    void findNormal();
-        
 public:
-         Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
-              bool invis=false, bool ai_ignore=false);
+    LEAK_CHECK()
+    // ------------------------------------------------------------------------
+         Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3);
+    // ------------------------------------------------------------------------
+         virtual ~Quad() {}
+    // ------------------------------------------------------------------------
     void getVertices(video::S3DVertex *v, const video::SColor &color) const;
-    bool pointInQuad(const Vec3& p, bool ignore_vertical = false) const;
-    bool pointInQuad3D(const Vec3& p) const;
+    // ------------------------------------------------------------------------
     void transform(const btTransform &t, Quad *result) const;
     // ------------------------------------------------------------------------
     /** Returns the i-th. point of a quad. */
-    const Vec3& operator[](int i) const {return m_p[i];     }
+    const Vec3& operator[](int i) const                      { return m_p[i]; }
     // ------------------------------------------------------------------------
     /** Returns the center of a quad. */
-    const Vec3& getCenter ()      const {return m_center;   }
+    const Vec3& getCenter ()      const                    { return m_center; }
     // ------------------------------------------------------------------------
     /** Returns the minimum height of a quad. */
-    float       getMinHeight() const { return m_min_height; }
+    float       getMinHeight() const                   { return m_min_height; }
     // ------------------------------------------------------------------------
-    /** Returns true of this quad is invisible, i.e. not to be shown in
-     *  the minimap. */
-    bool        isInvisible() const { return m_invisible; }
-    // ------------------------------------------------------------------------
-    /** True if this quad should be ignored by the AI. */
-    bool        letAIIgnore() const { return m_ai_ignore; }
-    // ------------------------------------------------------------------------
-    /** Returns the normal of this quad */
-    const Vec3& getNormal() const   { return m_normal; }
-    // ------------------------------------------------------------------------
-    /** Return a flattened version of this quad */
-    Quad  getFlattenedQuad();
+    virtual bool pointInside(const Vec3& p,
+                             bool ignore_vertical = false) const;
 
 };   // class Quad
 #endif

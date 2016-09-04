@@ -32,8 +32,9 @@
 #include "modes/linear_world.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
-#include "tracks/quad_graph.hpp"
 #include "tracks/battle_graph.hpp"
+#include "tracks/graph_node.hpp"
+#include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
@@ -162,7 +163,7 @@ ItemManager::ItemManager()
         m_items_in_quads = new std::vector<AllItemTypes>;
         // Entries 0 to n-1 are for the quads, entry
         // n is for all items that are not on a quad.
-        m_items_in_quads->resize(QuadSet::get()->getNumberOfQuads()+1);
+        m_items_in_quads->resize(QuadGraph::get()->getNumNodes()+1);
     }
     else
     {
@@ -227,7 +228,7 @@ void ItemManager::insertItem(Item *item)
         // If the item is on the driveline, store it at the appropriate index
         if(graph_node > -1)
         {
-            int sector = QuadGraph::get()->getNode(graph_node).getQuadIndex();
+            int sector = QuadGraph::get()->getNode(graph_node).getNodeIndex();
             (*m_items_in_quads)[sector].push_back(item);
         }
         else  // otherwise store it in the 'outside' index

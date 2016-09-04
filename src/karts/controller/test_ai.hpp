@@ -66,7 +66,6 @@ namespace irr
  *  stage) identical to the Skidding AI.
 \ingroup controller
 */
-
 class TestAI : public AIBaseLapController
 {
 private:
@@ -205,13 +204,13 @@ private:
     void  computeNearestKarts();
     void  handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                            int last_node);
-    bool  handleSelectedItem(float kart_aim_angle, Vec3 *aim_point);
+    bool  handleSelectedItem(Vec3 kart_aim_direction, Vec3 *aim_point);
     bool  steerToAvoid(const std::vector<const Item *> &items_to_avoid,
-                       const core::line2df &line_to_target,
+                       const core::line3df &line_to_target,
                        Vec3 *aim_point);
     bool  hitBadItemWhenAimAt(const Item *item,
                               const std::vector<const Item *> &items_to_avoid);
-    void  evaluateItems(const Item *item, float kart_aim_angle,
+    void  evaluateItems(const Item *item, Vec3 kart_aim_direction,
                         std::vector<const Item *> *items_to_avoid,
                         std::vector<const Item *> *items_to_collect);
 

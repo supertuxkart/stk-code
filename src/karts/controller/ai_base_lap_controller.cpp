@@ -25,7 +25,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "modes/linear_world.hpp"
-#include "tracks/track.hpp"
+#include "tracks/quad_graph.hpp"
 #include "utils/constants.hpp"
 
 

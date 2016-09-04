@@ -76,7 +76,7 @@ private:
     virtual void getGraphBoundingBox(Vec3 *min, Vec3 *max) const
                                 { NavMesh::get()->getBoundingBox(min, max); }
     // ------------------------------------------------------------------------
-    virtual const bool isNodeInvisible(int n) const;
+    virtual const bool isNodeInvisible(int n) const         { return false; }
     // ------------------------------------------------------------------------
     virtual const bool hasLapLine() const
                                                             { return false; }

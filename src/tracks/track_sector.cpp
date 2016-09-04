@@ -20,9 +20,9 @@
 #include "modes/world.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/check_structure.hpp"
-#include "tracks/track.hpp"
 #include "tracks/track_sector.hpp"
 #include "tracks/quad_graph.hpp"
+#include "tracks/graph_node.hpp"
 
 // ----------------------------------------------------------------------------
 /** Initialises the object, and sets the current graph node to be undefined.
@@ -65,7 +65,7 @@ void TrackSector::update(const Vec3 &xyz)
     {
         // keep the current quad as the latest valid one IF the player has one
         // of the required checklines
-        GraphNode gn = QuadGraph::get()->getNode(m_current_graph_node);
+        const GraphNode& gn = QuadGraph::get()->getNode(m_current_graph_node);
         const std::vector<int>& checkline_requirements = gn.getChecklineRequirements();
 
         if (checkline_requirements.size() == 0)

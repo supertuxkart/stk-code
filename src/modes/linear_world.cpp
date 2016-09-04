@@ -26,9 +26,12 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
+#include "graphics/material.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/graph_node.hpp"
+#include "tracks/quad_graph.hpp"
 #include "tracks/track_sector.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -644,8 +647,8 @@ unsigned int LinearWorld::getRescuePositionIndex(AbstractKart *kart)
 // ------------------------------------------------------------------------
 btTransform LinearWorld::getRescueTransform(unsigned int index) const
 {
-    const Vec3 &xyz = QuadGraph::get()->getQuadOfNode(index).getCenter();
-    const Vec3 &normal = QuadGraph::get()->getQuadOfNode(index).getNormal();
+    const Vec3 &xyz = QuadGraph::get()->getNode(index).getCenter();
+    const Vec3 &normal = QuadGraph::get()->getNode(index).getNormal();
     btTransform pos;
     pos.setOrigin(xyz);
 

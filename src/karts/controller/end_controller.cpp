@@ -45,6 +45,7 @@
 #include "modes/linear_world.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/race_result_gui.hpp"
+#include "tracks/graph_node.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -214,7 +215,7 @@ void EndController::handleSteering(float dt)
        0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )
     {
         const int next = m_next_node_index[m_track_node];
-        target_point = QuadGraph::get()->getQuadOfNode(next).getCenter();
+        target_point = QuadGraph::get()->getNode(next).getCenter();
 #ifdef AI_DEBUG
         Log::debug("end_controller.cpp", "- Outside of road: steer to center point.");
 #endif
@@ -274,7 +275,7 @@ void EndController::findNonCrashingPoint(Vec3 *result)
         target_sector = m_next_node_index[sector];
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = QuadGraph::get()->getQuadOfNode(target_sector).getCenter()
+        direction = QuadGraph::get()->getNode(target_sector).getCenter()
                   - m_kart->getXYZ();
 
         float len=direction.length_2d();
@@ -301,7 +302,7 @@ void EndController::findNonCrashingPoint(Vec3 *result)
             if ( distance + m_kart_width * 0.5f
                  > QuadGraph::get()->getNode(sector).getPathWidth()*0.5f )
             {
-                *result = QuadGraph::get()->getQuadOfNode(sector).getCenter();
+                *result = QuadGraph::get()->getNode(sector).getCenter();
                 return;
             }
         }
