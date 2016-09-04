@@ -223,6 +223,9 @@ void QuadGraph::load(const std::string &quad_file_name,
         if(xml_node->getName()=="node-list")
         {
             // Each quad is part of the graph exactly once now.
+            unsigned int to = 0;
+            xml_node->get("to-quad", &to);
+            assert(to + 1 == m_all_nodes.size());
             continue;
         }
         else if(xml_node->getName()=="edge-loop")

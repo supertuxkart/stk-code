@@ -95,14 +95,6 @@ NavMesh::NavMesh(const std::string &filename)
                 m_quads.push_back(new Quad(
                     all_vertices[quad_index[0]], all_vertices[quad_index[1]],
                     all_vertices[quad_index[2]], all_vertices[quad_index[3]]));
-
-/*(AbstractNode* tn = createNode(
-                    all_vertices[quad_index[0]], all_vertices[quad_index[1]],
-                    all_vertices[quad_index[2]], all_vertices[quad_index[3]],false,false);
-
-Vec3 pp(0,0,0);
-tn->pointInNode(pp);*/
-
             }
         }
     }

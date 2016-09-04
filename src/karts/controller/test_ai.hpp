@@ -66,6 +66,7 @@ namespace irr
  *  stage) identical to the Skidding AI.
 \ingroup controller
 */
+
 class TestAI : public AIBaseLapController
 {
 private:
