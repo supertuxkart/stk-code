@@ -56,7 +56,7 @@ void KartRewinder::reset()
  */
 BareNetworkString* KartRewinder::saveState() const
 {
-    const int MEMSIZE = 13*sizeof(float) + 9+2;
+    const int MEMSIZE = 13*sizeof(float) + 9+3;
 
     BareNetworkString *buffer = new BareNetworkString(MEMSIZE);
     const btRigidBody *body = getBody();
@@ -69,6 +69,7 @@ BareNetworkString* KartRewinder::saveState() const
     buffer->add(q);
     buffer->add(body->getLinearVelocity());
     buffer->add(body->getAngularVelocity());
+    buffer->addUInt8(m_has_started);   // necessary for startup speed boost
 
     // 2) Steering and other player controls
     // -------------------------------------
@@ -99,6 +100,7 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     body->proceedToTransform(t);
     body->setLinearVelocity(buffer->getVec3());
     body->setAngularVelocity(buffer->getVec3());
+    m_has_started = buffer->getUInt8();   // necessary for startup speed boost
 
     // 2) Steering and other controls
     // ------------------------------
