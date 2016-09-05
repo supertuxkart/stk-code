@@ -2181,7 +2181,7 @@ void Kart::updatePhysics(float dt)
     // gets rid of this jitter, and also r
     float old_speed = m_speed;
     m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
-    float f=1.0f;
+    float f=0.3f;
     m_speed = f*m_speed + (1.0f-f)*old_speed;
 
     // calculate direction of m_speed
