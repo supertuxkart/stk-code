@@ -17,9 +17,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "karts/kart_rewinder.hpp"
-#include "karts/abstract_kart.hpp"
+
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
+#include "karts/abstract_kart.hpp"
+#include "karts/max_speed.hpp"
 #include "modes/world.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/network_string.hpp"
@@ -82,6 +84,11 @@ BareNetworkString* KartRewinder::saveState() const
     // 4) Powerup
     // ----------
     getPowerup()->saveState(buffer);
+
+    // 5) Max speed info
+    // ------------------
+    m_max_speed->saveState(buffer);
+
     return buffer;
 }   // saveState
 
@@ -113,6 +120,10 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     // 4) Powerup
     // ----------
     getPowerup()->rewindTo(buffer);
+
+    // 5) Max speed info
+    // ------------------
+    m_max_speed->rewindTo(buffer);
     return;
 }   // rewindToState
 
