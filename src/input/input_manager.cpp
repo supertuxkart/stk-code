@@ -277,14 +277,14 @@ void InputManager::handleStaticAction(int key, int value)
         case KEY_F11:
             if(value && shift_is_pressed && world && RewindManager::isEnabled())
             {
-                printf("Enter rewind time:");
+                printf("Enter rewind to time:");
                 char s[256];
                 fgets(s, 256, stdin);
                 float t;
                 StringUtils::fromString(s,t);
-                RewindManager::get()->rewindTo(world->getTime()-t);
+                RewindManager::get()->rewindTo(t);
                 Log::info("Rewind", "Rewinding from %f to %f", 
-                          world->getTime(), world->getTime()-t);
+                          world->getTime(), t);
             }
             break;
 
