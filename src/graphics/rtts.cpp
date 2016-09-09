@@ -78,47 +78,67 @@ RTT::RTT(size_t width, size_t height)
 
     // All RTTs are currently RGBA16F mostly with stencil. The four tmp RTTs are the same size
     // as the screen, for use in post-processing.
-
-    RenderTargetTextures[RTT_TMP1] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP2] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP3] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP4] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
-    RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, GL_R32F, GL_RED, GL_FLOAT, linear_depth_mip_levels);
-    RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGBA16F, GL_RGBA, GL_FLOAT);
-    RenderTargetTextures[RTT_COLOR] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_SSAO] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
-    RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_DIFFUSE] = generateRTT(res, GL_R11F_G11F_B10F, GL_BGR, GL_FLOAT);
-    RenderTargetTextures[RTT_SPECULAR] = generateRTT(res, GL_R11F_G11F_B10F, GL_BGR, GL_FLOAT);
-
-    RenderTargetTextures[RTT_HALF1] = generateRTT(half, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_QUARTER1] = generateRTT(quarter, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_EIGHTH1] = generateRTT(eighth, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_HALF1_R] = generateRTT(half, GL_R16F, GL_RED, GL_FLOAT);
-
-    RenderTargetTextures[RTT_HALF2] = generateRTT(half, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_QUARTER2] = generateRTT(quarter, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_EIGHTH2] = generateRTT(eighth, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_HALF2_R] = generateRTT(half, GL_R16F, GL_RED, GL_FLOAT);
-
-    RenderTargetTextures[RTT_BLOOM_1024] = generateRTT(shadowsize0, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    
 #if !defined(USE_GLES2)
-    RenderTargetTextures[RTT_SCALAR_1024] = generateRTT(shadowsize0, GL_R32F, GL_RED, GL_FLOAT);
+    GLint rgba_internal_format = GL_RGBA16F;
+    GLint rgba_format = GL_BGRA;
+    GLint red_internal_format = GL_R16F;
+    GLint red32_internal_format = GL_R32F;
+    GLint red_format = GL_RED;
+    GLint rgb_format = GL_BGR;
+    GLint diffuse_specular_internal_format = GL_R11F_G11F_B10F;
+    GLint type = GL_FLOAT;
+#else
+    GLint rgba_internal_format = GL_RGBA8;
+    GLint rgba_format = GL_RGBA;
+    GLint red_internal_format = GL_R8;
+    GLint red32_internal_format = GL_R8;
+    GLint red_format = GL_RED;
+    GLint rgb_format = GL_RGB;
+    GLint diffuse_specular_internal_format = GL_RGBA8;
+    GLint type = GL_UNSIGNED_BYTE;
 #endif
-    RenderTargetTextures[RTT_BLOOM_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
-	RenderTargetTextures[RTT_LENS_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
+
+    RenderTargetTextures[RTT_TMP1] = generateRTT(res, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_TMP2] = generateRTT(res, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_TMP3] = generateRTT(res, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_TMP4] = generateRTT(res, red_internal_format, red_format, type);
+    RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, red32_internal_format, red_format, type, linear_depth_mip_levels);
+    RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, rgba_internal_format, GL_RGBA, type);
+    RenderTargetTextures[RTT_COLOR] = generateRTT(res, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB8_ALPHA8, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, GL_SRGB8_ALPHA8, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, GL_SRGB8_ALPHA8, rgb_format, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_SSAO] = generateRTT(res, red_internal_format, red_format, type);
+    RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_DIFFUSE] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_SPECULAR] = generateRTT(res, diffuse_specular_internal_format, rgb_format, type);
+
+    RenderTargetTextures[RTT_HALF1] = generateRTT(half, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_QUARTER1] = generateRTT(quarter, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_EIGHTH1] = generateRTT(eighth, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_HALF1_R] = generateRTT(half, red_internal_format, red_format, type);
+
+    RenderTargetTextures[RTT_HALF2] = generateRTT(half, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_QUARTER2] = generateRTT(quarter, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_EIGHTH2] = generateRTT(eighth, rgba_internal_format, rgba_format, type);
+    RenderTargetTextures[RTT_HALF2_R] = generateRTT(half, red_internal_format, red_format, type);
+
+    RenderTargetTextures[RTT_BLOOM_1024] = generateRTT(shadowsize0, rgba_internal_format, rgb_format, type);
+#if !defined(USE_GLES2)
+    RenderTargetTextures[RTT_SCALAR_1024] = generateRTT(shadowsize0, red32_internal_format, red_format, type);
+#endif
+    RenderTargetTextures[RTT_BLOOM_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_TMP_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_LENS_512] = generateRTT(shadowsize1, rgba_internal_format, rgb_format, type);
 	
-    RenderTargetTextures[RTT_BLOOM_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
-	RenderTargetTextures[RTT_LENS_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_BLOOM_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_TMP_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_LENS_256] = generateRTT(shadowsize2, rgba_internal_format, rgb_format, type);
 	
-    RenderTargetTextures[RTT_BLOOM_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
-    RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
-	RenderTargetTextures[RTT_LENS_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_BLOOM_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
+    RenderTargetTextures[RTT_LENS_128] = generateRTT(shadowsize3, rgba_internal_format, rgb_format, type);
 
     std::vector<GLuint> somevector;
     somevector.push_back(RenderTargetTextures[RTT_SSAO]);
