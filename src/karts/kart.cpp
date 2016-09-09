@@ -1289,21 +1289,27 @@ void Kart::update(float dt)
     // But only do this if auto-rescue is enabled (i.e. it will be disabled in
     // battle mode), and the material the kart is driving on does not have
     // gravity (which atm affects the roll angle).
-    unsigned int sector = 0;
-    Vec3 quadNormal(0, 1, 0);
+
+    // To be used later
+    float dist_to_sector = 0.0f;
     if (QuadGraph::get())
     {
-        sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
-        quadNormal = QuadGraph::get()->getNode(sector)->getNormal();
-        btQuaternion q = getTrans().getRotation();
-        float roll = quadNormal.angle((Vec3(0, 1, 0).rotate(q.getAxis(), q.getAngle())));
+        const int sector = ((LinearWorld*)World::getWorld())
+            ->getTrackSector(getWorldKartId()).getCurrentGraphNode();
+        dist_to_sector = getXYZ().distance
+            (QuadGraph::get()->getNode(sector)->getCenter());
+
+        const Vec3& quad_normal = QuadGraph::get()->getNode(sector)
+            ->getNormal();
+        const btQuaternion& q = getTrans().getRotation();
+        const float roll = quad_normal.angle
+               ((Vec3(0, 1, 0).rotate(q.getAxis(), q.getAngle())));
 
         if (World::getWorld()->getTrack()->isAutoRescueEnabled() &&
             (!m_terrain_info->getMaterial() ||
             !m_terrain_info->getMaterial()->hasGravity()) &&
             !getKartAnimation() && fabs(roll) > 60 * DEGREE_TO_RAD &&
-            fabs(getSpeed()) < 3.0f         &&
-            !m_flying)
+            fabs(getSpeed()) < 3.0f)
         {
             new RescueAnimation(this, /*is_auto_rescue*/true);
         }
@@ -1321,8 +1327,6 @@ void Kart::update(float dt)
 
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
-
-    //m_terrain_info->update(getXYZ() + epsilon*(quadNormal), -quadNormal);
 
     // After the physics step was done, the position of the wheels (as stored
     // in wheelInfo) is actually outdated, since the chassis was moved
@@ -1348,7 +1352,7 @@ void Kart::update(float dt)
     // partly tunnels through the track). While tunneling should not be
     // happening (since Z velocity is clamped), the epsilon is left in place
     // just to be on the safe side (it will not hit the chassis itself).
-    from = from/4 + Vec3(0,0.3f,0);
+    from = from/4 + (getTrans().getBasis() * Vec3(0,0.3f,0));
 
     m_terrain_info->update(getTrans().getBasis(), from);
 
@@ -1373,13 +1377,6 @@ void Kart::update(float dt)
         const Vec3 *min, *max;
         World::getWorld()->getTrack()->getAABB(&min, &max);
 
-        // We do this for now because dist_to_sector is not defined 
-        float dist_to_sector;
-        if (QuadGraph::get())
-            dist_to_sector = getXYZ().distance(QuadGraph::get()->getNode(sector)->getCenter());
-        else
-            dist_to_sector = 0;
-        
         if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
            !getKartAnimation())
             new RescueAnimation(this);
