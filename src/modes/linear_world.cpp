@@ -647,8 +647,8 @@ unsigned int LinearWorld::getRescuePositionIndex(AbstractKart *kart)
 // ------------------------------------------------------------------------
 btTransform LinearWorld::getRescueTransform(unsigned int index) const
 {
-    const Vec3 &xyz = QuadGraph::get()->getNode(index).getCenter();
-    const Vec3 &normal = QuadGraph::get()->getNode(index).getNormal();
+    const Vec3 &xyz = QuadGraph::get()->getNode(index)->getCenter();
+    const Vec3 &normal = QuadGraph::get()->getNode(index)->getNormal();
     btTransform pos;
     pos.setOrigin(xyz);
 
@@ -879,8 +879,8 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
         return;
 
     // check if the player is going in the wrong direction
-    GraphNode& node = QuadGraph::get()->getNode(sector);
-    Vec3 center_line = node.getUpperCenter() - node.getLowerCenter();
+    const GraphNode* node = QuadGraph::get()->getNode(sector);
+    Vec3 center_line = node->getUpperCenter() - node->getLowerCenter();
     float angle_diff = kart->getVelocity().angle(center_line);
 
     if (angle_diff > M_PI)

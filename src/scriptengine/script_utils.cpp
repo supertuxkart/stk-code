@@ -23,13 +23,13 @@
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "modes/world.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
 
 #include <angelscript.h>
-#include "scriptarray.hpp"
 
 #include <assert.h>
 #include <iostream> //debug

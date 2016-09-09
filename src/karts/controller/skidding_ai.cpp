@@ -476,14 +476,14 @@ void SkiddingAI::handleSteering(float dt)
         m_world->getDistanceToCenterForKart( m_kart->getWorldKartId() );
 
     if( fabsf(side_dist)  >
-       0.5f* QuadGraph::get()->getNode(m_track_node).getPathWidth()+0.5f )
+       0.5f* QuadGraph::get()->getNode(m_track_node)->getPathWidth()+0.5f )
     {
         steer_angle = steerToPoint(QuadGraph::get()->getNode(next)
-                                                    .getCenter());
+                                                   ->getCenter());
 
 #ifdef AI_DEBUG
         m_debug_sphere[0]->setPosition(QuadGraph::get()->getNode(next)
-                       .getCenter().toIrrVector());
+                         ->getCenter().toIrrVector());
         Log::debug(getControllerName().c_str(),
                    "Outside of road: steer to center point.");
 #endif
@@ -636,7 +636,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
     const float max_item_lookahead_distance = 30.f;
     while(distance < max_item_lookahead_distance)
     {
-        int n_index= QuadGraph::get()->getNode(node).getNodeIndex();
+        int n_index= QuadGraph::get()->getNode(node)->getNodeIndex();
         const std::vector<Item *> &items_ahead =
             ItemManager::get()->getItemsInQuads(n_index);
         for(unsigned int i=0; i<items_ahead.size(); i++)
@@ -782,7 +782,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
                 Vec3 xyz = item_to_collect->getXYZ();
                 Vec3 item_direction = xyz - m_kart->getXYZ();
                 Vec3 plane_normal = QuadGraph::get()->getNode(m_track_node)
-                    .getNormal();
+                    ->getNormal();
                 float dist_to_plane = item_direction.dot(plane_normal);
                 Vec3 projected_xyz = xyz - dist_to_plane*plane_normal;
 
@@ -865,7 +865,7 @@ bool SkiddingAI::handleSelectedItem(Vec3 kart_aim_direction, Vec3 *aim_point)
     // the kart is. The current quad provides a good estimate of the kart's plane.
     const Vec3 &xyz = m_item_to_collect->getXYZ();
     Vec3 item_direction = xyz - m_kart->getXYZ();
-    Vec3 plane_normal = QuadGraph::get()->getNode(m_track_node).getNormal();
+    Vec3 plane_normal = QuadGraph::get()->getNode(m_track_node)->getNormal();
     float dist_to_plane = item_direction.dot(plane_normal);
     Vec3 projected_xyz = xyz - dist_to_plane*plane_normal;
 
@@ -926,7 +926,7 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
     // rightmost point - if so, nothing to do.
     Vec3 left(items_to_avoid[index_left_most]->getXYZ());
     int node_index = items_to_avoid[index_left_most]->getGraphNode();
-    Vec3 normal = QuadGraph::get()->getNode(node_index).getNormal();
+    Vec3 normal = QuadGraph::get()->getNode(node_index)->getNormal();
     Vec3 p1 = line_to_target.start,
          p2 = line_to_target.getMiddle() + normal.toIrrVector(),
          p3 = line_to_target.end;
@@ -946,7 +946,7 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
     {
         Vec3 left(items_to_avoid[index_left_most]->getXYZ());
         int node_index = items_to_avoid[index_left_most]->getGraphNode();
-        Vec3 normal = QuadGraph::get()->getNode(node_index).getNormal();
+        Vec3 normal = QuadGraph::get()->getNode(node_index)->getNormal();
         Vec3 p1 = line_to_target.start,
             p2 = line_to_target.getMiddle() + normal.toIrrVector(),
             p3 = line_to_target.end;
@@ -1104,7 +1104,7 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
         // the kart is. The current quad provides a good estimate of the kart's plane.
         const Vec3 &xyz = item->getXYZ();
         Vec3 item_direction = xyz - m_kart->getXYZ();
-        Vec3 plane_normal = QuadGraph::get()->getNode(m_track_node).getNormal();
+        Vec3 plane_normal = QuadGraph::get()->getNode(m_track_node)->getNormal();
         float dist_to_plane = item_direction.dot(plane_normal);
         Vec3 projected_xyz = xyz - dist_to_plane*plane_normal;
 
@@ -1712,8 +1712,8 @@ void SkiddingAI::handleNitroAndZipper()
     {
         GraphNode::DirectionType dir;
         unsigned int last;
-        const GraphNode &gn = QuadGraph::get()->getNode(m_track_node);
-        gn.getDirectionData(m_successor_index[m_track_node], &dir, &last);
+        const GraphNode* gn = QuadGraph::get()->getNode(m_track_node);
+        gn->getDirectionData(m_successor_index[m_track_node], &dir, &last);
         if(dir==GraphNode::DIR_STRAIGHT)
         {
             float diff = QuadGraph::get()->getDistanceFromStart(last)
@@ -1861,23 +1861,23 @@ void SkiddingAI::findNonCrashingPointNew(Vec3 *result, int *last_node)
     *last_node = m_next_node_index[m_track_node];
     const core::vector2df xz = m_kart->getXYZ().toIrrVector2d();
 
-    const GraphNode &g = QuadGraph::get()->getNode(*last_node);
+    const GraphNode* g = QuadGraph::get()->getNode(*last_node);
 
     // Index of the left and right end of a quad.
     const unsigned int LEFT_END_POINT  = 0;
     const unsigned int RIGHT_END_POINT = 1;
-    core::line2df left (xz, g[LEFT_END_POINT ].toIrrVector2d());
-    core::line2df right(xz, g[RIGHT_END_POINT].toIrrVector2d());
+    core::line2df left (xz, (*g)[LEFT_END_POINT ].toIrrVector2d());
+    core::line2df right(xz, (*g)[RIGHT_END_POINT].toIrrVector2d());
 
 #if defined(AI_DEBUG) && defined(AI_DEBUG_NEW_FIND_NON_CRASHING)
     const Vec3 eps1(0,0.5f,0);
     m_curve[CURVE_LEFT]->clear();
     m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps1);
-    m_curve[CURVE_LEFT]->addPoint(g[LEFT_END_POINT]+eps1);
+    m_curve[CURVE_LEFT]->addPoint((*g)[LEFT_END_POINT]+eps1);
     m_curve[CURVE_LEFT]->addPoint(m_kart->getXYZ()+eps1);
     m_curve[CURVE_RIGHT]->clear();
     m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps1);
-    m_curve[CURVE_RIGHT]->addPoint(g[RIGHT_END_POINT]+eps1);
+    m_curve[CURVE_RIGHT]->addPoint((*g)[RIGHT_END_POINT]+eps1);
     m_curve[CURVE_RIGHT]->addPoint(m_kart->getXYZ()+eps1);
 #endif
 #if defined(AI_DEBUG_KART_HEADING) || defined(AI_DEBUG_NEW_FIND_NON_CRASHING)
@@ -1890,13 +1890,13 @@ void SkiddingAI::findNonCrashingPointNew(Vec3 *result, int *last_node)
     while(1)
     {
         unsigned int next_sector = m_next_node_index[*last_node];
-        const GraphNode &g_next = QuadGraph::get()->getNode(next_sector);
+        const GraphNode* g_next = QuadGraph::get()->getNode(next_sector);
         // Test if the next left point is to the right of the left
         // line. If so, a new left line is defined.
-        if(left.getPointOrientation(g_next[LEFT_END_POINT].toIrrVector2d())
+        if(left.getPointOrientation((*g_next)[LEFT_END_POINT].toIrrVector2d())
             < 0 )
         {
-            core::vector2df p = g_next[LEFT_END_POINT].toIrrVector2d();
+            core::vector2df p = (*g_next)[LEFT_END_POINT].toIrrVector2d();
             // Stop if the new point is to the right of the right line
             if(right.getPointOrientation(p)<0)
                 break;
@@ -1912,10 +1912,10 @@ void SkiddingAI::findNonCrashingPointNew(Vec3 *result, int *last_node)
 
         // Test if new right point is to the left of the right line. If
         // so, a new right line is defined.
-        if(right.getPointOrientation(g_next[RIGHT_END_POINT].toIrrVector2d())
+        if(right.getPointOrientation((*g_next)[RIGHT_END_POINT].toIrrVector2d())
             > 0 )
         {
-            core::vector2df p = g_next[RIGHT_END_POINT].toIrrVector2d();
+            core::vector2df p = (*g_next)[RIGHT_END_POINT].toIrrVector2d();
             // Break if new point is to the left of left line
             if(left.getPointOrientation(p)>0)
                 break;
@@ -1937,7 +1937,7 @@ void SkiddingAI::findNonCrashingPointNew(Vec3 *result, int *last_node)
     //         0.5f*(left.end.Y+right.end.Y));
     //*result = ppp;
 
-    *result = QuadGraph::get()->getNode(*last_node).getCenter();
+    *result = QuadGraph::get()->getNode(*last_node)->getCenter();
 }   // findNonCrashingPointNew
 
 //-----------------------------------------------------------------------------
@@ -1974,7 +1974,7 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
         target_sector = m_next_node_index[*last_node];
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = QuadGraph::get()->getNode(target_sector).getCenter()
+        direction = QuadGraph::get()->getNode(target_sector)->getCenter()
                   - m_kart->getXYZ();
 
         float len=direction.length();
@@ -2004,16 +2004,16 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
 
             //If we are outside, the previous node is what we are looking for
             if ( distance + m_kart_width * 0.5f
-                 > QuadGraph::get()->getNode(*last_node).getPathWidth()*0.5f )
+                 > QuadGraph::get()->getNode(*last_node)->getPathWidth()*0.5f )
             {
                 *aim_position = QuadGraph::get()->getNode(*last_node)
-                                                 .getCenter();
+                                                ->getCenter();
                 return;
             }
         }
         *last_node = target_sector;
     }   // for i<100
-    *aim_position = QuadGraph::get()->getNode(*last_node).getCenter();
+    *aim_position = QuadGraph::get()->getNode(*last_node)->getCenter();
 }   // findNonCrashingPointFixed
 
 //-----------------------------------------------------------------------------
@@ -2021,7 +2021,7 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
  *  1. the test:
  *
  *         distance + m_kart_width * 0.5f
- *                  > QuadGraph::get()->getNode(*last_node).getPathWidth() )
+ *                  > QuadGraph::get()->getNode(*last_node)->getPathWidth() )
  *
  *     is incorrect, it should compare with getPathWith*0.5f (since distance
  *     is the distance from the center, i.e. it is half the path width if
@@ -2078,12 +2078,12 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
         if(fabsf(diff)>1.5f)
         {
             *aim_position = QuadGraph::get()->getNode(target_sector)
-                                             .getCenter();
+                                            ->getCenter();
             return;
         }
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = QuadGraph::get()->getNode(target_sector).getCenter()
+        direction = QuadGraph::get()->getNode(target_sector)->getCenter()
                   - m_kart->getXYZ();
 
         float len=direction.length();
@@ -2113,17 +2113,17 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
 
             //If we are outside, the previous node is what we are looking for
             if ( distance + m_kart_width * 0.5f
-                 > QuadGraph::get()->getNode(*last_node).getPathWidth() )
+                 > QuadGraph::get()->getNode(*last_node)->getPathWidth() )
             {
                 *aim_position = QuadGraph::get()->getNode(*last_node)
-                                                 .getCenter();
+                                                ->getCenter();
                 return;
             }
         }
         angle = angle1;
         *last_node = target_sector;
     }   // for i<100
-    *aim_position = QuadGraph::get()->getNode(*last_node).getCenter();
+    *aim_position = QuadGraph::get()->getNode(*last_node)->getCenter();
 }   // findNonCrashingPoint
 
 //-----------------------------------------------------------------------------
@@ -2134,13 +2134,13 @@ void SkiddingAI::determineTrackDirection()
 {
     const QuadGraph *qg = QuadGraph::get();
     unsigned int succ   = m_successor_index[m_track_node];
-    unsigned int next = qg->getNode(m_track_node).getSuccessor(succ);
+    unsigned int next = qg->getNode(m_track_node)->getSuccessor(succ);
 
-    //float angle_to_track = qg->getNode(m_track_node).getAngleToSuccessor(succ)
+    //float angle_to_track = qg->getNode(m_track_node)->getAngleToSuccessor(succ)
     //                     - m_kart->getHeading();
-    Vec3 track_direction = -qg->getNode(m_track_node).getCenter()
-        + qg->getNode(next).getCenter();
-    //Vec3 kart_direction = qg->getNode(m_track_node).getCenter() + m_kart->getVelocity();
+    Vec3 track_direction = -qg->getNode(m_track_node)->getCenter()
+        + qg->getNode(next)->getCenter();
+    //Vec3 kart_direction = qg->getNode(m_track_node)->getCenter() + m_kart->getVelocity();
 
     float angle_to_track = 0;
     if (m_kart->getVelocity().length() > 0.0f)
@@ -2165,15 +2165,15 @@ void SkiddingAI::determineTrackDirection()
         return;
     }
 
-    qg->getNode(next).getDirectionData(m_successor_index[next],
-                                       &m_current_track_direction,
-                                       &m_last_direction_node);
+    qg->getNode(next)->getDirectionData(m_successor_index[next],
+                                        &m_current_track_direction,
+                                        &m_last_direction_node);
 
 #ifdef AI_DEBUG
     m_curve[CURVE_QG]->clear();
     for(unsigned int i=m_track_node; i<=m_last_direction_node; i++)
     {
-        m_curve[CURVE_QG]->addPoint(qg->getNode(i).getCenter());
+        m_curve[CURVE_QG]->addPoint(qg->getNode(i)->getCenter());
     }
 #endif
 
@@ -2206,7 +2206,7 @@ void SkiddingAI::handleCurve()
     const QuadGraph *qg = QuadGraph::get();
     Vec3 xyz            = m_kart->getXYZ();
     Vec3 tangent        = m_kart->getTrans()(Vec3(0,0,1)) - xyz;
-    Vec3 last_xyz       = qg->getNode(m_last_direction_node).getCenter();
+    Vec3 last_xyz       = qg->getNode(m_last_direction_node)->getCenter();
 
     determineTurnRadius(xyz, tangent, last_xyz,
                         &m_curve_center, &m_current_curve_radius);
@@ -2225,10 +2225,10 @@ void SkiddingAI::handleCurve()
         // Pick either the lower left or right point:
         int index = m_current_track_direction==GraphNode::DIR_LEFT
                   ? 0 : 1;
-        float r = (m_curve_center - qg->getNode(i)[index]).length();
+        float r = (m_curve_center - *(qg->getNode(i))[index]).length();
         if(m_current_curve_radius < r)
         {
-            last_xyz = qg->getNode(i)[index];
+            last_xyz = *(qg->getNode(i)[index]);
             determineTurnRadius(xyz, tangent, last_xyz,
                                 &m_curve_center, &m_current_curve_radius);
             m_last_direction_node = i;
@@ -2298,7 +2298,7 @@ bool SkiddingAI::canSkid(float steer_fraction)
 
     const float MIN_SKID_SPEED = 5.0f;
     const QuadGraph *qg = QuadGraph::get();
-    Vec3 last_xyz       = qg->getNode(m_last_direction_node).getCenter();
+    Vec3 last_xyz       = qg->getNode(m_last_direction_node)->getCenter();
 
     // Only try skidding when a certain minimum speed is reached.
     if(m_kart->getSpeed()<MIN_SKID_SPEED) return false;

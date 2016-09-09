@@ -164,7 +164,10 @@ public:
     int          getNumberOfSuccessors(int n) const;
     // ------------------------------------------------------------------------
     /** Returns the quad that belongs to a graph node. */
-    GraphNode&   getNode(unsigned int j) const      { return *m_all_nodes[j]; }
+    GraphNode*   getNode(unsigned int j)             { return m_all_nodes[j]; }
+    // ------------------------------------------------------------------------
+    /** Returns the quad that belongs to a graph node (const version). */
+    const GraphNode* getNode(unsigned int j) const   { return m_all_nodes[j]; }
     // ------------------------------------------------------------------------
     /** Returns the distance from the start to the beginning of a quad. */
     float        getDistanceFromStart(int j) const;

@@ -40,7 +40,6 @@ class ModelDefinitionLoader;
 
 #include "LinearMath/btTransform.h"
 
-#include "scriptengine/script_engine.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/translation.hpp"
 #include "utils/vec3.hpp"
@@ -61,11 +60,6 @@ class TrackObjectManager;
 class TriangleMesh;
 class World;
 class XMLNode;
-
-namespace Scripting
-{
-    class ScriptEngine;
-}
 
 const int HEIGHT_MAP_RESOLUTION = 256;
 

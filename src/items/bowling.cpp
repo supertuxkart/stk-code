@@ -64,7 +64,7 @@ Bowling::Bowling(AbstractKart *kart)
     {
         unsigned int sector = ((LinearWorld*)World::getWorld())->
             getTrackSector(kart->getWorldKartId()).getCurrentGraphNode();
-        quadNormal = QuadGraph::get()->getNode(sector).getNormal();
+        quadNormal = QuadGraph::get()->getNode(sector)->getNormal();
     }
     else
         quadNormal = btVector3(.0f, 1.0f, .0f);

@@ -41,7 +41,7 @@ Node2D::Node2D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
  *  \param result The X coordinate contains the sidewards distance, the
  *                Z coordinate the forward distance.
  */
-void Node2D::getDistances(const Vec3 &xyz, Vec3 *result)
+void Node2D::getDistances(const Vec3 &xyz, Vec3 *result) const
 {
     core::vector2df xyz2d(xyz.getX(), xyz.getZ());
     core::vector2df closest = m_line.getClosestPoint(xyz2d);
@@ -61,7 +61,7 @@ void Node2D::getDistances(const Vec3 &xyz, Vec3 *result)
  *  which belongs to this graph node. The value is computed in 2d only!
  *  \param xyz The point for which the distance to the line is computed.
  */
-float Node2D::getDistance2FromPoint(const Vec3 &xyz)
+float Node2D::getDistance2FromPoint(const Vec3 &xyz) const
 {
     core::vector2df xyz2d(xyz.getX(), xyz.getZ());
     core::vector2df closest = m_line.getClosestPoint(xyz2d);

@@ -1294,7 +1294,7 @@ void Kart::update(float dt)
     if (QuadGraph::get())
     {
         sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
-        quadNormal = QuadGraph::get()->getNode(sector).getNormal();
+        quadNormal = QuadGraph::get()->getNode(sector)->getNormal();
         btQuaternion q = getTrans().getRotation();
         float roll = quadNormal.angle((Vec3(0, 1, 0).rotate(q.getAxis(), q.getAngle())));
 
@@ -1376,7 +1376,7 @@ void Kart::update(float dt)
         // We do this for now because dist_to_sector is not defined 
         float dist_to_sector;
         if (QuadGraph::get())
-            dist_to_sector = getXYZ().distance(QuadGraph::get()->getNode(sector).getCenter());
+            dist_to_sector = getXYZ().distance(QuadGraph::get()->getNode(sector)->getCenter());
         else
             dist_to_sector = 0;
         
@@ -1944,9 +1944,9 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         {
             // Use the first predecessor node, which is the most
             // natural one (i.e. the one on the main driveline).
-            const GraphNode &gn = QuadGraph::get()->getNode(
-                QuadGraph::get()->getNode(sector).getPredecessor(0));
-            Vec3 impulse = gn.getCenter() - getXYZ();
+            const GraphNode* gn = QuadGraph::get()->getNode(
+                QuadGraph::get()->getNode(sector)->getPredecessor(0));
+            Vec3 impulse = gn->getCenter() - getXYZ();
             impulse.setY(0);
             if(impulse.getX() || impulse.getZ())
                 impulse.normalize();
@@ -2423,7 +2423,7 @@ void Kart::updateSliding()
         if (QuadGraph::get())
         {
             int sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
-            Vec3 quadNormal = QuadGraph::get()->getNode(sector).getNormal();
+            Vec3 quadNormal = QuadGraph::get()->getNode(sector)->getNormal();
             Vec3 kart_up = m.getColumn(1);
             distanceFromUp = kart_up.dot(quadNormal);
         }

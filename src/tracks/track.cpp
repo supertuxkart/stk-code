@@ -52,13 +52,14 @@
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/battle_graph.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/graph_node.hpp"
 #include "tracks/model_definition_loader.hpp"
-#include "tracks/track_manager.hpp"
 #include "tracks/quad_graph.hpp"
+#include "tracks/track_manager.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
@@ -698,7 +699,7 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
 #ifdef DEBUG
     for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
     {
-        assert(QuadGraph::get()->getNode(i).getPredecessor(0)!=-1);
+        assert(QuadGraph::get()->getNode(i)->getPredecessor(0)!=-1);
     }
 #endif
 
@@ -2292,7 +2293,7 @@ void Track::itemCommand(const XMLNode *node)
         // If a valid road_sector is not found
         if (road_sector == QuadGraph::UNKNOWN_SECTOR)
             road_sector = QuadGraph::get()->findOutOfRoadSector(xyz, road_sector);
-        const Vec3& quadnormal = QuadGraph::get()->getNode(road_sector).getNormal();
+        const Vec3& quadnormal = QuadGraph::get()->getNode(road_sector)->getNormal();
 
         const Material *m;
         Vec3 hit_point;
@@ -2385,7 +2386,7 @@ bool Track::findGround(AbstractKart *kart)
     {
         int sector = ((LinearWorld*)World::getWorld())->getTrackSector(kart->getWorldKartId()).getCurrentGraphNode();
         if (sector != QuadGraph::UNKNOWN_SECTOR)
-            quadNormal = QuadGraph::get()->getNode(sector).getNormal();
+            quadNormal = QuadGraph::get()->getNode(sector)->getNormal();
     }
 
     to = to + -1000.0f*quadNormal;
@@ -2438,6 +2439,14 @@ bool Track::findGround(AbstractKart *kart)
     return true;
 }   // findGround
 
+//-----------------------------------------------------------------------------
+float Track::getTrackLength() const
+{
+    return QuadGraph::get()->getLapLength();
+}   // getTrackLength
 
-float  Track::getTrackLength() const {return QuadGraph::get()->getLapLength();}
-float  Track::getAngle(int n) const { return QuadGraph::get()->getAngleToNext(n, 0);  }
+//-----------------------------------------------------------------------------
+float Track::getAngle(int n) const
+{
+    return QuadGraph::get()->getAngleToNext(n, 0);
+}   // getAngle

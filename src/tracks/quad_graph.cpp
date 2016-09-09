@@ -437,20 +437,20 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
         else
         {
             // First find on which segment we have to start
-            while(distance_from_start > getNode(current_node).getNodeLength())
+            while(distance_from_start > getNode(current_node)->getNodeLength())
             {
-                distance_from_start -= getNode(current_node).getNodeLength();
+                distance_from_start -= getNode(current_node)->getNodeLength();
                 // Only follow the main driveline, i.e. first predecessor
-                current_node = getNode(current_node).getPredecessor(0);
+                current_node = getNode(current_node)->getPredecessor(0);
             }
-            const GraphNode &gn   = getNode(current_node);
-            Vec3 center_line = gn.getLowerCenter() - gn.getUpperCenter();
+            const GraphNode* gn = getNode(current_node);
+            Vec3 center_line = gn->getLowerCenter() - gn->getUpperCenter();
             center_line.normalize();
 
-            Vec3 horizontal_line = gn[2] - gn[3];
+            Vec3 horizontal_line = (*gn)[2] - (*gn)[3];
             horizontal_line.normalize();
 
-            Vec3 start = gn.getUpperCenter()
+            Vec3 start = gn->getUpperCenter()
                        + center_line     * distance_from_start
                        + horizontal_line * x_pos;
             // Add a certain epsilon to the height in case that the
@@ -458,7 +458,7 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
             (*start_transforms)[i].setOrigin(start+Vec3(0,upwards_distance,0));
             (*start_transforms)[i].setRotation(
                 btQuaternion(btVector3(0, 1, 0),
-                             gn.getAngleToSuccessor(0)));
+                             gn->getAngleToSuccessor(0)));
             if(x_pos >= max_x_dist-sidewards_distance*0.5f)
             {
                 x_pos  = -max_x_dist;
@@ -563,23 +563,23 @@ void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta,
     }
     recursive_count++;
 
-    GraphNode &g=getNode(indx);
-    g.setDistanceFromStart(g.getDistanceFromStart()+delta);
-    for(unsigned int i=0; i<g.getNumberOfSuccessors(); i++)
+    GraphNode* g = getNode(indx);
+    g->setDistanceFromStart(g->getDistanceFromStart()+delta);
+    for(unsigned int i=0; i<g->getNumberOfSuccessors(); i++)
     {
-        GraphNode &g_next = getNode(g.getSuccessor(i));
+        GraphNode* g_next = getNode(g->getSuccessor(i));
         // Stop when we reach the start node, i.e. the only node with a
         // distance of 0
-        if(g_next.getDistanceFromStart()==0)
+        if(g_next->getDistanceFromStart()==0)
             continue;
 
         // Only increase the distance from start of a successor node, if
         // this successor has a distance from start that is smaller then
         // the increased amount.
-        if(g.getDistanceFromStart()+g.getDistanceToSuccessor(i) >
-            g_next.getDistanceFromStart())
+        if(g->getDistanceFromStart()+g->getDistanceToSuccessor(i) >
+            g_next->getDistanceFromStart())
         {
-            updateDistancesForAllSuccessors(g.getSuccessor(i), delta,
+            updateDistancesForAllSuccessors(g->getSuccessor(i), delta,
                                             recursive_count);
         }
     }
@@ -648,14 +648,14 @@ void QuadGraph::determineDirection(unsigned int current,
 
     // Compute the angle from n (=current) to n+1 (=next)
     float angle_current = getAngleToNext(current, succ_index);
-    unsigned int next   = getNode(current).getSuccessor(succ_index);
+    unsigned int next   = getNode(current)->getSuccessor(succ_index);
     float angle_next    = getAngleToNext(next, 0);
     float rel_angle     = normalizeAngle(angle_next-angle_current);
     // Small angles are considered to be straight
     if(fabsf(rel_angle)<max_straight_angle)
         rel_angle = 0;
 
-    next     = getNode(next).getSuccessor(0);  // next is now n+2
+    next     = getNode(next)->getSuccessor(0);  // next is now n+2
 
     // If the direction is still the same during a lap the last node
     // in the same direction is the previous node;
@@ -678,7 +678,7 @@ void QuadGraph::determineDirection(unsigned int current,
             break;
         rel_angle = new_rel_angle;
 
-        next = getNode(next).getSuccessor(0);
+        next = getNode(next)->getSuccessor(0);
     }    // while(1)
 
     GraphNode::DirectionType dir =
@@ -708,7 +708,7 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
         return;
     }
 
-    getNode(sector).getDistances(xyz, dst);
+    getNode(sector)->getDistances(xyz, dst);
 }   // spatialToTrack
 
 //-----------------------------------------------------------------------------
@@ -728,7 +728,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
 {
     // Most likely the kart will still be on the sector it was before,
     // so this simple case is tested first.
-    if(*sector!=UNKNOWN_SECTOR && getNode(*sector).pointInside(xyz) )
+    if(*sector!=UNKNOWN_SECTOR && getNode(*sector)->pointInside(xyz) )
     {
         return;
     }   // if still on same quad
@@ -756,8 +756,8 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
             indx = (*all_sectors)[i];
         else
             indx = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
-        const GraphNode &gn = getNode(indx);
-        if(gn.pointInside(xyz))
+        const GraphNode* gn = getNode(indx);
+        if(gn->pointInside(xyz))
         {
             *sector  = indx;
         }
@@ -846,8 +846,8 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
             float dist_2 = m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
             if(dist_2<min_dist_2)
             {
-                const GraphNode &gn = getNode(next_sector);
-                float dist    = xyz.getY() - gn.getMinHeight();
+                const GraphNode* gn = getNode(next_sector);
+                float dist    = xyz.getY() - gn->getMinHeight();
                 // While negative distances are unlikely, we allow some small
                 // negative numbers in case that the kart is partly in the
                 // track. Only do the height test in phase==0, in phase==1
@@ -920,5 +920,5 @@ const bool QuadGraph::differentNodeColor(int n, NodeColor* c) const
             *c = COLOR_YELLOW;
         return true;
     }
-    return false;
+    return n == 0;
 }   // differentNodeColor

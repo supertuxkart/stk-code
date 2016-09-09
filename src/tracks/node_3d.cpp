@@ -66,7 +66,7 @@ Node3D::Node3D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
  *  \param result The X coordinate contains the sidewards distance, the
  *                Z coordinate the forward distance.
  */
-void Node3D::getDistances(const Vec3 &xyz, Vec3 *result)
+void Node3D::getDistances(const Vec3 &xyz, Vec3 *result) const
 {
     core::vector3df xyz_irr = xyz.toIrrVector();
     core::vector3df closest = m_line.getClosestPoint(xyz.toIrrVector());
@@ -87,7 +87,7 @@ void Node3D::getDistances(const Vec3 &xyz, Vec3 *result)
  *  which belongs to this node.
  *  \param xyz The point for which the distance to the line is computed.
  */
-float Node3D::getDistance2FromPoint(const Vec3 &xyz)
+float Node3D::getDistance2FromPoint(const Vec3 &xyz) const
 {
     core::vector3df closest = m_line.getClosestPoint(xyz.toIrrVector());
     return (closest-xyz.toIrrVector()).getLengthSQ();

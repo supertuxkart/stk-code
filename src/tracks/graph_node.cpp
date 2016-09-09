@@ -72,17 +72,17 @@ void GraphNode::addSuccessor(unsigned int to)
 {
     m_successor_nodes.push_back(to);
     // to is the graph node
-    GraphNode &gn_to = QuadGraph::get()->getNode(to);
+    GraphNode* gn_to = QuadGraph::get()->getNode(to);
 
     // Note that the first predecessor is (because of the way the quad graph
     // is exported) the most 'natural' one, i.e. the one on the main
     // driveline.
-    gn_to.m_predecessor_nodes.push_back(m_node_index);
+    gn_to->m_predecessor_nodes.push_back(m_node_index);
 
-    Vec3 d = m_lower_center - gn_to.m_lower_center;
+    Vec3 d = m_lower_center - gn_to->m_lower_center;
     m_distance_to_next.push_back(d.length());
 
-    Vec3 diff = gn_to.getCenter() - getCenter();
+    Vec3 diff = gn_to->getCenter() - getCenter();
 
     core::CMatrix4<float> m;
     m.buildRotateFromTo(getNormal().toIrrVector(), 
@@ -123,8 +123,8 @@ void GraphNode::setupPathsToNode()
     // not be used.
     for(unsigned int i=0; i<getNumberOfSuccessors(); i++)
     {
-        GraphNode &gn = QuadGraph::get()->getNode(getSuccessor(i));
-        gn.markAllSuccessorsToUse(i, &m_path_to_node);
+        GraphNode* gn = QuadGraph::get()->getNode(getSuccessor(i));
+        gn->markAllSuccessorsToUse(i, &m_path_to_node);
     }
 #ifdef DEBUG
     for(unsigned int i = 0; i < m_path_to_node.size(); ++i)
@@ -154,8 +154,8 @@ void GraphNode::markAllSuccessorsToUse(unsigned int n,
     (*path_to_node)[m_node_index] = n;
     for(unsigned int i=0; i<getNumberOfSuccessors(); i++)
     {
-        GraphNode &gn = QuadGraph::get()->getNode(getSuccessor(i));
-        gn.markAllSuccessorsToUse(n, path_to_node);
+        GraphNode* gn = QuadGraph::get()->getNode(getSuccessor(i));
+        gn->markAllSuccessorsToUse(n, path_to_node);
     }
 }   // markAllSuccesorsToUse
 
@@ -185,5 +185,5 @@ void GraphNode::setChecklineRequirements(int latest_checkline)
  */
 bool GraphNode::ignoreSuccessorForAI(unsigned int i) const
 {
-    return QuadGraph::get()->getNode(m_successor_nodes[i]).letAIIgnore();
+    return QuadGraph::get()->getNode(m_successor_nodes[i])->letAIIgnore();
 }   // ignoreSuccessorForAI

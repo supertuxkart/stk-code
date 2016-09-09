@@ -56,9 +56,9 @@ public:
         return true;
     }
     // ------------------------------------------------------------------------
-    virtual void getDistances(const Vec3 &xyz, Vec3 *result) OVERRIDE;
+    virtual void getDistances(const Vec3 &xyz, Vec3 *result) const OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual float getDistance2FromPoint(const Vec3 &xyz) OVERRIDE;
+    virtual float getDistance2FromPoint(const Vec3 &xyz) const OVERRIDE;
 
 };
 #endif

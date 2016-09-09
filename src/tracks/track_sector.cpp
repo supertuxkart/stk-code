@@ -65,8 +65,8 @@ void TrackSector::update(const Vec3 &xyz)
     {
         // keep the current quad as the latest valid one IF the player has one
         // of the required checklines
-        const GraphNode& gn = QuadGraph::get()->getNode(m_current_graph_node);
-        const std::vector<int>& checkline_requirements = gn.getChecklineRequirements();
+        const GraphNode* gn = QuadGraph::get()->getNode(m_current_graph_node);
+        const std::vector<int>& checkline_requirements = gn->getChecklineRequirements();
 
         if (checkline_requirements.size() == 0)
         {
@@ -111,9 +111,9 @@ void TrackSector::rescue()
     // STK does not keep track of where the kart is coming from, so always
     // use the first predecessor, which is the one on the main driveline.
     m_current_graph_node = QuadGraph::get()->getNode(m_current_graph_node)
-                                               .getPredecessor(0);
+                                           ->getPredecessor(0);
     m_last_valid_graph_node = QuadGraph::get()->getNode(m_current_graph_node)
-                                               .getPredecessor(0);
+                                              ->getPredecessor(0);
 }    // rescue
 
 // ----------------------------------------------------------------------------
@@ -123,7 +123,7 @@ void TrackSector::rescue()
  */
 float TrackSector::getRelativeDistanceToCenter() const
 {
-    float w = QuadGraph::get()->getNode(m_current_graph_node).getPathWidth();
+    float w = QuadGraph::get()->getNode(m_current_graph_node)->getPathWidth();
     // w * 0.5 is the distance from center of the quad to the left or right
     // This way we get a value between -1 and 1.
     float ratio = getDistanceToCenter()/(w*0.5f);

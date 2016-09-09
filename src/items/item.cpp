@@ -161,8 +161,8 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
         Vec3 distances;
         QuadGraph::get()->spatialToTrack(&distances, m_xyz, m_graph_node);
         m_distance_from_center = distances.getX();
-        const GraphNode &gn = QuadGraph::get()->getNode(m_graph_node);
-        const Vec3 right = gn.getRightUnitVector();
+        const GraphNode* gn = QuadGraph::get()->getNode(m_graph_node);
+        const Vec3& right = gn->getRightUnitVector();
         // Give it 10% more space, since the kart will not always come
         // parallel to the drive line.
         Vec3 delta = right * sqrt(m_distance_2) * 1.3f;

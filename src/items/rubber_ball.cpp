@@ -100,7 +100,7 @@ RubberBall::RubberBall(AbstractKart *kart)
     // initialises the current graph node
     TrackSector::update(getXYZ());
     const Vec3& normal =
-        QuadGraph::get()->getNode(getCurrentGraphNode()).getNormal();
+        QuadGraph::get()->getNode(getCurrentGraphNode())->getNormal();
     TerrainInfo::update(getXYZ(), -normal);
     initializeControlPoints(m_owner->getXYZ());
 
@@ -136,7 +136,7 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
     // left or right when firing the ball off track.
     getNextControlPoint();
     m_control_points[2]     =
-        QuadGraph::get()->getNode(m_last_aimed_graph_node).getCenter();
+        QuadGraph::get()->getNode(m_last_aimed_graph_node)->getCenter();
 
     // This updates m_last_aimed_graph_node, and sets m_control_points[3]
     getNextControlPoint();
@@ -201,12 +201,12 @@ unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index,
 
     unsigned int sect =
         lin_world->getSectorForKart(m_target);
-    succ = QuadGraph::get()->getNode(node_index).getSuccessorToReach(sect);
+    succ = QuadGraph::get()->getNode(node_index)->getSuccessorToReach(sect);
 
     if(dist)
         *dist += QuadGraph::get()->getNode(node_index)
-                .getDistanceToSuccessor(succ);
-    return QuadGraph::get()->getNode(node_index).getSuccessor(succ);
+                 ->getDistanceToSuccessor(succ);
+    return QuadGraph::get()->getNode(node_index)->getSuccessor(succ);
 }   // getSuccessorToHitTarget
 
 // ----------------------------------------------------------------------------
@@ -236,9 +236,9 @@ void RubberBall::getNextControlPoint()
 
     m_last_aimed_graph_node = next;
     m_length_cp_2_3         = dist;
-    const Quad &quad        =
+    const GraphNode* gn     =
         QuadGraph::get()->getNode(m_last_aimed_graph_node);
-    m_control_points[3]     = quad.getCenter();
+    m_control_points[3]     = gn->getCenter();
 }   // getNextControlPoint
 
 // ----------------------------------------------------------------------------

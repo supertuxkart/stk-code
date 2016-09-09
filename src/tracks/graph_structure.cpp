@@ -168,7 +168,7 @@ void GraphStructure::createMesh(bool show_invisible,
 
     m_mesh_buffer->append(new_v, n*4, ind, n*6);
 
-    if (hasLapLine())
+    if (0)
     {
         video::S3DVertex lap_v[4];
         irr::u16         lap_ind[6];

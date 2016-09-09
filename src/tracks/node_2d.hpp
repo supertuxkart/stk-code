@@ -47,9 +47,9 @@ public:
            const Vec3 &normal, unsigned int node_index, bool invisible,
            bool ai_ignore);
     // ------------------------------------------------------------------------
-    virtual void getDistances(const Vec3 &xyz, Vec3 *result) OVERRIDE;
+    virtual void getDistances(const Vec3 &xyz, Vec3 *result) const OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual float getDistance2FromPoint(const Vec3 &xyz) OVERRIDE;
+    virtual float getDistance2FromPoint(const Vec3 &xyz) const OVERRIDE;
 
 };
 #endif

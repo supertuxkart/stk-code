@@ -228,7 +228,7 @@ void ItemManager::insertItem(Item *item)
         // If the item is on the driveline, store it at the appropriate index
         if(graph_node > -1)
         {
-            int sector = QuadGraph::get()->getNode(graph_node).getNodeIndex();
+            int sector = QuadGraph::get()->getNode(graph_node)->getNodeIndex();
             (*m_items_in_quads)[sector].push_back(item);
         }
         else  // otherwise store it in the 'outside' index
