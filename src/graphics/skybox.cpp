@@ -170,6 +170,15 @@ void Skybox::generateCubeMapFromTextures()
         image->copyToScaling(rgba[i], size, size);
         image->drop();
 
+#if defined(USE_GLES2)
+        for (unsigned int j = 0; j < size * size; j++)
+        {
+            char tmp_val = rgba[i][j*4];
+            rgba[i][j*4] = rgba[i][j*4 + 2];
+            rgba[i][j*4 + 2] = tmp_val;
+        }
+#endif
+
         if (i == 2 || i == 3)
         {
             char *tmp = new char[size * size * 4];
@@ -188,15 +197,14 @@ void Skybox::generateCubeMapFromTextures()
 #if !defined(USE_GLES2)
         GLint internal_format = CVS->isTextureCompressionEnabled() ?
                                     GL_COMPRESSED_SRGB_ALPHA : GL_SRGB_ALPHA;
+        GLint format = GL_BGRA;
 #else
-        // The GL_SRGB_ALPHA_EXT and GL_SRGB8_ALPHA8 formats are available in
-        // OpenGL ES, but they produce black texture for some reason.
-        // The basic GL_RGBA format works fine though.
-        GLint internal_format = GL_RGBA;
+        GLint internal_format = GL_RGBA8;
+        GLint format = GL_RGBA;
 #endif
 
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
-                     internal_format, size, size, 0, GL_BGRA,
+                     internal_format, size, size, 0, format,
                      GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
@@ -213,8 +221,13 @@ void Skybox::generateSpecularCubemap()
     size_t cubemap_size = 256;
     for (int i = 0; i < 6; i++)
     {
+#if !defined(USE_GLES2)
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F,
                      cubemap_size, cubemap_size, 0, GL_BGRA, GL_FLOAT, 0);
+#else
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8,
+                     cubemap_size, cubemap_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+#endif
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
