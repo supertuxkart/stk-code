@@ -178,6 +178,7 @@ void MaxSpeed::SpeedIncrease::rewindTo(BareNetworkString *buffer,
     {
         m_max_add_speed   = buffer->getFloat();
         m_duration        = buffer->getFloat();
+        m_fade_out_time   = buffer->getFloat();
         m_current_speedup = buffer->getFloat();
         m_engine_force    = buffer->getFloat();
     }
@@ -334,11 +335,10 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
     // ------------------------
     // Get the bit pattern of all active slowdowns
     uint8_t active_slowdown = 0;
-    for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
+    for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<=1)
     {
-        active_slowdown <<= 1;
         if (m_speed_decrease[i].isActive()) 
-            active_slowdown |= 1;
+            active_slowdown |= b;
     }
     buffer->addUInt8(active_slowdown);
 
@@ -352,10 +352,10 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
     // --------------------------
     // Get the bit pattern of all active speedups
     uint8_t active_speedups = 0;
-    for(unsigned int i=MS_INCREASE_MIN; i<MS_INCREASE_MAX; i++)
+    for(unsigned int i=MS_INCREASE_MIN, b=1; i<MS_INCREASE_MAX; i++, b <<= 1)
     {
-        active_speedups <<= 1;
-        if(m_speed_increase[i].isActive()) active_speedups |= 1;
+        if(m_speed_increase[i].isActive())
+            active_speedups |= b;
     }
     buffer->addUInt8(active_speedups);
     for(unsigned int i=MS_INCREASE_MIN, b=1; i<MS_INCREASE_MAX; i++, b <<= 1)
