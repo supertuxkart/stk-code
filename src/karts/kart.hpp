@@ -436,6 +436,8 @@ public:
     /** Returns the terrain info oject. */
     virtual const TerrainInfo *getTerrainInfo() const { return m_terrain_info; }
     // ------------------------------------------------------------------------
+    virtual void updateTerrainInfo();
+    // ------------------------------------------------------------------------
     virtual void setOnScreenText(const wchar_t *text);
     // ------------------------------------------------------------------------
     /** Returns the normal of the terrain the kart is over atm. This is

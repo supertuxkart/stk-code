@@ -661,18 +661,9 @@ btTransform LinearWorld::getRescueTransform(unsigned int index) const
     }
     else q1 = btQuaternion(Vec3(0,1,0),0);
 
-    btQuaternion q2(btVector3(0,1,0), m_track->getAngle(index));
-
     // First apply the heading change, than the 'parallelisation' to the plane
+    btQuaternion q2(btVector3(0,1,0), m_track->getAngle(index));
     pos.setRotation(q1*q2);
-#ifdef DEBUG
-    btQuaternion r = q1*q2;
-    btVector3 axis = r.getAxis();
-    float angle = r.getAngle();
-    //Log::debug("rescue", "%d angle %f axis %f %f %f pos %f %f %f",
-    //             index, angle, axis.getX(),axis.getY(),axis.getZ(),
-    //            xyz.getX(),xyz.getY(),xyz.getZ());
-#endif
     return pos;
 }   // getRescueTransform
 

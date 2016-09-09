@@ -2380,23 +2380,14 @@ const core::vector3df& Track::getSunRotation()
 
 bool Track::findGround(AbstractKart *kart)
 {
-    btVector3 to(kart->getXYZ());
-    Vec3 quadNormal(0, 1, 0);;
-    if (QuadGraph::get())
-    {
-        int sector = ((LinearWorld*)World::getWorld())->getTrackSector(kart->getWorldKartId()).getCurrentGraphNode();
-        if (sector != QuadGraph::UNKNOWN_SECTOR)
-            quadNormal = QuadGraph::get()->getNode(sector)->getNormal();
-    }
-
-    to = to + -1000.0f*quadNormal;
+    const Vec3 &xyz = kart->getXYZ();
+    Vec3 down = kart->getTrans().getBasis() * Vec3(0, -10000.0f, 0);
 
     // Material and hit point are not needed;
     const Material *m;
     Vec3 hit_point, normal;
-    bool over_ground = m_track_mesh->castRay(kart->getXYZ(), to, &hit_point,
+    bool over_ground = m_track_mesh->castRay(xyz, down, &hit_point,
                                              &m, &normal);
-    const Vec3 &xyz = kart->getXYZ();
     if(!over_ground)
     {
         Log::warn("physics", "Kart at (%f %f %f) can not be dropped.",
@@ -2432,7 +2423,7 @@ bool Track::findGround(AbstractKart *kart)
     // it). On the other hand this initial bouncing looks nice imho
     // - so I'll leave it in for now.
     float offset = kart->getKartProperties()->getSuspensionRest();
-    t.setOrigin(hit_point + quadNormal * offset);
+    t.setOrigin(hit_point + normal * offset);
     kart->getBody()->setCenterOfMassTransform(t);
     kart->setTrans(t);
 

@@ -98,6 +98,9 @@ RescueAnimation::~RescueAnimation()
                 camera->setMode(Camera::CM_NORMAL);
         }
     }
+    // Update the terrain info based on the moved position now, as
+    // updatePhysics in kart requires the normal from moved position to work
+    m_kart->updateTerrainInfo();
 }   // ~RescueAnimation
 
 // ----------------------------------------------------------------------------

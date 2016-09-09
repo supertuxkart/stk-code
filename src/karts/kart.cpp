@@ -1328,33 +1328,7 @@ void Kart::update(float dt)
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
 
-    // After the physics step was done, the position of the wheels (as stored
-    // in wheelInfo) is actually outdated, since the chassis was moved
-    // according to the force acting from the wheels. So the cnter of the
-    // chassis is not at the center of the wheels anymore, it is somewhat
-    // moved forward (depending on speed and fps). In very extreme cases
-    // (see bug 2246) the center of the chassis can actually be ahead of the
-    // front wheels. So if we do a raycast to detect the terrain from the
-    // current chassis, that raycast might be ahead of the wheels - which
-    // results in incorrect rescues (the wheels are still on the ground,
-    // but the raycast happens ahead of the front wheels and are over
-    // a rescue texture).
-    // To avoid this problem, we do the raycast for terrain detection from
-    // the center of the 4 wheel positions (in world coordinates).
-
-    Vec3 from(0, 0, 0);
-    for (unsigned int i = 0; i < 4; i++)
-        from += m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS;
-
-    // Add a certain epsilon (0.3) to the height of the kart. This avoids
-    // problems of the ray being cast from under the track (which happened
-    // e.g. on tux tollway when jumping down from the ramp, when the chassis
-    // partly tunnels through the track). While tunneling should not be
-    // happening (since Z velocity is clamped), the epsilon is left in place
-    // just to be on the safe side (it will not hit the chassis itself).
-    from = from/4 + (getTrans().getBasis() * Vec3(0,0.3f,0));
-
-    m_terrain_info->update(getTrans().getBasis(), from);
+    updateTerrainInfo();
 
     if(m_body->getBroadphaseHandle())
     {
@@ -1500,6 +1474,38 @@ void Kart::update(float dt)
     }
 
 }   // update
+
+//-----------------------------------------------------------------------------
+void Kart::updateTerrainInfo()
+{
+    // After the physics step was done, the position of the wheels (as stored
+    // in wheelInfo) is actually outdated, since the chassis was moved
+    // according to the force acting from the wheels. So the cnter of the
+    // chassis is not at the center of the wheels anymore, it is somewhat
+    // moved forward (depending on speed and fps). In very extreme cases
+    // (see bug 2246) the center of the chassis can actually be ahead of the
+    // front wheels. So if we do a raycast to detect the terrain from the
+    // current chassis, that raycast might be ahead of the wheels - which
+    // results in incorrect rescues (the wheels are still on the ground,
+    // but the raycast happens ahead of the front wheels and are over
+    // a rescue texture).
+    // To avoid this problem, we do the raycast for terrain detection from
+    // the center of the 4 wheel positions (in world coordinates).
+
+    Vec3 from(0, 0, 0);
+    for (unsigned int i = 0; i < 4; i++)
+        from += m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS;
+
+    // Add a certain epsilon (0.3) to the height of the kart. This avoids
+    // problems of the ray being cast from under the track (which happened
+    // e.g. on tux tollway when jumping down from the ramp, when the chassis
+    // partly tunnels through the track). While tunneling should not be
+    // happening (since Z velocity is clamped), the epsilon is left in place
+    // just to be on the safe side (it will not hit the chassis itself).
+    from = from/4 + (getTrans().getBasis() * Vec3(0,0.3f,0));
+
+    m_terrain_info->update(getTrans().getBasis(), from);
+}   // updateTerrainInfo
 
 //-----------------------------------------------------------------------------
 /** Show fire to go with a zipper.
