@@ -847,12 +847,14 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
             if(dist_2<min_dist_2)
             {
                 const GraphNode* gn = getNode(next_sector);
-                float dist    = xyz.getY() - gn->getMinHeight();
+                const bool is_3d = (dynamic_cast<const Node3D*>(gn) != NULL);
+                float dist = xyz.getY() - gn->getMinHeight();
                 // While negative distances are unlikely, we allow some small
                 // negative numbers in case that the kart is partly in the
                 // track. Only do the height test in phase==0, in phase==1
-                // accept any point, independent of height.
-                if(phase==1 || (dist < 5.0f && dist>-1.0f) )
+                // accept any point, independent of height, or this node is 3d
+                // which already takes height into account
+                if(phase==1 || (dist < 5.0f && dist>-1.0f) || is_3d)
                 {
                     min_dist_2 = dist_2;
                     min_sector = next_sector;
