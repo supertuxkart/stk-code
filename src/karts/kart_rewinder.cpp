@@ -22,6 +22,7 @@
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/max_speed.hpp"
+#include "karts/skidding.hpp"
 #include "modes/world.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/network_string.hpp"
@@ -89,6 +90,10 @@ BareNetworkString* KartRewinder::saveState() const
     // ------------------
     m_max_speed->saveState(buffer);
 
+    // 6) Skidding
+    // -----------
+    m_skidding->saveState(buffer);
+
     return buffer;
 }   // saveState
 
@@ -124,6 +129,10 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     // 5) Max speed info
     // ------------------
     m_max_speed->rewindTo(buffer);
+
+    // 6) Skidding
+    // -----------
+    m_skidding->rewindTo(buffer);
     return;
 }   // rewindToState
 

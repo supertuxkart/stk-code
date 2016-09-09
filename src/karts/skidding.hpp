@@ -23,6 +23,7 @@
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 
+class BareNetworkString;
 class Kart;
 class ShowCurve;
 
@@ -98,13 +99,15 @@ private:
 
     unsigned int getSkidBonus(float *bonus_time, float *bonus_speed,
                               float *bonus_force) const;
-    void  updateSteering(float steer, float dt);
+    float updateSteering(float steer, float dt);
 public:
          Skidding(Kart *kart);
         ~Skidding();
     void reset();
     void update(float dt, bool is_on_ground, float steer,
                 KartControl::SkidControl skidding);
+    void saveState(BareNetworkString *buffer);
+    void rewindTo(BareNetworkString *buffer);
     // ------------------------------------------------------------------------
     /** Determines how much the graphics model of the kart should be rotated
      *  additionally (for skidding), depending on how long the kart has been
