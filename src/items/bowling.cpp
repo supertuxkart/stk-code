@@ -58,21 +58,11 @@ Bowling::Bowling(AbstractKart *kart)
         if(m_speed < min_speed) m_speed = min_speed;
     }
 
-    Vec3 quadNormal;
-    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
-        race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
-    {
-        unsigned int sector = ((LinearWorld*)World::getWorld())->
-            getTrackSector(kart->getWorldKartId()).getCurrentGraphNode();
-        quadNormal = QuadGraph::get()->getNode(sector)->getNormal();
-    }
-    else
-        quadNormal = btVector3(.0f, 1.0f, .0f);
-
+    const Vec3& normal = kart->getNormal();
     createPhysics(y_offset, btVector3(0.0f, 0.0f, m_speed*2),
                   new btSphereShape(0.5f*m_extend.getY()),
                   0.8f /*restitution*/,
-                  -70.0f*quadNormal /*gravity*/,
+                  -70.0f*normal /*gravity*/,
                   true /*rotates*/);
     // Even if the ball is fired backwards, m_speed must be positive,
     // otherwise the ball can start to vibrate when energy is added.

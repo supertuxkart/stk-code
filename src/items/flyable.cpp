@@ -28,6 +28,7 @@
 
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/stars.hpp"
 #include "io/xml_node.hpp"
@@ -101,7 +102,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
  */
 void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
                             btCollisionShape *shape,
-                            float restitution, const btVector3 gravity,
+                            float restitution, const btVector3& gravity,
                             const bool rotates, const bool turn_around,
                             const btTransform* custom_direction)
 {
@@ -341,8 +342,6 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
     float aimX = time*target_x_speed + relative_target_kart_loc.getX();
     float aimZ = time*target_z_speed + relative_target_kart_loc.getZ();
 
-    Vec3 velocityXZ = Vec3(aimX, 0, aimZ).normalize() * item_XZ_speed;
-    
     assert(time!=0);
     float angle = atan2f(aimX, aimZ);
     
@@ -399,19 +398,22 @@ bool Flyable::updateAndDelete(float dt)
         // Add the position offset so that the flyable can adjust its position
         // (usually to do the raycast from a slightly higher position to avoid
         // problems finding the terrain in steep uphill sections).
-        // Towards is a unit vector. so we can multiply -towards to offset the position
-        // by one unit.
+        // Towards is a unit vector. so we can multiply -towards to offset the
+        // position by one unit.
         TerrainInfo::update(xyz + m_position_offset*(-towards), towards);
-        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
-            race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
+
+        // Make flyable anti-gravity when the it's projected on such surface
+        const Material* m = TerrainInfo::getMaterial();
+        if (m && m->hasGravity())
         {
-            Vec3 normal = TerrainInfo::getNormal();
-            float g = World::getWorld()->getTrack()->getGravity();
-            getBody()->setGravity(-g*normal);
+            getBody()->setGravity(TerrainInfo::getNormal() * -70.0f);
+        }
+        else
+        {
+            getBody()->setGravity(Vec3(0, 1, 0) * -70.0f);
         }
     }
 
-    
     if(m_adjust_up_velocity)
     {
         float hat = (xyz - getHitPoint()).length();

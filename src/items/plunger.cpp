@@ -58,7 +58,6 @@ Plunger::Plunger(AbstractKart *kart)
                    kart /* search in front of this kart */, m_reverse_mode);
 
     btTransform kart_transform = kart->getAlignedTransform();
-    btMatrix3x3 kart_rotation = kart_transform.getBasis();
 
     float heading =kart->getHeading();
     float pitch  = kart->getTerrainPitch(heading);
