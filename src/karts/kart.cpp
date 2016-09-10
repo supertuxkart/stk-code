@@ -295,7 +295,10 @@ void Kart::reset()
     // mode) - but only if they actually have a body (e.g. ghost karts
     // don't have one).
     if(m_body)
+    {
+        World::getWorld()->getPhysics()->removeKart(this);
         World::getWorld()->getPhysics()->addKart(this);
+    }
 
     m_min_nitro_time = 0.0f;
 
@@ -684,10 +687,8 @@ void Kart::createPhysics()
         wheel.m_frictionSlip             = m_kart_properties->getFrictionSlip();
         wheel.m_rollInfluence            = m_kart_properties->getStabilityRollInfluence();
     }
-    // Obviously these allocs have to be properly managed/freed
-    btTransform t;
-    t.setIdentity();
-    World::getWorld()->getPhysics()->addKart(this);
+    // Body to be added in reset() which allows complete reset kart when
+    // restarting the race
 
 }   // createPhysics
 
@@ -1345,7 +1346,7 @@ void Kart::update(float dt)
             float g = World::getWorld()->getTrack()->getGravity();
             Vec3 gravity(0, -g, 0);
             btRigidBody *body = getVehicle()->getRigidBody();
-            //body->setGravity(gravity);
+            body->setGravity(gravity);
         }
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;

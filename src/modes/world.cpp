@@ -693,69 +693,9 @@ void World::resetAllKarts()
         }
     }
 
-    bool all_finished=false;
-    // kart->isInRest() is not fully correct, since it only takes the
-    // velocity in count, which might be close to zero when the kart
-    // is just hitting the floor, before being pushed up again by
-    // the suspension. So we just do a longer initial simulation,
-    // which should be long enough for all karts to be firmly on ground.
+    // Do a longer initial simulation, which should be long enough for all
+    // karts to be firmly on ground.
     for(int i=0; i<60; i++) m_physics->update(1.f/60.f);
-
-    // Stil wait will all karts are in rest (and handle the case that a kart
-    // fell through the ground, which can happen if a kart falls for a long
-    // time, therefore having a high speed when hitting the ground.
-    int count = 0;
-    while(!all_finished)
-    {
-        if (count++ > 100)
-        {
-            Log::error("World", "Infinite loop waiting for all_finished?");
-            break;
-        }
-        m_physics->update(1.f/60.f);
-        all_finished=true;
-        for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
-        {
-            if ((*i)->isGhostKart()) continue;
-            if(!(*i)->isInRest())
-            {
-                Vec3            normal;
-                Vec3            hit_point;
-                const Material *material;
-                // We can't use (*i)->getXYZ(), since this is only defined
-                // after update() was called. Instead we have to get the
-                // real position of the rigid body.
-                btTransform     t;
-                (*i)->getBody()->getMotionState()->getWorldTransform(t);
-                // This test can not be done only once before the loop, since
-                // it can happen that the kart falls through the track later!
-                Vec3 to = t.getOrigin()+Vec3(0, -10000, 0);
-                m_track->getTriangleMesh().castRay(t.getOrigin(), to,
-                                                   &hit_point, &material,
-                                                   &normal);
-                if(!material)
-                {
-                    Log::error("World",
-                               "No valid starting position for kart %d "
-                               "on track %s.",
-                               (int)(i-m_karts.begin()),
-                               m_track->getIdent().c_str());
-                    if (UserConfigParams::m_artist_debug_mode)
-                    {
-                        Log::warn("World", "Activating fly mode.");
-                        (*i)->flyUp();
-                        continue;
-                    }
-                    else
-                    {
-                        exit(-1);
-                    }
-                }
-                all_finished=false;
-                break;
-            }
-        }
-    }   // while
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
