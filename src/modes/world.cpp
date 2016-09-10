@@ -811,6 +811,10 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     // This will set the physics transform
     m_track->findGround(kart);
 
+    // Update the terrain info based on the moved position now, as
+    // updatePhysics in kart requires the normal from moved position to work
+    kart->updateTerrainInfo();
+
 }   // moveKartTo
 
 // ----------------------------------------------------------------------------
