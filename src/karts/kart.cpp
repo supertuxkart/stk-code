@@ -2423,21 +2423,10 @@ void Kart::updateSliding()
          (!getMaterial() || !getMaterial()->highTireAdhesion()))
     {
         const btMatrix3x3 &m = m_vehicle->getChassisWorldTransform().getBasis();
-        float distanceFromUp;
-        if (QuadGraph::get())
-        {
-            int sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
-            Vec3 quadNormal = QuadGraph::get()->getNode(sector)->getNormal();
-            Vec3 kart_up = m.getColumn(1);
-            distanceFromUp = kart_up.dot(quadNormal);
-        }
-        else
-        {
-            // To get the angle between up=(0,1,0), we have to do:
-            // m*(0,1,0) to get the up vector of the kart, then the
-            // scalar product between this and (0,1,0) - which is m[1][1]:
-            distanceFromUp = m[1][1];
-        }
+        // To get the angle between up=(0,1,0), we have to do:
+        // m*(0,1,0) to get the up vector of the kart, then the
+        // scalar product between this and (0,1,0) - which is m[1][1]:
+        float distanceFromUp = m[1][1];
 
         if (distanceFromUp < 0.85f)
         {
