@@ -58,6 +58,7 @@
 #include "tracks/check_manager.hpp"
 #include "tracks/graph_node.hpp"
 #include "tracks/model_definition_loader.hpp"
+#include "tracks/node_3d.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -2262,19 +2263,40 @@ void Track::itemCommand(const XMLNode *node)
     }
 
     Vec3 loc(xyz);
-    // if only 2d coordinates are given, let the item fall from very high
-    if(drop)
+
+    // Test if the item lies on a 3d node, if so adjust the normal
+    // Also do a raycast if drop item is given
+    Vec3 normal(0, 1, 0);
+    Vec3 hit_point = loc;
+    Node3D* node_3d = NULL;
+    if (QuadGraph::get())
     {
+        int road_sector = QuadGraph::UNKNOWN_SECTOR;
+        QuadGraph::get()->findRoadSector(xyz, &road_sector);
+        // If a valid road_sector is not found
+        if (road_sector == QuadGraph::UNKNOWN_SECTOR)
+            road_sector = QuadGraph::get()->findOutOfRoadSector(xyz, road_sector);
+        node_3d = dynamic_cast<Node3D*>(QuadGraph::get()->getNode(road_sector));
+    }
+
+    Vec3 quad_normal = node_3d ? node_3d->getNormal() : Vec3(0, 1, 0);
+    if (node_3d || drop)
+    {
+        const Material *m;
         // If raycast is used, increase the start position slightly
         // in case that the point is too close to the actual surface
         // (e.g. floating point errors can cause a problem here).
-        loc += Vec3(0,0.1f,0);
+        // Only do so for 2d node
+        if (node_3d == NULL)
+            loc += Vec3(0.0f, 0.1f, 0.0f);
+
 #ifndef DEBUG
-        // Avoid unused variable warning in case of non-debug compilation.
-        setTerrainHeight(&loc);
+        m_track_mesh->castRay(loc, loc + (-10000 * quad_normal), &hit_point,
+            &m, &normal);
 #else
-        bool drop_success = setTerrainHeight(&loc);
-        if(!drop_success)
+        bool drop_success = m_track_mesh->castRay(loc, loc +
+            (-10000 * quad_normal), &hit_point, &m, &normal);
+        if (!drop_success)
         {
             Log::warn("track",
                       "Item at position (%f,%f,%f) can not be dropped",
@@ -2284,47 +2306,9 @@ void Track::itemCommand(const XMLNode *node)
 #endif
     }
 
-    // Tilt the items according to the track
-    Vec3 normal(0,1,0);
-    if (QuadGraph::get())
-    {
-        int road_sector = QuadGraph::UNKNOWN_SECTOR;
-        QuadGraph::get()->findRoadSector(xyz, &road_sector);
-        // If a valid road_sector is not found
-        if (road_sector == QuadGraph::UNKNOWN_SECTOR)
-            road_sector = QuadGraph::get()->findOutOfRoadSector(xyz, road_sector);
-        const Vec3& quadnormal = QuadGraph::get()->getNode(road_sector)->getNormal();
-
-        const Material *m;
-        Vec3 hit_point;
-        m_track_mesh->castRay(loc, loc + -1.0f*quadnormal, &hit_point, &m, &normal);
-    }
-    ItemManager::get()->newItem(type, loc, normal);
+    ItemManager::get()->newItem(type, drop ? hit_point : loc,
+        node_3d ? normal : Vec3(0, 1, 0));
 }   // itemCommand
-
-// ----------------------------------------------------------------------------
-/** Does a raycast from the given position, and if terrain was found
- *  adjust the Y position of the given vector to the actual terrain
- *  height. If no terrain is found, false is returned and the
- *  y position is not modified.
- *  \param pos Pointer to the position at which to determine the
- *         height. If terrain is found, its Y position will be
- *         set to the actual height.
- *  \return True if terrain was found and the height was adjusted.
- */
-bool Track::setTerrainHeight(Vec3 *pos) const
-{
-    Vec3  hit_point;
-    Vec3  normal;
-    const Material *m;
-    Vec3 to=*pos+Vec3(0,-10000,0);
-    if(m_track_mesh->castRay(*pos, to, &hit_point, &m, &normal))
-    {
-        pos->setY(hit_point.getY());
-        return true;
-    }
-    return false;
-}   // setTerrainHeight
 
 // ----------------------------------------------------------------------------
 

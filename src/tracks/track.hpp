@@ -402,7 +402,6 @@ public:
     void               removeCachedData  ();
     void               startMusic        () const;
 
-    bool               setTerrainHeight(Vec3 *pos) const;
     void               createPhysicsModel(unsigned int main_track_count);
     void               update(float dt);
     void               reset();
