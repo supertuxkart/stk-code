@@ -432,8 +432,6 @@ public:
     /** Returns the terrain info oject. */
     virtual const TerrainInfo *getTerrainInfo() const = 0;
     // ------------------------------------------------------------------------
-    virtual void updateTerrainInfo() = 0;
-    // ------------------------------------------------------------------------
     /** Called when the kart crashes against another kart.
      *  \param k The kart that was hit.
      *  \param update_attachments If true the attachment of this kart and the
