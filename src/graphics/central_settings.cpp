@@ -49,6 +49,10 @@ void CentralVideoSettings::init()
     hasUBO = false;
     hasExplicitAttribLocation = false;
     hasGS = false;
+    
+#if defined(USE_GLES2)
+    hasBGRA = false;
+#endif
 
     m_GI_has_artifact = false;
     m_need_rh_workaround = false;
@@ -218,6 +222,15 @@ void CentralVideoSettings::init()
             hasAtomics = true;
             hasSSBO = true;
         }
+        
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_FORMAT_BGRA8888) &&
+            (hasGLExtension("GL_IMG_texture_format_BGRA8888") ||
+             hasGLExtension("GL_EXT_texture_format_BGRA8888")))
+        {
+            hasBGRA = true;
+            Log::info("GLDriver", "EXT texture format BGRA8888 Present");
+        }
+            
 #endif
     }
 }
@@ -336,6 +349,13 @@ bool CentralVideoSettings::isARBMultiDrawIndirectUsable() const
 {
     return hasMultiDrawIndirect;
 }
+
+#if defined(USE_GLES2)
+bool CentralVideoSettings::isEXTTextureFormatBGRA8888Usable() const
+{
+    return hasBGRA;
+}
+#endif
 
 bool CentralVideoSettings::supportsShadows() const
 {

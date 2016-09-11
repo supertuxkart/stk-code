@@ -57,6 +57,9 @@ namespace GraphicsRestrictions
             "TextureCompressionS3TC",
             "AMDVertexShaderLayer",
             "ExplicitAttribLocation",
+#if defined(USE_GLES2)
+            "TextureFormatBGRA8888",
+#endif
             "DriverRecentEnough",
             "HighDefinitionTextures",
             "AdvancedPipeline",
