@@ -1481,7 +1481,7 @@ void Kart::updateTerrainInfo()
 {
     // After the physics step was done, the position of the wheels (as stored
     // in wheelInfo) is actually outdated, since the chassis was moved
-    // according to the force acting from the wheels. So the cnter of the
+    // according to the force acting from the wheels. So the center of the
     // chassis is not at the center of the wheels anymore, it is somewhat
     // moved forward (depending on speed and fps). In very extreme cases
     // (see bug 2246) the center of the chassis can actually be ahead of the

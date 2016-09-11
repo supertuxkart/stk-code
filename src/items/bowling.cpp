@@ -61,7 +61,7 @@ Bowling::Bowling(AbstractKart *kart)
     const Vec3& normal = kart->getNormal();
     createPhysics(y_offset, btVector3(0.0f, 0.0f, m_speed*2),
                   new btSphereShape(0.5f*m_extend.getY()),
-                  0.8f /*restitution*/,
+                  0.4f /*restitution*/,
                   -70.0f*normal /*gravity*/,
                   true /*rotates*/);
     // Even if the ball is fired backwards, m_speed must be positive,
