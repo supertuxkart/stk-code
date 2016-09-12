@@ -23,6 +23,7 @@
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "karts/abstract_kart.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -131,9 +132,17 @@ void History::updateReplay(float dt)
     {
         Log::info("History", "Replay finished");
         m_current = 0;
+        // This is useful to use a reproducable rewind problem:
+        // replay it with history, for debugging only
+#undef DO_REWIND_AT_END_OF_HISTORY
+#ifdef DO_REWIND_AT_END_OF_HISTORY
+        RewindManager::get()->rewindTo(5.0f);
+        exit(-1);
+#else
         // Note that for physics replay all physics parameters
         // need to be reset, e.g. velocity, ...
         world->reset();
+#endif
     }
     unsigned int num_karts = world->getNumKarts();
     for(unsigned k=0; k<num_karts; k++)
@@ -147,7 +156,7 @@ void History::updateReplay(float dt)
         }
         else
         {
-            kart->setControls(m_all_controls[index]);
+            kart->getControls().set(m_all_controls[index]);
         }
     }
 }   // updateReplay
@@ -314,6 +323,11 @@ void History::Load()
         sscanf(s, "delta: %f\n",&m_all_deltas[i]);
     }
 
+    // We need to disable the rewind manager here (otherwise setting the
+    // KartControl data would access the rewind manager).
+    bool rewind_manager_was_enabled = RewindManager::isEnabled();
+    RewindManager::setEnable(false);
+
     for(int i=0; i<m_size; i++)
     {
         for(unsigned int k=0; k<num_karts; k++)
@@ -334,6 +348,8 @@ void History::Load()
             m_all_controls[index].setButtonsCompressed(char(buttonsCompressed));
         }   // for i
     }   // for k
+    RewindManager::setEnable(rewind_manager_was_enabled);
+
     fprintf(fd, "History file end.\n");
     fclose(fd);
 }   // Load

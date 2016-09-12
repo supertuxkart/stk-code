@@ -61,6 +61,7 @@ public:
     void setRescue(bool b);
     void setFire(bool b);
     void setLookBack(bool b);
+    void set(const KartControl &c);
 
     // ------------------------------------------------------------------------
     KartControl()

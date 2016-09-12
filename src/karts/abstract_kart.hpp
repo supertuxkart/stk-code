@@ -116,9 +116,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns all controls of this kart - const version. */
     const KartControl& getControls() const { return m_controls; }
-    // ------------------------------------------------------------------------
-    /** Sets the kart controls. Used e.g. by replaying history. */
-    void setControls(const KartControl &c) { m_controls = c; }
 
     // ========================================================================
     // Access to the kart properties.
