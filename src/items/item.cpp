@@ -52,6 +52,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
         m_original_rotation = btQuaternion(axis, normal.angle(Vec3(0, 1, 0)));
     }
 
+    m_rotation_angle    = 0.0f;
     m_original_mesh     = mesh;
     m_original_lowmesh  = lowres_mesh;
     m_listener          = NULL;
