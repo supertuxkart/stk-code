@@ -2273,10 +2273,12 @@ void Track::itemCommand(const XMLNode *node)
     {
         int road_sector = QuadGraph::UNKNOWN_SECTOR;
         QuadGraph::get()->findRoadSector(xyz, &road_sector);
-        // If a valid road_sector is not found
-        if (road_sector == QuadGraph::UNKNOWN_SECTOR)
-            road_sector = QuadGraph::get()->findOutOfRoadSector(xyz, road_sector);
-        node_3d = dynamic_cast<Node3D*>(QuadGraph::get()->getNode(road_sector));
+        // Only do custom direction of raycast if item is on quad graph
+        if (road_sector != QuadGraph::UNKNOWN_SECTOR)
+        {
+            node_3d =
+                dynamic_cast<Node3D*>(QuadGraph::get()->getNode(road_sector));
+        }
     }
 
     Vec3 quad_normal = node_3d ? node_3d->getNormal() : Vec3(0, 1, 0);
