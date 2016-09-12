@@ -101,7 +101,10 @@ private:
      *  (bubble gums don't rotate, but it will be replaced with
      *  a nitro which rotates, and so overwrites the original
      *  rotation). */
-    Vec3 m_original_hpr;
+    btQuaternion  m_original_rotation;
+
+    /** Used when rotating the item */
+    float         m_rotation_angle;
 
     /** True if item was collected & is not displayed. */
     bool          m_collected;

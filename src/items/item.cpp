@@ -41,16 +41,15 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 
     m_distance_2        = 1.2f;
     initItem(type, xyz);
-    //* Rotate item depending on the normal */
-    if (normal.angle(Vec3(0, 1, 0))!= 0)
+    if (-normal.cross(Vec3(0, 1, 0)).length() == 0)
     {
-        m_original_hpr.setHPR(btQuaternion(-normal.cross(Vec3(0, 1, 0)),
-                                           normal.angle(Vec3(0, 1, 0))));
+        Vec3 axis(0, 0, 1);
+        m_original_rotation = btQuaternion(axis, normal.angle(Vec3(0, 1, 0)));
     }
     else
     {
-        // Sets heading to 0, and sets pitch and roll depending on the normal. */
-        m_original_hpr  = Vec3(0, normal);
+        Vec3 axis(-normal.cross(Vec3(0, 1, 0)));
+        m_original_rotation = btQuaternion(axis, normal.angle(Vec3(0, 1, 0)));
     }
 
     m_original_mesh     = mesh;
@@ -88,7 +87,9 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     World::getWorld()->getTrack()->adjustForFog(m_node);
     m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
     m_node->setPosition(xyz.toIrrVector());
-    m_node->setRotation(m_original_hpr.toIrrHPR());
+    Vec3 hpr;
+    hpr.setHPR(m_original_rotation);
+    m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
 
@@ -102,8 +103,8 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
 {
     m_distance_2        = distance*distance;
     initItem(ITEM_TRIGGER, xyz);
-    // Sets heading to 0, and sets pitch and roll depending on the normal. */
-    m_original_hpr      = Vec3(0, 0, 0);
+    m_original_rotation = btQuaternion(0, 0, 0, 1);
+    m_rotation_angle    = 0.0f;
     m_original_mesh     = NULL;
     m_original_lowmesh  = NULL;
     m_node              = NULL;
@@ -235,7 +236,9 @@ void Item::switchBack()
     }
 
     World::getWorld()->getTrack()->adjustForFog(m_node);
-    m_node->setRotation(m_original_hpr.toIrrHPR());
+    Vec3 hpr;
+    hpr.setHPR(m_original_rotation);
+    m_node->setRotation(hpr.toIrrHPR());
 }   // switchBack
 
 //-----------------------------------------------------------------------------
@@ -332,12 +335,17 @@ void Item::update(float dt)
 
         if(!m_rotate || m_node == NULL) return;
         // have it rotate
-        Vec3 rotation(0, dt*M_PI, 0);
-        core::vector3df r = m_node->getRotation();
-        r.Y += dt*180.0f;
-        if(r.Y>360.0f) r.Y -= 360.0f;
+        m_rotation_angle += dt * M_PI ;
+        if (m_rotation_angle > M_PI * 2) m_rotation_angle -= M_PI * 2;
 
-        m_node->setRotation(r);
+        btMatrix3x3 m;
+        m.setRotation(m_original_rotation);
+        btQuaternion r = btQuaternion(m.getColumn(1), m_rotation_angle) *
+            m_original_rotation;
+
+        Vec3 hpr;
+        hpr.setHPR(r);
+        m_node->setRotation(hpr.toIrrHPR());
         return;
     }   // not m_collected
 }   // update
