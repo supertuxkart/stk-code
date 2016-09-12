@@ -8,8 +8,13 @@ uniform float split2;
 uniform float splitmax;
 
 in vec2 uv;
+#ifdef GL_ES
+layout (location = 0) out vec4 Diff;
+layout (location = 1) out vec4 Spec;
+#else
 out vec4 Diff;
 out vec4 Spec;
+#endif
 
 #stk_include "utils/decodeNormal.frag"
 #stk_include "utils/SpecularBRDF.frag"
