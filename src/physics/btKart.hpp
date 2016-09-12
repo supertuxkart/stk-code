@@ -72,9 +72,9 @@ private:
     /** True if a zipper is active for that kart. */
     bool                m_zipper_active;
 
-    /** The zipper velocity (i.e. the velocity the kart should reach in
+    /** The zipper speed (i.e. the velocity the kart should reach in
      *  the first frame that the zipper is active). */
-    btScalar            m_zipper_velocity;
+    btScalar            m_zipper_speed;
 
     /** The angular velocity to be applied when the kart skids.
      *  0 means no skidding. */
@@ -274,6 +274,9 @@ public:
         m_additional_rotation      = rot/t;
         m_time_additional_rotation = t;
     }   // setTimedTorque
+    // ------------------------------------------------------------------------
+    /** Returns the current zipper speed. */
+    float getZipperSpeed() const { return m_zipper_speed; }
 };   // class btKart
 
 #endif //BT_KART_HPP

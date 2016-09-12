@@ -26,6 +26,7 @@
 #include "modes/world.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/network_string.hpp"
+#include "physics/btKart.hpp"
 #include "utils/vec3.hpp"
 
 #include <string.h>
@@ -73,6 +74,7 @@ BareNetworkString* KartRewinder::saveState() const
     buffer->add(body->getLinearVelocity());
     buffer->add(body->getAngularVelocity());
     buffer->addUInt8(m_has_started);   // necessary for startup speed boost
+    buffer->addFloat(m_vehicle->getZipperSpeed());
 
     // 2) Steering and other player controls
     // -------------------------------------
@@ -113,6 +115,7 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
     body->setLinearVelocity(buffer->getVec3());
     body->setAngularVelocity(buffer->getVec3());
     m_has_started = buffer->getUInt8()!=0;   // necessary for startup speed boost
+    m_vehicle->instantSpeedIncreaseTo(buffer->getFloat());
 
     // 2) Steering and other controls
     // ------------------------------

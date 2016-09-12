@@ -117,7 +117,7 @@ void btKart::reset()
     }
     m_visual_wheels_touch_ground = false;
     m_zipper_active              = false;
-    m_zipper_velocity            = btScalar(0);
+    m_zipper_speed               = btScalar(0);
     m_skid_angular_velocity      = 0;
     m_is_skidding                = false;
     m_allow_sliding              = false;
@@ -810,7 +810,7 @@ void btKart::updateFriction(btScalar timeStep)
             (btRigidBody*) wheelInfo.m_raycastInfo.m_groundObject;
         if(!groundObject) continue;
 
-        if(m_zipper_active && m_zipper_velocity > 0)
+        if(m_zipper_active && m_zipper_speed > 0)
         {
             if (wheel==2 || wheel==3)
             {
@@ -818,7 +818,7 @@ void btKart::updateFriction(btScalar timeStep)
                 // reached. So compute the impulse to accelerate the
                 // kart up to that speed:
                 m_forwardImpulse[wheel] =
-                    0.5f*(m_zipper_velocity -
+                    0.5f*(m_zipper_speed -
                           getRigidBody()->getLinearVelocity().length())
                     / m_chassisBody->getInvMass();
             }
@@ -882,8 +882,8 @@ void btKart::updateFriction(btScalar timeStep)
     }   // for (int wheel=0; wheel<getNumWheels(); wheel++)
 
 
-    m_zipper_active   = false;
-    m_zipper_velocity = 0;
+    m_zipper_active = false;
+    m_zipper_speed  = 0;
 
     // The kart just stopped skidding. Adjust the velocity so that
     // it points in the right direction.
@@ -1061,8 +1061,8 @@ void btKart::setSliding(bool active)
  */
 void btKart::instantSpeedIncreaseTo(float speed)
 {
-    m_zipper_active   = true;
-    m_zipper_velocity = speed;
+    m_zipper_active = true;
+    m_zipper_speed  = speed;
 }   // activateZipper
 
 // ----------------------------------------------------------------------------
