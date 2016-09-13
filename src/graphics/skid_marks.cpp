@@ -153,9 +153,9 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         float distance = (newPoint - start).length();
 
         m_left [m_current]->add(raycast_left-delta, raycast_left+delta,
-                                distance);
+                                m_kart.getNormal(), distance);
         m_right[m_current]->add(raycast_right-delta, raycast_right+delta,
-                                distance);
+                                m_kart.getNormal(), distance);
         // Adjust the boundary box of the mesh to include the
         // adjusted aabb of its buffers.
         core::aabbox3df aabb=m_nodes[m_current]->getMesh()
@@ -180,14 +180,16 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     delta *= m_width*0.5f;
 
     SkidMarkQuads *smq_left =
-        new SkidMarkQuads(raycast_left-delta, raycast_left+delta ,
-                          m_material, m_avoid_z_fighting, custom_color);
+        new SkidMarkQuads(raycast_left-delta, raycast_left+delta,
+                          m_kart.getNormal(), m_material, m_avoid_z_fighting,
+                          custom_color);
     scene::SMesh *new_mesh = new scene::SMesh();
     new_mesh->addMeshBuffer(smq_left);
 
     SkidMarkQuads *smq_right =
         new SkidMarkQuads(raycast_right-delta, raycast_right+delta,
-                          m_material, m_avoid_z_fighting, custom_color);
+                          m_kart.getNormal(), m_material, m_avoid_z_fighting,
+                          custom_color);
     new_mesh->addMeshBuffer(smq_right);
     scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh, "skidmark");
     if (STKMeshSceneNode* stkm = dynamic_cast<STKMeshSceneNode*>(new_node))
@@ -233,6 +235,7 @@ void SkidMarks::update(float dt, bool force_skid_marks,
 //=============================================================================
 SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
                                         const Vec3 &right,
+                                        const Vec3 &normal,
                                         video::SMaterial *material,
                                         float z_offset,
                                         video::SColor* custom_color)
@@ -250,7 +253,7 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
 
     Material   = *material;
     m_aabb     = core::aabbox3df(left.toIrrVector());
-    add(left, right, 0.0f);
+    add(left, right, normal, 0.0f);
 
 
 }   // SkidMarkQuads
@@ -261,6 +264,7 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
  */
 void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
                                    const Vec3 &right,
+                                   const Vec3 &normal,
                                    float distance)
 {
     // The skid marks must be raised slightly higher, otherwise it blends
@@ -280,13 +284,11 @@ void SkidMarks::SkidMarkQuads::add(const Vec3 &left,
         Vertices[n - 2].Color.setAlpha(m_start_alpha);
     }
 
-    v.Pos = left.toIrrVector();
-    v.Pos.Y += m_z_offset;
-    v.Normal = core::vector3df(0, 1, 0);
+    v.Pos = Vec3(left + normal * m_z_offset).toIrrVector();
+    v.Normal = normal.toIrrVector();
     v.TCoords = core::vector2df(0.0f, distance*0.5f);
     Vertices.push_back(v);
-    v.Pos = right.toIrrVector();
-    v.Pos.Y += m_z_offset;
+    v.Pos = Vec3(right + normal * m_z_offset).toIrrVector();
     v.TCoords = core::vector2df(1.0f, distance*0.5f);
     Vertices.push_back(v);
     // Out of the box Irrlicht only supports triangle meshes and not
