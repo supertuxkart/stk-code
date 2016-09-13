@@ -86,9 +86,7 @@ float AIBaseController::steerToPoint(const Vec3 &point)
 
     // First translate and rotate the point the AI is aiming
     // at into the kart's local coordinate system.
-    Vec3 lc;
-    btTransform trans = m_kart->getTrans().inverse();
-    lc = trans(point);
+    Vec3 lc = m_kart->getTrans().inverse()(point);
 
     // The point the kart is aiming at can be reached 'incorrectly' if the
     // point is below the y=x line: Instead of aiming at that point directly
@@ -287,10 +285,10 @@ void AIBaseController::checkPosition(const Vec3 &point, posData *pos_data,
                                      Vec3 *lc, bool use_front_xyz) const
 {
     // Convert to local coordinates from the point of view of current kart
-    btQuaternion q(btVector3(0, 1, 0), -m_kart->getHeading());
-    Vec3 p = point -
-        (use_front_xyz ? m_kart->getFrontXYZ() : m_kart->getXYZ());
-    Vec3 local_coordinates = quatRotate(q, p);
+    btTransform t;
+    t.setBasis(m_kart->getTrans().getBasis());
+    t.setOrigin(use_front_xyz ? m_kart->getFrontXYZ() : m_kart->getXYZ());
+    Vec3 local_coordinates = t.inverse()(point);
 
     // Save local coordinates for later use if needed
     if (lc) *lc = local_coordinates;
@@ -308,8 +306,8 @@ void AIBaseController::checkPosition(const Vec3 &point, posData *pos_data,
     else
         pos_data->behind = false;
 
-    pos_data->angle = atan2(fabsf(local_coordinates.getX()),
+    pos_data->angle = atan2f(fabsf(local_coordinates.getX()),
         fabsf(local_coordinates.getZ()));
-    pos_data->distance = p.length();
+    pos_data->distance = local_coordinates.length();
 
 }   //  checkPosition

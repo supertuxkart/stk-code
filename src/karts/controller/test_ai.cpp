@@ -1336,15 +1336,19 @@ void SkiddingAI::handleItems(const float dt)
             bool straight_ahead = false;
             if (m_kart_behind)
             {
-                posData behind_pos = {0};
-                checkPosition(m_kart_behind->getXYZ(), &behind_pos);
-                if (behind_pos.angle < 0.2f) straight_behind = true;
+                Vec3 behind_lc = m_kart->getTrans().inverse()
+                    (m_kart_behind->getXYZ());
+                const float abs_angle =
+                    atan2f(fabsf(behind_lc.x()), fabsf(behind_lc.z()));
+                if (abs_angle < 0.2f) straight_behind = true;
             }
             if (m_kart_ahead)
             {
-                posData ahead_pos = {0};
-                checkPosition(m_kart_ahead->getXYZ(), &ahead_pos);
-                if (ahead_pos.angle < 0.2f) straight_ahead = true;
+                Vec3 ahead_lc = m_kart->getTrans().inverse()
+                    (m_kart_ahead->getXYZ());
+                const float abs_angle =
+                    atan2f(fabsf(ahead_lc.x()), fabsf(ahead_lc.z()));
+                if (abs_angle < 0.2f) straight_ahead = true;
             }
 
             // Bowling balls are slower, so only fire on closer karts - but when
