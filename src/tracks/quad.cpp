@@ -23,8 +23,6 @@
 #include <S3DVertex.h>
 #include <triangle3d.h>
 
-#include "LinearMath/btTransform.h"
-
 /** Constructor, takes 4 points. */
 Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3)
 {
@@ -102,24 +100,3 @@ bool Quad::pointInside(const Vec3& p, bool ignore_vertical) const
                p.sideOfLine2D(m_p[3], m_p[0]) >= 0.0;
     }
 }   // pointInside
-
-// ----------------------------------------------------------------------------
-/** Transforms a quad by a given transform (i.e. translation+rotation). This
- *  function does not modify this quad, the results are stored in the quad
- *  specified as parameter. These functions are used for slipstreaming to
- *  determine the slipstream area from the original value (kart at 0,0,0 and
- *  no rotation) to the current value.
- *  \param t The transform to apply.
- *  \param result The quad which stores the result.
- */
-void Quad::transform(const btTransform &t, Quad *result) const
-{
-    result->m_p[0] = t(m_p[0]);
-    result->m_p[1] = t(m_p[1]);
-    result->m_p[2] = t(m_p[2]);
-    result->m_p[3] = t(m_p[3]);
-    result->m_min_height = std::min ( std::min(result->m_p[0].getY(),
-                                               result->m_p[1].getY()),
-                                      std::min(result->m_p[2].getY(),
-                                               result->m_p[3].getY())  );
-}   // transform

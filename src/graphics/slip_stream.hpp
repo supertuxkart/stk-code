@@ -66,13 +66,8 @@ private:
      *  'slipstream credits', or the kart is using accumulated credits. */
     enum         {SS_NONE, SS_COLLECT, SS_USE} m_slipstream_mode;
 
-    /** The quad inside which another kart is considered to be slipstreaming.
-     *  This value is current area, i.e. takes the kart position into account. */
+    /** This is slipstream area if the kart is at 0,0,0 without rotation. */
     Quad         *m_slipstream_quad;
-
-    /** This is slipstream area if the kart is at 0,0,0 without rotation. From
-     *  this value m_slipstream_area is computed by applying the kart transform. */
-    Quad         *m_slipstream_original_quad;
 
     /** The kart from which this kart gets slipstream. Used by the AI to
      ** overtake the right kart. */

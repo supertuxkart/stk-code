@@ -31,8 +31,6 @@ namespace irr
 }
 using namespace irr;
 
-class btTransform;
-
 /**
   * \ingroup tracks
   */
@@ -63,8 +61,6 @@ public:
          virtual ~Quad() {}
     // ------------------------------------------------------------------------
     void getVertices(video::S3DVertex *v, const video::SColor &color) const;
-    // ------------------------------------------------------------------------
-    void transform(const btTransform &t, Quad *result) const;
     // ------------------------------------------------------------------------
     /** Returns the i-th. point of a quad. */
     const Vec3& operator[](int i) const                      { return m_p[i]; }
