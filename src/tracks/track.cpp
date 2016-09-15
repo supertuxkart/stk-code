@@ -53,6 +53,7 @@
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "scriptengine/script_engine.hpp"
+#include "tracks/arena_graph.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/battle_graph.hpp"
 #include "tracks/check_manager.hpp"
@@ -668,12 +669,14 @@ void Track::startMusic() const
 }   // startMusic
 
 //-----------------------------------------------------------------------------
-/** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
- *  they are connected to each other. Input file name is hardcoded for now
+/** Loads the quad graph for arena, i.e. the definition of all quads, and the
+ *  way they are connected to each other. Input file name is hardcoded for now
  */
 void Track::loadBattleGraph(const XMLNode &node)
 {
     BattleGraph::create(m_root+"navmesh.xml", &node);
+    ArenaGraph* graph = new ArenaGraph(m_root+"navmesh.xml", &node);
+    Graph::setGraph(graph);
 
     if(BattleGraph::get()->getNumNodes()==0)
     {
@@ -725,7 +728,7 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
     if ((m_is_arena || m_is_soccer) && m_has_navmesh)
-        BattleGraph::get()->mapPoint2MiniMap(xyz, draw_at);
+        Graph::get()->mapPoint2MiniMap(xyz, draw_at);
     else
         QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
     draw_at->setX(draw_at->getX() * m_minimap_x_scale);
@@ -1032,7 +1035,7 @@ void Track::loadMinimap()
 
     if ((m_is_arena || m_is_soccer) && m_has_navmesh)
     {
-        BattleGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
+        Graph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
             &m_old_rtt_mini_map, &m_new_rtt_mini_map);
     }
     else

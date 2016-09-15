@@ -24,35 +24,7 @@ Node3D::Node3D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
                bool ai_ignore)
        : GraphNode(p0, p1, p2, p3, normal, node_index, invisible, ai_ignore)
 {
-    // Compute the node bounding box used for pointInNode
-    Vec3 box_corners[8];
-    float box_high = 5.0f;
-    float box_low = 1.0f;
-    box_corners[0] = m_p[0] + box_high * normal;
-    box_corners[1] = m_p[1] + box_high * normal;
-    box_corners[2] = m_p[2] + box_high * normal;
-    box_corners[3] = m_p[3] + box_high * normal;
-    box_corners[4] = m_p[0] - box_low * normal;
-    box_corners[5] = m_p[1] - box_low * normal;
-    box_corners[6] = m_p[2] - box_low * normal;
-    box_corners[7] = m_p[3] - box_low * normal;
-
-    Vec3 box_faces[6][4] =
-    {
-        { box_corners[0], box_corners[1], box_corners[2], box_corners[3] },
-        { box_corners[3], box_corners[2], box_corners[6], box_corners[7] },
-        { box_corners[7], box_corners[6], box_corners[5], box_corners[4] },
-        { box_corners[1], box_corners[0], box_corners[4], box_corners[5] },
-        { box_corners[4], box_corners[0], box_corners[3], box_corners[7] },
-        { box_corners[1], box_corners[5], box_corners[6], box_corners[2] }
-    };
-
-    for (unsigned int i = 0; i < 6 ; i++)
-    {
-        for (unsigned int j = 0; j < 4; j++)
-            m_box_faces[i][j] = box_faces[i][j];
-    }
-
+    BoundingBox3D::init(p0, p1, p2, p3, normal);
     m_line = core::line3df(m_lower_center.toIrrVector(),
         m_upper_center.toIrrVector());
 }   // Node3D

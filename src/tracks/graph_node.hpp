@@ -210,8 +210,6 @@ public:
     /** True if this node should be ignored by the AI. */
     bool        letAIIgnore() const { return m_ai_ignore; }
     // ------------------------------------------------------------------------
-    virtual float getDistance2FromPoint(const Vec3 &xyz) const = 0;
-    // ------------------------------------------------------------------------
     virtual void getDistances(const Vec3 &xyz, Vec3 *result) const = 0;
 
 };   // GraphNode

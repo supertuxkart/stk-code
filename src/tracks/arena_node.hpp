@@ -16,39 +16,48 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_NODE_3D_HPP
-#define HEADER_NODE_3D_HPP
+#ifndef HEADER_ARENA_NODE_HPP
+#define HEADER_ARENA_NODE_HPP
 
-#include "tracks/bounding_box_3d.hpp"
-#include "tracks/graph_node.hpp"
+#include "tracks/quad.hpp"
 #include "utils/cpp2011.hpp"
+
+#include <vector>
 
 /**
   * \ingroup tracks
   */
-class Node3D : public GraphNode,
-               public BoundingBox3D
+class ArenaNode : public Quad
 {
 private:
-    /** Line between lower and upper center, saves computation in
-     *  getDistance() later.
-     */
     core::line3df m_line;
 
+    std::vector<int>   m_adjacent_nodes;
+
+    std::vector<int>   m_nearby_nodes;
+
 public:
-    Node3D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
-           const Vec3 &normal, unsigned int node_index, bool invisible,
-           bool ai_ignore);
+    ArenaNode(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
+              const Vec3 &normal, unsigned int node_index);
     // ------------------------------------------------------------------------
-    virtual bool pointInside(const Vec3& p,
-                             bool ignore_vertical = false) const OVERRIDE
+    virtual ~ArenaNode() {}
+    // ------------------------------------------------------------------------
+    const std::vector<int>& getAdjacentNodes()     { return m_adjacent_nodes; }
+    // ------------------------------------------------------------------------
+    const std::vector<int>& getNearbyNodes()         { return m_nearby_nodes; }
+    // ------------------------------------------------------------------------
+    void setAdjacentNodes(const std::vector<int>& nodes)
     {
-        return BoundingBox3D::pointInside(p);
+        m_adjacent_nodes = nodes;
     }
     // ------------------------------------------------------------------------
-    virtual void getDistances(const Vec3 &xyz, Vec3 *result) const OVERRIDE;
+    void setNearbyNodes(const std::vector<int>& nodes)
+    {
+        m_nearby_nodes = nodes;
+    }
     // ------------------------------------------------------------------------
     virtual float getDistance2FromPoint(const Vec3 &xyz) const OVERRIDE;
 
 };
+
 #endif
