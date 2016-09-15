@@ -278,7 +278,7 @@ void EndController::findNonCrashingPoint(Vec3 *result)
         direction = QuadGraph::get()->getNode(target_sector)->getCenter()
                   - m_kart->getXYZ();
 
-        float len=direction.length_2d();
+        float len=direction.length();
         steps = int( len / m_kart_length );
         if( steps < 3 ) steps = 3;
 
