@@ -44,7 +44,7 @@ public:
     // ------------------------------------------------------------------------
     const std::vector<int>& getAdjacentNodes()     { return m_adjacent_nodes; }
     // ------------------------------------------------------------------------
-    const std::vector<int>& getNearbyNodes()         { return m_nearby_nodes; }
+    std::vector<int>* getNearbyNodes()              { return &m_nearby_nodes; }
     // ------------------------------------------------------------------------
     void setAdjacentNodes(const std::vector<int>& nodes)
     {

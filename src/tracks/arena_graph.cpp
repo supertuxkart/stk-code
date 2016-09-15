@@ -357,7 +357,7 @@ std::vector<int> ArenaGraph::getPathFromTo(int from, int to,
 }   // getPathFromTo
 
 // ============================================================================
-/** Unit testing for battle graph distance and parent node computation.
+/** Unit testing for arena graph distance and parent node computation.
  *  Instead of using hand-tuned test cases we use the tested, verified and
  *  easier to understand Floyd-Warshall algorithm to compute the distances,
  *  and check if the (significanty faster) Dijkstra algorithm gives the same
@@ -391,7 +391,7 @@ void ArenaGraph::unitTesting()
         {
             if(ag->m_distance_matrix[i][j] - distance_matrix[i][j] > 0.001f)
             {
-                Log::error("BattleGraph",
+                Log::error("ArenaGraph",
                            "Incorrect distance %d, %d: Dijkstra: %f F.W.: %f",
                            i, j, distance_matrix[i][j], ag->m_distance_matrix[i][j]);
                 error_count++;
@@ -412,17 +412,17 @@ void ArenaGraph::unitTesting()
                 std::vector<int> floyd_path = getPathFromTo(i, j, ag->m_parent_node);
                 if(dijkstra_path.size()!=floyd_path.size())
                 {
-                    Log::error("BattleGraph",
+                    Log::error("ArenaGraph",
                                "Incorrect path length %d, %d: Dijkstra: %d F.W.: %d",
                                i, j, parent_poly[i][j], ag->m_parent_poly[i][j]);
                     continue;
                 }
-                Log::error("BattleGraph", "Path problems from %d to %d:",
+                Log::error("ArenaGraph", "Path problems from %d to %d:",
                            i, j);
                 for (unsigned k = 0; k < dijkstra_path.size(); k++)
                 {
                     if(dijkstra_path[k]!=floyd_path[k])
-                        Log::error("BattleGraph", "%d/%d dijkstra: %d floyd %d",
+                        Log::error("ArenaGraph", "%d/%d dijkstra: %d floyd %d",
                             k, dijkstra_path.size(), dijkstra_path[k],
                             floyd_path[k]);
                 }    // for k<dijkstra_path.size()

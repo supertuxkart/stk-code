@@ -29,6 +29,7 @@
 #include <string>
 
 class PhysicalObject;
+class TrackSector;
 
 /**
  * \brief An implementation of World, to provide the 3 strikes battle game mode
@@ -40,7 +41,6 @@ private:
     struct BattleInfo
     {
         int  m_lives;
-        int  m_on_node;
     };
 
     /** This vector contains an 'BattleInfo' struct for every kart in the race.
@@ -71,7 +71,9 @@ private:
 
     PtrVector<TrackObject, REF> m_tires;
 
-    /** Function to update the locations of all karts on the polygon map */
+    std::vector<TrackSector*> m_kart_track_sector;
+
+    /** Function to update the locations of all karts on the navigation map */
     void updateKartNodes();
 
     /** Profiling usage */

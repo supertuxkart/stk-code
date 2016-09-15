@@ -24,7 +24,6 @@
 #include "karts/controller/kart_control.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/soccer_world.hpp"
-#include "tracks/battle_graph.hpp"
 
 #ifdef AI_DEBUG
 #include "irrlicht.h"

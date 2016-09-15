@@ -21,7 +21,6 @@
 
 #include "karts/controller/ai_base_controller.hpp"
 #include "race/race_manager.hpp"
-#include "utils/random_generator.hpp"
 
 #undef AI_DEBUG
 #ifdef AI_DEBUG

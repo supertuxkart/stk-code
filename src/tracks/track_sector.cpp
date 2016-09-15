@@ -21,6 +21,8 @@
 #include "tracks/check_manager.hpp"
 #include "tracks/check_structure.hpp"
 #include "tracks/track_sector.hpp"
+#include "tracks/arena_graph.hpp"
+#include "tracks/arena_node.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/graph_node.hpp"
 
@@ -46,23 +48,35 @@ void TrackSector::reset()
  *  the specified point.
  *  \param xyz The new coordinates to search the graph node for.
  */
-void TrackSector::update(const Vec3 &xyz)
+void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
 {
     int prev_sector = m_current_graph_node;
 
-    QuadGraph::get()->findRoadSector(xyz, &m_current_graph_node);
-    m_on_road = m_current_graph_node != QuadGraph::UNKNOWN_SECTOR;
+    const ArenaGraph* ag = ArenaGraph::get();
+    std::vector<int>* test_nodes = NULL;
+    if (ag)
+    {
+        // For ArenaGraph, only test nodes around current node
+        if (prev_sector != Graph::UNKNOWN_SECTOR)
+            test_nodes = ag->getNode(prev_sector)->getNearbyNodes();
+    }
+
+    Graph::get()->findRoadSector(xyz, &m_current_graph_node, test_nodes,
+        ignore_vertical);
+    m_on_road = m_current_graph_node != Graph::UNKNOWN_SECTOR;
 
     // If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
     // the road, so we have to use search for the closest graph node.
-    if(m_current_graph_node == QuadGraph::UNKNOWN_SECTOR)
+    if(m_current_graph_node == Graph::UNKNOWN_SECTOR)
     {
-        m_current_graph_node =
-            QuadGraph::get()->findOutOfRoadSector(xyz,
-                                                  prev_sector);
+        m_current_graph_node = Graph::get()->findOutOfRoadSector(xyz,
+            prev_sector, test_nodes, ignore_vertical);
+        // ArenaGraph (battle and soccer mode) doesn't need the code below
+        if (ag) return;
     }
     else
     {
+        if (ag) return;
         // keep the current quad as the latest valid one IF the player has one
         // of the required checklines
         const GraphNode* gn = QuadGraph::get()->getNode(m_current_graph_node);

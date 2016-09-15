@@ -31,6 +31,7 @@
 class AbstractKart;
 class Controller;
 class TrackObject;
+class TrackSector;
 
 /** An implementation of World, to provide the soccer game mode
  *  Notice: In soccer world, true goal means blue, false means red.
@@ -279,8 +280,8 @@ private:
     std::map<int, unsigned int> m_kart_position_map;
 
     /** Data generated from navmesh */
-    std::vector<int> m_kart_on_node;
-    int m_ball_on_node;
+    std::vector<TrackSector*> m_kart_track_sector;
+    TrackSector* m_ball_track_sector;
 
     int m_red_ai;
     int m_blue_ai;
@@ -293,8 +294,6 @@ private:
     void updateKartNodes();
     /** Function to update the location the ball on the polygon map */
     void updateBallPosition(float dt);
-    /** Clean up */
-    void resetAllPosition();
     /** Function to update data for AI usage. */
     void updateAIData();
     /** Get number of teammates in a team, used by starting position assign. */
@@ -357,11 +356,9 @@ public:
             m_blue_score_times : m_red_score_times);
     }
     // ------------------------------------------------------------------------
-    int getKartNode(unsigned int kart_id) const
-                                           { return m_kart_on_node[kart_id]; }
+    int getKartNode(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
-    int getBallNode() const
-                                                    { return m_ball_on_node; }
+    int getBallNode() const;
     // ------------------------------------------------------------------------
     const Vec3& getBallPosition() const
         { return (Vec3&)m_ball_body->getCenterOfMassTransform().getOrigin(); }
