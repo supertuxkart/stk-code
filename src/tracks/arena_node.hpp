@@ -56,6 +56,11 @@ public:
         m_nearby_nodes = nodes;
     }
     // ------------------------------------------------------------------------
+    /** Returns true if the quad lies near the edge, which means it doesn't
+     *  have 4 adjacent quads.
+     */
+    bool isNearEdge() const            { return m_adjacent_nodes.size() != 4; }
+    // ------------------------------------------------------------------------
     virtual float getDistance2FromPoint(const Vec3 &xyz) const OVERRIDE;
 
 };

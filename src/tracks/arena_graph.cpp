@@ -18,10 +18,13 @@
 
 #include "tracks/arena_graph.hpp"
 
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/arena_node.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm>
@@ -32,12 +35,12 @@ ArenaGraph::ArenaGraph(const std::string &navmesh, const XMLNode *node)
           : Graph()
 {
     loadNavmesh(navmesh);
-
+    buildGraph();
     // Compute shortest distance from all nodes
     for (unsigned int i = 0; i < getNumNodes(); i++)
         computeDijkstra(i);
 
-    sortNearbyNodes();
+    setNearbyNodesOfAllNodes();
     if (node && race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         loadGoalNodes(node);
 
@@ -67,6 +70,14 @@ void ArenaGraph::differentNodeColor(int n, video::SColor* c) const
     {
         *c = video::SColor(255, 0, 0, 255);
         return;
+    }
+
+    if (UserConfigParams::m_track_debug)
+    {
+        if (m_all_nodes[n]->is3DQuad())
+            *c = video::SColor(255, 0, 255, 0);
+        else
+            *c = video::SColor(255, 255, 255, 0);
     }
 
 }   // differentNodeColor
@@ -142,7 +153,11 @@ void ArenaGraph::loadNavmesh(const std::string &navmesh)
     }
     delete xml;
 
-    // Xml is loaded, now initialize the graph
+}   // loadNavmesh
+
+// ----------------------------------------------------------------------------
+void ArenaGraph::buildGraph()
+{
     const unsigned int n_nodes = getNumNodes();
 
     m_distance_matrix = std::vector<std::vector<float>>
@@ -173,7 +188,7 @@ void ArenaGraph::loadNavmesh(const std::string &navmesh)
         }   // for j
     }   // for i
 
-}   // loadNavmesh
+}   // buildGraph
 
 // ----------------------------------------------------------------------------
 /** Dijkstra shortest path computation. It computes the shortest distance from
@@ -244,22 +259,6 @@ void ArenaGraph::computeFloydWarshall()
 {
     unsigned int n = getNumNodes();
 
-    // initialize m_parent_node with unknown_node so that if no path is found
-    //  b/w i and j then m_parent_node[i][j] = -1 (UNKNOWN_SECTOR)
-    // AI must check this
-    m_parent_node = std::vector< std::vector<int> >
-        (n, std::vector<int>(n, Graph::UNKNOWN_SECTOR));
-    for (unsigned int i = 0; i < n; i++)
-    {
-        for (unsigned int j = 0; j < n; j++)
-        {
-            if(i == j || m_distance_matrix[i][j]>=9899.9f)
-                m_parent_node[i][j]=-1;
-            else
-                m_parent_node[i][j] = i;
-        }
-    }
-
     for (unsigned int k = 0; k < n; k++)
     {
         for (unsigned int i = 0; i < n; i++)
@@ -305,7 +304,7 @@ void ArenaGraph::loadGoalNodes(const XMLNode *node)
             {
                 // Find all the nodes which connect the two points of
                 // goal, notice: only work if it's a straight line
-                first = getNextShortestPath(first, last);
+                first = getNextNode(first, last);
                 first_goal ? m_blue_node.insert(first) :
                     m_red_node.insert(first);
             }
@@ -314,7 +313,7 @@ void ArenaGraph::loadGoalNodes(const XMLNode *node)
 }   // loadGoalNodes
 
 // ----------------------------------------------------------------------------
-void ArenaGraph::sortNearbyNodes()
+void ArenaGraph::setNearbyNodesOfAllNodes()
 {
     // Only save the nearby 8 nodes
     const unsigned int try_count = 8;
@@ -338,6 +337,101 @@ void ArenaGraph::sortNearbyNodes()
         cur_node->setNearbyNodes(nearby_nodes);
     }
 
-}   // sortNearbyNodes
+}   // setNearbyNodesOfAllNodes
 
 // ----------------------------------------------------------------------------
+/** Determines the full path from 'from' to 'to' and returns it in a
+ *  std::vector (in reverse order). Used only for unit testing.
+ */
+std::vector<int> ArenaGraph::getPathFromTo(int from, int to,
+                           const std::vector< std::vector< int > > parent_node)
+{
+    std::vector<int> path;
+    path.push_back(to);
+    while(from!=to)
+    {
+        to = parent_node[from][to];
+        path.push_back(to);
+    }
+    return path;
+}   // getPathFromTo
+
+// ============================================================================
+/** Unit testing for battle graph distance and parent node computation.
+ *  Instead of using hand-tuned test cases we use the tested, verified and
+ *  easier to understand Floyd-Warshall algorithm to compute the distances,
+ *  and check if the (significanty faster) Dijkstra algorithm gives the same
+ *  results. For now we use the cave mesh as test case.
+ */
+void ArenaGraph::unitTesting()
+{
+    Track *track = track_manager->getTrack("cave");
+    std::string navmesh_file_name=track->getTrackFile("navmesh.xml");
+
+    double s = StkTime::getRealTime();
+    ArenaGraph* ag = new ArenaGraph(navmesh_file_name);
+    double e = StkTime::getRealTime();
+    Log::error("Time", "Dijkstra       %lf", e-s);
+
+    // Save the Dijkstra results
+    std::vector< std::vector< float > > distance_matrix = ag->m_distance_matrix;
+    std::vector< std::vector< int > > parent_node = ag->m_parent_node;
+    ag->buildGraph();
+
+    // Now compute results with Floyd-Warshall
+    s = StkTime::getRealTime();
+    ag->computeFloydWarshall();
+    e = StkTime::getRealTime();
+    Log::error("Time", "Floyd-Warshall %lf", e-s);
+
+    int error_count = 0;
+    for(unsigned int i=0; i<ag->m_distance_matrix.size(); i++)
+    {
+        for(unsigned int j=0; j<ag->m_distance_matrix[i].size(); j++)
+        {
+            if(ag->m_distance_matrix[i][j] - distance_matrix[i][j] > 0.001f)
+            {
+                Log::error("BattleGraph",
+                           "Incorrect distance %d, %d: Dijkstra: %f F.W.: %f",
+                           i, j, distance_matrix[i][j], ag->m_distance_matrix[i][j]);
+                error_count++;
+            }    // if distance is too different
+
+            // Unortunately it happens frequently that there are different
+            // shortest path with the same length. And Dijkstra might find
+            // a different path then Floyd-Warshall. So the test for parent
+            // polygon often results in false positives, so it is disabled,
+            // but I leave the code in place in case it is useful for some
+            // debugging in the feature
+#undef TEST_PARENT_POLY_EVEN_THOUGH_MANY_FALSE_POSITIVES
+#ifdef TEST_PARENT_POLY_EVEN_THOUGH_MANY_FALSE_POSITIVES
+            if(ag->m_parent_poly[i][j] != parent_poly[i][j])
+            {
+                error_count++;
+                std::vector<int> dijkstra_path = getPathFromTo(i, j, parent_node);
+                std::vector<int> floyd_path = getPathFromTo(i, j, ag->m_parent_node);
+                if(dijkstra_path.size()!=floyd_path.size())
+                {
+                    Log::error("BattleGraph",
+                               "Incorrect path length %d, %d: Dijkstra: %d F.W.: %d",
+                               i, j, parent_poly[i][j], ag->m_parent_poly[i][j]);
+                    continue;
+                }
+                Log::error("BattleGraph", "Path problems from %d to %d:",
+                           i, j);
+                for (unsigned k = 0; k < dijkstra_path.size(); k++)
+                {
+                    if(dijkstra_path[k]!=floyd_path[k])
+                        Log::error("BattleGraph", "%d/%d dijkstra: %d floyd %d",
+                            k, dijkstra_path.size(), dijkstra_path[k],
+                            floyd_path[k]);
+                }    // for k<dijkstra_path.size()
+
+            }   // if dijkstra parent_poly != floyd parent poly
+#endif
+        }   // for j
+    }   // for i
+
+    delete ag;
+
+}   // unitTesting

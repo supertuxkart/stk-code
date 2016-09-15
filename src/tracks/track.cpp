@@ -1882,17 +1882,15 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh && !arena_random_item_created)
         BattleGraph::get()->findItemsOnGraphNodes();
 
-    if (UserConfigParams::m_track_debug &&
+    /*if (UserConfigParams::m_track_debug &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
         !m_is_cutscene)
     {
         QuadGraph::get()->createDebugMesh();
-    }
+    }*/
 
-    if (UserConfigParams::m_track_debug && m_has_navmesh &&
-        race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
-        !m_is_cutscene)
-        BattleGraph::get()->createDebugMesh();
+    if (UserConfigParams::m_track_debug && Graph::get() && !m_is_cutscene)
+        Graph::get()->createDebugMesh();
 
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.

@@ -194,7 +194,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "tracks/battle_graph.hpp"
+#include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/command_line.hpp"
@@ -1884,8 +1884,8 @@ void runUnitTests()
     Log::info("UnitTest", "Kart characteristics");
     CombinedCharacteristic::unitTesting();
 
-    Log::info("UnitTest", "Battle Graph");
-    BattleGraph::unitTesting();
+    Log::info("UnitTest", "Arena Graph");
+    ArenaGraph::unitTesting();
 
     Log::info("UnitTest", "Fonts for translation");
     font_manager->unitTesting();

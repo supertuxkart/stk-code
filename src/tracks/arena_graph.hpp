@@ -49,11 +49,16 @@ private:
     // ------------------------------------------------------------------------
     void loadNavmesh(const std::string &navmesh);
     // ------------------------------------------------------------------------
-    void sortNearbyNodes();
+    void buildGraph();
+    // ------------------------------------------------------------------------
+    void setNearbyNodesOfAllNodes();
     // ------------------------------------------------------------------------
     void computeDijkstra(int n);
     // ------------------------------------------------------------------------
     void computeFloydWarshall();
+    // ------------------------------------------------------------------------
+    static std::vector<int> getPathFromTo(int from, int to, 
+                          const std::vector< std::vector< int > > parent_node);
     // ------------------------------------------------------------------------
     virtual bool hasLapLine() const OVERRIDE                  { return false; }
     // ------------------------------------------------------------------------
@@ -61,6 +66,8 @@ private:
 
 public:
     static ArenaGraph* get()     { return dynamic_cast<ArenaGraph*>(m_graph); }
+    // ------------------------------------------------------------------------
+    static void unitTesting();
     // ------------------------------------------------------------------------
     ArenaGraph(const std::string &navmesh, const XMLNode *node = NULL);
     // ------------------------------------------------------------------------
@@ -72,13 +79,21 @@ public:
      *  Note: m_parent_node[j][i] contains the parent of i on path from j to i,
      *  which is the next node on the path from i to j (undirected graph)
      */
-    int getNextShortestPath(int i, int j) const
+    int getNextNode(int i, int j) const
     {
         if (i == Graph::UNKNOWN_SECTOR || j == Graph::UNKNOWN_SECTOR)
             return Graph::UNKNOWN_SECTOR;
         return m_parent_node[j][i];
     }
+    // ------------------------------------------------------------------------
+    /** Returns the distance between any two nodes */
+    float getDistance(int from, int to) const
+    {
+        if (from == Graph::UNKNOWN_SECTOR || to == Graph::UNKNOWN_SECTOR)
+            return 99999.0f;
+        return m_distance_matrix[from][to];
+    }
 
-};   // Graph
+};   // ArenaGraph
 
 #endif
