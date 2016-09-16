@@ -6,8 +6,13 @@ flat in float energy;
 flat in vec3 col;
 flat in float radius;
 
+#ifdef GL_ES
+layout (location = 0) out vec4 Diff;
+layout (location = 1) out vec4 Spec;
+#else
 out vec4 Diff;
 out vec4 Spec;
+#endif
 
 #stk_include "utils/decodeNormal.frag"
 #stk_include "utils/SpecularBRDF.frag"

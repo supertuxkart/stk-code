@@ -34,6 +34,8 @@
 
 GLuint getTextureGLuint(irr::video::ITexture *tex)
 {
+	if (tex == NULL)
+		return 0;
 #if defined(USE_GLES2)
     return static_cast<irr::video::COGLES2Texture*>(tex)->getOpenGLTextureName();
 #else
@@ -87,10 +89,20 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
     memcpy(data, tex->lock(), w * h * 4);
     tex->unlock();
     unsigned internalFormat, Format;
-    if (tex->hasAlpha())
-        Format = GL_BGRA;
-    else
-        Format = GL_BGR;
+    Format = tex->hasAlpha() ? GL_BGRA : GL_BGR;
+#if defined(USE_GLES2)
+    if (!CVS->isEXTTextureFormatBGRA8888Usable())
+    {
+        Format = tex->hasAlpha() ? GL_RGBA : GL_RGB;
+        
+        for (unsigned int i = 0; i < w * h; i++)
+        {
+            char tmp_val = data[i*4];
+            data[i*4] = data[i*4 + 2];
+            data[i*4 + 2] = tmp_val;
+        }
+    }
+#endif
 
     if (premul_alpha)
     {
