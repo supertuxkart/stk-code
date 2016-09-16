@@ -59,6 +59,7 @@ namespace GraphicsRestrictions
             "ExplicitAttribLocation",
 #if defined(USE_GLES2)
             "TextureFormatBGRA8888",
+            "ColorBufferFloat",
 #endif
             "DriverRecentEnough",
             "HighDefinitionTextures",

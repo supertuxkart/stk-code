@@ -53,6 +53,7 @@ namespace GraphicsRestrictions
         GR_EXPLICIT_ATTRIB_LOCATION,
 #if defined(USE_GLES2)
         GR_TEXTURE_FORMAT_BGRA8888,
+        GR_COLOR_BUFFER_FLOAT,
 #endif
         GR_DRIVER_RECENT_ENOUGH,
         GR_HIGHDEFINITION_TEXTURES,
