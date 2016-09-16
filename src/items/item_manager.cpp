@@ -32,10 +32,9 @@
 #include "modes/linear_world.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "tracks/arena_graph.hpp"
-#include "tracks/battle_graph.hpp"
-#include "tracks/graph.hpp"
-#include "tracks/graph_node.hpp"
+#include "tracks/arena_node.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
@@ -426,7 +425,6 @@ void ItemManager::deleteItem(Item *item)
     // First check if the item needs to be removed from the items-in-quad list
     if(m_items_in_quads)
     {
-        const Vec3 &xyz = item->getXYZ();
         int sector = item->getGraphNode();
         unsigned int indx = sector==Graph::UNKNOWN_SECTOR
                           ? (unsigned int) m_items_in_quads->size()-1
@@ -480,40 +478,41 @@ void ItemManager::switchItems()
 bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
 {
     if (!UserConfigParams::m_random_arena_item) return false;
-    if (!BattleGraph::get()) return false;
+    if (!ArenaGraph::get()) return false;
 
+    const ArenaGraph* ag = ArenaGraph::get();
     std::vector<int> used_location;
     std::vector<int> invalid_location;
     for (unsigned int i = 0; i < pos.size(); i++)
     {
         // Load all starting positions of arena, so no items will be near them
-        int node = BattleGraph::get()->pointToNode(/*cur_node*/-1,
-            Vec3(pos[i].getOrigin()), /*ignore_vertical*/true);
+        int node = -1;
+        ag->findRoadSector(pos[i].getOrigin(), &node, NULL, true);
         assert(node != -1);
         used_location.push_back(node);
         invalid_location.push_back(node);
     }
 
     RandomGenerator random;
-    const unsigned int MIN_DIST = int(sqrt(BattleGraph::get()->getNumNodes()));
+    const unsigned int ALL_NODES = ag->getNumNodes();
+    const unsigned int MIN_DIST = int(sqrt(ALL_NODES));
     const unsigned int TOTAL_ITEM = MIN_DIST / 2;
 
     Log::info("[ItemManager]","Creating %d random items for arena", TOTAL_ITEM);
     for (unsigned int i = 0; i < TOTAL_ITEM; i++)
     {
         int chosen_node = -1;
-        const unsigned int total_node = BattleGraph::get()->getNumNodes();
         while(true)
         {
             if (used_location.size() - pos.size() +
-                invalid_location.size() == total_node)
+                invalid_location.size() == ALL_NODES)
             {
                 Log::warn("[ItemManager]","Can't place more random items! "
                     "Use default item location.");
                 return false;
             }
 
-            const int node = random.get(total_node);
+            const int node = random.get(ALL_NODES);
 
             // Check if tried
             std::vector<int>::iterator it = std::find(invalid_location.begin(),
@@ -522,7 +521,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
                 continue;
 
             // Check if near edge
-            if (BattleGraph::get()->isNearEdge(node))
+            if (ag->getNode(node)->isNearEdge())
             {
                 invalid_location.push_back(node);
                 continue;
@@ -532,8 +531,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
             for (unsigned int j = 0; j < used_location.size(); j++)
             {
                 if (!found) continue;
-                float test_distance = BattleGraph::get()
-                    ->getDistance(used_location[j], node);
+                float test_distance = ag->getDistance(used_location[j], node);
                 found = test_distance > MIN_DIST;
             }
             if (found)
@@ -566,10 +564,31 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
         Item::ItemType type = (j > BONUS_BOX ? Item::ITEM_BONUS_BOX :
             j > NITRO_BIG ? Item::ITEM_NITRO_BIG :
             j > NITRO_SMALL ? Item::ITEM_NITRO_SMALL : Item::ITEM_BANANA);
-        Vec3 loc = BattleGraph::get()
-            ->getQuadOfNode(used_location[i]).getCenter();
-        Item* item = newItem(type, loc, Vec3(0, 1, 0));
-        BattleGraph::get()->insertItems(item, used_location[i]);
+
+        ArenaNode* an = ag->getNode(used_location[i]);
+        Vec3 loc = an->getCenter();
+        Vec3 quad_normal = an->getNormal();
+        loc += quad_normal;
+
+        // Do a raycast to help place it fully on the surface
+        const Material* m;
+        Vec3 normal;
+        Vec3 hit_point;
+        const TriangleMesh& tm =
+            World::getWorld()->getTrack()->getTriangleMesh();
+        bool success = tm.castRay(loc, an->getCenter() + (-10000*quad_normal),
+            &hit_point, &m, &normal);
+
+        if (success)
+        {
+            newItem(type, hit_point, normal);
+        }
+        else
+        {
+            Log::warn("[ItemManager]","Raycast to surface failed"
+                      "from node %d", used_location[i]);
+            newItem(type, an->getCenter(), quad_normal);
+        }
     }
 
     return true;

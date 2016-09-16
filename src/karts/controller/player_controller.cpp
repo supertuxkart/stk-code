@@ -33,7 +33,6 @@
 #include "modes/world.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
-#include "tracks/battle_graph.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"

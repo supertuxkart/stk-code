@@ -55,7 +55,6 @@
 #include "scriptengine/script_engine.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/bezier_curve.hpp"
-#include "tracks/battle_graph.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/graph_node.hpp"
 #include "tracks/model_definition_loader.hpp"
@@ -672,9 +671,8 @@ void Track::startMusic() const
 /** Loads the quad graph for arena, i.e. the definition of all quads, and the
  *  way they are connected to each other. Input file name is hardcoded for now
  */
-void Track::loadBattleGraph(const XMLNode &node)
+void Track::loadArenaGraph(const XMLNode &node)
 {
-    BattleGraph::create(m_root+"navmesh.xml", &node);
     ArenaGraph* graph = new ArenaGraph(m_root+"navmesh.xml", &node);
     Graph::setGraph(graph);
 
@@ -687,7 +685,7 @@ void Track::loadBattleGraph(const XMLNode &node)
     {
         loadMinimap();
     }
-}   // loadBattleGraph
+}   // loadArenaGraph
 
 //-----------------------------------------------------------------------------
 /** Loads the quad graph, i.e. the definition of all quads, and the way
@@ -1663,7 +1661,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // map to.
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
     else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
-        loadBattleGraph(*root);
+        loadArenaGraph(*root);
 
     ItemManager::create();
 
@@ -1878,16 +1876,6 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     delete root;
-
-    if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh && !arena_random_item_created)
-        BattleGraph::get()->findItemsOnGraphNodes();
-
-    /*if (UserConfigParams::m_track_debug &&
-        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
-        !m_is_cutscene)
-    {
-        QuadGraph::get()->createDebugMesh();
-    }*/
 
     if (UserConfigParams::m_track_debug && Graph::get() && !m_is_cutscene)
         Graph::get()->createDebugMesh();

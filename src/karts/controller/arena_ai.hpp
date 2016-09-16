@@ -128,7 +128,6 @@ private:
     virtual bool forceBraking() { return m_avoiding_item; }
     virtual bool ignorePathFinding() { return false; }
 public:
-    static int   m_test_node_for_banana;
                  ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};
     virtual void update      (float delta);

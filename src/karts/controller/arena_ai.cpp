@@ -30,15 +30,6 @@
 #include "tracks/arena_node.hpp"
 #include "utils/log.hpp"
 
-int ArenaAI::m_test_node_for_banana = Graph::UNKNOWN_SECTOR;
-
-bool isNodeWithBanana(const std::pair<const Item*, int>& item_pair)
-{
-    return item_pair.second == ArenaAI::m_test_node_for_banana &&
-        item_pair.first->getType() == Item::ITEM_BANANA &&
-        !item_pair.first->wasCollected();
-}
-
 ArenaAI::ArenaAI(AbstractKart *kart)
        : AIBaseController(kart)
 {

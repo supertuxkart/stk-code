@@ -145,7 +145,7 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     {
         Graph::get()->findRoadSector(xyz, &m_graph_node);
     }
-    else if (!ArenaGraph::get()) // Todo replace with driveline graph
+    if (Graph::get() && !ArenaGraph::get()) // Todo replace with driveline graph
     {
         // Item is on quad graph. Pre-compute the distance from center
         // of this item, which is used by the AI (mostly for avoiding items)
