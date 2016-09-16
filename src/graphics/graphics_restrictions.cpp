@@ -356,6 +356,9 @@ public:
 #ifdef BSD
             if(m_os!="bsd") return false;
 #endif
+#ifdef ANDROID
+            if(m_os!="android") return false;
+#endif
         }   // m_os.size()>0
 
         // Test for card
