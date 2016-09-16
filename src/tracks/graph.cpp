@@ -430,17 +430,19 @@ void Graph::createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
                 ai_ignore);
         }
     }
-
-    Log::debug("Graph", "2d node created, normal: %f, %f, %f",
-        normal.x(), normal.y(), normal.z());
-    if (is_arena)
-    {
-        q = new ArenaNode(p0, p1, p2, p3, normal, node_index);
-    }
     else
     {
-        q = new Node2D(p0, p1, p2, p3, normal, node_index, invisible,
-            ai_ignore);
+        Log::debug("Graph", "2d node created, normal: %f, %f, %f",
+            normal.x(), normal.y(), normal.z());
+        if (is_arena)
+        {
+            q = new ArenaNode(p0, p1, p2, p3, normal, node_index);
+        }
+        else
+        {
+            q = new Node2D(p0, p1, p2, p3, normal, node_index, invisible,
+                ai_ignore);
+        }
     }
     m_all_nodes.push_back(q);
 
