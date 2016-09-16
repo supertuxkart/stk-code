@@ -280,7 +280,7 @@ void Track::reset()
 void Track::cleanup()
 {
     QuadGraph::destroy();
-    BattleGraph::destroy();
+    Graph::destroy();
     ItemManager::destroy();
     VAOManager::kill();
 
@@ -678,7 +678,7 @@ void Track::loadBattleGraph(const XMLNode &node)
     ArenaGraph* graph = new ArenaGraph(m_root+"navmesh.xml", &node);
     Graph::setGraph(graph);
 
-    if(BattleGraph::get()->getNumNodes()==0)
+    if(Graph::get()->getNumNodes()==0)
     {
         Log::warn("track", "No graph nodes defined for track '%s'\n",
                 m_filename.c_str());

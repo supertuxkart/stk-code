@@ -67,7 +67,7 @@ private:
     virtual bool isWaiting() const;
     virtual bool canSkid(float steer_fraction)           { return false; }
     virtual bool forceBraking() OVERRIDE
-                            { return m_avoiding_banana || m_force_brake; }
+                              { return m_avoiding_item || m_force_brake; }
     virtual bool ignorePathFinding() OVERRIDE
                             { return  m_overtake_ball || m_chasing_ball; }
 public:

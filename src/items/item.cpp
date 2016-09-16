@@ -25,6 +25,7 @@
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
+#include "tracks/arena_graph.hpp"
 #include "tracks/graph_node.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
@@ -134,23 +135,17 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     }
     // Now determine in which quad this item is, and its distance
     // from the center within this quad.
-    m_graph_node = QuadGraph::UNKNOWN_SECTOR;
-    QuadGraph* currentQuadGraph = QuadGraph::get();
+    m_graph_node = Graph::UNKNOWN_SECTOR;
+    m_distance_from_center = 9999.9f;
+    m_avoidance_points[0] = NULL;
+    m_avoidance_points[1] = NULL;
 
-    // Check that QuadGraph exist (it might not in battle mode for eg)
-    if (currentQuadGraph != NULL)
+    // Check that Graph exist (it might not in battle mode without navmesh)
+    if (Graph::get())
     {
-      QuadGraph::get()->findRoadSector(xyz, &m_graph_node);
+        Graph::get()->findRoadSector(xyz, &m_graph_node);
     }
-
-    if(m_graph_node==QuadGraph::UNKNOWN_SECTOR)
-    {
-        m_graph_node = -1;
-        m_distance_from_center = 9999.9f;   // is not used
-        m_avoidance_points[0] = NULL;
-        m_avoidance_points[1] = NULL;
-    }
-    else
+    else if (!ArenaGraph::get()) // Todo replace with driveline graph
     {
         // Item is on quad graph. Pre-compute the distance from center
         // of this item, which is used by the AI (mostly for avoiding items)

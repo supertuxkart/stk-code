@@ -26,11 +26,11 @@
 #include "karts/controller/player_controller.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
-#include "tracks/battle_graph.hpp"
-#include "tracks/quad.hpp"
+#include "tracks/arena_graph.hpp"
+#include "tracks/arena_node.hpp"
 #include "utils/log.hpp"
 
-int ArenaAI::m_test_node_for_banana = BattleGraph::UNKNOWN_POLY;
+int ArenaAI::m_test_node_for_banana = Graph::UNKNOWN_SECTOR;
 
 bool isNodeWithBanana(const std::pair<const Item*, int>& item_pair)
 {
@@ -44,6 +44,8 @@ ArenaAI::ArenaAI(AbstractKart *kart)
 {
     m_debug_sphere = NULL;
     m_debug_sphere_next = NULL;
+    m_graph = ArenaGraph::get();
+    assert(m_graph != NULL);
 }   // ArenaAI
 
 //-----------------------------------------------------------------------------
@@ -51,18 +53,18 @@ ArenaAI::ArenaAI(AbstractKart *kart)
  */
 void ArenaAI::reset()
 {
-    m_target_node = BattleGraph::UNKNOWN_POLY;
-    m_current_forward_node = BattleGraph::UNKNOWN_POLY;
+    m_target_node = Graph::UNKNOWN_SECTOR;
+    m_current_forward_node = Graph::UNKNOWN_SECTOR;
     m_current_forward_point = Vec3(0, 0, 0);
     m_adjusting_side = false;
     m_closest_kart = NULL;
-    m_closest_kart_node = BattleGraph::UNKNOWN_POLY;
+    m_closest_kart_node = Graph::UNKNOWN_SECTOR;
     m_closest_kart_point = Vec3(0, 0, 0);
     m_closest_kart_pos_data = {0};
     m_cur_kart_pos_data = {0};
     m_is_stuck = false;
     m_is_uturn = false;
-    m_avoiding_banana = false;
+    m_avoiding_item = false;
     m_target_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
@@ -88,7 +90,7 @@ void ArenaAI::update(float dt)
     // This is used to enable firing an item backwards.
     m_controls->m_look_back = false;
     m_controls->m_nitro     = false;
-    m_avoiding_banana = false;
+    m_avoiding_item = false;
 
     // Don't do anything if there is currently a kart animations shown.
     if (m_kart->getKartAnimation())
@@ -140,24 +142,29 @@ bool ArenaAI::updateAimingPosition()
     // to compensate the time difference between steering
     m_current_forward_point =
         m_kart->getTrans()(Vec3(0, 0, m_kart->getKartLength()));
-    m_current_forward_node = BattleGraph::get()->pointToNode
-        (m_current_forward_node, m_current_forward_point,
-        false/*ignore_vertical*/);
+
+    std::vector<int>* test_nodes = NULL;
+    if (m_current_forward_node != Graph::UNKNOWN_SECTOR)
+    {
+        test_nodes =
+            m_graph->getNode(m_current_forward_node)->getNearbyNodes();
+    }
+    m_graph->findRoadSector(m_current_forward_point, &m_current_forward_node,
+        test_nodes);
 
     // Use current node if forward node is unknown, or near the target
-    const int forward = (m_current_forward_node == BattleGraph::UNKNOWN_POLY ||
+    const int forward = (m_current_forward_node == Graph::UNKNOWN_SECTOR ||
         m_current_forward_node == m_target_node ||
         getCurrentNode() == m_target_node ? getCurrentNode() :
         m_current_forward_node);
 
-    if (forward == BattleGraph::UNKNOWN_POLY ||
-        m_target_node == BattleGraph::UNKNOWN_POLY)
+    if (forward == Graph::UNKNOWN_SECTOR ||
+        m_target_node == Graph::UNKNOWN_SECTOR)
         return false;
 
     if (forward == m_target_node)
     {
-        m_aiming_points.push_back(BattleGraph::get()
-            ->getQuadOfNode(forward).getCenter());
+        m_aiming_points.push_back(m_graph->getNode(forward)->getCenter());
         m_aiming_points.push_back(m_target_point);
 
         m_aiming_nodes.insert(forward);
@@ -165,19 +172,16 @@ bool ArenaAI::updateAimingPosition()
         return true;
     }
 
-    const int next_node = BattleGraph::get()
-        ->getNextShortestPathPoly(forward, m_target_node);
-    if (next_node == BattleGraph::UNKNOWN_POLY)
+    const int next_node = m_graph->getNextNode(forward, m_target_node);
+    if (next_node == Graph::UNKNOWN_SECTOR)
     {
         Log::error("ArenaAI", "Next node is unknown, did you forget to link"
                    "adjacent face in navmesh?");
         return false;
     }
 
-    m_aiming_points.push_back(BattleGraph::get()
-        ->getQuadOfNode(forward).getCenter());
-    m_aiming_points.push_back(BattleGraph::get()
-        ->getQuadOfNode(next_node).getCenter());
+    m_aiming_points.push_back(m_graph->getNode(forward)->getCenter());
+    m_aiming_points.push_back(m_graph->getNode(next_node)->getCenter());
 
     m_aiming_nodes.insert(forward);
     m_aiming_nodes.insert(next_node);
@@ -194,8 +198,8 @@ void ArenaAI::handleArenaSteering(const float dt)
 {
     const int current_node = getCurrentNode();
 
-    if (current_node == BattleGraph::UNKNOWN_POLY ||
-        m_target_node == BattleGraph::UNKNOWN_POLY)
+    if (current_node == Graph::UNKNOWN_SECTOR ||
+        m_target_node == Graph::UNKNOWN_SECTOR)
     {
         return;
     }
@@ -224,7 +228,7 @@ void ArenaAI::handleArenaSteering(const float dt)
     }
     else if (found_position)
     {
-        updateBananaLocation();
+        updateBadItemLocation();
         assert(m_aiming_points.size() == 2);
         updateTurnRadius(m_kart->getXYZ(), m_aiming_points[0],
             m_aiming_points[1]);
@@ -368,44 +372,41 @@ bool ArenaAI::handleArenaUnstuck(const float dt)
 }   // handleArenaUnstuck
 
 //-----------------------------------------------------------------------------
-void ArenaAI::updateBananaLocation()
+void ArenaAI::updateBadItemLocation()
 {
-    std::vector<std::pair<const Item*, int>>& item_list =
-        BattleGraph::get()->getItemList();
-
-    std::set<int>::iterator node = m_aiming_nodes.begin();
-    while (node != m_aiming_nodes.end())
+    // Check if any nodes AI will cross will meet bad items
+    for (const int& node : m_aiming_nodes)
     {
-        m_test_node_for_banana = *node;
-        std::vector<std::pair<const Item*, int>>::iterator it =
-            std::find_if(item_list.begin(), item_list.end(), isNodeWithBanana);
+        assert(node != Graph::UNKNOWN_SECTOR);
+        Item* selected = ItemManager::get()->getFirstItemInQuad(node);
 
-        if (it != item_list.end())
+        if (selected && !selected->wasCollected() &&
+            (selected->getType() == Item::ITEM_BANANA ||
+            selected->getType() == Item::ITEM_BUBBLEGUM ||
+            selected->getType() == Item::ITEM_BUBBLEGUM_NOLOK))
         {
-            Vec3 banana_lc;
-            checkPosition(it->first->getXYZ(), NULL, &banana_lc,
+            Vec3 bad_item_lc;
+            checkPosition(selected->getXYZ(), NULL, &bad_item_lc,
                 true/*use_front_xyz*/);
 
-            // If satisfy the below condition, AI should not eat banana:
-            // banana_lc.z() < 0.0f, behind the kart
-            if (banana_lc.z() < 0.0f)
+            // If satisfy the below condition, AI should not be affected by it:
+            // bad_item_lc.z() < 0.0f, behind the kart
+            if (bad_item_lc.z() < 0.0f)
             {
-                node++;
                 continue;
             }
 
-            // If the node AI will pass has a banana, adjust the aim position
-            banana_lc = (banana_lc.x() < 0 ? banana_lc + Vec3(5, 0, 0) :
-                        banana_lc - Vec3(5, 0, 0));
-            m_aiming_points[1] = m_kart->getTrans()(banana_lc);
-            m_avoiding_banana = true;
+            // If the node AI will pass has a bad item, adjust the aim position
+            bad_item_lc = (bad_item_lc.x() < 0 ? bad_item_lc + Vec3(5, 0, 0) :
+                           bad_item_lc - Vec3(5, 0, 0));
+            m_aiming_points[1] = m_kart->getTrans()(bad_item_lc);
+            m_avoiding_item = true;
             // Handle one banana only
             return;
         }
-        node++;
     }
 
-}   // updateBananaLocation
+}   // updateBadItemLocation
 
 //-----------------------------------------------------------------------------
 /** This function handles braking. It used the turn radius found by
@@ -429,8 +430,8 @@ void ArenaAI::handleArenaBraking()
 
     m_controls->m_brake = false;
 
-    if (getCurrentNode() == BattleGraph::UNKNOWN_POLY ||
-        m_target_node    == BattleGraph::UNKNOWN_POLY) return;
+    if (getCurrentNode() == Graph::UNKNOWN_SECTOR ||
+        m_target_node    == Graph::UNKNOWN_SECTOR) return;
 
     if (m_aiming_points.empty()) return;
 
@@ -658,55 +659,50 @@ void ArenaAI::handleArenaItems(const float dt)
 //-----------------------------------------------------------------------------
 void ArenaAI::collectItemInArena(Vec3* aim_point, int* target_node) const
 {
-    float distance = 99999.9f;
-    const std::vector< std::pair<const Item*, int> >& item_list =
-        BattleGraph::get()->getItemList();
-    const unsigned int items_count = item_list.size();
+    float distance = 999999.9f;
+    Item* selected = (*target_node == Graph::UNKNOWN_SECTOR ? NULL :
+        ItemManager::get()->getFirstItemInQuad(*target_node));
 
-    if (item_list.empty())
+    // Don't look for a new item unless it's collected or swapped
+    if (selected && !(selected->wasCollected() ||
+        selected->getType() == Item::ITEM_BANANA ||
+        selected->getType() == Item::ITEM_BUBBLEGUM ||
+        selected->getType() == Item::ITEM_BUBBLEGUM_NOLOK))
     {
-        // Notice: this should not happen, as it makes no sense
-        // for an arean without items, if so how can attack happen?
-        Log::fatal ("ArenaAI",
-                    "AI can't find any items in the arena, "
-                    "maybe there is something wrong with the navmesh, "
-                    "make sure it lies closely to the ground.");
+        *aim_point = selected->getXYZ();
         return;
     }
 
-    unsigned int closest_item_num = 0;
-
-    for (unsigned int i = 0; i < items_count; ++i)
+    for (unsigned int i = 0; i < m_graph->getNumNodes(); i++)
     {
-        const Item* item = item_list[i].first;
+        Item* cur_item = ItemManager::get()->getFirstItemInQuad(i);
+        if (cur_item == NULL) continue;
+        if (cur_item->wasCollected() ||
+            cur_item->getType() == Item::ITEM_BANANA ||
+            cur_item->getType() == Item::ITEM_BUBBLEGUM ||
+            cur_item->getType() == Item::ITEM_BUBBLEGUM_NOLOK)
+            continue;
 
-        if (item->wasCollected()) continue;
-
-        if ((item->getType() == Item::ITEM_NITRO_BIG ||
-             item->getType() == Item::ITEM_NITRO_SMALL) &&
+        if ((cur_item->getType() == Item::ITEM_NITRO_BIG ||
+             cur_item->getType() == Item::ITEM_NITRO_SMALL) &&
             (m_kart->getEnergy() >
              m_kart->getKartProperties()->getNitroSmallContainer()))
                 continue; // Ignore nitro when already has some
 
-        float test_distance = BattleGraph::get()
-            ->getDistance(item_list[i].second, getCurrentNode());
-        if (test_distance <= distance               &&
-           (item->getType() == Item::ITEM_BONUS_BOX ||
-            item->getType() == Item::ITEM_NITRO_BIG ||
-            item->getType() == Item::ITEM_NITRO_SMALL))
+        const int cur_node = cur_item->getGraphNode();
+        assert(cur_node != Graph::UNKNOWN_SECTOR);
+        float test_distance = m_graph->getDistance(cur_node, getCurrentNode());
+        if (test_distance <= distance)
         {
-            closest_item_num = i;
+            selected = cur_item;
             distance = test_distance;
         }
     }
 
-    const Item *item_selected = item_list[closest_item_num].first;
-    if (item_selected->getType() == Item::ITEM_BONUS_BOX ||
-        item_selected->getType() == Item::ITEM_NITRO_BIG ||
-        item_selected->getType() == Item::ITEM_NITRO_SMALL)
+    if (selected != NULL)
     {
-        *aim_point = item_selected->getXYZ();
-        *target_node = item_list[closest_item_num].second;
+        *aim_point = selected->getXYZ();
+        *target_node = selected->getGraphNode();
     }
     else
     {

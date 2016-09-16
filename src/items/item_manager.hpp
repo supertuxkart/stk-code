@@ -132,6 +132,16 @@ public:
         assert(n<(*m_items_in_quads).size());
         return (*m_items_in_quads)[n];
     }   // getItemsInQuads
+    // ------------------------------------------------------------------------
+    /** Returns the first item (NULL if none) on the specified quad
+     */
+    Item* getFirstItemInQuad(unsigned int n) const
+    {
+        assert(m_items_in_quads);
+        assert(n < m_items_in_quads->size());
+        return ((*m_items_in_quads)[n]).empty() ? NULL :
+            (*m_items_in_quads)[n].front();
+    }   // getFirstItemInQuad
 };   // ItemManager
 
 #endif

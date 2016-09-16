@@ -27,7 +27,7 @@
 #include "graphics/irr_driver.hpp"
 #endif
 
-class Vec3;
+class ArenaGraph;
 
 namespace irr
 {
@@ -63,11 +63,13 @@ protected:
     /** The target point. */
     Vec3 m_target_point;
 
-    bool m_avoiding_banana;
+    bool m_avoiding_item;
 
     void  collectItemInArena(Vec3*, int*) const;
     float findAngleFrom3Edges(float a, float b, float c);
 private:
+    ArenaGraph* m_graph;
+
     /** Used by handleArenaUTurn, it tells whether to do left or right
      *  turning when steering is overridden. */
     bool m_adjusting_side;
@@ -115,7 +117,7 @@ private:
     void         handleArenaUTurn(const float dt);
     bool         handleArenaUnstuck(const float dt);
     bool         updateAimingPosition();
-    void         updateBananaLocation();
+    void         updateBadItemLocation();
     void         updateTurnRadius(const Vec3& p1, const Vec3& p2,
                                   const Vec3& p3);
     virtual int  getCurrentNode() const = 0;
@@ -123,7 +125,7 @@ private:
     virtual void resetAfterStop() {};
     virtual void findClosestKart(bool use_difficulty) = 0;
     virtual void findTarget() = 0;
-    virtual bool forceBraking() { return m_avoiding_banana; }
+    virtual bool forceBraking() { return m_avoiding_item; }
     virtual bool ignorePathFinding() { return false; }
 public:
     static int   m_test_node_for_banana;

@@ -32,9 +32,10 @@
 #include "modes/linear_world.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
+#include "tracks/arena_graph.hpp"
 #include "tracks/battle_graph.hpp"
+#include "tracks/graph.hpp"
 #include "tracks/graph_node.hpp"
-#include "tracks/quad_graph.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
@@ -158,12 +159,12 @@ ItemManager::ItemManager()
         m_switch_to.push_back((Item::ItemType)i);
     setSwitchItems(stk_config->m_switch_items);
 
-    if(QuadGraph::get())
+    if(Graph::get())
     {
         m_items_in_quads = new std::vector<AllItemTypes>;
         // Entries 0 to n-1 are for the quads, entry
         // n is for all items that are not on a quad.
-        m_items_in_quads->resize(QuadGraph::get()->getNumNodes()+1);
+        m_items_in_quads->resize(Graph::get()->getNumNodes()+1);
     }
     else
     {
@@ -228,8 +229,7 @@ void ItemManager::insertItem(Item *item)
         // If the item is on the driveline, store it at the appropriate index
         if(graph_node > -1)
         {
-            int sector = QuadGraph::get()->getNode(graph_node)->getNodeIndex();
-            (*m_items_in_quads)[sector].push_back(item);
+            (*m_items_in_quads)[graph_node].push_back(item);
         }
         else  // otherwise store it in the 'outside' index
             (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
@@ -427,9 +427,8 @@ void ItemManager::deleteItem(Item *item)
     if(m_items_in_quads)
     {
         const Vec3 &xyz = item->getXYZ();
-        int sector = QuadGraph::UNKNOWN_SECTOR;
-        QuadGraph::get()->findRoadSector(xyz, &sector);
-        unsigned int indx = sector==QuadGraph::UNKNOWN_SECTOR
+        int sector = item->getGraphNode();
+        unsigned int indx = sector==Graph::UNKNOWN_SECTOR
                           ? (unsigned int) m_items_in_quads->size()-1
                           : sector;
         AllItemTypes &items = (*m_items_in_quads)[indx];
