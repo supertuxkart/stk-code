@@ -375,6 +375,7 @@ private:
     void loadTrackInfo();
     void loadQuadGraph(unsigned int mode_id, const bool reverse);
     void loadArenaGraph(const XMLNode &node);
+    btQuaternion getArenaStartRotation(const Vec3& xyz, float heading);
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
     void loadMinimap();

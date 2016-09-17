@@ -56,7 +56,6 @@
 #include "tracks/arena_graph.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/check_manager.hpp"
-#include "tracks/graph_node.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/node_3d.hpp"
 #include "tracks/quad_graph.hpp"
@@ -686,6 +685,34 @@ void Track::loadArenaGraph(const XMLNode &node)
         loadMinimap();
     }
 }   // loadArenaGraph
+
+//-----------------------------------------------------------------------------
+btQuaternion Track::getArenaStartRotation(const Vec3& xyz, float heading)
+{
+    btQuaternion def_pos(Vec3(0, 1, 0), heading * DEGREE_TO_RAD);
+    if (!ArenaGraph::get())
+        return def_pos;
+
+    // Set the correct axis based on normal of the starting position
+    int node = Graph::UNKNOWN_SECTOR;
+    Graph::get()->findRoadSector(xyz, &node);
+    if (node == Graph::UNKNOWN_SECTOR)
+    {
+        Log::warn("track", "Starting position is not on ArenaGraph");
+        return def_pos;
+    }
+
+    const Vec3& normal = Graph::get()->getQuad(node)->getNormal();
+    Vec3 axis = -normal.cross(Vec3(0, 1, 0));
+    if (axis.length() == 0)
+        axis = Vec3(0, 0, 1);
+
+    btQuaternion q(axis, normal.angle(Vec3(0, 1, 0)));
+    btMatrix3x3 m;
+    m.setRotation(q);
+    return btQuaternion(m.getColumn(1), heading * DEGREE_TO_RAD) * q;
+
+}   // getArenaStartRotation
 
 //-----------------------------------------------------------------------------
 /** Loads the quad graph, i.e. the definition of all quads, and the way
@@ -1961,9 +1988,8 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
             }
 
             m_start_transforms[position].setOrigin(xyz);
-            m_start_transforms[position].setRotation(
-                                           btQuaternion(btVector3(0,1,0),
-                                                        h*DEGREE_TO_RAD ) );
+            m_start_transforms[position]
+                .setRotation(getArenaStartRotation(xyz, h));
         }
         else if (name == "camera")
         {

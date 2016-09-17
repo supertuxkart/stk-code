@@ -391,7 +391,10 @@ void Kart::reset()
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
 
-    m_terrain_info->update(getTrans().getBasis());
+    // Base on update() below, require if starting point of kart is not near
+    // 0, 0, 0 (like in battle arena)
+    m_terrain_info->update(getTrans().getBasis(),
+        getTrans().getOrigin() + getTrans().getBasis() * Vec3(0, 0.3f, 0));
 
     // Reset is also called when the kart is created, at which time
     // m_controller is not yet defined, so this has to be tested here.

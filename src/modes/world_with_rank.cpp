@@ -162,7 +162,7 @@ unsigned int WorldWithRank::getRescuePositionIndex(AbstractKart *kart)
         for(unsigned int k=0; k<getCurrentNumKarts(); k++)
         {
             if(kart->getWorldKartId()==k) continue;
-            float abs_distance2 = (getKart(k)->getXYZ()-v).length2_2d();
+            float abs_distance2 = (getKart(k)->getXYZ()-v).length2();
             const float CLEAR_SPAWN_RANGE2 = 5*5;
             if( abs_distance2 < CLEAR_SPAWN_RANGE2)
             {
