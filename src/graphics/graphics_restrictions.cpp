@@ -215,7 +215,7 @@ public:
             convertVersionString(s[0]);
             return;
         }
-
+        
         Log::warn("Graphics", "Can not find version for '%s' '%s' - ignored.",
             driver_version.c_str(), card_name.c_str());
 
@@ -277,7 +277,7 @@ class Rule : public NoCopy
 {
 private:
     /** Operators to test for a card. */
-    enum {CARD_IS, CARD_CONTAINS} m_card_test;
+    enum {CARD_IGNORE, CARD_IS, CARD_CONTAINS} m_card_test;
 
     /** Name of the card for which this rule applies. */
     std::string m_card_name;
@@ -298,6 +298,8 @@ public:
     Rule(const XMLNode *rule)
     {
         m_version_test = VERSION_IGNORE;
+        m_card_test = CARD_IGNORE;
+        
         if(rule->get("is", &m_card_name))
         {
             m_card_test = CARD_IS;
@@ -345,7 +347,7 @@ public:
         // -----------
         if(m_os.size()>0)
         {
-#ifdef __linux__
+#if defined(__linux__) && !defined(ANDROID)
             if(m_os!="linux") return false;
 #endif
 #ifdef WIN32
