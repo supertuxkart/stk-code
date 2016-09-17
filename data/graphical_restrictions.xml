@@ -30,4 +30,5 @@
   <card contains="ATI"            os="windows"  version="<14.300"  disable="DriverRecentEnough"/>
   <card contains="ATI"            os="windows"  version="<=3.1.8787" disable="ForceLegacyDevice"/>
   <card                           os="android"                     disable="TextureFormatBGRA8888"/>
+  <card                           os="android"                     disable="ColorBufferFloat"/>
 </graphical-restrictions>
