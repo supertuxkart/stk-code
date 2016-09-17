@@ -20,7 +20,7 @@
 
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
-#include "tracks/quad_graph.hpp"
+#include "tracks/drive_graph.hpp"
 
 #include "ICameraSceneNode.h"
 
@@ -62,7 +62,7 @@ void CameraEnd::readEndCamera(const XMLNode &root)
         unsigned int index = i;
         // In reverse mode, reverse the order in which the
         // end cameras are read.
-        if(QuadGraph::get()->isReverse())
+        if(DriveGraph::get()->isReverse())
             index = root.getNumNodes() - 1 - i;
         const XMLNode *node = root.getNode(index);
         EndCameraInformation eci;

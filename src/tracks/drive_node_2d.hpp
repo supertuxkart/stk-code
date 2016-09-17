@@ -16,10 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_NODE_2D_HPP
-#define HEADER_NODE_2D_HPP
+#ifndef HEADER_DRIVE_NODE_2D_HPP
+#define HEADER_DRIVE_NODE_2D_HPP
 
-#include "tracks/graph_node.hpp"
+#include "tracks/drive_node.hpp"
 #include "utils/cpp2011.hpp"
 
 #include <line2d.h>
@@ -27,7 +27,7 @@
 /**
   * \ingroup tracks
   */
-class Node2D : public GraphNode
+class DriveNode2D : public DriveNode
 {
 private:
     /** The center point of the lower two points (e.g. points 0 and 1).
@@ -43,9 +43,9 @@ private:
     core::line2df m_line;
 
 public:
-    Node2D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
-           const Vec3 &normal, unsigned int node_index, bool invisible,
-           bool ai_ignore);
+    DriveNode2D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
+                const Vec3 &normal, unsigned int node_index, bool invisible,
+                bool ai_ignore);
     // ------------------------------------------------------------------------
     virtual void getDistances(const Vec3 &xyz, Vec3 *result) const OVERRIDE;
     // ------------------------------------------------------------------------

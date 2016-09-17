@@ -30,8 +30,8 @@
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
-#include "tracks/graph_node.hpp"
-#include "tracks/quad_graph.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/track_sector.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -393,7 +393,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 int LinearWorld::getSectorForKart(const AbstractKart *kart) const
 {
     if(kart->getWorldKartId()>=m_kart_info.size())
-        return QuadGraph::UNKNOWN_SECTOR;
+        return Graph::UNKNOWN_SECTOR;
     return m_kart_info[kart->getWorldKartId()].getTrackSector()
           ->getCurrentGraphNode();
 }   // getSectorForKart
@@ -629,7 +629,7 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
   */
 unsigned int LinearWorld::getNumberOfRescuePositions() const
 {
-    return QuadGraph::get()->getNumNodes();
+    return DriveGraph::get()->getNumNodes();
 }   // getNumberOfRescuePositions
 
 // ------------------------------------------------------------------------
@@ -647,8 +647,8 @@ unsigned int LinearWorld::getRescuePositionIndex(AbstractKart *kart)
 // ------------------------------------------------------------------------
 btTransform LinearWorld::getRescueTransform(unsigned int index) const
 {
-    const Vec3 &xyz = QuadGraph::get()->getNode(index)->getCenter();
-    const Vec3 &normal = QuadGraph::get()->getNode(index)->getNormal();
+    const Vec3 &xyz = DriveGraph::get()->getNode(index)->getCenter();
+    const Vec3 &normal = DriveGraph::get()->getNode(index)->getNormal();
     btTransform pos;
     pos.setOrigin(xyz);
 
@@ -866,11 +866,11 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
     // will be one direction in which it isn't going backwards anyway.
     int sector = m_kart_info[i].getTrackSector()->getCurrentGraphNode();
     
-    if (QuadGraph::get()->getNumberOfSuccessors(sector) > 1)
+    if (DriveGraph::get()->getNumberOfSuccessors(sector) > 1)
         return;
 
     // check if the player is going in the wrong direction
-    const GraphNode* node = QuadGraph::get()->getNode(sector);
+    const DriveNode* node = DriveGraph::get()->getNode(sector);
     Vec3 center_line = node->getUpperCenter() - node->getLowerCenter();
     float angle_diff = kart->getVelocity().angle(center_line);
 

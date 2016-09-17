@@ -16,18 +16,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_NODE_3D_HPP
-#define HEADER_NODE_3D_HPP
+#ifndef HEADER_DRIVE_NODE_3D_HPP
+#define HEADER_DRIVE_NODE_3D_HPP
 
 #include "tracks/bounding_box_3d.hpp"
-#include "tracks/graph_node.hpp"
+#include "tracks/drive_node.hpp"
 #include "utils/cpp2011.hpp"
 
 /**
   * \ingroup tracks
   */
-class Node3D : public GraphNode,
-               public BoundingBox3D
+class DriveNode3D : public DriveNode,
+                    public BoundingBox3D
 {
 private:
     /** Line between lower and upper center, saves computation in
@@ -36,9 +36,9 @@ private:
     core::line3df m_line;
 
 public:
-    Node3D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
-           const Vec3 &normal, unsigned int node_index, bool invisible,
-           bool ai_ignore);
+    DriveNode3D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
+                const Vec3 &normal, unsigned int node_index, bool invisible,
+                bool ai_ignore);
     // ------------------------------------------------------------------------
     virtual bool pointInside(const Vec3& p,
                              bool ignore_vertical = false) const OVERRIDE

@@ -30,8 +30,8 @@
 #include "graphics/rtts.hpp"
 #include "modes/profile_world.hpp"
 #include "tracks/arena_node_3d.hpp"
-#include "tracks/node_2d.hpp"
-#include "tracks/node_3d.hpp"
+#include "tracks/drive_node_2d.hpp"
+#include "tracks/drive_node_3d.hpp"
 #include "utils/log.hpp"
 
 const int Graph::UNKNOWN_SECTOR = -1;
@@ -426,7 +426,7 @@ void Graph::createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
         }
         else
         {
-            q = new Node3D(p0, p1, p2, p3, normal, node_index, invisible,
+            q = new DriveNode3D(p0, p1, p2, p3, normal, node_index, invisible,
                 ai_ignore);
         }
     }
@@ -440,7 +440,7 @@ void Graph::createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
         }
         else
         {
-            q = new Node2D(p0, p1, p2, p3, normal, node_index, invisible,
+            q = new DriveNode2D(p0, p1, p2, p3, normal, node_index, invisible,
                 ai_ignore);
         }
     }
@@ -614,5 +614,3 @@ int Graph::findOutOfRoadSector(const Vec3& xyz, const int curr_sector,
     }
     return min_sector;
 }   // findOutOfRoadSector
-
-//-----------------------------------------------------------------------------

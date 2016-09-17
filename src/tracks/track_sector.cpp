@@ -16,15 +16,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "tracks/track_sector.hpp"
+
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/check_structure.hpp"
-#include "tracks/track_sector.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
-#include "tracks/quad_graph.hpp"
-#include "tracks/graph_node.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 
 // ----------------------------------------------------------------------------
 /** Initialises the object, and sets the current graph node to be undefined.
@@ -37,8 +38,8 @@ TrackSector::TrackSector()
 // ----------------------------------------------------------------------------
 void TrackSector::reset()
 {
-    m_current_graph_node       = QuadGraph::UNKNOWN_SECTOR;
-    m_last_valid_graph_node    = QuadGraph::UNKNOWN_SECTOR;
+    m_current_graph_node       = Graph::UNKNOWN_SECTOR;
+    m_last_valid_graph_node    = Graph::UNKNOWN_SECTOR;
     m_on_road                  = false;
     m_last_triggered_checkline = -1;
 }   // reset
@@ -79,8 +80,8 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
         if (ag) return;
         // keep the current quad as the latest valid one IF the player has one
         // of the required checklines
-        const GraphNode* gn = QuadGraph::get()->getNode(m_current_graph_node);
-        const std::vector<int>& checkline_requirements = gn->getChecklineRequirements();
+        const DriveNode* dn = DriveGraph::get()->getNode(m_current_graph_node);
+        const std::vector<int>& checkline_requirements = dn->getChecklineRequirements();
 
         if (checkline_requirements.size() == 0)
         {
@@ -107,8 +108,8 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
 
     // Now determine the 'track' coords, i.e. ow far from the start of the
     // track, and how far to the left or right of the center driveline.
-    QuadGraph::get()->spatialToTrack(&m_current_track_coords, xyz,
-                                     m_current_graph_node);
+    DriveGraph::get()->spatialToTrack(&m_current_track_coords, xyz,
+                                      m_current_graph_node);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -116,7 +117,7 @@ void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
  */
 void TrackSector::rescue()
 {
-    if (m_last_valid_graph_node != QuadGraph::UNKNOWN_SECTOR)
+    if (m_last_valid_graph_node != Graph::UNKNOWN_SECTOR)
         m_current_graph_node = m_last_valid_graph_node;
 
     // Using the predecessor has the additional advantage (besides punishing
@@ -124,10 +125,10 @@ void TrackSector::rescue()
     // rescue loop since the kart moves back on each attempt. At this stage
     // STK does not keep track of where the kart is coming from, so always
     // use the first predecessor, which is the one on the main driveline.
-    m_current_graph_node = QuadGraph::get()->getNode(m_current_graph_node)
-                                           ->getPredecessor(0);
-    m_last_valid_graph_node = QuadGraph::get()->getNode(m_current_graph_node)
-                                              ->getPredecessor(0);
+    m_current_graph_node = DriveGraph::get()->getNode(m_current_graph_node)
+                                            ->getPredecessor(0);
+    m_last_valid_graph_node = DriveGraph::get()->getNode(m_current_graph_node)
+                                               ->getPredecessor(0);
 }    // rescue
 
 // ----------------------------------------------------------------------------
@@ -137,7 +138,7 @@ void TrackSector::rescue()
  */
 float TrackSector::getRelativeDistanceToCenter() const
 {
-    float w = QuadGraph::get()->getNode(m_current_graph_node)->getPathWidth();
+    float w = DriveGraph::get()->getNode(m_current_graph_node)->getPathWidth();
     // w * 0.5 is the distance from center of the quad to the left or right
     // This way we get a value between -1 and 1.
     float ratio = getDistanceToCenter()/(w*0.5f);

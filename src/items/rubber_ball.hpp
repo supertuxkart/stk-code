@@ -25,7 +25,6 @@
 #include "tracks/track_sector.hpp"
 
 class AbstractKart;
-class QuadGraph;
 class SFXBase;
 
 /**

@@ -26,8 +26,8 @@
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
 #include "tracks/arena_graph.hpp"
-#include "tracks/graph_node.hpp"
-#include "tracks/quad_graph.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/vec3.hpp"
@@ -145,15 +145,15 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     {
         Graph::get()->findRoadSector(xyz, &m_graph_node);
     }
-    if (Graph::get() && !ArenaGraph::get()) // Todo replace with driveline graph
+    if (DriveGraph::get() && m_graph_node != Graph::UNKNOWN_SECTOR)
     {
-        // Item is on quad graph. Pre-compute the distance from center
+        // Item is on drive graph. Pre-compute the distance from center
         // of this item, which is used by the AI (mostly for avoiding items)
         Vec3 distances;
-        QuadGraph::get()->spatialToTrack(&distances, m_xyz, m_graph_node);
+        DriveGraph::get()->spatialToTrack(&distances, m_xyz, m_graph_node);
         m_distance_from_center = distances.getX();
-        const GraphNode* gn = QuadGraph::get()->getNode(m_graph_node);
-        const Vec3& right = gn->getRightUnitVector();
+        const DriveNode* dn = DriveGraph::get()->getNode(m_graph_node);
+        const Vec3& right = dn->getRightUnitVector();
         // Give it 10% more space, since the kart will not always come
         // parallel to the drive line.
         Vec3 delta = right * sqrt(m_distance_2) * 1.3f;

@@ -64,8 +64,8 @@
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "tracks/terrain_info.hpp"
-#include "tracks/quad_graph.hpp"
-#include "tracks/graph_node.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
@@ -1296,14 +1296,14 @@ void Kart::update(float dt)
 
     // To be used later
     float dist_to_sector = 0.0f;
-    if (QuadGraph::get())
+    if (DriveGraph::get())
     {
         const int sector = ((LinearWorld*)World::getWorld())
             ->getTrackSector(getWorldKartId()).getCurrentGraphNode();
         dist_to_sector = getXYZ().distance
-            (QuadGraph::get()->getNode(sector)->getCenter());
+            (DriveGraph::get()->getNode(sector)->getCenter());
 
-        const Vec3& quad_normal = QuadGraph::get()->getNode(sector)
+        const Vec3& quad_normal = DriveGraph::get()->getNode(sector)
             ->getNormal();
         const btQuaternion& q = getTrans().getRotation();
         const float roll = quad_normal.angle
@@ -1941,13 +1941,13 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
             World::getWorld()->getTrack()->isPushBackEnabled())
     {
         int sector = lw->getSectorForKart(this);
-        if(sector!=QuadGraph::UNKNOWN_SECTOR)
+        if(sector!=Graph::UNKNOWN_SECTOR)
         {
             // Use the first predecessor node, which is the most
             // natural one (i.e. the one on the main driveline).
-            const GraphNode* gn = QuadGraph::get()->getNode(
-                QuadGraph::get()->getNode(sector)->getPredecessor(0));
-            Vec3 impulse = gn->getCenter() - getXYZ();
+            const DriveNode* dn = DriveGraph::get()->getNode(
+                DriveGraph::get()->getNode(sector)->getPredecessor(0));
+            Vec3 impulse = dn->getCenter() - getXYZ();
             impulse.setY(0);
             if(impulse.getX() || impulse.getZ())
                 impulse.normalize();

@@ -28,6 +28,7 @@ class ArenaNode;
 class XMLNode;
 
 /**
+ *  \brief A graph made from navmesh
  *  \ingroup tracks
  */
 class ArenaGraph : public Graph

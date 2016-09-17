@@ -16,18 +16,20 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "tracks/node_3d.hpp"
+#include "tracks/drive_node_3d.hpp"
 
 // ----------------------------------------------------------------------------
-Node3D::Node3D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
-               const Vec3 &normal, unsigned int node_index, bool invisible,
-               bool ai_ignore)
-       : GraphNode(p0, p1, p2, p3, normal, node_index, invisible, ai_ignore)
+DriveNode3D::DriveNode3D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
+                         const Vec3 &p3, const Vec3 &normal,
+                         unsigned int node_index, bool invisible,
+                         bool ai_ignore)
+           : DriveNode(p0, p1, p2, p3, normal, node_index, invisible,
+                       ai_ignore)
 {
     BoundingBox3D::init(p0, p1, p2, p3, normal);
     m_line = core::line3df(m_lower_center.toIrrVector(),
         m_upper_center.toIrrVector());
-}   // Node3D
+}   // DriveNode3D
 
 // ----------------------------------------------------------------------------
 /** Returns the distance a point has from this node in forward and sidewards
@@ -38,7 +40,7 @@ Node3D::Node3D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
  *  \param result The X coordinate contains the sidewards distance, the
  *                Z coordinate the forward distance.
  */
-void Node3D::getDistances(const Vec3 &xyz, Vec3 *result) const
+void DriveNode3D::getDistances(const Vec3 &xyz, Vec3 *result) const
 {
     core::vector3df xyz_irr = xyz.toIrrVector();
     core::vector3df closest = m_line.getClosestPoint(xyz.toIrrVector());
@@ -59,7 +61,7 @@ void Node3D::getDistances(const Vec3 &xyz, Vec3 *result) const
  *  which belongs to this node.
  *  \param xyz The point for which the distance to the line is computed.
  */
-float Node3D::getDistance2FromPoint(const Vec3 &xyz) const
+float DriveNode3D::getDistance2FromPoint(const Vec3 &xyz) const
 {
     core::vector3df closest = m_line.getClosestPoint(xyz.toIrrVector());
     return (closest-xyz.toIrrVector()).getLengthSQ();

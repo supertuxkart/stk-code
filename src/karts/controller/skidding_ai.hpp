@@ -45,11 +45,11 @@
 
 #include "karts/controller/ai_base_lap_controller.hpp"
 #include "race/race_manager.hpp"
-#include "tracks/graph_node.hpp"
+#include "tracks/drive_node.hpp"
 #include "utils/random_generator.hpp"
 
 class LinearWorld;
-class QuadGraph;
+class DriveGraph;
 class ShowCurve;
 class Track;
 
@@ -155,7 +155,7 @@ private:
     int m_start_kart_crash_direction;
 
     /** The direction of the track where the kart is on atm. */
-    GraphNode::DirectionType m_current_track_direction;
+    DriveNode::DirectionType m_current_track_direction;
 
     /** The radius of the curve the kart is currently driving. Undefined
      *  when being on a straigt section. */

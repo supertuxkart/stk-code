@@ -56,9 +56,9 @@
 #include "tracks/arena_graph.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/check_manager.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/model_definition_loader.hpp"
-#include "tracks/node_3d.hpp"
-#include "tracks/quad_graph.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
@@ -277,7 +277,6 @@ void Track::reset()
  */
 void Track::cleanup()
 {
-    QuadGraph::destroy();
     Graph::destroy();
     ItemManager::destroy();
     VAOManager::kill();
@@ -374,7 +373,7 @@ void Track::cleanup()
     }
     if (m_new_rtt_mini_map)
     {
-        m_new_rtt_mini_map = NULL; // already deleted by QuadGraph::~QuadGraph
+        m_new_rtt_mini_map = NULL; // already deleted by Graph::~Graph
     }
 
     for(unsigned int i=0; i<m_sky_textures.size(); i++)
@@ -715,24 +714,25 @@ btQuaternion Track::getArenaStartRotation(const Vec3& xyz, float heading)
 }   // getArenaStartRotation
 
 //-----------------------------------------------------------------------------
-/** Loads the quad graph, i.e. the definition of all quads, and the way
+/** Loads the drive graph, i.e. the definition of all quads, and the way
  *  they are connected to each other.
  */
-void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
+void Track::loadDriveGraph(unsigned int mode_id, const bool reverse)
 {
-    QuadGraph::create(m_root+m_all_modes[mode_id].m_quad_name,
-                      m_root+m_all_modes[mode_id].m_graph_name,
-                      reverse);
+    new DriveGraph(m_root+m_all_modes[mode_id].m_quad_name,
+        m_root+m_all_modes[mode_id].m_graph_name, reverse);
 
-    QuadGraph::get()->setupPaths();
+    // setGraph is done in DriveGraph constructor
+    assert(DriveGraph::get());
+    DriveGraph::get()->setupPaths();
 #ifdef DEBUG
-    for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
+    for(unsigned int i=0; i<DriveGraph::get()->getNumNodes(); i++)
     {
-        assert(QuadGraph::get()->getNode(i)->getPredecessor(0)!=-1);
+        assert(DriveGraph::get()->getNode(i)->getPredecessor(0)!=-1);
     }
 #endif
 
-    if(QuadGraph::get()->getNumNodes()==0)
+    if(DriveGraph::get()->getNumNodes()==0)
     {
         Log::warn("track", "No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
@@ -746,16 +746,13 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
     {
         loadMinimap();
     }
-}   // loadQuadGraph
+}   // loadDriveGraph
 
 // -----------------------------------------------------------------------------
 
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
-    if ((m_is_arena || m_is_soccer) && m_has_navmesh)
-        Graph::get()->mapPoint2MiniMap(xyz, draw_at);
-    else
-        QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
+    Graph::get()->mapPoint2MiniMap(xyz, draw_at);
     draw_at->setX(draw_at->getX() * m_minimap_x_scale);
     draw_at->setY(draw_at->getY() * m_minimap_y_scale);
 }
@@ -1058,16 +1055,8 @@ void Track::loadMinimap()
     core::dimension2du size = m_mini_map_size
                              .getOptimalSize(!nonpower,!nonsquare);
 
-    if ((m_is_arena || m_is_soccer) && m_has_navmesh)
-    {
-        Graph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
-            &m_old_rtt_mini_map, &m_new_rtt_mini_map);
-    }
-    else
-    {
-        QuadGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
-            &m_old_rtt_mini_map, &m_new_rtt_mini_map);
-    }
+    Graph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
+        &m_old_rtt_mini_map, &m_new_rtt_mini_map);
 
     if (m_old_rtt_mini_map)
     {
@@ -1686,7 +1675,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadDriveGraph(mode_id, reverse_track);
     else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
         loadArenaGraph(*root);
 
@@ -1718,7 +1707,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
         else
             m_start_transforms.resize(race_manager->getNumberOfKarts());
-        QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
+        DriveGraph::get()->setDefaultStartPositions(&m_start_transforms,
                                                    karts_per_row,
                                                    forwards_distance,
                                                    sidewards_distance,
@@ -1929,7 +1918,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     World *world = World::getWorld();
     if (world->useChecklineRequirements())
     {
-        QuadGraph::get()->computeChecklineRequirements();
+        DriveGraph::get()->computeChecklineRequirements();
     }
 
     EasterEggHunt *easter_world = dynamic_cast<EasterEggHunt*>(world);
@@ -2282,30 +2271,26 @@ void Track::itemCommand(const XMLNode *node)
     // Test if the item lies on a 3d node, if so adjust the normal
     // Also do a raycast if drop item is given
     Vec3 normal(0, 1, 0);
+    Vec3 quad_normal = normal;
     Vec3 hit_point = loc;
-    Node3D* node_3d = NULL;
-    if (QuadGraph::get())
+    if (Graph::get())
     {
-        int road_sector = QuadGraph::UNKNOWN_SECTOR;
-        QuadGraph::get()->findRoadSector(xyz, &road_sector);
+        int road_sector = Graph::UNKNOWN_SECTOR;
+        Graph::get()->findRoadSector(xyz, &road_sector);
         // Only do custom direction of raycast if item is on quad graph
-        if (road_sector != QuadGraph::UNKNOWN_SECTOR)
+        if (road_sector != Graph::UNKNOWN_SECTOR)
         {
-            node_3d =
-                dynamic_cast<Node3D*>(QuadGraph::get()->getNode(road_sector));
+            quad_normal = Graph::get()->getQuad(road_sector)->getNormal();
         }
     }
 
-    Vec3 quad_normal = node_3d ? node_3d->getNormal() : Vec3(0, 1, 0);
-    if (node_3d || drop)
+    if (drop)
     {
         const Material *m;
         // If raycast is used, increase the start position slightly
         // in case that the point is too close to the actual surface
         // (e.g. floating point errors can cause a problem here).
-        // Only do so for 2d node
-        if (node_3d == NULL)
-            loc += Vec3(0.0f, 0.1f, 0.0f);
+        loc += quad_normal * 0.1;
 
 #ifndef DEBUG
         m_track_mesh->castRay(loc, loc + (-10000 * quad_normal), &hit_point,
@@ -2323,8 +2308,7 @@ void Track::itemCommand(const XMLNode *node)
 #endif
     }
 
-    ItemManager::get()->newItem(type, drop ? hit_point : loc,
-        node_3d ? normal : Vec3(0, 1, 0));
+    ItemManager::get()->newItem(type, drop ? hit_point : loc, normal);
 }   // itemCommand
 
 // ----------------------------------------------------------------------------
@@ -2434,11 +2418,11 @@ bool Track::findGround(AbstractKart *kart)
 //-----------------------------------------------------------------------------
 float Track::getTrackLength() const
 {
-    return QuadGraph::get()->getLapLength();
+    return DriveGraph::get()->getLapLength();
 }   // getTrackLength
 
 //-----------------------------------------------------------------------------
 float Track::getAngle(int n) const
 {
-    return QuadGraph::get()->getAngleToNext(n, 0);
+    return DriveGraph::get()->getAngleToNext(n, 0);
 }   // getAngle

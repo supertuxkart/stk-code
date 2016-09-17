@@ -16,19 +16,19 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, B
 
-#ifndef HEADER_GRAPH_NODE_HPP
-#define HEADER_GRAPH_NODE_HPP
+#ifndef HEADER_DRIVE_NODE_HPP
+#define HEADER_DRIVE_NODE_HPP
 
 #include <vector>
 
 #include "tracks/quad.hpp"
 
 /**
-  * \brief This class stores a node of the graph, i.e. a list of successor
-  *  edges, it can either be 2d or 3d.
+  * \brief This class stores a node of the drive graph, i.e. a list of
+  *  successor edges, it can either be 2d or 3d.
   * \ingroup tracks
   */
-class GraphNode : public Quad
+class DriveNode : public Quad
 {
 public:
     /** To indiciate in which direction the track is going:
@@ -37,29 +37,20 @@ public:
     enum         DirectionType {DIR_STRAIGHT, DIR_LEFT, DIR_RIGHT,
                                 DIR_UNDEFINED};
 protected:
-    /** Lower center point of the graph node. */
+    /** Lower center point of the drive node. */
     Vec3 m_lower_center;
 
-    /** Upper center point of the graph node. */
+    /** Upper center point of the drive node. */
     Vec3 m_upper_center;
 
-    /** Distance from the start to the beginning of the graph node. */
+    /** Distance from the start to the beginning of the drive node. */
     float m_distance_from_start;
 
 private:
-    /** Normal of the graph node */
-    Vec3               m_normal;
-
-    /** Set to true if this graph node should not be shown in the minimap. */
-    bool               m_invisible;
-
-    /** Set to true if this graph node should not be used by the AI. */
+    /** Set to true if this drive node should not be used by the AI. */
     bool               m_ai_ignore;
 
-    /** Index of this graph node. */
-    unsigned int       m_node_index;
-
-    /** The list of successor graph nodes. */
+    /** The list of successor drive nodes. */
     std::vector<int>   m_successor_nodes;
 
     /** The list of predecessors of a node. */
@@ -79,18 +70,18 @@ private:
     Vec3 m_center_to_right;
 
     typedef std::vector<int> PathToNodeVector;
-    /** This vector is only used if the graph node has more than one
+    /** This vector is only used if the drive node has more than one
      *  successor. In this case m_path_to_node[X] will contain the index
-     *  of the successor to use in order to reach graph node X for this
-     *  graph nodes.  */
+     *  of the successor to use in order to reach drive node X for this
+     *  drive nodes.  */
     PathToNodeVector  m_path_to_node;
 
     /** The direction for each of the successors. */
     std::vector<DirectionType>  m_direction;
 
-    /** Stores for each successor the index of the last graph node that
+    /** Stores for each successor the index of the last drive node that
      *  has the same direction (i.e. if index 0 curves left, this vector
-     *  will store the index of the last graph node that is still turning
+     *  will store the index of the last drive node that is still turning
      *  left. */
     std::vector<unsigned int> m_last_index_same_direction;
 
@@ -105,16 +96,17 @@ private:
      */
    std::vector< int > m_checkline_requirements;
 
+    // ------------------------------------------------------------------------
    void markAllSuccessorsToUse(unsigned int n,
                                 PathToNodeVector *m_path_to_node);
 
 public:
-                 GraphNode(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
+                 DriveNode(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
                            const Vec3 &p3, const Vec3 &normal,
                            unsigned int node_index, bool invisible,
                            bool ai_ignore);
     // ------------------------------------------------------------------------
-         virtual ~GraphNode() {}
+         virtual ~DriveNode() {}
     // ------------------------------------------------------------------------
     void         addSuccessor (unsigned int to);
     // ------------------------------------------------------------------------
@@ -131,7 +123,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the i-th successor node. */
     unsigned int getSuccessor(unsigned int i)  const
-                               { return m_successor_nodes[i];                 }
+                                               { return m_successor_nodes[i]; }
     // ------------------------------------------------------------------------
     /** Returns the number of predecessors. */
     unsigned int getNumberOfPredecessors() const
@@ -140,47 +132,41 @@ public:
     /** Returns a predecessor for this node. Note that the first predecessor
      *  is the most 'natural' one, i.e. the one on the main driveline.
      */
-    int getPredecessor(unsigned int i) const {return m_predecessor_nodes[i]; }
-    // ------------------------------------------------------------------------
-    /** Returns the node index of this node. */
-    unsigned int getNodeIndex() const { return m_node_index;                }
-    // ------------------------------------------------------------------------
-    /** Returns the normal of this quad */
-    const Vec3&  getNormal() const                         { return m_normal; }
+    int getPredecessor(unsigned int i) const { return m_predecessor_nodes[i]; }
     // ------------------------------------------------------------------------
     /** Returns the distance to the j-th. successor. */
     float        getDistanceToSuccessor(unsigned int j) const
-                               { return m_distance_to_next[j];           }
+                                              { return m_distance_to_next[j]; }
     // ------------------------------------------------------------------------
     /** Returns the angle from this node to the j-th. successor. */
     float        getAngleToSuccessor(unsigned int j) const
-                               { return m_angle_to_next[j];              }
+                                                 { return m_angle_to_next[j]; }
     // ------------------------------------------------------------------------
     /** Returns the distance from start. */
     float        getDistanceFromStart() const
-                               { return m_distance_from_start;           }
+                                              { return m_distance_from_start; }
     // ------------------------------------------------------------------------
     /** Sets the distance from start for this node. */
-    void         setDistanceFromStart(float d) {m_distance_from_start = d; }
+    void         setDistanceFromStart(float d)   { m_distance_from_start = d; }
     // ------------------------------------------------------------------------
     /** Returns the width of the part for this quad. */
-    float        getPathWidth() const  { return m_width;                 }
+    float        getPathWidth() const                       { return m_width; }
     // ------------------------------------------------------------------------
-    /** Returns the center point of the lower edge of this graph node. */
-    const Vec3& getLowerCenter() const {return m_lower_center;}
+    /** Returns the center point of the lower edge of this drive node. */
+    const Vec3& getLowerCenter() const               { return m_lower_center; }
     // ------------------------------------------------------------------------
-    /** Returns the center point of the upper edge of this graph node. */
-    const Vec3& getUpperCenter() const {return m_upper_center;}
+    /** Returns the center point of the upper edge of this drive node. */
+    const Vec3& getUpperCenter() const               { return m_upper_center; }
     // ------------------------------------------------------------------------
     /** Returns the length of the quad of this node. */
     float       getNodeLength() const
-                {return (m_lower_center-m_upper_center).length();}
+                           { return (m_lower_center-m_upper_center).length(); }
     // ------------------------------------------------------------------------
     bool        ignoreSuccessorForAI(unsigned int i) const;
     // ------------------------------------------------------------------------
     /** Returns which successor node to use in order to be able to reach the
      *  given node n.
-     *  \param n Index of the graph node to reach.
+     *  \param n Index of the drive node to reach.
      */
     int getSuccessorToReach(unsigned int n)
     {
@@ -189,7 +175,7 @@ public:
         return m_path_to_node.size()>0 ? m_path_to_node[n] : 0;
     }   // getSuccesorToReach
     // ------------------------------------------------------------------------
-    /** Returns the checkline requirements of this graph node. */
+    /** Returns the checkline requirements of this drive node. */
     const std::vector<int>& getChecklineRequirements() const
                                            { return m_checkline_requirements; }
     // ------------------------------------------------------------------------
@@ -201,17 +187,13 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Returns a unit vector pointing to the right side of the quad. */
-    const Vec3 &getRightUnitVector() const { return m_right_unit_vector; }
-    // ------------------------------------------------------------------------
-    /** Returns true of this node is invisible, i.e. not to be shown in
-     *  the minimap. */
-    bool        isInvisible() const { return m_invisible; }
+    const Vec3 &getRightUnitVector() const      { return m_right_unit_vector; }
     // ------------------------------------------------------------------------
     /** True if this node should be ignored by the AI. */
-    bool        letAIIgnore() const { return m_ai_ignore; }
+    bool        letAIIgnore() const                     { return m_ai_ignore; }
     // ------------------------------------------------------------------------
     virtual void getDistances(const Vec3 &xyz, Vec3 *result) const = 0;
 
-};   // GraphNode
+};   // DriveNode
 
 #endif

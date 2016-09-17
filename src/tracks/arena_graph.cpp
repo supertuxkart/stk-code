@@ -49,8 +49,9 @@ ArenaGraph::ArenaGraph(const std::string &navmesh, const XMLNode *node)
 // -----------------------------------------------------------------------------
 ArenaNode* ArenaGraph::getNode(unsigned int i) const
 {
+    assert(i < m_all_nodes.size());
     ArenaNode* n = dynamic_cast<ArenaNode*>(m_all_nodes[i]);
-    assert(n!= NULL);
+    assert(n != NULL);
     return n;
 }   // getNode
 

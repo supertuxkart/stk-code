@@ -26,8 +26,6 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
 #include "utils/random_generator.hpp"
-#include "tracks/graph_node.hpp"
-#include "tracks/quad_graph.hpp"
 
 #include "utils/log.hpp" //TODO: remove after debugging is done
 

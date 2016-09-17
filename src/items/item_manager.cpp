@@ -225,7 +225,7 @@ void ItemManager::insertItem(Item *item)
     if(m_items_in_quads)
     {
         int graph_node = item->getGraphNode();
-        // If the item is on the driveline, store it at the appropriate index
+        // If the item is on the graph, store it at the appropriate index
         if(graph_node > -1)
         {
             (*m_items_in_quads)[graph_node].push_back(item);
