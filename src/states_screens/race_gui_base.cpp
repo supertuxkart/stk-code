@@ -137,10 +137,13 @@ void RaceGUIBase::reset()
     {
         const AbstractKart *kart = World::getWorld()->getKart(i);
         m_referee_pos[i] = kart->getTrans()(Referee::getStartOffset());
-        m_referee_rotation[i] = Referee::getStartRotation()
-                              + Vec3(0, kart->getHeading()*RAD_TO_DEGREE, 0);
+        Vec3 hpr;
+        btQuaternion q = btQuaternion(kart->getTrans().getBasis().getColumn(1),
+            Referee::getStartRotation().getY() * DEGREE_TO_RAD) *
+            kart->getTrans().getRotation();
+        hpr.setHPR(q);
+        m_referee_rotation[i] = hpr.toIrrHPR();
     }
-
 
     m_referee_height = 10.0f;
     m_referee->attachToSceneNode();
@@ -419,8 +422,8 @@ void RaceGUIBase::preRenderCallback(const Camera *camera)
     if(m_referee && camera->getKart())
     {
         unsigned int world_id = camera->getKart()->getWorldKartId();
-        Vec3 xyz = m_referee_pos[world_id];
-        xyz.setY(xyz.getY()+m_referee_height);
+        Vec3 xyz = m_referee_pos[world_id] +
+            camera->getKart()->getNormal() * m_referee_height;
         m_referee->setPosition(xyz);
         m_referee->setRotation(m_referee_rotation[world_id]);
     }
