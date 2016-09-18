@@ -25,6 +25,7 @@
 #include "graphics/material.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
+#include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/terrain_info.hpp"
 #include "tracks/track.hpp"
@@ -375,6 +376,18 @@ void btKart::updateAllWheelPositions()
 // ----------------------------------------------------------------------------
 void btKart::updateVehicle( btScalar step )
 {
+    bool new_g = m_kart->getMaterial() && m_kart->getMaterial()->hasGravity();
+    if (new_g)
+    {
+        getRigidBody()->setGravity(m_kart->getNormal() * World::getWorld()
+            ->getPhysics()->getPhysicsWorld()->getGravity().y());
+    }
+    else
+    {
+        getRigidBody()->setGravity(World::getWorld()
+            ->getPhysics()->getPhysicsWorld()->getGravity());
+    }
+
     updateAllWheelPositions();
 
     const btTransform& chassisTrans = getChassisWorldTransform();
@@ -446,9 +459,7 @@ void btKart::updateVehicle( btScalar step )
     if(m_num_wheels_on_ground==0)
     {
         btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
-        btVector3 terrain_up =
-            m_kart->getMaterial() && m_kart->getMaterial()->hasGravity() ?
-            m_kart->getNormal() : Vec3(0, 1, 0);
+        btVector3 terrain_up = new_g ? m_kart->getNormal() : Vec3(0, 1, 0);
         // Length of axis depends on the angle - i.e. the further awat
         // the kart is from being upright, the larger the applied impulse
         // will be, resulting in fast changes when the kart is on its

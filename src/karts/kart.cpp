@@ -1370,13 +1370,6 @@ void Kart::update(float dt)
     const Material* material=m_terrain_info->getMaterial();
     if (!material)   // kart falling off the track
     {
-        if (!m_flying)
-        {
-            float g = World::getWorld()->getTrack()->getGravity();
-            Vec3 gravity(0, -g, 0);
-            btRigidBody *body = getVehicle()->getRigidBody();
-            body->setGravity(gravity);
-        }
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
         World::getWorld()->getTrack()->getAABB(&min, &max);
@@ -1387,19 +1380,6 @@ void Kart::update(float dt)
     }
     else
     {
-        if (!m_flying)
-        {
-            float g = World::getWorld()->getTrack()->getGravity();
-            Vec3 gravity(0.0f, -g, 0.0f);
-            btRigidBody *body = getVehicle()->getRigidBody();
-            // If the material should overwrite the gravity,
-            if (material->hasGravity())
-            {
-                Vec3 normal = m_terrain_info->getNormal();
-                gravity = normal * -g;
-            }
-            body->setGravity(gravity);
-        }   // if !flying
         handleMaterialSFX(material);
         if     (material->isDriveReset() && isOnGround())
             new RescueAnimation(this);
