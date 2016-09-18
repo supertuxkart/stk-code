@@ -377,12 +377,12 @@ void btKart::updateAllWheelPositions()
 void btKart::updateVehicle( btScalar step )
 {
     bool new_g = m_kart->getMaterial() && m_kart->getMaterial()->hasGravity();
-    if (new_g)
+    if (new_g && !m_kart->isFlying())
     {
         getRigidBody()->setGravity(m_kart->getNormal() * World::getWorld()
             ->getPhysics()->getPhysicsWorld()->getGravity().y());
     }
-    else
+    else if (!m_kart->isFlying())
     {
         getRigidBody()->setGravity(World::getWorld()
             ->getPhysics()->getPhysicsWorld()->getGravity());
