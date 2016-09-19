@@ -46,25 +46,17 @@ void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
 {
     // Eps is used to raise the track debug quads a little bit higher than
     // the ground, so that they are actually visible.
-    core::vector3df eps(0, 0.1f, 0);
+    core::vector3df normal = getNormal().toIrrVector();
+    core::vector3df eps = normal * 0.1f;
     v[0].Pos = m_p[0].toIrrVector()+eps;
     v[1].Pos = m_p[1].toIrrVector()+eps;
     v[2].Pos = m_p[2].toIrrVector()+eps;
     v[3].Pos = m_p[3].toIrrVector()+eps;
 
-    core::triangle3df tri(m_p[0].toIrrVector(), m_p[1].toIrrVector(),
-                          m_p[2].toIrrVector());
-    core::vector3df normal = tri.getNormal();
-    normal.normalize();
     v[0].Normal = normal;
     v[1].Normal = normal;
     v[2].Normal = normal;
-
-    core::triangle3df tri1(m_p[0].toIrrVector(), m_p[2].toIrrVector(),
-                           m_p[3].toIrrVector());
-    core::vector3df normal1 = tri1.getNormal();
-    normal1.normalize();
-    v[3].Normal = normal1;
+    v[3].Normal = normal;
 
     v[0].Color  = color;
     v[1].Color  = color;

@@ -49,6 +49,8 @@ public:
     virtual void getDistances(const Vec3 &xyz, Vec3 *result) const OVERRIDE;
     // ------------------------------------------------------------------------
     virtual float getDistance2FromPoint(const Vec3 &xyz) const OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool is3DQuad() const OVERRIDE                     { return true; }
 
 };
 #endif
