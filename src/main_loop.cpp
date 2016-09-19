@@ -178,7 +178,7 @@ void MainLoop::run()
 
             // Update sfx and music after graphics, so that graphics code
             // can use as many threads as possible without interfering
-            // with audia
+            // with audio
             PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
             SFXManager::get()->update();
             PROFILER_POP_CPU_MARKER();
