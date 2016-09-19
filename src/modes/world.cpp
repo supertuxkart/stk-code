@@ -27,6 +27,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
@@ -695,6 +696,13 @@ void World::resetAllKarts()
 
     // Do a longer initial simulation, which should be long enough for all
     // karts to be firmly on ground.
+    float g = World::getWorld()->getTrack()->getGravity();
+    for (KartList::iterator i = m_karts.begin(); i != m_karts.end(); i++)
+    {
+        if ((*i)->isGhostKart()) continue;
+        (*i)->getBody()->setGravity((*i)->getMaterial()->hasGravity() ?
+            (*i)->getNormal() * -g : Vec3(0, -g, 0));
+    }
     for(int i=0; i<60; i++) m_physics->update(1.f/60.f);
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
