@@ -26,6 +26,7 @@
 #include "utils/string_utils.hpp"
 
 #include "config/user_config.hpp"
+#include "icon_button_widget.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIElement.h>
@@ -38,12 +39,11 @@ using namespace irr;
 // -----------------------------------------------------------------------------
 
 SkillLevelWidget::SkillLevelWidget(core::recti area, const int player_id,
-                                   bool multiplayer, bool display_text,
-                                   const int value, const stringw& label)
+                                   bool multiplayer, bool display_icon,
+                                   const int value)
                                   : Widget(WTYPE_DIV)
 {
     m_player_id = player_id;
-    m_display_text = display_text;
 
     setSize(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
             area.getWidth(), area.getHeight()               );
@@ -60,19 +60,22 @@ SkillLevelWidget::SkillLevelWidget(core::recti area, const int player_id,
     m_bar->m_h = m_bar_h;
     m_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_skill_bar", m_player_id);
 
-    m_label = NULL;
+    m_iconbutton = NULL;
 
-    m_label = new LabelWidget(!multiplayer, true);
-    m_label->setText(label,false);
+    m_iconbutton = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO,
+                                        false, false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 
-    m_label->m_x = m_label_x;
-    m_label->m_y = m_label_y;
-    m_label->m_w = m_label_w;
-    m_label->m_h = m_label_h;
-    m_label->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_skill_label", m_player_id);
+    //m_iconbutton_* properties are calculated in setSize method
+    m_iconbutton->m_x = m_iconbutton_x;
+    m_iconbutton->m_y = m_iconbutton_y;
+    m_iconbutton->m_w = m_iconbutton_w;
+    m_iconbutton->m_h = m_iconbutton_h;
+    m_iconbutton->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_skill_label", m_player_id);
 
     m_children.push_back(m_bar);
-    m_children.push_back(m_label);
+    m_children.push_back(m_iconbutton);
+    
+    m_display_icon = display_icon;
 }   // KartStatsWidget
 
 // -----------------------------------------------------------------------------
@@ -80,8 +83,8 @@ SkillLevelWidget::SkillLevelWidget(core::recti area, const int player_id,
 void SkillLevelWidget::add()
 {
     m_bar->add();
-    m_label->add();
-    m_label->setVisible(m_display_text);
+    m_iconbutton->add();
+    m_iconbutton->setVisible(m_display_icon);
 }
 
 // -----------------------------------------------------------------------------
@@ -99,12 +102,12 @@ void SkillLevelWidget::move(const int x, const int y, const int w, const int h)
                     m_bar_w,
                     m_bar_h );
     }
-    if (m_label != NULL)
+    if (m_iconbutton != NULL)
     {
-        m_label->move(m_label_x,
-                      m_label_y,
-                      m_label_w,
-                      m_label_h);
+        m_iconbutton->move( m_iconbutton_x,
+                            m_iconbutton_y,
+                            m_iconbutton_w,
+                            m_iconbutton_h);
     }
 }
 
@@ -116,32 +119,30 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
     m_y = y;
     m_w = w;
     m_h = h;
+    
+    int iconbox_h = h; //within icon box, icon is drawn at 75% size
+    int iconbox_w = h; //assuming square icon
+    
+    m_iconbutton_h = iconbox_h * 3 / 4; 
+    m_iconbutton_w = iconbox_w * 3 / 4; 
 
     // -- sizes
-    if (m_display_text)
-        m_bar_w = (w / 2) * 3 / 4;
-    else
-        m_bar_w = w * 2 / 3;
-    m_bar_h = h;
-    m_label_w = w/2;
-    m_label_h = h;
+    m_bar_w = m_w - iconbox_w;  //leaving just enough space for icon + its margin  
+    m_bar_h = h;    
 
     // for shrinking effect
     if (h < 175)
     {
         const float factor = h / 175.0f;
         m_bar_h   = (int)(m_bar_h*factor);
-        m_label_h = (int)(m_label_h*factor);
+        // no scale effect for icon (becomes too small otherwise)
     }
+    
+    m_bar_x = x + iconbox_w;    
+    m_bar_y = y + h/2 - m_bar_h/2; //align to midpoint in y direction
 
-    if (m_display_text)
-        m_bar_x = x + w / 2;
-    else
-        m_bar_x = x + w / 6;
-    m_bar_y = y + m_h/2 - m_bar_h/2;
-
-    m_label_x = x;
-    m_label_y = y + m_h/2 - m_label_h/2;
+    m_iconbutton_x = x;
+    m_iconbutton_y = y + h/2 - m_iconbutton_h/2; //align to midpoint in y direction
 }   // setSize
 
 // -----------------------------------------------------------------------------
@@ -153,18 +154,19 @@ void SkillLevelWidget::setValue(const int value)
 
 // -----------------------------------------------------------------------------
 
-void SkillLevelWidget::setLabel(const irr::core::stringw& label)
+void SkillLevelWidget::setIcon(const irr::core::stringc& filepath)
 {
-    m_label->setText(label, false);
+    m_iconbutton->setImage(filepath.c_str());
 }
 
-void SkillLevelWidget::setDisplayText(bool display_text)
+// -----------------------------------------------------------------------------
+
+void SkillLevelWidget::setDisplayIcon(bool display_icon)
 {
-    if(m_display_text != display_text)
+    if(m_display_icon != display_icon)
     {
-        m_display_text = display_text;
-        m_label->setVisible(display_text);
+        m_display_icon = display_icon;
+        m_iconbutton->setVisible(display_icon);
         setSize(m_x, m_y, m_w, m_h);
     }
 }
-

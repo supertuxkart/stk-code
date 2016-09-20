@@ -23,6 +23,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
+#include "io/file_manager.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIElement.h>
@@ -37,7 +38,7 @@ using namespace irr;
 
 KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
                                  std::string kart_group, bool multiplayer,
-                                 bool display_text) : Widget(WTYPE_DIV)
+                                 bool display_icons) : Widget(WTYPE_DIV)
 {
     m_title_font = !multiplayer;
     m_player_id = player_id;
@@ -66,15 +67,14 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
                        "kart '%s' nor any other kart.",
                        default_kart.c_str());
     }
-
-
+                                                                                                                                    
     for (int i = 0; i < SKILL_COUNT; ++i)
     {
         irr::core::recti skillArea(0, 0, 1, 1);
 
         SkillLevelWidget* skill_bar = NULL;
 
-        skill_bar = new SkillLevelWidget(skillArea, m_player_id, multiplayer, display_text);
+        skill_bar = new SkillLevelWidget(skillArea, m_player_id, multiplayer, display_icons);       
 
         m_skills.push_back(skill_bar);
         m_children.push_back(skill_bar);
@@ -86,16 +86,19 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
     // different masses or velocities.
     m_skills[SKILL_MASS]->setValue((int)
             ((props->getCombinedCharacteristic()->getMass() - 20) / 4));
-    m_skills[SKILL_MASS]->setLabel(_("WEIGHT"));
-    m_skills[SKILL_MASS]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
+    m_skills[SKILL_MASS]->setIcon(irr::core::stringc(
+            file_manager->getAsset(FileManager::GUI, "mass.png").c_str()));    
+    m_skills[SKILL_MASS]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);    
 
     m_skills[SKILL_SPEED]->setValue((int)
             ((props->getCombinedCharacteristic()->getEngineMaxSpeed() - 15) * 6));
-    m_skills[SKILL_SPEED]->setLabel(_("SPEED"));
+    m_skills[SKILL_SPEED]->setIcon(irr::core::stringc(
+            file_manager->getAsset(FileManager::GUI, "speed.png").c_str()));    
     m_skills[SKILL_SPEED]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
 
-    m_skills[SKILL_POWER]->setValue((int) ((props->getAvgPower() - 30) / 20));
-    m_skills[SKILL_POWER]->setLabel(_("POWER"));
+    m_skills[SKILL_POWER]->setValue((int) ((props->getAvgPower() - 30) / 20));            
+    m_skills[SKILL_POWER]->setIcon(irr::core::stringc(
+            file_manager->getAsset(FileManager::GUI, "power.png").c_str()));    
     m_skills[SKILL_POWER]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_power", m_player_id);
 
     move(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
@@ -167,11 +170,11 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
     m_skill_bar_y = y + h/2 - m_skill_bar_h/2;
 }   // setSize
 
-void KartStatsWidget::setDisplayText(bool display_text)
+void KartStatsWidget::setDisplayIcons(bool display_icons)
 {
     for (int i = 0; i < SKILL_COUNT; ++i)
     {
-        m_skills[i]->setDisplayText(display_text);
+        m_skills[i]->setDisplayIcon(display_icons);
     }
 }   // setDisplayText
 

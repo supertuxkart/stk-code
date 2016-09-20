@@ -279,7 +279,7 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
     m_player_id = newPlayerID;
     if (!m_ready)
         m_player_ident_spinner->setID(m_player_id);
-    m_kart_stats->setDisplayText(m_player_id == 0);
+    m_kart_stats->setDisplayIcons(m_player_id == 0);
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
 
