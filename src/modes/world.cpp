@@ -991,6 +991,11 @@ void World::update(float dt)
     assert(m_magic_number == 0xB01D6543);
 #endif
 
+    history->update(dt);
+    if (history->replayHistory())
+    {
+        dt = history->getNextDelta();
+    }
 
     PROFILER_PUSH_CPU_MARKER("World::update()", 0x00, 0x7F, 0x00);
 
@@ -1004,8 +1009,10 @@ void World::update(float dt)
     }
 #endif
 
+    PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
     WorldStatus::update(dt);
     RewindManager::get()->saveStates();
+    PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);
 
@@ -1027,12 +1034,8 @@ void World::update(float dt)
     }
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
-    history->update(dt);
     if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
-    if(history->replayHistory()) dt=history->getNextDelta();
     if (m_script_engine) m_script_engine->update(dt);
-    PROFILER_POP_CPU_MARKER();
 
     if (!history->dontDoPhysics())
     {
