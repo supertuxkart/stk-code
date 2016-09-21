@@ -1201,6 +1201,17 @@ void Kart::update(float dt)
 
     // Update the position and other data taken from the physics
     Moveable::update(dt);
+    // Compute the speed of the kart. Smooth it with previous speed to make
+    // the camera smoother (because of capping the speed in m_max_speed
+    // the speed value jitters when approaching maximum speed. This results
+    // in the distance between kart and camera to jitter as well (typically
+    // only in the order of centimetres though). Smoothing the speed value
+    // gets rid of this jitter, and also r
+    float old_speed = m_speed;
+    m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
+    float f=0.3f;
+    m_speed = f*m_speed + (1.0f-f)*old_speed;
+
 
     if(!history->replayHistory() && !RewindManager::get()->isRewinding())
         m_controller->update(dt);
@@ -1209,13 +1220,19 @@ void Kart::update(float dt)
 #ifdef DEBUG_TO_COMPARE_KART_PHYSICS
     // This information is useful when comparing kart physics, e.g. to
     // see top speed, acceleration (i.e. time to top speed) etc.
-    Log::verbose("physics", "%s t %f %f xyz %f %f %f v %f %f %f s %f a %f",
+    Log::verbose("physics", "%s t %f %f xyz %f %f %f v %f %f %f sk %f %d %f %f %f st %f %f",
         getIdent().c_str(),
         World::getWorld()->getTime(), dt,
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
         getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
-        getControls().getSteer(),
-        getControls().getAccel());
+        m_skidding->getSkidFactor(),
+        m_skidding->getSkidState(),
+        m_skidding->getSteeringFraction(),
+        getMaxSteerAngle(),
+        m_speed,
+        m_vehicle->getWheelInfo(0).m_steering,
+        m_vehicle->getWheelInfo(1).m_steering
+        );
 #endif
 
     // if its view is blocked by plunger, decrease remaining time
@@ -2172,17 +2189,6 @@ void Kart::updatePhysics(float dt)
     float min_speed =  m && m->isZipper() ? m->getZipperMinSpeed() : -1.0f;
     m_max_speed->setMinSpeed(min_speed);
     m_max_speed->update(dt);
-
-    // Compute the speed of the kart. Smooth it with previous speed to make
-    // the camera smoother (because of capping the speed in m_max_speed
-    // the speed value jitters when approaching maximum speed. This results
-    // in the distance between kart and camera to jitter as well (typically
-    // only in the order of centimetres though). Smoothing the speed value
-    // gets rid of this jitter, and also r
-    float old_speed = m_speed;
-    m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
-    float f=0.3f;
-    m_speed = f*m_speed + (1.0f-f)*old_speed;
 
     // calculate direction of m_speed
     const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
