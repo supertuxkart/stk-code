@@ -847,7 +847,7 @@ void btKart::updateFriction(btScalar timeStep)
                 // bullet then tries to offset by applying a backward
                 // impulse - which is a bit too big, causing a impulse
                 // backwards, ... till the kart is shaking backwards and
-                // forwards. By onlyu applying half of the impulse in cae
+                // forwards. By only applying half of the impulse in case
                 // of low friction this goes away.
                 if(wheelInfo.m_brake && fabsf(rollingFriction)<10)
                     rollingFriction*=0.5f;
@@ -883,7 +883,8 @@ void btKart::updateFriction(btScalar timeStep)
 
 
     m_zipper_active = false;
-    m_zipper_speed  = 0;
+    // Note: don't reset zipper speed, or the kart rewinder will
+    // get incorrect zipper information.
 
     // The kart just stopped skidding. Adjust the velocity so that
     // it points in the right direction.
@@ -1061,7 +1062,7 @@ void btKart::setSliding(bool active)
  */
 void btKart::instantSpeedIncreaseTo(float speed)
 {
-    m_zipper_active = true;
+    m_zipper_active = speed > 0;
     m_zipper_speed  = speed;
 }   // activateZipper
 
