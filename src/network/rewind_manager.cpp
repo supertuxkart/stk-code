@@ -278,7 +278,7 @@ void RewindManager::rewindTo(float rewind_time)
 {
     assert(!m_is_rewinding);
     m_is_rewinding = true;
-
+    Log::info("rewind", "Rewinding to %f", rewind_time);
     history->doReplayHistory(History::HISTORY_NONE);
 
     // First find the state to which we need to rewind
