@@ -360,7 +360,6 @@ target_link_libraries(supertuxkart
     bulletcollision
     bulletmath
     enet
-    stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
