@@ -75,6 +75,16 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
+# CMakeLists.txt for Irrlicht in STK
+find_package(PNG REQUIRED)
+find_package(JPEG REQUIRED)
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
+                    "${JPEG_INCLUDE_DIR}"
+                    "${PNG_INCLUDE_DIRS}"
+                    "${ZLIB_INCLUDE_DIR}"
+"${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
+
 # Build glew library
 if(NOT USE_GLES2)
     add_definitions(-DGLEW_NO_GLU)
@@ -365,6 +375,9 @@ target_link_libraries(supertuxkart
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${FREETYPE_LIBRARIES}
+    ${PNG_LIBRARY}
+    ${JPEG_LIBRARY}
+    ${ZLIB_LIBRARY}
     )
 
 if(NOT USE_GLES2)
