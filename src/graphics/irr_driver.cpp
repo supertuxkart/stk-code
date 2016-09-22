@@ -69,7 +69,7 @@
 #include "utils/vs.hpp"
 
 #include <irrlicht.h>
-#include "../lib/irrlicht/source/Irrlicht/CSkinnedMesh.h"
+#include "stkirrlicht/CSkinnedMesh.h"
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.

@@ -22,7 +22,7 @@
 #include "font/font_with_face.hpp"
 #include "utils/cpp2011.hpp"
 
-#include "../lib/irrlicht/source/Irrlicht/CBillboardSceneNode.h"
+#include "stkirrlicht/CBillboardSceneNode.h"
 #include <IBillboardSceneNode.h>
 #include <irrTypes.h>
 #include <IMesh.h>

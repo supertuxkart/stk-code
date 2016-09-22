@@ -29,7 +29,7 @@
 
 #include <ICameraSceneNode.h>
 #include <IParticleSystemSceneNode.h>
-#include "../../lib/irrlicht/source/Irrlicht/os.h"
+#include "stkirrlicht/os.h"
 #define COMPONENTCOUNT 8
 
 

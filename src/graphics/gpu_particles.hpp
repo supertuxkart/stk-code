@@ -20,7 +20,7 @@
 
 #include "graphics/shader.hpp"
 
-#include "../lib/irrlicht/source/Irrlicht/CParticleSystemSceneNode.h"
+#include "stkirrlicht/CParticleSystemSceneNode.h"
 #include <ISceneManager.h>
 #include <IParticleSystemSceneNode.h>
 
