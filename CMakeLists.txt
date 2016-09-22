@@ -109,9 +109,8 @@ if((WIN32 AND NOT MINGW) OR APPLE)
     set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
     set(JPEG_LIBRARY jpeglib)
 endif()
-# Build the irrlicht library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
-include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
+# Include stkirrlicht headers
+include_directories("${PROJECT_SOURCE_DIR}/src/stkirrlicht/include")
 
 # Build the Wiiuse library
 # Note: wiiuse MUST be declared after irrlicht, since otherwise
