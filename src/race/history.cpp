@@ -76,19 +76,6 @@ void History::allocateMemory(int number_of_frames)
 }   // allocateMemory
 
 //-----------------------------------------------------------------------------
-/** Depending on mode either saves the data for the current time step, or
- *  replays the data.
- *  /param dt Time step.
- */
-void History::update(float dt)
-{
-    if(m_replay_mode==HISTORY_NONE)
-        updateSaving(dt);
-    else
-        updateReplay(dt);
-}   // update
-
-//-----------------------------------------------------------------------------
 /** Saves the current history.
  *  \param dt Time step size.
  */
@@ -124,7 +111,7 @@ void History::updateSaving(float dt)
 /** Sets the kart position and controls to the recorded history value.
  *  \param dt Time step size.
  */
-void History::updateReplay(float dt)
+float History::updateReplayAndGetDT()
 {
     m_current++;
     World *world = World::getWorld();
@@ -159,7 +146,8 @@ void History::updateReplay(float dt)
             kart->getControls().set(m_all_controls[index]);
         }
     }
-}   // updateReplay
+    return m_all_deltas[m_current];
+}   // updateReplayAndGetDT
 
 //-----------------------------------------------------------------------------
 /** Saves the history stored in the internal data structures into a file called

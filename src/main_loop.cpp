@@ -35,6 +35,7 @@
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "online/request_manager.hpp"
+#include "race/history.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
@@ -61,6 +62,15 @@ MainLoop::~MainLoop()
  */
 float MainLoop::getLimitedDt()
 {
+    float dt = 0;
+    // If we are doing a replay, use the dt from the history file
+    if (World::getWorld() && history->replayHistory() )
+    {
+        dt = history->updateReplayAndGetDT();
+        return dt;
+    }
+
+
     // In profile mode without graphics, run with a fixed dt of 1/60
     if ((ProfileWorld::isProfileMode() && ProfileWorld::isNoGraphics()) ||
         UserConfigParams::m_arena_ai_stats)
@@ -71,7 +81,6 @@ float MainLoop::getLimitedDt()
     IrrlichtDevice* device = irr_driver->getDevice();
     m_prev_time = m_curr_time;
 
-    float dt;  // needed outside of the while loop
     while( 1 )
     {
         m_curr_time = device->getTimer()->getRealTime();

@@ -890,6 +890,11 @@ void World::updateWorld(float dt)
         getPhase() == IN_GAME_MENU_PHASE      )
         return;
 
+    if (!history->replayHistory())
+    {
+        history->updateSaving(dt);   // updating the saved state
+    }
+
     try
     {
         update(dt);
@@ -990,12 +995,6 @@ void World::update(float dt)
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);
 #endif
-
-    history->update(dt);
-    if (history->replayHistory())
-    {
-        dt = history->getNextDelta();
-    }
 
     PROFILER_PUSH_CPU_MARKER("World::update()", 0x00, 0x7F, 0x00);
 
