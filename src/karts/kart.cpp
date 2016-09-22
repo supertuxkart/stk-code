@@ -1296,10 +1296,11 @@ void Kart::update(float dt)
 
     // To be used later
     float dist_to_sector = 0.0f;
-    if (DriveGraph::get())
+    LinearWorld* lw = dynamic_cast<LinearWorld*>(World::getWorld());
+    if (lw && DriveGraph::get())
     {
-        const int sector = ((LinearWorld*)World::getWorld())
-            ->getTrackSector(getWorldKartId()).getCurrentGraphNode();
+        const int sector =
+            lw->getTrackSector(getWorldKartId()).getCurrentGraphNode();
         dist_to_sector = getXYZ().distance
             (DriveGraph::get()->getNode(sector)->getCenter());
 
