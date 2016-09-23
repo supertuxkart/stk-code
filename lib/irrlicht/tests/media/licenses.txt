@@ -1,7 +1,0 @@
-All assets of this test suite, except where noted below, are tkane from the main Irrlicht repository and are copyright/licensed as stated there. The source code is copyright by the authors, except where stated differently inside the files.
-
-title_font.xml and its png files are taken from SuperTuxKart. They are in the public domain.
-
-The image RedbrushAlpha-0.25.png is Copyright 1999 Pieter S. van der Meulen. This image, including the alpha channel, may be used, edited and reproduced freely.
- Taken from http://www.libpng.org/pub/png/png-RedbrushAlpha.html
-

@@ -26,7 +26,7 @@
 
 #include <IMeshSceneNode.h>
 #include <IMesh.h>
-#include "../lib/irrlicht/source/Irrlicht/CMeshSceneNode.h"
+#include "stkirrlicht/CMeshSceneNode.h"
 
 #include <vector>
 

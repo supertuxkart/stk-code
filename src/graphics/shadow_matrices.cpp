@@ -32,8 +32,8 @@
 #include <limits>
 #include <ICameraSceneNode.h>
 #include <SViewFrustum.h>
-#include "../../lib/irrlicht/source/Irrlicht/CSceneManager.h"
-#include "../../lib/irrlicht/source/Irrlicht/os.h"
+#include "stkirrlicht/CSceneManager.h"
+#include "stkirrlicht/os.h"
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))

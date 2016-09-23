@@ -22,6 +22,13 @@ option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace
 
 if (UNIX AND NOT APPLE)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+    add_definitions(-DNO_IRR_LINUX_X11_VIDMODE_)
+    add_definitions(-D_IRR_LINUX_X11_RANDR_)
+endif()
+
+
+if(CYGWIN)
+    add_definitions(-DNO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 endif()
 
 if(MSVC AND (MSVC_VERSION LESS 1900))
@@ -75,6 +82,16 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
+# CMakeLists.txt for Irrlicht in STK
+find_package(PNG REQUIRED)
+find_package(JPEG REQUIRED)
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
+                    "${JPEG_INCLUDE_DIR}"
+                    "${PNG_INCLUDE_DIRS}"
+                    "${ZLIB_INCLUDE_DIR}"
+"${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
+
 # Build glew library
 if(NOT USE_GLES2)
     add_definitions(-DGLEW_NO_GLU)
@@ -109,9 +126,8 @@ if((WIN32 AND NOT MINGW) OR APPLE)
     set(JPEG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/lib/jpeglib/")
     set(JPEG_LIBRARY jpeglib)
 endif()
-# Build the irrlicht library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
-include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
+# Include stkirrlicht headers
+include_directories("${PROJECT_SOURCE_DIR}/src/stkirrlicht/include")
 
 # Build the Wiiuse library
 # Note: wiiuse MUST be declared after irrlicht, since otherwise
@@ -361,12 +377,14 @@ target_link_libraries(supertuxkart
     bulletcollision
     bulletmath
     enet
-    stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${FREETYPE_LIBRARIES}
+    ${PNG_LIBRARY}
+    ${JPEG_LIBRARY}
+    ${ZLIB_LIBRARY}
     )
 
 if(NOT USE_GLES2)
