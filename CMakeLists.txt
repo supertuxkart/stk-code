@@ -22,6 +22,13 @@ option(ENABLE_NETWORK_MULTIPLAYER "Enable network multiplayer. This will replace
 
 if (UNIX AND NOT APPLE)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
+    add_definitions(-DNO_IRR_LINUX_X11_VIDMODE_)
+    add_definitions(-D_IRR_LINUX_X11_RANDR_)
+endif()
+
+
+if(CYGWIN)
+    add_definitions(-DNO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 endif()
 
 if(MSVC AND (MSVC_VERSION LESS 1900))
