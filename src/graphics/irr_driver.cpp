@@ -355,7 +355,7 @@ void IrrDriver::createListOfVideoModes()
 void IrrDriver::initDevice()
 {
     SIrrlichtCreationParameters params;
-    
+
     // If --no-graphics option was used, the null device can still be used.
     if (!ProfileWorld::isNoGraphics())
     {
@@ -438,7 +438,7 @@ void IrrDriver::initDevice()
         m_device->drop();
         m_device  = NULL;
 
-        params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device || 
+        params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device ||
             UserConfigParams::m_gamepad_visualisation);
 
         // Try 32 and, upon failure, 24 then 16 bit per pixels
@@ -463,9 +463,9 @@ void IrrDriver::initDevice()
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
             params.HandleSRGB    = true;
-            params.ShadersPath   = (file_manager->getShadersDir() + 
+            params.ShadersPath   = (file_manager->getShadersDir() +
                                                            "irrlicht/").c_str();
-            
+
             /*
             switch ((int)UserConfigParams::m_antialiasing)
             {
@@ -526,13 +526,13 @@ void IrrDriver::initDevice()
     {
         Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
     }
-    
+
     CVS->init();
-    
+
     bool recreate_device = false;
-    
+
     // Some drivers are able to create OpenGL 3.1 context, but shader-based
-    // pipeline doesn't work for them. For example some radeon drivers 
+    // pipeline doesn't work for them. For example some radeon drivers
     // support only GLSL 1.3 and it causes STK to crash. We should force to use
     // fixed pipeline in this case.
     if (!ProfileWorld::isNoGraphics() &&
@@ -542,13 +542,13 @@ void IrrDriver::initDevice()
                                 "Re-creating device to workaround the issue.");
 
         params.ForceLegacyDevice = true;
-        recreate_device = true;        
+        recreate_device = true;
     }
-                    
+
     // This is the ugly hack for intel driver on linux, which doesn't
     // use sRGB-capable visual, even if we request it. This causes
-    // the screen to be darker than expected. It affects mesa 10.6 and newer. 
-    // Though we are able to force to use the proper format on mesa side by 
+    // the screen to be darker than expected. It affects mesa 10.6 and newer.
+    // Though we are able to force to use the proper format on mesa side by
     // setting WithAlphaChannel parameter.
     else if (CVS->needsSRGBCapableVisualWorkaround())
     {
@@ -558,19 +558,21 @@ void IrrDriver::initDevice()
         params.WithAlphaChannel = true;
         recreate_device = true;
     }
-    
+
     if (!ProfileWorld::isNoGraphics() && recreate_device)
     {
         m_device->closeDevice();
-        m_device->drop();  
-        
+        m_device->clearSystemMessages();
+        m_device->run();
+        m_device->drop();
+
         m_device = createDeviceEx(params);
-        
+
         if(!m_device)
         {
             Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
         }
-        
+
         CVS->init();
     }
 
@@ -587,7 +589,7 @@ void IrrDriver::initDevice()
         (UserConfigParams::m_shadows_resolution < 512 ||
          UserConfigParams::m_shadows_resolution > 2048))
     {
-        Log::warn("irr_driver", 
+        Log::warn("irr_driver",
                "Invalid value for UserConfigParams::m_shadows_resolution : %i",
             (int)UserConfigParams::m_shadows_resolution);
         UserConfigParams::m_shadows_resolution = 0;
@@ -697,7 +699,7 @@ void IrrDriver::setMaxTextureSize()
     {
         io::IAttributes &att = m_video_driver->getNonConstDriverAttributes();
         att.setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(
-                                        UserConfigParams::m_max_texture_size, 
+                                        UserConfigParams::m_max_texture_size,
                                         UserConfigParams::m_max_texture_size));
     }
 }   // setMaxTextureSize
@@ -725,7 +727,7 @@ void IrrDriver::createSunInterposer()
         mb->getMaterial().setTexture(7,
                                 getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
-    m_sun_interposer = new STKMeshSceneNode(sphere, 
+    m_sun_interposer = new STKMeshSceneNode(sphere,
                                             m_scene_manager->getRootSceneNode(),
                                             NULL, -1, "sun_interposer");
 
@@ -1176,7 +1178,7 @@ scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
 {
     scene::IMesh *mesh = m_scene_manager->getGeometryCreator()
                        ->createSphereMesh(radius);
-    
+
     mesh->setMaterialFlag(video::EMF_COLOR_MATERIAL, true);
     video::SMaterial &m = mesh->getMeshBuffer(0)->getMaterial();
     m.AmbientColor    = color;
@@ -1227,7 +1229,7 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     if (!parent)
       parent = m_scene_manager->getRootSceneNode();
 
-    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, 
+    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent,
                                                        m_scene_manager, -1,
                                                        debug_name,
                                                        core::vector3df(0, 0, 0),
@@ -1266,7 +1268,7 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
         if (!parent)
             parent = m_scene_manager->getRootSceneNode();
 
-        node = new STKBillboard(parent, m_scene_manager, -1, 
+        node = new STKBillboard(parent, m_scene_manager, -1,
                                 vector3df(0., 0., 0.), size);
         node->drop();
     }
@@ -1487,7 +1489,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     {
         m_spherical_harmonics->setTextures(spherical_harmonics_textures);
     }
-    
+
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
@@ -2249,13 +2251,13 @@ void IrrDriver::update(float dt)
             renderGLSL(dt);
         else
             renderFixed(dt);
-            
+
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
         if (current_screen != NULL && current_screen->needs3D())
         {
             GUIEngine::render(dt);
         }
-        
+
         if (world->getPhysics() != NULL)
         {
             IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
@@ -2274,7 +2276,7 @@ void IrrDriver::update(float dt)
 
         m_video_driver->endScene();
     }
-    
+
     if (m_request_screenshot) doScreenShot();
 
     // Enable this next print statement to get render information printed
@@ -2448,7 +2450,7 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     }
 
     irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 35, 35, 35) );
-    
+
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
     m_light = irr_driver->getSceneManager()
         ->addLightSceneNode(NULL, spot_pos, video::SColorf(1.0f,1.0f,1.0f),
@@ -2564,9 +2566,9 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
 
     const u32 mcount = node->getMaterialCount();
     u32 i;
-    const video::E_MATERIAL_TYPE ref = 
+    const video::E_MATERIAL_TYPE ref =
         Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT : ES_OBJECTPASS_REF);
-    const video::E_MATERIAL_TYPE pass = 
+    const video::E_MATERIAL_TYPE pass =
         Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT : ES_OBJECTPASS);
 
     const video::E_MATERIAL_TYPE origref = Shaders::getShader(ES_OBJECTPASS_REF);
@@ -2593,7 +2595,7 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
     for (i = 0; i < mcount; i++)
     {
         video::SMaterial &nodemat = node->getMaterial(i);
-        video::SMaterial &mbmat = mesh ? mesh->getMeshBuffer(i)->getMaterial() 
+        video::SMaterial &mbmat = mesh ? mesh->getMeshBuffer(i)->getMaterial()
                                        : nodemat;
         video::SMaterial *mat = &nodemat;
 
