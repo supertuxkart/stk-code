@@ -31,10 +31,8 @@ class ArenaNode3D : public ArenaNode,
 public:
     ArenaNode3D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
                 const Vec3 &normal, unsigned int node_index)
-    : ArenaNode(p0, p1, p2, p3, normal, node_index)
-    {
-        BoundingBox3D::init(p0, p1, p2, p3, normal);
-    }
+    : ArenaNode(p0, p1, p2, p3, normal, node_index),
+      BoundingBox3D(p0, p1, p2, p3, normal) {}
     // ------------------------------------------------------------------------
     virtual bool pointInside(const Vec3& p,
                              bool ignore_vertical = false) const OVERRIDE

@@ -33,21 +33,8 @@ private:
 
 public:
     // ------------------------------------------------------------------------
-    bool pointInside(const Vec3& p) const
-    {
-        float side = p.sideofPlane(m_box_faces[0][0], m_box_faces[0][1],
-            m_box_faces[0][2]);
-        for (int i = 1; i < 6; i++)
-        {
-            if (side * p.sideofPlane(m_box_faces[i][0], m_box_faces[i][1],
-                m_box_faces[i][2]) < 0)
-                return false;
-        }
-        return true;
-    }
-    // ------------------------------------------------------------------------
-    void init(const Vec3& p0, const Vec3& p1, const Vec3& p2, const Vec3& p3,
-              const Vec3& normal)
+    BoundingBox3D(const Vec3& p0, const Vec3& p1, const Vec3& p2,
+                  const Vec3& p3, const Vec3& normal)
     {
         // Compute the node bounding box used by pointInside
         Vec3 box_corners[8];
@@ -78,6 +65,20 @@ public:
                 m_box_faces[i][j] = box_faces[i][j];
         }
     }
+    // ------------------------------------------------------------------------
+    bool pointInside(const Vec3& p, bool ignore_vertical = false) const
+    {
+        float side = p.sideofPlane(m_box_faces[0][0], m_box_faces[0][1],
+            m_box_faces[0][2]);
+        for (int i = 1; i < 6; i++)
+        {
+            if (side * p.sideofPlane(m_box_faces[i][0], m_box_faces[i][1],
+                m_box_faces[i][2]) < 0)
+                return false;
+        }
+        return true;
+    }
+
 };
 
 #endif
