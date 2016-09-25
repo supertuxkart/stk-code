@@ -779,14 +779,8 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
             {
                 // Kart will not hit item, try to get closer to this item
                 // so that it can potentially become a permanent target.
-                Vec3 xyz = item_to_collect->getXYZ();
-                Vec3 item_direction = xyz - m_kart->getXYZ();
-                Vec3 plane_normal = DriveGraph::get()->getNode(m_track_node)
-                    ->getNormal();
-                float dist_to_plane = item_direction.dot(plane_normal);
-                Vec3 projected_xyz = xyz - dist_to_plane*plane_normal;
-
-                float angle_to_item = (projected_xyz - m_kart->getXYZ())
+                const Vec3& xyz = item_to_collect->getXYZ();
+                float angle_to_item = (xyz - m_kart->getXYZ())
                     .angle(kart_aim_direction);
                 float angle = normalizeAngle(angle_to_item);
 
@@ -859,19 +853,8 @@ bool SkiddingAI::handleSelectedItem(Vec3 kart_aim_direction, Vec3 *aim_point)
     if(m_item_to_collect->getDisableTime()>0)
         return false;
 
-    // Project the item's location onto the plane of the current quad.
-    // This is necessary because the kart's aim point may not be on the track
-    // in 3D curves. So we project the item's location onto the plane in which
-    // the kart is. The current quad provides a good estimate of the kart's plane.
     const Vec3 &xyz = m_item_to_collect->getXYZ();
-    Vec3 item_direction = xyz - m_kart->getXYZ();
-    Vec3 plane_normal = DriveGraph::get()->getNode(m_track_node)->getNormal();
-    float dist_to_plane = item_direction.dot(plane_normal);
-    Vec3 projected_xyz = xyz - dist_to_plane*plane_normal;
-
-    float angle_to_item = (projected_xyz - m_kart->getXYZ())
-                                                .angle(kart_aim_direction);
-
+    float angle_to_item = (xyz - m_kart->getXYZ()).angle(kart_aim_direction);
     float angle = normalizeAngle(angle_to_item);
 
     if(fabsf(angle)>1.5)
@@ -924,9 +907,9 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
 
     // Check if we would drive left of the leftmost or right of the
     // rightmost point - if so, nothing to do.
-    Vec3 left(items_to_avoid[index_left_most]->getXYZ());
+    const Vec3& left = items_to_avoid[index_left_most]->getXYZ();
     int node_index = items_to_avoid[index_left_most]->getGraphNode();
-    Vec3 normal = DriveGraph::get()->getNode(node_index)->getNormal();
+    const Vec3& normal = DriveGraph::get()->getNode(node_index)->getNormal();
     Vec3 p1 = line_to_target.start,
          p2 = line_to_target.getMiddle() + normal.toIrrVector(),
          p3 = line_to_target.end;
@@ -944,14 +927,14 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
     }
     else
     {
-        Vec3 left(items_to_avoid[index_left_most]->getXYZ());
-        int node_index = items_to_avoid[index_left_most]->getGraphNode();
-        Vec3 normal = DriveGraph::get()->getNode(node_index)->getNormal();
+        const Vec3& right = items_to_avoid[index_right_most]->getXYZ();
+        int node_index = items_to_avoid[index_right_most]->getGraphNode();
+        const Vec3& normal = DriveGraph::get()->getNode(node_index)->getNormal();
         Vec3 p1 = line_to_target.start,
             p2 = line_to_target.getMiddle() + normal.toIrrVector(),
             p3 = line_to_target.end;
 
-        if (left.sideofPlane(p1, p2, p3) >= 0)
+        if (right.sideofPlane(p1, p2, p3) >= 0)
         {
             // Right of rightmost point
             item_index = index_right_most;
@@ -996,7 +979,6 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
     for(unsigned int i=0; i<items_to_avoid.size(); i++)
     {
         const Vec3 &xyz         = items_to_avoid[i]->getXYZ();
-        core::vector2df item2d  = xyz.toIrrVector2d();
         core::vector3df point3d = line_to_target.getClosestPoint(xyz.toIrrVector());
         float d = (xyz.toIrrVector() - point3d).getLengthSQ();
         float direction = xyz.sideofPlane(p1,p2,p3);
@@ -1103,14 +1085,8 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
         // in 3D curves. So we project the item's location onto the plane in which
         // the kart is. The current quad provides a good estimate of the kart's plane.
         const Vec3 &xyz = item->getXYZ();
-        Vec3 item_direction = xyz - m_kart->getXYZ();
-        Vec3 plane_normal = DriveGraph::get()->getNode(m_track_node)->getNormal();
-        float dist_to_plane = item_direction.dot(plane_normal);
-        Vec3 projected_xyz = xyz - dist_to_plane*plane_normal;
-
-        float angle_to_item = (projected_xyz - m_kart->getXYZ())
-                                                   .angle(kart_aim_direction);
-
+        float angle_to_item =
+            (xyz - m_kart->getXYZ()).angle(kart_aim_direction);
         float diff = normalizeAngle(angle_to_item);
 
         // The kart is driving at high speed, when the current max speed
