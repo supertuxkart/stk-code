@@ -276,7 +276,9 @@ public:
     }   // setTimedTorque
     // ------------------------------------------------------------------------
     /** Returns the current zipper speed. */
-    float getZipperSpeed() const { return m_zipper_speed; }
+    float getInstantSpeedIncrease() const { return m_zipper_speed; }
+    // ------------------------------------------------------------------------
+    void resetInstantSpeed() { m_zipper_speed = 0;  }
 };   // class btKart
 
 #endif //BT_KART_HPP

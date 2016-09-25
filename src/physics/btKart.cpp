@@ -1062,6 +1062,11 @@ void btKart::setSliding(bool active)
  */
 void btKart::instantSpeedIncreaseTo(float speed)
 {
+    // Avoid that a speed 'increase' might cause a slowdown
+    if (m_chassisBody->getLinearVelocity().length2() > speed*speed)
+    {
+        return;
+    }
     m_zipper_active = speed > 0;
     m_zipper_speed  = speed;
 }   // activateZipper
