@@ -224,6 +224,7 @@ protected:
     void          updateSliding();
     void          updateEnginePowerAndBrakes(float dt);
     void          updateEngineSFX();
+    void          updateSpeed();
     void          updateNitro(float dt);
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, AbstractKart *k);

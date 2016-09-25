@@ -1204,17 +1204,10 @@ void Kart::update(float dt)
 
     // Update the position and other data taken from the physics
     Moveable::update(dt);
-    // Compute the speed of the kart. Smooth it with previous speed to make
-    // the camera smoother (because of capping the speed in m_max_speed
-    // the speed value jitters when approaching maximum speed. This results
-    // in the distance between kart and camera to jitter as well (typically
-    // only in the order of centimetres though). Smoothing the speed value
-    // gets rid of this jitter, and also r
-    float old_speed = m_speed;
-    m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
-    float f=0.3f;
-    m_speed = f*m_speed + (1.0f-f)*old_speed;
 
+    // Update the locally maintained speed of the kart (m_speed), which 
+    // is used furthermore for engine power, camera distance etc
+    updateSpeed();
 
     if(!history->replayHistory() && !RewindManager::get()->isRewinding())
         m_controller->update(dt);
@@ -1511,6 +1504,45 @@ void Kart::update(float dt)
     }
 
 }   // update
+
+//-----------------------------------------------------------------------------
+/** Updates the local speed based on the current physical velocity. The value
+ *  is smoothed exponentially to avoid camera stuttering (camera distance
+ *  is dependent on speed)
+ */
+void Kart::updateSpeed()
+{
+    // Compute the speed of the kart. Smooth it with previous speed to make
+    // the camera smoother (because of capping the speed in m_max_speed
+    // the speed value jitters when approaching maximum speed. This results
+    // in the distance between kart and camera to jitter as well (typically
+    // only in the order of centimetres though). Smoothing the speed value
+    // gets rid of this jitter, and also r
+    float old_speed = m_speed;
+    m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
+    float f = 0.3f;
+    m_speed = f*m_speed + (1.0f - f)*old_speed;
+
+    // calculate direction of m_speed
+    const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
+    btVector3 forwardW(
+        chassisTrans.getBasis()[0][2],
+        chassisTrans.getBasis()[1][2],
+        chassisTrans.getBasis()[2][2]);
+
+    if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
+        m_speed *= -1.f;
+
+    // At low velocity, forces on kart push it back and forth so we ignore this
+    if (fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
+        m_speed = 0;
+
+    if (dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
+        dynamic_cast<ExplosionAnimation*>(getKartAnimation()))
+    {
+        m_speed = 0;
+    }
+}   // updateSpeed
 
 //-----------------------------------------------------------------------------
 /** Show fire to go with a zipper.
@@ -2193,44 +2225,6 @@ void Kart::updatePhysics(float dt)
     m_max_speed->setMinSpeed(min_speed);
     m_max_speed->update(dt);
 
-    // calculate direction of m_speed
-    const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
-    btVector3 forwardW (
-               chassisTrans.getBasis()[0][2],
-               chassisTrans.getBasis()[1][2],
-               chassisTrans.getBasis()[2][2]);
-
-    if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
-        m_speed *= -1.f;
-
-    // To avoid tunneling (which can happen on long falls), clamp the
-    // velocity in Y direction. Tunneling can happen if the Y velocity
-    // is larger than the maximum suspension travel (per frame), since then
-    // the wheel suspension can not stop/slow down the fall (though I am
-    // not sure if this is enough in all cases!). So the speed is limited
-    // to suspensionTravel / dt with dt = 1/60 (since this is the dt
-    // bullet is using).
-
-    // Only apply if near ground instead of purely based on speed avoiding
-    // the "parachute on top" look.
-    const Vec3 &v = m_body->getLinearVelocity();
-    if(/*isNearGround() &&*/ v.getY() < - m_kart_properties->getSuspensionTravel() * 60)
-    {
-        Vec3 v_clamped = v;
-        // clamp the speed to 99% of the maxium falling speed.
-        v_clamped.setY(-m_kart_properties->getSuspensionTravel() * 60 * 0.99f);
-        //m_body->setLinearVelocity(v_clamped);
-    }
-
-    //at low velocity, forces on kart push it back and forth so we ignore this
-    if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
-         m_speed = 0;
-
-    if (dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
-        dynamic_cast<ExplosionAnimation*>(getKartAnimation()))
-    {
-        m_speed = 0;
-    }
 
     updateEngineSFX();
 #ifdef XX
