@@ -1742,16 +1742,14 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
 
     const size_t NUM_KARTS = m_world->getNumKarts();
 
-    //Protection against having vel_normal with nan values
-    const Vec3 &VEL = m_kart->getVelocity();
-    Vec3 vel_normal(VEL.getX(), 0.0, VEL.getZ());
-    float speed=vel_normal.length();
+    float speed = m_kart->getVelocity().length();
     // If the velocity is zero, no sense in checking for crashes in time
     if(speed==0) return;
 
+    Vec3 vel_normal = m_kart->getVelocity().normalized();
+
     // Time it takes to drive for m_kart_length units.
     float dt = m_kart_length / speed;
-    vel_normal/=speed;
 
     int current_node = m_track_node;
     if(steps<1 || steps>1000)
@@ -1781,7 +1779,7 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
                     continue;
                 Vec3 other_kart_xyz = other_kart->getXYZ()
                                     + other_kart->getVelocity()*(i*dt);
-                float kart_distance = (step_coord - other_kart_xyz).length_2d();
+                float kart_distance = (step_coord - other_kart_xyz).length();
 
                 if( kart_distance < m_kart_length)
                     m_crashes.m_kart = j;
