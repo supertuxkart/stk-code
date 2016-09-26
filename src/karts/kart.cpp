@@ -1252,7 +1252,10 @@ void Kart::update(float dt)
                            m_kart_properties->getStabilityChassisAngularDamping());
     }
 
-    if(m_kart_animation)
+    // Used to prevent creating a rescue animation after an explosion animation
+    // got deleted
+    const bool has_animation_before = m_kart_animation!= NULL;
+    if(has_animation_before)
         m_kart_animation->update(dt);
 
     m_attachment->update(dt);
@@ -1313,7 +1316,7 @@ void Kart::update(float dt)
         if (World::getWorld()->getTrack()->isAutoRescueEnabled() &&
             (!m_terrain_info->getMaterial() ||
             !m_terrain_info->getMaterial()->hasGravity()) &&
-            !getKartAnimation() && fabs(roll) > 60 * DEGREE_TO_RAD &&
+            !has_animation_before && fabs(roll) > 60 * DEGREE_TO_RAD &&
             fabs(getSpeed()) < 3.0f)
         {
             new RescueAnimation(this, /*is_auto_rescue*/true);
