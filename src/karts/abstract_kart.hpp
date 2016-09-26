@@ -274,6 +274,10 @@ public:
      *  like Ghost. */
     virtual float getSpeed() const = 0;
     // ------------------------------------------------------------------------
+    /** Returns the exponentially smoothened speed of the kart in 
+     *  which is removes shaking from camera. */
+    virtual float getSmoothedSpeed() const = 0;
+    // ------------------------------------------------------------------------
     /** Returns the current maximum speed for this kart, this includes all
      *  bonus and maluses that are currently applied. */
     virtual float getCurrentMaxSpeed() const = 0;

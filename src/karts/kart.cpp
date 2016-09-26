@@ -156,6 +156,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     // Set position and heading:
     m_reset_transform         = init_transform;
     m_speed                   = 0.0f;
+    m_smoothed_speed          = 0.0f;
 
     m_kart_model->setKart(this);
 
@@ -352,6 +353,7 @@ void Kart::reset()
     m_brake_time           = 0.0f;
     m_time_last_crash      = 0.0f;
     m_speed                = 0.0f;
+    m_smoothed_speed       = 0.0f;
     m_current_lean         = 0.0f;
     m_view_blocked_by_plunger = 0.0f;
     m_bubblegum_time       = 0.0f;
@@ -1518,10 +1520,9 @@ void Kart::updateSpeed()
     // in the distance between kart and camera to jitter as well (typically
     // only in the order of centimetres though). Smoothing the speed value
     // gets rid of this jitter, and also r
-    float old_speed = m_speed;
     m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
     float f = 0.3f;
-    m_speed = f*m_speed + (1.0f - f)*old_speed;
+    m_smoothed_speed = f*m_speed + (1.0f - f)*m_smoothed_speed;
 
     // calculate direction of m_speed
     const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
@@ -1531,16 +1532,18 @@ void Kart::updateSpeed()
         chassisTrans.getBasis()[2][2]);
 
     if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
-        m_speed *= -1.f;
+    {
+        m_speed = -m_speed;
+    }
 
     // At low velocity, forces on kart push it back and forth so we ignore this
-    if (fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
-        m_speed = 0;
-
-    if (dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
-        dynamic_cast<ExplosionAnimation*>(getKartAnimation()))
+    // - quick'n'dirty workaround for bug 1776883
+    if (fabsf(m_speed) < 0.2f                                   ||
+        dynamic_cast<RescueAnimation*>   ( getKartAnimation() ) ||
+        dynamic_cast<ExplosionAnimation*>( getKartAnimation() )    )
     {
-        m_speed = 0;
+        m_speed          = 0;
+        m_smoothed_speed = 0;
     }
 }   // updateSpeed
 

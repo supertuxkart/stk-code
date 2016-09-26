@@ -197,7 +197,11 @@ protected:
     /** When a kart has its view blocked by the plunger, this variable will be
      *  > 0 the number it contains is the time left before removing plunger. */
     float         m_view_blocked_by_plunger;
+    /** The current speed (i.e. length of velocity vector) of this kart. */
     float         m_speed;
+    /** For camera handling an exponentially smoothened value is used, which
+     *  reduces stuttering of the camera. */
+    float         m_smoothed_speed;
 
     std::vector<SFXBase*> m_custom_sounds;
     SFXBase      *m_beep_sound;
@@ -363,6 +367,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
     virtual float        getSpeed() const {return m_speed;                 }
+    // ------------------------------------------------------------------------
+    /** Returns the speed of the kart in meters/second. */
+    virtual float        getSmoothedSpeed() const { return m_smoothed_speed; }
     // ------------------------------------------------------------------------
     /** This is used on the client side only to set the speed of the kart
      *  from the server information.                                       */

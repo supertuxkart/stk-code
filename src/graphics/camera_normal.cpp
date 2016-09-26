@@ -81,7 +81,7 @@ void CameraNormal::smoothMoveCamera(float dt)
     const KartProperties *kp = m_kart->getKartProperties();
     float max_increase_with_zipper = kp->getZipperMaxSpeedIncrease();
     float max_speed_without_zipper = kp->getEngineMaxSpeed();
-    float current_speed = m_kart->getSpeed();
+    float current_speed = m_kart->getSmoothedSpeed();
 
     const Skidding *ks = m_kart->getSkidding();
     float skid_factor = ks->getVisualSkidRotation();
@@ -107,10 +107,10 @@ void CameraNormal::smoothMoveCamera(float dt)
     core::vector3df wanted_position = m_kart_camera_position_with_offset.toIrrVector();
 
     float f = 5.0f;
-    if ((m_kart->getSpeed() > 5 ) || (m_kart->getSpeed() < 0 ))
+    if ((current_speed > 5 ) || (current_speed < 0 ))
     {
-       f = m_kart->getSpeed()>0 ? m_kart->getSpeed()/3 + 1.0f
-                                : -1.5f * m_kart->getSpeed() + 2.0f;
+       f = current_speed >0 ?         current_speed/3 + 1.0f
+                            : -1.5f * current_speed   + 2.0f;
     }
     current_position += (wanted_position - current_position) * (dt *f);
 
