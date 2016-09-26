@@ -2217,7 +2217,7 @@ void SkiddingAI::handleCurve()
                                         m_current_curve_radius);
     m_curve[CURVE_PREDICT1]->addPoint(last_xyz);
     m_curve[CURVE_PREDICT1]->addPoint(m_kart->getTrans()(m_curve_center));
-    m_curve[CURVE_PREDICT1]->addPoint(xyz);
+    m_curve[CURVE_PREDICT1]->addPoint(m_kart->getXYZ());
 #endif
 
 }   // handleCurve
