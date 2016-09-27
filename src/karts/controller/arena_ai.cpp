@@ -23,7 +23,6 @@
 #include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/controller/player_controller.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
 #include "tracks/arena_graph.hpp"
@@ -63,6 +62,7 @@ void ArenaAI::reset()
     m_time_since_uturn = 0.0f;
     m_turn_radius = 0.0f;
     m_turn_angle = 0.0f;
+    m_steering_angle = 0.0f;
     m_on_node.clear();
     m_aiming_points.clear();
     m_aiming_nodes.clear();
@@ -106,6 +106,7 @@ void ArenaAI::update(float dt)
     // After found target, convert it to local coordinate, used for skidding or
     // u-turn
     m_target_point_lc = m_kart->getTrans().inverse()(m_target_point);
+    doSkiddingTest();
     handleArenaItems(dt);
 
     if (m_kart->getSpeed() > 15.0f && m_turn_angle < 20)
@@ -216,8 +217,8 @@ void ArenaAI::handleArenaSteering(const float dt)
         }
         else
         {
-            float target_angle = steerToPoint(m_target_point);
-            setSteering(target_angle, dt);
+            m_steering_angle = steerToPoint(m_target_point);
+            setSteering(m_steering_angle, dt);
         }
         return;
     }
@@ -242,8 +243,8 @@ void ArenaAI::handleArenaSteering(const float dt)
         }
         else
         {
-            float target_angle = steerToPoint(m_target_point);
-            setSteering(target_angle, dt);
+            m_steering_angle = steerToPoint(m_target_point);
+            setSteering(m_steering_angle, dt);
         }
         return;
     }
@@ -713,3 +714,27 @@ void ArenaAI::collectItemInArena(Vec3* aim_point, int* target_node) const
         *target_node = m_closest_kart_node;
     }
 }   // collectItemInArena
+
+//-----------------------------------------------------------------------------
+void ArenaAI::doSkiddingTest()
+{
+    m_mini_skid = false;
+
+    // No skidding when u-turn
+    if (m_is_uturn) return;
+
+    // Skid when close to target, but not straight ahead, in front of it, same
+    // steering side and with suitable difficulties.
+    const float abs_angle = atan2f(fabsf(m_target_point_lc.x()),
+        fabsf(m_target_point_lc.z()));
+    if ((m_cur_difficulty == RaceManager::DIFFICULTY_HARD ||
+        m_cur_difficulty == RaceManager::DIFFICULTY_BEST) &&
+        m_target_point_lc.z() > 0 && abs_angle > 0.15f &&
+        m_target_point_lc.length() < 10.0f &&
+        ((m_steering_angle < 0 && m_target_point_lc.x() < 0) ||
+        (m_steering_angle > 0 && m_target_point_lc.x() > 0)))
+    {
+        m_mini_skid = true;
+    }
+
+}   // doSkiddingTest

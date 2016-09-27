@@ -65,7 +65,8 @@ private:
     virtual int  getCurrentNode() const;
     virtual float getKartDistance(int to_id) const;
     virtual bool isWaiting() const;
-    virtual bool canSkid(float steer_fraction)           { return false; }
+    virtual bool canSkid(float steer_fraction)
+           { return m_mini_skid && !(m_overtake_ball || m_chasing_ball); }
     virtual bool forceBraking() OVERRIDE
                               { return m_avoiding_item || m_force_brake; }
     virtual bool ignorePathFinding() OVERRIDE

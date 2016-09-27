@@ -22,7 +22,7 @@
 #include "karts/controller/ai_base_controller.hpp"
 #include "race/race_manager.hpp"
 
-#define AI_DEBUG
+#undef AI_DEBUG
 #ifdef AI_DEBUG
 #include "graphics/irr_driver.hpp"
 #endif
@@ -65,8 +65,9 @@ protected:
 
     bool m_avoiding_item;
 
+    bool m_mini_skid;
+
     void  collectItemInArena(Vec3*, int*) const;
-    float findAngleFrom3Edges(float a, float b, float c);
 private:
     /** Used by handleArenaUTurn, it tells whether to do left or right
      *  turning when steering is overridden. */
@@ -100,6 +101,7 @@ private:
 
     float m_turn_radius;
     float m_turn_angle;
+    float m_steering_angle;
 
     Vec3 m_current_forward_point;
     int m_current_forward_node;
@@ -107,9 +109,9 @@ private:
     std::set<int> m_aiming_nodes;
     std::vector<Vec3> m_aiming_points;
 
-    bool m_mini_skid;
-
     void         checkIfStuck(const float dt);
+    void         doSkiddingTest();
+    float        findAngleFrom3Edges(float a, float b, float c);
     void         handleArenaAcceleration(const float dt);
     void         handleArenaBraking();
     void         handleArenaItems(const float dt);
