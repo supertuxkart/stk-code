@@ -21,6 +21,8 @@
 
 #include "karts/controller/arena_ai.hpp"
 
+#include "LinearMath/btTransform.h"
+
 #undef BALL_AIM_DEBUG
 #ifdef BALL_AIM_DEBUG
 #include "graphics/irr_driver.hpp"
@@ -52,6 +54,8 @@ private:
     bool m_overtake_ball;
     bool m_force_brake;
     bool m_chasing_ball;
+
+    btTransform m_front_transform;
 
     Vec3 determineBallAimingPosition();
     bool isOvertakable(const Vec3& ball_lc);

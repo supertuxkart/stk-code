@@ -1210,6 +1210,9 @@ void Kart::update(float dt)
     // Update the position and other data taken from the physics
     Moveable::update(dt);
 
+    Vec3 front(0, 0, getKartLength()*0.5f);
+    m_xyz_front = getTrans()(front);
+
     if(!history->replayHistory())
         m_controller->update(dt);
 
@@ -1332,9 +1335,6 @@ void Kart::update(float dt)
         old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
-
-    Vec3 front(0, 0, getKartLength()*0.5f);
-    m_xyz_front = getTrans()(front);
 
     // After the physics step was done, the position of the wheels (as stored
     // in wheelInfo) is actually outdated, since the chassis was moved
