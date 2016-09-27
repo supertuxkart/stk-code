@@ -24,12 +24,10 @@
 #include "karts/controller/kart_control.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/soccer_world.hpp"
+#include "tracks/arena_graph.hpp"
 
 #ifdef AI_DEBUG
 #include "irrlicht.h"
-#include <iostream>
-using namespace irr;
-using namespace std;
 #endif
 
 #ifdef BALL_AIM_DEBUG
@@ -94,7 +92,6 @@ SoccerAI::~SoccerAI()
 void SoccerAI::reset()
 {
     ArenaAI::reset();
-    AIBaseController::reset();
 
     m_overtake_ball = false;
     m_force_brake = false;
@@ -154,11 +151,9 @@ void SoccerAI::findClosestKart(bool use_difficulty)
         }
     }
 
-    const AbstractKart* closest_kart = m_world->getKart(closest_kart_num);
-    m_closest_kart_node = m_world->getKartNode(closest_kart_num);
-    m_closest_kart_point = closest_kart->getXYZ();
     m_closest_kart = m_world->getKart(closest_kart_num);
-    checkPosition(m_closest_kart_point, &m_closest_kart_pos_data);
+    m_closest_kart_node = m_world->getKartNode(closest_kart_num);
+    m_closest_kart_point = m_closest_kart->getXYZ();
 
 }   // findClosestKart
 
@@ -457,8 +452,15 @@ int SoccerAI::getCurrentNode() const
 {
     return m_world->getKartNode(m_kart->getWorldKartId());
 }   // getCurrentNode
+
 //-----------------------------------------------------------------------------
 bool SoccerAI::isWaiting() const
 {
     return m_world->isStartPhase();
 }   // isWaiting
+
+//-----------------------------------------------------------------------------
+float SoccerAI::getKartDistance(int to_id) const
+{
+    return m_graph->getDistance(getCurrentNode(), m_world->getKartNode(to_id));
+}   // getKartDistance

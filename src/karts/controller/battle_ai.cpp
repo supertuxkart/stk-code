@@ -25,12 +25,10 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "modes/three_strikes_battle.hpp"
+#include "tracks/arena_graph.hpp"
 
 #ifdef AI_DEBUG
 #include "irrlicht.h"
-#include <iostream>
-using namespace irr;
-using namespace std;
 #endif
 
 BattleAI::BattleAI(AbstractKart *kart)
@@ -72,14 +70,11 @@ BattleAI::~BattleAI()
 void BattleAI::reset()
 {
     ArenaAI::reset();
-    AIBaseController::reset();
-    m_mini_skid = false;
 }   // reset
 
 //-----------------------------------------------------------------------------
 void BattleAI::update(float dt)
 {
-    m_mini_skid = false;
     ArenaAI::update(dt);
 }   // update
 
@@ -118,33 +113,19 @@ void BattleAI::findClosestKart(bool use_difficulty)
                 continue;
         }
 
-        Vec3 d = kart->getXYZ() - m_kart->getXYZ();
-        if (d.length() <= distance)
+        float dist_to_kart = m_graph->getDistance(getCurrentNode(),
+            m_world->getKartNode(kart->getWorldKartId()));
+        if (dist_to_kart <= distance)
         {
-            distance = d.length();
+            distance = dist_to_kart;
             closest_kart_num = i;
         }
     }
 
-    const AbstractKart* closest_kart = m_world->getKart(closest_kart_num);
+    m_closest_kart = m_world->getKart(closest_kart_num);
     m_closest_kart_node = m_world->getKartNode(closest_kart_num);
-    m_closest_kart_point = closest_kart->getXYZ();
+    m_closest_kart_point = m_closest_kart->getXYZ();
 
-    if (!use_difficulty)
-    {
-        m_closest_kart = m_world->getKart(closest_kart_num);
-        checkPosition(m_closest_kart_point, &m_closest_kart_pos_data);
-
-        // Do a mini-skid to closest kart only when firing target,
-        // not straight ahead, not too far, in front of it
-        // and with suitable difficulties.
-        if (m_closest_kart_pos_data.angle > 0.2f             &&
-            m_closest_kart_pos_data.distance < 20.0f         &&
-           !m_closest_kart_pos_data.behind                   &&
-           (m_cur_difficulty == RaceManager::DIFFICULTY_HARD ||
-            m_cur_difficulty == RaceManager::DIFFICULTY_BEST))
-            m_mini_skid = true;
-    }
 }   // findClosestKart
 
 //-----------------------------------------------------------------------------
@@ -166,8 +147,15 @@ int BattleAI::getCurrentNode() const
 {
     return m_world->getKartNode(m_kart->getWorldKartId());
 }   // getCurrentNode
+
 //-----------------------------------------------------------------------------
 bool BattleAI::isWaiting() const
 {
     return m_world->isStartPhase();
 }   // isWaiting
+
+//-----------------------------------------------------------------------------
+float BattleAI::getKartDistance(int to_id) const
+{
+    return m_graph->getDistance(getCurrentNode(), m_world->getKartNode(to_id));
+}   // getKartDistance

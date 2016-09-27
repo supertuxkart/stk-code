@@ -22,7 +22,7 @@
 #include "karts/controller/ai_base_controller.hpp"
 #include "race/race_manager.hpp"
 
-#undef AI_DEBUG
+#define AI_DEBUG
 #ifdef AI_DEBUG
 #include "graphics/irr_driver.hpp"
 #endif
@@ -41,13 +41,13 @@ namespace irr
 class ArenaAI : public AIBaseController
 {
 protected:
+    ArenaGraph* m_graph;
+
     /** Pointer to the closest kart around this kart. */
     AbstractKart *m_closest_kart;
 
     int m_closest_kart_node;
     Vec3 m_closest_kart_point;
-
-    posData m_closest_kart_pos_data;
 
     /** Holds the current difficulty. */
     RaceManager::Difficulty m_cur_difficulty;
@@ -57,7 +57,7 @@ protected:
     irr::scene::ISceneNode *m_debug_sphere;
     irr::scene::ISceneNode *m_debug_sphere_next;
 
-    /** The node(poly) at which the target point lies in. */
+    /** The node(quad) at which the target point lies in. */
     int m_target_node;
 
     /** The target point. */
@@ -68,13 +68,11 @@ protected:
     void  collectItemInArena(Vec3*, int*) const;
     float findAngleFrom3Edges(float a, float b, float c);
 private:
-    ArenaGraph* m_graph;
-
     /** Used by handleArenaUTurn, it tells whether to do left or right
      *  turning when steering is overridden. */
     bool m_adjusting_side;
 
-    posData m_cur_kart_pos_data;
+    Vec3 m_target_point_lc;
 
    /** Indicates that the kart is currently stuck, and m_time_since_reversing is
      * counting down. */
@@ -109,6 +107,8 @@ private:
     std::set<int> m_aiming_nodes;
     std::vector<Vec3> m_aiming_points;
 
+    bool m_mini_skid;
+
     void         checkIfStuck(const float dt);
     void         handleArenaAcceleration(const float dt);
     void         handleArenaBraking();
@@ -125,8 +125,10 @@ private:
     virtual void resetAfterStop() {};
     virtual void findClosestKart(bool use_difficulty) = 0;
     virtual void findTarget() = 0;
+    virtual float getKartDistance(int to_id) const = 0;
     virtual bool forceBraking() { return m_avoiding_item; }
     virtual bool ignorePathFinding() { return false; }
+    virtual bool canSkid(float steer_fraction) { return m_mini_skid; }
 public:
                  ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};

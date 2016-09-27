@@ -27,7 +27,6 @@
 #endif
 
 class SoccerWorld;
-class Vec3;
 
 /** The actual soccer AI.
  * \ingroup controller
@@ -64,6 +63,7 @@ private:
     virtual void findTarget();
     virtual void resetAfterStop() OVERRIDE    { m_overtake_ball = false; }
     virtual int  getCurrentNode() const;
+    virtual float getKartDistance(int to_id) const;
     virtual bool isWaiting() const;
     virtual bool canSkid(float steer_fraction)           { return false; }
     virtual bool forceBraking() OVERRIDE
