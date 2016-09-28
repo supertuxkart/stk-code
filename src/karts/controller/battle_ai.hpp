@@ -34,16 +34,17 @@ private:
     /** Keep a pointer to world. */
     ThreeStrikesBattle *m_world;
 
-    virtual void findClosestKart(bool use_difficulty);
-    virtual void findTarget();
-    virtual int  getCurrentNode() const;
-    virtual bool isWaiting() const;
-    virtual float getKartDistance(int to_id) const;
+    virtual void  findClosestKart(bool use_difficulty) OVERRIDE;
+    virtual void  findTarget() OVERRIDE;
+    virtual int   getCurrentNode() const OVERRIDE;
+    virtual float getKartDistance(int to_id) const OVERRIDE;
+    virtual bool  isKartOnRoad() const OVERRIDE;
+    virtual bool  isWaiting() const OVERRIDE;
 public:
                  BattleAI(AbstractKart *kart);
                 ~BattleAI();
-    virtual void update      (float delta);
-    virtual void reset       ();
+    virtual void update  (float delta) OVERRIDE;
+    virtual void reset   () OVERRIDE;
 };
 
 #endif

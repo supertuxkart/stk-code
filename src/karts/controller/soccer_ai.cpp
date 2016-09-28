@@ -467,3 +467,9 @@ float SoccerAI::getKartDistance(int to_id) const
 {
     return m_graph->getDistance(getCurrentNode(), m_world->getKartNode(to_id));
 }   // getKartDistance
+
+//-----------------------------------------------------------------------------
+bool SoccerAI::isKartOnRoad() const
+{
+    return m_world->isOnRoad(m_kart->getWorldKartId());
+}   // isKartOnRoad

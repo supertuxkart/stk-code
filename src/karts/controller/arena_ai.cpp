@@ -25,9 +25,9 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/rescue_animation.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
-#include "utils/log.hpp"
 
 ArenaAI::ArenaAI(AbstractKart *kart)
        : AIBaseController(kart)
@@ -58,6 +58,7 @@ void ArenaAI::reset()
     m_target_point_lc = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
+    m_time_since_off_road = 0.0f;
     m_time_since_reversing = 0.0f;
     m_time_since_uturn = 0.0f;
     m_turn_radius = 0.0f;
@@ -87,6 +88,24 @@ void ArenaAI::update(float dt)
     if (m_kart->getKartAnimation())
     {
         resetAfterStop();
+        return;
+    }
+
+    if (!isKartOnRoad() && !m_kart->getKartAnimation())
+    {
+        m_time_since_off_road += dt;
+    }
+    else if (m_time_since_off_road != 0.0f)
+    {
+        m_time_since_off_road = 0.0f;
+    }
+
+    // If the kart needs to be rescued, do it now (and nothing else)
+    if (m_time_since_off_road > 5.0f && !m_kart->getKartAnimation())
+    {
+        m_time_since_off_road = 0.0f;
+        new RescueAnimation(m_kart);
+        AIBaseController::update(dt);
         return;
     }
 

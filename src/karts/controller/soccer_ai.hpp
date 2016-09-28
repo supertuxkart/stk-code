@@ -57,29 +57,30 @@ private:
 
     btTransform m_front_transform;
 
-    Vec3 determineBallAimingPosition();
-    bool isOvertakable(const Vec3& ball_lc);
-    bool determineOvertakePosition(const Vec3& ball_lc, const Vec3& aim_lc,
-                                   Vec3* overtake_lc);
+    Vec3  determineBallAimingPosition();
+    bool  determineOvertakePosition(const Vec3& ball_lc, const Vec3& aim_lc,
+                                    Vec3* overtake_lc);
+    bool  isOvertakable(const Vec3& ball_lc);
     float rotateSlope(float old_slope, bool rotate_up);
 
-    virtual void findClosestKart(bool use_difficulty);
-    virtual void findTarget();
-    virtual void resetAfterStop() OVERRIDE    { m_overtake_ball = false; }
-    virtual int  getCurrentNode() const;
-    virtual float getKartDistance(int to_id) const;
-    virtual bool isWaiting() const;
-    virtual bool canSkid(float steer_fraction)
+    virtual bool  canSkid(float steer_fraction) OVERRIDE
            { return m_mini_skid && !(m_overtake_ball || m_chasing_ball); }
-    virtual bool forceBraking() OVERRIDE
+    virtual void  findClosestKart(bool use_difficulty) OVERRIDE;
+    virtual void  findTarget() OVERRIDE;
+    virtual bool  forceBraking() OVERRIDE
                               { return m_avoiding_item || m_force_brake; }
-    virtual bool ignorePathFinding() OVERRIDE
+    virtual int   getCurrentNode() const OVERRIDE;
+    virtual float getKartDistance(int to_id) const OVERRIDE;
+    virtual bool  ignorePathFinding() OVERRIDE
                             { return  m_overtake_ball || m_chasing_ball; }
+    virtual bool  isKartOnRoad() const OVERRIDE;
+    virtual bool  isWaiting() const OVERRIDE;
+    virtual void  resetAfterStop() OVERRIDE   { m_overtake_ball = false; }
 public:
                  SoccerAI(AbstractKart *kart);
                 ~SoccerAI();
-    virtual void update      (float delta);
-    virtual void reset       ();
+    virtual void update  (float delta) OVERRIDE;
+    virtual void reset   () OVERRIDE;
 };
 
 #endif

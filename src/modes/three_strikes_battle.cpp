@@ -565,3 +565,10 @@ void ThreeStrikesBattle::enterRaceOverState()
     }
 
 }   // enterRaceOverState
+
+//-----------------------------------------------------------------------------
+bool ThreeStrikesBattle::isOnRoad(unsigned int kart_id) const
+{
+    assert(m_kart_track_sector.size() > kart_id);
+    return m_kart_track_sector[kart_id]->isOnRoad();
+}   // isOnRoad

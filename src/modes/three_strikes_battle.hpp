@@ -119,7 +119,7 @@ public:
     virtual void enterRaceOverState() OVERRIDE;
 
     int getKartNode(unsigned int kart_id) const;
-
+    bool isOnRoad(unsigned int kart_id) const;
     void updateKartRanks();
     void increaseRescueCount() { m_total_rescue++; }
 };   // ThreeStrikesBattles

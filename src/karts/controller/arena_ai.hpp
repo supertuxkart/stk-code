@@ -99,6 +99,9 @@ private:
     /** This is a timer that counts down when the kart is doing u-turn. */
     float m_time_since_uturn;
 
+    /** This is a timer that counts when the kart start going off road. */
+    float m_time_since_off_road;
+
     float m_turn_radius;
     float m_turn_angle;
     float m_steering_angle;
@@ -122,21 +125,23 @@ private:
     void         updateBadItemLocation();
     void         updateTurnRadius(const Vec3& p1, const Vec3& p2,
                                   const Vec3& p3);
-    virtual int  getCurrentNode() const = 0;
-    virtual bool isWaiting() const = 0;
-    virtual void resetAfterStop() {};
-    virtual void findClosestKart(bool use_difficulty) = 0;
-    virtual void findTarget() = 0;
+    virtual bool  canSkid(float steer_fraction) OVERRIDE
+                                     { return m_mini_skid; }
+    virtual void  findClosestKart(bool use_difficulty) = 0;
+    virtual void  findTarget() = 0;
+    virtual bool  forceBraking() { return m_avoiding_item; }
+    virtual int   getCurrentNode() const = 0;
     virtual float getKartDistance(int to_id) const = 0;
-    virtual bool forceBraking() { return m_avoiding_item; }
-    virtual bool ignorePathFinding() { return false; }
-    virtual bool canSkid(float steer_fraction) { return m_mini_skid; }
+    virtual bool  ignorePathFinding() { return false; }
+    virtual bool  isWaiting() const = 0;
+    virtual bool  isKartOnRoad() const = 0;
+    virtual void  resetAfterStop() {};
 public:
                  ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};
-    virtual void update      (float delta);
-    virtual void reset       ();
-    virtual void newLap(int lap) {};
+    virtual void update (float delta) OVERRIDE;
+    virtual void reset  () OVERRIDE;
+    virtual void newLap (int lap) OVERRIDE {}
 };
 
 #endif

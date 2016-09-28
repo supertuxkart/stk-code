@@ -756,3 +756,10 @@ void SoccerWorld::setAITeam()
     Log::debug("SoccerWorld","blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
 
 }   // setAITeam
+
+//-----------------------------------------------------------------------------
+bool SoccerWorld::isOnRoad(unsigned int kart_id) const
+{
+    assert(m_kart_track_sector.size() > kart_id);
+    return m_kart_track_sector[kart_id]->isOnRoad();
+}   // isOnRoad
