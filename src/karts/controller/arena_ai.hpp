@@ -131,7 +131,7 @@ private:
     virtual void  findTarget() = 0;
     virtual bool  forceBraking() { return m_avoiding_item; }
     virtual int   getCurrentNode() const = 0;
-    virtual float getKartDistance(int to_id) const = 0;
+    virtual float getKartDistance(const AbstractKart* kart) const = 0;
     virtual bool  ignorePathFinding() { return false; }
     virtual bool  isWaiting() const = 0;
     virtual bool  isKartOnRoad() const = 0;

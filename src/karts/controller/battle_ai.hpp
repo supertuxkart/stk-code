@@ -37,7 +37,7 @@ private:
     virtual void  findClosestKart(bool use_difficulty) OVERRIDE;
     virtual void  findTarget() OVERRIDE;
     virtual int   getCurrentNode() const OVERRIDE;
-    virtual float getKartDistance(int to_id) const OVERRIDE;
+    virtual float getKartDistance(const AbstractKart* kart) const OVERRIDE;
     virtual bool  isKartOnRoad() const OVERRIDE;
     virtual bool  isWaiting() const OVERRIDE;
 public:

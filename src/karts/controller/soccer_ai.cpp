@@ -157,7 +157,7 @@ void SoccerAI::findClosestKart(bool use_difficulty)
     }
 
     m_closest_kart = m_world->getKart(closest_kart_num);
-    m_closest_kart_node = m_world->getKartNode(closest_kart_num);
+    m_closest_kart_node = m_world->getSectorForKart(m_closest_kart);
     m_closest_kart_point = m_closest_kart->getXYZ();
 
 }   // findClosestKart
@@ -187,8 +187,9 @@ void SoccerAI::findTarget()
     {
         // This AI will attack the other team ball chaser
         int id = m_world->getBallChaser(m_opp_team);
-        m_target_point = m_world->getKart(id)->getXYZ();
-        m_target_node  = m_world->getKartNode(id);
+        const AbstractKart* kart = m_world->getKart(id);
+        m_target_point = kart->getXYZ();
+        m_target_node  = m_world->getSectorForKart(kart);
     }
     else
     {
@@ -453,7 +454,7 @@ float SoccerAI::rotateSlope(float old_slope, bool rotate_up)
 //-----------------------------------------------------------------------------
 int SoccerAI::getCurrentNode() const
 {
-    return m_world->getKartNode(m_kart->getWorldKartId());
+    return m_world->getSectorForKart(m_kart);
 }   // getCurrentNode
 
 //-----------------------------------------------------------------------------
@@ -463,9 +464,10 @@ bool SoccerAI::isWaiting() const
 }   // isWaiting
 
 //-----------------------------------------------------------------------------
-float SoccerAI::getKartDistance(int to_id) const
+float SoccerAI::getKartDistance(const AbstractKart* kart) const
 {
-    return m_graph->getDistance(getCurrentNode(), m_world->getKartNode(to_id));
+    return m_graph->getDistance(getCurrentNode(),
+        m_world->getSectorForKart(kart));
 }   // getKartDistance
 
 //-----------------------------------------------------------------------------

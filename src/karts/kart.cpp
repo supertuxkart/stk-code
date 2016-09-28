@@ -68,6 +68,7 @@
 #include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
 #include "utils/vs.hpp"
@@ -1306,7 +1307,7 @@ void Kart::update(float dt)
     if (lw && DriveGraph::get())
     {
         const int sector =
-            lw->getTrackSector(getWorldKartId()).getCurrentGraphNode();
+            lw->getTrackSector(getWorldKartId())->getCurrentGraphNode();
         dist_to_sector = getXYZ().distance
             (DriveGraph::get()->getNode(sector)->getCenter());
 

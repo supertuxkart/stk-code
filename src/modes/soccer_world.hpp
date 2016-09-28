@@ -280,7 +280,6 @@ private:
     std::map<int, unsigned int> m_kart_position_map;
 
     /** Data generated from navmesh */
-    std::vector<TrackSector*> m_kart_track_sector;
     TrackSector* m_ball_track_sector;
 
     int m_red_ai;
@@ -290,8 +289,6 @@ private:
 
     /** Set the team for the karts */
     void initKartList();
-    /** Function to update the locations of all karts on the polygon map */
-    void updateKartNodes();
     /** Function to update the location the ball on the polygon map */
     void updateBallPosition(float dt);
     /** Function to update data for AI usage. */
@@ -355,10 +352,6 @@ public:
         return (team == SOCCER_TEAM_BLUE ?
             m_blue_score_times : m_red_score_times);
     }
-    // ------------------------------------------------------------------------
-    int getKartNode(unsigned int kart_id) const;
-    // ------------------------------------------------------------------------
-    bool isOnRoad(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
     int getBallNode() const;
     // ------------------------------------------------------------------------

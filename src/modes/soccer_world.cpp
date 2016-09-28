@@ -71,12 +71,6 @@ SoccerWorld::~SoccerWorld()
 
     delete m_ball_track_sector;
     m_ball_track_sector = NULL;
-    for (unsigned int i = 0; i < m_kart_track_sector.size(); i++)
-    {
-        delete m_kart_track_sector[i];
-    }
-    m_kart_track_sector.clear();
-
 }   // ~SoccerWorld
 
 //-----------------------------------------------------------------------------
@@ -98,10 +92,8 @@ void SoccerWorld::init()
 
     if (m_track->hasNavMesh())
     {
-        // Init track sector if navmesh is found
+        // Init track sector for ball if navmesh is found
         m_ball_track_sector = new TrackSector();
-        for (unsigned int i = 0; i < m_karts.size(); i++)
-            m_kart_track_sector.push_back(new TrackSector());
     }
 
     TrackObjectManager* tom = getTrack()->getTrackObjectManager();
@@ -160,8 +152,6 @@ void SoccerWorld::reset()
     if (m_track->hasNavMesh())
     {
         m_ball_track_sector->reset();
-        for (unsigned int i = 0; i < m_karts.size(); i++)
-            m_kart_track_sector[i]->reset();
     }
 
     initKartList();
@@ -192,7 +182,7 @@ void SoccerWorld::update(float dt)
     updateBallPosition(dt);
     if (m_track->hasNavMesh())
     {
-        updateKartNodes();
+        updateSectorForKarts();
         updateAIData();
     }
 
@@ -451,22 +441,6 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
 }   // createKart
 
 //-----------------------------------------------------------------------------
-/** Updates the m_kart_on_node value of each kart to localize it
- *  on the navigation mesh.
- */
-void SoccerWorld::updateKartNodes()
-{
-    if (isRaceOver()) return;
-
-    const unsigned int n = getNumKarts();
-    for (unsigned int i = 0; i < n; i++)
-    {
-        if (m_karts[i]->isEliminated()) continue;
-        m_kart_track_sector[i]->update(m_karts[i]->getXYZ());
-    }
-}   // updateKartNodes
-
-//-----------------------------------------------------------------------------
 /** Localize the ball on the navigation mesh.
  */
 void SoccerWorld::updateBallPosition(float dt)
@@ -503,13 +477,6 @@ void SoccerWorld::updateBallPosition(float dt)
     }
 
 }   // updateBallPosition
-
-//-----------------------------------------------------------------------------
-int SoccerWorld::getKartNode(unsigned int kart_id) const
-{
-    assert(kart_id < m_kart_track_sector.size());
-    return m_kart_track_sector[kart_id]->getCurrentGraphNode();
-}   // getKartNode
 
 //-----------------------------------------------------------------------------
 int SoccerWorld::getBallNode() const
@@ -756,10 +723,3 @@ void SoccerWorld::setAITeam()
     Log::debug("SoccerWorld","blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
 
 }   // setAITeam
-
-//-----------------------------------------------------------------------------
-bool SoccerWorld::isOnRoad(unsigned int kart_id) const
-{
-    assert(m_kart_track_sector.size() > kart_id);
-    return m_kart_track_sector[kart_id]->isOnRoad();
-}   // isOnRoad

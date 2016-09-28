@@ -29,7 +29,6 @@
 #include <string>
 
 class PhysicalObject;
-class TrackSector;
 
 /**
  * \brief An implementation of World, to provide the 3 strikes battle game mode
@@ -70,11 +69,6 @@ private:
     float m_tire_rotation;
 
     PtrVector<TrackObject, REF> m_tires;
-
-    std::vector<TrackSector*> m_kart_track_sector;
-
-    /** Function to update the locations of all karts on the navigation map */
-    void updateKartNodes();
 
     /** Profiling usage */
     int m_total_rescue;
@@ -118,8 +112,6 @@ public:
     virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node) OVERRIDE;
     virtual void enterRaceOverState() OVERRIDE;
 
-    int getKartNode(unsigned int kart_id) const;
-    bool isOnRoad(unsigned int kart_id) const;
     void updateKartRanks();
     void increaseRescueCount() { m_total_rescue++; }
 };   // ThreeStrikesBattles

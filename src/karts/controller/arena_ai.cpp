@@ -544,8 +544,7 @@ void ArenaAI::handleArenaItems(const float dt)
     // Compensate the distance because this distance is straight to straight
     // in graph node, so if kart to kart are not facing like so as, their real
     // distance maybe smaller
-    const float dist_to_kart =
-        getKartDistance(m_closest_kart->getWorldKartId()) * 0.8f;
+    const float dist_to_kart = getKartDistance(m_closest_kart) * 0.8f;
 
     switch(m_kart->getPowerup()->getType())
     {

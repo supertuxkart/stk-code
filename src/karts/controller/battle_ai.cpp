@@ -114,7 +114,7 @@ void BattleAI::findClosestKart(bool use_difficulty)
         }
 
         float dist_to_kart = m_graph->getDistance(getCurrentNode(),
-            m_world->getKartNode(kart->getWorldKartId()));
+            m_world->getSectorForKart(kart));
         if (dist_to_kart <= distance)
         {
             distance = dist_to_kart;
@@ -123,7 +123,7 @@ void BattleAI::findClosestKart(bool use_difficulty)
     }
 
     m_closest_kart = m_world->getKart(closest_kart_num);
-    m_closest_kart_node = m_world->getKartNode(closest_kart_num);
+    m_closest_kart_node = m_world->getSectorForKart(m_closest_kart);
     m_closest_kart_point = m_closest_kart->getXYZ();
 
 }   // findClosestKart
@@ -145,7 +145,7 @@ void BattleAI::findTarget()
 //-----------------------------------------------------------------------------
 int BattleAI::getCurrentNode() const
 {
-    return m_world->getKartNode(m_kart->getWorldKartId());
+    return m_world->getSectorForKart(m_kart);
 }   // getCurrentNode
 
 //-----------------------------------------------------------------------------
@@ -155,9 +155,10 @@ bool BattleAI::isWaiting() const
 }   // isWaiting
 
 //-----------------------------------------------------------------------------
-float BattleAI::getKartDistance(int to_id) const
+float BattleAI::getKartDistance(const AbstractKart* kart) const
 {
-    return m_graph->getDistance(getCurrentNode(), m_world->getKartNode(to_id));
+    return m_graph->getDistance(getCurrentNode(),
+        m_world->getSectorForKart(kart));
 }   // getKartDistance
 
 //-----------------------------------------------------------------------------

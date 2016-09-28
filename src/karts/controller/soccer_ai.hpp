@@ -70,7 +70,7 @@ private:
     virtual bool  forceBraking() OVERRIDE
                               { return m_avoiding_item || m_force_brake; }
     virtual int   getCurrentNode() const OVERRIDE;
-    virtual float getKartDistance(int to_id) const OVERRIDE;
+    virtual float getKartDistance(const AbstractKart* kart) const OVERRIDE;
     virtual bool  ignorePathFinding() OVERRIDE
                             { return  m_overtake_ball || m_chasing_ball; }
     virtual bool  isKartOnRoad() const OVERRIDE;

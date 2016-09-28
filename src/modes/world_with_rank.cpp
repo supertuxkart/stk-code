@@ -20,10 +20,22 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "race/history.hpp"
+#include "tracks/graph.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_sector.hpp"
 #include "utils/log.hpp"
 
 #include <iostream>
+
+//-----------------------------------------------------------------------------
+WorldWithRank::~WorldWithRank()
+{
+    for (unsigned int i = 0; i < m_kart_track_sector.size(); i++)
+    {
+        delete m_kart_track_sector[i];
+    }
+    m_kart_track_sector.clear();
+}   // ~WorldWithRank
 
 //-----------------------------------------------------------------------------
 void WorldWithRank::init()
@@ -39,7 +51,22 @@ void WorldWithRank::init()
 #endif
     stk_config->getAllScores(&m_score_for_position, getNumKarts());
 
+    // Don't init track sector if navmesh is not found in arena
+    if ((m_track->isArena() || m_track->isSoccer()) && !m_track->hasNavMesh())
+        return;
+
+    for (unsigned int i = 0; i < m_karts.size(); i++)
+        m_kart_track_sector.push_back(new TrackSector());
+
 }   // init
+
+//-----------------------------------------------------------------------------
+void WorldWithRank::reset()
+{
+    World::reset();
+    for (unsigned int i = 0; i < m_kart_track_sector.size(); i++)
+        getTrackSector(i)->update(m_karts[i]->getXYZ());
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** Returns the kart with a given position.
@@ -184,3 +211,45 @@ int WorldWithRank::getScoreForPosition(int p)
     assert(p - 1 <(int) m_score_for_position.size());
     return m_score_for_position[p - 1];
 }   // getScoreForPosition
+
+//-----------------------------------------------------------------------------
+/** Returns true if the kart is on a valid graph quad.
+ *  \param kart_index  Index of the kart.
+ */
+bool WorldWithRank::isOnRoad(unsigned int kart_index) const
+{
+    return getTrackSector(kart_index)->isOnRoad();
+}   // isOnRoad
+
+//-----------------------------------------------------------------------------
+/** Gets the sector a kart is on. This function returns UNKNOWN_SECTOR if the
+ *  kart_id is larger than the current kart sector. This is necessary in the
+ *  case that a collision with the track happens during resetAllKarts: at this
+ *  time m_kart_track_sector is not initialised (and has size 0), so it would
+ *  trigger this assert. While this normally does not happen, it is useful for
+ *  track designers that STK does not crash.
+ *  \param kart_id The world kart id of the kart for which to return
+ *                 the sector.
+ */
+int WorldWithRank::getSectorForKart(const AbstractKart *kart) const
+{
+    if (kart->getWorldKartId() >= m_kart_track_sector.size())
+        return Graph::UNKNOWN_SECTOR;
+    return getTrackSector(kart->getWorldKartId())->getCurrentGraphNode();
+}   // getSectorForKart
+
+//-----------------------------------------------------------------------------
+/** Localize each kart on the graph using its center xyz.
+ */
+void WorldWithRank::updateSectorForKarts()
+{
+    if (isRaceOver()) return;
+
+    const unsigned int n = getNumKarts();
+    assert(n == m_kart_track_sector.size());
+    for (unsigned int i = 0; i < n; i++)
+    {
+        if (m_karts[i]->isEliminated()) continue;
+        getTrackSector(i)->update(m_karts[i]->getXYZ());
+    }
+}   // updateSectorForKarts
