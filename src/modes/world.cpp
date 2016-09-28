@@ -1237,20 +1237,36 @@ void World::unpause()
 void World::delayedSelfDestruct()
 {
     m_self_destruct = true;
-}
+}   // delayedSelfDestruct
 
 //-----------------------------------------------------------------------------
-
 void World::escapePressed()
 {
     new RacePausedDialog(0.8f, 0.6f);
-}
+}   // escapePressed
 
 //-----------------------------------------------------------------------------
-
 bool World::isFogEnabled() const
 {
     return !m_force_disable_fog && (m_track != NULL && m_track->isFogEnabled());
-}
+}   // isFogEnabled
+
+// ----------------------------------------------------------------------------
+/** Returns the start transform with the give index.
+ *  \param rescue_pos Index of the start position to be returned.
+ *  \returns The transform of the corresponding start position.
+ */
+btTransform World::getRescueTransform(unsigned int rescue_pos) const
+{
+    return m_track->getStartTransform(rescue_pos);
+}   // getRescueTransform
+
+//-----------------------------------------------------------------------------
+/** Uses the start position as rescue positions, override if necessary
+ */
+unsigned int World::getNumberOfRescuePositions() const
+{
+    return m_track->getNumberOfStartPositions();
+}   // getNumberOfRescuePositions
 
 /* EOF */

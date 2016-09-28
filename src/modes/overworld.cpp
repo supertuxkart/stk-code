@@ -39,7 +39,7 @@
 #include "tracks/track_object_manager.hpp"
 
 //-----------------------------------------------------------------------------
-OverWorld::OverWorld() : WorldWithRank()
+OverWorld::OverWorld() : World()
 {
     m_return_to_garage            = false;
     m_stop_music_when_dialog_open = false;
@@ -118,8 +118,8 @@ void OverWorld::update(float dt)
             music_manager->startMusic();
         m_karts[0]->startEngineSFX();
     }
-    WorldWithRank::update(dt);
-    WorldWithRank::updateTrack(dt);
+    World::update(dt);
+    World::updateTrack(dt);
     const unsigned int kart_amount  = (unsigned int)m_karts.size();
 
     // isn't it cool, on the overworld nitro is free!
@@ -269,7 +269,7 @@ void OverWorld::onMouseClick(int x, int y)
     if(challenge)
     {
         // Use the 'get closest start point' rescue function
-        // from WorldWithRank by setting the kart's position to
+        // from World by setting the kart's position to
         // be the location of the challenge bubble.
         AbstractKart* kart = getKart(0);
         kart->setXYZ(challenge->m_position);

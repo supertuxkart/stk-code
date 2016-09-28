@@ -124,16 +124,6 @@ void WorldWithRank::endSetKartPositions()
 #endif
 }   // endSetKartPositions
 
-
-//-----------------------------------------------------------------------------
-/** WorldWithRank uses the start position as rescue positions. So return
- *  the number of start positions.
- */
-unsigned int WorldWithRank::getNumberOfRescuePositions() const
-{
-    return getTrack()->getNumberOfStartPositions();
-}   // getNumberOfRescuePositions
-
 //-----------------------------------------------------------------------------
 /** Determines the rescue position for a kart. The rescue position is the
  *  start position which is has the biggest accumulated distance to all other
@@ -183,16 +173,6 @@ unsigned int WorldWithRank::getRescuePositionIndex(AbstractKart *kart)
     assert(furthest_id_found != -1);
     return furthest_id_found;
 }   // getRescuePositionIndex
-
-// ----------------------------------------------------------------------------
-/** Returns the start transform with the give index.
- *  \param rescue_pos Index of the start position to be returned.
- *  \returns The transform of the corresponding start position.
- */
-btTransform WorldWithRank::getRescueTransform(unsigned int rescue_pos) const
-{
-    return getTrack()->getStartTransform(rescue_pos);
-}   // getRescueTransform
 
 //-----------------------------------------------------------------------------
 /** Returns the number of points for a kart at a specified position.

@@ -71,17 +71,11 @@ public:
 
     void          beginSetKartPositions();
     bool          setKartPosition(unsigned int kart_id,
-                                 unsigned int position);
+                                  unsigned int position);
     void          endSetKartPositions();
     AbstractKart* getKartAtPosition(unsigned int p) const;
     virtual int   getScoreForPosition(int p);
-
-
-    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE;
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
-    virtual btTransform  getRescueTransform(unsigned int index) const OVERRIDE;
-
-
 
 };   // WorldWithRank
 

@@ -95,27 +95,27 @@ public:
     ThreeStrikesBattle();
     virtual ~ThreeStrikesBattle();
 
-    virtual void init();
+    virtual void init() OVERRIDE;
 
     // clock events
-    virtual bool isRaceOver();
-    virtual void terminateRace();
+    virtual bool isRaceOver() OVERRIDE;
+    virtual void terminateRace() OVERRIDE;
 
     // overriding World methods
-    virtual void reset();
+    virtual void reset() OVERRIDE;
 
     //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
-    virtual bool useFastMusicNearEnd() const { return false; }
+    virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
     virtual void getKartsDisplayInfo(
-                          std::vector<RaceGUIBase::KartIconDisplayInfo> *info);
-    virtual bool raceHasLaps(){ return false; }
+                 std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
+    virtual bool raceHasLaps() OVERRIDE { return false; }
 
-    virtual const std::string& getIdent() const;
+    virtual const std::string& getIdent() const OVERRIDE;
 
-    virtual void kartHit(const unsigned int kart_id);
-    virtual void update(float dt);
+    virtual void kartHit(const unsigned int kart_id) OVERRIDE;
+    virtual void update(float dt) OVERRIDE;
 
-    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node);
+    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node) OVERRIDE;
     virtual void enterRaceOverState() OVERRIDE;
 
     int getKartNode(unsigned int kart_id) const;
