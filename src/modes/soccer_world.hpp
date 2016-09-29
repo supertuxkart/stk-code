@@ -33,7 +33,7 @@ class Controller;
 class TrackObject;
 class TrackSector;
 
-/** An implementation of World, to provide the soccer game mode
+/** \brief An implementation of WorldWithRank, to provide the soccer game mode
  *  Notice: In soccer world, true goal means blue, false means red.
  * \ingroup modes
  */

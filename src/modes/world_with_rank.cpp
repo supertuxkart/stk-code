@@ -228,8 +228,7 @@ bool WorldWithRank::isOnRoad(unsigned int kart_index) const
  *  time m_kart_track_sector is not initialised (and has size 0), so it would
  *  trigger this assert. While this normally does not happen, it is useful for
  *  track designers that STK does not crash.
- *  \param kart_id The world kart id of the kart for which to return
- *                 the sector.
+ *  \param kart Kart for which to return the sector.
  */
 int WorldWithRank::getSectorForKart(const AbstractKart *kart) const
 {

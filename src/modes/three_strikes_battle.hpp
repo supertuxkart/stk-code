@@ -31,7 +31,8 @@
 class PhysicalObject;
 
 /**
- * \brief An implementation of World, to provide the 3 strikes battle game mode
+ *  \brief An implementation of WorldWithRank, to provide the 3 strikes battle
+ *  game mode
  * \ingroup modes
  */
 class ThreeStrikesBattle : public WorldWithRank
