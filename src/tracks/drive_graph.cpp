@@ -122,9 +122,7 @@ void DriveGraph::load(const std::string &quad_file_name,
         bool ai_ignore=false;
         xml_node->get("ai-ignore", &ai_ignore);
         createQuad(p0, p1, p2, p3, m_all_nodes.size(), invisible, ai_ignore,
-            false/*is_arena*/);
-        m_bb_max.max(p0);m_bb_max.max(p1);m_bb_max.max(p2);m_bb_max.max(p3);
-        m_bb_min.min(p0);m_bb_min.min(p1);m_bb_min.min(p2);m_bb_min.min(p3);
+                   false/*is_arena*/);
     }
     delete quad;
 

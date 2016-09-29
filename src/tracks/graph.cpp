@@ -446,6 +446,9 @@ void Graph::createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
     }
     m_all_nodes.push_back(q);
 
+    m_bb_max.max(p0); m_bb_max.max(p1); m_bb_max.max(p2); m_bb_max.max(p3);
+    m_bb_min.min(p0); m_bb_min.min(p1); m_bb_min.min(p2); m_bb_min.min(p3);
+
 }   // createQuad
 
 //-----------------------------------------------------------------------------
