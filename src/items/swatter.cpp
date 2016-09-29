@@ -280,13 +280,11 @@ void Swatter::pointToTarget()
     }
     else
     {
-        Vec3 swatter_to_target = m_target->getXYZ()
-                               -Vec3(m_scene_node->getAbsolutePosition());
+        Vec3 swatter_to_target =
+            m_kart->getTrans().inverse()(m_target->getXYZ());
         float dy = -swatter_to_target.getZ();
         float dx = swatter_to_target.getX();
-        float angle = SWAT_ANGLE_OFFSET + (atan2(dy, dx)-m_kart->getHeading())
-                                        * 180.0f/M_PI;
-
+        float angle = SWAT_ANGLE_OFFSET + atan2f(dy, dx) * 180 / M_PI;
         m_scene_node->setRotation(core::vector3df(0.0, angle, 0.0));
     }
 }   // pointToTarget

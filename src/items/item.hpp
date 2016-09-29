@@ -183,7 +183,6 @@ public:
 
     const AbstractKart* getEmitter() const { return m_emitter; }
 
-
     // ------------------------------------------------------------------------
     /** Returns true if the Kart is close enough to hit this item, the item is
      *  not deactivated anymore, and it wasn't placed by this kart (this is
@@ -192,29 +191,10 @@ public:
      *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
      *         kart.hpp does not need to be included here).
      */
-    bool hitKart (const Vec3 &xyz, const AbstractKart *kart=NULL) const
+    bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const
     {
         return (m_event_handler!=kart || m_deactive_time <=0) &&
                (xyz-m_xyz).length2()<m_distance_2;
-    }   // hitKart
-
-private:
-    // ------------------------------------------------------------------------
-    /** Returns true if the Kart is close enough to hit this item, the item is
-     *  not deactivated anymore, and it wasn't placed by this kart (this is
-     *  e.g. used to avoid that a kart hits a bubble gum it just dropped).
-     *  This function only uses the 2d coordinates, and it used by the AI only.
-     *  \param kart Kart to test.
-     *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
-     *         kart.hpp does not need to be included here).
-     */
-    bool hitKart (const core::vector2df &xyz,
-                  const AbstractKart *kart=NULL) const
-    {
-        if(m_event_handler==kart && m_deactive_time >0) return false;
-        float d2 = (m_xyz.getX()-xyz.X)*(m_xyz.getX()-xyz.X)
-                 + (m_xyz.getZ()-xyz.Y)*(m_xyz.getZ()-xyz.Y);
-        return d2 < m_distance_2;
     }   // hitKart
 
 protected:

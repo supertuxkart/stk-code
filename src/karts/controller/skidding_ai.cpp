@@ -1081,10 +1081,6 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
     // to avoid are collected).
     if(!avoid)
     {
-        // Project the item's location onto the plane of the current quad.
-        // This is necessary because the kart's aim point may not be on the track
-        // in 3D curves. So we project the item's location onto the plane in which
-        // the kart is. The current quad provides a good estimate of the kart's plane.
         const Vec3 &xyz = item->getXYZ();
         float angle_to_item =
             (xyz - m_kart->getXYZ()).angle(kart_aim_direction);

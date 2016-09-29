@@ -24,12 +24,10 @@
 #include "karts/controller/kart_control.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/soccer_world.hpp"
+#include "tracks/arena_graph.hpp"
 
 #ifdef AI_DEBUG
 #include "irrlicht.h"
-#include <iostream>
-using namespace irr;
-using namespace std;
 #endif
 
 #ifdef BALL_AIM_DEBUG
@@ -94,11 +92,13 @@ SoccerAI::~SoccerAI()
 void SoccerAI::reset()
 {
     ArenaAI::reset();
-    AIBaseController::reset();
 
     m_overtake_ball = false;
     m_force_brake = false;
     m_chasing_ball = false;
+
+    m_front_transform.setOrigin(m_kart->getFrontXYZ());
+    m_front_transform.setBasis(m_kart->getTrans().getBasis());
 
 }   // reset
 
@@ -113,6 +113,8 @@ void SoccerAI::update(float dt)
 #endif
     m_force_brake = false;
     m_chasing_ball = false;
+    m_front_transform.setOrigin(m_kart->getFrontXYZ());
+    m_front_transform.setBasis(m_kart->getTrans().getBasis());
 
     if (m_world->getPhase() == World::GOAL_PHASE)
     {
@@ -154,11 +156,9 @@ void SoccerAI::findClosestKart(bool use_difficulty)
         }
     }
 
-    const AbstractKart* closest_kart = m_world->getKart(closest_kart_num);
-    m_closest_kart_node = m_world->getKartNode(closest_kart_num);
-    m_closest_kart_point = closest_kart->getXYZ();
     m_closest_kart = m_world->getKart(closest_kart_num);
-    checkPosition(m_closest_kart_point, &m_closest_kart_pos_data);
+    m_closest_kart_node = m_world->getSectorForKart(m_closest_kart);
+    m_closest_kart_point = m_closest_kart->getXYZ();
 
 }   // findClosestKart
 
@@ -187,8 +187,9 @@ void SoccerAI::findTarget()
     {
         // This AI will attack the other team ball chaser
         int id = m_world->getBallChaser(m_opp_team);
-        m_target_point = m_world->getKart(id)->getXYZ();
-        m_target_node  = m_world->getKartNode(id);
+        const AbstractKart* kart = m_world->getKart(id);
+        m_target_point = kart->getXYZ();
+        m_target_node  = m_world->getSectorForKart(kart);
     }
     else
     {
@@ -214,10 +215,8 @@ Vec3 SoccerAI::determineBallAimingPosition()
     const Vec3& ball_aim_pos = m_world->getBallAimPosition(m_opp_team);
     const Vec3& orig_pos = m_world->getBallPosition();
 
-    Vec3 ball_lc;
-    Vec3 aim_lc;
-    checkPosition(orig_pos, NULL, &ball_lc, true/*use_front_xyz*/);
-    checkPosition(ball_aim_pos, NULL, &aim_lc, true/*use_front_xyz*/);
+    Vec3 ball_lc = m_front_transform.inverse()(orig_pos);
+    Vec3 aim_lc = m_front_transform.inverse()(ball_aim_pos);
 
     // Too far from the ball,
     // use path finding from arena ai to get close
@@ -235,7 +234,7 @@ Vec3 SoccerAI::determineBallAimingPosition()
             return ball_aim_pos;
         }
         else
-            return m_kart->getTrans()(Vec3(overtake_lc));
+            return m_front_transform(overtake_lc);
     }
     else
     {
@@ -455,10 +454,24 @@ float SoccerAI::rotateSlope(float old_slope, bool rotate_up)
 //-----------------------------------------------------------------------------
 int SoccerAI::getCurrentNode() const
 {
-    return m_world->getKartNode(m_kart->getWorldKartId());
+    return m_world->getSectorForKart(m_kart);
 }   // getCurrentNode
+
 //-----------------------------------------------------------------------------
 bool SoccerAI::isWaiting() const
 {
     return m_world->isStartPhase();
 }   // isWaiting
+
+//-----------------------------------------------------------------------------
+float SoccerAI::getKartDistance(const AbstractKart* kart) const
+{
+    return m_graph->getDistance(getCurrentNode(),
+        m_world->getSectorForKart(kart));
+}   // getKartDistance
+
+//-----------------------------------------------------------------------------
+bool SoccerAI::isKartOnRoad() const
+{
+    return m_world->isOnRoad(m_kart->getWorldKartId());
+}   // isKartOnRoad

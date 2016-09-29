@@ -30,7 +30,6 @@
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
-#include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
 
 #include <string>
@@ -65,12 +64,6 @@ void ThreeStrikesBattle::init()
     WorldWithRank::init();
     m_display_rank = false;
     m_kart_info.resize(m_karts.size());
-    if (m_track->hasNavMesh())
-    {
-        // Init track sector if navmesh is found
-        for (unsigned int i = 0; i < m_karts.size(); i++)
-            m_kart_track_sector.push_back(new TrackSector());
-    }
 }   // ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
@@ -86,12 +79,6 @@ ThreeStrikesBattle::~ThreeStrikesBattle()
     // freed once all refernces to it (which will happen once all
     // karts are being freed, which would have a pointer to this mesh)
     irr_driver->removeMeshFromCache(m_tire);
-
-    for (unsigned int i = 0; i < m_kart_track_sector.size(); i++)
-    {
-        delete m_kart_track_sector[i];
-    }
-    m_kart_track_sector.clear();
 }   // ~ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
@@ -145,12 +132,6 @@ void ThreeStrikesBattle::reset()
         m_track->getTrackObjectManager()->removeObject(obj);
     }
     m_tires.clearWithoutDeleting();
-
-    if (m_track->hasNavMesh())
-    {
-        for (unsigned int i = 0; i < kart_amount; i++)
-            m_kart_track_sector[i]->reset();
-    }
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -325,7 +306,7 @@ void ThreeStrikesBattle::update(float dt)
     WorldWithRank::updateTrack(dt);
 
     if (m_track->hasNavMesh())
-        updateKartNodes();
+        updateSectorForKarts();
 
     // insert blown away tire(s) now if was requested
     while (m_insert_tire > 0)
@@ -474,31 +455,6 @@ bool ThreeStrikesBattle::isRaceOver()
 
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
-
-//-----------------------------------------------------------------------------
-/** Updates the m_on_node value of each kart to localize it
- *  on the navigation mesh.
- */
-void ThreeStrikesBattle::updateKartNodes()
-{
-    if (isRaceOver()) return;
-
-    const unsigned int n = getNumKarts();
-    for (unsigned int i = 0; i < n; i++)
-    {
-        if (m_karts[i]->isEliminated()) continue;
-        m_kart_track_sector[i]->update(m_karts[i]->getXYZ());
-    }
-}   // updateKartNodes
-
-//-----------------------------------------------------------------------------
-/** Get the which node the kart located in navigation mesh.
- */
-int ThreeStrikesBattle::getKartNode(unsigned int kart_id) const
-{
-    assert(kart_id < m_kart_track_sector.size());
-    return m_kart_track_sector[kart_id]->getCurrentGraphNode();
-}   // getKartNode
 
 //-----------------------------------------------------------------------------
 /** Called when the race finishes, i.e. after playing (if necessary) an

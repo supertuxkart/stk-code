@@ -23,12 +23,11 @@
 #include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/controller/player_controller.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/rescue_animation.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
-#include "utils/log.hpp"
 
 ArenaAI::ArenaAI(AbstractKart *kart)
        : AIBaseController(kart)
@@ -51,18 +50,20 @@ void ArenaAI::reset()
     m_closest_kart = NULL;
     m_closest_kart_node = Graph::UNKNOWN_SECTOR;
     m_closest_kart_point = Vec3(0, 0, 0);
-    m_closest_kart_pos_data = {0};
-    m_cur_kart_pos_data = {0};
     m_is_stuck = false;
     m_is_uturn = false;
     m_avoiding_item = false;
+    m_mini_skid = false;
     m_target_point = Vec3(0, 0, 0);
+    m_target_point_lc = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
+    m_time_since_off_road = 0.0f;
     m_time_since_reversing = 0.0f;
     m_time_since_uturn = 0.0f;
     m_turn_radius = 0.0f;
     m_turn_angle = 0.0f;
+    m_steering_angle = 0.0f;
     m_on_node.clear();
     m_aiming_points.clear();
     m_aiming_nodes.clear();
@@ -90,6 +91,24 @@ void ArenaAI::update(float dt)
         return;
     }
 
+    if (!isKartOnRoad() && !m_kart->getKartAnimation())
+    {
+        m_time_since_off_road += dt;
+    }
+    else if (m_time_since_off_road != 0.0f)
+    {
+        m_time_since_off_road = 0.0f;
+    }
+
+    // If the kart needs to be rescued, do it now (and nothing else)
+    if (m_time_since_off_road > 5.0f && !m_kart->getKartAnimation())
+    {
+        m_time_since_off_road = 0.0f;
+        new RescueAnimation(m_kart);
+        AIBaseController::update(dt);
+        return;
+    }
+
     if (isWaiting())
     {
         AIBaseController::update(dt);
@@ -102,6 +121,11 @@ void ArenaAI::update(float dt)
 
     findClosestKart(true);
     findTarget();
+
+    // After found target, convert it to local coordinate, used for skidding or
+    // u-turn
+    m_target_point_lc = m_kart->getTrans().inverse()(m_target_point);
+    doSkiddingTest();
     handleArenaItems(dt);
 
     if (m_kart->getSpeed() > 15.0f && m_turn_angle < 20)
@@ -201,19 +225,19 @@ void ArenaAI::handleArenaSteering(const float dt)
     if (ignorePathFinding())
     {
         // Steer directly
-        checkPosition(m_target_point, &m_cur_kart_pos_data);
 #ifdef AI_DEBUG
         m_debug_sphere->setPosition(m_target_point.toIrrVector());
 #endif
-        if (m_cur_kart_pos_data.behind)
+        if (m_target_point_lc.z() < 0)
         {
-            m_adjusting_side = m_cur_kart_pos_data.lhs;
+            // Local coordinate z < 0 == target point is behind
+            m_adjusting_side = m_target_point_lc.x() < 0;
             m_is_uturn = true;
         }
         else
         {
-            float target_angle = steerToPoint(m_target_point);
-            setSteering(target_angle, dt);
+            m_steering_angle = steerToPoint(m_target_point);
+            setSteering(m_steering_angle, dt);
         }
         return;
     }
@@ -224,22 +248,22 @@ void ArenaAI::handleArenaSteering(const float dt)
         updateTurnRadius(m_kart->getXYZ(), m_aiming_points[0],
             m_aiming_points[1]);
         m_target_point = m_aiming_points[1];
-        checkPosition(m_target_point, &m_cur_kart_pos_data);
+        m_target_point_lc = m_kart->getTrans().inverse()(m_target_point);
 #ifdef AI_DEBUG
         m_debug_sphere->setVisible(true);
         m_debug_sphere_next->setVisible(true);
         m_debug_sphere->setPosition(m_aiming_points[0].toIrrVector());
         m_debug_sphere_next->setPosition(m_aiming_points[1].toIrrVector());
 #endif
-        if (m_cur_kart_pos_data.behind)
+        if (m_target_point_lc.z() < 0)
         {
-            m_adjusting_side = m_cur_kart_pos_data.lhs;
+            m_adjusting_side = m_target_point_lc.x() < 0;
             m_is_uturn = true;
         }
         else
         {
-            float target_angle = steerToPoint(m_target_point);
-            setSteering(target_angle, dt);
+            m_steering_angle = steerToPoint(m_target_point);
+            setSteering(m_steering_angle, dt);
         }
         return;
     }
@@ -324,10 +348,10 @@ void ArenaAI::handleArenaUTurn(const float dt)
         setSteering(turn_side, dt);
     m_time_since_uturn += dt;
 
-    checkPosition(m_target_point, &m_cur_kart_pos_data);
-    if (!m_cur_kart_pos_data.behind || m_time_since_uturn >
+    if (m_target_point_lc.z() > 0 || m_time_since_uturn >
         (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 3.5f : 3.0f))
     {
+        // End U-turn until target point is in front of this AI
         m_is_uturn = false;
         m_time_since_uturn = 0.0f;
     }
@@ -376,9 +400,8 @@ void ArenaAI::updateBadItemLocation()
             selected->getType() == Item::ITEM_BUBBLEGUM ||
             selected->getType() == Item::ITEM_BUBBLEGUM_NOLOK))
         {
-            Vec3 bad_item_lc;
-            checkPosition(selected->getXYZ(), NULL, &bad_item_lc,
-                true/*use_front_xyz*/);
+            Vec3 bad_item_lc =
+                m_kart->getTrans().inverse()(selected->getXYZ());
 
             // If satisfy the below condition, AI should not be affected by it:
             // bad_item_lc.z() < 0.0f, behind the kart
@@ -501,8 +524,10 @@ void ArenaAI::handleArenaItems(const float dt)
 
     // Find a closest kart again, this time we ignore difficulty
     findClosestKart(false);
-
     if (!m_closest_kart) return;
+
+    Vec3 closest_kart_point_lc =
+        m_kart->getTrans().inverse()(m_closest_kart_point);
 
     m_time_since_last_shot += dt;
 
@@ -510,9 +535,16 @@ void ArenaAI::handleArenaItems(const float dt)
     const bool difficulty = m_cur_difficulty == RaceManager::DIFFICULTY_EASY ||
                             m_cur_difficulty == RaceManager::DIFFICULTY_MEDIUM;
 
-    const bool fire_behind = m_closest_kart_pos_data.behind && !difficulty;
+    const bool fire_behind = closest_kart_point_lc.z() < 0 && !difficulty;
 
-    const bool perfect_aim = m_closest_kart_pos_data.angle < 0.2f;
+    const float abs_angle = atan2f(fabsf(closest_kart_point_lc.x()),
+        fabsf(closest_kart_point_lc.z()));
+    const bool perfect_aim = abs_angle < 0.2f;
+
+    // Compensate the distance because this distance is straight to straight
+    // in graph node, so if kart to kart are not facing like so as, their real
+    // distance maybe smaller
+    const float dist_to_kart = getKartDistance(m_closest_kart) * 0.8f;
 
     switch(m_kart->getPowerup()->getType())
     {
@@ -530,7 +562,7 @@ void ArenaAI::handleArenaItems(const float dt)
             if ((!m_kart->isShielded() &&
                 projectile_manager->projectileIsClose(m_kart,
                                     m_ai_properties->m_shield_incoming_radius)) ||
-               (m_closest_kart_pos_data.distance < 15.0f &&
+               (dist_to_kart < 15.0f &&
                ((m_closest_kart->getAttachment()->
                 getType() == Attachment::ATTACH_SWATTER) ||
                (m_closest_kart->getAttachment()->
@@ -544,11 +576,9 @@ void ArenaAI::handleArenaItems(const float dt)
             // Avoid dropping all bubble gums one after another
             if (m_time_since_last_shot < 3.0f) break;
 
-            // Use bubblegum if the next kart behind is 'close' but not too close,
+            // Use bubblegum if the kart around is close,
             // or can't find a close kart for too long time
-            if ((m_closest_kart_pos_data.distance < 15.0f &&
-                m_closest_kart_pos_data.distance > 3.0f) ||
-                m_time_since_last_shot > 15.0f)
+            if (dist_to_kart < 15.0f || m_time_since_last_shot > 15.0f)
             {
                 m_controls->m_fire      = true;
                 m_controls->m_look_back = true;
@@ -566,7 +596,7 @@ void ArenaAI::handleArenaItems(const float dt)
             // Leave some time between shots
             if (m_time_since_last_shot < 1.0f) break;
 
-            if (m_closest_kart_pos_data.distance < 25.0f &&
+            if (dist_to_kart < 25.0f &&
                 !m_closest_kart->isInvulnerable())
             {
                 m_controls->m_fire      = true;
@@ -586,7 +616,7 @@ void ArenaAI::handleArenaItems(const float dt)
             // Leave some time between shots
             if (m_time_since_last_shot < 1.0f) break;
 
-            if (m_closest_kart_pos_data.distance < 6.0f &&
+            if (dist_to_kart < 6.0f &&
                 (difficulty || perfect_aim) &&
                 !m_closest_kart->isInvulnerable())
             {
@@ -607,7 +637,7 @@ void ArenaAI::handleArenaItems(const float dt)
                 break;
 
             if (!m_closest_kart->isSquashed()          &&
-                 m_closest_kart_pos_data.distance < d2 &&
+                 dist_to_kart * dist_to_kart < d2 &&
                  m_closest_kart->getSpeed() < m_kart->getSpeed())
             {
                 m_controls->m_fire      = true;
@@ -702,3 +732,27 @@ void ArenaAI::collectItemInArena(Vec3* aim_point, int* target_node) const
         *target_node = m_closest_kart_node;
     }
 }   // collectItemInArena
+
+//-----------------------------------------------------------------------------
+void ArenaAI::doSkiddingTest()
+{
+    m_mini_skid = false;
+
+    // No skidding when u-turn
+    if (m_is_uturn) return;
+
+    // Skid when close to target, but not straight ahead, in front of it, same
+    // steering side and with suitable difficulties.
+    const float abs_angle = atan2f(fabsf(m_target_point_lc.x()),
+        fabsf(m_target_point_lc.z()));
+    if ((m_cur_difficulty == RaceManager::DIFFICULTY_HARD ||
+        m_cur_difficulty == RaceManager::DIFFICULTY_BEST) &&
+        m_target_point_lc.z() > 0 && abs_angle > 0.15f &&
+        m_target_point_lc.length() < 10.0f &&
+        ((m_steering_angle < 0 && m_target_point_lc.x() < 0) ||
+        (m_steering_angle > 0 && m_target_point_lc.x() > 0)))
+    {
+        m_mini_skid = true;
+    }
+
+}   // doSkiddingTest

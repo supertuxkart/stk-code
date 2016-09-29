@@ -68,6 +68,7 @@
 #include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
 #include "utils/vs.hpp"
@@ -1210,6 +1211,9 @@ void Kart::update(float dt)
     // Update the position and other data taken from the physics
     Moveable::update(dt);
 
+    Vec3 front(0, 0, getKartLength()*0.5f);
+    m_xyz_front = getTrans()(front);
+
     if(!history->replayHistory())
         m_controller->update(dt);
 
@@ -1252,7 +1256,10 @@ void Kart::update(float dt)
                            m_kart_properties->getStabilityChassisAngularDamping());
     }
 
-    if(m_kart_animation)
+    // Used to prevent creating a rescue animation after an explosion animation
+    // got deleted
+    const bool has_animation_before = m_kart_animation!= NULL;
+    if(has_animation_before)
         m_kart_animation->update(dt);
 
     m_attachment->update(dt);
@@ -1300,7 +1307,7 @@ void Kart::update(float dt)
     if (lw && DriveGraph::get())
     {
         const int sector =
-            lw->getTrackSector(getWorldKartId()).getCurrentGraphNode();
+            lw->getTrackSector(getWorldKartId())->getCurrentGraphNode();
         dist_to_sector = getXYZ().distance
             (DriveGraph::get()->getNode(sector)->getCenter());
 
@@ -1313,7 +1320,7 @@ void Kart::update(float dt)
         if (World::getWorld()->getTrack()->isAutoRescueEnabled() &&
             (!m_terrain_info->getMaterial() ||
             !m_terrain_info->getMaterial()->hasGravity()) &&
-            !getKartAnimation() && fabs(roll) > 60 * DEGREE_TO_RAD &&
+            !has_animation_before && fabs(roll) > 60 * DEGREE_TO_RAD &&
             fabs(getSpeed()) < 3.0f)
         {
             new RescueAnimation(this, /*is_auto_rescue*/true);
@@ -1329,9 +1336,6 @@ void Kart::update(float dt)
         old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
-
-    Vec3 front(0, 0, getKartLength()*0.5f);
-    m_xyz_front = getTrans()(front);
 
     // After the physics step was done, the position of the wheels (as stored
     // in wheelInfo) is actually outdated, since the chassis was moved
