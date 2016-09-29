@@ -51,15 +51,15 @@ class RTT;
   */
 class Graph : public NoCopy
 {
-private:
-    /** The 2d bounding box, used for hashing. */
-    Vec3 m_bb_min;
-    Vec3 m_bb_max;
-
 protected:
     static Graph* m_graph;
 
     std::vector<Quad*> m_all_nodes;
+
+    /** The 2d bounding box, used for hashing. */
+    Vec3 m_bb_min;
+
+    Vec3 m_bb_max;
 
     // ------------------------------------------------------------------------
     /** Factory method to dynamic create 2d / 3d quad for drive and arena
