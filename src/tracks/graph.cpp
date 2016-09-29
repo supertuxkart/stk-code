@@ -502,6 +502,7 @@ void Graph::findRoadSector(const Vec3& xyz, int *sector,
         if(q->pointInside(xyz, ignore_vertical))
         {
             *sector  = indx;
+            return;
         }
     }   // for i<m_all_nodes.size()
 
