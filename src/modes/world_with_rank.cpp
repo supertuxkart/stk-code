@@ -65,7 +65,10 @@ void WorldWithRank::reset()
 {
     World::reset();
     for (unsigned int i = 0; i < m_kart_track_sector.size(); i++)
+    {
+        getTrackSector(i)->reset();
         getTrackSector(i)->update(m_karts[i]->getXYZ());
+    }
 }   // reset
 
 //-----------------------------------------------------------------------------
