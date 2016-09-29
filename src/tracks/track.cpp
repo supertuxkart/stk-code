@@ -2290,7 +2290,7 @@ void Track::itemCommand(const XMLNode *node)
         // If raycast is used, increase the start position slightly
         // in case that the point is too close to the actual surface
         // (e.g. floating point errors can cause a problem here).
-        loc += quad_normal * 0.1;
+        loc += quad_normal * 0.1f;
 
 #ifndef DEBUG
         m_track_mesh->castRay(loc, loc + (-10000 * quad_normal), &hit_point,
