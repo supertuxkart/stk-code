@@ -117,8 +117,6 @@ void ArenaGraph::loadNavmesh(const std::string &navmesh)
                 xml_node_node->get("y", &y);
                 xml_node_node->get("z", &z);
                 Vec3 p(x, y, z);
-                m_bb_min.min(p);
-                m_bb_max.max(p);
                 all_vertices.push_back(p);
             }
         }

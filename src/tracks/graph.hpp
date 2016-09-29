@@ -56,11 +56,6 @@ protected:
 
     std::vector<Quad*> m_all_nodes;
 
-    /** The 2d bounding box, used for hashing. */
-    Vec3 m_bb_min;
-
-    Vec3 m_bb_max;
-
     // ------------------------------------------------------------------------
     /** Factory method to dynamic create 2d / 3d quad for drive and arena
      *  graph. */
@@ -69,6 +64,10 @@ protected:
                     bool invisible, bool ai_ignore, bool is_arena);
 
 private:
+    /** The 2d bounding box, used for hashing. */
+    Vec3 m_bb_min;
+    Vec3 m_bb_max;
+
     RTT* m_new_rtt;
 
     /** The node of the graph mesh. */
