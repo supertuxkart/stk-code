@@ -52,18 +52,18 @@ void TrackSector::reset()
 void TrackSector::update(const Vec3 &xyz, bool ignore_vertical)
 {
     int prev_sector = m_current_graph_node;
-
     const ArenaGraph* ag = ArenaGraph::get();
     std::vector<int>* test_nodes = NULL;
-    if (ag && m_on_road && prev_sector != Graph::UNKNOWN_SECTOR)
+
+    if (ag && prev_sector != Graph::UNKNOWN_SECTOR)
     {
-        // For ArenaGraph, only test nodes around current node if previously
-        // is on road
+        // For ArenaGraph, only test nodes around current node
         test_nodes = ag->getNode(prev_sector)->getNearbyNodes();
     }
 
-    Graph::get()->findRoadSector(xyz, &m_current_graph_node, test_nodes,
-        ignore_vertical);
+    // Don't only test nodes around if it was not on road
+    Graph::get()->findRoadSector(xyz, &m_current_graph_node,
+        m_on_road ? test_nodes : NULL, ignore_vertical);
     m_on_road = m_current_graph_node != Graph::UNKNOWN_SECTOR;
 
     // If m_track_sector == UNKNOWN_SECTOR, then the kart is not on top of
