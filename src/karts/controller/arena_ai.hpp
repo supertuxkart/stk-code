@@ -103,28 +103,22 @@ private:
     float m_time_since_off_road;
 
     float m_turn_radius;
-    float m_turn_angle;
+
     float m_steering_angle;
 
     Vec3 m_current_forward_point;
+
     int m_current_forward_node;
 
-    std::set<int> m_aiming_nodes;
-    std::vector<Vec3> m_aiming_points;
-
-    void         checkIfStuck(const float dt);
-    void         doSkiddingTest();
-    float        findAngleFrom3Edges(float a, float b, float c);
-    void         handleArenaAcceleration(const float dt);
-    void         handleArenaBraking();
-    void         handleArenaItems(const float dt);
-    void         handleArenaSteering(const float dt);
-    void         handleArenaUTurn(const float dt);
-    bool         handleArenaUnstuck(const float dt);
-    bool         updateAimingPosition();
-    void         updateBadItemLocation();
-    void         updateTurnRadius(const Vec3& p1, const Vec3& p2,
-                                  const Vec3& p3);
+    void          configSpeed();
+    void          configSteering();
+    bool          checkBadItem(int* node);
+    void          checkIfStuck(const float dt);
+    void          doSkiddingTest();
+    void          doUTurn(const float dt);
+    bool          gettingUnstuck(const float dt);
+    bool          updateAimingPosition(Vec3* target_point);
+    void          useItems(const float dt);
     virtual bool  canSkid(float steer_fraction) OVERRIDE
                                      { return m_mini_skid; }
     virtual void  findClosestKart(bool use_difficulty) = 0;

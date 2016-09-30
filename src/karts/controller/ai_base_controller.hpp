@@ -67,13 +67,15 @@ protected:
     void         setControllerName(const std::string &name);
     float        steerToPoint(const Vec3 &point);
     float        normalizeAngle(float angle);
-    virtual void update      (float delta);
-    virtual void setSteering   (float angle, float dt);
-    virtual bool canSkid(float steer_fraction) = 0;
     // ------------------------------------------------------------------------
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
     bool         isStuck() const { return m_stuck; }
+    void         determineTurnRadius(const Vec3 &end, Vec3 *center,
+                                     float *radius) const;
+    virtual void update      (float delta);
+    virtual void setSteering   (float angle, float dt);
+    virtual bool canSkid(float steer_fraction) = 0;
 
 public:
              AIBaseController(AbstractKart *kart);

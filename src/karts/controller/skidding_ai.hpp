@@ -265,7 +265,6 @@ private:
     void  findNonCrashingPoint(Vec3 *result, int *last_node);
 
     void  determineTrackDirection();
-    void  determineTurnRadius(const Vec3 &end, Vec3 *center, float *radius);
     virtual bool canSkid(float steer_fraction);
     virtual void setSteering(float angle, float dt);
     void handleCurve();
