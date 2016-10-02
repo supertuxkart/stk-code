@@ -63,8 +63,6 @@ protected:
     /** The target point. */
     Vec3 m_target_point;
 
-    bool m_avoiding_item;
-
     bool m_mini_skid;
 
     void  collectItemInArena(Vec3*, int*) const;
@@ -112,8 +110,8 @@ private:
 
     void          configSpeed();
     void          configSteering();
-    bool          checkBadItem(int* node);
     void          checkIfStuck(const float dt);
+    void          determinePath(int forward, std::vector<int>* path);
     void          doSkiddingTest();
     void          doUTurn(const float dt);
     bool          gettingUnstuck(const float dt);
@@ -123,7 +121,7 @@ private:
                                      { return m_mini_skid; }
     virtual void  findClosestKart(bool use_difficulty) = 0;
     virtual void  findTarget() = 0;
-    virtual bool  forceBraking() { return m_avoiding_item; }
+    virtual bool  forceBraking() { return false; }
     virtual int   getCurrentNode() const = 0;
     virtual float getKartDistance(const AbstractKart* kart) const = 0;
     virtual bool  ignorePathFinding() { return false; }

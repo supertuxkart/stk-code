@@ -29,6 +29,8 @@
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
 
+#include <algorithm>
+
 ArenaAI::ArenaAI(AbstractKart *kart)
        : AIBaseController(kart)
 {
@@ -52,7 +54,6 @@ void ArenaAI::reset()
     m_closest_kart_point = Vec3(0, 0, 0);
     m_is_stuck = false;
     m_is_uturn = false;
-    m_avoiding_item = false;
     m_mini_skid = false;
     m_target_point = Vec3(0, 0, 0);
     m_target_point_lc = Vec3(0, 0, 0);
@@ -79,7 +80,6 @@ void ArenaAI::update(float dt)
     // This is used to enable firing an item backwards.
     m_controls->m_look_back = false;
     m_controls->m_nitro     = false;
-    m_avoiding_item = false;
 
     // Don't do anything if there is currently a kart animations shown.
     if (m_kart->getKartAnimation())
@@ -149,10 +149,9 @@ void ArenaAI::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-/** Update aiming position, use path finding if necessary, it will set the turn
- *  radius too.
- *  \param[out] suitable target point.
- *  \return true if found a suitable target point.
+/** Update aiming position, use path finding if necessary.
+ *  \param[out] target_point Suitable target point.
+ *  \return True if found a suitable target point.
  */
 bool ArenaAI::updateAimingPosition(Vec3* target_point)
 {
@@ -165,6 +164,7 @@ bool ArenaAI::updateAimingPosition(Vec3* target_point)
     m_current_forward_point =
         m_kart->getTrans()(Vec3(0, 0, m_kart->getKartLength()));
 
+    m_turn_radius = 0.0f;
     std::vector<int>* test_nodes = NULL;
     if (m_current_forward_node != Graph::UNKNOWN_SECTOR)
     {
@@ -185,35 +185,27 @@ bool ArenaAI::updateAimingPosition(Vec3* target_point)
         m_target_node == Graph::UNKNOWN_SECTOR)
     {
         Log::error("ArenaAI", "Next node is unknown, path finding failed!");
-        m_turn_radius = 0.0f;
         return false;
     }
 
     if (forward == m_target_node)
     {
-        if (checkBadItem(&m_target_node))
-            m_target_point = m_graph->getNode(m_target_node)->getCenter();
-
         determineTurnRadius(m_target_point, NULL, &m_turn_radius);
         *target_point = m_target_point;
         return true;
     }
 
+    std::vector<int> path;
     int next_node = m_graph->getNextNode(forward, m_target_node);
-    // Use this next node for aim point if valid
+
     if (next_node == Graph::UNKNOWN_SECTOR)
     {
         Log::error("ArenaAI", "Next node is unknown, did you forget to link"
                    " adjacent face in navmesh?");
-        m_turn_radius = 0.0f;
         return false;
     }
 
-    checkBadItem(&next_node);
-    *target_point = m_graph->getNode(next_node)->getCenter();
-
-    // Then keep getting next node to find the first turning corner which is
-    // used to determine turn radius
+    path.push_back(next_node);
     while (m_target_node != next_node)
     {
         int previous_node = next_node;
@@ -222,31 +214,14 @@ bool ArenaAI::updateAimingPosition(Vec3* target_point)
         {
             Log::error("ArenaAI", "Next node is unknown, did you forget to"
                        " link adjacent face in navmesh?");
-            m_turn_radius = 0.0f;
             return false;
         }
-
-        const Vec3& p1 = m_kart->getXYZ();
-        const Vec3& p2 = m_graph->getNode(previous_node)->getCenter();
-        const Vec3& p3 = m_graph->getNode(next_node)->getCenter();
-        float edge1 = (p1 - p2).length();
-        float edge2 = (p2 - p3).length();
-        float to_target = (p1 - p3).length();
-
-        if (fabsf(edge1 + edge2 - to_target) > 0.1f)
-        {
-            // Triangle test
-            determineTurnRadius(p3, NULL, &m_turn_radius);
-#ifdef AI_DEBUG
-            m_debug_sphere_next->setVisible(true);
-            m_debug_sphere_next->setPosition(p3.toIrrVector());
-#endif
-            return true;
-        }
+        path.push_back(next_node);
     }
 
-    // Target node == next node
-    determineTurnRadius(m_target_point, NULL, &m_turn_radius);
+    determinePath(forward, &path);
+    *target_point = m_graph->getNode(path.front())->getCenter();
+
     return true;
 
 }   // updateAimingPosition
@@ -397,6 +372,7 @@ void ArenaAI::doUTurn(const float dt)
         // End U-turn until target point is in front of this AI
         m_is_uturn = false;
         m_time_since_uturn = 0.0f;
+        m_time_since_driving = 0.0f;
     }
     else
         m_is_uturn = true;
@@ -428,37 +404,6 @@ bool ArenaAI::gettingUnstuck(const float dt)
     return true;
 
 }   // gettingUnstuck
-
-//-----------------------------------------------------------------------------
-bool ArenaAI::checkBadItem(int* node)
-{
-    // Check if the node AI will cross will meet bad items
-    assert(*node != Graph::UNKNOWN_SECTOR);
-    Item* selected = ItemManager::get()->getFirstItemInQuad(*node);
-
-    if (selected && !selected->wasCollected() &&
-        (selected->getType() == Item::ITEM_BANANA ||
-        selected->getType() == Item::ITEM_BUBBLEGUM ||
-        selected->getType() == Item::ITEM_BUBBLEGUM_NOLOK))
-    {
-        // Choose any nearby node that is in front of the AI to prevent hitting
-        // bad item
-        ArenaNode* cur_node = m_graph->getNode(*node);
-        const float dist = (m_kart->getXYZ() - cur_node->getCenter()).length();
-        const std::vector<int>* nearby_nodes = cur_node->getNearbyNodes();
-        for (const int& nearby_node : *nearby_nodes)
-        {
-            Vec3 lc = m_kart->getTrans().inverse()
-                (m_graph->getNode(nearby_node)->getCenter());
-            if (lc.z() > 0 && dist > lc.length())
-            {
-                *node = nearby_node;
-                return true;
-            }
-        }
-    }
-    return false;
-}   // checkBadItem
 
 //-----------------------------------------------------------------------------
 void ArenaAI::useItems(const float dt)
@@ -702,3 +647,97 @@ void ArenaAI::doSkiddingTest()
     }
 
 }   // doSkiddingTest
+
+//-----------------------------------------------------------------------------
+/** Determine if the path to target needs to be changed to avoid bad items, it
+ *  will also set the turn radius based on the new path if necessary.
+ *  \param forward Forward node of current AI position.
+ *  \param path Default path to target.
+ */
+void ArenaAI::determinePath(int forward, std::vector<int>* path)
+{
+    std::vector<int> bad_item_nodes;
+    // First, test if the nodes AI will cross contain bad item
+    for (unsigned int i = 0; i < path->size(); i++)
+    {
+        // Only test few nodes ahead
+        if (i == 6) break;
+        const int node = (*path)[i];
+        Item* selected = ItemManager::get()->getFirstItemInQuad(node);
+
+        if (selected && !selected->wasCollected() &&
+            (selected->getType() == Item::ITEM_BANANA ||
+            selected->getType() == Item::ITEM_BUBBLEGUM ||
+            selected->getType() == Item::ITEM_BUBBLEGUM_NOLOK))
+        {
+            bad_item_nodes.push_back(node);
+        }
+    }
+
+    // If so try to avoid
+    if (!bad_item_nodes.empty())
+    {
+        bool failed_avoid = false;
+        for (unsigned int i = 0; i < path->size(); i++)
+        {
+            if (failed_avoid) break;
+            if (i == 6) break;
+            // Choose any adjacent node that is in front of the AI to prevent
+            // hitting bad item
+            ArenaNode* cur_node =
+                m_graph->getNode(i == 0 ? forward : (*path)[i - 1]);
+            float dist = 99999.9f;
+            const std::vector<int>& adj_nodes = cur_node->getAdjacentNodes();
+            int chosen_node = Graph::UNKNOWN_SECTOR;
+            for (const int& adjacent : adj_nodes)
+            {
+                if (std::find(bad_item_nodes.begin(), bad_item_nodes.end(),
+                    adjacent) != bad_item_nodes.end())
+                    continue;
+
+                Vec3 lc = m_kart->getTrans().inverse()
+                    (m_graph->getNode(adjacent)->getCenter());
+                const float dist_to_target =
+                    m_graph->getDistance(adjacent, m_target_node);
+                if (lc.z() > 0 && dist > dist_to_target)
+                {
+                    chosen_node = adjacent;
+                    dist = dist_to_target;
+                }
+                if (chosen_node == Graph::UNKNOWN_SECTOR)
+                {
+                    Log::debug("ArenaAI", "Too many bad items to avoid!");
+                    failed_avoid = true;
+                    break;
+                }
+                (*path)[i] = chosen_node;
+            }
+        }
+    }
+
+    // Now find the first turning corner to determine turn radius
+    for (unsigned int i = 0; i < path->size() - 1; i++)
+    {
+        const Vec3& p1 = m_kart->getXYZ();
+        const Vec3& p2 = m_graph->getNode((*path)[i])->getCenter();
+        const Vec3& p3 = m_graph->getNode((*path)[i + 1])->getCenter();
+        float edge1 = (p1 - p2).length();
+        float edge2 = (p2 - p3).length();
+        float to_target = (p1 - p3).length();
+
+        // Triangle test
+        if (fabsf(edge1 + edge2 - to_target) > 0.1f)
+        {
+            determineTurnRadius(p3, NULL, &m_turn_radius);
+#ifdef AI_DEBUG
+            m_debug_sphere_next->setVisible(true);
+            m_debug_sphere_next->setPosition(p3.toIrrVector());
+#endif
+            return;
+        }
+    }
+
+    // Fallback calculation
+    determineTurnRadius(m_target_point, NULL, &m_turn_radius);
+
+}   // determinePath

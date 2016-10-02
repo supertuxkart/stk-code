@@ -67,8 +67,7 @@ private:
            { return m_mini_skid && !(m_overtake_ball || m_chasing_ball); }
     virtual void  findClosestKart(bool use_difficulty) OVERRIDE;
     virtual void  findTarget() OVERRIDE;
-    virtual bool  forceBraking() OVERRIDE
-                              { return m_avoiding_item || m_force_brake; }
+    virtual bool  forceBraking() OVERRIDE { return m_force_brake; }
     virtual int   getCurrentNode() const OVERRIDE;
     virtual float getKartDistance(const AbstractKart* kart) const OVERRIDE;
     virtual bool  ignorePathFinding() OVERRIDE
