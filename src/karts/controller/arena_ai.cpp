@@ -88,7 +88,7 @@ void ArenaAI::update(float dt)
         return;
     }
 
-    if (!isKartOnRoad() && !m_kart->getKartAnimation())
+    if (!isKartOnRoad() && m_kart->isOnGround())
     {
         m_time_since_off_road += dt;
     }
@@ -98,7 +98,7 @@ void ArenaAI::update(float dt)
     }
 
     // If the kart needs to be rescued, do it now (and nothing else)
-    if (m_time_since_off_road > 5.0f && !m_kart->getKartAnimation())
+    if (m_time_since_off_road > 5.0f && m_kart->isOnGround())
     {
         m_time_since_off_road = 0.0f;
         new RescueAnimation(m_kart);
