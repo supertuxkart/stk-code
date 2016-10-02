@@ -1,7 +1,7 @@
 //
-//  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
-//  Copyright (C) 2006-2015 Joerg Henrichs, Steve Baker
+//  SuperTuxKart - A racing game
+//  Copyright (C) 2004-2016 Steve Baker <sjbaker1@airmail.net>
+//  Copyright (C) 2006-2016 Joerg Henrichs, Steve Baker
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -274,26 +274,27 @@ void PlayerController::update(float dt)
 
     if (World::getWorld()->isStartPhase())
     {
-        if (m_controls->m_accel || m_controls->m_brake ||
-            m_controls->m_fire  || m_controls->m_nitro)
+        if(World::getWorld()->getPhase() != WorldStatus::GO_PHASE)
         {
-            // Only give penalty time in SET_PHASE.
-            // Penalty time check makes sure it doesn't get rendered on every
-            // update.
-            if (m_penalty_time == 0.0 &&
-                World::getWorld()->getPhase() == WorldStatus::SET_PHASE)
-            {
-                displayPenaltyWarning();
-                m_penalty_time = stk_config->m_penalty_time;
-            }   // if penalty_time = 0
-
-            m_controls->m_brake = false;
-            m_controls->m_accel = 0.0f;
-        }   // if key pressed
-
+            // Only rev while tapping m_accel, once the player lets go we start cooling down.
+            // TODO: Floating point arithmetic is a big no-no.
+            // Temporarily use penalty time for rev accumulator to save some space in class object.
+            if(m_controls->m_accel) m_penalty_time += 1.0f;
+            //else m_penalty_time -= dt; // Always called >.>;
+            
+            // Burn out, happens when accel was tapped too many times. TODO: Play a burnout sound.
+            if(m_penalty_time >= 10.0f) m_penalty_time = 0.0f;
+            //else if(m_penalty_time >= 5.0f && m_rev_sound) m_rev_sound->play(); // Plays a rev sound.
+                
+        } // if GO_PHASE
+        
+        else m_penalty_time = 0.0f; // This is where we would use the final rev value for boost and such.
+        
+        m_controls->m_brake = false;
+        m_controls->m_accel = 0.0f;
         return;
     }   // if isStartPhase
-
+    
     if (m_penalty_time>0.0)
     {
         m_penalty_time-=dt;
