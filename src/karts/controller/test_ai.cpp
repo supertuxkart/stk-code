@@ -179,6 +179,7 @@ void SkiddingAI::reset()
     m_curve_center               = Vec3(0,0,0);
     m_current_track_direction    = DriveNode::DIR_STRAIGHT;
     m_item_to_collect            = NULL;
+    m_last_direction_node        = 0;
     m_avoid_item_close           = false;
     m_skid_probability_state     = SKID_PROBAB_NOT_YET;
     m_last_item_random           = NULL;
@@ -785,14 +786,8 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
             {
                 // Kart will not hit item, try to get closer to this item
                 // so that it can potentially become a permanent target.
-                Vec3 xyz = item_to_collect->getXYZ();
-                Vec3 item_direction = xyz - m_kart->getXYZ();
-                Vec3 plane_normal = DriveGraph::get()->getNode(m_track_node)
-                    ->getNormal();
-                float dist_to_plane = item_direction.dot(plane_normal);
-                Vec3 projected_xyz = xyz - dist_to_plane*plane_normal;
-
-                float angle_to_item = (projected_xyz - m_kart->getXYZ())
+                const Vec3& xyz = item_to_collect->getXYZ();
+                float angle_to_item = (xyz - m_kart->getXYZ())
                     .angle(kart_aim_direction);
                 float angle = normalizeAngle(angle_to_item);
 
@@ -865,19 +860,8 @@ bool SkiddingAI::handleSelectedItem(Vec3 kart_aim_direction, Vec3 *aim_point)
     if(m_item_to_collect->getDisableTime()>0)
         return false;
 
-    // Project the item's location onto the plane of the current quad.
-    // This is necessary because the kart's aim point may not be on the track
-    // in 3D curves. So we project the item's location onto the plane in which
-    // the kart is. The current quad provides a good estimate of the kart's plane.
     const Vec3 &xyz = m_item_to_collect->getXYZ();
-    Vec3 item_direction = xyz - m_kart->getXYZ();
-    Vec3 plane_normal = DriveGraph::get()->getNode(m_track_node)->getNormal();
-    float dist_to_plane = item_direction.dot(plane_normal);
-    Vec3 projected_xyz = xyz - dist_to_plane*plane_normal;
-
-    float angle_to_item = (projected_xyz - m_kart->getXYZ())
-                                                .angle(kart_aim_direction);
-
+    float angle_to_item = (xyz - m_kart->getXYZ()).angle(kart_aim_direction);
     float angle = normalizeAngle(angle_to_item);
 
     if(fabsf(angle)>1.5)
@@ -930,9 +914,9 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
 
     // Check if we would drive left of the leftmost or right of the
     // rightmost point - if so, nothing to do.
-    Vec3 left(items_to_avoid[index_left_most]->getXYZ());
+    const Vec3& left = items_to_avoid[index_left_most]->getXYZ();
     int node_index = items_to_avoid[index_left_most]->getGraphNode();
-    Vec3 normal = DriveGraph::get()->getNode(node_index)->getNormal();
+    const Vec3& normal = DriveGraph::get()->getNode(node_index)->getNormal();
     Vec3 p1 = line_to_target.start,
          p2 = line_to_target.getMiddle() + normal.toIrrVector(),
          p3 = line_to_target.end;
@@ -950,14 +934,14 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
     }
     else
     {
-        Vec3 left(items_to_avoid[index_left_most]->getXYZ());
-        int node_index = items_to_avoid[index_left_most]->getGraphNode();
-        Vec3 normal = DriveGraph::get()->getNode(node_index)->getNormal();
+        const Vec3& right = items_to_avoid[index_right_most]->getXYZ();
+        int node_index = items_to_avoid[index_right_most]->getGraphNode();
+        const Vec3& normal = DriveGraph::get()->getNode(node_index)->getNormal();
         Vec3 p1 = line_to_target.start,
             p2 = line_to_target.getMiddle() + normal.toIrrVector(),
             p3 = line_to_target.end;
 
-        if (left.sideofPlane(p1, p2, p3) >= 0)
+        if (right.sideofPlane(p1, p2, p3) >= 0)
         {
             // Right of rightmost point
             item_index = index_right_most;
@@ -1002,7 +986,6 @@ bool SkiddingAI::steerToAvoid(const std::vector<const Item *> &items_to_avoid,
     for(unsigned int i=0; i<items_to_avoid.size(); i++)
     {
         const Vec3 &xyz         = items_to_avoid[i]->getXYZ();
-        core::vector2df item2d  = xyz.toIrrVector2d();
         core::vector3df point3d = line_to_target.getClosestPoint(xyz.toIrrVector());
         float d = (xyz.toIrrVector() - point3d).getLengthSQ();
         float direction = xyz.sideofPlane(p1,p2,p3);
@@ -1104,19 +1087,9 @@ void SkiddingAI::evaluateItems(const Item *item, Vec3 kart_aim_direction,
     // to avoid are collected).
     if(!avoid)
     {
-        // Project the item's location onto the plane of the current quad.
-        // This is necessary because the kart's aim point may not be on the track
-        // in 3D curves. So we project the item's location onto the plane in which
-        // the kart is. The current quad provides a good estimate of the kart's plane.
         const Vec3 &xyz = item->getXYZ();
-        Vec3 item_direction = xyz - m_kart->getXYZ();
-        Vec3 plane_normal = DriveGraph::get()->getNode(m_track_node)->getNormal();
-        float dist_to_plane = item_direction.dot(plane_normal);
-        Vec3 projected_xyz = xyz - dist_to_plane*plane_normal;
-
-        float angle_to_item = (projected_xyz - m_kart->getXYZ())
-                                                   .angle(kart_aim_direction);
-
+        float angle_to_item =
+            (xyz - m_kart->getXYZ()).angle(kart_aim_direction);
         float diff = normalizeAngle(angle_to_item);
 
         // The kart is driving at high speed, when the current max speed
@@ -1814,16 +1787,14 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
 
     const size_t NUM_KARTS = m_world->getNumKarts();
 
-    //Protection against having vel_normal with nan values
-    const Vec3 &VEL = m_kart->getVelocity();
-    Vec3 vel_normal(VEL.getX(), 0.0, VEL.getZ());
-    float speed=vel_normal.length();
+    float speed = m_kart->getVelocity().length();
     // If the velocity is zero, no sense in checking for crashes in time
     if(speed==0) return;
 
+    Vec3 vel_normal = m_kart->getVelocity().normalized();
+
     // Time it takes to drive for m_kart_length units.
     float dt = m_kart_length / speed;
-    vel_normal/=speed;
 
     int current_node = m_track_node;
     if(steps<1 || steps>1000)
@@ -1853,7 +1824,7 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
                     continue;
                 Vec3 other_kart_xyz = other_kart->getXYZ()
                                     + other_kart->getVelocity()*(i*dt);
-                float kart_distance = (step_coord - other_kart_xyz).length_2d();
+                float kart_distance = (step_coord - other_kart_xyz).length();
 
                 if( kart_distance < m_kart_length)
                     m_crashes.m_kart = j;
@@ -2185,20 +2156,17 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
  */
 void SkiddingAI::determineTrackDirection()
 {
-    const DriveGraph *qg = DriveGraph::get();
-    unsigned int succ   = m_successor_index[m_track_node];
-    unsigned int next = qg->getNode(m_track_node)->getSuccessor(succ);
-
-    //float angle_to_track = qg->getNode(m_track_node)->getAngleToSuccessor(succ)
-    //                     - m_kart->getHeading();
-    Vec3 track_direction = -qg->getNode(m_track_node)->getCenter()
-        + qg->getNode(next)->getCenter();
-    //Vec3 kart_direction = qg->getNode(m_track_node)->getCenter() + m_kart->getVelocity();
-
-    float angle_to_track = 0;
+    const DriveGraph *dg = DriveGraph::get();
+    unsigned int succ    = m_successor_index[m_track_node];
+    unsigned int next    = dg->getNode(m_track_node)->getSuccessor(succ);
+    float angle_to_track = 0.0f;
     if (m_kart->getVelocity().length() > 0.0f)
-        angle_to_track = track_direction.angle(m_kart->getVelocity().normalized());
-
+    {
+        Vec3 track_direction = -dg->getNode(m_track_node)->getCenter()
+            + dg->getNode(next)->getCenter();
+        angle_to_track =
+            track_direction.angle(m_kart->getVelocity().normalized());
+    }
     angle_to_track = normalizeAngle(angle_to_track);
 
     // In certain circumstances (esp. S curves) it is possible that the
@@ -2218,15 +2186,15 @@ void SkiddingAI::determineTrackDirection()
         return;
     }
 
-    qg->getNode(next)->getDirectionData(m_successor_index[next],
-                                       &m_current_track_direction,
-                                       &m_last_direction_node);
+    dg->getNode(next)->getDirectionData(m_successor_index[next],
+                                        &m_current_track_direction,
+                                        &m_last_direction_node);
 
 #ifdef AI_DEBUG
     m_curve[CURVE_QG]->clear();
     for(unsigned int i=m_track_node; i<=m_last_direction_node; i++)
     {
-        m_curve[CURVE_QG]->addPoint(qg->getNode(i)->getCenter());
+        m_curve[CURVE_QG]->addPoint(dg->getNode(i)->getCenter());
     }
 #endif
 
@@ -2256,13 +2224,10 @@ void SkiddingAI::handleCurve()
     // kart will already point towards the direction of the circle), and
     // the case that the kart is facing wrong was already tested for before
 
-    const DriveGraph *qg = DriveGraph::get();
-    Vec3 xyz            = m_kart->getXYZ();
-    Vec3 tangent        = m_kart->getTrans()(Vec3(0,0,1)) - xyz;
-    Vec3 last_xyz       = qg->getNode(m_last_direction_node)->getCenter();
+    const DriveGraph *dg = DriveGraph::get();
+    const Vec3& last_xyz = dg->getNode(m_last_direction_node)->getCenter();
 
-    determineTurnRadius(xyz, tangent, last_xyz,
-                        &m_curve_center, &m_current_curve_radius);
+    determineTurnRadius(last_xyz, &m_curve_center, &m_current_curve_radius);
     assert(!std::isnan(m_curve_center.getX()));
     assert(!std::isnan(m_curve_center.getY()));
     assert(!std::isnan(m_curve_center.getZ()));
@@ -2278,11 +2243,12 @@ void SkiddingAI::handleCurve()
         // Pick either the lower left or right point:
         int index = m_current_track_direction==DriveNode::DIR_LEFT
                   ? 0 : 1;
-        float r = (m_curve_center - *(qg->getNode(i))[index]).length();
+        Vec3 curve_center_wc = m_kart->getTrans()(m_curve_center);
+        float r = (curve_center_wc - *(dg->getNode(i))[index]).length();
         if(m_current_curve_radius < r)
         {
-            last_xyz = *(qg->getNode(i))[index];
-            determineTurnRadius(xyz, tangent, last_xyz,
+            last_xyz = *(dg->getNode(i)[index]);
+            determineTurnRadius(last_xyz,
                                 &m_curve_center, &m_current_curve_radius);
             m_last_direction_node = i;
             break;
@@ -2292,11 +2258,11 @@ void SkiddingAI::handleCurve()
     }
 #endif
 #if defined(AI_DEBUG) && defined(AI_DEBUG_CIRCLES)
-    m_curve[CURVE_PREDICT1]->makeCircle(m_curve_center,
+    m_curve[CURVE_PREDICT1]->makeCircle(m_kart->getTrans()(m_curve_center),
                                         m_current_curve_radius);
     m_curve[CURVE_PREDICT1]->addPoint(last_xyz);
-    m_curve[CURVE_PREDICT1]->addPoint(m_curve_center);
-    m_curve[CURVE_PREDICT1]->addPoint(xyz);
+    m_curve[CURVE_PREDICT1]->addPoint(m_kart->getTrans()(m_curve_center));
+    m_curve[CURVE_PREDICT1]->addPoint(m_kart->getXYZ());
 #endif
 
 }   // handleCurve
@@ -2350,15 +2316,16 @@ bool SkiddingAI::canSkid(float steer_fraction)
     }
 
     const float MIN_SKID_SPEED = 5.0f;
-    const DriveGraph *qg = DriveGraph::get();
-    Vec3 last_xyz       = qg->getNode(m_last_direction_node)->getCenter();
+    const DriveGraph *dg = DriveGraph::get();
+    Vec3 last_xyz        = m_kart->getTrans().inverse()
+                           (dg->getNode(m_last_direction_node)->getCenter());
 
     // Only try skidding when a certain minimum speed is reached.
     if(m_kart->getSpeed()<MIN_SKID_SPEED) return false;
 
     // Estimate how long it takes to finish the curve
-    Vec3 diff_kart = m_kart->getXYZ() - m_curve_center;
-    Vec3 diff_last = last_xyz         - m_curve_center;
+    Vec3 diff_kart = -m_curve_center;
+    Vec3 diff_last = last_xyz - m_curve_center;
     float angle_kart = atan2(diff_kart.getX(), diff_kart.getZ());
     float angle_last = atan2(diff_last.getX(), diff_last.getZ());
     float angle = m_current_track_direction == DriveNode::DIR_RIGHT
@@ -2542,55 +2509,3 @@ void SkiddingAI::setSteering(float angle, float dt)
 
 
 }   // setSteering
-
-// ----------------------------------------------------------------------------
-/** Determine the center point and radius of a circle given two points on
- *  the ccircle and the tangent at the first point. This is done as follows:
- *  1. Determine the line going through the center point start+end, which is
- *     orthogonal to the vector from start to end. This line goes through the
- *     center of the circle.
- *  2. Determine the line going through the first point and is orthogonal
- *     to the given tangent.
- *  3. The intersection of these two lines is the center of the circle.
- *  \param[in] start First point.
- *  \param[in] tangent Tangent at first point.
- *  \param[in] end Second point on circle.
- *  \param[out] center Center point of the circle.
- *  \param[out] radius Radius of the circle.
- */
-void  SkiddingAI::determineTurnRadius(const Vec3 &start,
-                                      const Vec3 &tangent,
-                                      const Vec3 &end,
-                                      Vec3 *center,
-                                      float *radius)
-{
-    // 1) Line through middle of start+end
-    Vec3 mid = 0.5f*(start+end);
-    Vec3 direction = end-start;
-
-    Vec3 orthogonal(direction.getZ(), 0, -direction.getX());
-    Vec3  q1 = mid + orthogonal;
-    irr::core::line2df line1(mid.getX(), mid.getZ(),
-                             q1.getX(),  q1.getZ()  );
-
-    Vec3 ortho_tangent(tangent.getZ(), 0, -tangent.getX());
-    Vec3  q2 = start + ortho_tangent;
-    irr::core::line2df line2(start.getX(), start.getZ(),
-                             q2.getX(),    q2.getZ());
-
-
-    irr::core::vector2df result;
-    if(line1.intersectWith(line2, result, /*checkOnlySegments*/false))
-    {
-        *center = Vec3(result.X, start.getY(), result.Y);
-        *radius = (start - *center).length();
-    }
-    else
-    {
-        // No intersection. In this case assume that the two points are
-        // on a semicircle, in which case the center is at 0.5*(start+end):
-        *center = 0.5f*(start+end);
-        *radius = 0.5f*(end-start).length();
-    }
-    return;
-}   // determineTurnRadius
