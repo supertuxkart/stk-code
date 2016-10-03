@@ -23,11 +23,10 @@
 #include "tracks/track_object.hpp"
 #include "utils/ptr_vector.hpp"
 
-class LODNode;
-class RenderInfo;
 class Track;
 class Vec3;
 class XMLNode;
+class LODNode;
 
 #include <map>
 #include <vector>
@@ -59,7 +58,7 @@ public:
     void init();
     void add(const XMLNode &xml_node, scene::ISceneNode* parent,
              ModelDefinitionLoader& model_def_loader,
-             TrackObject* parent_library, RenderInfo* ri);
+             TrackObject* parent_library);
     void update(float dt);
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
                          bool secondary_hits=true);

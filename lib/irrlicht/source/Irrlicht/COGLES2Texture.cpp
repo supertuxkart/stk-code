@@ -15,6 +15,8 @@
 #include "os.h"
 #include "CImage.h"
 #include "CColorConverter.h"
+#include "IAttributes.h"
+#include "IrrlichtDevice.h"
 
 #include "irrString.h"
 
@@ -171,6 +173,17 @@ void COGLES2Texture::getImageValues(IImage* image)
 		ImageSize.Width = (u32)(Driver->MaxTextureSize*ratio);
 	}
 	TextureSize=ImageSize.getOptimalSize(false);
+    const core::dimension2du max_size = Driver->getDriverAttributes()
+                                 .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+
+    if (max_size.Width> 0 && TextureSize.Width > max_size.Width)
+    {
+        TextureSize.Width = max_size.Width;
+    }
+    if (max_size.Height> 0 && TextureSize.Height > max_size.Height)
+    {
+        TextureSize.Height = max_size.Height;
+    }
 
 	ColorFormat = getBestColorFormat(image->getColorFormat());
 }

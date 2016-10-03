@@ -62,7 +62,7 @@ const std::string& ShaderBase::getHeader()
 GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
 {
     GLuint id = glCreateShader(type);
-    
+
     std::ostringstream code;
 #if !defined(USE_GLES2)
     code << "#version " << CVS->getGLSLVersion()<<"\n";
@@ -87,13 +87,13 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
             code << "#extension GL_ARB_arrays_of_arrays : enable\n";
     }
 #endif
-    
+
     if (CVS->isAMDVertexShaderLayerUsable())
         code << "#extension GL_AMD_vertex_shader_layer : enable\n";
-        
+
     if (CVS->isARBExplicitAttribLocationUsable())
         code << "#extension GL_ARB_explicit_attrib_location : enable\n";
-    
+
     if (CVS->isAZDOEnabled())
     {
         code << "#extension GL_ARB_bindless_texture : enable\n";
@@ -107,10 +107,20 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
     if (CVS->needsRGBBindlessWorkaround())
         code << "#define SRGBBindlessFix\n";
 
+#if !defined(USE_GLES2)
     //shader compilation fails with some drivers if there is no precision qualifier
     if (type == GL_FRAGMENT_SHADER)
         code << "precision mediump float;\n";
+#else
+    int range[2], precision;
+    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range, &precision);
     
+    if (precision > 0)
+        code << "precision highp float;\n";
+    else
+        code << "precision mediump float;\n";
+#endif
+
     code << getHeader();
 
     std::ifstream stream(file_manager->getShader(file), std::ios::in);
@@ -129,31 +139,31 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
                     Log::error("shader", "Invalid #stk_include line: '%s'.", Line.c_str());
                     continue;
                 }
-                
+
                 std::string filename = Line.substr(pos+1);
-                
+
                 pos = filename.find("\"");
                 if (pos == std::string::npos)
                 {
                     Log::error("shader", "Invalid #stk_include line: '%s'.", Line.c_str());
                     continue;
                 }
-                
+
                 filename = filename.substr(0, pos);
-                
+
                 std::ifstream include_stream(file_manager->getShader(filename), std::ios::in);
                 if (!include_stream.is_open())
                 {
                     Log::error("shader", "Couldn't open included shader: '%s'.", filename.c_str());
                     continue;
                 }
-                
+
                 std::string include_line = "";
                 while (getline(include_stream, include_line))
                 {
                     code << "\n" << include_line;
                 }
-                
+
                 include_stream.close();
             }
             else
@@ -161,7 +171,7 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
                 code << "\n" << Line;
             }
         }
-        
+
         stream.close();
     }
     else
@@ -201,7 +211,7 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
 /** Loads a transform feedback buffer shader with a given number of varying
  *  parameters.
 */
-int ShaderBase::loadTFBProgram(const std::string &shader_name, 
+int ShaderBase::loadTFBProgram(const std::string &shader_name,
                                const char **varyings,
                                unsigned varying_count)
 {
@@ -250,7 +260,7 @@ void ShaderBase::bypassUBO() const
     glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
 
     GLint Screen = glGetUniformLocation(m_program, "screen");
-    glUniform2f(Screen, irr_driver->getCurrentScreenSize().X, 
+    glUniform2f(Screen, irr_driver->getCurrentScreenSize().X,
                         irr_driver->getCurrentScreenSize().Y);
 
     GLint bLmn = glGetUniformLocation(m_program, "blueLmn[0]");

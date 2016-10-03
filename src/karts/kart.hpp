@@ -28,6 +28,7 @@
 
 #include "LinearMath/btTransform.h"
 
+#include "graphics/render_info.hpp"
 #include "items/powerup_manager.hpp"    // For PowerupType
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
@@ -238,7 +239,7 @@ public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
                         PerPlayerDifficulty difficulty,
-                        RenderInfo::KartRenderType krt = RenderInfo::KRT_DEFAULT);
+                        KartRenderType krt = KRT_DEFAULT);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   kartIsInRestNow();

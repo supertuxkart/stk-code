@@ -23,7 +23,6 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
-#include "guiengine/scalable_font.hpp"
 #include "modes/world.hpp"
 #include "config/player_manager.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"

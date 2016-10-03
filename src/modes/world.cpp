@@ -27,6 +27,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/keyboard_device.hpp"
@@ -345,6 +346,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
                                     difficulty);
     else
         new_kart = new Kart(kart_ident, index, position, init_pos, difficulty);
+
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)

@@ -1,5 +1,7 @@
 #version 300 es
 
+precision mediump float;
+
 in vec3 Position;
 in vec2 Texcoord;
 out vec2 uv;

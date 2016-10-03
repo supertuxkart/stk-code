@@ -2006,7 +2006,7 @@ void COpenGLDriver::draw2DImageBatch(const video::ITexture* texture,
 
 	const u32 drawCount = core::min_<u32>(positions.size(), sourceRects.size());
 
-	const core::dimension2d<u32>& ss = texture->getOriginalSize();
+	const core::dimension2d<u32>& ss = texture->getSize();
 	const f32 invW = 1.f / static_cast<f32>(ss.Width);
 	const f32 invH = 1.f / static_cast<f32>(ss.Height);
 	const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
@@ -2225,7 +2225,7 @@ void COpenGLDriver::draw2DImage(const video::ITexture* texture,
 	// ok, we've clipped everything.
 	// now draw it.
 
-	const core::dimension2d<u32>& ss = texture->getOriginalSize();
+	const core::dimension2d<u32>& ss = texture->getSize();
 	const f32 invW = 1.f / static_cast<f32>(ss.Width);
 	const f32 invH = 1.f / static_cast<f32>(ss.Height);
 	const core::rect<f32> tcoords(
@@ -2268,7 +2268,7 @@ void COpenGLDriver::draw2DImage(const video::ITexture* texture, const core::rect
 	if (!texture)
 		return;
 
-	const core::dimension2d<u32>& ss = texture->getOriginalSize();
+	const core::dimension2d<u32>& ss = texture->getSize();
 	const f32 invW = 1.f / static_cast<f32>(ss.Width);
 	const f32 invH = 1.f / static_cast<f32>(ss.Height);
 	const core::rect<f32> tcoords(
@@ -2361,7 +2361,7 @@ void COpenGLDriver::draw2DImage(const video::ITexture* texture,
 			clipRect->getWidth(),clipRect->getHeight());
 	}
 
-	const core::dimension2d<u32>& ss = texture->getOriginalSize();
+	const core::dimension2d<u32>& ss = texture->getSize();
 	core::position2d<s32> targetPos(pos);
 	const f32 invW = 1.f / static_cast<f32>(ss.Width);
 	const f32 invH = 1.f / static_cast<f32>(ss.Height);

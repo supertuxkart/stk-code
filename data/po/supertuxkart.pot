@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-30 18:52-0400\n"
+"POT-Creation-Date: 2016-08-23 20:00-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -437,7 +437,7 @@ msgstr ""
 #. I18N: ./data/gui/user_screen_tab.stkgui
 #. I18N: In the user screen
 #: src/states_screens/dialogs/message_dialog.cpp:123
-#: src/states_screens/dialogs/message_dialog.cpp:136
+#: src/states_screens/dialogs/message_dialog.cpp:135
 msgid "OK"
 msgstr ""
 
@@ -825,7 +825,7 @@ msgstr ""
 
 #. I18N: ./data/gui/main_menu.stkgui
 #. I18N: In the main screen
-#: src/states_screens/race_gui_overworld.cpp:462
+#: src/states_screens/race_gui_overworld.cpp:465
 msgid "Tutorial"
 msgstr ""
 
@@ -996,7 +996,8 @@ msgstr ""
 
 #. I18N: ./data/gui/online/guest_login.stkgui
 #. I18N: ./data/gui/user_screen.stkgui
-#: src/states_screens/main_menu_screen.cpp:79
+#. I18N: Used as a verb, appears on the main menu (login button)
+#: src/states_screens/main_menu_screen.cpp:80
 msgid "Login"
 msgstr ""
 
@@ -1317,7 +1318,7 @@ msgstr ""
 #. I18N: Section in the settings menu
 #: src/states_screens/options_screen_device.cpp:86
 #: src/states_screens/options_screen_input.cpp:140
-#: src/states_screens/options_screen_ui.cpp:119
+#: src/states_screens/options_screen_ui.cpp:122
 #: src/states_screens/options_screen_video.cpp:172
 #: src/states_screens/user_screen.cpp:660
 msgid "Audio"
@@ -1351,7 +1352,7 @@ msgstr ""
 #. I18N: ./data/gui/options_input.stkgui
 #. I18N: Section in the settings menu
 #: src/states_screens/options_screen_audio.cpp:68
-#: src/states_screens/options_screen_ui.cpp:121
+#: src/states_screens/options_screen_ui.cpp:124
 #: src/states_screens/options_screen_video.cpp:175
 #: src/states_screens/user_screen.cpp:662
 msgid "Controls"
@@ -1393,7 +1394,7 @@ msgstr ""
 #: src/states_screens/options_screen_audio.cpp:67
 #: src/states_screens/options_screen_device.cpp:88
 #: src/states_screens/options_screen_input.cpp:142
-#: src/states_screens/options_screen_ui.cpp:120
+#: src/states_screens/options_screen_ui.cpp:123
 #: src/states_screens/options_screen_video.cpp:174
 #: src/states_screens/server_selection.cpp:103
 msgid "Players"
@@ -1405,7 +1406,7 @@ msgstr ""
 
 #. I18N: ./data/gui/options_players.stkgui
 #. I18N: In the player configuration screen
-msgid "Press enter or double-click on a player to edit him/her"
+msgid "Press enter or double-click on a player to edit their settings"
 msgstr ""
 
 #. I18N: ./data/gui/options_players.stkgui
@@ -1458,7 +1459,7 @@ msgstr ""
 #: src/states_screens/options_screen_audio.cpp:65
 #: src/states_screens/options_screen_device.cpp:85
 #: src/states_screens/options_screen_input.cpp:139
-#: src/states_screens/options_screen_ui.cpp:118
+#: src/states_screens/options_screen_ui.cpp:121
 #: src/states_screens/user_screen.cpp:659
 msgid "Graphics"
 msgstr ""
@@ -1871,46 +1872,47 @@ msgstr ""
 msgid "Completed achievement \"%s\"."
 msgstr ""
 
-#: src/addons/addons_manager.cpp:97 src/addons/news_manager.cpp:317
+#: src/addons/addons_manager.cpp:104 src/addons/news_manager.cpp:325
 msgid "Can't access stkaddons server..."
 msgstr ""
 
-#: src/addons/news_manager.cpp:174
+#: src/addons/news_manager.cpp:182
 #, c-format
 msgid "Error downloading news: '%s'."
 msgstr ""
 
 #. I18N: number of laps to race in a challenge
-#: src/challenges/challenge_data.cpp:259
+#: src/challenges/challenge_data.cpp:266
+#: src/states_screens/race_result_gui.cpp:1422
 #, c-format
-msgid "Laps : %i"
+msgid "Laps: %i"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:265
+#: src/challenges/challenge_data.cpp:272
 msgid "Follow the leader"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:511
+#: src/challenges/challenge_data.cpp:518
 #, c-format
 msgid "New track '%s' now available"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:516
+#: src/challenges/challenge_data.cpp:523
 #, c-format
 msgid "New game mode '%s' now available"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:526
+#: src/challenges/challenge_data.cpp:533
 #, c-format
 msgid "New Grand Prix '%s' now available"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:530
+#: src/challenges/challenge_data.cpp:537
 #, c-format
 msgid "New difficulty '%s' now available"
 msgstr ""
 
-#: src/challenges/challenge_data.cpp:540
+#: src/challenges/challenge_data.cpp:547
 #, c-format
 msgid "New kart '%s' now available"
 msgstr ""
@@ -1942,17 +1944,17 @@ msgid ""
 "created."
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:1896
+#: src/graphics/irr_driver.cpp:1950
 #, c-format
 msgid "FPS: %d/%d/%d  - PolyCount: %d Solid, %d Shadows - LightDist : %d"
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:1907
+#: src/graphics/irr_driver.cpp:1961
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris"
 msgstr ""
 
-#: src/guiengine/engine.cpp:1346
+#: src/guiengine/engine.cpp:1289
 msgid "Loading"
 msgstr ""
 
@@ -2467,11 +2469,11 @@ msgid "Mouse axis %d %s"
 msgstr ""
 
 #. I18N: shown when config file is too old
-#: src/input/device_manager.cpp:500
+#: src/input/device_manager.cpp:501
 msgid "Please re-configure your key bindings."
 msgstr ""
 
-#: src/input/device_manager.cpp:501
+#: src/input/device_manager.cpp:502
 msgid "Your input config file is not compatible with this version of STK."
 msgstr ""
 
@@ -2586,25 +2588,25 @@ msgstr ""
 msgid "Left thumb up"
 msgstr ""
 
-#: src/input/input_manager.cpp:776
+#: src/input/input_manager.cpp:768
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr ""
 
-#: src/input/input_manager.cpp:806
+#: src/input/input_manager.cpp:798
 msgid "Only the Game Master may act at this point!"
 msgstr ""
 
 #: src/input/wiimote_manager.cpp:389
 msgid ""
-"Connect your wiimote to the Bluetooth manager, then click on Ok.Detailed "
+"Connect your wiimote to the Bluetooth manager, then click on Ok. Detailed "
 "instructions at supertuxkart.net/Wiimote"
 msgstr ""
 
 #: src/input/wiimote_manager.cpp:392
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
-"mode, then click on Ok.Detailed instructions at supertuxkart.net/Wiimote"
+"mode, then click on Ok. Detailed instructions at supertuxkart.net/Wiimote"
 msgstr ""
 
 #: src/input/wiimote_manager.cpp:415
@@ -2618,23 +2620,23 @@ msgstr[1] ""
 msgid "Could not detect any wiimote :/"
 msgstr ""
 
-#: src/karts/controller/local_player_controller.cpp:204
+#: src/karts/controller/local_player_controller.cpp:206
 msgid "Penalty time!!"
 msgstr ""
 
-#: src/karts/controller/local_player_controller.cpp:206
+#: src/karts/controller/local_player_controller.cpp:208
 msgid "Don't accelerate before go"
 msgstr ""
 
-#: src/karts/kart.cpp:867 src/karts/kart.cpp:872
+#: src/karts/kart.cpp:852 src/karts/kart.cpp:857
 msgid "You won the race!"
 msgstr ""
 
-#: src/karts/kart.cpp:872
+#: src/karts/kart.cpp:857
 msgid "You finished the race!"
 msgstr ""
 
-#: src/main.cpp:1296
+#: src/main.cpp:1413
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -2644,15 +2646,16 @@ msgid ""
 "edit \"Connect to the Internet\" and \"Send anonymous HW statistics\")."
 msgstr ""
 
-#: src/main.cpp:1446
+#: src/main.cpp:1563
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr ""
 
-#: src/main.cpp:1458
+#: src/main.cpp:1580
+#, c-format
 msgid ""
 "Your OpenGL version appears to be too old. Please verify if an update for "
-"your video driver is available. SuperTuxKart requires OpenGL 3.1 or better."
+"your video driver is available. SuperTuxKart requires %s or better."
 msgstr ""
 
 #: src/modes/easter_egg_hunt.cpp:202
@@ -2660,7 +2663,7 @@ msgstr ""
 msgid "Eggs: %d / %d"
 msgstr ""
 
-#: src/modes/follow_the_leader.cpp:61 src/modes/follow_the_leader.cpp:293
+#: src/modes/follow_the_leader.cpp:61 src/modes/follow_the_leader.cpp:284
 msgid "Leader"
 msgstr ""
 
@@ -2687,11 +2690,11 @@ msgstr ""
 msgid "WRONG WAY!"
 msgstr ""
 
-#: src/modes/world.cpp:1208
+#: src/modes/world.cpp:1207
 msgid "You have been eliminated!"
 msgstr ""
 
-#: src/modes/world.cpp:1211
+#: src/modes/world.cpp:1210
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr ""
@@ -2700,7 +2703,7 @@ msgstr ""
 msgid "Failed to register server"
 msgstr ""
 
-#: src/network/servers_manager.cpp:195
+#: src/network/servers_manager.cpp:197
 msgid "No LAN server detected"
 msgstr ""
 
@@ -2815,27 +2818,33 @@ msgstr ""
 msgid "2 years"
 msgstr ""
 
-#: src/states_screens/addons_screen.cpp:110
+#: src/states_screens/addons_screen.cpp:115
 msgid "Add-on name"
 msgstr ""
 
-#: src/states_screens/addons_screen.cpp:111
+#: src/states_screens/addons_screen.cpp:116
 msgid "Updated date"
 msgstr ""
 
+#: src/states_screens/addons_screen.cpp:147
+msgid ""
+"Access to the Internet is disabled. (To enable it, go to options and select "
+"tab 'User Interface')"
+msgstr ""
+
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:304
+#: src/states_screens/addons_screen.cpp:343
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr ""
 
-#: src/states_screens/addons_screen.cpp:435
+#: src/states_screens/addons_screen.cpp:474
 msgid "Please wait while addons are updated"
 msgstr ""
 
-#: src/states_screens/addons_screen.cpp:512
-#: src/states_screens/main_menu_screen.cpp:553
+#: src/states_screens/addons_screen.cpp:551
+#: src/states_screens/main_menu_screen.cpp:554
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you "
 "are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3210,32 +3219,32 @@ msgstr ""
 msgid "Select a track"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:199
+#: src/states_screens/feature_unlocked.cpp:200
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:203
+#: src/states_screens/feature_unlocked.cpp:204
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:207
+#: src/states_screens/feature_unlocked.cpp:208
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:492
+#: src/states_screens/feature_unlocked.cpp:493
 msgid "Challenge Completed"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:529
+#: src/states_screens/feature_unlocked.cpp:530
 msgid "You unlocked track %0"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:567
+#: src/states_screens/feature_unlocked.cpp:568
 msgid "You unlocked grand prix %0"
 msgstr ""
 
@@ -3271,16 +3280,16 @@ msgid "User defined"
 msgstr ""
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:153
+#: src/states_screens/grand_prix_lose.cpp:154
 msgid "Better luck next time!"
 msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:126
+#: src/states_screens/grand_prix_win.cpp:127
 #: src/states_screens/race_result_gui.cpp:194
 msgid "You completed a challenge!"
 msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:283
+#: src/states_screens/grand_prix_win.cpp:284
 msgid "You completed the Grand Prix!"
 msgstr ""
 
@@ -3299,25 +3308,25 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:492
+#: src/states_screens/main_menu_screen.cpp:493
 msgid ""
 "You can not play online without internet access. If you want to play online, "
 "go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:516
+#: src/states_screens/main_menu_screen.cpp:517
 msgid ""
 "You can not download addons without internet access. If you want to download "
 "addons, go to options, select  tab 'User Interface', and edit \"Connect to "
 "the Internet\"."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:548
+#: src/states_screens/main_menu_screen.cpp:549
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:560
+#: src/states_screens/main_menu_screen.cpp:561
 msgid "Please wait while the add-ons are loading"
 msgstr ""
 
@@ -3505,14 +3514,14 @@ msgstr ""
 msgid "Keyboard %i"
 msgstr ""
 
-#: src/states_screens/options_screen_ui.cpp:155
+#: src/states_screens/options_screen_ui.cpp:158
 msgid ""
 "In multiplayer mode, players can select handicapped (more difficult) "
 "profiles on the kart selection screen"
 msgstr ""
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/options_screen_ui.cpp:187
+#: src/states_screens/options_screen_ui.cpp:190
 msgid "System Language"
 msgstr ""
 
@@ -3642,20 +3651,20 @@ msgid "GOAL!"
 msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/race_gui_base.cpp:504
+#: src/states_screens/race_gui_base.cpp:496
 msgid "by"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:612
+#: src/states_screens/race_gui_base.cpp:604
 msgid "Collect nitro!"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:614
+#: src/states_screens/race_gui_base.cpp:606
 msgid "Follow the leader!"
 msgstr ""
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:780
+#: src/states_screens/race_gui_base.cpp:772
 #, c-format
 msgid "Top %i"
 msgstr ""
@@ -3669,15 +3678,15 @@ msgstr ""
 msgid "Rank"
 msgstr ""
 
-#: src/states_screens/race_gui_overworld.cpp:469
+#: src/states_screens/race_gui_overworld.cpp:472
 msgid "Press fire to play the tutorial"
 msgstr ""
 
-#: src/states_screens/race_gui_overworld.cpp:508
+#: src/states_screens/race_gui_overworld.cpp:511
 msgid "Type: Grand Prix"
 msgstr ""
 
-#: src/states_screens/race_gui_overworld.cpp:539
+#: src/states_screens/race_gui_overworld.cpp:548
 msgid "Press fire to start the challenge"
 msgstr ""
 
@@ -3745,8 +3754,18 @@ msgstr ""
 msgid "Grand Prix progress:"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1341
+#: src/states_screens/race_result_gui.cpp:1344
 msgid "Highscores"
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:1430
+#, c-format
+msgid "Difficulty: %s"
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:1438
+#, c-format
+msgid "Best lap time: %s"
 msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:87
@@ -3767,7 +3786,7 @@ msgid "Hit others with weapons until they lose all their lives."
 msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:119
-msgid "Push the ball to the opposite cage to score goals."
+msgid "Push the ball into the opposite cage to score goals."
 msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:129

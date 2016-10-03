@@ -123,13 +123,6 @@ namespace video
 			EGL_NONE, 0
 #endif
 		};
-		EGLint contextAttrib[] =
-		{
-#ifdef EGL_VERSION_1_3
-			EGL_CONTEXT_CLIENT_VERSION, 2,
-#endif
-			EGL_NONE, 0
-		};
 
 		EGLConfig config;
 		EGLint num_configs;
@@ -242,11 +235,41 @@ namespace video
 			eglBindAPI(EGL_OPENGL_ES_API);
 #endif
 		os::Printer::log("Creating EglContext...");
-		EglContext = eglCreateContext(EglDisplay, config, EGL_NO_CONTEXT, contextAttrib);
+		EglContext = EGL_NO_CONTEXT;
+		
+		if (!Params.ForceLegacyDevice)
+		{
+			os::Printer::log("Trying to create Context for OpenGL-ES3.");
+			
+			EGLint contextAttrib[] =
+			{
+				#ifdef EGL_VERSION_1_3
+				EGL_CONTEXT_CLIENT_VERSION, 3,
+				#endif
+				EGL_NONE, 0
+			};
+			
+			EglContext = eglCreateContext(EglDisplay, config, EGL_NO_CONTEXT, contextAttrib);
+		}
+		
 		if (EGL_NO_CONTEXT == EglContext)
 		{
-			os::Printer::log("FAILED\n");
-			os::Printer::log("Could not create Context for OpenGL-ES2 display.");
+			os::Printer::log("Trying to create Context for OpenGL-ES2.");
+			
+			EGLint contextAttrib[] =
+			{
+				#ifdef EGL_VERSION_1_3
+				EGL_CONTEXT_CLIENT_VERSION, 2,
+				#endif
+				EGL_NONE, 0
+			};
+			
+			EglContext = eglCreateContext(EglDisplay, config, EGL_NO_CONTEXT, contextAttrib);
+			if (EGL_NO_CONTEXT == EglContext)
+			{
+				os::Printer::log("FAILED\n");
+				os::Printer::log("Could not create Context for OpenGL-ES2 display.");
+			}
 		}
 
 		eglMakeCurrent(EglDisplay, EglSurface, EglSurface, EglContext);
@@ -1314,7 +1337,7 @@ namespace video
 
 		// texcoords need to be flipped horizontally for RTTs
 		const bool isRTT = texture->isRenderTarget();
-		const core::dimension2d<u32>& ss = texture->getOriginalSize();
+		const core::dimension2d<u32>& ss = texture->getSize();
 		const f32 invW = 1.f / static_cast<f32>(ss.Width);
 		const f32 invH = 1.f / static_cast<f32>(ss.Height);
 		const core::rect<f32> tcoords(
@@ -1443,10 +1466,10 @@ namespace video
 			// now draw it.
 
 			core::rect<f32> tcoords;
-			tcoords.UpperLeftCorner.X = (((f32)sourcePos.X)) / texture->getOriginalSize().Width ;
-			tcoords.UpperLeftCorner.Y = (((f32)sourcePos.Y)) / texture->getOriginalSize().Height;
-			tcoords.LowerRightCorner.X = tcoords.UpperLeftCorner.X + ((f32)(sourceSize.Width) / texture->getOriginalSize().Width);
-			tcoords.LowerRightCorner.Y = tcoords.UpperLeftCorner.Y + ((f32)(sourceSize.Height) / texture->getOriginalSize().Height);
+			tcoords.UpperLeftCorner.X = (((f32)sourcePos.X)) / texture->getSize().Width ;
+			tcoords.UpperLeftCorner.Y = (((f32)sourcePos.Y)) / texture->getSize().Height;
+			tcoords.LowerRightCorner.X = tcoords.UpperLeftCorner.X + ((f32)(sourceSize.Width) / texture->getSize().Width);
+			tcoords.LowerRightCorner.Y = tcoords.UpperLeftCorner.Y + ((f32)(sourceSize.Height) / texture->getSize().Height);
 
 			const core::rect<s32> poss(targetPos, sourceSize);
 
@@ -1496,7 +1519,7 @@ namespace video
 
 		// texcoords need to be flipped horizontally for RTTs
 		const bool isRTT = texture->isRenderTarget();
-		const core::dimension2du& ss = texture->getOriginalSize();
+		const core::dimension2du& ss = texture->getSize();
 		const f32 invW = 1.f / static_cast<f32>(ss.Width);
 		const f32 invH = 1.f / static_cast<f32>(ss.Height);
 		const core::rect<f32> tcoords(
@@ -1573,7 +1596,7 @@ namespace video
 					clipRect->getWidth(), clipRect->getHeight());
 		}
 
-		const core::dimension2du& ss = texture->getOriginalSize();
+		const core::dimension2du& ss = texture->getSize();
 		core::position2d<s32> targetPos(pos);
 		// texcoords need to be flipped horizontally for RTTs
 		const bool isRTT = texture->isRenderTarget();

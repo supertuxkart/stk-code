@@ -18,6 +18,7 @@
 
 #include "karts/kart_with_stats.hpp"
 
+#include "graphics/render_info.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/rescue_animation.hpp"
 #include "items/item.hpp"
@@ -28,7 +29,7 @@ KartWithStats::KartWithStats(const std::string& ident,
                              int position, const btTransform& init_transform,
                              PerPlayerDifficulty difficulty)
              : Kart(ident, world_kart_id, position,
-                    init_transform, difficulty)
+                    init_transform, difficulty, KRT_DEFAULT)
 {
 }   // KartWithStats
 

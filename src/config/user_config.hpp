@@ -491,6 +491,14 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_old_driver_popup
         PARAM_DEFAULT(BoolUserConfigParam(true, "old_driver_popup",
         &m_video_group, "Determines if popup message about too old drivers should be displayed."));
+    PARAM_PREFIX FloatUserConfigParam       m_scale_rtts_factor
+        PARAM_DEFAULT(FloatUserConfigParam(1.0f, "scale_rtts_factor",
+        &m_video_group, "Allows to increase performance by setting lower RTTs "
+                        "resolution. Value should be smaller or equal to 1.0"));
+    PARAM_PREFIX IntUserConfigParam         m_max_texture_size
+        PARAM_DEFAULT(IntUserConfigParam(512, "max_texture_size",
+        &m_video_group, "Max texture size when high definition textures are "
+                        "disabled"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
@@ -670,7 +678,7 @@ namespace UserConfigParams
                            "Enable Screen Space Ambient Occlusion") );
     PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
             PARAM_DEFAULT( IntUserConfigParam(0,
-                           "shadows_resoltion", &m_graphics_quality,
+                           "shadows_resolution", &m_graphics_quality,
                            "Shadow resolution (0 = disabled") );
     PARAM_PREFIX BoolUserConfigParam          m_degraded_IBL
         PARAM_DEFAULT(BoolUserConfigParam(true,

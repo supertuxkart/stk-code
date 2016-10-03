@@ -532,7 +532,8 @@ void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name,
 
 EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
 {
-    if (!w->isActivated()) return EVENT_BLOCK;
+    if (w->onActivationInput(playerID) == EVENT_BLOCK)
+        return EVENT_BLOCK;
 
     Widget* parent = w->m_event_handler;
     

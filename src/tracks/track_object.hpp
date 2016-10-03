@@ -31,10 +31,10 @@
 #include <string>
 #include "animations/three_d_animation.hpp"
 
-class XMLNode;
-class ThreeDAnimation;
 class ModelDefinitionLoader;
 class RenderInfo;
+class ThreeDAnimation;
+class XMLNode;
 
 /**
  * \ingroup tracks
@@ -60,8 +60,9 @@ private:
 
     std::string m_id;
 
-protected:
+    RenderInfo*              m_render_info;
 
+protected:
 
     /** The initial XYZ position of the object. */
     core::vector3df                m_init_xyz;
@@ -99,14 +100,13 @@ protected:
 
     void init(const XMLNode &xml_node, scene::ISceneNode* parent,
         ModelDefinitionLoader& model_def_loader,
-        TrackObject* parent_library, RenderInfo* ri);
+        TrackObject* parent_library);
 
 public:
                  TrackObject(const XMLNode &xml_node,
                              scene::ISceneNode* parent,
                              ModelDefinitionLoader& model_def_loader,
-                             TrackObject* parent_library,
-                             RenderInfo* ri);
+                             TrackObject* parent_library);
 
                  TrackObject(const core::vector3df& xyz,
                              const core::vector3df& hpr,

@@ -51,12 +51,17 @@ namespace GraphicsRestrictions
         GR_EXT_TEXTURE_COMPRESSION_S3TC,
         GR_AMD_VERTEX_SHADER_LAYER,
         GR_EXPLICIT_ATTRIB_LOCATION,
+#if defined(USE_GLES2)
+        GR_TEXTURE_FORMAT_BGRA8888,
+        GR_COLOR_BUFFER_FLOAT,
+#endif
         GR_DRIVER_RECENT_ENOUGH,
         GR_HIGHDEFINITION_TEXTURES,
         GR_ADVANCED_PIPELINE,
         GR_FRAMEBUFFER_SRGB_WORKING,
         GR_FRAMEBUFFER_SRGB_CAPABLE,
         GR_GI,
+        GR_FORCE_LEGACY_DEVICE,
         GR_COUNT  /** MUST be last entry. */
     } ;
 
