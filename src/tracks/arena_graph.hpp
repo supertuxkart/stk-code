@@ -38,7 +38,7 @@ private:
     std::vector<std::vector<float>> m_distance_matrix;
 
     /** The matrix that is used to store computed shortest paths. */
-    std::vector<std::vector<int>> m_parent_node;
+    std::vector<std::vector<int16_t>> m_parent_node;
 
     /** Used in soccer mode to colorize the goal lines in minimap. */
     std::set<int> m_red_node;
@@ -58,8 +58,8 @@ private:
     // ------------------------------------------------------------------------
     void computeFloydWarshall();
     // ------------------------------------------------------------------------
-    static std::vector<int> getPathFromTo(int from, int to, 
-                          const std::vector< std::vector< int > > parent_node);
+    static std::vector<int16_t> getPathFromTo(int from, int to,
+                     const std::vector< std::vector< int16_t > >& parent_node);
     // ------------------------------------------------------------------------
     virtual bool hasLapLine() const OVERRIDE                  { return false; }
     // ------------------------------------------------------------------------
@@ -84,7 +84,7 @@ public:
     {
         if (i == Graph::UNKNOWN_SECTOR || j == Graph::UNKNOWN_SECTOR)
             return Graph::UNKNOWN_SECTOR;
-        return m_parent_node[j][i];
+        return (int)(m_parent_node[j][i]);
     }
     // ------------------------------------------------------------------------
     /** Returns the distance between any two nodes */

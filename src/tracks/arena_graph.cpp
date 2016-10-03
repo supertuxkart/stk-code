@@ -179,8 +179,8 @@ void ArenaGraph::buildGraph()
     }
 
     // Allocate and initialise the previous node data structure:
-    m_parent_node = std::vector<std::vector<int>>
-        (n_nodes, std::vector<int>(n_nodes, Graph::UNKNOWN_SECTOR));
+    m_parent_node = std::vector<std::vector<int16_t>>
+        (n_nodes, std::vector<int16_t>(n_nodes, Graph::UNKNOWN_SECTOR));
     for (unsigned int i = 0; i < n_nodes; i++)
     {
         for (unsigned int j = 0; j < n_nodes; j++)
@@ -347,10 +347,10 @@ void ArenaGraph::setNearbyNodesOfAllNodes()
 /** Determines the full path from 'from' to 'to' and returns it in a
  *  std::vector (in reverse order). Used only for unit testing.
  */
-std::vector<int> ArenaGraph::getPathFromTo(int from, int to,
-                           const std::vector< std::vector< int > > parent_node)
+std::vector<int16_t> ArenaGraph::getPathFromTo(int from, int to,
+                      const std::vector< std::vector< int16_t > >& parent_node)
 {
-    std::vector<int> path;
+    std::vector<int16_t> path;
     path.push_back(to);
     while(from!=to)
     {
@@ -379,7 +379,7 @@ void ArenaGraph::unitTesting()
 
     // Save the Dijkstra results
     std::vector< std::vector< float > > distance_matrix = ag->m_distance_matrix;
-    std::vector< std::vector< int > > parent_node = ag->m_parent_node;
+    std::vector< std::vector< int16_t > > parent_node = ag->m_parent_node;
     ag->buildGraph();
 
     // Now compute results with Floyd-Warshall
@@ -409,16 +409,16 @@ void ArenaGraph::unitTesting()
             // debugging in the feature
 #undef TEST_PARENT_POLY_EVEN_THOUGH_MANY_FALSE_POSITIVES
 #ifdef TEST_PARENT_POLY_EVEN_THOUGH_MANY_FALSE_POSITIVES
-            if(ag->m_parent_poly[i][j] != parent_poly[i][j])
+            if(ag->m_parent_node[i][j] != parent_node[i][j])
             {
                 error_count++;
-                std::vector<int> dijkstra_path = getPathFromTo(i, j, parent_node);
-                std::vector<int> floyd_path = getPathFromTo(i, j, ag->m_parent_node);
+                std::vector<int16_t> dijkstra_path = getPathFromTo(i, j, parent_node);
+                std::vector<int16_t> floyd_path = getPathFromTo(i, j, ag->m_parent_node);
                 if(dijkstra_path.size()!=floyd_path.size())
                 {
                     Log::error("ArenaGraph",
                                "Incorrect path length %d, %d: Dijkstra: %d F.W.: %d",
-                               i, j, parent_poly[i][j], ag->m_parent_poly[i][j]);
+                               i, j, parent_node[i][j], ag->m_parent_node[i][j]);
                     continue;
                 }
                 Log::error("ArenaGraph", "Path problems from %d to %d:",
@@ -431,7 +431,7 @@ void ArenaGraph::unitTesting()
                             floyd_path[k]);
                 }    // for k<dijkstra_path.size()
 
-            }   // if dijkstra parent_poly != floyd parent poly
+            }   // if dijkstra parent_node != floyd parent node
 #endif
         }   // for j
     }   // for i
