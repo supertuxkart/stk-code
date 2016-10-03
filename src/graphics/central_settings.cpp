@@ -52,6 +52,7 @@ void CentralVideoSettings::init()
     
 #if defined(USE_GLES2)
     hasBGRA = false;
+    hasColorBufferFloat = false;
 #endif
 
     m_GI_has_artifact = false;
@@ -230,7 +231,13 @@ void CentralVideoSettings::init()
             hasBGRA = true;
             Log::info("GLDriver", "EXT texture format BGRA8888 Present");
         }
-            
+        
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_COLOR_BUFFER_FLOAT) &&
+            hasGLExtension("GL_EXT_color_buffer_float"))
+        {
+            hasColorBufferFloat = true;
+            Log::info("GLDriver", "EXT Color Buffer Float Present");
+        }
 #endif
     }
 }
@@ -354,6 +361,11 @@ bool CentralVideoSettings::isARBMultiDrawIndirectUsable() const
 bool CentralVideoSettings::isEXTTextureFormatBGRA8888Usable() const
 {
     return hasBGRA;
+}
+
+bool CentralVideoSettings::isEXTColorBufferFloatUsable() const
+{
+    return hasColorBufferFloat;
 }
 #endif
 

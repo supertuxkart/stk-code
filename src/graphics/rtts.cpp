@@ -79,7 +79,6 @@ RTT::RTT(size_t width, size_t height)
     // All RTTs are currently RGBA16F mostly with stencil. The four tmp RTTs are the same size
     // as the screen, for use in post-processing.
     
-#if !defined(USE_GLES2)
     GLint rgba_internal_format = GL_RGBA16F;
     GLint rgba_format = GL_BGRA;
     GLint red_internal_format = GL_R16F;
@@ -88,15 +87,19 @@ RTT::RTT(size_t width, size_t height)
     GLint rgb_format = GL_BGR;
     GLint diffuse_specular_internal_format = GL_R11F_G11F_B10F;
     GLint type = GL_FLOAT;
-#else
-    GLint rgba_internal_format = GL_RGBA8;
-    GLint rgba_format = GL_RGBA;
-    GLint red_internal_format = GL_R8;
-    GLint red32_internal_format = GL_R8;
-    GLint red_format = GL_RED;
-    GLint rgb_format = GL_RGB;
-    GLint diffuse_specular_internal_format = GL_RGBA8;
-    GLint type = GL_UNSIGNED_BYTE;
+    
+#if defined(USE_GLES2)
+    if (!CVS->isEXTColorBufferFloatUsable())
+    {
+        rgba_internal_format = GL_RGBA8;
+        rgba_format = GL_RGBA;
+        red_internal_format = GL_R8;
+        red32_internal_format = GL_R8;
+        red_format = GL_RED;
+        rgb_format = GL_RGB;
+        diffuse_specular_internal_format = GL_RGBA8;
+        type = GL_UNSIGNED_BYTE;
+    }
 #endif
 
     RenderTargetTextures[RTT_TMP1] = generateRTT(res, rgba_internal_format, rgba_format, type);

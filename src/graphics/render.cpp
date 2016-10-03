@@ -431,10 +431,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     {
         PROFILER_PUSH_CPU_MARKER("- SSAO", 0xFF, 0xFF, 0x00);
         ScopedGPUTimer Timer(getGPUTimer(Q_SSAO));
-        #if !defined(USE_GLES2)
         if (UserConfigParams::m_ssao)
             renderSSAO();
-        #endif
         PROFILER_POP_CPU_MARKER();
     }
 

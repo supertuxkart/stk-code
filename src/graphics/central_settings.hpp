@@ -45,6 +45,7 @@ private:
     
 #if defined(USE_GLES2)
     bool hasBGRA;
+    bool hasColorBufferFloat;
 #endif
 
     bool m_need_rh_workaround;
@@ -82,6 +83,7 @@ public:
     
 #if defined(USE_GLES2)
     bool isEXTTextureFormatBGRA8888Usable() const;
+    bool isEXTColorBufferFloatUsable() const;
 #endif
 
 

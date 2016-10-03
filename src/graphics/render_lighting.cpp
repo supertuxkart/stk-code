@@ -527,6 +527,11 @@ void IrrDriver::renderLights(unsigned pointlightcount, bool hasShadow)
 // ----------------------------------------------------------------------------
 void IrrDriver::renderSSAO()
 {
+#if defined(USE_GLES2)
+    if (!CVS->isEXTColorBufferFloatUsable())
+        return;
+#endif
+
     m_rtts->getFBO(FBO_SSAO).bind();
     glClearColor(1., 1., 1., 1.);
     glClear(GL_COLOR_BUFFER_BIT);
