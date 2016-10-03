@@ -106,7 +106,7 @@ public:
     {
         assert(m_graph == NULL);
         m_graph = graph;
-    }   // create
+    }   // setGraph
     // ------------------------------------------------------------------------
     /** Cleans up the graph. It is possible that this function is called even
      *  if no instance exists (e.g. arena without navmesh). So it is not an
