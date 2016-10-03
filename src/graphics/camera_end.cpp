@@ -62,7 +62,7 @@ void CameraEnd::readEndCamera(const XMLNode &root)
         unsigned int index = i;
         // In reverse mode, reverse the order in which the
         // end cameras are read.
-        if(DriveGraph::get()->isReverse())
+        if(DriveGraph::get() != NULL && DriveGraph::get()->isReverse())
             index = root.getNumNodes() - 1 - i;
         const XMLNode *node = root.getNode(index);
         EndCameraInformation eci;
