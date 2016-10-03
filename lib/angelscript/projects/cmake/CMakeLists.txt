@@ -67,6 +67,7 @@ set(ANGELSCRIPT_SOURCE
     ../../source/as_builder.cpp
     ../../source/as_bytecode.cpp
     ../../source/as_callfunc.cpp
+    ../../source/as_callfunc_mips.cpp
     ../../source/as_callfunc_x86.cpp
     ../../source/as_callfunc_x64_gcc.cpp
     ../../source/as_callfunc_x64_msvc.cpp
