@@ -31,15 +31,15 @@
 
 #ifdef DEBUG
    // Enable AI graphical debugging
-#  define AI_DEBUG
+#  undef AI_DEBUG
    // Shows left and right lines when using new findNonCrashing function
-#  define AI_DEBUG_NEW_FIND_NON_CRASHING
+#  undef AI_DEBUG_NEW_FIND_NON_CRASHING
    // Show the predicted turn circles
-#  define AI_DEBUG_CIRCLES
+#  undef AI_DEBUG_CIRCLES
    // Show the heading of the kart
-#  define AI_DEBUG_KART_HEADING
+#  undef AI_DEBUG_KART_HEADING
    // Shows line from kart to its aim point
-#  define AI_DEBUG_KART_AIM
+#  undef AI_DEBUG_KART_AIM
 #endif
 
 
