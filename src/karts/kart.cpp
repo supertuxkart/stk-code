@@ -1214,6 +1214,18 @@ void Kart::update(float dt)
     if(!history->replayHistory() && !RewindManager::get()->isRewinding())
         m_controller->update(dt);
 
+#undef DEBUG_CAMERA_SHAKE
+#ifdef DEBUG_CAMERA_SHAKE
+    Log::verbose("camera", "%s t %f %f xyz %f %f %f v %f %f %f d3 %f d2 %f",
+        getIdent().c_str(),
+        World::getWorld()->getTime(), dt,
+        getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
+        (Camera::getCamera(0)->getXYZ()-getXYZ()).length(),
+        (Camera::getCamera(0)->getXYZ()-getXYZ()).length_2d()
+        );
+#endif
+
 #undef DEBUG_TO_COMPARE_KART_PHYSICS
 #ifdef DEBUG_TO_COMPARE_KART_PHYSICS
     // This information is useful when comparing kart physics, e.g. to
