@@ -116,7 +116,6 @@ void btKart::reset()
         updateWheelTransform(i, true);
     }
     m_visual_wheels_touch_ground = false;
-    m_zipper_active              = false;
     m_zipper_speed               = btScalar(0);
     m_skid_angular_velocity      = 0;
     m_is_skidding                = false;
@@ -810,7 +809,7 @@ void btKart::updateFriction(btScalar timeStep)
             (btRigidBody*) wheelInfo.m_raycastInfo.m_groundObject;
         if(!groundObject) continue;
 
-        if(m_zipper_active && m_zipper_speed > 0)
+        if(m_zipper_speed > 0)
         {
             if (wheel==2 || wheel==3)
             {
@@ -882,7 +881,6 @@ void btKart::updateFriction(btScalar timeStep)
     }   // for (int wheel=0; wheel<getNumWheels(); wheel++)
 
 
-    m_zipper_active = false;
     // Note: don't reset zipper speed, or the kart rewinder will
     // get incorrect zipper information.
 
@@ -1067,7 +1065,6 @@ void btKart::instantSpeedIncreaseTo(float speed)
     {
         return;
     }
-    m_zipper_active = speed > 0;
     m_zipper_speed  = speed;
 }   // activateZipper
 

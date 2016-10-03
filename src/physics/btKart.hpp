@@ -69,9 +69,6 @@ private:
     btScalar            m_damping;
     btVehicleRaycaster *m_vehicleRaycaster;
 
-    /** True if a zipper is active for that kart. */
-    bool                m_zipper_active;
-
     /** The zipper speed (i.e. the velocity the kart should reach in
      *  the first frame that the zipper is active). */
     btScalar            m_zipper_speed;
