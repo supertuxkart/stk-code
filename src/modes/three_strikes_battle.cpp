@@ -28,7 +28,6 @@
 #include "karts/kart_properties.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
-#include "tracks/battle_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
@@ -93,8 +92,7 @@ void ThreeStrikesBattle::reset()
 
     for(unsigned int n=0; n<kart_amount; n++)
     {
-        m_kart_info[n].m_lives    = 3;
-        m_kart_info[n].m_on_node  = BattleGraph::UNKNOWN_POLY;
+        m_kart_info[n].m_lives = 3;
 
         // no positions in this mode
         m_karts[n]->setPosition(-1);
@@ -308,7 +306,7 @@ void ThreeStrikesBattle::update(float dt)
     WorldWithRank::updateTrack(dt);
 
     if (m_track->hasNavMesh())
-        updateKartNodes();
+        updateSectorForKarts();
 
     // insert blown away tire(s) now if was requested
     while (m_insert_tire > 0)
@@ -457,33 +455,6 @@ bool ThreeStrikesBattle::isRaceOver()
 
     return getCurrentNumKarts()==1 || getCurrentNumPlayers()==0;
 }   // isRaceOver
-
-//-----------------------------------------------------------------------------
-/** Updates the m_on_node value of each kart to localize it
- *  on the navigation mesh.
- */
-void ThreeStrikesBattle::updateKartNodes()
-{
-    if (isRaceOver()) return;
-
-    const unsigned int n = getNumKarts();
-    for (unsigned int i = 0; i < n; i++)
-    {
-        if (m_karts[i]->isEliminated()) continue;
-
-        m_kart_info[i].m_on_node = BattleGraph::get()
-            ->pointToNode(m_kart_info[i].m_on_node,
-                          m_karts[i]->getXYZ(), false/*ignore_vertical*/);
-    }
-}
-
-//-----------------------------------------------------------------------------
-/** Get the which node the kart located in navigation mesh.
- */
-int ThreeStrikesBattle::getKartNode(unsigned int kart_id) const
-{
-    return m_kart_info[kart_id].m_on_node;
-}   // getKartNode
 
 //-----------------------------------------------------------------------------
 /** Called when the race finishes, i.e. after playing (if necessary) an

@@ -16,98 +16,133 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, B
 
-#include "tracks/quad_graph.hpp"
+#include "tracks/drive_graph.hpp"
 
-#include "LinearMath/btTransform.h"
-
-#include <IMesh.h>
-#include <ICameraSceneNode.h>
-#include "graphics/central_settings.hpp"
 #include "config/user_config.hpp"
-#include "graphics/callbacks.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/screen_quad.hpp"
-#include "graphics/shaders.hpp"
-#include "graphics/rtts.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
 #include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
 #include "tracks/check_manager.hpp"
-#include "tracks/quad_set.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
-#include "graphics/glwrap.hpp"
 
-const int QuadGraph::UNKNOWN_SECTOR  = -1;
-QuadGraph *QuadGraph::m_quad_graph = NULL;
-
+// ----------------------------------------------------------------------------
 /** Constructor, loads the graph information for a given set of quads
  *  from a graph file.
  *  \param quad_file_name Name of the file of all quads
  *  \param graph_file_name Name of the file describing the actual graph
  */
-QuadGraph::QuadGraph(const std::string &quad_file_name,
-                     const std::string &graph_file_name,
-                     const bool reverse) : m_reverse(reverse)
+DriveGraph::DriveGraph(const std::string &quad_file_name,
+                       const std::string &graph_file_name,
+                       const bool reverse) : m_reverse(reverse)
 {
-    m_lap_length           = 0;
-    QuadSet::create();
-    QuadSet::get()->init(quad_file_name);
-    m_quad_filename        = quad_file_name;
-    m_quad_graph           = this;
-    load(graph_file_name);
-}   // QuadGraph
+    m_lap_length    = 0;
+    m_quad_filename = quad_file_name;
+    Graph::setGraph(this);
+    load(quad_file_name, graph_file_name);
+}   // DriveGraph
 
-// -----------------------------------------------------------------------------
-/** Destructor, removes all nodes of the graph. */
-QuadGraph::~QuadGraph()
+// ----------------------------------------------------------------------------
+void DriveGraph::addSuccessor(unsigned int from, unsigned int to)
 {
-    QuadSet::destroy();
-    for(unsigned int i=0; i<m_all_nodes.size(); i++) {
-        delete m_all_nodes[i];
-    }
-    if(UserConfigParams::m_track_debug)
-        cleanupDebugMesh();
-    GraphStructure::destroyRTT();
-}   // ~QuadGraph
-
-// -----------------------------------------------------------------------------
-
-void QuadGraph::addSuccessor(unsigned int from, unsigned int to) {
     if(m_reverse)
-        m_all_nodes[to]->addSuccessor(from);
+        getNode(to)->addSuccessor(from);
     else
-        m_all_nodes[from]->addSuccessor(to);
+        getNode(from)->addSuccessor(to);
+
 }   // addSuccessor
 
-// -----------------------------------------------------------------------------
-/** Loads a quad graph from a file.
- *  \param filename Name of the file to load.
- */
-void QuadGraph::load(const std::string &filename)
+// ----------------------------------------------------------------------------
+/** This function interprets a point specification as an attribute in the
+    xml quad file. It understands two different specifications:
+    p1="n:p"      : get point p from square n (n, p integers)
+    p1="p1,p2,p3" : make a 3d point out of these 3 floating point values
+*/
+void DriveGraph::getPoint(const XMLNode *xml,
+                          const std::string &attribute_name,
+                          Vec3* result) const
 {
+    std::string s;
+    xml->get(attribute_name, &s);
+    int pos=(int)s.find_first_of(":");
+    if(pos>0)   // n:p specification
+    {
+        std::vector<std::string> l = StringUtils::split(s, ':');
+        int n=atoi(l[0].c_str());
+        int p=atoi(l[1].c_str());
+        *result=(*m_all_nodes[n])[p];
+    }
+    else
+    {
+        xml->get(attribute_name, result);
+    }
+
+}   // getPoint
+
+// ----------------------------------------------------------------------------
+/** Loads a drive graph from a file.
+ *  \param filename Name of the quad file to load.
+ *  \param filename Name of the graph file to load.
+ */
+void DriveGraph::load(const std::string &quad_file_name,
+                      const std::string &filename)
+{
+    XMLNode *quad = file_manager->createXMLTree(quad_file_name);
+    if (!quad || quad->getName() != "quads")
+    {
+        Log::error("DriveGraph : Quad xml '%s' not found.", filename.c_str());
+        delete quad;
+        return;
+    }
+
+    // Each quad is part of the graph exactly once now.
+    for(unsigned int i=0; i<quad->getNumNodes(); i++)
+    {
+        const XMLNode *xml_node = quad->getNode(i);
+        if(xml_node->getName()!="quad")
+        {
+            Log::warn("DriveGraph: Unsupported node type '%s' found in '%s' - ignored.",
+                   xml_node->getName().c_str(), filename.c_str());
+            continue;
+        }
+
+        // Note that it's not easy to do the reading of the parameters here
+        // in quad, since the specification in the xml can contain references
+        // to previous points. E.g.:
+        // <quad p0="40:3" p1="40:2" p2="25.396030 0.770338 64.796539" ...
+        Vec3 p0, p1, p2, p3;
+        getPoint(xml_node, "p0", &p0);
+        getPoint(xml_node, "p1", &p1);
+        getPoint(xml_node, "p2", &p2);
+        getPoint(xml_node, "p3", &p3);
+        bool invisible=false;
+        xml_node->get("invisible", &invisible);
+        bool ai_ignore=false;
+        xml_node->get("ai-ignore", &ai_ignore);
+        createQuad(p0, p1, p2, p3, m_all_nodes.size(), invisible, ai_ignore,
+                   false/*is_arena*/);
+    }
+    delete quad;
+
     const XMLNode *xml = file_manager->createXMLTree(filename);
 
     if(!xml)
     {
         // No graph file exist, assume a default loop X -> X+1
-        // i.e. each quad is part of the graph exactly once.
-        // First create an empty graph node for each quad:
-        for(unsigned int i=0; i<QuadSet::get()->getNumberOfQuads(); i++)
-            m_all_nodes.push_back(new GraphNode(i, (unsigned int) m_all_nodes.size()));
-        // Then set the default loop:
+        // Set the default loop:
         setDefaultSuccessors();
         computeDirectionData();
 
         if (m_all_nodes.size() > 0)
         {
-            m_lap_length = m_all_nodes[m_all_nodes.size()-1]->getDistanceFromStart()
-                         + m_all_nodes[m_all_nodes.size()-1]->getDistanceToSuccessor(0);
+            m_lap_length = getNode(m_all_nodes.size()-1)->getDistanceFromStart()
+                         + getNode(m_all_nodes.size()-1)->getDistanceToSuccessor(0);
         }
         else
         {
-            Log::error("Quad Graph", "No node in driveline graph.");
+            Log::error("DriveGraph", "No node in driveline graph.");
             m_lap_length = 10.0f;
         }
 
@@ -119,29 +154,16 @@ void QuadGraph::load(const std::string &filename)
     for(unsigned int node_index=0; node_index<xml->getNumNodes(); node_index++)
     {
         const XMLNode *xml_node = xml->getNode(node_index);
-        // First graph node definitions:
-        // -----------------------------
+        // Load the definition of edges between the graph nodes:
+        // -----------------------------------------------------
         if(xml_node->getName()=="node-list")
         {
-            // A list of quads is connected to a list of graph nodes:
-            unsigned int from, to;
-            xml_node->get("from-quad", &from);
+            // Each quad is part of the graph exactly once now.
+            unsigned int to = 0;
             xml_node->get("to-quad", &to);
-            for(unsigned int i=from; i<=to; i++)
-            {
-                m_all_nodes.push_back(new GraphNode(i, (unsigned int) m_all_nodes.size()));
-            }
+            assert(to + 1 == m_all_nodes.size());
+            continue;
         }
-        else if(xml_node->getName()=="node")
-        {
-            // A single quad is connected to a single graph node.
-            unsigned int id;
-            xml_node->get("quad", &id);
-            m_all_nodes.push_back(new GraphNode(id, (unsigned int) m_all_nodes.size()));
-        }
-
-        // Then the definition of edges between the graph nodes:
-        // -----------------------------------------------------
         else if(xml_node->getName()=="edge-loop")
         {
             // A closed loop:
@@ -179,7 +201,7 @@ void QuadGraph::load(const std::string &filename)
         }   // edge
         else
         {
-            Log::error("Quad Graph", "Incorrect specification in '%s': '%s' ignored.",
+            Log::error("DriveGraph", "Incorrect specification in '%s': '%s' ignored.",
                     filename.c_str(), xml_node->getName().c_str());
             continue;
         }   // incorrect specification
@@ -195,11 +217,12 @@ void QuadGraph::load(const std::string &filename)
     m_lap_length = -1;
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
-        float l = m_all_nodes[i]->getDistanceFromStart()
-                + m_all_nodes[i]->getDistanceToSuccessor(0);
+        float l = getNode(i)->getDistanceFromStart()
+                + getNode(i)->getDistanceToSuccessor(0);
         if(l > m_lap_length)
             m_lap_length = l;
     }
+
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -209,18 +232,18 @@ void QuadGraph::load(const std::string &filename)
  *  but in reverse mode (where node 0 is actually the end of the track)
  *  this is 0's successor.
  */
-unsigned int QuadGraph::getStartNode() const
+unsigned int DriveGraph::getStartNode() const
 {
-    return m_reverse ? m_all_nodes[0]->getSuccessor(0)
+    return m_reverse ? getNode(0)->getSuccessor(0)
                      : 0;
 }   // getStartNode
 
 // ----------------------------------------------------------------------------
 /** Sets the checkline requirements for all nodes in the graph.
  */
-void QuadGraph::computeChecklineRequirements()
+void DriveGraph::computeChecklineRequirements()
 {
-    computeChecklineRequirements(m_all_nodes[0],
+    computeChecklineRequirements(getNode(0),
                                  CheckManager::get()->getLapLineIndex());
 }   // computeChecklineRequirements
 
@@ -228,8 +251,8 @@ void QuadGraph::computeChecklineRequirements()
 /** Finds which checklines must be visited before driving on this quad
  *  (useful for rescue)
  */
-void QuadGraph::computeChecklineRequirements(GraphNode* node,
-                                             int latest_checkline)
+void DriveGraph::computeChecklineRequirements(DriveNode* node,
+                                              int latest_checkline)
 {
     for (unsigned int n=0; n<node->getNumberOfSuccessors(); n++)
     {
@@ -238,7 +261,7 @@ void QuadGraph::computeChecklineRequirements(GraphNode* node,
         // warp-around
         if (succ_id == 0) break;
 
-        GraphNode* succ = m_all_nodes[succ_id];
+        DriveNode* succ = getNode(succ_id);
         int new_latest_checkline =
             CheckManager::get()->getChecklineTriggering(node->getCenter(),
                                                         succ->getCenter() );
@@ -276,11 +299,11 @@ void QuadGraph::computeChecklineRequirements(GraphNode* node,
  *  (since on other graph nodes only one path can be used anyway, this
  *  saves some memory).
  */
-void QuadGraph::setupPaths()
+void DriveGraph::setupPaths()
 {
     for(unsigned int i=0; i<getNumNodes(); i++)
     {
-        m_all_nodes[i]->setupPathsToNode();
+        getNode(i)->setupPathsToNode();
     }
 }   // setupPaths
 
@@ -288,18 +311,18 @@ void QuadGraph::setupPaths()
 /** This function sets a default successor for all graph nodes that currently
  *  don't have a successor defined. The default successor of node X is X+1.
  */
-void QuadGraph::setDefaultSuccessors()
+void DriveGraph::setDefaultSuccessors()
 {
     for(unsigned int i=0; i<m_all_nodes.size(); i++) {
-        if(m_all_nodes[i]->getNumberOfSuccessors()==0) {
+        if(getNode(i)->getNumberOfSuccessors()==0) {
             addSuccessor(i,i+1>=m_all_nodes.size() ? 0 : i+1);
-            //~ m_all_nodes[i]->addSuccessor(i+1>=m_all_nodes.size() ? 0 : i+1);
+            //~ getNode(i)->addSuccessor(i+1>=m_all_nodes.size() ? 0 : i+1);
         }   // if size==0
     }   // for i<m_allNodes.size()
 }   // setDefaultSuccessors
 
 // -----------------------------------------------------------------------------
-/** Sets all start positions depending on the quad graph. The number of
+/** Sets all start positions depending on the drive graph. The number of
  *  entries needed is defined by the size of the start_transform (though all
  *  entries will be overwritten).
  *  E.g. the karts will be placed as:
@@ -319,17 +342,17 @@ void QuadGraph::setDefaultSuccessors()
  *  \param sidewards_distance Distance in sidewards (X) direction between
  *               karts.
  */
-void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
+void DriveGraph::setDefaultStartPositions(AlignedArray<btTransform>
                                                        *start_transforms,
-                                         unsigned int karts_per_row,
-                                         float forwards_distance,
-                                         float sidewards_distance,
-                                         float upwards_distance) const
+                                          unsigned int karts_per_row,
+                                          float forwards_distance,
+                                          float sidewards_distance,
+                                          float upwards_distance) const
 {
     // We start just before the start node (which will trigger lap
     // counting when reached). The first predecessor is the one on
     // the main driveline.
-    int current_node = m_all_nodes[getStartNode()]->getPredecessor(0);
+    int current_node = getNode(getStartNode())->getPredecessor(0);
 
     float distance_from_start = 0.1f+forwards_distance;
 
@@ -350,20 +373,20 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
         else
         {
             // First find on which segment we have to start
-            while(distance_from_start > getNode(current_node).getNodeLength())
+            while(distance_from_start > getNode(current_node)->getNodeLength())
             {
-                distance_from_start -= getNode(current_node).getNodeLength();
+                distance_from_start -= getNode(current_node)->getNodeLength();
                 // Only follow the main driveline, i.e. first predecessor
-                current_node = getNode(current_node).getPredecessor(0);
+                current_node = getNode(current_node)->getPredecessor(0);
             }
-            const GraphNode &gn   = getNode(current_node);
-            Vec3 center_line = gn.getLowerCenter() - gn.getUpperCenter();
+            const DriveNode* dn = getNode(current_node);
+            Vec3 center_line = dn->getLowerCenter() - dn->getUpperCenter();
             center_line.normalize();
 
-            Vec3 horizontal_line = gn[2] - gn[3];
+            Vec3 horizontal_line = (*dn)[2] - (*dn)[3];
             horizontal_line.normalize();
 
-            Vec3 start = gn.getUpperCenter()
+            Vec3 start = dn->getUpperCenter()
                        + center_line     * distance_from_start
                        + horizontal_line * x_pos;
             // Add a certain epsilon to the height in case that the
@@ -371,7 +394,7 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
             (*start_transforms)[i].setOrigin(start+Vec3(0,upwards_distance,0));
             (*start_transforms)[i].setRotation(
                 btQuaternion(btVector3(0, 1, 0),
-                             gn.getAngleToSuccessor(0)));
+                             dn->getAngleToSuccessor(0)));
             if(x_pos >= max_x_dist-sidewards_distance*0.5f)
             {
                 x_pos  = -max_x_dist;
@@ -395,17 +418,17 @@ void QuadGraph::setDefaultStartPositions(AlignedArray<btTransform>
  *  \param succ A vector of ints to which the successors are added.
  *  \param for_ai true if only quads accessible by the AI should be returned.
  */
-void QuadGraph::getSuccessors(int node_number,
-                              std::vector<unsigned int>& succ,
-                              bool for_ai) const
+void DriveGraph::getSuccessors(int node_number,
+                               std::vector<unsigned int>& succ,
+                               bool for_ai) const
 {
-    const GraphNode *gn=m_all_nodes[node_number];
-    for(unsigned int i=0; i<gn->getNumberOfSuccessors(); i++)
+    const DriveNode *dn=getNode(node_number);
+    for(unsigned int i=0; i<dn->getNumberOfSuccessors(); i++)
     {
         // If getSuccessor is called for the AI, only add
         // quads that are meant for the AI to be used.
-        if(!for_ai || !gn->ignoreSuccessorForAI(i))
-            succ.push_back(gn->getSuccessor(i));
+        if(!for_ai || !dn->ignoreSuccessorForAI(i))
+            succ.push_back(dn->getSuccessor(i));
     }
 }   // getSuccessors
 
@@ -415,10 +438,10 @@ void QuadGraph::getSuccessors(int node_number,
  *  \param node The node index for which to set the distance from start.
  *  \param new_distance The new distance for the specified graph node.
  */
-void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
+void DriveGraph::computeDistanceFromStart(unsigned int node, float new_distance)
 {
-    GraphNode *gn = m_all_nodes[node];
-    float current_distance = gn->getDistanceFromStart();
+    DriveNode *dn = getNode(node);
+    float current_distance = dn->getDistanceFromStart();
 
     // If this node already has a distance defined, check if the new distance
     // is longer, and if so adjust all following nodes. Without this the
@@ -432,25 +455,25 @@ void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
         if(current_distance<new_distance)
         {
             float delta = new_distance - current_distance;
-            updateDistancesForAllSuccessors(gn->getQuadIndex(), delta, 0);
+            updateDistancesForAllSuccessors(dn->getIndex(), delta, 0);
         }
         return;
     }
 
     // Otherwise this node has no distance defined yet. Set the new
     // distance, and recursively update all following nodes.
-    gn->setDistanceFromStart(new_distance);
+    dn->setDistanceFromStart(new_distance);
 
-    for(unsigned int i=0; i<gn->getNumberOfSuccessors(); i++)
+    for(unsigned int i=0; i<dn->getNumberOfSuccessors(); i++)
     {
-        GraphNode *gn_next = m_all_nodes[gn->getSuccessor(i)];
+        DriveNode *dn_next = getNode(dn->getSuccessor(i));
         // The start node (only node with distance 0) is reached again,
         // recursion can stop now
-        if(gn_next->getDistanceFromStart()==0)
+        if(dn_next->getDistanceFromStart()==0)
             continue;
 
-        computeDistanceFromStart(gn_next->getQuadIndex(),
-                                 new_distance + gn->getDistanceToSuccessor(i));
+        computeDistanceFromStart(dn_next->getIndex(),
+                                 new_distance + dn->getDistanceToSuccessor(i));
     }   // for i
 }   // computeDistanceFromStart
 
@@ -464,35 +487,35 @@ void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
  *  \param recursive_count Counts how often this function was called
  *         recursively in order to catch incorrect graphs that contain loops.
  */
-void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta,
+void DriveGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta,
                                                  unsigned int recursive_count)
 {
     if(recursive_count>getNumNodes())
     {
-        Log::error("QuadGraph",
-                   "Quad graph contains a loop (without start node).");
-        Log::fatal("QuadGraph",
+        Log::error("DriveGraph",
+                   "DriveGraph contains a loop (without start node).");
+        Log::fatal("DriveGraph",
                    "Fix graph, check for directions of all shortcuts etc.");
     }
     recursive_count++;
 
-    GraphNode &g=getNode(indx);
-    g.setDistanceFromStart(g.getDistanceFromStart()+delta);
-    for(unsigned int i=0; i<g.getNumberOfSuccessors(); i++)
+    DriveNode* dn = getNode(indx);
+    dn->setDistanceFromStart(dn->getDistanceFromStart()+delta);
+    for(unsigned int i=0; i<dn->getNumberOfSuccessors(); i++)
     {
-        GraphNode &g_next = getNode(g.getSuccessor(i));
+        DriveNode* dn_next = getNode(dn->getSuccessor(i));
         // Stop when we reach the start node, i.e. the only node with a
         // distance of 0
-        if(g_next.getDistanceFromStart()==0)
+        if(dn_next->getDistanceFromStart()==0)
             continue;
 
         // Only increase the distance from start of a successor node, if
         // this successor has a distance from start that is smaller then
         // the increased amount.
-        if(g.getDistanceFromStart()+g.getDistanceToSuccessor(i) >
-            g_next.getDistanceFromStart())
+        if(dn->getDistanceFromStart()+dn->getDistanceToSuccessor(i) >
+            dn_next->getDistanceFromStart())
         {
-            updateDistancesForAllSuccessors(g.getSuccessor(i), delta,
+            updateDistancesForAllSuccessors(dn->getSuccessor(i), delta,
                                             recursive_count);
         }
     }
@@ -513,12 +536,12 @@ void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta,
  *  its data constantly, i.e. if it takes a different turn, it will be using
  *  the new data).
  */
-void QuadGraph::computeDirectionData()
+void DriveGraph::computeDirectionData()
 {
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
     {
         for(unsigned int succ_index=0;
-            succ_index<m_all_nodes[i]->getNumberOfSuccessors();
+            succ_index<getNode(i)->getNumberOfSuccessors();
             succ_index++)
         {
             determineDirection(i, succ_index);
@@ -530,14 +553,14 @@ void QuadGraph::computeDirectionData()
 //-----------------------------------------------------------------------------
 /** Adjust the given angle to be in [-PI, PI].
  */
-float QuadGraph::normalizeAngle(float f)
+float DriveGraph::normalizeAngle(float f)
 {
     if(f>M_PI)       f -= 2*M_PI;
     else if(f<-M_PI) f += 2*M_PI;
     return f;
 }   // normalizeAngle
 //-----------------------------------------------------------------------------
-/** Determines the direction of the quad graph when driving to the specified
+/** Determines the direction of the drive graph when driving to the specified
  *  successor. It also determines the last graph node that is still following
  *  the given direction. The computed data is saved in the corresponding
  *  graph node.
@@ -553,22 +576,22 @@ float QuadGraph::normalizeAngle(float f)
  *                    If there should be any other branches later, successor
  *                    0 will always be tetsed.
  */
-void QuadGraph::determineDirection(unsigned int current,
-                                   unsigned int succ_index)
+void DriveGraph::determineDirection(unsigned int current,
+                                    unsigned int succ_index)
 {
     // The maximum angle which is still considered to be straight
     const float max_straight_angle=0.1f;
 
     // Compute the angle from n (=current) to n+1 (=next)
     float angle_current = getAngleToNext(current, succ_index);
-    unsigned int next   = getNode(current).getSuccessor(succ_index);
+    unsigned int next   = getNode(current)->getSuccessor(succ_index);
     float angle_next    = getAngleToNext(next, 0);
     float rel_angle     = normalizeAngle(angle_next-angle_current);
     // Small angles are considered to be straight
     if(fabsf(rel_angle)<max_straight_angle)
         rel_angle = 0;
 
-    next     = getNode(next).getSuccessor(0);  // next is now n+2
+    next     = getNode(next)->getSuccessor(0);  // next is now n+2
 
     // If the direction is still the same during a lap the last node
     // in the same direction is the previous node;
@@ -591,14 +614,14 @@ void QuadGraph::determineDirection(unsigned int current,
             break;
         rel_angle = new_rel_angle;
 
-        next = getNode(next).getSuccessor(0);
+        next = getNode(next)->getSuccessor(0);
     }    // while(1)
 
-    GraphNode::DirectionType dir =
-        rel_angle==0 ? GraphNode::DIR_STRAIGHT
-                     : (rel_angle>0) ? GraphNode::DIR_RIGHT
-                                     : GraphNode::DIR_LEFT;
-    m_all_nodes[current]->setDirectionData(succ_index, dir, next);
+    DriveNode::DirectionType dir =
+        rel_angle==0 ? DriveNode::DIR_STRAIGHT
+                     : (rel_angle>0) ? DriveNode::DIR_RIGHT
+                                     : DriveNode::DIR_LEFT;
+    getNode(current)->setDirectionData(succ_index, dir, next);
 }   // determineDirection
 
 
@@ -612,180 +635,60 @@ void QuadGraph::determineDirection(unsigned int current,
  *  \param xyz The position of the kart.
  *  \param sector The graph node the position is on.
  */
-void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
+void DriveGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
                               const int sector) const
 {
     if(sector == UNKNOWN_SECTOR )
     {
-        Log::warn("Quad Graph", "UNKNOWN_SECTOR in spatialToTrack().");
+        Log::warn("Drive Graph", "UNKNOWN_SECTOR in spatialToTrack().");
         return;
     }
 
-    getNode(sector).getDistances(xyz, dst);
+    getNode(sector)->getDistances(xyz, dst);
 }   // spatialToTrack
 
 //-----------------------------------------------------------------------------
-/** findRoadSector returns in which sector on the road the position
- *  xyz is. If xyz is not on top of the road, it sets UNKNOWN_SECTOR as sector.
- *
- *  \param xyz Position for which the segment should be determined.
- *  \param sector Contains the previous sector (as a shortcut, since usually
- *         the sector is the same as the last one), and on return the result
- *  \param all_sectors If this is not NULL, it is a list of all sectors to
- *         test. This is used by the AI to make sure that it ends up on the
- *         selected way in case of a branch, and also to make sure that it
- *         doesn't skip e.g. a loop (see explanation below for details).
- */
-void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
-                                std::vector<int> *all_sectors) const
+float DriveGraph::getDistanceToNext(int n, int j) const
 {
-    // Most likely the kart will still be on the sector it was before,
-    // so this simple case is tested first.
-    if(*sector!=UNKNOWN_SECTOR && getQuadOfNode(*sector).pointInQuad(xyz) )
-    {
-        return;
-    }   // if still on same quad
-
-    // Now we search through all graph nodes, starting with
-    // the current one
-    int indx       = *sector;
-    float min_dist = 999999.9f;
-
-    // If a current sector is given, and max_lookahead is specify, only test
-    // the next max_lookahead graph nodes instead of testing the whole graph.
-    // This is necessary for the AI: if the track contains a loop, e.g.:
-    // -A--+---B---+----F--------
-    //     E       C
-    //     +---D---+
-    // and the track is supposed to be driven: ABCDEBF, the AI might find
-    // the node on F, and then keep on going straight ahead instead of
-    // using the loop at all.
-    unsigned int max_count  = (*sector!=UNKNOWN_SECTOR && all_sectors!=NULL)
-                            ? (unsigned int)all_sectors->size()
-                            : (unsigned int)m_all_nodes.size();
-    *sector = UNKNOWN_SECTOR;
-    for(unsigned int i=0; i<max_count; i++)
-    {
-        if(all_sectors)
-            indx = (*all_sectors)[i];
-        else
-            indx = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
-        const Quad &q = getQuadOfNode(indx);
-        float dist    = xyz.getY() - q.getMinHeight();
-        // While negative distances are unlikely, we allow some small negative
-        // numbers in case that the kart is partly in the track.
-        if(q.pointInQuad(xyz) && dist < min_dist && dist>-1.0f)
-        {
-            min_dist = dist;
-            *sector  = indx;
-        }
-    }   // for i<m_all_nodes.size()
-
-    return;
-}   // findRoadSector
+    return getNode(n)->getDistanceToSuccessor(j);
+}   // getDistanceToNext
 
 //-----------------------------------------------------------------------------
-/** findOutOfRoadSector finds the sector where XYZ is, but as it name
-    implies, it is more accurate for the outside of the track than the
-    inside, and for STK's needs the accuracy on top of the track is
-    unacceptable; but if this was a 2D function, the accuracy for out
-    of road sectors would be perfect.
-
-    To find the sector we look for the closest line segment from the
-    right and left drivelines, and the number of that segment will be
-    the sector.
-
-    The SIDE argument is used to speed up the function only; if we know
-    that XYZ is on the left or right side of the track, we know that
-    the closest driveline must be the one that matches that condition.
-    In reality, the side used in STK is the one from the previous frame,
-    but in order to move from one side to another a point would go
-    through the middle, that is handled by findRoadSector() which doesn't
-    has speed ups based on the side.
-
-    NOTE: This method of finding the sector outside of the road is *not*
-    perfect: if two line segments have a similar altitude (but enough to
-    let a kart get through) and they are very close on a 2D system,
-    if a kart is on the air it could be closer to the top line segment
-    even if it is supposed to be on the sector of the lower line segment.
-    Probably the best solution would be to construct a quad that reaches
-    until the next higher overlapping line segment, and find the closest
-    one to XYZ.
- */
-int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
-                                   const int curr_sector,
-                                   std::vector<int> *all_sectors) const
+float DriveGraph::getAngleToNext(int n, int j) const
 {
-    int count = (all_sectors!=NULL) ? (int) all_sectors->size() : getNumNodes();
-    int current_sector = 0;
-    if(curr_sector != UNKNOWN_SECTOR && !all_sectors)
+    return getNode(n)->getAngleToSuccessor(j);
+}   // getAngleToNext
+
+//-----------------------------------------------------------------------------
+int DriveGraph::getNumberOfSuccessors(int n) const
+{
+    return getNode(n)->getNumberOfSuccessors();
+}   // getNumberOfSuccessors
+
+//-----------------------------------------------------------------------------
+float DriveGraph::getDistanceFromStart(int j) const
+{
+    return getNode(j)->getDistanceFromStart();
+}   // getDistanceFromStart
+
+// -----------------------------------------------------------------------------
+void DriveGraph::differentNodeColor(int n, video::SColor* c) const
+{
+    if (UserConfigParams::m_track_debug)
     {
-        // We have to test all nodes here: reason is that on track with
-        // shortcuts the n quads of the main drivelines is followed by
-        // the quads of the shortcuts. So after quad n-1 (the last one
-        // before the lap counting line) quad n will not be 0 (the first
-        // quad after the lap counting line), but one of the quads on a
-        // shortcut. If we only tested a limited number of quads to
-        // improve the performance the crossing of a lap might not be
-        // detected (because quad 0 is not tested, only quads on the
-        // shortcuts are tested). If this should become a performance
-        // bottleneck, we need to set up a graph of 'next' quads for each
-        // quad (similar to what the AI does), and only test the quads
-        // in this graph.
-        const int LIMIT = getNumNodes();
-        count           = LIMIT;
-        // Start 10 quads before the current quad, so the quads closest
-        // to the current position are tested first.
-        current_sector  = curr_sector -10;
-        if(current_sector<0) current_sector += getNumNodes();
+        if (getNode(n)->is3DQuad())
+            *c = video::SColor(255, 0, 255, 0);
+        else
+            *c = video::SColor(255, 255, 255, 0);
     }
 
-    int   min_sector = UNKNOWN_SECTOR;
-    float min_dist_2 = 999999.0f*999999.0f;
+}   // differentNodeColor
 
-    // If a kart is falling and in between (or too far below)
-    // a driveline point it might not fulfill
-    // the height condition. So we run the test twice: first with height
-    // condition, then again without the height condition - just to make sure
-    // it always comes back with some kind of quad.
-    for(int phase=0; phase<2; phase++)
-    {
-        for(int j=0; j<count; j++)
-        {
-            int next_sector;
-            if(all_sectors)
-                next_sector = (*all_sectors)[j];
-            else
-                next_sector  = current_sector+1 == (int)getNumNodes()
-                ? 0
-                : current_sector+1;
-
-            // A first simple test uses the 2d distance to the center of the quad.
-            float dist_2 = m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
-            if(dist_2<min_dist_2)
-            {
-                const Quad &q = getQuadOfNode(next_sector);
-                float dist    = xyz.getY() - q.getMinHeight();
-                // While negative distances are unlikely, we allow some small
-                // negative numbers in case that the kart is partly in the
-                // track. Only do the height test in phase==0, in phase==1
-                // accept any point, independent of height.
-                if(phase==1 || (dist < 5.0f && dist>-1.0f) )
-                {
-                    min_dist_2 = dist_2;
-                    min_sector = next_sector;
-                }
-            }
-            current_sector = next_sector;
-        }   // for j
-        // Leave in phase 0 if any sector was found.
-        if(min_sector!=UNKNOWN_SECTOR)
-            return min_sector;
-    }   // phase
-
-    if(min_sector==UNKNOWN_SECTOR )
-    {
-        Log::info("Quad Grap", "unknown sector found.");
-    }
-    return min_sector;
-}   // findOutOfRoadSector
+// -----------------------------------------------------------------------------
+DriveNode* DriveGraph::getNode(unsigned int j) const
+{
+    assert(j < m_all_nodes.size());
+    DriveNode* n = dynamic_cast<DriveNode*>(m_all_nodes[j]);
+    assert(n != NULL);
+    return n;
+}   // getNode

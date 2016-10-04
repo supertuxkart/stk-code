@@ -16,3 +16,5 @@ add_library(glew STATIC
     include/GL/glew.h  include/GL/glxew.h  include/GL/wglew.h
     src/glew.c         src/glewinfo.c
 )
+
+target_link_libraries(glew ${OPENGL_LIBRARIES})

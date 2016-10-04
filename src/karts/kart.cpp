@@ -73,8 +73,11 @@
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "tracks/terrain_info.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
 #include "utils/vs.hpp"
@@ -310,7 +313,10 @@ void Kart::reset()
     // mode) - but only if they actually have a body (e.g. ghost karts
     // don't have one).
     if(m_body)
+    {
+        World::getWorld()->getPhysics()->removeKart(this);
         World::getWorld()->getPhysics()->addKart(this);
+    }
 
     m_min_nitro_time = 0.0f;
 
@@ -404,7 +410,10 @@ void Kart::reset()
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
 
-    m_terrain_info->update(getTrans().getBasis());
+    // Base on update() below, require if starting point of kart is not near
+    // 0, 0, 0 (like in battle arena)
+    m_terrain_info->update(getTrans().getBasis(),
+        getTrans().getOrigin() + getTrans().getBasis() * Vec3(0, 0.3f, 0));
 
     // Reset is also called when the kart is created, at which time
     // m_controller is not yet defined, so this has to be tested here.
@@ -541,7 +550,7 @@ void Kart::blockViewWithPlunger()
 btTransform Kart::getAlignedTransform(const float custom_pitch)
 {
     btTransform trans = getTrans();
-
+    /*
     float pitch = (custom_pitch == -1 ? getTerrainPitch(getHeading())
                                       : custom_pitch);
 
@@ -549,7 +558,12 @@ btTransform Kart::getAlignedTransform(const float custom_pitch)
     m.setEulerZYX(pitch, getHeading()+m_skidding->getVisualSkidRotation(),
                   0.0f);
     trans.setBasis(m);
-
+    */
+    btTransform trans2;
+    trans2.setIdentity();
+    trans2.setRotation(btQuaternion(m_skidding->getVisualSkidRotation(), 0, 0));
+    trans *= trans2;
+    
     return trans;
 }   // getAlignedTransform
 
@@ -695,10 +709,8 @@ void Kart::createPhysics()
         wheel.m_frictionSlip             = m_kart_properties->getFrictionSlip();
         wheel.m_rollInfluence            = m_kart_properties->getStabilityRollInfluence();
     }
-    // Obviously these allocs have to be properly managed/freed
-    btTransform t;
-    t.setIdentity();
-    World::getWorld()->getPhysics()->addKart(this);
+    // Body to be added in reset() which allows complete reset kart when
+    // restarting the race
 
 }   // createPhysics
 
@@ -1070,7 +1082,7 @@ bool Kart::isOnGround() const
 */
 bool Kart::isNearGround() const
 {
-    if(m_terrain_info->getHoT()==Track::NOHIT)
+    if((m_terrain_info->getHitPoint() - getXYZ()).length() ==Track::NOHIT)
         return false;
     else
         return ((getXYZ().getY() - m_terrain_info->getHoT())
@@ -1207,6 +1219,8 @@ void Kart::update(float dt)
     // Update the position and other data taken from the physics
     Moveable::update(dt);
 
+    Vec3 front(0, 0, getKartLength()*0.5f);
+    m_xyz_front = getTrans()(front);
     // Update the locally maintained speed of the kart (m_speed), which 
     // is used furthermore for engine power, camera distance etc
     updateSpeed();
@@ -1284,7 +1298,10 @@ void Kart::update(float dt)
                            m_kart_properties->getStabilityChassisAngularDamping());
     }
 
-    if(m_kart_animation)
+    // Used to prevent creating a rescue animation after an explosion animation
+    // got deleted
+    const bool has_animation_before = m_kart_animation!= NULL;
+    if(has_animation_before)
         m_kart_animation->update(dt);
 
     m_attachment->update(dt);
@@ -1325,13 +1342,31 @@ void Kart::update(float dt)
     // But only do this if auto-rescue is enabled (i.e. it will be disabled in
     // battle mode), and the material the kart is driving on does not have
     // gravity (which atm affects the roll angle).
-    if(World::getWorld()->getTrack()->isAutoRescueEnabled()     &&
-        (!m_terrain_info->getMaterial() ||
-         !m_terrain_info->getMaterial()->hasGravity())          &&
-        !getKartAnimation() && fabs(getRoll())>60*DEGREE_TO_RAD &&
-                              fabs(getSpeed())<3.0f                )
+
+    // To be used later
+    float dist_to_sector = 0.0f;
+    LinearWorld* lw = dynamic_cast<LinearWorld*>(World::getWorld());
+    if (lw && DriveGraph::get())
     {
-        new RescueAnimation(this, /*is_auto_rescue*/true);
+        const int sector =
+            lw->getTrackSector(getWorldKartId())->getCurrentGraphNode();
+        dist_to_sector = getXYZ().distance
+            (DriveGraph::get()->getNode(sector)->getCenter());
+
+        const Vec3& quad_normal = DriveGraph::get()->getNode(sector)
+            ->getNormal();
+        const btQuaternion& q = getTrans().getRotation();
+        const float roll = quad_normal.angle
+               ((Vec3(0, 1, 0).rotate(q.getAxis(), q.getAngle())));
+
+        if (World::getWorld()->getTrack()->isAutoRescueEnabled() &&
+            (!m_terrain_info->getMaterial() ||
+            !m_terrain_info->getMaterial()->hasGravity()) &&
+            !has_animation_before && fabs(roll) > 60 * DEGREE_TO_RAD &&
+            fabs(getSpeed()) < 3.0f)
+        {
+            new RescueAnimation(this, /*is_auto_rescue*/true);
+        }
     }
 
     // Make sure that the ray doesn't hit the kart. This is done by
@@ -1344,12 +1379,9 @@ void Kart::update(float dt)
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
 
-    Vec3 front(0, 0, getKartLength()*0.5f);
-    m_xyz_front = getTrans()(front);
-
     // After the physics step was done, the position of the wheels (as stored
     // in wheelInfo) is actually outdated, since the chassis was moved
-    // according to the force acting from the wheels. So the cnter of the
+    // according to the force acting from the wheels. So the center of the
     // chassis is not at the center of the wheels anymore, it is somewhat
     // moved forward (depending on speed and fps). In very extreme cases
     // (see bug 2246) the center of the chassis can actually be ahead of the
@@ -1371,7 +1403,7 @@ void Kart::update(float dt)
     // partly tunnels through the track). While tunneling should not be
     // happening (since Z velocity is clamped), the epsilon is left in place
     // just to be on the safe side (it will not hit the chassis itself).
-    from = from/4 + Vec3(0,0.3f,0);
+    from = from/4 + (getTrans().getBasis() * Vec3(0,0.3f,0));
 
     m_terrain_info->update(getTrans().getBasis(), from);
 
@@ -1395,7 +1427,8 @@ void Kart::update(float dt)
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
         World::getWorld()->getTrack()->getAABB(&min, &max);
-        if(min->getY() - getXYZ().getY() > 17 && !m_flying &&
+
+        if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
            !getKartAnimation())
             new RescueAnimation(this);
     }
@@ -1995,13 +2028,13 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
             World::getWorld()->getTrack()->isPushBackEnabled())
     {
         int sector = lw->getSectorForKart(this);
-        if(sector!=QuadGraph::UNKNOWN_SECTOR)
+        if(sector!=Graph::UNKNOWN_SECTOR)
         {
             // Use the first predecessor node, which is the most
             // natural one (i.e. the one on the main driveline).
-            const GraphNode &gn = QuadGraph::get()->getNode(
-                QuadGraph::get()->getNode(sector).getPredecessor(0));
-            Vec3 impulse = gn.getCenter() - getXYZ();
+            const DriveNode* dn = DriveGraph::get()->getNode(
+                DriveGraph::get()->getNode(sector)->getPredecessor(0));
+            Vec3 impulse = dn->getCenter() - getXYZ();
             impulse.setY(0);
             if(impulse.getX() || impulse.getZ())
                 impulse.normalize();
@@ -2880,5 +2913,14 @@ void Kart::setOnScreenText(const wchar_t *text)
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.
 }   // setOnScreenText
+
+// ------------------------------------------------------------------------
+/** Returns the normal of the terrain the kart is over atm. This is
+  * defined even if the kart is flying.
+  */
+const Vec3& Kart::getNormal() const
+{
+    return m_terrain_info->getNormal();
+}   // getNormal
 
 /* EOF */

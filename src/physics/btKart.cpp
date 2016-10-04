@@ -22,6 +22,7 @@
 #include "LinearMath/btIDebugDraw.h"
 #include "BulletDynamics/ConstraintSolver/btContactConstraint.h"
 
+#include "graphics/material.hpp"
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -444,7 +445,9 @@ void btKart::updateVehicle( btScalar step )
     if(m_num_wheels_on_ground==0)
     {
         btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
-        btVector3 terrain_up(0,1,0);
+        btVector3 terrain_up =
+            m_kart->getMaterial() && m_kart->getMaterial()->hasGravity() ?
+            m_kart->getNormal() : Vec3(0, 1, 0);
         // Length of axis depends on the angle - i.e. the further awat
         // the kart is from being upright, the larger the applied impulse
         // will be, resulting in fast changes when the kart is on its
@@ -521,9 +524,9 @@ void btKart::updateVehicle( btScalar step )
     for (int i=0;i<m_wheelInfo.size();i++)
     {
         btWheelInfo& wheel = m_wheelInfo[i];
-        btVector3 relpos   = wheel.m_raycastInfo.m_hardPointWS
-                           - getRigidBody()->getCenterOfMassPosition();
-        btVector3 vel      = getRigidBody()->getVelocityInLocalPoint(relpos);
+        //btVector3 relpos   = wheel.m_raycastInfo.m_hardPointWS
+        //                   - getRigidBody()->getCenterOfMassPosition();
+        //btVector3 vel      = getRigidBody()->getVelocityInLocalPoint(relpos);
 
         if (wheel.m_raycastInfo.m_isInContact)
         {

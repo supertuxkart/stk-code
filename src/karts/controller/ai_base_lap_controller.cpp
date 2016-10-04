@@ -25,7 +25,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "modes/linear_world.hpp"
-#include "tracks/track.hpp"
+#include "tracks/drive_graph.hpp"
 #include "utils/constants.hpp"
 
 
@@ -37,7 +37,7 @@ I.e. the controller that takes over from a player (or AI) when the race is
 finished.
 
 This base class defines some basic operations:
-- It takes care on which part of the QuadGraph the AI currently is.
+- It takes care on which part of the DriveGraph the AI currently is.
 - It determines which path the AI should take (in case of shortcuts
   or forks in the road).
 
@@ -139,14 +139,14 @@ void  AIBaseLapController::newLap(int lap)
  */
 void AIBaseLapController::computePath()
 {
-    m_next_node_index.resize(QuadGraph::get()->getNumNodes());
-    m_successor_index.resize(QuadGraph::get()->getNumNodes());
+    m_next_node_index.resize(DriveGraph::get()->getNumNodes());
+    m_successor_index.resize(DriveGraph::get()->getNumNodes());
     std::vector<unsigned int> next;
-    for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
+    for(unsigned int i=0; i<DriveGraph::get()->getNumNodes(); i++)
     {
         next.clear();
         // Get all successors the AI is allowed to take.
-        QuadGraph::get()->getSuccessors(i, next, /*for_ai*/true);
+        DriveGraph::get()->getSuccessors(i, next, /*for_ai*/true);
         // In case of short cuts hidden for the AI it can be that a node
         // might not have a successor (since the first and last edge of
         // a hidden shortcut is ignored). Since in the case that the AI
@@ -154,7 +154,7 @@ void AIBaseLapController::computePath()
         // allowed way to drive, it should still be able to drive, so add
         // the non-AI successors of that node in this case.
         if(next.size()==0)
-            QuadGraph::get()->getSuccessors(i, next, /*for_ai*/false);
+            DriveGraph::get()->getSuccessors(i, next, /*for_ai*/false);
         // For now pick one part on random, which is not adjusted during the
         // race. Long term statistics might be gathered to determine the
         // best way, potentially depending on race position etc.
@@ -171,12 +171,12 @@ void AIBaseLapController::computePath()
     // Now compute for each node in the graph the list of the next 'look_ahead'
     // graph nodes. This is the list of node that is tested in checkCrashes.
     // If the look_ahead is too big, the AI can skip loops (see
-    // QuadGraph::findRoadSector for details), if it's too short the AI won't
+    // Graph::findRoadSector for details), if it's too short the AI won't
     // find too good a driveline. Note that in general this list should
     // be computed recursively, but since the AI for now is using only
     // (randomly picked) path this is fine
-    m_all_look_aheads.resize(QuadGraph::get()->getNumNodes());
-    for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
+    m_all_look_aheads.resize(DriveGraph::get()->getNumNodes());
+    for(unsigned int i=0; i<DriveGraph::get()->getNumNodes(); i++)
     {
         std::vector<int> l;
         int current = i;
@@ -199,24 +199,24 @@ void AIBaseLapController::computePath()
 void AIBaseLapController::update(float dt)
 {
     AIBaseController::update(dt);
-    if(QuadGraph::get())
+    if(DriveGraph::get())
     {
         // Update the current node:
         int old_node = m_track_node;
-        if(m_track_node!=QuadGraph::UNKNOWN_SECTOR)
+        if(m_track_node!=Graph::UNKNOWN_SECTOR)
         {
-            QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node,
+            DriveGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node,
                 &m_all_look_aheads[m_track_node]);
         }
         // If we can't find a proper place on the track, to a broader search
         // on off-track locations.
-        if(m_track_node==QuadGraph::UNKNOWN_SECTOR)
+        if(m_track_node==Graph::UNKNOWN_SECTOR)
         {
-            m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
+            m_track_node = DriveGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
         }
         // IF the AI is off track (or on a branch of the track it did not
         // select to be on), keep the old position.
-        if(m_track_node==QuadGraph::UNKNOWN_SECTOR ||
+        if(m_track_node==Graph::UNKNOWN_SECTOR ||
             m_next_node_index[m_track_node]==-1)
             m_track_node = old_node;
     }
@@ -233,7 +233,7 @@ void AIBaseLapController::update(float dt)
 unsigned int AIBaseLapController::getNextSector(unsigned int index)
 {
     std::vector<unsigned int> successors;
-    QuadGraph::get()->getSuccessors(index, successors);
+    DriveGraph::get()->getSuccessors(index, successors);
     return successors[0];
 }   // getNextSector
 
@@ -245,8 +245,8 @@ unsigned int AIBaseLapController::getNextSector(unsigned int index)
 float AIBaseLapController::steerToAngle(const unsigned int sector,
                                      const float add_angle)
 {
-    float angle = QuadGraph::get()->getAngleToNext(sector,
-                                                   getNextSector(sector));
+    float angle = DriveGraph::get()->getAngleToNext(sector,
+                                                    getNextSector(sector));
 
     //Desired angle minus current angle equals how many angles to turn
     float steer_angle = angle - m_kart->getHeading();

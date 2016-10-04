@@ -101,8 +101,7 @@ void CameraNormal::smoothMoveCamera(float dt)
     Vec3 m_kart_camera_position_with_offset = m_kart->getTrans()(camera_offset);
 
     // next target
-    core::vector3df current_target = m_kart->getXYZ().toIrrVector();
-    current_target.Y += 0.5f;
+    Vec3 current_target = m_kart->getTrans()(Vec3(0, 0.5f, 0));
     // new required position of camera
     core::vector3df wanted_position = m_kart_camera_position_with_offset.toIrrVector();
 
@@ -128,7 +127,7 @@ void CameraNormal::smoothMoveCamera(float dt)
 
     if(getMode()!=CM_FALLING)
         m_camera->setPosition(current_position);
-    m_camera->setTarget(current_target);//set new target
+    m_camera->setTarget(current_target.toIrrVector());//set new target
 
     assert(!std::isnan(m_camera->getPosition().X));
     assert(!std::isnan(m_camera->getPosition().Y));
@@ -252,8 +251,7 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
                            float side_way, float distance, float smoothing)
 {
     Vec3 wanted_position;
-    Vec3 wanted_target = m_kart->getXYZ();
-    wanted_target.setY(wanted_target.getY() + above_kart);
+    Vec3 wanted_target = m_kart->getTrans()(Vec3(0, above_kart, 0));
 
     float tan_up = tan(cam_angle);
     Vec3 relative_position(side_way,

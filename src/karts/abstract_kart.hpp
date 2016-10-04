@@ -441,6 +441,10 @@ public:
     // ------------------------------------------------------------------------
     virtual void crashed(const Material *m, const Vec3 &normal) = 0;
     // ------------------------------------------------------------------------
+    /** Returns the normal of the terrain the kart is over atm. This is
+     *  defined even if the kart is flying. */
+    virtual const Vec3& getNormal() const = 0;
+    // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
     virtual float getHoT() const = 0;
     // ------------------------------------------------------------------------

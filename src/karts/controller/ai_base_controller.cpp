@@ -86,9 +86,7 @@ float AIBaseController::steerToPoint(const Vec3 &point)
 
     // First translate and rotate the point the AI is aiming
     // at into the kart's local coordinate system.
-    btQuaternion q(btVector3(0,1,0), -m_kart->getHeading());
-    Vec3 p  = point - m_kart->getXYZ();
-    Vec3 lc = quatRotate(q, p);
+    Vec3 lc = m_kart->getTrans().inverse()(point);
 
     // The point the kart is aiming at can be reached 'incorrectly' if the
     // point is below the y=x line: Instead of aiming at that point directly
@@ -282,34 +280,50 @@ void AIBaseController::crashed(const Material *m)
 
 }   // crashed(Material)
 
-//-----------------------------------------------------------------------------
-void AIBaseController::checkPosition(const Vec3 &point, posData *pos_data,
-                                     Vec3 *lc, bool use_front_xyz) const
+// ----------------------------------------------------------------------------
+/** Determine the center point and radius of a circle given two points on
+ *  the circle and the tangent at the first point. This is done as follows:
+ *  1. Determine the line going through the center point start+end, which is
+ *     orthogonal to the vector from start to end. This line goes through the
+ *     center of the circle.
+ *  2. Determine the line going through the first point and is orthogonal
+ *     to the given tangent.
+ *  3. The intersection of these two lines is the center of the circle.
+ *  \param[in] end Second point on circle.
+ *  \param[out] center Center point of the circle (local coordinate).
+ *  \param[out] radius Radius of the circle.
+ */
+void AIBaseController::determineTurnRadius(const Vec3 &end, Vec3 *center,
+                                           float *radius) const
 {
-    // Convert to local coordinates from the point of view of current kart
-    btQuaternion q(btVector3(0, 1, 0), -m_kart->getHeading());
-    Vec3 p = point -
-        (use_front_xyz ? m_kart->getFrontXYZ() : m_kart->getXYZ());
-    Vec3 local_coordinates = quatRotate(q, p);
+    // Convert end point to local coordinate, so start will be 0, 0, 0
+    Vec3 lc = m_kart->getTrans().inverse()(end);
 
-    // Save local coordinates for later use if needed
-    if (lc) *lc = local_coordinates;
+    // 1) Line through middle of start+end
+    Vec3 mid = 0.5f * lc;
+    Vec3 direction = lc;
 
-    if (pos_data == NULL) return;
-    // lhs: tell whether it's left or right hand side
-    if (local_coordinates.getX() < 0)
-        pos_data->lhs = true;
+    Vec3 orthogonal(direction.getZ(), 0, -direction.getX());
+    Vec3 q1 = mid + orthogonal;
+    irr::core::line2df line1(mid.getX(), mid.getZ(),
+                             q1.getX(),  q1.getZ()  );
+
+    irr::core::line2df line2(0, 0, 1, 0);
+    irr::core::vector2df result;
+    if (line1.intersectWith(line2, result, /*checkOnlySegments*/false))
+    {
+        Vec3 lc_center(result.X, 0, result.Y);
+        if (center)
+            *center = lc_center;
+        *radius = lc_center.length();
+    }
     else
-        pos_data->lhs = false;
+    {
+        // No intersection. In this case assume that the two points are
+        // on a semicircle, in which case the center is at 0.5*(start+end):
+        if (center)
+            *center = mid;
+        *radius = 0.5f*(lc).length();
+    }
 
-    // behind: tell whether it's behind or not
-    if (local_coordinates.getZ() < 0)
-        pos_data->behind = true;
-    else
-        pos_data->behind = false;
-
-    pos_data->angle = atan2(fabsf(local_coordinates.getX()),
-        fabsf(local_coordinates.getZ()));
-    pos_data->distance = p.length();
-
-}   //  checkPosition
+}   // determineTurnRadius

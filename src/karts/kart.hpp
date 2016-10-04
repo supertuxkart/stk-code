@@ -401,7 +401,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if the kart is close to the ground, used to dis/enable
      *  the upright constraint to allow for more realistic explosions. */
-    bool           isNearGround     () const;
+    bool isNearGround() const;
     // ------------------------------------------------------------------------
     /** Returns true if the kart is eliminated.  */
     virtual bool isEliminated() const { return m_eliminated; }
@@ -445,6 +445,10 @@ public:
     virtual const TerrainInfo *getTerrainInfo() const { return m_terrain_info; }
     // ------------------------------------------------------------------------
     virtual void setOnScreenText(const wchar_t *text);
+    // ------------------------------------------------------------------------
+    /** Returns the normal of the terrain the kart is over atm. This is
+     *  defined even if the kart is flying. */
+    virtual const Vec3& getNormal() const;
     // ------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }

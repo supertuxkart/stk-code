@@ -278,9 +278,9 @@ void Powerup::use()
             Vec3 normal;
             const Material* material_hit;
             Vec3 pos = m_kart->getXYZ();
-            Vec3 to=pos+Vec3(0, -10000, 0);
+            Vec3 to  = pos+ m_kart->getTrans().getBasis() * Vec3(0, -10000, 0);
             world->getTrack()->getTriangleMesh().castRay(pos, to, &hit_point,
-                                                     &material_hit, &normal);
+                                                       &material_hit, &normal);
             // This can happen if the kart is 'over nothing' when dropping
             // the bubble gum
             if(!material_hit)
@@ -290,8 +290,7 @@ void Powerup::use()
             Powerup::adjustSound();
             m_sound_use->play();
 
-            pos.setY(hit_point.getY()-0.05f);
-
+            pos = hit_point + m_kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
             ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_kart);
         }
         else // if the kart is looking forward, use the bubblegum as a shield

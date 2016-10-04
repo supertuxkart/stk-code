@@ -25,6 +25,9 @@
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
+#include "tracks/arena_graph.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/vec3.hpp"
@@ -37,10 +40,14 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 {
     assert(type != ITEM_TRIGGER); // use other constructor for that
 
-    m_distance_2        = 0.8f;
+    m_distance_2        = 1.2f;
     initItem(type, xyz);
-    // Sets heading to 0, and sets pitch and roll depending on the normal. */
-    m_original_hpr      = Vec3(0, normal);
+
+    Vec3 axis = -normal.cross(Vec3(0, 1, 0));
+    if (axis.length() == 0)
+        axis = Vec3(0, 0, 1);
+    m_original_rotation = btQuaternion(axis, normal.angle(Vec3(0, 1, 0)));
+    m_rotation_angle    = 0.0f;
     m_original_mesh     = mesh;
     m_original_lowmesh  = lowres_mesh;
     m_listener          = NULL;
@@ -76,7 +83,9 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     World::getWorld()->getTrack()->adjustForFog(m_node);
     m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
     m_node->setPosition(xyz.toIrrVector());
-    m_node->setRotation(m_original_hpr.toIrrHPR());
+    Vec3 hpr;
+    hpr.setHPR(m_original_rotation);
+    m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
 
@@ -90,8 +99,8 @@ Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
 {
     m_distance_2        = distance*distance;
     initItem(ITEM_TRIGGER, xyz);
-    // Sets heading to 0, and sets pitch and roll depending on the normal. */
-    m_original_hpr      = Vec3(0, 0, 0);
+    m_original_rotation = btQuaternion(0, 0, 0, 1);
+    m_rotation_angle    = 0.0f;
     m_original_mesh     = NULL;
     m_original_lowmesh  = NULL;
     m_node              = NULL;
@@ -126,31 +135,25 @@ void Item::initItem(ItemType type, const Vec3 &xyz)
     }
     // Now determine in which quad this item is, and its distance
     // from the center within this quad.
-    m_graph_node = QuadGraph::UNKNOWN_SECTOR;
-    QuadGraph* currentQuadGraph = QuadGraph::get();
+    m_graph_node = Graph::UNKNOWN_SECTOR;
+    m_distance_from_center = 9999.9f;
+    m_avoidance_points[0] = NULL;
+    m_avoidance_points[1] = NULL;
 
-    // Check that QuadGraph exist (it might not in battle mode for eg)
-    if (currentQuadGraph != NULL)
+    // Check that Graph exist (it might not in battle mode without navmesh)
+    if (Graph::get())
     {
-      QuadGraph::get()->findRoadSector(xyz, &m_graph_node);
+        Graph::get()->findRoadSector(xyz, &m_graph_node);
     }
-
-    if(m_graph_node==QuadGraph::UNKNOWN_SECTOR)
+    if (DriveGraph::get() && m_graph_node != Graph::UNKNOWN_SECTOR)
     {
-        m_graph_node = -1;
-        m_distance_from_center = 9999.9f;   // is not used
-        m_avoidance_points[0] = NULL;
-        m_avoidance_points[1] = NULL;
-    }
-    else
-    {
-        // Item is on quad graph. Pre-compute the distance from center
+        // Item is on drive graph. Pre-compute the distance from center
         // of this item, which is used by the AI (mostly for avoiding items)
         Vec3 distances;
-        QuadGraph::get()->spatialToTrack(&distances, m_xyz, m_graph_node);
+        DriveGraph::get()->spatialToTrack(&distances, m_xyz, m_graph_node);
         m_distance_from_center = distances.getX();
-        const GraphNode &gn = QuadGraph::get()->getNode(m_graph_node);
-        const Vec3 right = gn.getRightUnitVector();
+        const DriveNode* dn = DriveGraph::get()->getNode(m_graph_node);
+        const Vec3& right = dn->getRightUnitVector();
         // Give it 10% more space, since the kart will not always come
         // parallel to the drive line.
         Vec3 delta = right * sqrt(m_distance_2) * 1.3f;
@@ -223,7 +226,9 @@ void Item::switchBack()
     }
 
     World::getWorld()->getTrack()->adjustForFog(m_node);
-    m_node->setRotation(m_original_hpr.toIrrHPR());
+    Vec3 hpr;
+    hpr.setHPR(m_original_rotation);
+    m_node->setRotation(hpr.toIrrHPR());
 }   // switchBack
 
 //-----------------------------------------------------------------------------
@@ -320,12 +325,17 @@ void Item::update(float dt)
 
         if(!m_rotate || m_node == NULL) return;
         // have it rotate
-        Vec3 rotation(0, dt*M_PI, 0);
-        core::vector3df r = m_node->getRotation();
-        r.Y += dt*180.0f;
-        if(r.Y>360.0f) r.Y -= 360.0f;
+        m_rotation_angle += dt * M_PI ;
+        if (m_rotation_angle > M_PI * 2) m_rotation_angle -= M_PI * 2;
 
-        m_node->setRotation(r);
+        btMatrix3x3 m;
+        m.setRotation(m_original_rotation);
+        btQuaternion r = btQuaternion(m.getColumn(1), m_rotation_angle) *
+            m_original_rotation;
+
+        Vec3 hpr;
+        hpr.setHPR(r);
+        m_node->setRotation(hpr.toIrrHPR());
         return;
     }   // not m_collected
 }   // update

@@ -140,8 +140,8 @@ void Moveable::update(float dt)
  */
 void Moveable::updatePosition()
 {
-    Vec3 forw_vec = m_transform.getBasis().getColumn(0);
-    m_heading     = -atan2f(forw_vec.getZ(), forw_vec.getX());
+    Vec3 forw_vec = m_transform.getBasis().getColumn(2);
+    m_heading     = atan2f(forw_vec.getX(), forw_vec.getZ());
 
     // The pitch in hpr is in between -pi and pi. But for the camera it
     // must be restricted to -pi/2 and pi/2 - so recompute it by restricting

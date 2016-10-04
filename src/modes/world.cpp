@@ -27,6 +27,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
@@ -164,11 +165,11 @@ void World::init()
     // constructor is called, so the wrong race gui would be created.
     createRaceGUI();
 
-	RewindManager::create();
+    RewindManager::create();
 
     // Grab the track file
     m_track = track_manager->getTrack(race_manager->getTrackName());
-	m_script_engine = new Scripting::ScriptEngine();
+    m_script_engine = new Scripting::ScriptEngine();
     if(!m_track)
     {
         std::ostringstream msg;
@@ -241,7 +242,7 @@ void World::init()
  */
 void World::reset()
 {
-	RewindManager::get()->reset();
+    RewindManager::get()->reset();
 
     // If m_saved_race_gui is set, it means that the restart was done
     // when the race result gui was being shown. In this case restore the
@@ -706,69 +707,16 @@ void World::resetAllKarts()
         }
     }
 
-    bool all_finished=false;
-    // kart->isInRest() is not fully correct, since it only takes the
-    // velocity in count, which might be close to zero when the kart
-    // is just hitting the floor, before being pushed up again by
-    // the suspension. So we just do a longer initial simulation,
-    // which should be long enough for all karts to be firmly on ground.
-    for(int i=0; i<60; i++) m_physics->update(1.f/60.f);
-
-    // Stil wait will all karts are in rest (and handle the case that a kart
-    // fell through the ground, which can happen if a kart falls for a long
-    // time, therefore having a high speed when hitting the ground.
-    int count = 0;
-    while(!all_finished)
+    // Do a longer initial simulation, which should be long enough for all
+    // karts to be firmly on ground.
+    float g = World::getWorld()->getTrack()->getGravity();
+    for (KartList::iterator i = m_karts.begin(); i != m_karts.end(); i++)
     {
-        if (count++ > 100)
-        {
-            Log::error("World", "Infinite loop waiting for all_finished?");
-            break;
-        }
-        m_physics->update(1.f/60.f);
-        all_finished=true;
-        for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
-        {
-            if ((*i)->isGhostKart()) continue;
-            if(!(*i)->isInRest())
-            {
-                Vec3            normal;
-                Vec3            hit_point;
-                const Material *material;
-                // We can't use (*i)->getXYZ(), since this is only defined
-                // after update() was called. Instead we have to get the
-                // real position of the rigid body.
-                btTransform     t;
-                (*i)->getBody()->getMotionState()->getWorldTransform(t);
-                // This test can not be done only once before the loop, since
-                // it can happen that the kart falls through the track later!
-                Vec3 to = t.getOrigin()+Vec3(0, -10000, 0);
-                m_track->getTriangleMesh().castRay(t.getOrigin(), to,
-                                                   &hit_point, &material,
-                                                   &normal);
-                if(!material)
-                {
-                    Log::error("World",
-                               "No valid starting position for kart %d "
-                               "on track %s.",
-                               (int)(i-m_karts.begin()),
-                               m_track->getIdent().c_str());
-                    if (UserConfigParams::m_artist_debug_mode)
-                    {
-                        Log::warn("World", "Activating fly mode.");
-                        (*i)->flyUp();
-                        continue;
-                    }
-                    else
-                    {
-                        exit(-1);
-                    }
-                }
-                all_finished=false;
-                break;
-            }
-        }
-    }   // while
+        if ((*i)->isGhostKart()) continue;
+        (*i)->getBody()->setGravity((*i)->getMaterial()->hasGravity() ?
+            (*i)->getNormal() * -g : Vec3(0, -g, 0));
+    }
+    for(int i=0; i<60; i++) m_physics->update(1.f/60.f);
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
@@ -806,8 +754,8 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     btTransform pos(transform);
 
     // Move the kart
-    Vec3 xyz = pos.getOrigin() + btVector3(0, 0.5f*kart->getKartHeight(),0.0f);
-
+    Vec3 xyz = pos.getOrigin() +
+        pos.getBasis() * Vec3(0, 0.5f*kart->getKartHeight(), 0);
     pos.setOrigin(xyz);
     kart->setXYZ(xyz);
     kart->setRotation(pos.getRotation());
@@ -1321,20 +1269,36 @@ void World::unpause()
 void World::delayedSelfDestruct()
 {
     m_self_destruct = true;
-}
+}   // delayedSelfDestruct
 
 //-----------------------------------------------------------------------------
-
 void World::escapePressed()
 {
     new RacePausedDialog(0.8f, 0.6f);
-}
+}   // escapePressed
 
 //-----------------------------------------------------------------------------
-
 bool World::isFogEnabled() const
 {
     return !m_force_disable_fog && (m_track != NULL && m_track->isFogEnabled());
-}
+}   // isFogEnabled
+
+// ----------------------------------------------------------------------------
+/** Returns the start transform with the give index.
+ *  \param rescue_pos Index of the start position to be returned.
+ *  \returns The transform of the corresponding start position.
+ */
+btTransform World::getRescueTransform(unsigned int rescue_pos) const
+{
+    return m_track->getStartTransform(rescue_pos);
+}   // getRescueTransform
+
+//-----------------------------------------------------------------------------
+/** Uses the start position as rescue positions, override if necessary
+ */
+unsigned int World::getNumberOfRescuePositions() const
+{
+    return m_track->getNumberOfStartPositions();
+}   // getNumberOfRescuePositions
 
 /* EOF */

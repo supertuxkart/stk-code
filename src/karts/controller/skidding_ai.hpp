@@ -45,11 +45,11 @@
 
 #include "karts/controller/ai_base_lap_controller.hpp"
 #include "race/race_manager.hpp"
-#include "tracks/graph_node.hpp"
+#include "tracks/drive_node.hpp"
 #include "utils/random_generator.hpp"
 
 class LinearWorld;
-class QuadGraph;
+class DriveGraph;
 class ShowCurve;
 class Track;
 
@@ -155,7 +155,7 @@ private:
     int m_start_kart_crash_direction;
 
     /** The direction of the track where the kart is on atm. */
-    GraphNode::DirectionType m_current_track_direction;
+    DriveNode::DirectionType m_current_track_direction;
 
     /** The radius of the curve the kart is currently driving. Undefined
      *  when being on a straigt section. */
@@ -249,13 +249,13 @@ private:
     void  computeNearestKarts();
     void  handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                            int last_node);
-    bool  handleSelectedItem(float kart_aim_angle, Vec3 *aim_point);
+    bool  handleSelectedItem(Vec3 kart_aim_direction, Vec3 *aim_point);
     bool  steerToAvoid(const std::vector<const Item *> &items_to_avoid,
-                       const core::line2df &line_to_target,
+                       const core::line3df &line_to_target,
                        Vec3 *aim_point);
     bool  hitBadItemWhenAimAt(const Item *item,
                               const std::vector<const Item *> &items_to_avoid);
-    void  evaluateItems(const Item *item, float kart_aim_angle,
+    void  evaluateItems(const Item *item, Vec3 kart_aim_direction,
                         std::vector<const Item *> *items_to_avoid,
                         std::vector<const Item *> *items_to_collect);
 
@@ -265,11 +265,6 @@ private:
     void  findNonCrashingPoint(Vec3 *result, int *last_node);
 
     void  determineTrackDirection();
-    void  determineTurnRadius(const Vec3 &start,
-                              const Vec3 &start_direction,
-                              const Vec3 &end,
-                              Vec3 *center,
-                              float *radius);
     virtual bool canSkid(float steer_fraction);
     virtual void setSteering(float angle, float dt);
     void handleCurve();

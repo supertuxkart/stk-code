@@ -195,7 +195,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "tracks/battle_graph.hpp"
+#include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/command_line.hpp"
@@ -902,13 +902,16 @@ int handleCmdLine()
     }
     if(CommandLine::has("--battle-ai-stats"))
     {
+        std::string track;
+        if (!CommandLine::has("--track", &track))
+            track = "temple";
         UserConfigParams::m_arena_ai_stats=true;
         race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
         std::vector<std::string> l;
         for (int i = 0; i < 8; i++)
             l.push_back("tux");
         race_manager->setDefaultAIKartList(l);
-        race_manager->setTrack("temple");
+        race_manager->setTrack(track);
         race_manager->setNumKarts(8);
         race_manager->setDifficulty(RaceManager::Difficulty(3));
         UserConfigParams::m_no_start_screen = true;
@@ -1887,8 +1890,8 @@ void runUnitTests()
     Log::info("UnitTest", "Kart characteristics");
     CombinedCharacteristic::unitTesting();
 
-    Log::info("UnitTest", "Battle Graph");
-    BattleGraph::unitTesting();
+    Log::info("UnitTest", "Arena Graph");
+    ArenaGraph::unitTesting();
 
     Log::info("UnitTest", "Fonts for translation");
     font_manager->unitTesting();

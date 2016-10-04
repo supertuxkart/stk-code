@@ -37,13 +37,17 @@
 class ExplosionAnimation: public AbstractKartAnimation
 {
 protected:
-    /** The coordinates where the kart was hit originally. */
+    /** The coordinates where the kart was hit originally, it will be increased
+     *  later. */
     Vec3 m_xyz;
 
-    /** The original Y coordinate. The kart needs to be restored accurately
+    /** The original coordinates. The kart needs to be restored accurately
      *  otherwise due to floating point errors, time step size variations,
      *  a kart can be restarted under the track. */
-    float m_orig_y;
+    Vec3 m_orig_xyz;
+
+    /** The normal of kart when it started to explode. */
+    Vec3 m_normal;
 
     /** The kart's current rotation. */
     Vec3 m_curr_rotation;
