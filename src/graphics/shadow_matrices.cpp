@@ -314,20 +314,6 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
 
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
-    float FarValues[] =
-    {
-        ShadowMatrices::m_shadow_split[1],
-        ShadowMatrices::m_shadow_split[2],
-        ShadowMatrices::m_shadow_split[3],
-        ShadowMatrices::m_shadow_split[4],
-    };
-    float NearValues[] =
-    {
-        ShadowMatrices::m_shadow_split[0],
-        ShadowMatrices::m_shadow_split[1],
-        ShadowMatrices::m_shadow_split[2],
-        ShadowMatrices::m_shadow_split[3]
-    };
 
     float tmp[16 * 9 + 2];
     memcpy(tmp, irr_driver->getViewMatrix().pointer(),          16 * sizeof(float));
@@ -358,6 +344,21 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
         const Vec3 vmin = btmin, vmax = btmax;
         core::aabbox3df trackbox(vmin.toIrrVector(), vmax.toIrrVector() -
             core::vector3df(0, 30, 0));
+
+        float FarValues[] =
+        {
+            ShadowMatrices::m_shadow_split[1],
+            ShadowMatrices::m_shadow_split[2],
+            ShadowMatrices::m_shadow_split[3],
+            ShadowMatrices::m_shadow_split[4],
+        };
+        float NearValues[] =
+        {
+            ShadowMatrices::m_shadow_split[0],
+            ShadowMatrices::m_shadow_split[1],
+            ShadowMatrices::m_shadow_split[2],
+            ShadowMatrices::m_shadow_split[3]
+        };
 
         // Shadow Matrixes and cameras
         for (unsigned i = 0; i < 4; i++)

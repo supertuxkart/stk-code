@@ -396,9 +396,11 @@ void handleXmasMode()
  */
 bool isEasterMode(int day, int month, int year, int before_after_days)
 {
-    switch (UserConfigParams::m_easter_ear_mode)
-    {
-    case 0:
+    if (UserConfigParams::m_easter_ear_mode == 1) {
+        return true;
+    }
+
+    if (UserConfigParams::m_easter_ear_mode == 0)
     {
         // Compute Easter date, based on wikipedia formula
         // http://en.wikipedia.org/wiki/Computus
@@ -430,12 +432,9 @@ bool isEasterMode(int day, int month, int year, int before_after_days)
         }
         return (month > easter_start_month || (month == easter_start_month && day >= easter_start_day)) &&
                (month < easter_end_month   || (month == easter_end_month   && day <= easter_end_day));
-        break;
     }
-    case 1:  return true;  break;
-    default: return false; break;
-    }   // switch m_xmas_mode
 
+    return false;
 }   // isEasterMode(day, month, year, before_after_days)
 
 // ============================================================================

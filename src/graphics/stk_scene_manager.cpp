@@ -723,7 +723,7 @@ PROFILER_POP_CPU_MARKER();
     ListInstancedMatDetails::getInstance()->clear();
     ListInstancedMatUnlit::getInstance()->clear();
 
-    size_t SolidPoly = 0, ShadowPoly = 0, MiscPoly = 0;
+    size_t SolidPoly = 0, ShadowPoly = 0;
 
     PROFILER_PUSH_CPU_MARKER("- Draw Command upload", 0xFF, 0x0, 0xFF);
 
@@ -867,6 +867,8 @@ PROFILER_POP_CPU_MARKER();
                 glBindBuffer(GL_DRAW_INDIRECT_BUFFER, RSMPassCmd::getInstance()->drawindirectcmd);
                 RSMCmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
             }
+
+            size_t MiscPoly = 0;
 
             // Default Material
             RSMPassCmd::getInstance()->Offset[Material::SHADERTYPE_SOLID] = current_cmd;

@@ -1982,7 +1982,6 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
     m_curve[CURVE_KART]->addPoint(m_kart->getTrans()(forw)+eps);
 #endif
     *last_node = m_next_node_index[m_track_node];
-    int target_sector;
 
     Vec3 direction;
     Vec3 step_track_coord;
@@ -1994,7 +1993,7 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
     {
         // target_sector is the sector at the longest distance that we can
         // drive to without crashing with the track.
-        target_sector = m_next_node_index[*last_node];
+        int target_sector = m_next_node_index[*last_node];
 
         //direction is a vector from our kart to the sectors we are testing
         direction = DriveGraph::get()->getNode(target_sector)->getCenter()
@@ -2078,12 +2077,9 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
     *last_node = m_next_node_index[m_track_node];
     float angle = DriveGraph::get()->getAngleToNext(m_track_node,
                                               m_successor_index[m_track_node]);
-    int target_sector;
-
     Vec3 direction;
     Vec3 step_track_coord;
 
-    float angle1;
     // The original while(1) loop is replaced with a for loop to avoid
     // infinite loops (which we had once or twice). Usually the number
     // of iterations in the while loop is less than 7.
@@ -2091,8 +2087,8 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
     {
         // target_sector is the sector at the longest distance that we can
         // drive to without crashing with the track.
-        target_sector = m_next_node_index[*last_node];
-        angle1 = DriveGraph::get()->getAngleToNext(target_sector,
+        int target_sector = m_next_node_index[*last_node];
+        float angle1 = DriveGraph::get()->getAngleToNext(target_sector,
                                                 m_successor_index[target_sector]);
         // In very sharp turns this algorithm tends to aim at off track points,
         // resulting in hitting a corner. So test for this special case and
