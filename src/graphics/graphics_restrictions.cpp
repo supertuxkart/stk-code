@@ -369,6 +369,7 @@ public:
         // -------------
         switch(m_card_test)
         {
+        case CARD_IGNORE: break;   // always true
         case CARD_IS:
             if(card!=m_card_name) return false;
             break;
