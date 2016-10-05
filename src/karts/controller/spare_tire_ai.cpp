@@ -20,6 +20,7 @@
 
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_gfx.hpp"
+#include "karts/max_speed.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
@@ -51,6 +52,9 @@ void SpareTireAI::reset()
 void SpareTireAI::update(float dt)
 {
     assert(!m_fixed_target_nodes.empty());
+
+    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.5f, /*fade_in_time*/0.0f);
+
     BattleAI::update(dt);
     m_timer -= dt;
     if (m_timer < 0.0f)

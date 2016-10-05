@@ -35,7 +35,6 @@ private:
 
     virtual void  findClosestKart(bool use_difficulty) OVERRIDE {}
     virtual void  findTarget() OVERRIDE;
-    virtual float getSpeedCap() const OVERRIDE { return 0.7f; }
     void          findDefaultPath();
 public:
                  SpareTireAI(AbstractKart *kart);
