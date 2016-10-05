@@ -65,20 +65,6 @@ BattleAI::~BattleAI()
 }   //  ~BattleAI
 
 //-----------------------------------------------------------------------------
-/** Resets the AI when a race is restarted.
- */
-void BattleAI::reset()
-{
-    ArenaAI::reset();
-}   // reset
-
-//-----------------------------------------------------------------------------
-void BattleAI::update(float dt)
-{
-    ArenaAI::update(dt);
-}   // update
-
-//-----------------------------------------------------------------------------
 void BattleAI::findClosestKart(bool use_difficulty)
 {
     float distance = 99999.9f;

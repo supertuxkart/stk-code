@@ -23,13 +23,17 @@
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "items/item_manager.hpp"
+#include "karts/kart.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
+#include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
 
 #include <string>
@@ -63,6 +67,41 @@ void ThreeStrikesBattle::init()
 {
     WorldWithRank::init();
     m_display_rank = false;
+
+    // Spare tire karts only added with large arena
+    const int all_nodes =
+        ArenaGraph::get() ? ArenaGraph::get()->getNumNodes() : 0;
+    if (all_nodes > 200)
+    {
+        const unsigned int max_sta_num = unsigned(m_karts.size() * 0.8f);
+        for (int i = 0; i < all_nodes; i++)
+        {
+            // Pre-spawn the spare tire karts on the item position, preventing
+            // affecting current karts
+            Item* item = ItemManager::get()->getFirstItemInQuad(i);
+            if (item == NULL) continue;
+            btTransform t;
+            t.setOrigin(item->getXYZ());
+            t.setRotation(item->getRotation());
+
+            AbstractKart* sta = new Kart("nolok", m_karts.size(),
+                m_karts.size() + 1, t, PLAYER_DIFFICULTY_NORMAL, KRT_BLUE);
+            sta->init(RaceManager::KartType::KT_AI);
+            sta->setController(new SpareTireAI(sta));
+
+            m_karts.push_back(sta);
+            m_spare_tire_karts.push_back(sta);
+            m_kart_track_sector.push_back(new TrackSector());
+            m_position_index.push_back(0);
+#ifdef DEBUG
+            m_position_used.push_back(false);
+#endif
+            m_track->adjustForFog(sta->getNode());
+
+            if (m_spare_tire_karts.size() >= max_sta_num) break;
+        }
+    }
+
     m_kart_info.resize(m_karts.size());
 }   // ThreeStrikesBattle
 
@@ -73,6 +112,7 @@ void ThreeStrikesBattle::init()
 ThreeStrikesBattle::~ThreeStrikesBattle()
 {
     m_tires.clearWithoutDeleting();
+    m_spare_tire_karts.clear();
 
     irr_driver->grabAllTextures(m_tire);
     // Remove the mesh from the cache so that the mesh is properly
@@ -88,14 +128,27 @@ void ThreeStrikesBattle::reset()
 {
     WorldWithRank::reset();
 
+    m_sta_spawned_count = 1;
     const unsigned int kart_amount = (unsigned int)m_karts.size();
 
     for(unsigned int n=0; n<kart_amount; n++)
     {
-        m_kart_info[n].m_lives = 3;
-
-        // no positions in this mode
-        m_karts[n]->setPosition(-1);
+        // Eliminate all spare tire karts first, they will be spawned if needed
+        bool is_sta = false;
+        if (dynamic_cast<SpareTireAI*>(m_karts[n]->getController()) != NULL)
+        {
+            m_kart_info[n].m_lives = -1;
+            m_karts[n]->setPosition(-1);
+            m_karts[n]->finishedRace(0.0f);
+            eliminateKart(n, /*notify_of_elimination*/ false);
+            is_sta = true;
+        }
+        else
+        {
+            m_kart_info[n].m_lives = 3;
+            // no positions in this mode
+            m_karts[n]->setPosition(-1);
+        }
 
         scene::ISceneNode* kart_node = m_karts[n]->getNode();
 
@@ -107,11 +160,11 @@ void ThreeStrikesBattle::reset()
 
             if (core::stringc(curr->getName()) == "tire1")
             {
-                curr->setVisible(true);
+                curr->setVisible(!is_sta);
             }
             else if (core::stringc(curr->getName()) == "tire2")
             {
-                curr->setVisible(true);
+                curr->setVisible(!is_sta);
             }
         }
 
@@ -164,6 +217,15 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
 {
     if (isRaceOver()) return;
+
+    SpareTireAI* sta =
+        dynamic_cast<SpareTireAI*>(m_karts[kart_id]->getController());
+    if (sta)
+    {
+        // Unspawn the spare tire kart if it get hit
+        sta->unspawn();
+        return;
+    }
 
     assert(kart_id < m_karts.size());
     // make kart lose a life, ignore if in profiling mode
@@ -304,6 +366,37 @@ void ThreeStrikesBattle::update(float dt)
 {
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
+
+    const float period = 20.0f;
+    if (!m_spare_tire_karts.empty() &&
+        period < getTimeSinceStart() / float(m_sta_spawned_count))
+    {
+        // Spawn spare tire kart when necessary
+        m_sta_spawned_count++;
+        // Formula : Total num of karts with life != 3 *
+        // time period / time since start, so towards the end of game,
+        // karts are less likely to gain back a life.
+        int kart_has_few_lives = 0;
+        for (unsigned int i = 0; i < m_kart_info.size(); i++)
+            m_kart_info[i].m_lives != 3 ? kart_has_few_lives++ : 0;
+        float ratio = kart_has_few_lives * period / getTimeSinceStart();
+        if (ratio > 1.0f)
+        {
+            unsigned int spawn_sta = unsigned(ratio);
+            if (spawn_sta > m_spare_tire_karts.size())
+                spawn_sta = m_spare_tire_karts.size();
+            m_race_gui->addMessage(_P("%i spare tire kart has been spawned!",
+                                      "%i spare tire karts have been spawned!",
+                                      spawn_sta), NULL, 2.0f);
+            for (unsigned int i = 0; i < spawn_sta; i++)
+            {
+                SpareTireAI* sta = dynamic_cast<SpareTireAI*>
+                    (m_spare_tire_karts[i]->getController());
+                assert(sta);
+                sta->spawn(period / 2);
+            }
+        }
+    }
 
     if (m_track->hasNavMesh())
         updateSectorForKarts();
@@ -476,6 +569,8 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
     const unsigned int kart_amount = getNumKarts();
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
+        if (dynamic_cast<SpareTireAI*>(m_karts[i]->getController()) != NULL)
+            continue;
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
 
         // reset color
@@ -509,6 +604,16 @@ void ThreeStrikesBattle::enterRaceOverState()
 {
     WorldWithRank::enterRaceOverState();
 
+    // Unspawn all spare tire karts if neccesary
+    for (unsigned int i = 0; i < m_spare_tire_karts.size(); i++)
+    {
+        SpareTireAI* sta =
+            dynamic_cast<SpareTireAI*>(m_spare_tire_karts[i]->getController());
+        assert(sta);
+        if (sta->needUpdate())
+            sta->unspawn();
+    }
+
     if (UserConfigParams::m_arena_ai_stats)
     {
         float runtime = (irr_driver->getRealTime()-m_start_time)*0.001f;
@@ -521,3 +626,15 @@ void ThreeStrikesBattle::enterRaceOverState()
     }
 
 }   // enterRaceOverState
+
+//-----------------------------------------------------------------------------
+bool ThreeStrikesBattle::spareTireKartsSpawned() const
+{
+    // Spare tire karts are spawned if at least 1 of them needs update
+    assert(!m_spare_tire_karts.empty());
+    SpareTireAI* sta =
+        dynamic_cast<SpareTireAI*>(m_spare_tire_karts[0]->getController());
+    assert(sta);
+
+    return sta->needUpdate();
+}   // spareTireKartsSpawned

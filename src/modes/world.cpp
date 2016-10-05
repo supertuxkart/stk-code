@@ -38,6 +38,7 @@
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "karts/controller/test_ai.hpp"
 #include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
@@ -971,8 +972,11 @@ void World::update(float dt)
     const int kart_amount = (int)m_karts.size();
     for (int i = 0 ; i < kart_amount; ++i)
     {
+        SpareTireAI* sta =
+            dynamic_cast<SpareTireAI*>(m_karts[i]->getController());
         // Update all karts that are not eliminated
-        if(!m_karts[i]->isEliminated()) m_karts[i]->update(dt) ;
+        if(!m_karts[i]->isEliminated() || (sta && sta->needUpdate()))
+            m_karts[i]->update(dt);
     }
     PROFILER_POP_CPU_MARKER();
 

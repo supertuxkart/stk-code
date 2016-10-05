@@ -343,7 +343,8 @@ void ArenaAI::configSpeed()
     else
     {
         // Otherwise accelerate
-        m_controls->setAccel(stk_config->m_ai_acceleration * handicap);
+        m_controls->setAccel(stk_config->m_ai_acceleration * handicap *
+                             getSpeedCap());
     }
 }   // configSpeed
 

@@ -77,6 +77,9 @@ private:
     int m_start_time;
     int m_total_hit;
 
+    std::vector<AbstractKart*> m_spare_tire_karts;
+    int m_sta_spawned_count;
+
 public:
 
     /** Used to show a nice graph when battle is over */
@@ -115,6 +118,9 @@ public:
 
     void updateKartRanks();
     void increaseRescueCount() { m_total_rescue++; }
+    void addKartLife(unsigned int id) { m_kart_info[id].m_lives++; }
+    int getKartLife(unsigned int id) const { return m_kart_info[id].m_lives; }
+    bool spareTireKartsSpawned() const;
 };   // ThreeStrikesBattles
 
 

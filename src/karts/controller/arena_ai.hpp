@@ -128,6 +128,7 @@ private:
     virtual bool  isWaiting() const = 0;
     virtual bool  isKartOnRoad() const = 0;
     virtual void  resetAfterStop() {};
+    virtual float getSpeedCap() const { return 1.0f; }
 public:
                  ArenaAI(AbstractKart *kart);
     virtual     ~ArenaAI() {};
