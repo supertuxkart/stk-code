@@ -96,7 +96,7 @@ void History::updateSaving(float dt)
     m_all_deltas[m_current] = dt;
 
     World *world = World::getWorld();
-    unsigned int num_karts = world->getNumKarts();
+    unsigned int num_karts = race_manager->getNumberOfKarts();
     unsigned int index     = m_current*num_karts;
     for(unsigned int i=0; i<num_karts; i++)
     {
