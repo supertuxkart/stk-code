@@ -332,7 +332,6 @@ void ArenaAI::configSpeed()
     const float MIN_SPEED = 5.0f;
     const float handicap = (m_cur_difficulty == RaceManager::DIFFICULTY_EASY 
                             ? 0.7f : 1.0f                                   );
-    m_controls->setAccel(stk_config->m_ai_acceleration * handicap);
 
     const float max_turn_speed = m_kart->getSpeedForTurnRadius(m_turn_radius);
     if ((m_kart->getSpeed() > max_turn_speed || forceBraking()) &&
