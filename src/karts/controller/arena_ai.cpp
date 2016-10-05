@@ -78,8 +78,8 @@ void ArenaAI::reset()
 void ArenaAI::update(float dt)
 {
     // This is used to enable firing an item backwards.
-    m_controls->m_look_back = false;
-    m_controls->m_nitro     = false;
+    m_controls->setLookBack(false);
+    m_controls->setNitro(false);
 
     // Don't do anything if there is currently a kart animations shown.
     if (m_kart->getKartAnimation())
@@ -129,8 +129,8 @@ void ArenaAI::update(float dt)
     if (m_kart->getSpeed() > 15.0f && !m_is_uturn && m_turn_radius > 30.0f &&
         !ignorePathFinding())
     {
-        // Only use nitro when turn radius is large
-        m_controls->m_nitro = true;
+        // Only use nitro when turn angle is big (180 - angle)
+        m_controls->setNitro(true);
     }
 
     if (m_is_uturn)
@@ -323,27 +323,27 @@ void ArenaAI::checkIfStuck(const float dt)
  */
 void ArenaAI::configSpeed()
 {
-    m_controls->m_accel = 0.0f;
-    m_controls->m_brake = false;
+    m_controls->setAccel(0.0f);
+    m_controls->setBrake(false);
+
     // A kart will not brake when the speed is already slower than this
     // value. This prevents a kart from going too slow (or even backwards)
     // in tight curves.
-
     const float MIN_SPEED = 5.0f;
-    const float handicap =
-        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 0.7f : 1.0f);
+    const float handicap = (m_cur_difficulty == RaceManager::DIFFICULTY_EASY 
+                            ? 0.7f : 1.0f                                   );
 
     const float max_turn_speed = m_kart->getSpeedForTurnRadius(m_turn_radius);
     if ((m_kart->getSpeed() > max_turn_speed || forceBraking()) &&
         m_kart->getSpeed() > MIN_SPEED * handicap)
     {
         // Brake if necessary
-        m_controls->m_brake = true;
+        m_controls->setBrake(true);
     }
     else
     {
         // Otherwise accelerate
-        m_controls->m_accel = stk_config->m_ai_acceleration * handicap;
+        m_controls->setAccel(stk_config->m_ai_acceleration * handicap);
     }
 }   // configSpeed
 
@@ -355,9 +355,9 @@ void ArenaAI::doUTurn(const float dt)
     if (fabsf(m_kart->getSpeed()) >
         (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
         && m_kart->getSpeed() < 0) // Try to emulate reverse like human players
-        m_controls->m_accel = -0.06f;
+        m_controls->setAccel(-0.06f);
     else
-        m_controls->m_accel = -5.0f;
+        m_controls->setAccel(-5.0f);
 
     if (m_time_since_uturn >=
         (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 2.0f : 1.5f))
@@ -389,9 +389,9 @@ bool ArenaAI::gettingUnstuck(const float dt)
     if (fabsf(m_kart->getSpeed()) >
         (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
         && m_kart->getSpeed() < 0)
-        m_controls->m_accel = -0.06f;
+        m_controls->setAccel(-0.06f);
     else
-        m_controls->m_accel = -4.0f;
+        m_controls->setAccel(-4.0f);
 
     m_time_since_reversing += dt;
 
@@ -408,7 +408,7 @@ bool ArenaAI::gettingUnstuck(const float dt)
 //-----------------------------------------------------------------------------
 void ArenaAI::useItems(const float dt)
 {
-    m_controls->m_fire = false;
+    m_controls->setFire(false);
     if (m_kart->getKartAnimation() ||
         m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING)
         return;
@@ -443,24 +443,21 @@ void ArenaAI::useItems(const float dt)
         {
             Attachment::AttachmentType type = m_kart->getAttachment()->getType();
             // Don't use shield when we have a swatter.
-            if (type == Attachment::ATTACH_SWATTER       ||
-                type == Attachment::ATTACH_NOLOKS_SWATTER)
+            if (type == Attachment::ATTACH_SWATTER)
                 break;
 
             // Check if a flyable (cake, ...) is close or a kart nearby
             // has a swatter attachment. If so, use bubblegum
             // as shield
-            if ((!m_kart->isShielded() &&
-                projectile_manager->projectileIsClose(m_kart,
-                                    m_ai_properties->m_shield_incoming_radius)) ||
-               (dist_to_kart < 15.0f &&
-               ((m_closest_kart->getAttachment()->
-                getType() == Attachment::ATTACH_SWATTER) ||
-               (m_closest_kart->getAttachment()->
-                getType() == Attachment::ATTACH_NOLOKS_SWATTER))))
+            if ( (!m_kart->isShielded() &&
+                   projectile_manager->projectileIsClose(m_kart,
+                                    m_ai_properties->m_shield_incoming_radius)  ) ||
+                 (dist_to_kart < 15.0f &&
+                  (m_closest_kart->getAttachment()->
+                                       getType() == Attachment::ATTACH_SWATTER)  )    )
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = false;
+                m_controls->setFire(true);
+                m_controls->setLookBack(false);
                 break;
             }
 
@@ -471,8 +468,8 @@ void ArenaAI::useItems(const float dt)
             // or can't find a close kart for too long time
             if (dist_to_kart < 15.0f || m_time_since_last_shot > 15.0f)
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = true;
+                m_controls->setFire(true);
+                m_controls->setLookBack(true);
                 break;
             }
 
@@ -490,8 +487,8 @@ void ArenaAI::useItems(const float dt)
             if (dist_to_kart < 25.0f &&
                 !m_closest_kart->isInvulnerable())
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = fire_behind;
+                m_controls->setFire(true);
+                m_controls->setLookBack(fire_behind);
                 break;
             }
 
@@ -511,8 +508,8 @@ void ArenaAI::useItems(const float dt)
                 (difficulty || perfect_aim) &&
                 !m_closest_kart->isInvulnerable())
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = fire_behind;
+                m_controls->setFire(true);
+                m_controls->setLookBack(fire_behind);
                 break;
             }
 
@@ -531,8 +528,8 @@ void ArenaAI::useItems(const float dt)
                  dist_to_kart * dist_to_kart < d2 &&
                  m_closest_kart->getSpeed() < m_kart->getSpeed())
             {
-                m_controls->m_fire      = true;
-                m_controls->m_look_back = false;
+                m_controls->setFire(true);
+                m_controls->setLookBack(false);
                 break;
             }
             break;
@@ -546,7 +543,7 @@ void ArenaAI::useItems(const float dt)
         break;   // POWERUP_PLUNGER
 
     case PowerupManager::POWERUP_SWITCH: // Don't handle switch
-        m_controls->m_fire = true;       // (use it no matter what) for now
+        m_controls->setFire(true);       // (use it no matter what) for now
         break;   // POWERUP_SWITCH
 
     case PowerupManager::POWERUP_PARACHUTE:
@@ -564,7 +561,7 @@ void ArenaAI::useItems(const float dt)
                 m_kart->getPowerup()->getType());
         assert(false);
     }
-    if (m_controls->m_fire)
+    if (m_controls->getFire())
         m_time_since_last_shot  = 0.0f;
 }   // useItems
 

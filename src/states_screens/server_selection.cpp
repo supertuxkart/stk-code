@@ -241,7 +241,6 @@ void ServerSelection::onUpdate(float dt)
 
         m_server_list_widget->clear();
 
-        ServersManager *manager = ServersManager::get();
         loadList();
         m_server_list_widget->addItem("spacer", L"");
         m_server_list_widget->addItem("loading",

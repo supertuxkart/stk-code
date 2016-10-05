@@ -175,10 +175,10 @@ void EndController::action(PlayerAction action, int value)
 void EndController::update(float dt)
 {
     // This is used to enable firing an item backwards.
-    m_controls->m_look_back = false;
-    m_controls->m_nitro     = false;
-    m_controls->m_brake     = false;
-    m_controls->m_accel     = 1.0f;
+    m_controls->setLookBack(false);
+    m_controls->setNitro(false);
+    m_controls->setBrake(false);
+    m_controls->setAccel(1.0f);
 
     AIBaseLapController::update(dt);
 
@@ -187,10 +187,10 @@ void EndController::update(float dt)
        race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER  ||
        race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG)
     {
-        m_controls->m_accel = 0.0f;
+        m_controls->setAccel(0.0f);
         // Brake while we are still driving forwards (if we keep
         // on braking, the kart will reverse otherwise)
-        m_controls->m_brake = m_kart->getSpeed()>0;
+        m_controls->setBrake(m_kart->getSpeed()>0);
         return;
     }
     /*Get information that is needed by more than 1 of the handling funcs*/
@@ -260,26 +260,24 @@ void EndController::handleRescue(const float DELTA)
 void EndController::findNonCrashingPoint(Vec3 *result)
 {
     unsigned int sector = m_next_node_index[m_track_node];
-    int target_sector;
 
     Vec3 direction;
     Vec3 step_track_coord;
     float distance;
-    int steps;
 
     //We exit from the function when we have found a solution
     while( 1 )
     {
         //target_sector is the sector at the longest distance that we can drive
         //to without crashing with the track.
-        target_sector = m_next_node_index[sector];
+        int target_sector = m_next_node_index[sector];
 
         //direction is a vector from our kart to the sectors we are testing
         direction = DriveGraph::get()->getNode(target_sector)->getCenter()
                   - m_kart->getXYZ();
 
         float len=direction.length();
-        steps = int( len / m_kart_length );
+        int steps = int( len / m_kart_length );
         if( steps < 3 ) steps = 3;
 
         //Protection against having vel_normal with nan values

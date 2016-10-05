@@ -324,7 +324,7 @@ void KartGFX::updateTerrain(const ParticleKind *pk)
     bool on_ground       = m_kart->isOnGround() &&
                            m_kart->getSkidding()->getGraphicalJumpOffset()==0;
     if (skidding > 1.0f && on_ground)
-        rate = fabsf(m_kart->getControls().m_steer) > 0.8 ? skidding - 1 : 0;
+        rate = fabsf(m_kart->getControls().getSteer()) > 0.8 ? skidding - 1 : 0;
     else if (speed >= 0.5f && on_ground)
         rate = speed/m_kart->getKartProperties()->getEngineMaxSpeed();
     else

@@ -38,8 +38,13 @@ public:
 
     /** Resets m_localTime to 0. This allows more precise replay of
      *  physics, which is important for replaying histories. */
-    virtual void resetLocalTime() { m_localTime = 0; }
-
+    void resetLocalTime() { m_localTime = 0; }
+    // ------------------------------------------------------------------------
+    /** Sets the local time to a specified value. Used in rewinding. */
+    void setLocalTime(float t) { m_localTime = t; }
+    // ------------------------------------------------------------------------
+    /** Gets the local time. */
+    float getLocalTime() const { return m_localTime; }
 };   // STKDynamicsWorld
 #endif
 /* EOF */

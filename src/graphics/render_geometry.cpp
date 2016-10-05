@@ -1319,9 +1319,9 @@ void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
     T::InstancedSecondPassShader::getInstance()->use();
     glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(T::VertexType,
                                                                 T::Instance));
-    uint64_t nulltex[10] = {};
     if (SolidPassCmd::getInstance()->Size[T::MaterialType])
     {
+        uint64_t nulltex[10] = {};
         HandleExpander<typename T::InstancedSecondPassShader>::template
             Expand(nulltex, T::SecondPassTextures, Handles[0], Handles[1],
                    Handles[2]);
@@ -1410,9 +1410,9 @@ void IrrDriver::renderSolidSecondPass()
                 GrassMat::InstancedSecondPassShader::getInstance()->use();
                 glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(GrassMat::VertexType,
                                                                            GrassMat::Instance));
-                uint64_t nulltex[10] = {};
                 if (SolidPassCmd::getInstance()->Size[GrassMat::MaterialType])
                 {
+                    uint64_t nulltex[10] = {};
                     HandleExpander<GrassMat::InstancedSecondPassShader>
                          ::Expand(nulltex, GrassMat::SecondPassTextures, DiffuseHandle,
                                   SpecularHandle, SSAOHandle, DepthHandle);

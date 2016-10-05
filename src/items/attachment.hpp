@@ -21,6 +21,7 @@
 
 #include "config/stk_config.hpp"
 #include "items/attachment_plugin.hpp"
+#include "network/event_rewinder.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/random_generator.hpp"
 
@@ -28,6 +29,7 @@
 using namespace irr;
 
 class AbstractKart;
+class BareNetworkString;
 class Item;
 class SFXBase;
 
@@ -44,7 +46,8 @@ class SFXBase;
  *  a scene node).
  *  \ingroup items
  */
-class Attachment: public NoCopy, public scene::IAnimationEndCallBack
+class Attachment: public NoCopy, public scene::IAnimationEndCallBack,
+                  public EventRewinder
 {
 public:
     // Some loop in attachment.cpp depend on ATTACH_FIRST and ATTACH_MAX.
@@ -57,6 +60,8 @@ public:
         ATTACH_BOMB,
         ATTACH_ANVIL,
         ATTACH_SWATTER,
+        // Note that the next symbol is only used as an index into the mesh
+        // array; it will NEVER be actually assigned as an attachment type
         ATTACH_NOLOKS_SWATTER,
         ATTACH_TINYTUX,
         ATTACH_BUBBLEGUM_SHIELD,
@@ -111,6 +116,9 @@ public:
     void  handleCollisionWithKart(AbstractKart *other);
     void  set (AttachmentType type, float time,
                AbstractKart *previous_kart=NULL);
+    virtual void rewind(BareNetworkString *buffer);
+    void rewindTo(BareNetworkString *buffer);
+    void saveState(BareNetworkString *buffer) const;
 
     // ------------------------------------------------------------------------
     /** Sets the type of the attachment, but keeps the old time left value. */
@@ -137,6 +145,10 @@ public:
     // ------------------------------------------------------------------------
     /** Implement IAnimatedMeshSceneNode */
     virtual void OnAnimationEnd(scene::IAnimatedMeshSceneNode* node);
+    // ------------------------------------------------------------------------
+    /** Nothing to undo when going back during a rewind, the full state info
+     *  will take care of creating the right attachment. */
+    virtual void undo(BareNetworkString *buffer) { }
 };   // Attachment
 
 #endif

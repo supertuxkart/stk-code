@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "karts/kart.hpp"
-#include "graphics/central_settings.hpp"
+
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/challenge_status.hpp"
@@ -27,6 +27,7 @@
 #include "config/user_config.hpp"
 #include "font/bold_face.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -40,25 +41,33 @@
 #include "graphics/stk_text_billboard.hpp"
 #include "graphics/stars.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "karts/explosion_animation.hpp"
-#include "karts/kart_gfx.hpp"
-#include "karts/rescue_animation.hpp"
-#include "modes/overworld.hpp"
-#include "modes/soccer_world.hpp"
-#include "modes/world.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
+#include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/controller/end_controller.hpp"
+#include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart_animation.hpp"
+#include "karts/cached_characteristic.hpp"
+#include "karts/controller/end_controller.hpp"
+#include "karts/explosion_animation.hpp"
+#include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/kart_rewinder.hpp"
 #include "karts/max_speed.hpp"
+#include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
+#include "modes/overworld.hpp"
+#include "modes/soccer_world.hpp"
+#include "modes/world.hpp"
 #include "modes/linear_world.hpp"
+#include "modes/overworld.hpp"
+#include "modes/soccer_world.hpp"
+#include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
 #include "physics/physics.hpp"
@@ -80,6 +89,13 @@
 #include <algorithm> // for min and max
 #include <iostream>
 #include <cmath>
+
+#include <math.h>
+#include <iostream>
+#include <algorithm> // for min and max
+
+#include <ICameraSceneNode.h>
+#include <ISceneManager.h>
 
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
@@ -143,6 +159,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     // Set position and heading:
     m_reset_transform         = init_transform;
     m_speed                   = 0.0f;
+    m_smoothed_speed          = 0.0f;
 
     m_kart_model->setKart(this);
 
@@ -342,6 +359,7 @@ void Kart::reset()
     m_brake_time           = 0.0f;
     m_time_last_crash      = 0.0f;
     m_speed                = 0.0f;
+    m_smoothed_speed       = 0.0f;
     m_current_lean         = 0.0f;
     m_view_blocked_by_plunger = 0.0f;
     m_bubblegum_time       = 0.0f;
@@ -1164,18 +1182,8 @@ void Kart::eliminate()
  */
 void Kart::update(float dt)
 {
-#ifdef DEBUG_TO_COMPARE_KART_PHYSICS
-    // This information is useful when comparing kart physics, e.g. to
-    // see top speed, acceleration (i.e. time to top speed) etc.
-    Log::verbose("physics", "%s t %f xyz %f %f %f %f v %f %f %f %f maxv %f",
-        getIdent().c_str(),
-        World::getWorld()->getTime(),
-        getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
-        getXYZ().length(),
-        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
-        getVelocity().length(),
-        m_max_speed->getCurrentMaxSpeed());
-#endif
+    // Reset any instand speed increase in the bullet kart
+    m_vehicle->resetInstantSpeed();
 
     // update star effect (call will do nothing if stars are not activated)
     m_stars_effect->update(dt);
@@ -1213,9 +1221,43 @@ void Kart::update(float dt)
 
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
+    // Update the locally maintained speed of the kart (m_speed), which 
+    // is used furthermore for engine power, camera distance etc
+    updateSpeed();
 
-    if(!history->replayHistory())
+    if(!history->replayHistory() && !RewindManager::get()->isRewinding())
         m_controller->update(dt);
+
+#undef DEBUG_CAMERA_SHAKE
+#ifdef DEBUG_CAMERA_SHAKE
+    Log::verbose("camera", "%s t %f %f xyz %f %f %f v %f %f %f d3 %f d2 %f",
+        getIdent().c_str(),
+        World::getWorld()->getTime(), dt,
+        getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
+        (Camera::getCamera(0)->getXYZ()-getXYZ()).length(),
+        (Camera::getCamera(0)->getXYZ()-getXYZ()).length_2d()
+        );
+#endif
+
+#undef DEBUG_TO_COMPARE_KART_PHYSICS
+#ifdef DEBUG_TO_COMPARE_KART_PHYSICS
+    // This information is useful when comparing kart physics, e.g. to
+    // see top speed, acceleration (i.e. time to top speed) etc.
+    Log::verbose("physics", "%s t %f %f xyz %f %f %f v %f %f %f sk %f %d %f %f %f st %f %f",
+        getIdent().c_str(),
+        World::getWorld()->getTime(), dt,
+        getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
+        getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(),
+        m_skidding->getSkidFactor(),
+        m_skidding->getSkidState(),
+        m_skidding->getSteeringFraction(),
+        getMaxSteerAngle(),
+        m_speed,
+        m_vehicle->getWheelInfo(0).m_steering,
+        m_vehicle->getWheelInfo(1).m_steering
+        );
+#endif
 
     // if its view is blocked by plunger, decrease remaining time
     if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= dt;
@@ -1271,9 +1313,9 @@ void Kart::update(float dt)
     updatePhysics(dt);
     PROFILER_POP_CPU_MARKER();
 
-    if(!m_controls.m_fire) m_fire_clicked = 0;
+    if(!m_controls.getFire()) m_fire_clicked = 0;
 
-    if(m_controls.m_fire && !m_fire_clicked && !m_kart_animation)
+    if(m_controls.getFire() && !m_fire_clicked && !m_kart_animation)
     {
         // use() needs to be called even if there currently is no collecteable
         // since use() can test if something needs to be switched on/off.
@@ -1509,6 +1551,47 @@ void Kart::update(float dt)
     }
 
 }   // update
+
+//-----------------------------------------------------------------------------
+/** Updates the local speed based on the current physical velocity. The value
+ *  is smoothed exponentially to avoid camera stuttering (camera distance
+ *  is dependent on speed)
+ */
+void Kart::updateSpeed()
+{
+    // Compute the speed of the kart. Smooth it with previous speed to make
+    // the camera smoother (because of capping the speed in m_max_speed
+    // the speed value jitters when approaching maximum speed. This results
+    // in the distance between kart and camera to jitter as well (typically
+    // only in the order of centimetres though). Smoothing the speed value
+    // gets rid of this jitter, and also r
+    m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
+
+    // calculate direction of m_speed
+    const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
+    btVector3 forwardW(
+        chassisTrans.getBasis()[0][2],
+        chassisTrans.getBasis()[1][2],
+        chassisTrans.getBasis()[2][2]);
+
+    if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
+    {
+        m_speed = -m_speed;
+    }
+
+    float f = 0.3f;
+    m_smoothed_speed = f*m_speed + (1.0f - f)*m_smoothed_speed;
+
+    // At low velocity, forces on kart push it back and forth so we ignore this
+    // - quick'n'dirty workaround for bug 1776883
+    if (fabsf(m_speed) < 0.2f                                   ||
+        dynamic_cast<RescueAnimation*>   ( getKartAnimation() ) ||
+        dynamic_cast<ExplosionAnimation*>( getKartAnimation() )    )
+    {
+        m_speed          = 0;
+        m_smoothed_speed = 0;
+    }
+}   // updateSpeed
 
 //-----------------------------------------------------------------------------
 /** Show fire to go with a zipper.
@@ -1799,7 +1882,7 @@ void Kart::handleZipper(const Material *material, bool play_sound)
         engine_force       = m_kart_properties->getZipperForce();
     }
     // Ignore a zipper that's activated while braking
-    if(m_controls.m_brake || m_speed<0) return;
+    if(m_controls.getBrake() || m_speed<0) return;
 
     m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
                                      max_speed_increase, speed_gain,
@@ -1815,7 +1898,7 @@ void Kart::handleZipper(const Material *material, bool play_sound)
  */
 void Kart::updateNitro(float dt)
 {
-    if (m_controls.m_nitro && m_min_nitro_time <= 0.0f)
+    if (m_controls.getNitro() && m_min_nitro_time <= 0.0f)
     {
         m_min_nitro_time = m_kart_properties->getNitroMinConsumptionTime();
     }
@@ -1825,11 +1908,11 @@ void Kart::updateNitro(float dt)
 
         // when pressing the key, don't allow the min time to go under zero.
         // If it went under zero, it would be reset
-        if (m_controls.m_nitro && m_min_nitro_time <= 0.0f)
+        if (m_controls.getNitro() && m_min_nitro_time <= 0.0f)
             m_min_nitro_time = 0.1f;
     }
 
-    bool increase_speed = (m_controls.m_nitro && isOnGround());
+    bool increase_speed = (m_controls.getNitro() && isOnGround());
     if (!increase_speed && m_min_nitro_time <= 0.0f)
     {
         if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
@@ -2140,16 +2223,19 @@ void Kart::updatePhysics(float dt)
     // Check if accel is pressed for the first time. The actual timing
     // is done in getStartupBoost - it returns 0 if the start was actually
     // too slow to qualify for a boost.
-    if(!m_has_started && m_controls.m_accel)
+    if(!m_has_started && m_controls.getAccel())
     {
         m_has_started = true;
         float f       = getStartupBoost();
-        if(f >= 0.0f)   m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 100*f);
-        m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
-                                          0.9f*f, f,
-                                          /*engine_force*/200.0f,
-                                          /*duration*/5.0f,
-                                          /*fade_out_time*/5.0f);
+        if(f >= 0.0f)
+        {
+            m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 100*f);
+            m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
+                                              0.9f*f, f,
+                                              /*engine_force*/200.0f,
+                                              /*duration*/5.0f,
+                                              /*fade_out_time*/5.0f);
+        }
     }
 
     m_bounce_back_time-=dt;
@@ -2160,8 +2246,8 @@ void Kart::updatePhysics(float dt)
     if (m_flying)
         updateFlying();
 
-    m_skidding->update(dt, isOnGround(), m_controls.m_steer,
-                       m_controls.m_skid);
+    m_skidding->update(dt, isOnGround(), m_controls.getSteer(),
+                       m_controls.getSkidControl());
     m_vehicle->setVisualRotation(m_skidding->getVisualSkidRotation());
     if(( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
          m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
@@ -2181,19 +2267,6 @@ void Kart::updatePhysics(float dt)
 
     updateSliding();
 
-    // Compute the speed of the kart.
-    m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
-
-    // calculate direction of m_speed
-    const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
-    btVector3 forwardW (
-               chassisTrans.getBasis()[0][2],
-               chassisTrans.getBasis()[1][2],
-               chassisTrans.getBasis()[2][2]);
-
-    if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) < btScalar(0.))
-        m_speed *= -1.f;
-
     // Cap speed if necessary
     const Material *m = getMaterial();
 
@@ -2201,34 +2274,6 @@ void Kart::updatePhysics(float dt)
     m_max_speed->setMinSpeed(min_speed);
     m_max_speed->update(dt);
 
-    // To avoid tunneling (which can happen on long falls), clamp the
-    // velocity in Y direction. Tunneling can happen if the Y velocity
-    // is larger than the maximum suspension travel (per frame), since then
-    // the wheel suspension can not stop/slow down the fall (though I am
-    // not sure if this is enough in all cases!). So the speed is limited
-    // to suspensionTravel / dt with dt = 1/60 (since this is the dt
-    // bullet is using).
-
-    // Only apply if near ground instead of purely based on speed avoiding
-    // the "parachute on top" look.
-    const Vec3 &v = m_body->getLinearVelocity();
-    if(/*isNearGround() &&*/ v.getY() < - m_kart_properties->getSuspensionTravel() * 60)
-    {
-        Vec3 v_clamped = v;
-        // clamp the speed to 99% of the maxium falling speed.
-        v_clamped.setY(-m_kart_properties->getSuspensionTravel() * 60 * 0.99f);
-        //m_body->setLinearVelocity(v_clamped);
-    }
-
-    //at low velocity, forces on kart push it back and forth so we ignore this
-    if(fabsf(m_speed) < 0.2f) // quick'n'dirty workaround for bug 1776883
-         m_speed = 0;
-
-    if (dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
-        dynamic_cast<ExplosionAnimation*>(getKartAnimation()))
-    {
-        m_speed = 0;
-    }
 
     updateEngineSFX();
 #ifdef XX
@@ -2244,7 +2289,7 @@ void Kart::updatePhysics(float dt)
        );
 #endif
 
-}   // updatePhysics
+}   // updatephysics
 
 //-----------------------------------------------------------------------------
 /** Adjust the engine sound effect depending on the speed of the kart.
@@ -2301,7 +2346,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         m_body->applyTorque(btVector3(0.0, m_bubblegum_torque, 0.0));
     }
 
-    if(m_controls.m_accel)   // accelerating
+    if(m_controls.getAccel())   // accelerating
     {
         // For a short time after a collision disable the engine,
         // so that the karts can bounce back a bit from the obstacle.
@@ -2314,11 +2359,11 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             engine_power *= 5.0f;
 
         // Lose some traction when skidding, to balance the advantage
-        if (m_controls.m_skid &&
+        if (m_controls.getSkidControl() &&
             m_kart_properties->getSkidVisualTime() == 0)
             engine_power *= 0.5f;
 
-        applyEngineForce(engine_power*m_controls.m_accel);
+        applyEngineForce(engine_power*m_controls.getAccel());
 
         // Either all or no brake is set, so test only one to avoid
         // resetting all brakes most of the time.
@@ -2329,7 +2374,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
     }
     else
     {   // not accelerating
-        if(m_controls.m_brake)
+        if(m_controls.getBrake())
         {   // check if the player is currently only slowing down
             // or moving backwards
             if(m_speed > 0.0f)
@@ -2365,9 +2410,9 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         {
             m_brake_time = 0;
             // lift the foot from throttle, brakes with 10% engine_power
-            assert(!std::isnan(m_controls.m_accel));
+            assert(!std::isnan(m_controls.getAccel()));
             assert(!std::isnan(engine_power));
-            applyEngineForce(-m_controls.m_accel*engine_power*0.1f);
+            applyEngineForce(-m_controls.getAccel()*engine_power*0.1f);
 
             // If not giving power (forward or reverse gear), and speed is low
             // we are "parking" the kart, so in battle mode we can ambush people
@@ -2436,7 +2481,7 @@ void Kart::updateFlying()
 {
     m_body->setLinearVelocity(m_body->getLinearVelocity() * 0.99f);
 
-    if (m_controls.m_accel)
+    if (m_controls.getAccel())
     {
         btVector3 velocity = m_body->getLinearVelocity();
         if (velocity.length() < 25)
@@ -2446,7 +2491,7 @@ void Kart::updateFlying()
                 100.0f*cos(orientation)));
         }
     }
-    else if (m_controls.m_brake)
+    else if (m_controls.getBrake())
     {
         btVector3 velocity = m_body->getLinearVelocity();
         if (velocity.length() > -15)
@@ -2457,9 +2502,9 @@ void Kart::updateFlying()
         }
     }
 
-    if (m_controls.m_steer != 0.0f)
+    if (m_controls.getSteer()!= 0.0f)
     {
-        m_body->applyTorque(btVector3(0.0, m_controls.m_steer * 3500.0f, 0.0));
+        m_body->applyTorque(btVector3(0.0, m_controls.getSteer()*3500.0f, 0.0));
     }
 
     // dampen any roll while flying, makes the kart hard to control
@@ -2695,7 +2740,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // depending on speed)
     // --------------------------------------------------------
     float nitro_frac = 0;
-    if ( (m_controls.m_nitro || m_min_nitro_time > 0.0f) &&
+    if ( (m_controls.getNitro() || m_min_nitro_time > 0.0f) &&
          isOnGround() &&  m_collected_energy > 0            )
     {
         // fabs(speed) is important, otherwise the negative number will
@@ -2796,7 +2841,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     }
 #ifdef XX
     // cheap wheelie effect
-    if (m_controls.m_nitro)
+    if (m_controls.getNitro())
     {
         m_node->updateAbsolutePosition();
         m_kart_model->getWheelNodes()[0]->updateAbsolutePosition();

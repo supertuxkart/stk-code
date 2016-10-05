@@ -1158,13 +1158,12 @@ void KartSelectionScreen::allPlayersDone()
         if (selected_kart == RANDOM_KART_ID)
         {
             // don't select an already selected kart
-            int random_id;
             // to prevent infinite loop in case they are all locked
             int count = 0;
             bool done = false;
             do
             {
-                random_id = random.get(item_count);
+                int random_id = random.get(item_count);
                 // valid kart if it can bt used, and is either not locked,
                 // or it's a multiplayer race.
                 if (items[random_id].m_code_name != ID_DONT_USE &&

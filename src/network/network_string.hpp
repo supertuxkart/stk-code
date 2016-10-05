@@ -138,6 +138,9 @@ public:
     }   // BareNetworkString
 
     // ------------------------------------------------------------------------
+    /** Allows to read a buffer from the beginning again. */
+    void reset() { m_current_offset = 0; }
+    // ------------------------------------------------------------------------
     BareNetworkString& encodeString(const std::string &value);
     BareNetworkString& encodeString(const irr::core::stringw &value);
     int decodeString(std::string *out) const;
@@ -225,6 +228,12 @@ public:
     }   // operator+=
 
     // ------------------------------------------------------------------------
+    /** Adds a floating point number */
+    BareNetworkString& add(float f)
+    {
+        return addFloat(f);
+    }   // add
+        // ------------------------------------------------------------------------
     /** Adds the xyz components of a Vec3 to the string. */
     BareNetworkString& add(const Vec3 &xyz)
     {

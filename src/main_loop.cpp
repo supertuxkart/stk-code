@@ -35,6 +35,7 @@
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "online/request_manager.hpp"
+#include "race/history.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
@@ -61,6 +62,15 @@ MainLoop::~MainLoop()
  */
 float MainLoop::getLimitedDt()
 {
+    float dt = 0;
+    // If we are doing a replay, use the dt from the history file
+    if (World::getWorld() && history->replayHistory() )
+    {
+        dt = history->updateReplayAndGetDT();
+        return dt;
+    }
+
+
     // In profile mode without graphics, run with a fixed dt of 1/60
     if ((ProfileWorld::isProfileMode() && ProfileWorld::isNoGraphics()) ||
         UserConfigParams::m_arena_ai_stats)
@@ -71,7 +81,6 @@ float MainLoop::getLimitedDt()
     IrrlichtDevice* device = irr_driver->getDevice();
     m_prev_time = m_curr_time;
 
-    float dt;  // needed outside of the while loop
     while( 1 )
     {
         m_curr_time = device->getTimer()->getRealTime();
@@ -135,6 +144,72 @@ void MainLoop::updateRace(float dt)
 
 //-----------------------------------------------------------------------------
 /** Run the actual main loop.
+ *  The sequnce in which various parts of STK are updated is:
+ *  - Determine next time step size (`getLimitedDt`). This takes maximum fps
+ *    into account (i.e. sleep if the fps would be too high), and will actually
+ *    slow down the in-game clock if the fps are too low (if more than 3/60 of
+ *    a second have passed, more than 3 physics time steps would be needed, 
+ *    and physics do at most 3 time steps).
+ *  - if a race is taking place (i.e. not only a menu being shown), call
+ *    `updateRace()`, which is a thin wrapper around a call to
+ *    `World::updateWorld()`:
+ *    - Update history manager (which will either set the kart position and/or
+ *      controls when replaying, or store the current info for a replay).
+ *      This is mostly for debugging only (though available even in release
+ *      mode).
+ *    - Updates Replays - either storing data when not replaying, or
+ *      updating kart positions/control when replaying).
+ *    - Calls `WorldStatus::update()`, which updates the race state (e.g.
+ *      go from 'ready' to 'set' etc), and clock.
+ *    - Updates the physics (`Physics::update()`). This will simulate all
+ *      physical objects for the specified time with bullet.
+ *    - Updates all karts (`Kart::update()`). Obviously the update function
+ *      does a lot more than what is described here, this is only supposed to
+ *      be a _very_ high level overview:
+ *      - Updates its rewinder (to store potentially changed controls
+ *        as events) in `KartRewinder::update()`.
+ *      - Calls `Moveable::update()`, which takes the new position from
+ *        the physics and saves it (and computes dependent values, like
+ *        heading, local velocity).
+ *      - Updates its controller. This is either:
+ *        - an AI using `SkiddingController::update()` (which then will
+ *          compute the new controls), or 
+ *        - a player controller using `PlayerController::update()`, which will
+ *          handle smooth steering (in case of digital input devices steering
+ *          is adjusted a bit over time to avoid an instant change from all
+ *          left to all right). Input events will be handled when updating
+ *          the irrlicht driver later at the end of the main loop.
+ *      - Updates kart animation (like rescue, ...) if one is shown atm.
+ *      - Update attachments.
+ *      - update physics, i.e. taking the current steering and updating
+ *        the bullet raycast vehicle with that data. The settings are actually
+ *        only used in the next frame when the physics are updated.
+ *    - Updates all cameras via `Camera::update()`. The camera position and
+ *      rotation is adjusted according to the position etc of the kart (and
+ *      special circumstances like rescue, falling).
+ *    - Updates all projectiles using the projectile manager. Some of the
+ *      projectiles are mostly handled by the physics (e.g. a cake will mainly
+ *      check if it's out of bounds), others (like basket ball) do all 
+ *      their aiming and movement here.
+ *    - Updates the rewind manager to store rewind states.
+ *  - Updates the music manager.
+ *  - Updates the input manager (which only updates internal time, actual
+ *    input handling follows late)
+ *  - Updates the wiimote manager. This will read the data of all wiimotes
+ *    and feed the corresponding events to the irrlicht event system.
+ *  - Updates the STK internal gui engine. This updates all widgets, and
+ *    e.g. takes care of the rotation of the karts in the KartSelection
+ *    screen using the ModelViewWidget.
+ *  - Updates STK's irrlicht driver `IrrDriver::update()`:
+ *    - Calls Irrlicht's `beginScene()` .
+ *    - Renders the scene (several times with different viewport if
+ *      split screen is being used)
+ *    - Calls `GUIEngine::render()`, which renders all widgets with the
+ *      help of Irrlicht's GUIEnvironment (`drawAll()`). This will also
+ *      handle all events, i.e. all input is now handled (e.g. steering,
+ *      firing etc are all set in the corresponding karts depending on
+ *      user input).
+ *    - Calls Irrlicht's `endScene()`
  */
 void MainLoop::run()
 {
@@ -147,6 +222,11 @@ void MainLoop::run()
 
         m_prev_time = m_curr_time;
         float dt   = getLimitedDt();
+        // Render the previous frame, and also handle all user input.
+        PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
+        irr_driver->update(dt);
+        PROFILER_POP_CPU_MARKER();
+
 
         if (World::getWorld())  // race is active if world exists
         {
@@ -170,10 +250,6 @@ void MainLoop::run()
             #endif
             
             GUIEngine::update(dt);
-            PROFILER_POP_CPU_MARKER();
-
-            PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
-            irr_driver->update(dt);
             PROFILER_POP_CPU_MARKER();
 
             // Update sfx and music after graphics, so that graphics code
@@ -208,6 +284,10 @@ void MainLoop::run()
             Online::RequestManager::get()->update(dt);
             PROFILER_POP_CPU_MARKER();
         }
+
+        // Update world time if world exists
+        if (World::getWorld())
+            World::getWorld()->updateTime(dt);
 
         PROFILER_POP_CPU_MARKER();
         PROFILER_SYNC_FRAME();

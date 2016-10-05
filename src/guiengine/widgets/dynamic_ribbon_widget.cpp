@@ -210,7 +210,6 @@ void DynamicRibbonWidget::add()
         // const int count = m_items.size();
 
         m_row_amount = -1;
-        float max_score_so_far = -1;
 
         if (m_h - m_label_height < 0)
         {
@@ -219,6 +218,7 @@ void DynamicRibbonWidget::add()
         }
         else
         {
+            float max_score_so_far = -1;
             for (int row_count = 1; row_count < 10; row_count++)
             {
                 int visible_items;

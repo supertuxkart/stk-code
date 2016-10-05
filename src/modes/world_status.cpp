@@ -153,10 +153,21 @@ void WorldStatus::terminateRace()
 }   // terminateRace
 
 //-----------------------------------------------------------------------------
-/** Updates all status information, called once per frame.
+/** Update, called once per frame. Called early on before physics are
+ *  updated.
+ *  \param dt Time step.
+ */
+void WorldStatus::update(float dt)
+{
+}   // update
+
+//-----------------------------------------------------------------------------
+/** Updates the world time and clock (which might be running backwards), and
+ *  all status information, called once per frame at the end of the main
+ *  loop.
  *  \param dt Duration of time step.
  */
-void WorldStatus::update(const float dt)
+void WorldStatus::updateTime(const float dt)
 {
     switch (m_phase)
     {

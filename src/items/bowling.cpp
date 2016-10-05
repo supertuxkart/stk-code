@@ -41,7 +41,7 @@ Bowling::Bowling(AbstractKart *kart)
     float y_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f;
 
     // if the kart is looking backwards, release from the back
-    if( kart->getControls().m_look_back )
+    if( kart->getControls().getLookBack())
     {
         y_offset   = -y_offset;
         m_speed    = -m_speed*2;

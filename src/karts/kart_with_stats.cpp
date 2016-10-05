@@ -62,11 +62,9 @@ void KartWithStats::reset()
 void KartWithStats::update(float dt)
 {
     Kart::update(dt);
-    if(getSpeed()>m_top_speed) m_top_speed = getSpeed();
-    if(getControls().m_skid)
-        m_skidding_time += dt;
-    if(getControls().m_brake)
-        m_brake_count ++;
+    if(getSpeed()>m_top_speed        ) m_top_speed = getSpeed();
+    if(getControls().getSkidControl()) m_skidding_time += dt;
+    if(getControls().getBrake()      ) m_brake_count ++;
     LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
     if(world && !world->isOnRoad(getWorldKartId()))
         m_off_track_count ++;

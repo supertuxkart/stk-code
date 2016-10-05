@@ -42,10 +42,12 @@
 #include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/kart_rewinder.hpp"
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/network_config.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -163,9 +165,11 @@ void World::init()
     // constructor is called, so the wrong race gui would be created.
     createRaceGUI();
 
+    RewindManager::create();
+
     // Grab the track file
     m_track = track_manager->getTrack(race_manager->getTrackName());
-	m_script_engine = new Scripting::ScriptEngine();
+    m_script_engine = new Scripting::ScriptEngine();
     if(!m_track)
     {
         std::ostringstream msg;
@@ -238,6 +242,8 @@ void World::init()
  */
 void World::reset()
 {
+    RewindManager::get()->reset();
+
     // If m_saved_race_gui is set, it means that the restart was done
     // when the race result gui was being shown. In this case restore the
     // race gui (note that the race result gui is cached and so never really
@@ -335,8 +341,13 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
 
     int position           = index+1;
     btTransform init_pos   = getStartTransform(index - gk);
-    AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
-                                      difficulty, KRT_DEFAULT);
+    AbstractKart *new_kart;
+    if (RewindManager::get()->isEnabled())
+        new_kart = new KartRewinder(kart_ident, index, position, init_pos,
+                                    difficulty);
+    else
+        new_kart = new Kart(kart_ident, index, position, init_pos, difficulty);
+
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)
@@ -415,6 +426,8 @@ Controller* World::loadAIController(AbstractKart *kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    RewindManager::destroy();
+
     irr_driver->onUnloadWorld();
 
     // In case that a race is aborted (e.g. track not found) m_track is 0.
@@ -827,6 +840,11 @@ void World::updateWorld(float dt)
         getPhase() == IN_GAME_MENU_PHASE      )
         return;
 
+    if (!history->replayHistory())
+    {
+        history->updateSaving(dt);   // updating the saved state
+    }
+
     try
     {
         update(dt);
@@ -916,7 +934,7 @@ void World::scheduleTutorial()
 {
     m_schedule_exit_race = true;
     m_schedule_tutorial = true;
-}
+}   // scheduleTutorial
 
 //-----------------------------------------------------------------------------
 /** Updates the physics, all karts, the track, and projectile manager.
@@ -927,7 +945,6 @@ void World::update(float dt)
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);
 #endif
-
 
     PROFILER_PUSH_CPU_MARKER("World::update()", 0x00, 0x7F, 0x00);
 
@@ -942,19 +959,15 @@ void World::update(float dt)
 #endif
 
     PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
-    history->update(dt);
-    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
-    if(history->replayHistory()) dt=history->getNextDelta();
     WorldStatus::update(dt);
-    if (m_script_engine) m_script_engine->update(dt);
+    RewindManager::get()->saveStates();
     PROFILER_POP_CPU_MARKER();
 
-    if (!history->dontDoPhysics())
-    {
-        m_physics->update(dt);
-    }
+    PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);
 
-    PROFILER_PUSH_CPU_MARKER("World::update (Kart::update)", 0x40, 0x7F, 0x00);
+    // Update all the karts. This in turn will also update the controller,
+    // which causes all AI steering commands set. So in the following 
+    // physics update the new steering is taken into account.
     const int kart_amount = (int)m_karts.size();
     for (int i = 0 ; i < kart_amount; ++i)
     {
@@ -969,6 +982,14 @@ void World::update(float dt)
         Camera::getCamera(i)->update(dt);
     }
     PROFILER_POP_CPU_MARKER();
+
+    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
+    if (m_script_engine) m_script_engine->update(dt);
+
+    if (!history->dontDoPhysics())
+    {
+        m_physics->update(dt);
+    }
 
     PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
     if (UserConfigParams::m_graphical_effects && m_weather)
@@ -987,6 +1008,17 @@ void World::update(float dt)
     assert(m_magic_number == 0xB01D6543);
 #endif
 }   // update
+
+// ----------------------------------------------------------------------------
+/** Compute the new time, and set this new time to be used in the rewind
+ *  manager.
+ *  \param dt Time step size.
+ */
+void World::updateTime(const float dt)
+{
+    WorldStatus::updateTime(dt);
+    RewindManager::get()->setCurrentTime(getTime(), dt);
+}   // updateTime
 
 // ----------------------------------------------------------------------------
 /** Only updates the track. The order in which the various parts of STK are
