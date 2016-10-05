@@ -1566,8 +1566,6 @@ void Kart::updateSpeed()
     // only in the order of centimetres though). Smoothing the speed value
     // gets rid of this jitter, and also r
     m_speed = getVehicle()->getRigidBody()->getLinearVelocity().length();
-    float f = 0.3f;
-    m_smoothed_speed = f*m_speed + (1.0f - f)*m_smoothed_speed;
 
     // calculate direction of m_speed
     const btTransform& chassisTrans = getVehicle()->getChassisWorldTransform();
@@ -1580,6 +1578,9 @@ void Kart::updateSpeed()
     {
         m_speed = -m_speed;
     }
+
+    float f = 0.3f;
+    m_smoothed_speed = f*m_speed + (1.0f - f)*m_smoothed_speed;
 
     // At low velocity, forces on kart push it back and forth so we ignore this
     // - quick'n'dirty workaround for bug 1776883
