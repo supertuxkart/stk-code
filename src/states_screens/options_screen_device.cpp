@@ -621,11 +621,10 @@ bool OptionsScreenDevice::conflictsBetweenKbdConfig(PlayerAction action,
                                                    PlayerAction from,
                                                    PlayerAction to)
 {
-    KeyboardConfig* other_kbd_config;
     int id = m_config->getBinding(action).getId();
     for (int i=0; i < input_manager->getDeviceManager()->getKeyboardAmount(); i++)
     {
-        other_kbd_config =
+        KeyboardConfig* other_kbd_config =
             input_manager->getDeviceManager()->getKeyboardConfig(i);
 
         if (m_config != other_kbd_config  &&

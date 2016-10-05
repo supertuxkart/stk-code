@@ -30,6 +30,7 @@
 #include "irrlicht.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <string>
 
 /** Constructor for a checkline.
@@ -171,7 +172,7 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
 
     bool previous_sign;
 
-    if (kart_index == -1)
+    if (kart_index == UINT_MAX)
     {
         core::vector2df p = old_pos.toIrrVector2d();
         previous_sign = (m_line.getPointOrientation(p) >= 0);
@@ -212,10 +213,10 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     else
         result = false;
 
-    if (kart_index != -1)
+    if (kart_index != UINT_MAX)
         m_previous_sign[kart_index] = sign;
 
-    if (result && kart_index != -1)
+    if (result && kart_index != UINT_MAX)
     {
         LinearWorld* lw = dynamic_cast<LinearWorld*>(w);
         if (lw != NULL)

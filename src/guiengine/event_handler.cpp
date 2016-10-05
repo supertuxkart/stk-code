@@ -387,7 +387,7 @@ const bool NAVIGATION_DEBUG = false;
  */
 void EventHandler::navigate(const int playerID, Input::InputType type, const bool pressedDown, const bool reverse)
 {
-    IGUIElement *el = NULL, *closest = NULL;
+    IGUIElement *el = NULL;
 
     if (type == Input::IT_STICKBUTTON && !pressedDown)
         return;
@@ -450,7 +450,7 @@ void EventHandler::navigate(const int playerID, Input::InputType type, const boo
         // Down: if the current widget is e.g. 5, search for widget 6, 7, 8, 9, ..., 15 (up to 10 IDs may be missing)
         for (int n = 1; n < 10 && !found; n++)
         {
-            closest = GUIEngine::getGUIEnv()->getRootGUIElement()->getElementFromId(el->getTabOrder() + (reverse ? -n : n), true);
+            IGUIElement *closest = GUIEngine::getGUIEnv()->getRootGUIElement()->getElementFromId(el->getTabOrder() + (reverse ? -n : n), true);
 
             if (closest != NULL && Widget::isFocusableId(closest->getID()))
             {

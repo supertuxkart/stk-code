@@ -358,14 +358,10 @@ void Skidding::update(float dt, bool is_on_ground,
             m_predicted_curve->setVisible(true);
             m_predicted_curve->setPosition(m_kart->getXYZ());
             m_predicted_curve->setHeading(m_kart->getHeading());
-            float angle = kp
-                                ->getMaxSteerAngle(m_kart->getSpeed())
-                        * fabsf(getSteeringFraction());
-            angle = kp
-                                ->getMaxSteerAngle(SPEED)
+            float angle = kp->getMaxSteerAngle(SPEED)
                         * fabsf(getSteeringFraction());
             float r = kp->getWheelBase()
-                   / asin(angle)*1.0f;
+                    / asin(angle)*1.0f;
 
             const int num_steps = 50;
 
