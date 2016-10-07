@@ -51,14 +51,11 @@ void SpareTireAI::reset()
 //-----------------------------------------------------------------------------
 void SpareTireAI::update(float dt)
 {
-    if (m_fixed_target_nodes.empty()) return;
-
+    BattleAI::update(dt);
     m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.5f, /*fade_in_time*/0.0f);
     m_timer -= dt;
     if (m_timer < 0.0f)
         unspawn();
-
-    BattleAI::update(dt);
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -95,6 +92,9 @@ void SpareTireAI::findDefaultPath()
 //-----------------------------------------------------------------------------
 void SpareTireAI::findTarget()
 {
+    if (m_fixed_target_nodes.empty()) return;
+
+    assert(m_fixed_target_nodes.size() == 3);
     if (getCurrentNode() == m_fixed_target_nodes[m_idx])
         m_idx = m_idx == 2 ? 0 : m_idx + 1;
 
