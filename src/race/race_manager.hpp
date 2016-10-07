@@ -751,6 +751,12 @@ public:
     {
         return m_watching_replay;
     }   // isWatchingReplay
+    // ------------------------------------------------------------------------
+    void addSpareTireKartStatus()
+    {
+        m_kart_status.push_back(KartStatus("nolok", 0, -1, -1,
+            -1, KT_AI, PLAYER_DIFFICULTY_NORMAL));
+    }   // addSpareTireKartStatus
 
 };   // RaceManager
 

@@ -39,7 +39,7 @@ using namespace irr;
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/controller/controller.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
@@ -104,6 +104,18 @@ RaceGUI::RaceGUI()
     else
         m_lap_width = font->getDimension(L"9/9").Width;
 
+}   // RaceGUI
+
+//-----------------------------------------------------------------------------
+RaceGUI::~RaceGUI()
+{
+}   // ~Racegui
+
+
+//-----------------------------------------------------------------------------
+void RaceGUI::init()
+{
+    RaceGUIBase::init();
     // Technically we only need getNumLocalPlayers, but using the
     // global kart id to find the data for a specific kart.
     int n = race_manager->getNumberOfKarts();
@@ -111,12 +123,7 @@ RaceGUI::RaceGUI()
     m_animation_states.resize(n);
     m_rank_animation_duration.resize(n);
     m_last_ranks.resize(n);
-}   // RaceGUI
-
-//-----------------------------------------------------------------------------
-RaceGUI::~RaceGUI()
-{
-}   // ~Racegui
+}   // init
 
 //-----------------------------------------------------------------------------
 /** Reset the gui before a race. It initialised all rank animation related
@@ -369,7 +376,10 @@ void RaceGUI::drawGlobalMiniMap()
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const AbstractKart *kart = world->getKart(i);
-        if(kart->isEliminated()) continue;   // don't draw eliminated kart
+        const SpareTireAI* sta =
+            dynamic_cast<const SpareTireAI*>(kart->getController());
+        // don't draw eliminated kart
+        if(kart->isEliminated() && !(sta && sta->needUpdate())) continue;
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);

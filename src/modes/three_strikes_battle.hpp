@@ -118,9 +118,10 @@ public:
 
     void updateKartRanks();
     void increaseRescueCount() { m_total_rescue++; }
-    void addKartLife(unsigned int id) { m_kart_info[id].m_lives++; }
+    void addKartLife(unsigned int id);
     int getKartLife(unsigned int id) const { return m_kart_info[id].m_lives; }
     bool spareTireKartsSpawned() const;
+    unsigned int getNumSpareTireKarts() const { return m_spare_tire_karts.size(); }
 };   // ThreeStrikesBattles
 
 

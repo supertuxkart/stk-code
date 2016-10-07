@@ -43,7 +43,7 @@
 #include "modes/demo_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
-#include "modes/world_with_rank.hpp"
+#include "modes/three_strikes_battle.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "race/highscores.hpp"
@@ -460,16 +460,19 @@ void RaceResultGUI::backToLobby()
         WorldWithRank *rank_world = (WorldWithRank*)World::getWorld();
 
         unsigned int first_position = 1;
+        unsigned int sta = 0;
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
             first_position = 2;
+        ThreeStrikesBattle* tsb = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
+        if (tsb)
+            sta = tsb->getNumSpareTireKarts();
 
         // Use only the karts that are supposed to be displayed (and
         // ignore e.g. the leader in a FTL race).
-        unsigned int num_karts = race_manager->getNumberOfKarts() - first_position + 1;
+        unsigned int num_karts = race_manager->getNumberOfKarts() - first_position + 1 - sta;
 
         // In FTL races the leader kart is not displayed
         m_all_row_infos.resize(num_karts);
-
 
         // Determine the kart to display in the right order,
         // and the maximum width for the kart name column
@@ -478,7 +481,7 @@ void RaceResultGUI::backToLobby()
         float max_finish_time = 0;
 
         for (unsigned int position = first_position;
-        position <= race_manager->getNumberOfKarts(); position++)
+        position <= race_manager->getNumberOfKarts() - sta; position++)
         {
             const AbstractKart *kart = rank_world->getKartAtPosition(position);
 

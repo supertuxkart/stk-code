@@ -866,12 +866,12 @@ void Kart::finishedRace(float time, bool from_server)
     m_finished_race = true;
     m_finish_time   = time;
 
-    // If this is spare tire kart, end now
-    if (dynamic_cast<SpareTireAI*>(m_controller) != NULL) return;
-
     m_controller->finishedRace(time);
     m_kart_model->finishedRace();
     race_manager->kartFinishedRace(this, time);
+
+    // If this is spare tire kart, end now
+    if (dynamic_cast<SpareTireAI*>(m_controller) != NULL) return;
 
     if ((race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
          race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
