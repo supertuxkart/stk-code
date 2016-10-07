@@ -106,21 +106,20 @@ void ThreeStrikesBattle::reset()
 
     for(unsigned int n=0; n<kart_amount; n++)
     {
-        // Eliminate all spare tire karts first, they will be spawned if needed
         bool is_sta = false;
         if (dynamic_cast<SpareTireAI*>(m_karts[n]->getController()) != NULL)
         {
+            // STA has no life
             m_kart_info[n].m_lives = 0;
-            m_karts[n]->setPosition(-1);
-            eliminateKart(n, /*notify_of_elimination*/ false);
             is_sta = true;
         }
         else
         {
             m_kart_info[n].m_lives = 3;
-            // no positions in this mode
-            m_karts[n]->setPosition(-1);
         }
+
+        // no positions in this mode
+        m_karts[n]->setPosition(-1);
 
         scene::ISceneNode* kart_node = m_karts[n]->getNode();
 
@@ -165,6 +164,8 @@ void ThreeStrikesBattle::reset()
         for (unsigned int i = 0; i < m_spare_tire_karts.size(); i++)
         {
              m_spare_tire_karts[i]->finishedRace(0.0f);
+             m_spare_tire_karts[i]->getNode()->setVisible(false);
+             m_eliminated_karts++;
         }
     }
 }   // reset
@@ -348,6 +349,18 @@ void ThreeStrikesBattle::update(float dt)
 {
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
+
+    if (getPhase() == World::GO_PHASE)
+    {
+        // Eliminate all spare tire karts first, they will be spawned if needed
+        for (unsigned int i = 0; i < m_spare_tire_karts.size(); i++)
+        {
+            if (!m_spare_tire_karts[i]->isEliminated())
+            {
+                m_spare_tire_karts[i]->eliminate();
+            }
+        }
+    }
 
     const float period = 20.0f;
     if (!m_spare_tire_karts.empty() &&

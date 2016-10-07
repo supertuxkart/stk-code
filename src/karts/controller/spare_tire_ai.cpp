@@ -51,14 +51,14 @@ void SpareTireAI::reset()
 //-----------------------------------------------------------------------------
 void SpareTireAI::update(float dt)
 {
-    assert(!m_fixed_target_nodes.empty());
+    if (m_fixed_target_nodes.empty()) return;
 
     m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI, 0.5f, /*fade_in_time*/0.0f);
-
-    BattleAI::update(dt);
     m_timer -= dt;
     if (m_timer < 0.0f)
         unspawn();
+
+    BattleAI::update(dt);
 }   // update
 
 //-----------------------------------------------------------------------------
