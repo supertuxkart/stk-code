@@ -101,7 +101,12 @@ void ThreeStrikesBattle::reset()
 {
     WorldWithRank::reset();
 
-    m_sta_spawned_count = 1;
+    m_next_sta_spawn_time =
+        race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
+        race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
+        race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
+        25.0f : 20.0f;
+
     const unsigned int kart_amount = (unsigned int)m_karts.size();
 
     for(unsigned int n=0; n<kart_amount; n++)
@@ -362,37 +367,7 @@ void ThreeStrikesBattle::update(float dt)
         }
     }
 
-    const float period = 20.0f;
-    if (!m_spare_tire_karts.empty() &&
-        period < getTimeSinceStart() / float(m_sta_spawned_count))
-    {
-        // Spawn spare tire kart when necessary
-        m_sta_spawned_count++;
-        // Formula : Total num of karts with life != 3 *
-        // time period / time since start, so towards the end of game,
-        // karts are less likely to gain back a life.
-        int kart_has_few_lives = 0;
-        for (unsigned int i = 0; i < m_kart_info.size(); i++)
-            m_kart_info[i].m_lives != 3 ? kart_has_few_lives++ : 0;
-        float ratio = kart_has_few_lives * period / getTimeSinceStart();
-        if (ratio > 1.0f)
-        {
-            unsigned int spawn_sta = unsigned(ratio);
-            if (spawn_sta > m_spare_tire_karts.size())
-                spawn_sta = m_spare_tire_karts.size();
-            m_race_gui->addMessage(_P("%i spare tire kart has been spawned!",
-                                      "%i spare tire karts have been spawned!",
-                                      spawn_sta), NULL, 2.0f);
-            for (unsigned int i = 0; i < spawn_sta; i++)
-            {
-                SpareTireAI* sta = dynamic_cast<SpareTireAI*>
-                    (m_spare_tire_karts[i]->getController());
-                assert(sta);
-                sta->spawn(period / 2);
-            }
-        }
-    }
-
+    spawnSpareTireKarts();
     if (m_track->hasNavMesh())
         updateSectorForKarts();
 
@@ -656,3 +631,51 @@ void ThreeStrikesBattle::addKartLife(unsigned int id)
     }
 
 }   // addKartLife
+
+//-----------------------------------------------------------------------------
+void ThreeStrikesBattle::spawnSpareTireKarts()
+{
+    if (m_spare_tire_karts.empty() ||
+        getTimeSinceStart() < m_next_sta_spawn_time)
+        return;
+
+    const float period =
+        race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
+        race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
+        race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
+        25.0f : 20.0f;
+    const float inc_factor =
+        race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 0.7f :
+        race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 0.65f :
+        race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
+        0.6f : 0.55f;
+
+    // Spawn spare tire kart when necessary
+    // The lifespan for sta: inc_factor / period * 1000 / 2
+    // So in easier mode the sta lasts longer than spawn period
+    const float lifespan = inc_factor / period * 1000;
+    m_next_sta_spawn_time = lifespan + (getTimeSinceStart() * inc_factor) +
+        getTimeSinceStart();
+    int kart_has_few_lives = 0;
+    for (unsigned int i = 0; i < m_kart_info.size(); i++)
+    {
+        if (m_kart_info[i].m_lives > 0 && m_kart_info[i].m_lives < 3)
+            kart_has_few_lives++;
+    }
+
+    float ratio = kart_has_few_lives / (inc_factor * 2);
+    if (ratio < 1.5f) return;
+    unsigned int spawn_sta = unsigned(ratio);
+    if (spawn_sta > m_spare_tire_karts.size())
+        spawn_sta = m_spare_tire_karts.size();
+    m_race_gui->addMessage(_P("%i spare tire kart has been spawned!",
+                              "%i spare tire karts have been spawned!",
+                              spawn_sta), NULL, 2.0f);
+    for (unsigned int i = 0; i < spawn_sta; i++)
+    {
+        SpareTireAI* sta = dynamic_cast<SpareTireAI*>
+            (m_spare_tire_karts[i]->getController());
+        assert(sta);
+        sta->spawn(lifespan);
+    }
+}   // spawnSpareTireKarts

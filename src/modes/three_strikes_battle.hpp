@@ -78,7 +78,7 @@ private:
     int m_total_hit;
 
     std::vector<AbstractKart*> m_spare_tire_karts;
-    int m_sta_spawned_count;
+    float m_next_sta_spawn_time;
 
 public:
 
@@ -121,6 +121,7 @@ public:
     void addKartLife(unsigned int id);
     int getKartLife(unsigned int id) const { return m_kart_info[id].m_lives; }
     bool spareTireKartsSpawned() const;
+    void spawnSpareTireKarts();
     unsigned int getNumSpareTireKarts() const { return m_spare_tire_karts.size(); }
 };   // ThreeStrikesBattles
 
