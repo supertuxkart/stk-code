@@ -32,7 +32,6 @@
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/keyboard_device.hpp"
-#include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/battle_ai.hpp"
 #include "karts/controller/soccer_ai.hpp"
@@ -65,7 +64,6 @@
 #include "states_screens/race_gui.hpp"
 #include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
-#include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
@@ -223,43 +221,8 @@ void World::init()
 
     }  // for i
 
-    // Pre-add spare tire karts in battle mode
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES &&
-        m_track->hasNavMesh())
-    {
-        // Spare tire karts only added with large arena
-        const int all_nodes =
-            ArenaGraph::get() ? ArenaGraph::get()->getNumNodes() : 0;
-        if (all_nodes > 200)
-        {
-            const unsigned int max_sta_num = unsigned(m_karts.size() * 0.8f);
-            unsigned int sta_created = 0;
-            for (int i = 0; i < all_nodes; i++)
-            {
-                // Pre-spawn the spare tire karts on the item position,
-                // preven affecting current karts
-                Item* item = ItemManager::get()->getFirstItemInQuad(i);
-                if (item == NULL) continue;
-                btTransform t;
-                t.setOrigin(item->getXYZ());
-                t.setRotation(item->getRotation());
-
-                AbstractKart* sta = new Kart("nolok", m_karts.size(),
-                    m_karts.size() + 1, t, PLAYER_DIFFICULTY_NORMAL, KRT_BLUE);
-                sta->init(RaceManager::KartType::KT_AI);
-                sta->setController(new SpareTireAI(sta));
-
-                m_karts.push_back(sta);
-                race_manager->addSpareTireKartStatus();
-                m_track->adjustForFog(sta->getNode());
-
-                sta_created++;
-                if (sta_created >= max_sta_num) break;
-            }
-            num_karts = m_karts.size();
-            race_manager->setNumKarts(num_karts);
-        }
-    }
+    // Load other custom models if needed
+    loadCustomModels();
 
     // Now that all models are loaded, apply the overrides
     irr_driver->applyObjectPassShader();
@@ -267,7 +230,7 @@ void World::init()
     // Must be called after all karts are created
     m_race_gui->init();
 
-    powerup_manager->updateWeightsForRace(num_karts);
+    powerup_manager->updateWeightsForRace(race_manager->getNumberOfKarts());
 
     if (UserConfigParams::m_weather_effects)
     {

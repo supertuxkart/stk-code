@@ -23,7 +23,8 @@
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "items/item_manager.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
@@ -32,7 +33,6 @@
 #include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
-#include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
 
 #include <string>
@@ -67,15 +67,6 @@ void ThreeStrikesBattle::init()
     WorldWithRank::init();
     m_display_rank = false;
     m_kart_info.resize(m_karts.size());
-
-    // Copy STA pointer to m_spare_tire_karts array, allowing them to respawn
-    // easily
-    for (KartList::iterator i = m_karts.begin(); i != m_karts.end() ; i++)
-    {
-        if (dynamic_cast<SpareTireAI*>((*i)->getController()) != NULL)
-            m_spare_tire_karts.push_back(*i);
-    }
-
 }   // ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
@@ -679,3 +670,46 @@ void ThreeStrikesBattle::spawnSpareTireKarts()
         sta->spawn(lifespan);
     }
 }   // spawnSpareTireKarts
+
+//-----------------------------------------------------------------------------
+void ThreeStrikesBattle::loadCustomModels()
+{
+    // Pre-add spare tire karts
+    if (ArenaGraph::get())
+    {
+        // Spare tire karts only added with large arena
+        const int all_nodes = ArenaGraph::get()->getNumNodes();
+        if (all_nodes > 200)
+        {
+            const unsigned int max_sta_num = unsigned(m_karts.size() * 0.8f);
+            unsigned int sta_created = 0;
+            for (int i = 0; i < all_nodes; i++)
+            {
+                // Pre-spawn the spare tire karts on the item position,
+                // preven affecting current karts
+                Item* item = ItemManager::get()->getFirstItemInQuad(i);
+                if (item == NULL) continue;
+                btTransform t;
+                t.setOrigin(item->getXYZ());
+                t.setRotation(item->getRotation());
+
+                AbstractKart* sta = new Kart("nolok", m_karts.size(),
+                    m_karts.size() + 1, t, PLAYER_DIFFICULTY_NORMAL, KRT_RED);
+                sta->init(RaceManager::KartType::KT_AI);
+                sta->setController(new SpareTireAI(sta));
+
+                m_karts.push_back(sta);
+                race_manager->addSpareTireKartStatus();
+                m_track->adjustForFog(sta->getNode());
+
+                // Copy STA pointer to m_spare_tire_karts array, allowing them
+                // to respawn easily
+                m_spare_tire_karts.push_back(sta);
+
+                sta_created++;
+                if (sta_created >= max_sta_num) break;
+            }
+            race_manager->setNumKarts(m_karts.size());
+        }
+    }
+}   // loadCustomModels

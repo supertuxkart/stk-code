@@ -865,7 +865,6 @@ void Kart::finishedRace(float time, bool from_server)
 */
     m_finished_race = true;
     m_finish_time   = time;
-
     m_controller->finishedRace(time);
     m_kart_model->finishedRace();
     race_manager->kartFinishedRace(this, time);
