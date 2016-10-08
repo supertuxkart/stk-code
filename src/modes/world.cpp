@@ -372,6 +372,8 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         break;
     case RaceManager::KT_LEADER:
         break;
+    case RaceManager::KT_SPARE_TIRE:
+        break;
     }
 
     new_kart->setController(controller);

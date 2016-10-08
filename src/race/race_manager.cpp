@@ -288,7 +288,7 @@ void RaceManager::computeRandomKartList()
     }
 
     if(n>0)
-        kart_properties_manager->getRandomKartList(n, m_player_karts,
+        kart_properties_manager->getRandomKartList(n, &m_player_karts,
                                                    &m_ai_kart_list   );
 
     if (m_ai_kart_override != "")

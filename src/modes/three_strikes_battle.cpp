@@ -28,6 +28,7 @@
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/arena_graph.hpp"
@@ -102,12 +103,10 @@ void ThreeStrikesBattle::reset()
 
     for(unsigned int n=0; n<kart_amount; n++)
     {
-        bool is_sta = false;
         if (dynamic_cast<SpareTireAI*>(m_karts[n]->getController()) != NULL)
         {
             // STA has no life
             m_kart_info[n].m_lives = 0;
-            is_sta = true;
         }
         else
         {
@@ -127,11 +126,11 @@ void ThreeStrikesBattle::reset()
 
             if (core::stringc(curr->getName()) == "tire1")
             {
-                curr->setVisible(!is_sta);
+                curr->setVisible(true);
             }
             else if (core::stringc(curr->getName()) == "tire2")
             {
-                curr->setVisible(!is_sta);
+                curr->setVisible(true);
             }
         }
 
@@ -174,6 +173,20 @@ void ThreeStrikesBattle::reset()
  */
 void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 {
+    if (kart->getType() == RaceManager::KartType::KT_SPARE_TIRE)
+    {
+        // Add heart billboard above it
+        video::ITexture *heart =
+            irr_driver->getTexture(FileManager::GUI, "heart.png");
+        float height = kart->getKartHeight() + 0.5f;
+
+        scene::ISceneNode* billboard = irr_driver->addBillboard
+            (core::dimension2d<irr::f32>(0.8f, 0.8f), heart, kart->getNode(),
+            true);
+        billboard->setPosition(core::vector3df(0, height, 0));
+        return;
+    }
+
     float coord = -kart->getKartLength()*0.5f;
 
     scene::IMeshSceneNode* tire_node = irr_driver->addMesh(m_tire, "3strikestire", node);
@@ -345,18 +358,6 @@ void ThreeStrikesBattle::update(float dt)
 {
     WorldWithRank::update(dt);
     WorldWithRank::updateTrack(dt);
-
-    if (getPhase() == World::GO_PHASE)
-    {
-        // Eliminate all spare tire karts first, they will be spawned if needed
-        for (unsigned int i = 0; i < m_spare_tire_karts.size(); i++)
-        {
-            if (!m_spare_tire_karts[i]->isEliminated())
-            {
-                m_spare_tire_karts[i]->eliminate();
-            }
-        }
-    }
 
     spawnSpareTireKarts();
     if (m_track->hasNavMesh())
@@ -682,7 +683,8 @@ void ThreeStrikesBattle::loadCustomModels()
         if (all_nodes > 200)
         {
             const unsigned int max_sta_num = unsigned(m_karts.size() * 0.8f);
-            unsigned int sta_created = 0;
+            unsigned int pos_created = 0;
+            std::vector<btTransform> pos;
             for (int i = 0; i < all_nodes; i++)
             {
                 // Pre-spawn the spare tire karts on the item position,
@@ -692,22 +694,33 @@ void ThreeStrikesBattle::loadCustomModels()
                 btTransform t;
                 t.setOrigin(item->getXYZ());
                 t.setRotation(item->getRotation());
+                pos.push_back(t);
+                pos_created++;
+                if (pos_created >= max_sta_num) break;
+            }
 
-                AbstractKart* sta = new Kart("nolok", m_karts.size(),
-                    m_karts.size() + 1, t, PLAYER_DIFFICULTY_NORMAL, KRT_RED);
-                sta->init(RaceManager::KartType::KT_AI);
+            // Compute a random kart list
+            std::vector<std::string> sta_list;
+            kart_properties_manager->getRandomKartList(pos.size(), NULL,
+                &sta_list);
+
+            assert(sta_list.size() == pos.size());
+            // Now add them
+            for (unsigned int i = 0; i < pos.size(); i++)
+            {
+                AbstractKart* sta = new Kart(sta_list[i], m_karts.size(),
+                    m_karts.size() + 1, pos[i], PLAYER_DIFFICULTY_NORMAL,
+                    KRT_RED);
+                sta->init(RaceManager::KartType::KT_SPARE_TIRE);
                 sta->setController(new SpareTireAI(sta));
 
                 m_karts.push_back(sta);
-                race_manager->addSpareTireKartStatus();
+                race_manager->addSpareTireKartStatus(sta_list[i]);
                 m_track->adjustForFog(sta->getNode());
 
                 // Copy STA pointer to m_spare_tire_karts array, allowing them
                 // to respawn easily
                 m_spare_tire_karts.push_back(sta);
-
-                sta_created++;
-                if (sta_created >= max_sta_num) break;
             }
             race_manager->setNumKarts(m_karts.size());
         }

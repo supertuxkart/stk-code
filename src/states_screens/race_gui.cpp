@@ -385,7 +385,9 @@ void RaceGUI::drawGlobalMiniMap()
         world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
         draw_at *= UserConfigParams::m_scale_rtts_factor;
 
-        video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+        video::ITexture* icon = sta ?
+            irr_driver->getTexture(FileManager::GUI, "heart.png") :
+            kart->getKartProperties()->getMinimapIcon();
 
         // int marker_height = m_marker->getSize().Height;
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());

@@ -494,7 +494,7 @@ const std::vector<int> KartPropertiesManager::getKartsInGroup(
  *                        to this list.
  */
 void KartPropertiesManager::getRandomKartList(int count,
-                                            RemoteKartInfoList& existing_karts,
+                                            RemoteKartInfoList* existing_karts,
                                             std::vector<std::string> *ai_list)
 {
     // First: set up flags (based on global kart
@@ -504,18 +504,22 @@ void KartPropertiesManager::getRandomKartList(int count,
     used.resize(getNumberOfKarts(), false);
 
     std::vector<std::string> random_kart_queue;
-    for (unsigned int i=0; i<existing_karts.size(); i++)
+    if (existing_karts != NULL)
     {
-        try
+        for (unsigned int i=0; i<existing_karts->size(); i++)
         {
-            int id = getKartId(existing_karts[i].getKartName());
-            used[id] = true;
-        }
-        catch (std::runtime_error& ex)
-        {
-            (void)ex;
-            Log::error("[KartPropertiesManager]", "getRandomKartList : WARNING, "
-                "can't find kart '%s'", existing_karts[i].getKartName().c_str());
+            try
+            {
+                int id = getKartId((*existing_karts)[i].getKartName());
+                used[id] = true;
+            }
+            catch (std::runtime_error& ex)
+            {
+                (void)ex;
+                Log::error("[KartPropertiesManager]", "getRandomKartList : "
+                    "WARNING, can't find kart '%s'",
+                    (*existing_karts)[i].getKartName().c_str());
+            }
         }
     }
     for(unsigned int i=0; i<ai_list->size(); i++)

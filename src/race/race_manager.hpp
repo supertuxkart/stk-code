@@ -236,9 +236,10 @@ public:
                           DIFFICULTY_COUNT};
 
     /** Different kart types: A local player, a player connected via network,
-     *  an AI kart, the leader kart (currently not used), a ghost kart. */
+     *  an AI kart, the leader kart (currently not used), a ghost kart and
+     *  spare tire karts which allow gain life in battle mode */
     enum KartType       { KT_PLAYER, KT_NETWORK_PLAYER, KT_AI, KT_LEADER,
-                          KT_GHOST };
+                          KT_GHOST, KT_SPARE_TIRE };
 private:
 
     bool m_started_from_overworld;
@@ -752,10 +753,10 @@ public:
         return m_watching_replay;
     }   // isWatchingReplay
     // ------------------------------------------------------------------------
-    void addSpareTireKartStatus()
+    void addSpareTireKartStatus(const std::string& name)
     {
-        m_kart_status.push_back(KartStatus("nolok", 0, -1, -1,
-            -1, KT_AI, PLAYER_DIFFICULTY_NORMAL));
+        m_kart_status.push_back(KartStatus(name, 0, -1, -1,
+            -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
     }   // addSpareTireKartStatus
 
 };   // RaceManager
