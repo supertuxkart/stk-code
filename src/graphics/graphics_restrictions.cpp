@@ -57,6 +57,7 @@ namespace GraphicsRestrictions
             "TextureCompressionS3TC",
             "AMDVertexShaderLayer",
             "ExplicitAttribLocation",
+            "TextureFilterAnisotropic",
 #if defined(USE_GLES2)
             "TextureFormatBGRA8888",
             "ColorBufferFloat",
@@ -215,7 +216,7 @@ public:
             convertVersionString(s[0]);
             return;
         }
-        
+
         Log::warn("Graphics", "Can not find version for '%s' '%s' - ignored.",
             driver_version.c_str(), card_name.c_str());
 
@@ -299,7 +300,7 @@ public:
     {
         m_version_test = VERSION_IGNORE;
         m_card_test = CARD_IGNORE;
-        
+
         if(rule->get("is", &m_card_name))
         {
             m_card_test = CARD_IS;
@@ -368,6 +369,7 @@ public:
         // -------------
         switch(m_card_test)
         {
+        case CARD_IGNORE: break;   // always true
         case CARD_IS:
             if(card!=m_card_name) return false;
             break;

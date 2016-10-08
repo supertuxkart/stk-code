@@ -86,7 +86,7 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
 #ifdef _IRR_COMPILE_WITH_X11_
 	display(0), visual(0), screennr(0), window(0), StdHints(0), SoftwareImage(0),
-	XInputMethod(0), XInputContext(0),
+	XInputMethod(0), XInputContext(0), numlock_mask(0),
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 	glxWin(0),
 	Context(0),
@@ -140,6 +140,7 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 
 #ifdef _IRR_COMPILE_WITH_X11_
 	createInputContext();
+	numlock_mask = getNumlockMask(display);
 #endif
 
 	createGUIAndScene();
@@ -1260,13 +1261,59 @@ void CIrrDeviceLinux::destroyInputContext()
 	}
 }
 
+int CIrrDeviceLinux::getNumlockMask(Display* display)
+{
+	int mask_table[8] = {ShiftMask, LockMask, ControlMask, Mod1Mask,
+						 Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask};
+
+	if (!display)
+		return 0;		
+
+	KeyCode numlock_keycode = XKeysymToKeycode(display, XK_Num_Lock);
+
+	if (numlock_keycode == NoSymbol)
+		return 0;
+
+	XModifierKeymap* map = XGetModifierMapping(display);
+	if (!map)
+		return 0;
+
+	int mask = 0;
+	for (int i = 0; i < 8 * map->max_keypermod; i++) 
+	{
+		if (map->modifiermap[i] != numlock_keycode)
+			continue;
+
+		mask = mask_table[i/map->max_keypermod];
+		break;
+	}
+
+	XFreeModifiermap(map);
+
+	return mask;
+}
+
 EKEY_CODE CIrrDeviceLinux::getKeyCode(XEvent &event)
 {
 	EKEY_CODE keyCode = (EKEY_CODE)0;
-
 	SKeyMap mp;
-	mp.X11Key = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 0);
-	// mp.X11Key = XKeycodeToKeysym(XDisplay, event.xkey.keycode, 0);	// deprecated, if we still find platforms which need that we have to use some define
+	
+	// First check for numpad keys
+	bool is_numpad_key = false;
+	if (event.xkey.state & numlock_mask)
+	{
+		mp.X11Key = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 1);
+		
+		if (mp.X11Key >=XK_KP_0 && mp.X11Key <= XK_KP_9)
+			is_numpad_key = true;
+	}
+	
+	// If it's not numpad key, then get keycode in typical way
+	if (!is_numpad_key)
+	{
+		mp.X11Key = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 0);
+	}
+		
 	const s32 idx = KeyMap.binary_search(mp);
 	if (idx != -1)
 	{

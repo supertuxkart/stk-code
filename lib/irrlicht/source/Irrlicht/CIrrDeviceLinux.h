@@ -156,6 +156,7 @@ namespace irr
 #ifdef _IRR_COMPILE_WITH_X11_
 		bool createInputContext();
 		void destroyInputContext();
+		int getNumlockMask(Display* display);
 		EKEY_CODE getKeyCode(XEvent &event);
 #endif
 
@@ -399,6 +400,7 @@ namespace irr
 		XIM XInputMethod;
 		XIC XInputContext;
 		mutable core::stringc Clipboard;
+		int numlock_mask;
 		#ifdef _IRR_LINUX_X11_VIDMODE_
 		XF86VidModeModeInfo oldVideoMode;
 		#endif

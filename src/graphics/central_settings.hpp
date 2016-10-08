@@ -42,7 +42,8 @@ private:
     bool hasSSBO;
     bool hasImageLoadStore;
     bool hasMultiDrawIndirect;
-    
+    bool hasTextureFilterAnisotropic;
+
 #if defined(USE_GLES2)
     bool hasBGRA;
     bool hasColorBufferFloat;
@@ -80,7 +81,8 @@ public:
     bool isARBImageLoadStoreUsable() const;
     bool isARBMultiDrawIndirectUsable() const;
     bool isARBExplicitAttribLocationUsable() const;
-    
+    bool isEXTTextureFilterAnisotropicUsable() const;
+
 #if defined(USE_GLES2)
     bool isEXTTextureFormatBGRA8888Usable() const;
     bool isEXTColorBufferFloatUsable() const;
