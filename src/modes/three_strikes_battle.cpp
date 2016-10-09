@@ -591,8 +591,9 @@ void ThreeStrikesBattle::enterRaceOverState()
 //-----------------------------------------------------------------------------
 bool ThreeStrikesBattle::spareTireKartsSpawned() const
 {
+    if (m_spare_tire_karts.empty()) return false;
+
     // Spare tire karts are spawned if at least 1 of them needs update
-    assert(!m_spare_tire_karts.empty());
     SpareTireAI* sta =
         dynamic_cast<SpareTireAI*>(m_spare_tire_karts[0]->getController());
     assert(sta);
