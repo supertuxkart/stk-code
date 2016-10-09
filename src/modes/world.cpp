@@ -483,6 +483,7 @@ World::~World()
     race_manager->setRecordRace(false);
     race_manager->setWatchingReplay(false);
     race_manager->setTimeTarget(0.0f);
+    race_manager->setSpareTireKartNum(0);
 
     Camera::removeAllCameras();
 

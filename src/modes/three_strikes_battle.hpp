@@ -133,9 +133,6 @@ public:
     bool spareTireKartsSpawned() const;
     // ------------------------------------------------------------------------
     void spawnSpareTireKarts();
-    // ------------------------------------------------------------------------
-    unsigned int getNumSpareTireKarts() const
-                                          { return m_spare_tire_karts.size(); }
 
 };   // ThreeStrikesBattles
 

@@ -723,6 +723,8 @@ void ThreeStrikesBattle::loadCustomModels()
                 m_spare_tire_karts.push_back(sta);
             }
             race_manager->setNumKarts(m_karts.size());
+            assert(m_spare_tire_karts.size() ==
+                race_manager->getNumSpareTireKarts());
         }
     }
 }   // loadCustomModels

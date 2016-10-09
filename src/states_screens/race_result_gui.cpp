@@ -43,7 +43,7 @@
 #include "modes/demo_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
-#include "modes/three_strikes_battle.hpp"
+#include "modes/world_with_rank.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "race/highscores.hpp"
@@ -460,12 +460,9 @@ void RaceResultGUI::backToLobby()
         WorldWithRank *rank_world = (WorldWithRank*)World::getWorld();
 
         unsigned int first_position = 1;
-        unsigned int sta = 0;
+        unsigned int sta = race_manager->getNumSpareTireKarts();
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
             first_position = 2;
-        ThreeStrikesBattle* tsb = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
-        if (tsb)
-            sta = tsb->getNumSpareTireKarts();
 
         // Use only the karts that are supposed to be displayed (and
         // ignore e.g. the leader in a FTL race).

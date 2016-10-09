@@ -330,6 +330,7 @@ private:
     GrandPrixData                    m_grand_prix;
     SavedGrandPrix*                  m_saved_gp;
     int                              m_num_karts;
+    unsigned int                     m_num_spare_tire_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
     int                              m_coin_target;
@@ -757,7 +758,18 @@ public:
     {
         m_kart_status.push_back(KartStatus(name, 0, -1, -1,
             -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
+        m_num_spare_tire_karts++;
     }   // addSpareTireKartStatus
+    // ------------------------------------------------------------------------
+    void setSpareTireKartNum(unsigned int i)
+    {
+        m_num_spare_tire_karts = i;
+    }   // setSpareTireKartNum
+    // ------------------------------------------------------------------------
+    unsigned int getNumSpareTireKarts() const
+    {
+        return m_num_spare_tire_karts;
+    }   // getNumSpareTireKarts
 
 };   // RaceManager
 

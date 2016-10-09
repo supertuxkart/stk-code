@@ -42,7 +42,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/linear_world.hpp"
-#include "modes/three_strikes_battle.hpp"
+#include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
@@ -638,11 +638,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 
-    unsigned int sta = 0;
-    ThreeStrikesBattle* tsb = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
-    if (tsb)
-        sta = tsb->getNumSpareTireKarts();
-
+    unsigned int sta = race_manager->getNumSpareTireKarts();
     const unsigned int num_karts = race_manager->getNumberOfKarts() - sta;
 
     // -2 because that's the spacing further on
