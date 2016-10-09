@@ -754,12 +754,13 @@ public:
         return m_watching_replay;
     }   // isWatchingReplay
     // ------------------------------------------------------------------------
-    void addSpareTireKartStatus(const std::string& name)
+    void addSpareTireKart(const std::string& name)
     {
         m_kart_status.push_back(KartStatus(name, 0, -1, -1,
             -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
         m_num_spare_tire_karts++;
-    }   // addSpareTireKartStatus
+        m_num_karts++;
+    }   // addSpareTireKart
     // ------------------------------------------------------------------------
     void setSpareTireKartNum(unsigned int i)
     {

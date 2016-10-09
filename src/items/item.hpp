@@ -276,9 +276,6 @@ public:
     {
         return (scene::ISceneNode *) m_node;
     }
-    // ------------------------------------------------------------------------
-    const btQuaternion& getRotation() const     { return m_original_rotation; }
-
 };   // class Item
 
 #endif

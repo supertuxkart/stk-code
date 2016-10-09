@@ -397,6 +397,14 @@ public:
 
     static const float NOHIT;
 
+    static btQuaternion createRotationFromNormal(const Vec3& normal)
+    {
+        Vec3 axis = -normal.cross(Vec3(0, 1, 0));
+        if (axis.length() == 0)
+            axis = Vec3(0, 0, 1);
+        return btQuaternion(axis, normal.angle(Vec3(0, 1, 0)));
+    }   // createRotationFromNormal
+
                        Track             (const std::string &filename);
                       ~Track             ();
     void               cleanup           ();

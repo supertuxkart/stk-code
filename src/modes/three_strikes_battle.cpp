@@ -23,7 +23,6 @@
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
-#include "items/item_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_model.hpp"
@@ -32,10 +31,12 @@
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/arena_graph.hpp"
+#include "tracks/arena_node.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 
+#include <algorithm>
 #include <string>
 #include <IMeshSceneNode.h>
 
@@ -675,27 +676,44 @@ void ThreeStrikesBattle::spawnSpareTireKarts()
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::loadCustomModels()
 {
-    // Pre-add spare tire karts
-    if (ArenaGraph::get())
+    // Pre-add spare tire karts if there are more than certain number of karts
+    ArenaGraph* ag = ArenaGraph::get();
+    if (ag && m_karts.size() > 4)
     {
         // Spare tire karts only added with large arena
-        const int all_nodes = ArenaGraph::get()->getNumNodes();
-        if (all_nodes > 200)
+        const int all_nodes = ag->getNumNodes();
+        if (all_nodes > 500)
         {
+            // Don't create too many spare tire karts
             const unsigned int max_sta_num = unsigned(m_karts.size() * 0.8f);
             unsigned int pos_created = 0;
+            std::vector<int> used;
             std::vector<btTransform> pos;
-            for (int i = 0; i < all_nodes; i++)
+
+            // Fill all current starting position into used first
+            for (unsigned int i = 0; i < getNumberOfRescuePositions(); i++)
             {
-                // Pre-spawn the spare tire karts on the item position,
-                // preven affecting current karts
-                Item* item = ItemManager::get()->getFirstItemInQuad(i);
-                if (item == NULL) continue;
+                int node = -1;
+                ag->findRoadSector(getRescueTransform(i).getOrigin(), &node,
+                    NULL, true);
+                assert(node != -1);
+                used.push_back(node);
+            }
+
+            // Find random nodes to pre-spawn spare tire karts
+            RandomGenerator random;
+            while (true)
+            {
+                const int node = random.get(all_nodes);
+                if (std::find(used.begin(), used.end(), node) != used.end())
+                    continue;
+                const ArenaNode* n = ag->getNode(node);
                 btTransform t;
-                t.setOrigin(item->getXYZ());
-                t.setRotation(item->getRotation());
+                t.setOrigin(n->getCenter());
+                t.setRotation(Track::createRotationFromNormal(n->getNormal()));
                 pos.push_back(t);
                 pos_created++;
+                used.push_back(node);
                 if (pos_created >= max_sta_num) break;
             }
 
@@ -715,16 +733,17 @@ void ThreeStrikesBattle::loadCustomModels()
                 sta->setController(new SpareTireAI(sta));
 
                 m_karts.push_back(sta);
-                race_manager->addSpareTireKartStatus(sta_list[i]);
+                race_manager->addSpareTireKart(sta_list[i]);
                 m_track->adjustForFog(sta->getNode());
 
                 // Copy STA pointer to m_spare_tire_karts array, allowing them
                 // to respawn easily
                 m_spare_tire_karts.push_back(sta);
             }
-            race_manager->setNumKarts(m_karts.size());
-            assert(m_spare_tire_karts.size() ==
-                race_manager->getNumSpareTireKarts());
+            unsigned int sta_num = race_manager->getNumSpareTireKarts();
+            assert(m_spare_tire_karts.size() == sta_num);
+            Log::info("ThreeStrikesBattle","%d spare tire kart(s) created.",
+                sta_num);
         }
     }
 }   // loadCustomModels
