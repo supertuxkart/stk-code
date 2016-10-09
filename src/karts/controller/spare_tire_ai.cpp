@@ -22,6 +22,7 @@
 #include "karts/kart_gfx.hpp"
 #include "karts/max_speed.hpp"
 #include "modes/three_strikes_battle.hpp"
+#include "states_screens/race_gui.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
 #include "physics/physics.hpp"
@@ -129,8 +130,13 @@ void SpareTireAI::crashed(const AbstractKart *k)
     // Nothing happen when two spare tire karts crash each other
     if (dynamic_cast<const SpareTireAI*>(k->getController()) != NULL) return;
 
-    // Max 3 lives only
-    if (m_world->getKartLife(k->getWorldKartId()) == 3) return;
+    // Tell player that they have max 3 lives only
+    if (m_world->getKartLife(k->getWorldKartId()) == 3)
+    {
+        World::getWorld()->getRaceGUI()->addMessage
+            (_("You can only have max 3 lives!"), k, 2.0f);
+        return;
+    }
 
     // Otherwise increase one life for that kart and unspawn
     m_world->addKartLife(k->getWorldKartId());
