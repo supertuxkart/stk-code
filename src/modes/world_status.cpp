@@ -243,13 +243,8 @@ void WorldStatus::updateTime(const float dt)
                 if(NetworkConfig::get()->isServer())
                     RaceEventManager::getInstance()->startReadySetGo();
                 m_server_is_ready = true;
-                m_phase = WAIT_FOR_SERVER_PHASE;
             }   // if not networked
-            else if(NetworkConfig::get()->isNetworking())
-            {
-                // must be client now
-                m_phase = WAIT_FOR_SERVER_PHASE;
-            }
+            m_phase = WAIT_FOR_SERVER_PHASE;
             return;   // Don't increase time
         case WAIT_FOR_SERVER_PHASE:
             // On a client this phase waits for the server to be ready. On a
