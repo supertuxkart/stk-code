@@ -981,7 +981,7 @@ void World::update(float dt)
         SpareTireAI* sta =
             dynamic_cast<SpareTireAI*>(m_karts[i]->getController());
         // Update all karts that are not eliminated
-        if(!m_karts[i]->isEliminated() || (sta && sta->needUpdate()))
+        if(!m_karts[i]->isEliminated() || (sta && sta->isMoving()))
             m_karts[i]->update(dt);
     }
     PROFILER_POP_CPU_MARKER();

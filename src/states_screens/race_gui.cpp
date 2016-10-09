@@ -379,7 +379,7 @@ void RaceGUI::drawGlobalMiniMap()
         const SpareTireAI* sta =
             dynamic_cast<const SpareTireAI*>(kart->getController());
         // don't draw eliminated kart
-        if(kart->isEliminated() && !(sta && sta->needUpdate())) continue;
+        if(kart->isEliminated() && !(sta && sta->isMoving())) continue;
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);

@@ -254,7 +254,7 @@ void WorldWithRank::updateSectorForKarts()
     {
         SpareTireAI* sta =
             dynamic_cast<SpareTireAI*>(m_karts[i]->getController());
-        if (!m_karts[i]->isEliminated() || (sta && sta->needUpdate()))
+        if (!m_karts[i]->isEliminated() || (sta && sta->isMoving()))
             getTrackSector(i)->update(m_karts[i]->getXYZ());
     }
 }   // updateSectorForKarts

@@ -65,7 +65,8 @@ protected:
 
     bool m_mini_skid;
 
-    void  collectItemInArena(Vec3*, int*) const;
+    void          collectItemInArena(Vec3*, int*) const;
+    virtual void  findClosestKart(bool use_difficulty, bool find_sta) = 0;
 private:
     /** Used by handleArenaUTurn, it tells whether to do left or right
      *  turning when steering is overridden. */
@@ -119,7 +120,6 @@ private:
     void          useItems(const float dt);
     virtual bool  canSkid(float steer_fraction) OVERRIDE
                                      { return m_mini_skid; }
-    virtual void  findClosestKart(bool use_difficulty) = 0;
     virtual void  findTarget() = 0;
     virtual bool  forceBraking() { return false; }
     virtual int   getCurrentNode() const = 0;

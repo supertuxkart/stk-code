@@ -571,7 +571,7 @@ void ThreeStrikesBattle::enterRaceOverState()
         SpareTireAI* sta =
             dynamic_cast<SpareTireAI*>(m_spare_tire_karts[i]->getController());
         assert(sta);
-        if (sta->needUpdate())
+        if (sta->isMoving())
             sta->unspawn();
     }
 
@@ -597,7 +597,7 @@ bool ThreeStrikesBattle::spareTireKartsSpawned() const
         dynamic_cast<SpareTireAI*>(m_spare_tire_karts[0]->getController());
     assert(sta);
 
-    return sta->needUpdate();
+    return sta->isMoving();
 }   // spareTireKartsSpawned
 
 //-----------------------------------------------------------------------------

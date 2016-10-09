@@ -129,7 +129,7 @@ void SoccerAI::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-void SoccerAI::findClosestKart(bool use_difficulty)
+void SoccerAI::findClosestKart(bool use_difficulty, bool find_sta)
 {
     float distance = 99999.9f;
     const unsigned int n = m_world->getNumKarts();
@@ -165,6 +165,7 @@ void SoccerAI::findClosestKart(bool use_difficulty)
 //-----------------------------------------------------------------------------
 void SoccerAI::findTarget()
 {
+    findClosestKart(true/*use_difficulty*/, false/*find_sta*/);
     // Check if this AI kart is the one who will chase the ball
     if (m_world->getBallChaser(m_cur_team) == (signed)m_kart->getWorldKartId())
     {

@@ -33,7 +33,6 @@ private:
 
     float m_timer;
 
-    virtual void  findClosestKart(bool use_difficulty) OVERRIDE {}
     virtual void  findTarget() OVERRIDE;
     void          findDefaultPath();
 public:
@@ -43,7 +42,7 @@ public:
     virtual void reset() OVERRIDE;
     void         spawn(float time_to_last);
     void         unspawn();
-    bool         needUpdate() const { return !m_fixed_target_nodes.empty(); }
+    bool         isMoving() const { return !m_fixed_target_nodes.empty(); }
 };
 
 #endif
