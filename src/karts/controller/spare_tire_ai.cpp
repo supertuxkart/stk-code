@@ -140,6 +140,7 @@ void SpareTireAI::crashed(const AbstractKart *k)
 
     // Otherwise increase one life for that kart and unspawn
     m_world->addKartLife(k->getWorldKartId());
+    World::getWorld()->getRaceGUI()->addMessage(_("+1 life."), k, 2.0f);
     unspawn();
 
 }   // crashed
