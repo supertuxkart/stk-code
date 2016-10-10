@@ -134,7 +134,7 @@ void SpareTireAI::crashed(const AbstractKart *k)
     if (m_world->getKartLife(k->getWorldKartId()) == 3)
     {
         World::getWorld()->getRaceGUI()->addMessage
-            (_("You can only have max 3 lives!"), k, 2.0f);
+            (_("You can have at most 3 lives!"), k, 2.0f);
         return;
     }
 
