@@ -131,6 +131,7 @@ KartModel::KartModel(bool is_master)
         m_min_suspension[i] = -0.07f;
         m_max_suspension[i] = 0.20f;
         m_dampen_suspension_amplitude[i] = 2.5f;
+        m_default_physics_suspension[i] = 0.25f;
     }
     m_wheel_filename[0] = "";
     m_wheel_filename[1] = "";
@@ -861,17 +862,18 @@ void KartModel::update(float dt, float distance, float steer, float speed,
 
         float suspension_length = 0.0f;
         GhostKart* gk = dynamic_cast<GhostKart*>(m_kart);
-        // Prevent using m_default_physics_suspension uninitialized
-        if (gk && gt_replay_index == -1) break;
-
-        if (gk)
+        // Prevent using suspension length uninitialized
+        if (dt != 0.0f && !(gk && gt_replay_index == -1))
         {
-            suspension_length = gk->getSuspensionLength(gt_replay_index, i);
-        }
-        else
-        {
-            suspension_length = m_kart->getVehicle()->getWheelInfo(i).
-                                m_raycastInfo.m_suspensionLength;
+            if (gk)
+            {
+                suspension_length = gk->getSuspensionLength(gt_replay_index, i);
+            }
+            else
+            {
+                suspension_length = m_kart->getVehicle()->getWheelInfo(i).
+                                    m_raycastInfo.m_suspensionLength;
+            }
         }
 
         // Check documentation of Kart::updateGraphics for the following line
