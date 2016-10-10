@@ -959,6 +959,7 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
                                                      scene::ISceneNode* parent)
                             : TrackObjectPresentationSceneNode(xml_node)
 {
+    m_color.set(0);
     xml_node.get("color", &m_color);
     const video::SColorf colorf(m_color);
 
