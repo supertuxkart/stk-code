@@ -297,7 +297,6 @@ void Camera::setInitialTransform()
     Vec3 target_position = m_kart->getTrans()(Vec3(0, 0, 1));
     m_camera->setTarget(target_position.toIrrVector());
     m_camera->setRotation(core::vector3df(0, 0, 0));
-    m_camera->setRotation( core::vector3df( 0.0f, 0.0f, 0.0f ) );
     m_camera->setFOV(m_fov);
 }   // setInitialTransform
 
