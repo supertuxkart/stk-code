@@ -27,7 +27,7 @@
 class SpareTireAI : public BattleAI
 {
 private:
-    std::vector<int> m_fixed_target_nodes;
+    int m_fixed_target_nodes[4];
 
     int m_idx;
 
@@ -42,7 +42,7 @@ public:
     virtual void reset() OVERRIDE;
     void         spawn(float time_to_last);
     void         unspawn();
-    bool         isMoving() const { return !m_fixed_target_nodes.empty(); }
+    bool         isMoving() const { return m_idx != -1; }
 };
 
 #endif

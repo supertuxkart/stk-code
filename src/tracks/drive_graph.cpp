@@ -223,6 +223,8 @@ void DriveGraph::load(const std::string &quad_file_name,
             m_lap_length = l;
     }
 
+    loadBoundingBoxNodes();
+
 }   // load
 
 // ----------------------------------------------------------------------------

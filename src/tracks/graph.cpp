@@ -46,6 +46,7 @@ Graph::Graph()
     m_new_rtt     = NULL;
     m_bb_min      = Vec3( 99999,  99999,  99999);
     m_bb_max      = Vec3(-99999, -99999, -99999);
+    memset(m_bb_nodes, 0, 4 * sizeof(int));
 }  // Graph
 
 // -----------------------------------------------------------------------------
@@ -618,3 +619,16 @@ int Graph::findOutOfRoadSector(const Vec3& xyz, const int curr_sector,
     }
     return min_sector;
 }   // findOutOfRoadSector
+
+//-----------------------------------------------------------------------------
+void Graph::loadBoundingBoxNodes()
+{
+    m_bb_nodes[0] = findOutOfRoadSector(Vec3(m_bb_min.x(), 0, m_bb_min.z()),
+        -1/*curr_sector*/, NULL/*all_sectors*/, true/*ignore_vertical*/);
+    m_bb_nodes[1] = findOutOfRoadSector(Vec3(m_bb_min.x(), 0, m_bb_max.z()),
+        -1/*curr_sector*/, NULL/*all_sectors*/, true/*ignore_vertical*/);
+    m_bb_nodes[2] = findOutOfRoadSector(Vec3(m_bb_max.x(), 0, m_bb_min.z()),
+        -1/*curr_sector*/, NULL/*all_sectors*/, true/*ignore_vertical*/);
+    m_bb_nodes[3] = findOutOfRoadSector(Vec3(m_bb_max.x(), 0, m_bb_max.z()),
+        -1/*curr_sector*/, NULL/*all_sectors*/, true/*ignore_vertical*/);
+}   // loadBoundingBoxNodes

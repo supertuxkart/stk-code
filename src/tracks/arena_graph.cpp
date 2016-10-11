@@ -44,6 +44,8 @@ ArenaGraph::ArenaGraph(const std::string &navmesh, const XMLNode *node)
     if (node && race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         loadGoalNodes(node);
 
+    loadBoundingBoxNodes();
+
 }   // ArenaGraph
 
 // -----------------------------------------------------------------------------

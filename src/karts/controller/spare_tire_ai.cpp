@@ -28,6 +28,8 @@
 #include "physics/physics.hpp"
 #include "utils/random_generator.hpp"
 
+#include <algorithm>
+
 SpareTireAI::SpareTireAI(AbstractKart *kart)
            : BattleAI(kart)
 {
@@ -36,6 +38,16 @@ SpareTireAI::SpareTireAI(AbstractKart *kart)
     // billboard showing 'AIBaseController' to the kart.
     Controller::setControllerName("SpareTireAI");
 
+    // Pre-load the 4 nodes of bounding box defined by battle world
+    memcpy(m_fixed_target_nodes, m_graph->getBBNodes(), 4 * sizeof(int));
+
+    // Reverse the order depends on world ID, so not all spare tire karts go
+    // the same way
+    if (m_kart->getWorldKartId() % 2 != 0)
+    {
+        std::reverse(std::begin(m_fixed_target_nodes),
+            std::end(m_fixed_target_nodes));
+    }
 }   // SpareTireAI
 
 //-----------------------------------------------------------------------------
@@ -44,7 +56,6 @@ SpareTireAI::SpareTireAI(AbstractKart *kart)
 void SpareTireAI::reset()
 {
     BattleAI::reset();
-    m_fixed_target_nodes.clear();
     m_idx = 0;
     m_timer = 0.0f;
 }   // reset
@@ -62,30 +73,11 @@ void SpareTireAI::update(float dt)
 //-----------------------------------------------------------------------------
 void SpareTireAI::findDefaultPath()
 {
-    // Randomly find 3 nodes for spare tire kart to move
-    assert(m_fixed_target_nodes.empty());
-    const int nodes = m_graph->getNumNodes();
-    const float min_dist = sqrtf(nodes);
+    // Randomly find a start node for spare tire kart to move
+    assert(m_idx == -1);
+
     RandomGenerator random;
-    while (m_fixed_target_nodes.size() < 3)
-    {
-        int node = random.get(nodes);
-        if (m_fixed_target_nodes.empty())
-        {
-            m_fixed_target_nodes.push_back(node);
-            continue;
-        }
-        bool succeed = true;
-        for (const int& all_node : m_fixed_target_nodes)
-        {
-            float dist = m_graph->getDistance(all_node, node);
-            if (dist < min_dist)
-                succeed = false;
-        }
-        if (succeed)
-            m_fixed_target_nodes.push_back(node);
-    }
-    m_idx = 0;
+    m_idx = random.get(4);
     m_target_node = m_fixed_target_nodes[m_idx];
 
 }   // findDefaultPath
@@ -93,11 +85,9 @@ void SpareTireAI::findDefaultPath()
 //-----------------------------------------------------------------------------
 void SpareTireAI::findTarget()
 {
-    if (m_fixed_target_nodes.empty()) return;
-
-    assert(m_fixed_target_nodes.size() == 3);
+    assert(m_idx != -1 && m_idx < 4);
     if (getCurrentNode() == m_fixed_target_nodes[m_idx])
-        m_idx = m_idx == 2 ? 0 : m_idx + 1;
+        m_idx = m_idx == 3 ? 0 : m_idx + 1;
 
     const int chosen_node = m_fixed_target_nodes[m_idx];
     m_target_node = chosen_node;
@@ -120,7 +110,7 @@ void SpareTireAI::spawn(float time_to_last)
 //-----------------------------------------------------------------------------
 void SpareTireAI::unspawn()
 {
-    reset();
+    m_idx = -1;
     m_kart->eliminate();
 }   // unspawn
 
