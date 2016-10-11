@@ -160,6 +160,7 @@ IrrDriver::~IrrDriver()
     }
     assert(m_device != NULL);
 
+    cleanUnicolorTextures();
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
@@ -905,6 +906,7 @@ void IrrDriver::applyResolutionSettings()
     {
         Shaders::destroy();
     }
+    cleanUnicolorTextures();
     initDevice();
 
     font_manager = new FontManager();
