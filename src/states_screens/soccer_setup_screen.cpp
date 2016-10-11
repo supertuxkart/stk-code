@@ -39,7 +39,7 @@
 using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( SoccerSetupScreen );
 
-#define KART_CONTINUOUS_ROTATION_SPEED      20.f
+#define KART_CONTINUOUS_ROTATION_SPEED      35.f
 #define KART_CONFIRMATION_ROTATION_SPEED    4.f
 #define KART_CONFIRMATION_TARGET_ANGLE      10.f
 
@@ -137,7 +137,7 @@ void SoccerSetupScreen::beforeAddingWidget()
         kart_view->m_y = 0;
         kart_view->m_w = 200;
         kart_view->m_h = 200;
-        kart_view->add();
+        kart_view->clearModels();
 
         // Record info about it for further update
         KartViewInfo info;
