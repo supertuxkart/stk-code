@@ -870,11 +870,11 @@ void IrrDriver::applyResolutionSettings()
                                             UserConfigParams::m_prev_height) );
     m_video_driver->endScene();
     track_manager->removeAllCachedData();
-    attachment_manager->removeTextures();
+    delete attachment_manager;
     projectile_manager->removeTextures();
     ItemManager::removeTextures();
     kart_properties_manager->unloadAllKarts();
-    powerup_manager->unloadPowerups();
+    delete powerup_manager;
     Referee::cleanup();
     ParticleKindManager::get()->cleanup();
     delete input_manager;
@@ -901,12 +901,23 @@ void IrrDriver::applyResolutionSettings()
     RSMPassCmd::getInstance()->kill();
     GlowPassCmd::getInstance()->kill();
     resetTextureTable();
-    // initDevice will drop the current device.
+
+    if (m_post_processing)
+    {
+        // check if we createad the OpenGL device by calling initDevice()
+        m_post_processing->drop();
+    }
+    cleanUnicolorTextures();
+
+    delete m_shadow_matrices;
+
     if (CVS->isGLSL())
     {
         Shaders::destroy();
     }
-    cleanUnicolorTextures();
+    delete m_spherical_harmonics;
+
+    // initDevice will drop the current device.
     initDevice();
 
     font_manager = new FontManager();
@@ -919,6 +930,8 @@ void IrrDriver::applyResolutionSettings()
     material_manager->loadMaterial();
     input_manager = new InputManager ();
     input_manager->setMode(InputManager::MENU);
+    powerup_manager = new PowerupManager();
+    attachment_manager = new AttachmentManager();
 
     GUIEngine::addLoadingIcon(
         irr_driver->getTexture(file_manager
