@@ -77,6 +77,8 @@ namespace Scripting
     ScriptEngine::~ScriptEngine()
     {
         // Release the engine
+        m_pending_timeouts.clearAndDeleteAll();
+        m_engine->DiscardModule(MODULE_ID_MAIN_SCRIPT_FILE);
         m_engine->Release();
     }
 
