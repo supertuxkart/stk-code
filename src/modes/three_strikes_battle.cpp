@@ -74,7 +74,7 @@ ThreeStrikesBattle::~ThreeStrikesBattle()
 {
     m_tires.clearWithoutDeleting();
 
-    irr_driver->grabAllTextures(m_tire);
+    irr_driver->dropAllTextures(m_tire);
     // Remove the mesh from the cache so that the mesh is properly
     // freed once all refernces to it (which will happen once all
     // karts are being freed, which would have a pointer to this mesh)
