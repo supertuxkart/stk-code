@@ -1868,8 +1868,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         sun->getLightData().SpecularColor = m_sun_specular_color;
     }
     else
+    {
         irr_driver->createSunInterposer();
-
+        m_sun->grab();
+    }
 
     createPhysicsModel(main_track_count);
 

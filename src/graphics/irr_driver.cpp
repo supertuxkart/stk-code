@@ -2664,8 +2664,6 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
         else
             light = new SunNode(m_scene_manager, parent, r, g, b);
 
-        light->grab();
-
         light->setPosition(pos);
         light->updateAbsolutePosition();
 
@@ -2695,9 +2693,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
 
 void IrrDriver::clearLights()
 {
-    u32 i;
-    const u32 max = (int)m_lights.size();
-    for (i = 0; i < max; i++)
+    for (unsigned int i = 0; i < m_lights.size(); i++)
     {
         m_lights[i]->drop();
     }
