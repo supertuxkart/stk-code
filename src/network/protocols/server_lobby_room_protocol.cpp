@@ -230,7 +230,7 @@ void ServerLobbyRoomProtocol::registerServer()
     {
         irr::core::stringc error(request->getInfo().c_str());
         Log::error("RegisterServer", "%s", error.c_str());
-        STKHost::get()->setErrorMessage(_("Failed to register server"));
+        STKHost::get()->setErrorMessage(_("Failed to register server: %s", error.c_str()));
     }
 
 }   // registerServer
