@@ -899,7 +899,7 @@ bool CIrrDeviceLinux::createWindow()
 									  WMCheck, 0L, 1L, False, XA_WINDOW,
 									  &type, &form, &len, &remain,
 									  (unsigned char **)&list);
-
+		XFree(list);
 		bool netWM = (s == Success) && len;
 		attributes.override_redirect = !netWM && CreationParams.Fullscreen;
 
