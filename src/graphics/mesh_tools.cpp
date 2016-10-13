@@ -444,29 +444,27 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
     clone->recalculateBoundingBox();
     if (calculate_tangents)
         recalculateTangents(clone, recalculate_normals, smooth, angle_weighted);
-    
-    int mbcount = clone->getMeshBufferCount();
-    for (int i = 0; i < mbcount; i++)
-    {
-        scene::IMeshBuffer* mb = clone->getMeshBuffer(i);
-
-        for (u32 t = 0; t < video::MATERIAL_MAX_TEXTURES; t++)
-        {
-            video::ITexture* texture = mb->getMaterial().TextureLayer[t].Texture;
-            if (texture != NULL)
-                texture->grab();
-        }
-    }
 
     scene::IMeshCache* meshCache = irr_driver->getSceneManager()->getMeshCache();
     io::SNamedPath path = meshCache->getMeshName(mesh);
-    irr_driver->removeMeshFromCache(mesh);
+    if (path.getPath() == "")
+    {
+        // This mesh is not in irrlicht cache, drop it directly
+        assert(mesh->getReferenceCount() == 1);
+        mesh->drop();
+        return clone;
+    }
+    else
+    {
+        // Cache the calcuated tangent mesh with path
+        irr_driver->removeMeshFromCache(mesh);
+        scene::SAnimatedMesh* amesh = new scene::SAnimatedMesh(clone);
+        clone->drop();
+        irr_driver->grabAllTextures(amesh);
+        meshCache->addMesh(path, amesh);
+        World::getWorld()->getTrack()->addCachedMesh(amesh);
 
-    scene::SAnimatedMesh* amesh = new scene::SAnimatedMesh(clone);
-    meshCache->addMesh(path, amesh);
+        return amesh;
+    }
 
-    World::getWorld()->getTrack()->addCachedMesh(amesh);
-
-    return clone;
 }
-
