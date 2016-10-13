@@ -10,14 +10,6 @@
 
 KartUpdateProtocol::KartUpdateProtocol() : Protocol(PROTOCOL_KART_UPDATE)
 {
-    // Allocate arrays to store one position and rotation for each kart
-    // (which is the update information from the server to the client).
-    m_next_positions.resize(World::getWorld()->getNumKarts());
-    m_next_quaternions.resize(World::getWorld()->getNumKarts());
-
-    // This flag keeps track if valid data for an update is in
-    // the arrays
-    m_was_updated = false;
 }   // KartUpdateProtocol
 
 // ----------------------------------------------------------------------------
@@ -28,6 +20,16 @@ KartUpdateProtocol::~KartUpdateProtocol()
 // ----------------------------------------------------------------------------
 void KartUpdateProtocol::setup()
 {
+    // Allocate arrays to store one position and rotation for each kart
+    // (which is the update information from the server to the client).
+    m_next_positions.resize(World::getWorld()->getNumKarts());
+    m_next_quaternions.resize(World::getWorld()->getNumKarts());
+
+    // This flag keeps track if valid data for an update is in
+    // the arrays
+    m_was_updated = false;
+
+    m_previous_time = 0;
 }   // setup
 
 // ----------------------------------------------------------------------------
@@ -36,7 +38,9 @@ void KartUpdateProtocol::setup()
  */
 bool KartUpdateProtocol::notifyEvent(Event* event)
 {
-    if (event->getType() != EVENT_TYPE_MESSAGE)
+    // It might be possible that we still receive messages after
+    // the game was exited, so make sure we still have a world.
+    if (event->getType() != EVENT_TYPE_MESSAGE || !World::getWorld())
         return true;
     NetworkString &ns = event->data();
     if (ns.size() < 33)
@@ -71,11 +75,11 @@ void KartUpdateProtocol::update(float dt)
 {
     if (!World::getWorld())
         return;
-    static double time = 0;
+
     double current_time = StkTime::getRealTime();
-    if (current_time > time + 0.1) // 10 updates per second
+    if (current_time > m_previous_time + 0.1) // 10 updates per second
     {
-        time = current_time;
+        m_previous_time = current_time;
         if (NetworkConfig::get()->isServer())
         {
             World *world = World::getWorld();

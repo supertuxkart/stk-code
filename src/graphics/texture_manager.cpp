@@ -34,8 +34,8 @@
 
 GLuint getTextureGLuint(irr::video::ITexture *tex)
 {
-	if (tex == NULL)
-		return 0;
+    if (tex == NULL)
+        return 0;
 #if defined(USE_GLES2)
     return static_cast<irr::video::COGLES2Texture*>(tex)->getOpenGLTextureName();
 #else

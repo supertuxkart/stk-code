@@ -260,19 +260,32 @@ void IrrDriver::renderGLSL(float dt)
         {
             bool isRace = StateManager::get()->getGameState() == GUIEngine::GAME;
             FrameBuffer *fbo = m_post_processing->render(camnode, isRace);
-
+            
+            // The viewport has been changed using glViewport function directly
+            // during scene rendering, but irrlicht thinks that nothing changed
+            // when single camera is used. In this case we set the viewport
+            // to whole screen manually.
+            glViewport(0, 0, irr_driver->getActualScreenSize().Width, 
+                       irr_driver->getActualScreenSize().Height);
+            
             if (irr_driver->getNormals())
-                irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+            {
+                irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(
+                    viewport.UpperLeftCorner.X, 
+                    irr_driver->getActualScreenSize().Height - viewport.LowerRightCorner.Y, 
+                    viewport.LowerRightCorner.X, 
+                    irr_driver->getActualScreenSize().Height - viewport.UpperLeftCorner.Y);
+            }
             else if (irr_driver->getSSAOViz())
             {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+                camera->activate();
                 m_post_processing->renderPassThrough(m_rtts->getFBO(FBO_HALF1_R).getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
             }
             else if (irr_driver->getRSM())
             {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+                camera->activate();
                 m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
             }
             else if (irr_driver->getShadowViz())
@@ -283,9 +296,7 @@ void IrrDriver::renderGLSL(float dt)
             {
                 glEnable(GL_FRAMEBUFFER_SRGB);
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                if (CVS->isDefferedEnabled())
-                    camera->activate();
-                glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+                camera->activate();
                 m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
                 glDisable(GL_FRAMEBUFFER_SRGB);
             }
