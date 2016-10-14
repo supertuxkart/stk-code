@@ -132,14 +132,7 @@ void ConnectToServer::asynchronousUpdate()
             }
             else
             {
-                // No quick connect, so we have a server to connect to.
-                // Find its address
-                m_current_protocol = new GetPeerAddress(m_host_id, this);
-                m_current_protocol->requestStart();
                 m_state = GOT_SERVER_ADDRESS;
-                // Pause this protocol till GetPeerAddress finishes.
-                // The callback then will unpause this protocol/
-                requestPause();
             }
         }
         break;
@@ -268,11 +261,6 @@ void ConnectToServer::callback(Protocol *protocol)
         case GETTING_SELF_ADDRESS:
             // The GetPublicAddress protocol stores our address in
             // STKHost, so we only need to unpause this protocol
-            requestUnpause();
-            break;
-        case GOT_SERVER_ADDRESS:
-            // Get the server address from the protocol.
-            m_server_address.copy(((GetPeerAddress*)protocol)->getAddress());
             requestUnpause();
             break;
         default:
