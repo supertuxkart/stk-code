@@ -169,7 +169,7 @@ void STKAnimatedMesh::updateNoGL()
             }
             else
             {
-                Material::ShaderType MatType = material->getShaderType();// getMeshMaterialFromType(type, mb->getVertexType(), material);
+                Material::ShaderType MatType = getMeshMaterialFromType(type, mb->getVertexType(), material, NULL);
                 MeshSolidMaterial[MatType].push_back(&mesh);
             }
         }

@@ -522,6 +522,13 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
                    full_path.c_str(), kart_properties.getIdent().c_str());
         return false;
     }
+
+    scene::ISkinnedMesh* sm = dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
+    if (sm)
+    {
+        MeshTools::createSkinnedMeshWithTangents(sm, &MeshTools::isNormalMap);
+    }
+
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
 
@@ -570,6 +577,14 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         // Grab all textures. This is done for the master only, so
         // the destructor will only free the textures if a master
         // copy is freed.
+
+        scene::ISkinnedMesh* sm =
+            dynamic_cast<scene::ISkinnedMesh*>(obj.m_model);
+        if (sm)
+        {
+            MeshTools::createSkinnedMeshWithTangents(sm,
+                &MeshTools::isNormalMap);
+        }
         irr_driver->grabAllTextures(obj.m_model);
 
         // Update min/max
@@ -612,6 +627,8 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         std::string full_wheel =
             kart_properties.getKartDir()+m_wheel_filename[i];
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
+        m_wheel_model[i] = MeshTools::createMeshWithTangents(m_wheel_model[i],
+            &MeshTools::isNormalMap);
         // Grab all textures. This is done for the master only, so
         // the destructor will only free the textures if a master
         // copy is freed.

@@ -21,7 +21,7 @@
 
 namespace irr
 {
-    namespace scene { class IMesh; class IMeshBuffer; }
+    namespace scene { class IMesh; class IMeshBuffer; class ISkinnedMesh; }
 }
 using namespace irr;
 
@@ -37,8 +37,14 @@ namespace MeshTools
     bool isNormalMap(scene::IMeshBuffer* mb);
 
     // Copied from irrlicht
-    scene::IMesh* createMeshWithTangents(scene::IMesh* mesh, bool(*predicate)(scene::IMeshBuffer*),
-        bool recalculateNormals = false, bool smooth = false, bool angleWeighted = false, bool calculateTangents = true);
+    scene::IMesh* createMeshWithTangents(scene::IMesh* mesh,
+        bool(*predicate)(scene::IMeshBuffer*), bool recalculateNormals = false,
+        bool smooth = false, bool angleWeighted = false,
+        bool calculateTangents = true);
+
+    void createSkinnedMeshWithTangents(scene::ISkinnedMesh* mesh,
+        bool(*predicate)(scene::IMeshBuffer*));
+
 }   // MeshTools
 
 #endif
