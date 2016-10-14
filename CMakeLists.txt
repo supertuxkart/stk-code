@@ -87,8 +87,8 @@ if(NOT USE_GLES2)
     include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
 endif()
 
-if((WIN32 AND NOT MINGW) OR APPLE)
-    if (NOT APPLE)
+if((WIN32 AND NOT MINGW) OR APPLE OR ANDROID)
+    if (NOT APPLE OR ANDROID)
     # Build zlib library
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
     include_directories("${PROJECT_SOURCE_DIR}/lib/zlib")
