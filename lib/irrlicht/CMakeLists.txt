@@ -13,7 +13,7 @@ if(NOT USE_GLES2)
     include_directories(${OPENGL_INCLUDE_DIR})
 endif()
 
-if (UNIX AND NOT APPLE)
+if (UNIX AND NOT (APPLE OR ANDROID))
     find_package(X11 REQUIRED)
     include_directories(${X11_INCLUDE_DIR})
 endif()
@@ -47,7 +47,7 @@ if(USE_GLES2)
 endif()
 
 # Xrandr
-if(UNIX AND NOT APPLE)
+if(UNIX AND NOT (APPLE OR ANDROID))
     add_definitions(-DNO_IRR_LINUX_X11_VIDMODE_)
     add_definitions(-D_IRR_LINUX_X11_RANDR_)
 endif()
