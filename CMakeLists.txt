@@ -24,6 +24,11 @@ if (UNIX AND NOT APPLE)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
 endif()
 
+if (ANDROID)
+    message(STATUS "Building Android APK and library")
+    set(USE_GLES2 ON)
+endif()
+
 if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
     # on the installation of the Windows DDK (Driver Developer Kit),
