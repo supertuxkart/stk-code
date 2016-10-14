@@ -332,6 +332,7 @@ void Kart::reset()
     // restore the original controller.
     if(m_saved_controller)
     {
+        delete m_controller;
         m_controller       = m_saved_controller;
         m_saved_controller = NULL;
     }
@@ -2888,12 +2889,14 @@ void Kart::setOnScreenText(const wchar_t *text)
 
     if (CVS->isGLSL())
     {
-        new STKTextBillboard(text, bold_face,
+        scene::ISceneNode* tb =
+            new STKTextBillboard(text, bold_face,
             GUIEngine::getSkin()->getColor("font::bottom"),
             GUIEngine::getSkin()->getColor("font::top"),
             getNode(), irr_driver->getSceneManager(), -1,
             core::vector3df(0.0f, 1.5f, 0.0f),
             core::vector3df(1.0f, 1.0f, 1.0f));
+        tb->drop();
     }
     else
     {
