@@ -368,6 +368,16 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         m_mesh = MeshTools::createMeshWithTangents(m_mesh,
                                                    &MeshTools::isNormalMap);
     }
+    else
+    {
+        scene::ISkinnedMesh* sm =
+            dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
+        if (sm)
+        {
+            MeshTools::createSkinnedMeshWithTangents(sm,
+                &MeshTools::isNormalMap);
+        }
+    }
     init(&xml_node, parent, enabled);
 }   // TrackObjectPresentationMesh
 
