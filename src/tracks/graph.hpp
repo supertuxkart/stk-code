@@ -61,7 +61,7 @@ protected:
      *  graph. */
     void createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
                     const Vec3 &p3, unsigned int node_index,
-                    bool invisible, bool ai_ignore, bool is_arena);
+                    bool invisible, bool ai_ignore, bool is_arena, bool ignore);
 
 private:
     /** The 2d bounding box, used for hashing. */

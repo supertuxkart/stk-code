@@ -620,7 +620,17 @@ unsigned int LinearWorld::getRescuePositionIndex(AbstractKart *kart)
     // Setting XYZ for the kart is important since otherwise the kart
     // will not detect the right material again when doing the next
     // raycast to detect where it is driving on (--> potential rescue loop)
-    return getTrackSector(kart_id)->getCurrentGraphNode();
+    int index = getTrackSector(kart_id)->getCurrentGraphNode();
+
+    // Do not rescue to an ignored quad, find another (non-ignored) quad
+    if (Graph::get()->getQuad(index)->isIgnored())
+    {
+        Vec3 pos = kart->getFrontXYZ();
+        int sector = Graph::get()->findOutOfRoadSector(pos);
+        return sector;
+    }
+
+    return index;
 }   // getRescuePositionIndex
 
 // ------------------------------------------------------------------------

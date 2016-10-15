@@ -28,8 +28,8 @@
 DriveNode::DriveNode(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
                      const Vec3 &p3, const Vec3 &normal,
                      unsigned int node_index, bool invisible,
-                     bool ai_ignore)
-          :Quad(p0, p1, p2, p3, normal, node_index, invisible)
+                     bool ai_ignore, bool ignored)
+          :Quad(p0, p1, p2, p3, normal, node_index, invisible, ignored)
 {
     m_ai_ignore           = ai_ignore;
     m_distance_from_start = -1.0f;

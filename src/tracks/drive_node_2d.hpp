@@ -45,7 +45,7 @@ private:
 public:
     DriveNode2D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
                 const Vec3 &normal, unsigned int node_index, bool invisible,
-                bool ai_ignore);
+                bool ai_ignore, bool ignored);
     // ------------------------------------------------------------------------
     virtual void getDistances(const Vec3 &xyz, Vec3 *result) const OVERRIDE;
     // ------------------------------------------------------------------------

@@ -399,7 +399,7 @@ void Graph::mapPoint2MiniMap(const Vec3 &xyz,Vec3 *draw_at) const
 // -----------------------------------------------------------------------------
 void Graph::createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
                        const Vec3 &p3, unsigned int node_index,
-                       bool invisible, bool ai_ignore, bool is_arena)
+                       bool invisible, bool ai_ignore, bool is_arena, bool ignored)
 {
     // Find the normal of this quad by computing the normal of two triangles
     // and taking their average.
@@ -427,7 +427,7 @@ void Graph::createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
         else
         {
             q = new DriveNode3D(p0, p1, p2, p3, normal, node_index, invisible,
-                ai_ignore);
+                ai_ignore, ignored);
         }
     }
     else
@@ -441,7 +441,7 @@ void Graph::createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
         else
         {
             q = new DriveNode2D(p0, p1, p2, p3, normal, node_index, invisible,
-                ai_ignore);
+                ai_ignore, ignored);
         }
     }
     m_all_nodes.push_back(q);
@@ -499,7 +499,7 @@ void Graph::findRoadSector(const Vec3& xyz, int *sector,
         else
             indx = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
         const Quad* q = getQuad(indx);
-        if(q->pointInside(xyz, ignore_vertical))
+        if (q->pointInside(xyz, ignore_vertical))
         {
             *sector  = indx;
             return;
@@ -585,24 +585,27 @@ int Graph::findOutOfRoadSector(const Vec3& xyz, const int curr_sector,
                 ? 0
                 : current_sector+1;
 
-            // A first simple test uses the 2d distance to the center of the
-            // quad.
-            float dist_2 =
-                m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
-            if(dist_2<min_dist_2)
+            const Quad* q = getQuad(next_sector);
+            if (!q->isIgnored())
             {
-                const Quad* q = getQuad(next_sector);
-                float dist = xyz.getY() - q->getMinHeight();
-                // While negative distances are unlikely, we allow some small
-                // negative numbers in case that the kart is partly in the
-                // track. Only do the height test in phase==0, in phase==1
-                // accept any point, independent of height, or this node is 3d
-                // which already takes height into account
-                if(phase==1 || (dist < 5.0f && dist>-1.0f) ||
-                    q->is3DQuad() || ignore_vertical)
+                // A first simple test uses the 2d distance to the center of the
+                // quad.
+                float dist_2 =
+                    m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
+                if (dist_2 < min_dist_2)
                 {
-                    min_dist_2 = dist_2;
-                    min_sector = next_sector;
+                    float dist = xyz.getY() - q->getMinHeight();
+                    // While negative distances are unlikely, we allow some small
+                    // negative numbers in case that the kart is partly in the
+                    // track. Only do the height test in phase==0, in phase==1
+                    // accept any point, independent of height, or this node is 3d
+                    // which already takes height into account
+                    if (phase == 1 || (dist < 5.0f && dist>-1.0f) ||
+                        q->is3DQuad() || ignore_vertical)
+                    {
+                        min_dist_2 = dist_2;
+                        min_sector = next_sector;
+                    }
                 }
             }
             current_sector = next_sector;
