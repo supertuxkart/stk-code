@@ -460,7 +460,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         uint8_t player_id = data.getUInt8();
         uint8_t host_id   = data.getUInt8();
         irr::core::stringw name;
-        int bytes_read = data.decodeStringW(&name);
+        data.decodeStringW(&name);
         
         NetworkPlayerProfile* profile2 =
             new NetworkPlayerProfile(name, player_id, host_id);
@@ -755,7 +755,7 @@ void ClientLobbyRoomProtocol::playerTrackVote(Event* event)
     std::string track_name;
     uint8_t player_id = data.getUInt8();
     uint8_t number    = data.getUInt8();
-    int N = data.decodeString(&track_name);
+    data.decodeString(&track_name);
     m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
                                                  number);
 }   // playerTrackVote

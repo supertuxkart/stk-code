@@ -713,4 +713,3 @@ EventPropagation PlayerKartWidget::onSpinnerConfirmed()
     KartSelectionScreen::getRunningInstance()->playerConfirm(m_player_id);
     return EVENT_BLOCK;
 }   // onSpinnerConfirmed
-

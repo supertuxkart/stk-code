@@ -331,7 +331,7 @@ void RewindManager::rewindTo(float rewind_time)
     {
         state->rewind();
         index++;
-        if(index>=m_rewind_info.size()) break;
+        if(index >= m_rewind_info.size()) break;
         state = dynamic_cast<RewindInfoState*>(m_rewind_info[index]);
     }
 
@@ -343,7 +343,7 @@ void RewindManager::rewindTo(float rewind_time)
         // Now handle all states and events at the current time before
         // updating the world:
         while(index < (int)m_rewind_info.size() &&
-              m_rewind_info[index]->getTime()<=world->getTime()+0.001f)
+              m_rewind_info[index]->getTime() <= world->getTime()+0.001f)
         {
             if(m_rewind_info[index]->isState())
             {

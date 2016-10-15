@@ -440,7 +440,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     // Connection accepted.
     // ====================
     std::string name_u8;
-    int len = data.decodeString(&name_u8);
+    data.decodeString(&name_u8);
     core::stringw name = StringUtils::utf8ToWide(name_u8);
     std::string password;
     data.decodeString(&password);
@@ -680,7 +680,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
     // 2nd track Mathclass, ...
     uint8_t track_number = data.getUInt8();
     std::string track_name;
-    int N = data.decodeString(&track_name);
+    data.decodeString(&track_name);
     m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
                                                  track_number);
     // Send the vote to everybody (including the sender)
