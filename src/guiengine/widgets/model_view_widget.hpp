@@ -56,7 +56,7 @@ namespace GUIEngine
         RTT* m_rtt_provider;
         IrrDriver::RTTProvider* m_old_rtt_provider;
 
-        float angle;
+        float m_angle;
 
         bool m_rtt_unsupported;
 

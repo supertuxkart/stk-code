@@ -485,6 +485,8 @@ World::~World()
     if(m_physics)
         delete m_physics;
 
+    delete m_script_engine;
+
     m_world = NULL;
 
     irr_driver->getSceneManager()->clear();

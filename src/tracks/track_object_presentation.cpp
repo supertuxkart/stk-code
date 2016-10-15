@@ -368,6 +368,16 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         m_mesh = MeshTools::createMeshWithTangents(m_mesh,
                                                    &MeshTools::isNormalMap);
     }
+    else
+    {
+        scene::ISkinnedMesh* sm =
+            dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
+        if (sm)
+        {
+            MeshTools::createSkinnedMeshWithTangents(sm,
+                &MeshTools::isNormalMap);
+        }
+    }
     init(&xml_node, parent, enabled);
 }   // TrackObjectPresentationMesh
 
@@ -959,6 +969,7 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
                                                      scene::ISceneNode* parent)
                             : TrackObjectPresentationSceneNode(xml_node)
 {
+    m_color.set(0);
     xml_node.get("color", &m_color);
     const video::SColorf colorf(m_color);
 
