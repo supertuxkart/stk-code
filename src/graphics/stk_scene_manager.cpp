@@ -344,6 +344,10 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
         for (GLMesh *mesh : node->TransparentMesh[TM_ADDITIVE])
             pushVector(ListAdditiveTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix);
     }
+    for (GLMesh *mesh : node->TransparentMesh[TM_GHOST_KART])
+        pushVector(ListGhostKart::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix);
+    for (GLMesh *mesh : node->TransparentMesh[TM_GHOST_KART_TANGENTS])
+        pushVector(ListGhostKartTangents::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix);
     for (GLMesh *mesh : node->TransparentMesh[TM_DISPLACEMENT])
         pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
 
@@ -606,6 +610,8 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     windDir = getWindDir();
     ListBlendTransparent::getInstance()->clear();
     ListAdditiveTransparent::getInstance()->clear();
+    ListGhostKart::getInstance()->clear();
+    ListGhostKartTangents::getInstance()->clear();
     ListBlendTransparentFog::getInstance()->clear();
     ListAdditiveTransparentFog::getInstance()->clear();
     ListDisplacement::getInstance()->clear();

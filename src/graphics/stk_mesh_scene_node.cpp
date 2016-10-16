@@ -209,10 +209,11 @@ void STKMeshSceneNode::updateNoGL()
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
             if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent())
             {
-                if (!immediate_draw)
-                    TransparentMesh[TM_ADDITIVE].push_back(&mesh);
+                assert(!immediate_draw);
+                if (mesh.VAOType == video::EVT_TANGENTS)
+                    TransparentMesh[TM_GHOST_KART_TANGENTS].push_back(&mesh);
                 else
-                    additive = true;
+                    TransparentMesh[TM_GHOST_KART].push_back(&mesh);
             }
             else if (rnd->isTransparent())
             {
