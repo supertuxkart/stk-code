@@ -120,18 +120,11 @@ public:
 
     // ========================================================================
     class TransparentShader : public TextureShader<TransparentShader, 1,
-                                                   core::matrix4, core::matrix4 >
+                                                   core::matrix4, core::matrix4,
+                                                   float >
     {
     public:
         TransparentShader();
-    };   // TransparentShader
-
-    // ========================================================================
-    class GhostKartsShader : public TextureShader<GhostKartsShader, 1,
-                                                  core::matrix4, core::matrix4 >
-    {
-    public:
-        GhostKartsShader();
     };   // TransparentShader
 
     // ========================================================================

@@ -1563,11 +1563,11 @@ void IrrDriver::renderTransparent()
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
     glEnable(GL_CULL_FACE);
-    renderTransparenPass<Shaders::GhostKartsShader, video::EVT_STANDARD, 2, 1>(
+    renderTransparenPass<Shaders::TransparentShader, video::EVT_STANDARD, 3, 2, 1>(
                          TexUnits(RenderGeometry::TexUnit(0, true)),
                                   ListGhostKart::getInstance());
 
-    renderTransparenPass<Shaders::GhostKartsShader, video::EVT_TANGENTS, 2, 1>(
+    renderTransparenPass<Shaders::TransparentShader, video::EVT_TANGENTS, 3, 2, 1>(
                          TexUnits(RenderGeometry::TexUnit(0, true)),
                                   ListGhostKartTangents::getInstance());
 
@@ -1596,11 +1596,11 @@ void IrrDriver::renderTransparent()
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         renderTransparenPass<Shaders::TransparentShader,
-                             video::EVT_STANDARD, 2, 1>(
+                             video::EVT_STANDARD, 3, 2, 1>(
                                   TexUnits(RenderGeometry::TexUnit(0, true)),
                                            ListBlendTransparent::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
-        renderTransparenPass<Shaders::TransparentShader, video::EVT_STANDARD, 2, 1>(
+        renderTransparenPass<Shaders::TransparentShader, video::EVT_STANDARD, 3, 2, 1>(
                              TexUnits(RenderGeometry::TexUnit(0, true)),
                                       ListAdditiveTransparent::getInstance());
     }

@@ -568,7 +568,7 @@ void STKMeshSceneNode::render()
 #endif
                         Shaders::TransparentShader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]));
 
-                    Shaders::TransparentShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
+                    Shaders::TransparentShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, 1.0f);
                     assert(mesh.vao);
                     glBindVertexArray(mesh.vao);
                     glDrawElements(ptype, count, itype, 0);
