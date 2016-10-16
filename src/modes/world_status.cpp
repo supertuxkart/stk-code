@@ -379,11 +379,16 @@ void WorldStatus::updateTime(const float dt)
         default: break;
     }
 
+    IrrlichtDevice *device = irr_driver->getDevice();
+
     switch (m_clock_mode)
     {
         case CLOCK_CHRONO:
-            m_time += dt;
-            m_count_up_timer += dt;
+            if (!device->getTimer()->isStopped())
+            {
+                m_time += dt;
+                m_count_up_timer += dt;
+            }
             break;
         case CLOCK_COUNTDOWN:
             // stop countdown when race is over
@@ -394,8 +399,11 @@ void WorldStatus::updateTime(const float dt)
                 break;
             }
 
-            m_time -= dt;
-            m_count_up_timer += dt;
+            if (!device->getTimer()->isStopped())
+            {
+                m_time -= dt;
+                m_count_up_timer += dt;
+            }
 
             if(m_time <= 0.0)
             {
