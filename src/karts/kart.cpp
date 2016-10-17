@@ -90,13 +90,6 @@
 #include <iostream>
 #include <cmath>
 
-#include <math.h>
-#include <iostream>
-#include <algorithm> // for min and max
-
-#include <ICameraSceneNode.h>
-#include <ISceneManager.h>
-
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
    // Disable warning for using 'this' in base member initializer list
