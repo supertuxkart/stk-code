@@ -2,8 +2,8 @@
 layout(bindless_sampler) uniform sampler2D tex;
 #else
 uniform sampler2D tex;
-uniform float custom_alpha;
 #endif
+uniform float custom_alpha;
 
 in vec2 uv;
 in vec4 color;
