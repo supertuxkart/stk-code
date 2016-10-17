@@ -351,7 +351,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
     {
         const video::SColor& c = World::getWorld()->getTrack()->getSunColor();
         float y = 0.2126f * c.getRed() + 0.7152f * c.getGreen() + 0.0722f * c.getBlue();
-        custom_alpha = y > 128.0f ? 0.5f : 0.2f;
+        custom_alpha = y > 128.0f ? 0.5f : 0.35f;
     }
 
     for (GLMesh *mesh : node->TransparentMesh[TM_GHOST_KART])

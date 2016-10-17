@@ -207,7 +207,7 @@ void STKMeshSceneNode::updateNoGL()
 
             GLMesh &mesh = GLmeshes[i];
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
-            if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent())
+            if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent() && !rnd->isTransparent())
             {
                 assert(!immediate_draw);
                 if (mesh.VAOType == video::EVT_TANGENTS)
