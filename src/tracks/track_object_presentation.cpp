@@ -419,9 +419,21 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     if (file_manager->fileExists(model_file))
     {
         if (animated)
+        {
             m_mesh = irr_driver->getAnimatedMesh(model_file);
+            scene::ISkinnedMesh* sm =
+                dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
+            if (sm)
+            {
+                MeshTools::createSkinnedMeshWithTangents(sm,
+                    &MeshTools::isNormalMap);
+            }
+        }
         else
-            m_mesh = irr_driver->getMesh(model_file);
+        {
+            m_mesh = MeshTools::createMeshWithTangents(
+                irr_driver->getMesh(model_file), &MeshTools::isNormalMap);
+        }
     }
 
     if (!m_mesh)
