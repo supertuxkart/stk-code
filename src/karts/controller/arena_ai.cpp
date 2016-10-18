@@ -48,7 +48,6 @@ void ArenaAI::reset()
     m_target_node = Graph::UNKNOWN_SECTOR;
     m_current_forward_node = Graph::UNKNOWN_SECTOR;
     m_current_forward_point = Vec3(0, 0, 0);
-    m_adjusting_side = false;
     m_closest_kart = NULL;
     m_closest_kart_node = Graph::UNKNOWN_SECTOR;
     m_closest_kart_point = Vec3(0, 0, 0);
@@ -80,6 +79,10 @@ void ArenaAI::update(float dt)
     // This is used to enable firing an item backwards.
     m_controls->setLookBack(false);
     m_controls->setNitro(false);
+
+    // Let the function below to reset it later
+    m_controls->setAccel(0.0f);
+    m_controls->setBrake(false);
 
     // Don't do anything if there is currently a kart animations shown.
     if (m_kart->getKartAnimation())
@@ -249,8 +252,6 @@ void ArenaAI::configSteering()
 #endif
         if (m_target_point_lc.z() < 0)
         {
-            // Local coordinate z < 0 == target point is behind
-            m_adjusting_side = m_target_point_lc.x() < 0;
             m_is_uturn = true;
         }
         else
@@ -273,7 +274,6 @@ void ArenaAI::configSteering()
 #endif
         if (m_target_point_lc.z() < 0)
         {
-            m_adjusting_side = m_target_point_lc.x() < 0;
             m_is_uturn = true;
         }
         else
@@ -323,9 +323,6 @@ void ArenaAI::checkIfStuck(const float dt)
  */
 void ArenaAI::configSpeed()
 {
-    m_controls->setAccel(0.0f);
-    m_controls->setBrake(false);
-
     // A kart will not brake when the speed is already slower than this
     // value. This prevents a kart from going too slow (or even backwards)
     // in tight curves.
@@ -350,24 +347,14 @@ void ArenaAI::configSpeed()
 //-----------------------------------------------------------------------------
 void ArenaAI::doUTurn(const float dt)
 {
-    const float turn_side = (m_adjusting_side ? 1.0f : -1.0f);
-
-    if (fabsf(m_kart->getSpeed()) >
-        (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
-        && m_kart->getSpeed() < 0) // Try to emulate reverse like human players
-        m_controls->setAccel(-0.06f);
-    else
-        m_controls->setAccel(-5.0f);
-
-    if (m_time_since_uturn >=
-        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 2.0f : 1.5f))
-        setSteering(-(turn_side), dt); // Preventing keep going around circle
-    else
-        setSteering(turn_side, dt);
+    float turn_angle = atan2f(m_target_point_lc.x(),
+        fabsf(m_target_point_lc.z()));
+    m_controls->setBrake(true);
+    setSteering(-turn_angle, dt);
     m_time_since_uturn += dt;
 
-    if (m_target_point_lc.z() > 0 || m_time_since_uturn >
-        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 3.5f : 3.0f))
+    if ((m_target_point_lc.z() > 0 && fabsf(turn_angle) < 0.2f) ||
+        m_time_since_uturn > 1.5f)
     {
         // End U-turn until target point is in front of this AI
         m_is_uturn = false;
@@ -385,13 +372,7 @@ bool ArenaAI::gettingUnstuck(const float dt)
 
     resetAfterStop();
     setSteering(0.0f, dt);
-
-    if (fabsf(m_kart->getSpeed()) >
-        (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
-        && m_kart->getSpeed() < 0)
-        m_controls->setAccel(-0.06f);
-    else
-        m_controls->setAccel(-4.0f);
+    m_controls->setBrake(true);
 
     m_time_since_reversing += dt;
 

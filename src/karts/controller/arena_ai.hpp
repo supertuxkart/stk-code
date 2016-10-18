@@ -67,10 +67,6 @@ protected:
 
     void  collectItemInArena(Vec3*, int*) const;
 private:
-    /** Used by handleArenaUTurn, it tells whether to do left or right
-     *  turning when steering is overridden. */
-    bool m_adjusting_side;
-
     Vec3 m_target_point_lc;
 
    /** Indicates that the kart is currently stuck, and m_time_since_reversing is
