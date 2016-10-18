@@ -56,6 +56,7 @@ void ArenaAI::reset()
     m_mini_skid = false;
     m_target_point = Vec3(0, 0, 0);
     m_target_point_lc = Vec3(0, 0, 0);
+    m_reverse_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
     m_time_since_off_road = 0.0f;
@@ -83,6 +84,7 @@ void ArenaAI::update(float dt)
     // Let the function below to reset it later
     m_controls->setAccel(0.0f);
     m_controls->setBrake(false);
+    m_mini_skid = false;
 
     // Don't do anything if there is currently a kart animations shown.
     if (m_kart->getKartAnimation())
@@ -123,9 +125,16 @@ void ArenaAI::update(float dt)
 
     // After found target, convert it to local coordinate, used for skidding or
     // u-turn
-    m_target_point_lc = m_kart->getTrans().inverse()(m_target_point);
-    doSkiddingTest();
-    configSteering();
+    if (!m_is_uturn)
+    {
+        m_target_point_lc = m_kart->getTrans().inverse()(m_target_point);
+        doSkiddingTest();
+        configSteering();
+    }
+    else
+    {
+        m_target_point_lc = m_kart->getTrans().inverse()(m_reverse_point);
+    }
     useItems(dt);
 
     if (m_kart->getSpeed() > 15.0f && !m_is_uturn && m_turn_radius > 30.0f &&
@@ -252,6 +261,7 @@ void ArenaAI::configSteering()
         if (m_target_point_lc.z() < 0)
         {
             m_is_uturn = true;
+            m_reverse_point = m_target_point;
         }
         else
         {
@@ -274,6 +284,7 @@ void ArenaAI::configSteering()
         if (m_target_point_lc.z() < 0)
         {
             m_is_uturn = true;
+            m_reverse_point = m_target_point;
         }
         else
         {
@@ -349,7 +360,7 @@ void ArenaAI::doUTurn(const float dt)
     float turn_angle = atan2f(m_target_point_lc.x(),
         fabsf(m_target_point_lc.z()));
     m_controls->setBrake(true);
-    setSteering(-turn_angle, dt);
+    setSteering(turn_angle > 0.0f ? -1.0f : 1.0f, dt);
     m_time_since_uturn += dt;
 
     if ((m_target_point_lc.z() > 0 && fabsf(turn_angle) < 0.2f) ||
@@ -359,6 +370,7 @@ void ArenaAI::doUTurn(const float dt)
         m_is_uturn = false;
         m_time_since_uturn = 0.0f;
         m_time_since_driving = 0.0f;
+        m_reverse_point = Vec3(0, 0, 0);
     }
     else
         m_is_uturn = true;
@@ -604,11 +616,6 @@ void ArenaAI::collectItemInArena(Vec3* aim_point, int* target_node) const
 //-----------------------------------------------------------------------------
 void ArenaAI::doSkiddingTest()
 {
-    m_mini_skid = false;
-
-    // No skidding when u-turn
-    if (m_is_uturn) return;
-
     // Skid when close to target, but not straight ahead, in front of it, same
     // steering side and with suitable difficulties.
     const float abs_angle = atan2f(fabsf(m_target_point_lc.x()),

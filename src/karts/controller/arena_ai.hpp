@@ -70,6 +70,8 @@ protected:
 private:
     Vec3 m_target_point_lc;
 
+    Vec3 m_reverse_point;
+
    /** Indicates that the kart is currently stuck, and m_time_since_reversing is
      * counting down. */
     bool m_is_stuck;
