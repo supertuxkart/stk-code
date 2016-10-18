@@ -50,6 +50,7 @@
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/cached_characteristic.hpp"
 #include "karts/controller/end_controller.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
@@ -861,6 +862,9 @@ void Kart::finishedRace(float time, bool from_server)
     m_controller->finishedRace(time);
     m_kart_model->finishedRace();
     race_manager->kartFinishedRace(this, time);
+
+    // If this is spare tire kart, end now
+    if (dynamic_cast<SpareTireAI*>(m_controller) != NULL) return;
 
     if ((race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
          race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||

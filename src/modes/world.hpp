@@ -360,6 +360,8 @@ public:
     void delayedSelfDestruct();
     // ------------------------------------------------------------------------
     virtual void escapePressed();
+    // ------------------------------------------------------------------------
+    virtual void loadCustomModels() {}
 
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }

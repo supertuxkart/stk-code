@@ -119,7 +119,6 @@ void ArenaAI::update(float dt)
     if (gettingUnstuck(dt))
         return;
 
-    findClosestKart(true);
     findTarget();
 
     // After found target, convert it to local coordinate, used for skidding or
@@ -395,7 +394,7 @@ void ArenaAI::useItems(const float dt)
         return;
 
     // Find a closest kart again, this time we ignore difficulty
-    findClosestKart(false);
+    findClosestKart(false/*use_difficulty*/, false/*find_sta*/);
     if (!m_closest_kart) return;
 
     Vec3 closest_kart_point_lc =

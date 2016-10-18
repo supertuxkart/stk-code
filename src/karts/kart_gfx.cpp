@@ -149,7 +149,8 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
                         const Vec3 &position, bool important)
 {
     if (!UserConfigParams::m_graphical_effects &&
-        (!important || m_kart->getType() == RaceManager::KT_AI))
+        (!important || m_kart->getType() == RaceManager::KT_AI ||
+        m_kart->getType() == RaceManager::KT_SPARE_TIRE))
     {
         m_all_emitters.push_back(NULL);
         return;
