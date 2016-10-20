@@ -207,12 +207,13 @@ void STKMeshSceneNode::updateNoGL()
 
             GLMesh &mesh = GLmeshes[i];
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
-            if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent())
+            if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent() && !rnd->isTransparent())
             {
-                if (!immediate_draw)
-                    TransparentMesh[TM_ADDITIVE].push_back(&mesh);
+                assert(!immediate_draw);
+                if (mesh.VAOType == video::EVT_TANGENTS)
+                    TransparentMesh[TM_GHOST_KART_TANGENTS].push_back(&mesh);
                 else
-                    additive = true;
+                    TransparentMesh[TM_GHOST_KART].push_back(&mesh);
             }
             else if (rnd->isTransparent())
             {
@@ -567,7 +568,7 @@ void STKMeshSceneNode::render()
 #endif
                         Shaders::TransparentShader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]));
 
-                    Shaders::TransparentShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
+                    Shaders::TransparentShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, 1.0f);
                     assert(mesh.vao);
                     glBindVertexArray(mesh.vao);
                     glDrawElements(ptype, count, itype, 0);

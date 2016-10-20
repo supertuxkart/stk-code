@@ -340,10 +340,24 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
     else
     {
         for (GLMesh *mesh : node->TransparentMesh[TM_DEFAULT])
-            pushVector(ListBlendTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix);
+            pushVector(ListBlendTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, 1.0f);
         for (GLMesh *mesh : node->TransparentMesh[TM_ADDITIVE])
-            pushVector(ListAdditiveTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix);
+            pushVector(ListAdditiveTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, 1.0f);
     }
+
+    // Use sun color to determine custom alpha for ghost karts
+    float custom_alpha = 1.0f;
+    if (World::getWorld())
+    {
+        const video::SColor& c = World::getWorld()->getTrack()->getSunColor();
+        float y = 0.2126f * c.getRed() + 0.7152f * c.getGreen() + 0.0722f * c.getBlue();
+        custom_alpha = y > 128.0f ? 0.5f : 0.35f;
+    }
+
+    for (GLMesh *mesh : node->TransparentMesh[TM_GHOST_KART])
+        pushVector(ListGhostKart::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
+    for (GLMesh *mesh : node->TransparentMesh[TM_GHOST_KART_TANGENTS])
+        pushVector(ListGhostKartTangents::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
     for (GLMesh *mesh : node->TransparentMesh[TM_DISPLACEMENT])
         pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
 
@@ -606,6 +620,8 @@ void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
     windDir = getWindDir();
     ListBlendTransparent::getInstance()->clear();
     ListAdditiveTransparent::getInstance()->clear();
+    ListGhostKart::getInstance()->clear();
+    ListGhostKartTangents::getInstance()->clear();
     ListBlendTransparentFog::getInstance()->clear();
     ListAdditiveTransparentFog::getInstance()->clear();
     ListDisplacement::getInstance()->clear();

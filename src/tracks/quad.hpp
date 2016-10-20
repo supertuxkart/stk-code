@@ -54,6 +54,8 @@ private:
     /** Set to true if this quad should not be shown in the minimap. */
     bool m_invisible;
 
+    bool m_is_ignored;
+
     /** The minimum height of the quad, used in case that several quads
      *  are on top of each other when determining the sector a kart is on. */
     float m_min_height;
@@ -67,7 +69,7 @@ public:
     // ------------------------------------------------------------------------
     Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
          const Vec3 & normal = Vec3(0, 1, 0), int index = -1,
-         bool invisible = false);
+         bool invisible = false, bool ignored = false);
     // ------------------------------------------------------------------------
     virtual ~Quad() {}
     // ------------------------------------------------------------------------
@@ -93,6 +95,8 @@ public:
     /** Returns true of this quad is invisible, i.e. not to be shown in
      *  the minimap. */
     bool isInvisible() const                            { return m_invisible; }
+	// ------------------------------------------------------------------------
+	bool isIgnored() const                              { return m_is_ignored; }
     // ------------------------------------------------------------------------
     /** Returns the normal of this quad. */
     const Vec3& getNormal() const                          { return m_normal; }

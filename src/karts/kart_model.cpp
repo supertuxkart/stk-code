@@ -131,6 +131,7 @@ KartModel::KartModel(bool is_master)
         m_min_suspension[i] = -0.07f;
         m_max_suspension[i] = 0.20f;
         m_dampen_suspension_amplitude[i] = 2.5f;
+        m_default_physics_suspension[i] = 0.25f;
     }
     m_wheel_filename[0] = "";
     m_wheel_filename[1] = "";
@@ -521,6 +522,13 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
                    full_path.c_str(), kart_properties.getIdent().c_str());
         return false;
     }
+
+    scene::ISkinnedMesh* sm = dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
+    if (sm)
+    {
+        MeshTools::createSkinnedMeshWithTangents(sm, &MeshTools::isNormalMap);
+    }
+
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
 
@@ -569,6 +577,14 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         // Grab all textures. This is done for the master only, so
         // the destructor will only free the textures if a master
         // copy is freed.
+
+        scene::ISkinnedMesh* sm =
+            dynamic_cast<scene::ISkinnedMesh*>(obj.m_model);
+        if (sm)
+        {
+            MeshTools::createSkinnedMeshWithTangents(sm,
+                &MeshTools::isNormalMap);
+        }
         irr_driver->grabAllTextures(obj.m_model);
 
         // Update min/max
@@ -611,6 +627,8 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         std::string full_wheel =
             kart_properties.getKartDir()+m_wheel_filename[i];
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
+        m_wheel_model[i] = MeshTools::createMeshWithTangents(m_wheel_model[i],
+            &MeshTools::isNormalMap);
         // Grab all textures. This is done for the master only, so
         // the destructor will only free the textures if a master
         // copy is freed.
@@ -861,17 +879,18 @@ void KartModel::update(float dt, float distance, float steer, float speed,
 
         float suspension_length = 0.0f;
         GhostKart* gk = dynamic_cast<GhostKart*>(m_kart);
-        // Prevent using m_default_physics_suspension uninitialized
-        if (gk && gt_replay_index == -1) break;
-
-        if (gk)
+        // Prevent using suspension length uninitialized
+        if (dt != 0.0f && !(gk && gt_replay_index == -1))
         {
-            suspension_length = gk->getSuspensionLength(gt_replay_index, i);
-        }
-        else
-        {
-            suspension_length = m_kart->getVehicle()->getWheelInfo(i).
-                                m_raycastInfo.m_suspensionLength;
+            if (gk)
+            {
+                suspension_length = gk->getSuspensionLength(gt_replay_index, i);
+            }
+            else
+            {
+                suspension_length = m_kart->getVehicle()->getWheelInfo(i).
+                                    m_raycastInfo.m_suspensionLength;
+            }
         }
 
         // Check documentation of Kart::updateGraphics for the following line

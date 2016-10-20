@@ -38,6 +38,7 @@
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/skidding_ai.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "karts/controller/test_ai.hpp"
 #include "karts/controller/network_player_controller.hpp"
 #include "karts/kart.hpp"
@@ -220,13 +221,16 @@ void World::init()
 
     }  // for i
 
+    // Load other custom models if needed
+    loadCustomModels();
+
     // Now that all models are loaded, apply the overrides
     irr_driver->applyObjectPassShader();
 
     // Must be called after all karts are created
     m_race_gui->init();
 
-    powerup_manager->updateWeightsForRace(num_karts);
+    powerup_manager->updateWeightsForRace(race_manager->getNumberOfKarts());
 
     if (UserConfigParams::m_weather_effects)
     {
@@ -368,6 +372,8 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
         break;
     case RaceManager::KT_LEADER:
         break;
+    case RaceManager::KT_SPARE_TIRE:
+        break;
     }
 
     new_kart->setController(controller);
@@ -477,6 +483,7 @@ World::~World()
     race_manager->setRecordRace(false);
     race_manager->setWatchingReplay(false);
     race_manager->setTimeTarget(0.0f);
+    race_manager->setSpareTireKartNum(0);
 
     Camera::removeAllCameras();
 
@@ -484,6 +491,8 @@ World::~World()
     // In case that the track is not found, m_physics is still undefined.
     if(m_physics)
         delete m_physics;
+
+    delete m_script_engine;
 
     m_world = NULL;
 
@@ -971,8 +980,11 @@ void World::update(float dt)
     const int kart_amount = (int)m_karts.size();
     for (int i = 0 ; i < kart_amount; ++i)
     {
+        SpareTireAI* sta =
+            dynamic_cast<SpareTireAI*>(m_karts[i]->getController());
         // Update all karts that are not eliminated
-        if(!m_karts[i]->isEliminated()) m_karts[i]->update(dt) ;
+        if(!m_karts[i]->isEliminated() || (sta && sta->isMoving()))
+            m_karts[i]->update(dt);
     }
     PROFILER_POP_CPU_MARKER();
 

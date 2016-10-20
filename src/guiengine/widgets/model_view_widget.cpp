@@ -50,6 +50,7 @@ IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, 
     m_old_rtt_provider = NULL;
     m_rotation_mode = ROTATE_OFF;
     m_render_info = new RenderInfo();
+    m_angle = 0;
 
     // so that the base class doesn't complain there is no icon defined
     m_properties[PROP_ICON]="gui/main_help.png";
@@ -84,8 +85,6 @@ void ModelViewWidget::add()
      \brief animate the element and its children.
      */
     GUIEngine::needsUpdate.push_back(this);
-
-    angle = 0;
 
 }   // add
 
@@ -133,28 +132,28 @@ void ModelViewWidget::update(float delta)
 
     if (m_rotation_mode == ROTATE_CONTINUOUSLY)
     {
-        angle += delta*m_rotation_speed;
-        if (angle > 360) angle -= 360;
+        m_angle += delta*m_rotation_speed;
+        if (m_angle > 360) m_angle -= 360;
     }
     else if (m_rotation_mode == ROTATE_TO)
     {
         // check if we should rotate clockwise or counter-clockwise to reach the target faster
         // (taking wrap-arounds into account)
-        const int angle_distance_from_end  = (int)(360 - angle);
-        const int target_distance_from_end = (int)(360 - angle);
+        const int angle_distance_from_end  = (int)(360 - m_angle);
+        const int target_distance_from_end = (int)(360 - m_angle);
 
         int distance_with_positive_rotation;
         int distance_with_negative_rotation;
 
-        if (angle < m_rotation_target)
+        if (m_angle < m_rotation_target)
         {
-            distance_with_positive_rotation = (int)(m_rotation_target - angle);
-            distance_with_negative_rotation = (int)(angle + target_distance_from_end);
+            distance_with_positive_rotation = (int)(m_rotation_target - m_angle);
+            distance_with_negative_rotation = (int)(m_angle + target_distance_from_end);
         }
         else
         {
             distance_with_positive_rotation = (int)(angle_distance_from_end + m_rotation_target);
-            distance_with_negative_rotation = (int)(angle - m_rotation_target);
+            distance_with_negative_rotation = (int)(m_angle - m_rotation_target);
         }
 
         //Log::info("ModelViewWidget", "distance_with_positive_rotation = %d; "
@@ -163,17 +162,17 @@ void ModelViewWidget::update(float delta)
 
         if (distance_with_positive_rotation < distance_with_negative_rotation)
         {
-            angle += m_rotation_speed * delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
+            m_angle += m_rotation_speed * delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
         }
         else
         {
-            angle -= m_rotation_speed * delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
+            m_angle -= m_rotation_speed * delta*(3.0f + std::min(distance_with_positive_rotation, distance_with_negative_rotation)*2.0f);
         }
-        if (angle > 360) angle -= 360;
-        if (angle < 0) angle += 360;
+        if (m_angle > 360) m_angle -= 360;
+        if (m_angle < 0) m_angle += 360;
 
         // stop rotating when target reached
-        if (fabsf(angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
+        if (fabsf(m_angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
 
     if (CVS->isGLSL())
@@ -188,7 +187,7 @@ void ModelViewWidget::update(float delta)
             setupRTTScene();
         }
 
-        m_rtt_main_node->setRotation(core::vector3df(0.0f, angle, 0.0f));
+        m_rtt_main_node->setRotation(core::vector3df(0.0f, m_angle, 0.0f));
 
         m_rtt_main_node->setVisible(true);
 
@@ -206,7 +205,7 @@ void ModelViewWidget::update(float delta)
             m_old_rtt_provider->setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
         }
 
-        m_texture = m_old_rtt_provider->renderToTexture(angle);
+        m_texture = m_old_rtt_provider->renderToTexture(m_angle);
 
         if (m_texture == NULL)
         {

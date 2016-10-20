@@ -61,12 +61,18 @@ protected:
      *  graph. */
     void createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
                     const Vec3 &p3, unsigned int node_index,
-                    bool invisible, bool ai_ignore, bool is_arena);
+                    bool invisible, bool ai_ignore, bool is_arena, bool ignore);
+    // ------------------------------------------------------------------------
+    /** Map 4 bounding box points to 4 closest graph nodes. */
+    void loadBoundingBoxNodes();
 
 private:
     /** The 2d bounding box, used for hashing. */
     Vec3 m_bb_min;
     Vec3 m_bb_max;
+
+    /** The 4 closest graph nodes to the bounding box. */
+    int m_bb_nodes[4];
 
     RTT* m_new_rtt;
 
@@ -149,6 +155,12 @@ public:
                             const int curr_sector = UNKNOWN_SECTOR,
                             std::vector<int> *all_sectors = NULL,
                             bool ignore_vertical = false) const;
+    // ------------------------------------------------------------------------
+    const Vec3& getBBMin() const                           { return m_bb_min; }
+    // ------------------------------------------------------------------------
+    const Vec3& getBBMax() const                           { return m_bb_max; }
+    // ------------------------------------------------------------------------
+    const int* getBBNodes() const                        { return m_bb_nodes; }
 
 };   // Graph
 

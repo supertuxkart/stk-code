@@ -28,6 +28,7 @@
 #include <irrlicht.h>
 #include <IMesh.h>
 #include <IMeshBuffer.h>
+#include <SSkinMeshBuffer.h>
 
 void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
 
@@ -444,29 +445,86 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
     clone->recalculateBoundingBox();
     if (calculate_tangents)
         recalculateTangents(clone, recalculate_normals, smooth, angle_weighted);
-    
-    int mbcount = clone->getMeshBufferCount();
-    for (int i = 0; i < mbcount; i++)
-    {
-        scene::IMeshBuffer* mb = clone->getMeshBuffer(i);
-
-        for (u32 t = 0; t < video::MATERIAL_MAX_TEXTURES; t++)
-        {
-            video::ITexture* texture = mb->getMaterial().TextureLayer[t].Texture;
-            if (texture != NULL)
-                texture->grab();
-        }
-    }
 
     scene::IMeshCache* meshCache = irr_driver->getSceneManager()->getMeshCache();
     io::SNamedPath path = meshCache->getMeshName(mesh);
-    irr_driver->removeMeshFromCache(mesh);
+    if (path.getPath() == "")
+    {
+        // This mesh is not in irrlicht cache, drop it directly
+        assert(mesh->getReferenceCount() == 1);
+        mesh->drop();
+        return clone;
+    }
+    else
+    {
+        // Cache the calcuated tangent mesh with path
+        irr_driver->removeMeshFromCache(mesh);
+        scene::SAnimatedMesh* amesh = new scene::SAnimatedMesh(clone);
+        clone->drop();
+        meshCache->addMesh(path, amesh);
+        if (World::getWorld())
+        {
+            irr_driver->grabAllTextures(amesh);
+            World::getWorld()->getTrack()->addCachedMesh(amesh);
+            return amesh;
+        }
+        amesh->drop();
+        return amesh;
+    }
 
-    scene::SAnimatedMesh* amesh = new scene::SAnimatedMesh(clone);
-    meshCache->addMesh(path, amesh);
-
-    World::getWorld()->getTrack()->addCachedMesh(amesh);
-
-    return clone;
 }
 
+void MeshTools::createSkinnedMeshWithTangents(scene::ISkinnedMesh* mesh,
+                                              bool(*predicate)(scene::IMeshBuffer*))
+{
+    core::array<scene::SSkinMeshBuffer*>& all_mb = mesh->getMeshBuffers();
+    const int all_mb_size = all_mb.size();
+    for (int i = 0; i < all_mb_size; i++)
+    {
+        scene::SSkinMeshBuffer* mb = all_mb[i];
+        if (mb && predicate(mb))
+        {
+            mb->convertToTangents();
+            const int index_count = mb->getIndexCount();
+            uint16_t* idx = mb->getIndices();
+            video::S3DVertexTangents* v =
+                (video::S3DVertexTangents*)mb->getVertices();
+
+            for (int i = 0; i < index_count; i += 3)
+            {
+                calculateTangents(
+                    v[idx[i+0]].Normal,
+                    v[idx[i+0]].Tangent,
+                    v[idx[i+0]].Binormal,
+                    v[idx[i+0]].Pos,
+                    v[idx[i+1]].Pos,
+                    v[idx[i+2]].Pos,
+                    v[idx[i+0]].TCoords,
+                    v[idx[i+1]].TCoords,
+                    v[idx[i+2]].TCoords);
+
+                calculateTangents(
+                    v[idx[i+1]].Normal,
+                    v[idx[i+1]].Tangent,
+                    v[idx[i+1]].Binormal,
+                    v[idx[i+1]].Pos,
+                    v[idx[i+2]].Pos,
+                    v[idx[i+0]].Pos,
+                    v[idx[i+1]].TCoords,
+                    v[idx[i+2]].TCoords,
+                    v[idx[i+0]].TCoords);
+
+                calculateTangents(
+                    v[idx[i+2]].Normal,
+                    v[idx[i+2]].Tangent,
+                    v[idx[i+2]].Binormal,
+                    v[idx[i+2]].Pos,
+                    v[idx[i+0]].Pos,
+                    v[idx[i+1]].Pos,
+                    v[idx[i+2]].TCoords,
+                    v[idx[i+0]].TCoords,
+                    v[idx[i+1]].TCoords);
+            }
+        }
+    }
+}

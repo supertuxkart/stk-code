@@ -160,6 +160,7 @@ IrrDriver::~IrrDriver()
     }
     assert(m_device != NULL);
 
+    cleanUnicolorTextures();
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
@@ -869,11 +870,11 @@ void IrrDriver::applyResolutionSettings()
                                             UserConfigParams::m_prev_height) );
     m_video_driver->endScene();
     track_manager->removeAllCachedData();
-    attachment_manager->removeTextures();
+    delete attachment_manager;
     projectile_manager->removeTextures();
     ItemManager::removeTextures();
     kart_properties_manager->unloadAllKarts();
-    powerup_manager->unloadPowerups();
+    delete powerup_manager;
     Referee::cleanup();
     ParticleKindManager::get()->cleanup();
     delete input_manager;
@@ -900,11 +901,23 @@ void IrrDriver::applyResolutionSettings()
     RSMPassCmd::getInstance()->kill();
     GlowPassCmd::getInstance()->kill();
     resetTextureTable();
-    // initDevice will drop the current device.
+
+    if (m_post_processing)
+    {
+        // check if we createad the OpenGL device by calling initDevice()
+        m_post_processing->drop();
+    }
+    cleanUnicolorTextures();
+
+    delete m_shadow_matrices;
+
     if (CVS->isGLSL())
     {
         Shaders::destroy();
     }
+    delete m_spherical_harmonics;
+
+    // initDevice will drop the current device.
     initDevice();
 
     font_manager = new FontManager();
@@ -917,6 +930,8 @@ void IrrDriver::applyResolutionSettings()
     material_manager->loadMaterial();
     input_manager = new InputManager ();
     input_manager->setMode(InputManager::MENU);
+    powerup_manager = new PowerupManager();
+    attachment_manager = new AttachmentManager();
 
     GUIEngine::addLoadingIcon(
         irr_driver->getTexture(file_manager
@@ -2649,8 +2664,6 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
         else
             light = new SunNode(m_scene_manager, parent, r, g, b);
 
-        light->grab();
-
         light->setPosition(pos);
         light->updateAbsolutePosition();
 
@@ -2680,9 +2693,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
 
 void IrrDriver::clearLights()
 {
-    u32 i;
-    const u32 max = (int)m_lights.size();
-    for (i = 0; i < max; i++)
+    for (unsigned int i = 0; i < m_lights.size(); i++)
     {
         m_lights[i]->drop();
     }

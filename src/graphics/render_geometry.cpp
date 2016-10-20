@@ -1555,14 +1555,25 @@ static video::ITexture *displaceTex = 0;
 // ----------------------------------------------------------------------------
 void IrrDriver::renderTransparent()
 {
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE);
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glDisable(GL_CULL_FACE);
 
     irr_driver->setPhase(TRANSPARENT_PASS);
 
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glEnable(GL_CULL_FACE);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    renderTransparenPass<Shaders::TransparentShader, video::EVT_STANDARD, 3, 2, 1>(
+                         TexUnits(RenderGeometry::TexUnit(0, true)),
+                                  ListGhostKart::getInstance());
+
+    renderTransparenPass<Shaders::TransparentShader, video::EVT_TANGENTS, 3, 2, 1>(
+                         TexUnits(RenderGeometry::TexUnit(0, true)),
+                                  ListGhostKartTangents::getInstance());
+
+    glDepthMask(GL_FALSE);
+    glDisable(GL_CULL_FACE);
     for (unsigned i = 0; i < ImmediateDrawList::getInstance()->size(); i++)
         ImmediateDrawList::getInstance()->at(i)->render();
 
@@ -1586,11 +1597,11 @@ void IrrDriver::renderTransparent()
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         renderTransparenPass<Shaders::TransparentShader,
-                             video::EVT_STANDARD, 2, 1>(
+                             video::EVT_STANDARD, 3, 2, 1>(
                                   TexUnits(RenderGeometry::TexUnit(0, true)),
                                            ListBlendTransparent::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
-        renderTransparenPass<Shaders::TransparentShader, video::EVT_STANDARD, 2, 1>(
+        renderTransparenPass<Shaders::TransparentShader, video::EVT_STANDARD, 3, 2, 1>(
                              TexUnits(RenderGeometry::TexUnit(0, true)),
                                       ListAdditiveTransparent::getInstance());
     }

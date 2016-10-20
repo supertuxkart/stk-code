@@ -222,11 +222,14 @@ void MainLoop::run()
 
         m_prev_time = m_curr_time;
         float dt   = getLimitedDt();
-        // Render the previous frame, and also handle all user input.
-        PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
-        irr_driver->update(dt);
-        PROFILER_POP_CPU_MARKER();
 
+        if (!m_abort && !ProfileWorld::isNoGraphics())
+        {
+            // Render the previous frame, and also handle all user input.
+            PROFILER_PUSH_CPU_MARKER("IrrDriver update", 0x00, 0x00, 0x7F);
+            irr_driver->update(dt);
+            PROFILER_POP_CPU_MARKER();
+        }
 
         if (World::getWorld())  // race is active if world exists
         {

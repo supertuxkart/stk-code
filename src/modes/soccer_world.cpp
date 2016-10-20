@@ -30,6 +30,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
 #include "karts/controller/local_player_controller.hpp"
+#include "karts/controller/network_player_controller.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -421,17 +422,17 @@ AbstractKart *SoccerWorld::createKart(const std::string &kart_ident, int index,
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
-        break;  // Avoid compiler warning about enum not handled.
-        //controller = new NetworkController(kart_ident, position, init_pos,
-        //                          global_player_id);
-        //m_num_players++;
-        //break;
+        controller = new NetworkPlayerController(new_kart);
+        m_num_players++;
+        break;
     case RaceManager::KT_AI:
         controller = loadAIController(new_kart);
         break;
     case RaceManager::KT_GHOST:
         break;
     case RaceManager::KT_LEADER:
+        break;
+    case RaceManager::KT_SPARE_TIRE:
         break;
     }
 

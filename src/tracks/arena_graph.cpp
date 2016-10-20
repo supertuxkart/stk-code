@@ -44,6 +44,8 @@ ArenaGraph::ArenaGraph(const std::string &navmesh, const XMLNode *node)
     if (node && race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         loadGoalNodes(node);
 
+    loadBoundingBoxNodes();
+
 }   // ArenaGraph
 
 // -----------------------------------------------------------------------------
@@ -148,7 +150,8 @@ void ArenaGraph::loadNavmesh(const std::string &navmesh)
                 createQuad(all_vertices[quad_index[0]],
                     all_vertices[quad_index[1]], all_vertices[quad_index[2]],
                     all_vertices[quad_index[3]], m_all_nodes.size(),
-                    false/*invisible*/, false/*ai_ignore*/, true/*is_arena*/);
+                    false/*invisible*/, false/*ai_ignore*/, true/*is_arena*/,
+                    false/*ignore*/);
 
                 ArenaNode* cur_node = getNode(m_all_nodes.size() - 1);
                 cur_node->setAdjacentNodes(adjacent_quad_index);

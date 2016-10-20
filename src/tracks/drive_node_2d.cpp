@@ -22,9 +22,9 @@
 DriveNode2D::DriveNode2D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
                          const Vec3 &p3, const Vec3 &normal,
                          unsigned int node_index, bool invisible,
-                         bool ai_ignore)
+                         bool ai_ignore, bool ignored)
            : DriveNode(p0, p1, p2, p3, normal, node_index, invisible,
-                       ai_ignore)
+                       ai_ignore, ignored)
 {
     m_line = core::line2df(m_upper_center.getX(), m_upper_center.getZ(),
         m_lower_center.getX(), m_lower_center.getZ());

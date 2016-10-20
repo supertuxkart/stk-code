@@ -50,6 +50,7 @@
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/cached_characteristic.hpp"
 #include "karts/controller/end_controller.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
@@ -89,13 +90,6 @@
 #include <algorithm> // for min and max
 #include <iostream>
 #include <cmath>
-
-#include <math.h>
-#include <iostream>
-#include <algorithm> // for min and max
-
-#include <ICameraSceneNode.h>
-#include <ISceneManager.h>
 
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
@@ -332,6 +326,7 @@ void Kart::reset()
     // restore the original controller.
     if(m_saved_controller)
     {
+        delete m_controller;
         m_controller       = m_saved_controller;
         m_saved_controller = NULL;
     }
@@ -867,6 +862,9 @@ void Kart::finishedRace(float time, bool from_server)
     m_controller->finishedRace(time);
     m_kart_model->finishedRace();
     race_manager->kartFinishedRace(this, time);
+
+    // If this is spare tire kart, end now
+    if (dynamic_cast<SpareTireAI*>(m_controller) != NULL) return;
 
     if ((race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
          race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
@@ -2888,12 +2886,14 @@ void Kart::setOnScreenText(const wchar_t *text)
 
     if (CVS->isGLSL())
     {
-        new STKTextBillboard(text, bold_face,
+        scene::ISceneNode* tb =
+            new STKTextBillboard(text, bold_face,
             GUIEngine::getSkin()->getColor("font::bottom"),
             GUIEngine::getSkin()->getColor("font::top"),
             getNode(), irr_driver->getSceneManager(), -1,
             core::vector3df(0.0f, 1.5f, 0.0f),
             core::vector3df(1.0f, 1.0f, 1.0f));
+        tb->drop();
     }
     else
     {

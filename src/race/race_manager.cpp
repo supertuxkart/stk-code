@@ -84,6 +84,7 @@ RaceManager::RaceManager()
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumPlayers(0);
+    setSpareTireKartNum(0);
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
@@ -288,7 +289,7 @@ void RaceManager::computeRandomKartList()
     }
 
     if(n>0)
-        kart_properties_manager->getRandomKartList(n, m_player_karts,
+        kart_properties_manager->getRandomKartList(n, &m_player_karts,
                                                    &m_ai_kart_list   );
 
     if (m_ai_kart_override != "")

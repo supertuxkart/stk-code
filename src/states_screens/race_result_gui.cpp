@@ -460,16 +460,16 @@ void RaceResultGUI::backToLobby()
         WorldWithRank *rank_world = (WorldWithRank*)World::getWorld();
 
         unsigned int first_position = 1;
+        unsigned int sta = race_manager->getNumSpareTireKarts();
         if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
             first_position = 2;
 
         // Use only the karts that are supposed to be displayed (and
         // ignore e.g. the leader in a FTL race).
-        unsigned int num_karts = race_manager->getNumberOfKarts() - first_position + 1;
+        unsigned int num_karts = race_manager->getNumberOfKarts() - first_position + 1 - sta;
 
         // In FTL races the leader kart is not displayed
         m_all_row_infos.resize(num_karts);
-
 
         // Determine the kart to display in the right order,
         // and the maximum width for the kart name column
@@ -478,7 +478,7 @@ void RaceResultGUI::backToLobby()
         float max_finish_time = 0;
 
         for (unsigned int position = first_position;
-        position <= race_manager->getNumberOfKarts(); position++)
+        position <= race_manager->getNumberOfKarts() - sta; position++)
         {
             const AbstractKart *kart = rank_world->getKartAtPosition(position);
 
