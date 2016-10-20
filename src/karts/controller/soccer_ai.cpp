@@ -71,7 +71,6 @@ SoccerAI::SoccerAI(AbstractKart *kart)
 }   // SoccerAI
 
 //-----------------------------------------------------------------------------
-
 SoccerAI::~SoccerAI()
 {
 #ifdef AI_DEBUG
@@ -103,6 +102,10 @@ void SoccerAI::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+/** Update \ref m_front_transform for ball aiming functions, also make AI stop
+ *  after goal.
+ *  \param dt Time step size.
+ */
 void SoccerAI::update(float dt)
 {
 #ifdef BALL_AIM_DEBUG
@@ -129,6 +132,11 @@ void SoccerAI::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** Find the closest kart around this AI, it won't find the kart with same
+ *  team, consider_difficulty and find_sta are not used here.
+ *  \param consider_difficulty If take current difficulty into account.
+ *  \param find_sta If find \ref SpareTireAI only.
+ */
 void SoccerAI::findClosestKart(bool consider_difficulty, bool find_sta)
 {
     float distance = 99999.9f;
@@ -163,6 +171,13 @@ void SoccerAI::findClosestKart(bool consider_difficulty, bool find_sta)
 }   // findClosestKart
 
 //-----------------------------------------------------------------------------
+/** Find a suitable target to follow, it will first call
+ *  \ref SoccerWorld::getBallChaser to check if this AI should go chasing the
+ *  ball and try to score, otherwise it will call \ref tryCollectItem if
+ *  needed. After that it will call \ref SoccerWorld::getAttacker to see if
+ *  this AI should attack the kart in opposite team which is chasing the ball,
+ *  if not go for the closest kart found by \ref findClosestKart.
+ */
 void SoccerAI::findTarget()
 {
     findClosestKart(true/*consider_difficulty*/, false/*find_sta*/);
@@ -201,6 +216,11 @@ void SoccerAI::findTarget()
 }   // findTarget
 
 //-----------------------------------------------------------------------------
+/** Determine the point for aiming when try to steer or overtake the ball.
+ *  AI will overtake the ball if the aiming position calculated by world is
+ *  non-reachable.
+ *  \return The coordinates to aim at.
+ */
 Vec3 SoccerAI::determineBallAimingPosition()
 {
 #ifdef BALL_AIM_DEBUG
@@ -276,6 +296,11 @@ Vec3 SoccerAI::determineBallAimingPosition()
 }   // determineBallAimingPosition
 
 //-----------------------------------------------------------------------------
+/** Used in \ref determineBallAimingPosition to test if AI can overtake the
+ *  ball by testing distance.
+ *  \param ball_lc Local coordinates of the ball.
+ *  \return False if the kart is too close to the ball which can't overtake
+ */
 bool SoccerAI::isOvertakable(const Vec3& ball_lc)
 {
     // No overtake if ball is behind
@@ -298,6 +323,13 @@ bool SoccerAI::isOvertakable(const Vec3& ball_lc)
 }   // isOvertakable
 
 //-----------------------------------------------------------------------------
+/** Used in \ref determineBallAimingPosition to pick a correct point to
+ *  overtake the ball
+ *  \param ball_lc Local coordinates of the ball.
+ *  \param aim_lc Local coordinates of the aiming position.
+ *  \param[out] overtake_lc Local coordinates of the overtaking position.
+ *  \return True if overtaking is possible.
+ */
 bool SoccerAI::determineOvertakePosition(const Vec3& ball_lc,
                                          const Vec3& aim_lc,
                                          Vec3* overtake_lc)
@@ -434,6 +466,12 @@ bool SoccerAI::determineOvertakePosition(const Vec3& ball_lc,
 }   // determineOvertakePosition
 
 //-----------------------------------------------------------------------------
+/** Used in \ref determineOvertakePosition to adjust the overtake position
+ *  which is calculated by slope of line if it's too close.
+ *  \param old_slope Old slope calculated.
+ *  \param rotate_up If adjust the slope upwards.
+ *  \return A newly calculated slope.
+ */
 float SoccerAI::rotateSlope(float old_slope, bool rotate_up)
 {
     const float theta = atan(old_slope) + (old_slope < 0 ? M_PI : 0);

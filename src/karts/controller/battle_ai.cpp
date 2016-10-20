@@ -139,22 +139,22 @@ void BattleAI::findTarget()
     bool find_sta = false;
     if (m_world->spareTireKartsSpawned())
     {
-       switch (m_cur_difficulty)
-       {
-          case RaceManager::DIFFICULTY_EASY:
-          case RaceManager::DIFFICULTY_MEDIUM:
-          {
-              find_sta = m_world->getKartLife(m_kart->getWorldKartId()) == 1;
-              break;
-          }
-          case RaceManager::DIFFICULTY_HARD:
-          case RaceManager::DIFFICULTY_BEST:
-          {
-              find_sta = m_world->getKartLife(m_kart->getWorldKartId()) != 3;
-              break;
-          }
-          default: assert(false);
-       }
+        switch (m_cur_difficulty)
+        {
+            case RaceManager::DIFFICULTY_EASY:
+            case RaceManager::DIFFICULTY_MEDIUM:
+            {
+                find_sta = m_world->getKartLife(m_kart->getWorldKartId()) == 1;
+                break;
+            }
+            case RaceManager::DIFFICULTY_HARD:
+            case RaceManager::DIFFICULTY_BEST:
+            {
+                find_sta = m_world->getKartLife(m_kart->getWorldKartId()) != 3;
+                break;
+            }
+            default: assert(false);
+        }
     }
 
     bool consider_difficulty = !find_sta;

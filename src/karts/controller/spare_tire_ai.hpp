@@ -27,22 +27,38 @@
 class SpareTireAI : public BattleAI
 {
 private:
+    /** The 4 bounding boxes \ref ArenaNode to follow. */
     int m_fixed_target_nodes[4];
 
+    /** The current index of \ref ArenaNode in \ref m_fixed_target_nodes to
+     *  follow, if it's -1, \ref update is not needed to be called. */
     int m_idx;
 
+    /** Store the time before calling \ref unspawn. */
     float m_timer;
 
+    // ------------------------------------------------------------------------
     virtual void  findTarget() OVERRIDE;
+    // ------------------------------------------------------------------------
     void          findDefaultPath();
+
 public:
                  SpareTireAI(AbstractKart *kart);
+    // ------------------------------------------------------------------------
     virtual void crashed(const AbstractKart *k) OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual void update(float delta) OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual void reset() OVERRIDE;
+    // ------------------------------------------------------------------------
     void         spawn(float time_to_last);
+    // ------------------------------------------------------------------------
     void         unspawn();
-    bool         isMoving() const { return m_idx != -1; }
+    // ------------------------------------------------------------------------
+    /** Return true if this AI needed to be called \ref update by \ref World,
+     *  ie it is spawned. */
+    bool         isMoving() const                       { return m_idx != -1; }
+
 };
 
 #endif

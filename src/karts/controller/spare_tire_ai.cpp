@@ -61,6 +61,10 @@ void SpareTireAI::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
+/** Besides calling update from parent class, it will auto \ref unspawn if
+ *  \ref m_timer reaches zero which it will be decreased here.
+ *  \param dt Time step size.
+ */
 void SpareTireAI::update(float dt)
 {
     BattleAI::update(dt);
@@ -71,9 +75,11 @@ void SpareTireAI::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
+/** Randomly find a start node for spare tire kart to move, called after \ref
+ *  spawn.
+ */
 void SpareTireAI::findDefaultPath()
 {
-    // Randomly find a start node for spare tire kart to move
     assert(m_idx == -1);
 
     RandomGenerator random;
@@ -83,6 +89,9 @@ void SpareTireAI::findDefaultPath()
 }   // findDefaultPath
 
 //-----------------------------------------------------------------------------
+/** For SpareTireAI, it will pick next node in \ref m_fixed_target_nodes after
+ *  reach the one in \ref m_idx, or the first one if it's the last.
+ */
 void SpareTireAI::findTarget()
 {
     assert(m_idx != -1 && m_idx < 4);
@@ -95,6 +104,10 @@ void SpareTireAI::findTarget()
 }   // findTarget
 
 //-----------------------------------------------------------------------------
+/** Spawn the SpareTireAI, it will start appearing in the battle mode and
+ *  moving around.
+ *  \param time_to_last Time before calling \ref unspawn.
+ */
 void SpareTireAI::spawn(float time_to_last)
 {
     findDefaultPath();
@@ -108,6 +121,9 @@ void SpareTireAI::spawn(float time_to_last)
 }   // spawn
 
 //-----------------------------------------------------------------------------
+/** Unspawn the SpareTireAI, it will be hidden in the battle mode but not
+ *  deleted, so it can be called with \ref spawn again later.
+ */
 void SpareTireAI::unspawn()
 {
     m_idx = -1;
@@ -115,6 +131,10 @@ void SpareTireAI::unspawn()
 }   // unspawn
 
 //-----------------------------------------------------------------------------
+/** Callback function when a kart crashes into the SpareTireAI, the kart will
+ *  increase one life if its life is not equal 3. A message will be shown too.
+ *  \param k \ref AbstractKart this SpareTireAI crashed.
+ */
 void SpareTireAI::crashed(const AbstractKart *k)
 {
     // Nothing happen when two spare tire karts crash each other
