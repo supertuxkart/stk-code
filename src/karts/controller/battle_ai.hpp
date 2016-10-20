@@ -33,16 +33,28 @@ class BattleAI : public ArenaAI
 protected:
     /** Keep a pointer to world. */
     ThreeStrikesBattle *m_world;
-    virtual void  findClosestKart(bool use_difficulty, bool find_sta) OVERRIDE;
+
+    // ------------------------------------------------------------------------
+    virtual void  findClosestKart(bool consider_difficulty,
+                                  bool find_sta) OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual int   getCurrentNode() const OVERRIDE;
+
 private:
+    // ------------------------------------------------------------------------
     virtual void  findTarget() OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual float getKartDistance(const AbstractKart* kart) const OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual bool  isKartOnRoad() const OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual bool  isWaiting() const OVERRIDE;
+
 public:
                   BattleAI(AbstractKart *kart);
+    // ------------------------------------------------------------------------
                  ~BattleAI();
+
 };
 
 #endif

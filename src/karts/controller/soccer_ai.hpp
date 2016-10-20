@@ -65,7 +65,7 @@ private:
 
     virtual bool  canSkid(float steer_fraction) OVERRIDE
            { return m_mini_skid && !(m_overtake_ball || m_chasing_ball); }
-    virtual void  findClosestKart(bool use_difficulty, bool find_sta) OVERRIDE;
+    virtual void  findClosestKart(bool consider_difficulty, bool find_sta) OVERRIDE;
     virtual void  findTarget() OVERRIDE;
     virtual bool  forceBraking() OVERRIDE { return m_force_brake; }
     virtual int   getCurrentNode() const OVERRIDE;

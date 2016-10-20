@@ -129,7 +129,7 @@ void SoccerAI::update(float dt)
 }   // update
 
 //-----------------------------------------------------------------------------
-void SoccerAI::findClosestKart(bool use_difficulty, bool find_sta)
+void SoccerAI::findClosestKart(bool consider_difficulty, bool find_sta)
 {
     float distance = 99999.9f;
     const unsigned int n = m_world->getNumKarts();
@@ -165,7 +165,7 @@ void SoccerAI::findClosestKart(bool use_difficulty, bool find_sta)
 //-----------------------------------------------------------------------------
 void SoccerAI::findTarget()
 {
-    findClosestKart(true/*use_difficulty*/, false/*find_sta*/);
+    findClosestKart(true/*consider_difficulty*/, false/*find_sta*/);
     // Check if this AI kart is the one who will chase the ball
     if (m_world->getBallChaser(m_cur_team) == (signed)m_kart->getWorldKartId())
     {
@@ -181,7 +181,7 @@ void SoccerAI::findTarget()
     if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING &&
         m_kart->getAttachment()->getType() != Attachment::ATTACH_SWATTER)
     {
-        collectItemInArena(&m_target_point , &m_target_node);
+        tryCollectItem(&m_target_point , &m_target_node);
     }
     else if (m_world->getAttacker(m_cur_team) == (signed)m_kart
         ->getWorldKartId())
