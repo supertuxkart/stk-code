@@ -73,6 +73,8 @@
    This module handles the user configuration, the supertuxkart configuration
    file (which contains options usually not edited by the player) and the input
    configuration file.
+ \li \ref font :
+   This module stores font files and tools used to draw characters in STK.
  \li \ref graphics :
    This module contains the core graphics engine, that is mostly a thin layer
    on top of irrlicht providing some additional features we need for STK

@@ -19,15 +19,29 @@
 #ifndef HEADER_FACE_TTF_HPP
 #define HEADER_FACE_TTF_HPP
 
-#include "font/font_manager.hpp"
+#include "utils/leak_check.hpp"
+#include "utils/no_copy.hpp"
 
+#include <vector>
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+/** This class will load a list of TTF files from \ref STKConfig, and save
+ *  them inside \ref m_faces for \ref FontWithFace to load glyph.
+ *  Each FaceTTF can be used more than once in each instantiation of \ref
+ *  FontWithFace, so it can render characters differently using the same TTF
+ *  file to save memory, for example different outline size.
+ *  \ingroup font
+ */
 class FaceTTF : public NoCopy
 {
 private:
+    /** Contains all TTF files loaded. */
     std::vector<FT_Face> m_faces;
 
 public:
-    LEAK_CHECK();
+    LEAK_CHECK()
     // ------------------------------------------------------------------------
     FaceTTF(const std::vector<std::string>& ttf_list);
     // ------------------------------------------------------------------------
@@ -35,6 +49,7 @@ public:
     // ------------------------------------------------------------------------
     FT_Face getFace(unsigned int i) const;
     // ------------------------------------------------------------------------
+    /** Return the total TTF files loaded. */
     unsigned int getTotalFaces() const               { return m_faces.size(); }
 
 };   // FaceTTF

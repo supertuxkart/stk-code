@@ -23,11 +23,12 @@
 
 class FaceTTF;
 
+/** A font which uses regular TTFs to most text in STK.
+ *  \ingroup font
+ */
 class RegularFace : public FontWithFace
 {
 private:
-    virtual bool supportLazyLoadChar() const OVERRIDE          { return true; }
-    // ------------------------------------------------------------------------
     virtual unsigned int getGlyphPageSize() const OVERRIDE      { return 512; }
     // ------------------------------------------------------------------------
     virtual float getScalingFactorOne() const OVERRIDE         { return 0.7f; }
@@ -38,8 +39,6 @@ public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
     RegularFace(FaceTTF* ttf);
-    // ------------------------------------------------------------------------
-    virtual ~RegularFace() {}
     // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
