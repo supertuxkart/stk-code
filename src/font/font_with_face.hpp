@@ -24,6 +24,7 @@
 #include "utils/no_copy.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <map>
 #include <set>
 

@@ -22,6 +22,7 @@
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 
+#include <string>
 #include <vector>
 
 #include <ft2build.h>
