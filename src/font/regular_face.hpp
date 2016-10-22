@@ -23,7 +23,7 @@
 
 class FaceTTF;
 
-/** A font which uses regular TTFs to most text in STK.
+/** A font which uses regular TTFs to render most text in STK.
  *  \ingroup font
  */
 class RegularFace : public FontWithFace
