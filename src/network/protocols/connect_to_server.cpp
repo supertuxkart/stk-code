@@ -284,7 +284,7 @@ void ConnectToServer::registerWithSTKServer()
     request->addParameter("address", addr.getIP());
     request->addParameter("port", addr.getPort());
     request->addParameter("private_port",
-                          NetworkConfig::get()->getPrivatePort());
+                          NetworkConfig::get()->getClientPort());
 
     Log::info("ConnectToServer", "Registering addr %s",
               addr.toString().c_str());

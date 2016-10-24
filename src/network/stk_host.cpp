@@ -141,7 +141,7 @@ void STKHost::create()
  *
  * Server:
  *
- *   The ServerLobbyRoomProtocol (SLR) will the detect the above client
+ *   The ServerLobbyRoomProtocol (SLR) will then detect the above client
  *   requests, and start a ConnectToPeer protocol for each incoming client.
  *   The ConnectToPeer protocol uses:
  *         1. GetPeerAddress to get the ip address and port of the client.
@@ -231,9 +231,13 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
     // server is made.
     m_host_id = 0;
     init();
+    TransportAddress a;
+    a.setIP(0);
+    a.setPort(NetworkConfig::get()->getClientPort());
+    ENetAddress ea = a.toEnetAddress();
 
     m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
-                            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0);
+                            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea);
     if (!m_network)
     {
         Log::fatal ("STKHost", "An error occurred while trying to create "
@@ -258,7 +262,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
 
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
-    addr.port = 2758;
+    addr.port = NetworkConfig::get()->getServerPort();
 
     m_network= new Network(NetworkConfig::get()->getMaxPlayers(),
                            /*channel_limit*/2,
@@ -511,7 +515,7 @@ void* STKHost::mainLoop(void* self)
     if(NetworkConfig::get()->isServer() && 
         NetworkConfig::get()->isLAN()      )
     {
-        TransportAddress address(0, 2757);
+        TransportAddress address(0, NetworkConfig::get()->getServerDiscoveryPort());
         ENetAddress eaddr = address.toEnetAddress();
         myself->m_lan_network = new Network(1, 1, 0, 0, &eaddr);
     }
@@ -565,6 +569,10 @@ void* STKHost::mainLoop(void* self)
 }   // mainLoop
 
 // ----------------------------------------------------------------------------
+/** Handles LAN related messages. It checks for any LAN broadcast messages,
+ *  and if a valid LAN server-request message is received, will answer
+ *  with a message containing server details (and sender IP address and port).
+ */
 void STKHost::handleLANRequests()
 {
     const int LEN=2048;

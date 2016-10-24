@@ -31,26 +31,54 @@
  * Here is an overview of the high-level interactions between modules :
  \dot
  digraph interaction {
- race -> modes
+# race -> modes
  race -> tracks
  race -> karts
- modes -> tracks
- modes -> karts
+# modes -> tracks
+# modes -> karts
  tracks -> graphics
  karts -> graphics
  tracks -> items
- graphics -> irrlicht
- guiengine -> irrlicht
- states_screens -> guiengine
- states_screens -> input
- guiengine -> input
- karts->physics
- tracks->physics
- karts -> controller
- input->controller
+ items -> graphics
+ animations -> graphics
+ graphics -> "Antarctica/irrlicht"
+# guiengine -> irrlicht
+# states_screens -> guiengine
+# input -> states_screens
+ input -> guiengine
+ guiengine -> font_system
+ karts -> physics
+ physics -> karts
+ tracks -> physics
+ ai -> controller
+ controller -> karts
+ input -> controller
  tracks -> animations
  physics -> animations
- }
+ animations -> physics
+ karts -> audio
+ physics -> audio
+ "translations\n(too many connections\nto draw)"
+ "configuration\n(too many connections\nto draw)"
+# addons -> tracks
+# addons -> karts
+ guiengine -> addons
+ guiengine -> race
+ addons -> online_manager
+ challenges -> race
+# challenges -> modes
+ guiengine -> challenges
+ online_manager -> addons
+ online_manager -> "STK Server"
+ "STK Server" -> online_manager
+ karts -> replay
+ replay 
+ # force karts and tracks on the same level, looks better this way
+ subgraph { 
+  rank = same; karts; tracks; 
+ } 
+
+}
  \enddot
 
  Note that this graph is only an approximation because the real one would be
@@ -182,6 +210,7 @@
 #include "network/rewind_manager.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
+#include "network/protocols/get_public_address.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -546,6 +575,7 @@ void cmdLineHelp()
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
+    "       --my-address=1.1.1.1:1  Own IP address (can replace stun protocol)\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
     "       --no-console       Does not write messages in the console but to\n"
     "                          stdout.log.\n"
@@ -980,6 +1010,9 @@ int handleCmdLine()
 
     if(CommandLine::has("--password", &s))
         password = s.c_str();
+
+    if (CommandLine::has("--my-address", &s))
+        GetPublicAddress::setMyIPAddress(s);
 
     // Race parameters
     if(CommandLine::has("--kartsize-debug"))
