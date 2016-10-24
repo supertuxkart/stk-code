@@ -18,6 +18,7 @@
 
 #include "guiengine/scalable_font.hpp"
 
+#include "font/font_settings.hpp"
 #include "font/font_with_face.hpp"
 #include "utils/translation.hpp"
 
