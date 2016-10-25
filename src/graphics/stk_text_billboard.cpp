@@ -54,7 +54,9 @@ void STKTextBillboard::updateAbsolutePosition()
     {
         // Override to not use the parent's rotation
         AbsoluteTransformation = getRelativeTransformation();
-        AbsoluteTransformation.setTranslation(AbsoluteTransformation.getTranslation() + Parent->getAbsolutePosition());
+        core::vector3df wc = RelativeTranslation;
+        Parent->getAbsoluteTransformation().transformVect(wc);
+        AbsoluteTransformation.setTranslation(wc);
     }
     else
         AbsoluteTransformation = getRelativeTransformation();
@@ -173,11 +175,15 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, FontWithFace* fo
 
 void STKTextBillboard::updateNoGL()
 {
-    scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
-    core::vector3df cam_pos = curr_cam->getPosition();
-    core::vector3df text_pos = this->getAbsolutePosition();
-    float angle = atan2(text_pos.X - cam_pos.X, text_pos.Z - cam_pos.Z);
-    this->setRotation(core::vector3df(0.0f, angle * 180.0f / M_PI, 0.0f));
+    scene::ICameraSceneNode* curr_cam =irr_driver->getSceneManager()->getActiveCamera();
+    btMatrix3x3 m;
+    m.setFromOpenGLSubMatrix(curr_cam->getViewMatrix().pointer());
+    btQuaternion q;
+    m.getRotation(q);
+    q.setW(-q.getW());
+    Vec3 hpr;
+    hpr.setHPR(q);
+    this->setRotation(hpr.toIrrHPR());
     updateAbsolutePosition();
 
     STKMeshSceneNode::updateNoGL();
