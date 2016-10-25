@@ -195,7 +195,6 @@ std::string GetPublicAddress::parseStunResponse()
 
     // Those are the port and the address to be detected
     
-    int pos = 20;
     while (true)
     {
         int type = datas.getUInt16();

@@ -705,7 +705,7 @@ PROFILER_POP_CPU_MARKER();
         
 #if !defined(USE_GLES2)
 
-    InstanceDataDualTex *InstanceBufferDualTex;
+    InstanceDataDualTex *InstanceBufferDualTex = NULL;
     InstanceDataThreeTex *InstanceBufferThreeTex;
     InstanceDataSingleTex *ShadowInstanceBuffer;
     InstanceDataSingleTex *RSMInstanceBuffer;
@@ -849,7 +849,7 @@ PROFILER_POP_CPU_MARKER();
                 ShadowCmdBuffer = (DrawElementsIndirectCommand*)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
             }
 
-            for (unsigned i = 0; i < 4; i++)
+            for (unsigned char i = 0; i < 4; i++)
             {
                 // Mat default
                 GenDrawCalls<Material::SHADERTYPE_SOLID>(i, ListInstancedMatDefault::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);

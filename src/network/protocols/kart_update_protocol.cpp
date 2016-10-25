@@ -48,7 +48,7 @@ bool KartUpdateProtocol::notifyEvent(Event* event)
         Log::info("KartUpdateProtocol", "Message too short.");
         return true;
     }
-    float time = ns.getFloat();
+    
     while(ns.size() >= 29)
     {
         uint8_t kart_id             = ns.getUInt8();

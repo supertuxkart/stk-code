@@ -3,8 +3,14 @@
 # Configuration manual:
 # http://docs.travis-ci.com/user/build-configuration/
 #
+
 sudo: false
+
 language: cpp
+
+os:
+  - linux
+
 compiler:
   - gcc
   - clang
@@ -14,8 +20,8 @@ matrix:
 
 env:
   matrix:
-    - BUILD_TYPE="Debug"
-    - BUILD_TYPE="Release"
+    - BUILD_TYPE='Debug'
+    - BUILD_TYPE='Release'
 
 addons:
   apt:
@@ -43,8 +49,8 @@ before_script:
   - free -mt
 
 script:
-  - mkdir "build"
-  - cd "build"
+  - mkdir build
+  - cd build
   - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCHECK_ASSETS=off
   - make VERBOSE=1 -j $THREADS
 

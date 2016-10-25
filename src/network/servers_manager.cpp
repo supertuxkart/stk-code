@@ -174,7 +174,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
                     BareNetworkString s(buffer, len);
                     irr::core::stringw name;
                     // bytes_read is the number of bytes read
-                    uint8_t bytes_read  = s.decodeStringW(&name);
+                    s.decodeStringW(&name);
                     uint8_t max_players = s.getUInt8();
                     uint8_t players     = s.getUInt8();
                     uint32_t my_ip      = s.getUInt32();

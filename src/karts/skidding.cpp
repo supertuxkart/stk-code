@@ -140,8 +140,8 @@ float Skidding::updateSteering(float steer, float dt)
             float f = m_visual_rotation - m_visual_rotation*dt/m_skid_time;
             // Floating point errors when m_skid_time is very close to 0
             // can result in visual rotation set to a large number
-            if( (f<0 && m_visual_rotation>0 ) ||
-                (f>0 && m_visual_rotation<0)     )
+            if( (f<0 && m_visual_rotation > 0 ) ||
+                (f>0 && m_visual_rotation < 0)     )
                 m_visual_rotation = 0;
             else
                 m_visual_rotation = f;
@@ -158,7 +158,7 @@ float Skidding::updateSteering(float steer, float dt)
         break;
     case SKID_ACCUMULATE_RIGHT:
         {
-            float f = (1.0f+steer)*0.5f;   // map [-1,1] --> [0, 1]
+            float f = (1.0f+steer) * 0.5f;   // map [-1,1] --> [0, 1]
             steer_result  = kp->getSkidReduceTurnMin()
                              + m_skid_reduce_turn_delta * f;
             if(m_skid_time < kp->getSkidVisualTime())
@@ -171,7 +171,7 @@ float Skidding::updateSteering(float steer, float dt)
         }   // SKID_ACCUMULATE_RIGHT
     case SKID_ACCUMULATE_LEFT:
         {
-            float f = (-1.0f+steer)*0.5f;   // map [-1,1] --> [-1, 0]
+            float f = (-1.0f+steer) * 0.5f;   // map [-1,1] --> [-1, 0]
             steer_result   = -kp->getSkidReduceTurnMin()
                                + m_skid_reduce_turn_delta * f;
             if(m_skid_time < kp->getSkidVisualTime())
@@ -504,4 +504,3 @@ unsigned int Skidding::getSkidBonus(float *bonus_time,
     }
     return (unsigned int) kp->getSkidBonusSpeed().size();
 }   // getSkidBonusForce
-
