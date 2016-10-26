@@ -50,16 +50,28 @@ STKTextBillboard::STKTextBillboard(core::stringw text, FontWithFace* font,
 
 void STKTextBillboard::updateAbsolutePosition()
 {
+    // Make billboard always face the camera
+    scene::ICameraSceneNode* curr_cam =
+        irr_driver->getSceneManager()->getActiveCamera();
+    if (!curr_cam) return;
+    core::quaternion q(curr_cam->getViewMatrix());
+    q.W = -q.W;
+
     if (Parent)
     {
         // Override to not use the parent's rotation
-        AbsoluteTransformation = getRelativeTransformation();
         core::vector3df wc = RelativeTranslation;
         Parent->getAbsoluteTransformation().transformVect(wc);
         AbsoluteTransformation.setTranslation(wc);
+        q.getMatrix(AbsoluteTransformation, wc);
     }
     else
-        AbsoluteTransformation = getRelativeTransformation();
+    {
+        q.getMatrix(AbsoluteTransformation, RelativeTranslation);
+    }
+    core::matrix4 m;
+    m.setScale(RelativeScale);
+    AbsoluteTransformation *= m;
 }
 
 scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, FontWithFace* font)
@@ -171,22 +183,6 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, FontWithFace* fo
     getMaterial(0).MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
 
     return Mesh;
-}
-
-void STKTextBillboard::updateNoGL()
-{
-    scene::ICameraSceneNode* curr_cam =irr_driver->getSceneManager()->getActiveCamera();
-    btMatrix3x3 m;
-    m.setFromOpenGLSubMatrix(curr_cam->getViewMatrix().pointer());
-    btQuaternion q;
-    m.getRotation(q);
-    q.setW(-q.getW());
-    Vec3 hpr;
-    hpr.setHPR(q);
-    this->setRotation(hpr.toIrrHPR());
-    updateAbsolutePosition();
-
-    STKMeshSceneNode::updateNoGL();
 }
 
 void STKTextBillboard::collectChar(video::ITexture* texture,
