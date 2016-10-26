@@ -74,8 +74,6 @@ public:
         const irr::core::vector3df& position,
         const irr::core::vector3df& size);
 
-    virtual void updateNoGL() OVERRIDE;
-
     virtual scene::ESCENE_NODE_TYPE getType() const OVERRIDE
     {
         return scene::ESNT_TEXT;

@@ -16,11 +16,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "font/face_ttf.hpp"
-
 #include "font/regular_face.hpp"
 
 // ----------------------------------------------------------------------------
+/** Constructor of RegularFace.
+ *  \param ttf \ref FaceTTF for RegularFace to use.
+ */
 RegularFace::RegularFace(FaceTTF* ttf) : FontWithFace("RegularFace", ttf)
 {
 }   // RegularFace

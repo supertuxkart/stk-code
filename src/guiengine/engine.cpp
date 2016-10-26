@@ -659,6 +659,8 @@ namespace GUIEngine
 #include "config/user_config.hpp"
 #include "font/bold_face.hpp"
 #include "font/digit_face.hpp"
+#include "font/font_manager.hpp"
+#include "font/font_settings.hpp"
 #include "font/regular_face.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"

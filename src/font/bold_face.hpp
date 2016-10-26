@@ -23,23 +23,27 @@
 
 class FaceTTF;
 
+/** A font which uses regular TTFs to render title or important message in STK
+ *  with a bold outline, it shares the same \ref FaceTTF with \ref RegularFace.
+ *  \ingroup font
+ */
 class BoldFace : public FontWithFace
 {
 private:
-    virtual bool supportLazyLoadChar() const OVERRIDE          { return true; }
-    // ------------------------------------------------------------------------
     virtual unsigned int getGlyphPageSize() const OVERRIDE     { return 1024; }
     // ------------------------------------------------------------------------
     virtual float getScalingFactorOne() const OVERRIDE         { return 0.2f; }
     // ------------------------------------------------------------------------
     virtual unsigned int getScalingFactorTwo() const OVERRIDE   { return 120; }
+    // ------------------------------------------------------------------------
+    virtual bool isBold() const                                { return true; }
+    // ------------------------------------------------------------------------
+    virtual int shapeOutline(FT_Outline* outline) const OVERRIDE;
 
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
     BoldFace(FaceTTF* ttf);
-    // ------------------------------------------------------------------------
-    virtual ~BoldFace() {}
     // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------

@@ -210,7 +210,7 @@ void ServerLobbyRoomProtocol::registerServer()
     request->addParameter("address",      addr.getIP()                    );
     request->addParameter("port",         addr.getPort()                  );
     request->addParameter("private_port",
-                                    NetworkConfig::get()->getPrivatePort());
+                                    NetworkConfig::get()->getServerPort() );
     request->addParameter("name",   NetworkConfig::get()->getServerName() );
     request->addParameter("max_players", 
                           UserConfigParams::m_server_max_players          );

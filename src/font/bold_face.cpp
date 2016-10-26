@@ -18,9 +18,10 @@
 
 #include "font/bold_face.hpp"
 
-#include "font/face_ttf.hpp"
-
 // ----------------------------------------------------------------------------
+/** Constructor of BoldFace.
+ *  \param ttf \ref FaceTTF for BoldFace to use.
+ */
 BoldFace::BoldFace(FaceTTF* ttf) : FontWithFace("BoldFace", ttf)
 {
 }   // BoldFace
@@ -53,3 +54,12 @@ void BoldFace::reset()
     insertCharacters(preload_chars.c_str());
     updateCharactersList();
 }   // reset
+
+// ----------------------------------------------------------------------------
+/** Embolden the glyph to make bold font using FT_Outline_Embolden.
+ *  \return A FT_Error value.
+ */
+int BoldFace::shapeOutline(FT_Outline* outline) const
+{
+    return FT_Outline_Embolden(outline, getDPI() * 2);
+}   // shapeOutline

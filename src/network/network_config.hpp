@@ -50,10 +50,14 @@ private:
      *  be updated from a separate thread. */
     Synchronised<TransportAddress> m_my_address;
 
-    /** Even if this is a WAN server, we also store the private (LAN)
-     *  port number, to allow direct connection to clients on the same
-     *  LAN. */
-    uint16_t m_private_port;
+    /** The port number to which the server listens to detect LAN requests. */
+    uint16_t m_server_discovery_port;
+
+    /** The port on which the server listens for connection requests from LAN. */
+    uint16_t m_server_port;
+
+    /** The LAN port on which a client is waiting for a server connection. */
+    uint16_t m_client_port;
 
     /** Maximum number of players on the server. */
     int m_max_players;
@@ -85,7 +89,28 @@ public:
 
     // ------------------------------------------------------------------------
     void setMyAddress(const TransportAddress& addr);
-
+    void setIsServer(bool b);
+    // ------------------------------------------------------------------------
+    /** Sets the port for server discovery. */
+    void setServerDiscoveryPort(uint16_t port)
+    {
+        m_server_discovery_port = port;
+    }   // setServerDiscoveryPort
+    // ------------------------------------------------------------------------
+    /** Sets the port on which this server listens. */
+    void setServerPort(uint16_t port) { m_server_port = port;  }
+    // ------------------------------------------------------------------------
+    /** Sets the port on which a client listens for server connection. */
+    void setClientPort(uint16_t port) {  m_client_port = port; }
+    // ------------------------------------------------------------------------
+    /** Returns the port on which this server listenes. */
+    uint16_t getServerPort() const { return m_server_port;  }
+    // ------------------------------------------------------------------------
+    /** Returns the port for LAN server discovery. */
+    uint16_t getServerDiscoveryPort() const { return m_server_discovery_port; }
+    // ------------------------------------------------------------------------
+    /** Returns the port on which a client listens for server connections. */
+    uint16_t getClientPort() const { return m_client_port;  }
     // ------------------------------------------------------------------------
     /** Sets the password for a server. */
     void setPassword(const std::string &password) { m_password = password; }
@@ -117,9 +142,6 @@ public:
     // --------------------------------------------------------------------
     /** Returns the maximum number of players for this server. */
     int getMaxPlayers() const { return m_max_players; }
-    // --------------------------------------------------------------------
-    /** Sets if this instance is a server or client. */
-    void setIsServer(bool b) { m_is_server = b; }
     // --------------------------------------------------------------------
     /** Returns if this instance is a server. */
     bool isServer() const { return m_is_server;  }
@@ -158,6 +180,7 @@ public:
     /** Returns the IP address of this host. We need to return a copy
      *  to make sure the address is thread safe (otherwise it could happen
      *  that e.g. data is taken when the IP address was written, but not
+        return a;
      *  yet the port). */
     const TransportAddress getMyAddress() const
     {
@@ -167,12 +190,6 @@ public:
         m_my_address.unlock();
         return a;
     }   // getMyAddress
-    // ------------------------------------------------------------------------
-    /** Sets the private (LAN) port for this instance. */
-    void setPrivatePort(uint16_t port) { m_private_port = port; }
-    // ------------------------------------------------------------------------
-    /** Returns the private (LAN) port. */
-    uint16_t getPrivatePort() const { return m_private_port; }
 
 };   // class NetworkConfig
 

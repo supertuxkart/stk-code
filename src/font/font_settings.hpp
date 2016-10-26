@@ -25,21 +25,34 @@
 
 using namespace irr;
 
+/** This class stores settings when rendering fonts, used when instantiating
+ *  \ref irr::gui::ScalableFont.
+ *  \ingroup font
+ */
 class FontSettings
 {
 private:
+    /** True if black border will be drawn when rendering. */
     bool m_black_border;
 
+    /** If true, characters will have right alignment when rendering, for RTL
+     *  language. */
     bool m_rtl;
 
+    /** Scaling when rendering. */
     float m_scale;
 
+    /** True if shadow will be drawn when rendering. */
     bool m_shadow;
 
+    /** Save the color of shadow when rendering. */
     video::SColor m_shadow_color;
+
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
+    /** Constructor. It will initialize all members with default values if no
+     *  parameter is given. */
     FontSettings(bool black_border = false, bool rtl = false,
                  float scale = 1.0f, bool shadow = false,
                  const video::SColor& color = video::SColor(0, 0, 0, 0))
@@ -51,26 +64,39 @@ public:
         m_shadow_color = color;
     }
     // ------------------------------------------------------------------------
-    ~FontSettings() {}
-    // ------------------------------------------------------------------------
+    /** Set the scaling.
+     *  \param scale Scaling to be set. */
     void setScale(float scale)                             { m_scale = scale; }
     // ------------------------------------------------------------------------
+    /** Return the scaling. */
     float getScale() const                                  { return m_scale; }
     // ------------------------------------------------------------------------
+    /** Set the color of shadow.
+     *  \param col The color of shadow to be set. */
     void setShadowColor(const video::SColor &col)     { m_shadow_color = col; }
     // ------------------------------------------------------------------------
+    /** Return the color of shadow. */
     const video::SColor& getShadowColor() const      { return m_shadow_color; }
     // ------------------------------------------------------------------------
+    /** Return if shadow is enabled. */
     bool useShadow() const                                 { return m_shadow; }
     // ------------------------------------------------------------------------
+    /** Set whether shadow is enabled.
+     *  \param shadow If it's enabled. */
     void setShadow(bool shadow)                          { m_shadow = shadow; }
     // ------------------------------------------------------------------------
+    /** Set whether black border is enabled.
+     *  \param border If it's enabled. */
     void setBlackBorder(bool border)               { m_black_border = border; }
     // ------------------------------------------------------------------------
+    /** Return if black border is enabled. */
     bool useBlackBorder() const                      { return m_black_border; }
     // ------------------------------------------------------------------------
+    /** Set right text alignment for RTL language.
+     *  \param rtl If it's enabled. */
     void setRTL(bool rtl)                                      { m_rtl = rtl; }
     // ------------------------------------------------------------------------
+    /** Return if right text alignment for RTL language is enabled. */
     bool isRTL() const                                        { return m_rtl; }
 
 };   // FontSettings
