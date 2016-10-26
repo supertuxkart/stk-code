@@ -105,6 +105,7 @@ namespace Scripting
                     core::vector3df(1.5f, 1.5f, 1.5f));
 
                 World::getWorld()->getTrack()->addNode(tb);
+                tb->drop();
             }
             else
             {
