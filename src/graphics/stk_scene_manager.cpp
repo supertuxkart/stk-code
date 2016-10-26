@@ -41,7 +41,6 @@
 
 #include <unordered_map>
 #include <SViewFrustum.h>
-#include <functional>
 
 template<typename T>
 struct InstanceFiller
@@ -155,28 +154,6 @@ FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > Instan
 
     PolyCount += (InstanceBufferOffset - InitialOffset) * mesh->IndexCount / 3;
 }
-
-class MeshRenderInfoHash
-{
-public:
-    size_t operator() (const std::pair<scene::IMeshBuffer*, RenderInfo*> &p) const
-    {
-        return (std::hash<scene::IMeshBuffer*>()(p.first) ^
-            (std::hash<RenderInfo*>()(p.second) << 1));
-    }
-};
-
-struct MeshRenderInfoEquals : std::binary_function
-    <const std::pair<scene::IMeshBuffer*, RenderInfo*>&,
-     const std::pair<scene::IMeshBuffer*, RenderInfo*>&, bool>
-{
-    result_type operator() (first_argument_type lhs,
-                            second_argument_type rhs) const
-    {
-        return (lhs.first == rhs.first) &&
-            (lhs.second == rhs.second);
-    }
-};
 
 template<typename T>
 static

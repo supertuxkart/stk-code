@@ -247,12 +247,6 @@ KartModel::~KartModel()
         {
             // Master KartModels should never have a speed weighted object attached.
             assert(!m_is_master);
-
-            // Drop the cloned transparent model if created
-            if (m_krt == KRT_TRANSPARENT)
-            {
-                m_speed_weighted_objects[i].m_model->drop();
-            }
             m_speed_weighted_objects[i].m_node->drop();
         }
         if(m_is_master && m_speed_weighted_objects[i].m_model)
@@ -262,20 +256,15 @@ KartModel::~KartModel()
         }
     }
 
-    // In case of the master, the mesh must be dropped. A non-master KartModel
-    // has a copy of the master's mesh, so it needs to be dropped, too.
-    if (m_mesh)
+    if (m_is_master && m_mesh)
     {
         m_mesh->drop();
-        if (m_is_master)
+        // If there is only one copy left, it's the copy in irrlicht's
+        // mesh cache, so it can be removed.
+        if (m_mesh && m_mesh->getReferenceCount() == 1)
         {
-            // If there is only one copy left, it's the copy in irrlicht's
-            // mesh cache, so it can be removed. 
-            if (m_mesh && m_mesh->getReferenceCount() == 1)
-            {
-                irr_driver->dropAllTextures(m_mesh);
-                irr_driver->removeMeshFromCache(m_mesh);
-            }
+            irr_driver->dropAllTextures(m_mesh);
+            irr_driver->removeMeshFromCache(m_mesh);
         }
     }
 
@@ -308,7 +297,7 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     km->m_kart_height          = m_kart_height;
     km->m_kart_highest_point   = m_kart_highest_point;
     km->m_kart_lowest_point    = m_kart_lowest_point;
-    km->m_mesh                 = irr_driver->copyAnimatedMesh(m_mesh);
+    km->m_mesh                 = m_mesh;
     km->m_model_filename       = m_model_filename;
     km->m_animation_speed      = m_animation_speed;
     km->m_current_animation    = AF_DEFAULT;
@@ -343,12 +332,6 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
         // Master should not have any speed weighted nodes.
         assert(!m_speed_weighted_objects[i].m_node);
         km->m_speed_weighted_objects[i] = m_speed_weighted_objects[i];
-        if (krt == KRT_TRANSPARENT)
-        {
-            // Only clone the mesh if transparent type is used, see #2445
-            km->m_speed_weighted_objects[i].m_model = irr_driver
-                ->copyAnimatedMesh(m_speed_weighted_objects[i].m_model);
-        }
     }
 
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
