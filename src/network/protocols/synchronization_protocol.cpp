@@ -155,17 +155,6 @@ void SynchronizationProtocol::asynchronousUpdate()
             requestTerminate();
             return;
         }
-        static int seconds = -1;
-        if (seconds == -1)
-        {
-            seconds = (int)(ceil(m_countdown));
-        }
-        else if (seconds != (int)(ceil(m_countdown)))
-        {
-            seconds = (int)(ceil(m_countdown));
-            Log::info("SynchronizationProtocol", "Starting in %d seconds.",
-                      seconds);
-        }
     }   // if m_countdown_activated
 
     if (NetworkConfig::get()->isServer() &&  current_time > m_last_time+1)
