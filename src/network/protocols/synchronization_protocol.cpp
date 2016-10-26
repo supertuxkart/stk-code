@@ -37,7 +37,12 @@ void SynchronizationProtocol::setup()
     m_has_quit = false;
 }   // setup
  //-----------------------------------------------------------------------------
-
+/** Called when receiving a message. On the client side the message is a ping
+ *  from the server, which is answered back. The client will also check if the
+ *  server has started the countdown (which is indicated in the ping message).
+ *  On the server the received message is a reply to a previous ping request.
+ *  The server will keep track of average latency.
+ */
 bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
@@ -79,15 +84,15 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         // countdown time in the message
         if (data.size() == 4)
         {
-            uint32_t time_to_start = data.getUInt32();
+            float time_to_start = data.getFloat();
             Log::debug("SynchronizationProtocol",
-                       "Request to start game in %d.", time_to_start);
+                       "Request to start game in %f.", time_to_start);
             if (!m_countdown_activated)
                 startCountdown(time_to_start);
             else
             {
                 // Adjust the time based on the value sent from the server.
-                m_countdown = (double)(time_to_start/1000.0);
+                m_countdown = time_to_start;
             }
         }
         else
@@ -120,10 +125,19 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
-
+/** Waits for the countdown to be started. On the server the start of the
+ *  countdown is triggered by the StartGameProtocol::startRace(), which is
+ *  called once all clients have confirmed that they are ready to start.
+ *  The server will send a ping request to each client once a second, and
+ *  include the information if the countdown has started (and its current
+ *  value). On the client the countdown is started in notifyEvenAsynchronous()
+ *  when a server ping is received that indicates that the countdown has
+ *  started. The measured times can be used later to estimate the latency
+ *  between server and client.
+ */
 void SynchronizationProtocol::asynchronousUpdate()
 {
-    double current_time = StkTime::getRealTime();
+    float current_time = float(StkTime::getRealTime());
     if (m_countdown_activated)
     {
         m_countdown -= (current_time - m_last_countdown_update);
@@ -167,7 +181,7 @@ void SynchronizationProtocol::asynchronousUpdate()
             // message is received), or to update the countdown time.
             if (m_countdown_activated)
             {
-                ping_request->addUInt32((int)(m_countdown*1000.0));
+                ping_request->addFloat(m_countdown);
                 Log::debug("SynchronizationProtocol",
                            "CNTActivated: Countdown value : %f", m_countdown);
             }
@@ -191,11 +205,11 @@ void SynchronizationProtocol::asynchronousUpdate()
  *  the countdown has to be started.
  *  \param ms_countdown Countdown to use in ms.
  */
-void SynchronizationProtocol::startCountdown(int ms_countdown)
+void SynchronizationProtocol::startCountdown(float ms_countdown)
 {
-    m_countdown_activated = true;
-    m_countdown = (double)(ms_countdown)/1000.0;
-    m_last_countdown_update = StkTime::getRealTime();
+    m_countdown_activated   = true;
+    m_countdown             = ms_countdown;
+    m_last_countdown_update = float(StkTime::getRealTime());
     Log::info("SynchronizationProtocol", "Countdown started with value %f",
               m_countdown);
 }   // startCountdown

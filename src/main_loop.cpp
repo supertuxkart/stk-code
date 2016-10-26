@@ -34,6 +34,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
+#include "network/protocols/synchronization_protocol.hpp"
 #include "online/request_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
@@ -288,9 +289,18 @@ void MainLoop::run()
             PROFILER_POP_CPU_MARKER();
         }
 
-        // Update world time if world exists
-        if (World::getWorld())
-            World::getWorld()->updateTime(dt);
+        if (World::getWorld() )
+        {
+            // In case of networking world we can only start the timing once the
+            // SynchronizationProtocol has disappeared (which indicates that all
+            // other protocols necessary for running a game are running).
+            SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(
+                ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
+            if (!protocol)
+            {
+                World::getWorld()->updateTime(dt);
+            }
+        }
 
         PROFILER_POP_CPU_MARKER();
         PROFILER_SYNC_FRAME();

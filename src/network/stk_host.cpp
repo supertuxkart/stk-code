@@ -218,7 +218,22 @@ void STKHost::create()
  *  the LocalPlayerController for each kart. Each remote player gets a
  *  NULL ActivePlayer (the ActivePlayer is only used for assigning the input
  *  device to each kart, achievements and highscores, so it's not needed for
- *  remote players).
+ *  remote players). It will also start the SynchronizationProtocol.
+ *  The StartGameProtocol has a callback ready which is called from world
+ *  when the world is loaded (i.e. track and all karts are ready). When
+ *  this callback is invoked, each client will send a 'ready' message to
+ *  the server's StartGameProtocol. Once the server has received all
+ *  messages in notifyEventAsynchronous(), it will call startCountdown()
+ *  in the SynchronizationProtocol. The SynchronizationProtocol is 
+ *  sending regular (once per second) pings to the clients and measure
+ *  the averate latency. Upon starting the countdown this information
+ *  is included in the ping request, so the clients can start the countdown
+ *  at that stage as wellk.
+ * 
+ *  Once the countdown is 0 (or below), the Synchronization Protocol will
+ *  start the protocols: KartUpdateProtocol, ControllerEventsProtocol,
+ *  GameEventsProtocol. Then the SynchronizationProtocol is terminated
+ *  which indicates to the main loop to start the actual game.
  */
 
 // ============================================================================
