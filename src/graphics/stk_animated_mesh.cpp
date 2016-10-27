@@ -99,6 +99,16 @@ void STKAnimatedMesh::updateNoGL()
 
     if (!isMaterialInitialized)
     {
+        // Use a default render info to distinguish same mesh buffer created by
+        // different animated mesh node in vao manager when using instanced
+        // rendering
+        RenderInfo* default_ri = NULL;
+        if (CVS->isARBBaseInstanceUsable())
+        {
+            default_ri = new RenderInfo();
+            m_static_render_info.push_back(default_ri);
+        }
+
         video::IVideoDriver* driver = SceneManager->getVideoDriver();
         const u32 mb_count = m->getMeshBufferCount();
         for (u32 i = 0; i < mb_count; ++i)
@@ -121,7 +131,7 @@ void STKAnimatedMesh::updateNoGL()
                     }
                     else
                     {
-                        cur_ri = NULL;
+                        cur_ri = default_ri;
                     }
                 }
                 else
@@ -137,7 +147,7 @@ void STKAnimatedMesh::updateNoGL()
             assert(cur_ri ? cur_ri->isStatic() : true);
             GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
                 affected || m_all_parts_colorized || (cur_ri
-                && cur_ri->isTransparent()) ? cur_ri : NULL));
+                && cur_ri->isTransparent()) ? cur_ri : default_ri));
         }
 
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
@@ -221,7 +231,7 @@ void STKAnimatedMesh::updateGL()
 
             if (CVS->isARBBaseInstanceUsable())
             {
-                std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
+                std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb, GLmeshes[i].m_render_info);
                 mesh.vaoBaseVertex = p.first;
                 mesh.vaoOffset = p.second;
             }

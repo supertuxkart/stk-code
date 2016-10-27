@@ -1070,28 +1070,6 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
 }   // getMesh
 
 // ----------------------------------------------------------------------------
-/** Create a skinned mesh which has copied all meshbuffers and joints of the
- *  original mesh. Note, that this will not copy any other information like
- *   joints data.
- *  \param mesh Original mesh
- *  \return Newly created skinned mesh. You should call drop() when you don't
- *          need it anymore.
- */
-scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
-{
-    using namespace scene;
-    CSkinnedMesh *mesh = dynamic_cast<CSkinnedMesh*>(orig);
-    if (!mesh)
-    {
-        Log::error("copyAnimatedMesh", "Given mesh was not a skinned mesh.");
-        return NULL;
-    }
-
-    scene::IAnimatedMesh* out = mesh->clone();
-    return out;
-}   // copyAnimatedMesh
-
-// ----------------------------------------------------------------------------
 /** Sets the material flags in this mesh depending on the settings in
  *  material_manager.
  *  \param mesh  The mesh to change the settings in.
@@ -1236,7 +1214,8 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                           const std::string& debug_name,
                                           scene::ISceneNode *parent,
                                           RenderInfo* render_info,
-                                          bool all_parts_colorized)
+                                          bool all_parts_colorized,
+                                          int frame_for_mesh)
 {
     if (!CVS->isGLSL())
         return m_scene_manager->addMeshSceneNode(mesh, parent);
@@ -1251,7 +1230,8 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                                        core::vector3df(0, 0, 0),
                                                        core::vector3df(1.0f, 1.0f, 1.0f),
                                                        true, render_info,
-                                                       all_parts_colorized);
+                                                       all_parts_colorized,
+                                                       frame_for_mesh);
     node->drop();
 
     return node;

@@ -32,8 +32,8 @@
 #include "utils/helpers.hpp"
 #include "utils/tuple.hpp"
 
-#include <ISceneManager.h>
 #include <IMaterialRenderer.h>
+#include <ISceneManager.h>
 
 // ============================================================================
 class ColorizeShader : public Shader<ColorizeShader, core::matrix4, 
@@ -54,12 +54,14 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     irr::s32 id, const std::string& debug_name,
     const irr::core::vector3df& position,
     const irr::core::vector3df& rotation,
-    const irr::core::vector3df& scale, bool createGLMeshes, RenderInfo* render_info, bool all_parts_colorized) :
+    const irr::core::vector3df& scale, bool createGLMeshes, RenderInfo* render_info, bool all_parts_colorized,
+    int frame_for_mesh) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
     isDisplacement = false;
     immediate_draw = false;
     update_each_frame = false;
+    m_frame_for_mesh = frame_for_mesh;
     isGlow = false;
 
     m_debug_name = debug_name;
@@ -250,9 +252,18 @@ void STKMeshSceneNode::updateGL()
 {
     if (isGLInitialized)
         return;
-    for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
+
+    scene::IAnimatedMesh* am = dynamic_cast<scene::IAnimatedMesh*>(Mesh);
+    scene::IMesh* m = Mesh;
+    if (am && m_frame_for_mesh > -1)
     {
-        scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+        // Get the correct frame of animation for animated mesh
+        m = am->getMesh(m_frame_for_mesh);
+    }
+
+    for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
+    {
+        scene::IMeshBuffer* mb = m->getMeshBuffer(i);
         if (!mb)
             continue;
         GLMesh &mesh = GLmeshes[i];
