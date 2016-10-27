@@ -393,7 +393,8 @@ public:
                                   const std::string& debug_name,
                                   scene::ISceneNode *parent = NULL,
                                   RenderInfo* render_info = NULL,
-                                  bool all_parts_colorized = false);
+                                  bool all_parts_colorized = false,
+                                  int frame_for_mesh = -1);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);

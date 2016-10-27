@@ -427,8 +427,12 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                            ? m_animation_frame[AF_STRAIGHT]
                            : 0;
 
-        scene::IMesh* main_frame = m_mesh->getMesh(straight_frame);
-        main_frame->setHardwareMappingHint(scene::EHM_STATIC);
+        scene::IMesh* main_frame = m_mesh;
+        if (!CVS->isGLSL())
+        {
+            main_frame = m_mesh->getMesh(straight_frame);
+            main_frame->setHardwareMappingHint(scene::EHM_STATIC);
+        }
 
         std::string debug_name;
 
@@ -437,7 +441,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
 #endif
 
         node = irr_driver->addMesh(main_frame, debug_name,
-               NULL /*parent*/, getRenderInfo());
+               NULL /*parent*/, getRenderInfo(), false, straight_frame);
 
 #ifdef DEBUG
         node->setName(debug_name.c_str());
