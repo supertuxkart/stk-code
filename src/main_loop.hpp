@@ -28,7 +28,10 @@ typedef unsigned long Uint32;
 class MainLoop
 {
 private:
+    /** True if the main loop should exit. */
     bool m_abort;
+
+    /** True if the frame rate should be throttled. */
     bool m_throttle_fps;
 
     Uint32   m_curr_time;

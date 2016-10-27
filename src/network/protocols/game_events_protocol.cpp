@@ -34,6 +34,15 @@ GameEventsProtocol::~GameEventsProtocol()
 }   // ~GameEventsProtocol
 
 // ----------------------------------------------------------------------------
+/** Once the GameEventsProtocol is ready, signal the world that the timer
+ *  can start.
+*/
+void GameEventsProtocol::setup()
+{
+    World::getWorld()->setReadyToRace();
+}   // setup
+
+// ----------------------------------------------------------------------------
 bool GameEventsProtocol::notifyEvent(Event* event)
 {
     // Avoid crash in case that we still receive race events when

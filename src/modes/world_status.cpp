@@ -17,6 +17,7 @@
 
 #include "modes/world_status.hpp"
 
+#include "main_loop.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
@@ -31,21 +32,6 @@
 #include "tracks/track.hpp"
 
 #include <irrlicht.h>
-
-//-----------------------------------------------------------------------------
-/** Starts the kart engines.
- */
-void WorldStatus::startEngines()
-{
-    if (m_engines_started)
-        return;
-
-    m_engines_started = true;
-    for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
-    {
-        World::getWorld()->getKart(i)->startEngineSFX();
-    }
-}
 
 //-----------------------------------------------------------------------------
 WorldStatus::WorldStatus()
@@ -65,6 +51,7 @@ WorldStatus::WorldStatus()
 
     if (device->getTimer()->isStopped())
         device->getTimer()->start();
+    m_ready_to_race = false;
 }   // WorldStatus
 
 //-----------------------------------------------------------------------------
@@ -105,6 +92,10 @@ void WorldStatus::reset()
 
     // Set the right music
     World::getWorld()->getTrack()->startMusic();
+    // In case of a networked race the race can only start once
+    // all protocols are up. This flag waits for that, and is
+    // set by 
+    m_ready_to_race = !NetworkConfig::get()->isNetworking();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -120,6 +111,21 @@ WorldStatus::~WorldStatus()
     if (device->getTimer()->isStopped())
         device->getTimer()->start();
 }   // ~WorldStatus
+
+//-----------------------------------------------------------------------------
+/** Starts the kart engines.
+ */
+void WorldStatus::startEngines()
+{
+    if (m_engines_started)
+        return;
+
+    m_engines_started = true;
+    for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
+    {
+        World::getWorld()->getKart(i)->startEngineSFX();
+    }
+}   // startEngines
 
 //-----------------------------------------------------------------------------
 /** Sets the clock mode and the initial time of the world clock.
@@ -173,6 +179,10 @@ void WorldStatus::update(float dt)
  */
 void WorldStatus::updateTime(const float dt)
 {
+    // In case of a networked race wait till all necessary protocols are
+    // ready before progressing the timer
+    if (!m_ready_to_race) return;
+
     switch (m_phase)
     {
         // Note: setup phase must be a separate phase, since the race_manager

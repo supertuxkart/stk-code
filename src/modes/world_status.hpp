@@ -94,6 +94,9 @@ protected:
     /** If the start race should be played, disabled in cutscenes. */
     bool            m_play_racestart_sounds;
 
+    /** A flag that causes the world to wait in case of a networking race
+     *  till all protocols are up and running. */
+    bool m_ready_to_race;
 private:
     /** Sound to play at the beginning of a race, during which a
      *  a camera intro of the track can be shown. */
@@ -194,6 +197,8 @@ public:
     // ------------------------------------------------------------------------
     /** Get the time since start regardless of which way the clock counts */
     float getTimeSinceStart() const { return m_count_up_timer; }
+    // ------------------------------------------------------------------------
+    void setReadyToRace() { m_ready_to_race = true; }
 
 };   // WorldStatus
 
