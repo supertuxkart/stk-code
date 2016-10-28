@@ -24,6 +24,11 @@ if (UNIX AND NOT APPLE)
     option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
 endif()
 
+if (ANDROID)
+    message(STATUS "Building Android APK and library")
+    set(USE_GLES2 ON)
+endif()
+
 if(MSVC AND (MSVC_VERSION LESS 1900))
     # Normally hide the option to build wiiuse on VS, since it depends
     # on the installation of the Windows DDK (Driver Developer Kit),
@@ -82,8 +87,8 @@ if(NOT USE_GLES2)
     include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
 endif()
 
-if((WIN32 AND NOT MINGW) OR APPLE)
-    if (NOT APPLE)
+if((WIN32 AND NOT MINGW) OR APPLE OR ANDROID)
+    if (NOT APPLE OR ANDROID)
     # Build zlib library
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/zlib")
     include_directories("${PROJECT_SOURCE_DIR}/lib/zlib")
@@ -132,6 +137,8 @@ if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -F/Library/Frameworks")
 elseif(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")   # Enable multi-processor compilation (faster)
+elseif(ANDROID)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti")
 endif()
 
 

@@ -2,6 +2,8 @@ bld*/
 build*/
 cmake_build/
 cmake_build*/
+android_build/
+android_build*/
 dependencies/
 CMakeFiles/
 stk-editor/
