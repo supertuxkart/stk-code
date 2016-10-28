@@ -26,16 +26,16 @@ class ParticleSystemProxy;
 class STKBillboard;
 
 class DrawCalls
-{  
+{
 private:
     std::vector<STKMeshCommon *>          m_deferred_update;
     irr::core::vector3df                  m_wind_dir;
-    GLsync                                m_sync = 0;
-    
+    GLsync                                m_sync;
+
     std::vector<irr::scene::ISceneNode *> m_immediate_draw_list;
     std::vector<STKBillboard *>           m_billboard_list;
     std::vector<ParticleSystemProxy *>    m_particles_list;
-            
+
     /** meshes to draw */
     SolidPassMeshMap m_solid_pass_mesh        [    Material::SHADERTYPE_COUNT];
     OtherMeshMap m_shadow_pass_mesh           [4 * Material::SHADERTYPE_COUNT];
@@ -44,12 +44,12 @@ private:
 
 #if !defined(USE_GLES2)
     /** meshes data in VRAM */
-    SolidCommandBuffer                   *m_solid_cmd_buffer                 = NULL;
-    ShadowCommandBuffer                  *m_shadow_cmd_buffer                = NULL;
-    ReflectiveShadowMapCommandBuffer     *m_reflective_shadow_map_cmd_buffer = NULL;
-    GlowCommandBuffer                    *m_glow_cmd_buffer                  = NULL;
+    SolidCommandBuffer                   *m_solid_cmd_buffer;
+    ShadowCommandBuffer                  *m_shadow_cmd_buffer;
+    ReflectiveShadowMapCommandBuffer     *m_reflective_shadow_map_cmd_buffer;
+    GlowCommandBuffer                    *m_glow_cmd_buffer;
 #endif // !defined(USE_GLES2)
-    
+
     void clearLists();
 
     void handleSTKCommon(scene::ISceneNode *Node,

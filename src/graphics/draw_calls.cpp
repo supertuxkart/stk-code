@@ -475,6 +475,12 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
 // ----------------------------------------------------------------------------
 DrawCalls::DrawCalls()
 {
+    m_sync = 0;
+    m_solid_cmd_buffer = NULL;
+    m_shadow_cmd_buffer = NULL;
+    m_reflective_shadow_map_cmd_buffer = NULL;
+    m_glow_cmd_buffer = NULL;
+
 #if !defined(USE_GLES2)
     if(CVS->supportsIndirectInstancingRendering())
     {
@@ -488,6 +494,7 @@ DrawCalls::DrawCalls()
 
 DrawCalls::~DrawCalls()
 {
+
 #if !defined(USE_GLES2)
     delete m_solid_cmd_buffer;
     delete m_shadow_cmd_buffer;

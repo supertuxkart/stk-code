@@ -140,7 +140,7 @@ Material* MaterialManager::getDefaultMaterial(video::E_MATERIAL_TYPE shader_type
     if (it == m_default_materials.end())
     {
         Material* default_material = new Material("", false, false, false);
-        
+
         // TODO: workaround, should not hardcode these material types here?
         // Try to find a cleaner way
         // If graphics are disabled, shaders should not be accessed (getShader
@@ -156,7 +156,7 @@ Material* MaterialManager::getDefaultMaterial(video::E_MATERIAL_TYPE shader_type
         //    default_material->setShaderType(Material::SHADERTYPE_ALPHA_BLEND);
         else
             default_material->setShaderType(Material::SHADERTYPE_SOLID);
-                
+
         m_default_materials[shader_type] = default_material;
         return default_material;
     }

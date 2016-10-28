@@ -22,6 +22,7 @@
 #include "graphics/draw_calls.hpp"
 #include "graphics/lighting_passes.hpp"
 #include "graphics/shadow_matrices.hpp"
+#include "utils/cpp2011.hpp"
 #include <map>
 #include <string>
 
@@ -90,33 +91,33 @@ public:
     ShaderBasedRenderer();
     ~ShaderBasedRenderer();
     
-    void onLoadWorld()  ;
-    void onUnloadWorld();
+    void onLoadWorld() OVERRIDE;
+    void onUnloadWorld() OVERRIDE;
     
-    void resetPostProcessing() override;
-    void giveBoost(unsigned int cam_index) override;
+    void resetPostProcessing() OVERRIDE;
+    void giveBoost(unsigned int cam_index) OVERRIDE;
 
     void addSkyBox(const std::vector<irr::video::ITexture*> &texture,
-                   const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) override;
-    void removeSkyBox() override;
-    const SHCoefficients* getSHCoefficients() const override;
-    GLuint getRenderTargetTexture(TypeRTT which) const override;
-    GLuint getDepthStencilTexture() const override;
+                   const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) OVERRIDE;
+    void removeSkyBox() OVERRIDE;
+    const SHCoefficients* getSHCoefficients() const OVERRIDE;
+    GLuint getRenderTargetTexture(TypeRTT which) const OVERRIDE;
+    GLuint getDepthStencilTexture() const OVERRIDE;
     
     void                  setAmbientLight(const irr::video::SColorf &light,
-                                          bool force_SH_computation = true) override;
+                                          bool force_SH_computation = true) OVERRIDE;
 
-    void addSunLight(const irr::core::vector3df &pos) override;
+    void addSunLight(const irr::core::vector3df &pos) OVERRIDE;
     
     void addGlowingNode(scene::ISceneNode *n,
-                        float r = 1.0f, float g = 1.0f, float b = 1.0f) override;
+                        float r = 1.0f, float g = 1.0f, float b = 1.0f) OVERRIDE;
                         
-    void clearGlowingNodes() override;
+    void clearGlowingNodes() OVERRIDE;
     
-    void render(float dt);
+    void render(float dt) OVERRIDE;
 
     std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
-                                                     const std::string &name);
+                                                     const std::string &name) OVERRIDE;
     
     void renderToTexture(GL3RenderTarget *render_target,
                          irr::scene::ICameraSceneNode* camera,
