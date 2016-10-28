@@ -231,11 +231,11 @@ void ShaderBasedRenderer::uploadLightingData() const
 void ShaderBasedRenderer::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
                                                     size_t width, size_t height)
 {
-    
     float w = width * UserConfigParams::m_scale_rtts_factor;
     float h = height * UserConfigParams::m_scale_rtts_factor;
     m_current_screen_size = core::vector2df(w, h);
-    m_shadow_matrices.computeMatrixesAndCameras(camnode, w, h, m_rtts->getDepthStencilTexture());
+    m_shadow_matrices.computeMatrixesAndCameras(camnode, int(w), int(h),
+        m_rtts->getDepthStencilTexture());
 }   // computeMatrixesAndCameras
 
 // ----------------------------------------------------------------------------
@@ -250,6 +250,11 @@ void ShaderBasedRenderer::renderSkybox(const scene::ICameraSceneNode *camera) co
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::renderSSAO() const
 {
+#if defined(USE_GLES2)
+    if (!CVS->isEXTColorBufferFloatUsable())
+        return;
+#endif
+
     m_rtts->getFBO(FBO_SSAO).bind();
     glClearColor(1., 1., 1., 1.);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -607,19 +612,32 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
     
     bool isRace = StateManager::get()->getGameState() == GUIEngine::GAME;
     FrameBuffer *fbo = m_post_processing->render(camnode, isRace, m_rtts);
+         
+    // The viewport has been changed using glViewport function directly
+    // during scene rendering, but irrlicht thinks that nothing changed
+    // when single camera is used. In this case we set the viewport
+    // to whole screen manually.
+    glViewport(0, 0, irr_driver->getActualScreenSize().Width, 
+        irr_driver->getActualScreenSize().Height);
 
     if (irr_driver->getNormals())
-        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+    {
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(
+            viewport.UpperLeftCorner.X, 
+            irr_driver->getActualScreenSize().Height - viewport.LowerRightCorner.Y, 
+            viewport.LowerRightCorner.X, 
+            irr_driver->getActualScreenSize().Height - viewport.UpperLeftCorner.Y);
+    }
     else if (irr_driver->getSSAOViz())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+        camera->activate();
         m_post_processing->renderPassThrough(m_rtts->getFBO(FBO_HALF1_R).getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
     }
     else if (irr_driver->getRSM())
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+        camera->activate();
         m_post_processing->renderPassThrough(m_rtts->getReflectiveShadowMapFrameBuffer().getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
     }
     else if (irr_driver->getShadowViz())
@@ -631,7 +649,6 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera)
         glEnable(GL_FRAMEBUFFER_SRGB);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         camera->activate();
-        glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
         m_post_processing->renderPassThrough(fbo->getRTT()[0], viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         glDisable(GL_FRAMEBUFFER_SRGB);
     }

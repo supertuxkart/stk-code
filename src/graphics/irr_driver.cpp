@@ -143,6 +143,7 @@ IrrDriver::~IrrDriver()
 {
     assert(m_device != NULL);
 
+    cleanUnicolorTextures();
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
@@ -329,7 +330,7 @@ void IrrDriver::createListOfVideoModes()
 void IrrDriver::initDevice()
 {
     SIrrlichtCreationParameters params;
-    
+
     // If --no-graphics option was used, the null device can still be used.
     if (!ProfileWorld::isNoGraphics())
     {
@@ -412,7 +413,7 @@ void IrrDriver::initDevice()
         m_device->drop();
         m_device  = NULL;
 
-        params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device || 
+        params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device ||
             UserConfigParams::m_gamepad_visualisation);
 
         // Try 32 and, upon failure, 24 then 16 bit per pixels
@@ -437,9 +438,9 @@ void IrrDriver::initDevice()
                 core::dimension2du(UserConfigParams::m_width,
                                    UserConfigParams::m_height);
             params.HandleSRGB    = true;
-            params.ShadersPath   = (file_manager->getShadersDir() + 
+            params.ShadersPath   = (file_manager->getShadersDir() +
                                                            "irrlicht/").c_str();
-            
+
             /*
             switch ((int)UserConfigParams::m_antialiasing)
             {
@@ -500,29 +501,54 @@ void IrrDriver::initDevice()
     {
         Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
     }
-    
+
     CVS->init();
-                    
+
+    bool recreate_device = false;
+
+    // Some drivers are able to create OpenGL 3.1 context, but shader-based
+    // pipeline doesn't work for them. For example some radeon drivers
+    // support only GLSL 1.3 and it causes STK to crash. We should force to use
+    // fixed pipeline in this case.
+    if (!ProfileWorld::isNoGraphics() &&
+        GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
+    {
+        Log::warn("irr_driver", "Driver doesn't support shader-based pipeline. "
+                                "Re-creating device to workaround the issue.");
+
+        params.ForceLegacyDevice = true;
+        recreate_device = true;
+    }
+
     // This is the ugly hack for intel driver on linux, which doesn't
     // use sRGB-capable visual, even if we request it. This causes
-    // the screen to be darker than expected. It affects mesa 10.6 and newer. 
-    // Though we are able to force to use the proper format on mesa side by 
+    // the screen to be darker than expected. It affects mesa 10.6 and newer.
+    // Though we are able to force to use the proper format on mesa side by
     // setting WithAlphaChannel parameter.
-    if (!ProfileWorld::isNoGraphics() && CVS->needsSRGBCapableVisualWorkaround())
+    else if (CVS->needsSRGBCapableVisualWorkaround())
     {
         Log::warn("irr_driver", "Created visual is not sRGB-capable. "
                                 "Re-creating device to workaround the issue.");
-        m_device->closeDevice();
-        m_device->drop();
 
         params.WithAlphaChannel = true;
-        
+        recreate_device = true;
+    }
+
+    if (!ProfileWorld::isNoGraphics() && recreate_device)
+    {
+        m_device->closeDevice();
+        m_device->clearSystemMessages();
+        m_device->run();
+        m_device->drop();
+
         m_device = createDeviceEx(params);
-        
+
         if(!m_device)
         {
             Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
         }
+
+        CVS->init();
     }
 
     m_scene_manager = m_device->getSceneManager();
@@ -540,7 +566,7 @@ void IrrDriver::initDevice()
         (UserConfigParams::m_shadows_resolution < 512 ||
          UserConfigParams::m_shadows_resolution > 2048))
     {
-        Log::warn("irr_driver", 
+        Log::warn("irr_driver",
                "Invalid value for UserConfigParams::m_shadows_resolution : %i",
             (int)UserConfigParams::m_shadows_resolution);
         UserConfigParams::m_shadows_resolution = 0;
@@ -646,7 +672,7 @@ void IrrDriver::setMaxTextureSize()
     {
         io::IAttributes &att = m_video_driver->getNonConstDriverAttributes();
         att.setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(
-                                        UserConfigParams::m_max_texture_size, 
+                                        UserConfigParams::m_max_texture_size,
                                         UserConfigParams::m_max_texture_size));
     }
 }   // setMaxTextureSize
@@ -674,7 +700,7 @@ void IrrDriver::createSunInterposer()
         mb->getMaterial().setTexture(7,
                                 getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
-    m_sun_interposer = new STKMeshSceneNode(sphere, 
+    m_sun_interposer = new STKMeshSceneNode(sphere,
                                             m_scene_manager->getRootSceneNode(),
                                             NULL, -1, "sun_interposer");
 
@@ -816,11 +842,11 @@ void IrrDriver::applyResolutionSettings()
                                             UserConfigParams::m_prev_height) );
     m_video_driver->endScene();
     track_manager->removeAllCachedData();
-    attachment_manager->removeTextures();
+    delete attachment_manager;
     projectile_manager->removeTextures();
     ItemManager::removeTextures();
     kart_properties_manager->unloadAllKarts();
-    powerup_manager->unloadPowerups();
+    delete powerup_manager;
     Referee::cleanup();
     ParticleKindManager::get()->cleanup();
     delete input_manager;
@@ -843,11 +869,13 @@ void IrrDriver::applyResolutionSettings()
     ShaderBase::updateShaders();
     VAOManager::getInstance()->kill();
     resetTextureTable();
+    cleanUnicolorTextures();
     // initDevice will drop the current device.
     if (CVS->isGLSL())
     {
         Shaders::destroy();
     }
+    delete m_renderer;
     initDevice();
 
     font_manager = new FontManager();
@@ -860,6 +888,8 @@ void IrrDriver::applyResolutionSettings()
     material_manager->loadMaterial();
     input_manager = new InputManager ();
     input_manager->setMode(InputManager::MENU);
+    powerup_manager = new PowerupManager();
+    attachment_manager = new AttachmentManager();
 
     GUIEngine::addLoadingIcon(
         irr_driver->getTexture(file_manager
@@ -998,28 +1028,6 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
 }   // getMesh
 
 // ----------------------------------------------------------------------------
-/** Create a skinned mesh which has copied all meshbuffers and joints of the
- *  original mesh. Note, that this will not copy any other information like
- *   joints data.
- *  \param mesh Original mesh
- *  \return Newly created skinned mesh. You should call drop() when you don't
- *          need it anymore.
- */
-scene::IAnimatedMesh *IrrDriver::copyAnimatedMesh(scene::IAnimatedMesh *orig)
-{
-    using namespace scene;
-    CSkinnedMesh *mesh = dynamic_cast<CSkinnedMesh*>(orig);
-    if (!mesh)
-    {
-        Log::error("copyAnimatedMesh", "Given mesh was not a skinned mesh.");
-        return NULL;
-    }
-
-    scene::IAnimatedMesh* out = mesh->clone();
-    return out;
-}   // copyAnimatedMesh
-
-// ----------------------------------------------------------------------------
 /** Sets the material flags in this mesh depending on the settings in
  *  material_manager.
  *  \param mesh  The mesh to change the settings in.
@@ -1121,7 +1129,7 @@ scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
 {
     scene::IMesh *mesh = m_scene_manager->getGeometryCreator()
                        ->createSphereMesh(radius);
-    
+
     mesh->setMaterialFlag(video::EMF_COLOR_MATERIAL, true);
     video::SMaterial &m = mesh->getMeshBuffer(0)->getMaterial();
     m.AmbientColor    = color;
@@ -1164,7 +1172,8 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                           const std::string& debug_name,
                                           scene::ISceneNode *parent,
                                           RenderInfo* render_info,
-                                          bool all_parts_colorized)
+                                          bool all_parts_colorized,
+                                          int frame_for_mesh)
 {
     if (!CVS->isGLSL())
         return m_scene_manager->addMeshSceneNode(mesh, parent);
@@ -1172,14 +1181,15 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     if (!parent)
       parent = m_scene_manager->getRootSceneNode();
 
-    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, 
+    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent,
                                                        m_scene_manager, -1,
                                                        debug_name,
                                                        core::vector3df(0, 0, 0),
                                                        core::vector3df(0, 0, 0),
                                                        core::vector3df(1.0f, 1.0f, 1.0f),
                                                        true, render_info,
-                                                       all_parts_colorized);
+                                                       all_parts_colorized,
+                                                       frame_for_mesh);
     node->drop();
 
     return node;
@@ -1211,7 +1221,7 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
         if (!parent)
             parent = m_scene_manager->getRootSceneNode();
 
-        node = new STKBillboard(parent, m_scene_manager, -1, 
+        node = new STKBillboard(parent, m_scene_manager, -1,
                                 vector3df(0., 0., 0.), size);
         node->drop();
     }
@@ -1424,7 +1434,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     assert(texture.size() == 6);
 
     m_renderer->addSkyBox(texture, spherical_harmonics_textures);
-    
+
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
@@ -1534,7 +1544,7 @@ std::string IrrDriver::getSmallerTexture(const std::string& filename)
         {
             core::dimension2d<u32> dim = img->getDimension();
             core::dimension2d<u32> new_dim; // Dimension of the cached texture
-            const int scale_factor = 2;
+            const unsigned scale_factor = 2;
             // Resize the texture only if it can be done properly
             if (dim.Width < scale_factor || dim.Height < scale_factor)
                 new_dim = dim;
@@ -1982,13 +1992,13 @@ void IrrDriver::update(float dt)
     if (world)
     {
         m_renderer->render(dt);
-            
+
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
         if (current_screen != NULL && current_screen->needs3D())
         {
             GUIEngine::render(dt);
         }
-        
+
         if (world->getPhysics() != NULL)
         {
             IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
@@ -2007,7 +2017,7 @@ void IrrDriver::update(float dt)
 
         m_video_driver->endScene();
     }
-    
+
     if (m_request_screenshot) doScreenShot();
 
     // Enable this next print statement to get render information printed
@@ -2070,7 +2080,6 @@ bool IrrDriver::supportsSplatting()
 }
 
 // ----------------------------------------------------------------------------
-
 void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimlit)
 {
     if (!CVS->isGLSL())
@@ -2083,9 +2092,9 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
 
     const u32 mcount = node->getMaterialCount();
     u32 i;
-    const video::E_MATERIAL_TYPE ref = 
+    const video::E_MATERIAL_TYPE ref =
         Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT : ES_OBJECTPASS_REF);
-    const video::E_MATERIAL_TYPE pass = 
+    const video::E_MATERIAL_TYPE pass =
         Shaders::getShader(rimlit ? ES_OBJECTPASS_RIMLIT : ES_OBJECTPASS);
 
     const video::E_MATERIAL_TYPE origref = Shaders::getShader(ES_OBJECTPASS_REF);
@@ -2112,7 +2121,7 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
     for (i = 0; i < mcount; i++)
     {
         video::SMaterial &nodemat = node->getMaterial(i);
-        video::SMaterial &mbmat = mesh ? mesh->getMeshBuffer(i)->getMaterial() 
+        video::SMaterial &mbmat = mesh ? mesh->getMeshBuffer(i)->getMaterial()
                                        : nodemat;
         video::SMaterial *mat = &nodemat;
 
@@ -2166,8 +2175,6 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
         else
             light = new SunNode(m_scene_manager, parent, r, g, b);
 
-        light->grab();
-
         light->setPosition(pos);
         light->updateAbsolutePosition();
 
@@ -2197,9 +2204,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
 
 void IrrDriver::clearLights()
 {
-    u32 i;
-    const u32 max = (int)m_lights.size();
-    for (i = 0; i < max; i++)
+    for (unsigned int i = 0; i < m_lights.size(); i++)
     {
         m_lights[i]->drop();
     }

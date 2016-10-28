@@ -36,6 +36,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "modes/world.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -45,6 +46,7 @@
 /** Initialises the attachment each kart has.
  */
 Attachment::Attachment(AbstractKart* kart)
+          : EventRewinder()
 {
     m_type                 = ATTACH_NOTHING;
     m_time_left            = 0.0;
@@ -106,7 +108,7 @@ void Attachment::set(AttachmentType type, float time,
 {
     bool was_bomb = (m_type == ATTACH_BOMB);
     scene::ISceneNode* bomb_scene_node = NULL;
-    if (was_bomb && type == ATTACH_SWATTER) //What about  ATTACH_NOLOKS_SWATTER ??
+    if (was_bomb && type == ATTACH_SWATTER)
     {
         // let's keep the bomb node, and create a new one for
         // the new attachment
@@ -182,6 +184,15 @@ void Attachment::set(AttachmentType type, float time,
     m_node->setVisible(true);
 
     irr_driver->applyObjectPassShader(m_node);
+
+    // Save event about the new attachment
+    RewindManager *rwm = RewindManager::get();
+    if(rwm->isEnabled() && !rwm->isRewinding())
+    {
+        BareNetworkString *buffer = new BareNetworkString(2);
+        saveState(buffer);
+        rwm->addEvent(this, buffer);
+    }
 }   // set
 
 // -----------------------------------------------------------------------------
@@ -215,6 +226,76 @@ void Attachment::clear()
     // ATTACH_NOTHING in order to reset the physics parameters.
     m_kart->updateWeight();
 }   // clear
+
+// -----------------------------------------------------------------------------
+/** Saves the attachment state. Called as part of the kart saving its state.
+ *  \param buffer The kart rewinder's state buffer.
+ */
+void Attachment::saveState(BareNetworkString *buffer) const
+{
+    // We use bit 7 to indicate if a previous owner is defined for a bomb
+    assert(ATTACH_MAX<=127);
+    uint8_t type = m_type | (( (m_type==ATTACH_BOMB) && (m_previous_owner!=NULL) )
+                             ? 0x80 : 0 );
+    buffer->addUInt8(type);
+    if(m_type!=ATTACH_NOTHING)
+    {
+        buffer->addFloat(m_time_left);
+        if(m_type==ATTACH_BOMB && m_previous_owner)
+            buffer->addUInt8(m_previous_owner->getWorldKartId());
+        // m_initial_speed is not saved, on restore state it will
+        // be set to the kart speed, which has already been restored
+    }
+}   // saveState
+
+// -----------------------------------------------------------------------------
+/** Called from the kart rewinder when resetting to a certain state.
+ *  \param buffer The kart rewinder's buffer with the attachment state next.
+ */
+void Attachment::rewindTo(BareNetworkString *buffer)
+{
+    uint8_t type = buffer->getUInt8();
+    AttachmentType new_type = AttachmentType(type & 0x7f);   // mask out bit 7
+
+    // If there is no attachment, clear the attachment if necessary and exit
+    if(new_type==ATTACH_NOTHING)
+    {
+        if(m_type!=new_type) clear();
+        return;
+    }
+
+    float time_left = buffer->getFloat();
+
+    // Attaching an object can be expensive (loading new models, ...)
+    // so avoid doing this if there is no change in attachment type
+    if(new_type == m_type)
+    {
+        setTimeLeft(time_left);
+        return;
+    }
+
+    // Now it is a new attachment:
+
+    if (type == (ATTACH_BOMB | 0x80))   // we have previous owner information
+    {
+        uint8_t kart_id = buffer->getUInt8();
+        m_previous_owner = World::getWorld()->getKart(kart_id);
+    }
+    else
+    {
+        m_previous_owner = NULL;
+    }
+    set(new_type, time_left, m_previous_owner);
+}   // rewindTo
+// -----------------------------------------------------------------------------
+/** Called when going forwards in time during a rewind. 
+ *  \param buffer Buffer with the rewind information.
+ */
+void Attachment::rewind(BareNetworkString *buffer)
+{
+    // Event has same info as a state, so re-use the restore function
+    rewindTo(buffer);
+}   // rewind
 
 // -----------------------------------------------------------------------------
 /** Randomly selects the new attachment. For a server process, the
@@ -440,8 +521,12 @@ void Attachment::update(float dt)
     case ATTACH_MAX:
         break;
     case ATTACH_SWATTER:
-    case ATTACH_NOLOKS_SWATTER:
         // Everything is done in the plugin.
+        break;
+    case ATTACH_NOLOKS_SWATTER:
+        // Should never be called, this symbols is only used as an index for
+        // the model, Nolok's attachment type is ATTACH_SWATTER
+        assert(false);
         break;
     case ATTACH_BOMB:
 
@@ -487,19 +572,17 @@ void Attachment::update(float dt)
             Vec3 hit_point;
             Vec3 normal;
             const Material* material_hit;
-            Vec3 pos = m_kart->getXYZ();
-            Vec3 to=pos+Vec3(0, -10000, 0);
             World* world = World::getWorld();
-            world->getTrack()->getTriangleMesh().castRay(pos, to, &hit_point,
-                                                         &material_hit, &normal);
+            world->getTrack()->getTriangleMesh().castRay(m_kart->getXYZ(),
+                m_kart->getTrans().getBasis() * Vec3(0, -10000, 0), &hit_point,
+                &material_hit, &normal);
             // This can happen if the kart is 'over nothing' when dropping
             // the bubble gum
             if(material_hit)
             {
                 normal.normalize();
 
-                pos.setY(hit_point.getY()-0.05f);
-
+                Vec3 pos = hit_point + m_kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
                 ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_kart);
             }
         }

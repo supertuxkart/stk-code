@@ -31,26 +31,54 @@
  * Here is an overview of the high-level interactions between modules :
  \dot
  digraph interaction {
- race -> modes
+# race -> modes
  race -> tracks
  race -> karts
- modes -> tracks
- modes -> karts
+# modes -> tracks
+# modes -> karts
  tracks -> graphics
  karts -> graphics
  tracks -> items
- graphics -> irrlicht
- guiengine -> irrlicht
- states_screens -> guiengine
- states_screens -> input
- guiengine -> input
- karts->physics
- tracks->physics
- karts -> controller
- input->controller
+ items -> graphics
+ animations -> graphics
+ graphics -> "Antarctica/irrlicht"
+# guiengine -> irrlicht
+# states_screens -> guiengine
+# input -> states_screens
+ input -> guiengine
+ guiengine -> font_system
+ karts -> physics
+ physics -> karts
+ tracks -> physics
+ ai -> controller
+ controller -> karts
+ input -> controller
  tracks -> animations
  physics -> animations
- }
+ animations -> physics
+ karts -> audio
+ physics -> audio
+ "translations\n(too many connections\nto draw)"
+ "configuration\n(too many connections\nto draw)"
+# addons -> tracks
+# addons -> karts
+ guiengine -> addons
+ guiengine -> race
+ addons -> online_manager
+ challenges -> race
+# challenges -> modes
+ guiengine -> challenges
+ online_manager -> addons
+ online_manager -> "STK Server"
+ "STK Server" -> online_manager
+ karts -> replay
+ replay 
+ # force karts and tracks on the same level, looks better this way
+ subgraph { 
+  rank = same; karts; tracks; 
+ } 
+
+}
  \enddot
 
  Note that this graph is only an approximation because the real one would be
@@ -73,6 +101,8 @@
    This module handles the user configuration, the supertuxkart configuration
    file (which contains options usually not edited by the player) and the input
    configuration file.
+ \li \ref font :
+   This module stores font files and tools used to draw characters in STK.
  \li \ref graphics :
    This module contains the core graphics engine, that is mostly a thin layer
    on top of irrlicht providing some additional features we need for STK
@@ -179,8 +209,10 @@
 #include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
+#include "network/protocols/get_public_address.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -194,7 +226,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "tracks/battle_graph.hpp"
+#include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/command_line.hpp"
@@ -395,9 +427,11 @@ void handleXmasMode()
  */
 bool isEasterMode(int day, int month, int year, int before_after_days)
 {
-    switch (UserConfigParams::m_easter_ear_mode)
-    {
-    case 0:
+    if (UserConfigParams::m_easter_ear_mode == 1) {
+        return true;
+    }
+
+    if (UserConfigParams::m_easter_ear_mode == 0)
     {
         // Compute Easter date, based on wikipedia formula
         // http://en.wikipedia.org/wiki/Computus
@@ -429,12 +463,9 @@ bool isEasterMode(int day, int month, int year, int before_after_days)
         }
         return (month > easter_start_month || (month == easter_start_month && day >= easter_start_day)) &&
                (month < easter_end_month   || (month == easter_end_month   && day <= easter_end_day));
-        break;
     }
-    case 1:  return true;  break;
-    default: return false; break;
-    }   // switch m_xmas_mode
 
+    return false;
 }   // isEasterMode(day, month, year, before_after_days)
 
 // ============================================================================
@@ -546,6 +577,7 @@ void cmdLineHelp()
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
+    "       --my-address=1.1.1.1:1  Own IP address (can replace stun protocol)\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
     "       --no-console       Does not write messages in the console but to\n"
     "                          stdout.log.\n"
@@ -880,6 +912,8 @@ int handleCmdLine()
         AIBaseController::setTestAI(n);
     if (CommandLine::has("--fps-debug"))
         UserConfigParams::m_fps_debug = true;
+    if (CommandLine::has("--rewind") )
+        RewindManager::setEnable(true);
     if(CommandLine::has("--soccer-ai-stats"))
     {
         UserConfigParams::m_arena_ai_stats=true;
@@ -899,13 +933,16 @@ int handleCmdLine()
     }
     if(CommandLine::has("--battle-ai-stats"))
     {
+        std::string track;
+        if (!CommandLine::has("--track", &track))
+            track = "temple";
         UserConfigParams::m_arena_ai_stats=true;
         race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
         std::vector<std::string> l;
         for (int i = 0; i < 8; i++)
             l.push_back("tux");
         race_manager->setDefaultAIKartList(l);
-        race_manager->setTrack("temple");
+        race_manager->setTrack(track);
         race_manager->setNumKarts(8);
         race_manager->setDifficulty(RaceManager::Difficulty(3));
         UserConfigParams::m_no_start_screen = true;
@@ -975,6 +1012,9 @@ int handleCmdLine()
 
     if(CommandLine::has("--password", &s))
         password = s.c_str();
+
+    if (CommandLine::has("--my-address", &s))
+        GetPublicAddress::setMyIPAddress(s);
 
     // Race parameters
     if(CommandLine::has("--kartsize-debug"))
@@ -1884,8 +1924,8 @@ void runUnitTests()
     Log::info("UnitTest", "Kart characteristics");
     CombinedCharacteristic::unitTesting();
 
-    Log::info("UnitTest", "Battle Graph");
-    BattleGraph::unitTesting();
+    Log::info("UnitTest", "Arena Graph");
+    ArenaGraph::unitTesting();
 
     Log::info("UnitTest", "Fonts for translation");
     font_manager->unitTesting();

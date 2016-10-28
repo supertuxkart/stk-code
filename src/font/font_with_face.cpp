@@ -18,17 +18,20 @@
 
 #include "font/font_with_face.hpp"
 
-#include "font/bold_face.hpp"
 #include "font/face_ttf.hpp"
+#include "font/font_manager.hpp"
+#include "font/font_settings.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
 #include "utils/string_utils.hpp"
 
-#include FT_OUTLINE_H
-
 // ----------------------------------------------------------------------------
+/** Constructor. It will initialize the \ref m_spritebank and TTF files to use.
+ *  \param name The name of face, used by irrlicht to distinguish spritebank.
+ *  \param ttf \ref FaceTTF for this face to use.
+ */
 FontWithFace::FontWithFace(const std::string& name, FaceTTF* ttf)
 {
     m_spritebank = irr_driver->getGUI()->addEmptySpriteBank(name.c_str());
@@ -43,6 +46,8 @@ FontWithFace::FontWithFace(const std::string& name, FaceTTF* ttf)
 
 }   // FontWithFace
 // ----------------------------------------------------------------------------
+/** Destructor. Clears the glyph page and sprite bank.
+ */
 FontWithFace::~FontWithFace()
 {
     m_page->drop();
@@ -56,6 +61,8 @@ FontWithFace::~FontWithFace()
 }   // ~FontWithFace
 
 // ----------------------------------------------------------------------------
+/** Initialize the font structure, but don't load glyph here.
+ */
 void FontWithFace::init()
 {
     setDPI();
@@ -83,7 +90,11 @@ void FontWithFace::init()
 
     reset();
 }   // init
+
 // ----------------------------------------------------------------------------
+/** Clear all the loaded characters, sub-class can do pre-loading of characters
+ *  after this.
+ */
 void FontWithFace::reset()
 {
     m_new_char_holder.clear();
@@ -94,6 +105,12 @@ void FontWithFace::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
+/** Convert a character to a glyph index in one of the font in \ref m_face_ttf,
+ *  it will find the first TTF that supports this character, if the final
+ *  glyph_index is 0, this means such character is not supported by all TTFs in
+ *  \ref m_face_ttf.
+ *  \param c The character to be loaded.
+ */
 void FontWithFace::loadGlyphInfo(wchar_t c)
 {
     unsigned int font_number = 0;
@@ -108,11 +125,12 @@ void FontWithFace::loadGlyphInfo(wchar_t c)
 }   // loadGlyphInfo
 
 // ----------------------------------------------------------------------------
+/** Create a new glyph page by filling it with transparent content.
+ */
 void FontWithFace::createNewGlyphPage()
 {
-    // Clean the current glyph page by filling it with transparent content
     m_page->fill(video::SColor(0, 255, 255, 255));
-    m_temp_height = 0;
+    m_current_height = 0;
     m_used_width = 0;
     m_used_height = 0;
 
@@ -140,6 +158,10 @@ void FontWithFace::createNewGlyphPage()
 }   // createNewGlyphPage
 
 // ----------------------------------------------------------------------------
+/** Render a glyph for a character into bitmap and save it into the glyph page.
+ *  \param c The character to be loaded.
+ *  \param c \ref GlyphInfo for the character.
+ */
 void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 {
     assert(gi.glyph_index > 0);
@@ -147,7 +169,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     FT_Face cur_face = m_face_ttf->getFace(gi.font_number);
     FT_GlyphSlot slot = cur_face->glyph;
 
-    // Faces may be shared across regular and bold,
+    // Same face may be shared across the different FontWithFace,
     // so reset dpi each time
     font_manager->checkFTError(FT_Set_Pixel_Sizes(cur_face, 0, getDPI()),
         "setting DPI");
@@ -155,15 +177,11 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     font_manager->checkFTError(FT_Load_Glyph(cur_face, gi.glyph_index,
         FT_LOAD_DEFAULT), "loading a glyph");
 
-    if (dynamic_cast<BoldFace*>(this) != NULL)
-    {
-        // Embolden the outline of the glyph
-        font_manager->checkFTError(FT_Outline_Embolden(&(slot->outline),
-            getDPI() * 2), "embolden a glyph");
-    }
+    font_manager->checkFTError(shapeOutline(&(slot->outline)),
+        "shaping outline");
 
     font_manager->checkFTError(FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL),
-        "render a glyph to bitmap");
+        "rendering a glyph to bitmap");
 
     // Convert to an anti-aliased bitmap
     FT_Bitmap bits = slot->bitmap;
@@ -176,7 +194,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
         true, 0);
 
     if ((m_used_width + texture_size.Width > getGlyphPageSize() &&
-        m_used_height + m_temp_height + texture_size.Height >
+        m_used_height + m_current_height + texture_size.Height >
         getGlyphPageSize())                                     ||
         m_used_height + texture_size.Height > getGlyphPageSize())
     {
@@ -244,8 +262,8 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     if (m_used_width + texture_size.Width > getGlyphPageSize())
     {
         m_used_width  = 0;
-        m_used_height += m_temp_height;
-        m_temp_height = 0;
+        m_used_height += m_current_height;
+        m_current_height = 0;
     }
 
     // Copy to the full glyph page
@@ -283,11 +301,13 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 
     // Store used area
     m_used_width += texture_size.Width;
-    if (m_temp_height < texture_size.Height)
-        m_temp_height = texture_size.Height;
+    if (m_current_height < texture_size.Height)
+        m_current_height = texture_size.Height;
 }   // insertGlyph
 
 // ----------------------------------------------------------------------------
+/** Update the supported characters for this font if required.
+ */
 void FontWithFace::updateCharactersList()
 {
     if (m_fallback_font != NULL)
@@ -321,6 +341,10 @@ void FontWithFace::updateCharactersList()
 }   // updateCharactersList
 
 // ----------------------------------------------------------------------------
+/** Write the current glyph page in png inside current running directory.
+ *  Mainly for debug use.
+ *  \param name The file name.
+ */
 void FontWithFace::dumpGlyphPage(const std::string& name)
 {
     for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
@@ -341,20 +365,23 @@ void FontWithFace::dumpGlyphPage(const std::string& name)
 }   // dumpGlyphPage
 
 // ----------------------------------------------------------------------------
+/** Write the current glyph page in png inside current running directory.
+ *  Useful in gdb without parameter.
+ */
 void FontWithFace::dumpGlyphPage()
 {
     dumpGlyphPage("face");
 }   // dumpGlyphPage
 
 // ----------------------------------------------------------------------------
+/** Set the face dpi which is resolution-dependent.
+ *  Normal text will range from 0.8, in 640x* resolutions (won't scale below
+ *  that) to 1.0, in 1024x* resolutions, and linearly up.
+ *  Bold text will range from 0.2, in 640x* resolutions (won't scale below
+ *  that) to 0.4, in 1024x* resolutions, and linearly up.
+ */
 void FontWithFace::setDPI()
 {
-    // Set face dpi:
-    // Font size is resolution-dependent.
-    // Normal text will range from 0.8, in 640x* resolutions (won't scale
-    // below that) to 1.0, in 1024x* resolutions, and linearly up
-    // Bold text will range from 0.2, in 640x* resolutions (won't scale
-    // below that) to 0.4, in 1024x* resolutions, and linearly up
     const int screen_width = irr_driver->getFrameSize().Width;
     const int screen_height = irr_driver->getFrameSize().Height;
     float scale = std::max(0, screen_width - 640) / 564.0f;
@@ -371,6 +398,10 @@ void FontWithFace::setDPI()
 }   // setDPI
 
 // ----------------------------------------------------------------------------
+/** Return the \ref FontArea about a character.
+ *  \param c The character to get.
+ *  \param[out] fallback_font Whether fallback font is used.
+ */
 const FontWithFace::FontArea&
     FontWithFace::getAreaFromCharacter(const wchar_t c,
                                        bool* fallback_font) const
@@ -397,6 +428,12 @@ const FontWithFace::FontArea&
 }   // getAreaFromCharacter
 
 // ----------------------------------------------------------------------------
+/** Get the dimension of text with support to different \ref FontSettings,
+ *  it will also do checking for missing characters in font and lazy load them.
+ *  \param text The text to be calculated.
+ *  \param font_settings \ref FontSettings to use.
+ *  \return The dimension of text
+ */
 core::dimension2d<u32> FontWithFace::getDimension(const wchar_t* text,
                                             FontSettings* font_settings)
 {
@@ -441,6 +478,12 @@ core::dimension2d<u32> FontWithFace::getDimension(const wchar_t* text,
 }   // getDimension
                                   
 // ----------------------------------------------------------------------------
+/** Calculate the index of the character in the text on a specific position.
+ *  \param text The text to be calculated.
+ *  \param pixel_x The specific position.
+ *  \param font_settings \ref FontSettings to use.
+ *  \return The index of the character, -1 means no character in such position.
+ */
 int FontWithFace::getCharacterFromPos(const wchar_t* text, int pixel_x,
                                       FontSettings* font_settings) const
 {
@@ -466,6 +509,17 @@ int FontWithFace::getCharacterFromPos(const wchar_t* text, int pixel_x,
 }   // getCharacterFromPos
 
 // ----------------------------------------------------------------------------
+/** Render text and clip it to the specified rectangle if wanted, it will also
+ *  do checking for missing characters in font and lazy load them.
+ *  \param text The text to be rendering.
+ *  \param position The position to be rendering.
+ *  \param color The color used when rendering.
+ *  \param hcenter If rendered horizontally center.
+ *  \param vcenter If rendered vertically center.
+ *  \param clip If clipping is needed.
+ *  \param font_settings \ref FontSettings to use.
+ *  \param char_collector \ref FontCharCollector to render billboard text.
+ */
 void FontWithFace::render(const core::stringw& text,
                           const core::rect<s32>& position,
                           const video::SColor& color, bool hcenter,
@@ -473,7 +527,6 @@ void FontWithFace::render(const core::stringw& text,
                           FontSettings* font_settings,
                           FontCharCollector* char_collector)
 {
-    const bool is_bold_face = (dynamic_cast<BoldFace*>(this) != NULL);
     const bool black_border = font_settings ?
         font_settings->useBlackBorder() : false;
     const bool rtl = font_settings ? font_settings->isRTL() : false;
@@ -621,7 +674,7 @@ void FontWithFace::render(const core::stringw& text,
 
     const int sprite_amount = sprites.size();
 
-    if ((black_border || is_bold_face) && char_collector == NULL)
+    if ((black_border || isBold()) && char_collector == NULL)
     {
         // Draw black border first, to make it behind the real character
         // which make script language display better
@@ -693,7 +746,7 @@ void FontWithFace::render(const core::stringw& text,
             m_fallback_font->m_spritebank->getTexture(tex_id) :
             m_spritebank->getTexture(tex_id));
 
-        if (fallback[n] || is_bold_face)
+        if (fallback[n] || isBold())
         {
             video::SColor top = GUIEngine::getSkin()->getColor("font::top");
             video::SColor bottom = GUIEngine::getSkin()

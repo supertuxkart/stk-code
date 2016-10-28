@@ -119,6 +119,7 @@ public:
 
          RaceGUI();
         ~RaceGUI();
+    virtual void init();
     virtual void reset();
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const Camera *camera, float dt);

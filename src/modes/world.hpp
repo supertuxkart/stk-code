@@ -178,7 +178,7 @@ protected:
     virtual void  onGo() OVERRIDE;
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool  isRaceOver() = 0;
-    virtual void  update(float dt);
+    virtual void  update(float dt) OVERRIDE;
     virtual void  createRaceGUI();
             void  updateTrack(float dt);
     // ------------------------------------------------------------------------
@@ -221,13 +221,13 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of rescue positions on a given track and game
      *  mode. */
-    virtual unsigned int getNumberOfRescuePositions() const = 0;
+    virtual unsigned int getNumberOfRescuePositions() const;
     // ------------------------------------------------------------------------
     /** Determines the rescue position index of the specified kart. */
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) = 0;
     // ------------------------------------------------------------------------
     /** Returns the bullet transformation for the specified rescue index. */
-    virtual btTransform getRescueTransform(unsigned int index) const = 0;
+    virtual btTransform getRescueTransform(unsigned int index) const;
     // ------------------------------------------------------------------------
     virtual void moveKartAfterRescue(AbstractKart* kart);
     // ------------------------------------------------------------------------
@@ -252,9 +252,10 @@ public:
     // =================
     virtual void    init();
     virtual void    terminateRace() OVERRIDE;
-    virtual void    reset();
+    virtual void    reset() OVERRIDE;
     virtual void    pause(Phase phase) OVERRIDE;
     virtual void    unpause() OVERRIDE;
+    virtual void    updateTime(const float dt) OVERRIDE;
     virtual void    getDefaultCollectibles(int *collectible_type,
                                            int *amount );
     virtual void    endRaceEarly() { return; }
@@ -359,6 +360,8 @@ public:
     void delayedSelfDestruct();
     // ------------------------------------------------------------------------
     virtual void escapePressed();
+    // ------------------------------------------------------------------------
+    virtual void loadCustomModels() {}
 
     /** Set the network mode (true if networked) */
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }

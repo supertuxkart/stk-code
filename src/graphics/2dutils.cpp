@@ -34,14 +34,14 @@
 
 
 // ============================================================================
-class Primitive2DList : public TextureShader<Primitive2DList, 1>
+class Primitive2DList : public TextureShader<Primitive2DList, 1, float>
 {
 public:
     Primitive2DList()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "primitive2dlist.vert",
                             GL_FRAGMENT_SHADER, "transparent.frag");
-        assignUniforms();
+        assignUniforms("custom_alpha");
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
     }   // Primitive2DList
 };   //Primitive2DList
@@ -703,7 +703,7 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
     VertexUtils::bindVertexArrayAttrib(vType);
 
     Primitive2DList::getInstance()->use();
-    Primitive2DList::getInstance()->setUniforms();
+    Primitive2DList::getInstance()->setUniforms(1.0f);
     compressTexture(tex, false);
     Primitive2DList::getInstance()->setTextureUnits(getTextureGLuint(tex));
     glDrawElements(GL_TRIANGLE_FAN, primitiveCount, GL_UNSIGNED_SHORT, 0);

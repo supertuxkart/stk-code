@@ -120,7 +120,8 @@ public:
 
     // ========================================================================
     class TransparentShader : public TextureShader<TransparentShader, 1,
-                                                   core::matrix4, core::matrix4 >
+                                                   core::matrix4, core::matrix4,
+                                                   float >
     {
     public:
         TransparentShader();

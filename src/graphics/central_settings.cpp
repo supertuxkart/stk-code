@@ -49,6 +49,12 @@ void CentralVideoSettings::init()
     hasUBO = false;
     hasExplicitAttribLocation = false;
     hasGS = false;
+    hasTextureFilterAnisotropic = false;
+
+#if defined(USE_GLES2)
+    hasBGRA = false;
+    hasColorBufferFloat = false;
+#endif
 
     m_GI_has_artifact = false;
     m_need_rh_workaround = false;
@@ -84,7 +90,7 @@ void CentralVideoSettings::init()
         std::string card((char*)(glGetString(GL_RENDERER)));
         GraphicsRestrictions::init(driver, card);
 
-#if !defined(USE_GLES2)        
+#if !defined(USE_GLES2)
         if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
             hasVSLayer = true;
             Log::info("GLDriver", "AMD Vertex Shader Layer Present");
@@ -165,6 +171,11 @@ void CentralVideoSettings::init()
             hasExplicitAttribLocation = true;
             Log::info("GLDriver", "ARB Explicit Attrib Location Present");
         }
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_FILTER_ANISOTROPIC) &&
+            hasGLExtension("GL_EXT_texture_filter_anisotropic")) {
+            hasTextureFilterAnisotropic = true;
+            Log::info("GLDriver", "EXT Texture Filter Anisotropic Present");
+        }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_GEOMETRY_SHADER) &&
             (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 2))) {
             hasGS = true;
@@ -217,6 +228,21 @@ void CentralVideoSettings::init()
             hasImageLoadStore = true;
             hasAtomics = true;
             hasSSBO = true;
+        }
+
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_FORMAT_BGRA8888) &&
+            (hasGLExtension("GL_IMG_texture_format_BGRA8888") ||
+             hasGLExtension("GL_EXT_texture_format_BGRA8888")))
+        {
+            hasBGRA = true;
+            Log::info("GLDriver", "EXT texture format BGRA8888 Present");
+        }
+
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_COLOR_BUFFER_FLOAT) &&
+            hasGLExtension("GL_EXT_color_buffer_float"))
+        {
+            hasColorBufferFloat = true;
+            Log::info("GLDriver", "EXT Color Buffer Float Present");
         }
 #endif
     }
@@ -336,6 +362,23 @@ bool CentralVideoSettings::isARBMultiDrawIndirectUsable() const
 {
     return hasMultiDrawIndirect;
 }
+
+bool CentralVideoSettings::isEXTTextureFilterAnisotropicUsable() const
+{
+    return hasTextureFilterAnisotropic;
+}
+
+#if defined(USE_GLES2)
+bool CentralVideoSettings::isEXTTextureFormatBGRA8888Usable() const
+{
+    return hasBGRA;
+}
+
+bool CentralVideoSettings::isEXTColorBufferFloatUsable() const
+{
+    return hasColorBufferFloat;
+}
+#endif
 
 bool CentralVideoSettings::supportsShadows() const
 {

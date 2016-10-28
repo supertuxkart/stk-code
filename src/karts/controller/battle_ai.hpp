@@ -24,30 +24,37 @@
 #include "karts/controller/arena_ai.hpp"
 
 class ThreeStrikesBattle;
-class Vec3;
-class Item;
 
 /** The actual battle AI.
  * \ingroup controller
  */
 class BattleAI : public ArenaAI
 {
-private:
+protected:
     /** Keep a pointer to world. */
     ThreeStrikesBattle *m_world;
 
-    bool m_mini_skid;
+    // ------------------------------------------------------------------------
+    virtual void  findClosestKart(bool consider_difficulty,
+                                  bool find_sta) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual int   getCurrentNode() const OVERRIDE;
 
-    virtual void findClosestKart(bool use_difficulty);
-    virtual void findTarget();
-    virtual int  getCurrentNode() const;
-    virtual bool isWaiting() const;
-    virtual bool canSkid(float steer_fraction) { return m_mini_skid; }
+private:
+    // ------------------------------------------------------------------------
+    virtual void  findTarget() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual float getKartDistance(const AbstractKart* kart) const OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool  isKartOnRoad() const OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool  isWaiting() const OVERRIDE;
+
 public:
-                 BattleAI(AbstractKart *kart);
-                ~BattleAI();
-    virtual void update      (float delta);
-    virtual void reset       ();
+                  BattleAI(AbstractKart *kart);
+    // ------------------------------------------------------------------------
+                 ~BattleAI();
+
 };
 
 #endif

@@ -125,15 +125,34 @@ ShadowMatrices::ShadowMatrices()
     m_shadow_cam_nodes[1] = NULL;
     m_shadow_cam_nodes[2] = NULL;
     m_shadow_cam_nodes[3] = NULL;
+    m_rsm_map_available = false;
+    m_rsm_matrix_initialized = false;
 }   // ShadowMatrices
+// ----------------------------------------------------------------------------
+ShadowMatrices::~ShadowMatrices()
+{
+    resetShadowCamNodes();
+    m_sun_cam->drop();
+}   // ~ShadowMatrices
+// ----------------------------------------------------------------------------
+void ShadowMatrices::resetShadowCamNodes()
+{
+    for (unsigned i = 0; i < 4; i++)
+    {
+        if (m_shadow_cam_nodes[i])
+        {
+            m_shadow_cam_nodes[i]->drop();
+            m_shadow_cam_nodes[i] = NULL;
+        }
+    }
+}   // resetShadowCamNodes
+
 // ----------------------------------------------------------------------------
 void ShadowMatrices::addLight(const core::vector3df &pos)
 {
     m_sun_cam->setPosition(pos);
     m_sun_cam->updateAbsolutePosition();
-
     m_rsm_matrix_initialized = false;
-
 }   // addLight
 
 // ----------------------------------------------------------------------------
@@ -315,20 +334,6 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
 
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
-    float FarValues[] =
-    {
-        ShadowMatrices::m_shadow_split[1],
-        ShadowMatrices::m_shadow_split[2],
-        ShadowMatrices::m_shadow_split[3],
-        ShadowMatrices::m_shadow_split[4],
-    };
-    float NearValues[] =
-    {
-        ShadowMatrices::m_shadow_split[0],
-        ShadowMatrices::m_shadow_split[1],
-        ShadowMatrices::m_shadow_split[2],
-        ShadowMatrices::m_shadow_split[3]
-    };
 
     float tmp[16 * 9 + 2];
     memcpy(tmp, irr_driver->getViewMatrix().pointer(),          16 * sizeof(float));
@@ -349,16 +354,20 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
 
     if (World::getWorld() && World::getWorld()->getTrack())
     {
-        // Compute track extent
-        btVector3 btmin, btmax;
-        if (World::getWorld()->getTrack()->getPtrTriangleMesh())
+        float FarValues[] =
         {
-            World::getWorld()->getTrack()->getTriangleMesh().getCollisionShape()
-                              .getAabb(btTransform::getIdentity(), btmin, btmax);
-        }
-        const Vec3 vmin = btmin, vmax = btmax;
-        core::aabbox3df trackbox(vmin.toIrrVector(), vmax.toIrrVector() -
-            core::vector3df(0, 30, 0));
+            ShadowMatrices::m_shadow_split[1],
+            ShadowMatrices::m_shadow_split[2],
+            ShadowMatrices::m_shadow_split[3],
+            ShadowMatrices::m_shadow_split[4],
+        };
+        float NearValues[] =
+        {
+            ShadowMatrices::m_shadow_split[0],
+            ShadowMatrices::m_shadow_split[1],
+            ShadowMatrices::m_shadow_split[2],
+            ShadowMatrices::m_shadow_split[3]
+        };
 
         // Shadow Matrixes and cameras
         for (unsigned i = 0; i < 4; i++)
@@ -411,8 +420,16 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
         }
 
         // Rsm Matrix and camera
-        if (!m_rsm_matrix_initialized)
+        if (!m_rsm_matrix_initialized &&
+            World::getWorld()->getTrack()->getPtrTriangleMesh())
         {
+            // Compute track extent
+            Vec3 vmin, vmax;
+            World::getWorld()->getTrack()->getTriangleMesh().getCollisionShape()
+                              .getAabb(btTransform::getIdentity(), vmin, vmax);
+            core::aabbox3df trackbox(vmin.toIrrVector(), vmax.toIrrVector() -
+                core::vector3df(0, 30, 0));
+
             if (trackbox.MinEdge.X != trackbox.MaxEdge.X &&
                 trackbox.MinEdge.Y != trackbox.MaxEdge.Y &&
                 // Cover the case where sun_cam_view_matrix is null

@@ -27,31 +27,7 @@
 #include "graphics/vao_manager.hpp"
 #include <irrlicht.h>
 #include <array>
-#include <functional>
 #include <unordered_map>
-
-
-class MeshRenderInfoHash
-{
-public:
-    size_t operator() (const std::pair<scene::IMeshBuffer*, RenderInfo*> &p) const
-    {
-        return (std::hash<scene::IMeshBuffer*>()(p.first) ^
-            (std::hash<RenderInfo*>()(p.second) << 1));
-    }
-};
-
-struct MeshRenderInfoEquals : std::binary_function
-    <const std::pair<scene::IMeshBuffer*, RenderInfo*>&,
-     const std::pair<scene::IMeshBuffer*, RenderInfo*>&, bool>
-{
-    result_type operator() (first_argument_type lhs,
-                            second_argument_type rhs) const
-    {
-        return (lhs.first == rhs.first) &&
-            (lhs.second == rhs.second);
-    }
-};
 
 struct InstanceList
 {

@@ -190,14 +190,16 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         if (model_name.size() > 0)
         {
             mesh = irr_driver->getMesh(model_name);
-            assert(mesh != NULL);
-            unsigned int n = mesh->getMeshBufferCount();
-            for (unsigned int i = 0; i < n; i++)
+            if (mesh != NULL)
             {
-                scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
-                Material* m = material_manager->getMaterialFor(mb
-                    ->getMaterial().getTexture(0), mb);
-                colorizable = colorizable || m->isColorizable();
+                unsigned int n = mesh->getMeshBufferCount();
+                for (unsigned int i = 0; i < n; i++)
+                {
+                    scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+                    Material* m = material_manager->getMaterialFor(mb
+                        ->getMaterial().getTexture(0), mb);
+                    colorizable = colorizable || m->isColorizable();
+                }
             }
         }
 

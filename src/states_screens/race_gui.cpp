@@ -39,7 +39,7 @@ using namespace irr;
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/controller/controller.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
@@ -104,6 +104,18 @@ RaceGUI::RaceGUI()
     else
         m_lap_width = font->getDimension(L"9/9").Width;
 
+}   // RaceGUI
+
+//-----------------------------------------------------------------------------
+RaceGUI::~RaceGUI()
+{
+}   // ~Racegui
+
+
+//-----------------------------------------------------------------------------
+void RaceGUI::init()
+{
+    RaceGUIBase::init();
     // Technically we only need getNumLocalPlayers, but using the
     // global kart id to find the data for a specific kart.
     int n = race_manager->getNumberOfKarts();
@@ -111,12 +123,7 @@ RaceGUI::RaceGUI()
     m_animation_states.resize(n);
     m_rank_animation_duration.resize(n);
     m_last_ranks.resize(n);
-}   // RaceGUI
-
-//-----------------------------------------------------------------------------
-RaceGUI::~RaceGUI()
-{
-}   // ~Racegui
+}   // init
 
 //-----------------------------------------------------------------------------
 /** Reset the gui before a race. It initialised all rank animation related
@@ -175,7 +182,7 @@ void RaceGUI::renderGlobal(float dt)
         //stop displaying timer as soon as race is over
         if (world->getPhase()<WorldStatus::DELAY_FINISH_PHASE)
            drawGlobalTimer();
-        
+
         if(world->getPhase() == WorldStatus::GO_PHASE ||
            world->getPhase() == WorldStatus::MUSIC_PHASE)
         {
@@ -203,7 +210,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     core::vector2df scaling = camera->getScaling();
     const AbstractKart *kart = camera->getKart();
     if(!kart) return;
-    
+
     drawPlungerInFace(camera, dt);
 
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
@@ -352,13 +359,18 @@ void RaceGUI::drawGlobalMiniMap()
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const AbstractKart *kart = world->getKart(i);
-        if(kart->isEliminated()) continue;   // don't draw eliminated kart
+        const SpareTireAI* sta =
+            dynamic_cast<const SpareTireAI*>(kart->getController());
+        // don't draw eliminated kart
+        if(kart->isEliminated() && !(sta && sta->isMoving())) continue;
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
         draw_at *= UserConfigParams::m_scale_rtts_factor;
 
-        video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+        video::ITexture* icon = sta ?
+            irr_driver->getTexture(FileManager::GUI, "heart.png") :
+            kart->getKartProperties()->getMinimapIcon();
 
         // int marker_height = m_marker->getSize().Height;
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
@@ -424,7 +436,8 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                                                (int)offset.Y-gauge_height,
                                                (int)offset.X + gauge_width,
                                                (int)offset.Y) /* dest rect */,
-                core::rect<s32>(0, 0, 256, 256) /* source rect */,
+                core::rect<s32>(core::position2d<s32>(0,0),
+                                m_gauge_empty->getSize()) /* source rect */,
                 NULL /* clip rect */, NULL /* colors */,
                 true /* alpha */);
 
@@ -587,7 +600,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
 
         video::SMaterial m;
-        if(kart->getControls().m_nitro || kart->isOnMinNitroTime())
+        if(kart->getControls().getNitro() || kart->isOnMinNitroTime())
             m.setTexture(0, m_gauge_full_bright);
         else
             m.setTexture(0, m_gauge_full);
@@ -816,7 +829,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 {
     // Don't display laps or ranks if the kart has already finished the race.
     if (kart->hasFinishedRace()) return;
-        
+
     World *world = World::getWorld();
     if (!world->raceHasLaps()) return;
     const int lap = world->getKartLaps(kart->getWorldKartId());

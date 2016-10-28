@@ -1,8 +1,13 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 
+#ifdef GL_ES
+layout (location = 0) out vec4 Diff;
+layout (location = 1) out vec4 Spec;
+#else
 out vec4 Diff;
 out vec4 Spec;
+#endif
 
 #stk_include "utils/decodeNormal.frag"
 #stk_include "utils/getPosFromUVDepth.frag"

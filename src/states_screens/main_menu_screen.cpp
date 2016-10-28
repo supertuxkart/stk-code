@@ -76,6 +76,7 @@ bool MainMenuScreen::m_enable_online = false;
 MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 {
     m_online_string = _("Online");
+    //I18N: Used as a verb, appears on the main menu (login button)
     m_login_string = _("Login");
 }   // MainMenuScreen
 

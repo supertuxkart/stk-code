@@ -77,6 +77,8 @@ namespace Scripting
     ScriptEngine::~ScriptEngine()
     {
         // Release the engine
+        m_pending_timeouts.clearAndDeleteAll();
+        m_engine->DiscardModule(MODULE_ID_MAIN_SCRIPT_FILE);
         m_engine->Release();
     }
 
@@ -378,7 +380,7 @@ namespace Scripting
                 Log::error("Scripting", "The script ended with an exception.");
 
                 // Write some information about the script exception
-                asIScriptFunction *func = ctx->GetExceptionFunction();
+                //asIScriptFunction *func = ctx->GetExceptionFunction();
                 //std::cout << "func: " << func->GetDeclaration() << std::endl;
                 //std::cout << "modl: " << func->GetModuleName() << std::endl;
                 //std::cout << "sect: " << func->GetScriptSectionName() << std::endl;
@@ -520,7 +522,6 @@ namespace Scripting
     {
         if (m_callback_delegate != NULL)
         {
-            asIScriptEngine* engine = World::getWorld()->getScriptEngine()->getEngine();
             m_callback_delegate->Release();
         }
     }

@@ -215,7 +215,7 @@ void CreditsScreen::loadedFromFile()
 
 
     irr::core::stringw translators_credits = _("translator-credits");
-    const int MAX_PER_SCREEN = 6;
+    const unsigned MAX_PER_SCREEN = 6;
 
     if (translators_credits != L"translator-credits")
     {

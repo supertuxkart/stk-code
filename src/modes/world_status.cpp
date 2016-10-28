@@ -17,6 +17,7 @@
 
 #include "modes/world_status.hpp"
 
+#include "main_loop.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
@@ -26,24 +27,11 @@
 #include "guiengine/modaldialog.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
+#include "network/race_event_manager.hpp"
 #include "tracks/track.hpp"
 
 #include <irrlicht.h>
-
-//-----------------------------------------------------------------------------
-/** Starts the kart engines.
- */
-void WorldStatus::startEngines()
-{
-    if (m_engines_started)
-        return;
-
-    m_engines_started = true;
-    for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
-    {
-        World::getWorld()->getKart(i)->startEngineSFX();
-    }
-}
 
 //-----------------------------------------------------------------------------
 WorldStatus::WorldStatus()
@@ -56,11 +44,14 @@ WorldStatus::WorldStatus()
 
     m_play_track_intro_sound = UserConfigParams::m_music;
     m_play_ready_set_go_sounds = true;
+    m_play_racestart_sounds = true;
+    m_server_is_ready       = false;
 
     IrrlichtDevice *device = irr_driver->getDevice();
 
     if (device->getTimer()->isStopped())
         device->getTimer()->start();
+    m_ready_to_race = false;
 }   // WorldStatus
 
 //-----------------------------------------------------------------------------
@@ -101,6 +92,10 @@ void WorldStatus::reset()
 
     // Set the right music
     World::getWorld()->getTrack()->startMusic();
+    // In case of a networked race the race can only start once
+    // all protocols are up. This flag waits for that, and is
+    // set by 
+    m_ready_to_race = !NetworkConfig::get()->isNetworking();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -116,6 +111,21 @@ WorldStatus::~WorldStatus()
     if (device->getTimer()->isStopped())
         device->getTimer()->start();
 }   // ~WorldStatus
+
+//-----------------------------------------------------------------------------
+/** Starts the kart engines.
+ */
+void WorldStatus::startEngines()
+{
+    if (m_engines_started)
+        return;
+
+    m_engines_started = true;
+    for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
+    {
+        World::getWorld()->getKart(i)->startEngineSFX();
+    }
+}   // startEngines
 
 //-----------------------------------------------------------------------------
 /** Sets the clock mode and the initial time of the world clock.
@@ -153,11 +163,26 @@ void WorldStatus::terminateRace()
 }   // terminateRace
 
 //-----------------------------------------------------------------------------
-/** Updates all status information, called once per frame.
+/** Update, called once per frame. Called early on before physics are
+ *  updated.
+ *  \param dt Time step.
+ */
+void WorldStatus::update(float dt)
+{
+}   // update
+
+//-----------------------------------------------------------------------------
+/** Updates the world time and clock (which might be running backwards), and
+ *  all status information, called once per frame at the end of the main
+ *  loop.
  *  \param dt Duration of time step.
  */
-void WorldStatus::update(const float dt)
+void WorldStatus::updateTime(const float dt)
 {
+    // In case of a networked race wait till all necessary protocols are
+    // ready before progressing the timer
+    if (!m_ready_to_race) return;
+
     switch (m_phase)
     {
         // Note: setup phase must be a separate phase, since the race_manager
@@ -179,12 +204,13 @@ void WorldStatus::update(const float dt)
                 World::getWorld()->getWeather()->playSound();
             }
 
-            return;
+            return;   // Do not increase time
         case TRACK_INTRO_PHASE:
             m_auxiliary_timer += dt;
 
             if (UserConfigParams::m_artist_debug_mode &&
-                race_manager->getNumberOfKarts() == 1 &&
+                race_manager->getNumberOfKarts() -
+                race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
             {
                 m_auxiliary_timer += dt * 6;
@@ -198,7 +224,7 @@ void WorldStatus::update(const float dt)
             // after 3.5 seconds.
             if (m_track_intro_sound->getStatus() == SFXBase::SFX_PLAYING &&
                 m_auxiliary_timer < 3.5f)
-                return;
+                return;   // Do not increase time
 
             // Wait before ready phase if sounds are disabled
             if (!UserConfigParams::m_sfx && m_auxiliary_timer < 3.0f)
@@ -208,7 +234,7 @@ void WorldStatus::update(const float dt)
             {
                 startEngines();
                 if (m_auxiliary_timer < 3.0f)
-                    return;
+                    return;   // Do not increase time
             }
 
             m_auxiliary_timer = 0.0f;
@@ -216,11 +242,35 @@ void WorldStatus::update(const float dt)
             if (m_play_ready_set_go_sounds)
                 m_prestart_sound->play();
 
-            m_phase = READY_PHASE;
-            
+            // In a networked game the client needs to wait for a notification
+            // from the server that ready-set-go can start now. So client will go
+            // to the 'wait_for_server_phase', from which they will progress once
+            // the notification is received. In all other cases (no networking or
+            // server), immediately go to race start
+            if(!NetworkConfig::get()->isNetworking() ||
+                NetworkConfig::get()->isServer()         )
+            {
+                // Notify the clients that they can start ready-set-go
+                if(NetworkConfig::get()->isServer())
+                    RaceEventManager::getInstance()->startReadySetGo();
+                m_server_is_ready = true;
+            }   // if not networked
+            m_phase = WAIT_FOR_SERVER_PHASE;
+            return;   // Don't increase time
+        case WAIT_FOR_SERVER_PHASE:
+            // On a client this phase waits for the server to be ready. On a
+            // server or in case of non-networked game this phase is reached
+            // with m_server_is_ready set to true, so it will immediately
+            // start the engines and then the race
+            if(!m_server_is_ready) return;
+
+            m_phase = READY_PHASE;            
             startEngines();
 
-            break;
+            // Receiving a 'startReadySetGo' message from the server triggers
+            // a call to startReadySetGo() here, which will change the phase
+            // (or state) of the finite state machine.
+            return;   // Don't increase time
         case READY_PHASE:
             if (m_auxiliary_timer > 1.0)
             {
@@ -234,15 +284,17 @@ void WorldStatus::update(const float dt)
 
             m_auxiliary_timer += dt;
 
-            // In artist debug mode, when without opponents, skip the ready/set/go counter faster
+            // In artist debug mode, when without opponents, skip the
+            // ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
-                race_manager->getNumberOfKarts() == 1 &&
+                race_manager->getNumberOfKarts() -
+                race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
             {
                 m_auxiliary_timer += dt*6;
             }
 
-            return;
+            return;   // Do not increase time
         case SET_PHASE:
             if (m_auxiliary_timer > 2.0)
             {
@@ -259,15 +311,17 @@ void WorldStatus::update(const float dt)
 
             m_auxiliary_timer += dt;
 
-            // In artist debug mode, when without opponents, skip the ready/set/go counter faster
+            // In artist debug mode, when without opponents, 
+            // skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
-                race_manager->getNumberOfKarts() == 1  &&
+                race_manager->getNumberOfKarts() -
+                race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
             {
                 m_auxiliary_timer += dt*6;
             }
 
-            return;
+            return;   // Do not increase time
         case GO_PHASE  :
 
             if (m_auxiliary_timer>2.5f && music_manager->getCurrentMusic() &&
@@ -283,15 +337,17 @@ void WorldStatus::update(const float dt)
 
             m_auxiliary_timer += dt;
 
-            // In artist debug mode, when without opponents, skip the ready/set/go counter faster
+            // In artist debug mode, when without opponents,
+            // skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
-                race_manager->getNumberOfKarts() == 1  &&
+                race_manager->getNumberOfKarts() -
+                race_manager->getNumSpareTireKarts() == 1 &&
                 race_manager->getTrackName() != "tutorial")
             {
                 m_auxiliary_timer += dt*6;
             }
 
-            break;
+            break;   // Now the world time starts
         case MUSIC_PHASE:
             // Start the music here when starting fast
             if (UserConfigParams::m_race_now)
@@ -337,11 +393,16 @@ void WorldStatus::update(const float dt)
         default: break;
     }
 
+    IrrlichtDevice *device = irr_driver->getDevice();
+
     switch (m_clock_mode)
     {
         case CLOCK_CHRONO:
-            m_time += dt;
-            m_count_up_timer += dt;
+            if (!device->getTimer()->isStopped())
+            {
+                m_time += dt;
+                m_count_up_timer += dt;
+            }
             break;
         case CLOCK_COUNTDOWN:
             // stop countdown when race is over
@@ -352,8 +413,11 @@ void WorldStatus::update(const float dt)
                 break;
             }
 
-            m_time -= dt;
-            m_count_up_timer += dt;
+            if (!device->getTimer()->isStopped())
+            {
+                m_time -= dt;
+                m_count_up_timer += dt;
+            }
 
             if(m_time <= 0.0)
             {
@@ -363,8 +427,18 @@ void WorldStatus::update(const float dt)
 
             break;
         default: break;
-    }
+    }   // switch m_phase
 }   // update
+
+//-----------------------------------------------------------------------------
+/** Called on the client when it receives a notification from the server that
+ *  the server is now starting its ready-set-go phase. This function changes
+ *  the state of the finite state machine to be ready.
+ */
+void WorldStatus::startReadySetGo()
+{
+    m_server_is_ready = true;
+}   // startReadySetGo
 
 //-----------------------------------------------------------------------------
 /** Sets the time for the clock.

@@ -23,6 +23,7 @@
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "karts/abstract_kart.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -75,19 +76,6 @@ void History::allocateMemory(int number_of_frames)
 }   // allocateMemory
 
 //-----------------------------------------------------------------------------
-/** Depending on mode either saves the data for the current time step, or
- *  replays the data.
- *  /param dt Time step.
- */
-void History::update(float dt)
-{
-    if(m_replay_mode==HISTORY_NONE)
-        updateSaving(dt);
-    else
-        updateReplay(dt);
-}   // update
-
-//-----------------------------------------------------------------------------
 /** Saves the current history.
  *  \param dt Time step size.
  */
@@ -123,7 +111,7 @@ void History::updateSaving(float dt)
 /** Sets the kart position and controls to the recorded history value.
  *  \param dt Time step size.
  */
-void History::updateReplay(float dt)
+float History::updateReplayAndGetDT()
 {
     m_current++;
     World *world = World::getWorld();
@@ -131,9 +119,17 @@ void History::updateReplay(float dt)
     {
         Log::info("History", "Replay finished");
         m_current = 0;
+        // This is useful to use a reproducable rewind problem:
+        // replay it with history, for debugging only
+#undef DO_REWIND_AT_END_OF_HISTORY
+#ifdef DO_REWIND_AT_END_OF_HISTORY
+        RewindManager::get()->rewindTo(5.0f);
+        exit(-1);
+#else
         // Note that for physics replay all physics parameters
         // need to be reset, e.g. velocity, ...
         world->reset();
+#endif
     }
     unsigned int num_karts = world->getNumKarts();
     for(unsigned k=0; k<num_karts; k++)
@@ -147,10 +143,11 @@ void History::updateReplay(float dt)
         }
         else
         {
-            kart->setControls(m_all_controls[index]);
+            kart->getControls().set(m_all_controls[index]);
         }
     }
-}   // updateReplay
+    return m_all_deltas[m_current];
+}   // updateReplayAndGetDT
 
 //-----------------------------------------------------------------------------
 /** Saves the history stored in the internal data structures into a file called
@@ -208,8 +205,8 @@ void History::Save()
         for(int k=0; k<num_karts; k++)
         {
             fprintf(fd, "%f %f %d  %f %f %f  %f %f %f %f\n",
-                    m_all_controls[index+k].m_steer,
-                    m_all_controls[index+k].m_accel,
+                    m_all_controls[index+k].getSteer(),
+                    m_all_controls[index+k].getAccel(),
                     m_all_controls[index+k].getButtonsCompressed(),
                     m_all_xyz[index+k].getX(), m_all_xyz[index+k].getY(),
                     m_all_xyz[index+k].getZ(),
@@ -314,6 +311,11 @@ void History::Load()
         sscanf(s, "delta: %f\n",&m_all_deltas[i]);
     }
 
+    // We need to disable the rewind manager here (otherwise setting the
+    // KartControl data would access the rewind manager).
+    bool rewind_manager_was_enabled = RewindManager::isEnabled();
+    RewindManager::setEnable(false);
+
     for(int i=0; i<m_size; i++)
     {
         for(unsigned int k=0; k<num_karts; k++)
@@ -321,19 +323,21 @@ void History::Load()
             unsigned int index = num_karts * i+k;
             fgets(s, 1023, fd);
             int buttonsCompressed;
-            float x,y,z,rx,ry,rz,rw;
+            float x,y,z,rx,ry,rz,rw, steer, accel;
             sscanf(s, "%f %f %d  %f %f %f  %f %f %f %f\n",
-                    &m_all_controls[index].m_steer,
-                    &m_all_controls[index].m_accel,
-                    &buttonsCompressed,
+                    &steer, &accel, &buttonsCompressed,
                     &x, &y, &z,
                     &rx, &ry, &rz, &rw
                     );
+            m_all_controls[index].setSteer(steer);
+            m_all_controls[index].setAccel(accel);
             m_all_xyz[index]       = Vec3(x,y,z);
             m_all_rotations[index] = btQuaternion(rx,ry,rz,rw);
             m_all_controls[index].setButtonsCompressed(char(buttonsCompressed));
         }   // for i
     }   // for k
+    RewindManager::setEnable(rewind_manager_was_enabled);
+
     fprintf(fd, "History file end.\n");
     fclose(fd);
 }   // Load

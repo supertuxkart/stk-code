@@ -368,6 +368,16 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         m_mesh = MeshTools::createMeshWithTangents(m_mesh,
                                                    &MeshTools::isNormalMap);
     }
+    else
+    {
+        scene::ISkinnedMesh* sm =
+            dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
+        if (sm)
+        {
+            MeshTools::createSkinnedMeshWithTangents(sm,
+                &MeshTools::isNormalMap);
+        }
+    }
     init(&xml_node, parent, enabled);
 }   // TrackObjectPresentationMesh
 
@@ -405,13 +415,25 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                       World::getWorld()->getIdent() == IDENT_CUTSCENE);
 
     m_model_file = model_file;
-
+    file_manager->pushTextureSearchPath(StringUtils::getPath(model_file));
     if (file_manager->fileExists(model_file))
     {
         if (animated)
+        {
             m_mesh = irr_driver->getAnimatedMesh(model_file);
+            scene::ISkinnedMesh* sm =
+                dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
+            if (sm)
+            {
+                MeshTools::createSkinnedMeshWithTangents(sm,
+                    &MeshTools::isNormalMap);
+            }
+        }
         else
-            m_mesh = irr_driver->getMesh(model_file);
+        {
+            m_mesh = MeshTools::createMeshWithTangents(
+                irr_driver->getMesh(model_file), &MeshTools::isNormalMap);
+        }
     }
 
     if (!m_mesh)
@@ -419,6 +441,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         throw std::runtime_error("Model '" + model_file + "' cannot be found");
     }
 
+    file_manager->popTextureSearchPath();
     init(NULL, NULL, true);
 }   // TrackObjectPresentationMesh
 
@@ -958,6 +981,7 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
                                                      scene::ISceneNode* parent)
                             : TrackObjectPresentationSceneNode(xml_node)
 {
+    m_color.set(0);
     xml_node.get("color", &m_color);
     const video::SColorf colorf(m_color);
 

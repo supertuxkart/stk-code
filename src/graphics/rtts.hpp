@@ -60,7 +60,9 @@ enum TypeFBO
     FBO_EIGHTH2,
     FBO_DISPLACE,
     FBO_BLOOM_1024,
+#if !defined(USE_GLES2)
     FBO_SCALAR_1024,
+#endif
     FBO_BLOOM_512,
     FBO_TMP_512,
     FBO_LENS_512,
@@ -122,7 +124,9 @@ enum TypeRTT
     RTT_MLAA_TMP,
 
     RTT_BLOOM_1024,
+#if !defined(USE_GLES2)
     RTT_SCALAR_1024,
+#endif
     RTT_BLOOM_512,
     RTT_TMP_512,
     RTT_LENS_512,

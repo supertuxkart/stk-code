@@ -135,8 +135,7 @@ void MaxSpeed::instantSpeedIncrease(unsigned int category,
 
     m_kart->getVehicle()->instantSpeedIncreaseTo(speed);
 
-}
-// instantSpeedIncrease
+}   // instantSpeedIncrease
 
 // ----------------------------------------------------------------------------
 /** Handles the update of speed increase objects. The m_duration variable
@@ -160,6 +159,34 @@ void MaxSpeed::SpeedIncrease::update(float dt)
     // Now we are in the fade out period: decrease time linearly
     m_current_speedup -= dt*m_max_add_speed/m_fade_out_time;
 }   // SpeedIncrease::update
+
+// ----------------------------------------------------------------------------
+void MaxSpeed::SpeedIncrease::saveState(BareNetworkString *buffer) const
+{
+    buffer->addFloat(m_max_add_speed);
+    buffer->addFloat(m_duration);
+    buffer->addFloat(m_fade_out_time);
+    buffer->addFloat(m_current_speedup);
+    buffer->addFloat(m_engine_force);
+}   // saveState
+
+// ----------------------------------------------------------------------------
+void MaxSpeed::SpeedIncrease::rewindTo(BareNetworkString *buffer,
+                                       bool is_active)
+{
+    if(is_active)
+    {
+        m_max_add_speed   = buffer->getFloat();
+        m_duration        = buffer->getFloat();
+        m_fade_out_time   = buffer->getFloat();
+        m_current_speedup = buffer->getFloat();
+        m_engine_force    = buffer->getFloat();
+    }
+    else   // make sure to disable this category
+    {
+        reset();
+    }
+}   // restoreState
 
 // ----------------------------------------------------------------------------
 /** Defines a slowdown, which is in fraction of top speed.
@@ -209,6 +236,38 @@ void MaxSpeed::SpeedDecrease::update(float dt)
     else
         m_current_fraction = m_max_speed_fraction;
 }   // SpeedDecrease::update
+
+// ----------------------------------------------------------------------------
+/** Saves the state of an (active) speed decrease category. It is not called
+ *  if the speed decrease is not active.
+ *  \param buffer Buffer which will store the state information.
+ */
+void MaxSpeed::SpeedDecrease::saveState(BareNetworkString *buffer) const
+{
+    buffer->addFloat(m_max_speed_fraction);
+    buffer->addFloat(m_fade_in_time);
+    buffer->addFloat(m_current_fraction);
+    buffer->addFloat(m_duration);
+}   // saveState
+
+// ----------------------------------------------------------------------------
+/** Restores a previously saved state for an active speed decrease category.
+ */
+void MaxSpeed::SpeedDecrease::rewindTo(BareNetworkString *buffer,
+                                       bool is_active)
+{
+    if(is_active)
+    {
+        m_max_speed_fraction = buffer->getFloat();
+        m_fade_in_time       = buffer->getFloat();
+        m_current_fraction   = buffer->getFloat();
+        m_duration           = buffer->getFloat();
+    }
+    else   // make sure it is not active
+    {
+        reset();
+    }
+}   // restoreState
 
 // ----------------------------------------------------------------------------
 /** Returns how much increased speed time is left over in the given category.
@@ -267,3 +326,70 @@ void MaxSpeed::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
+/** Saves the speed data in a network string for rewind.
+ *  \param buffer Pointer to the network string to store the data.
+ */
+void MaxSpeed::saveState(BareNetworkString *buffer) const
+{
+    // Save the slowdown states
+    // ------------------------
+    // Get the bit pattern of all active slowdowns
+    uint8_t active_slowdown = 0;
+    for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<=1)
+    {
+        if (m_speed_decrease[i].isActive()) 
+            active_slowdown |= b;
+    }
+    buffer->addUInt8(active_slowdown);
+
+    for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<= 1)
+    {
+        if (active_slowdown & b)
+            m_speed_decrease->saveState(buffer);
+    }
+
+    // Now save the speedup state
+    // --------------------------
+    // Get the bit pattern of all active speedups
+    uint8_t active_speedups = 0;
+    for(unsigned int i=MS_INCREASE_MIN, b=1; i<MS_INCREASE_MAX; i++, b <<= 1)
+    {
+        if(m_speed_increase[i].isActive())
+            active_speedups |= b;
+    }
+    buffer->addUInt8(active_speedups);
+    for(unsigned int i=MS_INCREASE_MIN, b=1; i<MS_INCREASE_MAX; i++, b <<= 1)
+    {
+        if(active_speedups & b)
+            m_speed_increase[i].saveState(buffer);
+    }
+
+}   // saveState
+
+// ----------------------------------------------------------------------------
+/** Restore a saved state.
+ *  \param buffer Saved state.
+ */
+void MaxSpeed::rewindTo(BareNetworkString *buffer)
+{
+    // Restore the slowdown states
+    // ---------------------------
+    // Get the bit pattern of all active slowdowns
+    uint8_t active_slowdown = buffer->getUInt8();
+
+    for(unsigned int i=MS_DECREASE_MIN, b=1; i<MS_DECREASE_MAX; i++, b <<= 1)
+    {
+        m_speed_decrease->rewindTo(buffer, (active_slowdown & b) == b);
+    }
+
+    // Restore the speedup state
+    // --------------------------
+    // Get the bit pattern of all active speedups
+    uint8_t active_speedups = buffer->getUInt8();
+    for(unsigned int i=MS_INCREASE_MIN, b=1; i<MS_INCREASE_MAX; i++, b <<= 1)
+    {
+        m_speed_increase[i].rewindTo(buffer, (active_speedups & b) == b);
+    }
+
+}   // rewindoTo
+

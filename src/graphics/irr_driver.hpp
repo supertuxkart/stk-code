@@ -72,7 +72,6 @@ class ShadowImportance;
 class ShadowMatrices;
 class RenderTarget;
 
-
 /**
   * \brief class that creates the irrLicht device and offers higher-level
   *  ways to manage the 3D scene
@@ -215,7 +214,6 @@ public:
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
-    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig);
     video::ITexture      *applyMask(video::ITexture* texture,
                                     const std::string& mask_path);
     void displayFPS();
@@ -251,7 +249,8 @@ public:
                                   const std::string& debug_name,
                                   scene::ISceneNode *parent = NULL,
                                   RenderInfo* render_info = NULL,
-                                  bool all_parts_colorized = false);
+                                  bool all_parts_colorized = false,
+                                  int frame_for_mesh = -1);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);

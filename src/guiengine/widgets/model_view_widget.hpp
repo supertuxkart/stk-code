@@ -52,10 +52,8 @@ namespace GUIEngine
         AlignedArray<Vec3> m_model_scale;
         std::vector<int> m_model_frames;  
         std::vector<bool> m_model_render_info_affected;
-              
         std::unique_ptr<RenderTarget> m_render_target;
-        
-        float angle;
+        float m_angle;
 
         bool m_rtt_unsupported;
 

@@ -32,12 +32,14 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/moving_texture.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/render_target.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
@@ -51,13 +53,14 @@
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
+#include "scriptengine/script_engine.hpp"
+#include "tracks/arena_graph.hpp"
 #include "tracks/bezier_curve.hpp"
-#include "tracks/battle_graph.hpp"
 #include "tracks/check_manager.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track_manager.hpp"
-#include "tracks/quad_graph.hpp"
-#include "tracks/quad_set.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
@@ -274,8 +277,7 @@ void Track::reset()
  */
 void Track::cleanup()
 {
-    QuadGraph::destroy();
-    BattleGraph::destroy();
+    Graph::destroy();
     ItemManager::destroy();
     VAOManager::kill();
 
@@ -653,14 +655,15 @@ void Track::startMusic() const
 }   // startMusic
 
 //-----------------------------------------------------------------------------
-/** Loads the polygon graph for battle, i.e. the definition of all polys, and the way
- *  they are connected to each other. Input file name is hardcoded for now
+/** Loads the quad graph for arena, i.e. the definition of all quads, and the
+ *  way they are connected to each other. Input file name is hardcoded for now
  */
-void Track::loadBattleGraph(const XMLNode &node)
+void Track::loadArenaGraph(const XMLNode &node)
 {
-    BattleGraph::create(m_root+"navmesh.xml", &node);
+    ArenaGraph* graph = new ArenaGraph(m_root+"navmesh.xml", &node);
+    Graph::setGraph(graph);
 
-    if(BattleGraph::get()->getNumNodes()==0)
+    if(Graph::get()->getNumNodes()==0)
     {
         Log::warn("track", "No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
@@ -669,27 +672,52 @@ void Track::loadBattleGraph(const XMLNode &node)
     {
         loadMinimap();
     }
-}   // loadBattleGraph
+}   // loadArenaGraph
 
 //-----------------------------------------------------------------------------
-/** Loads the quad graph, i.e. the definition of all quads, and the way
+btQuaternion Track::getArenaStartRotation(const Vec3& xyz, float heading)
+{
+    btQuaternion def_pos(Vec3(0, 1, 0), heading * DEGREE_TO_RAD);
+    if (!ArenaGraph::get())
+        return def_pos;
+
+    // Set the correct axis based on normal of the starting position
+    int node = Graph::UNKNOWN_SECTOR;
+    Graph::get()->findRoadSector(xyz, &node);
+    if (node == Graph::UNKNOWN_SECTOR)
+    {
+        Log::warn("track", "Starting position is not on ArenaGraph");
+        return def_pos;
+    }
+
+    const Vec3& normal = Graph::get()->getQuad(node)->getNormal();
+    btQuaternion q = createRotationFromNormal(normal);
+    btMatrix3x3 m;
+    m.setRotation(q);
+    return btQuaternion(m.getColumn(1), heading * DEGREE_TO_RAD) * q;
+
+}   // getArenaStartRotation
+
+//-----------------------------------------------------------------------------
+/** Loads the drive graph, i.e. the definition of all quads, and the way
  *  they are connected to each other.
  */
-void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
+void Track::loadDriveGraph(unsigned int mode_id, const bool reverse)
 {
-    QuadGraph::create(m_root+m_all_modes[mode_id].m_quad_name,
-                      m_root+m_all_modes[mode_id].m_graph_name,
-                      reverse);
+    new DriveGraph(m_root+m_all_modes[mode_id].m_quad_name,
+        m_root+m_all_modes[mode_id].m_graph_name, reverse);
 
-    QuadGraph::get()->setupPaths();
+    // setGraph is done in DriveGraph constructor
+    assert(DriveGraph::get());
+    DriveGraph::get()->setupPaths();
 #ifdef DEBUG
-    for(unsigned int i=0; i<QuadGraph::get()->getNumNodes(); i++)
+    for(unsigned int i=0; i<DriveGraph::get()->getNumNodes(); i++)
     {
-        assert(QuadGraph::get()->getNode(i).getPredecessor(0)!=-1);
+        assert(DriveGraph::get()->getNode(i)->getPredecessor(0)!=-1);
     }
 #endif
 
-    if(QuadGraph::get()->getNumNodes()==0)
+    if(DriveGraph::get()->getNumNodes()==0)
     {
         Log::warn("track", "No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
@@ -703,16 +731,13 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
     {
         loadMinimap();
     }
-}   // loadQuadGraph
+}   // loadDriveGraph
 
 // -----------------------------------------------------------------------------
 
 void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
 {
-    if ((m_is_arena || m_is_soccer) && m_has_navmesh)
-        BattleGraph::get()->mapPoint2MiniMap(xyz, draw_at);
-    else
-        QuadGraph::get()->mapPoint2MiniMap(xyz, draw_at);
+    Graph::get()->mapPoint2MiniMap(xyz, draw_at);
     draw_at->setX(draw_at->getX() * m_minimap_x_scale);
     draw_at->setY(draw_at->getY() * m_minimap_y_scale);
 }
@@ -1015,18 +1040,16 @@ void Track::loadMinimap()
     core::dimension2du size = m_mini_map_size
                              .getOptimalSize(!nonpower,!nonsquare);
 
-    if ((m_is_arena || m_is_soccer) && m_has_navmesh)
-        m_render_target = BattleGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
-    else
-        m_render_target = QuadGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
-        
+    m_render_target = Graph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
+    if (!m_render_target) return;
+
     core::dimension2du mini_map_texture_size = m_render_target->getTextureSize();
-        
+
     if(mini_map_texture_size.Width) 
         m_minimap_x_scale = float(m_mini_map_size.Width) / float(mini_map_texture_size.Width);
     else
         m_minimap_x_scale = 0;
-        
+
     if(mini_map_texture_size.Height) 
         m_minimap_y_scale = float(m_mini_map_size.Height) / float(mini_map_texture_size.Height);
     else
@@ -1132,7 +1155,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     handleAnimatedTextures(scene_node, *track_node);
     m_all_nodes.push_back(scene_node);
 
-    MeshTools::minMax3D(merged_mesh, &m_aabb_min, &m_aabb_max);
+    MeshTools::minMax3D(tangent_mesh, &m_aabb_min, &m_aabb_max);
     // Increase the maximum height of the track: since items that fly
     // too high explode, e.g. cakes can not be show when being at the
     // top of the track (since they will explode when leaving the AABB
@@ -1633,9 +1656,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadDriveGraph(mode_id, reverse_track);
     else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
-        loadBattleGraph(*root);
+        loadArenaGraph(*root);
 
     ItemManager::create();
 
@@ -1665,7 +1688,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         }
         else
             m_start_transforms.resize(race_manager->getNumberOfKarts());
-        QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
+        DriveGraph::get()->setDefaultStartPositions(&m_start_transforms,
                                                    karts_per_row,
                                                    forwards_distance,
                                                    sidewards_distance,
@@ -1824,8 +1847,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         sun->getLightData().SpecularColor = m_sun_specular_color;
     }
     else
+    {
         irr_driver->createSunInterposer();
-
+        m_sun->grab();
+    }
 
     createPhysicsModel(main_track_count);
 
@@ -1849,20 +1874,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     delete root;
 
-    if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh && !arena_random_item_created)
-        BattleGraph::get()->findItemsOnGraphNodes();
-
-    if (UserConfigParams::m_track_debug &&
-        race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
-        !m_is_cutscene)
-    {
-        QuadGraph::get()->createDebugMesh();
-    }
-
-    if (UserConfigParams::m_track_debug && m_has_navmesh &&
-        race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
-        !m_is_cutscene)
-        BattleGraph::get()->createDebugMesh();
+    if (UserConfigParams::m_track_debug && Graph::get() && !m_is_cutscene)
+        Graph::get()->createDebugMesh();
 
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
@@ -1886,7 +1899,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     World *world = World::getWorld();
     if (world->useChecklineRequirements())
     {
-        QuadGraph::get()->computeChecklineRequirements();
+        DriveGraph::get()->computeChecklineRequirements();
     }
 
     EasterEggHunt *easter_world = dynamic_cast<EasterEggHunt*>(world);
@@ -1945,9 +1958,8 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
             }
 
             m_start_transforms[position].setOrigin(xyz);
-            m_start_transforms[position].setRotation(
-                                           btQuaternion(btVector3(0,1,0),
-                                                        h*DEGREE_TO_RAD ) );
+            m_start_transforms[position]
+                .setRotation(getArenaStartRotation(xyz, h));
         }
         else if (name == "camera")
         {
@@ -2236,19 +2248,38 @@ void Track::itemCommand(const XMLNode *node)
     }
 
     Vec3 loc(xyz);
-    // if only 2d coordinates are given, let the item fall from very high
-    if(drop)
+
+    // Test if the item lies on a 3d node, if so adjust the normal
+    // Also do a raycast if drop item is given
+    Vec3 normal(0, 1, 0);
+    Vec3 quad_normal = normal;
+    Vec3 hit_point = loc;
+    if (Graph::get())
     {
+        int road_sector = Graph::UNKNOWN_SECTOR;
+        Graph::get()->findRoadSector(xyz, &road_sector);
+        // Only do custom direction of raycast if item is on quad graph
+        if (road_sector != Graph::UNKNOWN_SECTOR)
+        {
+            quad_normal = Graph::get()->getQuad(road_sector)->getNormal();
+        }
+    }
+
+    if (drop)
+    {
+        const Material *m;
         // If raycast is used, increase the start position slightly
         // in case that the point is too close to the actual surface
         // (e.g. floating point errors can cause a problem here).
-        loc += Vec3(0,0.1f,0);
+        loc += quad_normal * 0.1f;
+
 #ifndef DEBUG
-        // Avoid unused variable warning in case of non-debug compilation.
-        setTerrainHeight(&loc);
+        m_track_mesh->castRay(loc, loc + (-10000 * quad_normal), &hit_point,
+            &m, &normal);
 #else
-        bool drop_success = setTerrainHeight(&loc);
-        if(!drop_success)
+        bool drop_success = m_track_mesh->castRay(loc, loc +
+            (-10000 * quad_normal), &hit_point, &m, &normal);
+        if (!drop_success)
         {
             Log::warn("track",
                       "Item at position (%f,%f,%f) can not be dropped",
@@ -2258,37 +2289,8 @@ void Track::itemCommand(const XMLNode *node)
 #endif
     }
 
-    // Don't tilt the items, since otherwise the rotation will look odd,
-    // i.e. the items will not rotate around the normal, but 'wobble'
-    // around.
-    //Vec3 normal(0.7071f, 0, 0.7071f);
-    Vec3 normal(0, 1, 0);
-    ItemManager::get()->newItem(type, loc, normal);
+    ItemManager::get()->newItem(type, drop ? hit_point : loc, normal);
 }   // itemCommand
-
-// ----------------------------------------------------------------------------
-/** Does a raycast from the given position, and if terrain was found
- *  adjust the Y position of the given vector to the actual terrain
- *  height. If no terrain is found, false is returned and the
- *  y position is not modified.
- *  \param pos Pointer to the position at which to determine the
- *         height. If terrain is found, its Y position will be
- *         set to the actual height.
- *  \return True if terrain was found and the height was adjusted.
- */
-bool Track::setTerrainHeight(Vec3 *pos) const
-{
-    Vec3  hit_point;
-    Vec3  normal;
-    const Material *m;
-    Vec3 to=*pos+Vec3(0,-10000,0);
-    if(m_track_mesh->castRay(*pos, to, &hit_point, &m, &normal))
-    {
-        pos->setY(hit_point.getY());
-        return true;
-    }
-    return false;
-}   // setTerrainHeight
 
 // ----------------------------------------------------------------------------
 
@@ -2353,15 +2355,14 @@ const core::vector3df& Track::getSunRotation()
 
 bool Track::findGround(AbstractKart *kart)
 {
-    btVector3 to(kart->getXYZ());
-    to.setY(-100000.f);
+    const Vec3 &xyz = kart->getXYZ();
+    Vec3 down = kart->getTrans().getBasis() * Vec3(0, -10000.0f, 0);
 
     // Material and hit point are not needed;
     const Material *m;
     Vec3 hit_point, normal;
-    bool over_ground = m_track_mesh->castRay(kart->getXYZ(), to, &hit_point,
+    bool over_ground = m_track_mesh->castRay(xyz, down, &hit_point,
                                              &m, &normal);
-    const Vec3 &xyz = kart->getXYZ();
     if(!over_ground)
     {
         Log::warn("physics", "Kart at (%f %f %f) can not be dropped.",
@@ -2390,7 +2391,6 @@ bool Track::findGround(AbstractKart *kart)
         return false;
     }
 
-
     btTransform t = kart->getBody()->getCenterOfMassTransform();
     // The computer offset is slightly too large, it should take
     // the default suspension rest instead of suspension rest (i.e. the
@@ -2398,9 +2398,21 @@ bool Track::findGround(AbstractKart *kart)
     // it). On the other hand this initial bouncing looks nice imho
     // - so I'll leave it in for now.
     float offset = kart->getKartProperties()->getSuspensionRest();
-    t.setOrigin(hit_point+Vec3(0, offset, 0) );
+    t.setOrigin(hit_point + normal * offset);
     kart->getBody()->setCenterOfMassTransform(t);
     kart->setTrans(t);
 
     return true;
 }   // findGround
+
+//-----------------------------------------------------------------------------
+float Track::getTrackLength() const
+{
+    return DriveGraph::get()->getLapLength();
+}   // getTrackLength
+
+//-----------------------------------------------------------------------------
+float Track::getAngle(int n) const
+{
+    return DriveGraph::get()->getAngleToNext(n, 0);
+}   // getAngle

@@ -927,7 +927,6 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
     //if (widget->m_deactivated) return;
 
     bool mark_selected = widget->isSelected(PLAYER_ID_GAME_MASTER);
-    bool always_show_selection = false;
 
     IGUIElement* focusedElem = NULL;
     if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
@@ -1007,6 +1006,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
         /* in combo ribbons, always show selection */
         RibbonWidget* parentRibbonWidget = NULL;
+        bool always_show_selection = false;
 
         if (widget->m_event_handler != NULL &&
             widget->m_event_handler->m_type == WTYPE_RIBBON)

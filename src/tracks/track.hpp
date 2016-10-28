@@ -29,43 +29,33 @@
 #include <string>
 #include <vector>
 
-namespace irr
-{
-    namespace video { class ITexture; class SColor;       }
-    namespace scene { class IMesh; class ILightSceneNode; }
-}
+#include <irrlicht.h>
+
 using namespace irr;
-class ModelDefinitionLoader;
 
 #include "LinearMath/btTransform.h"
 
-#include "graphics/material.hpp"
-#include "items/item.hpp"
-#include "scriptengine/script_engine.hpp"
-#include "tracks/quad_graph.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/translation.hpp"
 #include "utils/vec3.hpp"
 #include "utils/ptr_vector.hpp"
 
+class AbstractKart;
 class AnimationManager;
 class BezierCurve;
 class CheckManager;
+class ModelDefinitionLoader;
 class MovingTexture;
 class MusicInformation;
 class ParticleEmitter;
 class ParticleKind;
 class PhysicalObject;
+class RenderTarget;
 class TrackObject;
 class TrackObjectManager;
 class TriangleMesh;
 class World;
 class XMLNode;
-
-namespace Scripting
-{
-    class ScriptEngine;
-}
 
 const int HEIGHT_MAP_RESOLUTION = 256;
 
@@ -378,8 +368,9 @@ private:
     int m_actual_number_of_laps;
 
     void loadTrackInfo();
-    void loadQuadGraph(unsigned int mode_id, const bool reverse);
-    void loadBattleGraph(const XMLNode &node);
+    void loadDriveGraph(unsigned int mode_id, const bool reverse);
+    void loadArenaGraph(const XMLNode &node);
+    btQuaternion getArenaStartRotation(const Vec3& xyz, float heading);
     void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
     void loadMinimap();
@@ -401,13 +392,20 @@ public:
 
     static const float NOHIT;
 
+    static btQuaternion createRotationFromNormal(const Vec3& normal)
+    {
+        Vec3 axis = -normal.cross(Vec3(0, 1, 0));
+        if (axis.length() == 0)
+            axis = Vec3(0, 0, 1);
+        return btQuaternion(axis, normal.angle(Vec3(0, 1, 0)));
+    }   // createRotationFromNormal
+
                        Track             (const std::string &filename);
                       ~Track             ();
     void               cleanup           ();
     void               removeCachedData  ();
     void               startMusic        () const;
 
-    bool               setTerrainHeight(Vec3 *pos) const;
     void               createPhysicsModel(unsigned int main_track_count);
     void               update(float dt);
     void               reset();
@@ -467,8 +465,7 @@ public:
     int                getVersion        () const {return m_version;          }
     // ------------------------------------------------------------------------
     /** Returns the length of the main driveline. */
-    float              getTrackLength    () const
-                                     {return QuadGraph::get()->getLapLength();}
+    float              getTrackLength    () const;
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this track (the directory name). */
     const std::string& getIdent          () const {return m_ident;            }
@@ -505,8 +502,7 @@ public:
      *  in the direction of the default way on the track.
      *  \param n Number of the quad for which the angle is asked.
      */
-    float              getAngle(int n) const
-                            { return QuadGraph::get()->getAngleToNext(n, 0);  }
+    float              getAngle(int n) const;
     // ------------------------------------------------------------------------
     /** Returns the 2d coordinates of a point when drawn on the mini map
      *  texture.

@@ -91,10 +91,9 @@ namespace Online
     /** Request a login using the saved credentials of the user. */
     void OnlinePlayerProfile::requestSavedSession()
     {
-        SignInRequest *request = NULL;
         if (m_online_state == OS_SIGNED_OUT && hasSavedSession())
         {
-            request = new SignInRequest(true);
+            SignInRequest *request = new SignInRequest(true);
             setUserDetails(request, "saved-session");
 
             // The userid must be taken from the saved data,

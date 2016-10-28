@@ -71,6 +71,8 @@ ConnectToPeer::~ConnectToPeer()
 
 void ConnectToPeer::setup()
 {
+    m_broadcast_count     = 0;
+    m_time_last_broadcast = 0;
 }   // setup
     // ----------------------------------------------------------------------------
 
@@ -125,13 +127,39 @@ void ConnectToPeer::asynchronousUpdate()
             // the server itself accepts connections from anywhere.
             if (!m_is_lan &&
                 m_peer_address.getIP() != NetworkConfig::get()
-                                          ->getMyAddress().getIP())
+                ->getMyAddress().getIP())
             {
                 m_current_protocol = new PingProtocol(m_peer_address,
                                                       /*time-between-ping*/2.0);
                 ProtocolManager::getInstance()->requestStart(m_current_protocol);
                 m_state = CONNECTING;
+            }
+            else
+            {
+                m_broadcast_count     = 0;
+                // Make sure we trigger the broadcast operation next
+                m_time_last_broadcast = float(StkTime::getRealTime()-100.0f);
+                m_state               = WAIT_FOR_LAN;
+            }
+            break;
+        }
+        case WAIT_FOR_LAN:
+        {
+            // Broadcast once per second
+            if (StkTime::getRealTime()  < m_time_last_broadcast + 1.0f)
+            {
                 break;
+            }
+            m_time_last_broadcast = float(StkTime::getRealTime());
+            m_broadcast_count++;
+            if (m_broadcast_count > 100)
+            {
+                // Not much we can do about if we don't receive the client
+                // connection - it could have stopped, lost network, ...
+                // Terminate this protocol.
+                Log::error("ConnectToPeer", "Time out trying to connect to %s",
+                           m_peer_address.toString().c_str());
+                requestTerminate();
             }
 
             // Otherwise we are in the same LAN  (same public ip address).
@@ -146,6 +174,9 @@ void ConnectToPeer::asynchronousUpdate()
             else
                 broadcast_address.copy(m_peer_address);
 
+
+            broadcast_address.copy(m_peer_address);
+
             BareNetworkString aloha(std::string("aloha_stk"));
             STKHost::get()->sendRawPacket(aloha, broadcast_address);
             Log::info("ConnectToPeer", "Broadcast aloha sent.");
@@ -155,10 +186,12 @@ void ConnectToPeer::asynchronousUpdate()
             broadcast_address.setPort(m_peer_address.getPort());
             STKHost::get()->sendRawPacket(aloha, broadcast_address);
             Log::info("ConnectToPeer", "Broadcast aloha to self.");
-            m_state = CONNECTING;
             break;
         }
         case CONNECTING: // waiting for the peer to connect
+            // If we receive a 'connected' event from enet, our
+            // notifyEventAsynchronous is called, which will move
+            // the FSM to the next state CONNECTED
             break;
         case CONNECTED:
         {

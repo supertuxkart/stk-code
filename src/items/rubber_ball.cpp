@@ -29,6 +29,8 @@
 #include "modes/linear_world.hpp"
 #include "physics/btKart.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "tracks/drive_graph.hpp"
+#include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
 
 #include "utils/log.hpp" //TODO: remove after debugging is done
@@ -66,8 +68,8 @@ RubberBall::RubberBall(AbstractKart *kart)
     float forw_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f+5.0f;
 
     createPhysics(forw_offset, btVector3(0.0f, 0.0f, m_speed*2),
-                  new btSphereShape(0.5f*m_extend.getY()),
-                  -70.0f /*gravity*/,
+                  new btSphereShape(0.5f*m_extend.getY()), -70.0f,
+                  btVector3(.0f,.0f,.0f) /*gravity*/,
                   true /*rotates*/);
 
     // Do not adjust the up velocity
@@ -97,7 +99,9 @@ RubberBall::RubberBall(AbstractKart *kart)
 
     // initialises the current graph node
     TrackSector::update(getXYZ());
-    TerrainInfo::update(getXYZ());
+    const Vec3& normal =
+        DriveGraph::get()->getNode(getCurrentGraphNode())->getNormal();
+    TerrainInfo::update(getXYZ(), -normal);
     initializeControlPoints(m_owner->getXYZ());
 
 }   // RubberBall
@@ -132,7 +136,7 @@ void RubberBall::initializeControlPoints(const Vec3 &xyz)
     // left or right when firing the ball off track.
     getNextControlPoint();
     m_control_points[2]     =
-        QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node).getCenter();
+        DriveGraph::get()->getNode(m_last_aimed_graph_node)->getCenter();
 
     // This updates m_last_aimed_graph_node, and sets m_control_points[3]
     getNextControlPoint();
@@ -197,12 +201,12 @@ unsigned int RubberBall::getSuccessorToHitTarget(unsigned int node_index,
 
     unsigned int sect =
         lin_world->getSectorForKart(m_target);
-    succ = QuadGraph::get()->getNode(node_index).getSuccessorToReach(sect);
+    succ = DriveGraph::get()->getNode(node_index)->getSuccessorToReach(sect);
 
     if(dist)
-        *dist += QuadGraph::get()->getNode(node_index)
-                .getDistanceToSuccessor(succ);
-    return QuadGraph::get()->getNode(node_index).getSuccessor(succ);
+        *dist += DriveGraph::get()->getNode(node_index)
+                 ->getDistanceToSuccessor(succ);
+    return DriveGraph::get()->getNode(node_index)->getSuccessor(succ);
 }   // getSuccessorToHitTarget
 
 // ----------------------------------------------------------------------------
@@ -220,21 +224,21 @@ void RubberBall::getNextControlPoint()
     // spline between the control points.
     float dist=0;
 
-    float f = QuadGraph::get()->getDistanceFromStart(m_last_aimed_graph_node);
+    float f = DriveGraph::get()->getDistanceFromStart(m_last_aimed_graph_node);
 
     int next = getSuccessorToHitTarget(m_last_aimed_graph_node, &dist);
-    float d = QuadGraph::get()->getDistanceFromStart(next)-f;
+    float d = DriveGraph::get()->getDistanceFromStart(next)-f;
     while(d<m_st_min_interpolation_distance && d>=0)
     {
         next = getSuccessorToHitTarget(next, &dist);
-        d = QuadGraph::get()->getDistanceFromStart(next)-f;
+        d = DriveGraph::get()->getDistanceFromStart(next)-f;
     }
 
     m_last_aimed_graph_node = next;
     m_length_cp_2_3         = dist;
-    const Quad &quad        =
-        QuadGraph::get()->getQuadOfNode(m_last_aimed_graph_node);
-    m_control_points[3]     = quad.getCenter();
+    const DriveNode* dn     =
+        DriveGraph::get()->getNode(m_last_aimed_graph_node);
+    m_control_points[3]     = dn->getCenter();
 }   // getNextControlPoint
 
 // ----------------------------------------------------------------------------
@@ -342,39 +346,42 @@ bool RubberBall::updateAndDelete(float dt)
     bool close_to_ground = 2.0*m_previous_height < m_current_max_height;
 
     float vertical_offset = close_to_ground ? 4.0f : 2.0f;
-    // Note that at this stage getHoT still reports the height at
-    // the previous location (since TerrainInfo wasn't updated). On
-    // the other hand, we can't update TerrainInfo without having
-    // at least a good estimation of the height.
-    next_xyz.setY(getHoT() + vertical_offset);
+       
     // Update height of terrain (which isn't done as part of
     // Flyable::update for rubber balls.
-    TerrainInfo::update(next_xyz);
+    TerrainInfo::update(next_xyz + getNormal()*vertical_offset, -getNormal());
 
     m_height_timer += dt;
     float height    = updateHeight()+m_extend.getY()*0.5f;
-    float new_y     = getHoT()+height;
-
+    
     if(UserConfigParams::logFlyable())
-        Log::debug("[RubberBall]", "ball %d: %f %f %f height %f new_y %f gethot %f ",
-                m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, new_y, getHoT());
+        Log::debug("[RubberBall]", "ball %d: %f %f %f height %f gethot %f ",
+                m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, getHoT());
 
     // No need to check for terrain height if the ball is low to the ground
     if(height > 0.5f)
     {
-        float terrain_height = getMaxTerrainHeight(vertical_offset)
+        float tunnel_height = getTunnelHeight(next_xyz, vertical_offset)
                              - m_extend.getY();
-        if(new_y>terrain_height)
-            new_y = terrain_height;
+        // If the current height of ball (above terrain) is higher than the 
+        // tunnel height then set adjust max height and compute new height again.
+        // Else reset the max height.
+        if (height > tunnel_height)
+        {
+            m_max_height = tunnel_height;
+            height = updateHeight();
+        }
+        else
+            m_max_height = m_st_max_height[m_type];
     }
 
     if(UserConfigParams::logFlyable())
-        Log::verbose("RubberBall", "newy2 %f gmth %f", new_y,
-                     getMaxTerrainHeight(vertical_offset));
+        Log::verbose("RubberBall", "newy2 %f gmth %f", height,
+                     getTunnelHeight(next_xyz,vertical_offset));
 
-    next_xyz.setY(new_y);
+    next_xyz = next_xyz + getNormal()*(height);
     m_previous_xyz = getXYZ();
-    m_previous_height = next_xyz.getY()-getHoT();
+    m_previous_height = (getXYZ() - getHitPoint()).length();
     setXYZ(next_xyz);
 
     if(checkTunneling())
@@ -405,39 +412,33 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
     // If the rubber ball is already close to a target, i.e. aiming
     // at it directly, stop interpolating, instead fly straight
     // towards it.
-    Vec3 diff = m_target->getXYZ()-getXYZ();
+    Vec3 diff = m_target->getXYZ() - getXYZ();
+    diff = diff - diff.dot(getNormal())*getNormal();
     // Avoid potential division by zero
     if(diff.length2()==0)
-        *next_xyz = getXYZ();
+        *next_xyz = getXYZ() - getNormal()*m_previous_height;
     else
-        *next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
+        *next_xyz = getXYZ() - getNormal()*m_previous_height +(dt*m_speed / diff.length())*diff;
 
     Vec3 old_vec = getXYZ()-m_previous_xyz;
     Vec3 new_vec = *next_xyz - getXYZ();
-    float angle  = atan2(new_vec.getZ(), new_vec.getX())
-                 - atan2(old_vec.getZ(), old_vec.getX());
+    //float angle  = atan2(new_vec.getZ(), new_vec.getX())
+    //             - atan2(old_vec.getZ(), old_vec.getX());
+    float angle = new_vec.angle(old_vec);
+    
     // Adjust angle to be between -180 and 180 degrees
     if(angle < -M_PI)
         angle += 2*M_PI;
     else if(angle > M_PI)
         angle -= 2*M_PI;
-
-    // If the angle is too large, adjust next xyz
-    if(fabsf(angle)>m_st_target_max_angle*dt)
-    {
-        core::vector2df old_2d(old_vec.getX(), old_vec.getZ());
-        if(old_2d.getLengthSQ()==0.0f) old_2d.Y = 1.0f;
-        old_2d.normalize();
-        old_2d.rotateBy(  RAD_TO_DEGREE * dt
-                                       * (angle > 0 ?  m_st_target_max_angle
-                                                    : -m_st_target_max_angle));
-        next_xyz->setX(getXYZ().getX() + old_2d.X*dt*m_speed);
-        next_xyz->setZ(getXYZ().getZ() + old_2d.Y*dt*m_speed);
-    }   // if fabsf(angle) > m_st_target_angle_max*dt
+    // If ball is close to the target, then explode
+    if (diff.length() < m_target->getKartLength()) 
+        hit((AbstractKart*)m_target);
 
     assert(!std::isnan((*next_xyz)[0]));
     assert(!std::isnan((*next_xyz)[1]));
     assert(!std::isnan((*next_xyz)[2]));
+
 }   // moveTowardsTarget
 
 // ----------------------------------------------------------------------------
@@ -585,29 +586,26 @@ float RubberBall::updateHeight()
 }   // updateHeight
 
 // ----------------------------------------------------------------------------
-/** Returns the maximum height of the terrain at the current point. While
- *  generall the height is arbitrary (a skybox is not part of the physics and
- *  will therefore not be detected), it is important that a rubber ball does
- *  not end up on top of a tunnel.
+/** When the ball is in a tunnel, this will return the tunnel height.
+ *  NOTE: When this function is called next_xyz is usually the interpolated point 
+ *  on the track and not the ball's current location. Look at updateAndDelete().
+ *  
  *  \param vertical_offset A vertical offset which is added to the current
- *         position of the kart in order to avoid tunneling effects (it could
- *         happen that the raycast down find the track since it uses the
- *         vertical offset, while the raycast up would hit under the track
- *         if the vertical offset is not used).
- *  \returns The height (Y coordinate) of the next terrain element found by
- *           a raycast up. If no terrain is found, it returns 99990
+ *         position in order to avoid hitting the track when doing a raycast up.
+ *  \returns The distance to the terrain element found by raycast in the up
+              direction. If no terrain found, it returns 99990
  */
-float RubberBall::getMaxTerrainHeight(const Vec3 &vertical_offset) const
+float RubberBall::getTunnelHeight(const Vec3 &next_xyz, const float vertical_offset) const
 {
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
-    Vec3 to(getXYZ());
-    to.setY(10000.0f);
+    Vec3 from(next_xyz + vertical_offset*getNormal());
+    Vec3 to(next_xyz + 10000.0f*getNormal());
     Vec3 hit_point;
     const Material *material;
-    tm.castRay(getXYZ()+vertical_offset, to, &hit_point, &material);
+    tm.castRay(from, to, &hit_point, &material);
 
-    return (material) ? hit_point.getY() : 99999.f;
-}   // getMaxTerrainHeight
+    return (material) ? (hit_point - next_xyz).length() : 99999.f;
+}   // getTunnelHeight
 
 // ----------------------------------------------------------------------------
 /** Determines the distance to the target kart. If the target is close, the
@@ -633,7 +631,7 @@ void RubberBall::updateDistanceToTarget()
         m_target->getXYZ().getZ(),m_distance_to_target
         );
 
-    float height_diff = fabsf(m_target->getXYZ().getY() - getXYZ().getY());
+    float height_diff = fabsf((m_target->getXYZ() - getXYZ()).dot(getNormal().normalized()));
 
     if(m_distance_to_target < m_st_fast_ping_distance &&
         height_diff < m_st_max_height_difference)

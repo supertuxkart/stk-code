@@ -80,6 +80,13 @@ KartGFX::KartGFX(const AbstractKart *kart)
     m_skidding_light_2->setName( ("skidding emitter 2 (" + m_kart->getIdent() 
                                                          + ")").c_str() );
 
+    if (CVS->isGLSL())
+    {
+        m_nitro_light->grab();
+        m_skidding_light_1->grab();
+        m_skidding_light_2->grab();
+    }
+
     // Create particle effects
     Vec3 rear_left(kart->getWheelGraphicsPosition(3).getX(), 0.05f,
                    kart->getWheelGraphicsPosition(3).getZ()-0.1f    );
@@ -142,7 +149,8 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
                         const Vec3 &position, bool important)
 {
     if (!UserConfigParams::m_graphical_effects &&
-        (!important || m_kart->getType() == RaceManager::KT_AI))
+        (!important || m_kart->getType() == RaceManager::KT_AI ||
+        m_kart->getType() == RaceManager::KT_SPARE_TIRE))
     {
         m_all_emitters.push_back(NULL);
         return;
@@ -324,7 +332,7 @@ void KartGFX::updateTerrain(const ParticleKind *pk)
     bool on_ground       = m_kart->isOnGround() &&
                            m_kart->getSkidding()->getGraphicalJumpOffset()==0;
     if (skidding > 1.0f && on_ground)
-        rate = fabsf(m_kart->getControls().m_steer) > 0.8 ? skidding - 1 : 0;
+        rate = fabsf(m_kart->getControls().getSteer()) > 0.8 ? skidding - 1 : 0;
     else if (speed >= 0.5f && on_ground)
         rate = speed/m_kart->getKartProperties()->getEngineMaxSpeed();
     else

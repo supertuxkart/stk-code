@@ -1321,11 +1321,10 @@ void CGUIEditBox::breakText()
     s32 size = Text.size();
     s32 length = 0;
     s32 elWidth = RelativeRect.getWidth() - 6;
-    wchar_t c;
 
     for (s32 i=0; i<size; ++i)
     {
-        c = Text[i];
+        wchar_t c = Text[i];
         bool lineBreak = false;
 
         if (c == L'\r') // Mac or Windows breaks

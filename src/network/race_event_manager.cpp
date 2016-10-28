@@ -101,6 +101,21 @@ void RaceEventManager::collectedItem(Item *item, AbstractKart *kart)
 }   // collectedItem
 
 // ----------------------------------------------------------------------------
+/** A message from the server to all clients that it is now starting the
+ *  'ready' phase. Clients will wait for this event before they display
+ *  RSG. This will make sure that the server time is always ahead of 
+ *  the client time.
+ */
+void RaceEventManager::startReadySetGo()
+{
+    // this is only called in the server
+    assert(NetworkConfig::get()->isServer());
+
+    GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
+        ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
+    protocol->startReadySetGo();
+}   // startReadySetGo
+// ----------------------------------------------------------------------------
 void RaceEventManager::controllerAction(Controller* controller,
                                         PlayerAction action, int value)
 {

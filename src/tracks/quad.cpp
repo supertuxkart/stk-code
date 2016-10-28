@@ -23,33 +23,19 @@
 #include <S3DVertex.h>
 #include <triangle3d.h>
 
-#include "LinearMath/btTransform.h"
-
 /** Constructor, takes 4 points. */
 Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
-           bool invisible, bool ai_ignore)
- {
-     if(p1.sideOfLine2D(p0, p2)>0 ||
-         p3.sideOfLine2D(p0, p2)<0)
-     {
-         Log::warn("Quad", "Quad has wrong orientation: p0=%f %f %f p1=%f %f %f",
-                   p0.getX(), p0.getY(), p0.getZ(),p1.getX(), p1.getY(), p1.getZ());
-         Log::warn("Quad", "The quad will be swapped, nevertheless test for correctness -");
-         Log::warn("Quad", "quads must be counter-clockwise oriented.");
-         m_p[0]=p1; m_p[1]=p0; m_p[2]=p3; m_p[3]=p2;
-     }
-     else
-     {
-        m_p[0]=p0; m_p[1]=p1; m_p[2]=p2; m_p[3]=p3;
-     }
-     m_center = 0.25f*(p0+p1+p2+p3);
-     m_min_height = std::min ( std::min(p0.getY(), p1.getY()),
-                               std::min(p2.getY(), p3.getY())  );
-     m_max_height = std::max ( std::max(p0.getY(), p1.getY()),
-                               std::max(p2.getY(), p3.getY())  );
-     m_invisible = invisible;
-     m_ai_ignore = ai_ignore;
+           const Vec3 &normal, int index, bool invisible, bool ignored)
+     : m_index(index), m_normal(normal), m_invisible(invisible)
+{
+    m_is_ignored = ignored;
+    m_p[0]=p0; m_p[1]=p1; m_p[2]=p2; m_p[3]=p3;
 
+    m_center = 0.25f*(p0+p1+p2+p3);
+    m_min_height = std::min ( std::min(p0.getY(), p1.getY()),
+                              std::min(p2.getY(), p3.getY())  );
+    m_max_height = std::max ( std::max(p0.getY(), p1.getY()),
+                              std::max(p2.getY(), p3.getY())  );
 }   // Quad
 
 // ----------------------------------------------------------------------------
@@ -61,25 +47,17 @@ void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
 {
     // Eps is used to raise the track debug quads a little bit higher than
     // the ground, so that they are actually visible.
-    core::vector3df eps(0, 0.1f, 0);
+    core::vector3df normal = getNormal().toIrrVector();
+    core::vector3df eps = normal * 0.1f;
     v[0].Pos = m_p[0].toIrrVector()+eps;
     v[1].Pos = m_p[1].toIrrVector()+eps;
     v[2].Pos = m_p[2].toIrrVector()+eps;
     v[3].Pos = m_p[3].toIrrVector()+eps;
 
-    core::triangle3df tri(m_p[0].toIrrVector(), m_p[1].toIrrVector(),
-                          m_p[2].toIrrVector());
-    core::vector3df normal = tri.getNormal();
-    normal.normalize();
     v[0].Normal = normal;
     v[1].Normal = normal;
     v[2].Normal = normal;
-
-    core::triangle3df tri1(m_p[0].toIrrVector(), m_p[2].toIrrVector(),
-                           m_p[3].toIrrVector());
-    core::vector3df normal1 = tri1.getNormal();
-    normal1.normalize();
-    v[3].Normal = normal1;
+    v[3].Normal = normal;
 
     v[0].Color  = color;
     v[1].Color  = color;
@@ -88,7 +66,7 @@ void Quad::getVertices(video::S3DVertex *v, const video::SColor &color) const
 }   // setVertices
 
 // ----------------------------------------------------------------------------
-bool Quad::pointInQuad(const Vec3& p, bool ignore_vertical) const
+bool Quad::pointInside(const Vec3& p, bool ignore_vertical) const
 {
     // In case that a kart can validly run too high over one driveline
     // and it should not be considered to be on that driveline. Example:
@@ -116,26 +94,4 @@ bool Quad::pointInQuad(const Vec3& p, bool ignore_vertical) const
         return p.sideOfLine2D(m_p[2], m_p[3]) >  0.0 &&
                p.sideOfLine2D(m_p[3], m_p[0]) >= 0.0;
     }
-}   // pointInQuad
-
-// ----------------------------------------------------------------------------
-/** Transforms a quad by a given transform (i.e. translation+rotation). This
- *  function does not modify this quad, the results are stored in the quad
- *  specified as parameter. These functions are used for slipstreaming to
- *  determine the slipstream area from the original value (kart at 0,0,0 and
- *  no rotation) to the current value.
- *  \param t The transform to apply.
- *  \param result The quad which stores the result.
- */
-void Quad::transform(const btTransform &t, Quad *result) const
-{
-    result->m_p[0] = t(m_p[0]);
-    result->m_p[1] = t(m_p[1]);
-    result->m_p[2] = t(m_p[2]);
-    result->m_p[3] = t(m_p[3]);
-    result->m_min_height = std::min ( std::min(result->m_p[0].getY(),
-                                               result->m_p[1].getY()),
-                                      std::min(result->m_p[2].getY(),
-                                               result->m_p[3].getY())  );
-}   // transform
-
+}   // pointInside

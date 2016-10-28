@@ -844,7 +844,7 @@
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
 			#define AS_X86
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
-		#elif defined(__LP64__) && !defined(__arm64__)
+		#elif defined(__x86_64__)
 			#define AS_X64_GCC
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
 			#define HAS_128_BIT_PRIMITIVES

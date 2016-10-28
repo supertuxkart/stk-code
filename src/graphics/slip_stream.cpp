@@ -77,7 +77,6 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     p[1]=Vec3(-ew*0.5f, 0, -kl*0.5f-length);
     p[2]=Vec3( ew*0.5f, 0, -kl*0.5f-length);
     p[3]=Vec3( kw*0.5f, 0, -kl*0.5f       );
-    m_slipstream_original_quad = new Quad(p[0], p[1], p[2], p[3]);
     m_slipstream_quad          = new Quad(p[0], p[1], p[2], p[3]);
     if(UserConfigParams::m_slipstream_debug)
     {
@@ -127,7 +126,6 @@ SlipStream::~SlipStream()
         m_debug_node->drop();
         m_debug_mesh->drop();
     }
-    delete m_slipstream_original_quad;
     delete m_slipstream_quad;
 
 }   // ~SlipStream
@@ -369,12 +367,6 @@ void SlipStream::update(float dt)
 
     MovingTexture::update(dt);
 
-    // Update this karts slipstream quad (even for low level AI which don't
-    // use slipstream, since even then player karts can get slipstream,
-    // and so have to compare with the modified slipstream quad.
-    m_slipstream_original_quad->transform(m_kart->getTrans(),
-                                          m_slipstream_quad);
-
     if(m_slipstream_mode==SS_USE)
     {
         m_slipstream_time -= dt;
@@ -418,12 +410,13 @@ void SlipStream::update(float dt)
             m_target_kart->getKartAnimation()  ||
             m_target_kart->isEliminated()        ) continue;
 
-        float diff = fabsf(m_target_kart->getXYZ().getY()
-                           - m_kart->getXYZ().getY()      );
+        // Transform this kart location into target kart point of view
+        Vec3 lc = m_target_kart->getTrans().inverse()(m_kart->getXYZ());
+
         // If the kart is 'on top' of this kart (e.g. up on a bridge),
         // don't consider it for slipstreaming.
+        if (fabsf(lc.y()) > 6.0f) continue;
 
-        if(diff>6.0f) continue;
         // If the kart we are testing against is too slow, no need to test
         // slipstreaming. Note: We compare the speed of the other kart
         // against the minimum slipstream speed kart of this kart - not
@@ -447,7 +440,7 @@ void SlipStream::update(float dt)
         float l    = kp->getSlipstreamLength()
                    + 0.5f*( m_target_kart->getKartLength()
                            +m_kart->getKartLength()        );
-        if(delta.length2_2d() > l*l)
+        if(delta.length2() > l*l)
         {
             if(UserConfigParams::m_slipstream_debug &&
                 m_kart->getController()->isLocalPlayerController())
@@ -457,7 +450,7 @@ void SlipStream::update(float dt)
         }
         // Real test: if in slipstream quad of other kart
         if(m_target_kart->getSlipstream()->m_slipstream_quad
-                                         ->pointInQuad(m_kart->getXYZ()))
+                                         ->pointInside(lc))
         {
             is_sstreaming     = true;
             break;

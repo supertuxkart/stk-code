@@ -110,16 +110,13 @@ public:
     // Functions related to controlling the kart
     // ------------------------------------------------------------------------
     /** Returns the current steering value for this kart. */
-    float getSteerPercent() const { return m_controls.m_steer;  }
+    float getSteerPercent() const { return m_controls.getSteer();  }
     // ------------------------------------------------------------------------
     /** Returns all controls of this kart. */
     KartControl&  getControls() { return m_controls; }
     // ------------------------------------------------------------------------
     /** Returns all controls of this kart - const version. */
     const KartControl& getControls() const { return m_controls; }
-    // ------------------------------------------------------------------------
-    /** Sets the kart controls. Used e.g. by replaying history. */
-    void setControls(const KartControl &c) { m_controls = c; }
 
     // ========================================================================
     // Access to the kart properties.
@@ -277,6 +274,10 @@ public:
      *  pure abstract, since this function is not needed for certain classes,
      *  like Ghost. */
     virtual float getSpeed() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the exponentially smoothened speed of the kart in 
+     *  which is removes shaking from camera. */
+    virtual float getSmoothedSpeed() const = 0;
     // ------------------------------------------------------------------------
     /** Returns the current maximum speed for this kart, this includes all
      *  bonus and maluses that are currently applied. */
@@ -439,6 +440,10 @@ public:
     virtual void crashed(AbstractKart *k, bool update_attachments) = 0;
     // ------------------------------------------------------------------------
     virtual void crashed(const Material *m, const Vec3 &normal) = 0;
+    // ------------------------------------------------------------------------
+    /** Returns the normal of the terrain the kart is over atm. This is
+     *  defined even if the kart is flying. */
+    virtual const Vec3& getNormal() const = 0;
     // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
     virtual float getHoT() const = 0;

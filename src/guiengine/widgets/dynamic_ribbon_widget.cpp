@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "font/font_manager.hpp"
 #include "font/regular_face.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -210,7 +211,6 @@ void DynamicRibbonWidget::add()
         // const int count = m_items.size();
 
         m_row_amount = -1;
-        float max_score_so_far = -1;
 
         if (m_h - m_label_height < 0)
         {
@@ -219,6 +219,7 @@ void DynamicRibbonWidget::add()
         }
         else
         {
+            float max_score_so_far = -1;
             for (int row_count = 1; row_count < 10; row_count++)
             {
                 int visible_items;

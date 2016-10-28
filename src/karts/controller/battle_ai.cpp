@@ -24,13 +24,12 @@
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "modes/three_strikes_battle.hpp"
+#include "tracks/arena_graph.hpp"
 
 #ifdef AI_DEBUG
 #include "irrlicht.h"
-#include <iostream>
-using namespace irr;
-using namespace std;
 #endif
 
 BattleAI::BattleAI(AbstractKart *kart)
@@ -57,7 +56,6 @@ BattleAI::BattleAI(AbstractKart *kart)
 }   // BattleAI
 
 //-----------------------------------------------------------------------------
-
 BattleAI::~BattleAI()
 {
 #ifdef AI_DEBUG
@@ -67,93 +65,106 @@ BattleAI::~BattleAI()
 }   //  ~BattleAI
 
 //-----------------------------------------------------------------------------
-/** Resets the AI when a race is restarted.
+/** Find the closest kart around this AI, if consider_difficulty is true, AI
+ *  will try to follow human players more or less depends on difficulty.
+ *  \param consider_difficulty If take current difficulty into account.
+ *  \param find_sta If find \ref SpareTireAI only.
  */
-void BattleAI::reset()
-{
-    ArenaAI::reset();
-    AIBaseController::reset();
-    m_mini_skid = false;
-}   // reset
-
-//-----------------------------------------------------------------------------
-void BattleAI::update(float dt)
-{
-    m_mini_skid = false;
-    ArenaAI::update(dt);
-}   // update
-
-//-----------------------------------------------------------------------------
-void BattleAI::findClosestKart(bool use_difficulty)
+void BattleAI::findClosestKart(bool consider_difficulty, bool find_sta)
 {
     float distance = 99999.9f;
-    const unsigned int n = m_world->getNumKarts();
     int closest_kart_num = 0;
+    const int end = m_world->getNumKarts();
 
-    for (unsigned int i = 0; i < n; i++)
+    for (int start_id =
+        find_sta ? end - race_manager->getNumSpareTireKarts() : 0;
+        start_id < end; start_id++)
     {
-        const AbstractKart* kart = m_world->getKart(i);
-        if (kart->isEliminated()) continue;
+        const AbstractKart* kart = m_world->getKart(start_id);
+        const SpareTireAI* sta =
+            dynamic_cast<const SpareTireAI*>(kart->getController());
+        if (kart->isEliminated() && !(find_sta && sta && sta->isMoving()))
+            continue;
 
         if (kart->getWorldKartId() == m_kart->getWorldKartId())
             continue; // Skip the same kart
 
         // Test whether takes current difficulty into account for closest kart
         // Notice: it don't affect aiming, this function will be called once
-        // more in handleArenaItems, which ignore difficulty.
-        if (m_cur_difficulty == RaceManager::DIFFICULTY_EASY && use_difficulty)
+        // more when use items, which ignore difficulty.
+        if (m_cur_difficulty == RaceManager::DIFFICULTY_EASY &&
+            consider_difficulty)
         {
-            // Skip human players for novice mode unless only human players left
-            const AbstractKart* temp = m_world->getKart(i);
+            // Skip human players for novice mode unless only they are left
+            const AbstractKart* temp = m_world->getKart(start_id);
             if (temp->getController()->isPlayerController() &&
                (m_world->getCurrentNumKarts() -
                 m_world->getCurrentNumPlayers()) > 1)
                 continue;
         }
-        else if (m_cur_difficulty == RaceManager::DIFFICULTY_BEST && use_difficulty)
+        else if (m_cur_difficulty == RaceManager::DIFFICULTY_BEST &&
+            consider_difficulty)
         {
             // Skip AI players for supertux mode
-            const AbstractKart* temp = m_world->getKart(i);
+            const AbstractKart* temp = m_world->getKart(start_id);
             if (!(temp->getController()->isPlayerController()))
                 continue;
         }
 
-        Vec3 d = kart->getXYZ() - m_kart->getXYZ();
-        if (d.length() <= distance)
+        float dist_to_kart = m_graph->getDistance(getCurrentNode(),
+            m_world->getSectorForKart(kart));
+        if (dist_to_kart <= distance)
         {
-            distance = d.length();
-            closest_kart_num = i;
+            distance = dist_to_kart;
+            closest_kart_num = start_id;
         }
     }
 
-    const AbstractKart* closest_kart = m_world->getKart(closest_kart_num);
-    m_closest_kart_node = m_world->getKartNode(closest_kart_num);
-    m_closest_kart_point = closest_kart->getXYZ();
+    m_closest_kart = m_world->getKart(closest_kart_num);
+    m_closest_kart_node = m_world->getSectorForKart(m_closest_kart);
+    m_closest_kart_point = m_closest_kart->getXYZ();
 
-    if (!use_difficulty)
-    {
-        m_closest_kart = m_world->getKart(closest_kart_num);
-        checkPosition(m_closest_kart_point, &m_closest_kart_pos_data);
-
-        // Do a mini-skid to closest kart only when firing target,
-        // not straight ahead, not too far, in front of it
-        // and with suitable difficulties.
-        if (m_closest_kart_pos_data.angle > 0.2f             &&
-            m_closest_kart_pos_data.distance < 20.0f         &&
-           !m_closest_kart_pos_data.behind                   &&
-           (m_cur_difficulty == RaceManager::DIFFICULTY_HARD ||
-            m_cur_difficulty == RaceManager::DIFFICULTY_BEST))
-            m_mini_skid = true;
-    }
 }   // findClosestKart
 
 //-----------------------------------------------------------------------------
+/** Find a suitable target to follow, it will find the closest kart first, it's
+ *  used as fallback if no item is found. It takes the current difficulty into
+ *  account, also collect life from \ref SpareTireAI depends on current
+ *  difficulty if actually they are spawned:
+ *  \li Novice and intermediate - collect them only AI has 1 life only.
+ *  \li Expert and supertux - collect them if AI dones't have 3 lives.
+ */
 void BattleAI::findTarget()
 {
+    bool find_sta = false;
+    if (m_world->spareTireKartsSpawned())
+    {
+        switch (m_cur_difficulty)
+        {
+            case RaceManager::DIFFICULTY_EASY:
+            case RaceManager::DIFFICULTY_MEDIUM:
+            {
+                find_sta = m_world->getKartLife(m_kart->getWorldKartId()) == 1;
+                break;
+            }
+            case RaceManager::DIFFICULTY_HARD:
+            case RaceManager::DIFFICULTY_BEST:
+            {
+                find_sta = m_world->getKartLife(m_kart->getWorldKartId()) != 3;
+                break;
+            }
+            default: assert(false);
+        }
+    }
+
+    bool consider_difficulty = !find_sta;
+    findClosestKart(consider_difficulty, find_sta);
+
     // Find a suitable target to drive to, either powerup or kart
     if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_NOTHING &&
-        m_kart->getAttachment()->getType() != Attachment::ATTACH_SWATTER)
-        collectItemInArena(&m_target_point , &m_target_node);
+        m_kart->getAttachment()->getType() != Attachment::ATTACH_SWATTER &&
+        !find_sta)
+        tryCollectItem(&m_target_point , &m_target_node);
     else
     {
         m_target_point = m_closest_kart_point;
@@ -164,10 +175,24 @@ void BattleAI::findTarget()
 //-----------------------------------------------------------------------------
 int BattleAI::getCurrentNode() const
 {
-    return m_world->getKartNode(m_kart->getWorldKartId());
+    return m_world->getSectorForKart(m_kart);
 }   // getCurrentNode
+
 //-----------------------------------------------------------------------------
 bool BattleAI::isWaiting() const
 {
     return m_world->isStartPhase();
 }   // isWaiting
+
+//-----------------------------------------------------------------------------
+float BattleAI::getKartDistance(const AbstractKart* kart) const
+{
+    return m_graph->getDistance(getCurrentNode(),
+        m_world->getSectorForKart(kart));
+}   // getKartDistance
+
+//-----------------------------------------------------------------------------
+bool BattleAI::isKartOnRoad() const
+{
+    return m_world->isOnRoad(m_kart->getWorldKartId());
+}   // isKartOnRoad

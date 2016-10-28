@@ -33,7 +33,6 @@
 #include "modes/world.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
-#include "tracks/battle_graph.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -103,8 +102,8 @@ void PlayerController::action(PlayerAction action, int value)
         if (value)
         {
           m_steer_val = value;
-          if(m_controls->m_skid==KartControl::SC_NO_DIRECTION)
-              m_controls->m_skid = KartControl::SC_LEFT;
+          if(m_controls->getSkidControl()==KartControl::SC_NO_DIRECTION)
+              m_controls->setSkidControl(KartControl::SC_LEFT);
         }
         else
           m_steer_val = m_steer_val_r;
@@ -115,8 +114,8 @@ void PlayerController::action(PlayerAction action, int value)
         if (value)
         {
             m_steer_val = -value;
-            if(m_controls->m_skid==KartControl::SC_NO_DIRECTION)
-                m_controls->m_skid = KartControl::SC_RIGHT;
+            if(m_controls->getSkidControl()==KartControl::SC_NO_DIRECTION)
+                m_controls->setSkidControl(KartControl::SC_RIGHT);
         }
         else
           m_steer_val = m_steer_val_l;
@@ -126,15 +125,15 @@ void PlayerController::action(PlayerAction action, int value)
         m_prev_accel = value;
         if (value && !(m_penalty_time > 0.0f))
         {
-            m_controls->m_accel = value/32768.0f;
-            m_controls->m_brake = false;
-            m_controls->m_nitro = m_prev_nitro;
+            m_controls->setAccel(value/32768.0f);
+            m_controls->setBrake(false);
+            m_controls->setNitro(m_prev_nitro);
         }
         else
         {
-            m_controls->m_accel = 0.0f;
-            m_controls->m_brake = m_prev_brake;
-            m_controls->m_nitro = false;
+            m_controls->setAccel(0.0f);
+            m_controls->setBrake(m_prev_brake);
+            m_controls->setNitro(false);
         }
         break;
     case PA_BRAKE:
@@ -142,44 +141,44 @@ void PlayerController::action(PlayerAction action, int value)
         // let's consider below that to be a deadzone
         if(value > 32768/2)
         {
-            m_controls->m_brake = true;
-            m_controls->m_accel = 0.0f;
-            m_controls->m_nitro = false;
+            m_controls->setBrake(true);
+            m_controls->setAccel(0.0f);
+            m_controls->setNitro(false);
         }
         else
         {
-            m_controls->m_brake = false;
-            m_controls->m_accel = m_prev_accel/32768.0f;
+            m_controls->setBrake(false);
+            m_controls->setAccel(m_prev_accel/32768.0f);
             // Nitro still depends on whether we're accelerating
-            m_controls->m_nitro = (m_prev_nitro && m_prev_accel);
+            m_controls->setNitro(m_prev_nitro && m_prev_accel);
         }
         break;
     case PA_NITRO:
         // This basically keeps track whether the button still is being pressed
         m_prev_nitro = (value != 0);
         // Enable nitro only when also accelerating
-        m_controls->m_nitro = ((value!=0) && m_controls->m_accel);
+        m_controls->setNitro( ((value!=0) && m_controls->getAccel()) );
         break;
     case PA_RESCUE:
-        m_controls->m_rescue = (value!=0);
+        m_controls->setRescue(value!=0);
         break;
     case PA_FIRE:
-        m_controls->m_fire = (value!=0);
+        m_controls->setFire(value!=0);
         break;
     case PA_LOOK_BACK:
-        m_controls->m_look_back = (value!=0);
+        m_controls->setLookBack(value!=0);
         break;
     case PA_DRIFT:
         if(value==0)
-            m_controls->m_skid = KartControl::SC_NONE;
+            m_controls->setSkidControl(KartControl::SC_NONE);
         else
         {
             if(m_steer_val==0)
-                m_controls->m_skid = KartControl::SC_NO_DIRECTION;
+                m_controls->setSkidControl(KartControl::SC_NO_DIRECTION);
             else
-                m_controls->m_skid = m_steer_val<0
-                                   ? KartControl::SC_RIGHT
-                                   : KartControl::SC_LEFT;
+                m_controls->setSkidControl(m_steer_val<0
+                                           ? KartControl::SC_RIGHT
+                                           : KartControl::SC_LEFT  );
         }
         break;
     case PA_PAUSE_RACE:
@@ -196,52 +195,54 @@ void PlayerController::action(PlayerAction action, int value)
  */
 void PlayerController::steer(float dt, int steer_val)
 {
+    // Get the old value, compute the new steering value,
+    // and set it at the end of this function
+    float steer = m_controls->getSteer();
     if(stk_config->m_disable_steer_while_unskid &&
-        m_controls->m_skid==KartControl::SC_NONE &&
+        m_controls->getSkidControl()==KartControl::SC_NONE &&
        m_kart->getSkidding()->getVisualSkidRotation()!=0)
     {
-        m_controls->m_steer = 0;
+        steer = 0;
     }
-
 
     // Amount the steering is changed for digital devices.
     // If the steering is 'back to straight', a different steering
     // change speed is used.
-    const float STEER_CHANGE = ( (steer_val<=0 && m_controls->m_steer<0) ||
-                                 (steer_val>=0 && m_controls->m_steer>0)   )
+    const float STEER_CHANGE = ( (steer_val<=0 && steer<0) ||
+                                 (steer_val>=0 && steer>0)   )
                      ? dt/m_kart->getKartProperties()->getTurnTimeResetSteer()
-                     : dt/m_kart->getTimeFullSteer(fabsf(m_controls->m_steer));
+                     : dt/m_kart->getTimeFullSteer(fabsf(steer));
     if (steer_val < 0)
     {
         // If we got analog values do not cumulate.
         if (steer_val > -32767)
-            m_controls->m_steer = -steer_val/32767.0f;
+            steer = -steer_val/32767.0f;
         else
-            m_controls->m_steer += STEER_CHANGE;
+            steer += STEER_CHANGE;
     }
     else if(steer_val > 0)
     {
         // If we got analog values do not cumulate.
         if (steer_val < 32767)
-            m_controls->m_steer = -steer_val/32767.0f;
+            steer = -steer_val/32767.0f;
         else
-            m_controls->m_steer -= STEER_CHANGE;
+            steer -= STEER_CHANGE;
     }
     else
     {   // no key is pressed
-        if(m_controls->m_steer>0.0f)
+        if(steer>0.0f)
         {
-            m_controls->m_steer -= STEER_CHANGE;
-            if(m_controls->m_steer<0.0f) m_controls->m_steer=0.0f;
+            steer -= STEER_CHANGE;
+            if(steer<0.0f) steer=0.0f;
         }
         else
-        {   // m_controls->m_steer<=0.0f;
-            m_controls->m_steer += STEER_CHANGE;
-            if(m_controls->m_steer>0.0f) m_controls->m_steer=0.0f;
-        }   // if m_controls->m_steer<=0.0f
+        {   // steer<=0.0f;
+            steer += STEER_CHANGE;
+            if(steer>0.0f) steer=0.0f;
+        }   // if steer<=0.0f
     }   // no key is pressed
 
-    m_controls->m_steer = std::min(1.0f, std::max(-1.0f, m_controls->m_steer));
+    m_controls->setSteer(std::min(1.0f, std::max(-1.0f, steer)) );
 
 }   // steer
 
@@ -251,7 +252,7 @@ void PlayerController::steer(float dt, int steer_val)
  */
 void PlayerController::skidBonusTriggered()
 {
-    m_controls->m_steer = 0;
+    m_controls->setSteer(0);
 }   // skidBonusTriggered
 
 //-----------------------------------------------------------------------------
@@ -267,15 +268,15 @@ void PlayerController::update(float dt)
 
     if (World::getWorld()->getPhase() == World::GOAL_PHASE)
     {
-        m_controls->m_brake = false;
-        m_controls->m_accel = 0.0f;
+        m_controls->setBrake(false);
+        m_controls->setAccel(0.0f);
         return;
     }
 
     if (World::getWorld()->isStartPhase())
     {
-        if (m_controls->m_accel || m_controls->m_brake ||
-            m_controls->m_fire  || m_controls->m_nitro)
+        if (m_controls->getAccel() || m_controls->getBrake()||
+            m_controls->getFire()  || m_controls->getNitro())
         {
             // Only give penalty time in SET_PHASE.
             // Penalty time check makes sure it doesn't get rendered on every
@@ -287,8 +288,8 @@ void PlayerController::update(float dt)
                 m_penalty_time = stk_config->m_penalty_time;
             }   // if penalty_time = 0
 
-            m_controls->m_brake = false;
-            m_controls->m_accel = 0.0f;
+            m_controls->setBrake(false);
+            m_controls->setAccel(0.0f);
         }   // if key pressed
 
         return;
@@ -303,10 +304,10 @@ void PlayerController::update(float dt)
     // Only accept rescue if there is no kart animation is already playing
     // (e.g. if an explosion happens, wait till the explosion is over before
     // starting any other animation).
-    if ( m_controls->m_rescue && !m_kart->getKartAnimation() )
+    if ( m_controls->getRescue() && !m_kart->getKartAnimation() )
     {
         new RescueAnimation(m_kart);
-        m_controls->m_rescue=false;
+        m_controls->setRescue(false);
     }
 }   // update
 

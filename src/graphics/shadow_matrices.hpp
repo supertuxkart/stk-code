@@ -64,6 +64,7 @@ private:
 public:
 
     ShadowMatrices();
+    ~ShadowMatrices();
 
     void computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
                                    unsigned int width, unsigned int height,
@@ -74,10 +75,7 @@ public:
                             const PostProcessing *post_processing);
 
     // ------------------------------------------------------------------------
-    void resetShadowCamNodes()
-    {
-        memset(m_shadow_cam_nodes, 0, 4 * sizeof(void*));
-    }   // resetShadowCamNodes
+    void resetShadowCamNodes();
     // ------------------------------------------------------------------------
     scene::ICameraSceneNode** getShadowCamNodes()
     {

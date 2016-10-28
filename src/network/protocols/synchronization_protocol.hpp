@@ -17,9 +17,14 @@ private:
     uint32_t m_pings_count;
     std::vector<uint32_t> m_successed_pings;
     std::vector<double> m_total_diff;
+
+    /** True if the countdown has started, i.e. all clients have loaded
+     *  the track and karts. */
     bool m_countdown_activated;
-    double m_countdown;
-    double m_last_countdown_update;
+
+    /** The countdown timer value. */
+    float m_countdown;
+    float  m_last_countdown_update;
     bool m_has_quit;
 
     /** Keeps track of last time that an update was sent. */
@@ -33,12 +38,13 @@ public:
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
-    void startCountdown(int ms_countdown);
+    void startCountdown(float ms_countdown);
 
     // ------------------------------------------------------------------------
     virtual void update(float dt) OVERRIDE {}
     // ------------------------------------------------------------------------
-    int getCountdown() { return (int)(m_countdown*1000.0); }
+    /** Returns the current countdown value. */
+    float getCountdown() { return m_countdown; }
 
 };   // class SynchronizationProtocol
 

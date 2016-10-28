@@ -42,6 +42,12 @@ private:
     bool hasSSBO;
     bool hasImageLoadStore;
     bool hasMultiDrawIndirect;
+    bool hasTextureFilterAnisotropic;
+
+#if defined(USE_GLES2)
+    bool hasBGRA;
+    bool hasColorBufferFloat;
+#endif
 
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
@@ -75,6 +81,12 @@ public:
     bool isARBImageLoadStoreUsable() const;
     bool isARBMultiDrawIndirectUsable() const;
     bool isARBExplicitAttribLocationUsable() const;
+    bool isEXTTextureFilterAnisotropicUsable() const;
+
+#if defined(USE_GLES2)
+    bool isEXTTextureFormatBGRA8888Usable() const;
+    bool isEXTColorBufferFloatUsable() const;
+#endif
 
 
     // Are all required extensions available for feature support

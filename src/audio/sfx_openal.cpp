@@ -424,7 +424,7 @@ void SFXOpenAL::setPosition(const Vec3 &position)
 {
     // Don't send a position command to the thread if the sound is not playing
     // (or sfx disabled or the sound was not initialised correctly)
-//    if (m_status != SFX_PLAYING|| !SFXManager::get()->sfxAllowed()) return;
+    if (!SFXManager::get()->sfxAllowed()) return;
     SFXManager::get()->queue(SFXManager::SFX_POSITION, this, position);
 
 }   // setPosition

@@ -28,13 +28,14 @@
 
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/stars.hpp"
 #include "io/xml_node.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
-#include "modes/world.hpp"
+#include "modes/linear_world.hpp"
 #include "modes/soccer_world.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
@@ -101,7 +102,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
  */
 void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
                             btCollisionShape *shape,
-                            float restitution, const float gravity,
+                            float restitution, const btVector3& gravity,
                             const bool rotates, const bool turn_around,
                             const btTransform* custom_direction)
 {
@@ -133,7 +134,7 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     m_user_pointer.set(this);
     World::getWorld()->getPhysics()->addBody(getBody());
 
-    m_body->setGravity(btVector3(0.0f, gravity, 0));
+    m_body->setGravity(gravity);
 
     // Rotate velocity to point in the right direction
     btVector3 v=trans.getBasis()*velocity;
@@ -296,65 +297,59 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
                                              float *fire_angle,
                                              float *up_velocity)
 {
-    Vec3 relative_target_kart_loc = target_kart->getXYZ() - origin;
-
+    // Transform the target into the firing kart's frame of reference
+    btTransform inv_trans = m_owner->getTrans().inverse();
+    
+    Vec3 relative_target_kart_loc = inv_trans(target_kart->getXYZ());
+    
+    // Find the direction target is moving in
     btTransform trans = target_kart->getTrans();
     Vec3 target_direction(trans.getBasis().getColumn(2));
 
-    float dx = relative_target_kart_loc.getX();
-    float dy = relative_target_kart_loc.getY();
-    float dz = relative_target_kart_loc.getZ();
+    // Now rotate it to the firing kart's frame of reference
+    btQuaternion inv_rotate = inv_trans.getRotation();
+    target_direction = 
+        target_direction.rotate(inv_rotate.getAxis(), inv_rotate.getAngle());
+    
+    // Now we try to find the angle to aim at to hit the target. 
+    // Warning : Funky math stuff going on below. To understand, see answer by 
+    // Jeffrey Hantin here : 
+    // http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
+    
+    float target_x_speed = target_direction.getX()*target_kart->getSpeed();
+    float target_z_speed = target_direction.getZ()*target_kart->getSpeed();
+    float target_y_speed = target_direction.getY()*target_kart->getSpeed();
 
-    float gy = target_direction.getY();
+    float a = (target_x_speed*target_x_speed) + (target_z_speed*target_z_speed) -
+                (item_XZ_speed*item_XZ_speed);
+    float b = 2 * (target_x_speed * (relative_target_kart_loc.getX())
+                    + target_z_speed * (relative_target_kart_loc.getZ()));
+    float c = relative_target_kart_loc.getX()*relative_target_kart_loc.getX()
+                + relative_target_kart_loc.getZ()*relative_target_kart_loc.getZ();
+    
+    float discriminant = b*b - 4 * a*c;
+    if (discriminant < 0) discriminant = 0;
 
-    //Projected onto X-Z plane
-    float target_kart_speed = target_direction.length_2d()
-                            * target_kart->getSpeed();
-
-    float target_kart_heading = target_kart->getHeading();
-
-    float dist = -(target_kart_speed / item_XZ_speed)
-               * (dx * cosf(target_kart_heading) -
-                  dz * sinf(target_kart_heading)   );
-
-    float f = dx*dx + dz*dz - dist*dist;
-    // Avoid negative square root
-    if(f>0)
-        f = sqrtf(f);
-    else
-        f = 0.0f;
-
-    float fire_th = (dx*dist - dz * f)
-                  / (dx*dx + dz*dz);
-    if(fire_th>1)
-        fire_th = 1.0f;
-    else if (fire_th<-1.0f)
-        fire_th = -1.0f;
-    fire_th = (((dist - dx*fire_th) / dz > 0) ? -acosf(fire_th)
-                                              :  acosf(fire_th));
-
-    float time = 0.0f;
-    float a = item_XZ_speed     * sinf (fire_th)
-            + target_kart_speed * sinf (target_kart_heading);
-    float b = item_XZ_speed     * cosf (fire_th)
-            + target_kart_speed * cosf (target_kart_heading);
-
-    if (fabsf(a) > fabsf(b)) time = fabsf (dx / a);
-    else if (b != 0.0f)      time = fabsf(dz / b);
-
-    if (fire_th > M_PI)
-        fire_th -= M_PI;
-    else
-        fire_th += M_PI;
+    float t1 = (-b + sqrt(discriminant)) / (2 * a);
+    float t2 = (-b - sqrt(discriminant)) / (2 * a);
+    float time;
+    if (t1 >= 0 && t1<t2) time = t1;
+    else time = t2;
 
     //createPhysics offset
-    assert(sqrt(a*a+b*b)!=0);
-    time -= forw_offset / sqrt(a*a+b*b);
+    time -= forw_offset / item_XZ_speed;
+
+    float aimX = time*target_x_speed + relative_target_kart_loc.getX();
+    float aimZ = time*target_z_speed + relative_target_kart_loc.getZ();
 
     assert(time!=0);
-    *fire_angle = fire_th;
-    *up_velocity = (0.5f * time * gravity) + (dy / time)
-                 + (gy * target_kart->getSpeed());
+    float angle = atan2f(aimX, aimZ);
+    
+    *fire_angle = angle;
+
+    // Now find the up_velocity. This is an application of newton's equation.
+    *up_velocity = (0.5f * time * gravity) + (relative_target_kart_loc.getY() / time)
+                 + ( target_y_speed);
 }   // getLinearKartItemIntersection
 
 //-----------------------------------------------------------------------------
@@ -396,15 +391,32 @@ bool Flyable::updateAndDelete(float dt)
         return true;
     }
 
-    // Add the position offset so that the flyable can adjust its position
-    // (usually to do the raycast from a slightly higher position to avoid
-    // problems finding the terrain in steep uphill sections).
-    if(m_do_terrain_info)
-        TerrainInfo::update(xyz+m_position_offset);
+    if (m_do_terrain_info)
+    {
+        Vec3 towards = getBody()->getGravity();
+        towards.normalize();
+        // Add the position offset so that the flyable can adjust its position
+        // (usually to do the raycast from a slightly higher position to avoid
+        // problems finding the terrain in steep uphill sections).
+        // Towards is a unit vector. so we can multiply -towards to offset the
+        // position by one unit.
+        TerrainInfo::update(xyz + m_position_offset*(-towards), towards);
+
+        // Make flyable anti-gravity when the it's projected on such surface
+        const Material* m = TerrainInfo::getMaterial();
+        if (m && m->hasGravity())
+        {
+            getBody()->setGravity(TerrainInfo::getNormal() * -70.0f);
+        }
+        else
+        {
+            getBody()->setGravity(Vec3(0, 1, 0) * -70.0f);
+        }
+    }
 
     if(m_adjust_up_velocity)
     {
-        float hat = xyz.getY()-getHoT();
+        float hat = (xyz - getHitPoint()).length();
 
         // Use the Height Above Terrain to set the Z velocity.
         // HAT is clamped by min/max height. This might be somewhat

@@ -131,6 +131,7 @@ KartModel::KartModel(bool is_master)
         m_min_suspension[i] = -0.07f;
         m_max_suspension[i] = 0.20f;
         m_dampen_suspension_amplitude[i] = 2.5f;
+        m_default_physics_suspension[i] = 0.25f;
     }
     m_wheel_filename[0] = "";
     m_wheel_filename[1] = "";
@@ -246,12 +247,6 @@ KartModel::~KartModel()
         {
             // Master KartModels should never have a speed weighted object attached.
             assert(!m_is_master);
-
-            // Drop the cloned transparent model if created
-            if (m_krt == KRT_TRANSPARENT)
-            {
-                m_speed_weighted_objects[i].m_model->drop();
-            }
             m_speed_weighted_objects[i].m_node->drop();
         }
         if(m_is_master && m_speed_weighted_objects[i].m_model)
@@ -261,20 +256,15 @@ KartModel::~KartModel()
         }
     }
 
-    // In case of the master, the mesh must be dropped. A non-master KartModel
-    // has a copy of the master's mesh, so it needs to be dropped, too.
-    if (m_mesh)
+    if (m_is_master && m_mesh)
     {
         m_mesh->drop();
-        if (m_is_master)
+        // If there is only one copy left, it's the copy in irrlicht's
+        // mesh cache, so it can be removed.
+        if (m_mesh && m_mesh->getReferenceCount() == 1)
         {
-            // If there is only one copy left, it's the copy in irrlicht's
-            // mesh cache, so it can be removed. 
-            if (m_mesh && m_mesh->getReferenceCount() == 1)
-            {
-                irr_driver->dropAllTextures(m_mesh);
-                irr_driver->removeMeshFromCache(m_mesh);
-            }
+            irr_driver->dropAllTextures(m_mesh);
+            irr_driver->removeMeshFromCache(m_mesh);
         }
     }
 
@@ -307,7 +297,7 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     km->m_kart_height          = m_kart_height;
     km->m_kart_highest_point   = m_kart_highest_point;
     km->m_kart_lowest_point    = m_kart_lowest_point;
-    km->m_mesh                 = irr_driver->copyAnimatedMesh(m_mesh);
+    km->m_mesh                 = m_mesh;
     km->m_model_filename       = m_model_filename;
     km->m_animation_speed      = m_animation_speed;
     km->m_current_animation    = AF_DEFAULT;
@@ -342,12 +332,6 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
         // Master should not have any speed weighted nodes.
         assert(!m_speed_weighted_objects[i].m_node);
         km->m_speed_weighted_objects[i] = m_speed_weighted_objects[i];
-        if (krt == KRT_TRANSPARENT)
-        {
-            // Only clone the mesh if transparent type is used, see #2445
-            km->m_speed_weighted_objects[i].m_model = irr_driver
-                ->copyAnimatedMesh(m_speed_weighted_objects[i].m_model);
-        }
     }
 
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
@@ -443,8 +427,12 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                            ? m_animation_frame[AF_STRAIGHT]
                            : 0;
 
-        scene::IMesh* main_frame = m_mesh->getMesh(straight_frame);
-        main_frame->setHardwareMappingHint(scene::EHM_STATIC);
+        scene::IMesh* main_frame = m_mesh;
+        if (!CVS->isGLSL())
+        {
+            main_frame = m_mesh->getMesh(straight_frame);
+            main_frame->setHardwareMappingHint(scene::EHM_STATIC);
+        }
 
         std::string debug_name;
 
@@ -453,7 +441,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
 #endif
 
         node = irr_driver->addMesh(main_frame, debug_name,
-               NULL /*parent*/, getRenderInfo());
+               NULL /*parent*/, getRenderInfo(), false, straight_frame);
 
 #ifdef DEBUG
         node->setName(debug_name.c_str());
@@ -521,6 +509,13 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
                    full_path.c_str(), kart_properties.getIdent().c_str());
         return false;
     }
+
+    scene::ISkinnedMesh* sm = dynamic_cast<scene::ISkinnedMesh*>(m_mesh);
+    if (sm)
+    {
+        MeshTools::createSkinnedMeshWithTangents(sm, &MeshTools::isNormalMap);
+    }
+
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
 
@@ -569,6 +564,14 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         // Grab all textures. This is done for the master only, so
         // the destructor will only free the textures if a master
         // copy is freed.
+
+        scene::ISkinnedMesh* sm =
+            dynamic_cast<scene::ISkinnedMesh*>(obj.m_model);
+        if (sm)
+        {
+            MeshTools::createSkinnedMeshWithTangents(sm,
+                &MeshTools::isNormalMap);
+        }
         irr_driver->grabAllTextures(obj.m_model);
 
         // Update min/max
@@ -611,6 +614,8 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         std::string full_wheel =
             kart_properties.getKartDir()+m_wheel_filename[i];
         m_wheel_model[i] = irr_driver->getMesh(full_wheel);
+        m_wheel_model[i] = MeshTools::createMeshWithTangents(m_wheel_model[i],
+            &MeshTools::isNormalMap);
         // Grab all textures. This is done for the master only, so
         // the destructor will only free the textures if a master
         // copy is freed.
@@ -861,17 +866,18 @@ void KartModel::update(float dt, float distance, float steer, float speed,
 
         float suspension_length = 0.0f;
         GhostKart* gk = dynamic_cast<GhostKart*>(m_kart);
-        // Prevent using m_default_physics_suspension uninitialized
-        if (gk && gt_replay_index == -1) break;
-
-        if (gk)
+        // Prevent using suspension length uninitialized
+        if (dt != 0.0f && !(gk && gt_replay_index == -1))
         {
-            suspension_length = gk->getSuspensionLength(gt_replay_index, i);
-        }
-        else
-        {
-            suspension_length = m_kart->getVehicle()->getWheelInfo(i).
-                                m_raycastInfo.m_suspensionLength;
+            if (gk)
+            {
+                suspension_length = gk->getSuspensionLength(gt_replay_index, i);
+            }
+            else
+            {
+                suspension_length = m_kart->getVehicle()->getWheelInfo(i).
+                                    m_raycastInfo.m_suspensionLength;
+            }
         }
 
         // Check documentation of Kart::updateGraphics for the following line
@@ -926,11 +932,10 @@ void KartModel::update(float dt, float distance, float steer, float speed,
     m_kart->getKartProperties()->getSpeedWeightedObjectProperties().value_name
 
             // Animation strength
-            float strength = 1.0f;
             const float strength_factor = GET_VALUE(obj, m_strength_factor);
             if (strength_factor >= 0.0f)
             {
-                strength = speed * strength_factor;
+                float strength = speed * strength_factor;
                 btClamp<float>(strength, 0.0f, 1.0f);
             }
 

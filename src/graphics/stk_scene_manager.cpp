@@ -43,7 +43,6 @@ void addEdge(const core::vector3df &P0, const core::vector3df &P1)
     BoundingBoxes.push_back(P1.Z);
 }
 
-
 bool isCulledPrecise(const scene::ICameraSceneNode *cam, const scene::ISceneNode *node)
 {
     if (!node->getAutomaticCulling())

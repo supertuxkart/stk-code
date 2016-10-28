@@ -37,6 +37,8 @@ enum TransparentMaterial
     TM_DEFAULT,
     TM_ADDITIVE,
     TM_DISPLACEMENT,
+    TM_GHOST_KART,
+    TM_GHOST_KART_TANGENTS,
     TM_COUNT
 };   // TransparentMaterial
 
@@ -156,13 +158,26 @@ class MiscList : public Singleton<T>, public std::vector<STK::Tuple<Args...> >
 
 // ----------------------------------------------------------------------------
 class ListBlendTransparent : public MiscList<ListBlendTransparent, GLMesh *,
-                                             core::matrix4, core::matrix4>
+                                             core::matrix4, core::matrix4,
+                                             float>
 {};
 
 // ----------------------------------------------------------------------------
 class ListAdditiveTransparent : public MiscList<ListAdditiveTransparent,
                                                 GLMesh *, core::matrix4,
-                                                core::matrix4>
+                                                core::matrix4, float>
+{};
+
+// ----------------------------------------------------------------------------
+class ListGhostKart : public MiscList<ListGhostKart,
+                                      GLMesh *, core::matrix4,
+                                      core::matrix4, float>
+{};
+
+// ----------------------------------------------------------------------------
+class ListGhostKartTangents : public MiscList<ListGhostKartTangents,
+                                              GLMesh *, core::matrix4,
+                                              core::matrix4, float>
 {};
 
 // ----------------------------------------------------------------------------

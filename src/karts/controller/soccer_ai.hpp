@@ -21,13 +21,14 @@
 
 #include "karts/controller/arena_ai.hpp"
 
+#include "LinearMath/btTransform.h"
+
 #undef BALL_AIM_DEBUG
 #ifdef BALL_AIM_DEBUG
 #include "graphics/irr_driver.hpp"
 #endif
 
 class SoccerWorld;
-class Vec3;
 
 /** The actual soccer AI.
  * \ingroup controller
@@ -44,37 +45,68 @@ private:
     /** Keep a pointer to world. */
     SoccerWorld *m_world;
 
+    /** Save the team this AI belongs to. */
     SoccerTeam m_cur_team;
+
+    /** Save the opposite team of this AI team. */
     SoccerTeam m_opp_team;
 
     /** Define which way to handle to ball, either steer with it,
-     *  or overtake it (Denfense).
-     */
+     *  or overtake it (Defense). */
     bool m_overtake_ball;
+
+    /** True if \ref forceBraking() is needed to be called. */
     bool m_force_brake;
+
+    /** True if AI should steer with the ball. */
     bool m_chasing_ball;
 
-    Vec3 determineBallAimingPosition();
-    bool isOvertakable(const Vec3& ball_lc);
-    bool determineOvertakePosition(const Vec3& ball_lc, const Vec3& aim_lc,
-                                   Vec3* overtake_lc);
-    float rotateSlope(float old_slope, bool rotate_up);
+    /** The front point of kart with the same rotation of center mass, used
+     *  to determine point for aiming with ball */
+    btTransform m_front_transform;
 
-    virtual void findClosestKart(bool use_difficulty);
-    virtual void findTarget();
-    virtual void resetAfterStop() OVERRIDE    { m_overtake_ball = false; }
-    virtual int  getCurrentNode() const;
-    virtual bool isWaiting() const;
-    virtual bool canSkid(float steer_fraction)           { return false; }
-    virtual bool forceBraking() OVERRIDE
-                            { return m_avoiding_banana || m_force_brake; }
-    virtual bool ignorePathFinding() OVERRIDE
-                            { return  m_overtake_ball || m_chasing_ball; }
+    // ------------------------------------------------------------------------
+    Vec3  determineBallAimingPosition();
+    // ------------------------------------------------------------------------
+    bool  determineOvertakePosition(const Vec3& ball_lc, const Vec3& aim_lc,
+                                    Vec3* overtake_lc);
+    // ------------------------------------------------------------------------
+    bool  isOvertakable(const Vec3& ball_lc);
+    // ------------------------------------------------------------------------
+    float rotateSlope(float old_slope, bool rotate_up);
+    // ------------------------------------------------------------------------
+    virtual bool  canSkid(float steer_fraction) OVERRIDE
+                { return m_mini_skid && !(m_overtake_ball || m_chasing_ball); }
+    // ------------------------------------------------------------------------
+    virtual void  findClosestKart(bool consider_difficulty,
+                                  bool find_sta) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void  findTarget() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool  forceBraking() OVERRIDE             { return m_force_brake; }
+    // ------------------------------------------------------------------------
+    virtual int   getCurrentNode() const OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual float getKartDistance(const AbstractKart* kart) const OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool  ignorePathFinding() OVERRIDE
+                                 { return  m_overtake_ball || m_chasing_ball; }
+    // ------------------------------------------------------------------------
+    virtual bool  isKartOnRoad() const OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool  isWaiting() const OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void  resetAfterStop() OVERRIDE        { m_overtake_ball = false; }
+
 public:
                  SoccerAI(AbstractKart *kart);
+    // ------------------------------------------------------------------------
                 ~SoccerAI();
-    virtual void update      (float delta);
-    virtual void reset       ();
+    // ------------------------------------------------------------------------
+    virtual void update  (float delta) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void reset   () OVERRIDE;
+
 };
 
 #endif

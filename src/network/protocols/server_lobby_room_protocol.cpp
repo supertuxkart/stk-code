@@ -206,15 +206,11 @@ void ServerLobbyRoomProtocol::registerServer()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
     const TransportAddress& addr = NetworkConfig::get()->getMyAddress();
-#ifdef NEW_PROTOCOL
-    PlayerManager::setUserDetails(request, "register", Online::API::SERVER_PATH);
-#else
-    PlayerManager::setUserDetails(request, "start", Online::API::SERVER_PATH);
-#endif
+    PlayerManager::setUserDetails(request, "create", Online::API::SERVER_PATH);
     request->addParameter("address",      addr.getIP()                    );
     request->addParameter("port",         addr.getPort()                  );
     request->addParameter("private_port",
-                                    NetworkConfig::get()->getPrivatePort());
+                                    NetworkConfig::get()->getServerPort() );
     request->addParameter("name",   NetworkConfig::get()->getServerName() );
     request->addParameter("max_players", 
                           UserConfigParams::m_server_max_players          );
@@ -234,7 +230,7 @@ void ServerLobbyRoomProtocol::registerServer()
     {
         irr::core::stringc error(request->getInfo().c_str());
         Log::error("RegisterServer", "%s", error.c_str());
-        STKHost::get()->setErrorMessage(_("Failed to register server"));
+        STKHost::get()->setErrorMessage(_("Failed to register server: %s", error.c_str()));
     }
 
 }   // registerServer

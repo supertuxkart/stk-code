@@ -82,7 +82,13 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                     continue;
                 }
 
-                irr_driver->setAllMaterialFlags(a_mesh);
+                scene::ISkinnedMesh* sm =
+                    dynamic_cast<scene::ISkinnedMesh*>(a_mesh);
+                if (sm)
+                {
+                    MeshTools::createSkinnedMeshWithTangents(sm,
+                        &MeshTools::isNormalMap);
+                }
 
                 a_mesh->grab();
                 //cache.push_back(a_mesh);

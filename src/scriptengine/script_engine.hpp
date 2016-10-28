@@ -22,8 +22,10 @@
 #include <string>
 #include <angelscript.h>
 #include <functional>
+#include <map>
 
 #include "scriptengine/script_utils.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 
 class TrackObjectPresentation;

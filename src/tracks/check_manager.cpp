@@ -28,7 +28,8 @@
 #include "tracks/check_lap.hpp"
 #include "tracks/check_line.hpp"
 #include "tracks/check_structure.hpp"
-#include "tracks/track.hpp"
+#include "tracks/drive_graph.hpp"
+#include "utils/log.hpp"
 
 CheckManager *CheckManager::m_check_manager = NULL;
 
@@ -84,7 +85,7 @@ void CheckManager::load(const XMLNode &node)
         for(it=check_structures_to_change_state.begin();
             it != check_structures_to_change_state.end(); it++)
         {
-            if(QuadGraph::get()->isReverse())
+            if(DriveGraph::get()->isReverse())
                 m_all_checks[*it]->addSuccessor(i);
             else
                 m_all_checks[i]->addSuccessor(*it);

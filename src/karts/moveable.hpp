@@ -89,15 +89,23 @@ public:
         m_transform.setOrigin(a);
         if(m_motion_state)
             m_motion_state->setWorldTransform(m_transform);
-    }
+    }   // setXYZ
     // ------------------------------------------------------------------------
-    /** Sets the rotation of this moveable. */
-    void setRotation(const btQuaternion&a)
+    /** Sets the rotation of the physical body this moveable. */
+    void setRotation(const btMatrix3x3 &m)
     {
-        m_transform.setRotation(a);
+        m_transform.setBasis(m);
         if(m_motion_state)
             m_motion_state->setWorldTransform(m_transform);
-    }
+    }   // setRotation(btMatrix3x3)
+    // ------------------------------------------------------------------------
+    /** Sets the rotation of the physical body this moveable. */
+    void setRotation(const btQuaternion &q)
+    {
+        m_transform.setRotation(q);
+        if(m_motion_state)
+            m_motion_state->setWorldTransform(m_transform);
+    }   // setRotation(btQuaternion)
     // ------------------------------------------------------------------------
     virtual void  updateGraphics(float dt, const Vec3& off_xyz,
                                  const btQuaternion& off_rotation);
