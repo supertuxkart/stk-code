@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
+        <header align="center" width="80%" text="SuperTuxKart Help" text_align="center"/>
+        <spacer height="15" width="10"/>
+
+        <tabs id="category" height="10%" max_height="110" x="2%" width="98%" align="center">
+            <icon-button id="page1" width="100" height="128" icon="gui/track_random.png"
+                    I18N="Tab in help menu" text="General"/>
+            <icon-button id="page2" width="100" height="128" icon="gui/weapons.png"
+                    I18N="Tab in help menu" text="Weapons"/>
+            <icon-button id="page3" width="100" height="128" icon="gui/mode_ftl.png"
+                    I18N="Tab in help menu" text="Game Modes"/>
+            <icon-button id="page4" width="100" height="128" icon="gui/options_input.png"
+                    I18N="Tab in help menu" text="Multi-player"/>
+            <icon-button id="page5" width="100" height="128" icon="gui/banana.png"
+                    I18N="Tab in help menu" text="Bananas"/>
+        </tabs>
+
+        <box proportion="1" width="100%" layout="vertical-row">
+            <label align="center" text="Hitting a banana can result in one of the following being attached to the kart:"/>
+            
+            <div width="100%" proportion="2" layout="horizontal-row">
+                <icon align="center" width="64" height="64" icon="models/anchor-icon.png"/>
+                <spacer width="64" height="64"/>
+                <bubble proportion="1" height="100%"
+                        I18N="In the help menu"
+                        text="Anchor - slows down the kart."/>
+            </div>
+            
+            <div width="100%" proportion="2" layout="horizontal-row">
+                <icon align="center" width="64" height="64" icon="models/parachute-icon.png"/>
+                <spacer width="64" height="64"/>
+                <bubble proportion="1" height="100%"
+                        I18N="In the help menu"
+                        text="Parachute - slows down the kart less than the anchor."/>
+            </div>
+            
+            <div width="100%" proportion="2" layout="horizontal-row">
+                <icon align="center" width="128" height="128" icon="models/bomb-attach-icon.png"/>
+                <bubble proportion="1" height="100%"
+                        I18N="In the help menu"
+                        text="Bomb - detonates after a short amount of time to throw the kart up in the air. Bump into another kart to transfer the bomb to another player."/>
+            </div>
+        </box>
+    </div>
+
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+</stkgui>
