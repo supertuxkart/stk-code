@@ -1,4 +1,4 @@
-//  SuperTuxKart - a fun racing game with }go-kart
+//  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
@@ -19,8 +19,6 @@
 #define HEADER_ABSTRACT_RENDERER_HPP
 
 #include "graphics/gl_headers.hpp"
-#include "graphics/rtts.hpp"
-#include "graphics/spherical_harmonics.hpp"
 #include <irrlicht.h>
 #include <memory>
 #include <string>
@@ -38,10 +36,14 @@ enum STKRenderingPass
     PASS_COUNT,
 };
 
+enum TypeRTT : unsigned int;
+
 struct GlowData {
     irr::scene::ISceneNode * node;
     float r, g, b;
 };
+
+struct SHCoefficients;
 
 /**
  *  \class AbstractRenderer

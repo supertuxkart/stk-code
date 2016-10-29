@@ -27,6 +27,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
 #include "graphics/render_target.hpp"
+#include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"

@@ -35,8 +35,6 @@
 #include "ISkinnedMesh.h"
 #include "graphics/abstract_renderer.hpp"
 #include "graphics/gl_headers.hpp"
-#include "graphics/spherical_harmonics.hpp"
-#include "graphics/rtts.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
@@ -57,20 +55,17 @@ namespace irr
 }
 using namespace irr;
 
-
-struct GlowData;
-class RTT;
-class RenderInfo;
-class FrameBuffer;
-class ShadowImportanceProvider;
+enum TypeRTT : unsigned int;
 class AbstractKart;
 class AbstractRenderer;
 class Camera;
-class PerCameraNode;
+class FrameBuffer;
 class LightNode;
-class ShadowImportance;
-class ShadowMatrices;
+class PerCameraNode;
+class RenderInfo;
 class RenderTarget;
+
+struct SHCoefficients;
 
 /**
   * \brief class that creates the irrLicht device and offers higher-level

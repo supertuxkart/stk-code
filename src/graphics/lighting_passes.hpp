@@ -22,6 +22,7 @@
 #include <irrlicht.h>
 
 class PostProcessing;
+class ShadowMatrices;
 
 class LightingPasses
 {

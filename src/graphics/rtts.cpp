@@ -292,12 +292,12 @@ RTT::RTT(size_t width, size_t height)
     getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
     glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 RTT::~RTT()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
     if (CVS->isShadowEnabled())

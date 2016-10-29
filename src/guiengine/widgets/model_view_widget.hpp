@@ -50,7 +50,7 @@ namespace GUIEngine
         PtrVector<scene::IMesh, REF> m_models;
         AlignedArray<Vec3> m_model_location;
         AlignedArray<Vec3> m_model_scale;
-        std::vector<int> m_model_frames;  
+        std::vector<int> m_model_frames;
         std::vector<bool> m_model_render_info_affected;
         std::unique_ptr<RenderTarget> m_render_target;
         float m_angle;

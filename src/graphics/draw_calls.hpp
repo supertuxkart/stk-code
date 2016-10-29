@@ -23,6 +23,7 @@
 #include <unordered_map>
 
 class ParticleSystemProxy;
+class ShadowMatrices;
 class STKBillboard;
 
 class DrawCalls

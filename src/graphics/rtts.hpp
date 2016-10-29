@@ -77,7 +77,7 @@ enum TypeFBO
     FBO_COUNT
 };
 
-enum TypeRTT
+enum TypeRTT : unsigned int
 {
     RTT_TMP1 = 0,
     RTT_TMP2,
@@ -139,8 +139,6 @@ enum TypeRTT
 
     RTT_COUNT
 };
-
-
 
 class RTT
 {

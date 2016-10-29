@@ -25,6 +25,7 @@
 #include "graphics/glwrap.hpp"
 
 class GL3RenderTarget;
+class RTT;
 
 #include <vector>
 

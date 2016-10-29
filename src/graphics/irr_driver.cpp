@@ -36,6 +36,7 @@
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_matrices.hpp"
+#include "graphics/spherical_harmonics.hpp"
 #include "graphics/stk_animated_mesh.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"

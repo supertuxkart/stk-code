@@ -31,6 +31,7 @@ class GL3RenderTarget;
 class RenderTarget;
 class RTT;
 class Skybox;
+class SphericalHarmonics;
 class PostProcessing;
 
 class ShaderBasedRenderer: public AbstractRenderer

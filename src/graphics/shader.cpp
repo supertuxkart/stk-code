@@ -22,6 +22,7 @@
 #include "graphics/gl_headers.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/spherical_harmonics.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 

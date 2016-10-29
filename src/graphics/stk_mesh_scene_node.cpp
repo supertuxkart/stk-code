@@ -25,6 +25,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
+#include "graphics/rtts.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "tracks/track.hpp"
 #include "modes/world.hpp"
