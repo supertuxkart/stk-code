@@ -287,8 +287,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
-    unsigned solid_poly_count;
-    unsigned shadow_poly_count;
+    unsigned solid_poly_count = 0;
+    unsigned shadow_poly_count = 0;
     m_draw_calls.prepareDrawCalls(m_shadow_matrices, camnode, solid_poly_count, shadow_poly_count);
     m_poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += solid_poly_count;
     m_poly_count[SHADOW_PASS] += shadow_poly_count;
