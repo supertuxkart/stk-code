@@ -50,9 +50,7 @@ private:
      * Glowing items can appear ordisappear each frame */
     std::vector<GlowData>       m_glowing;
     size_t                      m_nb_static_glowing;
-    
-    void setRTTDimensions(size_t width, size_t height);
-    
+
     void compressPowerUpTextures();
     void setOverrideMaterial();
     
@@ -123,7 +121,15 @@ public:
     void renderToTexture(GL3RenderTarget *render_target,
                          irr::scene::ICameraSceneNode* camera,
                          float dt);
-    
+
+    RTT* createRTT(size_t width, size_t height);
+
+    void setRTT(RTT* rtts)
+    {
+        assert(m_rtts == NULL);
+        m_rtts = rtts;
+    }
+
 };
 
 #endif //HEADER_SHADER_BASED_RENDERER_HPP

@@ -24,7 +24,6 @@
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 
-class GL3RenderTarget;
 class RTT;
 
 #include <vector>
@@ -124,7 +123,7 @@ public:
     
     /** Render the post-processed scene */
     FrameBuffer *render(scene::ICameraSceneNode * const camnode, bool isRace,
-                        RTT *rtts, GL3RenderTarget *specified_render_target = NULL);
+                        RTT *rtts);
 };   // class PostProcessing
 
 #endif // HEADER_POST_PROCESSING_HPP

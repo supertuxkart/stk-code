@@ -15,10 +15,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/2dutils.hpp"
 #include "graphics/render_target.hpp"
+
+#include "graphics/2dutils.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
+#include "graphics/rtts.hpp"
 #include "graphics/shader_based_renderer.hpp"
 
 
@@ -100,53 +102,35 @@ void GL1RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
 GL3RenderTarget::GL3RenderTarget(const irr::core::dimension2du &dimension,
                                  const std::string &name,
                                  ShaderBasedRenderer *renderer)
+               : m_renderer(renderer), m_name(name)
 {
-    m_renderer = renderer;
-    
-    glGenTextures(1, &m_texture_id);
-    glBindTexture(GL_TEXTURE_2D, m_texture_id);
-    
-    // Workaround a bug with srgb fbo on sandy bridge windows
-    if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, dimension.Width, dimension.Height, 0, GL_BGRA, GL_FLOAT, 0);    
-    else
-    {
-        if (CVS->isARBTextureStorageUsable())
-            glTexStorage2D(GL_TEXTURE_2D, 1, GL_SRGB8_ALPHA8, dimension.Width, dimension.Height);
-        else
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, dimension.Width, dimension.Height, 0, GL_BGR, GL_UNSIGNED_BYTE, 0);
-    }
-    
-    std::vector<GLuint> somevector;
-    somevector.push_back(m_texture_id);
-    m_frame_buffer = new FrameBuffer(somevector, dimension.Width, dimension.Height);
-}
+    m_rtts = m_renderer->createRTT(dimension.Width, dimension.Height);
+    m_frame_buffer = NULL;
+}   // GL3RenderTarget
 
 //-----------------------------------------------------------------------------
+
 GL3RenderTarget::~GL3RenderTarget()
 {
-    glDeleteTextures(1, &m_texture_id);
-    delete m_frame_buffer;
-}
+    delete m_rtts;
+}   // ~GL3RenderTarget
+
+//-----------------------------------------------------------------------------
+void GL3RenderTarget::renderToTexture(irr::scene::ICameraSceneNode* camera,
+                                      float dt)
+{
+    m_frame_buffer = NULL;
+    m_renderer->setRTT(m_rtts);
+    m_renderer->renderToTexture(this, camera, dt);
+
+}   // renderToTexture
 
 //-----------------------------------------------------------------------------
 irr::core::dimension2du GL3RenderTarget::getTextureSize() const
 {
     return irr::core::dimension2du(m_frame_buffer->getWidth(),
                                    m_frame_buffer->getHeight());
-}
-
-//-----------------------------------------------------------------------------
-FrameBuffer* GL3RenderTarget::getFrameBuffer()
-{
-    return m_frame_buffer;
-}
-
-//-----------------------------------------------------------------------------
-void GL3RenderTarget::renderToTexture(irr::scene::ICameraSceneNode* camera, float dt)
-{
-    m_renderer->renderToTexture(this, camera, dt);
-}
+}   // getTextureSize
 
 //-----------------------------------------------------------------------------
 void GL3RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
@@ -154,12 +138,14 @@ void GL3RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
                                   const irr::video::SColor &colors,
                                   bool use_alpha_channel_of_texture) const
 {
+    assert(m_frame_buffer != NULL);
     irr::core::rect<s32> source_rect(0, 0, m_frame_buffer->getWidth(),
                                      m_frame_buffer->getHeight());
     glEnable(GL_FRAMEBUFFER_SRGB);
-    draw2DImageFromRTT(m_texture_id,
+    draw2DImageFromRTT(m_frame_buffer->getRTT()[0],
                        m_frame_buffer->getWidth(), m_frame_buffer->getHeight(),
                        dest_rect, source_rect,
                        clip_rect, colors, use_alpha_channel_of_texture);
     glDisable(GL_FRAMEBUFFER_SRGB);
-}
+
+}   // draw2DImage

@@ -1421,19 +1421,10 @@ void PostProcessing::renderLightning(core::vector3df intensity)
 /** Render the post-processed scene */
 FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
                                     bool isRace,
-                                    RTT *rtts,
-                                    GL3RenderTarget *specified_render_target)
+                                    RTT *rtts)
 {
     FrameBuffer *in_fbo = &rtts->getFBO(FBO_COLORS);
-    FrameBuffer *out_fbo;
-
-    // Workaround a bug with srgb fbo on sandy bridge windows
-    if ((GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
-        &&(specified_render_target != NULL))
-        out_fbo = specified_render_target->getFrameBuffer();
-    else
-        out_fbo = &rtts->getFBO(FBO_TMP1_WITH_DS);
-    
+    FrameBuffer *out_fbo = &rtts->getFBO(FBO_TMP1_WITH_DS);
     // Each effect uses these as named, and sets them up for the next effect.
     // This allows chaining effects where some may be disabled.
 
@@ -1587,16 +1578,11 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         return in_fbo;
 
     glEnable(GL_FRAMEBUFFER_SRGB);
-    if(specified_render_target == NULL)
-        out_fbo = &rtts->getFBO(FBO_MLAA_COLORS);
-    else
-        out_fbo = specified_render_target->getFrameBuffer();
-    
+    out_fbo = &rtts->getFBO(FBO_MLAA_COLORS);
     out_fbo->bind();
     renderPassThrough(in_fbo->getRTT()[0],
                       out_fbo->getWidth(),
                       out_fbo->getHeight());
-    
 
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
     {

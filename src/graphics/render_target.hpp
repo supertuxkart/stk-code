@@ -23,6 +23,7 @@
 #include <string>
 
 class ShaderBasedRenderer;
+class RTT;
 
 class RenderTarget
 {
@@ -67,25 +68,24 @@ public:
 class GL3RenderTarget: public RenderTarget
 {
 private:
-    ShaderBasedRenderer *m_renderer;
-    FrameBuffer *m_frame_buffer;
-    GLuint m_texture_id;
-    
+    ShaderBasedRenderer* m_renderer;
+    std::string m_name;
+    RTT* m_rtts;
+    FrameBuffer* m_frame_buffer;
+
 public:
     GL3RenderTarget(const irr::core::dimension2du &dimension,
                     const std::string &name,
                     ShaderBasedRenderer *renderer);
     ~GL3RenderTarget();
-    
-    irr::core::dimension2du getTextureSize() const;
-    FrameBuffer* getFrameBuffer();
-    
-    void renderToTexture(irr::scene::ICameraSceneNode* camera, float dt);
     void draw2DImage(const irr::core::rect<s32>& dest_rect,
                      const irr::core::rect<s32>* clip_rect,
                      const irr::video::SColor &colors,
-                     bool use_alpha_channel_of_texture) const;    
-};
+                     bool use_alpha_channel_of_texture) const;
+    irr::core::dimension2du getTextureSize() const;
+    void renderToTexture(irr::scene::ICameraSceneNode* camera, float dt);
+    void setFrameBuffer(FrameBuffer* fb) { m_frame_buffer = fb; }
 
+};
 
 #endif

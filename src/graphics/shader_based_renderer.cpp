@@ -45,36 +45,18 @@
 extern std::vector<float> BoundingBoxes; //TODO: replace global variable by something cleaner
 
 // ----------------------------------------------------------------------------
-void ShaderBasedRenderer::setRTTDimensions(size_t width, size_t height)
-{    
-    if(m_rtts == NULL)
-        m_rtts = new RTT(width, height);
-    else
-    {
-        if((m_rtts->getWidth() != width) || (m_rtts->getHeight() != height))
-        {
-            delete m_rtts;
-            m_rtts = new RTT(width, height);
-        }
-        else
-        {    
-            //same dimensions; we don't need to create a new RTT
-            //just clear FBO_COMBINED_DIFFUSE_SPECULAR
-            m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
-            glClearColor(.5, .5, .5, .5);
-            glClear(GL_COLOR_BUFFER_BIT);
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            return;
-        }
-    }
-    
+RTT* ShaderBasedRenderer::createRTT(size_t width, size_t height)
+{
+    RTT* rtts = new RTT(width, height);
     std::vector<GLuint> prefilled_textures =
-        createVector<GLuint>(m_rtts->getRenderTarget(RTT_DIFFUSE),
-                             m_rtts->getRenderTarget(RTT_SPECULAR),
-                             m_rtts->getRenderTarget(RTT_HALF1_R),
-                             m_rtts->getDepthStencilTexture());
-    m_geometry_passes->setFirstPassRenderTargets(prefilled_textures);    
-} //setRTTDimensions
+        createVector<GLuint>(rtts->getRenderTarget(RTT_DIFFUSE),
+                             rtts->getRenderTarget(RTT_SPECULAR),
+                             rtts->getRenderTarget(RTT_HALF1_R),
+                             rtts->getDepthStencilTexture());
+    m_geometry_passes->setFirstPassRenderTargets(prefilled_textures);
+    return rtts;
+
+} //createRTT
 
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::compressPowerUpTextures()
@@ -419,7 +401,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         glClear(GL_COLOR_BUFFER_BIT);
         glDepthMask(GL_FALSE);
     }
-    
+
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
     m_geometry_passes->renderSolidSecondPass(m_draw_calls);
@@ -711,8 +693,9 @@ void ShaderBasedRenderer::onLoadWorld()
     const core::recti &viewport = Camera::getCamera(0)->getViewport();
     size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
     size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
-    setRTTDimensions(width, height);
-    
+    RTT* rtts = createRTT(width, height);
+    setRTT(rtts);
+
     compressPowerUpTextures();
 }
 
@@ -960,29 +943,26 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
 {
     resetObjectCount();
     resetPolyCount();
-    
-    irr::core::dimension2du texture_size = render_target->getTextureSize();
-    
-    size_t width  = texture_size.Width ;
-    size_t height = texture_size.Height;
-    
-    setRTTDimensions(width, height);
-    
+    assert(m_rtts != NULL);
+
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
-    computeMatrixesAndCameras(camera, width, height);
+    computeMatrixesAndCameras(camera, m_rtts->getWidth(), m_rtts->getHeight());
     updateLightsInfo(camera, dt);
-    if(CVS->isARBUniformBufferObjectUsable())
+    if (CVS->isARBUniformBufferObjectUsable())
         uploadLightingData();
-    
+
     renderScene(camera, dt, false, true);
-    m_post_processing->render(camera, false, m_rtts, render_target);    
+    render_target->setFrameBuffer(m_post_processing
+        ->render(camera, false, m_rtts));
 
     // reset
     glViewport(0, 0,
         irr_driver->getActualScreenSize().Width,
         irr_driver->getActualScreenSize().Height);
+    m_rtts = NULL;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     irr_driver->getSceneManager()->setActiveCamera(NULL);
+
 } //renderToTexture
