@@ -45,18 +45,24 @@
 extern std::vector<float> BoundingBoxes; //TODO: replace global variable by something cleaner
 
 // ----------------------------------------------------------------------------
-RTT* ShaderBasedRenderer::createRTT(size_t width, size_t height)
+void ShaderBasedRenderer::setRTT(RTT* rtts)
 {
-    RTT* rtts = new RTT(width, height);
-    std::vector<GLuint> prefilled_textures =
-        createVector<GLuint>(rtts->getRenderTarget(RTT_DIFFUSE),
-                             rtts->getRenderTarget(RTT_SPECULAR),
-                             rtts->getRenderTarget(RTT_HALF1_R),
-                             rtts->getDepthStencilTexture());
-    m_geometry_passes->setFirstPassRenderTargets(prefilled_textures);
-    return rtts;
-
-} //createRTT
+    if (m_rtts != rtts && rtts != NULL)
+    {
+        // Update prefilled textures if new RTT is used
+        std::vector<GLuint> prefilled_textures =
+            createVector<GLuint>(rtts->getRenderTarget(RTT_DIFFUSE),
+                                 rtts->getRenderTarget(RTT_SPECULAR),
+                                 rtts->getRenderTarget(RTT_HALF1_R),
+                                 rtts->getDepthStencilTexture());
+        m_geometry_passes->setFirstPassRenderTargets(prefilled_textures);
+        m_rtts = rtts;
+    }
+    else if (rtts == NULL)
+    {
+        m_rtts = NULL;
+    }
+} //setRTT
 
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::compressPowerUpTextures()
@@ -693,7 +699,7 @@ void ShaderBasedRenderer::onLoadWorld()
     const core::recti &viewport = Camera::getCamera(0)->getViewport();
     size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
     size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
-    RTT* rtts = createRTT(width, height);
+    RTT* rtts = new RTT(width, height);
     setRTT(rtts);
 
     compressPowerUpTextures();
@@ -960,7 +966,7 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     glViewport(0, 0,
         irr_driver->getActualScreenSize().Width,
         irr_driver->getActualScreenSize().Height);
-    m_rtts = NULL;
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     irr_driver->getSceneManager()->setActiveCamera(NULL);

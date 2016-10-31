@@ -122,13 +122,7 @@ public:
                          irr::scene::ICameraSceneNode* camera,
                          float dt);
 
-    RTT* createRTT(size_t width, size_t height);
-
-    void setRTT(RTT* rtts)
-    {
-        assert(m_rtts == NULL);
-        m_rtts = rtts;
-    }
+    void setRTT(RTT* rtts);
 
 };
 

@@ -106,7 +106,7 @@ GL3RenderTarget::GL3RenderTarget(const irr::core::dimension2du &dimension,
                                  ShaderBasedRenderer *renderer)
                : m_renderer(renderer), m_name(name)
 {
-    m_rtts = m_renderer->createRTT(dimension.Width, dimension.Height);
+    m_rtts = new RTT(dimension.Width, dimension.Height);
     m_frame_buffer = NULL;
 }   // GL3RenderTarget
 
@@ -115,6 +115,7 @@ GL3RenderTarget::GL3RenderTarget(const irr::core::dimension2du &dimension,
 GL3RenderTarget::~GL3RenderTarget()
 {
     delete m_rtts;
+    m_renderer->setRTT(NULL);
 }   // ~GL3RenderTarget
 
 //-----------------------------------------------------------------------------
