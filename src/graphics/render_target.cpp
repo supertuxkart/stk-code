@@ -50,6 +50,7 @@ GL1RenderTarget::~GL1RenderTarget()
 //-----------------------------------------------------------------------------
 irr::core::dimension2du GL1RenderTarget::getTextureSize() const
 {
+    if (m_render_target_texture == NULL) return irr::core::dimension2du(0, 0);
     return m_render_target_texture->getSize();
 }
 
@@ -91,7 +92,8 @@ void GL1RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
                                   const irr::core::rect<s32>* clip_rect,
                                   const irr::video::SColor &colors,
                                   bool use_alpha_channel_of_texture) const
-{    
+{
+    if (m_render_target_texture == NULL) return;
     irr::core::rect<s32> source_rect(irr::core::position2di(0, 0),
                                       m_render_target_texture->getSize());
     ::draw2DImage(m_render_target_texture, dest_rect, source_rect,
