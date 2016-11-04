@@ -36,7 +36,7 @@ private:
     // ------------------------------------------------------------------------
     virtual unsigned int getScalingFactorTwo() const OVERRIDE   { return 120; }
     // ------------------------------------------------------------------------
-    virtual bool isBold() const                                { return true; }
+    virtual bool isBold() const OVERRIDE                       { return true; }
     // ------------------------------------------------------------------------
     virtual int shapeOutline(FT_Outline* outline) const OVERRIDE;
 

@@ -693,7 +693,7 @@ void World::resetAllKarts()
         if ((*i)->isGhostKart()) continue;
         Vec3 xyz = (*i)->getXYZ();
         //start projection from top of kart
-        Vec3 up_offset(0, 0.5f * ((*i)->getKartHeight()), 0);
+        Vec3 up_offset = (*i)->getNormal() * (0.5f * ((*i)->getKartHeight()));
         (*i)->setXYZ(xyz+up_offset);
 
         bool kart_over_ground = m_track->findGround(*i);
