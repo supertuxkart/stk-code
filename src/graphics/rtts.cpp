@@ -16,13 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/rtts.hpp"
-#include "central_settings.hpp"
+
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/post_processing.hpp"
 #include "utils/log.hpp"
-#include <ISceneManager.h>
 
 static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type, unsigned mipmaplevel = 1)
 {

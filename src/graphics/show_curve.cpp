@@ -18,8 +18,8 @@
 
 #include "graphics/show_curve.hpp"
 
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/texture_manager.hpp"
 #include "utils/vec3.hpp"
 
 #include <IMeshSceneNode.h>

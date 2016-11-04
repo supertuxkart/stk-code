@@ -17,21 +17,16 @@
 
 #include "graphics/stk_mesh_scene_node.hpp"
 
-#include "config/user_config.hpp"
-#include "graphics/callbacks.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/camera.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/stk_mesh.hpp"
+#include "graphics/texture_manager.hpp"
+#include "graphics/vao_manager.hpp"
 #include "tracks/track.hpp"
 #include "modes/world.hpp"
-#include "utils/cpp2011.hpp"
-#include "utils/helpers.hpp"
-#include "utils/tuple.hpp"
 
 #include <IMaterialRenderer.h>
 #include <ISceneManager.h>

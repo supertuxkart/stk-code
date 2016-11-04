@@ -18,6 +18,7 @@
 #include "graphics/lighting_passes.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/post_processing.hpp"

@@ -22,8 +22,8 @@
 #include "karts/controller/skidding_ai.hpp"
 
 #ifdef AI_DEBUG
-#  include "graphics/glwrap.hpp"
 #  include "graphics/irr_driver.hpp"
+#  include "graphics/texture_manager.hpp"
 #endif
 #include "graphics/show_curve.hpp"
 #include "graphics/slip_stream.hpp"

@@ -18,8 +18,7 @@
 #include "graphics/render_target.hpp"
 
 #include "graphics/2dutils.hpp"
-#include "graphics/central_settings.hpp"
-#include "graphics/graphics_restrictions.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shader_based_renderer.hpp"
 

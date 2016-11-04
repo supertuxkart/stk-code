@@ -21,7 +21,6 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/post_processing.hpp"
 #include "graphics/render_target.hpp"
 
 #include <IAnimatedMesh.h>
@@ -108,7 +107,7 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
     m_model_scale.push_back(scale);
     m_model_frames.push_back(frame);
     m_model_render_info_affected.push_back(all_parts_colorized);
-    
+
     if (!CVS->isGLSL())
         m_render_target = NULL;
 }
@@ -256,8 +255,8 @@ void ModelViewWidget::setupRTTScene()
     irr_driver->setAmbientLight(video::SColor(255, 35, 35, 35));
 
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
-    
-    if(!CVS->isGLSL())
+
+    if (!CVS->isGLSL())
     {
         scene::ILightSceneNode* light = irr_driver->getSceneManager()
             ->addLightSceneNode(NULL, spot_pos, video::SColorf(1.0f,1.0f,1.0f),
@@ -266,7 +265,9 @@ void ModelViewWidget::setupRTTScene()
         light->setRotation((core::vector3df(0, 10, 0) - spot_pos).getHorizontalAngle());
         light->updateAbsolutePosition();
         m_light = light;
-    } else {
+    }
+    else
+    {
         m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
     }
 
@@ -327,7 +328,7 @@ void ModelViewWidget::elementRemoved()
 
 void ModelViewWidget::clearRttProvider()
 {
-    m_render_target = NULL;;
+    m_render_target = NULL;
 }
 
 void ModelViewWidget::drawRTTScene(const irr::core::rect<s32>& dest_rect) const
@@ -335,4 +336,3 @@ void ModelViewWidget::drawRTTScene(const irr::core::rect<s32>& dest_rect) const
     if(m_render_target != NULL)
         m_render_target->draw2DImage(dest_rect, NULL, video::SColor(255, 255, 255, 255), true);
 }
-

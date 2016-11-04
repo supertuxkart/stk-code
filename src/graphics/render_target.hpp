@@ -18,12 +18,12 @@
 #ifndef HEADER_RENDER_TARGET_HPP
 #define HEADER_RENDER_TARGET_HPP
 
-#include "graphics/glwrap.hpp"
 #include <irrlicht.h>
 #include <string>
 
-class ShaderBasedRenderer;
+class FrameBuffer;
 class RTT;
+class ShaderBasedRenderer;
 
 class RenderTarget
 {
@@ -33,8 +33,8 @@ public:
     virtual irr::core::dimension2du  getTextureSize()          const = 0;
 
     virtual void renderToTexture(irr::scene::ICameraSceneNode* camera, float dt) = 0;
-    virtual void draw2DImage(const irr::core::rect<s32>& dest_rect,
-                             const irr::core::rect<s32>* clip_rect,
+    virtual void draw2DImage(const irr::core::rect<irr::s32>& dest_rect,
+                             const irr::core::rect<irr::s32>* clip_rect,
                              const irr::video::SColor &colors,
                              bool use_alpha_channel_of_texture) const = 0;    
 };
@@ -45,24 +45,23 @@ private:
     /** A pointer to texture on which a scene is rendered. Only used
      *  in between beginRenderToTexture() and endRenderToTexture calls. */
     irr::video::ITexture            *m_render_target_texture;
-    
+
     /** Main node of the RTT scene */
     irr::scene::ISceneNode          *m_rtt_main_node;
-    
+
 public:
     GL1RenderTarget(const irr::core::dimension2du &dimension,
                     const std::string &name);
     ~GL1RenderTarget();
-                    
-    
+
     irr::core::dimension2du getTextureSize() const;
-    
+
     void renderToTexture(irr::scene::ICameraSceneNode* camera, float dt);
-    void draw2DImage(const irr::core::rect<s32>& dest_rect,
-                     const irr::core::rect<s32>* clip_rect,
+    void draw2DImage(const irr::core::rect<irr::s32>& dest_rect,
+                     const irr::core::rect<irr::s32>* clip_rect,
                      const irr::video::SColor &colors,
                      bool use_alpha_channel_of_texture) const;
-    
+
 };
 
 class GL3RenderTarget: public RenderTarget
@@ -78,8 +77,8 @@ public:
                     const std::string &name,
                     ShaderBasedRenderer *renderer);
     ~GL3RenderTarget();
-    void draw2DImage(const irr::core::rect<s32>& dest_rect,
-                     const irr::core::rect<s32>* clip_rect,
+    void draw2DImage(const irr::core::rect<irr::s32>& dest_rect,
+                     const irr::core::rect<irr::s32>* clip_rect,
                      const irr::video::SColor &colors,
                      bool use_alpha_channel_of_texture) const;
     irr::core::dimension2du getTextureSize() const;

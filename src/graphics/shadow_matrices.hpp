@@ -19,13 +19,12 @@
 #ifndef HEADER_SHADOW_MATRICES_HPP
 #define HEADER_SHADOW_MATRICES_HPP
 
-#include "graphics/glwrap.hpp"
+#include "graphics/gl_headers.hpp"
 
-#include "matrix4.h"
-#include "vector3d.h"
-
+#include <matrix4.h>
 #include <tuple>
 #include <vector>
+#include <vector3d.h>
 
 namespace irr
 {
@@ -34,6 +33,7 @@ namespace irr
 
 using namespace irr;
 
+class FrameBuffer;
 class PostProcessing;
 
 class ShadowMatrices
@@ -103,7 +103,6 @@ public:
     {
         return m_shadow_scales;
     }
-    // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
 
 };   // class ShadowMatrices

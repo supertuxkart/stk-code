@@ -18,16 +18,12 @@
 
 #include "tracks/graph.hpp"
 
-#include <ICameraSceneNode.h>
-#include <IMesh.h>
-#include <IMeshSceneNode.h>
-#include <ISceneManager.h>
-
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/render_target.hpp"
+#include "graphics/texture_manager.hpp"
+#include "graphics/vao_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "tracks/arena_node_3d.hpp"
 #include "tracks/drive_node_2d.hpp"

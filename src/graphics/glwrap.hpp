@@ -20,13 +20,12 @@
 
 #include "graphics/gl_headers.hpp"
 
-#include "graphics/irr_driver.hpp"
-#include "graphics/texture_manager.hpp"
-#include "graphics/vao_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#include <irrlicht.h>
 #include <vector>
 
 namespace HardwareStats
@@ -35,7 +34,6 @@ namespace HardwareStats
 }
 
 void initGL();
-video::ITexture* getUnicolorTexture(const video::SColor &c);
 
 class GPUTimer;
 

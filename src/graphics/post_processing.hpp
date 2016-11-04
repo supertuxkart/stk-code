@@ -18,20 +18,22 @@
 #ifndef HEADER_POST_PROCESSING_HPP
 #define HEADER_POST_PROCESSING_HPP
 
-#include "IShaderConstantSetCallBack.h"
-#include "S3DVertex.h"
-#include "SMaterial.h"
-#include "graphics/camera.hpp"
-#include "graphics/glwrap.hpp"
+#include "graphics/gl_headers.hpp"
 
-class RTT;
-
+#include <IReferenceCounted.h>
+#include <S3DVertex.h>
+#include <SMaterial.h>
 #include <vector>
+
+class FrameBuffer;
+class RTT;
 
 namespace irr
 {
     namespace video { class IVideoDriver;   class ITexture; }
+    namespace scene { class ICameraSceneNode; }
 }
+
 using namespace irr;
 
 /** \brief   Handles post processing, eg motion blur

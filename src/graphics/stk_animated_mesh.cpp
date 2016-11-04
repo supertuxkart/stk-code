@@ -15,19 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/glwrap.hpp"
+#include "graphics/stk_animated_mesh.hpp"
 
-#include "config/user_config.hpp"
-#include "central_settings.hpp"
-#include "graphics/camera.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
-#include "graphics/stk_animated_mesh.hpp"
-#include "modes/world.hpp"
-#include "tracks/track.hpp"
-#include "utils/profiler.hpp"
-#include "utils/cpp2011.hpp"
+#include "graphics/stk_mesh.hpp"
+#include "graphics/vao_manager.hpp"
 
 #include <IMaterialRenderer.h>
 #include <ISceneManager.h>

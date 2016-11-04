@@ -18,11 +18,14 @@
 #ifndef HEADER_LIGHTING_PASSES_HPP
 #define HEADER_LIGHTING_PASSES_HPP
 
-#include "graphics/glwrap.hpp"
+#include "graphics/gl_headers.hpp"
 #include <irrlicht.h>
 
+class FrameBuffer;
 class PostProcessing;
 class ShadowMatrices;
+
+using namespace irr;
 
 class LightingPasses
 {

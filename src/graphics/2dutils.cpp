@@ -15,14 +15,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "2dutils.hpp"
+#include "graphics/2dutils.hpp"
 
 #include "graphics/central_settings.hpp"
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/texture_manager.hpp"
 #include "graphics/texture_shader.hpp"
-#include "glwrap.hpp"
 #include "utils/cpp2011.hpp"
 
 #if defined(USE_GLES2)

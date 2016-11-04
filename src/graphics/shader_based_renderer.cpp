@@ -18,6 +18,7 @@
 #include "graphics/shader_based_renderer.hpp"
 
 #include "config/user_config.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/draw_policies.hpp"
 #include "graphics/geometry_passes.hpp"

@@ -18,7 +18,6 @@
 #include "graphics/geometry_passes.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/draw_tools.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/materials.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"

@@ -33,7 +33,6 @@
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
-#include "graphics/glwrap.hpp"
 
 using namespace GUIEngine;
 using namespace irr;
