@@ -23,6 +23,7 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocols/connect_to_server.hpp"
+#include "network/stk_host.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -115,7 +116,10 @@ void GetPublicAddress::createStunRequest()
     m_stun_server_ip = ntohl(current_interface->sin_addr.s_addr);
 
     // Create a new socket for the stun server.
-    m_transaction_host = new Network(1, 1, 0, 0);
+    ENetAddress addr;
+    addr.host = STKHost::HOST_ANY;
+    addr.port = STKHost::PORT_ANY;
+    m_transaction_host = new Network(1, 1, 0, 0, &addr);
 
     // Assemble the message for the stun server
     BareNetworkString s(20);

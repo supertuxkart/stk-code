@@ -54,7 +54,7 @@ public:
               Network(int peer_count, int channel_limit,
                       uint32_t max_incoming_bandwidth,
                       uint32_t max_outgoing_bandwidth,
-                      ENetAddress* address = NULL);
+                      ENetAddress* address);
     virtual  ~Network();
 
     static void openLog();
