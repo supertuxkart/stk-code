@@ -22,6 +22,7 @@
 #include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "network/stk_host.hpp"
 #include "online/xml_request.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
@@ -150,7 +151,10 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
         // --------------------------------------------------------------------
         virtual void operation() OVERRIDE
         {
-            Network *broadcast = new Network(1, 1, 0, 0);
+            ENetAddress addr;
+            addr.host = STKHost::HOST_ANY;
+            addr.port = STKHost::PORT_ANY;
+            Network *broadcast = new Network(1, 1, 0, 0, &addr);
 
             BareNetworkString s(std::string("stk-server"));
             TransportAddress broadcast_address(-1, 
