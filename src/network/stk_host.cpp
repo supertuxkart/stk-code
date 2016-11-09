@@ -47,7 +47,7 @@
 #include <signal.h>
 
 STKHost *STKHost::m_stk_host       = NULL;
-bool     STKHost::m_enable_console = true;
+bool     STKHost::m_enable_console = false;
 
 void STKHost::create()
 {
@@ -323,6 +323,7 @@ void STKHost::init()
     ProtocolManager::getInstance<ProtocolManager>();
 
     // Optional: start the network console
+    m_network_console = NULL;
     if(m_enable_console)
     {
         m_network_console = new NetworkConsole();
