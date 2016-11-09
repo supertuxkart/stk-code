@@ -86,7 +86,8 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
 #ifdef _IRR_COMPILE_WITH_X11_
 	display(0), visual(0), screennr(0), window(0), StdHints(0), SoftwareImage(0),
-	XInputMethod(0), XInputContext(0), numlock_mask(0),
+	XInputMethod(0), XInputContext(0), m_font_set(0), numlock_mask(0),
+	m_ime_enabled(false),
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 	glxWin(0),
 	Context(0),
@@ -139,8 +140,12 @@ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
 		return;
 
 #ifdef _IRR_COMPILE_WITH_X11_
+	m_ime_position.x = 0;
+	m_ime_position.y = 0;
 	createInputContext();
 	numlock_mask = getNumlockMask(display);
+	// Get maximum 16 characters from input method
+	m_ime_char_holder.reallocate(16);
 #endif
 
 	createGUIAndScene();
@@ -1183,12 +1188,15 @@ void CIrrDeviceLinux::createDriver()
 #ifdef _IRR_COMPILE_WITH_X11_
 bool CIrrDeviceLinux::createInputContext()
 {
+	if (!display)
+		return false;
+
 	// One one side it would be nicer to let users do that - on the other hand
 	// not setting the environment locale will not work when using i18n X11 functions.
 	// So users would have to call it always or their input is broken badly.
 	// We can restore immediately - so won't mess with anything in users apps.
 	core::stringc oldLocale(setlocale(LC_CTYPE, NULL));
-	setlocale(LC_CTYPE, "");	// use environment locale
+	setlocale(LC_CTYPE, "");        // use environment locale
 
 	if ( !XSupportsLocale() )
 	{
@@ -1197,31 +1205,56 @@ bool CIrrDeviceLinux::createInputContext()
 		return false;
 	}
 
-	XInputMethod = XOpenIM(display, NULL, NULL, NULL);
-	if ( !XInputMethod )
+	char* p = XSetLocaleModifiers("");
+	if (p == NULL)
 	{
+		os::Printer::log("Could not set locale modifiers. Falling back to non-i18n input.", ELL_WARNING);
 		setlocale(LC_CTYPE, oldLocale.c_str());
-		os::Printer::log("XOpenIM failed to create an input method. Falling back to non-i18n input.", ELL_WARNING);
 		return false;
 	}
 
-	XIMStyles *im_supported_styles;
-	XGetIMValues(XInputMethod, XNQueryInputStyle, &im_supported_styles, (char*)NULL);
-	XIMStyle bestStyle = 0;
-	// TODO: If we want to support languages like chinese or japanese as well we probably have to work with callbacks here.
-	XIMStyle supportedStyle = XIMPreeditNone | XIMStatusNone;
-	for (int i=0; i < im_supported_styles->count_styles; ++i)
+	XInputMethod = XOpenIM(display, NULL, NULL, NULL);
+	if ( !XInputMethod )
 	{
-		XIMStyle style = im_supported_styles->supported_styles[i];
-		if ((style & supportedStyle) == style) /* if we can handle it */
+		os::Printer::log("XOpenIM failed to create an input method. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	XIMStyles *im_supported_styles = NULL;
+	XGetIMValues(XInputMethod, XNQueryInputStyle, &im_supported_styles, (void*)NULL);
+	if (!im_supported_styles)
+	{
+		os::Printer::log("XGetIMValues failed to get supported styles. Falling back to non-i18n input.", ELL_WARNING);
+		setlocale(LC_CTYPE, oldLocale.c_str());
+		return false;
+	}
+
+	// Only OverTheSpot and Root pre-edit type are implemented for now
+	core::array<unsigned long> supported_style;
+	//supported_style.push_back(XIMPreeditPosition | XIMStatusNothing);
+	supported_style.push_back(XIMPreeditNothing | XIMStatusNothing);
+	XIMStyle best_style = 0;
+	bool found = false;
+	int supported_style_start = -1;
+
+	while (!found && supported_style_start < (int)supported_style.size())
+	{
+		supported_style_start++;
+		for (int i = 0; i < im_supported_styles->count_styles; i++)
 		{
-			bestStyle = style;
-			break;
+			XIMStyle cur_style = im_supported_styles->supported_styles[i];
+			if (cur_style == supported_style[supported_style_start])
+			{
+				best_style = cur_style;
+				found = true;
+				break;
+			}
 		}
 	}
 	XFree(im_supported_styles);
 
-	if ( !bestStyle )
+	if (!found)
 	{
 		XDestroyIC(XInputContext);
 		XInputContext = 0;
@@ -1231,18 +1264,53 @@ bool CIrrDeviceLinux::createInputContext()
 		return false;
 	}
 
-	XInputContext = XCreateIC(XInputMethod,
-							XNInputStyle, bestStyle,
-							XNClientWindow, window,
-							(char*)NULL);
+	// Only use root preedit type for now
+	/*if (best_style != (XIMPreeditNothing | XIMStatusNothing))
+	{
+		char **list = NULL;
+		int count = 0;
+		m_font_set = XCreateFontSet(display, "fixed", &list, &count, NULL);
+		if (!m_font_set)
+		{
+			os::Printer::log("XInputContext failed to create font set. Falling back to non-i18n input.", ELL_WARNING);
+			setlocale(LC_CTYPE, oldLocale.c_str());
+			return false;
+		}
+		if (count > 0)
+		{
+			XFreeStringList(list);
+		}
+
+		XPoint spot = {0, 0};
+		XVaNestedList p_list = XVaCreateNestedList(0, XNSpotLocation, &spot,
+												XNFontSet, m_font_set, (void*)NULL);
+		XInputContext = XCreateIC(XInputMethod,
+								XNInputStyle, best_style,
+								XNClientWindow, window,
+								XNFocusWindow, window,
+								XNPreeditAttributes, p_list,
+								(void*)NULL);
+		XFree(p_list);
+	}
+	else*/
+	{
+		XInputContext = XCreateIC(XInputMethod,
+								XNInputStyle, best_style,
+								XNClientWindow, window,
+								XNFocusWindow, window,
+								(void*)NULL);
+	}
+
 	if (!XInputContext )
 	{
 		os::Printer::log("XInputContext failed to create an input context. Falling back to non-i18n input.", ELL_WARNING);
 		setlocale(LC_CTYPE, oldLocale.c_str());
 		return false;
 	}
+
 	XSetICFocus(XInputContext);
 	setlocale(LC_CTYPE, oldLocale.c_str());
+	XFree(p);
 	return true;
 }
 
@@ -1259,6 +1327,34 @@ void CIrrDeviceLinux::destroyInputContext()
 		XCloseIM(XInputMethod);
 		XInputMethod = 0;
 	}
+	if (display && m_font_set)
+	{
+		XFreeFontSet(display, m_font_set);
+		m_font_set = 0;
+	}
+}
+
+void CIrrDeviceLinux::setIMELocation(const irr::core::position2di& pos)
+{
+	if (!XInputContext || !m_ime_enabled) return;
+	m_ime_position.x = pos.X;
+	m_ime_position.y = pos.Y;
+	updateIMELocation();
+}
+
+void CIrrDeviceLinux::updateIMELocation()
+{
+	if (!XInputContext || !m_ime_enabled) return;
+	XVaNestedList list;
+	list = XVaCreateNestedList(0, XNSpotLocation, &m_ime_position, (void*)NULL);
+	XSetICValues(XInputContext, XNPreeditAttributes, list, (void*)NULL);
+	XFree(list);
+}
+
+void CIrrDeviceLinux::setIMEEnable(bool enable)
+{
+	if (!XInputContext) return;
+	m_ime_enabled = enable;
 }
 
 int CIrrDeviceLinux::getNumlockMask(Display* display)
@@ -1361,12 +1457,30 @@ bool CIrrDeviceLinux::run()
 
 		while (XPending(display) > 0 && !Close)
 		{
+			if (!m_ime_char_holder.empty())
+			{
+				irrevent.KeyInput.Char = m_ime_char_holder[0];
+				irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
+				irrevent.KeyInput.PressedDown = true;
+				irrevent.KeyInput.Control = false;
+				irrevent.KeyInput.Shift = false;
+				irrevent.KeyInput.Key = (irr::EKEY_CODE)0;
+				postEventFromUser(irrevent);
+				m_ime_char_holder.erase(0);
+				continue;
+			}
+
 			XEvent event;
 			XNextEvent(display, &event);
-
+			if (m_ime_enabled && XFilterEvent(&event, None))
+			{
+				updateIMELocation();
+				continue;
+			}
 			switch (event.type)
 			{
 			case ConfigureNotify:
+				updateIMELocation();
 				// check for changed window size
 				if ((event.xconfigure.width != (int) Width) ||
 					(event.xconfigure.height != (int) Height))
@@ -1539,9 +1653,8 @@ bool CIrrDeviceLinux::run()
 					SKeyMap mp;
 					if ( XInputContext )
 					{
-						wchar_t buf[8]={0};
 						Status status;
-						int strLen = XwcLookupString(XInputContext, &event.xkey, buf, sizeof(buf), &mp.X11Key, &status);
+						int strLen = XwcLookupString(XInputContext, &event.xkey, m_ime_char_holder.pointer(), 16 * sizeof(wchar_t), &mp.X11Key, &status);
 						if ( status == XBufferOverflow )
 						{
 							os::Printer::log("XwcLookupString needs a larger buffer", ELL_INFORMATION);
@@ -1549,8 +1662,14 @@ bool CIrrDeviceLinux::run()
 						if ( strLen > 0 && (status == XLookupChars || status == XLookupBoth) )
 						{
 							if ( strLen > 1 )
-								os::Printer::log("Additional returned characters dropped", ELL_INFORMATION);
-							irrevent.KeyInput.Char = buf[0];
+							{
+								m_ime_char_holder.set_used(strLen > 16 ? 16 : strLen);
+								continue;
+							}
+							else
+							{
+								irrevent.KeyInput.Char = m_ime_char_holder[0];
+							}
 						}
 						else
 						{
@@ -1563,7 +1682,7 @@ bool CIrrDeviceLinux::run()
 						{
 							char buf[8];
 							wchar_t wbuf[2];
-						} tmp = {0};
+						} tmp = {{0}};
 						XLookupString(&event.xkey, tmp.buf, sizeof(tmp.buf), &mp.X11Key, NULL);
 						irrevent.KeyInput.Char = tmp.wbuf[0];
 					}
