@@ -125,9 +125,10 @@ void ConnectToPeer::asynchronousUpdate()
             // the Ping protocol to keep the port available. We can't rely on
             // STKHost::isLAN(), since we might get a LAN connection even if
             // the server itself accepts connections from anywhere.
-            if (!m_is_lan &&
-                m_peer_address.getIP() != NetworkConfig::get()
-                ->getMyAddress().getIP())
+            if ( (!m_is_lan &&
+                  m_peer_address.getIP() !=
+                      NetworkConfig::get()->getMyAddress().getIP() ) || 
+                  NetworkConfig::m_disable_lan                            )
             {
                 m_current_protocol = new PingProtocol(m_peer_address,
                                                       /*time-between-ping*/2.0);
