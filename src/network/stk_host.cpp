@@ -184,7 +184,7 @@ void STKHost::create()
  *  This triggers the creation of the kart selection screen in 
  *  CLR::startSelection / CLR::update for all clients. The clients create
  *  the ActivePlayer object (which stores which device is used by which
- *  plauyer).  The kart selection in a client calls
+ *  player).  The kart selection in a client calls
  *  (NetworkKartSelection::playerConfirm) which calls CLR::requestKartSelection.
  *  This sends a message to SLR::kartSelectionRequested, which verifies the
  *  selected kart and sends this information to all clients (including the
@@ -219,7 +219,7 @@ void STKHost::create()
  *  NULL ActivePlayer (the ActivePlayer is only used for assigning the input
  *  device to each kart, achievements and highscores, so it's not needed for
  *  remote players). It will also start the SynchronizationProtocol.
- *  The StartGameProtocol has a callback ready which is called from world
+ *  The StartGameProtocol has a callback ready() which is called from world
  *  when the world is loaded (i.e. track and all karts are ready). When
  *  this callback is invoked, each client will send a 'ready' message to
  *  the server's StartGameProtocol. Once the server has received all
@@ -228,7 +228,7 @@ void STKHost::create()
  *  sending regular (once per second) pings to the clients and measure
  *  the averate latency. Upon starting the countdown this information
  *  is included in the ping request, so the clients can start the countdown
- *  at that stage as wellk.
+ *  at that stage as well.
  * 
  *  Once the countdown is 0 (or below), the Synchronization Protocol will
  *  start the protocols: KartUpdateProtocol, ControllerEventsProtocol,
