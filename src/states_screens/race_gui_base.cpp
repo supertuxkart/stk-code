@@ -693,9 +693,16 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     const unsigned int kart_amount = world->getNumKarts() - sta;
 
     //where is the limit to hide last icons
-    int y_icons_limit=irr_driver->getActualScreenSize().Height-bottom_margin-ICON_PLAYER_WIDTH;
+    int y_icons_limit = irr_driver->getActualScreenSize().Height - 
+                                            bottom_margin - ICON_PLAYER_WIDTH;
     if (race_manager->getNumLocalPlayers() == 3)
-        y_icons_limit=irr_driver->getActualScreenSize().Height-ICON_WIDTH;
+    {
+        y_icons_limit = irr_driver->getActualScreenSize().Height - ICON_WIDTH;
+    }
+    else if (UserConfigParams::m_multitouch_enabled)
+    {
+        y_icons_limit = irr_driver->getActualScreenSize().Height / 2;
+    }
 
     world->getKartsDisplayInfo(&m_kart_display_infos);
 

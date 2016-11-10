@@ -389,6 +389,28 @@ namespace UserConfigParams
             &m_wiimote_group,
             "A weight applied to the sin component of mapping wiimote angle to steering angle"));
 
+    // ---- Multitouch device
+    PARAM_PREFIX GroupUserConfigParam        m_multitouch_group
+        PARAM_DEFAULT( GroupUserConfigParam("Multitouch",
+                                            "Settings for the multitouch device") );
+
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_enabled
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_enabled",
+            &m_multitouch_group,
+            "Enable multitouch support.") );
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_center
+            PARAM_DEFAULT( FloatUserConfigParam(0.15f, "multitouch_deadzone_center",
+            &m_multitouch_group,
+            "A parameter in range [0, 0.5] that determines the zone that is "
+            "considered as centered in steering button."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone_edge
+            PARAM_DEFAULT( FloatUserConfigParam(0.15f, "multitouch_deadzone_edge",
+            &m_multitouch_group,
+            "A parameter in range [0, 0.5] that determines the zone that is "
+            "considered as max value in steering button."));
+
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
             PARAM_DEFAULT( GroupUserConfigParam("GpStartOrder",

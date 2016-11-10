@@ -35,10 +35,13 @@ using namespace irr;
 #include "io/file_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
+#include "input/device_manager.hpp"
+#include "input/multitouch_device.hpp"
 #include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -83,6 +86,11 @@ RaceGUI::RaceGUI()
     {
         m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
     }
+    else if (UserConfigParams::m_multitouch_enabled)
+    {
+        m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
+        m_map_bottom = irr_driver->getActualScreenSize().Height * 0.55f;
+    }
 
     m_is_tutorial = (race_manager->getTrackName() == "tutorial");
 
@@ -104,11 +112,22 @@ RaceGUI::RaceGUI()
     else
         m_lap_width = font->getDimension(L"9/9").Width;
 
+    if (UserConfigParams::m_multitouch_enabled)
+    {
+        initMultitouchSteering();
+    }
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
+    MultitouchDevice* device = input_manager->getDeviceManager()->
+                                                        getMultitouchDevice();
+
+    if (device != NULL)
+    {
+        device->clearButtons();
+    }
 }   // ~Racegui
 
 
@@ -216,10 +235,19 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
     drawAllMessages(kart, viewport, scaling);
 
+    if (UserConfigParams::m_multitouch_enabled)
+    {
+        drawMultitouchSteering(kart, viewport, scaling);
+    }
+
     if(!World::getWorld()->isRacePhase()) return;
 
-    drawPowerupIcons   (kart, viewport, scaling);
-    drawSpeedEnergyRank(kart, viewport, scaling, dt);
+    drawPowerupIcons(kart, viewport, scaling);
+
+    if (!UserConfigParams::m_multitouch_enabled)
+    {
+        drawSpeedEnergyRank(kart, viewport, scaling, dt);
+    }
 
     if (!m_is_tutorial)
         drawLap(kart, viewport, scaling);
@@ -878,3 +906,157 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     font->setScale(1.0f);
 
 } // drawLap
+
+//-----------------------------------------------------------------------------
+/** Makes some initializations and determines the look of multitouch steering
+ *  interface
+ */
+void RaceGUI::initMultitouchSteering()
+{
+    MultitouchDevice* device = input_manager->getDeviceManager()->
+                                                        getMultitouchDevice();
+
+    if (device == NULL)
+        return;
+
+    const int w = irr_driver->getActualScreenSize().Width;
+    const int h = irr_driver->getActualScreenSize().Height;
+    const float btn_size = 0.1f * h;
+    const float btn2_size = 0.35f * h;
+    const float margin = 0.1f * h;
+    const float top_margin = 0.3f * h;
+    const float col_size = btn_size + margin;
+    const float small_ratio = 0.6f;
+
+    device->addButton(BUTTON_STEERING,
+                      0.5f * margin, h - 0.5f * margin - btn2_size,
+                      btn2_size, btn2_size);
+    device->addButton(BUTTON_ESCAPE,
+                      top_margin, small_ratio * margin,
+                      small_ratio * btn_size, small_ratio * btn_size);
+    device->addButton(BUTTON_RESCUE,
+                      top_margin + small_ratio * col_size, small_ratio * margin,
+                      small_ratio * btn_size, small_ratio * btn_size);
+    device->addButton(BUTTON_NITRO,
+                      w - 1 * col_size, h - 2 * col_size,
+                      btn_size, btn_size);
+    device->addButton(BUTTON_SKIDDING,
+                      w - 1 * col_size, h - 1 * col_size,
+                      btn_size, btn_size);
+    device->addButton(BUTTON_FIRE,
+                      w - 2 * col_size,  h - 2 * col_size,
+                      btn_size, btn_size);
+    device->addButton(BUTTON_LOOK_BACKWARDS,
+                      w - 2 * col_size, h - 1 * col_size,
+                      btn_size, btn_size);
+
+} // initMultitouchSteering
+
+//-----------------------------------------------------------------------------
+/** Draws the buttons for multitouch steering.
+ *  \param kart The kart for which to show the data.
+ *  \param viewport The viewport to use.
+ *  \param scaling Which scaling to apply to the buttons.
+ */
+void RaceGUI::drawMultitouchSteering(const AbstractKart* kart,
+                                     const core::recti &viewport,
+                                     const core::vector2df &scaling)
+{
+    MultitouchDevice* device = input_manager->getDeviceManager()->
+                                                        getMultitouchDevice();
+
+    if (device == NULL)
+        return;
+
+    for (unsigned int i = 0; i < device->getButtonsCount(); i++)
+    {
+        MultitouchButton* button = device->getButton(i);
+
+        core::rect<s32> pos(button->x, button->y, button->x + button->width,
+                            button->y + button->height);
+
+        if (button->type == MultitouchButtonType::BUTTON_STEERING)
+        {
+            video::ITexture* tex = irr_driver->getTexture(FileManager::GUI,
+                                                          "blue_plus.png");
+            core::rect<s32> coords(core::position2d<s32>(0,0), tex->getSize());
+
+            draw2DImage(tex, pos, coords, NULL, NULL, true);
+
+            float x = (float)(button->x) + (float)(button->width) / 2.0f *
+                                                        (button->axis_x + 1.0f);
+            float y = (float)(button->y) + (float)(button->height) / 2.0f *
+                                                        (button->axis_y + 1.0f);
+            float w = (float)(button->width) / 20.0f;
+            float h = (float)(button->height) / 20.0f;
+
+            core::rect<s32> pos2(round(x - w), round(y - h),
+                                 round(x + w), round(y + h));
+
+            draw2DImage(tex, pos2, coords, NULL, NULL, true);
+        }
+        else
+        {
+            if (button->pressed)
+            {
+                core::rect<s32> pos2(button->x - button->width * 0.2f,
+                                     button->y - button->height * 0.2f,
+                                     button->x + button->width * 1.2f,
+                                     button->y + button->height * 1.2f);
+
+                video::ITexture* tex = irr_driver->getTexture(FileManager::GUI,
+                                                              "icons-frame.png");
+                core::rect<s32> coords(core::position2d<s32>(0,0), tex->getSize());
+
+                draw2DImage(tex, pos2, coords, NULL, NULL, true);
+            }
+
+            video::ITexture* tex;
+
+            if (button->type == MultitouchButtonType::BUTTON_SKIDDING)
+            {
+                tex = irr_driver->getTexture(FileManager::TEXTURE,
+                                             "skid-particle1.png");
+            }
+            else
+            {
+                std::string name = "gui_lock.png";
+
+                switch (button->type)
+                {
+                case MultitouchButtonType::BUTTON_ESCAPE:
+                    name = "back.png";
+                    break;
+                case MultitouchButtonType::BUTTON_FIRE:
+                    name = "banana.png";
+                    break;
+                case MultitouchButtonType::BUTTON_NITRO:
+                    name = "nitro.png";
+                    break;
+                case MultitouchButtonType::BUTTON_LOOK_BACKWARDS:
+                    name = "down.png";
+                    break;
+                case MultitouchButtonType::BUTTON_RESCUE:
+                    name = "restart.png";
+                    break;
+                default:
+                    break;
+                }
+
+                tex = irr_driver->getTexture(FileManager::GUI, name);
+            }
+
+            core::rect<s32> coords(core::position2d<s32>(0,0), tex->getSize());
+            draw2DImage(tex, pos, coords, NULL, NULL, true);
+
+            if (button->type == MultitouchButtonType::BUTTON_NITRO)
+            {
+                float scale = (float)(irr_driver->
+                                        getActualScreenSize().Height) / 1600.0f;
+                drawEnergyMeter(button->x + button->width,
+                                button->y + button->height,
+                                kart, viewport, core::vector2df(scale, scale));
+            }
+        }
+    }
+} // drawMultitouchSteering
