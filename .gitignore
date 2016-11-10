@@ -1,8 +1,7 @@
 bld*/
 build*/
-cmake_build/
 cmake_build*/
-dependencies/
+dependencies*/
 CMakeFiles/
 stk-editor/
 
