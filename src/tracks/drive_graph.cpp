@@ -98,13 +98,13 @@ void DriveGraph::load(const std::string &quad_file_name,
     }
 
     // Each quad is part of the graph exactly once now.
-    for(unsigned int i=0; i<quad->getNumNodes(); i++)
+    for (unsigned int i = 0; i < quad->getNumNodes(); i++)
     {
         const XMLNode *xml_node = quad->getNode(i);
-        if(xml_node->getName()!="quad")
+        if (xml_node->getName() != "quad")
         {
             Log::warn("DriveGraph: Unsupported node type '%s' found in '%s' - ignored.",
-                   xml_node->getName().c_str(), filename.c_str());
+                xml_node->getName().c_str(), filename.c_str());
             continue;
         }
 
@@ -117,12 +117,29 @@ void DriveGraph::load(const std::string &quad_file_name,
         getPoint(xml_node, "p1", &p1);
         getPoint(xml_node, "p2", &p2);
         getPoint(xml_node, "p3", &p3);
-        bool invisible=false;
+        bool invisible = false;
         xml_node->get("invisible", &invisible);
-        bool ai_ignore=false;
+        bool ai_ignore = false;
         xml_node->get("ai-ignore", &ai_ignore);
+
+        bool ignored = false;
+        std::string direction;
+        xml_node->get("direction", &direction);
+        if (direction == "forward" && race_manager->getReverseTrack())
+        {
+            ignored = true;
+            invisible = true;
+            ai_ignore = true;
+        }
+        else if (direction == "reverse" && !race_manager->getReverseTrack())
+        {
+            ignored = true;
+            invisible = true;
+            ai_ignore = true;
+        }
+
         createQuad(p0, p1, p2, p3, m_all_nodes.size(), invisible, ai_ignore,
-                   false/*is_arena*/);
+                   false/*is_arena*/, ignored);
     }
     delete quad;
 
@@ -156,7 +173,7 @@ void DriveGraph::load(const std::string &quad_file_name,
         const XMLNode *xml_node = xml->getNode(node_index);
         // Load the definition of edges between the graph nodes:
         // -----------------------------------------------------
-        if(xml_node->getName()=="node-list")
+        if (xml_node->getName() == "node-list")
         {
             // Each quad is part of the graph exactly once now.
             unsigned int to = 0;
@@ -222,6 +239,8 @@ void DriveGraph::load(const std::string &quad_file_name,
         if(l > m_lap_length)
             m_lap_length = l;
     }
+
+    loadBoundingBoxNodes();
 
 }   // load
 

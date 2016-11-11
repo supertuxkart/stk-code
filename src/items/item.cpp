@@ -43,10 +43,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_distance_2        = 1.2f;
     initItem(type, xyz);
 
-    Vec3 axis = -normal.cross(Vec3(0, 1, 0));
-    if (axis.length() == 0)
-        axis = Vec3(0, 0, 1);
-    m_original_rotation = btQuaternion(axis, normal.angle(Vec3(0, 1, 0)));
+    m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
     m_rotation_angle    = 0.0f;
     m_original_mesh     = mesh;
     m_original_lowmesh  = lowres_mesh;

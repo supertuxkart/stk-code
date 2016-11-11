@@ -59,7 +59,7 @@ void StartGameProtocol::setup()
     // This creates the network world.
     RaceEventManager::getInstance<RaceEventManager>()->start();
 
-    // The number of karts includes the AI karts, which are not supported atn
+    // The number of karts includes the AI karts, which are not supported atm
     race_manager->setNumKarts(m_game_setup->getPlayerCount());
 
     // Set number of global and local players.
@@ -121,6 +121,11 @@ void StartGameProtocol::setup()
 }   // setup
 
 // ----------------------------------------------------------------------------
+/** Handles incoming messages on the server. Should never be called on a 
+ *  client. It counts how many clients are ready, and once all clients
+ *  are ready, will call startRace().
+ *  \param event Details about the received mnessage.
+ */
 bool StartGameProtocol::notifyEventAsynchronous(Event* event)
 {
     if(!checkDataSize(event, 1)) return true;
@@ -157,7 +162,7 @@ void StartGameProtocol::startRace()
                              static_cast<SynchronizationProtocol*>(p);
     if (protocol)
     {
-        protocol->startCountdown(5000); // 5 seconds countdown
+        protocol->startCountdown(5.0f); // 5 seconds countdown
         Log::info("StartGameProtocol",
                   "All players ready, starting countdown.");
         m_ready = true;

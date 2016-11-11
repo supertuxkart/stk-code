@@ -19,11 +19,7 @@
 #include "graphics/water.hpp"
 
 #include "graphics/callbacks.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/material.hpp"
-#include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 
 using namespace video;

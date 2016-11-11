@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "font/bold_face.hpp"
 #include "font/digit_face.hpp"
+#include "font/font_manager.hpp"
 #include "font/regular_face.hpp"
 #include "graphics/camera_debug.hpp"
 #include "graphics/camera_fps.hpp"
@@ -182,12 +183,9 @@ void changeCameraTarget(u32 num)
     {
         AbstractKart* kart = world->getKart(num - 1);
         if (kart == NULL) return;
-        if (kart->isEliminated()) return;
         cam->setMode(Camera::CM_NORMAL);
         cam->setKart(kart);
     }
-    else
-        return;
 
 }   // changeCameraTarget
 

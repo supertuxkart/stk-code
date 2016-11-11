@@ -287,7 +287,7 @@ irr::video::E_VERTEX_TYPE VAOManager::getVertexType(enum VTXTYPE tp)
     }
 }
 
-void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
+void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp, RenderInfo* ri)
 {
     size_t old_vtx_cnt = last_vertex[tp];
     size_t old_idx_cnt = last_index[tp];
@@ -318,26 +318,28 @@ void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, old_idx_cnt * sizeof(u16), mb->getIndexCount() * sizeof(u16), mb->getIndices());
     }
 
-    mappedBaseVertex[tp][mb] = old_vtx_cnt;
-    mappedBaseIndex[tp][mb] = old_idx_cnt * sizeof(u16);
+    std::pair<scene::IMeshBuffer*, RenderInfo*> key(mb, ri);
+    mappedBaseVertex[tp][key] = old_vtx_cnt;
+    mappedBaseIndex[tp][key] = old_idx_cnt * sizeof(u16);
 }
 
-std::pair<unsigned, unsigned> VAOManager::getBase(scene::IMeshBuffer *mb)
+std::pair<unsigned, unsigned> VAOManager::getBase(scene::IMeshBuffer *mb, RenderInfo* ri)
 {
     VTXTYPE tp = getVTXTYPE(mb->getVertexType());
-    if (mappedBaseVertex[tp].find(mb) == mappedBaseVertex[tp].end())
+    std::pair<scene::IMeshBuffer*, RenderInfo*> key(mb, ri);
+    if (mappedBaseVertex[tp].find(key) == mappedBaseVertex[tp].end())
     {
-        assert(mappedBaseIndex[tp].find(mb) == mappedBaseIndex[tp].end());
-        append(mb, tp);
+        assert(mappedBaseIndex[tp].find(key) == mappedBaseIndex[tp].end());
+        append(mb, tp, ri);
         regenerateVAO(tp);
         regenerateInstancedVAO();
     }
 
-    std::unordered_map<scene::IMeshBuffer*, unsigned>::iterator It;
-    It = mappedBaseVertex[tp].find(mb);
+    std::unordered_map<std::pair<scene::IMeshBuffer*, RenderInfo*>, unsigned, MeshRenderInfoHash, MeshRenderInfoEquals>::iterator It;
+    It = mappedBaseVertex[tp].find(key);
     assert(It != mappedBaseVertex[tp].end());
     unsigned vtx = It->second;
-    It = mappedBaseIndex[tp].find(mb);
+    It = mappedBaseIndex[tp].find(key);
     assert(It != mappedBaseIndex[tp].end());
     return std::pair<unsigned, unsigned>(vtx, It->second);
 }

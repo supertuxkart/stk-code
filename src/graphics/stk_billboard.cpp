@@ -17,12 +17,12 @@
 
 #include "graphics/stk_billboard.hpp"
 
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/texture_manager.hpp"
 
 #include <ISceneManager.h>
 

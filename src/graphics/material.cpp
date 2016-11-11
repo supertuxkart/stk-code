@@ -30,10 +30,10 @@
 #include "guiengine/engine.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/texture_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/string_utils.hpp"
@@ -740,6 +740,26 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(7, colorization_mask_tex);
         }
 
+
+        if (race_manager->getReverseTrack() &&
+            m_mirror_axis_when_reverse != ' ')
+        {
+            if (m_mirrorred_mesh_buffers.find((void*)mb) == m_mirrorred_mesh_buffers.end())
+            {
+                m_mirrorred_mesh_buffers[(void*)mb] = true;
+                //irr::video::S3DVertex* mbVertices = (video::S3DVertex*)mb->getVertices();
+                for (unsigned int i = 0; i < mb->getVertexCount(); i++)
+                {
+                    core::vector2df &tc = mb->getTCoords(i);
+                    if (m_mirror_axis_when_reverse == 'V')
+                        tc.Y = 1 - tc.Y;
+                    else
+                        tc.X = 1 - tc.X;
+                }
+            }
+        }   // reverse track and texture needs mirroring
+
+
         switch (m_shader_type)
         {
         case SHADERTYPE_SOLID_UNLIT:
@@ -985,21 +1005,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->ColorMaterial = video::ECM_NONE; // Override one above
     }
 #endif
-
-
-    if (race_manager->getReverseTrack() &&
-        m_mirror_axis_when_reverse != ' ')
-    {
-        //irr::video::S3DVertex* mbVertices = (video::S3DVertex*)mb->getVertices();
-        for (unsigned int i = 0; i < mb->getVertexCount(); i++)
-        {
-            core::vector2df &tc = mb->getTCoords(i);
-            if (m_mirror_axis_when_reverse == 'V')
-                tc.Y = 1 - tc.Y;
-            else
-                tc.X = 1 - tc.X;
-        }
-    }   // reverse track and texture needs mirroring
 
 } // setMaterialProperties
 

@@ -48,7 +48,6 @@ void ArenaAI::reset()
     m_target_node = Graph::UNKNOWN_SECTOR;
     m_current_forward_node = Graph::UNKNOWN_SECTOR;
     m_current_forward_point = Vec3(0, 0, 0);
-    m_adjusting_side = false;
     m_closest_kart = NULL;
     m_closest_kart_node = Graph::UNKNOWN_SECTOR;
     m_closest_kart_point = Vec3(0, 0, 0);
@@ -57,6 +56,7 @@ void ArenaAI::reset()
     m_mini_skid = false;
     m_target_point = Vec3(0, 0, 0);
     m_target_point_lc = Vec3(0, 0, 0);
+    m_reverse_point = Vec3(0, 0, 0);
     m_time_since_last_shot = 0.0f;
     m_time_since_driving = 0.0f;
     m_time_since_off_road = 0.0f;
@@ -74,12 +74,18 @@ void ArenaAI::reset()
 /** This is the main entry point for the AI.
  *  It is called once per frame for each AI and determines the behaviour of
  *  the AI, e.g. steering, accelerating/braking, firing.
+ *  \param dt Time step size.
  */
 void ArenaAI::update(float dt)
 {
     // This is used to enable firing an item backwards.
     m_controls->setLookBack(false);
     m_controls->setNitro(false);
+
+    // Let the function below to reset it later
+    m_controls->setAccel(0.0f);
+    m_controls->setBrake(false);
+    m_mini_skid = false;
 
     // Don't do anything if there is currently a kart animations shown.
     if (m_kart->getKartAnimation())
@@ -116,14 +122,20 @@ void ArenaAI::update(float dt)
     if (gettingUnstuck(dt))
         return;
 
-    findClosestKart(true);
     findTarget();
 
     // After found target, convert it to local coordinate, used for skidding or
     // u-turn
-    m_target_point_lc = m_kart->getTrans().inverse()(m_target_point);
-    doSkiddingTest();
-    configSteering();
+    if (!m_is_uturn)
+    {
+        m_target_point_lc = m_kart->getTrans().inverse()(m_target_point);
+        doSkiddingTest();
+        configSteering();
+    }
+    else
+    {
+        m_target_point_lc = m_kart->getTrans().inverse()(m_reverse_point);
+    }
     useItems(dt);
 
     if (m_kart->getSpeed() > 15.0f && !m_is_uturn && m_turn_radius > 30.0f &&
@@ -159,10 +171,7 @@ bool ArenaAI::updateAimingPosition(Vec3* target_point)
         m_debug_sphere_next->setVisible(false);
 #endif
 
-    // Notice: we use the point ahead of kart to determine next node,
-    // to compensate the time difference between steering
-    m_current_forward_point =
-        m_kart->getTrans()(Vec3(0, 0, m_kart->getKartLength()));
+    m_current_forward_point = m_kart->getTrans()(Vec3(0, 0, m_kart_length));
 
     m_turn_radius = 0.0f;
     std::vector<int>* test_nodes = NULL;
@@ -227,7 +236,7 @@ bool ArenaAI::updateAimingPosition(Vec3* target_point)
 }   // updateAimingPosition
 
 //-----------------------------------------------------------------------------
-/** This function config the steering of AI.
+/** This function config the steering (\ref m_steering_angle) of AI.
  */
 void ArenaAI::configSteering()
 {
@@ -249,9 +258,8 @@ void ArenaAI::configSteering()
 #endif
         if (m_target_point_lc.z() < 0)
         {
-            // Local coordinate z < 0 == target point is behind
-            m_adjusting_side = m_target_point_lc.x() < 0;
             m_is_uturn = true;
+            m_reverse_point = m_target_point;
         }
         else
         {
@@ -273,8 +281,8 @@ void ArenaAI::configSteering()
 #endif
         if (m_target_point_lc.z() < 0)
         {
-            m_adjusting_side = m_target_point_lc.x() < 0;
             m_is_uturn = true;
+            m_reverse_point = m_target_point;
         }
         else
         {
@@ -284,6 +292,11 @@ void ArenaAI::configSteering()
 }   // configSteering
 
 //-----------------------------------------------------------------------------
+/** Determine whether AI is stuck, by checking if it stays on the same node for
+ *  a long period of time (see \ref m_on_node), or \ref isStuck() is true.
+ *  \param dt Time step size.
+ *  \return True if AI is stuck
+ */
 void ArenaAI::checkIfStuck(const float dt)
 {
     if (m_is_stuck) return;
@@ -302,8 +315,7 @@ void ArenaAI::checkIfStuck(const float dt)
         && m_on_node.size() < 2 && !m_is_uturn &&
         fabsf(m_kart->getSpeed()) < 3.0f) || isStuck() == true)
     {
-        // Check whether a kart stay on the same node for a period of time
-        // Or crashed 3 times
+        // AI is stuck, reset now and try to get unstuck at next frame
         m_on_node.clear();
         m_time_since_driving = 0.0f;
         AIBaseController::reset();
@@ -323,9 +335,6 @@ void ArenaAI::checkIfStuck(const float dt)
  */
 void ArenaAI::configSpeed()
 {
-    m_controls->setAccel(0.0f);
-    m_controls->setBrake(false);
-
     // A kart will not brake when the speed is already slower than this
     // value. This prevents a kart from going too slow (or even backwards)
     // in tight curves.
@@ -348,50 +357,41 @@ void ArenaAI::configSpeed()
 }   // configSpeed
 
 //-----------------------------------------------------------------------------
+/** Make AI reverse so that it faces in front of the last target point.
+ */
 void ArenaAI::doUTurn(const float dt)
 {
-    const float turn_side = (m_adjusting_side ? 1.0f : -1.0f);
-
-    if (fabsf(m_kart->getSpeed()) >
-        (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
-        && m_kart->getSpeed() < 0) // Try to emulate reverse like human players
-        m_controls->setAccel(-0.06f);
-    else
-        m_controls->setAccel(-5.0f);
-
-    if (m_time_since_uturn >=
-        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 2.0f : 1.5f))
-        setSteering(-(turn_side), dt); // Preventing keep going around circle
-    else
-        setSteering(turn_side, dt);
+    float turn_angle = atan2f(m_target_point_lc.x(),
+        fabsf(m_target_point_lc.z()));
+    m_controls->setBrake(true);
+    setSteering(turn_angle > 0.0f ? -1.0f : 1.0f, dt);
     m_time_since_uturn += dt;
 
-    if (m_target_point_lc.z() > 0 || m_time_since_uturn >
-        (m_cur_difficulty == RaceManager::DIFFICULTY_EASY ? 3.5f : 3.0f))
+    if ((m_target_point_lc.z() > 0 && fabsf(turn_angle) < 0.2f) ||
+        m_time_since_uturn > 1.5f)
     {
         // End U-turn until target point is in front of this AI
         m_is_uturn = false;
         m_time_since_uturn = 0.0f;
         m_time_since_driving = 0.0f;
+        m_reverse_point = Vec3(0, 0, 0);
     }
     else
         m_is_uturn = true;
 }   // doUTurn
 
 //-----------------------------------------------------------------------------
+/** Function to let AI get unstuck.
+ *  \param dt Time step size.
+ *  \return True if getting stuck is needed to be done.
+ */
 bool ArenaAI::gettingUnstuck(const float dt)
 {
     if (!m_is_stuck || m_is_uturn) return false;
 
     resetAfterStop();
     setSteering(0.0f, dt);
-
-    if (fabsf(m_kart->getSpeed()) >
-        (m_kart->getKartProperties()->getEngineMaxSpeed() / 5)
-        && m_kart->getSpeed() < 0)
-        m_controls->setAccel(-0.06f);
-    else
-        m_controls->setAccel(-4.0f);
+    m_controls->setBrake(true);
 
     m_time_since_reversing += dt;
 
@@ -406,6 +406,10 @@ bool ArenaAI::gettingUnstuck(const float dt)
 }   // gettingUnstuck
 
 //-----------------------------------------------------------------------------
+/** Determine how AI should use its item, different \ref m_cur_difficulty will
+ *  have a corresponding strategy.
+ *  \param dt Time step size.
+ */
 void ArenaAI::useItems(const float dt)
 {
     m_controls->setFire(false);
@@ -414,7 +418,7 @@ void ArenaAI::useItems(const float dt)
         return;
 
     // Find a closest kart again, this time we ignore difficulty
-    findClosestKart(false);
+    findClosestKart(false/*consider_difficulty*/, false/*find_sta*/);
     if (!m_closest_kart) return;
 
     Vec3 closest_kart_point_lc =
@@ -566,7 +570,12 @@ void ArenaAI::useItems(const float dt)
 }   // useItems
 
 //-----------------------------------------------------------------------------
-void ArenaAI::collectItemInArena(Vec3* aim_point, int* target_node) const
+/** Try to collect item in arena, if no suitable item is found, like they are
+ *  swapped, it will follow closest kart instead.
+ *  \param[out] aim_point Location of item.
+ *  \param[out] target_node The node which item lied on.
+ */
+void ArenaAI::tryCollectItem(Vec3* aim_point, int* target_node) const
 {
     float distance = 999999.9f;
     Item* selected = (*target_node == Graph::UNKNOWN_SECTOR ? NULL :
@@ -619,18 +628,15 @@ void ArenaAI::collectItemInArena(Vec3* aim_point, int* target_node) const
         *aim_point = m_closest_kart_point;
         *target_node = m_closest_kart_node;
     }
-}   // collectItemInArena
+}   // tryCollectItem
 
 //-----------------------------------------------------------------------------
+/** Determine if AI should skid: When it's close to target, but not straight
+ *  ahead, in front of it, same steering side and with suitable difficulties
+ *  which are in expert and supertux only.
+ */
 void ArenaAI::doSkiddingTest()
 {
-    m_mini_skid = false;
-
-    // No skidding when u-turn
-    if (m_is_uturn) return;
-
-    // Skid when close to target, but not straight ahead, in front of it, same
-    // steering side and with suitable difficulties.
     const float abs_angle = atan2f(fabsf(m_target_point_lc.x()),
         fabsf(m_target_point_lc.z()));
     if ((m_cur_difficulty == RaceManager::DIFFICULTY_HARD ||
@@ -649,7 +655,7 @@ void ArenaAI::doSkiddingTest()
 /** Determine if the path to target needs to be changed to avoid bad items, it
  *  will also set the turn radius based on the new path if necessary.
  *  \param forward Forward node of current AI position.
- *  \param path Default path to target.
+ *  \param[in,out] path Default path to follow, will be changed if needed.
  */
 void ArenaAI::determinePath(int forward, std::vector<int>* path)
 {

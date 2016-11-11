@@ -18,16 +18,12 @@
 
 #include "tracks/graph.hpp"
 
-#include <ICameraSceneNode.h>
-#include <IMesh.h>
-#include <IMeshSceneNode.h>
-#include <ISceneManager.h>
-
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/rtts.hpp"
+#include "graphics/render_target.hpp"
+#include "graphics/texture_manager.hpp"
+#include "graphics/vao_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "tracks/arena_node_3d.hpp"
 #include "tracks/drive_node_2d.hpp"
@@ -43,20 +39,15 @@ Graph::Graph()
     m_node        = NULL;
     m_mesh        = NULL;
     m_mesh_buffer = NULL;
-    m_new_rtt     = NULL;
+    m_render_target = NULL;
     m_bb_min      = Vec3( 99999,  99999,  99999);
     m_bb_max      = Vec3(-99999, -99999, -99999);
+    memset(m_bb_nodes, 0, 4 * sizeof(int));
 }  // Graph
 
 // -----------------------------------------------------------------------------
 Graph::~Graph()
 {
-    if (m_new_rtt != NULL)
-    {
-        delete m_new_rtt;
-        m_new_rtt = NULL;
-    }
-
     if (UserConfigParams::m_track_debug)
         cleanupDebugMesh();
 
@@ -243,33 +234,19 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
 // -----------------------------------------------------------------------------
 /** Takes a snapshot of the graph so they can be used as minimap.
  */
-void Graph::makeMiniMap(const core::dimension2du &dimension,
-                        const std::string &name,
-                        const video::SColor &fill_color,
-                        video::ITexture** oldRttMinimap,
-                        FrameBuffer** newRttMinimap)
+RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
+                                 const std::string &name,
+                                 const video::SColor &fill_color)
 {
     // Skip minimap when profiling
-    if (ProfileWorld::isNoGraphics()) return;
+    if (ProfileWorld::isNoGraphics()) return NULL;
 
     const video::SColor oldClearColor = World::getWorld()->getClearColor();
     World::getWorld()
         ->setClearbackBufferColor(video::SColor(0, 255, 255, 255));
     World::getWorld()->forceFogDisabled(true);
-    *oldRttMinimap = NULL;
-    *newRttMinimap = NULL;
 
-    RTT* newRttProvider = NULL;
-    IrrDriver::RTTProvider* oldRttProvider = NULL;
-    if (CVS->isGLSL())
-    {
-        m_new_rtt = newRttProvider =
-            new RTT(dimension.Width, dimension.Height);
-    }
-    else
-    {
-        oldRttProvider = new IrrDriver::RTTProvider(dimension, name, true);
-    }
+    m_render_target = irr_driver->createRenderTarget(dimension, name);
 
     irr_driver->getSceneManager()
         ->setAmbientLight(video::SColor(255, 255, 255, 255));
@@ -346,31 +323,11 @@ void Graph::makeMiniMap(const core::dimension2du &dimension,
     //camera->setAspectRatio(1.0f);
     camera->updateAbsolutePosition();
 
-    video::ITexture* texture = NULL;
-    FrameBuffer* frame_buffer = NULL;
-
-    if (CVS->isGLSL())
-    {
-        frame_buffer = newRttProvider->render(camera,
-            GUIEngine::getLatestDt());
-    }
-    else
-    {
-        texture = oldRttProvider->renderToTexture();
-        delete oldRttProvider;
-    }
+    m_render_target->renderToTexture(camera, GUIEngine::getLatestDt());
 
     cleanupDebugMesh();
     irr_driver->removeCameraSceneNode(camera);
 
-    if (texture == NULL && frame_buffer == NULL)
-    {
-        Log::error("Graph", "[makeMiniMap] WARNING: RTT does not"
-                   "appear to work, mini-map will not be available.");
-    }
-
-    *oldRttMinimap = texture;
-    *newRttMinimap = frame_buffer;
     World::getWorld()->setClearbackBufferColor(oldClearColor);
     World::getWorld()->forceFogDisabled(false);
 
@@ -380,6 +337,8 @@ void Graph::makeMiniMap(const core::dimension2du &dimension,
     irr_driver->clearLights();
     irr_driver->clearForcedBloom();
     irr_driver->clearBackgroundNodes();
+    return m_render_target.get();
+
 }   // makeMiniMap
 
 // -----------------------------------------------------------------------------
@@ -399,7 +358,8 @@ void Graph::mapPoint2MiniMap(const Vec3 &xyz,Vec3 *draw_at) const
 // -----------------------------------------------------------------------------
 void Graph::createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
                        const Vec3 &p3, unsigned int node_index,
-                       bool invisible, bool ai_ignore, bool is_arena)
+                       bool invisible, bool ai_ignore, bool is_arena,
+                       bool ignored)
 {
     // Find the normal of this quad by computing the normal of two triangles
     // and taking their average.
@@ -427,7 +387,7 @@ void Graph::createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
         else
         {
             q = new DriveNode3D(p0, p1, p2, p3, normal, node_index, invisible,
-                ai_ignore);
+                ai_ignore, ignored);
         }
     }
     else
@@ -441,7 +401,7 @@ void Graph::createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
         else
         {
             q = new DriveNode2D(p0, p1, p2, p3, normal, node_index, invisible,
-                ai_ignore);
+                ai_ignore, ignored);
         }
     }
     m_all_nodes.push_back(q);
@@ -499,7 +459,7 @@ void Graph::findRoadSector(const Vec3& xyz, int *sector,
         else
             indx = indx<(int)m_all_nodes.size()-1 ? indx +1 : 0;
         const Quad* q = getQuad(indx);
-        if(q->pointInside(xyz, ignore_vertical))
+        if (q->pointInside(xyz, ignore_vertical))
         {
             *sector  = indx;
             return;
@@ -585,24 +545,27 @@ int Graph::findOutOfRoadSector(const Vec3& xyz, const int curr_sector,
                 ? 0
                 : current_sector+1;
 
-            // A first simple test uses the 2d distance to the center of the
-            // quad.
-            float dist_2 =
-                m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
-            if(dist_2<min_dist_2)
+            const Quad* q = getQuad(next_sector);
+            if (!q->isIgnored())
             {
-                const Quad* q = getQuad(next_sector);
-                float dist = xyz.getY() - q->getMinHeight();
-                // While negative distances are unlikely, we allow some small
-                // negative numbers in case that the kart is partly in the
-                // track. Only do the height test in phase==0, in phase==1
-                // accept any point, independent of height, or this node is 3d
-                // which already takes height into account
-                if(phase==1 || (dist < 5.0f && dist>-1.0f) ||
-                    q->is3DQuad() || ignore_vertical)
+                // A first simple test uses the 2d distance to the center of the
+                // quad.
+                float dist_2 =
+                    m_all_nodes[next_sector]->getDistance2FromPoint(xyz);
+                if (dist_2 < min_dist_2)
                 {
-                    min_dist_2 = dist_2;
-                    min_sector = next_sector;
+                    float dist = xyz.getY() - q->getMinHeight();
+                    // While negative distances are unlikely, we allow some small
+                    // negative numbers in case that the kart is partly in the
+                    // track. Only do the height test in phase==0, in phase==1
+                    // accept any point, independent of height, or this node is 3d
+                    // which already takes height into account
+                    if (phase == 1 || (dist < 5.0f && dist>-1.0f) ||
+                        q->is3DQuad() || ignore_vertical)
+                    {
+                        min_dist_2 = dist_2;
+                        min_sector = next_sector;
+                    }
                 }
             }
             current_sector = next_sector;
@@ -618,3 +581,16 @@ int Graph::findOutOfRoadSector(const Vec3& xyz, const int curr_sector,
     }
     return min_sector;
 }   // findOutOfRoadSector
+
+//-----------------------------------------------------------------------------
+void Graph::loadBoundingBoxNodes()
+{
+    m_bb_nodes[0] = findOutOfRoadSector(Vec3(m_bb_min.x(), 0, m_bb_min.z()),
+        -1/*curr_sector*/, NULL/*all_sectors*/, true/*ignore_vertical*/);
+    m_bb_nodes[1] = findOutOfRoadSector(Vec3(m_bb_min.x(), 0, m_bb_max.z()),
+        -1/*curr_sector*/, NULL/*all_sectors*/, true/*ignore_vertical*/);
+    m_bb_nodes[2] = findOutOfRoadSector(Vec3(m_bb_max.x(), 0, m_bb_min.z()),
+        -1/*curr_sector*/, NULL/*all_sectors*/, true/*ignore_vertical*/);
+    m_bb_nodes[3] = findOutOfRoadSector(Vec3(m_bb_max.x(), 0, m_bb_max.z()),
+        -1/*curr_sector*/, NULL/*all_sectors*/, true/*ignore_vertical*/);
+}   // loadBoundingBoxNodes

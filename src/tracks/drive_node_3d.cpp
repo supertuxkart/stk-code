@@ -22,9 +22,9 @@
 DriveNode3D::DriveNode3D(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
                          const Vec3 &p3, const Vec3 &normal,
                          unsigned int node_index, bool invisible,
-                         bool ai_ignore)
+                         bool ai_ignore, bool ignored)
            : DriveNode(p0, p1, p2, p3, normal, node_index, invisible,
-                       ai_ignore), BoundingBox3D(p0, p1, p2, p3, normal)
+                       ai_ignore, ignored), BoundingBox3D(p0, p1, p2, p3, normal)
 {
     m_line = core::line3df(m_lower_center.toIrrVector(),
         m_upper_center.toIrrVector());

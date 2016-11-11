@@ -34,8 +34,8 @@ namespace irr
 		IrrlichtDevice::postEventFromUser. They take the same path as mouse events. */
 		EET_KEY_INPUT_EVENT,
         
-        //! A multi touch event.
-		EET_MULTI_TOUCH_EVENT,
+        //! A touch input event.
+		EET_TOUCH_INPUT_EVENT,
         
         //! A accelerometer event.
         EET_ACCELEROMETER_EVENT,
@@ -177,22 +177,19 @@ namespace irr
 #endif
     
     //! Enumeration for all touch input events
-	enum EMULTI_TOUCH_INPUT_EVENT
+	enum ETOUCH_INPUT_EVENT
 	{
-		//! Max multi touch count
-		NUMBER_OF_MULTI_TOUCHES = 10,
-        
 		//! Touch was pressed down.
-		EMTIE_PRESSED_DOWN = 0,
-        
+		ETIE_PRESSED_DOWN = 0,
+
 		//! Touch was left up.
-		EMTIE_LEFT_UP,
-        
+		ETIE_LEFT_UP,
+
 		//! The touch changed its position.
-		EMTIE_MOVED,
-        
+		ETIE_MOVED,
+
 		//! No real event. Just for convenience to get number of events
-		EMTIE_COUNT
+		ETIE_COUNT
 	};
 
 	namespace gui
@@ -384,54 +381,22 @@ struct SEvent
 		bool Control:1;
 	};
     
-    //! Any kind of multi touch event.
-	struct SMultiTouchInput
+    //! Any kind of touch event.
+	struct STouchInput
 	{
-		//! A helper function to check if a button is pressed.
-		u32 touchedCount() const
-		{
-			u32 count = 0;
-            
-			for (u16 i = 0; i < NUMBER_OF_MULTI_TOUCHES; ++i)
-            {
-				if (Touched[i])
-                    count++;
-			}
-            
-			return count;
-		}
-        
-        //! Reset variables.
-		void clear()
-		{
-			for (u16 i = 0; i < NUMBER_OF_MULTI_TOUCHES; ++i)
-            {
-				Touched[i] = 0;
-				X[i] = 0;
-				Y[i] = 0;
-				PrevX[i] = 0;
-				PrevY[i] = 0;
-			}
-		}
-        
-        // Status of simple touch.
-        u8 Touched[NUMBER_OF_MULTI_TOUCHES];
-        
+        // Touch ID.
+        size_t ID;
+
         // X position of simple touch.
-		s32 X[NUMBER_OF_MULTI_TOUCHES];
-        
+		s32 X;
+
         // Y position of simple touch.
-		s32 Y[NUMBER_OF_MULTI_TOUCHES];
-        
-        // Previous X position of simple touch.
-		s32 PrevX[NUMBER_OF_MULTI_TOUCHES];
-        
-        // Previous Y position of simple touch.
-		s32 PrevY[NUMBER_OF_MULTI_TOUCHES];
-        
-		//! Type of multi touch event
-		EMULTI_TOUCH_INPUT_EVENT Event;
+		s32 Y;
+
+		//! Type of touch event.
+		ETOUCH_INPUT_EVENT Event;
 	};
+
     
     //! Any kind of accelerometer event.
 	struct SAccelerometerEvent
@@ -575,7 +540,7 @@ struct SEvent
 		struct SGUIEvent GUIEvent;
 		struct SMouseInput MouseInput;
 		struct SKeyInput KeyInput;
-        struct SMultiTouchInput MultiTouchInput;
+        struct STouchInput TouchInput;
         struct SAccelerometerEvent AccelerometerEvent;
         struct SGyroscopeEvent GyroscopeEvent;
         struct SDeviceMotionEvent DeviceMotionEvent;

@@ -26,6 +26,8 @@
 #include <map>
 #include <unordered_map>
 
+class RenderInfo;
+
 enum InstanceType
 {
     InstanceTypeDualTex,
@@ -153,6 +155,30 @@ struct GlowInstanceData
 #pragma pack(pop)
 #endif
 
+#include <functional>
+
+class MeshRenderInfoHash
+{
+public:
+    size_t operator() (const std::pair<irr::scene::IMeshBuffer*, RenderInfo*> &p) const
+    {
+        return (std::hash<irr::scene::IMeshBuffer*>()(p.first) ^
+            (std::hash<RenderInfo*>()(p.second) << 1));
+    }
+};
+
+struct MeshRenderInfoEquals : std::binary_function
+    <const std::pair<irr::scene::IMeshBuffer*, RenderInfo*>&,
+     const std::pair<irr::scene::IMeshBuffer*, RenderInfo*>&, bool>
+{
+    result_type operator() (first_argument_type lhs,
+                            second_argument_type rhs) const
+    {
+        return (lhs.first == rhs.first) &&
+            (lhs.second == rhs.second);
+    }
+};
+
 class VAOManager : public Singleton<VAOManager>
 {
     enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_COUNT };
@@ -162,7 +188,7 @@ class VAOManager : public Singleton<VAOManager>
     void *VBOPtr[VTXTYPE_COUNT], *IBOPtr[VTXTYPE_COUNT];
     size_t RealVBOSize[VTXTYPE_COUNT], RealIBOSize[VTXTYPE_COUNT];
     size_t last_vertex[VTXTYPE_COUNT], last_index[VTXTYPE_COUNT];
-    std::unordered_map<irr::scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
+    std::unordered_map <std::pair<irr::scene::IMeshBuffer*, RenderInfo*>, unsigned, MeshRenderInfoHash, MeshRenderInfoEquals>  mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
     std::map<std::pair<irr::video::E_VERTEX_TYPE, InstanceType>, GLuint> InstanceVAO;
 
     void cleanInstanceVAOs();
@@ -172,10 +198,10 @@ class VAOManager : public Singleton<VAOManager>
     size_t getVertexPitch(enum VTXTYPE) const;
     VTXTYPE getVTXTYPE(irr::video::E_VERTEX_TYPE type);
     irr::video::E_VERTEX_TYPE getVertexType(enum VTXTYPE tp);
-    void append(irr::scene::IMeshBuffer *, VTXTYPE tp);
+    void append(irr::scene::IMeshBuffer *, VTXTYPE tp, RenderInfo* ri = NULL);
 public:
     VAOManager();
-    std::pair<unsigned, unsigned> getBase(irr::scene::IMeshBuffer *);
+    std::pair<unsigned, unsigned> getBase(irr::scene::IMeshBuffer *, RenderInfo* ri = NULL);
     GLuint getInstanceBuffer(InstanceType it) { return instance_vbo[it]; }
     void *getInstanceBufferPtr(InstanceType it) { return Ptr[it]; }
     unsigned getVBO(irr::video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }

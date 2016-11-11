@@ -34,6 +34,15 @@ GameEventsProtocol::~GameEventsProtocol()
 }   // ~GameEventsProtocol
 
 // ----------------------------------------------------------------------------
+/** Once the GameEventsProtocol is ready, signal the world that the timer
+ *  can start.
+*/
+void GameEventsProtocol::setup()
+{
+    World::getWorld()->setReadyToRace();
+}   // setup
+
+// ----------------------------------------------------------------------------
 bool GameEventsProtocol::notifyEvent(Event* event)
 {
     // Avoid crash in case that we still receive race events when
@@ -44,6 +53,11 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     if (data.size() < 1) // for token and type
     {
         Log::warn("GameEventsProtocol", "Too short message.");
+        return true;
+    }
+    if ( event->getPeer()->getClientServerToken() != data.getToken())
+    {
+        Log::warn("GameEventsProtocol", "Bad token.");
         return true;
     }
     int8_t type = data.getUInt8();

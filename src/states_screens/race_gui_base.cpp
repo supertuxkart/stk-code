@@ -28,7 +28,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -638,8 +637,11 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 
+    unsigned int sta = race_manager->getNumSpareTireKarts();
+    const unsigned int num_karts = race_manager->getNumberOfKarts() - sta;
+
     // -2 because that's the spacing further on
-    int ICON_PLAYER_WIDTH = y_space / race_manager->getNumberOfKarts() - 2;
+    int ICON_PLAYER_WIDTH = y_space / num_karts - 2;
 
     int icon_width_max = (int)(50*(irr_driver->getActualScreenSize().Width/800.0f));
     int icon_width_min = (int)(35*(irr_driver->getActualScreenSize().Height/600.0f));
@@ -664,10 +666,11 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     int ICON_WIDTH = ICON_PLAYER_WIDTH * 4 / 5;
 
     WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
+
     //initialize m_previous_icons_position
     if(m_previous_icons_position.size()==0)
     {
-        for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+        for(unsigned int i=0; i<num_karts; i++)
         {
             const AbstractKart *kart = world->getKart(i);
             int position = kart->getPosition();
@@ -686,12 +689,19 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     int previous_y=y_base-ICON_PLAYER_WIDTH-2;
 
     gui::ScalableFont* font = GUIEngine::getFont();
-    const unsigned int kart_amount = world->getNumKarts();
+    const unsigned int kart_amount = world->getNumKarts() - sta;
 
     //where is the limit to hide last icons
-    int y_icons_limit=irr_driver->getActualScreenSize().Height-bottom_margin-ICON_PLAYER_WIDTH;
+    int y_icons_limit = irr_driver->getActualScreenSize().Height - 
+                                            bottom_margin - ICON_PLAYER_WIDTH;
     if (race_manager->getNumLocalPlayers() == 3)
-        y_icons_limit=irr_driver->getActualScreenSize().Height-ICON_WIDTH;
+    {
+        y_icons_limit = irr_driver->getActualScreenSize().Height - ICON_WIDTH;
+    }
+    else if (UserConfigParams::m_multitouch_enabled)
+    {
+        y_icons_limit = irr_driver->getActualScreenSize().Height / 2;
+    }
 
     world->getKartsDisplayInfo(&m_kart_display_infos);
 

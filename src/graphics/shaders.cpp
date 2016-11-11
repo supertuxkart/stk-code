@@ -365,7 +365,7 @@ Shaders::TransparentShader::TransparentShader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "transparent.frag");
-    assignUniforms("ModelMatrix", "TextureMatrix");
+    assignUniforms("ModelMatrix", "TextureMatrix", "custom_alpha");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // TransparentShader
 

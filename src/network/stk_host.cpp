@@ -47,7 +47,7 @@
 #include <signal.h>
 
 STKHost *STKHost::m_stk_host       = NULL;
-bool     STKHost::m_enable_console = true;
+bool     STKHost::m_enable_console = false;
 
 void STKHost::create()
 {
@@ -141,7 +141,7 @@ void STKHost::create()
  *
  * Server:
  *
- *   The ServerLobbyRoomProtocol (SLR) will the detect the above client
+ *   The ServerLobbyRoomProtocol (SLR) will then detect the above client
  *   requests, and start a ConnectToPeer protocol for each incoming client.
  *   The ConnectToPeer protocol uses:
  *         1. GetPeerAddress to get the ip address and port of the client.
@@ -218,7 +218,22 @@ void STKHost::create()
  *  the LocalPlayerController for each kart. Each remote player gets a
  *  NULL ActivePlayer (the ActivePlayer is only used for assigning the input
  *  device to each kart, achievements and highscores, so it's not needed for
- *  remote players).
+ *  remote players). It will also start the SynchronizationProtocol.
+ *  The StartGameProtocol has a callback ready which is called from world
+ *  when the world is loaded (i.e. track and all karts are ready). When
+ *  this callback is invoked, each client will send a 'ready' message to
+ *  the server's StartGameProtocol. Once the server has received all
+ *  messages in notifyEventAsynchronous(), it will call startCountdown()
+ *  in the SynchronizationProtocol. The SynchronizationProtocol is 
+ *  sending regular (once per second) pings to the clients and measure
+ *  the averate latency. Upon starting the countdown this information
+ *  is included in the ping request, so the clients can start the countdown
+ *  at that stage as wellk.
+ * 
+ *  Once the countdown is 0 (or below), the Synchronization Protocol will
+ *  start the protocols: KartUpdateProtocol, ControllerEventsProtocol,
+ *  GameEventsProtocol. Then the SynchronizationProtocol is terminated
+ *  which indicates to the main loop to start the actual game.
  */
 
 // ============================================================================
@@ -231,9 +246,13 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
     // server is made.
     m_host_id = 0;
     init();
+    TransportAddress a;
+    a.setIP(0);
+    a.setPort(NetworkConfig::get()->getClientPort());
+    ENetAddress ea = a.toEnetAddress();
 
     m_network = new Network(/*peer_count*/1,       /*channel_limit*/2,
-                            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0);
+                            /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea);
     if (!m_network)
     {
         Log::fatal ("STKHost", "An error occurred while trying to create "
@@ -258,7 +277,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
 
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
-    addr.port = 2758;
+    addr.port = NetworkConfig::get()->getServerPort();
 
     m_network= new Network(NetworkConfig::get()->getMaxPlayers(),
                            /*channel_limit*/2,
@@ -304,6 +323,7 @@ void STKHost::init()
     ProtocolManager::getInstance<ProtocolManager>();
 
     // Optional: start the network console
+    m_network_console = NULL;
     if(m_enable_console)
     {
         m_network_console = new NetworkConsole();
@@ -511,7 +531,7 @@ void* STKHost::mainLoop(void* self)
     if(NetworkConfig::get()->isServer() && 
         NetworkConfig::get()->isLAN()      )
     {
-        TransportAddress address(0, 2757);
+        TransportAddress address(0, NetworkConfig::get()->getServerDiscoveryPort());
         ENetAddress eaddr = address.toEnetAddress();
         myself->m_lan_network = new Network(1, 1, 0, 0, &eaddr);
     }
@@ -565,6 +585,10 @@ void* STKHost::mainLoop(void* self)
 }   // mainLoop
 
 // ----------------------------------------------------------------------------
+/** Handles LAN related messages. It checks for any LAN broadcast messages,
+ *  and if a valid LAN server-request message is received, will answer
+ *  with a message containing server details (and sender IP address and port).
+ */
 void STKHost::handleLANRequests()
 {
     const int LEN=2048;

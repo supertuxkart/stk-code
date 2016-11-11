@@ -15,14 +15,16 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "2dutils.hpp"
+#include "graphics/2dutils.hpp"
 
 #include "graphics/central_settings.hpp"
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/texture_manager.hpp"
 #include "graphics/texture_shader.hpp"
-#include "glwrap.hpp"
 #include "utils/cpp2011.hpp"
 
 #if defined(USE_GLES2)
@@ -34,14 +36,14 @@
 
 
 // ============================================================================
-class Primitive2DList : public TextureShader<Primitive2DList, 1>
+class Primitive2DList : public TextureShader<Primitive2DList, 1, float>
 {
 public:
     Primitive2DList()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "primitive2dlist.vert",
                             GL_FRAGMENT_SHADER, "transparent.frag");
-        assignUniforms();
+        assignUniforms("custom_alpha");
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
     }   // Primitive2DList
 };   //Primitive2DList
@@ -703,7 +705,7 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
     VertexUtils::bindVertexArrayAttrib(vType);
 
     Primitive2DList::getInstance()->use();
-    Primitive2DList::getInstance()->setUniforms();
+    Primitive2DList::getInstance()->setUniforms(1.0f);
     compressTexture(tex, false);
     Primitive2DList::getInstance()->setTextureUnits(getTextureGLuint(tex));
     glDrawElements(GL_TRIANGLE_FAN, primitiveCount, GL_UNSIGNED_SHORT, 0);

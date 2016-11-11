@@ -22,70 +22,12 @@
 #ifndef HEADER_STKSCENEMANAGER_HPP
 #define HEADER_STKSCENEMANAGER_HPP
 
-#include "graphics/central_settings.hpp"
-#include "graphics/gl_headers.hpp"
-#include "graphics/gpu_particles.hpp"
-#include "graphics/stk_billboard.hpp"
-#include "graphics/stk_mesh.hpp"
-#include "utils/singleton.hpp"
+#include <ICameraSceneNode.h>
+#include <ISceneNode.h>
+#include <vector3d.h>
 
-template<typename T>
-class CommandBuffer : public Singleton<T>
-{
-public:
-    GLuint drawindirectcmd;
-    DrawElementsIndirectCommand *Ptr;
-    CommandBuffer()
-    {
-#if !defined(USE_GLES2)
-        glGenBuffers(1, &drawindirectcmd);
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
-        if (CVS->supportsAsyncInstanceUpload())
-        {
-            glBufferStorage(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
-            Ptr = (DrawElementsIndirectCommand *)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 10000 * sizeof(DrawElementsIndirectCommand), GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
-        }
-        else
-        {
-            glBufferData(GL_DRAW_INDIRECT_BUFFER, 10000 * sizeof(DrawElementsIndirectCommand), 0, GL_STREAM_DRAW);
-        }
-#endif
-    }
-};
+void addEdge(const irr::core::vector3df &P0, const irr::core::vector3df &P1);
 
-class ImmediateDrawList : public Singleton<ImmediateDrawList>, public std::vector<scene::ISceneNode *>
-{};
-
-class BillBoardList : public Singleton<BillBoardList>, public std::vector<STKBillboard *>
-{};
-
-class ParticlesList : public Singleton<ParticlesList>, public std::vector<ParticleSystemProxy *>
-{};
-
-
-class SolidPassCmd : public CommandBuffer<SolidPassCmd>
-{
-public:
-    size_t Offset[Material::SHADERTYPE_COUNT], Size[Material::SHADERTYPE_COUNT];
-};
-
-class ShadowPassCmd : public CommandBuffer<ShadowPassCmd>
-{
-public:
-    size_t Offset[4][Material::SHADERTYPE_COUNT], Size[4][Material::SHADERTYPE_COUNT];
-};
-
-class RSMPassCmd : public CommandBuffer<RSMPassCmd>
-{
-public:
-    size_t Offset[Material::SHADERTYPE_COUNT], Size[Material::SHADERTYPE_COUNT];
-};
-
-class GlowPassCmd : public CommandBuffer<GlowPassCmd>
-{
-public:
-    size_t Offset, Size;
-};
-
+bool isCulledPrecise(const irr::scene::ICameraSceneNode *cam, const irr::scene::ISceneNode *node);
 
 #endif

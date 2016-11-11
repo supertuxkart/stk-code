@@ -52,11 +52,8 @@ namespace GUIEngine
         AlignedArray<Vec3> m_model_scale;
         std::vector<int> m_model_frames;
         std::vector<bool> m_model_render_info_affected;
-
-        RTT* m_rtt_provider;
-        IrrDriver::RTTProvider* m_old_rtt_provider;
-
-        float angle;
+        std::unique_ptr<RenderTarget> m_render_target;
+        float m_angle;
 
         bool m_rtt_unsupported;
 
@@ -65,9 +62,6 @@ namespace GUIEngine
         scene::ICameraSceneNode    *m_camera;
 
         scene::ISceneNode          *m_light;
-
-        FrameBuffer                *m_frame_buffer;
-        video::ITexture            *m_texture;
 
         RenderInfo                 *m_render_info;
 
@@ -106,8 +100,8 @@ namespace GUIEngine
 
         void setupRTTScene();
 
-        FrameBuffer* getFrameBuffer()       { return m_frame_buffer; }
-        video::ITexture* getTexture()            { return m_texture; }
+        void drawRTTScene(const irr::core::rect<s32>& dest_rect) const;
+
         RenderInfo* getModelViewRenderInfo() { return m_render_info; }
     };
 

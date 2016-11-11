@@ -18,21 +18,9 @@
 
 #include "graphics/light.hpp"
 
-#include "graphics/callbacks.hpp"
-#include "graphics/glwrap.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/material.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/rtts.hpp"
-#include "graphics/screen_quad.hpp"
-#include "graphics/shaders.hpp"
+#include <ISceneManager.h>
 
-using namespace video;
-using namespace scene;
-using namespace core;
-
-aabbox3df LightNode::box;
-
+core::aabbox3df LightNode::box;
 
 LightNode::LightNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float e, float d, float r, float g, float b):
                      ISceneNode(parent == NULL ? mgr->getRootSceneNode() : parent, mgr, -1)

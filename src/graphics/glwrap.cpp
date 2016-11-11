@@ -17,10 +17,10 @@
 
 #include "graphics/glwrap.hpp"
 
-
 #include "config/hardware_stats.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "utils/profiler.hpp"
@@ -289,17 +289,18 @@ void FrameBuffer::bind() const
     glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
-void FrameBuffer::bindLayer(unsigned i)
+void FrameBuffer::bindLayer(unsigned i) const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbolayer);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, RenderTargets[0], 0, i);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, DepthTexture, 0, i);
+    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE_EXT);
     glViewport(0, 0, (int)width, (int)height);
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers((int)RenderTargets.size(), bufs);
 }
 
-void FrameBuffer::Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask, GLenum filter)
+void FrameBuffer::Blit(const FrameBuffer &Src, const FrameBuffer &Dst, GLbitfield mask, GLenum filter)
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, Src.fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst.fbo);

@@ -27,7 +27,7 @@ using namespace irr;
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/2dutils.hpp"
-#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -35,11 +35,14 @@ using namespace irr;
 #include "io/file_manager.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
+#include "input/device_manager.hpp"
+#include "input/multitouch_device.hpp"
 #include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/follow_the_leader.hpp"
@@ -83,6 +86,11 @@ RaceGUI::RaceGUI()
     {
         m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
     }
+    else if (UserConfigParams::m_multitouch_enabled)
+    {
+        m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
+        m_map_bottom = irr_driver->getActualScreenSize().Height * 0.55f;
+    }
 
     m_is_tutorial = (race_manager->getTrackName() == "tutorial");
 
@@ -104,6 +112,29 @@ RaceGUI::RaceGUI()
     else
         m_lap_width = font->getDimension(L"9/9").Width;
 
+    if (UserConfigParams::m_multitouch_enabled)
+    {
+        initMultitouchSteering();
+    }
+}   // RaceGUI
+
+//-----------------------------------------------------------------------------
+RaceGUI::~RaceGUI()
+{
+    MultitouchDevice* device = input_manager->getDeviceManager()->
+                                                        getMultitouchDevice();
+
+    if (device != NULL)
+    {
+        device->clearButtons();
+    }
+}   // ~Racegui
+
+
+//-----------------------------------------------------------------------------
+void RaceGUI::init()
+{
+    RaceGUIBase::init();
     // Technically we only need getNumLocalPlayers, but using the
     // global kart id to find the data for a specific kart.
     int n = race_manager->getNumberOfKarts();
@@ -111,12 +142,7 @@ RaceGUI::RaceGUI()
     m_animation_states.resize(n);
     m_rank_animation_duration.resize(n);
     m_last_ranks.resize(n);
-}   // RaceGUI
-
-//-----------------------------------------------------------------------------
-RaceGUI::~RaceGUI()
-{
-}   // ~Racegui
+}   // init
 
 //-----------------------------------------------------------------------------
 /** Reset the gui before a race. It initialised all rank animation related
@@ -175,7 +201,7 @@ void RaceGUI::renderGlobal(float dt)
         //stop displaying timer as soon as race is over
         if (world->getPhase()<WorldStatus::DELAY_FINISH_PHASE)
            drawGlobalTimer();
-        
+
         if(world->getPhase() == WorldStatus::GO_PHASE ||
            world->getPhase() == WorldStatus::MUSIC_PHASE)
         {
@@ -203,16 +229,25 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     core::vector2df scaling = camera->getScaling();
     const AbstractKart *kart = camera->getKart();
     if(!kart) return;
-    
+
     drawPlungerInFace(camera, dt);
 
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
     drawAllMessages(kart, viewport, scaling);
 
+    if (UserConfigParams::m_multitouch_enabled)
+    {
+        drawMultitouchSteering(kart, viewport, scaling);
+    }
+
     if(!World::getWorld()->isRacePhase()) return;
 
-    drawPowerupIcons   (kart, viewport, scaling);
-    drawSpeedEnergyRank(kart, viewport, scaling, dt);
+    drawPowerupIcons(kart, viewport, scaling);
+
+    if (!UserConfigParams::m_multitouch_enabled)
+    {
+        drawSpeedEnergyRank(kart, viewport, scaling, dt);
+    }
 
     if (!m_is_tutorial)
         drawLap(kart, viewport, scaling);
@@ -341,41 +376,29 @@ void RaceGUI::drawGlobalMiniMap()
         !(world->getTrack()->hasNavMesh()))
         return;
 
-    const video::ITexture *old_rtt_mini_map = world->getTrack()->getOldRttMiniMap();
-    const FrameBuffer* new_rtt_mini_map = world->getTrack()->getNewRttMiniMap();
-
     int upper_y = irr_driver->getActualScreenSize().Height - m_map_bottom - m_map_height;
     int lower_y = irr_driver->getActualScreenSize().Height - m_map_bottom;
 
     core::rect<s32> dest(m_map_left, upper_y,
                          m_map_left + m_map_width, lower_y);
 
-    if (old_rtt_mini_map != NULL)
-    {
-        core::rect<s32> source(core::position2di(0, 0),
-                               old_rtt_mini_map->getSize());
-        draw2DImage(old_rtt_mini_map, dest, source,
-                    NULL, NULL, true);
-    }
-    else if (new_rtt_mini_map != NULL)
-    {
-        core::rect<s32> source(0, 0, (int)new_rtt_mini_map->getWidth(),
-                               (int)new_rtt_mini_map->getHeight());
-        draw2DImageFromRTT(new_rtt_mini_map->getRTT()[0],
-            new_rtt_mini_map->getWidth(), new_rtt_mini_map->getHeight(),
-            dest, source, NULL, video::SColor(127, 255, 255, 255), true);
-    }
+    world->getTrack()->drawMiniMap(dest);
 
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const AbstractKart *kart = world->getKart(i);
-        if(kart->isEliminated()) continue;   // don't draw eliminated kart
+        const SpareTireAI* sta =
+            dynamic_cast<const SpareTireAI*>(kart->getController());
+        // don't draw eliminated kart
+        if(kart->isEliminated() && !(sta && sta->isMoving())) continue;
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
         draw_at *= UserConfigParams::m_scale_rtts_factor;
 
-        video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+        video::ITexture* icon = sta ?
+            irr_driver->getTexture(FileManager::GUI, "heart.png") :
+            kart->getKartProperties()->getMinimapIcon();
 
         // int marker_height = m_marker->getSize().Height;
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
@@ -441,7 +464,8 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                                                (int)offset.Y-gauge_height,
                                                (int)offset.X + gauge_width,
                                                (int)offset.Y) /* dest rect */,
-                core::rect<s32>(0, 0, 256, 256) /* source rect */,
+                core::rect<s32>(core::position2d<s32>(0,0),
+                                m_gauge_empty->getSize()) /* source rect */,
                 NULL /* clip rect */, NULL /* colors */,
                 true /* alpha */);
 
@@ -833,7 +857,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 {
     // Don't display laps or ranks if the kart has already finished the race.
     if (kart->hasFinishedRace()) return;
-        
+
     World *world = World::getWorld();
     if (!world->raceHasLaps()) return;
     const int lap = world->getKartLaps(kart->getWorldKartId());
@@ -865,3 +889,157 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     font->setScale(1.0f);
 
 } // drawLap
+
+//-----------------------------------------------------------------------------
+/** Makes some initializations and determines the look of multitouch steering
+ *  interface
+ */
+void RaceGUI::initMultitouchSteering()
+{
+    MultitouchDevice* device = input_manager->getDeviceManager()->
+                                                        getMultitouchDevice();
+
+    if (device == NULL)
+        return;
+
+    const int w = irr_driver->getActualScreenSize().Width;
+    const int h = irr_driver->getActualScreenSize().Height;
+    const float btn_size = 0.1f * h;
+    const float btn2_size = 0.35f * h;
+    const float margin = 0.1f * h;
+    const float top_margin = 0.3f * h;
+    const float col_size = btn_size + margin;
+    const float small_ratio = 0.6f;
+
+    device->addButton(BUTTON_STEERING,
+                      0.5f * margin, h - 0.5f * margin - btn2_size,
+                      btn2_size, btn2_size);
+    device->addButton(BUTTON_ESCAPE,
+                      top_margin, small_ratio * margin,
+                      small_ratio * btn_size, small_ratio * btn_size);
+    device->addButton(BUTTON_RESCUE,
+                      top_margin + small_ratio * col_size, small_ratio * margin,
+                      small_ratio * btn_size, small_ratio * btn_size);
+    device->addButton(BUTTON_NITRO,
+                      w - 1 * col_size, h - 2 * col_size,
+                      btn_size, btn_size);
+    device->addButton(BUTTON_SKIDDING,
+                      w - 1 * col_size, h - 1 * col_size,
+                      btn_size, btn_size);
+    device->addButton(BUTTON_FIRE,
+                      w - 2 * col_size,  h - 2 * col_size,
+                      btn_size, btn_size);
+    device->addButton(BUTTON_LOOK_BACKWARDS,
+                      w - 2 * col_size, h - 1 * col_size,
+                      btn_size, btn_size);
+
+} // initMultitouchSteering
+
+//-----------------------------------------------------------------------------
+/** Draws the buttons for multitouch steering.
+ *  \param kart The kart for which to show the data.
+ *  \param viewport The viewport to use.
+ *  \param scaling Which scaling to apply to the buttons.
+ */
+void RaceGUI::drawMultitouchSteering(const AbstractKart* kart,
+                                     const core::recti &viewport,
+                                     const core::vector2df &scaling)
+{
+    MultitouchDevice* device = input_manager->getDeviceManager()->
+                                                        getMultitouchDevice();
+
+    if (device == NULL)
+        return;
+
+    for (unsigned int i = 0; i < device->getButtonsCount(); i++)
+    {
+        MultitouchButton* button = device->getButton(i);
+
+        core::rect<s32> pos(button->x, button->y, button->x + button->width,
+                            button->y + button->height);
+
+        if (button->type == MultitouchButtonType::BUTTON_STEERING)
+        {
+            video::ITexture* tex = irr_driver->getTexture(FileManager::GUI,
+                                                          "blue_plus.png");
+            core::rect<s32> coords(core::position2d<s32>(0,0), tex->getSize());
+
+            draw2DImage(tex, pos, coords, NULL, NULL, true);
+
+            float x = (float)(button->x) + (float)(button->width) / 2.0f *
+                                                        (button->axis_x + 1.0f);
+            float y = (float)(button->y) + (float)(button->height) / 2.0f *
+                                                        (button->axis_y + 1.0f);
+            float w = (float)(button->width) / 20.0f;
+            float h = (float)(button->height) / 20.0f;
+
+            core::rect<s32> pos2(round(x - w), round(y - h),
+                                 round(x + w), round(y + h));
+
+            draw2DImage(tex, pos2, coords, NULL, NULL, true);
+        }
+        else
+        {
+            if (button->pressed)
+            {
+                core::rect<s32> pos2(button->x - button->width * 0.2f,
+                                     button->y - button->height * 0.2f,
+                                     button->x + button->width * 1.2f,
+                                     button->y + button->height * 1.2f);
+
+                video::ITexture* tex = irr_driver->getTexture(FileManager::GUI,
+                                                              "icons-frame.png");
+                core::rect<s32> coords(core::position2d<s32>(0,0), tex->getSize());
+
+                draw2DImage(tex, pos2, coords, NULL, NULL, true);
+            }
+
+            video::ITexture* tex;
+
+            if (button->type == MultitouchButtonType::BUTTON_SKIDDING)
+            {
+                tex = irr_driver->getTexture(FileManager::TEXTURE,
+                                             "skid-particle1.png");
+            }
+            else
+            {
+                std::string name = "gui_lock.png";
+
+                switch (button->type)
+                {
+                case MultitouchButtonType::BUTTON_ESCAPE:
+                    name = "back.png";
+                    break;
+                case MultitouchButtonType::BUTTON_FIRE:
+                    name = "banana.png";
+                    break;
+                case MultitouchButtonType::BUTTON_NITRO:
+                    name = "nitro.png";
+                    break;
+                case MultitouchButtonType::BUTTON_LOOK_BACKWARDS:
+                    name = "down.png";
+                    break;
+                case MultitouchButtonType::BUTTON_RESCUE:
+                    name = "restart.png";
+                    break;
+                default:
+                    break;
+                }
+
+                tex = irr_driver->getTexture(FileManager::GUI, name);
+            }
+
+            core::rect<s32> coords(core::position2d<s32>(0,0), tex->getSize());
+            draw2DImage(tex, pos, coords, NULL, NULL, true);
+
+            if (button->type == MultitouchButtonType::BUTTON_NITRO)
+            {
+                float scale = (float)(irr_driver->
+                                        getActualScreenSize().Height) / 1600.0f;
+                drawEnergyMeter(button->x + button->width,
+                                button->y + button->height,
+                                kart, viewport, core::vector2df(scale, scale));
+            }
+        }
+    }
+} // drawMultitouchSteering

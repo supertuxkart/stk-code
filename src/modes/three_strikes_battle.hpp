@@ -77,44 +77,63 @@ private:
     int m_start_time;
     int m_total_hit;
 
-public:
+    std::vector<AbstractKart*> m_spare_tire_karts;
+    float m_next_sta_spawn_time;
 
+public:
     /** Used to show a nice graph when battle is over */
     struct BattleEvent
     {
         float m_time;
         std::vector<BattleInfo> m_kart_info;
     };
+    // ------------------------------------------------------------------------
     std::vector<BattleEvent> m_battle_events;
-
+    // ------------------------------------------------------------------------
     ThreeStrikesBattle();
+    // ------------------------------------------------------------------------
     virtual ~ThreeStrikesBattle();
-
+    // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
-
+    // ------------------------------------------------------------------------
     // clock events
     virtual bool isRaceOver() OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual void terminateRace() OVERRIDE;
-
+    // ------------------------------------------------------------------------
     // overriding World methods
     virtual void reset() OVERRIDE;
-
-    //virtual void getDefaultCollectibles(int& collectible_type, int& amount);
-    virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
+    // ------------------------------------------------------------------------
     virtual void getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
-    virtual bool raceHasLaps() OVERRIDE { return false; }
-
+    // ------------------------------------------------------------------------
+    virtual bool raceHasLaps() OVERRIDE                       { return false; }
+    // ------------------------------------------------------------------------
     virtual const std::string& getIdent() const OVERRIDE;
-
+    // ------------------------------------------------------------------------
     virtual void kartHit(const unsigned int kart_id) OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual void update(float dt) OVERRIDE;
-
-    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node) OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node)
+                                                                      OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual void enterRaceOverState() OVERRIDE;
-
+    // ------------------------------------------------------------------------
+    virtual void loadCustomModels() OVERRIDE;
+    // ------------------------------------------------------------------------
     void updateKartRanks();
-    void increaseRescueCount() { m_total_rescue++; }
+    // ------------------------------------------------------------------------
+    void increaseRescueCount()                            { m_total_rescue++; }
+    // ------------------------------------------------------------------------
+    void addKartLife(unsigned int id);
+    // ------------------------------------------------------------------------
+    int getKartLife(unsigned int id) const  { return m_kart_info[id].m_lives; }
+    // ------------------------------------------------------------------------
+    bool spareTireKartsSpawned() const;
+    // ------------------------------------------------------------------------
+    void spawnSpareTireKarts();
+
 };   // ThreeStrikesBattles
 
 

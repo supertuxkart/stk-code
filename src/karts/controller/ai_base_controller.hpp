@@ -75,6 +75,8 @@ protected:
                                      float *radius) const;
     virtual void update      (float delta);
     virtual void setSteering   (float angle, float dt);
+    // ------------------------------------------------------------------------
+    /** Return true if AI can skid now. */
     virtual bool canSkid(float steer_fraction) = 0;
 
 public:

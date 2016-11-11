@@ -20,13 +20,12 @@
 
 #include "graphics/gl_headers.hpp"
 
-#include "graphics/irr_driver.hpp"
-#include "graphics/texture_manager.hpp"
-#include "graphics/vao_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
+#include <irrlicht.h>
 #include <vector>
 
 namespace HardwareStats
@@ -35,7 +34,6 @@ namespace HardwareStats
 }
 
 void initGL();
-video::ITexture* getUnicolorTexture(const video::SColor &c);
 
 class GPUTimer;
 
@@ -73,12 +71,12 @@ public:
     FrameBuffer(const std::vector <GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered = false);
     ~FrameBuffer();
     void bind() const;
-    void bindLayer(unsigned);
+    void bindLayer(unsigned) const;
     const std::vector<GLuint> &getRTT() const { return RenderTargets; }
-    GLuint &getDepthTexture() { assert(DepthTexture); return DepthTexture; }
+    GLuint getDepthTexture() const { assert(DepthTexture); return DepthTexture; }
     size_t getWidth() const { return width; }
     size_t getHeight() const { return height; }
-    static void Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST);
+    static void Blit(const FrameBuffer &Src, const FrameBuffer &Dst, GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST);
     void BlitToDefault(size_t, size_t, size_t, size_t);
 
     LEAK_CHECK();

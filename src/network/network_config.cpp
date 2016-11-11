@@ -30,17 +30,19 @@ NetworkConfig *NetworkConfig::m_network_config = NULL;
  *  instance.
  */
 // ============================================================================
-/** Constructor for a client
+/** Constructor.
  */
 NetworkConfig::NetworkConfig()
 {
-    m_network_type  = NETWORK_NONE;
-    m_is_server     = false;
-    m_max_players   = 4;
-    m_is_registered = false;
-    m_server_name   = "";
-    m_password      = "";
-    m_private_port  = 0;
+    m_network_type          = NETWORK_NONE;
+    m_is_server             = false;
+    m_max_players           = 4;
+    m_is_registered         = false;
+    m_server_name           = "";
+    m_password              = "";
+    m_server_discovery_port = 2757;
+    m_server_port           = 2758;
+    m_client_port           = 2759;
     m_my_address.lock();
     m_my_address.getData().clear();
     m_my_address.unlock();
@@ -56,3 +58,11 @@ void NetworkConfig::setMyAddress(const TransportAddress& addr)
     m_my_address.unlock();
 }   // setPublicAddress
 
+// --------------------------------------------------------------------
+/** Sets if this instance is a server or client. It also assigns the
+ *  private port depending if this is a server or client.
+ */
+void NetworkConfig::setIsServer(bool b)
+{
+    m_is_server = b;
+}   // setIsServer

@@ -27,7 +27,7 @@ public:
     void kartFinishedRace(const NetworkString &ns);
     void startReadySetGo();
     void receivedReadySetGo();
-    virtual void setup() OVERRIDE {};
+    virtual void setup() OVERRIDE;
     virtual void update(float dt) OVERRIDE {};
     virtual void asynchronousUpdate() OVERRIDE{}
     // ------------------------------------------------------------------------

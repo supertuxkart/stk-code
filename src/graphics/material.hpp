@@ -47,7 +47,7 @@ class Material : public NoCopy
 public:
     enum ShaderType
     {
-        SHADERTYPE_SOLID,
+        SHADERTYPE_SOLID = 0,
         SHADERTYPE_ALPHA_TEST,
         SHADERTYPE_ALPHA_BLEND,
         SHADERTYPE_ADDITIVE,
@@ -161,6 +161,12 @@ private:
      *  mirrored when driving in reverse. Typically used for arrows indicating
      *  the direction. */
     char             m_mirror_axis_when_reverse;
+
+    /** 
+    * Associated with m_mirror_axis_when_reverse, to avoid mirroring the same material twice
+    * (setAllMaterialFlags can be called multiple times on the same mesh buffer)
+    */
+    std::map<void*, bool> m_mirrorred_mesh_buffers;
 
     ParticleKind*    m_particles_effects[EMIT_KINDS_COUNT];
 

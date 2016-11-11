@@ -29,6 +29,7 @@
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/spare_tire_ai.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
@@ -287,6 +288,8 @@ Item* ItemManager::newItem(const Vec3& xyz, float distance,
 void ItemManager::collectedItem(Item *item, AbstractKart *kart, int add_info)
 {
     assert(item);
+    // Spare tire karts don't collect items
+    if (dynamic_cast<SpareTireAI*>(kart->getController()) != NULL) return;
     if( (item->getType() == Item::ITEM_BUBBLEGUM || 
          item->getType() == Item::ITEM_BUBBLEGUM_NOLOK) && kart->isShielded())
     {

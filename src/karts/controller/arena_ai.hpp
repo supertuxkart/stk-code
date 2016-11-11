@@ -32,7 +32,6 @@ class ArenaGraph;
 namespace irr
 {
     namespace scene { class ISceneNode; }
-    namespace video { class ITexture; }
 }
 
 /** A base class for AI that use navmesh to work.
@@ -41,12 +40,16 @@ namespace irr
 class ArenaAI : public AIBaseController
 {
 protected:
+    /** Pointer to the \ref ArenaGraph. */
     ArenaGraph* m_graph;
 
     /** Pointer to the closest kart around this kart. */
     AbstractKart *m_closest_kart;
 
+    /** The \ref ArenaNode at which the closest kart located on. */
     int m_closest_kart_node;
+
+    /** The closest kart location. */
     Vec3 m_closest_kart_point;
 
     /** Holds the current difficulty. */
@@ -55,26 +58,39 @@ protected:
     /** For debugging purpose: a sphere indicating where the AI
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
+
+    /** For debugging purpose: a sphere indicating where the first
+     *  turning corner is located. */
     irr::scene::ISceneNode *m_debug_sphere_next;
 
-    /** The node(quad) at which the target point lies in. */
+    /** The \ref ArenaNode at which the target point located on. */
     int m_target_node;
 
-    /** The target point. */
+    /** The coordinates of target point. */
     Vec3 m_target_point;
 
+    /** True if AI can skid, currently only do when close to target, see
+     *  \ref doSkiddingTest(). */
     bool m_mini_skid;
 
-    void  collectItemInArena(Vec3*, int*) const;
-private:
-    /** Used by handleArenaUTurn, it tells whether to do left or right
-     *  turning when steering is overridden. */
-    bool m_adjusting_side;
+    // ------------------------------------------------------------------------
+    void          tryCollectItem(Vec3* aim_point, int* target_node) const;
+    // ------------------------------------------------------------------------
+    /** Find the closest kart around this AI, implemented by sub-class.
+     *  \param consider_difficulty If take current difficulty into account.
+     *  \param find_sta If find \ref SpareTireAI only. */
+    virtual void  findClosestKart(bool consider_difficulty, bool find_sta) = 0;
 
+private:
+    /** Local coordinates of current target point. */
     Vec3 m_target_point_lc;
 
-   /** Indicates that the kart is currently stuck, and m_time_since_reversing is
-     * counting down. */
+    /** Save the last target point before reversing, so AI will end reversing
+     *  until facing in front of it. */
+    Vec3 m_reverse_point;
+
+    /** Indicates that the kart is currently stuck, and m_time_since_reversing
+     *  is counting down. */
     bool m_is_stuck;
 
     /** Indicates that the kart need a uturn to reach a node behind, and
@@ -100,40 +116,79 @@ private:
     /** This is a timer that counts when the kart start going off road. */
     float m_time_since_off_road;
 
+    /** Used to determine braking and nitro usage. */
     float m_turn_radius;
 
+    /** Used to determine if skidding can be done. */
     float m_steering_angle;
 
+    /** The point in front of the AI which distance is \ref m_kart_length, used
+     *  to compensate the time difference between steering when finding next
+     *  node. */
     Vec3 m_current_forward_point;
 
+    /** The \ref ArenaNode at which the forward point located on. */
     int m_current_forward_node;
 
     void          configSpeed();
+    // ------------------------------------------------------------------------
     void          configSteering();
+    // ------------------------------------------------------------------------
     void          checkIfStuck(const float dt);
+    // ------------------------------------------------------------------------
     void          determinePath(int forward, std::vector<int>* path);
+    // ------------------------------------------------------------------------
     void          doSkiddingTest();
+    // ------------------------------------------------------------------------
     void          doUTurn(const float dt);
+    // ------------------------------------------------------------------------
     bool          gettingUnstuck(const float dt);
+    // ------------------------------------------------------------------------
     bool          updateAimingPosition(Vec3* target_point);
+    // ------------------------------------------------------------------------
     void          useItems(const float dt);
+    // ------------------------------------------------------------------------
     virtual bool  canSkid(float steer_fraction) OVERRIDE
-                                     { return m_mini_skid; }
-    virtual void  findClosestKart(bool use_difficulty) = 0;
+                                                        { return m_mini_skid; }
+    // ------------------------------------------------------------------------
+    /** Find a suitable target for this frame, implemented by sub-class. */
     virtual void  findTarget() = 0;
-    virtual bool  forceBraking() { return false; }
+    // ------------------------------------------------------------------------
+    /** If true, AI will always try to brake for this frame. */
+    virtual bool  forceBraking()                              { return false; }
+    // ------------------------------------------------------------------------
+    /** Return the current \ref ArenaNode the AI located on. */
     virtual int   getCurrentNode() const = 0;
+    // ------------------------------------------------------------------------
+    /** Return the distance based on graph distance matrix to any kart.
+     *  \param kart \ref AbstractKart to check. */
     virtual float getKartDistance(const AbstractKart* kart) const = 0;
-    virtual bool  ignorePathFinding() { return false; }
+    // ------------------------------------------------------------------------
+    /** If true, AI will drive directly to target without path finding. */
+    virtual bool  ignorePathFinding()                         { return false; }
+    // ------------------------------------------------------------------------
+    /** If true, AI will stop moving. */
     virtual bool  isWaiting() const = 0;
+    // ------------------------------------------------------------------------
+    /** If true, AI stays on the \ref ArenaNode correctly, otherwise
+     *  \ref RescueAnimation will be done after sometime. */
     virtual bool  isKartOnRoad() const = 0;
-    virtual void  resetAfterStop() {};
+    // ------------------------------------------------------------------------
+    /** Overridden if any action is needed to be done when AI stopped
+     *  moving or changed driving direction. */
+    virtual void  resetAfterStop() {}
+
 public:
                  ArenaAI(AbstractKart *kart);
-    virtual     ~ArenaAI() {};
+    // ------------------------------------------------------------------------
+    virtual     ~ArenaAI() {}
+    // ------------------------------------------------------------------------
     virtual void update (float delta) OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual void reset  () OVERRIDE;
+    // ------------------------------------------------------------------------
     virtual void newLap (int lap) OVERRIDE {}
+
 };
 
 #endif

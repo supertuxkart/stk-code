@@ -126,15 +126,34 @@ ShadowMatrices::ShadowMatrices()
     m_shadow_cam_nodes[1] = NULL;
     m_shadow_cam_nodes[2] = NULL;
     m_shadow_cam_nodes[3] = NULL;
+    m_rsm_map_available = false;
+    m_rsm_matrix_initialized = false;
 }   // ShadowMatrices
+// ----------------------------------------------------------------------------
+ShadowMatrices::~ShadowMatrices()
+{
+    resetShadowCamNodes();
+    m_sun_cam->drop();
+}   // ~ShadowMatrices
+// ----------------------------------------------------------------------------
+void ShadowMatrices::resetShadowCamNodes()
+{
+    for (unsigned i = 0; i < 4; i++)
+    {
+        if (m_shadow_cam_nodes[i])
+        {
+            m_shadow_cam_nodes[i]->drop();
+            m_shadow_cam_nodes[i] = NULL;
+        }
+    }
+}   // resetShadowCamNodes
+
 // ----------------------------------------------------------------------------
 void ShadowMatrices::addLight(const core::vector3df &pos)
 {
     m_sun_cam->setPosition(pos);
     m_sun_cam->updateAbsolutePosition();
-
     m_rsm_matrix_initialized = false;
-
 }   // addLight
 
 // ----------------------------------------------------------------------------
@@ -221,7 +240,8 @@ core::matrix4 ShadowMatrices::getTighestFitOrthoProj(const core::matrix4 &transf
  *         I have some motivation
  */
 void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
-                                                                     unsigned int height)
+                                                                     unsigned int height,
+                                                                     GLuint depth_stencil_texture)
 {
 #if !defined(USE_GLES2)
     struct CascadeBoundingBox
@@ -259,7 +279,7 @@ void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned in
 
     LightspaceBoundingBoxShader::getInstance()->use();
     LightspaceBoundingBoxShader::getInstance()
-        ->setTextureUnits(irr_driver->getDepthStencilTexture());
+        ->setTextureUnits(depth_stencil_texture);
     LightspaceBoundingBoxShader::getInstance()
         ->setUniforms(m_sun_cam->getViewMatrix(),
                       ShadowMatrices::m_shadow_split[1],
@@ -298,10 +318,11 @@ void ShadowMatrices::updateSplitAndLightcoordRangeFromComputeShaders(unsigned in
  *   \param height of the rendering viewport
  */
 void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
-                                               unsigned int width, unsigned int height)
+                                               unsigned int width, unsigned int height,
+                                               GLuint depth_stencil_texture)
 {
     if (CVS->isSDSMEnabled())
-        updateSplitAndLightcoordRangeFromComputeShaders(width, height);
+        updateSplitAndLightcoordRangeFromComputeShaders(width, height, depth_stencil_texture);
     static_cast<scene::CSceneManager *>(irr_driver->getSceneManager())
         ->OnAnimate(os::Timer::getTime());
     camnode->render();
@@ -334,17 +355,6 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
 
     if (World::getWorld() && World::getWorld()->getTrack())
     {
-        // Compute track extent
-        btVector3 btmin, btmax;
-        if (World::getWorld()->getTrack()->getPtrTriangleMesh())
-        {
-            World::getWorld()->getTrack()->getTriangleMesh().getCollisionShape()
-                              .getAabb(btTransform::getIdentity(), btmin, btmax);
-        }
-        const Vec3 vmin = btmin, vmax = btmax;
-        core::aabbox3df trackbox(vmin.toIrrVector(), vmax.toIrrVector() -
-            core::vector3df(0, 30, 0));
-
         float FarValues[] =
         {
             ShadowMatrices::m_shadow_split[1],
@@ -411,8 +421,16 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
         }
 
         // Rsm Matrix and camera
-        if (!m_rsm_matrix_initialized)
+        if (!m_rsm_matrix_initialized &&
+            World::getWorld()->getTrack()->getPtrTriangleMesh())
         {
+            // Compute track extent
+            Vec3 vmin, vmax;
+            World::getWorld()->getTrack()->getTriangleMesh().getCollisionShape()
+                              .getAabb(btTransform::getIdentity(), vmin, vmax);
+            core::aabbox3df trackbox(vmin.toIrrVector(), vmax.toIrrVector() -
+                core::vector3df(0, 30, 0));
+
             if (trackbox.MinEdge.X != trackbox.MaxEdge.X &&
                 trackbox.MinEdge.Y != trackbox.MaxEdge.Y &&
                 // Cover the case where sun_cam_view_matrix is null
@@ -454,6 +472,9 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
                    16 * sizeof(float));
     }
 
+    if(!CVS->isARBUniformBufferObjectUsable())
+        return;
+    
     tmp[144] = float(width);
     tmp[145] = float(height);
     glBindBuffer(GL_UNIFORM_BUFFER,
@@ -481,25 +502,24 @@ void ShadowMatrices::renderWireFrameFrustrum(float *tmp, unsigned i)
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 }
 // ----------------------------------------------------------------------------
-void ShadowMatrices::renderShadowsDebug()
+void ShadowMatrices::renderShadowsDebug(const FrameBuffer &shadow_framebuffer,
+                                        const PostProcessing *post_processing)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, UserConfigParams::m_height / 2,
                UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    PostProcessing *post_processing = irr_driver->getPostProcessing();
-    RTT *rtt = irr_driver->getRTT();
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 0);
+    post_processing->renderTextureLayer(shadow_framebuffer.getRTT()[0], 0);
     renderWireFrameFrustrum(m_shadows_cam[0], 0);
     glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2,
                UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 1);
+    post_processing->renderTextureLayer(shadow_framebuffer.getRTT()[0], 1);
     renderWireFrameFrustrum(m_shadows_cam[1], 1);
     glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 2);
+    post_processing->renderTextureLayer(shadow_framebuffer.getRTT()[0], 2);
     renderWireFrameFrustrum(m_shadows_cam[2], 2);
     glViewport(UserConfigParams::m_width / 2, 0, UserConfigParams::m_width / 2,
                UserConfigParams::m_height / 2);
-    post_processing->renderTextureLayer(rtt->getShadowFBO().getRTT()[0], 3);
+    post_processing->renderTextureLayer(shadow_framebuffer.getRTT()[0], 3);
     renderWireFrameFrustrum(m_shadows_cam[3], 3);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }

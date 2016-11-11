@@ -27,24 +27,24 @@
  * management, etc...)
  */
 
-#include <string>
-#include <vector>
-
 #include <IVideoDriver.h>
 #include <vector2d.h>
 #include <dimension2d.h>
 #include <SColor.h>
 #include "IrrlichtDevice.h"
 #include "ISkinnedMesh.h"
+#include "graphics/abstract_renderer.hpp"
 #include "graphics/gl_headers.hpp"
-#include "graphics/skybox.hpp"
-#include "graphics/sphericalHarmonics.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"
+#include <memory>
+#include <string>
+#include <vector>
+
 
 namespace irr
 {
@@ -55,132 +55,17 @@ namespace irr
 }
 using namespace irr;
 
-class RTT;
-class RenderInfo;
-class FrameBuffer;
-class ShadowImportanceProvider;
+enum TypeRTT : unsigned int;
 class AbstractKart;
+class AbstractRenderer;
 class Camera;
-class PerCameraNode;
-class PostProcessing;
+class FrameBuffer;
 class LightNode;
-class ShadowImportance;
-class ShadowMatrices;
+class PerCameraNode;
+class RenderInfo;
+class RenderTarget;
 
-enum STKRenderingPass
-{
-    SOLID_NORMAL_AND_DEPTH_PASS,
-    SOLID_LIT_PASS,
-    TRANSPARENT_PASS,
-    GLOW_PASS,
-    SHADOW_PASS,
-    PASS_COUNT,
-};
-
-enum TypeFBO
-{
-    FBO_SSAO,
-    FBO_NORMAL_AND_DEPTHS,
-    FBO_COMBINED_DIFFUSE_SPECULAR,
-    FBO_COLORS,
-    FBO_DIFFUSE,
-    FBO_SPECULAR,
-    FBO_MLAA_COLORS,
-    FBO_MLAA_BLEND,
-    FBO_MLAA_TMP,
-    FBO_TMP1_WITH_DS,
-    FBO_TMP2_WITH_DS,
-    FBO_TMP4,
-    FBO_LINEAR_DEPTH,
-    FBO_HALF1,
-    FBO_HALF1_R,
-    FBO_HALF2,
-    FBO_HALF2_R,
-    FBO_QUARTER1,
-    FBO_QUARTER2,
-    FBO_EIGHTH1,
-    FBO_EIGHTH2,
-    FBO_DISPLACE,
-    FBO_BLOOM_1024,
-#if !defined(USE_GLES2)
-    FBO_SCALAR_1024,
-#endif
-    FBO_BLOOM_512,
-    FBO_TMP_512,
-    FBO_LENS_512,
-
-    FBO_BLOOM_256,
-    FBO_TMP_256,
-    FBO_LENS_256,
-
-    FBO_BLOOM_128,
-    FBO_TMP_128,
-    FBO_LENS_128,
-    FBO_COUNT
-};
-
-enum TypeRTT
-{
-    RTT_TMP1 = 0,
-    RTT_TMP2,
-    RTT_TMP3,
-    RTT_TMP4,
-    RTT_LINEAR_DEPTH,
-    RTT_NORMAL_AND_DEPTH,
-    RTT_COLOR,
-    RTT_DIFFUSE,
-    RTT_SPECULAR,
-
-
-    RTT_HALF1,
-    RTT_HALF2,
-    RTT_HALF1_R,
-    RTT_HALF2_R,
-
-    RTT_QUARTER1,
-    RTT_QUARTER2,
-    //    RTT_QUARTER3,
-    //    RTT_QUARTER4,
-
-    RTT_EIGHTH1,
-    RTT_EIGHTH2,
-
-    //    RTT_SIXTEENTH1,
-    //    RTT_SIXTEENTH2,
-
-    RTT_SSAO,
-
-    //    RTT_COLLAPSE,
-    //    RTT_COLLAPSEH,
-    //    RTT_COLLAPSEV,
-    //    RTT_COLLAPSEH2,
-    //    RTT_COLLAPSEV2,
-    //    RTT_WARPH,
-    //    RTT_WARPV,
-
-    //    RTT_HALF_SOFT,
-
-    RTT_DISPLACE,
-    RTT_MLAA_COLORS,
-    RTT_MLAA_BLEND,
-    RTT_MLAA_TMP,
-
-    RTT_BLOOM_1024,
-#if !defined(USE_GLES2)
-    RTT_SCALAR_1024,
-#endif
-    RTT_BLOOM_512,
-    RTT_TMP_512,
-    RTT_LENS_512,
-    RTT_BLOOM_256,
-    RTT_TMP_256,
-    RTT_LENS_256,
-    RTT_BLOOM_128,
-    RTT_TMP_128,
-    RTT_LENS_128,
-
-    RTT_COUNT
-};
+struct SHCoefficients;
 
 /**
   * \brief class that creates the irrLicht device and offers higher-level
@@ -188,9 +73,8 @@ enum TypeRTT
   * \ingroup graphics
   */
 class IrrDriver : public IEventReceiver, public NoCopy
-{
+{    
 private:
-    GLsync m_sync;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -201,14 +85,12 @@ private:
     video::IVideoDriver        *m_video_driver;
     /** Irrlicht race font. */
     gui::IGUIFont              *m_race_font;
-    /** Post-processing. */
-    PostProcessing             *m_post_processing;
-
+    /** Renderer. */
+    AbstractRenderer           *m_renderer;
+    
     /** Wind. */
     Wind                 *m_wind;
-    /** RTTs. */
-    RTT                *m_rtts;
-    core::vector2df    m_current_screen_size;
+
     core::dimension2du m_actual_screen_size;
 
     /** Additional details to be shown in case that a texture is not found.
@@ -221,8 +103,6 @@ private:
     /** Matrixes used in several places stored here to avoid recomputation. */
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
-    Skybox *m_skybox;
-    SphericalHarmonics *m_spherical_harmonics;
 
 private:
 
@@ -237,7 +117,6 @@ private:
     enum {RES_CHANGE_NONE, RES_CHANGE_YES,
           RES_CHANGE_CANCEL}                m_resolution_changing;
 
-    ShadowMatrices *m_shadow_matrices;
 
 public:
     /** A simple class to store video resolutions. */
@@ -259,10 +138,7 @@ public:
 
     video::SColorf getAmbientLight() const;
 
-    struct GlowData {
-        scene::ISceneNode * node;
-        float r, g, b;
-    };
+
 
 private:
     std::vector<VideoMode> m_modes;
@@ -289,16 +165,13 @@ private:
     bool                 m_lightviz;
     bool                 m_distortviz;
     bool                 m_boundingboxesviz;
-    /** Performance stats */
+
     unsigned             m_last_light_bucket_distance;
-    unsigned             m_object_count[PASS_COUNT];
-    unsigned             m_poly_count[PASS_COUNT];
     u32                  m_renderpass;
     class STKMeshSceneNode *m_sun_interposer;
     core::vector3df m_sun_direction;
     video::SColorf m_suncolor;
 
-    std::vector<GlowData> m_glowing;
 
     std::vector<LightNode *> m_lights;
 
@@ -311,34 +184,14 @@ private:
     float m_ssao_radius;
     float m_ssao_k;
     float m_ssao_sigma;
-
+    
 #ifdef DEBUG
     /** Used to visualise skeletons. */
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
-
-    void drawDebugMeshes();
-    void drawJoint(bool drawline, bool drawname,
-                   irr::scene::ISkinnedMesh::SJoint* joint,
-                   irr::scene::ISkinnedMesh* mesh, int id);
 #endif
 
-    void renderFixed(float dt);
-    void renderGLSL(float dt);
-    void renderSolidFirstPass();
-    void renderSolidSecondPass();
-    void renderNormalsVisualisation();
-    void renderTransparent();
-    void renderParticles();
-    void renderShadows();
-    void renderRSM();
-    void renderGlow(std::vector<GlowData>& glows);
-    void renderSSAO();
-    void renderLights(unsigned pointlightCount, bool hasShadow);
-    void renderAmbientScatter();
-    void renderLightsScatter(unsigned pointlightCount);
-    void renderShadowsDebug();
-    void doScreenShot();
-    void PrepareDrawCalls(scene::ICameraSceneNode *camnode);
+public:
+    void doScreenShot();    
 public:
          IrrDriver();
         ~IrrDriver();
@@ -348,22 +201,20 @@ public:
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
-    void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;
     void IncreaseObjectCount();
-    void IncreasePolyCount(unsigned);
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
-    scene::IAnimatedMesh *copyAnimatedMesh(scene::IAnimatedMesh *orig);
     video::ITexture      *applyMask(video::ITexture* texture,
                                     const std::string& mask_path);
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
-    void                  setAmbientLight(const video::SColorf &light);
+    void                  setAmbientLight(const video::SColorf &light,
+                                          bool force_SH_computation = true);
     std::string           generateSmallerTextures(const std::string& dir);
     std::string           getSmallerTexture(const std::string& texture);
     video::ITexture      *getTexture(FileManager::AssetType type,
@@ -393,7 +244,8 @@ public:
                                   const std::string& debug_name,
                                   scene::ISceneNode *parent = NULL,
                                   RenderInfo* render_info = NULL,
-                                  bool all_parts_colorized = false);
+                                  bool all_parts_colorized = false,
+                                  int frame_for_mesh = -1);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);
@@ -445,14 +297,8 @@ public:
     void                  unsetTextureErrorMessage();
     class GPUTimer        &getGPUTimer(unsigned);
 
-    void draw2dTriangle(const core::vector2df &a, const core::vector2df &b,
-                        const core::vector2df &c,
-                        const video::ITexture *texture = NULL,
-                        const video::SColor *ca=NULL,
-                        const video::SColor *cb=NULL,
-                        const video::SColor *cc=NULL);
-
-
+    std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
+                                                     const std::string &name);
 
     // ------------------------------------------------------------------------
     /** Convenience function that loads a texture with default parameters
@@ -502,10 +348,7 @@ public:
     {
         return m_texture_error_message;
     }   // getTextureErrorMessage
-    // ------------------------------------------------------------------------
-    void setRTT(RTT* rtt);
-    // ------------------------------------------------------------------------
-    RTT* getRTT() { return m_rtts; }
+
     // ------------------------------------------------------------------------
     /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
@@ -530,16 +373,14 @@ public:
      *  application. Value in msec. */
     unsigned int getRealTime() {return m_device->getTimer()->getRealTime(); }
     // ------------------------------------------------------------------------
-    /** Returns a pointer to the post processing object. */
-    inline PostProcessing* getPostProcessing()  {return m_post_processing;}
+    /** Use motion blur for a short time */
+    void giveBoost(unsigned int cam_index) { m_renderer->giveBoost(cam_index);}
     // ------------------------------------------------------------------------
     inline core::vector3df getWind()  {return m_wind->getWind();}
+
     // -----------------------------------------------------------------------
-    /** Returns a pointer to the skybox. */
-    inline Skybox *getSkybox()  {return m_skybox;}
-    // -----------------------------------------------------------------------
-    /** Returns a pointer to spherical harmonics. */
-    inline SphericalHarmonics *getSphericalHarmonics()  {return m_spherical_harmonics;}
+    /** Returns a pointer to the spherical harmonics coefficients. */
+    inline const SHCoefficients* getSHCoefficients()  {return m_renderer->getSHCoefficients();}
     // -----------------------------------------------------------------------
     const core::vector3df& getSunDirection() const { return m_sun_direction; };
     // -----------------------------------------------------------------------
@@ -556,7 +397,6 @@ public:
     }
     // ------------------------------------------------------------------------
     GLuint getRenderTargetTexture(TypeRTT which);
-    FrameBuffer& getFBO(TypeFBO which);
     GLuint getDepthStencilTexture();
     // ------------------------------------------------------------------------
     void resetDebugModes()
@@ -574,45 +414,49 @@ public:
         m_boundingboxesviz = false;
     }
     // ------------------------------------------------------------------------
-    void toggleWireframe() { m_wireframe = !m_wireframe; }
+    void toggleWireframe()        { m_wireframe = !m_wireframe;     }
     // ------------------------------------------------------------------------
-    void toggleMipVisualization() { m_mipviz = !m_mipviz; }
+    bool getWireframe()           { return m_wireframe;             }
     // ------------------------------------------------------------------------
-    void toggleNormals() { m_normals = !m_normals; }
+    void toggleMipVisualization() { m_mipviz = !m_mipviz;           }
     // ------------------------------------------------------------------------
-    bool getNormals() { return m_normals; }
+    bool getMipViz()              { return m_mipviz;                }
+    // ------------------------------------------------------------------------    
+    void toggleNormals()          { m_normals = !m_normals;         }
     // ------------------------------------------------------------------------
-    void toggleSSAOViz() { m_ssaoviz = !m_ssaoviz; }
+    bool getNormals()             { return m_normals;               }
     // ------------------------------------------------------------------------
-    void toggleLightViz() { m_lightviz = !m_lightviz; }
+    void toggleSSAOViz()          { m_ssaoviz = !m_ssaoviz;         }
     // ------------------------------------------------------------------------
-    bool getLightViz() { return m_lightviz; }
+    void toggleLightViz()         { m_lightviz = !m_lightviz;       }
     // ------------------------------------------------------------------------
-    bool getSSAOViz() { return m_ssaoviz; }
+    bool getLightViz()            { return m_lightviz;              }
     // ------------------------------------------------------------------------
-    void toggleRSM() { m_rsm = !m_rsm; }
+    bool getSSAOViz()             { return m_ssaoviz;               }
     // ------------------------------------------------------------------------
-    bool getRSM() { return m_rsm; }
+    void toggleRSM()              { m_rsm = !m_rsm;                 }
     // ------------------------------------------------------------------------
-    void toggleRH() { m_rh = !m_rh; }
+    bool getRSM()                 { return m_rsm;                   }
     // ------------------------------------------------------------------------
-    bool getRH() { return m_rh; }
+    void toggleRH()               { m_rh = !m_rh;                   }
     // ------------------------------------------------------------------------
-    void toggleGI() { m_gi = !m_gi; }
+    bool getRH()                  { return m_rh;                    }
     // ------------------------------------------------------------------------
-    bool getGI() { return m_gi; }
+    void toggleGI()               { m_gi = !m_gi;                   }
     // ------------------------------------------------------------------------
-    void toggleShadowViz() { m_shadowviz = !m_shadowviz; }
+    bool getGI()                  { return m_gi;                    }
     // ------------------------------------------------------------------------
-    bool getShadowViz() { return m_shadowviz; }
+    void toggleShadowViz()        { m_shadowviz = !m_shadowviz;     }
     // ------------------------------------------------------------------------
-    void toggleDistortViz() { m_distortviz = !m_distortviz; }
+    bool getShadowViz()           { return m_shadowviz;             }
     // ------------------------------------------------------------------------
-    bool getDistortViz() { return m_distortviz; }
+    void toggleDistortViz()       { m_distortviz = !m_distortviz;   }
+    // ------------------------------------------------------------------------
+    bool getDistortViz()          { return m_distortviz;            }
     // ------------------------------------------------------------------------
     void toggleBoundingBoxesViz() { m_boundingboxesviz = !m_boundingboxesviz; }
     // ------------------------------------------------------------------------
-    bool getBoundingBoxesViz() { return m_boundingboxesviz; }
+    bool getBoundingBoxesViz()    { return m_boundingboxesviz;      }
     // ------------------------------------------------------------------------
     u32 getRenderPass() { return m_renderpass; }
     // ------------------------------------------------------------------------
@@ -621,16 +465,10 @@ public:
     void addGlowingNode(scene::ISceneNode *n, float r = 1.0f, float g = 1.0f,
                         float b = 1.0f)
     {
-        GlowData dat;
-        dat.node = n;
-        dat.r = r;
-        dat.g = g;
-        dat.b = b;
-
-        m_glowing.push_back(dat);
+        m_renderer->addGlowingNode(n, r, g, b);
     }
     // ------------------------------------------------------------------------
-    void clearGlowingNodes() { m_glowing.clear(); }
+    void clearGlowingNodes() { m_renderer->clearGlowingNodes(); }
     // ------------------------------------------------------------------------
     void addForcedBloomNode(scene::ISceneNode *n, float power = 1)
     {
@@ -667,8 +505,6 @@ public:
     void clearLights();
     // ------------------------------------------------------------------------
     class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
-    // ------------------------------------------------------------------------
-    ShadowMatrices *getShadowMatrices() { return m_shadow_matrices;  }
     // ------------------------------------------------------------------------
     
     void cleanSunInterposer();
@@ -708,7 +544,7 @@ public:
     // ------------------------------------------------------------------------
     const core::vector2df &getCurrentScreenSize() const
     {
-        return m_current_screen_size;
+        return m_renderer->getCurrentScreenSize();
     }
     // ------------------------------------------------------------------------
     const core::dimension2du getActualScreenSize() const
@@ -751,6 +587,10 @@ public:
         m_ssao_sigma = v;
     }
 #ifdef DEBUG
+    std::vector<scene::IAnimatedMeshSceneNode*> getDebugMeshes()
+    {
+        return m_debug_meshes;
+    }
     /** Removes debug meshes. */
     void clearDebugMesh() { m_debug_meshes.clear(); }
     // ------------------------------------------------------------------------
@@ -761,91 +601,13 @@ public:
     }   // addDebugMesh
 
 #endif
-
     void onLoadWorld();
     void onUnloadWorld();
 
-    void renderScene(scene::ICameraSceneNode * const camnode,
-                     unsigned pointlightcount, std::vector<GlowData>& glows,
-                     float dt, bool hasShadows, bool forceRTT);
-    unsigned updateLightsInfo(scene::ICameraSceneNode * const camnode,
-                              float dt);
     void updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
                                                          size_t height);
-    void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
-                                   size_t width, size_t height);
+
     void uploadLightingData();
-
-
-    // --------------------- OLD RTT --------------------
-    /**
-      * THIS IS THE OLD OPENGL 1 RTT PROVIDER, USE THE SHADER-BASED
-      * RTT FOR NEW DEVELOPMENT
-      *
-      * Class that provides RTT (currently, only when no other 3D rendering
-      * in the main scene is required)
-      * Provides an optional 'setupRTTScene' method to make it quick and easy
-      * to prepare rendering of 3D objects but you can also manually set the
-      * scene/camera. If you use the factory 'setupRTTScene', cleanup can be
-      * done through 'tearDownRTTScene' (destructor will also do this). If
-      * you set it up manually, you need to clean it up manually.
-      */
-    class RTTProvider
-    {
-        /** A pointer to texture on which a scene is rendered. Only used
-         *  in between beginRenderToTexture() and endRenderToTexture calls. */
-        video::ITexture            *m_render_target_texture;
-
-        bool                        m_persistent_texture;
-
-        /** Main node of the RTT scene */
-        scene::ISceneNode          *m_rtt_main_node;
-
-        scene::ICameraSceneNode    *m_camera;
-
-        scene::ILightSceneNode     *m_light;
-
-        /** Irrlicht video driver. */
-        video::IVideoDriver        *m_video_driver;
-
-    public:
-        RTTProvider(const core::dimension2du &dimension,
-                    const std::string &name, bool persistent_texture);
-
-        ~RTTProvider();
-
-        /**
-          * \brief Quick utility method to setup a scene from a plain list
-          *  of models
-          *
-          * Sets up a given vector of meshes for render-to-texture. Ideal to
-          * embed a 3D object inside the GUI. If there are multiple meshes,
-          * the first mesh is considered to be the root, and all following
-          * meshes will have their locations relative to the location of the
-          * first mesh.
-          *
-          * \param mesh             The list of meshes to add to the scene
-          * \param mesh_location    Location of each fo these meshes
-          * \param model_frames     For animated meshes, which frame to use
-          *                         (value can be -1 to set none)
-          *                         When frame is not -1, the corresponding
-          *                         IMesh must be an IAnimatedMesh.
-          * \pre           The 3 vectors have the same size.
-          */
-        void setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
-                           AlignedArray<Vec3>& mesh_location,
-                           AlignedArray<Vec3>& mesh_scale,
-                           const std::vector<int>& model_frames);
-
-        /** Optional 'angle' parameter will rotate the object added
-         *  *through setupRTTScene* */
-        video::ITexture* renderToTexture(float angle=-1,
-                                         bool is_2d_render=false);
-
-        void tearDownRTTScene();
-
-    };
-
 
 };   // IrrDriver
 
