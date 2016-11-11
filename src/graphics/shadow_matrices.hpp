@@ -19,11 +19,12 @@
 #ifndef HEADER_SHADOW_MATRICES_HPP
 #define HEADER_SHADOW_MATRICES_HPP
 
-#include "matrix4.h"
-#include "vector3d.h"
+#include "graphics/gl_headers.hpp"
 
+#include <matrix4.h>
 #include <tuple>
 #include <vector>
+#include <vector3d.h>
 
 namespace irr
 {
@@ -32,7 +33,8 @@ namespace irr
 
 using namespace irr;
 
-
+class FrameBuffer;
+class PostProcessing;
 
 class ShadowMatrices
 {
@@ -53,7 +55,8 @@ private:
 
 
     void updateSplitAndLightcoordRangeFromComputeShaders(unsigned int width,
-                                                         unsigned int height);
+                                                         unsigned int height,
+                                                         GLuint depth_stencil_texture);
     core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform,
                               const std::vector<core::vector3df> &pointsInside,
                               std::pair<float, float> &size);
@@ -64,10 +67,12 @@ public:
     ~ShadowMatrices();
 
     void computeMatrixesAndCameras(scene::ICameraSceneNode *const camnode,
-                                   unsigned int width, unsigned int height);
+                                   unsigned int width, unsigned int height,
+                                   GLuint depth_stencil_texture);
     void addLight(const core::vector3df &pos);
     void updateSunOrthoMatrices();
-    void renderShadowsDebug();
+    void renderShadowsDebug(const FrameBuffer &shadow_framebuffer,
+                            const PostProcessing *post_processing);
 
     // ------------------------------------------------------------------------
     void resetShadowCamNodes();
@@ -79,11 +84,11 @@ public:
     // ------------------------------------------------------------------------
     scene::ICameraSceneNode* getSunCam() { return m_sun_cam; }
     // ------------------------------------------------------------------------
-    core::matrix4& getRHMatrix() { return m_rh_matrix;  }
+    const core::matrix4& getRHMatrix() const { return m_rh_matrix;  }
     // ------------------------------------------------------------------------
-    core::vector3df& getRHExtend() { return m_rh_extend;  }
+    const core::vector3df& getRHExtend() const { return m_rh_extend;  }
     // ------------------------------------------------------------------------
-    core::matrix4& getRSMMatrix() { return m_rsm_matrix; }
+    const core::matrix4& getRSMMatrix() const { return m_rsm_matrix; }
     // ------------------------------------------------------------------------
     std::vector<core::matrix4>& getSunOrthoMatrices()
     {
@@ -98,7 +103,6 @@ public:
     {
         return m_shadow_scales;
     }
-    // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
 
 };   // class ShadowMatrices

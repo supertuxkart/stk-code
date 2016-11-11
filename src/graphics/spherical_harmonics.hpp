@@ -29,6 +29,13 @@ struct Color
     float Blue;
 };
 
+struct SHCoefficients
+{
+    float blue_SH_coeff[9];
+    float green_SH_coeff[9];
+    float red_SH_coeff[9];
+};
+
 
 class SphericalHarmonics
 {
@@ -40,10 +47,7 @@ private:
     irr::video::SColor m_ambient;
     
     /** The spherical harmonics coefficients */
-    float m_blue_SH_coeff[9];
-    float m_green_SH_coeff[9];
-    float m_red_SH_coeff[9];
-    
+    SHCoefficients *m_SH_coeff;
 
     void projectSH(Color *cubemap_face[6], size_t edge_size, float *Y00[],
                       float *Y1minus1[], float *Y10[], float *Y11[],
@@ -55,13 +59,12 @@ private:
 public:
     SphericalHarmonics(const std::vector<irr::video::ITexture *> &spherical_harmonics_textures);
     SphericalHarmonics(const irr::video::SColor &ambient);
+    ~SphericalHarmonics();
     
     void setTextures(const std::vector<irr::video::ITexture *> &spherical_harmonics_textures);    
     void setAmbientLight(const irr::video::SColor &ambient);
-    
-    inline const float* getBlueSHCoeff () const     {return m_blue_SH_coeff;  }
-    inline const float* getGreenSHCoeff() const     {return m_green_SH_coeff; }
-    inline const float* getRedSHCoeff  () const     {return m_red_SH_coeff;   }    
+
+    inline const SHCoefficients* getCoefficients() const { return m_SH_coeff;  }
     
     inline bool has6Textures() const {return m_spherical_harmonics_textures.size()==6;}
     

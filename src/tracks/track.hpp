@@ -26,17 +26,12 @@
   * objects.
   */
 
-#include <SColor.h>
 #include <string>
 #include <vector>
 
-namespace irr
-{
-    namespace video { class ITexture;       }
-    namespace scene { class IMesh; class ILightSceneNode; class ISceneNode; }
-}
+#include <irrlicht.h>
+
 using namespace irr;
-class ModelDefinitionLoader;
 
 #include "LinearMath/btTransform.h"
 
@@ -49,12 +44,13 @@ class AbstractKart;
 class AnimationManager;
 class BezierCurve;
 class CheckManager;
-class FrameBuffer;
+class ModelDefinitionLoader;
 class MovingTexture;
 class MusicInformation;
 class ParticleEmitter;
 class ParticleKind;
 class PhysicalObject;
+class RenderTarget;
 class TrackObject;
 class TrackObjectManager;
 class TriangleMesh;
@@ -334,9 +330,8 @@ private:
     video::SColor       m_sun_diffuse_color;
     video::SColor       m_fog_color;
 
-    /** The texture for the mini map, which is displayed in the race gui. */
-    video::ITexture         *m_old_rtt_mini_map;
-    FrameBuffer             *m_new_rtt_mini_map;
+    /** The render target for the mini map, which is displayed in the race gui. */
+    RenderTarget           *m_render_target;
     core::dimension2du      m_mini_map_size;
     float                   m_minimap_x_scale;
     float                   m_minimap_y_scale;
@@ -433,12 +428,7 @@ public:
     bool findGround(AbstractKart *kart);
 
     std::vector< std::vector<float> > buildHeightMap();
-    // ------------------------------------------------------------------------
-    /** Returns the texture with the mini map for this track. */
-    const video::ITexture*    getOldRttMiniMap() const { return m_old_rtt_mini_map; }
-    const FrameBuffer*        getNewRttMiniMap() const { return m_new_rtt_mini_map; }
-    // ------------------------------------------------------------------------
-    const core::dimension2du& getMiniMapSize() const { return m_mini_map_size; }
+    void               drawMiniMap(const core::rect<s32>& dest_rect) const;
     // ------------------------------------------------------------------------
     /** Returns true if this track has an arena mode. */
     bool isArena() const { return m_is_arena; }

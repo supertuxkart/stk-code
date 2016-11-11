@@ -28,7 +28,7 @@ private:
     bool hasVSLayer;
     bool hasBaseInstance;
     bool hasDrawIndirect;
-    bool hasBuffserStorage;
+    bool hasBufferStorage;
     bool hasComputeShaders;
     bool hasArraysOfArrays;
     bool hasTextureStorage;

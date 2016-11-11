@@ -47,7 +47,7 @@ class Material : public NoCopy
 public:
     enum ShaderType
     {
-        SHADERTYPE_SOLID,
+        SHADERTYPE_SOLID = 0,
         SHADERTYPE_ALPHA_TEST,
         SHADERTYPE_ALPHA_BLEND,
         SHADERTYPE_ADDITIVE,

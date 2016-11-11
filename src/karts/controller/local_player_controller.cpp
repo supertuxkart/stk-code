@@ -25,7 +25,6 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/post_processing.hpp"
 #include "input/input_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/item.hpp"
@@ -265,8 +264,7 @@ void LocalPlayerController::handleZipper(bool play_sound)
     }
 
     // Apply the motion blur according to the speed of the kart
-    irr_driver->getPostProcessing()->giveBoost(m_camera_index);
-
+    irr_driver->giveBoost(m_camera_index);
 }   // handleZipper
 
 //-----------------------------------------------------------------------------

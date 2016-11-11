@@ -665,6 +665,7 @@ namespace GUIEngine
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/message_queue.hpp"
@@ -681,7 +682,6 @@ namespace GUIEngine
 #include <iostream>
 #include <assert.h>
 #include <irrlicht.h>
-#include "graphics/glwrap.hpp"
 
 using namespace irr::gui;
 using namespace irr::video;

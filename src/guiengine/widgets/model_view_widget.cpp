@@ -21,8 +21,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/post_processing.hpp"
-#include "graphics/rtts.hpp"
+#include "graphics/render_target.hpp"
 
 #include <IAnimatedMesh.h>
 #include <IAnimatedMeshSceneNode.h>
@@ -40,14 +39,11 @@ using namespace irr::gui;
 ModelViewWidget::ModelViewWidget() :
 IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false)
 {
-    m_frame_buffer = NULL;
-    m_texture = NULL;
     m_rtt_main_node = NULL;
     m_camera = NULL;
     m_light = NULL;
     m_type = WTYPE_MODEL_VIEW;
-    m_rtt_provider = NULL;
-    m_old_rtt_provider = NULL;
+    m_render_target = NULL;
     m_rotation_mode = ROTATE_OFF;
     m_render_info = new RenderInfo();
     m_angle = 0;
@@ -61,14 +57,6 @@ IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, 
 ModelViewWidget::~ModelViewWidget()
 {
     GUIEngine::needsUpdate.remove(this);
-
-    delete m_rtt_provider;
-    m_rtt_provider = NULL;
-
-    delete m_old_rtt_provider;
-    m_old_rtt_provider = NULL;
-    m_texture = NULL;
-
     delete m_render_info;
 }
 // -----------------------------------------------------------------------------
@@ -120,9 +108,8 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
     m_model_frames.push_back(frame);
     m_model_render_info_affected.push_back(all_parts_colorized);
 
-    delete m_old_rtt_provider;
-    m_old_rtt_provider = NULL;
-    m_texture = NULL;
+    if (!CVS->isGLSL())
+        m_render_target = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -175,43 +162,25 @@ void ModelViewWidget::update(float delta)
         if (fabsf(m_angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
 
-    if (CVS->isGLSL())
+    if (m_render_target == NULL)
     {
-        if (m_rtt_provider == NULL)
-        {
-            m_rtt_provider = new RTT(512, 512);
-        }
-
-        if (m_rtt_main_node == NULL)
-        {
-            setupRTTScene();
-        }
-
-        m_rtt_main_node->setRotation(core::vector3df(0.0f, m_angle, 0.0f));
-
-        m_rtt_main_node->setVisible(true);
-
-        m_frame_buffer = m_rtt_provider->render(m_camera, GUIEngine::getLatestDt());
-
-        m_rtt_main_node->setVisible(false);
+        std::string name = "model view ";
+        name += m_properties[PROP_ID].c_str();
+        m_render_target = irr_driver->createRenderTarget(irr::core::dimension2du(512,512), name);
     }
-    else
+
+    if (m_rtt_main_node == NULL)
     {
-        if (m_old_rtt_provider == NULL)
-        {
-            std::string name = "model view ";
-            name += m_properties[PROP_ID].c_str();
-            m_old_rtt_provider = new IrrDriver::RTTProvider(core::dimension2d<u32>(512, 512), name, false);
-            m_old_rtt_provider->setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
-        }
+        setupRTTScene();
+    }    
 
-        m_texture = m_old_rtt_provider->renderToTexture(m_angle);
+    m_rtt_main_node->setRotation(core::vector3df(0.0f, m_angle, 0.0f));
 
-        if (m_texture == NULL)
-        {
-            m_rtt_unsupported = true;
-        }
-    }
+    m_rtt_main_node->setVisible(true);
+
+    m_render_target->renderToTexture(m_camera, GUIEngine::getLatestDt());
+
+    m_rtt_main_node->setVisible(false);
 }
 
 void ModelViewWidget::setupRTTScene()
@@ -286,7 +255,21 @@ void ModelViewWidget::setupRTTScene()
     irr_driver->setAmbientLight(video::SColor(255, 35, 35, 35));
 
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
-    m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
+
+    if (!CVS->isGLSL())
+    {
+        scene::ILightSceneNode* light = irr_driver->getSceneManager()
+            ->addLightSceneNode(NULL, spot_pos, video::SColorf(1.0f,1.0f,1.0f),
+                                1600 /* radius */);
+        light->setLightType(video::ELT_SPOT);
+        light->setRotation((core::vector3df(0, 10, 0) - spot_pos).getHorizontalAngle());
+        light->updateAbsolutePosition();
+        m_light = light;
+    }
+    else
+    {
+        m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
+    }
 
     m_rtt_main_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
     m_rtt_main_node->setMaterialFlag(video::EMF_LIGHTING, true);
@@ -314,7 +297,6 @@ void ModelViewWidget::setupRTTScene()
     m_camera->setFOV(DEGREE_TO_RAD*50.0f);
     m_camera->updateAbsolutePosition();
 
-    m_rtt_provider->prepareRender(m_camera);
 }
 
 void ModelViewWidget::setRotateOff()
@@ -340,22 +322,17 @@ bool ModelViewWidget::isRotating()
 
 void ModelViewWidget::elementRemoved()
 {
-    delete m_rtt_provider;
-    m_rtt_provider = NULL;
-
-    delete m_old_rtt_provider;
-    m_old_rtt_provider = NULL;
-    m_texture = NULL;
-
+    m_render_target = NULL;
     IconButtonWidget::elementRemoved();
 }
 
 void ModelViewWidget::clearRttProvider()
 {
-    delete m_rtt_provider;
-    m_rtt_provider = NULL;
+    m_render_target = NULL;
+}
 
-    delete m_old_rtt_provider;
-    m_old_rtt_provider = NULL;
-    m_texture = NULL;
+void ModelViewWidget::drawRTTScene(const irr::core::rect<s32>& dest_rect) const
+{
+    if(m_render_target != NULL)
+        m_render_target->draw2DImage(dest_rect, NULL, video::SColor(255, 255, 255, 255), true);
 }

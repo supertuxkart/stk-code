@@ -16,13 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/stk_text_billboard.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "guiengine/engine.hpp"
-#include "glwrap.hpp"
+#include "graphics/texture_manager.hpp"
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 #include <ISceneManager.h>
