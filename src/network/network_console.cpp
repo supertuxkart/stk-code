@@ -43,8 +43,10 @@ NetworkConsole::NetworkConsole()
 // ----------------------------------------------------------------------------
 NetworkConsole::~NetworkConsole()
 {
+#ifndef ANDROID
     if (m_thread_keyboard)
         pthread_cancel(*m_thread_keyboard);//, SIGKILL);
+#endif
 }
 
 // ----------------------------------------------------------------------------
