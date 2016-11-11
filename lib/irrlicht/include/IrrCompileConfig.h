@@ -248,6 +248,10 @@ define out. */
 #ifdef NO_IRR_LINUX_XCURSOR_
 #undef _IRR_LINUX_XCURSOR_
 #endif
+#else
+
+#undef _IRR_LINUX_X11_VIDMODE_
+#undef _IRR_LINUX_X11_RANDR_
 
 #endif
 

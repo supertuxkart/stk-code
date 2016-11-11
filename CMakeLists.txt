@@ -15,6 +15,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
+option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
@@ -34,7 +35,7 @@ else()
     set(WIIUSE_BUILD ON)
 endif()
 
-if(MINGW OR CYGWIN)
+if(MINGW OR CYGWIN OR SERVER_ONLY)
     option(USE_WIIUSE "Support for wiimote input devices" OFF)
 else()
     option(USE_WIIUSE "Support for wiimote input devices" ON)
@@ -67,6 +68,10 @@ if(USE_GLES2)
     add_definitions(-DUSE_GLES2)
 endif()
 
+if(SERVER_ONLY)
+    add_definitions(-DSERVER_ONLY)
+endif()
+
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
@@ -76,7 +81,7 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 
 # Build glew library
-if(NOT USE_GLES2)
+if(NOT USE_GLES2 AND NOT SERVER_ONLY)
     add_definitions(-DGLEW_NO_GLU)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
     include_directories("${PROJECT_SOURCE_DIR}/lib/glew/include")
@@ -205,12 +210,13 @@ if (OPENMP_FOUND)
 endif()
 
 # OpenGL
-if(NOT USE_GLES2)
+if(NOT USE_GLES2 AND NOT SERVER_ONLY)
     find_package(OpenGL REQUIRED)
     include_directories(${OPENGL_INCLUDE_DIR})
 endif()
 
-if(UNIX AND NOT APPLE)
+
+if(UNIX AND NOT APPLE AND NOT SERVER_ONLY)
     find_package(X11 REQUIRED)
     include_directories(${X11_INCLUDE_DIR})
 
