@@ -692,7 +692,7 @@ btQuaternion Track::getArenaStartRotation(const Vec3& xyz, float heading)
     }
 
     const Vec3& normal = Graph::get()->getQuad(node)->getNormal();
-    btQuaternion q = createRotationFromNormal(normal);
+    btQuaternion q = shortestArcQuat(Vec3(0, 1, 0), normal);
     btMatrix3x3 m;
     m.setRotation(q);
     return btQuaternion(m.getColumn(1), heading * DEGREE_TO_RAD) * q;
