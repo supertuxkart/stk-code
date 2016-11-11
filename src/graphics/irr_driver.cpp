@@ -75,9 +75,9 @@
        IRRLICHT_VERSION_MINOR < 7                   || \
       _IRR_MATERIAL_MAX_TEXTURES_ < 8               || \
       ( !defined(_IRR_COMPILE_WITH_OPENGL_) &&         \
-        !defined(SERVER_ONLY) )             &&         \
+        !defined(SERVER_ONLY)               &&         \
         !defined(_IRR_COMPILE_WITH_OGLES2_)       ) || \
-      !defined(_IRR_COMPILE_WITH_B3D_LOADER_))
+      !defined(_IRR_COMPILE_WITH_B3D_LOADER_)             )
 #error "Building against an incompatible Irrlicht. Distros, \
 please use the included version."
 #endif
@@ -556,11 +556,13 @@ void IrrDriver::initDevice()
     m_video_driver  = m_device->getVideoDriver();
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
-    
+
+#ifndef SERVER_ONLY
     if(CVS->isGLSL())
         m_renderer = new ShaderBasedRenderer();
     else
         m_renderer = new FixedPipelineRenderer();
+#endif
 
     if (UserConfigParams::m_shadows_resolution != 0 &&
         (UserConfigParams::m_shadows_resolution < 512 ||

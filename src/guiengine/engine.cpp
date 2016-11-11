@@ -1210,9 +1210,10 @@ namespace GUIEngine
                                                   y_from - count*text_height),
                                 core::dimension2d<s32>(screen_size.Width,
                                                        text_height) );
-
+#ifndef SERVER_ONLY
                     GL32_draw2DRectangle(SColor(255,252,248,230),
                                                        msgRect);
+#endif
                     Private::g_font->draw((*it).m_message.c_str(),
                                           msgRect,
                                           video::SColor(255, 255, 0, 0),
@@ -1254,6 +1255,7 @@ namespace GUIEngine
 
     void renderLoading(bool clearIcons)
     {
+#ifndef SERVER_ONLY
         if (clearIcons) g_loading_icons.clear();
 
         g_skin->drawBgImage();
@@ -1317,7 +1319,7 @@ namespace GUIEngine
                 x = ICON_MARGIN;
             }
         }
-
+#endif
     } // renderLoading
 
     // -----------------------------------------------------------------------

@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/command_buffer.hpp"
 #include "graphics/central_settings.hpp"
 #include "utils/cpp2011.hpp"
@@ -252,4 +254,6 @@ void GlowCommandBuffer::fill(OtherMeshMap *mesh_map)
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
     
 } //GlowCommandBuffer::fill
-#endif // !defined(USE_GLES2)
+#endif   // !defined(USE_GLES2)
+
+#endif   // !SERVER_ONLY

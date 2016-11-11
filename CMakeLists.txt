@@ -375,10 +375,12 @@ target_link_libraries(supertuxkart
     ${FREETYPE_LIBRARIES}
     )
 
-if(NOT USE_GLES2)
-    target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew)
-else()
-    target_link_libraries(supertuxkart EGL GLESv2)
+if(NOT SERVER_ONLY)
+    if(NOT USE_GLES2)
+        target_link_libraries(supertuxkart ${OPENGL_LIBRARIES} glew)
+    else()
+        target_link_libraries(supertuxkart EGL GLESv2)
+    endif()
 endif()
 
 if(UNIX AND NOT APPLE)

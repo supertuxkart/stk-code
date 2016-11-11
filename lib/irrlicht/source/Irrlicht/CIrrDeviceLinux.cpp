@@ -596,7 +596,6 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
-#endif
 
 #endif
 
