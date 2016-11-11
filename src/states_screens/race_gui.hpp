@@ -94,6 +94,8 @@ private:
 
     bool m_is_tutorial;
 
+    void initMultitouchSteering();
+
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
                                 const core::recti &viewport,
@@ -108,6 +110,9 @@ private:
                                 const core::vector2df &offset,
                                 float min_ratio, int meter_width,
                                 int meter_height, float dt);
+    void drawMultitouchSteering (const AbstractKart* kart,
+                                 const core::recti &viewport,
+                                 const core::vector2df &scaling);
 
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();

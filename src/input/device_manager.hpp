@@ -34,6 +34,7 @@ class DeviceConfig;
 class InputDevice;
 class GamePadDevice;
 class KeyboardDevice;
+class MultitouchDevice;
 
 
 enum PlayerAssignMode
@@ -66,6 +67,7 @@ private:
     PtrVector<GamePadDevice, HOLD>     m_gamepads;
     PtrVector<KeyboardConfig, HOLD>    m_keyboard_configs;
     PtrVector<GamepadConfig, HOLD>     m_gamepad_configs;
+    MultitouchDevice*                  m_multitouch_device;
 
     /** The list of all joysticks that were found and activated. */
     core::array<SJoystickInfo>         m_irrlicht_gamepads;
@@ -128,6 +130,11 @@ public:
     KeyboardDevice*     getKeyboard(const int i)            { return m_keyboards.get(i); }
     KeyboardConfig*     getKeyboardConfig(const int i)      { return m_keyboard_configs.get(i); }
     KeyboardDevice*     getKeyboardFromBtnID(const int btnID);
+
+    // ---- Multitouch device ----
+    MultitouchDevice*   getMultitouchDevice()    { return m_multitouch_device; }
+    void                clearMultitouchDevices();
+    void                updateMultitouchDevice();
 
 
     /**

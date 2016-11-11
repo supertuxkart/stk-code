@@ -20,6 +20,7 @@
 #include "graphics/2dutils.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/engine.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "utils/vs.hpp"
 

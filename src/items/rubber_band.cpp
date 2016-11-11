@@ -20,10 +20,10 @@
 
 #include <IMeshSceneNode.h>
 
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/texture_manager.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"

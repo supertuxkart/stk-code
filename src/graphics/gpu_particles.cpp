@@ -18,11 +18,11 @@
 #include "graphics/gpu_particles.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/texture_manager.hpp"
 #include "graphics/texture_shader.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
@@ -496,6 +496,7 @@ void ParticleSystemProxy::simulate()
     glDrawArrays(GL_POINTS, 0, m_count);
     glEndTransformFeedback();
     glBindVertexArray(0);
+    glActiveTexture(GL_TEXTURE0);
 
     glDisable(GL_RASTERIZER_DISCARD);
 #ifdef DEBUG_PARTICLES

@@ -24,6 +24,7 @@
 
 #include <dimension2d.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -35,9 +36,8 @@ namespace irr
 
 using namespace irr;
 
-class FrameBuffer;
 class Quad;
-class RTT;
+class RenderTarget;
 
 /**
  *  \brief This class stores a graph of quads. It uses a 'simplified singleton'
@@ -61,7 +61,8 @@ protected:
      *  graph. */
     void createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
                     const Vec3 &p3, unsigned int node_index,
-                    bool invisible, bool ai_ignore, bool is_arena, bool ignore);
+                    bool invisible, bool ai_ignore, bool is_arena,
+                    bool ignore);
     // ------------------------------------------------------------------------
     /** Map 4 bounding box points to 4 closest graph nodes. */
     void loadBoundingBoxNodes();
@@ -74,8 +75,6 @@ private:
     /** The 4 closest graph nodes to the bounding box. */
     int m_bb_nodes[4];
 
-    RTT* m_new_rtt;
-
     /** The node of the graph mesh. */
     scene::ISceneNode *m_node;
 
@@ -87,6 +86,9 @@ private:
 
     /** Scaling for mini map. */
     float m_scaling;
+
+    /** The render target used for drawing the minimap. */
+    std::unique_ptr<RenderTarget> m_render_target;
 
     // ------------------------------------------------------------------------
     void createMesh(bool show_invisible=true,
@@ -132,10 +134,9 @@ public:
     // ------------------------------------------------------------------------
     void createDebugMesh();
     // ------------------------------------------------------------------------
-    void makeMiniMap(const core::dimension2du &where, const std::string &name,
-                     const video::SColor &fill_color,
-                     video::ITexture** oldRttMinimap,
-                     FrameBuffer** newRttMinimap);
+    RenderTarget* makeMiniMap(const core::dimension2du &dimension,
+                              const std::string &name,
+                              const video::SColor &fill_color);
     // ------------------------------------------------------------------------
     void mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
     // ------------------------------------------------------------------------

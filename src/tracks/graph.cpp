@@ -18,16 +18,12 @@
 
 #include "tracks/graph.hpp"
 
-#include <ICameraSceneNode.h>
-#include <IMesh.h>
-#include <IMeshSceneNode.h>
-#include <ISceneManager.h>
-
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/rtts.hpp"
+#include "graphics/render_target.hpp"
+#include "graphics/texture_manager.hpp"
+#include "graphics/vao_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "tracks/arena_node_3d.hpp"
 #include "tracks/drive_node_2d.hpp"
@@ -43,7 +39,7 @@ Graph::Graph()
     m_node        = NULL;
     m_mesh        = NULL;
     m_mesh_buffer = NULL;
-    m_new_rtt     = NULL;
+    m_render_target = NULL;
     m_bb_min      = Vec3( 99999,  99999,  99999);
     m_bb_max      = Vec3(-99999, -99999, -99999);
     memset(m_bb_nodes, 0, 4 * sizeof(int));
@@ -52,12 +48,6 @@ Graph::Graph()
 // -----------------------------------------------------------------------------
 Graph::~Graph()
 {
-    if (m_new_rtt != NULL)
-    {
-        delete m_new_rtt;
-        m_new_rtt = NULL;
-    }
-
     if (UserConfigParams::m_track_debug)
         cleanupDebugMesh();
 
@@ -244,33 +234,19 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
 // -----------------------------------------------------------------------------
 /** Takes a snapshot of the graph so they can be used as minimap.
  */
-void Graph::makeMiniMap(const core::dimension2du &dimension,
-                        const std::string &name,
-                        const video::SColor &fill_color,
-                        video::ITexture** oldRttMinimap,
-                        FrameBuffer** newRttMinimap)
+RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
+                                 const std::string &name,
+                                 const video::SColor &fill_color)
 {
     // Skip minimap when profiling
-    if (ProfileWorld::isNoGraphics()) return;
+    if (ProfileWorld::isNoGraphics()) return NULL;
 
     const video::SColor oldClearColor = World::getWorld()->getClearColor();
     World::getWorld()
         ->setClearbackBufferColor(video::SColor(0, 255, 255, 255));
     World::getWorld()->forceFogDisabled(true);
-    *oldRttMinimap = NULL;
-    *newRttMinimap = NULL;
 
-    RTT* newRttProvider = NULL;
-    IrrDriver::RTTProvider* oldRttProvider = NULL;
-    if (CVS->isGLSL())
-    {
-        m_new_rtt = newRttProvider =
-            new RTT(dimension.Width, dimension.Height);
-    }
-    else
-    {
-        oldRttProvider = new IrrDriver::RTTProvider(dimension, name, true);
-    }
+    m_render_target = irr_driver->createRenderTarget(dimension, name);
 
     irr_driver->getSceneManager()
         ->setAmbientLight(video::SColor(255, 255, 255, 255));
@@ -347,31 +323,11 @@ void Graph::makeMiniMap(const core::dimension2du &dimension,
     //camera->setAspectRatio(1.0f);
     camera->updateAbsolutePosition();
 
-    video::ITexture* texture = NULL;
-    FrameBuffer* frame_buffer = NULL;
-
-    if (CVS->isGLSL())
-    {
-        frame_buffer = newRttProvider->render(camera,
-            GUIEngine::getLatestDt());
-    }
-    else
-    {
-        texture = oldRttProvider->renderToTexture();
-        delete oldRttProvider;
-    }
+    m_render_target->renderToTexture(camera, GUIEngine::getLatestDt());
 
     cleanupDebugMesh();
     irr_driver->removeCameraSceneNode(camera);
 
-    if (texture == NULL && frame_buffer == NULL)
-    {
-        Log::error("Graph", "[makeMiniMap] WARNING: RTT does not"
-                   "appear to work, mini-map will not be available.");
-    }
-
-    *oldRttMinimap = texture;
-    *newRttMinimap = frame_buffer;
     World::getWorld()->setClearbackBufferColor(oldClearColor);
     World::getWorld()->forceFogDisabled(false);
 
@@ -381,6 +337,8 @@ void Graph::makeMiniMap(const core::dimension2du &dimension,
     irr_driver->clearLights();
     irr_driver->clearForcedBloom();
     irr_driver->clearBackgroundNodes();
+    return m_render_target.get();
+
 }   // makeMiniMap
 
 // -----------------------------------------------------------------------------
@@ -400,7 +358,8 @@ void Graph::mapPoint2MiniMap(const Vec3 &xyz,Vec3 *draw_at) const
 // -----------------------------------------------------------------------------
 void Graph::createQuad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2,
                        const Vec3 &p3, unsigned int node_index,
-                       bool invisible, bool ai_ignore, bool is_arena, bool ignored)
+                       bool invisible, bool ai_ignore, bool is_arena,
+                       bool ignored)
 {
     // Find the normal of this quad by computing the normal of two triangles
     // and taking their average.

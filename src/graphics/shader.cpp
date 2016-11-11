@@ -22,6 +22,7 @@
 #include "graphics/gl_headers.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/spherical_harmonics.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
@@ -263,17 +264,16 @@ void ShaderBase::bypassUBO() const
     glUniform2f(Screen, irr_driver->getCurrentScreenSize().X,
                         irr_driver->getCurrentScreenSize().Y);
 
+    const SHCoefficients* sh_coeff = irr_driver->getSHCoefficients();
+
     GLint bLmn = glGetUniformLocation(m_program, "blueLmn[0]");
-    const float*  blue_SH_coeff = irr_driver->getSphericalHarmonics()->getBlueSHCoeff();
-    glUniform1fv(bLmn, 9, blue_SH_coeff);
+    glUniform1fv(bLmn, 9, sh_coeff->blue_SH_coeff);
 
     GLint gLmn = glGetUniformLocation(m_program, "greenLmn[0]");
-    const float*  green_SH_coeff = irr_driver->getSphericalHarmonics()->getGreenSHCoeff();
-    glUniform1fv(gLmn, 9, green_SH_coeff);
+    glUniform1fv(gLmn, 9, sh_coeff->green_SH_coeff);
 
     GLint rLmn = glGetUniformLocation(m_program, "redLmn[0]");
-    const float*  red_SH_coeff = irr_driver->getSphericalHarmonics()->getRedSHCoeff();
-    glUniform1fv(rLmn, 9, red_SH_coeff);
+    glUniform1fv(rLmn, 9, sh_coeff->red_SH_coeff);
 
     GLint sun_dir = glGetUniformLocation(m_program, "sun_direction");
     const core::vector3df &sd = irr_driver->getSunDirection();

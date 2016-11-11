@@ -29,7 +29,6 @@
 #include "graphics/camera_end.hpp"
 #include "graphics/CBatchingMesh.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/material.hpp"
@@ -39,6 +38,9 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/render_target.hpp"
+#include "graphics/texture_manager.hpp"
+#include "graphics/vao_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
@@ -122,8 +124,6 @@ Track::Track(const std::string &filename)
     m_is_soccer             = false;
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
-    m_old_rtt_mini_map      = NULL;
-    m_new_rtt_mini_map      = NULL;
     m_bloom                 = true;
     m_bloom_threshold       = 0.75f;
     m_color_inlevel         = core::vector3df(0.0,1.0, 255.0);
@@ -142,6 +142,7 @@ Track::Track(const std::string &filename)
     m_weather_sound         = "";
     m_cache_track           = UserConfigParams::m_cache_overworld &&
                               m_ident=="overworld";
+    m_render_target         = NULL;
     m_minimap_x_scale       = 1.0f;
     m_minimap_y_scale       = 1.0f;
     m_startup_run = false;
@@ -364,17 +365,6 @@ void Track::cleanup()
         irr_driver->removeMeshFromCache(m_detached_cached_meshes[i]);
     }
     m_detached_cached_meshes.clear();
-
-    if (m_old_rtt_mini_map)
-    {
-        assert(m_old_rtt_mini_map->getReferenceCount() == 1);
-        irr_driver->removeTexture(m_old_rtt_mini_map);
-        m_old_rtt_mini_map = NULL;
-    }
-    if (m_new_rtt_mini_map)
-    {
-        m_new_rtt_mini_map = NULL; // already deleted by Graph::~Graph
-    }
 
     for(unsigned int i=0; i<m_sky_textures.size(); i++)
     {
@@ -702,7 +692,7 @@ btQuaternion Track::getArenaStartRotation(const Vec3& xyz, float heading)
     }
 
     const Vec3& normal = Graph::get()->getQuad(node)->getNormal();
-    btQuaternion q = createRotationFromNormal(normal);
+    btQuaternion q = shortestArcQuat(Vec3(0, 1, 0), normal);
     btMatrix3x3 m;
     m.setRotation(q);
     return btQuaternion(m.getColumn(1), heading * DEGREE_TO_RAD) * q;
@@ -1051,24 +1041,20 @@ void Track::loadMinimap()
     core::dimension2du size = m_mini_map_size
                              .getOptimalSize(!nonpower,!nonsquare);
 
-    Graph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
-        &m_old_rtt_mini_map, &m_new_rtt_mini_map);
+    m_render_target = Graph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255));
+    if (!m_render_target) return;
 
-    if (m_old_rtt_mini_map)
-    {
-        m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_old_rtt_mini_map->getSize().Width);
-        m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_old_rtt_mini_map->getSize().Height);
-    }
-    else if (m_new_rtt_mini_map)
-    {
-        m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_new_rtt_mini_map->getWidth());
-        m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_new_rtt_mini_map->getHeight());
-    }
+    core::dimension2du mini_map_texture_size = m_render_target->getTextureSize();
+
+    if(mini_map_texture_size.Width) 
+        m_minimap_x_scale = float(m_mini_map_size.Width) / float(mini_map_texture_size.Width);
     else
-    {
         m_minimap_x_scale = 0;
+
+    if(mini_map_texture_size.Height) 
+        m_minimap_y_scale = float(m_mini_map_size.Height) / float(mini_map_texture_size.Height);
+    else
         m_minimap_y_scale = 0;
-    }
 }   // loadMinimap
 
 // ----------------------------------------------------------------------------
@@ -1833,9 +1819,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // ---- Set ambient color
     m_ambient_color = m_default_ambient_color;
-    irr_driver->getSceneManager()->setAmbientLight(m_ambient_color);
-    if (m_spherical_harmonics_textures.size() != 6)
-        irr_driver->getSphericalHarmonics()->setAmbientLight(m_ambient_color);
+    irr_driver->setAmbientLight(m_ambient_color, false);
     
     // ---- Create sun (non-ambient directional light)
     if (m_sun_position.getLengthSQ() < 0.03f)
@@ -2347,6 +2331,15 @@ std::vector< std::vector<float> > Track::buildHeightMap()
 
     return out;
 }   // buildHeightMap
+
+// ----------------------------------------------------------------------------
+void Track::drawMiniMap(const core::rect<s32>& dest_rect) const
+{
+    if(m_render_target)
+        m_render_target->draw2DImage(dest_rect, NULL,
+                                     video::SColor(127, 255, 255, 255),
+                                     true);
+}
 
 // ----------------------------------------------------------------------------
 /** Returns the rotation of the sun. */
