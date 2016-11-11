@@ -136,6 +136,12 @@ bool StartGameProtocol::notifyEventAsynchronous(Event* event)
     if (NetworkConfig::get()->isServer() && ready) // on server, player is ready
     {
         Log::info("StartGameProtocol", "One of the players is ready.");
+        if (m_player_states[player_id] != LOADING)
+        {
+            Log::error("StartGameProtocol",
+                       "Player %d send more than one ready message.",
+                       player_id);
+        }
         m_player_states[player_id] = READY;
         m_ready_count++;
         if (m_ready_count == m_game_setup->getPlayerCount())
@@ -159,7 +165,7 @@ void StartGameProtocol::startRace()
     Protocol *p = ProtocolManager::getInstance()
                ->getProtocol(PROTOCOL_SYNCHRONIZATION);
     SynchronizationProtocol* protocol = 
-                             static_cast<SynchronizationProtocol*>(p);
+                             dynamic_cast<SynchronizationProtocol*>(p);
     if (protocol)
     {
         protocol->startCountdown(5.0f); // 5 seconds countdown
@@ -185,7 +191,7 @@ void StartGameProtocol::update(float dt)
             Protocol *p = ProtocolManager::getInstance()
                         ->getProtocol(PROTOCOL_SYNCHRONIZATION);
             SynchronizationProtocol* protocol =
-                              static_cast<SynchronizationProtocol*>(p);
+                              dynamic_cast<SynchronizationProtocol*>(p);
             if (protocol)
             {
                 // Now the synchronization protocol exists.

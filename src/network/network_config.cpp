@@ -19,6 +19,7 @@
 #include "network/network_config.hpp"
 
 NetworkConfig *NetworkConfig::m_network_config = NULL;
+bool           NetworkConfig::m_disable_lan    = false;
 
 /** \class NetworkConfig
  *  This class is the interface between STK and the online code, particularly
