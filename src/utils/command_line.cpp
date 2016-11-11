@@ -31,7 +31,9 @@ std::string               CommandLine::m_exec_name="";
  */
 void CommandLine::init(unsigned int argc, char *argv[])
 {
-    m_exec_name = argv[0];
+    if (argc > 0)
+        m_exec_name = argv[0];
+
     for(unsigned int i=1; i<argc; i++)
         m_argv.push_back(argv[i]);
 }   // CommandLine
