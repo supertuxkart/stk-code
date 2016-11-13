@@ -73,7 +73,6 @@ namespace
 	Atom X_ATOM_CLIPBOARD;
 	Atom X_ATOM_TARGETS;
 	Atom X_ATOM_UTF8_STRING;
-	Atom X_ATOM_TEXT;
 };
 
 namespace irr
@@ -1721,7 +1720,7 @@ bool CIrrDeviceLinux::run()
 				{
 					XEvent respond;
 					XSelectionRequestEvent *req = &(event.xselectionrequest);
-					if (  req->target == XA_STRING)
+					if (  req->target == X_ATOM_UTF8_STRING)
 					{
 						XChangeProperty (display,
 								req->requestor,
@@ -1734,14 +1733,13 @@ bool CIrrDeviceLinux::run()
 					}
 					else if ( req->target == X_ATOM_TARGETS )
 					{
-						long data[2];
+						long data[1];
 
-						data[0] = X_ATOM_TEXT;
-						data[1] = XA_STRING;
+						data[0] = X_ATOM_UTF8_STRING;
 
 						XChangeProperty (display, req->requestor,
-								req->property, req->target,
-								8, PropModeReplace,
+								req->property, XA_ATOM,
+								32, PropModeReplace,
 								(unsigned char *) &data,
 								sizeof (data));
 						respond.xselection.property = req->property;
@@ -2583,7 +2581,7 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 		os::Printer::log("Couldn't access X clipboard", ELL_WARNING);
 		return 0;
 	}
-	
+
 	Window ownerWindow = XGetSelectionOwner(display, X_ATOM_CLIPBOARD);
 	if (ownerWindow == window)
 	{
@@ -2596,8 +2594,8 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 		return 0;
 
 	Atom selection = XInternAtom(display, "IRR_SELECTION", False);
-	XConvertSelection(display, X_ATOM_CLIPBOARD, XA_STRING, selection, window, CurrentTime);
-	
+	XConvertSelection(display, X_ATOM_CLIPBOARD, X_ATOM_UTF8_STRING, selection, window, CurrentTime);
+
 	const int SELECTION_RETRIES = 500;
 	int i = 0;
 	for (i = 0; i < SELECTION_RETRIES; i++)
@@ -2610,13 +2608,13 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 
 		usleep(1000);
 	}
-	
+
 	if (i == SELECTION_RETRIES)
 	{
 		os::Printer::log("Timed out waiting for SelectionNotify event", ELL_WARNING);
 		return 0;
 	}
-	
+
 	Atom type;
 	int format;
 	unsigned long numItems, dummy;
@@ -2628,7 +2626,7 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
 
 	if (result == Success)
 		Clipboard = (irr::c8*)data;
-		
+
 	XFree (data);
 	return Clipboard.c_str();
 #else
@@ -2688,7 +2686,6 @@ void CIrrDeviceLinux::initXAtoms()
 	X_ATOM_CLIPBOARD = XInternAtom(display, "CLIPBOARD", False);
 	X_ATOM_TARGETS = XInternAtom(display, "TARGETS", False);
 	X_ATOM_UTF8_STRING = XInternAtom (display, "UTF8_STRING", False);
-	X_ATOM_TEXT = XInternAtom (display, "TEXT", False);
 #endif
 }
 
