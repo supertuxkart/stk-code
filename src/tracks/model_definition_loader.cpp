@@ -33,7 +33,7 @@ using namespace irr;
 ModelDefinitionLoader::ModelDefinitionLoader(Track* track)
 {
     m_track = track;
-}
+}   // ModelDefinitionLoader
 
 // ----------------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ void ModelDefinitionLoader::addModelDefinition(const XMLNode* xml)
     xml->get("model", &model_name);
 
     m_lod_groups[lodgroup].push_back(ModelDefinition(xml, (int)lod_distance, model_name, false, skeletal_animation));
-}
+}   // addModelDefinition
 
 // ----------------------------------------------------------------------------
 
@@ -142,21 +142,21 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
 #else
     return NULL;
 #endif
-}
+}   // instanciateAsLOD
 
 // ----------------------------------------------------------------------------
 
 void ModelDefinitionLoader::clear()
 {
     m_lod_groups.clear();
-}
+}   // clear
 
 // ----------------------------------------------------------------------------
 
 scene::IMesh* ModelDefinitionLoader::getFirstMeshFor(const std::string& name)
 {
     return irr_driver->getMesh(m_lod_groups[name][0].m_model_file);
-}
+}   // getFirstMeshFor
 
 // ----------------------------------------------------------------------------
 
@@ -170,4 +170,4 @@ void ModelDefinitionLoader::cleanLibraryNodesAfterLoad()
         file_manager->popTextureSearchPath();
         file_manager->popModelSearchPath();
     }
-}
+}   // cleanLibraryNodesAfterLoad
