@@ -1841,8 +1841,9 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
 // ----------------------------------------------------------------------------
 void IrrDriver::onLoadWorld()
 {
+#ifndef SERVER_ONLY
     m_renderer->onLoadWorld();
-
+#endif
 }   // onLoadWorld
 
     // ----------------------------------------------------------------------------
