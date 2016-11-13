@@ -16,11 +16,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef MEMORYMANAGER_HPP
-#define MEMORYMANAGER_HPP
+#ifndef HEADER_TEXTURE_MANAGER_HPP
+#define HEADER_TEXTURE_MANAGER_HPP
 
-#include "gl_headers.hpp"
+#include "graphics/gl_headers.hpp"
+
 #include <ITexture.h>
+#include <SColor.h>
 #include <string>
 
 GLuint getTextureGLuint(irr::video::ITexture *tex);
@@ -30,5 +32,6 @@ void cleanUnicolorTextures();
 void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = false);
 bool loadCompressedTexture(const std::string& compressed_tex);
 void saveCompressedTexture(const std::string& compressed_tex);
+irr::video::ITexture* getUnicolorTexture(const irr::video::SColor &c);
 
 #endif

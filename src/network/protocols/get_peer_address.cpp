@@ -66,7 +66,7 @@ void GetPeerAddress::asynchronousUpdate()
 
             uint16_t port;
             uint32_t my_ip = NetworkConfig::get()->getMyAddress().getIP();
-            if (m_address.getIP() == my_ip)
+            if (m_address.getIP() == my_ip && !NetworkConfig::m_disable_lan)
                 result->get("private_port", &port);
             else
                 result->get("port", &port);

@@ -17,20 +17,16 @@
 
 #include "graphics/stk_mesh_scene_node.hpp"
 
-#include "config/user_config.hpp"
-#include "graphics/callbacks.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/camera.hpp"
-#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
+#include "graphics/rtts.hpp"
 #include "graphics/stk_mesh.hpp"
+#include "graphics/texture_manager.hpp"
+#include "graphics/vao_manager.hpp"
 #include "tracks/track.hpp"
 #include "modes/world.hpp"
-#include "utils/cpp2011.hpp"
-#include "utils/helpers.hpp"
-#include "utils/tuple.hpp"
 
 #include <IMaterialRenderer.h>
 #include <ISceneManager.h>
@@ -408,20 +404,14 @@ void STKMeshSceneNode::render()
                     glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE), 
                                                  Shaders::ObjectPass2Shader
                                                     ::getInstance()->m_sampler_ids[0]);
-                if (!glIsTextureHandleResidentARB(DiffuseHandle))
-                    glMakeTextureHandleResidentARB(DiffuseHandle);
 
                 GLuint64 SpecularHandle =
                     glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_SPECULAR),
                                         Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[1]);
-                if (!glIsTextureHandleResidentARB(SpecularHandle))
-                    glMakeTextureHandleResidentARB(SpecularHandle);
 
                 GLuint64 SSAOHandle =
                     glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_HALF1_R),
                                     Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[2]);
-                if (!glIsTextureHandleResidentARB(SSAOHandle))
-                    glMakeTextureHandleResidentARB(SSAOHandle);
 
                 if (!mesh.TextureHandles[0])
                     mesh.TextureHandles[0] = 

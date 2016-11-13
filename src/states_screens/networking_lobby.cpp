@@ -199,10 +199,11 @@ void NetworkingLobby::tearDown()
 bool NetworkingLobby::onEscapePressed()
 {
     // notify the server that we left
-    ClientLobbyRoomProtocol* protocol = static_cast<ClientLobbyRoomProtocol*>(
+    ClientLobbyRoomProtocol* protocol = dynamic_cast<ClientLobbyRoomProtocol*>(
             ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
     if (protocol)
         protocol->leave();
+    STKHost::get()->shutdown();
     return true; // close the screen
 }   // onEscapePressed
 

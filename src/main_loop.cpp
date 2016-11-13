@@ -104,10 +104,15 @@ float MainLoop::getLimitedDt()
 
         }
 
-        // don't allow the game to run slower than a certain amount.
+        // Don't allow the game to run slower than a certain amount.
         // when the computer can't keep it up, slow down the shown time instead
-        static const float max_elapsed_time = 3.0f*1.0f/60.0f*1000.0f; /* time 3 internal substeps take */
-        if(dt > max_elapsed_time) dt=max_elapsed_time;
+        // But this can not be done in networking, otherwise the game time on
+        // client and server will not be in synch anymore
+        if(!NetworkConfig::get()->isNetworking())
+        {
+            static const float max_elapsed_time = 3.0f*1.0f / 60.0f*1000.0f; /* time 3 internal substeps take */
+            if (dt > max_elapsed_time) dt = max_elapsed_time;
+        }
 
         // Throttle fps if more than maximum, which can reduce
         // the noise the fan on a graphics card makes.

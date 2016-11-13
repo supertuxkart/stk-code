@@ -7,7 +7,7 @@
   <card contains="Intel"          os="osx"                         disable="GI"/>
   <card contains="Intel"          os="linux"    version="<11.2"    disable="ComputeShader"/>
   <card contains="Intel"          os="linux"    version="<11.2"    disable="GeometryShader"/>
-  <card contains="Intel"          os="linux"    version="<16.0"    disable="FramebufferSRGBCapable"/>
+  <card contains="Intel"          os="linux"                       disable="FramebufferSRGBCapable"/>
   <card contains="Intel"          os="linux"    version="<11.2"    disable="TextureCompressionS3TC"/>
   <card contains="Intel"          os="windows"                     disable="TextureCompressionS3TC"/>
   <card contains="Intel"          os="osx"                         disable="TextureCompressionS3TC"/>

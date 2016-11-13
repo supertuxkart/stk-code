@@ -143,6 +143,35 @@ bool EventHandler::OnEvent (const SEvent &event)
     {
         DemoWorld::resetIdleTime();
     }
+    
+   // Simulate mouse event for first finger on multitouch device.
+   // This allows to click on GUI elements.
+    if (event.EventType == EET_TOUCH_INPUT_EVENT)
+    {
+        if (event.TouchInput.ID == 0)
+        {
+            if (event.TouchInput.Event == ETIE_PRESSED_DOWN)
+            {
+                SEvent irrevent;
+                irrevent.EventType = EET_MOUSE_INPUT_EVENT;
+                irrevent.MouseInput.X = event.TouchInput.X;
+                irrevent.MouseInput.Y = event.TouchInput.Y;
+                irrevent.MouseInput.Event = EMIE_LMOUSE_PRESSED_DOWN;
+
+                irr_driver->getDevice()->postEventFromUser(irrevent);
+            }
+            else if (event.TouchInput.Event == ETIE_LEFT_UP)
+            {
+                SEvent irrevent;
+                irrevent.EventType = EET_MOUSE_INPUT_EVENT;
+                irrevent.MouseInput.X = event.TouchInput.X;
+                irrevent.MouseInput.Y = event.TouchInput.Y;
+                irrevent.MouseInput.Event = EMIE_LMOUSE_LEFT_UP;
+
+                irr_driver->getDevice()->postEventFromUser(irrevent);
+            }
+        }
+    }
 
     if (event.EventType == EET_GUI_EVENT)
     {
@@ -155,6 +184,7 @@ bool EventHandler::OnEvent (const SEvent &event)
         return false; // EVENT_LET
     }
     else if (event.EventType == EET_MOUSE_INPUT_EVENT ||
+             event.EventType == EET_TOUCH_INPUT_EVENT ||
              event.EventType == EET_KEY_INPUT_EVENT   ||
              event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {

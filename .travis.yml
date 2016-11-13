@@ -38,7 +38,12 @@ addons:
     - zlib1g-dev
 
 before_script:
-  - export THREADS=$((`nproc` + 1))
+  # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
+  - 'if [ ${CC} = "gcc" ]; then
+        export THREADS=4;
+    else
+        export THREADS=$((`nproc` + 1));
+    fi'
   - echo "THREADS = $THREADS"
   - free -mt
 

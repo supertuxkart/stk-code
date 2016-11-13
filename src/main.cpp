@@ -578,6 +578,7 @@ void cmdLineHelp()
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
     "       --my-address=1.1.1.1:1  Own IP address (can replace stun protocol)\n"
+    "       --disable-lan      Disable LAN detection (connect using WAN).\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
     "       --no-console       Does not write messages in the console but to\n"
     "                          stdout.log.\n"
@@ -1015,6 +1016,11 @@ int handleCmdLine()
 
     if (CommandLine::has("--my-address", &s))
         GetPublicAddress::setMyIPAddress(s);
+
+    /** Disable detection of LAN connection when connecting via WAN. This is
+     *  mostly a debugging feature to force using WAN connection. */
+    if (CommandLine::has("--disable-lan"))
+        NetworkConfig::m_disable_lan = true;
 
     // Race parameters
     if(CommandLine::has("--kartsize-debug"))

@@ -16,13 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/rtts.hpp"
-#include "central_settings.hpp"
+
 #include "config/user_config.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/post_processing.hpp"
 #include "utils/log.hpp"
-#include <ISceneManager.h>
 
 static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type, unsigned mipmaplevel = 1)
 {
@@ -297,6 +295,7 @@ RTT::RTT(size_t width, size_t height)
 
 RTT::~RTT()
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
     if (CVS->isShadowEnabled())
@@ -318,33 +317,3 @@ RTT::~RTT()
     }
 }
 
-void RTT::prepareRender(scene::ICameraSceneNode* camera)
-{
-    irr_driver->setRTT(this);
-    irr_driver->getSceneManager()->setActiveCamera(camera);
-
-}
-
-FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
-{
-    irr_driver->setRTT(this);
-
-    irr_driver->getSceneManager()->setActiveCamera(camera);
-
-    std::vector<IrrDriver::GlowData> glows;
-    irr_driver->computeMatrixesAndCameras(camera, m_width, m_height);
-    unsigned plc = irr_driver->updateLightsInfo(camera, dt);
-    irr_driver->uploadLightingData();
-    irr_driver->renderScene(camera, plc, glows, dt, false, true);
-    FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
-
-    // reset
-    glViewport(0, 0,
-        irr_driver->getActualScreenSize().Width,
-        irr_driver->getActualScreenSize().Height);
-    irr_driver->setRTT(NULL);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    irr_driver->getSceneManager()->setActiveCamera(NULL);
-    return frame_buffer;
-}

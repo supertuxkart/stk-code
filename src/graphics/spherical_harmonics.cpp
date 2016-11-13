@@ -17,7 +17,7 @@
 
 
 #include "graphics/irr_driver.hpp"
-#include "graphics/sphericalHarmonics.hpp"
+#include "graphics/spherical_harmonics.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm> 
@@ -192,7 +192,8 @@ namespace
 } //namespace
 
 // ----------------------------------------------------------------------------
-/** Compute m_red_SH_coeff, m_green_SH_coeff and m_blue_SH_coeff from Yml values
+/** Compute m_SH_coeff->red_SH_coeff, m_SH_coeff->green_SH_coeff 
+ *  and m_SH_coeff->blue_SH_coeff from Yml values
  *  \param cubemap_face The 6 cubemap faces (float textures)
  *  \param edge_size Size of the cubemap face
  *  \param Yml The sphericals harmonics functions values on each texel of the cubemap
@@ -205,9 +206,9 @@ void SphericalHarmonics::projectSH(Color *cubemap_face[6], size_t edge_size,
 {
     for (unsigned i = 0; i < 9; i++)
     {
-        m_blue_SH_coeff[i] = 0;
-        m_green_SH_coeff[i] = 0;
-        m_red_SH_coeff[i] = 0;
+        m_SH_coeff->blue_SH_coeff[i] = 0;
+        m_SH_coeff->green_SH_coeff[i] = 0;
+        m_SH_coeff->red_SH_coeff[i] = 0;
     }
 
     float wh = float(edge_size * edge_size);
@@ -272,35 +273,35 @@ void SphericalHarmonics::projectSH(Color *cubemap_face[6], size_t edge_size,
         }
     }
 
-    m_blue_SH_coeff[0] = b0;
-    m_blue_SH_coeff[1] = b1;
-    m_blue_SH_coeff[2] = b2;
-    m_blue_SH_coeff[3] = b3;
-    m_blue_SH_coeff[4] = b4;
-    m_blue_SH_coeff[5] = b5;
-    m_blue_SH_coeff[6] = b6;
-    m_blue_SH_coeff[7] = b7;
-    m_blue_SH_coeff[8] = b8;
+    m_SH_coeff->blue_SH_coeff[0] = b0;
+    m_SH_coeff->blue_SH_coeff[1] = b1;
+    m_SH_coeff->blue_SH_coeff[2] = b2;
+    m_SH_coeff->blue_SH_coeff[3] = b3;
+    m_SH_coeff->blue_SH_coeff[4] = b4;
+    m_SH_coeff->blue_SH_coeff[5] = b5;
+    m_SH_coeff->blue_SH_coeff[6] = b6;
+    m_SH_coeff->blue_SH_coeff[7] = b7;
+    m_SH_coeff->blue_SH_coeff[8] = b8;
 
-    m_red_SH_coeff[0] = r0;
-    m_red_SH_coeff[1] = r1;
-    m_red_SH_coeff[2] = r2;
-    m_red_SH_coeff[3] = r3;
-    m_red_SH_coeff[4] = r4;
-    m_red_SH_coeff[5] = r5;
-    m_red_SH_coeff[6] = r6;
-    m_red_SH_coeff[7] = r7;
-    m_red_SH_coeff[8] = r8;
+    m_SH_coeff->red_SH_coeff[0] = r0;
+    m_SH_coeff->red_SH_coeff[1] = r1;
+    m_SH_coeff->red_SH_coeff[2] = r2;
+    m_SH_coeff->red_SH_coeff[3] = r3;
+    m_SH_coeff->red_SH_coeff[4] = r4;
+    m_SH_coeff->red_SH_coeff[5] = r5;
+    m_SH_coeff->red_SH_coeff[6] = r6;
+    m_SH_coeff->red_SH_coeff[7] = r7;
+    m_SH_coeff->red_SH_coeff[8] = r8;
 
-    m_green_SH_coeff[0] = g0;
-    m_green_SH_coeff[1] = g1;
-    m_green_SH_coeff[2] = g2;
-    m_green_SH_coeff[3] = g3;
-    m_green_SH_coeff[4] = g4;
-    m_green_SH_coeff[5] = g5;
-    m_green_SH_coeff[6] = g6;
-    m_green_SH_coeff[7] = g7;
-    m_green_SH_coeff[8] = g8;
+    m_SH_coeff->green_SH_coeff[0] = g0;
+    m_SH_coeff->green_SH_coeff[1] = g1;
+    m_SH_coeff->green_SH_coeff[2] = g2;
+    m_SH_coeff->green_SH_coeff[3] = g3;
+    m_SH_coeff->green_SH_coeff[4] = g4;
+    m_SH_coeff->green_SH_coeff[5] = g5;
+    m_SH_coeff->green_SH_coeff[6] = g6;
+    m_SH_coeff->green_SH_coeff[7] = g7;
+    m_SH_coeff->green_SH_coeff[8] = g8;
 }   // projectSH
 
 // ----------------------------------------------------------------------------
@@ -358,6 +359,7 @@ void SphericalHarmonics::generateSphericalHarmonics(Color *cubemap_face[6], size
 // ----------------------------------------------------------------------------
 SphericalHarmonics::SphericalHarmonics(const std::vector<video::ITexture *> &spherical_harmonics_textures)
 {
+    m_SH_coeff = new SHCoefficients;
     setTextures(spherical_harmonics_textures);
 }
 
@@ -369,8 +371,15 @@ SphericalHarmonics::SphericalHarmonics(const video::SColor &ambient)
 {
     //make sure m_ambient and ambient are not equal
     m_ambient = (ambient==0) ? 1 : 0;
+    m_SH_coeff = new SHCoefficients;
     setAmbientLight(ambient);
 }
+
+SphericalHarmonics::~SphericalHarmonics()
+{
+    delete m_SH_coeff;
+}
+
 
 /** Compute spherical harmonics coefficients from 6 textures */
 void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spherical_harmonics_textures)
@@ -459,9 +468,9 @@ void SphericalHarmonics::setAmbientLight(const video::SColor &ambient)
     // Diffuse env map is x 0.25, compensate
     for (unsigned i = 0; i < 9; i++)
     {
-        m_blue_SH_coeff[i] *= 4;
-        m_green_SH_coeff[i] *= 4;
-        m_red_SH_coeff[i] *= 4;
+        m_SH_coeff->blue_SH_coeff[i] *= 4;
+        m_SH_coeff->green_SH_coeff[i] *= 4;
+        m_SH_coeff->red_SH_coeff[i] *= 4;
     }    
 } //setAmbientLight
 
@@ -469,11 +478,11 @@ void SphericalHarmonics::setAmbientLight(const video::SColor &ambient)
 /** Print spherical harmonics coefficients (debug) */
 void SphericalHarmonics::printCoeff() {
     Log::debug("SphericalHarmonics", "Blue_SH:");
-    displayCoeff(m_blue_SH_coeff);
+    displayCoeff(m_SH_coeff->blue_SH_coeff);
     Log::debug("SphericalHarmonics", "Green_SH:");
-    displayCoeff(m_green_SH_coeff);
+    displayCoeff(m_SH_coeff->green_SH_coeff);
     Log::debug("SphericalHarmonics", "Red_SH:");
-    displayCoeff(m_red_SH_coeff);  
+    displayCoeff(m_SH_coeff->red_SH_coeff);  
 } //printCoeff
 
 // ----------------------------------------------------------------------------
@@ -500,17 +509,17 @@ void SphericalHarmonics::unprojectSH(size_t width, size_t height,
                 fi = 2 * fi - 1, fj = 2 * fj - 1;
 
                 output[face][4 * height * i + 4 * j + 2] =
-                    getTexelValue(i, j, width, height, m_red_SH_coeff, Y00[face],
+                    getTexelValue(i, j, width, height, m_SH_coeff->red_SH_coeff, Y00[face],
                                 Y1minus1[face], Y10[face], Y11[face],
                                 Y2minus2[face], Y2minus1[face], Y20[face],
                                 Y21[face], Y22[face]);
                 output[face][4 * height * i + 4 * j + 1] = 
-                    getTexelValue(i, j, width, height, m_green_SH_coeff, Y00[face],
+                    getTexelValue(i, j, width, height, m_SH_coeff->green_SH_coeff, Y00[face],
                                 Y1minus1[face], Y10[face], Y11[face],
                                 Y2minus2[face], Y2minus1[face], Y20[face],
                                 Y21[face], Y22[face]);
                 output[face][4 * height * i + 4 * j] = 
-                    getTexelValue(i, j, width, height, m_blue_SH_coeff, Y00[face],
+                    getTexelValue(i, j, width, height, m_SH_coeff->blue_SH_coeff, Y00[face],
                                 Y1minus1[face], Y10[face], Y11[face],
                                 Y2minus2[face], Y2minus1[face], Y20[face],
                                 Y21[face], Y22[face]);

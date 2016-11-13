@@ -72,6 +72,10 @@ private:
     NetworkConfig();
 
 public:
+    /** Stores the command line flag to disable lan detection (i.e. force
+     *  WAN code to be used when connection client and server). */
+    static bool m_disable_lan;
+
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
     {

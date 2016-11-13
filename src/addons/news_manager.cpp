@@ -75,9 +75,6 @@ void NewsManager::init(bool force_refresh)
         pthread_attr_t  attr;
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        // Should be the default, but just in case:
-        pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-        //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
         pthread_t thread_id;
         int error = pthread_create(&thread_id, &attr,
             &NewsManager::downloadNews, this);

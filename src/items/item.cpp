@@ -43,7 +43,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_distance_2        = 1.2f;
     initItem(type, xyz);
 
-    m_original_rotation = Track::createRotationFromNormal(normal);
+    m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
     m_rotation_angle    = 0.0f;
     m_original_mesh     = mesh;
     m_original_lowmesh  = lowres_mesh;

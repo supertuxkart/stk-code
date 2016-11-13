@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/central_settings.hpp"
 
 GLuint SharedGPUObjects::m_billboard_vbo;
 GLuint SharedGPUObjects::m_sky_tri_vbo;
@@ -147,6 +148,7 @@ void SharedGPUObjects::initFrustrumVBO()
 // ----------------------------------------------------------------------------
 void SharedGPUObjects::initShadowVPMUBO()
 {
+    assert(CVS->isARBUniformBufferObjectUsable());
     glGenBuffers(1, &m_View_projection_matrices_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, m_View_projection_matrices_ubo);
     glBufferData(GL_UNIFORM_BUFFER, (16 * 9 + 2) * sizeof(float), 0,
@@ -157,6 +159,7 @@ void SharedGPUObjects::initShadowVPMUBO()
 // ----------------------------------------------------------------------------
 void SharedGPUObjects::initLightingDataUBO()
 {
+    assert(CVS->isARBUniformBufferObjectUsable());
     glGenBuffers(1, &m_lighting_data_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, m_lighting_data_ubo);
     glBufferData(GL_UNIFORM_BUFFER, 36 * sizeof(float), 0, GL_STREAM_DRAW);
@@ -190,9 +193,13 @@ void SharedGPUObjects::init()
     initBillboardVBO();
     initSkyTriVBO();
     initFrustrumVBO();
-    initShadowVPMUBO();
-    initLightingDataUBO();
     initParticleQuadVBO();
+    
+    if(CVS->isARBUniformBufferObjectUsable())
+    {
+        initShadowVPMUBO();
+        initLightingDataUBO();        
+    }
 
     m_has_been_initialised = true;
 }   // SharedGPUObjects

@@ -711,7 +711,7 @@ void ThreeStrikesBattle::loadCustomModels()
                 const ArenaNode* n = ag->getNode(node);
                 btTransform t;
                 t.setOrigin(n->getCenter());
-                t.setRotation(Track::createRotationFromNormal(n->getNormal()));
+                t.setRotation(shortestArcQuat(Vec3(0, 1, 0), n->getNormal()));
                 pos.push_back(t);
                 pos_created++;
                 used.push_back(node);

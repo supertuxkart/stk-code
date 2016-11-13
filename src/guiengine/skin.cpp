@@ -33,7 +33,6 @@
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
-#include "graphics/glwrap.hpp"
 
 using namespace GUIEngine;
 using namespace irr;
@@ -1959,29 +1958,7 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     else if (type == WTYPE_MODEL_VIEW)
     {
         ModelViewWidget* mvw = dynamic_cast<ModelViewWidget*>(widget);
-        
-        if (CVS->isGLSL())
-        {
-            FrameBuffer* fb = mvw->getFrameBuffer();
-            if (fb != NULL && fb->getRTT().size() > 0)
-            {
-                glEnable(GL_FRAMEBUFFER_SRGB);
-                draw2DImageFromRTT(fb->getRTT()[0], 512, 512,
-                                   rect, core::rect<s32>(0, 0, 512, 512), NULL, 
-                                   SColor(255, 255, 255, 255), true);
-                glDisable(GL_FRAMEBUFFER_SRGB);
-            }
-        }
-        else
-        {
-            video::ITexture* texture = mvw->getTexture();
-            if (texture != NULL && texture->getSize().Width > 0 
-                                && texture->getSize().Height > 0)
-            {
-                draw2DImage(texture, rect, core::rect<s32>(0, 0, 512, 512),
-                            NULL, NULL, true);
-            }
-        }
+        mvw->drawRTTScene(rect);
     }
     else if (type == WTYPE_ICON_BUTTON)
     {
