@@ -42,6 +42,7 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
 {
     m_distance = kart ? kart->getKartProperties()->getCameraDistance() : 1000.0f;
     m_ambient_light = World::getWorld()->getTrack()->getDefaultAmbientColor();
+    m_smooth_dt = 0.0f;
 
     // TODO: Put these values into a config file
     //       Global or per split screen zone?
@@ -111,7 +112,8 @@ void CameraNormal::smoothMoveCamera(float dt)
        f = current_speed >0 ?         current_speed/3 + 1.0f
                             : -1.5f * current_speed   + 2.0f;
     }
-    current_position += (wanted_position - current_position) * (dt *f);
+    m_smooth_dt = 0.3f * dt + 0.7f * m_smooth_dt;
+    current_position += (wanted_position - current_position) * (m_smooth_dt*f);
 
     // Avoid camera crash: if the speed is negative, the current_position
     // can oscillate between plus and minus, getting bigger and bigger. If
