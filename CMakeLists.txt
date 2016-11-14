@@ -61,6 +61,7 @@ if(WIN32)
     set(ENV{LIB} ${PROJECT_SOURCE_DIR}/dependencies/lib)
     set(ENV{OPENALDIR} ${PROJECT_SOURCE_DIR}/dependencies)
     add_definitions(-D_IRR_STATIC_LIB_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
 endif()
 
 if(USE_GLES2)
