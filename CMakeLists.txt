@@ -71,6 +71,7 @@ endif()
 
 if(SERVER_ONLY)
     add_definitions(-DSERVER_ONLY)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
 endif()
 
 # Build the Bullet physics library
