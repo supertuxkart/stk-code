@@ -203,7 +203,7 @@ public:
 
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;
-    void IncreaseObjectCount();
+    void increaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;

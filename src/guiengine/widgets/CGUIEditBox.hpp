@@ -139,6 +139,8 @@ using namespace gui;
         bool processMouse(const SEvent& event);
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
         bool processIMEEvent(const SEvent& event);
+#endif
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_X11_)
         //! calculates the input composition position
         core::position2di calculateICPos();
 #endif

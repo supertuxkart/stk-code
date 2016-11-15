@@ -62,7 +62,7 @@ struct CustomUnrollArgs<>
     static void drawMesh(const STK::Tuple<TupleTypes...> &t,
                          Args... args)
     {
-        irr_driver->IncreaseObjectCount(); //TODO: move somewhere else
+        irr_driver->increaseObjectCount(); //TODO: move somewhere else
         GLMesh *mesh = STK::tuple_get<0>(t);
         
         //shadow_custom_unroll_args, rsm_custom_unroll_args and custom_unroll_args

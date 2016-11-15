@@ -91,9 +91,6 @@ SFXManager::SFXManager()
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-    // Should be the default, but just in case:
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-
     m_thread_id.setAtomic(new pthread_t());
     // The thread is created even if there atm sfx are disabled
     // (since the user might enable it later).
@@ -298,8 +295,6 @@ void* SFXManager::mainLoop(void *obj)
 {
     VS::setThreadName("SFXManager");
     SFXManager *me = (SFXManager*)obj;
-
-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
     me->m_sfx_commands.lock();
 

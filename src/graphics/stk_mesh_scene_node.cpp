@@ -347,7 +347,7 @@ void STKMeshSceneNode::render()
         // Only untextured
         for (unsigned i = 0; i < GLmeshes.size(); i++)
         {
-            irr_driver->IncreaseObjectCount();
+            irr_driver->increaseObjectCount();
             GLMesh &mesh = GLmeshes[i];
             GLenum ptype = mesh.PrimitiveType;
             GLenum itype = mesh.IndexType;
@@ -393,7 +393,7 @@ void STKMeshSceneNode::render()
         // Only untextured
         for (unsigned i = 0; i < GLmeshes.size(); i++)
         {
-            irr_driver->IncreaseObjectCount();
+            irr_driver->increaseObjectCount();
             GLMesh &mesh = GLmeshes[i];
             GLenum ptype = mesh.PrimitiveType;
             GLenum itype = mesh.IndexType;
@@ -496,7 +496,7 @@ void STKMeshSceneNode::render()
                 for (unsigned i = 0; i < GLmeshes.size(); i++)
                 {
                     GLMesh &mesh = GLmeshes[i];
-                    irr_driver->IncreaseObjectCount();
+                    irr_driver->increaseObjectCount();
                     GLenum ptype = mesh.PrimitiveType;
                     GLenum itype = mesh.IndexType;
                     size_t count = mesh.IndexCount;
@@ -549,7 +549,7 @@ void STKMeshSceneNode::render()
                 Shaders::TransparentShader::getInstance()->use();
                 for (unsigned i = 0; i < GLmeshes.size(); i++)
                 {
-                    irr_driver->IncreaseObjectCount();
+                    irr_driver->increaseObjectCount();
                     GLMesh &mesh = GLmeshes[i];
                     GLenum ptype = mesh.PrimitiveType;
                     GLenum itype = mesh.IndexType;

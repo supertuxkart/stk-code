@@ -13,9 +13,12 @@
 #include "Keycodes.h"
 
 #include "graphics/2dutils.hpp"
+#include "graphics/irr_driver.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
+
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceLinux.h"
 
 /*
     todo:
@@ -101,6 +104,10 @@ CGUIEditBox::~CGUIEditBox()
 
     if (Operator)
         Operator->drop();
+#ifdef _IRR_COMPILE_WITH_X11_
+    CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
+    dl->setIMEEnable(false);
+#endif
 }
 
 
@@ -241,7 +248,19 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     MouseMarking = false;
                     setTextMarkers(0,0);
                 }
+#ifdef _IRR_COMPILE_WITH_X11_
+                CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
+                dl->setIMEEnable(false);
+#endif
             }
+#ifdef _IRR_COMPILE_WITH_X11_
+            else if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUSED)
+            {
+                CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
+                dl->setIMEEnable(true);
+                dl->setIMELocation(calculateICPos());
+            }
+#endif
             break;
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
         case EET_IMPUT_METHOD_EVENT:
@@ -851,7 +870,9 @@ bool CGUIEditBox::processIMEEvent(const SEvent& event)
 
     return false;
 }
+#endif
 
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_X11_)
 //! calculate the position of input composition window
 core::position2di CGUIEditBox::calculateICPos()
 {
@@ -1590,6 +1611,13 @@ void CGUIEditBox::calculateScrollPos()
         VScrollPos = 0;
 
     // todo: adjust scrollbar
+#if defined(_IRR_COMPILE_WITH_X11_)
+    CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
+    if (dl)
+    {
+        dl->setIMELocation(calculateICPos());
+    }
+#endif
 }
 
 //! set text markers

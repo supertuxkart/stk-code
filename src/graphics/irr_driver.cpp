@@ -166,41 +166,48 @@ void IrrDriver::reset()
 #endif
 }   // reset
 
+// ----------------------------------------------------------------------------
 void IrrDriver::setPhase(STKRenderingPass p)
 {
     m_phase = p;
 }
 
+// ----------------------------------------------------------------------------
 STKRenderingPass IrrDriver::getPhase() const
 {
   return m_phase;
 }
 
-void IrrDriver::IncreaseObjectCount()
+#// ----------------------------------------------------------------------------
+void IrrDriver::increaseObjectCount()
 {
     m_renderer->incObjectCount(m_phase);
-}
+}   // increaseObjectCount
 
+// ----------------------------------------------------------------------------
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
 {
   return m_mrt;
-}
+}   // getMainSetup
+
+// ----------------------------------------------------------------------------
+
 #ifndef SERVER_ONLY
+
 GPUTimer &IrrDriver::getGPUTimer(unsigned i)
 {
     return m_perf_query[i];
-}
-#endif
+}   // getGPUTimer
 
-
+// ----------------------------------------------------------------------------
 
 #ifndef SERVER_ONLY
 std::unique_ptr<RenderTarget> IrrDriver::createRenderTarget(const irr::core::dimension2du &dimension,
                                                             const std::string &name)
 {
     return m_renderer->createRenderTarget(dimension, name);
-}
-#endif
+}   // createRenderTarget
+#endif   // ~SERVER_ONLY
 
 // ----------------------------------------------------------------------------
 
