@@ -198,7 +198,7 @@ GPUTimer &IrrDriver::getGPUTimer(unsigned i)
 {
     return m_perf_query[i];
 }   // getGPUTimer
-
+#endif
 // ----------------------------------------------------------------------------
 
 #ifndef SERVER_ONLY
