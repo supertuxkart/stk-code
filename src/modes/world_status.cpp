@@ -253,7 +253,11 @@ void WorldStatus::updateTime(const float dt)
                 // Notify the clients that they can start ready-set-go
                 if(NetworkConfig::get()->isServer())
                     RaceEventManager::getInstance()->startReadySetGo();
-                m_server_is_ready = true;
+                // The server will wait in 'wait_for_server' for clients
+                // to be ready before starting (using the same startReadySetGo
+                // callback).
+                if(!NetworkConfig::get()->isNetworking())
+                    m_server_is_ready = true;
             }   // if not networked
             m_phase = WAIT_FOR_SERVER_PHASE;
             return;   // Don't increase time
@@ -264,6 +268,20 @@ void WorldStatus::updateTime(const float dt)
             // start the engines and then the race
             if(!m_server_is_ready) return;
 
+            if (NetworkConfig::get()->isNetworking() &&
+                NetworkConfig::get()->isClient())
+            {
+                // Each client informs the server when its starting the race.
+                // The server waits for the last message (i.e. from the slowest
+                // client) before starting, which means the server's local time
+                // will always be behind any client's time by the latency to
+                // that client. This in turn should guarantee that any message
+                // from the clients reach the server before the server actually
+                // needs it. By running the server behind the clients the need
+                // for rollbacks on the server is greatly reduced.
+                RaceEventManager::getInstance()->clientHasStarted();
+            }
+
             m_phase = READY_PHASE;            
             startEngines();
 
@@ -272,6 +290,7 @@ void WorldStatus::updateTime(const float dt)
             // (or state) of the finite state machine.
             return;   // Don't increase time
         case READY_PHASE:
+
             if (m_auxiliary_timer > 1.0)
             {
                 if (m_play_ready_set_go_sounds)
@@ -432,8 +451,11 @@ void WorldStatus::updateTime(const float dt)
 
 //-----------------------------------------------------------------------------
 /** Called on the client when it receives a notification from the server that
- *  the server is now starting its ready-set-go phase. This function changes
- *  the state of the finite state machine to be ready.
+ *  all clients (and server) are ready to start the race. The server will
+ *  then additionally wait for all clients to report back that they are
+ *  starting, which guarantees that the server is running far enough behind
+ *  clients time that at server time T all events from the clients at time
+ *  T have arrived, minimising rollback impact.
  */
 void WorldStatus::startReadySetGo()
 {

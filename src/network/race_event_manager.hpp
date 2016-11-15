@@ -57,6 +57,7 @@ public:
                           int value);
     void kartFinishedRace(AbstractKart *kart, float time);
     void startReadySetGo();
+    void clientHasStarted();
     // ------------------------------------------------------------------------
     /** Returns if this instance is in running state or not. */
     bool isRunning() { return m_running; }

@@ -116,6 +116,26 @@ void RaceEventManager::startReadySetGo()
     protocol->startReadySetGo();
 }   // startReadySetGo
 // ----------------------------------------------------------------------------
+/** Called on a client if it has started the 'ready' phase. The clients will
+ *  send this information to the server, and the server will wait for all
+ *  those messages before it starts its own 'ready set go'. De-facto that
+ *  means that the server will wait for the client with the highest latency
+ *  before it starts. Assuming no latency peaks that means that the server will
+ *  always have received all events for time T before it executes time T
+
+The server waits
+ *  for all clients to report that they
+*/
+void RaceEventManager::clientHasStarted()
+{
+    // this is only called in the client
+    assert(NetworkConfig::get()->isClient());
+
+    GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
+        ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
+    protocol->clientHasStarted();
+}   // clientHasStarted
+// ----------------------------------------------------------------------------
 void RaceEventManager::controllerAction(Controller* controller,
                                         PlayerAction action, int value)
 {
