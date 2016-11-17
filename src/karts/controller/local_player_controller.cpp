@@ -25,6 +25,9 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/gpu_particles.hpp"
+#include "graphics/particle_emitter.hpp"
+#include "graphics/particle_kind.hpp"
 #include "input/input_manager.hpp"
 #include "items/attachment.hpp"
 #include "items/item.hpp"
@@ -39,6 +42,7 @@
 #include "network/race_event_manager.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -52,7 +56,8 @@
  */
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player)
-                     : PlayerController(kart)
+                     : PlayerController(kart), m_sky_particles_emitter(NULL),
+                       m_particle_system_proxy(NULL)
 {
     m_player = player;
     if(player)
@@ -67,6 +72,27 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
     m_ugh_sound    = SFXManager::get()->createSoundSource("ugh");
     m_grab_sound   = SFXManager::get()->createSoundSource("grab_collectable");
     m_full_sound   = SFXManager::get()->createSoundSource("energy_bar_full");
+
+    // Attach Particle System
+    Track *track = World::getWorld()->getTrack();
+    if (UserConfigParams::m_weather_effects &&
+        track->getSkyParticles() != NULL)
+    {
+        track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);
+
+        m_sky_particles_emitter =
+            new ParticleEmitter(track->getSkyParticles(),
+                                core::vector3df(0.0f, 30.0f, 100.0f),
+                                m_kart->getNode(),
+                                true);
+
+        // FIXME: in multiplayer mode, this will result in several instances
+        //        of the heightmap being calculated and kept in memory
+        m_sky_particles_emitter->addHeightMapAffector(track);
+        m_particle_system_proxy = dynamic_cast<ParticleSystemProxy*>
+            (m_sky_particles_emitter->getNode());
+    }
+
 }   // LocalPlayerController
 
 //-----------------------------------------------------------------------------
@@ -79,6 +105,8 @@ LocalPlayerController::~LocalPlayerController()
     m_ugh_sound ->deleteSFX();
     m_grab_sound->deleteSFX();
     m_full_sound->deleteSFX();
+    if (m_sky_particles_emitter)
+        delete m_sky_particles_emitter;
 }   // ~LocalPlayerController
 
 //-----------------------------------------------------------------------------
@@ -174,11 +202,17 @@ void LocalPlayerController::update(float dt)
             m_kart->getSpeed() < -UserConfigParams::m_reverse_look_threshold))
         {
             camera->setMode(Camera::CM_REVERSE);
+            if (m_particle_system_proxy)
+                m_particle_system_proxy->setReverse(true);
         }
         else
         {
             if (camera->getMode() == Camera::CM_REVERSE)
+            {
                 camera->setMode(Camera::CM_NORMAL);
+                if (m_particle_system_proxy)
+                    m_particle_system_proxy->setReverse(false);
+            }
         }
     }
 
