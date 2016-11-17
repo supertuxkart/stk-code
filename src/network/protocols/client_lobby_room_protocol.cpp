@@ -35,11 +35,12 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
 
-ClientLobbyRoomProtocol::
-ClientLobbyRoomProtocol(const TransportAddress& server_address)
+// ============================================================================
+ClientLobbyRoomProtocol::ClientLobbyRoomProtocol()
                        : LobbyRoomProtocol(NULL)
 {
-    m_server_address.copy(server_address);
+
+    m_server_address.clear();
     m_server = NULL;
     setHandleDisconnections(true);
 }   // ClientLobbyRoomProtocol
@@ -50,6 +51,13 @@ ClientLobbyRoomProtocol::~ClientLobbyRoomProtocol()
 {
 }   // ClientLobbyRoomProtocol
 
+//-----------------------------------------------------------------------------
+/** Sets the address of the server. 
+ */
+void ClientLobbyRoomProtocol::setAddress(const TransportAddress &address)
+{
+    m_server_address.copy(address);
+}   // setAddress
 //-----------------------------------------------------------------------------
 
 void ClientLobbyRoomProtocol::setup()
@@ -578,7 +586,8 @@ void ClientLobbyRoomProtocol::kartSelectionUpdate(Event* event)
 
 //-----------------------------------------------------------------------------
 
-/*! \brief Called when the race needs to be started.
+/*! \brief Called when the server broadcasts  the race start.
+race needs to be started.
  *  \param event : Event providing the information (no additional information
  *                 in this case).
  */

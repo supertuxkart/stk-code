@@ -236,7 +236,11 @@ void ServerLobbyRoomProtocol::registerServer()
 }   // registerServer
 
 //-----------------------------------------------------------------------------
-/** This function informs each client to start the race, and then starts the
+/** This function is called when all track votes from the clients have
+ *  been received. It broadcasts a message to all client to start the
+ *  race
+
+informs each client to start the race, and then starts the
  *  StartGameProtocol.
  */
 void ServerLobbyRoomProtocol::startGame()

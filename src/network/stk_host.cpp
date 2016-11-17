@@ -290,7 +290,8 @@ STKHost::STKHost(const irr::core::stringw &server_name)
     }
 
     startListening();
-    ProtocolManager::getInstance()->requestStart(new ServerLobbyRoomProtocol());
+    Protocol *p = LobbyRoomProtocol::create<ServerLobbyRoomProtocol>();
+    ProtocolManager::getInstance()->requestStart(p);
 
 }   // STKHost(server_name)
 

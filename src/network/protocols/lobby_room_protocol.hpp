@@ -59,11 +59,32 @@ public:
     };
 
 protected:
+    static LobbyRoomProtocol *m_lobby;
+
     /** The game setup. */
     GameSetup* m_setup;
 
 
 public:
+
+    /** Creates either a client or server lobby protocol as a singleton. */
+    template<typename S> static S* create()
+    {
+        assert(m_lobby == NULL);
+        m_lobby = new S();
+        return dynamic_cast<S*>(m_lobby);
+    }   // create
+
+    // ------------------------------------------------------------------------
+    /** Returns the singleton client or server lobby protocol. */
+    static LobbyRoomProtocol *get()
+    {
+        assert(m_lobby);
+        return m_lobby;
+    }   // get
+
+    // ------------------------------------------------------------------------
+
     LobbyRoomProtocol(CallbackObject* callback_object)
         : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
     {
@@ -74,6 +95,12 @@ public:
     // ------------------------------------------------------------------------
     virtual void setup() = 0;
     virtual void update(float dt) = 0;
+    virtual void requestKartSelection(uint8_t player_id,
+                                      const std::string &kart_name)
+    {
+        assert(false);   // Only defined in client
+    };
+
 };   // class LobbyRoomProtocol
 
 #endif // LOBBY_ROOM_PROTOCOL_HPP

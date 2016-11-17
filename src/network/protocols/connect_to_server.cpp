@@ -238,7 +238,9 @@ void ConnectToServer::asynchronousUpdate()
                 // lobby room protocol if we're connected only
                 if(STKHost::get()->getPeers()[0]->isConnected())
                 {
-                    Protocol *p = new ClientLobbyRoomProtocol(m_server_address);
+                    ClientLobbyRoomProtocol *p = 
+                        LobbyRoomProtocol::create<ClientLobbyRoomProtocol>();
+                    p->setAddress(m_server_address);
                     p->requestStart();
                 }
             }

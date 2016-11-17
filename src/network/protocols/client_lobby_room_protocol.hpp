@@ -50,11 +50,12 @@ private:
     STATE m_state;
 
 public:
-    ClientLobbyRoomProtocol(const TransportAddress& server_address);
+             ClientLobbyRoomProtocol();
     virtual ~ClientLobbyRoomProtocol();
 
-    void requestKartSelection(uint8_t player_id,
-        const std::string &kart_name);
+    virtual void requestKartSelection(uint8_t player_id,
+                                      const std::string &kart_name) OVERRIDE;
+    void setAddress(const TransportAddress &address);
     void voteMajor(uint8_t player_id, uint32_t major);
     void voteRaceCount(uint8_t player_id, uint8_t count);
     void voteMinor(uint8_t player_id, uint32_t minor);

@@ -34,7 +34,6 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/servers_manager.hpp"
@@ -163,10 +162,10 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     {
         if(NetworkConfig::get()->isServer())
         {
-            ServerLobbyRoomProtocol* slrp = static_cast<ServerLobbyRoomProtocol*>(
-                ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
-            if (slrp)
-                slrp->startSelection();
+            Protocol *p = LobbyRoomProtocol::get();
+            ServerLobbyRoomProtocol* slrp =
+                                     dynamic_cast<ServerLobbyRoomProtocol*>(p);
+            slrp->startSelection();
         }
         else // client
         {
@@ -199,8 +198,8 @@ void NetworkingLobby::tearDown()
 bool NetworkingLobby::onEscapePressed()
 {
     // notify the server that we left
-    ClientLobbyRoomProtocol* protocol = dynamic_cast<ClientLobbyRoomProtocol*>(
-            ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
+    ClientLobbyRoomProtocol* protocol =
+        dynamic_cast<ClientLobbyRoomProtocol*>(LobbyRoomProtocol::get());
     if (protocol)
         protocol->leave();
     STKHost::get()->shutdown();
