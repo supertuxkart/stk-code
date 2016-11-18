@@ -182,7 +182,6 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
                 button->event_id = 0;
                 button->axis_x = 0.0f;
                 button->axis_y = 0.0f;
-                update_controls = true;
             }
         }
         else
@@ -211,10 +210,11 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
                     update_controls = true;
                 }
             }
-            else if (prev_button_state != button->pressed)
-            {
-                update_controls = true;
-            }
+        }
+        
+        if (prev_button_state != button->pressed)
+        {
+            update_controls = true;
         }
 
         if (update_controls)
@@ -224,6 +224,21 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
 
     }
 } // updateDeviceState
+
+// ----------------------------------------------------------------------------
+/** Helper function that returns a steering factor for steering button.
+ *  \param value The axis value from 0 to 1.
+ */
+float MultitouchDevice::getSteeringFactor(float value)
+{
+    if (m_deadzone_edge + m_deadzone_center >= 1.0f)
+        return 1.0f;
+    
+    assert(m_deadzone_edge + m_deadzone_center != 1.0f);
+    
+    return std::min((value - m_deadzone_center) / (1.0f - m_deadzone_edge - 
+                    m_deadzone_center), 1.0f);
+}
 
 // ----------------------------------------------------------------------------
 /** Sends proper action for player controller depending on the button type
@@ -255,18 +270,14 @@ void MultitouchDevice::handleControls(MultitouchButton* button)
 
     if (button->type == MultitouchButtonType::BUTTON_STEERING)
     {
-        assert(m_deadzone_edge != 1.0f);
-
         if (button->axis_y < -m_deadzone_center)
         {
-            float factor = std::min(std::abs(button->axis_y) / (1 -
-                                    m_deadzone_edge), 1.0f);
+            float factor = getSteeringFactor(std::abs(button->axis_y));
             controller->action(PA_ACCEL, factor * Input::MAX_VALUE);
         }
         else if (button->axis_y > m_deadzone_center)
         {
-            float factor = std::min(std::abs(button->axis_y) / (1 -
-                                    m_deadzone_edge), 1.0f);
+            float factor = getSteeringFactor(std::abs(button->axis_y));
             controller->action(PA_BRAKE, factor * Input::MAX_VALUE);
         }
         else
@@ -277,14 +288,12 @@ void MultitouchDevice::handleControls(MultitouchButton* button)
 
         if (button->axis_x < -m_deadzone_center)
         {
-            float factor = std::min(std::abs(button->axis_x) / (1 -
-                                    m_deadzone_edge), 1.0f);
+            float factor = getSteeringFactor(std::abs(button->axis_x));
             controller->action(PA_STEER_LEFT, factor * Input::MAX_VALUE);
         }
         else if (button->axis_x > m_deadzone_center)
         {
-            float factor = std::min(std::abs(button->axis_x) / (1 -
-                                    m_deadzone_edge), 1.0f);
+            float factor = getSteeringFactor(std::abs(button->axis_x));
             controller->action(PA_STEER_RIGHT, factor * Input::MAX_VALUE);
         }
         else
