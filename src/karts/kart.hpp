@@ -178,8 +178,6 @@ protected:
     /** The shadow of a kart. */
     Shadow          *m_shadow;
 
-    ParticleEmitter *m_sky_particles_emitter;
-
     /** All particle effects. */
     KartGFX         *m_kart_gfx;
 

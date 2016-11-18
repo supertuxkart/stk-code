@@ -24,7 +24,7 @@
 #include "karts/controller/player_controller.hpp"
 
 class AbstractKart;
-class Player;
+class ParticleEmitter;
 class SFXBase;
 
 /** PlayerKart manages control events from the player and moves
@@ -41,6 +41,7 @@ private:
 
     bool           m_sound_schedule;
 
+    ParticleEmitter* m_sky_particles_emitter;
 
     /** The index of the camera attached to the kart for this controller. The
      *  camera object is managed in the Camera class, so no need to free it. */
