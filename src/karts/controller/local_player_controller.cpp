@@ -25,7 +25,6 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/gpu_particles.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "input/input_manager.hpp"
@@ -56,8 +55,7 @@
  */
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                    StateManager::ActivePlayer *player)
-                     : PlayerController(kart), m_sky_particles_emitter(NULL),
-                       m_particle_system_proxy(NULL)
+                     : PlayerController(kart), m_sky_particles_emitter(NULL)
 {
     m_player = player;
     if(player)
@@ -89,8 +87,6 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
         // FIXME: in multiplayer mode, this will result in several instances
         //        of the heightmap being calculated and kept in memory
         m_sky_particles_emitter->addHeightMapAffector(track);
-        m_particle_system_proxy = dynamic_cast<ParticleSystemProxy*>
-            (m_sky_particles_emitter->getNode());
     }
 
 }   // LocalPlayerController
@@ -202,16 +198,22 @@ void LocalPlayerController::update(float dt)
             m_kart->getSpeed() < -UserConfigParams::m_reverse_look_threshold))
         {
             camera->setMode(Camera::CM_REVERSE);
-            if (m_particle_system_proxy)
-                m_particle_system_proxy->setReverse(true);
+            if (m_sky_particles_emitter)
+            {
+                m_sky_particles_emitter->setPosition(Vec3(0, 30, -100));
+                m_sky_particles_emitter->setRotation(Vec3(0, 180, 0));
+            }
         }
         else
         {
             if (camera->getMode() == Camera::CM_REVERSE)
             {
                 camera->setMode(Camera::CM_NORMAL);
-                if (m_particle_system_proxy)
-                    m_particle_system_proxy->setReverse(false);
+                if (m_sky_particles_emitter)
+                {
+                    m_sky_particles_emitter->setPosition(Vec3(0, 30, 100));
+                    m_sky_particles_emitter->setRotation(Vec3(0, 0, 0));
+                }
             }
         }
     }

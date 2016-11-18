@@ -40,10 +40,9 @@ protected:
     float m_color_to[3];
     bool m_first_execution;
     bool m_randomize_initial_y;
-    bool m_reverse;
-
+    
     GLuint texture;
-
+    
     /** Previous frame particles emitter source matrix */
     core::matrix4 m_previous_frame_matrix;
     
@@ -107,8 +106,6 @@ public:
     const float* getColorTo() const { return m_color_to; }
     void setHeightmap(const std::vector<std::vector<float> >&, float, float, float, float);
     void setFlip();
-    void setReverse(bool reverse) { m_reverse = reverse; }
-    virtual void updateAbsolutePosition();
 };
 
 #endif // GPUPARTICLES_H

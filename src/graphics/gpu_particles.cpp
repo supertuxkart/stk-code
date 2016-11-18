@@ -158,7 +158,6 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     track_x_len = 0;
     track_z_len = 0;
     texture = 0;
-    m_reverse = false;
 }
 
 ParticleSystemProxy::~ParticleSystemProxy()
@@ -632,23 +631,5 @@ void ParticleSystemProxy::render() {
     {
         simulate();
         draw();
-    }
-}
-
-void ParticleSystemProxy::updateAbsolutePosition()
-{
-    if (Parent && m_reverse)
-    {
-        core::vector3df old_rot = RelativeRotation;
-        core::vector3df old_tran = RelativeTranslation;
-        RelativeRotation.Y += 180.0f;
-        RelativeTranslation.Z = -RelativeTranslation.Z;
-        scene::CParticleSystemSceneNode::updateAbsolutePosition();
-        RelativeRotation = old_rot;
-        RelativeTranslation = old_tran;
-    }
-    else
-    {
-        scene::CParticleSystemSceneNode::updateAbsolutePosition();
     }
 }

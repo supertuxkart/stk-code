@@ -427,8 +427,17 @@ int ParticleEmitter::getCreationRate()
  */
 void ParticleEmitter::setPosition(const Vec3 &pos)
 {
-  m_node->setPosition(pos.toIrrVector());
+    m_node->setPosition(pos.toIrrVector());
 }   // setPosition
+
+//-----------------------------------------------------------------------------
+/** Sets the rotation of the particle emitter.
+ *  \param pos The rotation for the particle emitter.
+ */
+void ParticleEmitter::setRotation(const Vec3 &rot)
+{
+    m_node->setRotation(rot.toIrrVector());
+}   // setRotation
 
 //-----------------------------------------------------------------------------
 
