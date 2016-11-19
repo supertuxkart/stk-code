@@ -187,6 +187,7 @@ source/Irrlicht/CZipReader.cpp
 source/Irrlicht/Irrlicht.cpp
 source/Irrlicht/irrXML.cpp
 source/Irrlicht/os.cpp
+source/Irrlicht/COpenGLNormalMapRenderer.cpp
 source/Irrlicht/BuiltInFont.h
 source/Irrlicht/CAnimatedMeshSceneNode.h
 source/Irrlicht/CAttributeImpl.h
@@ -339,6 +340,7 @@ source/Irrlicht/S4DVertex.h
 source/Irrlicht/SoftwareDriver2_compile_config.h
 source/Irrlicht/SoftwareDriver2_helper.h
 source/Irrlicht/wglext.h
+source/Irrlicht/COpenGLNormalMapRenderer.h
 
 include/aabbox3d.h
 include/CDynamicMeshBuffer.h
