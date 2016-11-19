@@ -86,6 +86,8 @@ public:
     /** returns the sprite number from a given character */
     virtual u32 getSpriteNoFromChar(const wchar_t *c) const;
     // ------------------------------------------------------------------------
+    virtual void addLazyLoadCharacters(const wchar_t *s);
+    // ------------------------------------------------------------------------
     // Below is not used:
     /** set an Pixel Offset on Drawing ( scale position on width ) */
     virtual void setKerningWidth (s32 kerning) {}

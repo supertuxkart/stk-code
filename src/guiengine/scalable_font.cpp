@@ -125,5 +125,16 @@ u32 ScalableFont::getSpriteNoFromChar(const wchar_t *c) const
     return area.spriteno;
 }   // getSpriteNoFromChar
 
+// ------------------------------------------------------------------------
+void ScalableFont::addLazyLoadCharacters(const wchar_t *c)
+{
+    if (!m_face->supportLazyLoadChar()) return;
+
+    m_face->insertCharacters(c);
+    m_face->updateCharactersList();
+    m_face->createNewGlyphPage();
+
+}   // addLazyLoadCharacters
+
 } // end namespace gui
 } // end namespace irr
