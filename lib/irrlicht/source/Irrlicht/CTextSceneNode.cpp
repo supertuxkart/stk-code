@@ -114,12 +114,12 @@ CBillboardTextSceneNode::CBillboardTextSceneNode(ISceneNode* parent, ISceneManag
 		{
 			Font = (gui::IGUIFontBitmap*)font;
 			Font->grab();
-			u32 old_texture_count = Font->getSpriteBank()->getTextureCount();
-			Font->addLazyLoadCharacters(text);
+			u32 texture_count = Font->addLazyLoadCharacters(text);
+			_IRR_DEBUG_BREAK_IF(texture_count==0);
 
 			// mesh with one buffer per texture
 			Mesh = new SMesh();
-			for (u32 i=0; i<old_texture_count; ++i)
+			for (u32 i=0; i<texture_count; ++i)
 			{
 				SMeshBuffer *mb = new SMeshBuffer();
 				mb->Material = Material;

@@ -126,13 +126,30 @@ u32 ScalableFont::getSpriteNoFromChar(const wchar_t *c) const
 }   // getSpriteNoFromChar
 
 // ------------------------------------------------------------------------
-void ScalableFont::addLazyLoadCharacters(const wchar_t *c)
+u32 ScalableFont::addLazyLoadCharacters(const wchar_t *c)
 {
-    if (!m_face->supportLazyLoadChar()) return;
+    IGUISpriteBank* sp = m_face->getSpriteBank();
+    u32 tex_count = sp->getTextureCount();
+    if (!m_face->supportLazyLoadChar()) return tex_count;
 
     m_face->insertCharacters(c);
     m_face->updateCharactersList();
-    m_face->createNewGlyphPage();
+
+    // Make sure text of billboard wasn't located in the last texture
+    for (const wchar_t p = *c; *c; c++)
+    {
+        const core::array<SGUISprite>& s = sp->getSprites();
+        const FontWithFace::FontArea& area =
+            m_face->getAreaFromCharacter(p, NULL/*fallback_font*/);
+        u32 cur_tex_no = s[area.spriteno].Frames[0].textureNumber;
+        if (cur_tex_no == (tex_count -1))
+        {
+            m_face->createNewGlyphPage();
+            return tex_count;
+        }
+    }
+
+    return tex_count -1;
 
 }   // addLazyLoadCharacters
 

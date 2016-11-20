@@ -96,7 +96,7 @@ public:
 	*/
 	virtual void setInvisibleCharacters( const wchar_t *s ) = 0;
 
-	virtual void addLazyLoadCharacters(const wchar_t *s) {}
+	virtual u32 addLazyLoadCharacters(const wchar_t *s) { return 0; }
 };
 
 } // end namespace gui
