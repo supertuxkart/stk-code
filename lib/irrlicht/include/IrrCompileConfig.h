@@ -232,8 +232,8 @@ define out. */
 //! to remove the dependencies such that Irrlicht will compile on those systems, too.
 //! If you don't need colored cursors you can also disable the Xcursor extension
 #if defined(_IRR_LINUX_PLATFORM_) && defined(_IRR_COMPILE_WITH_X11_)
-#define _IRR_LINUX_X11_VIDMODE_
-//#define _IRR_LINUX_X11_RANDR_
+//#define _IRR_LINUX_X11_VIDMODE_
+#define _IRR_LINUX_X11_RANDR_
 #ifdef NO_IRR_LINUX_X11_VIDMODE_
 #undef _IRR_LINUX_X11_VIDMODE_
 #endif
