@@ -119,9 +119,7 @@
 
 #if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
 #ifndef _IRR_SOLARIS_PLATFORM_
-#if !defined(__linux__) && !defined(__FreeBSD__)
 #define _IRR_LINUX_PLATFORM_
-#endif
 #endif
 #define _IRR_POSIX_API_
 #define _IRR_COMPILE_WITH_X11_DEVICE_
