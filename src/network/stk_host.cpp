@@ -26,7 +26,7 @@
 #include "network/network_string.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/connect_to_server.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_peer.hpp"
@@ -101,7 +101,7 @@ void STKHost::create()
  *
  *  Server:
  *
- *    1. ServerLobbyRoomProtocol:
+ *    1. ServerLobby:
  *       Spawns the following sub-protocols:
  *       1. GetPublicAddress: Use STUN to discover the public ip address
  *          and port number of this host.
@@ -141,7 +141,7 @@ void STKHost::create()
  *
  * Server:
  *
- *   The ServerLobbyRoomProtocol (SLR) will then detect the above client
+ *   The ServerLobby (SLR) will then detect the above client
  *   requests, and start a ConnectToPeer protocol for each incoming client.
  *   The ConnectToPeer protocol uses:
  *         1. GetPeerAddress to get the ip address and port of the client.
@@ -264,7 +264,7 @@ STKHost::STKHost(uint32_t server_id, uint32_t host_id)
 
 // ----------------------------------------------------------------------------
 /** The constructor for a server.
- *  The server control flow starts with the ServerLobbyRoomProtocol.
+ *  The server control flow starts with the ServerLobby.
  */
 STKHost::STKHost(const irr::core::stringw &server_name)
 {
@@ -289,7 +289,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
     }
 
     startListening();
-    Protocol *p = LobbyRoomProtocol::create<ServerLobbyRoomProtocol>();
+    Protocol *p = LobbyRoomProtocol::create<ServerLobby>();
     ProtocolManager::getInstance()->requestStart(p);
 
 }   // STKHost(server_name)

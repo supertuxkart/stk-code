@@ -52,6 +52,7 @@ public:
         LE_RACE_FINISHED,                 // race has finished, display result
         LE_RACE_FINISHED_ACK,             // client went back to lobby
         LE_EXIT_RESULT,                   // Force clients to exit race result screen
+        LE_VOTE,                          // Any vote (race mode, track, ...)
         LE_VOTE_MAJOR,                    // vote of major race mode
         LE_VOTE_MINOR,                    // vote for minor race mode
         LE_VOTE_RACE_COUNT,               // vote for number of tracks

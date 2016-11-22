@@ -22,8 +22,8 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/stk_host.hpp"
-#include "network/protocols/client_lobby_room_protocol.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/protocols/stop_server.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
@@ -78,23 +78,23 @@ void* NetworkConsole::mainLoop(void* data)
         }
         else if (str == "start" && NetworkConfig::get()->isServer())
         {
-            ServerLobbyRoomProtocol* protocol = 
-                dynamic_cast<ServerLobbyRoomProtocol*>(LobbyRoomProtocol::get());
+            ServerLobby* protocol = 
+                dynamic_cast<ServerLobby*>(LobbyRoomProtocol::get());
             protocol->signalRaceStartToClients();
         }
         else if (str == "selection" && NetworkConfig::get()->isServer())
         {
-            ServerLobbyRoomProtocol* protocol =
-                    dynamic_cast<ServerLobbyRoomProtocol*>(LobbyRoomProtocol::get());
+            ServerLobby* protocol =
+                    dynamic_cast<ServerLobby*>(LobbyRoomProtocol::get());
             protocol->startSelection();
         }
         else if (str == "select" && NetworkConfig::get()->isClient())
         {
             std::string str2;
             getline(std::cin, str2);
-            ServerLobbyRoomProtocol* protocol =
-                dynamic_cast<ServerLobbyRoomProtocol*>(LobbyRoomProtocol::get());
-            ClientLobbyRoomProtocol* clrp = dynamic_cast<ClientLobbyRoomProtocol*>(protocol);
+            ServerLobby* protocol =
+                dynamic_cast<ServerLobby*>(LobbyRoomProtocol::get());
+            ClientLobby* clrp = dynamic_cast<ClientLobby*>(protocol);
             std::vector<NetworkPlayerProfile*> players =
                                          STKHost::get()->getMyPlayerProfiles();
             // For now send a vote for each local player
@@ -110,8 +110,8 @@ void* NetworkConsole::mainLoop(void* data)
             std::string str2;
             getline(std::cin, str2);
             LobbyRoomProtocol* protocol = LobbyRoomProtocol::get();
-            ClientLobbyRoomProtocol* clrp =
-                               dynamic_cast<ClientLobbyRoomProtocol*>(protocol);
+            ClientLobby* clrp =
+                               dynamic_cast<ClientLobby*>(protocol);
             std::vector<NetworkPlayerProfile*> players =
                                      STKHost::get()->getMyPlayerProfiles();
             if (str2 == "track")

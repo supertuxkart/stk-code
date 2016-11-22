@@ -126,7 +126,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 
 //-----------------------------------------------------------------------------
 /** Waits for the countdown to be started. On the server the start of the
- *  countdown is triggered by ServerLobbyRoomProtocol::finishedLoadingWorld(),
+ *  countdown is triggered by ServerLobby::finishedLoadingWorld(),
  *  which is called once all clients have confirmed that they are ready to
  *  start. The server will send a ping request to each client once a second,
  *  and include the information if the countdown has started (and its current
@@ -188,7 +188,7 @@ void SynchronizationProtocol::asynchronousUpdate()
 
 //-----------------------------------------------------------------------------
 /** Starts the countdown on this machine. On the server side this function
- *  is called from ServerLobbyRoomProtocol::finishedLoadingWorld()  (when all
+ *  is called from ServerLobby::finishedLoadingWorld()  (when all
  *  players have confirmed that they are ready to play). On the client side
  *  this function is called from this protocol when a message from the server
  *  is received indicating that the countdown has to be started.

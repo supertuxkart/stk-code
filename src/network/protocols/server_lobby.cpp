@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "network/protocols/server_lobby.hpp"
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -75,21 +75,21 @@
  *  It starts with detecting the public ip address and port of this
  *  host (GetPublicAddress).
  */
-ServerLobbyRoomProtocol::ServerLobbyRoomProtocol() : LobbyRoomProtocol(NULL)
+ServerLobby::ServerLobby() : LobbyRoomProtocol(NULL)
 {
     setHandleDisconnections(true);
-}   // ServerLobbyRoomProtocol
+}   // ServerLobby
 
 //-----------------------------------------------------------------------------
 /** Destructor.
  */
-ServerLobbyRoomProtocol::~ServerLobbyRoomProtocol()
+ServerLobby::~ServerLobby()
 {
-}   // ~ServerLobbyRoomProtocol
+}   // ~ServerLobby
 
 //-----------------------------------------------------------------------------
 
-void ServerLobbyRoomProtocol::setup()
+void ServerLobby::setup()
 {
     m_game_setup = STKHost::get()->setupNewGame();
     m_game_setup->setNumLocalPlayers(0);    // no local players on a server
@@ -101,7 +101,7 @@ void ServerLobbyRoomProtocol::setup()
                                                         : INIT_WAN;
     m_selection_enabled = false;
     m_current_protocol  = NULL;
-    Log::info("ServerLobbyRoomProtocol", "Starting the protocol.");
+    Log::info("ServerLobby", "Starting the protocol.");
 
     // Initialise the data structures to detect if all clients and 
     // the server are ready:
@@ -120,7 +120,7 @@ void ServerLobbyRoomProtocol::setup()
 
 //-----------------------------------------------------------------------------
 
-bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
+bool ServerLobby::notifyEventAsynchronous(Event* event)
 {
     assert(m_game_setup); // assert that the setup exists
     if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -129,7 +129,7 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         assert(data.size()); // message not empty
         uint8_t message_type;
         message_type = data.getUInt8();
-        Log::info("ServerLobbyRoomProtocol", "Message received with type %d.",
+        Log::info("ServerLobby", "Message received with type %d.",
                   message_type);
         switch(message_type)
         {
@@ -159,7 +159,7 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
  *  is known, register the server and its address with the stk server so that
  *  client can find it.
  */
-void ServerLobbyRoomProtocol::update(float dt)
+void ServerLobby::update(float dt)
 {
     switch (m_state)
     {
@@ -173,7 +173,7 @@ void ServerLobbyRoomProtocol::update(float dt)
         break;
     case GETTING_PUBLIC_ADDRESS:
         {
-            Log::debug("ServerLobbyRoomProtocol", "Public address known.");
+            Log::debug("ServerLobby", "Public address known.");
             // Free GetPublicAddress protocol
             delete m_current_protocol;
 
@@ -181,7 +181,7 @@ void ServerLobbyRoomProtocol::update(float dt)
             // this thread, but there is no need for the protocol manager
             // to react to any requests before the server is registered.
             registerServer();
-            Log::info("ServerLobbyRoomProtocol", "Server registered.");
+            Log::info("ServerLobby", "Server registered.");
             m_state = ACCEPTING_CLIENTS;
         }
         break;
@@ -262,7 +262,7 @@ void ServerLobbyRoomProtocol::update(float dt)
 /** Callback when the GetPublicAddress terminates. It will unpause this
  *  protocol, which triggers the next state of the finite state machine.
  */
-void ServerLobbyRoomProtocol::callback(Protocol *protocol)
+void ServerLobby::callback(Protocol *protocol)
 {
     requestUnpause();
 }   // callback
@@ -274,7 +274,7 @@ void ServerLobbyRoomProtocol::callback(Protocol *protocol)
  *  ProtocolManager thread). The information about this client is added
  *  to the table 'server'.
  */
-void ServerLobbyRoomProtocol::registerServer()
+void ServerLobby::registerServer()
 {
     Online::XMLRequest *request = new Online::XMLRequest();
     const TransportAddress& addr = NetworkConfig::get()->getMyAddress();
@@ -312,7 +312,7 @@ void ServerLobbyRoomProtocol::registerServer()
  *  are therefore ready to start the race. It signals to all clients
  *  to start the race and then switches state to DELAY_SERVER.
  */
-void ServerLobbyRoomProtocol::signalRaceStartToClients()
+void ServerLobby::signalRaceStartToClients()
 {
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     NetworkString *ns = getNetworkString(1);
@@ -326,7 +326,7 @@ void ServerLobbyRoomProtocol::signalRaceStartToClients()
 /** Instructs all clients to start the kart selection. If event is not NULL,
  *  the command comes from a client (which needs to be authorised).
  */
-void ServerLobbyRoomProtocol::startSelection(const Event *event)
+void ServerLobby::startSelection(const Event *event)
 {
     if(event && !event->getPeer()->isAuthorised())
     {
@@ -352,7 +352,7 @@ void ServerLobbyRoomProtocol::startSelection(const Event *event)
 /** Query the STK server for connection requests. For each connection request
  *  start a ConnectToPeer protocol.
  */
-void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
+void ServerLobby::checkIncomingConnectionRequests()
 {
     // First poll every 5 seconds. Return if no polling needs to be done.
     const float POLL_INTERVAL = 5.0f;
@@ -378,7 +378,7 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
 
     if (!result->get("success", &success) || success != "yes")
     {
-        Log::error("ServerLobbyRoomProtocol", "Cannot retrieve the list.");
+        Log::error("ServerLobby", "Cannot retrieve the list.");
         return;
     }
 
@@ -388,7 +388,7 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
     for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
     {
         users_xml->getNode(i)->get("id", &id);
-        Log::debug("ServerLobbyRoomProtocol",
+        Log::debug("ServerLobby",
                    "User with id %d wants to connect.", id);
         Protocol *p = new ConnectToPeer(id);
         p->requestStart();
@@ -401,7 +401,7 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
  *  to state RESULT_DISPLAY, during which the race result gui is shown and all
  *  clients can click on 'continue'.
  */
- void ServerLobbyRoomProtocol::checkRaceFinished()
+ void ServerLobby::checkRaceFinished()
 {
     assert(RaceEventManager::getInstance()->isRunning());
     assert(World::getWorld());
@@ -439,12 +439,12 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
     for (unsigned int i = 0; i < karts_results.size(); i++)
     {
         total->addUInt8(karts_results[i]); // kart pos = i+1
-        Log::info("ServerLobbyRoomProtocol", "Kart %d finished #%d",
+        Log::info("ServerLobby", "Kart %d finished #%d",
             karts_results[i], i + 1);
     }
     sendMessageToPeersChangingToken(total, /*reliable*/ true);
     delete total;
-    Log::info("ServerLobbyRoomProtocol", "End of game message sent");
+    Log::info("ServerLobby", "End of game message sent");
         
 }   // checkRaceFinished
 
@@ -452,7 +452,7 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
 /** Called when a client disconnects.
  *  \param event The disconnect event.
  */
-void ServerLobbyRoomProtocol::clientDisconnected(Event* event)
+void ServerLobby::clientDisconnected(Event* event)
 {
     std::vector<NetworkPlayerProfile*> players_on_host = 
                                       event->getPeer()->getAllPlayerProfiles();
@@ -463,7 +463,7 @@ void ServerLobbyRoomProtocol::clientDisconnected(Event* event)
     for(unsigned int i=0; i<players_on_host.size(); i++)
     {
         msg->addUInt8(players_on_host[i]->getGlobalPlayerId());
-        Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
+        Log::info("ServerLobby", "Player disconnected : id %d",
                   players_on_host[i]->getGlobalPlayerId());
         m_game_setup->removePlayer(players_on_host[i]);
     }
@@ -487,7 +487,7 @@ void ServerLobbyRoomProtocol::clientDisconnected(Event* event)
  *  Data | 4 |n| player name |
  *       ---------------------
  */
-void ServerLobbyRoomProtocol::connectionRequested(Event* event)
+void ServerLobby::connectionRequested(Event* event)
 {
     STKPeer* peer = event->getPeer();
     const NetworkString &data = event->data();
@@ -504,7 +504,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         // send only to the peer that made the request
         peer->sendPacket(message);
         delete message;
-        Log::verbose("ServerLobbyRoomProtocol", "Player refused");
+        Log::verbose("ServerLobby", "Player refused");
         return;
     }
 
@@ -574,7 +574,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     m_game_setup->addPlayer(profile);
     NetworkingLobby::getInstance()->addPlayer(profile);
 
-    Log::verbose("ServerLobbyRoomProtocol", "New player.");
+    Log::verbose("ServerLobby", "New player.");
 
 }   // connectionRequested
 
@@ -590,7 +590,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
  *  Data |player id |  N (kart name size) | kart name |
  *       ----------------------------------------------
  */
-void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
+void ServerLobby::kartSelectionRequested(Event* event)
 {
     if(m_state!=SELECTING)
     {
@@ -662,7 +662,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
  *  Data | player-id | major mode vote |
  *       -------------------------------
  */
-void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
+void ServerLobby::playerMajorVote(Event* event)
 {
     if (!checkDataSize(event, 5)) return;
 
@@ -688,7 +688,7 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
  *  Data | player-id | races count |
  *       ---------------------------
  */
-void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
+void ServerLobby::playerRaceCountVote(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
     NetworkString &data = event->data();
@@ -715,7 +715,7 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
  *  Data | player-id | minor mode vote |
  *       -------------------------------
  */
-void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
+void ServerLobby::playerMinorVote(Event* event)
 {
     if (!checkDataSize(event, 1)) return;
     NetworkString &data = event->data();
@@ -742,7 +742,7 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
  *  Data | player id | track number (gp) | N | track name |
  *       --------------------------------------------------
  */
-void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
+void ServerLobby::playerTrackVote(Event* event)
 {
     if (!checkDataSize(event, 3)) return;
     NetworkString &data  = event->data();
@@ -786,7 +786,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
  *  Data | player id | reversed | track number (gp) |
  *       --------------------------------------------
  */
-void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
+void ServerLobby::playerReversedVote(Event* event)
 {
     if (!checkDataSize(event, 3)) return;
 
@@ -815,7 +815,7 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
  *  Data | player id | laps | track number (gp) |
  *       ----------------------------------------
  */
-void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
+void ServerLobby::playerLapsVote(Event* event)
 {
     if (!checkDataSize(event, 2)) return;
     NetworkString &data = event->data();
@@ -835,7 +835,7 @@ void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
 /** Called from the RaceManager of the server when the world is loaded. Marks
  *  the server to be ready to start the race.
  */
-void ServerLobbyRoomProtocol::finishedLoadingWorld()
+void ServerLobby::finishedLoadingWorld()
 {
     m_server_has_loaded_world = true;
 }   // finishedLoadingWorld;
@@ -844,7 +844,7 @@ void ServerLobbyRoomProtocol::finishedLoadingWorld()
 /** Called when a client notifies the server that it has loaded the world.
  *  When all clients and the server are ready, the race can be started.
  */
-void ServerLobbyRoomProtocol::finishedLoadingWorldClient(Event *event)
+void ServerLobby::finishedLoadingWorldClient(Event *event)
 {
     if (!checkDataSize(event, 1)) return;
 
@@ -887,7 +887,7 @@ void ServerLobbyRoomProtocol::finishedLoadingWorldClient(Event *event)
 /** Called when a client clicks on 'ok' on the race result screen.
  *  If all players have clicked on 'ok', go back to the lobby.
  */
-void ServerLobbyRoomProtocol::playerFinishedResult(Event *event)
+void ServerLobby::playerFinishedResult(Event *event)
 {
     m_player_ready_counter++;
     if(m_player_ready_counter == STKHost::get()->getPeerCount())

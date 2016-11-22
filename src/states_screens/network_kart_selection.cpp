@@ -28,7 +28,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/server_selection.hpp"
 #include "states_screens/state_manager.hpp"
@@ -135,7 +135,7 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
     {
 
         LobbyRoomProtocol* protocol = LobbyRoomProtocol::get();
-        ClientLobbyRoomProtocol *clrp = dynamic_cast<ClientLobbyRoomProtocol*>(protocol);
+        ClientLobby *clrp = dynamic_cast<ClientLobby*>(protocol);
         assert(clrp);
         // FIXME SPLITSCREEN: we need to supply the global player id of the 
         // player selecting the kart here. For now ... just vote the same kart
@@ -180,8 +180,8 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
     {
         Protocol* protocol = ProtocolManager::getInstance()
                            ->getProtocol(PROTOCOL_LOBBY_ROOM);
-        ClientLobbyRoomProtocol* clrp =
-                           dynamic_cast<ClientLobbyRoomProtocol*>(protocol);
+        ClientLobby* clrp =
+                           dynamic_cast<ClientLobby*>(protocol);
         assert(clrp);
         // FIXME: for now we submit a vote from the authorised user
         // for the various modes based on the settings in the race manager. 
@@ -213,8 +213,8 @@ bool NetworkKartSelectionScreen::onEscapePressed()
     ServerSelection::getInstance()->refresh();
     Protocol *lobby = LobbyRoomProtocol::get();
     // notify the server that we left
-    ClientLobbyRoomProtocol* clrp =
-        dynamic_cast<ClientLobbyRoomProtocol*>(lobby);
+    ClientLobby* clrp =
+        dynamic_cast<ClientLobby*>(lobby);
     if (clrp)
         clrp->leave();
     return true; // remove the screen

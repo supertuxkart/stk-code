@@ -45,7 +45,7 @@
 #include "modes/soccer_world.hpp"
 #include "modes/world_with_rank.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "race/highscores.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/feature_unlocked.hpp"
@@ -342,8 +342,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         {
             // Signal to the server that this client is back in the lobby now.
             Protocol* protocol = LobbyRoomProtocol::get();
-            ClientLobbyRoomProtocol* clrp =
-                dynamic_cast<ClientLobbyRoomProtocol*>(protocol);
+            ClientLobby* clrp =
+                dynamic_cast<ClientLobby*>(protocol);
             if(clrp)
                 clrp->doneWithResults();
             backToLobby();

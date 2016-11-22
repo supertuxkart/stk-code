@@ -28,7 +28,7 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/race_event_manager.hpp"
 #include "tracks/track.hpp"
 

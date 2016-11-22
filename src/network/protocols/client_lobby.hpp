@@ -1,13 +1,13 @@
-#ifndef CLIENT_LOBBY_ROOM_PROTOCOL_HPP
-#define CLIENT_LOBBY_ROOM_PROTOCOL_HPP
+#ifndef CLIENT_LOBBY_HPP
+#define CLIENT_LOBBY_HPP
 
-#include "network/protocols/lobby_room_protocol.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
 class STKPeer;
 
-class ClientLobbyRoomProtocol : public LobbyRoomProtocol
+class ClientLobby : public LobbyRoomProtocol
 {
 private:
     void newPlayer(Event* event);
@@ -50,8 +50,8 @@ private:
     STATE m_state;
 
 public:
-             ClientLobbyRoomProtocol();
-    virtual ~ClientLobbyRoomProtocol();
+             ClientLobby();
+    virtual ~ClientLobby();
 
     virtual void requestKartSelection(uint8_t player_id,
                                       const std::string &kart_name) OVERRIDE;

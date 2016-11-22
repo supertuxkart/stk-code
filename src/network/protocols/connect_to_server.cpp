@@ -26,7 +26,7 @@
 #include "network/protocols/hide_public_address.hpp"
 #include "network/protocols/request_connection.hpp"
 #include "network/protocols/ping_protocol.hpp"
-#include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
@@ -238,8 +238,8 @@ void ConnectToServer::asynchronousUpdate()
                 // lobby room protocol if we're connected only
                 if(STKHost::get()->getPeers()[0]->isConnected())
                 {
-                    ClientLobbyRoomProtocol *p = 
-                        LobbyRoomProtocol::create<ClientLobbyRoomProtocol>();
+                    ClientLobby *p = 
+                        LobbyRoomProtocol::create<ClientLobby>();
                     p->setAddress(m_server_address);
                     p->requestStart();
                 }

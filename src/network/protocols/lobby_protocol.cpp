@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "network/protocols/lobby_room_protocol.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"

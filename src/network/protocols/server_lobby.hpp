@@ -1,11 +1,11 @@
 #ifndef SERVER_LOBBY_ROOM_PROTOCOL_HPP
 #define SERVER_LOBBY_ROOM_PROTOCOL_HPP
 
-#include "network/protocols/lobby_room_protocol.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/synchronised.hpp"
 
-class ServerLobbyRoomProtocol : public LobbyRoomProtocol
+class ServerLobby : public LobbyRoomProtocol
                               , public CallbackObject
 {
 private:
@@ -70,8 +70,8 @@ private:
     void registerServer();
     void finishedLoadingWorldClient(Event *event);
 public:
-             ServerLobbyRoomProtocol();
-    virtual ~ServerLobbyRoomProtocol();
+             ServerLobby();
+    virtual ~ServerLobby();
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
@@ -86,6 +86,6 @@ public:
 
     virtual void callback(Protocol *protocol) OVERRIDE;
 
-};   // class ServerLobbyRoomProtocol
+};   // class ServerLobby
 
 #endif // SERVER_LOBBY_ROOM_PROTOCOL_HPP
