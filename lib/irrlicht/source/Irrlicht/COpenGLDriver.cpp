@@ -14,6 +14,7 @@ extern bool GLContextDebugBit;
 #include "COpenGLMaterialRenderer.h"
 #include "COpenGLShaderMaterialRenderer.h"
 #include "COpenGLSLMaterialRenderer.h"
+#include "COpenGLNormalMapRenderer.h"
 #include "COpenGLParallaxMapRenderer.h"
 #include "os.h"
 
@@ -29,7 +30,7 @@ namespace irr
 {
 namespace video
 {
-    bool useCoreContext;
+	bool useCoreContext;
 // -----------------------------------------------------------------------
 // WINDOWS CONSTRUCTOR
 // -----------------------------------------------------------------------
@@ -85,107 +86,107 @@ static PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribs_ARB;
 
 static HGLRC getMeAGLContext(HDC HDc, bool force_legacy_context)
 {
-    if (!force_legacy_context)
-    {
-        useCoreContext = true;
-        HGLRC hrc = 0;
-        int ctx44debug[] =
-        {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-            WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-            0
-        };
+	if (!force_legacy_context)
+	{
+		useCoreContext = true;
+		HGLRC hrc = 0;
+		int ctx44debug[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+			WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+			0
+		};
 
-        int ctx44[] =
-        {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-            0
-        };
+		int ctx44[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+			0
+		};
 
-        hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx44debug : ctx44);
-        if (hrc)
-            return hrc;
+		hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx44debug : ctx44);
+		if (hrc)
+			return hrc;
 
-        int ctx40debug[] =
-        {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 0,
-            WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-            0
-        };
+		int ctx40debug[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 0,
+			WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+			0
+		};
 
-        int ctx40[] =
-        {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 0,
-            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-            0
-        };
+		int ctx40[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 0,
+			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+			0
+		};
 
-        hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx40debug : ctx40);
-        if (hrc)
-            return hrc;
+		hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx40debug : ctx40);
+		if (hrc)
+			return hrc;
 
-        int ctx33debug[] =
-        {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-            WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-            0
-        };
+		int ctx33debug[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+			WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+			0
+		};
 
-        int ctx33[] =
-        {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-            0
-        };
+		int ctx33[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+			0
+		};
 
-        hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx33debug : ctx33);
-        if (hrc)
-            return hrc;
+		hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx33debug : ctx33);
+		if (hrc)
+			return hrc;
 
-        int ctx31debug[] =
-        {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 1,
-            WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-            0
-        };
+		int ctx31debug[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+			WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+			0
+		};
 
-        int ctx31[] =
-        {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 1,
-            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-            0
-        };
+		int ctx31[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+			0
+		};
 
-        hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx31debug : ctx31);
-        if (hrc)
-            return hrc;
-    }   // if (!force_legacy_context)
+		hrc = wglCreateContextAttribs_ARB(HDc, 0, GLContextDebugBit ? ctx31debug : ctx31);
+		if (hrc)
+			return hrc;
+	}   // if (!force_legacy_context)
 
-    useCoreContext = false;
-    int legacyctx[] =
-    {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 2,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 1,
-        0
-    };
-    HGLRC hrc = wglCreateContextAttribs_ARB(HDc, 0, legacyctx);
-    if (hrc)
-        return hrc;
+	useCoreContext = false;
+	int legacyctx[] =
+	{
+		WGL_CONTEXT_MAJOR_VERSION_ARB, 2,
+		WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+		0
+	};
+	HGLRC hrc = wglCreateContextAttribs_ARB(HDc, 0, legacyctx);
+	if (hrc)
+		return hrc;
 
-    return NULL;
+	return NULL;
 }
 
 //! inits the open gl driver
@@ -513,8 +514,8 @@ bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
 #ifdef WGL_ARB_create_context
 	if (wglCreateContextAttribs_ARB)
 	{
-        hrc = getMeAGLContext(HDc, Params.ForceLegacyDevice);
-    }
+		hrc = getMeAGLContext(HDc, Params.ForceLegacyDevice);
+	}
 	else
 #endif
 		hrc=wglCreateContext(HDc);
@@ -797,11 +798,11 @@ bool COpenGLDriver::genericDriverInit()
 
 	setAmbientLight(SColorf(0.0f,0.0f,0.0f,0.0f));
 #ifdef GL_EXT_separate_specular_color
-    if (FeatureAvailable[IRR_EXT_separate_specular_color] && !useCoreContext)
+	if (FeatureAvailable[IRR_EXT_separate_specular_color] && !useCoreContext)
 		glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 #endif
-    if (!useCoreContext)
-	    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
+	if (!useCoreContext)
+		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
 
 	Params.HandleSRGB &= ((FeatureAvailable[IRR_ARB_framebuffer_sRGB] || FeatureAvailable[IRR_EXT_framebuffer_sRGB]) &&
 		FeatureAvailable[IRR_EXT_texture_sRGB]);
@@ -820,8 +821,8 @@ bool COpenGLDriver::genericDriverInit()
 //		glEnable(GL_RESCALE_NORMAL_EXT);
 
 	glClearDepth(1.0);
-    if (!useCoreContext)
-	    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	if (!useCoreContext)
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
 	glDepthFunc(GL_LEQUAL);
@@ -837,8 +838,8 @@ bool COpenGLDriver::genericDriverInit()
 	// set the renderstates
 	setRenderStates3DMode();
 
-    if (!useCoreContext)
-	    glAlphaFunc(GL_GREATER, 0.f);
+	if (!useCoreContext)
+		glAlphaFunc(GL_GREATER, 0.f);
 
 	// set fog mode
 	setFog(FogColor, FogType, FogStart, FogEnd, FogDensity, PixelFog, RangeFog);
@@ -885,6 +886,15 @@ void COpenGLDriver::createMaterialRenderers()
 	// add normal map renderers
 	s32 tmp = 0;
 	video::IMaterialRenderer* renderer = 0;
+	if (!useCoreContext)
+	{
+		renderer = new COpenGLNormalMapRenderer(this, tmp, MaterialRenderers[EMT_SOLID].Renderer);
+		renderer->drop();
+		renderer = new COpenGLNormalMapRenderer(this, tmp, MaterialRenderers[EMT_TRANSPARENT_ADD_COLOR].Renderer);
+		renderer->drop();
+		renderer = new COpenGLNormalMapRenderer(this, tmp, MaterialRenderers[EMT_TRANSPARENT_VERTEX_ALPHA].Renderer);
+		renderer->drop();
+	}
 
 	// add parallax map renderers
 	renderer = new COpenGLParallaxMapRenderer(this, tmp, MaterialRenderers[EMT_SOLID].Renderer);
@@ -1025,29 +1035,31 @@ void COpenGLDriver::setTransform(E_TRANSFORMATION_STATE state, const core::matri
 	case ETS_WORLD:
 		{
 			// OpenGL only has a model matrix, view and world is not existent. so lets fake these two.
-            if (!useCoreContext)
-			    glMatrixMode(GL_MODELVIEW);
+			if (!useCoreContext)
+				glMatrixMode(GL_MODELVIEW);
 
 			// first load the viewing transformation for user clip planes
-        if (!useCoreContext)
-			glLoadMatrixf((Matrices[ETS_VIEW]).pointer());
+			if (!useCoreContext)
+				glLoadMatrixf((Matrices[ETS_VIEW]).pointer());
 
 			// we have to update the clip planes to the latest view matrix
 			for (u32 i=0; i<MaxUserClipPlanes; ++i)
+			{
 				if (UserClipPlanes[i].Enabled)
 					uploadClipPlane(i);
+			}
 
 			// now the real model-view matrix
-            if (!useCoreContext)
-			    glMultMatrixf(Matrices[ETS_WORLD].pointer());
+			if (!useCoreContext)
+				glMultMatrixf(Matrices[ETS_WORLD].pointer());
 		}
 		break;
 	case ETS_PROJECTION:
 		{
-            if (!useCoreContext)
-			    glMatrixMode(GL_PROJECTION);
-            if (!useCoreContext)
-			    glLoadMatrixf(mat.pointer());
+			if (!useCoreContext)
+				glMatrixMode(GL_PROJECTION);
+			if (!useCoreContext)
+				glLoadMatrixf(mat.pointer());
 		}
 		break;
 	case ETS_COUNT:
@@ -1063,9 +1075,9 @@ void COpenGLDriver::setTransform(E_TRANSFORMATION_STATE state, const core::matri
 			if (MultiTextureExtension)
 				extGlActiveTexture(GL_TEXTURE0_ARB + i);
 
-            if (!useCoreContext)
-			    glMatrixMode(GL_TEXTURE);
-            if (!isRTT && mat.isIdentity() && !useCoreContext)
+			if (!useCoreContext)
+				glMatrixMode(GL_TEXTURE);
+			if (!isRTT && mat.isIdentity() && !useCoreContext)
 				glLoadIdentity();
 			else
 			{
@@ -1074,8 +1086,8 @@ void COpenGLDriver::setTransform(E_TRANSFORMATION_STATE state, const core::matri
 					getGLTextureMatrix(glmat, mat * TextureFlipMatrix);
 				else
 					getGLTextureMatrix(glmat, mat);
-                if (!useCoreContext)
-				    glLoadMatrixf(glmat);
+				if (!useCoreContext)
+					glLoadMatrixf(glmat);
 			}
 			break;
 		}
@@ -1846,8 +1858,8 @@ void COpenGLDriver::draw2DVertexPrimitiveList(const void* vertices, u32 vertexCo
 	if (!primitiveCount || !vertexCount)
 		return;
 
-    if (useCoreContext)
-        return;
+	if (useCoreContext)
+		return;
 
 	if (!checkPrimitiveCount(primitiveCount))
 		return;
@@ -2526,23 +2538,23 @@ bool COpenGLDriver::setActiveTexture(u32 stage, const video::ITexture* texture)
 
 	if (!texture)
 	{
-        if (!useCoreContext)
-		    glDisable(GL_TEXTURE_2D);
+		if (!useCoreContext)
+			glDisable(GL_TEXTURE_2D);
 		return true;
 	}
 	else
 	{
 		if (texture->getDriverType() != EDT_OPENGL)
 		{
-            if (!useCoreContext)
-			    glDisable(GL_TEXTURE_2D);
+			if (!useCoreContext)
+				glDisable(GL_TEXTURE_2D);
 			CurrentTexture.set(stage, 0);
 			os::Printer::log("Fatal Error: Tried to set a texture not owned by this driver.", ELL_ERROR);
 			return false;
 		}
 
-        if (!useCoreContext)
-		    glEnable(GL_TEXTURE_2D);
+		if (!useCoreContext)
+			glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D,
 			static_cast<const COpenGLTexture*>(texture)->getOpenGLTextureName());
 	}
@@ -2658,20 +2670,20 @@ void COpenGLDriver::setRenderStates3DMode()
 	{
 		// Reset Texture Stages
 		glDisable(GL_BLEND);
-        if (!useCoreContext)
-		    glDisable(GL_ALPHA_TEST);
+		if (!useCoreContext)
+			glDisable(GL_ALPHA_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// switch back the matrices
-        if (!useCoreContext)
-		    glMatrixMode(GL_MODELVIEW);
-        if (!useCoreContext)
-		    glLoadMatrixf((Matrices[ETS_VIEW] * Matrices[ETS_WORLD]).pointer());
+		if (!useCoreContext)
+			glMatrixMode(GL_MODELVIEW);
+		if (!useCoreContext)
+			glLoadMatrixf((Matrices[ETS_VIEW] * Matrices[ETS_WORLD]).pointer());
 
-        if (!useCoreContext)
-		    glMatrixMode(GL_PROJECTION);
-        if (!useCoreContext)
-		    glLoadMatrixf(Matrices[ETS_PROJECTION].pointer());
+		if (!useCoreContext)
+			glMatrixMode(GL_PROJECTION);
+		if (!useCoreContext)
+			glLoadMatrixf(Matrices[ETS_PROJECTION].pointer());
 
 		ResetRenderStates = true;
 #ifdef GL_EXT_clip_volume_hint
@@ -2838,27 +2850,27 @@ void COpenGLDriver::setBasicRenderStates(const SMaterial& material, const SMater
 			glDisable(GL_COLOR_MATERIAL);
 			break;
 		case ECM_DIFFUSE:
-            if (!useCoreContext)
-			    glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+			if (!useCoreContext)
+				glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 			break;
 		case ECM_AMBIENT:
-            if (!useCoreContext)
-			    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT);
+			if (!useCoreContext)
+				glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT);
 			break;
 		case ECM_EMISSIVE:
-            if (!useCoreContext)
-			    glColorMaterial(GL_FRONT_AND_BACK, GL_EMISSION);
+			if (!useCoreContext)
+				glColorMaterial(GL_FRONT_AND_BACK, GL_EMISSION);
 			break;
 		case ECM_SPECULAR:
-            if (!useCoreContext)
-			    glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
+			if (!useCoreContext)
+				glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
 			break;
 		case ECM_DIFFUSE_AND_AMBIENT:
-            if (!useCoreContext)
-			    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+			if (!useCoreContext)
+				glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 			break;
 		}
-        if (material.ColorMaterial != ECM_NONE && !useCoreContext)
+		if (material.ColorMaterial != ECM_NONE && !useCoreContext)
 			glEnable(GL_COLOR_MATERIAL);
 	}
 
@@ -2879,8 +2891,8 @@ void COpenGLDriver::setBasicRenderStates(const SMaterial& material, const SMater
 			color[1] = material.AmbientColor.getGreen() * inv;
 			color[2] = material.AmbientColor.getBlue() * inv;
 			color[3] = material.AmbientColor.getAlpha() * inv;
-            if (!useCoreContext)
-			    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, color);
+			if (!useCoreContext)
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, color);
 		}
 
 		if ((material.ColorMaterial != video::ECM_DIFFUSE) &&
@@ -2890,8 +2902,8 @@ void COpenGLDriver::setBasicRenderStates(const SMaterial& material, const SMater
 			color[1] = material.DiffuseColor.getGreen() * inv;
 			color[2] = material.DiffuseColor.getBlue() * inv;
 			color[3] = material.DiffuseColor.getAlpha() * inv;
-            if (!useCoreContext)
-			    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
+			if (!useCoreContext)
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
 		}
 
 		if (material.ColorMaterial != video::ECM_EMISSIVE)
@@ -2900,8 +2912,8 @@ void COpenGLDriver::setBasicRenderStates(const SMaterial& material, const SMater
 			color[1] = material.EmissiveColor.getGreen() * inv;
 			color[2] = material.EmissiveColor.getBlue() * inv;
 			color[3] = material.EmissiveColor.getAlpha() * inv;
-            if (!useCoreContext)
-			    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, color);
+			if (!useCoreContext)
+				glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, color);
 		}
 	}
 
@@ -2913,14 +2925,14 @@ void COpenGLDriver::setBasicRenderStates(const SMaterial& material, const SMater
 		GLfloat color[4]={0.f,0.f,0.f,1.f};
 		const f32 inv = 1.0f / 255.0f;
 
-        if (!useCoreContext)
-		    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, material.Shininess);
+		if (!useCoreContext)
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, material.Shininess);
 		// disable Specular colors if no shininess is set
 		if ((material.Shininess != 0.0f) &&
 			(material.ColorMaterial != video::ECM_SPECULAR))
 		{
 #ifdef GL_EXT_separate_specular_color
-            if (FeatureAvailable[IRR_EXT_separate_specular_color] && !useCoreContext)
+			if (FeatureAvailable[IRR_EXT_separate_specular_color] && !useCoreContext)
 				glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 #endif
 			color[0] = material.SpecularColor.getRed() * inv;
@@ -2929,11 +2941,11 @@ void COpenGLDriver::setBasicRenderStates(const SMaterial& material, const SMater
 			color[3] = material.SpecularColor.getAlpha() * inv;
 		}
 #ifdef GL_EXT_separate_specular_color
-        else if (FeatureAvailable[IRR_EXT_separate_specular_color] && !useCoreContext)
+		else if (FeatureAvailable[IRR_EXT_separate_specular_color] && !useCoreContext)
 			glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);
 #endif
-        if (!useCoreContext)
-		    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, color);
+		if (!useCoreContext)
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, color);
 	}
 
 	// Texture filter
@@ -2987,18 +2999,18 @@ void COpenGLDriver::setBasicRenderStates(const SMaterial& material, const SMater
 	// shademode
 	if (resetAllRenderStates || (lastmaterial.GouraudShading != material.GouraudShading))
 	{
-        if (material.GouraudShading && !useCoreContext)
+		if (material.GouraudShading && !useCoreContext)
 			glShadeModel(GL_SMOOTH);
-        else if (!useCoreContext)
+		else if (!useCoreContext)
 			glShadeModel(GL_FLAT);
 	}
 
 	// lighting
 	if (resetAllRenderStates || (lastmaterial.Lighting != material.Lighting))
 	{
-        if (material.Lighting && !useCoreContext)
+		if (material.Lighting && !useCoreContext)
 			glEnable(GL_LIGHTING);
-        else if (!useCoreContext)
+		else if (!useCoreContext)
 			glDisable(GL_LIGHTING);
 	}
 
@@ -3079,18 +3091,18 @@ void COpenGLDriver::setBasicRenderStates(const SMaterial& material, const SMater
 	// fog
 	if (resetAllRenderStates || lastmaterial.FogEnable != material.FogEnable)
 	{
-        if (material.FogEnable && !useCoreContext)
+		if (material.FogEnable && !useCoreContext)
 			glEnable(GL_FOG);
-        else if (!useCoreContext)
+		else if (!useCoreContext)
 			glDisable(GL_FOG);
 	}
 
 	// normalization
 	if (resetAllRenderStates || lastmaterial.NormalizeNormals != material.NormalizeNormals)
 	{
-        if (material.NormalizeNormals && !useCoreContext)
+		if (material.NormalizeNormals && !useCoreContext)
 			glEnable(GL_NORMALIZE);
-        else if (!useCoreContext)
+		else if (!useCoreContext)
 			glDisable(GL_NORMALIZE);
 	}
 
@@ -3470,9 +3482,11 @@ const wchar_t* COpenGLDriver::getName() const
 //! deletes all dynamic lights there are
 void COpenGLDriver::deleteAllDynamicLights()
 {
-    if (!useCoreContext)
-	    for (s32 i=0; i<MaxLights; ++i)
-		    glDisable(GL_LIGHT0 + i);
+	if (!useCoreContext)
+	{
+		for (s32 i=0; i<MaxLights; ++i)
+			glDisable(GL_LIGHT0 + i);
+	}
 
 	RequestedLights.clear();
 
@@ -3645,8 +3659,8 @@ u32 COpenGLDriver::getMaximalDynamicLightAmount() const
 void COpenGLDriver::setAmbientLight(const SColorf& color)
 {
 	GLfloat data[4] = {color.r, color.g, color.b, color.a};
-    if (!useCoreContext)
-	    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, data);
+	if (!useCoreContext)
+		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, data);
 }
 
 
@@ -3877,42 +3891,42 @@ void COpenGLDriver::setFog(SColor c, E_FOG_TYPE fogType, f32 start,
 {
 	CNullDriver::setFog(c, fogType, start, end, density, pixelFog, rangeFog);
 
-    if (!useCoreContext)
-	    glFogf(GL_FOG_MODE, GLfloat((fogType==EFT_FOG_LINEAR)? GL_LINEAR : (fogType==EFT_FOG_EXP)?GL_EXP:GL_EXP2));
+	if (!useCoreContext)
+		glFogf(GL_FOG_MODE, GLfloat((fogType==EFT_FOG_LINEAR)? GL_LINEAR : (fogType==EFT_FOG_EXP)?GL_EXP:GL_EXP2));
 
 #ifdef GL_EXT_fog_coord
-    if (FeatureAvailable[IRR_EXT_fog_coord] && !useCoreContext)
+	if (FeatureAvailable[IRR_EXT_fog_coord] && !useCoreContext)
 		glFogi(GL_FOG_COORDINATE_SOURCE, GL_FRAGMENT_DEPTH);
 #endif
 #ifdef GL_NV_fog_distance
 	if (FeatureAvailable[IRR_NV_fog_distance])
 	{
-        if (rangeFog && !useCoreContext)
+		if (rangeFog && !useCoreContext)
 			glFogi(GL_FOG_DISTANCE_MODE_NV, GL_EYE_RADIAL_NV);
-        else if (!useCoreContext)
+		else if (!useCoreContext)
 			glFogi(GL_FOG_DISTANCE_MODE_NV, GL_EYE_PLANE_ABSOLUTE_NV);
 	}
 #endif
 
 	if (fogType==EFT_FOG_LINEAR)
 	{
-        if (!useCoreContext)
-		    glFogf(GL_FOG_START, start);
-        if (!useCoreContext)
-		    glFogf(GL_FOG_END, end);
+		if (!useCoreContext)
+			glFogf(GL_FOG_START, start);
+		if (!useCoreContext)
+			glFogf(GL_FOG_END, end);
 	}
-    else if (!useCoreContext)
+	else if (!useCoreContext)
 		glFogf(GL_FOG_DENSITY, density);
 
-    if (pixelFog && !useCoreContext)
+	if (pixelFog && !useCoreContext)
 		glHint(GL_FOG_HINT, GL_NICEST);
-    else if (!useCoreContext)
+	else if (!useCoreContext)
 		glHint(GL_FOG_HINT, GL_FASTEST);
 
 	SColorf color(c);
 	GLfloat data[4] = {color.r, color.g, color.b, color.a};
-    if (!useCoreContext)
-	    glFogfv(GL_FOG_COLOR, data);
+	if (!useCoreContext)
+		glFogfv(GL_FOG_COLOR, data);
 }
 
 

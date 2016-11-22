@@ -95,6 +95,8 @@ public:
 	\param s String of symbols which are not send down to the videodriver
 	*/
 	virtual void setInvisibleCharacters( const wchar_t *s ) = 0;
+
+	virtual u32 addLazyLoadCharacters(const wchar_t *s) { return 0; }
 };
 
 } // end namespace gui

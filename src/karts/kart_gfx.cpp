@@ -53,7 +53,8 @@ KartGFX::KartGFX(const AbstractKart *kart)
     // Create nitro light
     core::vector3df location(0.0f, 0.5f, -0.5f*length - 0.05f);
     m_nitro_light = irr_driver->addLight(location, /*force*/ 0.4f,
-                                         /*radius*/5.0f, 0.0f, 0.4f, 1.0f,
+                                         /*radius*/CVS->isGLSL() ? 5.0f : 1.0f,
+                                         0.0f, 0.4f, 1.0f,
                                          false, node);
     m_nitro_light->setVisible(false);
 #ifdef DEBUG
@@ -65,7 +66,8 @@ KartGFX::KartGFX(const AbstractKart *kart)
     // For the first skidding level
     m_skidding_light_1 = 
         irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f*length - 0.05f),
-                             /* force */ 0.3f,  /* radius */ 3.0f,
+                             /* force */ 0.3f,
+                             /*radius*/CVS->isGLSL() ? 3.0f : 1.0f,
                              1.0f, 0.6f, 0.0f, false, node);
     m_skidding_light_1->setVisible(false);
     m_skidding_light_1->setName( ("skidding emitter 1 (" + m_kart->getIdent() 
@@ -74,7 +76,8 @@ KartGFX::KartGFX(const AbstractKart *kart)
     // For the second skidding level
     m_skidding_light_2 =
         irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f*length - 0.05f),
-                             /* force */0.4f, /*radius*/ 4.0f,
+                             /* force */0.4f,
+                             /*radius*/CVS->isGLSL() ? 4.0f : 1.0f,
                              1.0f, 0.0f, 0.0f, false, node);
     m_skidding_light_2->setVisible(false);
     m_skidding_light_2->setName( ("skidding emitter 2 (" + m_kart->getIdent() 

@@ -2808,7 +2808,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     {
         const bool emergency = getKartAnimation() != NULL;
         m_shadow->update(isOnGround() && !emergency,
-            m_terrain_info->getHoT() - getXYZ().getY()
+            getTrans().inverse()(m_terrain_info->getHitPoint()).getY()
             - m_skidding->getGraphicalJumpOffset()
             - m_graphical_y_offset
             - m_kart_model->getLowestPoint());
