@@ -93,39 +93,6 @@ protected:
     int m_glyph_max_height;
 
     // ------------------------------------------------------------------------
-    /** Check characters to see if they are loaded in font, if not load them.
-     *  For font that doesn't need lazy loading, nothing will be done.
-     *  \param in_ptr Characters to check.
-     *  \param first_load If true, it will ignore \ref supportLazyLoadChar,
-     *  which is called in \ref reset. */
-    void insertCharacters(const wchar_t* in_ptr, bool first_load = false)
-    {
-        if (!supportLazyLoadChar() && !first_load) return;
-
-        for (const wchar_t* p = in_ptr; *p; ++p)
-        {
-            if (*p == L'\r' ||  *p == L'\n' || *p < (wchar_t)32)
-                continue;
-            if (!loadedChar(*p))
-            {
-                loadGlyphInfo(*p);
-                if (supportChar(*p))
-                    addLazyLoadChar(*p);
-                else if (m_fallback_font != NULL)
-                {
-                    if (!m_fallback_font->loadedChar(*p))
-                    {
-                        m_fallback_font->loadGlyphInfo(*p);
-                        if (m_fallback_font->supportChar(*p))
-                            m_fallback_font->addLazyLoadChar(*p);
-                    }
-                }
-            }
-        }
-    }
-    // ------------------------------------------------------------------------
-    void updateCharactersList();
-    // ------------------------------------------------------------------------
     /** Set the fallback font for this font, so if some character is missing in
      *  this font, it will use that fallback font to try rendering it.
      *  \param face A \ref FontWithFace font. */
@@ -239,17 +206,12 @@ private:
     // ------------------------------------------------------------------------
     void loadGlyphInfo(wchar_t c);
     // ------------------------------------------------------------------------
-    void createNewGlyphPage();
-    // ------------------------------------------------------------------------
     /** Add a character into \ref m_new_char_holder for lazy loading later. */
     void addLazyLoadChar(wchar_t c)            { m_new_char_holder.insert(c); }
     // ------------------------------------------------------------------------
     void insertGlyph(wchar_t c, const GlyphInfo& gi);
     // ------------------------------------------------------------------------
     void setDPI();
-    // ------------------------------------------------------------------------
-    /** Override it if sub-class should not do lazy loading characters. */
-    virtual bool supportLazyLoadChar() const                   { return true; }
     // ------------------------------------------------------------------------
     /** Defined by sub-class about the texture size of glyph page, it should be
      *  a power of two. */
@@ -304,6 +266,44 @@ public:
     // ------------------------------------------------------------------------
     /** Return the dpi of this face. */
     unsigned int getDPI() const                          { return m_face_dpi; }
+    // ------------------------------------------------------------------------
+    /** Override it if sub-class should not do lazy loading characters. */
+    virtual bool supportLazyLoadChar() const                   { return true; }
+    // ------------------------------------------------------------------------
+    /** Check characters to see if they are loaded in font, if not load them.
+     *  For font that doesn't need lazy loading, nothing will be done.
+     *  \param in_ptr Characters to check.
+     *  \param first_load If true, it will ignore \ref supportLazyLoadChar,
+     *  which is called in \ref reset. */
+    void insertCharacters(const wchar_t* in_ptr, bool first_load = false)
+    {
+        if (!supportLazyLoadChar() && !first_load) return;
+
+        for (const wchar_t* p = in_ptr; *p; ++p)
+        {
+            if (*p == L'\r' ||  *p == L'\n' || *p < (wchar_t)32)
+                continue;
+            if (!loadedChar(*p))
+            {
+                loadGlyphInfo(*p);
+                if (supportChar(*p))
+                    addLazyLoadChar(*p);
+                else if (m_fallback_font != NULL)
+                {
+                    if (!m_fallback_font->loadedChar(*p))
+                    {
+                        m_fallback_font->loadGlyphInfo(*p);
+                        if (m_fallback_font->supportChar(*p))
+                            m_fallback_font->addLazyLoadChar(*p);
+                    }
+                }
+            }
+        }
+    }
+    // ------------------------------------------------------------------------
+    void updateCharactersList();
+    // ------------------------------------------------------------------------
+    void createNewGlyphPage();
 
 };   // FontWithFace
 

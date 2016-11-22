@@ -250,11 +250,15 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     renderTransparenPass<Shaders::TransparentShader, video::EVT_STANDARD, 3, 2, 1>(
                          TexUnits(RenderGeometry::TexUnit(0, true)),
-                                  ListGhostKart::getInstance());
+                                  ListTranslucentStandard::getInstance());
 
     renderTransparenPass<Shaders::TransparentShader, video::EVT_TANGENTS, 3, 2, 1>(
                          TexUnits(RenderGeometry::TexUnit(0, true)),
-                                  ListGhostKartTangents::getInstance());
+                                  ListTranslucentTangents::getInstance());
+
+    renderTransparenPass<Shaders::TransparentShader, video::EVT_2TCOORDS, 3, 2, 1>(
+                         TexUnits(RenderGeometry::TexUnit(0, true)),
+                                  ListTranslucent2TCoords::getInstance());
 
     glDepthMask(GL_FALSE);
     glDisable(GL_CULL_FACE);
