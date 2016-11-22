@@ -37,8 +37,9 @@ enum TransparentMaterial
     TM_DEFAULT,
     TM_ADDITIVE,
     TM_DISPLACEMENT,
-    TM_GHOST_KART,
-    TM_GHOST_KART_TANGENTS,
+    TM_TRANSLUCENT_STD,
+    TM_TRANSLUCENT_TAN,
+    TM_TRANSLUCENT_2TC,
     TM_COUNT
 };   // TransparentMaterial
 
@@ -169,13 +170,19 @@ class ListAdditiveTransparent : public MiscList<ListAdditiveTransparent,
 {};
 
 // ----------------------------------------------------------------------------
-class ListGhostKart : public MiscList<ListGhostKart,
+class ListTranslucentStandard : public MiscList<ListTranslucentStandard,
                                       GLMesh *, core::matrix4,
                                       core::matrix4, float>
 {};
 
 // ----------------------------------------------------------------------------
-class ListGhostKartTangents : public MiscList<ListGhostKartTangents,
+class ListTranslucentTangents : public MiscList<ListTranslucentTangents,
+                                              GLMesh *, core::matrix4,
+                                              core::matrix4, float>
+{};
+
+// ----------------------------------------------------------------------------
+class ListTranslucent2TCoords : public MiscList<ListTranslucent2TCoords,
                                               GLMesh *, core::matrix4,
                                               core::matrix4, float>
 {};

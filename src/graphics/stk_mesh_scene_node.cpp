@@ -209,9 +209,9 @@ void STKMeshSceneNode::updateNoGL()
             {
                 assert(!immediate_draw);
                 if (mesh.VAOType == video::EVT_TANGENTS)
-                    TransparentMesh[TM_GHOST_KART_TANGENTS].push_back(&mesh);
+                    TransparentMesh[TM_TRANSLUCENT_TAN].push_back(&mesh);
                 else
-                    TransparentMesh[TM_GHOST_KART].push_back(&mesh);
+                    TransparentMesh[TM_TRANSLUCENT_STD].push_back(&mesh);
             }
             else if (rnd->isTransparent())
             {
