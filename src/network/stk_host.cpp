@@ -206,23 +206,22 @@ void STKHost::create()
  *  stored in RaceConfig of GameSetup.
  * 
  *  The server will detect when the track votes from each client have been
- *  received and will trigger the start of the race (SLR::startGame, called
- *  from playerTrackVote). In SLR::startGame the server will start the 
- *  StartGameProtocol and the clients will be informed to start the game.
- *  In a client the StartGame protocol will be started in CLR::startGame. 
+ *  received and will inform all clients to load the world (playerTrackVote).
+ *  Then (state LOAD_GAME) the server will load the world and wait for all
+ *  clients to finish loading (WAIT_FOR_WORLD_LOADED).
  *  
- *  The StartGame protocol will create the ActivePlayers for all non-local
- *  players: on a server, all karts are non-local. On a client, the
- *  ActivePlayer objects for each local players have been created (to store
- *  the device used by each player when joining), so they are used to create
- *  the LocalPlayerController for each kart. Each remote player gets a
+ *  In LR::loadWorld all ActivePlayers for all non-local players are created.
+ *  (on a server all karts are non-local). On a client, the ActivePlayer
+ *  objects for each local players have been created (to store the device
+ *  used by each player when joining), so they are used to create the 
+ *  LocalPlayerController for each kart. Each remote player gets a
  *  NULL ActivePlayer (the ActivePlayer is only used for assigning the input
  *  device to each kart, achievements and highscores, so it's not needed for
- *  remote players). It will also start the SynchronizationProtocol.
- *  The StartGameProtocol has a callback ready() which is called from world
- *  when the world is loaded (i.e. track and all karts are ready). When
- *  this callback is invoked, each client will send a 'ready' message to
- *  the server's StartGameProtocol. Once the server has received all
+ *  remote players). It will also start the SynchronizationProtocol, 
+ *  RaceEventManager and then load the world.
+
+ * TODO:
+ *  Once the server has received all
  *  messages in notifyEventAsynchronous(), it will call startCountdown()
  *  in the SynchronizationProtocol. The SynchronizationProtocol is 
  *  sending regular (once per second) pings to the clients and measure

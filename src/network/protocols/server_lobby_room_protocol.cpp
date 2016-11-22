@@ -26,7 +26,7 @@
 #include "network/network_player_profile.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
-#include "network/protocols/start_game_protocol.hpp"
+#include "network/protocols/synchronization_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
@@ -41,7 +41,37 @@
 #include "utils/time.hpp"
 
 
-/** This is the central game setup protocol running in the server.
+/** This is the central game setup protocol running in the server. It is
+ *  mostly a finite state machine. Note that all nodes in capital leters
+ *  are actual states, while nodes starting with a lower case letter are
+ *  just functions being called.
+ \dot
+ digraph interaction {
+ "Server Constructor" -> "INIT_WAN" [label="If WAN game"]
+ "Server Constructor" -> "ACCEPTING_CLIENTS" [label="If LAN game"]
+ "INIT_WAN" -> "GETTING_PUBLIC_ADDRESS" [label="GetPublicAddress protocol callback"]
+ "GETTING_PUBLIC_ADDRESS" -> "ACCEPTING_CLIENTS" [label="Register server"]
+ "ACCEPTING_CLIENTS" -> "connectionRequested" [label="Client connection request"]
+ "connectionRequested" -> "ACCEPTING_CLIENTS" 
+ "ACCEPTING_CLIENTS" -> "SELECTING" [label="Start race from authorised client"]
+ "SELECTING" -> "SELECTING" [label="Client selects kart, #laps, ..."]
+ "SELECTING" -> "playerVoteTrack" [label="Client selected track"]
+ "playerVoteTrack" -> "SELECTING" [label="Not all clients have selected"]
+ "playerVoteTrack" -> "LOAD_WORLD" [label="All clients have selected"]
+ "LOAD"WORLD -> "WAIT_FOR_WORLD_LOADED" 
+ "WAIT_FOR_WORLD_LOADED" -> "WAIT_FOR_WORLD_LOADED" [label="Client or server loaded world"]
+ "WAIT_FOR_WORLD_LOADED" -> "startRace" [label="All clients and server ready"]
+ "startRace" -> "DELAY_SERVER"
+ "DELAY_SERVER" -> "DELAY_SERVER" [label="Not done waiting"]
+ "DELAY_SERVER -> "Start Countdown" [label="Server starts race now"]
+ "Start Countdown" -> "Wait For Clients"
+ "Wait For Clients" -> "Wait For Clients" [label="Client started 'ready set go'"]
+ "Wait For Clients" -> "Additional Server Delay"
+ "Additional Server Delay" -> "Start Race" [label="Additional delay done"]
+ }
+ \enddot
+
+
  *  It starts with detecting the public ip address and port of this
  *  host (GetPublicAddress).
  */
@@ -61,24 +91,38 @@ ServerLobbyRoomProtocol::~ServerLobbyRoomProtocol()
 
 void ServerLobbyRoomProtocol::setup()
 {
-    m_setup             = STKHost::get()->setupNewGame();
-    m_setup->setNumLocalPlayers(0);    // no local players on a server
+    m_game_setup = STKHost::get()->setupNewGame();
+    m_game_setup->setNumLocalPlayers(0);    // no local players on a server
     m_next_player_id.setAtomic(0);
 
     // In case of LAN we don't need our public address or register with the
     // STK server, so we can directly go to the accepting clients state.
     m_state             = NetworkConfig::get()->isLAN() ? ACCEPTING_CLIENTS 
-                                                        : NONE;
+                                                        : INIT_WAN;
     m_selection_enabled = false;
     m_current_protocol  = NULL;
     Log::info("ServerLobbyRoomProtocol", "Starting the protocol.");
+
+    // Initialise the data structures to detect if all clients and 
+    // the server are ready:
+    m_player_states.clear();
+    m_client_ready_count.setAtomic(0);
+    m_server_delay = 0.02f;
+    m_server_has_loaded_world = false;
+    const std::vector<NetworkPlayerProfile*> &players =
+                                                    m_game_setup->getPlayers();
+    for (unsigned int i = 0; i < players.size(); i++)
+    {
+        m_player_states[players[i]->getGlobalPlayerId()] = false;
+    }
+
 }   // setup
 
 //-----------------------------------------------------------------------------
 
 bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
 {
-    assert(m_setup); // assert that the setup exists
+    assert(m_game_setup); // assert that the setup exists
     if (event->getType() == EVENT_TYPE_MESSAGE)
     {
         NetworkString &data = event->data();
@@ -92,6 +136,7 @@ bool ServerLobbyRoomProtocol::notifyEventAsynchronous(Event* event)
         case LE_CONNECTION_REQUESTED: connectionRequested(event); break;
         case LE_REQUEST_BEGIN: startSelection(event);             break;
         case LE_KART_SELECTION: kartSelectionRequested(event);    break;
+        case LE_CLIENT_LOADED_WORLD: finishedLoadingWorldClient(event); break;
         case LE_VOTE_MAJOR: playerMajorVote(event);               break;
         case LE_VOTE_RACE_COUNT: playerRaceCountVote(event);      break;
         case LE_VOTE_MINOR: playerMinorVote(event);               break;
@@ -118,7 +163,7 @@ void ServerLobbyRoomProtocol::update(float dt)
 {
     switch (m_state)
     {
-    case NONE:
+    case INIT_WAN:
         // Start the protocol to find the public ip address.
         m_current_protocol = new GetPublicAddress(this);
         m_current_protocol->requestStart();
@@ -148,7 +193,34 @@ void ServerLobbyRoomProtocol::update(float dt)
         break;
     }
     case SELECTING:
-        break;   // Nothing to do, this is event based
+        // The function playerVoteTrack will trigger the next state
+        // one all track votes have been received.
+        break;
+    case LOAD_WORLD:
+        Log::info("ServerLobbyRoom", "Starting the race loading.");
+        // This will create the world instance, i.e. load track and karts
+        loadWorld();
+        m_state = WAIT_FOR_WORLD_LOADED;
+        break;
+    case WAIT_FOR_WORLD_LOADED:
+        // Note that m_server_has_loaded_world is called by the main thread
+        // (same a the thread updating this protocol)
+        m_client_ready_count.lock();
+        if (m_server_has_loaded_world &&
+            m_client_ready_count.getData() == m_game_setup->getPlayerCount())
+        {
+            signalRaceStartToClients();
+        }
+        m_client_ready_count.unlock();
+        break;
+    case DELAY_SERVER:
+        m_server_delay -= dt;
+        if (m_server_delay < 0)
+        {
+            m_state = RACING;
+
+        }
+        break;
     case RACING:
         if (World::getWorld() &&
             RaceEventManager::getInstance<RaceEventManager>()->isRunning())
@@ -236,23 +308,18 @@ void ServerLobbyRoomProtocol::registerServer()
 }   // registerServer
 
 //-----------------------------------------------------------------------------
-/** This function is called when all track votes from the clients have
- *  been received. It broadcasts a message to all client to start the
- *  race
-
-informs each client to start the race, and then starts the
- *  StartGameProtocol.
+/** This function is called when all clients have loaded the world and
+ *  are therefore ready to start the race. It signals to all clients
+ *  to start the race and then switches state to DELAY_SERVER.
  */
-void ServerLobbyRoomProtocol::startGame()
+void ServerLobbyRoomProtocol::signalRaceStartToClients()
 {
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     NetworkString *ns = getNetworkString(1);
     ns->addUInt8(LE_START_RACE);
     sendMessageToPeersChangingToken(ns, /*reliable*/true);
     delete ns;
-    Protocol *p = new StartGameProtocol(m_setup);
-    p->requestStart();
-    m_state = RACING;
+    m_state = DELAY_SERVER;
 }   // startGame
 
 //-----------------------------------------------------------------------------
@@ -398,7 +465,7 @@ void ServerLobbyRoomProtocol::clientDisconnected(Event* event)
         msg->addUInt8(players_on_host[i]->getGlobalPlayerId());
         Log::info("ServerLobbyRoomProtocol", "Player disconnected : id %d",
                   players_on_host[i]->getGlobalPlayerId());
-        m_setup->removePlayer(players_on_host[i]);
+        m_game_setup->removePlayer(players_on_host[i]);
     }
 
     sendMessageToPeersChangingToken(msg, /*reliable*/true);
@@ -426,7 +493,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     const NetworkString &data = event->data();
 
     // can we add the player ?
-    if (m_setup->getPlayerCount() >= NetworkConfig::get()->getMaxPlayers() ||
+    if (m_game_setup->getPlayerCount() >= NetworkConfig::get()->getMaxPlayers() ||
         m_state!=ACCEPTING_CLIENTS                                           )
     {
         NetworkString *message = getNetworkString(2);
@@ -455,8 +522,8 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     m_next_player_id.getData()++;
     int new_player_id = m_next_player_id.getData();
     m_next_player_id.unlock();
-    if(m_setup->getLocalMasterID()==0)
-        m_setup->setLocalMaster(new_player_id);
+    if(m_game_setup->getLocalMasterID()==0)
+        m_game_setup->setLocalMaster(new_player_id);
 
     // The host id has already been incremented when the peer
     // was added, so it is the right id now.
@@ -484,7 +551,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
     peer->setAuthorised(is_authorised);
     peer->setHostId(new_host_id);
 
-    const std::vector<NetworkPlayerProfile*> &players = m_setup->getPlayers();
+    const std::vector<NetworkPlayerProfile*> &players = m_game_setup->getPlayers();
     // send a message to the one that asked to connect
     // Estimate 10 as average name length
     NetworkString *message_ack = getNetworkString(4 + players.size() * (2+10));
@@ -504,7 +571,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
 
     NetworkPlayerProfile* profile = 
         new NetworkPlayerProfile(name, new_player_id, new_host_id);
-    m_setup->addPlayer(profile);
+    m_game_setup->addPlayer(profile);
     NetworkingLobby::getInstance()->addPlayer(profile);
 
     Log::verbose("ServerLobbyRoomProtocol", "New player.");
@@ -551,7 +618,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
         return;
     }
     // check if somebody picked that kart
-    if (!m_setup->isKartAvailable(kart_name))
+    if (!m_game_setup->isKartAvailable(kart_name))
     {
         NetworkString *answer = getNetworkString(2);
         // kart is already taken
@@ -561,7 +628,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
         return;
     }
     // check if this kart is authorized
-    if (!m_setup->isKartAllowed(kart_name))
+    if (!m_game_setup->isKartAllowed(kart_name))
     {
         NetworkString *answer = getNetworkString(2);
         // kart is not authorized
@@ -580,7 +647,7 @@ void ServerLobbyRoomProtocol::kartSelectionRequested(Event* event)
           .encodeString(kart_name);
     sendMessageToPeersChangingToken(answer);
     delete answer;
-    m_setup->setPlayerKart(player_id, kart_name);
+    m_game_setup->setPlayerKart(player_id, kart_name);
 }   // kartSelectionRequested
 
 //-----------------------------------------------------------------------------
@@ -602,7 +669,7 @@ void ServerLobbyRoomProtocol::playerMajorVote(Event* event)
     NetworkString &data = event->data();
     uint8_t player_id   = data.getUInt8();
     uint32_t major      = data.getUInt32();
-    m_setup->getRaceConfig()->setPlayerMajorVote(player_id, major);
+    m_game_setup->getRaceConfig()->setPlayerMajorVote(player_id, major);
     // Send the vote to everybody (including the sender)
     NetworkString *other = getNetworkString(6);
     other->addUInt8(LE_VOTE_MAJOR).addUInt8(player_id).addUInt32(major);
@@ -627,7 +694,7 @@ void ServerLobbyRoomProtocol::playerRaceCountVote(Event* event)
     NetworkString &data = event->data();
     uint8_t player_id   = data.getUInt8();
     uint8_t race_count  = data.getUInt8();
-    m_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, race_count);
+    m_game_setup->getRaceConfig()->setPlayerRaceCountVote(player_id, race_count);
     // Send the vote to everybody (including the sender)
     NetworkString *other = getNetworkString(3);
     other->addUInt8(LE_VOTE_RACE_COUNT).addUInt8(player_id)
@@ -654,7 +721,7 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
     NetworkString &data = event->data();
     uint8_t player_id   = data.getUInt8();
     uint32_t minor      = data.getUInt32();
-    m_setup->getRaceConfig()->setPlayerMinorVote(player_id, minor);
+    m_game_setup->getRaceConfig()->setPlayerMinorVote(player_id, minor);
 
     // Send the vote to everybody (including the sender)
     NetworkString *other = getNetworkString(3);
@@ -685,7 +752,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
     uint8_t track_number = data.getUInt8();
     std::string track_name;
     int N = data.decodeString(&track_name);
-    m_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
+    m_game_setup->getRaceConfig()->setPlayerTrackVote(player_id, track_name,
                                                  track_number);
     // Send the vote to everybody (including the sender)
     NetworkString *other = getNetworkString(3+1+data.size());
@@ -693,8 +760,19 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
           .encodeString(track_name);
     sendMessageToPeersChangingToken(other);
     delete other;
-    if(m_setup->getRaceConfig()->getNumTrackVotes()==m_setup->getPlayerCount())
-        startGame();
+
+    // Check if we received all information
+    if (m_game_setup->getRaceConfig()->getNumTrackVotes() ==
+                                                m_game_setup->getPlayerCount())
+    {
+        // Inform clients to start loading the world
+        NetworkString *ns = getNetworkString(1);
+        ns->setSynchronous(true);
+        ns->addUInt8(LE_LOAD_WORLD);
+        sendMessageToPeersChangingToken(ns, /*reliable*/true);
+        delete ns;
+        m_state = LOAD_WORLD;   // Server can now load world
+    }
 }   // playerTrackVote
 
 //-----------------------------------------------------------------------------
@@ -716,8 +794,8 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
     uint8_t player_id   = data.getUInt8();
     uint8_t reverse     = data.getUInt8();
     uint8_t nb_track    = data.getUInt8();
-    m_setup->getRaceConfig()->setPlayerReversedVote(player_id,
-                                                    reverse!=0, nb_track);
+    m_game_setup->getRaceConfig()->setPlayerReversedVote(player_id,
+                                                         reverse!=0, nb_track);
     // Send the vote to everybody (including the sender)
     NetworkString *other = getNetworkString(4);
     other->addUInt8(LE_VOTE_REVERSE).addUInt8(player_id).addUInt8(reverse)
@@ -744,14 +822,66 @@ void ServerLobbyRoomProtocol::playerLapsVote(Event* event)
     uint8_t player_id   = data.getUInt8();
     uint8_t lap_count   = data.getUInt8();
     uint8_t track_nb    = data.getUInt8();
-    m_setup->getRaceConfig()->setPlayerLapsVote(player_id, lap_count,
-                                                track_nb);
+    m_game_setup->getRaceConfig()->setPlayerLapsVote(player_id, lap_count,
+                                                     track_nb);
     NetworkString *other = getNetworkString(4);
     other->addUInt8(LE_VOTE_LAPS).addUInt8(player_id).addUInt8(lap_count)
           .addUInt8(track_nb);
     sendMessageToPeersChangingToken(other);
     delete other;
 }   // playerLapsVote
+
+// ----------------------------------------------------------------------------
+/** Called from the RaceManager of the server when the world is loaded. Marks
+ *  the server to be ready to start the race.
+ */
+void ServerLobbyRoomProtocol::finishedLoadingWorld()
+{
+    m_server_has_loaded_world = true;
+}   // finishedLoadingWorld;
+
+//-----------------------------------------------------------------------------
+/** Called when a client notifies the server that it has loaded the world.
+ *  When all clients and the server are ready, the race can be started.
+ */
+void ServerLobbyRoomProtocol::finishedLoadingWorldClient(Event *event)
+{
+    if (!checkDataSize(event, 1)) return;
+
+    const NetworkString &data = event->data();
+    uint8_t player_count = data.getUInt8();
+    m_client_ready_count.lock();
+    for (unsigned int i = 0; i < player_count; i++)
+    {
+        uint8_t player_id = data.getUInt8();
+        if (m_player_states[player_id])
+        {
+            Log::error("ServerLobbyProtocol",
+                       "Player %d send more than one ready message.",
+                       player_id);
+            return;
+        }
+        Log::info("ServerLobbyeProtocol", "One of the players is ready.");
+        m_player_states[player_id] = true;
+        m_client_ready_count.getData()++;
+    }
+    m_client_ready_count.unlock();
+
+    if (m_client_ready_count.getAtomic() == m_game_setup->getPlayerCount())
+    {
+        Protocol *p = ProtocolManager::getInstance()
+                    ->getProtocol(PROTOCOL_SYNCHRONIZATION);
+        SynchronizationProtocol* protocol =
+                                 dynamic_cast<SynchronizationProtocol*>(p);
+        if (protocol)
+        {
+            protocol->startCountdown(5.0f); // 5 seconds countdown
+            Log::info("ServerLobbyProtocol",
+                     "All players ready, starting countdown.");
+        }
+    }   // if m_ready_count == number of players
+
+}   // finishedLoadingWorld
 
 //-----------------------------------------------------------------------------
 /** Called when a client clicks on 'ok' on the race result screen.

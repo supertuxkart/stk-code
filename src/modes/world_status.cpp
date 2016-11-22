@@ -28,6 +28,7 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "tracks/track.hpp"
 
@@ -181,7 +182,7 @@ void WorldStatus::updateTime(const float dt)
 {
     // In case of a networked race wait till all necessary protocols are
     // ready before progressing the timer
-    if (!m_ready_to_race) return;
+//    if (!m_ready_to_race) return;
 
     switch (m_phase)
     {
@@ -247,19 +248,17 @@ void WorldStatus::updateTime(const float dt)
             // to the 'wait_for_server_phase', from which they will progress once
             // the notification is received. In all other cases (no networking or
             // server), immediately go to race start
-            if(!NetworkConfig::get()->isNetworking() ||
-                NetworkConfig::get()->isServer()         )
+            if (NetworkConfig::get()->isNetworking())
             {
-                // Notify the clients that they can start ready-set-go
-                if(NetworkConfig::get()->isServer())
-                    RaceEventManager::getInstance()->startReadySetGo();
-                // The server will wait in 'wait_for_server' for clients
-                // to be ready before starting (using the same startReadySetGo
-                // callback).
-                if(!NetworkConfig::get()->isNetworking())
-                    m_server_is_ready = true;
-            }   // if not networked
-            m_phase = WAIT_FOR_SERVER_PHASE;
+                LobbyRoomProtocol *p = LobbyRoomProtocol::get();
+                p->finishedLoadingWorld();
+                m_phase = WAIT_FOR_SERVER_PHASE;
+            }
+            else
+            {
+                m_phase = READY_PHASE;
+                startEngines();
+            }
             return;   // Don't increase time
         case WAIT_FOR_SERVER_PHASE:
             // On a client this phase waits for the server to be ready. On a
@@ -279,17 +278,17 @@ void WorldStatus::updateTime(const float dt)
                 // from the clients reach the server before the server actually
                 // needs it. By running the server behind the clients the need
                 // for rollbacks on the server is greatly reduced.
-                RaceEventManager::getInstance()->clientHasStarted();
+                //RaceEventManager::getInstance()->clientHasStarted();
             }
 
             m_phase = READY_PHASE;            
-            startEngines();
 
             // Receiving a 'startReadySetGo' message from the server triggers
             // a call to startReadySetGo() here, which will change the phase
             // (or state) of the finite state machine.
             return;   // Don't increase time
         case READY_PHASE:
+            startEngines();
 
             if (m_auxiliary_timer > 1.0)
             {

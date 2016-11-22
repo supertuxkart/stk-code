@@ -126,10 +126,10 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 
 //-----------------------------------------------------------------------------
 /** Waits for the countdown to be started. On the server the start of the
- *  countdown is triggered by the StartGameProtocol::startRace(), which is
- *  called once all clients have confirmed that they are ready to start.
- *  The server will send a ping request to each client once a second, and
- *  include the information if the countdown has started (and its current
+ *  countdown is triggered by ServerLobbyRoomProtocol::finishedLoadingWorld(),
+ *  which is called once all clients have confirmed that they are ready to
+ *  start. The server will send a ping request to each client once a second,
+ *  and include the information if the countdown has started (and its current
  *  value). On the client the countdown is started in notifyEvenAsynchronous()
  *  when a server ping is received that indicates that the countdown has
  *  started. The measured times can be used later to estimate the latency
@@ -188,10 +188,10 @@ void SynchronizationProtocol::asynchronousUpdate()
 
 //-----------------------------------------------------------------------------
 /** Starts the countdown on this machine. On the server side this function
- *  is called from the StartGameProtocol (when all players have confirmed that
- *  they are ready to play). On the client side this function is called from
- *  this protocol when a message from the server is received indicating that
- *  the countdown has to be started.
+ *  is called from ServerLobbyRoomProtocol::finishedLoadingWorld()  (when all
+ *  players have confirmed that they are ready to play). On the client side
+ *  this function is called from this protocol when a message from the server
+ *  is received indicating that the countdown has to be started.
  *  \param ms_countdown Countdown to use in ms.
  */
 void SynchronizationProtocol::startCountdown(float ms_countdown)

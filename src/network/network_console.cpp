@@ -80,7 +80,7 @@ void* NetworkConsole::mainLoop(void* data)
         {
             ServerLobbyRoomProtocol* protocol = 
                 dynamic_cast<ServerLobbyRoomProtocol*>(LobbyRoomProtocol::get());
-            protocol->startGame();
+            protocol->signalRaceStartToClients();
         }
         else if (str == "selection" && NetworkConfig::get()->isServer())
         {

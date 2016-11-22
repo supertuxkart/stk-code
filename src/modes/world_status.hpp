@@ -198,7 +198,7 @@ public:
     /** Get the time since start regardless of which way the clock counts */
     float getTimeSinceStart() const { return m_count_up_timer; }
     // ------------------------------------------------------------------------
-    void setReadyToRace() { m_ready_to_race = true; }
+    void setReadyToRace() { m_server_is_ready = true; }
 
 };   // WorldStatus
 

@@ -135,7 +135,8 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
     {
 
         LobbyRoomProtocol* protocol = LobbyRoomProtocol::get();
-        
+        ClientLobbyRoomProtocol *clrp = dynamic_cast<ClientLobbyRoomProtocol*>(protocol);
+        assert(clrp);
         // FIXME SPLITSCREEN: we need to supply the global player id of the 
         // player selecting the kart here. For now ... just vote the same kart
         // for each local player.
@@ -143,7 +144,7 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
             STKHost::get()->getMyPlayerProfiles();
         for(unsigned int i=0; i<players.size(); i++)
         {
-            protocol->requestKartSelection(players[i]->getGlobalPlayerId(),
+            clrp->requestKartSelection(players[i]->getGlobalPlayerId(),
                                            selection);
         }
     }

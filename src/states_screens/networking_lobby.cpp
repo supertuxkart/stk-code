@@ -56,7 +56,7 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
  *  for all local players (the ActivePlayer maps device to player, i.e.
  *  controls which device is used by which player). Note that a server
  *  does not create an instance of this class and will create the ActivePlayer
- *  data structure in the StartGameProtocol.
+ *  data structure in LobbyProtocol::loadWorld().
  */
 // ----------------------------------------------------------------------------
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")

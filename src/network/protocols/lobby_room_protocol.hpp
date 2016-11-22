@@ -45,6 +45,8 @@ public:
         LE_NEW_PLAYER_CONNECTED,          // inform client about new player
         LE_KART_SELECTION,                // Player selected kart
         LE_PLAYER_DISCONNECTED,           // Client disconnected
+        LE_CLIENT_LOADED_WORLD,           // Client finished loading world
+        LE_LOAD_WORLD,                    // Clients should load world
         LE_START_RACE,                    // start race
         LE_START_SELECTION,               // inform client to start selection
         LE_RACE_FINISHED,                 // race has finished, display result
@@ -62,7 +64,7 @@ protected:
     static LobbyRoomProtocol *m_lobby;
 
     /** The game setup. */
-    GameSetup* m_setup;
+    GameSetup* m_game_setup;
 
 
 public:
@@ -85,16 +87,12 @@ public:
 
     // ------------------------------------------------------------------------
 
-    LobbyRoomProtocol(CallbackObject* callback_object)
-        : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
-    {
-        m_setup = NULL;
-    }   // LobbyRoomProtocol
-    // ------------------------------------------------------------------------
-    virtual ~LobbyRoomProtocol() {}
-    // ------------------------------------------------------------------------
-    virtual void setup() = 0;
-    virtual void update(float dt) = 0;
+             LobbyRoomProtocol(CallbackObject* callback_object);
+    virtual ~LobbyRoomProtocol();
+    virtual void setup()                = 0;
+    virtual void update(float dt)       = 0;
+    virtual void finishedLoadingWorld() = 0;
+    virtual void loadWorld();
     virtual void requestKartSelection(uint8_t player_id,
                                       const std::string &kart_name)
     {

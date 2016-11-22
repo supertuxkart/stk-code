@@ -421,15 +421,15 @@ void RaceConfig::computeNextTrack()
 
 //-----------------------------------------------------------------------------
 /** Computes the selected setting (based on the users' vote) and sets them
- *  in the race manager.
+ *  in the race manager. Then it loads the world.
  */
-void RaceConfig::setRaceData()
+void RaceConfig::loadWorld()
 {
     computeRaceMode();
     computeNextTrack();
     race_manager->startSingleRace(m_tracks[0].track, m_tracks[0].laps,
                                   m_tracks[0].reversed);
-}   // setRaceData
+}   // loadWorld
 
 //-----------------------------------------------------------------------------
 const TrackInfo* RaceConfig::getNextTrackInfo() const
