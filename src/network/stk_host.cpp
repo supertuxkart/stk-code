@@ -151,7 +151,7 @@ void STKHost::create()
  *            destination (unless if it is a LAN connection, then UDP
  *            broadcasts will be used). 
  *
- *  Each client will run a ClientLobbyRoomProtocol (CLR) to handle the further
+ *  Each client will run a ClientLobbyProtocol (CLR) to handle the further
  *  interaction with the server. The client will first request a connection
  *  with the server (this is for the 'logical' connection to the server; so
  *  far it was mostly about the 'physical' connection, i.e. being able to send
@@ -162,7 +162,7 @@ void STKHost::create()
  *  each received message to the protocol with the same id. So any message
  *  sent by protocol X on the server will be received by protocol X on the
  *  client and vice versa. The only exception are the client- and server-lobby:
- *  They share the same id (set in LobbyRoomProtocol), so a message sent by
+ *  They share the same id (set in LobbyProtocol), so a message sent by
  *  the SLR will be received by the CLR, and a message from the CLR will be
  *  received by the SLR.
  *
@@ -289,7 +289,7 @@ STKHost::STKHost(const irr::core::stringw &server_name)
     }
 
     startListening();
-    Protocol *p = LobbyRoomProtocol::create<ServerLobby>();
+    Protocol *p = LobbyProtocol::create<ServerLobby>();
     ProtocolManager::getInstance()->requestStart(p);
 
 }   // STKHost(server_name)

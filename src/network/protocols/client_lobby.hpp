@@ -7,7 +7,7 @@
 
 class STKPeer;
 
-class ClientLobby : public LobbyRoomProtocol
+class ClientLobby : public LobbyProtocol
 {
 private:
     void newPlayer(Event* event);
@@ -75,4 +75,4 @@ public:
 
 };
 
-#endif // CLIENT_LOBBY_ROOM_PROTOCOL_HPP
+#endif // CLIENT_LOBBY_HPP

@@ -45,7 +45,7 @@
 #include "modes/soccer_world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/lobby_room_protocol.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "scriptengine/property_animator.hpp"
@@ -560,7 +560,7 @@ void RaceManager::startNextRace()
     // the world has been setup
     if(NetworkConfig::get()->isNetworking())
     {
-        LobbyRoomProtocol *lobby = LobbyRoomProtocol::get();
+        LobbyProtocol *lobby = LobbyProtocol::get();
         assert(lobby);
         lobby->finishedLoadingWorld();
     }

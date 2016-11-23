@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef LOBBY_ROOM_PROTOCOL_HPP
-#define LOBBY_ROOM_PROTOCOL_HPP
+#ifndef LOBBY_PROTOCOL_HPP
+#define LOBBY_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
 
@@ -25,12 +25,12 @@
 #include "network/network_string.hpp"
 
 /*!
- * \class LobbyRoomProtocol
+ * \class LobbyProtocol
  * \brief Base class for both client and server lobby. The lobbies are started
  *  when a server opens a game, or when a client joins a game.
  *  It is used to exchange data about the race settings, like kart selection.
  */
-class LobbyRoomProtocol : public Protocol
+class LobbyProtocol : public Protocol
 {
 public:
     /** Lists all lobby events (LE). */
@@ -62,7 +62,7 @@ public:
     };
 
 protected:
-    static LobbyRoomProtocol *m_lobby;
+    static LobbyProtocol *m_lobby;
 
     /** The game setup. */
     GameSetup* m_game_setup;
@@ -80,7 +80,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the singleton client or server lobby protocol. */
-    static LobbyRoomProtocol *get()
+    static LobbyProtocol *get()
     {
         assert(m_lobby);
         return m_lobby;
@@ -88,8 +88,8 @@ public:
 
     // ------------------------------------------------------------------------
 
-             LobbyRoomProtocol(CallbackObject* callback_object);
-    virtual ~LobbyRoomProtocol();
+             LobbyProtocol(CallbackObject* callback_object);
+    virtual ~LobbyProtocol();
     virtual void setup()                = 0;
     virtual void update(float dt)       = 0;
     virtual void finishedLoadingWorld() = 0;
@@ -100,6 +100,6 @@ public:
         assert(false);   // Only defined in client
     };
 
-};   // class LobbyRoomProtocol
+};   // class LobbyProtocol
 
-#endif // LOBBY_ROOM_PROTOCOL_HPP
+#endif // LOBBY_PROTOCOL_HPP

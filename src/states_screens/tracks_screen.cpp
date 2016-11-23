@@ -89,7 +89,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         {
             if(STKHost::existHost())
             {
-                Protocol* protocol = LobbyRoomProtocol::get();
+                Protocol* protocol = LobbyProtocol::get();
                 ClientLobby* clrp =
                               dynamic_cast<ClientLobby*>(protocol);
                 assert(clrp);   // server never shows the track screen.

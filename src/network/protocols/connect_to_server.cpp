@@ -239,7 +239,7 @@ void ConnectToServer::asynchronousUpdate()
                 if(STKHost::get()->getPeers()[0]->isConnected())
                 {
                     ClientLobby *p = 
-                        LobbyRoomProtocol::create<ClientLobby>();
+                        LobbyProtocol::create<ClientLobby>();
                     p->setAddress(m_server_address);
                     p->requestStart();
                 }

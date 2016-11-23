@@ -35,8 +35,7 @@
 #include "utils/log.hpp"
 
 // ============================================================================
-ClientLobby::ClientLobby()
-                       : LobbyRoomProtocol(NULL)
+ClientLobby::ClientLobby() : LobbyProtocol(NULL)
 {
 
     m_server_address.clear();

@@ -1,12 +1,12 @@
-#ifndef SERVER_LOBBY_ROOM_PROTOCOL_HPP
-#define SERVER_LOBBY_ROOM_PROTOCOL_HPP
+#ifndef SERVER_LOBBY_HPP
+#define SERVER_LOBBY_HPP
 
 #include "network/protocols/lobby_protocol.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/synchronised.hpp"
 
-class ServerLobby : public LobbyRoomProtocol
-                              , public CallbackObject
+class ServerLobby : public LobbyProtocol
+                  , public CallbackObject
 {
 private:
     /* The state for a small finite state machine. */
@@ -88,4 +88,4 @@ public:
 
 };   // class ServerLobby
 
-#endif // SERVER_LOBBY_ROOM_PROTOCOL_HPP
+#endif // SERVER_LOBBY_HPP

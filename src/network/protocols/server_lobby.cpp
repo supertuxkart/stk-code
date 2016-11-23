@@ -75,7 +75,7 @@
  *  It starts with detecting the public ip address and port of this
  *  host (GetPublicAddress).
  */
-ServerLobby::ServerLobby() : LobbyRoomProtocol(NULL)
+ServerLobby::ServerLobby() : LobbyProtocol(NULL)
 {
     setHandleDisconnections(true);
 }   // ServerLobby

@@ -162,7 +162,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     {
         if(NetworkConfig::get()->isServer())
         {
-            Protocol *p = LobbyRoomProtocol::get();
+            Protocol *p = LobbyProtocol::get();
             ServerLobby* slrp =
                                      dynamic_cast<ServerLobby*>(p);
             slrp->startSelection();
@@ -171,7 +171,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         {
             // Send a message to the server to start
             NetworkString start(PROTOCOL_LOBBY_ROOM);
-            start.addUInt8(LobbyRoomProtocol::LE_REQUEST_BEGIN);
+            start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
             STKHost::get()->sendToServer(&start, true);
         }
     }
@@ -199,7 +199,7 @@ bool NetworkingLobby::onEscapePressed()
 {
     // notify the server that we left
     ClientLobby* protocol =
-        dynamic_cast<ClientLobby*>(LobbyRoomProtocol::get());
+        dynamic_cast<ClientLobby*>(LobbyProtocol::get());
     if (protocol)
         protocol->leave();
     STKHost::get()->shutdown();

@@ -29,18 +29,18 @@
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
-LobbyRoomProtocol *LobbyRoomProtocol::m_lobby = NULL;
+LobbyProtocol *LobbyProtocol::m_lobby = NULL;
 
-LobbyRoomProtocol::LobbyRoomProtocol(CallbackObject* callback_object)
+LobbyProtocol::LobbyProtocol(CallbackObject* callback_object)
                  : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
 {
     m_game_setup = NULL;
-}   // LobbyRoomProtocol
+}   // LobbyProtocol
 
 // ----------------------------------------------------------------------------
-LobbyRoomProtocol::~LobbyRoomProtocol()
+LobbyProtocol::~LobbyProtocol()
 {
-}   // ~LobbyRoomProtocol
+}   // ~LobbyProtocol
 
 //-----------------------------------------------------------------------------
 /** Starts the sychronization protocol and the RaceEventManager. It then
@@ -50,13 +50,13 @@ LobbyRoomProtocol::~LobbyRoomProtocol()
  *  the world can be loaded (LE_LOAD_WORLD) and on the server in state
  *  LOAD_WORLD (i.e. just after informing all clients).
  */
-void LobbyRoomProtocol::loadWorld()
+void LobbyProtocol::loadWorld()
 {
-    Log::info("LobbyRoomProtocol", "Ready !");
+    Log::info("LobbyProtocol", "Ready !");
 
     Protocol *p = new SynchronizationProtocol();
     p->requestStart();
-    Log::info("LobbyRoomProtocol", "SynchronizationProtocol started.");
+    Log::info("LobbyProtocol", "SynchronizationProtocol started.");
 
     // Race startup sequence
     // ---------------------
@@ -119,7 +119,7 @@ void LobbyRoomProtocol::loadWorld()
 
     input_manager->getDeviceManager()->setSinglePlayer(ap);
 
-    Log::info("LobbyRoomProtocol", "Player configuration ready.");
+    Log::info("LobbyProtocol", "Player configuration ready.");
 
     // Load the actual world.
     m_game_setup->getRaceConfig()->loadWorld();

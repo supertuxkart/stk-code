@@ -134,7 +134,7 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
     if(playerID == PLAYER_ID_GAME_MASTER) // self
     {
 
-        LobbyRoomProtocol* protocol = LobbyRoomProtocol::get();
+        LobbyProtocol* protocol = LobbyProtocol::get();
         ClientLobby *clrp = dynamic_cast<ClientLobby*>(protocol);
         assert(clrp);
         // FIXME SPLITSCREEN: we need to supply the global player id of the 
@@ -211,7 +211,7 @@ bool NetworkKartSelectionScreen::onEscapePressed()
     // then remove the lobby screen (you left the server)
     StateManager::get()->popMenu();
     ServerSelection::getInstance()->refresh();
-    Protocol *lobby = LobbyRoomProtocol::get();
+    Protocol *lobby = LobbyProtocol::get();
     // notify the server that we left
     ClientLobby* clrp =
         dynamic_cast<ClientLobby*>(lobby);
