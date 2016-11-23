@@ -70,7 +70,7 @@ void ClientLobby::setup()
  *  \param kart_name Name of the selected kart.
  */
 void ClientLobby::requestKartSelection(uint8_t player_id,
-                                                   const std::string &kart_name)
+                                       const std::string &kart_name)
 {
     NetworkString *request = getNetworkString(3+kart_name.size());
     request->addUInt8(LE_KART_SELECTION).addUInt8(player_id)

@@ -163,8 +163,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         if(NetworkConfig::get()->isServer())
         {
             Protocol *p = LobbyProtocol::get();
-            ServerLobby* slrp =
-                                     dynamic_cast<ServerLobby*>(p);
+            ServerLobby* slrp = dynamic_cast<ServerLobby*>(p);
             slrp->startSelection();
         }
         else // client

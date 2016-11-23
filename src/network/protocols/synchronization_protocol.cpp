@@ -2,9 +2,6 @@
 
 #include "network/event.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/kart_update_protocol.hpp"
-#include "network/protocols/controller_events_protocol.hpp"
-#include "network/protocols/game_events_protocol.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/time.hpp"
@@ -149,9 +146,6 @@ void SynchronizationProtocol::asynchronousUpdate()
             m_has_quit = true;
             Log::info("SynchronizationProtocol",
                       "Countdown finished. Starting now.");
-            (new KartUpdateProtocol())->requestStart();
-            (new ControllerEventsProtocol())->requestStart();
-            (new GameEventsProtocol())->requestStart();
             requestTerminate();
             return;
         }
