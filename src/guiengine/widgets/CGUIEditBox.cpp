@@ -104,7 +104,7 @@ CGUIEditBox::~CGUIEditBox()
 
     if (Operator)
         Operator->drop();
-#ifdef _IRR_COMPILE_WITH_X11_
+#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
     CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
     dl->setIMEEnable(false);
 #endif
@@ -248,12 +248,12 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     MouseMarking = false;
                     setTextMarkers(0,0);
                 }
-#ifdef _IRR_COMPILE_WITH_X11_
+#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
                 CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
                 dl->setIMEEnable(false);
 #endif
             }
-#ifdef _IRR_COMPILE_WITH_X11_
+#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
             else if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUSED)
             {
                 CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
@@ -872,7 +872,7 @@ bool CGUIEditBox::processIMEEvent(const SEvent& event)
 }
 #endif
 
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_X11_)
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_X11_DEVICE_)
 //! calculate the position of input composition window
 core::position2di CGUIEditBox::calculateICPos()
 {
@@ -1609,7 +1609,7 @@ void CGUIEditBox::calculateScrollPos()
         VScrollPos = 0;
 
     // todo: adjust scrollbar
-#if defined(_IRR_COMPILE_WITH_X11_)
+#if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
     CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
     if (dl)
     {

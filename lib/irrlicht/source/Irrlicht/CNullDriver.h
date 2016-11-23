@@ -700,17 +700,20 @@ namespace video
 		//! normal map lookup 32 bit version
 		inline f32 nml32(int x, int y, int pitch, int height, s32 *p) const
 		{
-			if (x < 0) x = pitch-1; if (x >= pitch) x = 0;
-			if (y < 0) y = height-1; if (y >= height) y = 0;
+			if (x < 0) x = pitch-1;
+			if (x >= pitch) x = 0;
+			if (y < 0) y = height-1;
+			if (y >= height) y = 0;
 			return (f32)(((p[(y * pitch) + x])>>16) & 0xff);
 		}
 
 		//! normal map lookup 16 bit version
 		inline f32 nml16(int x, int y, int pitch, int height, s16 *p) const
 		{
-			if (x < 0) x = pitch-1; if (x >= pitch) x = 0;
-			if (y < 0) y = height-1; if (y >= height) y = 0;
-
+			if (x < 0) x = pitch-1;
+			if (x >= pitch) x = 0;
+			if (y < 0) y = height-1;
+			if (y >= height) y = 0;
 			return (f32) getAverage ( p[(y * pitch) + x] );
 		}
 

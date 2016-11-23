@@ -33,7 +33,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
-#include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/render_info.hpp"
 #include "graphics/shadow.hpp"
@@ -137,7 +136,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_controller           = NULL;
     m_saved_controller     = NULL;
     m_flying               = false;
-    m_sky_particles_emitter= NULL;
     m_stars_effect         = NULL;
     m_is_jumping           = false;
     m_min_nitro_time       = 0.0f;
@@ -261,7 +259,6 @@ Kart::~Kart()
     if(m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();
     if(m_collision_particles)    delete m_collision_particles;
     if(m_slipstream)             delete m_slipstream;
-    if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
     if(m_attachment)             delete m_attachment;
     if(m_stars_effect)          delete m_stars_effect;
 
@@ -2536,28 +2533,6 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     m_attachment = new Attachment(this);
     createPhysics();
 
-    // Attach Particle System
-
-    Track *track = World::getWorld()->getTrack();
-    if (type == RaceManager::KT_PLAYER      &&
-        UserConfigParams::m_weather_effects &&
-        track->getSkyParticles() != NULL)
-    {
-        track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);
-
-        m_sky_particles_emitter =
-            new ParticleEmitter(track->getSkyParticles(),
-                                core::vector3df(0.0f, 30.0f, 100.0f),
-                                getNode(),
-                                true);
-
-        // FIXME: in multiplayer mode, this will result in several instances
-        //        of the heightmap being calculated and kept in memory
-        m_sky_particles_emitter->addHeightMapAffector(track);
-    }
-
-    Vec3 position(0, getKartHeight()*0.35f, -getKartLength()*0.35f);
-
     m_slipstream = new SlipStream(this);
 
     if (m_kart_properties->getSkidEnabled())
@@ -2833,7 +2808,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     {
         const bool emergency = getKartAnimation() != NULL;
         m_shadow->update(isOnGround() && !emergency,
-            m_terrain_info->getHoT() - getXYZ().getY()
+            getTrans().inverse()(m_terrain_info->getHitPoint()).getY()
             - m_skidding->getGraphicalJumpOffset()
             - m_graphical_y_offset
             - m_kart_model->getLowestPoint());

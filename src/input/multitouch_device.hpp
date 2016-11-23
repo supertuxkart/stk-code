@@ -77,6 +77,8 @@ private:
     /** The parameter that is used for steering button and determines dead area
      *  at the edge of button */
     float m_deadzone_edge;
+    
+    float getSteeringFactor(float value);
 
 public:
     /** The array that contains data for all multitouch input events */

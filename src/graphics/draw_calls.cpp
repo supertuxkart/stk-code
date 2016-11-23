@@ -50,8 +50,9 @@ void DrawCalls::clearLists()
 {
     ListBlendTransparent::getInstance()->clear();
     ListAdditiveTransparent::getInstance()->clear();
-    ListGhostKart::getInstance()->clear();
-    ListGhostKartTangents::getInstance()->clear();
+    ListTranslucentStandard::getInstance()->clear();
+    ListTranslucentTangents::getInstance()->clear();
+    ListTranslucent2TCoords::getInstance()->clear();
     ListBlendTransparentFog::getInstance()->clear();
     ListAdditiveTransparentFog::getInstance()->clear();
     ListDisplacement::getInstance()->clear();
@@ -175,10 +176,12 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
         custom_alpha = y > 128.0f ? 0.5f : 0.35f;
     }
 
-    for (GLMesh *mesh : node->TransparentMesh[TM_GHOST_KART])
-        pushVector(ListGhostKart::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
-    for (GLMesh *mesh : node->TransparentMesh[TM_GHOST_KART_TANGENTS])
-        pushVector(ListGhostKartTangents::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
+    for (GLMesh *mesh : node->TransparentMesh[TM_TRANSLUCENT_STD])
+        pushVector(ListTranslucentStandard::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
+    for (GLMesh *mesh : node->TransparentMesh[TM_TRANSLUCENT_TAN])
+        pushVector(ListTranslucentTangents::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
+    for (GLMesh *mesh : node->TransparentMesh[TM_TRANSLUCENT_2TC])
+        pushVector(ListTranslucent2TCoords::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
     for (GLMesh *mesh : node->TransparentMesh[TM_DISPLACEMENT])
         pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
 

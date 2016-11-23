@@ -170,9 +170,9 @@ void STKAnimatedMesh::updateNoGL()
             else if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent())
             {
                 if (mesh.VAOType == video::EVT_TANGENTS)
-                    TransparentMesh[TM_GHOST_KART_TANGENTS].push_back(&mesh);
+                    TransparentMesh[TM_TRANSLUCENT_TAN].push_back(&mesh);
                 else
-                    TransparentMesh[TM_GHOST_KART].push_back(&mesh);
+                    TransparentMesh[TM_TRANSLUCENT_STD].push_back(&mesh);
             }
             else
             {

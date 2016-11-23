@@ -46,12 +46,6 @@ if(USE_GLES2)
     add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_SOFTWARE_ -DNO_IRR_COMPILE_WITH_BURNINGSVIDEO_ -DNO_IRR_COMPILE_WITH_OGLES1_ -DNO_IRR_COMPILE_WITH_OPENGL_ -DNO_IRR_USE_NON_SYSTEM_JPEG_LIB_ -DNO_IRR_USE_NON_SYSTEM_LIB_PNG_ -DNO_IRR_USE_NON_SYSTEM_ZLIB_)
 endif()
 
-# Xrandr
-if(UNIX AND NOT APPLE)
-    add_definitions(-DNO_IRR_LINUX_X11_VIDMODE_)
-    add_definitions(-D_IRR_LINUX_X11_RANDR_)
-endif()
-
 if(CYGWIN)
     add_definitions(-DNO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 endif()
@@ -187,6 +181,7 @@ source/Irrlicht/CZipReader.cpp
 source/Irrlicht/Irrlicht.cpp
 source/Irrlicht/irrXML.cpp
 source/Irrlicht/os.cpp
+source/Irrlicht/COpenGLNormalMapRenderer.cpp
 source/Irrlicht/BuiltInFont.h
 source/Irrlicht/CAnimatedMeshSceneNode.h
 source/Irrlicht/CAttributeImpl.h
@@ -339,6 +334,7 @@ source/Irrlicht/S4DVertex.h
 source/Irrlicht/SoftwareDriver2_compile_config.h
 source/Irrlicht/SoftwareDriver2_helper.h
 source/Irrlicht/wglext.h
+source/Irrlicht/COpenGLNormalMapRenderer.h
 
 include/aabbox3d.h
 include/CDynamicMeshBuffer.h
