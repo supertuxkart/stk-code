@@ -250,8 +250,6 @@ void WorldStatus::updateTime(const float dt)
             // server), immediately go to race start
             if (NetworkConfig::get()->isNetworking())
             {
-                LobbyProtocol *p = LobbyProtocol::get();
-                p->finishedLoadingWorld();
                 m_phase = WAIT_FOR_SERVER_PHASE;
             }
             else
