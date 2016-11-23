@@ -859,6 +859,7 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
             Log::error("ServerLobbyProtocol",
                        "Player %d send more than one ready message.",
                        player_id);
+            m_client_ready_count.unlock();
             return;
         }
         Log::info("ServerLobbyeProtocol", "One of the players is ready.");
@@ -881,7 +882,7 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
         }
     }   // if m_ready_count == number of players
 
-}   // finishedLoadingWorld
+}   // finishedLoadingWorldClient
 
 //-----------------------------------------------------------------------------
 /** Called when a client clicks on 'ok' on the race result screen.
