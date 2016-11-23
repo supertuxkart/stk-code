@@ -716,6 +716,10 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                   m_texname.c_str());
     }
 
+    // Backface culling
+    if(!m_backface_culling)
+        m->setFlag(video::EMF_BACK_FACE_CULLING, false);
+
     if (CVS->isGLSL())
     {
         ITexture *tex;
@@ -991,10 +995,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->TextureLayer[n].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
         }
     }
-
-    // Backface culling
-    if(!m_backface_culling)
-        m->setFlag(video::EMF_BACK_FACE_CULLING, false);
 
     // Material color
     m->ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;

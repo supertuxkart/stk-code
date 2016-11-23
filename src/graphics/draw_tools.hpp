@@ -77,15 +77,17 @@ struct CustomUnrollArgs<>
         {
             S::getInstance()->changeableColor(mesh->m_render_info->getHue(),
                 mesh->m_material->getColorizationFactor());
-        }            
-        
+        }
+        if (!mesh->mb->getMaterial().BackfaceCulling)
+            glDisable(GL_CULL_FACE);
         S::getInstance()->setUniforms(args...);
         glDrawElementsBaseVertex(mesh->PrimitiveType,
                                 (int)mesh->IndexCount,
                                 mesh->IndexType,
                                 (GLvoid *)mesh->vaoOffset,
                                 (int)mesh->vaoBaseVertex);
-                                
+        if (!mesh->mb->getMaterial().BackfaceCulling)
+            glEnable(GL_CULL_FACE);
         if (need_change_hue)
         {
             // Reset after changing
