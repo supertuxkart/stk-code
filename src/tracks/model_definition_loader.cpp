@@ -19,10 +19,12 @@
 #include "tracks/model_definition_loader.hpp"
 using namespace irr;
 
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "io/xml_node.hpp"
+#include "modes/world.hpp"
 #include "tracks/track.hpp"
 
 #include <IMeshSceneNode.h>
@@ -72,7 +74,9 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
         lod_node->updateAbsolutePosition();
         for (unsigned int m=0; m<group.size(); m++)
         {
-            if (group[m].m_skeletal_animation)
+            if (group[m].m_skeletal_animation &&
+                (UserConfigParams::m_graphical_effects ||
+                World::getWorld()->getIdent() == IDENT_CUTSCENE))
             {
                 scene::IAnimatedMesh* a_mesh = irr_driver->getAnimatedMesh(group[m].m_model_file);
                 if (!a_mesh)
