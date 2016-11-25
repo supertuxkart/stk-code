@@ -111,6 +111,48 @@ void renderShadow(unsigned cascade)
 
 
 // ----------------------------------------------------------------------------
+template<typename T, typename...uniforms>
+void draw_rsm(const T *Shader, const GLMesh *mesh, uniforms... Args)
+{
+    irr_driver->increaseObjectCount();
+    Shader->setUniforms(Args...);
+    glDrawElementsBaseVertex(mesh->PrimitiveType,
+                            (int)mesh->IndexCount,
+                            mesh->IndexType,
+                            (GLvoid *)mesh->vaoOffset,
+                            (int)mesh->vaoBaseVertex);
+
+}   // draw_rsm
+
+// ----------------------------------------------------------------------------
+template<int...List>
+struct rsm_custom_unroll_args;
+
+template<>
+struct rsm_custom_unroll_args<>
+{
+    template<typename T, typename ...TupleTypes, typename ...Args>
+    static void exec(const core::matrix4 &rsm_matrix,
+                      const STK::Tuple<TupleTypes...> &t, Args... args)
+    {
+        draw_rsm<T>(T::getInstance(), STK::tuple_get<0>(t), rsm_matrix, args...);
+    }
+};   // rsm_custom_unroll_args
+
+// ----------------------------------------------------------------------------
+template<int N, int...List>
+struct rsm_custom_unroll_args<N, List...>
+{
+    template<typename T, typename ...TupleTypes, typename ...Args>
+    static void exec(const core::matrix4 &rsm_matrix,
+                     const STK::Tuple<TupleTypes...> &t, Args... args)
+    {
+        rsm_custom_unroll_args<List...>::template
+            exec<T>(rsm_matrix, t, STK::tuple_get<N>(t), args...);
+    }
+};   // rsm_custom_unroll_args
+
+// ----------------------------------------------------------------------------
 template<typename T, int... Selector>
 void drawRSM(const core::matrix4 & rsm_matrix)
 {
@@ -128,11 +170,11 @@ void drawRSM(const core::matrix4 & rsm_matrix)
             HandleExpander<typename T::RSMShader>::template expand(mesh->TextureHandles, T::RSMTextures);
         else
             TexExpander<typename T::RSMShader>::template expandTex(*mesh, T::RSMTextures);
-        CustomUnrollArgs<Selector...>::template drawMesh<typename T::RSMShader>(t.at(i), rsm_matrix);
+        //FIXME
+        //CustomUnrollArgs<Selector...>::template drawMesh<typename T::RSMShader>(t.at(i), rsm_matrix);
+        rsm_custom_unroll_args<Selector...>::template exec<typename T::RSMShader>(rsm_matrix, t.at(i));
     }
 }   // drawRSM
-
-
 
 // ----------------------------------------------------------------------------
 void GL3DrawPolicy::drawSolidFirstPass(const DrawCalls& draw_calls) const
