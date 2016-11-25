@@ -37,6 +37,8 @@ private:
     std::vector<STKBillboard *>           m_billboard_list;
     std::vector<ParticleSystemProxy *>    m_particles_list;
 
+    std::vector<float>                    m_bounding_boxes;
+
     /** meshes to draw */
     SolidPassMeshMap m_solid_pass_mesh        [    Material::SHADERTYPE_COUNT];
     OtherMeshMap m_shadow_pass_mesh           [4 * Material::SHADERTYPE_COUNT];
@@ -56,23 +58,22 @@ private:
     void handleSTKCommon(scene::ISceneNode *Node,
                          std::vector<scene::ISceneNode *> *ImmediateDraw,
                          const scene::ICameraSceneNode *cam,
-                         scene::ICameraSceneNode *shadowcam[4],
-                         const scene::ICameraSceneNode *rsmcam,
-                         bool &culledforcam,
-                         bool culledforshadowcam[4],
-                         bool &culledforrsm,
-                         bool drawRSM);
-    
-     void parseSceneManager(core::list<scene::ISceneNode*> &List,
-                            std::vector<scene::ISceneNode *> *ImmediateDraw,
-                            const scene::ICameraSceneNode* cam,
-                            scene::ICameraSceneNode *shadow_cam[4],
-                            const scene::ICameraSceneNode *rsmcam,
-                            bool culledforcam,
-                            bool culledforshadowcam[4],
-                            bool culledforrsm,
-                            bool drawRSM);
-    
+                         ShadowMatrices& shadow_matrices);
+
+    void parseSceneManager(core::list<scene::ISceneNode*> &List,
+                           std::vector<scene::ISceneNode *> *ImmediateDraw,
+                           const scene::ICameraSceneNode *cam,
+                           ShadowMatrices& shadow_matrices);
+
+    bool isCulledPrecise(const scene::ICameraSceneNode *cam,
+                         const scene::ISceneNode* node,
+                         bool visualization = false);
+
+    bool isBoxInFrontOfPlane(const core::plane3df &plane,
+                             const core::vector3df* edges);
+
+    void addEdgeForViz(const core::vector3df &p0, const core::vector3df &p1);
+
 public:
     DrawCalls();
     ~DrawCalls();
@@ -103,7 +104,7 @@ public:
     
     void drawIndirectGlow() const;
     void multidrawGlow() const;
-    
+    void renderBoundingBoxes();
 };
 
 #endif //HEADER_DRAW_CALLS_HPP

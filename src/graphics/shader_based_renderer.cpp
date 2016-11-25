@@ -31,7 +31,6 @@
 #include "graphics/shaders.hpp"
 #include "graphics/skybox.hpp"
 #include "graphics/spherical_harmonics.hpp"
-#include "graphics/stk_scene_manager.hpp"
 #include "graphics/texture_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
@@ -537,24 +536,6 @@ void ShaderBasedRenderer::renderParticles()
 } //renderParticles
 
 // ----------------------------------------------------------------------------
-void ShaderBasedRenderer::renderBoundingBoxes()
-{
-    Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
-    line->use();
-    line->bindVertexArray();
-    line->bindBuffer();
-    line->setUniforms(irr::video::SColor(255, 255, 0, 0));
-    const float *tmp = BoundingBoxes.data();
-    for (unsigned int i = 0; i < BoundingBoxes.size(); i += 1024 * 6)
-    {
-        unsigned count = std::min((unsigned)BoundingBoxes.size() - i, (unsigned)1024 * 6);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
-
-        glDrawArrays(GL_LINES, 0, count / 3);
-    }
-} //renderBoundingBoxes
-
-// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::debugPhysics()
 {
     // Note that drawAll must be called before rendering
@@ -804,9 +785,7 @@ void ShaderBasedRenderer::render(float dt)
 {
     resetObjectCount();
     resetPolyCount();
-    
-    BoundingBoxes.clear(); //TODO: do not use a global variable
-    
+
     setOverrideMaterial();
     
     addItemsInGlowingList();
@@ -858,7 +837,7 @@ void ShaderBasedRenderer::render(float dt)
         
         if (irr_driver->getBoundingBoxesViz())
         {        
-            renderBoundingBoxes();
+            m_draw_calls.renderBoundingBoxes();
         }
         
         debugPhysics();
