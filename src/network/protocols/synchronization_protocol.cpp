@@ -7,7 +7,16 @@
 #include "utils/time.hpp"
 
 //-----------------------------------------------------------------------------
-
+/** This protocol tries to determine the average latency between client and
+ *  server. While this information is not used atm, it might be useful for
+ *  the server to determine how much behind the clients it should start.
+ *  FIXME: ATM the main thread will load the world as part of an update
+ *  of the ProtocolManager (which updates the protocols). Since all protocols
+ *  are locked dusing this update, the synchronisation protocol is actually
+ *  delayed from starting while world is loading (since finding the protocol
+ *  for a message requires the protocol lock) - causing at least two frames
+ *  of significanlty delayed pings :(
+ */
 SynchronizationProtocol::SynchronizationProtocol() 
                        : Protocol(PROTOCOL_SYNCHRONIZATION)
 {
@@ -17,8 +26,6 @@ SynchronizationProtocol::SynchronizationProtocol()
     m_total_diff.resize(size, 0);
     m_average_ping.resize(size, 0);
     m_pings_count = 0;
-    m_countdown_activated = false;
-    m_last_time = -1;
 }   // SynchronizationProtocol
 
 //-----------------------------------------------------------------------------
@@ -30,15 +37,13 @@ SynchronizationProtocol::~SynchronizationProtocol()
 void SynchronizationProtocol::setup()
 {
     Log::info("SynchronizationProtocol", "Ready !");
-    m_countdown = 5.0; // init the countdown to 5s
-    m_has_quit = false;
 }   // setup
+
  //-----------------------------------------------------------------------------
 /** Called when receiving a message. On the client side the message is a ping
- *  from the server, which is answered back. The client will also check if the
- *  server has started the countdown (which is indicated in the ping message).
- *  On the server the received message is a reply to a previous ping request.
- *  The server will keep track of average latency.
+ *  from the server, which is answered back. On the server the received message
+ *  is a reply to a previous ping request. The server will keep track of
+ *  average latency.
  */
 bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 {
@@ -77,23 +82,6 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         delete response;
         Log::verbose("SynchronizationProtocol", "Answering sequence %u at %lf",
                      sequence, StkTime::getRealTime());
-
-        // countdown time in the message
-        if (data.size() == 4)
-        {
-            float time_to_start = data.getFloat();
-            Log::debug("SynchronizationProtocol",
-                       "Request to start game in %f.", time_to_start);
-            if (!m_countdown_activated)
-                startCountdown(time_to_start);
-            else
-            {
-                // Adjust the time based on the value sent from the server.
-                m_countdown = time_to_start;
-            }
-        }
-        else
-            Log::verbose("SynchronizationProtocol", "No countdown for now.");
     }
     else // receive response to a ping request
     {
@@ -135,39 +123,14 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
 void SynchronizationProtocol::asynchronousUpdate()
 {
     float current_time = float(StkTime::getRealTime());
-    if (m_countdown_activated)
-    {
-        m_countdown -= (current_time - m_last_countdown_update);
-        m_last_countdown_update = current_time;
-        Log::debug("SynchronizationProtocol",
-                   "Update! Countdown remaining : %f", m_countdown);
-        if (m_countdown < 0.0 && !m_has_quit)
-        {
-            m_has_quit = true;
-            Log::info("SynchronizationProtocol",
-                      "Countdown finished. Starting now.");
-            requestTerminate();
-            return;
-        }
-    }   // if m_countdown_activated
-
     if (NetworkConfig::get()->isServer() &&  current_time > m_last_time+1)
     {
         const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
         for (unsigned int i = 0; i < peers.size(); i++)
         {
             NetworkString *ping_request = 
-                            getNetworkString(m_countdown_activated ? 9 : 5);
+                            getNetworkString(5);
             ping_request->addUInt8(1).addUInt32(m_pings[i].size());
-            // Server adds the countdown if it has started. This will indicate
-            // to the client to start the countdown as well (first time the 
-            // message is received), or to update the countdown time.
-            if (m_countdown_activated)
-            {
-                ping_request->addFloat(m_countdown);
-                Log::debug("SynchronizationProtocol",
-                           "CNTActivated: Countdown value : %f", m_countdown);
-            }
             Log::verbose("SynchronizationProtocol",
                          "Added sequence number %u for peer %d at %lf",
                          m_pings[i].size(), i, StkTime::getRealTime());
@@ -180,19 +143,3 @@ void SynchronizationProtocol::asynchronousUpdate()
     }   // if current_time > m_last_time + 0.1
 }   // asynchronousUpdate
 
-//-----------------------------------------------------------------------------
-/** Starts the countdown on this machine. On the server side this function
- *  is called from ServerLobby::finishedLoadingWorld()  (when all
- *  players have confirmed that they are ready to play). On the client side
- *  this function is called from this protocol when a message from the server
- *  is received indicating that the countdown has to be started.
- *  \param ms_countdown Countdown to use in ms.
- */
-void SynchronizationProtocol::startCountdown(float ms_countdown)
-{
-    m_countdown_activated   = true;
-    m_countdown             = ms_countdown;
-    m_last_countdown_update = float(StkTime::getRealTime());
-    Log::info("SynchronizationProtocol", "Countdown started with value %f",
-              m_countdown);
-}   // startCountdown

@@ -18,6 +18,7 @@ private:
         SELECTING,                // kart, track, ... selection started
         LOAD_WORLD,               // Server starts loading world
         WAIT_FOR_WORLD_LOADED,    // Wait for clients and server to load world
+        WAIT_FOR_RACE_STARTED,    // Wait for all clients to have started the race
         START_RACE,               // Inform clients to start race
         DELAY_SERVER,             // Additional server delay
         RACING,                   // racing
@@ -69,6 +70,7 @@ private:
     void playerFinishedResult(Event *event);
     void registerServer();
     void finishedLoadingWorldClient(Event *event);
+    void startedRaceOnClient(Event *event);
 public:
              ServerLobby();
     virtual ~ServerLobby();

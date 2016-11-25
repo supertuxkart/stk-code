@@ -24,6 +24,7 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/protocols/synchronization_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -316,6 +317,10 @@ void ClientLobby::update(float dt)
                                      NetworkKartSelectionScreen::getInstance();
         screen->push();
         m_state = SELECTING_KARTS;
+
+        Protocol *p = new SynchronizationProtocol();
+        p->requestStart();
+        Log::info("LobbyProtocol", "SynchronizationProtocol started.");
     }
     break;
     case SELECTING_KARTS:
@@ -585,7 +590,7 @@ void ClientLobby::kartSelectionUpdate(Event* event)
 
 //-----------------------------------------------------------------------------
 
-/*! \brief Called when the server broadcasts  the race start.
+/*! \brief Called when the server broadcasts to start the race.
 race needs to be started.
  *  \param event : Event providing the information (no additional information
  *                 in this case).
@@ -593,12 +598,29 @@ race needs to be started.
 void ClientLobby::startGame(Event* event)
 {
     m_state = PLAYING;
+    // Triggers the world finite state machine to go from WAIT_FOR_SERVER_PHASE
+    // to READY_PHASE.
     World::getWorld()->setReadyToRace();
     Log::info("ClientLobby", "Starting new game");
 }   // startGame
 
 //-----------------------------------------------------------------------------
+/** Called from WorldStatus when reaching the READY phase, i.e. when the race
+ *  was started. It is going to inform the server of the race start. This
+ *  allows the server to wait for all clients to start, so the server will
+ *  be running behind the client with the biggest latency, which should
+ *  make it likely that at local time T on the server all messages from
+ *  all clients at their local time T have arrived.
+ */
+void ClientLobby::startingRaceNow()
+{
+    NetworkString *ns = getNetworkString(2);
+    ns->addUInt8(LE_STARTED_RACE);
+    sendToServer(ns, /*reliable*/true);
+    terminateSynchronizationProtocol();
+}   // startingRaceNow
 
+//-----------------------------------------------------------------------------
 /*! \brief Called when the kart selection starts.
  *  \param event : Event providing the information (no additional information
  *                 in this case).

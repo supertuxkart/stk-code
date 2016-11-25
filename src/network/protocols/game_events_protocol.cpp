@@ -40,7 +40,6 @@ GameEventsProtocol::~GameEventsProtocol()
 void GameEventsProtocol::setup()
 {
     m_count_ready_clients = 0;
-    World::getWorld()->setReadyToRace();
 }   // setup
 
 // ----------------------------------------------------------------------------

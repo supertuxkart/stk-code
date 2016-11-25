@@ -64,6 +64,7 @@ public:
     void voteReversed(uint8_t player_id, bool reversed, uint8_t track_nb = 0);
     void voteLaps(uint8_t player_id, uint8_t laps, uint8_t track_nb = 0);
     void doneWithResults();
+    void startingRaceNow();
     void leave();
 
     virtual bool notifyEvent(Event* event) OVERRIDE;

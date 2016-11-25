@@ -47,7 +47,8 @@ public:
         LE_PLAYER_DISCONNECTED,           // Client disconnected
         LE_CLIENT_LOADED_WORLD,           // Client finished loading world
         LE_LOAD_WORLD,                    // Clients should load world
-        LE_START_RACE,                    // start race
+        LE_START_RACE,                    // Server to client to start race
+        LE_STARTED_RACE,                  // Client to server that it has started race
         LE_START_SELECTION,               // inform client to start selection
         LE_RACE_FINISHED,                 // race has finished, display result
         LE_RACE_FINISHED_ACK,             // client went back to lobby
@@ -94,6 +95,7 @@ public:
     virtual void update(float dt)       = 0;
     virtual void finishedLoadingWorld() = 0;
     virtual void loadWorld();
+    void terminateSynchronizationProtocol();
     virtual void requestKartSelection(uint8_t player_id,
                                       const std::string &kart_name)
     {

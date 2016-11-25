@@ -23,6 +23,7 @@
 #include "input/device_manager.hpp"
 #include "modes/world.hpp"
 #include "network/network_player_profile.hpp"
+#include "network/protocol_manager.hpp"
 #include "network/protocols/controller_events_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/protocols/kart_update_protocol.hpp"
@@ -56,10 +57,6 @@ LobbyProtocol::~LobbyProtocol()
 void LobbyProtocol::loadWorld()
 {
     Log::info("LobbyProtocol", "Ready !");
-
-    Protocol *p = new SynchronizationProtocol();
-    p->requestStart();
-    Log::info("LobbyProtocol", "SynchronizationProtocol started.");
 
     // Race startup sequence
     // ---------------------
@@ -133,3 +130,14 @@ void LobbyProtocol::loadWorld()
 
 }   // loadWorld
 
+// ----------------------------------------------------------------------------
+/** Terminates the SynchronizationProtocol.
+ */
+void LobbyProtocol::terminateSynchronizationProtocol()
+{
+    Protocol *p = ProtocolManager::getInstance()
+                ->getProtocol(PROTOCOL_SYNCHRONIZATION);
+    SynchronizationProtocol *sp = dynamic_cast<SynchronizationProtocol*>(p);
+    if (sp)
+        sp->requestTerminate();
+}   // stopSynchronizationProtocol

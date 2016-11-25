@@ -58,12 +58,15 @@
  "SELECTING" -> "playerVoteTrack" [label="Client selected track"]
  "playerVoteTrack" -> "SELECTING" [label="Not all clients have selected"]
  "playerVoteTrack" -> "LOAD_WORLD" [label="All clients have selected"]
- "LOAD"WORLD -> "WAIT_FOR_WORLD_LOADED" 
+ "LOAD_WORLD" -> "WAIT_FOR_WORLD_LOADED" 
  "WAIT_FOR_WORLD_LOADED" -> "WAIT_FOR_WORLD_LOADED" [label="Client or server loaded world"]
- "WAIT_FOR_WORLD_LOADED" -> "startRace" [label="All clients and server ready"]
- "startRace" -> "DELAY_SERVER"
+ "WAIT_FOR_WORLD_LOADED" -> "signalRaceStartToClients" [label="All clients and server ready"]
+ "signalRaceStartToClients" -> "WAIT_FOR_RACE_STARTED"
+ "WAIT_FOR_RACE_STARTED" ->  "startedRaceOnClient"
+ "startedRaceOnClient" -> "WAIT_FOR_RACE_STARTED" [label="Not all clients have started"]
+ "startedRaceOnClient" -> "DELAY_SERVER" [label="All clients have started"]
  "DELAY_SERVER" -> "DELAY_SERVER" [label="Not done waiting"]
- "DELAY_SERVER -> "Start Countdown" [label="Server starts race now"]
+ "DELAY_SERVER" -> "Start Countdown" [label="Server starts race now"]
  "Start Countdown" -> "Wait For Clients"
  "Wait For Clients" -> "Wait For Clients" [label="Client started 'ready set go'"]
  "Wait For Clients" -> "Additional Server Delay"
@@ -107,7 +110,6 @@ void ServerLobby::setup()
     // the server are ready:
     m_player_states.clear();
     m_client_ready_count.setAtomic(0);
-    m_server_delay = 0.02f;
     m_server_has_loaded_world = false;
     const std::vector<NetworkPlayerProfile*> &players =
                                                     m_game_setup->getPlayers();
@@ -137,6 +139,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_REQUEST_BEGIN: startSelection(event);             break;
         case LE_KART_SELECTION: kartSelectionRequested(event);    break;
         case LE_CLIENT_LOADED_WORLD: finishedLoadingWorldClient(event); break;
+        case LE_STARTED_RACE:  startedRaceOnClient(event);        break;
         case LE_VOTE_MAJOR: playerMajorVote(event);               break;
         case LE_VOTE_RACE_COUNT: playerRaceCountVote(event);      break;
         case LE_VOTE_MINOR: playerMinorVote(event);               break;
@@ -172,19 +175,19 @@ void ServerLobby::update(float dt)
         requestPause();
         break;
     case GETTING_PUBLIC_ADDRESS:
-        {
-            Log::debug("ServerLobby", "Public address known.");
-            // Free GetPublicAddress protocol
-            delete m_current_protocol;
+    {
+        Log::debug("ServerLobby", "Public address known.");
+        // Free GetPublicAddress protocol
+        delete m_current_protocol;
 
-            // Register this server with the STK server. This will block
-            // this thread, but there is no need for the protocol manager
-            // to react to any requests before the server is registered.
-            registerServer();
-            Log::info("ServerLobby", "Server registered.");
-            m_state = ACCEPTING_CLIENTS;
-        }
-        break;
+        // Register this server with the STK server. This will block
+        // this thread, but there is no need for the protocol manager
+        // to react to any requests before the server is registered.
+        registerServer();
+        Log::info("ServerLobby", "Server registered.");
+        m_state = ACCEPTING_CLIENTS;
+    }
+    break;
     case ACCEPTING_CLIENTS:
     {
         // Only poll the STK server if this is a WAN server.
@@ -194,7 +197,7 @@ void ServerLobby::update(float dt)
     }
     case SELECTING:
         // The function playerVoteTrack will trigger the next state
-        // one all track votes have been received.
+        // once all track votes have been received.
         break;
     case LOAD_WORLD:
         Log::info("ServerLobbyRoom", "Starting the race loading.");
@@ -211,14 +214,22 @@ void ServerLobby::update(float dt)
         {
             signalRaceStartToClients();
         }
+        // Initialise counter again, to wait for all clients to indicate that
+        // they have started the race/
+        m_server_delay = 0.02f;
+        m_client_ready_count.getData() = 0;
         m_client_ready_count.unlock();
+        break;
+    case WAIT_FOR_RACE_STARTED: 
+        // The function finishedLoadingWorldClient() will trigger the
+        // next state.
         break;
     case DELAY_SERVER:
         m_server_delay -= dt;
         if (m_server_delay < 0)
         {
             m_state = RACING;
-
+            World::getWorld()->setReadyToRace();
         }
         break;
     case RACING:
@@ -319,7 +330,7 @@ void ServerLobby::signalRaceStartToClients()
     ns->addUInt8(LE_START_RACE);
     sendMessageToPeersChangingToken(ns, /*reliable*/true);
     delete ns;
-    m_state = DELAY_SERVER;
+    m_state = WAIT_FOR_RACE_STARTED;
 }   // startGame
 
 //-----------------------------------------------------------------------------
@@ -328,6 +339,13 @@ void ServerLobby::signalRaceStartToClients()
  */
 void ServerLobby::startSelection(const Event *event)
 {
+
+    if (m_state != ACCEPTING_CLIENTS)
+    {
+        Log::warn("ServerLobby",
+                  "Received startSelection while being in state %d", m_state);
+        return;
+    }
     if(event && !event->getPeer()->isAuthorised())
     {
         Log::warn("ServerLobby", 
@@ -346,6 +364,11 @@ void ServerLobby::startSelection(const Event *event)
 
     m_state = SELECTING;
     WaitingForOthersScreen::getInstance()->push();
+
+    Protocol *p = new SynchronizationProtocol();
+    p->requestStart();
+    Log::info("LobbyProtocol", "SynchronizationProtocol started.");
+
 }   // startSelection
 
 //-----------------------------------------------------------------------------
@@ -862,27 +885,38 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
             m_client_ready_count.unlock();
             return;
         }
-        Log::info("ServerLobbyeProtocol", "One of the players is ready.");
+        Log::info("ServerLobbyeProtocol", "Player %d is ready (%d/%d).",
+                  player_id, m_client_ready_count.getData(),
+                  m_game_setup->getPlayerCount()                        );
         m_player_states[player_id] = true;
         m_client_ready_count.getData()++;
     }
     m_client_ready_count.unlock();
 
-    if (m_client_ready_count.getAtomic() == m_game_setup->getPlayerCount())
-    {
-        Protocol *p = ProtocolManager::getInstance()
-                    ->getProtocol(PROTOCOL_SYNCHRONIZATION);
-        SynchronizationProtocol* protocol =
-                                 dynamic_cast<SynchronizationProtocol*>(p);
-        if (protocol)
-        {
-            protocol->startCountdown(5.0f); // 5 seconds countdown
-            Log::info("ServerLobbyProtocol",
-                     "All players ready, starting countdown.");
-        }
-    }   // if m_ready_count == number of players
-
 }   // finishedLoadingWorldClient
+
+//-----------------------------------------------------------------------------
+/** Called when a notification from a client is received that the client has
+ *  started the race. Once all clients have informed the server that they 
+ *  have started the race, the server can start. This makes sure that the
+ *  server's local time is behind all clients by (at least) their latency,
+ *  which in turn means that when the server simulates local time T all
+ *  messages from clients at their local time T should have arrived at
+ *  the server, which creates smoother play experience.
+ */
+void ServerLobby::startedRaceOnClient(Event *event)
+{
+    m_client_ready_count.lock();
+    Log::verbose("ServerLobby", "Host %d has started race.",
+                 event->getPeer()->getHostId());
+    m_client_ready_count.getData()++;
+    if (m_client_ready_count.getData() == m_game_setup->getPlayerCount())
+    {
+        m_state = DELAY_SERVER;
+        terminateSynchronizationProtocol();
+    }
+    m_client_ready_count.unlock();
+}   // startedRaceOnClient
 
 //-----------------------------------------------------------------------------
 /** Called when a client clicks on 'ok' on the race result screen.
