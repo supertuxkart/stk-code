@@ -119,9 +119,9 @@ void ThreeStrikesBattle::reset()
 
         scene::ISceneNode* kart_node = m_karts[n]->getNode();
 
-        // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow getting a writable list of children, wtf??
-        core::list<scene::ISceneNode*>& children = const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
-        for (core::list<scene::ISceneNode*>::Iterator it = children.begin(); it != children.end(); it++)
+        core::list<scene::ISceneNode*>& children = kart_node->getChildren();
+        for (core::list<scene::ISceneNode*>::Iterator it = children.begin();
+            it != children.end(); it++)
         {
             scene::ISceneNode* curr = *it;
 
@@ -295,11 +295,7 @@ void ThreeStrikesBattle::kartHit(const unsigned int kart_id)
     }
 
     scene::ISceneNode* kart_node = m_karts[kart_id]->getNode();
-
-    // FIXME: sorry for this ugly const_cast, irrlicht doesn't seem to allow
-    // getting a writable list of children, wtf??
-    core::list<scene::ISceneNode*>& children =
-        const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
+    core::list<scene::ISceneNode*>& children = kart_node->getChildren();
     for (core::list<scene::ISceneNode*>::Iterator it = children.begin();
                                                   it != children.end(); it++)
     {
@@ -608,8 +604,7 @@ void ThreeStrikesBattle::addKartLife(unsigned int id)
     updateKartRanks();
 
     scene::ISceneNode* kart_node = m_karts[id]->getNode();
-    core::list<scene::ISceneNode*>& children =
-        const_cast<core::list<scene::ISceneNode*>&>(kart_node->getChildren());
+    core::list<scene::ISceneNode*>& children = kart_node->getChildren();
     for (core::list<scene::ISceneNode*>::Iterator it = children.begin();
                                                   it != children.end(); it++)
     {
