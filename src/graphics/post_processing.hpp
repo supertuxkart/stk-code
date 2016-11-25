@@ -104,6 +104,7 @@ public:
     void renderDoF(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture);
     void renderGodRays(scene::ICameraSceneNode * const camnode,
                        const FrameBuffer &in_fbo,
+                       const FrameBuffer &out_fbo,
                        const FrameBuffer &quarter1_fbo,
                        const FrameBuffer &quarter2_fbo);
 
