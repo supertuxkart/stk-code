@@ -47,18 +47,19 @@ public:
     
     void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                           float dt);
-    
+
+    void renderRadianceHints(  const ShadowMatrices& shadow_matrices,
+                               const FrameBuffer& radiance_hint_framebuffer,
+                               const FrameBuffer& reflective_shadow_map_framebuffer);
+
     void renderGlobalIllumination(  const ShadowMatrices& shadow_matrices,
                                     const FrameBuffer& radiance_hint_framebuffer,
-                                    const FrameBuffer& reflective_shadow_map_framebuffer,
-                                    const FrameBuffer& diffuse_framebuffer,
                                     GLuint normal_depth_texture,
                                     GLuint depth_stencil_texture);
     void renderLights(  bool has_shadow,
                         GLuint normal_depth_texture,
                         GLuint depth_stencil_texture,
                         const FrameBuffer& shadow_framebuffer,
-                        const FrameBuffer& diffuse_specular_framebuffer,
                         GLuint specular_probe);
     void renderAmbientScatter(GLuint depth_stencil_texture);
     void renderLightsScatter(GLuint depth_stencil_texture,

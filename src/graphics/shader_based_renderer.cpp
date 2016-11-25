@@ -356,30 +356,37 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         if (CVS->isDefferedEnabled())
         {
             if (CVS->isGlobalIlluminationEnabled() && hasShadow)
-            {    
+            {
+                ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
+                m_lighting_passes.renderRadianceHints( m_shadow_matrices,
+                                                       m_rtts->getRadianceHintFrameBuffer(),
+                                                       m_rtts->getReflectiveShadowMapFrameBuffer());
+            }
+
+            m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
+            glClear(GL_COLOR_BUFFER_BIT);
+            m_rtts->getFBO(FBO_DIFFUSE).bind();
+
+            if (CVS->isGlobalIlluminationEnabled() && hasShadow)
+            {
+                ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
                 m_lighting_passes.renderGlobalIllumination( m_shadow_matrices,
                                                             m_rtts->getRadianceHintFrameBuffer(),
-                                                            m_rtts->getReflectiveShadowMapFrameBuffer(),
-                                                            m_rtts->getFBO(FBO_DIFFUSE),
                                                             m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
                                                             m_rtts->getDepthStencilTexture());
-            }            
-            
-            GLuint specular_probe;
-            if(m_skybox)
+            }
+
+            m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
+            GLuint specular_probe = 0;
+            if (m_skybox)
             {
                 specular_probe = m_skybox->getSpecularProbe();
             }
-            else 
-            {
-                specular_probe = 0;
-            }              
-            
+
             m_lighting_passes.renderLights( hasShadow,
                                             m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
                                             m_rtts->getDepthStencilTexture(),
                                             m_rtts->getShadowFrameBuffer(),
-                                            m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR),
                                             specular_probe);
         }
         PROFILER_POP_CPU_MARKER();
@@ -468,8 +475,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         m_rtts->getFBO(FBO_COLORS).bind();
         m_lighting_passes.renderGlobalIllumination(m_shadow_matrices,
                                                    m_rtts->getRadianceHintFrameBuffer(),
-                                                   m_rtts->getReflectiveShadowMapFrameBuffer(),
-                                                   m_rtts->getFBO(FBO_DIFFUSE),
                                                    m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
                                                    m_rtts->getDepthStencilTexture());
     }
