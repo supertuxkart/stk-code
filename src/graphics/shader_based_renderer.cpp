@@ -42,8 +42,6 @@
 
 #include <algorithm> 
 
-extern std::vector<float> BoundingBoxes; //TODO: replace global variable by something cleaner
-
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::setRTT(RTT* rtts)
 {
