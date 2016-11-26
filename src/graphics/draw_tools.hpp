@@ -64,20 +64,6 @@ struct CustomUnrollArgs<>
     {
         irr_driver->increaseObjectCount(); //TODO: move somewhere else
         GLMesh *mesh = STK::tuple_get<0>(t);
-        
-        //shadow_custom_unroll_args, rsm_custom_unroll_args and custom_unroll_args
-        // have been merged in order to avoid duplicated code.
-        // don't need to call change color things for shadows and rsm
-        //TODO: don't call next 10 lines for shadow/rsm shaders?
-        const bool support_change_hue = (mesh->m_render_info != NULL &&
-            mesh->m_material != NULL);
-        const bool need_change_hue = (support_change_hue &&
-            mesh->m_render_info->getHue() > 0.0f);
-        if (need_change_hue)
-        {
-            S::getInstance()->changeableColor(mesh->m_render_info->getHue(),
-                mesh->m_material->getColorizationFactor());
-        }
         if (!mesh->mb->getMaterial().BackfaceCulling)
             glDisable(GL_CULL_FACE);
         S::getInstance()->setUniforms(args...);
@@ -88,11 +74,6 @@ struct CustomUnrollArgs<>
                                 (int)mesh->vaoBaseVertex);
         if (!mesh->mb->getMaterial().BackfaceCulling)
             glEnable(GL_CULL_FACE);
-        if (need_change_hue)
-        {
-            // Reset after changing
-            S::getInstance()->changeableColor();
-        }
     }   // drawMesh
 };   // CustomUnrollArgs
 

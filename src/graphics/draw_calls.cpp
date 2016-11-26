@@ -270,7 +270,10 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         switch (Mat)
                         {
                         case Material::SHADERTYPE_SOLID:
-                            ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                            ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix,
+                                (mesh->m_render_info && mesh->m_material ?
+                                core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                                core::vector2df(0.0f, 0.0f)));
                             break;
                         case Material::SHADERTYPE_ALPHA_TEST:
                             ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
@@ -281,7 +284,6 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         case Material::SHADERTYPE_SPLATTING:
                             ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                             break;
- 
                         case Material::SHADERTYPE_ALPHA_BLEND:
                             break;
                         case Material::SHADERTYPE_ADDITIVE:
@@ -296,7 +298,6 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                             break;
                         case Material::SHADERTYPE_DETAIL_MAP:
                             break;
-
                         default:
                             Log::warn("DrawCalls", "Unknown material type: %d", Mat);
                         }
@@ -313,13 +314,19 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     switch (Mat)
                     {
                     case Material::SHADERTYPE_SOLID:
-                        ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
                         ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
-                        ListMatNormalMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatNormalMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_DETAIL_MAP:
                         ListMatDetails::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
@@ -336,14 +343,12 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     case Material::SHADERTYPE_VEGETATION:
                         ListMatGrass::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
                         break;
-                    
                     case Material::SHADERTYPE_ALPHA_BLEND:
                         break;
                     case Material::SHADERTYPE_ADDITIVE:
                         break;
                     case Material::SHADERTYPE_WATER:
                         break;
-                        
                     default:
                         Log::warn("DrawCalls", "Unknown material type: %d", Mat);
                     }
@@ -377,13 +382,13 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     switch (Mat)
                     {
                     case Material::SHADERTYPE_SOLID:
-                        ListMatDefault::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDefault::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
                         ListMatAlphaRef::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
-                        ListMatNormalMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatNormalMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_DETAIL_MAP:
                         ListMatDetails::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
@@ -399,14 +404,12 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         break;
                     case Material::SHADERTYPE_VEGETATION:
                         ListMatGrass::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
-                    
                     case Material::SHADERTYPE_ALPHA_BLEND:
                         break;
                     case Material::SHADERTYPE_ADDITIVE:
                         break;
                     case Material::SHADERTYPE_WATER:
                         break;
-                        
                     default:
                         Log::warn("DrawCalls", "Unknown material type: %d", Mat);
                     }
@@ -442,7 +445,6 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
             }
             else
             {
-
                 core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                 ModelMatrix.getInverse(InvModelMatrix);
 
@@ -451,13 +453,13 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     switch (Mat)
                     {
                     case Material::SHADERTYPE_SOLID:
-                        ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
                         ListMatAlphaRef::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
-                        ListMatNormalMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatNormalMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_DETAIL_MAP:
                         ListMatDetails::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
@@ -474,14 +476,12 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     case Material::SHADERTYPE_VEGETATION:
                         ListMatGrass::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
                         break;
-                    
                     case Material::SHADERTYPE_ALPHA_BLEND:
                         break;
                     case Material::SHADERTYPE_ADDITIVE:
                         break;
                     case Material::SHADERTYPE_WATER:
                         break;
-                        
                     default:
                         Log::warn("DrawCalls", "Unknown material type: %d", Mat);
                     }
