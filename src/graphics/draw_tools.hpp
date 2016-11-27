@@ -77,7 +77,6 @@ struct CustomUnrollArgs<>
     }   // drawMesh
 };   // CustomUnrollArgs
 
-
 // ----------------------------------------------------------------------------
 /** Variadic template to implement TexExpander*/
 template<typename T, int N>

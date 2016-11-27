@@ -181,7 +181,7 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "rsm.vert",
                             GL_FRAGMENT_SHADER, "rsm.frag");
 
-        assignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
+        assignUniforms("ModelMatrix", "TextureMatrix", "RSMMatrix");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // CRSMShader
 };   // CRSMShader
@@ -197,7 +197,7 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "rsm.vert",
                             GL_FRAGMENT_SHADER, "splatting_rsm.frag");
 
-        assignUniforms("RSMMatrix", "ModelMatrix");
+        assignUniforms("ModelMatrix", "RSMMatrix");
         assignSamplerNames(0, "tex_layout", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "tex_detail0", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            2, "tex_detail1", ST_TRILINEAR_ANISOTROPIC_FILTERED,
