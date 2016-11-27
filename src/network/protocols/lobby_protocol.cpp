@@ -27,7 +27,7 @@
 #include "network/protocols/controller_events_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/protocols/kart_update_protocol.hpp"
-#include "network/protocols/synchronization_protocol.hpp"
+#include "network/protocols/latency_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
@@ -131,13 +131,13 @@ void LobbyProtocol::loadWorld()
 }   // loadWorld
 
 // ----------------------------------------------------------------------------
-/** Terminates the SynchronizationProtocol.
+/** Terminates the LatencyProtocol.
  */
-void LobbyProtocol::terminateSynchronizationProtocol()
+void LobbyProtocol::terminateLatencyProtocol()
 {
     Protocol *p = ProtocolManager::getInstance()
                 ->getProtocol(PROTOCOL_SYNCHRONIZATION);
-    SynchronizationProtocol *sp = dynamic_cast<SynchronizationProtocol*>(p);
+    LatencyProtocol *sp = dynamic_cast<LatencyProtocol*>(p);
     if (sp)
         sp->requestTerminate();
-}   // stopSynchronizationProtocol
+}   // stopLatencyProtocol

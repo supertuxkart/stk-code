@@ -1,4 +1,4 @@
-#include "network/protocols/synchronization_protocol.hpp"
+#include "network/protocols/latency_protocol.hpp"
 
 #include "network/event.hpp"
 #include "network/network_config.hpp"
@@ -17,8 +17,8 @@
  *  for a message requires the protocol lock) - causing at least two frames
  *  of significanlty delayed pings :(
  */
-SynchronizationProtocol::SynchronizationProtocol() 
-                       : Protocol(PROTOCOL_SYNCHRONIZATION)
+LatencyProtocol::LatencyProtocol() 
+               : Protocol(PROTOCOL_SYNCHRONIZATION)
 {
     unsigned int size = STKHost::get()->getPeerCount();
     m_pings.resize(size, std::map<uint32_t,double>());
@@ -26,17 +26,17 @@ SynchronizationProtocol::SynchronizationProtocol()
     m_total_diff.resize(size, 0);
     m_average_ping.resize(size, 0);
     m_pings_count = 0;
-}   // SynchronizationProtocol
+}   // LatencyProtocol
 
 //-----------------------------------------------------------------------------
-SynchronizationProtocol::~SynchronizationProtocol()
+LatencyProtocol::~LatencyProtocol()
 {
-}   // ~SynchronizationProtocol
+}   // ~LatencyProtocol
 
 //-----------------------------------------------------------------------------
-void SynchronizationProtocol::setup()
+void LatencyProtocol::setup()
 {
-    Log::info("SynchronizationProtocol", "Ready !");
+    Log::info("LatencyProtocol", "Ready !");
 }   // setup
 
  //-----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ void SynchronizationProtocol::setup()
  *  is a reply to a previous ping request. The server will keep track of
  *  average latency.
  */
-bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
+bool LatencyProtocol::notifyEventAsynchronous(Event* event)
 {
     if (event->getType() != EVENT_TYPE_MESSAGE)
         return true;
@@ -80,7 +80,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         response->addUInt8(0).addUInt32(sequence);
         event->getPeer()->sendPacket(response, false);
         delete response;
-        Log::verbose("SynchronizationProtocol", "Answering sequence %u at %lf",
+        Log::verbose("LatencyProtocol", "Answering sequence %u at %lf",
                      sequence, StkTime::getRealTime());
     }
     else // receive response to a ping request
@@ -89,7 +89,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         assert(NetworkConfig::get()->isServer());
         if (sequence >= m_pings[peer_id].size())
         {
-            Log::warn("SynchronizationProtocol",
+            Log::warn("LatencyProtocol",
                       "The sequence# %u isn't known.", sequence);
             return true;
         }
@@ -99,7 +99,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
         m_average_ping[peer_id] =
             (int)((m_total_diff[peer_id]/m_successed_pings[peer_id])*1000.0);
 
-        Log::debug("SynchronizationProtocol",
+        Log::debug("LatencyProtocol",
             "Peer %d sequence %d ping %u average %u at %lf",
             peer_id, sequence,
             (unsigned int)((current_time - m_pings[peer_id][sequence])*1000),
@@ -120,7 +120,7 @@ bool SynchronizationProtocol::notifyEventAsynchronous(Event* event)
  *  started. The measured times can be used later to estimate the latency
  *  between server and client.
  */
-void SynchronizationProtocol::asynchronousUpdate()
+void LatencyProtocol::asynchronousUpdate()
 {
     float current_time = float(StkTime::getRealTime());
     if (NetworkConfig::get()->isServer() &&  current_time > m_last_time+1)
@@ -131,7 +131,7 @@ void SynchronizationProtocol::asynchronousUpdate()
             NetworkString *ping_request = 
                             getNetworkString(5);
             ping_request->addUInt8(1).addUInt32(m_pings[i].size());
-            Log::verbose("SynchronizationProtocol",
+            Log::verbose("LatencyProtocol",
                          "Added sequence number %u for peer %d at %lf",
                          m_pings[i].size(), i, StkTime::getRealTime());
             m_pings[i] [ m_pings_count ] = current_time;

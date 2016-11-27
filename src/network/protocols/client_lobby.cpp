@@ -24,7 +24,7 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/synchronization_protocol.hpp"
+#include "network/protocols/latency_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -318,9 +318,9 @@ void ClientLobby::update(float dt)
         screen->push();
         m_state = SELECTING_KARTS;
 
-        Protocol *p = new SynchronizationProtocol();
+        Protocol *p = new LatencyProtocol();
         p->requestStart();
-        Log::info("LobbyProtocol", "SynchronizationProtocol started.");
+        Log::info("LobbyProtocol", "LatencyProtocol started.");
     }
     break;
     case SELECTING_KARTS:
@@ -617,7 +617,7 @@ void ClientLobby::startingRaceNow()
     NetworkString *ns = getNetworkString(2);
     ns->addUInt8(LE_STARTED_RACE);
     sendToServer(ns, /*reliable*/true);
-    terminateSynchronizationProtocol();
+    terminateLatencyProtocol();
 }   // startingRaceNow
 
 //-----------------------------------------------------------------------------

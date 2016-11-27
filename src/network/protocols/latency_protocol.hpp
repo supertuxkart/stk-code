@@ -1,5 +1,5 @@
-#ifndef SYNCHRONIZATION_PROTOCOL_HPP
-#define SYNCHRONIZATION_PROTOCOL_HPP
+#ifndef LATENCY_PROTOCOL_HPP
+#define LATENCY_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
 #include "utils/cpp2011.hpp"
@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 
-class SynchronizationProtocol : public Protocol
+class LatencyProtocol : public Protocol
 {
 private:
     std::vector<std::map<uint32_t, double> > m_pings;
@@ -23,8 +23,8 @@ private:
 
 
 public:
-             SynchronizationProtocol();
-    virtual ~SynchronizationProtocol();
+             LatencyProtocol();
+    virtual ~LatencyProtocol();
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void setup() OVERRIDE;
@@ -33,6 +33,6 @@ public:
     // ------------------------------------------------------------------------
     virtual void update(float dt) OVERRIDE {}
 
-};   // class SynchronizationProtocol
+};   // class LatencyProtocol
 
-#endif // SYNCHRONIZATION_PROTOCOL_HPP
+#endif // LATENCY_PROTOCOL_HPP

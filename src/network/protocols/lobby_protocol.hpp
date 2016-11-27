@@ -95,7 +95,7 @@ public:
     virtual void update(float dt)       = 0;
     virtual void finishedLoadingWorld() = 0;
     virtual void loadWorld();
-    void terminateSynchronizationProtocol();
+    void terminateLatencyProtocol();
     virtual void requestKartSelection(uint8_t player_id,
                                       const std::string &kart_name)
     {

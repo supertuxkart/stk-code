@@ -26,7 +26,7 @@
 #include "network/network_player_profile.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
-#include "network/protocols/synchronization_protocol.hpp"
+#include "network/protocols/latency_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/stk_host.hpp"
@@ -365,9 +365,9 @@ void ServerLobby::startSelection(const Event *event)
     m_state = SELECTING;
     WaitingForOthersScreen::getInstance()->push();
 
-    Protocol *p = new SynchronizationProtocol();
+    Protocol *p = new LatencyProtocol();
     p->requestStart();
-    Log::info("LobbyProtocol", "SynchronizationProtocol started.");
+    Log::info("LobbyProtocol", "LatencyProtocol started.");
 
 }   // startSelection
 
@@ -913,7 +913,7 @@ void ServerLobby::startedRaceOnClient(Event *event)
     if (m_client_ready_count.getData() == m_game_setup->getPlayerCount())
     {
         m_state = DELAY_SERVER;
-        terminateSynchronizationProtocol();
+        terminateLatencyProtocol();
     }
     m_client_ready_count.unlock();
 }   // startedRaceOnClient
