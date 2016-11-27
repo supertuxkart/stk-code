@@ -194,8 +194,10 @@ public:
      */
     bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const
     {
+		Vec3 diff = (xyz - m_xyz);
+		diff.setY(diff.getY() / 2.0f); // don't be too strict if the kart is a bit above the item
         return (m_event_handler!=kart || m_deactive_time <=0) &&
-               (xyz-m_xyz).length2()<m_distance_2;
+               diff.length2()<m_distance_2;
     }   // hitKart
 
 protected:
