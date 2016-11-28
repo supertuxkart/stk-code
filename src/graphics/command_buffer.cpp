@@ -21,7 +21,9 @@
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, InstanceSettings is, InstanceDataSingleTex &instance)
+void InstanceFiller<InstanceDataSingleTex>::add(GLMesh* mesh,
+                                                const InstanceSettings& is,
+                                                InstanceDataSingleTex& instance)
 {
     fillOriginOrientationScale<InstanceDataSingleTex>(STK::tuple_get<0>(is), instance);
     instance.Texture = mesh->TextureHandles[0];
@@ -29,7 +31,9 @@ void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, InstanceSettings i
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, InstanceSettings is, InstanceDataDualTex &instance)
+void InstanceFiller<InstanceDataDualTex>::add(GLMesh* mesh,
+                                              const InstanceSettings& is,
+                                              InstanceDataDualTex& instance)
 {
     fillOriginOrientationScale<InstanceDataDualTex>(STK::tuple_get<0>(is), instance);
     instance.Texture = mesh->TextureHandles[0];
@@ -38,7 +42,9 @@ void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, InstanceSettings is,
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, InstanceSettings is, InstanceDataThreeTex &instance)
+void InstanceFiller<InstanceDataThreeTex>::add(GLMesh* mesh,
+                                               const InstanceSettings& is,
+                                               InstanceDataThreeTex& instance)
 {
     fillOriginOrientationScale<InstanceDataThreeTex>(STK::tuple_get<0>(is), instance);
     instance.MiscData.X = STK::tuple_get<1>(is).X;
@@ -52,7 +58,9 @@ void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, InstanceSettings is
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataFourTex>::add(GLMesh *mesh, InstanceSettings is, InstanceDataFourTex &instance)
+void InstanceFiller<InstanceDataFourTex>::add(GLMesh* mesh,
+                                              const InstanceSettings& is,
+                                              InstanceDataFourTex& instance)
 {
     fillOriginOrientationScale<InstanceDataFourTex>(STK::tuple_get<0>(is), instance);
     instance.MiscData.X = STK::tuple_get<1>(is).X;
@@ -67,7 +75,9 @@ void InstanceFiller<InstanceDataFourTex>::add(GLMesh *mesh, InstanceSettings is,
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, InstanceSettings is, GlowInstanceData &instance)
+void InstanceFiller<GlowInstanceData>::add(GLMesh* mesh,
+                                           const InstanceSettings& is,
+                                           GlowInstanceData& instance)
 {
     scene::ISceneNode* node = STK::tuple_get<0>(is);
     fillOriginOrientationScale<GlowInstanceData>(node, instance);

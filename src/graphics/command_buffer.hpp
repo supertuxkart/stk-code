@@ -69,7 +69,7 @@ void fillOriginOrientationScale(scene::ISceneNode *node, InstanceData &instance)
 template<typename InstanceData>
 struct InstanceFiller
 {
-    static void add(GLMesh *, InstanceSettings, InstanceData &);
+    static void add(GLMesh *, const InstanceSettings&, InstanceData &);
 };
 
 // ----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ struct InstanceFiller
  *  \param[in,out] poly_count Number of triangles. Will be updated.
  */
 template<typename T>
-void FillInstances_impl(InstanceList instance_list,
+void FillInstances_impl(const InstanceList& instance_list,
                         T * instance_buffer,
                         DrawElementsIndirectCommand *command_buffer,
                         size_t &instance_buffer_offset,
