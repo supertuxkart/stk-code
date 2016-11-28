@@ -211,18 +211,18 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
             tmpcol.getBlue() / 255.0f);
 
         for (GLMesh *mesh : node->TransparentMesh[TM_DEFAULT])
-            pushVector(ListBlendTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
+            pushVector(ListBlendTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans,
             fogmax, startH, endH, start, end, col);
         for (GLMesh *mesh : node->TransparentMesh[TM_ADDITIVE])
-            pushVector(ListAdditiveTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
+            pushVector(ListAdditiveTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans,
             fogmax, startH, endH, start, end, col);
     }
     else
     {
         for (GLMesh *mesh : node->TransparentMesh[TM_DEFAULT])
-            pushVector(ListBlendTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, 1.0f);
+            pushVector(ListBlendTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans, 1.0f);
         for (GLMesh *mesh : node->TransparentMesh[TM_ADDITIVE])
-            pushVector(ListAdditiveTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, 1.0f);
+            pushVector(ListAdditiveTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans, 1.0f);
     }
 
     // Use sun color to determine custom alpha for ghost karts
@@ -235,11 +235,11 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     }
 
     for (GLMesh *mesh : node->TransparentMesh[TM_TRANSLUCENT_STD])
-        pushVector(ListTranslucentStandard::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
+        pushVector(ListTranslucentStandard::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans, custom_alpha);
     for (GLMesh *mesh : node->TransparentMesh[TM_TRANSLUCENT_TAN])
-        pushVector(ListTranslucentTangents::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
+        pushVector(ListTranslucentTangents::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans, custom_alpha);
     for (GLMesh *mesh : node->TransparentMesh[TM_TRANSLUCENT_2TC])
-        pushVector(ListTranslucent2TCoords::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
+        pushVector(ListTranslucent2TCoords::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans, custom_alpha);
     for (GLMesh *mesh : node->TransparentMesh[TM_DISPLACEMENT])
         pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
 
@@ -257,7 +257,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         m_glow_pass_mesh[mesh->mb].m_scene_nodes.emplace_back(Node);
                     }
 
-                    if (Mat != Material::SHADERTYPE_SPLATTING && mesh->TextureMatrix.isIdentity())
+                    if (Mat != Material::SHADERTYPE_SPLATTING && mesh->texture_trans.getLength() == 0.0f)
                     {
                         std::pair<scene::IMeshBuffer*, RenderInfo*> meshRenderInfo(mesh->mb, mesh->m_render_info);
                         m_solid_pass_mesh[Mat][meshRenderInfo].m_mesh = mesh;
@@ -270,16 +270,16 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         switch (Mat)
                         {
                         case Material::SHADERTYPE_SOLID:
-                            ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix,
+                            ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
                                 (mesh->m_render_info && mesh->m_material ?
                                 core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
                                 core::vector2df(0.0f, 0.0f)));
                             break;
                         case Material::SHADERTYPE_ALPHA_TEST:
-                            ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                            ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                             break;
                         case Material::SHADERTYPE_SOLID_UNLIT:
-                            ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                            ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                             break;
                         case Material::SHADERTYPE_SPLATTING:
                             ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
@@ -314,28 +314,28 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     switch (Mat)
                     {
                     case Material::SHADERTYPE_SOLID:
-                        ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix,
+                        ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
                             (mesh->m_render_info && mesh->m_material ?
                             core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
                             core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
-                        ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
-                        ListMatNormalMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix,
+                        ListMatNormalMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
                             (mesh->m_render_info && mesh->m_material ?
                             core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
                             core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_DETAIL_MAP:
-                        ListMatDetails::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDetails::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SOLID_UNLIT:
-                        ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPHERE_MAP:
-                        ListMatSphereMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatSphereMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPLATTING:
                         ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
@@ -382,22 +382,22 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     switch (Mat)
                     {
                     case Material::SHADERTYPE_SOLID:
-                        ListMatDefault::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix, core::vector2df(0.0f, 0.0f));
+                        ListMatDefault::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
-                        ListMatAlphaRef::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatAlphaRef::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
-                        ListMatNormalMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix, core::vector2df(0.0f, 0.0f));
+                        ListMatNormalMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_DETAIL_MAP:
-                        ListMatDetails::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDetails::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SOLID_UNLIT:
-                        ListMatUnlit::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatUnlit::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPHERE_MAP:
-                        ListMatSphereMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatSphereMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPLATTING:
                         ListMatSplatting::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix);
@@ -453,22 +453,22 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     switch (Mat)
                     {
                     case Material::SHADERTYPE_SOLID:
-                        ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix, core::vector2df(0.0f, 0.0f));
+                        ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
-                        ListMatAlphaRef::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatAlphaRef::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
-                        ListMatNormalMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix, core::vector2df(0.0f, 0.0f));
+                        ListMatNormalMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_DETAIL_MAP:
-                        ListMatDetails::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDetails::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SOLID_UNLIT:
-                        ListMatUnlit::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatUnlit::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPHERE_MAP:
-                        ListMatSphereMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatSphereMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPLATTING:
                         ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);

@@ -1,7 +1,7 @@
 #ifdef GL_ES
 uniform mat4 ModelMatrix;
 uniform mat4 InverseModelMatrix;
-uniform mat4 TextureMatrix;
+uniform vec2 texture_trans;
 #else
 uniform mat4 ModelMatrix =
     mat4(1., 0., 0., 0.,
@@ -14,11 +14,7 @@ uniform mat4 InverseModelMatrix =
          0., 0., 1., 0.,
          0., 0., 0., 1.);
 
-uniform mat4 TextureMatrix =
-    mat4(1., 0., 0., 0.,
-         0., 1., 0., 0.,
-         0., 0., 1., 0.,
-         0., 0., 0., 1.);
+uniform vec2 texture_trans = vec2(0., 0.);
 #endif
 
 #if __VERSION__ >= 330
@@ -58,6 +54,10 @@ void main(void)
     // Keep direction
     tangent = (ViewMatrix * ModelMatrix * vec4(Tangent, 0.)).xyz;
     bitangent = (ViewMatrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
-    uv = (TextureMatrix * vec4(Texcoord, 1., 1.)).xy;
+    uv = (mat4(1., 0., 0., 0.,
+               0., 1., 0., 0.,
+               texture_trans.x, texture_trans.y, 1., 0.,
+               0., 0., 0., 1.)
+       * vec4(Texcoord, 1., 1.)).xy;
     uv_bis = SecondTexcoord;
 }

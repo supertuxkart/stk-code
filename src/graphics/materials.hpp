@@ -56,14 +56,14 @@ public:
 
 // ============================================================================
 class ObjectRefPass2Shader : public TextureShader<ObjectRefPass2Shader, 5,
-                                                core::matrix4, core::matrix4>
+                                                core::matrix4, core::vector2df>
 {
 public:
     ObjectRefPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                             GL_FRAGMENT_SHADER, "objectref_pass2.frag");
-        assignUniforms("ModelMatrix", "TextureMatrix");
+        assignUniforms("ModelMatrix", "texture_trans");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
@@ -172,7 +172,7 @@ public:
 };   // InstancedShadowShader
 
 // ============================================================================
-class CRSMShader : public TextureShader<CRSMShader, 1, core::matrix4, core::matrix4,
+class CRSMShader : public TextureShader<CRSMShader, 1, core::matrix4, core::vector2df,
                                  core::matrix4>
 {
 public:
@@ -181,7 +181,7 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "rsm.vert",
                             GL_FRAGMENT_SHADER, "rsm.frag");
 
-        assignUniforms("ModelMatrix", "TextureMatrix", "RSMMatrix");
+        assignUniforms("ModelMatrix", "texture_trans", "RSMMatrix");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // CRSMShader
 };   // CRSMShader
@@ -278,14 +278,14 @@ public:
 
 // ============================================================================
 class ObjectRefPass1Shader : public TextureShader<ObjectRefPass1Shader, 2, core::matrix4,
-                                           core::matrix4, core::matrix4>
+                                           core::matrix4, core::vector2df>
 {
 public:
     ObjectRefPass1Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
-        assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
+        assignUniforms("ModelMatrix", "InverseModelMatrix", "texture_trans");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // ObjectRefPass1Shader
@@ -324,14 +324,14 @@ public:
 
 // ============================================================================
 class ObjectUnlitShader : public TextureShader<ObjectUnlitShader, 4, core::matrix4,
-                                        core::matrix4>
+                                        core::vector2df>
 {
 public:
     ObjectUnlitShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                             GL_FRAGMENT_SHADER, "object_unlit.frag");
-        assignUniforms("ModelMatrix", "TextureMatrix");
+        assignUniforms("ModelMatrix", "texture_trans");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
