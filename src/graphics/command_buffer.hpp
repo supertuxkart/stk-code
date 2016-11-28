@@ -97,7 +97,7 @@ void FillInstances_impl(InstanceList instance_list,
     {
         scene::ISceneNode *node = instance_list.m_scene_nodes[i];
         InstanceFiller<T>::add(mesh, node, instance_buffer[instance_buffer_offset++]);
-        assert(instance_buffer_offset * sizeof(T) < 10000 * sizeof(InstanceDataDualTex));
+        assert(instance_buffer_offset * sizeof(T) < 10000 * sizeof(InstanceDataThreeTex));
     }
 
     DrawElementsIndirectCommand &CurrentCommand = command_buffer[command_buffer_offset++];
@@ -227,7 +227,7 @@ protected:
                          VAOManager::getInstance()->getInstanceBuffer(instance_type));
             instance_buffer = (InstanceData*)
                 glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                                 10000 * sizeof(InstanceDataDualTex),
+                                 10000 * sizeof(InstanceDataThreeTex),
                                  GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
         }
         

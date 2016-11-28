@@ -41,9 +41,28 @@ template<>
 void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataThreeTex &instance)
 {
     fillOriginOrientationScale<InstanceDataThreeTex>(node, instance);
+    instance.MiscData.X = 0;
+    instance.MiscData.Y = 0;
+    instance.MiscData.Z = 0;
+    instance.MiscData.W = 0;
+    instance.Texture = mesh->TextureHandles[0];
+    instance.SecondTexture = mesh->TextureHandles[1];
+    instance.ThirdTexture = mesh->TextureHandles[7];
+}
+
+// ----------------------------------------------------------------------------
+template<>
+void InstanceFiller<InstanceDataFourTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataFourTex &instance)
+{
+    fillOriginOrientationScale<InstanceDataFourTex>(node, instance);
+    instance.MiscData.X = 0;
+    instance.MiscData.Y = 0;
+    instance.MiscData.Z = 0;
+    instance.MiscData.W = 0;
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
     instance.ThirdTexture = mesh->TextureHandles[2];
+    instance.FourthTexture = mesh->TextureHandles[7];
 }
 
 // ----------------------------------------------------------------------------
@@ -142,23 +161,27 @@ void SolidCommandBuffer::fill(SolidPassMeshMap *mesh_map)
         mapIndirectBuffer();
     
     std::vector<int> dual_tex_material_list =
+        createVector<int>(Material::SHADERTYPE_VEGETATION);
+
+    fillInstanceData<InstanceDataDualTex, SolidPassMeshMap>
+        (mesh_map, dual_tex_material_list, InstanceTypeDualTex);
+
+    std::vector<int> three_tex_material_list =
         createVector<int>(Material::SHADERTYPE_SOLID,
                           Material::SHADERTYPE_ALPHA_TEST,
                           Material::SHADERTYPE_SOLID_UNLIT,
-                          Material::SHADERTYPE_SPHERE_MAP,
-                          Material::SHADERTYPE_VEGETATION);
-                          
-    fillInstanceData<InstanceDataDualTex, SolidPassMeshMap>
-        (mesh_map, dual_tex_material_list, InstanceTypeDualTex);
-    
-    std::vector<int> three_tex_material_list =
-        createVector<int>(Material::SHADERTYPE_DETAIL_MAP,
-                          Material::SHADERTYPE_NORMAL_MAP);
-                          
+                          Material::SHADERTYPE_SPHERE_MAP);
+
     fillInstanceData<InstanceDataThreeTex, SolidPassMeshMap>
         (mesh_map, three_tex_material_list, InstanceTypeThreeTex);
-        
-    
+
+    std::vector<int> four_tex_material_list =
+        createVector<int>(Material::SHADERTYPE_DETAIL_MAP,
+                          Material::SHADERTYPE_NORMAL_MAP);
+
+    fillInstanceData<InstanceDataFourTex, SolidPassMeshMap>
+        (mesh_map, four_tex_material_list, InstanceTypeFourTex);
+
     if (!CVS->supportsAsyncInstanceUpload())
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 } //SolidCommandBuffer::fill

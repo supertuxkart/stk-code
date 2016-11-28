@@ -636,7 +636,7 @@ struct DefaultMaterial
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType
                                                = Material::SHADERTYPE_SOLID;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t> FirstPassTextures;
     static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;
@@ -657,7 +657,7 @@ struct AlphaRef
     typedef ListMatAlphaRef List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_ALPHA_TEST;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t, size_t> FirstPassTextures;
     static const STK::Tuple<size_t, size_t> SecondPassTextures;
     static const STK::Tuple<size_t> ShadowTextures;
@@ -679,7 +679,7 @@ struct SphereMap
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType
                                           = Material::SHADERTYPE_SPHERE_MAP;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t> FirstPassTextures;
     static const STK::Tuple<size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;
@@ -701,7 +701,7 @@ struct UnlitMat
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType =
                                            Material::SHADERTYPE_SOLID_UNLIT;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t, size_t> FirstPassTextures;
     static const STK::Tuple<size_t> SecondPassTextures;
     static const STK::Tuple<size_t> ShadowTextures;
@@ -745,7 +745,7 @@ struct NormalMat
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_TANGENTS;
     static const enum Material::ShaderType MaterialType
                                           = Material::SHADERTYPE_NORMAL_MAP;
-    static const enum InstanceType Instance = InstanceTypeThreeTex;
+    static const enum InstanceType Instance = InstanceTypeFourTex;
     static const STK::Tuple<size_t, size_t> FirstPassTextures;
     static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;
@@ -767,7 +767,7 @@ struct DetailMat
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
     static const enum Material::ShaderType MaterialType
                                           = Material::SHADERTYPE_DETAIL_MAP;
-    static const enum InstanceType Instance = InstanceTypeThreeTex;
+    static const enum InstanceType Instance = InstanceTypeFourTex;
     static const STK::Tuple<size_t> FirstPassTextures;
     static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;
