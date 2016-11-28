@@ -36,6 +36,25 @@
 #include "utils/log.hpp"
 
 // ============================================================================
+/** The protocol that manages starting a race with the server. It uses a 
+ *  finite state machine:
+\dot
+digraph interaction {
+"NONE" -> "LINKED" [label="ENet connection with server established"]
+"LINKED" -> "REQUESTING_CONNECTION" [label="Request connection from server"]
+"REQUESTING_CONNECTION" -> CONNECTED [label="Connection accepted by server"]
+"REQUESTING_CONNECTION" -> "?? TO BE DONE ??" [label="Connection refused by server"]
+"CONNECTED" -> "KART_SELECTION" [label="Server tells us to start kart selection"]
+"KART_SELECTION" -> "SELECTING_KARTS" [label="Show kart selection screen"]
+"SELECTING_KARTS" -> "PLAYING" [label="Server sends start race message"]
+}
+\enddot
+Note that some states are actually managed outside of the client lobby. For
+example to select race details after selecting a kart is managed by the GUI
+engine.
+
+*/
+
 ClientLobby::ClientLobby() : LobbyProtocol(NULL)
 {
 
