@@ -22,7 +22,6 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stk_scene_manager.hpp"
 #include "modes/world.hpp"
 #include "utils/tuple.hpp"
 #include <SColor.h>

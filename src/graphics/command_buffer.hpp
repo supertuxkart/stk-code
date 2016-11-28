@@ -298,10 +298,13 @@ public:
 #endif
             TexExpander<typename T::InstancedFirstPassShader>::template
                 expandTex(*mesh, T::FirstPassTextures);
-
+            if (!mesh->mb->getMaterial().BackfaceCulling)
+                glDisable(GL_CULL_FACE);
             glDrawElementsIndirect(GL_TRIANGLES,
                                    GL_UNSIGNED_SHORT,
                                    (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
+            if (!mesh->mb->getMaterial().BackfaceCulling)
+                glEnable(GL_CULL_FACE);
         }        
         
     } //drawIndirectFirstPass
@@ -366,11 +369,13 @@ public:
                     (mesh->m_render_info->getHue(),
                      mesh->m_material->getColorizationFactor());
             }
-            
+            if (!mesh->mb->getMaterial().BackfaceCulling)
+                glDisable(GL_CULL_FACE);
             glDrawElementsIndirect(GL_TRIANGLES,
                                    GL_UNSIGNED_SHORT,
                                    (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
-                                   
+            if (!mesh->mb->getMaterial().BackfaceCulling)
+                glEnable(GL_CULL_FACE);
             if (need_change_hue)
             {
                 // Reset after changing

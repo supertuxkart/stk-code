@@ -31,7 +31,6 @@
 #include "graphics/shaders.hpp"
 #include "graphics/skybox.hpp"
 #include "graphics/spherical_harmonics.hpp"
-#include "graphics/stk_scene_manager.hpp"
 #include "graphics/texture_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
@@ -42,8 +41,6 @@
 #include "utils/profiler.hpp"
 
 #include <algorithm> 
-
-extern std::vector<float> BoundingBoxes; //TODO: replace global variable by something cleaner
 
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::setRTT(RTT* rtts)
@@ -357,30 +354,37 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         if (CVS->isDefferedEnabled())
         {
             if (CVS->isGlobalIlluminationEnabled() && hasShadow)
-            {    
+            {
+                ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
+                m_lighting_passes.renderRadianceHints( m_shadow_matrices,
+                                                       m_rtts->getRadianceHintFrameBuffer(),
+                                                       m_rtts->getReflectiveShadowMapFrameBuffer());
+            }
+
+            m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
+            glClear(GL_COLOR_BUFFER_BIT);
+            m_rtts->getFBO(FBO_DIFFUSE).bind();
+
+            if (CVS->isGlobalIlluminationEnabled() && hasShadow)
+            {
+                ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
                 m_lighting_passes.renderGlobalIllumination( m_shadow_matrices,
                                                             m_rtts->getRadianceHintFrameBuffer(),
-                                                            m_rtts->getReflectiveShadowMapFrameBuffer(),
-                                                            m_rtts->getFBO(FBO_DIFFUSE),
                                                             m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
                                                             m_rtts->getDepthStencilTexture());
-            }            
-            
-            GLuint specular_probe;
-            if(m_skybox)
+            }
+
+            m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).bind();
+            GLuint specular_probe = 0;
+            if (m_skybox)
             {
                 specular_probe = m_skybox->getSpecularProbe();
             }
-            else 
-            {
-                specular_probe = 0;
-            }              
-            
+
             m_lighting_passes.renderLights( hasShadow,
                                             m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
                                             m_rtts->getDepthStencilTexture(),
                                             m_rtts->getShadowFrameBuffer(),
-                                            m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR),
                                             specular_probe);
         }
         PROFILER_POP_CPU_MARKER();
@@ -469,8 +473,6 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         m_rtts->getFBO(FBO_COLORS).bind();
         m_lighting_passes.renderGlobalIllumination(m_shadow_matrices,
                                                    m_rtts->getRadianceHintFrameBuffer(),
-                                                   m_rtts->getReflectiveShadowMapFrameBuffer(),
-                                                   m_rtts->getFBO(FBO_DIFFUSE),
                                                    m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
                                                    m_rtts->getDepthStencilTexture());
     }
@@ -535,24 +537,6 @@ void ShaderBasedRenderer::renderParticles()
 
 //    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 } //renderParticles
-
-// ----------------------------------------------------------------------------
-void ShaderBasedRenderer::renderBoundingBoxes()
-{
-    Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
-    line->use();
-    line->bindVertexArray();
-    line->bindBuffer();
-    line->setUniforms(irr::video::SColor(255, 255, 0, 0));
-    const float *tmp = BoundingBoxes.data();
-    for (unsigned int i = 0; i < BoundingBoxes.size(); i += 1024 * 6)
-    {
-        unsigned count = std::min((unsigned)BoundingBoxes.size() - i, (unsigned)1024 * 6);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
-
-        glDrawArrays(GL_LINES, 0, count / 3);
-    }
-} //renderBoundingBoxes
 
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::debugPhysics()
@@ -804,9 +788,7 @@ void ShaderBasedRenderer::render(float dt)
 {
     resetObjectCount();
     resetPolyCount();
-    
-    BoundingBoxes.clear(); //TODO: do not use a global variable
-    
+
     setOverrideMaterial();
     
     addItemsInGlowingList();
@@ -858,7 +840,7 @@ void ShaderBasedRenderer::render(float dt)
         
         if (irr_driver->getBoundingBoxesViz())
         {        
-            renderBoundingBoxes();
+            m_draw_calls.renderBoundingBoxes();
         }
         
         debugPhysics();

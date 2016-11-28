@@ -37,7 +37,6 @@
 #include "graphics/stk_animated_mesh.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "graphics/stk_scene_manager.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/texture_manager.hpp"
 #include "guiengine/engine.hpp"

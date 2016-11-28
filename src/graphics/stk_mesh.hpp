@@ -112,7 +112,8 @@ public:
 
 // ----------------------------------------------------------------------------
 class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4,
-                                      core::matrix4, core::matrix4>
+                                      core::matrix4, core::matrix4,
+                                      core::vector2df>
 {};
 
 // ----------------------------------------------------------------------------
@@ -122,7 +123,8 @@ class ListMatAlphaRef : public MeshList<ListMatAlphaRef, GLMesh *, core::matrix4
 
 // ----------------------------------------------------------------------------
 class ListMatNormalMap : public MeshList<ListMatNormalMap, GLMesh *, core::matrix4,
-                                         core::matrix4, core::matrix4>
+                                         core::matrix4, core::matrix4,
+                                         core::vector2df>
 {};
 
 // ----------------------------------------------------------------------------
