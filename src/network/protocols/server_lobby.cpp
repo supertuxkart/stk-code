@@ -62,15 +62,11 @@
  "WAIT_FOR_WORLD_LOADED" -> "WAIT_FOR_WORLD_LOADED" [label="Client or server loaded world"]
  "WAIT_FOR_WORLD_LOADED" -> "signalRaceStartToClients" [label="All clients and server ready"]
  "signalRaceStartToClients" -> "WAIT_FOR_RACE_STARTED"
- "WAIT_FOR_RACE_STARTED" ->  "startedRaceOnClient"
+ "WAIT_FOR_RACE_STARTED" ->  "startedRaceOnClient" [label="Client has started race"]
  "startedRaceOnClient" -> "WAIT_FOR_RACE_STARTED" [label="Not all clients have started"]
  "startedRaceOnClient" -> "DELAY_SERVER" [label="All clients have started"]
  "DELAY_SERVER" -> "DELAY_SERVER" [label="Not done waiting"]
- "DELAY_SERVER" -> "Start Countdown" [label="Server starts race now"]
- "Start Countdown" -> "Wait For Clients"
- "Wait For Clients" -> "Wait For Clients" [label="Client started 'ready set go'"]
- "Wait For Clients" -> "Additional Server Delay"
- "Additional Server Delay" -> "Start Race" [label="Additional delay done"]
+ "DELAY_SERVER" -> "RACING" [label="Server starts race now"]
  }
  \enddot
 
