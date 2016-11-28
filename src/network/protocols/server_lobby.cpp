@@ -42,11 +42,16 @@
 
 
 /** This is the central game setup protocol running in the server. It is
- *  mostly a finite state machine. Note that all nodes in capital leters
- *  are actual states, while nodes starting with a lower case letter are
- *  just functions being called.
+ *  mostly a finite state machine. Note that all nodes in ellipses and light
+ *  grey background are actual states; nodes in boxes and white background 
+ *  are functions triggered from a state or triggering potentially a state
+ *  change.
  \dot
  digraph interaction {
+ node [shape=box]; "Server Constructor"; "playerTrackVote"; "connectionRequested"; 
+                   "signalRaceStartToClients"; "startedRaceOnClient"; "loadWorld";
+ node [shape=ellipse,style=filled,color=lightgrey];
+
  "Server Constructor" -> "INIT_WAN" [label="If WAN game"]
  "Server Constructor" -> "ACCEPTING_CLIENTS" [label="If LAN game"]
  "INIT_WAN" -> "GETTING_PUBLIC_ADDRESS" [label="GetPublicAddress protocol callback"]
@@ -55,10 +60,11 @@
  "connectionRequested" -> "ACCEPTING_CLIENTS" 
  "ACCEPTING_CLIENTS" -> "SELECTING" [label="Start race from authorised client"]
  "SELECTING" -> "SELECTING" [label="Client selects kart, #laps, ..."]
- "SELECTING" -> "playerVoteTrack" [label="Client selected track"]
- "playerVoteTrack" -> "SELECTING" [label="Not all clients have selected"]
- "playerVoteTrack" -> "LOAD_WORLD" [label="All clients have selected"]
- "LOAD_WORLD" -> "WAIT_FOR_WORLD_LOADED" 
+ "SELECTING" -> "playerTrackVote" [label="Client selected track"]
+ "playerTrackVote" -> "SELECTING" [label="Not all clients have selected"]
+ "playerTrackVote" -> "LOAD_WORLD" [label="All clients have selected; signal load_world to clients"]
+ "LOAD_WORLD" -> "loadWorld"
+ "loadWorld" -> "WAIT_FOR_WORLD_LOADED" 
  "WAIT_FOR_WORLD_LOADED" -> "WAIT_FOR_WORLD_LOADED" [label="Client or server loaded world"]
  "WAIT_FOR_WORLD_LOADED" -> "signalRaceStartToClients" [label="All clients and server ready"]
  "signalRaceStartToClients" -> "WAIT_FOR_RACE_STARTED"
@@ -192,7 +198,7 @@ void ServerLobby::update(float dt)
         break;
     }
     case SELECTING:
-        // The function playerVoteTrack will trigger the next state
+        // The function playerTrackVote will trigger the next state
         // once all track votes have been received.
         break;
     case LOAD_WORLD:
