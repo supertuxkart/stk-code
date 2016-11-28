@@ -105,11 +105,8 @@ namespace irr
 #endif
 
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
-__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "%s %d", __FILE__, __LINE__);
-	   if (params.DeviceType == EIDT_ANDROID || (!dev && params.DeviceType == EIDT_BEST)) {
-__android_log_print(ANDROID_LOG_VERBOSE, "native-activity", "%s %d", __FILE__, __LINE__);
-		   dev = new CIrrDeviceAndroid(params);
-	   }
+		if (params.DeviceType == EIDT_ANDROID || (!dev && params.DeviceType == EIDT_BEST))
+			dev = new CIrrDeviceAndroid(params);
 #endif
 
 #ifdef _IRR_COMPILE_WITH_CONSOLE_DEVICE_

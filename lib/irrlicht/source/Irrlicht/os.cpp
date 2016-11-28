@@ -181,7 +181,7 @@ namespace os
 	void Printer::log(const c8* message, ELOG_LEVEL ll)
 	{
 #ifdef _IRR_ANDROID_PLATFORM_
-		__android_log_print(ANDROID_LOG_VERBOSE, "native-activity",  "%s", message);
+		__android_log_print(ANDROID_LOG_VERBOSE, "Irrlicht",  "%s", message);
 #endif
 		if (Logger)
 			Logger->log(message, ll);
@@ -192,7 +192,7 @@ namespace os
 #ifdef _IRR_ANDROID_PLATFORM_
 		char test[200];
 		wcstombs(test, message, 200);
-		__android_log_print(ANDROID_LOG_VERBOSE, "native-activity",  "%s", test);
+		__android_log_print(ANDROID_LOG_VERBOSE, "Irrlicht",  "%s", test);
 #endif
 		if (Logger)
 			Logger->log(message, ll);
@@ -201,7 +201,7 @@ namespace os
 	void Printer::log(const c8* message, const c8* hint, ELOG_LEVEL ll)
 	{
 #ifdef _IRR_ANDROID_PLATFORM_
-		__android_log_print(ANDROID_LOG_VERBOSE, "native-activity",  "%s %s", message, hint);
+		__android_log_print(ANDROID_LOG_VERBOSE, "Irrlicht",  "%s %s", message, hint);
 #endif
 		if (Logger)
 			Logger->log(message, hint, ll);
@@ -210,7 +210,7 @@ namespace os
 	void Printer::log(const c8* message, const io::path& hint, ELOG_LEVEL ll)
 	{
 #ifdef _IRR_ANDROID_PLATFORM_
-		__android_log_print(ANDROID_LOG_VERBOSE, "native-activity",  "%s %s", message, core::stringc(hint).c_str());
+		__android_log_print(ANDROID_LOG_VERBOSE, "Irrlicht",  "%s %s", message, core::stringc(hint).c_str());
 #endif
 		if (Logger)
 			Logger->log(message, hint.c_str(), ll);
