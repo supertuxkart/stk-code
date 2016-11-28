@@ -30,6 +30,7 @@ in vec3 Bitangent;
 in vec3 Origin;
 in vec3 Orientation;
 in vec3 Scale;
+in vec4 misc_data;
 #endif
 
 out vec3 nor;
@@ -38,10 +39,12 @@ out vec3 bitangent;
 out vec2 uv;
 out vec2 uv_bis;
 out vec4 color;
+out vec2 color_change;
 #ifdef Use_Bindless_Texture
 flat out sampler2D handle;
 flat out sampler2D secondhandle;
 flat out sampler2D thirdhandle;
+flat out sampler2D fourthhandle;
 #endif
 
 #stk_include "utils/getworldmatrix.vert"
@@ -56,12 +59,18 @@ void main(void)
     // Keep direction
     tangent = (ViewMatrix * ModelMatrix * vec4(Tangent, 0.)).xyz;
     bitangent = (ViewMatrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
-    uv = Texcoord;
+    uv = (mat4(1., 0., 0., 0.,
+               0., 1., 0., 0.,
+               misc_data.x, misc_data.y, 1., 0.,
+               0., 0., 0., 1.)
+       * vec4(Texcoord, 1., 1.)).xy;
     uv_bis = SecondTexcoord;
     color = Color.zyxw;
+    color_change = misc_data.zw;
 #ifdef Use_Bindless_Texture
     handle = Handle;
     secondhandle = SecondHandle;
     thirdhandle = ThirdHandle;
+    fourthhandle = FourthHandle;
 #endif
 }

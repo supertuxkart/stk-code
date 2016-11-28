@@ -21,30 +21,30 @@
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataSingleTex &instance)
+void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, InstanceSettings is, InstanceDataSingleTex &instance)
 {
-    fillOriginOrientationScale<InstanceDataSingleTex>(node, instance);
+    fillOriginOrientationScale<InstanceDataSingleTex>(STK::tuple_get<0>(is), instance);
     instance.Texture = mesh->TextureHandles[0];
 }
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataDualTex &instance)
+void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, InstanceSettings is, InstanceDataDualTex &instance)
 {
-    fillOriginOrientationScale<InstanceDataDualTex>(node, instance);
+    fillOriginOrientationScale<InstanceDataDualTex>(STK::tuple_get<0>(is), instance);
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
 }
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataThreeTex &instance)
+void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, InstanceSettings is, InstanceDataThreeTex &instance)
 {
-    fillOriginOrientationScale<InstanceDataThreeTex>(node, instance);
-    instance.MiscData.X = 0;
-    instance.MiscData.Y = 0;
-    instance.MiscData.Z = 0;
-    instance.MiscData.W = 0;
+    fillOriginOrientationScale<InstanceDataThreeTex>(STK::tuple_get<0>(is), instance);
+    instance.MiscData.X = STK::tuple_get<1>(is).X;
+    instance.MiscData.Y = STK::tuple_get<1>(is).Y;
+    instance.MiscData.Z = STK::tuple_get<2>(is).X;
+    instance.MiscData.W = STK::tuple_get<2>(is).Y;
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
     instance.ThirdTexture = mesh->TextureHandles[7];
@@ -52,13 +52,13 @@ void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, scene::ISceneNode *
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataFourTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataFourTex &instance)
+void InstanceFiller<InstanceDataFourTex>::add(GLMesh *mesh, InstanceSettings is, InstanceDataFourTex &instance)
 {
-    fillOriginOrientationScale<InstanceDataFourTex>(node, instance);
-    instance.MiscData.X = 0;
-    instance.MiscData.Y = 0;
-    instance.MiscData.Z = 0;
-    instance.MiscData.W = 0;
+    fillOriginOrientationScale<InstanceDataFourTex>(STK::tuple_get<0>(is), instance);
+    instance.MiscData.X = STK::tuple_get<1>(is).X;
+    instance.MiscData.Y = STK::tuple_get<1>(is).Y;
+    instance.MiscData.Z = STK::tuple_get<2>(is).X;
+    instance.MiscData.W = STK::tuple_get<2>(is).Y;
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
     instance.ThirdTexture = mesh->TextureHandles[2];
@@ -67,8 +67,9 @@ void InstanceFiller<InstanceDataFourTex>::add(GLMesh *mesh, scene::ISceneNode *n
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, scene::ISceneNode *node, GlowInstanceData &instance)
+void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, InstanceSettings is, GlowInstanceData &instance)
 {
+    scene::ISceneNode* node = STK::tuple_get<0>(is);
     fillOriginOrientationScale<GlowInstanceData>(node, instance);
     STKMeshSceneNode *nd = dynamic_cast<STKMeshSceneNode*>(node);
     instance.Color = nd->getGlowColor().color;

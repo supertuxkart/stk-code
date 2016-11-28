@@ -75,15 +75,11 @@ public:
 // ============================================================================
 class InstancedObjectPass2Shader : public TextureShader<InstancedObjectPass2Shader, 6>
 {
-private:
-    GLint m_color_change_location;
-
 public:
     InstancedObjectPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
-        m_color_change_location = glGetUniformLocation(m_program, "color_change");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -92,12 +88,6 @@ public:
                            4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedObjectPass2Shader
-
-    virtual bool changeableColor(float hue = 0.0f, float min_sat = 0.0f) const OVERRIDE
-    {
-        glUniform2f(m_color_change_location, hue, min_sat);
-        return true;
-    }   // changeableColor
 };   // InstancedObjectPass2Shader
 
 // ============================================================================

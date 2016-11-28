@@ -7,12 +7,12 @@ uniform sampler2D colorization_mask;
 #ifdef Use_Bindless_Texture
 flat in sampler2D handle;
 flat in sampler2D secondhandle;
+flat in sampler2D fourthhandle;
 #endif
-
-uniform vec2 color_change;
 
 in vec2 uv;
 in vec4 color;
+in vec2 color_change;
 out vec4 FragColor;
 
 #stk_include "utils/getLightFactor.frag"
@@ -24,6 +24,7 @@ void main(void)
     vec4 col = texture(handle, uv);
     float specmap = texture(secondhandle, uv).g;
     float emitmap = texture(secondhandle, uv).b;
+    float mask = texture(fourthhandle, uv).a;
 #ifdef SRGBBindlessFix
     col.xyz = pow(col.xyz, vec3(2.2));
 #endif

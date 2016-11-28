@@ -399,19 +399,24 @@ void initTextures(GLMesh &mesh, Material::ShaderType mat)
     switch (mat)
     {
     default:
+    case Material::SHADERTYPE_VEGETATION:
+        setTexture(mesh, 0, true, getShaderTypeName(mat));
+        setTexture(mesh, 1, false, getShaderTypeName(mat));
+        break;
     case Material::SHADERTYPE_SOLID:
     case Material::SHADERTYPE_ALPHA_TEST:
-    case Material::SHADERTYPE_VEGETATION:
     case Material::SHADERTYPE_SPHERE_MAP:
     case Material::SHADERTYPE_SOLID_UNLIT:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
         setTexture(mesh, 1, false, getShaderTypeName(mat));
+        setTexture(mesh, 7, false, getShaderTypeName(mat));
         break;
     case Material::SHADERTYPE_DETAIL_MAP:
     case Material::SHADERTYPE_NORMAL_MAP:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
         setTexture(mesh, 1, false, getShaderTypeName(mat));
         setTexture(mesh, 2, false, getShaderTypeName(mat));
+        setTexture(mesh, 7, false, getShaderTypeName(mat));
         break;
     case Material::SHADERTYPE_SPLATTING:
         setTexture(mesh, 0, true, getShaderTypeName(mat));

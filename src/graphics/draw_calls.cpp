@@ -254,53 +254,27 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     if (node->glow())
                     {
                         m_glow_pass_mesh[mesh->mb].m_mesh = mesh;
-                        m_glow_pass_mesh[mesh->mb].m_scene_nodes.emplace_back(Node);
+                        m_glow_pass_mesh[mesh->mb].m_instance_settings
+                            .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f));
                     }
-
-                    if (Mat != Material::SHADERTYPE_SPLATTING && mesh->texture_trans.getLength() == 0.0f)
+                    if (Mat == Material::SHADERTYPE_SPLATTING)
                     {
-                        std::pair<scene::IMeshBuffer*, RenderInfo*> meshRenderInfo(mesh->mb, mesh->m_render_info);
-                        m_solid_pass_mesh[Mat][meshRenderInfo].m_mesh = mesh;
-                        m_solid_pass_mesh[Mat][meshRenderInfo].m_scene_nodes.emplace_back(Node);
+                        //TODO: write instanced splatting solid shader and remove this if
+                        core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
+                        ModelMatrix.getInverse(InvModelMatrix);
+                        ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                     }
                     else
                     {
-                        core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
-                        ModelMatrix.getInverse(InvModelMatrix);
-                        switch (Mat)
-                        {
-                        case Material::SHADERTYPE_SOLID:
-                            ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
-                                (mesh->m_render_info && mesh->m_material ?
-                                core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
-                                core::vector2df(0.0f, 0.0f)));
-                            break;
-                        case Material::SHADERTYPE_ALPHA_TEST:
-                            ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
-                            break;
-                        case Material::SHADERTYPE_SOLID_UNLIT:
-                            ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
-                            break;
-                        case Material::SHADERTYPE_SPLATTING:
-                            ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
-                            break;
-                        case Material::SHADERTYPE_ALPHA_BLEND:
-                            break;
-                        case Material::SHADERTYPE_ADDITIVE:
-                            break;
-                        case Material::SHADERTYPE_VEGETATION:
-                            break;
-                        case Material::SHADERTYPE_WATER:
-                            break;
-                        case Material::SHADERTYPE_SPHERE_MAP:
-                            break;
-                        case Material::SHADERTYPE_NORMAL_MAP:
-                            break;
-                        case Material::SHADERTYPE_DETAIL_MAP:
-                            break;
-                        default:
-                            Log::warn("DrawCalls", "Unknown material type: %d", Mat);
-                        }
+                        // Only take render info into account if the node is not static (animated)
+                        // So they can have different animation
+                        std::pair<scene::IMeshBuffer*, RenderInfo*> mesh_render_info(mesh->mb,
+                            dynamic_cast<STKMeshSceneNode*>(Node) == NULL ? mesh->m_render_info : NULL);
+                        m_solid_pass_mesh[Mat][mesh_render_info].m_mesh = mesh;
+                        m_solid_pass_mesh[Mat][mesh_render_info].m_instance_settings.emplace_back(Node, mesh->texture_trans,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                     }
                 }
             }
@@ -369,7 +343,8 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                 for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
                     m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].m_mesh = mesh;
-                    m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].m_scene_nodes.emplace_back(Node);
+                    m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].m_instance_settings
+                        .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f));
                 }
             }
             else
@@ -425,21 +400,20 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
         {
             if (CVS->supportsIndirectInstancingRendering())
             {
-                if (Mat == Material::SHADERTYPE_SPLATTING)
+                for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
-                    for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
+                    if (Mat == Material::SHADERTYPE_SPLATTING)
                     {
+                        //TODO: write instanced splatting rsm shader and remove this if
                         core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                         ModelMatrix.getInverse(InvModelMatrix);
                         ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                     }
-                }
-                else
-                {
-                    for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
+                    else
                     {
                         m_reflective_shadow_map_mesh[Mat][mesh->mb].m_mesh = mesh;
-                        m_reflective_shadow_map_mesh[Mat][mesh->mb].m_scene_nodes.emplace_back(Node);
+                        m_reflective_shadow_map_mesh[Mat][mesh->mb].m_instance_settings
+                            .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f));
                     }
                 }
             }
