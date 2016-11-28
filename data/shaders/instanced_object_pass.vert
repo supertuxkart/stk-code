@@ -59,11 +59,7 @@ void main(void)
     // Keep direction
     tangent = (ViewMatrix * ModelMatrix * vec4(Tangent, 0.)).xyz;
     bitangent = (ViewMatrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
-    uv = (mat4(1., 0., 0., 0.,
-               0., 1., 0., 0.,
-               misc_data.x, misc_data.y, 1., 0.,
-               0., 0., 0., 1.)
-       * vec4(Texcoord, 1., 1.)).xy;
+    uv = vec2(Texcoord.x + misc_data.x, Texcoord.y + misc_data.y);
     uv_bis = SecondTexcoord;
     color = Color.zyxw;
     color_change = misc_data.zw;

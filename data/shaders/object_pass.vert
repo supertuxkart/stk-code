@@ -54,10 +54,6 @@ void main(void)
     // Keep direction
     tangent = (ViewMatrix * ModelMatrix * vec4(Tangent, 0.)).xyz;
     bitangent = (ViewMatrix * ModelMatrix * vec4(Bitangent, 0.)).xyz;
-    uv = (mat4(1., 0., 0., 0.,
-               0., 1., 0., 0.,
-               texture_trans.x, texture_trans.y, 1., 0.,
-               0., 0., 0., 1.)
-       * vec4(Texcoord, 1., 1.)).xy;
+    uv = vec2(Texcoord.x + texture_trans.x, Texcoord.y + texture_trans.y);
     uv_bis = SecondTexcoord;
 }
