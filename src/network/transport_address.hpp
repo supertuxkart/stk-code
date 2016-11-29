@@ -58,6 +58,26 @@ public:
     }   // TransportAddress(EnetAddress)
 
     // ------------------------------------------------------------------------
+    /** Construct an IO address from a string in the format x.x.x.x:xxx. */
+    TransportAddress(const std::string& str)
+    {
+        std::string combined = StringUtils::replace(str, ":", ".");
+        std::vector<uint32_t> ip = StringUtils::splitToUInt(combined, '.');
+        m_ip = 0;
+        m_port = 0;
+        if (ip.size() == 5)
+        {
+            m_ip = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3];
+            m_port = (uint16_t)(ip[4] < 65536 ? ip[4] : 0);
+        }
+        else
+        {
+            m_ip = 0;
+            m_port = 0;
+        }
+    }   // TransportAddress(string of ip)
+
+    // ------------------------------------------------------------------------
     ~TransportAddress() {}
     // ------------------------------------------------------------------------
 private:
