@@ -41,6 +41,7 @@ extern "C" {
 #        define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
 #    endif
 #elif defined(USE_GLES2)
+#    define __gl2_h_
 #    include <GLES3/gl3.h>
 #    include <GLES3/gl3ext.h>
 #    include <GLES2/gl2ext.h>
