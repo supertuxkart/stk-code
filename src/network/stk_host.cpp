@@ -540,7 +540,7 @@ void* STKHost::mainLoop(void* self)
     {
         if(myself->m_lan_network)
         {
-            myself->handleLANRequests();
+            myself->handleDirectSocketRequest();
         }   // if discovery host
 
         while (enet_host_service(host, &event, 20) != 0)
@@ -585,11 +585,15 @@ void* STKHost::mainLoop(void* self)
 }   // mainLoop
 
 // ----------------------------------------------------------------------------
-/** Handles LAN related messages. It checks for any LAN broadcast messages,
- *  and if a valid LAN server-request message is received, will answer
- *  with a message containing server details (and sender IP address and port).
+/** Handles a direct request given to a socket. This is typically a LAN 
+ *  request, but can also be used if the server is public (i.e. not behind
+ *  a fire wall) to allow direct connection to the server (without using the
+ *  STK server). It checks for any messages (i.e. a LAN broadcast requesting
+ *  server details or a connection request) and if a valid LAN server-request
+ *  message is received, will answer with a message containing server details
+ *  (and sender IP address and port).
  */
-void STKHost::handleLANRequests()
+void STKHost::handleDirectSocketRequest()
 {
     const int LEN=2048;
     char buffer[LEN];
@@ -632,7 +636,7 @@ void STKHost::handleLANRequests()
         Log::info("STKHost", "Received unknown command '%s'",
                   std::string(buffer, len).c_str());
 
-}   // handleLANRequests
+}   // handleDirectSocketRequest
 
 // ----------------------------------------------------------------------------
 /** \brief Tells if a peer is known.
