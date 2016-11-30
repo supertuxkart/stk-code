@@ -53,7 +53,7 @@ void InstanceFiller<InstanceDataThreeTex>::add(GLMesh* mesh,
     instance.MiscData.W = STK::tuple_get<2>(is).Y;
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
-    instance.ThirdTexture = mesh->TextureHandles[7];
+    instance.ThirdTexture = mesh->TextureHandles[2];
 }
 
 // ----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ void InstanceFiller<InstanceDataFourTex>::add(GLMesh* mesh,
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
     instance.ThirdTexture = mesh->TextureHandles[2];
-    instance.FourthTexture = mesh->TextureHandles[7];
+    instance.FourthTexture = mesh->TextureHandles[3];
 }
 
 // ----------------------------------------------------------------------------

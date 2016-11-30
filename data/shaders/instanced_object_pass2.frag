@@ -7,7 +7,7 @@ uniform sampler2D colorization_mask;
 #ifdef Use_Bindless_Texture
 flat in sampler2D handle;
 flat in sampler2D secondhandle;
-flat in sampler2D fourthhandle;
+flat in sampler2D thirdhandle;
 #endif
 
 in vec2 uv;
@@ -24,7 +24,7 @@ void main(void)
     vec4 col = texture(handle, uv);
     float specmap = texture(secondhandle, uv).g;
     float emitmap = texture(secondhandle, uv).b;
-    float mask = texture(fourthhandle, uv).a;
+    float mask = texture(thirdhandle, uv).a;
 #ifdef SRGBBindlessFix
     col.xyz = pow(col.xyz, vec3(2.2));
 #endif

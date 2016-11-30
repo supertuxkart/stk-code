@@ -109,7 +109,7 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
         m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     m.setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
     m.setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-    m.setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m.setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     m_mesh             = irr_driver->createQuadMesh(&m);
     m_mesh_buffer      = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);

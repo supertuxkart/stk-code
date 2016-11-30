@@ -5,7 +5,7 @@ uniform sampler2D glossMap;
 
 #ifdef Use_Bindless_Texture
 flat in sampler2D secondhandle;
-flat in sampler2D thirdhandle;
+flat in sampler2D fourthhandle;
 #endif
 in vec3 tangent;
 in vec3 bitangent;
@@ -18,7 +18,7 @@ void main()
 {
     // normal in Tangent Space
 #ifdef Use_Bindless_Texture
-    vec3 TS_normal = 2.0 * texture(thirdhandle, uv).rgb - 1.0;
+    vec3 TS_normal = 2.0 * texture(fourthhandle, uv).rgb - 1.0;
     float gloss = texture(secondhandle, uv).x;
 #else
     vec3 TS_normal = 2.0 * texture(normalMap, uv).rgb - 1.0;

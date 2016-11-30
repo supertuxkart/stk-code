@@ -409,14 +409,14 @@ void initTextures(GLMesh &mesh, Material::ShaderType mat)
     case Material::SHADERTYPE_SOLID_UNLIT:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
         setTexture(mesh, 1, false, getShaderTypeName(mat));
-        setTexture(mesh, 7, false, getShaderTypeName(mat));
+        setTexture(mesh, 2, false, getShaderTypeName(mat));
         break;
     case Material::SHADERTYPE_DETAIL_MAP:
     case Material::SHADERTYPE_NORMAL_MAP:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
         setTexture(mesh, 1, false, getShaderTypeName(mat));
         setTexture(mesh, 2, false, getShaderTypeName(mat));
-        setTexture(mesh, 7, false, getShaderTypeName(mat));
+        setTexture(mesh, 3, false, getShaderTypeName(mat));
         break;
     case Material::SHADERTYPE_SPLATTING:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
@@ -426,6 +426,7 @@ void initTextures(GLMesh &mesh, Material::ShaderType mat)
         setTexture(mesh, 4, true, getShaderTypeName(mat));
         setTexture(mesh, 5, true, getShaderTypeName(mat));
         setTexture(mesh, 6, false, getShaderTypeName(mat));
+        setTexture(mesh, 7, false, getShaderTypeName(mat));
         break;
     }
 }   // initTextures

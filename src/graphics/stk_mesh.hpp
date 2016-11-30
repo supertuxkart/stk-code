@@ -57,7 +57,7 @@ struct GLMesh
     size_t vaoBaseVertex;
     size_t vaoOffset;
     video::E_VERTEX_TYPE VAOType;
-    uint64_t TextureHandles[6];
+    uint64_t TextureHandles[8];
     scene::IMeshBuffer *mb;
     RenderInfo* m_render_info;
     Material* m_material;
