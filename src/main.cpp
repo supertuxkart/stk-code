@@ -980,6 +980,13 @@ int handleCmdLine()
     // Networking command lines
     NetworkConfig::get()->
         setMaxPlayers(UserConfigParams::m_server_max_players);
+    if (CommandLine::has("--port", &n))
+    {
+        // We don't know if this instance is going to be a client
+        // or server, so just set both ports, only one will be used anyway
+        NetworkConfig::get()->setClientPort(n);
+        NetworkConfig::get()->setServerPort(n);
+    }
     if (CommandLine::has("--connect-now", &s))
     {
         TransportAddress ip(s);
