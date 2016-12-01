@@ -215,12 +215,12 @@ void ServerLobby::update(float dt)
             m_client_ready_count.getData() == m_game_setup->getPlayerCount())
         {
             signalRaceStartToClients();
+            m_server_delay = 0.02f;
+            m_client_ready_count.getData() = 0;
+            m_client_ready_count.unlock();
         }
         // Initialise counter again, to wait for all clients to indicate that
         // they have started the race/
-        m_server_delay = 0.02f;
-        m_client_ready_count.getData() = 0;
-        m_client_ready_count.unlock();
         break;
     case WAIT_FOR_RACE_STARTED: 
         // The function finishedLoadingWorldClient() will trigger the
