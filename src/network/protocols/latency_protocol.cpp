@@ -80,8 +80,6 @@ bool LatencyProtocol::notifyEventAsynchronous(Event* event)
         response->addUInt8(0).addUInt32(sequence);
         event->getPeer()->sendPacket(response, false);
         delete response;
-        Log::verbose("LatencyProtocol", "Answering sequence %u at %lf",
-                     sequence, StkTime::getRealTime());
     }
     else // receive response to a ping request
     {
@@ -131,9 +129,6 @@ void LatencyProtocol::asynchronousUpdate()
             NetworkString *ping_request = 
                             getNetworkString(5);
             ping_request->addUInt8(1).addUInt32(m_pings[i].size());
-            Log::verbose("LatencyProtocol",
-                         "Added sequence number %u for peer %d at %lf",
-                         m_pings[i].size(), i, StkTime::getRealTime());
             m_pings[i] [ m_pings_count ] = current_time;
             peers[i]->sendPacket(ping_request, false);
             delete ping_request;
