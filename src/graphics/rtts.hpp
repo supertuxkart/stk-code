@@ -18,8 +18,9 @@
 #ifndef HEADER_RTTS_HPP
 #define HEADER_RTTS_HPP
 
-#include "utils/ptr_vector.hpp"
 #include "utils/leak_check.hpp"
+#include "utils/ptr_vector.hpp"
+#include "utils/types.hpp"
 #include <stddef.h>
 
 class FrameBuffer;
