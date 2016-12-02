@@ -372,7 +372,10 @@ void STKMeshSceneNode::render()
                                                      ::getInstance()->m_sampler_ids[0]);
                 }
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                {
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                    insertTextureHandle(mesh.TextureHandles[0]);
+                }
                 Shaders::ObjectPass1Shader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
             }
             else
@@ -425,23 +428,32 @@ void STKMeshSceneNode::render()
                 if (!mesh.TextureHandles[0])
                     mesh.TextureHandles[0] = 
                     glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), 
-                                Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+                                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                {
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                    insertTextureHandle(mesh.TextureHandles[0]);
+                }
 
                 if (!mesh.TextureHandles[1])
                     mesh.TextureHandles[1] =
                     glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[1]),
-                                Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+                                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[1]))
+                {
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[1]);
+                    insertTextureHandle(mesh.TextureHandles[1]);
+                }
 
                 if (!mesh.TextureHandles[2])
                     mesh.TextureHandles[2] =
                     glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[2]),
-                                Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+                                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[2]))
+                {
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[2]);
+                    insertTextureHandle(mesh.TextureHandles[2]);
+                }
 
                 Shaders::ObjectPass2Shader::getInstance()
                     ->setTextureHandles(DiffuseHandle, SpecularHandle, SSAOHandle,
@@ -530,9 +542,12 @@ void STKMeshSceneNode::render()
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] =
                             glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]),
-                                   Shaders::TransparentFogShader::getInstance()->m_sampler_ids[0]);
+                                   Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
                         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                        {
                             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                            insertTextureHandle(mesh.TextureHandles[0]);
+                        }
                         Shaders::TransparentFogShader::getInstance()
                                     ->setTextureHandles(mesh.TextureHandles[0]);
                     }
@@ -570,9 +585,12 @@ void STKMeshSceneNode::render()
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] =
                             glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]),
-                            Shaders::TransparentShader::getInstance()->m_sampler_ids[0]);
+                            Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
                         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                        {
                             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                            insertTextureHandle(mesh.TextureHandles[0]);
+                        }
                         Shaders::TransparentShader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
                     }
                     else

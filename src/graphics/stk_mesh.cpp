@@ -363,7 +363,10 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
                 Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
         }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
+        {
             glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
+            insertTextureHandle(mesh.TextureHandles[i]);
+        }
     }
 #endif
 }   // setTexture
@@ -449,7 +452,10 @@ void initTexturesTransparent(GLMesh &mesh)
                 Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
         }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+        {
             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+            insertTextureHandle(mesh.TextureHandles[0]);
+        }
     }
 #endif
 }   // initTexturesTransparent
