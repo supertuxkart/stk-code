@@ -718,7 +718,7 @@ void ShaderBasedRenderer::addSkyBox(const std::vector<video::ITexture*> &texture
     if(spherical_harmonics_textures.size() == 6)
     {
         m_spherical_harmonics->setTextures(spherical_harmonics_textures);
-    }    
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -750,7 +750,7 @@ GLuint ShaderBasedRenderer::getDepthStencilTexture() const
 void ShaderBasedRenderer::setAmbientLight(const video::SColorf &light,
                                           bool force_SH_computation)
 {
-    if(!m_spherical_harmonics->has6Textures() || force_SH_computation)
+    if (force_SH_computation)
         m_spherical_harmonics->setAmbientLight(light.toSColor());
 }
 
