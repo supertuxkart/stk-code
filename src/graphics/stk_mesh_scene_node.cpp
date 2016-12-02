@@ -438,7 +438,7 @@ void STKMeshSceneNode::render()
 
                 if (!mesh.TextureHandles[2])
                     mesh.TextureHandles[2] =
-                    glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[7]),
+                    glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[2]),
                                 Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[2]))
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[2]);
@@ -456,7 +456,7 @@ void STKMeshSceneNode::render()
                 irr_driver->getRenderTargetTexture(RTT_HALF1_R),
                 getTextureGLuint(mesh.textures[0]),
                 getTextureGLuint(mesh.textures[1]),
-                getTextureGLuint(mesh.textures[7]));
+                getTextureGLuint(mesh.textures[2]));
             Shaders::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation,
                                                                    mesh.texture_trans,
                                                                    core::vector2df(0.0f, 0.0f));
