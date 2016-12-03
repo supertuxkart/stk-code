@@ -30,7 +30,6 @@ class RenderInfo;
 
 enum InstanceType
 {
-    InstanceTypeDualTex,
     InstanceTypeThreeTex,
     InstanceTypeFourTex,
     InstanceTypeShadow,
@@ -63,34 +62,6 @@ struct InstanceDataSingleTex
         float Z;
     } Scale;
     uint64_t Texture;
-#ifdef WIN32
-};
-#else
-} __attribute__((packed));
-#endif
-
-struct InstanceDataDualTex
-{
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Origin;
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Orientation;
-    struct
-    {
-        float X;
-        float Y;
-        float Z;
-    } Scale;
-    uint64_t Texture;
-    uint64_t SecondTexture;
 #ifdef WIN32
 };
 #else

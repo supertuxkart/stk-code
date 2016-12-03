@@ -129,7 +129,7 @@ class ListMatNormalMap : public MeshList<ListMatNormalMap, GLMesh *, core::matri
 
 // ----------------------------------------------------------------------------
 class ListMatGrass : public MeshList<ListMatGrass, GLMesh *, core::matrix4, 
-                                     core::matrix4, core::vector3df>
+                                     core::matrix4, core::vector3df, core::vector2df>
 {};
 
 // ----------------------------------------------------------------------------

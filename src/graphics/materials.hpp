@@ -536,26 +536,27 @@ public:
 
 
 // ============================================================================
-class GrassPass2Shader : public TextureShader<GrassPass2Shader, 6, core::matrix4,
-                                       core::vector3df>
+class GrassPass2Shader : public TextureShader<GrassPass2Shader, 7, core::matrix4,
+                                       core::vector3df, core::vector2df>
 {
 public:
     GrassPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "grass_pass.vert",
                             GL_FRAGMENT_SHADER, "grass_pass2.frag");
-        assignUniforms("ModelMatrix", "windDir");
+        assignUniforms("ModelMatrix", "windDir", "color_change");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "dtex", ST_NEAREST_FILTERED,
-                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+                           4, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           6, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // GrassPass2Shader
 };   // GrassPass2Shader
 
 // ============================================================================
-class InstancedGrassPass2Shader : public TextureShader<InstancedGrassPass2Shader, 6,
+class InstancedGrassPass2Shader : public TextureShader<InstancedGrassPass2Shader, 7,
                                              core::vector3df>
 {
 public:
@@ -569,7 +570,8 @@ public:
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "dtex", ST_NEAREST_FILTERED,
                            4, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                           5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+                           5, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           6, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedGrassPass2Shader
 };   // InstancedGrassPass2Shader
 
@@ -714,9 +716,9 @@ struct GrassMat
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType
         = Material::SHADERTYPE_VEGETATION;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t> SecondPassTextures;
+    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<size_t> ShadowTextures;
     static const STK::Tuple<size_t> RSMTextures;
 };   // GrassMat

@@ -315,7 +315,10 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
                     case Material::SHADERTYPE_VEGETATION:
-                        ListMatGrass::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
+                        ListMatGrass::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_ALPHA_BLEND:
                         break;
@@ -378,7 +381,10 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         ListMatSplatting::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
                     case Material::SHADERTYPE_VEGETATION:
-                        ListMatGrass::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
+                        ListMatGrass::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                     case Material::SHADERTYPE_ALPHA_BLEND:
                         break;
                     case Material::SHADERTYPE_ADDITIVE:
@@ -448,7 +454,10 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
                     case Material::SHADERTYPE_VEGETATION:
-                        ListMatGrass::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
+                        ListMatGrass::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_ALPHA_BLEND:
                         break;

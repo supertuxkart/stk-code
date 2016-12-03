@@ -88,7 +88,7 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
 
 // ----------------------------------------------------------------------------
 template<>
-void renderMeshes2ndPass<GrassMat, 3, 1>
+void renderMeshes2ndPass<GrassMat, 4, 3, 1>
     (const std::vector<uint64_t> &Prefilled_Handle,
      const std::vector<GLuint> &Prefilled_Tex)
 {
@@ -125,7 +125,7 @@ void renderMeshes2ndPass<GrassMat, 3, 1>
                 expandTex(mesh, GrassMat::SecondPassTextures, Prefilled_Tex[0],
                           Prefilled_Tex[1], Prefilled_Tex[2], Prefilled_Tex[3]);
         }
-        CustomUnrollArgs<3, 1>::drawMesh<GrassMat::SecondPassShader>(meshes.at(i));
+        CustomUnrollArgs<4, 3, 1>::drawMesh<GrassMat::SecondPassShader>(meshes.at(i));
     }
 }   // renderMeshes2ndPass
 
@@ -196,7 +196,7 @@ void GL3DrawPolicy::drawSolidSecondPass (const DrawCalls& draw_calls,
     renderMeshes2ndPass<SplattingMat,    1      > (handles, prefilled_tex);
     renderMeshes2ndPass<SphereMap,       2, 1   > (handles, prefilled_tex);
     renderMeshes2ndPass<DetailMat,       1      > (handles, prefilled_tex);
-    renderMeshes2ndPass<GrassMat,        3, 1   > (handles, prefilled_tex);
+    renderMeshes2ndPass<GrassMat,        4, 3, 1> (handles, prefilled_tex);
     renderMeshes2ndPass<NormalMat,       4, 3, 1> (handles, prefilled_tex);
 }
 

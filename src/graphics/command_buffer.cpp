@@ -31,17 +31,6 @@ void InstanceFiller<InstanceDataSingleTex>::add(GLMesh* mesh,
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataDualTex>::add(GLMesh* mesh,
-                                              const InstanceSettings& is,
-                                              InstanceDataDualTex& instance)
-{
-    fillOriginOrientationScale<InstanceDataDualTex>(STK::tuple_get<0>(is), instance);
-    instance.Texture = mesh->TextureHandles[0];
-    instance.SecondTexture = mesh->TextureHandles[1];
-}
-
-// ----------------------------------------------------------------------------
-template<>
 void InstanceFiller<InstanceDataThreeTex>::add(GLMesh* mesh,
                                                const InstanceSettings& is,
                                                InstanceDataThreeTex& instance)
@@ -170,18 +159,13 @@ void SolidCommandBuffer::fill(SolidPassMeshMap *mesh_map)
     
     if(!CVS->supportsAsyncInstanceUpload())
         mapIndirectBuffer();
-    
-    std::vector<int> dual_tex_material_list =
-        createVector<int>(Material::SHADERTYPE_VEGETATION);
-
-    fillInstanceData<InstanceDataDualTex, SolidPassMeshMap>
-        (mesh_map, dual_tex_material_list, InstanceTypeDualTex);
 
     std::vector<int> three_tex_material_list =
         createVector<int>(Material::SHADERTYPE_SOLID,
                           Material::SHADERTYPE_ALPHA_TEST,
                           Material::SHADERTYPE_SOLID_UNLIT,
-                          Material::SHADERTYPE_SPHERE_MAP);
+                          Material::SHADERTYPE_SPHERE_MAP,
+                          Material::SHADERTYPE_VEGETATION);
 
     fillInstanceData<InstanceDataThreeTex, SolidPassMeshMap>
         (mesh_map, three_tex_material_list, InstanceTypeThreeTex);

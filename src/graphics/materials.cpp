@@ -48,8 +48,8 @@ const STK::Tuple<size_t> UnlitMat::RSMTextures = STK::Tuple<size_t>(0);
 // ----------------------------------------------------------------------------
 const STK::Tuple<size_t, size_t> GrassMat::FirstPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<size_t, size_t> GrassMat::SecondPassTextures
-    = STK::Tuple<size_t, size_t>(0, 1);
+const STK::Tuple<size_t, size_t, size_t> GrassMat::SecondPassTextures
+    = STK::Tuple<size_t, size_t, size_t>(0, 1, 2);
 const STK::Tuple<size_t> GrassMat::ShadowTextures = STK::Tuple<size_t>(0);
 const STK::Tuple<size_t> GrassMat::RSMTextures = STK::Tuple<size_t>(0);
 
