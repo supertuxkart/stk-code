@@ -60,6 +60,7 @@ static std::vector<uint64_t> texture_handles;
 
 void resetTextureTable()
 {
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         // Driver seems to crash if texture handles are not cleared...
@@ -70,6 +71,7 @@ void resetTextureTable()
         Shaders::ObjectPass1Shader::getInstance()->recreateTrilinearSampler(0);
         texture_handles.clear();
     }
+#endif
     AlreadyTransformedTexture.clear();
 }
 

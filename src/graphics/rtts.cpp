@@ -292,6 +292,7 @@ RTT::RTT(size_t width, size_t height)
     glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         uint64_t handle =
@@ -315,16 +316,19 @@ RTT::RTT(size_t width, size_t height)
         glMakeTextureHandleResidentARB(handle);
         m_prefilled_handles.push_back(handle);
     }
+#endif
 }
 
 RTT::~RTT()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         for (uint64_t& handle : m_prefilled_handles)
             glMakeTextureHandleNonResidentARB(handle);
     }
+#endif
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
     if (CVS->isShadowEnabled())
