@@ -125,7 +125,7 @@ void renderMeshes2ndPass<GrassMat, 3, 1>
                 expandTex(mesh, GrassMat::SecondPassTextures, Prefilled_Tex[0],
                           Prefilled_Tex[1], Prefilled_Tex[2], Prefilled_Tex[3]);
         }
-        CustomUnrollArgs<3, 1>::template drawMesh<GrassMat::SecondPassShader>(meshes.at(i));
+        CustomUnrollArgs<3, 1>::drawMesh<GrassMat::SecondPassShader>(meshes.at(i));
     }
 }   // renderMeshes2ndPass
 
