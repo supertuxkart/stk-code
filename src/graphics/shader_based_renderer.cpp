@@ -53,7 +53,8 @@ void ShaderBasedRenderer::setRTT(RTT* rtts)
                                  rtts->getRenderTarget(RTT_SPECULAR),
                                  rtts->getRenderTarget(RTT_HALF1_R),
                                  rtts->getDepthStencilTexture());
-        m_geometry_passes->setFirstPassRenderTargets(prefilled_textures);
+        m_geometry_passes->setFirstPassRenderTargets(prefilled_textures,
+            rtts->getPrefilledHandles());
         m_rtts = rtts;
     }
     else if (rtts == NULL)
@@ -718,7 +719,7 @@ void ShaderBasedRenderer::addSkyBox(const std::vector<video::ITexture*> &texture
     if(spherical_harmonics_textures.size() == 6)
     {
         m_spherical_harmonics->setTextures(spherical_harmonics_textures);
-    }    
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -750,7 +751,7 @@ GLuint ShaderBasedRenderer::getDepthStencilTexture() const
 void ShaderBasedRenderer::setAmbientLight(const video::SColorf &light,
                                           bool force_SH_computation)
 {
-    if(!m_spherical_harmonics->has6Textures() || force_SH_computation)
+    if (force_SH_computation)
         m_spherical_harmonics->setAmbientLight(light.toSColor());
 }
 

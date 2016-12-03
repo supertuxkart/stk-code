@@ -792,7 +792,7 @@ void Track::createPhysicsModel(unsigned int main_track_count)
             // Gloss
             mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
             // Colorization mask
-            mb->getMaterial().setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            mb->getMaterial().setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
         }
         else
             irr_driver->removeNode(m_static_physics_only_nodes[i]);
@@ -1819,8 +1819,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // ---- Set ambient color
     m_ambient_color = m_default_ambient_color;
-    irr_driver->setAmbientLight(m_ambient_color, false);
-    
+    irr_driver->setAmbientLight(m_ambient_color,
+        m_spherical_harmonics_textures.size() != 6/*force_SH_computation*/);
+
     // ---- Create sun (non-ambient directional light)
     if (m_sun_position.getLengthSQ() < 0.03f)
     {

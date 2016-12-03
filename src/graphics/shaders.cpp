@@ -350,7 +350,7 @@ Shaders::ObjectPass2Shader::ObjectPass2Shader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "object_pass2.frag");
-    assignUniforms("ModelMatrix", "TextureMatrix", "color_change");
+    assignUniforms("ModelMatrix", "texture_trans", "color_change");
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                        1, "SpecularMap", ST_NEAREST_FILTERED,
                        2, "SSAO", ST_BILINEAR_FILTERED,
@@ -364,7 +364,7 @@ Shaders::TransparentShader::TransparentShader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "transparent.frag");
-    assignUniforms("ModelMatrix", "TextureMatrix", "custom_alpha");
+    assignUniforms("ModelMatrix", "texture_trans", "custom_alpha");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // TransparentShader
 
@@ -373,7 +373,7 @@ Shaders::TransparentFogShader::TransparentFogShader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "transparentfog.frag");
-    assignUniforms("ModelMatrix", "TextureMatrix", "fogmax", "startH",
+    assignUniforms("ModelMatrix", "texture_trans", "fogmax", "startH",
                    "endH", "start", "end", "col");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // TransparentFogShader

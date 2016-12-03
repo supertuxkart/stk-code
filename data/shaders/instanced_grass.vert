@@ -10,8 +10,8 @@ layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
 #ifdef Use_Bindless_Texture
-layout(location = 10) in sampler2D Handle;
-layout(location = 11) in sampler2D SecondHandle;
+layout(location = 11) in sampler2D Handle;
+layout(location = 12) in sampler2D SecondHandle;
 #endif
 
 #else

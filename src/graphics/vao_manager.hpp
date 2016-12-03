@@ -32,6 +32,7 @@ enum InstanceType
 {
     InstanceTypeDualTex,
     InstanceTypeThreeTex,
+    InstanceTypeFourTex,
     InstanceTypeShadow,
     InstanceTypeRSM,
     InstanceTypeGlow,
@@ -116,9 +117,53 @@ struct InstanceDataThreeTex
         float Y;
         float Z;
     } Scale;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+        float W;
+    } MiscData;
     uint64_t Texture;
     uint64_t SecondTexture;
     uint64_t ThirdTexture;
+#ifdef WIN32
+};
+#else
+} __attribute__((packed));
+#endif
+
+struct InstanceDataFourTex
+{
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Origin;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Orientation;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Scale;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+        float W;
+    } MiscData;
+    uint64_t Texture;
+    uint64_t SecondTexture;
+    uint64_t ThirdTexture;
+    uint64_t FourthTexture;
 #ifdef WIN32
 };
 #else

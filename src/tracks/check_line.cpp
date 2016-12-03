@@ -104,7 +104,7 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
         buffer->recalculateBoundingBox();
         buffer->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
         buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-        buffer->getMaterial().setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
         buffer->getMaterial().BackfaceCulling = false;
         //mesh->setBoundingBox(buffer->getBoundingBox());
         m_debug_node = irr_driver->addMesh(mesh, "checkdebug");

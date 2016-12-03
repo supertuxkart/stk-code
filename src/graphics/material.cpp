@@ -733,7 +733,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             glossytex = getUnicolorTexture(SColor(0, 0, 0, 0));
         }
 
-        if (!m->getTexture(7))
+        if (!m->getTexture(2))
         {
             // Only set colorization mask if not set
             ITexture *colorization_mask_tex = getUnicolorTexture(SColor(0, 0, 0, 0));
@@ -741,7 +741,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             {
                 colorization_mask_tex = irr_driver->getTexture(m_colorization_mask);
             }
-            m->setTexture(7, colorization_mask_tex);
+            m->setTexture(2, colorization_mask_tex);
         }
 
 
@@ -796,26 +796,26 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             return;
         case SHADERTYPE_SPLATTING:
             tex = irr_driver->getTexture(m_splatting_texture_1);
-            m->setTexture(2, tex);
+            m->setTexture(3, tex);
 
             if (m_splatting_texture_2.size() > 0)
             {
                 tex = irr_driver->getTexture(m_splatting_texture_2);
             }
-            m->setTexture(3, tex);
+            m->setTexture(4, tex);
 
             if (m_splatting_texture_3.size() > 0)
             {
                 tex = irr_driver->getTexture(m_splatting_texture_3);
             }
-            m->setTexture(4, tex);
+            m->setTexture(5, tex);
 
             if (m_splatting_texture_4.size() > 0)
             {
                 tex = irr_driver->getTexture(m_splatting_texture_4);
             }
-            m->setTexture(5, tex);
-            m->setTexture(6, glossytex);
+            m->setTexture(6, tex);
+            m->setTexture(7, glossytex);
 
             // Material and shaders
             m->MaterialType = Shaders::getShader(ES_SPLATTING);
@@ -850,7 +850,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         if (m_normal_map_tex.size() > 0)
         {
             tex = irr_driver->getTexture(m_normal_map_tex);
-            m->setTexture(2, tex);
+            m->setTexture(3, tex);
 
             // Material and shaders
             m->MaterialType = Shaders::getShader(ES_NORMAL_MAP);
@@ -863,9 +863,9 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         if (mb && mb->getVertexType() == video::EVT_2TCOORDS)
         {
             if (m->getTexture(1) != glossytex)
-                m->setTexture(2, m->getTexture(1));
-            if (!m->getTexture(2))
-                m->setTexture(2, getUnicolorTexture(SColor(255, 255, 255, 255)));
+                m->setTexture(3, m->getTexture(1));
+            if (!m->getTexture(3))
+                m->setTexture(3, getUnicolorTexture(SColor(255, 255, 255, 255)));
         }
         m->setTexture(1, glossytex);
     }

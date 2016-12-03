@@ -53,11 +53,11 @@ struct GLMesh
     GLenum IndexType;
     size_t IndexCount;
     size_t Stride;
-    core::matrix4 TextureMatrix;
+    core::vector2df texture_trans;
     size_t vaoBaseVertex;
     size_t vaoOffset;
     video::E_VERTEX_TYPE VAOType;
-    uint64_t TextureHandles[6];
+    uint64_t TextureHandles[8];
     scene::IMeshBuffer *mb;
     RenderInfo* m_render_info;
     Material* m_material;
@@ -112,18 +112,18 @@ public:
 
 // ----------------------------------------------------------------------------
 class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4,
-                                      core::matrix4, core::matrix4,
+                                      core::matrix4, core::vector2df,
                                       core::vector2df>
 {};
 
 // ----------------------------------------------------------------------------
 class ListMatAlphaRef : public MeshList<ListMatAlphaRef, GLMesh *, core::matrix4,
-                                        core::matrix4, core::matrix4>
+                                        core::matrix4, core::vector2df>
 {};
 
 // ----------------------------------------------------------------------------
 class ListMatNormalMap : public MeshList<ListMatNormalMap, GLMesh *, core::matrix4,
-                                         core::matrix4, core::matrix4,
+                                         core::matrix4, core::vector2df,
                                          core::vector2df>
 {};
 
@@ -135,7 +135,7 @@ class ListMatGrass : public MeshList<ListMatGrass, GLMesh *, core::matrix4,
 // ----------------------------------------------------------------------------
 class ListMatSphereMap : public MeshList<ListMatSphereMap, GLMesh *,
                                          core::matrix4, core::matrix4,
-                                         core::matrix4>
+                                         core::vector2df>
 {};
 
 // ----------------------------------------------------------------------------
@@ -145,12 +145,12 @@ class ListMatSplatting : public MeshList<ListMatSplatting, GLMesh *,
 
 // ----------------------------------------------------------------------------
 class ListMatUnlit : public MeshList<ListMatUnlit, GLMesh *, core::matrix4,
-                                     core::matrix4, core::matrix4>
+                                     core::matrix4, core::vector2df>
 {};
 
 // ----------------------------------------------------------------------------
 class ListMatDetails : public MeshList<ListMatDetails, GLMesh *, core::matrix4,
-                                       core::matrix4, core::matrix4>
+                                       core::matrix4, core::vector2df>
 {};
 
 // ----------------------------------------------------------------------------
@@ -161,38 +161,38 @@ class MiscList : public Singleton<T>, public std::vector<STK::Tuple<Args...> >
 
 // ----------------------------------------------------------------------------
 class ListBlendTransparent : public MiscList<ListBlendTransparent, GLMesh *,
-                                             core::matrix4, core::matrix4,
+                                             core::matrix4, core::vector2df,
                                              float>
 {};
 
 // ----------------------------------------------------------------------------
 class ListAdditiveTransparent : public MiscList<ListAdditiveTransparent,
                                                 GLMesh *, core::matrix4,
-                                                core::matrix4, float>
+                                                core::vector2df, float>
 {};
 
 // ----------------------------------------------------------------------------
 class ListTranslucentStandard : public MiscList<ListTranslucentStandard,
                                       GLMesh *, core::matrix4,
-                                      core::matrix4, float>
+                                      core::vector2df, float>
 {};
 
 // ----------------------------------------------------------------------------
 class ListTranslucentTangents : public MiscList<ListTranslucentTangents,
                                               GLMesh *, core::matrix4,
-                                              core::matrix4, float>
+                                              core::vector2df, float>
 {};
 
 // ----------------------------------------------------------------------------
 class ListTranslucent2TCoords : public MiscList<ListTranslucent2TCoords,
                                               GLMesh *, core::matrix4,
-                                              core::matrix4, float>
+                                              core::vector2df, float>
 {};
 
 // ----------------------------------------------------------------------------
 class ListBlendTransparentFog : public MiscList<ListBlendTransparentFog,
                                                 GLMesh *, core::matrix4,
-                                                core::matrix4, float, float,
+                                                core::vector2df, float, float,
                                                 float, float, float,
                                                 video::SColorf>
 {};
@@ -200,7 +200,7 @@ class ListBlendTransparentFog : public MiscList<ListBlendTransparentFog,
 // ----------------------------------------------------------------------------
 class ListAdditiveTransparentFog : public MiscList<ListAdditiveTransparentFog,
                                                    GLMesh *, core::matrix4,
-                                                   core::matrix4, float, float,
+                                                   core::vector2df, float, float,
                                                    float, float, float,
                                                    video::SColorf>
 {};

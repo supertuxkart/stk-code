@@ -1,6 +1,8 @@
 #ifdef Use_Bindless_Texture
 layout(bindless_sampler) uniform sampler2D Albedo;
 layout(bindless_sampler) uniform sampler2D SpecMap;
+layout(bindless_sampler) uniform sampler2D colorization_mask;
+
 #else
 uniform sampler2D Albedo;
 uniform sampler2D SpecMap;
@@ -20,6 +22,7 @@ void main(void)
 {
 #ifdef Use_Bindless_Texture
     vec4 col = texture(Albedo, uv);
+    float mask = texture(colorization_mask, uv).a;
 #ifdef SRGBBindlessFix
     col.xyz = pow(col.xyz, vec3(2.2));
 #endif

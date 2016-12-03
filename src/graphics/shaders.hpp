@@ -120,7 +120,7 @@ public:
 
     // ========================================================================
     class TransparentShader : public TextureShader<TransparentShader, 1,
-                                                   core::matrix4, core::matrix4,
+                                                   core::matrix4, core::vector2df,
                                                    float >
     {
     public:
@@ -129,7 +129,7 @@ public:
 
     // ========================================================================
     class TransparentFogShader : public TextureShader<TransparentFogShader, 1,
-                                     core::matrix4, core::matrix4, float, float,
+                                     core::matrix4, core::vector2df, float, float,
                                      float, float, float, video::SColorf >
     {
     public:
@@ -145,7 +145,7 @@ public:
 
     // ========================================================================
     class ObjectPass2Shader : public TextureShader < ObjectPass2Shader, 6,
-                                                 core::matrix4, core::matrix4,
+                                                 core::matrix4, core::vector2df,
                                                  core::vector2df >
     {
     public:

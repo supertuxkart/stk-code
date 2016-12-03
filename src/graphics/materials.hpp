@@ -56,14 +56,14 @@ public:
 
 // ============================================================================
 class ObjectRefPass2Shader : public TextureShader<ObjectRefPass2Shader, 5,
-                                                core::matrix4, core::matrix4>
+                                                core::matrix4, core::vector2df>
 {
 public:
     ObjectRefPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                             GL_FRAGMENT_SHADER, "objectref_pass2.frag");
-        assignUniforms("ModelMatrix", "TextureMatrix");
+        assignUniforms("ModelMatrix", "texture_trans");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
@@ -75,15 +75,11 @@ public:
 // ============================================================================
 class InstancedObjectPass2Shader : public TextureShader<InstancedObjectPass2Shader, 6>
 {
-private:
-    GLint m_color_change_location;
-
 public:
     InstancedObjectPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
                             GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
-        m_color_change_location = glGetUniformLocation(m_program, "color_change");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -92,12 +88,6 @@ public:
                            4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedObjectPass2Shader
-
-    virtual bool changeableColor(float hue = 0.0f, float min_sat = 0.0f) const OVERRIDE
-    {
-        glUniform2f(m_color_change_location, hue, min_sat);
-        return true;
-    }   // changeableColor
 };   // InstancedObjectPass2Shader
 
 // ============================================================================
@@ -172,7 +162,7 @@ public:
 };   // InstancedShadowShader
 
 // ============================================================================
-class CRSMShader : public TextureShader<CRSMShader, 1, core::matrix4, core::matrix4,
+class CRSMShader : public TextureShader<CRSMShader, 1, core::matrix4, core::vector2df,
                                  core::matrix4>
 {
 public:
@@ -181,7 +171,7 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "rsm.vert",
                             GL_FRAGMENT_SHADER, "rsm.frag");
 
-        assignUniforms("ModelMatrix", "TextureMatrix", "RSMMatrix");
+        assignUniforms("ModelMatrix", "texture_trans", "RSMMatrix");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // CRSMShader
 };   // CRSMShader
@@ -278,14 +268,14 @@ public:
 
 // ============================================================================
 class ObjectRefPass1Shader : public TextureShader<ObjectRefPass1Shader, 2, core::matrix4,
-                                           core::matrix4, core::matrix4>
+                                           core::matrix4, core::vector2df>
 {
 public:
     ObjectRefPass1Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
-        assignUniforms("ModelMatrix", "InverseModelMatrix", "TextureMatrix");
+        assignUniforms("ModelMatrix", "InverseModelMatrix", "texture_trans");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // ObjectRefPass1Shader
@@ -324,14 +314,14 @@ public:
 
 // ============================================================================
 class ObjectUnlitShader : public TextureShader<ObjectUnlitShader, 4, core::matrix4,
-                                        core::matrix4>
+                                        core::vector2df>
 {
 public:
     ObjectUnlitShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                             GL_FRAGMENT_SHADER, "object_unlit.frag");
-        assignUniforms("ModelMatrix", "TextureMatrix");
+        assignUniforms("ModelMatrix", "texture_trans");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
@@ -636,7 +626,7 @@ struct DefaultMaterial
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType
                                                = Material::SHADERTYPE_SOLID;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t> FirstPassTextures;
     static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;
@@ -657,7 +647,7 @@ struct AlphaRef
     typedef ListMatAlphaRef List;
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_ALPHA_TEST;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t, size_t> FirstPassTextures;
     static const STK::Tuple<size_t, size_t> SecondPassTextures;
     static const STK::Tuple<size_t> ShadowTextures;
@@ -679,7 +669,7 @@ struct SphereMap
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType
                                           = Material::SHADERTYPE_SPHERE_MAP;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t> FirstPassTextures;
     static const STK::Tuple<size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;
@@ -701,7 +691,7 @@ struct UnlitMat
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_STANDARD;
     static const enum Material::ShaderType MaterialType =
                                            Material::SHADERTYPE_SOLID_UNLIT;
-    static const enum InstanceType Instance = InstanceTypeDualTex;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t, size_t> FirstPassTextures;
     static const STK::Tuple<size_t> SecondPassTextures;
     static const STK::Tuple<size_t> ShadowTextures;
@@ -745,7 +735,7 @@ struct NormalMat
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_TANGENTS;
     static const enum Material::ShaderType MaterialType
                                           = Material::SHADERTYPE_NORMAL_MAP;
-    static const enum InstanceType Instance = InstanceTypeThreeTex;
+    static const enum InstanceType Instance = InstanceTypeFourTex;
     static const STK::Tuple<size_t, size_t> FirstPassTextures;
     static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;
@@ -767,7 +757,7 @@ struct DetailMat
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_2TCOORDS;
     static const enum Material::ShaderType MaterialType
                                           = Material::SHADERTYPE_DETAIL_MAP;
-    static const enum InstanceType Instance = InstanceTypeThreeTex;
+    static const enum InstanceType Instance = InstanceTypeFourTex;
     static const STK::Tuple<size_t> FirstPassTextures;
     static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;

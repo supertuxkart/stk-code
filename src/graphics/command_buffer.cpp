@@ -21,26 +21,36 @@
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataSingleTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataSingleTex &instance)
+void InstanceFiller<InstanceDataSingleTex>::add(GLMesh* mesh,
+                                                const InstanceSettings& is,
+                                                InstanceDataSingleTex& instance)
 {
-    fillOriginOrientationScale<InstanceDataSingleTex>(node, instance);
+    fillOriginOrientationScale<InstanceDataSingleTex>(STK::tuple_get<0>(is), instance);
     instance.Texture = mesh->TextureHandles[0];
 }
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataDualTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataDualTex &instance)
+void InstanceFiller<InstanceDataDualTex>::add(GLMesh* mesh,
+                                              const InstanceSettings& is,
+                                              InstanceDataDualTex& instance)
 {
-    fillOriginOrientationScale<InstanceDataDualTex>(node, instance);
+    fillOriginOrientationScale<InstanceDataDualTex>(STK::tuple_get<0>(is), instance);
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
 }
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, scene::ISceneNode *node, InstanceDataThreeTex &instance)
+void InstanceFiller<InstanceDataThreeTex>::add(GLMesh* mesh,
+                                               const InstanceSettings& is,
+                                               InstanceDataThreeTex& instance)
 {
-    fillOriginOrientationScale<InstanceDataThreeTex>(node, instance);
+    fillOriginOrientationScale<InstanceDataThreeTex>(STK::tuple_get<0>(is), instance);
+    instance.MiscData.X = STK::tuple_get<1>(is).X;
+    instance.MiscData.Y = STK::tuple_get<1>(is).Y;
+    instance.MiscData.Z = STK::tuple_get<2>(is).X;
+    instance.MiscData.W = STK::tuple_get<2>(is).Y;
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
     instance.ThirdTexture = mesh->TextureHandles[2];
@@ -48,8 +58,28 @@ void InstanceFiller<InstanceDataThreeTex>::add(GLMesh *mesh, scene::ISceneNode *
 
 // ----------------------------------------------------------------------------
 template<>
-void InstanceFiller<GlowInstanceData>::add(GLMesh *mesh, scene::ISceneNode *node, GlowInstanceData &instance)
+void InstanceFiller<InstanceDataFourTex>::add(GLMesh* mesh,
+                                              const InstanceSettings& is,
+                                              InstanceDataFourTex& instance)
 {
+    fillOriginOrientationScale<InstanceDataFourTex>(STK::tuple_get<0>(is), instance);
+    instance.MiscData.X = STK::tuple_get<1>(is).X;
+    instance.MiscData.Y = STK::tuple_get<1>(is).Y;
+    instance.MiscData.Z = STK::tuple_get<2>(is).X;
+    instance.MiscData.W = STK::tuple_get<2>(is).Y;
+    instance.Texture = mesh->TextureHandles[0];
+    instance.SecondTexture = mesh->TextureHandles[1];
+    instance.ThirdTexture = mesh->TextureHandles[2];
+    instance.FourthTexture = mesh->TextureHandles[3];
+}
+
+// ----------------------------------------------------------------------------
+template<>
+void InstanceFiller<GlowInstanceData>::add(GLMesh* mesh,
+                                           const InstanceSettings& is,
+                                           GlowInstanceData& instance)
+{
+    scene::ISceneNode* node = STK::tuple_get<0>(is);
     fillOriginOrientationScale<GlowInstanceData>(node, instance);
     STKMeshSceneNode *nd = dynamic_cast<STKMeshSceneNode*>(node);
     instance.Color = nd->getGlowColor().color;
@@ -142,23 +172,27 @@ void SolidCommandBuffer::fill(SolidPassMeshMap *mesh_map)
         mapIndirectBuffer();
     
     std::vector<int> dual_tex_material_list =
+        createVector<int>(Material::SHADERTYPE_VEGETATION);
+
+    fillInstanceData<InstanceDataDualTex, SolidPassMeshMap>
+        (mesh_map, dual_tex_material_list, InstanceTypeDualTex);
+
+    std::vector<int> three_tex_material_list =
         createVector<int>(Material::SHADERTYPE_SOLID,
                           Material::SHADERTYPE_ALPHA_TEST,
                           Material::SHADERTYPE_SOLID_UNLIT,
-                          Material::SHADERTYPE_SPHERE_MAP,
-                          Material::SHADERTYPE_VEGETATION);
-                          
-    fillInstanceData<InstanceDataDualTex, SolidPassMeshMap>
-        (mesh_map, dual_tex_material_list, InstanceTypeDualTex);
-    
-    std::vector<int> three_tex_material_list =
-        createVector<int>(Material::SHADERTYPE_DETAIL_MAP,
-                          Material::SHADERTYPE_NORMAL_MAP);
-                          
+                          Material::SHADERTYPE_SPHERE_MAP);
+
     fillInstanceData<InstanceDataThreeTex, SolidPassMeshMap>
         (mesh_map, three_tex_material_list, InstanceTypeThreeTex);
-        
-    
+
+    std::vector<int> four_tex_material_list =
+        createVector<int>(Material::SHADERTYPE_DETAIL_MAP,
+                          Material::SHADERTYPE_NORMAL_MAP);
+
+    fillInstanceData<InstanceDataFourTex, SolidPassMeshMap>
+        (mesh_map, four_tex_material_list, InstanceTypeFourTex);
+
     if (!CVS->supportsAsyncInstanceUpload())
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 } //SolidCommandBuffer::fill

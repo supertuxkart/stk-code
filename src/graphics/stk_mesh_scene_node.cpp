@@ -238,9 +238,18 @@ void STKMeshSceneNode::updateNoGL()
     for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
     {
         scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-        if (!mb)
-            continue;
-        GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
+        if (mb != NULL)
+        {
+            // Test if texture matrix needs to be updated every frame
+            const core::matrix4& mat = getMaterial(i).getTextureMatrix(0);
+            if (mat.isIdentity())
+                continue;
+            else
+            {
+                GLmeshes[i].texture_trans.X = mat[8];
+                GLmeshes[i].texture_trans.Y = mat[9];
+            }
+        }
     }
 }
 
@@ -363,7 +372,10 @@ void STKMeshSceneNode::render()
                                                      ::getInstance()->m_sampler_ids[0]);
                 }
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                {
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                    insertTextureHandle(mesh.TextureHandles[0]);
+                }
                 Shaders::ObjectPass1Shader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
             }
             else
@@ -416,23 +428,32 @@ void STKMeshSceneNode::render()
                 if (!mesh.TextureHandles[0])
                     mesh.TextureHandles[0] = 
                     glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), 
-                                Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+                                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                {
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                    insertTextureHandle(mesh.TextureHandles[0]);
+                }
 
                 if (!mesh.TextureHandles[1])
                     mesh.TextureHandles[1] =
                     glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[1]),
-                                Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+                                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[1]))
+                {
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[1]);
+                    insertTextureHandle(mesh.TextureHandles[1]);
+                }
 
                 if (!mesh.TextureHandles[2])
                     mesh.TextureHandles[2] =
-                    glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[7]),
-                                Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+                    glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[2]),
+                                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
                 if (!glIsTextureHandleResidentARB(mesh.TextureHandles[2]))
+                {
                     glMakeTextureHandleResidentARB(mesh.TextureHandles[2]);
+                    insertTextureHandle(mesh.TextureHandles[2]);
+                }
 
                 Shaders::ObjectPass2Shader::getInstance()
                     ->setTextureHandles(DiffuseHandle, SpecularHandle, SSAOHandle,
@@ -447,9 +468,9 @@ void STKMeshSceneNode::render()
                 irr_driver->getRenderTargetTexture(RTT_HALF1_R),
                 getTextureGLuint(mesh.textures[0]),
                 getTextureGLuint(mesh.textures[1]),
-                getTextureGLuint(mesh.textures[7]));
+                getTextureGLuint(mesh.textures[2]));
             Shaders::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation,
-                                                                   mesh.TextureMatrix,
+                                                                   mesh.texture_trans,
                                                                    core::vector2df(0.0f, 0.0f));
             assert(mesh.vao);
             glBindVertexArray(mesh.vao);
@@ -521,9 +542,12 @@ void STKMeshSceneNode::render()
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] =
                             glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]),
-                                   Shaders::TransparentFogShader::getInstance()->m_sampler_ids[0]);
+                                   Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
                         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                        {
                             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                            insertTextureHandle(mesh.TextureHandles[0]);
+                        }
                         Shaders::TransparentFogShader::getInstance()
                                     ->setTextureHandles(mesh.TextureHandles[0]);
                     }
@@ -534,7 +558,7 @@ void STKMeshSceneNode::render()
                             ->setTextureUnits(getTextureGLuint(mesh.textures[0]));
                     }
                     Shaders::TransparentFogShader::getInstance()
-                           ->setUniforms(AbsoluteTransformation, mesh.TextureMatrix,
+                           ->setUniforms(AbsoluteTransformation, mesh.texture_trans,
                                          fogmax, startH, endH, start, end, col);
 
                     assert(mesh.vao);
@@ -561,16 +585,19 @@ void STKMeshSceneNode::render()
                         if (!mesh.TextureHandles[0])
                             mesh.TextureHandles[0] =
                             glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]),
-                            Shaders::TransparentShader::getInstance()->m_sampler_ids[0]);
+                            Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
                         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                        {
                             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                            insertTextureHandle(mesh.TextureHandles[0]);
+                        }
                         Shaders::TransparentShader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
                     }
                     else
 #endif
                         Shaders::TransparentShader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]));
 
-                    Shaders::TransparentShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, 1.0f);
+                    Shaders::TransparentShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.texture_trans, 1.0f);
                     assert(mesh.vao);
                     glBindVertexArray(mesh.vao);
                     glDrawElements(ptype, count, itype, 0);

@@ -8,7 +8,7 @@ layout(location = 6) in vec3 Bitangent;
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
-layout(location = 12) in vec4 GlowColor;
+layout(location = 15) in vec4 GlowColor;
 
 flat out vec4 glowColor;
 

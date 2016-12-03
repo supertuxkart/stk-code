@@ -18,8 +18,9 @@
 #ifndef HEADER_RTTS_HPP
 #define HEADER_RTTS_HPP
 
-#include "utils/ptr_vector.hpp"
 #include "utils/leak_check.hpp"
+#include "utils/ptr_vector.hpp"
+#include "utils/types.hpp"
 #include <stddef.h>
 
 class FrameBuffer;
@@ -156,10 +157,12 @@ public:
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
     FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
+    const std::vector<uint64_t>& getPrefilledHandles() { return m_prefilled_handles; }
 
 private:
     unsigned RenderTargetTextures[RTT_COUNT];
     PtrVector<FrameBuffer> FrameBuffers;
+    std::vector<uint64_t> m_prefilled_handles;
     unsigned DepthStencilTexture;
 
     size_t m_width;
