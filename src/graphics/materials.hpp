@@ -536,7 +536,7 @@ public:
 
 
 // ============================================================================
-class GrassPass2Shader : public TextureShader<GrassPass2Shader, 5, core::matrix4,
+class GrassPass2Shader : public TextureShader<GrassPass2Shader, 6, core::matrix4,
                                        core::vector3df>
 {
 public:
@@ -548,6 +548,7 @@ public:
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "dtex", ST_NEAREST_FILTERED,
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // GrassPass2Shader

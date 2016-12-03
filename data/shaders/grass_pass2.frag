@@ -39,8 +39,8 @@ void main(void)
 
     float fLdotNBack  = max(0., - dot(nor, L) * 0.6 + 0.4);
     float scattering = mix(fPowEdotL, fLdotNBack, .5);
-    float specmap = texture(SpecMap, uv).g;
 
-    vec3 LightFactor = color.xyz * (scattering * 0.3) + getLightFactor(color.xyz, vec3(1.), specmap, 0.);
-    FragColor = vec4(color.xyz * LightFactor, 1.);
+    float specmap = texture(SpecMap, uv).g;
+    vec3 LightFactor = color.xyz * (scattering * 0.1) + getLightFactor(color.xyz, vec3(1.), specmap, 0.);
+    FragColor = vec4(LightFactor, 1.);
 }

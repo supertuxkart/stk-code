@@ -86,7 +86,48 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
     }
 }   // renderMeshes2ndPass
 
+// ----------------------------------------------------------------------------
+template<>
+void renderMeshes2ndPass<GrassMat, 3, 1>
+    (const std::vector<uint64_t> &Prefilled_Handle,
+     const std::vector<GLuint> &Prefilled_Tex)
+{
+    auto &meshes = GrassMat::List::getInstance()->SolidPass;
+    GrassMat::SecondPassShader::getInstance()->use();
+    if (CVS->isARBBaseInstanceUsable())
+        glBindVertexArray(VAOManager::getInstance()->getVAO(GrassMat::VertexType));
+    for (unsigned i = 0; i < meshes.size(); i++)
+    {
+        GLMesh &mesh = *(STK::tuple_get<0>(meshes.at(i)));
+        if (!CVS->isARBBaseInstanceUsable())
+            glBindVertexArray(mesh.vao);
 
+        if (mesh.VAOType != GrassMat::VertexType)
+        {
+#ifdef DEBUG
+            Log::error("Materials", "Wrong vertex Type associed to pass 2 "
+                                    "(hint texture : %s)",
+                       mesh.textures[0]->getName().getPath().c_str());
+#endif
+            continue;
+        }
+
+        if (CVS->isAZDOEnabled())
+        {
+            HandleExpander<GrassMat::SecondPassShader>::
+                expand(mesh.TextureHandles, GrassMat::SecondPassTextures,
+                       Prefilled_Handle[0], Prefilled_Handle[1],
+                       Prefilled_Handle[2], Prefilled_Handle[3]);
+        }
+        else
+        {
+            TexExpander<GrassMat::SecondPassShader>::
+                expandTex(mesh, GrassMat::SecondPassTextures, Prefilled_Tex[0],
+                          Prefilled_Tex[1], Prefilled_Tex[2], Prefilled_Tex[3]);
+        }
+        CustomUnrollArgs<3, 1>::template drawMesh<GrassMat::SecondPassShader>(meshes.at(i));
+    }
+}   // renderMeshes2ndPass
 
 // ----------------------------------------------------------------------------
 template<typename T, int...List>
