@@ -90,6 +90,10 @@ using namespace irr;
 #include <X11/Xutil.h>
 #endif
 
+#ifdef ANDROID
+struct android_app* global_android_app;
+#endif
+
 /** singleton */
 IrrDriver *irr_driver = NULL;
 
@@ -112,13 +116,21 @@ IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
-    m_device              = createDevice(video::EDT_NULL,
-                                         irr::core::dimension2d<u32>(640, 480),
-                                         /*bits*/16U, /**fullscreen*/ false,
-                                         /*stencilBuffer*/ false,
-                                         /*vsync*/false,
-                                         /*event receiver*/ NULL,
-                                         file_manager->getFileSystem());
+    
+    struct irr::SIrrlichtCreationParameters p;
+    p.DriverType    = video::EDT_NULL;
+    p.WindowSize    = core::dimension2d<u32>(640,480);
+    p.Bits          = 16U;
+    p.Fullscreen    = false;
+    p.Vsync         = false;
+    p.EventReceiver = NULL;
+    p.FileSystem    = file_manager->getFileSystem();
+#ifdef ANDROID
+    p.PrivateData   = (void*)global_android_app;
+#endif
+
+    m_device = createDeviceEx(p);
+
     m_request_screenshot = false;
     m_renderer            = NULL;
     m_wind                = new Wind();
@@ -428,6 +440,9 @@ void IrrDriver::initDevice()
             params.DriverType    = video::EDT_OGLES2;
 #else
             params.DriverType    = video::EDT_OPENGL;
+#endif
+#if defined(ANDROID)
+            params.PrivateData = (void*)global_android_app;
 #endif
             params.Stencilbuffer = false;
             params.Bits          = bits;

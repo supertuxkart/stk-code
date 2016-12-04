@@ -29,6 +29,10 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
+#ifdef ANDROID
+#include "io/assets_android.hpp"
+#endif
+
 #include <irrlicht.h>
 
 #include <stdio.h>
@@ -144,6 +148,11 @@ FileManager::FileManager()
 #endif
 
     m_file_system = irr::io::createFileSystem();
+
+#ifdef ANDROID
+    AssetsAndroid android_assets(this);
+    android_assets.init();
+#endif
 
     std::string exe_path;
 
