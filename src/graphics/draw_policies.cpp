@@ -191,7 +191,7 @@ void GL3DrawPolicy::drawSolidSecondPass (const DrawCalls& draw_calls,
                                          const std::vector<GLuint>& prefilled_tex) const
 {
     renderMeshes2ndPass<DefaultMaterial, 4, 3, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<AlphaRef,        3, 1   > (handles, prefilled_tex);
+    renderMeshes2ndPass<AlphaRef,        4, 3, 1> (handles, prefilled_tex);
     renderMeshes2ndPass<UnlitMat,        3, 1   > (handles, prefilled_tex);
     renderMeshes2ndPass<SplattingMat,    1      > (handles, prefilled_tex);
     renderMeshes2ndPass<SphereMap,       2, 1   > (handles, prefilled_tex);

@@ -295,7 +295,10 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                             core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
-                        ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
+                        ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
                         ListMatNormalMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
@@ -364,7 +367,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         ListMatDefault::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
-                        ListMatAlphaRef::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
+                        ListMatAlphaRef::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
                         ListMatNormalMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
@@ -436,7 +439,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                         ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
-                        ListMatAlphaRef::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
+                        ListMatAlphaRef::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
                         ListMatNormalMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));

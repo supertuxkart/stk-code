@@ -27,8 +27,8 @@ const STK::Tuple<size_t> DefaultMaterial::RSMTextures = STK::Tuple<size_t>(0);
 // ----------------------------------------------------------------------------
 const STK::Tuple<size_t, size_t> AlphaRef::FirstPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
-const STK::Tuple<size_t, size_t> AlphaRef::SecondPassTextures
-    = STK::Tuple<size_t, size_t>(0, 1);
+const STK::Tuple<size_t, size_t, size_t> AlphaRef::SecondPassTextures
+    = STK::Tuple<size_t, size_t, size_t>(0, 1, 2);
 const STK::Tuple<size_t> AlphaRef::ShadowTextures = STK::Tuple<size_t>(0);
 const STK::Tuple<size_t> AlphaRef::RSMTextures = STK::Tuple<size_t>(0);
 

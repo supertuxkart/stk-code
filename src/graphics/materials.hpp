@@ -55,20 +55,22 @@ public:
 };   // InstancedObjectRefPass1Shader
 
 // ============================================================================
-class ObjectRefPass2Shader : public TextureShader<ObjectRefPass2Shader, 5,
-                                                core::matrix4, core::vector2df>
+class ObjectRefPass2Shader : public TextureShader<ObjectRefPass2Shader, 6,
+                                                core::matrix4, core::vector2df,
+                                                core::vector2df>
 {
 public:
     ObjectRefPass2Shader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                             GL_FRAGMENT_SHADER, "objectref_pass2.frag");
-        assignUniforms("ModelMatrix", "texture_trans");
+        assignUniforms("ModelMatrix", "texture_trans", "color_change");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // ObjectRefPass2Shader
 };   // ObjectRefPass2Shader
 
@@ -91,7 +93,7 @@ public:
 };   // InstancedObjectPass2Shader
 
 // ============================================================================
-class InstancedObjectRefPass2Shader : public TextureShader<InstancedObjectRefPass2Shader, 5>
+class InstancedObjectRefPass2Shader : public TextureShader<InstancedObjectRefPass2Shader, 6>
 {
 public:
     InstancedObjectRefPass2Shader()
@@ -103,7 +105,8 @@ public:
                            1, "SpecularMap", ST_NEAREST_FILTERED,
                            2, "SSAO", ST_BILINEAR_FILTERED,
                            3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }    // InstancedObjectRefPass2Shader
 };   // InstancedObjectRefPass2Shader
 
@@ -652,7 +655,7 @@ struct AlphaRef
     static const enum Material::ShaderType MaterialType = Material::SHADERTYPE_ALPHA_TEST;
     static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t, size_t> FirstPassTextures;
-    static const STK::Tuple<size_t, size_t> SecondPassTextures;
+    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<size_t> ShadowTextures;
     static const STK::Tuple<size_t> RSMTextures;
 };   // struct AlphaRef

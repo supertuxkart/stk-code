@@ -118,7 +118,8 @@ class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4,
 
 // ----------------------------------------------------------------------------
 class ListMatAlphaRef : public MeshList<ListMatAlphaRef, GLMesh *, core::matrix4,
-                                        core::matrix4, core::vector2df>
+                                        core::matrix4, core::vector2df,
+                                        core::vector2df>
 {};
 
 // ----------------------------------------------------------------------------
