@@ -259,7 +259,8 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     }
                     if (Mat == Material::SHADERTYPE_SPLATTING)
                     {
-                        //TODO: write instanced splatting solid shader and remove this if
+                        // Notice: splatting will be drawn using non-instanced shader only
+                        // It's only used one place (in overworld) and may be removed eventually
                         core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                         ModelMatrix.getInverse(InvModelMatrix);
                         ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
@@ -410,7 +411,6 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                 {
                     if (Mat == Material::SHADERTYPE_SPLATTING)
                     {
-                        //TODO: write instanced splatting rsm shader and remove this if
                         core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                         ModelMatrix.getInverse(InvModelMatrix);
                         ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);

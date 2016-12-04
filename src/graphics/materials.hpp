@@ -771,9 +771,7 @@ struct DetailMat
 struct SplattingMat
 {
     typedef InstancedObjectPass1Shader InstancedFirstPassShader;
-    //TODO: InstancedSecondPassShader
     typedef InstancedShadowShader InstancedShadowPassShader;
-    //TODO InstancedRSMShader
     typedef Shaders::ObjectPass1Shader FirstPassShader;
     typedef SplattingShader SecondPassShader;
     typedef ShadowShader ShadowPassShader;
