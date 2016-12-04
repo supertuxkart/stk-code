@@ -1245,10 +1245,8 @@ void FileManager::listFiles(std::set<std::string>& result,
 {
     result.clear();
 
-#ifndef ANDROID
     if(!isDirectory(dir))
         return;
-#endif
 
     io::path previous_cwd = m_file_system->getWorkingDirectory();
 
@@ -1315,26 +1313,37 @@ bool FileManager::removeDirectory(const std::string &name) const
 {
     std::set<std::string> files;
     listFiles(files, name, /*is full path*/ true);
-    for(std::set<std::string>::iterator i=files.begin(); i!=files.end(); i++)
+
+    for (std::string file : files)
     {
-        if((*i)=="." || (*i)=="..") continue;
-        if(UserConfigParams::logMisc())
+        if (file == "." || file == ".." || file == name + "/." || 
+            file == name + "/..") 
+            continue;
+
+        if (UserConfigParams::logMisc())
             Log::verbose("FileManager", "Deleting directory '%s'.",
-                         (*i).c_str());
-        if(isDirectory(*i))
+                         file.c_str());
+
+        if (isDirectory(file))
         {
             // This should not be necessary (since this function is only
             // used to remove addons), and it limits the damage in case
             // of any bugs - i.e. if name should be "/" or so.
-            // removeDirectory(full_path);
+            // We need to remove whole data directory on Android though, i.e.
+            // when we install newer STK version and new assets are extracted.
+            // So enable it only for Android for now.
+            #ifdef ANDROID
+            removeDirectory(file);
+            #endif
         }
         else
         {
-            removeFile(*i);
+            removeFile(file);
         }
     }
+    
 #if defined(WIN32)
-        return RemoveDirectory(name.c_str())==TRUE;
+    return RemoveDirectory(name.c_str())==TRUE;
 #else
     return remove(name.c_str())==0;
 #endif
