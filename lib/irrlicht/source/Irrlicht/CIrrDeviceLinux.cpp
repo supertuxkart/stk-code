@@ -1309,7 +1309,6 @@ bool CIrrDeviceLinux::createInputContext()
 
 	XSetICFocus(XInputContext);
 	setlocale(LC_CTYPE, oldLocale.c_str());
-	XFree(p);
 	return true;
 }
 
