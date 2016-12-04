@@ -203,6 +203,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                     Material* m = material_manager->getMaterialFor(mb
                         ->getMaterial().getTexture(0), mb);
                     colorizable = colorizable || m->isColorizable();
+                    if (colorizable) break;
                 }
             }
         }
