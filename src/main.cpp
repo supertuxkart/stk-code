@@ -573,6 +573,7 @@ void cmdLineHelp()
     // "                          (so n=1 means all Ais will be the test ai)\n"
     // "
     "       --server=name      Start a server (not a playing client).\n"
+    "       --public-server    Allow direct connection to the server (without stk server)\n"
     "       --lan-server=name  Start a LAN server (not a playing client).\n"
     "       --server-password= Sets a password for a server (both client&server).\n"
     "       --connect-now=ip   Connect to a server with IP known now (in format x.x.x.x:xxx(port)).\n"
@@ -986,6 +987,10 @@ int handleCmdLine()
         // or server, so just set both ports, only one will be used anyway
         NetworkConfig::get()->setClientPort(n);
         NetworkConfig::get()->setServerPort(n);
+    }
+    if (CommandLine::has("--public-server"))
+    {
+        NetworkConfig::get()->setIsPublicServer();
     }
     if (CommandLine::has("--connect-now", &s))
     {
@@ -1926,6 +1931,8 @@ void runUnitTests()
     GraphicsRestrictions::unitTesting();
     Log::info("UnitTest", "NetworkString");
     NetworkString::unitTesting();
+    Log::info("UnitTest", "TransportAddress");
+    TransportAddress::unitTesting();
 
     Log::info("UnitTest", "Easter detection");
     // Test easter mode: in 2015 Easter is 5th of April - check with 0 days

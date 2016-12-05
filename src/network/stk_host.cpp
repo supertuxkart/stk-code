@@ -529,7 +529,7 @@ void* STKHost::mainLoop(void* self)
     ENetHost* host = myself->m_network->getENetHost();
 
     if(NetworkConfig::get()->isServer() && 
-        NetworkConfig::get()->isLAN()      )
+        (NetworkConfig::get()->isLAN() || NetworkConfig::get()->isPublicServer()) )
     {
         TransportAddress address(0, NetworkConfig::get()->getServerDiscoveryPort());
         ENetAddress eaddr = address.toEnetAddress();
@@ -604,6 +604,7 @@ void STKHost::handleDirectSocketRequest()
     BareNetworkString message(buffer, len);
     std::string command;
     message.decodeString(&command);
+
     if (command == "stk-server")
     {
         Log::verbose("STKHost", "Received LAN server query");
@@ -629,6 +630,15 @@ void STKHost::handleDirectSocketRequest()
     }   // if message is server-requested
     else if (command == "connection-request")
     {
+        // In case of a LAN connection, we only allow connections from
+        // a LAN address (192.168*, ..., and 127.*).
+        if (NetworkConfig::get()->isLAN() && !sender.isLAN())
+        {
+            Log::error("STKHost", "Client trying to connect from '%s'",
+                       sender.toString().c_str());
+            Log::error("STKHost", "which is outside of LAN - rejected.");
+            return;
+        }
         Protocol *c = new ConnectToPeer(sender);
         c->requestStart();
     }

@@ -63,23 +63,21 @@ public:
     {
         std::string combined = StringUtils::replace(str, ":", ".");
         std::vector<uint32_t> ip = StringUtils::splitToUInt(combined, '.');
-        m_ip = 0;
+        m_ip   = 0;
         m_port = 0;
-        if (ip.size() == 5)
-        {
+        if (ip.size() >= 4)
             m_ip = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3];
+
+        if(ip.size()==5)
             m_port = (uint16_t)(ip[4] < 65536 ? ip[4] : 0);
-        }
         else
-        {
-            m_ip = 0;
             m_port = 0;
-        }
     }   // TransportAddress(string of ip)
 
     // ------------------------------------------------------------------------
     ~TransportAddress() {}
     // ------------------------------------------------------------------------
+    static void unitTesting();
 private:
     friend class NetworkConfig;
     /** The copy constructor is private, so that the friend class
@@ -90,6 +88,7 @@ private:
         copy(other);
     }   // TransportAddress(const TransportAddress&)
 public:
+    bool isLAN() const;
     // ------------------------------------------------------------------------
     /** A copy function (to replace the copy constructor which is disabled
      *  using NoCopy): it copies the data from the argument into this object.*/
