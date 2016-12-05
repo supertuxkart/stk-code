@@ -17,6 +17,8 @@
 
 #include "graphics/materials.hpp"
 
+#ifndef SERVER_ONLY
+
 const STK::Tuple<size_t> DefaultMaterial::FirstPassTextures
     = STK::Tuple<size_t>(1);
 const STK::Tuple<size_t, size_t, size_t> DefaultMaterial::SecondPassTextures
@@ -76,3 +78,5 @@ const STK::Tuple<size_t, size_t, size_t, size_t, size_t>
 const STK::Tuple<> SplattingMat::ShadowTextures;
 const STK::Tuple<size_t, size_t, size_t, size_t, size_t> SplattingMat::RSMTextures
     = STK::Tuple<size_t, size_t, size_t, size_t, size_t>(1, 2, 3, 4, 5);
+
+#endif

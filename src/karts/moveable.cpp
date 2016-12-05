@@ -66,6 +66,7 @@ void Moveable::setNode(scene::ISceneNode *n)
 void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
                               const btQuaternion& rotation)
 {
+#ifndef SERVER_ONLY
     Vec3 xyz=getXYZ()+offset_xyz;
     m_node->setPosition(xyz.toIrrVector());
     btQuaternion r_all = getRotation()*rotation;
@@ -75,6 +76,7 @@ void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
     Vec3 hpr;
     hpr.setHPR(r_all);
     m_node->setRotation(hpr.toIrrHPR());
+#endif
 }   // updateGraphics
 
 //-----------------------------------------------------------------------------

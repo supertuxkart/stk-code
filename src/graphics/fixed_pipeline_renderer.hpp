@@ -18,6 +18,7 @@
 #ifndef HEADER_FIXED_PIPELINE_RENDERER_HPP
 #define HEADER_FIXED_PIPELINE_RENDERER_HPP
 
+#ifndef SERVER_ONLY
 #include "graphics/abstract_renderer.hpp"
 #include <map>
 
@@ -37,4 +38,5 @@ public:
                                                      const std::string &name);
 };
 
+#endif // !SERVER_ONLY
 #endif //HEADER_FIXED_PIPELINE_RENDERER_HPP

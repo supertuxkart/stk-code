@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
 #include "graphics/render_target.hpp"
 
 #include "graphics/2dutils.hpp"
@@ -151,3 +152,5 @@ void GL3RenderTarget::draw2DImage(const irr::core::rect<s32>& dest_rect,
     glDisable(GL_FRAMEBUFFER_SRGB);
 
 }   // draw2DImage
+
+#endif   // !SERVER_ONLY

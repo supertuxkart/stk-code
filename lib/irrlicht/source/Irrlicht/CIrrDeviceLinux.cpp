@@ -68,12 +68,14 @@ namespace irr
 	}
 } // end namespace irr
 
+#if defined(_IRR_COMPILE_WITH_X11_)
 namespace
 {
 	Atom X_ATOM_CLIPBOARD;
 	Atom X_ATOM_TARGETS;
 	Atom X_ATOM_UTF8_STRING;
 };
+#endif
 
 namespace irr
 {
@@ -598,6 +600,7 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
 	return Context;
 }
+
 #endif
 
 bool CIrrDeviceLinux::createWindow()

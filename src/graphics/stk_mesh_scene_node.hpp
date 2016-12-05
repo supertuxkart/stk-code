@@ -73,8 +73,10 @@ public:
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
             if (!mb)
                 continue;
+#ifndef SERVER_ONLY
             if (isDisplacement)
                 mb->getMaterial().MaterialType = Shaders::getShader(ES_DISPLACE);
+#endif
         }
     }
     virtual bool glow() const { return isGlow; }

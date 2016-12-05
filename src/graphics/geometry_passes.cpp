@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/geometry_passes.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/draw_tools.hpp"
@@ -389,5 +391,4 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
 
 }   // renderTransparent
 
-
-
+#endif   // !SERVER_ONLY

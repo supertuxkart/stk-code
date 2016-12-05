@@ -18,6 +18,8 @@
 #ifndef HEADER_SHADER_BASED_RENDERER_HPP
 #define HEADER_SHADER_BASED_RENDERER_HPP
 
+#ifndef SERVER_ONLY
+
 #include "graphics/abstract_renderer.hpp"
 #include "graphics/draw_calls.hpp"
 #include "graphics/lighting_passes.hpp"
@@ -126,4 +128,5 @@ public:
 
 };
 
-#endif //HEADER_SHADER_BASED_RENDERER_HPP
+#endif   // !SERVER_ONLY
+#endif   // HEADER_SHADER_BASED_RENDERER_HPP

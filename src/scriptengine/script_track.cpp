@@ -94,7 +94,7 @@ namespace Scripting
             core::dimension2d<u32> textsize = digit_face->getDimension(wtext.c_str());
 
             core::vector3df xyz(location->getX(), location->getY(), location->getZ());
-
+#ifndef SERVER_ONLY
             if (CVS->isGLSL())
             {
                 STKTextBillboard* tb = new STKTextBillboard(wtext.c_str(), digit_face,
@@ -123,6 +123,7 @@ namespace Scripting
                         GUIEngine::getSkin()->getColor("font::top"));
                 World::getWorld()->getTrack()->addNode(sn);
             }
+#endif
         }
 
         /** Exits the race to the main menu */

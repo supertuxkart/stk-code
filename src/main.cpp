@@ -1644,6 +1644,7 @@ int main(int argc, char *argv[] )
             }
             Log::warn("OpenGL", "Driver is too old!");
         }
+#ifndef SERVER_ONLY
         else if (!CVS->isGLSL())
         {
             if (UserConfigParams::m_old_driver_popup)
@@ -1662,7 +1663,7 @@ int main(int argc, char *argv[] )
             }
             Log::warn("OpenGL", "OpenGL version is too old!");
         }
-
+#endif
         // Note that on the very first run of STK internet status is set to
         // "not asked", so the report will only be sent in the next run.
         if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)

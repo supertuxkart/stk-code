@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
 
+#ifndef SERVER_ONLY
+
 #include "graphics/post_processing.hpp"
 
 #include "config/user_config.hpp"
@@ -1596,3 +1598,5 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
     return out_fbo;
 }   // render
+
+#endif   // !SERVER_ONLY

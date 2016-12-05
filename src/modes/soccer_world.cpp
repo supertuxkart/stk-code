@@ -320,6 +320,7 @@ void SoccerWorld::countdownReachedZero()
 //-----------------------------------------------------------------------------
 void SoccerWorld::initKartList()
 {
+#ifndef SERVER_ONLY
     const unsigned int kart_amount = (unsigned int)m_karts.size();
 
     //Loading the indicator textures
@@ -340,13 +341,14 @@ void SoccerWorld::initKartList()
         float arrow_pos_height = km->getHeight() + 0.5f;
         SoccerTeam team = getKartTeam(i);
 
-        arrow_node = irr_driver->addBillboard(core::dimension2d<irr::f32>(0.3f,
-            0.3f), team == SOCCER_TEAM_BLUE ? blue : red, m_karts[i]
-            ->getNode(), true);
+        arrow_node = irr_driver->addBillboard(
+                                        core::dimension2d<irr::f32>(0.3f,0.3f),
+                                        team == SOCCER_TEAM_BLUE ? blue : red, 
+                                        m_karts[i]->getNode(), true);
 
         arrow_node->setPosition(core::vector3df(0, arrow_pos_height, 0));
     }
-
+#endif
 }   // initKartList
 
 //-----------------------------------------------------------------------------
