@@ -60,8 +60,8 @@
  physics -> audio
  "translations\n(too many connections\nto draw)"
  "configuration\n(too many connections\nto draw)"
-# addons -> tracks
-# addons -> karts
+ addons -> tracks
+ addons -> karts
  guiengine -> addons
  guiengine -> race
  addons -> online_manager
