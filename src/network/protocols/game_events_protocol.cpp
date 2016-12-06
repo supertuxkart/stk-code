@@ -63,8 +63,6 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     int8_t type = data.getUInt8();
     switch (type)
     {
-    case GE_START_READY_SET_GO:
-        receivedReadySetGo();       break;
     case GE_CLIENT_STARTED_RSG:
         receivedClientHasStarted(event); break;
     case GE_ITEM_COLLECTED:
@@ -164,31 +162,6 @@ void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
     World::getWorld()->getKart(kart_id)->finishedRace(time,
                                                       /*from_server*/true);
 }   // kartFinishedRace
-
-// ----------------------------------------------------------------------------
-/** This function is called on a server when the world starts the ready-set-go
- *  phase. It signals to all clients to do the same.
- */
-void GameEventsProtocol::startReadySetGo()
-{
-    assert(NetworkConfig::get()->isServer());
-    NetworkString *ns = getNetworkString(1);
-    ns->setSynchronous(true);
-    ns->addUInt8(GE_START_READY_SET_GO);
-    sendMessageToPeersChangingToken(ns, /*reliable*/true);
-    delete ns;
-}   // startReadySetGo
-
-// ----------------------------------------------------------------------------
-/** Called on the client when it receives the message that the server has
- *  started its ready-set-go. Signal to world that it can go to the next
- *  phase (ready phase) now.
- */
-void GameEventsProtocol::receivedReadySetGo()
-{
-    assert(NetworkConfig::get()->isClient());
-    World::getWorld()->startReadySetGo();
-}   // receivedReadySetGo
 
 // ----------------------------------------------------------------------------
 /** Called on a client when it has started its ready-set-go. The client will
