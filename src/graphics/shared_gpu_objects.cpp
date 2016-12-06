@@ -29,6 +29,7 @@ GLuint SharedGPUObjects::m_full_screen_quad_vao;
 GLuint SharedGPUObjects::m_ui_vao;
 GLuint SharedGPUObjects::m_quad_buffer;
 GLuint SharedGPUObjects::m_quad_vbo;
+GLuint SharedGPUObjects::m_skinning_ubo;
 bool   SharedGPUObjects::m_has_been_initialised = false;
 
 /** Initialises m_full_screen_quad_vbo.
@@ -167,6 +168,17 @@ void SharedGPUObjects::initLightingDataUBO()
 }   // initLightingDataUBO
 
 // ----------------------------------------------------------------------------
+void SharedGPUObjects::initSkinningUBO()
+{
+    assert(CVS->isARBUniformBufferObjectUsable());
+    glGenBuffers(1, &m_skinning_ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, m_skinning_ubo);
+    glBufferData(GL_UNIFORM_BUFFER, 1000 * 16 * sizeof(float), 0,
+                 GL_STREAM_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}   // initSkinningUBO
+
+// ----------------------------------------------------------------------------
 void SharedGPUObjects::initParticleQuadVBO()
 {
     static const GLfloat QUAD_VERTEX[] =
@@ -198,7 +210,8 @@ void SharedGPUObjects::init()
     if(CVS->isARBUniformBufferObjectUsable())
     {
         initShadowVPMUBO();
-        initLightingDataUBO();        
+        initLightingDataUBO();
+        initSkinningUBO();
     }
 
     m_has_been_initialised = true;

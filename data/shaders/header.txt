@@ -63,5 +63,11 @@ layout (std140) uniform LightingData
     float rL21;
     float rL22;
 };
+
+layout (std140) uniform SkinningData
+{
+    mat4 joint_matrices[1000];
+};
+
 #endif
 #endif // HEADER_TXT

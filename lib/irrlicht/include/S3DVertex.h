@@ -26,7 +26,9 @@ enum E_VERTEX_TYPE
 
 	//! Vertex with a tangent and binormal vector, video::S3DVertexTangents.
 	/** Usually used for tangent space normal mapping. */
-	EVT_TANGENTS
+	EVT_TANGENTS,
+
+	EVT_SKINNED_MESH
 };
 
 //! Array holding the built in vertex type names
@@ -251,6 +253,22 @@ struct S3DVertexTangents : public S3DVertex
 	}
 };
 
+struct S3DVertexSkinnedMesh : public S3DVertexTangents
+{
+	s32 m_joint_idx1;
+	s32 m_joint_idx2;
+	s32 m_joint_idx3;
+	s32 m_joint_idx4;
+	f32 m_weight1;
+	f32 m_weight2;
+	f32 m_weight3;
+	f32 m_weight4;
+
+	E_VERTEX_TYPE getType() const
+	{
+		return EVT_SKINNED_MESH;
+	}
+};
 
 
 inline u32 getVertexPitchFromType(E_VERTEX_TYPE vertexType)
@@ -261,6 +279,8 @@ inline u32 getVertexPitchFromType(E_VERTEX_TYPE vertexType)
 		return sizeof(video::S3DVertex2TCoords);
 	case video::EVT_TANGENTS:
 		return sizeof(video::S3DVertexTangents);
+	case video::EVT_SKINNED_MESH:
+		return sizeof(video::S3DVertexSkinnedMesh);
 	default:
 		return sizeof(video::S3DVertex);
 	}

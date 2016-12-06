@@ -27,6 +27,7 @@ void InstanceFiller<InstanceDataSingleTex>::add(GLMesh* mesh,
 {
     fillOriginOrientationScale<InstanceDataSingleTex>(STK::tuple_get<0>(is), instance);
     instance.Texture = mesh->TextureHandles[0];
+    instance.skinning_offset = STK::tuple_get<3>(is);
 }
 
 // ----------------------------------------------------------------------------
@@ -60,6 +61,7 @@ void InstanceFiller<InstanceDataFourTex>::add(GLMesh* mesh,
     instance.SecondTexture = mesh->TextureHandles[1];
     instance.ThirdTexture = mesh->TextureHandles[2];
     instance.FourthTexture = mesh->TextureHandles[3];
+    instance.skinning_offset = STK::tuple_get<3>(is);
 }
 
 // ----------------------------------------------------------------------------
@@ -172,7 +174,8 @@ void SolidCommandBuffer::fill(SolidPassMeshMap *mesh_map)
 
     std::vector<int> four_tex_material_list =
         createVector<int>(Material::SHADERTYPE_DETAIL_MAP,
-                          Material::SHADERTYPE_NORMAL_MAP);
+                          Material::SHADERTYPE_NORMAL_MAP,
+                          Material::SHADERTYPE_SOLID_SKINNED_MESH);
 
     fillInstanceData<InstanceDataFourTex, SolidPassMeshMap>
         (mesh_map, four_tex_material_list, InstanceTypeFourTex);

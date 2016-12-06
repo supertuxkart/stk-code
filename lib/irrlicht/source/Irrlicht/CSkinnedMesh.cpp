@@ -18,7 +18,7 @@ namespace scene
 
 //! constructor
 CSkinnedMesh::CSkinnedMesh()
-: SkinningBuffers(0), AnimationFrames(0.f), FramesPerSecond(25.f),
+: m_joint_total_size(0), SkinningBuffers(0), AnimationFrames(0.f), FramesPerSecond(25.f),
 	LastAnimatedFrame(-1), SkinnedLastFrame(false),
 	InterpolationMode(EIM_LINEAR),
 	HasAnimation(false), PreparedForSkinning(false),
@@ -27,7 +27,6 @@ CSkinnedMesh::CSkinnedMesh()
 	#ifdef _DEBUG
 	setDebugName("CSkinnedMesh");
 	#endif
-
 	SkinningBuffers=&LocalBuffers;
 }
 
@@ -74,12 +73,19 @@ void CSkinnedMesh::setAnimationSpeed(f32 fps)
 //! returns the animated mesh based on a detail level. 0 is the lowest, 255 the highest detail. Note, that some Meshes will ignore the detail level.
 IMesh* CSkinnedMesh::getMesh(s32 frame, s32 detailLevel, s32 startFrameLoop, s32 endFrameLoop)
 {
+	const bool is_hw_skinning_before = HardwareSkinning;
+	if (is_hw_skinning_before)
+		HardwareSkinning = false;
 	//animate(frame,startFrameLoop, endFrameLoop);
 	if (frame==-1)
 		return this;
 
 	animateMesh((f32)frame, 1.0f);
 	skinMesh();
+
+	if (is_hw_skinning_before)
+		HardwareSkinning = true;
+
 	return this;
 }
 
@@ -456,7 +462,13 @@ void CSkinnedMesh::skinMesh(f32 strength)
 	//-----------------
 
 	SkinnedLastFrame=true;
-	if (!HardwareSkinning)
+	m_joint_matrixes.clear();
+	if (HardwareSkinning)
+	{
+		for (u32 i = 0; i < RootJoints.size(); i++)
+			skinJoint(RootJoints[i], 0, strength);
+	}
+	else
 	{
 		//Software skin....
 		u32 i;
@@ -493,52 +505,58 @@ void CSkinnedMesh::skinJoint(SJoint *joint, SJoint *parentJoint, f32 strength)
 		//Find this joints pull on vertices...
 		core::matrix4 jointVertexPull(core::matrix4::EM4CONST_NOTHING);
 		jointVertexPull.setbyproduct(joint->GlobalAnimatedMatrix, joint->GlobalInversedMatrix);
-
-		core::vector3df thisVertexMove, thisNormalMove;
-
-		core::array<scene::SSkinMeshBuffer*> &buffersUsed=*SkinningBuffers;
-
-		//Skin Vertices Positions and Normals...
-		for (u32 i=0; i<joint->Weights.size(); ++i)
+		if (HardwareSkinning)
 		{
-			SWeight& weight = joint->Weights[i];
+			m_joint_matrixes.push_back(jointVertexPull);
+		}
+		else
+		{
+			core::vector3df thisVertexMove, thisNormalMove;
 
-			// Pull this vertex...
-			jointVertexPull.transformVect(thisVertexMove, weight.StaticPos);
+			core::array<scene::SSkinMeshBuffer*> &buffersUsed=*SkinningBuffers;
 
-			if (AnimateNormals)
-				jointVertexPull.rotateVect(thisNormalMove, weight.StaticNormal);
-
-			// Apply animation strength
-			if(strength != 1.f)
+			//Skin Vertices Positions and Normals...
+			for (u32 i=0; i<joint->Weights.size(); ++i)
 			{
-				thisVertexMove = core::lerp(weight.StaticPos, thisVertexMove, strength);
-				if(AnimateNormals)
-					thisNormalMove = core::lerp(weight.StaticNormal, thisNormalMove, strength);
-			}
+				SWeight& weight = joint->Weights[i];
 
-			if (! (*(weight.Moved)) )
-			{
-				*(weight.Moved) = true;
-
-				buffersUsed[weight.buffer_id]->getVertex(weight.vertex_id)->Pos = thisVertexMove * weight.strength;
+				// Pull this vertex...
+				jointVertexPull.transformVect(thisVertexMove, weight.StaticPos);
 
 				if (AnimateNormals)
-					buffersUsed[weight.buffer_id]->getVertex(weight.vertex_id)->Normal = thisNormalMove * weight.strength;
+					jointVertexPull.rotateVect(thisNormalMove, weight.StaticNormal);
 
-				//*(weight._Pos) = thisVertexMove * weight.strength;
+				// Apply animation strength
+				if(strength != 1.f)
+				{
+					thisVertexMove = core::lerp(weight.StaticPos, thisVertexMove, strength);
+					if(AnimateNormals)
+						thisNormalMove = core::lerp(weight.StaticNormal, thisNormalMove, strength);
+				}
+
+				if (! (*(weight.Moved)) )
+				{
+					*(weight.Moved) = true;
+
+					buffersUsed[weight.buffer_id]->getVertex(weight.vertex_id)->Pos = thisVertexMove * weight.strength;
+
+					if (AnimateNormals)
+						buffersUsed[weight.buffer_id]->getVertex(weight.vertex_id)->Normal = thisNormalMove * weight.strength;
+
+					//*(weight._Pos) = thisVertexMove * weight.strength;
+				}
+				else
+				{
+					buffersUsed[weight.buffer_id]->getVertex(weight.vertex_id)->Pos += thisVertexMove * weight.strength;
+
+					if (AnimateNormals)
+						buffersUsed[weight.buffer_id]->getVertex(weight.vertex_id)->Normal += thisNormalMove * weight.strength;
+
+					//*(weight._Pos) += thisVertexMove * weight.strength;
+				}
+
+				buffersUsed[weight.buffer_id]->boundingBoxNeedsRecalculated();
 			}
-			else
-			{
-				buffersUsed[weight.buffer_id]->getVertex(weight.vertex_id)->Pos += thisVertexMove * weight.strength;
-
-				if (AnimateNormals)
-					buffersUsed[weight.buffer_id]->getVertex(weight.vertex_id)->Normal += thisNormalMove * weight.strength;
-
-				//*(weight._Pos) += thisVertexMove * weight.strength;
-			}
-
-			buffersUsed[weight.buffer_id]->boundingBoxNeedsRecalculated();
 		}
 	}
 
@@ -1382,6 +1400,85 @@ void CSkinnedMesh::addJoints(core::array<IBoneSceneNode*> &jointChildSceneNodes,
 	SkinnedLastFrame=false;
 }
 
+void CSkinnedMesh::convertForSkinning()
+{
+	if (HardwareSkinning) return;
+
+	setHardwareSkinning(true);
+	WeightInfluence wi;
+	for (u32 b = 0; b < LocalBuffers.size(); b++)
+	{
+		if (LocalBuffers[b])
+			LocalBuffers[b]->convertForSkinning();
+
+		wi.push_back(core::array<core::array<JointInfluence>> ());
+		for (u32 i = 0; i < LocalBuffers[b]->getVertexCount(); i++)
+			wi[b].push_back(core::array<JointInfluence>());
+	}
+
+	size_t idx = 0;
+	for (u32 i = 0; i < RootJoints.size(); i++)
+		computeWeightInfluence(RootJoints[i], idx, wi);
+
+	for (u32 b = 0; b < LocalBuffers.size(); b++)
+	{
+		if (LocalBuffers[b])
+		{
+			const u32 total = wi[b].size();
+			_IRR_DEBUG_BREAK_IF(LocalBuffers[b]->getVertexCount() != total);
+			for (u32 i = 0; i < total; i++)
+			{
+				core::array<JointInfluence> this_influence;
+				core::array<JointInfluence> reported_weight = wi[b][i];
+				reported_weight.sort();
+				float remaining_weight = 1.0f;
+				for (u32 j = 0; j < 4; j++)
+				{
+					JointInfluence influence;
+					if (reported_weight.size() > j)
+						influence = reported_weight[j];
+					else
+					{
+						influence.joint_idx = -1;
+						influence.weight = remaining_weight;
+					}
+					remaining_weight -= influence.weight;
+					this_influence.push_back(influence);
+				}
+				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_joint_idx1 = this_influence[0].joint_idx;
+				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_joint_idx2 = this_influence[1].joint_idx;
+				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_joint_idx3 = this_influence[2].joint_idx;
+				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_joint_idx4 = this_influence[3].joint_idx;
+				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_weight1 = this_influence[0].weight;
+				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_weight2 = this_influence[1].weight;
+				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_weight3 = this_influence[2].weight;
+				LocalBuffers[b]->Vertices_SkinnedMesh[i].m_weight4 = this_influence[3].weight;
+			}
+		}
+	}
+	SkinnedLastFrame = false;
+	skinMesh();
+	m_joint_total_size = m_joint_matrixes.size() * sizeof(core::matrix4);
+}
+
+void CSkinnedMesh::computeWeightInfluence(SJoint *joint, size_t &index, WeightInfluence& wi)
+{
+	if (!joint->Weights.empty())
+	{
+		for (u32 i = 0; i < joint->Weights.size(); i++)
+		{
+			SWeight& weight = joint->Weights[i];
+			JointInfluence tmp;
+			tmp.joint_idx = index;
+			tmp.weight = weight.strength;
+			wi[weight.buffer_id][weight.vertex_id].push_back(tmp);
+		}
+		index++;
+	}
+
+	for (u32 j = 0; j < joint->Children.size(); j++)
+		computeWeightInfluence(joint->Children[j], index, wi);
+}
 
 void CSkinnedMesh::convertMeshToTangents()
 {

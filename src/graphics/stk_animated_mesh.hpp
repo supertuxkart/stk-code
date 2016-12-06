@@ -26,6 +26,10 @@
 #include <irrTypes.h>
 
 class RenderInfo;
+namespace irr
+{
+    namespace scene { class CSkinnedMesh; }
+}
 
 class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode, public STKMeshCommon
 {
@@ -50,9 +54,15 @@ public:
   virtual void render();
   virtual void setMesh(irr::scene::IAnimatedMesh* mesh);
   virtual bool glow() const { return false; }
+  int getTotalJointSize() const;
+  int getSkinningOffset() const { return m_skinning_offset; }
+  void setSkinningOffset(int offset) { m_skinning_offset = offset; }
+  bool useHardwareSkinning() const { return m_skinned_mesh!= NULL; }
 private:
     RenderInfo* m_mesh_render_info;
     bool m_all_parts_colorized;
+    irr::scene::CSkinnedMesh* m_skinned_mesh;
+    int m_skinning_offset;
 };
 
 #endif // STKANIMATEDMESH_HPP

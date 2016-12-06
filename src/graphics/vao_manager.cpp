@@ -161,6 +161,9 @@ void VAOInstanceUtil<InstanceDataSingleTex>::SetVertexAttrib()
     glEnableVertexAttribArray(11);
     glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceDataSingleTex), (GLvoid*)(9 * sizeof(float)));
     glVertexAttribDivisorARB(11, 1);
+    glEnableVertexAttribArray(15);
+    glVertexAttribIPointer(15, 1, GL_UNSIGNED_INT, sizeof(InstanceDataSingleTex), (GLvoid*)(11 * sizeof(float)));
+    glVertexAttribDivisorARB(15, 1);
 }
 
 template<>
@@ -200,6 +203,9 @@ void VAOInstanceUtil<InstanceDataFourTex>::SetVertexAttrib()
     glEnableVertexAttribArray(14);
     glVertexAttribIPointer(14, 2, GL_UNSIGNED_INT, sizeof(InstanceDataFourTex), (GLvoid*)(13 * sizeof(float) + 6 * sizeof(unsigned)));
     glVertexAttribDivisorARB(14, 1);
+    glEnableVertexAttribArray(15);
+    glVertexAttribIPointer(15, 1, GL_UNSIGNED_INT, sizeof(InstanceDataFourTex), (GLvoid*)(13 * sizeof(float) + 8 * sizeof(unsigned)));
+    glVertexAttribDivisorARB(15, 1);
 }
 
 template<>
@@ -216,7 +222,7 @@ void VAOManager::regenerateInstancedVAO()
 {
     cleanInstanceVAOs();
 
-    enum video::E_VERTEX_TYPE IrrVT[] = { video::EVT_STANDARD, video::EVT_2TCOORDS, video::EVT_TANGENTS };
+    enum video::E_VERTEX_TYPE IrrVT[] = { video::EVT_STANDARD, video::EVT_2TCOORDS, video::EVT_TANGENTS, video::EVT_SKINNED_MESH };
     for (unsigned i = 0; i < VTXTYPE_COUNT; i++)
     {
         video::E_VERTEX_TYPE tp = IrrVT[i];
@@ -264,6 +270,8 @@ size_t VAOManager::getVertexPitch(enum VTXTYPE tp) const
         return getVertexPitchFromType(video::EVT_2TCOORDS);
     case VTXTYPE_TANGENT:
         return getVertexPitchFromType(video::EVT_TANGENTS);
+    case VTXTYPE_SKINNED_MESH:
+        return getVertexPitchFromType(video::EVT_SKINNED_MESH);
     default:
         assert(0 && "Wrong vtxtype");
         return -1;
@@ -282,6 +290,8 @@ VAOManager::VTXTYPE VAOManager::getVTXTYPE(video::E_VERTEX_TYPE type)
         return VTXTYPE_TCOORD;
     case video::EVT_TANGENTS:
         return VTXTYPE_TANGENT;
+    case video::EVT_SKINNED_MESH:
+        return VTXTYPE_SKINNED_MESH;
     }
 };
 
@@ -296,6 +306,8 @@ irr::video::E_VERTEX_TYPE VAOManager::getVertexType(enum VTXTYPE tp)
         return video::EVT_2TCOORDS;
     case VTXTYPE_TANGENT:
         return video::EVT_TANGENTS;
+    case VTXTYPE_SKINNED_MESH:
+        return video::EVT_SKINNED_MESH;
     }
 }
 

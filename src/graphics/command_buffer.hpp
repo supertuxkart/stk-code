@@ -29,7 +29,7 @@
 #include <array>
 #include <unordered_map>
 
-typedef STK::Tuple<scene::ISceneNode*, core::vector2df, core::vector2df> InstanceSettings;
+typedef STK::Tuple<scene::ISceneNode*, core::vector2df, core::vector2df, uint32_t> InstanceSettings;
 
 struct InstanceList
 {

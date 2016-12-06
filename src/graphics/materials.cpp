@@ -25,6 +25,14 @@ const STK::Tuple<> DefaultMaterial::ShadowTextures;
 const STK::Tuple<size_t> DefaultMaterial::RSMTextures = STK::Tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
+const STK::Tuple<size_t> SkinnedSolid::FirstPassTextures
+    = STK::Tuple<size_t>(1);
+const STK::Tuple<size_t, size_t, size_t> SkinnedSolid::SecondPassTextures
+    = STK::Tuple<size_t, size_t, size_t>(0, 1, 2);
+const STK::Tuple<> SkinnedSolid::ShadowTextures;
+const STK::Tuple<size_t> SkinnedSolid::RSMTextures = STK::Tuple<size_t>(0);
+
+// ----------------------------------------------------------------------------
 const STK::Tuple<size_t, size_t> AlphaRef::FirstPassTextures
     = STK::Tuple<size_t, size_t>(0, 1);
 const STK::Tuple<size_t, size_t, size_t> AlphaRef::SecondPassTextures

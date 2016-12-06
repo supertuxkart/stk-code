@@ -22,6 +22,7 @@
 #include "graphics/lod_node.hpp"
 #include "graphics/materials.hpp"
 #include "graphics/shadow_matrices.hpp"
+#include "graphics/stk_animated_mesh.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
@@ -29,6 +30,8 @@
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
+
+#include <numeric>
 
 // ----------------------------------------------------------------------------
 void DrawCalls::clearLists()
@@ -175,6 +178,28 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
         return;
     }
 
+    uint32_t skinning_offset = 0;
+    STKAnimatedMesh* am = dynamic_cast<STKAnimatedMesh*>(Node);
+    if (am && am->useHardwareSkinning())
+    {
+        SkinningOffset::const_iterator it = m_skinning_offsets.find(am);
+        if (it != m_skinning_offsets.end())
+        {
+            skinning_offset = am->getSkinningOffset() / sizeof(core::matrix4);
+        }
+        else
+        {
+            const uint32_t cur_offset =
+                std::accumulate(m_skinning_offsets.begin(),
+                m_skinning_offsets.end(), 0, [] (const size_t previous,
+                const std::pair<STKAnimatedMesh*, uint32_t>& p)
+                { return previous + p.second; });
+            am->setSkinningOffset(cur_offset);
+            m_skinning_offsets[am] = am->getTotalJointSize();
+            skinning_offset = cur_offset / sizeof(core::matrix4);
+        }
+    }
+
     bool culled_for_cams[6] = { true, true, true, true, true, true };
     culled_for_cams[0] = isCulledPrecise(cam, Node,
         irr_driver->getBoundingBoxesViz());
@@ -255,7 +280,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     {
                         m_glow_pass_mesh[mesh->mb].m_mesh = mesh;
                         m_glow_pass_mesh[mesh->mb].m_instance_settings
-                            .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f));
+                            .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f), skinning_offset);
                     }
                     if (Mat == Material::SHADERTYPE_SPLATTING)
                     {
@@ -267,15 +292,12 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     }
                     else
                     {
-                        // Only take render info into account if the node is not static (animated)
-                        // So they can have different animation
-                        std::pair<scene::IMeshBuffer*, RenderInfo*> mesh_render_info(mesh->mb,
-                            dynamic_cast<STKMeshSceneNode*>(Node) == NULL ? mesh->m_render_info : NULL);
+                        std::pair<scene::IMeshBuffer*, RenderInfo*> mesh_render_info(mesh->mb, NULL);
                         m_solid_pass_mesh[Mat][mesh_render_info].m_mesh = mesh;
                         m_solid_pass_mesh[Mat][mesh_render_info].m_instance_settings.emplace_back(Node, mesh->texture_trans,
                             (mesh->m_render_info && mesh->m_material ?
                             core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
-                            core::vector2df(0.0f, 0.0f)));
+                            core::vector2df(0.0f, 0.0f)), skinning_offset);
                     }
                 }
             }
@@ -351,7 +373,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                 {
                     m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].m_mesh = mesh;
                     m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].m_instance_settings
-                        .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f));
+                        .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f), skinning_offset);
                 }
             }
             else
@@ -419,7 +441,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     {
                         m_reflective_shadow_map_mesh[Mat][mesh->mb].m_mesh = mesh;
                         m_reflective_shadow_map_mesh[Mat][mesh->mb].m_instance_settings
-                            .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f));
+                            .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f), skinning_offset);
                     }
                 }
             }
@@ -683,6 +705,7 @@ void DrawCalls::drawIndirectSolidFirstPass() const
 {
     m_solid_cmd_buffer->bind();
     m_solid_cmd_buffer->drawIndirectFirstPass<DefaultMaterial>();
+    m_solid_cmd_buffer->drawIndirectFirstPass<SkinnedSolid>();
     m_solid_cmd_buffer->drawIndirectFirstPass<AlphaRef>();
     m_solid_cmd_buffer->drawIndirectFirstPass<UnlitMat>();
     m_solid_cmd_buffer->drawIndirectFirstPass<SphereMap>();
@@ -718,6 +741,7 @@ void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled
 {
     m_solid_cmd_buffer->bind();
     m_solid_cmd_buffer->drawIndirectSecondPass<DefaultMaterial>(prefilled_tex);
+    m_solid_cmd_buffer->drawIndirectSecondPass<SkinnedSolid>(prefilled_tex);
     m_solid_cmd_buffer->drawIndirectSecondPass<AlphaRef>(prefilled_tex);
     m_solid_cmd_buffer->drawIndirectSecondPass<UnlitMat>(prefilled_tex);
     m_solid_cmd_buffer->drawIndirectSecondPass<SphereMap>(prefilled_tex);

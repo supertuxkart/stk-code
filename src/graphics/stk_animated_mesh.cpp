@@ -20,12 +20,13 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
+#include "graphics/shared_gpu_objects.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "graphics/vao_manager.hpp"
 
 #include <IMaterialRenderer.h>
 #include <ISceneManager.h>
-#include <ISkinnedMesh.h>
+#include "../../lib/irrlicht/source/Irrlicht/CSkinnedMesh.h"
 
 using namespace irr;
 
@@ -34,7 +35,7 @@ irr::scene::ISceneManager* mgr, s32 id, const std::string& debug_name,
 const core::vector3df& position,
 const core::vector3df& rotation,
 const core::vector3df& scale, RenderInfo* render_info, bool all_parts_colorized) :
-    CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
+    CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale), m_skinned_mesh(NULL)
 {
     isGLInitialized = false;
     isMaterialInitialized = false;
@@ -43,6 +44,10 @@ const core::vector3df& scale, RenderInfo* render_info, bool all_parts_colorized)
 #ifdef DEBUG
     m_debug_name = debug_name;
 #endif
+    m_skinning_offset = -1;
+    m_skinned_mesh = dynamic_cast<scene::CSkinnedMesh*>(Mesh);
+    if (m_skinned_mesh)
+        m_skinned_mesh->convertForSkinning();
 }
 
 STKAnimatedMesh::~STKAnimatedMesh()
@@ -108,6 +113,16 @@ void STKAnimatedMesh::updateNoGL()
         for (u32 i = 0; i < mb_count; ++i)
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+            if (!mb)
+                continue;
+
+            scene::SSkinMeshBuffer* ssmb = NULL;
+            if (m_skinned_mesh)
+            {
+                ssmb = dynamic_cast<scene::SSkinMeshBuffer*>(mb);
+                ssmb->VertexType = video::EVT_SKINNED_MESH;
+            }
+
             bool affected = false;
             RenderInfo* cur_ri = m_mesh_render_info;
             if (!m_all_parts_colorized && mb && cur_ri)
@@ -142,6 +157,8 @@ void STKAnimatedMesh::updateNoGL()
             GLmeshes.push_back(allocateMeshBuffer(mb, m_debug_name,
                 affected || m_all_parts_colorized || (cur_ri
                 && cur_ri->isTransparent()) ? cur_ri : default_ri));
+
+            if (m_skinned_mesh) ssmb->VertexType = video::EVT_STANDARD;
         }
 
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
@@ -162,7 +179,7 @@ void STKAnimatedMesh::updateNoGL()
             GLMesh &mesh = GLmeshes[i];
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
 
-            if (rnd->isTransparent())
+            /*if (rnd->isTransparent())
             {
                 TransparentMaterial TranspMat = getTransparentMaterialFromType(type, MaterialTypeParam, material);
                 TransparentMesh[TranspMat].push_back(&mesh);
@@ -174,10 +191,10 @@ void STKAnimatedMesh::updateNoGL()
                 else
                     TransparentMesh[TM_TRANSLUCENT_STD].push_back(&mesh);
             }
-            else
+            else*/
             {
                 Material::ShaderType MatType = getMeshMaterialFromType(type, mb->getVertexType(), material, NULL);
-                MeshSolidMaterial[MatType].push_back(&mesh);
+                MeshSolidMaterial[m_skinned_mesh ? Material::SHADERTYPE_SOLID_SKINNED_MESH : MatType].push_back(&mesh);
             }
         }
         isMaterialInitialized = true;
@@ -213,6 +230,13 @@ void STKAnimatedMesh::updateGL()
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
             if (!mb)
                 continue;
+            scene::SSkinMeshBuffer* ssmb = NULL;
+            if (m_skinned_mesh)
+            {
+                ssmb = dynamic_cast<scene::SSkinMeshBuffer*>(mb);
+                ssmb->VertexType = video::EVT_SKINNED_MESH;
+            }
+
             video::IVideoDriver* driver = SceneManager->getVideoDriver();
             video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
             video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
@@ -233,7 +257,7 @@ void STKAnimatedMesh::updateGL()
 
             if (CVS->isARBBaseInstanceUsable())
             {
-                std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb, GLmeshes[i].m_render_info);
+                std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb,NULL /*GLmeshes[i].m_render_info*/);
                 mesh.vaoBaseVertex = p.first;
                 mesh.vaoOffset = p.second;
             }
@@ -243,8 +267,18 @@ void STKAnimatedMesh::updateGL()
                 mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
                 glBindVertexArray(0);
             }
+            if (m_skinned_mesh) ssmb->VertexType = video::EVT_STANDARD;
         }
         isGLInitialized = true;
+    }
+
+    if (m_skinned_mesh)
+    {
+        assert(m_skinning_offset != -1);
+        glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getSkinningUBO());
+        glBufferSubData(GL_UNIFORM_BUFFER, m_skinning_offset,
+            m_skinned_mesh->getTotalJointSize(), m_skinned_mesh->getJointPointer());
+        return;
     }
 
     for (u32 i = 0; i<m->getMeshBufferCount(); ++i)
@@ -288,4 +322,9 @@ void STKAnimatedMesh::render()
 
     updateNoGL();
     updateGL();
+}
+
+int STKAnimatedMesh::getTotalJointSize() const
+{
+    return m_skinned_mesh->getTotalJointSize();
 }

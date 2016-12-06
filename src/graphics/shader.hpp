@@ -150,6 +150,7 @@ private:
     {
         bindPoint("MatrixData",   0);
         bindPoint("LightingData", 1);
+        bindPoint("SkinningData", 2);
     }   // assignUniformsImpl
 
     // ------------------------------------------------------------------------

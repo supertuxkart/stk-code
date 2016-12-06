@@ -155,6 +155,22 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
         glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE,
                               getVertexPitchFromType(type), (GLvoid*)48);
         break;
+    case video::EVT_SKINNED_MESH:
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)12);
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(type), (GLvoid*)24);
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)44);
+        glEnableVertexAttribArray(5);
+        glVertexAttribIPointer(5, 4, GL_INT, getVertexPitchFromType(type), (GLvoid*)60);
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)76);
+        break;
     default:
         assert(0 && "Wrong vertex type");
     }
@@ -346,8 +362,8 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
 {
     if (!mesh.textures[i])
     {
-        Log::error("STKMesh", "Missing texture %d for material %s", i,
-                   mat_name.c_str());
+        //Log::error("STKMesh", "Missing texture %d for material %s", i,
+        //           mat_name.c_str());
         // use unicolor texture to replace missing texture
         mesh.textures[i] = 
                       getUnicolorTexture(video::SColor(255, 127, 127, 127));
@@ -413,6 +429,7 @@ void initTextures(GLMesh &mesh, Material::ShaderType mat)
         break;
     case Material::SHADERTYPE_DETAIL_MAP:
     case Material::SHADERTYPE_NORMAL_MAP:
+    case Material::SHADERTYPE_SOLID_SKINNED_MESH:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
         setTexture(mesh, 1, false, getShaderTypeName(mat));
         setTexture(mesh, 2, false, getShaderTypeName(mat));

@@ -24,7 +24,10 @@
 
 class ParticleSystemProxy;
 class ShadowMatrices;
+class STKAnimatedMesh;
 class STKBillboard;
+
+typedef std::unordered_map<STKAnimatedMesh*, uint32_t> SkinningOffset;
 
 class DrawCalls
 {
@@ -36,6 +39,7 @@ private:
     std::vector<irr::scene::ISceneNode *> m_immediate_draw_list;
     std::vector<STKBillboard *>           m_billboard_list;
     std::vector<ParticleSystemProxy *>    m_particles_list;
+    SkinningOffset                        m_skinning_offsets;
 
     std::vector<float>                    m_bounding_boxes;
 
@@ -105,6 +109,7 @@ public:
     void drawIndirectGlow() const;
     void multidrawGlow() const;
     void renderBoundingBoxes();
+    void resetSkinningOffsets() { m_skinning_offsets.clear(); }
 };
 
 #endif //HEADER_DRAW_CALLS_HPP

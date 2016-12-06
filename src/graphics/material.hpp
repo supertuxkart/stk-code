@@ -48,6 +48,7 @@ public:
     enum ShaderType
     {
         SHADERTYPE_SOLID = 0,
+        SHADERTYPE_SOLID_SKINNED_MESH,
         SHADERTYPE_ALPHA_TEST,
         SHADERTYPE_ALPHA_BLEND,
         SHADERTYPE_ADDITIVE,

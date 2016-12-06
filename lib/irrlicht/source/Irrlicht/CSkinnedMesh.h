@@ -14,6 +14,20 @@
 #include "matrix4.h"
 #include "quaternion.h"
 
+class JointInfluence
+{
+public:
+	int joint_idx;
+	float weight;
+	bool operator < (const JointInfluence& other) const
+	{
+		return weight < other.weight;
+	}
+};
+
+typedef irr::core::array<irr::core::array
+		<irr::core::array<JointInfluence> > > WeightInfluence;
+
 namespace irr
 {
 namespace scene
@@ -25,7 +39,6 @@ namespace scene
 	class CSkinnedMesh: public ISkinnedMesh
 	{
 	public:
-
 		//! constructor
 		CSkinnedMesh();
 
@@ -159,6 +172,19 @@ namespace scene
 		void addJoints(core::array<IBoneSceneNode*> &jointChildSceneNodes,
 				IAnimatedMeshSceneNode* node,
 				ISceneManager* smgr);
+
+		void convertForSkinning();
+
+		void computeWeightInfluence(SJoint *joint, size_t &index, WeightInfluence& wi);
+
+		const void* getJointPointer() const { return m_joint_matrixes.const_pointer(); }
+
+		u32 getTotalJointSize() const
+		{
+			_IRR_DEBUG_BREAK_IF(m_joint_total_size == 0);
+			return m_joint_total_size;
+		}
+
 private:
 		void checkForAnimation();
 
@@ -205,6 +231,8 @@ private:
 		bool PreparedForSkinning;
 		bool AnimateNormals;
 		bool HardwareSkinning;
+		core::array<core::matrix4> m_joint_matrixes;
+		u32 m_joint_total_size;
 	};
 
 } // end namespace scene

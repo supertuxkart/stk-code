@@ -62,6 +62,7 @@ struct InstanceDataSingleTex
         float Z;
     } Scale;
     uint64_t Texture;
+    uint32_t skinning_offset;
 #ifdef WIN32
 };
 #else
@@ -135,6 +136,7 @@ struct InstanceDataFourTex
     uint64_t SecondTexture;
     uint64_t ThirdTexture;
     uint64_t FourthTexture;
+    uint32_t skinning_offset;
 #ifdef WIN32
 };
 #else
@@ -197,7 +199,7 @@ struct MeshRenderInfoEquals : std::binary_function
 
 class VAOManager : public Singleton<VAOManager>
 {
-    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_COUNT };
+    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_SKINNED_MESH, VTXTYPE_COUNT };
     GLuint vbo[VTXTYPE_COUNT], ibo[VTXTYPE_COUNT], vao[VTXTYPE_COUNT];
     GLuint instance_vbo[InstanceTypeCount];
     void *Ptr[InstanceTypeCount];

@@ -270,6 +270,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     {
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
         glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
+        glBindBufferBase(GL_UNIFORM_BUFFER, 2, SharedGPUObjects::getSkinningUBO());
     }
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
@@ -697,6 +698,7 @@ void ShaderBasedRenderer::onUnloadWorld()
     delete m_rtts;
     m_rtts = NULL;
     removeSkyBox();    
+    m_draw_calls.resetSkinningOffsets();
 }
 
 // ----------------------------------------------------------------------------

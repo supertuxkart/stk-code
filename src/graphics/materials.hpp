@@ -616,8 +616,61 @@ public:
     }   // InstancedDetailedObjectPass2Shader
 };   // InstancedDetailedObjectPass2Shader
 
+// ============================================================================
+class InstancedSkinnedMeshPass1Shader : public TextureShader<InstancedSkinnedMeshPass1Shader, 1>
+{
+public:
+    InstancedSkinnedMeshPass1Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+                            GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
+
+        assignUniforms();
+        assignSamplerNames(0, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedSkinnedMeshPass1Shader
+};   // InstancedSkinnedMeshPass1Shader
 
 // ============================================================================
+class InstancedSkinnedMeshPass2Shader : public TextureShader<InstancedSkinnedMeshPass2Shader, 6>
+{
+public:
+    InstancedSkinnedMeshPass2Shader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+                            GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
+        assignUniforms();
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedSkinnedMeshPass2Shader
+};   // InstancedSkinnedMeshPass2Shader
+
+// ============================================================================
+struct SkinnedSolid
+{
+    typedef InstancedSkinnedMeshPass1Shader InstancedFirstPassShader;
+    typedef InstancedSkinnedMeshPass2Shader InstancedSecondPassShader;
+    //typedef InstancedShadowShader InstancedShadowPassShader;
+    //typedef CInstancedRSMShader InstancedRSMShader;
+    //typedef Shaders::ObjectPass1Shader FirstPassShader;
+    //typedef Shaders::ObjectPass2Shader SecondPassShader;
+    //typedef ShadowShader ShadowPassShader;
+    //typedef CRSMShader RSMShader;
+    typedef ListSkinnedSolid List;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_SKINNED_MESH;
+    static const enum Material::ShaderType MaterialType
+                                      = Material::SHADERTYPE_SOLID_SKINNED_MESH;
+    static const enum InstanceType Instance = InstanceTypeFourTex;
+    static const STK::Tuple<size_t> FirstPassTextures;
+    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const STK::Tuple<> ShadowTextures;
+    static const STK::Tuple<size_t> RSMTextures;
+};   // struct DefaultMaterial
+
+// ----------------------------------------------------------------------------
 struct DefaultMaterial
 {
     typedef InstancedObjectPass1Shader InstancedFirstPassShader;
