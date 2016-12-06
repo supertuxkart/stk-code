@@ -254,6 +254,7 @@ void LODNode::OnRegisterSceneNode()
 
     m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN);
     m_last_tick = now;
+#ifndef SERVER_ONLY
     if (!CVS->isGLSL())
     {
         for (core::list<ISceneNode*>::Iterator it = Children.begin();
@@ -262,7 +263,7 @@ void LODNode::OnRegisterSceneNode()
             (*it)->updateAbsolutePosition();
         }
     }
-
+#endif
     scene::ISceneNode::OnRegisterSceneNode();
 }
 

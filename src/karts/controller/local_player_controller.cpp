@@ -73,6 +73,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
 
     // Attach Particle System
     Track *track = World::getWorld()->getTrack();
+#ifndef SERVER_ONLY
     if (UserConfigParams::m_weather_effects &&
         track->getSkyParticles() != NULL)
     {
@@ -88,7 +89,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
         //        of the heightmap being calculated and kept in memory
         m_sky_particles_emitter->addHeightMapAffector(track);
     }
-
+#endif
 }   // LocalPlayerController
 
 //-----------------------------------------------------------------------------
@@ -191,6 +192,7 @@ void LocalPlayerController::update(float dt)
 
     // look backward when the player requests or
     // if automatic reverse camera is active
+#ifndef SERVER_ONLY
     Camera *camera = Camera::getCamera(m_camera_index);
     if (camera->getType() != Camera::CM_TYPE_END)
     {
@@ -217,7 +219,7 @@ void LocalPlayerController::update(float dt)
             }
         }
     }
-
+#endif
     if (m_kart->getKartAnimation() && m_sound_schedule == false &&
         m_kart->getAttachment()->getType() != Attachment::ATTACH_TINYTUX)
     {

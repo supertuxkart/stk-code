@@ -52,11 +52,11 @@ KartGFX::KartGFX(const AbstractKart *kart)
     scene::ISceneNode *node = m_kart->getNode();
     // Create nitro light
     core::vector3df location(0.0f, 0.5f, -0.5f*length - 0.05f);
+#ifndef SERVER_ONLY
     m_nitro_light = irr_driver->addLight(location, /*force*/ 0.4f,
                                          /*radius*/CVS->isGLSL() ? 5.0f : 1.0f,
                                          0.0f, 0.4f, 1.0f,
                                          false, node);
-#ifndef SERVER_ONLY
     m_nitro_light->setVisible(false);
 #ifdef DEBUG
     m_nitro_light->setName( ("nitro emitter (" + m_kart->getIdent()
