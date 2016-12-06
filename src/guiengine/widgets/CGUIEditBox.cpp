@@ -99,6 +99,7 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
 //! destructor
 CGUIEditBox::~CGUIEditBox()
 {
+#ifndef SERVER_ONLY
     if (OverrideFont)
         OverrideFont->drop();
 
@@ -107,6 +108,7 @@ CGUIEditBox::~CGUIEditBox()
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
     CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(irr_driver->getDevice());
     dl->setIMEEnable(false);
+#endif
 #endif
 }
 
@@ -235,6 +237,7 @@ void CGUIEditBox::setTextAlignment(EGUI_ALIGNMENT horizontal, EGUI_ALIGNMENT ver
 //! called if an event happened.
 bool CGUIEditBox::OnEvent(const SEvent& event)
 {
+#ifndef SERVER_ONLY
     if (isEnabled())
     {
 
@@ -280,7 +283,7 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
             break;
         }
     }
-
+#endif
     return IGUIElement::OnEvent(event);
 }
 
@@ -1565,6 +1568,7 @@ void CGUIEditBox::inputChar(wchar_t c)
 
 void CGUIEditBox::calculateScrollPos()
 {
+#ifndef SERVER_ONLY
     if (!AutoScroll)
         return;
 
@@ -1618,6 +1622,7 @@ void CGUIEditBox::calculateScrollPos()
         dl->setIMELocation(calculateICPos());
     }
 #endif
+#endif   // SERVER_ONLY
 }
 
 //! set text markers
