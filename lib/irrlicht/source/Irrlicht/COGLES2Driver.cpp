@@ -341,11 +341,25 @@ namespace video
 			delete BridgeCalls;
         
 #if defined(EGL_VERSION_1_0)
-		// HACK : the following is commented because destroying the context crashes under Linux (Thibault 04-feb-10)
-		/*eglMakeCurrent(EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-		eglDestroyContext(EglDisplay, EglContext);
-		eglDestroySurface(EglDisplay, EglSurface);*/
-		eglTerminate(EglDisplay);
+		eglMakeCurrent(EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+		
+		if (EglContext != EGL_NO_CONTEXT)
+		{
+			eglDestroyContext(EglDisplay, EglContext);
+			EglContext = EGL_NO_CONTEXT;
+		}
+		
+		if (EglSurface != EGL_NO_SURFACE)
+		{
+			eglDestroySurface(EglDisplay, EglSurface);
+			EglSurface = EGL_NO_SURFACE;
+		}
+		
+		if (EglDisplay != EGL_NO_DISPLAY)
+		{
+			eglTerminate(EglDisplay);
+			EglDisplay = EGL_NO_DISPLAY;
+		}
 
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
 		if (HDc)
