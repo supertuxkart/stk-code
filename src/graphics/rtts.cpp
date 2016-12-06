@@ -60,14 +60,14 @@ RTT::RTT(size_t width, size_t height)
     using namespace video;
     using namespace core;
     
-    dimension2du res(width * UserConfigParams::m_scale_rtts_factor, 
-                     height * UserConfigParams::m_scale_rtts_factor);
+    dimension2du res(int(width * UserConfigParams::m_scale_rtts_factor),
+                     int(height * UserConfigParams::m_scale_rtts_factor) );
     
     const dimension2du half = res/2;
     const dimension2du quarter = res/4;
     const dimension2du eighth = res/8;
 
-    const u16 shadowside = 1024 * UserConfigParams::m_scale_rtts_factor;
+    const u16 shadowside = u16(1024 * UserConfigParams::m_scale_rtts_factor);
     const dimension2du shadowsize0(shadowside, shadowside);
     const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
     const dimension2du shadowsize2(shadowside / 4, shadowside / 4);
