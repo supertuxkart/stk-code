@@ -341,7 +341,7 @@ namespace video
 			delete BridgeCalls;
         
 #if defined(EGL_VERSION_1_0)
-		eglMakeCurrent(EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+		eglMakeCurrent(EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 		
 		if (EglContext != EGL_NO_CONTEXT)
 		{
