@@ -235,7 +235,7 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name,
     }
     for (unsigned i = 0; i < 8; i++)
         result.textures[i] = mb->getMaterial().getTexture(i);
-    result.TextureMatrix = 0;
+    result.texture_trans = core::vector2df(0.0f, 0.0f);
     result.VAOType = mb->getVertexType();
     return result;
 }   // allocateMeshBuffer
@@ -365,7 +365,10 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
                 Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
         }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
+        {
             glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
+            insertTextureHandle(mesh.TextureHandles[i]);
+        }
     }
 #endif
 }   // setTexture
@@ -403,17 +406,19 @@ void initTextures(GLMesh &mesh, Material::ShaderType mat)
     default:
     case Material::SHADERTYPE_SOLID:
     case Material::SHADERTYPE_ALPHA_TEST:
-    case Material::SHADERTYPE_VEGETATION:
     case Material::SHADERTYPE_SPHERE_MAP:
     case Material::SHADERTYPE_SOLID_UNLIT:
+    case Material::SHADERTYPE_VEGETATION:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
         setTexture(mesh, 1, false, getShaderTypeName(mat));
+        setTexture(mesh, 2, false, getShaderTypeName(mat));
         break;
     case Material::SHADERTYPE_DETAIL_MAP:
     case Material::SHADERTYPE_NORMAL_MAP:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
         setTexture(mesh, 1, false, getShaderTypeName(mat));
         setTexture(mesh, 2, false, getShaderTypeName(mat));
+        setTexture(mesh, 3, false, getShaderTypeName(mat));
         break;
     case Material::SHADERTYPE_SPLATTING:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
@@ -423,6 +428,7 @@ void initTextures(GLMesh &mesh, Material::ShaderType mat)
         setTexture(mesh, 4, true, getShaderTypeName(mat));
         setTexture(mesh, 5, true, getShaderTypeName(mat));
         setTexture(mesh, 6, false, getShaderTypeName(mat));
+        setTexture(mesh, 7, false, getShaderTypeName(mat));
         break;
     }
 }   // initTextures
@@ -445,7 +451,10 @@ void initTexturesTransparent(GLMesh &mesh)
                 Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
         }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+        {
             glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+            insertTextureHandle(mesh.TextureHandles[0]);
+        }
     }
 #endif
 }   // initTexturesTransparent

@@ -188,10 +188,18 @@ void STKAnimatedMesh::updateNoGL()
     for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
     {
         scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-        if (!mb)
-            continue;
-        if (mb)
-            GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
+        if (mb != NULL)
+        {
+            // Test if texture matrix needs to be updated every frame
+            const core::matrix4& mat = getMaterial(i).getTextureMatrix(0);
+            if (mat.isIdentity())
+                continue;
+            else
+            {
+                GLmeshes[i].texture_trans.X = mat[8];
+                GLmeshes[i].texture_trans.Y = mat[9];
+            }
+        }
     }
 }
 

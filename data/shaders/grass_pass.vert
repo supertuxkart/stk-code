@@ -19,9 +19,18 @@ out vec2 uv;
 
 void main()
 {
+
+    mat4 new_model_matrix = ModelMatrix;
+    mat4 new_inverse_model_matrix = InverseModelMatrix;
+    new_model_matrix[3].xyz += windDir * Color.r;
+
+    // FIXME doesn't seem to make too much difference in pass 2, because this
+    // affects "nor" which is later only * 0.1 by scattering
+    new_inverse_model_matrix[3].xyz -= windDir * Color.r;
+
+    mat4 ModelViewProjectionMatrix = ProjectionMatrix * ViewMatrix * new_model_matrix;
+    mat4 TransposeInverseModelView = transpose(InverseViewMatrix * new_inverse_model_matrix);
+    gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
+    nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
     uv = Texcoord;
-    mat4 ModelViewProjectionMatrix = ProjectionMatrix * ViewMatrix * ModelMatrix;
-    mat4 TransposeInverseModelView = transpose(InverseModelMatrix * InverseViewMatrix);
-    nor = (TransposeInverseModelView * vec4(Normal, 1.)).xyz;
-    gl_Position = ModelViewProjectionMatrix * vec4(Position + windDir * Color.r, 1.);
 }

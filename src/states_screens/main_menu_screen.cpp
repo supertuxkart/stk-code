@@ -407,7 +407,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "quit")
     {
+        #ifdef ANDROID
+        ANativeActivity_finish(global_android_app->activity);
+        #else
         StateManager::get()->popMenu();
+        #endif
         return;
     }
     else if (selection == "about")

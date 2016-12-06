@@ -122,7 +122,7 @@ public:
 
     // ========================================================================
     class TransparentShader : public TextureShader<TransparentShader, 1,
-                                                   core::matrix4, core::matrix4,
+                                                   core::matrix4, core::vector2df,
                                                    float >
     {
     public:
@@ -131,7 +131,7 @@ public:
 
     // ========================================================================
     class TransparentFogShader : public TextureShader<TransparentFogShader, 1,
-                                     core::matrix4, core::matrix4, float, float,
+                                     core::matrix4, core::vector2df, float, float,
                                      float, float, float, video::SColorf >
     {
     public:
@@ -147,17 +147,11 @@ public:
 
     // ========================================================================
     class ObjectPass2Shader : public TextureShader < ObjectPass2Shader, 6,
-                                                 core::matrix4, core::matrix4 >
+                                                 core::matrix4, core::vector2df,
+                                                 core::vector2df >
     {
-    private:
-        GLint m_color_change_location;
     public:
         ObjectPass2Shader();
-        virtual bool changeableColor(float hue = 0.0f, float min_sat = 0.0f) const OVERRIDE
-        {
-            glUniform2f(m_color_change_location, hue, min_sat);
-            return true;
-        }   // changeableColor
     };   // ObjectPass2Shader
 
     // ========================================================================

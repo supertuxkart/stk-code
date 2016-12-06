@@ -124,10 +124,9 @@ namespace video
 #endif
 		};
 
-		EGLConfig config;
 		EGLint num_configs;
 		u32 steps=5;
-		while (!eglChooseConfig(EglDisplay, attribs, &config, 1, &num_configs) || !num_configs)
+		while (!eglChooseConfig(EglDisplay, attribs, &EglConfig, 1, &num_configs) || !num_configs)
 		{
 			switch (steps)
 			{
@@ -208,16 +207,16 @@ namespace video
 		* As soon as we picked a EGLConfig, we can safely reconfigure the
 		* ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
 	   EGLint format;
-	   eglGetConfigAttrib(EglDisplay, config, EGL_NATIVE_VISUAL_ID, &format);
+	   eglGetConfigAttrib(EglDisplay, EglConfig, EGL_NATIVE_VISUAL_ID, &format);
 
 	   ANativeWindow_setBuffersGeometry(EglWindow, 0, 0, format);
 	   #endif
 		os::Printer::log(" Creating EglSurface with nativeWindow...");
-		EglSurface = eglCreateWindowSurface(EglDisplay, config, EglWindow, NULL);
+		EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, EglWindow, NULL);
 		if (EGL_NO_SURFACE == EglSurface)
 		{
 			os::Printer::log("FAILED\n");
-			EglSurface = eglCreateWindowSurface(EglDisplay, config, NULL, NULL);
+			EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, NULL, NULL);
 			os::Printer::log("Creating EglSurface without nativeWindows...");
 		}
 		else
@@ -249,7 +248,7 @@ namespace video
 				EGL_NONE, 0
 			};
 			
-			EglContext = eglCreateContext(EglDisplay, config, EGL_NO_CONTEXT, contextAttrib);
+			EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
 		}
 		
 		if (EGL_NO_CONTEXT == EglContext)
@@ -264,7 +263,7 @@ namespace video
 				EGL_NONE, 0
 			};
 			
-			EglContext = eglCreateContext(EglDisplay, config, EGL_NO_CONTEXT, contextAttrib);
+			EglContext = eglCreateContext(EglDisplay, EglConfig, EGL_NO_CONTEXT, contextAttrib);
 			if (EGL_NO_CONTEXT == EglContext)
 			{
 				os::Printer::log("FAILED\n");
@@ -374,6 +373,32 @@ namespace video
 // -----------------------------------------------------------------------
 // METHODS
 // -----------------------------------------------------------------------
+
+	void COGLES2Driver::reloadEGLSurface(void* window)
+	{
+		os::Printer::log("Reload EGL surface.");
+		
+		#ifdef EGL_VERSION_1_0
+		#if defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
+			EglWindow = (ANativeWindow*)window;
+		#endif
+		
+		if (!EglWindow)
+			os::Printer::log("Invalid Egl window.");
+		
+		eglMakeCurrent(EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+	
+		eglDestroySurface(EglDisplay, EglSurface);
+		
+		EglSurface = eglCreateWindowSurface(EglDisplay, EglConfig, EglWindow, 0);
+		
+		if (EGL_NO_SURFACE == EglSurface)
+			os::Printer::log("Could not create EGL surface.");
+			
+		eglMakeCurrent(EglDisplay, EglSurface, EglSurface, EglContext);
+		#endif
+	}
+	
 
 	bool COGLES2Driver::genericDriverInit(const core::dimension2d<u32>& screenSize, bool stencilBuffer)
 	{

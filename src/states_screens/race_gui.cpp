@@ -925,22 +925,23 @@ void RaceGUI::initMultitouchSteering()
                       int(0.5f * margin), int(h - 0.5f * margin - btn2_size),
                       int(btn2_size), int(btn2_size));
     device->addButton(BUTTON_ESCAPE,
-                      top_margin, int(small_ratio * margin),
+                      int(top_margin), int(small_ratio * margin),
                       int(small_ratio * btn_size), int(small_ratio * btn_size));
     device->addButton(BUTTON_RESCUE,
-                      int(top_margin + small_ratio * col_size), int(small_ratio * margin),
+                      int(top_margin + small_ratio * col_size), 
+                      int(small_ratio * margin),
                       int(small_ratio * btn_size), int(small_ratio * btn_size));
     device->addButton(BUTTON_NITRO,
-                      w - 1 * col_size, h - 2 * col_size,
+                      int(w - 1 * col_size), int(h - 2 * col_size),
                       int(btn_size), int(btn_size));
     device->addButton(BUTTON_SKIDDING,
-                      w - 1 * col_size, h - 1 * col_size,
+                      int(w - 1 * col_size), int(h - 1 * col_size),
                       int(btn_size), int(btn_size));
     device->addButton(BUTTON_FIRE,
-                      w - 2 * col_size,  h - 2 * col_size,
+                      int(w - 2 * col_size),  int(h - 2 * col_size),
                       int(btn_size), int(btn_size));
     device->addButton(BUTTON_LOOK_BACKWARDS,
-                      w - 2 * col_size, h - 1 * col_size,
+                      int(w - 2 * col_size), int(h - 1 * col_size),
                       int(btn_size), int(btn_size));
 
 } // initMultitouchSteering
@@ -984,8 +985,8 @@ void RaceGUI::drawMultitouchSteering(const AbstractKart* kart,
             float w = (float)(button->width) / 20.0f;
             float h = (float)(button->height) / 20.0f;
 
-            core::rect<s32> pos2(round(x - w), round(y - h),
-                                 round(x + w), round(y + h));
+            core::rect<s32> pos2(int(round(x - w)), int(round(y - h)),
+                                 int(round(x + w)), int(round(y + h)) );
 
             draw2DImage(tex, pos2, coords, NULL, NULL, true);
         }
@@ -993,10 +994,10 @@ void RaceGUI::drawMultitouchSteering(const AbstractKart* kart,
         {
             if (button->pressed)
             {
-                core::rect<s32> pos2(button->x - button->width * 0.2f,
-                                     button->y - button->height * 0.2f,
-                                     button->x + button->width * 1.2f,
-                                     button->y + button->height * 1.2f);
+                core::rect<s32> pos2(int(button->x - button->width * 0.2f),
+                                     int(button->y - button->height * 0.2f),
+                                     int(button->x + button->width * 1.2f),
+                                     int(button->y + button->height * 1.2f) );
 
                 video::ITexture* tex = irr_driver->getTexture(FileManager::GUI,
                                                               "icons-frame.png");

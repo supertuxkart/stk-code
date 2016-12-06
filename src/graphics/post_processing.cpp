@@ -1295,7 +1295,8 @@ void PostProcessing::renderDoF(const FrameBuffer &framebuffer, GLuint color_text
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
-                                   const FrameBuffer &fbo,
+                                   const FrameBuffer &in_fbo,
+                                   const FrameBuffer &out_fbo,
                                    const FrameBuffer &quarter1_fbo,
                                    const FrameBuffer &quarter2_fbo)
 {
@@ -1303,7 +1304,7 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
 
     glEnable(GL_DEPTH_TEST);
     // Grab the sky
-    fbo.bind();
+    out_fbo.bind();
     glClear(GL_COLOR_BUFFER_BIT);
 //            irr_driver->renderSkybox(camnode);
 
@@ -1323,7 +1324,7 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     quarter1_fbo.bind();
     glViewport(0, 0, irr_driver->getActualScreenSize().Width / 4,
                      irr_driver->getActualScreenSize().Height / 4);
-    GodFadeShader::getInstance()->render(fbo.getRTT()[0], col);
+    GodFadeShader::getInstance()->render(out_fbo.getRTT()[0], col);
 
     // Blur
     renderGaussian3Blur(quarter1_fbo, quarter2_fbo);
@@ -1358,8 +1359,8 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
     glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE);
     glBlendEquation(GL_FUNC_ADD);
 
-    fbo.bind();
-    renderPassThrough(quarter2_fbo.getRTT()[0], fbo.getWidth(), fbo.getHeight());
+    in_fbo.bind();
+    renderPassThrough(quarter2_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getHeight());
     glDisable(GL_BLEND);
     
 }
@@ -1454,7 +1455,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GODRAYS));
-        renderGodRays(camnode, *out_fbo, rtts->getFBO(FBO_QUARTER1), rtts->getFBO(FBO_QUARTER2));
+        renderGodRays(camnode, *in_fbo, *out_fbo, rtts->getFBO(FBO_QUARTER1), rtts->getFBO(FBO_QUARTER2));
         PROFILER_POP_CPU_MARKER();
     }
 

@@ -27,25 +27,10 @@
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "graphics/stk_scene_manager.hpp"
 #include "graphics/vao_manager.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
-
-using namespace irr;
-
-namespace
-{
-    void FixBoundingBoxes(scene::ISceneNode* node)
-    {
-        for (scene::ISceneNode *child : node->getChildren())
-        {
-            FixBoundingBoxes(child);
-            const_cast<core::aabbox3df&>(node->getBoundingBox()).addInternalBox(child->getBoundingBox());
-        }
-    }
-} //namespace
 
 // ----------------------------------------------------------------------------
 void DrawCalls::clearLists()
@@ -74,27 +59,16 @@ void DrawCalls::clearLists()
 }
 
 // ----------------------------------------------------------------------------
-void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
-                            std::vector<scene::ISceneNode *> *ImmediateDraw,
-                            const scene::ICameraSceneNode *cam,
-                            scene::ICameraSceneNode *shadowcam[4],
-                            const scene::ICameraSceneNode *rsmcam,
-                            bool &culledforcam,
-                            bool culledforshadowcam[4],
-                            bool &culledforrsm,
-                            bool drawRSM)
+bool DrawCalls::isCulledPrecise(const scene::ICameraSceneNode *cam,
+                                const scene::ISceneNode* node,
+                                bool visualization)
 {
-    STKMeshCommon *node = dynamic_cast<STKMeshCommon*>(Node);
-    if (!node)
-        return;
-    node->updateNoGL();
-    m_deferred_update.push_back(node);
+    if (!node->getAutomaticCulling() && !visualization)
+        return false;
 
-
-    const core::matrix4 &trans = Node->getAbsoluteTransformation();
-
+    const core::matrix4 &trans = node->getAbsoluteTransformation();
     core::vector3df edges[8];
-    Node->getBoundingBox().getEdges(edges);
+    node->getBoundingBox().getEdges(edges);
     for (unsigned i = 0; i < 8; i++)
         trans.transformVect(edges[i]);
 
@@ -109,21 +83,93 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     0---------4/
     */
 
-    if (irr_driver->getBoundingBoxesViz())
+    if (visualization)
     {
-        addEdge(edges[0], edges[1]);
-        addEdge(edges[1], edges[5]);
-        addEdge(edges[5], edges[4]);
-        addEdge(edges[4], edges[0]);
-        addEdge(edges[2], edges[3]);
-        addEdge(edges[3], edges[7]);
-        addEdge(edges[7], edges[6]);
-        addEdge(edges[6], edges[2]);
-        addEdge(edges[0], edges[2]);
-        addEdge(edges[1], edges[3]);
-        addEdge(edges[5], edges[7]);
-        addEdge(edges[4], edges[6]);
+        addEdgeForViz(edges[0], edges[1]);
+        addEdgeForViz(edges[1], edges[5]);
+        addEdgeForViz(edges[5], edges[4]);
+        addEdgeForViz(edges[4], edges[0]);
+        addEdgeForViz(edges[2], edges[3]);
+        addEdgeForViz(edges[3], edges[7]);
+        addEdgeForViz(edges[7], edges[6]);
+        addEdgeForViz(edges[6], edges[2]);
+        addEdgeForViz(edges[0], edges[2]);
+        addEdgeForViz(edges[1], edges[3]);
+        addEdgeForViz(edges[5], edges[7]);
+        addEdgeForViz(edges[4], edges[6]);
+        if (!node->getAutomaticCulling())
+        {
+            return false;
+        }
     }
+
+    const scene::SViewFrustum &frust = *cam->getViewFrustum();
+    for (s32 i = 0; i < scene::SViewFrustum::VF_PLANE_COUNT; i++)
+    {
+        if (isBoxInFrontOfPlane(frust.planes[i], edges))
+        {
+            return true;
+        }
+    }
+    return false;
+
+}   // isCulledPrecise
+
+// ----------------------------------------------------------------------------
+bool DrawCalls::isBoxInFrontOfPlane(const core::plane3df &plane,
+                                    const core::vector3df* edges)
+{
+    for (u32 i = 0; i < 8; i++)
+    {
+        if (plane.classifyPointRelation(edges[i]) != core::ISREL3D_FRONT)
+            return false;
+    }
+    return true;
+}   // isBoxInFrontOfPlane
+
+// ----------------------------------------------------------------------------
+void DrawCalls::addEdgeForViz(const core::vector3df &p0,
+                              const core::vector3df &p1)
+{
+    m_bounding_boxes.push_back(p0.X);
+    m_bounding_boxes.push_back(p0.Y);
+    m_bounding_boxes.push_back(p0.Z);
+    m_bounding_boxes.push_back(p1.X);
+    m_bounding_boxes.push_back(p1.Y);
+    m_bounding_boxes.push_back(p1.Z);
+}   // addEdgeForViz
+
+// ----------------------------------------------------------------------------
+void DrawCalls::renderBoundingBoxes()
+{
+    Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
+    line->use();
+    line->bindVertexArray();
+    line->bindBuffer();
+    line->setUniforms(irr::video::SColor(255, 255, 0, 0));
+    const float *tmp = m_bounding_boxes.data();
+    for (unsigned int i = 0; i < m_bounding_boxes.size(); i += 1024 * 6)
+    {
+        unsigned count = std::min((unsigned)m_bounding_boxes.size() - i,
+            (unsigned)1024 * 6);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
+
+        glDrawArrays(GL_LINES, 0, count / 3);
+    }
+    m_bounding_boxes.clear();
+}   // renderBoundingBoxes
+
+// ----------------------------------------------------------------------------
+void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
+                                std::vector<scene::ISceneNode *> *ImmediateDraw,
+                                const scene::ICameraSceneNode *cam,
+                                ShadowMatrices& shadow_matrices)
+{
+    STKMeshCommon* node = dynamic_cast<STKMeshCommon*>(Node);
+    if (!node)
+        return;
+    node->updateNoGL();
+    m_deferred_update.push_back(node);
 
     if (node->isImmediateDraw())
     {
@@ -131,13 +177,25 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
         return;
     }
 
-    culledforcam = culledforcam || isCulledPrecise(cam, Node);
-    culledforrsm = culledforrsm || isCulledPrecise(rsmcam, Node);
-    for (unsigned i = 0; i < 4; i++)
-        culledforshadowcam[i] = culledforshadowcam[i] || isCulledPrecise(shadowcam[i], Node);
+    bool culled_for_cams[6] = { true, true, true, true, true, true };
+    culled_for_cams[0] = isCulledPrecise(cam, Node,
+        irr_driver->getBoundingBoxesViz());
+
+    if (UserConfigParams::m_gi && !shadow_matrices.isRSMMapAvail())
+    {
+        culled_for_cams[1] = isCulledPrecise(shadow_matrices.getSunCam(), Node);
+    }
+
+    if (CVS->isShadowEnabled())
+    {
+        for (unsigned i = 0; i < 4; i++)
+        {
+            culled_for_cams[i + 2] =
+                isCulledPrecise(shadow_matrices.getShadowCamNodes()[i], Node);
+        }
+    }
 
     // Transparent
-
     if (World::getWorld() && World::getWorld()->isFogEnabled())
     {
         const Track * const track = World::getWorld()->getTrack();
@@ -155,18 +213,18 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
             tmpcol.getBlue() / 255.0f);
 
         for (GLMesh *mesh : node->TransparentMesh[TM_DEFAULT])
-            pushVector(ListBlendTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
+            pushVector(ListBlendTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans,
             fogmax, startH, endH, start, end, col);
         for (GLMesh *mesh : node->TransparentMesh[TM_ADDITIVE])
-            pushVector(ListAdditiveTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix,
+            pushVector(ListAdditiveTransparentFog::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans,
             fogmax, startH, endH, start, end, col);
     }
     else
     {
         for (GLMesh *mesh : node->TransparentMesh[TM_DEFAULT])
-            pushVector(ListBlendTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, 1.0f);
+            pushVector(ListBlendTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans, 1.0f);
         for (GLMesh *mesh : node->TransparentMesh[TM_ADDITIVE])
-            pushVector(ListAdditiveTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, 1.0f);
+            pushVector(ListAdditiveTransparent::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans, 1.0f);
     }
 
     // Use sun color to determine custom alpha for ghost karts
@@ -179,15 +237,15 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     }
 
     for (GLMesh *mesh : node->TransparentMesh[TM_TRANSLUCENT_STD])
-        pushVector(ListTranslucentStandard::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
+        pushVector(ListTranslucentStandard::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans, custom_alpha);
     for (GLMesh *mesh : node->TransparentMesh[TM_TRANSLUCENT_TAN])
-        pushVector(ListTranslucentTangents::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
+        pushVector(ListTranslucentTangents::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans, custom_alpha);
     for (GLMesh *mesh : node->TransparentMesh[TM_TRANSLUCENT_2TC])
-        pushVector(ListTranslucent2TCoords::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->TextureMatrix, custom_alpha);
+        pushVector(ListTranslucent2TCoords::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans, custom_alpha);
     for (GLMesh *mesh : node->TransparentMesh[TM_DISPLACEMENT])
         pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
 
-    if (!culledforcam)
+    if (!culled_for_cams[0])
     {
         for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
@@ -198,52 +256,28 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     if (node->glow())
                     {
                         m_glow_pass_mesh[mesh->mb].m_mesh = mesh;
-                        m_glow_pass_mesh[mesh->mb].m_scene_nodes.emplace_back(Node);
+                        m_glow_pass_mesh[mesh->mb].m_instance_settings
+                            .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f));
                     }
-
-                    if (Mat != Material::SHADERTYPE_SPLATTING && mesh->TextureMatrix.isIdentity())
+                    if (Mat == Material::SHADERTYPE_SPLATTING)
                     {
-                        std::pair<scene::IMeshBuffer*, RenderInfo*> meshRenderInfo(mesh->mb, mesh->m_render_info);
-                        m_solid_pass_mesh[Mat][meshRenderInfo].m_mesh = mesh;
-                        m_solid_pass_mesh[Mat][meshRenderInfo].m_scene_nodes.emplace_back(Node);
+                        // Notice: splatting will be drawn using non-instanced shader only
+                        // It's only used one place (in overworld) and may be removed eventually
+                        core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
+                        ModelMatrix.getInverse(InvModelMatrix);
+                        ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                     }
                     else
                     {
-                        core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
-                        ModelMatrix.getInverse(InvModelMatrix);
-                        switch (Mat)
-                        {
-                        case Material::SHADERTYPE_SOLID:
-                            ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                            break;
-                        case Material::SHADERTYPE_ALPHA_TEST:
-                            ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                            break;
-                        case Material::SHADERTYPE_SOLID_UNLIT:
-                            ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
-                            break;
-                        case Material::SHADERTYPE_SPLATTING:
-                            ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
-                            break;
- 
-                        case Material::SHADERTYPE_ALPHA_BLEND:
-                            break;
-                        case Material::SHADERTYPE_ADDITIVE:
-                            break;
-                        case Material::SHADERTYPE_VEGETATION:
-                            break;
-                        case Material::SHADERTYPE_WATER:
-                            break;
-                        case Material::SHADERTYPE_SPHERE_MAP:
-                            break;
-                        case Material::SHADERTYPE_NORMAL_MAP:
-                            break;
-                        case Material::SHADERTYPE_DETAIL_MAP:
-                            break;
-
-                        default:
-                            Log::warn("DrawCalls", "Unknown material type: %d", Mat);
-                        }
+                        // Only take render info into account if the node is not static (animated)
+                        // So they can have different animation
+                        std::pair<scene::IMeshBuffer*, RenderInfo*> mesh_render_info(mesh->mb,
+                            dynamic_cast<STKMeshSceneNode*>(Node) == NULL ? mesh->m_render_info : NULL);
+                        m_solid_pass_mesh[Mat][mesh_render_info].m_mesh = mesh;
+                        m_solid_pass_mesh[Mat][mesh_render_info].m_instance_settings.emplace_back(Node, mesh->texture_trans,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                     }
                 }
             }
@@ -257,37 +291,47 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     switch (Mat)
                     {
                     case Material::SHADERTYPE_SOLID:
-                        ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
-                        ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
-                        ListMatNormalMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatNormalMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_DETAIL_MAP:
-                        ListMatDetails::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDetails::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SOLID_UNLIT:
-                        ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPHERE_MAP:
-                        ListMatSphereMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatSphereMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPLATTING:
                         ListMatSplatting::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
                     case Material::SHADERTYPE_VEGETATION:
-                        ListMatGrass::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
+                        ListMatGrass::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                         break;
-                    
                     case Material::SHADERTYPE_ALPHA_BLEND:
                         break;
                     case Material::SHADERTYPE_ADDITIVE:
                         break;
                     case Material::SHADERTYPE_WATER:
                         break;
-                        
                     default:
                         Log::warn("DrawCalls", "Unknown material type: %d", Mat);
                     }
@@ -299,7 +343,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
         return;
     for (unsigned cascade = 0; cascade < 4; ++cascade)
     {
-        if (culledforshadowcam[cascade])
+        if (culled_for_cams[cascade + 2])
             continue;
         for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
@@ -308,7 +352,8 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                 for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
                 {
                     m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].m_mesh = mesh;
-                    m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].m_scene_nodes.emplace_back(Node);
+                    m_shadow_pass_mesh[cascade * Material::SHADERTYPE_COUNT + Mat][mesh->mb].m_instance_settings
+                        .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f));
                 }
             }
             else
@@ -321,36 +366,34 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     switch (Mat)
                     {
                     case Material::SHADERTYPE_SOLID:
-                        ListMatDefault::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDefault::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
-                        ListMatAlphaRef::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatAlphaRef::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
-                        ListMatNormalMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatNormalMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_DETAIL_MAP:
-                        ListMatDetails::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDetails::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SOLID_UNLIT:
-                        ListMatUnlit::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatUnlit::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPHERE_MAP:
-                        ListMatSphereMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatSphereMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPLATTING:
                         ListMatSplatting::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
                     case Material::SHADERTYPE_VEGETATION:
-                        ListMatGrass::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
-                    
+                        ListMatGrass::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir, core::vector2df(0.0f, 0.0f));
                     case Material::SHADERTYPE_ALPHA_BLEND:
                         break;
                     case Material::SHADERTYPE_ADDITIVE:
                         break;
                     case Material::SHADERTYPE_WATER:
                         break;
-                        
                     default:
                         Log::warn("DrawCalls", "Unknown material type: %d", Mat);
                     }
@@ -358,33 +401,32 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
             }
         }
     }
-    if (!UserConfigParams::m_gi || !drawRSM)
+    if (!UserConfigParams::m_gi || shadow_matrices.isRSMMapAvail())
         return;
-    if (!culledforrsm)
+    if (!culled_for_cams[1])
     {
         for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
             if (CVS->supportsIndirectInstancingRendering())
             {
-                if (Mat == Material::SHADERTYPE_SPLATTING)
-                    for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
+                for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
+                {
+                    if (Mat == Material::SHADERTYPE_SPLATTING)
                     {
                         core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                         ModelMatrix.getInverse(InvModelMatrix);
-                       ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
-                     }
-                else
-                {
-                    for (GLMesh *mesh : node->MeshSolidMaterial[Mat])
+                        ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
+                    }
+                    else
                     {
                         m_reflective_shadow_map_mesh[Mat][mesh->mb].m_mesh = mesh;
-                        m_reflective_shadow_map_mesh[Mat][mesh->mb].m_scene_nodes.emplace_back(Node);
+                        m_reflective_shadow_map_mesh[Mat][mesh->mb].m_instance_settings
+                            .emplace_back(Node, core::vector2df(0.0f, 0.0f), core::vector2df(0.0f, 0.0f));
                     }
                 }
             }
             else
             {
-
                 core::matrix4 ModelMatrix = Node->getAbsoluteTransformation(), InvModelMatrix;
                 ModelMatrix.getInverse(InvModelMatrix);
 
@@ -393,37 +435,35 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     switch (Mat)
                     {
                     case Material::SHADERTYPE_SOLID:
-                        ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
-                        ListMatAlphaRef::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatAlphaRef::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_NORMAL_MAP:
-                        ListMatNormalMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatNormalMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
                     case Material::SHADERTYPE_DETAIL_MAP:
-                        ListMatDetails::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatDetails::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SOLID_UNLIT:
-                        ListMatUnlit::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatUnlit::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPHERE_MAP:
-                        ListMatSphereMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->TextureMatrix);
+                        ListMatSphereMap::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans);
                         break;
                     case Material::SHADERTYPE_SPLATTING:
                         ListMatSplatting::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix);
                         break;
                     case Material::SHADERTYPE_VEGETATION:
-                        ListMatGrass::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir);
+                        ListMatGrass::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, m_wind_dir, core::vector2df(0.0f, 0.0f));
                         break;
-                    
                     case Material::SHADERTYPE_ALPHA_BLEND:
                         break;
                     case Material::SHADERTYPE_ADDITIVE:
                         break;
                     case Material::SHADERTYPE_WATER:
                         break;
-                        
                     default:
                         Log::warn("DrawCalls", "Unknown material type: %d", Mat);
                     }
@@ -433,16 +473,11 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     }
 }
 
-
+// ----------------------------------------------------------------------------
 void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
                                   std::vector<scene::ISceneNode *> *ImmediateDraw,
-                                  const scene::ICameraSceneNode* cam,
-                                  scene::ICameraSceneNode *shadow_cam[4],
-                                  const scene::ICameraSceneNode *rsmcam,
-                                  bool culledforcam,
-                                  bool culledforshadowcam[4],
-                                  bool culledforrsm,
-                                  bool drawRSM)
+                                  const scene::ICameraSceneNode *cam,
+                                  ShadowMatrices& shadow_matrices)
 {
     core::list<scene::ISceneNode*>::Iterator I = List.begin(), E = List.end();
     for (; I != E; ++I)
@@ -467,13 +502,9 @@ void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
             continue;
         }
 
-        bool newculledforcam = culledforcam;
-        bool newculledforrsm = culledforrsm;
-        bool newculledforshadowcam[4] = { culledforshadowcam[0], culledforshadowcam[1], culledforshadowcam[2], culledforshadowcam[3] };
-
-        handleSTKCommon(*I, ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm, drawRSM);
-
-        parseSceneManager(const_cast<core::list<scene::ISceneNode*>& >((*I)->getChildren()), ImmediateDraw, cam, shadow_cam, rsmcam, newculledforcam, newculledforshadowcam, newculledforrsm, drawRSM);
+        handleSTKCommon((*I), ImmediateDraw, cam, shadow_matrices);
+        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam,
+            shadow_matrices);
     }
 }
 
@@ -508,15 +539,13 @@ DrawCalls::~DrawCalls()
 #endif // !defined(USE_GLES2)
 } //~DrawCalls
 
-
-
 // ----------------------------------------------------------------------------
  /** Prepare draw calls before scene rendering
  * \param[out] solid_poly_count Total number of polygons in objects 
  *                              that will be rendered in this frame
  * \param[out] shadow_poly_count Total number of polygons for shadow
  *                               (rendered this frame)
- */ 
+ */
 void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
                                   scene::ICameraSceneNode *camnode,
                                   unsigned &solid_poly_count,
@@ -535,23 +564,11 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
 
     m_glow_pass_mesh.clear();
     m_deferred_update.clear();
-    
-    core::list<scene::ISceneNode*> List = irr_driver->getSceneManager()->getRootSceneNode()->getChildren();
-
 
     PROFILER_PUSH_CPU_MARKER("- culling", 0xFF, 0xFF, 0x0);
-    for (scene::ISceneNode *child : List)
-        FixBoundingBoxes(child);
-
-    bool cam = false, rsmcam = false;
-    bool shadowcam[4] = { false, false, false, false };
-    parseSceneManager(List,
-                      &m_immediate_draw_list,
-                      camnode, 
-                      shadow_matrices.getShadowCamNodes(),
-                      shadow_matrices.getSunCam(),
-                      cam, shadowcam, rsmcam,
-                      !shadow_matrices.isRSMMapAvail());
+    parseSceneManager(
+        irr_driver->getSceneManager()->getRootSceneNode()->getChildren(),
+        &m_immediate_draw_list, camnode, shadow_matrices);
     PROFILER_POP_CPU_MARKER();
 
     // Add a 1 s timeout

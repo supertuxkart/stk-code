@@ -31,15 +31,17 @@
 #include <array>
 #include <unordered_map>
 
+typedef STK::Tuple<scene::ISceneNode*, core::vector2df, core::vector2df> InstanceSettings;
+
 struct InstanceList
 {
     GLMesh *m_mesh;
-    std::vector<irr::scene::ISceneNode*> m_scene_nodes;
+    std::vector<InstanceSettings> m_instance_settings;
 };
 
 typedef std::unordered_map <std::pair<scene::IMeshBuffer*, RenderInfo*>, InstanceList,
                             MeshRenderInfoHash, MeshRenderInfoEquals> SolidPassMeshMap;
-                            
+
 typedef std::unordered_map <irr::scene::IMeshBuffer *, InstanceList > OtherMeshMap;
 
 // ----------------------------------------------------------------------------
@@ -69,7 +71,7 @@ void fillOriginOrientationScale(scene::ISceneNode *node, InstanceData &instance)
 template<typename InstanceData>
 struct InstanceFiller
 {
-    static void add(GLMesh *, scene::ISceneNode *, InstanceData &);
+    static void add(GLMesh *, const InstanceSettings&, InstanceData &);
 };
 
 // ----------------------------------------------------------------------------
@@ -84,7 +86,7 @@ struct InstanceFiller
  *  \param[in,out] poly_count Number of triangles. Will be updated.
  */
 template<typename T>
-void FillInstances_impl(InstanceList instance_list,
+void FillInstances_impl(const InstanceList& instance_list,
                         T * instance_buffer,
                         DrawElementsIndirectCommand *command_buffer,
                         size_t &instance_buffer_offset,
@@ -95,11 +97,11 @@ void FillInstances_impl(InstanceList instance_list,
     GLMesh *mesh = instance_list.m_mesh;
     size_t initial_offset = instance_buffer_offset;
 
-    for (unsigned i = 0; i < instance_list.m_scene_nodes.size(); i++)
+    for (unsigned i = 0; i < instance_list.m_instance_settings.size(); i++)
     {
-        scene::ISceneNode *node = instance_list.m_scene_nodes[i];
-        InstanceFiller<T>::add(mesh, node, instance_buffer[instance_buffer_offset++]);
-        assert(instance_buffer_offset * sizeof(T) < 10000 * sizeof(InstanceDataDualTex));
+        InstanceFiller<T>::add(mesh, instance_list.m_instance_settings[i],
+            instance_buffer[instance_buffer_offset++]);
+        assert(instance_buffer_offset * sizeof(T) < 10000 * sizeof(InstanceDataThreeTex));
     }
 
     DrawElementsIndirectCommand &CurrentCommand = command_buffer[command_buffer_offset++];
@@ -229,7 +231,7 @@ protected:
                          VAOManager::getInstance()->getInstanceBuffer(instance_type));
             instance_buffer = (InstanceData*)
                 glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                                 10000 * sizeof(InstanceDataDualTex),
+                                 10000 * sizeof(InstanceDataThreeTex),
                                  GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
         }
         
@@ -300,12 +302,14 @@ public:
 #endif
             TexExpander<typename T::InstancedFirstPassShader>::template
                 expandTex(*mesh, T::FirstPassTextures);
-
+            if (!mesh->mb->getMaterial().BackfaceCulling)
+                glDisable(GL_CULL_FACE);
             glDrawElementsIndirect(GL_TRIANGLES,
                                    GL_UNSIGNED_SHORT,
                                    (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
-        }        
-        
+            if (!mesh->mb->getMaterial().BackfaceCulling)
+                glEnable(GL_CULL_FACE);
+        }
     } //drawIndirectFirstPass
 
     // ----------------------------------------------------------------------------
@@ -355,29 +359,13 @@ public:
         {
             GLMesh *mesh = m_meshes[T::MaterialType][i];
             expandTexSecondPass<T>(*mesh, prefilled_tex);
-            
-            //TODO: next 10 lines are duplicated in draw_tools.hpp (see CustomUnrollArgs::drawMesh)
-            //TODO: find a way to remove duplicated code
-            const bool support_change_hue = (mesh->m_render_info != NULL &&
-                mesh->m_material != NULL);
-            const bool need_change_hue =
-                (support_change_hue && mesh->m_render_info->getHue() > 0.0f);
-            if (need_change_hue)
-            {
-                T::InstancedSecondPassShader::getInstance()->changeableColor
-                    (mesh->m_render_info->getHue(),
-                     mesh->m_material->getColorizationFactor());
-            }
-            
+            if (!mesh->mb->getMaterial().BackfaceCulling)
+                glDisable(GL_CULL_FACE);
             glDrawElementsIndirect(GL_TRIANGLES,
                                    GL_UNSIGNED_SHORT,
                                    (const void*)((m_offset[T::MaterialType] + i) * sizeof(DrawElementsIndirectCommand)));
-                                   
-            if (need_change_hue)
-            {
-                // Reset after changing
-                T::InstancedSecondPassShader::getInstance()->changeableColor();
-            }
+            if (!mesh->mb->getMaterial().BackfaceCulling)
+                glEnable(GL_CULL_FACE);
         }
     } //drawIndirectSecondPass
 

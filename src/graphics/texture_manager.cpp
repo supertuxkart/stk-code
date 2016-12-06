@@ -21,6 +21,7 @@
 
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/shaders.hpp"
 
 #if defined(USE_GLES2)
 #define _IRR_COMPILE_WITH_OGLES2_
@@ -57,10 +58,28 @@ GLuint getDepthTexture(irr::video::ITexture *tex)
 
 static std::set<irr::video::ITexture *> AlreadyTransformedTexture;
 static std::map<int, video::ITexture*> unicolor_cache;
+static std::vector<uint64_t> texture_handles;
 
 void resetTextureTable()
 {
+#if !defined(USE_GLES2)
+    if (CVS->isAZDOEnabled())
+    {
+        // Driver seems to crash if texture handles are not cleared...
+        for (uint64_t& handle : texture_handles)
+        {
+            glMakeTextureHandleNonResidentARB(handle);
+        }
+        Shaders::ObjectPass1Shader::getInstance()->recreateTrilinearSampler(0);
+        texture_handles.clear();
+    }
+#endif
     AlreadyTransformedTexture.clear();
+}
+
+void insertTextureHandle(uint64_t handle)
+{
+    texture_handles.push_back(handle);
 }
 
 void cleanUnicolorTextures()

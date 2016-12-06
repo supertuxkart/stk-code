@@ -2539,30 +2539,6 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     m_attachment = new Attachment(this);
     createPhysics();
 
-    // Attach Particle System
-
-    Track *track = World::getWorld()->getTrack();
-#ifndef SERVER_ONLY
-    if (type == RaceManager::KT_PLAYER      &&
-        UserConfigParams::m_weather_effects &&
-        track->getSkyParticles() != NULL)
-    {
-        track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);
-
-        m_sky_particles_emitter =
-            new ParticleEmitter(track->getSkyParticles(),
-                                core::vector3df(0.0f, 30.0f, 100.0f),
-                                getNode(),
-                                true);
-
-        // FIXME: in multiplayer mode, this will result in several instances
-        //        of the heightmap being calculated and kept in memory
-        m_sky_particles_emitter->addHeightMapAffector(track);
-    }
-#endif
-
-    Vec3 position(0, getKartHeight()*0.35f, -getKartLength()*0.35f);
-
     m_slipstream = new SlipStream(this);
 
     if (m_kart_properties->getSkidEnabled())

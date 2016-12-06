@@ -381,6 +381,8 @@ namespace video
 		//! Get bridge calls.
         COGLES2CallBridge* getBridgeCalls() const;
 
+		void reloadEGLSurface(void* window);
+
 	private:
 		// Bridge calls.
         COGLES2CallBridge* BridgeCalls;
@@ -477,6 +479,7 @@ namespace video
 		void* EglDisplay;
 		void* EglSurface;
 		void* EglContext;
+		EGLConfig EglConfig;
 #endif
 
 		SIrrlichtCreationParameters Params;

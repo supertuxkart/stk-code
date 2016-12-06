@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/shaders.hpp"
 #include "utils/log.hpp"
 
 static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type, unsigned mipmaplevel = 1)
@@ -293,11 +294,43 @@ RTT::RTT(size_t width, size_t height)
     glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#if !defined(USE_GLES2)
+    if (CVS->isAZDOEnabled())
+    {
+        uint64_t handle =
+            glGetTextureSamplerHandleARB(getRenderTarget(RTT_DIFFUSE),
+            Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[0]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+        handle =
+            glGetTextureSamplerHandleARB(getRenderTarget(RTT_SPECULAR),
+            Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[1]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+        handle =
+            glGetTextureSamplerHandleARB(getRenderTarget(RTT_HALF1_R),
+            Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[2]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+        handle =
+            glGetTextureSamplerHandleARB(getDepthStencilTexture(),
+            Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[3]);
+        glMakeTextureHandleResidentARB(handle);
+        m_prefilled_handles.push_back(handle);
+    }
+#endif
 }
 
 RTT::~RTT()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#if !defined(USE_GLES2)
+    if (CVS->isAZDOEnabled())
+    {
+        for (uint64_t& handle : m_prefilled_handles)
+            glMakeTextureHandleNonResidentARB(handle);
+    }
+#endif
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
     if (CVS->isShadowEnabled())

@@ -549,16 +549,11 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
 }   // updateLightsInfo
 
 // ----------------------------------------------------------------------------
-void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_matrices,
-                                                const FrameBuffer& radiance_hint_framebuffer,
-                                                const FrameBuffer& reflective_shadow_map_framebuffer,
-                                                const FrameBuffer& diffuse_framebuffer,
-                                                GLuint normal_depth_texture,
-                                                GLuint depth_stencil_texture)
+void LightingPasses::renderRadianceHints(  const ShadowMatrices& shadow_matrices,
+                                           const FrameBuffer& radiance_hint_framebuffer,
+                                           const FrameBuffer& reflective_shadow_map_framebuffer)
 {
-    //Radiance hints
 #if !defined(USE_GLES2)
-    ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
     glDisable(GL_BLEND);
     radiance_hint_framebuffer.bind();
     glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
@@ -597,18 +592,18 @@ void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_mat
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
     }
 #endif //!defined(USE_GLES2)
+}   // renderRadianceHints
 
-    //Global illumination
-    {
-        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
-        diffuse_framebuffer.bind();
-        GlobalIlluminationReconstructionShader::getInstance()
-            ->render(shadow_matrices.getRHMatrix(),
-                     shadow_matrices.getRHExtend(),
-                     radiance_hint_framebuffer,
-                     normal_depth_texture,
-                     depth_stencil_texture);
-    }
+// ----------------------------------------------------------------------------
+void LightingPasses::renderGlobalIllumination(  const ShadowMatrices& shadow_matrices,
+                                                const FrameBuffer& radiance_hint_framebuffer,
+                                                GLuint normal_depth_texture,
+                                                GLuint depth_stencil_texture)
+{
+    GlobalIlluminationReconstructionShader::getInstance()
+        ->render(shadow_matrices.getRHMatrix(), shadow_matrices.getRHExtend(),
+                 radiance_hint_framebuffer, normal_depth_texture,
+                 depth_stencil_texture);
 }
 
 // ----------------------------------------------------------------------------
@@ -616,19 +611,15 @@ void LightingPasses::renderLights(  bool has_shadow,
                                     GLuint normal_depth_texture,
                                     GLuint depth_stencil_texture,
                                     const FrameBuffer& shadow_framebuffer,
-                                    const FrameBuffer& diffuse_specular_framebuffer,
                                     GLuint specular_probe)
-{    
-    diffuse_specular_framebuffer.bind();
-    glClear(GL_COLOR_BUFFER_BIT);
-
+{
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
         renderEnvMap(normal_depth_texture,
                      depth_stencil_texture,
                      specular_probe);       
-    } 
-        
+    }
+
     // Render sunlight if and only if track supports shadow
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
@@ -746,5 +737,4 @@ void LightingPasses::renderLightsScatter(GLuint depth_stencil_texture,
                                        colors_framebuffer.getHeight());
 }   // renderLightsScatter
 
-#endif    // !SERVER_ONLY
-
+#endif

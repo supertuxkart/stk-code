@@ -83,7 +83,6 @@ private:
                      
     void renderParticles();
 
-    void renderBoundingBoxes();
     void debugPhysics();
     void renderPostProcessing(Camera * const camera);
 

@@ -88,7 +88,48 @@ void renderMeshes2ndPass( const std::vector<uint64_t> &Prefilled_Handle,
     }
 }   // renderMeshes2ndPass
 
+// ----------------------------------------------------------------------------
+template<>
+void renderMeshes2ndPass<GrassMat, 4, 3, 1>
+    (const std::vector<uint64_t> &Prefilled_Handle,
+     const std::vector<GLuint> &Prefilled_Tex)
+{
+    auto &meshes = GrassMat::List::getInstance()->SolidPass;
+    GrassMat::SecondPassShader::getInstance()->use();
+    if (CVS->isARBBaseInstanceUsable())
+        glBindVertexArray(VAOManager::getInstance()->getVAO(GrassMat::VertexType));
+    for (unsigned i = 0; i < meshes.size(); i++)
+    {
+        GLMesh &mesh = *(STK::tuple_get<0>(meshes.at(i)));
+        if (!CVS->isARBBaseInstanceUsable())
+            glBindVertexArray(mesh.vao);
 
+        if (mesh.VAOType != GrassMat::VertexType)
+        {
+#ifdef DEBUG
+            Log::error("Materials", "Wrong vertex Type associed to pass 2 "
+                                    "(hint texture : %s)",
+                       mesh.textures[0]->getName().getPath().c_str());
+#endif
+            continue;
+        }
+
+        if (CVS->isAZDOEnabled())
+        {
+            HandleExpander<GrassMat::SecondPassShader>::
+                expand(mesh.TextureHandles, GrassMat::SecondPassTextures,
+                       Prefilled_Handle[0], Prefilled_Handle[1],
+                       Prefilled_Handle[2], Prefilled_Handle[3]);
+        }
+        else
+        {
+            TexExpander<GrassMat::SecondPassShader>::
+                expandTex(mesh, GrassMat::SecondPassTextures, Prefilled_Tex[0],
+                          Prefilled_Tex[1], Prefilled_Tex[2], Prefilled_Tex[3]);
+        }
+        CustomUnrollArgs<4, 3, 1>::drawMesh<GrassMat::SecondPassShader>(meshes.at(i));
+    }
+}   // renderMeshes2ndPass
 
 // ----------------------------------------------------------------------------
 template<typename T, int...List>
@@ -110,7 +151,6 @@ void renderShadow(unsigned cascade)
         CustomUnrollArgs<List...>::template drawMesh<typename T::ShadowPassShader>(t.at(i), cascade);
     }   // for i
 }   // renderShadow
-
 
 // ----------------------------------------------------------------------------
 template<typename T, int... Selector>
@@ -134,8 +174,6 @@ void drawRSM(const core::matrix4 & rsm_matrix)
     }
 }   // drawRSM
 
-
-
 // ----------------------------------------------------------------------------
 void GL3DrawPolicy::drawSolidFirstPass(const DrawCalls& draw_calls) const
 {
@@ -154,14 +192,14 @@ void GL3DrawPolicy::drawSolidSecondPass (const DrawCalls& draw_calls,
                                          const std::vector<uint64_t>& handles,
                                          const std::vector<GLuint>& prefilled_tex) const
 {
-    renderMeshes2ndPass<DefaultMaterial, 3, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<AlphaRef,        3, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<UnlitMat,        3, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<SplattingMat,    1   > (handles, prefilled_tex);
-    renderMeshes2ndPass<SphereMap,       2, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<DetailMat,       1   > (handles, prefilled_tex);
-    renderMeshes2ndPass<GrassMat,        3, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<NormalMat,       3, 1> (handles, prefilled_tex);
+    renderMeshes2ndPass<DefaultMaterial, 4, 3, 1> (handles, prefilled_tex);
+    renderMeshes2ndPass<AlphaRef,        4, 3, 1> (handles, prefilled_tex);
+    renderMeshes2ndPass<UnlitMat,        3, 1   > (handles, prefilled_tex);
+    renderMeshes2ndPass<SplattingMat,    1      > (handles, prefilled_tex);
+    renderMeshes2ndPass<SphereMap,       2, 1   > (handles, prefilled_tex);
+    renderMeshes2ndPass<DetailMat,       1      > (handles, prefilled_tex);
+    renderMeshes2ndPass<GrassMat,        4, 3, 1> (handles, prefilled_tex);
+    renderMeshes2ndPass<NormalMat,       4, 3, 1> (handles, prefilled_tex);
 }
 
 // ----------------------------------------------------------------------------
@@ -203,13 +241,7 @@ void GL3DrawPolicy::drawReflectiveShadowMap(const DrawCalls& draw_calls,
 void IndirectDrawPolicy::drawSolidFirstPass(const DrawCalls& draw_calls) const
 {
 #if !defined(USE_GLES2)
-    //TODO: find a way to add TextureMarix in instanced shaders,
-    //and remove these four lines
-    renderMeshes1stPass<DefaultMaterial, 2, 1>();
     renderMeshes1stPass<SplattingMat, 2, 1>();
-    renderMeshes1stPass<UnlitMat, 3, 2, 1>();
-    renderMeshes1stPass<AlphaRef, 3, 2, 1>();
-    
     draw_calls.drawIndirectSolidFirstPass();
 #endif //!defined(USE_GLES2)
 }
@@ -220,13 +252,7 @@ void IndirectDrawPolicy::drawSolidSecondPass (const DrawCalls& draw_calls,
                                               const std::vector<GLuint>& prefilled_tex) const
 {
 #if !defined(USE_GLES2)
-    //TODO: find a way to add TextureMatrix in instanced shaders,
-    //and remove these four lines
-    renderMeshes2ndPass<DefaultMaterial, 3, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<AlphaRef,        3, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<UnlitMat,        3, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<SplattingMat,    1   > (handles, prefilled_tex);    
-    
+    renderMeshes2ndPass<SplattingMat, 1> (handles, prefilled_tex);
     draw_calls.drawIndirectSolidSecondPass(prefilled_tex);
 #endif //!defined(USE_GLES2)
 }
@@ -266,7 +292,7 @@ void IndirectDrawPolicy::drawReflectiveShadowMap(const DrawCalls& draw_calls,
                                                  const core::matrix4 &rsm_matrix) const
 {
 #if !defined(USE_GLES2)
-    drawRSM<SplattingMat, 1>(rsm_matrix); //TODO: write instanced splatting RSM shader and remove this line
+    drawRSM<SplattingMat, 1>(rsm_matrix);
     draw_calls.drawIndirectReflectiveShadowMaps(rsm_matrix);
 #endif //!defined(USE_GLES2)
 }
@@ -276,13 +302,7 @@ void IndirectDrawPolicy::drawReflectiveShadowMap(const DrawCalls& draw_calls,
 void MultidrawPolicy::drawSolidFirstPass(const DrawCalls& draw_calls) const
 {
 #if !defined(USE_GLES2)
-    //TODO: find a way to add TextureMarix in instanced shaders,
-    //and remove these four lines
-    renderMeshes1stPass<DefaultMaterial, 2, 1>();
     renderMeshes1stPass<SplattingMat, 2, 1>();
-    renderMeshes1stPass<UnlitMat, 3, 2, 1>();
-    renderMeshes1stPass<AlphaRef, 3, 2, 1>();
-    
     draw_calls.multidrawSolidFirstPass();
 #endif //!defined(USE_GLES2)
 }
@@ -293,13 +313,7 @@ void MultidrawPolicy::drawSolidSecondPass (const DrawCalls& draw_calls,
                                            const std::vector<GLuint>& prefilled_tex) const
 {
 #if !defined(USE_GLES2)
-    //TODO: find a way to add TextureMarix in instanced shaders,
-    //and remove these four lines
-    renderMeshes2ndPass<DefaultMaterial, 3, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<AlphaRef,        3, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<UnlitMat,        3, 1> (handles, prefilled_tex);
-    renderMeshes2ndPass<SplattingMat,    1   > (handles, prefilled_tex);
-    
+    renderMeshes2ndPass<SplattingMat, 1> (handles, prefilled_tex);
     draw_calls.multidrawSolidSecondPass(handles);
 #endif //!defined(USE_GLES2)
 }
@@ -334,7 +348,7 @@ void MultidrawPolicy::drawReflectiveShadowMap(const DrawCalls& draw_calls,
                                               const core::matrix4 &rsm_matrix) const
 {
 #if !defined(USE_GLES2)
-    drawRSM<SplattingMat, 1>(rsm_matrix); //TODO: add instanced splatting RSM shader
+    drawRSM<SplattingMat, 1>(rsm_matrix);
     draw_calls.multidrawReflectiveShadowMaps(rsm_matrix);
 #endif //!defined(USE_GLES2)
 }

@@ -37,7 +37,6 @@
 #include "graphics/stk_animated_mesh.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "graphics/stk_scene_manager.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/texture_manager.hpp"
 #include "guiengine/engine.hpp"
@@ -93,6 +92,10 @@ using namespace irr;
 #include <X11/Xutil.h>
 #endif
 
+#ifdef ANDROID
+struct android_app* global_android_app;
+#endif
+
 /** singleton */
 IrrDriver *irr_driver = NULL;
 
@@ -116,13 +119,21 @@ IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
-    m_device              = createDevice(video::EDT_NULL,
-                                         irr::core::dimension2d<u32>(640, 480),
-                                         /*bits*/16U, /**fullscreen*/ false,
-                                         /*stencilBuffer*/ false,
-                                         /*vsync*/false,
-                                         /*event receiver*/ NULL,
-                                         file_manager->getFileSystem());
+    
+    struct irr::SIrrlichtCreationParameters p;
+    p.DriverType    = video::EDT_NULL;
+    p.WindowSize    = core::dimension2d<u32>(640,480);
+    p.Bits          = 16U;
+    p.Fullscreen    = false;
+    p.Vsync         = false;
+    p.EventReceiver = NULL;
+    p.FileSystem    = file_manager->getFileSystem();
+#ifdef ANDROID
+    p.PrivateData   = (void*)global_android_app;
+#endif
+
+    m_device = createDeviceEx(p);
+
     m_request_screenshot = false;
     m_renderer            = NULL;
     m_wind                = new Wind();
@@ -447,6 +458,9 @@ void IrrDriver::initDevice()
 #else
             params.DriverType    = video::EDT_OPENGL;
 #endif
+#if defined(ANDROID)
+            params.PrivateData = (void*)global_android_app;
+#endif
             params.Stencilbuffer = false;
             params.Bits          = bits;
             params.EventReceiver = this;
@@ -727,7 +741,7 @@ void IrrDriver::createSunInterposer()
                         getUnicolorTexture(video::SColor(255, 255, 255, 255)));
         mb->getMaterial().setTexture(1,
                                 getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-        mb->getMaterial().setTexture(7,
+        mb->getMaterial().setTexture(2,
                                 getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
     m_sun_interposer = new STKMeshSceneNode(sphere,
@@ -1178,7 +1192,7 @@ scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
     //m.setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
     m.setTexture(0, getUnicolorTexture(color));
     m.setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-    m.setTexture(7, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m.setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
 
     if (CVS->isGLSL())
     {

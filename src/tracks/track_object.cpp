@@ -31,6 +31,7 @@
 #include "physics/physical_object.hpp"
 #include "race/race_manager.hpp"
 #include "scriptengine/script_engine.hpp"
+#include "tracks/model_definition_loader.hpp"
 #include "utils/helpers.hpp"
 #include <ISceneManager.h>
 
@@ -187,6 +188,9 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         xml_node.get("model", &model_name);
         bool colorizable = false;
         scene::IMesh* mesh = NULL;
+        // Only non-lod groups can use dynamic hue for different parts of mesh
+        bool use_dynamic_hue = true;
+        float static_hue = 0.0f;
         if (model_name.size() > 0)
         {
             mesh = irr_driver->getMesh(model_name);
@@ -199,15 +203,48 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                     Material* m = material_manager->getMaterialFor(mb
                         ->getMaterial().getTexture(0), mb);
                     colorizable = colorizable || m->isColorizable();
+                    if (colorizable) break;
                 }
             }
         }
+        else
+        {
+            std::string group_name = "";
+            xml_node.get("lod_group", &group_name);
+            // Try to get the first mesh from lod groups
+            mesh = model_def_loader.getFirstMeshFor(group_name);
+            if (mesh != NULL)
+            {
+                use_dynamic_hue = false;
+                unsigned int n = mesh->getMeshBufferCount();
+                for (unsigned int i = 0; i < n; i++)
+                {
+                    scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
+                    Material* m = material_manager->getMaterialFor(mb
+                        ->getMaterial().getTexture(0), mb);
+                    if (m->isColorizable())
+                    {
+                        // Use the first texture to determine static hue
+                        // Other texture that is non-colorizable will be
+                        // untouched, otherwise they will be colorized the
+                        // same hue
+                        colorizable = true;
+                        static_hue = m->getRandomHue();
+                        break;
+                    }
+                }
+            }
+        }
+
 
         // If at least one material is colorizable, add RenderInfo for it
         if (colorizable)
         {
             m_render_info = new RenderInfo();
-            m_render_info->setDynamicHue(mesh);
+            if (use_dynamic_hue)
+                m_render_info->setDynamicHue(mesh);
+            else
+                m_render_info->setHue(static_hue);
         }
 
         scene::ISceneNode *glownode = NULL;

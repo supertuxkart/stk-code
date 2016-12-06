@@ -14,7 +14,9 @@ void main()
 {
     vec4 Color = texture(tex, uv);
 #ifdef Use_Bindless_Texture
+#ifdef SRGBBindlessFix
     Color.xyz = pow(Color.xyz, vec3(2.2));
+#endif
 #endif
     Color.xyz *= pow(color.xyz, vec3(2.2));
     Color.a *= color.a;

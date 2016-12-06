@@ -159,7 +159,13 @@ void ModelDefinitionLoader::clear()
 
 scene::IMesh* ModelDefinitionLoader::getFirstMeshFor(const std::string& name)
 {
-    return irr_driver->getMesh(m_lod_groups[name][0].m_model_file);
+    if (name.size() > 0)
+    {
+        const std::vector<ModelDefinition>& md = m_lod_groups[name];
+        if (!md.empty())
+            return irr_driver->getMesh(md[0].m_model_file);
+    }
+    return NULL;
 }   // getFirstMeshFor
 
 // ----------------------------------------------------------------------------

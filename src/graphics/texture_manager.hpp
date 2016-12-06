@@ -33,5 +33,6 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = f
 bool loadCompressedTexture(const std::string& compressed_tex);
 void saveCompressedTexture(const std::string& compressed_tex);
 irr::video::ITexture* getUnicolorTexture(const irr::video::SColor &c);
+void insertTextureHandle(uint64_t handle);
 
 #endif

@@ -24,7 +24,6 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/stk_scene_manager.hpp"
 #include "modes/world.hpp"
 #include "utils/tuple.hpp"
 #include <SColor.h>
@@ -182,23 +181,15 @@ AbstractGeometryPasses::AbstractGeometryPasses()
 }
 
 // ----------------------------------------------------------------------------
-void AbstractGeometryPasses::setFirstPassRenderTargets(const std::vector<GLuint>& prefilled_textures)
+void AbstractGeometryPasses::setFirstPassRenderTargets(const std::vector<GLuint>& prefilled_textures,
+                                                       const std::vector<uint64_t>& prefilled_handles)
 {    
     m_prefilled_textures = prefilled_textures;
 
 #if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
-        m_textures_handles.clear();
-        for(size_t i=0;i<m_prefilled_textures.size();i++)
-        {
-            uint64_t handle = 0;
-            handle = glGetTextureSamplerHandleARB(m_prefilled_textures[i],
-                Shaders::ObjectPass2Shader::getInstance()->m_sampler_ids[i]);
-            if (!glIsTextureHandleResidentARB(handle))
-                glMakeTextureHandleResidentARB(handle);
-            m_textures_handles.push_back(handle);
-        }
+        m_textures_handles = prefilled_handles;
     }
 #endif // !defined(USE_GLES2)
 }
