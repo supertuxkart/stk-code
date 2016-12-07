@@ -217,8 +217,8 @@ void ServerLobby::update(float dt)
             signalRaceStartToClients();
             m_server_delay = 0.02f;
             m_client_ready_count.getData() = 0;
-            m_client_ready_count.unlock();
         }
+        m_client_ready_count.unlock();
         // Initialise counter again, to wait for all clients to indicate that
         // they have started the race/
         break;
@@ -887,11 +887,11 @@ void ServerLobby::finishedLoadingWorldClient(Event *event)
             m_client_ready_count.unlock();
             return;
         }
-        Log::info("ServerLobbyeProtocol", "Player %d is ready (%d/%d).",
-                  player_id, m_client_ready_count.getData(),
-                  m_game_setup->getPlayerCount()                        );
         m_player_states[player_id] = true;
         m_client_ready_count.getData()++;
+        Log::info("ServerLobbyeProtocol", "Player %d is ready (%d/%d).",
+            player_id, m_client_ready_count.getData(),
+            m_game_setup->getPlayerCount());
     }
     m_client_ready_count.unlock();
 
