@@ -252,11 +252,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
         (!culled_for_cams[0] || !culled_for_cams[1] || !culled_for_cams[2] ||
         !culled_for_cams[3] || !culled_for_cams[4] || !culled_for_cams[5]))
     {
-        skinning_offset =
-            std::accumulate(m_mesh_for_skinning.begin(),
-            m_mesh_for_skinning.end(), 0, [] (const size_t previous,
-            const STKAnimatedMesh* m)
-            { return previous + m->getTotalJointSize(); });
+        skinning_offset = getSkinningOffset();
         m_mesh_for_skinning.insert(am);
         am->setSkinningOffset(skinning_offset * sizeof(core::matrix4));
     }
@@ -584,6 +580,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
         &m_immediate_draw_list, camnode, shadow_matrices);
     PROFILER_POP_CPU_MARKER();
 
+    irr_driver->setSkinningJoint(getSkinningOffset());
     // Add a 1 s timeout
     if (!m_sync)
         m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -882,3 +879,12 @@ void DrawCalls::multidrawGlow() const
     m_glow_cmd_buffer->multidraw();
 }
 #endif // !defined(USE_GLES2)
+
+// ----------------------------------------------------------------------------
+uint32_t DrawCalls::getSkinningOffset() const
+{
+    return std::accumulate(m_mesh_for_skinning.begin(),
+        m_mesh_for_skinning.end(), 0, []
+        (const size_t previous, const STKAnimatedMesh* m)
+        { return previous + m->getTotalJointSize(); });
+}   // getSkinningOffset
