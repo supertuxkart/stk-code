@@ -1411,7 +1411,7 @@ void CSkinnedMesh::convertForSkinning()
 		if (LocalBuffers[b])
 			LocalBuffers[b]->convertForSkinning();
 
-		wi.push_back(core::array<core::array<JointInfluence>> ());
+		wi.push_back(core::array<core::array<JointInfluence> > ());
 		for (u32 i = 0; i < LocalBuffers[b]->getVertexCount(); i++)
 			wi[b].push_back(core::array<JointInfluence>());
 	}
