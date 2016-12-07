@@ -117,6 +117,7 @@ void STKAnimatedMesh::updateNoGL()
                 continue;
 
             scene::SSkinMeshBuffer* ssmb = NULL;
+            video::E_VERTEX_TYPE prev_type = mb->getVertexType();
             if (m_skinned_mesh)
             {
                 ssmb = dynamic_cast<scene::SSkinMeshBuffer*>(mb);
@@ -158,7 +159,7 @@ void STKAnimatedMesh::updateNoGL()
                 affected || m_all_parts_colorized || (cur_ri
                 && cur_ri->isTransparent()) ? cur_ri : default_ri));
 
-            if (m_skinned_mesh) ssmb->VertexType = video::EVT_STANDARD;
+            if (m_skinned_mesh) ssmb->VertexType = prev_type;
         }
 
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
@@ -231,6 +232,7 @@ void STKAnimatedMesh::updateGL()
             if (!mb)
                 continue;
             scene::SSkinMeshBuffer* ssmb = NULL;
+            video::E_VERTEX_TYPE prev_type = mb->getVertexType();
             if (m_skinned_mesh)
             {
                 ssmb = dynamic_cast<scene::SSkinMeshBuffer*>(mb);
@@ -267,7 +269,7 @@ void STKAnimatedMesh::updateGL()
                 mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
                 glBindVertexArray(0);
             }
-            if (m_skinned_mesh) ssmb->VertexType = video::EVT_STANDARD;
+            if (m_skinned_mesh) ssmb->VertexType = prev_type;
         }
         isGLInitialized = true;
     }
