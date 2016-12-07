@@ -236,16 +236,47 @@ struct SSkinMeshBuffer : public IMeshBuffer
 		{
 			for(u32 n=0;n<Vertices_Standard.size();++n)
 			{
-				video::S3DVertexSkinnedMesh Vertex = {};
+				video::S3DVertexSkinnedMesh Vertex;
 				Vertex.Color=Vertices_Standard[n].Color;
 				Vertex.Pos=Vertices_Standard[n].Pos;
 				Vertex.Normal=Vertices_Standard[n].Normal;
 				Vertex.TCoords=Vertices_Standard[n].TCoords;
+				Vertex.Tangent=core::vector3df(0.0f, 0.0f, 0.0f);
+				Vertex.Binormal=core::vector3df(0.0f, 0.0f, 0.0f);
+				Vertex.m_joint_idx1 = 0;
+				Vertex.m_joint_idx2 = 0;
+				Vertex.m_joint_idx3 = 0;
+				Vertex.m_joint_idx4 = 0;
+				Vertex.m_weight1 = 0;
+				Vertex.m_weight2 = 0;
+				Vertex.m_weight3 = 0;
+				Vertex.m_weight4 = 0;
+				Vertices_SkinnedMesh.push_back(Vertex);
+			}
+		}
+		if (VertexType==video::EVT_TANGENTS)
+		{
+			for(u32 n=0;n<Vertices_Tangents.size();++n)
+			{
+				video::S3DVertexSkinnedMesh Vertex;
+				Vertex.Color=Vertices_Tangents[n].Color;
+				Vertex.Pos=Vertices_Tangents[n].Pos;
+				Vertex.Normal=Vertices_Tangents[n].Normal;
+				Vertex.TCoords=Vertices_Tangents[n].TCoords;
+				Vertex.Tangent=Vertices_Tangents[n].Tangent;
+				Vertex.Binormal=Vertices_Tangents[n].Binormal;
+				Vertex.m_joint_idx1 = 0;
+				Vertex.m_joint_idx2 = 0;
+				Vertex.m_joint_idx3 = 0;
+				Vertex.m_joint_idx4 = 0;
+				Vertex.m_weight1 = 0;
+				Vertex.m_weight2 = 0;
+				Vertex.m_weight3 = 0;
+				Vertex.m_weight4 = 0;
 				Vertices_SkinnedMesh.push_back(Vertex);
 			}
 		}
 	}
-
 
 	//! Convert to tangents vertex type
 	virtual void convertToTangents()

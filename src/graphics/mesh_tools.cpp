@@ -476,7 +476,7 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
 
 void MeshTools::createSkinnedMeshWithTangents(scene::ISkinnedMesh* mesh,
                                               bool(*predicate)(scene::IMeshBuffer*))
-{return;
+{
     core::array<scene::SSkinMeshBuffer*>& all_mb = mesh->getMeshBuffers();
     const int all_mb_size = all_mb.size();
     for (int i = 0; i < all_mb_size; i++)

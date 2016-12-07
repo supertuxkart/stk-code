@@ -18,11 +18,11 @@ namespace scene
 
 //! constructor
 CSkinnedMesh::CSkinnedMesh()
-: m_joint_total_size(0), SkinningBuffers(0), AnimationFrames(0.f), FramesPerSecond(25.f),
+: SkinningBuffers(0), AnimationFrames(0.f), FramesPerSecond(25.f),
 	LastAnimatedFrame(-1), SkinnedLastFrame(false),
 	InterpolationMode(EIM_LINEAR),
 	HasAnimation(false), PreparedForSkinning(false),
-	AnimateNormals(true), HardwareSkinning(false)
+	AnimateNormals(true), HardwareSkinning(false), m_joint_total_size(0)
 {
 	#ifdef _DEBUG
 	setDebugName("CSkinnedMesh");
