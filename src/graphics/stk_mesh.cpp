@@ -219,8 +219,6 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name,
     }
     result.VAOType = mb->getVertexType();
     result.Stride = getVertexPitchFromType(result.VAOType);
-
-
     result.IndexCount = mb->getIndexCount();
     switch (mb->getPrimitiveType())
     {
@@ -250,7 +248,7 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name,
     for (unsigned i = 0; i < 8; i++)
         result.textures[i] = mb->getMaterial().getTexture(i);
     result.texture_trans = core::vector2df(0.0f, 0.0f);
-    result.VAOType = mb->getVertexType();
+
     return result;
 }   // allocateMeshBuffer
 

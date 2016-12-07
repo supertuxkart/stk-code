@@ -697,8 +697,7 @@ void ShaderBasedRenderer::onUnloadWorld()
 {
     delete m_rtts;
     m_rtts = NULL;
-    removeSkyBox();    
-    m_draw_calls.resetSkinningOffsets();
+    removeSkyBox();
 }
 
 // ----------------------------------------------------------------------------

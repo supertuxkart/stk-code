@@ -178,28 +178,6 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
         return;
     }
 
-    uint32_t skinning_offset = 0;
-    STKAnimatedMesh* am = dynamic_cast<STKAnimatedMesh*>(Node);
-    if (am && am->useHardwareSkinning())
-    {
-        SkinningOffset::const_iterator it = m_skinning_offsets.find(am);
-        if (it != m_skinning_offsets.end())
-        {
-            skinning_offset = am->getSkinningOffset() / sizeof(core::matrix4);
-        }
-        else
-        {
-            const uint32_t cur_offset =
-                std::accumulate(m_skinning_offsets.begin(),
-                m_skinning_offsets.end(), 0, [] (const size_t previous,
-                const std::pair<STKAnimatedMesh*, uint32_t>& p)
-                { return previous + p.second; });
-            am->setSkinningOffset(cur_offset);
-            m_skinning_offsets[am] = am->getTotalJointSize();
-            skinning_offset = cur_offset / sizeof(core::matrix4);
-        }
-    }
-
     bool culled_for_cams[6] = { true, true, true, true, true, true };
     culled_for_cams[0] = isCulledPrecise(cam, Node,
         irr_driver->getBoundingBoxesViz());
@@ -267,6 +245,21 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
         pushVector(ListTranslucent2TCoords::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans, custom_alpha);
     for (GLMesh *mesh : node->TransparentMesh[TM_DISPLACEMENT])
         pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
+
+    uint32_t skinning_offset = 0;
+    STKAnimatedMesh* am = dynamic_cast<STKAnimatedMesh*>(Node);
+    if (am && am->useHardwareSkinning() &&
+        (!culled_for_cams[0] || !culled_for_cams[1] || !culled_for_cams[2] ||
+        !culled_for_cams[3] || !culled_for_cams[4] || !culled_for_cams[5]))
+    {
+        skinning_offset =
+            std::accumulate(m_mesh_for_skinning.begin(),
+            m_mesh_for_skinning.end(), 0, [] (const size_t previous,
+            const STKAnimatedMesh* m)
+            { return previous + m->getTotalJointSize(); });
+        m_mesh_for_skinning.insert(am);
+        am->setSkinningOffset(skinning_offset * sizeof(core::matrix4));
+    }
 
     if (!culled_for_cams[0])
     {
@@ -573,7 +566,7 @@ void DrawCalls::prepareDrawCalls( ShadowMatrices& shadow_matrices,
 {
     m_wind_dir = getWindDir();
     clearLists();
-    
+    m_mesh_for_skinning.clear();
     for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
     {
         m_solid_pass_mesh[Mat].clear();

@@ -55,9 +55,9 @@ public:
   virtual void setMesh(irr::scene::IAnimatedMesh* mesh);
   virtual bool glow() const { return false; }
   int getTotalJointSize() const;
-  int getSkinningOffset() const { return m_skinning_offset; }
-  void setSkinningOffset(int offset) { m_skinning_offset = offset; }
-  bool useHardwareSkinning() const { return m_skinned_mesh!= NULL; }
+  void setSkinningOffset(int offset)  { m_skinning_offset = offset; }
+  bool useHardwareSkinning() const { return m_skinned_mesh != NULL; }
+  void resetSkinningState(scene::IAnimatedMesh*);
 private:
     RenderInfo* m_mesh_render_info;
     bool m_all_parts_colorized;

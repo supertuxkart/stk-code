@@ -1458,7 +1458,7 @@ void CSkinnedMesh::convertForSkinning()
 	}
 	SkinnedLastFrame = false;
 	skinMesh();
-	m_joint_total_size = m_joint_matrixes.size() * sizeof(core::matrix4);
+	m_joint_total_size = m_joint_matrixes.size();
 }
 
 void CSkinnedMesh::computeWeightInfluence(SJoint *joint, size_t &index, WeightInfluence& wi)

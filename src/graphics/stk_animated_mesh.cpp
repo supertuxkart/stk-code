@@ -35,7 +35,8 @@ irr::scene::ISceneManager* mgr, s32 id, const std::string& debug_name,
 const core::vector3df& position,
 const core::vector3df& rotation,
 const core::vector3df& scale, RenderInfo* render_info, bool all_parts_colorized) :
-    CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale), m_skinned_mesh(NULL)
+    CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale),
+    m_skinned_mesh(NULL), m_skinning_offset(-1)
 {
     isGLInitialized = false;
     isMaterialInitialized = false;
@@ -44,10 +45,7 @@ const core::vector3df& scale, RenderInfo* render_info, bool all_parts_colorized)
 #ifdef DEBUG
     m_debug_name = debug_name;
 #endif
-    m_skinning_offset = -1;
-    m_skinned_mesh = dynamic_cast<scene::CSkinnedMesh*>(Mesh);
-    if (m_skinned_mesh)
-        m_skinned_mesh->convertForSkinning();
+    resetSkinningState(mesh);
 }
 
 STKAnimatedMesh::~STKAnimatedMesh()
@@ -82,6 +80,7 @@ void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
     isMaterialInitialized = false;
     cleanGLMeshes();
     CAnimatedMeshSceneNode::setMesh(mesh);
+    resetSkinningState(mesh);
 }
 
 void STKAnimatedMesh::updateNoGL()
@@ -274,12 +273,14 @@ void STKAnimatedMesh::updateGL()
         isGLInitialized = true;
     }
 
-    if (m_skinned_mesh)
+    if (useHardwareSkinning())
     {
-        assert(m_skinning_offset != -1);
+        if (m_skinning_offset == -1) return;
         glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getSkinningUBO());
         glBufferSubData(GL_UNIFORM_BUFFER, m_skinning_offset,
-            m_skinned_mesh->getTotalJointSize(), m_skinned_mesh->getJointPointer());
+            m_skinned_mesh->getTotalJointSize() * sizeof(core::matrix4),
+            m_skinned_mesh->getJointPointer());
+        m_skinning_offset = -1;
         return;
     }
 
@@ -329,4 +330,12 @@ void STKAnimatedMesh::render()
 int STKAnimatedMesh::getTotalJointSize() const
 {
     return m_skinned_mesh->getTotalJointSize();
+}
+
+void STKAnimatedMesh::resetSkinningState(scene::IAnimatedMesh* mesh)
+{
+    m_skinning_offset = -1;
+    m_skinned_mesh = dynamic_cast<scene::CSkinnedMesh*>(mesh);
+    if (m_skinned_mesh)
+        m_skinned_mesh->convertForSkinning();
 }
