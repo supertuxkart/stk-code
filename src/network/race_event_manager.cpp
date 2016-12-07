@@ -5,7 +5,6 @@
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/controller_events_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 
 
@@ -84,14 +83,4 @@ void RaceEventManager::collectedItem(Item *item, AbstractKart *kart)
         ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
     protocol->collectedItem(item,kart);
 }   // collectedItem
-
-// ----------------------------------------------------------------------------
-void RaceEventManager::controllerAction(Controller* controller,
-                                        PlayerAction action, int value)
-{
-    ControllerEventsProtocol* protocol = static_cast<ControllerEventsProtocol*>(
-        ProtocolManager::getInstance()->getProtocol(PROTOCOL_CONTROLLER_EVENTS));
-    if (protocol)
-        protocol->controllerAction(controller, action, value);
-}   // controllerAction
 

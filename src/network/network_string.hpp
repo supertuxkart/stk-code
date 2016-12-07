@@ -354,6 +354,13 @@ public:
     }   // NetworkString
 
     // ------------------------------------------------------------------------
+    /** Empties the string, but does not reset the pre-allocated size. */
+    void clear()
+    {
+        m_buffer.erase(m_buffer.begin() + 5, m_buffer.end());
+        m_current_offset = 5;
+    }   // clear
+    // ------------------------------------------------------------------------
     /** Returns the protocol type of this message. */
     ProtocolType getProtocolType() const
     {

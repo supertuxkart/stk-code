@@ -24,7 +24,7 @@
 #include "modes/world.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/controller_events_protocol.hpp"
+#include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/protocols/kart_update_protocol.hpp"
 #include "network/protocols/latency_protocol.hpp"
@@ -125,7 +125,7 @@ void LobbyProtocol::loadWorld()
     m_game_setup->getRaceConfig()->loadWorld();
     World::getWorld()->setNetworkWorld(true);
     (new KartUpdateProtocol())->requestStart();
-    (new ControllerEventsProtocol())->requestStart();
+    GameProtocol::getInstance()->requestStart();
     (new GameEventsProtocol())->requestStart();
 
 }   // loadWorld

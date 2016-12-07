@@ -230,7 +230,7 @@ void STKHost::create()
  *  at that stage as well.
  * 
  *  Once the countdown is 0 (or below), the Synchronization Protocol will
- *  start the protocols: KartUpdateProtocol, ControllerEventsProtocol,
+ *  start the protocols: KartUpdateProtocol, GameProtocol,
  *  GameEventsProtocol. Then the LatencyProtocol is terminated
  *  which indicates to the main loop to start the actual game.
  */

@@ -38,7 +38,7 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/race_event_manager.hpp"
+#include "network/protocols/game_protocol.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -144,13 +144,12 @@ void LocalPlayerController::action(PlayerAction action, int value)
     PlayerController::action(action, value);
 
     // If this is a client, send the action to the server
-    if (World::getWorld()->isNetworkWorld()      && 
-        NetworkConfig::get()->isClient()         &&
-        RaceEventManager::getInstance()->isRunning()    )
+    if (World::getWorld()->isNetworkWorld() && 
+        NetworkConfig::get()->isClient()       )
     {
-        RaceEventManager::getInstance()->controllerAction(this, action, value);
+        GameProtocol::getInstance()->controllerAction(m_kart->getWorldKartId(),
+                                                      action, value);
     }
-
 }   // action
 
 //-----------------------------------------------------------------------------
