@@ -90,7 +90,7 @@ void GameProtocol::update(float dt)
     // Clear left-over data from previous frame. This way the network
     // string will increase till it reaches maximum size necessary
     m_data_to_send->clear();
-    m_data_to_send->addUInt8(m_all_actions.size());
+    m_data_to_send->addUInt8( uint8_t( m_all_actions.size() ) );
 
     // Add all actions
     for (auto a : m_all_actions)
