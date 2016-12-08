@@ -254,7 +254,7 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     {
         skinning_offset = getSkinningOffset();
         m_mesh_for_skinning.insert(am);
-        am->setSkinningOffset(skinning_offset * sizeof(core::matrix4));
+        am->setSkinningOffset(skinning_offset * 16 * sizeof(float));
     }
 
     if (!culled_for_cams[0])
@@ -712,6 +712,7 @@ void DrawCalls::multidrawSolidFirstPass() const
 {
     m_solid_cmd_buffer->bind();
     m_solid_cmd_buffer->multidrawFirstPass<DefaultMaterial>();
+    m_solid_cmd_buffer->multidrawFirstPass<SkinnedSolid>();
     m_solid_cmd_buffer->multidrawFirstPass<AlphaRef>();
     m_solid_cmd_buffer->multidrawFirstPass<SphereMap>();
     m_solid_cmd_buffer->multidrawFirstPass<UnlitMat>();
@@ -750,6 +751,7 @@ void DrawCalls::multidrawSolidSecondPass(const std::vector<uint64_t> &handles) c
 {
     m_solid_cmd_buffer->bind();
     m_solid_cmd_buffer->multidraw2ndPass<DefaultMaterial>(handles);
+    m_solid_cmd_buffer->multidraw2ndPass<SkinnedSolid>(handles);
     m_solid_cmd_buffer->multidraw2ndPass<AlphaRef>(handles);
     m_solid_cmd_buffer->multidraw2ndPass<SphereMap>(handles);
     m_solid_cmd_buffer->multidraw2ndPass<UnlitMat>(handles);

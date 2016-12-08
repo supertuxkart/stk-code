@@ -14,6 +14,17 @@
 #include "matrix4.h"
 #include "quaternion.h"
 
+class Matrix4x4
+{
+private:
+	float data[16];
+public:
+	inline Matrix4x4(const irr::core::matrix4& m)
+	{
+		memcpy(data, m.pointer(), 16 * sizeof(float));
+	}
+};
+
 class JointInfluence
 {
 public:
@@ -181,7 +192,6 @@ namespace scene
 
 		u32 getTotalJointSize() const
 		{
-			_IRR_DEBUG_BREAK_IF(m_joint_total_size == 0);
 			return m_joint_total_size;
 		}
 
@@ -231,7 +241,7 @@ private:
 		bool PreparedForSkinning;
 		bool AnimateNormals;
 		bool HardwareSkinning;
-		core::array<core::matrix4> m_joint_matrixes;
+		core::array<Matrix4x4> m_joint_matrixes;
 		u32 m_joint_total_size;
 	};
 

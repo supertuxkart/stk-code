@@ -243,7 +243,7 @@ void STKAnimatedMesh::updateGL()
             video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
             GLMesh &mesh = GLmeshes[i];
 
-            if (!rnd->isTransparent())
+            if (1)//!rnd->isTransparent())
             {
                 Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
                 Material* material2 = NULL;
@@ -251,7 +251,7 @@ void STKAnimatedMesh::updateGL()
                     material2 = material_manager->getMaterialFor(mb->getMaterial().getTexture(1), mb);
 
                 Material::ShaderType MatType = getMeshMaterialFromType(type, mb->getVertexType(), material, material2);
-                initTextures(mesh, MatType);
+                initTextures(mesh, m_skinned_mesh ? Material::SHADERTYPE_SOLID_SKINNED_MESH : MatType);
             }
             else
                 initTexturesTransparent(mesh);
@@ -278,7 +278,7 @@ void STKAnimatedMesh::updateGL()
         if (m_skinning_offset == -1) return;
         glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getSkinningUBO());
         glBufferSubData(GL_UNIFORM_BUFFER, m_skinning_offset,
-            m_skinned_mesh->getTotalJointSize() * sizeof(core::matrix4),
+            m_skinned_mesh->getTotalJointSize() * 16 * sizeof(float),
             m_skinned_mesh->getJointPointer());
         m_skinning_offset = -1;
         return;
@@ -337,5 +337,9 @@ void STKAnimatedMesh::resetSkinningState(scene::IAnimatedMesh* mesh)
     m_skinning_offset = -1;
     m_skinned_mesh = dynamic_cast<scene::CSkinnedMesh*>(mesh);
     if (m_skinned_mesh)
+    {
         m_skinned_mesh->convertForSkinning();
+        if (m_skinned_mesh->getTotalJointSize() == 0)
+            m_skinned_mesh = NULL;
+    }
 }
