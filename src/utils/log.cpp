@@ -140,11 +140,11 @@ void Log::printMessage(int level, const char *component, const char *format,
     android_LogPriority alp;
     switch (level)
     {
-        // STK is using the levels slightly different from android
-        // (debug lowest, verbose above it; while android reverses
-        // this order. So to get the same behaviour (e.g. filter
-        // out debug message, but still get verbose, we swap
-        // the order here.
+    // STK is using the levels slightly different from android
+    // (debug lowest, verbose above it; while android reverses
+    // this order. So to get the same behaviour (e.g. filter
+    // out debug message, but still get verbose, we swap
+    // the order here.
     case LL_VERBOSE: alp = ANDROID_LOG_DEBUG;   break;
     case LL_DEBUG:   alp = ANDROID_LOG_VERBOSE; break;
     case LL_INFO:    alp = ANDROID_LOG_INFO;    break;
@@ -153,8 +153,8 @@ void Log::printMessage(int level, const char *component, const char *format,
     case LL_FATAL:   alp = ANDROID_LOG_FATAL;   break;
     default:         alp = ANDROID_LOG_FATAL;
     }
-    __android_log_vprint(alp, "SuperTuxKart", format, args);
-#else
+#endif
+
     static const char *names[] = {"debug", "verbose  ", "info   ",
                                   "warn   ", "error  ", "fatal  "};
 
@@ -178,8 +178,12 @@ void Log::printMessage(int level, const char *component, const char *format,
         va_copy(out, args);
 
         setTerminalColor((LogLevel)level);
+        #ifdef ANDROID
+        __android_log_vprint(alp, "SuperTuxKart", format, out);
+        #else
         printf("[%s] %s: ", names[level], component);
         vprintf(format, out);
+        #endif
         resetTerminalColor();  // this prints a \n
 
         va_end(out);
@@ -224,8 +228,6 @@ void Log::printMessage(int level, const char *component, const char *format,
 
         MessageBoxA(NULL, message.c_str(), "SuperTuxKart - Fatal error", MB_OK);
     }
-#endif
-
 #endif
 }   // printMessage
 
