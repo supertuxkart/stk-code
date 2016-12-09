@@ -808,6 +808,7 @@ void DrawCalls::drawIndirectShadows(unsigned cascade) const
 {
     m_shadow_cmd_buffer->bind();
     m_shadow_cmd_buffer->drawIndirect<DefaultMaterial>(cascade);
+    m_shadow_cmd_buffer->drawIndirect<SkinnedSolid>(cascade);
     m_shadow_cmd_buffer->drawIndirect<DetailMat>(cascade);
     m_shadow_cmd_buffer->drawIndirect<AlphaRef>(cascade);
     m_shadow_cmd_buffer->drawIndirect<UnlitMat>(cascade);
@@ -826,6 +827,7 @@ void DrawCalls::multidrawShadows(unsigned cascade) const
 {
     m_shadow_cmd_buffer->bind();
     m_shadow_cmd_buffer->multidrawShadow<DefaultMaterial>(cascade);
+    m_shadow_cmd_buffer->multidrawShadow<SkinnedSolid>(cascade);
     m_shadow_cmd_buffer->multidrawShadow<DetailMat>(cascade);
     m_shadow_cmd_buffer->multidrawShadow<NormalMat>(cascade);
     m_shadow_cmd_buffer->multidrawShadow<AlphaRef>(cascade);

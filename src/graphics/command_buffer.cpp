@@ -203,6 +203,8 @@ void ShadowCommandBuffer::fill(OtherMeshMap *mesh_map)
         shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
                                            + Material::SHADERTYPE_SOLID);
         shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_SOLID_SKINNED_MESH);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
                                            + Material::SHADERTYPE_ALPHA_TEST);
         shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
                                            + Material::SHADERTYPE_SOLID_UNLIT);

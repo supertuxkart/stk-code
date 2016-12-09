@@ -144,7 +144,6 @@ public:
     {
 #if !defined(USE_GLES2)
         // Geometry shader needed
-        // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
@@ -603,7 +602,6 @@ class InstancedDetailedObjectPass2Shader : public TextureShader<InstancedDetaile
 public:
     InstancedDetailedObjectPass2Shader()
     {
-        if (!CVS->supportsHardwareSkinning()) return;
         loadProgram(OBJECT,
                    GL_VERTEX_SHADER, "instanced_object_pass.vert",
                    GL_FRAGMENT_SHADER, "instanced_detailed_object_pass2.frag");
@@ -638,6 +636,7 @@ class InstancedSkinnedMeshPass2Shader : public TextureShader<InstancedSkinnedMes
 public:
     InstancedSkinnedMeshPass2Shader()
     {
+        if (!CVS->supportsHardwareSkinning()) return;
         loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
                             GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
         assignUniforms();
@@ -651,11 +650,38 @@ public:
 };   // InstancedSkinnedMeshPass2Shader
 
 // ============================================================================
+class InstancedSkinningShadowShader : public TextureShader<InstancedSkinningShadowShader, 0, int>
+{
+public:
+    InstancedSkinningShadowShader()
+    {
+#if !defined(USE_GLES2)
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150 || !CVS->supportsHardwareSkinning())
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+                                GL_FRAGMENT_SHADER, "shadow.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+                                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
+                                GL_FRAGMENT_SHADER, "shadow.frag");
+        }
+        assignUniforms("layer");
+#endif
+    }   // InstancedSkinningShadowShader
+
+};   // InstancedSkinningShadowShader
+
+// ============================================================================
 struct SkinnedSolid
 {
     typedef InstancedSkinnedMeshPass1Shader InstancedFirstPassShader;
     typedef InstancedSkinnedMeshPass2Shader InstancedSecondPassShader;
-    //typedef InstancedShadowShader InstancedShadowPassShader;
+    typedef InstancedSkinningShadowShader InstancedShadowPassShader;
     //typedef CInstancedRSMShader InstancedRSMShader;
     typedef Shaders::SkinnedMeshPass1Shader FirstPassShader;
     typedef Shaders::SkinnedMeshPass2Shader SecondPassShader;
