@@ -141,8 +141,8 @@ float MainLoop::getLimitedDt()
 void MainLoop::updateRace(float dt)
 {
     // The race event manager will update world in case of an online race
-    if (RaceEventManager::getInstance<RaceEventManager>()->isRunning())
-        RaceEventManager::getInstance<RaceEventManager>()->update(dt);
+    if (RaceEventManager::getInstance()->isRunning())
+        RaceEventManager::getInstance()->update(dt);
     else
         World::getWorld()->updateWorld(dt);
 }   // updateRace
