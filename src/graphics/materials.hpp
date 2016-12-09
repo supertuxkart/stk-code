@@ -655,8 +655,8 @@ struct SkinnedSolid
     typedef InstancedSkinnedMeshPass2Shader InstancedSecondPassShader;
     //typedef InstancedShadowShader InstancedShadowPassShader;
     //typedef CInstancedRSMShader InstancedRSMShader;
-    //typedef Shaders::ObjectPass1Shader FirstPassShader;
-    //typedef Shaders::ObjectPass2Shader SecondPassShader;
+    typedef Shaders::SkinnedMeshPass1Shader FirstPassShader;
+    typedef Shaders::SkinnedMeshPass2Shader SecondPassShader;
     //typedef ShadowShader ShadowPassShader;
     //typedef CRSMShader RSMShader;
     typedef ListSkinnedSolid List;
@@ -668,7 +668,7 @@ struct SkinnedSolid
     static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;
     static const STK::Tuple<size_t> RSMTextures;
-};   // struct DefaultMaterial
+};   // struct SkinnedSolid
 
 // ----------------------------------------------------------------------------
 struct DefaultMaterial

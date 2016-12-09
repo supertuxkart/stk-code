@@ -360,6 +360,29 @@ Shaders::ObjectPass2Shader::ObjectPass2Shader()
 }   // ObjectPass2Shader
 
 // ============================================================================
+Shaders::SkinnedMeshPass1Shader::SkinnedMeshPass1Shader()
+{
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+                        GL_FRAGMENT_SHADER, "object_pass1.frag");
+    assignUniforms("ModelMatrix", "InverseModelMatrix", "skinning_offset");
+    assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+}   // SkinnedMeshPass1Shader
+
+// ============================================================================
+Shaders::SkinnedMeshPass2Shader::SkinnedMeshPass2Shader()
+{
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+                        GL_FRAGMENT_SHADER, "object_pass2.frag");
+    assignUniforms("ModelMatrix", "texture_trans", "color_change", "skinning_offset");
+    assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
+                       1, "SpecularMap", ST_NEAREST_FILTERED,
+                       2, "SSAO", ST_BILINEAR_FILTERED,
+                       3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                       4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                       5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+}   // SkinnedMeshPass2Shader
+
+// ============================================================================
 Shaders::TransparentShader::TransparentShader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",

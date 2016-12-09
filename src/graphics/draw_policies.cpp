@@ -176,6 +176,7 @@ void drawRSM(const core::matrix4 & rsm_matrix)
 void GL3DrawPolicy::drawSolidFirstPass(const DrawCalls& draw_calls) const
 {
     renderMeshes1stPass<DefaultMaterial, 2, 1>();
+    renderMeshes1stPass<SkinnedSolid, 5, 2, 1>();
     renderMeshes1stPass<SplattingMat, 2, 1>();
     renderMeshes1stPass<UnlitMat, 3, 2, 1>();
     renderMeshes1stPass<AlphaRef, 3, 2, 1>();
@@ -191,6 +192,7 @@ void GL3DrawPolicy::drawSolidSecondPass (const DrawCalls& draw_calls,
                                          const std::vector<GLuint>& prefilled_tex) const
 {
     renderMeshes2ndPass<DefaultMaterial, 4, 3, 1> (handles, prefilled_tex);
+    renderMeshes2ndPass<SkinnedSolid, 5, 4, 3, 1> (handles, prefilled_tex);
     renderMeshes2ndPass<AlphaRef,        4, 3, 1> (handles, prefilled_tex);
     renderMeshes2ndPass<UnlitMat,        3, 1   > (handles, prefilled_tex);
     renderMeshes2ndPass<SplattingMat,    1      > (handles, prefilled_tex);

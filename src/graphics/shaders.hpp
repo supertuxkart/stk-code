@@ -153,6 +153,24 @@ public:
     };   // ObjectPass2Shader
 
     // ========================================================================
+    class SkinnedMeshPass1Shader : public TextureShader<SkinnedMeshPass1Shader, 1,
+                                                  core::matrix4, core::matrix4,
+                                                  int>
+    {
+    public:
+        SkinnedMeshPass1Shader();
+    };   // SkinnedMeshPass1Shader
+
+    // ========================================================================
+    class SkinnedMeshPass2Shader : public TextureShader < SkinnedMeshPass2Shader, 6,
+                                                 core::matrix4, core::vector2df,
+                                                 core::vector2df, int >
+    {
+    public:
+        SkinnedMeshPass2Shader();
+    };   // SkinnedMeshPass2Shader
+
+    // ========================================================================
 
 
 };   // class Shaders

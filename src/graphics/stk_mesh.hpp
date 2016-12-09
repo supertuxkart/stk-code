@@ -119,7 +119,7 @@ class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4,
 // ----------------------------------------------------------------------------
 class ListSkinnedSolid : public MeshList<ListSkinnedSolid, GLMesh *, core::matrix4,
                                       core::matrix4, core::vector2df,
-                                      core::vector2df>
+                                      core::vector2df, int>
 {};
 
 // ----------------------------------------------------------------------------

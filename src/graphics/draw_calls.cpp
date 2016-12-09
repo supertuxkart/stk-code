@@ -46,6 +46,7 @@ void DrawCalls::clearLists()
     ListDisplacement::getInstance()->clear();
 
     ListMatDefault::getInstance()->clear();
+    ListSkinnedSolid::getInstance()->clear();
     ListMatAlphaRef::getInstance()->clear();
     ListMatSphereMap::getInstance()->clear();
     ListMatDetails::getInstance()->clear();
@@ -304,6 +305,12 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                             (mesh->m_render_info && mesh->m_material ?
                             core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
                             core::vector2df(0.0f, 0.0f)));
+                        break;
+                    case Material::SHADERTYPE_SOLID_SKINNED_MESH:
+                        ListSkinnedSolid::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)), skinning_offset);
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
                         ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
