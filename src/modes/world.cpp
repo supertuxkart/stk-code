@@ -129,7 +129,6 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_schedule_pause     = false;
     m_schedule_unpause   = false;
     m_schedule_exit_race = false;
-    m_self_destruct      = false;
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
     m_weather            = NULL;
@@ -840,12 +839,6 @@ void World::updateWorld(float dt)
         m_schedule_unpause = false;
     }
 
-    if (m_self_destruct)
-    {
-        delete this;
-        return;
-    }
-
     // Don't update world if a menu is shown or the race is over.
     if( getPhase() == FINISH_PHASE         ||
         getPhase() == IN_GAME_MENU_PHASE      )
@@ -1275,15 +1268,6 @@ void World::unpause()
             pc->resetInputState();
     }
 }   // pause
-
-//-----------------------------------------------------------------------------
-/** Call when the world needs to be deleted but you can't do it immediately
- * because you are e.g. within World::update()
- */
-void World::delayedSelfDestruct()
-{
-    m_self_destruct = true;
-}   // delayedSelfDestruct
 
 //-----------------------------------------------------------------------------
 void World::escapePressed()
