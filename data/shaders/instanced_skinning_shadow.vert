@@ -32,27 +32,12 @@ void main(void)
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
     vec4 idle_position = vec4(Position, 1.);
     vec4 skinned_position = vec4(0.);
-    vec4 single_bone_influenced_position;
-
-    // First bone:
-    single_bone_influenced_position = joint_matrices[clamp(Joint[0] + skinning_offset, 0, MAX_BONES)] * idle_position;
-    single_bone_influenced_position /= single_bone_influenced_position.w;
-    skinned_position += Weight[0] * single_bone_influenced_position;
-
-    // Second bone:
-    single_bone_influenced_position = joint_matrices[clamp(Joint[1] + skinning_offset, 0, MAX_BONES)] * idle_position;
-    single_bone_influenced_position /= single_bone_influenced_position.w;
-    skinned_position += Weight[1] * single_bone_influenced_position;
-
-    // Third bone:
-    single_bone_influenced_position = joint_matrices[clamp(Joint[2] + skinning_offset, 0, MAX_BONES)] * idle_position;
-    single_bone_influenced_position /= single_bone_influenced_position.w;
-    skinned_position += Weight[2] * single_bone_influenced_position;
-
-    // Fourth bone:
-    single_bone_influenced_position = joint_matrices[clamp(Joint[3] + skinning_offset, 0, MAX_BONES)] * idle_position;
-    single_bone_influenced_position /= single_bone_influenced_position.w;
-    skinned_position += Weight[3] * single_bone_influenced_position;
+    for (int i = 0; i < 4; i++)
+    {
+        vec4 single_bone_influenced_position = joint_matrices[clamp(Joint[i] + skinning_offset, 0, MAX_BONES)] * idle_position;
+        single_bone_influenced_position /= single_bone_influenced_position.w;
+        skinned_position += Weight[i] * single_bone_influenced_position;
+    }
 
 #ifdef VSLayer
     gl_Layer = layer;

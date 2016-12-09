@@ -37,43 +37,19 @@ void main(void)
 {
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
     mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * InverseViewMatrix);
-
     vec4 idle_position = vec4(Position, 1.);
     vec4 idle_normal = vec4(Normal, 0.);
     vec4 skinned_position = vec4(0.);
     vec4 skinned_normal = vec4(0.);
-
     // Note : For normal we assume no scale factor in bone (otherwise we'll have to compute inversematrix for each bones...)
-    vec4 single_bone_influenced_position;
-    vec4 single_bone_influenced_normal;
-
-    // First bone:
-    single_bone_influenced_position = joint_matrices[clamp(Joint[0] + skinning_offset, 0, MAX_BONES)] * idle_position;
-    single_bone_influenced_position /= single_bone_influenced_position.w;
-    single_bone_influenced_normal = joint_matrices[clamp(Joint[0] + skinning_offset, 0, MAX_BONES)] * idle_normal;
-    skinned_position += Weight[0] * single_bone_influenced_position;
-    skinned_normal += Weight[0] * single_bone_influenced_normal;
-
-    // Second bone:
-    single_bone_influenced_position = joint_matrices[clamp(Joint[1] + skinning_offset, 0, MAX_BONES)] * idle_position;
-    single_bone_influenced_position /= single_bone_influenced_position.w;
-    single_bone_influenced_normal = joint_matrices[clamp(Joint[1] + skinning_offset, 0, MAX_BONES)] * idle_normal;
-    skinned_position += Weight[1] * single_bone_influenced_position;
-    skinned_normal += Weight[1] * single_bone_influenced_normal;
-
-    // Third bone:
-    single_bone_influenced_position = joint_matrices[clamp(Joint[2] + skinning_offset, 0, MAX_BONES)] * idle_position;
-    single_bone_influenced_position /= single_bone_influenced_position.w;
-    single_bone_influenced_normal = joint_matrices[clamp(Joint[2] + skinning_offset, 0, MAX_BONES)] * idle_normal;
-    skinned_position += Weight[2] * single_bone_influenced_position;
-    skinned_normal += Weight[2] * single_bone_influenced_normal;
-
-    // Fourth bone:
-    single_bone_influenced_position = joint_matrices[clamp(Joint[3] + skinning_offset, 0, MAX_BONES)] * idle_position;
-    single_bone_influenced_position /= single_bone_influenced_position.w;
-    single_bone_influenced_normal = joint_matrices[clamp(Joint[3] + skinning_offset, 0, MAX_BONES)] * idle_normal;
-    skinned_position += Weight[3] * single_bone_influenced_position;
-    skinned_normal += Weight[3] * single_bone_influenced_normal;
+    for (int i = 0; i < 4; i++)
+    {
+        vec4 single_bone_influenced_position = joint_matrices[clamp(Joint[i] + skinning_offset, 0, MAX_BONES)] * idle_position;
+        single_bone_influenced_position /= single_bone_influenced_position.w;
+        vec4 single_bone_influenced_normal = joint_matrices[clamp(Joint[i] + skinning_offset, 0, MAX_BONES)] * idle_normal;
+        skinned_position += Weight[i] * single_bone_influenced_position;
+        skinned_normal += Weight[i] * single_bone_influenced_normal;
+    }
 
     gl_Position = ProjectionViewMatrix *  ModelMatrix * skinned_position;
     // Keep orthogonality
