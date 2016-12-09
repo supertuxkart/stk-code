@@ -62,7 +62,7 @@ struct InstanceDataSingleTex
         float Z;
     } Scale;
     uint64_t Texture;
-    uint32_t skinning_offset;
+    int32_t skinning_offset;
 #ifdef WIN32
 };
 #else
@@ -136,7 +136,7 @@ struct InstanceDataFourTex
     uint64_t SecondTexture;
     uint64_t ThirdTexture;
     uint64_t FourthTexture;
-    uint32_t skinning_offset;
+    int32_t skinning_offset;
 #ifdef WIN32
 };
 #else

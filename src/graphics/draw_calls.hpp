@@ -107,7 +107,7 @@ public:
     void drawIndirectGlow() const;
     void multidrawGlow() const;
     void renderBoundingBoxes();
-    uint32_t getSkinningOffset() const;
+    int32_t getSkinningOffset() const;
 };
 
 #endif //HEADER_DRAW_CALLS_HPP

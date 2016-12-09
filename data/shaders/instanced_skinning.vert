@@ -16,7 +16,7 @@ layout(location = 12) in sampler2D SecondHandle;
 layout(location = 13) in sampler2D ThirdHandle;
 layout(location = 14) in sampler2D FourthHandle;
 #endif
-layout(location = 15) in uint skinning_offset;
+layout(location = 15) in int skinning_offset;
 
 out vec3 nor;
 out vec3 tangent;
@@ -42,62 +42,36 @@ void main(void)
     vec4 idle_normal = vec4(Normal, 0.);
     vec4 skinned_position = vec4(0.);
     vec4 skinned_normal = vec4(0.);
+
     // Note : For normal we assume no scale factor in bone (otherwise we'll have to compute inversematrix for each bones...)
     vec4 single_bone_influenced_position;
     vec4 single_bone_influenced_normal;
-    if (Joint[0] >= 0)
-    {
-        single_bone_influenced_position = joint_matrices[Joint[0] + skinning_offset] * idle_position;
-        single_bone_influenced_position /= single_bone_influenced_position.w;
-        single_bone_influenced_normal = joint_matrices[Joint[0] + skinning_offset] * idle_normal;
-    }
-    else
-    {
-        single_bone_influenced_position = idle_position;
-        single_bone_influenced_normal = idle_normal;
-    }
+
+    // First bone:
+    single_bone_influenced_position = joint_matrices[clamp(Joint[0] + skinning_offset, 0, MAX_BONES)] * idle_position;
+    single_bone_influenced_position /= single_bone_influenced_position.w;
+    single_bone_influenced_normal = joint_matrices[clamp(Joint[0] + skinning_offset, 0, MAX_BONES)] * idle_normal;
     skinned_position += Weight[0] * single_bone_influenced_position;
     skinned_normal += Weight[0] * single_bone_influenced_normal;
 
-    if (Joint[1] >= 0)
-    {
-        single_bone_influenced_position= joint_matrices[Joint[1] + skinning_offset] * idle_position;
-        single_bone_influenced_position /= single_bone_influenced_position.w;
-        single_bone_influenced_normal = joint_matrices[Joint[1] + skinning_offset] * idle_normal;
-    }
-    else
-    {
-        single_bone_influenced_position = idle_position;
-        single_bone_influenced_normal = idle_normal;
-    }
+    // Second bone:
+    single_bone_influenced_position = joint_matrices[clamp(Joint[1] + skinning_offset, 0, MAX_BONES)] * idle_position;
+    single_bone_influenced_position /= single_bone_influenced_position.w;
+    single_bone_influenced_normal = joint_matrices[clamp(Joint[1] + skinning_offset, 0, MAX_BONES)] * idle_normal;
     skinned_position += Weight[1] * single_bone_influenced_position;
     skinned_normal += Weight[1] * single_bone_influenced_normal;
 
-    if (Joint[2] >= 0)
-    {
-        single_bone_influenced_position = joint_matrices[Joint[2] + skinning_offset] * idle_position;
-        single_bone_influenced_position /= single_bone_influenced_position.w;
-        single_bone_influenced_normal = joint_matrices[Joint[2] + skinning_offset] * idle_normal;
-    }
-    else
-    {
-        single_bone_influenced_position = idle_position;
-        single_bone_influenced_normal = idle_normal;
-    }
+    // Third bone:
+    single_bone_influenced_position = joint_matrices[clamp(Joint[2] + skinning_offset, 0, MAX_BONES)] * idle_position;
+    single_bone_influenced_position /= single_bone_influenced_position.w;
+    single_bone_influenced_normal = joint_matrices[clamp(Joint[2] + skinning_offset, 0, MAX_BONES)] * idle_normal;
     skinned_position += Weight[2] * single_bone_influenced_position;
     skinned_normal += Weight[2] * single_bone_influenced_normal;
 
-    if (Joint[3] >= 0)
-    {
-        single_bone_influenced_position = joint_matrices[Joint[3] + skinning_offset] * idle_position;
-        single_bone_influenced_position /= single_bone_influenced_position.w;
-        single_bone_influenced_normal = joint_matrices[Joint[3] + skinning_offset] * idle_normal;
-    }
-    else
-    {
-        single_bone_influenced_position = idle_position;
-        single_bone_influenced_normal = idle_normal;
-    }
+    // Fourth bone:
+    single_bone_influenced_position = joint_matrices[clamp(Joint[3] + skinning_offset, 0, MAX_BONES)] * idle_position;
+    single_bone_influenced_position /= single_bone_influenced_position.w;
+    single_bone_influenced_normal = joint_matrices[clamp(Joint[3] + skinning_offset, 0, MAX_BONES)] * idle_normal;
     skinned_position += Weight[3] * single_bone_influenced_position;
     skinned_normal += Weight[3] * single_bone_influenced_normal;
 

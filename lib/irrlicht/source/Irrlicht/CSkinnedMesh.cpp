@@ -1439,7 +1439,7 @@ void CSkinnedMesh::convertForSkinning()
 						influence = reported_weight[j];
 					else
 					{
-						influence.joint_idx = -1;
+						influence.joint_idx = -1000;
 						influence.weight = remaining_weight;
 					}
 					remaining_weight -= influence.weight;

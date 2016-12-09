@@ -246,13 +246,13 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     for (GLMesh *mesh : node->TransparentMesh[TM_DISPLACEMENT])
         pushVector(ListDisplacement::getInstance(), mesh, Node->getAbsoluteTransformation());
 
-    uint32_t skinning_offset = 0;
+    int32_t skinning_offset = 0;
     STKAnimatedMesh* am = dynamic_cast<STKAnimatedMesh*>(Node);
     if (am && am->useHardwareSkinning() &&
         (!culled_for_cams[0] || !culled_for_cams[1] || !culled_for_cams[2] ||
         !culled_for_cams[3] || !culled_for_cams[4] || !culled_for_cams[5]))
     {
-        skinning_offset = getSkinningOffset();
+        skinning_offset = getSkinningOffset() + 1/*reserved identity matrix*/;
         m_mesh_for_skinning.insert(am);
         am->setSkinningOffset(skinning_offset * 16 * sizeof(float));
     }
@@ -883,7 +883,7 @@ void DrawCalls::multidrawGlow() const
 #endif // !defined(USE_GLES2)
 
 // ----------------------------------------------------------------------------
-uint32_t DrawCalls::getSkinningOffset() const
+int32_t DrawCalls::getSkinningOffset() const
 {
     return std::accumulate(m_mesh_for_skinning.begin(),
         m_mesh_for_skinning.end(), 0, []

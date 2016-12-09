@@ -162,7 +162,7 @@ void VAOInstanceUtil<InstanceDataSingleTex>::SetVertexAttrib()
     glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceDataSingleTex), (GLvoid*)(9 * sizeof(float)));
     glVertexAttribDivisorARB(11, 1);
     glEnableVertexAttribArray(15);
-    glVertexAttribIPointer(15, 1, GL_UNSIGNED_INT, sizeof(InstanceDataSingleTex), (GLvoid*)(11 * sizeof(float)));
+    glVertexAttribIPointer(15, 1, GL_INT, sizeof(InstanceDataSingleTex), (GLvoid*)(11 * sizeof(float)));
     glVertexAttribDivisorARB(15, 1);
 }
 
@@ -204,7 +204,7 @@ void VAOInstanceUtil<InstanceDataFourTex>::SetVertexAttrib()
     glVertexAttribIPointer(14, 2, GL_UNSIGNED_INT, sizeof(InstanceDataFourTex), (GLvoid*)(13 * sizeof(float) + 6 * sizeof(unsigned)));
     glVertexAttribDivisorARB(14, 1);
     glEnableVertexAttribArray(15);
-    glVertexAttribIPointer(15, 1, GL_UNSIGNED_INT, sizeof(InstanceDataFourTex), (GLvoid*)(13 * sizeof(float) + 8 * sizeof(unsigned)));
+    glVertexAttribIPointer(15, 1, GL_INT, sizeof(InstanceDataFourTex), (GLvoid*)(13 * sizeof(float) + 8 * sizeof(unsigned)));
     glVertexAttribDivisorARB(15, 1);
 }
 
