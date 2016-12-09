@@ -243,9 +243,8 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     // Skip minimap when profiling
     if (ProfileWorld::isNoGraphics()) return NULL;
 
-    const video::SColor oldClearColor = World::getWorld()->getClearColor();
-    World::getWorld()
-        ->setClearbackBufferColor(video::SColor(0, 255, 255, 255));
+    const video::SColor oldClearColor = irr_driver->getClearColor();
+    irr_driver->setClearbackBufferColor(video::SColor(0, 255, 255, 255));
     World::getWorld()->forceFogDisabled(true);
 #ifndef SERVER_ONLY
     m_render_target = irr_driver->createRenderTarget(dimension, name);
@@ -330,7 +329,7 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     cleanupDebugMesh();
     irr_driver->removeCameraSceneNode(camera);
 
-    World::getWorld()->setClearbackBufferColor(oldClearColor);
+    irr_driver->setClearbackBufferColor(oldClearColor);
     World::getWorld()->forceFogDisabled(false);
 
     irr_driver->getSceneManager()->clear();

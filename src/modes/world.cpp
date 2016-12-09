@@ -114,7 +114,7 @@ World* World::m_world = NULL;
  *  after the constructor. Those functions must be called in the init()
  *  function, which is called immediately after the constructor.
  */
-World::World() : WorldStatus(), m_clear_color(255,100,101,140)
+World::World() : WorldStatus()
 {
 
 #ifdef DEBUG

@@ -141,8 +141,6 @@ protected:
         there are scene nodes). */
     RaceGUIBase *m_saved_race_gui;
 
-    irr::video::SColor m_clear_color;
-
     /** Pausing/unpausing are not done immediately, but at next udpdate. The
      *  use of this is when switching between screens : if we leave a screen
      *  that paused the game, only to go to another screen that pauses back
@@ -339,14 +337,6 @@ public:
     /** \return whether this world can generate/have highscores */
     bool useHighScores() const { return m_use_highscores; }
     // ------------------------------------------------------------------------
-    /** Returns the color to clear the back buffer. */
-    const irr::video::SColor& getClearColor() const { return m_clear_color; }
-    // ------------------------------------------------------------------------
-    /** Sets the color to use when clearing the back buffer. */
-    void setClearbackBufferColor(irr::video::SColor color)
-    {
-        m_clear_color       = color;
-    }
     /** Override track fog value to force disabled */
     void forceFogDisabled(bool v) { m_force_disable_fog = v; }
     // ------------------------------------------------------------------------

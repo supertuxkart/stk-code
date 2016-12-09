@@ -168,7 +168,7 @@ void ShaderBasedRenderer::prepareForwardRenderer()
 {
     irr::video::SColor clearColor(0, 150, 150, 150);
     if (World::getWorld() != NULL)
-        clearColor = World::getWorld()->getClearColor();
+        clearColor = irr_driver->getClearColor();
 
     glClear(GL_COLOR_BUFFER_BIT);
     glDepthMask(GL_TRUE);
@@ -408,7 +408,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         m_rtts->getFBO(FBO_COLORS).bind();
         video::SColor clearColor(0, 150, 150, 150);
         if (World::getWorld() != NULL)
-            clearColor = World::getWorld()->getClearColor();
+            clearColor = irr_driver->getClearColor();
 
         glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
             clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);

@@ -1823,7 +1823,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     else if(m_sky_type==SKY_COLOR)
     {
-        World::getWorld()->setClearbackBufferColor(m_sky_color);
+        irr_driver->setClearbackBufferColor(m_sky_color);
     }
 
 #ifdef USE_RESIZE_CACHE

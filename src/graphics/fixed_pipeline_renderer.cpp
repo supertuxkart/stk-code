@@ -43,7 +43,7 @@ void FixedPipelineRenderer::render(float dt)
 
     irr_driver->getVideoDriver()->beginScene(/*backBuffer clear*/ true, 
                                              /*zBuffer*/ true,
-                                             world->getClearColor());
+                                             irr_driver->getClearColor());
     
     irr_driver->getVideoDriver()->enableMaterial2D();
 
