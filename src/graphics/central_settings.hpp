@@ -95,6 +95,7 @@ public:
     bool supportsIndirectInstancingRendering() const;
     bool supportsComputeShadersFiltering() const;
     bool supportsAsyncInstanceUpload() const;
+    bool supportsHardwareSkinning() const;
 
     // "Macro" around feature support and user config
     bool isShadowEnabled() const;

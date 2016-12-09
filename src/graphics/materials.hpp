@@ -603,6 +603,7 @@ class InstancedDetailedObjectPass2Shader : public TextureShader<InstancedDetaile
 public:
     InstancedDetailedObjectPass2Shader()
     {
+        if (!CVS->supportsHardwareSkinning()) return;
         loadProgram(OBJECT,
                    GL_VERTEX_SHADER, "instanced_object_pass.vert",
                    GL_FRAGMENT_SHADER, "instanced_detailed_object_pass2.frag");
@@ -622,6 +623,7 @@ class InstancedSkinnedMeshPass1Shader : public TextureShader<InstancedSkinnedMes
 public:
     InstancedSkinnedMeshPass1Shader()
     {
+        if (!CVS->supportsHardwareSkinning()) return;
         loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
                             GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
 

@@ -442,3 +442,8 @@ bool CentralVideoSettings::isDefferedEnabled() const
 {
     return UserConfigParams::m_dynamic_lights && !GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_ADVANCED_PIPELINE);
 }
+
+bool CentralVideoSettings::supportsHardwareSkinning() const
+{
+    return isARBUniformBufferObjectUsable() && isARBExplicitAttribLocationUsable() && getGLSLVersion() >= 330;
+}

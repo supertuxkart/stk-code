@@ -362,6 +362,7 @@ Shaders::ObjectPass2Shader::ObjectPass2Shader()
 // ============================================================================
 Shaders::SkinnedMeshPass1Shader::SkinnedMeshPass1Shader()
 {
+    if (!CVS->supportsHardwareSkinning()) return;
     loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
                         GL_FRAGMENT_SHADER, "object_pass1.frag");
     assignUniforms("ModelMatrix", "InverseModelMatrix", "skinning_offset");
@@ -371,6 +372,7 @@ Shaders::SkinnedMeshPass1Shader::SkinnedMeshPass1Shader()
 // ============================================================================
 Shaders::SkinnedMeshPass2Shader::SkinnedMeshPass2Shader()
 {
+    if (!CVS->supportsHardwareSkinning()) return;
     loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
                         GL_FRAGMENT_SHADER, "object_pass2.frag");
     assignUniforms("ModelMatrix", "texture_trans", "color_change", "skinning_offset");

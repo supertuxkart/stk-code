@@ -334,6 +334,7 @@ int STKAnimatedMesh::getTotalJointSize() const
 
 void STKAnimatedMesh::resetSkinningState(scene::IAnimatedMesh* mesh)
 {
+    if (!CVS->supportsHardwareSkinning()) return;
     m_skinning_offset = -1;
     m_skinned_mesh = dynamic_cast<scene::CSkinnedMesh*>(mesh);
     if (m_skinned_mesh)
