@@ -305,6 +305,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
                                    const core::recti &viewport,
                                    const core::vector2df &scaling)
 {
+#ifndef SERVER_ONLY
     // If player doesn't have any powerups or has completed race, do nothing.
     const Powerup* powerup = kart->getPowerup();
     if (powerup->getType() == PowerupManager::POWERUP_NOTHING
@@ -354,6 +355,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
             pos, video::SColor(255, 255, 255, 255));
         font->setScale(1.0f);
     }
+#endif
 }   // drawPowerupIcons
 
 // ----------------------------------------------------------------------------
@@ -454,6 +456,7 @@ void RaceGUIBase::addMessage(const core::stringw &msg,
  */
 void RaceGUIBase::drawGlobalMusicDescription()
 {
+#ifndef SERVER_ONLY
      // show no music description when it's off
     if (!UserConfigParams::m_music) return;
 
@@ -550,6 +553,7 @@ void RaceGUIBase::drawGlobalMusicDescription()
 
     draw2DImage(t, dest, source,
                                               NULL, NULL, true);
+#endif
 }   // drawGlobalMusicDescription
 
 //-----------------------------------------------------------------------------
@@ -621,6 +625,7 @@ void RaceGUIBase::drawGlobalReadySetGo()
  */
 void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 {
+#ifndef SERVER_ONLY
     // For now, don't draw player icons when in soccer mode
     const RaceManager::MinorRaceModeType  minor_mode = race_manager->getMinorMode();
     if(minor_mode == RaceManager::MINOR_MODE_SOCCER)
@@ -934,6 +939,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         }
 
     } //next position
+#endif
 }   // drawGlobalPlayerIcons
 
 // ----------------------------------------------------------------------------
@@ -943,6 +949,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
  */
 void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
 {
+#ifndef SERVER_ONLY
     const AbstractKart *kart = camera->getKart();
     if (kart->getBlockedByPlungerTime()<=0)
     {
@@ -1029,4 +1036,5 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
                                               &viewport /* clip */,
                                               NULL /* color */,
                                               true /* alpha */     );
+#endif   // !SERVER_ONLY
 }   // drawPlungerInFace

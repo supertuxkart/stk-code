@@ -212,7 +212,11 @@ void Kart::init(RaceManager::KartType type)
     }
 
 
+#ifdef SERVER_ONLY
+    bool animations = false;  // server never animates
+#else
     bool animations = true;
+#endif
     const int anims = UserConfigParams::m_show_steering_animations;
     if (anims == ANIMS_NONE)
     {
@@ -333,9 +337,10 @@ void Kart::reset()
     m_kart_gfx->reset();
     m_skidding->reset();
 
-
+#ifndef SERVER_ONLY
     if (m_collision_particles)
         m_collision_particles->setCreationRateAbsolute(0.0f);
+#endif
 
     m_race_position        = m_initial_position;
     m_finished_race        = false;
@@ -2051,6 +2056,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     if(m && m->getCollisionReaction() != Material::NORMAL &&
         !getKartAnimation())
     {
+#ifndef SERVER_ONLY
         std::string particles = m->getCrashResetParticles();
         if (particles.size() > 0)
         {
@@ -2076,7 +2082,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                                 "crash-reset properties\n", particles.c_str());
             }
         }
-
+#endif
         if (m->getCollisionReaction() == Material::RESCUE)
         {
             new RescueAnimation(this);
@@ -2542,12 +2548,13 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
             track_manager->getTrack(race_manager->getTrackName())
                          ->isFogEnabled() );
     }
-
+#ifndef SERVER_ONLY
     if (!CVS->supportsShadows())
     {
         m_shadow = new Shadow(m_kart_properties.get(), m_node,
                               -m_kart_model->getLowestPoint());
     }
+#endif
     World::getWorld()->kartAdded(this, m_node);
 }   // loadData
 
@@ -2857,6 +2864,7 @@ btQuaternion Kart::getVisualRotation() const
  */
 void Kart::setOnScreenText(const wchar_t *text)
 {
+#ifndef SERVER_ONLY
     BoldFace* bold_face = font_manager->getFont<BoldFace>();
     core::dimension2d<u32> textsize = bold_face->getDimension(text);
 
@@ -2889,6 +2897,7 @@ void Kart::setOnScreenText(const wchar_t *text)
     // No need to store the reference to the billboard scene node:
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.
+#endif
 }   // setOnScreenText
 
 // ------------------------------------------------------------------------

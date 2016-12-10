@@ -131,12 +131,14 @@ void SkidMarks::update(float dt, bool force_skid_marks,
         if (!is_skidding)   // end skid marking
         {
             m_skid_marking = false;
+#ifndef SERVER_ONLY
             // The vertices and indices will not change anymore
             // (till these skid mark quads are deleted)
             m_left[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
             m_right[m_current]->setHardwareMappingHint(scene::EHM_STATIC);
             if (STKMeshSceneNode* stkm = dynamic_cast<STKMeshSceneNode*>(m_nodes[m_current]))
                 stkm->setReloadEachFrame(false);
+#endif
             return;
         }
 
@@ -192,11 +194,13 @@ void SkidMarks::update(float dt, bool force_skid_marks,
                           custom_color);
     new_mesh->addMeshBuffer(smq_right);
     scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh, "skidmark");
+#ifndef SERVER_ONLY
     if (STKMeshSceneNode* stkm = dynamic_cast<STKMeshSceneNode*>(new_node))
         stkm->setReloadEachFrame(true);
 #ifdef DEBUG
     std::string debug_name = m_kart.getIdent()+" (skid-mark)";
     new_node->setName(debug_name.c_str());
+#endif
 #endif
 
     // We don't keep a reference to the mesh here, so we have to decrement

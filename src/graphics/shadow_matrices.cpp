@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/shadow_matrices.hpp"
 
 #include "config/user_config.hpp"
@@ -523,3 +525,5 @@ void ShadowMatrices::renderShadowsDebug(const FrameBuffer &shadow_framebuffer,
     renderWireFrameFrustrum(m_shadows_cam[3], 3);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
+
+#endif   // !SERVER_ONLY

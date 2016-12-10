@@ -52,6 +52,7 @@ CustomVideoSettingsDialog::~CustomVideoSettingsDialog()
 
 void CustomVideoSettingsDialog::beforeAddingWidgets()
 {
+#ifndef SERVER_ONLY
     getWidget<CheckBoxWidget>("anim_gfx")->setState(UserConfigParams::m_graphical_effects);
     getWidget<CheckBoxWidget>("weather_gfx")->setState(UserConfigParams::m_weather_effects);
     getWidget<CheckBoxWidget>("dof")->setState(UserConfigParams::m_dof);
@@ -115,12 +116,14 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         shadows->setActive(false);
         getWidget<CheckBoxWidget>("global_illumination")->setActive(false);
     }
+#endif
 }
 
 // -----------------------------------------------------------------------------
 
 GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::string& eventSource)
 {
+#ifndef SERVER_ONLY
     if (eventSource == "close")
     {
         bool advanced_pipeline = getWidget<CheckBoxWidget>("dynamiclight")->getState();
@@ -219,7 +222,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
     {
         updateActivation();
     }
-
+#endif
     return GUIEngine::EVENT_LET;
 }   // processEvent
 
@@ -227,6 +230,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
 void CustomVideoSettingsDialog::updateActivation()
 {
+#ifndef SERVER_ONLY
     bool light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
     getWidget<CheckBoxWidget>("motionblur")->setActive(light);
     getWidget<CheckBoxWidget>("dof")->setActive(light);
@@ -244,5 +248,6 @@ void CustomVideoSettingsDialog::updateActivation()
         getWidget<SpinnerWidget>("shadows")->setActive(false);
         getWidget<CheckBoxWidget>("global_illumination")->setActive(false);
     }
+#endif
 }   // updateActivation
 

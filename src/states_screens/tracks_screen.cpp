@@ -26,8 +26,7 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/client_lobby_room_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
@@ -90,10 +89,10 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         {
             if(STKHost::existHost())
             {
-                Protocol* protocol = ProtocolManager::getInstance()
-                                   ->getProtocol(PROTOCOL_LOBBY_ROOM);
-                ClientLobbyRoomProtocol* clrp =
-                              static_cast<ClientLobbyRoomProtocol*>(protocol);
+                Protocol* protocol = LobbyProtocol::get();
+                ClientLobby* clrp =
+                              dynamic_cast<ClientLobby*>(protocol);
+                assert(clrp);   // server never shows the track screen.
                 // FIXME SPLITSCREEN: we need to supply the global player id of the
                 // player selecting the track here. For now ... just vote the same
                 // track for each local player.

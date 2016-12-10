@@ -56,7 +56,6 @@ public:
     void controllerAction(Controller* controller, PlayerAction action, 
                           int value);
     void kartFinishedRace(AbstractKart *kart, float time);
-    void startReadySetGo();
     // ------------------------------------------------------------------------
     /** Returns if this instance is in running state or not. */
     bool isRunning() { return m_running; }

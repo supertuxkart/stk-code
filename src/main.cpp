@@ -60,8 +60,8 @@
  physics -> audio
  "translations\n(too many connections\nto draw)"
  "configuration\n(too many connections\nto draw)"
-# addons -> tracks
-# addons -> karts
+ addons -> tracks
+ addons -> karts
  guiengine -> addons
  guiengine -> race
  addons -> online_manager
@@ -222,6 +222,7 @@
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/networking_lobby.hpp"
 #include "states_screens/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
@@ -572,8 +573,10 @@ void cmdLineHelp()
     // "                          (so n=1 means all Ais will be the test ai)\n"
     // "
     "       --server=name      Start a server (not a playing client).\n"
+    "       --public-server    Allow direct connection to the server (without stk server)\n"
     "       --lan-server=name  Start a LAN server (not a playing client).\n"
     "       --server-password= Sets a password for a server (both client&server).\n"
+    "       --connect-now=ip   Connect to a server with IP known now (in format x.x.x.x:xxx(port)).\n"
     "       --login=s          Automatically log in (set the login).\n"
     "       --password=s       Automatically log in (set the password).\n"
     "       --port=n           Port number to use.\n"
@@ -978,6 +981,34 @@ int handleCmdLine()
     // Networking command lines
     NetworkConfig::get()->
         setMaxPlayers(UserConfigParams::m_server_max_players);
+    if (CommandLine::has("--port", &n))
+    {
+        // We don't know if this instance is going to be a client
+        // or server, so just set both ports, only one will be used anyway
+        NetworkConfig::get()->setClientPort(n);
+        NetworkConfig::get()->setServerPort(n);
+    }
+    if (CommandLine::has("--public-server"))
+    {
+        NetworkConfig::get()->setIsPublicServer();
+    }
+    if (CommandLine::has("--connect-now", &s))
+    {
+        TransportAddress ip(s);
+        TransportAddress me(2130706433/*127.0.0.1*/, 
+                            NetworkConfig::get()->getServerDiscoveryPort() );
+        NetworkConfig::get()->setIsLAN();
+        NetworkConfig::get()->setIsServer(false);
+        NetworkConfig::get()->setMyAddress(me);
+        Log::info("main", "Try to connect to server '%s'.",
+                  ip.toString().c_str()                    );
+        irr::core::stringw name = StringUtils::utf8ToWide(ip.toString());
+        ServersManager::get()->addServer(new Server(name, /*lan*/true,
+                                                    16, 0, ip));
+        ServersManager::get()->setJoinedServer(0);
+        STKHost::create();
+    }
+
     if(CommandLine::has("--server", &s))
     {
         NetworkConfig::get()->setServerName(core::stringw(s.c_str()));
@@ -1613,6 +1644,7 @@ int main(int argc, char *argv[] )
             }
             Log::warn("OpenGL", "Driver is too old!");
         }
+#ifndef SERVER_ONLY
         else if (!CVS->isGLSL())
         {
             if (UserConfigParams::m_old_driver_popup)
@@ -1631,7 +1663,7 @@ int main(int argc, char *argv[] )
             }
             Log::warn("OpenGL", "OpenGL version is too old!");
         }
-
+#endif
         // Note that on the very first run of STK internet status is set to
         // "not asked", so the report will only be sent in the next run.
         if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)
@@ -1639,7 +1671,13 @@ int main(int argc, char *argv[] )
             HardwareStats::reportHardwareStats();
         }
 
-        if(!UserConfigParams::m_no_start_screen)
+        // This can only be the case if --connect-now was used, which adds
+        // a server to the server list.
+        if (ServersManager::get()->getNumServers()==1)
+        {
+            NetworkingLobby::getInstance()->push();
+        }
+        else if (!UserConfigParams::m_no_start_screen)
         {
             // If there is a current player, it was saved in the config file,
             // so we immediately start the main menu (unless it was requested
@@ -1894,6 +1932,8 @@ void runUnitTests()
     GraphicsRestrictions::unitTesting();
     Log::info("UnitTest", "NetworkString");
     NetworkString::unitTesting();
+    Log::info("UnitTest", "TransportAddress");
+    TransportAddress::unitTesting();
 
     Log::info("UnitTest", "Easter detection");
     // Test easter mode: in 2015 Easter is 5th of April - check with 0 days

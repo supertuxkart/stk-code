@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/stk_text_billboard.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/irr_driver.hpp"
@@ -190,3 +192,6 @@ void STKTextBillboard::collectChar(video::ITexture* texture,
 {
     m_chars.push_back(STKTextBillboardChar(texture, destRect, sourceRect, colors));
 }
+
+#endif   // !SERVER_ONLY
+

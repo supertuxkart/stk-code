@@ -716,6 +716,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                   m_texname.c_str());
     }
 
+#ifndef SERVER_ONLY
     // Backface culling
     if(!m_backface_culling)
         m->setFlag(video::EMF_BACK_FACE_CULLING, false);
@@ -869,7 +870,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         }
         m->setTexture(1, glossytex);
     }
-
+#endif
 
     if (m_shader_type == SHADERTYPE_SOLID_UNLIT)
     {
@@ -1013,6 +1014,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
                             bool use_fog) const
 {
+#ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
         // to disable fog in the new pipeline, we slightly abuse the steps :
@@ -1036,6 +1038,7 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
         if (parent != NULL)
             parent->setMaterialFlag(video::EMF_FOG_ENABLE, m_fog && use_fog);
     }
+#endif
 }   // adjustForFog
 
 //-----------------------------------------------------------------------------
@@ -1043,7 +1046,9 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
 /** Callback from LOD nodes to create some effects */
 void Material::onMadeVisible(scene::IMeshBuffer* who)
 {
+#ifndef SERVER_ONLY
     if (!CVS->isGLSL()) return;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1051,14 +1056,18 @@ void Material::onMadeVisible(scene::IMeshBuffer* who)
 /** Callback from LOD nodes to create some effects */
 void Material::onHidden(scene::IMeshBuffer* who)
 {
+#ifndef SERVER_ONLY
     if (!CVS->isGLSL()) return;
+#endif
 }
 
 //-----------------------------------------------------------------------------
 
 void Material::isInitiallyHidden(scene::IMeshBuffer* who)
 {
+#ifndef SERVER_ONLY
     if (!CVS->isGLSL()) return;
+#endif
 }
 
 //-----------------------------------------------------------------------------

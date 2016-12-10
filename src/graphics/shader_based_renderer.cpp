@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/shader_based_renderer.hpp"
 
 #include "config/user_config.hpp"
@@ -957,3 +959,5 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     irr_driver->getSceneManager()->setActiveCamera(NULL);
 
 } //renderToTexture
+
+#endif   // !SERVER_ONLY

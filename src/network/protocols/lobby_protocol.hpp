@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef LOBBY_ROOM_PROTOCOL_HPP
-#define LOBBY_ROOM_PROTOCOL_HPP
+#ifndef LOBBY_PROTOCOL_HPP
+#define LOBBY_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
 
@@ -25,12 +25,12 @@
 #include "network/network_string.hpp"
 
 /*!
- * \class LobbyRoomProtocol
+ * \class LobbyProtocol
  * \brief Base class for both client and server lobby. The lobbies are started
  *  when a server opens a game, or when a client joins a game.
  *  It is used to exchange data about the race settings, like kart selection.
  */
-class LobbyRoomProtocol : public Protocol
+class LobbyProtocol : public Protocol
 {
 public:
     /** Lists all lobby events (LE). */
@@ -45,11 +45,15 @@ public:
         LE_NEW_PLAYER_CONNECTED,          // inform client about new player
         LE_KART_SELECTION,                // Player selected kart
         LE_PLAYER_DISCONNECTED,           // Client disconnected
-        LE_START_RACE,                    // start race
+        LE_CLIENT_LOADED_WORLD,           // Client finished loading world
+        LE_LOAD_WORLD,                    // Clients should load world
+        LE_START_RACE,                    // Server to client to start race
+        LE_STARTED_RACE,                  // Client to server that it has started race
         LE_START_SELECTION,               // inform client to start selection
         LE_RACE_FINISHED,                 // race has finished, display result
         LE_RACE_FINISHED_ACK,             // client went back to lobby
         LE_EXIT_RESULT,                   // Force clients to exit race result screen
+        LE_VOTE,                          // Any vote (race mode, track, ...)
         LE_VOTE_MAJOR,                    // vote of major race mode
         LE_VOTE_MINOR,                    // vote for minor race mode
         LE_VOTE_RACE_COUNT,               // vote for number of tracks
@@ -59,21 +63,45 @@ public:
     };
 
 protected:
+    static LobbyProtocol *m_lobby;
+
     /** The game setup. */
-    GameSetup* m_setup;
+    GameSetup* m_game_setup;
 
 
 public:
-    LobbyRoomProtocol(CallbackObject* callback_object)
-        : Protocol(PROTOCOL_LOBBY_ROOM, callback_object)
-    {
-        m_setup = NULL;
-    }   // LobbyRoomProtocol
-    // ------------------------------------------------------------------------
-    virtual ~LobbyRoomProtocol() {}
-    // ------------------------------------------------------------------------
-    virtual void setup() = 0;
-    virtual void update(float dt) = 0;
-};   // class LobbyRoomProtocol
 
-#endif // LOBBY_ROOM_PROTOCOL_HPP
+    /** Creates either a client or server lobby protocol as a singleton. */
+    template<typename S> static S* create()
+    {
+        assert(m_lobby == NULL);
+        m_lobby = new S();
+        return dynamic_cast<S*>(m_lobby);
+    }   // create
+
+    // ------------------------------------------------------------------------
+    /** Returns the singleton client or server lobby protocol. */
+    static LobbyProtocol *get()
+    {
+        assert(m_lobby);
+        return m_lobby;
+    }   // get
+
+    // ------------------------------------------------------------------------
+
+             LobbyProtocol(CallbackObject* callback_object);
+    virtual ~LobbyProtocol();
+    virtual void setup()                = 0;
+    virtual void update(float dt)       = 0;
+    virtual void finishedLoadingWorld() = 0;
+    virtual void loadWorld();
+    void terminateLatencyProtocol();
+    virtual void requestKartSelection(uint8_t player_id,
+                                      const std::string &kart_name)
+    {
+        assert(false);   // Only defined in client
+    };
+
+};   // class LobbyProtocol
+
+#endif // LOBBY_PROTOCOL_HPP

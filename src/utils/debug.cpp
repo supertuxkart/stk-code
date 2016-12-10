@@ -234,8 +234,10 @@ bool handleContextMenuAction(s32 cmd_id)
     switch(cmd_id)
     {
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
-            Log::info("Debug", "Reloading shaders...");
+#ifndef SERVER_ONLY
+        Log::info("Debug", "Reloading shaders...");
             ShaderBase::updateShaders();
+#endif
             break;
     case DEBUG_GRAPHICS_RESET:
         if (physics)

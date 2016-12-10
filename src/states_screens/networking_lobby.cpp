@@ -34,9 +34,8 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "network/network_player_profile.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/client_lobby_room_protocol.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "network/protocols/client_lobby.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
@@ -57,7 +56,7 @@ DEFINE_SCREEN_SINGLETON( NetworkingLobby );
  *  for all local players (the ActivePlayer maps device to player, i.e.
  *  controls which device is used by which player). Note that a server
  *  does not create an instance of this class and will create the ActivePlayer
- *  data structure in the StartGameProtocol.
+ *  data structure in LobbyProtocol::loadWorld().
  */
 // ----------------------------------------------------------------------------
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
@@ -163,16 +162,15 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     {
         if(NetworkConfig::get()->isServer())
         {
-            ServerLobbyRoomProtocol* slrp = static_cast<ServerLobbyRoomProtocol*>(
-                ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
-            if (slrp)
-                slrp->startSelection();
+            Protocol *p = LobbyProtocol::get();
+            ServerLobby* slrp = dynamic_cast<ServerLobby*>(p);
+            slrp->startSelection();
         }
         else // client
         {
             // Send a message to the server to start
             NetworkString start(PROTOCOL_LOBBY_ROOM);
-            start.addUInt8(LobbyRoomProtocol::LE_REQUEST_BEGIN);
+            start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
             STKHost::get()->sendToServer(&start, true);
         }
     }
@@ -199,8 +197,8 @@ void NetworkingLobby::tearDown()
 bool NetworkingLobby::onEscapePressed()
 {
     // notify the server that we left
-    ClientLobbyRoomProtocol* protocol = dynamic_cast<ClientLobbyRoomProtocol*>(
-            ProtocolManager::getInstance()->getProtocol(PROTOCOL_LOBBY_ROOM));
+    ClientLobby* protocol =
+        dynamic_cast<ClientLobby*>(LobbyProtocol::get());
     if (protocol)
         protocol->leave();
     STKHost::get()->shutdown();

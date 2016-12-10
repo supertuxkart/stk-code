@@ -72,6 +72,7 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
     m_line.setLine(p1, p2);
     if(UserConfigParams::m_check_debug)
     {
+#ifndef SERVER_ONLY
         video::SMaterial material;
         material.setFlag(video::EMF_BACK_FACE_CULLING, false);
         material.setFlag(video::EMF_LIGHTING, false);
@@ -109,6 +110,7 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
         //mesh->setBoundingBox(buffer->getBoundingBox());
         m_debug_node = irr_driver->addMesh(mesh, "checkdebug");
         mesh->drop();
+#endif
     }
     else
     {
@@ -150,7 +152,9 @@ void CheckLine::changeDebugColor(bool is_active)
     {
         vertices[i].Color = color;
     }
+#ifndef SERVER_ONLY
     buffer->getMaterial().setTexture(0, getUnicolorTexture(color));
+#endif
 
 }   // changeDebugColor
 

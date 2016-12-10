@@ -39,7 +39,7 @@ GameEventsProtocol::~GameEventsProtocol()
 */
 void GameEventsProtocol::setup()
 {
-    World::getWorld()->setReadyToRace();
+    m_count_ready_clients = 0;
 }   // setup
 
 // ----------------------------------------------------------------------------
@@ -63,16 +63,16 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     int8_t type = data.getUInt8();
     switch (type)
     {
-        case GE_ITEM_COLLECTED:
-            collectedItem(data);      break;
-        case GE_KART_FINISHED_RACE:
-            kartFinishedRace(data);   break;
-        case GE_START_READY_SET_GO:
-            receivedReadySetGo();     break;
+    case GE_CLIENT_STARTED_RSG:
+        receivedClientHasStarted(event); break;
+    case GE_ITEM_COLLECTED:
+        collectedItem(data);        break;
+    case GE_KART_FINISHED_RACE:
+        kartFinishedRace(data);     break;
 
-        default:
-            Log::warn("GameEventsProtocol", "Unkown message type.");
-            break;
+    default:
+        Log::warn("GameEventsProtocol", "Unkown message type.");
+        break;
     }
     return true;
 }   // notifyEvent
@@ -164,26 +164,37 @@ void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
 }   // kartFinishedRace
 
 // ----------------------------------------------------------------------------
-/** This function is called on a server when the world starts the ready-set-go
- *  phase. It signals to all clients to do the same.
+/** Called on a client when it has started its ready-set-go. The client will
+ *  inform the server anout this. The server will wait for all clients to
+ *  have started before it will start its own countdown.
  */
-void GameEventsProtocol::startReadySetGo()
-{
-    assert(NetworkConfig::get()->isServer());
-    NetworkString *ns = getNetworkString(1);
-    ns->setSynchronous(true);
-    ns->addUInt8(GE_START_READY_SET_GO);
-    sendMessageToPeersChangingToken(ns, /*reliable*/true);
-    delete ns;
-}   // startReadySetGo
-
-// ----------------------------------------------------------------------------
-/** Called on the client when it receives the message that the server has
- *  started its ready-set-go. Signal to world that it can go to the next
- *  phase (ready phase) now.
- */
-void GameEventsProtocol::receivedReadySetGo()
+void GameEventsProtocol::clientHasStarted()
 {
     assert(NetworkConfig::get()->isClient());
-    World::getWorld()->startReadySetGo();
-}   // receivedReadySetGo
+    NetworkString *ns = getNetworkString(1);
+    ns->setSynchronous(true);
+    ns->addUInt8(GE_CLIENT_STARTED_RSG);
+    sendToServer(ns, /*reliable*/true);
+    delete ns;
+}   // clientHasStarted
+// ----------------------------------------------------------------------------
+/** Called on the server when a client has signaled that it has started ready
+*  set go. The server waits for the last client before it starts its own
+*  ready set go. */
+void GameEventsProtocol::receivedClientHasStarted(Event *event)
+{
+    assert(NetworkConfig::get()->isServer());
+    m_count_ready_clients++;
+    Log::verbose("GameEvent",
+                 "Host %d has started ready-set-go: %d out of %d done",
+                 event->getPeer()->getHostId(), m_count_ready_clients, 
+                 STKHost::get()->getGameSetup()->getPlayerCount()        );
+    if (m_count_ready_clients==STKHost::get()->getGameSetup()->getPlayerCount())
+    {
+        Log::verbose("GameEvent", "All %d clients have started.",
+                     STKHost::get()->getGameSetup()->getPlayerCount());
+        // SIgnal the server to start now - since it is now behind the client
+        // times by the latency of the 'slowest' client.
+        World::getWorld()->startReadySetGo();
+    }
+}   // receivedClientHasStarted

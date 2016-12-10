@@ -305,8 +305,10 @@ public:
     void                  unsetTextureErrorMessage();
     class GPUTimer        &getGPUTimer(unsigned);
 
+#ifndef SERVER_ONLY
     std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
                                                      const std::string &name);
+#endif
 
     // ------------------------------------------------------------------------
     /** Convenience function that loads a texture with default parameters

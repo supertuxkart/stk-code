@@ -16,6 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/show_curve.hpp"
 
 #include "graphics/irr_driver.hpp"
@@ -200,3 +202,6 @@ void ShowCurve::setPosition(const Vec3 &xyz)
     m_scene_node->setPosition(xyz.toIrrVector());
 }   // setPosition
 // ----------------------------------------------------------------------------
+
+#endif   // !SERVER_ONLY
+

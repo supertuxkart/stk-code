@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2015 SuperTuxKart-Team
+//  Copyright (C) 2014-2015 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,28 +15,23 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_FIXED_PIPELINE_RENDERER_HPP
-#define HEADER_FIXED_PIPELINE_RENDERER_HPP
+
+// Not really a scene manager yet but hold algorithm that
+// rework scene manager output
 
 #ifndef SERVER_ONLY
-#include "graphics/abstract_renderer.hpp"
-#include <map>
 
-class RenderTarget;
-class GL1RenderTarget;
+#ifndef HEADER_STKSCENEMANAGER_HPP
+#define HEADER_STKSCENEMANAGER_HPP
 
-class FixedPipelineRenderer: public AbstractRenderer
-{  
-public:
-    
-    void onLoadWorld()  ;
-    void onUnloadWorld();
-    
-    void render(float dt);
-    
-    std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
-                                                     const std::string &name);
-};
+#include <ICameraSceneNode.h>
+#include <ISceneNode.h>
+#include <vector3d.h>
 
-#endif // !SERVER_ONLY
-#endif //HEADER_FIXED_PIPELINE_RENDERER_HPP
+void addEdge(const irr::core::vector3df &P0, const irr::core::vector3df &P1);
+
+bool isCulledPrecise(const irr::scene::ICameraSceneNode *cam, const irr::scene::ISceneNode *node);
+
+#endif
+
+#endif   // supertuxkart

@@ -101,6 +101,7 @@ void Graph::cleanupDebugMesh()
 void Graph::createMesh(bool show_invisible, bool enable_transparency,
                        const video::SColor *track_color)
 {
+#ifndef SERVER_ONLY
     // The debug track will not be lighted or culled.
     video::SMaterial m;
     m.BackfaceCulling  = false;
@@ -229,6 +230,7 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
 
     delete[] ind;
     delete[] new_v;
+#endif
 }   // createMesh
 
 // -----------------------------------------------------------------------------
@@ -245,9 +247,9 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     World::getWorld()
         ->setClearbackBufferColor(video::SColor(0, 255, 255, 255));
     World::getWorld()->forceFogDisabled(true);
-
+#ifndef SERVER_ONLY
     m_render_target = irr_driver->createRenderTarget(dimension, name);
-
+#endif
     irr_driver->getSceneManager()
         ->setAmbientLight(video::SColor(255, 255, 255, 255));
 

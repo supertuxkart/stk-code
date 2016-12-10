@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
 #include "graphics/2dutils.hpp"
 
 #include "graphics/central_settings.hpp"
@@ -779,3 +780,6 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 
     glGetError();
 }   // GL32_draw2DRectangle
+
+#endif   // !SERVER_ONLY
+

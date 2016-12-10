@@ -1,5 +1,6 @@
 # CMakeLists.txt - glew
 
+if (NOT SERVER_ONLY)
 include_directories("include")
 
 if(APPLE)
@@ -18,3 +19,5 @@ add_library(glew STATIC
 )
 
 target_link_libraries(glew ${OPENGL_LIBRARIES})
+
+endif()

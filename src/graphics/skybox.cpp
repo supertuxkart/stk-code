@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
 
 #include "graphics/skybox.hpp"
 #include "graphics/central_settings.hpp"
@@ -375,4 +376,5 @@ void Skybox::render(const scene::ICameraSceneNode *camera) const
     glBindVertexArray(0);
 }   // renderSkybox
 
+#endif   // !SERVER_ONLY
 

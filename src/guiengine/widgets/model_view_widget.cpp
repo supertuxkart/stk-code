@@ -52,13 +52,17 @@ IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, 
     m_properties[PROP_ICON]="gui/main_help.png";
 
     m_rtt_unsupported = false;
-}
+}   // ModelViewWidget
+
 // -----------------------------------------------------------------------------
 ModelViewWidget::~ModelViewWidget()
 {
     GUIEngine::needsUpdate.remove(this);
+#ifndef SERVER_ONLY    
     delete m_render_info;
-}
+#endif
+}   // ~ModelViewWidget
+
 // -----------------------------------------------------------------------------
 void ModelViewWidget::add()
 {
@@ -92,7 +96,7 @@ void ModelViewWidget::clearModels()
     m_rtt_main_node = NULL;
     m_camera = NULL;
     m_light = NULL;
-}
+}   // clearModels
 
 // -----------------------------------------------------------------------------
 
@@ -107,10 +111,11 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
     m_model_scale.push_back(scale);
     m_model_frames.push_back(frame);
     m_model_render_info_affected.push_back(all_parts_colorized);
-
+#ifndef SERVER_ONLY
     if (!CVS->isGLSL())
         m_render_target = NULL;
-}
+#endif
+}   // addModel
 
 // -----------------------------------------------------------------------------
 void ModelViewWidget::update(float delta)
@@ -161,7 +166,10 @@ void ModelViewWidget::update(float delta)
         // stop rotating when target reached
         if (fabsf(m_angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
-
+   
+#ifdef SERVER_ONLY 
+    return;
+#else
     if (m_render_target == NULL)
     {
         std::string name = "model view ";
@@ -181,10 +189,13 @@ void ModelViewWidget::update(float delta)
     m_render_target->renderToTexture(m_camera, GUIEngine::getLatestDt());
 
     m_rtt_main_node->setVisible(false);
-}
+#endif
+}   // update
 
+// ----------------------------------------------------------------------------
 void ModelViewWidget::setupRTTScene()
 {
+#ifndef SERVER_ONLY
     irr_driver->suppressSkyBox();
 
     if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
@@ -297,42 +308,57 @@ void ModelViewWidget::setupRTTScene()
     m_camera->setFOV(DEGREE_TO_RAD*50.0f);
     m_camera->updateAbsolutePosition();
 
-}
+#endif
+}   // setupRTTScene
 
+// ----------------------------------------------------------------------------
 void ModelViewWidget::setRotateOff()
 {
     m_rotation_mode = ROTATE_OFF;
-}
+}   // setRotateOff
+
+// ----------------------------------------------------------------------------
 void ModelViewWidget::setRotateContinuously(float speed)
 {
     m_rotation_mode = ROTATE_CONTINUOUSLY;
     m_rotation_speed = speed;
-}
+}   // setRotateContinuously
+
+// ----------------------------------------------------------------------------
 void ModelViewWidget::setRotateTo(float targetAngle, float speed)
 {
     m_rotation_mode = ROTATE_TO;
     m_rotation_speed = speed;
     m_rotation_target = targetAngle;
-}
+}   // setRotateTo
 
+// ----------------------------------------------------------------------------
 bool ModelViewWidget::isRotating()
 {
     return m_rotation_mode != ROTATE_OFF ? true : false;
-}
+}   // isRotating
 
+// ----------------------------------------------------------------------------
 void ModelViewWidget::elementRemoved()
 {
+#ifndef SERVER_ONLY
     m_render_target = NULL;
     IconButtonWidget::elementRemoved();
-}
+#endif
+}   // elementRemoved
 
+// ----------------------------------------------------------------------------
 void ModelViewWidget::clearRttProvider()
 {
     m_render_target = NULL;
-}
+}   // clearRttProvider
 
+// ----------------------------------------------------------------------------
 void ModelViewWidget::drawRTTScene(const irr::core::rect<s32>& dest_rect) const
 {
+#ifndef SERVER_ONLY
     if(m_render_target != NULL)
         m_render_target->draw2DImage(dest_rect, NULL, video::SColor(255, 255, 255, 255), true);
-}
+#endif
+}   // drawRTTScene
+

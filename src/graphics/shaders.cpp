@@ -16,6 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
+#ifndef SERVER_ONLY
+
 /**
 \page shaders_overview Shaders Overview
 
@@ -421,3 +423,5 @@ Shaders::ColoredLine::ColoredLine()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }   // Shaders::ColoredLine
+
+#endif   // !SERVER_ONLY

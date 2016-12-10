@@ -15,7 +15,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
 #include "graphics/draw_calls.hpp"
+
 #include "config/user_config.hpp"
 #include "graphics/draw_tools.hpp"
 #include "graphics/gpu_particles.hpp"
@@ -899,3 +901,4 @@ int32_t DrawCalls::getSkinningOffset() const
         (const size_t previous, const STKAnimatedMesh* m)
         { return previous + m->getTotalJointSize(); });
 }   // getSkinningOffset
+#endif   // !SERVER_ONLY

@@ -18,6 +18,8 @@
 #ifndef HEADER_MATERIAL_TYPE_HPP
 #define HEADER_MATERIAL_TYPE_HPP
 
+#ifndef SERVER_ONLY
+
 #include "graphics/shader.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_mesh.hpp"
@@ -871,4 +873,5 @@ struct SplattingMat
 };   // SplattingMat
 
 
-#endif //HEADER_MATERIAL_TYPE_HPP
+#endif  // !SERVER_ONLY
+#endif  // HEADER_MATERIAL_TYPE_HPP

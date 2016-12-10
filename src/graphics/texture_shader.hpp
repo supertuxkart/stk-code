@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SHADER_ONLY
+
 #ifndef HEADER_TEXTURE_SHADER_HPP
 #define HEADER_TEXTURE_SHADER_HPP
 
@@ -259,3 +261,5 @@ public:
 };   // class TextureShader
 
 #endif
+
+#endif   // SHADER_ONLY

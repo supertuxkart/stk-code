@@ -18,6 +18,7 @@
 #ifndef HEADER_DRAW_CALLS_HPP
 #define HEADER_DRAW_CALLS_HPP
 
+#ifndef SERVER_ONLY
 #include "graphics/command_buffer.hpp"
 #include <irrlicht.h>
 #include <unordered_map>
@@ -110,4 +111,5 @@ public:
     int32_t getSkinningOffset() const;
 };
 
+#endif   // !SERVER_ONLY
 #endif //HEADER_DRAW_CALLS_HPP

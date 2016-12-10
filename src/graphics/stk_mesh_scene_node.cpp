@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "graphics/stk_mesh_scene_node.hpp"
 
 #include "graphics/central_settings.hpp"
@@ -608,3 +610,6 @@ void STKMeshSceneNode::render()
         }
     }
 }
+
+#endif   // !SERVER_ONLY
+

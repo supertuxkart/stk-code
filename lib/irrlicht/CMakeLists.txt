@@ -8,9 +8,14 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                     "${ZLIB_INCLUDE_DIR}"
                     "${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
 
-if(NOT USE_GLES2)
-    find_package(OpenGL REQUIRED)
-    include_directories(${OPENGL_INCLUDE_DIR})
+if (SERVER_ONLY)
+    add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+else()
+    if(NOT USE_GLES2)
+        find_package(OpenGL REQUIRED)
+        include_directories(${OPENGL_INCLUDE_DIR})
+    endif()
 endif()
 
 if (UNIX AND NOT APPLE)

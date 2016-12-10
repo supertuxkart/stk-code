@@ -27,6 +27,9 @@ using namespace irr;
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/2dutils.hpp"
+#ifndef SERVER_ONLY
+#include "graphics/glwrap.hpp"
+#endif
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
@@ -165,6 +168,7 @@ void RaceGUI::reset()
  */
 void RaceGUI::renderGlobal(float dt)
 {
+#ifndef SERVER_ONLY
     RaceGUIBase::renderGlobal(dt);
     cleanupMessages(dt);
 
@@ -213,6 +217,7 @@ void RaceGUI::renderGlobal(float dt)
 
     if (!m_is_tutorial)               drawGlobalPlayerIcons(m_map_height);
     if(world->getTrack()->isSoccer()) drawScores();
+#endif
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
@@ -260,6 +265,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
  */
 void RaceGUI::drawScores()
 {
+#ifndef SERVER_ONLY
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
     int offset_y = 5;
     int offset_x = 5;
@@ -301,6 +307,7 @@ void RaceGUI::drawScores()
             NULL,NULL,true);
         offset_x += position.LowerRightCorner.X + 30;
     }
+#endif
 }   // drawScores
 
 //-----------------------------------------------------------------------------
@@ -370,6 +377,7 @@ void RaceGUI::drawGlobalTimer()
  */
 void RaceGUI::drawGlobalMiniMap()
 {
+#ifndef SERVER_ONLY
     World *world = World::getWorld();
     // draw a map when arena has a navigation mesh.
     if ((world->getTrack()->isArena() || world->getTrack()->isSoccer()) &&
@@ -428,7 +436,7 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.5f)));
         draw2DImage(icon, position, source, NULL, NULL, true);
     }
-
+#endif
 }   // drawGlobalMiniMap
 
 //-----------------------------------------------------------------------------
@@ -444,6 +452,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                               const core::recti &viewport,
                               const core::vector2df &scaling)
 {
+#ifndef SERVER_ONLY
     float min_ratio        = std::min(scaling.X, scaling.Y);
     const int GAUGEWIDTH   = 78;
     int gauge_width        = (int)(GAUGEWIDTH*min_ratio);
@@ -638,7 +647,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
 
     }
-
+#endif
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
@@ -738,6 +747,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                  const core::vector2df &scaling,
                                  float dt)
 {
+#ifndef SERVER_ONLY
     float min_ratio         = std::min(scaling.X, scaling.Y);
     const int SPEEDWIDTH   = 128;
     int meter_width        = (int)(SPEEDWIDTH*min_ratio);
@@ -844,7 +854,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
     irr_driver->getVideoDriver()->setMaterial(m);
     draw2DVertexPrimitiveList(m_speed_bar_icon->getTexture(), vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
-
+#endif
 }   // drawSpeedEnergyRank
 
 //-----------------------------------------------------------------------------
@@ -946,6 +956,7 @@ void RaceGUI::drawMultitouchSteering(const AbstractKart* kart,
                                      const core::recti &viewport,
                                      const core::vector2df &scaling)
 {
+#ifndef SERVER_ONLY
     MultitouchDevice* device = input_manager->getDeviceManager()->
                                                         getMultitouchDevice();
 
@@ -1043,4 +1054,5 @@ void RaceGUI::drawMultitouchSteering(const AbstractKart* kart,
             }
         }
     }
+#endif
 } // drawMultitouchSteering

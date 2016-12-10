@@ -93,6 +93,8 @@ void ScalableFont::draw(const core::stringw& text,
                         const video::SColor& color, bool hcenter, bool vcenter,
                         const core::rect<s32>* clip, bool ignoreRTL)
 {
+#ifndef SERVER_ONLY
+
     bool previousRTL = m_font_settings->isRTL();
     if (ignoreRTL)
         m_font_settings->setRTL(false);
@@ -102,7 +104,7 @@ void ScalableFont::draw(const core::stringw& text,
 
     if (ignoreRTL)
         m_font_settings->setRTL(previousRTL);
-
+#endif
 }   // draw
 
 // ----------------------------------------------------------------------------

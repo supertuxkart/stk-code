@@ -28,6 +28,8 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/client_lobby.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/race_event_manager.hpp"
 #include "tracks/track.hpp"
 
@@ -51,7 +53,6 @@ WorldStatus::WorldStatus()
 
     if (device->getTimer()->isStopped())
         device->getTimer()->start();
-    m_ready_to_race = false;
 }   // WorldStatus
 
 //-----------------------------------------------------------------------------
@@ -93,9 +94,9 @@ void WorldStatus::reset()
     // Set the right music
     World::getWorld()->getTrack()->startMusic();
     // In case of a networked race the race can only start once
-    // all protocols are up. This flag waits for that, and is
-    // set by 
-    m_ready_to_race = !NetworkConfig::get()->isNetworking();
+    // all protocols are up. This flag is used to wait for
+    // a confirmation before starting the actual race.
+    m_server_is_ready = false;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -179,10 +180,6 @@ void WorldStatus::update(float dt)
  */
 void WorldStatus::updateTime(const float dt)
 {
-    // In case of a networked race wait till all necessary protocols are
-    // ready before progressing the timer
-    if (!m_ready_to_race) return;
-
     switch (m_phase)
     {
         // Note: setup phase must be a separate phase, since the race_manager
@@ -243,35 +240,34 @@ void WorldStatus::updateTime(const float dt)
                 m_prestart_sound->play();
 
             // In a networked game the client needs to wait for a notification
-            // from the server that ready-set-go can start now. So client will go
-            // to the 'wait_for_server_phase', from which they will progress once
-            // the notification is received. In all other cases (no networking or
-            // server), immediately go to race start
-            if(!NetworkConfig::get()->isNetworking() ||
-                NetworkConfig::get()->isServer()         )
-            {
-                // Notify the clients that they can start ready-set-go
-                if(NetworkConfig::get()->isServer())
-                    RaceEventManager::getInstance()->startReadySetGo();
-                m_server_is_ready = true;
-            }   // if not networked
-            m_phase = WAIT_FOR_SERVER_PHASE;
+            // from the server that all clients and the server are ready to 
+            // start the game. The server will actually wait for all clients
+            // to confirm that they have started the race before starting
+            // itself. In a normal race, this phase is skipped and the race
+            // starts immediately.
+            m_phase = NetworkConfig::get()->isNetworking() ? WAIT_FOR_SERVER_PHASE
+                                                           : READY_PHASE;
             return;   // Don't increase time
         case WAIT_FOR_SERVER_PHASE:
-            // On a client this phase waits for the server to be ready. On a
-            // server or in case of non-networked game this phase is reached
-            // with m_server_is_ready set to true, so it will immediately
-            // start the engines and then the race
-            if(!m_server_is_ready) return;
+        {
+            // This stage is only reached in case of a networked game.
+            // A client waits for a message from the server that it can
+            // start the race (i.e. that all clients and the server have
+            // loaded the world). The server waits for a confirmation from
+            // each client that they have started (to guarantee that the
+            // server is running with a local time behind all clients).
+            if (!m_server_is_ready) return;
 
-            m_phase = READY_PHASE;            
+            m_phase = READY_PHASE;
+            Protocol *p = LobbyProtocol::get();
+            ClientLobby *cl = dynamic_cast<ClientLobby*>(p);
+            if (cl)
+                cl->startingRaceNow();
+            return;   // Don't increase time
+        }
+        case READY_PHASE:
             startEngines();
 
-            // Receiving a 'startReadySetGo' message from the server triggers
-            // a call to startReadySetGo() here, which will change the phase
-            // (or state) of the finite state machine.
-            return;   // Don't increase time
-        case READY_PHASE:
             if (m_auxiliary_timer > 1.0)
             {
                 if (m_play_ready_set_go_sounds)
@@ -432,8 +428,11 @@ void WorldStatus::updateTime(const float dt)
 
 //-----------------------------------------------------------------------------
 /** Called on the client when it receives a notification from the server that
- *  the server is now starting its ready-set-go phase. This function changes
- *  the state of the finite state machine to be ready.
+ *  all clients (and server) are ready to start the race. The server will
+ *  then additionally wait for all clients to report back that they are
+ *  starting, which guarantees that the server is running far enough behind
+ *  clients time that at server time T all events from the clients at time
+ *  T have arrived, minimising rollback impact.
  */
 void WorldStatus::startReadySetGo()
 {

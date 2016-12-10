@@ -224,8 +224,10 @@ void World::init()
     // Load other custom models if needed
     loadCustomModels();
 
+#ifndef SERVER_ONLY
     // Now that all models are loaded, apply the overrides
     irr_driver->applyObjectPassShader();
+#endif
 
     // Must be called after all karts are created
     m_race_gui->init();

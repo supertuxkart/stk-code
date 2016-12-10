@@ -54,6 +54,7 @@ void main(void)
     float scattering = mix(fPowEdotL, fLdotNBack, .5);
 
     float specmap = texture(SpecMap, uv).g;
-    vec3 LightFactor = color.xyz * (scattering * 0.1) + getLightFactor(color.xyz, vec3(1.), specmap, 0.);
+    float emitmap = texture(SpecMap, uv).b;
+    vec3 LightFactor = color.xyz * (scattering * 0.1) + getLightFactor(color.xyz, vec3(1.), specmap, emitmap);
     FragColor = vec4(LightFactor, 1.);
 }

@@ -280,11 +280,13 @@ void Track::cleanup()
 {
     Graph::destroy();
     ItemManager::destroy();
+#ifndef SERVER_ONLY
     VAOManager::kill();
-
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
     // Clear reminder of transformed textures
     resetTextureTable();
+#endif
+
     // Clear reminder of the link between textures and file names.
     irr_driver->clearTexturesFileName();
 
@@ -320,16 +322,20 @@ void Track::cleanup()
     m_object_physics_only_nodes.clear();
 
     irr_driver->removeNode(m_sun);
+#ifndef SERVER_ONLY
     if (CVS->isGLSL())
         m_sun->drop();
+#endif
     delete m_track_mesh;
     m_track_mesh = NULL;
 
     delete m_gfx_effect_mesh;
     m_gfx_effect_mesh = NULL;
 
+#ifndef SERVER_ONLY
     if (CVS->isGLSL())
         irr_driver->cleanSunInterposer();
+#endif
 
 
     // The m_all_cached_mesh contains each mesh loaded from a file, which
@@ -787,12 +793,16 @@ void Track::createPhysicsModel(unsigned int main_track_count)
             }
 
             // Color
+#ifndef SERVER_ONLY
             mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 105, 180)));
+#endif
             irr_driver->grabAllTextures(mesh);
             // Gloss
+#ifndef SERVER_ONLY
             mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
             // Colorization mask
             mb->getMaterial().setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+#endif
         }
         else
             irr_driver->removeNode(m_static_physics_only_nodes[i]);
@@ -1029,6 +1039,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 
 void Track::loadMinimap()
 {
+#ifndef SERVER_ONLY
     //Check whether the hardware can do nonsquare or
     // non power-of-two textures
     video::IVideoDriver* const video_driver = irr_driver->getVideoDriver();
@@ -1055,6 +1066,7 @@ void Track::loadMinimap()
         m_minimap_y_scale = float(m_mini_map_size.Height) / float(mini_map_texture_size.Height);
     else
         m_minimap_y_scale = 0;
+#endif
 }   // loadMinimap
 
 // ----------------------------------------------------------------------------
@@ -1122,10 +1134,13 @@ bool Track::loadMainTrack(const XMLNode &root)
     scene::CBatchingMesh *merged_mesh = new scene::CBatchingMesh();
     merged_mesh->addMesh(mesh);
     merged_mesh->finalize();
-
+#ifndef SERVER_ONLY
     scene::IMesh* tangent_mesh = MeshTools::createMeshWithTangents(merged_mesh, &MeshTools::isNormalMap);
 
     adjustForFog(tangent_mesh, NULL);
+#else
+    scene::IMesh* tangent_mesh = merged_mesh;
+#endif
 
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
@@ -1243,8 +1258,9 @@ bool Track::loadMainTrack(const XMLNode &root)
                            full_path.c_str());
                 continue;
             }
-
+#ifndef SERVER_ONLY
             a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
+#endif
 
             // The meshes loaded here are in irrlicht's mesh cache. So we
             // have to keep track of them in order to properly remove them
@@ -1753,7 +1769,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // It's important to execute this BEFORE the code that creates the skycube,
     // otherwise the skycube node could be modified to have fog enabled, which
     // we don't want
-    if (m_use_fog && Camera::getDefaultCameraType()!=Camera::CM_TYPE_DEBUG && 
+#ifndef SERVER_ONLY
+    if (m_use_fog && Camera::getDefaultCameraType()!=Camera::CM_TYPE_DEBUG &&
         !CVS->isGLSL())
     {
         /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
@@ -1763,6 +1780,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
                                              m_fog_start, m_fog_end,
                                              1.0f);
     }
+#endif
 
     // Enable for for all track nodes if fog is used
     const unsigned int count = (int)m_all_nodes.size();
@@ -1831,6 +1849,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     const video::SColorf tmpf(m_sun_diffuse_color);
     m_sun = irr_driver->addLight(m_sun_position, 0., 0., tmpf.r, tmpf.g, tmpf.b, true);
 
+#ifndef SERVER_ONLY
     if (!CVS->isGLSL())
     {
         scene::ILightSceneNode *sun = (scene::ILightSceneNode *) m_sun;
@@ -1853,6 +1872,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         irr_driver->createSunInterposer();
         m_sun->grab();
     }
+#endif
 
     createPhysicsModel(main_track_count);
 

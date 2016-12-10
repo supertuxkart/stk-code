@@ -37,6 +37,7 @@ NetworkConfig::NetworkConfig()
 {
     m_network_type          = NETWORK_NONE;
     m_is_server             = false;
+    m_is_public_server      = false;
     m_max_players           = 4;
     m_is_registered         = false;
     m_server_name           = "";

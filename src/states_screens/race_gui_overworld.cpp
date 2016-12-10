@@ -25,6 +25,9 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/2dutils.hpp"
+#ifndef SERVER_ONLY
+#include "graphics/glwrap.hpp"
+#endif
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
@@ -137,6 +140,7 @@ RaceGUIOverworld::~RaceGUIOverworld()
  */
 void RaceGUIOverworld::renderGlobal(float dt)
 {
+#ifndef SERVER_ONLY
     RaceGUIBase::renderGlobal(dt);
     cleanupMessages(dt);
 
@@ -173,6 +177,7 @@ void RaceGUIOverworld::renderGlobal(float dt)
     //irr_driver->getVideoDriver()->enableMaterial2D();
 
     m_is_first_render_call = false;
+#endif
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
@@ -208,6 +213,7 @@ void RaceGUIOverworld::renderPlayerView(const Camera *camera, float dt)
  */
 void RaceGUIOverworld::drawTrophyPoints()
 {
+#ifndef SERVER_ONLY
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     const int points = player->getPoints();
     std::string s = StringUtils::toString(points);
@@ -286,7 +292,7 @@ void RaceGUIOverworld::drawTrophyPoints()
 
     font->draw(sw.c_str(), pos, time_color, false, vcenter, NULL, true /* ignore RTL */);
     font->disableShadow();
-
+#endif
 }   // drawTrophyPoints
 
 //-----------------------------------------------------------------------------
@@ -294,6 +300,7 @@ void RaceGUIOverworld::drawTrophyPoints()
  */
 void RaceGUIOverworld::drawGlobalMiniMap()
 {
+#ifndef SERVER_ONLY
     World *world = World::getWorld();
     // arenas currently don't have a map.
     if(world->getTrack()->isArena() || world->getTrack()->isSoccer()) return;
@@ -534,7 +541,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                        true, true /* vcenter */, NULL);
         }
     }
-
+#endif   // SERVER_ONLY
 }   // drawGlobalMiniMap
 
 //-----------------------------------------------------------------------------
@@ -550,6 +557,7 @@ void RaceGUIOverworld::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                               const core::recti &viewport,
                               const core::vector2df &scaling)
 {
+#ifndef SERVER_ONLY
     float state = (float)(kart->getEnergy())
                 / kart->getKartProperties()->getNitroMax();
     if (state < 0.0f) state = 0.0f;
@@ -603,7 +611,7 @@ void RaceGUIOverworld::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                                                   &clip, NULL /* colors */, true /* alpha */);
     }
 
-
+#endif
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------

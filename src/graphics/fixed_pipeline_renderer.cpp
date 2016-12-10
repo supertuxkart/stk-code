@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
 #include "graphics/fixed_pipeline_renderer.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
@@ -112,3 +113,4 @@ std::unique_ptr<RenderTarget> FixedPipelineRenderer::createRenderTarget(const ir
 {
     return std::unique_ptr<RenderTarget>(new GL1RenderTarget(dimension, name));
 }
+#endif

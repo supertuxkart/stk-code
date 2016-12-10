@@ -145,6 +145,7 @@ Material* MaterialManager::getDefaultMaterial(video::E_MATERIAL_TYPE shader_type
         // Try to find a cleaner way
         // If graphics are disabled, shaders should not be accessed (getShader
         // asserts that shaders are initialised).
+#ifndef SERVER_ONLY
         if(!ProfileWorld::isNoGraphics() && CVS->isGLSL() &&
             shader_type == Shaders::getShader(ShaderType::ES_OBJECT_UNLIT))
             default_material->setShaderType(Material::SHADERTYPE_SOLID_UNLIT);
@@ -156,7 +157,7 @@ Material* MaterialManager::getDefaultMaterial(video::E_MATERIAL_TYPE shader_type
         //    default_material->setShaderType(Material::SHADERTYPE_ALPHA_BLEND);
         else
             default_material->setShaderType(Material::SHADERTYPE_SOLID);
-
+#endif
         m_default_materials[shader_type] = default_material;
         return default_material;
     }

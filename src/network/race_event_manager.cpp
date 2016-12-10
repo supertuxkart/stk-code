@@ -5,7 +5,6 @@
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
-#include "network/protocols/synchronization_protocol.hpp"
 #include "network/protocols/controller_events_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 
@@ -22,9 +21,7 @@ RaceEventManager::~RaceEventManager()
 
 // ----------------------------------------------------------------------------
 /** In network games this update function is called instead of
- *  World::updateWorld(). This allow this function to postpone calling
- *  the worl update while the countdown from the SynchronisationProtocol is
- *  running.
+ *  World::updateWorld(). 
  */
 void RaceEventManager::update(float dt)
 {
@@ -33,18 +30,6 @@ void RaceEventManager::update(float dt)
     if(!ProtocolManager::getInstance())
         return;
 
-    SynchronizationProtocol* protocol = static_cast<SynchronizationProtocol*>(
-            ProtocolManager::getInstance()->getProtocol(PROTOCOL_SYNCHRONIZATION));
-    if (protocol) // The existance of this protocol indicates that we play online
-    {
-        Log::debug("RaceEventManager", "Countdown value is %f",
-                   protocol->getCountdown());
-        if (protocol->getCountdown() > 0.0)
-        {
-            return;
-        }
-        World::getWorld()->setNetworkWorld(true);
-    }
     World::getWorld()->updateWorld(dt);
 
     // if the race is over
@@ -100,21 +85,6 @@ void RaceEventManager::collectedItem(Item *item, AbstractKart *kart)
     protocol->collectedItem(item,kart);
 }   // collectedItem
 
-// ----------------------------------------------------------------------------
-/** A message from the server to all clients that it is now starting the
- *  'ready' phase. Clients will wait for this event before they display
- *  RSG. This will make sure that the server time is always ahead of 
- *  the client time.
- */
-void RaceEventManager::startReadySetGo()
-{
-    // this is only called in the server
-    assert(NetworkConfig::get()->isServer());
-
-    GameEventsProtocol* protocol = static_cast<GameEventsProtocol*>(
-        ProtocolManager::getInstance()->getProtocol(PROTOCOL_GAME_EVENTS));
-    protocol->startReadySetGo();
-}   // startReadySetGo
 // ----------------------------------------------------------------------------
 void RaceEventManager::controllerAction(Controller* controller,
                                         PlayerAction action, int value)

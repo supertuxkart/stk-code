@@ -18,6 +18,8 @@
 #ifndef HEADER_DRAW_POLICIES_HPP
 #define HEADER_DRAW_POLICIES_HPP
 
+#ifndef SERVER_ONLY
+
 #include "graphics/draw_calls.hpp"
 
 
@@ -91,5 +93,5 @@ public:
                                  const core::matrix4 &rsm_matrix         ) const;  
 };
 
-
-#endif //HEADER_DRAW_POLICIES_HPP
+#endif   // !SERVER_ONLY
+#endif   // HEADER_DRAW_POLICIES_HPP

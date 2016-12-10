@@ -34,10 +34,17 @@ private:
     static NetworkConfig *m_network_config;
 
     enum NetworkType
-    { NETWORK_NONE, NETWORK_WAN, NETWORK_LAN };
+    {
+        NETWORK_NONE, NETWORK_WAN, NETWORK_LAN
+    };
 
     /** Keeps the type of network connection: none (yet), LAN or WAN. */
     NetworkType m_network_type;
+
+    /** If set it allows clients to connect directly to this server without
+     *  using the stk server in between. It requires obviously that this
+     *  server is accessible (through the firewall) from the outside. */
+    bool m_is_public_server;
 
     /** True if this host is a server, false otherwise. */
     bool m_is_server;
@@ -79,7 +86,7 @@ public:
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
     {
-        if(!m_network_config)
+        if (!m_network_config)
             m_network_config = new NetworkConfig();
         return m_network_config;
     }   // get
@@ -102,25 +109,31 @@ public:
     }   // setServerDiscoveryPort
     // ------------------------------------------------------------------------
     /** Sets the port on which this server listens. */
-    void setServerPort(uint16_t port) { m_server_port = port;  }
+    void setServerPort(uint16_t port) { m_server_port = port; }
     // ------------------------------------------------------------------------
     /** Sets the port on which a client listens for server connection. */
-    void setClientPort(uint16_t port) {  m_client_port = port; }
+    void setClientPort(uint16_t port) { m_client_port = port; }
     // ------------------------------------------------------------------------
     /** Returns the port on which this server listenes. */
-    uint16_t getServerPort() const { return m_server_port;  }
+    uint16_t getServerPort() const { return m_server_port; }
     // ------------------------------------------------------------------------
     /** Returns the port for LAN server discovery. */
     uint16_t getServerDiscoveryPort() const { return m_server_discovery_port; }
     // ------------------------------------------------------------------------
     /** Returns the port on which a client listens for server connections. */
-    uint16_t getClientPort() const { return m_client_port;  }
+    uint16_t getClientPort() const { return m_client_port; }
     // ------------------------------------------------------------------------
     /** Sets the password for a server. */
     void setPassword(const std::string &password) { m_password = password; }
     // ------------------------------------------------------------------------
     /** Returns the password. */
     const std::string& getPassword() const { return m_password; }
+    // ------------------------------------------------------------------------
+    /** Sets that this server can be contacted directly. */
+    void setIsPublicServer() { m_is_public_server = true; }
+    // ------------------------------------------------------------------------
+    /** Returns if connections directly to the server are to be accepted. */
+    bool isPublicServer() const { return m_is_public_server; }
     // ------------------------------------------------------------------------
     /** Return if a network setting is happening. A network setting is active
      *  if a host (server or client) exists. */

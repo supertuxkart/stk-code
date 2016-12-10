@@ -94,9 +94,6 @@ protected:
     /** If the start race should be played, disabled in cutscenes. */
     bool            m_play_racestart_sounds;
 
-    /** A flag that causes the world to wait in case of a networking race
-     *  till all protocols are up and running. */
-    bool m_ready_to_race;
 private:
     /** Sound to play at the beginning of a race, during which a
      *  a camera intro of the track can be shown. */
@@ -130,10 +127,10 @@ private:
 
     bool            m_engines_started;
     void            startEngines();
-    /** In networked game the client must wait for the server to start 'ready set go'
-     *  (to guarantee that the client's time is not ahead of the server), This flag
-     *  indicates that the notification from the server was received, and that the
-     *  client can go to 'ready' phase. */
+    /** In networked game a client must wait for the server to start 'ready
+     *  set go' to make sure all client are actually ready to start the game.
+     *  A server on the other hand will run behind all clients, so it will
+     *  wait for all clients to indicate that they have started the race. */
     bool m_server_is_ready;
 
 public:
@@ -198,7 +195,7 @@ public:
     /** Get the time since start regardless of which way the clock counts */
     float getTimeSinceStart() const { return m_count_up_timer; }
     // ------------------------------------------------------------------------
-    void setReadyToRace() { m_ready_to_race = true; }
+    void setReadyToRace() { m_server_is_ready = true; }
 
 };   // WorldStatus
 

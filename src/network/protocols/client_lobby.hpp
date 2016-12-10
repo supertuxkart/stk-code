@@ -1,13 +1,13 @@
-#ifndef CLIENT_LOBBY_ROOM_PROTOCOL_HPP
-#define CLIENT_LOBBY_ROOM_PROTOCOL_HPP
+#ifndef CLIENT_LOBBY_HPP
+#define CLIENT_LOBBY_HPP
 
-#include "network/protocols/lobby_room_protocol.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 
 class STKPeer;
 
-class ClientLobbyRoomProtocol : public LobbyRoomProtocol
+class ClientLobby : public LobbyProtocol
 {
 private:
     void newPlayer(Event* event);
@@ -50,11 +50,12 @@ private:
     STATE m_state;
 
 public:
-    ClientLobbyRoomProtocol(const TransportAddress& server_address);
-    virtual ~ClientLobbyRoomProtocol();
+             ClientLobby();
+    virtual ~ClientLobby();
 
-    void requestKartSelection(uint8_t player_id,
-        const std::string &kart_name);
+    virtual void requestKartSelection(uint8_t player_id,
+                                      const std::string &kart_name) OVERRIDE;
+    void setAddress(const TransportAddress &address);
     void voteMajor(uint8_t player_id, uint32_t major);
     void voteRaceCount(uint8_t player_id, uint8_t count);
     void voteMinor(uint8_t player_id, uint32_t minor);
@@ -63,14 +64,16 @@ public:
     void voteReversed(uint8_t player_id, bool reversed, uint8_t track_nb = 0);
     void voteLaps(uint8_t player_id, uint8_t laps, uint8_t track_nb = 0);
     void doneWithResults();
+    void startingRaceNow();
     void leave();
 
     virtual bool notifyEvent(Event* event) OVERRIDE;
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
+    virtual void finishedLoadingWorld() OVERRIDE;
     virtual void setup() OVERRIDE;
     virtual void update(float dt) OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE {}
 
 };
 
-#endif // CLIENT_LOBBY_ROOM_PROTOCOL_HPP
+#endif // CLIENT_LOBBY_HPP

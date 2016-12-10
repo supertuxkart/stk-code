@@ -18,6 +18,8 @@
 #ifndef HEADER_COMMAND_BUFFER_HPP
 #define HEADER_COMMAND_BUFFER_HPP
 
+#ifndef SERVER_ONLY
+
 #include "graphics/draw_tools.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/material.hpp"
@@ -653,5 +655,6 @@ public:
         }
     } // multidraw
 };
-#endif // !defined(USE_GLES2)
-#endif //HEADER_COMMAND_BUFFER_HPP
+#endif   // !defined(USE_GLES2)
+#endif   // !SERVER_ONLY
+#endif   // HEADER_COMMAND_BUFFER_HPP
