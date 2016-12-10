@@ -161,7 +161,7 @@ namespace scene
 	protected:
 
 		//! Get a static mesh for the current frame of this animated mesh
-		IMesh* getMeshForCurrentFrame();
+		virtual IMesh* getMeshForCurrentFrame(SkinningCallback sc = NULL, int offset = -1);
 
 		void buildFrameNr(u32 timeMs);
 		void checkJoints();

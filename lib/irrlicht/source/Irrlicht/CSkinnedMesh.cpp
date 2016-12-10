@@ -22,7 +22,8 @@ CSkinnedMesh::CSkinnedMesh()
 	LastAnimatedFrame(-1), SkinnedLastFrame(false),
 	InterpolationMode(EIM_LINEAR),
 	HasAnimation(false), PreparedForSkinning(false),
-	AnimateNormals(true), HardwareSkinning(false), m_joint_total_size(0)
+	AnimateNormals(true), HardwareSkinning(false), m_total_joints(0),
+	m_current_joint(0)
 {
 	#ifdef _DEBUG
 	setDebugName("CSkinnedMesh");
@@ -99,6 +100,12 @@ IMesh* CSkinnedMesh::getMesh(s32 frame, s32 detailLevel, s32 startFrameLoop, s32
 //! blend: {0-old position, 1-New position}
 void CSkinnedMesh::animateMesh(f32 frame, f32 blend)
 {
+	if (HardwareSkinning && LastAnimatedFrame==frame)
+	{
+		SkinnedLastFrame=false;
+		return;
+	}
+
 	if (!HasAnimation || LastAnimatedFrame==frame)
 		return;
 
@@ -451,7 +458,7 @@ void CSkinnedMesh::getFrameData(f32 frame, SJoint *joint,
 //--------------------------------------------------------------------------
 
 //! Preforms a software skin on this mesh based of joint positions
-void CSkinnedMesh::skinMesh(f32 strength)
+void CSkinnedMesh::skinMesh(f32 strength, SkinningCallback sc, int offset)
 {
 	if (!HasAnimation || SkinnedLastFrame)
 		return;
@@ -462,11 +469,11 @@ void CSkinnedMesh::skinMesh(f32 strength)
 	//-----------------
 
 	SkinnedLastFrame=true;
-	m_joint_matrixes.clear();
+	m_current_joint = 0;
 	if (HardwareSkinning)
 	{
 		for (u32 i = 0; i < RootJoints.size(); i++)
-			skinJoint(RootJoints[i], 0, strength);
+			skinJoint(RootJoints[i], 0, strength, sc, offset);
 	}
 	else
 	{
@@ -498,7 +505,8 @@ void CSkinnedMesh::skinMesh(f32 strength)
 	updateBoundingBox();
 }
 
-void CSkinnedMesh::skinJoint(SJoint *joint, SJoint *parentJoint, f32 strength)
+void CSkinnedMesh::skinJoint(SJoint *joint, SJoint *parentJoint, f32 strength,
+							SkinningCallback sc, int offset)
 {
 	if (joint->Weights.size())
 	{
@@ -507,7 +515,8 @@ void CSkinnedMesh::skinJoint(SJoint *joint, SJoint *parentJoint, f32 strength)
 		jointVertexPull.setbyproduct(joint->GlobalAnimatedMatrix, joint->GlobalInversedMatrix);
 		if (HardwareSkinning)
 		{
-			m_joint_matrixes.push_back(jointVertexPull);
+			if (sc != NULL) sc(jointVertexPull, m_current_joint, offset);
+			m_current_joint++;
 		}
 		else
 		{
@@ -562,7 +571,7 @@ void CSkinnedMesh::skinJoint(SJoint *joint, SJoint *parentJoint, f32 strength)
 
 	//Skin all children
 	for (u32 j=0; j<joint->Children.size(); ++j)
-		skinJoint(joint->Children[j], joint, strength);
+		skinJoint(joint->Children[j], joint, strength, sc, offset);
 }
 
 
@@ -1458,7 +1467,7 @@ void CSkinnedMesh::convertForSkinning()
 	}
 	SkinnedLastFrame = false;
 	skinMesh();
-	m_joint_total_size = m_joint_matrixes.size();
+	m_total_joints = m_current_joint;
 }
 
 void CSkinnedMesh::computeWeightInfluence(SJoint *joint, size_t &index, WeightInfluence& wi)

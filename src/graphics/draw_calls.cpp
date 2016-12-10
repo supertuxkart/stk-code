@@ -899,6 +899,6 @@ int32_t DrawCalls::getSkinningOffset() const
     return std::accumulate(m_mesh_for_skinning.begin(),
         m_mesh_for_skinning.end(), 0, []
         (const size_t previous, const STKAnimatedMesh* m)
-        { return previous + m->getTotalJointSize(); });
+        { return previous + m->getTotalJoints(); });
 }   // getSkinningOffset
 #endif   // !SERVER_ONLY

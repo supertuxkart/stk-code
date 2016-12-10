@@ -222,12 +222,9 @@ void STKAnimatedMesh::updateNoGL()
 
 void STKAnimatedMesh::updateGL()
 {
-
-    scene::IMesh* m = getMeshForCurrentFrame();
-
     if (!isGLInitialized)
     {
-        for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
+        for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
             if (!mb)
@@ -275,13 +272,9 @@ void STKAnimatedMesh::updateGL()
         isGLInitialized = true;
     }
 
+    scene::IMesh* m = getMeshForCurrentFrame();
     if (useHardwareSkinning())
     {
-        if (m_skinning_offset == -1) return;
-        glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getSkinningUBO());
-        glBufferSubData(GL_UNIFORM_BUFFER, m_skinning_offset,
-            m_skinned_mesh->getTotalJointSize() * 16 * sizeof(float),
-            m_skinned_mesh->getJointPointer());
         m_skinning_offset = -1;
         return;
     }
@@ -329,9 +322,9 @@ void STKAnimatedMesh::render()
     updateGL();
 }
 
-int STKAnimatedMesh::getTotalJointSize() const
+int STKAnimatedMesh::getTotalJoints() const
 {
-    return m_skinned_mesh->getTotalJointSize();
+    return m_skinned_mesh->getTotalJoints();
 }
 
 void STKAnimatedMesh::resetSkinningState(scene::IAnimatedMesh* mesh)
@@ -342,9 +335,30 @@ void STKAnimatedMesh::resetSkinningState(scene::IAnimatedMesh* mesh)
     if (m_skinned_mesh)
     {
         m_skinned_mesh->convertForSkinning();
-        if (m_skinned_mesh->getTotalJointSize() == 0)
+        if (m_skinned_mesh->getTotalJoints() == 0)
             m_skinned_mesh = NULL;
     }
+}
+
+scene::IMesh* STKAnimatedMesh::getMeshForCurrentFrame(SkinningCallback sc,
+                                                      int offset)
+{
+    if (!useHardwareSkinning())
+        return scene::CAnimatedMeshSceneNode::getMeshForCurrentFrame();
+    if (m_skinning_offset == -1)
+        return Mesh;
+
+    return scene::CAnimatedMeshSceneNode::getMeshForCurrentFrame
+        (uploadJoints, m_skinning_offset);
+}
+
+void STKAnimatedMesh::uploadJoints(const irr::core::matrix4& m,
+                                   int joint, int offset)
+{
+    assert(offset != -1);
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedGPUObjects::getSkinningUBO());
+    glBufferSubData(GL_UNIFORM_BUFFER, offset + joint * 16 * sizeof(float),
+        16 * sizeof(float), m.pointer());
 }
 
 #endif   // !SERVER_ONLY

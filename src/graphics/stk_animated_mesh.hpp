@@ -54,10 +54,16 @@ public:
   virtual void render();
   virtual void setMesh(irr::scene::IAnimatedMesh* mesh);
   virtual bool glow() const { return false; }
-  int getTotalJointSize() const;
+  virtual irr::scene::IMesh* getMeshForCurrentFrame(SkinningCallback sc = NULL,
+                                                    int offset = -1);
+  int getTotalJoints() const;
   void setSkinningOffset(int offset)  { m_skinning_offset = offset; }
   bool useHardwareSkinning() const { return m_skinned_mesh != NULL; }
   void resetSkinningState(scene::IAnimatedMesh*);
+
+  // Callback for skinning mesh
+  static void uploadJoints(const irr::core::matrix4& m,
+                           int joint, int offset);
 private:
     RenderInfo* m_mesh_render_info;
     bool m_all_parts_colorized;

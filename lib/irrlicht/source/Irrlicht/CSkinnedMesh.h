@@ -14,17 +14,6 @@
 #include "matrix4.h"
 #include "quaternion.h"
 
-class Matrix4x4
-{
-private:
-	float data[16];
-public:
-	inline Matrix4x4(const irr::core::matrix4& m)
-	{
-		memcpy(data, m.pointer(), 16 * sizeof(float));
-	}
-};
-
 class JointInfluence
 {
 public:
@@ -76,7 +65,7 @@ namespace scene
 		virtual void animateMesh(f32 frame, f32 blend);
 
 		//! Preforms a software skin on this mesh based of joint positions
-		virtual void skinMesh(f32 strength=1.f);
+		virtual void skinMesh(f32 strength=1.f, SkinningCallback sc = NULL, int offset = -1);
 
 		//! returns amount of mesh buffers.
 		virtual u32 getMeshBufferCount() const;
@@ -188,12 +177,7 @@ namespace scene
 
 		void computeWeightInfluence(SJoint *joint, size_t &index, WeightInfluence& wi);
 
-		const void* getJointPointer() const { return m_joint_matrixes.const_pointer(); }
-
-		u32 getTotalJointSize() const
-		{
-			return m_joint_total_size;
-		}
+		u32 getTotalJoints() const { return m_total_joints; }
 
 private:
 		void checkForAnimation();
@@ -211,7 +195,8 @@ private:
 
 		void calculateGlobalMatrices(SJoint *Joint,SJoint *ParentJoint);
 
-		void skinJoint(SJoint *Joint, SJoint *ParentJoint, f32 strength=1.f);
+		void skinJoint(SJoint *Joint, SJoint *ParentJoint, f32 strength=1.f,
+						SkinningCallback sc = NULL, int offset = -1);
 
 		void calculateTangents(core::vector3df& normal,
 			core::vector3df& tangent, core::vector3df& binormal,
@@ -241,8 +226,8 @@ private:
 		bool PreparedForSkinning;
 		bool AnimateNormals;
 		bool HardwareSkinning;
-		core::array<Matrix4x4> m_joint_matrixes;
-		u32 m_joint_total_size;
+		u32 m_total_joints;
+		u32 m_current_joint;
 	};
 
 } // end namespace scene

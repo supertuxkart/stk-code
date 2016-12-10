@@ -69,7 +69,7 @@ namespace scene
 		virtual void animateMesh(f32 frame, f32 blend)=0;
 
 		//! Preforms a software skin on this mesh based of joint positions
-		virtual void skinMesh(f32 strength=1.f) = 0;
+		virtual void skinMesh(f32 strength=1.f, SkinningCallback sc = NULL, int offset = -1) = 0;
 
 		//! converts the vertex type of all meshbuffers to tangents.
 		/** E.g. used for bump mapping. */
