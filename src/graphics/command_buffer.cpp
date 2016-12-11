@@ -46,6 +46,7 @@ void InstanceFiller<InstanceDataThreeTex>::add(GLMesh* mesh,
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
     instance.ThirdTexture = mesh->TextureHandles[2];
+    instance.skinning_offset = STK::tuple_get<3>(is);
 }
 
 // ----------------------------------------------------------------------------
@@ -169,15 +170,16 @@ void SolidCommandBuffer::fill(SolidPassMeshMap *mesh_map)
                           Material::SHADERTYPE_ALPHA_TEST,
                           Material::SHADERTYPE_SOLID_UNLIT,
                           Material::SHADERTYPE_SPHERE_MAP,
-                          Material::SHADERTYPE_VEGETATION);
+                          Material::SHADERTYPE_VEGETATION,
+                          Material::SHADERTYPE_SOLID_SKINNED_MESH,
+                          Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH);
 
     fillInstanceData<InstanceDataThreeTex, SolidPassMeshMap>
         (mesh_map, three_tex_material_list, InstanceTypeThreeTex);
 
     std::vector<int> four_tex_material_list =
         createVector<int>(Material::SHADERTYPE_DETAIL_MAP,
-                          Material::SHADERTYPE_NORMAL_MAP,
-                          Material::SHADERTYPE_SOLID_SKINNED_MESH);
+                          Material::SHADERTYPE_NORMAL_MAP);
 
     fillInstanceData<InstanceDataFourTex, SolidPassMeshMap>
         (mesh_map, four_tex_material_list, InstanceTypeFourTex);
@@ -203,9 +205,11 @@ void ShadowCommandBuffer::fill(OtherMeshMap *mesh_map)
     for(int cascade=0; cascade<4; cascade++)
     {
         shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
-                                           + Material::SHADERTYPE_SOLID);
-        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
                                            + Material::SHADERTYPE_SOLID_SKINNED_MESH);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_SOLID);
         shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
                                            + Material::SHADERTYPE_ALPHA_TEST);
         shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT

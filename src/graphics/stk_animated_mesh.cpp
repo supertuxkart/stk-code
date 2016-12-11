@@ -168,6 +168,15 @@ void STKAnimatedMesh::updateNoGL()
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
             if (!mb)
                 continue;
+
+            scene::SSkinMeshBuffer* ssmb = NULL;
+            video::E_VERTEX_TYPE prev_type = mb->getVertexType();
+            if (m_skinned_mesh)
+            {
+                ssmb = dynamic_cast<scene::SSkinMeshBuffer*>(mb);
+                ssmb->VertexType = video::EVT_SKINNED_MESH;
+            }
+
             video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
             f32 MaterialTypeParam = mb->getMaterial().MaterialTypeParam;
             video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
@@ -196,8 +205,9 @@ void STKAnimatedMesh::updateNoGL()
             else*/
             {
                 Material::ShaderType MatType = getMeshMaterialFromType(type, mb->getVertexType(), material, NULL);
-                MeshSolidMaterial[m_skinned_mesh ? Material::SHADERTYPE_SOLID_SKINNED_MESH : MatType].push_back(&mesh);
+                MeshSolidMaterial[MatType].push_back(&mesh);
             }
+            if (m_skinned_mesh) ssmb->VertexType = prev_type;
         }
         isMaterialInitialized = true;
     }
@@ -250,7 +260,7 @@ void STKAnimatedMesh::updateGL()
                     material2 = material_manager->getMaterialFor(mb->getMaterial().getTexture(1), mb);
 
                 Material::ShaderType MatType = getMeshMaterialFromType(type, mb->getVertexType(), material, material2);
-                initTextures(mesh, m_skinned_mesh ? Material::SHADERTYPE_SOLID_SKINNED_MESH : MatType);
+                initTextures(mesh, MatType);
             }
             else
                 initTexturesTransparent(mesh);

@@ -40,6 +40,22 @@ Material::ShaderType getMeshMaterialFromType(video::E_MATERIAL_TYPE material_typ
         layer2_material->getShaderType() == Material::SHADERTYPE_SPLATTING)
         return Material::SHADERTYPE_SPLATTING;
 
+    if (tp == video::EVT_SKINNED_MESH)
+    {
+        switch (material->getShaderType())
+        {
+        //case Material::SHADERTYPE_SOLID:
+        //    if (material_type == Shaders::getShader(ES_NORMAL_MAP))
+        //        return Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH;
+        case Material::SHADERTYPE_ALPHA_TEST:
+            return Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH;
+        //case Material::SHADERTYPE_SOLID_UNLIT:
+        //    return Material::SHADERTYPE_SOLID_UNLIT_SKINNED_MESH;
+        default:
+            return Material::SHADERTYPE_SOLID_SKINNED_MESH;
+        }
+    }
+
     switch (material->getShaderType())
     {
     default:
@@ -423,13 +439,16 @@ void initTextures(GLMesh &mesh, Material::ShaderType mat)
     case Material::SHADERTYPE_SPHERE_MAP:
     case Material::SHADERTYPE_SOLID_UNLIT:
     case Material::SHADERTYPE_VEGETATION:
+    case Material::SHADERTYPE_SOLID_SKINNED_MESH:
+    case Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH:
+    case Material::SHADERTYPE_SOLID_UNLIT_SKINNED_MESH:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
         setTexture(mesh, 1, false, getShaderTypeName(mat));
         setTexture(mesh, 2, false, getShaderTypeName(mat));
         break;
     case Material::SHADERTYPE_DETAIL_MAP:
     case Material::SHADERTYPE_NORMAL_MAP:
-    case Material::SHADERTYPE_SOLID_SKINNED_MESH:
+    case Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
         setTexture(mesh, 1, false, getShaderTypeName(mat));
         setTexture(mesh, 2, false, getShaderTypeName(mat));

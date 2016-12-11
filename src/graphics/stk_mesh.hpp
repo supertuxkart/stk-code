@@ -112,15 +112,33 @@ public:
 
 
 // ----------------------------------------------------------------------------
-class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4,
-                                      core::matrix4, core::vector2df,
-                                      core::vector2df>
+class ListSkinnedSolid : public MeshList<ListSkinnedSolid, GLMesh *, core::matrix4,
+                                         core::matrix4, core::vector2df,
+                                         core::vector2df, int>
 {};
 
 // ----------------------------------------------------------------------------
-class ListSkinnedSolid : public MeshList<ListSkinnedSolid, GLMesh *, core::matrix4,
-                                      core::matrix4, core::vector2df,
-                                      core::vector2df, int>
+class ListSkinnedAlphaRef : public MeshList<ListSkinnedAlphaRef, GLMesh *,
+                                            core::matrix4, core::matrix4,
+                                            core::vector2df, core::vector2df, int>
+{};
+
+// ----------------------------------------------------------------------------
+class ListSkinnedNormalMap : public MeshList<ListSkinnedNormalMap, GLMesh *,
+                                             core::matrix4, core::matrix4,
+                                             core::vector2df, core::vector2df, int>
+{};
+
+// ----------------------------------------------------------------------------
+class ListSkinnedUnlit : public MeshList<ListSkinnedUnlit, GLMesh *,
+                                         core::matrix4, core::matrix4,
+                                         core::vector2df, core::vector2df, int>
+{};
+
+// ----------------------------------------------------------------------------
+class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4,
+                                       core::matrix4, core::vector2df,
+                                       core::vector2df>
 {};
 
 // ----------------------------------------------------------------------------

@@ -99,6 +99,7 @@ struct InstanceDataThreeTex
     uint64_t Texture;
     uint64_t SecondTexture;
     uint64_t ThirdTexture;
+    int32_t skinning_offset;
 #ifdef WIN32
 };
 #else

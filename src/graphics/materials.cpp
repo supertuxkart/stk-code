@@ -19,20 +19,28 @@
 
 #ifndef SERVER_ONLY
 
+const STK::Tuple<size_t> SkinnedSolid::FirstPassTextures
+= STK::Tuple<size_t>(1);
+const STK::Tuple<size_t, size_t, size_t> SkinnedSolid::SecondPassTextures
+= STK::Tuple<size_t, size_t, size_t>(0, 1, 2);
+const STK::Tuple<> SkinnedSolid::ShadowTextures;
+const STK::Tuple<size_t> SkinnedSolid::RSMTextures = STK::Tuple<size_t>(0);
+
+// ----------------------------------------------------------------------------
+const STK::Tuple<size_t, size_t> SkinnedAlphaRef::FirstPassTextures
+= STK::Tuple<size_t, size_t>(0, 1);
+const STK::Tuple<size_t, size_t, size_t> SkinnedAlphaRef::SecondPassTextures
+= STK::Tuple<size_t, size_t, size_t>(0, 1, 2);
+const STK::Tuple<size_t> SkinnedAlphaRef::ShadowTextures = STK::Tuple<size_t>(0);
+const STK::Tuple<size_t> SkinnedAlphaRef::RSMTextures = STK::Tuple<size_t>(0);
+
+// ----------------------------------------------------------------------------
 const STK::Tuple<size_t> DefaultMaterial::FirstPassTextures
     = STK::Tuple<size_t>(1);
 const STK::Tuple<size_t, size_t, size_t> DefaultMaterial::SecondPassTextures
     = STK::Tuple<size_t, size_t, size_t>(0, 1, 2);
 const STK::Tuple<> DefaultMaterial::ShadowTextures;
 const STK::Tuple<size_t> DefaultMaterial::RSMTextures = STK::Tuple<size_t>(0);
-
-// ----------------------------------------------------------------------------
-const STK::Tuple<size_t> SkinnedSolid::FirstPassTextures
-    = STK::Tuple<size_t>(1);
-const STK::Tuple<size_t, size_t, size_t> SkinnedSolid::SecondPassTextures
-    = STK::Tuple<size_t, size_t, size_t>(0, 1, 2);
-const STK::Tuple<> SkinnedSolid::ShadowTextures;
-const STK::Tuple<size_t> SkinnedSolid::RSMTextures = STK::Tuple<size_t>(0);
 
 // ----------------------------------------------------------------------------
 const STK::Tuple<size_t, size_t> AlphaRef::FirstPassTextures

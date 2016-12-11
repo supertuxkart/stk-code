@@ -184,6 +184,9 @@ void VAOInstanceUtil<InstanceDataThreeTex>::SetVertexAttrib()
     glEnableVertexAttribArray(13);
     glVertexAttribIPointer(13, 2, GL_UNSIGNED_INT, sizeof(InstanceDataThreeTex), (GLvoid*)(13 * sizeof(float) + 4 * sizeof(unsigned)));
     glVertexAttribDivisorARB(13, 1);
+    glEnableVertexAttribArray(15);
+    glVertexAttribIPointer(15, 1, GL_INT, sizeof(InstanceDataThreeTex), (GLvoid*)(13 * sizeof(float) + 6 * sizeof(unsigned)));;
+    glVertexAttribDivisorARB(15, 1);
 }
 
 template<>

@@ -652,10 +652,46 @@ public:
 };   // InstancedSkinnedMeshPass2Shader
 
 // ============================================================================
-class InstancedSkinningShadowShader : public TextureShader<InstancedSkinningShadowShader, 0, int>
+class InstancedSkinnedMeshRefPass1Shader : public TextureShader<InstancedSkinnedMeshRefPass1Shader, 2>
 {
 public:
-    InstancedSkinningShadowShader()
+    InstancedSkinnedMeshRefPass1Shader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+                            GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
+
+        assignUniforms();
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }    // InstancedSkinnedMeshRefPass1Shader
+
+};   // InstancedSkinnedMeshRefPass1Shader
+
+// ============================================================================
+class InstancedSkinnedMeshRefPass2Shader : public TextureShader<InstancedSkinnedMeshRefPass2Shader, 6>
+{
+public:
+    InstancedSkinnedMeshRefPass2Shader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+                            GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
+        assignUniforms();
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }    // InstancedSkinnedMeshRefPass2Shader
+};   // InstancedSkinnedMeshRefPass2Shader
+
+// ============================================================================
+class InstancedSkinnedShadowShader : public TextureShader<InstancedSkinnedShadowShader, 0, int>
+{
+public:
+    InstancedSkinnedShadowShader()
     {
 #if !defined(USE_GLES2)
         // Geometry shader needed
@@ -674,16 +710,45 @@ public:
         }
         assignUniforms("layer");
 #endif
-    }   // InstancedSkinningShadowShader
+    }   // InstancedSkinnedShadowShader
 
-};   // InstancedSkinningShadowShader
+};   // InstancedSkinnedShadowShader
+
+// ============================================================================
+class InstancedSkinnedRefShadowShader : public TextureShader<InstancedSkinnedRefShadowShader,
+                                                          1, int>
+{
+public:
+    InstancedSkinnedRefShadowShader()
+    {
+#if !defined(USE_GLES2)
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150 || !CVS->supportsHardwareSkinning())
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+                                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
+                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
+        }
+        assignUniforms("layer");
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+#endif
+    }   // InstancedSkinnedRefShadowShader
+
+};   // InstancedSkinnedRefShadowShader
 
 // ============================================================================
 struct SkinnedSolid
 {
     typedef InstancedSkinnedMeshPass1Shader InstancedFirstPassShader;
     typedef InstancedSkinnedMeshPass2Shader InstancedSecondPassShader;
-    typedef InstancedSkinningShadowShader InstancedShadowPassShader;
+    typedef InstancedSkinnedShadowShader InstancedShadowPassShader;
     //typedef CInstancedRSMShader InstancedRSMShader;
     typedef Shaders::SkinnedMeshPass1Shader FirstPassShader;
     typedef Shaders::SkinnedMeshPass2Shader SecondPassShader;
@@ -693,12 +758,34 @@ struct SkinnedSolid
     static const enum video::E_VERTEX_TYPE VertexType = video::EVT_SKINNED_MESH;
     static const enum Material::ShaderType MaterialType
                                       = Material::SHADERTYPE_SOLID_SKINNED_MESH;
-    static const enum InstanceType Instance = InstanceTypeFourTex;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
     static const STK::Tuple<size_t> FirstPassTextures;
     static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
     static const STK::Tuple<> ShadowTextures;
     static const STK::Tuple<size_t> RSMTextures;
 };   // struct SkinnedSolid
+
+// ----------------------------------------------------------------------------
+struct SkinnedAlphaRef
+{
+    typedef InstancedSkinnedMeshRefPass1Shader InstancedFirstPassShader;
+    typedef InstancedSkinnedMeshRefPass2Shader InstancedSecondPassShader;
+    typedef InstancedSkinnedRefShadowShader InstancedShadowPassShader;
+    //typedef CInstancedRSMShader InstancedRSMShader;
+    //typedef ObjectRefPass1Shader FirstPassShader;
+    //typedef ObjectRefPass2Shader SecondPassShader;
+    //typedef RefShadowShader ShadowPassShader;
+    //typedef CRSMShader RSMShader;
+    typedef ListSkinnedAlphaRef List;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_SKINNED_MESH;
+    static const enum Material::ShaderType MaterialType =
+                                   Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
+    static const STK::Tuple<size_t, size_t> FirstPassTextures;
+    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const STK::Tuple<size_t> ShadowTextures;
+    static const STK::Tuple<size_t> RSMTextures;
+};   // struct SkinnedAlphaRef
 
 // ----------------------------------------------------------------------------
 struct DefaultMaterial
