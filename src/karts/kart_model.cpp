@@ -361,11 +361,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
 
         node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh",
                NULL/*parent*/, getRenderInfo());
-        // as animated mesh are not cheap to render use frustum box culling
-        if (CVS->isGLSL())
-            node->setAutomaticCulling(scene::EAC_OFF);
-        else
-            node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
+        node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
 #endif
         if (always_animated)
         {

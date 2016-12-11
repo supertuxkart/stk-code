@@ -1166,7 +1166,7 @@ void CSkinnedMesh::finalize()
 
 void CSkinnedMesh::updateBoundingBox(void)
 {
-	if(!SkinningBuffers)
+	if(HardwareSkinning || !SkinningBuffers)
 		return;
 
 	core::array<SSkinMeshBuffer*> & buffer = *SkinningBuffers;
