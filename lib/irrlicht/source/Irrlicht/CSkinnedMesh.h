@@ -19,10 +19,6 @@ class JointInfluence
 public:
 	int joint_idx;
 	float weight;
-	bool operator < (const JointInfluence& other) const
-	{
-		return weight < other.weight;
-	}
 };
 
 typedef irr::core::array<irr::core::array

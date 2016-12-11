@@ -1439,7 +1439,9 @@ void CSkinnedMesh::convertForSkinning()
 			{
 				core::array<JointInfluence> this_influence;
 				core::array<JointInfluence> reported_weight = wi[b][i];
-				reported_weight.sort();
+				reported_weight.sort([]
+					(const JointInfluence& a, const JointInfluence& b)
+					{ return a.weight > b.weight; });
 				float remaining_weight = 1.0f;
 				for (u32 j = 0; j < 4; j++)
 				{
