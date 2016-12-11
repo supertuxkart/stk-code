@@ -133,7 +133,6 @@ World::World() : WorldStatus()
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
     m_weather            = NULL;
-    m_force_disable_fog  = false;
 
     m_stop_music_when_dialog_open = true;
 
@@ -1290,12 +1289,6 @@ void World::escapePressed()
 {
     new RacePausedDialog(0.8f, 0.6f);
 }   // escapePressed
-
-//-----------------------------------------------------------------------------
-bool World::isFogEnabled() const
-{
-    return !m_force_disable_fog && (m_track != NULL && m_track->isFogEnabled());
-}   // isFogEnabled
 
 // ----------------------------------------------------------------------------
 /** Returns the start transform with the give index.

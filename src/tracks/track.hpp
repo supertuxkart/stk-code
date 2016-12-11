@@ -313,7 +313,12 @@ private:
     /** The name used in sorting the track. */
     core::stringw       m_sort_name;
 
+    /** True if the track uses fog. */
     bool                m_use_fog;
+
+    /** Can be set to force fog off (e.g. for rendering minimap). */
+    bool                m_force_disable_fog;
+
     /** True if this track supports using smoothed normals. */
     bool                m_smooth_normals;
 
@@ -546,7 +551,16 @@ public:
     // ------------------------------------------------------------------------
     ParticleKind* getSkyParticles         () { return m_sky_particles; }
     // ------------------------------------------------------------------------
-    bool  isFogEnabled() const { return m_use_fog;   }
+    /** Override track fog value to force disabled */
+    void forceFogDisabled(bool v) { m_force_disable_fog = v; }
+    //-------------------------------------------------------------------------
+    /** Returns if fog is currently enabled. It can be disabled per track, or
+     *  temporary be disabled (e.g. for rendering mini map). */
+    bool isFogEnabled() const
+    {
+        return !m_force_disable_fog && m_use_fog;
+    }   // isFogEnabled
+
     // ------------------------------------------------------------------------
     float getFogStart()  const { return m_fog_start; }
     // ------------------------------------------------------------------------

@@ -25,6 +25,7 @@
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "modes/world.hpp"
+#include "tracks/track.hpp"
 #include "utils/tuple.hpp"
 #include <SColor.h>
 #include <S3DVertex.h>
@@ -260,7 +261,8 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
 
-    if (World::getWorld() && World::getWorld()->isFogEnabled())
+    const World *world = World::getWorld();
+    if (world && world->getTrack()->isFogEnabled())
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         renderTransparenPass<Shaders::TransparentFogShader, video::EVT_STANDARD,

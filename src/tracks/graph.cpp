@@ -28,6 +28,7 @@
 #include "tracks/arena_node_3d.hpp"
 #include "tracks/drive_node_2d.hpp"
 #include "tracks/drive_node_3d.hpp"
+#include "tracks/track.hpp"
 #include "utils/log.hpp"
 
 const int Graph::UNKNOWN_SECTOR = -1;
@@ -245,7 +246,7 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
 
     const video::SColor oldClearColor = irr_driver->getClearColor();
     irr_driver->setClearbackBufferColor(video::SColor(0, 255, 255, 255));
-    World::getWorld()->forceFogDisabled(true);
+    World::getWorld()->getTrack()->forceFogDisabled(true);
 #ifndef SERVER_ONLY
     m_render_target = irr_driver->createRenderTarget(dimension, name);
 #endif
@@ -330,7 +331,7 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     irr_driver->removeCameraSceneNode(camera);
 
     irr_driver->setClearbackBufferColor(oldClearColor);
-    World::getWorld()->forceFogDisabled(false);
+    World::getWorld()->getTrack()->forceFogDisabled(false);
 
     irr_driver->getSceneManager()->clear();
     VAOManager::kill();

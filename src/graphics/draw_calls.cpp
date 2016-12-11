@@ -196,7 +196,8 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     }
 
     // Transparent
-    if (World::getWorld() && World::getWorld()->isFogEnabled())
+    const World *world = World::getWorld();
+    if (world && world->getTrack()->isFogEnabled())
     {
         const Track * const track = World::getWorld()->getTrack();
 

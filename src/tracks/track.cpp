@@ -145,8 +145,9 @@ Track::Track(const std::string &filename)
     m_render_target         = NULL;
     m_minimap_x_scale       = 1.0f;
     m_minimap_y_scale       = 1.0f;
-    m_startup_run = false;
-    m_default_number_of_laps= 3;
+    m_force_disable_fog     = false;
+    m_startup_run           = false;
+    m_default_number_of_laps = 3;
     m_all_nodes.clear();
     m_static_physics_only_nodes.clear();
     m_all_cached_meshes.clear();

@@ -97,7 +97,6 @@ protected:
     RandomGenerator           m_random;
 
     Physics*      m_physics;
-    bool          m_force_disable_fog;
     AbstractKart* m_fastest_kart;
     /** Number of eliminated karts. */
     int         m_eliminated_karts;
@@ -324,8 +323,6 @@ public:
     /** Returns a pointer to the Scripting Engine. */
     Scripting::ScriptEngine   *getScriptEngine() 
                                const { return m_script_engine; }
-    //-------------------------------------------------------------------------
-    bool            isFogEnabled() const;
     // ------------------------------------------------------------------------
     void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
@@ -336,9 +333,6 @@ public:
     // ------------------------------------------------------------------------
     /** \return whether this world can generate/have highscores */
     bool useHighScores() const { return m_use_highscores; }
-    // ------------------------------------------------------------------------
-    /** Override track fog value to force disabled */
-    void forceFogDisabled(bool v) { m_force_disable_fog = v; }
     // ------------------------------------------------------------------------
     /** Override if you want to know when a kart presses fire */
     virtual void onFirePressed(Controller* who) {}

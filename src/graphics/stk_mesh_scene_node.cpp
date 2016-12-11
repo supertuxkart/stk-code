@@ -512,7 +512,8 @@ void STKMeshSceneNode::render()
             else
                 glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-            if (World::getWorld() && World::getWorld()->isFogEnabled())
+            const World* world = World::getWorld();
+            if (world && world->getTrack()->isFogEnabled())
             {
                 Shaders::TransparentFogShader::getInstance()->use();
                 for (unsigned i = 0; i < GLmeshes.size(); i++)
