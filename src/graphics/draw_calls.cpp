@@ -256,6 +256,15 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
         !culled_for_cams[3] || !culled_for_cams[4] || !culled_for_cams[5]))
     {
         skinning_offset = getSkinningOffset() + 1/*reserved identity matrix*/;
+        if (skinning_offset + am->getTotalJoints() >
+            SharedGPUObjects::getMaxMat4Size())
+        {
+            Log::error("DrawCalls", "Don't have enough space to render skinned"
+                " mesh %s! Max joints can hold: %d",
+                am->getMeshDebugName().c_str(),
+                SharedGPUObjects::getMaxMat4Size());
+            return;
+        }
         m_mesh_for_skinning.insert(am);
         am->setSkinningOffset(skinning_offset * 16 * sizeof(float));
     }

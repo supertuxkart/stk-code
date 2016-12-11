@@ -1,6 +1,5 @@
 #ifndef HEADER_TXT
 #define HEADER_TXT
-#define MAX_BONES 1000
 #ifdef UBO_DISABLED
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;

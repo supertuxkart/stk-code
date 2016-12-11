@@ -38,6 +38,7 @@ private:
     static GLuint m_quad_buffer;
     static GLuint m_quad_vbo;
     static GLuint m_skinning_ubo;
+    static int m_max_mat4_size;
 
     static void initQuadVBO();
     static void initQuadBuffer();
@@ -124,7 +125,12 @@ public:
         assert(m_has_been_initialised);
         return m_skinning_ubo;
     }   // getSkinningUBO
-};   // class SharedGPUObjecctS
+    // ------------------------------------------------------------------------
+    static int getMaxMat4Size()
+    {
+        return m_max_mat4_size;
+    }   // getMaxMat4Size
+};   // class SharedGPUObjects
 
 
 #endif

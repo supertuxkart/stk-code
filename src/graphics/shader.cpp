@@ -117,12 +117,13 @@ GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
 #else
     int range[2], precision;
     glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range, &precision);
-    
+
     if (precision > 0)
         code << "precision highp float;\n";
     else
         code << "precision mediump float;\n";
 #endif
+    code << "#define MAX_BONES " << SharedGPUObjects::getMaxMat4Size() << "\n";
 
     code << getHeader();
 
