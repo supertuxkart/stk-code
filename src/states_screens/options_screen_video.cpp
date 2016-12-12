@@ -86,7 +86,11 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 512 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
         true /* animatedScenery */,
-        (SharedGPUObjects::getMaxMat4Size() > 512 || !CVS->supportsHardwareSkinning() ? 2 : 1)/* animatedCharacters */,
+#ifndef SERVER_ONLY
+        (SharedGPUObjects::getMaxMat4Size() > 512 || !CVS->supportsHardwareSkinning() ? 2 : 1),
+#else
+        2 /* animatedCharacters */,
+#endif
         16 /* anisotropy */,
         true /* depth of field */, false /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
     });
@@ -96,7 +100,11 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
         true /* animatedScenery */,
-        (SharedGPUObjects::getMaxMat4Size() > 512 || !CVS->supportsHardwareSkinning() ? 2 : 1)/* animatedCharacters */,
+#ifndef SERVER_ONLY
+        (SharedGPUObjects::getMaxMat4Size() > 512 || !CVS->supportsHardwareSkinning() ? 2 : 1),
+#else
+        2 /* animatedCharacters */,
+#endif
         16 /* anisotropy */,
         true /* depth of field */, true /* global illumination */, false /* degraded IBL */, 1 /* hd_textures */
     });
