@@ -544,7 +544,9 @@ public:
     float getSkidReduceTurnMax() const;
     bool getSkidEnabled() const;
 
-    /* <characteristics-end kpdefs> */
+	/* <characteristics-end kpdefs> */
+
+	LEAK_CHECK()
 };   // KartProperties
 
 #endif

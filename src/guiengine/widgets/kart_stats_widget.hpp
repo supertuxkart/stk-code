@@ -30,6 +30,7 @@
 #include "guiengine/widgets/progress_bar_widget.hpp"
 #include "guiengine/widgets/skill_level_widget.hpp"
 
+class KartProperties;
 
 namespace GUIEngine
 {
@@ -90,6 +91,8 @@ namespace GUIEngine
         /** Sets the size of the widget as a whole, and placed children widgets
          * inside itself */
         void setSize(const int x, const int y, const int w, const int h);
+
+		void setValues(const KartProperties* props);
 
         /** Change the value of the widget, it must be a percent. */
         void setValue(Stats type, int value);
