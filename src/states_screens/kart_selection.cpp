@@ -812,7 +812,7 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
 
     if (kp != NULL)
     {
-		w->setValues(kp);
+        w->setValues(kp);
         w->update(0);
     }
 }
