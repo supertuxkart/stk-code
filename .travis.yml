@@ -1,4 +1,4 @@
-# Travis-CI configuration file for SuperTuxKart
+# Travis-CI configuration file for SuperTuxKart 
 #
 # Configuration manual:
 # http://docs.travis-ci.com/user/build-configuration/
@@ -14,8 +14,10 @@ matrix:
 
 env:
   matrix:
-    - BUILD_TYPE="Debug"
-    - BUILD_TYPE="Release"
+    - BUILD_TYPE="Debug" SERVER_ONLY="OFF"
+    - BUILD_TYPE="Debug" SERVER_ONLY="ON"
+    - BUILD_TYPE="Release" SERVER_ONLY="OFF"
+    - BUILD_TYPE="Release" SERVER_ONLY="ON"
 
 addons:
   apt:
@@ -39,8 +41,9 @@ addons:
 
 before_script:
   # Unfortunately using all threads crashes g++: "g++: internal compiler error: Killed (program cc1plus)"
+  # Use half of the available threads, gcc is memory hungry
   - 'if [ ${CC} = "gcc" ]; then
-        export THREADS=4;
+        export THREADS=$((`nproc` / 2));
     else
         export THREADS=$((`nproc` + 1));
     fi'
@@ -50,7 +53,7 @@ before_script:
 script:
   - mkdir "build"
   - cd "build"
-  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCHECK_ASSETS=off
+  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off
   - make VERBOSE=1 -j $THREADS
 
 notifications:

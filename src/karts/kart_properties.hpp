@@ -545,6 +545,8 @@ public:
     bool getSkidEnabled() const;
 
     /* <characteristics-end kpdefs> */
+    
+    LEAK_CHECK()
 };   // KartProperties
 
 #endif

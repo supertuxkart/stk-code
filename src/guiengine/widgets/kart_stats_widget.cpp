@@ -80,27 +80,45 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
         m_children.push_back(skill_bar);
     }
 
+	setValues(props);
+
+    move(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
+         area.getWidth(), area.getHeight());
+}   // KartStatsWidget
+
+// -----------------------------------------------------------------------------
+
+void KartStatsWidget::setValues(const KartProperties* props)
+{
+    // Use kart properties computed for "hard" difficulty to show the user, so
+    // that properties don't change according to the the last used difficulty
+    // (And because this code uses arbitrary scaling factors to make them look
+    // nice and the arbitrary factors were optimised for hard difficulty)
+    RaceManager::Difficulty previous_difficulty = race_manager->getDifficulty();
+    race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
+    KartProperties kp_computed;
+    kp_computed.copyForPlayer(props);
+    
     // Scale the values so they look better
     // The scaling factor and offset were found by trial and error.
     // It should look nice and you should be able to see the difference between
     // different masses or velocities.
     m_skills[SKILL_MASS]->setValue((int)
-            ((props->getCombinedCharacteristic()->getMass() - 20) / 4));
+    	((kp_computed.getCombinedCharacteristic()->getMass() - 20) / 4));
     m_skills[SKILL_MASS]->setLabel(_("WEIGHT"));
     m_skills[SKILL_MASS]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
-
+    
     m_skills[SKILL_SPEED]->setValue((int)
-            ((props->getCombinedCharacteristic()->getEngineMaxSpeed() - 15) * 6));
+    	((kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed() - 15) * 6));
     m_skills[SKILL_SPEED]->setLabel(_("SPEED"));
     m_skills[SKILL_SPEED]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
-
-    m_skills[SKILL_POWER]->setValue((int) ((props->getAvgPower() - 30) / 20));
+    
+    m_skills[SKILL_POWER]->setValue((int)((kp_computed.getAvgPower() - 30) / 20));
     m_skills[SKILL_POWER]->setLabel(_("POWER"));
     m_skills[SKILL_POWER]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_power", m_player_id);
-
-    move(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
-         area.getWidth(), area.getHeight());
-}   // KartStatsWidget
+    
+    race_manager->setDifficulty(previous_difficulty);
+}
 
 // -----------------------------------------------------------------------------
 
