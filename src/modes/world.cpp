@@ -121,7 +121,6 @@ World::World() : WorldStatus()
     m_magic_number = 0xB01D6543;
 #endif
 
-    m_physics            = NULL;
     m_race_gui           = NULL;
     m_saved_race_gui     = NULL;
     m_use_highscores     = true;
@@ -181,7 +180,7 @@ void World::init()
     m_script_engine->loadScript(script_path, true);
 
     // Create the physics
-    m_physics = new Physics();
+    Physics::getInstance<Physics>();
 
     unsigned int num_karts = race_manager->getNumberOfKarts();
     //assert(num_karts > 0);
@@ -489,9 +488,10 @@ World::~World()
     Camera::removeAllCameras();
 
     projectile_manager->cleanup();
-    // In case that the track is not found, m_physics is still undefined.
-    if(m_physics)
-        delete m_physics;
+
+    // In case that the track is not found, Physics was not instantiated,
+    // but kill handles this correctly.
+    Physics::kill();
 
     delete m_script_engine;
 
@@ -654,7 +654,7 @@ void World::resetAllKarts()
 {
     // Reset the physics 'remaining' time to 0 so that the number
     // of timesteps is reproducible if doing a physics-based history run
-    getPhysics()->getPhysicsWorld()->resetLocalTime();
+    Physics::getInstance()->getPhysicsWorld()->resetLocalTime();
 
     // If track checking is requested, check all rescue positions if
     // they are high enough.
@@ -727,7 +727,7 @@ void World::resetAllKarts()
         (*i)->getBody()->setGravity((*i)->getMaterial()->hasGravity() ?
             (*i)->getNormal() * -g : Vec3(0, -g, 0));
     }
-    for(int i=0; i<60; i++) m_physics->update(1.f/60.f);
+    for(int i=0; i<60; i++) Physics::getInstance()->update(1.f/60.f);
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
@@ -1002,7 +1002,7 @@ void World::update(float dt)
 
     if (!history->dontDoPhysics())
     {
-        m_physics->update(dt);
+        Physics::getInstance()->update(dt);
     }
 
     PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);

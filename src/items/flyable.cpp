@@ -133,7 +133,7 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     m_shape = shape;
     createBody(m_mass, trans, m_shape, restitution);
     m_user_pointer.set(this);
-    World::getWorld()->getPhysics()->addBody(getBody());
+    Physics::getInstance()->addBody(getBody());
 
     m_body->setGravity(gravity);
 
@@ -199,7 +199,7 @@ void Flyable::init(const XMLNode &node, scene::IMesh *model,
 Flyable::~Flyable()
 {
     if(m_shape) delete m_shape;
-    World::getWorld()->getPhysics()->removeBody(getBody());
+    Physics::getInstance()->removeBody(getBody());
 }   // ~Flyable
 
 //-----------------------------------------------------------------------------

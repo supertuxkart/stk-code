@@ -1436,7 +1436,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     glDisable(GL_BLEND);
 
     World *world = World::getWorld();
-    Physics *physics = world ? world->getPhysics() : NULL;
+    Physics *physics = Physics::getInstance();
 
     if (isRace && UserConfigParams::m_dof && (physics == NULL || !physics->isDebug()))
     {

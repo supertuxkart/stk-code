@@ -2078,9 +2078,9 @@ void IrrDriver::update(float dt)
             GUIEngine::render(dt);
         }
 
-        if (world->getPhysics() != NULL)
+        if (Physics::getInstance())
         {
-            IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
+            IrrDebugDrawer* debug_drawer = Physics::getInstance()->getDebugDrawer();
             if (debug_drawer != NULL && debug_drawer->debugEnabled())
             {
                 debug_drawer->beginNextFrame();

@@ -230,7 +230,7 @@ bool handleContextMenuAction(s32 cmd_id)
 {
 
     World *world = World::getWorld();
-    Physics *physics = world ? world->getPhysics() : NULL;
+    Physics *physics = Physics::getInstance();
     switch(cmd_id)
     {
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
@@ -325,8 +325,8 @@ bool handleContextMenuAction(s32 cmd_id)
     {
         irr_driver->resetDebugModes();
 
-        if (!world) return false;
-        Physics *physics = world->getPhysics();
+        Physics *physics = Physics::getInstance();
+        if (!physics) return false;
         physics->setDebugMode(IrrDebugDrawer::DM_NO_KARTS_GRAPHICS);
         break;
     }

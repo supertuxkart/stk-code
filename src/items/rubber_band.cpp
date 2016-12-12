@@ -29,7 +29,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
-#include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -215,8 +214,7 @@ void RubberBand::checkForHit(const Vec3 &k, const Vec3 &p)
         m_owner->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = 0;
 
     // Do the raycast
-    World::getWorld()->getPhysics()->getPhysicsWorld()->rayTest(k, p,
-                                                                ray_callback);
+    Physics::getInstance()->getPhysicsWorld()->rayTest(k, p, ray_callback);
     // Reset collision groups
     m_plunger->getBody()->getBroadphaseHandle()->m_collisionFilterGroup = old_plunger_group;
     if(m_owner->getBody()->getBroadphaseHandle())

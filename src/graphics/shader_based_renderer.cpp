@@ -547,15 +547,16 @@ void ShaderBasedRenderer::debugPhysics()
     // the bullet debug view, since otherwise the camera
     // is not set up properly. This is only used for
     // the bullet debug view.
-    World *world = World::getWorld();
-    if (UserConfigParams::m_artist_debug_mode)
-        world->getPhysics()->draw();
-    if (world != NULL && world->getPhysics() != NULL)
+    if(Physics::getInstance())
     {
-        IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
+        if (UserConfigParams::m_artist_debug_mode)
+            Physics::getInstance()->draw();
+
+        IrrDebugDrawer* debug_drawer = Physics::getInstance()->getDebugDrawer();
         if (debug_drawer != NULL && debug_drawer->debugEnabled())
         {
-            const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
+            const std::map<video::SColor, std::vector<float> >& lines = 
+                                                       debug_drawer->getLines();
             std::map<video::SColor, std::vector<float> >::const_iterator it;
 
             Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();

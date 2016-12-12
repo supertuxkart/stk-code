@@ -21,6 +21,10 @@
 
 #include "btBulletDynamicsCommon.h"
 
+/** A thin wrapper around bullet's btDiscreteDynamicsWorld. Used to
+ *  be able to query and set the 'left over' time from a previous
+ *  time step, which is needed for more precise rewind/replays.
+ */
 class STKDynamicsWorld : public btDiscreteDynamicsWorld
 {
 public:

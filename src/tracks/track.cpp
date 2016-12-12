@@ -1183,7 +1183,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     // could be relaxed to fix this, it is not certain how the physics
     // will handle items that are out of the AABB
     m_aabb_max.setY(m_aabb_max.getY()+30.0f);
-    World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
+    Physics::getInstance()->init(m_aabb_min, m_aabb_max);
 
     ModelDefinitionLoader lodLoader(this);
 

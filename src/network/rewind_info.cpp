@@ -18,7 +18,6 @@
 
 #include "network/rewind_info.hpp"
 
-#include "modes/world.hpp"
 #include "physics/physics.hpp"
 
 /** Constructor for a state: it only takes the size, and allocates a buffer
@@ -42,8 +41,8 @@ RewindInfoState::RewindInfoState(float time, Rewinder *rewinder,
                                  BareNetworkString *buffer, bool is_confirmed)
     : RewindInfoRewinder(time, rewinder, buffer, is_confirmed)
 {
-    m_local_physics_time = World::getWorld()->getPhysics()->getPhysicsWorld()
-                                            ->getLocalTime();
+    m_local_physics_time = Physics::getInstance()->getPhysicsWorld()
+                                                 ->getLocalTime();
 }   // RewindInfoState
 
 // ============================================================================

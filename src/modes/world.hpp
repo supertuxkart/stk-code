@@ -41,7 +41,6 @@ class AbstractKart;
 class btRigidBody;
 class Controller;
 class PhysicalObject;
-class Physics;
 
 namespace Scripting
 {
@@ -95,7 +94,6 @@ protected:
     KartList                  m_karts;
     RandomGenerator           m_random;
 
-    Physics*      m_physics;
     AbstractKart* m_fastest_kart;
     /** Number of eliminated karts. */
     int         m_eliminated_karts;
@@ -310,9 +308,6 @@ public:
     /** Returns the number of currently active (i.e. non-eliminated) players.*/
     unsigned int    getCurrentNumPlayers() const { return m_num_players -
                                                          m_eliminated_players;}
-    // ------------------------------------------------------------------------
-    /** Returns a pointer to the physics. */
-    Physics        *getPhysics() const { return m_physics; }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the Scripting Engine. */
     Scripting::ScriptEngine   *getScriptEngine() 

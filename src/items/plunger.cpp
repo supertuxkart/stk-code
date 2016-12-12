@@ -28,7 +28,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
@@ -174,7 +173,7 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
         m_keep_alive = 0;
         // Make this object invisible.
         getNode()->setVisible(false);
-        World::getWorld()->getPhysics()->removeBody(getBody());
+        Physics::getInstance()->removeBody(getBody());
     }
     else
     {
@@ -188,7 +187,7 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
         {
             node->setVisible(false);
         }
-        World::getWorld()->getPhysics()->removeBody(getBody());
+        Physics::getInstance()->removeBody(getBody());
 
         if(kart)
         {
