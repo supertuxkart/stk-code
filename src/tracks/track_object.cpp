@@ -27,7 +27,6 @@
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
-#include "modes/world.hpp"
 #include "physics/physical_object.hpp"
 #include "race/race_manager.hpp"
 #include "scriptengine/script_engine.hpp"
@@ -364,7 +363,8 @@ void TrackObject::onWorldReady()
     else if (m_visibility_condition.size() > 0)
     {
         unsigned char result = -1;
-        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+        Scripting::ScriptEngine* script_engine = 
+                                        Scripting::ScriptEngine::getInstance();
 
         std::ostringstream fn_signature;
         std::vector<std::string> arguments;

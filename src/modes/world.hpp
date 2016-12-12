@@ -122,9 +122,6 @@ protected:
                              RaceManager::KartType type,
                              PerPlayerDifficulty difficulty);
 
-    /**Pointer to scripting engine  */
-    Scripting::ScriptEngine* m_script_engine;
-
     /** Pointer to the race GUI. The race GUI is handled by world. */
     RaceGUIBase *m_race_gui;
 
@@ -286,6 +283,7 @@ public:
     AbstractKart*   getPlayerKart(unsigned int player) const;
     AbstractKart*   getLocalPlayerKart(unsigned int n) const;
     virtual const btTransform &getStartTransform(int index);
+    void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
     /** Returns a pointer to the race gui. */
     RaceGUIBase    *getRaceGUI() const { return m_race_gui;}
@@ -308,12 +306,6 @@ public:
     /** Returns the number of currently active (i.e. non-eliminated) players.*/
     unsigned int    getCurrentNumPlayers() const { return m_num_players -
                                                          m_eliminated_players;}
-    // ------------------------------------------------------------------------
-    /** Returns a pointer to the Scripting Engine. */
-    Scripting::ScriptEngine   *getScriptEngine() 
-                               const { return m_script_engine; }
-    // ------------------------------------------------------------------------
-    void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */

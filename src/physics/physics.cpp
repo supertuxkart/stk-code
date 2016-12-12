@@ -169,7 +169,8 @@ void Physics::update(float dt)
                               p->getContactPointCS(0),
                               p->getUserPointer(1)->getPointerKart(),
                               p->getContactPointCS(1)                );
-            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::ScriptEngine* script_engine =
+                                            Scripting::ScriptEngine::getInstance();
             int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
             int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
             script_engine->runFunction(false, "void onKartKartCollision(int, int)",
@@ -184,7 +185,7 @@ void Physics::update(float dt)
         {
             // Kart hits physical object
             // -------------------------
-            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
             AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
             int kartId = kart->getWorldKartId();
             PhysicalObject* obj = p->getUserPointer(0)->getPointerPhysicalObject();
@@ -267,7 +268,7 @@ void Physics::update(float dt)
         {
             // Projectile hits physical object
             // -------------------------------
-            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
             Flyable* flyable = p->getUserPointer(0)->getPointerFlyable();
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
             std::string obj_id = obj->getID();

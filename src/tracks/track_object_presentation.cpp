@@ -210,13 +210,13 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
             lib_path = track->getTrackFile("library/" + name);
             libroot = file_manager->createXMLTree(local_lib_node_path);
             if (track != NULL)
-                World::getWorld()->getScriptEngine()->loadScript(local_script_file_path, false);
+                Scripting::ScriptEngine::getInstance()->loadScript(local_script_file_path, false);
         }
         else if (file_manager->fileExists(lib_node_path))
         {
             libroot = file_manager->createXMLTree(lib_node_path);
             if (track != NULL)
-                World::getWorld()->getScriptEngine()->loadScript(lib_script_file_path, false);
+                Scripting::ScriptEngine::getInstance()->loadScript(lib_script_file_path, false);
         }
         else
         {
@@ -1098,13 +1098,11 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached()
 {
     if (!m_action_active) return;
 
-    Scripting::ScriptEngine* script_engine =
-        World::getWorld()->getScriptEngine();
     m_action_active = false; // TODO: allow auto re-activating?
     int idKart = 0;
     Camera* camera = Camera::getActiveCamera();
     if (camera != NULL && camera->getKart() != NULL)
         idKart = camera->getKart()->getWorldKartId();
-    script_engine->runFunction(true, "void " + m_action + "(int)",
-        [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
+    Scripting::ScriptEngine::getInstance()->runFunction(true, "void " + m_action + "(int)",
+                               [=](asIScriptContext* ctx) { ctx->SetArgDWord(0, idKart); });
 }   // onTriggerItemApproached

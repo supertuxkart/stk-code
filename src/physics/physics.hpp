@@ -154,7 +154,10 @@ private:
 
              Physics();
     virtual ~Physics();
+
+    // Give the singleton access to the constructor
     friend class AbstractSingleton<Physics>;
+
 public:
     void  init             (const Vec3 &min_world, const Vec3 &max_world);
     void  addKart          (const AbstractKart *k);

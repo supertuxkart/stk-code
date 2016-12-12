@@ -458,9 +458,7 @@ void Track::cleanup()
     }
 #endif
 
-    Scripting::ScriptEngine* script_engine =
-        World::getWorld()->getScriptEngine();
-    script_engine->cleanupCache();
+    Scripting::ScriptEngine::getInstance()->cleanupCache();
 
     m_current_track = NULL;
 }   // cleanup
@@ -1449,8 +1447,7 @@ void Track::update(float dt)
 {
     if (!m_startup_run) // first time running update = good point to run startup script
     {
-        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-        script_engine->runFunction(false, "void onStart()");
+        Scripting::ScriptEngine::getInstance()->runFunction(false, "void onStart()");
         m_startup_run = true;
     }
     m_track_object_manager->update(dt);
@@ -1769,7 +1766,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     model_def_loader.cleanLibraryNodesAfterLoad();
 
-    World::getWorld()->getScriptEngine()->compileLoadedScripts();
+    Scripting::ScriptEngine::getInstance()->compileLoadedScripts();
 
     // Init all track objects
     m_track_object_manager->init();

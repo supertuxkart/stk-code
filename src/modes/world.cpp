@@ -167,7 +167,7 @@ void World::init()
 
     // Grab the track file
     Track *track = track_manager->getTrack(race_manager->getTrackName());
-    m_script_engine = new Scripting::ScriptEngine();
+    Scripting::ScriptEngine::getInstance<Scripting::ScriptEngine>();
     if(!track)
     {
         std::ostringstream msg;
@@ -177,7 +177,7 @@ void World::init()
     }
 
     std::string script_path = track->getTrackFile("scripting.as");
-    m_script_engine->loadScript(script_path, true);
+    Scripting::ScriptEngine::getInstance()->loadScript(script_path, true);
 
     // Create the physics
     Physics::getInstance<Physics>();
@@ -493,7 +493,7 @@ World::~World()
     // but kill handles this correctly.
     Physics::kill();
 
-    delete m_script_engine;
+    Scripting::ScriptEngine::kill();
 
     m_world = NULL;
 
@@ -998,7 +998,8 @@ void World::update(float dt)
     PROFILER_POP_CPU_MARKER();
 
     if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(dt);
-    if (m_script_engine) m_script_engine->update(dt);
+    Scripting::ScriptEngine *script_engine = Scripting::ScriptEngine::getInstance();
+    if (script_engine) script_engine->update(dt);
 
     if (!history->dontDoPhysics())
     {
