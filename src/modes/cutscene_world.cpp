@@ -75,7 +75,7 @@ void CutsceneWorld::init()
 
     dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(1.0f);
 
-    getTrack()->startMusic();
+    Track::getCurrentTrack()->startMusic();
 
     m_duration = -1.0f;
 
@@ -85,7 +85,8 @@ void CutsceneWorld::init()
     m_camera->bindTargetAndRotation(true); // no "look-at"
 
     // --- Build list of sounds to play at certain frames
-    PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+    PtrVector<TrackObject>& objects = Track::getCurrentTrack()
+                                    ->getTrackObjectManager()->getObjects();
     for (TrackObject* curr : objects)
     {
         if (curr->getType() == "particle-emitter" &&
@@ -199,7 +200,8 @@ void CutsceneWorld::update(float dt)
     {
         //printf("INITIAL TIME for CutsceneWorld\n");
 
-        PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+        PtrVector<TrackObject>& objects = Track::getCurrentTrack()
+                                        ->getTrackObjectManager()->getObjects();
         TrackObject* curr;
         for_in(curr, objects)
         {
@@ -213,7 +215,8 @@ void CutsceneWorld::update(float dt)
     {
         m_second_reset = false;
 
-        PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+        PtrVector<TrackObject>& objects = Track::getCurrentTrack()
+                                        ->getTrackObjectManager()->getObjects();
         TrackObject* curr;
         for_in(curr, objects)
         {
@@ -265,7 +268,8 @@ void CutsceneWorld::update(float dt)
 
     //printf("Estimated current frame : %f\n", curr_frame);
 
-    const std::vector<Subtitle>& subtitles = m_track->getSubtitles();
+    const std::vector<Subtitle>& subtitles = Track::getCurrentTrack()
+                                           ->getSubtitles();
     bool foundSubtitle = false;
     for (unsigned int n = 0; n < subtitles.size(); n++)
     {
@@ -287,7 +291,8 @@ void CutsceneWorld::update(float dt)
     World::update((float)dt);
     World::updateTrack((float)dt);
 
-    PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+    PtrVector<TrackObject>& objects = Track::getCurrentTrack()
+                                    ->getTrackObjectManager()->getObjects();
     TrackObject* curr;
     for_in(curr, objects)
     {

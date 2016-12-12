@@ -92,7 +92,7 @@ void WorldStatus::reset()
         device->getTimer()->start();
 
     // Set the right music
-    World::getWorld()->getTrack()->startMusic();
+    Track::getCurrentTrack()->startMusic();
     // In case of a networked race the race can only start once
     // all protocols are up. This flag is used to wait for
     // a confirmation before starting the actual race.

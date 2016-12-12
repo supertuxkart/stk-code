@@ -246,7 +246,7 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
 
     const video::SColor oldClearColor = irr_driver->getClearColor();
     irr_driver->setClearbackBufferColor(video::SColor(0, 255, 255, 255));
-    World::getWorld()->getTrack()->forceFogDisabled(true);
+    Track::getCurrentTrack()->forceFogDisabled(true);
 #ifndef SERVER_ONLY
     m_render_target = irr_driver->createRenderTarget(dimension, name);
 #endif
@@ -331,7 +331,7 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     irr_driver->removeCameraSceneNode(camera);
 
     irr_driver->setClearbackBufferColor(oldClearColor);
-    World::getWorld()->getTrack()->forceFogDisabled(false);
+    Track::getCurrentTrack()->forceFogDisabled(false);
 
     irr_driver->getSceneManager()->clear();
     VAOManager::kill();

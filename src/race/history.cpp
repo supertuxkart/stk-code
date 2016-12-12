@@ -181,7 +181,7 @@ void History::Save()
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
     fprintf(fd, "reverse: %c\n", race_manager->getReverseTrack() ? 'y' : 'n');
 
-    fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
+    fprintf(fd, "track: %s\n",      Track::getCurrentTrack()->getIdent().c_str());
 
     assert(num_karts > 0);
 

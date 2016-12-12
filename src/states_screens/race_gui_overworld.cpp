@@ -303,9 +303,9 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 #ifndef SERVER_ONLY
     World *world = World::getWorld();
     // arenas currently don't have a map.
-    if(world->getTrack()->isArena() || world->getTrack()->isSoccer()) return;
+    Track* track = Track::getCurrentTrack();
+    if(track->isArena() || track->isSoccer()) return;
 
-    Track* track = world->getTrack();
     const std::vector<OverworldChallenge>& challenges =
                                                      track->getChallengeList();
 
@@ -332,7 +332,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     core::rect<s32> dest(m_map_left, upper_y,
                          m_map_left + m_map_width, lower_y);
 
-    world->getTrack()->drawMiniMap(dest);
+    track->drawMiniMap(dest);
 
     Vec3 kart_xyz;
 

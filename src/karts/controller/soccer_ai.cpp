@@ -25,6 +25,7 @@
 #include "karts/kart_properties.hpp"
 #include "modes/soccer_world.hpp"
 #include "tracks/arena_graph.hpp"
+#include "tracks/track.hpp"
 
 #ifdef AI_DEBUG
 #include "irrlicht.h"
@@ -59,7 +60,7 @@ SoccerAI::SoccerAI(AbstractKart *kart)
 #endif
 
     m_world = dynamic_cast<SoccerWorld*>(World::getWorld());
-    m_track = m_world->getTrack();
+    m_track = Track::getCurrentTrack();
     m_cur_team = m_world->getKartTeam(m_kart->getWorldKartId());
     m_opp_team = (m_cur_team == SOCCER_TEAM_BLUE ?
         SOCCER_TEAM_RED : SOCCER_TEAM_BLUE);

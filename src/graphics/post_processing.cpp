@@ -1300,7 +1300,7 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
                                    const FrameBuffer &quarter1_fbo,
                                    const FrameBuffer &quarter2_fbo)
 {
-    Track* track = World::getWorld()->getTrack();
+    Track* track = Track::getCurrentTrack();
 
     glEnable(GL_DEPTH_TEST);
     // Grab the sky
@@ -1448,8 +1448,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     }
 
     bool hasgodrays = false;
-    if (World::getWorld() != NULL)
-        hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+    const Track * const track = Track::getCurrentTrack();
+    if (track)
+        hasgodrays = track->hasGodRays();
 
     if (isRace && UserConfigParams::m_light_shaft && hasgodrays)
     {

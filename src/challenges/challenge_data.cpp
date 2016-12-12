@@ -436,7 +436,7 @@ bool ChallengeData::isChallengeFulfilled() const
     // Single races
     // ------------
     World *world = World::getWorld();
-    std::string track_name = world->getTrack()->getIdent();
+    std::string track_name = Track::getCurrentTrack()->getIdent();
 
     int d = race_manager->getDifficulty();
 

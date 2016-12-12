@@ -740,7 +740,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             LinearWorld *linear_world = (LinearWorld*)(World::getWorld());
 
             float distance = linear_world->getDistanceDownTrackForKart(kart_id)
-                           + linear_world->getTrack()->getTrackLength()*lap;
+                           + Track::getCurrentTrack()->getTrackLength()*lap;
             if ((position>1) &&
                 (previous_distance-distance<m_dist_show_overlap) &&
                 (!kart->hasFinishedRace())                          )

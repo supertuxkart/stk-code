@@ -86,6 +86,7 @@ using namespace irr;
 
 const float Track::NOHIT               = -99999.9f;
 bool        Track::m_dont_load_navmesh = false;
+Track      *Track::m_current_track = NULL;
 
 // ----------------------------------------------------------------------------
 Track::Track(const std::string &filename)
@@ -460,6 +461,8 @@ void Track::cleanup()
     Scripting::ScriptEngine* script_engine =
         World::getWorld()->getScriptEngine();
     script_engine->cleanupCache();
+
+    m_current_track = NULL;
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -1578,6 +1581,8 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 {
+    assert(!m_current_track);
+
     // Use m_filename to also get the path, not only the identifier
     irr_driver->setTextureErrorMessage("While loading track '%s'",
                                        m_filename                  );
@@ -1670,11 +1675,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         throw std::runtime_error(msg.str());
     }
 
+    m_current_track = this;
+
     // Load the graph only now: this function is called from world, after
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadDriveGraph(mode_id, reverse_track);
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) 
+        loadDriveGraph(mode_id, reverse_track);
     else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
         loadArenaGraph(*root);
 
@@ -1738,6 +1746,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     loadMainTrack(*root);
+
     unsigned int main_track_count = (unsigned int)m_all_nodes.size();
 
     ModelDefinitionLoader model_def_loader(this);
@@ -1933,6 +1942,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     irr_driver->unsetTextureErrorMessage();
+
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------

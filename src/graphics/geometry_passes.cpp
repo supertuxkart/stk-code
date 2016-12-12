@@ -261,8 +261,8 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
     if (CVS->isARBBaseInstanceUsable())
         glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
 
-    const World *world = World::getWorld();
-    if (world && world->getTrack()->isFogEnabled())
+    const Track* const track = Track::getCurrentTrack();
+    if (track && track->isFogEnabled())
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         renderTransparenPass<Shaders::TransparentFogShader, video::EVT_STANDARD,

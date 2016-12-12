@@ -355,7 +355,8 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
     m_sun_ortho_matrices.clear();
     const core::matrix4 &sun_cam_view_matrix = m_sun_cam->getViewMatrix();
 
-    if (World::getWorld() && World::getWorld()->getTrack())
+    const Track* const track = Track::getCurrentTrack();
+    if (track)
     {
         float FarValues[] =
         {
@@ -423,13 +424,12 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
         }
 
         // Rsm Matrix and camera
-        if (!m_rsm_matrix_initialized &&
-            World::getWorld()->getTrack()->getPtrTriangleMesh())
+        if (!m_rsm_matrix_initialized && track->getPtrTriangleMesh())
         {
             // Compute track extent
             Vec3 vmin, vmax;
-            World::getWorld()->getTrack()->getTriangleMesh().getCollisionShape()
-                              .getAabb(btTransform::getIdentity(), vmin, vmax);
+            track->getTriangleMesh().getCollisionShape()
+                  .getAabb(btTransform::getIdentity(), vmin, vmax);
             core::aabbox3df trackbox(vmin.toIrrVector(), vmax.toIrrVector() -
                 core::vector3df(0, 30, 0));
 

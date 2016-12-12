@@ -149,7 +149,7 @@ void ThreeStrikesBattle::reset()
     TrackObject *obj;
     for_in(obj, m_tires)
     {
-        m_track->getTrackObjectManager()->removeObject(obj);
+        Track::getCurrentTrack()->getTrackObjectManager()->removeObject(obj);
     }
     m_tires.clearWithoutDeleting();
 
@@ -357,7 +357,7 @@ void ThreeStrikesBattle::update(float dt)
     WorldWithRank::updateTrack(dt);
 
     spawnSpareTireKarts();
-    if (m_track->hasNavMesh())
+    if (Track::getCurrentTrack()->hasNavMesh())
         updateSectorForKarts();
 
     // insert blown away tire(s) now if was requested
@@ -419,7 +419,7 @@ void ThreeStrikesBattle::update(float dt)
                                                 "movable", tire_presentation,
                                                 true /* is_dynamic */,
                                                 &physics_settings);
-        getTrack()->getTrackObjectManager()->insertObject(tire_obj);
+        Track::getCurrentTrack()->getTrackObjectManager()->insertObject(tire_obj);
 
         // FIXME: orient the force relative to kart orientation
         tire_obj->getPhysicalObject()->getBody()
@@ -730,7 +730,7 @@ void ThreeStrikesBattle::loadCustomModels()
 
                 m_karts.push_back(sta);
                 race_manager->addSpareTireKart(sta_list[i]);
-                m_track->adjustForFog(sta->getNode());
+                Track::getCurrentTrack()->adjustForFog(sta->getNode());
 
                 // Copy STA pointer to m_spare_tire_karts array, allowing them
                 // to respawn easily

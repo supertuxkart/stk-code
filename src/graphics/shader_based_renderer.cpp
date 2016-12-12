@@ -429,8 +429,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     }
 
     // Render ambient scattering
-    const World *world = World::getWorld();
-    if (CVS->isDefferedEnabled() && world && world->getTrack()->isFogEnabled())
+    const Track * const track = Track::getCurrentTrack();
+    if (CVS->isDefferedEnabled() && track && track->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- Ambient scatter", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
@@ -446,7 +446,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     }
 
     // Render discrete lights scattering
-    if (CVS->isDefferedEnabled() && world && world->getTrack()->isFogEnabled())
+    if (CVS->isDefferedEnabled() && track && track->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
@@ -801,7 +801,7 @@ void ShaderBasedRenderer::render(float dt)
     m_post_processing->begin();
 
     World *world = World::getWorld(); // Never NULL.
-    Track *track = world->getTrack();
+    Track *track = Track::getCurrentTrack();
     
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);

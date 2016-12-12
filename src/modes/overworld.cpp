@@ -112,7 +112,7 @@ void OverWorld::update(float dt)
         setPhase(RACE_PHASE);
         // Normally done in WorldStatus::update(), during phase SET_PHASE,
         // so we have to start music 'manually', since we skip all phases.
-        World::getWorld()->getTrack()->startMusic();
+        Track::getCurrentTrack()->startMusic();
 
         if (UserConfigParams::m_music)
             music_manager->startMusic();
@@ -212,7 +212,7 @@ void OverWorld::createRaceGUI()
 void OverWorld::onFirePressed(Controller* who)
 {
     const std::vector<OverworldChallenge>& challenges =
-                                                  m_track->getChallengeList();
+                                  Track::getCurrentTrack()->getChallengeList();
 
     AbstractKart* k = getKart(0);
     Vec3 kart_xyz = k->getXYZ();

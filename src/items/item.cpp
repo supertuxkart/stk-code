@@ -76,8 +76,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     debug_name += m_type;
     m_node->setName(debug_name.c_str());
 #endif
-
-    World::getWorld()->getTrack()->adjustForFog(m_node);
+    Track::getCurrentTrack()->adjustForFog(m_node);
     m_node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
     m_node->setPosition(xyz.toIrrVector());
     Vec3 hpr;
@@ -195,7 +194,7 @@ void Item::switchTo(ItemType type, scene::IMesh *mesh, scene::IMesh *lowmesh)
 
     irr_driver->applyObjectPassShader(m_node->getAllNodes()[0]);
 
-    World::getWorld()->getTrack()->adjustForFog(m_node);
+    Track::getCurrentTrack()->adjustForFog(m_node);
 #endif
 }   // switchTo
 
@@ -224,7 +223,7 @@ void Item::switchBack()
         ((scene::IMeshSceneNode*)node)->setMesh(m_original_lowmesh);
     }
 
-    World::getWorld()->getTrack()->adjustForFog(m_node);
+    Track::getCurrentTrack()->adjustForFog(m_node);
     Vec3 hpr;
     hpr.setHPR(m_original_rotation);
     m_node->setRotation(hpr.toIrrHPR());

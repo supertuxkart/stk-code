@@ -42,7 +42,6 @@ class btRigidBody;
 class Controller;
 class PhysicalObject;
 class Physics;
-class Track;
 
 namespace Scripting
 {
@@ -124,8 +123,6 @@ protected:
                              int local_player_id, int global_player_id,
                              RaceManager::KartType type,
                              PerPlayerDifficulty difficulty);
-    /** Pointer to the track. The track is managed by world. */
-    Track* m_track;
 
     /**Pointer to scripting engine  */
     Scripting::ScriptEngine* m_script_engine;
@@ -316,9 +313,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a pointer to the physics. */
     Physics        *getPhysics() const { return m_physics; }
-    // ------------------------------------------------------------------------
-    /** Returns a pointer to the track. */
-    Track          *getTrack() const { return m_track; }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the Scripting Engine. */
     Scripting::ScriptEngine   *getScriptEngine() 

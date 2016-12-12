@@ -193,10 +193,7 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
 
     if (!model_def_loader.containsLibraryNode(name))
     {
-        World* world = World::getWorld();
-        Track* track = NULL;
-        if (world != NULL)
-            track = world->getTrack();
+        Track* track = Track::getCurrentTrack();
         std::string local_lib_node_path;
         std::string local_script_file_path;
         if (track != NULL)
@@ -206,6 +203,7 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
         }
         std::string lib_node_path = lib_path + "node.xml";
         std::string lib_script_file_path = lib_path + "scripting.as";
+        World* world = World::getWorld();
 
         if (local_lib_node_path.size() > 0 && file_manager->fileExists(local_lib_node_path))
         {
@@ -267,8 +265,9 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     m_node->updateAbsolutePosition();
 
     assert(libroot != NULL);
-    World::getWorld()->getTrack()->loadObjects(libroot, lib_path, model_def_loader,
-        create_lod_definitions, m_node, parent);
+    Track::getCurrentTrack()->loadObjects(libroot, lib_path, model_def_loader,
+                                          create_lod_definitions, m_node,
+                                          parent);
     m_parent = parent;
 }   // TrackObjectPresentationLibraryNode
 
@@ -494,9 +493,9 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
             m_force_always_hidden = true;
             m_frame_start = 0;
             m_frame_end = 0;
-
-            if (World::getWorld() && World::getWorld()->getTrack() && xml_node)
-                World::getWorld()->getTrack()->addPhysicsOnlyNode(m_node);
+            Track *track = Track::getCurrentTrack();
+            if (track && track && xml_node)
+                track->addPhysicsOnlyNode(m_node);
         }
     }
     else if (m_is_in_skybox)
@@ -526,9 +525,9 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         if (xml_node)
             xml_node->get("frame-end", &m_frame_end);
 
-        if (World::getWorld() && World::getWorld()->getTrack() && xml_node)
-            World::getWorld()->getTrack()
-            ->handleAnimatedTextures(m_node, *xml_node);
+        Track *track = Track::getCurrentTrack();
+        if (track && track && xml_node)
+            track->handleAnimatedTextures(m_node, *xml_node);
     }
     else
     {
@@ -547,9 +546,9 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         m_frame_start = 0;
         m_frame_end = 0;
 
-        if (World::getWorld() && World::getWorld()->getTrack() && xml_node)
-            World::getWorld()->getTrack()
-                             ->handleAnimatedTextures(m_node, *xml_node);
+        Track *track = Track::getCurrentTrack();
+        if (track && xml_node)
+            track->handleAnimatedTextures(m_node, *xml_node);
     }
 
     if(!enabled)
@@ -674,7 +673,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(
     xml_node.get("max_dist", &max_dist );
 
     // first try track dir, then global dir
-    std::string soundfile = World::getWorld()->getTrack()->getTrackFile(sound);
+    std::string soundfile = Track::getCurrentTrack()->getTrackFile(sound);
     //std::string soundfile = file_manager->getAsset(FileManager::MODEL,sound);
     if (!file_manager->fileExists(soundfile))
     {

@@ -464,10 +464,11 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
         scene::SAnimatedMesh* amesh = new scene::SAnimatedMesh(clone);
         clone->drop();
         meshCache->addMesh(path, amesh);
-        if (World::getWorld())
+        Track* track = Track::getCurrentTrack();
+        if (track)
         {
             irr_driver->grabAllTextures(amesh);
-            World::getWorld()->getTrack()->addCachedMesh(amesh);
+            track->addCachedMesh(amesh);
             return amesh;
         }
         amesh->drop();

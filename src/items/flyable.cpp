@@ -371,7 +371,7 @@ bool Flyable::updateAndDelete(float dt)
     const Vec3 &xyz=getXYZ();
     // Check if the flyable is outside of the track. If so, explode it.
     const Vec3 *min, *max;
-    World::getWorld()->getTrack()->getAABB(&min, &max);
+    Track::getCurrentTrack()->getAABB(&min, &max);
 
     // I have seen that the bullet AABB can be slightly different from the
     // one computed here - I assume due to minor floating point errors
@@ -515,13 +515,13 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
             // The explosion animation will register itself with the kart
             // and will free it later.
             ExplosionAnimation::create(kart, getXYZ(), kart==kart_hit);
-            if(kart==kart_hit && world->getTrack()->isArena())
+            if(kart==kart_hit && Track::getCurrentTrack()->isArena())
             {
                 world->kartHit(kart->getWorldKartId());
             }
         }
     }
-    world->getTrack()->handleExplosion(getXYZ(), object, secondary_hits);
+    Track::getCurrentTrack()->handleExplosion(getXYZ(), object,secondary_hits);
 }   // explode
 
 // ----------------------------------------------------------------------------

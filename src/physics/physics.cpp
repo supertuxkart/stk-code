@@ -69,7 +69,7 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
     m_karts_to_delete.clear();
     m_dynamics_world->setGravity(
         btVector3(0.0f,
-                  -World::getWorld()->getTrack()->getGravity(),
+                  -Track::getCurrentTrack()->getGravity(),
                   0.0f));
     m_debug_drawer = new IrrDebugDrawer();
     m_dynamics_world->setDebugDrawer(m_debug_drawer);

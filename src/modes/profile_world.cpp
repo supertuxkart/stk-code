@@ -244,7 +244,7 @@ void ProfileWorld::enterRaceOverState()
         all_groups.insert(kart->getController()->getControllerName());
         float distance = (float)(m_profile_mode==PROFILE_LAPS
                                  ? race_manager->getNumLaps() : 1);
-        distance *= m_track->getTrackLength();
+        distance *= Track::getCurrentTrack()->getTrackLength();
         ss << distance/kart->getFinishTime() << " " << kart->getTopSpeed() << " ";
         ss << kart->getSkiddingTime() << " " << kart->getRescueTime() << " ";
         ss << kart->getRescueCount() << " " << kart->getBrakeCount() << " ";
@@ -300,7 +300,7 @@ void ProfileWorld::enterRaceOverState()
 
             float distance = (float)(m_profile_mode==PROFILE_LAPS
                                      ? race_manager->getNumLaps() : 1);
-            distance *= m_track->getTrackLength();
+            distance *= Track::getCurrentTrack()->getTrackLength();
 
             Log::verbose("profile",
                    "%s %4.2f %3.2f %6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d %4.2f",

@@ -279,8 +279,10 @@ void Powerup::use()
             const Material* material_hit;
             Vec3 pos = m_kart->getXYZ();
             Vec3 to  = pos+ m_kart->getTrans().getBasis() * Vec3(0, -10000, 0);
-            world->getTrack()->getTriangleMesh().castRay(pos, to, &hit_point,
-                                                       &material_hit, &normal);
+            Track::getCurrentTrack()->getTriangleMesh().castRay(pos, to, 
+                                                                &hit_point,
+                                                                &material_hit,
+                                                                &normal);
             // This can happen if the kart is 'over nothing' when dropping
             // the bubble gum
             if(!material_hit)

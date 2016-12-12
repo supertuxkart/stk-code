@@ -28,7 +28,6 @@
 #include "graphics/stk_mesh.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/vao_manager.hpp"
-#include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
 
@@ -196,11 +195,9 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
     }
 
     // Transparent
-    const World *world = World::getWorld();
-    if (world && world->getTrack()->isFogEnabled())
+    const Track* const track = Track::getCurrentTrack();
+    if (track&& track->isFogEnabled())
     {
-        const Track * const track = World::getWorld()->getTrack();
-
         // Todo : put everything in a ubo
         const float fogmax = track->getFogMax();
         const float startH = track->getFogStartHeight();
@@ -230,9 +227,9 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
 
     // Use sun color to determine custom alpha for ghost karts
     float custom_alpha = 1.0f;
-    if (World::getWorld())
+    if (track)
     {
-        const video::SColor& c = World::getWorld()->getTrack()->getSunColor();
+        const video::SColor& c = track->getSunColor();
         float y = 0.2126f * c.getRed() + 0.7152f * c.getGreen() + 0.0722f * c.getBlue();
         custom_alpha = y > 128.0f ? 0.5f : 0.35f;
     }
