@@ -27,6 +27,7 @@
 #include "karts/controller/spare_tire_ai.hpp"
 #include "modes/three_strikes_battle.hpp"
 #include "tracks/arena_graph.hpp"
+#include "tracks/track.hpp"
 
 #ifdef AI_DEBUG
 #include "irrlicht.h"
@@ -47,7 +48,7 @@ BattleAI::BattleAI(AbstractKart *kart)
     m_debug_sphere_next->setVisible(true);
 #endif
     m_world = dynamic_cast<ThreeStrikesBattle*>(World::getWorld());
-    m_track = m_world->getTrack();
+    m_track = Track::getCurrentTrack();
 
     // Don't call our own setControllerName, since this will add a
     // billboard showing 'AIBaseController' to the kart.

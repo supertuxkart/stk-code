@@ -24,7 +24,6 @@
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/world.hpp"
 #include "tracks/track.hpp"
 
 /** A static create function that does only create an explosion if
@@ -91,7 +90,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     // Since v(explosion_time*0.5) = 0, the following forumla computes
     // the right initial velocity for a kart to land back after
     // the specified time.
-    m_velocity = 0.5f * m_timer * World::getWorld()->getTrack()->getGravity();
+    m_velocity = 0.5f * m_timer * Track::getCurrentTrack()->getGravity();
 
     m_curr_rotation.setHeading(m_kart->getHeading());
     m_curr_rotation.setPitch(m_kart->getPitch());
@@ -141,7 +140,7 @@ ExplosionAnimation::~ExplosionAnimation()
  */
 void ExplosionAnimation::update(float dt)
 {
-    m_velocity -= dt*World::getWorld()->getTrack()->getGravity();
+    m_velocity -= dt*Track::getCurrentTrack()->getGravity();
     m_xyz = m_xyz + dt*m_velocity*m_normal;
 
     // Make sure the kart does not end up under the track

@@ -69,7 +69,7 @@ void Physics::init(const Vec3 &world_min, const Vec3 &world_max)
     m_karts_to_delete.clear();
     m_dynamics_world->setGravity(
         btVector3(0.0f,
-                  -World::getWorld()->getTrack()->getGravity(),
+                  -Track::getCurrentTrack()->getGravity(),
                   0.0f));
     m_debug_drawer = new IrrDebugDrawer();
     m_dynamics_world->setDebugDrawer(m_debug_drawer);
@@ -169,7 +169,8 @@ void Physics::update(float dt)
                               p->getContactPointCS(0),
                               p->getUserPointer(1)->getPointerKart(),
                               p->getContactPointCS(1)                );
-            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::ScriptEngine* script_engine =
+                                            Scripting::ScriptEngine::getInstance();
             int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
             int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
             script_engine->runFunction(false, "void onKartKartCollision(int, int)",
@@ -184,7 +185,7 @@ void Physics::update(float dt)
         {
             // Kart hits physical object
             // -------------------------
-            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
             AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
             int kartId = kart->getWorldKartId();
             PhysicalObject* obj = p->getUserPointer(0)->getPointerPhysicalObject();
@@ -267,7 +268,7 @@ void Physics::update(float dt)
         {
             // Projectile hits physical object
             // -------------------------------
-            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
             Flyable* flyable = p->getUserPointer(0)->getPointerFlyable();
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
             std::string obj_id = obj->getID();

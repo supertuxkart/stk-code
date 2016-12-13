@@ -52,8 +52,9 @@ void WorldWithRank::init()
 #endif
     stk_config->getAllScores(&m_score_for_position, getNumKarts());
 
+    Track *track = Track::getCurrentTrack();
     // Don't init track sector if navmesh is not found in arena
-    if ((m_track->isArena() || m_track->isSoccer()) && !m_track->hasNavMesh())
+    if ((track->isArena() || track->isSoccer()) && !track->hasNavMesh())
         return;
 
     for (unsigned int i = 0; i < m_karts.size(); i++)
@@ -167,7 +168,8 @@ void WorldWithRank::endSetKartPositions()
 
 unsigned int WorldWithRank::getRescuePositionIndex(AbstractKart *kart)
 {
-    const int start_spots_amount = getTrack()->getNumberOfStartPositions();
+    const int start_spots_amount =
+                         Track::getCurrentTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
 
     float largest_accumulated_distance_found = -1;

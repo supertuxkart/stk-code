@@ -22,7 +22,6 @@
 #include "input/device_manager.hpp"
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
-#include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track.hpp"
@@ -109,8 +108,7 @@ namespace Scripting
         /** Runs the script function specified by the given string */
         void runScript(const std::string* str)
         {
-            ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-            script_engine->runFunction(true, *str);
+            ScriptEngine::getInstance()->runFunction(true, *str);
         }
 
         /** Generate a random integer value */
@@ -129,13 +127,13 @@ namespace Scripting
         /** Call a function after the specified delay */
         void setTimeout(const std::string* callback_name, float delay)
         {
-            World::getWorld()->getScriptEngine()->addPendingTimeout(delay, *callback_name);
+            ScriptEngine::getInstance()->addPendingTimeout(delay, *callback_name);
         }
 
         /** Call a method from the given object after the specified delay */
         void setTimeoutDelegate(asIScriptFunction* obj, float delay)
         {
-            World::getWorld()->getScriptEngine()->addPendingTimeout(delay, obj);
+            ScriptEngine::getInstance()->addPendingTimeout(delay, obj);
         }
 
         /** Log to the console */

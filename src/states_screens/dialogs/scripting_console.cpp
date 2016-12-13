@@ -21,7 +21,6 @@
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
-#include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -80,7 +79,8 @@ void ScriptingConsole::runScript()
     core::stringw script = textCtrl->getText();
     textCtrl->setText(L"");
 
-    World::getWorld()->getScriptEngine()->evalScript(core::stringc(script.c_str()).c_str());
+    Scripting::ScriptEngine::getInstance()
+                           ->evalScript(core::stringc(script.c_str()).c_str());
 }
 
 // -----------------------------------------------------------------------------

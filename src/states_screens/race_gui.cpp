@@ -216,7 +216,7 @@ void RaceGUI::renderGlobal(float dt)
     drawGlobalMiniMap();
 
     if (!m_is_tutorial)               drawGlobalPlayerIcons(m_map_height);
-    if(world->getTrack()->isSoccer()) drawScores();
+    if(Track::getCurrentTrack()->isSoccer()) drawScores();
 #endif
 }   // renderGlobal
 
@@ -378,10 +378,9 @@ void RaceGUI::drawGlobalTimer()
 void RaceGUI::drawGlobalMiniMap()
 {
 #ifndef SERVER_ONLY
-    World *world = World::getWorld();
     // draw a map when arena has a navigation mesh.
-    if ((world->getTrack()->isArena() || world->getTrack()->isSoccer()) &&
-        !(world->getTrack()->hasNavMesh()))
+    Track *track = Track::getCurrentTrack();
+    if ( (track->isArena() || track->isSoccer()) && !(track->hasNavMesh()) )
         return;
 
     int upper_y = irr_driver->getActualScreenSize().Height - m_map_bottom - m_map_height;
@@ -390,8 +389,9 @@ void RaceGUI::drawGlobalMiniMap()
     core::rect<s32> dest(m_map_left, upper_y,
                          m_map_left + m_map_width, lower_y);
 
-    world->getTrack()->drawMiniMap(dest);
+    track->drawMiniMap(dest);
 
+    World *world = World::getWorld();
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         const AbstractKart *kart = world->getKart(i);
@@ -401,7 +401,7 @@ void RaceGUI::drawGlobalMiniMap()
         if(kart->isEliminated() && !(sta && sta->isMoving())) continue;
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
-        world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
+        track->mapPoint2MiniMap(xyz, &draw_at);
         draw_at *= UserConfigParams::m_scale_rtts_factor;
 
         video::ITexture* icon = sta ?
@@ -424,7 +424,7 @@ void RaceGUI::drawGlobalMiniMap()
     if (sw)
     {
         Vec3 draw_at;
-        world->getTrack()->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
+        track->mapPoint2MiniMap(sw->getBallPosition(), &draw_at);
         draw_at *= UserConfigParams::m_scale_rtts_factor;
         video::ITexture* icon =
             irr_driver->getTexture(FileManager::GUI, "soccer_ball_normal.png");

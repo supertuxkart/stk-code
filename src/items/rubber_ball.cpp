@@ -492,7 +492,7 @@ void RubberBall::interpolate(Vec3 *next_xyz, float dt)
  */
 bool RubberBall::checkTunneling()
 {
-    const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+    const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();
     Vec3 hit_point;
     const Material *material;
 
@@ -595,9 +595,10 @@ float RubberBall::updateHeight()
  *  \returns The distance to the terrain element found by raycast in the up
               direction. If no terrain found, it returns 99990
  */
-float RubberBall::getTunnelHeight(const Vec3 &next_xyz, const float vertical_offset) const
+float RubberBall::getTunnelHeight(const Vec3 &next_xyz, 
+                                  const float vertical_offset) const
 {
-    const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+    const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();
     Vec3 from(next_xyz + vertical_offset*getNormal());
     Vec3 to(next_xyz + 10000.0f*getNormal());
     Vec3 hit_point;
@@ -623,7 +624,7 @@ void RubberBall::updateDistanceToTarget()
     m_distance_to_target = target_distance - ball_distance;
     if(m_distance_to_target < 0)
     {
-        m_distance_to_target += world->getTrack()->getTrackLength();
+        m_distance_to_target += Track::getCurrentTrack()->getTrackLength();
     }
     if(UserConfigParams::logFlyable())
         Log::debug("[RubberBall]", "ball %d: target %f %f %f distance_2_target %f",
@@ -652,7 +653,7 @@ void RubberBall::updateDistanceToTarget()
         // new target. If the new distance is nearly the full track
         // length, assume that the rubber ball has overtaken the
         // original target, and start deleting it.
-        if(m_distance_to_target > 0.9f * world->getTrack()->getTrackLength())
+        if(m_distance_to_target > 0.9f * Track::getCurrentTrack()->getTrackLength())
         {
             m_delete_timer = m_st_delete_time;
 #ifdef PRINT_BALL_REMOVE_INFO

@@ -168,7 +168,7 @@ void ShaderBasedRenderer::prepareForwardRenderer()
 {
     irr::video::SColor clearColor(0, 150, 150, 150);
     if (World::getWorld() != NULL)
-        clearColor = World::getWorld()->getClearColor();
+        clearColor = irr_driver->getClearColor();
 
     glClear(GL_COLOR_BUFFER_BIT);
     glDepthMask(GL_TRUE);
@@ -408,7 +408,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
         m_rtts->getFBO(FBO_COLORS).bind();
         video::SColor clearColor(0, 150, 150, 150);
         if (World::getWorld() != NULL)
-            clearColor = World::getWorld()->getClearColor();
+            clearColor = irr_driver->getClearColor();
 
         glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
             clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
@@ -429,8 +429,8 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     }
 
     // Render ambient scattering
-    if (CVS->isDefferedEnabled() && World::getWorld() != NULL &&
-        World::getWorld()->isFogEnabled())
+    const Track * const track = Track::getCurrentTrack();
+    if (CVS->isDefferedEnabled() && track && track->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- Ambient scatter", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
@@ -446,8 +446,7 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
     }
 
     // Render discrete lights scattering
-    if (CVS->isDefferedEnabled() && World::getWorld() != NULL &&
-        World::getWorld()->isFogEnabled())
+    if (CVS->isDefferedEnabled() && track && track->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_FOG));
@@ -548,15 +547,16 @@ void ShaderBasedRenderer::debugPhysics()
     // the bullet debug view, since otherwise the camera
     // is not set up properly. This is only used for
     // the bullet debug view.
-    World *world = World::getWorld();
-    if (UserConfigParams::m_artist_debug_mode)
-        world->getPhysics()->draw();
-    if (world != NULL && world->getPhysics() != NULL)
+    if(Physics::getInstance())
     {
-        IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
+        if (UserConfigParams::m_artist_debug_mode)
+            Physics::getInstance()->draw();
+
+        IrrDebugDrawer* debug_drawer = Physics::getInstance()->getDebugDrawer();
         if (debug_drawer != NULL && debug_drawer->debugEnabled())
         {
-            const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
+            const std::map<video::SColor, std::vector<float> >& lines = 
+                                                       debug_drawer->getLines();
             std::map<video::SColor, std::vector<float> >::const_iterator it;
 
             Shaders::ColoredLine *line = Shaders::ColoredLine::getInstance();
@@ -802,7 +802,7 @@ void ShaderBasedRenderer::render(float dt)
     m_post_processing->begin();
 
     World *world = World::getWorld(); // Never NULL.
-    Track *track = world->getTrack();
+    Track *track = Track::getCurrentTrack();
     
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);

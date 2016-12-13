@@ -1300,7 +1300,7 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
                                    const FrameBuffer &quarter1_fbo,
                                    const FrameBuffer &quarter2_fbo)
 {
-    Track* track = World::getWorld()->getTrack();
+    Track* track = Track::getCurrentTrack();
 
     glEnable(GL_DEPTH_TEST);
     // Grab the sky
@@ -1435,8 +1435,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
-    World *world = World::getWorld();
-    Physics *physics = world ? world->getPhysics() : NULL;
+    Physics *physics = Physics::getInstance();
 
     if (isRace && UserConfigParams::m_dof && (physics == NULL || !physics->isDebug()))
     {
@@ -1448,8 +1447,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     }
 
     bool hasgodrays = false;
-    if (World::getWorld() != NULL)
-        hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+    const Track * const track = Track::getCurrentTrack();
+    if (track)
+        hasgodrays = track->hasGodRays();
 
     if (isRace && UserConfigParams::m_light_shaft && hasgodrays)
     {
@@ -1563,14 +1563,10 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Lightning", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTNING));
-        if (World::getWorld() != NULL)
+        Weather* weather = Weather::getInstance();
+        if ( weather && weather->shouldLightning() )
         {
-            Weather* m_weather = World::getWorld()->getWeather();
-
-            if (m_weather != NULL && m_weather->shouldLightning())
-            {
-                renderLightning(m_weather->getIntensity());
-            }
+            renderLightning(weather->getIntensity());
         }
         PROFILER_POP_CPU_MARKER();
     }

@@ -621,7 +621,8 @@ void LightingPasses::renderLights(  bool has_shadow,
     }
 
     // Render sunlight if and only if track supports shadow
-    if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
+    const Track* const track = Track::getCurrentTrack();
+    if (!track|| track->hasShadows())
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
         if (World::getWorld() && CVS->isShadowEnabled() && has_shadow)
@@ -664,7 +665,7 @@ void LightingPasses::renderLights(  bool has_shadow,
 // ----------------------------------------------------------------------------
 void LightingPasses::renderAmbientScatter(GLuint depth_stencil_texture)
 {
-    const Track * const track = World::getWorld()->getTrack();
+    const Track * const track = Track::getCurrentTrack();
 
     // This function is only called once per frame - thus no need for setters.
     float start = track->getFogStart() + .001f;
@@ -694,7 +695,7 @@ void LightingPasses::renderLightsScatter(GLuint depth_stencil_texture,
     glClearColor(0., 0., 0., 0.);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    const Track * const track = World::getWorld()->getTrack();
+    const Track * const track = Track::getCurrentTrack();
 
     // This function is only called once per frame - thus no need for setters.
     float start = track->getFogStart() + .001f;

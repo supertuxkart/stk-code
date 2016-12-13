@@ -54,7 +54,6 @@ class RenderTarget;
 class TrackObject;
 class TrackObjectManager;
 class TriangleMesh;
-class World;
 class XMLNode;
 
 const int HEIGHT_MAP_RESOLUTION = 256;
@@ -96,6 +95,10 @@ struct Subtitle
 class Track
 {
 private:
+
+    /** If a race is in progress, this stores the active track object.
+     *  NULL otherwise. */
+    static Track *m_current_track;
 
 #ifdef DEBUG
     unsigned int             m_magic_number;
@@ -313,7 +316,12 @@ private:
     /** The name used in sorting the track. */
     core::stringw       m_sort_name;
 
+    /** True if the track uses fog. */
     bool                m_use_fog;
+
+    /** Can be set to force fog off (e.g. for rendering minimap). */
+    bool                m_force_disable_fog;
+
     /** True if this track supports using smoothed normals. */
     bool                m_smooth_normals;
 
@@ -382,7 +390,10 @@ private:
 
 public:
 
-    bool reverseAvailable() const { return m_reverse_available; }
+    /** Static function to get the current track. NULL if no current
+     *  track is defined (i.e. no race is active atm) */
+    static Track* getCurrentTrack() { return m_current_track;  }
+    // ------------------------------------------------------------------------
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
 
     /** Flag to avoid loading navmeshes (useful to speedup debugging: e.g.
@@ -435,6 +446,9 @@ public:
     /** Returns true if this track has easter eggs. */
     bool hasEasterEggs() const { return m_has_easter_eggs; }
     // ------------------------------------------------------------------------
+    /** Returns true if this race can be driven in reverse. */
+    bool reverseAvailable() const { return m_reverse_available; }
+    // ------------------------------------------------------------------------
     /** Returns true if this track navmesh. */
     bool hasNavMesh() const { return m_has_navmesh; }
     // ------------------------------------------------------------------------
@@ -443,10 +457,6 @@ public:
         scene::ISceneNode* parent, TrackObject* parent_library);
     // ------------------------------------------------------------------------
     bool               isSoccer             () const { return m_is_soccer; }
-    // ------------------------------------------------------------------------
-    void               loadTrackModel  (World* parent,
-                                        bool reverse_track = false,
-                                        unsigned int mode_id=0);
     // ------------------------------------------------------------------------
     void               addMusic          (MusicInformation* mi)
                                                   {m_music.push_back(mi);     }
@@ -542,11 +552,20 @@ public:
     // ------------------------------------------------------------------------
     bool getWeatherLightning() {return m_weather_lightning;}
     // ------------------------------------------------------------------------
-    std::string getWeatherSound() {return m_weather_sound;}
+    const std::string& getWeatherSound() {return m_weather_sound;}
     // ------------------------------------------------------------------------
     ParticleKind* getSkyParticles         () { return m_sky_particles; }
     // ------------------------------------------------------------------------
-    bool  isFogEnabled() const { return m_use_fog;   }
+    /** Override track fog value to force disabled */
+    void forceFogDisabled(bool v) { m_force_disable_fog = v; }
+    //-------------------------------------------------------------------------
+    /** Returns if fog is currently enabled. It can be disabled per track, or
+     *  temporary be disabled (e.g. for rendering mini map). */
+    bool isFogEnabled() const
+    {
+        return !m_force_disable_fog && m_use_fog;
+    }   // isFogEnabled
+
     // ------------------------------------------------------------------------
     float getFogStart()  const { return m_fog_start; }
     // ------------------------------------------------------------------------

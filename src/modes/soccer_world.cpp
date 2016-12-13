@@ -91,13 +91,14 @@ void SoccerWorld::init()
     m_goal_target = race_manager->getMaxGoal();
     m_goal_sound = SFXManager::get()->createSoundSource("goal_scored");
 
-    if (m_track->hasNavMesh())
+    Track *track = Track::getCurrentTrack();
+    if (track->hasNavMesh())
     {
         // Init track sector for ball if navmesh is found
         m_ball_track_sector = new TrackSector();
     }
 
-    TrackObjectManager* tom = getTrack()->getTrackObjectManager();
+    TrackObjectManager* tom = track->getTrackObjectManager();
     assert(tom);
     PtrVector<TrackObject>& objects = tom->getObjects();
     for (unsigned int i = 0; i < objects.size(); i++)
@@ -150,7 +151,7 @@ void SoccerWorld::reset()
         m_goal_sound->stop();
     }
 
-    if (m_track->hasNavMesh())
+    if (Track::getCurrentTrack()->hasNavMesh())
     {
         m_ball_track_sector->reset();
     }
@@ -181,7 +182,7 @@ const std::string& SoccerWorld::getIdent() const
 void SoccerWorld::update(float dt)
 {
     updateBallPosition(dt);
-    if (m_track->hasNavMesh())
+    if (Track::getCurrentTrack()->hasNavMesh())
     {
         updateSectorForKarts();
         updateAIData();
@@ -457,7 +458,7 @@ void SoccerWorld::updateBallPosition(float dt)
             m_ball_body->getLinearVelocity().getZ());
     }
 
-    if (m_track->hasNavMesh())
+    if (Track::getCurrentTrack()->hasNavMesh())
     {
         m_ball_track_sector
             ->update(getBallPosition(), true/*ignore_vertical*/);

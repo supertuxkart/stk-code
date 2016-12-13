@@ -140,8 +140,9 @@ IrrDriver::IrrDriver()
 
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = false;
     m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
-    m_boundingboxesviz = false;
+    m_boundingboxesviz           = false;
     m_last_light_bucket_distance = 0;
+    m_clear_color                = video::SColor(255, 100, 101, 140);
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -2077,9 +2078,9 @@ void IrrDriver::update(float dt)
             GUIEngine::render(dt);
         }
 
-        if (world->getPhysics() != NULL)
+        if (Physics::getInstance())
         {
-            IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
+            IrrDebugDrawer* debug_drawer = Physics::getInstance()->getDebugDrawer();
             if (debug_drawer != NULL && debug_drawer->debugEnabled())
             {
                 debug_drawer->beginNextFrame();

@@ -573,10 +573,10 @@ void Attachment::update(float dt)
             Vec3 hit_point;
             Vec3 normal;
             const Material* material_hit;
-            World* world = World::getWorld();
-            world->getTrack()->getTriangleMesh().castRay(m_kart->getXYZ(),
-                m_kart->getTrans().getBasis() * Vec3(0, -10000, 0), &hit_point,
-                &material_hit, &normal);
+            
+            Track::getCurrentTrack()->getTriangleMesh().castRay(m_kart->getXYZ(),
+                            m_kart->getTrans().getBasis() * Vec3(0, -10000, 0),
+                            &hit_point,&material_hit, &normal                    );
             // This can happen if the kart is 'over nothing' when dropping
             // the bubble gum
             if(material_hit)

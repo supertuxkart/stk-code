@@ -322,7 +322,7 @@ void RewindManager::rewindTo(float rewind_time)
     // Now start the rewind with the full state:
     world->setTime(exact_rewind_time);
     float local_physics_time = state->getLocalPhysicsTime();
-    world->getPhysics()->getPhysicsWorld()->setLocalTime(local_physics_time);
+    Physics::getInstance()->getPhysicsWorld()->setLocalTime(local_physics_time);
 
     // Restore all states from the current time - the full state of a race
     // will be potentially stored in several state objects. State can be NULL

@@ -25,6 +25,7 @@ void main(void)
 #ifdef Use_Bindless_Texture
     vec4 color = texture(handle, uv);
     float specmap = texture(secondhandle, uv).g;
+    float emitmap = texture(secondhandle, uv).b;
     float mask = texture(thirdhandle, uv).a;
 #ifdef SRGBBindlessFix
     color.xyz = pow(color.xyz, vec3(2.2));
@@ -32,6 +33,7 @@ void main(void)
 #else
     vec4 color = texture(Albedo, uv);
     float specmap = texture(SpecMap, uv).g;
+    float emitmap = texture(SpecMap, uv).b;
     float mask = texture(colorization_mask, uv).a;
 #endif
     if (color.a < 0.5) discard;
@@ -59,7 +61,8 @@ void main(void)
 
     float fLdotNBack  = max(0., - dot(nor, L) * 0.6 + 0.4);
     float scattering = mix(fPowEdotL, fLdotNBack, .5);
+    
+    vec3 LightFactor = color.xyz * (scattering * 0.1) + getLightFactor(color.xyz, vec3(1.), specmap, emitmap);
 
-    vec3 LightFactor = color.xyz * (scattering * 0.1) + getLightFactor(color.xyz, vec3(1.), specmap, 0.);
     FragColor = vec4(LightFactor, 1.);
 }

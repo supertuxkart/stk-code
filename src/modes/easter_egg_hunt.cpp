@@ -126,7 +126,7 @@ void EasterEggHunt::readData(const std::string &filename)
                    race_manager->getDifficultyAsString(act_difficulty).c_str());
             continue;
         }
-        World::getTrack()->itemCommand(egg);
+        Track::getCurrentTrack()->itemCommand(egg);
         m_number_of_eggs++;
     }   // for i <num_nodes
 

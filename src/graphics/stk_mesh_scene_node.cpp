@@ -512,7 +512,8 @@ void STKMeshSceneNode::render()
             else
                 glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-            if (World::getWorld() && World::getWorld()->isFogEnabled())
+            const Track * const track = Track::getCurrentTrack();
+            if (track && track->isFogEnabled())
             {
                 Shaders::TransparentFogShader::getInstance()->use();
                 for (unsigned i = 0; i < GLmeshes.size(); i++)
@@ -523,19 +524,17 @@ void STKMeshSceneNode::render()
                     GLenum itype = mesh.IndexType;
                     size_t count = mesh.IndexCount;
 
-                    const Track * const track = World::getWorld()->getTrack();
-
                     // This function is only called once per frame - thus no need for setters.
                     const float fogmax = track->getFogMax();
                     const float startH = track->getFogStartHeight();
-                    const float endH = track->getFogEndHeight();
-                    const float start = track->getFogStart();
-                    const float end = track->getFogEnd();
+                    const float endH   = track->getFogEndHeight();
+                    const float start  = track->getFogStart();
+                    const float end    = track->getFogEnd();
                     const video::SColor tmpcol = track->getFogColor();
 
                     video::SColorf col(tmpcol.getRed() / 255.0f,
-                        tmpcol.getGreen() / 255.0f,
-                        tmpcol.getBlue() / 255.0f);
+                                       tmpcol.getGreen() / 255.0f,
+                                       tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
 #if !defined(USE_GLES2)

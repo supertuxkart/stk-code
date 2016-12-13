@@ -203,7 +203,7 @@ void ReplayRecorder::save()
     std::string time = StringUtils::toString(min_time);
     std::replace(time.begin(), time.end(), '.', '_');
     std::ostringstream oss;
-    oss << world->getTrack()->getIdent() << "_" << year << month << day
+    oss << Track::getCurrentTrack()->getIdent() << "_" << year << month << day
         << "_" << num_karts << "_" << time << ".replay";
     m_filename = oss.str();
 
@@ -230,7 +230,7 @@ void ReplayRecorder::save()
     fprintf(fd, "kart_list_end\n");
     fprintf(fd, "reverse: %d\n",    (int)race_manager->getReverseTrack());
     fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
-    fprintf(fd, "track: %s\n",      world->getTrack()->getIdent().c_str());
+    fprintf(fd, "track: %s\n",      Track::getCurrentTrack()->getIdent().c_str());
     fprintf(fd, "laps: %d\n",       race_manager->getNumLaps());
     fprintf(fd, "min_time: %f\n",   min_time);
 

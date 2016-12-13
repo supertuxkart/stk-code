@@ -18,7 +18,6 @@
 
 #include "tracks/terrain_info.hpp"
 
-#include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -58,11 +57,11 @@ void TerrainInfo::update(const Vec3 &from)
     btVector3 to(from);
     to.setY(-10000.0f);
 
-    const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+    const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();
     tm.castRay(from, to, &m_hit_point, &m_material, &m_normal,
                /*interpolate*/false);
     // Now also raycast against all track objects (that are driveable).
-    World::getWorld()->getTrack()->getTrackObjectManager()
+    Track::getCurrentTrack()->getTrackObjectManager()
                      ->castRay(from, to, &m_hit_point, &m_material,
                                &m_normal, /*interpolate*/false);
 }   // update
@@ -83,15 +82,15 @@ void TerrainInfo::update(const btMatrix3x3 &rotation, const Vec3 &from)
     btVector3 to(0, -10000.0f, 0);
     to = from + rotation*to;
 
-    const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+    const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();
     tm.castRay(from, to, &m_hit_point, &m_material, &m_normal,
                /*interpolate*/true);
     // Now also raycast against all track objects (that are driveable). If
     // there should be a closer result (than the one against the main track 
     // mesh), its data will be returned.
-    World::getWorld()->getTrack()->getTrackObjectManager()
-                     ->castRay(from, to, &m_hit_point, &m_material,
-                               &m_normal, /*interpolate*/true);
+    Track::getCurrentTrack()->getTrackObjectManager()
+                            ->castRay(from, to, &m_hit_point, &m_material,
+                                      &m_normal, /*interpolate*/true);
 }   // update
 //-----------------------------------------------------------------------------
 /** Update the terrain information based on the latest position.
@@ -103,7 +102,7 @@ void TerrainInfo::update(const Vec3 &from, const Vec3 &towards)
     Vec3 direction = towards.normalized();
     btVector3 to = from + 10000.0f*direction;
 
-    const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+    const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();
     tm.castRay(from, to, &m_hit_point, &m_material, &m_normal);
 }   // update
 
@@ -120,7 +119,7 @@ bool TerrainInfo::getSurfaceInfo(const Vec3 &from, Vec3 *position,
                                  const Material **material)
 {
     Vec3 to=from+Vec3(0, 10000, 0);
-    const TriangleMesh &tm = World::getWorld()->getTrack()->getGFXEffectMesh();
+    const TriangleMesh &tm = Track::getCurrentTrack()->getGFXEffectMesh();
     return tm.castRay(from, to, position, material);
 }   // getSurfaceInfo
 

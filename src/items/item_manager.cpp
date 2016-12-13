@@ -30,7 +30,6 @@
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
-#include "modes/linear_world.hpp"
 #include "network/network_config.hpp"
 #include "network/race_event_manager.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -577,8 +576,7 @@ bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
         const Material* m;
         Vec3 normal;
         Vec3 hit_point;
-        const TriangleMesh& tm =
-            World::getWorld()->getTrack()->getTriangleMesh();
+        const TriangleMesh& tm = Track::getCurrentTrack()->getTriangleMesh();
         bool success = tm.castRay(loc, an->getCenter() + (-10000*quad_normal),
             &hit_point, &m, &normal);
 

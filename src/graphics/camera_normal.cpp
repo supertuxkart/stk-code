@@ -19,12 +19,12 @@
 
 #include "graphics/camera_normal.hpp"
 
+#include "config/stk_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
-#include "modes/world.hpp"
 #include "tracks/track.hpp"
 
 // ============================================================================
@@ -41,7 +41,7 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
             : Camera(type, camera_index, kart)
 {
     m_distance = kart ? kart->getKartProperties()->getCameraDistance() : 1000.0f;
-    m_ambient_light = World::getWorld()->getTrack()->getDefaultAmbientColor();
+    m_ambient_light = Track::getCurrentTrack()->getDefaultAmbientColor();
     m_smooth_dt = 0.0f;
 
     // TODO: Put these values into a config file

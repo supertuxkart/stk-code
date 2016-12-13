@@ -1743,7 +1743,7 @@ void SkiddingAI::handleNitroAndZipper()
         {
             float diff = DriveGraph::get()->getDistanceFromStart(last)
                        - DriveGraph::get()->getDistanceFromStart(m_track_node);
-            if(diff<0) diff+=World::getWorld()->getTrack()->getTrackLength();
+            if (diff < 0) diff += Track::getCurrentTrack()->getTrackLength();
             if(diff>m_ai_properties->m_straight_length_for_zipper)
                 m_controls->setFire(true);
         }

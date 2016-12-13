@@ -72,7 +72,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
     m_full_sound   = SFXManager::get()->createSoundSource("energy_bar_full");
 
     // Attach Particle System
-    Track *track = World::getWorld()->getTrack();
+    Track *track = Track::getCurrentTrack();
 #ifndef SERVER_ONLY
     if (UserConfigParams::m_weather_effects &&
         track->getSkyParticles() != NULL)

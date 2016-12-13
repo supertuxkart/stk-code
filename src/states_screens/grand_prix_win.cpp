@@ -292,9 +292,10 @@ void GrandPrixWin::onUpdate(float dt)
 
 void GrandPrixWin::setKarts(const std::string idents_arg[3])
 {
-    TrackObjectManager* tobjman = World::getWorld()->getTrack()->getTrackObjectManager();
+    TrackObjectManager* tobjman = Track::getCurrentTrack()->getTrackObjectManager();
 
-    // reorder in "podium order" (i.e. second player to the left, first player in the middle, last at the right)
+    // reorder in "podium order" (i.e. second player to the left, first player
+    // in the middle, last at the right)
     std::string idents[3];
     idents[0] = idents_arg[1];
     idents[1] = idents_arg[0];
