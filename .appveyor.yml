@@ -2,6 +2,7 @@ environment:
     DEPS_DIR: c:\\projects\dependencies
     ASSETS_DIR: c:\\projects\stk-assets
     APPVEYOR_CACHE_ENTRY_ZIP_ARGS: -t7z -m0=lzma2 -mx=9
+    IRC_NOTIFY_SCRIPT: c:\\projects\stk-code\tools\appveyor-irc-notify.py
 
 os: Visual Studio 2015
 clone_depth: 1
@@ -55,3 +56,10 @@ before_build:
 build:
     parallel: true
     project: build\ALL_BUILD.vcxproj
+
+
+on_success:
+    - "python %IRC_NOTIFY_SCRIPT% supertuxkart [{author}:{branch}] {short_commit}: {message} {color_green}Succeeded,Details: {build_url},Commit: {commit_url}"
+
+on_failure:
+    - "python %IRC_NOTIFY_SCRIPT% supertuxkart [{author}:{branch}] {short_commit}: {message} {color_red}Failed,Details: {build_url},Commit: {commit_url}"
