@@ -552,7 +552,7 @@ public:
     // ------------------------------------------------------------------------
     bool getWeatherLightning() {return m_weather_lightning;}
     // ------------------------------------------------------------------------
-    std::string getWeatherSound() {return m_weather_sound;}
+    const std::string& getWeatherSound() {return m_weather_sound;}
     // ------------------------------------------------------------------------
     ParticleKind* getSkyParticles         () { return m_sky_particles; }
     // ------------------------------------------------------------------------

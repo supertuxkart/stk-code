@@ -1435,7 +1435,6 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
-    World *world = World::getWorld();
     Physics *physics = Physics::getInstance();
 
     if (isRace && UserConfigParams::m_dof && (physics == NULL || !physics->isDebug()))
@@ -1564,14 +1563,10 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Lightning", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTNING));
-        if (World::getWorld() != NULL)
+        Weather* weather = Weather::getInstance();
+        if ( weather && weather->shouldLightning() )
         {
-            Weather* m_weather = World::getWorld()->getWeather();
-
-            if (m_weather != NULL && m_weather->shouldLightning())
-            {
-                renderLightning(m_weather->getIntensity());
-            }
+            renderLightning(weather->getIntensity());
         }
         PROFILER_POP_CPU_MARKER();
     }

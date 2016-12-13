@@ -160,10 +160,6 @@ protected:
     /** Set when the world is online and counts network players. */
     bool m_is_network_world;
     
-    /** Used to show weather graphical effects. */
-    Weather* m_weather;
-
-
     virtual void  onGo() OVERRIDE;
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool  isRaceOver() = 0;
@@ -333,8 +329,6 @@ public:
 
     bool isNetworkWorld() const { return m_is_network_world; }
     
-    /** Returns a pointer to the weather. */
-    Weather* getWeather() {return m_weather;}
 };   // World
 
 #endif

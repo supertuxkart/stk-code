@@ -130,7 +130,6 @@ World::World() : WorldStatus()
     m_self_destruct      = false;
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
-    m_weather            = NULL;
 
     m_stop_music_when_dialog_open = true;
 
@@ -234,8 +233,7 @@ void World::init()
 
     if (UserConfigParams::m_weather_effects)
     {
-        m_weather = new Weather(track->getWeatherLightning(),
-                                track->getWeatherSound());
+        Weather::getInstance<Weather>();   // create Weather instance
     }
 }   // init
 
@@ -456,8 +454,7 @@ World::~World()
         delete m_race_gui;
     }
     
-    if (m_weather != NULL)
-        delete m_weather;
+    Weather::kill();
 
     for ( unsigned int i = 0 ; i < m_karts.size() ; i++ )
     {
@@ -1007,9 +1004,9 @@ void World::update(float dt)
     }
 
     PROFILER_PUSH_CPU_MARKER("World::update (weather)", 0x80, 0x7F, 0x00);
-    if (UserConfigParams::m_graphical_effects && m_weather)
+    if (UserConfigParams::m_graphical_effects && Weather::getInstance())
     {
-        m_weather->update(dt);
+        Weather::getInstance()->update(dt);
     }
     PROFILER_POP_CPU_MARKER();
 
