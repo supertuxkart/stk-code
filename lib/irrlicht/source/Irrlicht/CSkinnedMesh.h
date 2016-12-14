@@ -114,7 +114,7 @@ namespace scene
 		virtual void setInterpolationMode(E_INTERPOLATION_MODE mode);
 
 		//! Convertes the mesh to contain tangent information
-		virtual void convertMeshToTangents();
+		virtual void convertMeshToTangents(bool(*predicate)(IMeshBuffer*));
 
 		//! Does the mesh have no animation
 		virtual bool isStatic();
@@ -176,6 +176,8 @@ namespace scene
 		u32 getTotalJoints() const { return m_total_joints; }
 
 private:
+		void toStaticPose();
+
 		void checkForAnimation();
 
 		void normalizeWeights();

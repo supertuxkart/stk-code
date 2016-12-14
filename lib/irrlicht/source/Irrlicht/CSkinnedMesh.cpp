@@ -9,6 +9,7 @@
 #include "CBoneSceneNode.h"
 #include "IAnimatedMeshSceneNode.h"
 #include "os.h"
+#include "irrMap.h"
 
 namespace irr
 {
@@ -751,28 +752,28 @@ bool CSkinnedMesh::setHardwareSkinning(bool on)
 	if (HardwareSkinning!=on)
 	{
 		if (on)
-		{
-
-			//set mesh to static pose...
-			for (u32 i=0; i<AllJoints.size(); ++i)
-			{
-				SJoint *joint=AllJoints[i];
-				for (u32 j=0; j<joint->Weights.size(); ++j)
-				{
-					const u16 buffer_id=joint->Weights[j].buffer_id;
-					const u32 vertex_id=joint->Weights[j].vertex_id;
-					LocalBuffers[buffer_id]->getVertex(vertex_id)->Pos = joint->Weights[j].StaticPos;
-					LocalBuffers[buffer_id]->getVertex(vertex_id)->Normal = joint->Weights[j].StaticNormal;
-					LocalBuffers[buffer_id]->boundingBoxNeedsRecalculated();
-				}
-			}
-		}
+			toStaticPose();
 
 		HardwareSkinning=on;
 	}
 	return HardwareSkinning;
 }
 
+void CSkinnedMesh::toStaticPose()
+{
+	for (u32 i=0; i<AllJoints.size(); ++i)
+	{
+		SJoint *joint=AllJoints[i];
+		for (u32 j=0; j<joint->Weights.size(); ++j)
+		{
+			const u16 buffer_id=joint->Weights[j].buffer_id;
+			const u32 vertex_id=joint->Weights[j].vertex_id;
+			LocalBuffers[buffer_id]->getVertex(vertex_id)->Pos = joint->Weights[j].StaticPos;
+			LocalBuffers[buffer_id]->getVertex(vertex_id)->Normal = joint->Weights[j].StaticNormal;
+			LocalBuffers[buffer_id]->boundingBoxNeedsRecalculated();
+		}
+	}
+}
 
 void CSkinnedMesh::calculateGlobalMatrices(SJoint *joint,SJoint *parentJoint)
 {
@@ -1491,25 +1492,51 @@ void CSkinnedMesh::computeWeightInfluence(SJoint *joint, size_t &index, WeightIn
 		computeWeightInfluence(joint->Children[j], index, wi);
 }
 
-void CSkinnedMesh::convertMeshToTangents()
+void CSkinnedMesh::convertMeshToTangents(bool(*predicate)(IMeshBuffer*))
 {
-	// now calculate tangents
-	for (u32 b=0; b < LocalBuffers.size(); ++b)
+	bool recalculate_animation = false;
+	toStaticPose();
+	for (u32 b = 0; b < LocalBuffers.size(); b++)
 	{
-		if (LocalBuffers[b])
+		bool recalculate_joints = false;
+		core::map<u32, u32> vert_loc_map;
+		SSkinMeshBuffer* ssmb = LocalBuffers[b];
+		if (ssmb)
 		{
-			LocalBuffers[b]->convertToTangents();
+			if (!predicate(ssmb)) continue;
 
-			const s32 idxCnt = LocalBuffers[b]->getIndexCount();
-
-			u16* idx = LocalBuffers[b]->getIndices();
-			video::S3DVertexTangents* v =
-				(video::S3DVertexTangents*)LocalBuffers[b]->getVertices();
-
-			for (s32 i=0; i<idxCnt; i+=3)
+			recalculate_joints = true;
+			recalculate_animation = true;
+			core::map<video::S3DVertexTangents, u32> vert_map;
+			core::array<u16> tmp_indices;
+			for (u32 i = 0; i < ssmb->Indices.size(); i++)
+			{
+				u32 vert_location = 0;
+				const u32 cur_ver_loc = ssmb->Indices[i];
+				const video::S3DVertex& v_old = ssmb->Vertices_Standard[cur_ver_loc];
+				video::S3DVertexTangents v(v_old.Pos, v_old.Normal, v_old.Color, v_old.TCoords);
+				core::map<video::S3DVertexTangents, u32>::Node *n = vert_map.find(v);
+				if (n)
+				{
+					vert_location = n->getValue();
+				}
+				else
+				{
+					vert_location = ssmb->Vertices_Tangents.size();
+					ssmb->Vertices_Tangents.push_back(v);
+					vert_map.insert(v, vert_location);
+				}
+				vert_loc_map[cur_ver_loc] = vert_location;
+				tmp_indices.push_back(vert_location);
+			}
+			const s32 index_count = tmp_indices.size();
+			u16* idx = tmp_indices.pointer();
+			video::S3DVertexTangents* v = ssmb->Vertices_Tangents.pointer();
+			core::vector3df local_normal;
+			for (s32 i = 0; i < index_count; i += 3)
 			{
 				calculateTangents(
-					v[idx[i+0]].Normal,
+					local_normal,
 					v[idx[i+0]].Tangent,
 					v[idx[i+0]].Binormal,
 					v[idx[i+0]].Pos,
@@ -1520,7 +1547,7 @@ void CSkinnedMesh::convertMeshToTangents()
 					v[idx[i+2]].TCoords);
 
 				calculateTangents(
-					v[idx[i+1]].Normal,
+					local_normal,
 					v[idx[i+1]].Tangent,
 					v[idx[i+1]].Binormal,
 					v[idx[i+1]].Pos,
@@ -1531,7 +1558,7 @@ void CSkinnedMesh::convertMeshToTangents()
 					v[idx[i+0]].TCoords);
 
 				calculateTangents(
-					v[idx[i+2]].Normal,
+					local_normal,
 					v[idx[i+2]].Tangent,
 					v[idx[i+2]].Binormal,
 					v[idx[i+2]].Pos,
@@ -1541,10 +1568,37 @@ void CSkinnedMesh::convertMeshToTangents()
 					v[idx[i+0]].TCoords,
 					v[idx[i+1]].TCoords);
 			}
+			ssmb->Indices = tmp_indices;
+			ssmb->Vertices_Standard.clear();
+			ssmb->VertexType = video::EVT_TANGENTS;
+		}
+		if (recalculate_joints)
+		{
+			Vertices_Moved[b].set_used(ssmb->getVertexCount());
+			for (u32 i = 0; i < AllJoints.size(); i++)
+			{
+				SJoint *joint = AllJoints[i];
+				for (u32 j = 0; j <joint->Weights.size(); j++)
+				{
+					if (joint->Weights[j].buffer_id == b)
+					{
+						core::map<u32, u32>::Node *n =
+							vert_loc_map.find(joint->Weights[j].vertex_id);
+						if (n)
+						{
+							joint->Weights[j].vertex_id = n->getValue();
+						}
+					}
+				}
+			}
 		}
 	}
+	if (recalculate_animation)
+	{
+		PreparedForSkinning = false;
+		checkForAnimation();
+	}
 }
-
 
 void CSkinnedMesh::calculateTangents(
 	core::vector3df& normal,

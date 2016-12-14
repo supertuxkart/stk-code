@@ -151,7 +151,7 @@ public:
             glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(tp), (GLvoid*)24);
             glEnableVertexAttribArray(3);
             glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)28);
-            glEnableVertexAttribArray(3);
+            glEnableVertexAttribArray(4);
             glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)44);
             glEnableVertexAttribArray(5);
             glVertexAttribIPointer(5, 4, GL_INT, getVertexPitchFromType(tp), (GLvoid*)60);

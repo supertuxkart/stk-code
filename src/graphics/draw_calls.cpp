@@ -712,15 +712,20 @@ void DrawCalls::renderParticlesList() const
 void DrawCalls::drawIndirectSolidFirstPass() const
 {
     m_solid_cmd_buffer->bind();
-    m_solid_cmd_buffer->drawIndirectFirstPass<SkinnedSolid>();
-    m_solid_cmd_buffer->drawIndirectFirstPass<SkinnedAlphaRef>();
+
     m_solid_cmd_buffer->drawIndirectFirstPass<DefaultMaterial>();
     m_solid_cmd_buffer->drawIndirectFirstPass<AlphaRef>();
     m_solid_cmd_buffer->drawIndirectFirstPass<UnlitMat>();
     m_solid_cmd_buffer->drawIndirectFirstPass<SphereMap>();
     m_solid_cmd_buffer->drawIndirectFirstPass<GrassMat>(m_wind_dir);
     m_solid_cmd_buffer->drawIndirectFirstPass<DetailMat>();
-    m_solid_cmd_buffer->drawIndirectFirstPass<NormalMat>();  
+    m_solid_cmd_buffer->drawIndirectFirstPass<NormalMat>();
+
+    if (!CVS->supportsHardwareSkinning()) return;
+    m_solid_cmd_buffer->drawIndirectFirstPass<SkinnedSolid>();
+    m_solid_cmd_buffer->drawIndirectFirstPass<SkinnedAlphaRef>();
+    m_solid_cmd_buffer->drawIndirectFirstPass<SkinnedUnlitMat>();
+    m_solid_cmd_buffer->drawIndirectFirstPass<SkinnedNormalMat>();
 }
 
 // ----------------------------------------------------------------------------
@@ -730,15 +735,19 @@ void DrawCalls::drawIndirectSolidFirstPass() const
 void DrawCalls::multidrawSolidFirstPass() const
 {
     m_solid_cmd_buffer->bind();
-    m_solid_cmd_buffer->multidrawFirstPass<SkinnedSolid>();
-    m_solid_cmd_buffer->multidrawFirstPass<SkinnedAlphaRef>();
     m_solid_cmd_buffer->multidrawFirstPass<DefaultMaterial>();
     m_solid_cmd_buffer->multidrawFirstPass<AlphaRef>();
     m_solid_cmd_buffer->multidrawFirstPass<SphereMap>();
     m_solid_cmd_buffer->multidrawFirstPass<UnlitMat>();
     m_solid_cmd_buffer->multidrawFirstPass<GrassMat>(m_wind_dir);
     m_solid_cmd_buffer->multidrawFirstPass<NormalMat>();
-    m_solid_cmd_buffer->multidrawFirstPass<DetailMat>();  
+    m_solid_cmd_buffer->multidrawFirstPass<DetailMat>();
+
+    if (!CVS->supportsHardwareSkinning()) return;
+    m_solid_cmd_buffer->multidrawFirstPass<SkinnedSolid>();
+    m_solid_cmd_buffer->multidrawFirstPass<SkinnedAlphaRef>();
+    m_solid_cmd_buffer->multidrawFirstPass<SkinnedUnlitMat>();
+    m_solid_cmd_buffer->multidrawFirstPass<SkinnedNormalMat>();
 }
 
 // ----------------------------------------------------------------------------
@@ -751,8 +760,6 @@ void DrawCalls::multidrawSolidFirstPass() const
 void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled_tex) const
 {
     m_solid_cmd_buffer->bind();
-    m_solid_cmd_buffer->drawIndirectSecondPass<SkinnedSolid>(prefilled_tex);
-    m_solid_cmd_buffer->drawIndirectSecondPass<SkinnedAlphaRef>(prefilled_tex);
     m_solid_cmd_buffer->drawIndirectSecondPass<DefaultMaterial>(prefilled_tex);
     m_solid_cmd_buffer->drawIndirectSecondPass<AlphaRef>(prefilled_tex);
     m_solid_cmd_buffer->drawIndirectSecondPass<UnlitMat>(prefilled_tex);
@@ -760,6 +767,12 @@ void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled
     m_solid_cmd_buffer->drawIndirectSecondPass<GrassMat>(prefilled_tex, m_wind_dir);
     m_solid_cmd_buffer->drawIndirectSecondPass<DetailMat>(prefilled_tex);
     m_solid_cmd_buffer->drawIndirectSecondPass<NormalMat>(prefilled_tex);
+
+    if (!CVS->supportsHardwareSkinning()) return;
+    m_solid_cmd_buffer->drawIndirectSecondPass<SkinnedSolid>(prefilled_tex);
+    m_solid_cmd_buffer->drawIndirectSecondPass<SkinnedAlphaRef>(prefilled_tex);
+    m_solid_cmd_buffer->drawIndirectSecondPass<SkinnedUnlitMat>(prefilled_tex);
+    m_solid_cmd_buffer->drawIndirectSecondPass<SkinnedNormalMat>(prefilled_tex);
 }
 
 // ----------------------------------------------------------------------------
@@ -771,8 +784,6 @@ void DrawCalls::drawIndirectSolidSecondPass(const std::vector<GLuint> &prefilled
 void DrawCalls::multidrawSolidSecondPass(const std::vector<uint64_t> &handles) const
 {
     m_solid_cmd_buffer->bind();
-    m_solid_cmd_buffer->multidraw2ndPass<SkinnedSolid>(handles);
-    m_solid_cmd_buffer->multidraw2ndPass<SkinnedAlphaRef>(handles);
     m_solid_cmd_buffer->multidraw2ndPass<DefaultMaterial>(handles);
     m_solid_cmd_buffer->multidraw2ndPass<AlphaRef>(handles);
     m_solid_cmd_buffer->multidraw2ndPass<SphereMap>(handles);
@@ -780,6 +791,12 @@ void DrawCalls::multidrawSolidSecondPass(const std::vector<uint64_t> &handles) c
     m_solid_cmd_buffer->multidraw2ndPass<NormalMat>(handles);
     m_solid_cmd_buffer->multidraw2ndPass<DetailMat>(handles);
     m_solid_cmd_buffer->multidraw2ndPass<GrassMat>(handles, m_wind_dir);
+
+    if (!CVS->supportsHardwareSkinning()) return;
+    m_solid_cmd_buffer->multidraw2ndPass<SkinnedSolid>(handles);
+    m_solid_cmd_buffer->multidraw2ndPass<SkinnedAlphaRef>(handles);
+    m_solid_cmd_buffer->multidraw2ndPass<SkinnedUnlitMat>(handles);
+    m_solid_cmd_buffer->multidraw2ndPass<SkinnedNormalMat>(handles);
 }
 
 // ----------------------------------------------------------------------------
@@ -822,8 +839,6 @@ void DrawCalls::multidrawNormals() const
 void DrawCalls::drawIndirectShadows(unsigned cascade) const
 {
     m_shadow_cmd_buffer->bind();
-    m_shadow_cmd_buffer->drawIndirect<SkinnedSolid>(cascade);
-    m_shadow_cmd_buffer->drawIndirect<SkinnedAlphaRef>(cascade);
     m_shadow_cmd_buffer->drawIndirect<DefaultMaterial>(cascade);
     m_shadow_cmd_buffer->drawIndirect<DetailMat>(cascade);
     m_shadow_cmd_buffer->drawIndirect<AlphaRef>(cascade);
@@ -832,6 +847,12 @@ void DrawCalls::drawIndirectShadows(unsigned cascade) const
     m_shadow_cmd_buffer->drawIndirect<NormalMat>(cascade);
     m_shadow_cmd_buffer->drawIndirect<SplattingMat>(cascade);
     m_shadow_cmd_buffer->drawIndirect<SphereMap>(cascade);
+
+    if (!CVS->supportsHardwareSkinning()) return;
+    m_shadow_cmd_buffer->drawIndirect<SkinnedSolid>(cascade);
+    m_shadow_cmd_buffer->drawIndirect<SkinnedAlphaRef>(cascade);
+    m_shadow_cmd_buffer->drawIndirect<SkinnedUnlitMat>(cascade);
+    m_shadow_cmd_buffer->drawIndirect<SkinnedNormalMat>(cascade);
 }
 
 // ----------------------------------------------------------------------------
@@ -842,8 +863,6 @@ void DrawCalls::drawIndirectShadows(unsigned cascade) const
 void DrawCalls::multidrawShadows(unsigned cascade) const
 {
     m_shadow_cmd_buffer->bind();
-    m_shadow_cmd_buffer->multidrawShadow<SkinnedSolid>(cascade);
-    m_shadow_cmd_buffer->multidrawShadow<SkinnedAlphaRef>(cascade);
     m_shadow_cmd_buffer->multidrawShadow<DefaultMaterial>(cascade);
     m_shadow_cmd_buffer->multidrawShadow<DetailMat>(cascade);
     m_shadow_cmd_buffer->multidrawShadow<NormalMat>(cascade);
@@ -852,6 +871,12 @@ void DrawCalls::multidrawShadows(unsigned cascade) const
     m_shadow_cmd_buffer->multidrawShadow<GrassMat,irr::core::vector3df>(cascade, m_wind_dir); 
     m_shadow_cmd_buffer->multidrawShadow<SplattingMat>(cascade);
     m_shadow_cmd_buffer->multidrawShadow<SphereMap>(cascade);
+
+    if (!CVS->supportsHardwareSkinning()) return;
+    m_shadow_cmd_buffer->multidrawShadow<SkinnedSolid>(cascade);
+    m_shadow_cmd_buffer->multidrawShadow<SkinnedAlphaRef>(cascade);
+    m_shadow_cmd_buffer->multidrawShadow<SkinnedUnlitMat>(cascade);
+    m_shadow_cmd_buffer->multidrawShadow<SkinnedNormalMat>(cascade);
 }
 
 // ----------------------------------------------------------------------------

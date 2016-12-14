@@ -73,7 +73,7 @@ namespace scene
 
 		//! converts the vertex type of all meshbuffers to tangents.
 		/** E.g. used for bump mapping. */
-		virtual void convertMeshToTangents() = 0;
+		virtual void convertMeshToTangents(bool(*predicate)(IMeshBuffer*)) = 0;
 
 		//! Allows to enable hardware skinning.
 		/* This feature is not implementated in Irrlicht yet */
