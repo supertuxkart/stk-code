@@ -39,6 +39,7 @@
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/game_protocol.hpp"
+#include "network/rewind_manager.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -143,9 +144,10 @@ void LocalPlayerController::action(PlayerAction action, int value)
 {
     PlayerController::action(action, value);
 
-    // If this is a client, send the action to the server
+    // If this is a client, send the action to networking layer
     if (World::getWorld()->isNetworkWorld() && 
-        NetworkConfig::get()->isClient()       )
+        NetworkConfig::get()->isClient()    &&
+        !RewindManager::get()->isRewinding()   )
     {
         GameProtocol::getInstance()->controllerAction(m_kart->getWorldKartId(),
                                                       action, value);

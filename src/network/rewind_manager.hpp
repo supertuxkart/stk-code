@@ -93,6 +93,9 @@ private:
 
     AllRewindInfo m_rewind_info;
 
+    /** Index of the next event to be used when playing events. */
+    unsigned int m_next_event;
+
     /** Overall amount of memory allocated by states. */
     unsigned int m_overall_state_size;
 
@@ -110,9 +113,6 @@ private:
      *  if e.g. states are saved before world time is increased, other
      *  events later. */
     float m_current_time;
-
-    /** The current time step size. */
-    float m_time_step;
 
 #define REWIND_SEARCH_STATS
 
@@ -134,33 +134,13 @@ public:
     static RewindManager *create();
     static void destroy();
     // ------------------------------------------------------------------------
-    /** Sets the time that is to be used for all further states or events,
-     *  and the time step size. This is necessary so that states/events before 
-     *  and after World::m_time is increased have the same time stamp. 
-     *  \param t Time.
-     *  \param dt Time step size.
-     */
-    void setCurrentTime(float t, float dt)
-    {
-        m_current_time = t;
-        m_time_step    = dt;
-    }   // setCurrentTime
-
-    // ------------------------------------------------------------------------
-    /** Returns the current time. */
-    float getCurrentTime() const { return m_current_time; }
-    // ------------------------------------------------------------------------
-    float getCurrentTimeStep() const { return m_time_step; }
-    // ------------------------------------------------------------------------
     /** En- or disables rewinding. */
-    static void setEnable(bool m) { m_enable_rewind_manager = m;}
-
+    static void setEnable(bool m) { m_enable_rewind_manager = m; }
     // ------------------------------------------------------------------------
     /** Returns if rewinding is enabled or not. */
     static bool isEnabled() { return m_enable_rewind_manager; }
-        
     // ------------------------------------------------------------------------
-    /** Returns the singleton. This function will not automatically create 
+    /** Returns the singleton. This function will not automatically create
      *  the singleton. */
     static RewindManager *get()
     {
@@ -168,12 +148,30 @@ public:
         return m_rewind_manager;
     }   // get
 
-    // ------------------------------------------------------------------------
+    // Non-static functtion declarations:
 
     void reset();
     void saveStates();
     void rewindTo(float target_time);
-    void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer);
+    void playEventsTill(float time);
+    void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
+                  bool confirmed, float time = -1.0f);
+    // ------------------------------------------------------------------------
+    /** Sets the time that is to be used for all further states or events,
+     *  and the time step size. This is necessary so that states/events before 
+     *  and after World::m_time is increased have the same time stamp. 
+     *  \param t Time.
+     *  \param dt Time step size.
+     */
+    void setCurrentTime(float t)
+    {
+        m_current_time = t;
+    }   // setCurrentTime
+
+    // ------------------------------------------------------------------------
+    /** Returns the current time. */
+    float getCurrentTime() const { return m_current_time; }
+        
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 

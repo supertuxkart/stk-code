@@ -191,7 +191,7 @@ void Attachment::set(AttachmentType type, float time,
     {
         BareNetworkString *buffer = new BareNetworkString(2);
         saveState(buffer);
-        rwm->addEvent(this, buffer);
+        rwm->addEvent(this, buffer, /*confirmed*/true);
     }
 #endif
 }   // set

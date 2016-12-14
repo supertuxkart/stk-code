@@ -19,6 +19,7 @@
 #ifndef GAME_PROTOCOL_HPP
 #define GAME_PROTOCOL_HPP
 
+#include "network/event_rewinder.hpp"
 #include "network/protocol.hpp"
 
 #include "input/input.hpp"                // for PlayerAction
@@ -27,10 +28,11 @@
 
 #include <vector>
 
+class BareNetworkString;
 class NetworkString;
 
-
 class GameProtocol : public Protocol
+                   , public EventRewinder
                    , public Singleton<GameProtocol>
 {
 private:
@@ -59,13 +61,16 @@ public:
 
     virtual bool notifyEventAsynchronous(Event* event) OVERRIDE;
     virtual void update(float dt) OVERRIDE;
+
     void controllerAction(int kart_id, PlayerAction action,
                           int value);
+    virtual void undo(BareNetworkString *buffer) OVERRIDE;
+    virtual void rewind(BareNetworkString *buffer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void setup() OVERRIDE {};
     // ------------------------------------------------------------------------
     virtual void asynchronousUpdate() OVERRIDE {}
-    
+
 };   // class GameProtocol
 
 #endif // GAME_PROTOCOL_HPP

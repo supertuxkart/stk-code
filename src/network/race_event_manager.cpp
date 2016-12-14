@@ -6,6 +6,7 @@
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/game_events_protocol.hpp"
+#include "network/rewind_manager.hpp"
 
 
 RaceEventManager::RaceEventManager()
@@ -28,6 +29,9 @@ void RaceEventManager::update(float dt)
     // shut down, but still events to process.
     if(!ProtocolManager::getInstance())
         return;
+
+    // Replay all recorded events up to the current time:
+    RewindManager::get()->playEventsTill(World::getWorld()->getTime());
 
     World::getWorld()->updateWorld(dt);
 

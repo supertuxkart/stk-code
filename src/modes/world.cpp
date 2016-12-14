@@ -1022,7 +1022,7 @@ void World::update(float dt)
 void World::updateTime(const float dt)
 {
     WorldStatus::updateTime(dt);
-    RewindManager::get()->setCurrentTime(getTime(), dt);
+    RewindManager::get()->setCurrentTime(getTime());
 }   // updateTime
 
 // ----------------------------------------------------------------------------

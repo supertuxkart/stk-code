@@ -75,7 +75,7 @@ void KartControl::setSteer(float f)
         // Save full status
         BareNetworkString *buffer = new BareNetworkString(getLength());
         copyToBuffer(buffer);
-        RewindManager::get()->addEvent(this, buffer);
+        RewindManager::get()->addEvent(this, buffer, true);
     }
 }   // setSteer
 
@@ -90,7 +90,7 @@ void KartControl::setAccel(float f)
     {
         BareNetworkString *buffer = new BareNetworkString(getLength());
         copyToBuffer(buffer);
-        RewindManager::get()->addEvent(this, buffer);
+        RewindManager::get()->addEvent(this, buffer, true);
     }
 }   // setAccel
 
@@ -106,7 +106,7 @@ void KartControl::setBrake(bool b)
         // Only store the buttons in this case
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
-        RewindManager::get()->addEvent(this, buffer);
+        RewindManager::get()->addEvent(this, buffer, true);
     }
 }   // setBrake
 // ----------------------------------------------------------------------------
@@ -120,7 +120,7 @@ void KartControl::setNitro(bool b)
     {
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
-        RewindManager::get()->addEvent(this, buffer);
+        RewindManager::get()->addEvent(this, buffer, true);
     }
 }   // setNitro
 
@@ -135,7 +135,7 @@ void KartControl::setSkidControl(SkidControl sc)
     {
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
-        RewindManager::get()->addEvent(this, buffer);
+        RewindManager::get()->addEvent(this, buffer, true);
     }
 }   // seSkidControl
 
@@ -150,7 +150,7 @@ void KartControl::setRescue(bool b)
     {
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
-        RewindManager::get()->addEvent(this, buffer);
+        RewindManager::get()->addEvent(this, buffer, true);
     }
 }   // setRescue
 
@@ -165,7 +165,7 @@ void KartControl::setFire(bool b)
     {
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
-        RewindManager::get()->addEvent(this, buffer);
+        RewindManager::get()->addEvent(this, buffer, true);
     }
 }   // setFire
 
@@ -180,6 +180,6 @@ void KartControl::setLookBack(bool b)
     {
         BareNetworkString *buffer = new BareNetworkString(1);
         buffer->addUInt8(getButtonsCompressed());
-        RewindManager::get()->addEvent(this, buffer);
+        RewindManager::get()->addEvent(this, buffer, true);
     }
 }   // setLookBack

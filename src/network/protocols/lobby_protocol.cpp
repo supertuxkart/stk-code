@@ -28,6 +28,7 @@
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/protocols/latency_protocol.hpp"
 #include "network/race_event_manager.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
@@ -56,6 +57,7 @@ LobbyProtocol::~LobbyProtocol()
 void LobbyProtocol::loadWorld()
 {
     Log::info("LobbyProtocol", "Ready !");
+    RewindManager::setEnable(true);
 
     // Race startup sequence
     // ---------------------

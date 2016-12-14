@@ -19,7 +19,7 @@
 
 #include "modes/world.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/controller/controller.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
@@ -27,6 +27,7 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
@@ -56,14 +57,14 @@ bool GameProtocol::notifyEventAsynchronous(Event* event)
     {
         float        time    = data.getFloat();
         uint8_t      kart_id = data.getUInt8();
+        assert(kart_id < World::getWorld()->getNumKarts());
         PlayerAction action  = (PlayerAction)(data.getUInt8());
         int          value   = data.getUInt32();
         Log::info("GameProtocol", "Action at %f: %d %d %d",
                   time, kart_id, action, value);
-        assert(kart_id < World::getWorld()->getNumKarts());
-        Controller *controller = World::getWorld()->getKart(kart_id)
-                               ->getController();
-        controller->action(action, value);
+        BareNetworkString *s = new BareNetworkString(3);
+        s->addUInt8(kart_id).addUInt8(action).addUInt16(value);
+        RewindManager::get()->addEvent(this, s, /*confirmed*/ true, time);
     }
 
     if (data.size() > 0 )
@@ -107,8 +108,8 @@ void GameProtocol::update(float dt)
 
 //-----------------------------------------------------------------------------
 /** Called from the local kart controller when an action (like steering,
- *  acceleration, ...) was triggered. It compresses the current kart control
- *  state and sends a message with the new info to the server.
+ *  acceleration, ...) was triggered. It sends a message with the new info
+ *  to the server and informs the rewind manager to store the event.
  *  \param Kart id that triggered the action.
  *  \param action Which action was triggered.
  *  \param value New value for the given action.
@@ -116,6 +117,8 @@ void GameProtocol::update(float dt)
 void GameProtocol::controllerAction(int kart_id, PlayerAction action,
                                     int value)
 {
+    // Store the action in the list of actions that will be sent to the
+    // server next.
     assert(NetworkConfig::get()->isClient());
     Action a;
     a.m_kart_id = kart_id;
@@ -125,6 +128,36 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
 
     m_all_actions.push_back(a);
 
-    
-    Log::info("GameProtocol", "Action %d value %d", action, value);
+    // Store the event in the rewind manager, which is responsible
+    // for freeing the allocated memory
+    BareNetworkString *s = new BareNetworkString(4);
+    s->addUInt8(kart_id).addUInt8(action).addUInt16(uint16_t(value));
+    RewindManager::get()->addEvent(this, s, /*confirmed*/true,
+                                   World::getWorld()->getTime() );
+
+    Log::info("GameProtocol", "Action at %f: %d value %d",
+              World::getWorld()->getTime(), action, value);
 }   // controllerAction
+
+// ----------------------------------------------------------------------------
+/** Called from the RewindManager when rolling back.
+ *  \param buffer Pointer to the saved state information.
+ */
+void GameProtocol::undo(BareNetworkString *buffer)
+{
+
+}   // undo
+
+// ----------------------------------------------------------------------------
+/** Called from the RewindManager after a rollback to replay the stored
+ *  events.
+ *  \param buffer Pointer to the saved state information.
+ */
+void GameProtocol::rewind(BareNetworkString *buffer)
+{
+    int kart_id = buffer->getUInt8();
+    PlayerAction action = PlayerAction(buffer->getUInt8());
+    int value = buffer->getUInt16();
+    Controller *c = World::getWorld()->getKart(kart_id)->getController();
+    c->action(action, value);
+}   // rewind

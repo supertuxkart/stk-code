@@ -83,6 +83,7 @@ void RewindManager::reset()
     m_overall_state_size   = 0;
     m_state_frequency      = 0.1f;   // save 10 states a second
     m_last_saved_state     = -9999.9f;  // forces initial state save
+    m_next_event           = 0;
 
     if(!m_enable_rewind_manager) return;
 
@@ -108,6 +109,12 @@ void RewindManager::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
+/** Inserts a RewindInfo object in the list of all events at the correct time.
+ *  If there are several RewindInfo at the exact same time, state RewindInfo
+ *  will be insert at the front, and event and time info at the end of the
+ *  RewindInfo with the same time.
+ *  \param ri The RewindInfo object to insert.
+ */
 void RewindManager::insertRewindInfo(RewindInfo *ri)
 {
 #ifdef REWIND_SEARCH_STATS
@@ -211,7 +218,8 @@ unsigned int RewindManager::findFirstIndex(float target_time) const
  *  \param buffer Pointer to the event data. 
  */
 void RewindManager::addEvent(EventRewinder *event_rewinder,
-                             BareNetworkString *buffer)
+                             BareNetworkString *buffer, bool confirmed,
+                             float time                                   )
 {
     if(m_is_rewinding) 
     {
@@ -219,8 +227,11 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
         Log::error("RewindManager", "Adding event when rewinding");
         return;
     }
-    RewindInfo *ri = new RewindInfoEvent(getCurrentTime(), event_rewinder,
-                                         buffer, /*is confirmed*/true);
+    Log::verbose("time", "wolrd %f rewind %f", World::getWorld()->getTime(), getCurrentTime());
+    if (time < 0)
+        time = getCurrentTime();
+    RewindInfo *ri = new RewindInfoEvent(time, event_rewinder,
+                                         buffer, confirmed);
     insertRewindInfo(ri);
 }   // addEvent
 
@@ -269,6 +280,29 @@ void RewindManager::saveStates()
 
     m_last_saved_state = time;
 }   // saveStates
+
+// ----------------------------------------------------------------------------
+/** Replays all events from the last event played till the specified time.
+ *  \param time Up to (and inclusive) which time events will be replayed.
+ */
+void RewindManager::playEventsTill(float time)
+{
+    assert(!m_is_rewinding);
+    m_is_rewinding = true;
+    while (m_next_event < m_rewind_info.size())
+    {
+        RewindInfo *ri = m_rewind_info[m_next_event];
+        if (ri->getTime() > time)
+        {
+            m_is_rewinding = false;
+            return;
+        }
+        m_next_event++;
+        if(ri->isEvent())
+            ri->rewind();
+    }
+    m_is_rewinding = false;
+}   // playEventsTill
 
 // ----------------------------------------------------------------------------
 /** Rewinds to the specified time.
