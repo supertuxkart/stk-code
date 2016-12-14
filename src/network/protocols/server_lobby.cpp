@@ -123,6 +123,29 @@ void ServerLobby::setup()
 }   // setup
 
 //-----------------------------------------------------------------------------
+bool ServerLobby::notifyEvent(Event* event)
+{
+    assert(m_game_setup); // assert that the setup exists
+    if (event->getType() != EVENT_TYPE_MESSAGE)
+        return false;
+
+    NetworkString &data = event->data();
+    assert(data.size()); // message not empty
+    uint8_t message_type;
+    message_type = data.getUInt8();
+    Log::info("ServerLobby", "Synchronous message received with type %d.",
+              message_type);
+    switch (message_type)
+    {
+    case LE_REQUEST_BEGIN: startSelection(event); break;
+    default: Log::error("ServerLobby", "Unknown message type %d - ignored.",
+                        message_type);
+             break;
+    }   // switch message_type
+    return true;
+}   // notifyEvent
+
+//-----------------------------------------------------------------------------
 
 bool ServerLobby::notifyEventAsynchronous(Event* event)
 {
@@ -138,7 +161,6 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         switch(message_type)
         {
         case LE_CONNECTION_REQUESTED: connectionRequested(event); break;
-        case LE_REQUEST_BEGIN: startSelection(event);             break;
         case LE_KART_SELECTION: kartSelectionRequested(event);    break;
         case LE_CLIENT_LOADED_WORLD: finishedLoadingWorldClient(event); break;
         case LE_STARTED_RACE:  startedRaceOnClient(event);        break;
@@ -357,7 +379,9 @@ void ServerLobby::startSelection(const Event *event)
     }
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     NetworkString *ns = getNetworkString(1);
-    // start selection
+    // Start selection - must be synchronous since the receiver pushes
+    // a new screen, which must be donefrom the main thread.
+    ns->setSynchronous(true);
     ns->addUInt8(LE_START_SELECTION);
     sendMessageToPeersChangingToken(ns, /*reliable*/true);
     delete ns;

@@ -237,6 +237,7 @@ bool ClientLobby::notifyEvent(Event* event)
               message_type);
     switch(message_type)
     {
+        case LE_START_SELECTION:       startSelection(event);      break;
         case LE_KART_SELECTION_UPDATE: kartSelectionUpdate(event); break;
         case LE_LOAD_WORLD:            loadWorld();                break;
         case LE_RACE_FINISHED:         raceFinished(event);        break;
@@ -266,7 +267,6 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             case LE_NEW_PLAYER_CONNECTED: newPlayer(event);              break;
             case LE_PLAYER_DISCONNECTED : disconnectedPlayer(event);     break;
             case LE_START_RACE: startGame(event);                        break;
-            case LE_START_SELECTION: startSelection(event);              break;
             case LE_CONNECTION_REFUSED: connectionRefused(event);        break;
             case LE_CONNECTION_ACCEPTED: connectionAccepted(event);      break;
             case LE_KART_SELECTION_REFUSED: kartSelectionRefused(event); break;

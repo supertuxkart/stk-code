@@ -170,6 +170,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         {
             // Send a message to the server to start
             NetworkString start(PROTOCOL_LOBBY_ROOM);
+            start.setSynchronous(true);
             start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
             STKHost::get()->sendToServer(&start, true);
         }
