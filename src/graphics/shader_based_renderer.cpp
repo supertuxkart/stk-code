@@ -268,11 +268,12 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                                       bool hasShadow,
                                       bool forceRTT)
 {
-    if(CVS->isARBUniformBufferObjectUsable())
+    if (CVS->isARBUniformBufferObjectUsable())
     {
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
         glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
-        glBindBufferBase(GL_UNIFORM_BUFFER, 2, SharedGPUObjects::getSkinningUBO());
+        if (CVS->supportsHardwareSkinning())
+            glBindBufferBase(GL_UNIFORM_BUFFER, 2, SharedGPUObjects::getSkinningUBO());
     }
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 

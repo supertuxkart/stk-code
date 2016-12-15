@@ -26,8 +26,6 @@
 #include <map>
 #include <unordered_map>
 
-class RenderInfo;
-
 enum InstanceType
 {
     InstanceTypeThreeTex,

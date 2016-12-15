@@ -223,11 +223,12 @@ void SharedGPUObjects::init()
     initFrustrumVBO();
     initParticleQuadVBO();
     
-    if(CVS->isARBUniformBufferObjectUsable())
+    if (CVS->isARBUniformBufferObjectUsable())
     {
         initShadowVPMUBO();
         initLightingDataUBO();
-        initSkinningUBO();
+        if (CVS->supportsHardwareSkinning())
+            initSkinningUBO();
     }
 
     m_has_been_initialised = true;
