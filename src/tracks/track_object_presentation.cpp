@@ -203,7 +203,6 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
         }
         std::string lib_node_path = lib_path + "node.xml";
         std::string lib_script_file_path = lib_path + "scripting.as";
-        World* world = World::getWorld();
 
         if (local_lib_node_path.size() > 0 && file_manager->fileExists(local_lib_node_path))
         {

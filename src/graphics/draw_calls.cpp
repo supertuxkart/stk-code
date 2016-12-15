@@ -318,17 +318,33 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                 {
                     switch (Mat)
                     {
-                    case Material::SHADERTYPE_SOLID:
-                        ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
-                            (mesh->m_render_info && mesh->m_material ?
-                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
-                            core::vector2df(0.0f, 0.0f)));
-                        break;
                     case Material::SHADERTYPE_SOLID_SKINNED_MESH:
                         ListSkinnedSolid::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
                             (mesh->m_render_info && mesh->m_material ?
                             core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
                             core::vector2df(0.0f, 0.0f)), skinning_offset);
+                        break;
+                    case Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH:
+                        ListSkinnedAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)), skinning_offset);
+                        break;
+                    case Material::SHADERTYPE_SOLID_UNLIT_SKINNED_MESH:
+                        ListSkinnedUnlit::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            core::vector2df(0.0f, 0.0f), skinning_offset);
+                        break;
+                    case Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH:
+                        ListSkinnedNormalMap::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)), skinning_offset);
+                        break;
+                    case Material::SHADERTYPE_SOLID:
+                        ListMatDefault::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            (mesh->m_render_info && mesh->m_material ?
+                            core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
+                            core::vector2df(0.0f, 0.0f)));
                         break;
                     case Material::SHADERTYPE_ALPHA_TEST:
                         ListMatAlphaRef::getInstance()->SolidPass.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
@@ -399,6 +415,22 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                 {
                     switch (Mat)
                     {
+                    case Material::SHADERTYPE_SOLID_SKINNED_MESH:
+                        ListSkinnedSolid::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            core::vector2df(0.0f, 0.0f), skinning_offset);
+                        break;
+                    case Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH:
+                        ListSkinnedAlphaRef::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            core::vector2df(0.0f, 0.0f), skinning_offset);
+                        break;
+                    case Material::SHADERTYPE_SOLID_UNLIT_SKINNED_MESH:
+                        ListSkinnedUnlit::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            core::vector2df(0.0f, 0.0f), skinning_offset);
+                        break;
+                    case Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH:
+                        ListSkinnedNormalMap::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans,
+                            core::vector2df(0.0f, 0.0f), skinning_offset);
+                        break;
                     case Material::SHADERTYPE_SOLID:
                         ListMatDefault::getInstance()->Shadows[cascade].emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
@@ -468,6 +500,12 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                 {
                     switch (Mat)
                     {
+                    // Todo: RSMs
+                    case Material::SHADERTYPE_SOLID_SKINNED_MESH:
+                    case Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH:
+                    case Material::SHADERTYPE_SOLID_UNLIT_SKINNED_MESH:
+                    case Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH:
+                        break;
                     case Material::SHADERTYPE_SOLID:
                         ListMatDefault::getInstance()->RSM.emplace_back(mesh, ModelMatrix, InvModelMatrix, mesh->texture_trans, core::vector2df(0.0f, 0.0f));
                         break;
@@ -719,7 +757,6 @@ void DrawCalls::renderParticlesList() const
 void DrawCalls::drawIndirectSolidFirstPass() const
 {
     m_solid_cmd_buffer->bind();
-
     m_solid_cmd_buffer->drawIndirectFirstPass<DefaultMaterial>();
     m_solid_cmd_buffer->drawIndirectFirstPass<AlphaRef>();
     m_solid_cmd_buffer->drawIndirectFirstPass<UnlitMat>();
