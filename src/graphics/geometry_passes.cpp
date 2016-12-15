@@ -241,6 +241,14 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
     glBlendEquation(GL_FUNC_ADD);
     glEnable(GL_CULL_FACE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+    if (CVS->supportsHardwareSkinning())
+    {
+        renderTransparenPass<Shaders::SkinnedTransparentShader, video::EVT_SKINNED_MESH, 4, 3, 2, 1>(
+                             TexUnits(RenderGeometry::TexUnit(0, true)),
+                                      ListTranslucentSkinned::getInstance());
+    }
+
     renderTransparenPass<Shaders::TransparentShader, video::EVT_STANDARD, 3, 2, 1>(
                          TexUnits(RenderGeometry::TexUnit(0, true)),
                                   ListTranslucentStandard::getInstance());

@@ -39,6 +39,8 @@ void main(void)
     mat4 TransposeInverseModelView =  transpose(InverseModelMatrix * InverseViewMatrix);
     vec4 idle_position = vec4(Position, 1.);
     vec4 idle_normal = vec4(Normal, 0.);
+    vec4 idle_tangent = vec4(Data1.z, Data1.w, Data2.x, 0.);
+    vec4 idle_bitangent = vec4(Data2.y, Data2.z, Data2.w, 0.);
     vec4 skinned_position = vec4(0.);
     vec4 skinned_normal = vec4(0.);
     vec4 skinned_tangent = vec4(0.);

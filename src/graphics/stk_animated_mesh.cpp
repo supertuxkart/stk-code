@@ -188,23 +188,26 @@ void STKAnimatedMesh::updateNoGL()
                 continue;
             }
             GLMesh &mesh = GLmeshes[i];
+            video::E_VERTEX_TYPE vt = mb->getVertexType();
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
 
-            /*if (rnd->isTransparent())
+            if (rnd->isTransparent())
             {
-                TransparentMaterial TranspMat = getTransparentMaterialFromType(type, MaterialTypeParam, material);
+                TransparentMaterial TranspMat = getTransparentMaterialFromType(type, vt, MaterialTypeParam, material);
                 TransparentMesh[TranspMat].push_back(&mesh);
             }
             else if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent())
             {
-                if (mesh.VAOType == video::EVT_TANGENTS)
+                if (mesh.VAOType == video::EVT_SKINNED_MESH)
+                    TransparentMesh[TM_TRANSLUCENT_SKN].push_back(&mesh);
+                else if (mesh.VAOType == video::EVT_TANGENTS)
                     TransparentMesh[TM_TRANSLUCENT_TAN].push_back(&mesh);
                 else
                     TransparentMesh[TM_TRANSLUCENT_STD].push_back(&mesh);
             }
-            else*/
+            else
             {
-                Material::ShaderType MatType = getMeshMaterialFromType(type, mb->getVertexType(), material, NULL);
+                Material::ShaderType MatType = getMeshMaterialFromType(type, vt, material, NULL);
                 MeshSolidMaterial[MatType].push_back(&mesh);
             }
             if (m_skinned_mesh) ssmb->VertexType = prev_type;
@@ -252,7 +255,7 @@ void STKAnimatedMesh::updateGL()
             video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
             GLMesh &mesh = GLmeshes[i];
 
-            if (1)//!rnd->isTransparent())
+            if (!rnd->isTransparent())
             {
                 Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
                 Material* material2 = NULL;

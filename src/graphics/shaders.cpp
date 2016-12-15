@@ -387,6 +387,16 @@ Shaders::SkinnedMeshPass2Shader::SkinnedMeshPass2Shader()
 }   // SkinnedMeshPass2Shader
 
 // ============================================================================
+Shaders::SkinnedTransparentShader::SkinnedTransparentShader()
+{
+    if (!CVS->supportsHardwareSkinning()) return;
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+                        GL_FRAGMENT_SHADER, "transparent.frag");
+    assignUniforms("ModelMatrix", "texture_trans", "skinning_offset",  "custom_alpha");
+    assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+}   // SkinnedTransparentShader
+
+// ============================================================================
 Shaders::TransparentShader::TransparentShader()
 {
     loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",

@@ -71,9 +71,13 @@ Material::ShaderType getMeshMaterialFromType(video::E_MATERIAL_TYPE material_typ
 
 // ----------------------------------------------------------------------------
 TransparentMaterial getTransparentMaterialFromType(video::E_MATERIAL_TYPE type,
+                                                   video::E_VERTEX_TYPE tp,
                                                    f32 MaterialTypeParam,
                                                    Material* material)
 {
+    if (tp == video::EVT_SKINNED_MESH)
+        return TM_TRANSLUCENT_SKN;
+
     if (type == Shaders::getShader(ES_DISPLACE))
     {
         if (CVS->isDefferedEnabled())
@@ -378,8 +382,8 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
 {
     if (!mesh.textures[i])
     {
-        //Log::error("STKMesh", "Missing texture %d for material %s", i,
-        //           mat_name.c_str());
+        Log::error("STKMesh", "Missing texture %d for material %s", i,
+                   mat_name.c_str());
         // use unicolor texture to replace missing texture
         mesh.textures[i] = 
                       getUnicolorTexture(video::SColor(255, 127, 127, 127));

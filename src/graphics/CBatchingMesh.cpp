@@ -400,6 +400,8 @@ void CBatchingMesh::recalculateDestBufferBoundingBox(u32 i)
     case video::EVT_TANGENTS:
         ((SMeshBufferTangents*)DestBuffers[i].Buffer)->recalculateBoundingBox();
         break;
+    default:
+        break;
     }
 }
 

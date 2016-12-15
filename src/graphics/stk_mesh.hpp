@@ -37,6 +37,7 @@ enum TransparentMaterial
     TM_DEFAULT,
     TM_ADDITIVE,
     TM_DISPLACEMENT,
+    TM_TRANSLUCENT_SKN,
     TM_TRANSLUCENT_STD,
     TM_TRANSLUCENT_TAN,
     TM_TRANSLUCENT_2TC,
@@ -198,6 +199,12 @@ class ListAdditiveTransparent : public MiscList<ListAdditiveTransparent,
 {};
 
 // ----------------------------------------------------------------------------
+class ListTranslucentSkinned : public MiscList<ListTranslucentSkinned,
+                                              GLMesh *, core::matrix4,
+                                              core::vector2df, int, float>
+{};
+
+// ----------------------------------------------------------------------------
 class ListTranslucentStandard : public MiscList<ListTranslucentStandard,
                                       GLMesh *, core::matrix4,
                                       core::vector2df, float>
@@ -243,6 +250,7 @@ Material::ShaderType getMeshMaterialFromType(video::E_MATERIAL_TYPE MaterialType
                                              Material* layer2Material);
 // ----------------------------------------------------------------------------
 TransparentMaterial getTransparentMaterialFromType(video::E_MATERIAL_TYPE,
+                                                   video::E_VERTEX_TYPE tp,
                                                    f32 MaterialTypeParam,
                                                    Material* material);
 

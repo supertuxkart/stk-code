@@ -173,6 +173,15 @@ public:
     };   // SkinnedMeshPass2Shader
 
     // ========================================================================
+    class SkinnedTransparentShader : public TextureShader<SkinnedTransparentShader, 1,
+                                                 core::matrix4, core::vector2df,
+                                                 int, float >
+    {
+    public:
+        SkinnedTransparentShader();
+    };   // SkinnedTransparentShader
+
+    // ========================================================================
 
 
 };   // class Shaders

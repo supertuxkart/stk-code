@@ -206,6 +206,7 @@ void STKMeshSceneNode::updateNoGL()
             }
 
             GLMesh &mesh = GLmeshes[i];
+            video::E_VERTEX_TYPE vt = mb->getVertexType();
             Material* material = material_manager->getMaterialFor(mb->getMaterial().getTexture(0), mb);
             if (mesh.m_render_info != NULL && mesh.m_render_info->isTransparent() && !rnd->isTransparent())
             {
@@ -217,7 +218,7 @@ void STKMeshSceneNode::updateNoGL()
             }
             else if (rnd->isTransparent())
             {
-                TransparentMaterial TranspMat = getTransparentMaterialFromType(type, MaterialTypeParam, material);
+                TransparentMaterial TranspMat = getTransparentMaterialFromType(type, vt, MaterialTypeParam, material);
                 if (!immediate_draw)
                     TransparentMesh[TranspMat].push_back(&mesh);
                 else
@@ -229,7 +230,7 @@ void STKMeshSceneNode::updateNoGL()
                 Material* material2 = NULL;
                 if (mb->getMaterial().getTexture(1) != NULL)
                     material2 = material_manager->getMaterialFor(mb->getMaterial().getTexture(1), mb);
-                Material::ShaderType MatType = getMeshMaterialFromType(type, mb->getVertexType(), material, material2);
+                Material::ShaderType MatType = getMeshMaterialFromType(type, vt, material, material2);
                 if (!immediate_draw)
                     MeshSolidMaterial[MatType].push_back(&mesh);
             }

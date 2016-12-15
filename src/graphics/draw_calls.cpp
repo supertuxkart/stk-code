@@ -40,6 +40,7 @@ void DrawCalls::clearLists()
 {
     ListBlendTransparent::getInstance()->clear();
     ListAdditiveTransparent::getInstance()->clear();
+    ListTranslucentSkinned::getInstance()->clear();
     ListTranslucentStandard::getInstance()->clear();
     ListTranslucentTangents::getInstance()->clear();
     ListTranslucent2TCoords::getInstance()->clear();
@@ -47,8 +48,11 @@ void DrawCalls::clearLists()
     ListAdditiveTransparentFog::getInstance()->clear();
     ListDisplacement::getInstance()->clear();
 
-    ListMatDefault::getInstance()->clear();
     ListSkinnedSolid::getInstance()->clear();
+    ListSkinnedAlphaRef::getInstance()->clear();
+    ListSkinnedNormalMap::getInstance()->clear();
+    ListSkinnedUnlit::getInstance()->clear();
+    ListMatDefault::getInstance()->clear();
     ListMatAlphaRef::getInstance()->clear();
     ListMatSphereMap::getInstance()->clear();
     ListMatDetails::getInstance()->clear();
@@ -271,6 +275,12 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
 
     if (!culled_for_cams[0])
     {
+        for (GLMesh *mesh : node->TransparentMesh[TM_TRANSLUCENT_SKN])
+        {
+            pushVector(ListTranslucentSkinned::getInstance(), mesh, Node->getAbsoluteTransformation(), mesh->texture_trans,
+                skinning_offset, (mesh->m_render_info && mesh->m_render_info->isTransparent() ? custom_alpha : 1.0f));
+        }
+
         for (unsigned Mat = 0; Mat < Material::SHADERTYPE_COUNT; ++Mat)
         {
             if (CVS->supportsIndirectInstancingRendering())
