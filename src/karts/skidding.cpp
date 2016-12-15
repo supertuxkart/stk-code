@@ -287,7 +287,7 @@ void Skidding::update(float dt, bool is_on_ground,
     // be displayed, update the data
     if(m_remaining_jump_time>0)
     {
-        m_jump_speed -= World::getWorld()->getTrack()->getGravity()*dt;
+        m_jump_speed -= Track::getCurrentTrack()->getGravity()*dt;
         m_gfx_jump_offset += m_jump_speed * dt;
         m_remaining_jump_time -= dt;
         if(m_remaining_jump_time<0)
@@ -339,13 +339,13 @@ void Skidding::update(float dt, bool is_on_ground,
             // the same time to come down again), based on v = gravity * t.
             // Then use this speed to determine the impulse necessary to
             // reach this speed.
-            float v = World::getWorld()->getTrack()->getGravity()
+            float v = Track::getCurrentTrack()->getGravity()
                     * 0.5f * kp->getSkidPhysicalJumpTime();
             btVector3 imp(0, v / m_kart->getBody()->getInvMass(),0);
             m_kart->getVehicle()->getRigidBody()->applyCentralImpulse(imp);
 
             // Some karts might use a graphical-only jump. Set it up:
-            m_jump_speed = World::getWorld()->getTrack()->getGravity()
+            m_jump_speed = Track::getCurrentTrack()->getGravity()
                          * 0.5f * kp->getSkidGraphicalJumpTime();
             m_remaining_jump_time = kp->getSkidGraphicalJumpTime();
 

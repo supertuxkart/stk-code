@@ -67,7 +67,8 @@ namespace Scripting
           */
         ::TrackObject* getTrackObject(std::string* libraryInstance, std::string* objID)
         {
-            return World::getWorld()->getTrack()->getTrackObjectManager()->getTrackObject(*libraryInstance, *objID);
+            return ::Track::getCurrentTrack()->getTrackObjectManager()
+                          ->getTrackObject(*libraryInstance, *objID);
         }
 
         /** Creates a trigger at the specified location */
@@ -84,7 +85,7 @@ namespace Scripting
             ::TrackObject* tobj = new ::TrackObject(posi, hpr, scale,
                 "none", newtrigger, false /* isDynamic */, NULL /* physics settings */);
             tobj->setID(*triggerID);
-            World::getWorld()->getTrack()->getTrackObjectManager()->insertObject(tobj);
+            ::Track::getCurrentTrack()->getTrackObjectManager()->insertObject(tobj);
         }
 
         void createTextBillboard(std::string* text, SimpleVec3* location)
@@ -104,7 +105,7 @@ namespace Scripting
                     irr_driver->getSceneManager(), -1, xyz,
                     core::vector3df(1.5f, 1.5f, 1.5f));
 
-                World::getWorld()->getTrack()->addNode(tb);
+                ::Track::getCurrentTrack()->addNode(tb);
                 tb->drop();
             }
             else
@@ -121,7 +122,7 @@ namespace Scripting
                         -1, // id
                         GUIEngine::getSkin()->getColor("font::bottom"),
                         GUIEngine::getSkin()->getColor("font::top"));
-                World::getWorld()->getTrack()->addNode(sn);
+                ::Track::getCurrentTrack()->addNode(sn);
             }
 #endif
         }
@@ -155,7 +156,7 @@ namespace Scripting
         void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)
         {
             PropertyAnimator* animator = PropertyAnimator::get();
-            ::Track* track = World::getWorld()->getTrack();
+            ::Track* track = ::Track::getCurrentTrack();
             animator->add(
                 new AnimatedProperty(FOG_MAX, 1,
                     new double[1] { track->getFogMax() }, 

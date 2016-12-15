@@ -74,8 +74,8 @@ void WorldStatus::reset()
     if (UserConfigParams::m_race_now)
     {
         // Setup music and sound
-        if (World::getWorld()->getWeather() != NULL)
-            World::getWorld()->getWeather()->playSound();
+        if (Weather::getInstance())
+            Weather::getInstance()->playSound();
 
         // Start engines
         for (unsigned int i = 0; i < World::getWorld()->getNumKarts(); i++)
@@ -92,7 +92,7 @@ void WorldStatus::reset()
         device->getTimer()->start();
 
     // Set the right music
-    World::getWorld()->getTrack()->startMusic();
+    Track::getCurrentTrack()->startMusic();
     // In case of a networked race the race can only start once
     // all protocols are up. This flag is used to wait for
     // a confirmation before starting the actual race.
@@ -196,9 +196,9 @@ void WorldStatus::updateTime(const float dt)
                 m_track_intro_sound->play();
             }
 
-            if (World::getWorld()->getWeather() != NULL)
+            if (Weather::getInstance())
             {
-                World::getWorld()->getWeather()->playSound();
+                Weather::getInstance()->playSound();
             }
 
             return;   // Do not increase time

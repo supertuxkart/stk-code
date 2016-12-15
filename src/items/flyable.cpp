@@ -133,7 +133,7 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     m_shape = shape;
     createBody(m_mass, trans, m_shape, restitution);
     m_user_pointer.set(this);
-    World::getWorld()->getPhysics()->addBody(getBody());
+    Physics::getInstance()->addBody(getBody());
 
     m_body->setGravity(gravity);
 
@@ -199,7 +199,7 @@ void Flyable::init(const XMLNode &node, scene::IMesh *model,
 Flyable::~Flyable()
 {
     if(m_shape) delete m_shape;
-    World::getWorld()->getPhysics()->removeBody(getBody());
+    Physics::getInstance()->removeBody(getBody());
 }   // ~Flyable
 
 //-----------------------------------------------------------------------------
@@ -371,7 +371,7 @@ bool Flyable::updateAndDelete(float dt)
     const Vec3 &xyz=getXYZ();
     // Check if the flyable is outside of the track. If so, explode it.
     const Vec3 *min, *max;
-    World::getWorld()->getTrack()->getAABB(&min, &max);
+    Track::getCurrentTrack()->getAABB(&min, &max);
 
     // I have seen that the bullet AABB can be slightly different from the
     // one computed here - I assume due to minor floating point errors
@@ -515,13 +515,13 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
             // The explosion animation will register itself with the kart
             // and will free it later.
             ExplosionAnimation::create(kart, getXYZ(), kart==kart_hit);
-            if(kart==kart_hit && world->getTrack()->isArena())
+            if(kart==kart_hit && Track::getCurrentTrack()->isArena())
             {
                 world->kartHit(kart->getWorldKartId());
             }
         }
     }
-    world->getTrack()->handleExplosion(getXYZ(), object, secondary_hits);
+    Track::getCurrentTrack()->handleExplosion(getXYZ(), object,secondary_hits);
 }   // explode
 
 // ----------------------------------------------------------------------------

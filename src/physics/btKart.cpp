@@ -24,7 +24,6 @@
 
 #include "graphics/material.hpp"
 #include "karts/kart.hpp"
-#include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/terrain_info.hpp"
 #include "tracks/track.hpp"
@@ -1026,7 +1025,7 @@ void btKart::debugDraw(btIDebugDraw* debugDrawer)
         int n = w.m_raycastInfo.m_triangle_index;
         if (n > -1)
         {
-            const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+            const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();
             btVector3 *p1, *p2, *p3;
             tm.getTriangle(n, &p1, &p2, &p3);
             const btVector3 *n1, *n2, *n3;

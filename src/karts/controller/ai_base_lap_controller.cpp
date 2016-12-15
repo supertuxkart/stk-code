@@ -26,6 +26,7 @@
 #include "karts/controller/ai_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "tracks/drive_graph.hpp"
+#include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
 
@@ -90,7 +91,7 @@ AIBaseLapController::AIBaseLapController(AbstractKart *kart)
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_SOCCER)
     {
         m_world     = dynamic_cast<LinearWorld*>(World::getWorld());
-        m_track     = m_world->getTrack();
+        m_track     = Track::getCurrentTrack();
         computePath();
     }
     else

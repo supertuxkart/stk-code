@@ -172,6 +172,10 @@ private:
     bool                 m_distortviz;
     bool                 m_boundingboxesviz;
 
+    /** Background colour to reset a buffer. Can be changed by each track. */
+    irr::video::SColor m_clear_color;
+
+
     unsigned             m_last_light_bucket_distance;
     unsigned             m_skinning_joint;
     u32                  m_renderpass;
@@ -309,6 +313,15 @@ public:
     std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
                                                      const std::string &name);
 #endif
+    // ------------------------------------------------------------------------
+    /** Returns the color to clear the back buffer. */
+    const irr::video::SColor& getClearColor() const { return m_clear_color; }
+    // ------------------------------------------------------------------------
+    /** Sets the color to use when clearing the back buffer. */
+    void setClearbackBufferColor(irr::video::SColor color)
+    {
+        m_clear_color = color;
+    }   // setClearbackBufferColor
 
     // ------------------------------------------------------------------------
     /** Convenience function that loads a texture with default parameters

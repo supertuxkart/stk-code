@@ -19,9 +19,8 @@
 
 #include "graphics/camera.hpp"
 
-#include <cmath>
-
 #include "audio/sfx_manager.hpp"
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera_debug.hpp"
 #include "graphics/camera_end.hpp"
@@ -34,7 +33,6 @@
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
-#include "modes/world.hpp"
 #include "physics/btKart.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -43,6 +41,8 @@
 #include "utils/vs.hpp"
 
 #include "ISceneManager.h"
+
+#include <cmath>
 
 std::vector<Camera*> Camera::m_all_cameras;
 Camera*              Camera::s_active_camera = NULL;
@@ -125,7 +125,7 @@ Camera::Camera(CameraType type, int camera_index, AbstractKart* kart)
 
     setupCamera();
     setKart(kart);
-    m_ambient_light = World::getWorld()->getTrack()->getDefaultAmbientColor();
+    m_ambient_light = Track::getCurrentTrack()->getDefaultAmbientColor();
 
     reset();
 }   // Camera
@@ -229,7 +229,7 @@ void Camera::setupCamera()
     }   // switch
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
-    m_camera->setFarValue(World::getWorld()->getTrack()->getCameraFar());
+    m_camera->setFarValue(Track::getCurrentTrack()->getCameraFar());
 }   // setupCamera
 
 // ----------------------------------------------------------------------------

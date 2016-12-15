@@ -41,8 +41,6 @@ class AbstractKart;
 class btRigidBody;
 class Controller;
 class PhysicalObject;
-class Physics;
-class Track;
 
 namespace Scripting
 {
@@ -96,8 +94,6 @@ protected:
     KartList                  m_karts;
     RandomGenerator           m_random;
 
-    Physics*      m_physics;
-    bool          m_force_disable_fog;
     AbstractKart* m_fastest_kart;
     /** Number of eliminated karts. */
     int         m_eliminated_karts;
@@ -125,11 +121,6 @@ protected:
                              int local_player_id, int global_player_id,
                              RaceManager::KartType type,
                              PerPlayerDifficulty difficulty);
-    /** Pointer to the track. The track is managed by world. */
-    Track* m_track;
-
-    /**Pointer to scripting engine  */
-    Scripting::ScriptEngine* m_script_engine;
 
     /** Pointer to the race GUI. The race GUI is handled by world. */
     RaceGUIBase *m_race_gui;
@@ -140,8 +131,6 @@ protected:
         to texture without having any scene nodes, but in case of a restart
         there are scene nodes). */
     RaceGUIBase *m_saved_race_gui;
-
-    irr::video::SColor m_clear_color;
 
     /** Pausing/unpausing are not done immediately, but at next udpdate. The
      *  use of this is when switching between screens : if we leave a screen
@@ -171,10 +160,6 @@ protected:
     /** Set when the world is online and counts network players. */
     bool m_is_network_world;
     
-    /** Used to show weather graphical effects. */
-    Weather* m_weather;
-
-
     virtual void  onGo() OVERRIDE;
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool  isRaceOver() = 0;
@@ -294,6 +279,7 @@ public:
     AbstractKart*   getPlayerKart(unsigned int player) const;
     AbstractKart*   getLocalPlayerKart(unsigned int n) const;
     virtual const btTransform &getStartTransform(int index);
+    void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
     /** Returns a pointer to the race gui. */
     RaceGUIBase    *getRaceGUI() const { return m_race_gui;}
@@ -317,20 +303,6 @@ public:
     unsigned int    getCurrentNumPlayers() const { return m_num_players -
                                                          m_eliminated_players;}
     // ------------------------------------------------------------------------
-    /** Returns a pointer to the physics. */
-    Physics        *getPhysics() const { return m_physics; }
-    // ------------------------------------------------------------------------
-    /** Returns a pointer to the track. */
-    Track          *getTrack() const { return m_track; }
-    // ------------------------------------------------------------------------
-    /** Returns a pointer to the Scripting Engine. */
-    Scripting::ScriptEngine   *getScriptEngine() 
-                               const { return m_script_engine; }
-    //-------------------------------------------------------------------------
-    bool            isFogEnabled() const;
-    // ------------------------------------------------------------------------
-    void moveKartTo(AbstractKart* kart, const btTransform &t);
-    // ------------------------------------------------------------------------
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */
     virtual bool shouldDrawTimer() const
@@ -338,17 +310,6 @@ public:
     // ------------------------------------------------------------------------
     /** \return whether this world can generate/have highscores */
     bool useHighScores() const { return m_use_highscores; }
-    // ------------------------------------------------------------------------
-    /** Returns the color to clear the back buffer. */
-    const irr::video::SColor& getClearColor() const { return m_clear_color; }
-    // ------------------------------------------------------------------------
-    /** Sets the color to use when clearing the back buffer. */
-    void setClearbackBufferColor(irr::video::SColor color)
-    {
-        m_clear_color       = color;
-    }
-    /** Override track fog value to force disabled */
-    void forceFogDisabled(bool v) { m_force_disable_fog = v; }
     // ------------------------------------------------------------------------
     /** Override if you want to know when a kart presses fire */
     virtual void onFirePressed(Controller* who) {}
@@ -368,8 +329,6 @@ public:
 
     bool isNetworkWorld() const { return m_is_network_world; }
     
-    /** Returns a pointer to the weather. */
-    Weather* getWeather() {return m_weather;}
 };   // World
 
 #endif

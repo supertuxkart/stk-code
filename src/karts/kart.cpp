@@ -273,7 +273,7 @@ Kart::~Kart()
     // Ghost karts don't have a body
     if(m_body)
     {
-        World::getWorld()->getPhysics()->removeKart(this);
+        Physics::getInstance()->removeKart(this);
         delete m_vehicle;
         delete m_vehicle_raycaster;
     }
@@ -310,8 +310,8 @@ void Kart::reset()
     // don't have one).
     if(m_body)
     {
-        World::getWorld()->getPhysics()->removeKart(this);
-        World::getWorld()->getPhysics()->addKart(this);
+        Physics::getInstance()->removeKart(this);
+        Physics::getInstance()->addKart(this);
     }
 
     m_min_nitro_time = 0.0f;
@@ -671,9 +671,9 @@ void Kart::createPhysics()
     // Create the actual vehicle
     // -------------------------
     m_vehicle_raycaster =
-        new btKartRaycaster(World::getWorld()->getPhysics()->getPhysicsWorld(),
+        new btKartRaycaster(Physics::getInstance()->getPhysicsWorld(),
                             stk_config->m_smooth_normals &&
-                            World::getWorld()->getTrack()->smoothNormals());
+                            Track::getCurrentTrack()->smoothNormals());
     m_vehicle = new btKart(m_body, m_vehicle_raycaster, this);
 
     // never deactivate the vehicle
@@ -1158,7 +1158,7 @@ void Kart::eliminate()
 {
     if (!getKartAnimation())
     {
-        World::getWorld()->getPhysics()->removeKart(this);
+        Physics::getInstance()->removeKart(this);
     }
     if (m_stars_effect)
     {
@@ -1360,7 +1360,7 @@ void Kart::update(float dt)
         const float roll = quad_normal.angle
                ((Vec3(0, 1, 0).rotate(q.getAxis(), q.getAngle())));
 
-        if (World::getWorld()->getTrack()->isAutoRescueEnabled() &&
+        if (Track::getCurrentTrack()->isAutoRescueEnabled() &&
             (!m_terrain_info->getMaterial() ||
             !m_terrain_info->getMaterial()->hasGravity()) &&
             !has_animation_before && fabs(roll) > 60 * DEGREE_TO_RAD &&
@@ -1420,14 +1420,14 @@ void Kart::update(float dt)
     {
         if (!m_flying)
         {
-            float g = World::getWorld()->getTrack()->getGravity();
+            float g = Track::getCurrentTrack()->getGravity();
             Vec3 gravity(0, -g, 0);
             btRigidBody *body = getVehicle()->getRigidBody();
             body->setGravity(gravity);
         }
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
-        World::getWorld()->getTrack()->getAABB(&min, &max);
+        Track::getCurrentTrack()->getAABB(&min, &max);
 
         if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
            !getKartAnimation())
@@ -1437,7 +1437,7 @@ void Kart::update(float dt)
     {
         if (!m_flying)
         {
-            float g = World::getWorld()->getTrack()->getGravity();
+            float g = Track::getCurrentTrack()->getGravity();
             Vec3 gravity(0.0f, -g, 0.0f);
             btRigidBody *body = getVehicle()->getRigidBody();
             // If the material should overwrite the gravity,
@@ -1519,7 +1519,7 @@ void Kart::update(float dt)
             m_kart_model->getAnimation() == KartModel::AF_DEFAULT)
         {
             float v = getVelocity().getY();
-            float force = World::getWorld()->getTrack()->getGravity();
+            float force = Track::getCurrentTrack()->getGravity();
             // Velocity / force is the time it takes to reach the peak
             // of the jump (i.e. when vertical speed becomes 0). Assuming
             // that jump start height and end height are the same, it will
@@ -2027,7 +2027,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     else if(m_kart_properties->getTerrainImpulseType()
                                  ==KartProperties::IMPULSE_TO_DRIVELINE &&
             lw && m_vehicle->getCentralImpulseTime()<=0 &&
-            World::getWorld()->getTrack()->isPushBackEnabled())
+            Track::getCurrentTrack()->isPushBackEnabled())
     {
         int sector = lw->getSectorForKart(this);
         if(sector!=Graph::UNKNOWN_SECTOR)

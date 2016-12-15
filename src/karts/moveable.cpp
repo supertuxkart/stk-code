@@ -23,7 +23,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "modes/world.hpp"
 #include "tracks/track.hpp"
 
 #include "ISceneNode.h"
@@ -118,7 +117,7 @@ void Moveable::flyDown()
 // ----------------------------------------------------------------------------
 void Moveable::stopFlying()
 {
-    m_body->setGravity(btVector3(0.0, -World::getWorld()->getTrack()->getGravity(), 0.0));
+    m_body->setGravity(btVector3(0.0, -Track::getCurrentTrack()->getGravity(), 0.0));
 }   // stopFlying
 
 //-----------------------------------------------------------------------------

@@ -105,12 +105,12 @@ int FollowTheLeaderRace::getScoreForPosition(int p)
 const btTransform &FollowTheLeaderRace::getStartTransform(int index)
 {
     if (index == 0)   // Leader start position
-        return m_track->getStartTransform(index);
+        return Track::getCurrentTrack()->getStartTransform(index);
 
     // Otherwise the karts will start at the rear starting positions
     int start_index = stk_config->m_max_karts
                     - race_manager->getNumberOfKarts() + index;
-    return m_track->getStartTransform(start_index);
+    return Track::getCurrentTrack()->getStartTransform(start_index);
 }   // getStartTransform
 
 //-----------------------------------------------------------------------------

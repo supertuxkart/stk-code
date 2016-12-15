@@ -86,6 +86,7 @@ using namespace irr;
 
 const float Track::NOHIT               = -99999.9f;
 bool        Track::m_dont_load_navmesh = false;
+Track      *Track::m_current_track = NULL;
 
 // ----------------------------------------------------------------------------
 Track::Track(const std::string &filename)
@@ -145,8 +146,9 @@ Track::Track(const std::string &filename)
     m_render_target         = NULL;
     m_minimap_x_scale       = 1.0f;
     m_minimap_y_scale       = 1.0f;
-    m_startup_run = false;
-    m_default_number_of_laps= 3;
+    m_force_disable_fog     = false;
+    m_startup_run           = false;
+    m_default_number_of_laps = 3;
     m_all_nodes.clear();
     m_static_physics_only_nodes.clear();
     m_all_cached_meshes.clear();
@@ -456,9 +458,9 @@ void Track::cleanup()
     }
 #endif
 
-    Scripting::ScriptEngine* script_engine =
-        World::getWorld()->getScriptEngine();
-    script_engine->cleanupCache();
+    Scripting::ScriptEngine::getInstance()->cleanupCache();
+
+    m_current_track = NULL;
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -1179,7 +1181,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     // could be relaxed to fix this, it is not certain how the physics
     // will handle items that are out of the AABB
     m_aabb_max.setY(m_aabb_max.getY()+30.0f);
-    World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
+    Physics::getInstance()->init(m_aabb_min, m_aabb_max);
 
     ModelDefinitionLoader lodLoader(this);
 
@@ -1445,8 +1447,7 @@ void Track::update(float dt)
 {
     if (!m_startup_run) // first time running update = good point to run startup script
     {
-        Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-        script_engine->runFunction(false, "void onStart()");
+        Scripting::ScriptEngine::getInstance()->runFunction(false, "void onStart()");
         m_startup_run = true;
     }
     m_track_object_manager->update(dt);
@@ -1577,6 +1578,8 @@ void Track::createWater(const XMLNode &node)
  */
 void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 {
+    assert(!m_current_track);
+
     // Use m_filename to also get the path, not only the identifier
     irr_driver->setTextureErrorMessage("While loading track '%s'",
                                        m_filename                  );
@@ -1669,11 +1672,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         throw std::runtime_error(msg.str());
     }
 
+    m_current_track = this;
+
     // Load the graph only now: this function is called from world, after
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
-    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadDriveGraph(mode_id, reverse_track);
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) 
+        loadDriveGraph(mode_id, reverse_track);
     else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
         loadArenaGraph(*root);
 
@@ -1737,6 +1743,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     loadMainTrack(*root);
+
     unsigned int main_track_count = (unsigned int)m_all_nodes.size();
 
     ModelDefinitionLoader model_def_loader(this);
@@ -1759,7 +1766,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     model_def_loader.cleanLibraryNodesAfterLoad();
 
-    World::getWorld()->getScriptEngine()->compileLoadedScripts();
+    Scripting::ScriptEngine::getInstance()->compileLoadedScripts();
 
     // Init all track objects
     m_track_object_manager->init();
@@ -1823,7 +1830,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     else if(m_sky_type==SKY_COLOR)
     {
-        World::getWorld()->setClearbackBufferColor(m_sky_color);
+        irr_driver->setClearbackBufferColor(m_sky_color);
     }
 
 #ifdef USE_RESIZE_CACHE
@@ -1932,6 +1939,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     irr_driver->unsetTextureErrorMessage();
+
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------

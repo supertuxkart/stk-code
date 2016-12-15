@@ -61,8 +61,8 @@ void LinearWorld::init()
 {
     WorldWithRank::init();
 
-    assert(!m_track->isArena());
-    assert(!m_track->isSoccer());
+    assert(!Track::getCurrentTrack()->isArena());
+    assert(!Track::getCurrentTrack()->isSoccer());
 
     m_last_lap_sfx_played           = false;
     m_last_lap_sfx_playing          = false;
@@ -102,7 +102,7 @@ void LinearWorld::reset()
     // the track length must be extended (to avoid negative numbers in
     // estimateFinishTimeForKart()). On the other hand future game modes
     // might not follow this rule, so check the distance for all karts here:
-    m_distance_increase = m_track->getTrackLength();
+    m_distance_increase = Track::getCurrentTrack()->getTrackLength();
     for(unsigned int i=0; i<kart_amount; i++)
     {
         m_distance_increase = std::min(m_distance_increase,
@@ -112,8 +112,8 @@ void LinearWorld::reset()
     // be increased to avoid negative values in estimateFinishTimeForKart
     // Increase this value somewhat in case that a kart drivess/slides
     // backwards a little bit at start.
-    m_distance_increase = m_track->getTrackLength() - m_distance_increase
-                        + 5.0f;
+    m_distance_increase = Track::getCurrentTrack()->getTrackLength() 
+                        - m_distance_increase + 5.0f;
 
     if(m_distance_increase<0) m_distance_increase = 1.0f;  // shouldn't happen
 
@@ -187,7 +187,7 @@ void LinearWorld::update(float dt)
             continue;
         getTrackSector(n)->update(kart->getFrontXYZ());
         kart_info.m_overall_distance = kart_info.m_race_lap
-                                     * m_track->getTrackLength()
+                                     * Track::getCurrentTrack()->getTrackLength()
                         + getDistanceDownTrackForKart(kart->getWorldKartId());
     }   // for n
 
@@ -277,7 +277,8 @@ void LinearWorld::newLap(unsigned int kart_index)
         kart_info.m_time_at_last_lap=getTime();
         kart_info.m_race_lap++;
         m_kart_info[kart_index].m_overall_distance =
-              m_kart_info[kart_index].m_race_lap * m_track->getTrackLength()
+              m_kart_info[kart_index].m_race_lap 
+            * Track::getCurrentTrack()->getTrackLength()
             + getDistanceDownTrackForKart(kart->getWorldKartId());
     }
     // Last lap message (kart_index's assert in previous block already)
@@ -549,7 +550,7 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
     const KartInfo &kart_info = m_kart_info[kart->getWorldKartId()];
 
     float full_distance = race_manager->getNumLaps()
-                        * m_track->getTrackLength();
+                        * Track::getCurrentTrack()->getTrackLength();
 
     if(full_distance == 0)
         full_distance = 1.0f;   // For 0 lap races avoid warning below
@@ -651,7 +652,7 @@ btTransform LinearWorld::getRescueTransform(unsigned int index) const
     else q1 = btQuaternion(Vec3(0,1,0),0);
 
     // First apply the heading change, than the 'parallelisation' to the plane
-    btQuaternion q2(btVector3(0,1,0), m_track->getAngle(index));
+    btQuaternion q2(btVector3(0,1,0), Track::getCurrentTrack()->getAngle(index));
     pos.setRotation(q1*q2);
     return pos;
 }   // getRescueTransform
