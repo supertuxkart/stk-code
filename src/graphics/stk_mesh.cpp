@@ -47,6 +47,8 @@ Material::ShaderType getMeshMaterialFromType(video::E_MATERIAL_TYPE material_typ
         case Material::SHADERTYPE_SOLID:
             if (material_type == Shaders::getShader(ES_NORMAL_MAP))
                 return Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH;
+            else
+                return Material::SHADERTYPE_SOLID_SKINNED_MESH;
         case Material::SHADERTYPE_ALPHA_TEST:
             return Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH;
         case Material::SHADERTYPE_SOLID_UNLIT:
