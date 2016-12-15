@@ -301,9 +301,8 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
                     }
                     else
                     {
-                        std::pair<scene::IMeshBuffer*, RenderInfo*> mesh_render_info(mesh->mb, NULL);
-                        m_solid_pass_mesh[Mat][mesh_render_info].m_mesh = mesh;
-                        m_solid_pass_mesh[Mat][mesh_render_info].m_instance_settings.emplace_back(Node, mesh->texture_trans,
+                        m_solid_pass_mesh[Mat][mesh->mb].m_mesh = mesh;
+                        m_solid_pass_mesh[Mat][mesh->mb].m_instance_settings.emplace_back(Node, mesh->texture_trans,
                             (mesh->m_render_info && mesh->m_material ?
                             core::vector2df(mesh->m_render_info->getHue(), mesh->m_material->getColorizationFactor()) :
                             core::vector2df(0.0f, 0.0f)), skinning_offset);

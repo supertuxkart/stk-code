@@ -43,10 +43,10 @@ private:
     std::vector<float>                    m_bounding_boxes;
 
     /** meshes to draw */
-    SolidPassMeshMap m_solid_pass_mesh        [    Material::SHADERTYPE_COUNT];
-    OtherMeshMap m_shadow_pass_mesh           [4 * Material::SHADERTYPE_COUNT];
-    OtherMeshMap m_reflective_shadow_map_mesh [    Material::SHADERTYPE_COUNT];
-    OtherMeshMap m_glow_pass_mesh;
+    MeshMap m_solid_pass_mesh            [    Material::SHADERTYPE_COUNT];
+    MeshMap m_shadow_pass_mesh           [4 * Material::SHADERTYPE_COUNT];
+    MeshMap m_reflective_shadow_map_mesh [    Material::SHADERTYPE_COUNT];
+    MeshMap m_glow_pass_mesh;
 
 #if !defined(USE_GLES2)
     /** meshes data in VRAM */
