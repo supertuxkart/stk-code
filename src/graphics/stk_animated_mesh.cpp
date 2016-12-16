@@ -275,6 +275,8 @@ void STKAnimatedMesh::updateGL()
         isGLInitialized = true;
     }
 
+    if (useHardwareSkinning() && m_skinned_mesh->getTotalJoints() == 0) return;
+
     scene::IMesh* m = getMeshForCurrentFrame();
     if (useHardwareSkinning())
     {
@@ -336,11 +338,7 @@ void STKAnimatedMesh::resetSkinningState(scene::IAnimatedMesh* mesh)
     m_skinning_offset = -1;
     m_skinned_mesh = dynamic_cast<scene::CSkinnedMesh*>(mesh);
     if (m_skinned_mesh)
-    {
         m_skinned_mesh->convertForSkinning();
-        if (m_skinned_mesh->getTotalJoints() == 0)
-            m_skinned_mesh = NULL;
-    }
 }
 
 scene::IMesh* STKAnimatedMesh::getMeshForCurrentFrame(SkinningCallback sc,
