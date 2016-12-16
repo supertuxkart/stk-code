@@ -64,7 +64,7 @@ bool GameProtocol::notifyEventAsynchronous(Event* event)
                   time, kart_id, action, value);
         BareNetworkString *s = new BareNetworkString(3);
         s->addUInt8(kart_id).addUInt8(action).addUInt16(value);
-        RewindManager::get()->addEvent(this, s, /*confirmed*/ true, time);
+        RewindManager::get()->addNetworkEvent(this, s, time);
     }
 
     if (data.size() > 0 )

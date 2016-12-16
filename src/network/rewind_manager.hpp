@@ -21,8 +21,10 @@
 
 #include "network/rewinder.hpp"
 #include "utils/ptr_vector.hpp"
+#include "utils/synchronised.hpp"
 
 #include <assert.h>
+#include <list>
 #include <vector>
 
 class RewindInfo;
@@ -89,12 +91,20 @@ private:
     AllRewinder m_all_rewinder;
 
     /** Pointer to all saved states. */
-    typedef std::vector<RewindInfo*> AllRewindInfo;
+    typedef std::list<RewindInfo*> AllRewindInfo;
 
+    /** The list of all events that are affected by a rewind. */
     AllRewindInfo m_rewind_info;
 
+    /** The list of all events received from the network. They are stored
+     *  in a separate thread (so this data structure is thread-save), and
+     *  merged into m_rewind_info from the main thread. This design (as
+     *  opposed to locking m_rewind_info) reduces the synchronisation
+     *  between main thread and network thread. */
+    Synchronised<AllRewindInfo> m_network_events;
+
     /** Index of the next event to be used when playing events. */
-    unsigned int m_next_event;
+    AllRewindInfo::const_iterator m_next_event;
 
     /** Overall amount of memory allocated by states. */
     unsigned int m_overall_state_size;
@@ -125,9 +135,10 @@ private:
 
     RewindManager();
     ~RewindManager();
-    unsigned int findFirstIndex(float time) const;
+    AllRewindInfo::reverse_iterator findFirstIndex(float time);
     void insertRewindInfo(RewindInfo *ri);
-    float determineTimeStepSize(int state, float max_time);
+    float determineTimeStepSize(AllRewindInfo::iterator state, float max_time);
+
 public:
     // First static functions to manage rewinding.
     // ===========================================
@@ -156,6 +167,8 @@ public:
     void playEventsTill(float time);
     void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
                   bool confirmed, float time = -1.0f);
+    void addNetworkEvent(EventRewinder *event_rewinder,
+                         BareNetworkString *buffer, float time);
     // ------------------------------------------------------------------------
     /** Sets the time that is to be used for all further states or events,
      *  and the time step size. This is necessary so that states/events before 
