@@ -324,7 +324,7 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         if((*i)->hitKart(kart->getXYZ(), kart))
         {
             // if we're not playing online, pick the item.
-            if (!RaceEventManager::getInstance()->isRunning())
+            if (!NetworkConfig::get()->isNetworking())
                 collectedItem(*i, kart);
             else if (NetworkConfig::get()->isServer())
             {
