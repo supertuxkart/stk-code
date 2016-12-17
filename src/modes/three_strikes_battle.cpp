@@ -102,6 +102,7 @@ void ThreeStrikesBattle::reset()
 
     const unsigned int kart_amount = (unsigned int)m_karts.size();
 
+    int idCamera = 0;
     for(unsigned int n=0; n<kart_amount; n++)
     {
         if (dynamic_cast<SpareTireAI*>(m_karts[n]->getController()) != NULL)
@@ -117,8 +118,12 @@ void ThreeStrikesBattle::reset()
         // no positions in this mode
         m_karts[n]->setPosition(-1);
 
-        Camera *camera = Camera::getCamera(n);
-        camera->setKart(m_karts[n]);
+        if (m_karts[n]->getController()->isPlayerController())
+        {
+            Camera *camera = Camera::getCamera(idCamera);
+            camera->setKart(m_karts[n]);
+            idCamera++;
+        }
 
         scene::ISceneNode* kart_node = m_karts[n]->getNode();
 
