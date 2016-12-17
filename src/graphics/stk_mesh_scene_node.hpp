@@ -30,6 +30,7 @@ class STKMeshSceneNode : public irr::scene::CMeshSceneNode, public STKMeshCommon
 protected:
     PtrVector<RenderInfo> m_static_render_info;
     int m_frame_for_mesh;
+    bool m_got_animated_matrix;
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix;
     core::vector3df windDir;

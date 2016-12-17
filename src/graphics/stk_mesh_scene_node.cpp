@@ -61,6 +61,7 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     update_each_frame = false;
     m_frame_for_mesh = frame_for_mesh;
     isGlow = false;
+    m_got_animated_matrix = false;
 
     m_debug_name = debug_name;
 
@@ -244,10 +245,11 @@ void STKMeshSceneNode::updateNoGL()
         {
             // Test if texture matrix needs to be updated every frame
             const core::matrix4& mat = getMaterial(i).getTextureMatrix(0);
-            if (mat.isIdentity())
+            if (mat.isIdentity() && !m_got_animated_matrix)
                 continue;
             else
             {
+                m_got_animated_matrix = true;
                 GLmeshes[i].texture_trans.X = mat[8];
                 GLmeshes[i].texture_trans.Y = mat[9];
             }

@@ -146,6 +146,8 @@ void RaceGUIBase::reset()
 
     m_referee_height = 10.0f;
     m_referee->attachToSceneNode();
+    m_referee->selectReadySetGo(0); // set red color
+
     m_plunger_move_time = 0;
     m_plunger_offset    = core::vector2di(0,0);
     m_plunger_speed     = core::vector2df(0,0);

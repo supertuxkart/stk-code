@@ -53,6 +53,7 @@ public:
 private:
     RenderInfo* m_mesh_render_info;
     bool m_all_parts_colorized;
+    bool m_got_animated_matrix;
 };
 
 #endif // STKANIMATEDMESH_HPP
