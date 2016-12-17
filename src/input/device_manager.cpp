@@ -100,8 +100,9 @@ bool DeviceManager::initialize()
     {
         core::stringc name = m_irrlicht_gamepads[id].Name;
 
-        // Some linux systems report a disk accelerometer as a gamepad, skip that
+        // Some systems report a disk accelerometer as a gamepad, skip that
         if (name.find("LIS3LV02DL") != -1) continue;
+        if (name == "applesmc") continue;
 
         if(m_irrlicht_gamepads[id].HasGenericName)
         {
