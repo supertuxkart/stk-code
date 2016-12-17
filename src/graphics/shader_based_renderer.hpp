@@ -85,7 +85,7 @@ private:
 
     void debugPhysics();
     void renderPostProcessing(Camera * const camera);
-
+    void preloadSharedShaders();
 
 public:
     ShaderBasedRenderer();

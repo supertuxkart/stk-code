@@ -29,6 +29,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/shared_shader_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
@@ -236,9 +237,10 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
 #ifndef SERVER_ONLY
         Log::info("Debug", "Reloading shaders...");
-            ShaderBase::updateShaders();
+        SharedShaderManager::kill();
+        ShaderBase::updateShaders();
 #endif
-            break;
+        break;
     case DEBUG_GRAPHICS_RESET:
         if (physics)
             physics->setDebugMode(IrrDebugDrawer::DM_NONE);

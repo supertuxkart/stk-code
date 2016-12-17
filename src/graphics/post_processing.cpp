@@ -30,6 +30,7 @@
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/shared_shaders.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/texture_manager.hpp"
 #include "graphics/weather.hpp"
@@ -56,7 +57,7 @@ class Gaussian3HBlurShader : public TextureShader<Gaussian3HBlurShader, 1,
 public:
     Gaussian3HBlurShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "gaussian3h.frag");
         assignUniforms("pixel");
 
@@ -98,7 +99,7 @@ class Gaussian6VBlurShader : public TextureShader<Gaussian6VBlurShader, 1,
 public:
     Gaussian6VBlurShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "gaussian6v.frag");
         assignUniforms("pixel", "sigma");
 
@@ -120,7 +121,7 @@ class Gaussian3VBlurShader : public TextureShader<Gaussian3VBlurShader, 1,
 public:
     Gaussian3VBlurShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "gaussian3v.frag");
         assignUniforms("pixel");
 
@@ -194,7 +195,7 @@ class Gaussian6HBlurShader : public TextureShader<Gaussian6HBlurShader, 1,
 public:
     Gaussian6HBlurShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "gaussian6h.frag");
         assignUniforms("pixel", "sigma");
 
@@ -218,7 +219,7 @@ class Gaussian17TapHShader : public TextureShader<Gaussian17TapHShader, 2,
 public:
     Gaussian17TapHShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "bilateralH.frag");
         assignUniforms("pixel");
         assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
@@ -278,7 +279,7 @@ class Gaussian17TapVShader : public TextureShader<Gaussian17TapVShader, 2,
 public:
     Gaussian17TapVShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "bilateralV.frag");
         assignUniforms("pixel");
 
@@ -340,7 +341,7 @@ class BloomShader : public TextureShader<BloomShader, 1, float>
 public:
     BloomShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "bloom.frag");
         assignUniforms("scale");
         assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
@@ -364,7 +365,7 @@ public:
 		if (!lensDustTex)
 			lensDustTex = irr_driver->getTexture(FileManager::TEXTURE, "gfx_lensDust_a.png");
 
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "bloomblend.frag");
         assignUniforms();
         assignSamplerNames(0, "tex_128", ST_BILINEAR_FILTERED,
@@ -391,7 +392,7 @@ class LensBlendShader : public TextureShader<LensBlendShader, 3>
 public:
     LensBlendShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "lensblend.frag");
         assignUniforms();
 
@@ -419,7 +420,7 @@ public:
 
     ToneMapShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "tonemap.frag");
         assignUniforms("vignette_weight");
         assignSamplerNames(0, "text", ST_NEAREST_FILTERED);
@@ -439,7 +440,7 @@ class DepthOfFieldShader : public TextureShader<DepthOfFieldShader, 2>
 public:
     DepthOfFieldShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "dof.frag");
 
         assignUniforms();
@@ -481,7 +482,7 @@ class PassThroughShader : public TextureShader<PassThroughShader, 1, int, int>
 public:
     PassThroughShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "passthrough.frag");
         assignUniforms("width", "height");
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
@@ -505,7 +506,7 @@ private:
 public:
     LayerPassThroughShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "layertexturequad.frag");
         m_tu_texture = 0;
         assignUniforms("layer");
@@ -531,7 +532,7 @@ class LinearizeDepthShader : public TextureShader<LinearizeDepthShader, 1,
 public:
     LinearizeDepthShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "linearizedepth.frag");
         assignUniforms("zn", "zf");
         assignSamplerNames(0, "texture", ST_BILINEAR_FILTERED);
@@ -555,7 +556,7 @@ public:
 
     GlowShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "glow.frag");
         assignUniforms();
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
@@ -578,7 +579,7 @@ class SSAOShader : public TextureShader<SSAOShader, 1, float, float, float>
 public:
     SSAOShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "ssao.frag");
 
         assignUniforms("radius", "k", "sigma");
@@ -605,7 +606,7 @@ class MotionBlurShader : public TextureShader<MotionBlurShader, 2,
 public:
     MotionBlurShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "motion_blur.frag");
         assignUniforms("previous_viewproj", "center", "boost_amount",
                         "mask_radius");
@@ -631,7 +632,7 @@ class GodFadeShader : public TextureShader<GodFadeShader, 1, video::SColorf>
 public:
     GodFadeShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "godfade.frag");
         assignUniforms("col");
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
@@ -650,7 +651,7 @@ class GodRayShader : public TextureShader<GodRayShader, 1, core::vector2df>
 public:
     GodRayShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "godray.frag");
 
         assignUniforms("sunpos");
@@ -671,7 +672,7 @@ class MLAAColorEdgeDetectionSHader
 public:
     MLAAColorEdgeDetectionSHader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "mlaa_color1.frag");
         assignUniforms("PIXEL_SIZE");
         assignSamplerNames(0, "colorMapG", ST_NEAREST_FILTERED);
@@ -692,7 +693,7 @@ class MLAABlendWeightSHader : public TextureShader<MLAABlendWeightSHader,
 public:
     MLAABlendWeightSHader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "mlaa_blend2.frag");
         assignUniforms("PIXEL_SIZE");
 
@@ -719,7 +720,7 @@ class MLAAGatherSHader : public TextureShader<MLAAGatherSHader, 2,
 public:
     MLAAGatherSHader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "mlaa_neigh3.frag");
         assignUniforms("PIXEL_SIZE");
         assignSamplerNames(0, "blendMap", ST_NEAREST_FILTERED,
@@ -745,7 +746,7 @@ class LightningShader : public TextureShader<LightningShader, 1,
 public:
     LightningShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
                             GL_FRAGMENT_SHADER, "lightning.frag");
         assignUniforms("intensity");
     }   // LightningShader

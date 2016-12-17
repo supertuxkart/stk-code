@@ -22,9 +22,9 @@
 
 #include "graphics/shader.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/shared_shaders.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "graphics/vao_manager.hpp"
-
 
 // ============================================================================
 class InstancedObjectPass1Shader : public TextureShader<InstancedObjectPass1Shader, 1>
@@ -32,8 +32,8 @@ class InstancedObjectPass1Shader : public TextureShader<InstancedObjectPass1Shad
 public:
     InstancedObjectPass1Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstanced),
+                            GET_SS(SharedInstancedPass1));
 
         assignUniforms();
         assignSamplerNames(0, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -46,8 +46,8 @@ class InstancedObjectRefPass1Shader : public TextureShader<InstancedObjectRefPas
 public:
     InstancedObjectRefPass1Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstanced),
+                            GET_SS(SharedInstancedRefPass1));
 
         assignUniforms();
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -64,7 +64,7 @@ class ObjectRefPass2Shader : public TextureShader<ObjectRefPass2Shader, 6,
 public:
     ObjectRefPass2Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+        loadProgram(OBJECT, GET_SS(SharedObject),
                             GL_FRAGMENT_SHADER, "objectref_pass2.frag");
         assignUniforms("ModelMatrix", "texture_trans", "color_change");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -82,8 +82,8 @@ class InstancedObjectPass2Shader : public TextureShader<InstancedObjectPass2Shad
 public:
     InstancedObjectPass2Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstanced),
+                            GET_SS(SharedInstancedPass2));
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -100,8 +100,8 @@ class InstancedObjectRefPass2Shader : public TextureShader<InstancedObjectRefPas
 public:
     InstancedObjectRefPass2Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstanced),
+                            GET_SS(SharedInstancedRefPass2));
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -150,12 +150,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT, GET_SS(SharedInstancedShadow),
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT, GET_SS(SharedInstancedShadow),
                                 GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
@@ -222,7 +222,7 @@ class SphereMapShader : public TextureShader<SphereMapShader, 4, core::matrix4,
 public:
     SphereMapShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+        loadProgram(OBJECT, GET_SS(SharedObject),
                             GL_FRAGMENT_SHADER, "objectpass_spheremap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -239,7 +239,7 @@ public:
     InstancedSphereMapShader()
     {
         loadProgram(OBJECT,
-                    GL_VERTEX_SHADER, "instanced_object_pass.vert",
+                    GET_SS(SharedInstanced),
                     GL_FRAGMENT_SHADER, "instanced_objectpass_spheremap.frag");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -255,7 +255,7 @@ class SplattingShader : public TextureShader<SplattingShader, 8, core::matrix4>
 public:
     SplattingShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+        loadProgram(OBJECT, GET_SS(SharedObject),
                             GL_FRAGMENT_SHADER, "splatting.frag");
         assignUniforms("ModelMatrix");
 
@@ -277,7 +277,7 @@ class ObjectRefPass1Shader : public TextureShader<ObjectRefPass1Shader, 2, core:
 public:
     ObjectRefPass1Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+        loadProgram(OBJECT, GET_SS(SharedObject),
                             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "texture_trans");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -293,7 +293,7 @@ class NormalMapShader : public TextureShader<NormalMapShader, 2, core::matrix4,
 public:
     NormalMapShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+        loadProgram(OBJECT, GET_SS(SharedObject),
                             GL_FRAGMENT_SHADER, "normalmap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
         assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -308,8 +308,8 @@ class InstancedNormalMapShader : public TextureShader<InstancedNormalMapShader, 
 public:
     InstancedNormalMapShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "instanced_normalmap.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstanced),
+                            GET_SS(SharedInstancedNormal));
         assignUniforms();
         assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "glossMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -323,7 +323,7 @@ class ObjectUnlitShader : public TextureShader<ObjectUnlitShader, 4, core::matri
 public:
     ObjectUnlitShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+        loadProgram(OBJECT, GET_SS(SharedObject),
                             GL_FRAGMENT_SHADER, "object_unlit.frag");
         assignUniforms("ModelMatrix", "texture_trans");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -339,8 +339,8 @@ class InstancedObjectUnlitShader : public TextureShader<InstancedObjectUnlitShad
 public:
     InstancedObjectUnlitShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
-                            GL_FRAGMENT_SHADER, "instanced_object_unlit.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstanced),
+                            GET_SS(SharedInstancedUnlit));
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -390,12 +390,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT,GET_SS(SharedInstancedShadow),
                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT,GET_SS(SharedInstancedShadow),
                                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
@@ -442,9 +442,9 @@ public:
     NormalVisualizer()
     {
 #if !defined(USE_GLES2)
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_object_pass.vert",
+        loadProgram(OBJECT, GET_SS(SharedInstanced),
                             GL_GEOMETRY_SHADER, "normal_visualizer.geom",
-                            GL_FRAGMENT_SHADER, "coloredquad.frag");
+                            GET_SS(SharedColoredQuad));
         assignUniforms("color");
 #endif
     }   // NormalVisualizer
@@ -473,8 +473,8 @@ class InstancedGrassPass1Shader : public TextureShader<InstancedGrassPass1Shader
 public:
     InstancedGrassPass1Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_grass.vert",
-                            GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstancedGrass),
+                            GET_SS(SharedInstancedRefPass1));
         assignUniforms("windDir");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -566,8 +566,8 @@ class InstancedGrassPass2Shader : public TextureShader<InstancedGrassPass2Shader
 public:
     InstancedGrassPass2Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_grass.vert",
-                            GL_FRAGMENT_SHADER, "instanced_grass_pass2.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstancedGrass),
+                            GET_SS(SharedInstancedGrassPass2));
         assignUniforms("windDir");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -586,7 +586,7 @@ class DetailedObjectPass2Shader : public TextureShader<DetailedObjectPass2Shader
 public:
     DetailedObjectPass2Shader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+        loadProgram(OBJECT, GET_SS(SharedObject),
                             GL_FRAGMENT_SHADER, "detailed_object_pass2.frag");
         assignUniforms("ModelMatrix");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -605,7 +605,7 @@ public:
     InstancedDetailedObjectPass2Shader()
     {
         loadProgram(OBJECT,
-                   GL_VERTEX_SHADER, "instanced_object_pass.vert",
+                   GET_SS(SharedInstanced),
                    GL_FRAGMENT_SHADER, "instanced_detailed_object_pass2.frag");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -626,8 +626,8 @@ public:
     SkinnedPass1Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
-                            GL_FRAGMENT_SHADER, "object_pass1.frag");
+        loadProgram(OBJECT, GET_SS(SharedSkinning),
+                            GET_SS(SharedPass1));
         assignUniforms("ModelMatrix", "InverseModelMatrix", "skinning_offset");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // SkinnedPass1Shader
@@ -640,8 +640,8 @@ public:
     InstancedSkinnedPass1Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
-                            GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstancedSkinning),
+                            GET_SS(SharedInstancedPass1));
         assignUniforms();
         assignSamplerNames(0, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // InstancedSkinnedPass1Shader
@@ -656,7 +656,7 @@ public:
     SkinnedPass2Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+        loadProgram(OBJECT, GET_SS(SharedSkinning),
                             GL_FRAGMENT_SHADER, "object_pass2.frag");
         assignUniforms("ModelMatrix", "texture_trans", "color_change",
                        "skinning_offset");
@@ -676,8 +676,8 @@ public:
     InstancedSkinnedPass2Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
-                            GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstancedSkinning),
+                            GET_SS(SharedInstancedPass2));
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -698,7 +698,7 @@ public:
     SkinnedRefPass1Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+        loadProgram(OBJECT, GET_SS(SharedSkinning),
                             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "texture_trans",
                        "skinning_offset");
@@ -714,8 +714,8 @@ public:
     InstancedSkinnedRefPass1Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
-                            GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstancedSkinning),
+                            GET_SS(SharedInstancedRefPass1));
         assignUniforms();
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -732,7 +732,7 @@ public:
     SkinnedRefPass2Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+        loadProgram(OBJECT, GET_SS(SharedSkinning),
                             GL_FRAGMENT_SHADER, "objectref_pass2.frag");
         assignUniforms("ModelMatrix", "texture_trans", "color_change",
                        "skinning_offset");
@@ -752,8 +752,8 @@ public:
     InstancedSkinnedRefPass2Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
-                            GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstancedSkinning),
+                            GET_SS(SharedInstancedRefPass2));
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -773,7 +773,7 @@ public:
     SkinnedUnlitShader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+        loadProgram(OBJECT, GET_SS(SharedSkinning),
                             GL_FRAGMENT_SHADER, "object_unlit.frag");
         assignUniforms("ModelMatrix", "texture_trans", "skinning_offset");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -790,8 +790,8 @@ public:
     InstancedSkinnedUnlitShader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
-                            GL_FRAGMENT_SHADER, "instanced_object_unlit.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstancedSkinning),
+                            GET_SS(SharedInstancedUnlit));
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
                            1, "SpecularMap", ST_NEAREST_FILTERED,
@@ -809,7 +809,7 @@ public:
     SkinnedNormalMapShader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+        loadProgram(OBJECT, GET_SS(SharedSkinning),
                             GL_FRAGMENT_SHADER, "normalmap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "skinning_offset");
         assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -824,8 +824,8 @@ public:
     InstancedSkinnedNormalMapShader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
-                            GL_FRAGMENT_SHADER, "instanced_normalmap.frag");
+        loadProgram(OBJECT, GET_SS(SharedInstancedSkinning),
+                            GET_SS(SharedInstancedNormal));
         assignUniforms();
         assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "glossMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -871,12 +871,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+            loadProgram(OBJECT, GET_SS(SharedInstancedSkinningShadow),
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+            loadProgram(OBJECT, GET_SS(SharedInstancedSkinningShadow),
                                 GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
@@ -926,12 +926,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+            loadProgram(OBJECT, GET_SS(SharedInstancedSkinningShadow),
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+            loadProgram(OBJECT, GET_SS(SharedInstancedSkinningShadow),
                                 GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }

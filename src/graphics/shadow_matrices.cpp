@@ -27,6 +27,7 @@
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/shared_shaders.hpp"
 #include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
@@ -95,7 +96,7 @@ private:
 public:    ViewFrustrumShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "frustrum.vert",
-                            GL_FRAGMENT_SHADER, "coloredquad.frag");
+                            GET_SS(SharedColoredQuad));
 
         assignUniforms("color", "idx");
 

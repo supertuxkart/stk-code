@@ -24,6 +24,7 @@
 #include "graphics/shader.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
+#include "graphics/shared_shaders.hpp"
 #include "graphics/texture_manager.hpp"
 #include "graphics/texture_shader.hpp"
 #include "utils/cpp2011.hpp"
@@ -43,7 +44,7 @@ public:
     Primitive2DList()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "primitive2dlist.vert",
-                            GL_FRAGMENT_SHADER, "transparent.frag");
+                            GET_SS(SharedTransparent));
         assignUniforms("custom_alpha");
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
     }   // Primitive2DList
@@ -58,7 +59,7 @@ class UniformColoredTextureRectShader : public TextureShader<UniformColoredTextu
 public:
     UniformColoredTextureRectShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "texturedquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedTexturedQuad),
                     GL_FRAGMENT_SHADER, "uniformcolortexturedquad.frag");
 
         assignUniforms("center", "size", "texcenter", "texsize", "color");
@@ -75,7 +76,7 @@ class TextureRectShader : public TextureShader<TextureRectShader, 1,
 public:
     TextureRectShader()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "texturedquad.vert",
+        loadProgram(OBJECT, GET_SS(SharedTexturedQuad),
                             GL_FRAGMENT_SHADER, "texturedquad.frag");
         assignUniforms("center", "size", "texcenter", "texsize");
 
@@ -91,7 +92,7 @@ public:
     ColoredRectShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "coloredquad.vert",
-                            GL_FRAGMENT_SHADER, "coloredquad.frag");
+                            GET_SS(SharedColoredQuad));
         assignUniforms("center", "size", "color");
     }   // ColoredRectShader
 };   // ColoredRectShader

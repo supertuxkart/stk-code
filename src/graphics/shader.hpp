@@ -22,6 +22,7 @@
 
 #include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
+#include "graphics/shared_shader.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "utils/singleton.hpp"
 
@@ -81,6 +82,18 @@ protected:
         loadAndAttachShader(args...);
     }   // loadAndAttachShader
     // ------------------------------------------------------------------------
+    template<typename ... Types>
+    void loadAndAttachShader(SharedShader* ss, Types ... args)
+    {
+        GLint shader_id = ss->getShaderID();
+        glAttachShader(m_program, shader_id);
+        GLint is_deleted = GL_TRUE;
+        glGetShaderiv(shader_id, GL_DELETE_STATUS, &is_deleted);
+        if (is_deleted == GL_FALSE)
+            glDeleteShader(shader_id);
+        loadAndAttachShader(args...);
+    }   // loadAndAttachShader
+    // ------------------------------------------------------------------------
     /** Convenience interface using const char. */
     template<typename ... Types>
     void loadAndAttachShader(GLint shader_type, const char *name,
@@ -90,12 +103,12 @@ protected:
     }   // loadAndAttachShader
     // ------------------------------------------------------------------------
 
-    const std::string& getHeader();
-    GLuint loadShader(const std::string &file, unsigned type);
+    static const std::string& getHeader();
     void setAttribute(AttributeType type);
 
 public:
         ShaderBase();
+    static GLuint loadShader(const std::string &file, unsigned type);
     int loadTFBProgram(const std::string &vertex_file_path,
                        const char **varyings,
                        unsigned varyingscount);
@@ -285,7 +298,13 @@ protected:
         Log::error("shader", filepath);
         printFileList(args...);
     }   // printFileList
-
+    // ------------------------------------------------------------------------
+    template<typename ...Types>
+    void printFileList(SharedShader* ss, Types ... args)
+    {
+        Log::error("shader", ss->getName());
+        printFileList(args...);
+    }   // printFileList
     // ------------------------------------------------------------------------
     /** End recursion for variadic template. */
 private:
