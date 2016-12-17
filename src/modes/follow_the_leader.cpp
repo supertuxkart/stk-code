@@ -85,19 +85,6 @@ void FollowTheLeaderRace::reset()
     WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
                               m_leader_intervals[0]);
     
-    const unsigned int kart_amount = (unsigned int)m_karts.size();
-    int idCamera = 0;
-    for (unsigned int n = 1; n < kart_amount; n++)
-    {
-        if (m_karts[n]->getController()->isPlayerController())
-        {
-            Camera *camera = Camera::getCamera(idCamera);
-            camera->setMode(Camera::CM_NORMAL);
-            camera->setKart(getKart(n));
-            idCamera++;
-        }
-    }
-
     m_is_over_delay = 2.0f;
 }   // reset
 
