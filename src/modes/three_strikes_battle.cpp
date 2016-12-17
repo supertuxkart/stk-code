@@ -117,6 +117,9 @@ void ThreeStrikesBattle::reset()
         // no positions in this mode
         m_karts[n]->setPosition(-1);
 
+        Camera *camera = Camera::getCamera(n);
+        camera->setKart(m_karts[n]);
+
         scene::ISceneNode* kart_node = m_karts[n]->getNode();
 
         core::list<scene::ISceneNode*>& children = kart_node->getChildren();
