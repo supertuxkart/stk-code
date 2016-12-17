@@ -39,6 +39,7 @@ class AbstractKart;
 class Camera;
 class Material;
 class Referee;
+class RaceGUIMultitouch;
 
 /**
   * \brief An abstract base class for the two race guis (race_gui and
@@ -139,7 +140,7 @@ private:
 
     /** The referee scene node. */
     Referee *m_referee;
-
+    
 
 protected:
     /** Material for the 'plunger in the face' texture. */
@@ -178,6 +179,8 @@ protected:
 
     /** The frame around player karts in the mini map. */
     Material         *m_icons_frame;
+    
+    RaceGUIMultitouch* m_multitouch_gui;
 
     void cleanupMessages(const float dt);
     //void createMarkerTexture();
@@ -237,6 +240,10 @@ public:
     virtual void clearAllMessages() { m_messages.clear(); }
 
     void drawGlobalPlayerIcons(int bottom_margin);
+    
+    virtual void drawEnergyMeter(int x, int y, const AbstractKart *kart,
+                                 const core::recti &viewport,
+                                 const core::vector2df &scaling) {};
 
 };   // RaceGUIBase
 

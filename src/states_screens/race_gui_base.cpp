@@ -42,6 +42,7 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
+#include "states_screens/race_gui_multitouch.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 
@@ -99,6 +100,13 @@ RaceGUIBase::RaceGUIBase()
     m_icons_inertia         = 2;
 
     m_referee               = NULL;
+    m_multitouch_gui        = NULL;
+
+    if (UserConfigParams::m_multitouch_enabled &&
+        race_manager->getNumLocalPlayers() == 1)
+    {
+        m_multitouch_gui = new RaceGUIMultitouch(this);
+    }
 }   // RaceGUIBase
 
 // ----------------------------------------------------------------------------
@@ -147,7 +155,6 @@ void RaceGUIBase::reset()
     m_referee_height = 10.0f;
     m_referee->attachToSceneNode();
     m_referee->selectReadySetGo(0); // set red color
-
     m_plunger_move_time = 0;
     m_plunger_offset    = core::vector2di(0,0);
     m_plunger_speed     = core::vector2df(0,0);
@@ -165,6 +172,7 @@ RaceGUIBase::~RaceGUIBase()
     // If the referee is currently being shown,
     // remove it from the scene graph.
     delete m_referee;
+    delete m_multitouch_gui;
 }   // ~RaceGUIBase
 
 //-----------------------------------------------------------------------------
@@ -435,7 +443,15 @@ void RaceGUIBase::preRenderCallback(const Camera *camera)
 // ----------------------------------------------------------------------------
 void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 {
-
+    const core::recti &viewport = camera->getViewport();
+    const core::vector2df scaling = camera->getScaling();
+    const AbstractKart* kart = camera->getKart();
+    if(!kart) return;
+    
+    if (m_multitouch_gui != NULL)
+    {
+        m_multitouch_gui->drawMultitouchSteering(kart, viewport, scaling);
+    }
 }   // renderPlayerView
 
 
