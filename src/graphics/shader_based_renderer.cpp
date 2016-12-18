@@ -641,7 +641,9 @@ ShaderBasedRenderer::ShaderBasedRenderer()
     m_skybox                = NULL;
     m_spherical_harmonics   = new SphericalHarmonics(irr_driver->getAmbientLight().toSColor());
     m_nb_static_glowing     = 0;
-    
+    Log::info("ShaderBasedRenderer", "Preloading shaders...");
+    preloadShaderFiles();
+
     if (CVS->isAZDOEnabled())
     {
         m_geometry_passes = new GeometryPasses<MultidrawPolicy>();
@@ -657,7 +659,7 @@ ShaderBasedRenderer::ShaderBasedRenderer()
         m_geometry_passes = new GeometryPasses<GL3DrawPolicy>();
         Log::info("ShaderBasedRenderer", "Geometry will be rendered with GL3 policy.");
     }
-        
+
     m_post_processing = new PostProcessing(irr_driver->getVideoDriver());    
 }
 
@@ -961,5 +963,61 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     irr_driver->getSceneManager()->setActiveCamera(NULL);
 
 } //renderToTexture
+
+// ----------------------------------------------------------------------------
+void ShaderBasedRenderer::preloadShaderFiles()
+{
+    ShaderFilesManager* sfm = ShaderFilesManager::getInstance();
+
+    sfm->addShaderFile("object_pass.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("object_pass1.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("splatting.frag", GL_FRAGMENT_SHADER);
+    if (CVS->supportsHardwareSkinning())
+        sfm->addShaderFile("skinning.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("transparent.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("coloredquad.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("coloredquad.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("screenquad.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("tonemap.frag", GL_FRAGMENT_SHADER);
+    if (!GraphicsRestrictions::isDisabled
+        (GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+        sfm->addShaderFile("passthrough.frag", GL_FRAGMENT_SHADER);
+
+    sfm->addShaderFile("billboard.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("billboard.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("pointemitter.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("particle.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("particle.frag", GL_FRAGMENT_SHADER);
+
+    if (CVS->supportsIndirectInstancingRendering())
+    {
+        sfm->addShaderFile("instanced_object_pass.vert", GL_VERTEX_SHADER);
+        if (CVS->supportsHardwareSkinning())
+            sfm->addShaderFile("instanced_skinning.vert", GL_VERTEX_SHADER);
+        sfm->addShaderFile("instanced_object_pass1.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_object_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_objectref_pass1.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_objectref_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_object_unlit.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_normalmap.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_grass.vert", GL_VERTEX_SHADER);
+        sfm->addShaderFile("instanced_grass_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_objectpass_spheremap.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_detailed_object_pass2.frag", GL_FRAGMENT_SHADER);
+    }
+    else
+    {
+        sfm->addShaderFile("object_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("objectref_pass1.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("objectref_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("object_unlit.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("normalmap.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("grass_pass.vert", GL_VERTEX_SHADER);
+        sfm->addShaderFile("grass_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("objectpass_spheremap.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("detailed_object_pass2.frag", GL_FRAGMENT_SHADER);
+    }
+
+} //preloadShaderFiles
 
 #endif   // !SERVER_ONLY
