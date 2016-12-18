@@ -100,7 +100,6 @@
 #include "graphics/gpu_particles.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shared_gpu_objects.hpp"
-#include "graphics/shared_shaders.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
@@ -341,8 +340,8 @@ void Shaders::check(const int num)
 // Solid Normal and depth pass shaders
 Shaders::ObjectPass1Shader::ObjectPass1Shader()
 {
-    loadProgram(OBJECT, GET_SS(SharedObject),
-                        GET_SS(SharedPass1));
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                        GL_FRAGMENT_SHADER, "object_pass1.frag");
     assignUniforms("ModelMatrix", "InverseModelMatrix");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // ObjectPass1Shader
@@ -351,7 +350,7 @@ Shaders::ObjectPass1Shader::ObjectPass1Shader()
 // Solid Lit pass shaders
 Shaders::ObjectPass2Shader::ObjectPass2Shader()
 {
-    loadProgram(OBJECT, GET_SS(SharedObject),
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "object_pass2.frag");
     assignUniforms("ModelMatrix", "texture_trans", "color_change");
     assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -366,8 +365,8 @@ Shaders::ObjectPass2Shader::ObjectPass2Shader()
 Shaders::SkinnedTransparentShader::SkinnedTransparentShader()
 {
     if (!CVS->supportsHardwareSkinning()) return;
-    loadProgram(OBJECT, GET_SS(SharedSkinning),
-                        GET_SS(SharedTransparent));
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+                        GL_FRAGMENT_SHADER, "transparent.frag");
     assignUniforms("ModelMatrix", "texture_trans", "skinning_offset",  "custom_alpha");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // SkinnedTransparentShader
@@ -375,8 +374,8 @@ Shaders::SkinnedTransparentShader::SkinnedTransparentShader()
 // ============================================================================
 Shaders::TransparentShader::TransparentShader()
 {
-    loadProgram(OBJECT, GET_SS(SharedObject),
-                        GET_SS(SharedTransparent));
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
+                        GL_FRAGMENT_SHADER, "transparent.frag");
     assignUniforms("ModelMatrix", "texture_trans", "custom_alpha");
     assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
 }   // TransparentShader
@@ -384,7 +383,7 @@ Shaders::TransparentShader::TransparentShader()
 // ============================================================================
 Shaders::TransparentFogShader::TransparentFogShader()
 {
-    loadProgram(OBJECT, GET_SS(SharedObject),
+    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                         GL_FRAGMENT_SHADER, "transparentfog.frag");
     assignUniforms("ModelMatrix", "texture_trans", "fogmax", "startH",
                    "endH", "start", "end", "col");
@@ -394,8 +393,9 @@ Shaders::TransparentFogShader::TransparentFogShader()
 // ============================================================================
 Shaders::ColoredLine::ColoredLine()
 {
-    loadProgram(OBJECT, GET_SS(SharedObject),
-                        GET_SS(SharedColoredQuad));
+    loadProgram(OBJECT, GL_VERTEX_SHADER,   "object_pass.vert",
+                        GL_FRAGMENT_SHADER, "coloredquad.frag");
+
     assignUniforms("color");
 
     glGenVertexArrays(1, &m_vao);

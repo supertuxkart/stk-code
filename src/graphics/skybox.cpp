@@ -21,7 +21,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/shared_shaders.hpp"
+
 
 #include <algorithm>
 #include <cassert>
@@ -64,7 +64,7 @@ public:
     GLuint m_tu_samples;
     SpecularIBLGenerator()
     {
-        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
+        loadProgram(OBJECT, GL_VERTEX_SHADER,   "screenquad.vert",
                             GL_FRAGMENT_SHADER, "importance_sampling_specular.frag");
         assignUniforms("PermutationMatrix", "ViewportSize");
         m_tu_samples = 1;

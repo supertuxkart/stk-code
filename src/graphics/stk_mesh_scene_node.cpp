@@ -24,7 +24,6 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
 #include "graphics/rtts.hpp"
-#include "graphics/shared_shaders.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "graphics/texture_manager.hpp"
 #include "graphics/vao_manager.hpp"
@@ -41,7 +40,7 @@ class ColorizeShader : public Shader<ColorizeShader, core::matrix4,
 public:
     ColorizeShader()
     {
-        loadProgram(OBJECT, GET_SS(SharedObject),
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                             GL_FRAGMENT_SHADER, "colorize.frag");
         assignUniforms("ModelMatrix", "col");
     }

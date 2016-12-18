@@ -27,7 +27,6 @@
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_matrices.hpp"
-#include "graphics/shared_shaders.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
@@ -64,7 +63,7 @@ class FogShader : public TextureShader<FogShader, 1, float, core::vector3df>
 public:
     FogShader()
     {
-        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "fog.frag");
         assignUniforms("density", "col");
         assignSamplerNames(0, "tex", ST_NEAREST_FILTERED);
@@ -191,12 +190,12 @@ public:
     {
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GET_SS(SharedSlicedScreenQuad),
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
                                 GL_FRAGMENT_SHADER, "rh.frag");
         }
         else
         {
-            loadProgram(OBJECT, GET_SS(SharedSlicedScreenQuad),
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "slicedscreenquad.vert",
                                 GL_GEOMETRY_SHADER, "rhpassthrough.geom",
                                 GL_FRAGMENT_SHADER, "rh.frag");
         }
@@ -239,7 +238,7 @@ class GlobalIlluminationReconstructionShader
 public:
     GlobalIlluminationReconstructionShader()
     {
-        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "gi.frag");
 
         assignUniforms("rh_matrix", "inv_rh_matrix", "extents");
@@ -272,7 +271,7 @@ class IBLShader : public TextureShader<IBLShader, 3>
 public:
     IBLShader()
     {
-        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "IBL.frag");
         assignUniforms();
         assignSamplerNames(0, "ntex",  ST_NEAREST_FILTERED,
@@ -287,7 +286,7 @@ class DegradedIBLShader : public TextureShader<DegradedIBLShader, 1>
 public:
     DegradedIBLShader()
     {
-        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "degraded_ibl.frag");
         assignUniforms();
         assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED);
@@ -302,7 +301,7 @@ class ShadowedSunLightShaderPCF : public TextureShader<ShadowedSunLightShaderPCF
 public:
     ShadowedSunLightShaderPCF()
     {
-        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "sunlightshadow.frag");
 
         // Use 8 to circumvent a catalyst bug when binding sampler
@@ -336,7 +335,7 @@ class ShadowedSunLightShaderESM : public TextureShader<ShadowedSunLightShaderESM
 public:
     ShadowedSunLightShaderESM()
     {
-        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "sunlightshadowesm.frag");
 
         // Use 8 to circumvent a catalyst bug when binding sampler
@@ -369,7 +368,7 @@ class SunLightShader : public TextureShader<SunLightShader, 2,
 public:
     SunLightShader()
     {
-        loadProgram(OBJECT, GET_SS(SharedScreenQuad),
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "sunlight.frag");
 
         assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,

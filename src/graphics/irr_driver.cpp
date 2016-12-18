@@ -919,6 +919,7 @@ void IrrDriver::applyResolutionSettings()
     // FIXME: this load sequence is (mostly) duplicated from main.cpp!!
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
+    ShaderBase::updateShaders();
     VAOManager::getInstance()->kill();
     resetTextureTable();
     cleanUnicolorTextures();
@@ -929,7 +930,6 @@ void IrrDriver::applyResolutionSettings()
     }
     delete m_renderer;
     initDevice();
-    ShaderBase::updateShaders();
 
     font_manager = new FontManager();
     font_manager->loadFonts();

@@ -31,7 +31,6 @@
 #include "graphics/render_target.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/shared_shaders.hpp"
 #include "graphics/skybox.hpp"
 #include "graphics/spherical_harmonics.hpp"
 #include "graphics/texture_manager.hpp"
@@ -642,8 +641,7 @@ ShaderBasedRenderer::ShaderBasedRenderer()
     m_skybox                = NULL;
     m_spherical_harmonics   = new SphericalHarmonics(irr_driver->getAmbientLight().toSColor());
     m_nb_static_glowing     = 0;
-    preloadSharedShaders();
-
+    
     if (CVS->isAZDOEnabled())
     {
         m_geometry_passes = new GeometryPasses<MultidrawPolicy>();
@@ -683,7 +681,6 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_spherical_harmonics;
     delete m_skybox;
     delete m_rtts;
-    SharedShaderManager::kill();
 }
 
 // ----------------------------------------------------------------------------
@@ -963,42 +960,5 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     irr_driver->getSceneManager()->setActiveCamera(NULL);
 
 } //renderToTexture
-
-void ShaderBasedRenderer::preloadSharedShaders()
-{
-    SharedShaderManager* ssm = SharedShaderManager::getInstance();
-    // Common shaders:
-    ssm->addSharedShader(new SharedObject());
-    ssm->addSharedShader(new SharedPass1());
-    if (CVS->supportsHardwareSkinning())
-        ssm->addSharedShader(new SharedSkinning());
-    ssm->addSharedShader(new SharedTransparent());
-    ssm->addSharedShader(new SharedTexturedQuad());
-    ssm->addSharedShader(new SharedColoredQuad());
-    ssm->addSharedShader(new SharedSlicedScreenQuad());
-    ssm->addSharedShader(new SharedScreenQuad());
-
-    if (CVS->supportsIndirectInstancingRendering())
-    {
-        ssm->addSharedShader(new SharedInstanced());
-        if (CVS->supportsHardwareSkinning())
-            ssm->addSharedShader(new SharedInstancedSkinning());
-        ssm->addSharedShader(new SharedInstancedPass1());
-        ssm->addSharedShader(new SharedInstancedPass2());
-        ssm->addSharedShader(new SharedInstancedRefPass1());
-        ssm->addSharedShader(new SharedInstancedRefPass2());
-        ssm->addSharedShader(new SharedInstancedUnlit());
-        ssm->addSharedShader(new SharedInstancedNormal());
-        ssm->addSharedShader(new SharedInstancedGrass());
-        ssm->addSharedShader(new SharedInstancedGrassPass2());
-        if (CVS->isShadowEnabled())
-        {
-            ssm->addSharedShader(new SharedInstancedShadow());
-            if (CVS->supportsHardwareSkinning())
-                ssm->addSharedShader(new SharedInstancedSkinningShadow());
-        }
-    }
-
-} //preLoadSharedShaders
 
 #endif   // !SERVER_ONLY
