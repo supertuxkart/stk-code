@@ -26,47 +26,39 @@
 #include <fstream>
 #include <sstream>
 
-std::string ShaderFilesManager::m_shader_header = "";
-
 // ----------------------------------------------------------------------------
 /** Returns a string with the content of header.txt (which contains basic
  *  shader defines).
  */
 const std::string& ShaderFilesManager::getHeader()
 {
+    // Stores the content of header.txt, to avoid reading this file repeatedly.
+    static std::string shader_header;
+
     // Only read file first time
-    if (m_shader_header.empty())
+    if (shader_header.empty())
     {
-        std::ifstream stream(file_manager->getShader("header.txt"),
-            std::ios::in);
+        std::ifstream stream(file_manager->getShader("header.txt"), std::ios::in);
         if (stream.is_open())
         {
             std::string line = "";
-            while (getline(stream, line))
-                m_shader_header += "\n" + line;
+            while (std::getline(stream, line))
+                shader_header += "\n" + line;
             stream.close();
         }
-    }   // if m_shader_header.empty()
+    }   // if shader_header.empty()
 
-    return m_shader_header;
+    return shader_header;
 }   // getHeader
 
 // ----------------------------------------------------------------------------
-/** Loads a single shader file, and add it to the loaded list
+/** Loads a single shader. This is NOT cached, use addShaderFile for that.
  *  \param file Filename of the shader to load.
  *  \param type Type of the shader.
  */
-GLuint ShaderFilesManager::addShaderFile(const std::string &file,
-                                         unsigned type)
+GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
 {
-#ifdef DEBUG
-    // Make sure no duplicated shader is added somewhere else
-    std::unordered_map<std::string, GLuint>::const_iterator i =
-        m_shader_files_loaded.find(file);
-    assert(i == m_shader_files_loaded.end());
-#endif
-
-    GLuint id = glCreateShader(type);
+    const GLuint id = glCreateShader(type);
 
     std::ostringstream code;
 #if !defined(USE_GLES2)
@@ -134,13 +126,17 @@ GLuint ShaderFilesManager::addShaderFile(const std::string &file,
     std::ifstream stream(file_manager->getShader(file), std::ios::in);
     if (stream.is_open())
     {
-        std::string line = "";
-        while (getline(stream, line))
+        const std::string stk_include = "#stk_include";
+        std::string line;
+
+        while (std::getline(stream, line))
         {
-            const std::string stk_include = "#stk_include";
-            std::size_t pos = line.find(stk_include);
+            const std::size_t pos = line.find(stk_include);
+
+            // load the custom file pointed by the #stk_include directive
             if (pos != std::string::npos)
             {
+                // find the start "
                 std::size_t pos = line.find("\"");
                 if (pos == std::string::npos)
                 {
@@ -151,6 +147,7 @@ GLuint ShaderFilesManager::addShaderFile(const std::string &file,
 
                 std::string filename = line.substr(pos + 1);
 
+                // find the end "
                 pos = filename.find("\"");
                 if (pos == std::string::npos)
                 {
@@ -161,8 +158,8 @@ GLuint ShaderFilesManager::addShaderFile(const std::string &file,
 
                 filename = filename.substr(0, pos);
 
-                std::ifstream include_stream(file_manager->getShader(filename),
-                    std::ios::in);
+                // read the whole include file
+                std::ifstream include_stream(file_manager->getShader(filename), std::ios::in);
                 if (!include_stream.is_open())
                 {
                     Log::error("ShaderFilesManager", "Couldn't open included"
@@ -171,7 +168,7 @@ GLuint ShaderFilesManager::addShaderFile(const std::string &file,
                 }
 
                 std::string include_line = "";
-                while (getline(include_stream, include_line))
+                while (std::getline(include_stream, include_line))
                 {
                     code << "\n" << include_line;
                 }
@@ -201,6 +198,7 @@ GLuint ShaderFilesManager::addShaderFile(const std::string &file,
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
     if (result == GL_FALSE)
     {
+        // failed to compile
         int info_length;
         Log::error("ShaderFilesManager", "Error in shader %s", file.c_str());
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &info_length);
@@ -212,24 +210,44 @@ GLuint ShaderFilesManager::addShaderFile(const std::string &file,
         Log::error("ShaderFilesManager", error_message);
         delete[] error_message;
     }
-
     glGetError();
+
+    return id;
+} // loadShader
+
+// ----------------------------------------------------------------------------
+/** Loads a single shader file, and add it to the loaded (cached) list
+ *  \param file Filename of the shader to load.
+ *  \param type Type of the shader.
+ */
+GLuint ShaderFilesManager::addShaderFile(const std::string &file, unsigned type)
+{
+#ifdef DEBUG
+    // Make sure no duplicated shader is added somewhere else
+    std::unordered_map<std::string, GLuint>::const_iterator i =
+        m_shader_files_loaded.find(file);
+    assert(i == m_shader_files_loaded.end());
+#endif
+
+    const GLuint id = loadShader(file, type);
     m_shader_files_loaded[file] = id;
     return id;
-
 }   // addShaderFile
 
 // ----------------------------------------------------------------------------
-GLuint ShaderFilesManager::getShaderFile(const std::string &file,
-                                         unsigned type)
+/** Get a shader file. If the shader is not already in the cache it will be loaded and cached.
+ *  \param file Filename of the shader to load.
+ *  \param type Type of the shader.
+ */
+GLuint ShaderFilesManager::getShaderFile(const std::string &file, unsigned type)
 {
-    std::unordered_map<std::string, GLuint>::const_iterator i =
-        m_shader_files_loaded.find(file);
-    if (i != m_shader_files_loaded.end())
-        return i->second;
-    else
-        return addShaderFile(file, type);
+    // found in cache
+    auto it = m_shader_files_loaded.find(file);
+    if (it != m_shader_files_loaded.end())
+        return it->second;
 
+   // add to the cache now
+   return addShaderFile(file, type);
 }   // getShaderFile
 
 #endif   // !SERVER_ONLY

@@ -31,10 +31,9 @@
 class ShaderFilesManager : public Singleton<ShaderFilesManager>, NoCopy
 {
 private:
-    /** Stores the context of header.txt, to avoid reading
-    *  this file repeatedly. */
-    static std::string m_shader_header;
-
+    /**
+     * Map from a filename to a shader indentifier. Used for caching shaders.
+     */
     std::unordered_map<std::string, GLuint> m_shader_files_loaded;
 
     // ------------------------------------------------------------------------
@@ -47,6 +46,8 @@ public:
     ~ShaderFilesManager()                                          { clean(); }
     // ------------------------------------------------------------------------
     void clean()                             { m_shader_files_loaded.clear(); }
+    // ------------------------------------------------------------------------
+    GLuint loadShader(const std::string &file, unsigned type);
     // ------------------------------------------------------------------------
     GLuint addShaderFile(const std::string &file, unsigned type);
     // ------------------------------------------------------------------------
