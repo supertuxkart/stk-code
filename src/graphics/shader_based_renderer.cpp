@@ -681,6 +681,7 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_spherical_harmonics;
     delete m_skybox;
     delete m_rtts;
+    ShaderFilesManager::kill();
 }
 
 // ----------------------------------------------------------------------------

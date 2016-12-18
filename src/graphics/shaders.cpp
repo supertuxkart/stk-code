@@ -175,69 +175,6 @@ static std::string loadHeader()
 }   // loadHeader
 
 // ----------------------------------------------------------------------------
-// Mostly from shader tutorial
-GLuint loadShader(const char * file, unsigned type)
-{
-    GLuint Id = glCreateShader(type);
-    char versionString[20];
-#if !defined(USE_GLES2)
-    sprintf(versionString, "#version %d\n", CVS->getGLSLVersion());
-#else
-    if (CVS->isGLSL())
-        sprintf(versionString, "#version 300 es\n");
-#endif
-    std::string Code = versionString;
-    if (CVS->isAMDVertexShaderLayerUsable())
-        Code += "#extension GL_AMD_vertex_shader_layer : enable\n";
-    if (CVS->isAZDOEnabled())
-    {
-        Code += "#extension GL_ARB_bindless_texture : enable\n";
-        Code += "#define Use_Bindless_Texture\n";
-    }
-    std::ifstream Stream(file, std::ios::in);
-    Code += "//" + std::string(file) + "\n";
-    if (!CVS->isARBUniformBufferObjectUsable())
-        Code += "#define UBO_DISABLED\n";
-    if (CVS->isAMDVertexShaderLayerUsable())
-        Code += "#define VSLayer\n";
-    if (CVS->needsRGBBindlessWorkaround())
-        Code += "#define SRGBBindlessFix\n";
-    Code += loadHeader();
-    if (Stream.is_open())
-    {
-        std::string Line = "";
-        while (getline(Stream, Line))
-            Code += "\n" + Line;
-        Stream.close();
-    }
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
-    Log::info("GLWrap", "Compiling shader : %s", file);
-    char const * SourcePointer = Code.c_str();
-    int length = (int)strlen(SourcePointer);
-    glShaderSource(Id, 1, &SourcePointer, &length);
-    glCompileShader(Id);
-
-    glGetShaderiv(Id, GL_COMPILE_STATUS, &Result);
-    if (Result == GL_FALSE)
-    {
-        Log::error("GLWrap", "Error in shader %s", file);
-        glGetShaderiv(Id, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        if (InfoLogLength<0)
-            InfoLogLength = 1024;
-        char *ErrorMessage = new char[InfoLogLength];
-        ErrorMessage[0] = 0;
-        glGetShaderInfoLog(Id, InfoLogLength, NULL, ErrorMessage);
-        Log::error("GLWrap", ErrorMessage);
-        delete[] ErrorMessage;
-    }
-
-    glGetError();
-
-    return Id;
-}   // loadShader
-
-// ----------------------------------------------------------------------------
 void Shaders::loadShaders()
 {
     const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");

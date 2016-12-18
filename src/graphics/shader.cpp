@@ -19,197 +19,15 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/shader.hpp"
-
-#include "graphics/central_settings.hpp"
-#include "graphics/gl_headers.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/shared_gpu_objects.hpp"
 #include "graphics/spherical_harmonics.hpp"
-#include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
 
-std::string             ShaderBase::m_shader_header = "";
 std::vector<void(*)()>  ShaderBase::m_all_kill_functions;
-
-// ----------------------------------------------------------------------------
-/** Returns a string with the content of header.txt (which contains basic
- *  shader defines).
- */
-const std::string& ShaderBase::getHeader()
-{
-    // Only read file first time
-    if (m_shader_header.empty())
-    {
-        std::ifstream stream(file_manager->getShader("header.txt"), std::ios::in);
-        if (stream.is_open())
-        {
-            std::string line = "";
-            while (getline(stream, line))
-                m_shader_header += "\n" + line;
-            stream.close();
-        }
-    }   // if m_shader_header.empty()
-
-    return m_shader_header;
-}   // getHeader
-
-// ----------------------------------------------------------------------------
-/** Loads a single shader.
- *  \param file Filename of the shader to load.
- *  \param type Type of the shader.
- */
-GLuint ShaderBase::loadShader(const std::string &file, unsigned type)
-{
-    GLuint id = glCreateShader(type);
-
-    std::ostringstream code;
-#if !defined(USE_GLES2)
-    code << "#version " << CVS->getGLSLVersion()<<"\n";
-#else
-    if (CVS->isGLSL())
-        code << "#version 300 es\n";
-#endif
-
-#if !defined(USE_GLES2)
-    // Some drivers report that the compute shaders extension is available,
-    // but they report only OpenGL 3.x version, and thus these extensions
-    // must be enabled manually. Otherwise the shaders compilation will fail
-    // because STK tries to use extensions which are available, but disabled
-    // by default.
-    if (type == GL_COMPUTE_SHADER)
-    {
-        if (CVS->isARBComputeShaderUsable())
-            code << "#extension GL_ARB_compute_shader : enable\n";
-        if (CVS->isARBImageLoadStoreUsable())
-            code << "#extension GL_ARB_shader_image_load_store : enable\n";
-        if (CVS->isARBArraysOfArraysUsable())
-            code << "#extension GL_ARB_arrays_of_arrays : enable\n";
-    }
-#endif
-
-    if (CVS->isAMDVertexShaderLayerUsable())
-        code << "#extension GL_AMD_vertex_shader_layer : enable\n";
-
-    if (CVS->isARBExplicitAttribLocationUsable())
-        code << "#extension GL_ARB_explicit_attrib_location : enable\n";
-
-    if (CVS->isAZDOEnabled())
-    {
-        code << "#extension GL_ARB_bindless_texture : enable\n";
-        code << "#define Use_Bindless_Texture\n";
-    }
-    code << "//" << file << "\n";
-    if (!CVS->isARBUniformBufferObjectUsable())
-        code << "#define UBO_DISABLED\n";
-    if (CVS->isAMDVertexShaderLayerUsable())
-        code << "#define VSLayer\n";
-    if (CVS->needsRGBBindlessWorkaround())
-        code << "#define SRGBBindlessFix\n";
-
-#if !defined(USE_GLES2)
-    //shader compilation fails with some drivers if there is no precision qualifier
-    if (type == GL_FRAGMENT_SHADER)
-        code << "precision mediump float;\n";
-#else
-    int range[2], precision;
-    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range, &precision);
-
-    if (precision > 0)
-        code << "precision highp float;\n";
-    else
-        code << "precision mediump float;\n";
-#endif
-    code << "#define MAX_BONES " << SharedGPUObjects::getMaxMat4Size() << "\n";
-
-    code << getHeader();
-
-    std::ifstream stream(file_manager->getShader(file), std::ios::in);
-    if (stream.is_open())
-    {
-        std::string Line = "";
-        while (getline(stream, Line))
-        {
-            const std::string stk_include = "#stk_include";
-            std::size_t pos = Line.find(stk_include);
-            if (pos != std::string::npos)
-            {
-                std::size_t pos = Line.find("\"");
-                if (pos == std::string::npos)
-                {
-                    Log::error("shader", "Invalid #stk_include line: '%s'.", Line.c_str());
-                    continue;
-                }
-
-                std::string filename = Line.substr(pos+1);
-
-                pos = filename.find("\"");
-                if (pos == std::string::npos)
-                {
-                    Log::error("shader", "Invalid #stk_include line: '%s'.", Line.c_str());
-                    continue;
-                }
-
-                filename = filename.substr(0, pos);
-
-                std::ifstream include_stream(file_manager->getShader(filename), std::ios::in);
-                if (!include_stream.is_open())
-                {
-                    Log::error("shader", "Couldn't open included shader: '%s'.", filename.c_str());
-                    continue;
-                }
-
-                std::string include_line = "";
-                while (getline(include_stream, include_line))
-                {
-                    code << "\n" << include_line;
-                }
-
-                include_stream.close();
-            }
-            else
-            {
-                code << "\n" << Line;
-            }
-        }
-
-        stream.close();
-    }
-    else
-    {
-        Log::error("shader", "Can not open '%s'.", file.c_str());
-    }
-
-    Log::info("shader", "Compiling shader : %s", file.c_str());
-    const std::string &source  = code.str();
-    char const *source_pointer = source.c_str();
-    int len                    = source.size();
-    glShaderSource(id, 1, &source_pointer, &len);
-    glCompileShader(id);
-
-    GLint result = GL_FALSE;
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-    if (result == GL_FALSE)
-    {
-        int info_length;
-        Log::error("GLWrap", "Error in shader %s", file.c_str());
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &info_length);
-        if (info_length<0)
-            info_length = 1024;
-        char *error_message = new char[info_length];
-        error_message[0] = 0;
-        glGetShaderInfoLog(id, info_length, NULL, error_message);
-        Log::error("GLWrap", error_message);
-        delete[] error_message;
-    }
-
-    glGetError();
-
-    return id;
-}   // loadShader
 
 // ----------------------------------------------------------------------------
 /** Loads a transform feedback buffer shader with a given number of varying
@@ -239,7 +57,7 @@ int ShaderBase::loadTFBProgram(const std::string &shader_name,
         glGetProgramiv(m_program, GL_INFO_LOG_LENGTH, &info_log_length);
         char *error_message = new char[info_log_length];
         glGetProgramInfoLog(m_program, info_log_length, NULL, error_message);
-        Log::error("GLWrap", error_message);
+        Log::error("ShaderBase", error_message);
         delete[] error_message;
     }
 

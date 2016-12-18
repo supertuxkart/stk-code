@@ -236,9 +236,10 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
 #ifndef SERVER_ONLY
         Log::info("Debug", "Reloading shaders...");
-            ShaderBase::updateShaders();
+        ShaderFilesManager::getInstance()->clean();
+        ShaderBase::updateShaders();
 #endif
-            break;
+        break;
     case DEBUG_GRAPHICS_RESET:
         if (physics)
             physics->setDebugMode(IrrDebugDrawer::DM_NONE);
