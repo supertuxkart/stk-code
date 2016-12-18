@@ -59,6 +59,13 @@ const std::string& ShaderFilesManager::getHeader()
 GLuint ShaderFilesManager::addShaderFile(const std::string &file,
                                          unsigned type)
 {
+#ifdef DEBUG
+    // Make sure no duplicated shader is added somewhere else
+    std::unordered_map<std::string, GLuint>::const_iterator i =
+        m_shader_files_loaded.find(file);
+    assert(i == m_shader_files_loaded.end());
+#endif
+
     GLuint id = glCreateShader(type);
 
     std::ostringstream code;
@@ -214,7 +221,7 @@ GLuint ShaderFilesManager::addShaderFile(const std::string &file,
 
 // ----------------------------------------------------------------------------
 GLuint ShaderFilesManager::getShaderFile(const std::string &file,
-                                       unsigned type)
+                                         unsigned type)
 {
     std::unordered_map<std::string, GLuint>::const_iterator i =
         m_shader_files_loaded.find(file);
