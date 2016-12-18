@@ -150,12 +150,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_shadow.vert",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_shadow.vert",
                                 GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
@@ -390,12 +390,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanced_shadow.vert",
                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanced_shadow.vert",
                                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
@@ -522,12 +522,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_grassshadow.vert",
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_grassshadow.vert",
                                 GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
