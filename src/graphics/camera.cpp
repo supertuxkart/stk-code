@@ -94,7 +94,7 @@ void Camera::changeCamera(unsigned int camera_index, CameraType type)
     if(old_camera->getType()==type) return;
 
     Camera *new_camera = createCamera(old_camera->getIndex(), type,
-                                      old_camera->m_kart            );
+                                      old_camera->m_original_kart);
     // Replace the previous camera
     m_all_cameras[camera_index] = new_camera;
     if(s_active_camera == old_camera)

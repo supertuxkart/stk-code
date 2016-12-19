@@ -40,6 +40,7 @@ const core::vector3df& scale, RenderInfo* render_info, bool all_parts_colorized)
 {
     isGLInitialized = false;
     isMaterialInitialized = false;
+    m_got_animated_matrix = false;
     m_mesh_render_info = render_info;
     m_all_parts_colorized = all_parts_colorized;
 #ifdef DEBUG
@@ -192,10 +193,11 @@ void STKAnimatedMesh::updateNoGL()
         {
             // Test if texture matrix needs to be updated every frame
             const core::matrix4& mat = getMaterial(i).getTextureMatrix(0);
-            if (mat.isIdentity())
+            if (mat.isIdentity() && !m_got_animated_matrix)
                 continue;
             else
             {
+                m_got_animated_matrix = true;
                 GLmeshes[i].texture_trans.X = mat[8];
                 GLmeshes[i].texture_trans.Y = mat[9];
             }
