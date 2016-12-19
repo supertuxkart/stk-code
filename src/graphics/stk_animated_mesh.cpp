@@ -336,7 +336,7 @@ void STKAnimatedMesh::resetSkinningState(scene::IAnimatedMesh* mesh)
 {
     if (!CVS->supportsHardwareSkinning()) return;
     m_skinning_offset = -1;
-    m_skinned_mesh = dynamic_cast<scene::CSkinnedMesh*>(mesh);
+    setHardwareSkinning(true);
     if (m_skinned_mesh)
         m_skinned_mesh->convertForSkinning();
 }
@@ -351,6 +351,15 @@ scene::IMesh* STKAnimatedMesh::getMeshForCurrentFrame(SkinningCallback sc,
 
     return scene::CAnimatedMeshSceneNode::getMeshForCurrentFrame
         (uploadJoints, m_skinning_offset);
+}
+
+void STKAnimatedMesh::setHardwareSkinning(bool val)
+{
+    if (!CVS->supportsHardwareSkinning()) return;
+    if (val)
+        m_skinned_mesh = dynamic_cast<scene::CSkinnedMesh*>(Mesh);
+    else
+        m_skinned_mesh = NULL;
 }
 
 void STKAnimatedMesh::uploadJoints(const irr::core::matrix4& m,

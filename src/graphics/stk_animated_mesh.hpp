@@ -59,6 +59,7 @@ public:
   int getTotalJoints() const;
   void setSkinningOffset(int offset)  { m_skinning_offset = offset; }
   bool useHardwareSkinning() const { return m_skinned_mesh != NULL; }
+  void setHardwareSkinning(bool val);
   void resetSkinningState(scene::IAnimatedMesh*);
 
   // Callback for skinning mesh
