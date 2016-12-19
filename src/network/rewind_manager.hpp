@@ -138,6 +138,11 @@ private:
     AllRewindInfo::reverse_iterator findFirstIndex(float time);
     void insertRewindInfo(RewindInfo *ri);
     float determineTimeStepSize(AllRewindInfo::iterator state, float max_time);
+    // ------------------------------------------------------------------------
+    struct _RewindInfoCompare
+    {
+        bool operator()(const RewindInfo *ri1, const RewindInfo *r2) const;
+    } RewindInfoCompare;   // _RewindInfoCompare
 
 public:
     // First static functions to manage rewinding.
