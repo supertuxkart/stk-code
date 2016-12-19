@@ -1028,6 +1028,7 @@ void KartModel::attachHat()
             m_hat_node = irr_driver->addMesh(hat_mesh, "hat");
             bone->addChild(m_hat_node);
             m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
+#ifndef SERVER_ONLY
             STKAnimatedMesh* am = dynamic_cast<STKAnimatedMesh*>(m_animated_node);
             if (am)
             {
@@ -1036,6 +1037,7 @@ void KartModel::attachHat()
                 am->setHardwareSkinning(true);
             }
             else
+#endif
                 m_animated_node->OnAnimate(0);
             bone->updateAbsolutePosition();
              // With the hat node attached to the head bone, we have to
