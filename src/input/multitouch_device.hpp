@@ -107,6 +107,8 @@ public:
 
     void updateDeviceState(unsigned int event_id);
     void handleControls(MultitouchButton* button);
+    
+    void updateConfigParams();
 
 };   // MultitouchDevice
 

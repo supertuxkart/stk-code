@@ -19,6 +19,9 @@
 
 #include "config/user_config.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
+#include "input/multitouch_device.hpp"
 #include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
@@ -59,18 +62,26 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
     {
         SpinnerWidget* scale = getWidget<SpinnerWidget>("scale");
         assert(scale != NULL);
-        UserConfigParams::m_multitouch_scale = scale->getValue() / 100.0f;
+        UserConfigParams::m_multitouch_scale = (float)scale->getValue() / 100.0f;
         
         SpinnerWidget* deadzone_edge = getWidget<SpinnerWidget>("deadzone_edge");
         assert(deadzone_edge != NULL);
         UserConfigParams::m_multitouch_deadzone_edge = 
-                                        deadzone_edge->getValue() / 100.0f;
+                                    (float)deadzone_edge->getValue() / 100.0f;
                     
         SpinnerWidget* deadzone_center = getWidget<SpinnerWidget>("deadzone_center");
         assert(deadzone_center != NULL);
         UserConfigParams::m_multitouch_deadzone_center = 
-                                        deadzone_center->getValue() / 100.0f;
+                                    (float)deadzone_center->getValue() / 100.0f;
     
+        MultitouchDevice* touch_device = input_manager->getDeviceManager()->
+                                                        getMultitouchDevice();
+                                                            
+        if (touch_device != NULL)
+        {
+            touch_device->updateConfigParams();
+        }
+        
         user_config->saveConfig();
 
         ModalDialog::dismiss();
