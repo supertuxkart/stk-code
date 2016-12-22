@@ -1228,8 +1228,7 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                           const std::string& debug_name,
                                           scene::ISceneNode *parent,
                                           RenderInfo* render_info,
-                                          bool all_parts_colorized,
-                                          int frame_for_mesh)
+                                          bool all_parts_colorized)
 {
 #ifdef SERVER_ONLY
     return m_scene_manager->addMeshSceneNode(mesh, parent);
@@ -1247,8 +1246,7 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                                        core::vector3df(0, 0, 0),
                                                        core::vector3df(1.0f, 1.0f, 1.0f),
                                                        true, render_info,
-                                                       all_parts_colorized,
-                                                       frame_for_mesh);
+                                                       all_parts_colorized);
     node->drop();
 
     return node;

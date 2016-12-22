@@ -29,7 +29,6 @@ class STKMeshSceneNode : public irr::scene::CMeshSceneNode, public STKMeshCommon
 {
 protected:
     PtrVector<RenderInfo> m_static_render_info;
-    int m_frame_for_mesh;
     bool m_got_animated_matrix;
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix;
@@ -60,8 +59,7 @@ public:
         const irr::core::vector3df& rotation = irr::core::vector3df(0, 0, 0),
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f),
         bool createGLMeshes = true,
-        RenderInfo* render_info = NULL, bool all_parts_colorized = false,
-        int frame_for_mesh = -1);
+        RenderInfo* render_info = NULL, bool all_parts_colorized = false);
     virtual void render();
     virtual void setMesh(irr::scene::IMesh* mesh);
     virtual void OnRegisterSceneNode();
