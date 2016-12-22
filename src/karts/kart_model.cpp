@@ -31,6 +31,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/render_info.hpp"
+#include "graphics/stk_animated_mesh.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
@@ -361,11 +362,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
 
         node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh",
                NULL/*parent*/, getRenderInfo());
-        // as animated mesh are not cheap to render use frustum box culling
-        if (CVS->isGLSL())
-            node->setAutomaticCulling(scene::EAC_OFF);
-        else
-            node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
+        node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
 #endif
         if (always_animated)
         {
@@ -1031,7 +1028,17 @@ void KartModel::attachHat()
             m_hat_node = irr_driver->addMesh(hat_mesh, "hat");
             bone->addChild(m_hat_node);
             m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
-            m_animated_node->OnAnimate(0);
+#ifndef SERVER_ONLY
+            STKAnimatedMesh* am = dynamic_cast<STKAnimatedMesh*>(m_animated_node);
+            if (am)
+            {
+                am->setHardwareSkinning(false);
+                am->OnAnimate(0);
+                am->setHardwareSkinning(true);
+            }
+            else
+#endif
+                m_animated_node->OnAnimate(0);
             bone->updateAbsolutePosition();
              // With the hat node attached to the head bone, we have to
             // reverse the transformation of the bone, so that the hat

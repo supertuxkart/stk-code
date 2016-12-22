@@ -1,23 +1,3 @@
-#ifdef GL_ES
-uniform mat4 ModelMatrix;
-uniform mat4 InverseModelMatrix;
-uniform vec2 texture_trans;
-#else
-uniform mat4 ModelMatrix =
-    mat4(1., 0., 0., 0.,
-         0., 1., 0., 0.,
-         0., 0., 1., 0.,
-         0., 0., 0., 1.);
-uniform mat4 InverseModelMatrix =
-    mat4(1., 0., 0., 0.,
-         0., 1., 0., 0.,
-         0., 0., 1., 0.,
-         0., 0., 0., 1.);
-
-uniform vec2 texture_trans = vec2(0., 0.);
-#endif
-uniform int skinning_offset;
-
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
 layout(location = 2) in vec4 Color;
@@ -26,17 +6,37 @@ layout(location = 4) in vec4 Data2;
 layout(location = 5) in ivec4 Joint;
 layout(location = 6) in vec4 Weight;
 
+layout(location = 7) in vec3 Origin;
+layout(location = 8) in vec3 Orientation;
+layout(location = 9) in vec3 Scale;
+layout(location = 10) in vec4 misc_data;
+#ifdef Use_Bindless_Texture
+layout(location = 11) in sampler2D Handle;
+layout(location = 12) in sampler2D SecondHandle;
+layout(location = 13) in sampler2D ThirdHandle;
+layout(location = 14) in sampler2D FourthHandle;
+#endif
+layout(location = 15) in int skinning_offset;
+
 out vec3 nor;
 out vec3 tangent;
 out vec3 bitangent;
 out vec2 uv;
 out vec4 color;
+out vec2 color_change;
+#ifdef Use_Bindless_Texture
+flat out sampler2D handle;
+flat out sampler2D secondhandle;
+flat out sampler2D thirdhandle;
+flat out sampler2D fourthhandle;
+#endif
 
 #stk_include "utils/getworldmatrix.vert"
 
 void main(void)
 {
-    mat4 TransposeInverseModelView =  transpose(InverseModelMatrix * InverseViewMatrix);
+    mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
+    mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * InverseViewMatrix);
     vec4 idle_position = vec4(Position, 1.);
     vec4 idle_normal = vec4(Normal, 0.);
     vec4 idle_tangent = vec4(Data1.z, Data1.w, Data2.x, 0.);
@@ -59,12 +59,19 @@ void main(void)
         skinned_bitangent += Weight[i] * single_bone_influenced_bitangent;
     }
 
-    gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * skinned_position;
+    gl_Position = ProjectionViewMatrix *  ModelMatrix * skinned_position;
     // Keep orthogonality
     nor = (TransposeInverseModelView * skinned_normal).xyz;
     // Keep direction
     tangent = (ViewMatrix * ModelMatrix * skinned_tangent).xyz;
     bitangent = (ViewMatrix * ModelMatrix * skinned_bitangent).xyz;
-    uv = vec2(Data1.x + texture_trans.x, Data1.y + texture_trans.y);
+    uv = vec2(Data1.x + misc_data.x, Data1.y + misc_data.y);
     color = Color.zyxw;
+    color_change = misc_data.zw;
+#ifdef Use_Bindless_Texture
+    handle = Handle;
+    secondhandle = SecondHandle;
+    thirdhandle = ThirdHandle;
+    fourthhandle = FourthHandle;
+#endif
 }

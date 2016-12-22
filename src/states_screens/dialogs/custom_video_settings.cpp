@@ -24,6 +24,7 @@
 #include "utils/translation.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/shared_gpu_objects.hpp"
 
 #include <IGUIEnvironment.h>
 
@@ -36,8 +37,12 @@ using namespace irr::gui;
 // -----------------------------------------------------------------------------
 
 CustomVideoSettingsDialog::CustomVideoSettingsDialog(const float w, const float h) :
-        ModalDialog(w, h)
+        ModalDialog(w, h), m_all_kart_animated(true)
 {
+#ifndef SERVER_ONLY
+    m_all_kart_animated = SharedGPUObjects::getMaxMat4Size() > 512 ||
+        !CVS->supportsHardwareSkinning();
+#endif
     loadFromFile("custom_video_settings.stkgui");
     updateActivation();
 }
@@ -64,8 +69,11 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     //I18N: animations setting (only karts with human players are animated)
     kart_anim->addLabel(_("Human players only")); // 1
     //I18N: animations setting (all karts are animated)
-    kart_anim->addLabel(_("Enabled for all")); // 2
-    kart_anim->setValue(UserConfigParams::m_show_steering_animations);
+    if (m_all_kart_animated)
+        kart_anim->addLabel(_("Enabled for all")); // 2
+    kart_anim->setValue(!m_all_kart_animated &&
+        UserConfigParams::m_show_steering_animations == 2 ?
+        1 : UserConfigParams::m_show_steering_animations);
 
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("filtering");
     int value = 0;
@@ -242,6 +250,8 @@ void CustomVideoSettingsDialog::updateActivation()
     getWidget<CheckBoxWidget>("global_illumination")->setActive(light);
     getWidget<CheckBoxWidget>("glow")->setActive(light);
     getWidget<CheckBoxWidget>("bloom")->setActive(light);
+    getWidget<SpinnerWidget>("steering_animations")
+        ->setMax(m_all_kart_animated ? 2 : 1);
 
     if (!CVS->supportsShadows() && !CVS->supportsGlobalIllumination())
     {

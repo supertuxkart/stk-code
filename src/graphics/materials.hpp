@@ -146,17 +146,16 @@ public:
     {
 #if !defined(USE_GLES2)
         // Geometry shader needed
-        // Geometry shader needed
         if (CVS->getGLSLVersion() < 150)
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_shadow.vert",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_shadow.vert",
                                 GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
@@ -297,8 +296,8 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
                             GL_FRAGMENT_SHADER, "normalmap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix");
-        assignSamplerNames(1, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                           0, "DiffuseForAlpha", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+        assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "glossMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // NormalMapShader
 
 };   // NormalMapShader
@@ -391,12 +390,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanced_shadow.vert",
                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanciedshadow.vert",
+            loadProgram(OBJECT,GL_VERTEX_SHADER, "instanced_shadow.vert",
                                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
@@ -523,12 +522,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_grassshadow.vert",
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanciedgrassshadow.vert",
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_grassshadow.vert",
                                 GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
@@ -618,8 +617,415 @@ public:
     }   // InstancedDetailedObjectPass2Shader
 };   // InstancedDetailedObjectPass2Shader
 
+// ============================================================================
+class SkinnedPass1Shader : public TextureShader<SkinnedPass1Shader, 1,
+                                                core::matrix4, core::matrix4,
+                                                int>
+{
+public:
+    SkinnedPass1Shader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+                            GL_FRAGMENT_SHADER, "object_pass1.frag");
+        assignUniforms("ModelMatrix", "InverseModelMatrix", "skinning_offset");
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // SkinnedPass1Shader
+};   // SkinnedPass1Shader
 
 // ============================================================================
+class InstancedSkinnedPass1Shader : public TextureShader<InstancedSkinnedPass1Shader, 1>
+{
+public:
+    InstancedSkinnedPass1Shader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+                            GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
+        assignUniforms();
+        assignSamplerNames(0, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedSkinnedPass1Shader
+};   // InstancedSkinnedPass1Shader
+
+// ============================================================================
+class SkinnedPass2Shader : public TextureShader<SkinnedPass2Shader, 6,
+                                                core::matrix4, core::vector2df,
+                                                core::vector2df, int >
+{
+public:
+    SkinnedPass2Shader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+                            GL_FRAGMENT_SHADER, "object_pass2.frag");
+        assignUniforms("ModelMatrix", "texture_trans", "color_change",
+                       "skinning_offset");
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // SkinnedPass2Shader
+};   // SkinnedPass2Shader
+
+// ============================================================================
+class InstancedSkinnedPass2Shader : public TextureShader<InstancedSkinnedPass2Shader, 6>
+{
+public:
+    InstancedSkinnedPass2Shader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+                            GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
+        assignUniforms();
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedSkinnedPass2Shader
+};   // InstancedSkinnedPass2Shader
+
+// ============================================================================
+class SkinnedRefPass1Shader : public TextureShader<SkinnedRefPass1Shader, 2,
+                                                   core::matrix4,
+                                                   core::matrix4,
+                                                   core::vector2df, int>
+{
+public:
+    SkinnedRefPass1Shader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+                            GL_FRAGMENT_SHADER, "objectref_pass1.frag");
+        assignUniforms("ModelMatrix", "InverseModelMatrix", "texture_trans",
+                       "skinning_offset");
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // SkinnedRefPass1Shader
+};  // SkinnedRefPass1Shader
+
+// ============================================================================
+class InstancedSkinnedRefPass1Shader : public TextureShader<InstancedSkinnedRefPass1Shader, 2>
+{
+public:
+    InstancedSkinnedRefPass1Shader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+                            GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
+        assignUniforms();
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }    // InstancedSkinnedRefPass1Shader
+};   // InstancedSkinnedRefPass1Shader
+
+// ============================================================================
+class SkinnedRefPass2Shader : public TextureShader<SkinnedRefPass2Shader, 6,
+                                                   core::matrix4,
+                                                   core::vector2df,
+                                                   core::vector2df, int>
+{
+public:
+    SkinnedRefPass2Shader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+                            GL_FRAGMENT_SHADER, "objectref_pass2.frag");
+        assignUniforms("ModelMatrix", "texture_trans", "color_change",
+                       "skinning_offset");
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // SkinnedRefPass2Shader
+};   // SkinnedRefPass2Shader
+
+// ============================================================================
+class InstancedSkinnedRefPass2Shader : public TextureShader<InstancedSkinnedRefPass2Shader, 6>
+{
+public:
+    InstancedSkinnedRefPass2Shader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+                            GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
+        assignUniforms();
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }    // InstancedSkinnedRefPass2Shader
+};   // InstancedSkinnedRefPass2Shader
+
+// ============================================================================
+class SkinnedUnlitShader : public TextureShader<SkinnedUnlitShader, 4,
+                                                core::matrix4, core::vector2df,
+                                                int>
+{
+public:
+    SkinnedUnlitShader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+                            GL_FRAGMENT_SHADER, "object_unlit.frag");
+        assignUniforms("ModelMatrix", "texture_trans", "skinning_offset");
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // SkinnedUnlitShader
+};   // SkinnedUnlitShader
+
+// ============================================================================
+class InstancedSkinnedUnlitShader : public TextureShader<InstancedSkinnedUnlitShader, 4>
+{
+public:
+    InstancedSkinnedUnlitShader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+                            GL_FRAGMENT_SHADER, "instanced_object_unlit.frag");
+        assignUniforms();
+        assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
+                           1, "SpecularMap", ST_NEAREST_FILTERED,
+                           2, "SSAO", ST_BILINEAR_FILTERED,
+                           3, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedSkinnedUnlitShader
+};   // InstancedSkinnedUnlitShader
+
+// ============================================================================
+class SkinnedNormalMapShader : public TextureShader<SkinnedNormalMapShader, 2,
+                                                    core::matrix4,
+                                                    core::matrix4, int>
+{
+public:
+    SkinnedNormalMapShader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+                            GL_FRAGMENT_SHADER, "normalmap.frag");
+        assignUniforms("ModelMatrix", "InverseModelMatrix", "skinning_offset");
+        assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "glossMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // SkinnedNormalMapShader
+};   // SkinnedNormalMapShader
+
+// ============================================================================
+class InstancedSkinnedNormalMapShader : public TextureShader<InstancedSkinnedNormalMapShader, 2>
+{
+public:
+    InstancedSkinnedNormalMapShader()
+    {
+        if (!CVS->supportsHardwareSkinning()) return;
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+                            GL_FRAGMENT_SHADER, "instanced_normalmap.frag");
+        assignUniforms();
+        assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
+                           1, "glossMap", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+    }   // InstancedSkinnedNormalMapShader
+};   // InstancedSkinnedNormalMapShader
+
+// ============================================================================
+class SkinnedShadowShader : public TextureShader<SkinnedShadowShader, 0,
+                                                 core::matrix4, int, int>
+{
+public:
+    SkinnedShadowShader()
+    {
+#if !defined(USE_GLES2)
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150 || !CVS->supportsHardwareSkinning())
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning_shadow.vert",
+                                GL_FRAGMENT_SHADER, "shadow.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning_shadow.vert",
+                                GL_GEOMETRY_SHADER, "shadow.geom",
+                                GL_FRAGMENT_SHADER, "shadow.frag");
+        }
+        assignUniforms("ModelMatrix", "skinning_offset", "layer");
+#endif
+    }   // SkinnedShadowShader
+};   // SkinnedShadowShader
+
+// ============================================================================
+class InstancedSkinnedShadowShader : public TextureShader<InstancedSkinnedShadowShader, 0, int>
+{
+public:
+    InstancedSkinnedShadowShader()
+    {
+#if !defined(USE_GLES2)
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150 || !CVS->supportsHardwareSkinning())
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+                                GL_FRAGMENT_SHADER, "shadow.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+                                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
+                                GL_FRAGMENT_SHADER, "shadow.frag");
+        }
+        assignUniforms("layer");
+#endif
+    }   // InstancedSkinnedShadowShader
+};   // InstancedSkinnedShadowShader
+
+// ============================================================================
+class SkinnedRefShadowShader : public TextureShader<SkinnedRefShadowShader, 1,
+                                                    core::matrix4, int, int>
+{
+public:
+    SkinnedRefShadowShader()
+    {
+#if !defined(USE_GLES2)
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150 || !CVS->supportsHardwareSkinning())
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning_shadow.vert",
+                                GL_FRAGMENT_SHADER, "shadowref.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning_shadow.vert",
+                                GL_GEOMETRY_SHADER, "shadow.geom",
+                                GL_FRAGMENT_SHADER, "shadowref.frag");
+        }
+        assignUniforms("ModelMatrix", "skinning_offset", "layer");
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+#endif
+    }   // SkinnedRefShadowShader
+};   // SkinnedRefShadowShader
+
+// ============================================================================
+class InstancedSkinnedRefShadowShader : public TextureShader<InstancedSkinnedRefShadowShader,
+                                                          1, int>
+{
+public:
+    InstancedSkinnedRefShadowShader()
+    {
+#if !defined(USE_GLES2)
+        // Geometry shader needed
+        if (CVS->getGLSLVersion() < 150 || !CVS->supportsHardwareSkinning())
+            return;
+        if (CVS->isAMDVertexShaderLayerUsable())
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
+        }
+        else
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+                                GL_GEOMETRY_SHADER, "instanced_shadow.geom",
+                                GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
+        }
+        assignUniforms("layer");
+        assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
+#endif
+    }   // InstancedSkinnedRefShadowShader
+};   // InstancedSkinnedRefShadowShader
+
+// ============================================================================
+struct SkinnedSolid
+{
+    typedef InstancedSkinnedPass1Shader InstancedFirstPassShader;
+    typedef InstancedSkinnedPass2Shader InstancedSecondPassShader;
+    typedef InstancedSkinnedShadowShader InstancedShadowPassShader;
+    typedef SkinnedPass1Shader FirstPassShader;
+    typedef SkinnedPass2Shader SecondPassShader;
+    typedef SkinnedShadowShader ShadowPassShader;
+    // Todo: RSMs
+    typedef ListSkinnedSolid List;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_SKINNED_MESH;
+    static const enum Material::ShaderType MaterialType
+                                      = Material::SHADERTYPE_SOLID_SKINNED_MESH;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
+    static const STK::Tuple<size_t> FirstPassTextures;
+    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const STK::Tuple<> ShadowTextures;
+    static const STK::Tuple<size_t> RSMTextures;
+};   // struct SkinnedSolid
+
+// ----------------------------------------------------------------------------
+struct SkinnedAlphaRef
+{
+    typedef InstancedSkinnedRefPass1Shader InstancedFirstPassShader;
+    typedef InstancedSkinnedRefPass2Shader InstancedSecondPassShader;
+    typedef InstancedSkinnedRefShadowShader InstancedShadowPassShader;
+    typedef SkinnedRefPass1Shader FirstPassShader;
+    typedef SkinnedRefPass2Shader SecondPassShader;
+    typedef SkinnedRefShadowShader ShadowPassShader;
+    // Todo: RSMs
+    typedef ListSkinnedAlphaRef List;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_SKINNED_MESH;
+    static const enum Material::ShaderType MaterialType =
+                                   Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
+    static const STK::Tuple<size_t, size_t> FirstPassTextures;
+    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const STK::Tuple<size_t> ShadowTextures;
+    static const STK::Tuple<size_t> RSMTextures;
+};   // struct SkinnedAlphaRef
+
+// ----------------------------------------------------------------------------
+struct SkinnedNormalMat
+{
+    typedef InstancedSkinnedNormalMapShader InstancedFirstPassShader;
+    typedef InstancedSkinnedPass2Shader InstancedSecondPassShader;
+    typedef InstancedSkinnedShadowShader InstancedShadowPassShader;
+    typedef SkinnedNormalMapShader FirstPassShader;
+    typedef SkinnedPass2Shader SecondPassShader;
+    typedef SkinnedShadowShader ShadowPassShader;
+    // Todo: RSMs
+    typedef ListSkinnedNormalMap List;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_SKINNED_MESH;
+    static const enum Material::ShaderType MaterialType =
+                                   Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH;
+    static const enum InstanceType Instance = InstanceTypeFourTex;
+    static const STK::Tuple<size_t, size_t> FirstPassTextures;
+    static const STK::Tuple<size_t, size_t, size_t> SecondPassTextures;
+    static const STK::Tuple<> ShadowTextures;
+    static const STK::Tuple<size_t> RSMTextures;
+};   // struct SkinnedNormalMat
+
+// ----------------------------------------------------------------------------
+struct SkinnedUnlitMat
+{
+    typedef InstancedSkinnedRefPass1Shader InstancedFirstPassShader;
+    typedef InstancedSkinnedUnlitShader InstancedSecondPassShader;
+    typedef InstancedSkinnedRefShadowShader InstancedShadowPassShader;
+    typedef SkinnedRefPass1Shader FirstPassShader;
+    typedef SkinnedUnlitShader SecondPassShader;
+    typedef SkinnedRefShadowShader ShadowPassShader;
+    // Todo: RSMs
+    typedef ListSkinnedUnlit List;
+    static const enum video::E_VERTEX_TYPE VertexType = video::EVT_SKINNED_MESH;
+    static const enum Material::ShaderType MaterialType =
+                                  Material::SHADERTYPE_SOLID_UNLIT_SKINNED_MESH;
+    static const enum InstanceType Instance = InstanceTypeThreeTex;
+    static const STK::Tuple<size_t, size_t> FirstPassTextures;
+    static const STK::Tuple<size_t> SecondPassTextures;
+    static const STK::Tuple<size_t> ShadowTextures;
+    static const STK::Tuple<size_t> RSMTextures;
+};   // struct SkinnedUnlitMat
+
+// ----------------------------------------------------------------------------
 struct DefaultMaterial
 {
     typedef InstancedObjectPass1Shader InstancedFirstPassShader;

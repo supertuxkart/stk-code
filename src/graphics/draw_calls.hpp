@@ -25,6 +25,7 @@
 
 class ParticleSystemProxy;
 class ShadowMatrices;
+class STKAnimatedMesh;
 class STKBillboard;
 
 class DrawCalls
@@ -37,14 +38,15 @@ private:
     std::vector<irr::scene::ISceneNode *> m_immediate_draw_list;
     std::vector<STKBillboard *>           m_billboard_list;
     std::vector<ParticleSystemProxy *>    m_particles_list;
+    std::set<STKAnimatedMesh*>            m_mesh_for_skinning;
 
     std::vector<float>                    m_bounding_boxes;
 
     /** meshes to draw */
-    SolidPassMeshMap m_solid_pass_mesh        [    Material::SHADERTYPE_COUNT];
-    OtherMeshMap m_shadow_pass_mesh           [4 * Material::SHADERTYPE_COUNT];
-    OtherMeshMap m_reflective_shadow_map_mesh [    Material::SHADERTYPE_COUNT];
-    OtherMeshMap m_glow_pass_mesh;
+    MeshMap m_solid_pass_mesh            [    Material::SHADERTYPE_COUNT];
+    MeshMap m_shadow_pass_mesh           [4 * Material::SHADERTYPE_COUNT];
+    MeshMap m_reflective_shadow_map_mesh [    Material::SHADERTYPE_COUNT];
+    MeshMap m_glow_pass_mesh;
 
 #if !defined(USE_GLES2)
     /** meshes data in VRAM */
@@ -106,6 +108,7 @@ public:
     void drawIndirectGlow() const;
     void multidrawGlow() const;
     void renderBoundingBoxes();
+    int32_t getSkinningOffset() const;
 };
 
 #endif   // !SERVER_ONLY

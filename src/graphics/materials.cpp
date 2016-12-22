@@ -19,6 +19,37 @@
 
 #ifndef SERVER_ONLY
 
+const STK::Tuple<size_t> SkinnedSolid::FirstPassTextures
+    = STK::Tuple<size_t>(1);
+const STK::Tuple<size_t, size_t, size_t> SkinnedSolid::SecondPassTextures
+    = STK::Tuple<size_t, size_t, size_t>(0, 1, 2);
+const STK::Tuple<> SkinnedSolid::ShadowTextures;
+const STK::Tuple<size_t> SkinnedSolid::RSMTextures = STK::Tuple<size_t>(0);
+
+// ----------------------------------------------------------------------------
+const STK::Tuple<size_t, size_t> SkinnedAlphaRef::FirstPassTextures
+    = STK::Tuple<size_t, size_t>(0, 1);
+const STK::Tuple<size_t, size_t, size_t> SkinnedAlphaRef::SecondPassTextures
+    = STK::Tuple<size_t, size_t, size_t>(0, 1, 2);
+const STK::Tuple<size_t> SkinnedAlphaRef::ShadowTextures = STK::Tuple<size_t>(0);
+const STK::Tuple<size_t> SkinnedAlphaRef::RSMTextures = STK::Tuple<size_t>(0);
+
+// ----------------------------------------------------------------------------
+const STK::Tuple<size_t, size_t> SkinnedUnlitMat::FirstPassTextures
+    = STK::Tuple<size_t, size_t>(0, 1);
+const STK::Tuple<size_t> SkinnedUnlitMat::SecondPassTextures = STK::Tuple<size_t>(0);
+const STK::Tuple<size_t> SkinnedUnlitMat::ShadowTextures = STK::Tuple<size_t>(0);
+const STK::Tuple<size_t> SkinnedUnlitMat::RSMTextures = STK::Tuple<size_t>(0);
+
+// ----------------------------------------------------------------------------
+const STK::Tuple<size_t, size_t> SkinnedNormalMat::FirstPassTextures
+    = STK::Tuple<size_t, size_t>(3, 1);
+const STK::Tuple<size_t, size_t, size_t> SkinnedNormalMat::SecondPassTextures
+    = STK::Tuple<size_t, size_t, size_t>(0, 1, 2);
+const STK::Tuple<> SkinnedNormalMat::ShadowTextures;
+const STK::Tuple<size_t> SkinnedNormalMat::RSMTextures = STK::Tuple<size_t>(0);
+
+// ----------------------------------------------------------------------------
 const STK::Tuple<size_t> DefaultMaterial::FirstPassTextures
     = STK::Tuple<size_t>(1);
 const STK::Tuple<size_t, size_t, size_t> DefaultMaterial::SecondPassTextures

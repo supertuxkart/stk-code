@@ -177,6 +177,7 @@ private:
 
 
     unsigned             m_last_light_bucket_distance;
+    unsigned             m_skinning_joint;
     u32                  m_renderpass;
     class STKMeshSceneNode *m_sun_interposer;
     core::vector3df m_sun_direction;
@@ -296,6 +297,7 @@ public:
     void                  showPointer();
     void                  hidePointer();
     void                  setLastLightBucketDistance(unsigned d) { m_last_light_bucket_distance = d; }
+    void                  setSkinningJoint(unsigned d) { m_skinning_joint = d; }
     bool                  isPointerShown() const { return m_pointer_shown; }
     core::position2di     getMouseLocation();
 

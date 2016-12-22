@@ -143,6 +143,8 @@ IrrDriver::IrrDriver()
     m_boundingboxesviz           = false;
     m_last_light_bucket_distance = 0;
     m_clear_color                = video::SColor(255, 100, 101, 140);
+    m_skinning_joint             = 0;
+
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -917,7 +919,6 @@ void IrrDriver::applyResolutionSettings()
     // FIXME: this load sequence is (mostly) duplicated from main.cpp!!
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
-    ShaderBase::updateShaders();
     VAOManager::getInstance()->kill();
     resetTextureTable();
     cleanUnicolorTextures();
@@ -928,6 +929,7 @@ void IrrDriver::applyResolutionSettings()
     }
     delete m_renderer;
     initDevice();
+    ShaderBase::updateShaders();
 
     font_manager = new FontManager();
     font_manager->loadFonts();
@@ -1959,10 +1961,12 @@ void IrrDriver::displayFPS()
 
     if ((UserConfigParams::m_artist_debug_mode)&&(CVS->isGLSL()))
     {
-        fps_string = _("FPS: %d/%d/%d  - PolyCount: %d Solid, "
-                      "%d Shadows - LightDist : %d",
+        fps_string = StringUtils::insertValues
+                    (L"FPS: %d/%d/%d  - PolyCount: %d Solid, "
+                      "%d Shadows - LightDist : %d, Total skinning joints: %d",
                     min, fps, max, m_renderer->getPolyCount(SOLID_NORMAL_AND_DEPTH_PASS),
-                    m_renderer->getPolyCount(SHADOW_PASS), m_last_light_bucket_distance);
+                    m_renderer->getPolyCount(SHADOW_PASS), m_last_light_bucket_distance,
+                    m_skinning_joint);
     }
     else
         fps_string = _("FPS: %d/%d/%d - %d KTris", min, fps, max, (int)roundf(kilotris)); 

@@ -142,6 +142,22 @@ public:
             glEnableVertexAttribArray(6);
             glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)48);
             break;
+        case video::EVT_SKINNED_MESH:
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), 0);
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)12);
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(tp), (GLvoid*)24);
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)28);
+            glEnableVertexAttribArray(4);
+            glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)44);
+            glEnableVertexAttribArray(5);
+            glVertexAttribIPointer(5, 4, GL_INT, getVertexPitchFromType(tp), (GLvoid*)60);
+            glEnableVertexAttribArray(6);
+            glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(tp), (GLvoid*)76);
+            break;
         }
     }
 };

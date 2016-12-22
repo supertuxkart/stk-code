@@ -394,10 +394,17 @@ public:
 	void sort()
 	{
 		if (!is_sorted && used>1)
-			heapsort(data, used);
+			heapsort(data, used, sortless<T>);
 		is_sorted = true;
 	}
 
+	template<class Compare>
+	void sort(Compare cmp)
+	{
+		if (!is_sorted && used>1)
+			heapsort(data, used, cmp);
+		is_sorted = true;
+	}
 
 	//! Performs a binary search for an element, returns -1 if not found.
 	/** The array will be sorted before the binary search if it is not

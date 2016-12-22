@@ -434,9 +434,7 @@ void Profiler::draw()
         s32 y_up_sync = (s32)(MARGIN_Y*screen_size.Height);
         s32 y_down_sync = (s32)( (MARGIN_Y + (2+nb_thread_infos)*LINE_HEIGHT)*screen_size.Height );
 
-        driver->draw2DLine(core::vector2di(x_sync, y_up_sync),
-                           core::vector2di(x_sync, y_down_sync),
-                           video::SColor(0xFF, 0x00, 0x00, 0x00));
+        GL32_draw2DRectangle(video::SColor(0xFF, 0x00, 0x00, 0x00), core::rect<s32>(x_sync, y_up_sync, x_sync + 1, y_down_sync));
     }
 
     // Draw the hovered markers' names

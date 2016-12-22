@@ -40,6 +40,24 @@ Material::ShaderType getMeshMaterialFromType(video::E_MATERIAL_TYPE material_typ
         layer2_material->getShaderType() == Material::SHADERTYPE_SPLATTING)
         return Material::SHADERTYPE_SPLATTING;
 
+    if (tp == video::EVT_SKINNED_MESH)
+    {
+        switch (material->getShaderType())
+        {
+        case Material::SHADERTYPE_SOLID:
+            if (material_type == Shaders::getShader(ES_NORMAL_MAP))
+                return Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH;
+            else
+                return Material::SHADERTYPE_SOLID_SKINNED_MESH;
+        case Material::SHADERTYPE_ALPHA_TEST:
+            return Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH;
+        case Material::SHADERTYPE_SOLID_UNLIT:
+            return Material::SHADERTYPE_SOLID_UNLIT_SKINNED_MESH;
+        default:
+            return Material::SHADERTYPE_SOLID_SKINNED_MESH;
+        }
+    }
+
     switch (material->getShaderType())
     {
     default:
@@ -55,9 +73,13 @@ Material::ShaderType getMeshMaterialFromType(video::E_MATERIAL_TYPE material_typ
 
 // ----------------------------------------------------------------------------
 TransparentMaterial getTransparentMaterialFromType(video::E_MATERIAL_TYPE type,
+                                                   video::E_VERTEX_TYPE tp,
                                                    f32 MaterialTypeParam,
                                                    Material* material)
 {
+    if (tp == video::EVT_SKINNED_MESH)
+        return TM_TRANSLUCENT_SKN;
+
     if (type == Shaders::getShader(ES_DISPLACE))
     {
         if (CVS->isDefferedEnabled())
@@ -157,6 +179,22 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
         glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE,
                               getVertexPitchFromType(type), (GLvoid*)48);
         break;
+    case video::EVT_SKINNED_MESH:
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)12);
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(type), (GLvoid*)24);
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)44);
+        glEnableVertexAttribArray(5);
+        glVertexAttribIPointer(5, 4, GL_INT, getVertexPitchFromType(type), (GLvoid*)60);
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)76);
+        break;
     default:
         assert(0 && "Wrong vertex type");
     }
@@ -205,8 +243,6 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name,
     }
     result.VAOType = mb->getVertexType();
     result.Stride = getVertexPitchFromType(result.VAOType);
-
-
     result.IndexCount = mb->getIndexCount();
     switch (mb->getPrimitiveType())
     {
@@ -236,7 +272,7 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb, const std::string& debug_name,
     for (unsigned i = 0; i < 8; i++)
         result.textures[i] = mb->getMaterial().getTexture(i);
     result.texture_trans = core::vector2df(0.0f, 0.0f);
-    result.VAOType = mb->getVertexType();
+
     return result;
 }   // allocateMeshBuffer
 
@@ -409,12 +445,16 @@ void initTextures(GLMesh &mesh, Material::ShaderType mat)
     case Material::SHADERTYPE_SPHERE_MAP:
     case Material::SHADERTYPE_SOLID_UNLIT:
     case Material::SHADERTYPE_VEGETATION:
+    case Material::SHADERTYPE_SOLID_SKINNED_MESH:
+    case Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH:
+    case Material::SHADERTYPE_SOLID_UNLIT_SKINNED_MESH:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
         setTexture(mesh, 1, false, getShaderTypeName(mat));
         setTexture(mesh, 2, false, getShaderTypeName(mat));
         break;
     case Material::SHADERTYPE_DETAIL_MAP:
     case Material::SHADERTYPE_NORMAL_MAP:
+    case Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH:
         setTexture(mesh, 0, true, getShaderTypeName(mat));
         setTexture(mesh, 1, false, getShaderTypeName(mat));
         setTexture(mesh, 2, false, getShaderTypeName(mat));

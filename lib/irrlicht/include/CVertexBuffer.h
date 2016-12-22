@@ -116,6 +116,8 @@ namespace scene
 					NewVertices=new CSpecificVertexList<video::S3DVertexTangents>;
 					break;
 				}
+				default:
+					break;
 			}
 			if (Vertices)
 			{
