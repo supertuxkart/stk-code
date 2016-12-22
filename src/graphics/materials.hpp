@@ -626,7 +626,7 @@ public:
     SkinnedPass1Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                             GL_FRAGMENT_SHADER, "object_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "skinning_offset");
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -640,7 +640,7 @@ public:
     InstancedSkinnedPass1Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "instanced_skinning.vert",
                             GL_FRAGMENT_SHADER, "instanced_object_pass1.frag");
         assignUniforms();
         assignSamplerNames(0, "glosstex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
@@ -656,7 +656,7 @@ public:
     SkinnedPass2Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                             GL_FRAGMENT_SHADER, "object_pass2.frag");
         assignUniforms("ModelMatrix", "texture_trans", "color_change",
                        "skinning_offset");
@@ -676,7 +676,7 @@ public:
     InstancedSkinnedPass2Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "instanced_skinning.vert",
                             GL_FRAGMENT_SHADER, "instanced_object_pass2.frag");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -698,7 +698,7 @@ public:
     SkinnedRefPass1Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                             GL_FRAGMENT_SHADER, "objectref_pass1.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "texture_trans",
                        "skinning_offset");
@@ -714,7 +714,7 @@ public:
     InstancedSkinnedRefPass1Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "instanced_skinning.vert",
                             GL_FRAGMENT_SHADER, "instanced_objectref_pass1.frag");
         assignUniforms();
         assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -732,7 +732,7 @@ public:
     SkinnedRefPass2Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                             GL_FRAGMENT_SHADER, "objectref_pass2.frag");
         assignUniforms("ModelMatrix", "texture_trans", "color_change",
                        "skinning_offset");
@@ -752,7 +752,7 @@ public:
     InstancedSkinnedRefPass2Shader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "instanced_skinning.vert",
                             GL_FRAGMENT_SHADER, "instanced_objectref_pass2.frag");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -773,7 +773,7 @@ public:
     SkinnedUnlitShader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                             GL_FRAGMENT_SHADER, "object_unlit.frag");
         assignUniforms("ModelMatrix", "texture_trans", "skinning_offset");
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -790,7 +790,7 @@ public:
     InstancedSkinnedUnlitShader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "instanced_skinning.vert",
                             GL_FRAGMENT_SHADER, "instanced_object_unlit.frag");
         assignUniforms();
         assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
@@ -809,7 +809,7 @@ public:
     SkinnedNormalMapShader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning.vert",
                             GL_FRAGMENT_SHADER, "normalmap.frag");
         assignUniforms("ModelMatrix", "InverseModelMatrix", "skinning_offset");
         assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -824,7 +824,7 @@ public:
     InstancedSkinnedNormalMapShader()
     {
         if (!CVS->supportsHardwareSkinning()) return;
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning.vert",
+        loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "instanced_skinning.vert",
                             GL_FRAGMENT_SHADER, "instanced_normalmap.frag");
         assignUniforms();
         assignSamplerNames(0, "normalMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
@@ -845,12 +845,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning_shadow.vert",
+            loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning_shadow.vert",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning_shadow.vert",
+            loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning_shadow.vert",
                                 GL_GEOMETRY_SHADER, "shadow.geom",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
@@ -871,12 +871,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+            loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+            loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
                                 GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                 GL_FRAGMENT_SHADER, "shadow.frag");
         }
@@ -898,12 +898,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning_shadow.vert",
+            loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning_shadow.vert",
                                 GL_FRAGMENT_SHADER, "shadowref.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "skinning_shadow.vert",
+            loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "skinning_shadow.vert",
                                 GL_GEOMETRY_SHADER, "shadow.geom",
                                 GL_FRAGMENT_SHADER, "shadowref.frag");
         }
@@ -926,12 +926,12 @@ public:
             return;
         if (CVS->isAMDVertexShaderLayerUsable())
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+            loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }
         else
         {
-            loadProgram(OBJECT, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
+            loadProgram(SKINNED_MESH, GL_VERTEX_SHADER, "instanced_skinning_shadow.vert",
                                 GL_GEOMETRY_SHADER, "instanced_shadow.geom",
                                 GL_FRAGMENT_SHADER, "instanced_shadowref.frag");
         }

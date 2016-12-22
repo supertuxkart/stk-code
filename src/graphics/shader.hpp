@@ -50,6 +50,7 @@ protected:
         OBJECT,
         PARTICLES_SIM,
         PARTICLES_RENDERING,
+        SKINNED_MESH,
     };   // AttributeType
 
     /** OpenGL's program id. */

@@ -1,5 +1,6 @@
 uniform int layer;
 
+#if __VERSION__ >= 330
 layout(location = 0) in vec3 Position;
 layout(location = 3) in vec4 Data1;
 layout(location = 5) in ivec4 Joint;
@@ -11,6 +12,16 @@ layout(location = 9) in vec3 Scale;
 layout(location = 11) in uvec2 Handle;
 #endif
 layout(location = 15) in int skinning_offset;
+#else
+in vec3 Position;
+in vec4 Data1;
+in ivec4 Joint;
+in vec4 Weight;
+in vec3 Origin;
+in vec3 Orientation;
+in vec3 Scale;
+in int skinning_offset;
+#endif
 
 #ifdef VSLayer
 out vec2 uv;

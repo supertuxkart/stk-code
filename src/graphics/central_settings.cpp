@@ -446,6 +446,6 @@ bool CentralVideoSettings::isDefferedEnabled() const
 
 bool CentralVideoSettings::supportsHardwareSkinning() const
 {
-    return isARBUniformBufferObjectUsable() && isARBExplicitAttribLocationUsable() && getGLSLVersion() >= 330;
+    return isARBUniformBufferObjectUsable();
 }
 #endif   // !SERVER_ONLY

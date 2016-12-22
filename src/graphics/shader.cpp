@@ -142,6 +142,7 @@ void ShaderBase::setAttribute(AttributeType type)
         glBindAttribLocation(m_program, 7, "Origin");
         glBindAttribLocation(m_program, 8, "Orientation");
         glBindAttribLocation(m_program, 9, "Scale");
+        glBindAttribLocation(m_program, 10, "misc_data");
         break;
     case PARTICLES_SIM:
         glBindAttribLocation(m_program, 0, "particle_position");
@@ -159,6 +160,20 @@ void ShaderBase::setAttribute(AttributeType type)
         glBindAttribLocation(m_program, 4, "quadcorner");
         glBindAttribLocation(m_program, 5, "rotationvec");
         glBindAttribLocation(m_program, 6, "anglespeed");
+        break;
+    case SKINNED_MESH:
+        glBindAttribLocation(m_program, 0, "Position");
+        glBindAttribLocation(m_program, 1, "Normal");
+        glBindAttribLocation(m_program, 2, "Color");
+        glBindAttribLocation(m_program, 3, "Data1");
+        glBindAttribLocation(m_program, 4, "Data2");
+        glBindAttribLocation(m_program, 5, "Joint");
+        glBindAttribLocation(m_program, 6, "Weight");
+        glBindAttribLocation(m_program, 7, "Origin");
+        glBindAttribLocation(m_program, 8, "Orientation");
+        glBindAttribLocation(m_program, 9, "Scale");
+        glBindAttribLocation(m_program, 10, "misc_data");
+        glBindAttribLocation(m_program, 15, "skinning_offset");
         break;
     }
 }   // setAttribute

@@ -18,6 +18,7 @@ uniform vec2 texture_trans = vec2(0., 0.);
 #endif
 uniform int skinning_offset;
 
+#if __VERSION__ >= 330
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
 layout(location = 2) in vec4 Color;
@@ -25,6 +26,15 @@ layout(location = 3) in vec4 Data1;
 layout(location = 4) in vec4 Data2;
 layout(location = 5) in ivec4 Joint;
 layout(location = 6) in vec4 Weight;
+#else
+in vec3 Position;
+in vec3 Normal;
+in vec4 Color;
+in vec4 Data1;
+in vec4 Data2;
+in ivec4 Joint;
+in vec4 Weight;
+#endif
 
 out vec3 nor;
 out vec3 tangent;
