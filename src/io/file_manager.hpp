@@ -97,7 +97,6 @@ private:
     bool              checkAndCreateDirectory(const std::string &path);
     io::path          createAbsoluteFilename(const std::string &f);
     void              checkAndCreateConfigDir();
-    bool              isDirectory(const std::string &path) const;
     void              checkAndCreateAddonsDir();
     void              checkAndCreateScreenshotDir();
     void              checkAndCreateReplayDir();
@@ -130,6 +129,7 @@ public:
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);
     void checkAndCreateDirForAddons(const std::string &dir);
+    bool isDirectory(const std::string &path) const;
     bool removeFile(const std::string &name) const;
     bool removeDirectory(const std::string &name) const;
     bool copyFile(const std::string &source, const std::string &dest);
