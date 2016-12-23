@@ -180,7 +180,8 @@ void DrawCalls::handleSTKCommon(scene::ISceneNode *Node,
 
     if (node->isImmediateDraw())
     {
-        ImmediateDraw->push_back(Node);
+        if (!isCulledPrecise(cam, Node, irr_driver->getBoundingBoxesViz()))
+            ImmediateDraw->push_back(Node);
         return;
     }
 
