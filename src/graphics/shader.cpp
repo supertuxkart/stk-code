@@ -74,6 +74,9 @@ void ShaderBase::bypassUBO() const
 
     GLint PM = glGetUniformLocation(m_program, "ProjectionMatrix");
     glUniformMatrix4fv(PM, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
+    
+    GLint PVM = glGetUniformLocation(m_program, "ProjectionViewMatrix");
+    glUniformMatrix4fv(PVM, 1, GL_FALSE, irr_driver->getProjViewMatrix().pointer());
 
     GLint IVM = glGetUniformLocation(m_program, "InverseViewMatrix");
     glUniformMatrix4fv(IVM, 1, GL_FALSE, irr_driver->getInvViewMatrix().pointer());
