@@ -30,7 +30,7 @@ in vec4 misc_data;
 
 out vec3 nor;
 out vec2 uv;
-out vec2 color_change;
+flat out vec2 color_change;
 #ifdef Use_Bindless_Texture
 flat out sampler2D handle;
 flat out sampler2D secondhandle;
