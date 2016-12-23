@@ -26,7 +26,6 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_kind.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track.hpp"

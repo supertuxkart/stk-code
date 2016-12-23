@@ -20,7 +20,6 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/render_target.hpp"
 #include "graphics/texture_manager.hpp"
 #include "graphics/vao_manager.hpp"

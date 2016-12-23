@@ -20,7 +20,6 @@
 
 #include "graphics/stk_mesh.hpp"
 
-#include "graphics/shaders.hpp"
 #include "utils/ptr_vector.hpp"
 
 class RenderInfo;
@@ -65,19 +64,7 @@ public:
     virtual void OnRegisterSceneNode();
     virtual ~STKMeshSceneNode();
     virtual bool isImmediateDraw() const { return immediate_draw; }
-    void setIsDisplacement(bool v) {
-        isDisplacement = v;
-        for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
-        {
-            scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-            if (!mb)
-                continue;
-#ifndef SERVER_ONLY
-            if (isDisplacement)
-                mb->getMaterial().MaterialType = Shaders::getShader(ES_DISPLACE);
-#endif
-        }
-    }
+    void setIsDisplacement(bool v);
     virtual bool glow() const { return isGlow; }
     void setGlowColors(const video::SColor &c) { isGlow = true; glowcolor = c; }
     video::SColor getGlowColor() const { return glowcolor; }

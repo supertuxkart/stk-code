@@ -274,31 +274,6 @@ void Shaders::check(const int num)
 }   // check
 
 // ============================================================================
-// Solid Normal and depth pass shaders
-Shaders::ObjectPass1Shader::ObjectPass1Shader()
-{
-    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                        GL_FRAGMENT_SHADER, "object_pass1.frag");
-    assignUniforms("ModelMatrix", "InverseModelMatrix");
-    assignSamplerNames(0, "tex", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-}   // ObjectPass1Shader
-
-// ============================================================================
-// Solid Lit pass shaders
-Shaders::ObjectPass2Shader::ObjectPass2Shader()
-{
-    loadProgram(OBJECT, GL_VERTEX_SHADER, "object_pass.vert",
-                        GL_FRAGMENT_SHADER, "object_pass2.frag");
-    assignUniforms("ModelMatrix", "texture_trans", "color_change");
-    assignSamplerNames(0, "DiffuseMap", ST_NEAREST_FILTERED,
-                       1, "SpecularMap", ST_NEAREST_FILTERED,
-                       2, "SSAO", ST_BILINEAR_FILTERED,
-                       3, "Albedo", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                       4, "SpecMap", ST_TRILINEAR_ANISOTROPIC_FILTERED,
-                       5, "colorization_mask", ST_TRILINEAR_ANISOTROPIC_FILTERED);
-}   // ObjectPass2Shader
-
-// ============================================================================
 Shaders::SkinnedTransparentShader::SkinnedTransparentShader()
 {
     if (!CVS->supportsHardwareSkinning()) return;

@@ -24,6 +24,7 @@
 #include "graphics/lod_node.hpp"
 #include "graphics/materials.hpp"
 #include "graphics/shadow_matrices.hpp"
+#include "graphics/shaders.hpp"
 #include "graphics/stk_animated_mesh.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh.hpp"

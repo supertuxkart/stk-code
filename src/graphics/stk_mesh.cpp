@@ -23,6 +23,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/materials.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/texture_manager.hpp"
 
@@ -398,7 +399,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
         {
             mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(
                 getTextureGLuint(mesh.textures[i]),
-                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
+                ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
         }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
         {
@@ -488,7 +489,7 @@ void initTexturesTransparent(GLMesh &mesh)
         {
             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(
                 getTextureGLuint(mesh.textures[0]),
-                Shaders::ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
+                ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
         }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
         {

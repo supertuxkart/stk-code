@@ -26,7 +26,7 @@
 #include <map>
 #include <unordered_map>
 
-enum InstanceType
+enum InstanceType : unsigned int
 {
     InstanceTypeThreeTex,
     InstanceTypeFourTex,

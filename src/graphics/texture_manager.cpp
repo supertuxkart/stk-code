@@ -21,7 +21,7 @@
 
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/shaders.hpp"
+#include "graphics/materials.hpp"
 
 #if defined(USE_GLES2)
 #define _IRR_COMPILE_WITH_OGLES2_
@@ -70,7 +70,7 @@ void resetTextureTable()
         {
             glMakeTextureHandleNonResidentARB(handle);
         }
-        Shaders::ObjectPass1Shader::getInstance()->recreateTrilinearSampler(0);
+        ObjectPass1Shader::getInstance()->recreateTrilinearSampler(0);
         texture_handles.clear();
     }
 #endif
