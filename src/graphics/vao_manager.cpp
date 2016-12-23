@@ -217,9 +217,9 @@ template<>
 void VAOInstanceUtil<GlowInstanceData>::SetVertexAttrib()
 {
     SetVertexAttrib_impl();
-    glEnableVertexAttribArray(15);
-    glVertexAttribPointer(15, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(GlowInstanceData), (GLvoid*)(9 * sizeof(float)));
-    glVertexAttribDivisorARB(15, 1);
+    glEnableVertexAttribArray(10);
+    glVertexAttribPointer(10, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(GlowInstanceData), (GLvoid*)(9 * sizeof(float)));
+    glVertexAttribDivisorARB(10, 1);
 }
 
 
