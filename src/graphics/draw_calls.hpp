@@ -19,14 +19,21 @@
 #define HEADER_DRAW_CALLS_HPP
 
 #ifndef SERVER_ONLY
-#include "graphics/command_buffer.hpp"
+#include "graphics/material.hpp"
+#include "graphics/vao_manager.hpp"
 #include <irrlicht.h>
+#include <set>
 #include <unordered_map>
 
+class GlowCommandBuffer;
 class ParticleSystemProxy;
+class ReflectiveShadowMapCommandBuffer;
 class ShadowMatrices;
+class ShadowCommandBuffer;
+class SolidCommandBuffer;
 class STKAnimatedMesh;
 class STKBillboard;
+class STKMeshCommon;
 
 class DrawCalls
 {

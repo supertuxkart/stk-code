@@ -20,10 +20,8 @@
 
 #include "graphics/shader.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/render_info.hpp"
 #include "graphics/stk_mesh.hpp"
 #include "graphics/texture_manager.hpp"
-
 
 // ----------------------------------------------------------------------------
 /** Variadic template to draw a mesh (using OpenGL 3.2 function)

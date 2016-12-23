@@ -18,13 +18,17 @@
 #ifndef VAOMANAGER_HPP
 #define VAOMANAGER_HPP
 
-#include "gl_headers.hpp"
+#include "graphics/gl_headers.hpp"
 #include "utils/singleton.hpp"
+#include "utils/tuple.hpp"
 #include <S3DVertex.h>
 #include <IMeshBuffer.h>
+#include <ISceneNode.h>
 #include <vector>
 #include <map>
 #include <unordered_map>
+
+using namespace irr;
 
 enum InstanceType : unsigned int
 {
@@ -35,6 +39,17 @@ enum InstanceType : unsigned int
     InstanceTypeGlow,
     InstanceTypeCount,
 };
+
+typedef STK::Tuple<scene::ISceneNode*, core::vector2df, core::vector2df,
+    int32_t> InstanceSettings;
+
+struct GLMesh;
+struct InstanceList
+{
+    GLMesh* m_mesh;
+    std::vector<InstanceSettings> m_instance_settings;
+};
+typedef std::unordered_map <scene::IMeshBuffer *, InstanceList> MeshMap;
 
 #ifdef WIN32
 #pragma pack(push, 1)

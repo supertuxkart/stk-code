@@ -20,8 +20,10 @@
 #ifndef HEADER_GEOMETRY_PASSES_HPP
 #define HEADER_GEOMETRY_PASSES_HPP
 
+#include "graphics/central_settings.hpp"
 #include "graphics/draw_calls.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/shadow_matrices.hpp"
 #include "utils/profiler.hpp"
 #include <ITexture.h>

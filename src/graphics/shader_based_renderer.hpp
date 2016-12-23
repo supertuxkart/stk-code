@@ -29,6 +29,7 @@
 #include <string>
 
 class AbstractGeometryPasses;
+class Camera;
 class GL3RenderTarget;
 class RenderTarget;
 class RTT;

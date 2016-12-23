@@ -24,22 +24,10 @@
 #include "graphics/gl_headers.hpp"
 #include "graphics/material.hpp"
 #include "graphics/materials.hpp"
-#include "graphics/render_info.hpp"
-#include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/vao_manager.hpp"
 #include <irrlicht.h>
 #include <array>
 #include <unordered_map>
-
-typedef STK::Tuple<scene::ISceneNode*, core::vector2df, core::vector2df, int32_t> InstanceSettings;
-
-struct InstanceList
-{
-    GLMesh *m_mesh;
-    std::vector<InstanceSettings> m_instance_settings;
-};
-
-typedef std::unordered_map <irr::scene::IMeshBuffer *, InstanceList > MeshMap;
 
 // ----------------------------------------------------------------------------
 /** Fill origin, orientation and scale attributes

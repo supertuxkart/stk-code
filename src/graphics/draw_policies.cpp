@@ -18,6 +18,7 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/draw_policies.hpp"
+#include "graphics/draw_calls.hpp"
 #include "graphics/draw_tools.hpp"
 #include "graphics/materials.hpp"
 

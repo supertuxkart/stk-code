@@ -19,6 +19,7 @@
 
 #include "graphics/command_buffer.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "utils/cpp2011.hpp"
 
 // ----------------------------------------------------------------------------
