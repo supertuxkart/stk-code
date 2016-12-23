@@ -891,6 +891,10 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_artist_debug_mode
             PARAM_DEFAULT( BoolUserConfigParam(false, "artist_debug_mode",
                                "Whether to enable track debugging features") );
+                               
+    PARAM_PREFIX BoolUserConfigParam        m_everything_unlocked
+            PARAM_DEFAULT( BoolUserConfigParam(false, "everything_unlocked",
+                               "Enable all karts and tracks") );
 
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;

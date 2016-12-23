@@ -431,6 +431,9 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         const unsigned int val = challenge->getNumTrophies();
         bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
         int state = (unlocked ? OPEN : LOCKED);
+        
+        if (UserConfigParams::m_everything_unlocked)
+            state = OPEN;
 
         const ChallengeStatus* c = PlayerManager::getCurrentPlayer()
                                   ->getChallengeStatus(challenges[n].m_challenge_id);
@@ -475,6 +478,10 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
             const unsigned int val = challenge->getNumTrophies();
             bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+            
+            if (UserConfigParams::m_everything_unlocked)
+                unlocked = true;
+                            
             if (!unlocked)
                 continue;
         }

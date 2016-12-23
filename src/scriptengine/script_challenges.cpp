@@ -20,6 +20,7 @@
 
 #include "animations/three_d_animation.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
@@ -49,18 +50,21 @@ namespace Scripting
         */
 
         // --------------------------------------------------------------------
-        /** Get number of challenges that were completed at any difficulty */
-        int getCompletedChallengesCount()
-        {
-            return ::Track::getCurrentTrack()->getNumOfCompletedChallenges();
-        }   // getCompletedChallengesCount
-
-        // --------------------------------------------------------------------
         /** Get total number of challenges */
         int getChallengeCount()
         {
             return ::Track::getCurrentTrack()->getChallengeList().size();
         }   // getChallengeCount
+
+        // --------------------------------------------------------------------
+        /** Get number of challenges that were completed at any difficulty */
+        int getCompletedChallengesCount()
+        {
+            if (UserConfigParams::m_everything_unlocked)
+                return getChallengeCount();
+
+            return ::Track::getCurrentTrack()->getNumOfCompletedChallenges();
+        }   // getCompletedChallengesCount
 
         // --------------------------------------------------------------------
         int getChallengeRequiredPoints(std::string* challenge_name)
@@ -81,6 +85,9 @@ namespace Scripting
         // --------------------------------------------------------------------
         bool isChallengeUnlocked(std::string* challenge_name)
         {
+            if (UserConfigParams::m_everything_unlocked)
+                return true;
+
             const ChallengeData* challenge =
                              unlock_manager->getChallengeData(*challenge_name);
             if (challenge == NULL)

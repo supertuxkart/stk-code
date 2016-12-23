@@ -244,6 +244,10 @@ void OverWorld::onFirePressed(Controller* who)
 
                 const unsigned int val = challenge->getNumTrophies();
                 bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
+                
+                if (UserConfigParams::m_everything_unlocked)
+                    unlocked = true;
+
                 if (unlocked)
                 {
                     race_manager->setKartLastPositionOnOverworld(kart_xyz);
