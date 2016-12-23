@@ -25,6 +25,7 @@
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/skidding.hpp"
+#include "modes/world.hpp"
 #include "physics/btKart.hpp"
 
 #include <IMeshSceneNode.h>
@@ -208,7 +209,9 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     // The scene node will keep the mesh alive.
     new_mesh->drop();
     m_current++;
-    if(m_current>=stk_config->m_max_skidmarks)
+    int cleaning_threshold =
+        core::clamp(int(World::getWorld()->getNumKarts()), 5, 15);
+    if(m_current>=int(stk_config->m_max_skidmarks/cleaning_threshold))
         m_current = 0;
     if(m_current>=(int)m_left.size())
     {
