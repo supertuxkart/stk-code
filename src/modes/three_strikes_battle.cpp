@@ -101,8 +101,6 @@ void ThreeStrikesBattle::reset()
         25.0f : 20.0f;
 
     const unsigned int kart_amount = (unsigned int)m_karts.size();
-
-    int idCamera = 0;
     for(unsigned int n=0; n<kart_amount; n++)
     {
         if (dynamic_cast<SpareTireAI*>(m_karts[n]->getController()) != NULL)

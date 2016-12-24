@@ -19,6 +19,8 @@ namespace scene
 
 	class CAnimatedMeshSceneNode : public IAnimatedMeshSceneNode
 	{
+	private:
+		core::array<u32> m_animation_set;
 	public:
 
 		//! constructor
@@ -157,6 +159,14 @@ namespace scene
 		\param newManager An optional new scene manager.
 		\return The newly created clone of this node. */
 		virtual ISceneNode* clone(ISceneNode* newParent=0, ISceneManager* newManager=0);
+
+		virtual u32 getAnimationSetNum() { return m_animation_set.size() / 2; }
+		virtual void addAnimationSet(u32 start, u32 end)
+		{
+			m_animation_set.push_back(start);
+			m_animation_set.push_back(end);
+		}
+		virtual void useAnimationSet(u32 set_num);
 
 	protected:
 

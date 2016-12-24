@@ -102,6 +102,24 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                 scene::IAnimatedMeshSceneNode* scene_node = irr_driver
                     ->addAnimatedMesh(a_mesh, group[m].m_model_file, NULL, ri);
 
+                std::vector<int> frames_start;
+                if (node)
+                    node->get("frame-start", &frames_start);
+
+                std::vector<int> frames_end;
+                if (node)
+                    node->get("frame-end", &frames_end);
+
+                if (frames_start.empty() && frames_end.empty())
+                {
+                    frames_start.push_back(scene_node->getStartFrame());
+                    frames_end.push_back(scene_node->getEndFrame());
+                }
+                assert(frames_start.size() == frames_end.size());
+                for (unsigned int i = 0 ; i < frames_start.size() ; i++)
+                    scene_node->addAnimationSet(frames_start[i], frames_end[i]);
+                scene_node->useAnimationSet(0);
+
                 m_track->handleAnimatedTextures(scene_node, *group[m].m_xml);
 
                 lod_node->add(group[m].m_distance, scene_node, true);

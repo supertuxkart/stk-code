@@ -207,6 +207,7 @@ public:
                                ModelDefinitionLoader& model_def_loader,
                                RenderInfo* ri);
     virtual ~TrackObjectPresentationLOD();
+    virtual void reset() OVERRIDE;
 };
 
 // ============================================================================
@@ -225,12 +226,6 @@ private:
 
     /** True if the object is in the skybox */
     bool                    m_is_in_skybox;
-
-    /** Start frame of the animation to be played. */
-    unsigned int            m_frame_start;
-
-    /** End frame of the animation to be played. */
-    unsigned int            m_frame_end;
 
     std::string             m_model_file;
 

@@ -315,6 +315,28 @@ TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
 }   // TrackObjectPresentationLOD
 
 // ----------------------------------------------------------------------------
+void TrackObjectPresentationLOD::reset()
+{
+    LODNode* ln = dynamic_cast<LODNode*>(m_node);
+    if (ln)
+    {
+        for (scene::ISceneNode* node : ln->getAllNodes())
+        {
+            scene::IAnimatedMeshSceneNode* a_node =
+                dynamic_cast<scene::IAnimatedMeshSceneNode*>(node);
+            if (a_node)
+            {
+                RandomGenerator rg;
+                int animation_set = 0;
+                if (a_node->getAnimationSetNum() > 0)
+                    animation_set = rg.get(a_node->getAnimationSetNum());
+                 a_node->useAnimationSet(animation_set);
+            }
+        }
+    }
+}   // reset
+
+// ----------------------------------------------------------------------------
 TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                                                      const XMLNode& xml_node,
                                                      bool enabled,
@@ -481,8 +503,6 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
             m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
             enabled = false;
             m_force_always_hidden = true;
-            m_frame_start = 0;
-            m_frame_end = 0;
         }
         else
         {
@@ -490,8 +510,6 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
             m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
             enabled = false;
             m_force_always_hidden = true;
-            m_frame_start = 0;
-            m_frame_end = 0;
             Track *track = Track::getCurrentTrack();
             if (track && track && xml_node)
                 track->addPhysicsOnlyNode(m_node);
@@ -516,13 +534,23 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
                                         m_model_file, parent, m_render_info);
         m_node = node;
 
-        m_frame_start = node->getStartFrame();
+        std::vector<int> frames_start;
         if (xml_node)
-            xml_node->get("frame-start", &m_frame_start);
+            xml_node->get("frame-start", &frames_start);
 
-        m_frame_end = node->getEndFrame();
+        std::vector<int> frames_end;
         if (xml_node)
-            xml_node->get("frame-end", &m_frame_end);
+            xml_node->get("frame-end", &frames_end);
+
+        if (frames_start.empty() && frames_end.empty())
+        {
+            frames_start.push_back(node->getStartFrame());
+            frames_end.push_back(node->getEndFrame());
+        }
+        assert(frames_start.size() == frames_end.size());
+        for (unsigned int i = 0 ; i < frames_start.size() ; i++)
+             node->addAnimationSet(frames_start[i], frames_end[i]);
+        node->useAnimationSet(0);
 
         Track *track = Track::getCurrentTrack();
         if (track && track && xml_node)
@@ -541,9 +569,6 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         if (displacing && stkmesh != NULL)
             stkmesh->setIsDisplacement(displacing);
 #endif
-
-        m_frame_start = 0;
-        m_frame_end = 0;
 
         Track *track = Track::getCurrentTrack();
         if (track && xml_node)
@@ -593,7 +618,11 @@ void TrackObjectPresentationMesh::reset()
 
         // irrlicht's "setFrameLoop" is a misnomer, it just sets the first and
         // last frame, even if looping is disabled
-        a_node->setFrameLoop(m_frame_start, m_frame_end);
+        RandomGenerator rg;
+        int animation_set = 0;
+        if (a_node->getAnimationSetNum() > 0)
+            animation_set = rg.get(a_node->getAnimationSetNum());
+        a_node->useAnimationSet(animation_set);
     }
 }   // reset
 
