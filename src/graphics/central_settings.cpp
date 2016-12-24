@@ -222,13 +222,7 @@ void CentralVideoSettings::init()
 #else
         if (m_glsl == true)
         {
-            hasArraysOfArrays = true;
             hasTextureStorage = true;
-            hasTextureView = true;
-            hasBindlessTexture = true;
-            hasImageLoadStore = true;
-            hasAtomics = true;
-            hasSSBO = true;
         }
 
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_FORMAT_BGRA8888) &&
