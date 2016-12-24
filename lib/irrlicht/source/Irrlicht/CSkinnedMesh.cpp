@@ -1410,6 +1410,12 @@ void CSkinnedMesh::addJoints(core::array<IBoneSceneNode*> &jointChildSceneNodes,
 	SkinnedLastFrame=false;
 }
 
+bool CSkinnedMesh::sortJointInfluenceFunc(const JointInfluence& a, 
+										  const JointInfluence& b)
+{
+	return a.weight > b.weight;
+}
+
 void CSkinnedMesh::convertForSkinning()
 {
 	if (HardwareSkinning) return;
@@ -1440,9 +1446,7 @@ void CSkinnedMesh::convertForSkinning()
 			{
 				core::array<JointInfluence> this_influence;
 				core::array<JointInfluence> reported_weight = wi[b][i];
-				reported_weight.sort([]
-					(const JointInfluence& a, const JointInfluence& b)
-					{ return a.weight > b.weight; });
+				reported_weight.sort(sortJointInfluenceFunc);
 				float remaining_weight = 1.0f;
 				for (u32 j = 0; j < 4; j++)
 				{
