@@ -173,6 +173,14 @@
             <gauge id="filtering" min_value="0" max_value="5" width="50%" />
         </div>
 
+        <spacer height="4" width="10" />
+
+        <div layout="horizontal-row" width="100%" proportion="1">
+            <label text="Geometry detail" I18N="Video settings" width="40%"/>
+            <spacer width="10" height="10"/>
+            <gauge id="geometry_detail" min_value="0" max_value="2" width="50%" />
+        </div>
+
         <spacer height="10" width="10" />
 
         <label text="* Restart STK to apply new settings" width="100%" text_align="center" I18N="Video settings"/>
