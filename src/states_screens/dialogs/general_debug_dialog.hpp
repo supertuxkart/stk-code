@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014-2015 Marc Coll
+//  Copyright (C) 2016 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,15 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-#ifndef HEADER_SCRIPTING_CONSOLE_DIALOG_HPP
-#define HEADER_SCRIPTING_CONSOLE_DIALOG_HPP
+#ifndef HEADER_GENERAL_DEBUG_DIALOG_HPP
+#define HEADER_GENERAL_DEBUG_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.hpp"
-
-#include <irrString.h>
-
 
 namespace GUIEngine
 {
@@ -33,19 +29,27 @@ namespace GUIEngine
 }
 
 /**
- * \brief Dialog that allows the player to enter the name for a new grand prix
+ * \brief A general debug dialog to run stuff based on captured text.
  * \ingroup states_screens
  */
-class ScriptingConsole : public GUIEngine::ModalDialog
+class GeneralDebugDialog : public GUIEngine::ModalDialog
 {
+private:
+    typedef void (*Callback)(const std::string& text);
+
+    Callback m_callback;
+
+    void run();
+
 public:
-
-    ScriptingConsole();
-    ~ScriptingConsole();
-
-    virtual void onEnterPressedInternal() OVERRIDE{ runScript(); }
-    void runScript();
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
+    GeneralDebugDialog(const wchar_t* title, Callback cb);
+    // ------------------------------------------------------------------------
+    ~GeneralDebugDialog();
+    // ------------------------------------------------------------------------
+    virtual void onEnterPressedInternal() OVERRIDE                   { run(); }
+    // ------------------------------------------------------------------------
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource)
+        OVERRIDE;
 };
 
 #endif

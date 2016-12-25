@@ -40,8 +40,9 @@
 #include "race/history.hpp"
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
-#include "states_screens/dialogs/scripting_console.hpp"
+#include "states_screens/dialogs/general_debug_dialog.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -53,6 +54,14 @@
 
 using namespace irr;
 using namespace gui;
+
+// -----------------------------------------------------------------------------
+// Callback for each general debug dialog
+static void scripting(const std::string& text)
+{
+    Scripting::ScriptEngine::getInstance()->evalScript(text);
+}   // scripting
+// -----------------------------------------------------------------------------
 
 namespace Debug {
 
@@ -630,7 +639,7 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     }
     case DEBUG_SCRIPT_CONSOLE:
-        new ScriptingConsole();
+        new GeneralDebugDialog(L"Run Script", scripting);
         break;
     }   // switch
     return false;

@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2014-2015 Marc Coll
+//  Copyright (C) 2016 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,72 +15,67 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/dialogs/scripting_console.hpp"
+#include "states_screens/dialogs/general_debug_dialog.hpp"
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
-#include "scriptengine/script_engine.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/translation.hpp"
+#include "utils/string_utils.hpp"
 
 #include <IGUIEnvironment.h>
-
 
 using namespace GUIEngine;
 using namespace irr::core;
 
 // -----------------------------------------------------------------------------
-
-ScriptingConsole::ScriptingConsole() :
-    ModalDialog(0.95f, 0.2f, GUIEngine::MODAL_DIALOG_LOCATION_BOTTOM)
+GeneralDebugDialog::GeneralDebugDialog(const wchar_t* title, Callback cb) :
+    ModalDialog(0.95f, 0.4f, GUIEngine::MODAL_DIALOG_LOCATION_BOTTOM),
+    m_callback(cb)
 {
     m_fade_background = false;
-    loadFromFile("scripting_console.stkgui");
+    loadFromFile("general_debug_dialog.stkgui");
 
-    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-    assert(textCtrl != NULL);
-    textCtrl->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-}
+    TextBoxWidget* text_field = getWidget<TextBoxWidget>("textfield");
+    assert(text_field != NULL);
+    text_field->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+
+    LabelWidget* label = getWidget<LabelWidget>("title");
+    assert(label != NULL);
+    label->setText(title, false/*expandAsNeeded*/);
+}   // GeneralDebugDialog
 
 // -----------------------------------------------------------------------------
-
-ScriptingConsole::~ScriptingConsole()
+GeneralDebugDialog::~GeneralDebugDialog()
 {
-    // FIXME: what is this code for?
-    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-    textCtrl->getIrrlichtElement()->remove();
-    textCtrl->clearListeners();
-}
+    TextBoxWidget* text_field = getWidget<TextBoxWidget>("textfield");
+    text_field->getIrrlichtElement()->remove();
+    text_field->clearListeners();
+}   // ~GeneralDebugDialog
 
 // -----------------------------------------------------------------------------
-
-GUIEngine::EventPropagation ScriptingConsole::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation GeneralDebugDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "close")
     {
         dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
-    else if (eventSource == "run")
+    else if (eventSource == "ok")
     {
-        runScript();
+        run();
         return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
 // -----------------------------------------------------------------------------
-
-void ScriptingConsole::runScript()
+void GeneralDebugDialog::run()
 {
-    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-    core::stringw script = textCtrl->getText();
-    textCtrl->setText(L"");
+    TextBoxWidget* text_field = getWidget<TextBoxWidget>("textfield");
+    std::string text = StringUtils::wideToUtf8(text_field->getText());
+    m_callback(text);
+    text_field->setText(L"");
 
-    Scripting::ScriptEngine::getInstance()
-                           ->evalScript(core::stringc(script.c_str()).c_str());
-}
-
-// -----------------------------------------------------------------------------
+}   // run
