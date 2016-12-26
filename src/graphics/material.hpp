@@ -268,6 +268,8 @@ private:
 
     bool  m_deprecated;
 
+    bool  m_installed = false;
+
     void  init    ();
     void  install (bool is_full_path=false, bool complain_if_not_found=true);
     void  initCustomSFX(const XMLNode *sfx);
@@ -290,14 +292,7 @@ public:
     void isInitiallyHidden(scene::IMeshBuffer* who);
 
     /** Returns the ITexture associated with this material. */
-    video::ITexture *getTexture() const
-    {
-        // Note that dont load means that the textures are not loaded
-        // via the material. So getTexture should only get called for
-		// automatically loaded textures (used atm for font textures).
-        assert(!m_dont_load_texture);
-        return m_texture;
-    }   // getTexture
+    video::ITexture *getTexture();
     // ------------------------------------------------------------------------
     bool  isIgnore           () const { return m_ignore;             }
     // ------------------------------------------------------------------------

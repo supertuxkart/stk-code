@@ -398,8 +398,30 @@ Material::Material(const XMLNode *node, bool deprecated)
     if(m_has_gravity)
         m_high_tire_adhesion = true;
 
-    install(/*is_full_path*/false);
+    //Log::info("Material", "setting for lazy load: '%s' '%s'", m_full_path.c_str(), m_texname.c_str());
+
+    //install(/*is_full_path*/false);
+    // now set the name to the basename, so that all tests work as expected
+
+	//m_full_path = file_manager->searchTexture(m_texname);
+    //m_texname = StringUtils::getBasename(m_full_path);
 }   // Material
+//-----------------------------------------------------------------------------
+
+video::ITexture* Material::getTexture()
+{
+    // Note that dont load means that the textures are not loaded
+    // via the material. So getTexture should only get called for
+    // automatically loaded textures (used atm for font textures).
+    assert(!m_dont_load_texture);
+    if (!m_installed)
+    {
+        //m_texname = m_full_path;
+        Log::info("Material", "LazyLoading (getTexture) '%s'", m_texname.c_str());
+        install(/*is_full_path*/true, true);
+    }
+    return m_texture;
+}   // getTexture
 
 //-----------------------------------------------------------------------------
 /** Create a standard material using the default settings for materials.
@@ -475,6 +497,8 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
 {
     // Don't load a texture that are not supposed to be loaded automatically
     if(m_dont_load_texture) return;
+
+    m_installed = true;
 
     const std::string &full_path = is_full_path
                                  ? m_texname
@@ -708,6 +732,13 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) con
  */
 void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb)
 {
+    if (!m_installed)
+    {
+        //Log::info("Material", "LazyLoading (setMaterialProperties) '%s' : '%s'", m_texname.c_str(), m_full_path.c_str());
+        install(/*is_full_path*/true, true);
+    }
+    //Log::info("Material", "setMaterialProperties '%s'", m_texname.c_str());
+
     if (m_deprecated ||
         (m->getTexture(0) != NULL &&
          ((core::stringc)m->getTexture(0)->getName()).find("deprecated") != -1))

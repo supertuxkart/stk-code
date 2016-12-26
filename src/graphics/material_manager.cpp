@@ -86,13 +86,20 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
         return getDefaultMaterial(material_type);
 
     core::stringc img_path = core::stringc(t->getName());
+	img_path.make_lower();
+
     const std::string image = StringUtils::getBasename(img_path.c_str());
     if (!img_path.empty() && (img_path.findFirst('/') != -1 || img_path.findFirst('\\') != -1))
     {
         // Search backward so that temporary (track) textures are found first
         for (int i = (int)m_materials.size() - 1; i >= 0; i--)
         {
-            if (m_materials[i]->getTexFullPath() == img_path.c_str())
+			//Log::info("DEBUG_TEX", "<%s> <%s>", m_materials[i]->getTexFullPath().c_str(), img_path.c_str());
+			core::stringc fullpath = core::stringc(m_materials[i]->getTexFullPath().c_str());
+			fullpath.make_lower();
+			//if (fullpath.find("bumpy") > 0)
+			//	Log::info("DEBUG_TEX", "<%s> <%s>", fullpath.c_str(), img_path.c_str());
+            if (fullpath == img_path.c_str())
             {
                 return m_materials[i];
             }
@@ -102,6 +109,7 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
     {
         for (int i = (int)m_materials.size() - 1; i >= 0; i--)
         {
+			//Log::info("DEBUG_TEX2", "<%s> <%s>", m_materials[i]->getTexFname().c_str(), image.c_str());
             if (m_materials[i]->getTexFname() == image)
             {
                 return m_materials[i];
@@ -139,7 +147,7 @@ Material* MaterialManager::getDefaultMaterial(video::E_MATERIAL_TYPE shader_type
     auto it = m_default_materials.find(shader_type);
     if (it == m_default_materials.end())
     {
-        Material* default_material = new Material("", false, false, false);
+        Material* default_material = new Material("Default", false, false, false);
 
         // TODO: workaround, should not hardcode these material types here?
         // Try to find a cleaner way

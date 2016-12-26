@@ -49,7 +49,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the icon to display in the race gui if a kart
      *  has an attachment. */
-    const Material* getIcon (int type) const {return m_all_icons [type]; }
+    Material* getIcon (int type) const { return m_all_icons [type]; }
     // ------------------------------------------------------------------------
 };
 
