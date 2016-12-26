@@ -75,6 +75,14 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         UserConfigParams::m_show_steering_animations == 2 ?
         1 : UserConfigParams::m_show_steering_animations);
 
+    SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
+    geometry_level->addLabel(_("disabled")); // 0
+    //I18N: animations setting (only karts with human players are animated)
+    geometry_level->addLabel(_("low")); // 1
+    //I18N: animations setting (all karts are animated)
+    geometry_level->addLabel(_("high")); // 2
+    geometry_level->setValue(UserConfigParams::m_geometry_level);
+
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("filtering");
     int value = 0;
     if (UserConfigParams::m_anisotropic == 2)  value = 2;
@@ -191,6 +199,9 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
         UserConfigParams::m_show_steering_animations =
             getWidget<SpinnerWidget>("steering_animations")->getValue();
+
+        UserConfigParams::m_geometry_level =
+            getWidget<SpinnerWidget>("geometry_detail")->getValue();
 
         switch (getWidget<SpinnerWidget>("filtering")->getValue())
         {
