@@ -35,10 +35,9 @@ GeneralTextFieldDialog::GeneralTextFieldDialog(const wchar_t* title,
                                                ValidationCallback val_cb)
                   : ModalDialog(0.95f, 0.4f,
                     GUIEngine::MODAL_DIALOG_LOCATION_BOTTOM),
-                    m_dm_cb(dm_cb), m_val_cb(val_cb)
+                    m_dm_cb(dm_cb), m_val_cb(val_cb), m_self_destroy(false)
 {
     m_fade_background = false;
-    m_self_destroy = false;
     loadFromFile("general_textfield_dialog.stkgui");
 
     m_text_field = getWidget<TextBoxWidget>("textfield");
@@ -48,6 +47,8 @@ GeneralTextFieldDialog::GeneralTextFieldDialog(const wchar_t* title,
     m_title = getWidget<LabelWidget>("title");
     assert(m_title != NULL);
     m_title->setText(title, false/*expandAsNeeded*/);
+    assert(m_dm_cb != NULL);
+    assert(m_val_cb != NULL);
 }   // GeneralTextFieldDialog
 
 // -----------------------------------------------------------------------------
@@ -110,10 +111,7 @@ void GeneralTextFieldDialog::onUpdate(float dt)
         // but in order not to crash we must make a local copy of the callback
         // otherwise we will crash
         DismissCallback dm_cb = m_dm_cb;
-
         ModalDialog::dismiss();
-
-        if (dm_cb != NULL)
-            dm_cb(name);
+        dm_cb(name);
     }
 }   // onUpdate

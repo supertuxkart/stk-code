@@ -56,7 +56,7 @@ private:
 
 public:
     GeneralTextFieldDialog(const wchar_t* title, DismissCallback dm_cb,
-                           ValidationCallback val_cb = [=]
+                           ValidationCallback val_cb = []
         (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
         {
             // No validation if not specify, always go to dismiss callback
