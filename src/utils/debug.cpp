@@ -42,7 +42,7 @@
 #include "replay/replay_recorder.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
-#include "states_screens/dialogs/general_debug_dialog.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -54,14 +54,6 @@
 
 using namespace irr;
 using namespace gui;
-
-// -----------------------------------------------------------------------------
-// Callback for each general debug dialog
-static void scripting(const std::string& text)
-{
-    Scripting::ScriptEngine::getInstance()->evalScript(text);
-}   // scripting
-// -----------------------------------------------------------------------------
 
 namespace Debug {
 
@@ -639,7 +631,12 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     }
     case DEBUG_SCRIPT_CONSOLE:
-        new GeneralDebugDialog(L"Run Script", scripting);
+        new GeneralTextFieldDialog(L"Run Script", [=]
+            (const irr::core::stringw& text)
+            {
+                Scripting::ScriptEngine::getInstance()
+                    ->evalScript(StringUtils::wideToUtf8(text));
+            });
         break;
     }   // switch
     return false;
