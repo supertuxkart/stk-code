@@ -268,7 +268,7 @@ private:
 
     bool  m_deprecated;
 
-    bool  m_installed = false;
+    bool  m_installed;
 
     void  init    ();
     void  install (bool is_full_path=false, bool complain_if_not_found=true);

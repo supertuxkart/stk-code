@@ -59,6 +59,7 @@ Material::Material(const XMLNode *node, bool deprecated)
 {
     m_shader_type = SHADERTYPE_SOLID;
     m_deprecated = deprecated;
+    m_installed = false;
 
     node->get("name",      &m_texname);
     if (m_texname=="")
@@ -422,7 +423,7 @@ Material::Material(const std::string& fname, bool is_full_path,
                    bool complain_if_not_found, bool load_texture)
 {
     m_deprecated = false;
-
+    m_installed = false;
     m_texname = fname;
     init();
     m_full_path = file_manager->getFileSystem()->getAbsolutePath(
