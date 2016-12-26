@@ -38,7 +38,7 @@ GeneralTextFieldDialog::GeneralTextFieldDialog(const wchar_t* title,
                     m_dm_cb(dm_cb), m_val_cb(val_cb), m_self_destroy(false)
 {
     m_fade_background = false;
-    loadFromFile("general_textfield_dialog.stkgui");
+    loadFromFile("general_text_field_dialog.stkgui");
 
     m_text_field = getWidget<TextBoxWidget>("textfield");
     assert(m_text_field != NULL);
