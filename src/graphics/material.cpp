@@ -397,14 +397,6 @@ Material::Material(const XMLNode *node, bool deprecated)
 
     if(m_has_gravity)
         m_high_tire_adhesion = true;
-
-    //Log::info("Material", "setting for lazy load: '%s' '%s'", m_full_path.c_str(), m_texname.c_str());
-
-    //install(/*is_full_path*/false);
-    // now set the name to the basename, so that all tests work as expected
-
-	//m_full_path = file_manager->searchTexture(m_texname);
-    //m_texname = StringUtils::getBasename(m_full_path);
 }   // Material
 //-----------------------------------------------------------------------------
 
@@ -416,8 +408,6 @@ video::ITexture* Material::getTexture()
     assert(!m_dont_load_texture);
     if (!m_installed)
     {
-        //m_texname = m_full_path;
-        Log::info("Material", "LazyLoading (getTexture) '%s'", m_texname.c_str());
         install(/*is_full_path*/true, true);
     }
     return m_texture;
@@ -496,7 +486,8 @@ void Material::init()
 void Material::install(bool is_full_path, bool complain_if_not_found)
 {
     // Don't load a texture that are not supposed to be loaded automatically
-    if(m_dont_load_texture) return;
+    if (m_dont_load_texture) return;
+    if (m_installed) return;
 
     m_installed = true;
 
@@ -525,9 +516,11 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
 
     if (m_mask.size() > 0)
     {
+        m_texture->grab();
         video::ITexture* tex = irr_driver->applyMask(m_texture, m_mask);
         if (tex)
         {
+            // TODO
             irr_driver->removeTexture(m_texture);
             m_texture = tex;
         }
@@ -546,8 +539,11 @@ Material::~Material()
     if (m_texture != NULL)
     {
         m_texture->drop();
-        if(m_texture->getReferenceCount()==1)
+        if (m_texture->getReferenceCount() == 1)
+        {
             irr_driver->removeTexture(m_texture);
+            m_texture = NULL;
+        }
     }
 
     // If a special sfx is installed (that isn't part of stk itself), the
@@ -734,10 +730,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 {
     if (!m_installed)
     {
-        //Log::info("Material", "LazyLoading (setMaterialProperties) '%s' : '%s'", m_texname.c_str(), m_full_path.c_str());
         install(/*is_full_path*/true, true);
     }
-    //Log::info("Material", "setMaterialProperties '%s'", m_texname.c_str());
 
     if (m_deprecated ||
         (m->getTexture(0) != NULL &&
