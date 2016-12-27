@@ -521,7 +521,6 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
         video::ITexture* tex = irr_driver->applyMask(m_texture, m_mask);
         if (tex)
         {
-            // TODO
             irr_driver->removeTexture(m_texture);
             m_texture = tex;
         }
@@ -537,15 +536,7 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
 //-----------------------------------------------------------------------------
 Material::~Material()
 {
-    if (m_texture != NULL)
-    {
-        m_texture->drop();
-        if (m_texture->getReferenceCount() == 1)
-        {
-            irr_driver->removeTexture(m_texture);
-            m_texture = NULL;
-        }
-    }
+    unloadTexture();
 
     // If a special sfx is installed (that isn't part of stk itself), the
     // entry needs to be removed from the sfx_manager's mapping, since other
@@ -555,6 +546,22 @@ Material::~Material()
         SFXManager::get()->deleteSFXMapping(m_sfx_name);
     }
 }   // ~Material
+
+//-----------------------------------------------------------------------------
+
+void Material::unloadTexture()
+{
+    if (m_texture != NULL)
+    {
+        m_texture->drop();
+        if (m_texture->getReferenceCount() == 1)
+        {
+            irr_driver->removeTexture(m_texture);
+        }
+        m_texture = NULL;
+        m_installed = false;
+    }
+}
 
 //-----------------------------------------------------------------------------
 /** Initialise the data structures for a custom sfx to be played when a

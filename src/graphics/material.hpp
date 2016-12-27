@@ -283,6 +283,8 @@ public:
                    bool load_texture = true);
          ~Material ();
 
+    void unloadTexture();
+
     void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
     void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, 

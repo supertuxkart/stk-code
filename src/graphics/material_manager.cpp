@@ -384,6 +384,16 @@ void MaterialManager::makeMaterialsPermanent()
 }   // makeMaterialsPermanent
 
 // ----------------------------------------------------------------------------
+
+void MaterialManager::unloadAllTextures()
+{
+    for (int i = 0; i < m_shared_material_index; i++)
+    {
+        m_materials[i]->unloadTexture();
+    }
+}
+
+// ----------------------------------------------------------------------------
 bool MaterialManager::hasMaterial(const std::string& fname)
 {
     std::string basename=StringUtils::getBasename(fname);
