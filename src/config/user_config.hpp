@@ -679,7 +679,7 @@ namespace UserConfigParams
                 "1=enabled for humans, disabled for AIs; 2=enabled for all") );
 
     PARAM_PREFIX IntUserConfigParam        m_geometry_level
-            PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_2,
+            PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_0,
                             "geometry_level", &m_graphics_quality,
                 "Geometry quality 0=everything is displayed; "
                 "1=a few details are displayed; 2=lowest level, no details") );
