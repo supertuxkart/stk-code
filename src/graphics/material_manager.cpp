@@ -387,9 +387,11 @@ void MaterialManager::makeMaterialsPermanent()
 
 void MaterialManager::unloadAllTextures()
 {
+    std::string texture_folder = file_manager->getAssetDirectory(FileManager::TEXTURE);
     for (int i = 0; i < m_shared_material_index; i++)
     {
-        m_materials[i]->unloadTexture();
+        if (m_materials[i]->getTexFullPath().find(texture_folder) != std::string::npos)
+            m_materials[i]->unloadTexture();
     }
 }
 
