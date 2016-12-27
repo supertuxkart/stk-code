@@ -677,12 +677,12 @@ namespace UserConfigParams
                             "steering_animations", &m_graphics_quality,
                 "Whether to display kart animations (0=disabled for all; "
                 "1=enabled for humans, disabled for AIs; 2=enabled for all") );
-    
+
     PARAM_PREFIX IntUserConfigParam        m_geometry_level
             PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_2,
                             "geometry_level", &m_graphics_quality,
-                "Geometry quality 0=lowest level, no details; "
-                "1=a few details are displayed; 2=everything is displayed") );
+                "Geometry quality 0=everything is displayed; "
+                "1=a few details are displayed; 2=lowest level, no details") );
 
     PARAM_PREFIX IntUserConfigParam         m_anisotropic
             PARAM_DEFAULT( IntUserConfigParam(4, "anisotropic",

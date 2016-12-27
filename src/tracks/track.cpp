@@ -1960,6 +1960,10 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         if (name == "track" || name == "default-start") continue;
         if (name == "object" || name == "library")
         {
+            int geo_level = 0;
+            node->get("geometry-level", &geo_level);
+            if (UserConfigParams::m_geometry_level + geo_level - 2 > 0)
+                continue;
             m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }
         else if (name == "water")
