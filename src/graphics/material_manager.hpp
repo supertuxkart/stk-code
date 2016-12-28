@@ -83,7 +83,6 @@ public:
     void      makeMaterialsPermanent();
     bool      hasMaterial(const std::string& fname);
 
-    void      installAllTextures();
     void      unloadAllTextures();
 
     Material* getLatestMaterial() { return m_materials[m_materials.size()-1]; }

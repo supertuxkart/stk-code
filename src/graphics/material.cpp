@@ -517,20 +517,7 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
 
     if (m_mask.size() > 0)
     {
-        m_texture->grab();
-        irr_driver->removeTexture(m_texture);
-        video::ITexture* tex = irr_driver->applyMask(m_texture, m_mask);
-        if (tex)
-        {
-            // TODO: cleanup
-            //m_texture->drop();
-            m_texture = tex;
-        }
-        else
-        {
-            Log::warn("material", "Applying mask failed for '%s'!",
-                      m_texname.c_str());
-        }
+        irr_driver->applyMask(m_texture, m_mask);
     }
     m_texture->grab();
 }   // install
