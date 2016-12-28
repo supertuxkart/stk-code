@@ -396,6 +396,18 @@ void MaterialManager::unloadAllTextures()
 }
 
 // ----------------------------------------------------------------------------
+
+void MaterialManager::installAllTextures()
+{
+    std::string texture_folder = file_manager->getAssetDirectory(FileManager::TEXTURE);
+    for (int i = 0; i < m_shared_material_index; i++)
+    {
+        if (m_materials[i]->getTexFullPath().find(texture_folder) != std::string::npos)
+            m_materials[i]->install(true, true);
+    }
+}
+
+// ----------------------------------------------------------------------------
 bool MaterialManager::hasMaterial(const std::string& fname)
 {
     std::string basename=StringUtils::getBasename(fname);

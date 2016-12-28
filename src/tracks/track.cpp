@@ -1645,10 +1645,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         {
             if(!m_materials_loaded)
                 material_manager->addSharedMaterial(materials_file);
+            material_manager->installAllTextures();
             m_materials_loaded = true;
         }
         else
+        {
             material_manager->pushTempMaterial(materials_file);
+            material_manager->installAllTextures();
+        }
     }
     catch (std::exception& e)
     {

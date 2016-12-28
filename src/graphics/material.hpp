@@ -271,7 +271,6 @@ private:
     bool  m_installed;
 
     void  init    ();
-    void  install (bool is_full_path=false, bool complain_if_not_found=true);
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
 
@@ -283,7 +282,8 @@ public:
                    bool load_texture = true);
          ~Material ();
 
-    void unloadTexture();
+    void  install(bool is_full_path = false, bool complain_if_not_found = true);
+    void  unloadTexture();
 
     void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
