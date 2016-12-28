@@ -279,6 +279,10 @@ enum AnimType {ANIMS_NONE         = 0,
                ANIMS_PLAYERS_ONLY = 1,
                ANIMS_ALL          = 2 };
 
+enum GeometryLevel {GEOLEVEL_0    = 0,
+                    GEOLEVEL_1    = 1,
+                    GEOLEVEL_2    = 2 };
+
 /** Using X-macros for setting-possible values is not very pretty, but it's a
  *  no-maintenance case :
  *  when you want to add a new parameter, just add one signle line below and
@@ -673,6 +677,13 @@ namespace UserConfigParams
                             "steering_animations", &m_graphics_quality,
                 "Whether to display kart animations (0=disabled for all; "
                 "1=enabled for humans, disabled for AIs; 2=enabled for all") );
+
+    PARAM_PREFIX IntUserConfigParam        m_geometry_level
+            PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_0,
+                            "geometry_level", &m_graphics_quality,
+                "Geometry quality 0=everything is displayed; "
+                "1=a few details are displayed; 2=lowest level, no details") );
+
     PARAM_PREFIX IntUserConfigParam         m_anisotropic
             PARAM_DEFAULT( IntUserConfigParam(4, "anisotropic",
                            &m_graphics_quality,

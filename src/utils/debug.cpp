@@ -29,11 +29,13 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/shaders.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/controller.hpp"
+#include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physics.hpp"
@@ -42,7 +44,8 @@
 #include "replay/replay_recorder.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
-#include "states_screens/dialogs/general_debug_dialog.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -54,14 +57,6 @@
 
 using namespace irr;
 using namespace gui;
-
-// -----------------------------------------------------------------------------
-// Callback for each general debug dialog
-static void scripting(const std::string& text)
-{
-    Scripting::ScriptEngine::getInstance()->evalScript(text);
-}   // scripting
-// -----------------------------------------------------------------------------
 
 namespace Debug {
 
@@ -134,7 +129,8 @@ enum DebugMenuCommand
     DEBUG_VISUAL_VALUES,
     DEBUG_PRINT_START_POS,
     DEBUG_ADJUST_LIGHTS,
-    DEBUG_SCRIPT_CONSOLE
+    DEBUG_SCRIPT_CONSOLE,
+    DEBUG_RUN_CUTSCENE,
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -639,7 +635,54 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     }
     case DEBUG_SCRIPT_CONSOLE:
-        new GeneralDebugDialog(L"Run Script", scripting);
+        new GeneralTextFieldDialog(L"Run Script", []
+            (const irr::core::stringw& text) {},
+            [] (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
+            {
+                Scripting::ScriptEngine* engine =
+                    Scripting::ScriptEngine::getInstance();
+                if (engine == NULL)
+                {
+                    Log::warn("Debug", "No scripting engine loaded!");
+                    return true;
+                }
+                engine->evalScript(StringUtils::wideToUtf8(tb->getText()));
+                tb->setText(L"");
+                // Don't close the console after each run
+                return false;
+            });
+        break;
+    case DEBUG_RUN_CUTSCENE:
+        new GeneralTextFieldDialog(
+            L"Enter the cutscene names (separate parts by space)", []
+            (const irr::core::stringw& text)
+            {
+                if (World::getWorld())
+                {
+                    Log::warn("Debug", "Please run cutscene in main menu");
+                    return;
+                }
+                if (text.empty()) return;
+                std::vector<std::string> parts =
+                    StringUtils::split(StringUtils::wideToUtf8(text), ' ');
+                for (const std::string& track : parts)
+                {
+                    Track* t = track_manager->getTrack(track);
+                    if (t == NULL)
+                    {
+                        Log::warn("Debug", "Cutscene %s not found!",
+                            track.c_str());
+                        return;
+                    }
+                }
+                CutsceneWorld::setUseDuration(true);
+                StateManager::get()->enterGameState();
+                race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                race_manager->setNumKarts(0);
+                race_manager->setNumPlayers(0);
+                race_manager->startSingleRace(parts.front(), 999, false);
+                ((CutsceneWorld*)World::getWorld())->setParts(parts);
+            });
         break;
     }   // switch
     return false;
@@ -748,6 +791,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
             mnu->addItem(L"Adjust Lights", DEBUG_ADJUST_LIGHTS);
             mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
+            mnu->addItem(L"Run cutscene(s)", DEBUG_RUN_CUTSCENE);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();

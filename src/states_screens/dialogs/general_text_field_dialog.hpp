@@ -15,11 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_GENERAL_DEBUG_DIALOG_HPP
-#define HEADER_GENERAL_DEBUG_DIALOG_HPP
+#ifndef HEADER_GENERAL_TEXT_FIELD_DIALOG_HPP
+#define HEADER_GENERAL_TEXT_FIELD_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.hpp"
+
+#include <functional>
 
 namespace GUIEngine
 {
@@ -29,24 +31,43 @@ namespace GUIEngine
 }
 
 /**
- * \brief A general debug dialog to run stuff based on captured text.
+ * \brief A general textfield dialog to do anything based on captured text
+ *  using callbacks.
  * \ingroup states_screens
  */
-class GeneralDebugDialog : public GUIEngine::ModalDialog
+class GeneralTextFieldDialog : public GUIEngine::ModalDialog
 {
 private:
-    typedef void (*Callback)(const std::string& text);
+    typedef std::function<void(const irr::core::stringw&)> DismissCallback;
 
-    Callback m_callback;
+    typedef
+        std::function<bool(GUIEngine::LabelWidget*, GUIEngine::TextBoxWidget*)>
+        ValidationCallback;
 
-    void run();
+    GUIEngine::LabelWidget* m_title;
+
+    GUIEngine::TextBoxWidget* m_text_field;
+
+    DismissCallback m_dm_cb;
+
+    ValidationCallback m_val_cb;
+
+    bool m_self_destroy;
 
 public:
-    GeneralDebugDialog(const wchar_t* title, Callback cb);
+    GeneralTextFieldDialog(const wchar_t* title, DismissCallback dm_cb,
+                           ValidationCallback val_cb = []
+        (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
+        {
+            // No validation if not specify, always go to dismiss callback
+            return true;
+        });
     // ------------------------------------------------------------------------
-    ~GeneralDebugDialog();
+    ~GeneralTextFieldDialog();
     // ------------------------------------------------------------------------
-    virtual void onEnterPressedInternal() OVERRIDE                   { run(); }
+    virtual void onEnterPressedInternal() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void onUpdate(float dt) OVERRIDE;
     // ------------------------------------------------------------------------
     GUIEngine::EventPropagation processEvent(const std::string& eventSource)
         OVERRIDE;

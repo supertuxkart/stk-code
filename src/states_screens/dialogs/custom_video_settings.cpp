@@ -75,6 +75,17 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         UserConfigParams::m_show_steering_animations == 2 ?
         1 : UserConfigParams::m_show_steering_animations);
 
+    SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
+    //I18N: Geometry level disabled : lowest level, no details
+    geometry_level->addLabel(_("Disabled"));
+    //I18N: Geometry level low : few details are displayed
+    geometry_level->addLabel(_("low"));
+    //I18N: Geometry level high : everything is displayed
+    geometry_level->addLabel(_("high"));
+    geometry_level->setValue(
+        UserConfigParams::m_geometry_level == 2 ? 0 :
+        UserConfigParams::m_geometry_level == 0 ? 2 : 1);
+
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("filtering");
     int value = 0;
     if (UserConfigParams::m_anisotropic == 2)  value = 2;
@@ -191,6 +202,10 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
         UserConfigParams::m_show_steering_animations =
             getWidget<SpinnerWidget>("steering_animations")->getValue();
+
+        const int val =
+            getWidget<SpinnerWidget>("geometry_detail")->getValue();
+        UserConfigParams::m_geometry_level = val == 2 ? 0 : val == 0 ? 2 : 1;
 
         switch (getWidget<SpinnerWidget>("filtering")->getValue())
         {

@@ -17,20 +17,21 @@
 
 #include "states_screens/grand_prix_editor_screen.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/edit_gp_screen.hpp"
-#include "states_screens/dialogs/enter_gp_name_dialog.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
-
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -97,7 +98,9 @@ void GrandPrixEditorScreen::eventCallback(Widget* widget, const std::string& nam
 
         if (m_action == "new" || m_action == "copy")
         {
-            new EnterGPNameDialog(this, 0.5f, 0.4f);
+            new GeneralTextFieldDialog(_("Please enter the name of the grand prix"),
+                std::bind(&GrandPrixEditorScreen::setNewGPWithName,
+                          this, std::placeholders::_1), validateName);
         }
         else if (m_action == "edit" && m_selection != NULL)
         {
@@ -112,7 +115,9 @@ void GrandPrixEditorScreen::eventCallback(Widget* widget, const std::string& nam
         }
         else if (m_action == "rename" && m_selection != NULL)
         {
-            new EnterGPNameDialog(this, 0.5f, 0.4f);
+            new GeneralTextFieldDialog(_("Please enter the name of the grand prix"),
+                std::bind(&GrandPrixEditorScreen::setNewGPWithName,
+                          this, std::placeholders::_1), validateName);
         }
     }
     else if (name == "gpgroups")
@@ -281,7 +286,7 @@ void GrandPrixEditorScreen::enableButtons()
 }
 
 // -----------------------------------------------------------------------------
-void GrandPrixEditorScreen::onNewGPWithName(const stringw& newName)
+void GrandPrixEditorScreen::setNewGPWithName(const stringw& newName)
 {
     if (m_action == "copy" && m_selection != NULL)
     {
@@ -326,5 +331,36 @@ const core::stringw GrandPrixEditorScreen::getGroupName(enum GrandPrixData::GPGr
         case GrandPrixData::GP_USER_DEFINED:  return _("User defined");
         case GrandPrixData::GP_ADDONS:        return _("Add-Ons");
         default:                              return L"???";
+    }
+}
+
+// -----------------------------------------------------------------------------
+bool GrandPrixEditorScreen::validateName(LabelWidget* label,
+                                         TextBoxWidget* text)
+{
+    stringw name = text->getText().trim();
+    if (name.size() == 0)
+    {
+        label->setText(_("Name is empty."), false);
+        SFXManager::get()->quickSound("anvil");
+        return false;
+    }
+    else if (grand_prix_manager->existsName(name) ||
+        name == GrandPrixData::getRandomGPName())
+    {
+        // check for duplicate names
+        label->setText(_("Another grand prix with this name already exists."), false);
+        SFXManager::get()->quickSound("anvil");
+        return false;
+    }
+    else if (name.size() > 30)
+    {
+        label->setText(_("Name is too long."), false);
+        SFXManager::get()->quickSound("anvil");
+        return false;
+    }
+    else
+    {
+        return true;
     }
 }
