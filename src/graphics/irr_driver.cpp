@@ -1826,6 +1826,7 @@ void IrrDriver::dropAllTextures(const scene::IMesh *mesh)
 void IrrDriver::applyMask(video::ITexture* texture,
                           const std::string& mask_path)
 {
+#ifndef SERVER_ONLY
     video::IImage* img =
         m_video_driver->createImage(texture, core::position2d<s32>(0,0),
                                     texture->getSize());
@@ -1879,6 +1880,7 @@ void IrrDriver::applyMask(video::ITexture* texture,
         core::stringc(texture->getName()).c_str());
     img->drop();
     mask->drop();
+#endif
 }   // applyMask
 
 // ----------------------------------------------------------------------------
