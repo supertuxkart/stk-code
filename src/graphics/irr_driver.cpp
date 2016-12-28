@@ -1828,9 +1828,9 @@ void IrrDriver::applyMask(video::ITexture* texture,
                           const std::string& mask_path)
 {
 #ifndef SERVER_ONLY
+    const core::dimension2d<u32> size = texture->getSize();
     video::IImage* img =
-        m_video_driver->createImage(texture, core::position2d<s32>(0,0),
-                                    texture->getSize());
+        m_video_driver->createImage(texture, core::position2d<s32>(0,0), size);
 
     video::IImage* mask =
         m_video_driver->createImageFromFile(mask_path.c_str());
@@ -1840,6 +1840,15 @@ void IrrDriver::applyMask(video::ITexture* texture,
         Log::warn("irr_driver", "Applying mask failed for '%s'!",
             core::stringc(texture->getName()).c_str());
         return;
+    }
+
+    if (mask->getDimension() != size)
+    {
+        video::IImage* mask_scaled =
+            m_video_driver->createImage(texture->getColorFormat(), size);
+        mask->copyToScaling(mask_scaled);
+        mask->drop();
+        mask = mask_scaled;
     }
 
     void* dest = img->lock();
