@@ -75,7 +75,6 @@ Material::Material(const XMLNode *node, bool deprecated)
         m_full_path = file_manager->getFileSystem()->getAbsolutePath(relativePath.c_str()).c_str();
     init();
 
-    node->get("dont-load", &m_dont_load_texture);
     bool b = false;
     
     node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.4 style
@@ -403,13 +402,9 @@ Material::Material(const XMLNode *node, bool deprecated)
 
 video::ITexture* Material::getTexture()
 {
-    // Note that dont load means that the textures are not loaded
-    // via the material. So getTexture should only get called for
-    // automatically loaded textures (used atm for font textures).
-    assert(!m_dont_load_texture);
     if (!m_installed)
     {
-        install(/*is_full_path*/true, true);
+        install(/*is_full_path*/true);
     }
     return m_texture;
 }   // getTexture
@@ -429,8 +424,10 @@ Material::Material(const std::string& fname, bool is_full_path,
     m_full_path = file_manager->getFileSystem()->getAbsolutePath(
         file_manager->searchTexture(m_texname).c_str()).c_str();
 
+    m_complain_if_not_found = complain_if_not_found;
+
     if (load_texture)
-        install(is_full_path, complain_if_not_found);
+        install(is_full_path);
 }   // Material
 
 //-----------------------------------------------------------------------------
@@ -438,7 +435,6 @@ Material::Material(const std::string& fname, bool is_full_path,
  */
 void Material::init()
 {
-    m_dont_load_texture         = false;
     m_texture                   = NULL;
     m_clamp_tex                 = 0;
     m_shader_type               = SHADERTYPE_SOLID;
@@ -476,7 +472,7 @@ void Material::init()
     m_water_splash              = false;
     m_is_jump_texture           = false;
     m_has_gravity               = false;
-
+    m_complain_if_not_found     = true;
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {
         m_particles_effects[n] = NULL;
@@ -484,10 +480,9 @@ void Material::init()
 }   // init
 
 //-----------------------------------------------------------------------------
-void Material::install(bool is_full_path, bool complain_if_not_found)
+void Material::install(bool is_full_path)
 {
     // Don't load a texture that are not supposed to be loaded automatically
-    if (m_dont_load_texture) return;
     if (m_installed) return;
 
     m_installed = true;
@@ -496,7 +491,7 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
                                  ? m_texname
                                  : file_manager->searchTexture(m_texname);
 
-    if (complain_if_not_found && full_path.size() == 0)
+    if (m_complain_if_not_found && full_path.size() == 0)
     {
         Log::error("material", "Cannot find texture '%s'.", m_texname.c_str());
         m_texture = NULL;
@@ -507,7 +502,7 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
         m_texture = irr_driver->getTexture(full_path,
                                            false, //isPreMul(),
                                            false, //isPreDiv(),
-                                           complain_if_not_found);
+                                           m_complain_if_not_found);
     }
 
     if (m_texture == NULL) return;
@@ -727,7 +722,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 {
     if (!m_installed)
     {
-        install(/*is_full_path*/true, true);
+        install(/*is_full_path*/true);
     }
 
     if (m_deprecated ||
