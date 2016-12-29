@@ -93,11 +93,8 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
         // Search backward so that temporary (track) textures are found first
         for (int i = (int)m_materials.size() - 1; i >= 0; i--)
         {
-			//Log::info("DEBUG_TEX", "<%s> <%s>", m_materials[i]->getTexFullPath().c_str(), img_path.c_str());
-			core::stringc fullpath = core::stringc(m_materials[i]->getTexFullPath().c_str());
-			fullpath.make_lower();
-			//if (fullpath.find("bumpy") > 0)
-			//	Log::info("DEBUG_TEX", "<%s> <%s>", fullpath.c_str(), img_path.c_str());
+            core::stringc fullpath = core::stringc(m_materials[i]->getTexFullPath().c_str());
+            fullpath.make_lower();
             if (fullpath == img_path.c_str())
             {
                 return m_materials[i];
@@ -111,7 +108,6 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
 
         for (int i = (int)m_materials.size() - 1; i >= 0; i--)
         {
-			//Log::info("DEBUG_TEX2", "<%s> <%s>", m_materials[i]->getTexFname().c_str(), image.c_str());
             core::stringc texfname(m_materials[i]->getTexFname().c_str());
             texfname.make_lower();
             if (texfname == image)
