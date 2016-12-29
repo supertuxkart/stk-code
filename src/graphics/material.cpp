@@ -865,9 +865,12 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         if (!m->getTexture(0))
             m->setTexture(0, getUnicolorTexture(SColor(255, 255, 255, 255)));
 
-        if (m_normal_map_tex.size() > 0 && UserConfigParams::m_dynamic_lights)
+        if (m_normal_map_tex.size() > 0)
         {
-            tex = irr_driver->getTexture(m_normal_map_tex);
+            if (UserConfigParams::m_dynamic_lights)
+                tex = irr_driver->getTexture(m_normal_map_tex);
+            else
+                tex = getUnicolorTexture(SColor(0, 0, 0, 0));
             m->setTexture(3, tex);
 
             // Material and shaders
