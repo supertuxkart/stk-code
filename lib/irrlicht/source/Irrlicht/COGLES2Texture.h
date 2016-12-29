@@ -109,6 +109,13 @@ public:
 	//! Get an access to texture states cache.
 	SStatesCache& getStatesCache() const;
 
+	void setImage(IImage* new_image)
+	{
+		if (Image)
+			Image->drop();
+		Image = new_image;
+	}
+
 protected:
 
 	//! protected constructor with basic setup, no GL texture name created, for derived classes

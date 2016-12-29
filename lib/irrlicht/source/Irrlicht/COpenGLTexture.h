@@ -103,6 +103,13 @@ public:
 	//! sets whether this texture is intended to be used as a render target.
 	void setIsRenderTarget(bool isTarget);
 
+	void setImage(IImage* new_image)
+	{
+		if (Image)
+			Image->drop();
+		Image = new_image;
+	}
+
 protected:
 
 	//! protected constructor with basic setup, no GL texture name created, for derived classes

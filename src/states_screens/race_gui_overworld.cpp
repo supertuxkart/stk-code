@@ -29,6 +29,7 @@
 #include "graphics/glwrap.hpp"
 #endif
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"

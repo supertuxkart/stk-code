@@ -92,12 +92,6 @@ private:
 
     std::string      m_full_path;
 
-    /** If true, the texture will not automatically be loaded and bound
-     *  at load time, it must be loaded elsewhere. This is used to store
-     *  material settings for font textures, without loading fonts for
-     *  languages that might not be needed at all. */
-    bool             m_dont_load_texture;
-
     /** Name of a special sfx to play when a kart is on this terrain, or
      *  "" if no special sfx exists. */
     std::string      m_sfx_name;
@@ -266,10 +260,14 @@ private:
 
     std::string      m_gloss_map;
 
+    bool  m_complain_if_not_found;
+
     bool  m_deprecated;
 
+    bool  m_installed;
+
     void  init    ();
-    void  install (bool is_full_path=false, bool complain_if_not_found=true);
+    void  install (bool is_full_path=false);
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
 
@@ -281,6 +279,8 @@ public:
                    bool load_texture = true);
          ~Material ();
 
+    void unloadTexture();
+
     void  setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) const;
     void  setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb);
     void  adjustForFog(scene::ISceneNode* parent, video::SMaterial *m, 
@@ -290,14 +290,7 @@ public:
     void isInitiallyHidden(scene::IMeshBuffer* who);
 
     /** Returns the ITexture associated with this material. */
-    video::ITexture *getTexture() const
-    {
-        // Note that dont load means that the textures are not loaded
-        // via the material. So getTexture should only get called for
-		// automatically loaded textures (used atm for font textures).
-        assert(!m_dont_load_texture);
-        return m_texture;
-    }   // getTexture
+    video::ITexture *getTexture();
     // ------------------------------------------------------------------------
     bool  isIgnore           () const { return m_ignore;             }
     // ------------------------------------------------------------------------

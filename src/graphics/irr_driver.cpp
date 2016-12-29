@@ -65,6 +65,12 @@
 #include "utils/vs.hpp"
 
 #include <irrlicht.h>
+#if defined(USE_GLES2)
+#define _IRR_COMPILE_WITH_OGLES2_
+#include "../../lib/irrlicht/source/Irrlicht/COGLES2Texture.h"
+#else
+#include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
+#endif
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.
@@ -1818,19 +1824,35 @@ void IrrDriver::dropAllTextures(const scene::IMesh *mesh)
 }   // dropAllTextures
 
 // ----------------------------------------------------------------------------
-video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
-                                      const std::string& mask_path)
+void IrrDriver::applyMask(video::ITexture* texture,
+                          const std::string& mask_path)
 {
+#ifndef SERVER_ONLY
+    const core::dimension2d<u32> size = texture->getSize();
     video::IImage* img =
-        m_video_driver->createImage(texture, core::position2d<s32>(0,0),
-                                    texture->getSize());
+        m_video_driver->createImage(texture, core::position2d<s32>(0,0), size);
 
     video::IImage* mask =
         m_video_driver->createImageFromFile(mask_path.c_str());
 
-    if (img == NULL || mask == NULL) return NULL;
+    if (img == NULL || mask == NULL)
+    {
+        Log::warn("irr_driver", "Applying mask failed for '%s'!",
+            core::stringc(texture->getName()).c_str());
+        return;
+    }
 
-    if (img->lock() && mask->lock())
+    if (mask->getDimension() != size)
+    {
+        video::IImage* mask_scaled =
+            m_video_driver->createImage(texture->getColorFormat(), size);
+        mask->copyToScaling(mask_scaled);
+        mask->drop();
+        mask = mask_scaled;
+    }
+
+    void* dest = img->lock();
+    if (dest != NULL && mask->lock())
     {
         core::dimension2d<u32> dim = img->getDimension();
         for (unsigned int x = 0; x < dim.Width; x++)
@@ -1844,20 +1866,31 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
             }   // for y
         }   // for x
 
+        if (!CVS->isGLSL())
+        {
+            // For new graphical pipeline, it will be done in texture manager
+            // compressTexture
+            glBindTexture(GL_TEXTURE_2D, getTextureGLuint(texture));
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dim.Width, dim.Height,
+                GL_BGRA, GL_UNSIGNED_BYTE, dest);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
         mask->unlock();
         img->unlock();
+#if defined(USE_GLES2)
+        static_cast<irr::video::COGLES2Texture*>(texture)->setImage(img);
+#else
+        static_cast<irr::video::COpenGLTexture*>(texture)->setImage(img);
+#endif
+        mask->drop();
+        return;
     }
-    else
-    {
-        return NULL;
-    }
-
-    std::string base =
-        StringUtils::getBasename(texture->getName().getPath().c_str());
-    video::ITexture *t = m_video_driver->addTexture(base.c_str(),img, NULL);
+    Log::warn("irr_driver", "Applying mask failed for '%s'!",
+        core::stringc(texture->getName()).c_str());
     img->drop();
     mask->drop();
-    return t;
+#endif
 }   // applyMask
 
 // ----------------------------------------------------------------------------
