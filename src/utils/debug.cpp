@@ -694,7 +694,9 @@ bool handleContextMenuAction(s32 cmd_id)
             (const irr::core::stringw& text) {},
             [] (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
             {
+#ifndef SERVER_ONLY
                 lw->setText(reloadTexture(tb->getText()), true);
+#endif
                 // Don't close the dialog after each run
                 return false;
             });
