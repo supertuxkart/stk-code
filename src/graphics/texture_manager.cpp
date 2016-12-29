@@ -22,6 +22,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/materials.hpp"
+#include "utils/string_utils.hpp"
 
 #if defined(USE_GLES2)
 #define _IRR_COMPILE_WITH_OGLES2_
@@ -278,6 +279,76 @@ video::ITexture* getUnicolorTexture(const video::SColor &c)
         img->drop();
         return tex;
     }
+}
+
+core::stringw reloadTexture(const core::stringw& name)
+{
+    if (!CVS->isGLSL())
+        return L"Use shader based renderer to reload textures.";
+    if (CVS->isTextureCompressionEnabled())
+        return L"Please disable texture compression for reloading textures.";
+
+    if (name.empty())
+    {
+        for (video::ITexture* tex : AlreadyTransformedTexture)
+            reloadSingleTexture(tex);
+        return L"All textures reloaded.";
+    }
+
+    core::stringw result;
+    std::vector<std::string> names =
+        StringUtils::split(StringUtils::wideToUtf8(name), ';');
+    for (const std::string& fname : names)
+    {
+        for (video::ITexture* tex : AlreadyTransformedTexture)
+        {
+            std::string tex_path = tex->getName().getPtr();
+            std::string tex_name = StringUtils::getBasename(tex_path).c_str();
+            if (fname == tex_name || fname == tex_path)
+            {
+                if (reloadSingleTexture(tex))
+                {
+                    result += tex_name.c_str();
+                    result += L" ";
+                }
+            }
+        }
+    }
+    if (result.empty())
+        return L"Texture(s) not found!";
+    return result + "reloaded.";
+}
+
+bool reloadSingleTexture(video::ITexture* tex)
+{
+    video::IImage* tmp =
+        irr_driver->getVideoDriver()->createImageFromFile(tex->getName());
+    if (tmp == NULL) return false;
+
+    const bool scaling = tmp->getDimension() != tex->getSize();
+    video::IImage* new_texture =
+        irr_driver->getVideoDriver()->createImage(video::ECF_A8R8G8B8,
+        scaling ? tex->getSize() : tmp->getDimension());
+    if (scaling)
+        tmp->copyToScaling(new_texture);
+    else
+        tmp->copyTo(new_texture);
+    tmp->drop();
+
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, new_texture->getDimension().Width,
+        new_texture->getDimension().Height, GL_BGRA, GL_UNSIGNED_BYTE,
+        new_texture->lock());
+    new_texture->unlock();
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+#if defined(USE_GLES2)
+    static_cast<irr::video::COGLES2Texture*>(tex)->setImage(new_texture);
+#else
+    static_cast<irr::video::COpenGLTexture*>(tex)->setImage(new_texture);
+#endif
+    Log::info("TextureManager", "%s reloaded", tex->getName().getPtr());
+    return true;
 }
 
 #endif   // !SERVER_ONLY

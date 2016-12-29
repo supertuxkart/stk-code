@@ -1838,7 +1838,7 @@ void IrrDriver::applyMask(video::ITexture* texture,
     if (img == NULL || mask == NULL)
     {
         Log::warn("irr_driver", "Applying mask failed for '%s'!",
-            core::stringc(texture->getName()).c_str());
+            texture->getName().getPtr());
         return;
     }
 
@@ -1887,7 +1887,7 @@ void IrrDriver::applyMask(video::ITexture* texture,
         return;
     }
     Log::warn("irr_driver", "Applying mask failed for '%s'!",
-        core::stringc(texture->getName()).c_str());
+        texture->getName().getPtr());
     img->drop();
     mask->drop();
 #endif

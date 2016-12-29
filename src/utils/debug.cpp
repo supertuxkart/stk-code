@@ -29,6 +29,8 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/texture_manager.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
@@ -131,6 +133,7 @@ enum DebugMenuCommand
     DEBUG_ADJUST_LIGHTS,
     DEBUG_SCRIPT_CONSOLE,
     DEBUG_RUN_CUTSCENE,
+    DEBUG_RELOAD_TEXTURE,
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -684,6 +687,18 @@ bool handleContextMenuAction(s32 cmd_id)
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
             });
         break;
+        case DEBUG_RELOAD_TEXTURE:
+        new GeneralTextFieldDialog(
+            L"Enter the texture filename(s) (separate names by ;)"
+            " to be reloaded (empty to reload all)", []
+            (const irr::core::stringw& text) {},
+            [] (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
+            {
+                lw->setText(reloadTexture(tb->getText()), true);
+                // Don't close the dialog after each run
+                return false;
+            });
+        break;
     }   // switch
     return false;
 }
@@ -792,6 +807,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Adjust Lights", DEBUG_ADJUST_LIGHTS);
             mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
             mnu->addItem(L"Run cutscene(s)", DEBUG_RUN_CUTSCENE);
+            mnu->addItem(L"Reload texture", DEBUG_RELOAD_TEXTURE);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();
