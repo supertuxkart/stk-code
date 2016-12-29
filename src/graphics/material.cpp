@@ -742,7 +742,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         ITexture *tex;
         ITexture *glossytex;
-        if (m_gloss_map.size() > 0)
+        if (m_gloss_map.size() > 0 && UserConfigParams::m_dynamic_lights)
         {
             glossytex = irr_driver->getTexture(m_gloss_map);
         }
