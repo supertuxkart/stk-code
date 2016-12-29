@@ -220,6 +220,11 @@ void CentralVideoSettings::init()
             m_need_srgb_visual_workaround = (param != GL_SRGB);
         }
 #else
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
+        {
+            m_glsl = false;
+        }
+
         if (m_glsl == true)
         {
             hasTextureStorage = true;
