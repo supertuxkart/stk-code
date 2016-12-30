@@ -296,8 +296,10 @@ core::stringw reloadTexture(const core::stringw& name)
     }
 
     core::stringw result;
+    core::stringw list = name;
+    list.make_lower().replace(L'\u005C', L'\u002F');
     std::vector<std::string> names =
-        StringUtils::split(StringUtils::wideToUtf8(name), ';');
+        StringUtils::split(StringUtils::wideToUtf8(list), ';');
     for (const std::string& fname : names)
     {
         for (video::ITexture* tex : AlreadyTransformedTexture)
@@ -310,6 +312,7 @@ core::stringw reloadTexture(const core::stringw& name)
                 {
                     result += tex_name.c_str();
                     result += L" ";
+                    break;
                 }
             }
         }
