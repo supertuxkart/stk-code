@@ -53,6 +53,7 @@ struct GFXPreset
 class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenVideo>
 {
 private:
+    bool m_prev_adv_pipline;
     OptionsScreenVideo();
     bool m_inited;
     std::vector<GFXPreset> m_presets;

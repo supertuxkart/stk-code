@@ -141,7 +141,8 @@ struct Resolution
 
 // ----------------------------------------------------------------------------
 
-OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui")
+OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui"),
+                                           m_prev_adv_pipline(false)
 {
     m_inited = false;
     initPresets();
@@ -166,6 +167,7 @@ void OptionsScreenVideo::loadedFromFile()
 void OptionsScreenVideo::init()
 {
     Screen::init();
+    m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
     assert(ribbon != NULL);
     ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
@@ -559,6 +561,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
 void OptionsScreenVideo::tearDown()
 {
+    if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights)
+        irr_driver->sameRestart();
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();

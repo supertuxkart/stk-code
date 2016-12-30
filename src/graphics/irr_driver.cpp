@@ -1001,7 +1001,7 @@ void IrrDriver::cancelResChange()
     // is actually called from the gui, i.e. the event loop, i.e. while the
     // old device is active - so we can't delete this device (which we must
     // do in applyResolutionSettings)
-    m_resolution_changing=RES_CHANGE_CANCEL;
+    m_resolution_changing=RES_CHANGE_SAME;
 
 }   // cancelResChange
 

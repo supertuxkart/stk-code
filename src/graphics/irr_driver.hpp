@@ -118,10 +118,10 @@ private:
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
      *  change to new resolution and trigger confirmation dialog.
-     *  Cancel indicates a change of the resolution (back to the original
+     *  Same indicates a change of the resolution (back to the original
      *  one), but no confirmation dialog. */
     enum {RES_CHANGE_NONE, RES_CHANGE_YES,
-          RES_CHANGE_CANCEL}                m_resolution_changing;
+          RES_CHANGE_SAME}                m_resolution_changing;
 
 
 public:
@@ -630,6 +630,7 @@ public:
                                                          size_t height);
 
     void uploadLightingData();
+    void sameRestart()             { m_resolution_changing = RES_CHANGE_SAME; }
 
 };   // IrrDriver
 
