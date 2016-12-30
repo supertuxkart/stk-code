@@ -174,6 +174,8 @@ public:
                   bool confirmed, float time = -1.0f);
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, float time);
+    void addNetworkState(int rewinder_index, BareNetworkString *buffer,
+                         float time);
     // ------------------------------------------------------------------------
     /** Sets the time that is to be used for all further states or events,
      *  and the time step size. This is necessary so that states/events before 

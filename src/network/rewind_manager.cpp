@@ -20,7 +20,9 @@
 
 #include "graphics/irr_driver.hpp"
 #include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "network/protocols/game_protocol.hpp"
 #include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
 #include "physics/physics.hpp"
@@ -84,7 +86,7 @@ void RewindManager::reset()
 #endif
     m_is_rewinding         = false;
     m_overall_state_size   = 0;
-    m_state_frequency      = 0.1f;   // save 10 states a second
+    m_state_frequency      = 0.5f;   // save 10 states a second
     m_last_saved_state     = -9999.9f;  // forces initial state save
 
     if(!m_enable_rewind_manager) return;
@@ -184,7 +186,7 @@ RewindManager::AllRewindInfo::reverse_iterator
 #endif
         if((*index)->isState())
         {
-            if((*index)->getTime()<target_time)
+            if(   (*index)->getTime() <= target_time )
             {
                 return index;
             }
@@ -223,7 +225,8 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
         Log::error("RewindManager", "Adding event when rewinding");
         return;
     }
-    Log::verbose("time", "wolrd %f rewind %f", World::getWorld()->getTime(), getCurrentTime());
+    Log::verbose("RewindManager", "Time world %f self-event %f",
+                 World::getWorld()->getTime(), getCurrentTime());
     if (time < 0)
         time = getCurrentTime();
     RewindInfo *ri = new RewindInfoEvent(time, event_rewinder,
@@ -254,7 +257,37 @@ void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
                          RewindManager::RewindInfoCompare        );
     m_network_events.getData().insert(i, ri);
     m_network_events.unlock();
+    Log::verbose("RewindManager", "Time world %f network-event %f",
+                 World::getWorld()->getTime(), time);
+
 }   // addEvent
+
+// ----------------------------------------------------------------------------
+/** Adds a state to the list of network rewind data. This function is
+ *  threadsafe so can be called by the network thread. The data is synched
+ *  to m_rewind_info by the main thread. The data to be stored must be
+ *  allocated and not freed by the caller!
+ *  \param time Time at which the event was recorded.
+ *  \param buffer Pointer to the event data.
+ */
+void RewindManager::addNetworkState(int rewinder_index,
+                                    BareNetworkString *buffer, float time)
+{
+    RewindInfo *ri = new RewindInfoState(time, m_all_rewinder[rewinder_index],
+                                         buffer, /*confirmed*/true);
+
+    // Sort the incoming network events so that we can use list::merge
+    // to move the network events into the RewindInfo main list.
+    m_network_events.lock();
+    AllRewindInfo::iterator i =
+        std::upper_bound(m_network_events.getData().begin(),
+                         m_network_events.getData().end(), ri,
+                         RewindManager::RewindInfoCompare      );
+    m_network_events.getData().insert(i, ri);
+    m_network_events.unlock();
+    Log::verbose("RewindManager", "Time world %f network-state %f",
+        World::getWorld()->getTime(), time);
+}   // addState
 
 // ----------------------------------------------------------------------------
 /** Determines if a new state snapshot should be taken, and if so calls all
@@ -266,17 +299,20 @@ void RewindManager::saveStates()
     if(!m_enable_rewind_manager  || 
         m_all_rewinder.size()==0 ||
         m_is_rewinding              )  return;
-   
+    if (NetworkConfig::get()->isClient())
+        return;
+
     float time = World::getWorld()->getTime();
     if(time - m_last_saved_state < m_state_frequency)
     {
+        // Avoid saving a time event for the same time, which happens
+        // with t=0.
         if (time > m_last_saved_state)
         {
             // No full state necessary, add a dummy entry for the time
             // which increases replay precision (same time step size)
             RewindInfo *ri = new RewindInfoTime(getCurrentTime());
             insertRewindInfo(ri);
-            m_last_saved_state = getCurrentTime();
         }
         return;
     }
@@ -284,6 +320,8 @@ void RewindManager::saveStates()
     bool was_empty = m_rewind_info.empty();
 
     // For now always create a snapshot.
+    if (NetworkConfig::get()->isServer())
+        GameProtocol::getInstance()->startNewState();
     AllRewinder::const_iterator i;
     for(i=m_all_rewinder.begin(); i!=m_all_rewinder.end(); ++i)
     {
@@ -296,10 +334,14 @@ void RewindManager::saveStates()
                                                  /*is_confirmed*/true);
             assert(ri);
             insertRewindInfo(ri);
+            if(NetworkConfig::get()->isServer())
+                GameProtocol::getInstance()->addState(buffer);
         }   // size >= 0
         else
             delete buffer;   // NULL or 0 byte buffer
     }
+    if (NetworkConfig::get()->isServer())
+        GameProtocol::getInstance()->sendState();
 
     if (was_empty && !m_rewind_info.empty())
         m_next_event = m_rewind_info.begin();
@@ -317,38 +359,57 @@ void RewindManager::saveStates()
  */
 void RewindManager::playEventsTill(float time)
 {    
-    if(m_rewind_info.empty())
+    m_network_events.lock();
+    if (m_rewind_info.empty() && m_network_events.getData().empty())
+    {
+        m_network_events.unlock();
         return;
+    }
 
     /** First merge all newly received network events into the main 
      *  event list */
     bool rewind_necessary = false;
-    m_network_events.lock();
+    float rewind_time     = -1.0f;
+
     if (!m_network_events.getData().empty())
     {
         // Check if a rewind is necessary
-        if (m_network_events.getData().front()->getTime() < time)
+        rewind_time = m_network_events.getData().front()->getTime();
+        Log::info("RewindManager", "At %f merging states from %f",
+                  World::getWorld()->getTime(), rewind_time);
+        if (rewind_time < time)
         {
-            Log::info("RewindManager", "Rewind necessary at %f because of event at %f",
-                       time, 
-                       m_network_events.getData().front()->getTime());
+
+            Log::info("RewindManager",
+                      "Rewind necessary at %f because of event at %f",
+                      time, rewind_time);
+            rewind_necessary = true;
         }
         // It is possible that m_next_event points m_rewind_info.end()
         // and that new elements are added to the end of the list. In this
         // case m_rewind_info end would still point to end(), but should
         // point to the newly added element. To achieve this, we first
-        // decrement m_next_event (note that it was tested previously that
+        // decrement m_next_eventr (note that it was tested previously that
         // the list is not empty), merge in the new events, and then
         // increment m_next_event again. If elements have been added to
         // the end of the list, m_next_event will now corretly point to them.
-        m_next_event--;
+
+        bool adjust_next = !m_rewind_info.empty();
+        if(adjust_next) m_next_event--;
         m_rewind_info.merge(m_network_events.getData(),
                             RewindManager::RewindInfoCompare);
-        m_next_event++;
+        if (adjust_next)
+            m_next_event++;
+        else   // rewind_info was empty, set pointer to first element
+            m_next_event = m_rewind_info.begin();
     }   // if !m_network_events empty
 
     m_network_events.unlock();
 
+    if (rewind_necessary)
+    {
+        rewindTo(rewind_time);
+    }
     assert(!m_is_rewinding);
     m_is_rewinding = true;
     while (m_next_event !=m_rewind_info.end() )
@@ -373,22 +434,24 @@ void RewindManager::playEventsTill(float time)
 void RewindManager::rewindTo(float rewind_time)
 {
     assert(!m_is_rewinding);
-    m_is_rewinding = true;
     Log::info("rewind", "Rewinding to %f", rewind_time);
     history->doReplayHistory(History::HISTORY_NONE);
 
     // First find the state to which we need to rewind
     // ------------------------------------------------
     AllRewindInfo::reverse_iterator rindex = findFirstIndex(rewind_time);
-    rindex--;
-    AllRewindInfo::iterator index = --(rindex.base());
+    //rindex--;
+    AllRewindInfo::reverse_iterator xx = rindex;
+    ++xx;
+    AllRewindInfo::iterator index = --(xx.base());
 
-    if(!(*index)->isState())
+    if(!(*rindex)->isState())
     {
         Log::error("RewindManager", "No state for rewind to %f, state %d.",
                    rewind_time, index);
         return;
     }
+    m_is_rewinding = true;
 
     // Then undo the rewind infos going backwards in time
     // --------------------------------------------------
@@ -413,7 +476,7 @@ void RewindManager::rewindTo(float rewind_time)
 
     // Get the (first) full state to which we have to rewind
     RewindInfoState *state =
-                    dynamic_cast<RewindInfoState*>(*index);
+                    dynamic_cast<RewindInfoState*>(*rindex);
 
     // Store the time to which we have to replay to
     float exact_rewind_time = state->getTime();
@@ -430,6 +493,7 @@ void RewindManager::rewindTo(float rewind_time)
     {
         state->rewind();
         index++;
+        //rindex--;
         if(index==m_rewind_info.end()) break;
         state = dynamic_cast<RewindInfoState*>(*index);
     }
@@ -457,7 +521,7 @@ void RewindManager::rewindTo(float rewind_time)
         }
         float dt = determineTimeStepSize(index, current_time);
         world->updateWorld(dt);
-#define SHOW_ROLLBACK
+#undef SHOW_ROLLBACK
 #ifdef SHOW_ROLLBACK
         irr_driver->update(dt);
 #endif
@@ -465,7 +529,8 @@ void RewindManager::rewindTo(float rewind_time)
 
     }
     m_is_rewinding = false;
-
+    Log::info("RewindManager", "Rewind from %f to %f finished.",
+              rewind_time, World::getWorld()->getTime());
 }   // rewindTo
 
 // ----------------------------------------------------------------------------

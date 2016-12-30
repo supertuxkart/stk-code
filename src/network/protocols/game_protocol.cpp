@@ -47,43 +47,9 @@ GameProtocol::~GameProtocol()
 }   // ~GameProtocol
 
 //-----------------------------------------------------------------------------
-bool GameProtocol::notifyEventAsynchronous(Event* event)
-{
-    if(!checkDataSize(event, 1)) return true;
-
-    NetworkString &data = event->data();
-    uint8_t count = data.getUInt8();
-    for (unsigned int i = 0; i < count; i++)
-    {
-        float        time    = data.getFloat();
-        uint8_t      kart_id = data.getUInt8();
-        assert(kart_id < World::getWorld()->getNumKarts());
-        PlayerAction action  = (PlayerAction)(data.getUInt8());
-        int          value   = data.getUInt32();
-        Log::info("GameProtocol", "Action at %f: %d %d %d",
-                  time, kart_id, action, value);
-        BareNetworkString *s = new BareNetworkString(3);
-        s->addUInt8(kart_id).addUInt8(action).addUInt16(value);
-        RewindManager::get()->addNetworkEvent(this, s, time);
-    }
-
-    if (data.size() > 0 )
-    {
-        Log::warn("ControllerEventProtocol",
-                  "The data seems corrupted. Remains %d", data.size());
-    }
-    if (NetworkConfig::get()->isServer())
-    {
-        // Send update to all clients except the original sender.
-        STKHost::get()->sendPacketExcept(event->getPeer(), 
-                                         &data, false);
-    }   // if server
-    return true;
-}   // notifyEventAsynchronous
-
-//-----------------------------------------------------------------------------
 /** Synchronous update - will send all commands collected during the last
- *  frame (and could optional only send messages every N frames). */
+ *  frame (and could optional only send messages every N frames).
+ */
 void GameProtocol::update(float dt)
 {
     if (m_all_actions.size() == 0) return;   // nothing to do
@@ -91,7 +57,8 @@ void GameProtocol::update(float dt)
     // Clear left-over data from previous frame. This way the network
     // string will increase till it reaches maximum size necessary
     m_data_to_send->clear();
-    m_data_to_send->addUInt8( uint8_t( m_all_actions.size() ) );
+    m_data_to_send->addUInt8(GP_CONTROLLER_ACTION)
+                   .addUInt8(uint8_t(m_all_actions.size()));
 
     // Add all actions
     for (auto a : m_all_actions)
@@ -101,10 +68,30 @@ void GameProtocol::update(float dt)
         m_data_to_send->addUInt8((uint8_t)(a.m_action)).addUInt32(a.m_value);
     }   // for a in m_all_actions
 
-    // FIXME: for now send reliable
+        // FIXME: for now send reliable
     sendToServer(m_data_to_send, /*reliable*/ true);
     m_all_actions.clear();
 }   // update
+
+//-----------------------------------------------------------------------------
+/** Called when a message from a remote GameProtocol is received.
+ */
+bool GameProtocol::notifyEventAsynchronous(Event* event)
+{
+    if(!checkDataSize(event, 1)) return true;
+
+    NetworkString &data = event->data();
+    uint8_t message_type = data.getUInt8();
+    switch (message_type)
+    {
+    case GP_CONTROLLER_ACTION: handleControllerAction(event); break;
+    case GP_STATE:             handleState(event);            break;
+    default: Log::error("GameProtocol",
+                        "Received unknown message type %d - ignored.",
+                        message_type);                        break;
+    }   // switch message_type
+    return true;
+}   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
 /** Called from the local kart controller when an action (like steering,
@@ -138,6 +125,99 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
     Log::info("GameProtocol", "Action at %f: %d value %d",
               World::getWorld()->getTime(), action, value);
 }   // controllerAction
+
+// ----------------------------------------------------------------------------
+/** Called when a controller event is receiver - either on the server from
+ *  a client, or on a client from the server. It sorts the event into the
+ *  RewindManager's network event queue. The server will also send this 
+ *  event immediately to all clients (except to the original sender).
+ */
+void GameProtocol::handleControllerAction(Event *event)
+{
+    NetworkString &data = event->data();
+    uint8_t count = data.getUInt8();
+    for (unsigned int i = 0; i < count; i++)
+    {
+        float   time    = data.getFloat();
+        uint8_t kart_id = data.getUInt8();
+        assert(kart_id < World::getWorld()->getNumKarts());
+
+        PlayerAction action = (PlayerAction)(data.getUInt8());
+        int          value  = data.getUInt32();
+        Log::info("GameProtocol", "Action at %f: %d %d %d",
+                  time, kart_id, action, value);
+        BareNetworkString *s = new BareNetworkString(3);
+        s->addUInt8(kart_id).addUInt8(action).addUInt16(value);
+        RewindManager::get()->addNetworkEvent(this, s, time);
+    }
+
+    if (data.size() > 0)
+    {
+        Log::warn("GameProtocol",
+                  "Received invalid controller data - remains %d",data.size());
+    }
+    if (NetworkConfig::get()->isServer())
+    {
+        // Send update to all clients except the original sender.
+        STKHost::get()->sendPacketExcept(event->getPeer(),
+                                         &data, false);
+    }   // if server
+
+}   // handleControllerAction
+
+// ----------------------------------------------------------------------------
+/** Called by the server before assembling a new message containing the full
+ *  state of the race to be sent to a client.
+ */
+void GameProtocol::startNewState()
+{
+    assert(NetworkConfig::get()->isServer());
+    m_data_to_send->clear();
+    m_data_to_send->addUInt8(GP_STATE).addFloat(World::getWorld()->getTime());
+    Log::info("GameProtocol", "Sending new state at %f.",
+              World::getWorld()->getTime());
+}   // startNewState
+
+// ----------------------------------------------------------------------------
+/** Called by a server to add data to the current state.
+ */
+void GameProtocol::addState(BareNetworkString *buffer)
+{
+    assert(NetworkConfig::get()->isServer());
+    m_data_to_send->addUInt16(buffer->size());
+    (*m_data_to_send) += *buffer;
+}   // addState
+// ----------------------------------------------------------------------------
+/** Called when the last state information has been added and the message
+ *  can be sent to the clients.
+ */
+void GameProtocol::sendState()
+{
+    assert(NetworkConfig::get()->isServer());
+    sendMessageToPeersChangingToken(m_data_to_send, /*reliable*/true);
+}   // sendState
+
+// ----------------------------------------------------------------------------
+/** Called when a new full state is received form the server.
+ */
+void GameProtocol::handleState(Event *event)
+{
+    assert(NetworkConfig::get()->isClient());
+    NetworkString &data = event->data();
+    float time          = data.getFloat();
+    Log::info("GameProtocol", "Received at %f state from %f",
+              World::getWorld()->getTime(), time);
+    int index           = 0;
+    while (data.size() > 0)
+    {
+        uint16_t count = data.getUInt16();
+        BareNetworkString *state = new BareNetworkString(data.getCurrentData(),
+                                                         count);
+        data.skip(count);
+        RewindManager::get()->addNetworkState(index, state, time);
+        index++;
+    }   // while data.size()>0
+}   // handleState
 
 // ----------------------------------------------------------------------------
 /** Called from the RewindManager when rolling back.

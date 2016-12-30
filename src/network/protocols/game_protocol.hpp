@@ -38,7 +38,8 @@ class GameProtocol : public Protocol
 private:
 
     /** The type of game events to be forwarded to the server. */
-    enum { GP_CONTROLLER_ACTION  = 0x01};
+    enum { GP_CONTROLLER_ACTION,
+           GP_STATE};
 
     /** A network string that collects all information from the server to be sent
      *  next. */
@@ -55,6 +56,9 @@ private:
 
     // List of all kart actions to send to the server
     std::vector<Action> m_all_actions;
+
+    void handleControllerAction(Event *event);
+    void handleState(Event *event);
 public:
              GameProtocol();
     virtual ~GameProtocol();
@@ -64,6 +68,10 @@ public:
 
     void controllerAction(int kart_id, PlayerAction action,
                           int value);
+    void startNewState();
+    void addState(BareNetworkString *buffer);
+    void sendState();
+
     virtual void undo(BareNetworkString *buffer) OVERRIDE;
     virtual void rewind(BareNetworkString *buffer) OVERRIDE;
     // ------------------------------------------------------------------------

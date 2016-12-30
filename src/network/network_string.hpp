@@ -155,6 +155,22 @@ public:
     const char* getData() const { return (char*)(m_buffer.data()); };
 
     // ------------------------------------------------------------------------
+    /** Returns a byte pointer to the unread remaining content of the network
+     *  string. */
+    char* getCurrentData()
+    {
+        return (char*)(m_buffer.data()+m_current_offset);
+    }   // getCurrentData
+
+    // ------------------------------------------------------------------------
+    /** Returns a byte pointer to the unread remaining content of the network
+     *  string. */
+    const char* getCurrentData() const
+    {
+        return (char*)(m_buffer.data()+m_current_offset); 
+    }   // getCurrentData
+
+    // ------------------------------------------------------------------------
     /** Returns the remaining length of the network string. */
     unsigned int size() const { return (int)m_buffer.size()-m_current_offset; }
 
@@ -164,7 +180,7 @@ public:
     {
         m_current_offset += n;
         assert(m_current_offset >=0 &&
-               m_current_offset < (int)m_buffer.size());
+               m_current_offset <= (int)m_buffer.size());
     }   // skip
     // ------------------------------------------------------------------------
     /** Returns the send size, which is the full length of the buffer. A 
@@ -233,7 +249,7 @@ public:
     {
         return addFloat(f);
     }   // add
-        // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Adds the xyz components of a Vec3 to the string. */
     BareNetworkString& add(const Vec3 &xyz)
     {
