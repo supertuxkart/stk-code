@@ -76,6 +76,8 @@ public:
                                                        Input::InputType type,
                                                        int playerId) OVERRIDE;
 
+    virtual bool onEscapePressed() OVERRIDE;
+
 private:
     bool areAllKartsConfirmed() const;
     int getNumConfirmedKarts();

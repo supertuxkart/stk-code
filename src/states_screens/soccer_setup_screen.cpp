@@ -487,3 +487,10 @@ void SoccerSetupScreen::updateKartViewsLayout()
         view_info.view->move(pos_x, pos_y, kart_view_size, kart_view_size);
     }
 }   // updateKartViewsLayout
+
+// -----------------------------------------------------------------------------
+bool SoccerSetupScreen::onEscapePressed()
+{
+    race_manager->setTimeTarget(0.0f);
+    return true;
+}   // onEscapePressed
