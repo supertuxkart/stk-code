@@ -267,7 +267,7 @@ private:
     bool  m_installed;
 
     void  init    ();
-    void  install (bool is_full_path=false);
+    void  install ();
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
 

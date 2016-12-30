@@ -404,7 +404,7 @@ video::ITexture* Material::getTexture()
 {
     if (!m_installed)
     {
-        install(/*is_full_path*/true);
+        install();
     }
     return m_texture;
 }   // getTexture
@@ -419,15 +419,24 @@ Material::Material(const std::string& fname, bool is_full_path,
 {
     m_deprecated = false;
     m_installed = false;
-    m_texname = fname;
     init();
-    m_full_path = file_manager->getFileSystem()->getAbsolutePath(
-        file_manager->searchTexture(m_texname).c_str()).c_str();
+
+    if (is_full_path)
+    {
+        m_texname = StringUtils::getBasename(fname);
+        m_full_path = fname;
+    }
+    else
+    {
+        m_texname = fname;
+        m_full_path = file_manager->getFileSystem()->getAbsolutePath(
+            file_manager->searchTexture(m_texname).c_str()).c_str();
+    }
 
     m_complain_if_not_found = complain_if_not_found;
 
     if (load_texture)
-        install(is_full_path);
+        install();
 }   // Material
 
 //-----------------------------------------------------------------------------
@@ -480,18 +489,14 @@ void Material::init()
 }   // init
 
 //-----------------------------------------------------------------------------
-void Material::install(bool is_full_path)
+void Material::install()
 {
     // Don't load a texture that are not supposed to be loaded automatically
     if (m_installed) return;
 
     m_installed = true;
 
-    const std::string &full_path = is_full_path
-                                 ? m_texname
-                                 : file_manager->searchTexture(m_texname);
-
-    if (m_complain_if_not_found && full_path.size() == 0)
+    if (m_complain_if_not_found && m_full_path.size() == 0)
     {
         Log::error("material", "Cannot find texture '%s'.", m_texname.c_str());
         m_texture = NULL;
@@ -499,7 +504,7 @@ void Material::install(bool is_full_path)
 
     else
     {
-        m_texture = irr_driver->getTexture(full_path,
+        m_texture = irr_driver->getTexture(m_full_path,
                                            false, //isPreMul(),
                                            false, //isPreDiv(),
                                            m_complain_if_not_found);
@@ -722,7 +727,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 {
     if (!m_installed)
     {
-        install(/*is_full_path*/true);
+        install();
     }
 
     if (m_deprecated ||
