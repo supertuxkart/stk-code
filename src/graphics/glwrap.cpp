@@ -349,6 +349,7 @@ void draw3DLine(const core::vector3df& start,
 
 bool hasGLExtension(const char* extension) 
 {
+#if !defined(USE_GLES2)
     if (glGetStringi != NULL)
     {
         GLint numExtensions = 0;
@@ -364,6 +365,7 @@ bool hasGLExtension(const char* extension)
         }
     }
     else
+#endif
     {
         const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
         if (extensions && strstr(extensions, extension) != NULL)
@@ -381,6 +383,7 @@ bool hasGLExtension(const char* extension)
 const std::string getGLExtensions()
 {
     std::string result;
+#if !defined(USE_GLES2)
     if (glGetStringi != NULL)
     {
         GLint num_extensions = 0;
@@ -394,6 +397,7 @@ const std::string getGLExtensions()
         }
     }
     else
+#endif
     {
         const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
         result = extensions;
