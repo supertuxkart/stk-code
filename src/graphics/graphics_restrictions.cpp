@@ -198,7 +198,8 @@ public:
 
         // AMD: driver_version = "4.3.13283 Core Profile/Debug Context 14.501.1003.0"
         // ----------------------------------------------
-        if (card_name.find("AMD") != std::string::npos)
+        if (card_name.find("AMD") != std::string::npos
+            || card_name.find("Radeon") != std::string::npos)
         {
             std::vector<std::string> s = StringUtils::split(driver_version, ' ');
             if (s.size() == 5)
