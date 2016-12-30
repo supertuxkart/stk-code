@@ -304,8 +304,9 @@ core::stringw reloadTexture(const core::stringw& name)
     {
         for (video::ITexture* tex : AlreadyTransformedTexture)
         {
-            std::string tex_path = tex->getName().getPtr();
-            std::string tex_name = StringUtils::getBasename(tex_path).c_str();
+            std::string tex_path =
+                StringUtils::toLowerCase(tex->getName().getPtr());
+            std::string tex_name = StringUtils::getBasename(tex_path);
             if (fname == tex_name || fname == tex_path)
             {
                 if (reloadSingleTexture(tex))
