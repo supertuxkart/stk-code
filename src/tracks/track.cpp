@@ -280,6 +280,15 @@ void Track::reset()
  */
 void Track::cleanup()
 {
+#ifdef USE_RESIZE_CACHE
+    if (!UserConfigParams::m_high_definition_textures)
+    {
+        file_manager->popTextureSearchPath();
+    }
+#endif
+    file_manager->popTextureSearchPath();
+    file_manager->popModelSearchPath();
+
     Graph::destroy();
     ItemManager::destroy();
 #ifndef SERVER_ONLY
@@ -931,7 +940,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         TriangleMesh *tmesh = m_track_mesh;
         if(t)
         {
-            std::string image = std::string(core::stringc(t->getName()).c_str());
+            std::string image = t->getName().getPtr();
 
             // the third boolean argument is false because at this point we're
             // dealing physics, so it's useless to warn about missing textures,
@@ -1422,7 +1431,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
                 video::ITexture* t=irrMaterial.getTexture(j);
                 if(!t) continue;
                 std::string texture_name =
-                    StringUtils::getBasename(core::stringc(t->getName()).c_str());
+                    StringUtils::getBasename(t->getName().getPtr());
 
                 // to lower case, for case-insensitive comparison
                 texture_name = StringUtils::toLowerCase(texture_name);
@@ -1832,15 +1841,6 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     {
         irr_driver->setClearbackBufferColor(m_sky_color);
     }
-
-#ifdef USE_RESIZE_CACHE
-    if (!UserConfigParams::m_high_definition_textures)
-    {
-        file_manager->popTextureSearchPath();
-    }
-#endif
-    file_manager->popTextureSearchPath();
-    file_manager->popModelSearchPath  ();
 
     // ---- Set ambient color
     m_ambient_color = m_default_ambient_color;
