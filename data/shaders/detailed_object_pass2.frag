@@ -24,7 +24,7 @@ void main(void)
 #endif
     vec4 detail = texture(Detail, uv_bis);
     detail.rgb = detail.a * detail.rgb;
-    color.rgb = detail.rgb + color.rgb * (1 - detail.a);
+    color.rgb = detail.rgb + color.rgb * (1. - detail.a);
     float specmap = texture(SpecMap, uv).g;
     FragColor = vec4(getLightFactor(color.xyz, vec3(1.), specmap, 0.), 1.);
 }
