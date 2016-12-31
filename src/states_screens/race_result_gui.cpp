@@ -1086,6 +1086,10 @@ void RaceResultGUI::backToLobby()
         current_y += rect.Height / 2 + rect.Height / 4;
         font = GUIEngine::getSmallFont();
         std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(SOCCER_TEAM_RED);
+        while (scorers.size() > 10)
+        {
+            scorers.erase(scorers.begin());
+        }
         std::vector<float> score_times = sw->getScoreTimes(SOCCER_TEAM_RED);
         irr::video::ITexture* scorer_icon;
 
@@ -1138,6 +1142,10 @@ void RaceResultGUI::backToLobby()
         current_y = prev_y;
         current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
         scorers = sw->getScorers(SOCCER_TEAM_BLUE);
+        while (scorers.size() > 10)
+        {
+            scorers.erase(scorers.begin());
+        }
         score_times = sw->getScoreTimes(SOCCER_TEAM_BLUE);
         for (unsigned int i = 0; i < scorers.size(); i++)
         {
