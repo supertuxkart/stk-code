@@ -1091,6 +1091,10 @@ void RaceResultGUI::backToLobby()
             scorers.erase(scorers.begin());
         }
         std::vector<float> score_times = sw->getScoreTimes(SOCCER_TEAM_RED);
+        while (score_times.size() > 10)
+        {
+            score_times.erase(score_times.begin());
+        }
         irr::video::ITexture* scorer_icon;
 
         int prev_y = current_y;
@@ -1147,6 +1151,10 @@ void RaceResultGUI::backToLobby()
             scorers.erase(scorers.begin());
         }
         score_times = sw->getScoreTimes(SOCCER_TEAM_BLUE);
+        while (score_times.size() > 10)
+        {
+            score_times.erase(score_times.begin());
+        }
         for (unsigned int i = 0; i < scorers.size(); i++)
         {
             const bool own_goal = !(scorers.at(i).m_correct_goal);
