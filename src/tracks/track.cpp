@@ -607,6 +607,9 @@ void Track::loadTrackInfo()
         // Currently only max eight players in soccer mode
         m_max_arena_players = 8;
     }
+    // Max 10 players supported in arena
+    if (m_max_arena_players > 10)
+        m_max_arena_players = 10;
 
 }   // loadTrackInfo
 
