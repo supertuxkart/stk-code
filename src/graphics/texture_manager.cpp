@@ -22,6 +22,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/materials.hpp"
+#include "graphics/stk_texture.hpp"
 #include "utils/string_utils.hpp"
 
 #if defined(USE_GLES2)
@@ -40,22 +41,9 @@ GLuint getTextureGLuint(irr::video::ITexture *tex)
 {
     if (tex == NULL)
         return 0;
-#if defined(USE_GLES2)
-    return static_cast<irr::video::COGLES2Texture*>(tex)->getOpenGLTextureName();
-#else
-    return static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
-#endif
+    return tex->getOpenGLTextureName();
 }
 
-GLuint getDepthTexture(irr::video::ITexture *tex)
-{
-    assert(tex->isRenderTarget());
-#if defined(USE_GLES2)
-    return static_cast<irr::video::COGLES2FBOTexture*>(tex)->DepthBufferTexture;
-#else
-    return static_cast<irr::video::COpenGLFBOTexture*>(tex)->DepthBufferTexture;
-#endif
-}
 
 static std::set<irr::video::ITexture *> AlreadyTransformedTexture;
 static std::map<int, video::ITexture*> unicolor_cache;
@@ -94,6 +82,9 @@ void cleanUnicolorTextures()
 
 void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
 {
+    STKTexture* stk_tex = dynamic_cast<STKTexture*>(tex);
+    if (stk_tex) return;
+
     if (AlreadyTransformedTexture.find(tex) != AlreadyTransformedTexture.end())
         return;
     AlreadyTransformedTexture.insert(tex);

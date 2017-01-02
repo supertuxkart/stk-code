@@ -28,14 +28,6 @@
 #include "graphics/texture_shader.hpp"
 #include "utils/cpp2011.hpp"
 
-#if defined(USE_GLES2)
-#   define _IRR_COMPILE_WITH_OGLES2_
-#   include "../../lib/irrlicht/source/Irrlicht/COGLES2Texture.h"
-#else
-#   include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
-#endif
-
-
 // ============================================================================
 class Primitive2DList : public TextureShader<Primitive2DList, 1, float>
 {
@@ -186,16 +178,8 @@ static void drawTexColoredQuad(const video::ITexture *texture,
 
     ColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(ColoredTextureRectShader::getInstance()->m_vao);
-
-#if !defined(USE_GLES2)
-    const irr::video::COpenGLTexture *t = 
-                       static_cast<const irr::video::COpenGLTexture*>(texture);
-#else
-    const irr::video::COGLES2Texture *t = 
-                       static_cast<const irr::video::COGLES2Texture*>(texture);
-#endif
     ColoredTextureRectShader::getInstance()
-        ->setTextureUnits(t->getOpenGLTextureName());
+        ->setTextureUnits(texture->getOpenGLTextureName());
     ColoredTextureRectShader::getInstance()
         ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
                       core::vector2df(width, height),
@@ -367,16 +351,8 @@ void draw2DImage(const video::ITexture* texture,
 
     UniformColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(SharedGPUObjects::getUI_VAO());
-
-#if !defined(USE_GLES2)
-    const video::COpenGLTexture *c_texture =
-        static_cast<const video::COpenGLTexture*>(texture);
-#else
-    const video::COGLES2Texture *c_texture =
-        static_cast<const video::COGLES2Texture*>(texture);
-#endif
     UniformColoredTextureRectShader::getInstance()
-        ->setTextureUnits(c_texture->getOpenGLTextureName());
+        ->setTextureUnits(texture->getOpenGLTextureName());
 
     UniformColoredTextureRectShader::getInstance()
         ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
@@ -450,16 +426,8 @@ void draw2DImage(const video::ITexture* texture,
 
     UniformColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(SharedGPUObjects::getUI_VAO());
-
-#if !defined(USE_GLES2)
-    const video::COpenGLTexture *c_texture =
-        static_cast<const video::COpenGLTexture*>(texture);
-#else
-    const video::COGLES2Texture *c_texture =
-        static_cast<const video::COGLES2Texture*>(texture);
-#endif
     UniformColoredTextureRectShader::getInstance()
-        ->setTextureUnits(c_texture->getOpenGLTextureName());
+        ->setTextureUnits(texture->getOpenGLTextureName());
 
     UniformColoredTextureRectShader::getInstance()
         ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
@@ -574,14 +542,7 @@ void draw2DImage(const video::ITexture* texture,
     }
     else
     {
-#if !defined(USE_GLES2)
-        const video::COpenGLTexture *c_texture = 
-                            static_cast<const video::COpenGLTexture*>(texture);
-#else
-        const video::COGLES2Texture *c_texture = 
-                            static_cast<const video::COGLES2Texture*>(texture);
-#endif
-        drawTexQuad(c_texture->getOpenGLTextureName(), width, height,
+        drawTexQuad(texture->getOpenGLTextureName(), width, height,
                     center_pos_x, center_pos_y, tex_center_pos_x,
                     tex_center_pos_y, tex_width, tex_height);
     }
@@ -657,14 +618,7 @@ void draw2DImage(const video::ITexture* texture,
     }
     else
     {
-#if !defined(USE_GLES2)
-        const video::COpenGLTexture *c_texture =
-                            static_cast<const video::COpenGLTexture*>(texture);
-#else
-        const video::COGLES2Texture *c_texture =
-                            static_cast<const video::COGLES2Texture*>(texture);
-#endif
-        drawTexQuad(c_texture->getOpenGLTextureName(), width, height,
+        drawTexQuad(texture->getOpenGLTextureName(), width, height,
                     center_pos_x, center_pos_y, tex_center_pos_x,
                     tex_center_pos_y, tex_width, tex_height);
     }

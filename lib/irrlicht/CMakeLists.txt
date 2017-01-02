@@ -64,7 +64,6 @@ endif()
 set(IRRLICHT_SOURCES
 source/Irrlicht/CAnimatedMeshSceneNode.cpp
 source/Irrlicht/CAttributes.cpp
-source/Irrlicht/CB3DMeshFileLoader.cpp
 source/Irrlicht/CBillboardSceneNode.cpp
 source/Irrlicht/CBoneSceneNode.cpp
 source/Irrlicht/CCameraSceneNode.cpp
@@ -196,7 +195,6 @@ source/Irrlicht/BuiltInFont.h
 source/Irrlicht/CAnimatedMeshSceneNode.h
 source/Irrlicht/CAttributeImpl.h
 source/Irrlicht/CAttributes.h
-source/Irrlicht/CB3DMeshFileLoader.h
 source/Irrlicht/CBillboardSceneNode.h
 source/Irrlicht/CBlit.h
 source/Irrlicht/CBoneSceneNode.h

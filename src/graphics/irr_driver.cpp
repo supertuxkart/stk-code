@@ -36,7 +36,10 @@
 #include "graphics/shaders.hpp"
 #include "graphics/stk_animated_mesh.hpp"
 #include "graphics/stk_billboard.hpp"
+#include "graphics/stk_mesh_loader.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/stk_tex_manager.hpp"
+#include "graphics/stk_texture.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/texture_manager.hpp"
 #include "guiengine/engine.hpp"
@@ -600,6 +603,9 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
+    STKMeshLoader* sml = new STKMeshLoader(m_scene_manager);
+    m_scene_manager->addExternalMeshLoader(sml);
+    sml->drop();
 
     m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
 #ifndef SERVER_ONLY
@@ -1671,6 +1677,11 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
                                        bool is_prediv,
                                        bool complain_if_not_found)
 {
+    if (CVS->isGLSL())
+    {
+        return STKTexManager::getInstance()->getTexture(filename);
+    }
+
     video::ITexture* out;
     if(!is_premul && !is_prediv)
     {

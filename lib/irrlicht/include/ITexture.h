@@ -190,6 +190,9 @@ public:
 	//! Get name of texture (in most cases this is the filename)
 	const io::SNamedPath& getName() const { return NamedPath; }
 
+	//! return open gl texture name
+	virtual u32 getOpenGLTextureName() const = 0;
+
 protected:
 
 	//! Helper function, helps to get the desired texture creation format from the flags.

@@ -399,12 +399,11 @@ Material::Material(const XMLNode *node, bool deprecated)
         m_high_tire_adhesion = true;
 }   // Material
 //-----------------------------------------------------------------------------
-
-video::ITexture* Material::getTexture()
+video::ITexture* Material::getTexture(bool srgb, bool premul_alpha)
 {
     if (!m_installed)
     {
-        install();
+        install(srgb, premul_alpha);
     }
     return m_texture;
 }   // getTexture
@@ -489,7 +488,7 @@ void Material::init()
 }   // init
 
 //-----------------------------------------------------------------------------
-void Material::install()
+void Material::install(bool srgb, bool premul_alpha)
 {
     // Don't load a texture that are not supposed to be loaded automatically
     if (m_installed) return;
@@ -515,7 +514,7 @@ void Material::install()
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::getBasename(m_texname);
 
-    if (m_mask.size() > 0)
+    if (!CVS->isGLSL() && m_mask.size() > 0)
     {
         irr_driver->applyMask(m_texture, m_mask);
     }
