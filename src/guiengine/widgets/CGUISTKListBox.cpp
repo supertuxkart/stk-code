@@ -25,9 +25,10 @@ CGUISTKListBox::CGUISTKListBox(IGUIEnvironment* environment, IGUIElement* parent
             bool drawBack, bool moveOverSelect)
 : IGUIElement(EGUIET_LIST_BOX, environment, parent, id, rectangle), Selected(-1),
     ItemHeight(0),ItemHeightOverride(0),
-    TotalItemHeight(0), ItemsIconWidth(0), Font(0), IconBank(0),
-    ScrollBar(0), selectTime(0), Selecting(false), DrawBack(drawBack),
-    MoveOverSelect(moveOverSelect), AutoScroll(true), HighlightWhenNotFocused(true)
+    TotalItemHeight(0), ItemsIconWidth(0), MousePosY(0), Font(0), IconBank(0),
+    ScrollBar(0), selectTime(0), Selecting(false), Moving(false),
+    DrawBack(drawBack), MoveOverSelect(moveOverSelect), AutoScroll(true), 
+    HighlightWhenNotFocused(true)
 {
     #ifdef _DEBUG
     setDebugName("CGUISTKListBox");
@@ -334,10 +335,12 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
             case gui::EGET_ELEMENT_FOCUS_LOST:
                 {
                     if (event.GUIEvent.Caller == this)
+                    {
+                        Moving = false;
                         Selecting = false;
+                    }
                     break;
                 }
-
             default:
             break;
             }
@@ -356,21 +359,43 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                 case EMIE_LMOUSE_PRESSED_DOWN:
                 {
                     Selecting = true;
+                    Moving = false;
+                    MousePosY = event.MouseInput.Y;
                     return true;
                 }
 
                 case EMIE_LMOUSE_LEFT_UP:
                 {
-                    Selecting = false;
-
-                    if (isPointInside(p))
+                    if (isPointInside(p) && !Moving)
                         selectNew(event.MouseInput.Y);
+                        
+                    Selecting = false;
+                    Moving = false;
 
                     return true;
                 }
 
                 case EMIE_MOUSE_MOVED:
-                    if (Selecting || MoveOverSelect)
+                    if (!event.MouseInput.isLeftPressed())
+                    {
+                        Selecting = false;
+                        Moving = false;
+                    }
+
+                    if (Selecting &&
+                        fabs(event.MouseInput.Y - MousePosY) > ItemHeight/3)
+                    {
+                        Moving = true;
+                        Selecting = false;
+                    }
+                    
+                    if (Moving)
+                    {
+                        int pos = ScrollBar->getPos() - event.MouseInput.Y + MousePosY;
+                        ScrollBar->setPos(pos);
+                        MousePosY = event.MouseInput.Y;
+                    }
+                    else if (Selecting || MoveOverSelect)
                     {
                         if (isPointInside(p))
                         {
