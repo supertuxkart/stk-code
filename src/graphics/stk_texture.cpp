@@ -55,10 +55,12 @@ STKTexture::STKTexture(video::IImage* image)
 // ----------------------------------------------------------------------------
 STKTexture::~STKTexture()
 {
+#ifndef SERVER_ONLY
     if (m_texture_name != 0)
     {
         glDeleteTextures(1, &m_texture_name);
     }
+#endif   // !SERVER_ONLY
     if (m_texture_image != NULL)
         m_texture_image->drop();
 }   // ~STKTexture
