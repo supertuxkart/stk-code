@@ -137,6 +137,7 @@ void ModalDialog::doInit()
                                                           true /* modal */);
     m_irrlicht_window->setDrawTitlebar(false);
     m_irrlicht_window->getCloseButton()->setVisible(false);
+    m_irrlicht_window->setDraggable(false);
 
     GUIEngine::getSkin()->m_dialog = true;
     GUIEngine::getSkin()->m_dialog_size = 0.0f;
