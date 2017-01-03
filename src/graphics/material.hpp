@@ -266,8 +266,11 @@ private:
 
     bool  m_installed;
 
+    /** If Layer 1 texture is srgb. */
+    bool  m_srgb_texture;
+
     void  init    ();
-    void  install (bool srgb = false, bool premul_alpha = false);
+    void  install ();
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
 
@@ -276,7 +279,8 @@ public:
           Material(const std::string& fname,
                    bool is_full_path=false,
                    bool complain_if_not_found=true,
-                   bool load_texture = true);
+                   bool load_texture = true,
+                   bool srgb = false);
          ~Material ();
 
     void unloadTexture();
@@ -290,7 +294,7 @@ public:
     void isInitiallyHidden(scene::IMeshBuffer* who);
 
     /** Returns the ITexture associated with this material. */
-    video::ITexture *getTexture(bool srgb = false, bool premul_alpha = false);
+    video::ITexture *getTexture();
     // ------------------------------------------------------------------------
     bool  isIgnore           () const { return m_ignore;             }
     // ------------------------------------------------------------------------

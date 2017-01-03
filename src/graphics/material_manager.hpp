@@ -76,7 +76,8 @@ public:
                                 bool is_full_path=false,
                                 bool make_permanent=false,
                                 bool complain_if_not_found=true,
-                                bool strip_path=true);
+                                bool strip_path=true,
+                                bool srgb=false);
     void      addSharedMaterial(const std::string& filename, bool deprecated = false);
     bool      pushTempMaterial (const std::string& filename, bool deprecated = false);
     bool      pushTempMaterial (const XMLNode *root, const std::string& filename, bool deprecated = false);

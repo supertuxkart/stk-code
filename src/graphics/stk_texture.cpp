@@ -99,6 +99,35 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
     else
         new_texture = pre_loaded_tex;
 
+    unsigned char* data = (unsigned char*)new_texture->lock();
+    const unsigned int w = new_texture->getDimension().Width;
+    const unsigned int h = new_texture->getDimension().Height;
+    unsigned int format = GL_BGRA;
+#if defined(USE_GLES2)
+    if (!CVS->isEXTTextureFormatBGRA8888Usable())
+    {
+        format = GL_RGBA;
+        for (unsigned int i = 0; i < w * h; i++)
+        {
+            char tmp_val = data[i * 4];
+            data[i * 4] = data[i * 4 + 2];
+            data[i * 4 + 2] = tmp_val;
+        }
+    }
+#endif
+    if (m_premul_alpha)
+    {
+        for (unsigned int i = 0; i < w * h; i++)
+        {
+            float alpha = data[4 * i + 3];
+            if (alpha > 0.0f)
+                alpha = pow(alpha / 255.f, 1.f / 2.2f);
+            data[i * 4] = (unsigned char)(data[i * 4] * alpha);
+            data[i * 4 + 1] = (unsigned char)(data[i * 4 + 1] * alpha);
+            data[i * 4 + 2] = (unsigned char)(data[i * 4 + 2] * alpha);
+        }
+    }
+
     if (!no_upload)
     {
         const bool reload = m_texture_name != 0;
@@ -110,15 +139,15 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
         {
             glTexImage2D(GL_TEXTURE_2D, 0, m_srgb ? GL_SRGB_ALPHA : GL_RGBA,
                 new_texture->getDimension().Width,
-                new_texture->getDimension().Height, 0, GL_BGRA,
-                GL_UNSIGNED_BYTE, new_texture->lock());
+                new_texture->getDimension().Height, 0, format,
+                GL_UNSIGNED_BYTE, data);
         }
         else
         {
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
                 new_texture->getDimension().Width,
-                new_texture->getDimension().Height, GL_BGRA, GL_UNSIGNED_BYTE,
-                new_texture->lock());
+                new_texture->getDimension().Height, format, GL_UNSIGNED_BYTE,
+                data);
         }
         new_texture->unlock();
         glGenerateMipmap(GL_TEXTURE_2D);
