@@ -16,7 +16,7 @@ namespace irr
 {
 namespace video
 {
-
+	extern bool useCoreContext;
 
 //! Constructor
 COpenGLShaderMaterialRenderer::COpenGLShaderMaterialRenderer(video::COpenGLDriver* driver,
@@ -90,6 +90,9 @@ void COpenGLShaderMaterialRenderer::init(s32& outMaterialTypeNr,
 		E_VERTEX_TYPE type)
 {
 	outMaterialTypeNr = -1;
+
+	if (useCoreContext)
+		return;
 
 	bool success;
 
