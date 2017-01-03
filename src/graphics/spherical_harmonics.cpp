@@ -19,6 +19,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/spherical_harmonics.hpp"
+#include "graphics/stk_texture.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm> 
@@ -405,17 +406,8 @@ void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spher
     for (unsigned i = 0; i < 6; i++)
     {
         unsigned idx = texture_permutation[i];
-
-        video::IImage* image = irr_driver->getVideoDriver()->createImageFromData(
-            m_spherical_harmonics_textures[idx]->getColorFormat(),
-            m_spherical_harmonics_textures[idx]->getSize(),
-            m_spherical_harmonics_textures[idx]->lock(),
-            false
-            );
-        m_spherical_harmonics_textures[idx]->unlock();
-
-        image->copyToScaling(sh_rgba[i], sh_w, sh_h);
-        delete image;
+        static_cast<STKTexture*>(m_spherical_harmonics_textures[idx])
+            ->getTextureImage()->copyToScaling(sh_rgba[i], sh_w, sh_h);
     } //for (unsigned i = 0; i < 6; i++)
 
     Color *float_tex_cube[6];

@@ -110,6 +110,8 @@ public:
     unsigned int getTextureSize() const              { return m_texture_size; }
     // ------------------------------------------------------------------------
     void reload(bool no_upload = false, video::IImage* pre_loaded_tex = NULL);
+    // ------------------------------------------------------------------------
+    video::IImage* getTextureImage()                { return m_texture_image; }
 
 };   // STKTexture
 

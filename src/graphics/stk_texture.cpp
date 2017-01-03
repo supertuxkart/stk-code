@@ -20,8 +20,6 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "io/file_manager.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/log.hpp"
 
 #include <fstream>

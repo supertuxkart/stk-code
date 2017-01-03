@@ -20,6 +20,7 @@
 #include "graphics/skybox.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/stk_texture.hpp"
 #include "graphics/texture_shader.hpp"
 
 #include <algorithm>
@@ -160,15 +161,8 @@ void Skybox::generateCubeMapFromTextures()
     for (unsigned i = 0; i < 6; i++)
     {
         unsigned idx = texture_permutation[i];
-
-        video::IImage* image = irr_driver->getVideoDriver()
-            ->createImageFromData(m_skybox_textures[idx]->getColorFormat(),
-                                  m_skybox_textures[idx]->getSize(),
-                                  m_skybox_textures[idx]->lock(), false   );
-        m_skybox_textures[idx]->unlock();
-
-        image->copyToScaling(rgba[i], size, size);
-        image->drop();
+        static_cast<STKTexture*>(m_skybox_textures[idx])->getTextureImage()
+            ->copyToScaling(rgba[i], size, size);
 
 #if defined(USE_GLES2)
         for (unsigned int j = 0; j < size * size; j++)

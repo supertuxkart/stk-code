@@ -22,9 +22,6 @@
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
 
-#include <fstream>
-#include <sstream>
-
 // ----------------------------------------------------------------------------
 STKTexManager::~STKTexManager()
 {
