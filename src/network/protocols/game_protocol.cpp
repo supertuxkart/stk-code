@@ -202,6 +202,10 @@ void GameProtocol::sendState()
  */
 void GameProtocol::handleState(Event *event)
 {
+    // Ignore events arriving when client has already exited
+    if (!World::getWorld())
+        return;
+
     assert(NetworkConfig::get()->isClient());
     NetworkString &data = event->data();
     float time          = data.getFloat();
