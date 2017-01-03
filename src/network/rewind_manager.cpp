@@ -86,7 +86,7 @@ void RewindManager::reset()
 #endif
     m_is_rewinding         = false;
     m_overall_state_size   = 0;
-    m_state_frequency      = 0.5f;   // save 10 states a second
+    m_state_frequency      = 0.1f;   // save 10 states a second
     m_last_saved_state     = -9999.9f;  // forces initial state save
 
     if(!m_enable_rewind_manager) return;
@@ -434,7 +434,8 @@ void RewindManager::playEventsTill(float time)
 void RewindManager::rewindTo(float rewind_time)
 {
     assert(!m_is_rewinding);
-    Log::info("rewind", "Rewinding to %f", rewind_time);
+    Log::info("rewind", "Rewinding to %f at %f", rewind_time,
+               StkTime::getRealTime());
     history->doReplayHistory(History::HISTORY_NONE);
 
     // First find the state to which we need to rewind
@@ -500,7 +501,7 @@ void RewindManager::rewindTo(float rewind_time)
 
     // Now go forward through the list of rewind infos:
     // ------------------------------------------------
-    while( world->getTime() < current_time && index !=m_rewind_info.end() )
+    while( world->getTime() < current_time )
     {
         // Now handle all states and events at the current time before
         // updating the world:
@@ -529,8 +530,9 @@ void RewindManager::rewindTo(float rewind_time)
 
     }
     m_is_rewinding = false;
-    Log::info("RewindManager", "Rewind from %f to %f finished.",
-              rewind_time, World::getWorld()->getTime());
+    Log::info("RewindManager", "Rewind from %f to %f finished at %f.",
+              rewind_time, World::getWorld()->getTime(),
+              StkTime::getRealTime());
 }   // rewindTo
 
 // ----------------------------------------------------------------------------
