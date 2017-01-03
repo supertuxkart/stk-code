@@ -30,8 +30,11 @@ void RaceEventManager::update(float dt)
     if(!ProtocolManager::getInstance())
         return;
 
-    // Replay all recorded events up to the current time:
-    RewindManager::get()->playEventsTill(World::getWorld()->getTime());
+    // Replay all recorded events up to the current time (only if the
+    // timer isn't stopped, otherwise a potential rewind will trigger
+    // an infinite loop since world time does not increase)
+    if(World::getWorld()->getPhase()!=WorldStatus::IN_GAME_MENU_PHASE)
+        RewindManager::get()->playEventsTill(World::getWorld()->getTime());
 
     World::getWorld()->updateWorld(dt);
 
