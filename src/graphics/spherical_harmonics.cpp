@@ -385,7 +385,6 @@ SphericalHarmonics::~SphericalHarmonics()
 /** Compute spherical harmonics coefficients from 6 textures */
 void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spherical_harmonics_textures)
 {
-    return;
     assert(spherical_harmonics_textures.size() == 6);
     
     m_spherical_harmonics_textures = spherical_harmonics_textures;

@@ -39,6 +39,8 @@
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/render_target.hpp"
+#include "graphics/stk_texture.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "graphics/texture_manager.hpp"
 #include "graphics/vao_manager.hpp"
 #include "io/file_manager.hpp"
@@ -1812,7 +1814,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Sky dome and boxes support
     // --------------------------
     irr_driver->suppressSkyBox();
-    if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
+#ifndef SERVER_ONLY
+    if(!CVS->isGLSL() && m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
     {
         scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
                                                          m_sky_hori_segments,
@@ -1844,6 +1847,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     {
         irr_driver->setClearbackBufferColor(m_sky_color);
     }
+#endif
 
     // ---- Set ambient color
     m_ambient_color = m_default_ambient_color;
@@ -1942,7 +1946,21 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     irr_driver->unsetTextureErrorMessage();
-
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        for (video::ITexture* t : m_sky_textures)
+        {
+            t->drop();
+        }
+        m_sky_textures.clear();
+        for (video::ITexture* t : m_spherical_harmonics_textures)
+        {
+            t->drop();
+        }
+        m_spherical_harmonics_textures.clear();
+    }
+#endif   // !SERVER_ONLY
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------
@@ -2194,10 +2212,26 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         std::vector<std::string> v = StringUtils::split(s, ' ');
         for(unsigned int i=0; i<v.size(); i++)
         {
-            video::ITexture *t = irr_driver->getTexture(v[i]);
-            if(t)
+            video::ITexture* t = NULL;
+#ifndef SERVER_ONLY
+            if (CVS->isGLSL())
             {
-                t->grab();
+                t = STKTexManager::getInstance()->getTexture(v[i],
+                    false/*srgb*/, false/*premul_alpha*/,
+                    false/*set_material*/, false/*mesh_tex*/,
+                    true/*no_upload*/);
+            }
+            else
+#endif   // !SERVER_ONLY
+            {
+                t = irr_driver->getTexture(v[i]);
+            }
+            if (t)
+            {
+#ifndef SERVER_ONLY
+                if (!CVS->isGLSL())
+#endif   // !SERVER_ONLY
+                    t->grab();
                 m_sky_textures.push_back(t);
             }
             else
@@ -2224,10 +2258,26 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         v = StringUtils::split(sh_textures, ' ');
         for (unsigned int i = 0; i<v.size(); i++)
         {
-            video::ITexture *t = irr_driver->getTexture(v[i]);
+            video::ITexture* t = NULL;
+#ifndef SERVER_ONLY
+            if (CVS->isGLSL())
+            {
+                t = STKTexManager::getInstance()->getTexture(v[i],
+                    false/*srgb*/, false/*premul_alpha*/,
+                    false/*set_material*/, false/*mesh_tex*/,
+                    true/*no_upload*/);
+            }
+            else
+#endif   // !SERVER_ONLY
+            {
+                t = irr_driver->getTexture(v[i]);
+            }
             if (t)
             {
-                t->grab();
+#ifndef SERVER_ONLY
+                if (!CVS->isGLSL())
+#endif   // !SERVER_ONLY
+                    t->grab();
                 m_spherical_harmonics_textures.push_back(t);
             }
             else

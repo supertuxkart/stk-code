@@ -333,7 +333,6 @@ Out of legacy the sequence of textures maps to:
 */
 Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
 {
-    return;
     m_skybox_textures = skybox_textures;
 
 #if !defined(USE_GLES2)

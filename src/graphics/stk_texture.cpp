@@ -29,27 +29,27 @@
 
 // ----------------------------------------------------------------------------
 STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
-                       bool set_material)
+                       bool set_material, bool mesh_tex, bool no_upload)
           : video::ITexture(path.c_str()), m_texture_handle(0), m_srgb(srgb),
-            m_premul_alpha(premul_alpha), m_mesh_texture(set_material),
+            m_premul_alpha(premul_alpha), m_mesh_texture(mesh_tex),
             m_material(NULL), m_texture_name(0), m_texture_size(0),
             m_texture_image(NULL)
 {
     if (set_material)
     {
         m_material = material_manager->getMaterialFor(this);
+        m_mesh_texture = true;
     }
+    reload(no_upload);
 }   // STKTexture
 
 // ----------------------------------------------------------------------------
-STKTexture::STKTexture(video::IImage* image)
-          : video::ITexture(""), m_texture_handle(0), m_srgb(false),
-            m_premul_alpha(false),
-            m_mesh_texture(false), m_texture_name(0), m_texture_size(0),
-            m_texture_image(image)
+STKTexture::STKTexture(video::IImage* image, const std::string& name)
+          : video::ITexture(name.c_str()), m_texture_handle(0), m_srgb(false),
+            m_premul_alpha(false), m_mesh_texture(false), m_material(NULL),
+            m_texture_name(0), m_texture_size(0), m_texture_image(NULL)
 {
-    m_size = m_texture_image->getDimension();
-    m_orig_size = m_texture_image->getDimension();
+    reload(false/*no_upload*/, image/*pre_loaded_tex*/);
 }   // STKTexture
 
 // ----------------------------------------------------------------------------
@@ -66,55 +66,76 @@ STKTexture::~STKTexture()
 }   // ~STKTexture
 
 // ----------------------------------------------------------------------------
-void STKTexture::reload()
+void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
 {
 #ifndef SERVER_ONLY
     irr_driver->getDevice()->getLogger()->setLogLevel(ELL_NONE);
-    video::IImage* orig_img =
-        irr_driver->getVideoDriver()->createImageFromFile(NamedPath);
-    if (orig_img == NULL)
+    video::IImage* orig_img = NULL;
+    if (pre_loaded_tex == NULL)
     {
-        Log::warn("STKTexture", "No image %s.", NamedPath.getPtr());
-        return;
-    }
+        orig_img =
+            irr_driver->getVideoDriver()->createImageFromFile(NamedPath);
+        if (orig_img == NULL)
+        {
+            Log::warn("STKTexture", "No image %s.", NamedPath.getPtr());
+            return;
+        }
 
-    if (orig_img->getDimension().Width  == 0 ||
-        orig_img->getDimension().Height == 0)
-    {
-        Log::warn("STKTexture", "image %s has 0 size.", NamedPath.getPtr());
-        return;
-    }
-
-    video::IImage* new_texture = convertImage(&orig_img);
-    applyMask(new_texture);
-
-    const bool reload = m_texture_name != 0;
-    if (!reload)
-        glGenTextures(1, &m_texture_name);
-
-    glBindTexture(GL_TEXTURE_2D, m_texture_name);
-    if (!reload)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, m_srgb ? GL_SRGB_ALPHA : GL_RGBA,
-            new_texture->getDimension().Width,
-            new_texture->getDimension().Height, 0, GL_BGRA, GL_UNSIGNED_BYTE,
-            new_texture->lock());
+        if (orig_img->getDimension().Width  == 0 ||
+            orig_img->getDimension().Height == 0)
+        {
+            Log::warn("STKTexture", "image %s has 0 size.",
+                NamedPath.getPtr());
+            return;
+        }
     }
     else
+        orig_img = pre_loaded_tex;
+
+    video::IImage* new_texture = NULL;
+    if (pre_loaded_tex == NULL)
     {
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-            new_texture->getDimension().Width,
-            new_texture->getDimension().Height, GL_BGRA, GL_UNSIGNED_BYTE,
-            new_texture->lock());
+        new_texture = convertImage(&orig_img);
+        applyMask(new_texture);
     }
-    new_texture->unlock();
+    else
+        new_texture = pre_loaded_tex;
+
+    if (!no_upload)
+    {
+        const bool reload = m_texture_name != 0;
+        if (!reload)
+            glGenTextures(1, &m_texture_name);
+
+        glBindTexture(GL_TEXTURE_2D, m_texture_name);
+        if (!reload)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, m_srgb ? GL_SRGB_ALPHA : GL_RGBA,
+                new_texture->getDimension().Width,
+                new_texture->getDimension().Height, 0, GL_BGRA,
+                GL_UNSIGNED_BYTE, new_texture->lock());
+        }
+        else
+        {
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
+                new_texture->getDimension().Width,
+                new_texture->getDimension().Height, GL_BGRA, GL_UNSIGNED_BYTE,
+                new_texture->lock());
+        }
+        new_texture->unlock();
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
     m_size = new_texture->getDimension();
     m_orig_size = orig_img->getDimension();
-    m_texture_size = m_size.Width * m_size.Height * 4 /*BRGA*/;
-    new_texture->drop();
     orig_img->drop();
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    m_texture_size = m_size.Width * m_size.Height * 4 /*BRGA*/;
+    if (!no_upload && pre_loaded_tex == NULL)
+        new_texture->drop();
+    else if (pre_loaded_tex == NULL)
+        m_texture_image = new_texture;
+
     irr_driver->getDevice()->getLogger()->setLogLevel(ELL_WARNING);
 #endif   // !SERVER_ONLY
 }   // reload
@@ -211,6 +232,7 @@ void STKTexture::applyMask(video::IImage* orig_img)
                 }   // for y
             }   // for x
         }
+        converted_mask->drop();
     }
 #endif   // !SERVER_ONLY
 }   // applyMask

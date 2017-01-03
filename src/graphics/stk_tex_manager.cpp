@@ -71,7 +71,8 @@ STKTexture* STKTexManager::findTexturePathless(const std::string& filename)
 
 // ----------------------------------------------------------------------------
 STKTexture* STKTexManager::getTexture(const std::string& path, bool srgb,
-                                      bool premul_alpha, bool set_material)
+                                      bool premul_alpha, bool set_material,
+                                      bool mesh_tex, bool no_upload)
 {
     auto ret = m_all_textures.find(path);
     if (ret != m_all_textures.end())
@@ -89,18 +90,24 @@ STKTexture* STKTexManager::getTexture(const std::string& path, bool srgb,
     }
 
     new_texture = new STKTexture(full_path == "" ? path : full_path, srgb,
-        premul_alpha, set_material);
-    new_texture->reload();
-    if (new_texture->getOpenGLTextureName() == 0)
+        premul_alpha, set_material, mesh_tex, no_upload);
+    if (new_texture->getOpenGLTextureName() == 0 && !no_upload)
     {
         m_all_textures[new_texture->getName().getPtr()] = NULL;
         delete new_texture;
         return NULL;
     }
 
-    m_all_textures[new_texture->getName().getPtr()] = new_texture;
+    if (!no_upload)
+        addTexture(new_texture);
     return new_texture;
 }   // getTexture
+
+// ----------------------------------------------------------------------------
+void STKTexManager::addTexture(STKTexture* t)
+{
+    m_all_textures[t->getName().getPtr()] = t;
+}   // addTexture
 
 // ----------------------------------------------------------------------------
 void STKTexManager::dumpAllTexture()

@@ -46,7 +46,10 @@ public:
     // ------------------------------------------------------------------------
     STKTexture* getTexture(const std::string& path, bool srgb = false,
                            bool premul_alpha = false,
-                           bool set_material = false);
+                           bool set_material = false,
+                           bool mesh_tex = false, bool no_upload = false);
+    // ------------------------------------------------------------------------
+    void addTexture(STKTexture* t);
     // ------------------------------------------------------------------------
     void removeTexture(STKTexture* t);
     // ------------------------------------------------------------------------

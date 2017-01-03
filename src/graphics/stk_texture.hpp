@@ -53,9 +53,10 @@ private:
 public:
     // ------------------------------------------------------------------------
     STKTexture(const std::string& path, bool srgb = false,
-               bool premul_alpha = false, bool mesh_texture = false);
+               bool premul_alpha = false, bool set_material = false,
+               bool mesh_tex = false, bool no_upload = false);
     // ------------------------------------------------------------------------
-    STKTexture(video::IImage* image);
+    STKTexture(video::IImage* image, const std::string& name);
     // ------------------------------------------------------------------------
     ~STKTexture();
     // ------------------------------------------------------------------------
@@ -108,7 +109,7 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getTextureSize() const              { return m_texture_size; }
     // ------------------------------------------------------------------------
-    void reload();
+    void reload(bool no_upload = false, video::IImage* pre_loaded_tex = NULL);
 
 };   // STKTexture
 

@@ -1677,11 +1677,12 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
                                        bool is_prediv,
                                        bool complain_if_not_found)
 {
+#ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
         return STKTexManager::getInstance()->getTexture(filename);
     }
-
+#endif   // !SERVER_ONLY
     video::ITexture* out;
     if(!is_premul && !is_prediv)
     {
