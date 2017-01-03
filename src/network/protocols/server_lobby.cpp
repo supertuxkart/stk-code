@@ -231,13 +231,13 @@ void ServerLobby::update(float dt)
         break;
     case WAIT_FOR_WORLD_LOADED:
         // Note that m_server_has_loaded_world is called by the main thread
-        // (same a the thread updating this protocol)
+        // (same as the thread updating this protocol)
         m_client_ready_count.lock();
         if (m_server_has_loaded_world &&
             m_client_ready_count.getData() == m_game_setup->getPlayerCount())
         {
             signalRaceStartToClients();
-            m_server_delay = 0.02f;
+            m_server_delay = 0.1f;
             m_client_ready_count.getData() = 0;
         }
         m_client_ready_count.unlock();
