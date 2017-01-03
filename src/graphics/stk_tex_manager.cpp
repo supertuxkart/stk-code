@@ -72,7 +72,7 @@ STKTexture* STKTexManager::getTexture(const std::string& path, bool srgb,
                                       bool mesh_tex, bool no_upload)
 {
     auto ret = m_all_textures.find(path);
-    if (ret != m_all_textures.end())
+    if (!no_upload && ret != m_all_textures.end())
         return ret->second;
 
     STKTexture* new_texture = NULL;
@@ -82,7 +82,7 @@ STKTexture* STKTexManager::getTexture(const std::string& path, bool srgb,
         new_texture = findTextureInFileSystem(path, &full_path);
         if (full_path == "")
             return NULL;
-        if (new_texture)
+        if (!no_upload && new_texture)
             return new_texture;
     }
 

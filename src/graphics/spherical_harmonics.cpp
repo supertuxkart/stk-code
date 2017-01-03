@@ -406,8 +406,10 @@ void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spher
     for (unsigned i = 0; i < 6; i++)
     {
         unsigned idx = texture_permutation[i];
-        static_cast<STKTexture*>(m_spherical_harmonics_textures[idx])
-            ->getTextureImage()->copyToScaling(sh_rgba[i], sh_w, sh_h);
+        video::IImage* img = static_cast<STKTexture*>
+            (m_spherical_harmonics_textures[idx])->getTextureImage();
+        assert(img != NULL);
+        img->copyToScaling(sh_rgba[i], sh_w, sh_h);
     } //for (unsigned i = 0; i < 6; i++)
 
     Color *float_tex_cube[6];

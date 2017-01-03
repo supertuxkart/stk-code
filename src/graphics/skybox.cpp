@@ -161,8 +161,10 @@ void Skybox::generateCubeMapFromTextures()
     for (unsigned i = 0; i < 6; i++)
     {
         unsigned idx = texture_permutation[i];
-        static_cast<STKTexture*>(m_skybox_textures[idx])->getTextureImage()
-            ->copyToScaling(rgba[i], size, size);
+        video::IImage* img = static_cast<STKTexture*>
+            (m_skybox_textures[idx])->getTextureImage();
+        assert(img != NULL);
+        img->copyToScaling(rgba[i], size, size);
 
 #if defined(USE_GLES2)
         for (unsigned int j = 0; j < size * size; j++)
