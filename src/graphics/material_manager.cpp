@@ -335,8 +335,7 @@ Material *MaterialManager::getMaterial(const std::string& fname,
                                        bool is_full_path,
                                        bool make_permanent,
                                        bool complain_if_not_found,
-                                       bool strip_path,
-                                       bool srgb)
+                                       bool strip_path)
 {
     if(fname=="")
     {

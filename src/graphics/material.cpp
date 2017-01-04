@@ -62,7 +62,6 @@ Material::Material(const XMLNode *node, bool deprecated)
     m_shader_type = SHADERTYPE_SOLID;
     m_deprecated = deprecated;
     m_installed = false;
-    m_srgb_texture = true;
 
     node->get("name",      &m_texname);
     if (m_texname=="")
@@ -402,11 +401,11 @@ Material::Material(const XMLNode *node, bool deprecated)
         m_high_tire_adhesion = true;
 }   // Material
 //-----------------------------------------------------------------------------
-video::ITexture* Material::getTexture()
+video::ITexture* Material::getTexture(bool srgb, bool premul_alpha)
 {
     if (!m_installed)
     {
-        install();
+        install(srgb, premul_alpha);
     }
     return m_texture;
 }   // getTexture
@@ -417,12 +416,10 @@ video::ITexture* Material::getTexture()
  *  \param is_full_path If the fname contains the full path.
  */
 Material::Material(const std::string& fname, bool is_full_path,
-                   bool complain_if_not_found, bool load_texture,
-                   bool srgb)
+                   bool complain_if_not_found, bool load_texture)
 {
     m_deprecated = false;
     m_installed = false;
-    m_srgb_texture = srgb;
     init();
 
     if (is_full_path)
@@ -493,30 +490,30 @@ void Material::init()
 }   // init
 
 //-----------------------------------------------------------------------------
-void Material::install()
+void Material::install(bool srgb, bool premul_alpha)
 {
     // Don't load a texture that are not supposed to be loaded automatically
     if (m_installed) return;
 
     m_installed = true;
 
-    if (m_complain_if_not_found && m_full_path.size() == 0)
+    if (StringUtils::getPath(m_full_path).empty())
     {
-        Log::error("material", "Cannot find texture '%s'.", m_texname.c_str());
+        if (m_complain_if_not_found)
+        {
+            Log::error("material", "Cannot find texture '%s'.",
+                m_texname.c_str());
+        }
         m_texture = NULL;
     }
-
     else
     {
 #ifndef SERVER_ONLY
         if (CVS->isGLSL())
         {
             m_texture = STKTexManager::getInstance()->getTexture
-                (m_full_path, m_srgb_texture,
-                m_shader_type == SHADERTYPE_ALPHA_BLEND ||
-                m_shader_type == SHADERTYPE_ADDITIVE ?
-                true : false/*premul_alpha*/,
-                false/*set_material*/, m_srgb_texture/*mesh_tex*/);
+                (m_full_path, srgb, premul_alpha, false/*set_material*/,
+                srgb/*mesh_tex*/);
         }
         else
 #endif

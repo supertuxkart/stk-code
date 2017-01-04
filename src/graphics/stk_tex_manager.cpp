@@ -108,10 +108,12 @@ void STKTexManager::addTexture(STKTexture* t)
 }   // addTexture
 
 // ----------------------------------------------------------------------------
-void STKTexManager::dumpAllTexture()
+void STKTexManager::dumpAllTexture(bool mesh_texture)
 {
     for (auto p : m_all_textures)
     {
+        if (!p.second || (mesh_texture && !p.second->isMeshTexture()))
+            continue;
         Log::info("STKTexManager", "%s loc: %p", p.first.c_str(), p.second);
     }
 }   // dumpAllTexture
