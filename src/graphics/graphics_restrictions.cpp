@@ -26,6 +26,7 @@
 #include "utils/types.hpp"
 
 #include <algorithm>
+#include <array>
 
 namespace GraphicsRestrictions
 {
@@ -39,7 +40,7 @@ namespace GraphicsRestrictions
         /** The list of names used in the XML file for the graphics
          *  restriction types. They must be in the same order as the types. */
 
-        const char *m_names_of_restrictions[] = {
+        std::array<std::string, 27> m_names_of_restrictions = {
             "UniformBufferObject",
             "GeometryShader",
             "DrawIndirect",
@@ -58,10 +59,8 @@ namespace GraphicsRestrictions
             "AMDVertexShaderLayer",
             "ExplicitAttribLocation",
             "TextureFilterAnisotropic",
-#if defined(USE_GLES2)
             "TextureFormatBGRA8888",
             "ColorBufferFloat",
-#endif
             "DriverRecentEnough",
             "HighDefinitionTextures",
             "AdvancedPipeline",
@@ -77,12 +76,10 @@ namespace GraphicsRestrictions
      *  GR_COUNT if the name is not found. */
 GraphicsRestrictionsType getTypeForName(const std::string &name)
 {
-    unsigned int i = 0;
-    while (m_names_of_restrictions[i] != NULL)
+    for (unsigned int i = 0; i < m_names_of_restrictions.size(); i++)
     {
         if (name == m_names_of_restrictions[i])
             return (GraphicsRestrictionsType)i;
-        i++;
     }
     return GR_COUNT;
 }   // getTypeForName
