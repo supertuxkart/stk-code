@@ -24,7 +24,6 @@
 #include "graphics/shader.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
-#include "graphics/texture_manager.hpp"
 #include "graphics/texture_shader.hpp"
 #include "utils/cpp2011.hpp"
 
@@ -661,8 +660,7 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
 
     Primitive2DList::getInstance()->use();
     Primitive2DList::getInstance()->setUniforms(1.0f);
-    compressTexture(tex, false);
-    Primitive2DList::getInstance()->setTextureUnits(getTextureGLuint(tex));
+    Primitive2DList::getInstance()->setTextureUnits(tex->getOpenGLTextureName());
     glDrawElements(GL_TRIANGLE_FAN, primitiveCount, GL_UNSIGNED_SHORT, 0);
 
     glDeleteVertexArrays(1, &tmpvao);
