@@ -31,8 +31,9 @@ STKTexManager::~STKTexManager()
 STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
                                                    std::string* full_path)
 {
-    *full_path = file_manager->searchTexture(filename);
-    if (*full_path == "")
+    *full_path = file_manager->getFileSystem()->getAbsolutePath
+        (file_manager->searchTexture(filename).c_str()).c_str();
+    if (full_path->empty())
     {
         Log::warn("STKTexManager", "Failed to load %s.", filename.c_str());
         return NULL;
@@ -41,7 +42,7 @@ STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
     {
         if (p.second == NULL)
             continue;
-        if (*full_path == p.second->getName().getPtr())
+        if (*full_path == p.first)
             return p.second;
     }
 
@@ -57,7 +58,7 @@ STKTexture* STKTexManager::findTexturePathless(const std::string& filename)
             continue;
         std::string lc_name = StringUtils::toLowerCase(filename);
         std::string lc_path =
-            StringUtils::toLowerCase(p.second->getName().getPtr());
+            StringUtils::toLowerCase(p.first);
         std::string tex_name = StringUtils::getBasename(lc_path);
         if (lc_name == tex_name || lc_name == lc_path)
             return p.second;
@@ -80,13 +81,13 @@ STKTexture* STKTexManager::getTexture(const std::string& path, bool srgb,
     if (path.find('/') == std::string::npos)
     {
         new_texture = findTextureInFileSystem(path, &full_path);
-        if (full_path == "")
+        if (full_path.empty())
             return NULL;
         if (!no_upload && new_texture)
             return new_texture;
     }
 
-    new_texture = new STKTexture(full_path == "" ? path : full_path, srgb,
+    new_texture = new STKTexture(full_path.empty() ? path : full_path, srgb,
         premul_alpha, set_material, mesh_tex, no_upload);
     if (new_texture->getOpenGLTextureName() == 0 && !no_upload)
     {
