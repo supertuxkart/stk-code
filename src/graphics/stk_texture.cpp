@@ -103,6 +103,21 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
     const unsigned int w = new_texture->getDimension().Width;
     const unsigned int h = new_texture->getDimension().Height;
     unsigned int format = GL_BGRA;
+    unsigned int internal_format = GL_RGBA;
+
+#if !defined(USE_GLES2)
+    if (CVS->isTextureCompressionEnabled())
+    {
+        internal_format = m_srgb ?
+            GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT :
+            GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+    }
+    else
+    {
+        internal_format = m_srgb ? GL_SRGB_ALPHA : GL_RGBA;
+    }
+#endif
+
 #if defined(USE_GLES2)
     if (!CVS->isEXTTextureFormatBGRA8888Usable())
     {
@@ -137,7 +152,7 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
         glBindTexture(GL_TEXTURE_2D, m_texture_name);
         if (!reload)
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, m_srgb ? GL_SRGB_ALPHA : GL_RGBA,
+            glTexImage2D(GL_TEXTURE_2D, 0, internal_format,
                 new_texture->getDimension().Width,
                 new_texture->getDimension().Height, 0, format,
                 GL_UNSIGNED_BYTE, data);
