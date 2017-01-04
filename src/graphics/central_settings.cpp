@@ -90,6 +90,11 @@ void CentralVideoSettings::init()
         std::string driver((char*)(glGetString(GL_VERSION)));
         std::string card((char*)(glGetString(GL_RENDERER)));
         GraphicsRestrictions::init(driver, card);
+        
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
+        {
+            m_glsl = false;
+        }
 
 #if !defined(USE_GLES2)
         if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
@@ -220,11 +225,6 @@ void CentralVideoSettings::init()
             m_need_srgb_visual_workaround = (param != GL_SRGB);
         }
 #else
-        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
-        {
-            m_glsl = false;
-        }
-
         if (m_glsl == true)
         {
             hasTextureStorage = true;
