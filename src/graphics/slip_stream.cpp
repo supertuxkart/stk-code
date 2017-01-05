@@ -367,8 +367,9 @@ void SlipStream::update(float dt)
 {
     const KartProperties *kp = m_kart->getKartProperties();
 
-    // Low level AIs should not do any slipstreaming.
-    if(m_kart->getController()->disableSlipstreamBonus())
+    // Low level AIs and ghost karts should not do any slipstreaming.
+    if (m_kart->getController()->disableSlipstreamBonus()
+        || m_kart->isGhostKart())
         return;
 
     MovingTexture::update(dt);
@@ -411,9 +412,10 @@ void SlipStream::update(float dt)
     {
         m_target_kart= world->getKart(i);
         // Don't test for slipstream with itself, a kart that is being
-        // rescued or exploding, or an eliminated kart
+        // rescued or exploding, a ghost kart or an eliminated kart
         if(m_target_kart==m_kart               ||
             m_target_kart->getKartAnimation()  ||
+            m_target_kart->isGhostKart()       ||
             m_target_kart->isEliminated()        ) continue;
 
         // Transform this kart location into target kart point of view
