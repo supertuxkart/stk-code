@@ -497,7 +497,7 @@ void Material::install(bool srgb, bool premul_alpha)
 
     m_installed = true;
 
-    if (StringUtils::getPath(m_full_path).empty())
+    if (m_texname.find(".") == std::string::npos || m_full_path.empty())
     {
         if (m_complain_if_not_found)
         {
