@@ -21,8 +21,10 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 
 #include <fstream>
+#include <functional>
 #include <sstream>
 
 // ----------------------------------------------------------------------------
@@ -68,6 +70,25 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
 {
 #ifndef SERVER_ONLY
     irr_driver->getDevice()->getLogger()->setLogLevel(ELL_NONE);
+
+    std::string compressed_texture;
+#if !defined(USE_GLES2)
+    if (!no_upload && m_mesh_texture && CVS->isTextureCompressionEnabled())
+    {
+        std::string orig_file = NamedPath.getPtr();
+        compressed_texture = getHashedName(orig_file);
+        if (!file_manager->fileIsNewer(orig_file, compressed_texture))
+        {
+            if (loadCompressedTexture(compressed_texture))
+            {
+                Log::info("STKTexture", "Compressed %s for texture %s",
+                    compressed_texture.c_str(), orig_file.c_str());
+                return;
+            }
+        }
+    }
+#endif
+
     video::IImage* orig_img = NULL;
     if (pre_loaded_tex == NULL)
     {
@@ -106,7 +127,7 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
     unsigned int internal_format = GL_RGBA;
 
 #if !defined(USE_GLES2)
-    if (CVS->isTextureCompressionEnabled())
+    if (m_mesh_texture && CVS->isTextureCompressionEnabled())
     {
         internal_format = m_srgb ?
             GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT :
@@ -166,7 +187,6 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
         }
         new_texture->unlock();
         glGenerateMipmap(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     m_size = new_texture->getDimension();
@@ -177,6 +197,11 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
         new_texture->drop();
     else if (pre_loaded_tex == NULL)
         m_texture_image = new_texture;
+
+    if (!compressed_texture.empty())
+        saveCompressedTexture(compressed_texture);
+    if (!no_upload)
+        glBindTexture(GL_TEXTURE_2D, 0);
 
     irr_driver->getDevice()->getLogger()->setLogLevel(ELL_WARNING);
 #endif   // !SERVER_ONLY
@@ -278,3 +303,110 @@ void STKTexture::applyMask(video::IImage* orig_img)
     }
 #endif   // !SERVER_ONLY
 }   // applyMask
+
+//-----------------------------------------------------------------------------
+/** Try to load a compressed texture from the given file name.
+ *  Data in the specified file need to have a specific format. See the
+ *  saveCompressedTexture() function for a description of the format.
+ *  \return true if the loading succeeded, false otherwise.
+ *  \see saveCompressedTexture
+ */
+bool STKTexture::loadCompressedTexture(const std::string& file_name)
+{
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    std::ifstream ifs(file_name.c_str(), std::ios::in | std::ios::binary);
+    if (!ifs.is_open())
+        return false;
+
+    int internal_format;
+    ifs.read((char*)&internal_format, sizeof(int));
+    ifs.read((char*)&m_size.Width, sizeof(unsigned int));
+    ifs.read((char*)&m_size.Height, sizeof(unsigned int));
+    ifs.read((char*)&m_orig_size.Width, sizeof(unsigned int));
+    ifs.read((char*)&m_orig_size.Height, sizeof(unsigned int));
+    ifs.read((char*)&m_texture_size, sizeof(unsigned int));
+
+    if (ifs.fail() || m_texture_size == 0)
+        return false;
+
+    char *data = new char[m_texture_size];
+    ifs.read(data, m_texture_size);
+    if (!ifs.fail())
+    {
+        // No on the fly reload is supported for compressed texture
+        assert(m_texture_name == 0);
+        glGenTextures(1, &m_texture_name);
+        glBindTexture(GL_TEXTURE_2D, m_texture_name);
+        glCompressedTexImage2D(GL_TEXTURE_2D, 0, internal_format,
+            m_size.Width, m_size.Height, 0, m_texture_size, (GLvoid*)data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        delete[] data;
+        ifs.close();
+        return true;
+    }
+    delete[] data;
+    return false;
+#endif
+}   // loadCompressedTexture
+
+//-----------------------------------------------------------------------------
+/** Try to save the last texture sent to glTexImage2D in a file of the given
+ *   file name. This function should only be used for textures sent to
+ *   glTexImage2D with a compressed internal format as argument.<br>
+ *   \note The following format is used to save the compressed texture:<br>
+ *         <internal-format><w><h><orig_w><orig_h><size><data> <br>
+ *         The first six elements are integers and the last one is stored
+ *         on \c size bytes.
+ *   \see loadCompressedTexture
+ */
+void STKTexture::saveCompressedTexture(const std::string& compressed_tex)
+{
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    int internal_format;
+    int compression_successful = 0;
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT,
+        (GLint *)&internal_format);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH,
+        (GLint *)&m_size.Width);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT,
+        (GLint *)&m_size.Height);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED,
+        (GLint *)&compression_successful);
+    if (compression_successful == 0) return;
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+        GL_TEXTURE_COMPRESSED_IMAGE_SIZE, (GLint *)&m_texture_size);
+    if (m_texture_size == 0) return;
+
+    char *data = new char[m_texture_size];
+    glGetCompressedTexImage(GL_TEXTURE_2D, 0, (GLvoid*)data);
+    std::ofstream ofs(compressed_tex.c_str(),
+        std::ios::out | std::ios::binary);
+    if (ofs.is_open())
+    {
+        ofs.write((char*)&internal_format, sizeof(int));
+        ofs.write((char*)&m_size.Width, sizeof(unsigned int));
+        ofs.write((char*)&m_size.Height, sizeof(unsigned int));
+        ofs.write((char*)&m_orig_size.Width, sizeof(unsigned int));
+        ofs.write((char*)&m_orig_size.Height, sizeof(unsigned int));
+        ofs.write((char*)&m_texture_size, sizeof(unsigned int));
+        ofs.write(data, m_texture_size);
+        ofs.close();
+    }
+    delete[] data;
+#endif
+}   // saveCompressedTexture
+
+//-----------------------------------------------------------------------------
+std::string STKTexture::getHashedName(const std::string& orig_file)
+{
+    std::string result = file_manager->getCachedTexturesDir();
+    std::stringstream hash;
+    size_t hash_1 = std::hash<std::string>{}(StringUtils::getPath(orig_file));
+    size_t hash_2 =
+        std::hash<std::string>{}(StringUtils::getBasename(orig_file));
+    const core::dimension2du& max_size = irr_driver->getVideoDriver()
+        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+    hash << std::hex << hash_1 << hash_2 << max_size.Height;
+    return result + hash.str() + ".stktz";
+}   // getHashedName
