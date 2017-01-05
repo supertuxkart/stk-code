@@ -25,7 +25,6 @@
 
 #include <fstream>
 #include <functional>
-#include <sstream>
 
 // ----------------------------------------------------------------------------
 STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,

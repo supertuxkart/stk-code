@@ -27,6 +27,10 @@
 #include <unordered_map>
 
 class STKTexture;
+namespace irr
+{
+    namespace video { class SColor; }
+}
 
 class STKTexManager : public Singleton<STKTexManager>, NoCopy
 {
@@ -48,6 +52,8 @@ public:
                            bool premul_alpha = false,
                            bool set_material = false,
                            bool mesh_tex = false, bool no_upload = false);
+    // ------------------------------------------------------------------------
+    STKTexture* getUnicolorTexture(const irr::video::SColor &c);
     // ------------------------------------------------------------------------
     void addTexture(STKTexture* t);
     // ------------------------------------------------------------------------

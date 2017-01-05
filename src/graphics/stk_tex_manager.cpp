@@ -17,6 +17,7 @@
 
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/stk_texture.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -131,3 +132,21 @@ int STKTexManager::dumpTextureUsage()
     Log::info("STKTexManager", "Total %dMB", size);
     return size;
 }   // dumpAllTexture
+
+// ----------------------------------------------------------------------------
+STKTexture* STKTexManager::getUnicolorTexture(const irr::video::SColor &c)
+{
+    std::string name = StringUtils::toString(c.color) + "unic";
+    auto ret = m_all_textures.find(name);
+    if (ret != m_all_textures.end())
+        return ret->second;
+
+    uint32_t color[4] = { c.color, c.color, c.color, c.color };
+    video::IImage* image = irr_driver->getVideoDriver()
+        ->createImageFromData(video::ECF_A8R8G8B8,
+        core::dimension2d<u32>(2, 2), color);
+    STKTexture* texture = new STKTexture(image, name);
+    addTexture(texture);
+    return texture;
+
+}   // getUnicolorTexture
