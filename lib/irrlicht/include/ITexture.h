@@ -104,6 +104,8 @@ public:
 	{
 	}
 
+	virtual ~ITexture() {}
+
 	//! Lock function.
 	/** Locks the Texture and returns a pointer to access the
 	pixels. After lock() has been called and all operations on the pixels

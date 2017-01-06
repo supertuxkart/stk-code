@@ -137,6 +137,7 @@ video::ITexture* STKTexManager::getUnicolorTexture(const irr::video::SColor &c)
 // ----------------------------------------------------------------------------
 core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
 {
+#ifndef SERVER_ONLY
     if (CVS->isTextureCompressionEnabled())
         return L"Please disable texture compression for reloading textures.";
 
@@ -179,5 +180,5 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
     if (result.empty())
         return L"Texture(s) not found!";
     return result + "reloaded.";
-
+#endif   // !SERVER_ONLY
 }   // reloadTexture

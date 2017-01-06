@@ -66,7 +66,7 @@ public:
     // ------------------------------------------------------------------------
     STKTexture(video::IImage* image, const std::string& name);
     // ------------------------------------------------------------------------
-    ~STKTexture();
+    virtual ~STKTexture();
     // ------------------------------------------------------------------------
     virtual void* lock(video::E_TEXTURE_LOCK_MODE mode =
                        video::ETLM_READ_WRITE, u32 mipmap_level = 0)

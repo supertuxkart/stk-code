@@ -129,9 +129,6 @@ private:
     /** Sprite bank to store each glyph. */
     gui::IGUISpriteBank*         m_spritebank;
 
-    /** A full glyph page for this font. */
-    video::IImage*               m_page;
-
     /** The current max height at current drawing line in glyph page. */
     unsigned int                 m_current_height;
 
