@@ -32,13 +32,14 @@ STKTexManager::~STKTexManager()
 STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
                                                    std::string* full_path)
 {
-    *full_path = file_manager->getFileSystem()->getAbsolutePath
-        (file_manager->searchTexture(filename).c_str()).c_str();
-    if (full_path->empty())
+    io::path relative_path = file_manager->searchTexture(filename).c_str();
+    if (relative_path.empty())
     {
         Log::warn("STKTexManager", "Failed to load %s.", filename.c_str());
         return NULL;
     }
+    *full_path =
+        file_manager->getFileSystem()->getAbsolutePath(relative_path).c_str();
     for (auto p : m_all_textures)
     {
         if (p.second == NULL)

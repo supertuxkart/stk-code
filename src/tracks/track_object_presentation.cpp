@@ -31,7 +31,6 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
