@@ -35,7 +35,6 @@
 #include "graphics/skybox.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/spherical_harmonics.hpp"
-#include "graphics/texture_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "modes/world.hpp"
@@ -66,30 +65,6 @@ void ShaderBasedRenderer::setRTT(RTT* rtts)
         m_rtts = NULL;
     }
 } //setRTT
-
-// ----------------------------------------------------------------------------
-void ShaderBasedRenderer::compressPowerUpTextures()
-{
-    for (unsigned i = 0; i < PowerupManager::POWERUP_MAX; i++)
-    {
-        scene::IMesh *mesh = powerup_manager->m_all_meshes[i];
-        if (!mesh)
-            continue;
-        for (unsigned j = 0; j < mesh->getMeshBufferCount(); j++)
-        {
-            scene::IMeshBuffer *mb = mesh->getMeshBuffer(j);
-            if (!mb)
-                continue;
-            for (unsigned k = 0; k < 4; k++)
-            {
-                video::ITexture *tex = mb->getMaterial().getTexture(k);
-                if (!tex)
-                    continue;
-                compressTexture(tex, true);
-            }
-        }
-    }
-} //compressPowerUpTextures
 
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::setOverrideMaterial()
@@ -696,8 +671,6 @@ void ShaderBasedRenderer::onLoadWorld()
     size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
     RTT* rtts = new RTT(width, height);
     setRTT(rtts);
-
-    compressPowerUpTextures();
 }
 
 // ----------------------------------------------------------------------------

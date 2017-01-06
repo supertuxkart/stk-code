@@ -46,7 +46,9 @@ private:
     video::IImage* m_texture_image;
 
     // ------------------------------------------------------------------------
-    video::IImage* convertImage(video::IImage** orig_img);
+    video::IImage* resizeImage(video::IImage* orig_img,
+                               core::dimension2du* new_img_size = NULL,
+                               core::dimension2du* new_tex_size = NULL);
     // ------------------------------------------------------------------------
     void applyMask(video::IImage* orig_img);
     // ------------------------------------------------------------------------
@@ -98,6 +100,8 @@ public:
                                                 { return video::ECF_A8R8G8B8; }
     // ------------------------------------------------------------------------
     virtual u32 getPitch() const                                  { return 0; }
+    // ------------------------------------------------------------------------
+    virtual bool hasMipMaps() const;
     // ------------------------------------------------------------------------
     virtual void regenerateMipMapLevels(void* mipmap_data = NULL)            {}
     // ------------------------------------------------------------------------

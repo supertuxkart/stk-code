@@ -21,10 +21,8 @@
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stk_tex_manager.hpp"
-#include "graphics/stk_texture.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
@@ -181,19 +179,9 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
         // Add heart billboard above it
         std::string heart_path =
             file_manager->getAsset(FileManager::GUI, "heart.png");
-        video::ITexture* heart = NULL;
-#ifndef SERVER_ONLY
-        if (CVS->isGLSL())
-        {
-            heart = STKTexManager::getInstance()->getTexture
-                (heart_path, true/*srgb*/, true/*premul_alpha*/,
-                false/*set_material*/, true/*mesh_tex*/);
-        }
-        else
-#endif
-        {
-            heart = irr_driver->getTexture(heart_path);
-        }
+        video::ITexture* heart = STKTexManager::getInstance()->getTexture
+            (heart_path, true/*srgb*/, true/*premul_alpha*/,
+            false/*set_material*/, true/*mesh_tex*/);
 
         float height = kart->getKartHeight() + 0.5f;
 

@@ -21,7 +21,6 @@
 #include "graphics/shader.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stk_mesh.hpp"
-#include "graphics/texture_manager.hpp"
 
 // ----------------------------------------------------------------------------
 /** Variadic template to draw a mesh (using OpenGL 3.2 function)
@@ -87,10 +86,8 @@ struct TexExpanderImpl
                           Args... args)
     {
         size_t idx = STK::tuple_get<sizeof...(TupleArgs) - N>(tex_swizzle);
-        TexExpanderImpl<T, N - 1>::template expandTex( mesh,
-                                                       tex_swizzle,
-                                                       args...,
-                                                       getTextureGLuint(mesh.textures[idx]));
+        TexExpanderImpl<T, N - 1>::template expandTex(mesh, tex_swizzle,
+            args..., mesh.textures[idx]->getOpenGLTextureName());
     }   // ExpandTex
 };   // TexExpanderImpl
 

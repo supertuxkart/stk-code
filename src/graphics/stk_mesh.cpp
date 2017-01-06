@@ -25,6 +25,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/materials.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "graphics/texture_manager.hpp"
 
 #include <ISceneManager.h>
@@ -389,7 +390,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
                    mat_name.c_str());
         // use unicolor texture to replace missing texture
         mesh.textures[i] = 
-                      getUnicolorTexture(video::SColor(255, 127, 127, 127));
+                      STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 127, 127, 127));
     }
     compressTexture(mesh.textures[i], is_srgb);
 #if !defined(USE_GLES2)
@@ -479,7 +480,7 @@ void initTexturesTransparent(GLMesh &mesh)
 {
     if (!mesh.textures[0])
     {
-        mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+        mesh.textures[0] = STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 255, 255));
     }
     compressTexture(mesh.textures[0], true);
 #if !defined(USE_GLES2)

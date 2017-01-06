@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2016 SuperTuxKart-Team
+//  Copyright (C) 2017 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@
 class STKTexture;
 namespace irr
 {
-    namespace video { class SColor; }
+    namespace video { class ITexture; class SColor; }
 }
 
 class STKTexManager : public Singleton<STKTexManager>, NoCopy
@@ -37,23 +37,25 @@ class STKTexManager : public Singleton<STKTexManager>, NoCopy
 private:
     std::unordered_map<std::string, STKTexture*> m_all_textures;
 
+    // ------------------------------------------------------------------------
+    STKTexture* findTexturePathless(const std::string& filename);
+    // ------------------------------------------------------------------------
+    STKTexture* findTextureInFileSystem(const std::string& filename,
+                                        std::string* full_path);
 public:
     // ------------------------------------------------------------------------
     STKTexManager() {}
     // ------------------------------------------------------------------------
     ~STKTexManager();
     // ------------------------------------------------------------------------
-    STKTexture* findTexturePathless(const std::string& filename);
+    irr::video::ITexture* getTexture(const std::string& path,
+                                     bool srgb = false,
+                                     bool premul_alpha = false,
+                                     bool set_material = false,
+                                     bool mesh_tex = false,
+                                     bool no_upload = false);
     // ------------------------------------------------------------------------
-    STKTexture* findTextureInFileSystem(const std::string& filename,
-                                        std::string* full_path);
-    // ------------------------------------------------------------------------
-    STKTexture* getTexture(const std::string& path, bool srgb = false,
-                           bool premul_alpha = false,
-                           bool set_material = false,
-                           bool mesh_tex = false, bool no_upload = false);
-    // ------------------------------------------------------------------------
-    STKTexture* getUnicolorTexture(const irr::video::SColor &c);
+    irr::video::ITexture* getUnicolorTexture(const irr::video::SColor &c);
     // ------------------------------------------------------------------------
     void addTexture(STKTexture* t);
     // ------------------------------------------------------------------------

@@ -2565,8 +2565,7 @@ bool COpenGLDriver::setActiveTexture(u32 stage, const video::ITexture* texture)
 
 		if (!useCoreContext)
 			glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D,
-			static_cast<const COpenGLTexture*>(texture)->getOpenGLTextureName());
+		glBindTexture(GL_TEXTURE_2D, texture->getOpenGLTextureName());
 	}
 	return true;
 }

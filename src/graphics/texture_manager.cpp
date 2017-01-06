@@ -17,12 +17,13 @@
 
 #ifndef SERVER_ONLY
 
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/materials.hpp"
 #include "graphics/stk_texture.hpp"
+#include "graphics/texture_manager.hpp"
 #include "utils/string_utils.hpp"
 
 #if defined(USE_GLES2)
@@ -242,34 +243,6 @@ void saveCompressedTexture(const std::string& compressed_tex)
     }
     delete[] data;
 #endif
-}
-
-video::ITexture* getUnicolorTexture(const video::SColor &c)
-{
-    std::map<int, video::ITexture*>::iterator it = unicolor_cache.find(c.color);
-    if (it != unicolor_cache.end())
-    {
-        return it->second;
-    }
-    else
-    {
-        unsigned tmp[4] = {
-            c.color,
-            c.color,
-            c.color,
-            c.color
-        };
-        video::IImage *img = irr_driver->getVideoDriver()->createImageFromData(video::ECF_A8R8G8B8, core::dimension2d<u32>(2, 2), tmp);
-        std::stringstream name;
-        name << "color" << c.color;
-        video::ITexture* tex = irr_driver->getVideoDriver()->addTexture(name.str().c_str(), img);
-        tex->grab();
-        // Only let our map hold the unicolor texture
-        irr_driver->getVideoDriver()->removeTexture(tex);
-        unicolor_cache[c.color] = tex;
-        img->drop();
-        return tex;
-    }
 }
 
 core::stringw reloadTexture(const core::stringw& name)

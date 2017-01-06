@@ -16,8 +16,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/stk_mesh_loader.hpp"
-#include "graphics/central_settings.hpp"
-#include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
 
 #include <IVideoDriver.h>
@@ -1042,7 +1040,6 @@ void STKMeshLoader::loadTextures(SB3dMaterial& material) const
         SB3dTexture* B3dTexture = material.Textures[i];
         if (B3dTexture && B3dTexture->TextureName.size() && !material.Material.getTexture(i))
         {
-            video::ITexture* tex = NULL;
             if (!SceneManager->getParameters()->getAttributeAsBool(scene::B3D_LOADER_IGNORE_MIPMAP_FLAG))
                 SceneManager->getVideoDriver()->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, (B3dTexture->Flags & 0x8) ? true:false);
             io::IFileSystem* fs = SceneManager->getFileSystem();
@@ -1060,18 +1057,11 @@ void STKMeshLoader::loadTextures(SB3dMaterial& material) const
             else
                 full_path = fs->getFileBasename(B3dTexture->TextureName);
 
-#ifndef SERVER_ONLY
-            if (CVS->isGLSL())
-            {
-                tex = STKTexManager::getInstance()->getTexture(full_path.c_str(),
-                    i == 0 ? true : false/*is_srgb*/, false/*premul_alpha*/,
-                    true/*set_material*/);
-            }
-            else
-#endif   // !SERVER_ONLY
-            {
-                tex = SceneManager->getVideoDriver()->getTexture(full_path);
-            }
+            video::ITexture* tex =
+                STKTexManager::getInstance()->getTexture(full_path.c_str(),
+                i == 0 ? true : false/*is_srgb*/, false/*premul_alpha*/,
+                true/*set_material*/);
+
             material.Material.setTexture(i, tex);
             if (material.Textures[i]->Flags & 0x10) // Clamp U
                 material.Material.TextureLayer[i].TextureWrapU=video::ETC_CLAMP;

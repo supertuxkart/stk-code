@@ -39,7 +39,6 @@
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/render_target.hpp"
-#include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/texture_manager.hpp"
 #include "graphics/vao_manager.hpp"
@@ -810,14 +809,14 @@ void Track::createPhysicsModel(unsigned int main_track_count)
 
             // Color
 #ifndef SERVER_ONLY
-            mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 105, 180)));
+            mb->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 105, 180)));
 #endif
             irr_driver->grabAllTextures(mesh);
             // Gloss
 #ifndef SERVER_ONLY
-            mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            mb->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
             // Colorization mask
-            mb->getMaterial().setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            mb->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
 #endif
         }
         else

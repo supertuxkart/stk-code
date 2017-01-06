@@ -31,7 +31,6 @@
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "graphics/texture_manager.hpp"
 #include "graphics/weather.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -380,7 +379,7 @@ public:
         setTextureUnits(render_target_bloom_128,
                         render_target_bloom_256,
                         render_target_bloom_512,
-						getTextureGLuint(lensDustTex));
+						lensDustTex->getOpenGLTextureName());
         drawFullScreenEffect();
     }   // render
 };   // BloomBlendShader
@@ -705,8 +704,7 @@ public:
                 GLuint rtt_mlaa_tmp)
     {
         use();
-        setTextureUnits(rtt_mlaa_tmp,
-                        getTextureGLuint(area_map));
+        setTextureUnits(rtt_mlaa_tmp, area_map->getOpenGLTextureName());
         drawFullScreenEffect(pixel_size);
 
     }   // render

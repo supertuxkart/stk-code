@@ -832,20 +832,9 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(
         xml_node.get("start",  &m_fade_out_start);
         xml_node.get("end",    &m_fade_out_end  );
     }
-    video::ITexture* texture = NULL;
-#ifndef SERVER_ONLY
-    if (CVS->isGLSL())
-    {
-        texture = STKTexManager::getInstance()->getTexture
-            (file_manager->searchTexture(texture_name), true/*srgb*/,
-            true/*premul_alpha*/, false/*set_material*/, true/*mesh_tex*/);
-    }
-    else
-#endif
-    {
-        texture =
-            irr_driver->getTexture(file_manager->searchTexture(texture_name));
-    }
+    video::ITexture* texture = STKTexManager::getInstance()->getTexture
+        (file_manager->searchTexture(texture_name), true/*srgb*/,
+        true/*premul_alpha*/, false/*set_material*/, true/*mesh_tex*/);
 
     if (texture == NULL)
     {

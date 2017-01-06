@@ -39,6 +39,10 @@ STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
         m_material = material_manager->getMaterialFor(this);
         m_mesh_texture = true;
     }
+#ifndef SERVER_ONLY
+    if (!CVS->isGLSL())
+        m_srgb = false;
+#endif
     reload(no_upload);
 }   // STKTexture
 
@@ -113,15 +117,19 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
     video::IImage* new_texture = NULL;
     if (pre_loaded_tex == NULL)
     {
-        new_texture = convertImage(&orig_img);
+        new_texture = resizeImage(orig_img, &m_orig_size, &m_size);
         applyMask(new_texture);
     }
     else
+    {
         new_texture = pre_loaded_tex;
+        m_orig_size = pre_loaded_tex->getDimension();
+        m_size = pre_loaded_tex->getDimension();
+    }
 
     unsigned char* data = (unsigned char*)new_texture->lock();
-    const unsigned int w = new_texture->getDimension().Width;
-    const unsigned int h = new_texture->getDimension().Height;
+    const unsigned int w = m_size.Width;
+    const unsigned int h = m_size.Height;
     unsigned int format = GL_BGRA;
     unsigned int internal_format = GL_RGBA;
 
@@ -172,30 +180,24 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
         glBindTexture(GL_TEXTURE_2D, m_texture_name);
         if (!reload)
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, internal_format,
-                new_texture->getDimension().Width,
-                new_texture->getDimension().Height, 0, format,
+            glTexImage2D(GL_TEXTURE_2D, 0, internal_format, w, h, 0, format,
                 GL_UNSIGNED_BYTE, data);
         }
         else
         {
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-                new_texture->getDimension().Width,
-                new_texture->getDimension().Height, format, GL_UNSIGNED_BYTE,
-                data);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, format,
+                GL_UNSIGNED_BYTE, data);
         }
         new_texture->unlock();
-        glGenerateMipmap(GL_TEXTURE_2D);
+        if (hasMipMaps())
+            glGenerateMipmap(GL_TEXTURE_2D);
     }
 
-    m_size = new_texture->getDimension();
-    m_orig_size = orig_img->getDimension();
-    orig_img->drop();
-    m_texture_size = m_size.Width * m_size.Height * 4 /*BRGA*/;
-    if (!no_upload && pre_loaded_tex == NULL)
-        new_texture->drop();
-    else if (pre_loaded_tex == NULL)
+    m_texture_size = w * h * 4 /*BRGA*/;
+    if (no_upload)
         m_texture_image = new_texture;
+    else
+        new_texture->drop();
 
     if (!compressed_texture.empty())
         saveCompressedTexture(compressed_texture);
@@ -207,66 +209,70 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
 }   // reload
 
 // ----------------------------------------------------------------------------
-video::IImage* STKTexture::convertImage(video::IImage** orig_img)
+video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
+                                       core::dimension2du* new_img_size,
+                                       core::dimension2du* new_tex_size)
 {
 #ifndef SERVER_ONLY
-    video::IImage* image = *orig_img;
-    core::dimension2du size = image->getDimension();
+    video::IImage* image = orig_img;
+    const core::dimension2du& old_size = image->getDimension();
+    core::dimension2du img_size = old_size;
 
-    bool scale_image = false;
-    const float ratio = float(size.Width) / float(size.Height);
+    const float ratio = float(img_size.Width) / float(img_size.Height);
     const unsigned int drv_max_size =
         irr_driver->getVideoDriver()->getMaxTextureSize().Width;
 
-    if ((size.Width > drv_max_size) && (ratio >= 1.0f))
+    if ((img_size.Width > drv_max_size) && (ratio >= 1.0f))
     {
-        size.Width = drv_max_size;
-        size.Height = (unsigned)(drv_max_size / ratio);
-        scale_image = true;
+        img_size.Width = drv_max_size;
+        img_size.Height = (unsigned)(drv_max_size / ratio);
     }
-    else if (size.Height > drv_max_size)
+    else if (img_size.Height > drv_max_size)
     {
-        size.Height = drv_max_size;
-        size.Width = (unsigned)(drv_max_size * ratio);
-        scale_image = true;
+        img_size.Height = drv_max_size;
+        img_size.Width = (unsigned)(drv_max_size * ratio);
     }
-    if (scale_image)
+
+    if (img_size != old_size)
     {
         video::IImage* new_img = irr_driver->getVideoDriver()
-            ->createImage(video::ECF_A8R8G8B8, size);
+            ->createImage(video::ECF_A8R8G8B8, img_size);
         image->copyToScaling(new_img);
         image->drop();
         image = new_img;
-        *orig_img = new_img;
     }
 
-    bool scale_texture = false;
-    size = size.getOptimalSize
+    core::dimension2du tex_size = img_size.getOptimalSize
         (!irr_driver->getVideoDriver()->queryFeature(video::EVDF_TEXTURE_NPOT));
     const core::dimension2du& max_size = irr_driver->getVideoDriver()
         ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
 
-    if (max_size.Width > 0 && size.Width > max_size.Width)
+    if (max_size.Width > 0 && tex_size.Width > max_size.Width)
+        tex_size.Width = max_size.Width;
+    if (max_size.Height > 0 && tex_size.Height > max_size.Height)
+        tex_size.Height = max_size.Height;
+
+    if (image->getColorFormat() != video::ECF_A8R8G8B8 ||
+        tex_size != img_size)
     {
-        size.Width = max_size.Width;
-        scale_texture = true;
-    }
-    if (max_size.Height > 0 && size.Height > max_size.Height)
-    {
-        size.Height = max_size.Height;
-        scale_texture = true;
+        video::IImage* new_texture = irr_driver
+            ->getVideoDriver()->createImage(video::ECF_A8R8G8B8, tex_size);
+        if (tex_size != img_size)
+            image->copyToScaling(new_texture);
+        else
+            image->copyTo(new_texture);
+        image->drop();
+        image = new_texture;
     }
 
-    video::IImage* new_texture =
-        irr_driver->getVideoDriver()->createImage(video::ECF_A8R8G8B8, size);
-    if (scale_texture)
-        image->copyToScaling(new_texture);
-    else
-        image->copyTo(new_texture);
-
-    return new_texture;
+    if (new_img_size && new_tex_size)
+    {
+        *new_img_size = img_size;
+        *new_tex_size = tex_size;
+    }
+    return image;
 #endif   // !SERVER_ONLY
-}   // convertImage
+}   // resizeImage
 
 // ----------------------------------------------------------------------------
 void STKTexture::applyMask(video::IImage* orig_img)
@@ -274,16 +280,15 @@ void STKTexture::applyMask(video::IImage* orig_img)
 #ifndef SERVER_ONLY
     if (m_material && !m_material->getAlphaMask().empty())
     {
-        video::IImage* tmp_mask = irr_driver->getVideoDriver()
+        video::IImage* converted_mask = irr_driver->getVideoDriver()
             ->createImageFromFile(m_material->getAlphaMask().c_str());
-        if (tmp_mask == NULL)
+        if (converted_mask == NULL)
         {
             Log::warn("STKTexture", "Applying mask failed for '%s'!",
                 m_material->getAlphaMask().c_str());
             return;
         }
-        video::IImage* converted_mask = convertImage(&tmp_mask);
-        tmp_mask->drop();
+        converted_mask = resizeImage(converted_mask);
         if (converted_mask->lock())
         {
             core::dimension2d<u32> dim = orig_img->getDimension();
@@ -298,6 +303,7 @@ void STKTexture::applyMask(video::IImage* orig_img)
                 }   // for y
             }   // for x
         }
+        converted_mask->unlock();
         converted_mask->drop();
     }
 #endif   // !SERVER_ONLY
@@ -409,3 +415,13 @@ std::string STKTexture::getHashedName(const std::string& orig_file)
     hash << std::hex << hash_1 << hash_2 << max_size.Height;
     return result + hash.str() + ".stktz";
 }   // getHashedName
+
+//-----------------------------------------------------------------------------
+bool STKTexture::hasMipMaps() const
+{
+#ifndef SERVER_ONLY
+    return CVS->getGLSLVersion() >= 130;
+#else
+    return false;
+#endif   // !SERVER_ONLY
+}   // hasMipMaps

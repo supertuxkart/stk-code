@@ -753,11 +753,11 @@ void IrrDriver::createSunInterposer()
         if (!mb)
             continue;
         mb->getMaterial().setTexture(0,
-                        getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+                        STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 255, 255)));
         mb->getMaterial().setTexture(1,
-                                getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+                                STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
         mb->getMaterial().setTexture(2,
-                                getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+                                STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
     m_sun_interposer = new STKMeshSceneNode(sphere,
                                             m_scene_manager->getRootSceneNode(),
@@ -1204,10 +1204,10 @@ scene::IMeshSceneNode *IrrDriver::addSphere(float radius,
     m.BackfaceCulling = false;
     m.MaterialType    = video::EMT_SOLID;
 #ifndef SERVER_ONLY
-    //m.setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-    m.setTexture(0, getUnicolorTexture(color));
-    m.setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-    m.setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    //m.setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+    m.setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(color));
+    m.setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m.setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
 
     if (CVS->isGLSL())
     {
@@ -1677,91 +1677,7 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
                                        bool is_prediv,
                                        bool complain_if_not_found)
 {
-#ifndef SERVER_ONLY
-    if (CVS->isGLSL())
-    {
-        return STKTexManager::getInstance()->getTexture(filename);
-    }
-#endif   // !SERVER_ONLY
-    video::ITexture* out;
-    if(!is_premul && !is_prediv)
-    {
-        if (!complain_if_not_found) m_device->getLogger()->setLogLevel(ELL_NONE);
-        out = m_video_driver->getTexture(filename.c_str());
-        if (!complain_if_not_found) m_device->getLogger()->setLogLevel(ELL_WARNING);
-    }
-    else
-    {
-        // FIXME: can't we just do this externally, and just use the
-        // modified textures??
-        video::IImage* img =
-            m_video_driver->createImageFromFile(filename.c_str());
-        // PNGs are non premul, but some are used for premul tasks, so convert
-        // http://home.comcast.net/~tom_forsyth/blog.wiki.html#[[Premultiplied%20alpha]]
-        // FIXME check param, not name
-        if(img && is_premul &&
-            StringUtils::hasSuffix(filename.c_str(), ".png") &&
-            (img->getColorFormat() == video::ECF_A8R8G8B8) &&
-            img->lock())
-        {
-            core::dimension2d<u32> dim = img->getDimension();
-            for(unsigned int x = 0; x < dim.Width; x++)
-            {
-                for(unsigned int y = 0; y < dim.Height; y++)
-                {
-                    video::SColor col = img->getPixel(x, y);
-                    unsigned int alpha = col.getAlpha();
-                    unsigned int red   = alpha * col.getRed()   / 255;
-                    unsigned int blue  = alpha * col.getBlue()  / 255;
-                    unsigned int green = alpha * col.getGreen() / 255;
-                    col.set(alpha, red, green, blue);
-                    img->setPixel(x, y, col, false);
-                }   // for y
-            }   // for x
-            img->unlock();
-        }   // if png and ColorFOrmat and lock
-        // Other formats can be premul, but the tasks can be non premul
-        // So divide to get the separate RGBA (only possible if alpha!=0)
-        else if(img && is_prediv &&
-            (img->getColorFormat() == video::ECF_A8R8G8B8) &&
-            img->lock())
-        {
-            core::dimension2d<u32> dim = img->getDimension();
-            for(unsigned int  x = 0; x < dim.Width; x++)
-            {
-                for(unsigned int y = 0; y < dim.Height; y++)
-                {
-                    video::SColor col = img->getPixel(x, y);
-                    unsigned int alpha = col.getAlpha();
-                    // Avoid divide by zero
-                    if (alpha) {
-                        unsigned int red   = 255 * col.getRed() / alpha ;
-                        unsigned int blue  = 255 * col.getBlue() / alpha;
-                        unsigned int green = 255 * col.getGreen() / alpha;
-                        col.set(alpha, red, green, blue);
-                        img->setPixel(x, y, col, false);
-                    }
-                }   // for y
-            }   // for x
-            img->unlock();
-        }   // if premul && color format && lock
-        out = m_video_driver->addTexture(filename.c_str(), img, NULL);
-    }   // if is_premul or is_prediv
-
-
-    if (complain_if_not_found && out == NULL)
-    {
-
-        if(m_texture_error_message.size()>0)
-        {
-            Log::error("irr_driver", m_texture_error_message.c_str());
-        }
-        Log::error("irr_driver", "Texture '%s' not found.", filename.c_str());
-    }
-
-    m_texturesFileName[out] = filename;
-
-    return out;
+    return STKTexManager::getInstance()->getTexture(filename);
 }   // getTexture
 
 // ----------------------------------------------------------------------------
@@ -1834,76 +1750,6 @@ void IrrDriver::dropAllTextures(const scene::IMesh *mesh)
         }   // for j < MATERIAL_MAX_TEXTURE
     }   // for i <getMeshBufferCount
 }   // dropAllTextures
-
-// ----------------------------------------------------------------------------
-void IrrDriver::applyMask(video::ITexture* texture,
-                          const std::string& mask_path)
-{
-#ifndef SERVER_ONLY
-    const core::dimension2d<u32> size = texture->getSize();
-    video::IImage* img =
-        m_video_driver->createImage(texture, core::position2d<s32>(0,0), size);
-
-    video::IImage* mask =
-        m_video_driver->createImageFromFile(mask_path.c_str());
-
-    if (img == NULL || mask == NULL)
-    {
-        Log::warn("irr_driver", "Applying mask failed for '%s'!",
-            texture->getName().getPtr());
-        return;
-    }
-
-    if (mask->getDimension() != size)
-    {
-        video::IImage* mask_scaled =
-            m_video_driver->createImage(texture->getColorFormat(), size);
-        mask->copyToScaling(mask_scaled);
-        mask->drop();
-        mask = mask_scaled;
-    }
-
-    void* dest = img->lock();
-    if (dest != NULL && mask->lock())
-    {
-        core::dimension2d<u32> dim = img->getDimension();
-        for (unsigned int x = 0; x < dim.Width; x++)
-        {
-            for (unsigned int y = 0; y < dim.Height; y++)
-            {
-                video::SColor col = img->getPixel(x, y);
-                video::SColor alpha = mask->getPixel(x, y);
-                col.setAlpha( alpha.getRed() );
-                img->setPixel(x, y, col, false);
-            }   // for y
-        }   // for x
-
-        if (!CVS->isGLSL())
-        {
-            // For new graphical pipeline, it will be done in texture manager
-            // compressTexture
-            glBindTexture(GL_TEXTURE_2D, getTextureGLuint(texture));
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dim.Width, dim.Height,
-                GL_BGRA, GL_UNSIGNED_BYTE, dest);
-            glGenerateMipmap(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, 0);
-        }
-        mask->unlock();
-        img->unlock();
-#if defined(USE_GLES2)
-        static_cast<irr::video::COGLES2Texture*>(texture)->setImage(img);
-#else
-        static_cast<irr::video::COpenGLTexture*>(texture)->setImage(img);
-#endif
-        mask->drop();
-        return;
-    }
-    Log::warn("irr_driver", "Applying mask failed for '%s'!",
-        texture->getName().getPtr());
-    img->drop();
-    mask->drop();
-#endif
-}   // applyMask
 
 // ----------------------------------------------------------------------------
 void IrrDriver::onLoadWorld()

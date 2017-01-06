@@ -32,7 +32,6 @@ void cleanUnicolorTextures();
 void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = false);
 bool loadCompressedTexture(const std::string& compressed_tex);
 void saveCompressedTexture(const std::string& compressed_tex);
-irr::video::ITexture* getUnicolorTexture(const irr::video::SColor &c);
 void insertTextureHandle(uint64_t handle);
 bool reloadSingleTexture(irr::video::ITexture *tex);
 irr::core::stringw reloadTexture(const irr::core::stringw& name);

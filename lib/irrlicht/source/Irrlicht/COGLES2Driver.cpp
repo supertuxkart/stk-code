@@ -3120,7 +3120,7 @@ namespace video
 				setActiveTexture(GL_TEXTURE0 + stage);
 
 				if(Driver->CurrentTexture[stage])
-					glBindTexture(GL_TEXTURE_2D, static_cast<const COGLES2Texture*>(Driver->CurrentTexture[stage])->getOpenGLTextureName());
+					glBindTexture(GL_TEXTURE_2D, Driver->CurrentTexture[stage]->getOpenGLTextureName());
 
 				Texture[stage] = Driver->CurrentTexture[stage];
 			}

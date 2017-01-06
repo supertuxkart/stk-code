@@ -18,11 +18,9 @@
 
 #include "graphics/stars.hpp"
 
-#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
@@ -42,20 +40,9 @@ Stars::Stars(AbstractKart *kart)
     m_parent_kart_node = kart->getNode();
     m_enabled = false;
 
-    video::ITexture* texture = NULL;
-#ifndef SERVER_ONLY
-    if (CVS->isGLSL())
-    {
-        texture = STKTexManager::getInstance()->getTexture
-            ("starparticle.png", true/*srgb*/, true/*premul_alpha*/,
-            false/*set_material*/, true/*mesh_tex*/);
-    }
-    else
-#endif
-    {
-        texture =
-            irr_driver->getTexture("starparticle.png");
-    }
+    video::ITexture* texture = STKTexManager::getInstance()->getTexture
+        ("starparticle.png", true/*srgb*/, true/*premul_alpha*/,
+        false/*set_material*/, true/*mesh_tex*/);
 
     Material* star_material =
         material_manager->getMaterial("starparticle.png");

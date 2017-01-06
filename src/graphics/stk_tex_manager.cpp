@@ -69,9 +69,10 @@ STKTexture* STKTexManager::findTexturePathless(const std::string& filename)
 }   // findTexturePathless
 
 // ----------------------------------------------------------------------------
-STKTexture* STKTexManager::getTexture(const std::string& path, bool srgb,
-                                      bool premul_alpha, bool set_material,
-                                      bool mesh_tex, bool no_upload)
+video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
+                                           bool premul_alpha,
+                                           bool set_material, bool mesh_tex,
+                                           bool no_upload)
 {
     auto ret = m_all_textures.find(path);
     if (!no_upload && ret != m_all_textures.end())
@@ -134,7 +135,7 @@ int STKTexManager::dumpTextureUsage()
 }   // dumpAllTexture
 
 // ----------------------------------------------------------------------------
-STKTexture* STKTexManager::getUnicolorTexture(const irr::video::SColor &c)
+video::ITexture* STKTexManager::getUnicolorTexture(const irr::video::SColor &c)
 {
     std::string name = StringUtils::toString(c.color) + "unic";
     auto ret = m_all_textures.find(name);
