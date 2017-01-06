@@ -392,14 +392,13 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
         mesh.textures[i] = 
                       STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 127, 127, 127));
     }
-    compressTexture(mesh.textures[i], is_srgb);
 #if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[i])
         {
             mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(
-                getTextureGLuint(mesh.textures[i]),
+                mesh.textures[i]->getOpenGLTextureName(),
                 ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
         }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
@@ -482,14 +481,13 @@ void initTexturesTransparent(GLMesh &mesh)
     {
         mesh.textures[0] = STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 255, 255));
     }
-    compressTexture(mesh.textures[0], true);
 #if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[0])
         {
             mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(
-                getTextureGLuint(mesh.textures[0]),
+                mesh.textures[0]->getOpenGLTextureName(),
                 ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
         }
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))

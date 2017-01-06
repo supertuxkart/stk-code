@@ -19,18 +19,6 @@
 #ifndef HEADER_TEXTURE_MANAGER_HPP
 #define HEADER_TEXTURE_MANAGER_HPP
 
-#include "graphics/gl_headers.hpp"
-
-#include <ITexture.h>
-#include <SColor.h>
-#include <string>
-
-GLuint getTextureGLuint(irr::video::ITexture *tex);
-void resetTextureTable();
-void cleanUnicolorTextures();
-void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = false);
-bool loadCompressedTexture(const std::string& compressed_tex);
-void saveCompressedTexture(const std::string& compressed_tex);
-void insertTextureHandle(uint64_t handle);
+static void insertTextureHandle(uint64_t handle){}
 
 #endif

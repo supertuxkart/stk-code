@@ -41,7 +41,6 @@
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/stk_texture.hpp"
 #include "graphics/sun.hpp"
-#include "graphics/texture_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -162,9 +161,7 @@ IrrDriver::IrrDriver()
 IrrDriver::~IrrDriver()
 {
     assert(m_device != NULL);
-#ifndef SERVER_ONLY
-    cleanUnicolorTextures();
-#endif
+    STKTexManager::getInstance()->kill();
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
@@ -932,8 +929,7 @@ void IrrDriver::applyResolutionSettings()
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
     VAOManager::getInstance()->kill();
-    resetTextureTable();
-    cleanUnicolorTextures();
+    STKTexManager::getInstance()->kill();
     // initDevice will drop the current device.
     if (CVS->isGLSL())
     {

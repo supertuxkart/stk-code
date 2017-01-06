@@ -40,7 +40,6 @@
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/render_target.hpp"
 #include "graphics/stk_tex_manager.hpp"
-#include "graphics/texture_manager.hpp"
 #include "graphics/vao_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -295,8 +294,6 @@ void Track::cleanup()
 #ifndef SERVER_ONLY
     VAOManager::kill();
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
-    // Clear reminder of transformed textures
-    resetTextureTable();
 #endif
 
     // Clear reminder of the link between textures and file names.
