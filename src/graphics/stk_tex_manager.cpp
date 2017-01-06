@@ -26,6 +26,7 @@
 // ----------------------------------------------------------------------------
 STKTexManager::~STKTexManager()
 {
+    removeTexture(NULL/*texture*/, true/*remove_all*/);
 }   // ~STKTexManager
 
 // ----------------------------------------------------------------------------
@@ -87,10 +88,46 @@ video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
 }   // getTexture
 
 // ----------------------------------------------------------------------------
-void STKTexManager::addTexture(STKTexture* t)
+void STKTexManager::addTexture(STKTexture* texture)
 {
-    m_all_textures[t->getName().getPtr()] = t;
+    m_all_textures[texture->getName().getPtr()] = texture;
 }   // addTexture
+
+// ----------------------------------------------------------------------------
+void STKTexManager::removeTexture(STKTexture* texture, bool remove_all)
+{
+#ifdef DEBUG
+    std::vector<std::string> undeleted_texture;
+#endif
+    auto p = m_all_textures.begin();
+    while (p != m_all_textures.end())
+    {
+        if (remove_all || p->second == texture)
+        {
+            if (remove_all && p->second == NULL)
+            {
+                p = m_all_textures.erase(p);
+                continue;
+            }
+#ifdef DEBUG
+            if (remove_all && p->second->getReferenceCount() != 1)
+                undeleted_texture.push_back(p->second->getName().getPtr());
+#endif
+            p->second->drop();
+            p = m_all_textures.erase(p);
+        }
+        else
+        {
+           p++;
+        }
+    }
+#ifdef DEBUG
+    for (const std::string& s : undeleted_texture)
+    {
+        Log::error("STKTexManager", "%s undeleted!", s.c_str());
+    }
+#endif
+}   // removeTexture
 
 // ----------------------------------------------------------------------------
 void STKTexManager::dumpAllTexture(bool mesh_texture)

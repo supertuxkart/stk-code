@@ -52,6 +52,11 @@ FontWithFace::FontWithFace(const std::string& name, FaceTTF* ttf)
  */
 FontWithFace::~FontWithFace()
 {
+    for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
+    {
+        STKTexManager::getInstance()->removeTexture(
+            static_cast<STKTexture*>(m_spritebank->getTexture(i)));
+    }
     m_spritebank->drop();
     m_spritebank = NULL;
 

@@ -296,9 +296,6 @@ void Track::cleanup()
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
 #endif
 
-    // Clear reminder of the link between textures and file names.
-    irr_driver->clearTexturesFileName();
-
     for (unsigned int i = 0; i < m_animated_textures.size(); i++)
     {
         delete m_animated_textures[i];

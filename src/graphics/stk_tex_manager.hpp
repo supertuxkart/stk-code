@@ -57,9 +57,9 @@ public:
     // ------------------------------------------------------------------------
     irr::video::ITexture* getUnicolorTexture(const irr::video::SColor &c);
     // ------------------------------------------------------------------------
-    void addTexture(STKTexture* t);
+    void addTexture(STKTexture* texture);
     // ------------------------------------------------------------------------
-    void removeTexture(STKTexture* t);
+    void removeTexture(STKTexture* texture, bool remove_all = false);
     // ------------------------------------------------------------------------
     void dumpAllTexture(bool mesh_texture);
     // ------------------------------------------------------------------------

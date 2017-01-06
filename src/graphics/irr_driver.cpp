@@ -161,11 +161,10 @@ IrrDriver::IrrDriver()
 IrrDriver::~IrrDriver()
 {
     assert(m_device != NULL);
-    STKTexManager::getInstance()->kill();
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
-
+    STKTexManager::getInstance()->kill();
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
@@ -1431,6 +1430,12 @@ void IrrDriver::removeMeshFromCache(scene::IMesh *mesh)
  */
 void IrrDriver::removeTexture(video::ITexture *t)
 {
+    STKTexture* stkt = dynamic_cast<STKTexture*>(t);
+    if (stkt)
+    {
+        STKTexManager::getInstance()->removeTexture(stkt);
+        return;
+    }
     m_video_driver->removeTexture(t);
 }   // removeTexture
 
@@ -1675,29 +1680,6 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
 {
     return STKTexManager::getInstance()->getTexture(filename);
 }   // getTexture
-
-// ----------------------------------------------------------------------------
-/** Clear the texture-filename reminder.
-*/
-void IrrDriver::clearTexturesFileName()
-{
-    m_texturesFileName.clear();
-} // clearTexturesFileName
-
-// ----------------------------------------------------------------------------
-/** Get the texture file name using a texture pointer.
-*   \param tex Pointer on the texture for which we want to find the file name.
-*   \return Filename of the texture if found, or an empty string otherwise.
-*/
-std::string IrrDriver::getTextureName(video::ITexture* tex)
-{
-    std::map<video::ITexture*, std::string>::iterator it;
-    it = m_texturesFileName.find(tex);
-    if (it != m_texturesFileName.end())
-        return it->second;
-    else
-        return "";
-} // getTextureName
 
 // ----------------------------------------------------------------------------
 /** Appends a pointer to each texture used in this mesh to the vector.
