@@ -312,7 +312,20 @@ void FontWithFace::updateCharactersList()
  */
 void FontWithFace::dumpGlyphPage(const std::string& name)
 {
-    // Todo for new texture format
+    for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
+    {
+        video::ITexture* tex = m_spritebank->getTexture(i);
+        core::dimension2d<u32> size = tex->getSize();
+        video::ECOLOR_FORMAT col_format = tex->getColorFormat();
+        void* data = tex->lock();
+        video::IImage* image = irr_driver->getVideoDriver()
+            ->createImageFromData(col_format, size, data,
+            true/*ownForeignMemory*/);
+        tex->unlock();
+        irr_driver->getVideoDriver()->writeImageToFile(image, std::string
+            (name + "_" + StringUtils::toString(i) + ".png").c_str());
+        image->drop();
+    }
 }   // dumpGlyphPage
 
 // ----------------------------------------------------------------------------

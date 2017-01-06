@@ -69,12 +69,7 @@ public:
     virtual ~STKTexture();
     // ------------------------------------------------------------------------
     virtual void* lock(video::E_TEXTURE_LOCK_MODE mode =
-                       video::ETLM_READ_WRITE, u32 mipmap_level = 0)
-    {
-        if (m_texture_image)
-            return m_texture_image->lock();
-        return NULL;
-    }
+                       video::ETLM_READ_WRITE, u32 mipmap_level = 0);
     // ------------------------------------------------------------------------
     virtual void unlock()
     {

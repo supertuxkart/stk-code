@@ -425,3 +425,22 @@ bool STKTexture::hasMipMaps() const
     return false;
 #endif   // !SERVER_ONLY
 }   // hasMipMaps
+
+//-----------------------------------------------------------------------------
+void* STKTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
+{
+#ifndef SERVER_ONLY
+    if (m_texture_image)
+        return m_texture_image->lock();
+
+    uint8_t* pixels = new uint8_t[m_size.Width * m_size.Height * 4]();
+    GLint tmp_texture;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmp_texture);
+    glBindTexture(GL_TEXTURE_2D, m_texture_name);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
+    glBindTexture(GL_TEXTURE_2D, tmp_texture);
+    return pixels;
+#else
+    return NULL;
+#endif   // !SERVER_ONLY
+}   // lock
