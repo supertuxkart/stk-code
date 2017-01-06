@@ -26,14 +26,11 @@
 #include <string>
 
 GLuint getTextureGLuint(irr::video::ITexture *tex);
-
 void resetTextureTable();
 void cleanUnicolorTextures();
 void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = false);
 bool loadCompressedTexture(const std::string& compressed_tex);
 void saveCompressedTexture(const std::string& compressed_tex);
 void insertTextureHandle(uint64_t handle);
-bool reloadSingleTexture(irr::video::ITexture *tex);
-irr::core::stringw reloadTexture(const irr::core::stringw& name);
 
 #endif

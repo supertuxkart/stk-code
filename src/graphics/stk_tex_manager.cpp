@@ -51,24 +51,6 @@ STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
 }   // findTextureInFileSystem
 
 // ----------------------------------------------------------------------------
-STKTexture* STKTexManager::findTexturePathless(const std::string& filename)
-{
-    for (auto p : m_all_textures)
-    {
-        if (p.second == NULL)
-            continue;
-        std::string lc_name = StringUtils::toLowerCase(filename);
-        std::string lc_path =
-            StringUtils::toLowerCase(p.first);
-        std::string tex_name = StringUtils::getBasename(lc_path);
-        if (lc_name == tex_name || lc_name == lc_path)
-            return p.second;
-    }
-
-    return NULL;
-}   // findTexturePathless
-
-// ----------------------------------------------------------------------------
 video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
                                            bool premul_alpha,
                                            bool set_material, bool mesh_tex,
@@ -151,3 +133,51 @@ video::ITexture* STKTexManager::getUnicolorTexture(const irr::video::SColor &c)
     return texture;
 
 }   // getUnicolorTexture
+
+// ----------------------------------------------------------------------------
+core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
+{
+    if (CVS->isTextureCompressionEnabled())
+        return L"Please disable texture compression for reloading textures.";
+
+    if (name.empty())
+    {
+        for (auto p : m_all_textures)
+        {
+            if (p.second == NULL || !p.second->isMeshTexture())
+                continue;
+            p.second->reload();
+            Log::info("STKTexManager", "%s reloaded",
+                p.second->getName().getPtr());
+        }
+        return L"All textures reloaded.";
+    }
+
+    core::stringw result;
+    core::stringw list = name;
+    list.make_lower().replace(L'\u005C', L'\u002F');
+    std::vector<std::string> names =
+        StringUtils::split(StringUtils::wideToUtf8(list), ';');
+    for (const std::string& fname : names)
+    {
+        for (auto p : m_all_textures)
+        {
+            if (p.second == NULL || !p.second->isMeshTexture())
+                continue;
+            std::string tex_path =
+                StringUtils::toLowerCase(p.second->getName().getPtr());
+            std::string tex_name = StringUtils::getBasename(tex_path);
+            if (fname == tex_name || fname == tex_path)
+            {
+                p.second->reload();
+                result += tex_name.c_str();
+                result += L" ";
+                break;
+            }
+        }
+    }
+    if (result.empty())
+        return L"Texture(s) not found!";
+    return result + "reloaded.";
+
+}   // reloadTexture

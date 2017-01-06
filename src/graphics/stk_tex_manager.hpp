@@ -22,6 +22,8 @@
 #include "utils/no_copy.hpp"
 #include "utils/singleton.hpp"
 
+#include "irrString.h"
+
 #include <algorithm>
 #include <string>
 #include <unordered_map>
@@ -37,8 +39,6 @@ class STKTexManager : public Singleton<STKTexManager>, NoCopy
 private:
     std::unordered_map<std::string, STKTexture*> m_all_textures;
 
-    // ------------------------------------------------------------------------
-    STKTexture* findTexturePathless(const std::string& filename);
     // ------------------------------------------------------------------------
     STKTexture* findTextureInFileSystem(const std::string& filename,
                                         std::string* full_path);
@@ -66,6 +66,8 @@ public:
     int dumpTextureUsage();
     // ------------------------------------------------------------------------
     void clean();
+    // ------------------------------------------------------------------------
+    irr::core::stringw reloadTexture(const irr::core::stringw& name);
 
 };   // STKTexManager
 
