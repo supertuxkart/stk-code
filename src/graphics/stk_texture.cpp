@@ -159,7 +159,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     const unsigned int w = m_size.Width;
     const unsigned int h = m_size.Height;
     unsigned int format = single_channel ? GL_RED : GL_BGRA;
-    unsigned int internal_format = single_channel ? GL_RED : GL_RGBA;
+    unsigned int internal_format = single_channel ? GL_R8 : GL_RGBA;
 
 #if !defined(USE_GLES2)
     if (m_mesh_texture && CVS->isTextureCompressionEnabled())

@@ -134,7 +134,7 @@ void FontWithFace::createNewGlyphPage()
 {
 #ifndef SERVER_ONLY
     uint8_t* data = new uint8_t[getGlyphPageSize() * getGlyphPageSize() *
-    (CVS->isARBTextureSwizzleUsable() ? 1 : 4)];
+    (CVS->isARBTextureSwizzleUsable() ? 1 : 4)]();
 #else
     uint8_t* data = NULL;
 #endif
