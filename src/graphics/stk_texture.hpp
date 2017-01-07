@@ -55,8 +55,6 @@ private:
     bool loadCompressedTexture(const std::string& file_name);
     // ------------------------------------------------------------------------
     void saveCompressedTexture(const std::string& file_name);
-    // ------------------------------------------------------------------------
-    //std::string getHashedName(const std::string& orig_file);
 
 public:
     // ------------------------------------------------------------------------

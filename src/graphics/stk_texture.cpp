@@ -27,6 +27,7 @@
 #include <fstream>
 #include <functional>
 
+static const uint8_t CACHE_VERSION = 1;
 // ----------------------------------------------------------------------------
 STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
                        bool set_material, bool mesh_tex, bool no_upload)
@@ -82,13 +83,9 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
         std::string orig_file = NamedPath.getPtr();
 
         std::string basename = StringUtils::getBasename(orig_file);
-        //Log::info("STKTexture", "Basename: <%s> / <%s>", basename.c_str(), orig_file.c_str());
-
         std::string container_id;
         if (file_manager->searchTextureContainerId(container_id, basename))
         {
-            //Log::info("STKTexture", "container_id: %s", container_id.c_str());
-
             std::string cache_subdir = "hd/";
             if ((UserConfigParams::m_high_definition_textures & 0x01) == 0x01)
             {
@@ -100,12 +97,13 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
                     (int)UserConfigParams::m_max_texture_size);
             }
 
-            std::string cache_dir = file_manager->getCachedTexturesDir() + cache_subdir + container_id;
+            std::string cache_dir = file_manager->getCachedTexturesDir() +
+                cache_subdir + container_id;
             compressed_texture = cache_dir + "/" + basename + ".stktz";
 
             if (loadCompressedTexture(compressed_texture))
             {
-                Log::info("STKTexture", "Compressed %s for texture %s",
+                Log::verbose("STKTexture", "Compressed %s for texture %s",
                     compressed_texture.c_str(), orig_file.c_str());
                 return;
             }
@@ -114,7 +112,8 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
         }
         else
         {
-            Log::warn("STKTexture", "Cannot find container_id for texture '%s'", orig_file.c_str());
+            Log::warn("STKTexture", "Cannot find container_id for texture %s",
+                orig_file.c_str());
         }
     }
 #endif
@@ -351,6 +350,16 @@ bool STKTexture::loadCompressedTexture(const std::string& file_name)
         return false;
 
     int internal_format;
+    uint8_t cache_verison;
+    ifs.read((char*)&cache_verison, sizeof(uint8_t));
+    if (cache_verison != CACHE_VERSION)
+    {
+        Log::warn("STKTexture", "%s version %d is not supported!",
+            file_name.c_str(), cache_verison);
+        ifs.close();
+        // Remove the file later if we have more version
+        return false;
+    }
     ifs.read((char*)&internal_format, sizeof(int));
     ifs.read((char*)&m_size.Width, sizeof(unsigned int));
     ifs.read((char*)&m_size.Height, sizeof(unsigned int));
@@ -416,6 +425,7 @@ void STKTexture::saveCompressedTexture(const std::string& compressed_tex)
         std::ios::out | std::ios::binary);
     if (ofs.is_open())
     {
+        ofs.write((char*)&CACHE_VERSION, sizeof(uint8_t));
         ofs.write((char*)&internal_format, sizeof(int));
         ofs.write((char*)&m_size.Width, sizeof(unsigned int));
         ofs.write((char*)&m_size.Height, sizeof(unsigned int));
