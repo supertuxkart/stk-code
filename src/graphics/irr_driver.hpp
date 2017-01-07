@@ -220,8 +220,10 @@ public:
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColorf &light,
                                           bool force_SH_computation = true);
+#if 0
     std::string           generateSmallerTextures(const std::string& dir);
     std::string           getSmallerTexture(const std::string& texture);
+#endif
     video::ITexture      *getTexture(FileManager::AssetType type,
                                      const std::string &filename,
                                      bool is_premul=false,

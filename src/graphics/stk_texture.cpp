@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "config/user_config.hpp"
 #include "graphics/stk_texture.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
@@ -79,15 +80,41 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
     if (!no_upload && m_mesh_texture && CVS->isTextureCompressionEnabled())
     {
         std::string orig_file = NamedPath.getPtr();
-        compressed_texture = getHashedName(orig_file);
-        if (!file_manager->fileIsNewer(orig_file, compressed_texture))
+
+        std::string basename = StringUtils::getBasename(orig_file);
+        //Log::info("STKTexture", "Basename: <%s> / <%s>", basename.c_str(), orig_file.c_str());
+
+        std::string container_id;
+        if (file_manager->searchTextureContainerId(container_id, basename))
         {
+            //Log::info("STKTexture", "container_id: %s", container_id.c_str());
+
+            std::string cache_subdir = "hd/";
+            if ((UserConfigParams::m_high_definition_textures & 0x01) == 0x01)
+            {
+                cache_subdir = "hd/";
+            }
+            else
+            {
+                cache_subdir = StringUtils::insertValues("resized_%i/",
+                    (int)UserConfigParams::m_max_texture_size);
+            }
+
+            std::string cache_dir = file_manager->getCachedTexturesDir() + cache_subdir + container_id;
+            compressed_texture = cache_dir + "/" + basename + ".stktz";
+
             if (loadCompressedTexture(compressed_texture))
             {
                 Log::info("STKTexture", "Compressed %s for texture %s",
                     compressed_texture.c_str(), orig_file.c_str());
                 return;
             }
+
+            file_manager->checkAndCreateDirectoryP(cache_dir);
+        }
+        else
+        {
+            Log::warn("STKTexture", "Cannot find container_id for texture '%s'", orig_file.c_str());
         }
     }
 #endif
@@ -401,20 +428,6 @@ void STKTexture::saveCompressedTexture(const std::string& compressed_tex)
     delete[] data;
 #endif
 }   // saveCompressedTexture
-
-//-----------------------------------------------------------------------------
-std::string STKTexture::getHashedName(const std::string& orig_file)
-{
-    std::string result = file_manager->getCachedTexturesDir();
-    std::stringstream hash;
-    size_t hash_1 = std::hash<std::string>{}(StringUtils::getPath(orig_file));
-    size_t hash_2 =
-        std::hash<std::string>{}(StringUtils::getBasename(orig_file));
-    const core::dimension2du& max_size = irr_driver->getVideoDriver()
-        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
-    hash << std::hex << hash_1 << hash_2 << max_size.Height;
-    return result + hash.str() + ".stktz";
-}   // getHashedName
 
 //-----------------------------------------------------------------------------
 bool STKTexture::hasMipMaps() const

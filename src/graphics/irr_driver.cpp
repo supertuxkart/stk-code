@@ -956,7 +956,7 @@ void IrrDriver::applyResolutionSettings()
                                ->getAsset(FileManager::GUI,"options_video.png"))
                              );
 
-    file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""));
+    file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""), "models");
     const std::string materials_file =
         file_manager->getAssetChecked(FileManager::MODEL, "materials.xml");
     if (materials_file != "")
@@ -1576,6 +1576,7 @@ void IrrDriver::unsetTextureErrorMessage()
 }   // unsetTextureErrorMessage
 
 // ----------------------------------------------------------------------------
+#if 0
 /** Retrieve all textures in the specified directory, generate a smaller
 *   version for each of them and save them in the cache. Smaller textures are
 *   generated only if they do not already exist or if their original version
@@ -1642,7 +1643,7 @@ std::string IrrDriver::getSmallerTexture(const std::string& filename)
     } // if !file_manager->fileExists(cached_file)
     return cached_file;
 } // getSmallerTexture
-
+#endif
 // ----------------------------------------------------------------------------
 /** Loads a texture from a file and returns the texture object. This is just
  *  a convenient wrapper which loads the texture from a STK asset directory.

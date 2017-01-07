@@ -1627,9 +1627,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
 
+    std::string unique_id = StringUtils::insertValues("tracks/%s", m_ident.c_str());
+
     // Add the track directory to the texture search path
-    file_manager->pushTextureSearchPath(m_root);
-    file_manager->pushModelSearchPath  (m_root);
+    file_manager->pushTextureSearchPath(m_root, unique_id);
+    file_manager->pushModelSearchPath(m_root);
 
     // For now ignore the resize cache, since atm it only handles texturs in
     // the track directory.
