@@ -162,11 +162,12 @@ video::ITexture* STKTexManager::getUnicolorTexture(const irr::video::SColor &c)
     if (ret != m_all_textures.end())
         return ret->second;
 
-    uint32_t color[4] = { c.color, c.color, c.color, c.color };
-    video::IImage* image = irr_driver->getVideoDriver()
-        ->createImageFromData(video::ECF_A8R8G8B8,
-        core::dimension2d<u32>(2, 2), color);
-    STKTexture* texture = new STKTexture(image, name);
+    uint8_t* data = new uint8_t[2 * 2 * 4];
+    memcpy(data, &c.color, sizeof(video::SColor));
+    memcpy(data + 4, &c.color, sizeof(video::SColor));
+    memcpy(data + 8, &c.color, sizeof(video::SColor));
+    memcpy(data + 12, &c.color, sizeof(video::SColor));
+    STKTexture* texture = new STKTexture(data, name, 2);
     addTexture(texture);
     return texture;
 

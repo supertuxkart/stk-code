@@ -49,12 +49,16 @@ STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
 }   // STKTexture
 
 // ----------------------------------------------------------------------------
-STKTexture::STKTexture(video::IImage* image, const std::string& name)
+STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
+                       bool single_channel)
           : video::ITexture(name.c_str()), m_texture_handle(0), m_srgb(false),
             m_premul_alpha(false), m_mesh_texture(false), m_material(NULL),
             m_texture_name(0), m_texture_size(0), m_texture_image(NULL)
 {
-    reload(false/*no_upload*/, image/*pre_loaded_tex*/);
+    m_size.Width = size;
+    m_size.Height = size;
+    m_orig_size = m_size;
+    reload(false/*no_upload*/, data, single_channel);
 }   // STKTexture
 
 // ----------------------------------------------------------------------------
@@ -71,7 +75,8 @@ STKTexture::~STKTexture()
 }   // ~STKTexture
 
 // ----------------------------------------------------------------------------
-void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
+void STKTexture::reload(bool no_upload, uint8_t* preload_data,
+                        bool single_channel)
 {
 #ifndef SERVER_ONLY
     irr_driver->getDevice()->getLogger()->setLogLevel(ELL_NONE);
@@ -119,7 +124,8 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
 #endif
 
     video::IImage* orig_img = NULL;
-    if (pre_loaded_tex == NULL)
+    uint8_t* data = preload_data;
+    if (data == NULL)
     {
         orig_img =
             irr_driver->getVideoDriver()->createImageFromFile(NamedPath);
@@ -134,26 +140,14 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
         {
             Log::warn("STKTexture", "image %s has 0 size.",
                 NamedPath.getPtr());
+            orig_img->drop();
             return;
         }
-    }
-    else
-        orig_img = pre_loaded_tex;
-
-    video::IImage* new_texture = NULL;
-    if (pre_loaded_tex == NULL)
-    {
-        new_texture = resizeImage(orig_img, &m_orig_size, &m_size);
-        applyMask(new_texture);
-    }
-    else
-    {
-        new_texture = pre_loaded_tex;
-        m_orig_size = pre_loaded_tex->getDimension();
-        m_size = pre_loaded_tex->getDimension();
+        orig_img = resizeImage(orig_img, &m_orig_size, &m_size);
+        applyMask(orig_img);
+        data = (uint8_t*)orig_img->lock();
     }
 
-    unsigned char* data = (unsigned char*)new_texture->lock();
     const unsigned int w = m_size.Width;
     const unsigned int h = m_size.Height;
     unsigned int format = GL_BGRA;
@@ -178,7 +172,7 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
         format = GL_RGBA;
         for (unsigned int i = 0; i < w * h; i++)
         {
-            char tmp_val = data[i * 4];
+            uint8_t tmp_val = data[i * 4];
             data[i * 4] = data[i * 4 + 2];
             data[i * 4 + 2] = tmp_val;
         }
@@ -191,9 +185,9 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
             float alpha = data[4 * i + 3];
             if (alpha > 0.0f)
                 alpha = pow(alpha / 255.f, 1.f / 2.2f);
-            data[i * 4] = (unsigned char)(data[i * 4] * alpha);
-            data[i * 4 + 1] = (unsigned char)(data[i * 4 + 1] * alpha);
-            data[i * 4 + 2] = (unsigned char)(data[i * 4 + 2] * alpha);
+            data[i * 4] = (uint8_t)(data[i * 4] * alpha);
+            data[i * 4 + 1] = (uint8_t)(data[i * 4 + 1] * alpha);
+            data[i * 4 + 2] = (uint8_t)(data[i * 4 + 2] * alpha);
         }
     }
 
@@ -214,16 +208,19 @@ void STKTexture::reload(bool no_upload, video::IImage* pre_loaded_tex)
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, format,
                 GL_UNSIGNED_BYTE, data);
         }
-        new_texture->unlock();
+        if (orig_img)
+            orig_img->unlock();
         if (hasMipMaps())
             glGenerateMipmap(GL_TEXTURE_2D);
     }
 
     m_texture_size = w * h * 4 /*BRGA*/;
     if (no_upload)
-        m_texture_image = new_texture;
+        m_texture_image = orig_img;
+    else if (orig_img)
+        orig_img->drop();
     else
-        new_texture->drop();
+        delete[] data;
 
     if (!compressed_texture.empty())
         saveCompressedTexture(compressed_texture);

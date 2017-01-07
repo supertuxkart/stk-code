@@ -131,15 +131,13 @@ void FontWithFace::loadGlyphInfo(wchar_t c)
  */
 void FontWithFace::createNewGlyphPage()
 {
-    video::IImage* glyph = irr_driver->getVideoDriver()
-        ->createImage(video::ECF_A8R8G8B8,
-        core::dimension2du(getGlyphPageSize(), getGlyphPageSize()));
-    glyph->fill(video::SColor(0, 255, 255, 255));
+    uint8_t* data = new uint8_t[getGlyphPageSize() * getGlyphPageSize() * 4]();
     m_current_height = 0;
     m_used_width = 0;
     m_used_height = 0;
-    STKTexture* stkt = new STKTexture(glyph, typeid(*this).name() +
-        StringUtils::toString(m_spritebank->getTextureCount()));
+    STKTexture* stkt = new STKTexture(data, typeid(*this).name() +
+        StringUtils::toString(m_spritebank->getTextureCount()),
+        getGlyphPageSize());
     m_spritebank->addTexture(stkt);
     STKTexManager::getInstance()->addTexture(stkt);
 }   // createNewGlyphPage
@@ -173,14 +171,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 
     // Convert to an anti-aliased bitmap
     FT_Bitmap bits = slot->bitmap;
-
-    core::dimension2du d(bits.width + 1, bits.rows + 1);
-    core::dimension2du texture_size;
-    texture_size = d.getOptimalSize(!(irr_driver->getVideoDriver()
-        ->queryFeature(video::EVDF_TEXTURE_NPOT)), !(irr_driver
-        ->getVideoDriver()->queryFeature(video::EVDF_TEXTURE_NSQUARE)),
-        true, 0);
-
+    core::dimension2du texture_size(bits.width + 1, bits.rows + 1);
     if ((m_used_width + texture_size.Width > getGlyphPageSize() &&
         m_used_height + m_current_height + texture_size.Height >
         getGlyphPageSize())                                     ||
@@ -190,45 +181,33 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
         createNewGlyphPage();
     }
 
-    video::IImage* glyph = NULL;
-    unsigned int* image_data = NULL;
+    std::vector<uint32_t> image_data;
+    image_data.resize(texture_size.Width * texture_size.Height,
+        video::SColor(0, 255, 255, 255).color);
     switch (bits.pixel_mode)
     {
         case FT_PIXEL_MODE_GRAY:
         {
-            // Create our blank image.
-            glyph = irr_driver->getVideoDriver()
-                ->createImage(video::ECF_A8R8G8B8, texture_size);
-            glyph->fill(video::SColor(0, 255, 255, 255));
-
             // Load the grayscale data in.
             const float gray_count = static_cast<float>(bits.num_grays);
             const unsigned int image_pitch =
-                glyph->getPitch() / sizeof(unsigned int);
-            image_data = (unsigned int*)glyph->lock();
-            unsigned char* glyph_data = bits.buffer;
-
-            for (unsigned int y = 0; y < (unsigned int)bits.rows; y++)
+                4 * texture_size.Width / sizeof(unsigned int);
+            uint8_t* glyph_data = bits.buffer;
+            for (int y = 0; y < bits.rows; y++)
             {
-                unsigned char* row = glyph_data;
-                for (unsigned int x = 0; x < (unsigned)bits.width; x++)
+                uint8_t* row = glyph_data;
+                for (int x = 0; x < bits.width; x++)
                 {
-                    image_data[y * image_pitch + x] |=
-                        static_cast<unsigned int>(255.0f *
+                    image_data.data()[y * image_pitch + x] |=
+                        static_cast<uint32_t>(255.0f *
                         (static_cast<float>(*row++) / gray_count)) << 24;
                 }
                 glyph_data += bits.pitch;
             }
-            glyph->unlock();
             break;
         }
         default:
             assert(false);
-    }
-    if (glyph == NULL)
-    {
-        Log::warn("FontWithFace", "Failed to load a glyph");
-        return;
     }
 
     // Done creating a single glyph, now copy to the glyph page...
@@ -250,7 +229,12 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 #endif
     glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
         texture_size.Width, texture_size.Height, format, GL_UNSIGNED_BYTE,
-        image_data);
+        image_data.data());
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //static GLint swizzle_mask[] = { GL_ONE, GL_ONE, GL_ONE, GL_RED };
+    //glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle_mask);
+    //glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height, bits.width, bits.rows, GL_RED, GL_UNSIGNED_BYTE, bits.buffer);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     if (tex->hasMipMaps())
         glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -280,10 +264,6 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     a.offset_y_bt = -cur_offset_y;
     a.spriteno = f.rectNumber;
     m_character_area_map[c] = a;
-
-    // Clean the temporary glyph
-    glyph->drop();
-    glyph = NULL;
 
     // Store used area
     m_used_width += texture_size.Width;

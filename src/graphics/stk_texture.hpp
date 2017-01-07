@@ -62,7 +62,8 @@ public:
                bool premul_alpha = false, bool set_material = false,
                bool mesh_tex = false, bool no_upload = false);
     // ------------------------------------------------------------------------
-    STKTexture(video::IImage* image, const std::string& name);
+    STKTexture(uint8_t* data, const std::string& name, size_t size,
+               bool single_channel = false);
     // ------------------------------------------------------------------------
     virtual ~STKTexture();
     // ------------------------------------------------------------------------
@@ -112,7 +113,8 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getTextureSize() const              { return m_texture_size; }
     // ------------------------------------------------------------------------
-    void reload(bool no_upload = false, video::IImage* pre_loaded_tex = NULL);
+    void reload(bool no_upload = false, uint8_t* preload_data = NULL,
+                bool single_channel = false);
     // ------------------------------------------------------------------------
     video::IImage* getTextureImage()                { return m_texture_image; }
 
