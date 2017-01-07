@@ -149,7 +149,6 @@ void FontWithFace::createNewGlyphPage()
  */
 void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 {
-#ifndef SERVER_ONLY
     assert(gi.glyph_index > 0);
     assert(gi.font_number < m_face_ttf->getTotalFaces());
     FT_Face cur_face = m_face_ttf->getFace(gi.font_number);
@@ -193,10 +192,10 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
             const unsigned int image_pitch =
                 4 * texture_size.Width / sizeof(unsigned int);
             uint8_t* glyph_data = bits.buffer;
-            for (int y = 0; y < bits.rows; y++)
+            for (unsigned int y = 0; y < (unsigned int)bits.rows; y++)
             {
                 uint8_t* row = glyph_data;
-                for (int x = 0; x < bits.width; x++)
+                for (unsigned int x = 0; x < (unsigned int)bits.width; x++)
                 {
                     image_data.data()[y * image_pitch + x] |=
                         static_cast<uint32_t>(255.0f *
@@ -220,6 +219,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     }
 
     const unsigned int cur_tex = m_spritebank->getTextureCount() -1;
+#ifndef SERVER_ONLY
     video::ITexture* tex = m_spritebank->getTexture(cur_tex);
     glBindTexture(GL_TEXTURE_2D, tex->getOpenGLTextureName());
     unsigned int format = GL_BGRA;
@@ -238,6 +238,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     if (tex->hasMipMaps())
         glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
+#endif
 
     // Store the rectangle of current glyph
     gui::SGUISpriteFrame f;
@@ -269,7 +270,6 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     m_used_width += texture_size.Width;
     if (m_current_height < texture_size.Height)
         m_current_height = texture_size.Height;
-#endif
 }   // insertGlyph
 
 // ----------------------------------------------------------------------------

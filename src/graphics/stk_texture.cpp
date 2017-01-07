@@ -21,6 +21,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -78,6 +79,11 @@ STKTexture::~STKTexture()
 void STKTexture::reload(bool no_upload, uint8_t* preload_data,
                         bool single_channel)
 {
+    if (ProfileWorld::isNoGraphics())
+    {
+        m_texture_name = 1;
+        return;
+    }
 #ifndef SERVER_ONLY
     irr_driver->getDevice()->getLogger()->setLogLevel(ELL_NONE);
 
@@ -236,8 +242,8 @@ video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
                                        core::dimension2du* new_img_size,
                                        core::dimension2du* new_tex_size)
 {
-#ifndef SERVER_ONLY
     video::IImage* image = orig_img;
+#ifndef SERVER_ONLY
     const core::dimension2du& old_size = image->getDimension();
     core::dimension2du img_size = old_size;
 
@@ -293,8 +299,8 @@ video::IImage* STKTexture::resizeImage(video::IImage* orig_img,
         *new_img_size = img_size;
         *new_tex_size = tex_size;
     }
-    return image;
 #endif   // !SERVER_ONLY
+    return image;
 }   // resizeImage
 
 // ----------------------------------------------------------------------------
@@ -384,8 +390,8 @@ bool STKTexture::loadCompressedTexture(const std::string& file_name)
         return true;
     }
     delete[] data;
-    return false;
 #endif
+    return false;
 }   // loadCompressedTexture
 
 //-----------------------------------------------------------------------------
@@ -441,9 +447,8 @@ bool STKTexture::hasMipMaps() const
 {
 #ifndef SERVER_ONLY
     return CVS->getGLSLVersion() >= 130;
-#else
-    return false;
 #endif   // !SERVER_ONLY
+    return false;
 }   // hasMipMaps
 
 //-----------------------------------------------------------------------------
@@ -460,7 +465,6 @@ void* STKTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
     glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
     glBindTexture(GL_TEXTURE_2D, tmp_texture);
     return pixels;
-#else
-    return NULL;
 #endif   // !SERVER_ONLY
+    return NULL;
 }   // lock

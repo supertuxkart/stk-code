@@ -176,6 +176,7 @@ video::ITexture* STKTexManager::getUnicolorTexture(const irr::video::SColor &c)
 // ----------------------------------------------------------------------------
 core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
 {
+    core::stringw result;
 #ifndef SERVER_ONLY
     if (CVS->isTextureCompressionEnabled())
         return L"Please disable texture compression for reloading textures.";
@@ -193,7 +194,6 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
         return L"All textures reloaded.";
     }
 
-    core::stringw result;
     core::stringw list = name;
     list.make_lower().replace(L'\u005C', L'\u002F');
     std::vector<std::string> names =
@@ -218,6 +218,6 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
     }
     if (result.empty())
         return L"Texture(s) not found!";
-    return result + "reloaded.";
 #endif   // !SERVER_ONLY
+    return result + "reloaded.";
 }   // reloadTexture
