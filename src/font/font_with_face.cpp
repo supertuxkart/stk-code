@@ -22,6 +22,7 @@
 #include "font/font_manager.hpp"
 #include "font/font_settings.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
@@ -131,13 +132,24 @@ void FontWithFace::loadGlyphInfo(wchar_t c)
  */
 void FontWithFace::createNewGlyphPage()
 {
-    uint8_t* data = new uint8_t[getGlyphPageSize() * getGlyphPageSize() * 4]();
+#ifndef SERVER_ONLY
+    uint8_t* data = new uint8_t[getGlyphPageSize() * getGlyphPageSize() *
+    (CVS->isARBTextureSwizzleUsable() ? 1 : 4)];
+#else
+    uint8_t* data = NULL;
+#endif
     m_current_height = 0;
     m_used_width = 0;
     m_used_height = 0;
     STKTexture* stkt = new STKTexture(data, typeid(*this).name() +
         StringUtils::toString(m_spritebank->getTextureCount()),
-        getGlyphPageSize());
+        getGlyphPageSize(),
+#ifndef SERVER_ONLY
+        CVS->isARBTextureSwizzleUsable()
+#else
+        false
+#endif
+        );
     m_spritebank->addTexture(stkt);
     STKTexManager::getInstance()->addTexture(stkt);
 }   // createNewGlyphPage
@@ -180,36 +192,6 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
         createNewGlyphPage();
     }
 
-    std::vector<uint32_t> image_data;
-    image_data.resize(texture_size.Width * texture_size.Height,
-        video::SColor(0, 255, 255, 255).color);
-    switch (bits.pixel_mode)
-    {
-        case FT_PIXEL_MODE_GRAY:
-        {
-            // Load the grayscale data in.
-            const float gray_count = static_cast<float>(bits.num_grays);
-            const unsigned int image_pitch =
-                4 * texture_size.Width / sizeof(unsigned int);
-            uint8_t* glyph_data = bits.buffer;
-            for (unsigned int y = 0; y < (unsigned int)bits.rows; y++)
-            {
-                uint8_t* row = glyph_data;
-                for (unsigned int x = 0; x < (unsigned int)bits.width; x++)
-                {
-                    image_data.data()[y * image_pitch + x] |=
-                        static_cast<uint32_t>(255.0f *
-                        (static_cast<float>(*row++) / gray_count)) << 24;
-                }
-                glyph_data += bits.pitch;
-            }
-            break;
-        }
-        default:
-            assert(false);
-    }
-
-    // Done creating a single glyph, now copy to the glyph page...
     // Determine the linebreak location
     if (m_used_width + texture_size.Width > getGlyphPageSize())
     {
@@ -222,19 +204,45 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 #ifndef SERVER_ONLY
     video::ITexture* tex = m_spritebank->getTexture(cur_tex);
     glBindTexture(GL_TEXTURE_2D, tex->getOpenGLTextureName());
-    unsigned int format = GL_BGRA;
-#if defined(USE_GLES2)
-    if (!CVS->isEXTTextureFormatBGRA8888Usable())
-        format = GL_RGBA;
-#endif
-    glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-        texture_size.Width, texture_size.Height, format, GL_UNSIGNED_BYTE,
-        image_data.data());
-    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    //static GLint swizzle_mask[] = { GL_ONE, GL_ONE, GL_ONE, GL_RED };
-    //glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle_mask);
-    //glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height, bits.width, bits.rows, GL_RED, GL_UNSIGNED_BYTE, bits.buffer);
-    //glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    if (CVS->isARBTextureSwizzleUsable())
+    {
+        glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
+            bits.width, bits.rows, GL_RED, GL_UNSIGNED_BYTE, bits.buffer);
+    }
+    else
+    {
+        std::vector<uint32_t> image_data;
+        image_data.resize(texture_size.Width * texture_size.Height,
+            video::SColor(0, 255, 255, 255).color);
+        switch (bits.pixel_mode)
+        {
+            case FT_PIXEL_MODE_GRAY:
+            {
+                // Load the grayscale data in.
+                const float gray_count = static_cast<float>(bits.num_grays);
+                const unsigned int image_pitch =
+                    4 * texture_size.Width / sizeof(unsigned int);
+                uint8_t* glyph_data = bits.buffer;
+                for (unsigned int y = 0; y < (unsigned int)bits.rows; y++)
+                {
+                    uint8_t* row = glyph_data;
+                    for (unsigned int x = 0; x < (unsigned int)bits.width; x++)
+                    {
+                        image_data.data()[y * image_pitch + x] |=
+                            static_cast<uint32_t>(255.0f *
+                            (static_cast<float>(*row++) / gray_count)) << 24;
+                    }
+                    glyph_data += bits.pitch;
+                }
+                break;
+            }
+            default:
+                assert(false);
+        }
+        glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
+            texture_size.Width, texture_size.Height, GL_BGRA, GL_UNSIGNED_BYTE,
+            image_data.data());
+    }
     if (tex->hasMipMaps())
         glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);

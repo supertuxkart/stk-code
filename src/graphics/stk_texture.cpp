@@ -82,6 +82,8 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     if (ProfileWorld::isNoGraphics())
     {
         m_texture_name = 1;
+        if (preload_data)
+            delete[] preload_data;
         return;
     }
 #ifndef SERVER_ONLY
@@ -156,8 +158,8 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
 
     const unsigned int w = m_size.Width;
     const unsigned int h = m_size.Height;
-    unsigned int format = GL_BGRA;
-    unsigned int internal_format = GL_RGBA;
+    unsigned int format = single_channel ? GL_RED : GL_BGRA;
+    unsigned int internal_format = single_channel ? GL_RED : GL_RGBA;
 
 #if !defined(USE_GLES2)
     if (m_mesh_texture && CVS->isTextureCompressionEnabled())
@@ -166,14 +168,14 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
             GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT :
             GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     }
-    else
+    else if (!single_channel)
     {
         internal_format = m_srgb ? GL_SRGB_ALPHA : GL_RGBA;
     }
 #endif
 
 #if defined(USE_GLES2)
-    if (!CVS->isEXTTextureFormatBGRA8888Usable())
+    if (!CVS->isEXTTextureFormatBGRA8888Usable() && !single_channel)
     {
         format = GL_RGBA;
         for (unsigned int i = 0; i < w * h; i++)
@@ -206,6 +208,14 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
         glBindTexture(GL_TEXTURE_2D, m_texture_name);
         if (!reload)
         {
+            if (single_channel)
+            {
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_ONE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_ONE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_ONE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
+            }
             glTexImage2D(GL_TEXTURE_2D, 0, internal_format, w, h, 0, format,
                 GL_UNSIGNED_BYTE, data);
         }
@@ -220,7 +230,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
             glGenerateMipmap(GL_TEXTURE_2D);
     }
 
-    m_texture_size = w * h * 4 /*BRGA*/;
+    m_texture_size = w * h * (single_channel ? 1 : 4);
     if (no_upload)
         m_texture_image = orig_img;
     else if (orig_img)
@@ -454,10 +464,10 @@ bool STKTexture::hasMipMaps() const
 //-----------------------------------------------------------------------------
 void* STKTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 {
-#ifndef SERVER_ONLY
     if (m_texture_image)
         return m_texture_image->lock();
 
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
     uint8_t* pixels = new uint8_t[m_size.Width * m_size.Height * 4]();
     GLint tmp_texture;
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmp_texture);
