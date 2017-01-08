@@ -98,8 +98,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
 
     std::string compressed_texture;
 #if !defined(USE_GLES2)
-    if (!no_upload && !single_channel && m_mesh_texture &&
-        CVS->isTextureCompressionEnabled())
+    if (!no_upload && m_mesh_texture && CVS->isTextureCompressionEnabled())
     {
         std::string orig_file = NamedPath.getPtr();
 
@@ -124,7 +123,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
 
             if (loadCompressedTexture(compressed_texture))
             {
-                Log::verbose("STKTexture", "Compressed %s for texture %s",
+                Log::debug("STKTexture", "Compressed %s for texture %s",
                     compressed_texture.c_str(), orig_file.c_str());
                 return;
             }
@@ -179,15 +178,16 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     unsigned int internal_format = single_channel ? GL_R8 : GL_RGBA;
 
 #if !defined(USE_GLES2)
-    if (m_mesh_texture && CVS->isTextureCompressionEnabled() & !single_channel)
+    if (m_mesh_texture && CVS->isTextureCompressionEnabled())
     {
-        internal_format = m_srgb ?
-            GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT :
+        internal_format = single_channel ? GL_COMPRESSED_RED_RGTC1 :
+            m_srgb ? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT :
             GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     }
-    else if (!single_channel)
+    else
     {
-        internal_format = m_srgb ? GL_SRGB_ALPHA : GL_RGBA;
+        internal_format =
+            single_channel ? GL_R8 : m_srgb ? GL_SRGB_ALPHA : GL_RGBA;
     }
 #endif
 
@@ -408,6 +408,13 @@ bool STKTexture::loadCompressedTexture(const std::string& file_name)
         assert(m_texture_name == 0);
         glGenTextures(1, &m_texture_name);
         glBindTexture(GL_TEXTURE_2D, m_texture_name);
+        if (internal_format == GL_COMPRESSED_RED_RGTC1)
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_ONE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_ONE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_ONE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_RED);
+        }
         glCompressedTexImage2D(GL_TEXTURE_2D, 0, internal_format,
             m_size.Width, m_size.Height, 0, m_texture_size, (GLvoid*)data);
         glGenerateMipmap(GL_TEXTURE_2D);
