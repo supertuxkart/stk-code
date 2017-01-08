@@ -45,8 +45,9 @@ STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
         m_material = material_manager->getMaterialFor(this);
         m_mesh_texture = true;
     }
-#ifndef SERVER_ONLY
+
     bool sc = single_channel;
+#ifndef SERVER_ONLY
     if (!CVS->isGLSL())
         m_srgb = false;
     if (!CVS->isARBTextureSwizzleUsable())
@@ -137,8 +138,6 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
         }
     }
 #endif
-    unsigned int format = single_channel ? GL_RED : GL_BGRA;
-    unsigned int internal_format = single_channel ? GL_R8 : GL_RGBA;
     video::IImage* orig_img = NULL;
     uint8_t* data = preload_data;
     if (data == NULL)
@@ -176,6 +175,8 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
 
     const unsigned int w = m_size.Width;
     const unsigned int h = m_size.Height;
+    unsigned int format = single_channel ? GL_RED : GL_BGRA;
+    unsigned int internal_format = single_channel ? GL_R8 : GL_RGBA;
 
 #if !defined(USE_GLES2)
     if (m_mesh_texture && CVS->isTextureCompressionEnabled() & !single_channel)
