@@ -136,7 +136,8 @@ void STKTexManager::dumpAllTexture(bool mesh_texture)
     {
         if (!p.second || (mesh_texture && !p.second->isMeshTexture()))
             continue;
-        Log::info("STKTexManager", "%s loc: %p", p.first.c_str(), p.second);
+        Log::info("STKTexManager", "%s size: %dK", p.first.c_str(),
+            p.second->getTextureSize());
     }
 }   // dumpAllTexture
 
