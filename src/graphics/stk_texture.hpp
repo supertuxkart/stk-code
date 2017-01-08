@@ -60,7 +60,8 @@ public:
     // ------------------------------------------------------------------------
     STKTexture(const std::string& path, bool srgb = false,
                bool premul_alpha = false, bool set_material = false,
-               bool mesh_tex = false, bool no_upload = false);
+               bool mesh_tex = false, bool no_upload = false,
+               bool single_channel = false);
     // ------------------------------------------------------------------------
     STKTexture(uint8_t* data, const std::string& name, size_t size,
                bool single_channel = false);

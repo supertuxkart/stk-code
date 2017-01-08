@@ -53,7 +53,8 @@ public:
                                      bool premul_alpha = false,
                                      bool set_material = false,
                                      bool mesh_tex = false,
-                                     bool no_upload = false);
+                                     bool no_upload = false,
+                                     bool single_channel = false);
     // ------------------------------------------------------------------------
     irr::video::ITexture* getUnicolorTexture(const irr::video::SColor &c);
     // ------------------------------------------------------------------------

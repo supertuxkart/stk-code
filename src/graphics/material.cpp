@@ -765,7 +765,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             {
                 colorization_mask_tex = stm->getTexture(m_colorization_mask,
                     false/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
-                    true/*mesh_tex*/);
+                    true/*mesh_tex*/, false/*no_upload*/, true/*single_channel*/);
             }
             m->setTexture(2, colorization_mask_tex);
         }
