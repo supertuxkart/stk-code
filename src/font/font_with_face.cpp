@@ -181,8 +181,8 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
         "rendering a glyph to bitmap");
 
     // Convert to an anti-aliased bitmap
-    FT_Bitmap bits = slot->bitmap;
-    core::dimension2du texture_size(bits.width + 1, bits.rows + 1);
+    FT_Bitmap* bits = &(slot->bitmap);
+    core::dimension2du texture_size(bits->width + 1, bits->rows + 1);
     if ((m_used_width + texture_size.Width > getGlyphPageSize() &&
         m_used_height + m_current_height + texture_size.Height >
         getGlyphPageSize())                                     ||
@@ -207,32 +207,32 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     if (CVS->isARBTextureSwizzleUsable())
     {
         glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-            bits.width, bits.rows, GL_RED, GL_UNSIGNED_BYTE, bits.buffer);
+            bits->width, bits->rows, GL_RED, GL_UNSIGNED_BYTE, bits->buffer);
     }
     else
     {
         std::vector<uint32_t> image_data;
         image_data.resize(texture_size.Width * texture_size.Height,
             video::SColor(0, 255, 255, 255).color);
-        switch (bits.pixel_mode)
+        switch (bits->pixel_mode)
         {
             case FT_PIXEL_MODE_GRAY:
             {
                 // Load the grayscale data in.
-                const float gray_count = static_cast<float>(bits.num_grays);
+                const float gray_count = static_cast<float>(bits->num_grays);
                 const unsigned int image_pitch =
                     4 * texture_size.Width / sizeof(unsigned int);
-                uint8_t* glyph_data = bits.buffer;
-                for (unsigned int y = 0; y < (unsigned int)bits.rows; y++)
+                uint8_t* glyph_data = bits->buffer;
+                for (unsigned int y = 0; y < (unsigned)bits->rows; y++)
                 {
                     uint8_t* row = glyph_data;
-                    for (unsigned int x = 0; x < (unsigned int)bits.width; x++)
+                    for (unsigned int x = 0; x < (unsigned)bits->width; x++)
                     {
                         image_data.data()[y * image_pitch + x] |=
                             static_cast<uint32_t>(255.0f *
                             (static_cast<float>(*row++) / gray_count)) << 24;
                     }
-                    glyph_data += bits.pitch;
+                    glyph_data += bits->pitch;
                 }
                 break;
             }
@@ -252,7 +252,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     gui::SGUISpriteFrame f;
     gui::SGUISprite s;
     core::rect<s32> rectangle(m_used_width, m_used_height,
-        m_used_width + bits.width, m_used_height + bits.rows);
+        m_used_width + bits->width, m_used_height + bits->rows);
     f.rectNumber = m_spritebank->getPositions().size();
     f.textureNumber = cur_tex;
 
