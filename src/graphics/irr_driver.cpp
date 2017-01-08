@@ -943,6 +943,7 @@ void IrrDriver::applyResolutionSettings()
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
 
+    setMaxTextureSize();
     //material_manager->reInit();
     material_manager = new MaterialManager();
     material_manager->loadMaterial();
