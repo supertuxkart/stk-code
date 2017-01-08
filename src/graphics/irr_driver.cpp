@@ -67,12 +67,6 @@
 #include "utils/vs.hpp"
 
 #include <irrlicht.h>
-#if defined(USE_GLES2)
-#define _IRR_COMPILE_WITH_OGLES2_
-#include "../../lib/irrlicht/source/Irrlicht/COGLES2Texture.h"
-#else
-#include "../../lib/irrlicht/source/Irrlicht/COpenGLTexture.h"
-#endif
 
 /* Build-time check that the Irrlicht we're building against works for us.
  * Should help prevent distros building against an incompatible library.

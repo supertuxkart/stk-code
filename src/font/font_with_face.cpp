@@ -204,6 +204,7 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 #ifndef SERVER_ONLY
     video::ITexture* tex = m_spritebank->getTexture(cur_tex);
     glBindTexture(GL_TEXTURE_2D, tex->getOpenGLTextureName());
+    assert(bits->pixel_mode == FT_PIXEL_MODE_GRAY);
     if (CVS->isARBTextureSwizzleUsable())
     {
         glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
@@ -211,37 +212,14 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     }
     else
     {
-        std::vector<uint32_t> image_data;
-        image_data.resize(texture_size.Width * texture_size.Height,
-            video::SColor(0, 255, 255, 255).color);
-        switch (bits->pixel_mode)
-        {
-            case FT_PIXEL_MODE_GRAY:
-            {
-                // Load the grayscale data in.
-                const float gray_count = static_cast<float>(bits->num_grays);
-                const unsigned int image_pitch =
-                    4 * texture_size.Width / sizeof(unsigned int);
-                uint8_t* glyph_data = bits->buffer;
-                for (unsigned int y = 0; y < (unsigned)bits->rows; y++)
-                {
-                    uint8_t* row = glyph_data;
-                    for (unsigned int x = 0; x < (unsigned)bits->width; x++)
-                    {
-                        image_data.data()[y * image_pitch + x] |=
-                            static_cast<uint32_t>(255.0f *
-                            (static_cast<float>(*row++) / gray_count)) << 24;
-                    }
-                    glyph_data += bits->pitch;
-                }
-                break;
-            }
-            default:
-                assert(false);
-        }
+        const unsigned int size = bits->width * bits->rows;
+        uint8_t* image_data = new uint8_t[size * 4];
+        memset(image_data, 255, size * 4);
+        for (unsigned int i = 0; i < size; i++)
+            image_data[4 * i + 3] = bits->buffer[i];
         glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-            texture_size.Width, texture_size.Height, GL_BGRA, GL_UNSIGNED_BYTE,
-            image_data.data());
+            bits->width, bits->rows, GL_BGRA, GL_UNSIGNED_BYTE, image_data);
+        delete[] image_data;
     }
     if (tex->hasMipMaps())
         glGenerateMipmap(GL_TEXTURE_2D);
