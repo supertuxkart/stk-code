@@ -28,7 +28,9 @@
 #include <fstream>
 #include <functional>
 
+#if !defined(USE_GLES2)
 static const uint8_t CACHE_VERSION = 1;
+#endif
 // ----------------------------------------------------------------------------
 STKTexture::STKTexture(const std::string& path, bool srgb, bool premul_alpha,
                        bool set_material, bool mesh_tex, bool no_upload)

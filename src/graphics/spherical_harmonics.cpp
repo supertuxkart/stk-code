@@ -17,8 +17,11 @@
 
 #ifndef SERVER_ONLY
 
-#include "graphics/irr_driver.hpp"
 #include "graphics/spherical_harmonics.hpp"
+#if defined(USE_GLES2)
+#include "graphics/central_settings.hpp"
+#endif
+#include "graphics/irr_driver.hpp"
 #include "graphics/stk_texture.hpp"
 #include "utils/log.hpp"
 
@@ -410,6 +413,18 @@ void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spher
             (m_spherical_harmonics_textures[idx])->getTextureImage();
         assert(img != NULL);
         img->copyToScaling(sh_rgba[i], sh_w, sh_h);
+#if defined(USE_GLES2)
+        if (!CVS->isEXTTextureFormatBGRA8888Usable())
+        {
+            // Code here assume color format is BGRA
+            for (unsigned int j = 0; j < sh_w * sh_h; j++)
+            {
+                char tmp_val = sh_rgba[i][j * 4];
+                sh_rgba[i][j * 4] = sh_rgba[i][j * 4 + 2];
+                sh_rgba[i][j * 4 + 2] = tmp_val;
+            }
+        }
+#endif
     } //for (unsigned i = 0; i < 6; i++)
 
     Color *float_tex_cube[6];
@@ -420,7 +435,7 @@ void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spher
     {
         delete[] sh_rgba[i];
         delete[] float_tex_cube[i];
-    }    
+    }
 } //setSphericalHarmonicsTextures
 
 /** Compute spherical harmonics coefficients from ambient light */

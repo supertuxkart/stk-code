@@ -167,11 +167,15 @@ void Skybox::generateCubeMapFromTextures()
         img->copyToScaling(rgba[i], size, size);
 
 #if defined(USE_GLES2)
-        for (unsigned int j = 0; j < size * size; j++)
+        if (CVS->isEXTTextureFormatBGRA8888Usable())
         {
-            char tmp_val = rgba[i][j*4];
-            rgba[i][j*4] = rgba[i][j*4 + 2];
-            rgba[i][j*4 + 2] = tmp_val;
+            // BGRA image returned by getTextureImage causes black sky in gles
+            for (unsigned int j = 0; j < size * size; j++)
+            {
+                char tmp_val = rgba[i][j * 4];
+                rgba[i][j * 4] = rgba[i][j * 4 + 2];
+                rgba[i][j * 4 + 2] = tmp_val;
+            }
         }
 #endif
 
