@@ -35,7 +35,7 @@ private:
 
     uint64_t m_texture_handle;
 
-    bool m_srgb, m_premul_alpha, m_mesh_texture;
+    bool m_srgb, m_premul_alpha, m_mesh_texture, m_single_channel;
 
     Material* m_material;
 
@@ -119,7 +119,6 @@ public:
     unsigned int getTextureSize() const              { return m_texture_size; }
     // ------------------------------------------------------------------------
     void reload(bool no_upload = false, uint8_t* preload_data = NULL,
-                bool single_channel = false,
                 video::IImage* preload_img = NULL);
     // ------------------------------------------------------------------------
     video::IImage* getTextureImage()                { return m_texture_image; }
