@@ -518,9 +518,8 @@ u64 STKTexture::getHandle()
 
     if (!glIsTextureHandleResidentARB(m_texture_handle))
         glMakeTextureHandleResidentARB(m_texture_handle);
-
-    return m_texture_handle;
 #endif
+    return m_texture_handle;
 }   // getHandle
 
 //-----------------------------------------------------------------------------
