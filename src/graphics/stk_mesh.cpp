@@ -23,10 +23,8 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/materials.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/stk_tex_manager.hpp"
-#include "graphics/texture_manager.hpp"
 
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
@@ -397,14 +395,7 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
     {
         if (!mesh.TextureHandles[i])
         {
-            mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(
-                mesh.textures[i]->getOpenGLTextureName(),
-                ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
-        }
-        if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
-        {
-            glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
-            insertTextureHandle(mesh.TextureHandles[i]);
+            mesh.TextureHandles[i] = mesh.textures[i]->getHandle();
         }
     }
 #endif
@@ -486,14 +477,7 @@ void initTexturesTransparent(GLMesh &mesh)
     {
         if (!mesh.TextureHandles[0])
         {
-            mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(
-                mesh.textures[0]->getOpenGLTextureName(),
-                ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
-        }
-        if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
-        {
-            glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
-            insertTextureHandle(mesh.TextureHandles[0]);
+            mesh.TextureHandles[0] = mesh.textures[0]->getHandle();
         }
     }
 #endif

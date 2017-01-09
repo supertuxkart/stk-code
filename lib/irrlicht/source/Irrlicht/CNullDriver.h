@@ -745,6 +745,7 @@ namespace video
 			virtual ECOLOR_FORMAT getColorFormat() const { return video::ECF_A1R5G5B5; };
 			virtual u32 getPitch() const { return 0; }
 			virtual u32 getOpenGLTextureName() const { return 0; }
+			virtual u64 getHandle() { return 0; }
 			virtual void regenerateMipMapLevels(void* mipmapData=0) {};
 			core::dimension2d<u32> size;
 		};

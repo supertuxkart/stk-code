@@ -26,7 +26,6 @@
 #include "graphics/render_info.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/texture_manager.hpp"
 #include "graphics/vao_manager.hpp"
 #include "tracks/track.hpp"
 #include "modes/world.hpp"
@@ -360,15 +359,7 @@ void STKMeshSceneNode::render()
             {
                 if (!mesh.TextureHandles[0])
                 {
-                    mesh.TextureHandles[0] = 
-                        glGetTextureSamplerHandleARB(mesh.textures[0]->getOpenGLTextureName(),
-                                                     ObjectPass1Shader
-                                                     ::getInstance()->m_sampler_ids[0]);
-                }
-                if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
-                {
-                    glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
-                    insertTextureHandle(mesh.TextureHandles[0]);
+                    mesh.TextureHandles[0] = mesh.textures[0]->getHandle();
                 }
                 ObjectPass1Shader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
             }
@@ -420,34 +411,13 @@ void STKMeshSceneNode::render()
                                     ObjectPass2Shader::getInstance()->m_sampler_ids[2]);
 
                 if (!mesh.TextureHandles[0])
-                    mesh.TextureHandles[0] = 
-                    glGetTextureSamplerHandleARB(mesh.textures[0]->getOpenGLTextureName(),
-                                ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
-                if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
-                {
-                    glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
-                    insertTextureHandle(mesh.TextureHandles[0]);
-                }
+                    mesh.TextureHandles[0] = mesh.textures[0]->getHandle();
 
                 if (!mesh.TextureHandles[1])
-                    mesh.TextureHandles[1] =
-                    glGetTextureSamplerHandleARB(mesh.textures[1]->getOpenGLTextureName(),
-                                ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
-                if (!glIsTextureHandleResidentARB(mesh.TextureHandles[1]))
-                {
-                    glMakeTextureHandleResidentARB(mesh.TextureHandles[1]);
-                    insertTextureHandle(mesh.TextureHandles[1]);
-                }
+                    mesh.TextureHandles[1] = mesh.textures[1]->getHandle();
 
                 if (!mesh.TextureHandles[2])
-                    mesh.TextureHandles[2] =
-                    glGetTextureSamplerHandleARB(mesh.textures[2]->getOpenGLTextureName(),
-                                ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
-                if (!glIsTextureHandleResidentARB(mesh.TextureHandles[2]))
-                {
-                    glMakeTextureHandleResidentARB(mesh.TextureHandles[2]);
-                    insertTextureHandle(mesh.TextureHandles[2]);
-                }
+                    mesh.TextureHandles[2] = mesh.textures[2]->getHandle();
 
                 ObjectPass2Shader::getInstance()
                     ->setTextureHandles(DiffuseHandle, SpecularHandle, SSAOHandle,
@@ -532,14 +502,7 @@ void STKMeshSceneNode::render()
                     if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])
-                            mesh.TextureHandles[0] =
-                            glGetTextureSamplerHandleARB(mesh.textures[0]->getOpenGLTextureName(),
-                                   ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
-                        if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
-                        {
-                            glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
-                            insertTextureHandle(mesh.TextureHandles[0]);
-                        }
+                            mesh.TextureHandles[0] = mesh.textures[0]->getHandle();
                         Shaders::TransparentFogShader::getInstance()
                                     ->setTextureHandles(mesh.TextureHandles[0]);
                     }
@@ -574,14 +537,7 @@ void STKMeshSceneNode::render()
                     if (CVS->isAZDOEnabled())
                     {
                         if (!mesh.TextureHandles[0])
-                            mesh.TextureHandles[0] =
-                            glGetTextureSamplerHandleARB(mesh.textures[0]->getOpenGLTextureName(),
-                            ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
-                        if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
-                        {
-                            glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
-                            insertTextureHandle(mesh.TextureHandles[0]);
-                        }
+                            mesh.TextureHandles[0] = mesh.textures[0]->getHandle();
                         Shaders::TransparentShader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
                     }
                     else

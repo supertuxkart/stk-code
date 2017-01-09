@@ -17,7 +17,7 @@
 
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/materials.hpp"
 #include "graphics/stk_texture.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -222,3 +222,19 @@ core::stringw STKTexManager::reloadTexture(const irr::core::stringw& name)
 #endif   // !SERVER_ONLY
     return result + "reloaded.";
 }   // reloadTexture
+
+// ----------------------------------------------------------------------------
+void STKTexManager::reset()
+{
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    if (!CVS->isAZDOEnabled()) return;
+    for (auto p : m_all_textures)
+    {
+        if (p.second == NULL)
+            continue;
+        p.second->unloadHandle();
+    }
+    // Driver seems to crash if texture handles are not cleared...
+    ObjectPass1Shader::getInstance()->recreateTrilinearSampler(0);
+#endif
+}   // reset

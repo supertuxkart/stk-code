@@ -67,6 +67,8 @@ public:
     int dumpTextureUsage();
     // ------------------------------------------------------------------------
     irr::core::stringw reloadTexture(const irr::core::stringw& name);
+    // ------------------------------------------------------------------------
+    void reset();
 
 };   // STKTexManager
 

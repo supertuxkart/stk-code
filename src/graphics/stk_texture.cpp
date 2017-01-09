@@ -15,12 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "config/user_config.hpp"
 #include "graphics/stk_texture.hpp"
+#include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/materials.hpp"
 #include "modes/profile_world.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
@@ -73,6 +74,7 @@ STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
 STKTexture::~STKTexture()
 {
 #ifndef SERVER_ONLY
+    unloadHandle();
     if (m_texture_name != 0)
     {
         glDeleteTextures(1, &m_texture_name);
@@ -433,9 +435,9 @@ bool STKTexture::loadCompressedTexture(const std::string& file_name)
  *   file name. This function should only be used for textures sent to
  *   glTexImage2D with a compressed internal format as argument.<br>
  *   \note The following format is used to save the compressed texture:<br>
- *         <internal-format><w><h><orig_w><orig_h><size><data> <br>
- *         The first six elements are integers and the last one is stored
- *         on \c size bytes.
+ *         <version><internal-format><w><h><orig_w><orig_h><size><data> <br>
+ *         The first element is the version of cache, next six elements are
+ *         integers and the last one is stored on \c size bytes.
  *   \see loadCompressedTexture
  */
 void STKTexture::saveCompressedTexture(const std::string& compressed_tex)
@@ -502,3 +504,34 @@ void* STKTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 #endif   // !SERVER_ONLY
     return NULL;
 }   // lock
+
+//-----------------------------------------------------------------------------
+u64 STKTexture::getHandle()
+{
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    assert(CVS->isAZDOEnabled());
+    if (m_texture_handle != 0) return m_texture_handle;
+
+    m_texture_handle =
+        glGetTextureSamplerHandleARB( m_texture_name,
+        ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
+
+    if (!glIsTextureHandleResidentARB(m_texture_handle))
+        glMakeTextureHandleResidentARB(m_texture_handle);
+
+    return m_texture_handle;
+#endif
+}   // getHandle
+
+//-----------------------------------------------------------------------------
+void STKTexture::unloadHandle()
+{
+#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
+    if (CVS->isAZDOEnabled())
+    {
+        if (m_texture_handle == 0) return;
+        glMakeTextureHandleNonResidentARB(m_texture_handle);
+        m_texture_handle = 0;
+    }
+#endif
+}   // unloadHandle

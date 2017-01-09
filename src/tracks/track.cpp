@@ -406,6 +406,7 @@ void Track::cleanup()
     irr_driver->clearLights();
     irr_driver->clearForcedBloom();
     irr_driver->clearBackgroundNodes();
+    STKTexManager::getInstance()->reset();
 
     if(UserConfigParams::logMemory())
     {
