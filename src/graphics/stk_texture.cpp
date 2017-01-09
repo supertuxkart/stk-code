@@ -71,6 +71,16 @@ STKTexture::STKTexture(uint8_t* data, const std::string& name, size_t size,
 }   // STKTexture
 
 // ----------------------------------------------------------------------------
+STKTexture::STKTexture(video::IImage* img, const std::string& name)
+          : video::ITexture(name.c_str()), m_texture_handle(0), m_srgb(false),
+            m_premul_alpha(false), m_mesh_texture(false), m_material(NULL),
+            m_texture_name(0), m_texture_size(0), m_texture_image(NULL)
+{
+    reload(false/*no_upload*/, NULL/*preload_data*/, false/*single_channel*/,
+        img);
+}   // STKTexture
+
+// ----------------------------------------------------------------------------
 STKTexture::~STKTexture()
 {
 #ifndef SERVER_ONLY
@@ -86,7 +96,7 @@ STKTexture::~STKTexture()
 
 // ----------------------------------------------------------------------------
 void STKTexture::reload(bool no_upload, uint8_t* preload_data,
-                        bool single_channel)
+                        bool single_channel, video::IImage* preload_img)
 {
     if (ProfileWorld::isNoGraphics())
     {
@@ -143,7 +153,7 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
     uint8_t* data = preload_data;
     if (data == NULL)
     {
-        orig_img =
+        orig_img = preload_img ? preload_img :
             irr_driver->getVideoDriver()->createImageFromFile(NamedPath);
         if (orig_img == NULL)
         {

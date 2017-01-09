@@ -31,6 +31,8 @@
 #include "graphics/shaders.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/stk_texture.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "graphics/weather.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -769,18 +771,20 @@ PostProcessing::PostProcessing(IVideoDriver* video_driver)
     {
         m_material.TextureLayer[i].TextureWrapU =
         m_material.TextureLayer[i].TextureWrapV = ETC_CLAMP_TO_EDGE;
-        }
+    }
 
     // Load the MLAA area map
     io::IReadFile *areamap = irr_driver->getDevice()->getFileSystem()->
                          createMemoryReadFile((void *) AreaMap33, sizeof(AreaMap33),
                          "AreaMap33", false);
-    if (!areamap)
+    video::IImage* img = irr_driver->getVideoDriver()->createImageFromFile(areamap);
+    m_areamap = new STKTexture(img, "AreaMap33");
+    if (m_areamap->getOpenGLTextureName() == 0)
     {
         Log::fatal("postprocessing", "Failed to load the areamap");
         return;
     }
-    m_areamap = irr_driver->getVideoDriver()->getTexture(areamap);
+    STKTexManager::getInstance()->addTexture(m_areamap);
     areamap->drop();
 
 }   // PostProcessing

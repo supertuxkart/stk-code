@@ -66,6 +66,8 @@ public:
     STKTexture(uint8_t* data, const std::string& name, size_t size,
                bool single_channel = false);
     // ------------------------------------------------------------------------
+    STKTexture(video::IImage* img, const std::string& name);
+    // ------------------------------------------------------------------------
     virtual ~STKTexture();
     // ------------------------------------------------------------------------
     virtual void* lock(video::E_TEXTURE_LOCK_MODE mode =
@@ -117,7 +119,8 @@ public:
     unsigned int getTextureSize() const              { return m_texture_size; }
     // ------------------------------------------------------------------------
     void reload(bool no_upload = false, uint8_t* preload_data = NULL,
-                bool single_channel = false);
+                bool single_channel = false,
+                video::IImage* preload_img = NULL);
     // ------------------------------------------------------------------------
     video::IImage* getTextureImage()                { return m_texture_image; }
 

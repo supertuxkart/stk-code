@@ -122,6 +122,7 @@ void STKTexManager::removeTexture(STKTexture* texture, bool remove_all)
         }
     }
 #ifdef DEBUG
+    if (!remove_all) return;
     for (const std::string& s : undeleted_texture)
     {
         Log::error("STKTexManager", "%s undeleted!", s.c_str());
