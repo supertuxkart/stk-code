@@ -40,7 +40,6 @@
 #include "IWriteFile.h"
 #include "IXMLWriter.h"
 
-#include "BuiltInFont.h"
 #include "os.h"
 
 namespace irr
@@ -77,8 +76,6 @@ CGUIEnvironment::CGUIEnvironment(io::IFileSystem* fs, video::IVideoDriver* drive
 	IGUIElementFactory* factory = new CDefaultGUIElementFactory(this);
 	registerGUIElementFactory(factory);
 	factory->drop();
-
-	loadBuiltInFont();
 
 	IGUISkin* skin = createSkin( gui::EGST_WINDOWS_METALLIC );
 	setSkin(skin);
@@ -164,29 +161,6 @@ CGUIEnvironment::~CGUIEnvironment()
 		Driver = 0;
 	}
 }
-
-
-void CGUIEnvironment::loadBuiltInFont()
-{
-	io::IReadFile* file = io::createMemoryReadFile(BuiltInFontData, BuiltInFontDataSize, DefaultFontName, false);
-
-	CGUIFont* font = new CGUIFont(this, DefaultFontName );
-	if (!font->load(file))
-	{
-		os::Printer::log("Error: Could not load built-in Font. Did you compile without the BMP loader?", ELL_ERROR);
-		font->drop();
-		file->drop();
-		return;
-	}
-
-	SFont f;
-	f.NamedPath.setPath(DefaultFontName);
-	f.Font = font;
-	Fonts.push_back(f);
-
-	file->drop();
-}
-
 
 //! draws all gui elements
 void CGUIEnvironment::drawAll()

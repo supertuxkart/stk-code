@@ -262,8 +262,6 @@ private:
 
 	void updateHoveredElement(core::position2d<s32> mousePos);
 
-	void loadBuiltInFont();
-
 	struct SFont
 	{
 		io::SNamedPath NamedPath;
