@@ -332,8 +332,8 @@ const video::ITexture* IconButtonWidget::getTexture()
 // -----------------------------------------------------------------------------
 video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* texture)
 {
-    STKTexture* stk_tex = static_cast<STKTexture*>(texture);
 #ifndef SERVER_ONLY
+    STKTexture* stk_tex = static_cast<STKTexture*>(texture);
     // Compressed texture can't be turned into greyscale
     if (stk_tex->isMeshTexture() && CVS->isTextureCompressionEnabled())
         return stk_tex;
@@ -369,8 +369,10 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
         }
         return stkm->addTexture(new STKTexture(image, name));
     }
-#endif   // !SERVER_ONLY
     return disabled_stk_tex;
+#else
+    return texture;
+#endif   // !SERVER_ONLY
 }
 
 // -----------------------------------------------------------------------------
