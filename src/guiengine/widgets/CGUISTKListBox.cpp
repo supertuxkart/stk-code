@@ -366,11 +366,11 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
 
                 case EMIE_LMOUSE_LEFT_UP:
                 {
-                    if (isPointInside(p) && !Moving)
-                        selectNew(event.MouseInput.Y);
-                        
                     Selecting = false;
                     Moving = false;
+
+                    if (isPointInside(p) && !Moving)
+                        selectNew(event.MouseInput.Y);
 
                     return true;
                 }
@@ -664,12 +664,11 @@ void CGUISTKListBox::recalculateIconWidth()
 
 void CGUISTKListBox::setCell(u32 row_num, u32 col_num, const wchar_t* text, s32 icon)
 {
-    if ( row_num >= Items.size() )
+    if ( row_num >= Items.size() || col_num >= Items[row_num].m_contents.size())
         return;
-        if ( col_num >= Items[row_num].m_contents.size() )
-                return;
-        Items[row_num].m_contents[col_num].m_text = text;
-        Items[row_num].m_contents[col_num].m_icon = icon;
+
+    Items[row_num].m_contents[col_num].m_text = text;
+    Items[row_num].m_contents[col_num].m_icon = icon;
 
     recalculateItemHeight();
     recalculateIconWidth();
