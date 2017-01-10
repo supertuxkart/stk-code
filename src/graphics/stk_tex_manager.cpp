@@ -56,7 +56,8 @@ STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
 video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
                                            bool premul_alpha,
                                            bool set_material, bool mesh_tex,
-                                           bool no_upload, bool single_channel)
+                                           bool no_upload, bool single_channel,
+                                           bool create_if_unfound)
 {
     auto ret = m_all_textures.find(path);
     if (!no_upload && ret != m_all_textures.end())
@@ -73,24 +74,29 @@ video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
             return new_texture;
     }
 
-    new_texture = new STKTexture(full_path.empty() ? path : full_path, srgb,
-        premul_alpha, set_material, mesh_tex, no_upload, single_channel);
-    if (new_texture->getOpenGLTextureName() == 0 && !no_upload)
+    if (create_if_unfound)
     {
-        m_all_textures[new_texture->getName().getPtr()] = NULL;
-        delete new_texture;
-        return NULL;
+        new_texture = new STKTexture(full_path.empty() ? path : full_path,
+            srgb, premul_alpha, set_material, mesh_tex, no_upload,
+            single_channel);
+        if (new_texture->getOpenGLTextureName() == 0 && !no_upload)
+        {
+            m_all_textures[new_texture->getName().getPtr()] = NULL;
+            delete new_texture;
+            return NULL;
+        }
     }
 
-    if (!no_upload)
+    if (create_if_unfound && !no_upload)
         addTexture(new_texture);
     return new_texture;
 }   // getTexture
 
 // ----------------------------------------------------------------------------
-void STKTexManager::addTexture(STKTexture* texture)
+video::ITexture* STKTexManager::addTexture(STKTexture* texture)
 {
     m_all_textures[texture->getName().getPtr()] = texture;
+    return texture;
 }   // addTexture
 
 // ----------------------------------------------------------------------------

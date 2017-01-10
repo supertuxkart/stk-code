@@ -54,11 +54,12 @@ public:
                                      bool set_material = false,
                                      bool mesh_tex = false,
                                      bool no_upload = false,
-                                     bool single_channel = false);
+                                     bool single_channel = false,
+                                     bool create_if_unfound = true);
     // ------------------------------------------------------------------------
     irr::video::ITexture* getUnicolorTexture(const irr::video::SColor &c);
     // ------------------------------------------------------------------------
-    void addTexture(STKTexture* texture);
+    irr::video::ITexture* addTexture(STKTexture* texture);
     // ------------------------------------------------------------------------
     void removeTexture(STKTexture* texture, bool remove_all = false);
     // ------------------------------------------------------------------------
