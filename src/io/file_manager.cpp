@@ -791,7 +791,7 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
     for (unsigned int i=0; i<split.size(); i++)
     {
         current_path += split[i] + "/";
-        Log::info("[FileManager]", "Checking for: '%s",
+        Log::verbose("[FileManager]", "Checking for: '%s",
                     current_path.c_str());
         if (!m_file_system->existFile(io::path(current_path.c_str())))
         {
