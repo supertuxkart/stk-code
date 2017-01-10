@@ -27,7 +27,7 @@ CGUISTKListBox::CGUISTKListBox(IGUIEnvironment* environment, IGUIElement* parent
     ItemHeight(0),ItemHeightOverride(0),
     TotalItemHeight(0), ItemsIconWidth(0), MousePosY(0), Font(0), IconBank(0),
     ScrollBar(0), selectTime(0), Selecting(false), Moving(false),
-    DrawBack(drawBack), MoveOverSelect(moveOverSelect), AutoScroll(true), 
+    DrawBack(drawBack), MoveOverSelect(moveOverSelect), AutoScroll(true),
     HighlightWhenNotFocused(true)
 {
     #ifdef _DEBUG
@@ -367,7 +367,6 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                 case EMIE_LMOUSE_LEFT_UP:
                 {
                     Selecting = false;
-                    Moving = false;
 
                     if (isPointInside(p) && !Moving)
                         selectNew(event.MouseInput.Y);
@@ -388,7 +387,7 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                         Moving = true;
                         Selecting = false;
                     }
-                    
+
                     if (Moving)
                     {
                         int pos = ScrollBar->getPos() - event.MouseInput.Y + MousePosY;
