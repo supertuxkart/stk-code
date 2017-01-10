@@ -23,7 +23,7 @@
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/cached_characteristic.hpp"
 #include "karts/combined_characteristic.hpp"
@@ -225,8 +225,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 
     // Load material
     std::string materials_file = m_root+"materials.xml";
-    file_manager->pushModelSearchPath  (m_root);
-    file_manager->pushTextureSearchPath(m_root);
+    std::string unique_id = StringUtils::insertValues("karts/%s", m_ident.c_str());
+    file_manager->pushModelSearchPath(m_root);
+    file_manager->pushTextureSearchPath(m_root, unique_id);
 
     irr_driver->setTextureErrorMessage("Error while loading kart '%s':",
                                        m_name);
@@ -252,7 +253,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 #ifndef SERVER_ONLY
     if (m_minimap_icon == NULL)
     {
-        m_minimap_icon = getUnicolorTexture(m_color);
+        m_minimap_icon = STKTexManager::getInstance()->getUnicolorTexture(m_color);
     }
 #endif
 

@@ -23,9 +23,8 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/materials.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
@@ -389,22 +388,14 @@ static void setTexture(GLMesh &mesh, unsigned i, bool is_srgb,
                    mat_name.c_str());
         // use unicolor texture to replace missing texture
         mesh.textures[i] = 
-                      getUnicolorTexture(video::SColor(255, 127, 127, 127));
+                      STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 127, 127, 127));
     }
-    compressTexture(mesh.textures[i], is_srgb);
 #if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[i])
         {
-            mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(
-                getTextureGLuint(mesh.textures[i]),
-                ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
-        }
-        if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
-        {
-            glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
-            insertTextureHandle(mesh.TextureHandles[i]);
+            mesh.TextureHandles[i] = mesh.textures[i]->getHandle();
         }
     }
 #endif
@@ -479,22 +470,14 @@ void initTexturesTransparent(GLMesh &mesh)
 {
     if (!mesh.textures[0])
     {
-        mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+        mesh.textures[0] = STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 255, 255));
     }
-    compressTexture(mesh.textures[0], true);
 #if !defined(USE_GLES2)
     if (CVS->isAZDOEnabled())
     {
         if (!mesh.TextureHandles[0])
         {
-            mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(
-                getTextureGLuint(mesh.textures[0]),
-                ObjectPass1Shader::getInstance()->m_sampler_ids[0]);
-        }
-        if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
-        {
-            glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
-            insertTextureHandle(mesh.TextureHandles[0]);
+            mesh.TextureHandles[0] = mesh.textures[0]->getHandle();
         }
     }
 #endif

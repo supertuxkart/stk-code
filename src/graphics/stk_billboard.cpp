@@ -23,7 +23,6 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/shared_gpu_objects.hpp"
-#include "graphics/texture_manager.hpp"
 #include "graphics/texture_shader.hpp"
 
 #include <ISceneManager.h>
@@ -110,10 +109,8 @@ void STKBillboard::render()
     else
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    compressTexture(tex, true, true);
-    GLuint texid = getTextureGLuint(tex);
     BillboardShader::getInstance()->use();
-    BillboardShader::getInstance()->setTextureUnits(texid);
+    BillboardShader::getInstance()->setTextureUnits(tex->getOpenGLTextureName());
     BillboardShader::getInstance()->setUniforms(irr_driver->getViewMatrix(), 
                                                 irr_driver->getProjMatrix(),
                                                 pos, Size);

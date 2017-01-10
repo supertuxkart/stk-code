@@ -27,6 +27,7 @@
 
 class FrameBuffer;
 class RTT;
+class STKTexture;
 
 namespace irr
 {
@@ -63,7 +64,7 @@ private:
      *  the vertex position, normal, and texture coordinate. */
     std::vector<Quad> m_vertices;
 
-    video::ITexture *m_areamap;
+    STKTexture* m_areamap;
 
     void setMotionBlurCenterY(const u32 num, const float y);
 

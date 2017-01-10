@@ -78,13 +78,8 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
 }
 
 //-----------------------------------------------------------------------------
-
-Material* MaterialManager::getMaterialFor(video::ITexture* t,
-    video::E_MATERIAL_TYPE material_type)
+Material* MaterialManager::getMaterialFor(video::ITexture* t)
 {
-    if (t == NULL)
-        return getDefaultMaterial(material_type);
-
     core::stringc img_path = core::stringc(t->getName());
 	img_path.make_lower();
 
@@ -116,6 +111,19 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
             }
         }   // for i
     }
+    return NULL;
+}
+
+//-----------------------------------------------------------------------------
+Material* MaterialManager::getMaterialFor(video::ITexture* t,
+    video::E_MATERIAL_TYPE material_type)
+{
+    if (t == NULL)
+        return getDefaultMaterial(material_type);
+
+    Material* m = getMaterialFor(t);
+    if (m != NULL)
+        return m;
 
     return getDefaultMaterial(material_type);
 }

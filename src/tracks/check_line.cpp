@@ -20,7 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
@@ -103,9 +103,9 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
                               : video::SColor(128, 128, 128, 128);
         }
         buffer->recalculateBoundingBox();
-        buffer->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-        buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-        buffer->getMaterial().setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+        buffer->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
         buffer->getMaterial().BackfaceCulling = false;
         //mesh->setBoundingBox(buffer->getBoundingBox());
         m_debug_node = irr_driver->addMesh(mesh, "checkdebug");
@@ -153,7 +153,7 @@ void CheckLine::changeDebugColor(bool is_active)
         vertices[i].Color = color;
     }
 #ifndef SERVER_ONLY
-    buffer->getMaterial().setTexture(0, getUnicolorTexture(color));
+    buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(color));
 #endif
 
 }   // changeDebugColor

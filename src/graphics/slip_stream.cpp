@@ -23,7 +23,7 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
@@ -102,7 +102,7 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
         video::SMaterial &mat = buffer->getMaterial();
         // Meshes need a texture, otherwise stk crashes.
 #ifndef SERVER_ONLY
-        video::ITexture *red_texture = getUnicolorTexture(red);
+        video::ITexture *red_texture = STKTexManager::getInstance()->getUnicolorTexture(red);
         mat.setTexture(0, red_texture);
 #endif
 

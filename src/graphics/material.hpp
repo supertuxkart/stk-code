@@ -267,7 +267,7 @@ private:
     bool  m_installed;
 
     void  init    ();
-    void  install ();
+    void  install (bool srgb = false, bool premul_alpha = false);
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
 
@@ -290,7 +290,7 @@ public:
     void isInitiallyHidden(scene::IMeshBuffer* who);
 
     /** Returns the ITexture associated with this material. */
-    video::ITexture *getTexture();
+    video::ITexture *getTexture(bool srgb = true, bool premul_alpha = false);
     // ------------------------------------------------------------------------
     bool  isIgnore           () const { return m_ignore;             }
     // ------------------------------------------------------------------------
@@ -419,7 +419,8 @@ public:
     /** True if this texture should have the U coordinates mirrored. */
     char getMirrorAxisInReverse() const { return m_mirror_axis_when_reverse; }
     // ------------------------------------------------------------------------
-} ;
+    const std::string getAlphaMask() const                 { return m_mask; }
+};
 
 
 #endif

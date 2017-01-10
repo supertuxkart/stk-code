@@ -33,7 +33,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "io/xml_node.hpp"
@@ -399,12 +399,11 @@ Material::Material(const XMLNode *node, bool deprecated)
         m_high_tire_adhesion = true;
 }   // Material
 //-----------------------------------------------------------------------------
-
-video::ITexture* Material::getTexture()
+video::ITexture* Material::getTexture(bool srgb, bool premul_alpha)
 {
     if (!m_installed)
     {
-        install();
+        install(srgb, premul_alpha);
     }
     return m_texture;
 }   // getTexture
@@ -489,25 +488,27 @@ void Material::init()
 }   // init
 
 //-----------------------------------------------------------------------------
-void Material::install()
+void Material::install(bool srgb, bool premul_alpha)
 {
     // Don't load a texture that are not supposed to be loaded automatically
     if (m_installed) return;
 
     m_installed = true;
 
-    if (m_complain_if_not_found && m_full_path.size() == 0)
+    if (m_texname.find(".") == std::string::npos || m_full_path.empty())
     {
-        Log::error("material", "Cannot find texture '%s'.", m_texname.c_str());
+        if (m_complain_if_not_found)
+        {
+            Log::error("material", "Cannot find texture '%s'.",
+                m_texname.c_str());
+        }
         m_texture = NULL;
     }
-
     else
     {
-        m_texture = irr_driver->getTexture(m_full_path,
-                                           false, //isPreMul(),
-                                           false, //isPreDiv(),
-                                           m_complain_if_not_found);
+        m_texture = STKTexManager::getInstance()->getTexture
+            (m_full_path, srgb, premul_alpha, false/*set_material*/,
+            srgb/*mesh_tex*/);
     }
 
     if (m_texture == NULL) return;
@@ -515,10 +516,6 @@ void Material::install()
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::getBasename(m_texname);
 
-    if (m_mask.size() > 0)
-    {
-        irr_driver->applyMask(m_texture, m_mask);
-    }
     m_texture->grab();
 }   // install
 
@@ -747,22 +744,28 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         ITexture *tex;
         ITexture *glossytex;
+        STKTexManager* stm = STKTexManager::getInstance();
         if (m_gloss_map.size() > 0 && UserConfigParams::m_dynamic_lights)
         {
-            glossytex = irr_driver->getTexture(m_gloss_map);
+            glossytex = stm->getTexture(m_gloss_map, false/*srgb*/,
+                false/*premul_alpha*/, false/*set_material*/,
+                true/*mesh_tex*/);
         }
         else
         {
-            glossytex = getUnicolorTexture(SColor(0, 0, 0, 0));
+            glossytex = stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(0, 0, 0, 0));
         }
 
         if (!m->getTexture(2))
         {
             // Only set colorization mask if not set
-            ITexture *colorization_mask_tex = getUnicolorTexture(SColor(0, 0, 0, 0));
+            ITexture *colorization_mask_tex =
+                stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(0, 0, 0, 0));
             if (m_colorization_mask.size() > 0)
             {
-                colorization_mask_tex = irr_driver->getTexture(m_colorization_mask);
+                colorization_mask_tex = stm->getTexture(m_colorization_mask,
+                    false/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
+                    true/*mesh_tex*/, false/*no_upload*/, true/*single_channel*/);
             }
             m->setTexture(2, colorization_mask_tex);
         }
@@ -818,24 +821,32 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(1, glossytex);
             return;
         case SHADERTYPE_SPLATTING:
-            tex = irr_driver->getTexture(m_splatting_texture_1);
+            tex = stm->getTexture(m_splatting_texture_1,
+                true/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
+                true/*mesh_tex*/);
             m->setTexture(3, tex);
 
             if (m_splatting_texture_2.size() > 0)
             {
-                tex = irr_driver->getTexture(m_splatting_texture_2);
+                tex = stm->getTexture(m_splatting_texture_2,
+                    true/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
+                    true/*mesh_tex*/);
             }
             m->setTexture(4, tex);
 
             if (m_splatting_texture_3.size() > 0)
             {
-                tex = irr_driver->getTexture(m_splatting_texture_3);
+                tex = stm->getTexture(m_splatting_texture_3,
+                    true/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
+                    true/*mesh_tex*/);
             }
             m->setTexture(5, tex);
 
             if (m_splatting_texture_4.size() > 0)
             {
-                tex = irr_driver->getTexture(m_splatting_texture_4);
+                tex = stm->getTexture(m_splatting_texture_4,
+                    false/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
+                    true/*mesh_tex*/);
             }
             m->setTexture(6, tex);
             m->setTexture(7, glossytex);
@@ -868,14 +879,21 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         }
 
         if (!m->getTexture(0))
-            m->setTexture(0, getUnicolorTexture(SColor(255, 255, 255, 255)));
+        {
+            m->setTexture(0,
+                stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(255, 255, 255, 255)));
+        }
 
         if (m_normal_map_tex.size() > 0)
         {
             if (UserConfigParams::m_dynamic_lights)
-                tex = irr_driver->getTexture(m_normal_map_tex);
+            {
+                tex = stm->getTexture(m_normal_map_tex, false/*srgb*/,
+                    false/*premul_alpha*/, false/*set_material*/,
+                    true/*mesh_tex*/);
+            }
             else
-                tex = getUnicolorTexture(SColor(0, 0, 0, 0));
+                tex = stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(0, 0, 0, 0));
             m->setTexture(3, tex);
 
             // Material and shaders
@@ -891,7 +909,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             if (m->getTexture(1) != glossytex)
                 m->setTexture(3, m->getTexture(1));
             if (!m->getTexture(3))
-                m->setTexture(3, getUnicolorTexture(SColor(255, 255, 255, 255)));
+                m->setTexture(3, stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(255, 255, 255, 255)));
         }
         m->setTexture(1, glossytex);
     }

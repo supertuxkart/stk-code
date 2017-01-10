@@ -54,7 +54,6 @@ private:
     std::vector<GlowData>       m_glowing;
     size_t                      m_nb_static_glowing;
 
-    void compressPowerUpTextures();
     void setOverrideMaterial();
     
     void addItemsInGlowingList();

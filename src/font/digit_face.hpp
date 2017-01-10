@@ -29,6 +29,8 @@ class FaceTTF;
 class DigitFace : public FontWithFace
 {
 private:
+    virtual bool supportLazyLoadChar() const OVERRIDE         { return false; }
+    // ------------------------------------------------------------------------
     virtual unsigned int getGlyphPageSize() const OVERRIDE      { return 256; }
     // ------------------------------------------------------------------------
     virtual float getScalingFactorOne() const OVERRIDE         { return 0.7f; }
@@ -43,8 +45,6 @@ public:
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void reset() OVERRIDE;
-    // ------------------------------------------------------------------------
-    virtual bool supportLazyLoadChar() const OVERRIDE         { return false; }
 
 };   // DigitFace
 

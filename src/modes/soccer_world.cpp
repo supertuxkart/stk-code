@@ -25,6 +25,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_info.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
@@ -325,10 +326,18 @@ void SoccerWorld::initKartList()
     const unsigned int kart_amount = (unsigned int)m_karts.size();
 
     //Loading the indicator textures
-    irr::video::ITexture *red =
-            irr_driver->getTexture(FileManager::GUI, "soccer_player_red.png");
-    irr::video::ITexture *blue =
-            irr_driver->getTexture(FileManager::GUI, "soccer_player_blue.png");
+    std::string red_path =
+            file_manager->getAsset(FileManager::GUI, "soccer_player_red.png");
+    std::string blue_path =
+            file_manager->getAsset(FileManager::GUI, "soccer_player_blue.png");
+
+    video::ITexture* red = STKTexManager::getInstance()->getTexture
+        (red_path, true/*srgb*/, true/*premul_alpha*/, false/*set_material*/,
+        true/*mesh_tex*/);
+
+    video::ITexture* blue = STKTexManager::getInstance()->getTexture
+        (blue_path, true/*srgb*/, true/*premul_alpha*/, false/*set_material*/,
+        true/*mesh_tex*/);
 
     //Assigning indicators
     for(unsigned int i = 0; i < kart_amount; i++)

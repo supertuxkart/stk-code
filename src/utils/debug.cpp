@@ -29,7 +29,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "items/powerup_manager.hpp"
@@ -133,7 +133,7 @@ enum DebugMenuCommand
     DEBUG_ADJUST_LIGHTS,
     DEBUG_SCRIPT_CONSOLE,
     DEBUG_RUN_CUTSCENE,
-    DEBUG_RELOAD_TEXTURE,
+    DEBUG_TEXTURE_CONSOLE,
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -687,15 +687,24 @@ bool handleContextMenuAction(s32 cmd_id)
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
             });
         break;
-        case DEBUG_RELOAD_TEXTURE:
+        case DEBUG_TEXTURE_CONSOLE:
         new GeneralTextFieldDialog(
             L"Enter the texture filename(s) (separate names by ;)"
-            " to be reloaded (empty to reload all)", []
+            " to be reloaded (empty to reload all)\n"
+            "Press tus; for texture usage stats (shown in console)", []
             (const irr::core::stringw& text) {},
             [] (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
             {
 #ifndef SERVER_ONLY
-                lw->setText(reloadTexture(tb->getText()), true);
+                core::stringw t = tb->getText();
+                STKTexManager* stktm = STKTexManager::getInstance();
+                if (t == "tus;")
+                {
+                    stktm->dumpAllTexture(false/*mesh_texture*/);
+                    stktm->dumpTextureUsage();
+                    return false;
+                }
+                lw->setText(stktm->reloadTexture(t), true);
 #endif
                 // Don't close the dialog after each run
                 return false;
@@ -809,7 +818,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Adjust Lights", DEBUG_ADJUST_LIGHTS);
             mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
             mnu->addItem(L"Run cutscene(s)", DEBUG_RUN_CUTSCENE);
-            mnu->addItem(L"Reload texture", DEBUG_RELOAD_TEXTURE);
+            mnu->addItem(L"Texture console", DEBUG_TEXTURE_CONSOLE);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();

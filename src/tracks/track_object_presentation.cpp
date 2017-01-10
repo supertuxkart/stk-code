@@ -31,6 +31,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -231,7 +232,8 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
             return;
         }
 
-        file_manager->pushTextureSearchPath(lib_path + "/");
+        std::string unique_id = StringUtils::insertValues("library/%s", name.c_str());
+        file_manager->pushTextureSearchPath(lib_path + "/", unique_id);
         file_manager->pushModelSearchPath(lib_path);
         material_manager->pushTempMaterial(lib_path + "/materials.xml");
         model_def_loader.addToLibrary(name, libroot);
@@ -437,7 +439,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                       World::getWorld()->getIdent() == IDENT_CUTSCENE);
 
     m_model_file = model_file;
-    file_manager->pushTextureSearchPath(StringUtils::getPath(model_file));
+    //file_manager->pushTextureSearchPath(StringUtils::getPath(model_file));
 #ifndef SERVER_ONLY
     if (file_manager->fileExists(model_file))
     {
@@ -465,7 +467,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         throw std::runtime_error("Model '" + model_file + "' cannot be found");
     }
 
-    file_manager->popTextureSearchPath();
+    //file_manager->popTextureSearchPath();
     init(NULL, NULL, true);
 }   // TrackObjectPresentationMesh
 
@@ -830,9 +832,10 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(
         xml_node.get("start",  &m_fade_out_start);
         xml_node.get("end",    &m_fade_out_end  );
     }
+    video::ITexture* texture = STKTexManager::getInstance()->getTexture
+        (file_manager->searchTexture(texture_name), true/*srgb*/,
+        true/*premul_alpha*/, false/*set_material*/, true/*mesh_tex*/);
 
-    video::ITexture* texture =
-        irr_driver->getTexture(file_manager->searchTexture(texture_name));
     if (texture == NULL)
     {
         Log::warn("TrackObjectPresentation", "Billboard texture '%s' not found",

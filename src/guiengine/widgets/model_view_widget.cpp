@@ -57,6 +57,7 @@ IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, 
 // -----------------------------------------------------------------------------
 ModelViewWidget::~ModelViewWidget()
 {
+    clearModels();
     GUIEngine::needsUpdate.remove(this);
 #ifndef SERVER_ONLY    
     delete m_render_info;
@@ -92,6 +93,7 @@ void ModelViewWidget::clearModels()
     if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
     if (m_light != NULL) m_light->remove();
     if (m_camera != NULL) m_camera->remove();
+    irr_driver->clearLights();
 
     m_rtt_main_node = NULL;
     m_camera = NULL;
