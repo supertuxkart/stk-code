@@ -279,9 +279,15 @@ enum AnimType {ANIMS_NONE         = 0,
                ANIMS_PLAYERS_ONLY = 1,
                ANIMS_ALL          = 2 };
 
-enum GeometryLevel {GEOLEVEL_0    = 0,
-                    GEOLEVEL_1    = 1,
-                    GEOLEVEL_2    = 2 };
+enum GeometryLevel
+{
+    /** Display everything */
+    GEOLEVEL_0    = 0,
+    /** a few details are displayed */
+    GEOLEVEL_1    = 1,
+    /** Lowest level, no details are displayed. */
+    GEOLEVEL_2    = 2
+};
 
 /** Using X-macros for setting-possible values is not very pretty, but it's a
  *  no-maintenance case :
