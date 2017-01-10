@@ -394,14 +394,6 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                         ScrollBar->setPos(pos);
                         MousePosY = event.MouseInput.Y;
                     }
-                    else if (Selecting || MoveOverSelect)
-                    {
-                        if (isPointInside(p))
-                        {
-                            selectNew(event.MouseInput.Y, true);
-                            return true;
-                        }
-                    }
                 default:
                 break;
                 }
@@ -423,16 +415,15 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
 
 void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
 {
-    u32 now = (u32)StkTime::getTimeSinceEpoch();
+    u32 now = (u32)StkTime::getRealTime() * 1000;
     s32 oldSelected = Selected;
 
     Selected = getItemAt(AbsoluteRect.UpperLeftCorner.X, ypos);
-    if (Selected<0 && !Items.empty())
+    if (Selected < 0 && !Items.empty())
         Selected = 0;
 
     recalculateScrollPos();
 
-    gui::EGUI_EVENT_TYPE eventType = (Selected == oldSelected && now < selectTime + 500) ? EGET_LISTBOX_SELECTED_AGAIN : EGET_LISTBOX_CHANGED;
     selectTime = now;
     // post the news
     if (Parent && !onlyHover)
@@ -441,7 +432,14 @@ void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
         event.EventType = EET_GUI_EVENT;
         event.GUIEvent.Caller = this;
         event.GUIEvent.Element = 0;
-        event.GUIEvent.EventType = eventType;
+        
+#if !defined(ANDROID)
+        if (Selected != oldSelected /*|| now < selectTime + 500*/)
+            event.GUIEvent.EventType = EGET_LISTBOX_CHANGED;
+        else
+#endif
+            event.GUIEvent.EventType = EGET_LISTBOX_SELECTED_AGAIN;
+            
         Parent->OnEvent(event);
     }
 }
