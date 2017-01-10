@@ -101,7 +101,7 @@ public:
     static int getLength() { return 9; }
     // ------------------------------------------------------------------------
     /** Copies the important data from this objects into a memory buffer. */
-    void copyToBuffer(BareNetworkString *buffer) const
+    void saveState(BareNetworkString *buffer) const
     {
         buffer->add(m_steer);
         buffer->add(m_accel);
@@ -110,7 +110,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Restores this object from a previously saved memory  buffer. */
-    void setFromBuffer(BareNetworkString *buffer)
+    void rewindTo(BareNetworkString *buffer)
     {
         m_steer = buffer->getFloat();
         m_accel = buffer->getFloat();

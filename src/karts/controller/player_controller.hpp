@@ -45,10 +45,14 @@ public:
     virtual     ~PlayerController  ();
     virtual void update            (float) OVERRIDE;
     virtual void action            (PlayerAction action, int value) OVERRIDE;
+    virtual void actionFromNetwork(PlayerAction action, int value,
+                                   int value_l, int value_r);
     virtual void skidBonusTriggered() OVERRIDE;
     virtual void reset             () OVERRIDE;
     virtual void handleZipper(bool play_sound) OVERRIDE;
     virtual void resetInputState();
+    virtual void saveState(BareNetworkString *buffer) const OVERRIDE;
+    virtual void rewindTo(BareNetworkString *buffer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void  collectedItem(const Item &item, int add_info=-1,
                                 float previous_energy=0            ) OVERRIDE

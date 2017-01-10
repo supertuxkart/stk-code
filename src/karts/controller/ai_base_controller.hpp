@@ -20,6 +20,7 @@
 #define HEADER_AI_BASE_CONTROLLER_HPP
 
 #include "karts/controller/controller.hpp"
+#include "utils/cpp2011.hpp"
 
 class AIProperties;
 class Track;
@@ -71,6 +72,7 @@ protected:
     /** This can be called to detect if the kart is stuck (i.e. repeatedly
     *  hitting part of the track). */
     bool         isStuck() const { return m_stuck; }
+    // ------------------------------------------------------------------------
     void         determineTurnRadius(const Vec3 &end, Vec3 *center,
                                      float *radius) const;
     virtual void update      (float delta);
@@ -98,6 +100,10 @@ public:
     virtual bool isLocalPlayerController() const { return false; }
     virtual void action(PlayerAction action, int value) {};
     virtual void skidBonusTriggered() {};
+    // ------------------------------------------------------------------------
+    /** Not used for AIs. */
+    virtual void saveState(BareNetworkString *buffer) const OVERRIDE {}
+    virtual void rewindTo(BareNetworkString *buffer) OVERRIDE {}
 
 };   // AIBaseController
 

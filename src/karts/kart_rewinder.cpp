@@ -21,6 +21,7 @@
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/controller.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
@@ -78,7 +79,8 @@ BareNetworkString* KartRewinder::saveState() const
 
     // 2) Steering and other player controls
     // -------------------------------------
-    getControls().copyToBuffer(buffer);
+    getControls().saveState(buffer);
+    getController()->saveState(buffer);
 
     // 3) Attachment
     // -------------
@@ -124,7 +126,8 @@ void KartRewinder::rewindToState(BareNetworkString *buffer)
 
     // 2) Steering and other controls
     // ------------------------------
-    getControls().setFromBuffer(buffer);
+    getControls().rewindTo(buffer);
+    getController()->rewindTo(buffer);
 
     // 3) Attachment
     // -------------

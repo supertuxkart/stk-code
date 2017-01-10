@@ -21,6 +21,8 @@
 #include <irrString.h>
 using namespace irr;
 
+class BareNetworkString;
+
 /**
   * \defgroup controller Karts/controller
   * Contains kart controllers, which are either human players or AIs
@@ -31,6 +33,7 @@ using namespace irr;
 #include "states_screens/state_manager.hpp"
 
 class AbstractKart;
+class BareNetworString;
 class Item;
 class KartControl;
 class Material;
@@ -74,6 +77,9 @@ public:
      *  rubber-banding. */
     virtual bool  isPlayerController () const = 0;
     virtual bool  disableSlipstreamBonus() const = 0;
+    virtual void  saveState(BareNetworkString *buffer) const = 0;
+    virtual void  rewindTo(BareNetworkString *buffer) = 0;
+
     // ---------------------------------------------------------------------------
     /** Sets the controller name for this controller. */
     virtual void setControllerName(const std::string &name)

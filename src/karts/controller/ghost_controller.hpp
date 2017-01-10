@@ -58,6 +58,9 @@ public:
     virtual void action(PlayerAction action, int value) OVERRIDE;
     virtual void skidBonusTriggered() {};
     virtual void newLap(int lap) {};
+    virtual void saveState(BareNetworkString *buffer) const {};
+    virtual void rewindTo(BareNetworkString *buffer) {};
+
     void         addReplayTime(float time);
     // ------------------------------------------------------------------------
     bool         isReplayEnd() const

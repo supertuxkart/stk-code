@@ -93,6 +93,9 @@ void PlayerController::resetInputState()
  */
 void PlayerController::action(PlayerAction action, int value)
 {
+    Log::info("action", "t %f action %d value %d val_l %d val_r %d val %d",
+        World::getWorld()->getTime(), action, value,
+        m_steer_val_l, m_steer_val_r, m_steer_val);
     switch (action)
     {
     case PA_STEER_LEFT:
@@ -189,6 +192,15 @@ void PlayerController::action(PlayerAction action, int value)
 }   // action
 
 //-----------------------------------------------------------------------------
+void PlayerController::actionFromNetwork(PlayerAction p_action, int value,
+                                         int value_l, int value_r)
+{
+    m_steer_val_l = value_l;
+    m_steer_val_r = value_r;
+    action(p_action, value);
+}   // actionFromNetwork
+
+//-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
  */
 void PlayerController::steer(float dt, int steer_val)
@@ -203,6 +215,8 @@ void PlayerController::steer(float dt, int steer_val)
         steer = 0;
     }
 
+    Log::info("steer", "t %f dt %f steer_val %d steer %f",
+        World::getWorld()->getTime(), dt, steer_val, steer);
     // Amount the steering is changed for digital devices.
     // If the steering is 'back to straight', a different steering
     // change speed is used.
@@ -316,3 +330,18 @@ void PlayerController::handleZipper(bool play_sound)
 {
     m_kart->showZipperFire();
 }   // handleZipper
+
+//-----------------------------------------------------------------------------
+void PlayerController::saveState(BareNetworkString *buffer) const
+{
+    buffer->addUInt32(m_steer_val).addUInt32(m_steer_val_l)
+           .addUInt32(m_steer_val_r);
+}   // copyToBuffer
+
+//-----------------------------------------------------------------------------
+void PlayerController::rewindTo(BareNetworkString *buffer)
+{
+    m_steer_val   = buffer->getUInt32();
+    m_steer_val_l = buffer->getUInt32();
+    m_steer_val_r = buffer->getUInt32();
+}   // rewindTo

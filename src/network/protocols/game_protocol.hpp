@@ -52,6 +52,8 @@ private:
         int          m_kart_id;
         PlayerAction m_action;
         int          m_value;
+        int          m_value_l;
+        int          m_value_r;
     };   // struct Action
 
     // List of all kart actions to send to the server
@@ -67,7 +69,7 @@ public:
     virtual void update(float dt) OVERRIDE;
 
     void controllerAction(int kart_id, PlayerAction action,
-                          int value);
+                          int value, int val_l, int val_r);
     void startNewState();
     void addState(BareNetworkString *buffer);
     void sendState();

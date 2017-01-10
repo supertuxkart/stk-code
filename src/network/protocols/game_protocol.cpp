@@ -65,7 +65,8 @@ void GameProtocol::update(float dt)
     {
         m_data_to_send->addFloat(a.m_time);
         m_data_to_send->addUInt8(a.m_kart_id);
-        m_data_to_send->addUInt8((uint8_t)(a.m_action)).addUInt32(a.m_value);
+        m_data_to_send->addUInt8((uint8_t)(a.m_action)).addUInt32(a.m_value)
+                       .addUInt32(a.m_value_l).addUInt32(a.m_value_r);
     }   // for a in m_all_actions
 
         // FIXME: for now send reliable
@@ -102,7 +103,7 @@ bool GameProtocol::notifyEventAsynchronous(Event* event)
  *  \param value New value for the given action.
  */
 void GameProtocol::controllerAction(int kart_id, PlayerAction action,
-                                    int value)
+                                    int value, int val_l, int val_r)
 {
     // Store the action in the list of actions that will be sent to the
     // server next.
@@ -111,6 +112,8 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
     a.m_kart_id = kart_id;
     a.m_action  = action;
     a.m_value   = value;
+    a.m_value_l = val_l;
+    a.m_value_r = val_r;
     a.m_time    = World::getWorld()->getTime();
 
     m_all_actions.push_back(a);
@@ -118,7 +121,8 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
     // Store the event in the rewind manager, which is responsible
     // for freeing the allocated memory
     BareNetworkString *s = new BareNetworkString(4);
-    s->addUInt8(kart_id).addUInt8(action).addUInt16(uint16_t(value));
+    s->addUInt8(kart_id).addUInt8(action).addUInt32(value)
+                        .addUInt32(val_l).addUInt32(val_r);
     RewindManager::get()->addEvent(this, s, /*confirmed*/true,
                                    World::getWorld()->getTime() );
 
@@ -143,11 +147,14 @@ void GameProtocol::handleControllerAction(Event *event)
         assert(kart_id < World::getWorld()->getNumKarts());
 
         PlayerAction action = (PlayerAction)(data.getUInt8());
-        int          value  = data.getUInt32();
-        Log::info("GameProtocol", "Action at %f: %d %d %d",
-                  time, kart_id, action, value);
+        int value   = data.getUInt32();
+        int value_l = data.getUInt32();
+        int value_r = data.getUInt32();
+        Log::info("GameProtocol", "Action at %f: %d %d %d %d %d",
+                  time, kart_id, action, value, value_l, value_r);
         BareNetworkString *s = new BareNetworkString(3);
-        s->addUInt8(kart_id).addUInt8(action).addUInt16(value);
+        s->addUInt8(kart_id).addUInt8(action).addUInt32(value)
+                            .addUInt32(value_l).addUInt32(value_r);
         RewindManager::get()->addNetworkEvent(this, s, time);
     }
 
@@ -241,7 +248,12 @@ void GameProtocol::rewind(BareNetworkString *buffer)
 {
     int kart_id = buffer->getUInt8();
     PlayerAction action = PlayerAction(buffer->getUInt8());
-    int value = buffer->getUInt16();
+    int value   = buffer->getUInt32();
+    int value_l = buffer->getUInt32();
+    int value_r = buffer->getUInt32();
     Controller *c = World::getWorld()->getKart(kart_id)->getController();
-    c->action(action, value);
+    PlayerController *pc = dynamic_cast<PlayerController*>(c);
+    assert(pc);
+    if(pc)
+        pc->actionFromNetwork(action, value, value_l, value_r);
 }   // rewind

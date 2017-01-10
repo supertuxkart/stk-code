@@ -494,19 +494,21 @@ void RewindManager::rewindTo(float rewind_time)
     {
         state->rewind();
         index++;
-        //rindex--;
         if(index==m_rewind_info.end()) break;
         state = dynamic_cast<RewindInfoState*>(*index);
     }
 
     // Now go forward through the list of rewind infos:
     // ------------------------------------------------
-    while( world->getTime() < current_time )
+    // Need to exit loop if in-game menu is open, since world clock
+    // will not be increased while the game is paused
+    while( world->getTime() < current_time &&
+           World::getWorld()->getPhase()!=WorldStatus::IN_GAME_MENU_PHASE)
     {
         // Now handle all states and events at the current time before
         // updating the world:
         while(index !=m_rewind_info.end() &&
-              (*index)->getTime()<=world->getTime()+0.001f)
+              (*index)->getTime()<=world->getTime())
         {
             if((*index)->isState())
             {
