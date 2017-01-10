@@ -42,6 +42,7 @@
 #include "utils/log.hpp"
 
 #include "IMeshManipulator.h"
+#include <algorithm>
 
 #define SKELETON_DEBUG 0
 
@@ -175,6 +176,9 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]);
         animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP] );
         animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_END]  );
+        animation_node->get("backpedal-left", &m_animation_frame[AF_BACK_LEFT]);
+        animation_node->get("backpedal",      &m_animation_frame[AF_BACK_STRAIGHT]);
+        animation_node->get("backpedal-right",&m_animation_frame[AF_BACK_RIGHT]);
         animation_node->get("start-speed-weighted", &m_animation_frame[AF_SPEED_WEIGHTED_START]);
         animation_node->get("end-speed-weighted",   &m_animation_frame[AF_SPEED_WEIGHTED_END]  );
         animation_node->get("speed",          &m_animation_speed               );
@@ -733,12 +737,27 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
     if(m_current_animation==AF_DEFAULT)
     {
         m_animated_node->setLoopMode(false);
-        if(m_animation_frame[AF_LEFT] <= m_animation_frame[AF_RIGHT])
-            m_animated_node->setFrameLoop(m_animation_frame[AF_LEFT],
-                                          m_animation_frame[AF_RIGHT] );
+        const bool support_backpedal =
+            m_animation_frame[AF_BACK_STRAIGHT] > -1 &&
+            m_animation_frame[AF_BACK_LEFT] > -1 &&
+            m_animation_frame[AF_BACK_RIGHT] > -1;
+        if (support_backpedal)
+        {
+            int start_frame = std::min(m_animation_frame[AF_LEFT],
+                m_animation_frame[AF_RIGHT]);
+            int end_frame = std::max(m_animation_frame[AF_BACK_LEFT],
+                m_animation_frame[AF_BACK_RIGHT]);
+            m_animated_node->setFrameLoop(start_frame, end_frame);
+        }
         else
-            m_animated_node->setFrameLoop(m_animation_frame[AF_RIGHT],
-                                          m_animation_frame[AF_LEFT] );
+        {
+            if(m_animation_frame[AF_LEFT] <= m_animation_frame[AF_RIGHT])
+                m_animated_node->setFrameLoop(m_animation_frame[AF_LEFT],
+                                              m_animation_frame[AF_RIGHT] );
+            else
+                m_animated_node->setFrameLoop(m_animation_frame[AF_RIGHT],
+                                              m_animation_frame[AF_LEFT] );
+        }
         m_animated_node->setAnimationEndCallback(NULL);
         m_animated_node->setAnimationSpeed(0);
     }
@@ -979,15 +998,23 @@ void KartModel::update(float dt, float distance, float steer, float speed,
 
     // Update animation if necessary
     // -----------------------------
+    const bool back = m_animation_frame[AF_BACK_STRAIGHT] > -1 && speed < 0.0f;
     float frame;
-    if(steer>0.0f)      frame = m_animation_frame[AF_STRAIGHT]
+    if(steer>0.0f && back) frame = m_animation_frame[AF_BACK_STRAIGHT]
+                                 - ( ( m_animation_frame[AF_BACK_STRAIGHT]
+                                   -m_animation_frame[AF_BACK_RIGHT]  )*steer);
+    else if(steer<0.0f && back) frame = m_animation_frame[AF_BACK_STRAIGHT]
+                              + ( (m_animation_frame[AF_BACK_STRAIGHT]
+                                   -m_animation_frame[AF_BACK_LEFT]   )*steer);
+    else if(steer>0.0f) frame = m_animation_frame[AF_STRAIGHT]
                               - ( ( m_animation_frame[AF_STRAIGHT]
                                         -m_animation_frame[AF_RIGHT]  )*steer);
     else if(steer<0.0f) frame = m_animation_frame[AF_STRAIGHT]
                               + ( (m_animation_frame[AF_STRAIGHT]
                                         -m_animation_frame[AF_LEFT]   )*steer);
-    else                frame = (float)m_animation_frame[AF_STRAIGHT];
-
+    else                frame = (float)(back ?
+                                m_animation_frame[AF_BACK_STRAIGHT] :
+                                m_animation_frame[AF_STRAIGHT]);
     m_animated_node->setCurrentFrame(frame);
 }   // update
 
