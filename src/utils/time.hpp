@@ -136,18 +136,10 @@ public:
     class ScopeProfiler
     {
         float m_time;
+        std::string m_name;
     public:
-        ScopeProfiler(const char* name)
-        {
-            printf("%s {\n", name);
-            m_time = (float)getRealTime();
-        }
-
-        ~ScopeProfiler()
-        {
-            float f2 = (float)getRealTime();
-            printf("} // took %f s\n", (f2 - m_time));
-        }
+        ScopeProfiler(const char* name);
+        ~ScopeProfiler();
     };   // class ScopeProfiler
 
 };   // namespace time
