@@ -175,9 +175,7 @@ video::ITexture* STKTexManager::getUnicolorTexture(const irr::video::SColor &c)
     memcpy(data + 4, &c.color, sizeof(video::SColor));
     memcpy(data + 8, &c.color, sizeof(video::SColor));
     memcpy(data + 12, &c.color, sizeof(video::SColor));
-    STKTexture* texture = new STKTexture(data, name, 2);
-    addTexture(texture);
-    return texture;
+    return addTexture(new STKTexture(data, name, 2));
 
 }   // getUnicolorTexture
 

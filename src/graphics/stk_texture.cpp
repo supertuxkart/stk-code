@@ -135,7 +135,9 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
                 cache_subdir + container_id;
             compressed_texture = cache_dir + "/" + basename + ".stktz";
 
-            if (loadCompressedTexture(compressed_texture))
+            if ((!file_manager->fileExists(compressed_texture) ||
+                file_manager->fileIsNewer(compressed_texture, orig_file)) &&
+                loadCompressedTexture(compressed_texture))
             {
                 Log::debug("STKTexture", "Compressed %s for texture %s",
                     compressed_texture.c_str(), orig_file.c_str());
