@@ -103,6 +103,11 @@ void FontWithFace::reset()
     m_new_char_holder.clear();
     m_character_area_map.clear();
     m_character_glyph_info_map.clear();
+    for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
+    {
+        STKTexManager::getInstance()->removeTexture(
+            static_cast<STKTexture*>(m_spritebank->getTexture(i)));
+    }
     m_spritebank->clear();
     createNewGlyphPage();
 }   // reset
@@ -150,8 +155,7 @@ void FontWithFace::createNewGlyphPage()
         false
 #endif
         );
-    m_spritebank->addTexture(stkt);
-    STKTexManager::getInstance()->addTexture(stkt);
+    m_spritebank->addTexture(STKTexManager::getInstance()->addTexture(stkt));
 }   // createNewGlyphPage
 
 // ----------------------------------------------------------------------------
