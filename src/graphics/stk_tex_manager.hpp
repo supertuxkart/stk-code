@@ -39,6 +39,10 @@ class STKTexManager : public Singleton<STKTexManager>, NoCopy
 private:
     std::unordered_map<std::string, STKTexture*> m_all_textures;
 
+    /** Additional details to be shown in case that a texture is not found.
+     *  This is used to specify details like: "while loading kart '...'" */
+    std::string m_texture_error_message;
+
     // ------------------------------------------------------------------------
     STKTexture* findTextureInFileSystem(const std::string& filename,
                                         std::string* full_path);
@@ -70,6 +74,59 @@ public:
     irr::core::stringw reloadTexture(const irr::core::stringw& name);
     // ------------------------------------------------------------------------
     void reset();
+    // ------------------------------------------------------------------------
+    /** Returns the currently defined texture error message, which is used
+     *  by event_handler.cpp to print additional info about irrlicht
+     *  internal errors or warnings. If no error message is currently
+     *  defined, the error message is "".
+     */
+    const std::string &getTextureErrorMessage()
+    {
+        return m_texture_error_message;
+    }   // getTextureErrorMessage
+    // ------------------------------------------------------------------------
+    void setTextureErrorMessage(const std::string &error,
+                                const std::string &detail="");
+    // ------------------------------------------------------------------------
+    /** Disables the texture error message again.
+     */
+    void unsetTextureErrorMessage()           { m_texture_error_message = ""; }
+    // ------------------------------------------------------------------------
+    /** Convenience function that loads a texture with default parameters
+     *  but includes an error message.
+     *  \param filename File name of the texture to load.
+     *  \param error Error message, potentially with a '%' which will be
+     *               replaced with detail.
+     *  \param detail String to replace a '%' in the error message.
+     */
+    irr::video::ITexture* getTexture(const std::string &filename,
+                                     const std::string &error_message,
+                                     const std::string &detail="")
+    {
+        setTextureErrorMessage(error_message, detail);
+        irr::video::ITexture *tex = getTexture(filename);
+        unsetTextureErrorMessage();
+        return tex;
+    }   // getTexture
+    // ------------------------------------------------------------------------
+    /** Convenience function that loads a texture with default parameters
+     *  but includes an error message.
+     *  \param filename File name of the texture to load.
+     *  \param error Error message, potentially with a '%' which will be
+     *               replaced with detail.
+     *  \param detail String to replace a '%' in the error message.
+     */
+    irr::video::ITexture* getTexture(const std::string &filename,
+                                     char *error_message,
+                                     char *detail = NULL)
+    {
+        if (!detail)
+            return getTexture(filename, std::string(error_message),
+                              std::string(""));
+
+        return getTexture(filename, std::string(error_message),
+                          std::string(detail));
+    }   // getTexture
 
 };   // STKTexManager
 

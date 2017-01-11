@@ -161,15 +161,12 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
             irr_driver->getVideoDriver()->createImageFromFile(NamedPath);
         if (orig_img == NULL)
         {
-            Log::warn("STKTexture", "No image %s.", NamedPath.getPtr());
             return;
         }
 
         if (orig_img->getDimension().Width  == 0 ||
             orig_img->getDimension().Height == 0)
         {
-            Log::warn("STKTexture", "image %s has 0 size.",
-                NamedPath.getPtr());
             orig_img->drop();
             return;
         }

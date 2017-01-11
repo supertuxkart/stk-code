@@ -36,7 +36,9 @@ STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
     io::path relative_path = file_manager->searchTexture(filename).c_str();
     if (relative_path.empty())
     {
-        Log::warn("STKTexManager", "Failed to load %s.", filename.c_str());
+        if (!m_texture_error_message.empty())
+            Log::error("STKTexManager", "%s", m_texture_error_message.c_str());
+        Log::error("STKTexManager", "Failed to load %s.", filename.c_str());
         return NULL;
     }
     *full_path =
@@ -81,7 +83,15 @@ video::ITexture* STKTexManager::getTexture(const std::string& path, bool srgb,
             single_channel);
         if (new_texture->getOpenGLTextureName() == 0 && !no_upload)
         {
-            m_all_textures[new_texture->getName().getPtr()] = NULL;
+            const char* name = new_texture->getName().getPtr();
+            if (!m_texture_error_message.empty())
+            {
+                Log::error("STKTexManager", "%s",
+                    m_texture_error_message.c_str());
+            }
+            Log::error("STKTexManager", "Texture %s not found or invalid.",
+                name);
+            m_all_textures[name] = NULL;
             delete new_texture;
             return NULL;
         }
@@ -243,3 +253,21 @@ void STKTexManager::reset()
     ObjectPass1Shader::getInstance()->recreateTrilinearSampler(0);
 #endif
 }   // reset
+
+// ----------------------------------------------------------------------------
+/** Sets an error message to be displayed when a texture is not found. This
+ *  error message is shown before the "Texture %s not found or invalid"
+ *  message. It can be used to supply additional details like what kart is
+ *  currently being loaded.
+ *  \param error Error message, potentially with a '%' which will be replaced
+ *               with detail.
+ *  \param detail String to replace a '%' in the error message.
+ */
+void STKTexManager::setTextureErrorMessage(const std::string &error,
+                                           const std::string &detail)
+{
+    if (detail=="")
+        m_texture_error_message = error;
+    else
+        m_texture_error_message = StringUtils::insertValues(error, detail);
+}   // setTextureErrorMessage

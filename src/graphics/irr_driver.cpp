@@ -1545,32 +1545,6 @@ void IrrDriver::removeCameraSceneNode(scene::ICameraSceneNode *camera)
 }   // removeCameraSceneNode
 
 // ----------------------------------------------------------------------------
-/** Sets an error message to be displayed when a texture is not found. This
- *  error message is shown before the "Texture '%s' not found" message. It can
- *  be used to supply additional details like what kart is currently being
- *  loaded.
- *  \param error Error message, potentially with a '%' which will be replaced
- *               with detail.
- *  \param detail String to replace a '%' in the error message.
- */
-void IrrDriver::setTextureErrorMessage(const std::string &error,
-                                       const std::string &detail)
-{
-    if(detail=="")
-        m_texture_error_message = error;
-    else
-        m_texture_error_message = StringUtils::insertValues(error, detail);
-}   // setTextureErrorMessage
-
-// ----------------------------------------------------------------------------
-/** Disables the texture error message again.
- */
-void IrrDriver::unsetTextureErrorMessage()
-{
-    m_texture_error_message = "";
-}   // unsetTextureErrorMessage
-
-// ----------------------------------------------------------------------------
 /** Loads a texture from a file and returns the texture object. This is just
  *  a convenient wrapper which loads the texture from a STK asset directory.
  *  It calls the file manager to get the full path, then calls the normal

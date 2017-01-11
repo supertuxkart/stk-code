@@ -21,7 +21,6 @@
 #include "addons/addon.hpp"
 #include "config/stk_config.hpp"
 #include "config/player_manager.hpp"
-#include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
@@ -229,8 +228,8 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     file_manager->pushModelSearchPath(m_root);
     file_manager->pushTextureSearchPath(m_root, unique_id);
 
-    irr_driver->setTextureErrorMessage("Error while loading kart '%s':",
-                                       m_name);
+    STKTexManager::getInstance()
+        ->setTextureErrorMessage("Error while loading kart '%s':", m_name);
 
     // addShared makes sure that these textures/material infos stay in memory
     material_manager->addSharedMaterial(materials_file);
@@ -245,8 +244,11 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                                                     /*make_permanent*/true,
                                                     /*complain_if_not_found*/true,
                                                     /*strip_path*/false);
-    if(m_minimap_icon_file!="")
-        m_minimap_icon = irr_driver->getTexture(m_root+m_minimap_icon_file);
+    if (m_minimap_icon_file!="")
+    {
+        m_minimap_icon = STKTexManager::getInstance()
+            ->getTexture(m_root+m_minimap_icon_file);
+    }
     else
         m_minimap_icon = NULL;
 
@@ -296,9 +298,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // used.
     m_wheel_base = fabsf(m_kart_model->getLength() - 2*0.25f);
 
-    m_shadow_texture = irr_driver->getTexture(m_shadow_file);
+    m_shadow_texture = STKTexManager::getInstance()->getTexture(m_shadow_file);
 
-    irr_driver->unsetTextureErrorMessage();
+    STKTexManager::getInstance()->unsetTextureErrorMessage();
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath();
 

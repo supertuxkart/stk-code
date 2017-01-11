@@ -99,10 +99,6 @@ private:
 
     core::dimension2du m_actual_screen_size;
 
-    /** Additional details to be shown in case that a texture is not found.
-     *  This is used to specify details like: "while loading kart '...'" */
-    std::string                 m_texture_error_message;
-
     /** The main MRT setup. */
     core::array<video::IRenderTarget> m_mrt;
 
@@ -293,9 +289,6 @@ public:
     void                  printRenderStats();
     bool                  supportsSplatting();
     void                  requestScreenshot();
-    void                  setTextureErrorMessage(const std::string &error,
-                                                 const std::string &detail="");
-    void                  unsetTextureErrorMessage();
     class GPUTimer        &getGPUTimer(unsigned);
 
 #ifndef SERVER_ONLY
@@ -312,56 +305,7 @@ public:
         m_clear_color = color;
     }   // setClearbackBufferColor
 
-    // ------------------------------------------------------------------------
-    /** Convenience function that loads a texture with default parameters
-     *  but includes an error message.
-     *  \param filename File name of the texture to load.
-     *  \param error Error message, potentially with a '%' which will be replaced
-     *               with detail.
-     *  \param detail String to replace a '%' in the error message.
-     */
-    video::ITexture* getTexture(const std::string &filename,
-                                const std::string &error_message,
-                                const std::string &detail="")
-    {
-        setTextureErrorMessage(error_message, detail);
-        video::ITexture *tex = getTexture(filename);
-        unsetTextureErrorMessage();
-        return tex;
-    }   // getTexture
 
-    // ------------------------------------------------------------------------
-    /** Convenience function that loads a texture with default parameters
-     *  but includes an error message.
-     *  \param filename File name of the texture to load.
-     *  \param error Error message, potentially with a '%' which will be replaced
-     *               with detail.
-     *  \param detail String to replace a '%' in the error message.
-     */
-    video::ITexture* getTexture(const std::string &filename,
-                                char *error_message,
-                                char *detail=NULL)
-    {
-        if(!detail)
-            return getTexture(filename, std::string(error_message),
-                              std::string(""));
-
-        return getTexture(filename, std::string(error_message),
-                          std::string(detail));
-    }   // getTexture
-
-    // ------------------------------------------------------------------------
-    /** Returns the currently defined texture error message, which is used
-     *  by event_handler.cpp to print additional info about irrlicht
-     *  internal errors or warnings. If no error message is currently
-     *  defined, the error message is "".
-     */
-    const std::string &getTextureErrorMessage()
-    {
-        return m_texture_error_message;
-    }   // getTextureErrorMessage
-
-    // ------------------------------------------------------------------------
     /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
     // ------------------------------------------------------------------------

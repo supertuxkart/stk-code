@@ -1563,8 +1563,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     assert(!m_current_track);
 
     // Use m_filename to also get the path, not only the identifier
-    irr_driver->setTextureErrorMessage("While loading track '%s'",
-                                       m_filename                  );
+    STKTexManager::getInstance()
+        ->setTextureErrorMessage("While loading track '%s'", m_filename);
     if(!m_reverse_available)
     {
         reverse_track = false;
@@ -1902,7 +1902,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         easter_world->readData(dir+"/easter_eggs.xml");
     }
 
-    irr_driver->unsetTextureErrorMessage();
+    STKTexManager::getInstance()->unsetTextureErrorMessage();
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
