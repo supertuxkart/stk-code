@@ -338,6 +338,16 @@ void STKAnimatedMesh::resetSkinningState(scene::IAnimatedMesh* mesh)
 {
     if (!CVS->supportsHardwareSkinning()) return;
     m_skinning_offset = -1;
+    m_skinned_mesh = NULL;
+    if (mesh == NULL) return;
+    for (u32 i = 0; i < mesh->getMeshBufferCount(); ++i)
+    {
+        scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+        if (!mb)
+            continue;
+        if (mb->getVertexType() == video::EVT_2TCOORDS)
+            return;
+    }
     setHardwareSkinning(true);
     if (m_skinned_mesh)
         m_skinned_mesh->convertForSkinning();

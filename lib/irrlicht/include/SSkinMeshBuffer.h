@@ -254,7 +254,7 @@ struct SSkinMeshBuffer : public IMeshBuffer
 				Vertices_SkinnedMesh.push_back(Vertex);
 			}
 		}
-		if (VertexType==video::EVT_TANGENTS)
+		else if (VertexType==video::EVT_TANGENTS)
 		{
 			for(u32 n=0;n<Vertices_Tangents.size();++n)
 			{
