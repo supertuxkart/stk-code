@@ -439,7 +439,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                       World::getWorld()->getIdent() == IDENT_CUTSCENE);
 
     m_model_file = model_file;
-    //file_manager->pushTextureSearchPath(StringUtils::getPath(model_file));
+    file_manager->pushTextureSearchPath(StringUtils::getPath(model_file), "");
 #ifndef SERVER_ONLY
     if (file_manager->fileExists(model_file))
     {
@@ -467,7 +467,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         throw std::runtime_error("Model '" + model_file + "' cannot be found");
     }
 
-    //file_manager->popTextureSearchPath();
+    file_manager->popTextureSearchPath();
     init(NULL, NULL, true);
 }   // TrackObjectPresentationMesh
 
