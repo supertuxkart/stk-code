@@ -75,16 +75,16 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         UserConfigParams::m_show_steering_animations == 2 ?
         1 : UserConfigParams::m_show_steering_animations);
 
-    SpinnerWidget* geometry_lod = getWidget<SpinnerWidget>("geometry_lod");
-    //I18N: Geometry level of detail low : lowest level, no details
-    geometry_lod->addLabel(_("Low"));
-    //I18N: Geometry level of detail medium : few details are displayed
-    geometry_lod->addLabel(_("Medium"));
-    //I18N: Geometry level of detail high : everything is displayed
-    geometry_lod->addLabel(_("High"));
-    geometry_lod->setValue(
-        UserConfigParams::m_geometry_lod == 2 ? 0 :
-        UserConfigParams::m_geometry_lod == 0 ? 2 : 1);
+    SpinnerWidget* scenery_level = getWidget<SpinnerWidget>("scenery_level");
+    //I18N: Scenery level low : lowest level, only basic scenery
+    scenery_level->addLabel(_("Low"));
+    //I18N: Scenery level medium : some more scenery is displayed
+    scenery_level->addLabel(_("Medium"));
+    //I18N: Scenery level high : all scenery is displayed
+    scenery_level->addLabel(_("High"));
+    scenery_level->setValue(
+        UserConfigParams::m_scenery_level == 2 ? 0 :
+        UserConfigParams::m_scenery_level == 0 ? 2 : 1);
 
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("filtering");
     int value = 0;
@@ -204,8 +204,8 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             getWidget<SpinnerWidget>("steering_animations")->getValue();
 
         const int val =
-            getWidget<SpinnerWidget>("geometry_lod")->getValue();
-        UserConfigParams::m_geometry_lod = val == 2 ? 0 : val == 0 ? 2 : 1;
+            getWidget<SpinnerWidget>("scenery_level")->getValue();
+        UserConfigParams::m_scenery_level = val == 2 ? 0 : val == 0 ? 2 : 1;
 
         switch (getWidget<SpinnerWidget>("filtering")->getValue())
         {

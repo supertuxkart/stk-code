@@ -176,9 +176,9 @@
         <spacer height="4" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
-            <label text="Level of detail" I18N="Video settings" width="40%"/>
+            <label text="Level of scenery" I18N="Video settings" width="40%"/>
             <spacer width="10" height="10"/>
-            <gauge id="geometry_lod" min_value="0" max_value="2" width="50%" />
+            <gauge id="scenery_level" min_value="0" max_value="2" width="50%" />
         </div>
 
         <spacer height="10" width="10" />
