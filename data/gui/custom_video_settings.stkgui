@@ -18,7 +18,7 @@
         <div layout="horizontal-row" width="100%" proportion="1">
             <checkbox id="dynamiclight"/>
             <spacer width="10" height="10"/>
-            <label text="Advanced pipeline (lights, etc.)" I18N="Video settings"/>
+            <label text="Advanced pipeline (lights, etc.)*" I18N="Video settings"/>
         </div>
 
         <spacer height="4" width="10" />
@@ -176,14 +176,14 @@
         <spacer height="4" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
-            <label text="Geometry detail" I18N="Video settings" width="40%"/>
+            <label text="Level of detail" I18N="Video settings" width="40%"/>
             <spacer width="10" height="10"/>
-            <gauge id="geometry_detail" min_value="0" max_value="2" width="50%" />
+            <gauge id="geometry_lod" min_value="0" max_value="2" width="50%" />
         </div>
 
         <spacer height="10" width="10" />
 
-        <label text="* Restart STK to apply new settings" width="100%" text_align="center" I18N="Video settings"/>
+        <label text="*If changed, STK will be restarted to apply new settings" width="100%" text_align="center" I18N="Video settings"/>
 
         <spacer proportion="1"/>
 
