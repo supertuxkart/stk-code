@@ -117,6 +117,9 @@ void COGLES2MaterialRenderer::init(s32& outMaterialTypeNr,
 		bool addMaterial)
 {
 	outMaterialTypeNr = -1;
+	
+	if (!vertexShaderProgram || !pixelShaderProgram)
+		return;
 
 	Program = glCreateProgram();
 

@@ -505,7 +505,6 @@ namespace video
 
 		core::stringc FPVSPath = shaders_path;
 		FPVSPath += "COGLES2FixedPipeline.vsh";
-		os::Printer::log(FPVSPath.c_str());
 
 		core::stringc FPFSPath = shaders_path;
 		FPFSPath += "COGLES2FixedPipeline.fsh";
@@ -516,7 +515,7 @@ namespace video
 		c8* FPVSData = 0;
 		c8* FPFSData = 0;
 
-		long Size = FPVSFile->getSize();
+		long Size = FPVSFile ? FPVSFile->getSize() : 0;
 
 		if (Size)
 		{
@@ -525,7 +524,7 @@ namespace video
 			FPVSData[Size] = 0;
 		}
 
-		Size = FPFSFile->getSize();
+		Size = FPFSFile ? FPFSFile->getSize() : 0;
 
 		if (Size)
 		{
@@ -558,7 +557,7 @@ namespace video
 		c8* NMVSData = 0;
 		c8* NMFSData = 0;
 
-		Size = NMVSFile->getSize();
+		Size = NMVSFile ? NMVSFile->getSize() : 0;
 
 		if (Size)
 		{
@@ -567,7 +566,7 @@ namespace video
 			NMVSData[Size] = 0;
 		}
 
-		Size = NMFSFile->getSize();
+		Size = NMFSFile ? NMFSFile->getSize() : 0;
 
 		if (Size)
 		{
@@ -600,7 +599,7 @@ namespace video
 		c8* PMVSData = 0;
 		c8* PMFSData = 0;
 
-		Size = PMVSFile->getSize();
+		Size = PMVSFile ? PMVSFile->getSize() : 0;
 
 		if (Size)
 		{
@@ -609,7 +608,7 @@ namespace video
 			PMVSData[Size] = 0;
 		}
 
-		Size = PMFSFile->getSize();
+		Size = PMFSFile ? PMFSFile->getSize() : 0;
 
 		if (Size)
 		{
@@ -672,7 +671,7 @@ namespace video
 		c8* R2DVSData = 0;
 		c8* R2DFSData = 0;
 
-		Size = R2DVSFile->getSize();
+		Size = R2DVSFile ? R2DVSFile->getSize() : 0;
 
 		if (Size)
 		{
@@ -681,7 +680,7 @@ namespace video
 			R2DVSData[Size] = 0;
 		}
 
-		Size = R2DFSFile->getSize();
+		Size = R2DFSFile ? R2DFSFile->getSize() : 0;
 
 		if (Size)
 		{
