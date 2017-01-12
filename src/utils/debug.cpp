@@ -357,6 +357,7 @@ bool handleContextMenuAction(s32 cmd_id)
         font_manager->getFont<BoldFace>()->dumpGlyphPage("bold");
         font_manager->getFont<DigitFace>()->dumpGlyphPage("digit");
         font_manager->getFont<RegularFace>()->dumpGlyphPage("regular");
+        break;
     case DEBUG_FONT_RELOAD:
         font_manager->getFont<BoldFace>()->reset();
         font_manager->getFont<DigitFace>()->reset();
