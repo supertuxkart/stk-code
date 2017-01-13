@@ -50,8 +50,9 @@ namespace GUIEngine
         PtrVector<scene::IMesh, REF> m_models;
         AlignedArray<Vec3> m_model_location;
         AlignedArray<Vec3> m_model_scale;
-        std::vector<int> m_model_frames;
+        std::vector<std::pair<int, int> > m_model_frames;
         std::vector<bool> m_model_render_info_affected;
+        std::vector<float> m_model_animation_speed;
         std::unique_ptr<RenderTarget> m_render_target;
         float m_angle;
 
@@ -77,8 +78,10 @@ namespace GUIEngine
         void addModel(irr::scene::IMesh* mesh,
                       const Vec3& location = Vec3(0,0,0),
                       const Vec3& scale = Vec3(1,1,1),
-                      const int frame=-1,
-                      bool all_parts_colorized = false);
+                      const int start_loop_frame=-1,
+                      const int end_loop_frame=-1,
+                      bool all_parts_colorized = false,
+                      float animation_speed=0.0f);
 
         void update(float delta);
 

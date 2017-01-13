@@ -271,6 +271,10 @@ public:
      *  to use. */
     int  getBaseFrame() const   { return m_animation_frame[AF_STRAIGHT];  }
     // ------------------------------------------------------------------------
+    int  getFrame(AnimationFrameType f) const  { return m_animation_frame[f]; }
+    // ------------------------------------------------------------------------
+    float  getAnimationSpeed() const              { return m_animation_speed; }
+    // ------------------------------------------------------------------------
     /** Returns the position of a wheel relative to the kart.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
      *           right, 3 = rear left.  */

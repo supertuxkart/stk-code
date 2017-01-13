@@ -155,31 +155,35 @@ void SoccerSetupScreen::beforeAddingWidget()
         }
 
         // Add the kart model (including wheels and speed weight objects)
-        kart_view->addModel( kart_model.getModel(), Vec3(0,0,0),
-                                Vec3(35.0f, 35.0f, 35.0f),
-                                kart_model.getBaseFrame() );
+        kart_view->addModel(kart_model.getModel(), Vec3(0, 0, 0),
+            Vec3(35.0f, 35.0f, 35.0f), kart_model.getBaseFrame(),
+            kart_model.getBaseFrame());
 
         kart_view->addModel( kart_model.getWheelModel(0),
                                 kart_model.getWheelGraphicsPosition(0),
                                 Vec3(1, 1, 1), /*scale*/
-                                -1, /*frame*/
+                                -1, /*start_loop_frame*/
+                                -1, /*end_loop_frame*/
                                 true /*all_parts_colorized*/);
 
         kart_view->addModel( kart_model.getWheelModel(1),
                                 kart_model.getWheelGraphicsPosition(1),
                                 Vec3(1, 1, 1), /*scale*/
-                                -1, /*frame*/
+                                -1, /*start_loop_frame*/
+                                -1, /*end_loop_frame*/
                                 true /*all_parts_colorized*/);
         kart_view->addModel( kart_model.getWheelModel(2),
                                 kart_model.getWheelGraphicsPosition(2),
                                 Vec3(1, 1, 1), /*scale*/
-                                -1, /*frame*/
+                                -1, /*start_loop_frame*/
+                                -1, /*end_loop_frame*/
                                 true /*all_parts_colorized*/);
 
         kart_view->addModel( kart_model.getWheelModel(3),
                                 kart_model.getWheelGraphicsPosition(3),
                                 Vec3(1, 1, 1), /*scale*/
-                                -1, /*frame*/
+                                -1, /*start_loop_frame*/
+                                -1, /*end_loop_frame*/
                                 true /*all_parts_colorized*/);
 
         for (size_t i = 0; i < kart_model.getSpeedWeightedObjectsCount(); i++)
@@ -187,7 +191,8 @@ void SoccerSetupScreen::beforeAddingWidget()
             const SpeedWeightedObject& obj = kart_model.getSpeedWeightedObject((int)i);
             kart_view->addModel(obj.m_model, obj.m_position,
                                 Vec3(1, 1, 1), /*scale*/
-                                -1, /*frame*/
+                                -1, /*start_loop_frame*/
+                                -1, /*end_loop_frame*/
                                 true /*all_parts_colorized*/);
         }
 
