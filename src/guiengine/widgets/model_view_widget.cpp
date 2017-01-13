@@ -269,7 +269,7 @@ void ModelViewWidget::setupRTTScene()
                 m_model_render_info_affected[n]);
             node->setPosition(m_model_location[n].toIrrVector());
             node->setFrameLoop(m_model_frames[n].first, m_model_frames[n].second);
-            node->setAnimationSpeed(m_model_animation_speed[0]);
+            node->setAnimationSpeed(m_model_animation_speed[n]);
             node->updateAbsolutePosition();
             node->setScale(m_model_scale[n].toIrrVector());
             //Log::info("ModelViewWidget", "Set frame %d", m_model_frames[n]);
