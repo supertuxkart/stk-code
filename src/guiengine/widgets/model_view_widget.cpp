@@ -31,7 +31,9 @@
 #include <IMeshSceneNode.h>
 
 #include <algorithm>
+#ifndef SERVER_ONLY
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
+#endif
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -191,8 +193,10 @@ void ModelViewWidget::update(float delta)
     m_rtt_main_node->setRotation(core::vector3df(0.0f, m_angle, 0.0f));
 
     m_rtt_main_node->setVisible(true);
+#ifndef SERVER_ONLY
     if (UserConfigParams::m_show_steering_animations != 0)
         m_rtt_main_node->OnAnimate(os::Timer::getTime());
+#endif
 
     m_render_target->renderToTexture(m_camera, GUIEngine::getLatestDt());
 
