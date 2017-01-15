@@ -181,6 +181,10 @@ bool EventHandler::OnEvent (const SEvent &event)
                 SFXManager::get()->resumeAll();
             }
         }
+        else if (cmd == APP_CMD_LOW_MEMORY)
+        {
+            Log::warn("EventHandler", "Low memory event received");
+        }
 
         return false;
     }
