@@ -386,6 +386,7 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                     {
                         Moving = true;
                         Selecting = false;
+                        MousePosY = event.MouseInput.Y;
                     }
 
                     if (Moving)
