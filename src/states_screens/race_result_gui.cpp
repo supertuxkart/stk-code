@@ -373,8 +373,10 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 MessageDialog::MESSAGE_DIALOG_CONFIRM, this, false);
         }
         else if (!getWidget(name.c_str())->isVisible())
-            Log::fatal("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
+        {
+            Log::warn("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
                 name.c_str());
+        }
         return;
     }
 
