@@ -31,6 +31,9 @@
 #include <IMeshSceneNode.h>
 
 #include <algorithm>
+#ifndef SERVER_ONLY
+#include "../../lib/irrlicht/source/Irrlicht/os.h"
+#endif
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -89,6 +92,7 @@ void ModelViewWidget::clearModels()
     m_model_scale.clear();
     m_model_frames.clear();
     m_model_render_info_affected.clear();
+    m_model_animation_speed.clear();
 
     if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
     if (m_light != NULL) m_light->remove();
@@ -103,16 +107,18 @@ void ModelViewWidget::clearModels()
 // -----------------------------------------------------------------------------
 
 void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
-                               const Vec3& scale, const int frame,
-                               bool all_parts_colorized)
+                               const Vec3& scale, const int start_loop_frame,
+                               const int end_loop_frame,
+                               bool all_parts_colorized, float animation_speed)
 {
     if(!mesh) return;
 
     m_models.push_back(mesh);
     m_model_location.push_back(location);
     m_model_scale.push_back(scale);
-    m_model_frames.push_back(frame);
+    m_model_frames.emplace_back(start_loop_frame, end_loop_frame);
     m_model_render_info_affected.push_back(all_parts_colorized);
+    m_model_animation_speed.push_back(animation_speed);
 #ifndef SERVER_ONLY
     if (!CVS->isGLSL())
         m_render_target = NULL;
@@ -187,6 +193,10 @@ void ModelViewWidget::update(float delta)
     m_rtt_main_node->setRotation(core::vector3df(0.0f, m_angle, 0.0f));
 
     m_rtt_main_node->setVisible(true);
+#ifndef SERVER_ONLY
+    if (UserConfigParams::m_show_steering_animations != 0)
+        m_rtt_main_node->OnAnimate(os::Timer::getTime());
+#endif
 
     m_render_target->renderToTexture(m_camera, GUIEngine::getLatestDt());
 
@@ -210,7 +220,7 @@ void ModelViewWidget::setupRTTScene()
 
     irr_driver->clearLights();
 
-    if (m_model_frames[0] == -1)
+    if (m_model_frames[0].first == -1)
     {
         scene::ISceneNode* node = irr_driver->addMesh(m_models.get(0), "rtt_mesh",
             NULL, m_render_info, m_model_render_info_affected[0]);
@@ -225,8 +235,8 @@ void ModelViewWidget::setupRTTScene()
         irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_models.get(0), "rtt_mesh",
             NULL, m_render_info, m_model_render_info_affected[0]);
         node->setPosition(m_model_location[0].toIrrVector());
-        node->setFrameLoop(m_model_frames[0], m_model_frames[0]);
-        node->setAnimationSpeed(0);
+        node->setFrameLoop(m_model_frames[0].first, m_model_frames[0].second);
+        node->setAnimationSpeed(m_model_animation_speed[0]);
         node->setScale(m_model_scale[0].toIrrVector());
         node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
         m_rtt_main_node = node;
@@ -237,11 +247,12 @@ void ModelViewWidget::setupRTTScene()
     assert(m_models.size() == m_model_frames.size());
     assert(m_models.size() == m_model_scale.size());
     assert(m_models.size() == m_model_render_info_affected.size());
+    assert(m_models.size() == m_model_animation_speed.size());
 
     const int mesh_amount = m_models.size();
     for (int n = 1; n<mesh_amount; n++)
     {
-        if (m_model_frames[n] == -1)
+        if (m_model_frames[n].first == -1)
         {
             scene::ISceneNode* node =
             irr_driver->addMesh(m_models.get(n), "rtt_node", m_rtt_main_node,
@@ -257,8 +268,8 @@ void ModelViewWidget::setupRTTScene()
                 "modelviewrtt", m_rtt_main_node, m_render_info,
                 m_model_render_info_affected[n]);
             node->setPosition(m_model_location[n].toIrrVector());
-            node->setFrameLoop(m_model_frames[n], m_model_frames[n]);
-            node->setAnimationSpeed(0);
+            node->setFrameLoop(m_model_frames[n].first, m_model_frames[n].second);
+            node->setAnimationSpeed(m_model_animation_speed[n]);
             node->updateAbsolutePosition();
             node->setScale(m_model_scale[n].toIrrVector());
             //Log::info("ModelViewWidget", "Set frame %d", m_model_frames[n]);

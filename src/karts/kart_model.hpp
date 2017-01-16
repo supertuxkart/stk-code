@@ -114,9 +114,11 @@ public:
             AF_WIN_START,          // Begin of win animation
             AF_WIN_LOOP_START,     // Begin of win loop animation
             AF_WIN_END,            // End of win animation
-            AF_BACK_LEFT,            // Going back left
-            AF_BACK_STRAIGHT,         // Going back straight
-            AF_BACK_RIGHT,            // Going back right
+            AF_SELECTION_START,    // Start frame in kart selection screen
+            AF_SELECTION_END,      // End frame in kart selection screen
+            AF_BACK_LEFT,          // Going back left
+            AF_BACK_STRAIGHT,      // Going back straight
+            AF_BACK_RIGHT,         // Going back right
             AF_SPEED_WEIGHTED_START,        // Start of speed-weighted animation
             AF_SPEED_WEIGHTED_END,          // End of speed-weighted animation
             AF_END=AF_SPEED_WEIGHTED_END,   // Last animation frame
@@ -270,6 +272,10 @@ public:
     /** Since karts might be animated, we might need to know which base frame
      *  to use. */
     int  getBaseFrame() const   { return m_animation_frame[AF_STRAIGHT];  }
+    // ------------------------------------------------------------------------
+    int  getFrame(AnimationFrameType f) const  { return m_animation_frame[f]; }
+    // ------------------------------------------------------------------------
+    float  getAnimationSpeed() const              { return m_animation_speed; }
     // ------------------------------------------------------------------------
     /** Returns the position of a wheel relative to the kart.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
