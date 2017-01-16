@@ -181,6 +181,8 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("backpedal-right",&m_animation_frame[AF_BACK_RIGHT]);
         animation_node->get("start-speed-weighted", &m_animation_frame[AF_SPEED_WEIGHTED_START]);
         animation_node->get("end-speed-weighted",   &m_animation_frame[AF_SPEED_WEIGHTED_END]  );
+        animation_node->get("selection-start", &m_animation_frame[AF_SELECTION_START]);
+        animation_node->get("selection-end",   &m_animation_frame[AF_SELECTION_END]  );
         animation_node->get("speed",          &m_animation_speed               );
     }
 

@@ -114,9 +114,11 @@ public:
             AF_WIN_START,          // Begin of win animation
             AF_WIN_LOOP_START,     // Begin of win loop animation
             AF_WIN_END,            // End of win animation
-            AF_BACK_LEFT,            // Going back left
-            AF_BACK_STRAIGHT,         // Going back straight
-            AF_BACK_RIGHT,            // Going back right
+            AF_SELECTION_START,    // Start frame in kart selection screen
+            AF_SELECTION_END,      // End frame in kart selection screen
+            AF_BACK_LEFT,          // Going back left
+            AF_BACK_STRAIGHT,      // Going back straight
+            AF_BACK_RIGHT,         // Going back right
             AF_SPEED_WEIGHTED_START,        // Start of speed-weighted animation
             AF_SPEED_WEIGHTED_END,          // End of speed-weighted animation
             AF_END=AF_SPEED_WEIGHTED_END,   // Last animation frame
