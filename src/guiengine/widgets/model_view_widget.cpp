@@ -32,7 +32,7 @@
 
 #include <algorithm>
 #ifndef SERVER_ONLY
-#include "../../lib/irrlicht/source/Irrlicht/os.h"
+#include "../../../lib/irrlicht/source/Irrlicht/os.h"
 #endif
 
 using namespace GUIEngine;
