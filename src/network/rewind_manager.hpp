@@ -20,6 +20,7 @@
 #define HEADER_REWIND_MANAGER_HPP
 
 #include "network/rewinder.hpp"
+#include "network/rewind_queue.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/synchronised.hpp"
 
@@ -90,21 +91,8 @@ private:
     /** A list of all objects that can be rewound. */
     AllRewinder m_all_rewinder;
 
-    /** Pointer to all saved states. */
-    typedef std::list<RewindInfo*> AllRewindInfo;
-
-    /** The list of all events that are affected by a rewind. */
-    AllRewindInfo m_rewind_info;
-
-    /** The list of all events received from the network. They are stored
-     *  in a separate thread (so this data structure is thread-save), and
-     *  merged into m_rewind_info from the main thread. This design (as
-     *  opposed to locking m_rewind_info) reduces the synchronisation
-     *  between main thread and network thread. */
-    Synchronised<AllRewindInfo> m_network_events;
-
-    /** Index of the next event to be used when playing events. */
-    AllRewindInfo::const_iterator m_next_event;
+    /** The queue that stores all rewind infos. */
+    RewindQueue m_rewind_queue;
 
     /** Overall amount of memory allocated by states. */
     unsigned int m_overall_state_size;
@@ -124,25 +112,8 @@ private:
      *  events later. */
     float m_current_time;
 
-#define REWIND_SEARCH_STATS
-
-#ifdef REWIND_SEARCH_STATS
-    /** Gather some statistics about how many comparisons we do, 
-     *  to find out if it's worth doing a binary search.*/
-    mutable int m_count_of_comparisons;
-    mutable int m_count_of_searches;
-#endif
-
     RewindManager();
-    ~RewindManager();
-    AllRewindInfo::reverse_iterator findFirstIndex(float time);
-    void insertRewindInfo(RewindInfo *ri);
-    float determineTimeStepSize(AllRewindInfo::iterator state, float max_time);
-    // ------------------------------------------------------------------------
-    struct _RewindInfoCompare
-    {
-        bool operator()(const RewindInfo *ri1, const RewindInfo *r2) const;
-    } RewindInfoCompare;   // _RewindInfoCompare
+   ~RewindManager();
 
 public:
     // First static functions to manage rewinding.

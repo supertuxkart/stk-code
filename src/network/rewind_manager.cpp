@@ -65,14 +65,6 @@ RewindManager::RewindManager()
  */
 RewindManager::~RewindManager()
 {
-    // Destroying the 
-    AllRewindInfo::const_iterator i;
-
-    for(i=m_rewind_info.begin(); i!=m_rewind_info.end(); ++i)
-    {
-        delete *i;
-    }
-    m_rewind_info.clear();
 }   // ~RewindManager
 
 // ----------------------------------------------------------------------------
@@ -80,10 +72,6 @@ RewindManager::~RewindManager()
  */
 void RewindManager::reset()
 {
-#ifdef REWIND_SEARCH_STATS
-    m_count_of_comparisons = 0;
-    m_count_of_searches    = 0;
-#endif
     m_is_rewinding         = false;
     m_overall_state_size   = 0;
     m_state_frequency      = 0.1f;   // save 10 states a second
@@ -104,110 +92,8 @@ void RewindManager::reset()
         delete rewinder;
     }
 
-    AllRewindInfo::const_iterator i;
-    for(i=m_rewind_info.begin(); i!=m_rewind_info.end(); i++)
-    {
-        delete *i;
-    }
-    m_rewind_info.clear();
-    m_next_event = m_rewind_info.begin();
-
-    m_network_events.lock();
-    const AllRewindInfo &info = m_network_events.getData();
-    for (i = info.begin(); i != info.end(); ++i)
-    {
-        delete *i;
-    }
-    m_network_events.getData().clear();
-    m_network_events.unlock();
+    m_rewind_queue.reset();
 }   // reset
-
-// ----------------------------------------------------------------------------
-/** A compare function used when sorting the event lists. It sorts events by
- *  time. In case of equal times, it sorts states and events first (since the
- *  state needs to be restored when replaying first before any other events).
- */
-bool RewindManager::_RewindInfoCompare::operator()(const RewindInfo *ri1,
-    const RewindInfo *ri2) const
-{
-    if (ri1->getTime() < ri2->getTime()) return true;
-    if (ri1->getTime() > ri2->getTime()) return false;
-
-    // Now the times are equal. In this case make sure that states and
-    // time events are 'smallest', i.e. sorted first (which is necessary for
-    // replay). Time and State events at the same time do not happen, so no
-    // further test are necessary
-    return ri1->isState() || ri1->isTime();
-}   // RewindInfoCompare::operator()
-
-// ----------------------------------------------------------------------------
-/** Inserts a RewindInfo object in the list of all events at the correct time.
- *  If there are several RewindInfo at the exact same time, state RewindInfo
- *  will be insert at the front, and event and time info at the end of the
- *  RewindInfo with the same time.
- *  \param ri The RewindInfo object to insert.
- */
-void RewindManager::insertRewindInfo(RewindInfo *ri)
-{
-    AllRewindInfo::iterator i = std::upper_bound(m_rewind_info.begin(),
-                                                 m_rewind_info.end(), ri,
-                                                 RewindManager::RewindInfoCompare);
-    m_rewind_info.insert(i, ri);
-}   // insertRewindInfo
-
-// ----------------------------------------------------------------------------
-/** Returns the first (i.e. lowest) index i in m_rewind_info which fulfills 
- *  time(i) < target_time <= time(i+1) and is a state. This is the state
- *  from which a rewind can start - all states for the karts will be well
- *  defined.
- *  \param time Time for which an index is searched.
- *  \return Index in m_rewind_info after which to add rewind data.
- */
-RewindManager::AllRewindInfo::reverse_iterator 
-                         RewindManager::findFirstIndex(float target_time)
-{
-    // For now do a linear search, even though m_rewind_info is sorted
-    // I would expect that most insertions will be towards the (very)
-    // end of the list, since rewinds should be for short periods of time. 
-    // Note that after finding an entry in a binary search, you still
-    // have to do a linear search to find the last entry with the same
-    // time in order to minimise the later necessary memory move.
-
-    // Gather some statistics about search for now:
-#ifdef REWIND_SEARCH_STATS
-    m_count_of_searches++;
-#endif
-    AllRewindInfo::reverse_iterator index = m_rewind_info.rbegin();
-    AllRewindInfo::reverse_iterator index_last_state = m_rewind_info.rend();
-    while(index!=m_rewind_info.rend())
-    {
-#ifdef REWIND_SEARCH_STATS
-        m_count_of_comparisons++;
-#endif
-        if((*index)->isState())
-        {
-            if(   (*index)->getTime() <= target_time )
-            {
-                return index;
-            }
-            index_last_state = index;
-        }
-        index++;
-    }
-
-    if(index_last_state==m_rewind_info.rend())
-    {
-        Log::fatal("RewindManager",
-                   "Can't find any state when rewinding to %f - aborting.",
-                   target_time);
-    }
-
-    // Otherwise use the last found state - not much we can do in this case.
-    Log::error("RewindManager",
-               "Can't find state to rewind to for time %f, using %f.",
-               target_time, (*index_last_state)->getTime());
-    return index_last_state;  // avoid compiler warning
-}   // findFirstIndex
 
 // ----------------------------------------------------------------------------
 /** Adds an event to the rewind data. The data to be stored must be allocated
@@ -225,13 +111,12 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
         Log::error("RewindManager", "Adding event when rewinding");
         return;
     }
+
     Log::verbose("RewindManager", "Time world %f self-event %f",
                  World::getWorld()->getTime(), getCurrentTime());
     if (time < 0)
         time = getCurrentTime();
-    RewindInfo *ri = new RewindInfoEvent(time, event_rewinder,
-                                         buffer, confirmed);
-    insertRewindInfo(ri);
+    m_rewind_queue.addEvent(event_rewinder, buffer, confirmed, time);
 }   // addEvent
 
 // ----------------------------------------------------------------------------
@@ -245,21 +130,9 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
 void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
                                     BareNetworkString *buffer, float time)
 {
-    RewindInfo *ri = new RewindInfoEvent(time, event_rewinder,
-                                         buffer, /*confirmed*/true);
-
-    // Sort the incoming network events so that we can use list::merge
-    // to move the network events into the RewindInfo main list.
-    m_network_events.lock();
-    AllRewindInfo::iterator i =
-        std::upper_bound(m_network_events.getData().begin(),
-                         m_network_events.getData().end()  , ri,
-                         RewindManager::RewindInfoCompare        );
-    m_network_events.getData().insert(i, ri);
-    m_network_events.unlock();
+    m_rewind_queue.addNetworkEvent(event_rewinder, buffer, time);
     Log::verbose("RewindManager", "Time world %f network-event %f",
                  World::getWorld()->getTime(), time);
-
 }   // addEvent
 
 // ----------------------------------------------------------------------------
@@ -273,18 +146,8 @@ void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
 void RewindManager::addNetworkState(int rewinder_index,
                                     BareNetworkString *buffer, float time)
 {
-    RewindInfo *ri = new RewindInfoState(time, m_all_rewinder[rewinder_index],
-                                         buffer, /*confirmed*/true);
-
-    // Sort the incoming network events so that we can use list::merge
-    // to move the network events into the RewindInfo main list.
-    m_network_events.lock();
-    AllRewindInfo::iterator i =
-        std::upper_bound(m_network_events.getData().begin(),
-                         m_network_events.getData().end(), ri,
-                         RewindManager::RewindInfoCompare      );
-    m_network_events.getData().insert(i, ri);
-    m_network_events.unlock();
+    m_rewind_queue.addNetworkState(m_all_rewinder[rewinder_index], buffer,
+                                   time);
     Log::verbose("RewindManager", "Time world %f network-state %f",
         World::getWorld()->getTime(), time);
 }   // addState
@@ -311,13 +174,10 @@ void RewindManager::saveStates()
         {
             // No full state necessary, add a dummy entry for the time
             // which increases replay precision (same time step size)
-            RewindInfo *ri = new RewindInfoTime(getCurrentTime());
-            insertRewindInfo(ri);
+            m_rewind_queue.addTimeEvent(getCurrentTime());
         }
         return;
     }
-
-    bool was_empty = m_rewind_info.empty();
 
     // For now always create a snapshot.
     if (NetworkConfig::get()->isServer())
@@ -329,11 +189,8 @@ void RewindManager::saveStates()
         if(buffer && buffer->size()>=0)
         {
             m_overall_state_size += buffer->size();
-            RewindInfo *ri = new RewindInfoState(getCurrentTime(),
-                                                 *i, buffer,
-                                                 /*is_confirmed*/true);
-            assert(ri);
-            insertRewindInfo(ri);
+            m_rewind_queue.addState(*i, buffer, /*confirmed*/true,
+                                    getCurrentTime());
             if(NetworkConfig::get()->isServer())
                 GameProtocol::getInstance()->addState(buffer);
         }   // size >= 0
@@ -343,12 +200,8 @@ void RewindManager::saveStates()
     if (NetworkConfig::get()->isServer())
         GameProtocol::getInstance()->sendState();
 
-    if (was_empty && !m_rewind_info.empty())
-        m_next_event = m_rewind_info.begin();
-    Log::verbose("RewindManager", "%f allocated %ld bytes search %d/%d=%f",
-                 World::getWorld()->getTime(), m_overall_state_size,
-                 m_count_of_comparisons, m_count_of_searches,
-                 float(m_count_of_comparisons)/ float(m_count_of_searches) );
+    Log::verbose("RewindManager", "%f allocated %ld",
+                 World::getWorld()->getTime(), m_overall_state_size);
 
     m_last_saved_state = time;
 }   // saveStates
@@ -359,68 +212,39 @@ void RewindManager::saveStates()
  */
 void RewindManager::playEventsTill(float time)
 {    
-    m_network_events.lock();
-    if (m_rewind_info.empty() && m_network_events.getData().empty())
-    {
-        m_network_events.unlock();
+    // No events, nothing to do
+    if (m_rewind_queue.isEmpty())
         return;
-    }
 
-    /** First merge all newly received network events into the main 
-     *  event list */
-    bool rewind_necessary = false;
-    float rewind_time     = -1.0f;
+    bool needs_rewind;
+    float rewind_time;
 
-    if (!m_network_events.getData().empty())
-    {
-        // Check if a rewind is necessary
-        rewind_time = m_network_events.getData().front()->getTime();
-        Log::info("RewindManager", "At %f merging states from %f",
+    m_rewind_queue.mergeNetworkData(&needs_rewind, &rewind_time);
+    if(needs_rewind)
+        Log::info("RewindManager", "At %f merging states from %f needs rewind",
                   World::getWorld()->getTime(), rewind_time);
-        if (rewind_time < time)
-        {
+    else
+        Log::info("RewindManager", "At %f no need for rewind",
+                  World::getWorld()->getTime());
 
-            Log::info("RewindManager",
-                      "Rewind necessary at %f because of event at %f",
-                      time, rewind_time);
-            rewind_necessary = true;
-        }
-        // It is possible that m_next_event points m_rewind_info.end()
-        // and that new elements are added to the end of the list. In this
-        // case m_rewind_info end would still point to end(), but should
-        // point to the newly added element. To achieve this, we first
-        // decrement m_next_eventr (note that it was tested previously that
-        // the list is not empty), merge in the new events, and then
-        // increment m_next_event again. If elements have been added to
-        // the end of the list, m_next_event will now corretly point to them.
 
-        bool adjust_next = !m_rewind_info.empty();
-        if(adjust_next) m_next_event--;
-        m_rewind_info.merge(m_network_events.getData(),
-                            RewindManager::RewindInfoCompare);
-        if (adjust_next)
-            m_next_event++;
-        else   // rewind_info was empty, set pointer to first element
-            m_next_event = m_rewind_info.begin();
-    }   // if !m_network_events empty
-
-    m_network_events.unlock();
-
-    if (rewind_necessary)
+    if (needs_rewind)
     {
         rewindTo(rewind_time);
     }
+
     assert(!m_is_rewinding);
     m_is_rewinding = true;
-    while (m_next_event !=m_rewind_info.end() )
+
+    while(m_rewind_queue.hasMoreRewindInfo())
     {
-        RewindInfo *ri = *m_next_event;
+        RewindInfo *ri = m_rewind_queue.getNext();
         if (ri->getTime() > time)
         {
             m_is_rewinding = false;
             return;
         }
-        m_next_event++;
+        ++m_rewind_queue;
         if(ri->isEvent())
             ri->rewind();
     }
@@ -438,37 +262,11 @@ void RewindManager::rewindTo(float rewind_time)
                StkTime::getRealTime());
     history->doReplayHistory(History::HISTORY_NONE);
 
-    // First find the state to which we need to rewind
-    // ------------------------------------------------
-    AllRewindInfo::reverse_iterator rindex = findFirstIndex(rewind_time);
-    //rindex--;
-    AllRewindInfo::reverse_iterator xx = rindex;
-    ++xx;
-    AllRewindInfo::iterator index = --(xx.base());
-
-    if(!(*rindex)->isState())
-    {
-        Log::error("RewindManager", "No state for rewind to %f, state %d.",
-                   rewind_time, index);
-        return;
-    }
-    m_is_rewinding = true;
 
     // Then undo the rewind infos going backwards in time
     // --------------------------------------------------
-    AllRewindInfo::reverse_iterator i;
-    for(i= m_rewind_info.rbegin(); i!=rindex; i++)
-    {
-        (*i)->undo();
-
-        // Now all states after the time we rewind to are not confirmed
-        // anymore. They need to be rewritten when going forward during
-        // the rewind.
-        if((*i)->isState() && 
-            (*i)->getTime() > (*index)->getTime() )
-            (*i)->setConfirmed(false);
-    }   // for i>state
-
+    m_is_rewinding = true;
+    m_rewind_queue.undoUntil(rewind_time);
 
     // Rewind the required state(s)
     // ----------------------------
@@ -477,7 +275,7 @@ void RewindManager::rewindTo(float rewind_time)
 
     // Get the (first) full state to which we have to rewind
     RewindInfoState *state =
-                    dynamic_cast<RewindInfoState*>(*rindex);
+                     dynamic_cast<RewindInfoState*>(m_rewind_queue.getNext());
 
     // Store the time to which we have to replay to
     float exact_rewind_time = state->getTime();
@@ -493,9 +291,9 @@ void RewindManager::rewindTo(float rewind_time)
     while(state && state->getTime()==exact_rewind_time)
     {
         state->rewind();
-        index++;
-        if(index==m_rewind_info.end()) break;
-        state = dynamic_cast<RewindInfoState*>(*index);
+        ++m_rewind_queue;
+        if(!m_rewind_queue.hasMoreRewindInfo()) break;
+        state = dynamic_cast<RewindInfoState*>(m_rewind_queue.getNext());
     }
 
     // Now go forward through the list of rewind infos:
@@ -507,22 +305,27 @@ void RewindManager::rewindTo(float rewind_time)
     {
         // Now handle all states and events at the current time before
         // updating the world:
-        while(index !=m_rewind_info.end() &&
-              (*index)->getTime()<=world->getTime())
+        if (m_rewind_queue.hasMoreRewindInfo())
         {
-            if((*index)->isState())
+            RewindInfo *ri = m_rewind_queue.getNext();
+            while (ri->getTime() <= world->getTime())
             {
-                // TOOD: replace the old state with a new state. 
-                // For now just set it to confirmed
-                (*index)->setConfirmed(true);
-            }
-            else if((*index)->isEvent())
-            {
-                (*index)->rewind();
-            }
-            index++;
-        }
-        float dt = determineTimeStepSize(index, current_time);
+                if (ri->isState())
+                {
+                    // TOOD: replace the old state with a new state. 
+                    // For now just set it to confirmed
+                    ri->setConfirmed(true);
+                }
+                else if (ri->isEvent())
+                {
+                    ri->rewind();
+                }
+
+                ++m_rewind_queue;
+            }   // while ri->getTime() <= world->getTime()
+        }   // if m_rewind_queue.hasMoreRewindInfo()
+
+        float dt = m_rewind_queue.determineNextDT(current_time);
         world->updateWorld(dt);
 #undef SHOW_ROLLBACK
 #ifdef SHOW_ROLLBACK
@@ -538,25 +341,3 @@ void RewindManager::rewindTo(float rewind_time)
 }   // rewindTo
 
 // ----------------------------------------------------------------------------
-/** Determines the next time step size to use when recomputing the physics.
- *  The time step size is either 1/60 (default physics), or less, if there
- *  is an even to handle before that time.
- *  \param next_state The next state to replay.
- *  \param end_time The end time to which we must replay forward. Don't
- *         return a dt that would be bigger tham this value.
- *  \return The time step size to use in the next simulation step.
- */
-float RewindManager::determineTimeStepSize(AllRewindInfo::iterator next_state,
-                                           float end_time)
-{
-    // If there is a next state (which is known to have a different time)
-    // use the time difference to determine the time step size.
-    if(next_state !=m_rewind_info.end())
-        return (*next_state)->getTime() - World::getWorld()->getTime();
-
-    // Otherwise, i.e. we are rewinding the last state/event, take the
-    // difference between that time and the world time at which the rewind
-    // was triggered.
-    return end_time -  (*(--next_state))->getTime();
-
-}   // determineTimeStepSize

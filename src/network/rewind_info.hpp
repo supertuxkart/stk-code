@@ -159,7 +159,8 @@ public:
      *  It calls undoState in the rewinder. */
     virtual void undo()
     {
-        m_rewinder->undoState(getBuffer());
+        if(m_rewinder)   // Unit testing uses NULL as rewinder
+            m_rewinder->undoState(getBuffer());
     }   // undo
     // ------------------------------------------------------------------------
     /** Rewinds to this state. This is called while going forwards in time

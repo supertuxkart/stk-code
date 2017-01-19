@@ -41,14 +41,16 @@ RewindInfoState::RewindInfoState(float time, Rewinder *rewinder,
                                  BareNetworkString *buffer, bool is_confirmed)
     : RewindInfoRewinder(time, rewinder, buffer, is_confirmed)
 {
-    m_local_physics_time = Physics::getInstance()->getPhysicsWorld()
-                                                 ->getLocalTime();
+    // rewinder = NULL is used in unit testing, in which case no world exists
+    if(rewinder!=NULL)
+        m_local_physics_time = Physics::getInstance()->getPhysicsWorld()
+                                                     ->getLocalTime();
 }   // RewindInfoState
 
 // ============================================================================
 RewindInfoEvent::RewindInfoEvent(float time, EventRewinder *event_rewinder,
                                  BareNetworkString *buffer, bool is_confirmed)
-    : RewindInfo(time, is_confirmed)
+               : RewindInfo(time, is_confirmed)
 {
     m_event_rewinder = event_rewinder;
     m_buffer         = buffer;

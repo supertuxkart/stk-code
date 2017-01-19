@@ -210,6 +210,7 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
+#include "network/rewind_queue.hpp"
 #include "network/servers_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/protocols/get_public_address.hpp"
@@ -1975,6 +1976,9 @@ void runUnitTests()
 
     Log::info("UnitTest", "Fonts for translation");
     font_manager->unitTesting();
+
+    Log::info("UnitTest", "RewindQueue");
+    RewindQueue::unitTesting();
 
     Log::info("UnitTest", "=====================");
     Log::info("UnitTest", "Testing successful   ");
