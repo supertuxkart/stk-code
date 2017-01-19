@@ -305,25 +305,24 @@ void RewindManager::rewindTo(float rewind_time)
     {
         // Now handle all states and events at the current time before
         // updating the world:
-        if (m_rewind_queue.hasMoreRewindInfo())
+        while (m_rewind_queue.hasMoreRewindInfo())
         {
             RewindInfo *ri = m_rewind_queue.getNext();
-            while (ri->getTime() <= world->getTime())
-            {
-                if (ri->isState())
-                {
-                    // TOOD: replace the old state with a new state. 
-                    // For now just set it to confirmed
-                    ri->setConfirmed(true);
-                }
-                else if (ri->isEvent())
-                {
-                    ri->rewind();
-                }
+            if (ri->getTime() > world->getTime()) break;
 
-                ++m_rewind_queue;
-            }   // while ri->getTime() <= world->getTime()
-        }   // if m_rewind_queue.hasMoreRewindInfo()
+            if (ri->isState())
+            {
+                // TOOD: replace the old state with a new state. 
+                // For now just set it to confirmed
+                ri->setConfirmed(true);
+            }
+            else if (ri->isEvent())
+            {
+                ri->rewind();
+            }
+
+            ++m_rewind_queue;
+        }   // while ri->getTime() <= world->getTime()
 
         float dt = m_rewind_queue.determineNextDT(current_time);
         world->updateWorld(dt);
