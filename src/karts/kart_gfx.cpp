@@ -83,6 +83,17 @@ KartGFX::KartGFX(const AbstractKart *kart)
     m_skidding_light_2->setVisible(false);
     m_skidding_light_2->setName( ("skidding emitter 2 (" + m_kart->getIdent() 
                                                          + ")").c_str() );
+
+    
+    m_head_light = 
+        irr_driver->addLight(core::vector3df(0.0f, 0.2f, 1.5f*length),
+                             /* force */ 0.5f,
+                             /*radius*/CVS->isGLSL() ? 5.0f : 1.0f,
+                             1.0f, 1.0f, 1.0f, false, node);
+    m_head_light->setVisible(true);
+    m_head_light->setName( ("head light " + m_kart->getIdent() 
+                                                         + ")").c_str() );
+
 #endif
 
 #ifndef SERVER_ONLY
@@ -499,6 +510,7 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
 
             m_skidding_light_1->setVisible(true);
             m_skidding_light_2->setVisible(false);
+            m_head_light->setVisible(false);
         }
         if (!m_skidding_light_2->isVisible() && red_skidding)
         {
@@ -509,6 +521,7 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
 
             m_skidding_light_1->setVisible(false);
             m_skidding_light_2->setVisible(true);
+            m_head_light->setVisible(false);
         }
         setCreationRateAbsolute(KartGFX::KGFX_SKIDL, (float)skidding);
         setCreationRateAbsolute(KartGFX::KGFX_SKIDR, (float)skidding);
@@ -520,6 +533,7 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
         setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0.0f);
         m_skidding_light_1->setVisible(false);
         m_skidding_light_2->setVisible(false);
+        m_head_light->setVisible(true);
     }
 #endif
 }   // setGFXFromReplay
@@ -531,5 +545,6 @@ void KartGFX::setGFXInvisible()
     m_nitro_light->setVisible(false);
     m_skidding_light_1->setVisible(false);
     m_skidding_light_2->setVisible(false);
+    m_head_light->setVisible(false);
 #endif
 }   // setGFXInvisible
