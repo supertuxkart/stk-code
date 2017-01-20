@@ -187,7 +187,7 @@ class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNo
     TrackObject* m_parent;
     using TrackObjectPresentationSceneNode::move;
     std::string m_name;
-    bool m_start_executed = false;
+    bool m_start_executed;
 public:
     TrackObjectPresentationLibraryNode(TrackObject* parent,
         const XMLNode& xml_node,

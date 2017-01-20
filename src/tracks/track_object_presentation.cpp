@@ -178,6 +178,8 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     ModelDefinitionLoader& model_def_loader)
     : TrackObjectPresentationSceneNode(xml_node)
 {
+    m_start_executed = false;
+
     std::string name;
     xml_node.get("name", &name);
     m_name = name;
