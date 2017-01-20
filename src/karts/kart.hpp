@@ -286,6 +286,7 @@ public:
 
     virtual bool   playCustomSFX    (unsigned int type);
     virtual void   setController(Controller *controller);
+    virtual void   setXYZ(const Vec3& a);
 
     // ========================================================================
     // Powerup related functions.

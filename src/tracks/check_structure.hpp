@@ -105,6 +105,7 @@ public:
                 CheckStructure(const XMLNode &node, unsigned int index);
     virtual    ~CheckStructure() {};
     virtual void update(float dt);
+    virtual void resetAfterKartMove(unsigned int kart_index) {};
     virtual void changeDebugColor(bool is_active) {}
     /** True if going from old_pos to new_pos crosses this checkline. This function
      *  is called from update (of the checkline structure).
