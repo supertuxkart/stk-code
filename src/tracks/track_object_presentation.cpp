@@ -178,8 +178,11 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     ModelDefinitionLoader& model_def_loader)
     : TrackObjectPresentationSceneNode(xml_node)
 {
+    m_start_executed = false;
+
     std::string name;
     xml_node.get("name", &name);
+    m_name = name;
 
     m_node = irr_driver->getSceneManager()->addEmptySceneNode();
 #ifdef DEBUG
@@ -210,13 +213,17 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
             lib_path = track->getTrackFile("library/" + name);
             libroot = file_manager->createXMLTree(local_lib_node_path);
             if (track != NULL)
+            {
                 Scripting::ScriptEngine::getInstance()->loadScript(local_script_file_path, false);
+            }
         }
         else if (file_manager->fileExists(lib_node_path))
         {
             libroot = file_manager->createXMLTree(lib_node_path);
             if (track != NULL)
+            {
                 Scripting::ScriptEngine::getInstance()->loadScript(lib_script_file_path, false);
+            }
         }
         else
         {
@@ -271,6 +278,25 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
                                           parent);
     m_parent = parent;
 }   // TrackObjectPresentationLibraryNode
+
+// ----------------------------------------------------------------------------
+
+void TrackObjectPresentationLibraryNode::update(float dt)
+{
+    if (!m_start_executed)
+    {
+        m_start_executed = true;
+        std::string fn_name = StringUtils::insertValues("void %s::onStart(const string)", m_name.c_str());
+
+        std::string lib_id = m_parent->getID();
+        std::string* lib_id_ptr = &lib_id;
+
+        Scripting::ScriptEngine::getInstance()->runFunction(false, fn_name,
+            [&](asIScriptContext* ctx) {
+                ctx->SetArgObject(0, lib_id_ptr);
+            });
+    }
+}
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLibraryNode::~TrackObjectPresentationLibraryNode()
