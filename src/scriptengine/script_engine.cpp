@@ -31,6 +31,7 @@
 #include "scriptengine/script_utils.hpp"
 #include "scriptengine/scriptstdstring.hpp"
 #include "scriptengine/scriptvec3.hpp"
+#include "scriptengine/scriptarray.hpp" 
 #include <string.h>
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -428,6 +429,7 @@ namespace Scripting
         // Register the script string type
         RegisterStdString(engine); //register std::string
         RegisterVec3(engine);      //register Vec3
+        RegisterScriptArray(engine, true);
 
         Scripting::Track::registerScriptFunctions(m_engine);
         Scripting::Challenges::registerScriptFunctions(m_engine);
