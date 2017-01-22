@@ -95,7 +95,7 @@ void RewindManager::reset()
     m_rewind_queue.reset();
 }   // reset
 
-// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------    
 /** Adds an event to the rewind data. The data to be stored must be allocated
  *  and not freed by the caller!
  *  \param time Time at which the event was recorded.
@@ -162,11 +162,13 @@ void RewindManager::saveStates()
     if(!m_enable_rewind_manager  || 
         m_all_rewinder.size()==0 ||
         m_is_rewinding              )  return;
-    if (NetworkConfig::get()->isClient())
-        return;
 
     float time = World::getWorld()->getTime();
-    if(time - m_last_saved_state < m_state_frequency)
+
+    // Client doesn't save state (atm), so we need to store
+    // time infos to get the correct dt when rewinding
+    if(time - m_last_saved_state < m_state_frequency ||
+        NetworkConfig::get()->isClient())
     {
         // Avoid saving a time event for the same time, which happens
         // with t=0.
@@ -176,6 +178,8 @@ void RewindManager::saveStates()
             // which increases replay precision (same time step size)
             m_rewind_queue.addTimeEvent(getCurrentTime());
         }
+        if (NetworkConfig::get()->isClient())
+            m_last_saved_state = time;
         return;
     }
 
@@ -245,6 +249,7 @@ void RewindManager::playEventsTill(float time)
             return;
         }
         ++m_rewind_queue;
+
         if(ri->isEvent())
             ri->rewind();
         else if (ri->isState())

@@ -195,6 +195,8 @@ void PlayerController::action(PlayerAction action, int value)
 void PlayerController::actionFromNetwork(PlayerAction p_action, int value,
                                          int value_l, int value_r)
 {
+    if (m_steer_val_l != value_l || m_steer_val_r != value_r)
+        printf("");
     m_steer_val_l = value_l;
     m_steer_val_r = value_r;
     action(p_action, value);
