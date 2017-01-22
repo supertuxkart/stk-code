@@ -247,6 +247,13 @@ void RewindManager::playEventsTill(float time)
         ++m_rewind_queue;
         if(ri->isEvent())
             ri->rewind();
+        else if (ri->isState())
+        {
+            Log::warn("RewindManager",
+                      "Client has received state in the future: at %f state %f",
+                      World::getWorld()->getTime(), ri->getTime());
+            ri->rewind();
+        }
     }
     m_is_rewinding = false;
 }   // playEventsTill
