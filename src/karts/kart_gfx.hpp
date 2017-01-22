@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <string>
+#include "race/race_manager.hpp"
 
 class AbstractKart;
 class ParticleEmitter;
@@ -92,7 +93,7 @@ private:
     void resizeBox(const KartGFXType type, float new_size);
 
 public:
-         KartGFX(const AbstractKart *kart);
+         KartGFX(const AbstractKart *kart, RaceManager::KartType type);
         ~KartGFX();
     void reset();
     void setSkidLevel(const unsigned int level);
