@@ -77,6 +77,7 @@ public:
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              unsigned int indx);
     virtual void reset(const Track &track);
+    virtual void resetAfterKartMove(unsigned int kart_index);
     virtual void changeDebugColor(bool is_active);
     /** Returns the actual line data for this checkpoint. */
     const core::line2df &getLine2D() const {return m_line;}

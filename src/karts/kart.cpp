@@ -428,6 +428,14 @@ void Kart::reset()
 }   // reset
 
 // -----------------------------------------------------------------------------
+void Kart::setXYZ(const Vec3& a)
+{
+    AbstractKart::setXYZ(a);
+    Vec3 front(0, 0, getKartLength()*0.5f);
+    m_xyz_front = getTrans()(front);
+}    // setXYZ
+
+// -----------------------------------------------------------------------------
 void Kart::increaseMaxSpeed(unsigned int category, float add_speed,
                             float engine_force, float duration,
                             float fade_out_time)

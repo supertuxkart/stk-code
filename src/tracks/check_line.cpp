@@ -138,6 +138,13 @@ void CheckLine::reset(const Track &track)
 }   // reset
 
 // ----------------------------------------------------------------------------
+void CheckLine::resetAfterKartMove(unsigned int kart_index)
+{
+    AbstractKart *kart = World::getWorld()->getKart(kart_index);
+    m_previous_position[kart_index] = kart->getXYZ();
+}   // resetAfterKartMove
+
+// ----------------------------------------------------------------------------
 void CheckLine::changeDebugColor(bool is_active)
 {
     assert(m_debug_node);
@@ -167,7 +174,7 @@ void CheckLine::changeDebugColor(bool is_active)
  *                  additional data.
  */
 bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-    unsigned int kart_index)
+                            unsigned int kart_index)
 {
     World* w = World::getWorld();
     core::vector2df p=new_pos.toIrrVector2d();

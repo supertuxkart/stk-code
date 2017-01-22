@@ -84,7 +84,7 @@ public:
     virtual void stopFlying();
 
     /** Sets the XYZ coordinates of the moveable. */
-    void setXYZ(const Vec3& a)
+    virtual void setXYZ(const Vec3& a)
     {
         m_transform.setOrigin(a);
         if(m_motion_state)
