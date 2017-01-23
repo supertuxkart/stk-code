@@ -12,8 +12,10 @@
 //#include "os.h"
 #include "Keycodes.h"
 
+#include "config/user_config.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
@@ -1236,6 +1238,7 @@ bool CGUIEditBox::processMouse(const SEvent& event)
 #endif
             setTextMarkers(CursorPos, CursorPos );
             calculateScrollPos();
+
             return true;
         }
         else if (!m_rtl)
@@ -1244,6 +1247,19 @@ bool CGUIEditBox::processMouse(const SEvent& event)
                 core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y)))
             {
                 return false;
+            }
+            else if (UserConfigParams::m_screen_keyboard)
+            {
+                CursorPos = Text.size();
+                setTextMarkers(CursorPos, CursorPos);
+                calculateScrollPos();
+
+                if (GUIEngine::ScreenKeyboard::getCurrent() == NULL)
+                {
+                    new GUIEngine::ScreenKeyboard(0.98, 0.30, this);
+                }
+
+                return true;
             }
             else
             {
@@ -1264,6 +1280,7 @@ bool CGUIEditBox::processMouse(const SEvent& event)
                 MouseMarking = true;
                 setTextMarkers( newMarkBegin, CursorPos);
                 calculateScrollPos();
+
                 return true;
             }
         }

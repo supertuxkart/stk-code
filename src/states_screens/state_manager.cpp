@@ -25,6 +25,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "main_loop.hpp"
@@ -163,8 +164,15 @@ void StateManager::escapePressed()
     if(input_manager->isInMode(InputManager::INPUT_SENSE_KEYBOARD) ||
        input_manager->isInMode(InputManager::INPUT_SENSE_GAMEPAD) )
     {
+        ScreenKeyboard::dismiss();
         ModalDialog::dismiss();
         input_manager->setMode(InputManager::MENU);
+    }
+    // when another modal dialog is visible
+    else if(ScreenKeyboard::isActive())
+    {
+        if(ScreenKeyboard::getCurrent()->onEscapePressed())
+            ScreenKeyboard::getCurrent()->dismiss();
     }
     // when another modal dialog is visible
     else if(ModalDialog::isADialogActive())

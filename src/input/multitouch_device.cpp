@@ -25,6 +25,7 @@
 #include "karts/controller/controller.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen_keyboard.hpp"
 
 // ----------------------------------------------------------------------------
 /** The multitouch device constructor
@@ -263,6 +264,7 @@ void MultitouchDevice::handleControls(MultitouchButton* button)
     // to use it for GUI navigation.
     if (StateManager::get()->getGameState() != GUIEngine::GAME ||
         GUIEngine::ModalDialog::isADialogActive() ||
+        GUIEngine::ScreenKeyboard::isActive() ||
         race_manager->isWatchingReplay())
         return;
 

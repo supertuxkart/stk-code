@@ -420,12 +420,17 @@ namespace UserConfigParams
             &m_multitouch_group,
             "A parameter in range [0, 0.5] that determines the zone that is "
             "considered as max value in steering button."));
-            
+
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_scale
             PARAM_DEFAULT( FloatUserConfigParam(1.0f, "multitouch_scale",
             &m_multitouch_group,
             "A parameter in range [0.5, 1.5] that determines the scale of the "
             "multitouch interface."));
+
+    PARAM_PREFIX BoolUserConfigParam         m_screen_keyboard
+            PARAM_DEFAULT( BoolUserConfigParam(false, "screen_keyboard",
+            &m_multitouch_group,
+            "Enable screen keyboard.") );
 
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
@@ -491,7 +496,7 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_texture_compression
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
         &m_video_group, "Enable Texture Compression"));
-    /** This is a bit flag: bit 0: enabled (1) or disabled(0). 
+    /** This is a bit flag: bit 0: enabled (1) or disabled(0).
      *  Bit 1: setting done by default(0), or by user choice (2). This allows
      *  to e.g. disable h.d. textures on hd3000 as default, but still allow the
      *  user to enable it. */
@@ -592,7 +597,7 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_no_start_screen   PARAM_DEFAULT( false );
 
     PARAM_PREFIX bool m_race_now          PARAM_DEFAULT( false );
-    
+
     PARAM_PREFIX bool m_enforce_current_player PARAM_DEFAULT( false );
 
     /** True to test funky ambient/diffuse/specularity in RGB &
@@ -910,7 +915,7 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_artist_debug_mode
             PARAM_DEFAULT( BoolUserConfigParam(false, "artist_debug_mode",
                                "Whether to enable track debugging features") );
-                               
+
     PARAM_PREFIX BoolUserConfigParam        m_everything_unlocked
             PARAM_DEFAULT( BoolUserConfigParam(false, "everything_unlocked",
                                "Enable all karts and tracks") );
