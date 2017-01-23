@@ -245,7 +245,7 @@ void ServerLobby::update(float dt)
         // they have started the race/
         break;
     case WAIT_FOR_RACE_STARTED: 
-        // The function finishedLoadingWorldClient() will trigger the
+        // The function startedRaceOnClient() will trigger the
         // next state.
         break;
     case DELAY_SERVER:
