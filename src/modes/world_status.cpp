@@ -30,6 +30,7 @@
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocols/server_lobby.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "tracks/track.hpp"
 
@@ -61,6 +62,7 @@ WorldStatus::WorldStatus()
 void WorldStatus::reset()
 {
     m_time            = 0.0f;
+    m_adjust_time_by  = 0.0f;
     m_auxiliary_timer = 0.0f;
     m_count_up_timer  = 0.0f;
 
@@ -391,14 +393,23 @@ void WorldStatus::updateTime(const float dt)
     }
 
     IrrlichtDevice *device = irr_driver->getDevice();
+    // If this is a client, the server might request an 
+    // adjustment of this client's world clock (to reduce
+    // number of rewinds).
+    float actual_dt;
+    if (NetworkConfig::get()->isClient() &&
+        !RewindManager::get()->isRewinding())
+        actual_dt = adjustDT(dt);
+    else
+        actual_dt = dt;
 
     switch (m_clock_mode)
     {
         case CLOCK_CHRONO:
             if (!device->getTimer()->isStopped())
             {
-                m_time += dt;
-                m_count_up_timer += dt;
+                m_time += actual_dt;
+                m_count_up_timer += actual_dt;
             }
             break;
         case CLOCK_COUNTDOWN:
@@ -412,8 +423,8 @@ void WorldStatus::updateTime(const float dt)
 
             if (!device->getTimer()->isStopped())
             {
-                m_time -= dt;
-                m_count_up_timer += dt;
+                m_time -= actual_dt;
+                m_count_up_timer += actual_dt;
             }
 
             if(m_time <= 0.0)
@@ -426,6 +437,41 @@ void WorldStatus::updateTime(const float dt)
         default: break;
     }   // switch m_phase
 }   // update
+
+//-----------------------------------------------------------------------------
+/** If the server requests that a client's time should be adjusted,
+ *  smoothly change the clock speed of this client to go a bit faster
+ *  or slower till the overall adjustment was reached.
+ *  \param dt Original time step size.
+ */
+float WorldStatus::adjustDT(float dt)
+{
+    // If request, adjust world time to go ahead (adjust>0) or
+    // slow down (<0). This is done in 5% of dt steps so that the
+    // user will not notice this.
+    const float FRACTION = 0.05f;   // fraction of dt to be adjusted
+    float time_adjust;
+    if (m_adjust_time_by >= 0)   // make it run faster
+    {
+        time_adjust = dt * FRACTION;
+        if (time_adjust > m_adjust_time_by) time_adjust = m_adjust_time_by;
+        if (m_adjust_time_by > 0)
+            Log::verbose("info", "At %f %f adjusting time by %f dt %f to dt %f for %f",
+                World::getWorld()->getTime(), StkTime::getRealTime(),
+                time_adjust, dt, dt + time_adjust, m_adjust_time_by);
+    }
+    else   // m_adjust_time negative, i.e. will go slower
+    {
+        time_adjust = -dt * FRACTION;
+        if (time_adjust < m_adjust_time_by) time_adjust = m_adjust_time_by;
+        Log::verbose("info", "At %f %f adjusting time by %f dt %f to dt %f for %f",
+            World::getWorld()->getTime(), StkTime::getRealTime(),
+            time_adjust, dt, dt + time_adjust, m_adjust_time_by);
+    }
+    m_adjust_time_by -= time_adjust;
+    dt += time_adjust;
+    return dt;
+}  // adjustDT
 
 //-----------------------------------------------------------------------------
 /** Called on the client when it receives a notification from the server that

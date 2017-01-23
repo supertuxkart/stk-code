@@ -30,6 +30,7 @@
 
 class BareNetworkString;
 class NetworkString;
+class STKPeer;
 
 class GameProtocol : public Protocol
                    , public EventRewinder
@@ -39,11 +40,17 @@ private:
 
     /** The type of game events to be forwarded to the server. */
     enum { GP_CONTROLLER_ACTION,
-           GP_STATE};
+           GP_STATE,
+           GP_ADJUST_TIME
+    };
 
     /** A network string that collects all information from the server to be sent
      *  next. */
     NetworkString *m_data_to_send;
+
+    /** The server might request that the world clock of a client is adjusted
+     *  to reduce number of rollbacks. */
+    std::vector<int8_t> m_adjust_time;
 
     // Dummy data structure to save all kart actions.
     struct Action
@@ -61,6 +68,7 @@ private:
 
     void handleControllerAction(Event *event);
     void handleState(Event *event);
+    void handleAdjustTime(Event *event);
 public:
              GameProtocol();
     virtual ~GameProtocol();
@@ -73,6 +81,7 @@ public:
     void startNewState();
     void addState(BareNetworkString *buffer);
     void sendState();
+    void adjustTimeForClient(STKPeer *peer, float t);
 
     virtual void undo(BareNetworkString *buffer) OVERRIDE;
     virtual void rewind(BareNetworkString *buffer) OVERRIDE;
@@ -80,7 +89,7 @@ public:
     virtual void setup() OVERRIDE {};
     // ------------------------------------------------------------------------
     virtual void asynchronousUpdate() OVERRIDE {}
-
+    // ------------------------------------------------------------------------
 };   // class GameProtocol
 
 #endif // GAME_PROTOCOL_HPP

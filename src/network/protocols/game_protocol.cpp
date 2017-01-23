@@ -69,7 +69,7 @@ void GameProtocol::update(float dt)
                        .addUInt32(a.m_value_l).addUInt32(a.m_value_r);
     }   // for a in m_all_actions
 
-        // FIXME: for now send reliable
+    // FIXME: for now send reliable
     sendToServer(m_data_to_send, /*reliable*/ true);
     m_all_actions.clear();
 }   // update
@@ -87,6 +87,7 @@ bool GameProtocol::notifyEventAsynchronous(Event* event)
     {
     case GP_CONTROLLER_ACTION: handleControllerAction(event); break;
     case GP_STATE:             handleState(event);            break;
+    case GP_ADJUST_TIME:       handleAdjustTime(event);       break;
     default: Log::error("GameProtocol",
                         "Received unknown message type %d - ignored.",
                         message_type);                        break;
@@ -130,6 +131,9 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
               World::getWorld()->getTime(), action, value);
 }   // controllerAction
 
+
+#include "utils/time.hpp"
+
 // ----------------------------------------------------------------------------
 /** Called when a controller event is receiver - either on the server from
  *  a client, or on a client from the server. It sorts the event into the
@@ -140,9 +144,16 @@ void GameProtocol::handleControllerAction(Event *event)
 {
     NetworkString &data = event->data();
     uint8_t count = data.getUInt8();
+    bool will_trigger_rewind = false;
+    float rewind_delta = 0.0f;
     for (unsigned int i = 0; i < count; i++)
     {
         float   time    = data.getFloat();
+        if (time < World::getWorld()->getTime())
+        {
+            will_trigger_rewind = true;
+            rewind_delta = time - World::getWorld()->getTime();
+        }
         uint8_t kart_id = data.getUInt8();
         assert(kart_id < World::getWorld()->getNumKarts());
 
@@ -168,10 +179,46 @@ void GameProtocol::handleControllerAction(Event *event)
         // Send update to all clients except the original sender.
         STKHost::get()->sendPacketExcept(event->getPeer(),
                                          &data, false);
+        if (will_trigger_rewind)
+        {
+            Log::info("GameProtocol", "At %f %f requesting time adjust of %f for host %d",
+                World::getWorld()->getTime(), StkTime::getRealTime(),
+                rewind_delta, event->getPeer()->getHostId());
+            // This message from a client triggered a rewind in the server.
+            // To avoid this, signal to the client that it should slow down.
+            adjustTimeForClient(event->getPeer(), rewind_delta);
+        }
     }   // if server
 
 }   // handleControllerAction
 
+// ----------------------------------------------------------------------------
+/** The server might request that a client adjusts its world clock (in order to
+ *  reduce rewinds). This function sends a a (unreliable) message to the 
+ *  client.
+ *  \param peer The peer that triggered the rewind.
+ *  \param t Time that the peer needs to slowdown (<0) or sped up(>0).
+ */
+void GameProtocol::adjustTimeForClient(STKPeer *peer, float t)
+{
+    assert(NetworkConfig::get()->isServer());
+    NetworkString *ns = getNetworkString(5);
+    ns->addUInt8(GP_ADJUST_TIME).addFloat(t);
+    // This message can be send unreliable, it's not critical if it doesn't
+    // get delivered, the server will request again later anyway.
+    peer->sendPacket(ns, /*reliable*/false);
+    delete ns;
+}   // adjustTimeForClient
+
+// ----------------------------------------------------------------------------
+/** Called on a client when the server requests an adjustment of this client's
+ *  world clock time (in order to reduce rewinds).
+ */
+void GameProtocol::handleAdjustTime(Event *event)
+{
+    float t = event->data().getFloat();
+    World::getWorld()->setAdjustTime(t);
+}   // handleAdjustTime
 // ----------------------------------------------------------------------------
 /** Called by the server before assembling a new message containing the full
  *  state of the race to be sent to a client.
