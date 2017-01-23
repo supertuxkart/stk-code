@@ -162,6 +162,7 @@ KartGFX::~KartGFX()
         m_nitro_light->drop();
         m_skidding_light_1->drop();
         m_skidding_light_2->drop();
+        m_head_light->drop();
     }
 #endif
 

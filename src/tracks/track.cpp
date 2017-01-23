@@ -126,6 +126,7 @@ Track::Track(const std::string &filename)
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
     m_bloom                 = true;
+    m_is_day                = true;
     m_bloom_threshold       = 0.75f;
     m_color_inlevel         = core::vector3df(0.0,1.0, 255.0);
     m_color_outlevel        = core::vector2df(0.0, 255.0);
@@ -481,7 +482,6 @@ void Track::loadTrackInfo()
     m_gravity               = 9.80665f;
     m_smooth_normals        = false;
     m_godrays               = false;
-    m_is_day                = true;
     m_godrays_opacity       = 1.0f;
     m_godrays_color         = video::SColor(255, 255, 255, 255);
                               /* ARGB */
