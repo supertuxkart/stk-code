@@ -138,6 +138,10 @@ KartGFX::KartGFX(const AbstractKart *kart, RaceManager::KartType type, bool is_d
     addEffect(KGFX_NITRO2,      "nitro.xml",       rear_nitro_left,  true );
     addEffect(KGFX_NITROSMOKE1, "nitro-smoke.xml", rear_nitro_left,  false);
     addEffect(KGFX_NITROSMOKE2, "nitro-smoke.xml", rear_nitro_right, false);
+
+    addEffect(KGFX_EXHAUST1,    "kart_exhaust.xml",rear_nitro_right, false );
+    addEffect(KGFX_EXHAUST2,    "kart_exhaust.xml",rear_nitro_left,  false );
+    
     addEffect(KGFX_ZIPPER,      "zipper_fire.xml", rear_center,      true );
     addEffect(KGFX_TERRAIN,     "smoke.xml",       Vec3(0, 0, 0),    false);
     addEffect(KGFX_SKID1L,      "skid1.xml",       rear_left,        true );
@@ -436,6 +440,10 @@ void KartGFX::updateNitroGraphics(float nitro_frac)
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
         m_nitro_light->setVisible(false);
     }
+    
+    // Exhaust is always emitting
+    setCreationRateRelative(KartGFX::KGFX_EXHAUST1, 1.0);
+    setCreationRateRelative(KartGFX::KGFX_EXHAUST2, 1.0);
 #endif
 }  // updateGraphics
 

@@ -50,6 +50,8 @@ public:
                        KGFX_NITRO2,
                        KGFX_NITROSMOKE1,
                        KGFX_NITROSMOKE2,
+                       KGFX_EXHAUST1,
+                       KGFX_EXHAUST2,
                        KGFX_ZIPPER,
                        KGFX_TERRAIN,
                        KGFX_SKIDL,
