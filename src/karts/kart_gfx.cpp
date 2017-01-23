@@ -111,6 +111,7 @@ KartGFX::KartGFX(const AbstractKart *kart, RaceManager::KartType type, bool is_d
         m_nitro_light->grab();
         m_skidding_light_1->grab();
         m_skidding_light_2->grab();
+        m_head_light->grab();
     }
 #endif
 
