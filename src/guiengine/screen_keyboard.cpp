@@ -26,6 +26,7 @@
 #include "guiengine/widgets/CGUIEditBox.hpp"
 #include "utils/log.hpp"
 
+#include <algorithm>
 #include <string>
 
 using namespace GUIEngine;
