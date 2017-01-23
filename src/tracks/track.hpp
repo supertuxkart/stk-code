@@ -107,6 +107,7 @@ private:
     float                    m_gravity;
     std::string              m_ident;
     std::string              m_screenshot;
+    bool                     m_is_day;
     std::vector<MusicInformation*> m_music;
 
     /** Will only be used on overworld */
@@ -484,6 +485,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns an absolute path to the screenshot file of this track */
     const std::string& getScreenshotFile () const {return m_screenshot;       }
+    // ------------------------------------------------------------------------
+    /** Returns if the track is during day time */
+    const bool getIsDuringDay () const {return m_is_day;               }
     // ------------------------------------------------------------------------
     /** Returns the start coordinates for a kart with a given index.
      *  \param index Index of kart ranging from 0 to kart_num-1. */

@@ -228,7 +228,7 @@ void Kart::init(RaceManager::KartType type)
     }
     loadData(type, animations);
 
-    m_kart_gfx = new KartGFX(this, m_type);
+    m_kart_gfx = new KartGFX(this, m_type, Track::getCurrentTrack()->getIsDuringDay());
     m_skidding = new Skidding(this);
     // Create the stars effect
     m_stars_effect = new Stars(this);

@@ -481,6 +481,7 @@ void Track::loadTrackInfo()
     m_gravity               = 9.80665f;
     m_smooth_normals        = false;
     m_godrays               = false;
+    m_is_day                = true;
     m_godrays_opacity       = 1.0f;
     m_godrays_color         = video::SColor(255, 255, 255, 255);
                               /* ARGB */
@@ -526,6 +527,7 @@ void Track::loadTrackInfo()
     root->get("bloom",                 &m_bloom);
     root->get("bloom-threshold",       &m_bloom_threshold);
     root->get("shadows",               &m_shadows);
+    root->get("is-during-day",         &m_is_day);
     root->get("displacement-speed",    &m_displacement_speed);
     root->get("caustics-speed",        &m_caustics_speed);
     root->get("color-level-in",        &m_color_inlevel);

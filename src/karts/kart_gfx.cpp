@@ -36,7 +36,7 @@
 
 #include <iostream>
 
-KartGFX::KartGFX(const AbstractKart *kart, RaceManager::KartType type)
+KartGFX::KartGFX(const AbstractKart *kart, RaceManager::KartType type, bool is_day)
 {
     //if(!UserConfigParams::m_graphical_effects)
     //{
@@ -93,7 +93,7 @@ KartGFX::KartGFX(const AbstractKart *kart, RaceManager::KartType type)
     m_head_light->setName( ("head light " + m_kart->getIdent() 
                                                          + ")").c_str() );
 
-    if (type == RaceManager::KT_PLAYER)
+    if (type == RaceManager::KT_PLAYER && !is_day)
     {
         m_head_light->setVisible(true);
     }

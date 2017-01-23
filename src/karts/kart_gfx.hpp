@@ -93,7 +93,7 @@ private:
     void resizeBox(const KartGFXType type, float new_size);
 
 public:
-         KartGFX(const AbstractKart *kart, RaceManager::KartType type);
+         KartGFX(const AbstractKart *kart, RaceManager::KartType type, bool is_day);
         ~KartGFX();
     void reset();
     void setSkidLevel(const unsigned int level);
