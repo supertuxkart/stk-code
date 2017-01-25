@@ -425,7 +425,7 @@ void KartSelectionScreen::tearDown()
 
 void KartSelectionScreen::unloaded()
 {
-    // these pointer is no more valid (have been deleted along other widgets)
+    // This pointer is no longer valid (has been deleted along other widgets)
     m_dispatcher = NULL;
 }
 

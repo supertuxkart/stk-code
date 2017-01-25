@@ -73,6 +73,10 @@ private:
     *  with the stk server. */
     bool m_is_registered;
 
+    /** True if a client should connect to the first server it finds and
+     *  immediately start a race. */
+    bool m_auto_connect;
+
     /** If this is a server, the server name. */
     irr::core::stringw m_server_name;
 
@@ -207,6 +211,13 @@ public:
         m_my_address.unlock();
         return a;
     }   // getMyAddress
+    // --------------------------------------------------------------------
+    /** Sets if a client should immediately connect to the first server. */
+    void setAutoConnect(bool b) { m_auto_connect = b; }
+    // --------------------------------------------------------------------
+    /** Returns if an immediate connection to the first server was
+     *  requested. */
+    bool isAutoConnect() const { return m_auto_connect; }
 
 };   // class NetworkConfig
 

@@ -171,6 +171,14 @@ void TracksScreen::init()
         tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
     }
     irr_driver->unsetTextureErrorMessage();
+    if (NetworkConfig::get()->isAutoConnect())
+    {
+        DynamicRibbonWidget* tw = getWidget<DynamicRibbonWidget>("tracks");
+        tw->setSelection(UserConfigParams::m_last_track, 0,
+                         /*focus*/true);
+        eventCallback(tw, "tracks",
+                      /*player id*/0);
+    }
 }   // init
 
 // -----------------------------------------------------------------------------

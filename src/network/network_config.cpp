@@ -36,6 +36,7 @@ bool           NetworkConfig::m_disable_lan    = false;
 NetworkConfig::NetworkConfig()
 {
     m_network_type          = NETWORK_NONE;
+    m_auto_connect          = false;
     m_is_server             = false;
     m_is_public_server      = false;
     m_max_players           = 4;

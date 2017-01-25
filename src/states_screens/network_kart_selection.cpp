@@ -30,6 +30,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/stk_host.hpp"
+#include "states_screens/race_setup_screen.hpp"
 #include "states_screens/server_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
@@ -106,6 +107,15 @@ void NetworkKartSelectionScreen::init()
         m_kart_widgets[n].move( fullarea->m_x + splitWidth*n,
                                 fullarea->m_y, splitWidth, fullarea->m_h);
     }
+    // In case of auto-connect, select default kart and go to track selection.
+    if (NetworkConfig::get()->isAutoConnect())
+    {
+        DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
+        assert(w != NULL);
+        w->setSelection(UserConfigParams::m_default_kart, /*player id*/0, /*focus*/true);
+        playerConfirm(0);
+        RaceSetupScreen::getInstance()->push();
+    }
 
 }   // init
 
@@ -145,7 +155,7 @@ void NetworkKartSelectionScreen::playerConfirm(const int playerID)
         for(unsigned int i=0; i<players.size(); i++)
         {
             clrp->requestKartSelection(players[i]->getGlobalPlayerId(),
-                                           selection);
+                                       selection                        );
         }
     }
 }   // playerConfirm
@@ -168,11 +178,16 @@ void NetworkKartSelectionScreen::playerSelected(uint8_t player_id,
     if(widget_id==-1)
         return;
 
-    KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name,
-                                       irr::core::stringw(kart_name.c_str()));
-    KartSelectionScreen::updateKartStats(widget_id, kart_name);
-    m_kart_widgets[widget_id].setKartInternalName(kart_name);
-    m_kart_widgets[widget_id].markAsReady(); // mark player ready
+    // In case of auto-connect the screen is already replaced, so
+    // m_kart_widget is empty.
+    if (! STKHost::get()->isAuthorisedToControl())
+    {
+        KartSelectionScreen::updateKartWidgetModel(widget_id, kart_name,
+            irr::core::stringw(kart_name.c_str()));
+        KartSelectionScreen::updateKartStats(widget_id, kart_name);
+        m_kart_widgets[widget_id].setKartInternalName(kart_name);
+        m_kart_widgets[widget_id].markAsReady(); // mark player ready
+    }
 
     // If this is the authorised client, send the currently set race config
     // to the server.

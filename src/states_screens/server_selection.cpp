@@ -19,6 +19,7 @@
 
 #include "audio/sfx_manager.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "network/network_config.hpp"
 #include "network/servers_manager.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -208,6 +209,7 @@ void ServerSelection::eventCallback( GUIEngine::Widget* widget,
  *  if so, update the list of servers.
  */
 void ServerSelection::onUpdate(float dt)
+
 {
     if (!m_refresh_request) return;
 
@@ -249,5 +251,15 @@ void ServerSelection::onUpdate(float dt)
         // restore previous selection
         if (selection != -1 && selection_str != "spacer" && selection_str != "loading")
             m_server_list_widget->setSelectionID(selection);
+    }
+
+    // In case of auto-connect command line parameter, select the first server asap
+    if (NetworkConfig::get()->isAutoConnect() && 
+        m_refresh_request == NULL             &&
+        m_server_list_widget->getItemCount() > 0)
+    {
+        ServerInfoDialog *sid = new ServerInfoDialog(/*server*/0,
+                                                     /*host id*/0, false);
+        sid->requestJoin();
     }
 }   // onUpdate

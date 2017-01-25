@@ -54,7 +54,6 @@ private:
     /** The cancel button. */
     GUIEngine::IconButtonWidget *m_cancel_widget;
 
-    void requestJoin();
 
 public:
     ServerInfoDialog(uint32_t server_id, uint32_t host_id, bool just_created = false);
@@ -65,6 +64,7 @@ public:
 
     virtual bool onEscapePressed();
     virtual void onUpdate(float dt);
+    void requestJoin();
 };   // class ServerInfoDialog
 
 #endif

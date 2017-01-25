@@ -507,6 +507,15 @@ void ClientLobby::connectionAccepted(Event* event)
     NetworkingLobby::getInstance()->addPlayer(profile);
     m_server = event->getPeer();
     m_state = CONNECTED;
+    if (NetworkConfig::get()->isAutoConnect())
+    {
+        // Send a message to the server to start
+        NetworkString start(PROTOCOL_LOBBY_ROOM);
+        start.setSynchronous(true);
+        start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
+        STKHost::get()->sendToServer(&start, true);
+    }
+
 }   // connectionAccepted
 
 //-----------------------------------------------------------------------------
@@ -609,8 +618,7 @@ void ClientLobby::kartSelectionUpdate(Event* event)
 
 //-----------------------------------------------------------------------------
 
-/*! \brief Called when the server broadcasts to start the race.
-race needs to be started.
+/*! \brief Called when the server broadcasts to start the race to all clients.
  *  \param event : Event providing the information (no additional information
  *                 in this case).
  */

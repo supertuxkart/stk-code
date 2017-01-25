@@ -583,6 +583,7 @@ void cmdLineHelp()
     "       --port=n           Port number to use.\n"
     "       --my-address=1.1.1.1:1  Own IP address (can replace stun protocol)\n"
     "       --disable-lan      Disable LAN detection (connect using WAN).\n"
+    "       --auto-connect     Automatically connect to fist server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
     "       --no-console       Does not write messages in the console but to\n"
     "                          stdout.log.\n"
@@ -1030,7 +1031,10 @@ int handleCmdLine()
     {
         NetworkConfig::get()->setPassword(s);
     }
-
+    if (CommandLine::has("--auto-connect"))
+    {
+        NetworkConfig::get()->setAutoConnect(true);
+    }
     if(CommandLine::has("--max-players", &n))
         UserConfigParams::m_server_max_players=n;
 
