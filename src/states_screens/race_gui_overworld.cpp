@@ -119,7 +119,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     {
         m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
                                                         m_map_width) * 0.9f);
-        m_map_bottom = m_map_height + 10 * scaling;
+        m_map_bottom = m_map_height + int(10 * scaling);
     }
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
