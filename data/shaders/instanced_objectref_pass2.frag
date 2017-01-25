@@ -11,7 +11,7 @@ flat in sampler2D thirdhandle;
 #endif
 in vec2 uv;
 in vec4 color;
-in vec2 color_change;
+flat in vec2 color_change;
 out vec4 FragColor;
 
 #stk_include "utils/getLightFactor.frag"
@@ -29,6 +29,7 @@ void main(void)
 #else
     vec4 col = texture(Albedo, uv);
     float specmap = texture(SpecMap, uv).g;
+    float emitmap = texture(SpecMap, uv).b;
     float mask = texture(colorization_mask, uv).a;
 #endif
     col.xyz *= pow(color.xyz, vec3(2.2));
@@ -43,5 +44,5 @@ void main(void)
         col = vec4(new_color.r, new_color.g, new_color.b, col.a);
     }
 
-    FragColor = vec4(getLightFactor(col.xyz, vec3(1.), specmap, 0.), 1.);
+    FragColor = vec4(getLightFactor(col.xyz, vec3(1.), specmap, emitmap), 1.);
 }

@@ -78,21 +78,19 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
 }
 
 //-----------------------------------------------------------------------------
-
-Material* MaterialManager::getMaterialFor(video::ITexture* t,
-    video::E_MATERIAL_TYPE material_type)
+Material* MaterialManager::getMaterialFor(video::ITexture* t)
 {
-    if (t == NULL)
-        return getDefaultMaterial(material_type);
-
     core::stringc img_path = core::stringc(t->getName());
-    const std::string image = StringUtils::getBasename(img_path.c_str());
+	img_path.make_lower();
+
     if (!img_path.empty() && (img_path.findFirst('/') != -1 || img_path.findFirst('\\') != -1))
     {
         // Search backward so that temporary (track) textures are found first
         for (int i = (int)m_materials.size() - 1; i >= 0; i--)
         {
-            if (m_materials[i]->getTexFullPath() == img_path.c_str())
+            core::stringc fullpath = core::stringc(m_materials[i]->getTexFullPath().c_str());
+            fullpath.make_lower();
+            if (fullpath == img_path.c_str())
             {
                 return m_materials[i];
             }
@@ -100,14 +98,32 @@ Material* MaterialManager::getMaterialFor(video::ITexture* t,
     }
     else
     {
+        core::stringc image(StringUtils::getBasename(img_path.c_str()).c_str());
+        image.make_lower();
+
         for (int i = (int)m_materials.size() - 1; i >= 0; i--)
         {
-            if (m_materials[i]->getTexFname() == image)
+            core::stringc texfname(m_materials[i]->getTexFname().c_str());
+            texfname.make_lower();
+            if (texfname == image)
             {
                 return m_materials[i];
             }
         }   // for i
     }
+    return NULL;
+}
+
+//-----------------------------------------------------------------------------
+Material* MaterialManager::getMaterialFor(video::ITexture* t,
+    video::E_MATERIAL_TYPE material_type)
+{
+    if (t == NULL)
+        return getDefaultMaterial(material_type);
+
+    Material* m = getMaterialFor(t);
+    if (m != NULL)
+        return m;
 
     return getDefaultMaterial(material_type);
 }
@@ -139,7 +155,7 @@ Material* MaterialManager::getDefaultMaterial(video::E_MATERIAL_TYPE shader_type
     auto it = m_default_materials.find(shader_type);
     if (it == m_default_materials.end())
     {
-        Material* default_material = new Material("", false, false, false);
+        Material* default_material = new Material("Default", false, false, false);
 
         // TODO: workaround, should not hardcode these material types here?
         // Try to find a cleaner way
@@ -339,10 +355,16 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     else
         basename = fname;
         
+    core::stringc basename_lower(basename.c_str());
+    basename_lower.make_lower();
+
     // Search backward so that temporary (track) textures are found first
-    for(int i = (int)m_materials.size()-1; i>=0; i-- )
+    for (int i = (int)m_materials.size()-1; i>=0; i-- )
     {
-        if(m_materials[i]->getTexFname()==basename) return m_materials[i];
+        core::stringc fname(m_materials[i]->getTexFname().c_str());
+        fname.make_lower();
+        if (fname == basename_lower)
+            return m_materials[i];
     }
 
     // Add the new material
@@ -364,6 +386,18 @@ void MaterialManager::makeMaterialsPermanent()
 {
     m_shared_material_index = (int) m_materials.size();
 }   // makeMaterialsPermanent
+
+// ----------------------------------------------------------------------------
+
+void MaterialManager::unloadAllTextures()
+{
+    std::string texture_folder = file_manager->getAssetDirectory(FileManager::TEXTURE);
+    for (int i = 0; i < m_shared_material_index; i++)
+    {
+        if (m_materials[i]->getTexFullPath().find(texture_folder) != std::string::npos)
+            m_materials[i]->unloadTexture();
+    }
+}
 
 // ----------------------------------------------------------------------------
 bool MaterialManager::hasMaterial(const std::string& fname)

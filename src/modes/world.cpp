@@ -28,6 +28,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
@@ -429,6 +430,7 @@ Controller* World::loadAIController(AbstractKart *kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    material_manager->unloadAllTextures();
     RewindManager::destroy();
 
     irr_driver->onUnloadWorld();
@@ -778,6 +780,7 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     // Project kart to surface of track
     // This will set the physics transform
     Track::getCurrentTrack()->findGround(kart);
+    CheckManager::get()->resetAfterKartMove(kart);
 
 }   // moveKartTo
 

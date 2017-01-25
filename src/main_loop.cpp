@@ -118,15 +118,19 @@ float MainLoop::getLimitedDt()
         // the noise the fan on a graphics card makes.
         // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
         const int max_fps = (StateManager::get()->throttleFPS() ? 30 : UserConfigParams::m_max_fps);
-        const int current_fps = (int)(1000.0f/dt);
-        if (m_throttle_fps && current_fps > max_fps && !ProfileWorld::isProfileMode())
+        if (dt > 0)
         {
-            int wait_time = 1000/max_fps - 1000/current_fps;
-            if(wait_time < 1) wait_time = 1;
+            const int current_fps = (int)(1000.0f / dt);
+            if (m_throttle_fps && current_fps > max_fps && !ProfileWorld::isProfileMode())
+            {
+                int wait_time = 1000 / max_fps - 1000 / current_fps;
+                if (wait_time < 1) wait_time = 1;
 
-            PROFILER_PUSH_CPU_MARKER("Throttle framerate", 0, 0, 0);
-            StkTime::sleep(wait_time);
-            PROFILER_POP_CPU_MARKER();
+                PROFILER_PUSH_CPU_MARKER("Throttle framerate", 0, 0, 0);
+                StkTime::sleep(wait_time);
+                PROFILER_POP_CPU_MARKER();
+            }
+            else break;
         }
         else break;
     }

@@ -20,9 +20,8 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/render_target.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "graphics/vao_manager.hpp"
 #include "modes/profile_world.hpp"
 #include "tracks/arena_node_3d.hpp"
@@ -109,9 +108,9 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
     m.Lighting         = false;
     if (enable_transparency)
         m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-    m.setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
-    m.setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-    m.setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m.setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+    m.setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m.setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     m_mesh             = irr_driver->createQuadMesh(&m);
     m_mesh_buffer      = m_mesh->getMeshBuffer(0);
     assert(m_mesh_buffer->getVertexType()==video::EVT_STANDARD);

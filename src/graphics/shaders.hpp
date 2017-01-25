@@ -138,21 +138,13 @@ public:
         TransparentFogShader();
     };   // TransparentFogShader
     // ========================================================================
-    class ObjectPass1Shader : public TextureShader<ObjectPass1Shader, 1,
-                                                  core::matrix4, core::matrix4>
-    {
-    public:
-        ObjectPass1Shader();
-    };   // ObjectPass1Shader
-
-    // ========================================================================
-    class ObjectPass2Shader : public TextureShader < ObjectPass2Shader, 6,
+    class SkinnedTransparentShader : public TextureShader<SkinnedTransparentShader, 1,
                                                  core::matrix4, core::vector2df,
-                                                 core::vector2df >
+                                                 int, float >
     {
     public:
-        ObjectPass2Shader();
-    };   // ObjectPass2Shader
+        SkinnedTransparentShader();
+    };   // SkinnedTransparentShader
 
     // ========================================================================
 

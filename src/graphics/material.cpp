@@ -33,7 +33,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "io/xml_node.hpp"
@@ -59,6 +59,7 @@ Material::Material(const XMLNode *node, bool deprecated)
 {
     m_shader_type = SHADERTYPE_SOLID;
     m_deprecated = deprecated;
+    m_installed = false;
 
     node->get("name",      &m_texname);
     if (m_texname=="")
@@ -74,7 +75,6 @@ Material::Material(const XMLNode *node, bool deprecated)
         m_full_path = file_manager->getFileSystem()->getAbsolutePath(relativePath.c_str()).c_str();
     init();
 
-    node->get("dont-load", &m_dont_load_texture);
     bool b = false;
     
     node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.4 style
@@ -397,9 +397,16 @@ Material::Material(const XMLNode *node, bool deprecated)
 
     if(m_has_gravity)
         m_high_tire_adhesion = true;
-
-    install(/*is_full_path*/false);
 }   // Material
+//-----------------------------------------------------------------------------
+video::ITexture* Material::getTexture(bool srgb, bool premul_alpha)
+{
+    if (!m_installed)
+    {
+        install(srgb, premul_alpha);
+    }
+    return m_texture;
+}   // getTexture
 
 //-----------------------------------------------------------------------------
 /** Create a standard material using the default settings for materials.
@@ -410,14 +417,25 @@ Material::Material(const std::string& fname, bool is_full_path,
                    bool complain_if_not_found, bool load_texture)
 {
     m_deprecated = false;
-
-    m_texname = fname;
+    m_installed = false;
     init();
-    m_full_path = file_manager->getFileSystem()->getAbsolutePath(
-        file_manager->searchTexture(m_texname).c_str()).c_str();
+
+    if (is_full_path)
+    {
+        m_texname = StringUtils::getBasename(fname);
+        m_full_path = fname;
+    }
+    else
+    {
+        m_texname = fname;
+        m_full_path = file_manager->getFileSystem()->getAbsolutePath(
+            file_manager->searchTexture(m_texname).c_str()).c_str();
+    }
+
+    m_complain_if_not_found = complain_if_not_found;
 
     if (load_texture)
-        install(is_full_path, complain_if_not_found);
+        install();
 }   // Material
 
 //-----------------------------------------------------------------------------
@@ -425,7 +443,6 @@ Material::Material(const std::string& fname, bool is_full_path,
  */
 void Material::init()
 {
-    m_dont_load_texture         = false;
     m_texture                   = NULL;
     m_clamp_tex                 = 0;
     m_shader_type               = SHADERTYPE_SOLID;
@@ -463,7 +480,7 @@ void Material::init()
     m_water_splash              = false;
     m_is_jump_texture           = false;
     m_has_gravity               = false;
-
+    m_complain_if_not_found     = true;
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {
         m_particles_effects[n] = NULL;
@@ -471,27 +488,27 @@ void Material::init()
 }   // init
 
 //-----------------------------------------------------------------------------
-void Material::install(bool is_full_path, bool complain_if_not_found)
+void Material::install(bool srgb, bool premul_alpha)
 {
     // Don't load a texture that are not supposed to be loaded automatically
-    if(m_dont_load_texture) return;
+    if (m_installed) return;
 
-    const std::string &full_path = is_full_path
-                                 ? m_texname
-                                 : file_manager->searchTexture(m_texname);
+    m_installed = true;
 
-    if (complain_if_not_found && full_path.size() == 0)
+    if (m_texname.find(".") == std::string::npos || m_full_path.empty())
     {
-        Log::error("material", "Cannot find texture '%s'.", m_texname.c_str());
+        if (m_complain_if_not_found)
+        {
+            Log::error("material", "Cannot find texture '%s'.",
+                m_texname.c_str());
+        }
         m_texture = NULL;
     }
-
     else
     {
-        m_texture = irr_driver->getTexture(full_path,
-                                           false, //isPreMul(),
-                                           false, //isPreDiv(),
-                                           complain_if_not_found);
+        m_texture = STKTexManager::getInstance()->getTexture
+            (m_full_path, srgb, premul_alpha, false/*set_material*/,
+            srgb/*mesh_tex*/);
     }
 
     if (m_texture == NULL) return;
@@ -499,32 +516,13 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
     // now set the name to the basename, so that all tests work as expected
     m_texname  = StringUtils::getBasename(m_texname);
 
-    if (m_mask.size() > 0)
-    {
-        video::ITexture* tex = irr_driver->applyMask(m_texture, m_mask);
-        if (tex)
-        {
-            irr_driver->removeTexture(m_texture);
-            m_texture = tex;
-        }
-        else
-        {
-            Log::warn("material", "Applying mask failed for '%s'!",
-                      m_texname.c_str());
-        }
-    }
     m_texture->grab();
 }   // install
 
 //-----------------------------------------------------------------------------
 Material::~Material()
 {
-    if (m_texture != NULL)
-    {
-        m_texture->drop();
-        if(m_texture->getReferenceCount()==1)
-            irr_driver->removeTexture(m_texture);
-    }
+    unloadTexture();
 
     // If a special sfx is installed (that isn't part of stk itself), the
     // entry needs to be removed from the sfx_manager's mapping, since other
@@ -534,6 +532,22 @@ Material::~Material()
         SFXManager::get()->deleteSFXMapping(m_sfx_name);
     }
 }   // ~Material
+
+//-----------------------------------------------------------------------------
+
+void Material::unloadTexture()
+{
+    if (m_texture != NULL)
+    {
+        m_texture->drop();
+        if (m_texture->getReferenceCount() == 1)
+        {
+            irr_driver->removeTexture(m_texture);
+        }
+        m_texture = NULL;
+        m_installed = false;
+    }
+}
 
 //-----------------------------------------------------------------------------
 /** Initialise the data structures for a custom sfx to be played when a
@@ -708,6 +722,11 @@ void Material::setSFXSpeed(SFXBase *sfx, float speed, bool should_be_paused) con
  */
 void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* mb)
 {
+    if (!m_installed)
+    {
+        install();
+    }
+
     if (m_deprecated ||
         (m->getTexture(0) != NULL &&
          ((core::stringc)m->getTexture(0)->getName()).find("deprecated") != -1))
@@ -725,22 +744,28 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         ITexture *tex;
         ITexture *glossytex;
-        if (m_gloss_map.size() > 0)
+        STKTexManager* stm = STKTexManager::getInstance();
+        if (m_gloss_map.size() > 0 && UserConfigParams::m_dynamic_lights)
         {
-            glossytex = irr_driver->getTexture(m_gloss_map);
+            glossytex = stm->getTexture(m_gloss_map, false/*srgb*/,
+                false/*premul_alpha*/, false/*set_material*/,
+                true/*mesh_tex*/);
         }
         else
         {
-            glossytex = getUnicolorTexture(SColor(0, 0, 0, 0));
+            glossytex = stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(0, 0, 0, 0));
         }
 
         if (!m->getTexture(2))
         {
             // Only set colorization mask if not set
-            ITexture *colorization_mask_tex = getUnicolorTexture(SColor(0, 0, 0, 0));
+            ITexture *colorization_mask_tex =
+                stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(0, 0, 0, 0));
             if (m_colorization_mask.size() > 0)
             {
-                colorization_mask_tex = irr_driver->getTexture(m_colorization_mask);
+                colorization_mask_tex = stm->getTexture(m_colorization_mask,
+                    false/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
+                    true/*mesh_tex*/, false/*no_upload*/, true/*single_channel*/);
             }
             m->setTexture(2, colorization_mask_tex);
         }
@@ -796,24 +821,32 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(1, glossytex);
             return;
         case SHADERTYPE_SPLATTING:
-            tex = irr_driver->getTexture(m_splatting_texture_1);
+            tex = stm->getTexture(m_splatting_texture_1,
+                true/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
+                true/*mesh_tex*/);
             m->setTexture(3, tex);
 
             if (m_splatting_texture_2.size() > 0)
             {
-                tex = irr_driver->getTexture(m_splatting_texture_2);
+                tex = stm->getTexture(m_splatting_texture_2,
+                    true/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
+                    true/*mesh_tex*/);
             }
             m->setTexture(4, tex);
 
             if (m_splatting_texture_3.size() > 0)
             {
-                tex = irr_driver->getTexture(m_splatting_texture_3);
+                tex = stm->getTexture(m_splatting_texture_3,
+                    true/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
+                    true/*mesh_tex*/);
             }
             m->setTexture(5, tex);
 
             if (m_splatting_texture_4.size() > 0)
             {
-                tex = irr_driver->getTexture(m_splatting_texture_4);
+                tex = stm->getTexture(m_splatting_texture_4,
+                    false/*srgb*/, false/*premul_alpha*/, false/*set_material*/,
+                    true/*mesh_tex*/);
             }
             m->setTexture(6, tex);
             m->setTexture(7, glossytex);
@@ -846,11 +879,21 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         }
 
         if (!m->getTexture(0))
-            m->setTexture(0, getUnicolorTexture(SColor(255, 255, 255, 255)));
+        {
+            m->setTexture(0,
+                stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(255, 255, 255, 255)));
+        }
 
         if (m_normal_map_tex.size() > 0)
         {
-            tex = irr_driver->getTexture(m_normal_map_tex);
+            if (UserConfigParams::m_dynamic_lights)
+            {
+                tex = stm->getTexture(m_normal_map_tex, false/*srgb*/,
+                    false/*premul_alpha*/, false/*set_material*/,
+                    true/*mesh_tex*/);
+            }
+            else
+                tex = stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(0, 0, 0, 0));
             m->setTexture(3, tex);
 
             // Material and shaders
@@ -866,7 +909,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             if (m->getTexture(1) != glossytex)
                 m->setTexture(3, m->getTexture(1));
             if (!m->getTexture(3))
-                m->setTexture(3, getUnicolorTexture(SColor(255, 255, 255, 255)));
+                m->setTexture(3, stm->STKTexManager::getInstance()->getUnicolorTexture(SColor(255, 255, 255, 255)));
         }
         m->setTexture(1, glossytex);
     }

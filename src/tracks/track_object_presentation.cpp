@@ -31,6 +31,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "graphics/render_info.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -177,8 +178,11 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     ModelDefinitionLoader& model_def_loader)
     : TrackObjectPresentationSceneNode(xml_node)
 {
+    m_start_executed = false;
+
     std::string name;
     xml_node.get("name", &name);
+    m_name = name;
 
     m_node = irr_driver->getSceneManager()->addEmptySceneNode();
 #ifdef DEBUG
@@ -203,20 +207,23 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
         }
         std::string lib_node_path = lib_path + "node.xml";
         std::string lib_script_file_path = lib_path + "scripting.as";
-        World* world = World::getWorld();
 
         if (local_lib_node_path.size() > 0 && file_manager->fileExists(local_lib_node_path))
         {
             lib_path = track->getTrackFile("library/" + name);
             libroot = file_manager->createXMLTree(local_lib_node_path);
             if (track != NULL)
+            {
                 Scripting::ScriptEngine::getInstance()->loadScript(local_script_file_path, false);
+            }
         }
         else if (file_manager->fileExists(lib_node_path))
         {
             libroot = file_manager->createXMLTree(lib_node_path);
             if (track != NULL)
+            {
                 Scripting::ScriptEngine::getInstance()->loadScript(lib_script_file_path, false);
+            }
         }
         else
         {
@@ -232,7 +239,8 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
             return;
         }
 
-        file_manager->pushTextureSearchPath(lib_path + "/");
+        std::string unique_id = StringUtils::insertValues("library/%s", name.c_str());
+        file_manager->pushTextureSearchPath(lib_path + "/", unique_id);
         file_manager->pushModelSearchPath(lib_path);
         material_manager->pushTempMaterial(lib_path + "/materials.xml");
         model_def_loader.addToLibrary(name, libroot);
@@ -270,6 +278,25 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
                                           parent);
     m_parent = parent;
 }   // TrackObjectPresentationLibraryNode
+
+// ----------------------------------------------------------------------------
+
+void TrackObjectPresentationLibraryNode::update(float dt)
+{
+    if (!m_start_executed)
+    {
+        m_start_executed = true;
+        std::string fn_name = StringUtils::insertValues("void %s::onStart(const string)", m_name.c_str());
+
+        std::string lib_id = m_parent->getID();
+        std::string* lib_id_ptr = &lib_id;
+
+        Scripting::ScriptEngine::getInstance()->runFunction(false, fn_name,
+            [&](asIScriptContext* ctx) {
+                ctx->SetArgObject(0, lib_id_ptr);
+            });
+    }
+}
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLibraryNode::~TrackObjectPresentationLibraryNode()
@@ -314,6 +341,28 @@ TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
     if (m_node)
         irr_driver->removeNode(m_node);
 }   // TrackObjectPresentationLOD
+
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationLOD::reset()
+{
+    LODNode* ln = dynamic_cast<LODNode*>(m_node);
+    if (ln)
+    {
+        for (scene::ISceneNode* node : ln->getAllNodes())
+        {
+            scene::IAnimatedMeshSceneNode* a_node =
+                dynamic_cast<scene::IAnimatedMeshSceneNode*>(node);
+            if (a_node)
+            {
+                RandomGenerator rg;
+                int animation_set = 0;
+                if (a_node->getAnimationSetNum() > 0)
+                    animation_set = rg.get(a_node->getAnimationSetNum());
+                 a_node->useAnimationSet(animation_set);
+            }
+        }
+    }
+}   // reset
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationMesh::TrackObjectPresentationMesh(
@@ -416,7 +465,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                       World::getWorld()->getIdent() == IDENT_CUTSCENE);
 
     m_model_file = model_file;
-    file_manager->pushTextureSearchPath(StringUtils::getPath(model_file));
+    file_manager->pushTextureSearchPath(StringUtils::getPath(model_file), "");
 #ifndef SERVER_ONLY
     if (file_manager->fileExists(model_file))
     {
@@ -482,8 +531,6 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
             m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
             enabled = false;
             m_force_always_hidden = true;
-            m_frame_start = 0;
-            m_frame_end = 0;
         }
         else
         {
@@ -491,8 +538,6 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
             m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
             enabled = false;
             m_force_always_hidden = true;
-            m_frame_start = 0;
-            m_frame_end = 0;
             Track *track = Track::getCurrentTrack();
             if (track && track && xml_node)
                 track->addPhysicsOnlyNode(m_node);
@@ -517,13 +562,23 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
                                         m_model_file, parent, m_render_info);
         m_node = node;
 
-        m_frame_start = node->getStartFrame();
+        std::vector<int> frames_start;
         if (xml_node)
-            xml_node->get("frame-start", &m_frame_start);
+            xml_node->get("frame-start", &frames_start);
 
-        m_frame_end = node->getEndFrame();
+        std::vector<int> frames_end;
         if (xml_node)
-            xml_node->get("frame-end", &m_frame_end);
+            xml_node->get("frame-end", &frames_end);
+
+        if (frames_start.empty() && frames_end.empty())
+        {
+            frames_start.push_back(node->getStartFrame());
+            frames_end.push_back(node->getEndFrame());
+        }
+        assert(frames_start.size() == frames_end.size());
+        for (unsigned int i = 0 ; i < frames_start.size() ; i++)
+             node->addAnimationSet(frames_start[i], frames_end[i]);
+        node->useAnimationSet(0);
 
         Track *track = Track::getCurrentTrack();
         if (track && track && xml_node)
@@ -542,9 +597,6 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         if (displacing && stkmesh != NULL)
             stkmesh->setIsDisplacement(displacing);
 #endif
-
-        m_frame_start = 0;
-        m_frame_end = 0;
 
         Track *track = Track::getCurrentTrack();
         if (track && xml_node)
@@ -594,7 +646,11 @@ void TrackObjectPresentationMesh::reset()
 
         // irrlicht's "setFrameLoop" is a misnomer, it just sets the first and
         // last frame, even if looping is disabled
-        a_node->setFrameLoop(m_frame_start, m_frame_end);
+        RandomGenerator rg;
+        int animation_set = 0;
+        if (a_node->getAnimationSetNum() > 0)
+            animation_set = rg.get(a_node->getAnimationSetNum());
+        a_node->useAnimationSet(animation_set);
     }
 }   // reset
 
@@ -802,9 +858,10 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(
         xml_node.get("start",  &m_fade_out_start);
         xml_node.get("end",    &m_fade_out_end  );
     }
+    video::ITexture* texture = STKTexManager::getInstance()->getTexture
+        (file_manager->searchTexture(texture_name), true/*srgb*/,
+        true/*premul_alpha*/, false/*set_material*/, true/*mesh_tex*/);
 
-    video::ITexture* texture =
-        irr_driver->getTexture(file_manager->searchTexture(texture_name));
     if (texture == NULL)
     {
         Log::warn("TrackObjectPresentation", "Billboard texture '%s' not found",

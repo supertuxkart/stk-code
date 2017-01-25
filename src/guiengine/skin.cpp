@@ -29,6 +29,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widgets.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
@@ -2299,32 +2300,41 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
                                          const core::recti *clip,
                                          core::recti* checkClientArea)
 {
-    if (ModalDialog::getCurrent() == NULL) return rect;
-
-    if (ModalDialog::getCurrent()->fadeBackground())
-        drawBGFadeColor();
-
-    // draw frame
-    if (m_dialog_size < 1.0f)
+    if (ScreenKeyboard::getCurrent() &&
+        ScreenKeyboard::getCurrent()->getIrrlichtElement() == element)
     {
-        core::recti sized_rect = rect;
-        core::position2d<s32> center = sized_rect.getCenter();
-        const int w = sized_rect.getWidth();
-        const int h = sized_rect.getHeight();
-        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
-        sized_rect.UpperLeftCorner.X  = (int)(center.X -(w/2.0f)*texture_size);
-        sized_rect.UpperLeftCorner.Y  = (int)(center.Y -(h/2.0f)*texture_size);
-        sized_rect.LowerRightCorner.X = (int)(center.X +(w/2.0f)*texture_size);
-        sized_rect.LowerRightCorner.Y = (int)(center.Y +(h/2.0f)*texture_size);
-        drawBoxFromStretchableTexture( ModalDialog::getCurrent(), sized_rect,
-                               SkinConfig::m_render_params["window::neutral"]);
-
-        m_dialog_size += GUIEngine::getLatestDt()*5;
+        drawBoxFromStretchableTexture( ScreenKeyboard::getCurrent(), rect,
+                           SkinConfig::m_render_params["window::neutral"]);
     }
-    else
+    else if (ModalDialog::getCurrent() &&
+             ModalDialog::getCurrent()->getIrrlichtElement() == element)
     {
-        drawBoxFromStretchableTexture( ModalDialog::getCurrent(), rect,
+        if (ModalDialog::getCurrent()->fadeBackground())
+            drawBGFadeColor();
+        
+        // draw frame
+        if (m_dialog_size < 1.0f)
+        {
+            core::recti sized_rect = rect;
+            core::position2d<s32> center = sized_rect.getCenter();
+            const int w = sized_rect.getWidth();
+            const int h = sized_rect.getHeight();
+            const float tex_size = sin(m_dialog_size*M_PI*0.5f);
+            sized_rect.UpperLeftCorner.X  = (int)(center.X -(w/2.0f)*tex_size);
+            sized_rect.UpperLeftCorner.Y  = (int)(center.Y -(h/2.0f)*tex_size);
+            sized_rect.LowerRightCorner.X = (int)(center.X +(w/2.0f)*tex_size);
+            sized_rect.LowerRightCorner.Y = (int)(center.Y +(h/2.0f)*tex_size);
+            
+            drawBoxFromStretchableTexture(ModalDialog::getCurrent(), sized_rect,
                                SkinConfig::m_render_params["window::neutral"]);
+
+            m_dialog_size += GUIEngine::getLatestDt()*5;
+        }
+        else
+        {
+            drawBoxFromStretchableTexture(ModalDialog::getCurrent(), rect,
+                               SkinConfig::m_render_params["window::neutral"]);
+        }
     }
 
     return rect;

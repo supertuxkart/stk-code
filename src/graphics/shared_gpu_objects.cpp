@@ -19,6 +19,10 @@
 
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/central_settings.hpp"
+#include "utils/log.hpp"
+
+#include "matrix4.h"
+#include <algorithm>
 
 GLuint SharedGPUObjects::m_billboard_vbo;
 GLuint SharedGPUObjects::m_sky_tri_vbo;
@@ -31,6 +35,8 @@ GLuint SharedGPUObjects::m_full_screen_quad_vao;
 GLuint SharedGPUObjects::m_ui_vao;
 GLuint SharedGPUObjects::m_quad_buffer;
 GLuint SharedGPUObjects::m_quad_vbo;
+GLuint SharedGPUObjects::m_skinning_ubo;
+int    SharedGPUObjects::m_max_mat4_size = 1024;
 bool   SharedGPUObjects::m_has_been_initialised = false;
 
 /** Initialises m_full_screen_quad_vbo.
@@ -169,6 +175,26 @@ void SharedGPUObjects::initLightingDataUBO()
 }   // initLightingDataUBO
 
 // ----------------------------------------------------------------------------
+void SharedGPUObjects::initSkinningUBO()
+{
+    assert(CVS->isARBUniformBufferObjectUsable());
+    irr::core::matrix4 m;
+    glGenBuffers(1, &m_skinning_ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, m_skinning_ubo);
+    int max_size = 0;
+    glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &max_size);
+    max_size = std::min(max_size, 65536);
+    m_max_mat4_size = max_size / 16 / sizeof(float);
+    Log::info("SharedGPUObjects", "Hardware skinning supported, max joints"
+        " support: %d", m_max_mat4_size);
+    glBufferData(GL_UNIFORM_BUFFER, max_size, 0, GL_STREAM_DRAW);
+    // Reserve a identity matrix for non moving mesh in animated model used by
+    // vertex shader calculation
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * sizeof(float), m.pointer());
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}   // initSkinningUBO
+
+// ----------------------------------------------------------------------------
 void SharedGPUObjects::initParticleQuadVBO()
 {
     static const GLfloat QUAD_VERTEX[] =
@@ -197,10 +223,12 @@ void SharedGPUObjects::init()
     initFrustrumVBO();
     initParticleQuadVBO();
     
-    if(CVS->isARBUniformBufferObjectUsable())
+    if (CVS->isARBUniformBufferObjectUsable())
     {
         initShadowVPMUBO();
-        initLightingDataUBO();        
+        initLightingDataUBO();
+        if (CVS->supportsHardwareSkinning())
+            initSkinningUBO();
     }
 
     m_has_been_initialised = true;

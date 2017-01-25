@@ -222,7 +222,10 @@ void renderTransparenPass(const std::vector<RenderGeometry::TexUnit> &TexUnits,
         if (CVS->isAZDOEnabled())
             Shader::getInstance()->setTextureHandles(mesh.TextureHandles[0]);
         else
-            Shader::getInstance()->setTextureUnits(getTextureGLuint(mesh.textures[0]));
+        {
+            Shader::getInstance()->setTextureUnits(mesh.textures[0]
+                ->getOpenGLTextureName());
+        }
         CustomUnrollArgs<List...>::template drawMesh<Shader>(meshes->at(i));
     }
 }   // renderTransparenPass
@@ -242,6 +245,14 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
     glBlendEquation(GL_FUNC_ADD);
     glEnable(GL_CULL_FACE);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+    if (CVS->supportsHardwareSkinning())
+    {
+        renderTransparenPass<Shaders::SkinnedTransparentShader, video::EVT_SKINNED_MESH, 4, 3, 2, 1>(
+                             TexUnits(RenderGeometry::TexUnit(0, true)),
+                                      ListTranslucentSkinned::getInstance());
+    }
+
     renderTransparenPass<Shaders::TransparentShader, video::EVT_STANDARD, 3, 2, 1>(
                          TexUnits(RenderGeometry::TexUnit(0, true)),
                                   ListTranslucentStandard::getInstance());
@@ -362,10 +373,10 @@ void AbstractGeometryPasses::renderTransparent(const DrawCalls& draw_calls,
         size_t count = mesh.IndexCount;
         // Render the effect
         DisplaceShader::getInstance()->setTextureUnits(
-            getTextureGLuint(m_displace_tex),
+            m_displace_tex->getOpenGLTextureName(),
             colors_framebuffer.getRTT()[0],
             tmp_framebuffer.getRTT()[0],
-            getTextureGLuint(mesh.textures[0]));
+            mesh.textures[0]->getOpenGLTextureName());
         DisplaceShader::getInstance()->use();
         DisplaceShader::getInstance()->setUniforms(AbsoluteTransformation,
             core::vector2df(cb->getDirX(), cb->getDirY()),

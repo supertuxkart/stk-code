@@ -39,7 +39,7 @@
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/render_target.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "graphics/vao_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -126,6 +126,7 @@ Track::Track(const std::string &filename)
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
     m_bloom                 = true;
+    m_is_day                = true;
     m_bloom_threshold       = 0.75f;
     m_color_inlevel         = core::vector3df(0.0,1.0, 255.0);
     m_color_outlevel        = core::vector2df(0.0, 255.0);
@@ -280,17 +281,21 @@ void Track::reset()
  */
 void Track::cleanup()
 {
+#ifdef USE_RESIZE_CACHE
+    if (!UserConfigParams::m_high_definition_textures)
+    {
+        file_manager->popTextureSearchPath();
+    }
+#endif
+    file_manager->popTextureSearchPath();
+    file_manager->popModelSearchPath();
+
     Graph::destroy();
     ItemManager::destroy();
 #ifndef SERVER_ONLY
     VAOManager::kill();
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
-    // Clear reminder of transformed textures
-    resetTextureTable();
 #endif
-
-    // Clear reminder of the link between textures and file names.
-    irr_driver->clearTexturesFileName();
 
     for (unsigned int i = 0; i < m_animated_textures.size(); i++)
     {
@@ -402,6 +407,7 @@ void Track::cleanup()
     irr_driver->clearLights();
     irr_driver->clearForcedBloom();
     irr_driver->clearBackgroundNodes();
+    STKTexManager::getInstance()->reset();
 
     if(UserConfigParams::logMemory())
     {
@@ -521,6 +527,7 @@ void Track::loadTrackInfo()
     root->get("bloom",                 &m_bloom);
     root->get("bloom-threshold",       &m_bloom_threshold);
     root->get("shadows",               &m_shadows);
+    root->get("is-during-day",         &m_is_day);
     root->get("displacement-speed",    &m_displacement_speed);
     root->get("caustics-speed",        &m_caustics_speed);
     root->get("color-level-in",        &m_color_inlevel);
@@ -598,6 +605,9 @@ void Track::loadTrackInfo()
         // Currently only max eight players in soccer mode
         m_max_arena_players = 8;
     }
+    // Max 10 players supported in arena
+    if (m_max_arena_players > 10)
+        m_max_arena_players = 10;
 
 }   // loadTrackInfo
 
@@ -796,14 +806,14 @@ void Track::createPhysicsModel(unsigned int main_track_count)
 
             // Color
 #ifndef SERVER_ONLY
-            mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 105, 180)));
+            mb->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 105, 180)));
 #endif
             irr_driver->grabAllTextures(mesh);
             // Gloss
 #ifndef SERVER_ONLY
-            mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            mb->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
             // Colorization mask
-            mb->getMaterial().setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            mb->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
 #endif
         }
         else
@@ -931,7 +941,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
         TriangleMesh *tmesh = m_track_mesh;
         if(t)
         {
-            std::string image = std::string(core::stringc(t->getName()).c_str());
+            std::string image = t->getName().getPtr();
 
             // the third boolean argument is false because at this point we're
             // dealing physics, so it's useless to warn about missing textures,
@@ -1090,33 +1100,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     std::string model_name;
     track_node->get("model", &model_name);
     std::string full_path = m_root+model_name;
-
-    scene::IMesh *mesh;
-    // If the hd texture option is disabled, we generate smaller textures
-    // and configure the path to them before loading the mesh.
-    if ( (UserConfigParams::m_high_definition_textures & 0x01) == 0x00)
-    {
-#undef USE_RESIZE_CACHE
-#ifdef USE_RESIZE_CACHE
-        std::string cached_textures_dir =
-            irr_driver->generateSmallerTextures(m_root);
-
-        irr::io::IAttributes* scene_params =
-            irr_driver->getSceneManager()->getParameters();
-        // Before changing the texture path, we retrieve the older one to restore it later
-        std::string texture_default_path =
-            scene_params->getAttributeAsString(scene::B3D_TEXTURE_PATH).c_str();
-        scene_params->setAttribute(scene::B3D_TEXTURE_PATH, cached_textures_dir.c_str());
-#endif
-        mesh = irr_driver->getMesh(full_path);
-#ifdef USE_RESIZE_CACHE
-        scene_params->setAttribute(scene::B3D_TEXTURE_PATH, texture_default_path.c_str());
-#endif
-    }
-    else // Load mesh with default (hd) textures
-    {
-        mesh = irr_driver->getMesh(full_path);
-    }
+    scene::IMesh *mesh = irr_driver->getMesh(full_path);
 
     if(!mesh)
     {
@@ -1422,7 +1406,7 @@ void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
                 video::ITexture* t=irrMaterial.getTexture(j);
                 if(!t) continue;
                 std::string texture_name =
-                    StringUtils::getBasename(core::stringc(t->getName()).c_str());
+                    StringUtils::getBasename(t->getName().getPtr());
 
                 // to lower case, for case-insensitive comparison
                 texture_name = StringUtils::toLowerCase(texture_name);
@@ -1581,8 +1565,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     assert(!m_current_track);
 
     // Use m_filename to also get the path, not only the identifier
-    irr_driver->setTextureErrorMessage("While loading track '%s'",
-                                       m_filename                  );
+    STKTexManager::getInstance()
+        ->setTextureErrorMessage("While loading track '%s'", m_filename);
     if(!m_reverse_available)
     {
         reverse_track = false;
@@ -1620,23 +1604,12 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     m_sky_type             = SKY_NONE;
     m_track_object_manager = new TrackObjectManager();
 
-    // Add the track directory to the texture search path
-    file_manager->pushTextureSearchPath(m_root);
-    file_manager->pushModelSearchPath  (m_root);
+    std::string unique_id = StringUtils::insertValues("tracks/%s", m_ident.c_str());
 
-    // For now ignore the resize cache, since atm it only handles texturs in
-    // the track directory.
-#undef USE_RESIZE_CACHE
-#ifdef USE_RESIZE_CACHE
-    // If the hd texture option is disabled, we generate smaller textures
-    // and we also add the cache directory to the texture search path
-    if ( (UserConfigParams::m_high_definition_textures & 0x01) == 0x00)
-    {
-        std::string cached_textures_dir =
-            irr_driver->generateSmallerTextures(m_root);
-        file_manager->pushTextureSearchPath(cached_textures_dir);
-    }
-#endif
+    // Add the track directory to the texture search path
+    file_manager->pushTextureSearchPath(m_root, unique_id);
+    file_manager->pushModelSearchPath(m_root);
+
     // First read the temporary materials.xml file if it exists
     try
     {
@@ -1800,7 +1773,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Sky dome and boxes support
     // --------------------------
     irr_driver->suppressSkyBox();
-    if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
+#ifndef SERVER_ONLY
+    if(!CVS->isGLSL() && m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
     {
         scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
                                                          m_sky_hori_segments,
@@ -1832,15 +1806,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     {
         irr_driver->setClearbackBufferColor(m_sky_color);
     }
-
-#ifdef USE_RESIZE_CACHE
-    if (!UserConfigParams::m_high_definition_textures)
-    {
-        file_manager->popTextureSearchPath();
-    }
 #endif
-    file_manager->popTextureSearchPath();
-    file_manager->popModelSearchPath  ();
 
     // ---- Set ambient color
     m_ambient_color = m_default_ambient_color;
@@ -1938,8 +1904,22 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         easter_world->readData(dir+"/easter_eggs.xml");
     }
 
-    irr_driver->unsetTextureErrorMessage();
-
+    STKTexManager::getInstance()->unsetTextureErrorMessage();
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        for (video::ITexture* t : m_sky_textures)
+        {
+            t->drop();
+        }
+        m_sky_textures.clear();
+        for (video::ITexture* t : m_spherical_harmonics_textures)
+        {
+            t->drop();
+        }
+        m_spherical_harmonics_textures.clear();
+    }
+#endif   // !SERVER_ONLY
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------
@@ -1960,6 +1940,10 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         if (name == "track" || name == "default-start") continue;
         if (name == "object" || name == "library")
         {
+            int geo_level = 0;
+            node->get("geometry-level", &geo_level);
+            if (UserConfigParams::m_geometry_level + geo_level - 2 > 0)
+                continue;
             m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
         }
         else if (name == "water")
@@ -2187,10 +2171,26 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         std::vector<std::string> v = StringUtils::split(s, ' ');
         for(unsigned int i=0; i<v.size(); i++)
         {
-            video::ITexture *t = irr_driver->getTexture(v[i]);
-            if(t)
+            video::ITexture* t = NULL;
+#ifndef SERVER_ONLY
+            if (CVS->isGLSL())
             {
-                t->grab();
+                t = STKTexManager::getInstance()->getTexture(v[i],
+                    false/*srgb*/, false/*premul_alpha*/,
+                    false/*set_material*/, false/*mesh_tex*/,
+                    true/*no_upload*/);
+            }
+            else
+#endif   // !SERVER_ONLY
+            {
+                t = irr_driver->getTexture(v[i]);
+            }
+            if (t)
+            {
+#ifndef SERVER_ONLY
+                if (!CVS->isGLSL())
+#endif   // !SERVER_ONLY
+                    t->grab();
                 m_sky_textures.push_back(t);
             }
             else
@@ -2217,10 +2217,26 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         v = StringUtils::split(sh_textures, ' ');
         for (unsigned int i = 0; i<v.size(); i++)
         {
-            video::ITexture *t = irr_driver->getTexture(v[i]);
+            video::ITexture* t = NULL;
+#ifndef SERVER_ONLY
+            if (CVS->isGLSL())
+            {
+                t = STKTexManager::getInstance()->getTexture(v[i],
+                    false/*srgb*/, false/*premul_alpha*/,
+                    false/*set_material*/, false/*mesh_tex*/,
+                    true/*no_upload*/);
+            }
+            else
+#endif   // !SERVER_ONLY
+            {
+                t = irr_driver->getTexture(v[i]);
+            }
             if (t)
             {
-                t->grab();
+#ifndef SERVER_ONLY
+                if (!CVS->isGLSL())
+#endif   // !SERVER_ONLY
+                    t->grab();
                 m_spherical_harmonics_textures.push_back(t);
             }
             else

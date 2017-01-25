@@ -8,6 +8,8 @@
 #include "aabbox3d.h"
 #include "IMesh.h"
 
+typedef void (*SkinningCallback)(const irr::core::matrix4& m, int joint, int offset);
+
 namespace irr
 {
 namespace scene

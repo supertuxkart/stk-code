@@ -22,6 +22,7 @@
 #include <algorithm>
 
 #include "io/xml_node.hpp"
+#include "karts/abstract_kart.hpp"
 #include "tracks/ambient_light_sphere.hpp"
 #include "tracks/check_cannon.hpp"
 #include "tracks/check_goal.hpp"
@@ -116,6 +117,19 @@ void CheckManager::reset(const Track &track)
     for(i=m_all_checks.begin(); i!=m_all_checks.end(); i++)
         (*i)->reset(track);
 }   // reset
+
+// ----------------------------------------------------------------------------
+/** Called after a kart is moved (e.g. after a rescue) to reset any cached
+ *  check information. Without this an incorrect crossing of a checkline
+ *  could be triggered since a CheckLine stores the previous position).
+ *  \param kart_index Index of the kart that was moved.
+ */
+void CheckManager::resetAfterKartMove(AbstractKart *kart)
+{
+    std::vector<CheckStructure*>::iterator i;
+    for (i = m_all_checks.begin(); i != m_all_checks.end(); i++)
+        (*i)->resetAfterKartMove(kart->getWorldKartId());
+}   // resetAfterKartMove
 
 // ----------------------------------------------------------------------------
 /** Updates all animations. Called one per time step.

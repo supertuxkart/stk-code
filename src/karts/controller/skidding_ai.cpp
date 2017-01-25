@@ -23,7 +23,7 @@
 
 #ifdef AI_DEBUG
 #  include "graphics/irr_driver.hpp"
-#  include "graphics/texture_manager.hpp"
+#  include "graphics/stk_tex_manager.hpp"
 #endif
 #include "graphics/show_curve.hpp"
 #include "graphics/slip_stream.hpp"
@@ -95,8 +95,8 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
                                      i==2 ? 128 : 0);
         m_debug_sphere[i] = irr_driver->addSphere(1.0f, col_debug);
         m_debug_sphere[i]->setVisible(false);
-        m_debug_sphere[i]->setMaterialTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-        m_debug_sphere[i]->setMaterialTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        m_debug_sphere[i]->setMaterialTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+        m_debug_sphere[i]->setMaterialTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     }
     m_debug_sphere[m_point_selection_algorithm]->setVisible(true);
     m_item_sphere  = irr_driver->addSphere(1.0f, video::SColor(255, 0, 255, 0));

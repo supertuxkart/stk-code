@@ -16,23 +16,31 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_TEXTURE_MANAGER_HPP
-#define HEADER_TEXTURE_MANAGER_HPP
+#ifndef HEADER_MULTITOUCH_SETTINGS_DIALOG_HPP
+#define HEADER_MULTITOUCH_SETTINGS_DIALOG_HPP
 
-#include "graphics/gl_headers.hpp"
+#include "guiengine/modaldialog.hpp"
 
-#include <ITexture.h>
-#include <SColor.h>
-#include <string>
+/**
+ * \brief Dialog that allows the player to adjust multitouch steering settings
+ * \ingroup states_screens
+ */
+class MultitouchSettingsDialog : public GUIEngine::ModalDialog
+{
+private:
+    void updateValues();
+    
+public:
+    /**
+     * Creates a modal dialog with given percentage of screen width and height
+     */
+    MultitouchSettingsDialog(const float percentWidth, const float percentHeight);
+    ~MultitouchSettingsDialog();
 
-GLuint getTextureGLuint(irr::video::ITexture *tex);
-GLuint getDepthTexture(irr::video::ITexture *tex);
-void resetTextureTable();
-void cleanUnicolorTextures();
-void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = false);
-bool loadCompressedTexture(const std::string& compressed_tex);
-void saveCompressedTexture(const std::string& compressed_tex);
-irr::video::ITexture* getUnicolorTexture(const irr::video::SColor &c);
-void insertTextureHandle(uint64_t handle);
+    virtual void beforeAddingWidgets();
+
+    GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    
+};
 
 #endif

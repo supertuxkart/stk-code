@@ -25,8 +25,8 @@
 #include "graphics/light.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/rtts.hpp"
-#include "graphics/shaders.hpp"
 #include "graphics/shadow_matrices.hpp"
+#include "graphics/texture_shader.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
@@ -617,7 +617,7 @@ void LightingPasses::renderLights(  bool has_shadow,
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
         renderEnvMap(normal_depth_texture,
                      depth_stencil_texture,
-                     specular_probe);       
+                     specular_probe);
     }
 
     // Render sunlight if and only if track supports shadow
@@ -652,7 +652,7 @@ void LightingPasses::renderLights(  bool has_shadow,
                            normal_depth_texture,
                            depth_stencil_texture);
     }
-    
+
     //points lights
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_POINTLIGHTS));
@@ -660,7 +660,7 @@ void LightingPasses::renderLights(  bool has_shadow,
                           normal_depth_texture,
                           depth_stencil_texture);
     }
-}   // renderLights    
+}   // renderLights
 
 // ----------------------------------------------------------------------------
 void LightingPasses::renderAmbientScatter(GLuint depth_stencil_texture)

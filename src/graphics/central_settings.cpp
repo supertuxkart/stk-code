@@ -51,6 +51,7 @@ void CentralVideoSettings::init()
     hasExplicitAttribLocation = false;
     hasGS = false;
     hasTextureFilterAnisotropic = false;
+    hasTextureSwizzle = false;
 
 #if defined(USE_GLES2)
     hasBGRA = false;
@@ -90,6 +91,11 @@ void CentralVideoSettings::init()
         std::string driver((char*)(glGetString(GL_VERSION)));
         std::string card((char*)(glGetString(GL_RENDERER)));
         GraphicsRestrictions::init(driver, card);
+        
+        if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
+        {
+            m_glsl = false;
+        }
 
 #if !defined(USE_GLES2)
         if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
@@ -158,9 +164,12 @@ void CentralVideoSettings::init()
             Log::info("GLDriver", "ARB Multi Draw Indirect Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXT_TEXTURE_COMPRESSION_S3TC) &&
-            hasGLExtension("GL_EXT_texture_compression_s3tc")) {
+            hasGLExtension("GL_EXT_texture_compression_s3tc") &&
+            hasGLExtension("GL_ARB_texture_compression_rgtc"))
+        {
             hasTextureCompression = true;
             Log::info("GLDriver", "EXT Texture Compression S3TC Present");
+            Log::info("GLDriver", "ARB Texture Compression RGTC Present");
         }
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_UNIFORM_BUFFER_OBJECT) &&
             hasGLExtension("GL_ARB_uniform_buffer_object")) {
@@ -182,7 +191,11 @@ void CentralVideoSettings::init()
             hasGS = true;
             Log::info("GLDriver", "Geometry Shaders Present");
         }
-
+        if (hasGLExtension("GL_ARB_texture_swizzle"))
+        {
+            hasTextureSwizzle = true;
+            Log::info("GLDriver", "ARB Texture Swizzle Present");
+        }
         // Only unset the high def textures if they are set as default. If the
         // user has enabled them (bit 1 set), then leave them enabled.
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_HIGHDEFINITION_TEXTURES) &&
@@ -222,13 +235,8 @@ void CentralVideoSettings::init()
 #else
         if (m_glsl == true)
         {
-            hasArraysOfArrays = true;
             hasTextureStorage = true;
-            hasTextureView = true;
-            hasBindlessTexture = true;
-            hasImageLoadStore = true;
-            hasAtomics = true;
-            hasSSBO = true;
+            hasTextureSwizzle = true;
         }
 
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_TEXTURE_FORMAT_BGRA8888) &&
@@ -442,6 +450,16 @@ bool CentralVideoSettings::isESMEnabled() const
 bool CentralVideoSettings::isDefferedEnabled() const
 {
     return UserConfigParams::m_dynamic_lights && !GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_ADVANCED_PIPELINE);
+}
+
+bool CentralVideoSettings::supportsHardwareSkinning() const
+{
+    return isARBUniformBufferObjectUsable();
+}
+
+bool CentralVideoSettings::isARBTextureSwizzleUsable() const
+{
+    return m_glsl && hasTextureSwizzle;
 }
 
 #endif   // !SERVER_ONLY

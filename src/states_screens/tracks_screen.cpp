@@ -20,7 +20,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -162,7 +162,7 @@ void TracksScreen::init()
     buildTrackList();
 
     // select old track for the game master (if found)
-    irr_driver->setTextureErrorMessage(
+    STKTexManager::getInstance()->setTextureErrorMessage(
               "While loading screenshot in track screen for last track '%s':",
               UserConfigParams::m_last_track);
     if (!tracks_widget->setSelection(UserConfigParams::m_last_track,
@@ -170,7 +170,7 @@ void TracksScreen::init()
     {
         tracks_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
     }
-    irr_driver->unsetTextureErrorMessage();
+    STKTexManager::getInstance()->unsetTextureErrorMessage();
     if (NetworkConfig::get()->isAutoConnect())
     {
         DynamicRibbonWidget* tw = getWidget<DynamicRibbonWidget>("tracks");

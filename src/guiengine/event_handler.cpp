@@ -17,12 +17,16 @@
 
 #include "guiengine/event_handler.hpp"
 
+#include "audio/music_manager.hpp"
+#include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/abstract_state_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -38,6 +42,10 @@
 #include <IGUIListBox.h>
 
 #include <iostream>
+
+#ifdef ANDROID
+#include <android_native_app_glue.h>
+#endif
 
 using GUIEngine::EventHandler;
 using GUIEngine::EventPropagation;
@@ -143,40 +151,45 @@ bool EventHandler::OnEvent (const SEvent &event)
     {
         DemoWorld::resetIdleTime();
     }
-    
-   // Simulate mouse event for first finger on multitouch device.
-   // This allows to click on GUI elements.
-    if (event.EventType == EET_TOUCH_INPUT_EVENT)
-    {
-        if (event.TouchInput.ID == 0)
-        {
-            if (event.TouchInput.Event == ETIE_PRESSED_DOWN)
-            {
-                SEvent irrevent;
-                irrevent.EventType = EET_MOUSE_INPUT_EVENT;
-                irrevent.MouseInput.X = event.TouchInput.X;
-                irrevent.MouseInput.Y = event.TouchInput.Y;
-                irrevent.MouseInput.Event = EMIE_LMOUSE_PRESSED_DOWN;
-
-                irr_driver->getDevice()->postEventFromUser(irrevent);
-            }
-            else if (event.TouchInput.Event == ETIE_LEFT_UP)
-            {
-                SEvent irrevent;
-                irrevent.EventType = EET_MOUSE_INPUT_EVENT;
-                irrevent.MouseInput.X = event.TouchInput.X;
-                irrevent.MouseInput.Y = event.TouchInput.Y;
-                irrevent.MouseInput.Event = EMIE_LMOUSE_LEFT_UP;
-
-                irr_driver->getDevice()->postEventFromUser(irrevent);
-            }
-        }
-    }
 
     if (event.EventType == EET_GUI_EVENT)
     {
         return onGUIEvent(event) == EVENT_BLOCK;
     }
+#ifdef ANDROID    
+    else if (event.EventType == EET_SYSTEM_EVENT &&
+             event.SystemEvent.EventType == ESET_ANDROID_CMD)
+    {
+        int cmd = event.SystemEvent.AndroidCmd.Cmd;
+        
+        IrrlichtDevice* device = irr_driver->getDevice();
+        assert(device != NULL);
+        
+        if (cmd == APP_CMD_PAUSE || cmd == APP_CMD_LOST_FOCUS)
+        {
+            // Make sure that pause/unpause is executed only once
+            if (device->isWindowMinimized() == device->isWindowFocused())
+            {
+                music_manager->pauseMusic();
+                SFXManager::get()->pauseAll();
+            }
+        }
+        else if (cmd == APP_CMD_RESUME || cmd == APP_CMD_GAINED_FOCUS)
+        {
+            if (device->isWindowActive())
+            {
+                music_manager->resumeMusic();
+                SFXManager::get()->resumeAll();
+            }
+        }
+        else if (cmd == APP_CMD_LOW_MEMORY)
+        {
+            Log::warn("EventHandler", "Low memory event received");
+        }
+
+        return false;
+    }
+#endif
     else if (GUIEngine::getStateManager()->getGameState() != GUIEngine::GAME &&
              event.EventType != EET_KEY_INPUT_EVENT && event.EventType != EET_JOYSTICK_INPUT_EVENT &&
              event.EventType != EET_LOG_TEXT_EVENT)
@@ -249,7 +262,7 @@ bool EventHandler::OnEvent (const SEvent &event)
 #else
             return true; // EVENT_BLOCK
 #endif
-            const std::string &error_info = irr_driver->getTextureErrorMessage();
+            const std::string &error_info = STKTexManager::getInstance()->getTextureErrorMessage();
             if (event.LogEvent.Level == irr::ELL_WARNING)
             {
                 if(error_info.size()>0)
@@ -466,9 +479,15 @@ void EventHandler::navigate(const int playerID, Input::InputType type, const boo
     }
 
     // don't allow navigating to any widget when a dialog is shown; only navigate to widgets in the dialog
-    if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyIrrChild(el))
+    if (ScreenKeyboard::isActive())
     {
-        el = NULL;
+        if (!ScreenKeyboard::getCurrent()->isMyIrrChild(el))
+            el = NULL;
+    }
+    else if (ModalDialog::isADialogActive())
+    {
+        if (!ModalDialog::getCurrent()->isMyIrrChild(el))
+            el = NULL;
     }
 
     bool found = false;
@@ -489,8 +508,16 @@ void EventHandler::navigate(const int playerID, Input::InputType type, const boo
                 if (playerID != PLAYER_ID_GAME_MASTER && !closestWidget->m_supports_multiplayer) return;
 
                 // if a dialog is shown, restrict to items in the dialog
-                if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(closestWidget))
-                    continue;
+                if (ScreenKeyboard::isActive())
+                {
+                    if (!ScreenKeyboard::getCurrent()->isMyChild(closestWidget))
+                        continue;
+                }
+                else if (ModalDialog::isADialogActive())
+                {
+                    if (!ModalDialog::getCurrent()->isMyChild(closestWidget))
+                        continue;
+                }
 
                 if (NAVIGATION_DEBUG)
                 {
@@ -525,7 +552,12 @@ void EventHandler::navigate(const int playerID, Input::InputType type, const boo
         // select the last/first widget
         Widget* wrapWidget = NULL;
 
-        if (ModalDialog::isADialogActive())
+        if (ScreenKeyboard::isActive())
+        {
+            wrapWidget = reverse ? ScreenKeyboard::getCurrent()->getLastWidget():
+                ScreenKeyboard::getCurrent()->getFirstWidget();
+        }
+        else if (ModalDialog::isADialogActive())
         {
             wrapWidget = reverse ? ModalDialog::getCurrent()->getLastWidget() :
                 ModalDialog::getCurrent()->getFirstWidget();
@@ -546,6 +578,14 @@ void EventHandler::navigate(const int playerID, Input::InputType type, const boo
 
 void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name, const int playerID)
 {
+    if (ScreenKeyboard::isActive())
+    {
+        if (ScreenKeyboard::getCurrent()->processEvent(widget->m_properties[PROP_ID]) == EVENT_BLOCK)
+        {
+            return;
+        }
+    }
+    
     if (ModalDialog::isADialogActive())
     {
         if (ModalDialog::getCurrent()->processEvent(widget->m_properties[PROP_ID]) == EVENT_BLOCK)
@@ -567,6 +607,14 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
 
     Widget* parent = w->m_event_handler;
     
+    if (ScreenKeyboard::isActive())
+    {
+        if (ScreenKeyboard::getCurrent()->processEvent(w->m_properties[PROP_ID]) == EVENT_BLOCK)
+        {
+            return EVENT_BLOCK;
+        }
+    }
+
     if (ModalDialog::isADialogActive() && (parent == NULL || parent->m_type != GUIEngine::WTYPE_RIBBON))
     {
         if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]) == EVENT_BLOCK)
@@ -658,10 +706,23 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 if (!w->isFocusable() || !w->isActivated()) return GUIEngine::EVENT_BLOCK;
 
                 // When a modal dialog is shown, don't select widgets out of the dialog
-                if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(w))
+                if (ScreenKeyboard::isActive())
                 {
                     // check for parents too before discarding event
-                    if (w->m_event_handler != NULL)
+                    if (!ScreenKeyboard::getCurrent()->isMyChild(w) && 
+                        w->m_event_handler != NULL)
+                    {
+                        if (!ScreenKeyboard::getCurrent()->isMyChild(w->m_event_handler))
+                        {
+                            break;
+                        }
+                    }
+                }
+                else if (ModalDialog::isADialogActive())
+                {
+                    // check for parents too before discarding event
+                    if (!ModalDialog::getCurrent()->isMyChild(w) && 
+                        w->m_event_handler != NULL)
                     {
                         if (!ModalDialog::getCurrent()->isMyChild(w->m_event_handler))
                         {
@@ -759,7 +820,8 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
             {
                 // currently, enter pressed in text ctrl events can only happen in dialogs.
                 // FIXME : find a cleaner way to route the event to its proper location
-                if (ModalDialog::isADialogActive()) ModalDialog::onEnterPressed();
+                if (!ScreenKeyboard::isActive() && ModalDialog::isADialogActive()) 
+                    ModalDialog::onEnterPressed();
                 break;
             }
             default:

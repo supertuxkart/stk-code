@@ -19,6 +19,7 @@
 
 #include "graphics/command_buffer.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "utils/cpp2011.hpp"
 
 // ----------------------------------------------------------------------------
@@ -29,6 +30,7 @@ void InstanceFiller<InstanceDataSingleTex>::add(GLMesh* mesh,
 {
     fillOriginOrientationScale<InstanceDataSingleTex>(STK::tuple_get<0>(is), instance);
     instance.Texture = mesh->TextureHandles[0];
+    instance.skinning_offset = STK::tuple_get<3>(is);
 }
 
 // ----------------------------------------------------------------------------
@@ -45,6 +47,7 @@ void InstanceFiller<InstanceDataThreeTex>::add(GLMesh* mesh,
     instance.Texture = mesh->TextureHandles[0];
     instance.SecondTexture = mesh->TextureHandles[1];
     instance.ThirdTexture = mesh->TextureHandles[2];
+    instance.skinning_offset = STK::tuple_get<3>(is);
 }
 
 // ----------------------------------------------------------------------------
@@ -62,6 +65,7 @@ void InstanceFiller<InstanceDataFourTex>::add(GLMesh* mesh,
     instance.SecondTexture = mesh->TextureHandles[1];
     instance.ThirdTexture = mesh->TextureHandles[2];
     instance.FourthTexture = mesh->TextureHandles[3];
+    instance.skinning_offset = STK::tuple_get<3>(is);
 }
 
 // ----------------------------------------------------------------------------
@@ -155,7 +159,7 @@ SolidCommandBuffer::SolidCommandBuffer(): CommandBuffer()
 }
 
 // ----------------------------------------------------------------------------
-void SolidCommandBuffer::fill(SolidPassMeshMap *mesh_map)
+void SolidCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
     
@@ -167,16 +171,20 @@ void SolidCommandBuffer::fill(SolidPassMeshMap *mesh_map)
                           Material::SHADERTYPE_ALPHA_TEST,
                           Material::SHADERTYPE_SOLID_UNLIT,
                           Material::SHADERTYPE_SPHERE_MAP,
-                          Material::SHADERTYPE_VEGETATION);
+                          Material::SHADERTYPE_VEGETATION,
+                          Material::SHADERTYPE_SOLID_SKINNED_MESH,
+                          Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH,
+                          Material::SHADERTYPE_SOLID_UNLIT_SKINNED_MESH);
 
-    fillInstanceData<InstanceDataThreeTex, SolidPassMeshMap>
+    fillInstanceData<InstanceDataThreeTex, MeshMap>
         (mesh_map, three_tex_material_list, InstanceTypeThreeTex);
 
     std::vector<int> four_tex_material_list =
         createVector<int>(Material::SHADERTYPE_DETAIL_MAP,
-                          Material::SHADERTYPE_NORMAL_MAP);
+                          Material::SHADERTYPE_NORMAL_MAP,
+                          Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH);
 
-    fillInstanceData<InstanceDataFourTex, SolidPassMeshMap>
+    fillInstanceData<InstanceDataFourTex, MeshMap>
         (mesh_map, four_tex_material_list, InstanceTypeFourTex);
 
     if (!CVS->supportsAsyncInstanceUpload())
@@ -189,7 +197,7 @@ ShadowCommandBuffer::ShadowCommandBuffer(): CommandBuffer()
 }
 
 // ----------------------------------------------------------------------------
-void ShadowCommandBuffer::fill(OtherMeshMap *mesh_map)
+void ShadowCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
     
@@ -215,9 +223,17 @@ void ShadowCommandBuffer::fill(OtherMeshMap *mesh_map)
                                            + Material::SHADERTYPE_VEGETATION);
         shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
                                            + Material::SHADERTYPE_SPLATTING);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_SOLID_SKINNED_MESH);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_ALPHA_TEST_SKINNED_MESH);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_SOLID_UNLIT_SKINNED_MESH);
+        shadow_tex_material_list.push_back(cascade * Material::SHADERTYPE_COUNT
+                                           + Material::SHADERTYPE_NORMAL_MAP_SKINNED_MESH);
     }
     
-    fillInstanceData<InstanceDataSingleTex, OtherMeshMap>
+    fillInstanceData<InstanceDataSingleTex, MeshMap>
         (mesh_map, shadow_tex_material_list, InstanceTypeShadow);
     
     if (!CVS->supportsAsyncInstanceUpload())
@@ -231,7 +247,7 @@ ReflectiveShadowMapCommandBuffer::ReflectiveShadowMapCommandBuffer()
 }
 
 // ----------------------------------------------------------------------------
-void ReflectiveShadowMapCommandBuffer::fill(OtherMeshMap *mesh_map)
+void ReflectiveShadowMapCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
     
@@ -245,7 +261,7 @@ void ReflectiveShadowMapCommandBuffer::fill(OtherMeshMap *mesh_map)
                           Material::SHADERTYPE_DETAIL_MAP,
                           Material::SHADERTYPE_NORMAL_MAP);
                           
-    fillInstanceData<InstanceDataSingleTex, OtherMeshMap>
+    fillInstanceData<InstanceDataSingleTex, MeshMap>
         (mesh_map, rsm_material_list, InstanceTypeRSM);
 
     if (!CVS->supportsAsyncInstanceUpload())
@@ -259,14 +275,14 @@ GlowCommandBuffer::GlowCommandBuffer()
 }
 
 // ----------------------------------------------------------------------------
-void GlowCommandBuffer::fill(OtherMeshMap *mesh_map)
+void GlowCommandBuffer::fill(MeshMap *mesh_map)
 {
     clearMeshes();
     
     if(!CVS->supportsAsyncInstanceUpload())
         mapIndirectBuffer();
     
-    fillInstanceData<GlowInstanceData, OtherMeshMap>
+    fillInstanceData<GlowInstanceData, MeshMap>
         (mesh_map, createVector<int>(0), InstanceTypeGlow);
     if (!CVS->supportsAsyncInstanceUpload())
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);

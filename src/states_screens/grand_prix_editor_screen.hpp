@@ -20,11 +20,10 @@
 
 #include "guiengine/screen.hpp"
 #include "race/grand_prix_data.hpp"
-#include "states_screens/dialogs/enter_gp_name_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine { class Widget; class LabelWidget; }
 
 class GrandPrixData;
 
@@ -35,7 +34,6 @@ class GrandPrixData;
 class GrandPrixEditorScreen :
     public GUIEngine::Screen,
     public GUIEngine::ScreenSingleton<GrandPrixEditorScreen>,
-    public EnterGPNameDialog::INewGPListener,
     public MessageDialog::IConfirmDialogListener
 {
     friend class GUIEngine::ScreenSingleton<GrandPrixEditorScreen>;
@@ -48,7 +46,7 @@ class GrandPrixEditorScreen :
     void showEditScreen(GrandPrixData* gp);
     void enableButtons();
 
-    void onNewGPWithName(const irr::core::stringw& newName) OVERRIDE;
+    void setNewGPWithName(const irr::core::stringw& newName);
     void onConfirm() OVERRIDE;
 
     static const core::stringw getGroupName(enum GrandPrixData::GPGroupType group);
@@ -71,6 +69,9 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
+
+    /** \brief Global function to validate grand prix names. */
+    static bool validateName(GUIEngine::LabelWidget*, GUIEngine::TextBoxWidget*);
 };
 
 #endif

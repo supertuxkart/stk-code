@@ -185,11 +185,15 @@ public:
 class TrackObjectPresentationLibraryNode : public TrackObjectPresentationSceneNode
 {
     TrackObject* m_parent;
+    using TrackObjectPresentationSceneNode::move;
+    std::string m_name;
+    bool m_start_executed;
 public:
     TrackObjectPresentationLibraryNode(TrackObject* parent,
         const XMLNode& xml_node,
         ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationLibraryNode();
+    virtual void update(float dt);
     void move(const core::vector3df& xyz, const core::vector3df& hpr,
         const core::vector3df& scale, bool isAbsoluteCoord, bool moveChildrenPhysicalBodies);
 };   // TrackObjectPresentationLibraryNode
@@ -207,6 +211,7 @@ public:
                                ModelDefinitionLoader& model_def_loader,
                                RenderInfo* ri);
     virtual ~TrackObjectPresentationLOD();
+    virtual void reset() OVERRIDE;
 };
 
 // ============================================================================
@@ -225,12 +230,6 @@ private:
 
     /** True if the object is in the skybox */
     bool                    m_is_in_skybox;
-
-    /** Start frame of the animation to be played. */
-    unsigned int            m_frame_start;
-
-    /** End frame of the animation to be played. */
-    unsigned int            m_frame_end;
 
     std::string             m_model_file;
 

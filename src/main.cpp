@@ -1579,7 +1579,7 @@ int main(int argc, char *argv[] )
         // Both item_manager and powerup_manager load models and therefore
         // textures from the model directory. To avoid reading the
         // materials.xml twice, we do this here once for both:
-        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""));
+        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""), "models");
         const std::string materials_file =
             file_manager->getAsset(FileManager::MODEL,"materials.xml");
         if(materials_file!="")
@@ -1684,6 +1684,11 @@ int main(int argc, char *argv[] )
         }
         else if (!UserConfigParams::m_no_start_screen)
         {
+            if (UserConfigParams::m_enforce_current_player)
+            {
+                PlayerManager::get()->enforceCurrentPlayer();
+            }
+
             // If there is a current player, it was saved in the config file,
             // so we immediately start the main menu (unless it was requested
             // to always show the login screen). Otherwise show the login

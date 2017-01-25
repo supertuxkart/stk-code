@@ -56,11 +56,6 @@ float SearchYUp(vec2 texcoord) {
 	return min(i - 1.5 + 2.0 * e, 2.0 * MAX_SEARCH_STEPS);
 }
 
-
-vec2 round(vec2 invec) {
-	return vec2(floor(abs(invec) + vec2(0.5)) * sign(invec));
-}
-
 vec2 Area(vec2 distance, float e1, float e2) {
 	// * By dividing by areaSize - 1.0 below we are implicitely offsetting to
 	//   always fall inside of a pixel

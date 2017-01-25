@@ -81,45 +81,20 @@ CreditsSection* CreditsScreen::getCurrentSection()
 
 // ----------------------------------------------------------------------------
 
-bool CreditsScreen::getWideLine(std::ifstream& file, core::stringw* out)
+bool CreditsScreen::getLineAsWide(std::ifstream& file, core::stringw* out)
 {
     if (!file.good())
     {
-        Log::error("CreditsScreen", "getWideLine: File is not good!");
+        Log::error("CreditsScreen", "getLineAsWide: File is not good!");
         return false;
     }
-    wchar_t wide_char;
 
-    bool found_eol = false;
-    stringw line;
+    std::string line;
+    std::getline(file, line);
+    *out = StringUtils::utf8ToWide(line);
+    return file.good();
 
-    char buff[2];
-
-    while (true)
-    {
-        file.read( buff, 2 );
-        if (file.good())
-        {
-            // We got no complaints so I assume the endianness code here is OK
-            wide_char = unsigned(buff[0] & 0xFF)
-                      | (unsigned(buff[1] & 0xFF) << 8);
-            line += wide_char;
-            if (wide_char == L'\n')
-            {
-                found_eol = true;
-                break;
-            }
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    if (!found_eol) return false;
-    *out = line;
-    return true;
-}   // getWideLine
+}   // getLineAsWide
 
 // ----------------------------------------------------------------------------
 
@@ -153,25 +128,13 @@ void CreditsScreen::loadedFromFile()
     }
 
     stringw line;
-
-    // skip Unicode header
-    file.get();
-    file.get();
-
-    if (file.fail() || !file.is_open() || file.eof())
-    {
-        Log::error("CreditsScreen", "Failed to read file at '%s', unexpected EOF.",
-                   creditsfile.c_str());
-        return;
-    }
-
     int lineCount = 0;
 #undef DEBUG_TRANSLATIONS    // Enable to only see the translator credits
 #ifdef DEBUG_TRANSLATIONS
         int my_counter = 0;
 #endif
-    // let's assume the file is encoded as UTF-16
-    while (getWideLine( file, &line ))
+    // Read file into wide strings (converted from utf-8 on the fly)
+    while (getLineAsWide( file, &line ))
     {
 #ifdef DEBUG_TRANSLATIONS
         if (my_counter > 0)

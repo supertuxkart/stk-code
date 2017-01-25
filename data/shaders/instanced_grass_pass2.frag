@@ -14,7 +14,7 @@ flat in sampler2D thirdhandle;
 #endif
 in vec3 nor;
 in vec2 uv;
-in vec2 color_change;
+flat in vec2 color_change;
 out vec4 FragColor;
 
 #stk_include "utils/getLightFactor.frag"

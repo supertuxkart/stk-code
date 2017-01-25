@@ -25,6 +25,7 @@
 #include "karts/controller/controller.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen_keyboard.hpp"
 
 // ----------------------------------------------------------------------------
 /** The multitouch device constructor
@@ -44,11 +45,7 @@ MultitouchDevice::MultitouchDevice()
         event.y = 0;
     }
 
-    m_deadzone_center = UserConfigParams::m_multitouch_deadzone_center;
-    m_deadzone_center = std::min(std::max(m_deadzone_center, 0.0f), 0.5f);
-
-    m_deadzone_edge = UserConfigParams::m_multitouch_deadzone_edge;
-    m_deadzone_edge = std::min(std::max(m_deadzone_edge, 0.0f), 0.5f);
+    updateConfigParams();
 }   // MultitouchDevice
 
 // ----------------------------------------------------------------------------
@@ -226,6 +223,18 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
 } // updateDeviceState
 
 // ----------------------------------------------------------------------------
+/** Updates config parameters i.e. when they are modified in options
+ */
+void MultitouchDevice::updateConfigParams()
+{
+    m_deadzone_center = UserConfigParams::m_multitouch_deadzone_center;
+    m_deadzone_center = std::min(std::max(m_deadzone_center, 0.0f), 0.5f);
+
+    m_deadzone_edge = UserConfigParams::m_multitouch_deadzone_edge;
+    m_deadzone_edge = std::min(std::max(m_deadzone_edge, 0.0f), 0.5f);
+} // updateConfigParams
+
+// ----------------------------------------------------------------------------
 /** Helper function that returns a steering factor for steering button.
  *  \param value The axis value from 0 to 1.
  */
@@ -255,6 +264,7 @@ void MultitouchDevice::handleControls(MultitouchButton* button)
     // to use it for GUI navigation.
     if (StateManager::get()->getGameState() != GUIEngine::GAME ||
         GUIEngine::ModalDialog::isADialogActive() ||
+        GUIEngine::ScreenKeyboard::isActive() ||
         race_manager->isWatchingReplay())
         return;
 

@@ -81,7 +81,9 @@ public:
 	virtual u32 getPitch() const;
 
 	//! return open gl texture name
-	GLuint getOpenGLTextureName() const;
+	virtual u32 getOpenGLTextureName() const;
+
+	virtual u64 getHandle() { return 0; }
 
 	//! return whether this texture has mipmaps
 	virtual bool hasMipMaps() const;
@@ -108,6 +110,13 @@ public:
 
 	//! Get an access to texture states cache.
 	SStatesCache& getStatesCache() const;
+
+	void setImage(IImage* new_image)
+	{
+		if (Image)
+			Image->drop();
+		Image = new_image;
+	}
 
 protected:
 

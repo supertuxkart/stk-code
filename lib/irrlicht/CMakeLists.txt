@@ -30,6 +30,11 @@ if(APPLE)
 endif()
 
 add_definitions(-DNDEBUG=1 -DIRRLICHT_EXPORTS=1 -DPNG_THREAD_UNSAFE_OK -DPNG_NO_MMX_CODE -DPNG_NO_MNG_FEATURES)
+
+if(UNIX OR MINGW)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
+endif()
+
 if(MSVC)
   add_definitions(/D_IRR_STATIC_LIB_)
   add_definitions(/D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
@@ -59,7 +64,6 @@ endif()
 set(IRRLICHT_SOURCES
 source/Irrlicht/CAnimatedMeshSceneNode.cpp
 source/Irrlicht/CAttributes.cpp
-source/Irrlicht/CB3DMeshFileLoader.cpp
 source/Irrlicht/CBillboardSceneNode.cpp
 source/Irrlicht/CBoneSceneNode.cpp
 source/Irrlicht/CCameraSceneNode.cpp
@@ -187,11 +191,9 @@ source/Irrlicht/Irrlicht.cpp
 source/Irrlicht/irrXML.cpp
 source/Irrlicht/os.cpp
 source/Irrlicht/COpenGLNormalMapRenderer.cpp
-source/Irrlicht/BuiltInFont.h
 source/Irrlicht/CAnimatedMeshSceneNode.h
 source/Irrlicht/CAttributeImpl.h
 source/Irrlicht/CAttributes.h
-source/Irrlicht/CB3DMeshFileLoader.h
 source/Irrlicht/CBillboardSceneNode.h
 source/Irrlicht/CBlit.h
 source/Irrlicht/CBoneSceneNode.h

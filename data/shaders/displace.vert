@@ -15,7 +15,7 @@ out vec2 uv_bis;
 out float camdist;
 
 void main() {
-	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(Position, 1.);
+	gl_Position = ProjectionViewMatrix * ModelMatrix * vec4(Position, 1.);
 	uv = Texcoord;
 	uv_bis = SecondTexcoord;
 	camdist = length(ViewMatrix * ModelMatrix *  vec4(Position, 1.));

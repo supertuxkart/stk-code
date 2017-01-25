@@ -19,6 +19,8 @@ namespace scene
 
 	class CAnimatedMeshSceneNode : public IAnimatedMeshSceneNode
 	{
+	private:
+		core::array<u32> m_animation_set;
 	public:
 
 		//! constructor
@@ -158,10 +160,18 @@ namespace scene
 		\return The newly created clone of this node. */
 		virtual ISceneNode* clone(ISceneNode* newParent=0, ISceneManager* newManager=0);
 
+		virtual u32 getAnimationSetNum() { return m_animation_set.size() / 2; }
+		virtual void addAnimationSet(u32 start, u32 end)
+		{
+			m_animation_set.push_back(start);
+			m_animation_set.push_back(end);
+		}
+		virtual void useAnimationSet(u32 set_num);
+
 	protected:
 
 		//! Get a static mesh for the current frame of this animated mesh
-		IMesh* getMeshForCurrentFrame();
+		virtual IMesh* getMeshForCurrentFrame(SkinningCallback sc = NULL, int offset = -1);
 
 		void buildFrameNr(u32 timeMs);
 		void checkJoints();

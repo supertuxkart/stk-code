@@ -29,6 +29,7 @@
 #include <string>
 
 class AbstractGeometryPasses;
+class Camera;
 class GL3RenderTarget;
 class RenderTarget;
 class RTT;
@@ -53,7 +54,6 @@ private:
     std::vector<GlowData>       m_glowing;
     size_t                      m_nb_static_glowing;
 
-    void compressPowerUpTextures();
     void setOverrideMaterial();
     
     void addItemsInGlowingList();
@@ -85,7 +85,7 @@ private:
 
     void debugPhysics();
     void renderPostProcessing(Camera * const camera);
-
+    void preloadShaderFiles();
 
 public:
     ShaderBasedRenderer();

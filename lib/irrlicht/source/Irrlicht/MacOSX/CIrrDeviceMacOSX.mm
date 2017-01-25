@@ -719,7 +719,7 @@ bool CIrrDeviceMacOSX::createWindow()
 					if (!CreationParams.WindowId)
 					{
 						[Window center];
-						[(NSFileManager *)Window setDelegate:[NSApp delegate]];
+						[(NSFileManager *)Window setDelegate:[(NSFileManager *)NSApp delegate]];
 
 						if(CreationParams.DriverType == video::EDT_OPENGL)
 							[OGLContext setView:[Window contentView]];

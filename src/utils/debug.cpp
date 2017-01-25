@@ -29,19 +29,25 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/stk_tex_manager.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/controller.hpp"
+#include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
-#include "states_screens/dialogs/scripting_console.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -125,7 +131,9 @@ enum DebugMenuCommand
     DEBUG_VISUAL_VALUES,
     DEBUG_PRINT_START_POS,
     DEBUG_ADJUST_LIGHTS,
-    DEBUG_SCRIPT_CONSOLE
+    DEBUG_SCRIPT_CONSOLE,
+    DEBUG_RUN_CUTSCENE,
+    DEBUG_TEXTURE_CONSOLE,
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -236,9 +244,10 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
 #ifndef SERVER_ONLY
         Log::info("Debug", "Reloading shaders...");
-            ShaderBase::updateShaders();
+        ShaderFilesManager::getInstance()->clean();
+        ShaderBase::updateShaders();
 #endif
-            break;
+        break;
     case DEBUG_GRAPHICS_RESET:
         if (physics)
             physics->setDebugMode(IrrDebugDrawer::DM_NONE);
@@ -348,6 +357,7 @@ bool handleContextMenuAction(s32 cmd_id)
         font_manager->getFont<BoldFace>()->dumpGlyphPage("bold");
         font_manager->getFont<DigitFace>()->dumpGlyphPage("digit");
         font_manager->getFont<RegularFace>()->dumpGlyphPage("regular");
+        break;
     case DEBUG_FONT_RELOAD:
         font_manager->getFont<BoldFace>()->reset();
         font_manager->getFont<DigitFace>()->reset();
@@ -629,7 +639,77 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     }
     case DEBUG_SCRIPT_CONSOLE:
-        new ScriptingConsole();
+        new GeneralTextFieldDialog(L"Run Script", []
+            (const irr::core::stringw& text) {},
+            [] (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
+            {
+                Scripting::ScriptEngine* engine =
+                    Scripting::ScriptEngine::getInstance();
+                if (engine == NULL)
+                {
+                    Log::warn("Debug", "No scripting engine loaded!");
+                    return true;
+                }
+                engine->evalScript(StringUtils::wideToUtf8(tb->getText()));
+                tb->setText(L"");
+                // Don't close the console after each run
+                return false;
+            });
+        break;
+    case DEBUG_RUN_CUTSCENE:
+        new GeneralTextFieldDialog(
+            L"Enter the cutscene names (separate parts by space)", []
+            (const irr::core::stringw& text)
+            {
+                if (World::getWorld())
+                {
+                    Log::warn("Debug", "Please run cutscene in main menu");
+                    return;
+                }
+                if (text.empty()) return;
+                std::vector<std::string> parts =
+                    StringUtils::split(StringUtils::wideToUtf8(text), ' ');
+                for (const std::string& track : parts)
+                {
+                    Track* t = track_manager->getTrack(track);
+                    if (t == NULL)
+                    {
+                        Log::warn("Debug", "Cutscene %s not found!",
+                            track.c_str());
+                        return;
+                    }
+                }
+                CutsceneWorld::setUseDuration(true);
+                StateManager::get()->enterGameState();
+                race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                race_manager->setNumKarts(0);
+                race_manager->setNumPlayers(0);
+                race_manager->startSingleRace(parts.front(), 999, false);
+                ((CutsceneWorld*)World::getWorld())->setParts(parts);
+            });
+        break;
+        case DEBUG_TEXTURE_CONSOLE:
+        new GeneralTextFieldDialog(
+            L"Enter the texture filename(s) (separate names by ;)"
+            " to be reloaded (empty to reload all)\n"
+            "Press tus; for texture usage stats (shown in console)", []
+            (const irr::core::stringw& text) {},
+            [] (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
+            {
+#ifndef SERVER_ONLY
+                core::stringw t = tb->getText();
+                STKTexManager* stktm = STKTexManager::getInstance();
+                if (t == "tus;")
+                {
+                    stktm->dumpAllTexture(false/*mesh_texture*/);
+                    stktm->dumpTextureUsage();
+                    return false;
+                }
+                lw->setText(stktm->reloadTexture(t), true);
+#endif
+                // Don't close the dialog after each run
+                return false;
+            });
         break;
     }   // switch
     return false;
@@ -738,6 +818,8 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
             mnu->addItem(L"Adjust Lights", DEBUG_ADJUST_LIGHTS);
             mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
+            mnu->addItem(L"Run cutscene(s)", DEBUG_RUN_CUTSCENE);
+            mnu->addItem(L"Texture console", DEBUG_TEXTURE_CONSOLE);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();

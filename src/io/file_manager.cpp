@@ -309,11 +309,11 @@ void FileManager::init()
     // Note that we can't push the texture search path in the constructor
     // since this also adds a file archive to the file system - and
     // m_file_system is deleted (in irr_driver)
-    pushTextureSearchPath(m_subdir_name[TEXTURE]);
-    if(fileExists(m_subdir_name[TEXTURE]+"deprecated/"))
-        pushTextureSearchPath(m_subdir_name[TEXTURE]+"deprecated/");
+    pushTextureSearchPath(m_subdir_name[TEXTURE], "textures");
+    if (fileExists(m_subdir_name[TEXTURE]+"deprecated/"))
+        pushTextureSearchPath(m_subdir_name[TEXTURE]+"deprecated/", "deprecatedtex");
 
-    pushTextureSearchPath(m_subdir_name[GUI]);
+    pushTextureSearchPath(m_subdir_name[GUI], "gui");
 
     pushModelSearchPath  (m_subdir_name[MODEL]);
     pushMusicSearchPath  (m_subdir_name[MUSIC]);
@@ -517,9 +517,9 @@ void FileManager::pushModelSearchPath(const std::string& path)
 /** Adds a texture search path to the list of texture search paths.
  *  This path will be searched before any other existing paths.
  */
-void FileManager::pushTextureSearchPath(const std::string& path)
+void FileManager::pushTextureSearchPath(const std::string& path, const std::string& container_id)
 {
-    m_texture_search_path.push_back(path);
+    m_texture_search_path.push_back(TextureSearchPath(path, container_id));
     const int n=m_file_system->getFileArchiveCount();
     m_file_system->addFileArchive(createAbsoluteFilename(path),
                                   /*ignoreCase*/false,
@@ -548,9 +548,9 @@ void FileManager::popTextureSearchPath()
 {
     if(!m_texture_search_path.empty())
     {
-        std::string dir = m_texture_search_path.back();
+        TextureSearchPath dir = m_texture_search_path.back();
         m_texture_search_path.pop_back();
-        m_file_system->removeFileArchive(createAbsoluteFilename(dir));
+        m_file_system->removeFileArchive(createAbsoluteFilename(dir.m_texture_search_path));
     }
 }   // popTextureSearchPath
 
@@ -598,6 +598,29 @@ bool FileManager::findFile(std::string& full_path,
         if(m_file_system->existFile(full_path.c_str())) return true;
     }
     full_path="";
+    return false;
+}   // findFile
+
+    //-----------------------------------------------------------------------------
+    /** Tries to find the specified file in any of the given search paths.
+    *  \param full_path On return contains the full path of the file, or
+    *         "" if the file is not found.
+    *  \param file_name The name of the file to look for.
+    *  \param search_path The list of paths to search for the file.
+    *  \return True if the file is found, false otherwise.
+    */
+bool FileManager::findFile(std::string& full_path,
+    const std::string& file_name,
+    const std::vector<TextureSearchPath>& search_path) const
+{
+    for (std::vector<TextureSearchPath>::const_reverse_iterator
+        i = search_path.rbegin();
+        i != search_path.rend(); ++i)
+    {
+        full_path = i->m_texture_search_path + file_name;
+        if (m_file_system->existFile(full_path.c_str())) return true;
+    }
+    full_path = "";
     return false;
 }   // findFile
 
@@ -694,6 +717,27 @@ std::string FileManager::searchTexture(const std::string& file_name) const
 }   // searchTexture
 
 //-----------------------------------------------------------------------------
+
+bool FileManager::searchTextureContainerId(std::string& container_id,
+    const std::string& file_name) const
+{
+    std::string full_path;
+    for (std::vector<TextureSearchPath>::const_reverse_iterator
+        i = m_texture_search_path.rbegin();
+        i != m_texture_search_path.rend(); ++i)
+    {
+        full_path = i->m_texture_search_path + file_name;
+        if (m_file_system->existFile(full_path.c_str()))
+        {
+            container_id = i->m_container_id;
+            return true;
+        }
+    }
+    full_path = "";
+    return false;
+}   // findFile
+
+//-----------------------------------------------------------------------------
 /** Returns the list of all directories in which music files are searched.
  */
 std::vector<std::string> FileManager::getMusicDirs() const
@@ -747,7 +791,7 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
     for (unsigned int i=0; i<split.size(); i++)
     {
         current_path += split[i] + "/";
-        Log::info("[FileManager]", "Checking for: '%s",
+        Log::verbose("[FileManager]", "Checking for: '%s",
                     current_path.c_str());
         if (!m_file_system->existFile(io::path(current_path.c_str())))
         {
@@ -1136,35 +1180,6 @@ void FileManager::redirectOutput()
                          "be logged to %s.", logoutfile.c_str());
     Log::openOutputFiles(logoutfile);
 }   // redirectOutput
-
-//-----------------------------------------------------------------------------
-/** Returns the theoretical location of the cached version of a texture
-*   depending of the current config. (This function also works for directories:
-*   in this case the returned directory will be the cache location for all
-*   textures that you will find in the specified directory. The specified
-*   directory must end with '/')
-*   \note The returned location is where the cached data should be read or
-*   written but the file itseft does not necessarity exist. However, the
-*   directory structure is automatically created if it does not exist.
-*/
-std::string FileManager::getTextureCacheLocation(const std::string& filename)
-{
-    std::string file = StringUtils::getBasename(filename);
-
-    std::string parent_dir = StringUtils::getPath(filename);
-    if (StringUtils::hasSuffix(parent_dir, "/"))
-        parent_dir = parent_dir.substr(0, parent_dir.size() - 1);
-    parent_dir = StringUtils::getBasename(parent_dir);
-
-    std::string cache_subdir = (UserConfigParams::m_high_definition_textures & 0x01) == 0x01
-                               ? "hd/"
-                               : "resized/";
-    std::string cached_file =
-        getCachedTexturesDir() + cache_subdir + parent_dir + "/";
-    checkAndCreateDirectoryP(cached_file);
-    cached_file += file;
-    return cached_file;
-}   // getTextureCacheLocation
 
 //-----------------------------------------------------------------------------
 /** Returns the directory for addon files. */

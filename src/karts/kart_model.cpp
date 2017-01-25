@@ -31,16 +31,19 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/render_info.hpp"
+#include "graphics/stk_animated_mesh.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"
+#include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
 #include "IMeshManipulator.h"
+#include <algorithm>
 
 #define SKELETON_DEBUG 0
 
@@ -138,6 +141,7 @@ KartModel::KartModel(bool is_master)
     m_wheel_filename[2] = "";
     m_wheel_filename[3] = "";
     m_speed_weighted_objects.clear();
+    m_headlight_objects.clear();
     m_animated_node     = NULL;
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
         m_animation_frame[i]=-1;
@@ -174,8 +178,13 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]);
         animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP] );
         animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_END]  );
+        animation_node->get("backpedal-left", &m_animation_frame[AF_BACK_LEFT]);
+        animation_node->get("backpedal",      &m_animation_frame[AF_BACK_STRAIGHT]);
+        animation_node->get("backpedal-right",&m_animation_frame[AF_BACK_RIGHT]);
         animation_node->get("start-speed-weighted", &m_animation_frame[AF_SPEED_WEIGHTED_START]);
         animation_node->get("end-speed-weighted",   &m_animation_frame[AF_SPEED_WEIGHTED_END]  );
+        animation_node->get("selection-start", &m_animation_frame[AF_SELECTION_START]);
+        animation_node->get("selection-end",   &m_animation_frame[AF_SELECTION_END]  );
         animation_node->get("speed",          &m_animation_speed               );
     }
 
@@ -187,6 +196,11 @@ void KartModel::loadInfo(const XMLNode &node)
         loadWheelInfo(*wheels_node, "rear-left",   3);
     }
     
+    if (const XMLNode *headlights_node = node.getNode("headlights"))
+    {
+        loadHeadlights(*headlights_node);
+    }
+
     m_nitro_emitter_position[0] = Vec3 (0,0.1f,0);
     m_nitro_emitter_position[1] = Vec3 (0,0.1f,0);
     m_has_nitro_emitter = false;
@@ -253,6 +267,23 @@ KartModel::~KartModel()
         {
             irr_driver->dropAllTextures(m_speed_weighted_objects[i].m_model);
             irr_driver->removeMeshFromCache(m_speed_weighted_objects[i].m_model);
+        }
+    }
+
+    for (size_t i = 0; i < m_headlight_objects.size(); i++)
+    {
+        HeadlightObject& obj = m_headlight_objects[i];
+        obj.m_node = NULL;
+        if (obj.m_node)
+        {
+            // Master KartModels should never have a speed weighted object attached.
+            assert(!m_is_master);
+            obj.m_node->drop();
+        }
+        if (m_is_master && obj.m_model)
+        {
+            irr_driver->dropAllTextures(obj.m_model);
+            irr_driver->removeMeshFromCache(obj.m_model);
         }
     }
 
@@ -334,6 +365,14 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
         km->m_speed_weighted_objects[i] = m_speed_weighted_objects[i];
     }
 
+    km->m_headlight_objects.resize(m_headlight_objects.size());
+    for (size_t i = 0; i<m_headlight_objects.size(); i++)
+    {
+        // Master should not have any speed weighted nodes.
+        assert(!m_headlight_objects[i].m_node);
+        km->m_headlight_objects[i] = m_headlight_objects[i];
+    }
+
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
         km->m_animation_frame[i] = m_animation_frame[i];
 
@@ -361,11 +400,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
 
         node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh",
                NULL/*parent*/, getRenderInfo());
-        // as animated mesh are not cheap to render use frustum box culling
-        if (CVS->isGLSL())
-            node->setAutomaticCulling(scene::EAC_OFF);
-        else
-            node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
+        node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
 #endif
         if (always_animated)
         {
@@ -410,6 +445,13 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             if(!m_speed_weighted_objects[i].m_node) continue;
             m_speed_weighted_objects[i].m_node->setParent(lod_node);
         }
+
+        for (size_t i = 0; i<m_headlight_objects.size(); i++)
+        {
+            if (!m_headlight_objects[i].m_node) continue;
+            m_headlight_objects[i].m_node->setParent(lod_node);
+        }
+
 #ifndef SERVER_ONLY
         // Enable rim lighting for the kart
         irr_driver->applyObjectPassShader(lod_node, true);
@@ -430,21 +472,16 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                            : 0;
 
         scene::IMesh* main_frame = m_mesh;
-#ifndef SERVER_ONLY
-        if (!CVS->isGLSL())
-        {
-            main_frame = m_mesh->getMesh(straight_frame);
-            main_frame->setHardwareMappingHint(scene::EHM_STATIC);
-        }
-#endif
+        main_frame = m_mesh->getMesh(straight_frame);
+        main_frame->setHardwareMappingHint(scene::EHM_STATIC);
         std::string debug_name;
 
 #ifdef DEBUG
-       debug_name = m_model_filename + " (kart-model)";
+        debug_name = m_model_filename + " (kart-model)";
 #endif
 
         node = irr_driver->addMesh(main_frame, debug_name,
-               NULL /*parent*/, getRenderInfo(), false, straight_frame);
+               NULL /*parent*/, getRenderInfo());
 
 #ifdef DEBUG
         node->setName(debug_name.c_str());
@@ -492,6 +529,24 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                 obj.m_node->setPosition(obj.m_position.toIrrVector());
             }
         }
+
+        for (int i = 0; i < m_headlight_objects.size(); i++)
+        {
+            HeadlightObject& obj = m_headlight_objects[i];
+
+            obj.m_node = NULL;
+            if (obj.m_model)
+            {
+                obj.m_node = irr_driver->addMesh(obj.m_model, "kart_headlight", node, getRenderInfo());
+                obj.m_node->grab();
+                obj.m_node->setPosition(obj.getPosition());
+
+                Track* track = Track::getCurrentTrack();
+                if (track == NULL || track->getIsDuringDay())
+                    obj.m_node->setVisible(false);
+            }
+        }
+
     }
     return node;
 }   // attachModel
@@ -587,6 +642,14 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         kart_max.max(obj_max);
     }
 
+    for (int i = 0; i < m_headlight_objects.size(); i++)
+    {
+        HeadlightObject& obj = m_headlight_objects[i];
+        std::string full_name = kart_properties.getKartDir() + obj.getFilename();
+        obj.m_model = irr_driver->getMesh(full_name);
+        irr_driver->grabAllTextures(obj.m_model);
+    }
+
     Vec3 size     = kart_max-kart_min;
     m_kart_width  = size.getX();
     m_kart_height = size.getY();
@@ -656,6 +719,8 @@ void KartModel::loadNitroEmitterInfo(const XMLNode &node,
     emitter_node->get("position", &m_nitro_emitter_position[index]);
 }   // loadNitroEmitterInfo
 
+// ----------------------------------------------------------------------------
+
 /** Loads a single speed weighted node. */
 void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, const SpeedWeightedObject::Properties& fallback_properties)
 {
@@ -688,6 +753,32 @@ void KartModel::loadWheelInfo(const XMLNode &node,
     wheel_node->get("min-suspension",   &m_min_suspension[index]         );
     wheel_node->get("max-suspension",   &m_max_suspension[index]         );
 }   // loadWheelInfo
+
+// ----------------------------------------------------------------------------
+
+void KartModel::loadHeadlights(const XMLNode &node)
+{
+    int children = node.getNumNodes();
+    for (int i = 0; i < children; i++)
+    {
+        const XMLNode* child = node.getNode(i);
+        if (child->getName() == "object")
+        {
+            // <object position="-0.168000 0.151288 0.917929" model="TuxHeadlight.b3d"/>
+            core::vector3df position;
+            child->get("position", &position);
+
+            std::string model;
+            child->get("model", &model);
+
+            m_headlight_objects.push_back(HeadlightObject(model, position));
+        }
+        else
+        {
+            Log::warn("KartModel", "Unknown XML node in the headlights section");
+        }
+    }
+}
 
 // ----------------------------------------------------------------------------
 /** Resets the kart model. It stops animation from being played and resets
@@ -741,12 +832,27 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
     if(m_current_animation==AF_DEFAULT)
     {
         m_animated_node->setLoopMode(false);
-        if(m_animation_frame[AF_LEFT] <= m_animation_frame[AF_RIGHT])
-            m_animated_node->setFrameLoop(m_animation_frame[AF_LEFT],
-                                          m_animation_frame[AF_RIGHT] );
+        const bool support_backpedal =
+            m_animation_frame[AF_BACK_STRAIGHT] > -1 &&
+            m_animation_frame[AF_BACK_LEFT] > -1 &&
+            m_animation_frame[AF_BACK_RIGHT] > -1;
+        if (support_backpedal)
+        {
+            int start_frame = std::min(m_animation_frame[AF_LEFT],
+                m_animation_frame[AF_RIGHT]);
+            int end_frame = std::max(m_animation_frame[AF_BACK_LEFT],
+                m_animation_frame[AF_BACK_RIGHT]);
+            m_animated_node->setFrameLoop(start_frame, end_frame);
+        }
         else
-            m_animated_node->setFrameLoop(m_animation_frame[AF_RIGHT],
-                                          m_animation_frame[AF_LEFT] );
+        {
+            if(m_animation_frame[AF_LEFT] <= m_animation_frame[AF_RIGHT])
+                m_animated_node->setFrameLoop(m_animation_frame[AF_LEFT],
+                                              m_animation_frame[AF_RIGHT] );
+            else
+                m_animated_node->setFrameLoop(m_animation_frame[AF_RIGHT],
+                                              m_animation_frame[AF_LEFT] );
+        }
         m_animated_node->setAnimationEndCallback(NULL);
         m_animated_node->setAnimationSpeed(0);
     }
@@ -987,15 +1093,23 @@ void KartModel::update(float dt, float distance, float steer, float speed,
 
     // Update animation if necessary
     // -----------------------------
+    const bool back = m_animation_frame[AF_BACK_STRAIGHT] > -1 && speed < 0.0f;
     float frame;
-    if(steer>0.0f)      frame = m_animation_frame[AF_STRAIGHT]
+    if(steer>0.0f && back) frame = m_animation_frame[AF_BACK_STRAIGHT]
+                                 - ( ( m_animation_frame[AF_BACK_STRAIGHT]
+                                   -m_animation_frame[AF_BACK_RIGHT]  )*steer);
+    else if(steer<0.0f && back) frame = m_animation_frame[AF_BACK_STRAIGHT]
+                              + ( (m_animation_frame[AF_BACK_STRAIGHT]
+                                   -m_animation_frame[AF_BACK_LEFT]   )*steer);
+    else if(steer>0.0f) frame = m_animation_frame[AF_STRAIGHT]
                               - ( ( m_animation_frame[AF_STRAIGHT]
                                         -m_animation_frame[AF_RIGHT]  )*steer);
     else if(steer<0.0f) frame = m_animation_frame[AF_STRAIGHT]
                               + ( (m_animation_frame[AF_STRAIGHT]
                                         -m_animation_frame[AF_LEFT]   )*steer);
-    else                frame = (float)m_animation_frame[AF_STRAIGHT];
-
+    else                frame = (float)(back ?
+                                m_animation_frame[AF_BACK_STRAIGHT] :
+                                m_animation_frame[AF_STRAIGHT]);
     m_animated_node->setCurrentFrame(frame);
 }   // update
 
@@ -1031,7 +1145,17 @@ void KartModel::attachHat()
             m_hat_node = irr_driver->addMesh(hat_mesh, "hat");
             bone->addChild(m_hat_node);
             m_animated_node->setCurrentFrame((float)m_animation_frame[AF_STRAIGHT]);
-            m_animated_node->OnAnimate(0);
+#ifndef SERVER_ONLY
+            STKAnimatedMesh* am = dynamic_cast<STKAnimatedMesh*>(m_animated_node);
+            if (am)
+            {
+                am->setHardwareSkinning(false);
+                am->OnAnimate(0);
+                am->setHardwareSkinning(true);
+            }
+            else
+#endif
+                m_animated_node->OnAnimate(0);
             bone->updateAbsolutePosition();
              // With the hat node attached to the head bone, we have to
             // reverse the transformation of the bone, so that the hat

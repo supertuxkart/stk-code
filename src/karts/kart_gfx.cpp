@@ -32,10 +32,11 @@
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
 #include "utils/log.hpp"
+#include "race/race_manager.hpp"
 
 #include <iostream>
 
-KartGFX::KartGFX(const AbstractKart *kart)
+KartGFX::KartGFX(const AbstractKart *kart, RaceManager::KartType type, bool is_day)
 {
     //if(!UserConfigParams::m_graphical_effects)
     //{
@@ -83,6 +84,25 @@ KartGFX::KartGFX(const AbstractKart *kart)
     m_skidding_light_2->setVisible(false);
     m_skidding_light_2->setName( ("skidding emitter 2 (" + m_kart->getIdent() 
                                                          + ")").c_str() );
+
+    m_head_light = 
+        irr_driver->addLight(core::vector3df(0.0f, 0.2f, 1.5f*length),
+                             /* force */ 0.5f,
+                             /*radius*/CVS->isGLSL() ? 5.0f : 1.0f,
+                             1.0f, 1.0f, 1.0f, false, node);
+    m_head_light->setName( ("head light " + m_kart->getIdent() 
+                                                         + ")").c_str() );
+
+    if (type == RaceManager::KT_PLAYER && !is_day)
+    {
+        m_head_light->setVisible(true);
+    }
+    else
+    {
+        m_head_light->setVisible(false);
+    }
+
+
 #endif
 
 #ifndef SERVER_ONLY
@@ -91,6 +111,7 @@ KartGFX::KartGFX(const AbstractKart *kart)
         m_nitro_light->grab();
         m_skidding_light_1->grab();
         m_skidding_light_2->grab();
+        m_head_light->grab();
     }
 #endif
 
@@ -117,6 +138,10 @@ KartGFX::KartGFX(const AbstractKart *kart)
     addEffect(KGFX_NITRO2,      "nitro.xml",       rear_nitro_left,  true );
     addEffect(KGFX_NITROSMOKE1, "nitro-smoke.xml", rear_nitro_left,  false);
     addEffect(KGFX_NITROSMOKE2, "nitro-smoke.xml", rear_nitro_right, false);
+
+    addEffect(KGFX_EXHAUST1,    "kart_exhaust.xml",rear_nitro_right, false );
+    addEffect(KGFX_EXHAUST2,    "kart_exhaust.xml",rear_nitro_left,  false );
+    
     addEffect(KGFX_ZIPPER,      "zipper_fire.xml", rear_center,      true );
     addEffect(KGFX_TERRAIN,     "smoke.xml",       Vec3(0, 0, 0),    false);
     addEffect(KGFX_SKID1L,      "skid1.xml",       rear_left,        true );
@@ -142,6 +167,7 @@ KartGFX::~KartGFX()
         m_nitro_light->drop();
         m_skidding_light_1->drop();
         m_skidding_light_2->drop();
+        m_head_light->drop();
     }
 #endif
 
@@ -414,6 +440,10 @@ void KartGFX::updateNitroGraphics(float nitro_frac)
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
         m_nitro_light->setVisible(false);
     }
+    
+    // Exhaust is always emitting
+    setCreationRateRelative(KartGFX::KGFX_EXHAUST1, 1.0);
+    setCreationRateRelative(KartGFX::KGFX_EXHAUST2, 1.0);
 #endif
 }  // updateGraphics
 
@@ -531,5 +561,6 @@ void KartGFX::setGFXInvisible()
     m_nitro_light->setVisible(false);
     m_skidding_light_1->setVisible(false);
     m_skidding_light_2->setVisible(false);
+    m_head_light->setVisible(false);
 #endif
 }   // setGFXInvisible

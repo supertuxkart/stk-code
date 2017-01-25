@@ -99,10 +99,6 @@ private:
 
     core::dimension2du m_actual_screen_size;
 
-    /** Additional details to be shown in case that a texture is not found.
-     *  This is used to specify details like: "while loading kart '...'" */
-    std::string                 m_texture_error_message;
-
     /** The main MRT setup. */
     core::array<video::IRenderTarget> m_mrt;
 
@@ -111,17 +107,13 @@ private:
 
 
 private:
-
-    /** Keep a trace of the origin file name of a texture. */
-    std::map<video::ITexture*, std::string> m_texturesFileName;
-
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
      *  change to new resolution and trigger confirmation dialog.
-     *  Cancel indicates a change of the resolution (back to the original
+     *  Same indicates a change of the resolution (back to the original
      *  one), but no confirmation dialog. */
     enum {RES_CHANGE_NONE, RES_CHANGE_YES,
-          RES_CHANGE_CANCEL}                m_resolution_changing;
+          RES_CHANGE_SAME}                m_resolution_changing;
 
 
 public:
@@ -177,6 +169,7 @@ private:
 
 
     unsigned             m_last_light_bucket_distance;
+    unsigned             m_skinning_joint;
     u32                  m_renderpass;
     class STKMeshSceneNode *m_sun_interposer;
     core::vector3df m_sun_direction;
@@ -219,14 +212,10 @@ public:
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
-    video::ITexture      *applyMask(video::ITexture* texture,
-                                    const std::string& mask_path);
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColorf &light,
                                           bool force_SH_computation = true);
-    std::string           generateSmallerTextures(const std::string& dir);
-    std::string           getSmallerTexture(const std::string& texture);
     video::ITexture      *getTexture(FileManager::AssetType type,
                                      const std::string &filename,
                                      bool is_premul=false,
@@ -236,8 +225,6 @@ public:
                                      bool is_premul=false,
                                      bool is_prediv=false,
                                      bool complain_if_not_found=true);
-    void                  clearTexturesFileName();
-    std::string           getTextureName(video::ITexture* tex);
     void                  grabAllTextures(const scene::IMesh *mesh);
     void                  dropAllTextures(const scene::IMesh *mesh);
     scene::IMesh         *createQuadMesh(const video::SMaterial *material=NULL,
@@ -254,8 +241,7 @@ public:
                                   const std::string& debug_name,
                                   scene::ISceneNode *parent = NULL,
                                   RenderInfo* render_info = NULL,
-                                  bool all_parts_colorized = false,
-                                  int frame_for_mesh = -1);
+                                  bool all_parts_colorized = false);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);
@@ -296,15 +282,13 @@ public:
     void                  showPointer();
     void                  hidePointer();
     void                  setLastLightBucketDistance(unsigned d) { m_last_light_bucket_distance = d; }
+    void                  setSkinningJoint(unsigned d) { m_skinning_joint = d; }
     bool                  isPointerShown() const { return m_pointer_shown; }
     core::position2di     getMouseLocation();
 
     void                  printRenderStats();
     bool                  supportsSplatting();
     void                  requestScreenshot();
-    void                  setTextureErrorMessage(const std::string &error,
-                                                 const std::string &detail="");
-    void                  unsetTextureErrorMessage();
     class GPUTimer        &getGPUTimer(unsigned);
 
 #ifndef SERVER_ONLY
@@ -321,56 +305,7 @@ public:
         m_clear_color = color;
     }   // setClearbackBufferColor
 
-    // ------------------------------------------------------------------------
-    /** Convenience function that loads a texture with default parameters
-     *  but includes an error message.
-     *  \param filename File name of the texture to load.
-     *  \param error Error message, potentially with a '%' which will be replaced
-     *               with detail.
-     *  \param detail String to replace a '%' in the error message.
-     */
-    video::ITexture* getTexture(const std::string &filename,
-                                const std::string &error_message,
-                                const std::string &detail="")
-    {
-        setTextureErrorMessage(error_message, detail);
-        video::ITexture *tex = getTexture(filename);
-        unsetTextureErrorMessage();
-        return tex;
-    }   // getTexture
 
-    // ------------------------------------------------------------------------
-    /** Convenience function that loads a texture with default parameters
-     *  but includes an error message.
-     *  \param filename File name of the texture to load.
-     *  \param error Error message, potentially with a '%' which will be replaced
-     *               with detail.
-     *  \param detail String to replace a '%' in the error message.
-     */
-    video::ITexture* getTexture(const std::string &filename,
-                                char *error_message,
-                                char *detail=NULL)
-    {
-        if(!detail)
-            return getTexture(filename, std::string(error_message),
-                              std::string(""));
-
-        return getTexture(filename, std::string(error_message),
-                          std::string(detail));
-    }   // getTexture
-
-    // ------------------------------------------------------------------------
-    /** Returns the currently defined texture error message, which is used
-     *  by event_handler.cpp to print additional info about irrlicht
-     *  internal errors or warnings. If no error message is currently
-     *  defined, the error message is "".
-     */
-    const std::string &getTextureErrorMessage()
-    {
-        return m_texture_error_message;
-    }   // getTextureErrorMessage
-
-    // ------------------------------------------------------------------------
     /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
     // ------------------------------------------------------------------------
@@ -629,6 +564,7 @@ public:
                                                          size_t height);
 
     void uploadLightingData();
+    void sameRestart()             { m_resolution_changing = RES_CHANGE_SAME; }
 
 };   // IrrDriver
 

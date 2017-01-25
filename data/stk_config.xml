@@ -72,8 +72,10 @@
           delta-angle="0.5" />
 
   <!-- Skidmark data: maximum number of skid marks, and
-       time for skidmarks to fade out. -->
-  <skid-marks max-number="100"  fadeout-time="60"/>
+       time for skidmarks to fade out. Maximum number will over
+       current number of karts, so the more karts, the less
+       skidmark is on track. -->
+  <skid-marks max-number="500"  fadeout-time="60"/>
 
   <!-- Defines when the upright constraint should be active, it's
        disabled when the kart is more than this value from the track. -->

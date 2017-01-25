@@ -178,7 +178,7 @@ void CAnimatedMeshSceneNode::OnRegisterSceneNode()
 	}
 }
 
-IMesh * CAnimatedMeshSceneNode::getMeshForCurrentFrame()
+IMesh * CAnimatedMeshSceneNode::getMeshForCurrentFrame(SkinningCallback sc, int offset)
 {
 	if(Mesh->getMeshType() != EAMT_SKINNED)
 	{
@@ -203,7 +203,7 @@ IMesh * CAnimatedMeshSceneNode::getMeshForCurrentFrame()
 			skinnedMesh->animateMesh(getFrameNr(), 1.0f);
 
 		// Update the skinned mesh for the current joint transforms.
-		skinnedMesh->skinMesh(AnimationStrength);
+		skinnedMesh->skinMesh(AnimationStrength, sc, offset);
 
 		if (JointMode == EJUOR_READ)//read from mesh
 		{
@@ -992,6 +992,15 @@ ISceneNode* CAnimatedMeshSceneNode::clone(ISceneNode* newParent, ISceneManager* 
 	return newNode;
 }
 
+void CAnimatedMeshSceneNode::useAnimationSet(u32 set_num)
+{
+	if (m_animation_set.empty())
+	{
+		setFrameLoop(getStartFrame(), getEndFrame());
+		return;
+	}
+	setFrameLoop(m_animation_set[set_num * 2], m_animation_set[set_num * 2 + 1]);
+}
 
 } // end namespace scene
 } // end namespace irr

@@ -31,7 +31,7 @@
 #include "race/race_manager.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "tracks/model_definition_loader.hpp"
-#include "utils/helpers.hpp"
+
 #include <ISceneManager.h>
 
 /** A track object: any additional object on the track. This object implements
@@ -332,8 +332,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         {
             float power = 1;
             xml_node.get("bloompower", &power);
-            power = clampf(power, 0.5f, 10);
-
+            btClamp(power, 0.5f, 10.0f);
             irr_driver->addForcedBloomNode(glownode, power);
         }
     }

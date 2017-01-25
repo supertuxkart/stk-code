@@ -20,8 +20,10 @@
 
 #ifndef SERVER_ONLY
 
-#include "graphics/draw_calls.hpp"
+#include "graphics/abstract_renderer.hpp"
 
+using namespace irr;
+class DrawCalls;
 
 /** Rendering methods in this class only require
  *  OpenGL3.2 functions */

@@ -257,7 +257,7 @@ Material* ParticleKind::getMaterial() const
     if (material_manager->hasMaterial(m_material_file))
     {
         Material* material = material_manager->getMaterial(m_material_file);
-        if (material->getTexture() == NULL)
+        if (material->getTexture(true/*srgb*/, true/*premul_alpha*/) == NULL)
         {
             throw std::runtime_error("[ParticleKind] Cannot locate file " + m_material_file);
         }

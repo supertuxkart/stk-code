@@ -21,7 +21,7 @@
 #include "graphics/show_curve.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "utils/vec3.hpp"
 
 #include <IMeshSceneNode.h>
@@ -67,9 +67,9 @@ void ShowCurve::addEmptyMesh()
     m_mesh            = irr_driver->createQuadMesh(&m,
                                                    /*create_one_quad*/ false);
     m_buffer          = m_mesh->getMeshBuffer(0);
-    m_buffer->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(128, 255, 105, 180)));
-    m_buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-    m_buffer->getMaterial().setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m_buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+    m_buffer->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    m_buffer->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
 
     assert(m_buffer->getVertexType()==video::EVT_STANDARD);
 }   // addEmptyMesh

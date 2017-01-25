@@ -1581,6 +1581,8 @@ void COpenGLDriver::drawVertexPrimitiveList(const void* vertices, u32 vertexCoun
 				case EVT_TANGENTS:
 					glColorPointer(colorSize, GL_UNSIGNED_BYTE, sizeof(S3DVertexTangents), &(static_cast<const S3DVertexTangents*>(vertices))[0].Color);
 					break;
+				default:
+					break;
 			}
 		}
 		else
@@ -1676,6 +1678,8 @@ void COpenGLDriver::drawVertexPrimitiveList(const void* vertices, u32 vertexCoun
 					glTexCoordPointer(3, GL_FLOAT, sizeof(S3DVertexTangents), buffer_offset(48));
 			}
 			break;
+		default:
+			break;
 	}
 
 	renderArray(indexList, primitiveCount, pType, iType);
@@ -1739,6 +1743,8 @@ void COpenGLDriver::getColorBuffer(const void* vertices, u32 vertexCount, E_VERT
 				++p;
 			}
 		}
+		break;
+		default:
 		break;
 	}
 }
@@ -1913,6 +1919,8 @@ void COpenGLDriver::draw2DVertexPrimitiveList(const void* vertices, u32 vertexCo
 				case EVT_TANGENTS:
 					glColorPointer(colorSize, GL_UNSIGNED_BYTE, sizeof(S3DVertexTangents), &(static_cast<const S3DVertexTangents*>(vertices))[0].Color);
 					break;
+				default:
+					break;
 			}
 		}
 		else
@@ -1984,6 +1992,8 @@ void COpenGLDriver::draw2DVertexPrimitiveList(const void* vertices, u32 vertexCo
 				glVertexPointer(2, GL_FLOAT, sizeof(S3DVertexTangents), buffer_offset(0));
 			}
 
+			break;
+		default:
 			break;
 	}
 
@@ -2555,8 +2565,7 @@ bool COpenGLDriver::setActiveTexture(u32 stage, const video::ITexture* texture)
 
 		if (!useCoreContext)
 			glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D,
-			static_cast<const COpenGLTexture*>(texture)->getOpenGLTextureName());
+		glBindTexture(GL_TEXTURE_2D, texture->getOpenGLTextureName());
 	}
 	return true;
 }

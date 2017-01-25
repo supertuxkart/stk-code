@@ -875,9 +875,29 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
             }
 
             w3->clearModels();
+            const bool has_win_anime =
+                UserConfigParams::m_show_steering_animations != 0 &&
+                (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
+                kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
+                kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
+                (kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 &&
+                kart_model.getFrame(KartModel::AF_SELECTION_END) > -1));
             w3->addModel( kart_model.getModel(), Vec3(0,0,0),
                 Vec3(scale, scale, scale),
-                          kart_model.getBaseFrame() );
+                has_win_anime ?
+                kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 ?
+                kart_model.getFrame(KartModel::AF_SELECTION_START) :
+                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
+                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
+                kart_model.getFrame(KartModel::AF_WIN_START) :
+                kart_model.getBaseFrame(),
+                has_win_anime ?
+                kart_model.getFrame(KartModel::AF_SELECTION_END) > -1 ?
+                kart_model.getFrame(KartModel::AF_SELECTION_END) :
+                kart_model.getFrame(KartModel::AF_WIN_END) :
+                kart_model.getBaseFrame(),
+                false/*all_parts_colorized*/,
+                kart_model.getAnimationSpeed());
             w3->addModel( kart_model.getWheelModel(0),
                           kart_model.getWheelGraphicsPosition(0) );
             w3->addModel( kart_model.getWheelModel(1),

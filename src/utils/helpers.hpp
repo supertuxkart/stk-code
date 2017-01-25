@@ -23,12 +23,6 @@
 
 using irr::video::ITexture;
 
-float clampf(float, float, float);
-
-unsigned ispow(const unsigned in);
-
 float noise2d(float v1, float v2 = 0);
-
-u8 shash8(const u8 * const data, const u16 size);
 
 #endif

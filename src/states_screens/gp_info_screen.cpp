@@ -22,7 +22,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/saved_grand_prix.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -286,9 +286,9 @@ void GPInfoScreen::addScreenshot()
     screenshot->m_properties[PROP_ICON] = "gui/main_help.png";
 
     const Track *track = track_manager->getTrack(m_gp.getTrackId(0));
-    video::ITexture* image = irr_driver->getTexture(track->getScreenshotFile(),
-                                    "While loading screenshot for track '%s':",
-                                           track->getFilename()            );
+    video::ITexture* image = STKTexManager::getInstance()
+        ->getTexture(track->getScreenshotFile(),
+        "While loading screenshot for track '%s':", track->getFilename());
     if (image != NULL)
         screenshot->setImage(image);
 }   // addScreenShot

@@ -227,7 +227,7 @@ void Kart::init(RaceManager::KartType type)
     }
     loadData(type, animations);
 
-    m_kart_gfx = new KartGFX(this);
+    m_kart_gfx = new KartGFX(this, m_type, Track::getCurrentTrack()->getIsDuringDay());
     m_skidding = new Skidding(this);
     // Create the stars effect
     m_stars_effect = new Stars(this);
@@ -425,6 +425,14 @@ void Kart::reset()
     if(wheels[3]) wheels[3]->setVisible(true);
 
 }   // reset
+
+// -----------------------------------------------------------------------------
+void Kart::setXYZ(const Vec3& a)
+{
+    AbstractKart::setXYZ(a);
+    Vec3 front(0, 0, getKartLength()*0.5f);
+    m_xyz_front = getTrans()(front);
+}    // setXYZ
 
 // -----------------------------------------------------------------------------
 void Kart::increaseMaxSpeed(unsigned int category, float add_speed,

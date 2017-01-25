@@ -26,14 +26,15 @@
 #include "graphics/geometry_passes.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/graphics_restrictions.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/post_processing.hpp"
 #include "graphics/render_target.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/skybox.hpp"
+#include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/spherical_harmonics.hpp"
-#include "graphics/texture_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "modes/world.hpp"
@@ -64,30 +65,6 @@ void ShaderBasedRenderer::setRTT(RTT* rtts)
         m_rtts = NULL;
     }
 } //setRTT
-
-// ----------------------------------------------------------------------------
-void ShaderBasedRenderer::compressPowerUpTextures()
-{
-    for (unsigned i = 0; i < PowerupManager::POWERUP_MAX; i++)
-    {
-        scene::IMesh *mesh = powerup_manager->m_all_meshes[i];
-        if (!mesh)
-            continue;
-        for (unsigned j = 0; j < mesh->getMeshBufferCount(); j++)
-        {
-            scene::IMeshBuffer *mb = mesh->getMeshBuffer(j);
-            if (!mb)
-                continue;
-            for (unsigned k = 0; k < 4; k++)
-            {
-                video::ITexture *tex = mb->getMaterial().getTexture(k);
-                if (!tex)
-                    continue;
-                compressTexture(tex, true);
-            }
-        }
-    }
-} //compressPowerUpTextures
 
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::setOverrideMaterial()
@@ -268,10 +245,12 @@ void ShaderBasedRenderer::renderScene(scene::ICameraSceneNode * const camnode,
                                       bool hasShadow,
                                       bool forceRTT)
 {
-    if(CVS->isARBUniformBufferObjectUsable())
+    if (CVS->isARBUniformBufferObjectUsable())
     {
         glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedGPUObjects::getViewProjectionMatricesUBO());
         glBindBufferBase(GL_UNIFORM_BUFFER, 1, SharedGPUObjects::getLightingDataUBO());
+        if (CVS->supportsHardwareSkinning())
+            glBindBufferBase(GL_UNIFORM_BUFFER, 2, SharedGPUObjects::getSkinningUBO());
     }
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
@@ -639,7 +618,9 @@ ShaderBasedRenderer::ShaderBasedRenderer()
     m_skybox                = NULL;
     m_spherical_harmonics   = new SphericalHarmonics(irr_driver->getAmbientLight().toSColor());
     m_nb_static_glowing     = 0;
-    
+    Log::info("ShaderBasedRenderer", "Preloading shaders...");
+    preloadShaderFiles();
+
     if (CVS->isAZDOEnabled())
     {
         m_geometry_passes = new GeometryPasses<MultidrawPolicy>();
@@ -655,7 +636,7 @@ ShaderBasedRenderer::ShaderBasedRenderer()
         m_geometry_passes = new GeometryPasses<GL3DrawPolicy>();
         Log::info("ShaderBasedRenderer", "Geometry will be rendered with GL3 policy.");
     }
-        
+
     m_post_processing = new PostProcessing(irr_driver->getVideoDriver());    
 }
 
@@ -679,6 +660,7 @@ ShaderBasedRenderer::~ShaderBasedRenderer()
     delete m_spherical_harmonics;
     delete m_skybox;
     delete m_rtts;
+    ShaderFilesManager::kill();
 }
 
 // ----------------------------------------------------------------------------
@@ -689,8 +671,6 @@ void ShaderBasedRenderer::onLoadWorld()
     size_t height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
     RTT* rtts = new RTT(width, height);
     setRTT(rtts);
-
-    compressPowerUpTextures();
 }
 
 // ----------------------------------------------------------------------------
@@ -698,7 +678,7 @@ void ShaderBasedRenderer::onUnloadWorld()
 {
     delete m_rtts;
     m_rtts = NULL;
-    removeSkyBox();    
+    removeSkyBox();
 }
 
 // ----------------------------------------------------------------------------
@@ -958,5 +938,61 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     irr_driver->getSceneManager()->setActiveCamera(NULL);
 
 } //renderToTexture
+
+// ----------------------------------------------------------------------------
+void ShaderBasedRenderer::preloadShaderFiles()
+{
+    ShaderFilesManager* sfm = ShaderFilesManager::getInstance();
+
+    sfm->addShaderFile("object_pass.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("object_pass1.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("splatting.frag", GL_FRAGMENT_SHADER);
+    if (CVS->supportsHardwareSkinning())
+        sfm->addShaderFile("skinning.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("transparent.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("coloredquad.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("coloredquad.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("screenquad.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("tonemap.frag", GL_FRAGMENT_SHADER);
+    if (!GraphicsRestrictions::isDisabled
+        (GraphicsRestrictions::GR_FRAMEBUFFER_SRGB_WORKING))
+        sfm->addShaderFile("passthrough.frag", GL_FRAGMENT_SHADER);
+
+    sfm->addShaderFile("billboard.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("billboard.frag", GL_FRAGMENT_SHADER);
+    sfm->addShaderFile("pointemitter.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("particle.vert", GL_VERTEX_SHADER);
+    sfm->addShaderFile("particle.frag", GL_FRAGMENT_SHADER);
+
+    if (CVS->supportsIndirectInstancingRendering())
+    {
+        sfm->addShaderFile("instanced_object_pass.vert", GL_VERTEX_SHADER);
+        if (CVS->supportsHardwareSkinning())
+            sfm->addShaderFile("instanced_skinning.vert", GL_VERTEX_SHADER);
+        sfm->addShaderFile("instanced_object_pass1.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_object_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_objectref_pass1.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_objectref_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_object_unlit.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_normalmap.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_grass.vert", GL_VERTEX_SHADER);
+        sfm->addShaderFile("instanced_grass_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_objectpass_spheremap.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("instanced_detailed_object_pass2.frag", GL_FRAGMENT_SHADER);
+    }
+    else
+    {
+        sfm->addShaderFile("object_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("objectref_pass1.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("objectref_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("object_unlit.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("normalmap.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("grass_pass.vert", GL_VERTEX_SHADER);
+        sfm->addShaderFile("grass_pass2.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("objectpass_spheremap.frag", GL_FRAGMENT_SHADER);
+        sfm->addShaderFile("detailed_object_pass2.frag", GL_FRAGMENT_SHADER);
+    }
+
+} //preloadShaderFiles
 
 #endif   // !SERVER_ONLY

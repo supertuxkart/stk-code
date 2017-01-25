@@ -37,6 +37,7 @@ enum TransparentMaterial
     TM_DEFAULT,
     TM_ADDITIVE,
     TM_DISPLACEMENT,
+    TM_TRANSLUCENT_SKN,
     TM_TRANSLUCENT_STD,
     TM_TRANSLUCENT_TAN,
     TM_TRANSLUCENT_2TC,
@@ -91,6 +92,7 @@ public:
     virtual void updateGL() = 0;
     virtual bool glow() const = 0;
     virtual bool isImmediateDraw() const { return false; }
+    const std::string& getMeshDebugName() const { return m_debug_name; }
 };   // STKMeshCommon
 
 
@@ -111,9 +113,33 @@ public:
 
 
 // ----------------------------------------------------------------------------
+class ListSkinnedSolid : public MeshList<ListSkinnedSolid, GLMesh *, core::matrix4,
+                                         core::matrix4, core::vector2df,
+                                         core::vector2df, int>
+{};
+
+// ----------------------------------------------------------------------------
+class ListSkinnedAlphaRef : public MeshList<ListSkinnedAlphaRef, GLMesh *,
+                                            core::matrix4, core::matrix4,
+                                            core::vector2df, core::vector2df, int>
+{};
+
+// ----------------------------------------------------------------------------
+class ListSkinnedNormalMap : public MeshList<ListSkinnedNormalMap, GLMesh *,
+                                             core::matrix4, core::matrix4,
+                                             core::vector2df, core::vector2df, int>
+{};
+
+// ----------------------------------------------------------------------------
+class ListSkinnedUnlit : public MeshList<ListSkinnedUnlit, GLMesh *,
+                                         core::matrix4, core::matrix4,
+                                         core::vector2df, core::vector2df, int>
+{};
+
+// ----------------------------------------------------------------------------
 class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4,
-                                      core::matrix4, core::vector2df,
-                                      core::vector2df>
+                                       core::matrix4, core::vector2df,
+                                       core::vector2df>
 {};
 
 // ----------------------------------------------------------------------------
@@ -173,6 +199,12 @@ class ListAdditiveTransparent : public MiscList<ListAdditiveTransparent,
 {};
 
 // ----------------------------------------------------------------------------
+class ListTranslucentSkinned : public MiscList<ListTranslucentSkinned,
+                                              GLMesh *, core::matrix4,
+                                              core::vector2df, int, float>
+{};
+
+// ----------------------------------------------------------------------------
 class ListTranslucentStandard : public MiscList<ListTranslucentStandard,
                                       GLMesh *, core::matrix4,
                                       core::vector2df, float>
@@ -218,6 +250,7 @@ Material::ShaderType getMeshMaterialFromType(video::E_MATERIAL_TYPE MaterialType
                                              Material* layer2Material);
 // ----------------------------------------------------------------------------
 TransparentMaterial getTransparentMaterialFromType(video::E_MATERIAL_TYPE,
+                                                   video::E_VERTEX_TYPE tp,
                                                    f32 MaterialTypeParam,
                                                    Material* material);
 

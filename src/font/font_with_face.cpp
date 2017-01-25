@@ -22,7 +22,10 @@
 #include "font/font_manager.hpp"
 #include "font/font_settings.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/stk_texture.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
 #include "utils/string_utils.hpp"
@@ -50,8 +53,11 @@ FontWithFace::FontWithFace(const std::string& name, FaceTTF* ttf)
  */
 FontWithFace::~FontWithFace()
 {
-    m_page->drop();
-    m_page = NULL;
+    for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
+    {
+        STKTexManager::getInstance()->removeTexture(
+            static_cast<STKTexture*>(m_spritebank->getTexture(i)));
+    }
     m_spritebank->drop();
     m_spritebank = NULL;
 
@@ -66,9 +72,6 @@ FontWithFace::~FontWithFace()
 void FontWithFace::init()
 {
     setDPI();
-    m_page = irr_driver->getVideoDriver()->createImage(video::ECF_A8R8G8B8,
-        core::dimension2du(getGlyphPageSize(), getGlyphPageSize()));
-
     // Get the max height for this face
     assert(m_face_ttf->getTotalFaces() > 0);
     FT_Face cur_face = m_face_ttf->getFace(0);
@@ -100,6 +103,11 @@ void FontWithFace::reset()
     m_new_char_holder.clear();
     m_character_area_map.clear();
     m_character_glyph_info_map.clear();
+    for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
+    {
+        STKTexManager::getInstance()->removeTexture(
+            static_cast<STKTexture*>(m_spritebank->getTexture(i)));
+    }
     m_spritebank->clear();
     createNewGlyphPage();
 }   // reset
@@ -129,32 +137,25 @@ void FontWithFace::loadGlyphInfo(wchar_t c)
  */
 void FontWithFace::createNewGlyphPage()
 {
-    m_page->fill(video::SColor(0, 255, 255, 255));
+#ifndef SERVER_ONLY
+    uint8_t* data = new uint8_t[getGlyphPageSize() * getGlyphPageSize() *
+    (CVS->isARBTextureSwizzleUsable() ? 1 : 4)]();
+#else
+    uint8_t* data = NULL;
+#endif
     m_current_height = 0;
     m_used_width = 0;
     m_used_height = 0;
-
-    // Font textures can not be resized (besides the impact on quality in
-    // this case, the rectangles in spritebank would become wrong).
-    core::dimension2du old_max_size = irr_driver->getVideoDriver()
-        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
-    irr_driver->getVideoDriver()->getNonConstDriverAttributes()
-        .setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(0, 0));
-
-    video::ITexture* page_texture = irr_driver->getVideoDriver()
-        ->addTexture("Glyph_page", m_page);
-    m_spritebank->addTexture(NULL);
-    m_spritebank->setTexture(m_spritebank->getTextureCount() - 1,
-        page_texture);
-
-    // Doing so to make sure the texture inside the sprite bank has only 1
-    // reference, so they can be removed or updated on-the-fly
-    irr_driver->getVideoDriver()->removeTexture(page_texture);
-    assert(page_texture->getReferenceCount() == 1);
-
-    irr_driver->getVideoDriver()->getNonConstDriverAttributes()
-        .setAttribute("MAX_TEXTURE_SIZE", old_max_size);
-
+    STKTexture* stkt = new STKTexture(data, typeid(*this).name() +
+        StringUtils::toString(m_spritebank->getTextureCount()),
+        getGlyphPageSize(),
+#ifndef SERVER_ONLY
+        CVS->isARBTextureSwizzleUsable()
+#else
+        false
+#endif
+        );
+    m_spritebank->addTexture(STKTexManager::getInstance()->addTexture(stkt));
 }   // createNewGlyphPage
 
 // ----------------------------------------------------------------------------
@@ -184,80 +185,17 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
         "rendering a glyph to bitmap");
 
     // Convert to an anti-aliased bitmap
-    FT_Bitmap bits = slot->bitmap;
-
-    core::dimension2du d(bits.width + 1, bits.rows + 1);
-    core::dimension2du texture_size;
-    texture_size = d.getOptimalSize(!(irr_driver->getVideoDriver()
-        ->queryFeature(video::EVDF_TEXTURE_NPOT)), !(irr_driver
-        ->getVideoDriver()->queryFeature(video::EVDF_TEXTURE_NSQUARE)),
-        true, 0);
-
+    FT_Bitmap* bits = &(slot->bitmap);
+    core::dimension2du texture_size(bits->width + 1, bits->rows + 1);
     if ((m_used_width + texture_size.Width > getGlyphPageSize() &&
         m_used_height + m_current_height + texture_size.Height >
         getGlyphPageSize())                                     ||
         m_used_height + texture_size.Height > getGlyphPageSize())
     {
-        // Current glyph page is full:
-        // Save the old glyph page
-        core::dimension2du old_max_size = irr_driver->getVideoDriver()
-            ->getDriverAttributes().getAttributeAsDimension2d
-            ("MAX_TEXTURE_SIZE");
-        irr_driver->getVideoDriver()->getNonConstDriverAttributes()
-            .setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(0, 0));
-        video::ITexture* page_texture = irr_driver->getVideoDriver()
-            ->addTexture("Glyph_page", m_page);
-
-        m_spritebank->setTexture(m_spritebank->getTextureCount() - 1,
-            page_texture);
-        irr_driver->getVideoDriver()->removeTexture(page_texture);
-        assert(page_texture->getReferenceCount() == 1);
-
-        irr_driver->getVideoDriver()->getNonConstDriverAttributes()
-            .setAttribute("MAX_TEXTURE_SIZE", old_max_size);
-
-        // Clear and add a new one
+        // Add a new glyph page if current one is full
         createNewGlyphPage();
     }
 
-    video::IImage* glyph = NULL;
-    switch (bits.pixel_mode)
-    {
-        case FT_PIXEL_MODE_GRAY:
-        {
-            // Create our blank image.
-            glyph = irr_driver->getVideoDriver()
-                ->createImage(video::ECF_A8R8G8B8, texture_size);
-            glyph->fill(video::SColor(0, 255, 255, 255));
-
-            // Load the grayscale data in.
-            const float gray_count = static_cast<float>(bits.num_grays);
-            const unsigned int image_pitch =
-                glyph->getPitch() / sizeof(unsigned int);
-            unsigned int* image_data = (unsigned int*)glyph->lock();
-            unsigned char* glyph_data = bits.buffer;
-
-            for (unsigned int y = 0; y < (unsigned int)bits.rows; y++)
-            {
-                unsigned char* row = glyph_data;
-                for (unsigned int x = 0; x < (unsigned)bits.width; x++)
-                {
-                    image_data[y * image_pitch + x] |=
-                        static_cast<unsigned int>(255.0f *
-                        (static_cast<float>(*row++) / gray_count)) << 24;
-                }
-                glyph_data += bits.pitch;
-            }
-            glyph->unlock();
-            break;
-        }
-        default:
-            assert(false);
-    }
-    if (!glyph)
-        Log::fatal("FontWithFace", "Failed to load a glyph");
-
-    // Done creating a single glyph, now copy to the glyph page...
     // Determine the linebreak location
     if (m_used_width + texture_size.Width > getGlyphPageSize())
     {
@@ -266,16 +204,39 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
         m_current_height = 0;
     }
 
-    // Copy to the full glyph page
-    glyph->copyTo(m_page, core::position2di(m_used_width, m_used_height));
+    const unsigned int cur_tex = m_spritebank->getTextureCount() -1;
+#ifndef SERVER_ONLY
+    video::ITexture* tex = m_spritebank->getTexture(cur_tex);
+    glBindTexture(GL_TEXTURE_2D, tex->getOpenGLTextureName());
+    assert(bits->pixel_mode == FT_PIXEL_MODE_GRAY);
+    if (CVS->isARBTextureSwizzleUsable())
+    {
+        glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
+            bits->width, bits->rows, GL_RED, GL_UNSIGNED_BYTE, bits->buffer);
+    }
+    else
+    {
+        const unsigned int size = bits->width * bits->rows;
+        uint8_t* image_data = new uint8_t[size * 4];
+        memset(image_data, 255, size * 4);
+        for (unsigned int i = 0; i < size; i++)
+            image_data[4 * i + 3] = bits->buffer[i];
+        glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
+            bits->width, bits->rows, GL_BGRA, GL_UNSIGNED_BYTE, image_data);
+        delete[] image_data;
+    }
+    if (tex->hasMipMaps())
+        glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+#endif
 
     // Store the rectangle of current glyph
     gui::SGUISpriteFrame f;
     gui::SGUISprite s;
     core::rect<s32> rectangle(m_used_width, m_used_height,
-        m_used_width + bits.width, m_used_height + bits.rows);
+        m_used_width + bits->width, m_used_height + bits->rows);
     f.rectNumber = m_spritebank->getPositions().size();
-    f.textureNumber = m_spritebank->getTextureCount() - 1;
+    f.textureNumber = cur_tex;
 
     // Add frame to sprite
     s.Frames.push_back(f);
@@ -294,10 +255,6 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
     a.offset_y_bt = -cur_offset_y;
     a.spriteno = f.rectNumber;
     m_character_area_map[c] = a;
-
-    // Clean the temporary glyph
-    glyph->drop();
-    glyph = NULL;
 
     // Store used area
     m_used_width += texture_size.Width;
@@ -321,23 +278,6 @@ void FontWithFace::updateCharactersList()
     }
     m_new_char_holder.clear();
 
-    // Update last glyph page
-    core::dimension2du old_max_size = irr_driver->getVideoDriver()
-        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
-    irr_driver->getVideoDriver()->getNonConstDriverAttributes()
-        .setAttribute("MAX_TEXTURE_SIZE", core::dimension2du(0, 0));
-
-    video::ITexture* page_texture = irr_driver->getVideoDriver()
-        ->addTexture("Glyph_page", m_page);
-    m_spritebank->setTexture(m_spritebank->getTextureCount() - 1,
-        page_texture);
-
-    irr_driver->getVideoDriver()->removeTexture(page_texture);
-    assert(page_texture->getReferenceCount() == 1);
-
-    irr_driver->getVideoDriver()->getNonConstDriverAttributes()
-        .setAttribute("MAX_TEXTURE_SIZE", old_max_size);
-
 }   // updateCharactersList
 
 // ----------------------------------------------------------------------------
@@ -353,10 +293,9 @@ void FontWithFace::dumpGlyphPage(const std::string& name)
         core::dimension2d<u32> size = tex->getSize();
         video::ECOLOR_FORMAT col_format = tex->getColorFormat();
         void* data = tex->lock();
-
         video::IImage* image = irr_driver->getVideoDriver()
-            ->createImageFromData(col_format, size, data, false/*copy mem*/);
-
+            ->createImageFromData(col_format, size, data,
+            true/*ownForeignMemory*/);
         tex->unlock();
         irr_driver->getVideoDriver()->writeImageToFile(image, std::string
             (name + "_" + StringUtils::toString(i) + ".png").c_str());
@@ -618,28 +557,6 @@ void FontWithFace::render(const core::stringw& text,
         }
         else
         {
-            // Prevent overwriting texture used by billboard text when
-            // using lazy loading characters
-            if (supportLazyLoadChar() && fallback[i])
-            {
-                const int cur_texno = m_fallback_font->getSpriteBank()
-                    ->getSprites()[area.spriteno].Frames[0].textureNumber;
-                if (cur_texno == int(m_fallback_font->getSpriteBank()
-                    ->getTextureCount() - 1))
-                {
-                    m_fallback_font->createNewGlyphPage();
-                }
-            }
-            else if (supportLazyLoadChar())
-            {
-                const int cur_texno = m_spritebank
-                    ->getSprites()[area.spriteno].Frames[0].textureNumber;
-                if (cur_texno == int(m_spritebank->getTextureCount() - 1))
-                {
-                    createNewGlyphPage();
-                }
-            }
-
             // Billboard text specific, use offset_y_bt instead
             float glyph_offset_x = area.bearing_x *
                 (fallback[i] ? m_fallback_font_scale : scale);

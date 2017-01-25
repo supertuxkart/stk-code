@@ -46,7 +46,7 @@ out vec4 color;
 void main(void)
 {
     color = Color.zyxw;
-    mat4 ModelViewProjectionMatrix = ProjectionMatrix * ViewMatrix * ModelMatrix;
+    mat4 ModelViewProjectionMatrix = ProjectionViewMatrix * ModelMatrix;
     mat4 TransposeInverseModelView = transpose(InverseModelMatrix * InverseViewMatrix);
     gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
     // Keep orthogonality

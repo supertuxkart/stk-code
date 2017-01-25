@@ -12,18 +12,25 @@ namespace irr
 namespace core
 {
 
-//! Sinks an element into the heap.
+//! Function object which can be used for sorting (default)
 template<class T>
-inline void heapsink(T*array, s32 element, s32 max)
+inline bool sortless(const T& a, const T& b)
+{
+	return a < b;
+}
+
+//! Sinks an element into the heap with a custom compare function
+template<class T, class Compare>
+inline void heapsink(T*array, s32 element, s32 max, Compare cmp)
 {
 	while ((element<<1) < max) // there is a left child
 	{
 		s32 j = (element<<1);
 
-		if (j+1 < max && array[j] < array[j+1])
+		if (j+1 < max && cmp(array[j], array[j+1]))
 			j = j+1; // take right child
 
-		if (array[element] < array[j])
+		if (cmp(array[element], array[j]))
 		{
 			T t = array[j]; // swap elements
 			array[j] = array[element];
@@ -35,10 +42,9 @@ inline void heapsink(T*array, s32 element, s32 max)
 	}
 }
 
-
-//! Sorts an array with size 'size' using heapsort.
-template<class T>
-inline void heapsort(T* array_, s32 size)
+//! Sorts an array with size 'size' using heapsort with a custom compare function
+template<class T, class Compare>
+inline void heapsort(T* array_, s32 size, Compare cmp)
 {
 	// for heapsink we pretent this is not c++, where
 	// arrays start with index 0. So we decrease the array pointer,
@@ -51,7 +57,7 @@ inline void heapsort(T* array_, s32 size)
 	// build heap
 
 	for (i=((size-1)/2); i>=0; --i)
-		heapsink(virtualArray, i+1, virtualSize-1);
+		heapsink(virtualArray, i+1, virtualSize-1, cmp);
 
 	// sort array, leave out the last element (0)
 	for (i=size-1; i>0; --i)
@@ -59,7 +65,7 @@ inline void heapsort(T* array_, s32 size)
 		T t = array_[0];
 		array_[0] = array_[i];
 		array_[i] = t;
-		heapsink(virtualArray, 1, i + 1);
+		heapsink(virtualArray, 1, i + 1, cmp);
 	}
 }
 

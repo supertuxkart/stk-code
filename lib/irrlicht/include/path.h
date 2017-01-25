@@ -66,6 +66,10 @@ struct SNamedPath
 	{
 		return core::stringw(getPath());
 	}
+	const c8* getPtr() const
+	{
+		return getPath().c_str();
+	}
 
 protected:
 	// convert the given path string to a name string.

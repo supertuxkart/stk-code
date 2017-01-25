@@ -23,7 +23,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -69,11 +69,11 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
 
 #ifndef SERVER_ONLY
     // Color
-    mb->getMaterial().setTexture(0, getUnicolorTexture(video::SColor(255, 255, 255, 255)));
+    mb->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(255, 255, 255, 255)));
     // Gloss
-    mb->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    mb->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
     // Colorization mask
-    mb->getMaterial().setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+    mb->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
 #endif
     updatePosition();
     m_node = irr_driver->addMesh(m_mesh, "rubberband");

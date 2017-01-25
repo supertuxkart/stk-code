@@ -21,7 +21,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/irr_driver.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -128,14 +128,13 @@ void TrackInfoScreen::init()
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
     screenshot->m_properties[PROP_ICON] = "gui/main_help.png";
 
-    ITexture* image = irr_driver->getTexture(m_track->getScreenshotFile(),
-                                    "While loading screenshot for track '%s':",
-                                           m_track->getFilename()            );
+    ITexture* image = STKTexManager::getInstance()
+        ->getTexture(m_track->getScreenshotFile(),
+        "While loading screenshot for track '%s':", m_track->getFilename());
     if(!image)
     {
-        image = irr_driver->getTexture("main_help.png",
-                                    "While loading screenshot for track '%s':",
-                                    m_track->getFilename());
+        image = STKTexManager::getInstance()->getTexture("main_help.png",
+            "While loading screenshot for track '%s':", m_track->getFilename());
     }
     if (image != NULL)
         screenshot->setImage(image);
@@ -311,7 +310,8 @@ void TrackInfoScreen::updateHighScores()
             if (prop != NULL)
             {
                 const std::string &icon_path = prop->getAbsoluteIconFile();
-                ITexture* kart_icon_texture = irr_driver->getTexture( icon_path );
+                ITexture* kart_icon_texture =
+                    STKTexManager::getInstance()->getTexture( icon_path );
                 m_kart_icons[n]->setImage(kart_icon_texture);
             }
             line = name + "\t" + core::stringw(time_string.c_str());
@@ -321,9 +321,9 @@ void TrackInfoScreen::updateHighScores()
             //I18N: for empty highscores entries
             line = _("(Empty)");
 
-            ITexture* no_kart_texture = irr_driver->getTexture(
-                                 file_manager->getAsset(FileManager::GUI,
-                                                        "random_kart.png") );
+            ITexture* no_kart_texture =
+                STKTexManager::getInstance()->getTexture
+                (file_manager->getAsset(FileManager::GUI, "random_kart.png"));
             m_kart_icons[n]->setImage(no_kart_texture);
 
         }

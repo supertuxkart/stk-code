@@ -39,7 +39,7 @@ out vec3 bitangent;
 out vec2 uv;
 out vec2 uv_bis;
 out vec4 color;
-out vec2 color_change;
+flat out vec2 color_change;
 #ifdef Use_Bindless_Texture
 flat out sampler2D handle;
 flat out sampler2D secondhandle;

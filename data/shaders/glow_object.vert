@@ -1,15 +1,16 @@
+#if __VERSION__ >= 330
 layout(location = 0) in vec3 Position;
-layout(location = 1) in vec3 Normal;
-layout(location = 2) in vec4 Color;
-layout(location = 3) in vec2 Texcoord;
-layout(location = 5) in vec3 Tangent;
-layout(location = 6) in vec3 Bitangent;
-
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
-layout(location = 15) in vec4 GlowColor;
-
+layout(location = 10) in vec4 misc_data;
+#else
+in vec3 Position;
+in vec3 Origin;
+in vec3 Orientation;
+in vec3 Scale;
+in vec4 misc_data;
+#endif
 flat out vec4 glowColor;
 
 #stk_include "utils/getworldmatrix.vert"
@@ -19,5 +20,5 @@ void main(void)
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
     mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * InverseViewMatrix);
     gl_Position = ProjectionViewMatrix * ModelMatrix * vec4(Position, 1.);
-    glowColor = GlowColor;
+    glowColor = misc_data;
 }

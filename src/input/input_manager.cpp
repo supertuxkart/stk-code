@@ -25,6 +25,7 @@
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "input/device_manager.hpp"
 #include "input/gamepad_device.hpp"
 #include "input/keyboard_device.hpp"
@@ -663,9 +664,13 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             }
         }
 
-        if (button == KEY_RETURN && GUIEngine::ModalDialog::isADialogActive())
+        if (button == KEY_RETURN)
         {
-            GUIEngine::ModalDialog::onEnterPressed();
+            if (GUIEngine::ModalDialog::isADialogActive() &&
+                !GUIEngine::ScreenKeyboard::isActive())
+            {
+                GUIEngine::ModalDialog::onEnterPressed();
+            }
         }
 
         if (action != PA_BEFORE_FIRST)
@@ -732,6 +737,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         // ... when in-game
         if (StateManager::get()->getGameState() == GUIEngine::GAME &&
              !GUIEngine::ModalDialog::isADialogActive()            &&
+             !GUIEngine::ScreenKeyboard::isActive()                &&
              !race_manager->isWatchingReplay() )
         {
             if (player == NULL)
@@ -1171,6 +1177,7 @@ EventPropagation InputManager::input(const SEvent& event)
     if (getDeviceManager()->getAssignMode() != NO_ASSIGN &&
         !GUIEngine::isWithinATextBox() &&
         (!GUIEngine::ModalDialog::isADialogActive() &&
+        !GUIEngine::ScreenKeyboard::isActive() &&
         StateManager::get()->getGameState() == GUIEngine::GAME))
     {
         return EVENT_BLOCK;

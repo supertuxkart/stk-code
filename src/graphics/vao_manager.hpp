@@ -18,17 +18,19 @@
 #ifndef VAOMANAGER_HPP
 #define VAOMANAGER_HPP
 
-#include "gl_headers.hpp"
+#include "graphics/gl_headers.hpp"
 #include "utils/singleton.hpp"
+#include "utils/tuple.hpp"
 #include <S3DVertex.h>
 #include <IMeshBuffer.h>
+#include <ISceneNode.h>
 #include <vector>
 #include <map>
 #include <unordered_map>
 
-class RenderInfo;
+using namespace irr;
 
-enum InstanceType
+enum InstanceType : unsigned int
 {
     InstanceTypeThreeTex,
     InstanceTypeFourTex,
@@ -37,6 +39,17 @@ enum InstanceType
     InstanceTypeGlow,
     InstanceTypeCount,
 };
+
+typedef STK::Tuple<scene::ISceneNode*, core::vector2df, core::vector2df,
+    int32_t> InstanceSettings;
+
+struct GLMesh;
+struct InstanceList
+{
+    GLMesh* m_mesh;
+    std::vector<InstanceSettings> m_instance_settings;
+};
+typedef std::unordered_map <scene::IMeshBuffer *, InstanceList> MeshMap;
 
 #ifdef WIN32
 #pragma pack(push, 1)
@@ -62,6 +75,7 @@ struct InstanceDataSingleTex
         float Z;
     } Scale;
     uint64_t Texture;
+    int32_t skinning_offset;
 #ifdef WIN32
 };
 #else
@@ -98,6 +112,7 @@ struct InstanceDataThreeTex
     uint64_t Texture;
     uint64_t SecondTexture;
     uint64_t ThirdTexture;
+    int32_t skinning_offset;
 #ifdef WIN32
 };
 #else
@@ -135,6 +150,7 @@ struct InstanceDataFourTex
     uint64_t SecondTexture;
     uint64_t ThirdTexture;
     uint64_t FourthTexture;
+    int32_t skinning_offset;
 #ifdef WIN32
 };
 #else
@@ -171,40 +187,16 @@ struct GlowInstanceData
 #pragma pack(pop)
 #endif
 
-#include <functional>
-
-class MeshRenderInfoHash
-{
-public:
-    size_t operator() (const std::pair<irr::scene::IMeshBuffer*, RenderInfo*> &p) const
-    {
-        return (std::hash<irr::scene::IMeshBuffer*>()(p.first) ^
-            (std::hash<RenderInfo*>()(p.second) << 1));
-    }
-};
-
-struct MeshRenderInfoEquals : std::binary_function
-    <const std::pair<irr::scene::IMeshBuffer*, RenderInfo*>&,
-     const std::pair<irr::scene::IMeshBuffer*, RenderInfo*>&, bool>
-{
-    result_type operator() (first_argument_type lhs,
-                            second_argument_type rhs) const
-    {
-        return (lhs.first == rhs.first) &&
-            (lhs.second == rhs.second);
-    }
-};
-
 class VAOManager : public Singleton<VAOManager>
 {
-    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_COUNT };
+    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_SKINNED_MESH, VTXTYPE_COUNT };
     GLuint vbo[VTXTYPE_COUNT], ibo[VTXTYPE_COUNT], vao[VTXTYPE_COUNT];
     GLuint instance_vbo[InstanceTypeCount];
     void *Ptr[InstanceTypeCount];
     void *VBOPtr[VTXTYPE_COUNT], *IBOPtr[VTXTYPE_COUNT];
     size_t RealVBOSize[VTXTYPE_COUNT], RealIBOSize[VTXTYPE_COUNT];
     size_t last_vertex[VTXTYPE_COUNT], last_index[VTXTYPE_COUNT];
-    std::unordered_map <std::pair<irr::scene::IMeshBuffer*, RenderInfo*>, unsigned, MeshRenderInfoHash, MeshRenderInfoEquals>  mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
+    std::unordered_map<irr::scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
     std::map<std::pair<irr::video::E_VERTEX_TYPE, InstanceType>, GLuint> InstanceVAO;
 
     void cleanInstanceVAOs();
@@ -214,10 +206,10 @@ class VAOManager : public Singleton<VAOManager>
     size_t getVertexPitch(enum VTXTYPE) const;
     VTXTYPE getVTXTYPE(irr::video::E_VERTEX_TYPE type);
     irr::video::E_VERTEX_TYPE getVertexType(enum VTXTYPE tp);
-    void append(irr::scene::IMeshBuffer *, VTXTYPE tp, RenderInfo* ri = NULL);
+    void append(irr::scene::IMeshBuffer *, VTXTYPE tp);
 public:
     VAOManager();
-    std::pair<unsigned, unsigned> getBase(irr::scene::IMeshBuffer *, RenderInfo* ri = NULL);
+    std::pair<unsigned, unsigned> getBase(irr::scene::IMeshBuffer *);
     GLuint getInstanceBuffer(InstanceType it) { return instance_vbo[it]; }
     void *getInstanceBufferPtr(InstanceType it) { return Ptr[it]; }
     unsigned getVBO(irr::video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }

@@ -78,12 +78,15 @@ AbstractKart::~AbstractKart()
 // ----------------------------------------------------------------------------
 void AbstractKart::reset()
 {
-    Moveable::reset();
+    // important to delete animations before calling reset, as some animations
+    // set the kart velocity in their destructor (e.g. cannon) which "reset"
+    // can then cancel. See #2738
     if(m_kart_animation)
     {
         delete m_kart_animation;
         m_kart_animation = NULL;
     }
+    Moveable::reset();
 }   // reset
 
 // ----------------------------------------------------------------------------

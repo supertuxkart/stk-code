@@ -18,6 +18,7 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/draw_policies.hpp"
+#include "graphics/draw_calls.hpp"
 #include "graphics/draw_tools.hpp"
 #include "graphics/materials.hpp"
 
@@ -185,6 +186,12 @@ void GL3DrawPolicy::drawSolidFirstPass(const DrawCalls& draw_calls) const
     renderMeshes1stPass<NormalMat, 2, 1>();
     renderMeshes1stPass<SphereMap, 2, 1>();
     renderMeshes1stPass<DetailMat, 2, 1>();
+
+    if (!CVS->supportsHardwareSkinning()) return;
+    renderMeshes1stPass<SkinnedSolid, 5, 2, 1>();
+    renderMeshes1stPass<SkinnedAlphaRef, 5, 3, 2, 1>();
+    renderMeshes1stPass<SkinnedUnlitMat, 5, 3, 2, 1>();
+    renderMeshes1stPass<SkinnedNormalMat, 5, 2, 1>();
 }
 
 // ----------------------------------------------------------------------------
@@ -200,6 +207,12 @@ void GL3DrawPolicy::drawSolidSecondPass (const DrawCalls& draw_calls,
     renderMeshes2ndPass<DetailMat,       1      > (handles, prefilled_tex);
     renderMeshes2ndPass<GrassMat,        4, 3, 1> (handles, prefilled_tex);
     renderMeshes2ndPass<NormalMat,       4, 3, 1> (handles, prefilled_tex);
+
+    if (!CVS->supportsHardwareSkinning()) return;
+    renderMeshes2ndPass<SkinnedSolid,     5, 4, 3, 1> (handles, prefilled_tex);
+    renderMeshes2ndPass<SkinnedAlphaRef,  5, 4, 3, 1> (handles, prefilled_tex);
+    renderMeshes2ndPass<SkinnedUnlitMat,  5, 3, 1   > (handles, prefilled_tex);
+    renderMeshes2ndPass<SkinnedNormalMat, 5, 4, 3, 1> (handles, prefilled_tex);
 }
 
 // ----------------------------------------------------------------------------
@@ -222,6 +235,12 @@ void GL3DrawPolicy::drawShadows(const DrawCalls& draw_calls, unsigned cascade) c
     renderShadow<AlphaRef, 1>(cascade);
     renderShadow<UnlitMat, 1>(cascade);
     renderShadow<GrassMat, 3, 1>(cascade);    
+
+    if (!CVS->supportsHardwareSkinning()) return;
+    renderShadow<SkinnedSolid, 5, 1>(cascade);
+    renderShadow<SkinnedAlphaRef, 5, 1>(cascade);
+    renderShadow<SkinnedUnlitMat, 5, 1>(cascade);
+    renderShadow<SkinnedNormalMat, 5, 1>(cascade);
 }
 
 // ----------------------------------------------------------------------------
@@ -270,12 +289,7 @@ void IndirectDrawPolicy::drawGlow(const DrawCalls& draw_calls,
                                   const std::vector<GlowData>& glows) const
 {
 #if !defined(USE_GLES2)
-    //to draw Glow with indirect commands, we also need GL_ARB_explicit_attrib_location extension
-    //TODO: add a way to render glow without explicit attrib
-    if(CVS->isARBExplicitAttribLocationUsable())
-    {
-        draw_calls.drawIndirectGlow();
-    }
+    draw_calls.drawIndirectGlow();
 #endif // !defined(USE_GLES2)
 }
 

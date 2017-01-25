@@ -373,8 +373,10 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 MessageDialog::MESSAGE_DIALOG_CONFIRM, this, false);
         }
         else if (!getWidget(name.c_str())->isVisible())
-            Log::fatal("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
+        {
+            Log::warn("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
                 name.c_str());
+        }
         return;
     }
 
@@ -1086,7 +1088,15 @@ void RaceResultGUI::backToLobby()
         current_y += rect.Height / 2 + rect.Height / 4;
         font = GUIEngine::getSmallFont();
         std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(SOCCER_TEAM_RED);
+        while (scorers.size() > 10)
+        {
+            scorers.erase(scorers.begin());
+        }
         std::vector<float> score_times = sw->getScoreTimes(SOCCER_TEAM_RED);
+        while (score_times.size() > 10)
+        {
+            score_times.erase(score_times.begin());
+        }
         irr::video::ITexture* scorer_icon;
 
         int prev_y = current_y;
@@ -1138,7 +1148,15 @@ void RaceResultGUI::backToLobby()
         current_y = prev_y;
         current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
         scorers = sw->getScorers(SOCCER_TEAM_BLUE);
+        while (scorers.size() > 10)
+        {
+            scorers.erase(scorers.begin());
+        }
         score_times = sw->getScoreTimes(SOCCER_TEAM_BLUE);
+        while (score_times.size() > 10)
+        {
+            score_times.erase(score_times.begin());
+        }
         for (unsigned int i = 0; i < scorers.size(); i++)
         {
             const bool own_goal = !(scorers.at(i).m_correct_goal);

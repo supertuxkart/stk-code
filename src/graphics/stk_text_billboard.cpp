@@ -22,7 +22,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/stk_billboard.hpp"
 #include "graphics/stk_mesh_scene_node.hpp"
-#include "graphics/texture_manager.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 #include <ISceneManager.h>
@@ -123,8 +123,8 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, FontWithFace* fo
         {
             buffer = new scene::SMeshBuffer();
             buffer->getMaterial().setTexture(0, m_chars[i].m_texture);
-            buffer->getMaterial().setTexture(1, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
-            buffer->getMaterial().setTexture(2, getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            buffer->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+            buffer->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
             buffer->getMaterial().MaterialType = Shaders::getShader(ES_OBJECT_UNLIT);
             buffers[m_chars[i].m_texture] = buffer;
         }

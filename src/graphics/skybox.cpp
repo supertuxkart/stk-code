@@ -20,8 +20,8 @@
 #include "graphics/skybox.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/shaders.hpp"
-
+#include "graphics/stk_texture.hpp"
+#include "graphics/texture_shader.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -161,22 +161,21 @@ void Skybox::generateCubeMapFromTextures()
     for (unsigned i = 0; i < 6; i++)
     {
         unsigned idx = texture_permutation[i];
-
-        video::IImage* image = irr_driver->getVideoDriver()
-            ->createImageFromData(m_skybox_textures[idx]->getColorFormat(),
-                                  m_skybox_textures[idx]->getSize(),
-                                  m_skybox_textures[idx]->lock(), false   );
-        m_skybox_textures[idx]->unlock();
-
-        image->copyToScaling(rgba[i], size, size);
-        image->drop();
+        video::IImage* img = static_cast<STKTexture*>
+            (m_skybox_textures[idx])->getTextureImage();
+        assert(img != NULL);
+        img->copyToScaling(rgba[i], size, size);
 
 #if defined(USE_GLES2)
-        for (unsigned int j = 0; j < size * size; j++)
+        if (CVS->isEXTTextureFormatBGRA8888Usable())
         {
-            char tmp_val = rgba[i][j*4];
-            rgba[i][j*4] = rgba[i][j*4 + 2];
-            rgba[i][j*4 + 2] = tmp_val;
+            // BGRA image returned by getTextureImage causes black sky in gles
+            for (unsigned int j = 0; j < size * size; j++)
+            {
+                char tmp_val = rgba[i][j * 4];
+                rgba[i][j * 4] = rgba[i][j * 4 + 2];
+                rgba[i][j * 4 + 2] = tmp_val;
+            }
         }
 #endif
 

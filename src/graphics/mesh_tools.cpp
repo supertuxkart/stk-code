@@ -421,6 +421,8 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
                         vNew = v[idx[i]];
                 }
                 break;
+                default:
+                break;
             }
             core::map<video::S3DVertexTangents, int>::Node* n = vertMap.find(vNew);
             if (n)
@@ -480,54 +482,5 @@ scene::IMesh* MeshTools::createMeshWithTangents(scene::IMesh* mesh,
 void MeshTools::createSkinnedMeshWithTangents(scene::ISkinnedMesh* mesh,
                                               bool(*predicate)(scene::IMeshBuffer*))
 {
-    core::array<scene::SSkinMeshBuffer*>& all_mb = mesh->getMeshBuffers();
-    const int all_mb_size = all_mb.size();
-    for (int i = 0; i < all_mb_size; i++)
-    {
-        scene::SSkinMeshBuffer* mb = all_mb[i];
-        if (mb && predicate(mb))
-        {
-            mb->convertToTangents();
-            const int index_count = mb->getIndexCount();
-            uint16_t* idx = mb->getIndices();
-            video::S3DVertexTangents* v =
-                (video::S3DVertexTangents*)mb->getVertices();
-
-            for (int i = 0; i < index_count; i += 3)
-            {
-                calculateTangents(
-                    v[idx[i+0]].Normal,
-                    v[idx[i+0]].Tangent,
-                    v[idx[i+0]].Binormal,
-                    v[idx[i+0]].Pos,
-                    v[idx[i+1]].Pos,
-                    v[idx[i+2]].Pos,
-                    v[idx[i+0]].TCoords,
-                    v[idx[i+1]].TCoords,
-                    v[idx[i+2]].TCoords);
-
-                calculateTangents(
-                    v[idx[i+1]].Normal,
-                    v[idx[i+1]].Tangent,
-                    v[idx[i+1]].Binormal,
-                    v[idx[i+1]].Pos,
-                    v[idx[i+2]].Pos,
-                    v[idx[i+0]].Pos,
-                    v[idx[i+1]].TCoords,
-                    v[idx[i+2]].TCoords,
-                    v[idx[i+0]].TCoords);
-
-                calculateTangents(
-                    v[idx[i+2]].Normal,
-                    v[idx[i+2]].Tangent,
-                    v[idx[i+2]].Binormal,
-                    v[idx[i+2]].Pos,
-                    v[idx[i+0]].Pos,
-                    v[idx[i+1]].Pos,
-                    v[idx[i+2]].TCoords,
-                    v[idx[i+0]].TCoords,
-                    v[idx[i+1]].TCoords);
-            }
-        }
-    }
+    mesh->convertMeshToTangents(predicate);
 }

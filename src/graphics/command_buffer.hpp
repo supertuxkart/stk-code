@@ -24,25 +24,10 @@
 #include "graphics/gl_headers.hpp"
 #include "graphics/material.hpp"
 #include "graphics/materials.hpp"
-#include "graphics/render_info.hpp"
-#include "graphics/stk_mesh_scene_node.hpp"
 #include "graphics/vao_manager.hpp"
 #include <irrlicht.h>
 #include <array>
 #include <unordered_map>
-
-typedef STK::Tuple<scene::ISceneNode*, core::vector2df, core::vector2df> InstanceSettings;
-
-struct InstanceList
-{
-    GLMesh *m_mesh;
-    std::vector<InstanceSettings> m_instance_settings;
-};
-
-typedef std::unordered_map <std::pair<scene::IMeshBuffer*, RenderInfo*>, InstanceList,
-                            MeshRenderInfoHash, MeshRenderInfoEquals> SolidPassMeshMap;
-
-typedef std::unordered_map <irr::scene::IMeshBuffer *, InstanceList > OtherMeshMap;
 
 // ----------------------------------------------------------------------------
 /** Fill origin, orientation and scale attributes
@@ -271,7 +256,7 @@ class SolidCommandBuffer: public CommandBuffer<static_cast<int>(Material::SHADER
 {
 public:
     SolidCommandBuffer();
-    void fill(SolidPassMeshMap *mesh_map);
+    void fill(MeshMap *mesh_map);
     
     // ----------------------------------------------------------------------------
     /** First rendering pass; draw all meshes associated with the same material
@@ -458,7 +443,7 @@ class ShadowCommandBuffer: public CommandBuffer<4*static_cast<int>(Material::SHA
 {
 public:
     ShadowCommandBuffer();
-    void fill(OtherMeshMap *mesh_map);
+    void fill(MeshMap *mesh_map);
     
     // ----------------------------------------------------------------------------
     /** Draw shadowmaps for meshes with the same material
@@ -532,7 +517,7 @@ class ReflectiveShadowMapCommandBuffer: public CommandBuffer<static_cast<int>(Ma
 {
 public:
     ReflectiveShadowMapCommandBuffer();
-    void fill(OtherMeshMap *mesh_map);
+    void fill(MeshMap *mesh_map);
     
     // ----------------------------------------------------------------------------
     /** Draw reflective shadow map for meshes with the same material
@@ -615,7 +600,7 @@ class GlowCommandBuffer: public CommandBuffer<1>
 {
 public:
     GlowCommandBuffer();
-    void fill(OtherMeshMap *mesh_map);
+    void fill(MeshMap *mesh_map);
 
     // ----------------------------------------------------------------------------
     /** Draw glowing meshes.

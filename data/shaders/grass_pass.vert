@@ -28,7 +28,7 @@ void main()
     // affects "nor" which is later only * 0.1 by scattering
     new_inverse_model_matrix[3].xyz -= windDir * Color.r;
 
-    mat4 ModelViewProjectionMatrix = ProjectionMatrix * ViewMatrix * new_model_matrix;
+    mat4 ModelViewProjectionMatrix = ProjectionViewMatrix * new_model_matrix;
     mat4 TransposeInverseModelView = transpose(InverseViewMatrix * new_inverse_model_matrix);
     gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
