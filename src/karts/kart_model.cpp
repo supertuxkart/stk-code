@@ -38,6 +38,7 @@
 #include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"
+#include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
@@ -140,6 +141,7 @@ KartModel::KartModel(bool is_master)
     m_wheel_filename[2] = "";
     m_wheel_filename[3] = "";
     m_speed_weighted_objects.clear();
+    m_headlight_objects.clear();
     m_animated_node     = NULL;
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
         m_animation_frame[i]=-1;
@@ -194,6 +196,11 @@ void KartModel::loadInfo(const XMLNode &node)
         loadWheelInfo(*wheels_node, "rear-left",   3);
     }
     
+    if (const XMLNode *headlights_node = node.getNode("headlights"))
+    {
+        loadHeadlights(*headlights_node);
+    }
+
     m_nitro_emitter_position[0] = Vec3 (0,0.1f,0);
     m_nitro_emitter_position[1] = Vec3 (0,0.1f,0);
     m_has_nitro_emitter = false;
@@ -260,6 +267,23 @@ KartModel::~KartModel()
         {
             irr_driver->dropAllTextures(m_speed_weighted_objects[i].m_model);
             irr_driver->removeMeshFromCache(m_speed_weighted_objects[i].m_model);
+        }
+    }
+
+    for (size_t i = 0; i < m_headlight_objects.size(); i++)
+    {
+        HeadlightObject& obj = m_headlight_objects[i];
+        obj.m_node = NULL;
+        if (obj.m_node)
+        {
+            // Master KartModels should never have a speed weighted object attached.
+            assert(!m_is_master);
+            obj.m_node->drop();
+        }
+        if (m_is_master && obj.m_model)
+        {
+            irr_driver->dropAllTextures(obj.m_model);
+            irr_driver->removeMeshFromCache(obj.m_model);
         }
     }
 
@@ -341,6 +365,14 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
         km->m_speed_weighted_objects[i] = m_speed_weighted_objects[i];
     }
 
+    km->m_headlight_objects.resize(m_headlight_objects.size());
+    for (size_t i = 0; i<m_headlight_objects.size(); i++)
+    {
+        // Master should not have any speed weighted nodes.
+        assert(!m_headlight_objects[i].m_node);
+        km->m_headlight_objects[i] = m_headlight_objects[i];
+    }
+
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
         km->m_animation_frame[i] = m_animation_frame[i];
 
@@ -413,6 +445,13 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             if(!m_speed_weighted_objects[i].m_node) continue;
             m_speed_weighted_objects[i].m_node->setParent(lod_node);
         }
+
+        for (size_t i = 0; i<m_headlight_objects.size(); i++)
+        {
+            if (!m_headlight_objects[i].m_node) continue;
+            m_headlight_objects[i].m_node->setParent(lod_node);
+        }
+
 #ifndef SERVER_ONLY
         // Enable rim lighting for the kart
         irr_driver->applyObjectPassShader(lod_node, true);
@@ -490,6 +529,24 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
                 obj.m_node->setPosition(obj.m_position.toIrrVector());
             }
         }
+
+        for (int i = 0; i < m_headlight_objects.size(); i++)
+        {
+            HeadlightObject& obj = m_headlight_objects[i];
+
+            obj.m_node = NULL;
+            if (obj.m_model)
+            {
+                obj.m_node = irr_driver->addMesh(obj.m_model, "kart_headlight", node, getRenderInfo());
+                obj.m_node->grab();
+                obj.m_node->setPosition(obj.getPosition());
+
+                Track* track = Track::getCurrentTrack();
+                if (track == NULL || track->getIsDuringDay())
+                    obj.m_node->setVisible(false);
+            }
+        }
+
     }
     return node;
 }   // attachModel
@@ -585,6 +642,14 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         kart_max.max(obj_max);
     }
 
+    for (int i = 0; i < m_headlight_objects.size(); i++)
+    {
+        HeadlightObject& obj = m_headlight_objects[i];
+        std::string full_name = kart_properties.getKartDir() + obj.getFilename();
+        obj.m_model = irr_driver->getMesh(full_name);
+        irr_driver->grabAllTextures(obj.m_model);
+    }
+
     Vec3 size     = kart_max-kart_min;
     m_kart_width  = size.getX();
     m_kart_height = size.getY();
@@ -654,6 +719,8 @@ void KartModel::loadNitroEmitterInfo(const XMLNode &node,
     emitter_node->get("position", &m_nitro_emitter_position[index]);
 }   // loadNitroEmitterInfo
 
+// ----------------------------------------------------------------------------
+
 /** Loads a single speed weighted node. */
 void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, const SpeedWeightedObject::Properties& fallback_properties)
 {
@@ -686,6 +753,32 @@ void KartModel::loadWheelInfo(const XMLNode &node,
     wheel_node->get("min-suspension",   &m_min_suspension[index]         );
     wheel_node->get("max-suspension",   &m_max_suspension[index]         );
 }   // loadWheelInfo
+
+// ----------------------------------------------------------------------------
+
+void KartModel::loadHeadlights(const XMLNode &node)
+{
+    int children = node.getNumNodes();
+    for (int i = 0; i < children; i++)
+    {
+        const XMLNode* child = node.getNode(i);
+        if (child->getName() == "object")
+        {
+            // <object position="-0.168000 0.151288 0.917929" model="TuxHeadlight.b3d"/>
+            core::vector3df position;
+            child->get("position", &position);
+
+            std::string model;
+            child->get("model", &model);
+
+            m_headlight_objects.push_back(HeadlightObject(model, position));
+        }
+        else
+        {
+            Log::warn("KartModel", "Unknown XML node in the headlights section");
+        }
+    }
+}
 
 // ----------------------------------------------------------------------------
 /** Resets the kart model. It stops animation from being played and resets

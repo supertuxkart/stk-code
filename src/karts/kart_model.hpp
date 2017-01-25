@@ -84,6 +84,34 @@ struct SpeedWeightedObject
 };
 typedef std::vector<SpeedWeightedObject>    SpeedWeightedObjectList;
 
+class HeadlightObject
+{
+    std::string m_filename;
+    core::vector3df m_position;
+
+public:
+
+    scene::IMesh* m_model;
+    scene::ISceneNode* m_node;
+
+    HeadlightObject()
+    {
+        m_model = NULL;
+        m_node = NULL;
+    }
+
+    HeadlightObject(const std::string& filename, core::vector3df pos)
+    {
+        m_filename = filename;
+        m_position = pos;
+        m_model = NULL;
+        m_node = NULL;
+    }
+
+    const std::string& getFilename() const { return m_filename; }
+    const core::vector3df getPosition() const { return m_position; }
+};
+
 /**
  * \brief This class stores a 3D kart model.
  * It takes especially care of attaching
@@ -178,6 +206,8 @@ private:
     /** The speed weighted objects. */
     SpeedWeightedObjectList     m_speed_weighted_objects;
     
+    std::vector<HeadlightObject> m_headlight_objects;
+
     /** Length of the physics suspension when the kart is at rest. */
     float m_default_physics_suspension[4];
 
@@ -232,6 +262,8 @@ private:
 
     void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node,
                                 const SpeedWeightedObject::Properties& fallback_properties);
+
+    void  loadHeadlights(const XMLNode &node);
 
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
