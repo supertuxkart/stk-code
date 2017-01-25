@@ -530,7 +530,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
             }
         }
 
-        for (int i = 0; i < m_headlight_objects.size(); i++)
+        for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
         {
             HeadlightObject& obj = m_headlight_objects[i];
 
@@ -645,7 +645,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         kart_max.max(obj_max);
     }
 
-    for (int i = 0; i < m_headlight_objects.size(); i++)
+    for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
     {
         HeadlightObject& obj = m_headlight_objects[i];
         std::string full_name = kart_properties.getKartDir() + obj.getFilename();
