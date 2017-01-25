@@ -273,17 +273,17 @@ KartModel::~KartModel()
     for (size_t i = 0; i < m_headlight_objects.size(); i++)
     {
         HeadlightObject& obj = m_headlight_objects[i];
-        obj.m_node = NULL;
-        if (obj.m_node)
+        obj.setNode(NULL);
+        if (obj.getNode())
         {
-            // Master KartModels should never have a speed weighted object attached.
+            // Master KartModels should never have a headlight attached.
             assert(!m_is_master);
-            obj.m_node->drop();
+            obj.getNode()->drop();
         }
-        if (m_is_master && obj.m_model)
+        if (m_is_master && obj.getModel())
         {
-            irr_driver->dropAllTextures(obj.m_model);
-            irr_driver->removeMeshFromCache(obj.m_model);
+            irr_driver->dropAllTextures(obj.getModel());
+            irr_driver->removeMeshFromCache(obj.getModel());
         }
     }
 
@@ -368,8 +368,8 @@ KartModel* KartModel::makeCopy(KartRenderType krt)
     km->m_headlight_objects.resize(m_headlight_objects.size());
     for (size_t i = 0; i<m_headlight_objects.size(); i++)
     {
-        // Master should not have any speed weighted nodes.
-        assert(!m_headlight_objects[i].m_node);
+        // Master should not have any headlight nodes.
+        assert(!m_headlight_objects[i].getNode());
         km->m_headlight_objects[i] = m_headlight_objects[i];
     }
 
@@ -448,8 +448,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
 
         for (size_t i = 0; i<m_headlight_objects.size(); i++)
         {
-            if (!m_headlight_objects[i].m_node) continue;
-            m_headlight_objects[i].m_node->setParent(lod_node);
+            if (!m_headlight_objects[i].getNode()) continue;
+            m_headlight_objects[i].getNode()->setParent(lod_node);
         }
 
 #ifndef SERVER_ONLY
@@ -534,16 +534,19 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_anim
         {
             HeadlightObject& obj = m_headlight_objects[i];
 
-            obj.m_node = NULL;
-            if (obj.m_model)
+            obj.setNode(NULL);
+            if (obj.getModel())
             {
-                obj.m_node = irr_driver->addMesh(obj.m_model, "kart_headlight", node, getRenderInfo());
-                obj.m_node->grab();
-                obj.m_node->setPosition(obj.getPosition());
+                scene::ISceneNode *new_node =
+                    irr_driver->addMesh(obj.getModel(), "kart_headlight",
+                                        node, getRenderInfo()            );
 
+                new_node->grab();
+                obj.setNode(new_node);
+                
                 Track* track = Track::getCurrentTrack();
                 if (track == NULL || track->getIsDuringDay())
-                    obj.m_node->setVisible(false);
+                    obj.getNode()->setVisible(false);
             }
         }
 
@@ -646,8 +649,8 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     {
         HeadlightObject& obj = m_headlight_objects[i];
         std::string full_name = kart_properties.getKartDir() + obj.getFilename();
-        obj.m_model = irr_driver->getMesh(full_name);
-        irr_driver->grabAllTextures(obj.m_model);
+        obj.setModel(irr_driver->getMesh(full_name));
+        irr_driver->grabAllTextures(obj.getModel());
     }
 
     Vec3 size     = kart_max-kart_min;
@@ -722,7 +725,8 @@ void KartModel::loadNitroEmitterInfo(const XMLNode &node,
 // ----------------------------------------------------------------------------
 
 /** Loads a single speed weighted node. */
-void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, const SpeedWeightedObject::Properties& fallback_properties)
+void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node,
+                    const SpeedWeightedObject::Properties& fallback_properties)
 {
     SpeedWeightedObject obj;
     obj.m_properties    = fallback_properties;
@@ -778,7 +782,7 @@ void KartModel::loadHeadlights(const XMLNode &node)
             Log::warn("KartModel", "Unknown XML node in the headlights section");
         }
     }
-}
+}   // loadHeadlights
 
 // ----------------------------------------------------------------------------
 /** Resets the kart model. It stops animation from being played and resets
