@@ -84,33 +84,64 @@ struct SpeedWeightedObject
 };
 typedef std::vector<SpeedWeightedObject>    SpeedWeightedObjectList;
 
+// ============================================================================
+/** A class to store the headlights of a kart.
+ */
 class HeadlightObject
 {
+private:
+    /** The filename of the headlight model. */
     std::string m_filename;
+    /** The position relative to the parent kart scene node where the
+     *  headlight mesh is attached to. */
     core::vector3df m_position;
+    /** The mesh for the headlight. */
+    scene::IMesh* m_model;
+    /** The scene node of the headlight. */
+    scene::ISceneNode* m_node;
 
 public:
 
-    scene::IMesh* m_model;
-    scene::ISceneNode* m_node;
-
     HeadlightObject()
     {
-        m_model = NULL;
-        m_node = NULL;
-    }
-
-    HeadlightObject(const std::string& filename, core::vector3df pos)
+        m_model    = NULL;
+        m_node     = NULL;
+        m_filename = "";
+        m_position.set(0, 0, 0);
+    }   // HeadlightObject
+    // ------------------------------------------------------------------------
+    HeadlightObject(const std::string& filename, core::vector3df &pos)
     {
         m_filename = filename;
         m_position = pos;
-        m_model = NULL;
-        m_node = NULL;
-    }
-
+        m_model    = NULL;
+        m_node     = NULL;
+    }   // HeadlightObjects
+    // ------------------------------------------------------------------------
     const std::string& getFilename() const { return m_filename; }
-    const core::vector3df getPosition() const { return m_position; }
-};
+    // ------------------------------------------------------------------------
+    /** Sets the mesh for this headlight object. */
+    void setModel(scene::IMesh *mesh) { m_model = mesh; }
+    // ------------------------------------------------------------------------
+    /** Sets the node of the headlight, and (if not NULL) also sets the
+     *  position of this scene node to be the position of the headlight. */
+    void setNode(scene::ISceneNode *node)
+    {
+        m_node = node; 
+        if (m_node) m_node->setPosition(m_position);
+    }   // setNode
+    // ------------------------------------------------------------------------
+    const scene::ISceneNode *getNode() const { return m_node;  }
+    // ------------------------------------------------------------------------
+    scene::ISceneNode *getNode() { return m_node; }
+    // ------------------------------------------------------------------------
+    const scene::IMesh *getModel() const { return m_model;  }
+    // ------------------------------------------------------------------------
+    scene::IMesh *getModel() { return m_model; }
+    // ------------------------------------------------------------------------
+};   // class HeadlightObject
+
+// ============================================================================
 
 /**
  * \brief This class stores a 3D kart model.
