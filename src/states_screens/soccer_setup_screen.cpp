@@ -318,20 +318,22 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
     switch (action)
     {
     case PA_MENU_LEFT:
-        if ((bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
-            bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)) &&
-            m_kart_view_info[playerId].confirmed == false)
+        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
+            bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
         {
-            changeTeam(playerId, SOCCER_TEAM_RED);
+            if (m_kart_view_info[playerId].confirmed == false)
+                changeTeam(playerId, SOCCER_TEAM_RED);
+
             return EVENT_BLOCK;
         }
         break;
     case PA_MENU_RIGHT:
-        if ((bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
-            bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)) &&
-            m_kart_view_info[playerId].confirmed == false)
+        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
+            bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
         {
-            changeTeam(playerId, SOCCER_TEAM_BLUE);
+            if (m_kart_view_info[playerId].confirmed == false)
+                changeTeam(playerId, SOCCER_TEAM_BLUE);
+
             return EVENT_BLOCK;
         }
         break;
@@ -345,8 +347,9 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         break;
     case PA_MENU_SELECT:
     {
-        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
-            areAllKartsConfirmed())
+        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+            !bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+            playerId == PLAYER_ID_GAME_MASTER)
         {
             return EVENT_LET;
         }
@@ -363,25 +366,34 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             SFXManager::get()->quickSound( "wee" );
         }
 
+        if (areAllKartsConfirmed())
+        {
+            m_schedule_continue = true;
+        }
+
         return EVENT_BLOCK;
     }
     case PA_MENU_CANCEL:
     {
         if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+            !bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
             playerId == PLAYER_ID_GAME_MASTER)
         {
             return EVENT_LET;
         }
 
-        // Un-confirm team selection
-        m_kart_view_info[playerId].confirmed = false;
-        m_kart_view_info[playerId].view->setRotateContinuously(
-                                                KART_CONTINUOUS_ROTATION_SPEED);
-        m_kart_view_info[playerId].view->unsetBadge(OK_BADGE);
-
-        for (unsigned int i = 0 ; i < m_kart_view_info.size() ; i++)
+        if (m_kart_view_info[playerId].confirmed)
         {
-            m_kart_view_info[i].view->unsetBadge(BAD_BADGE);
+            // Un-confirm team selection
+            m_kart_view_info[playerId].confirmed = false;
+            m_kart_view_info[playerId].view->setRotateContinuously(
+                                                KART_CONTINUOUS_ROTATION_SPEED);
+            m_kart_view_info[playerId].view->unsetBadge(OK_BADGE);
+
+            for (unsigned int i = 0; i < m_kart_view_info.size(); i++)
+            {
+                m_kart_view_info[i].view->unsetBadge(BAD_BADGE);
+            }
         }
 
         return EVENT_BLOCK;
