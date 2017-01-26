@@ -104,6 +104,20 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
         getWidget<SpinnerWidget>("goalamount")->setActive(!timed);
         getWidget<SpinnerWidget>("timeamount")->setActive(timed);
     }
+    else if (name == "red_team")
+    {
+        if (m_kart_view_info.size() == 1)
+        {
+            changeTeam(0, SOCCER_TEAM_RED);
+        }
+    }
+    else if (name == "blue_team")
+    {
+        if (m_kart_view_info.size() == 1)
+        {
+            changeTeam(0, SOCCER_TEAM_BLUE);
+        }
+    }
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
