@@ -112,6 +112,10 @@ private:
      *  events later. */
     float m_current_time;
 
+    /** This stores the original World time during a rewind. It is used to
+     *  detect if a client's local time need adjustment to reduce rewinds. */
+    float m_not_rewound_time;
+
     RewindManager();
    ~RewindManager();
 
@@ -138,7 +142,7 @@ public:
     // Non-static functtion declarations:
 
     void reset();
-    void saveStates();
+    void update();
     void rewindTo(float target_time);
     void playEventsTill(float time);
     void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
@@ -176,6 +180,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if currently a rewind is happening. */
     bool isRewinding() const { return m_is_rewinding; }
+    // ------------------------------------------------------------------------
+    float getNotRewoundWorldTime() const { return m_not_rewound_time;  }
 };   // RewindManager
 
 

@@ -964,7 +964,7 @@ void World::update(float dt)
 
     PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
     WorldStatus::update(dt);
-    RewindManager::get()->saveStates();
+    RewindManager::get()->update();
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);

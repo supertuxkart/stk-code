@@ -131,9 +131,6 @@ void GameProtocol::controllerAction(int kart_id, PlayerAction action,
               World::getWorld()->getTime(), action, value);
 }   // controllerAction
 
-
-#include "utils/time.hpp"
-
 // ----------------------------------------------------------------------------
 /** Called when a controller event is receiver - either on the server from
  *  a client, or on a client from the server. It sorts the event into the
@@ -149,10 +146,15 @@ void GameProtocol::handleControllerAction(Event *event)
     for (unsigned int i = 0; i < count; i++)
     {
         float   time    = data.getFloat();
-        if (time < World::getWorld()->getTime())
+        // Since this is running in a thread, it might be called during
+        // a rewind, i.e. with an incorrect world time. So the event
+        // time needs to be compared with the World time independent
+        // of any rewinding.
+        if (time < RewindManager::get()->getNotRewoundWorldTime() &&
+            !will_trigger_rewind                                     )
         {
             will_trigger_rewind = true;
-            rewind_delta = time - World::getWorld()->getTime();
+            rewind_delta = time - RewindManager::get()->getNotRewoundWorldTime();
         }
         uint8_t kart_id = data.getUInt8();
         assert(kart_id < World::getWorld()->getNumKarts());
@@ -181,8 +183,10 @@ void GameProtocol::handleControllerAction(Event *event)
                                          &data, false);
         if (will_trigger_rewind)
         {
-            Log::info("GameProtocol", "At %f %f requesting time adjust of %f for host %d",
+            Log::info("GameProtocol",
+                "At %f %f %f requesting time adjust of %f for host %d",
                 World::getWorld()->getTime(), StkTime::getRealTime(),
+                RewindManager::get()->getNotRewoundWorldTime(),
                 rewind_delta, event->getPeer()->getHostId());
             // This message from a client triggered a rewind in the server.
             // To avoid this, signal to the client that it should slow down.

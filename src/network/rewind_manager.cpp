@@ -73,6 +73,7 @@ RewindManager::~RewindManager()
 void RewindManager::reset()
 {
     m_is_rewinding         = false;
+    m_not_rewound_time     = 0;
     m_overall_state_size   = 0;
     m_state_frequency      = 0.1f;   // save 10 states a second
     m_last_saved_state     = -9999.9f;  // forces initial state save
@@ -157,13 +158,15 @@ void RewindManager::addNetworkState(int rewinder_index,
  *  rewinder to do so.
  *  \param dt Time step size.
  */
-void RewindManager::saveStates()
+void RewindManager::update()
 {
+ 
     if(!m_enable_rewind_manager  || 
         m_all_rewinder.size()==0 ||
         m_is_rewinding              )  return;
 
     float time = World::getWorld()->getTime();
+    m_not_rewound_time = time;
 
     // Client doesn't save state (atm), so we need to store
     // time infos to get the correct dt when rewinding
@@ -208,7 +211,7 @@ void RewindManager::saveStates()
                  World::getWorld()->getTime(), m_overall_state_size);
 
     m_last_saved_state = time;
-}   // saveStates
+}   // update
 
 // ----------------------------------------------------------------------------
 /** Replays all events from the last event played till the specified time.
