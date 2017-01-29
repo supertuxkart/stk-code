@@ -30,6 +30,7 @@
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
+#include <list>
 #include <vector>
 
 class Event;
@@ -101,9 +102,11 @@ private:
      *  state and their unique id. */
     Synchronised<std::vector<Protocol*> >m_protocols;
 
+    typedef std::list<Event*> EventList;
+
     /** Contains the network events to pass asynchronously to protocols
      *  (i.e. from the separate ProtocolManager thread). */
-    Synchronised<std::vector<Event*> > m_events_to_process;
+    Synchronised<EventList> m_events_to_process;
 
     /** Contains the requests to start/pause etc... protocols. */
     Synchronised< std::vector<ProtocolRequest> > m_requests;

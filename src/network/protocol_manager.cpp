@@ -79,8 +79,10 @@ void ProtocolManager::abort()
     m_protocols.unlock();
 
     m_events_to_process.lock();
-    for (unsigned int i = 0; i < m_events_to_process.getData().size() ; i++)
-        delete m_events_to_process.getData()[i];
+    EventList::iterator i;
+    for (EventList::iterator i =m_events_to_process.getData().begin();
+                             i!=m_events_to_process.getData().end(); ++i)
+        delete *i;
     m_events_to_process.getData().clear();
     m_events_to_process.unlock();
     
@@ -325,22 +327,31 @@ void ProtocolManager::update(float dt)
 {
     // before updating, notify protocols that they have received events
     m_events_to_process.lock();
-    int size = (int)m_events_to_process.getData().size();
-    int offset = 0;
-    for (int i = 0; i < size; i++)
+    EventList::iterator i = m_events_to_process.getData().begin();
+
+    while (i != m_events_to_process.getData().end())
     {
-        // Don't handle asynchronous events here.
-        if(!m_events_to_process.getData()[i+offset]->isSynchronous()) continue;
-        bool result = sendEvent(m_events_to_process.getData()[i+offset]);
+        // Don't handle asynchronous events here
+        if (!(*i)->isSynchronous())
+        {
+            ++i;
+            continue;
+        }
+        m_events_to_process.unlock();
+        bool result = sendEvent(*i);
+        m_events_to_process.lock();
         if (result)
         {
-            m_events_to_process.getData()
-                               .erase(m_events_to_process.getData().begin()+(i+offset),
-                                      m_events_to_process.getData().begin()+(i+offset+1));
-            offset --;
+            i = m_events_to_process.getData().erase(i);
+        }
+        else
+        {
+            // This should only happen if the protocol has not been started
+            ++i;
         }
     }
     m_events_to_process.unlock();
+
     // now update all protocols
     m_protocols.lock();
     for (unsigned int i = 0; i < m_protocols.getData().size(); i++)
@@ -365,20 +376,28 @@ void ProtocolManager::asynchronousUpdate()
     // before updating, notice protocols that they have received information
     m_events_to_process.lock();
     int size = (int)m_events_to_process.getData().size();
-    int offset = 0;
-    for (int i = 0; i < size; i++)
+    EventList::iterator i = m_events_to_process.getData().begin();
+    while (i != m_events_to_process.getData().end())
     {
         // Don't handle synchronous events here.
-        if(m_events_to_process.getData()[i+offset]->isSynchronous()) continue;
-        bool result = sendEvent(m_events_to_process.getData()[i+offset]);
+        if ((*i)->isSynchronous())
+        {
+            ++i;
+            continue;
+        }
+        m_events_to_process.unlock();
+        bool result = sendEvent(*i);
+        m_events_to_process.lock();
         if (result)
         {
-            m_events_to_process.getData()
-                               .erase(m_events_to_process.getData().begin()+(i+offset),
-                                      m_events_to_process.getData().begin()+(i+offset+1));
-            offset --;
+            i = m_events_to_process.getData().erase(i);
         }
-    }
+        else
+        {
+            // This should only happen if the protocol has not been started
+            ++i;
+        }
+    }   // while i != m_events_to_process.end()
     m_events_to_process.unlock();
 
     // now update all protocols that need to be updated in asynchronous mode
