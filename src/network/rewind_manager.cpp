@@ -255,7 +255,7 @@ void RewindManager::playEventsTill(float time)
 
         if(ri->isEvent())
             ri->rewind();
-        else if (ri->isState())
+        else if (ri->isState() && NetworkConfig::get()->isClient())
         {
             Log::warn("RewindManager",
                       "Client has received state in the future: at %f state %f",
