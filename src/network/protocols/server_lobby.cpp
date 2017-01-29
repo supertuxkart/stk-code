@@ -349,6 +349,7 @@ void ServerLobby::registerServer()
  */
 void ServerLobby::signalRaceStartToClients()
 {
+    Log::verbose("Server", "Signaling race start to clients");
     const std::vector<STKPeer*> &peers = STKHost::get()->getPeers();
     NetworkString *ns = getNetworkString(1);
     ns->addUInt8(LE_START_RACE);
