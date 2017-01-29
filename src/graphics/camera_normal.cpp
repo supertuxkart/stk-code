@@ -91,8 +91,8 @@ void CameraNormal::smoothMoveCamera(float dt)
     float ratio = (current_speed - max_speed_without_zipper) / max_increase_with_zipper;
     ratio = ratio > -0.12f ? ratio : -0.12f;
 
-    // distance of camera from kart in x and z plane
-    float camera_distance = -3 * (0.5f + ratio);
+    // distance of camera from kart in x and z plane    
+    float camera_distance = -3.0f * (0.5f + ratio) - fabsf(current_speed)/7.0f;
     if (camera_distance > -2.0f) camera_distance = -2.0f;
 
     // Defines how far camera should be from player kart.
@@ -106,14 +106,14 @@ void CameraNormal::smoothMoveCamera(float dt)
     // new required position of camera
     core::vector3df wanted_position = m_kart_camera_position_with_offset.toIrrVector();
 
-    float f = 5.0f;
+    /*float f = 5.0f;
     if ((current_speed > 5 ) || (current_speed < 0 ))
     {
        f = current_speed >0 ?         current_speed/3 + 1.0f
                             : -1.5f * current_speed   + 2.0f;
-    }
-    m_smooth_dt = 0.3f * dt + 0.7f * m_smooth_dt;
-    current_position += (wanted_position - current_position) * (m_smooth_dt*f);
+    }*/
+    m_smooth_dt = 0.3f * dt + 0.7f * m_smooth_dt;    
+    current_position = wanted_position;
 
     // Avoid camera crash: if the speed is negative, the current_position
     // can oscillate between plus and minus, getting bigger and bigger. If
