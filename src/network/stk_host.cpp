@@ -559,6 +559,10 @@ void* STKHost::mainLoop(void* self)
                 Log::debug("STKHost", "Addresses are : %lx, %lx",
                            stk_event->getPeer(), peer);
             }   // EVENT_TYPE_CONNECTED
+            else if (stk_event->getType() == EVENT_TYPE_DISCONNECTED)
+            {
+                Log::info("STKHost", "A client has just disconnected.");
+            }   // EVENT_TYPE_CONNECTED
             else if (stk_event->getType() == EVENT_TYPE_MESSAGE)
             {
                 Network::logPacket(stk_event->data(), true);
