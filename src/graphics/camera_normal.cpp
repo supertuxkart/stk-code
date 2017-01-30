@@ -96,7 +96,7 @@ void CameraNormal::smoothMoveCamera(float dt)
     ratio = ratio > -0.12f ? ratio : -0.12f;
 
     // distance of camera from kart in x and z plane
-    float camera_distance = -2.5f * ratio;
+    float camera_distance = -4.0f * ratio;
     if (camera_distance > -2.0f) camera_distance = -2.0f; // don't get too close to the kart
 
     // Defines how far camera should be from player kart.
@@ -121,7 +121,7 @@ void CameraNormal::smoothMoveCamera(float dt)
         delta2 = 1;
 
     btTransform btt = m_kart->getTrans();
-    m_kart_position = m_kart_position + (btt.getOrigin() - m_kart_position) * delta2;
+    m_kart_position = btt.getOrigin();// m_kart_position + (btt.getOrigin() - m_kart_position) * delta2;
     m_kart_rotation = m_kart_rotation.normalized().slerp(btt.getRotation().normalized(), delta2);
 
     btt.setOrigin(m_kart_position);
