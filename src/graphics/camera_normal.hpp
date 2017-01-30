@@ -59,6 +59,9 @@ private:
     void positionCamera(float dt, float above_kart, float cam_angle,
                         float side_way, float distance, float smoothing);
 
+    btVector3 m_kart_position;
+    btQuaternion m_kart_rotation;
+
     // Give a few classes access to the constructor (mostly for inheritance)
     friend class Camera;
     friend class CameraDebug;

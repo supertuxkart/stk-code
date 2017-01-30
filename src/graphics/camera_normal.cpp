@@ -54,6 +54,10 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
     m_rotation_range = 0.0f;
     reset();
     m_camera->setNearValue(1.0f);
+
+    btTransform btt = kart->getTrans();
+    m_kart_position = btt.getOrigin();
+    m_kart_rotation = btt.getRotation();
 }   // Camera
 
 //-----------------------------------------------------------------------------
@@ -68,15 +72,15 @@ void CameraNormal::smoothMoveCamera(float dt)
     if (kart->isFlying())
     {
         Vec3 vec3 = m_kart->getXYZ() + Vec3(sin(m_kart->getHeading()) * -4.0f,
-                                            0.5f,
-                                            cos(m_kart->getHeading()) * -4.0f);
+            0.5f,
+            cos(m_kart->getHeading()) * -4.0f);
         m_camera->setTarget(m_kart->getXYZ().toIrrVector());
         m_camera->setPosition(vec3.toIrrVector());
         return;
     }   // kart is flying
 
 
-    core::vector3df current_position  =  m_camera->getPosition();
+    core::vector3df current_position = m_camera->getPosition();
     // Smoothly interpolate towards the position and target
     const KartProperties *kp = m_kart->getKartProperties();
     float max_increase_with_zipper = kp->getZipperMaxSpeedIncrease();
@@ -92,13 +96,13 @@ void CameraNormal::smoothMoveCamera(float dt)
     ratio = ratio > -0.12f ? ratio : -0.12f;
 
     // distance of camera from kart in x and z plane
-    float camera_distance = -4.0f * ratio;
+    float camera_distance = -2.5f * ratio;
     if (camera_distance > -2.0f) camera_distance = -2.0f; // don't get too close to the kart
 
     // Defines how far camera should be from player kart.
     Vec3 wanted_camera_offset(camera_distance * sin(skid_angle / 2),
-                       1.1f * (1 + ratio / 2),
-                       camera_distance * cos(skid_angle / 2));
+        1.1f * (1 + ratio / 2),
+        camera_distance * cos(skid_angle / 2));
 
 
     //m_smooth_dt = 0.3f * dt + 0.7f * m_smooth_dt;
@@ -110,12 +114,34 @@ void CameraNormal::smoothMoveCamera(float dt)
 
     m_camera_offset += (wanted_camera_offset - m_camera_offset) * delta;
 
-    Vec3 m_kart_camera_position_with_offset = m_kart->getTrans()(m_camera_offset);
+    float delta2 = dt * 8.0f;
+    if (delta2 < 0)
+        delta2 = 0;
+    else if (delta2 > 1)
+        delta2 = 1;
 
+    btTransform btt = m_kart->getTrans();
+    m_kart_position = m_kart_position + (btt.getOrigin() - m_kart_position) * delta2;
+
+    // TODO
+    //m_kart_rotation = m_kart_rotation.slerp(btt.getRotation(), delta2);
+    m_kart_rotation = btt.getRotation();
+
+    btt.setOrigin(m_kart_position);
+    btt.setRotation(m_kart_rotation);
+
+    Vec3 m_kart_camera_position_with_offset = btt(m_camera_offset);
     // next target
-    Vec3 current_target = m_kart->getTrans()(Vec3(0, 0.5f, 0));
+    Vec3 current_target = btt(Vec3(0, 0.5f, 0));
     // new required position of camera
     current_position = m_kart_camera_position_with_offset.toIrrVector();
+
+
+    //Log::info("CAM_DEBUG", "OFFSET: %f %f %f TRANSFORMED %f %f %f TARGET %f %f %f",
+    //    wanted_camera_offset.x(), wanted_camera_offset.y(), wanted_camera_offset.z(),
+    //    m_kart_camera_position_with_offset.x(), m_kart_camera_position_with_offset.y(),
+    //    m_kart_camera_position_with_offset.z(), current_target.x(), current_target.y(),
+    //    current_target.z());
 
     if(getMode()!=CM_FALLING)
         m_camera->setPosition(current_position);
