@@ -787,7 +787,9 @@ void ShaderBasedRenderer::render(float dt)
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
     
-    if (!CVS->isDefferedEnabled())
+    bool force_rtt = UserConfigParams::m_scale_rtts_factor != 1.0f;
+    
+    if (!CVS->isDefferedEnabled() && !force_rtt)
     {
         prepareForwardRenderer();
     }
@@ -801,7 +803,7 @@ void ShaderBasedRenderer::render(float dt)
         oss << "drawAll() for kart " << cam;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
-        camera->activate(!CVS->isDefferedEnabled());
+        camera->activate(!CVS->isDefferedEnabled() && !force_rtt);
         rg->preRenderCallback(camera);   // adjusts start referee
         irr_driver->getSceneManager()->setActiveCamera(camnode);
 
@@ -819,7 +821,7 @@ void ShaderBasedRenderer::render(float dt)
         if(CVS->isARBUniformBufferObjectUsable())
             uploadLightingData();
         PROFILER_POP_CPU_MARKER();
-        renderScene(camnode, dt, track->hasShadows(), false); 
+        renderScene(camnode, dt, track->hasShadows(), force_rtt); 
         
         if (irr_driver->getBoundingBoxesViz())
         {        
@@ -828,7 +830,7 @@ void ShaderBasedRenderer::render(float dt)
         
         debugPhysics();
         
-        if (CVS->isDefferedEnabled())
+        if (CVS->isDefferedEnabled() || force_rtt)
         {
             renderPostProcessing(camera);
         }
