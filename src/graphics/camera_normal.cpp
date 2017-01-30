@@ -38,11 +38,10 @@
  */
 CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index, 
                            AbstractKart* kart) 
-            : Camera(type, camera_index, kart)
+            : Camera(type, camera_index, kart), m_camera_offset(0, 0, -15.0f)
 {
     m_distance = kart ? kart->getKartProperties()->getCameraDistance() : 1000.0f;
     m_ambient_light = Track::getCurrentTrack()->getDefaultAmbientColor();
-    m_smooth_dt = 0.0f;
 
     // TODO: Put these values into a config file
     //       Global or per split screen zone?
@@ -88,44 +87,35 @@ void CameraNormal::smoothMoveCamera(float dt)
     float skid_factor = ks->getVisualSkidRotation();
 
     float skid_angle = asin(skid_factor);
-    float ratio = (current_speed - max_speed_without_zipper) / max_increase_with_zipper;
+    float ratio = current_speed / max_speed_without_zipper;
+
     ratio = ratio > -0.12f ? ratio : -0.12f;
 
     // distance of camera from kart in x and z plane
-    float camera_distance = -3 * (0.5f + ratio);
-    if (camera_distance > -2.0f) camera_distance = -2.0f;
+    float camera_distance = -4.0f * ratio;
+    if (camera_distance > -2.0f) camera_distance = -2.0f; // don't get too close to the kart
 
     // Defines how far camera should be from player kart.
-    Vec3 camera_offset(camera_distance * sin(skid_angle / 2),
+    Vec3 wanted_camera_offset(camera_distance * sin(skid_angle / 2),
                        1.1f * (1 + ratio / 2),
                        camera_distance * cos(skid_angle / 2));
-    Vec3 m_kart_camera_position_with_offset = m_kart->getTrans()(camera_offset);
+
+
+    //m_smooth_dt = 0.3f * dt + 0.7f * m_smooth_dt;
+    float delta = (dt*5.0f);
+    if (delta < 0.0f)
+        delta = 0.0f;
+    else if (delta > 1.0f)
+        delta = 1.0f;
+
+    m_camera_offset += (wanted_camera_offset - m_camera_offset) * delta;
+
+    Vec3 m_kart_camera_position_with_offset = m_kart->getTrans()(m_camera_offset);
 
     // next target
     Vec3 current_target = m_kart->getTrans()(Vec3(0, 0.5f, 0));
     // new required position of camera
-    core::vector3df wanted_position = m_kart_camera_position_with_offset.toIrrVector();
-
-    float f = 5.0f;
-    if ((current_speed > 5 ) || (current_speed < 0 ))
-    {
-       f = current_speed >0 ?         current_speed/3 + 1.0f
-                            : -1.5f * current_speed   + 2.0f;
-    }
-    m_smooth_dt = 0.3f * dt + 0.7f * m_smooth_dt;
-    current_position += (wanted_position - current_position) * (m_smooth_dt*f);
-
-    // Avoid camera crash: if the speed is negative, the current_position
-    // can oscillate between plus and minus, getting bigger and bigger. If
-    // this happens often enough, floating point overflow happens (large
-    // negative speeds can happen when the kart is tumbling/falling)
-    // To avoid this, we just move the camera to the wanted position if
-    // the distance becomes too large (see #1356).
-    if( (current_position - wanted_position).getLengthSQ() > 100)
-    {
-        Log::debug("camera", "Resetting camera position to avoid crash");
-        current_position = wanted_position;
-    }
+    current_position = m_kart_camera_position_with_offset.toIrrVector();
 
     if(getMode()!=CM_FALLING)
         m_camera->setPosition(current_position);
