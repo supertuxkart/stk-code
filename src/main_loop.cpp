@@ -85,6 +85,7 @@ float MainLoop::getLimitedDt()
     {
         m_curr_time = device->getTimer()->getRealTime();
         dt = (float)(m_curr_time - m_prev_time);
+        if (dt <= 0) break;    // should not really happen
         const World* const world = World::getWorld();
         if (UserConfigParams::m_fps_debug && world)
         {
@@ -110,29 +111,28 @@ float MainLoop::getLimitedDt()
         // client and server will not be in synch anymore
         if(!NetworkConfig::get()->isNetworking())
         {
-            static const float max_elapsed_time = 3.0f*1.0f / 60.0f*1000.0f; /* time 3 internal substeps take */
-            if (dt > max_elapsed_time) dt = max_elapsed_time;
+            /* time 3 internal substeps take */
+            const float MAX_ELAPSED_TIME = 3.0f*1.0f / 60.0f*1000.0f;
+            if (dt > MAX_ELAPSED_TIME) dt = MAX_ELAPSED_TIME;
         }
+        if (!m_throttle_fps || ProfileWorld::isProfileMode()) break;
 
-        // Throttle fps if more than maximum, which can reduce
-        // the noise the fan on a graphics card makes.
-        // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
-        const int max_fps = (StateManager::get()->throttleFPS() ? 30 : UserConfigParams::m_max_fps);
-        if (dt > 0)
-        {
-            const int current_fps = (int)(1000.0f / dt);
-            if (m_throttle_fps && current_fps > max_fps && !ProfileWorld::isProfileMode())
-            {
-                int wait_time = 1000 / max_fps - 1000 / current_fps;
-                if (wait_time < 1) wait_time = 1;
+        // Throttle fps if more than a certain maximum, which can reduce
+        // the noise the fan on a graphics card makes. When in menus, limit
+        // FPS even more
+        const int max_fps = StateManager::get()->throttleFPS() 
+                          ? 30 
+                          : UserConfigParams::m_max_fps;
 
-                PROFILER_PUSH_CPU_MARKER("Throttle framerate", 0, 0, 0);
-                StkTime::sleep(wait_time);
-                PROFILER_POP_CPU_MARKER();
-            }
-            else break;
-        }
-        else break;
+        const int current_fps = (int)(1000.0f / dt);
+        if (current_fps <= max_fps ) break;
+
+        int wait_time = 1000 / max_fps - 1000 / current_fps;
+        if (wait_time < 1) wait_time = 1;
+
+        PROFILER_PUSH_CPU_MARKER("Throttle framerate", 0, 0, 0);
+        StkTime::sleep(wait_time);
+        PROFILER_POP_CPU_MARKER();
     }
     dt *= 0.001f;
     return dt;
@@ -144,6 +144,8 @@ float MainLoop::getLimitedDt()
  */
 void MainLoop::updateRace(float dt)
 {
+    if (!World::getWorld())  return;   // No race on atm - i.e. we are in menu
+
     // The race event manager will update world in case of an online race
     if ( RaceEventManager::getInstance() && 
          RaceEventManager::getInstance()->isRunning() )
@@ -241,19 +243,18 @@ void MainLoop::run()
             PROFILER_POP_CPU_MARKER();
         }
 
-        if (World::getWorld())  // race is active if world exists
-        {
-            PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
-            updateRace(dt);
-            PROFILER_POP_CPU_MARKER();
-        }   // if race is active
-
+        PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
+        updateRace(dt);   // Doesn't do anything if race is not active
+        PROFILER_POP_CPU_MARKER();
+    
         // We need to check again because update_race may have requested
         // the main loop to abort; and it's not a good idea to continue
         // since the GUI engine is no more to be called then.
-        // Also only do music, input, and graphics update if graphics are
+        if (m_abort) break;
+
+        // Only do music, input, and graphics update if graphics are
         // enabled.
-        if (!m_abort && !ProfileWorld::isNoGraphics())
+        if (!ProfileWorld::isNoGraphics())
         {
             PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
             input_manager->update(dt);
@@ -282,21 +283,18 @@ void MainLoop::run()
             }
             PROFILER_POP_CPU_MARKER();
 
-            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
-            Online::RequestManager::get()->update(dt);
-            PROFILER_POP_CPU_MARKER();
         }
-        else if (!m_abort && ProfileWorld::isNoGraphics())
+        else
         {
             PROFILER_PUSH_CPU_MARKER("Protocol manager update", 0x7F, 0x00, 0x7F);
             if(NetworkConfig::get()->isNetworking())
                 ProtocolManager::getInstance()->update(dt);
             PROFILER_POP_CPU_MARKER();
 
-            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
-            Online::RequestManager::get()->update(dt);
-            PROFILER_POP_CPU_MARKER();
         }
+        PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
+        Online::RequestManager::get()->update(dt);
+        PROFILER_POP_CPU_MARKER();
 
         if (World::getWorld() )
         {
