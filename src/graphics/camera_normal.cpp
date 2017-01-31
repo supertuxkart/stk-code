@@ -96,12 +96,12 @@ void CameraNormal::smoothMoveCamera(float dt)
     ratio = ratio > -0.12f ? ratio : -0.12f;
 
     // distance of camera from kart in x and z plane
-    float camera_distance = -4.0f * ratio;
+    float camera_distance = -1.25f - 2.5f * ratio;
     if (camera_distance > -2.0f) camera_distance = -2.0f; // don't get too close to the kart
 
     // Defines how far camera should be from player kart.
     Vec3 wanted_camera_offset(camera_distance * sin(skid_angle / 2),
-        1.1f * (1 + ratio / 2),
+        (0.85f + ratio / 2.5f),
         camera_distance * cos(skid_angle / 2));
 
 
