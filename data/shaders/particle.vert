@@ -1,7 +1,7 @@
 uniform vec3 color_from;
 uniform vec3 color_to;
 
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location=0) in vec3 Position;
 layout(location = 1) in float lifetime;
 layout(location = 2) in float size;

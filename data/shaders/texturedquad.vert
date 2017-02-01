@@ -3,7 +3,7 @@ uniform vec2 size;
 uniform vec2 texcenter;
 uniform vec2 texsize;
 
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location=0) in vec2 Position;
 layout(location=3) in vec2 Texcoord;
 #else

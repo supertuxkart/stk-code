@@ -9,7 +9,7 @@ uniform float track_x_len;
 uniform float track_z_len;
 uniform samplerBuffer heightmap;
 
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout (location = 4) in vec3 particle_position_initial;
 layout (location = 5) in float lifetime_initial;
 layout (location = 6) in vec3 particle_velocity_initial;
