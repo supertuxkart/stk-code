@@ -239,7 +239,7 @@ void CentralVideoSettings::init()
             hasTextureSwizzle = true;
         }
         
-        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXPLICIT_ATTRIB_LOCATION)
+        if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_EXPLICIT_ATTRIB_LOCATION))
         {
             Log::info("GLDriver", "Explicit Attrib Location Present");
             hasExplicitAttribLocation = true;
