@@ -91,7 +91,7 @@ void CentralVideoSettings::init()
         std::string driver((char*)(glGetString(GL_VERSION)));
         std::string card((char*)(glGetString(GL_RENDERER)));
         GraphicsRestrictions::init(driver, card);
-        
+
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
         {
             m_glsl = false;
@@ -259,12 +259,19 @@ void CentralVideoSettings::init()
 
 unsigned CentralVideoSettings::getGLSLVersion() const
 {
+#if defined(USE_GLES2)
+    if (m_gl_major_version >= 3)
+        return 300;
+    else
+        return 100;
+#else
     if (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version == 3))
         return m_gl_major_version * 100 + m_gl_minor_version * 10;
     else if (m_gl_major_version == 3)
         return 100 + (m_gl_minor_version + 3) * 10;
     else
         return 120;
+#endif
 }
 
 bool CentralVideoSettings::isGLSL() const
