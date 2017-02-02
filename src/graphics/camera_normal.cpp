@@ -52,12 +52,17 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
     m_target_speed   = 10.0f;
     m_rotation_range = 0.4f;
     m_rotation_range = 0.0f;
+    m_kart_position = btVector3(0, 0, 0);
+    m_kart_rotation = btQuaternion(0, 0, 0, 0);
     reset();
     m_camera->setNearValue(1.0f);
 
-    btTransform btt = kart->getTrans();
-    m_kart_position = btt.getOrigin();
-    m_kart_rotation = btt.getRotation();
+    if (kart)
+    {
+        btTransform btt = kart->getTrans();
+        m_kart_position = btt.getOrigin();
+        m_kart_rotation = btt.getRotation();
+    }
 }   // Camera
 
 //-----------------------------------------------------------------------------
@@ -68,6 +73,8 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
  */
 void CameraNormal::smoothMoveCamera(float dt)
 {
+    if(!m_kart) return;
+    
     Kart *kart = dynamic_cast<Kart*>(m_kart);
     if (kart->isFlying())
     {
