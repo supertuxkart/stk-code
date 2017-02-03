@@ -259,7 +259,6 @@ void Shaders::loadShaders()
     }
 
     initGL();
-    SharedGPUObjects::init();
 }   // loadShaders
 
 // ----------------------------------------------------------------------------

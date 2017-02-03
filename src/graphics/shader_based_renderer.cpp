@@ -944,6 +944,7 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::preloadShaderFiles()
 {
+    SharedGPUObjects::init();
     ShaderFilesManager* sfm = ShaderFilesManager::getInstance();
 
     sfm->addShaderFile("object_pass.vert", GL_VERTEX_SHADER);
