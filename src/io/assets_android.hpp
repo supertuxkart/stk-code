@@ -32,6 +32,7 @@ private:
     bool extractDir(std::string dir_name);
     void removeData();
     void touchFile(std::string path);
+    std::string getPreferredPath(const std::vector<std::string>& paths);
 
 public:
     AssetsAndroid(FileManager* file_manager);

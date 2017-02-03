@@ -27,6 +27,7 @@
 
 #ifdef ANDROID
 #include <android/asset_manager.h>
+#include <sys/statfs.h> 
 #endif
 
 //-----------------------------------------------------------------------------
@@ -95,6 +96,25 @@ void AssetsAndroid::init()
     }
 
     // Create data dir if it's not available anywhere
+    if (m_stk_dir.size() == 0)
+    {
+        std::string preferred_path = getPreferredPath(paths);
+
+        if (preferred_path.length() > 0)
+        {
+            if (m_file_manager->checkAndCreateDirectoryP(preferred_path +
+                                                                "/stk/data"))
+            {
+                Log::info("AssetsAndroid", "Data directory created in: %s",
+                          preferred_path.c_str());
+                m_stk_dir = preferred_path + "/stk";
+                needs_extract_data = true;
+            }
+        }
+    }
+
+    // If getPreferredPath failed for some reason, then try to use the first
+    // available path
     if (m_stk_dir.size() == 0)
     {
         for (std::string path : paths)
@@ -428,6 +448,51 @@ void AssetsAndroid::touchFile(std::string path)
 
     file.close();
 #endif
+}
+
+//-----------------------------------------------------------------------------
+/** Determines best path for extracting assets, depending on available disk
+ *  space.
+ *  \param paths A list of paths that should be checked
+ *  \return Best path or empty string in case of error
+ */
+std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>& 
+                                            paths)
+{
+#ifdef ANDROID
+    std::string preferred_path;
+    int prev_available_space = 0;
+
+    for (std::string path : paths)
+    {
+        // Paths that start with /data should be used only as a fallback if
+        // everything other doesn't work, because typical user doesn't have
+        // access to these directories and i.e. can't manually delete the files
+        // to clean up device
+        if (path.find("/data") == 0)
+            continue;
+
+        struct statfs stat;
+
+        if (statfs(path.c_str(), &stat) != 0)
+            continue;
+
+        int available_space = (int)((stat.f_bavail * stat.f_bsize) / 1000000);
+
+        Log::info("AssetsAndroid", "Available space in '%s': %i MB",
+                  path.c_str(), available_space);
+                  
+        if (available_space > prev_available_space)
+        {
+            preferred_path = path;
+            prev_available_space = available_space;
+        }
+    }
+
+    return preferred_path;
+#endif
+
+    return "";
 }
 
 //-----------------------------------------------------------------------------
