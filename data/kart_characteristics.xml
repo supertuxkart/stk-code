@@ -211,7 +211,7 @@
                 detach parachute. E.g. at nearly 0 speed, only 20% of speed
                 need to be lost.
             ubound-fraction: The upper bound fraction of speed when lost will
-                detach parachute. E.g. at max-speed 60% of speed must be lost.
+                detach parachute. E.g. at max-speed 50% of speed must be lost.
             max-speed: A factor that decides the impact of rate of speed
                 (distance between bounds) -->
         <parachute friction="2.0" duration="2.0" duration-other="2.6"
