@@ -435,6 +435,10 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[PARACHUTE_DURATION]);
         sub_node->get("duration-other",
             &m_values[PARACHUTE_DURATION_OTHER]);
+        sub_node->get("duration-rank-mult",
+            &m_values[PARACHUTE_DURATION_RANK_MULT]);
+        sub_node->get("duration-speed-mult",
+            &m_values[PARACHUTE_DURATION_SPEED_MULT]);
         sub_node->get("lbound-fraction",
             &m_values[PARACHUTE_LBOUND_FRACTION]);
         sub_node->get("ubound-fraction",
