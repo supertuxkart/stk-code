@@ -171,9 +171,24 @@ void Attachment::set(AttachmentType type, float time,
     // by slowing down.
     if(m_type==ATTACH_PARACHUTE)
     {
+        const KartProperties *kp = m_kart->getKartProperties();
+        float speed_mult;
+
         m_initial_speed = m_kart->getSpeed();
         // if going very slowly or backwards, braking won't remove parachute
         if(m_initial_speed <= 1.5) m_initial_speed = 1.5;
+
+        float f = m_initial_speed / kp->getParachuteMaxSpeed();
+        float temp_mult = kp->getParachuteDurationSpeedMult();
+
+        // duration can't be reduced by higher speed
+        if (temp_mult < 1.0f) temp_mult = 1.0f;
+
+        if (f > 1.0f) f = 1.0f;   // cap fraction
+
+        speed_mult = 1.0f + (f *  (temp_mult - 1.0f));
+
+        m_time_left = m_time_left * speed_mult;
 
         if (UserConfigParams::m_graphical_effects)
         {
