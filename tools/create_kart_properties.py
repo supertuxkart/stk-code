@@ -38,7 +38,7 @@ Camera: distance, forwardUpAngle, backwardUpAngle
 Jump: animationTime
 Lean: max, speed
 Anvil: duration, weight, speedFactor
-Parachute: friction, duration, durationOther, lboundFraction, uboundFraction, maxSpeed
+Parachute: friction, duration, durationOther, durationRankMult, durationSpeedMult, lboundFraction, uboundFraction, maxSpeed
 Bubblegum: duration, speedFraction, torque, fadeInTime, shieldDuration
 Zipper: duration, force, speedGain, maxSpeedIncrease, fadeOutTime
 Swatter: duration, distance, squashDuration, squashSlowdown

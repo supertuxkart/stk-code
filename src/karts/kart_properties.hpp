@@ -467,6 +467,8 @@ public:
     float getParachuteFriction() const;
     float getParachuteDuration() const;
     float getParachuteDurationOther() const;
+    float getParachuteDurationRankMult() const;
+    float getParachuteDurationSpeedMult() const;
     float getParachuteLboundFraction() const;
     float getParachuteUboundFraction() const;
     float getParachuteMaxSpeed() const;

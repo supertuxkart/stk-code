@@ -202,16 +202,21 @@
             friction: The friction increase when a parachute is attached.
             duration: The time an attached parachute is active
             duration-other: The time a parachute attached from other kart works
+            duration-rank-mult: The multiplier applied to the duration of the
+            parachute on the 1st kart when affected by the item. Scale for
+            intermediary ranks to 1.0 for the last affected.
+            duration-speed-mult: Applied in all cases, multitplier to duration
+            of the parachute at max-speed. Scale to 1.0 at 0 speed.
             lbound-fraction: The lower bound fraction of speed when lost will
-                detach parachute. E.g. at nearly 0 speed, only 5% of speed
+                detach parachute. E.g. at nearly 0 speed, only 20% of speed
                 need to be lost.
             ubound-fraction: The upper bound fraction of speed when lost will
-                detach parachute. E.g. at max-speed 30% of speed must be lost.
+                detach parachute. E.g. at max-speed 50% of speed must be lost.
             max-speed: A factor that decides the impact of rate of speed
                 (distance between bounds) -->
-        <parachute friction="2.0" duration="4.0" duration-other="8.0"
-                   lbound-fraction="0.95" ubound-fraction="0.7" max-speed="23" />
-
+        <parachute friction="2.0" duration="2.0" duration-other="2.6"
+                   duration-rank-mult="1.35" duration-speed-mult="2.0"
+                   lbound-fraction="0.8" ubound-fraction="0.5" max-speed="23" />
         <!-- Bubblegum
             duration: How long the bubblegum lasts.
             speed-fraction: To what fraction of top-speed the speed is reduced.

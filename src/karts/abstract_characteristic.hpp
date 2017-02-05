@@ -130,6 +130,8 @@ public:
         PARACHUTE_FRICTION,
         PARACHUTE_DURATION,
         PARACHUTE_DURATION_OTHER,
+        PARACHUTE_DURATION_RANK_MULT,
+        PARACHUTE_DURATION_SPEED_MULT,
         PARACHUTE_LBOUND_FRACTION,
         PARACHUTE_UBOUND_FRACTION,
         PARACHUTE_MAX_SPEED,
@@ -300,6 +302,8 @@ public:
     float getParachuteFriction() const;
     float getParachuteDuration() const;
     float getParachuteDurationOther() const;
+    float getParachuteDurationRankMult() const;
+    float getParachuteDurationSpeedMult() const;
     float getParachuteLboundFraction() const;
     float getParachuteUboundFraction() const;
     float getParachuteMaxSpeed() const;

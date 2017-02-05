@@ -126,6 +126,10 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case PARACHUTE_DURATION_OTHER:
         return TYPE_FLOAT;
+    case PARACHUTE_DURATION_RANK_MULT:
+        return TYPE_FLOAT;
+    case PARACHUTE_DURATION_SPEED_MULT:
+        return TYPE_FLOAT;
     case PARACHUTE_LBOUND_FRACTION:
         return TYPE_FLOAT;
     case PARACHUTE_UBOUND_FRACTION:
@@ -350,6 +354,10 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "PARACHUTE_DURATION";
     case PARACHUTE_DURATION_OTHER:
         return "PARACHUTE_DURATION_OTHER";
+    case PARACHUTE_DURATION_RANK_MULT:
+        return "PARACHUTE_DURATION_RANK_MULT";
+    case PARACHUTE_DURATION_SPEED_MULT:
+        return "PARACHUTE_DURATION_SPEED_MULT";
     case PARACHUTE_LBOUND_FRACTION:
         return "PARACHUTE_LBOUND_FRACTION";
     case PARACHUTE_UBOUND_FRACTION:
@@ -925,6 +933,30 @@ float AbstractCharacteristic::getParachuteDurationOther() const
                     getName(PARACHUTE_DURATION_OTHER).c_str());
     return result;
 }  // getParachuteDurationOther
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getParachuteDurationRankMult() const
+{
+    float result;
+    bool is_set = false;
+    process(PARACHUTE_DURATION_RANK_MULT, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(PARACHUTE_DURATION_RANK_MULT).c_str());
+    return result;
+}  // getParachuteDurationRankMult
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getParachuteDurationSpeedMult() const
+{
+    float result;
+    bool is_set = false;
+    process(PARACHUTE_DURATION_SPEED_MULT, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(PARACHUTE_DURATION_SPEED_MULT).c_str());
+    return result;
+}  // getParachuteDurationSpeedMult
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getParachuteLboundFraction() const
