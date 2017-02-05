@@ -16,51 +16,12 @@
 
   <!-- Scores are the number of points given when the race ends. -->
   <grand-prix>
-  <!-- Establish the distribution of points in GP.
-
-       For a race of N karts ; the N-first point values are taken.
-       Then, they are sorted. E.g. ; 0 1 2 1 3 2 becomes 0 1 1 2 2 3.
-       Then these numbers are used to establish the DIFFERENCE of points
-       between consecutive karts.
-
-       The smaller of the numbers is used to establish the score for the
-       last kart and not the difference between 2 karts.
-
-       In the above example, the last kart will have 0 point, the one before
-       before 1 (0+1) ; the one before 2 (0+1+1), the one before 4 (0+1+1+2),
-       etc. until the 1st which have 0 (0+1+1+2+2+3)
-
-       There shall be at least as much points nodes as max-numbers kart -->
-    <points points="0" /> <!-- added with 1 kart, score for the last kart -->
-    <points points="1" /> <!-- added with 2 karts -->
-    <points points="1" /> <!-- added with 3 karts -->
-    <points points="2" /> <!-- added with 4 karts -->
-    <points points="2" /> <!-- added with 5 karts -->
-    <points points="1" /> <!-- added with 6 karts -->
-    <points points="3" /> <!-- added with 7 karts -->
-    <points points="2" /> <!-- added with 8 karts -->
-    <points points="3" /> <!-- added with 9 karts -->
-    <points points="1" /> <!-- added with 10 karts -->
-    <points points="4" /> <!-- added with 11 karts -->
-    <points points="2" /> <!-- added with 12 karts -->
-    <points points="1" /> <!-- added with 13 karts -->
-    <points points="3" /> <!-- added with 14 karts -->
-    <points points="2" /> <!-- added with 15 karts -->
-    <points points="1" /> <!-- added with 16 karts -->
-    <points points="4" /> <!-- added with 17 karts -->
-    <points points="2" /> <!-- added with 18 karts -->
-    <points points="3" /> <!-- added with 19 karts -->
-    <points points="1" /> <!-- added with 20 karts -->
-    <points points="5" /> <!-- added with 21 karts -->
-    <points points="2" /> <!-- added with 22 karts -->
-    <points points="1" /> <!-- added with 23 karts -->
-    <points points="3" /> <!-- added with 24 karts -->
-    <points points="4" /> <!-- added with 25 karts -->
-    <points points="1" /> <!-- added with 26 karts -->
-    <points points="2" /> <!-- added with 27 karts -->
-    <points points="1" /> <!-- added with 28 karts -->
-    <points points="3" /> <!-- added with 29 karts -->
-    <points points="5" /> <!-- added with 30 karts -->
+    <!-- Karts on position 1 and 2 will have 3 more points than the next kart;
+         a kart on position 3 and 4 will have two more points than the next;
+         and all remaining karts will have one more point than the next. -->
+    <points from="1" to="2" points="3"/>
+    <points from="3" to="4" points="2"/>
+    <points from="5"        points="1"/>
   </grand-prix>
 
   <!-- Time in follow-the-leader after which karts are removed.
