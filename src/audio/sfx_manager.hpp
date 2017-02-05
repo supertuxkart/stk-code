@@ -104,6 +104,7 @@ public:
         CUSTOM_GOO,     //!< Played when driving through goo
         CUSTOM_PASS,    //!< Played when passing another kart
         CUSTOM_ZIPPER,  //!< Played when kart hits zipper
+        CUSTOM_SKID,    //!< Played when kart get skip bonus
         CUSTOM_NAME,    //!< Introduction (e.g. "I'm Tux!")
         CUSTOM_ATTACH,  //!< Played when something is attached to kart (Uh-Oh)
         CUSTOM_SHOOT,   //!< Played when weapon is used
