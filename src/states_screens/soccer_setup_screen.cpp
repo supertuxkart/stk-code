@@ -84,13 +84,6 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
         {
             m_schedule_continue = true;
         }
-
-        if(getWidget<SpinnerWidget>("goalamount")->isActivated())
-            race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
-        else
-            race_manager->setTimeTarget((float)getWidget<SpinnerWidget>("timeamount")->getValue()*60);
-
-        input_manager->setMasterPlayerOnly(true);
     }
     else if (name == "back")
     {
@@ -381,9 +374,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         }
 
         if (areAllKartsConfirmed())
-        {
             m_schedule_continue = true;
-        }
 
         return EVENT_BLOCK;
     }
@@ -432,6 +423,7 @@ void SoccerSetupScreen::onUpdate(float delta)
                 return;
         }
         m_schedule_continue = false;
+        prepareGame();
         ArenasScreen::getInstance()->push();
     }
 }   // onUpdate
@@ -523,3 +515,14 @@ bool SoccerSetupScreen::onEscapePressed()
     race_manager->setTimeTarget(0.0f);
     return true;
 }   // onEscapePressed
+
+// -----------------------------------------------------------------------------
+void SoccerSetupScreen::prepareGame()
+{
+    if (getWidget<SpinnerWidget>("goalamount")->isActivated())
+        race_manager->setMaxGoal(getWidget<SpinnerWidget>("goalamount")->getValue());
+    else
+        race_manager->setTimeTarget((float)getWidget<SpinnerWidget>("timeamount")->getValue() * 60);
+
+    input_manager->setMasterPlayerOnly(true);
+}   // prepareGame
