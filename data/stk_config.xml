@@ -28,7 +28,7 @@
 
        In the above example, the last kart will have 0 point, the one before
        before 1 (0+1) ; the one before 2 (0+1+1), the one before 4 (0+1+1+2),
-       etc. until the 1st which have 0 (0+1+1+2+2+3)
+       etc. until the 1st which have 9 (0+1+1+2+2+3)
 
        There shall be at least as much points nodes as max-numbers kart -->
     <points points="0" /> <!-- added with 1 kart, score for the last kart -->
