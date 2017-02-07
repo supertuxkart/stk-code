@@ -1165,6 +1165,32 @@ EventPropagation InputManager::input(const SEvent& event)
                             how fast.
          */
     }
+    else if (event.EventType == EET_ACCELEROMETER_EVENT)
+    {
+        MultitouchDevice* device = m_device_manager->getMultitouchDevice();
+        
+        if (device)
+        {
+            for (unsigned int i = 0; i < device->getButtonsCount(); i++)
+            {
+                MultitouchButton* button = device->getButton(i);
+                
+                if (button->type != BUTTON_STEERING)
+                    continue;
+
+                if (UserConfigParams::m_multitouch_accelerometer == 1)
+                {
+                    button->axis_x = -event.AccelerometerEvent.X / 6.0f;
+                    device->handleControls(button);
+                }
+                else if (UserConfigParams::m_multitouch_accelerometer == 2)
+                {
+                    button->axis_x = event.AccelerometerEvent.Y / 6.0f;
+                    device->handleControls(button);                    
+                }
+            }
+        }
+    }
 
     // block events in all modes but initial menus (except in text boxes to
     // allow typing, and except in modal dialogs in-game)

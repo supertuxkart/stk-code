@@ -199,7 +199,8 @@ bool EventHandler::OnEvent (const SEvent &event)
     else if (event.EventType == EET_MOUSE_INPUT_EVENT ||
              event.EventType == EET_TOUCH_INPUT_EVENT ||
              event.EventType == EET_KEY_INPUT_EVENT   ||
-             event.EventType == EET_JOYSTICK_INPUT_EVENT)
+             event.EventType == EET_JOYSTICK_INPUT_EVENT ||
+             event.EventType == EET_ACCELEROMETER_EVENT)
     {
         // Remember the mouse position
         if (event.EventType == EET_MOUSE_INPUT_EVENT &&

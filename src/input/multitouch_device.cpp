@@ -36,6 +36,11 @@ MultitouchDevice::MultitouchDevice()
     m_type          = DT_MULTITOUCH;
     m_name          = "Multitouch";
     m_player        = NULL;
+#ifdef ANDROID
+    m_android_device = dynamic_cast<CIrrDeviceAndroid*>(
+                                                    irr_driver->getDevice());
+    assert(m_android_device != NULL);
+#endif
 
     for (MultitouchEvent& event : m_events)
     {
@@ -53,6 +58,13 @@ MultitouchDevice::MultitouchDevice()
  */
 MultitouchDevice::~MultitouchDevice()
 {
+#ifdef ANDROID   
+    if (m_android_device->isAccelerometerActive())
+    {
+        m_android_device->deactivateAccelerometer();
+    }
+#endif
+
     clearButtons();
 }
 
@@ -177,8 +189,7 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
             {
                 button->pressed = false;
                 button->event_id = 0;
-                button->axis_x = 0.0f;
-                button->axis_y = 0.0f;
+                updateButtonAxes(button, 0.0f, 0.0f);
             }
         }
         else
@@ -190,15 +201,13 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
             {
                 if (button->pressed == true)
                 {
-                    button->axis_x = (float)(event.x - button->x) /
-                                                        (button->width/2) - 1;
-                    button->axis_y = (float)(event.y - button->y) /
-                                                        (button->height/2) - 1;
+                    updateButtonAxes(button,
+                         (float)(event.x - button->x) / (button->width/2) - 1,
+                         (float)(event.y - button->y) / (button->height/2) - 1);
                 }
                 else
                 {
-                    button->axis_x = 0.0f;
-                    button->axis_y = 0.0f;
+                    updateButtonAxes(button, 0.0f, 0.0f);
                 }
 
                 if (prev_axis_x != button->axis_x ||
@@ -232,6 +241,25 @@ void MultitouchDevice::updateConfigParams()
 
     m_deadzone_edge = UserConfigParams::m_multitouch_deadzone_edge;
     m_deadzone_edge = std::min(std::max(m_deadzone_edge, 0.0f), 0.5f);
+    
+#ifdef ANDROID   
+    if (UserConfigParams::m_multitouch_accelerometer > 0 &&
+        !m_android_device->isAccelerometerActive())
+    {
+        m_android_device->activateAccelerometer(1.0f / 30);
+        
+        // Disable accelerometer if it couldn't be activated
+        if (!m_android_device->isAccelerometerActive())
+        {
+            UserConfigParams::m_multitouch_accelerometer = 0;
+        }
+    }
+    else if (UserConfigParams::m_multitouch_accelerometer == 0 &&
+             m_android_device->isAccelerometerActive())
+    {
+        m_android_device->deactivateAccelerometer();
+    }
+#endif
 } // updateConfigParams
 
 // ----------------------------------------------------------------------------
@@ -248,6 +276,26 @@ float MultitouchDevice::getSteeringFactor(float value)
     return std::min((value - m_deadzone_center) / (1.0f - m_deadzone_edge - 
                     m_deadzone_center), 1.0f);
 }
+
+/** Updates the button axes. It leaves X axis untouched if the accelerometer is
+ *  used for turning left/right
+ *  \param button A button that should be updated
+ *  \param x A value from 0 to 1
+ *  \param y A value from 0 to 1
+ */
+void MultitouchDevice::updateButtonAxes(MultitouchButton* button, float x, 
+                                        float y)
+{
+    if (UserConfigParams::m_multitouch_accelerometer == 0)
+    {
+        button->axis_x = x;
+    }
+    
+    button->axis_y = y;
+}
+
+// ----------------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------------
 /** Sends proper action for player controller depending on the button type

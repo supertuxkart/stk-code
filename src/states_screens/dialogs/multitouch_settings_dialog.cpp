@@ -78,7 +78,25 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
         assert(buttons_en != NULL);
         UserConfigParams::m_multitouch_mode = buttons_en->getState() ? 1 : 0;
-    
+        
+        CheckBoxWidget* accel = getWidget<CheckBoxWidget>("accelerometer_tablet");
+        assert(accel != NULL);
+        CheckBoxWidget* accel2 = getWidget<CheckBoxWidget>("accelerometer_phone");
+        assert(accel2 != NULL);
+        
+        if (accel->getState())
+        {
+            UserConfigParams::m_multitouch_accelerometer = 1;
+        }
+        else if (accel2->getState())
+        {
+            UserConfigParams::m_multitouch_accelerometer = 2;
+        }
+        else
+        {
+            UserConfigParams::m_multitouch_accelerometer = 0;
+        }
+        
         MultitouchDevice* touch_device = input_manager->getDeviceManager()->
                                                         getMultitouchDevice();
         
@@ -98,8 +116,25 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         UserConfigParams::m_multitouch_deadzone_edge.revertToDefaults();
         UserConfigParams::m_multitouch_deadzone_center.revertToDefaults();
         UserConfigParams::m_multitouch_mode.revertToDefaults();
+        UserConfigParams::m_multitouch_accelerometer.revertToDefaults();
         
         updateValues();
+        
+        return GUIEngine::EVENT_BLOCK;
+    }
+    else if (eventSource == "accelerometer_disabled" ||
+             eventSource == "accelerometer_tablet" ||
+             eventSource == "accelerometer_phone")
+    {
+        CheckBoxWidget* accel = getWidget<CheckBoxWidget>("accelerometer_disabled");
+        assert(accel != NULL);
+        accel->setState(eventSource == accel->m_properties[PROP_ID]);
+        accel = getWidget<CheckBoxWidget>("accelerometer_tablet");
+        assert(accel != NULL);
+        accel->setState(eventSource == accel->m_properties[PROP_ID]);
+        accel = getWidget<CheckBoxWidget>("accelerometer_phone");
+        assert(accel != NULL);
+        accel->setState(eventSource == accel->m_properties[PROP_ID]);
         
         return GUIEngine::EVENT_BLOCK;
     }
@@ -128,6 +163,19 @@ void MultitouchSettingsDialog::updateValues()
     CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
     assert(buttons_en != NULL);
     buttons_en->setState(UserConfigParams::m_multitouch_mode);
+    
+    CheckBoxWidget* accelerometer;
+    accelerometer = getWidget<CheckBoxWidget>("accelerometer_disabled");
+    assert(accelerometer != NULL);
+    accelerometer->setState(UserConfigParams::m_multitouch_accelerometer == 0);
+    
+    accelerometer = getWidget<CheckBoxWidget>("accelerometer_tablet");
+    assert(accelerometer != NULL);
+    accelerometer->setState(UserConfigParams::m_multitouch_accelerometer == 1);
+    
+    accelerometer = getWidget<CheckBoxWidget>("accelerometer_phone");
+    assert(accelerometer != NULL);
+    accelerometer->setState(UserConfigParams::m_multitouch_accelerometer == 2);
 }
 
 // -----------------------------------------------------------------------------
