@@ -27,8 +27,9 @@
 #include <list>
 #include <vector>
 
-class RewindInfo;
 class EventRewinder;
+class RewindInfo;
+class TimeStepInfo;
 
 /** \ingroup network
  */
@@ -36,38 +37,31 @@ class EventRewinder;
 class RewindQueue
 {
 private:
-
-    /** Pointer to all saved states. */
-    typedef std::list<RewindInfo*> AllRewindInfo;
+    /** Pointer to all saved */
+    typedef std::list<TimeStepInfo*> AllTimeStepInfo;
 
     /** The list of all events that are affected by a rewind. */
-    AllRewindInfo m_rewind_info;
+    AllTimeStepInfo m_time_step_info;
 
     /** The list of all events received from the network. They are stored
      *  in a separate thread (so this data structure is thread-save), and
      *  merged into m_rewind_info from the main thread. This design (as
      *  opposed to locking m_rewind_info) reduces the synchronisation
      *  between main thread and network thread. */
-    Synchronised<AllRewindInfo> m_network_events;
+    typedef std::vector<RewindInfo*> AllNetworkRewindInfo;
+    Synchronised<AllNetworkRewindInfo> m_network_events;
 
-    /** Iterator to the next rewind info to be handled. */
-    AllRewindInfo::iterator m_current;
+    /** Iterator to the curren time step info to be handled. This should
+     *  always be at the same time as World::getTime(). */
+    AllTimeStepInfo::iterator m_current;
 
-#define REWIND_SEARCH_STATS
-
-#ifdef REWIND_SEARCH_STATS
-    /** Gather some statistics about how many comparisons we do, 
-     *  to find out if it's worth doing a binary search.*/
-    mutable int m_count_of_comparisons;
-    mutable int m_count_of_searches;
-#endif
-
+    TimeStepInfo *findClosestTimeStepInfo(float t);
     void insertRewindInfo(RewindInfo *ri);
 
-    struct _RewindInfoCompare
+    struct _TimeStepInfoCompare
     {
-        bool operator()(const RewindInfo *ri1, const RewindInfo *ri2) const;
-    } m_rewind_info_compare;
+        bool operator()(const TimeStepInfo * const ri1, const TimeStepInfo * const ri2) const;
+    } m_time_step_info_compare;
 
     void testingSortingOrderType(EventRewinder *rewinder, int types[3]);
     void testingSortingOrderTime(EventRewinder *rewinder, int types[3],
@@ -79,15 +73,15 @@ public:
          RewindQueue();
         ~RewindQueue();
     void reset();
-    void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
-                  bool confirmed, float time);
-    void addState(Rewinder *rewinder, BareNetworkString *buffer,
-                  bool confirmed, float time);
+    void addNewTimeStep(float time, float dt);
+    void addLocalEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
+                       bool confirmed, float time);
+    void addLocalState(Rewinder *rewinder, BareNetworkString *buffer,
+                       bool confirmed);
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, float time);
     void addNetworkState(Rewinder *rewinder, BareNetworkString *buffer,
-                         float time);
-    void addTimeEvent(float time);
+                         float time, float dt);
     void mergeNetworkData(bool *needs_rewind, float *rewind_time);
     bool isEmpty() const;
     bool hasMoreRewindInfo() const;
@@ -95,19 +89,19 @@ public:
     float determineNextDT(float max_time);
 
     // ------------------------------------------------------------------------
-    RewindQueue::AllRewindInfo::iterator& operator++()
+    RewindQueue::AllTimeStepInfo::iterator& operator++()
     {
-        assert(m_current != m_rewind_info.end());
+        assert(m_current != m_time_step_info.end());
         m_current++;
         return m_current;
     }   // operator++
 
     // ------------------------------------------------------------------------
-    /** Returns the next event. Caller must make sure that there is at least
+    /** Returns the current RewindInfo. Caller must make sure that there is at least
      *  one more RewindInfo (see hasMoreRewindInfo()). */
-    RewindInfo *getNext()
+    TimeStepInfo *getCurrent()
     {
-        assert(m_current != m_rewind_info.end());
+        assert(m_current != m_time_step_info.end());
         return *m_current;
     }   // getNext
 

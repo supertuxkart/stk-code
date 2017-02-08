@@ -106,12 +106,6 @@ private:
     /** Time at which the last state was saved. */
     float m_last_saved_state;
 
-    /** The current time to be used in all states/events. This is used to
-     *  give all states and events during one frame the same time, even
-     *  if e.g. states are saved before world time is increased, other
-     *  events later. */
-    float m_current_time;
-
     /** This stores the original World time during a rewind. It is used to
      *  detect if a client's local time need adjustment to reduce rewinds. */
     float m_not_rewound_time;
@@ -142,31 +136,15 @@ public:
     // Non-static functtion declarations:
 
     void reset();
-    void update();
+    void update(float dt);
     void rewindTo(float target_time);
-    void playEventsTill(float time);
+    void playEventsTill(float time, float *dt);
     void addEvent(EventRewinder *event_rewinder, BareNetworkString *buffer,
                   bool confirmed, float time = -1.0f);
     void addNetworkEvent(EventRewinder *event_rewinder,
                          BareNetworkString *buffer, float time);
     void addNetworkState(int rewinder_index, BareNetworkString *buffer,
                          float time);
-    // ------------------------------------------------------------------------
-    /** Sets the time that is to be used for all further states or events,
-     *  and the time step size. This is necessary so that states/events before 
-     *  and after World::m_time is increased have the same time stamp. 
-     *  \param t Time.
-     *  \param dt Time step size.
-     */
-    void setCurrentTime(float t)
-    {
-        m_current_time = t;
-    }   // setCurrentTime
-
-    // ------------------------------------------------------------------------
-    /** Returns the current time. */
-    float getCurrentTime() const { return m_current_time; }
-        
     // ------------------------------------------------------------------------
     /** Adds a Rewinder to the list of all rewinders.
      *  \return true If rewinding is enabled, false otherwise. 

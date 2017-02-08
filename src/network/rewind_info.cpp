@@ -31,12 +31,6 @@ RewindInfo::RewindInfo(float time, bool is_confirmed)
 }   // RewindInfo
 
 // ============================================================================
-RewindInfoTime::RewindInfoTime(float time)
-              : RewindInfo(time, /*is_confirmed*/true)
-{
-}   // RewindInfoTime
-
-// ============================================================================
 RewindInfoState::RewindInfoState(float time, Rewinder *rewinder, 
                                  BareNetworkString *buffer, bool is_confirmed)
     : RewindInfoRewinder(time, rewinder, buffer, is_confirmed)

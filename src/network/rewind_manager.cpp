@@ -25,6 +25,7 @@
 #include "network/protocols/game_protocol.hpp"
 #include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
+#include "network/time_step_info.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "utils/log.hpp"
@@ -99,7 +100,8 @@ void RewindManager::reset()
 // ----------------------------------------------------------------------------    
 /** Adds an event to the rewind data. The data to be stored must be allocated
  *  and not freed by the caller!
- *  \param time Time at which the event was recorded.
+ *  \param time Time at which the event was recorded. If time is not specified
+ *          (or set to -1), the current world time is used.
  *  \param buffer Pointer to the event data. 
  */
 void RewindManager::addEvent(EventRewinder *event_rewinder,
@@ -113,11 +115,11 @@ void RewindManager::addEvent(EventRewinder *event_rewinder,
         return;
     }
 
-    Log::verbose("RewindManager", "Time world %f self-event %f",
-                 World::getWorld()->getTime(), getCurrentTime());
+    Log::verbose("RewindManager", "Time world %f self-event",
+                 World::getWorld()->getTime());
     if (time < 0)
-        time = getCurrentTime();
-    m_rewind_queue.addEvent(event_rewinder, buffer, confirmed, time);
+        time = World::getWorld()->getTime();
+    m_rewind_queue.addLocalEvent(event_rewinder, buffer, confirmed, time);
 }   // addEvent
 
 // ----------------------------------------------------------------------------
@@ -134,7 +136,7 @@ void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
     m_rewind_queue.addNetworkEvent(event_rewinder, buffer, time);
     Log::verbose("RewindManager", "Time world %f network-event %f",
                  World::getWorld()->getTime(), time);
-}   // addEvent
+}   // addNetworkEvent
 
 // ----------------------------------------------------------------------------
 /** Adds a state to the list of network rewind data. This function is
@@ -144,23 +146,25 @@ void RewindManager::addNetworkEvent(EventRewinder *event_rewinder,
  *  \param time Time at which the event was recorded.
  *  \param buffer Pointer to the event data.
  */
-void RewindManager::addNetworkState(int rewinder_index,
-                                    BareNetworkString *buffer, float time)
+void RewindManager::addNetworkState(int rewinder_index, BareNetworkString *buffer,
+                                    float time)
 {
+    assert(NetworkConfig::get()->isClient());
+    // On a client dt from a state is never used, it maintains
+    // its own dt information (using TimeEvents).
     m_rewind_queue.addNetworkState(m_all_rewinder[rewinder_index], buffer,
-                                   time);
+                                   time, -99);
     Log::verbose("RewindManager", "Time world %f network-state %f",
-        World::getWorld()->getTime(), time);
-}   // addState
+                 World::getWorld()->getTime(), time);
+}   // addNetworkState
 
 // ----------------------------------------------------------------------------
 /** Determines if a new state snapshot should be taken, and if so calls all
  *  rewinder to do so.
  *  \param dt Time step size.
  */
-void RewindManager::update()
+void RewindManager::update(float dt)
 {
- 
     if(!m_enable_rewind_manager  || 
         m_all_rewinder.size()==0 ||
         m_is_rewinding              )  return;
@@ -168,44 +172,37 @@ void RewindManager::update()
     float time = World::getWorld()->getTime();
     m_not_rewound_time = time;
 
-    // Client doesn't save state (atm), so we need to store
-    // time infos to get the correct dt when rewinding
-    if(time - m_last_saved_state < m_state_frequency ||
-        NetworkConfig::get()->isClient())
+    // Avoid duplicating time step during ready-set-go, all with time 0
+    if (time > m_last_saved_state)
     {
-        // Avoid saving a time event for the same time, which happens
-        // with t=0.
-        if (time > m_last_saved_state)
-        {
-            // No full state necessary, add a dummy entry for the time
-            // which increases replay precision (same time step size)
-            m_rewind_queue.addTimeEvent(getCurrentTime());
-        }
-        if (NetworkConfig::get()->isClient())
-            m_last_saved_state = time;
+        m_rewind_queue.addNewTimeStep(World::getWorld()->getTime(), dt);
+    }
+
+    // Clients don't save state, so they just update m_last_saved_state
+    // (only for the above if test) and exit.
+    if ( NetworkConfig::get()->isClient() || 
+         time - m_last_saved_state < m_state_frequency  )
+    {
         return;
     }
 
-    // For now always create a snapshot.
-    if (NetworkConfig::get()->isServer())
-        GameProtocol::getInstance()->startNewState();
-    AllRewinder::const_iterator i;
-    for(i=m_all_rewinder.begin(); i!=m_all_rewinder.end(); ++i)
+    // Save state
+    GameProtocol::getInstance()->startNewState();
+    AllRewinder::const_iterator rewinder;
+    for(rewinder=m_all_rewinder.begin(); rewinder!=m_all_rewinder.end(); ++rewinder)
     {
-        BareNetworkString *buffer = (*i)->saveState();
+        BareNetworkString *buffer = (*rewinder)->saveState();
         if(buffer && buffer->size()>=0)
         {
             m_overall_state_size += buffer->size();
-            m_rewind_queue.addState(*i, buffer, /*confirmed*/true,
-                                    getCurrentTime());
-            if(NetworkConfig::get()->isServer())
-                GameProtocol::getInstance()->addState(buffer);
+            // Add to the previously created container
+            m_rewind_queue.addLocalState(*rewinder, buffer, /*confirmed*/true);
+            GameProtocol::getInstance()->addState(buffer);
         }   // size >= 0
         else
             delete buffer;   // NULL or 0 byte buffer
     }
-    if (NetworkConfig::get()->isServer())
-        GameProtocol::getInstance()->sendState();
+    GameProtocol::getInstance()->sendState();
 
     Log::verbose("RewindManager", "%f allocated %ld",
                  World::getWorld()->getTime(), m_overall_state_size);
@@ -216,8 +213,10 @@ void RewindManager::update()
 // ----------------------------------------------------------------------------
 /** Replays all events from the last event played till the specified time.
  *  \param time Up to (and inclusive) which time events will be replayed.
+ *  \param dt Time step size. This might get adjusted if a new state has
+ *         been received.
  */
-void RewindManager::playEventsTill(float time)
+void RewindManager::playEventsTill(float time, float *dt)
 {    
     // No events, nothing to do
     if (m_rewind_queue.isEmpty())
@@ -240,43 +239,45 @@ void RewindManager::playEventsTill(float time)
         rewindTo(rewind_time);
     }
 
+    // This is necessary to avoid that rewinding an event will store the 
+    // event again as a seemingly new event.
     assert(!m_is_rewinding);
     m_is_rewinding = true;
 
+    // Now play all events between time and time + dt
+    // Note that we need to use time and not World::getTime(), since
+    // the world time was potentially set back during a rewind
     while(m_rewind_queue.hasMoreRewindInfo())
     {
-        RewindInfo *ri = m_rewind_queue.getNext();
-        if (ri->getTime() > time)
-        {
-            m_is_rewinding = false;
-            return;
-        }
-        ++m_rewind_queue;
+        TimeStepInfo *tsi = m_rewind_queue.getCurrent();
+        // This timestep simulates from time to time+dt
+        if (tsi->getTime() > time + *dt) break;
 
-        if(ri->isEvent())
-            ri->rewind();
-        else if (ri->isState() && NetworkConfig::get()->isClient())
+        ++m_rewind_queue;   // Point to next rewind info
+        tsi->replayAllEvents();
+
+        if (tsi->hasConfirmedState() && NetworkConfig::get()->isClient())
         {
             Log::warn("RewindManager",
                       "Client has received state in the future: at %f state %f",
-                      World::getWorld()->getTime(), ri->getTime());
-            ri->rewind();
+                      World::getWorld()->getTime(), tsi->getTime());
         }
     }
     m_is_rewinding = false;
 }   // playEventsTill
 
 // ----------------------------------------------------------------------------
-/** Rewinds to the specified time.
- *  \param t Time to rewind to.
+/** Rewinds to the specified time, then goes forward till the current
+ *  World::getTime() is reached again: it will replay everything before
+ *  World::getTime(), but not the events at World::getTime() (or later)/
+ *  \param rewind_time Time to rewind to.
  */
 void RewindManager::rewindTo(float rewind_time)
 {
     assert(!m_is_rewinding);
-    Log::info("rewind", "Rewinding to %f at %f", rewind_time,
-               StkTime::getRealTime());
+    Log::info("rewind", "Rewinding to %f at %f %f", rewind_time,
+               World::getWorld()->getTime(), StkTime::getRealTime());
     history->doReplayHistory(History::HISTORY_NONE);
-
 
     // Then undo the rewind infos going backwards in time
     // --------------------------------------------------
@@ -289,57 +290,44 @@ void RewindManager::rewindTo(float rewind_time)
     float current_time = world->getTime();
 
     // Get the (first) full state to which we have to rewind
-    RewindInfoState *state =
-                     dynamic_cast<RewindInfoState*>(m_rewind_queue.getNext());
+    TimeStepInfo *current = m_rewind_queue.getCurrent();
 
-    // Store the time to which we have to replay to
-    float exact_rewind_time = state->getTime();
+    // Store the time to which we have to replay to,
+    // which can be earlier than rewind_time
+    float exact_rewind_time = current->getTime();
 
     // Now start the rewind with the full state:
     world->setTime(exact_rewind_time);
-    float local_physics_time = state->getLocalPhysicsTime();
+    float local_physics_time = current->getLocalPhysicsTime();
     Physics::getInstance()->getPhysicsWorld()->setLocalTime(local_physics_time);
 
     // Restore all states from the current time - the full state of a race
     // will be potentially stored in several state objects. State can be NULL
     // if the next event is not a state
-    while(state && state->getTime()==exact_rewind_time)
+    float dt = -1.0f;
+
+    // Restore the state, then all events for the specified time
+    current->replayAllStates();
+
+    // Need to exit loop if in-game menu is open, since world clock
+    // will not be increased while the game is paused
+    if (World::getWorld()->getPhase() == WorldStatus::IN_GAME_MENU_PHASE)
     {
-        state->rewind();
-        ++m_rewind_queue;
-        if(!m_rewind_queue.hasMoreRewindInfo()) break;
-        state = dynamic_cast<RewindInfoState*>(m_rewind_queue.getNext());
+        m_is_rewinding = false;
+        return;
     }
+
+    current->replayAllStates();
 
     // Now go forward through the list of rewind infos:
     // ------------------------------------------------
-    // Need to exit loop if in-game menu is open, since world clock
-    // will not be increased while the game is paused
-    while( world->getTime() < current_time &&
-           World::getWorld()->getPhase()!=WorldStatus::IN_GAME_MENU_PHASE)
+    while (world->getTime() < current_time)
     {
-        // Now handle all states and events at the current time before
-        // updating the world:
-        while (m_rewind_queue.hasMoreRewindInfo())
-        {
-            RewindInfo *ri = m_rewind_queue.getNext();
-            if (ri->getTime() > world->getTime()) break;
-
-            if (ri->isState())
-            {
-                // TOOD: replace the old state with a new state. 
-                // For now just set it to confirmed
-                ri->setConfirmed(true);
-            }
-            else if (ri->isEvent())
-            {
-                ri->rewind();
-            }
-
-            ++m_rewind_queue;
-        }   // while ri->getTime() <= world->getTime()
-
-        float dt = m_rewind_queue.determineNextDT(current_time);
+        // Now handle all events(!) at the current time (i.e. between 
+        // World::getTime() and World::getTime()+dt) before updating
+        // the world:
+        current->replayAllEvents();
+        dt = current->getDT();
         world->updateWorld(dt);
 #undef SHOW_ROLLBACK
 #ifdef SHOW_ROLLBACK
@@ -347,7 +335,11 @@ void RewindManager::rewindTo(float rewind_time)
 #endif
         world->updateTime(dt);
 
-    }
+        ++m_rewind_queue;
+        if (!m_rewind_queue.hasMoreRewindInfo()) break;
+        current = m_rewind_queue.getCurrent();
+    }   // while (world->getTime() < current_time)
+
     m_is_rewinding = false;
     Log::info("RewindManager", "Rewind from %f to %f finished at %f.",
               rewind_time, World::getWorld()->getTime(),

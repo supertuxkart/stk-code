@@ -22,6 +22,7 @@
 #include "network/event_rewinder.hpp"
 #include "network/network_string.hpp"
 #include "network/rewinder.hpp"
+#include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -44,7 +45,7 @@ class RewindInfo
 private:
     LEAK_CHECK();
 
-    /** Time when this state was taken. */
+    /** Time when this RewindInfo was taken. */
     float m_time;
 
     /** A confirmed event is one that was sent from the server. When
@@ -65,22 +66,22 @@ public:
     // ------------------------------------------------------------------------
     virtual ~RewindInfo() { }
     // ------------------------------------------------------------------------
-    /** Returns the time at which this rewind state was saved. */
+    /** Returns the time at which this RewindInfo was saved. */
     float getTime() const { return m_time; }
     // ------------------------------------------------------------------------
     /** Sets if this RewindInfo is confirmed or not. */
     void setConfirmed(bool b) { m_is_confirmed = b; }
     // ------------------------------------------------------------------------
-    /** Returns if this state is confirmed. */
+    /** Returns if this RewindInfo is confirmed. */
     bool isConfirmed() const { return m_is_confirmed; }
     // ------------------------------------------------------------------------
-    /** If this rewind info is an event. Subclasses will overwrite this. */
+    /** If this RewindInfo is an event. Subclasses will overwrite this. */
     virtual bool isEvent() const { return false; }
     // ------------------------------------------------------------------------
-    /** If this rewind info is time info. Subclasses will overwrite this. */
+    /** If this RewindInfo is time info. Subclasses will overwrite this. */
     virtual bool isTime() const { return false; }
     // ------------------------------------------------------------------------
-    /** If this rewind info is an event. Subclasses will overwrite this. */
+    /** If this RewindInfo is an event. Subclasses will overwrite this. */
     virtual bool isState() const { return false; }
     // ------------------------------------------------------------------------
 };   // RewindInfo
@@ -116,26 +117,6 @@ public:
     /** Returns a pointer to the state buffer. */
     BareNetworkString *getBuffer() const { return m_buffer; }
 };   // RewindInfoRewinder
-
-// ============================================================================
-class RewindInfoTime : public RewindInfo
-{
-private:
-
-public:
-             RewindInfoTime(float time);
-    virtual ~RewindInfoTime() {};
-
-    // ------------------------------------------------------------------------
-    virtual bool isTime() const { return true; }
-    // ------------------------------------------------------------------------
-    /** Called when going back in time to undo any rewind information.
-     *  Does actually nothing. */
-    virtual void undo() {} 
-    // ------------------------------------------------------------------------
-    /** Rewinds to this state. Nothing to be done for time info. */
-    virtual void rewind() {}
-};   // class RewindInfoTime
 
 // ============================================================================
 class RewindInfoState: public RewindInfoRewinder

@@ -271,7 +271,8 @@ void ProtocolManager::terminateProtocol(Protocol *protocol)
 }   // terminateProtocol
 
 // ----------------------------------------------------------------------------
-/** Sends the event to the corresponding protocol.
+/** Sends the event to the corresponding protocol. Returns true if the event
+ *  can be ignored, or false otherwise.
  */
 bool ProtocolManager::sendEvent(Event* event)
 {
@@ -304,13 +305,8 @@ bool ProtocolManager::sendEvent(Event* event)
 
     m_protocols.unlock();
 
-    if (count>0 || StkTime::getTimeSinceEpoch()-event->getArrivalTime()
-                    >= TIME_TO_KEEP_EVENTS                                  )
-    {
-        delete event;
-        return true;
-    }
-    return false;
+    return (count > 0 || StkTime::getTimeSinceEpoch() - event->getArrivalTime()
+                         >= TIME_TO_KEEP_EVENTS                                );
 }   // sendEvent
 
 // ----------------------------------------------------------------------------
@@ -342,6 +338,7 @@ void ProtocolManager::update(float dt)
         m_events_to_process.lock();
         if (result)
         {
+            delete *i;
             i = m_events_to_process.getData().erase(i);
         }
         else
@@ -390,6 +387,7 @@ void ProtocolManager::asynchronousUpdate()
         m_events_to_process.lock();
         if (result)
         {
+            delete *i;
             i = m_events_to_process.getData().erase(i);
         }
         else
