@@ -41,6 +41,15 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
 {
     m_race_gui = race_gui;
     m_minimap_bottom = 0;
+    m_directionnal_wheel_tex = NULL;
+    m_pause_tex = NULL;
+    m_nitro_tex = NULL;
+    m_nitro_empty_tex = NULL;
+    m_wing_mirror_tex = NULL;
+    m_thunderbird_reset_tex = NULL;
+    m_drift_tex = NULL;
+    m_bg_button_tex = NULL;
+    m_bg_button_focus_tex = NULL;
 
     m_device = input_manager->getDeviceManager()->getMultitouchDevice();
 
@@ -122,9 +131,24 @@ void RaceGUIMultitouch::initMultitouchSteering()
     m_device->addButton(BUTTON_LOOK_BACKWARDS,
                       int(w - 2 * col_size), int(h - 1 * col_size),
                       int(btn_size), int(btn_size));
+                      
+    m_directionnal_wheel_tex = irr_driver->getTexture(FileManager::GUI, 
+                                              "android/directionnal_wheel.png");
+    m_pause_tex = irr_driver->getTexture(FileManager::GUI, "android/pause.png");
+    m_nitro_tex = irr_driver->getTexture(FileManager::GUI, "android/nitro.png");
+    m_nitro_empty_tex = irr_driver->getTexture(FileManager::GUI, 
+                                                     "android/nitro_empty.png");
+    m_wing_mirror_tex = irr_driver->getTexture(FileManager::GUI, 
+                                                     "android/wing_mirror.png");
+    m_thunderbird_reset_tex = irr_driver->getTexture(FileManager::GUI, 
+                                               "android/thunderbird_reset.png");
+    m_drift_tex = irr_driver->getTexture(FileManager::GUI, "android/drift.png");
+    m_bg_button_tex = irr_driver->getTexture(FileManager::GUI, 
+                                                  "android/blur_bg_button.png");
+    m_bg_button_focus_tex = irr_driver->getTexture(FileManager::GUI, 
+                                            "android/blur_bg_button_focus.png");
 
 } // initMultitouchSteering
-
 
 //-----------------------------------------------------------------------------
 /** Draws the buttons for multitouch steering.
@@ -156,8 +180,7 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
 
         if (button->type == MultitouchButtonType::BUTTON_STEERING)
         {
-            video::ITexture* btn_texture = irr_driver->getTexture(
-                            FileManager::GUI, "android/directionnal_wheel.png");
+            video::ITexture* btn_texture = m_directionnal_wheel_tex;
             core::rect<s32> coords(pos_zero, btn_texture->getSize());
             draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
 
@@ -178,7 +201,12 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
             bool can_be_pressed = true;
             video::ITexture* btn_texture = NULL;
 
-            if (button->type == MultitouchButtonType::BUTTON_FIRE)
+            switch (button->type)
+            {
+            case MultitouchButtonType::BUTTON_ESCAPE:
+                btn_texture = m_pause_tex;
+                break;
+            case MultitouchButtonType::BUTTON_FIRE:
             {
                 const Powerup* powerup = kart->getPowerup();
                 if (powerup->getType() != PowerupManager::POWERUP_NOTHING &&
@@ -191,51 +219,39 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
                     can_be_pressed = false;
                     btn_texture = NULL;
                 }
+                break;
             }
-            else
+            case MultitouchButtonType::BUTTON_NITRO:
             {
-                std::string name = "gui_lock.png";
-
-                switch (button->type)
+                if (kart->getEnergy() > 0)
                 {
-                case MultitouchButtonType::BUTTON_ESCAPE:
-                    name = "android/pause.png";
-                    break;
-                case MultitouchButtonType::BUTTON_NITRO:
-                    if (kart->getEnergy() > 0)
-                    {
-                        name = "android/nitro.png";
-                    }
-                    else
-                    {
-                        can_be_pressed = false;
-                        name = "android/nitro_empty.png";
-                    }
-                    break;
-                case MultitouchButtonType::BUTTON_LOOK_BACKWARDS:
-                    name = "android/wing_mirror.png";
-                    break;
-                case MultitouchButtonType::BUTTON_RESCUE:
-                    name = "android/thunderbird_reset.png";
-                    break;
-                case MultitouchButtonType::BUTTON_SKIDDING:
-                    name = "android/drift.png";
-                    break;
-                default:
-                    break;
+                    btn_texture = m_nitro_tex;
                 }
-
-                btn_texture = irr_driver->getTexture(FileManager::GUI, name);
+                else
+                {
+                    can_be_pressed = false;
+                    btn_texture = m_nitro_empty_tex;
+                }
+                break;
+            }
+            case MultitouchButtonType::BUTTON_LOOK_BACKWARDS:
+                btn_texture = m_wing_mirror_tex;
+                break;
+            case MultitouchButtonType::BUTTON_RESCUE:
+                btn_texture = m_thunderbird_reset_tex;
+                break;
+            case MultitouchButtonType::BUTTON_SKIDDING:
+                btn_texture = m_drift_tex;
+                break;
+            default:
+                break;
             }
 
             if (btn_texture)
             {
-                std::string bg_name = (can_be_pressed && button->pressed) ?
-                                       "android/blur_bg_button_focus.png" :
-                                       "android/blur_bg_button.png";
-
-                video::ITexture* btn_bg;
-                btn_bg = irr_driver->getTexture(FileManager::GUI, bg_name);
+                video::ITexture* btn_bg = (can_be_pressed && button->pressed) ?
+                                                        m_bg_button_focus_tex : 
+                                                        m_bg_button_tex;
                 core::rect<s32> coords_bg(pos_zero, btn_bg->getSize());
                 draw2DImage(btn_bg, btn_pos_bg, coords_bg, NULL, NULL, true);                
 
@@ -243,33 +259,29 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
                 draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
             }
 
-            if (button->type == MultitouchButtonType::BUTTON_NITRO)
+            if (button->type == MultitouchButtonType::BUTTON_NITRO &&
+                m_race_gui != NULL)
             {
                 float scale = UserConfigParams::m_multitouch_scale *
                     (float)(irr_driver->getActualScreenSize().Height) / 720.0f;
 
-                if (m_race_gui != NULL)
-                {
-                    m_race_gui->drawEnergyMeter(button->x + button->width * 1.15f,
-                                                button->y + button->height * 1.35f,
-                                                kart, viewport,
-                                                core::vector2df(scale, scale));
-                }
+                m_race_gui->drawEnergyMeter(button->x + button->width * 1.15f,
+                                            button->y + button->height * 1.35f,
+                                            kart, viewport,
+                                            core::vector2df(scale, scale));
             }
-            else if (button->type == MultitouchButtonType::BUTTON_FIRE)
+            else if (button->type == MultitouchButtonType::BUTTON_FIRE &&
+                     kart->getPowerup()->getNum() > 1)
             {
-                if (kart->getPowerup()->getNum() > 1)
-                {
-                    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-                    core::rect<s32> btn_pos((int)(button->x),
-                                            (int)(button->y),
-                                            (int)(button->x + button->width/2),
-                                            (int)(button->y + button->height/2));
-                    font->setScale(UserConfigParams::m_multitouch_scale);
-                    font->draw(core::stringw(L"+"), btn_pos,
-                               video::SColor(255, 255, 255, 255));
-                    font->setScale(1.0f);
-                }
+                gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+                core::rect<s32> pos((int)(button->x),
+                                    (int)(button->y),
+                                    (int)(button->x + button->width/2),
+                                    (int)(button->y + button->height/2));
+                font->setScale(UserConfigParams::m_multitouch_scale);
+                font->draw(core::stringw(L"+"), pos,
+                           video::SColor(255, 255, 255, 255));
+                font->setScale(1.0f);
             }
         }
     }
