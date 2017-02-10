@@ -91,12 +91,12 @@ void RaceGUIMultitouch::initMultitouchSteering()
 
     const int w = irr_driver->getActualScreenSize().Width;
     const int h = irr_driver->getActualScreenSize().Height;
-    const float btn_size = 0.1f * h * scale;
+    const float btn_size = 0.125f * h * scale;
     const float btn2_size = 0.35f * h * scale;
-    const float margin = 0.1f * h * scale;
+    const float margin = 0.075f * h * scale;
     const float top_margin = 0.3f * h;
     const float col_size = (btn_size + margin);
-    const float small_ratio = 0.6f;
+    const float small_ratio = 0.75f;
 
     m_minimap_bottom = (unsigned int)(h - 2 * col_size);
 
@@ -146,39 +146,39 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
 
         core::rect<s32> btn_pos(button->x, button->y, button->x + button->width,
                                 button->y + button->height);
+                                
+        core::rect<s32> btn_pos_bg((int)(button->x - button->width * 0.2f),
+                                   (int)(button->y - button->height * 0.2f),
+                                   (int)(button->x + button->width * 1.2f),
+                                   (int)(button->y + button->height * 1.2f));
+                                   
+        const core::position2d<s32> pos_zero = core::position2d<s32>(0,0);
 
         if (button->type == MultitouchButtonType::BUTTON_STEERING)
         {
             video::ITexture* btn_texture = irr_driver->getTexture(
-                                            FileManager::GUI, "blue_plus.png");
-            core::rect<s32> coords(core::position2d<s32>(0,0),
-                                   btn_texture->getSize());
-
+                            FileManager::GUI, "android/directionnal_wheel.png");
+            core::rect<s32> coords(pos_zero, btn_texture->getSize());
             draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
 
-            float x = (float)(button->x) + (float)(button->width) / 2.0f *
-                                                        (button->axis_x + 1.0f);
-            float y = (float)(button->y) + (float)(button->height) / 2.0f *
-                                                        (button->axis_y + 1.0f);
-            float w = (float)(button->width) / 20.0f;
-            float h = (float)(button->height) / 20.0f;
+            // float x = (float)(button->x) + (float)(button->width) / 2.0f *
+            //                                          (button->axis_x + 1.0f);
+            // float y = (float)(button->y) + (float)(button->height) / 2.0f *
+            //                                          (button->axis_y + 1.0f);
+            // float w = (float)(button->width) / 20.0f;
+            // float h = (float)(button->height) / 20.0f;
 
-            core::rect<s32> pos2(int(round(x - w)), int(round(y - h)),
-                                 int(round(x + w)), int(round(y + h)) );
+            // core::rect<s32> pos2(int(round(x - w)), int(round(y - h)),
+            //                      int(round(x + w)), int(round(y + h)));
 
-            draw2DImage(btn_texture, pos2, coords, NULL, NULL, true);
+            // draw2DImage(btn_texture, pos2, coords, NULL, NULL, true);
         }
         else
         {
             bool can_be_pressed = true;
             video::ITexture* btn_texture = NULL;
 
-            if (button->type == MultitouchButtonType::BUTTON_SKIDDING)
-            {
-                btn_texture = irr_driver->getTexture(FileManager::TEXTURE,
-                                                     "skid-particle1.png");
-            }
-            else if (button->type == MultitouchButtonType::BUTTON_FIRE)
+            if (button->type == MultitouchButtonType::BUTTON_FIRE)
             {
                 const Powerup* powerup = kart->getPowerup();
                 if (powerup->getType() != PowerupManager::POWERUP_NOTHING &&
@@ -189,6 +189,7 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
                 else
                 {
                     can_be_pressed = false;
+                    btn_texture = NULL;
                 }
             }
             else
@@ -198,19 +199,27 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
                 switch (button->type)
                 {
                 case MultitouchButtonType::BUTTON_ESCAPE:
-                    name = "back.png";
-                    break;
-                case MultitouchButtonType::BUTTON_FIRE:
-                    name = "banana.png";
+                    name = "android/pause.png";
                     break;
                 case MultitouchButtonType::BUTTON_NITRO:
-                    name = "nitro.png";
+                    if (kart->getEnergy() > 0)
+                    {
+                        name = "android/nitro.png";
+                    }
+                    else
+                    {
+                        can_be_pressed = false;
+                        name = "android/nitro_empty.png";
+                    }
                     break;
                 case MultitouchButtonType::BUTTON_LOOK_BACKWARDS:
-                    name = "down.png";
+                    name = "android/wing_mirror.png";
                     break;
                 case MultitouchButtonType::BUTTON_RESCUE:
-                    name = "restart.png";
+                    name = "android/thunderbird_reset.png";
+                    break;
+                case MultitouchButtonType::BUTTON_SKIDDING:
+                    name = "android/drift.png";
                     break;
                 default:
                     break;
@@ -219,37 +228,30 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
                 btn_texture = irr_driver->getTexture(FileManager::GUI, name);
             }
 
-            if (can_be_pressed && button->pressed)
-            {
-                core::rect<s32> pos2((int)(button->x - button->width * 0.2f),
-                                     (int)(button->y - button->height * 0.2f),
-                                     (int)(button->x + button->width * 1.2f),
-                                     (int)(button->y + button->height * 1.2f));
-
-                video::ITexture* pressed = irr_driver->getTexture(
-                                        FileManager::GUI, "icons-frame.png");
-                core::rect<s32> coords(core::position2d<s32>(0,0),
-                                       pressed->getSize());
-
-                draw2DImage(pressed, pos2, coords, NULL, NULL, true);
-            }
-
             if (btn_texture)
             {
-                core::rect<s32> coords(core::position2d<s32>(0,0),
-                                       btn_texture->getSize());
+                std::string bg_name = (can_be_pressed && button->pressed) ?
+                                       "android/blur_bg_button_focus.png" :
+                                       "android/blur_bg_button.png";
+
+                video::ITexture* btn_bg;
+                btn_bg = irr_driver->getTexture(FileManager::GUI, bg_name);
+                core::rect<s32> coords_bg(pos_zero, btn_bg->getSize());
+                draw2DImage(btn_bg, btn_pos_bg, coords_bg, NULL, NULL, true);                
+
+                core::rect<s32> coords(pos_zero, btn_texture->getSize());
                 draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
             }
 
             if (button->type == MultitouchButtonType::BUTTON_NITRO)
             {
                 float scale = UserConfigParams::m_multitouch_scale *
-                    (float)(irr_driver->getActualScreenSize().Height) / 1600.0f;
+                    (float)(irr_driver->getActualScreenSize().Height) / 720.0f;
 
                 if (m_race_gui != NULL)
                 {
-                    m_race_gui->drawEnergyMeter(button->x + button->width,
-                                                button->y + button->height,
+                    m_race_gui->drawEnergyMeter(button->x + button->width * 1.15f,
+                                                button->y + button->height * 1.35f,
                                                 kart, viewport,
                                                 core::vector2df(scale, scale));
                 }
