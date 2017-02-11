@@ -101,13 +101,7 @@ to just run:
     adding few lines to object pass shader, but we should rather try to find the
     real reason.
 
-4.  Explosion effect has poor performance and causes fps drop for a while.
-    Though it can be easily tweaked, so that less particles per second is
-    generated.
-
-5.  Touch steering needs nice button icons.
-
-6.  We use "exit(0)" at the end of main function. We shouldn't do it and we
+4.  We use "exit(0)" at the end of main function. We shouldn't do it and we
     should just return from the main function. But STK uses some global
     variables and their values are remembered when the game is restarted. We
     should properly clear them or re-initialize on startup. Using the "exit(0)"
@@ -115,20 +109,18 @@ to just run:
     It seems to affect only Android 5.0. More information about the crash:
     https://code.google.com/p/android/issues/detail?id=160824
 
-7.  STK crashes on Qualcomm with Adreno 305 when trying to draw menu interface.
+5.  STK crashes on Qualcomm with Adreno 305 when trying to draw menu interface.
     Backtrace shows glDrawElements function, and internally crashed in vbo
     allocation.
 
-8.  STK crashes on startup on some devices when aarch64 build is made using
+6.  STK crashes on startup on some devices when aarch64 build is made using
     Android r13 NDK. The r13 version has rather big modifications (it uses clang
     instead of gcc by default). This is probably a bug in NDK/compiler/OS, but
     for this reason using NDK r12 for 64-bit arm compilation is preferred.
 
-9.  Angelscript doesn't have full support for aarch64 builds, so that scripting
+7.  Angelscript doesn't have full support for aarch64 builds, so that scripting
     won't work on this platform.
-
-10. Steering with accelerometer is not available yet. It needs some work to do
-    it properly because tablets have different screen orientation than phones,
-    so that they receive events from different axies during rotating the device.
-    As far as I see it's not possible to read default screen orientation using
-    NDK functions.
+    
+8.  Turning left/right using accelerometer is available, but at this stage the
+    default screen orientation is not automatically detected and user must 
+    manually choose if he needs "phone" or "tablet" accelerometer.
