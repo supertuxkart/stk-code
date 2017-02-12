@@ -710,7 +710,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
 void ParticleEmitter::addHeightMapAffector(Track* t)
 {
     
-    if (m_is_glsl)
+    if (m_is_glsl && CVS->isARBTextureBufferObjectUsable())
     {
         const Vec3* aabb_min;
         const Vec3* aabb_max;

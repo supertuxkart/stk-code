@@ -33,7 +33,8 @@ TextureShaderBase::BindFunction TextureShaderBase::m_all_bind_functions[] =
   /* ST_VOLUME_LINEAR_FILTERED         */ &TextureShaderBase::bindTextureVolume,
   /* ST_NEARED_CLAMPED_FILTERED        */ &TextureShaderBase::bindTextureNearestClamped,
   /* ST_BILINEAR_CLAMPED_FILTERED      */ &TextureShaderBase::bindTextureBilinearClamped,
-  /* ST_SEMI_TRILINEAR                 */ &TextureShaderBase::bindTextureSemiTrilinear
+  /* ST_SEMI_TRILINEAR                 */ &TextureShaderBase::bindTextureSemiTrilinear,
+  /* ST_TEXTURE_BUFFER                 */ &TextureShaderBase::bindTextureBuffer
 };
 
 GLuint TextureShaderBase::m_all_texture_types[] =
@@ -46,7 +47,8 @@ GLuint TextureShaderBase::m_all_texture_types[] =
   /* ST_VOLUME_LINEAR_FILTERED         */ GL_TEXTURE_3D,
   /* ST_NEARED_CLAMPED_FILTERED        */ GL_TEXTURE_2D,
   /* ST_BILINEAR_CLAMPED_FILTERED      */ GL_TEXTURE_2D,
-  /* ST_SEMI_TRILINEAR                 */ GL_TEXTURE_2D
+  /* ST_SEMI_TRILINEAR                 */ GL_TEXTURE_2D,
+  /* ST_TEXTURE_BUFFER                 */ GL_TEXTURE_BUFFER
 };
 
 // ----------------------------------------------------------------------------
@@ -116,6 +118,11 @@ void TextureShaderBase::bindTextureNearestClamped(GLuint texture_unit,
 }   // bindTextureNearestClamped
 
 // ----------------------------------------------------------------------------
+void TextureShaderBase::bindTextureBuffer(GLuint texture_unit, GLuint tex_id)
+{
+    glActiveTexture(GL_TEXTURE0 + texture_unit);
+    glBindTexture(GL_TEXTURE_BUFFER, tex_id);
+}   // bindTextureBuffer
 
 // ----------------------------------------------------------------------------
 void TextureShaderBase::bindTextureBilinear(GLuint texture_unit, GLuint tex)
@@ -239,6 +246,8 @@ GLuint TextureShaderBase::createSamplers(SamplerTypeNew sampler_type)
         return createBilinearClampedSampler();
     case ST_SEMI_TRILINEAR:
         return createSemiTrilinearSampler();
+    case ST_TEXTURE_BUFFER:
+        return 0;
     default:
         assert(false);
         return 0;
