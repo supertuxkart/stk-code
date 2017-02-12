@@ -56,7 +56,7 @@ public:
     }   // bindVertexArray
 };   // SkyboxShader
 
-
+#if !defined(USE_GLES2)
 class SpecularIBLGenerator : public TextureShader<SpecularIBLGenerator, 2,
                                                   core::matrix4, float >
 {
@@ -70,7 +70,7 @@ public:
                            1, "samples", ST_TEXTURE_BUFFER);
     }
 };   // SpecularIBLGenerator
-
+#endif
 
 namespace {
     // ----------------------------------------------------------------------------

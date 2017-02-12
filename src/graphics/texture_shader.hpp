@@ -43,8 +43,12 @@ enum SamplerTypeNew
     ST_NEARED_CLAMPED_FILTERED,
     ST_BILINEAR_CLAMPED_FILTERED,
     ST_SEMI_TRILINEAR,
+#ifdef USE_GLES2
+    ST_MAX = ST_SEMI_TRILINEAR
+#else
     ST_TEXTURE_BUFFER,
     ST_MAX = ST_TEXTURE_BUFFER
+#endif
 };   // SamplerTypeNew
 
 // ============================================================================

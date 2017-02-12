@@ -91,6 +91,7 @@ public:
 
 // ============================================================================
 /** */
+#if !defined(USE_GLES2)
 class HeightmapSimulationShader :
                              public TextureShader<HeightmapSimulationShader, 1,
                                                   core::matrix4, int, int,
@@ -110,6 +111,7 @@ public:
 
 
 };   // class HeightmapSimulationShader
+#endif
 
 // ============================================================================
 
