@@ -43,7 +43,8 @@ enum SamplerTypeNew
     ST_NEARED_CLAMPED_FILTERED,
     ST_BILINEAR_CLAMPED_FILTERED,
     ST_SEMI_TRILINEAR,
-    ST_MAX = ST_SEMI_TRILINEAR
+    ST_TEXTURE_BUFFER,
+    ST_MAX = ST_TEXTURE_BUFFER
 };   // SamplerTypeNew
 
 // ============================================================================
@@ -68,6 +69,7 @@ protected:
     static void   bindTextureShadow(GLuint tex_unit, GLuint tex_id);
     static void   bindTrilinearClampedArrayTexture(GLuint tex_unit, GLuint tex_id);
     static void   bindTextureVolume(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureBuffer(GLuint tex_unit, GLuint tex_id);
 
     GLuint        createSamplers(SamplerTypeNew sampler_type);
 private:
@@ -179,7 +181,8 @@ public:
         {
             glActiveTexture(GL_TEXTURE0 + m_texture_units[N]);
             glBindTexture(m_texture_type[N], tex_id);
-            glBindSampler(m_texture_units[N], m_sampler_ids[N]);
+            if (m_sampler_ids[N] != 0)
+                glBindSampler(m_texture_units[N], m_sampler_ids[N]);
         }
         else
         {

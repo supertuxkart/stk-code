@@ -224,15 +224,10 @@ void STKConfig::getAllData(const XMLNode * root)
             }
             m_score_increase.push_back(points);
         }
-        if(m_max_karts>(gp_node->getNumNodes()))
+        if (m_max_karts > int(gp_node->getNumNodes()))
         {
             Log::error("StkConfig", "Not enough grand-prix ranking nodes:");
-
-            for(unsigned int i=0; i<(m_max_karts-(gp_node->getNumNodes())); i++)
-            {
-                int points=0;
-                m_score_increase.push_back(points);
-            }
+            m_score_increase.resize(m_max_karts, 0);
         }
     }
 

@@ -44,6 +44,7 @@ private:
     bool hasMultiDrawIndirect;
     bool hasTextureFilterAnisotropic;
     bool hasTextureSwizzle;
+    bool hasTextureBufferObject;
 
 #if defined(USE_GLES2)
     bool hasBGRA;
@@ -84,6 +85,7 @@ public:
     bool isARBExplicitAttribLocationUsable() const;
     bool isEXTTextureFilterAnisotropicUsable() const;
     bool isARBTextureSwizzleUsable() const;
+    bool isARBTextureBufferObjectUsable() const;
 
 #if defined(USE_GLES2)
     bool isEXTTextureFormatBGRA8888Usable() const;

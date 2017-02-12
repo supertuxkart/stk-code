@@ -644,13 +644,7 @@ btTransform LinearWorld::getRescueTransform(unsigned int index) const
 
     // First rotate into the quad's plane (q1), then rotate so that the kart points in the
     // right direction (q2).
-    btQuaternion q1;
-    if (normal.cross(Vec3(0, 1, 0)).length() > 0)
-    {
-         q1 = btQuaternion(-normal.cross(Vec3(0, 1, 0)), normal.angle(Vec3(0, 1, 0)));
-    }
-    else q1 = btQuaternion(Vec3(0,1,0),0);
-
+    btQuaternion q1 = shortestArcQuat(Vec3(0, 1, 0), normal);
     // First apply the heading change, than the 'parallelisation' to the plane
     btQuaternion q2(btVector3(0,1,0), Track::getCurrentTrack()->getAngle(index));
     pos.setRotation(q1*q2);

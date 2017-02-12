@@ -91,13 +91,13 @@ public:
 
 // ============================================================================
 /** */
-class HeightmapSimulationShader : public Shader <HeightmapSimulationShader,
-                                                 core::matrix4, int, int,
-                                                 float,float,float,float,float>
+class HeightmapSimulationShader :
+                             public TextureShader<HeightmapSimulationShader, 1,
+                                                  core::matrix4, int, int,
+                                                  float, float, float, float,
+                                                  float>
 {
 public:
-    GLuint m_TU_heightmap;
-
     HeightmapSimulationShader()
     {
         const char *varyings[] = {"new_particle_position", "new_lifetime",
@@ -105,8 +105,7 @@ public:
         loadTFBProgram("particlesimheightmap.vert", varyings, 4);
         assignUniforms("sourcematrix", "dt", "level", "size_increase_factor",
                        "track_x", "track_x_len", "track_z", "track_z_len");
-        m_TU_heightmap = 2;
-        assignTextureUnit(m_TU_heightmap, "heightmap");
+        assignSamplerNames(0, "heightmap",  ST_TEXTURE_BUFFER);
     }   // HeightmapSimulationShader
 
 
@@ -203,6 +202,7 @@ void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &h
     glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
     glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, heighmapbuffer);
     glBindBuffer(GL_TEXTURE_BUFFER, 0);
+    glBindTexture(GL_TEXTURE_BUFFER, 0);
 
     delete[] hm_array;
 #endif
@@ -475,10 +475,9 @@ void ParticleSystemProxy::simulate()
     {
 #if !defined(USE_GLES2)
         HeightmapSimulationShader::getInstance()->use();
-        glActiveTexture(GL_TEXTURE0 + HeightmapSimulationShader::getInstance()->m_TU_heightmap);
-        glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
+        HeightmapSimulationShader::getInstance()->setTextureUnits(heightmaptexture);
         HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
-#endif        
+#endif
     }
     else
     {

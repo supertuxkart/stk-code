@@ -140,6 +140,7 @@ void CheckLine::reset(const Track &track)
 // ----------------------------------------------------------------------------
 void CheckLine::resetAfterKartMove(unsigned int kart_index)
 {
+    if (m_previous_position.empty()) return;
     AbstractKart *kart = World::getWorld()->getKart(kart_index);
     m_previous_position[kart_index] = kart->getXYZ();
 }   // resetAfterKartMove
