@@ -569,8 +569,9 @@ void* STKHost::mainLoop(void* self)
                 TransportAddress stk_addr(peer->getAddress());
 #ifdef DEBUG_MESSAGE_CONTENT
                 Log::verbose("NetworkManager",
-                             "Message, Sender : %s, message:",
-                             stk_addr.toString(/*show port*/false).c_str());
+                             "Message, Sender : %s time %f message:",
+                             stk_addr.toString(/*show port*/false).c_str(),
+                             StkTime::getRealTime());
                 Log::verbose("NetworkManager", "%s",
                              stk_event->data().getLogMessage().c_str());
 #endif

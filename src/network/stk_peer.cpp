@@ -63,8 +63,8 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable)
 {
     data->setToken(m_client_server_token);
     TransportAddress a(m_enet_peer->address);
-    Log::verbose("STKPeer", "sending packet of size %d to %s",
-                 data->size(), a.toString().c_str());
+    Log::verbose("STKPeer", "sending packet of size %d to %s at %f",
+                 data->size(), a.toString().c_str(),StkTime::getRealTime());
          
     ENetPacket* packet = enet_packet_create(data->getData(),
                                             data->getTotalSize(),
