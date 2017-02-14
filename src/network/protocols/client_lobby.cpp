@@ -679,29 +679,10 @@ void ClientLobby::raceFinished(Event* event)
                "Server notified that the race is finished.");
 
     // stop race protocols
-    Protocol* protocol = ProtocolManager::getInstance()
-                       ->getProtocol(PROTOCOL_CONTROLLER_EVENTS);
-    if (protocol)
-        ProtocolManager::getInstance()->requestTerminate(protocol);
-    else
-        Log::error("ClientLobby",
-                   "No controller events protocol registered.");
-
-    protocol = ProtocolManager::getInstance() 
-             ->getProtocol(PROTOCOL_KART_UPDATE);
-    if (protocol)
-        ProtocolManager::getInstance()->requestTerminate(protocol);
-    else
-        Log::error("ClientLobby",
-                   "No kart update protocol registered.");
-
-    protocol = ProtocolManager::getInstance()
-             ->getProtocol(PROTOCOL_GAME_EVENTS);
-    if (protocol)
-        ProtocolManager::getInstance()->requestTerminate(protocol);
-    else
-        Log::error("ClientLobby",
-                   "No game events protocol registered.");
+    ProtocolManager *pm = ProtocolManager::getInstance();
+    pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
+    pm->findAndTerminate(PROTOCOL_KART_UPDATE);
+    pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
 
     // finish the race
     WorldWithRank* ranked_world = (WorldWithRank*)(World::getWorld());

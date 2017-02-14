@@ -37,7 +37,6 @@ Protocol::Protocol(ProtocolType type, CallbackObject* callback_object)
     m_callback_object       = callback_object;
     m_type                  = type;
     m_state                 = PROTOCOL_STATE_INITIALISING;
-    m_id                    = 0;
     m_handle_connections    = false;
     m_handle_disconnections = false;
 }   // Protocol
@@ -106,20 +105,6 @@ void Protocol::requestTerminate()
 {
     ProtocolManager::getInstance()->requestTerminate(this);
 }   // requestTerminate
-
-// ----------------------------------------------------------------------------
-/** Finds a protocol with the given type and requests it to be terminated.
- *  If no such protocol exist, log an error message.
- *  \param type The protocol type to delete.
- */
-void Protocol::findAndTerminateProtocol(ProtocolType type)
-{
-    Protocol* protocol = ProtocolManager::getInstance()->getProtocol(type);
-    if (protocol)
-        protocol->requestTerminate();
-    else
-        Log::error("Protocol", "No protocol %d registered.", type);
-}   // findAndTerminateProtocol
 
 // ----------------------------------------------------------------------------
 /** Sends a message to all peers, inserting the peer's token into the message.

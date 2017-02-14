@@ -54,7 +54,8 @@ enum ProtocolRequestType
 
 // ----------------------------------------------------------------------------
 /** \struct ProtocolRequest
- *  \brief Represents a request to do an action about a protocol.
+ *  \brief Represents a request to do an action about a protocol, e.g. to
+ *         start, pause, unpause or terminate a protocol.
  */
 class ProtocolRequest
 {
@@ -97,41 +98,89 @@ class ProtocolManager : public AbstractSingleton<ProtocolManager>,
     friend class AbstractSingleton<ProtocolManager>;
 private:
 
-    /** Contains the running protocols.
-     *  This stores the protocols that are either running or paused, their
-     *  state and their unique id. */
-    Synchronised<std::vector<Protocol*> >m_protocols;
+    /** A simple class that stores all protocols of a certain type. While
+     *  many protocols have at most one instance running, some (e.g. 
+     *  GetPublicAddress, ConntectToPeer, ...) can have several instances
+     *  active at the same time. */
+    class OneProtocolType
+    {
+    private:
+        Synchronised< std::vector<Protocol*> > m_protocols;
+    public:
+        void removeProtocol(Protocol *p);
+        void requestTerminateAll();
+        bool notifyEvent(Event *event);
+        void update(float dt, bool async);
+        void abort();
+        // --------------------------------------------------------------------
+        /** Returns the first protocol of a given type. It is assumed that
+         *  there is a protocol of that type. */
+        Protocol *getFirstProtocol() { return m_protocols.getData()[0]; }
+        // --------------------------------------------------------------------
+        /** Returns if this protocol class handles connect events. Protocols
+         *  of the same class either all handle a connect event, or none, so
+         *  only the first protocol is actually tested. */
+        bool handleConnects() const
+        {
+            return !m_protocols.getData().empty() &&
+                    m_protocols.getData()[0]->handleConnects();
+        }   // handleConnects
+        // --------------------------------------------------------------------
+        /** Returns if this protocol class handles disconnect events. Protocols
+        *  of the same class either all handle a disconnect event, or none, so
+        *  only the first protocol is actually tested. */
+        bool handleDisconnects() const
+        {
+            return !m_protocols.getData().empty() &&
+                m_protocols.getData()[0]->handleDisconnects();
+        }   // handleDisconnects
+        // --------------------------------------------------------------------
+        /** Locks access to this list of all protocols of a certain type. */
+        void lock() { m_protocols.lock(); }
+        // --------------------------------------------------------------------
+        /** Locks access to this list of all protocols of a certain type. */
+        void unlock() { m_protocols.unlock(); }
+        // --------------------------------------------------------------------
+        void addProtocol(Protocol *p)
+        {
+            m_protocols.getData().push_back(p); 
+        }   // addProtocol
+        // --------------------------------------------------------------------
+        /** Returns if there are no protocols of this type registered. */
+        bool isEmpty() const { return m_protocols.getData().empty(); }
+        // --------------------------------------------------------------------
 
+    };   // class OneProtocolType
+
+    // ------------------------------------------------------------------------
+    
+    /** The list of all protocol types, each one containing a (potentially
+     *  empty) list of protocols. */
+    std::vector<OneProtocolType> m_all_protocols;
+
+    /** A list of network events - messages, disconnect and disconnects. */
     typedef std::list<Event*> EventList;
 
+    /** Contains the network events to pass synchronously to protocols
+     *  (i.e. from the main thread). */
+    Synchronised<EventList> m_sync_events_to_process;
+
     /** Contains the network events to pass asynchronously to protocols
-     *  (i.e. from the separate ProtocolManager thread). */
-    Synchronised<EventList> m_events_to_process;
+    *  (i.e. from the separate ProtocolManager thread). */
+    Synchronised<EventList> m_async_events_to_process;
 
     /** Contains the requests to start/pause etc... protocols. */
     Synchronised< std::vector<ProtocolRequest> > m_requests;
 
-    /*! \brief The next id to assign to a protocol.
-     * This value is incremented by 1 each time a protocol is started.
-     * If a protocol has an id lower than this value, it means that it has
-     * been formerly started.
-     */
-    Synchronised<uint32_t> m_next_protocol_id;
-
     /** When set to true, the main thread will exit. */
     Synchronised<bool> m_exit;
 
-    // mutexes:
-    /*! Used to ensure that the protocol vector is used thread-safely.   */
-    pthread_mutex_t m_asynchronous_protocols_mutex;
-
     /*! Asynchronous update thread.*/
-    pthread_t* m_asynchronous_update_thread;
+    pthread_t m_asynchronous_update_thread;
 
                  ProtocolManager();
     virtual     ~ProtocolManager();
     static void* mainLoop(void *data);
-    uint32_t     getNextProtocolId();
     bool         sendEvent(Event* event);
 
     virtual void startProtocol(Protocol *protocol);
@@ -141,15 +190,21 @@ private:
     virtual void unpauseProtocol(Protocol *protocol);
 
 public:
-    virtual void      abort();
-    virtual void      propagateEvent(Event* event);
-    virtual uint32_t  requestStart(Protocol* protocol);
-    virtual void      requestPause(Protocol* protocol);
-    virtual void      requestUnpause(Protocol* protocol);
-    virtual void      requestTerminate(Protocol* protocol);
-    virtual void      update(float dt);
-    virtual Protocol* getProtocol(uint32_t id);
-    virtual Protocol* getProtocol(ProtocolType type);
+    void      abort();
+    void      propagateEvent(Event* event);
+    Protocol* getProtocol(ProtocolType type);
+    void      requestStart(Protocol* protocol);
+    void      requestPause(Protocol* protocol);
+    void      requestUnpause(Protocol* protocol);
+    void      requestTerminate(Protocol* protocol);
+    void      findAndTerminate(ProtocolType type);
+    void      update(float dt);
+    // ------------------------------------------------------------------------
+    const pthread_t & getThreadID() const
+    {
+        return m_asynchronous_update_thread; 
+    }   // getThreadID
+
 };   // class ProtocolManager
 
 #endif // PROTOCOL_MANAGER_HPP

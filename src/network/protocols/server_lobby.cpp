@@ -279,9 +279,10 @@ void ServerLobby::update(float dt)
             // notify the network world that it is stopped
             RaceEventManager::getInstance()->stop();
             // stop race protocols
-            findAndTerminateProtocol(PROTOCOL_CONTROLLER_EVENTS);
-            findAndTerminateProtocol(PROTOCOL_KART_UPDATE);
-            findAndTerminateProtocol(PROTOCOL_GAME_EVENTS);
+            ProtocolManager *pm = ProtocolManager::getInstance();
+            pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
+            pm->findAndTerminate(PROTOCOL_KART_UPDATE);
+            pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
         }
         break;
     case DONE:

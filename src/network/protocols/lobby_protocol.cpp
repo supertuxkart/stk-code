@@ -135,9 +135,5 @@ void LobbyProtocol::loadWorld()
  */
 void LobbyProtocol::terminateLatencyProtocol()
 {
-    Protocol *p = ProtocolManager::getInstance()
-                ->getProtocol(PROTOCOL_SYNCHRONIZATION);
-    LatencyProtocol *sp = dynamic_cast<LatencyProtocol*>(p);
-    if (sp)
-        sp->requestTerminate();
+    ProtocolManager::getInstance()->findAndTerminate(PROTOCOL_SYNCHRONIZATION);
 }   // stopLatencyProtocol
