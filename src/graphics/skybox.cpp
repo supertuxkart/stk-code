@@ -228,7 +228,7 @@ void Skybox::generateSpecularCubemap()
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-    if (!CVS->isDefferedEnabled() || !CVS->isARBTextureBufferObjectUsable())
+    if (!CVS->isDefferedEnabled())
         return;
 
 #if !defined(USE_GLES2)
