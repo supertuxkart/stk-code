@@ -185,8 +185,7 @@ public:
         {
             glActiveTexture(GL_TEXTURE0 + m_texture_units[N]);
             glBindTexture(m_texture_type[N], tex_id);
-            if (m_sampler_ids[N] != 0)
-                glBindSampler(m_texture_units[N], m_sampler_ids[N]);
+            glBindSampler(m_texture_units[N], m_sampler_ids[N]);
         }
         else
         {
