@@ -709,7 +709,6 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
 
 void ParticleEmitter::addHeightMapAffector(Track* t)
 {
-    
     if (m_is_glsl)
     {
         const Vec3* aabb_min;

@@ -865,6 +865,11 @@ bool handleStaticAction(int key)
     {
         handleContextMenuAction(DEBUG_GUI_CAM_NORMAL);
     }
+    else if (key == KEY_F3)
+    {
+        STKTexManager::getInstance()->reloadTexture("");
+        return true;
+    }
     // TODO: create more keyboard shortcuts
 
     return false;

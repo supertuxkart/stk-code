@@ -82,6 +82,8 @@ private:
     bool areAllKartsConfirmed() const;
     int getNumConfirmedKarts();
     void updateKartViewsLayout();
+    void changeTeam(int player_id, SoccerTeam team);
+    void prepareGame();
 };
 
 #endif // HEADER_SOCCER_SETUP_SCREEN_HPP

@@ -1,0 +1,126 @@
+================================================================================
+
+ SUPERTUXKART
+
+================================================================================
+
+
+
+--------------------------------------------------------------------------------
+ SYSTEM REQUIREMENTS
+--------------------------------------------------------------------------------
+
+To run SuperTuxKart on Android, you need a device that meets following
+requirements:
+
+- Android 4.4 or later
+- Processor compatible with armv7 or x86
+- GPU that supports OpenGL ES 3.0
+- 1 GB RAM (STK uses ~150 MB in minimal configuration)
+- 300 MB of free space on internal storage
+- Touch screen or external keyboard
+
+
+
+--------------------------------------------------------------------------------
+ COMPILATION
+--------------------------------------------------------------------------------
+
+The build scripts are designed to run under linux. They may work under cygwin
+after some tweaks, but atm. only linux is supported.
+
+Dependencies list (may be incomplete):
+
+    autoconf, automake, make, python, ant, imagemagick, cmake, vorbis-tools
+
+Additionally some dependencies for optimize_data script:
+
+    advancecomp, libjpeg-progs, optipng
+
+Before compilation you must download the package with dependencies from:
+https://github.com/supertuxkart/dependencies
+and extract it to stk-code/lib. It contains sources of libraries that are used
+in STK, but are not availiable in stk-code repository (curl, freetype, openal).
+
+You need also Android SDK for android-19 platform (the API for Android 4.4) and
+Android NDK (versions r12b and r13b have been tested).
+
+You need to create proper "android-sdk" and "android-ndk" symlinks in the
+directory with Android project, so that the compilation script will have access
+to the SDK and NDK.
+
+These paths can be also set in SDK_PATH and NDK_PATH environmental variables.
+
+Before running the compilation, run the generate_assets script, so that
+selected assets will be copied to "assets" directory, and then included in the
+apk file.
+
+You can select different karts and tracks by setting KARTS and TRACKS variables
+in the generate_assets.sh script at the beginning of file.
+
+When you are creating the assets directory manually, note that the
+directories.txt file is urgently needed and it is used by the application for
+extracting assets.
+
+If the assets directory is already prepared, you can run "./make.sh" command to
+build the project and create an apk file. Note that all arguments are passed to
+the make command, so that you can run "./make.sh -j5" for multi-threaded build.
+
+If you want to prepare a package for particular architecture, you can choose it
+by setting the COMPILE_ARCH environmental variable. At this stage, supported
+architectures are "armv7", "x86" and "aarch64". The default is "armv7".
+
+Basically if all dependencies are installed in the system, it should be enough
+to just run:
+
+    export SDK_PATH=/path/to/your/android/sdk
+    export NDK_PATH=/path/to/your/android/ndk
+    ./generate_assets.sh
+    ./make.sh -j5
+
+
+
+--------------------------------------------------------------------------------
+ KNOWN ISSUES
+--------------------------------------------------------------------------------
+
+1.  At this stage only shader-based (OpenGL ES 3.0) pipeline works. The fixed
+    pipeline (GLES 2.0) could work (it works under linux), but it doesn't look
+    good and is generally broken. It means that it's not possible to run STK on
+    Android 4.2 or older. It is technically possible to do - check GLES context
+    version, load OpenGL functions dynamically using EGL, and if they are not
+    loaded properly, then fallback to GLES 2.0. But these devices may be too
+    slow to run STK anyway.
+
+2.  It never ocurred for me, but it's possible that EGL context is lost in some
+    cases. SuperTuxKart is not designed to re-create all textures at any moment,
+    so this is a "Wontfix", at least for now.
+
+3.  Some bright tracks (Farm, Gran Paradiso) seem to be a bit darker in GLES
+    renderer than in original OpenGL 3.x renderer. It can be easily hacked by
+    adding few lines to object pass shader, but we should rather try to find the
+    real reason.
+
+4.  We use "exit(0)" at the end of main function. We shouldn't do it and we
+    should just return from the main function. But STK uses some global
+    variables and their values are remembered when the game is restarted. We
+    should properly clear them or re-initialize on startup. Using the "exit(0)"
+    is not-that-bad workaround, but it may cause a crash on exit sometimes.
+    It seems to affect only Android 5.0. More information about the crash:
+    https://code.google.com/p/android/issues/detail?id=160824
+
+5.  STK crashes on Qualcomm with Adreno 305 when trying to draw menu interface.
+    Backtrace shows glDrawElements function, and internally crashed in vbo
+    allocation.
+
+6.  STK crashes on startup on some devices when aarch64 build is made using
+    Android r13 NDK. The r13 version has rather big modifications (it uses clang
+    instead of gcc by default). This is probably a bug in NDK/compiler/OS, but
+    for this reason using NDK r12 for 64-bit arm compilation is preferred.
+
+7.  Angelscript doesn't have full support for aarch64 builds, so that scripting
+    won't work on this platform.
+    
+8.  Turning left/right using accelerometer is available, but at this stage the
+    default screen orientation is not automatically detected and user must 
+    manually choose if he needs "phone" or "tablet" accelerometer.

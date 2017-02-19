@@ -84,7 +84,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     const float map_size = 250.0f;
 
     // Check if we have enough space for minimap when touch steering is enabled
-    if (UserConfigParams::m_multitouch_enabled)
+    if (m_multitouch_gui != NULL)
     {
         const float map_bottom = (float)(m_multitouch_gui->getMinimapBottom());
         
@@ -115,7 +115,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     {
         m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
     }
-    else if (UserConfigParams::m_multitouch_enabled)
+    else if (m_multitouch_gui != NULL)
     {
         m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
                                                         m_map_width) * 0.9f);
@@ -190,7 +190,7 @@ void RaceGUIOverworld::renderGlobal(float dt)
     if(!world->isRacePhase()) return;
     if (!m_enabled) return;
 
-    if (!UserConfigParams::m_multitouch_enabled)
+    if (m_multitouch_gui == NULL)
     {
         drawTrophyPoints();
     }
@@ -230,7 +230,10 @@ void RaceGUIOverworld::renderPlayerView(const Camera *camera, float dt)
 
     if(!World::getWorld()->isRacePhase()) return;
 
-    drawPowerupIcons    (kart, viewport, scaling);
+    if (m_multitouch_gui == NULL)
+    {
+        drawPowerupIcons(kart, viewport, scaling);
+    }
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------
@@ -351,7 +354,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             if(draw_at.getX()>right_most) right_most = draw_at.getX();
         }
 
-        if (UserConfigParams::m_multitouch_enabled)
+        if (m_multitouch_gui != NULL)
         {
             m_map_left += m_map_width - (int)right_most;
         }

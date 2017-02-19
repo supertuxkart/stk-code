@@ -206,28 +206,33 @@ void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 
     const unsigned int cur_tex = m_spritebank->getTextureCount() -1;
 #ifndef SERVER_ONLY
-    video::ITexture* tex = m_spritebank->getTexture(cur_tex);
-    glBindTexture(GL_TEXTURE_2D, tex->getOpenGLTextureName());
-    assert(bits->pixel_mode == FT_PIXEL_MODE_GRAY);
-    if (CVS->isARBTextureSwizzleUsable())
+    if (bits->buffer != NULL)
     {
-        glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-            bits->width, bits->rows, GL_RED, GL_UNSIGNED_BYTE, bits->buffer);
+        video::ITexture* tex = m_spritebank->getTexture(cur_tex);
+        glBindTexture(GL_TEXTURE_2D, tex->getOpenGLTextureName());
+        assert(bits->pixel_mode == FT_PIXEL_MODE_GRAY);
+        if (CVS->isARBTextureSwizzleUsable())
+        {
+            glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
+                bits->width, bits->rows, GL_RED, GL_UNSIGNED_BYTE,
+                bits->buffer);
+        }
+        else
+        {
+            const unsigned int size = bits->width * bits->rows;
+            uint8_t* image_data = new uint8_t[size * 4];
+            memset(image_data, 255, size * 4);
+            for (unsigned int i = 0; i < size; i++)
+                image_data[4 * i + 3] = bits->buffer[i];
+            glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
+                bits->width, bits->rows, GL_BGRA, GL_UNSIGNED_BYTE,
+                image_data);
+            delete[] image_data;
+        }
+        if (tex->hasMipMaps())
+            glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
-    else
-    {
-        const unsigned int size = bits->width * bits->rows;
-        uint8_t* image_data = new uint8_t[size * 4];
-        memset(image_data, 255, size * 4);
-        for (unsigned int i = 0; i < size; i++)
-            image_data[4 * i + 3] = bits->buffer[i];
-        glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-            bits->width, bits->rows, GL_BGRA, GL_UNSIGNED_BYTE, image_data);
-        delete[] image_data;
-    }
-    if (tex->hasMipMaps())
-        glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
 #endif
 
     // Store the rectangle of current glyph

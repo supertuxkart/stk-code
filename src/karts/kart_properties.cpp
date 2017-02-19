@@ -754,6 +754,18 @@ float KartProperties::getParachuteDurationOther() const
 }  // getParachuteDurationOther
 
 // ----------------------------------------------------------------------------
+float KartProperties::getParachuteDurationRankMult() const
+{
+    return m_cached_characteristic->getParachuteDurationRankMult();
+}  // getParachuteDurationRankMult
+
+// ----------------------------------------------------------------------------
+float KartProperties::getParachuteDurationSpeedMult() const
+{
+    return m_cached_characteristic->getParachuteDurationSpeedMult();
+}  // getParachuteDurationSpeedMult
+
+// ----------------------------------------------------------------------------
 float KartProperties::getParachuteLboundFraction() const
 {
     return m_cached_characteristic->getParachuteLboundFraction();

@@ -40,7 +40,11 @@ void main(void)
         col = vec4(new_color.r, new_color.g, new_color.b, col.a);
     }
 
+#ifdef GL_ES
+    col.xyz *= color.xyz;
+#else
     col.xyz *= pow(color.xyz, vec3(2.2));
+#endif
     float specmap = texture(SpecMap, uv).g;
     float emitmap = texture(SpecMap, uv).b;
     FragColor = vec4(getLightFactor(col.xyz, vec3(1.), specmap, emitmap), 1.);

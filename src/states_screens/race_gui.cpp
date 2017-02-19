@@ -85,7 +85,7 @@ RaceGUI::RaceGUI()
     const float top_margin = 3.5f * m_font_height;
     
     // Check if we have enough space for minimap when touch steering is enabled
-    if (UserConfigParams::m_multitouch_enabled)
+    if (m_multitouch_gui != NULL)
     {
         const float map_bottom = (float)(m_multitouch_gui->getMinimapBottom());
         
@@ -115,7 +115,7 @@ RaceGUI::RaceGUI()
     {
         m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
     }
-    else if (UserConfigParams::m_multitouch_enabled)
+    else if (m_multitouch_gui != NULL)
     {
         m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
                                                         m_map_width) * 0.95f);
@@ -246,10 +246,9 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     if(!World::getWorld()->isRacePhase()) return;
 
-    drawPowerupIcons(kart, viewport, scaling);
-
-    if (!UserConfigParams::m_multitouch_enabled)
+    if (m_multitouch_gui == NULL)
     {
+        drawPowerupIcons(kart, viewport, scaling);
         drawSpeedEnergyRank(kart, viewport, scaling, dt);
     }
 

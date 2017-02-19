@@ -4,7 +4,7 @@ uniform mat4 sourcematrix;
 uniform int level;
 uniform float size_increase_factor;
 
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout (location = 4) in vec3 particle_position_initial;
 layout (location = 5) in float lifetime_initial;
 layout (location = 6) in vec3 particle_velocity_initial;
@@ -40,14 +40,14 @@ void main(void)
         {
             float dt_from_last_frame = fract(updated_lifetime) * lifetime_initial;
             float coeff = dt_from_last_frame / float(dt);
-            
+
             vec4 previous_frame_position = previous_frame_sourcematrix * vec4(particle_position_initial, 1.0);
             vec4 current_frame_position  = sourcematrix * vec4(particle_position_initial, 1.0);
-            
+
             vec4 updated_initialposition = mix(current_frame_position,
                                                previous_frame_position,
                                                coeff);
-                                                
+
             vec4 updated_initial_velocity = mix(sourcematrix * vec4(particle_velocity_initial, 0.0),
                                                 previous_frame_sourcematrix * vec4(particle_velocity_initial, 0.0),
                                                 coeff);
@@ -56,12 +56,12 @@ void main(void)
             //But the simple formula ( (current_frame_position - previous_frame_position) / dt ) with a constant speed
             //between 2 frames creates visual artifacts when the framerate is low, and a more accurate formula would need
             //more complex computations.
-                                                
+
             new_particle_position = updated_initialposition.xyz + dt_from_last_frame * updated_initial_velocity.xyz;
             new_particle_velocity = updated_initial_velocity.xyz;
-            
+
             new_lifetime = fract(updated_lifetime);
-            new_size = mix(size_initial, size_initial * size_increase_factor, fract(updated_lifetime));                                                                       
+            new_size = mix(size_initial, size_initial * size_increase_factor, fract(updated_lifetime));
         }
         else
         {

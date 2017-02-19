@@ -2,7 +2,7 @@ uniform mat4 ModelMatrix;
 uniform int skinning_offset;
 uniform int layer;
 
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec3 Position;
 layout(location = 3) in vec4 Data1;
 layout(location = 5) in ivec4 Joint;

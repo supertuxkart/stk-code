@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-/** A simple non-templated base class. It is used to store some enums used in 
+/** A simple non-templated base class. It is used to store some enums used in
  *  templates, the actual header for a shader, and a statis list of all kill
  *  functions (which delete all singletons, and therefore forces a reload of all
  *  shaders).
@@ -301,7 +301,7 @@ public:
      *  \param index Index of the texture.
      *  \param uniform Uniform name.
      */
-    template<typename... T1> 
+    template<typename... T1>
     void assignTextureUnit(GLuint index, const char* uniform, T1... rest)
     {
         glUseProgram(m_program);
@@ -349,7 +349,7 @@ public:
     {
         m_program = glCreateProgram();
         loadAndAttachShader(args...);
-        if (CVS->getGLSLVersion() < 330)
+        if (!CVS->isARBExplicitAttribLocationUsable())
             setAttribute(type);
         glLinkProgram(m_program);
 

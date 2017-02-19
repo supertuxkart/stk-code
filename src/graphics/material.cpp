@@ -76,7 +76,7 @@ Material::Material(const XMLNode *node, bool deprecated)
     init();
 
     bool b = false;
-    
+
     node->get("clampu", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.4 style
     node->get("clampU", &b);  if (b) m_clamp_tex |= UCLAMP; //blender 2.5 style
     b = false;
@@ -745,7 +745,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         ITexture *tex;
         ITexture *glossytex;
         STKTexManager* stm = STKTexManager::getInstance();
-        if (m_gloss_map.size() > 0 && UserConfigParams::m_dynamic_lights)
+        if (m_gloss_map.size() > 0 && CVS->isDefferedEnabled())
         {
             glossytex = stm->getTexture(m_gloss_map, false/*srgb*/,
                 false/*premul_alpha*/, false/*set_material*/,
@@ -886,7 +886,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 
         if (m_normal_map_tex.size() > 0)
         {
-            if (UserConfigParams::m_dynamic_lights)
+            if (CVS->isDefferedEnabled())
             {
                 tex = stm->getTexture(m_normal_map_tex, false/*srgb*/,
                     false/*premul_alpha*/, false/*set_material*/,

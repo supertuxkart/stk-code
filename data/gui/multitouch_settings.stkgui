@@ -3,12 +3,18 @@
     <div x="2%" y="1%" width="96%" height="98%" layout="vertical-row" >
         <header id="title" width="100%" height="fit" text_align="center" word_wrap="true" text="Touch Device Settings" />
 
-        <spacer height="30" width="10" />
+        <spacer height="35" width="10" />
 	
 	<label width="100%" I18N="In the multitouch settings screen" text="General"/>
 
-	<spacer height="15" width="10"/>
-	
+	<div width="75%" height="fit" layout="horizontal-row" >
+	    <label proportion="1" height="100%" text_align="right" I18N="In the multitouch settings screen" text="Device enabled"/>
+	    <div proportion="1" height="fit" layout="horizontal-row" >
+		<spacer width="40" height="100%" />
+                <checkbox id="buttons_enabled"/>
+	    </div>
+	</div>
+
 	<div width="75%" height="fit" layout="horizontal-row" >
 	    <label proportion="1" height="100%" text_align="right" I18N="In the multitouch settings screen" text="Buttons scale"/>
 	    <div proportion="1" height="fit" layout="horizontal-row" >
@@ -16,13 +22,35 @@
 		<gauge id="scale" proportion="1" min_value="50" max_value="150"/>
 	    </div>
 	</div>
+	
+	<label width="100%" I18N="In the multitouch settings screen" text="Accelerometer"/>
     
-	<spacer height="45" width="10"/>
+	<div width="75%" height="fit" layout="horizontal-row" >
+	    <label proportion="1" height="100%" text_align="right" I18N="In the multitouch settings screen" text="Disabled"/>
+	    <div proportion="1" height="fit" layout="horizontal-row" >
+		<spacer width="40" height="100%" />
+                <checkbox id="accelerometer_disabled"/>
+	    </div>
+	</div>
+	
+	<div width="75%" height="fit" layout="horizontal-row" >
+	    <label proportion="1" height="100%" text_align="right" I18N="In the multitouch settings screen" text="Phone"/>
+	    <div proportion="1" height="fit" layout="horizontal-row" >
+		<spacer width="40" height="100%" />
+                <checkbox id="accelerometer_phone"/>
+	    </div>
+	</div>
+	
+	<div width="75%" height="fit" layout="horizontal-row" >
+	    <label proportion="1" height="100%" text_align="right" I18N="In the multitouch settings screen" text="Tablet"/>
+	    <div proportion="1" height="fit" layout="horizontal-row" >
+		<spacer width="40" height="100%" />
+                <checkbox id="accelerometer_tablet"/>
+	    </div>
+	</div>
 	
 	<label width="100%" I18N="In the multitouch settings screen" text="Advanced"/>
 	
-	<spacer height="15" width="10"/>
-
 	<div width="75%" height="fit" layout="horizontal-row" >
 	    <label proportion="1" height="100%" text_align="right" I18N="In the multitouch settings screen" text="Deadzone center"/>
 	    <div proportion="1" height="fit" layout="horizontal-row" >
@@ -31,8 +59,6 @@
 	    </div>
 	</div>
     
-	<spacer height="15" width="10"/>
-
 	<div width="75%" height="fit" layout="horizontal-row" >
 	    <label proportion="1" height="100%" text_align="right" I18N="In the multitouch settings screen" text="Deadzone edge"/>
 	    <div proportion="1" height="fit" layout="horizontal-row" >
@@ -41,12 +67,13 @@
 	    </div>
 	</div>
     
-	<spacer height="45" width="10"/>
+	<spacer height="35" width="10"/>
 
-        <button id="restore" text="Restore defaults" align="center"/>
-	
-	<spacer height="15" width="10"/>
-	
-        <button id="close" text="Apply" align="center"/>
+	<div width="fit" height="fit" layout="horizontal-row" align="center">
+	    <button id="restore" text="Restore defaults"/>
+	    <spacer width="40" height="100%" />
+	    <button id="close" text="Apply"/>
+	</div>
     </div>
+    
 </stkgui>

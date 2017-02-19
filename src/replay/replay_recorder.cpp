@@ -193,7 +193,7 @@ void ReplayRecorder::save()
     for (unsigned int k = 0; k < num_karts; k++)
     {
         if (world->getKart(k)->isGhostKart()) continue;
-        float cur_time = m_transform_events[k][m_count_transforms[k]-1].m_time;
+        float cur_time = world->getKart(k)->getFinishTime();
         if (cur_time < min_time)
             min_time = cur_time;
     }

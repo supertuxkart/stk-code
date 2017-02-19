@@ -79,15 +79,9 @@ void DriveNode::addSuccessor(unsigned int to)
     Vec3 d = m_lower_center - dn_to->m_lower_center;
     m_distance_to_next.push_back(d.length());
 
-    Vec3 diff = dn_to->getCenter() - getCenter();
-
-    core::CMatrix4<float> m;
-    m.buildRotateFromTo(getNormal().toIrrVector(), 
-                        Vec3(0, 1, 0).toIrrVector());
-    core::vector3df diff_rotated;
-    m.rotateVect(diff_rotated, diff.toIrrVector());
-
-    m_angle_to_next.push_back(atan2(diff_rotated.X, diff_rotated.Z));
+    Vec3 loc_pos = btTransform(shortestArcQuat(Vec3(0, 1, 0), getNormal()),
+        getCenter()).inverse()(dn_to->getCenter());
+    m_angle_to_next.push_back(atan2(loc_pos.x(), loc_pos.z()));
 
 }   // addSuccessor
 

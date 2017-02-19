@@ -2,7 +2,7 @@ uniform mat4 ModelViewMatrix;
 uniform vec3 Position;
 uniform vec2 Size;
 
-#if __VERSION__ >= 330
+#ifdef Explicit_Attrib_Location_Usable
 layout(location = 0) in vec2 Corner;
 layout(location = 3) in vec2 Texcoord;
 #else

@@ -89,7 +89,10 @@ GLuint ShaderFilesManager::loadShader(const std::string &file, unsigned type)
         code << "#extension GL_AMD_vertex_shader_layer : enable\n";
 
     if (CVS->isARBExplicitAttribLocationUsable())
+    {
         code << "#extension GL_ARB_explicit_attrib_location : enable\n";
+        code << "#define Explicit_Attrib_Location_Usable\n";
+    }
 
     if (CVS->isAZDOEnabled())
     {

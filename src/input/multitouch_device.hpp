@@ -25,6 +25,10 @@
 #include "input/input_device.hpp"
 #include "IEventReceiver.h"
 
+#ifdef ANDROID
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+#endif
+
 #define NUMBER_OF_MULTI_TOUCHES 10
 
 enum MultitouchButtonType
@@ -77,8 +81,14 @@ private:
     /** The parameter that is used for steering button and determines dead area
      *  at the edge of button */
     float m_deadzone_edge;
+
+#ifdef ANDROID
+    /** Pointer to the Android irrlicht device */
+    CIrrDeviceAndroid* m_android_device;
+#endif
     
     float getSteeringFactor(float value);
+    void updateButtonAxes(MultitouchButton* button, float x, float y);
 
 public:
     /** The array that contains data for all multitouch input events */

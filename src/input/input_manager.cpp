@@ -1129,30 +1129,26 @@ EventPropagation InputManager::input(const SEvent& event)
 
         // Simulate touch event on non-android devices
         #if !defined(ANDROID)
-        if (UserConfigParams::m_multitouch_enabled == true &&
-            (type == EMIE_LMOUSE_PRESSED_DOWN || type == EMIE_LMOUSE_LEFT_UP ||
-             type == EMIE_MOUSE_MOVED))
+        MultitouchDevice* device = m_device_manager->getMultitouchDevice();
+        
+        if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN || 
+            type == EMIE_LMOUSE_LEFT_UP || type == EMIE_MOUSE_MOVED))
         {
-            MultitouchDevice* device = m_device_manager->getMultitouchDevice();
+            device->m_events[0].id = 0;
+            device->m_events[0].x = event.MouseInput.X;
+            device->m_events[0].y = event.MouseInput.Y;
 
-            if (device != NULL)
+            if (type == EMIE_LMOUSE_PRESSED_DOWN)
             {
-                device->m_events[0].id = 0;
-                device->m_events[0].x = event.MouseInput.X;
-                device->m_events[0].y = event.MouseInput.Y;
-
-                if (type == EMIE_LMOUSE_PRESSED_DOWN)
-                {
-                    device->m_events[0].touched = true;
-                }
-                else if (type == EMIE_LMOUSE_LEFT_UP)
-                {
-                    device->m_events[0].touched = false;
-                }
-
-                m_device_manager->updateMultitouchDevice();
-                device->updateDeviceState(0);
+                device->m_events[0].touched = true;
             }
+            else if (type == EMIE_LMOUSE_LEFT_UP)
+            {
+                device->m_events[0].touched = false;
+            }
+
+            m_device_manager->updateMultitouchDevice();
+            device->updateDeviceState(0);
         }
         #endif
 
@@ -1168,6 +1164,32 @@ EventPropagation InputManager::input(const SEvent& event)
                             event data to find out in what direction and
                             how fast.
          */
+    }
+    else if (event.EventType == EET_ACCELEROMETER_EVENT)
+    {
+        MultitouchDevice* device = m_device_manager->getMultitouchDevice();
+        
+        if (device)
+        {
+            for (unsigned int i = 0; i < device->getButtonsCount(); i++)
+            {
+                MultitouchButton* button = device->getButton(i);
+                
+                if (button->type != BUTTON_STEERING)
+                    continue;
+
+                if (UserConfigParams::m_multitouch_accelerometer == 1)
+                {
+                    button->axis_x = -event.AccelerometerEvent.X / 5.0f;
+                    device->handleControls(button);
+                }
+                else if (UserConfigParams::m_multitouch_accelerometer == 2)
+                {
+                    button->axis_x = event.AccelerometerEvent.Y / 5.0f;
+                    device->handleControls(button);                    
+                }
+            }
+        }
     }
 
     // block events in all modes but initial menus (except in text boxes to
