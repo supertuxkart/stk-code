@@ -27,8 +27,10 @@
 
 #include "LinearMath/btTransform.h"
 
-CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo)
-             : AbstractKartAnimation(kart, "CannonAnimation")
+CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
+                                 const Vec3 &start_left, const Vec3 &start_right,
+                                 const Vec3 &end_left,   const Vec3 &end_right   )
+               : AbstractKartAnimation(kart, "CannonAnimation")
 {
     m_curve  = new AnimationBase(ipo);
     m_timer  = ipo->getEndTime();
@@ -39,6 +41,12 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo)
     m_curve->update(0, &m_previous_orig_xyz);
     m_delta = kart->getXYZ() - m_previous_orig_xyz;
 
+    m_delta_rotation =
+        shortestArcQuatNormalize2(start_left - start_right,
+                                  end_left   - end_right  );
+
+    
+
     // Now the delta vector needs to be rotated back, so that it will point
     // in the right direction when it is (in update) rotated to be the same
     // as the kart's heading. To estimate the angle at the start, use the
@@ -46,11 +54,6 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo)
     const float dt = 0.1f;
     Vec3 xyz1;
     m_curve->update(dt, &xyz1);
-    core::vector3df rot = (m_previous_orig_xyz-xyz1).toIrrVector()
-                                                    .getHorizontalAngle();
-    btQuaternion q(Vec3(0,1,0),rot.Y*DEGREE_TO_RAD);
-    btMatrix3x3 m(q);
-    m_delta = m * m_delta;
 
     // The previous call to m_curve->update will set the internal timer
     // of the curve to dt. Reset it to 0 to make sure the timer is in
@@ -104,7 +107,11 @@ void CannonAnimation::update(float dt)
     }
     m_previous_orig_xyz = xyz;
 
-    Vec3 rotated_delta = m_kart->getTrans().getBasis()*m_delta;
+    btQuaternion zero(0, 0, 0, 1);
+    // The timer count backwards, so the fraction goes from 1 to 0
+    float f = m_timer / m_curve->getAnimationDuration();
+    btQuaternion current_rot = m_delta_rotation.slerp(zero, f);
+    Vec3 rotated_delta = quatRotate(current_rot, m_delta);
     m_kart->setXYZ(xyz + rotated_delta);
 
     AbstractKartAnimation::update(dt);

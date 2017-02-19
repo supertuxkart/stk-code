@@ -22,14 +22,17 @@
 #include "karts/abstract_kart_animation.hpp"
 #include "utils/vec3.hpp"
 
-/** This animation shoots the kart to a specified point on the track.
- *
- * \ingroup karts
- */
+#include "LinearMath/btQuaternion.h"
 
 class AbstractKart;
 class AnimationBase;
 class Ipo;
+
+
+/** This animation shoots the kart to a specified point on the track.
+ *
+ * \ingroup karts
+ */
 
 class CannonAnimation: public AbstractKartAnimation
 {
@@ -40,6 +43,10 @@ protected:
      *  kart position (so the kart moves relative to the curve). */
     Vec3           m_delta;
 
+    /** The amount of rotation to be applied to m_delta so that it keeps
+     *  being on the 'right' side of the curve. */
+    btQuaternion m_delta_rotation;
+
     /** Stores the curve interpolation for the cannon. */
     AnimationBase *m_curve;
 
@@ -48,7 +55,9 @@ protected:
     Vec3           m_previous_orig_xyz;
 
 public:
-             CannonAnimation(AbstractKart *kart, Ipo *ipo);
+             CannonAnimation(AbstractKart *kart, Ipo *ipo,
+                             const Vec3 &start_left, const Vec3 &start_right,
+                             const Vec3 &end_left, const Vec3 &end_right);
     virtual ~CannonAnimation();
     virtual void  update(float dt);
 

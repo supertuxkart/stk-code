@@ -363,6 +363,38 @@ float Ipo::IpoData::getCubicBezier(float t, float p0, float p1,
     return ((a*t+b)*t+c)*t+p0;
 }   // bezier
 
+// ----------------------------------------------------------------------------
+/** Determines the rotation between the start and end of this curve.
+ */
+btQuaternion Ipo::IpoData::getOverallRotation()
+{
+    // Vectors at start and end of curve
+    Vec3 start, end;
+
+    if (m_interpolation == IP_BEZIER)
+    {
+        // In case of Bezier use the handles to get initial and final
+        // orientation
+        start =  m_handle2[0]     -  m_handle1[0];
+        end   = *m_handle2.back() - *m_handle1.back();
+    }
+    else   // Const or linear
+    {
+        // In this case determine the start vector by selecting using the
+        // beginning and a second point a bit further on the curve
+        start.setX(get(m_start_time + 0.1f, 0, 0) - m_points[0].getX());
+        start.setY(get(m_start_time + 0.1f, 1, 0) - m_points[0].getY());
+        start.setZ(get(m_start_time + 0.1f, 2, 0) - m_points[0].getZ());
+        int n = m_points.size() - 2;
+        end.  setX(get(m_end_time   - 0.1f, 0, n) - m_points[n].getX());
+        end.  setY(get(m_end_time   - 0.1f, 1, n) - m_points[n].getY());
+        end.  setZ(get(m_end_time   - 0.1f, 2, n) - m_points[n].getZ());
+    }
+
+    btQuaternion q = shortestArcQuatNormalize2(start, end);
+    return q;
+}   // IpData::getOverallRoation
+
 // ============================================================================
 /** The Ipo constructor. Ipos can share the actual data to interpolate, which
  *  is stored in a separate IpoData object, see Ipo(const Ipo *ipo)
@@ -499,3 +531,19 @@ float Ipo::get(float time, unsigned int index) const
     assert(!std::isnan(rval));
     return rval;
 }   // get
+
+// ----------------------------------------------------------------------------
+/** Return the quaternion that rotates an object form the start of the IPO
+ *  to the end.
+ */
+btQuaternion Ipo::getOverallRotation()
+{
+    // In case of a single point only:
+    if (m_next_n == 0)
+    {
+        // Return a unit quaternion
+        btQuaternion q(0, 0, 0, 1);
+        return q;
+    }
+    return m_ipo_data->getOverallRotation();
+}   // getOverallRoation

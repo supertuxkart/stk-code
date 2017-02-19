@@ -35,13 +35,14 @@
 CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
            : CheckLine(node, index)
 {
-    core::vector3df p1, p2;
-    if(!node.get("target-p1", &p1) || !node.get("target-p2", &p2))
+    if( !node.get("target-p1", &m_target_left ) || 
+        !node.get("target-p2", &m_target_right)    )
         Log::fatal("CheckCannon", "No target line specified.");
-    m_target.setLine(p1, p2);
+
     m_curve = new Ipo(*(node.getNode("curve")),
                       /*fps*/25,
                       /*reverse*/race_manager->getReverseTrack());
+
 #if defined(DEBUG) && !defined(SERVER_ONLY)
     if(UserConfigParams::m_track_debug)
     {
@@ -73,9 +74,9 @@ CheckCannon::~CheckCannon()
  */
 void CheckCannon::trigger(unsigned int kart_index)
 {
-    Vec3 target(m_target.getMiddle());
     AbstractKart *kart = World::getWorld()->getKart(kart_index);
     if(kart->getKartAnimation()) return;
 
-    new CannonAnimation(kart, m_curve->clone());
+    new CannonAnimation(kart, m_curve->clone(), getLeftPoint(), getRightPoint(),
+                        m_target_left, m_target_right);
 }   // CheckCannon

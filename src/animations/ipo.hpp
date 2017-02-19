@@ -81,10 +81,10 @@ private:
     private:
         float  getCubicBezier(float t, float p0, float p1,
                               float p2, float p3) const;
-          void approximateBezier(float t0, float t1,
-                                 const Vec3 &p0, const Vec3 &p1,
-                                 const Vec3 &h0, const Vec3 &h2,
-                                 unsigned int rec_level = 0);
+        void approximateBezier(float t0, float t1,
+                               const Vec3 &p0, const Vec3 &p1,
+                               const Vec3 &h0, const Vec3 &h2,
+                               unsigned int rec_level = 0);
     public:
                IpoData(const XMLNode &curve, float fps, bool reverse);
         void   readCurve(const XMLNode &node, bool reverse);
@@ -94,6 +94,7 @@ private:
                                  const Vec3 &h1, const Vec3 &h2);
         float  adjustTime(float time);
         float  get(float time, unsigned int index, unsigned int n);
+        btQuaternion getOverallRotation();
 
     };   // IpoData
     // ------------------------------------------------------------------------
@@ -123,7 +124,7 @@ public:
     float    get(float time, unsigned int index) const;
     void     setInitialTransform(const Vec3 &xyz, const Vec3 &hpr);
     void     reset();
-
+    btQuaternion getOverallRotation();
     // ------------------------------------------------------------------------
     /** Returns the raw data points for this IPO. */
     const std::vector<Vec3>& getPoints() const { return m_ipo_data->m_points; }

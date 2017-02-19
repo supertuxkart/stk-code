@@ -37,7 +37,8 @@ class CheckCannon : public CheckLine
 {
 private:
     /** The target point the kart will fly to. */
-    core::line3df   m_target;
+    Vec3 m_target_left;
+    Vec3 m_target_right;
 
     /** Stores the cannon curve data. */
     Ipo *m_curve;
