@@ -23,6 +23,8 @@
 #include "tracks/drive_node.hpp"
 #include "utils/cpp2011.hpp"
 
+#include <line3d.h>
+
 /**
   * \ingroup tracks
   */

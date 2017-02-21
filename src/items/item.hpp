@@ -30,7 +30,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
-#include <line2d.h>
+#include <line3d.h>
 
 class AbstractKart;
 class Item;

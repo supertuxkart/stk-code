@@ -20,7 +20,6 @@
 
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
-#include "matrix4.h"
 #include "tracks/drive_graph.hpp"
 #include "utils/log.hpp"
 
