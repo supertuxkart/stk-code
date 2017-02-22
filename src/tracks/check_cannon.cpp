@@ -21,7 +21,9 @@
 #include "animations/animation_base.hpp"
 #include "animations/ipo.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/show_curve.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/cannon_animation.hpp"
@@ -51,7 +53,41 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
         for(unsigned int i=0; i<p.size(); i++)
             m_show_curve->addPoint(p[i]);
     }
+    if (UserConfigParams::m_check_debug)
+    {
+        video::SMaterial material;
+        material.setFlag(video::EMF_BACK_FACE_CULLING, false);
+        material.setFlag(video::EMF_LIGHTING, false);
+        material.MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
+        scene::IMesh *mesh = irr_driver->createQuadMesh(&material,
+            /*create mesh*/true);
+        scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
+
+        assert(buffer->getVertexType() == video::EVT_STANDARD);
+        irr::video::S3DVertex* vertices
+            = (video::S3DVertex*)buffer->getVertices();
+        Vec3 height(0, 3, 0);
+        vertices[0].Pos = m_target_left.toIrrVector();
+        vertices[1].Pos = m_target_right.toIrrVector();
+        vertices[2].Pos = Vec3(m_target_right + height).toIrrVector();
+        vertices[3].Pos = Vec3(m_target_left  + height).toIrrVector();
+        for (unsigned int i = 0; i<4; i++)
+        {
+            vertices[i].Color = m_active_at_reset
+                ? video::SColor(128, 255, 0, 0)
+                : video::SColor(128, 128, 128, 128);
+        }
+        buffer->recalculateBoundingBox();
+        buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(128, 255, 105, 180)));
+        buffer->getMaterial().setTexture(1, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().setTexture(2, STKTexManager::getInstance()->getUnicolorTexture(video::SColor(0, 0, 0, 0)));
+        buffer->getMaterial().BackfaceCulling = false;
+        //mesh->setBoundingBox(buffer->getBoundingBox());
+        m_debug_target_node = irr_driver->addMesh(mesh, "checkdebug");
+        mesh->drop();
+    }
 #endif   // DEBUG AND !SERVER_ONLY
+
 }   // CheckCannon
 
 // ----------------------------------------------------------------------------
@@ -66,6 +102,26 @@ CheckCannon::~CheckCannon()
         delete m_show_curve;
 #endif
 }   // ~CheckCannon
+
+// ----------------------------------------------------------------------------
+void CheckCannon::changeDebugColor(bool is_active)
+{
+#if defined(DEBUG) && !defined(SERVER_ONLY)
+    CheckLine::changeDebugColor(is_active);
+
+    scene::IMesh *mesh = m_debug_target_node->getMesh();
+    scene::IMeshBuffer *buffer = mesh->getMeshBuffer(0);
+    irr::video::S3DVertex* vertices
+        = (video::S3DVertex*)buffer->getVertices();
+    video::SColor color = is_active ? video::SColor(192, 255, 0, 0)
+        : video::SColor(192, 128, 128, 128);
+    for (unsigned int i = 0; i<4; i++)
+    {
+        vertices[i].Color = color;
+    }
+    buffer->getMaterial().setTexture(0, STKTexManager::getInstance()->getUnicolorTexture(color));
+#endif
+}   // changeDebugColor
 
 // ----------------------------------------------------------------------------
 /** Called when the check line is triggered. This function  creates a cannon
