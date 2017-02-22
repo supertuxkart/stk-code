@@ -863,6 +863,10 @@ void ShaderBasedRenderer::render(float dt)
     irr_driver->getVideoDriver()->setViewPort(core::recti(0, 0,
         irr_driver->getActualScreenSize().Width,
         irr_driver->getActualScreenSize().Height));
+        
+    m_current_screen_size = core::vector2df(
+                                    irr_driver->getActualScreenSize().Width, 
+                                    irr_driver->getActualScreenSize().Height);
     
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
