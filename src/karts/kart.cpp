@@ -2557,8 +2557,16 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
                          ->isFogEnabled() );
     }
 #ifndef SERVER_ONLY
-    if (!CVS->supportsShadows() && 
-        m_kart_properties->getShadowTexture() != NULL)
+    bool create_shadow = m_kart_properties->getShadowTexture() != NULL &&
+                         !CVS->supportsShadows();
+                         
+#ifdef USE_GLES2
+    // Disable kart shadow for legacy pipeline in GLES renderer because it's 
+    // broken
+    create_shadow = create_shadow && CVS->isGLSL();
+#endif
+
+    if (create_shadow)
     {
         m_shadow = new Shadow(m_kart_properties.get(), m_node,
                               -m_kart_model->getLowestPoint());
