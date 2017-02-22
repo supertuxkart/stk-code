@@ -41,6 +41,7 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
 {
     m_race_gui = race_gui;
     m_minimap_bottom = 0;
+    m_gui_action = false;
     m_directionnal_wheel_tex = NULL;
     m_pause_tex = NULL;
     m_nitro_tex = NULL;
@@ -147,6 +148,7 @@ void RaceGUIMultitouch::initMultitouchSteering()
                                                   "android/blur_bg_button.png");
     m_bg_button_focus_tex = irr_driver->getTexture(FileManager::GUI, 
                                             "android/blur_bg_button_focus.png");
+    m_gui_action_tex = irr_driver->getTexture(FileManager::GUI,"challenge.png");
 
 } // initMultitouchSteering
 
@@ -209,8 +211,12 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
             case MultitouchButtonType::BUTTON_FIRE:
             {
                 const Powerup* powerup = kart->getPowerup();
-                if (powerup->getType() != PowerupManager::POWERUP_NOTHING &&
-                    !kart->hasFinishedRace())
+                if (m_gui_action == true)
+                {
+                    btn_texture = m_gui_action_tex;
+                }
+                else if (powerup->getType() != PowerupManager::POWERUP_NOTHING
+                         && !kart->hasFinishedRace())
                 {
                     btn_texture = powerup->getIcon()->getTexture();
                 }
@@ -271,7 +277,8 @@ void RaceGUIMultitouch::drawMultitouchSteering(const AbstractKart* kart,
                                             core::vector2df(scale, scale));
             }
             else if (button->type == MultitouchButtonType::BUTTON_FIRE &&
-                     kart->getPowerup()->getNum() > 1)
+                     kart->getPowerup()->getNum() > 1 && 
+                     m_gui_action == false)
             {
                 gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
                 core::rect<s32> pos((int)(button->x),

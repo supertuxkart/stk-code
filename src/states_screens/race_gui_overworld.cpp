@@ -590,6 +590,11 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                        true, true /* vcenter */, NULL);
         }
     }
+    
+    if (m_multitouch_gui != NULL)
+    {
+        m_multitouch_gui->setGuiAction(m_close_to_a_challenge);
+    }
 #endif   // SERVER_ONLY
 }   // drawGlobalMiniMap
 
