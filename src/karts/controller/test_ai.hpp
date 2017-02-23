@@ -49,6 +49,8 @@
 #include "tracks/drive_node.hpp"
 #include "utils/random_generator.hpp"
 
+#include <line3d.h>
+
 #ifdef AI_DEBUG
   class ShowCurve;
 

@@ -35,6 +35,7 @@ private:
     RaceGUIBase* m_race_gui;
     MultitouchDevice* m_device;
     
+    bool m_gui_action;
     unsigned int m_minimap_bottom;
     
     video::ITexture* m_directionnal_wheel_tex;
@@ -46,6 +47,7 @@ private:
     video::ITexture* m_drift_tex;
     video::ITexture* m_bg_button_tex;
     video::ITexture* m_bg_button_focus_tex;
+    video::ITexture* m_gui_action_tex;
 
     void initMultitouchSteering();
     void closeMultitouchSteering();
@@ -59,6 +61,7 @@ public:
                                 const core::vector2df &scaling);
                                 
     unsigned int getMinimapBottom() {return m_minimap_bottom;}
+    void setGuiAction(bool enabled = true) {m_gui_action = enabled;}
                                  
 };   // RaceGUIMultitouch
 
