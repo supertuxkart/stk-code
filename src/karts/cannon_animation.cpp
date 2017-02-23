@@ -41,9 +41,9 @@ CannonAnimation::CannonAnimation(AbstractKart *kart, Ipo *ipo,
     m_curve->update(0, &m_previous_orig_xyz);
     m_delta = kart->getXYZ() - m_previous_orig_xyz;
 
-    m_delta_rotation =
-        shortestArcQuatNormalize2(start_left - start_right,
-                                  end_left   - end_right  );
+    Vec3 v1 = start_left - start_right;
+    Vec3 v2 = end_left   - end_right;
+    m_delta_rotation = shortestArcQuatNormalize2(v1, v2 );
 
     
 
