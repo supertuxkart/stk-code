@@ -1225,7 +1225,19 @@ void Kart::update(float dt)
         }
     }
 
-    // Update the position and other data taken from the physics
+    // This is to avoid a rescue immediately after an explosion
+    const bool has_animation_before = m_kart_animation != NULL;
+    // A kart animation can change the xyz position. This needs to be done
+    // before updating the graphical position (which is done in
+    // Moveable::update() ), otherwise 'stuttering' can happen (caused by
+    // graphical and physical position not being the same).
+    if (has_animation_before)
+    {
+        m_kart_animation->update(dt);
+    }
+    // Update the position and other data taken from the physics (or
+    // an animation which calls setXYZ(), which also updates the kart
+    // physical position).
     Moveable::update(dt);
 
     Vec3 front(0, 0, getKartLength()*0.5f);
@@ -1309,9 +1321,6 @@ void Kart::update(float dt)
 
     // Used to prevent creating a rescue animation after an explosion animation
     // got deleted
-    const bool has_animation_before = m_kart_animation!= NULL;
-    if(has_animation_before)
-        m_kart_animation->update(dt);
 
     m_attachment->update(dt);
 
